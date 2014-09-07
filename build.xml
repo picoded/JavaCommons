@@ -1,0 +1,90 @@
+<project name="picoded servlet commons" default="source">
+	<property name="ant.build.javac.source" value="1.5"/>
+	<property name="ant.build.javac.target" value="1.5"/>
+	<property name='lib.dir' value='./lib' />
+	
+	<!--
+	<presetdef name="javac">
+    	<javac includeantruntime="false" />
+  	</presetdef>
+  	-->
+	
+	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
+		<classpath>
+			<pathelement path="classes" />
+			<fileset dir="./lib" includes="**/*.jar" />
+		</classpath>
+  	</taskdef>
+  	
+	<!-- - - - - - - - - - - - - - - - - -
+	 target: clean
+	 - - - - - - - - - - - - - - - - - -->
+	<target name="clean">
+		<delete dir="classes" failonerror="false"/>
+		<mkdir dir="classes"/>
+		
+		<delete dir="test-reports" failonerror="false"/>
+		<mkdir dir="test-reports"/>
+		
+		<delete dir="docs/html" failonerror="false"/>
+		<mkdir dir="docs/html"/>
+	</target>
+	
+	<!-- - - - - - - - - - - - - - - - - -
+	 target: build
+	 - - - - - - - - - - - - - - - - - -->
+	<target name="build">
+		<mkdir dir="classes"/>
+		<path id="lib.path.ref">
+			<fileset dir="./lib" includes="**/*.jar" />
+		</path>
+		<javac destdir="classes" classpathref="lib.path.ref" includeantruntime="false">
+			<src path="picoded"/>
+			<src path="src"/>
+		</javac>
+	</target>
+	
+	<!-- - - - - - - - - - - - - - - - - -
+	 target: source
+	 - - - - - - - - - - - - - - - - - -->
+	<target name="source">
+		<mkdir dir="classes"/>
+		<path id="lib.path.ref">
+			<fileset dir="./lib" includes="**/*.jar" />
+		</path>
+		<javac destdir="classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" includeantruntime="false">
+			<compilerarg value="-Xlint:unchecked"/>
+			<src path="picoded"/>
+			<src path="src"/>
+		</javac>
+	</target>
+	
+	<!-- - - - - - - - - - - - - - - - - -
+	 target: clean-build
+	 - - - - - - - - - - - - - - - - - -->
+	<target name="clean-build">
+		<antcall target="clean"/>
+		<antcall target="source"/>
+	</target>
+	
+	<!-- - - - - - - - - - - - - - - - - -
+	 target: make-tests
+	 - - - - - - - - - - - - - - - - - -->
+	<target name="make-tests" depends="source">
+		<delete dir="test-reports" failonerror="false"/>
+		<mkdir dir="test-reports"/>
+		
+		<path id="lib.path.ref">
+			<fileset dir="./lib" includes="**/*.jar" />
+		</path>
+		<javac srcdir="picodedTests" destdir="classes" classpathref="lib.path.ref"/>
+		
+		<!-- Some over-riding decleration for jUnitTest -->
+		<path id="tests.classpath">
+			<pathelement path="classes" />
+			<fileset dir="./lib" includes="**/*.jar" />
+		</path>
+	</target>
+	
+	
+</project>

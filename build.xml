@@ -37,26 +37,32 @@
 	 target: build
 	 - - - - - - - - - - - - - - - - - -->
 	<target name="build">
-		<mkdir dir="bin"/>
+		<mkdir dir="bin/build"/>
+		<mkdir dir="bin/classes"/>
 		<path id="lib.path.ref">
 			<fileset dir="./lib" includes="**/*.jar" />
 		</path>
-		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
+		<javac destdir="bin/classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false" bootclasspath="./rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:all"/>
 			<src path="src/picoded"/>
 		</javac>
+		<jar destfile="bin/build/picodedJavaCommons.jar"
+			  basedir="./">
+			<fileset dir="./bin/classes" includes="**/*.class" />
+			<fileset dir="./lib" includes="**/*.jar" />
+		</jar>
 	</target>
 	
 	<!-- - - - - - - - - - - - - - - - - -
 	 target: source
 	 - - - - - - - - - - - - - - - - - -->
 	<target name="source">
-		<mkdir dir="bin"/>
+		<mkdir dir="bin/classes"/>
 		<path id="lib.path.ref">
 			<fileset dir="./lib" includes="**/*.jar" />
 		</path>
-		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
+		<javac destdir="bin/classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false" bootclasspath="./rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:all"/>
 			<src path="src/picoded"/>
@@ -67,11 +73,11 @@
 	 target: picodedX
 	 - - - - - - - - - - - - - - - - - -->
 	<target name="picodedX">
-		<mkdir dir="bin"/>
+		<mkdir dir="bin/classes"/>
 		<path id="lib.path.ref">
 			<fileset dir="./lib" includes="**/*.jar" />
 		</path>
-		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
+		<javac destdir="bin/classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false" bootclasspath="./rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:unchecked"/>
 			<src path="src/picodedX"/>
@@ -82,11 +88,11 @@
 	 target: picodedTests
 	 - - - - - - - - - - - - - - - - - -->
 	<target name="picodedTests">
-		<mkdir dir="bin"/>
+		<mkdir dir="bin/classes"/>
 		<path id="lib.path.ref">
 			<fileset dir="./lib" includes="**/*.jar" />
 		</path>
-		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
+		<javac destdir="bin/classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false" bootclasspath="./rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:all"/>
 			<src path="src/picoded"/>

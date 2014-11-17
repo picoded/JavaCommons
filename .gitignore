@@ -1,2 +1,4 @@
 #exclude compiled files
-classes/*
+bin/*
+test-reports/*
+html-docs/*

@@ -12,6 +12,8 @@ import java.lang.IllegalArgumentException;
 import picoded.socketServer.RequestListener;
 
 ///
+/// @version 0.1 Experimental
+///
 /// Provides a socket thread pool
 ///
 public class SocketThreadPool implements Runnable{

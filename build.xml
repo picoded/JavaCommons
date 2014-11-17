@@ -11,7 +11,7 @@
 	
 	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
 		<classpath>
-			<pathelement path="classes" />
+			<pathelement path="bin" />
 			<fileset dir="./lib" includes="**/*.jar" />
 		</classpath>
   	</taskdef>
@@ -20,27 +20,29 @@
 	 target: clean
 	 - - - - - - - - - - - - - - - - - -->
 	<target name="clean">
-		<delete dir="classes" failonerror="false"/>
-		<mkdir dir="classes"/>
-		
+		<delete dir="bin" failonerror="false"/>
 		<delete dir="test-reports" failonerror="false"/>
-		<mkdir dir="test-reports"/>
+		<delete dir="html-docs" failonerror="false"/>
 		
-		<delete dir="docs/html" failonerror="false"/>
-		<mkdir dir="docs/html"/>
+		<mkdir dir="bin"/>
+		
+		<!--
+		<mkdir dir="test-reports"/>
+		<mkdir dir="html-docs"/>
+		-->
 	</target>
 	
 	<!-- - - - - - - - - - - - - - - - - -
 	 target: build
 	 - - - - - - - - - - - - - - - - - -->
 	<target name="build">
-		<mkdir dir="classes"/>
+		<mkdir dir="bin"/>
 		<path id="lib.path.ref">
 			<fileset dir="./lib" includes="**/*.jar" />
 		</path>
-		<javac destdir="classes" classpathref="lib.path.ref" includeantruntime="false">
-			<src path="picoded"/>
-			<src path="src"/>
+		<javac destdir="bin" classpathref="lib.path.ref" includeantruntime="false">
+			<compilerarg value="-Xlint:unchecked"/>
+			<src path="src/picoded"/>
 		</javac>
 	</target>
 	
@@ -48,42 +50,57 @@
 	 target: source
 	 - - - - - - - - - - - - - - - - - -->
 	<target name="source">
-		<mkdir dir="classes"/>
+		<mkdir dir="bin"/>
 		<path id="lib.path.ref">
 			<fileset dir="./lib" includes="**/*.jar" />
 		</path>
-		<javac destdir="classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" includeantruntime="false">
+		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" includeantruntime="false">
 			<compilerarg value="-Xlint:unchecked"/>
-			<src path="picoded"/>
-			<src path="src"/>
+			<src path="src/picoded"/>
 		</javac>
 	</target>
 	
 	<!-- - - - - - - - - - - - - - - - - -
-	 target: clean-build
+	 target: lint
 	 - - - - - - - - - - - - - - - - - -->
-	<target name="clean-build">
-		<antcall target="clean"/>
-		<antcall target="source"/>
-	</target>
-	
-	<!-- - - - - - - - - - - - - - - - - -
-	 target: make-tests
-	 - - - - - - - - - - - - - - - - - -->
-	<target name="make-tests" depends="source">
-		<delete dir="test-reports" failonerror="false"/>
-		<mkdir dir="test-reports"/>
-		
+	<target name="lint">
+		<mkdir dir="bin"/>
 		<path id="lib.path.ref">
 			<fileset dir="./lib" includes="**/*.jar" />
 		</path>
-		<javac srcdir="picodedTests" destdir="classes" classpathref="lib.path.ref"/>
-		
-		<!-- Some over-riding decleration for jUnitTest -->
-		<path id="tests.classpath">
-			<pathelement path="classes" />
+		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" includeantruntime="false">
+			<compilerarg value="-Xlint:all"/>
+			<src path="src/picoded"/>
+		</javac>
+	</target>
+	
+	<!-- - - - - - - - - - - - - - - - - -
+	 target: picodedX
+	 - - - - - - - - - - - - - - - - - -->
+	<target name="picodedX">
+		<mkdir dir="bin"/>
+		<path id="lib.path.ref">
 			<fileset dir="./lib" includes="**/*.jar" />
 		</path>
+		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" includeantruntime="false">
+			<compilerarg value="-Xlint:unchecked"/>
+			<src path="src/picodedX"/>
+		</javac>
+	</target>
+	
+	<!-- - - - - - - - - - - - - - - - - -
+	 target: picodedTests
+	 - - - - - - - - - - - - - - - - - -->
+	<target name="picodedTests">
+		<mkdir dir="bin"/>
+		<path id="lib.path.ref">
+			<fileset dir="./lib" includes="**/*.jar" />
+		</path>
+		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" includeantruntime="false">
+			<compilerarg value="-Xlint:unchecked"/>
+			<src path="src/picoded"/>
+			<src path="src/picodedTests"/>
+		</javac>
 	</target>
 	
 	

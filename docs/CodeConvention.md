@@ -6,5 +6,7 @@
 + Code Documentation: Every public function must have its respective documentation. (Markdown preferred, but not enforced).
 + dOxygen documentation should be enclosed in "///" blocks
 + Function / Variables without documentation must have self-descriptive names.
-+ Aim for 0 build warnings.
-+ All required files are needed to be inside the repository. Except for Java 7 JDK/JRE files.
++ Aim for 0 build warnings. View warnings using ant lint
++ All required files are needed to be inside the repository. Except for Java 7 JDK/JRE files, and dOxygen build files.
++ picodedX is reserved for experimental, and not fully formalized / tested classes.
++ picodedTests is for test cases, and should follow the same class structure as picoded

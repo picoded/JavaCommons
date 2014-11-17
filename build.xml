@@ -1,6 +1,7 @@
 <project name="picoded servlet commons" default="source">
 	<property name="ant.build.javac.source" value="1.5"/>
 	<property name="ant.build.javac.target" value="1.5"/>
+	
 	<property name='lib.dir' value='./lib' />
 	
 	<!--
@@ -40,8 +41,9 @@
 		<path id="lib.path.ref">
 			<fileset dir="./lib" includes="**/*.jar" />
 		</path>
-		<javac destdir="bin" classpathref="lib.path.ref" includeantruntime="false">
-			<compilerarg value="-Xlint:unchecked"/>
+		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
+				 includeantruntime="false" bootclasspath="./rt-stubs/java-rt-jar-stubs-1.5.0.jar">
+			<compilerarg value="-Xlint:all"/>
 			<src path="src/picoded"/>
 		</javac>
 	</target>
@@ -54,21 +56,8 @@
 		<path id="lib.path.ref">
 			<fileset dir="./lib" includes="**/*.jar" />
 		</path>
-		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" includeantruntime="false">
-			<compilerarg value="-Xlint:unchecked"/>
-			<src path="src/picoded"/>
-		</javac>
-	</target>
-	
-	<!-- - - - - - - - - - - - - - - - - -
-	 target: lint
-	 - - - - - - - - - - - - - - - - - -->
-	<target name="lint">
-		<mkdir dir="bin"/>
-		<path id="lib.path.ref">
-			<fileset dir="./lib" includes="**/*.jar" />
-		</path>
-		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" includeantruntime="false">
+		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
+				 includeantruntime="false" bootclasspath="./rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:all"/>
 			<src path="src/picoded"/>
 		</javac>
@@ -82,7 +71,8 @@
 		<path id="lib.path.ref">
 			<fileset dir="./lib" includes="**/*.jar" />
 		</path>
-		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" includeantruntime="false">
+		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
+				 includeantruntime="false" bootclasspath="./rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:unchecked"/>
 			<src path="src/picodedX"/>
 		</javac>
@@ -97,7 +87,7 @@
 			<fileset dir="./lib" includes="**/*.jar" />
 		</path>
 		<javac destdir="bin" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" includeantruntime="false">
-			<compilerarg value="-Xlint:unchecked"/>
+			<compilerarg value="-Xlint:all"/>
 			<src path="src/picoded"/>
 			<src path="src/picodedTests"/>
 		</javac>

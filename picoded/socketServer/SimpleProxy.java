@@ -16,9 +16,6 @@ import java.net.UnknownHostException;
 
 import picoded.socketServer.RequestListener;
 
-///
-/// @version 0.1 Experimental
-///
 /// Simple proxy class, that just relays the connection to the target ip:port, via TCP?
 /// 
 public class SimpleProxy extends RequestListener {

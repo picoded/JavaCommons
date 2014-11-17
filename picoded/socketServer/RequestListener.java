@@ -10,9 +10,6 @@ import java.io.BufferedReader;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-///
-/// @version 0.1 Experimental
-///
 /// Base class for creating a socket listener.
 ///
 /// This primarily performs a System.out for the input stream till it is terminated, via a requestEvent function.

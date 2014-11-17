@@ -3,7 +3,13 @@ package picoded.struct;
 import java.util.HashMap;
 
 /// Case Insensitive HashMap, useful for various things (like Oracle/mysql compatibility)
-public abstract class CaseInsensitiveHashMap<K extends String,V>  extends HashMap<K,V> {
+/// Normalizes, stores, and retrives all keys in lowercase.
+///
+/// As this class extends HashMap directly, several of its common functionalities are inherited
+public class CaseInsensitiveHashMap<K extends String,V>  extends HashMap<K,V> {
+	
+	/// Java serialversion uid: http://stackoverflow.com/questions/285793/what-is-a-serialversionuid-and-why-should-i-use-it
+	private static final long serialVersionUID = 42L;
 	
 	@Override @SuppressWarnings("unchecked")
 	public V put(K key, V value) {

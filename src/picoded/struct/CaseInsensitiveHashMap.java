@@ -11,6 +11,11 @@ public class CaseInsensitiveHashMap<K extends String,V>  extends HashMap<K,V> {
 	/// Java serialversion uid: http://stackoverflow.com/questions/285793/what-is-a-serialversionuid-and-why-should-i-use-it
 	private static final long serialVersionUID = 42L;
 	
+	/// Associates the specified value with the specified key in this map.
+	/// If the map previously contained a mapping for the key, the old value is replaced.
+	///
+	/// @param   key     key with which the specified value is to be associated
+	/// @param   value   value to be associated with the specified key
 	@Override @SuppressWarnings("unchecked")
 	public V put(K key, V value) {
 		return super.put( (K)(key.toString().toLowerCase()), value);

@@ -24,6 +24,10 @@ public class CaseInsensitiveHashMap_test {
 		
 	}
 	
+	/// Test the following functions
+	///
+	/// + CaseInsensitiveHashMap.put
+	/// + CaseInsensitiveHashMap.get
 	@Test
 	public void basicPutAndGet() {
 		tObj.put("TEST", "a");

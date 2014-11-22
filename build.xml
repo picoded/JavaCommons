@@ -27,6 +27,9 @@
 		
 		<mkdir dir="bin"/>
 		
+		<delete dir="test-files/tmp" failonerror="false"/>
+		<mkdir dir="test-files/tmp"/>
+		
 		<!--
 		<mkdir dir="test-reports"/>
 		<mkdir dir="html-docs"/>
@@ -88,6 +91,9 @@
 	 target: picodedTests
 	 - - - - - - - - - - - - - - - - - -->
 	<target name="picodedTests">
+		<delete dir="test-files/tmp" failonerror="false"/>
+		<mkdir dir="test-files/tmp"/>
+		
 		<mkdir dir="bin/classes"/>
 		<path id="lib.path.ref">
 			<fileset dir="./lib" includes="**/*.jar" />

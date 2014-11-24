@@ -2,3 +2,4 @@
 bin/*
 test-reports/*
 html-docs/*
+test-files/tmp/*

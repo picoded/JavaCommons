@@ -1,4 +1,12 @@
-#exclude compiled files
+#
+# exclude common file types
+#
+*.swp
+*._*
+
+#
+# Exclude built / temporary flis
+#
 bin/*
 test-reports/*
 html-docs/*

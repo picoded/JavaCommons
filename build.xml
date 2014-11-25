@@ -1,14 +1,26 @@
-<project name="picoded servlet commons" default="source">
+<project name="picoded.JavaCommons" default="source">
 	<property name="ant.build.javac.source" value="1.5"/>
 	<property name="ant.build.javac.target" value="1.5"/>
 	
-	<property name='lib.dir' value='./lib' />
+	<property name='lib.dir' value='./bin/lib' />
 	
-	<!--
+	<!-- **************************************************
+	The following lists the target sets supported by ant
+	
+	+ clean
+	+ compile-lib
+	+ compile-src
+	+ compile-srcX
+	+ compile-tests
+	+ compile
+	+ build
+	
+	************************************************** -->
+	
+	<!-- Dummy codes for future refence (to use?)
 	<presetdef name="javac">
     	<javac includeantruntime="false" />
   	</presetdef>
-  	-->
 	
 	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
 		<classpath>
@@ -16,94 +28,83 @@
 			<fileset dir="./lib" includes="**/*.jar" />
 		</classpath>
   	</taskdef>
+	
+	<antcall target="doSomethingElse">
+		<param name="param1" value="value"/>
+	</antcall>
+  	-->
   	
-	<!-- - - - - - - - - - - - - - - - - -
-	 target: clean
-	 - - - - - - - - - - - - - - - - - -->
 	<target name="clean">
-		<delete dir="bin" failonerror="false"/>
 		<delete dir="test-reports" failonerror="false"/>
 		<delete dir="html-docs" failonerror="false"/>
 		
+		<delete dir="bin" failonerror="false"/>
 		<mkdir dir="bin"/>
 		
 		<delete dir="test-files/tmp" failonerror="false"/>
 		<mkdir dir="test-files/tmp"/>
-		
-		<!--
-		<mkdir dir="test-reports"/>
-		<mkdir dir="html-docs"/>
-		-->
 	</target>
 	
-	<!-- - - - - - - - - - - - - - - - - -
-	 target: build
-	 - - - - - - - - - - - - - - - - - -->
-	<target name="build">
-		<mkdir dir="bin/build"/>
+	<target name="compile-lib">
+		<copy todir="bin/lib">
+			<fileset dir="lib-organized"/>
+			<cutdirsmapper dirs="1"/>
+		</copy>
+	</target>
+	
+	<target name="compile-src" depends="compile-lib">
 		<mkdir dir="bin/classes"/>
 		<path id="lib.path.ref">
-			<fileset dir="./lib" includes="**/*.jar" />
+			<fileset dir="bin/lib" includes="**/*.jar" />
 		</path>
 		<javac destdir="bin/classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false" bootclasspath="./rt-stubs/java-rt-jar-stubs-1.5.0.jar">
-			<compilerarg value="-Xlint:all"/>
+			<compilerarg value="-Xlint:all -XX:+DoEscapeAnalysis"/>
 			<src path="src/picoded"/>
-		</javac>
-		<jar destfile="bin/build/picodedJavaCommons.jar"
-			  basedir="./">
-			<fileset dir="./bin/classes" includes="**/*.class" />
-			<fileset dir="./lib" includes="**/*.jar" />
-		</jar>
-	</target>
-	
-	<!-- - - - - - - - - - - - - - - - - -
-	 target: source
-	 - - - - - - - - - - - - - - - - - -->
-	<target name="source">
-		<mkdir dir="bin/classes"/>
-		<path id="lib.path.ref">
-			<fileset dir="./lib" includes="**/*.jar" />
-		</path>
-		<javac destdir="bin/classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
-				 includeantruntime="false" bootclasspath="./rt-stubs/java-rt-jar-stubs-1.5.0.jar">
-			<compilerarg value="-Xlint:all"/>
-			<src path="src/picoded"/>
+			<exclude name="**/package-info.java"/>
 		</javac>
 	</target>
 	
-	<!-- - - - - - - - - - - - - - - - - -
-	 target: picodedX
-	 - - - - - - - - - - - - - - - - - -->
-	<target name="picodedX">
+	<target name="compile-srcX" depends="compile-lib">
 		<mkdir dir="bin/classes"/>
 		<path id="lib.path.ref">
-			<fileset dir="./lib" includes="**/*.jar" />
+			<fileset dir="bin/lib" includes="**/*.jar" />
 		</path>
 		<javac destdir="bin/classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false" bootclasspath="./rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:unchecked"/>
 			<src path="src/picodedX"/>
+			<exclude name="**/package-info.java"/>
 		</javac>
 	</target>
 	
-	<!-- - - - - - - - - - - - - - - - - -
-	 target: picodedTests
-	 - - - - - - - - - - - - - - - - - -->
-	<target name="picodedTests">
+	<target name="compile-tests">
 		<delete dir="test-files/tmp" failonerror="false"/>
 		<mkdir dir="test-files/tmp"/>
 		
 		<mkdir dir="bin/classes"/>
 		<path id="lib.path.ref">
-			<fileset dir="./lib" includes="**/*.jar" />
+			<fileset dir="bin/lib" includes="**/*.jar" />
 		</path>
 		<javac destdir="bin/classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false" bootclasspath="./rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:all"/>
 			<src path="src/picoded"/>
 			<src path="src/picodedTests"/>
+			<exclude name="**/package-info.java"/>
 		</javac>
+	</target>
+	
+	<target name="compile" depends="compile-src">
+	</target>
+	
+	<target name="build" depends="compile-src">
+		<mkdir dir="bin/build"/>
+		<jar destfile="bin/build/picodedJavaCommons.jar"
+			  basedir="./">
+			<fileset dir="./bin/classes" includes="**/*.class"/>
+			<fileset dir="./bin/lib" includes="**/*.jar" />
+		</jar>
 	</target>
 	
 	

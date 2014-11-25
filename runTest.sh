@@ -3,7 +3,7 @@
 workingDir="`dirname \"$0\"`"
 cd "$workingDir" || exit 1
 
-ant picodedTests
+ant compile-tests
 
 for ARG in $*
 do
@@ -23,5 +23,5 @@ do
 	echo "Running test: picodedTests."$ARG"_test"
 	echo "---------------------------------------------------------------------------------"
 	
-	java -Djava.library.path="./lib" -cp "./lib/*:./bin/classes" org.junit.runner.JUnitCore picodedTests."$ARG"_test
+	java -Djava.library.path="./bin/lib" -cp "./bin/lib/*:./bin/classes" org.junit.runner.JUnitCore picodedTests."$ARG"_test
 done

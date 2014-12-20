@@ -1,0 +1,921 @@
+<script type="text/javascript" src="/js/redirect.js" page="jacobeReleaseNotes"></script>
+
+
+<h1>Jacobe Release Notes</h1>
+<font size=2>
+
+<hr>
+<h3>Jacobe 7.3.14, release date: 22-2-2011</h3>
+
+<ul>
+  <li>fixed the parser to allow annotations on local variable declarations</li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.3.13, release date: 14-2-2011</h3>
+
+<ul>
+  <li>fixed formatting of <i>instance initializer</i> blocks</li>
+</ul>
+
+<hr>
+
+<hr>
+<h3>Jacobe 7.3.12, release date: 19-7-2010</h3>
+
+<hr>
+
+<ul>
+  <li>fixed parsing of "foreach-final": e.g., '<code>for (<b>final</b> int i : new int[] { 1, 2, 3 })</code>'</li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.3.11, release date: 4-5-2010</h3>
+
+<hr>
+
+<ul>
+  <li>fixed handling of package annotations</li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.3.10, release date: 16-7-2009</h3>
+
+<hr>
+
+<ul>
+  <li>fixed option -outdir to not create additional directories in case
+of arguments containing relative directories . or ..</li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.3.9, release date: 2-8-2006</h3>
+
+<hr>
+
+<ul>
+  <li>fixed lineterm derivation for files immediately starting with a
+multi line block comment and using DOS (CR LF) style line terminators</li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.3.8, release date: 6-6-2006</h3>
+<hr>
+
+<ul>
+  <li>added option -inext</li>
+
+</ul>
+
+<hr>
+<h3>Jacobe 7.3.7, release date: 31-5-2006</h3>
+<hr>
+
+<ul>
+  <li>added rule --enumcommalineterm (217)</li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.3.6, release date: 9-2-2006</h3>
+<hr>
+
+<ul>
+  <li>added rule --castcloseparenspacegroupopenparen (216)</li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.3.5, release date: 24-1-2006</h3>
+<hr>
+
+<ul>
+  <li>added rule --extendslineterm (214)</li>
+  <li>added rule --implementslineterm (215)</li>
+
+</ul>
+
+<hr>
+<h3>Jacobe 7.3.4, release date: 10-1-2006 (released internally only)</h3>
+<hr>
+
+<ul>
+  <li>Removed conflict between annotation and modifier rules.</li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.3.3, release date: 4-1-2006</h3>
+<hr>
+
+<ul>
+  <li>Added documentation for Jacobe Professional rules (Javadoc).</li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.3.2, release date: 2-1-2006 (released internally only)</h3>
+<hr>
+
+<ul>
+  <li>split off rule --blockstatlinetermopenbrace (213) from
+--blocklinetermopenbrace (16) to be able to control the handling of line
+terminators in front of a '{' depending on whether a block is part of
+some structured statement (such as "if", "while", "for") or a statement
+on its own</li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.3.1, release date: 10-11-2005 (released internally only)</h3>
+<hr>
+
+<ul>
+  <li>added rule --opencommentlineterm (212)</li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.3.0, release date: 9-11-2005</h3>
+<hr>
+
+<ul>
+  <li>added rule --annotationatspace (170)</li>
+  <li>added rule --annotationatlineterm (171)</li>
+  <li>added rule --annotationspaceopenparen (172)</li>
+  <li>added rule --annotationlinetermopenparen (173)</li>
+  <li>added rule --annotationopenparenspace (174)</li>
+  <li>added rule --annotationopenparenlineterm (175)</li>
+
+  <li>added rule --annotationspacecloseparen (176)</li>
+  <li>added rule --annotationlinetermcloseparen (177)</li>
+  <li>added rule --annotationcloseparenspace (178)</li>
+  <li>added rule --annotationcloseparenlineterm (179)</li>
+  <li>added rule --annotationspaceopenbrace (180)</li>
+  <li>added rule --annotationlinetermopenbrace (181)</li>
+
+  <li>added rule --annotationopenbracespace (182)</li>
+  <li>added rule --annotationopenbracelineterm (183)</li>
+  <li>added rule --annotationspaceclosebrace (184)</li>
+  <li>added rule --annotationlinetermclosebrace (185)</li>
+  <li>added rule --annotationclosebracespace (186)</li>
+  <li>added rule --annotationclosebracelineterm (187)</li>
+
+  <li>added rule --annotationspace (188)</li>
+  <li>added rule --annotationlineterm (189)</li>
+  <li>added rule --keywordlinetermopenparen (190)</li>
+  <li>added rule --statopenparenlineterm (191)</li>
+  <li>added rule --methodopenparenlineterm (192)</li>
+  <li>added rule --paramspaceopenparen (193)</li>
+
+  <li>added rule --groupspaceopenparen (194)</li>
+  <li>added rule --grouplinetermopenparen (195)</li>
+  <li>added rule --groupopenparenlineterm (196)</li>
+  <li>added rule --groupcloseparenspace (197)</li>
+  <li>added rule --grouplinetermcloseparen (198)</li>
+  <li>added rule --groupcloseparenlineterm (199)</li>
+
+  <li>added rule --castspaceopenparen (200)</li>
+  <li>added rule --castlinetermopenparen (201)</li>
+  <li>added rule --castopenparenlineterm (202)</li>
+  <li>added rule --castcloseparenspace (203)</li>
+  <li>added rule --castlinetermcloseparen (204)</li>
+  <li>added rule --castcloseparenlineterm (205)</li>
+
+  <li>added rule --methodlinetermcloseparen (206)</li>
+  <li>added rule --methodcloseparenspace (207)</li>
+  <li>added rule --methodcloseparenlineterm (208)</li>
+  <li>added rule --statlinetermcloseparen (209)</li>
+  <li>added rule --statcloseparenspace (210)</li>
+  <li>added rule --statcloseparenlineterm (211)</li>
+
+</ul>
+
+<hr>
+<h3>Jacobe 7.2.9, release date: 7-11-2005</h3>
+<hr>
+
+<ul>
+  <li>added rule --enumconstantblanklinesdecl (169)</li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.2.8, release date: 12-7-2005</h3>
+<hr>
+
+<ul>
+  <li>improved layout of annotations (Java 5)</li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.2.7, release date: 20-6-2005</h3>
+<hr>
+
+<ul>
+  <li>fixed a problem with rules --opencommentspace=0 (51) and
+  --commentstarspace=0 (159); these settings enabled <tt>* /</tt> to be
+  contracted to <tt>*/</tt> resulting in illegal Java code. Example:
+  <blockquote><pre>/** / */</pre></blockquote>
+
+  resulted in
+  <blockquote><pre>/**/ */</pre></blockquote>
+  The fix is to insert one space in such a case.
+</ul>
+
+<hr>
+<h3>Jacobe 7.2.6, release date: 17-6-2005</h3>
+<hr>
+
+<ul>
+  <li>added rule --paramlinetermopenparen (166)
+  <li>added rule --paramcloseparenlineterm (167)
+  <li>added rule --methodcalllinetermopenparen (168)
+
+</ul>
+
+<hr>
+<h3>Jacobe 7.2.5, release date: 10-6-2005</h3>
+<hr>
+
+<ul>
+  <li>added <tt>-cmpth</tt> option to control the comparison between the
+actual header encountered in a <tt>.java</tt> file and the header specified
+by the <tt>-header</tt> option</li>
+
+</ul>
+
+<hr>
+<hr>
+<h3>Jacobe 7.2.4, release date: 6-6-2005</h3>
+<hr>
+
+<ul>
+  <li>in case Jacobe fails to beautify one of the input files the exit
+code is non-zero</li>
+</ul>
+
+<hr>
+<hr>
+<h3>Jacobe 7.2.3, release date: 6-5-2005</h3>
+
+<hr>
+
+<ul>
+  <li>fixed interaction problem between <tt>--unindentjumplabel</tt> and
+<tt>--indentcontinuation</tt>/<tt>--continuationindent</tt></li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.2.2, release date: 28-4-2005</h3>
+
+<hr>
+
+<ul>
+  <li>fixed line terminator problem when using -stdout on win32</li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.2.1, release date: 30-3-2005</h3>
+<hr>
+
+<ul>
+  <li>prepared <tt>jacobe.jar</tt> for Eclipse 3 plug-in</li>
+
+</ul>
+
+<hr>
+<h3>Jacobe 7.2.0, release date: 17-12-2004</h3>
+<hr>
+
+<ul>
+  <li>fixed mistakes in the documentation</li>
+  <li>added rule --prependheader (164)</li>
+  <li>added rule --blanklinescompilationunit (165)</li>
+
+</ul>
+
+<hr>
+<h3>Jacobe 7.1.1, not officially released</h3>
+<hr>
+
+<ul>
+  <li>added rule --commentoffset (163)
+</ul>
+
+<hr>
+<h3>Jacobe 7.1.0, release date: 10-6-2004</h3>
+<hr>
+
+<ul>
+  <li>Incorporated new Java 1.5.0 language features:
+     <ul>
+       <li>
+         Enhanced <tt>for</tt> loop
+         (<a href="http://jcp.org/en/jsr/detail?id=201">JSR 201</a>)
+       </li>
+       <li>
+         Generics
+         (<a href="http://jcp.org/en/jsr/detail?id=14">JSR 14</a>)
+       </li>
+
+       <li>
+         Metadata
+         (<a href="http://jcp.org/en/jsr/detail?id=175">JSR 175</a>)
+         <p>
+         <b><i>
+           Currently, Jacobe does not fully support the metadata
+           functionallity as described in JSR 175. The specification
+           allows </i>constant expressions<i> as so-called
+           </i>MemberValue<i>s, but Jacobe only accepts </i>Literal<i>s
+           (JLS 15.8.1), </i>ExpressionName<i>s (JLS 6.5) and </i>Class
+           Literal<i>s (JLS 15.8.2).
+         </i></b>
+
+       </li>
+       <li>
+         Static Import
+         (<a href="http://jcp.org/en/jsr/detail?id=201">JSR 201</a>)
+       </li>
+       <li>
+         Typesafe Enums
+         (<a href="http://jcp.org/en/jsr/detail?id=201">JSR 201</a>)
+       </li>
+       <li>
+
+         Varargs
+         (<a href="http://jcp.org/en/jsr/detail?id=201">JSR 201</a>)
+       </li>
+     </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 7.0.5, release date: 21-5-2004</h3>
+<hr>
+
+<ul>
+
+  <li>fixed trailing directory separator [/\] problem on command line
+</ul>
+
+<hr>
+<h3>Jacobe 7.0.4, release date: 8-3-2004</h3>
+<hr>
+
+<ul>
+  <li>fixed tab problem in continuations (spaces where used)
+</ul>
+
+<hr>
+<h3>Jacobe 7.0.3, not officially released</h3>
+
+<hr>
+
+<ul>
+  <li>added rules 160, 161, 162 (documentation pending)
+</ul>
+
+<hr>
+<h3>Jacobe 7.0.2, not officially released</h3>
+<hr>
+
+<ul>
+  <li>guarded rule 89 with modifier check
+</ul>
+
+<hr>
+<h3>Jacobe 7.0.1, release date: 4-2-2004</h3>
+<hr>
+
+<ul>
+  <li>minor bug fix release
+  <li>the following rule pairs were (consistently) swapped
+  <li>10 and 144 (--statopenparenspace and --statspacecloseparen)
+  <li>29 and 145 (--groupopenparenspace and --groupspacecloseparen)
+  <li>30 and 146 (--methodopenparenspace and --methodspacecloseparen)
+  <li>31 and 147 (--castopenparenspace and --castspacecloseparen)
+  <li>107 and 148 (--dimopenbracketspace and --dimspaceclosebracket)
+  <li>108 and 149 (--indexopenbracketspace and --indexspaceclosebracket)
+</ul>
+
+<hr>
+<h3>Jacobe 7.0, release date: 28-11-2003</h3>
+<hr>
+
+<ul>
+  <li>refined and extended expression line wrapping</li>
+  <li>fixed rules 111, 119</li>
+  <li>added rule 139</li>
+  <li>fixed/improved rule 34</li>
+
+  <li>uses new formating engine v1.1</li>
+  <li>added rule 138</li>
+  <li>added rule 140</li>
+  <li>split-up and renamed many existing rules</li>
+  <li>simplified the indentation of continued (sub-)expressions</li>
+  <li>improved memory management (traded off against speed)</li>
+
+  <li>accepts rule identifiers case insensitively</li>
+  <li>added rule --closebracelinetermopenbrace (152)</li>
+  <li>added rule --statblanklinesdecl (153)</li>
+  <li>added rule --importlineterm (155)</li>
+  <li>added rule --modifierlineterm (156)</li>
+  <li>added rule --insertcomment (157)</li>
+
+  <li>added rule --tablen (158)</li>
+  <li>fixed many bugs in the Jacobe documentation</li>
+</ul>
+
+<hr>
+<h3>Jacobe 6.2.2, release date: 11-6-2003</h3>
+<hr>
+
+<ul>
+  <li>fixed drive letter problem in Windows version</li>
+
+</ul>
+
+<hr>
+<h3>Jacobe 6.2.1, release date: 30-5-2003</h3>
+<hr>
+
+<ul>
+  <li>fixed indentation for rule --insertbracescasestats (136)
+</ul>
+
+<hr>
+<h3>Jacobe 6.2, release date: 23-5-2003</h3>
+<hr>
+
+<ul>
+  <li>new rules have been added:
+    <ul>
+      <li>--insertbracescasestats (136)
+      <li>--continuationindent (137)
+    </ul>
+  <li>rule --spacesep has been split up into
+    <ul>
+      <li>--spacecomma (4),
+      <li>--spacesemicolon (131), and
+      <li>--spacecolon (133)
+    </ul>
+  <li>rule --sepspace has been split up into
+    <ul>
+
+      <li>--commaspace (6),
+      <li>--semicolonspace (132), and
+      <li>--colonspace (134)
+    </ul>
+  <li>added minimum value checks for rule arguments. Examples of
+      minimum values:
+      <blockquote>
+      <table class=ttable>
+        <col align=left><col align=right>
+        <tr><th>rule</th><th>minimum</th></tr>
+        <tr><td>classspace (55)</td><td>1</td></tr>
+
+        <tr><td>typespace (56)</td><td>1</td></tr>
+        <tr><td>spaceextends (59)</td><td>1</td></tr>
+        <tr><td>extendsspace (60)</td><td>1</td></tr>
+        <tr><td>modifiersspace (62)</td><td>1</td></tr>
+      </table>
+
+      </blockquote>
+   </li>
+  <li>separated --fortypelineterm (135) from --typelineterm (124)</li>
+  <li>if environment variable 'JACOBECFG' is set, it is used
+      to locate a .cfg file to be used by Jacobe</li>
+  <li>if option -outext=&lt;ext&gt; is passed to Jacobe, this is used to
+      create Jacobe's output file names (default 'jacobe')</li>
+  <li>if option -outdir=&lt;dir&gt; is passed to Jacobe, this is used as a
+      directory prefix for all files, creating directories as necessary</li>
+</ul>
+
+<hr>
+<h3>Jacobe 6.1, release date: 23-4-2003</h3>
+
+<hr>
+
+<ul>
+  <li>new rules have been added:
+    <ul>
+      <li>--linetermclass (89)</li>
+      <li>--linetermconstructor (91)</li>
+      <li>--semicolonlinetermdowhile (94) [sun]</li>
+      <li>--unindentjumplabel (95)</li>
+      <li>--declarraytoarraytype (125)</li>
+      <li>--elselinetermif=0 (126) [sun]</li>
+      <li>--spaceopenbracket=0 (127) [sun]</li>
+      <li>--indentblock=1 (128) [sun]</li>
+      <li>--paramtypelineterm=0 (129)</li>
+      <li>--keywordspace=1 (130)</li>
+    </ul>
+
+  <li>--typelineterm (124) does no longer apply to parameter lists
+      (see --paramtypelineterm (129))</li>
+  <li>--spacepostfixop (9) does no longer apply to array indices
+      (see --spaceopenbracket (127))</li>
+  <li>line wrapping has been extended to include the formatting of
+      array initializers</li>
+  <li>line breaks before "<tt>extends</tt>", "<tt>implements</tt>" and
+      "<tt>throws</tt>" (rules
+      --linetermextends (48), --linetermimplements (49) and
+      --linetermthrows (50)) are now considered <i>natural</i> breaks
+      and are no longer followed by additional continuation
+      indentation (see --indentcontinuation (92))</li>
+  <li>added -noassert option to process older Java files (Java 1.3 and
+      older) (see <a href="jacobe_doc.htm#Synopsis">Jacobe User Manual</a>)</li>
+
+</ul>
+
+<hr>
+<h3>Jacobe 6.0, release date: 2-4-2003</h3>
+<hr>
+
+<ul>
+	<li>5 new rules have been added:
+		<ul>
+			<li>--spacefinally=1 (120) [sun]</li>
+			<li>--linetermfinally=0 (121) [sun]</li>
+
+			<li>--forstatlineterm=0 (122) [sun]</li>
+			<li>--classlineterm=0 (123) [sun]</li>
+			<li>--typelineterm=0 (124)</li>
+		</ul>
+	<li>--classspacename (55) has been renamed into --classspace</li>
+        <li>--typespacename (56) has been renamed into --typespace</li>
+
+	<li>rules --linetermcatch (39) and --spacecatch (58) do not hold for "finally" anymore</li>
+</ul>
+
+<hr>
+<h3>Jacobe 5.10, release date: 26-2-2003</h3>
+<hr>
+
+<ul>
+	<li>1 new rule has been added:
+		<ul>
+			<li>--openbracespace</li>
+
+		</ul>
+	<li>option '@&lt;filelist&gt;' added to allow file list arguments</li>
+	<li>indexing of array initializers allowed, e.g. { "a", "b" }[2]</li>
+	<li>problem solved with insertion of initial line terminator</li>
+</ul>
+
+<hr>
+<h3>Jacobe 5.9, release date: 30-1-2003</h3>
+
+<hr>
+
+<ul>
+	<li>7 new rules have been added:
+		<ul>
+			<li>--wrapcommalineterm</li>
+			<li>--wraplinetermcomma</li>
+			<li>--linetermcomma</li>
+
+			<li>--commalineterm</li>
+			<li>--openparenlineterm</li>
+			<li>--linetermcloseparen</li>
+			<li>--assoplineterm</li>
+		</ul>
+		</li>
+	<li>wrapping has been extended with wrapping of method and constructor invocation
+		argument lists</li>
+
+	<li>character code 255 is now accepted in strings</li>
+	<li>performance has been further improved</li>
+</ul>
+
+<hr>
+<h3>Jacobe 5.8.1, release date: 10-12-2002</h3>
+<hr>
+
+<ul>
+<li>The following PR has been resolved:
+  <ul>
+    <li>PR393: bug in rule --opencommentspace</li>
+  </ul>
+</li>
+</ul>
+
+<hr>
+<h3>Jacobe 5.8, release date: 20-11-2002</h3>
+<hr>
+
+<ul>
+  <li>8 new rules have been added</li>
+  <li>The following CR/PRs have been resolved:
+  <ul>
+    <li>CR19: rule --insertbraces for control statements added</li>
+    <li>CR46: rules added to pad brackets of arrays</li>
+  
+    <li>PR126: rule --indenttab should not throw away space before '*' of multi-line comment</li>
+    <li>CR131: already hyphenated code should be indented properly</li>
+    <li>CR148: rule --arrayinitclosebracelineterm has been added</li>
+    <li>PR280: anonymous classes should not be treated as hyphenated code</li>
+    <li>CR284/CR285: rule --indentbraces has been added to enforce GNU-style bracing</li>
+    <li>CR371: line wrapping for nested expressions</li>
+    <li>PR389: rule --keywordspaceopenparen should not hold for returns</li>
+    <li>CR390: rule --returntypelineterm added</li>
+  </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 5.7.1, release date: 6-11-2002</h3>
+<hr>
+
+<ul>
+  <li>The following PRs have been resolved:
+    <ul>
+      <li>PR370: inconsistencies between sun.cfg and documentation</li>
+      <li>PR374: --lineterm bug on Windows for new line wrapping feature</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 5.7, release date: 4-11-2002</h3>
+<hr>
+
+<ul>
+  <li>9 new rules have been added</li>
+  <li>The following CR/PRs have been resolved:
+    <ul>
+      <li>CR3: line wrapping</li>
+      <li>PR130: hyphenated code is not double indented</li>
+      <li>CR172: being able to move operators from end of line to the beginning of the next line</li>
+      <li>PR351: incorrect line terminator at first line</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 5.6, release date: 30-8-2002</h3>
+<hr>
+
+<ul>
+  <li>2 new rules have been added</li>
+  <li>The following CR/PRs have been resolved:
+    <ul>
+      <li>CR67: rule to enforce a number of spaces after an opening comment</li>
+      <li>PR174: rule 14 (--lineterm) does not work correctly on a Windows machine</li>
+      <li>CR250: rule to enforce line terminators between closing brace and while of a do-while loop</li>
+      
+      <li>CR315: the PATH variable should be used to search for the .cfg file</li>
+      <li>CR316: errors concerning .cfg files are prompted before version info</li>
+      <li>CR317: if a specified .cfg file is not found, Jacobe should not run</li>
+      <li>PR341: missing parameter for -cfg switch is not recognized</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 5.5, release date: 27-6-2002</h3>
+<hr>
+
+<ul>
+  <li>Performance of beautifying directories has been increased considerably</li>
+  <li>The following CR/PRs have been resolved:
+    <ul>
+      <li>PR121: rule --methodcallspace does not work for constructors</li>
+      <li>CR164: reading input from stdin</li>
+      <li>PR190: rule --methodnamespace does not work for constructors</li>
+      <li>CR299: give warning in case a specified input file or directory does not exist</li>
+      <li>CR300: -quiet option to suppress warnings and informationals</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 5.4, release date: 29-5-2002</h3>
+<hr>
+
+<ul>
+  <li>1 new rule has been added</li>
+  <li>The following CR/PRs have been resolved:
+    <ul>
+      <li>CR119: indentation for case labels</li>
+      <li>CR165: writing output to stdout</li>
+      <li>PR288: typo in documentation fixed</li>
+      <li>CR296: documentation extended with how to run Jacobe for Windows</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 5.3, release date: 29-4-2002</h3>
+<hr>
+
+<ul>
+  <li>The following CR/PRs have been resolved:
+    <ul>
+      <li>CR123: beautify directories recursively</li>
+      <li>PR147: incorrect indentation for comments after unblocked control statement</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 5.2, release date: 3-3-2002</h3>
+<hr>
+
+<ul>
+  <li>4 new rules have been added</li>
+  <li>The following CRs have been resolved:
+    <ul>
+      <li>CR208: rule to control spaces before "extends"</li>
+      <li>CR209: rule to control spaces after "extends"</li>
+      <li>CR210: rule to control spaces after a modifier list</li>
+      <li>CR222: rule to control line terminators after a modifier list</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 5.1, release date: 21-2-2002</h3>
+<hr>
+
+<ul>
+  <li>4 new rules have been added</li>
+  <li>The following CRs have been resolved:
+    <ul>
+      <li>CR197: rule to control spaces before "else"</li>
+      <li>CR198: rule to control spaces before "catch"</li>
+      <li>CR202: rule to control spaces between "class" and its name</li>
+      <li>CR205: rule to control spaces between a type and a variable</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 5.0, release date: 4-2-2002</h3>
+<hr>
+
+<ul>
+  <li>3 new rules have been added</li>
+  <li>The following PR/CRs have been resolved:
+    <ul>
+      <li>PR167: incorrect naming of rule in documentation</li>
+      <li>PR168: --openbracelinetermclosebrace should overrule --linetermblockclosebrace</li>
+      <li>PR173: default behaviour of --lineterm incorrectly documented</li>
+      <li>CR185: all rules concerning blocks should be split up to make a distinction between method and statement blocks</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 4.2, release date: 19-12-2001</h3>
+<hr>
+
+<ul>
+  <li>3 new rules have been added</li>
+  <li>Release notes are distributed with the release</li>
+  <li>The following CRs have been resolved:
+    <ul>
+      <li>CR81: rule to control line terminators before "throws"</li>
+      <li>CR82: rule to control line terminators before "implements"</li>
+      <li>CR83: rule to control line terminators before "extends"</li>
+      <li>CR134: synchronization order of rules in documentation and .cfg file</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 4.1, release date: 22-11-2001</h3>
+<hr>
+
+<ul>
+  <li>The following CR has been resolved:
+    <ul>
+      <li>CR127: assert statement support (Java 1.4)</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<h3>Jacobe 4.0.1, release date: 19-11-2001</h3>
+<hr>
+
+<ul>
+  <li>The following PR has been resolved:
+    <ul>
+      <li>PR104: super and this should not be part of --keywordspaceopenpar</li>
+    </ul>
+  </li>
+</ul>
+
+
+<hr>
+<h3>Jacobe 4.0, release date: 6-11-2001</h3>
+
+<hr>
+
+<ul>
+  <li>3 new rules have been added</li>
+  <li>The following PR/CRs have been resolved:
+    <ul>
+      <li>CR45: indentation support for throws</li>
+      <li>CR58: indentation support for implements</li>
+      <li>CR73: open brace line terminator for array initializations</li>
+      <li>CR78: special treatment for unblocked else statements</li>
+      <li>CR80: indentation support for hyphenated expressions</li>
+      <li>CR106: indentation support for extends</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 3.0.2, release date: 29-10-2001</h3>
+<hr>
+
+<ul>
+  <li>The following PRs have been resolved:
+    <ul>
+      <li>PR88: some inconsistencies in the documentation</li>
+      <li>PR92: file overwrite is impossible for DOS</li>
+      <li>PR95: typo in documentation</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 3.0.1, release date: 24-10-2001</h3>
+<hr>
+
+<ul>
+  <li>The following PRs have been resolved:
+    <ul>
+      <li>PR72: unreadable Jacobe documentation for Netscape</li>
+      <li>PR76: error in documentation concerning public classes</li>
+      <li>PR77: incorrect default value in sun.cfg file</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 3.0, release date: 5-10-2001</h3>
+<hr>
+
+<ul>
+  <li>12 new rules have been added</li>
+  <li>The following PR/CRs have been resolved:
+    <ul>
+      <li>CR10: indentation for switch statements</li>
+      <li>CR16: rule concerning blank lines between methods</li>
+      <li>CR20: moving comments to the next line when adding a new line</li>
+      <li>CR25: rule concerning tabs for indentation</li>
+      <li>CR30: rule concerning padding of parentheses made more general</li>
+      <li>CR33: rule concerning empty catch blocks</li>
+      <li>CR34: rule concerning empty parameter list</li>
+      <li>CR36: rule that demands no space after a cast</li>
+      <li>CR37: rule concerning spaces between method name and open parenthesis</li>
+      <li>CR38: rule concerning spaces between method call and open parenthesis</li>
+      <li>CR42: rule concerning layouting else statement</li>
+      <li>CR43: rule concerning layouting catch statement</li>
+      <li>CR54: removal of unclear use of bitfields as rule arguments</li>
+      <li>CR55: split up of linetermclosebrace for array inits</li>
+      <li>PR59: bug concerning missing end of line at the end of a file</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 2.0.2, release date: 11-09-2001</h3>
+<hr>
+
+<ul>
+<li>Jacobe does not use cygwin.dll anymore</li>
+</ul>
+
+<hr>
+<h3>Jacobe 2.0.1, release date: 16-08-2001</h3>
+<hr>
+
+<ul>
+  <li>The following PRs have been resolved:
+    <ul>
+      <li>PR21: documentation unreadable for Netscape</li>
+      <li>PR27: removal of a newline before an end of line comment blocked</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+<h3>Jacobe 2.0, release date: 27-07-2001</h3>
+<hr>
+
+<ul>
+  <li>Jetty has been renamed to Jacobe</li>
+  <li>14 new rules have been added</li>
+  <li>Option "-h" has been added</li>
+  <li>The following CR/PRs have been resolved:
+    <ul>
+      <li>CR1: memorable names have been introduced for the rules</li>
+      <li>CR2: comments are allowed in the config file</li>
+      <li>PR5: array initialization bug solved</li>
+      <li>PR13: inconsistency solved with -v switch</li>
+    </ul>
+  </li>
+</ul>
+
+</font>
+
+<hr>

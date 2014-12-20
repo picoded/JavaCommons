@@ -95,9 +95,6 @@
 		</javac>
 	</target>
 	
-	<target name="compile" depends="compile-src">
-	</target>
-	
 	<target name="build" depends="compile-src">
 		<mkdir dir="bin/build"/>
 		<jar destfile="bin/build/picodedJavaCommons.jar"
@@ -107,5 +104,30 @@
 		</jar>
 	</target>
 	
+	
+	<!-- Code Beautifier, used for pre-commit hook -->
+	<target name="src-beautify">
+		
+		<!-- Delete cleanedup code -->
+		<delete>
+			<fileset dir="./src" includes="**/formatted_*.java"/>
+		</delete>
+
+		<!-- Scan and beautify the code -->
+		<exec executable="java">
+			<arg value="-cp"/>
+			<arg value="./build-tools/java-formatter/java-formatter-with-dependencies.jar"/>
+			<arg value="Formatter"/>
+			<arg value="./code-format.opts"/>
+			<arg value="./src"/>
+		</exec>
+	</target>
+	
+	<!-- convinent aliases -->
+	<target name="compile" depends="compile-src">
+	</target>
+	
+	<target name="source" depends="compile-src">
+	</target>
 	
 </project>

@@ -58,8 +58,8 @@
 			<fileset dir="bin/lib" includes="**/*.jar" />
 		</path>
 		<javac destdir="bin/classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
-				 includeantruntime="false" bootclasspath="./rt-stubs/java-rt-jar-stubs-1.5.0.jar">
-			<compilerarg value="-Xlint:all -XX:+DoEscapeAnalysis"/>
+				 includeantruntime="false" bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar">
+			<compilerarg value="-Xlint:all"/>
 			<src path="src/picoded"/>
 			<exclude name="**/package-info.java"/>
 		</javac>
@@ -71,7 +71,7 @@
 			<fileset dir="bin/lib" includes="**/*.jar" />
 		</path>
 		<javac destdir="bin/classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
-				 includeantruntime="false" bootclasspath="./rt-stubs/java-rt-jar-stubs-1.5.0.jar">
+				 includeantruntime="false" bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:unchecked"/>
 			<src path="src/picodedX"/>
 			<exclude name="**/package-info.java"/>
@@ -87,7 +87,7 @@
 			<fileset dir="bin/lib" includes="**/*.jar" />
 		</path>
 		<javac destdir="bin/classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
-				 includeantruntime="false" bootclasspath="./rt-stubs/java-rt-jar-stubs-1.5.0.jar">
+				 includeantruntime="false" bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:all"/>
 			<src path="src/picoded"/>
 			<src path="src/picodedTests"/>

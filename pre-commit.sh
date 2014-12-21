@@ -1,2 +1,3 @@
 #! /bin/sh
-ant src-beautify;
+ant src-beautify
+exitCode=$?

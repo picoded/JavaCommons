@@ -7,9 +7,16 @@
 # For a full list of options
 #
 
+# output a mix of space and tabs
+tab_char:int:4
+
 # Sets tabs size to 3 spaces
 tab_size:int:3
 indentation_size:int:3
+
+# Continous statement, indenting size (double of standard)
+continuation_indentation:int:6
+continuation_indentation_for_array_initializer:int:6
 
 # Sets the page width to 120 characters
 page_width:int:120

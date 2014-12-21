@@ -113,7 +113,7 @@
 			<fileset dir="./src" includes="**/formatted_*.java"/>
 		</delete>
 
-		<!-- Scan and beautify the code -->
+		<!-- Scan and beautify the code : spaces only -->
 		<exec executable="java">
 			<arg value="-cp"/>
 			<arg value="./build-tools/java-formatter/java-formatter-with-dependencies.jar"/>
@@ -121,6 +121,17 @@
 			<arg value="./code-format.opts"/>
 			<arg value="./src"/>
 		</exec>
+		
+		<!-- Scan and convert to smart tabs -->
+		<!--
+		<replaceregexp flags="g" byline="true">
+			<regexp pattern="(?:^\s*)(\s{3,3})"/>
+			<substitution expression="&#x0009;"/>
+			
+			<fileset dir="./src" includes="**/*.java"/>
+		</replaceregexp>
+		-->
+		
 	</target>
 	
 	<!-- convinent aliases -->

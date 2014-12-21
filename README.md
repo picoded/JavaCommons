@@ -1,6 +1,6 @@
 #The following covers the basic setup
 
-+ Setup java beautifier pre-commit hook: ln -s ../../pre-commit.sh .git/hooks/pre-commit
++ Setup java beautifier pre-commit hook: ln -s ./pre-commit.sh .git/hooks/pre-commit
 
 #The following covers the ANT build commands
 

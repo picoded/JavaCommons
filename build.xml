@@ -7,6 +7,7 @@
 	<!-- **************************************************
 	The following lists the target sets supported by ant
 	
+	+ setup
 	+ clean
 	+ compile-lib
 	+ compile-src
@@ -33,8 +34,14 @@
 	<antcall target="doSomethingElse">
 		<param name="param1" value="value"/>
 	</antcall>
-  	-->
-  	
+	 -->
+	
+	<target name="setup">
+		<mkdir dir=".git/hooks"/>
+		<symlink link="./pre-commit.sh" resource=".git/hooks/pre-commit" failonerror="false"/>
+	</target>
+	
+	
 	<target name="clean">
 		<delete dir="test-reports" failonerror="false"/>
 		<delete dir="html-docs" failonerror="false"/>

@@ -14,6 +14,7 @@
 	+ compile-tests
 	+ compile
 	+ build
+	+ src-beautify
 	
 	************************************************** -->
 	

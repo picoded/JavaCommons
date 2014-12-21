@@ -22,11 +22,11 @@ import java.util.HashMap;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
-public class CaseInsensitiveHashMap<K extends String,V>  extends HashMap<K,V> {
-	
+public class CaseInsensitiveHashMap<K extends String, V> extends HashMap<K, V> {
+
 	/// Java serialversion uid: http://stackoverflow.com/questions/285793/what-is-a-serialversionuid-and-why-should-i-use-it
 	private static final long serialVersionUID = 42L;
-	
+
 	/// Associates the specified value with the specified key in this map.
 	/// If the map previously contained a mapping for the key, the old value is replaced.
 	///
@@ -36,11 +36,11 @@ public class CaseInsensitiveHashMap<K extends String,V>  extends HashMap<K,V> {
 	/// @returns  the previous value associated with key, or null if there was no mapping for key. 
 	///           (A null return can also indicate that the map previously associated null with key.)
 	@SuppressWarnings("unchecked")
-	@Override 
+	@Override
 	public V put(K key, V value) {
-		return super.put( (K)(key.toString().toLowerCase()), value);
+		return super.put((K) (key.toString().toLowerCase()), value);
 	}
-	
+
 	/// Returns the value to which the specified key is mapped, or null if this map contains no mapping for the key.
 	/// More formally, if this map contains a mapping from a key k to a value v such that (key==null ? k==null : key.toLowerCase().equals(k)), 
 	/// then this method returns v; otherwise it returns null. (There can be at most one such mapping.)
@@ -51,22 +51,22 @@ public class CaseInsensitiveHashMap<K extends String,V>  extends HashMap<K,V> {
 	///
 	/// @returns  the value to which the specified key is mapped, or null if this map contains no mapping for the key
 	@SuppressWarnings("unchecked")
-	@Override 
+	@Override
 	public V get(Object key) {
-		return super.get( (K)(key.toString().toLowerCase()) );
+		return super.get((K) (key.toString().toLowerCase()));
 	}
-	
+
 	/// Returns true if this map contains a mapping for the specified key.
 	///
 	/// @param    key     The key whose presence in this map is to be tested
 	///
 	/// @returns  true if this map contains a mapping for the specified key.
 	@SuppressWarnings("unchecked")
-	@Override 
+	@Override
 	public boolean containsKey(Object key) {
-		return super.containsKey( (K)(key.toString().toLowerCase()) );
+		return super.containsKey((K) (key.toString().toLowerCase()));
 	}
-	
+
 	/// Removes the mapping for the specified key from this map if present.
 	///
 	/// @param    key     key whose mapping is to be removed from the map
@@ -74,11 +74,11 @@ public class CaseInsensitiveHashMap<K extends String,V>  extends HashMap<K,V> {
 	/// @returns  the previous value associated with key, or null if there was no mapping for key. 
 	///           (A null return can also indicate that the map previously associated null with key.)
 	@SuppressWarnings("unchecked")
-	@Override 
+	@Override
 	public V remove(Object key) {
-		return super.remove( (K)(key.toString().toLowerCase()) );
+		return super.remove((K) (key.toString().toLowerCase()));
 	}
-	
+
 	/// @todo   the actual class implementation
 	///
 	/// Copies all of the mappings from the specified map to this map. 
@@ -88,8 +88,8 @@ public class CaseInsensitiveHashMap<K extends String,V>  extends HashMap<K,V> {
 	/// overwritten may not be predictable / in sequence.
 	///
 	/// @param    m     Original mappings to be stored in this map
-	@Override 
-	public void putAll(Map<? extends K,? extends V> m) {
+	@Override
+	public void putAll(Map<? extends K, ? extends V> m) {
 		throw new RuntimeException("Not Yet Implmented");
 	}
 }

@@ -116,15 +116,15 @@
 		<mkdir dir="${junit-reports}"/>
 		<junit printsummary="yes" haltonfailure="yes">
 			<classpath>
-				<pathelement location="${build-classes}"/>
-				<pathelement location="${build-lib}"/>
+				<pathelement path="${build-classes}"/>
+				<pathelement path="${build-lib}"/>
 				<fileset dir="${build-lib}" includes="**/*.jar" />
 			</classpath>
 			
 			<formatter type="plain"/>
 			<formatter type="xml"/>
 			
-			<test name="picodedTests.struct.CaseInsensitiveHashMap_test"
+			<test name="picodedTests.all_test"
 				haltonfailure="no" todir="${junit-reports}" outfile="junit-all">
 				<formatter type="plain"/>
 				<formatter type="xml"/>

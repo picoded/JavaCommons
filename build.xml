@@ -2,7 +2,16 @@
 	<property name="ant.build.javac.source" value="1.7"/>
 	<property name="ant.build.javac.target" value="1.7"/>
 	
-	<property name='lib.dir' value='./bin/lib' />
+	<property name='lib.dir' value='${basedir}/bin/lib' />
+	
+	<!-- Sets the property variables to point to respective directories -->
+	<property name="junit-reports" value="${basedir}/test-files/junit-reports"/>
+	<property name="junit-html" value="${basedir}/test-files/junit-html" />
+	
+	<property name="build-classes" value="${basedir}/bin/classes" />
+	<property name="build-lib" value="${basedir}/bin/lib" />
+	
+	<property name="test-temp" value="${basedir}/test-files/tmp" />
 	
 	<!-- **************************************************
 	The following lists the target sets supported by ant
@@ -54,18 +63,18 @@
 	</target>
 	
 	<target name="compile-lib">
-		<copy todir="bin/lib">
+		<copy todir="${build-lib}">
 			<fileset dir="lib-organized"/>
 			<cutdirsmapper dirs="1"/>
 		</copy>
 	</target>
 	
 	<target name="compile-src" depends="compile-lib">
-		<mkdir dir="bin/classes"/>
+		<mkdir dir="${build-classes}"/>
 		<path id="lib.path.ref">
-			<fileset dir="bin/lib" includes="**/*.jar" />
+			<fileset dir="${build-lib}" includes="**/*.jar" />
 		</path>
-		<javac destdir="bin/classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
+		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false" bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:all"/>
 			<src path="src/picoded"/>
@@ -74,11 +83,11 @@
 	</target>
 	
 	<target name="compile-srcX" depends="compile-lib">
-		<mkdir dir="bin/classes"/>
+		<mkdir dir="${build-classes}"/>
 		<path id="lib.path.ref">
-			<fileset dir="bin/lib" includes="**/*.jar" />
+			<fileset dir="${build-lib}" includes="**/*.jar" />
 		</path>
-		<javac destdir="bin/classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
+		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false" bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:unchecked"/>
 			<src path="src/picodedX"/>
@@ -90,11 +99,11 @@
 		<delete dir="test-files/tmp" failonerror="false"/>
 		<mkdir dir="test-files/tmp"/>
 		
-		<mkdir dir="bin/classes"/>
+		<mkdir dir="${build-classes}"/>
 		<path id="lib.path.ref">
-			<fileset dir="bin/lib" includes="**/*.jar" />
+			<fileset dir="${build-lib}" includes="**/*.jar" />
 		</path>
-		<javac destdir="bin/classes" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
+		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false" bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:all"/>
 			<src path="src/picoded"/>
@@ -107,12 +116,33 @@
 		<mkdir dir="bin/build"/>
 		<jar destfile="bin/build/picodedJavaCommons.jar"
 			  basedir="./">
-			<fileset dir="./bin/classes" includes="**/*.class"/>
-			<fileset dir="./bin/lib" includes="**/*.jar" />
+			<fileset dir="${build-classes}" includes="**/*.class"/>
+			<fileset dir="${build-lib}" includes="**/*.jar" />
 		</jar>
 	</target>
 	
-	
+	<!-- jUnit test report runner, used for continuous unit testing -->
+	<target name="junit-all" depends="compile-tests">
+		<mkdir dir="${junit-reports}"/>
+		<junit printsummary="yes" haltonfailure="yes">
+			<classpath>
+				<pathelement location="${build-classes}"/>
+				<pathelement location="${build-lib}"/>
+				<fileset dir="${build-lib}" includes="**/*.jar" />
+				
+			</classpath>
+			
+			<formatter type="plain"/>
+			<formatter type="xml"/>
+			
+			<test name="picodedTests.struct.CaseInsensitiveHashMap_test"
+				haltonfailure="no" todir="${junit-reports}" outfile="junit-all">
+				<formatter type="plain"/>
+				<formatter type="xml"/>
+			</test>
+		</junit>
+	</target>
+
 	<!-- Code Beautifier, used for pre-commit hook -->
 	<target name="src-beautify">
 		

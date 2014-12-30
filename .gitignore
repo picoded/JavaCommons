@@ -8,6 +8,8 @@
 # Exclude built / temporary flis
 #
 bin/*
-test-reports/*
 html-docs/*
+
 test-files/tmp/*
+test-files/junit-html/*
+test-files/junit-reports/*

@@ -13,6 +13,14 @@
 	
 	<property name="test-temp" value="${basedir}/test-files/tmp" />
 	
+	<!-- jUnit declearation over-ride, see: 'http://stackoverflow.com/questions/9774264/junit-ant-task-junittask-was-not-found' -->
+	<path id="junit-path">
+		<fileset dir="${build-lib}" includes="**/*.jar" />
+	</path>
+	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
+		<classpath refid="junit-path"/>
+	</taskdef>
+	
 	<!-- **************************************************
 	The following lists the target sets supported by ant
 	
@@ -28,23 +36,6 @@
 	
 	************************************************** -->
 	
-	<!-- Dummy codes for future refence (to use?)
-	<presetdef name="javac">
-    	<javac includeantruntime="false" />
-  	</presetdef>
-	
-	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
-		<classpath>
-			<pathelement path="bin" />
-			<fileset dir="./lib" includes="**/*.jar" />
-		</classpath>
-  	</taskdef>
-	
-	<antcall target="doSomethingElse">
-		<param name="param1" value="value"/>
-	</antcall>
-	 -->
-	
 	<target name="setup">
 		<mkdir dir=".git/hooks"/>
 		<symlink link="./pre-commit.sh" resource=".git/hooks/pre-commit" failonerror="false"/>
@@ -52,7 +43,6 @@
 	
 	
 	<target name="clean">
-		<delete dir="test-reports" failonerror="false"/>
 		<delete dir="html-docs" failonerror="false"/>
 		
 		<delete dir="bin" failonerror="false"/>
@@ -129,7 +119,6 @@
 				<pathelement location="${build-classes}"/>
 				<pathelement location="${build-lib}"/>
 				<fileset dir="${build-lib}" includes="**/*.jar" />
-				
 			</classpath>
 			
 			<formatter type="plain"/>

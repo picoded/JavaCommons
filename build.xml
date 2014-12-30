@@ -15,7 +15,7 @@
 	
 	<!-- jUnit declearation over-ride, see: 'http://stackoverflow.com/questions/9774264/junit-ant-task-junittask-was-not-found' -->
 	<path id="junit-path">
-		<fileset dir="${build-lib}" includes="**/*.jar" />
+		<fileset dir="lib-organized/junit" includes="**/*.jar" />
 	</path>
 	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
 		<classpath refid="junit-path"/>

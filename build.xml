@@ -109,6 +109,7 @@
 	</target>
 	
 	<target name="build" depends="compile-src">
+		<delete dir="bin/build" failonerror="false"/>
 		<mkdir dir="bin/build"/>
 		<jar destfile="bin/build/picodedJavaCommons.jar"
 			  basedir="./">

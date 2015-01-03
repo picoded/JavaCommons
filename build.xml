@@ -47,6 +47,7 @@
 		
 		<delete dir="bin" failonerror="false"/>
 		<mkdir dir="bin"/>
+		<mkdir dir="bin/docs"/>
 		
 		<delete dir="test-files/tmp" failonerror="false"/>
 		<mkdir dir="test-files/tmp"/>

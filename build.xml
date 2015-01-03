@@ -1,4 +1,4 @@
-<project name="picoded.JavaCommons" default="source">
+<project name="picoded.JavaCommons" default="source" xmlns:jacoco="antlib:org.jacoco.ant">
 	<property name="ant.build.javac.source" value="1.7"/>
 	<property name="ant.build.javac.target" value="1.7"/>
 	
@@ -21,6 +21,10 @@
 		<classpath refid="junit-path"/>
 	</taskdef>
 	
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+		<classpath refid="junit-path"/>
+    </taskdef>
+    
 	<!-- **************************************************
 	The following lists the target sets supported by ant
 	
@@ -115,22 +119,24 @@
 	<!-- jUnit test report runner, used for continuous unit testing -->
 	<target name="junit-all" depends="compile-tests">
 		<mkdir dir="${junit-reports}"/>
-		<junit printsummary="yes" haltonfailure="yes">
-			<classpath>
-				<pathelement path="${build-classes}"/>
-				<pathelement path="${build-lib}"/>
-				<fileset dir="${build-lib}" includes="**/*.jar" />
-			</classpath>
+		<jacoco:coverage destfile="${junit-reports}/junit-all.exec">
+			<junit printsummary="yes" haltonfailure="yes" fork="true" forkmode="once">
+				<classpath>
+					<pathelement path="${build-classes}"/>
+					<pathelement path="${build-lib}"/>
+					<fileset dir="${build-lib}" includes="**/*.jar" />
+				</classpath>
 			
-			<formatter type="plain"/>
-			<formatter type="xml"/>
-			
-			<test name="picodedTests.all_test"
-				haltonfailure="no" todir="${junit-reports}" outfile="junit-all">
 				<formatter type="plain"/>
 				<formatter type="xml"/>
-			</test>
-		</junit>
+			
+				<test name="picodedTests.all_test"
+					haltonfailure="no" todir="${junit-reports}" outfile="junit-all">
+					<formatter type="plain"/>
+					<formatter type="xml"/>
+				</test>
+			</junit>
+		</jacoco:coverage>
 	</target>
 
 	<!-- Code Beautifier, used for pre-commit hook -->

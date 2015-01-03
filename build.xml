@@ -145,7 +145,7 @@
 			<arg value="-cp"/>
 			<arg value="./build-tools/java-formatter/java-formatter-with-dependencies.jar"/>
 			<arg value="Formatter"/>
-			<arg value="./code-format.opts"/>
+			<arg value="./build-config/code-format.opts"/>
 			<arg value="./src"/>
 		</exec>
 		

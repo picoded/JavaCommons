@@ -118,7 +118,7 @@
 	</target>
 	
 	<!-- jUnit test report runner, used for continuous unit testing -->
-	<target name="junit-all" depends="build compile-tests">
+	<target name="junit-all" depends="build,compile-tests">
 		<mkdir dir="${junit-reports}"/>
 		<!--
 		<jacoco:coverage>

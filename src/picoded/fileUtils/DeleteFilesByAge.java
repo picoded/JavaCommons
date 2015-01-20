@@ -6,6 +6,9 @@ import java.lang.System;
 /// Scans a directory and delete all files older then a specified age.
 /// This works using modified timestamp, and its main usage is the clearing of temporary files inside a java servlet.
 ///
+/// @TODO : File name / type filtering by regexp
+/// 
+///
 /// ### Example Usage
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.java}

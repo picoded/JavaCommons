@@ -140,12 +140,26 @@
 			
 				<formatter type="plain"/>
 				<formatter type="xml"/>
-			
+				
+				<!--
 				<test name="picodedTests.all_test"
 					haltonfailure="no" todir="${junit-reports}" outfile="junit-all">
 					<formatter type="plain"/>
 					<formatter type="xml"/>
 				</test>
+				 -->
+				
+				<batchtest haltonfailure="no" todir="${junit-reports}">
+					
+					<fileset dir="src">
+						<include name="picodedTests/**/*_test.java"/>
+					</fileset>
+					
+					<formatter type="plain"/>
+					<formatter type="xml"/>
+					
+				</batchtest>
+				
 			</junit>
 		</jacoco:coverage>
 	</target>

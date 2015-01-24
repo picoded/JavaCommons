@@ -118,7 +118,7 @@
 		<jar destfile="bin/build/picodedJavaCommons.jar"
 			  basedir="./">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
-			<fileset dir="${build-lib}" includes="**/*.jar" />
+			<fileset dir="${build-lib}" includes="*.jar" />
 		</jar>
 	</target>
 	

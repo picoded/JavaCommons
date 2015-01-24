@@ -11,18 +11,12 @@ import static org.junit.Assert.*;
 /// Test Case for picoded.struct.CaseInsensitiveHashMap
 ///
 public class CaseInsensitiveHashMap_test {
-
-	private CaseInsensitiveHashMap<String, String> tObj = null;
-
+	
 	@Before
-	public void setUp() {
-		tObj = new CaseInsensitiveHashMap<String, String>();
-	}
+	public void setUp() { }
 
 	@After
-	public void tearDown() {
-
-	}
+	public void tearDown() { }
 
 	/// Test the following functions
 	///
@@ -30,10 +24,13 @@ public class CaseInsensitiveHashMap_test {
 	/// + CaseInsensitiveHashMap.get
 	@Test
 	public void basicPutAndGet() {
-		tObj.put("TEST", "a");
-		tObj.put("Hello", "WORLD");
-		tObj.put("test", "WORLD");
-
+		CaseInsensitiveHashMap<String, String> tObj = new CaseInsensitiveHashMap<String, String>();
+		
+		assertNull( tObj.put("TEST", "a") );
+		assertNull( tObj.put("Hello", "WORLD") );
+		
+		assertEquals("a", tObj.put("test", "WORLD") );
+		
 		assertEquals("WORLD", tObj.get("tEsT"));
 		assertEquals("WORLD", tObj.get("hello"));
 	}

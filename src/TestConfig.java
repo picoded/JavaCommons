@@ -1,0 +1,73 @@
+package picodedTests;
+
+import java.lang.String;
+
+///
+/// The SQL configuration vars, this is to ensure a centralized place to change the various test configuration values
+/// Value access were made as functions, to facilitate future migration to config files??
+///
+public class TestConfig {
+
+   //Default Credentials for MYSQL
+   static private String MYSQL_CONN ="127.0.0.1:3306";
+   static private String MYSQL_DATA ="SERVLETCOMMONS";
+   static private String MYSQL_USER ="SERVLETCOMMONS";
+   static private String MYSQL_PASS ="SERVLETCOMMONS";
+
+   static public String MYSQL_CONN() {
+      return MYSQL_CONN;
+   }
+
+   static public String MYSQL_DATA() {
+      return MYSQL_DATA;
+   }
+
+   static public String MYSQL_USER() {
+      return MYSQL_USER;
+   }
+
+   static public String MYSQL_PASS() {
+      return MYSQL_PASS;
+   }
+	
+	/*
+	//Credentials for ORACLE
+	static private String ORACLE_PATH ="SERVLETCOMMONS@//wen-sg-oracle.cvbukxarewjf.ap-southeast-1.rds.amazonaws.com/WENTEST";
+	static private String ORACLE_USER ="SERVLETCOMMONS";
+	static private String ORACLE_PASS ="SERVLETCOMMONS";
+	
+	static public String ORACLE_PATH() {
+		return ORACLE_PATH;
+	}
+	
+	static public String ORACLE_USER() {
+		return ORACLE_USER;
+	}
+	 
+	 static public String ORACLE_PASS() {
+		return ORACLE_PASS;
+	}
+
+   //Credentials for MS-SQL
+   static private String MSSQL_CONN ="wen-sg-mssqlstd.cvbukxarewjf.ap-southeast-1.rds.amazonaws.com";
+   static private String MSSQL_NAME ="SERVLETCOMMONS";
+   static private String MSSQL_USER ="SERVLETCOMMONS";
+   static private String MSSQL_PASS ="SERVLETCOMMONS";
+
+   static public String MSSQL_CONN() {
+      return MSSQL_CONN;
+   }
+
+   static public String MSSQL_NAME() {
+      return MSSQL_NAME;
+   }
+
+   static public String MSSQL_USER() {
+      return MSSQL_USER;
+   }
+
+   static public String MSSQL_PASS() {
+      return MSSQL_PASS;
+   }
+	 */
+}

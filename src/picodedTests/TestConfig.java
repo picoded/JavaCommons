@@ -1,19 +1,29 @@
 package picodedTests;
 
 import java.lang.String;
+import org.apache.commons.lang3.RandomStringUtils;
 
 ///
 /// The SQL configuration vars, this is to ensure a centralized place to change the various test configuration values
 /// Value access were made as functions, to facilitate future migration to config files??
 ///
 public class TestConfig {
-
-   //Default Credentials for MYSQL
+	
+	///
+	/// Randomly generated table prefix, used to prevent multiple running tests from colliding
+	///
+	static public String randomTablePrefix() {
+		return RandomStringUtils.randomAlphanumeric(8).toUpperCase();
+	}
+	
+	//-------------------------------//
+   // Default Credentials for MYSQL //
+	//-------------------------------//
    static private String MYSQL_CONN ="127.0.0.1:3306";
-   static private String MYSQL_DATA ="SERVLETCOMMONS";
-   static private String MYSQL_USER ="SERVLETCOMMONS";
-   static private String MYSQL_PASS ="SERVLETCOMMONS";
-
+   static private String MYSQL_DATA ="JAVACOMMONS";
+   static private String MYSQL_USER ="JAVACOMMONS";
+   static private String MYSQL_PASS ="JAVACOMMONS";
+	
    static public String MYSQL_CONN() {
       return MYSQL_CONN;
    }

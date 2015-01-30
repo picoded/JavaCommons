@@ -765,7 +765,8 @@ WARN_LOGFILE           =
 
 INPUT                  = ./src/picoded \
                          ./docs \
-                         ./src/picodedTests
+                         ./src/picodedTests \
+                         ./lib-organized/apache-commons/lang3-3.3.2/source/src/main/java
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

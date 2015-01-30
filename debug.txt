@@ -1,8 +1,0 @@
-ASSERT: "tok==TK_WHITESPACE" in docparser.cpp (4718)
-ASSERT: "tok==TK_WHITESPACE" in docparser.cpp (4718)
-ASSERT: "tok==TK_WHITESPACE" in docparser.cpp (4718)
-ASSERT: "tok==TK_WHITESPACE" in docparser.cpp (4718)
-ASSERT: "tok==TK_WHITESPACE" in docparser.cpp (4718)
-ASSERT: "tok==TK_WHITESPACE" in docparser.cpp (4718)
-ASSERT: "tok==TK_WHITESPACE" in docparser.cpp (4718)
-ASSERT: "tok==TK_WHITESPACE" in docparser.cpp (4718)

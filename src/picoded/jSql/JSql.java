@@ -40,12 +40,11 @@ public class JSql implements BaseInterface {
 		return new picoded.jSql.db.JSql_Sqlite(sqliteLoc);
 	}
 	
-	
-	/*
 	/// MySql static constructor, returns picoded.jSql.dbMysql
-	public static JSql mySql(String urlStr, String dbName,String dbUser, String dbPass) {
-		return new picoded.jSql.dbMysql(urlStr, dbName, dbUser, dbPass);
+	public static JSql mysql(String urlStr, String dbName,String dbUser, String dbPass) {
+		return new picoded.jSql.db.JSql_Mysql(urlStr, dbName, dbUser, dbPass);
 	}
+	/*
 	
 	/// Oracle static constructor, returns picoded.jSql.dbOracle
 	public static JSql oracle(String oraclePath, String dbUser, String dbPass) {

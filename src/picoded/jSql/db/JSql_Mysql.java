@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import java.lang.RuntimeException;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-//import java.util.*;
+import java.util.*;
 
 import java.io.StringWriter;
 import java.util.logging.*;
@@ -28,57 +28,31 @@ import picoded.jSql.JSqlException;
 import picoded.jSql.JSql;
 import picoded.jSql.db.BaseInterface;
 
-/// Pure SQLite implentation of JSql
-public class JSql_Sqlite extends JSql implements BaseInterface {
+/// Pure MySQL implentation of JSql
+public class JSql_Mysql extends JSql implements BaseInterface {
 	
 	/// Internal self used logger
-	private static Logger logger = Logger.getLogger(JSql_Sqlite.class.getName());
+	private static Logger logger = Logger.getLogger(JSql_Mysql.class.getName());
 	
-	/// Internal reuse sqlite file location, used for recreate
-	private String sqliteLocation = null;
-	
-	/// Runs with in memory SQLite
-	public JSql_Sqlite() {
-		setupSqliteConnection(null);
-	}
-	
-   /// Runs JSql with the JDBC sqlite engine
-	public JSql_Sqlite(String sqliteLoc) {
-		setupSqliteConnection(sqliteLoc);
-	}
-	
-	/// Internal common reuse constructor
-	private void setupSqliteConnection(String sqliteLoc) {
-		sqlType = JSqlType.sqlite;
-		sqliteLocation = sqliteLoc;
+	/// Runs JSql with the JDBC "MY"SQL engine
+	///
+	/// **Note:** urlString, is just IP:PORT. For example, "127.0.0.1:3306"
+	public JSql_Mysql(String urlStr, String dbName,String dbUser, String dbPass) {
+		sqlType = JSqlType.sql;
 		
-		if(sqliteLocation == null) {
-			sqliteLocation = ":memory:";
-		}
-		
+		String connectionUrl="jdbc:mysql://"+urlStr+"/"+dbName+"?autoReconnect=true&failOverReadOnly=false&maxReconnects=5";
 		try {
-			Class.forName("org.sqlite.JDBC");
-			sqlConn = java.sql.DriverManager.getConnection("jdbc:sqlite:"+sqliteLocation);
+			Class.forName("com.mysql.jdbc.Driver").newInstance(); //ensure jdbc driver is loaded
+			sqlConn = java.sql.DriverManager.getConnection(connectionUrl,dbUser,dbPass);
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to load sqlite connection: ", e);
-		}
-	}
-	
-	/// Creates the connection as needed
-	public void recreate(boolean force) {
-		if(force) {
-			dispose();
-		}
-		
-		if(sqlConn != null || force) {
-			setupSqliteConnection( sqliteLocation );
+			throw new RuntimeException("Failed to load sql connection: ", e);
 		}
 	}
 	
 	/// Internal parser that converts some of the common sql statements to sqlite
-	public static String genericSqlParser(String inString) {
-		return inString;
-	}
+   public static String genericSqlParser(String inString) {
+      return inString.replaceAll("\'","`").replaceAll("\"","`"); //fix table name bracketing
+   }
 	
 	/// Executes the argumented query, and returns the result object *without* 
 	/// fetching the result data from the database. (not fetching may not apply to all implementations)
@@ -99,8 +73,7 @@ public class JSql_Sqlite extends JSql implements BaseInterface {
 	/// Executes and dispose the sqliteResult object.
 	///
 	/// Returns false if no result is given by the execution call, else true on success
-	public boolean execute(String qString, Object...values) throws JSqlException {
-		return execute_raw( genericSqlParser(qString), values );
-	}
-	
+   public boolean execute(String qString, Object...values) throws JSqlException {
+      return execute_raw( genericSqlParser(qString), values );
+   }
 }

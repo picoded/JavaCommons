@@ -100,10 +100,13 @@ public class JSql_Sqlite_test {
 	public void execute() throws JSqlException {
 		assertTrue(JSqlObj.execute("DROP TABLE IF EXISTS " + testTableName + "")); //cleanup (just incase)
 
+		//valid table creation : no exception
 		assertTrue(JSqlObj
-		                  .execute("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")); //valid table creation : no exception
+		                  .execute("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )"));
+
+		//run twice to ensure "IF NOT EXISTS" works
 		assertTrue(JSqlObj
-		                  .execute("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")); //run twice to ensure "IF NOT EXISTS" works
+		                  .execute("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )"));
 
 		//assertTrue(JSqlObj.execute( "TRUNCATE TABLE "+testTableName+"")); //cleanup (just incase)
 

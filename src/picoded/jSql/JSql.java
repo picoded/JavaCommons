@@ -44,7 +44,12 @@ public class JSql implements BaseInterface {
 	public static JSql mysql(String urlStr, String dbName, String dbUser, String dbPass) {
 		return new picoded.jSql.db.JSql_Mysql(urlStr, dbName, dbUser, dbPass);
 	}
-
+	
+	/// Mssql static constructor, returns picoded.jSql.dbMssql
+	public static JSql msSql(String dbUrl,String dbName,String dbUser, String dbPass) {
+		return new picoded.jSql.db.JSql_Mssql(dbUrl, dbName, dbUser, dbPass);
+	}
+	
 	/*
 	
 	/// Oracle static constructor, returns picoded.jSql.dbOracle
@@ -52,10 +57,6 @@ public class JSql implements BaseInterface {
 		return new picoded.jSql.dbOracle(oraclePath, dbUser, dbPass);
 	}
 	
-	/// Mssql static constructor, returns picoded.jSql.dbMssql
-	public static JSql msSql(String dbUrl,String dbName,String dbUser, String dbPass) {
-		return new picoded.jSql.dbMssql(dbUrl, dbName, dbUser, dbPass);
-	}
 	 */
 
 	// Throws an exception, as this functionality isnt supported in the base class

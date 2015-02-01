@@ -30,34 +30,30 @@ import picoded.jSql.db.BaseInterface;
 /// Database intreface base class.
 public class JSql implements BaseInterface {
 
-	/// SQLite static constructor, returns picoded.jSql.dbSqlite
+	/// SQLite static constructor, returns picoded.jSql.JSql_Sqlite
 	public static JSql sqlite() {
 		return new picoded.jSql.db.JSql_Sqlite();
 	}
 
-	/// SQLite static constructor, returns picoded.jSql.dbSqlite
+	/// SQLite static constructor, returns picoded.jSql.JSql_Sqlite
 	public static JSql sqlite(String sqliteLoc) {
 		return new picoded.jSql.db.JSql_Sqlite(sqliteLoc);
 	}
 
-	/// MySql static constructor, returns picoded.jSql.dbMysql
+	/// MySql static constructor, returns picoded.jSql.JSql_Mysql
 	public static JSql mysql(String urlStr, String dbName, String dbUser, String dbPass) {
 		return new picoded.jSql.db.JSql_Mysql(urlStr, dbName, dbUser, dbPass);
 	}
-	
-	/// Mssql static constructor, returns picoded.jSql.dbMssql
-	public static JSql msSql(String dbUrl,String dbName,String dbUser, String dbPass) {
+
+	/// Mssql static constructor, returns picoded.jSql.JSql_Mssql
+	public static JSql mssql(String dbUrl, String dbName, String dbUser, String dbPass) {
 		return new picoded.jSql.db.JSql_Mssql(dbUrl, dbName, dbUser, dbPass);
 	}
-	
-	/*
-	
-	/// Oracle static constructor, returns picoded.jSql.dbOracle
+
+	/// Oracle static constructor, returns picoded.jSql.db.JSql_Oracle
 	public static JSql oracle(String oraclePath, String dbUser, String dbPass) {
-		return new picoded.jSql.dbOracle(oraclePath, dbUser, dbPass);
+		return new picoded.jSql.db.JSql_Oracle(oraclePath, dbUser, dbPass);
 	}
-	
-	 */
 
 	// Throws an exception, as this functionality isnt supported in the base class
 	// also allows backwards competibility with test cases

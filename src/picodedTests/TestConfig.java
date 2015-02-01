@@ -64,23 +64,23 @@ public class TestConfig {
 		return MSSQL_PASS;
 	}
 
-	/*
-	//Credentials for ORACLE
-	static private String ORACLE_PATH ="SERVLETCOMMONS@//wen-sg-oracle.cvbukxarewjf.ap-southeast-1.rds.amazonaws.com/WENTEST";
-	static private String ORACLE_USER ="SERVLETCOMMONS";
-	static private String ORACLE_PASS ="SERVLETCOMMONS";
-	
+	//--------------------------------//
+	// Default Credentials for ORACLE //
+	//--------------------------------//
+	static private String ORACLE_PATH = "JAVACOMMONS@//54.169.34.78/xe";
+	static private String ORACLE_USER = "JAVACOMMONS";
+	static private String ORACLE_PASS = "JAVACOMMONS";
+
 	static public String ORACLE_PATH() {
 		return ORACLE_PATH;
 	}
-	
+
 	static public String ORACLE_USER() {
 		return ORACLE_USER;
 	}
-	 
-	 static public String ORACLE_PASS() {
+
+	static public String ORACLE_PASS() {
 		return ORACLE_PASS;
 	}
 
-	 */
 }

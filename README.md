@@ -6,7 +6,6 @@
 
 # The following covers the ANT build commands
 
-|---------------|-------------------------------------------------------------------------------|
 | ant command   | Description                                                                   |
 |---------------|-------------------------------------------------------------------------------|
 | setup         | Setsup the precommit hook script                                              |
@@ -19,4 +18,3 @@
 | src-beautify  | Applies the java beautifier script with current project convention            |
 | compile       | Alias to compile-src                                                          |
 | source        | Alias to compile-src                                                          |
-|---------------|-------------------------------------------------------------------------------|

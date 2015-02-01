@@ -4,7 +4,7 @@ package picoded.jSql;
 public enum JSqlType {
 	/// invalid type (reserved for base class)
 	invalid,
-	
+
 	/// sqlite jdbc or file access
 	sqlite,
 

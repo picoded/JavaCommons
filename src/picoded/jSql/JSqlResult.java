@@ -21,7 +21,6 @@ import java.io.IOException;
 import oracle.sql.CLOB;
 import picoded.conv.ClobString;
 
-
 /// JSql result set, data is either prefetched, or fetch on row request. For example usage, refer to JSql
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.java}
@@ -49,29 +48,28 @@ import picoded.conv.ClobString;
 ///
 public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, ArrayList<Object> /*rowNumber array */> {
 	protected static final long serialVersionUID = 1L;
-	
-	
+
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(JSqlResult.class.getName());
-	
+
 	/// Total row count for query
 	private int rowCount = 0;
-	
+
 	private PreparedStatement sqlStmt = null;
 	private ResultSet sqlRes = null;
-	
+
 	/// Constructor with SQL resultSet
 	/// (Used internally by JSql : not to be used directly)
 	public JSqlResult(PreparedStatement ps, ResultSet rs) {
 		sqlStmt = ps;
 		sqlRes = rs;
 	}
-	
+
 	/// Empty constructor, used as place holder
 	public JSqlResult() { //empty
-		
+
 	}
-	
+
 	/// Fetches all the row data, and store it into the local hashmap & respective array list
 	/// Returns the rowCount on success.
 	///
@@ -82,133 +80,133 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 		String colName;
 		ArrayList<Object> colArr;
 		Object tmpObj;
-		
-		if( sqlRes != null ) {
+
+		if (sqlRes != null) {
 			try {
 				ResultSetMetaData rsmd = sqlRes.getMetaData();
 				colCount = rsmd.getColumnCount();
-				while(sqlRes.next()) {
+				while (sqlRes.next()) {
 					for (pt = 0; pt < colCount; pt++) {
-						colName = rsmd.getColumnName(pt+1);
-						
-						if(this.containsKey(colName)) {
+						colName = rsmd.getColumnName(pt + 1);
+
+						if (this.containsKey(colName)) {
 							colArr = this.get(colName);
 						} else {
 							colArr = new ArrayList<Object>();
 							this.put(colName, colArr);
 						}
-						
+
 						//Auto conversion from Oracle type variables, to a more
 						//Expected format for mysql (basic data structs)
-						tmpObj = sqlRes.getObject(pt+1);
-						if( BigDecimal.class.isInstance(tmpObj) ) {
-							tmpObj = new Double( ((BigDecimal)tmpObj).doubleValue() );
-						} else if( CLOB.class.isInstance(tmpObj) ) {
+						tmpObj = sqlRes.getObject(pt + 1);
+						if (BigDecimal.class.isInstance(tmpObj)) {
+							tmpObj = new Double(((BigDecimal) tmpObj).doubleValue());
+						} else if (CLOB.class.isInstance(tmpObj)) {
 							try {
-								tmpObj = ClobString.toStringNoisy((CLOB)tmpObj);
-							} catch(SQLException e) {
+								tmpObj = ClobString.toStringNoisy((CLOB) tmpObj);
+							} catch (SQLException e) {
 								throw new JSqlException("CLOB Processing Error", e);
-							} catch(IOException e) {
+							} catch (IOException e) {
 								throw new JSqlException("CLOB Processing Error", e);
 							}
 						}
-						
+
 						colArr.add(rowCount, tmpObj);
 					}
-					
+
 					++rowCount;
 				}
-				
+
 				dispose();
-			} catch(Exception e) {
-				throw new JSqlException("Error fetching sql row "+rowCount+": ", e);
+			} catch (Exception e) {
+				throw new JSqlException("Error fetching sql row " + rowCount + ": ", e);
 			}
-			
+
 		}
-		
+
 		//throw new JSqlException("SQL format is not yet implemented");
 		return rowCount;
 	}
-	
+
 	/// Return current row count
 	public int rowCount() {
 		return rowCount;
 	}
-	
+
 	/// Read a fetched row in a single hashmap
 	@SuppressWarnings("unchecked")
 	public HashMap<String, Object> readRow(int pt) {
-		if(pt >= rowCount) {
+		if (pt >= rowCount) {
 			return null;
 		}
 		HashMap<String, Object> ret = new HashMap<String, Object>();
-		Iterator<Map.Entry<String,ArrayList<Object>>> it = this.entrySet().iterator();
-		Map.Entry<String,ArrayList<Object>> pairs;
+		Iterator<Map.Entry<String, ArrayList<Object>>> it = this.entrySet().iterator();
+		Map.Entry<String, ArrayList<Object>> pairs;
 		String colName;
 		ArrayList<Object> colArr;
 		while (it.hasNext()) {
 			pairs = it.next();
 			colName = pairs.getKey();
 			colArr = pairs.getValue();
-			ret.put( colName, colArr.get(pt) );
+			ret.put(colName, colArr.get(pt));
 		}
 		return ret;
 	}
-	
+
 	/// Read a fetched row column value and returns it (if row/value exists)
 	public Object readRowCol(int pt, String name) {
 		ArrayList<Object> colArr = this.get(name);
-		if(colArr != null) {
+		if (colArr != null) {
 			return colArr.get(pt);
 		}
 		return null;
 	}
-	
+
 	/// JSql result set to an object array, from a single collumn field
 	public Object[] readCol(String field) {
 		ArrayList<Object> resList = get(field);
-		return (resList != null)? resList.toArray( new Object[resList.size()] ) : null;
+		return (resList != null) ? resList.toArray(new Object[resList.size()]) : null;
 	}
-	
+
 	/// JSql result set to an string array, from a single collumn field
 	public String[] readCol_StringArr(String field) {
 		ArrayList<Object> resList = get(field);
 		int len = resList.size();
-		
+
 		int pt = 0;
 		String[] res = new String[len];
 		for (Object data : resList) {
 			res[pt] = (String) data;
-			
+
 			pt++;
-			if( pt > len ) {
+			if (pt > len) {
 				break;
 			}
 		}
 		return res;
 	}
-	
+
 	/// Dispose and closes the result connection
 	public void dispose() {
 		try {
-			if(sqlRes != null) {
+			if (sqlRes != null) {
 				sqlRes.close();
 				sqlRes = null;
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			//Logg the exception as warning
 			logger.log(Level.WARNING, "JSqlResult.dispose result exception", e);
 		}
-		
+
 		try {
-			if(sqlStmt != null) {
+			if (sqlStmt != null) {
 				sqlStmt.close();
 				sqlStmt = null;
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			//Logg the exception as warning
 			logger.log(Level.WARNING, "JSqlResult.dispose statement exception", e);
 		}
 	}
-	
+
 }

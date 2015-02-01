@@ -47,9 +47,11 @@ public class HazelcastSimple_test {
 		
 		Config clusterConfig = new Config();
 		clusterConfig.getGroupConfig().setName( clusterName );
+		clusterConfig.setProperty("hazelcast.logging.type", "none");
 		
 		ClientConfig clientConfig = new ClientConfig();
 		clientConfig.getGroupConfig().setName( clusterName );
+		clientConfig.setProperty("hazelcast.logging.type", "none");
 		
 		
 		HazelcastInstance instance = Hazelcast.newHazelcastInstance(clusterConfig);

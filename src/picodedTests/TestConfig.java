@@ -19,7 +19,7 @@ public class TestConfig {
 	//-------------------------------//
    // Default Credentials for MYSQL //
 	//-------------------------------//
-   static private String MYSQL_CONN ="127.0.0.1:3306";
+   static private String MYSQL_CONN ="54.169.34.78:3306";
    static private String MYSQL_DATA ="JAVACOMMONS";
    static private String MYSQL_USER ="JAVACOMMONS";
    static private String MYSQL_PASS ="JAVACOMMONS";

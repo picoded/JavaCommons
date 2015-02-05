@@ -48,28 +48,28 @@ import picoded.conv.ClobString;
 ///
 public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, ArrayList<Object> /*rowNumber array */> {
 	protected static final long serialVersionUID = 1L;
-
+	
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(JSqlResult.class.getName());
-
+	
 	/// Total row count for query
 	private int rowCount = 0;
-
+	
 	private PreparedStatement sqlStmt = null;
 	private ResultSet sqlRes = null;
-
+	
 	/// Constructor with SQL resultSet
 	/// (Used internally by JSql : not to be used directly)
 	public JSqlResult(PreparedStatement ps, ResultSet rs) {
 		sqlStmt = ps;
 		sqlRes = rs;
 	}
-
+	
 	/// Empty constructor, used as place holder
 	public JSqlResult() { //empty
-
+	
 	}
-
+	
 	/// Fetches all the row data, and store it into the local hashmap & respective array list
 	/// Returns the rowCount on success.
 	///
@@ -80,7 +80,7 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 		String colName;
 		ArrayList<Object> colArr;
 		Object tmpObj;
-
+		
 		if (sqlRes != null) {
 			try {
 				ResultSetMetaData rsmd = sqlRes.getMetaData();
@@ -88,14 +88,14 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 				while (sqlRes.next()) {
 					for (pt = 0; pt < colCount; pt++) {
 						colName = rsmd.getColumnName(pt + 1);
-
+						
 						if (this.containsKey(colName)) {
 							colArr = this.get(colName);
 						} else {
 							colArr = new ArrayList<Object>();
 							this.put(colName, colArr);
 						}
-
+						
 						//Auto conversion from Oracle type variables, to a more
 						//Expected format for mysql (basic data structs)
 						tmpObj = sqlRes.getObject(pt + 1);
@@ -110,29 +110,29 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 								throw new JSqlException("CLOB Processing Error", e);
 							}
 						}
-
+						
 						colArr.add(rowCount, tmpObj);
 					}
-
+					
 					++rowCount;
 				}
-
+				
 				dispose();
 			} catch (Exception e) {
 				throw new JSqlException("Error fetching sql row " + rowCount + ": ", e);
 			}
-
+			
 		}
-
+		
 		//throw new JSqlException("SQL format is not yet implemented");
 		return rowCount;
 	}
-
+	
 	/// Return current row count
 	public int rowCount() {
 		return rowCount;
 	}
-
+	
 	/// Read a fetched row in a single hashmap
 	@SuppressWarnings("unchecked")
 	public HashMap<String, Object> readRow(int pt) {
@@ -152,7 +152,7 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 		}
 		return ret;
 	}
-
+	
 	/// Read a fetched row column value and returns it (if row/value exists)
 	public Object readRowCol(int pt, String name) {
 		ArrayList<Object> colArr = this.get(name);
@@ -161,23 +161,23 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 		}
 		return null;
 	}
-
+	
 	/// JSql result set to an object array, from a single collumn field
 	public Object[] readCol(String field) {
 		ArrayList<Object> resList = get(field);
 		return (resList != null) ? resList.toArray(new Object[resList.size()]) : null;
 	}
-
+	
 	/// JSql result set to an string array, from a single collumn field
 	public String[] readCol_StringArr(String field) {
 		ArrayList<Object> resList = get(field);
 		int len = resList.size();
-
+		
 		int pt = 0;
 		String[] res = new String[len];
 		for (Object data : resList) {
 			res[pt] = (String) data;
-
+			
 			pt++;
 			if (pt > len) {
 				break;
@@ -185,7 +185,7 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 		}
 		return res;
 	}
-
+	
 	/// Dispose and closes the result connection
 	public void dispose() {
 		try {
@@ -197,7 +197,7 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 			//Logg the exception as warning
 			logger.log(Level.WARNING, "JSqlResult.dispose result exception", e);
 		}
-
+		
 		try {
 			if (sqlStmt != null) {
 				sqlStmt.close();
@@ -208,5 +208,5 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 			logger.log(Level.WARNING, "JSqlResult.dispose statement exception", e);
 		}
 	}
-
+	
 }

@@ -18,24 +18,24 @@ import org.codehaus.jackson.map.ObjectMapper;
 /// Technical notes: Jackson is used internally.
 ///
 public class ConvertJSON {
-
+	
 	/// Internal reused object mapper, this is via jackson json conerter
 	private static ObjectMapper cachedMapper = new ObjectMapper();
-
+	
 	/////////////////////////////////////////////////
 	// From java objects to JSON string conversion
 	/////////////////////////////////////////////////
-
+	
 	/// Converts input object into a json string
 	public static String fromMap(Map<String, ?> input) {
 		return fromObject(input);
 	}
-
+	
 	/// Converts input object into a json string
 	public static String fromList(List<?> input) {
 		return fromObject(input);
 	}
-
+	
 	/// Converts input object into a json string
 	///
 	/// Note that this is the core "to JSON string" function that all
@@ -47,29 +47,29 @@ public class ConvertJSON {
 			throw new RuntimeException(e);
 		}
 	}
-
+	
 	/////////////////////////////////////////////////
 	// From JSON string to java object
 	/////////////////////////////////////////////////
-
+	
 	/// Converts json string into an mapping object
 	@SuppressWarnings("unchecked")
 	public static Map<String, Object> toMap(String input) {
 		return (Map<String, Object>) toCustomClass(input, Map.class);
 	}
-
+	
 	/// Converts json string into an list array
 	@SuppressWarnings("unchecked")
 	public static List<Object> toList(String input) {
 		return (List<Object>) toCustomClass(input, List.class);
 	}
-
+	
 	/// Converts json string into any output object (depends on input)
 	@SuppressWarnings("unchecked")
 	public static Object toObject(String input) {
 		return toCustomClass(input, Object.class);
 	}
-
+	
 	/// Converts json string into a custom output object
 	///
 	/// Note that this is the core "to java object" function that all
@@ -82,11 +82,11 @@ public class ConvertJSON {
 			throw new RuntimeException(e);
 		}
 	}
-
+	
 	/////////////////////////////////////////////////
 	// To refactor, Test, and creates its conversion counterpart
 	/////////////////////////////////////////////////
-
+	
 	/// Converts a json string into a string[] array
 	@SuppressWarnings("unchecked")
 	public static String[] toStringArray(String input) {
@@ -94,7 +94,7 @@ public class ConvertJSON {
 		if (rawList == null || rawList.size() <= 0) {
 			return null;
 		}
-
+		
 		int len = rawList.size();
 		String[] ret = new String[len];
 		for (int a = 0; a < len; ++a) {
@@ -102,7 +102,7 @@ public class ConvertJSON {
 		}
 		return ret;
 	}
-
+	
 	/// Converts a json string into a double[] array
 	@SuppressWarnings("unchecked")
 	public static double[] toDoubleArray(String input) {
@@ -110,7 +110,7 @@ public class ConvertJSON {
 		if (rawList == null || rawList.size() <= 0) {
 			return null;
 		}
-
+		
 		int len = rawList.size();
 		double[] ret = new double[len];
 		for (int a = 0; a < len; ++a) {
@@ -118,7 +118,7 @@ public class ConvertJSON {
 		}
 		return ret;
 	}
-
+	
 	/// Converts a json string into a int[] array
 	@SuppressWarnings("unchecked")
 	public static int[] toIntArray(String input) {
@@ -126,7 +126,7 @@ public class ConvertJSON {
 		if (rawList == null || rawList.size() <= 0) {
 			return null;
 		}
-
+		
 		int len = rawList.size();
 		int[] ret = new int[len];
 		for (int a = 0; a < len; ++a) {

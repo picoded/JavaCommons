@@ -11,7 +11,7 @@ import java.io.BufferedReader;
 /// Utility function that converst from oracle.sql.CLOB to string (and back!)
 ///
 public class ClobString {
-
+	
 	static public String toString(CLOB inData) {
 		try {
 			return toStringNoisy(inData);
@@ -21,7 +21,7 @@ public class ClobString {
 			return null;
 		}
 	}
-
+	
 	static public String toStringNoisy(CLOB inData) throws SQLException, IOException {
 		final StringBuilder sb = new StringBuilder();
 		final BufferedReader br = new BufferedReader(inData.getCharacterStream());

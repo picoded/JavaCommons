@@ -29,32 +29,32 @@ import picoded.jSql.db.BaseInterface;
 
 /// Pure SQLite implentation of JSql
 public class JSql_Sqlite extends JSql implements BaseInterface {
-
+	
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(JSql_Sqlite.class.getName());
-
+	
 	/// Internal reuse sqlite file location, used for recreate
 	private String sqliteLocation = null;
-
+	
 	/// Runs with in memory SQLite
 	public JSql_Sqlite() {
 		setupSqliteConnection(null);
 	}
-
+	
 	/// Runs JSql with the JDBC sqlite engine
 	public JSql_Sqlite(String sqliteLoc) {
 		setupSqliteConnection(sqliteLoc);
 	}
-
+	
 	/// Internal common reuse constructor
 	private void setupSqliteConnection(String sqliteLoc) {
 		sqlType = JSqlType.sqlite;
 		sqliteLocation = sqliteLoc;
-
+		
 		if (sqliteLocation == null) {
 			sqliteLocation = ":memory:";
 		}
-
+		
 		try {
 			Class.forName("org.sqlite.JDBC");
 			sqlConn = java.sql.DriverManager.getConnection("jdbc:sqlite:" + sqliteLocation);
@@ -62,23 +62,23 @@ public class JSql_Sqlite extends JSql implements BaseInterface {
 			throw new RuntimeException("Failed to load sqlite connection: ", e);
 		}
 	}
-
+	
 	/// Creates the connection as needed
 	public void recreate(boolean force) {
 		if (force) {
 			dispose();
 		}
-
+		
 		if (sqlConn != null || force) {
 			setupSqliteConnection(sqliteLocation);
 		}
 	}
-
+	
 	/// Internal parser that converts some of the common sql statements to sqlite
 	public static String genericSqlParser(String inString) {
 		return inString;
 	}
-
+	
 	/// Executes the argumented query, and returns the result object *without* 
 	/// fetching the result data from the database. (not fetching may not apply to all implementations)
 	/// 
@@ -86,7 +86,7 @@ public class JSql_Sqlite extends JSql implements BaseInterface {
 	public JSqlResult executeQuery(String qString, Object... values) throws JSqlException {
 		return executeQuery_raw(genericSqlParser(qString), values);
 	}
-
+	
 	/// Executes the argumented query, and immediately fetches the result from
 	/// the database into the result set.
 	///
@@ -94,12 +94,12 @@ public class JSql_Sqlite extends JSql implements BaseInterface {
 	public JSqlResult query(String qString, Object... values) throws JSqlException {
 		return query_raw(genericSqlParser(qString), values);
 	}
-
+	
 	/// Executes and dispose the sqliteResult object.
 	///
 	/// Returns false if no result is given by the execution call, else true on success
 	public boolean execute(String qString, Object... values) throws JSqlException {
 		return execute_raw(genericSqlParser(qString), values);
 	}
-
+	
 }

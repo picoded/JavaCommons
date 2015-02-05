@@ -8,14 +8,14 @@ import org.apache.commons.lang3.RandomStringUtils;
 /// Value access were made as functions, to facilitate future migration to config files??
 ///
 public class TestConfig {
-
+	
 	///
 	/// Randomly generated table prefix, used to prevent multiple running tests from colliding
 	///
 	static public String randomTablePrefix() {
 		return RandomStringUtils.randomAlphanumeric(8).toUpperCase();
 	}
-
+	
 	//-------------------------------//
 	// Default Credentials for MYSQL //
 	//-------------------------------//
@@ -23,28 +23,53 @@ public class TestConfig {
 	static private String MYSQL_DATA = "JAVACOMMONS";
 	static private String MYSQL_USER = "JAVACOMMONS";
 	static private String MYSQL_PASS = "JAVACOMMONS";
-
+	
 	static public String MYSQL_CONN() {
 		return MYSQL_CONN;
 	}
-
+	
 	static public String MYSQL_DATA() {
 		return MYSQL_DATA;
 	}
-
+	
 	static public String MYSQL_USER() {
 		return MYSQL_USER;
 	}
-
+	
 	static public String MYSQL_PASS() {
 		return MYSQL_PASS;
 	}
-
-	/*
-	//Credentials for ORACLE
-	static private String ORACLE_PATH ="SERVLETCOMMONS@//wen-sg-oracle.cvbukxarewjf.ap-southeast-1.rds.amazonaws.com/WENTEST";
-	static private String ORACLE_USER ="SERVLETCOMMONS";
-	static private String ORACLE_PASS ="SERVLETCOMMONS";
+	
+	//-------------------------------//
+	// Default Credentials for MSSQL //
+	//-------------------------------//
+	static private String MSSQL_CONN = "54.169.34.78";
+	static private String MSSQL_NAME = "JAVACOMMONS";
+	static private String MSSQL_USER = "JAVACOMMONS";
+	static private String MSSQL_PASS = "JAVACOMMONS";
+	
+	static public String MSSQL_CONN() {
+		return MSSQL_CONN;
+	}
+	
+	static public String MSSQL_NAME() {
+		return MSSQL_NAME;
+	}
+	
+	static public String MSSQL_USER() {
+		return MSSQL_USER;
+	}
+	
+	static public String MSSQL_PASS() {
+		return MSSQL_PASS;
+	}
+	
+	//--------------------------------//
+	// Default Credentials for ORACLE //
+	//--------------------------------//
+	static private String ORACLE_PATH = "JAVACOMMONS@//54.169.34.78/xe";
+	static private String ORACLE_USER = "JAVACOMMONS";
+	static private String ORACLE_PASS = "JAVACOMMONS";
 	
 	static public String ORACLE_PATH() {
 		return ORACLE_PATH;
@@ -53,31 +78,9 @@ public class TestConfig {
 	static public String ORACLE_USER() {
 		return ORACLE_USER;
 	}
-	 
-	 static public String ORACLE_PASS() {
+	
+	static public String ORACLE_PASS() {
 		return ORACLE_PASS;
 	}
-
-	//Credentials for MS-SQL
-	static private String MSSQL_CONN ="wen-sg-mssqlstd.cvbukxarewjf.ap-southeast-1.rds.amazonaws.com";
-	static private String MSSQL_NAME ="SERVLETCOMMONS";
-	static private String MSSQL_USER ="SERVLETCOMMONS";
-	static private String MSSQL_PASS ="SERVLETCOMMONS";
-
-	static public String MSSQL_CONN() {
-	   return MSSQL_CONN;
-	}
-
-	static public String MSSQL_NAME() {
-	   return MSSQL_NAME;
-	}
-
-	static public String MSSQL_USER() {
-	   return MSSQL_USER;
-	}
-
-	static public String MSSQL_PASS() {
-	   return MSSQL_PASS;
-	}
-	 */
+	
 }

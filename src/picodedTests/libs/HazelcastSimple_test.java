@@ -26,42 +26,42 @@ import picodedTests.TestConfig;
 /// Test Case for Hazelcast basic functionality, this is to ensure the library "is working"
 ///
 public class HazelcastSimple_test {
-
+	
 	@Before
 	public void setUp() {
-
+		
 	}
-
+	
 	@After
 	public void tearDown() {
-
+		
 	}
-
+	
 	///
 	/// Test the basic memory cache put and get
 	///
 	@Test
 	public void basicPutAndGet() {
-
+		
 		String clusterName = TestConfig.randomTablePrefix();
-
+		
 		Config clusterConfig = new Config();
 		clusterConfig.getGroupConfig().setName(clusterName);
 		clusterConfig.setProperty("hazelcast.logging.type", "none");
-
+		
 		ClientConfig clientConfig = new ClientConfig();
 		clientConfig.getGroupConfig().setName(clusterName);
 		clientConfig.setProperty("hazelcast.logging.type", "none");
-
+		
 		HazelcastInstance instance = Hazelcast.newHazelcastInstance(clusterConfig);
 		Map<Integer, String> mapCustomers = instance.getMap("customers");
 		mapCustomers.put(1, "Joe");
-
+		
 		HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
 		Map<Integer, String> map = client.getMap("customers");
-
+		
 		assertEquals(1, map.size());
 		assertEquals("Joe", map.get(1));
-
+		
 	}
 }

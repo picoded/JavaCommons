@@ -29,35 +29,32 @@ import picoded.jSql.db.BaseInterface;
 
 /// Database intreface base class.
 public class JSql implements BaseInterface {
-
-	/// SQLite static constructor, returns picoded.jSql.dbSqlite
+	
+	/// SQLite static constructor, returns picoded.jSql.JSql_Sqlite
 	public static JSql sqlite() {
 		return new picoded.jSql.db.JSql_Sqlite();
 	}
-
-	/// SQLite static constructor, returns picoded.jSql.dbSqlite
+	
+	/// SQLite static constructor, returns picoded.jSql.JSql_Sqlite
 	public static JSql sqlite(String sqliteLoc) {
 		return new picoded.jSql.db.JSql_Sqlite(sqliteLoc);
 	}
-
-	/// MySql static constructor, returns picoded.jSql.dbMysql
+	
+	/// MySql static constructor, returns picoded.jSql.JSql_Mysql
 	public static JSql mysql(String urlStr, String dbName, String dbUser, String dbPass) {
 		return new picoded.jSql.db.JSql_Mysql(urlStr, dbName, dbUser, dbPass);
 	}
-
-	/*
 	
-	/// Oracle static constructor, returns picoded.jSql.dbOracle
+	/// Mssql static constructor, returns picoded.jSql.JSql_Mssql
+	public static JSql mssql(String dbUrl, String dbName, String dbUser, String dbPass) {
+		return new picoded.jSql.db.JSql_Mssql(dbUrl, dbName, dbUser, dbPass);
+	}
+	
+	/// Oracle static constructor, returns picoded.jSql.db.JSql_Oracle
 	public static JSql oracle(String oraclePath, String dbUser, String dbPass) {
-		return new picoded.jSql.dbOracle(oraclePath, dbUser, dbPass);
+		return new picoded.jSql.db.JSql_Oracle(oraclePath, dbUser, dbPass);
 	}
 	
-	/// Mssql static constructor, returns picoded.jSql.dbMssql
-	public static JSql msSql(String dbUrl,String dbName,String dbUser, String dbPass) {
-		return new picoded.jSql.dbMssql(dbUrl, dbName, dbUser, dbPass);
-	}
-	 */
-
 	// Throws an exception, as this functionality isnt supported in the base class
 	// also allows backwards competibility with test cases
 	//public JSql() {
@@ -67,24 +64,24 @@ public class JSql implements BaseInterface {
 	public void recreate(boolean force) {
 		throw new RuntimeException(JSqlException.invalidDatabaseImplementationException);
 	}
-
+	
 	/// database connection
 	protected Connection sqlConn = null;
-
+	
 	/// Internal refrence of the current sqlType the system is running as
 	public JSqlType sqlType = JSqlType.invalid;
-
+	
 	/// [private] Helper function, used to prepare the sql statment in multiple situations
 	protected PreparedStatement prepareSqlStatment(String qString, Object... values) throws JSqlException {
 		int pt = 0;
 		final Object parts[] = values;
-
+		
 		Object argObj;
 		PreparedStatement ps;
-
+		
 		try {
 			ps = sqlConn.prepareStatement(qString);
-
+			
 			for (pt = 0; pt < parts.length; ++pt) {
 				argObj = parts[pt];
 				if (argObj == null) {
@@ -107,7 +104,7 @@ public class JSql implements BaseInterface {
 		}
 		return ps;
 	}
-
+	
 	/// Executes the argumented query, and returns the result object *without*
 	/// fetching the result data from the database. This is raw execution.
 	///
@@ -125,7 +122,7 @@ public class JSql implements BaseInterface {
 				if (qString.trim().toUpperCase().substring(0, 6).equals("SELECT")) {
 					rs = ps.executeQuery();
 					res = new JSqlResult(ps, rs);
-
+					
 					//let JSqlResult "close" it
 					ps = null;
 					rs = null;
@@ -150,7 +147,7 @@ public class JSql implements BaseInterface {
 			throw new JSqlException("executeQuery_raw exception", e);
 		}
 	}
-
+	
 	/// Executes the argumented query, and immediately fetches the result from
 	/// the database into the result set. This is raw execution.
 	///
@@ -162,7 +159,7 @@ public class JSql implements BaseInterface {
 		}
 		return result;
 	}
-
+	
 	/// Executes and dispose the sqliteResult object. Similar to executeQuery
 	/// Returns false if no result object is given by the execution call. This is raw execution.
 	public boolean execute_raw(String qString, Object... values) throws JSqlException {
@@ -195,27 +192,27 @@ public class JSql implements BaseInterface {
 		}
 		return false;
 	}
-
+	
 	/// Throws an exception, as this functionality isnt supported in the base class
 	public JSqlResult executeQuery(String qString, Object... values) throws JSqlException {
 		throw new JSqlException(JSqlException.invalidDatabaseImplementationException);
 	}
-
+	
 	/// Throws an exception, as this functionality isnt supported in the base class
 	public JSqlResult query(String qString, Object... values) throws JSqlException {
 		throw new JSqlException(JSqlException.invalidDatabaseImplementationException);
 	}
-
+	
 	/// Throws an exception, as this functionality isnt supported in the base class
 	public boolean execute(String qString, Object... values) throws JSqlException {
 		throw new JSqlException(JSqlException.invalidDatabaseImplementationException);
 	}
-
+	
 	/// Returns true, if dispose() function was called prior
 	public boolean isDisposed() {
 		return (sqlConn == null);
 	}
-
+	
 	/// Dispose of the respective SQL driver / connection
 	public void dispose() {
 		// Disposes the instancce connection
@@ -229,7 +226,7 @@ public class JSql implements BaseInterface {
 			sqlConn = null;
 		}
 	}
-
+	
 	/// Just incase a user forgets to dispose "as per normal"
 	protected void finalize() throws Throwable {
 		try {
@@ -238,5 +235,5 @@ public class JSql implements BaseInterface {
 			super.finalize();
 		}
 	}
-
+	
 }

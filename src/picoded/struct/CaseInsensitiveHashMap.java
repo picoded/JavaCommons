@@ -23,10 +23,10 @@ import java.util.HashMap;
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
 public class CaseInsensitiveHashMap<K extends String, V> extends HashMap<K, V> {
-
+	
 	/// Java serialversion uid: http://stackoverflow.com/questions/285793/what-is-a-serialversionuid-and-why-should-i-use-it
 	private static final long serialVersionUID = 42L;
-
+	
 	/// Associates the specified value with the specified key in this map.
 	/// If the map previously contained a mapping for the key, the old value is replaced.
 	///
@@ -40,7 +40,7 @@ public class CaseInsensitiveHashMap<K extends String, V> extends HashMap<K, V> {
 	public V put(K key, V value) {
 		return super.put((K) (key.toString().toLowerCase()), value);
 	}
-
+	
 	/// Returns the value to which the specified key is mapped, or null if this map contains no mapping for the key.
 	/// More formally, if this map contains a mapping from a key k to a value v such that (key==null ? k==null : key.toLowerCase().equals(k)), 
 	/// then this method returns v; otherwise it returns null. (There can be at most one such mapping.)
@@ -55,7 +55,7 @@ public class CaseInsensitiveHashMap<K extends String, V> extends HashMap<K, V> {
 	public V get(Object key) {
 		return super.get((K) (key.toString().toLowerCase()));
 	}
-
+	
 	/// Returns true if this map contains a mapping for the specified key.
 	///
 	/// @param    key     The key whose presence in this map is to be tested
@@ -66,7 +66,7 @@ public class CaseInsensitiveHashMap<K extends String, V> extends HashMap<K, V> {
 	public boolean containsKey(Object key) {
 		return super.containsKey((K) (key.toString().toLowerCase()));
 	}
-
+	
 	/// Removes the mapping for the specified key from this map if present.
 	///
 	/// @param    key     key whose mapping is to be removed from the map
@@ -78,7 +78,7 @@ public class CaseInsensitiveHashMap<K extends String, V> extends HashMap<K, V> {
 	public V remove(Object key) {
 		return super.remove((K) (key.toString().toLowerCase()));
 	}
-
+	
 	/// @todo   the actual class implementation
 	///
 	/// Copies all of the mappings from the specified map to this map. 

@@ -40,7 +40,7 @@ import java.lang.System;
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
 public class DeleteFilesByAge {
-
+	
 	/// Delete files modified timestamp, found older then the given time stamp
 	///
 	/// @param   fileObj                  File object, that is scanned as a directory / deleted as a file
@@ -54,7 +54,7 @@ public class DeleteFilesByAge {
 			fileObj.delete();
 		}
 	}
-
+	
 	/// Delete files modified timestamp, older then given age
 	///
 	/// @param   fileObj        File object, that is scanned as a directory / deleted as a file
@@ -62,7 +62,7 @@ public class DeleteFilesByAge {
 	static public void olderThenGivenAgeInSeconds(File fileObj, long ageInSeconds) {
 		DeleteFilesByAge.olderThenUnixTimestamp(fileObj, ((System.currentTimeMillis() / 1000L) - ageInSeconds));
 	}
-
+	
 	/// Delete files modified timestamp, older then given age
 	///
 	/// @param   filePath       The file path of the directory / file to scan

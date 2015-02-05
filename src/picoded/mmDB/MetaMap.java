@@ -35,12 +35,12 @@ import java.util.logging.*;
 /// *******************************************************************************
 ///
 public class MetaMap /*implements Map<String, Map<String,Object>>*/{
-
+	
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(MetaMap.class.getName());
-
+	
 	protected JSql JSqlObj = null;
-
+	
 	/*
 	/// [TODO: Mid priority] -> To make protected (double check test case), and
 	/// create getter function

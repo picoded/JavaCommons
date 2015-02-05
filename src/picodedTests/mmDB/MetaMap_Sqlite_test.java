@@ -11,18 +11,18 @@ import static org.junit.Assert.*;
 /// Test Case for picoded.struct.CaseInsensitiveHashMap
 ///
 public class MetaMap_Sqlite_test {
-
+	
 	protected MetaMap mmObj = null;
-
+	
 	@Before
 	public void setUp() {
 		mmObj = new MetaMap();
 	}
-
+	
 	@After
 	public void tearDown() {
 	}
-
+	
 	/// Test the object constructor
 	@Test
 	public void constructor() {

@@ -6,9 +6,7 @@ import java.util.Set;
 import picoded.jSql.*;
 import java.util.logging.*;
 
-/// MetaMap, is a simple abstraction of a objectkey, key, value storage. This extends the Map<String, Map<String, Object>> class.
-///
-/// All key values pairs are stored and read as strings
+/// MetaMap, is a simple abstraction of a objectkey, key, value storage. This extends the Map<String, MultiMap<String, Object>> class.
 ///
 /// *******************************************************************************
 ///
@@ -36,147 +34,131 @@ import java.util.logging.*;
 ///
 public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 	
+	//---------------------//
+	// Constructor         //
+	//---------------------//
+	
+	/// Constructor with the jSql object, and the deployed table name
+	public MetaMap(JSql inSql, String tableName) {
+		JSqlObj = inSql;
+		sqlTableName = tableName;
+	}
+	
+	//---------------------//
+	// Protected variables //
+	//---------------------//
+	
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(MetaMap.class.getName());
 	
+	/// The JSQL object that acts as the persistent object store
 	protected JSql JSqlObj = null;
 	
-	/*
-	/// [TODO: Mid priority] -> To make protected (double check test case), and
-	/// create getter function
+	/// Internal SQL table name
 	protected String sqlTableName;
-
-	/// Object ID field type, This value SHOULD NOT be modified directly
-	/// [TODO: Mid priority] -> To make protected (double check test case), and
-	/// create getter function
-	public String objColumnType = "VARCHAR(60)";
-
-	/// Key name field type, This value SHOULD NOT be modified directly
-	/// [TODO: Mid priority] -> To make protected (double check test case), and
-	/// create getter function
-	public String keyColumnType = "VARCHAR(60)";
-
-	/// Value name field type, This value SHOULD NOT be modified directly
-	/// [TODO: Mid priority] -> To make protected (double check test case), and
-	// create getter function
-	public String valColumnType = "VARCHAR(4000)";
-
-	/// Additional field defination, This value SHOULD NOT be modified directly
-	/// [TODO: Mid priority] -> To make protected (double check test case), and
-	/// create getter function
-	public String addColumnDefination = "";
-
-	/// Constructor with the jSql object, and the deployed table name
-	public metaTable(jSql inSql, String tableName) {
-		jSqlObj = inSql;
-		sqlTableName = tableName;
+	
+	/// Object byte space default as 60
+	protected int objColumnLength = 60;
+	
+	/// Key byte space default as 60
+	protected int keyColumnLength = 60;
+	
+	/// Value byte space default as 4000
+	protected int valColumnLength = 4000;
+	
+	//--------------------------------------//
+	// Protected variables getter functions //
+	//--------------------------------------//
+	
+	/// Returns the initialized tableName
+	public String tableName() {
+		return sqlTableName;
 	}
-
-	/// Sets the Object ID field type.
-	/// These are meant to give an exception if table is already setup
-	public metaTable objColumnType(String inStr) {
-		objColumnType = inStr;
-		return this;
+	
+	/// Returns the initialized JSqlObject
+	public JSql JSqlObject() {
+		return JSqlObj;
 	}
-
-	/// Sets the key name field type
-	/// These are meant to give an exception if table is already setup
-	public metaTable keyColumnType(String inStr) {
-		keyColumnType = inStr;
-		return this;
-	}
-
-	/// Sets the value name field type
-	/// These are meant to give an exception if table is already setup
-	public metaTable valColumnType(String inStr) {
-		valColumnType = inStr;
-		return this;
-	}
-
-	/// Add additional column defination
-	/// These are meant to give an exception if table is already setup
-	/// [TODO: Mid priority] The respective test case
-	public metaTable addColumnDefination(String inStr) {
-		addColumnDefination = inStr;
-		return this;
-	}
-
-	/// Table setup : This is to be replaced by missing table exception
-	/// handling
-	public metaTable tableSetup() throws jSqlException {
-	   String qStr;
-	   if (jSqlObj.sqlType == jSqlType.sql){ //val column will be TEXT for mysql
-	      valColumnType = "TEXT(65535)";
-	   }
-		if (addColumnDefination != null && addColumnDefination.length() > 0) {
-			qStr = "CREATE TABLE IF NOT EXISTS `" + sqlTableName + "` (obj " + objColumnType + ", metaKey "
-					+ keyColumnType + ", val " + valColumnType + "," + addColumnDefination + ");";
-		} else {
-			qStr = "CREATE TABLE IF NOT EXISTS `" + sqlTableName + "` (obj " + objColumnType + ", metaKey "
-					+ keyColumnType + ", val " + valColumnType + ");";
-		}
-
+	
+	//-----------------------------------//
+	// JSql database storage table setup //
+	//-----------------------------------//
+	
+	/// Helper function, that logs the query, then execute it
+	private void logAndExecute(String qStr) throws JSqlException {
 		logger.finer(qStr);
-		jSqlObj.execute(qStr);
-		if (jSqlObj.sqlType == jSqlType.sqlite || jSqlObj.sqlType == jSqlType.oracle) {
-			// sqlite unique index http://www.sqlite.org/lang_createindex.html
-			jSqlObj.execute("CREATE UNIQUE INDEX IF NOT EXISTS `" + sqlTableName + "_unique` ON `" + sqlTableName
-					+ "` (obj, metaKey)");
+		JSqlObj.execute(qStr);
+	}
+	
+	/// Helper function, creates a non unique index for hte given collumn type
+	private void createJSqlIndex(String collumnName) throws JSqlException {
+		logAndExecute("CREATE INDEX IF NOT EXISTS `" + sqlTableName + "_" + collumnName + "` ON `" + sqlTableName + "` ("
+		   + collumnName + ")");
+	}
+	
+	/// Performs the required tableSetup for the JSQL database, after defining the various column lengths
+	public MetaMap tableSetup(int inObjColumnLength, int inKeyColumnLength, int inValColumnLength) throws JSqlException {
+		objColumnLength = inObjColumnLength;
+		keyColumnLength = inKeyColumnLength;
+		valColumnLength = inValColumnLength;
+		return tableSetup();
+	}
+	
+	/// Performs the required tableSetup for the JSQL database
+	public MetaMap tableSetup() throws JSqlException {
+		logAndExecute("CREATE TABLE IF NOT EXISTS `" + sqlTableName + "` (" + // Table Name
+		   // --------------------------------------------------------------------------
+		   "oKey VARCHAR(" + objColumnLength + "), " + // Object namespace
+		   "mKey VARCHAR(" + keyColumnLength + "), " + // Obj.Key namespace
+		   // --------------------------------------------------------------------------
+		   "vStr VARCHAR(" + valColumnLength + "), " + // String or numeric expression value if applicable
+		   "vInt BIGINT, " + // Int value if applicable
+		   "vDci BIGINT, " + // Decimal point value if applicable
+		   "vIdx INT, " + // The value index (multi map support)
+		   "vTyp INT, " + // The value type (0:String, 1:Int, 2:Double, 3:Float)
+		   // --------------------------------------------------------------------------
+		   "uTim BIGINT, " + // Last updated time stamp
+		   "cTim BIGINT, " + // Created time stamp
+		   "eTim BIGINT " + // Expire time stamp
+		   ")");
+		
+		// Create the various indexs used for the table
+		// --------------------------------------------------------------------------
+		logAndExecute("CREATE UNIQUE INDEX IF NOT EXISTS `" + sqlTableName + "_unique` ON `" + sqlTableName
+		   + "` (oKey, mKey)");
+		
+		if (JSqlObj.sqlType == JSqlType.mysql) { //Value string index, is FULLTEXT in mysql (as normal index does not work)
+			logAndExecute("CREATE FULLTEXT INDEX IF NOT EXISTS `" + sqlTableName + "_vStr` ON `" + sqlTableName
+			   + "` (vStr)");
 		} else {
-			// Create the index anyway : And handles the exception on unique
-			// index conflict
-			try {
-				jSqlObj.execute("CREATE UNIQUE INDEX `" + sqlTableName + "_unique` ON `" + sqlTableName
-						+ "` (obj, metaKey)");
-			} catch (jSqlException e) {
-				if (!e.getCause()
-						.toString()
-						.equals("com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Duplicate key name '"
-								+ sqlTableName + "_unique'")) {
-					// throws if not valid
-					throw e;
-				}
-			}
+			createJSqlIndex("vStr");
 		}
 		
-		// Rename val column type to VARCHAR if it is different (for oracle only)
-		if (jSqlObj.sqlType == jSqlType.oracle ) {
-			
-			jSqlResult res = jSqlObj.query("SELECT DATA_TYPE FROM USER_TAB_COLUMNS WHERE TABLE_NAME = ? AND COLUMN_NAME = ?", sqlTableName.toUpperCase(), "VAL");
-			if(res.rowCount() > 0 && !res.readRowCol(0,"DATA_TYPE").equals("VARCHAR2") && valColumnType.contains("VARCHAR") ) {
-				jSqlObj.execute("ALTER TABLE " + sqlTableName + " ADD val_TEMP "+(valColumnType.toUpperCase().replace("VARCHAR", "VARCHAR2")) );
-				jSqlObj.execute("UPDATE " + sqlTableName + "  SET val_TEMP = DBMS_LOB.SUBSTR (val, 4000)");
-				jSqlObj.execute("ALTER TABLE " + sqlTableName + " DROP COLUMN val");
-				jSqlObj.execute("ALTER TABLE " + sqlTableName + " RENAME COLUMN val_TEMP TO val");
-			}
+		createJSqlIndex("vInt");
+		createJSqlIndex("vDci");
+		createJSqlIndex("vIdx");
+		createJSqlIndex("vTyp");
+		
+		createJSqlIndex("uTim");
+		createJSqlIndex("cTim");
+		createJSqlIndex("eTim");
+		
+		// Optimization usage?
+		if (JSqlObj.sqlType != JSqlType.mysql) {
+			createJSqlIndex("oKey");
+			createJSqlIndex("mKey");
 		}
 		
-		if(valColumnType.contains("VARCHAR")) {
-			if (jSqlObj.sqlType == jSqlType.sqlite || jSqlObj.sqlType == jSqlType.oracle) {
-				// sqlite unique index http://www.sqlite.org/lang_createindex.html
-				jSqlObj.execute("CREATE INDEX IF NOT EXISTS `" + sqlTableName + "_value` ON `" + sqlTableName
-									 + "` (val)");
-			} else {
-				// index conflict
-				try {
-					jSqlObj.execute("CREATE INDEX `" + sqlTableName + "_value` ON `" + sqlTableName
-										 + "` (val)");
-				} catch (jSqlException e) {
-					if (!e.getCause()
-						 .toString()
-						 .equals("com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Duplicate key name '"
-									+ sqlTableName + "_value'")) {
-						// throws if not valid
-						throw e;
-					}
-				}
-			}
-		}
-		
-		
-		//valColumnType
 		return this;
 	}
+	
+	/// Drops the database table with all relevant data
+	public MetaMap tableDrop() throws JSqlException {
+		logAndExecute("DROP TABLE IF EXISTS `" + sqlTableName + "`");
+		return this;
+	}
+	
+	/*
 
 	/// Store objid / key / value
 	public boolean put(String objid, String key, String val) throws jSqlException {

@@ -9,7 +9,7 @@ public enum JSqlType {
 	sqlite,
 
 	/// mysql connection mode
-	sql,
+	mysql,
 
 	/// oracle connection mode
 	oracle,

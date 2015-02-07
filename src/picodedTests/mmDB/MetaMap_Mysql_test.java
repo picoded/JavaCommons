@@ -28,7 +28,7 @@ import picodedTests.TestConfig;
 public class MetaMap_Mysql_test extends MetaMap_Sqlite_test {
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws JSqlException {
 		JSqlObj = JSql.mysql(TestConfig.MYSQL_CONN(), TestConfig.MYSQL_DATA(), TestConfig.MYSQL_USER(), TestConfig
 		   .MYSQL_PASS());
 		commonSetUp();

@@ -69,12 +69,13 @@ public class MetaMap_Sqlite_test {
 		}
 	}
 	
-	protected void commonSetUp() {
+	protected void commonSetUp() throws JSqlException {
 		mmObj = new MetaMap(JSqlObj, testTableName);
+		assertNotNull(mmObj.tableSetup());
 	}
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws JSqlException {
 		JSqlObj = JSql.sqlite();
 		commonSetUp();
 	}
@@ -99,4 +100,11 @@ public class MetaMap_Sqlite_test {
 		
 		assertNotNull(mmObj.tableSetup());
 	}
+	
+	/// Test basic put/get keyValue
+	@Test
+	public void basicPutGetKeyValue() throws JSqlException {
+		assertTrue(mmObj.putKeyValue("hello", "world", "domination"));
+	}
+	
 }

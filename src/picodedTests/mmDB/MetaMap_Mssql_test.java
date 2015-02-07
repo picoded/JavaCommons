@@ -28,7 +28,7 @@ import picodedTests.TestConfig;
 public class MetaMap_Mssql_test extends MetaMap_Sqlite_test {
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws JSqlException {
 		JSqlObj = JSql.mssql(TestConfig.MSSQL_CONN(), TestConfig.MSSQL_NAME(), TestConfig.MSSQL_USER(), TestConfig
 		   .MSSQL_PASS());
 		commonSetUp();

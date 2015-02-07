@@ -92,6 +92,7 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 					// throws as its not a duplicate key exception
 					throw e;
 				}
+				return true;
 			}
 		}
 		return execute_raw(qString, values);

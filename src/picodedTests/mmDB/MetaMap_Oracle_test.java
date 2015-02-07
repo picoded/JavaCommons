@@ -28,7 +28,7 @@ import picodedTests.TestConfig;
 public class MetaMap_Oracle_test extends MetaMap_Sqlite_test {
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws JSqlException {
 		JSqlObj = JSql.oracle(TestConfig.ORACLE_PATH(), TestConfig.ORACLE_USER(), TestConfig.ORACLE_PASS());
 		commonSetUp();
 	}

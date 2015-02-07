@@ -228,5 +228,24 @@ public class JSql_Sqlite_test {
 		
 		r.dispose();
 	}
+	
+	/// Test if the "INDEX IF NOT EXISTS" clause is being handled correctly
+	@Test
+	public void uniqueIndexIfNotExists() throws JSqlException {
+		executeQuery();
+		
+		assertTrue("1st uniq index", JSqlObj.execute("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName
+		   + "_unique` ON `" + testTableName + "` ( col1, col2 )"));
+		assertTrue("2nd uniq index", JSqlObj.execute("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName
+		   + "_unique` ON `" + testTableName + "` ( col1, col2 )"));
+	}
+	
+	@Test
+	public void arrayHelperFunctions() {
+		String[] querytSet = new String[] { "0", "1", "2", "3" };
+		
+		assertEquals("0", JSqlObj.queryFromQuerySet(querytSet));
+		assertArrayEquals((new String[] { "1", "2", "3" }), JSqlObj.argsFromQuerySet(querytSet));
+	}
 	//*/
 }

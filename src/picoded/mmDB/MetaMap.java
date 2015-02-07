@@ -16,17 +16,17 @@ import java.util.logging.*;
 ///                .objColumnType("VARCHAR(60)").keyColumnType("VARCHAR(60)");
 /// mt.tableSetup(); //table setup
 ///
-/// mt.put("objid","hello","world");
-/// String test = mt.get("objid","hello");
+/// mt.put("oKey","hello","world");
+/// String test = mt.get("oKey","hello");
 /// assertEquals( test, "world" );
 ///
 /// // getObj (and getObjRaw), also exists to get all the key value pairs associated to the object.
-/// HashMap<String,String> hObj = mt.getObj("objid");
+/// HashMap<String,String> hObj = mt.getObj("oKey");
 ///
 /// assertEquals( hObj.gets("hello"), "world );
 ///
 /// // This is the raw varient of getObj
-/// jSqlResult rObj = mt.getObj_jSql("objid");
+/// jSqlResult rObj = mt.getObj_jSql("oKey");
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
@@ -48,6 +48,9 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 	// Protected variables //
 	//---------------------//
 	
+	/// vDci multiplier used to convert the decimal places, to an int value
+	protected static int vDciMultiplier = 100000000;
+	
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(MetaMap.class.getName());
 	
@@ -65,6 +68,17 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 	
 	/// Value byte space default as 4000
 	protected int valColumnLength = 4000;
+	
+	/// Various table collumn names, and classification (used in upsert)?
+	protected String[] allColumnNames = new String[] { //
+	"oKey", "mKey", "vIdx", //
+	   "vStr", "vInt", "vDci", "vTyp", //
+	   "uTim", "cTim", "eTim" //
+	};
+	protected String[] uniqueColumnNames = new String[] { "oKey", "mKey", "vIdx" };
+	protected String[] valueColumnNames = new String[] { "vStr", "vInt", "vDci", "vTyp" };
+	protected String[] timeStampColumnNames = new String[] { "uTim", "cTim", "eTim" };
+	protected String[] nonUniqueColumnNames = new String[] { "vStr", "vInt", "vDci", "vTyp", "uTim", "cTim", "eTim" };
 	
 	//--------------------------------------//
 	// Protected variables getter functions //
@@ -111,11 +125,11 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 		   "oKey VARCHAR(" + objColumnLength + "), " + // Object namespace
 		   "mKey VARCHAR(" + keyColumnLength + "), " + // Obj.Key namespace
 		   // --------------------------------------------------------------------------
+		   "vIdx INT, " + // The value index (multi map support)
 		   "vStr VARCHAR(" + valColumnLength + "), " + // String or numeric expression value if applicable
 		   "vInt BIGINT, " + // Int value if applicable
-		   "vDci BIGINT, " + // Decimal point value if applicable
-		   "vIdx INT, " + // The value index (multi map support)
-		   "vTyp INT, " + // The value type (0:String, 1:Int, 2:Double, 3:Float)
+		   "vDci INT, " + // Decimal point value if applicable
+		   "vTyp INT, " + // The value type (0:null, 1:String, 2:Int/Long, 3:Double, 4:Float)
 		   // --------------------------------------------------------------------------
 		   "uTim BIGINT, " + // Last updated time stamp
 		   "cTim BIGINT, " + // Created time stamp
@@ -125,7 +139,11 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 		// Create the various indexs used for the table
 		// --------------------------------------------------------------------------
 		logAndExecute("CREATE UNIQUE INDEX IF NOT EXISTS `" + sqlTableName + "_unique` ON `" + sqlTableName
-		   + "` (oKey, mKey)");
+		   + "` (oKey, mKey, vIdx)");
+		
+		createJSqlIndex("oKey");
+		createJSqlIndex("mKey");
+		createJSqlIndex("vIdx");
 		
 		if (JSqlObj.sqlType == JSqlType.mysql) { //Value string index, is FULLTEXT in mysql (as normal index does not work)
 			logAndExecute("CREATE FULLTEXT INDEX IF NOT EXISTS `" + sqlTableName + "_vStr` ON `" + sqlTableName
@@ -136,18 +154,11 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 		
 		createJSqlIndex("vInt");
 		createJSqlIndex("vDci");
-		createJSqlIndex("vIdx");
 		createJSqlIndex("vTyp");
 		
 		createJSqlIndex("uTim");
 		createJSqlIndex("cTim");
 		createJSqlIndex("eTim");
-		
-		// Optimization usage?
-		if (JSqlObj.sqlType != JSqlType.mysql) {
-			createJSqlIndex("oKey");
-			createJSqlIndex("mKey");
-		}
 		
 		return this;
 	}
@@ -158,34 +169,128 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 		return this;
 	}
 	
+	public Object getKeyValue(String oKey, String mKey) throws JSqlException {
+		JSqlResult r = JSqlObj.query("SELECT * FROM " + sqlTableName + " WHERE oKey LIKE ? AND mKey LIKE ? LIMIT 1",
+		   oKey, mKey);
+		
+		return null;
+	}
+	
+	// Internal usage putKeyValue
+	private boolean putKeyValueWith(String oKey, String mKey, String vStr, long vInt, int vDci, int vIdx, int vTyp,
+	   long expireUnixTime) throws JSqlException {
+		
+		if (expireUnixTime <= 0) {
+			expireUnixTime = 0;
+		}
+		
+		long nowTime = (System.currentTimeMillis() / 1000L);
+		
+		if (JSqlObj.sqlType == JSqlType.sqlite) {
+			Object[] querySet = JSqlObj.prepareUpsertQuerySet( //
+				sqlTableName, //
+			   uniqueColumnNames, null, //
+			   nonUniqueColumnNames, null, null, //
+			   null //
+			   );
+			
+			//JSqlObj.execute( JSqlObj.prepareUpsertQuery(  ), prepareUpsertArguments() );
+			
+			/*
+			 JSqlObj.execute(
+								  "INSERT OR REPLACE INTO `" + sqlTableName + "` (oKey,mKey,vIdx, vStr,vInt,vDci,vTyp) VALUES (?,?,?,?,?,?,?)",
+								  oKey, mKey, vIdx,
+								  vStr, vInt, vDci, vTyp
+								);
+			 */
+		}
+		/// JSqlType checks for the various insert OR replace varients
+		///
+		/*
+		if (JSqlObj.sqlType == JSqlType.sqlite) {
+			
+			//return jSqlObj.execute("INSERT OR REPLACE INTO `" + sqlTableName + "` (oKey,mKey,val) VALUES (?,?,?)", oKey, key, val);
+		} else if (jSqlObj.sqlType == jSqlType.oracle) {
+			return jSqlObj.execute(
+										  "BEGIN BEGIN INSERT INTO " + sqlTableName.toUpperCase()
+										  + " (obj,metaKey,val) VALUES (?,?,?); EXCEPTION WHEN dup_val_on_index THEN UPDATE "
+										  + sqlTableName.toUpperCase() + " SET val=? WHERE obj=? AND metaKey=?; END; END;", oKey,
+										  key, val, val, oKey, key);
+		} else if(jSqlObj.sqlType == jSqlType.mssql){
+			return jSqlObj.execute("IF EXISTS (Select * from "+sqlTableName + " WHERE obj = ? AND metaKey = ?) "
+										  + " UPDATE "+ sqlTableName + "  set val = ? WHERE obj = ? AND metaKey=? " + " ELSE INSERT INTO "+sqlTableName+" (obj,metaKey,val) VALUES (?,?,?) ",oKey, key, val, oKey, key, oKey, key, val);
+		} else {
+			return jSqlObj.execute("INSERT INTO `" + sqlTableName
+										  + "` (obj,metaKey,val) VALUES (?,?,?) ON DUPLICATE KEY UPDATE val=VALUES(val)", oKey, key, val);
+		}
+		 */
+		return true;
+	}
+	
+	// Dynamic putKeyValue call, based on value object type
+	public boolean putKeyValue(String oKey, String mKey, Object val) throws JSqlException {
+		return putKeyValue(oKey, mKey, val, 0);
+	}
+	
+	// Dynamic putKeyValue call, based on value object type. With expire unix timestamp
+	public boolean putKeyValue(String oKey, String mKey, Object val, long expireUnixTime) throws JSqlException {
+		// Evaluating the various put values
+		if (val == null) {
+			return putKeyValueWith(oKey, mKey, null, 0, 0, 0, 0, expireUnixTime);
+		} else if (String.class.isInstance(val)) {
+			return putKeyValueWith(oKey, mKey, (val.toString()), 0, 0, 0, 1, expireUnixTime);
+		} else if (Integer.class.isInstance(val) || Long.class.isInstance(val)) {
+			return putKeyValueWith(oKey, mKey, null, ((Number) val).longValue(), 0, 0, 2, expireUnixTime);
+			
+		} else if (Double.class.isInstance(val)) {
+			
+			double dVal = ((Double) val).doubleValue();
+			long vInt = (long) Math.floor(dVal);
+			int vDci = (int) ((dVal - (double) vInt) * (double) vDciMultiplier);
+			return putKeyValueWith(oKey, mKey, null, vInt, vDci, 0, 3, expireUnixTime);
+			
+		} else if (Float.class.isInstance(val)) {
+			
+			float dVal = ((Float) val).floatValue();
+			long vInt = (long) Math.floor(dVal);
+			int vDci = (int) ((dVal - (float) vInt) * (float) vDciMultiplier);
+			return putKeyValueWith(oKey, mKey, null, vInt, vDci, 0, 4, expireUnixTime);
+			
+		} else {
+			String valClassName = val.getClass().getName();
+			throw new JSqlException("Unknown value object type : " + (valClassName));
+		}
+		//return false;
+	}
+	
 	/*
 
-	/// Store objid / key / value
-	public boolean put(String objid, String key, String val) throws jSqlException {
+	/// Store oKey / key / value
+	public boolean put(String oKey, String key, String val) throws jSqlException {
 		/// As mySql doesn`t support INSERT OR REPLACE INTO... need to check
 		// jSqlType
 		if (jSqlObj.sqlType == jSqlType.sqlite) {
 			return jSqlObj.execute("INSERT OR REPLACE INTO `" + sqlTableName + "` (obj,metaKey,val) VALUES (?,?,?)",
-					objid, key, val);
+					oKey, key, val);
 		} else if (jSqlObj.sqlType == jSqlType.oracle) {
 			return jSqlObj.execute(
 					"BEGIN BEGIN INSERT INTO " + sqlTableName.toUpperCase()
 							+ " (obj,metaKey,val) VALUES (?,?,?); EXCEPTION WHEN dup_val_on_index THEN UPDATE "
-							+ sqlTableName.toUpperCase() + " SET val=? WHERE obj=? AND metaKey=?; END; END;", objid,
-					key, val, val, objid, key);
+							+ sqlTableName.toUpperCase() + " SET val=? WHERE obj=? AND metaKey=?; END; END;", oKey,
+					key, val, val, oKey, key);
 		} else if(jSqlObj.sqlType == jSqlType.mssql){
 	      return jSqlObj.execute("IF EXISTS (Select * from "+sqlTableName + " WHERE obj = ? AND metaKey = ?) " 
-	                         + " UPDATE "+ sqlTableName + "  set val = ? WHERE obj = ? AND metaKey=? " + " ELSE INSERT INTO "+sqlTableName+" (obj,metaKey,val) VALUES (?,?,?) ",objid, key, val, objid, key, objid, key, val);
+	                         + " UPDATE "+ sqlTableName + "  set val = ? WHERE obj = ? AND metaKey=? " + " ELSE INSERT INTO "+sqlTableName+" (obj,metaKey,val) VALUES (?,?,?) ",oKey, key, val, oKey, key, oKey, key, val);
 	   }
 	   else {
 			return jSqlObj.execute("INSERT INTO `" + sqlTableName
-					+ "` (obj,metaKey,val) VALUES (?,?,?) ON DUPLICATE KEY UPDATE val=VALUES(val)", objid, key, val);
+					+ "` (obj,metaKey,val) VALUES (?,?,?) ON DUPLICATE KEY UPDATE val=VALUES(val)", oKey, key, val);
 		}
 	}
 
-	/// Fetches objid / key / value
-	public String get(String objid, String key) throws jSqlException {
-		jSqlResult r = jSqlObj.query("SELECT * FROM " + sqlTableName + " WHERE obj=? AND metaKey=?", objid, key);
+	/// Fetches oKey / key / value
+	public String get(String oKey, String key) throws jSqlException {
+		jSqlResult r = jSqlObj.query("SELECT * FROM " + sqlTableName + " WHERE obj=? AND metaKey=?", oKey, key);
 
 		if (r.fetchAllRows() > 0) {
 			return (String) r.readRowCol(0, "val");
@@ -193,9 +298,9 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 		return null;
 	}
 
-	/// Fetches objid / key / value, using partial matching search (SQL LIKE)
-	public String[] getMultiple(String objid, String key) throws jSqlException {
-		jSqlResult r = jSqlObj.query("SELECT * FROM " + sqlTableName + " WHERE obj LIKE ? AND metaKey LIKE ?", objid, key);
+	/// Fetches oKey / key / value, using partial matching search (SQL LIKE)
+	public String[] getMultiple(String oKey, String key) throws jSqlException {
+		jSqlResult r = jSqlObj.query("SELECT * FROM " + sqlTableName + " WHERE obj LIKE ? AND metaKey LIKE ?", oKey, key);
 		
 		String[] res = null;
 		int len;
@@ -208,9 +313,9 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 		return res;
 	}
 	
-	/// Fetches objid / key / value, using partial matching search (SQL LIKE)
-	public HashMap<String, String> getMultipleSet(String objid, String key, String val) throws jSqlException {
-		jSqlResult r = jSqlObj.query("SELECT * FROM " + sqlTableName + " WHERE obj LIKE ? AND metaKey LIKE ? AND val LIKE ?", objid, key, val);
+	/// Fetches oKey / key / value, using partial matching search (SQL LIKE)
+	public HashMap<String, String> getMultipleSet(String oKey, String key, String val) throws jSqlException {
+		jSqlResult r = jSqlObj.query("SELECT * FROM " + sqlTableName + " WHERE obj LIKE ? AND metaKey LIKE ? AND val LIKE ?", oKey, key, val);
 		
 		HashMap<String, String> res = new HashMap<String, String>();
 		int pt = r.rowCount();
@@ -224,14 +329,14 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 	}
 	
 	/// Deletes all records related to an object
-	public boolean deleteObj(String objid) throws jSqlException {
-		return jSqlObj.execute("DELETE FROM `" + sqlTableName + "` WHERE obj=?;", objid);
+	public boolean deleteObj(String oKey) throws jSqlException {
+		return jSqlObj.execute("DELETE FROM `" + sqlTableName + "` WHERE obj=?;", oKey);
 	}
 
 	/// Gets all the key value pairs related to the object. And returns as as
 	// HashMap< metaKey, value >
-	public HashMap<String, String> getObj(String objid) throws jSqlException {
-		jSqlResult r = getObj_jSql(objid);
+	public HashMap<String, String> getObj(String oKey) throws jSqlException {
+		jSqlResult r = getObj_jSql(oKey);
 
 		HashMap<String, String> res = new HashMap<String, String>();
 		int pt = r.rowCount();
@@ -245,8 +350,8 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 	}
 
 	/// Returns the jSqlResult raw varient
-	public jSqlResult getObj_jSql(String objid) throws jSqlException {
-		return jSqlObj.query("SELECT * FROM `" + sqlTableName + "` WHERE obj=?;", objid);
+	public jSqlResult getObj_jSql(String oKey) throws jSqlException {
+		return jSqlObj.query("SELECT * FROM `" + sqlTableName + "` WHERE obj=?;", oKey);
 	}
 
 	/// Returns the jSqlResult raw varient
@@ -255,32 +360,32 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 		return jSqlObj.query("SELECT * FROM `" + sqlTableName + "`");
 	}
 
-	/// Fetches everything, in objid, key, value pairs
+	/// Fetches everything, in oKey, key, value pairs
 	public HashMap<String, HashMap<String, Object>> getAll() throws jSqlException {
 		jSqlResult r = getAll_jSql();
 
 		HashMap<String, HashMap<String, Object>> res = new HashMap<String, HashMap<String, Object>>();
 		HashMap<String, Object> objMap = null;
-		String prvObjId = null;
-		String objId = null;
+		String prvoKey = null;
+		String oKey = null;
 		int len;
 
 		if ((len = r.fetchAllRows()) > 0) {
 			for (int i = 0; i < len; i++) {
 				// Gets current object id
-				objId = (String) r.readRowCol(i, "obj");
+				oKey = (String) r.readRowCol(i, "obj");
 
 				// Gets the previous objMap, if needed
-				if (prvObjId != objId) {
-					objMap = res.get(objId);
+				if (prvoKey != oKey) {
+					objMap = res.get(oKey);
 
 					// result set dosent have the object map yet
 					if (objMap == null) {
 						objMap = new HashMap<String, Object>();
-						res.put(objId, objMap);
+						res.put(oKey, objMap);
 					}
 
-					prvObjId = objId;
+					prvoKey = oKey;
 				} // else assumes there isnt a need to change objMap
 
 				objMap.put((String) r.readRowCol(i, "metaKey"), (String) r.readRowCol(i, "val"));
@@ -340,9 +445,9 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 
 	/// Fetches an array of keys, matching the object id and value
 	/// [TODO: Mid priority]
-	public String[] getObjKeyMap(String objid, String val) throws jSqlException {
+	public String[] getObjKeyMap(String oKey, String val) throws jSqlException {
 		// throw new jSqlException("Not Yet Implemented");
-		jSqlResult r = getObjKeyMap_jSql(objid, val);
+		jSqlResult r = getObjKeyMap_jSql(oKey, val);
 		String[] res = null;
 		int pt = r.rowCount();
 		int len;
@@ -357,11 +462,11 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 
 	/// Returns the jSqlResult raw varient
 	/// [TODO: Mid priority]
-	public jSqlResult getObjKeyMap_jSql(String objid, String val) throws jSqlException {
-		return jSqlObj.query("SELECT metaKey FROM `" + sqlTableName + "` WHERE obj=? AND val like ?", objid, val);
+	public jSqlResult getObjKeyMap_jSql(String oKey, String val) throws jSqlException {
+		return jSqlObj.query("SELECT metaKey FROM `" + sqlTableName + "` WHERE obj=? AND val like ?", oKey, val);
 	}
 
-	/// Fetches a HashMap<objid, val> matched to key
+	/// Fetches a HashMap<oKey, val> matched to key
 	/// [TODO: Mid priority]
 	public HashMap<String, Object> getValMap(String key) throws jSqlException {
 		// throw new jSqlException("Not Yet Implemented");
@@ -415,7 +520,7 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 
 	/// returns the meta count in an object
 	/// [TODO: Low priority]
-	public long objectMetaCount(String objid) throws jSqlException {
+	public long objectMetaCount(String oKey) throws jSqlException {
 		throw new jSqlException("Not Yet Implemented");
 	}
 	 */

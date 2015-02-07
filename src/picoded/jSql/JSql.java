@@ -55,11 +55,6 @@ public class JSql implements BaseInterface {
 		return new picoded.jSql.db.JSql_Oracle(oraclePath, dbUser, dbPass);
 	}
 	
-	// Throws an exception, as this functionality isnt supported in the base class
-	// also allows backwards competibility with test cases
-	//public JSql() {
-	//throw new RuntimeException(JSqlException.invalidDatabaseImplementationException);
-	//}
 	/// As this is the base class varient, this funciton isnt suported
 	public void recreate(boolean force) {
 		throw new RuntimeException(JSqlException.invalidDatabaseImplementationException);
@@ -234,6 +229,127 @@ public class JSql implements BaseInterface {
 		} finally {
 			super.finalize();
 		}
+	}
+	
+	//--------------------------------------------------------------------------
+	// Utility helper functions used to prepare common complex SQL quries
+	//--------------------------------------------------------------------------
+	public Object[] joinArguments(Object[] arr1, Object[] arr2) {
+		return org.apache.commons.lang3.ArrayUtils.addAll(arr1, arr2);
+	}
+	
+	public void setAutoCommit(boolean autoCommit) throws JSqlException {
+		try {
+			sqlConn.setAutoCommit(autoCommit);
+		} catch (Exception e) {
+			throw new JSqlException(e);
+		}
+	}
+	
+	public boolean getAutoCommit() throws JSqlException {
+		try {
+			return sqlConn.getAutoCommit();
+		} catch (Exception e) {
+			throw new JSqlException(e);
+		}
+	}
+	
+	public void rollback() throws JSqlException {
+		try {
+			sqlConn.rollback();
+		} catch (Exception e) {
+			throw new JSqlException(e);
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	// Utility helper functions used to prepare common complex SQL quries
+	//--------------------------------------------------------------------------
+	public String queryFromQuerySet(Object[] set) {
+		return (String) set[0];
+	}
+	
+	public Object[] argsFromQuerySet(Object[] set) {
+		return Arrays.asList(set).subList(1, set.length).toArray();
+	}
+	
+	public Object[] prepareSelectQuerySet(
+		String tableName, // Table name to select from
+		String[] selectColumns, // The Columns to select
+		String[] whereColumns, // The Columns to apply where clause
+		Object[] updateValues, // Values to filter where clause
+		long limit, //limit row count to
+		long offset //offset limit by?
+	) {
+		
+		StringBuilder tmpSB = new StringBuilder( "SELECT " );
+		
+		
+		
+		tmpSB.append(" FROM `"+tableName+"` WHERE " );
+		
+		for(int b=0; b<whereClauses.length; ++b) {
+			if(b>0) {
+				tmpSB.append(" AND ");
+			}
+			tmpSB.append(whereClauses[b]+" = ?");
+			queryArgs.add(whereValues[b]);
+		}
+		return tmpSB.toString();
+	}
+	
+	public Object[] prepareUpsertQuerySet( //
+		String tableName, // Table name to upsert on
+	   String[] uniqueColumns, // The unique column names
+	   Object[] uniqueValues, // The row unique identifier values
+	   String[] valueColumns, // Columns values to update
+	   Object[] updateValues, // Values to update, note that null is skipped
+	   Object[] insertValues, // Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+	   String[] miscColumns // Various column names where its existing value needs to be maintained (if any)
+	) throws JSqlException {
+		
+		/// Note the following is for SQLite only
+		
+		/// Building the query for INSERT OR REPLACE
+		ArrayList<String> columnNames = new ArrayList<String>();
+		ArrayList<String> columnValues = new ArrayList<String>();
+		ArrayList<Object> queryArgs = new ArrayList<Object>();
+		
+		
+		/// Inserting unique values
+		if( uniqueColumns != null && uniqueValues != null && uniqueColumns.length == uniqueValues.length ) {
+			for(int a=0; a<uniqueColumns.length; ++a) {
+				columnNames.add(uniqueColumns[a]);
+				columnValues.add("?");
+				queryArgs.add(uniqueValues[a]);
+			}
+		} else {
+			throw new JSqlException("Upsert query requires unique column values");
+		}
+		
+		
+		
+		if( miscColumns != null ) {
+			for(int a=0; a<miscColumns.length; ++a) {
+				columnNames.add(miscColumns[a]);
+				
+				/*
+				tmpSB = new StringBuilder( "(SELECT "+miscColumns[a]+" FROM `"+tableName+"` WHERE " );
+				for(int b=0; b<uniqueColumns.length; ++b) {
+					if(b>0) {
+						tmpSB.append(" AND ");
+					}
+					tmpSB.append(uniqueColumns[b]+" = ?");
+					queryArgs.add(uniqueValues[b]);
+				}
+				tmpSB.append(")");
+				
+				columnValues.add( tmpSB.toString() );
+				 */
+			}
+		}
+		
+		return null;
 	}
 	
 }

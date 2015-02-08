@@ -187,13 +187,15 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 		long nowTime = (System.currentTimeMillis() / 1000L);
 		
 		if (JSqlObj.sqlType == JSqlType.sqlite) {
+			
+			/*
 			Object[] querySet = JSqlObj.prepareUpsertQuerySet( //
 				sqlTableName, //
 			   uniqueColumnNames, null, //
 			   nonUniqueColumnNames, null, null, //
 			   null //
 			   );
-			
+			*/
 			//JSqlObj.execute( JSqlObj.prepareUpsertQuery(  ), prepareUpsertArguments() );
 			
 			/*

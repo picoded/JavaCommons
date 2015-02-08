@@ -265,38 +265,43 @@ public class JSql implements BaseInterface {
 	//--------------------------------------------------------------------------
 	// Utility helper functions used to prepare common complex SQL quries
 	//--------------------------------------------------------------------------
-	public String queryFromQuerySet(Object[] set) {
-		return (String) set[0];
-	}
 	
-	public Object[] argsFromQuerySet(Object[] set) {
-		return Arrays.asList(set).subList(1, set.length).toArray();
-	}
-	
-	public Object[] prepareSelectQuerySet(
-		String tableName, // Table name to select from
-		String[] selectColumns, // The Columns to select
-		String[] whereColumns, // The Columns to apply where clause
-		Object[] updateValues, // Values to filter where clause
-		long limit, //limit row count to
-		long offset //offset limit by?
-	) {
+	public JSqlQuerySet prepareSelectQuerySet(
+													  String tableName, // Table name to select from
+													  String[] selectColumns, // The Columns to select, null means all
+													  String[] whereColumns, // The Columns to apply where clause
+													  Object[] updateValues, // Values to filter where clause
+													  long limit, //limit row count to
+													  long offset //offset limit by?
+													  ) {
 		
-		StringBuilder tmpSB = new StringBuilder( "SELECT " );
+		ArrayList<Object> queryArgs = new ArrayList<Object>();
+		StringBuilder querySB = new StringBuilder( "SELECT " );
 		
+		if( selectColumns == null || selectColumns.length == 0 ) {
+			querySB.append("*");
+		} else {
+			for(int b=0; b<selectColumns.length; ++b) {
+				if(b>0) {
+					querySB.append(",");
+				}
+				querySB.append( selectColumns[b] );
+			}
+		}
 		
-		
-		tmpSB.append(" FROM `"+tableName+"` WHERE " );
+		querySB.append(" FROM `"+tableName+"` WHERE " );
 		
 		for(int b=0; b<whereClauses.length; ++b) {
 			if(b>0) {
-				tmpSB.append(" AND ");
+				querySB.append(" AND ");
 			}
-			tmpSB.append(whereClauses[b]+" = ?");
+			querySB.append(whereClauses[b]+" = ?");
 			queryArgs.add(whereValues[b]);
 		}
-		return tmpSB.toString();
+		
+		return new JSqlQuerySet( querySB.toString(), queryArgs.toArray() );
 	}
+	/*
 	
 	public Object[] prepareUpsertQuerySet( //
 		String tableName, // Table name to upsert on
@@ -333,7 +338,6 @@ public class JSql implements BaseInterface {
 			for(int a=0; a<miscColumns.length; ++a) {
 				columnNames.add(miscColumns[a]);
 				
-				/*
 				tmpSB = new StringBuilder( "(SELECT "+miscColumns[a]+" FROM `"+tableName+"` WHERE " );
 				for(int b=0; b<uniqueColumns.length; ++b) {
 					if(b>0) {
@@ -345,11 +349,10 @@ public class JSql implements BaseInterface {
 				tmpSB.append(")");
 				
 				columnValues.add( tmpSB.toString() );
-				 */
 			}
 		}
 		
 		return null;
 	}
-	
+	*/
 }

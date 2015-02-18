@@ -13,7 +13,7 @@ public class JSqlQuerySet {
 	protected JSql JSqlObj = null;
 	
 	/// Initialize the query set with the following options
-	public JSqlQuerySet( String query, Object[] args, JSql dbObj ) {
+	public JSqlQuerySet(String query, Object[] args, JSql dbObj) {
 		sqlQuery = query;
 		sqlArgs = args;
 		JSqlObj = dbObj;
@@ -39,7 +39,7 @@ public class JSqlQuerySet {
 	///
 	/// **Note:** Only queries starting with 'SELECT' will produce a JSqlResult object that has fetchable results
 	public JSqlResult executeQuery(String qString, Object... values) throws JSqlException {
-		return JSqlObj.executeQuery( sqlQuery, sqlArgs );
+		return JSqlObj.executeQuery(sqlQuery, sqlArgs);
 	}
 	
 	/// Executes the argumented query, and immediately fetches the result from
@@ -47,12 +47,12 @@ public class JSqlQuerySet {
 	///
 	/// **Note:** Only queries starting with 'SELECT' will produce a JSqlResult object that has fetchable results
 	public JSqlResult query(String qString, Object... values) throws JSqlException {
-		return JSqlObj.query( sqlQuery, sqlArgs );
+		return JSqlObj.query(sqlQuery, sqlArgs);
 	}
 	
 	/// Executes and dispose the sqliteResult object. Similar to executeQuery
 	/// Returns false if no result object is given by the execution call. This is raw execution.
 	public boolean execute() throws JSqlException {
-		return JSqlObj.execute( sqlQuery, sqlArgs );
+		return JSqlObj.execute(sqlQuery, sqlArgs);
 	}
 }

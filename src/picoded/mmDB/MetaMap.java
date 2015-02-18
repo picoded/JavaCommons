@@ -71,7 +71,7 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 	
 	/// Various table collumn names, and classification (used in upsert)?
 	protected String[] allColumnNames = new String[] { //
-	"oKey", "mKey", "vIdx", //
+	   "oKey", "mKey", "vIdx", //
 	   "vStr", "vInt", "vDci", "vTyp", //
 	   "uTim", "cTim", "eTim" //
 	};

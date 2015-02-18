@@ -241,11 +241,12 @@ public class JSql_Sqlite_test {
 	}
 	
 	@Test
-	public void arrayHelperFunctions() {
+	public void JSqlQuerySetConstructor() {
 		JSqlQuerySet qSet = null;
 		
-		assertNotNull( qSet = new JSqlQuerySet("hello", (new String[] { "world", "one" })) );
+		assertNotNull( qSet = new JSqlQuerySet("hello", (new String[] { "world", "one" }), JSqlObj) );
 		
+		assertEquals( JSqlObj, qSet.getJSql() );
 		assertEquals( "hello", qSet.getQuery() );
 		assertArrayEquals( (new String[] { "world", "one" }), qSet.getArguments() );
 	}

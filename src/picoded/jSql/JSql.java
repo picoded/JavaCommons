@@ -266,11 +266,82 @@ public class JSql implements BaseInterface {
 	// Utility helper functions used to prepare common complex SQL quries
 	//--------------------------------------------------------------------------
 	
+	public JSqlQuerySet selectQuerySet(
+													  String   tableName,     // Table name to select from
+													  String[] selectColumns, // The Columns to select, null means all
+													  
+													  String   whereStatement, // The Columns to apply where clause, this must be sql neutral
+													  Object[] whereValues,    // Values that corresponds to the where statement
+													) {
+		return selectQuerySet( tableName, selectColumns, whereColumns, whereValues, null, 0, 0);
+	}
+															
+	public JSqlQuerySet selectQuerySet(
+													  String   tableName,     // Table name to select from
+													  String[] selectColumns, // The Columns to select, null means all
+													  
+													  String   whereStatement, // The Columns to apply where clause, this must be sql neutral
+													  Object[] whereValues,    // Values that corresponds to the where statement
+															
+													  String orderStatement, // Order by statements, must be either ASC / DESC
+															
+													  long limit, // Limit row count to, use 0 to ignore / disable
+													  long offset // Offset limit by?
+												  ) {
+		
+		ArrayList<Object> queryArgs = new ArrayList<Object>();
+		StringBuilder querySB = new StringBuilder( "SELECT " );
+		
+		// Select collumns
+		if( selectColumns == null || selectColumns.length == 0 ) {
+			querySB.append("*");
+		} else {
+			for(int b=0; b<selectColumns.length; ++b) {
+				if(b>0) {
+					querySB.append(",");
+				}
+				querySB.append( selectColumns[b] );
+			}
+		}
+		
+		// From table names
+		querySB.append(" FROM `"+tableName+"`");
+		
+		// Where clauses
+		if( whereStatement != null && whereStatement.length() > 3 ) {
+			
+			querySB.append(" WHERE " );
+			querySB.append( whereStatement );
+			
+			for(int b=0; b<whereValues.length; ++b) {
+				queryArgs.add(whereValues[b]);
+			}
+		}
+		
+		// Order By clause
+		if( orderStatement != null && orderStatement.length() > 3 ) {
+			querySB.append(" ORDER BY " );
+			querySB.append( orderStatement );
+		}
+		
+		// Limit and offset clause
+		if( limit > 0 ) {
+			querySB.append(" LIMIT "+limit );
+			
+			if( offset > 0 ) {
+				querySB.append(" OFFSET "+offset );
+			}
+		}
+		
+		// Create the query set
+		return new JSqlQuerySet( querySB.toString(), queryArgs.toArray(), this );
+	}
+	
+	/*
 	public JSqlQuerySet prepareSelectQuerySet(
 													  String tableName, // Table name to select from
 													  String[] selectColumns, // The Columns to select, null means all
-													  String[] whereColumns, // The Columns to apply where clause
-													  Object[] updateValues, // Values to filter where clause
+													  Map<String,Object> whereMapping, // The Columns and / or where mapping to filter
 													  long limit, //limit row count to
 													  long offset //offset limit by?
 													  ) {
@@ -291,16 +362,20 @@ public class JSql implements BaseInterface {
 		
 		querySB.append(" FROM `"+tableName+"` WHERE " );
 		
-		for(int b=0; b<whereClauses.length; ++b) {
+		for(int b=0; b<whereColumns.length; ++b) {
 			if(b>0) {
 				querySB.append(" AND ");
 			}
-			querySB.append(whereClauses[b]+" = ?");
+			querySB.append(whereColumns[b]+" = ?");
 			queryArgs.add(whereValues[b]);
 		}
 		
-		return new JSqlQuerySet( querySB.toString(), queryArgs.toArray() );
+		return new JSqlQuerySet( querySB.toString(), queryArgs.toArray(), this );
 	}
+	 */
+	
+	
+	
 	/*
 	
 	public Object[] prepareUpsertQuerySet( //

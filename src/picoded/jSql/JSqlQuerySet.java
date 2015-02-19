@@ -38,7 +38,7 @@ public class JSqlQuerySet {
 	/// fetching the result data from the database. This is raw execution.
 	///
 	/// **Note:** Only queries starting with 'SELECT' will produce a JSqlResult object that has fetchable results
-	public JSqlResult executeQuery(String qString, Object... values) throws JSqlException {
+	public JSqlResult executeQuery() throws JSqlException {
 		return JSqlObj.executeQuery(sqlQuery, sqlArgs);
 	}
 	
@@ -46,7 +46,7 @@ public class JSqlQuerySet {
 	/// the database into the result set. This is raw execution.
 	///
 	/// **Note:** Only queries starting with 'SELECT' will produce a JSqlResult object that has fetchable results
-	public JSqlResult query(String qString, Object... values) throws JSqlException {
+	public JSqlResult query() throws JSqlException {
 		return JSqlObj.query(sqlQuery, sqlArgs);
 	}
 	

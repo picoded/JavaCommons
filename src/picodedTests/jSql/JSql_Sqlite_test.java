@@ -250,5 +250,75 @@ public class JSql_Sqlite_test {
 		assertEquals("hello", qSet.getQuery());
 		assertArrayEquals((new String[] { "world", "one" }), qSet.getArguments());
 	}
+	
+	@Test
+	public void selectQuerySet() throws JSqlException {
+		
+		JSqlResult r = null;
+		JSqlQuerySet qSet = null;
+		executeQuery();
+		
+		// added more data to test
+		JSqlObj.query("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 405, "hello").dispose();
+		JSqlObj.query("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 406, "world").dispose();
+		JSqlObj.query("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 407, "no.7").dispose();
+		
+		// Select all as normal
+		assertNotNull(qSet = JSqlObj.selectQuerySet(testTableName, null, null, null)); //select all
+		r = qSet.executeQuery();
+		assertNotNull("SQL result should return a result", r);
+		
+		r.fetchAllRows();
+		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col1")).intValue());
+		assertEquals("via readRowCol", "has nothing", r.readRowCol(0, "col2"));
+		assertEquals("via readRowCol", 405, ((Number) r.readRowCol(1, "col1")).intValue());
+		assertEquals("via readRowCol", "hello", r.readRowCol(1, "col2"));
+		assertEquals("via readRowCol", 406, ((Number) r.readRowCol(2, "col1")).intValue());
+		assertEquals("via readRowCol", "world", r.readRowCol(2, "col2"));
+		
+		assertEquals("via get().get()", 404, ((Number) r.get("col1").get(0)).intValue());
+		assertEquals("via get().get()", "has nothing", r.get("col2").get(0));
+		assertEquals("via get().get()", 405, ((Number) r.get("col1").get(1)).intValue());
+		assertEquals("via get().get()", "hello", r.get("col2").get(1));
+		assertEquals("via get().get()", 406, ((Number) r.get("col1").get(2)).intValue());
+		assertEquals("via get().get()", "world", r.get("col2").get(2));
+		
+		assertEquals("via readRowCol", 407, ((Number) r.readRowCol(3, "col1")).intValue());
+		assertEquals("via readRowCol", "no.7", r.readRowCol(3, "col2"));
+		assertEquals("via get().get()", 407, ((Number) r.get("col1").get(3)).intValue());
+		assertEquals("via get().get()", "no.7", r.get("col2").get(3));
+		
+		r.dispose();
+		
+		// orderby DESC, limits 2, offset 1
+		assertNotNull(qSet = JSqlObj.selectQuerySet(testTableName, null, null, null, "col1 DESC", 2, 1));
+		assertNotNull("SQL result should return a result", r = qSet.query());
+		
+		assertEquals("DESC, limit 2, offset 1 length check", 2, r.get("col1").size());
+		assertEquals("via get().get()", 405, ((Number) r.get("col1").get(1)).intValue());
+		assertEquals("via get().get()", "hello", r.get("col2").get(1));
+		assertEquals("via get().get()", 406, ((Number) r.get("col1").get(0)).intValue());
+		assertEquals("via get().get()", "world", r.get("col2").get(0));
+		
+		// select all, with select clause, orderby DESC
+		assertNotNull(qSet = JSqlObj.selectQuerySet(testTableName, "col1, col2", null, null, "col1 DESC", 2, 1));
+		assertNotNull("SQL result should return a result", r = qSet.query());
+		
+		assertEquals("DESC, limit 2, offset 1 length check", 2, r.get("col1").size());
+		assertEquals("via get().get()", 405, ((Number) r.get("col1").get(1)).intValue());
+		assertEquals("via get().get()", "hello", r.get("col2").get(1));
+		assertEquals("via get().get()", 406, ((Number) r.get("col1").get(0)).intValue());
+		assertEquals("via get().get()", "world", r.get("col2").get(0));
+		
+		// select 404, with col2 clause
+		assertNotNull(qSet = JSqlObj.selectQuerySet(testTableName, "col2", "col1 = ?", (new Object[] { 404 })));
+		assertNotNull("SQL result should return a result", r = qSet.query());
+		
+		assertNull("no column", r.get("col1"));
+		assertNotNull("has column check", r.get("col2"));
+		assertEquals("1 length check", 1, r.get("col2").size());
+		assertEquals("via get().get()", "has nothing", r.get("col2").get(0));
+		
+	}
 	//*/
 }

@@ -268,17 +268,17 @@ public class JSql implements BaseInterface {
 	
 	public JSqlQuerySet selectQuerySet( //
 	   String tableName, // Table name to select from
-	   String[] selectColumns, // The Columns to select, null means all
+	   String selectStatement, // The Columns to select, null means all
 	   
 	   String whereStatement, // The Columns to apply where clause, this must be sql neutral
 	   Object[] whereValues // Values that corresponds to the where statement
 	) {
-		return selectQuerySet(tableName, selectColumns, whereStatement, whereValues, null, 0, 0);
+		return selectQuerySet(tableName, selectStatement, whereStatement, whereValues, null, 0, 0);
 	}
 	
 	public JSqlQuerySet selectQuerySet( //
 	   String tableName, // Table name to select from
-	   String[] selectColumns, // The Columns to select, null means all
+	   String selectStatement, // The Columns to select, null means all
 	   
 	   String whereStatement, // The Columns to apply where clause, this must be sql neutral
 	   Object[] whereValues, // Values that corresponds to the where statement
@@ -288,20 +288,14 @@ public class JSql implements BaseInterface {
 	   long limit, // Limit row count to, use 0 to ignore / disable
 	   long offset // Offset limit by?
 	) {
-		
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		StringBuilder querySB = new StringBuilder("SELECT ");
 		
 		// Select collumns
-		if (selectColumns == null || selectColumns.length == 0) {
+		if (selectStatement == null || selectStatement.length() <= 0) {
 			querySB.append("*");
 		} else {
-			for (int b = 0; b < selectColumns.length; ++b) {
-				if (b > 0) {
-					querySB.append(",");
-				}
-				querySB.append(selectColumns[b]);
-			}
+			querySB.append(selectStatement);
 		}
 		
 		// From table names
@@ -313,8 +307,10 @@ public class JSql implements BaseInterface {
 			querySB.append(" WHERE ");
 			querySB.append(whereStatement);
 			
-			for (int b = 0; b < whereValues.length; ++b) {
-				queryArgs.add(whereValues[b]);
+			if (whereValues != null) {
+				for (int b = 0; b < whereValues.length; ++b) {
+					queryArgs.add(whereValues[b]);
+				}
 			}
 		}
 		

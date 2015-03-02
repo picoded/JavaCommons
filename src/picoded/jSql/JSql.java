@@ -276,6 +276,10 @@ public class JSql implements BaseInterface {
 		return selectQuerySet(tableName, selectStatement, whereStatement, whereValues, null, 0, 0);
 	}
 	
+	///
+	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
+	/// syntax differances of SELECT across the various SQL vendors (if any).
+	///
 	public JSqlQuerySet selectQuerySet( //
 	   String tableName, // Table name to select from
 	   String selectStatement, // The Columns to select, null means all
@@ -333,76 +337,109 @@ public class JSql implements BaseInterface {
 		return new JSqlQuerySet(querySB.toString(), queryArgs.toArray(), this);
 	}
 	
-	/*
-	public JSqlQuerySet prepareSelectQuerySet(
-													  String tableName, // Table name to select from
-													  String[] selectColumns, // The Columns to select, null means all
-													  Map<String,Object> whereMapping, // The Columns and / or where mapping to filter
-													  long limit, //limit row count to
-													  long offset //offset limit by?
-													  ) {
-		
-		ArrayList<Object> queryArgs = new ArrayList<Object>();
-		StringBuilder querySB = new StringBuilder( "SELECT " );
-		
-		if( selectColumns == null || selectColumns.length == 0 ) {
-			querySB.append("*");
-		} else {
-			for(int b=0; b<selectColumns.length; ++b) {
-				if(b>0) {
-					querySB.append(",");
-				}
-				querySB.append( selectColumns[b] );
-			}
-		}
-		
-		querySB.append(" FROM `"+tableName+"` WHERE " );
-		
-		for(int b=0; b<whereColumns.length; ++b) {
-			if(b>0) {
-				querySB.append(" AND ");
-			}
-			querySB.append(whereColumns[b]+" = ?");
-			queryArgs.add(whereValues[b]);
-		}
-		
-		return new JSqlQuerySet( querySB.toString(), queryArgs.toArray(), this );
-	}
-	 */
-
-	/*
-	
-	public Object[] prepareUpsertQuerySet( //
+	///
+	/// Helps generate an SQL UPSERT request. This function was created to acommedate the various
+	/// syntax differances of UPSERT across the various SQL vendors.
+	///
+	/// The syntax below, is an example of such an upsert for SQLITE.
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	/// INSERT OR REPLACE INTO Employee (
+	///	id,   // Unique Columns to check for upsert
+	///	name, // Insert Columns to update
+	///	role, // Default Columns, that has default fallback value
+	///   note, // Misc Columns, which existing values are preserved (if exists)
+	/// ) VALUES (
+	///	1,    //
+	/// 	'C3PO',
+	///	COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'),
+	///	(SELECT note FROM Employee WHERE id = 1)
+	/// );
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	///
+	public JSqlQuerySet prepareUpsertQuerySet( //
 		String tableName, // Table name to upsert on
 	   String[] uniqueColumns, // The unique column names
 	   Object[] uniqueValues, // The row unique identifier values
-	   String[] valueColumns, // Columns values to update
-	   Object[] updateValues, // Values to update, note that null is skipped
-	   Object[] insertValues, // Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+		//
+	   String[] insertColumns, // Columns names to update
+	   Object[] insertValues, // Values to update, note that null is skipped
+	   //
+		String[] defaultColumns, // Columns names to apply default value, if not exists
+		Object[] defaultValues, // Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+		//
 	   String[] miscColumns // Various column names where its existing value needs to be maintained (if any)
 	) throws JSqlException {
 		
-		/// Note the following is for SQLite only
+		/// Checks that unique collumn and values length to be aligned
+		if( uniqueColumns == null || uniqueValues == null || uniqueColumns.length != uniqueValues.length ) {
+			throw new JSqlException("Upsert query requires unique column and values to be equal length");
+		}
+		
+		/// Preparing inner default select
+		ArrayList<Object> innerSelectArgs = new ArrayList<Object>();
+		StringBuilder innerSelectSB = new StringBuilder( " FROM " );
+		innerSelectSB.append( tableName );
+		innerSelectSB.append( " WHERE " );
+		for(int a=0; a<uniqueColumns.length; ++a) {
+			if(a > 0) {
+				innerSelectSB.append(" AND ");
+			}
+			innerSelectSB.append( uniqueColumns[a]+" = ?" );
+			innerSelectArgs.add( uniqueValues[a] );
+		}
+		innerSelectSB.append(")");
+		
+		String innerSelectPrefix = "(SELECT ";
+		String innerSelectSuffix = innerSelectSB.toString();
+		
 		
 		/// Building the query for INSERT OR REPLACE
+		
+		/*
 		ArrayList<String> columnNames = new ArrayList<String>();
 		ArrayList<String> columnValues = new ArrayList<String>();
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		
+		/// Setting up unique values
+		for(int a=0; a<uniqueColumns.length; ++a) {
+			columnNames.add(uniqueColumns[a]);
+			columnValues.add("?");
+			queryArgs.add(uniqueValues[a]);
+		}
+		*/
 		
-		/// Inserting unique values
-		if( uniqueColumns != null && uniqueValues != null && uniqueColumns.length == uniqueValues.length ) {
-			for(int a=0; a<uniqueColumns.length; ++a) {
-				columnNames.add(uniqueColumns[a]);
+		/// Inserting updated values
+		/*
+		if( updateColumns != null && updateValues != null && updateColumns.length == updateValues.length ) {
+			for(int a=0; a<updateColumns.length; ++a) {
+				columnNames.add(updateColumns[a]);
 				columnValues.add("?");
-				queryArgs.add(uniqueValues[a]);
+				queryArgs.add(updateValues[a]);
 			}
 		} else {
-			throw new JSqlException("Upsert query requires unique column values");
+			// - No exception, as its optional
+			// throw new JSqlException("Upsert query requires update column values");
+		}
+		*/
+		
+		/*
+		/// Ensuring default values
+		if( updateColumns != null && updateValues != null && updateColumns.length == updateValues.length ) {
+			for(int a=0; a<updateColumns.length; ++a) {
+				columnNames.add(updateColumns[a]);
+				columnValues.add("?");
+				queryArgs.add(updateValues[a]);
+			}
+		} else {
+			// - No exception, as its optional
+			// throw new JSqlException("Upsert query requires update column values");
 		}
 		
+		*/
 		
 		
+		/*
 		if( miscColumns != null ) {
 			for(int a=0; a<miscColumns.length; ++a) {
 				columnNames.add(miscColumns[a]);
@@ -420,8 +457,15 @@ public class JSql implements BaseInterface {
 				columnValues.add( tmpSB.toString() );
 			}
 		}
+		*/
 		
+		/*
+		/// Note the following is for SQLite only
+		StringBuilder resSB = new StringBuilder( "INSERT OR REPLACE INTO " );
+		resSB.add( tableName );
+		resSB.add( " (" );
+		*/
 		return null;
 	}
-	 */
+	
 }

@@ -60,8 +60,12 @@
 	<target name="compile-lib">
 		<mkdir dir="bin"/>
 		<copy todir="${build-lib}">
-			<fileset dir="lib-organized"/>
+			<fileset dir="lib-organized" includes="*/*.jar"/>
 			<cutdirsmapper dirs="1"/>
+		</copy>
+		<copy todir="${build-lib}">
+			<fileset dir="lib-organized" includes="*/*/*.jar"/>
+			<cutdirsmapper dirs="2"/>
 		</copy>
 	</target>
 	
@@ -111,10 +115,12 @@
 	<target name="build" depends="compile-src">
 		<delete dir="bin/build" failonerror="false"/>
 		<mkdir dir="bin/build"/>
-		<jar destfile="bin/build/picodedJavaCommons.jar"
-			  basedir="./">
+		<jar destfile="bin/build/picodedJavaCommons-withDependencies.jar">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
-			<fileset dir="${build-lib}" includes="**/*.jar" />
+			<fileset dir="${build-lib}" includes="*.jar" />
+		</jar>
+		<jar destfile="bin/build/picodedJavaCommons.jar">
+			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 		</jar>
 	</target>
 	
@@ -140,12 +146,26 @@
 			
 				<formatter type="plain"/>
 				<formatter type="xml"/>
-			
+				
+				<!--
 				<test name="picodedTests.all_test"
 					haltonfailure="no" todir="${junit-reports}" outfile="junit-all">
 					<formatter type="plain"/>
 					<formatter type="xml"/>
 				</test>
+				 -->
+				
+				<batchtest haltonfailure="no" todir="${junit-reports}">
+					
+					<fileset dir="src">
+						<include name="picodedTests/**/*_test.java"/>
+					</fileset>
+					
+					<formatter type="plain"/>
+					<formatter type="xml"/>
+					
+				</batchtest>
+				
 			</junit>
 		</jacoco:coverage>
 	</target>

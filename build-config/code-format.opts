@@ -15,11 +15,14 @@ tab_size:int:3
 indentation_size:int:3
 
 # Continous statement, indenting size (double of standard)
-continuation_indentation:int:6
-continuation_indentation_for_array_initializer:int:6
+continuation_indentation:int:1
+continuation_indentation_for_array_initializer:int:1
 
 # Sets the page width to 120 characters
 page_width:int:120
 
 # Setup tabs as leading indentation only
 use_tabs_only_for_leading_indentations:boolean:true
+
+# Fills up empty lines with indent
+indent_empty_lines:boolean:true

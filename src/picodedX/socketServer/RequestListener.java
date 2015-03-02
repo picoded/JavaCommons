@@ -19,29 +19,29 @@ import java.util.concurrent.Executors;
 /// This function is meant to be over-ridden when extending for the specific respective functionality
 /// 
 public class RequestListener implements Runnable {
-
+	
 	/// the requestListener parent socket
 	public Socket requestSocket = null;
-
+	
 	/// the argument array used to initiate this class
 	public Object[] initArgumentArray = null;
-
+	
 	/// Initiates the class with nothing defined
 	public RequestListener() {
-
+		
 	}
-
+	
 	/// Initiates the class, with the request socket
 	public RequestListener(Socket requestSocket, Object[] initArgumentArray) {
 		this.requestSocket = requestSocket;
 		this.initArgumentArray = initArgumentArray;
 	}
-
+	
 	/// The actually RequestListener runner, that processes each input/output request
 	public void requestRunner(InputStream input, OutputStream output, Object[] argumentArray) throws IOException {
 		long time = System.currentTimeMillis();
 		System.out.println("[Request Recieved: " + time + "]");
-
+		
 		BufferedReader in = new BufferedReader(new InputStreamReader(input));
 		String inputLine;
 		while ((inputLine = in.readLine()) != null) {
@@ -49,26 +49,26 @@ public class RequestListener implements Runnable {
 			if (inputLine.equals("")) { //blank: terminates header tag
 				break;
 			}
-
+			
 			System.out.println(inputLine);
 		}
 		output.write(("HTTP/1.1 200 OK\n\nWorkerRunnable: " + "RequestListener Demo @ UnixTimestamp: " + time + "")
-		                  .getBytes());
+		   .getBytes());
 		output.close();
 		in.close();
 		input.close();
-
+		
 		System.out.println("[Request Closed]");
 	}
-
+	
 	/// The runnable run function, used internally by SocketThreadPool
 	public void run() {
 		try {
 			InputStream input = requestSocket.getInputStream();
 			OutputStream output = requestSocket.getOutputStream();
-
+			
 			this.requestRunner(input, output, initArgumentArray);
-
+			
 			output.close();
 			input.close();
 		} catch (IOException e) {

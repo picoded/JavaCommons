@@ -12,6 +12,6 @@ import java.util.Map;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
-public class RadixTrie<K,V> /* implements Map<K,V> */ {
+public class RadixTrie<K, V> /* implements Map<K,V> */{
 	
 }

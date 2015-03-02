@@ -25,7 +25,7 @@ import java.util.Map;
 ///
 /// *Total = 54 bytes*
 ///
-public class RadixByteTrie<V> /* implements Map<K,V> */ {
+public class RadixByteTrie<V> /* implements Map<K,V> */{
 	
 	/// Parent node above this tree node.
 	/// if this is null, node is considered root
@@ -36,5 +36,5 @@ public class RadixByteTrie<V> /* implements Map<K,V> */ {
 	
 	///Prefix
 	private byte[] prefixArray = null;
-
+	
 }

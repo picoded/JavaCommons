@@ -27,7 +27,7 @@ package picoded.struct;
 ///
 /// *Total = 29 bytes*
 ///
-public class ByteKeyArray<V> /* implements Map<K,V> */ {
+public class ByteKeyArray<V> /* implements Map<K,V> */{
 	
 	//---------------------------------------------
 	// Static Key Sets
@@ -62,16 +62,14 @@ public class ByteKeyArray<V> /* implements Map<K,V> */ {
 		97,  98,  99,  100, 101, 102, 103, 104, 105, 106, 107, 108, 109,  //a-m
 		110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122   //n-z
 	};
-	*/
-	
+	 */
+
 	//--------------------------------------------------------------
 	// Static Byte Flags, used internally to indicate system state
 	//--------------------------------------------------------------
-	
 	// Byte flag, Optimized keysets, indicator
 	// Made redundent by using keyArray = null
 	// private static final byte BYTEFLAG_OPTIMIZED = (byte)0x80;
-	
 	/// Byte flag, lowercase keysets, indicator
 	private static final byte BYTEFLAG_LOWERCASE = 0x40;
 	
@@ -92,7 +90,6 @@ public class ByteKeyArray<V> /* implements Map<K,V> */ {
 	
 	/// Byte flag, reserved character keysets, up to char 255, indicator
 	private static final byte BYTEFLAG_RESERVED_255 = 0x01;
-	
 	
 	//---------------------------------------------
 	// System variables
@@ -115,12 +112,11 @@ public class ByteKeyArray<V> /* implements Map<K,V> */ {
 	/// upp-alpha-symbolic  | 65       | {32-96}               | Space, Symbolic, Numeric, Symbolic, Uppercase alpha, Symbolic
 	/// low-alpha-symbolic  |          | {}
 	public String storageMode() {
-		if(storeArray == null) {
+		if (storeArray == null) {
 			return "blank";
 		}
 		
-		throw new RuntimeException("Unknown Storage Array Size found: "+storeArray.length);
+		throw new RuntimeException("Unknown Storage Array Size found: " + storeArray.length);
 	}
-	
 	
 }

@@ -35,6 +35,7 @@ public class ByteKeyArray_test {
 		assertEquals( "blank" , tObj.storageMode() );
 	}
 	
+	/*
 	/// Tests Basic UTF8 Byte array support
 	@Test
 	public void utf8byteArray() throws UnsupportedEncodingException{
@@ -64,6 +65,7 @@ public class ByteKeyArray_test {
 			assertEquals( (char)cVal, ((char)bArr[0] & 0xFF));
 		}
 	}
+	*/
 	
 	@Test
 	public void byteArrayPointerTest() {

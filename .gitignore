@@ -3,6 +3,7 @@
 #
 *.swp
 *._*
+*.unison*
 
 #
 # Exclude built / temporary flis

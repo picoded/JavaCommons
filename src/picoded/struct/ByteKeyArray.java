@@ -91,7 +91,7 @@ public class ByteKeyArray<V> /* implements Map<K,V> */ {
 	private static final byte BYTEFLAG_RESERVED_127 = 0x02;
 	
 	/// Byte flag, reserved character keysets, up to char 255, indicator
-	private static final byte BYTEFLAG_RESERVED_127 = 0x01;
+	private static final byte BYTEFLAG_RESERVED_255 = 0x01;
 	
 	
 	//---------------------------------------------

@@ -280,36 +280,53 @@ public class JSql implements BaseInterface {
 	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
 	/// syntax differances of SELECT across the various SQL vendors (if any).
 	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
+	/// The syntax below, is an example of such an SELECT statement for SQLITE.
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	/// SELECT
+	///	col1, col2   //select collumn
+	/// FROM tableName //table name to select from
+	/// WHERE
+	///	col1=?       //where clause
+	/// ORDER BY
+	///	col2 DESC    //order by clause
+	/// LIMIT 2        //limit clause
+	/// OFFSET 3       //offset clause
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	///
 	public JSqlQuerySet selectQuerySet( //
 	   String tableName, // Table name to select from
+	   //
 	   String selectStatement, // The Columns to select, null means all
-	   
+	   //
 	   String whereStatement, // The Columns to apply where clause, this must be sql neutral
 	   Object[] whereValues, // Values that corresponds to the where statement
-	   
+	   //
 	   String orderStatement, // Order by statements, must be either ASC / DESC
-	   
+	   //
 	   long limit, // Limit row count to, use 0 to ignore / disable
 	   long offset // Offset limit by?
 	) {
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
-		StringBuilder querySB = new StringBuilder("SELECT ");
+		StringBuilder queryBuilder = new StringBuilder("SELECT ");
 		
 		// Select collumns
 		if (selectStatement == null || selectStatement.length() <= 0) {
-			querySB.append("*");
+			queryBuilder.append("*");
 		} else {
-			querySB.append(selectStatement);
+			queryBuilder.append(selectStatement);
 		}
 		
 		// From table names
-		querySB.append(" FROM `" + tableName + "`");
+		queryBuilder.append(" FROM `" + tableName + "`");
 		
 		// Where clauses
 		if (whereStatement != null && whereStatement.length() > 3) {
 			
-			querySB.append(" WHERE ");
-			querySB.append(whereStatement);
+			queryBuilder.append(" WHERE ");
+			queryBuilder.append(whereStatement);
 			
 			if (whereValues != null) {
 				for (int b = 0; b < whereValues.length; ++b) {
@@ -320,152 +337,160 @@ public class JSql implements BaseInterface {
 		
 		// Order By clause
 		if (orderStatement != null && orderStatement.length() > 3) {
-			querySB.append(" ORDER BY ");
-			querySB.append(orderStatement);
+			queryBuilder.append(" ORDER BY ");
+			queryBuilder.append(orderStatement);
 		}
 		
 		// Limit and offset clause
 		if (limit > 0) {
-			querySB.append(" LIMIT " + limit);
+			queryBuilder.append(" LIMIT " + limit);
 			
 			if (offset > 0) {
-				querySB.append(" OFFSET " + offset);
+				queryBuilder.append(" OFFSET " + offset);
 			}
 		}
 		
 		// Create the query set
-		return new JSqlQuerySet(querySB.toString(), queryArgs.toArray(), this);
+		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	
 	///
 	/// Helps generate an SQL UPSERT request. This function was created to acommedate the various
 	/// syntax differances of UPSERT across the various SQL vendors.
 	///
-	/// The syntax below, is an example of such an upsert for SQLITE.
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
+	/// The syntax below, is an example of such an UPSERT statement for SQLITE.
 	///
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
 	/// INSERT OR REPLACE INTO Employee (
-	///	id,   // Unique Columns to check for upsert
-	///	name, // Insert Columns to update
-	///	role, // Default Columns, that has default fallback value
-	///   note, // Misc Columns, which existing values are preserved (if exists)
+	///	id,     // Unique Columns to check for upsert
+	///	name,   // Insert Columns to update
+	///	role,   // Default Columns, that has default fallback value
+	///   note,   // Misc Columns, which existing values are preserved (if exists)
 	/// ) VALUES (
-	///	1,    //
-	/// 	'C3PO',
-	///	COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'),
-	///	(SELECT note FROM Employee WHERE id = 1)
+	///	1,      // Unique value
+	/// 	'C3PO', // Insert value
+	///	COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'), // Values with default
+	///	(SELECT note FROM Employee WHERE id = 1) // Misc values to preserve
 	/// );
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
 	public JSqlQuerySet prepareUpsertQuerySet( //
-		String tableName, // Table name to upsert on
+	   String tableName, // Table name to upsert on
+	   //
 	   String[] uniqueColumns, // The unique column names
 	   Object[] uniqueValues, // The row unique identifier values
-		//
-	   String[] insertColumns, // Columns names to update
-	   Object[] insertValues, // Values to update, note that null is skipped
 	   //
-		String[] defaultColumns, // Columns names to apply default value, if not exists
-		Object[] defaultValues, // Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
-		//
-	   String[] miscColumns // Various column names where its existing value needs to be maintained (if any)
+	   String[] insertColumns, // Columns names to update
+	   Object[] insertValues, // Values to update
+	   //
+	   String[] defaultColumns, // Columns names to apply default value, if not exists
+	   Object[] defaultValues, // Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+	   //
+	   // Various column names where its existing value needs to be maintained (if any),
+	   // this is important as some SQL implementation will fallback to default table values, if not properly handled
+	   String[] miscColumns //
 	) throws JSqlException {
 		
 		/// Checks that unique collumn and values length to be aligned
-		if( uniqueColumns == null || uniqueValues == null || uniqueColumns.length != uniqueValues.length ) {
+		if (uniqueColumns == null || uniqueValues == null || uniqueColumns.length != uniqueValues.length) {
 			throw new JSqlException("Upsert query requires unique column and values to be equal length");
 		}
 		
-		/// Preparing inner default select
+		/// Preparing inner default select, this will be used repeatingly for COALESCE, DEFAULT and MISC values
 		ArrayList<Object> innerSelectArgs = new ArrayList<Object>();
-		StringBuilder innerSelectSB = new StringBuilder( " FROM " );
-		innerSelectSB.append( tableName );
-		innerSelectSB.append( " WHERE " );
-		for(int a=0; a<uniqueColumns.length; ++a) {
-			if(a > 0) {
+		StringBuilder innerSelectSB = new StringBuilder(" FROM ");
+		innerSelectSB.append("`" + tableName + "`");
+		innerSelectSB.append(" WHERE ");
+		for (int a = 0; a < uniqueColumns.length; ++a) {
+			if (a > 0) {
 				innerSelectSB.append(" AND ");
 			}
-			innerSelectSB.append( uniqueColumns[a]+" = ?" );
-			innerSelectArgs.add( uniqueValues[a] );
+			innerSelectSB.append(uniqueColumns[a] + " = ?");
+			innerSelectArgs.add(uniqueValues[a]);
 		}
 		innerSelectSB.append(")");
 		
 		String innerSelectPrefix = "(SELECT ";
 		String innerSelectSuffix = innerSelectSB.toString();
 		
-		
 		/// Building the query for INSERT OR REPLACE
-		
-		/*
-		ArrayList<String> columnNames = new ArrayList<String>();
-		ArrayList<String> columnValues = new ArrayList<String>();
+		StringBuilder queryBuilder = new StringBuilder("INSERT OR REPLACE INTO `" + tableName + "` (");
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		
+		/// Building the query for both sides of '(...columns...) VALUE (...vars...)' clauses in upsert
+		/// Note that the final trailing ", " seperator will be removed prior to final query conversion
+		StringBuilder columnNames = new StringBuilder();
+		StringBuilder columnValues = new StringBuilder();
+		String columnSeperator = ", ";
+		
 		/// Setting up unique values
-		for(int a=0; a<uniqueColumns.length; ++a) {
-			columnNames.add(uniqueColumns[a]);
-			columnValues.add("?");
+		for (int a = 0; a < uniqueColumns.length; ++a) {
+			columnNames.append(uniqueColumns[a]);
+			columnNames.append(columnSeperator);
+			//
+			columnValues.append("?");
+			columnValues.append(columnSeperator);
+			//
 			queryArgs.add(uniqueValues[a]);
 		}
-		*/
 		
 		/// Inserting updated values
-		/*
-		if( updateColumns != null && updateValues != null && updateColumns.length == updateValues.length ) {
-			for(int a=0; a<updateColumns.length; ++a) {
-				columnNames.add(updateColumns[a]);
-				columnValues.add("?");
-				queryArgs.add(updateValues[a]);
-			}
-		} else {
-			// - No exception, as its optional
-			// throw new JSqlException("Upsert query requires update column values");
-		}
-		*/
-		
-		/*
-		/// Ensuring default values
-		if( updateColumns != null && updateValues != null && updateColumns.length == updateValues.length ) {
-			for(int a=0; a<updateColumns.length; ++a) {
-				columnNames.add(updateColumns[a]);
-				columnValues.add("?");
-				queryArgs.add(updateValues[a]);
-			}
-		} else {
-			// - No exception, as its optional
-			// throw new JSqlException("Upsert query requires update column values");
-		}
-		
-		*/
-		
-		
-		/*
-		if( miscColumns != null ) {
-			for(int a=0; a<miscColumns.length; ++a) {
-				columnNames.add(miscColumns[a]);
-				
-				tmpSB = new StringBuilder( "(SELECT "+miscColumns[a]+" FROM `"+tableName+"` WHERE " );
-				for(int b=0; b<uniqueColumns.length; ++b) {
-					if(b>0) {
-						tmpSB.append(" AND ");
-					}
-					tmpSB.append(uniqueColumns[b]+" = ?");
-					queryArgs.add(uniqueValues[b]);
-				}
-				tmpSB.append(")");
-				
-				columnValues.add( tmpSB.toString() );
+		if (insertColumns != null) {
+			for (int a = 0; a < insertColumns.length; ++a) {
+				columnNames.append(insertColumns[a]);
+				columnNames.append(columnSeperator);
+				//
+				columnValues.append("?");
+				columnValues.append(columnSeperator);
+				//
+				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
 			}
 		}
-		*/
 		
-		/*
-		/// Note the following is for SQLite only
-		StringBuilder resSB = new StringBuilder( "INSERT OR REPLACE INTO " );
-		resSB.add( tableName );
-		resSB.add( " (" );
-		*/
-		return null;
+		/// Handling default values
+		if (defaultColumns != null) {
+			for (int a = 0; a < defaultColumns.length; ++a) {
+				columnNames.append(defaultColumns[a]);
+				columnNames.append(columnSeperator);
+				//
+				columnValues.append("COALESCE(");
+				//-
+				columnValues.append(innerSelectPrefix);
+				columnValues.append(defaultColumns[a]);
+				columnValues.append(innerSelectSuffix);
+				queryArgs.addAll(innerSelectArgs);
+				//-
+				columnValues.append(", ?)");
+				columnValues.append(columnSeperator);
+				//
+				queryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+			}
+		}
+		
+		/// Handling Misc values
+		if (miscColumns != null) {
+			for (int a = 0; a < miscColumns.length; ++a) {
+				columnNames.append(miscColumns[a]);
+				columnNames.append(columnSeperator);
+				//-
+				columnValues.append(innerSelectPrefix);
+				columnValues.append(miscColumns[a]);
+				columnValues.append(innerSelectSuffix);
+				queryArgs.addAll(innerSelectArgs);
+				//-
+				columnValues.append(columnSeperator);
+			}
+		}
+		
+		/// Building the final query
+		queryBuilder.append(columnNames.substring(0, columnNames.length() - columnSeperator.length()));
+		queryBuilder.append(") VALUES (");
+		queryBuilder.append(columnValues.substring(0, columnValues.length() - columnSeperator.length()));
+		queryBuilder.append(")");
+		
+		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	
 }

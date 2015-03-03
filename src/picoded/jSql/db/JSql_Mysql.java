@@ -38,7 +38,7 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 	///
 	/// **Note:** urlString, is just IP:PORT. For example, "127.0.0.1:3306"
 	public JSql_Mysql(String urlStr, String dbName, String dbUser, String dbPass) {
-		sqlType = JSqlType.sql;
+		sqlType = JSqlType.mysql;
 		
 		String connectionUrl = "jdbc:mysql://" + urlStr + "/" + dbName
 		   + "?autoReconnect=true&failOverReadOnly=false&maxReconnects=5";
@@ -75,6 +75,26 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 	///
 	/// Returns false if no result is given by the execution call, else true on success
 	public boolean execute(String qString, Object... values) throws JSqlException {
-		return execute_raw(genericSqlParser(qString), values);
+		qString = genericSqlParser(qString);
+		String qStringUpper = qString.toUpperCase();
+		
+		// Possible "INDEX IF NOT EXISTS" call for mysql, suppress duplicate index error if needed
+		//
+		// This is a work around for MYSQL not supporting the "CREATE X INDEX IF NOT EXISTS" syntax
+		//
+		if (qStringUpper.indexOf("INDEX IF NOT EXISTS") != -1) {
+			// index conflict try catch
+			try {
+				return execute_raw(qStringUpper.replaceAll("INDEX IF NOT EXISTS", "INDEX"));
+			} catch (JSqlException e) {
+				if (e.getCause().toString().indexOf(
+				   "com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Duplicate key name '") == -1) {
+					// throws as its not a duplicate key exception
+					throw e;
+				}
+				return true;
+			}
+		}
+		return execute_raw(qString, values);
 	}
 }

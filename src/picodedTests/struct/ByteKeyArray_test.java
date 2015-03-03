@@ -32,9 +32,10 @@ public class ByteKeyArray_test {
 	/// Tests: CaseInsensitiveHashMap.storageMode
 	@Test
 	public void storageMode_blank() {
-		assertEquals( "blank" , tObj.storageMode() );
+		assertEquals("blank", tObj.storageMode());
 	}
 	
+	/*
 	/// Tests Basic UTF8 Byte array support
 	@Test
 	public void utf8byteArray() throws UnsupportedEncodingException{
@@ -64,18 +65,19 @@ public class ByteKeyArray_test {
 			assertEquals( (char)cVal, ((char)bArr[0] & 0xFF));
 		}
 	}
-	
+	 */
+
 	@Test
 	public void byteArrayPointerTest() {
 		byte arrLen = 5;
 		byte[] setA = new byte[arrLen];
 		
-		for( byte a=0; a<arrLen; ++a ) {
-			setA[a] = (byte)-a;
+		for (byte a = 0; a < arrLen; ++a) {
+			setA[a] = (byte) -a;
 		}
 		
 		byte[] setB = setA;
-		for( byte a=0; a<arrLen; ++a ) {
+		for (byte a = 0; a < arrLen; ++a) {
 			assertEquals(-a, setA[a]);
 			assertEquals(setA[a], setB[a]);
 			
@@ -87,6 +89,5 @@ public class ByteKeyArray_test {
 			assertEquals(setB[a], setA[a]);
 		}
 	}
-	
 	
 }

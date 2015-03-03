@@ -63,5 +63,6 @@ public class HazelcastSimple_test {
 		assertEquals(1, map.size());
 		assertEquals("Joe", map.get(1));
 		
+		instance.shutdown();
 	}
 }

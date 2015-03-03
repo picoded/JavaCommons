@@ -214,7 +214,7 @@ public class JSql_Mssql extends JSql implements BaseInterface {
 		}
 		
 		//remove ON DELETE FOR CLIENTSTATUSHISTORY---> this block needs to be refined for future.
-		if (qString.contains("CLIENTSTATUSHISTORY") && qString.contains("ON DELETE")) {
+		if (qString.contains("ON DELETE")) { //qString.contains("CLIENTSTATUSHISTORY") &&
 			qString = qString.replaceAll("ON DELETE SET NULL", "");
 		}
 		

@@ -228,5 +228,121 @@ public class JSql_Sqlite_test {
 		
 		r.dispose();
 	}
+	
+	/// Test if the "INDEX IF NOT EXISTS" clause is being handled correctly
+	@Test
+	public void uniqueIndexIfNotExists() throws JSqlException {
+		executeQuery();
+		
+		assertTrue("1st uniq index", JSqlObj.execute("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName
+		   + "_unique` ON `" + testTableName + "` ( col1, col2 )"));
+		assertTrue("2nd uniq index", JSqlObj.execute("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName
+		   + "_unique` ON `" + testTableName + "` ( col1, col2 )"));
+	}
+	
+	@Test
+	public void JSqlQuerySetConstructor() {
+		JSqlQuerySet qSet = null;
+		
+		assertNotNull(qSet = new JSqlQuerySet("hello", (new String[] { "world", "one" }), JSqlObj));
+		
+		assertEquals(JSqlObj, qSet.getJSql());
+		assertEquals("hello", qSet.getQuery());
+		assertArrayEquals((new String[] { "world", "one" }), qSet.getArguments());
+	}
+	
+	public void row1to7setup() throws JSqlException {
+		executeQuery();
+		
+		// added more data to test
+		JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 405, "hello");
+		JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 406, "world");
+		JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 407, "no.7");
+	}
+	
+	@Test
+	public void selectQuerySet() throws JSqlException {
+		row1to7setup();
+		
+		JSqlResult r = null;
+		JSqlQuerySet qSet = null;
+		
+		// Select all as normal
+		assertNotNull(qSet = JSqlObj.selectQuerySet(testTableName, null, null, null)); //select all
+		r = qSet.executeQuery();
+		assertNotNull("SQL result should return a result", r);
+		
+		r.fetchAllRows();
+		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col1")).intValue());
+		assertEquals("via readRowCol", "has nothing", r.readRowCol(0, "col2"));
+		assertEquals("via readRowCol", 405, ((Number) r.readRowCol(1, "col1")).intValue());
+		assertEquals("via readRowCol", "hello", r.readRowCol(1, "col2"));
+		assertEquals("via readRowCol", 406, ((Number) r.readRowCol(2, "col1")).intValue());
+		assertEquals("via readRowCol", "world", r.readRowCol(2, "col2"));
+		
+		assertEquals("via get().get()", 404, ((Number) r.get("col1").get(0)).intValue());
+		assertEquals("via get().get()", "has nothing", r.get("col2").get(0));
+		assertEquals("via get().get()", 405, ((Number) r.get("col1").get(1)).intValue());
+		assertEquals("via get().get()", "hello", r.get("col2").get(1));
+		assertEquals("via get().get()", 406, ((Number) r.get("col1").get(2)).intValue());
+		assertEquals("via get().get()", "world", r.get("col2").get(2));
+		
+		assertEquals("via readRowCol", 407, ((Number) r.readRowCol(3, "col1")).intValue());
+		assertEquals("via readRowCol", "no.7", r.readRowCol(3, "col2"));
+		assertEquals("via get().get()", 407, ((Number) r.get("col1").get(3)).intValue());
+		assertEquals("via get().get()", "no.7", r.get("col2").get(3));
+		
+		r.dispose();
+		
+		// orderby DESC, limits 2, offset 1
+		assertNotNull(qSet = JSqlObj.selectQuerySet(testTableName, null, null, null, "col1 DESC", 2, 1));
+		assertNotNull("SQL result should return a result", r = qSet.query());
+		
+		assertEquals("DESC, limit 2, offset 1 length check", 2, r.get("col1").size());
+		assertEquals("via get().get()", 405, ((Number) r.get("col1").get(1)).intValue());
+		assertEquals("via get().get()", "hello", r.get("col2").get(1));
+		assertEquals("via get().get()", 406, ((Number) r.get("col1").get(0)).intValue());
+		assertEquals("via get().get()", "world", r.get("col2").get(0));
+		
+		// select all, with select clause, orderby DESC
+		assertNotNull(qSet = JSqlObj.selectQuerySet(testTableName, "col1, col2", null, null, "col1 DESC", 2, 1));
+		assertNotNull("SQL result should return a result", r = qSet.query());
+		
+		assertEquals("DESC, limit 2, offset 1 length check", 2, r.get("col1").size());
+		assertEquals("via get().get()", 405, ((Number) r.get("col1").get(1)).intValue());
+		assertEquals("via get().get()", "hello", r.get("col2").get(1));
+		assertEquals("via get().get()", 406, ((Number) r.get("col1").get(0)).intValue());
+		assertEquals("via get().get()", "world", r.get("col2").get(0));
+		
+		// select 404, with col2 clause
+		assertNotNull(qSet = JSqlObj.selectQuerySet(testTableName, "col2", "col1 = ?", (new Object[] { 404 })));
+		assertNotNull("SQL result should return a result", r = qSet.query());
+		
+		assertNull("no column", r.get("col1"));
+		assertNotNull("has column check", r.get("col2"));
+		assertEquals("1 length check", 1, r.get("col2").size());
+		assertEquals("via get().get()", "has nothing", r.get("col2").get(0));
+	}
+	
+	@Test
+	public void upsertQuerySet() throws JSqlException {
+		row1to7setup();
+		JSqlResult r = null;
+		JSqlQuerySet qSet = null;
+		
+		r = JSqlObj.query("SELECT * FROM " + testTableName + "");
+		assertNotNull("query should return a jSql result", r);
+		assertEquals("Initial value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
+		assertEquals("Initial value check failed", "has nothing", r.readRowCol(0, "col2"));
+		
+		//Upsert query
+		assertNotNull(qSet = JSqlObj.prepareUpsertQuerySet( //
+		   testTableName, //
+		   new String[] { "col1" }, new Object[] { 404 }, //
+		   new String[] { "col2" }, new Object[] { "not found" } //
+		));
+		assertNotNull("SQL result should return a result", r = qSet.query());
+		
+	}
 	//*/
 }

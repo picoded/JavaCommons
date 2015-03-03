@@ -251,17 +251,21 @@ public class JSql_Sqlite_test {
 		assertArrayEquals((new String[] { "world", "one" }), qSet.getArguments());
 	}
 	
-	@Test
-	public void selectQuerySet() throws JSqlException {
-		
-		JSqlResult r = null;
-		JSqlQuerySet qSet = null;
+	public void row1to7setup() throws JSqlException {
 		executeQuery();
 		
 		// added more data to test
-		JSqlObj.query("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 405, "hello").dispose();
-		JSqlObj.query("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 406, "world").dispose();
-		JSqlObj.query("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 407, "no.7").dispose();
+		JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 405, "hello");
+		JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 406, "world");
+		JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 407, "no.7");
+	}
+	
+	@Test
+	public void selectQuerySet() throws JSqlException {
+		row1to7setup();
+		
+		JSqlResult r = null;
+		JSqlQuerySet qSet = null;
 		
 		// Select all as normal
 		assertNotNull(qSet = JSqlObj.selectQuerySet(testTableName, null, null, null)); //select all
@@ -318,6 +322,26 @@ public class JSql_Sqlite_test {
 		assertNotNull("has column check", r.get("col2"));
 		assertEquals("1 length check", 1, r.get("col2").size());
 		assertEquals("via get().get()", "has nothing", r.get("col2").get(0));
+	}
+	
+	@Test
+	public void upsertQuerySet() throws JSqlException {
+		row1to7setup();
+		JSqlResult r = null;
+		JSqlQuerySet qSet = null;
+		
+		r = JSqlObj.query("SELECT * FROM " + testTableName + "");
+		assertNotNull("query should return a jSql result", r);
+		assertEquals("Initial value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
+		assertEquals("Initial value check failed", "has nothing", r.readRowCol(0, "col2"));
+		
+		//Upsert query
+		assertNotNull(qSet = JSqlObj.prepareUpsertQuerySet( //
+		   testTableName, //
+		   new String[] { "col1" }, new Object[] { 404 }, //
+		   new String[] { "col2" }, new Object[] { "not found" } //
+		));
+		assertNotNull("SQL result should return a result", r = qSet.query());
 		
 	}
 	//*/

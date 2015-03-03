@@ -354,6 +354,18 @@ public class JSql implements BaseInterface {
 		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	
+	public JSqlQuerySet prepareUpsertQuerySet( //
+															String tableName, // Table name to upsert on
+															//
+															String[] uniqueColumns, // The unique column names
+															Object[] uniqueValues, // The row unique identifier values
+															//
+															String[] insertColumns, // Columns names to update
+															Object[] insertValues // Values to update
+															) throws JSqlException {
+		return prepareUpsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues, null,null,null);
+	}
+	
 	///
 	/// Helps generate an SQL UPSERT request. This function was created to acommedate the various
 	/// syntax differances of UPSERT across the various SQL vendors.

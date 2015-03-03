@@ -37,6 +37,9 @@ public class JSqlQuerySet {
 	/// Executes the argumented query, and returns the result object *without*
 	/// fetching the result data from the database. This is raw execution.
 	///
+	/// @Warning, this function is not to be used. Unless optimizataion is heavily needed. As careless usage may
+	/// result into a memory leak.
+	///
 	/// **Note:** Only queries starting with 'SELECT' will produce a JSqlResult object that has fetchable results
 	public JSqlResult executeQuery() throws JSqlException {
 		return JSqlObj.executeQuery(sqlQuery, sqlArgs);

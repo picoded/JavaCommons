@@ -324,14 +324,14 @@ public class JSql_Sqlite_test {
 		assertEquals("via get().get()", "has nothing", r.get("col2").get(0));
 	}
 	
+	/// @TODO extend test coverage to include default, and misc columns
 	@Test
 	public void upsertQuerySet() throws JSqlException {
 		row1to7setup();
 		JSqlResult r = null;
 		JSqlQuerySet qSet = null;
 		
-		r = JSqlObj.query("SELECT * FROM " + testTableName + "");
-		assertNotNull("query should return a jSql result", r);
+		assertNotNull("query should return a jSql result", r = JSqlObj.query("SELECT * FROM " + testTableName + " ORDER BY col1 ASC"));
 		assertEquals("Initial value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
 		assertEquals("Initial value check failed", "has nothing", r.readRowCol(0, "col2"));
 		
@@ -341,8 +341,11 @@ public class JSql_Sqlite_test {
 		   new String[] { "col1" }, new Object[] { 404 }, //
 		   new String[] { "col2" }, new Object[] { "not found" } //
 		));
-		assertNotNull("SQL result should return a result", r = qSet.query());
+		assertTrue("SQL result should return true", qSet.execute());
 		
+		assertNotNull("query should return a jSql result", r = JSqlObj.query("SELECT * FROM " + testTableName + " ORDER BY col1 ASC"));
+		assertEquals("Upsert value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
+		assertEquals("Upsert value check failed", "not found", r.readRowCol(0, "col2"));
 	}
 	//*/
 }

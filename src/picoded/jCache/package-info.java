@@ -6,6 +6,5 @@
 /// Currently Supported SQL Databases
 /// + HazelCast
 /// + Redis
-/// + Memcache
 ///
 package picoded.jCache;

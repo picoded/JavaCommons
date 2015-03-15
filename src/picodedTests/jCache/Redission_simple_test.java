@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.lang.System;
 import java.util.*;
 
+import java.util.concurrent.ConcurrentMap;
 import org.redisson.*;
 import picodedTests.jCache.LocalCacheSetup;
 
@@ -47,4 +48,12 @@ public class Redission_simple_test {
 	}
 	
 	
+	@Test
+	public void simplePutAndGet() {
+		ConcurrentMap<String, String> rMap = redissionObj.getMap("testMap");
+		
+		assertNull( rMap.get("testIsNull") );
+		rMap.put("hello", "world");
+		assertEquals("world", rMap.get("hello") );
+	}
 }

@@ -1,5 +1,6 @@
 package picoded.jSql.db;
 
+import picoded.jSql.JSqlType;
 import picoded.jSql.JSqlResult;
 import picoded.jSql.JSqlException;
 
@@ -9,8 +10,8 @@ import picoded.jSql.JSqlException;
 /// Note that the interface intentionaly does not include a "constructor" as that may be database implementation dependent
 public interface BaseInterface {
 	
-	// Internal refrence of the current sqlType the system is running as, or so it should be by default
-	// public JSqlType sqlType = JSqlType.invalid;
+	/// Internal refrence of the current sqlType the system is running as, or so it should be by default
+	//public JSqlType sqlType = JSqlType.invalid;
 	
 	/// Executes the argumented query, and returns the result object *without* 
 	/// fetching the result data from the database. (not fetching may not apply to all implementations)

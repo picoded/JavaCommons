@@ -9,21 +9,22 @@ import java.util.concurrent.ConcurrentMap;
 import org.redisson.*;
 import picodedTests.jCache.LocalCacheSetup;
 
-public class Redission_simple_test {
+public class Redisson_simple_test {
 	
-	static protected Config redissionConfig;
+	static protected Config redissonConfig;
+	static protected int redisPort = 0;
 	
-	protected Redisson redissionObj;
+	protected Redisson redissonObj;
 	
 	@BeforeClass
 	public static void oneTimeSetUp() {
 		// one-time initialization code
+		redisPort = LocalCacheSetup.setupRedisServer();
 		
 		// Config to use
-		redissionConfig= new Config();
-		redissionConfig.useSingleServer().setAddress("127.0.0.1:6379");
+		redissonConfig= new Config();
+		redissonConfig.useSingleServer().setAddress("127.0.0.1:"+redisPort);
 		
-		LocalCacheSetup.setupRedisServer();
 	}
 	
 	@AfterClass
@@ -34,7 +35,7 @@ public class Redission_simple_test {
 	
 	@Before
 	public void setUp() {
-		redissionObj = Redisson.create(redissionConfig);
+		redissonObj = Redisson.create(redissonConfig);
 	}
 	
 	@After
@@ -44,13 +45,13 @@ public class Redission_simple_test {
 	
 	@Test
 	public void sqliteInMemoryConstructor() {
-		assertNotNull("Redission constructed object must not be null", redissionObj);
+		assertNotNull("redisson constructed object must not be null", redissonObj);
 	}
 	
 	
 	@Test
 	public void simplePutAndGet() {
-		ConcurrentMap<String, String> rMap = redissionObj.getMap("testMap");
+		ConcurrentMap<String, String> rMap = redissonObj.getMap("testMap");
 		
 		assertNull( rMap.get("testIsNull") );
 		rMap.put("hello", "world");

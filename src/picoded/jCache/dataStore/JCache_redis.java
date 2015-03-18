@@ -15,7 +15,7 @@ import org.redisson.*;
 public class JCache_redis extends JCache implements BaseInterface {
 	
 	/// Overwrite as redis
-	public JCacheType cacheType  = JCacheType.redis;
+	public JCacheType cacheType = JCacheType.redis;
 	
 	/// Logger (if needed)
 	//private static Logger logger = Logger.getLogger(JCache_redis.class.getName());
@@ -56,12 +56,12 @@ public class JCache_redis extends JCache implements BaseInterface {
 	///
 	/// @param  force  Boolean if true, forces the existing connection to terminate and be recreated
 	public void recreate(boolean force) {
-		if(force) {
-			if(!isDisposed()) {
+		if (force) {
+			if (!isDisposed()) {
 				dispose();
 			}
 		} else {
-			if(redissonObj != null) {
+			if (redissonObj != null) {
 				return; //already created, skips
 			}
 		}
@@ -87,7 +87,7 @@ public class JCache_redis extends JCache implements BaseInterface {
 	
 	/// Dispose the connection unless it has already been disposed
 	public void dispose() {
-		if(redissonObj != null) {
+		if (redissonObj != null) {
 			redissonObj.shutdown(); //shutdown the redission connection
 			redissonObj = null;
 		}

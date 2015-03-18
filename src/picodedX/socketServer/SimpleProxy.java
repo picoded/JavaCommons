@@ -142,31 +142,31 @@ public class SimpleProxy extends RequestListener {
 							//---------------------------------------
 							if (clientInputLength >= 4) { //copies the last 4 byte entirely
 								System.arraycopy(buffer, //original data
-								   clientInputLength - 4, //starts from 4th last character 
-								   last4bytes, //store into buffer for checks
-								   0, //fill entirely the checking buffer
-								   4 //store the 4 bytes of data
-								   );
+									clientInputLength - 4, //starts from 4th last character 
+									last4bytes, //store into buffer for checks
+									0, //fill entirely the checking buffer
+									4 //store the 4 bytes of data
+									);
 							} else { //copies it in remaining part
 								System.arraycopy(last4bytes, //previously buffered data (if any)
-								   clientInputLength, //offset to copy from
-								   last4bytes, //store into buffer for checks
-								   0, //push data to zero position
-								   4 - clientInputLength //by the existing data
-								   );
+									clientInputLength, //offset to copy from
+									last4bytes, //store into buffer for checks
+									0, //push data to zero position
+									4 - clientInputLength //by the existing data
+									);
 								
 								System.arraycopy(buffer, //original data
-								   0, //stores all (less then 4)
-								   last4bytes, //store into buffer for checks
-								   4 - clientInputLength, //from the last copied byte onwards
-								   clientInputLength //last byte length
-								   );
+									0, //stores all (less then 4)
+									last4bytes, //store into buffer for checks
+									4 - clientInputLength, //from the last copied byte onwards
+									clientInputLength //last byte length
+									);
 							}
 							
 							// Check the last 4 byte
 							//------------------------
 							if (last4bytes[0] == '\r' && last4bytes[1] == '\n' && last4bytes[2] == '\r'
-							   && last4bytes[3] == '\n') {
+								&& last4bytes[3] == '\n') {
 								reachedEndOfRequest = true;
 							} else {
 								reachedEndOfRequest = false;
@@ -193,18 +193,18 @@ public class SimpleProxy extends RequestListener {
 				// Checks for any closed sockets
 				//---------------------------------
 				if (serverSocket.isClosed() || !serverSocket.isConnected() || serverSocket.isInputShutdown()
-				   || serverSocket.isOutputShutdown()) {
+					|| serverSocket.isOutputShutdown()) {
 					serverInputLength = -1;
 				}
 				if (requestSocket.isClosed() || !requestSocket.isConnected() || requestSocket.isInputShutdown()
-				   || requestSocket.isOutputShutdown()) {
+					|| requestSocket.isOutputShutdown()) {
 					clientInputLength = -1;
 				}
 				
 				// Runs loop atleast once again, before actually closing the socket (just in case)
 				//-----------------------------------------------------------------------------------
 				if (clientInputLength == -1 || serverInputLength == -1
-				   || (reachedEndOfRequest == true && serverBegunResponse == true)) {
+					|| (reachedEndOfRequest == true && serverBegunResponse == true)) {
 					
 					if (closeCheck) {
 						break;

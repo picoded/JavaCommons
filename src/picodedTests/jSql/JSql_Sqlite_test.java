@@ -49,14 +49,14 @@ public class JSql_Sqlite_test {
 		JSqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "`").dispose(); //cleanup (just incase)
 		
 		JSqlObj.executeQuery("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")
-		   .dispose(); //valid table creation : no exception
+			.dispose(); //valid table creation : no exception
 		JSqlObj.executeQuery("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")
-		   .dispose(); //run twice to ensure "IF NOT EXISTS" works
+			.dispose(); //run twice to ensure "IF NOT EXISTS" works
 		
 		//JSqlObj.executeQuery( "TRUNCATE TABLE "+testTableName+"").dispose(); //run twice to ensure "IF NOT EXISTS" works
 		
 		JSqlObj.executeQuery("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing")
-		   .dispose();
+			.dispose();
 	}
 	
 	///*
@@ -82,7 +82,7 @@ public class JSql_Sqlite_test {
 		caughtException = null;
 		try {
 			JSqlObj.executeQuery("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing")
-			   .dispose(); //inserts into : Expect exception
+				.dispose(); //inserts into : Expect exception
 		} catch (JSqlException e) {
 			caughtException = e; //fish caught
 			assertNotNull("Exception caught as intended", e);
@@ -102,11 +102,11 @@ public class JSql_Sqlite_test {
 		
 		//valid table creation : no exception
 		assertTrue(JSqlObj
-		   .execute("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )"));
+			.execute("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )"));
 		
 		//run twice to ensure "IF NOT EXISTS" works
 		assertTrue(JSqlObj
-		   .execute("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )"));
+			.execute("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )"));
 		
 		//assertTrue(JSqlObj.execute( "TRUNCATE TABLE "+testTableName+"")); //cleanup (just incase)
 		
@@ -135,7 +135,7 @@ public class JSql_Sqlite_test {
 		caughtException = null;
 		try {
 			assertTrue(JSqlObj
-			   .execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing")); //inserts into : Expect exception
+				.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing")); //inserts into : Expect exception
 		} catch (JSqlException e) {
 			caughtException = e; //fish caught
 			assertNotNull("Exception caught as intended", e);
@@ -235,9 +235,9 @@ public class JSql_Sqlite_test {
 		executeQuery();
 		
 		assertTrue("1st uniq index", JSqlObj.execute("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName
-		   + "_unique` ON `" + testTableName + "` ( col1, col2 )"));
+			+ "_unique` ON `" + testTableName + "` ( col1, col2 )"));
 		assertTrue("2nd uniq index", JSqlObj.execute("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName
-		   + "_unique` ON `" + testTableName + "` ( col1, col2 )"));
+			+ "_unique` ON `" + testTableName + "` ( col1, col2 )"));
 	}
 	
 	@Test
@@ -331,19 +331,21 @@ public class JSql_Sqlite_test {
 		JSqlResult r = null;
 		JSqlQuerySet qSet = null;
 		
-		assertNotNull("query should return a jSql result", r = JSqlObj.query("SELECT * FROM " + testTableName + " ORDER BY col1 ASC"));
+		assertNotNull("query should return a jSql result", r = JSqlObj.query("SELECT * FROM " + testTableName
+			+ " ORDER BY col1 ASC"));
 		assertEquals("Initial value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
 		assertEquals("Initial value check failed", "has nothing", r.readRowCol(0, "col2"));
 		
 		//Upsert query
 		assertNotNull(qSet = JSqlObj.prepareUpsertQuerySet( //
-		   testTableName, //
-		   new String[] { "col1" }, new Object[] { 404 }, //
-		   new String[] { "col2" }, new Object[] { "not found" } //
-		));
+			testTableName, //
+			new String[] { "col1" }, new Object[] { 404 }, //
+			new String[] { "col2" }, new Object[] { "not found" } //
+			));
 		assertTrue("SQL result should return true", qSet.execute());
 		
-		assertNotNull("query should return a jSql result", r = JSqlObj.query("SELECT * FROM " + testTableName + " ORDER BY col1 ASC"));
+		assertNotNull("query should return a jSql result", r = JSqlObj.query("SELECT * FROM " + testTableName
+			+ " ORDER BY col1 ASC"));
 		assertEquals("Upsert value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
 		assertEquals("Upsert value check failed", "not found", r.readRowCol(0, "col2"));
 	}

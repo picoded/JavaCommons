@@ -36,7 +36,7 @@ public class SocketThreadPool implements Runnable {
 	///
 	/// This function is automatically called by the constructor
 	private void initSocketThreadPool(ExecutorService threadPool, int port, Class reqListenerClass,
-	   Object[] initArgumentArray) {
+		Object[] initArgumentArray) {
 		this.threadPool = threadPool;
 		
 		if (this.threadPool == null) {

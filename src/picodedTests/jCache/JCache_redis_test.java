@@ -28,9 +28,9 @@ public class JCache_redis_test {
 		redisPort = LocalCacheSetup.setupRedisServer();
 		
 		// Config to use
-		redissonConfigString = "127.0.0.1:"+redisPort;
+		redissonConfigString = "127.0.0.1:" + redisPort;
 		
-		redissonConfig= new Config();
+		redissonConfig = new Config();
 		redissonConfig.useSingleServer().setAddress(redissonConfigString);
 	}
 	
@@ -39,7 +39,7 @@ public class JCache_redis_test {
 	public static void oneTimeTearDown() {
 		
 		// Close JCache if needed (reduce false error)
-		if( redisJCacheObj != null ) {
+		if (redisJCacheObj != null) {
 			redisJCacheObj.dispose();
 			redisJCacheObj = null;
 		}
@@ -58,7 +58,7 @@ public class JCache_redis_test {
 	/// Dispose the JCache object
 	@After
 	public void tearDown() {
-		if(JCacheObj != null) {
+		if (JCacheObj != null) {
 			JCacheObj.dispose();
 			JCacheObj = null;
 		}
@@ -83,13 +83,12 @@ public class JCache_redis_test {
 		JCacheObj = null;
 	}
 	
-	
 	@Test
 	public void simplePutAndGet() throws JCacheException {
 		ConcurrentMap<String, String> rMap = JCacheObj.getMap("testMap");
 		
-		assertNull( rMap.get("testIsNull") );
+		assertNull(rMap.get("testIsNull"));
 		rMap.put("hello", "world");
-		assertEquals("world", rMap.get("hello") );
+		assertEquals("world", rMap.get("hello"));
 	}
 }

@@ -1,4 +1,4 @@
-package picoded.mmDB;
+package picoded.mmDB.dataStore;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,8 @@ import java.util.Set;
 import picoded.jSql.*;
 import java.util.logging.*;
 
-/// MetaMap, is a simple abstraction of a objectkey, key, value storage. This extends the Map<String, MultiMap<String, Object>> class.
+/// MetaMap, is a simple abstraction of a objectkey, key, value storage in JSql.
+/// This handles the internal managment of its SQL table, and extracting of its data.
 ///
 /// *******************************************************************************
 ///
@@ -32,33 +33,47 @@ import java.util.logging.*;
 ///
 /// *******************************************************************************
 ///
-public class MetaMap /*implements Map<String, Map<String,Object>>*/{
+public class MetaMap_JSql /*implements Map<String, Map<String,Object>>*/{
 	
 	//---------------------//
 	// Constructor         //
 	//---------------------//
 	
 	/// Constructor with the jSql object, and the deployed table name
-	public MetaMap(JSql inSql, String tableName) {
+	public MetaMap_JSql(JSql inSql, String tableName) {
 		JSqlObj = inSql;
 		sqlTableName = tableName;
 	}
 	
-	//---------------------//
-	// Protected variables //
-	//---------------------//
-	
-	/// vDci multiplier used to convert the decimal places, to an int value
-	protected static int vDciMultiplier = 100000000;
-	
-	/// Internal self used logger
-	private static Logger logger = Logger.getLogger(MetaMap.class.getName());
+	//--------------------------------------------------//
+	// Protected variables with public getter functions //
+	//--------------------------------------------------//
 	
 	/// The JSQL object that acts as the persistent object store
 	protected JSql JSqlObj = null;
 	
 	/// Internal SQL table name
 	protected String sqlTableName;
+	
+	/// Returns the initialized tableName
+	public String tableName() {
+		return sqlTableName;
+	}
+	
+	/// Returns the initialized JSqlObject
+	public JSql JSqlObject() {
+		return JSqlObj;
+	}
+	
+	//---------------------//
+	// Protected variables //
+	//---------------------//
+	
+	/// Internal self used logger
+	private static Logger logger = Logger.getLogger(MetaMap_JSql.class.getName());
+	
+	/// vDci multiplier used to convert the decimal places, to an int value
+	protected static int vDciMultiplier = 100000000;
 	
 	/// Object byte space default as 60
 	protected int objColumnLength = 60;
@@ -71,33 +86,69 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 	
 	/// Various table collumn names, and classification (used in upsert)?
 	protected String[] allColumnNames = new String[] { //
-	"oKey", "mKey", "vIdx", //
-	   "vStr", "vInt", "vDci", "vTyp", //
-	   "uTim", "cTim", "eTim" //
+	"oKey", "mKey", "vIdx", //Object Key, Meta Key, Value Index
+		"vStr", "vInt", "vDci", "vTyp", //Value String, INT, Decimal, Type
+		"uTim", "cTim", "eTim" //Updated, Created, Expire timestamp
 	};
+	
 	protected String[] uniqueColumnNames = new String[] { "oKey", "mKey", "vIdx" };
 	protected String[] valueColumnNames = new String[] { "vStr", "vInt", "vDci", "vTyp" };
 	protected String[] timeStampColumnNames = new String[] { "uTim", "cTim", "eTim" };
 	protected String[] nonUniqueColumnNames = new String[] { "vStr", "vInt", "vDci", "vTyp", "uTim", "cTim", "eTim" };
 	
-	//--------------------------------------//
-	// Protected variables getter functions //
-	//--------------------------------------//
-	
-	/// Returns the initialized tableName
-	public String tableName() {
-		return sqlTableName;
-	}
-	
-	/// Returns the initialized JSqlObject
-	public JSql JSqlObject() {
-		return JSqlObj;
-	}
-	
 	//-----------------------------------//
 	// JSql database storage table setup //
 	//-----------------------------------//
 	
+	/// Performs the required tableSetup for the JSQL database
+	public MetaMap_JSql tableSetup() throws JSqlException {
+		JSqlObj.execute("CREATE TABLE IF NOT EXISTS `" + sqlTableName + "` (" + // Table Name
+			// --------------------------------------------------------------------------
+			"oKey VARCHAR(" + objColumnLength + "), " + // Object namespace
+			"mKey VARCHAR(" + keyColumnLength + "), " + // Obj.Key namespace
+			// --------------------------------------------------------------------------
+			"vIdx INT, " + // The value index (multi map support)
+			"vStr VARCHAR(" + valColumnLength + "), " + // String or numeric expression value if applicable
+			"vInt BIGINT, " + // Int value if applicable
+			"vDci INT, " + // Decimal point value if applicable
+			"vTyp INT, " + // The value type (0:null, 1:String, 2:Int/Long, 3:Double, 4:Float)
+			// --------------------------------------------------------------------------
+			"uTim BIGINT, " + // Last updated time stamp
+			"cTim BIGINT, " + // Created time stamp
+			"eTim BIGINT " + // Expire time stamp
+			")" //
+		);
+		
+		/*
+		// Create the various indexs used for the table
+		// --------------------------------------------------------------------------
+		logAndExecute("CREATE UNIQUE INDEX IF NOT EXISTS `" + sqlTableName + "_unique` ON `" + sqlTableName
+						  + "` (oKey, mKey, vIdx)");
+		
+		createJSqlIndex("oKey");
+		createJSqlIndex("mKey");
+		createJSqlIndex("vIdx");
+		
+		if (JSqlObj.sqlType == JSqlType.mysql) { //Value string index, is FULLTEXT in mysql (as normal index does not work)
+			logAndExecute("CREATE FULLTEXT INDEX IF NOT EXISTS `" + sqlTableName + "_vStr` ON `" + sqlTableName
+							  + "` (vStr)");
+		} else {
+			createJSqlIndex("vStr");
+		}
+		
+		createJSqlIndex("vInt");
+		createJSqlIndex("vDci");
+		createJSqlIndex("vTyp");
+		
+		createJSqlIndex("uTim");
+		createJSqlIndex("cTim");
+		createJSqlIndex("eTim");
+		 */
+		return this;
+	}
+	
+	/*
+	 
 	/// Helper function, that logs the query, then execute it
 	private void logAndExecute(String qStr) throws JSqlException {
 		logger.finer(qStr);
@@ -116,51 +167,6 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 		keyColumnLength = inKeyColumnLength;
 		valColumnLength = inValColumnLength;
 		return tableSetup();
-	}
-	
-	/// Performs the required tableSetup for the JSQL database
-	public MetaMap tableSetup() throws JSqlException {
-		logAndExecute("CREATE TABLE IF NOT EXISTS `" + sqlTableName + "` (" + // Table Name
-		   // --------------------------------------------------------------------------
-		   "oKey VARCHAR(" + objColumnLength + "), " + // Object namespace
-		   "mKey VARCHAR(" + keyColumnLength + "), " + // Obj.Key namespace
-		   // --------------------------------------------------------------------------
-		   "vIdx INT, " + // The value index (multi map support)
-		   "vStr VARCHAR(" + valColumnLength + "), " + // String or numeric expression value if applicable
-		   "vInt BIGINT, " + // Int value if applicable
-		   "vDci INT, " + // Decimal point value if applicable
-		   "vTyp INT, " + // The value type (0:null, 1:String, 2:Int/Long, 3:Double, 4:Float)
-		   // --------------------------------------------------------------------------
-		   "uTim BIGINT, " + // Last updated time stamp
-		   "cTim BIGINT, " + // Created time stamp
-		   "eTim BIGINT " + // Expire time stamp
-		   ")");
-		
-		// Create the various indexs used for the table
-		// --------------------------------------------------------------------------
-		logAndExecute("CREATE UNIQUE INDEX IF NOT EXISTS `" + sqlTableName + "_unique` ON `" + sqlTableName
-		   + "` (oKey, mKey, vIdx)");
-		
-		createJSqlIndex("oKey");
-		createJSqlIndex("mKey");
-		createJSqlIndex("vIdx");
-		
-		if (JSqlObj.sqlType == JSqlType.mysql) { //Value string index, is FULLTEXT in mysql (as normal index does not work)
-			logAndExecute("CREATE FULLTEXT INDEX IF NOT EXISTS `" + sqlTableName + "_vStr` ON `" + sqlTableName
-			   + "` (vStr)");
-		} else {
-			createJSqlIndex("vStr");
-		}
-		
-		createJSqlIndex("vInt");
-		createJSqlIndex("vDci");
-		createJSqlIndex("vTyp");
-		
-		createJSqlIndex("uTim");
-		createJSqlIndex("cTim");
-		createJSqlIndex("eTim");
-		
-		return this;
 	}
 	
 	/// Drops the database table with all relevant data
@@ -188,43 +194,9 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 		
 		if (JSqlObj.sqlType == JSqlType.sqlite) {
 			
-			/*
-			Object[] querySet = JSqlObj.prepareUpsertQuerySet( //
-				sqlTableName, //
-			   uniqueColumnNames, null, //
-			   nonUniqueColumnNames, null, null, //
-			   null //
-			   );
-			 */
-			//JSqlObj.execute( JSqlObj.prepareUpsertQuery(  ), prepareUpsertArguments() );
-			/*
-			 JSqlObj.execute(
-								  "INSERT OR REPLACE INTO `" + sqlTableName + "` (oKey,mKey,vIdx, vStr,vInt,vDci,vTyp) VALUES (?,?,?,?,?,?,?)",
-								  oKey, mKey, vIdx,
-								  vStr, vInt, vDci, vTyp
-								);
-			 */
 		}
 		/// JSqlType checks for the various insert OR replace varients
 		///
-		/*
-		if (JSqlObj.sqlType == JSqlType.sqlite) {
-			
-			//return jSqlObj.execute("INSERT OR REPLACE INTO `" + sqlTableName + "` (oKey,mKey,val) VALUES (?,?,?)", oKey, key, val);
-		} else if (jSqlObj.sqlType == jSqlType.oracle) {
-			return jSqlObj.execute(
-										  "BEGIN BEGIN INSERT INTO " + sqlTableName.toUpperCase()
-										  + " (obj,metaKey,val) VALUES (?,?,?); EXCEPTION WHEN dup_val_on_index THEN UPDATE "
-										  + sqlTableName.toUpperCase() + " SET val=? WHERE obj=? AND metaKey=?; END; END;", oKey,
-										  key, val, val, oKey, key);
-		} else if(jSqlObj.sqlType == jSqlType.mssql){
-			return jSqlObj.execute("IF EXISTS (Select * from "+sqlTableName + " WHERE obj = ? AND metaKey = ?) "
-										  + " UPDATE "+ sqlTableName + "  set val = ? WHERE obj = ? AND metaKey=? " + " ELSE INSERT INTO "+sqlTableName+" (obj,metaKey,val) VALUES (?,?,?) ",oKey, key, val, oKey, key, oKey, key, val);
-		} else {
-			return jSqlObj.execute("INSERT INTO `" + sqlTableName
-										  + "` (obj,metaKey,val) VALUES (?,?,?) ON DUPLICATE KEY UPDATE val=VALUES(val)", oKey, key, val);
-		}
-		 */
 		return true;
 	}
 	
@@ -264,7 +236,6 @@ public class MetaMap /*implements Map<String, Map<String,Object>>*/{
 		//return false;
 	}
 	
-	/*
 
 	/// Store oKey / key / value
 	public boolean put(String oKey, String key, String val) throws jSqlException {

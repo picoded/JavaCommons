@@ -90,8 +90,8 @@ public class JSql_Mssql extends JSql implements BaseInterface {
 					prefixOffset += ifExists.length() + 1;
 					
 					qStringPrefix = "BEGIN TRY IF OBJECT_ID('" + fixedQuotes.substring(prefixOffset).toUpperCase()
-					   + "', 'U')" + " IS NOT NULL DROP TABLE " + fixedQuotes.substring(prefixOffset)
-					   + " END TRY BEGIN CATCH END CATCH";
+						+ "', 'U')" + " IS NOT NULL DROP TABLE " + fixedQuotes.substring(prefixOffset)
+						+ " END TRY BEGIN CATCH END CATCH";
 				} else {
 					qStringPrefix = "DROP TABLE ";
 				}
@@ -110,7 +110,7 @@ public class JSql_Mssql extends JSql implements BaseInterface {
 					//get the table name from incoming query
 					String tableName = getTableName(fixedQuotes.substring(prefixOffset));
 					qStringPrefix = "BEGIN TRY IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'" + tableName
-					   + "')" + " AND OBJECTPROPERTY(id, N'" + tableName + "')" + " = 1) CREATE TABLE ";
+						+ "')" + " AND OBJECTPROPERTY(id, N'" + tableName + "')" + " = 1) CREATE TABLE ";
 					qStringSuffix = " END TRY BEGIN CATCH END CATCH";
 				} else {
 					qStringPrefix = "CREATE TABLE ";
@@ -148,9 +148,9 @@ public class JSql_Mssql extends JSql implements BaseInterface {
 						
 						if (tmpIndx > 0) {
 							qString = "BEGIN TRY CREATE " + ((indexType != null) ? indexType + " " : "") + "INDEX "
-							   + tmpStr.substring(0, tmpIndx) + " ON "
-							   + _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx + 4))
-							   + " END TRY BEGIN CATCH END CATCH";
+								+ tmpStr.substring(0, tmpIndx) + " ON "
+								+ _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx + 4))
+								+ " END TRY BEGIN CATCH END CATCH";
 						}
 						
 					}
@@ -170,7 +170,7 @@ public class JSql_Mssql extends JSql implements BaseInterface {
 			
 			if (tmpIndx > 0) {
 				qString = "SELECT " + tmpStr.substring(0, tmpIndx - 7).replaceAll("\"", "'").replaceAll("`", "'")
-				   + " FROM " + _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx - 1));
+					+ " FROM " + _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx - 1));
 			} else {
 				qString = _fixTableNameInMssqlSubQuery(fixedQuotes);
 			}
@@ -182,8 +182,8 @@ public class JSql_Mssql extends JSql implements BaseInterface {
 				
 				if (prefixOffset > 0) {
 					qString = qString.substring(0, tmpIndx)
-					   + qString.substring(tmpIndx, prefixOffset).replaceAll("`", "\"").replaceAll("'", "\"")
-					   + qString.substring(prefixOffset);
+						+ qString.substring(tmpIndx, prefixOffset).replaceAll("`", "\"").replaceAll("'", "\"")
+						+ qString.substring(prefixOffset);
 				} else {
 					break;
 				}

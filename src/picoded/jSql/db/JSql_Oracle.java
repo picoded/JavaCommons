@@ -80,42 +80,42 @@ public class JSql_Oracle extends JSql implements BaseInterface {
 	/// Collumn type correction from mysql to oracle sql
 	private static String _simpleMysqlToOracle_collumnSubstitude(String qString) {
 		return qString.replaceAll("(?i)BIGINT", "NUMBER(19, 0)")
-		   .replaceAll("(?i)BIT", "RAW")
-		   .replaceAll("(?i)BLOB", "BLOB")
-		   //, RAW
-		   //.replaceAll("(?i)CHAR","CHAR")
-		   //.replaceAll("(?i)DATE","DATE")
-		   .replaceAll("(?i)DATETIME", "DATE").replaceAll("(?i)DECIMAL", "FLOAT(24)").replaceAll("(?i)DOUBLE",
-		      "FLOAT(24)").replaceAll("(?i)DOUBLE PRECISION", "FLOAT(24)")
-		   //.replaceAll("(?i)FLOAT","FLOAT")
-		   .replaceAll("(?i)INTEGER", "INT")
-		   //.replaceAll("(?i)INT","NUMBER(10,0)")
-		   .replaceAll("(?i)LONGBLOB", "BLOB")
-		   //, RAW
-		   .replaceAll("(?i)LONGTEXT", "CLOB")
-		   //, RAW
-		   .replaceAll("(?i)MEDIUMBLOB", "BLOB")
-		   //, RAW
-		   .replaceAll("(?i)MEDIUMINT", "NUMBER(7,0)").replaceAll("(?i)MEDIUMTEXT", "CLOB")
-		   //, RAW
-		   .replaceAll("(?i)NUMERIC", "NUMBER").replaceAll("(?i)REAL", "FLOAT (24)").replaceAll("(?i)SMALLINT",
-		      "NUMBER(5,0)").replaceAll("(?i)TEXT", "CLOB")
-		   //VARCHAR2,
-		   .replaceAll("(?i)TIME", "DATE").replaceAll("(?i)TIMESTAMP", "DATE").replaceAll("(?i)TINYBLOB", "RAW")
-		   .replaceAll("(?i)TINYINT", "NUMBER(3,0)")
+			.replaceAll("(?i)BIT", "RAW")
+			.replaceAll("(?i)BLOB", "BLOB")
+			//, RAW
+			//.replaceAll("(?i)CHAR","CHAR")
+			//.replaceAll("(?i)DATE","DATE")
+			.replaceAll("(?i)DATETIME", "DATE").replaceAll("(?i)DECIMAL", "FLOAT(24)").replaceAll("(?i)DOUBLE",
+				"FLOAT(24)").replaceAll("(?i)DOUBLE PRECISION", "FLOAT(24)")
+			//.replaceAll("(?i)FLOAT","FLOAT")
+			.replaceAll("(?i)INTEGER", "INT")
+			//.replaceAll("(?i)INT","NUMBER(10,0)")
+			.replaceAll("(?i)LONGBLOB", "BLOB")
+			//, RAW
+			.replaceAll("(?i)LONGTEXT", "CLOB")
+			//, RAW
+			.replaceAll("(?i)MEDIUMBLOB", "BLOB")
+			//, RAW
+			.replaceAll("(?i)MEDIUMINT", "NUMBER(7,0)").replaceAll("(?i)MEDIUMTEXT", "CLOB")
+			//, RAW
+			.replaceAll("(?i)NUMERIC", "NUMBER").replaceAll("(?i)REAL", "FLOAT (24)").replaceAll("(?i)SMALLINT",
+				"NUMBER(5,0)").replaceAll("(?i)TEXT", "CLOB")
+			//VARCHAR2,
+			.replaceAll("(?i)TIME", "DATE").replaceAll("(?i)TIMESTAMP", "DATE").replaceAll("(?i)TINYBLOB", "RAW")
+			.replaceAll("(?i)TINYINT", "NUMBER(3,0)")
 
-		   /*
-		   .replaceAll("(?i)ENUM(?=\\()","VARCHAR2")
-		   .replaceAll("(?i)ENUM(?!\\()","VARCHAR2(n)")
-		   .replaceAll("(?i)SET(?=\\()","VARCHAR2")
-		   .replaceAll("(?i)SET(?!\\()","VARCHAR2(n)")
-		   .replaceAll("(?i)TINYTEXT(?=\\()","VARCHAR2")
-		   .replaceAll("(?i)TINYTEXT(?!\\()","VARCHAR2(n)")
-		    */
+			/*
+			.replaceAll("(?i)ENUM(?=\\()","VARCHAR2")
+			.replaceAll("(?i)ENUM(?!\\()","VARCHAR2(n)")
+			.replaceAll("(?i)SET(?=\\()","VARCHAR2")
+			.replaceAll("(?i)SET(?!\\()","VARCHAR2(n)")
+			.replaceAll("(?i)TINYTEXT(?=\\()","VARCHAR2")
+			.replaceAll("(?i)TINYTEXT(?!\\()","VARCHAR2(n)")
+			 */
 
-		   .replaceAll("(?i)VARCHAR(?!\\()", "VARCHAR2(4000)") //, CLOB
-		   .replaceAll("(?i)VARCHAR\\(", "VARCHAR2(") //, CLOB
-		   .replaceAll("(?i)YEAR", "NUMBER");
+			.replaceAll("(?i)VARCHAR(?!\\()", "VARCHAR2(4000)") //, CLOB
+			.replaceAll("(?i)VARCHAR\\(", "VARCHAR2(") //, CLOB
+			.replaceAll("(?i)YEAR", "NUMBER");
 	}
 	
 	/// Fixes the table name, and removes any trailing ";" if needed
@@ -240,8 +240,8 @@ public class JSql_Oracle extends JSql implements BaseInterface {
 						
 						if (tmpIndx > 0) {
 							qString = "CREATE " + ((indexType != null) ? indexType + " " : "") + "INDEX "
-							   + tmpStr.substring(0, tmpIndx) + " ON "
-							   + _fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx + 4));
+								+ tmpStr.substring(0, tmpIndx) + " ON "
+								+ _fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx + 4));
 						}
 						
 					}
@@ -269,7 +269,7 @@ public class JSql_Oracle extends JSql implements BaseInterface {
 			
 			if (tmpIndx > 0) {
 				qString = "SELECT " + tmpStr.substring(0, tmpIndx - 7).replaceAll("\"", "'").replaceAll("`", "'")
-				   + " FROM " + _fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx - 1));
+					+ " FROM " + _fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx - 1));
 			} else {
 				qString = _fixTableNameInOracleSubQuery(fixedQuotes);
 			}
@@ -281,8 +281,8 @@ public class JSql_Oracle extends JSql implements BaseInterface {
 				
 				if (prefixOffset > 0) {
 					qString = qString.substring(0, tmpIndx)
-					   + qString.substring(tmpIndx, prefixOffset).replaceAll("`", "\"").replaceAll("'", "\"")
-					   + qString.substring(prefixOffset);
+						+ qString.substring(tmpIndx, prefixOffset).replaceAll("`", "\"").replaceAll("'", "\"")
+						+ qString.substring(prefixOffset);
 				} else {
 					break;
 				}

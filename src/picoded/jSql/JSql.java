@@ -267,11 +267,11 @@ public class JSql implements BaseInterface {
 	//--------------------------------------------------------------------------
 	
 	public JSqlQuerySet selectQuerySet( //
-	   String tableName, // Table name to select from
-	   String selectStatement, // The Columns to select, null means all
-	   
-	   String whereStatement, // The Columns to apply where clause, this must be sql neutral
-	   Object[] whereValues // Values that corresponds to the where statement
+		String tableName, // Table name to select from
+		String selectStatement, // The Columns to select, null means all
+		
+		String whereStatement, // The Columns to apply where clause, this must be sql neutral
+		Object[] whereValues // Values that corresponds to the where statement
 	) {
 		return selectQuerySet(tableName, selectStatement, whereStatement, whereValues, null, 0, 0);
 	}
@@ -297,17 +297,17 @@ public class JSql implements BaseInterface {
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
 	public JSqlQuerySet selectQuerySet( //
-	   String tableName, // Table name to select from
-	   //
-	   String selectStatement, // The Columns to select, null means all
-	   //
-	   String whereStatement, // The Columns to apply where clause, this must be sql neutral
-	   Object[] whereValues, // Values that corresponds to the where statement
-	   //
-	   String orderStatement, // Order by statements, must be either ASC / DESC
-	   //
-	   long limit, // Limit row count to, use 0 to ignore / disable
-	   long offset // Offset limit by?
+		String tableName, // Table name to select from
+		//
+		String selectStatement, // The Columns to select, null means all
+		//
+		String whereStatement, // The Columns to apply where clause, this must be sql neutral
+		Object[] whereValues, // Values that corresponds to the where statement
+		//
+		String orderStatement, // Order by statements, must be either ASC / DESC
+		//
+		long limit, // Limit row count to, use 0 to ignore / disable
+		long offset // Offset limit by?
 	) {
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		StringBuilder queryBuilder = new StringBuilder("SELECT ");
@@ -355,15 +355,16 @@ public class JSql implements BaseInterface {
 	}
 	
 	public JSqlQuerySet prepareUpsertQuerySet( //
-															String tableName, // Table name to upsert on
-															//
-															String[] uniqueColumns, // The unique column names
-															Object[] uniqueValues, // The row unique identifier values
-															//
-															String[] insertColumns, // Columns names to update
-															Object[] insertValues // Values to update
-															) throws JSqlException {
-		return prepareUpsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues, null,null,null);
+		String tableName, // Table name to upsert on
+		//
+		String[] uniqueColumns, // The unique column names
+		Object[] uniqueValues, // The row unique identifier values
+		//
+		String[] insertColumns, // Columns names to update
+		Object[] insertValues // Values to update
+	) throws JSqlException {
+		return prepareUpsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues, null, null,
+			null);
 	}
 	
 	///
@@ -389,20 +390,20 @@ public class JSql implements BaseInterface {
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
 	public JSqlQuerySet prepareUpsertQuerySet( //
-	   String tableName, // Table name to upsert on
-	   //
-	   String[] uniqueColumns, // The unique column names
-	   Object[] uniqueValues, // The row unique identifier values
-	   //
-	   String[] insertColumns, // Columns names to update
-	   Object[] insertValues, // Values to update
-	   //
-	   String[] defaultColumns, // Columns names to apply default value, if not exists
-	   Object[] defaultValues, // Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
-	   //
-	   // Various column names where its existing value needs to be maintained (if any),
-	   // this is important as some SQL implementation will fallback to default table values, if not properly handled
-	   String[] miscColumns //
+		String tableName, // Table name to upsert on
+		//
+		String[] uniqueColumns, // The unique column names
+		Object[] uniqueValues, // The row unique identifier values
+		//
+		String[] insertColumns, // Columns names to update
+		Object[] insertValues, // Values to update
+		//
+		String[] defaultColumns, // Columns names to apply default value, if not exists
+		Object[] defaultValues, // Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+		//
+		// Various column names where its existing value needs to be maintained (if any),
+		// this is important as some SQL implementation will fallback to default table values, if not properly handled
+		String[] miscColumns //
 	) throws JSqlException {
 		
 		/// Checks that unique collumn and values length to be aligned
@@ -502,6 +503,52 @@ public class JSql implements BaseInterface {
 		queryBuilder.append(columnValues.substring(0, columnValues.length() - columnSeperator.length()));
 		queryBuilder.append(")");
 		
+		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
+	}
+	
+	///
+	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
+	/// syntax differances of SELECT across the various SQL vendors (if any).
+	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
+	/// The syntax below, is an example of such an SELECT statement for SQLITE.
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	/// CREATE (UNIQUE|FULLTEXT) INDEX IF NOT EXISTS TABLENAME_SUFFIX ON TABLENAME ( COLLUMNS )
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	///
+	public JSqlQuerySet selectQuerySet( //
+		String tableName, // Table name to select from
+		//
+		String columnNames, // The column name to create the index on
+		//
+		String indexType, // The index type if given, can be null
+		//
+		String indexSuffix // The index name suffix, its auto generated if null
+	//
+	) {
+		ArrayList<Object> queryArgs = new ArrayList<Object>();
+		StringBuilder queryBuilder = new StringBuilder("CREATE ");
+		
+		if (indexType != null && indexType.length() > 0) {
+			queryBuilder.append(indexType);
+			queryBuilder.append(" ");
+		}
+		
+		queryBuilder.append("IF NOT EXISTS ");
+		
+		if (indexSuffix == null || indexSuffix.length() <= 0) {
+			indexSuffix = columnNames.replaceAll("/[^A-Za-z0-9]/", ""); //.toUpperCase()?
+		}
+		
+		queryBuilder.append("`");
+		queryBuilder.append(tableName);
+		queryBuilder.append("_");
+		queryBuilder.append(indexSuffix);
+		queryBuilder.append("`");
+		
+		// Create the query set
 		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	

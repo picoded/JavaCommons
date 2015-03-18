@@ -14,6 +14,6 @@ public class JSql_Mssql_test extends JSql_Sqlite_test {
 	public void setUp() {
 		//create connection
 		JSqlObj = JSql.mssql(TestConfig.MSSQL_CONN(), TestConfig.MSSQL_NAME(), TestConfig.MSSQL_USER(), TestConfig
-		   .MSSQL_PASS());
+			.MSSQL_PASS());
 	}
 }

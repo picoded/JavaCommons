@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.lang.System;
 import java.util.*;
 
-
 import com.hazelcast.config.*;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.HazelcastClient;
@@ -43,14 +42,14 @@ public class JCache_hazelcast_test extends picodedTests.jCache.JCache_redis_test
 	public static void oneTimeTearDown() {
 		
 		// Close JCache if needed (reduce false error)
-		if( hazelcastJCacheObj != null ) {
+		if (hazelcastJCacheObj != null) {
 			hazelcastJCacheObj.dispose();
 			hazelcastJCacheObj = null;
 		}
 		
 		try {
 			Thread.sleep(5000);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		// one-time cleanup code
@@ -67,7 +66,7 @@ public class JCache_hazelcast_test extends picodedTests.jCache.JCache_redis_test
 	/// Dispose the JCache object
 	@After
 	public void tearDown() {
-		if(JCacheObj != null) {
+		if (JCacheObj != null) {
 			JCacheObj.dispose();
 			JCacheObj = null;
 		}

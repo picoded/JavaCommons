@@ -22,7 +22,7 @@ import com.hazelcast.core.IMap;
 public class JCache_hazelcast extends JCache implements BaseInterface {
 	
 	/// Overwrite as redis
-	public JCacheType cacheType  = JCacheType.hazelcast;
+	public JCacheType cacheType = JCacheType.hazelcast;
 	
 	/// Logger (if needed)
 	//private static Logger logger = Logger.getLogger(JCache_redis.class.getName());
@@ -66,12 +66,12 @@ public class JCache_hazelcast extends JCache implements BaseInterface {
 	///
 	/// @param  force  Boolean if true, forces the existing connection to terminate and be recreated
 	public void recreate(boolean force) {
-		if(force) {
-			if(!isDisposed()) {
+		if (force) {
+			if (!isDisposed()) {
 				dispose();
 			}
 		} else {
-			if(hazelcastObj != null) {
+			if (hazelcastObj != null) {
 				return; //already created, skips
 			}
 		}
@@ -97,7 +97,7 @@ public class JCache_hazelcast extends JCache implements BaseInterface {
 	
 	/// Dispose the connection unless it has already been disposed
 	public void dispose() {
-		if(hazelcastObj != null) {
+		if (hazelcastObj != null) {
 			hazelcastObj.shutdown(); //shutdown the hazelcast connection
 			hazelcastObj = null;
 		}

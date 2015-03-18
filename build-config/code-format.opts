@@ -22,7 +22,8 @@ continuation_indentation_for_array_initializer:int:1
 page_width:int:120
 
 # Setup tabs as leading indentation only
-use_tabs_only_for_leading_indentations:boolean:true
+use_tabs_only_for_leading_indentations:boolean:false
 
 # Fills up empty lines with indent
 indent_empty_lines:boolean:true
+

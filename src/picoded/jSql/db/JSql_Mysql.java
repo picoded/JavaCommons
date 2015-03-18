@@ -41,7 +41,7 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 		sqlType = JSqlType.mysql;
 		
 		String connectionUrl = "jdbc:mysql://" + urlStr + "/" + dbName
-		   + "?autoReconnect=true&failOverReadOnly=false&maxReconnects=5";
+			+ "?autoReconnect=true&failOverReadOnly=false&maxReconnects=5";
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance(); //ensure jdbc driver is loaded
 			sqlConn = java.sql.DriverManager.getConnection(connectionUrl, dbUser, dbPass);
@@ -88,7 +88,7 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 				return execute_raw(qStringUpper.replaceAll("INDEX IF NOT EXISTS", "INDEX"));
 			} catch (JSqlException e) {
 				if (e.getCause().toString().indexOf(
-				   "com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Duplicate key name '") == -1) {
+					"com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Duplicate key name '") == -1) {
 					// throws as its not a duplicate key exception
 					throw e;
 				}

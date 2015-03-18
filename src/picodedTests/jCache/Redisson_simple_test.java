@@ -22,8 +22,8 @@ public class Redisson_simple_test {
 		redisPort = LocalCacheSetup.setupRedisServer();
 		
 		// Config to use
-		redissonConfig= new Config();
-		redissonConfig.useSingleServer().setAddress("127.0.0.1:"+redisPort);
+		redissonConfig = new Config();
+		redissonConfig.useSingleServer().setAddress("127.0.0.1:" + redisPort);
 		
 	}
 	
@@ -48,13 +48,12 @@ public class Redisson_simple_test {
 		assertNotNull("redisson constructed object must not be null", redissonObj);
 	}
 	
-	
 	@Test
 	public void simplePutAndGet() {
 		ConcurrentMap<String, String> rMap = redissonObj.getMap("testMap");
 		
-		assertNull( rMap.get("testIsNull") );
+		assertNull(rMap.get("testIsNull"));
 		rMap.put("hello", "world");
-		assertEquals("world", rMap.get("hello") );
+		assertEquals("world", rMap.get("hello"));
 	}
 }

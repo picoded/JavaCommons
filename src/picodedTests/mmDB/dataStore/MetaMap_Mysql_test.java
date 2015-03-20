@@ -2,18 +2,7 @@ package picodedTests.mmDB.dataStore;
 
 // Target test class
 import picoded.jSql.*;
-import picoded.mmDB.MetaMap;
 import picodedTests.mmDB.dataStore.MetaMap_Sqlite_test;
-
-// Hazelcast testing support
-import com.hazelcast.core.*;
-import com.hazelcast.config.*;
-import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.HazelcastClient;
-import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.HazelcastClient;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
 
 // Test Case include
 import org.junit.*;

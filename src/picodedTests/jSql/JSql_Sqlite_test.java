@@ -337,7 +337,7 @@ public class JSql_Sqlite_test {
 		assertEquals("Initial value check failed", "has nothing", r.readRowCol(0, "col2"));
 		
 		//Upsert query
-		assertNotNull(qSet = JSqlObj.prepareUpsertQuerySet( //
+		assertNotNull(qSet = JSqlObj.upsertQuerySet( //
 			testTableName, //
 			new String[] { "col1" }, new Object[] { 404 }, //
 			new String[] { "col2" }, new Object[] { "not found" } //

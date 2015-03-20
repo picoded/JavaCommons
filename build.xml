@@ -42,7 +42,7 @@
 	
 	<target name="setup">
 		<mkdir dir=".git/hooks"/>
-		<symlink link="./pre-commit.sh" resource=".git/hooks/pre-commit" failonerror="false"/>
+		<symlink link=".git/hooks/pre-commit" resource="./pre-commit.sh" failonerror="false"/>
 	</target>
 	
 	

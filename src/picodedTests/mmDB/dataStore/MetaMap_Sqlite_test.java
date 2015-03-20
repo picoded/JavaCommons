@@ -1,8 +1,8 @@
-package picodedTests.mmDB;
+package picodedTests.mmDB.dataStore;
 
 // Target test class
 import picoded.jSql.*;
-import picoded.mmDB.MetaMap;
+import picoded.mmDB.dataStore.MetaMap_JSql;
 
 // Hazelcast testing support
 import com.hazelcast.core.*;
@@ -29,12 +29,7 @@ public class MetaMap_Sqlite_test {
 	protected static String testTableName = "mmDB-metaMap";
 	
 	protected JSql JSqlObj = null;
-	protected MetaMap mmObj = null;
-	
-	protected static String clusterName = "random hazel cast clsuter";
-	protected static Config clusterConfig = null;
-	protected static ClientConfig clientConfig = null;
-	protected static HazelcastInstance hcInstance;
+	protected MetaMap_JSql mmObj = null;
 	
 	///
 	/// Setsup the test case hazelcast instance
@@ -43,18 +38,6 @@ public class MetaMap_Sqlite_test {
 	public static void oneTimeSetUp() {
 		// one-time initialization code
 		testTableName = "mmDB-metaMap_" + TestConfig.randomTablePrefix();
-		
-		clusterName = TestConfig.randomTablePrefix();
-		
-		clusterConfig = new Config();
-		clusterConfig.getGroupConfig().setName(clusterName);
-		clusterConfig.setProperty("hazelcast.logging.type", "none");
-		
-		clientConfig = new ClientConfig();
-		clientConfig.getGroupConfig().setName(clusterName);
-		clientConfig.setProperty("hazelcast.logging.type", "none");
-		
-		//hcInstance = Hazelcast.newHazelcastInstance(clusterConfig);
 	}
 	
 	///
@@ -63,14 +46,10 @@ public class MetaMap_Sqlite_test {
 	@AfterClass
 	public static void oneTimeTearDown() {
 		// one-time cleanup code
-		if (hcInstance != null) {
-			hcInstance.shutdown();
-			hcInstance = null;
-		}
 	}
 	
 	protected void commonSetUp() throws JSqlException {
-		mmObj = new MetaMap(JSqlObj, testTableName);
+		mmObj = new MetaMap_JSql(JSqlObj, testTableName);
 		assertNotNull(mmObj.tableSetup());
 	}
 	
@@ -104,7 +83,8 @@ public class MetaMap_Sqlite_test {
 	/// Test basic put/get keyValue
 	@Test
 	public void basicPutGetKeyValue() throws JSqlException {
-		assertTrue(mmObj.putKeyValue("hello", "world", "domination"));
+		assertTrue(mmObj.putKeyValue("hello", "world", 0, "domination"));
+		assertEquals("domination", mmObj.getKeyValue("hello", "world", 0));
 	}
 	
 }

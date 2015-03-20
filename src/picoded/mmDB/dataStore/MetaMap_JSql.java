@@ -74,7 +74,9 @@ public class MetaMap_JSql /*implements Map<String, Map<String,Object>>*/{
 	private static Logger logger = Logger.getLogger(MetaMap_JSql.class.getName());
 	
 	/// vDci multiplier used to convert the decimal places, to an int value
-	protected static int vDciMultiplier = 100000000;
+	//2,147,483,647
+	//0 ~ 1,000,000,000
+	protected static int vDciMultiplier = 1000000000;
 	
 	/// Object byte space default as 60
 	protected int objColumnLength = 60;
@@ -296,17 +298,45 @@ public class MetaMap_JSql /*implements Map<String, Map<String,Object>>*/{
 	
 	public Object getValueFromResult(JSqlResult jRes, int vPt) {
 		Object vTypObj = jRes.readRowCol(vPt, "vTyp");
-		Object vStrObj = jRes.readRowCol(vPt, "vStr");
-		Object vIntObj = jRes.readRowCol(vPt, "vInt");
-		Object vDciObj = jRes.readRowCol(vPt, "vDci");
-		
 		int vTyp = ((Number) vTypObj).intValue();
+		
+		if (vTyp == 0) {
+			return null;
+		}
+		
+		Object vStrObj = jRes.readRowCol(vPt, "vStr");
+		String vStr = (vStrObj != null) ? (vStrObj.toString()) : null;
+		
+		if (vTyp == 1) {
+			return vStr;
+		}
+		
+		Object vIntObj = jRes.readRowCol(vPt, "vInt");
+		long vInt = (vIntObj != null) ? ((Number) vIntObj).longValue() : 0;
+		
+		if (vTyp == 2) {
+			return new Long(vInt);
+		}
+		
+		Object vDciObj = jRes.readRowCol(vPt, "vDci");
+		int vDci = (vDciObj != null) ? ((Number) vDciObj).intValue() : 0;
+		
+		if (vTyp == 3) {
+			return new Double((double) vInt + ((double) vDci) / ((double) vDciMultiplier));
+		}
+		
+		if (vTyp == 4) {
+			return new Float((float) vInt + ((float) vDci) / ((float) vDciMultiplier));
+		}
 		
 		return null;
 	}
 	
 	public Object getKeyValue(String oKey, String mKey, int vIdx) throws JSqlException {
-		//return getKeyValueRaw(oKey, mKey, vIdx, 1);
+		JSqlResult jRes = getKeyValueRaw(oKey, mKey, vIdx, 1);
+		if (jRes.rowCount() > 0) {
+			return getValueFromResult(jRes, 0);
+		}
 		return null;
 	}
 	

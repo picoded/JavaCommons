@@ -77,16 +77,16 @@ public class MetaMap_Sqlite_test {
 	
 	/// Test basic put/get keyValue
 	@Test
-	public void basicPutGetKeyValue() throws JSqlException {
+	public void basicPutget() throws JSqlException {
 		Random rObj = new Random();
 		
-		assertNull("No value test", mmObj.getKeyValue("hello", "world", 0));
+		assertNull("No value test", mmObj.get("hello", "world", 0));
 		
-		assertTrue("String value test", mmObj.putKeyValue("hello", "world", 0, "domination"));
-		assertEquals("String value test", "domination", mmObj.getKeyValue("hello", "world", 0));
+		assertTrue("String value test", mmObj.put("hello", "world", 0, "domination"));
+		assertEquals("String value test", "domination", mmObj.get("hello", "world", 0));
 		
-		assertTrue("null value test", mmObj.putKeyValue("hello", "world", 0, null));
-		assertNull("null value test", mmObj.getKeyValue("hello", "world", 0));
+		assertTrue("null value test", mmObj.put("hello", "world", 0, null));
+		assertNull("null value test", mmObj.get("hello", "world", 0));
 		
 		int tmp_int;
 		long tmp_long;
@@ -96,31 +96,30 @@ public class MetaMap_Sqlite_test {
 		for (int i = 0; i < basicTestIterations; ++i) {
 			tmp_int = rObj.nextInt();
 			
-			assertTrue("Int value test", mmObj.putKeyValue("hello", "world", 0, tmp_int));
-			assertEquals("Int value test", (long) tmp_int, mmObj.getKeyValue("hello", "world", 0));
+			assertTrue("Int value test", mmObj.put("hello", "world", 0, tmp_int));
+			assertEquals("Int value test", (long) tmp_int, mmObj.get("hello", "world", 0));
 		}
 		
 		for (int i = 0; i < basicTestIterations; ++i) {
 			tmp_long = rObj.nextLong();
 			
-			assertTrue("Long value test", mmObj.putKeyValue("hello", "world", 0, tmp_long));
-			assertEquals("Long value test", tmp_long, mmObj.getKeyValue("hello", "world", 0));
+			assertTrue("Long value test", mmObj.put("hello", "world", 0, tmp_long));
+			assertEquals("Long value test", tmp_long, mmObj.get("hello", "world", 0));
 		}
 		
 		for (int i = 0; i < basicTestIterations; ++i) {
 			tmp_double = rObj.nextDouble() + rObj.nextInt();
 			
-			assertTrue("Double value test", mmObj.putKeyValue("hello", "world", 0, tmp_double));
-			assertEquals("Double value test", tmp_double, ((Double) mmObj.getKeyValue("hello", "world", 0)).doubleValue(),
+			assertTrue("Double value test", mmObj.put("hello", "world", 0, tmp_double));
+			assertEquals("Double value test", tmp_double, ((Double) mmObj.get("hello", "world", 0)).doubleValue(),
 				0.000000001);
 		}
 		
 		for (int i = 0; i < basicTestIterations; ++i) {
 			tmp_float = rObj.nextFloat() + rObj.nextInt();
 			
-			assertTrue("Float value test", mmObj.putKeyValue("hello", "world", 0, tmp_float));
-			assertEquals("Float value test", tmp_float, ((Float) mmObj.getKeyValue("hello", "world", 0)).floatValue(),
-				0.000000001);
+			assertTrue("Float value test", mmObj.put("hello", "world", 0, tmp_float));
+			assertEquals("Float value test", tmp_float, ((Float) mmObj.get("hello", "world", 0)).floatValue(), 0.000000001);
 		}
 	}
 }

@@ -1,8 +1,8 @@
-package picodedTests.mmDB.dataStore;
+package picodedTests.mmData.dataStore;
 
 // Target test class
 import picoded.jSql.*;
-import picodedTests.mmDB.dataStore.MetaMap_Sqlite_test;
+import picodedTests.mmData.dataStore.MetaMap_Sqlite_test;
 
 // Test Case include
 import org.junit.*;
@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 import picodedTests.TestConfig;
 
 ///
-/// Test Case for picoded.mmDB.MetaMap (using mysql)
+/// Test Case for picoded.mmData.MetaMap (using mysql)
 ///
 public class MetaMap_Mysql_test extends MetaMap_Sqlite_test {
 	

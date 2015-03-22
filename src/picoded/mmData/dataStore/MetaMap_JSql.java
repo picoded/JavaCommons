@@ -1,4 +1,4 @@
-package picoded.mmDB.dataStore;
+package picoded.mmData.dataStore;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -427,7 +427,7 @@ public class MetaMap_JSql /*implements Map<String, Map<String,Object>>*/{
 	/// Fetches oKey / key / value, using partial matching search (SQL LIKE)
 	public String[] getMultiple(String oKey, String key) throws JSqlException {
 		jSqlResult r = JSqlObj.query("SELECT * FROM " + sqlTableName + " WHERE obj LIKE ? AND metaKey LIKE ?", oKey, key);
-		
+
 		String[] res = null;
 		int len;
 		if ((len = r.fetchAllRows()) > 0) {
@@ -438,11 +438,11 @@ public class MetaMap_JSql /*implements Map<String, Map<String,Object>>*/{
 		}
 		return res;
 	}
-	
+
 	/// Fetches oKey / key / value, using partial matching search (SQL LIKE)
 	public HashMap<String, String> getMultipleSet(String oKey, String key, String val) throws JSqlException {
 		jSqlResult r = JSqlObj.query("SELECT * FROM " + sqlTableName + " WHERE obj LIKE ? AND metaKey LIKE ? AND val LIKE ?", oKey, key, val);
-		
+
 		HashMap<String, String> res = new HashMap<String, String>();
 		int pt = r.rowCount();
 		if (r.fetchAllRows() > 0) {
@@ -453,7 +453,7 @@ public class MetaMap_JSql /*implements Map<String, Map<String,Object>>*/{
 		}
 		return null;
 	}
-	
+
 	/// Gets all the key value pairs related to the object. And returns as as
 	// HashMap< metaKey, value >
 	public HashMap<String, String> getObj(String oKey) throws JSqlException {
@@ -590,7 +590,7 @@ public class MetaMap_JSql /*implements Map<String, Map<String,Object>>*/{
 	public jSqlResult getValMap_jSql(String key) throws JSqlException {
 		return JSqlObj.query("SELECT obj, val FROM `" + sqlTableName + "` WHERE metaKey like ?", key);
 	}
-	 
+
 	/// returns true if database table is empty
 	/// [TODO: Low priority]
 	public boolean isEmpty() throws JSqlException {

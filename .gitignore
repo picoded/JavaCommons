@@ -14,5 +14,7 @@ html-docs/*
 test-files/tmp/*
 test-files/junit-html/*
 test-files/junit-reports/*
+test-files/libs/SimpleDB-Dev/data/*
+test-files/libs/SimpleDB-Dev/*.pyc
 
 debug.txt

@@ -20,10 +20,14 @@ public class LocalCacheSetup {
 	/// The redis server instance
 	private static RedisServer rServer = null;
 	
+	/// The generate redis port
+	public static int rPort = 6379;
+	
 	/// Starts up redis at the default port
 	static public int setupRedisServer() {
 		if (rServer != null) {
-			throw new RuntimeException("Local Redis server already started");
+			return rPort;
+			//throw new RuntimeException("Local Redis server already started");
 		}
 		
 		try {
@@ -39,7 +43,7 @@ public class LocalCacheSetup {
 	/// Tears down the redis test server
 	static public void teardownRedisServer() {
 		if (rServer == null) {
-			throw new RuntimeException("No local Redis server to 'teardown'");
+			return; // throw new RuntimeException("No local Redis server to 'teardown'");
 		}
 		
 		rServer.stop();
@@ -49,13 +53,19 @@ public class LocalCacheSetup {
 	/// The redis server instance
 	private static HazelcastInstance hcServer = null;
 	
+	/// The generated hazel0cast name
+	public static String hcClusterName = null;
+	
 	/// Starts up redis at the default port
 	static public String setupHazelcastServer() {
 		if (hcServer != null) {
-			throw new RuntimeException("Local hazelcast server already started");
+			return hcClusterName;
+			//throw new RuntimeException("Local hazelcast server already started");
 		}
 		
 		String clusterName = TestConfig.randomTablePrefix();
+		hcClusterName = clusterName;
+		
 		try {
 			
 			Config clusterConfig = new Config();
@@ -74,7 +84,7 @@ public class LocalCacheSetup {
 	/// Tears down the redis test server
 	static public void teardownHazelcastServer() {
 		if (hcServer == null) {
-			throw new RuntimeException("No local hazelcast server to 'teardown'");
+			return; // throw new RuntimeException("No local hazelcast server to 'teardown'");
 		}
 		
 		hcServer.shutdown();

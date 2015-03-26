@@ -120,4 +120,19 @@ public class JStack {
 		return (ret == null || ret.length <= 0) ? empty_jSqlArr : ret;
 	}
 	
+	//--------------------------------------------------//
+	// gets the relevent MetaMap object, for the stack  //
+	//--------------------------------------------------//
+	public MetaMap getMetaMap(String mapName) {
+		return new MetaMap(getJCacheStack(mapName), getJSqlStack(mapName), mapName);
+	}
+	
+	public MetaObject getMetaObject(String mapName, String objName) {
+		return new MetaObject(getJCacheStack(mapName), getJSqlStack(mapName), mapName, objName);
+	}
+	
+	// Common glue code to 'get'
+	public MetaMap get(String mapName) {
+		return getMetaMap(mapName);
+	}
 }

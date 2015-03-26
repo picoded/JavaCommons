@@ -48,6 +48,10 @@ public class HazelcastMetaMapStructure_test {
 	String clusterName = null;
 	HazelcastInstance hcClient = null;
 	
+	/// Overwriteable test scale, used to modify the test case intensity
+	static int testScale_objCount = 10;
+	static int testScale_metaCount = 5;
+	
 	/// Setsup the hazelcast cluster read / write
 	@Before
 	public void setUp() throws InterruptedException {
@@ -63,7 +67,7 @@ public class HazelcastMetaMapStructure_test {
 		hcClient = HazelcastClient.newHazelcastClient(clientConfig);
 		
 		//Warm up the test cache
-		allMetaPerKey_write("warmup", "wu", "mp", "vp", 10000, 100);
+		allMetaPerKey_write("warmup", "wu", "mp", "vp", testScale_objCount, testScale_metaCount);
 		
 	}
 	
@@ -93,6 +97,15 @@ public class HazelcastMetaMapStructure_test {
 		structureDesc = new ArrayList<String>();
 		structureWriteTime = new ArrayList<Long>();
 		structureReadTime = new ArrayList<Long>();
+		
+		// Setup the test scale
+		so_ObjCount = testScale_objCount;
+		so_metaCount = testScale_metaCount;
+		so_objDec = testScale_objCount + " Objects, " + testScale_metaCount + " meta values";
+		
+		lo_ObjCount = testScale_objCount;
+		lo_metaCount = testScale_metaCount;
+		lo_objDec = testScale_objCount + " Objects, " + testScale_metaCount + " meta values";
 	}
 	
 	@AfterClass
@@ -278,8 +291,8 @@ public class HazelcastMetaMapStructure_test {
 	
 	static int so_ObjCount = 10000;
 	static int so_metaCount = 50;
-	static String so_metaValue = "value";
 	static String so_objDec = "10,000 Objects, 50 meta values";
+	static String so_metaValue = "value";
 	
 	@Test
 	public void soAll_100() {
@@ -343,8 +356,8 @@ public class HazelcastMetaMapStructure_test {
 	
 	static int lo_ObjCount = 10000;
 	static int lo_metaCount = 50;
-	static String lo_metaValue = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ullamcorper eros ac tortor venenatis, vel elementum velit rutrum. Morbi nec magna vitae libero mollis suscipit vitae vel est. Maecenas et massa aliquet tellus ultricies tristique. Fusce in odio odio. Cras quis tellus tortor. Aenean ac arcu vitae nisl molestie tempor congue nec odio. Phasellus ut tristique mi. Nullam ut maximus massa. Duis a neque sapien. Vivamus quis sagittis est, vitae blandit neque. Nulla congue iaculis orci in hendrerit. Ut pulvinar lacus sit amet rutrum eleifend.";
 	static String lo_objDec = "10,000 Objects, 50 meta values";
+	static String lo_metaValue = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ullamcorper eros ac tortor venenatis, vel elementum velit rutrum. Morbi nec magna vitae libero mollis suscipit vitae vel est. Maecenas et massa aliquet tellus ultricies tristique. Fusce in odio odio. Cras quis tellus tortor. Aenean ac arcu vitae nisl molestie tempor congue nec odio. Phasellus ut tristique mi. Nullam ut maximus massa. Duis a neque sapien. Vivamus quis sagittis est, vitae blandit neque. Nulla congue iaculis orci in hendrerit. Ut pulvinar lacus sit amet rutrum eleifend.";
 	
 	@Test
 	public void loAll_100() {

@@ -5,4 +5,7 @@
 /// This is used to get the benefits of NoSQL movement, while still complying with the "requirment" for SQL
 /// found in several larger coporate environments.
 ///
+/// NOTE: mmData is SUPERCEDED by ObjectSetDB
+///
 package picoded.mmData;
+

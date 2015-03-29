@@ -16,6 +16,6 @@
 /// + Every object has a GUID/ID : For ID purposes, can be replaced with manual ID's
 /// + Every object belongs to a collection set : For Object Structure enforcement
 /// + Works using just java.util.Map interface : For ease of use
+/// + Key values are alphanumeric, with underscore/dash only : Ensure consistancy across all storage layers
 ///
 package picoded.objectSetDB;
-

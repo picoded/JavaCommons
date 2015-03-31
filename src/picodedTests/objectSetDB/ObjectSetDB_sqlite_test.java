@@ -77,9 +77,13 @@ public class ObjectSetDB_sqlite_test {
 	
 	/// Getting object set
 	@Test
-	public void getObjSet() {
+	public void objSet() {
 		assertNotNull(OSDB.get("test-sub-set"));
-		
-		assertNotNull(OSDB.get("test-sub-set"));
+	}
+	
+	/// Testing object map
+	@Test
+	public void objMap() {
+		assertNotNull(OSDB.get("test-sub-set").get("obj1"));
 	}
 }

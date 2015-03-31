@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 ///
-/// An object set class, that represents a collection of objects found in ObjectSetDB
+/// An object map. this represents an object, found in an object set.
+/// And does the final interface with the DB
 ///
 public class ObjectMap extends AbstractMap<String, Object> {
 	
@@ -37,9 +38,9 @@ public class ObjectMap extends AbstractMap<String, Object> {
 	}
 	
 	/// Constructor for the ObjectSet, this should not be called directly, except via ObjectSetDB
-	public ObjectMap(String setName, String mapID, DataStack dObj) {
+	public ObjectMap(String setName, String objID, DataStack dObj) {
 		sName = setName;
-		mName = mapID;
+		mName = objID;
 		dStack = dObj;
 	}
 	

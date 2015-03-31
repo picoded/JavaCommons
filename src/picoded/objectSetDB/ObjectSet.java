@@ -36,6 +36,13 @@ public class ObjectSet extends AbstractMap<String, Map<String, Object>> {
 		dStack = dObj;
 	}
 	
+	//----------------------------
+	// Object map fetching
+	//----------------------------
+	public ObjectMap get(String objID) {
+		return dStack.getObjectMap(sName, objID);
+	}
+	
 	///----------------------------------------
 	/// Map compliance
 	///----------------------------------------

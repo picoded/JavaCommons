@@ -17,6 +17,19 @@
 /// + Every object belongs to a collection set : For Object Structure enforcement
 /// + Works using just java.util.Map interface : For ease of use
 /// + Key values are alphanumeric, with underscore/dash only : Ensure consistancy across all storage layers
+/// + Keep all records in history AKA Delete later : For transactional tracing, this feature is optional
+///
+/// ## jCache notes
+///
+/// Additionally, one of the key decision factors was to store each object (from an objectset) entirely
+/// (without the LOBS data), and fetch it respectively in its entire form from jCache, even if only a
+/// single attribute will eventually be fetched. This may seem counterintuitive, however the main key
+/// decision for this came from bench marking done on picodedTests.libs.HazelcastMetaMapStructure_test
+/// showing a huge factor in performance improvement when doing a complete object in most of the use
+/// cases where multiple attributes per object is fetched.
+///
+/// Long story short, the overhead to fetch any key-value pair from jCache, far outweights the transmission
+/// size and serialization / deserialization of the object data for 99% of the use cases not involving LOBS.
 ///
 package picoded.objectSetDB;
 

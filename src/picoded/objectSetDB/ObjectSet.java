@@ -18,31 +18,31 @@ import java.util.Iterator;
 /// An object set class, that represents a collection of objects found in ObjectSetDB
 ///
 public class ObjectSet extends AbstractMap<String, Map<String, Object>> {
-
+	
 	/// Internal data stack of ObjectSetDB (shared across subclasses)
 	protected DataStack dStack;
-
+	
 	/// Internal set name
 	protected String sName;
-
+	
 	/// Returns the "safe", protected setName
 	public String setName() {
 		return sName;
 	}
-
+	
 	/// Constructor for the ObjectSet, this should not be called directly, except via ObjectSetDB
 	public ObjectSet(String setName, DataStack dObj) {
 		sName = setName;
 		dStack = dObj;
 	}
-
+	
 	///----------------------------------------
 	/// Map compliance
 	///----------------------------------------
 	@Override
 	public Set<Map.Entry<String, Map<String, Object>>> entrySet() {
 		throw new RuntimeException("entrySet / Iterator support is not (yet) implemented");
-
+		
 		/*
 		if (entries == null) {
 			entries = new AbstractSet() {
@@ -62,5 +62,5 @@ public class ObjectSet extends AbstractMap<String, Map<String, Object>> {
 		return entries;
 		// */
 	}
-
+	
 }

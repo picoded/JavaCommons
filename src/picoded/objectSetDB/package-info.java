@@ -17,7 +17,6 @@
 /// + Every object belongs to a collection set : For Object Structure enforcement
 /// + Works using just java.util.Map interface : For ease of use
 /// + Key values are alphanumeric, with underscore/dash only : Ensure consistancy across all storage layers
-/// + Keep all records in history AKA Delete later : For transactional tracing, this feature is optional
 ///
 /// ## jCache notes
 ///

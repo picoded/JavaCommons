@@ -40,7 +40,7 @@ public class ObjectSet extends AbstractMap<String, Map<String, Object>> {
 	// Object map fetching
 	//----------------------------
 	public ObjectMap get(String objID) {
-		return dStack.getObjectMap(sName, objID);
+		return (new ObjectMap(sName, objID, dStack));
 	}
 	
 	///----------------------------------------

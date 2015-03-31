@@ -189,7 +189,7 @@ public class DataStack extends AbstractMap<String, Map<String, Map<String, Objec
 		return ret; //return the newly constructed set
 	}
 	
-	/// Gets a cached ObjectSet, this is thread safe?
+	/// Gets a cached ObjectMap, this is thread safe?
 	public ObjectMap getObjectMap(String setName, String objID) {
 		return (new ObjectMap(setName, objID, this));
 	}

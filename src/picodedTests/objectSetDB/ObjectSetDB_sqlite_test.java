@@ -1,4 +1,4 @@
-package picodedTests.objectSetDB;
+package picodedTests.objectSetDB.internal;
 
 // Target test class
 import picoded.objectSetDB.*;

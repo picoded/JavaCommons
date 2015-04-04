@@ -3,9 +3,12 @@ package picoded.objectSetDB;
 import picoded.objectSetDB.*;
 import picoded.objectSetDB.internal.*;
 import picoded.jSql.*;
+import picoded.jCache.*;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
@@ -50,7 +53,39 @@ public class ObjectMap extends AbstractMap<String, Object> {
 		mName = objID;
 		dStack = dObj;
 		pSet = parent;
+		
+		//JCache_dataCopy = getRawObjVia_ACID_JCache();
+		//if (JCache_dataCopy == null) {
+		//	JCache_dataCopy = new HashMap<String, Object>();
+		//}
 	}
+	
+	///----------------------------------------
+	/// JCache data layer fetching
+	///----------------------------------------
+	
+	protected HashMap<String, Object> JCache_dataCopy = null;
+	
+	/// Gets the object from jCache layer
+	protected HashMap<String, Object> getRawObjVia_ACID_JCache() throws ObjectSetException {
+		try {
+			HashMap<String, Object> r = null;
+			JCache[] ACID_JCache = dStack.ACID_JCache;
+			for (int a = 0; a < ACID_JCache.length; ++a) {
+				ConcurrentMap<String, HashMap<String, Object>> setMap = ACID_JCache[a].getMap("OSDB_" + sName);
+				
+				r = setMap.get(mName);
+				if (r != null) {
+					return r;
+				}
+			}
+			return null;
+		} catch (JCacheException e) {
+			throw new ObjectSetException(e);
+		}
+	}
+	
+	//protected Lock[]
 	
 	///----------------------------------------
 	/// JSql data layer fetching

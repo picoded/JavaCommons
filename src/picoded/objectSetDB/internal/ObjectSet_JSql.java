@@ -38,7 +38,7 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	/// Constructor with the jSql object, and the deployed table name
 	public ObjectSet_JSql(JSql inSql, String tableName) {
 		JSqlObj = inSql;
-		sqlTableName = tableName;
+		sqlTableName = "OSDB_" + tableName;
 	}
 	
 	//--------------------------------------------------//

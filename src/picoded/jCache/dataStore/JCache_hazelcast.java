@@ -3,6 +3,8 @@ package picoded.jCache.dataStore;
 import picoded.jCache.*;
 import picoded.jCache.dataStore.BaseInterface;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.Queue;
 
 import com.hazelcast.core.*;
 import com.hazelcast.config.*;
@@ -86,6 +88,22 @@ public class JCache_hazelcast extends JCache implements BaseInterface {
 	public <K, V> ConcurrentMap<K, V> getMap(String name) throws JCacheException {
 		throwIfIsDispose();
 		return hazelcastObj.getMap(name);
+	}
+	
+	/// Gets a distributed concurrent lock
+	///
+	/// @param  name  The concurrent lock name
+	public Lock getLock(String name) throws JCacheException {
+		throwIfIsDispose();
+		return hazelcastObj.getLock(name);
+	}
+	
+	/// Gets a distributed concurrent Queue
+	///
+	/// @param  name  The concurrent Queue name
+	public <K> Queue<K> getQueue(String name) throws JCacheException {
+		throwIfIsDispose();
+		return hazelcastObj.getQueue(name);
 	}
 	
 	/// Returns true, if dispose() function was called prior

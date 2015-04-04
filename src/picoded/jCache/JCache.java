@@ -6,6 +6,8 @@ import picoded.jCache.*;
 import picoded.jCache.dataStore.BaseInterface;
 
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.Queue;
 
 /// Database intreface base class.
 public class JCache implements BaseInterface {
@@ -14,9 +16,19 @@ public class JCache implements BaseInterface {
 	///
 	/// Setsup Hazelcast client, using the local clsuter name
 	///
-	/// @param  clustername  IP address string, with port. eg:"LocalHC"
+	/// @param  clustername  Hazelcast local cluster name to 'auto search' eg:"LocalHC"
 	public static JCache hazelcast(String clustername) {
 		return new picoded.jCache.dataStore.JCache_hazelcast(clustername);
+	}
+	
+	/// @TODO : NOT YET IMPLEMENTED
+	public static JCache hazelcast(String clustername, String password) {
+		throw new RuntimeException(JCacheException.invalidDatastoreImplementationException);
+	}
+	
+	/// @TODO : NOT YET IMPLEMENTED
+	public static JCache hazelcast(String clustername, String password, String ipAddressWithPort) {
+		throw new RuntimeException(JCacheException.invalidDatastoreImplementationException);
 	}
 	
 	/// Hazelcast implementation constructor, returns picoded.jCache.dataStore.JCache_redis
@@ -78,6 +90,20 @@ public class JCache implements BaseInterface {
 	
 	/// Gets a ConcurrentMap with the given name
 	public <K, V> ConcurrentMap<K, V> getMap(String name) throws JCacheException {
+		throw new JCacheException(JCacheException.invalidDatastoreImplementationException);
+	}
+	
+	/// Gets a distributed concurrent lock
+	///
+	/// @param  name  The concurrent lock name
+	public Lock getLock(String name) throws JCacheException {
+		throw new JCacheException(JCacheException.invalidDatastoreImplementationException);
+	}
+	
+	/// Gets a distributed concurrent Queue
+	///
+	/// @param  name  The concurrent Queue name
+	public <K> Queue<K> getQueue(String name) throws JCacheException {
 		throw new JCacheException(JCacheException.invalidDatastoreImplementationException);
 	}
 	

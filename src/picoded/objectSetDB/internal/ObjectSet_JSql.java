@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.*;
 
+import java.math.BigDecimal;
+
 import org.apache.commons.lang3.StringUtils;
 
 import picoded.jSql.*;
@@ -66,11 +68,6 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(ObjectSet_JSql.class.getName());
 	
-	/// vDci multiplier used to convert the decimal places, to an int value
-	//2,147,483,647
-	//0 ~ 1,000,000,000
-	protected static int vDciMultiplier = 1000000000;
-	
 	/// Object byte space default as 260
 	protected int objColumnLength = 260;
 	
@@ -80,18 +77,18 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	/// Value byte space default as 4000
 	protected int valColumnLength = 4000;
 	
-	/// Numeric accuracy key space. NUMERIC(38,10)
-	protected int numericPrecision = 38;
+	/// Numeric accuracy key space. NUMERIC(28,10)
+	protected int numericPrecision = 28;
 	protected int numericDecimals = 10;
 	
 	/// Various table collumn names, and classification (used in upsert)?
 	protected static String[] uniqueColumnNames = new String[] { "oKey", "mKey", "vIdx" };
-	protected static String[] valueColumnNames = new String[] { "vTyp", "vStr", "vInt", "vDci" };
+	protected static String[] valueColumnNames = new String[] { "vTyp", "vNum", "vStr" };
 	protected static String[] timeStampColumnNames = new String[] { "uTim", "cTim", "eTim", "oTim" };
 	
 	protected static String[] allColumnNames = new String[] { //
 	"oKey", "mKey", "vIdx", //Object Key, Meta Key, Value Index
-		"vStr", "vInt", "vDci", "vTyp", //Value String, INT, Decimal, Type
+		"vTyp", "vNum", "vStr", //Value Type, Numeric / String
 		"uTim", "cTim", "eTim", //Updated, Created, Expire timestamp
 		"oTim" //Orphan flag
 	};
@@ -110,10 +107,8 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 			"vIdx INT, " + // The value index (multi map support), -1 is reserved for 'length'
 			"vTyp INT, " + // The value type (0:null, 1:String, 2:Int/Long, 3:Double, 4:Float)
 			// --------------------------------------------------------------------------
+			"vNum NUMERIC(" + numericPrecision + "," + numericDecimals + "), " + // The numeric accuracy for storage
 			"vStr VARCHAR(" + valColumnLength + "), " + // String or numeric expression value if applicable
-			//"vNum NUMERIC(" + numericPrecision + "," + numericDecimals + "), " + // The numeric accuracy for storage
-			"vInt BIGINT, " + // Int value if applicable
-			"vDci INT, " + // Decimal point value if applicable
 			// --------------------------------------------------------------------------
 			"uTim BIGINT, " + // Last updated time stamp
 			"cTim BIGINT, " + // Created time stamp
@@ -168,11 +163,20 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	private boolean putRaw( //
 		String oKey, String mKey, int vIdx, // unique identifier
 		int vTyp, // type identifier
-		String vStr, long vInt, int vDci, // value storage
+		String vStr, Number vNum, // value storage
 		long expireUnixTime // expire timestamp, if applicable
 	) throws JSqlException {
 		
 		long nowTime = (System.currentTimeMillis() / 1000L);
+		
+		Object vActualNum = vNum;
+		
+		//Sqlite workaround
+		if (vNum != null) {
+			if (vTyp == 4 && JSqlObj.sqlType == JSqlType.sqlite) {
+				vActualNum = new Double(vNum.doubleValue()); //the closest we can get
+			}
+		}
 		
 		//-1 expire time, means ignore, use misc field
 		if (expireUnixTime < 0) {
@@ -190,8 +194,8 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 				//
 				// Insert Values
 				//----------------------------------------
-				new String[] { "vTyp", "vStr", "vInt", "vDci", "uTim" }, //
-				new Object[] { vTyp, vStr, vInt, vDci, nowTime },
+				new String[] { "vTyp", "vNum", "vStr", "uTim" }, //
+				new Object[] { vTyp, vActualNum, vStr, nowTime },
 				//
 				// Default Values (created timestamp)
 				//----------------------------------------
@@ -217,8 +221,8 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 				//
 				// Insert Values
 				//----------------------------------------
-				new String[] { "vTyp", "vStr", "vInt", "vDci", "uTim", "eTim" }, //
-				new Object[] { vTyp, vStr, vInt, vDci, nowTime, expireUnixTime },
+				new String[] { "vTyp", "vNum", "vStr", "uTim", "eTim" }, //
+				new Object[] { vTyp, vActualNum, vStr, nowTime, expireUnixTime },
 				//
 				// Default Values (created timestamp)
 				//----------------------------------------
@@ -239,27 +243,19 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 		// Evaluating the various put values
 		if (val == null) {
 			return putRaw(oKey, mKey, vIdx, 0, null, //
-				0, 0, expireUnixTime);
+				null, expireUnixTime);
 		} else if (String.class.isInstance(val)) {
 			return putRaw(oKey, mKey, vIdx, 1, (val.toString()), //
-				0, 0, expireUnixTime);
+				null, expireUnixTime);
 		} else if (Integer.class.isInstance(val) || Long.class.isInstance(val)) {
 			return putRaw(oKey, mKey, vIdx, 2, null, //
-				((Number) val).longValue(), 0, expireUnixTime);
+				(new Long(((Number) val).longValue())), expireUnixTime);
 		} else if (Double.class.isInstance(val)) {
-			double dVal = ((Double) val).doubleValue();
-			long vInt = (long) Math.floor(dVal);
-			int vDci = (int) ((dVal - (double) vInt) * (double) vDciMultiplier);
-			
 			return putRaw(oKey, mKey, vIdx, 3, null, //
-				vInt, vDci, expireUnixTime);
+				(new Double(((Number) val).doubleValue())), expireUnixTime);
 		} else if (Float.class.isInstance(val)) {
-			float dVal = ((Float) val).floatValue();
-			long vInt = (long) Math.floor(dVal);
-			int vDci = (int) ((dVal - (float) vInt) * (float) vDciMultiplier);
-			
 			return putRaw(oKey, mKey, vIdx, 4, null, //
-				vInt, vDci, expireUnixTime);
+				(new Float(((Number) val).floatValue())), expireUnixTime);
 		} else {
 			String valClassName = val.getClass().getName();
 			throw new JSqlException("Unknown value object type : " + (valClassName));
@@ -320,22 +316,18 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 			return vStr;
 		}
 		
-		Object vIntObj = jRes.readRowCol(vPt, "vInt");
-		long vInt = (vIntObj != null) ? ((Number) vIntObj).longValue() : 0;
+		Number vNumObj = (Number) (jRes.readRowCol(vPt, "vNum"));
 		
 		if (vTyp == 2) {
-			return new Long(vInt);
+			return new Long(vNumObj.longValue());
 		}
 		
-		Object vDciObj = jRes.readRowCol(vPt, "vDci");
-		int vDci = (vDciObj != null) ? ((Number) vDciObj).intValue() : 0;
-		
 		if (vTyp == 3) {
-			return new Double((double) vInt + ((double) vDci) / ((double) vDciMultiplier));
+			return new Double(vNumObj.doubleValue());
 		}
 		
 		if (vTyp == 4) {
-			return new Float((float) vInt + ((float) vDci) / ((float) vDciMultiplier));
+			return new Float(vNumObj.floatValue());
 		}
 		
 		return null;

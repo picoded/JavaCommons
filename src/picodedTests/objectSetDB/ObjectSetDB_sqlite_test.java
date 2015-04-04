@@ -1,4 +1,4 @@
-package picodedTests.objectSetDB.internal;
+package picodedTests.objectSetDB;
 
 // Target test class
 import picoded.objectSetDB.*;
@@ -83,7 +83,16 @@ public class ObjectSetDB_sqlite_test {
 	
 	/// Testing object map
 	@Test
-	public void objMap() {
-		assertNotNull(OSDB.get("test-sub-set").get("obj1"));
+	public void objMap() throws ObjectSetException {
+		ObjectMap m;
+		assertNotNull(m = OSDB.get("test-sub-set").get("obj1"));
+		
+		assertNull(m.get("blank"));
+		assertNull(m.get("hello"));
+		
+		m.put("hello", "world");
+		assertNotNull(m.get("hello"));
+		assertEquals("world", m.get("hello"));
+		
 	}
 }

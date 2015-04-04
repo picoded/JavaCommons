@@ -28,74 +28,74 @@ import picoded.objectSetDB.*;
 /// *******************************************************************************
 ///
 public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
-	
+
 	//---------------------//
 	// Constructor         //
 	//---------------------//
-	
+
 	/// Constructor with the jSql object, and the deployed table name
 	public ObjectSet_JSql(JSql inSql, String tableName) {
 		JSqlObj = inSql;
 		sqlTableName = tableName;
 	}
-	
+
 	//--------------------------------------------------//
 	// Protected variables with public getter functions //
 	//--------------------------------------------------//
-	
+
 	/// The JSQL object that acts as the persistent object store
 	protected JSql JSqlObj = null;
-	
+
 	/// Internal SQL table name
 	protected String sqlTableName;
-	
+
 	/// Returns the initialized tableName
 	public String tableName() {
 		return sqlTableName;
 	}
-	
+
 	/// Returns the initialized JSqlObject
 	public JSql JSqlObject() {
 		return JSqlObj;
 	}
-	
+
 	//---------------------//
 	// Protected variables //
 	//---------------------//
-	
+
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(ObjectSet_JSql.class.getName());
-	
+
 	/// vDci multiplier used to convert the decimal places, to an int value
 	//2,147,483,647
 	//0 ~ 1,000,000,000
 	protected static int vDciMultiplier = 1000000000;
-	
-	/// Object byte space default as 60
-	protected int objColumnLength = 60;
-	
-	/// Key byte space default as 60
-	protected int keyColumnLength = 60;
-	
+
+	/// Object byte space default as 260
+	protected int objColumnLength = 260;
+
+	/// Key byte space default as 260
+	protected int keyColumnLength = 260;
+
 	/// Value byte space default as 4000
 	protected int valColumnLength = 4000;
-	
+
 	/// Various table collumn names, and classification (used in upsert)?
 	protected static String[] uniqueColumnNames = new String[] { "oKey", "mKey", "vIdx" };
 	protected static String[] valueColumnNames = new String[] { "vTyp", "vStr", "vInt", "vDci" };
 	protected static String[] timeStampColumnNames = new String[] { "uTim", "cTim", "eTim", "oTim" };
-	
+
 	protected static String[] allColumnNames = new String[] { //
 	"oKey", "mKey", "vIdx", //Object Key, Meta Key, Value Index
 		"vStr", "vInt", "vDci", "vTyp", //Value String, INT, Decimal, Type
 		"uTim", "cTim", "eTim", //Updated, Created, Expire timestamp
 		"oTim" //Orphan flag
 	};
-	
+
 	//-----------------------------------//
 	// JSql database storage table setup //
 	//-----------------------------------//
-	
+
 	/// Performs the required tableSetup for the JSQL database
 	public ObjectSet_JSql tableSetup() throws JSqlException {
 		JSqlObj.execute("CREATE TABLE IF NOT EXISTS `" + sqlTableName + "` (" + // Table Name
@@ -116,16 +116,16 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 			"oTim BIGINT " + // Orphan record detection and clearing flag, this is reserved for orphan record cleanup
 			")" //
 		);
-		
+
 		// Create the unique for the table
 		// --------------------------------------------------------------------------
 		JSqlObj.createTableIndexQuerySet(sqlTableName, StringUtils.join(uniqueColumnNames, ","), "UNIQUE", "unique")
 			.execute();
-		
+
 		// Create the various indexs used for the table
 		// --------------------------------------------------------------------------
 		for (int a = 0; a < allColumnNames.length; ++a) {
-			
+
 			if (allColumnNames[a].equals("vStr")) {
 				//Value string index, is FULLTEXT in mysql (as normal index does not work)
 				if (JSqlObj.sqlType == JSqlType.mysql) {
@@ -133,13 +133,13 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 					continue;
 				}
 			}
-			
+
 			JSqlObj.createTableIndexQuerySet(sqlTableName, allColumnNames[a]).execute();
 		}
-		
+
 		return this;
 	}
-	
+
 	/// Performs the required tableSetup for the JSQL database, after defining the various column lengths
 	public ObjectSet_JSql tableSetup(int inObjColumnLength, int inKeyColumnLength, int inValColumnLength)
 		throws JSqlException {
@@ -148,17 +148,17 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 		valColumnLength = inValColumnLength;
 		return tableSetup();
 	}
-	
+
 	/// Drops the database table with all relevant data
 	public ObjectSet_JSql tableDrop() throws JSqlException {
 		JSqlObj.execute("DROP TABLE IF EXISTS `" + sqlTableName + "`");
 		return this;
 	}
-	
+
 	//-----------------------------------//
 	// Meta data put commands            //
 	//-----------------------------------//
-	
+
 	/// Internal usage put, note that this does not handle any of the storage logic
 	private boolean putRaw( //
 		String oKey, String mKey, int vIdx, // unique identifier
@@ -166,9 +166,9 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 		String vStr, long vInt, int vDci, // value storage
 		long expireUnixTime // expire timestamp, if applicable
 	) throws JSqlException {
-		
+
 		long nowTime = (System.currentTimeMillis() / 1000L);
-		
+
 		//-1 expire time, means ignore, use misc field
 		if (expireUnixTime < 0) {
 			// JSql based upsert
@@ -197,7 +197,7 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 				new String[] { "eTim", "oTim" } //
 				).execute();
 		} else {
-			
+
 			// JSql based upsert
 			return JSqlObj.upsertQuerySet( //prepare querySet
 				//
@@ -225,12 +225,12 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 				).execute();
 		}
 	}
-	
+
 	// Dynamic put call, based on value object type. With expire unix timestamp
 	public boolean put(String oKey, String mKey, int vIdx, Object val, long expireUnixTime) throws JSqlException {
-		
+
 		// return putRaw(oKey, mKey, vIdx, vTyp, vStr, vInt, vDci, expireUnixTime)
-		
+
 		// Evaluating the various put values
 		if (val == null) {
 			return putRaw(oKey, mKey, vIdx, 0, null, //
@@ -245,38 +245,38 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 			double dVal = ((Double) val).doubleValue();
 			long vInt = (long) Math.floor(dVal);
 			int vDci = (int) ((dVal - (double) vInt) * (double) vDciMultiplier);
-			
+
 			return putRaw(oKey, mKey, vIdx, 3, null, //
 				vInt, vDci, expireUnixTime);
 		} else if (Float.class.isInstance(val)) {
 			float dVal = ((Float) val).floatValue();
 			long vInt = (long) Math.floor(dVal);
 			int vDci = (int) ((dVal - (float) vInt) * (float) vDciMultiplier);
-			
+
 			return putRaw(oKey, mKey, vIdx, 4, null, //
 				vInt, vDci, expireUnixTime);
 		} else {
 			String valClassName = val.getClass().getName();
 			throw new JSqlException("Unknown value object type : " + (valClassName));
 		}
-		
+
 		//return false;
 	}
-	
+
 	// Dynamic put call, based on value object type
 	public boolean put(String oKey, String mKey, int vIdx, Object val) throws JSqlException {
 		return put(oKey, mKey, vIdx, val, -1);
 	}
-	
+
 	// Default put call, places the value at index 0
 	public boolean put(String oKey, String mKey, Object val) throws JSqlException {
 		return put(oKey, mKey, 0, val, -1);
 	}
-	
+
 	//-----------------------------------//
 	// Meta data get commands            //
 	//-----------------------------------//
-	
+
 	/// Gets a JSqlResult set for the result set
 	public JSqlResult getRaw(String oKey, String mKey, int vIdx, int limit) throws JSqlException {
 		return JSqlObj.selectQuerySet(
@@ -289,49 +289,53 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 			limit, vIdx // select indexes
 			).query();
 	}
-	
+
 	/// Extracts the value from the JSqlResult generated by getRaw, note that expired values returns null
-	public Object valueFromRawResult(JSqlResult jRes, int vPt) {
+	public static Object valueFromRawResult(JSqlResult jRes, int vPt) {
+		if (jRes == null) {
+			return null;
+		}
+
 		long expireValue = expireValueFromRawResult(jRes, vPt);
 		if (expireValue > 10 && expireValue < (System.currentTimeMillis() / 1000L)) {
 			return null;
 		}
-		
+
 		Object vTypObj = jRes.readRowCol(vPt, "vTyp");
 		int vTyp = ((Number) vTypObj).intValue();
-		
+
 		if (vTyp == 0) {
 			return null;
 		}
-		
+
 		Object vStrObj = jRes.readRowCol(vPt, "vStr");
 		String vStr = (vStrObj != null) ? (vStrObj.toString()) : null;
-		
+
 		if (vTyp == 1) {
 			return vStr;
 		}
-		
+
 		Object vIntObj = jRes.readRowCol(vPt, "vInt");
 		long vInt = (vIntObj != null) ? ((Number) vIntObj).longValue() : 0;
-		
+
 		if (vTyp == 2) {
 			return new Long(vInt);
 		}
-		
+
 		Object vDciObj = jRes.readRowCol(vPt, "vDci");
 		int vDci = (vDciObj != null) ? ((Number) vDciObj).intValue() : 0;
-		
+
 		if (vTyp == 3) {
 			return new Double((double) vInt + ((double) vDci) / ((double) vDciMultiplier));
 		}
-		
+
 		if (vTyp == 4) {
 			return new Float((float) vInt + ((float) vDci) / ((float) vDciMultiplier));
 		}
-		
+
 		return null;
 	}
-	
+
 	public Object get(String oKey, String mKey, int vIdx) throws JSqlException {
 		JSqlResult jRes = getRaw(oKey, mKey, vIdx, 1);
 		if (jRes.rowCount() > 0) {
@@ -339,15 +343,15 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 		}
 		return null;
 	}
-	
+
 	public Object get(String oKey, String mKey) throws JSqlException {
 		return get(oKey, mKey, 0);
 	}
-	
+
 	//-----------------------------------//
 	// Expire timestamp commands         //
 	//-----------------------------------//
-	
+
 	// Gets a JSqlResult set of expired values (without the values)
 	private JSqlResult getExpireValueRaw(String oKey, String mKey, int vIdx, int limit) throws JSqlException {
 		return JSqlObj.selectQuerySet(
@@ -360,13 +364,13 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 			limit, vIdx // select indexes
 			).query();
 	}
-	
+
 	/// Extracts the expire timestamp from the JSqlResult generated by getRaw
-	public long expireValueFromRawResult(JSqlResult jRes, int vPt) {
+	public static long expireValueFromRawResult(JSqlResult jRes, int vPt) {
 		long ret = ((Number) jRes.readRowCol(vPt, "eTim")).longValue();
 		return (ret > 10) ? ret : -1;
 	}
-	
+
 	/// Get the expired value for the object / meta key
 	public long getExpireValue(String oKey, String mKey, int vIdx) throws JSqlException {
 		JSqlResult jRes = getExpireValueRaw(oKey, mKey, vIdx, 1);
@@ -375,58 +379,59 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 		}
 		return -1;
 	}
-	
+
 	/// Get the expired value for the object / meta key
 	public void setExpireValue(String oKey, String mKey, int vIdx, long expireUnixTime) throws JSqlException {
 		JSqlObj.execute("UPDATE `" + sqlTableName + "` SET eTim=? WHERE oKey=? AND mKey=? AND vIdx=?", //
 			expireUnixTime, oKey, mKey, vIdx);
 	}
-	
+
 	/// Scans the JSql table for any expired value, and remove them
 	public ObjectSet_JSql clearExpiredValues() throws JSqlException {
 		return clearExpiredValues((System.currentTimeMillis() / 1000L));
 	}
-	
+
 	/// Scans the JSql table for any expired value before given timestamp, and remove them
 	public ObjectSet_JSql clearExpiredValues(long expireTime) throws JSqlException {
 		long nowTime = (System.currentTimeMillis() / 1000L);
-		
+
 		if (expireTime > nowTime) {
 			throw new JSqlException("Clear Expire timestamp cannot be in the future");
 		}
-		
+
 		JSqlObj.execute("DELETE FROM `" + sqlTableName + "` WHERE eTim > 10 && eTim < ?", //
 			expireTime);
 		return this;
 	}
-	
+
 	//-----------------------------------//
 	// Meta data DEL commands            //
 	//-----------------------------------//
-	
+
 	/// Delets all value in table
 	public boolean deleteAll() throws JSqlException {
 		return JSqlObj.execute("DELETE FROM `" + sqlTableName + "`");
 	}
-	
+
 	/// Deletes all records related to an object
 	public boolean delete(String oKey) throws JSqlException {
 		return JSqlObj.execute("DELETE FROM `" + sqlTableName + "` WHERE oKey=?", oKey);
 	}
-	
+
 	/// Deletes all records related to an object, and meta key
 	public boolean delete(String oKey, String mKey) throws JSqlException {
 		return JSqlObj.execute("DELETE FROM `" + sqlTableName + "` WHERE oKey=? AND mKey=?", oKey, mKey);
 	}
-	
+
 	/// Deletes all records related to an object, and meta key, and index
 	public boolean delete(String oKey, String mKey, int vIdx) throws JSqlException {
 		return JSqlObj.execute("DELETE FROM `" + sqlTableName + "` WHERE oKey=? AND mKey=? AND vIdx=?", oKey, mKey, vIdx);
 	}
-	
+
 	//-----------------------------------//
 	// Legacy stuff, to recycle / delete //
 	//-----------------------------------//
+
 	/*
 	/// Fetches oKey / key / value, using partial matching search (SQL LIKE)
 	public String[] getMultiple(String oKey, String key) throws JSqlException {
@@ -626,7 +631,7 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	@Override
 	public Set<Map.Entry<String, Map<String, Object>>> entrySet() {
 		throw new RuntimeException("entrySet / Iterator support is not (yet) implemented");
-		
+
 		/*
 		 if (entries == null) {
 			entries = new AbstractSet() {

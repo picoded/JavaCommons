@@ -1,4 +1,4 @@
-package picodedTests.libs;
+package picodedTests.benchmarks;
 
 // Target test class
 import com.hazelcast.core.*;

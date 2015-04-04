@@ -30,5 +30,11 @@
 /// Long story short, the overhead to fetch any key-value pair from jCache, far outweights the transmission
 /// size and serialization / deserialization of the object data for 99% of the use cases not involving LOBS.
 ///
+/// ## jCache notes
+///
+/// @TODO LOBS support layer for JSql
+/// @TODO LOBS support layer for JSql, and file system hybrid
+/// @TODO LOBS support layer for JSql, and AWS S3
+///
 package picoded.objectSetDB;
 

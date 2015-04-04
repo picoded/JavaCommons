@@ -1,7 +1,8 @@
 package picoded.objectSetDB;
 
 import picoded.objectSetDB.*;
-import picoded.objectSetDB.internal.DataStack;
+import picoded.objectSetDB.internal.*;
+import picoded.jSql.*;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +27,7 @@ public class ObjectMap extends AbstractMap<String, Object> {
 	/// Internal set name
 	protected String sName;
 	protected String mName;
+	protected ObjectSet pSet;
 	
 	/// Returns the "safe", protected setName
 	public String setName() {
@@ -37,11 +39,64 @@ public class ObjectMap extends AbstractMap<String, Object> {
 		return mName;
 	}
 	
+	/// Returns the parent set
+	public ObjectSet parentSet() {
+		return pSet;
+	}
+	
 	/// Constructor for the ObjectSet, this should not be called directly, except via ObjectSetDB
-	public ObjectMap(String setName, String objID, DataStack dObj) {
+	public ObjectMap(String setName, String objID, DataStack dObj, ObjectSet parent) {
 		sName = setName;
 		mName = objID;
 		dStack = dObj;
+		pSet = parent;
+	}
+	
+	///----------------------------------------
+	/// JSql data layer fetching
+	///----------------------------------------
+	protected JSqlResult getRawVia_ACID_JSql(String meta, int idx) throws ObjectSetException {
+		try {
+			ObjectSet_JSql[] ACID_JSqlSet = pSet.ACID_JSqlSet;
+			for (int a = 0; a < ACID_JSqlSet.length; ++a) {
+				JSqlResult r = ACID_JSqlSet[a].getRaw(mName, meta, idx, 1);
+				
+				if (r.rowCount() > 0) {
+					return r;
+				}
+			}
+			return null;
+		} catch (JSqlException e) {
+			throw new ObjectSetException(e);
+		}
+	}
+	
+	protected JSqlResult putRawVia_ACID_JSql(String meta, int idx) throws ObjectSetException {
+		try {
+			ObjectSet_JSql[] ACID_JSqlSet = pSet.ACID_JSqlSet;
+			for (int a = 0; a < ACID_JSqlSet.length; ++a) {
+				JSqlResult r = ACID_JSqlSet[a].getRaw(mName, meta, idx, 1);
+				
+				if (r.rowCount() > 0) {
+					return r;
+				}
+			}
+			return null;
+		} catch (JSqlException e) {
+			throw new ObjectSetException(e);
+		}
+	}
+	
+	///----------------------------------------
+	/// Basic get / put functions
+	///----------------------------------------
+	public Object get(String meta) throws ObjectSetException {
+		return ObjectSet_JSql.valueFromRawResult(getRawVia_ACID_JSql(meta, 0), 0);
+	}
+	
+	public Object put(String meta, Object value) {
+		
+		return null;
 	}
 	
 	///----------------------------------------

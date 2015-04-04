@@ -19,44 +19,55 @@ import picoded.objectSetDB.*;
 ///
 /// Provides management (and sharing) of the internal DataStack used in objectSetDB
 public class DataStack extends AbstractMap<String, Map<String, Map<String, Object>>> {
-	
+
 	/// Caching layer, that is used for ACID storage
 	public JCache[] ACID_JCache = null;
-	
+
 	/// SQL layer, that is used for ACID storage
 	public JSql[] ACID_JSql = null;
-	
+
 	/// Caching layer, that is used for LOBS storage
 	public JCache[] LOBS_JCache = null;
-	
+
 	/// SQL layer, that is used for LOBS storage
 	public JSql[] LOBS_JSql = null;
-	
+
 	/// Object structure mapping for the Data Stack,
 	/// @TODO: evaluate usage of ConcurrentHashMap?
 	public Map<String, Map<String, Object>> objectStructures = new HashMap<String, Map<String, Object>>();
-	
+
 	/// The data stack constructor, used to setup acid and lobs storage layers
 	public DataStack(JCache[] acidCache, JSql[] acidSql, JCache[] lobsCache, JSql[] lobsSql) {
 		ACID_JCache = (acidCache != null) ? acidCache : (new JCache[] {});
 		ACID_JSql = (acidSql != null) ? acidSql : (new JSql[] {});
-		
+
 		LOBS_JCache = (lobsCache != null) ? lobsCache : ACID_JCache;
 		LOBS_JSql = (lobsSql != null) ? lobsSql : ACID_JSql;
-		
+
 		if (ACID_JSql.length == 0 && ACID_JCache.length == 0) {
 			throw new IllegalArgumentException("Empty ACID JSql & JCache stack setup is not allowed");
 		}
-		
+
 		if (LOBS_JSql.length == 0 && LOBS_JCache.length == 0) {
 			throw new IllegalArgumentException("Empty LOBS JSql & JCache stack setup is not allowed");
 		}
 	}
-	
+
+	//----------------------------
+	// Size limits
+	//----------------------------
+
+	/// Lmit of all key sizes
+	int keySizeLimit = 260;
+
+	/// Limit of val string size
+	int valSizeLmit = 4000;
+	long lobSizeLmit = 4000000000L; //4GB
+
 	//----------------------------
 	// Structure handling
 	//----------------------------
-	
+
 	/// Gets the currently configured Object structure, note that this will be READ ONLY
 	public Map<String, Object> getStructure(String setName) {
 		Map<String, Object> ret = null;
@@ -65,7 +76,7 @@ public class DataStack extends AbstractMap<String, Map<String, Map<String, Objec
 		}
 		return (ret != null) ? ret : ObjectSetDB.BlankObjectStructure;
 	}
-	
+
 	/// Setup the configured Object structure, does automated conversion of common basic class strings, to class object
 	public void setStructure(String setName, Map<String, Object> structure) {
 		if (structure == null || //
@@ -73,31 +84,31 @@ public class DataStack extends AbstractMap<String, Map<String, Map<String, Objec
 		) {
 			objectStructures.remove(setName);
 		}
-		
+
 		HashMap<String, Object> sMap = new HashMap<String, Object>();
 		sMap.putAll(structure);
-		
+
 		for (Map.Entry<String, Object> entry : sMap.entrySet()) {
 			//System.out.println(entry.getKey() + "/" + entry.getValue());
 			String k = entry.getKey();
 			Object v = entry.getValue();
-			
+
 			if (v instanceof String) {
-				
+
 				//skips true wildcard test
 				if (v == ObjectSetDB.WildCard) {
 					continue;
 				}
-				
+
 				//normalize wildcards
 				if (v.equals(ObjectSetDB.WildCard)) {
 					sMap.put(k, ObjectSetDB.WildCard);
 					continue;
 				}
-				
+
 				//Check for standard class mapping
 				v = v.toString().toUpperCase();
-				
+
 				boolean changed = true;
 				if (v.equals(ObjectSetDB.LOBstructure)) {
 					if (v != ObjectSetDB.LOBstructure) {
@@ -122,14 +133,14 @@ public class DataStack extends AbstractMap<String, Map<String, Map<String, Objec
 				} else {
 					changed = false;
 				}
-				
+
 				if (changed) {
 					sMap.put(k, v);
 				}
-				
+
 				//else keeps the string, assume is map name?
 			}
-			
+
 			if ( //
 			v == Integer.class || v == Double.class || //
 				v == Float.class || v == Long.class || //
@@ -144,64 +155,65 @@ public class DataStack extends AbstractMap<String, Map<String, Map<String, Objec
 					k + " : " + v.getClass().getName());
 			}
 		}
-		
+
 		objectStructures.put(setName, Collections.unmodifiableMap(sMap));
 	}
-	
+
 	/// Resets the configured Object structure
 	public void resetStructure(String setName) {
 		objectStructures.remove(setName);
 	}
-	
+
 	/// Gets the sub structure info directly
 	public Object getSubStructure(String setName, String parameterName) {
 		Map<String, Object> s = getStructure(setName);
 		if (s == ObjectSetDB.BlankObjectStructure) {
 			return ObjectSetDB.WildCard;
 		}
-		
+
 		if (s.containsKey(parameterName)) {
 			return s.get(parameterName);
 		}
-		
+
 		// Fallback to wildcard config
 		return s.get(ObjectSetDB.WildCard);
 	}
-	
+
 	///----------------------------------------
 	/// ObjectSet fetching
 	///----------------------------------------
 	ConcurrentHashMap<String, ObjectSet> objSetCache = new ConcurrentHashMap<String, ObjectSet>();
-	
+
 	/// Gets a cached ObjectSet, this is thread safe?
 	public ObjectSet getObjectSet(String setName) {
 		ObjectSet ret = objSetCache.get(setName);
 		if (ret != null) {
 			return ret;
 		}
-		
+
 		ret = new ObjectSet(setName, this);
 		ObjectSet nRet = objSetCache.putIfAbsent(setName, ret);
-		
+
 		if (nRet != null) { //Use old value, possible in "race condition"
 			return nRet;
 		}
 		return ret; //return the newly constructed set
 	}
-	
+
 	/// Gets a cached ObjectMap, this is thread safe?
 	public ObjectMap getObjectMap(String setName, String objID) {
-		return (new ObjectMap(setName, objID, this));
+		return getObjectSet(setName).get(objID);
+		//return (new ObjectMap(setName, objID, this));
 	}
-	
+
 	///----------------------------------------
 	/// Map compliance
 	///----------------------------------------
-	
+
 	@Override
 	public Set<Map.Entry<String, Map<String, Map<String, Object>>>> entrySet() {
 		throw new RuntimeException("entrySet / Iterator support is not (yet) implemented");
-		
+
 		/*
 		if (entries == null) {
 			entries = new AbstractSet() {
@@ -221,5 +233,5 @@ public class DataStack extends AbstractMap<String, Map<String, Map<String, Objec
 		return entries;
 		// */
 	}
-	
+
 }

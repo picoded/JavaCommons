@@ -71,31 +71,44 @@ public class ObjectMap extends AbstractMap<String, Object> {
 		}
 	}
 	
-	protected JSqlResult putRawVia_ACID_JSql(String meta, int idx) throws ObjectSetException {
+	/// Inserts the raw value into the JSql stack
+	protected void putRawVia_ACID_JSql(String meta, int idx, Object val, long expireUnixTime) throws ObjectSetException {
 		try {
 			ObjectSet_JSql[] ACID_JSqlSet = pSet.ACID_JSqlSet;
-			for (int a = 0; a < ACID_JSqlSet.length; ++a) {
-				JSqlResult r = ACID_JSqlSet[a].getRaw(mName, meta, idx, 1);
-				
-				if (r.rowCount() > 0) {
-					return r;
-				}
+			
+			// Updates from inner most to outer most
+			for (int a = ACID_JSqlSet.length - 1; a >= 0; --a) {
+				ACID_JSqlSet[a].put(mName, meta, idx, val, expireUnixTime);
 			}
-			return null;
 		} catch (JSqlException e) {
 			throw new ObjectSetException(e);
 		}
 	}
 	
+	/// No Expire time varient of putRawVia_ACID_JSql
+	protected void putRawVia_ACID_JSql(String meta, int idx, Object val) throws ObjectSetException {
+		putRawVia_ACID_JSql(meta, idx, val, -1);
+	}
+	
 	///----------------------------------------
 	/// Basic get / put functions
 	///----------------------------------------
+	
+	/// Gets the stored value
 	public Object get(String meta) throws ObjectSetException {
 		return ObjectSet_JSql.valueFromRawResult(getRawVia_ACID_JSql(meta, 0), 0);
 	}
 	
+	/// Overwrite the stored value,
+	/// note that this maybe silently ignored if the previous value is identical
+	///
+	/// !IMPORTANT, DOES NOT GURANTEE RETURN OF PREVIOUS VALUE
 	public Object put(String meta, Object value) {
-		
+		try {
+			putRawVia_ACID_JSql(meta, 0, value);
+		} catch (ObjectSetException e) {
+			throw new RuntimeException(e);
+		}
 		return null;
 	}
 	

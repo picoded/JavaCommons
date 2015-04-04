@@ -86,6 +86,7 @@ public class ObjectSetDB_sqlite_test {
 	public void objMap() throws ObjectSetException {
 		ObjectMap m;
 		assertNotNull(m = OSDB.get("test-sub-set").get("obj1"));
+		m.parentSet().tableSetup();
 		
 		assertNull(m.get("blank"));
 		assertNull(m.get("hello"));

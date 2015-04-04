@@ -2,6 +2,7 @@ package picoded.objectSetDB;
 
 import picoded.objectSetDB.*;
 import picoded.objectSetDB.internal.*;
+import picoded.jSql.*;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,6 +40,11 @@ public class ObjectSet extends AbstractMap<String, Map<String, Object>> {
 		setup_jSqlSets();
 	}
 	
+	/// Table setup for the set
+	public void tableSetup() throws ObjectSetException {
+		tableSetup_jSqlSets();
+	}
+	
 	//----------------------------
 	// Object map fetching
 	//----------------------------
@@ -59,9 +65,13 @@ public class ObjectSet extends AbstractMap<String, Map<String, Object>> {
 		}
 	}
 	
-	protected void tableSetup_jSqlSets() {
-		for (int a = 0; a < ACID_JSqlSet.length; ++a) {
-			//ACID_JSqlSet[a].tableSetup();
+	protected void tableSetup_jSqlSets() throws ObjectSetException {
+		try {
+			for (int a = 0; a < ACID_JSqlSet.length; ++a) {
+				ACID_JSqlSet[a].tableSetup();
+			}
+		} catch (JSqlException e) {
+			throw new ObjectSetException(e);
 		}
 	}
 	

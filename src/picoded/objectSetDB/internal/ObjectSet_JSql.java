@@ -53,7 +53,7 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	
 	/// Returns the initialized tableName
 	public String tableName() {
-		return sqlTableName;
+		return sqlTableName.substring(3);
 	}
 	
 	/// Returns the initialized JSqlObject
@@ -119,7 +119,7 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 		
 		// Create the unique for the table
 		// --------------------------------------------------------------------------
-		JSqlObj.createTableIndexQuerySet(sqlTableName, StringUtils.join(uniqueColumnNames, ","), "UNIQUE", "unique")
+		JSqlObj.createTableIndexQuerySet(sqlTableName, StringUtils.join(uniqueColumnNames, ","), "UNIQUE", "unq")
 			.execute();
 		
 		// Create the various indexs used for the table

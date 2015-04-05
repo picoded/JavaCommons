@@ -66,6 +66,9 @@ public class JSql implements BaseInterface {
 	/// Internal refrence of the current sqlType the system is running as
 	public JSqlType sqlType = JSqlType.invalid;
 	
+	/// Internal self used logger
+	private static Logger logger = Logger.getLogger(JSql.class.getName());
+	
 	/// [private] Helper function, used to prepare the sql statment in multiple situations
 	protected PreparedStatement prepareSqlStatment(String qString, Object... values) throws JSqlException {
 		int pt = 0;
@@ -309,6 +312,11 @@ public class JSql implements BaseInterface {
 		long limit, // Limit row count to, use 0 to ignore / disable
 		long offset // Offset limit by?
 	) {
+		
+		if (tableName.length() > 30) {
+			logger.warning(JSqlException.oracleNameSpaceWarning + tableName);
+		}
+		
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		StringBuilder queryBuilder = new StringBuilder("SELECT ");
 		
@@ -392,6 +400,10 @@ public class JSql implements BaseInterface {
 		// this is important as some SQL implementation will fallback to default table values, if not properly handled
 		String[] miscColumns //
 	) throws JSqlException {
+		
+		if (tableName.length() > 30) {
+			logger.warning(JSqlException.oracleNameSpaceWarning + tableName);
+		}
 		
 		/// Checks that unique collumn and values length to be aligned
 		if (uniqueColumns == null || uniqueValues == null || uniqueColumns.length != uniqueValues.length) {
@@ -527,6 +539,11 @@ public class JSql implements BaseInterface {
 		//
 		String indexSuffix // The index name suffix, its auto generated if null
 	) {
+		
+		if (tableName.length() > 30) {
+			logger.warning(JSqlException.oracleNameSpaceWarning + tableName);
+		}
+		
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		StringBuilder queryBuilder = new StringBuilder("CREATE ");
 		
@@ -540,6 +557,10 @@ public class JSql implements BaseInterface {
 		// Creates a suffix, based on the collumn names
 		if (indexSuffix == null || indexSuffix.length() <= 0) {
 			indexSuffix = columnNames.replaceAll("/[^A-Za-z0-9]/", ""); //.toUpperCase()?
+		}
+		
+		if ((tableName.length() + 1 + indexSuffix.length()) > 30) {
+			logger.warning(JSqlException.oracleNameSpaceWarning + tableName + "_" + indexSuffix);
 		}
 		
 		queryBuilder.append("`");

@@ -17,7 +17,7 @@ import java.util.Random;
 ///
 /// Test Case for picoded.mmData.MetaMap (using in memory Sqlite)
 ///
-public class ObjectSet_JSql_Sqlite_test {
+public class ObjectSet_JSql_sqlite_test {
 	
 	protected static String testTableName = "mmData-metaMap";
 	
@@ -30,7 +30,7 @@ public class ObjectSet_JSql_Sqlite_test {
 	@BeforeClass
 	public static void oneTimeSetUp() {
 		// one-time initialization code
-		testTableName = "mmData-metaMap_" + TestConfig.randomTablePrefix();
+		testTableName = TestConfig.randomTablePrefix();
 	}
 	
 	///
@@ -46,9 +46,14 @@ public class ObjectSet_JSql_Sqlite_test {
 		assertNotNull(objSetJSql.tableSetup());
 	}
 	
+	/// This function is to be overriden for the various JSQL implementation
+	public void setUpDB() {
+		JSqlObj = JSql.sqlite();
+	}
+	
 	@Before
 	public void setUp() throws JSqlException {
-		JSqlObj = JSql.sqlite();
+		setUpDB();
 		commonSetUp();
 	}
 	

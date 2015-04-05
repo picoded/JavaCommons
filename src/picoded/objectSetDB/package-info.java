@@ -33,13 +33,14 @@
 ///
 /// ## jCache notes
 ///
+/// @TODO Basic Java Type checking on PUT / GET
+/// @TODO Key Value, alpha numeric, with underscore/dash/spaces/....
+///
 /// @TODO Performance optimization: Allow caching of null values?, by introducing an internal NULLOBJ, to pass as "NULL"
 /// @TODO Performance optimization: Ignore cache values update, if value did not change
 /// @TODO JCache, and JSql locking for ACID compliance
-/// @TODO Key Value, alpha numeric, with underscore/dash/spaces/....
 /// @TODO LOBS support layer for JSql
 /// @TODO LOBS support layer for JSql, and file system hybrid
 /// @TODO LOBS support layer for JSql, and AWS S3
 ///
 package picoded.objectSetDB;
-

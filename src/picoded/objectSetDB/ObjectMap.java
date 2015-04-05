@@ -58,7 +58,7 @@ public class ObjectMap extends AbstractMap<String, Object> {
 		setupJCacheLocks();
 	}
 	
-	protected String lockPrefix = "OL$";
+	protected String lockPrefix = "OSL$";
 	protected String mapPrefix = "OS$";
 	
 	///----------------------------------------

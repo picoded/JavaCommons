@@ -90,6 +90,22 @@ public class ObjectSetDB extends AbstractMap<String, Map<String, Map<String, Obj
 		return this;
 	}
 	
+	//-----------------------------------
+	// Gets a in-memory only map cache
+	// (for key value storage)
+	//-----------------------------------
+	public Map<String, Object> cachedMap(String cacheName) throws ObjectSetException {
+		try {
+			if (dStack.ACID_JCache != null && dStack.ACID_JCache.length > 0) {
+				return dStack.ACID_JCache[0].getMap("OC$" + cacheName);
+			}
+		} catch (JCacheException e) {
+			throw new ObjectSetException(e);
+		}
+		
+		throw new ObjectSetException("Cached Map, requries atleast 1 JCache instance, to be supported");
+	}
+	
 	//----------------------------
 	// Object set fetching
 	//----------------------------

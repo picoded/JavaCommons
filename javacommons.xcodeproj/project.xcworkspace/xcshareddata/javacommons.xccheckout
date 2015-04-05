@@ -5,23 +5,23 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>AFE55CDE-F0E8-4254-A3E0-52D9D7FBED54</string>
+	<string>E5A34449-08A4-4E68-AEA6-5C1B00FC0373</string>
 	<key>IDESourceControlProjectName</key>
 	<string>javacommons</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>249EF405C9C3B13CA675E8943AEC9AEA1E50C113</key>
-		<string>54.169.187.142:picoded/javacommons.git</string>
+		<string>http://54.255.137.161/picoded/javacommons.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>javacommons.xcworkspace</string>
+	<string>javacommons.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>249EF405C9C3B13CA675E8943AEC9AEA1E50C113</key>
-		<string>..</string>
+		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>54.169.187.142:picoded/javacommons.git</string>
+	<string>http://54.255.137.161/picoded/javacommons.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>

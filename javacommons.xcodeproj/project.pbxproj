@@ -1,0 +1,94 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		E41A02731AD19D3200BEDACC /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		E41A02741AD19D3200BEDACC /* build-config */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "build-config"; sourceTree = "<group>"; };
+		E41A02751AD19D3200BEDACC /* build-tools */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "build-tools"; sourceTree = "<group>"; };
+		E41A02761AD19D3200BEDACC /* build.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = build.xml; sourceTree = "<group>"; };
+		E41A02771AD19D3200BEDACC /* docs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = docs; sourceTree = "<group>"; };
+		E41A02781AD19D3200BEDACC /* lib-organized */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "lib-organized"; sourceTree = "<group>"; };
+		E41A02791AD19D3200BEDACC /* pre-commit.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "pre-commit.sh"; sourceTree = "<group>"; };
+		E41A027A1AD19D3200BEDACC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		E41A027B1AD19D3200BEDACC /* rt-stubs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "rt-stubs"; sourceTree = "<group>"; };
+		E41A027C1AD19D3200BEDACC /* runTest.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = runTest.sh; sourceTree = "<group>"; };
+		E41A027D1AD19D3200BEDACC /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
+		E41A027E1AD19D3200BEDACC /* test-files */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "test-files"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		E41A026B1AD19CE400BEDACC = {
+			isa = PBXGroup;
+			children = (
+				E41A02731AD19D3200BEDACC /* .gitignore */,
+				E41A02741AD19D3200BEDACC /* build-config */,
+				E41A02751AD19D3200BEDACC /* build-tools */,
+				E41A02761AD19D3200BEDACC /* build.xml */,
+				E41A02771AD19D3200BEDACC /* docs */,
+				E41A02781AD19D3200BEDACC /* lib-organized */,
+				E41A02791AD19D3200BEDACC /* pre-commit.sh */,
+				E41A027A1AD19D3200BEDACC /* README.md */,
+				E41A027B1AD19D3200BEDACC /* rt-stubs */,
+				E41A027C1AD19D3200BEDACC /* runTest.sh */,
+				E41A027D1AD19D3200BEDACC /* src */,
+				E41A027E1AD19D3200BEDACC /* test-files */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		E41A026C1AD19CE400BEDACC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+			};
+			buildConfigurationList = E41A026F1AD19CE400BEDACC /* Build configuration list for PBXProject "javacommons" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = E41A026B1AD19CE400BEDACC;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		E41A02701AD19CE400BEDACC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		E41A02711AD19CE400BEDACC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E41A026F1AD19CE400BEDACC /* Build configuration list for PBXProject "javacommons" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E41A02701AD19CE400BEDACC /* Debug */,
+				E41A02711AD19CE400BEDACC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E41A026C1AD19CE400BEDACC /* Project object */;
+}

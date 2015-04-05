@@ -7,88 +7,202 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		E41A02731AD19D3200BEDACC /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		E41A02741AD19D3200BEDACC /* build-config */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "build-config"; sourceTree = "<group>"; };
-		E41A02751AD19D3200BEDACC /* build-tools */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "build-tools"; sourceTree = "<group>"; };
-		E41A02761AD19D3200BEDACC /* build.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = build.xml; sourceTree = "<group>"; };
-		E41A02771AD19D3200BEDACC /* docs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = docs; sourceTree = "<group>"; };
-		E41A02781AD19D3200BEDACC /* lib-organized */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "lib-organized"; sourceTree = "<group>"; };
-		E41A02791AD19D3200BEDACC /* pre-commit.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "pre-commit.sh"; sourceTree = "<group>"; };
-		E41A027A1AD19D3200BEDACC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		E41A027B1AD19D3200BEDACC /* rt-stubs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "rt-stubs"; sourceTree = "<group>"; };
-		E41A027C1AD19D3200BEDACC /* runTest.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = runTest.sh; sourceTree = "<group>"; };
-		E41A027D1AD19D3200BEDACC /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
-		E41A027E1AD19D3200BEDACC /* test-files */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "test-files"; sourceTree = "<group>"; };
+		E41A028A1AD19F4C00BEDACC /* build-config */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "build-config"; sourceTree = "<group>"; };
+		E41A028B1AD19F4C00BEDACC /* build-tools */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "build-tools"; sourceTree = "<group>"; };
+		E41A028C1AD19F4C00BEDACC /* build.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = build.xml; sourceTree = "<group>"; };
+		E41A028D1AD19F4C00BEDACC /* docs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = docs; sourceTree = "<group>"; };
+		E41A028E1AD19F4C00BEDACC /* lib-organized */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "lib-organized"; sourceTree = "<group>"; };
+		E41A028F1AD19F4C00BEDACC /* pre-commit.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "pre-commit.sh"; sourceTree = "<group>"; };
+		E41A02901AD19F4C00BEDACC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		E41A02911AD19F4C00BEDACC /* rt-stubs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "rt-stubs"; sourceTree = "<group>"; };
+		E41A02921AD19F4C00BEDACC /* runTest.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = runTest.sh; sourceTree = "<group>"; };
+		E41A02931AD19F4C00BEDACC /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
+		E41A02941AD19F4C00BEDACC /* test-files */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "test-files"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		E41A026B1AD19CE400BEDACC = {
+		E41A027F1AD19F1400BEDACC = {
 			isa = PBXGroup;
 			children = (
-				E41A02731AD19D3200BEDACC /* .gitignore */,
-				E41A02741AD19D3200BEDACC /* build-config */,
-				E41A02751AD19D3200BEDACC /* build-tools */,
-				E41A02761AD19D3200BEDACC /* build.xml */,
-				E41A02771AD19D3200BEDACC /* docs */,
-				E41A02781AD19D3200BEDACC /* lib-organized */,
-				E41A02791AD19D3200BEDACC /* pre-commit.sh */,
-				E41A027A1AD19D3200BEDACC /* README.md */,
-				E41A027B1AD19D3200BEDACC /* rt-stubs */,
-				E41A027C1AD19D3200BEDACC /* runTest.sh */,
-				E41A027D1AD19D3200BEDACC /* src */,
-				E41A027E1AD19D3200BEDACC /* test-files */,
+				E41A028A1AD19F4C00BEDACC /* build-config */,
+				E41A028B1AD19F4C00BEDACC /* build-tools */,
+				E41A028C1AD19F4C00BEDACC /* build.xml */,
+				E41A028D1AD19F4C00BEDACC /* docs */,
+				E41A028E1AD19F4C00BEDACC /* lib-organized */,
+				E41A028F1AD19F4C00BEDACC /* pre-commit.sh */,
+				E41A02901AD19F4C00BEDACC /* README.md */,
+				E41A02911AD19F4C00BEDACC /* rt-stubs */,
+				E41A02921AD19F4C00BEDACC /* runTest.sh */,
+				E41A02931AD19F4C00BEDACC /* src */,
+				E41A02941AD19F4C00BEDACC /* test-files */,
 			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
+/* Begin PBXLegacyTarget section */
+		E41A02841AD19F1400BEDACC /* javacommons */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = build;
+			buildConfigurationList = E41A02871AD19F1400BEDACC /* Build configuration list for PBXLegacyTarget "javacommons" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/local/bin/ant;
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = javacommons;
+			passBuildSettingsInEnvironment = 1;
+			productName = javacommons;
+		};
+/* End PBXLegacyTarget section */
+
 /* Begin PBXProject section */
-		E41A026C1AD19CE400BEDACC /* Project object */ = {
+		E41A02801AD19F1400BEDACC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = picoded;
+				TargetAttributes = {
+					E41A02841AD19F1400BEDACC = {
+						CreatedOnToolsVersion = 6.1;
+					};
+				};
 			};
-			buildConfigurationList = E41A026F1AD19CE400BEDACC /* Build configuration list for PBXProject "javacommons" */;
+			buildConfigurationList = E41A02831AD19F1400BEDACC /* Build configuration list for PBXProject "javacommons" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = E41A026B1AD19CE400BEDACC;
+			mainGroup = E41A027F1AD19F1400BEDACC;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				E41A02841AD19F1400BEDACC /* javacommons */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin XCBuildConfiguration section */
-		E41A02701AD19CE400BEDACC /* Debug */ = {
+		E41A02851AD19F1400BEDACC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
-		E41A02711AD19CE400BEDACC /* Release */ = {
+		E41A02861AD19F1400BEDACC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		E41A02881AD19F1400BEDACC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUGGING_SYMBOLS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E41A02891AD19F1400BEDACC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E41A026F1AD19CE400BEDACC /* Build configuration list for PBXProject "javacommons" */ = {
+		E41A02831AD19F1400BEDACC /* Build configuration list for PBXProject "javacommons" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E41A02701AD19CE400BEDACC /* Debug */,
-				E41A02711AD19CE400BEDACC /* Release */,
+				E41A02851AD19F1400BEDACC /* Debug */,
+				E41A02861AD19F1400BEDACC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E41A02871AD19F1400BEDACC /* Build configuration list for PBXLegacyTarget "javacommons" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E41A02881AD19F1400BEDACC /* Debug */,
+				E41A02891AD19F1400BEDACC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = E41A026C1AD19CE400BEDACC /* Project object */;
+	rootObject = E41A02801AD19F1400BEDACC /* Project object */;
 }

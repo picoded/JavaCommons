@@ -49,6 +49,16 @@ public class ObjectSetDB extends AbstractMap<String, Map<String, Map<String, Obj
 		dStack = new DataStack(null, new JSql[] { JSql.sqlite() }, null, null);
 	}
 	
+	/// setup using the given cache / jSql
+	public ObjectSetDB(JCache acidCache, JSql acidSql) {
+		dStack = new DataStack(new JCache[] { acidCache }, new JSql[] { acidSql }, null, null);
+	}
+	
+	/// setup using the given cache / jSql
+	public ObjectSetDB(JCache[] acidCache, JSql[] acidSql) {
+		dStack = new DataStack(acidCache, acidSql, null, null);
+	}
+	
 	//----------------------------
 	// Structure handling
 	//----------------------------

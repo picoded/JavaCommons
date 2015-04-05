@@ -11,7 +11,8 @@ import static org.junit.Assert.*;
 import picodedTests.TestConfig;
 import picodedTests.jCache.LocalCacheSetup;
 
-//
+// Various utility includes
+import java.util.Random;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -83,9 +84,10 @@ public class ObjectSetDB_sqlite_test {
 	
 	/// Testing object map
 	@Test
-	public void objMap() throws ObjectSetException {
+	public void objMapBasic() throws ObjectSetException {
 		ObjectMap m;
 		assertNotNull(m = OSDB.get("test-sub-set").get("obj1"));
+		m.parentSet().tableSetup();
 		
 		assertNull(m.get("blank"));
 		assertNull(m.get("hello"));
@@ -93,6 +95,56 @@ public class ObjectSetDB_sqlite_test {
 		m.put("hello", "world");
 		assertNotNull(m.get("hello"));
 		assertEquals("world", m.get("hello"));
+	}
+	
+	/// Iteration count
+	static int basicTestIterations = 15;
+	
+	/// Testing object standard java types in a loop
+	public void objMapStdJava() throws ObjectSetException {
+		Random rObj = new Random();
+		
+		int tmp_int;
+		long tmp_long;
+		double tmp_double;
+		float tmp_float;
+		
+		double accuracy = 0.000000001;
+		
+		for (int i = 0; i < basicTestIterations; ++i) {
+			tmp_int = rObj.nextInt();
+			
+			OSDB.get("test-sub-set").get("hello").put("world", "s" + tmp_int);
+			assertEquals("String value test", "s" + tmp_int, OSDB.get("test-sub-set").get("hello").get("world"));
+		}
+		
+		for (int i = 0; i < basicTestIterations; ++i) {
+			tmp_int = rObj.nextInt();
+			
+			OSDB.get("test-sub-set").get("hello").put("world", tmp_int);
+			assertEquals("Int value test", (long) tmp_int, OSDB.get("test-sub-set").get("hello").get("world"));
+		}
+		
+		for (int i = 0; i < basicTestIterations; ++i) {
+			tmp_long = rObj.nextLong();
+			
+			OSDB.get("test-sub-set").get("hello").put("world", tmp_long);
+			assertEquals("Long value test", tmp_long, OSDB.get("test-sub-set").get("hello").get("world"));
+		}
+		
+		for (int i = 0; i < basicTestIterations; ++i) {
+			tmp_double = rObj.nextDouble() + rObj.nextInt();
+			
+			OSDB.get("test-sub-set").get("hello").put("world", tmp_double);
+			assertEquals("Double value test", tmp_double, OSDB.get("test-sub-set").get("hello").get("world"));
+		}
+		
+		for (int i = 0; i < basicTestIterations; ++i) {
+			tmp_float = rObj.nextFloat() + rObj.nextInt();
+			
+			OSDB.get("test-sub-set").get("hello").put("world", tmp_float);
+			assertEquals("Double value test", tmp_float, OSDB.get("test-sub-set").get("hello").get("world"));
+		}
 		
 	}
 }

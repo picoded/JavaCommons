@@ -9,14 +9,15 @@
 ///
 /// + Cache everything : For performance
 /// + Index everything : For performance
-/// + ACID everything : For reliability
+/// + ACID everything : For reliability (incomplete, requires atleast a JCache to ensure locking)
 /// + Reuse SQL and NOSQL : For compliance
 /// + Relative Object relation : For ease of use, and super joins
 /// + Flexible Object Structure : For rapid iterations
 /// + Every object has a GUID/ID : For ID purposes, can be replaced with manual ID's
 /// + Every object belongs to a collection set : For Object Structure enforcement
 /// + Works using just java.util.Map interface : For ease of use
-/// + Key values are alphanumeric, with underscore/dash only : Ensure consistancy across all storage layers
+/// + Linked object sets : For all your complex hirachy needs
+/// + Key values are alphanumeric, with underscore/dash/spaces/dots/slashes only : Ensure consistancy across all storage layers
 ///
 /// ## jCache notes
 ///
@@ -32,6 +33,12 @@
 ///
 /// ## jCache notes
 ///
+/// @TODO Basic Java Type checking on PUT / GET
+/// @TODO Key Value, alpha numeric, with underscore/dash/spaces/....
+///
+/// @TODO Performance optimization: Allow caching of null values?, by introducing an internal NULLOBJ, to pass as "NULL"
+/// @TODO Performance optimization: Ignore cache values update, if value did not change
+/// @TODO JCache, and JSql locking for ACID compliance
 /// @TODO LOBS support layer for JSql
 /// @TODO LOBS support layer for JSql, and file system hybrid
 /// @TODO LOBS support layer for JSql, and AWS S3

@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.*;
 
+import java.math.BigDecimal;
+
 import org.apache.commons.lang3.StringUtils;
 
 import picoded.jSql.*;
@@ -36,7 +38,7 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	/// Constructor with the jSql object, and the deployed table name
 	public ObjectSet_JSql(JSql inSql, String tableName) {
 		JSqlObj = inSql;
-		sqlTableName = tableName;
+		sqlTableName = "OS$" + tableName;
 	}
 	
 	//--------------------------------------------------//
@@ -66,11 +68,6 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(ObjectSet_JSql.class.getName());
 	
-	/// vDci multiplier used to convert the decimal places, to an int value
-	//2,147,483,647
-	//0 ~ 1,000,000,000
-	protected static int vDciMultiplier = 1000000000;
-	
 	/// Object byte space default as 260
 	protected int objColumnLength = 260;
 	
@@ -80,18 +77,18 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	/// Value byte space default as 4000
 	protected int valColumnLength = 4000;
 	
-	/// Numeric accuracy key space. NUMERIC(38,10)
-	protected int numericPrecision = 38;
+	/// Numeric accuracy key space. NUMERIC(28,10)
+	protected int numericPrecision = 28;
 	protected int numericDecimals = 10;
 	
 	/// Various table collumn names, and classification (used in upsert)?
 	protected static String[] uniqueColumnNames = new String[] { "oKey", "mKey", "vIdx" };
-	protected static String[] valueColumnNames = new String[] { "vTyp", "vStr", "vInt", "vDci" };
+	protected static String[] valueColumnNames = new String[] { "vTyp", "vNum", "vStr" };
 	protected static String[] timeStampColumnNames = new String[] { "uTim", "cTim", "eTim", "oTim" };
 	
 	protected static String[] allColumnNames = new String[] { //
 	"oKey", "mKey", "vIdx", //Object Key, Meta Key, Value Index
-		"vStr", "vInt", "vDci", "vTyp", //Value String, INT, Decimal, Type
+		"vTyp", "vNum", "vStr", //Value Type, Numeric / String
 		"uTim", "cTim", "eTim", //Updated, Created, Expire timestamp
 		"oTim" //Orphan flag
 	};
@@ -110,10 +107,8 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 			"vIdx INT, " + // The value index (multi map support), -1 is reserved for 'length'
 			"vTyp INT, " + // The value type (0:null, 1:String, 2:Int/Long, 3:Double, 4:Float)
 			// --------------------------------------------------------------------------
+			"vNum NUMERIC(" + numericPrecision + "," + numericDecimals + "), " + // The numeric accuracy for storage
 			"vStr VARCHAR(" + valColumnLength + "), " + // String or numeric expression value if applicable
-			//"vNum NUMERIC(" + numericPrecision + "," + numericDecimals + "), " + // The numeric accuracy for storage
-			"vInt BIGINT, " + // Int value if applicable
-			"vDci INT, " + // Decimal point value if applicable
 			// --------------------------------------------------------------------------
 			"uTim BIGINT, " + // Last updated time stamp
 			"cTim BIGINT, " + // Created time stamp
@@ -164,18 +159,34 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	// Meta data put commands            //
 	//-----------------------------------//
 	
+	private boolean putRaw( //
+		String oKey, String mKey, int vIdx, // unique identifier
+		int vTyp, // type identifier
+		String vStr, Number vNum, // value storage
+		long expireUnixTime // expire timestamp, if applicable
+	) throws JSqlException {
+		return putRaw(oKey, mKey, vIdx, vTyp, vStr, vNum, expireUnixTime, (System.currentTimeMillis() / 1000L));
+	}
+	
 	/// Internal usage put, note that this does not handle any of the storage logic
 	private boolean putRaw( //
 		String oKey, String mKey, int vIdx, // unique identifier
 		int vTyp, // type identifier
-		String vStr, long vInt, int vDci, // value storage
-		long expireUnixTime // expire timestamp, if applicable
+		String vStr, Number vNum, // value storage
+		long expireUnixTime, long updateTime // expire timestamp, if applicable
 	) throws JSqlException {
 		
-		long nowTime = (System.currentTimeMillis() / 1000L);
+		Object vActualNum = vNum;
+		
+		//Sqlite workaround
+		if (vNum != null) {
+			if (vTyp == 4 && JSqlObj.sqlType == JSqlType.sqlite) {
+				vActualNum = new Double(vNum.doubleValue()); //the closest we can get
+			}
+		}
 		
 		//-1 expire time, means ignore, use misc field
-		if (expireUnixTime < 0) {
+		if (expireUnixTime <= 0) {
 			// JSql based upsert
 			return JSqlObj.upsertQuerySet( //prepare querySet
 				//
@@ -190,12 +201,12 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 				//
 				// Insert Values
 				//----------------------------------------
-				new String[] { "vTyp", "vStr", "vInt", "vDci", "uTim" }, //
-				new Object[] { vTyp, vStr, vInt, vDci, nowTime },
+				new String[] { "vTyp", "vNum", "vStr", "uTim" }, //
+				new Object[] { vTyp, vActualNum, vStr, updateTime },
 				//
 				// Default Values (created timestamp)
 				//----------------------------------------
-				new String[] { "cTim" }, new Object[] { nowTime },
+				new String[] { "cTim" }, new Object[] { updateTime },
 				//
 				// Misc value to preserve, such as expire timestamp
 				//----------------------------------------
@@ -217,12 +228,12 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 				//
 				// Insert Values
 				//----------------------------------------
-				new String[] { "vTyp", "vStr", "vInt", "vDci", "uTim", "eTim" }, //
-				new Object[] { vTyp, vStr, vInt, vDci, nowTime, expireUnixTime },
+				new String[] { "vTyp", "vNum", "vStr", "uTim", "eTim" }, //
+				new Object[] { vTyp, vActualNum, vStr, updateTime, expireUnixTime },
 				//
 				// Default Values (created timestamp)
 				//----------------------------------------
-				new String[] { "cTim" }, new Object[] { nowTime },
+				new String[] { "cTim" }, new Object[] { updateTime },
 				//
 				// Misc value to preserve, such as expire timestamp
 				//----------------------------------------
@@ -232,34 +243,27 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	}
 	
 	// Dynamic put call, based on value object type. With expire unix timestamp
-	public boolean put(String oKey, String mKey, int vIdx, Object val, long expireUnixTime) throws JSqlException {
+	public boolean put(String oKey, String mKey, int vIdx, Object val, long expireUnixTime, long updateTime)
+		throws JSqlException {
 		
 		// return putRaw(oKey, mKey, vIdx, vTyp, vStr, vInt, vDci, expireUnixTime)
 		
 		// Evaluating the various put values
 		if (val == null) {
 			return putRaw(oKey, mKey, vIdx, 0, null, //
-				0, 0, expireUnixTime);
+				null, expireUnixTime, updateTime);
 		} else if (String.class.isInstance(val)) {
 			return putRaw(oKey, mKey, vIdx, 1, (val.toString()), //
-				0, 0, expireUnixTime);
+				null, expireUnixTime, updateTime);
 		} else if (Integer.class.isInstance(val) || Long.class.isInstance(val)) {
 			return putRaw(oKey, mKey, vIdx, 2, null, //
-				((Number) val).longValue(), 0, expireUnixTime);
+				(new Long(((Number) val).longValue())), expireUnixTime, updateTime);
 		} else if (Double.class.isInstance(val)) {
-			double dVal = ((Double) val).doubleValue();
-			long vInt = (long) Math.floor(dVal);
-			int vDci = (int) ((dVal - (double) vInt) * (double) vDciMultiplier);
-			
 			return putRaw(oKey, mKey, vIdx, 3, null, //
-				vInt, vDci, expireUnixTime);
+				(new Double(((Number) val).doubleValue())), expireUnixTime, updateTime);
 		} else if (Float.class.isInstance(val)) {
-			float dVal = ((Float) val).floatValue();
-			long vInt = (long) Math.floor(dVal);
-			int vDci = (int) ((dVal - (float) vInt) * (float) vDciMultiplier);
-			
 			return putRaw(oKey, mKey, vIdx, 4, null, //
-				vInt, vDci, expireUnixTime);
+				(new Float(((Number) val).floatValue())), expireUnixTime, updateTime);
 		} else {
 			String valClassName = val.getClass().getName();
 			throw new JSqlException("Unknown value object type : " + (valClassName));
@@ -270,12 +274,12 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	
 	// Dynamic put call, based on value object type
 	public boolean put(String oKey, String mKey, int vIdx, Object val) throws JSqlException {
-		return put(oKey, mKey, vIdx, val, -1);
+		return put(oKey, mKey, vIdx, val, -1, (System.currentTimeMillis() / 1000L));
 	}
 	
 	// Default put call, places the value at index 0
 	public boolean put(String oKey, String mKey, Object val) throws JSqlException {
-		return put(oKey, mKey, 0, val, -1);
+		return put(oKey, mKey, 0, val, -1, (System.currentTimeMillis() / 1000L));
 	}
 	
 	//-----------------------------------//
@@ -320,22 +324,14 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 			return vStr;
 		}
 		
-		Object vIntObj = jRes.readRowCol(vPt, "vInt");
-		long vInt = (vIntObj != null) ? ((Number) vIntObj).longValue() : 0;
+		Number vNumObj = (Number) (jRes.readRowCol(vPt, "vNum"));
 		
 		if (vTyp == 2) {
-			return new Long(vInt);
-		}
-		
-		Object vDciObj = jRes.readRowCol(vPt, "vDci");
-		int vDci = (vDciObj != null) ? ((Number) vDciObj).intValue() : 0;
-		
-		if (vTyp == 3) {
-			return new Double((double) vInt + ((double) vDci) / ((double) vDciMultiplier));
-		}
-		
-		if (vTyp == 4) {
-			return new Float((float) vInt + ((float) vDci) / ((float) vDciMultiplier));
+			return new Long(vNumObj.longValue());
+		} else if (vTyp == 3) {
+			return new Double(vNumObj.doubleValue());
+		} else if (vTyp == 4) {
+			return new Float(vNumObj.floatValue());
 		}
 		
 		return null;
@@ -354,6 +350,35 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	}
 	
 	//-----------------------------------//
+	// get timestamp commands         //
+	//-----------------------------------//
+	
+	/// extract long timestamp value, from result
+	protected static long timestampValueFromRawResult(JSqlResult jRes, String col, int vPt) {
+		if (jRes == null || jRes.rowCount() <= 0) {
+			return -1;
+		}
+		Number inVal = ((Number) jRes.readRowCol(vPt, col));
+		long ret = (inVal != null) ? inVal.longValue() : -1;
+		return (ret > 10) ? ret : -1;
+	}
+	
+	/// Extracts the expire timestamp from the JSqlResult generated by getRaw
+	public static long updatedValueFromRawResult(JSqlResult jRes, int vPt) {
+		return timestampValueFromRawResult(jRes, "uTim", vPt);
+	}
+	
+	/// Extracts the created timestamp from the JSqlResult generated by getRaw
+	public static long createdValueFromRawResult(JSqlResult jRes, int vPt) {
+		return timestampValueFromRawResult(jRes, "cTim", vPt);
+	}
+	
+	/// Extracts the expire timestamp from the JSqlResult generated by getRaw
+	public static long expireValueFromRawResult(JSqlResult jRes, int vPt) {
+		return timestampValueFromRawResult(jRes, "eTim", vPt);
+	}
+	
+	//-----------------------------------//
 	// Expire timestamp commands         //
 	//-----------------------------------//
 	
@@ -368,16 +393,6 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 			"vIdx ASC", //order by
 			limit, vIdx // select indexes
 			).query();
-	}
-	
-	/// Extracts the expire timestamp from the JSqlResult generated by getRaw
-	public static long expireValueFromRawResult(JSqlResult jRes, int vPt) {
-		if (jRes == null || jRes.rowCount() <= 0) {
-			return -1;
-		}
-		Number inVal = ((Number) jRes.readRowCol(vPt, "eTim"));
-		long ret = (inVal != null) ? inVal.longValue() : -1;
-		return (ret > 10) ? ret : -1;
 	}
 	
 	/// Get the expired value for the object / meta key

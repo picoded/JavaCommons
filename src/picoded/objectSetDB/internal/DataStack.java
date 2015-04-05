@@ -57,12 +57,15 @@ public class DataStack extends AbstractMap<String, Map<String, Map<String, Objec
 	// Size limits
 	//----------------------------
 	
+	/// JCache lock timeout, in milliseconds
+	public long cacheLockTimeout = 30000;
+	
 	/// Lmit of all key sizes
-	int keySizeLimit = 260;
+	public int keySizeLimit = 260;
 	
 	/// Limit of val string size
-	int valSizeLmit = 4000;
-	long lobSizeLmit = 4000000000L; //4GB
+	public int valSizeLmit = 4000;
+	public long lobSizeLmit = 4000000000L; //4GB
 	
 	//----------------------------
 	// Structure handling

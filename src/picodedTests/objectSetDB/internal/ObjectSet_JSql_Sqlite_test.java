@@ -73,6 +73,7 @@ public class ObjectSet_JSql_Sqlite_test {
 		assertNotNull(objSetJSql.tableSetup());
 	}
 	
+	/// Iteration count
 	static int basicTestIterations = 15;
 	
 	/// Test basic put/get keyValue
@@ -94,6 +95,13 @@ public class ObjectSet_JSql_Sqlite_test {
 		float tmp_float;
 		
 		double accuracy = 0.000000001;
+		
+		for (int i = 0; i < basicTestIterations; ++i) {
+			tmp_int = rObj.nextInt();
+			
+			assertTrue("String value test", objSetJSql.put("hello", "world", 0, "s" + tmp_int));
+			assertEquals("String value test", "s" + tmp_int, objSetJSql.get("hello", "world", 0));
+		}
 		
 		for (int i = 0; i < basicTestIterations; ++i) {
 			tmp_int = rObj.nextInt();

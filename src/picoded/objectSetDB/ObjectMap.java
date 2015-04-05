@@ -58,6 +58,9 @@ public class ObjectMap extends AbstractMap<String, Object> {
 		setupJCacheLocks();
 	}
 	
+	protected String lockPrefix = "OL$";
+	protected String mapPrefix = "OS$";
+	
 	///----------------------------------------
 	/// JCache lock handling
 	///----------------------------------------
@@ -72,7 +75,7 @@ public class ObjectMap extends AbstractMap<String, Object> {
 		
 		try {
 			for (int a = 0; a < l; ++a) {
-				JCacheLockArray[a] = dStack.ACID_JCache[a].getLock("OL$" + sName + "$" + mName);
+				JCacheLockArray[a] = dStack.ACID_JCache[a].getLock(lockPrefix + sName + "$" + mName);
 				JCacheLockState[a] = false;
 			}
 		} catch (JCacheException e) {
@@ -167,7 +170,7 @@ public class ObjectMap extends AbstractMap<String, Object> {
 			HashMap<String, Object> r = null;
 			JCache[] ACID_JCache = dStack.ACID_JCache;
 			for (int a = 0; a < ACID_JCache.length; ++a) {
-				ConcurrentMap<String, HashMap<String, Object>> setMap = ACID_JCache[a].getMap("OS$" + sName);
+				ConcurrentMap<String, HashMap<String, Object>> setMap = ACID_JCache[a].getMap(mapPrefix + sName);
 				
 				r = setMap.get(mName);
 				if (r != null) {

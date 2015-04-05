@@ -49,7 +49,7 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	protected JSql JSqlObj = null;
 	
 	/// Internal SQL table name
-	protected String sqlTableName;
+	public String sqlTableName;
 	
 	/// Returns the initialized tableName
 	public String tableName() {

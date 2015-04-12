@@ -33,6 +33,9 @@
 ///
 /// ## jCache notes
 ///
+/// @TODO Migrate from VARCHAR, to UNIQUEIDENTIFIER, or 2 BIGINT for name keyspace.
+/// @TODO Auto conversion of string keys to UNIQUEIDENTIFIER / 2 BIGINT
+///
 /// @TODO Basic Java Type checking on PUT / GET
 /// @TODO Key Value, alpha numeric, with underscore/dash/spaces/....
 ///

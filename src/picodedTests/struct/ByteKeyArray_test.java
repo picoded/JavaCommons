@@ -1,7 +1,7 @@
 package picodedTests.struct;
 
 // Target test class
-import picoded.struct.ByteKeyArray;
+import picoded.struct.*;
 
 // Test Case include
 import org.junit.*;
@@ -15,6 +15,7 @@ import java.io.UnsupportedEncodingException;
 ///
 /// Test Case for picoded.struct.ByteKeyArray
 ///
+@SuppressWarnings("deprecation")
 public class ByteKeyArray_test {
 	
 	private ByteKeyArray<String> tObj = null;

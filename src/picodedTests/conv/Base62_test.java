@@ -97,22 +97,24 @@ public class Base62_test {
 	@Test
 	public void base64_encodeAndDecodeOnce() {
 		BaseX b = null;
-		assertNotNull(b = new BaseX("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"));
+		assertNotNull(b = new BaseX("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"));
 		
 		// min, max
-		int byteLen = RandomUtils.nextInt(1, 20);
+		// (2^8)^12 / (64^16) = 1
+		int byteLen = 12; //RandomUtils.nextInt(1, 20);
 		
 		// raw byteArray to encode
 		byte[] byteArr = RandomUtils.nextBytes(byteLen);
 		
 		//encodeBase64String
 		String b64str = null;
+		String bXstr = null;
 		
 		assertNotNull(b64str = Base64.encodeBase64String(byteArr));
-		assertEquals(b64str, b.encode(byteArr));
+		assertEquals(b64str, (bXstr = b.encode(byteArr)));
 		
 		assertArrayEquals(byteArr, Base64.decodeBase64(b64str));
-		assertArrayEquals(byteArr, b.decode(b64str));
+		assertArrayEquals(byteArr, b.decode(bXstr));
 	}
 	
 	@Test

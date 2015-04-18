@@ -72,13 +72,37 @@ public class RESTBuilder_test {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		assertEquals("hello", m.getName());
 		
 		assertNotNull(restObj.apiMethod("test.hello"));
-		assertNotNull(restObj.apiMethod("test.hello").setGet(this, m));
+		assertNotNull(restObj.apiMethod("test.hello").setGET(this, m));
 		
-		assertEquals("world", restObj.apiMethod("test.hello").get());
-		
-		assertEquals("world", restObj.apiMethod("test.hello").get(null, "one", "two"));
+		assertEquals("world", restObj.apiMethod("test.hello").GET());
+		assertEquals("world", restObj.apiMethod("test.hello").GET(null, "one", "two"));
 	}
 	
+	@Test
+	public void echoMethod() {
+		Method m = null;
+		try {
+			assertNotNull(m = RESTBuilder_test.class.getMethod("echo", String.class));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		assertEquals("echo", m.getName());
+		
+		assertNotNull(restObj.apiMethod("test.echo"));
+		assertNotNull(restObj.apiMethod("test.echo").setGET(this, m));
+		
+		assertEquals(null, restObj.apiMethod("test.echo").GET());
+		assertEquals("echo: one", restObj.apiMethod("test.echo").GET("one"));
+		assertEquals("echo: two", restObj.apiMethod("test.echo").GET("two"));
+	}
+	
+	@Test
+	public void simpleSet() {
+		assertNotNull(restObj.apiMethod("test.hello").setGET(this, "hello"));
+		assertEquals("world", restObj.apiMethod("test.hello").GET());
+		
+	}
 }

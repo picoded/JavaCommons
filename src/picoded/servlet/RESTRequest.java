@@ -17,6 +17,9 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 
+// Ext lib used
+import org.apache.commons.lang3.ArrayUtils;
+
 ///
 /// RESTRequest object handler, this is usually the first argument for all
 /// functions registered to the RESTBuilder framework
@@ -52,8 +55,21 @@ public class RESTRequest extends HashMap<String, Object> {
 	/// and limiting it to the accepted argument length
 	public Object[] requestArgs = null;
 	
+	//--------------------------------------------------------------------------------
+	// Constructor and setup
+	//--------------------------------------------------------------------------------
+	
+	/// [For internal use] Builds the rest request with the default values only
 	///
-	public RESTRequest() {
+	/// @param bObj      baseObject representing the "this" for the method call
+	/// @param bMeth     baseMethod is the function which is actually called
+	/// @param bRest     boolean used to indicate if first argument is RESTRequest
+	/// @param defMap    default arguments map
+	/// @param defArg    default request arguments list
+	public RESTRequest(Object bObj, Method bMeth, boolean bRest, //
+		Map<String, Object> defMap, Object[] defArg //
+	) {
+		commonSetup(bObj, bMeth, bRest, defMap, defArg);
 	}
 	
 	/// [For internal use] Builds the full rest request with the given base, default, and request values
@@ -70,12 +86,24 @@ public class RESTRequest extends HashMap<String, Object> {
 		Map<String, Object> defMap, Object[] defArg, //
 		Map<String, Object> reqMap, Object[] reqArg //
 	) {
+		commonSetup(bObj, bMeth, bRest, defMap, defArg);
+		setupRequestArgs(reqMap, reqArg);
+	}
+	
+	/// [For internal use] Common setup function
+	///
+	/// @param bObj      baseObject representing the "this" for the method call
+	/// @param bMeth     baseMethod is the function which is actually called
+	/// @param bRest     boolean used to indicate if first argument is RESTRequest
+	/// @param defMap    default arguments map
+	/// @param defArg    default request arguments list
+	protected void commonSetup(Object bObj, Method bMeth, boolean bRest, //
+		Map<String, Object> defMap, Object[] defArg //
+	) {
+		
 		baseObject = bObj;
 		baseMethod = bMeth;
 		baseMethodUsesRestRequest = bRest;
-		
-		// Make the raw request args avaliable
-		rawRequestArgs = reqArg;
 		
 		// Setup the default set
 		if (defMap != null) {
@@ -92,6 +120,17 @@ public class RESTRequest extends HashMap<String, Object> {
 			}
 		}
 		
+	}
+	
+	/// Sets up the request arguments, this is useful if the constructor occurs
+	/// with only the default values first
+	///
+	/// @param reqMap    request argument map, which overrides the default
+	/// @param reqArg    request argument list, which overrides the default
+	///
+	/// @returns RESTRequest self object, for function chaining
+	public RESTRequest setupRequestArgs(Map<String, Object> reqMap, Object[] reqArg) {
+		
 		// Overwrite non default map
 		if (reqMap != null) {
 			for (Map.Entry<String, Object> entry : reqMap.entrySet()) {
@@ -100,19 +139,17 @@ public class RESTRequest extends HashMap<String, Object> {
 		}
 		
 		// And non default args
-		if (reqArg != null && requestArgs != null) {
-			int aLen = Math.min(reqArg.length, requestArgs.length);
+		if (reqArg != null) {
+			// Make the raw request args avaliable
+			rawRequestArgs = reqArg;
+			
+			int aLen = (requestArgs == null) ? 0 : Math.min(reqArg.length, requestArgs.length);
 			for (int a = 0; a < aLen; ++a) {
 				requestArgs[a] = reqArg[a];
 			}
 		}
 		
-		if (requestArgs == null) {
-			requestArgs = new Object[0];
-		}
-		if (rawRequestArgs == null) {
-			rawRequestArgs = new Object[0];
-		}
+		return this;
 	}
 	
 	//-------------------------------------------------------------------
@@ -126,6 +163,13 @@ public class RESTRequest extends HashMap<String, Object> {
 	///
 	/// @returns  the value returned by the method
 	public Object call() {
+		if (requestArgs == null) {
+			requestArgs = ArrayUtils.EMPTY_OBJECT_ARRAY;
+		}
+		if (rawRequestArgs == null) {
+			rawRequestArgs = ArrayUtils.EMPTY_OBJECT_ARRAY;
+		}
+		
 		try {
 			if (baseMethodUsesRestRequest) {
 				// The function requires RESTRequest as first argument

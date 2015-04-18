@@ -18,53 +18,71 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 
+// Ext lib used
+import org.apache.commons.lang3.ArrayUtils;
+
 /// Internal RESTSet Sub class which handles each function in a namespace
 ///
-/// This handles the actual function calling and can represent a single GET/PUT/POST/DELETE request
+/// This object class helps hold all the various default values
+/// and can represent a single GET/PUT/POST/DELETE request
+///
 class RESTSet {
-	// Core functionalities
+	
+	/// Base object for the method, represents "this"
 	Object baseObject = null;
+	
+	/// The actual method to be called
 	Method baseMethod = null;
 	
-	// Optional defaults
+	/// The default map values
 	Map<String, Object> defaultMap = null;
+	
+	/// The default argument array
 	Object[] defaultArgs = null;
+	
+	/// The array of the method classes, if the first argument is a RESTRequest, it is automatically removed
 	Class<?>[] methodArgsClass = null;
 	
-	int methodArgsLength = 0;
-	boolean firstIsRESTRequest = false;
+	/// Indicates if the method requires a RESTRequest object as the first parameter
+	boolean baseMethodUsesRestRequest = false;
 	
-	//
-	// Commons setup function
-	//
-	// @TODO : Preoperly handle default values (not just null?)
-	//
-	private void commonSetup(Object bObject, Method bMethod, Map<String, Object> dMap, Object[] dArgs) {
+	/// [For internal use] Setsup the actual request method, and check its various argument classes
+	///
+	/// @TODO : Preoperly handle auto default values (not just null?), based on the argument basic class types
+	///
+	/// @param bObject      baseObject representing the "this" for the method call
+	/// @param bMethod     baseMethod is the function which is actually called
+	/// @param defMap    default arguments map
+	/// @param defArg    default request arguments list
+	///
+	private void commonSetup(Object bObject, Method bMethod, Map<String, Object> defMap, Object[] defArg) {
 		baseObject = bObject;
 		baseMethod = bMethod;
 		
 		methodArgsClass = bMethod.getParameterTypes();
-		if (methodArgsLength > 0 && RESTRequest.class.isAssignableFrom(methodArgsClass[0])) {
-			firstIsRESTRequest = true;
+		if (methodArgsClass == null || methodArgsClass.length == 0) {
+			methodArgsClass = ArrayUtils.EMPTY_CLASS_ARRAY;
+		}
+		
+		if (methodArgsClass.length > 0 && RESTRequest.class.isAssignableFrom(methodArgsClass[0])) {
+			baseMethodUsesRestRequest = true;
 			
 			methodArgsClass = Arrays.asList(methodArgsClass) //
 				.subList(1, methodArgsClass.length).toArray(new Class<?>[0]);
 		}
 		
-		methodArgsLength = methodArgsClass.length;
-		
 		// Derive the default arguments list
-		defaultArgs = new Object[methodArgsLength];
+		defaultArgs = new Object[methodArgsClass.length];
 		
-		for (int a = 0; a < methodArgsLength; ++a) {
+		// The default arguments, apply if applicable
+		for (int a = 0; a < methodArgsClass.length; ++a) {
 			defaultArgs[a] = null;
-			
-			if (a < dArgs.length) {
-				defaultArgs[a] = dArgs[a];
+			if (defArg != null && a < defArg.length) {
+				defaultArgs[a] = defArg[a];
 			}
 		}
 		
-		defaultMap = dMap;
+		defaultMap = defMap;
 		if (defaultMap == null) {
 			defaultMap = new HashMap<String, Object>();
 		}
@@ -73,31 +91,44 @@ class RESTSet {
 	//---------------------------------------------------
 	// Constructor function
 	//---------------------------------------------------
-	public RESTSet(Object bObject, Method bMethod, Map<String, Object> dMap, Object[] dArgs) {
-		commonSetup(bObject, bMethod, dMap, dArgs);
+	
+	/// [For internal use] Setsup the RESTSet, and check its various argument classes
+	///
+	/// @param bObject      baseObject representing the "this" for the method call
+	/// @param bMethod     baseMethod is the function which is actually called
+	/// @param defMap    default arguments map
+	/// @param defArg    default request arguments list
+	public RESTSet(Object bObject, Method bMethod, Map<String, Object> defMap, Object[] defArg) {
+		commonSetup(bObject, bMethod, defMap, defArg);
 	}
 	
+	/// [For internal use] Setsup the RESTSet, and check its various argument classes
+	///
+	/// @param bObject      baseObject representing the "this" for the method call
+	/// @param bMethod     baseMethod is the function which is actually called
 	public RESTSet(Object bObject, Method bMethod) {
 		commonSetup(bObject, bMethod, null, null);
-	}
-	
-	public RESTSet() {
 	}
 	
 	//---------------------------------------------------
 	// Function calling
 	//---------------------------------------------------
 	
+	/// Generates a RESTRequest object with the default values
+	protected RESTRequest generateRequest() {
+		return new RESTRequest(baseObject, baseMethod, baseMethodUsesRestRequest, defaultMap, defaultArgs);
+	}
+	
 	// Calls with provided values
 	public Object call(Map<String, Object> reqObj, Object[] reqArg) {
 		// new rest request with default values
-		return null; //return (new RESTRequest(this, reqObj, reqArg)).call();
+		return generateRequest().setupRequestArgs(reqObj, reqArg).call();
 	}
 	
 	// Calls using default values
 	public Object call() {
 		// new rest request with default values
-		return null; //return (new RESTRequest(this, null, null)).call();
+		return generateRequest().call();
 	}
 	
 }

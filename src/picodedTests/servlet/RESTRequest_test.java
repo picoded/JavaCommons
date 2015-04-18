@@ -81,7 +81,8 @@ public class RESTRequest_test {
 		assertNotNull(restObj = new RESTRequest(this, m, false, null, new Object[] { "one" }, null, null));
 		assertEquals("echo: one", restObj.call());
 		
-		assertNotNull(restObj = new RESTRequest(this, m, false, null, new Object[] { "two" }, null, null));
+		assertNotNull(restObj = new RESTRequest(this, m, false, null, new Object[] { "one" }, null,
+			new Object[] { "two" }));
 		assertEquals("echo: two", restObj.call());
 	}
 }

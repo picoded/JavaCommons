@@ -1,7 +1,7 @@
 package picodedTests.servlet;
 
 // Target test class
-import picoded.servlet.RESTBuilder;
+import picoded.servlet.RESTRequest;
 
 // Test Case include
 import org.junit.*;
@@ -15,14 +15,14 @@ import picodedTests.jCache.LocalCacheSetup;
 import java.util.*;
 import java.lang.reflect.*;
 
-public class RESTBuilder_test {
+public class RESTRequest_test {
 	
 	//-------------------------------
 	// Test variables
 	//-------------------------------
 	
 	/// Base RESTBuilder object to test on, automatic setup
-	protected RESTBuilder restObj = null;
+	protected RESTRequest restObj = null;
 	
 	//-------------------------------
 	// Test methods to use as "API's"
@@ -45,7 +45,7 @@ public class RESTBuilder_test {
 	
 	@Before
 	public void setUp() {
-		restObj = new RESTBuilder();
+		//restObj = new RESTRequest();
 	}
 	
 	@After
@@ -56,29 +56,32 @@ public class RESTBuilder_test {
 	//-------------------------------
 	// Basic sanity test
 	//-------------------------------
-	
-	@Test
-	public void constructTest() {
-		assertNotNull(restObj);
-	}
-	
 	@Test
 	public void helloMethod() {
-		assertEquals("world", hello());
-		
 		Method m = null;
 		try {
-			assertNotNull(m = RESTBuilder_test.class.getMethod("hello"));
+			assertNotNull(m = RESTRequest_test.class.getMethod("hello"));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		
-		assertNotNull(restObj.apiMethod("test.hello"));
-		assertNotNull(restObj.apiMethod("test.hello").setGet(this, m));
-		
-		assertEquals("world", restObj.apiMethod("test.hello").get());
-		
-		assertEquals("world", restObj.apiMethod("test.hello").get(null, "one", "two"));
+		assertNotNull(restObj = new RESTRequest(this, m, false, null, null, null, null));
+		assertEquals("world", restObj.call());
 	}
 	
+	@Test
+	public void echoMethod() {
+		Method m = null;
+		try {
+			assertNotNull(m = RESTRequest_test.class.getMethod("echo", String.class));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
+		assertNotNull(restObj = new RESTRequest(this, m, false, null, new Object[] { "one" }, null, null));
+		assertEquals("echo: one", restObj.call());
+		
+		assertNotNull(restObj = new RESTRequest(this, m, false, null, new Object[] { "two" }, null, null));
+		assertEquals("echo: two", restObj.call());
+	}
 }

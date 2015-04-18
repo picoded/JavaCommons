@@ -20,7 +20,7 @@ import java.io.UnsupportedEncodingException;
 
 /// Internal RESTSet Sub class which handles each function in a namespace
 ///
-/// This handles the actual function calling and can represent either GET/PUT/POST/DELETE
+/// This handles the actual function calling and can represent a single GET/PUT/POST/DELETE request
 class RESTSet {
 	// Core functionalities
 	Object baseObject = null;
@@ -34,11 +34,12 @@ class RESTSet {
 	int methodArgsLength = 0;
 	boolean firstIsRESTRequest = false;
 	
+	//
 	// Commons setup function
 	//
 	// @TODO : Preoperly handle default values (not just null?)
 	//
-	private void commonSetup(Object bObject, Method bMethod, Object[] dArgs, Map<String, Object> dMap) {
+	private void commonSetup(Object bObject, Method bMethod, Map<String, Object> dMap, Object[] dArgs) {
 		baseObject = bObject;
 		baseMethod = bMethod;
 		
@@ -69,16 +70,34 @@ class RESTSet {
 		}
 	}
 	
-	public RESTSet() {
+	//---------------------------------------------------
+	// Constructor function
+	//---------------------------------------------------
+	public RESTSet(Object bObject, Method bMethod, Map<String, Object> dMap, Object[] dArgs) {
+		commonSetup(bObject, bMethod, dMap, dArgs);
 	}
 	
 	public RESTSet(Object bObject, Method bMethod) {
 		commonSetup(bObject, bMethod, null, null);
 	}
 	
+	public RESTSet() {
+	}
+	
+	//---------------------------------------------------
+	// Function calling
+	//---------------------------------------------------
+	
+	// Calls with provided values
+	public Object call(Map<String, Object> reqObj, Object[] reqArg) {
+		// new rest request with default values
+		return null; //return (new RESTRequest(this, reqObj, reqArg)).call();
+	}
+	
 	// Calls using default values
 	public Object call() {
 		// new rest request with default values
-		return (new RESTRequest(this, null, null)).call();
+		return null; //return (new RESTRequest(this, null, null)).call();
 	}
+	
 }

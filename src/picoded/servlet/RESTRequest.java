@@ -17,47 +17,101 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 
-/// RESTRequest object handler, this is the first argument for all
+///
+/// RESTRequest object handler, this is usually the first argument for all
 /// functions registered to the RESTBuilder framework
+///
+/// It represents the request object, and include utility functions 
+///
 public class RESTRequest extends HashMap<String, Object> {
+	
+	//--------------------------------------------------------------------------------
+	// Protected vars
+	//--------------------------------------------------------------------------------
+	
 	/// Build warning suppression
 	static final long serialVersionUID = 1L;
+	
+	/// Base object which represents the "this" argument during the function call
+	protected Object baseObject = null;
+	
+	/// Base method that is actually executed
+	protected Method baseMethod = null;
+	
+	/// Indicates if the base method starts with RESTRequest
+	protected boolean baseMethodUsesRestRequest = false;
+	
+	//--------------------------------------------------------------------------------
+	// Public request vars
+	//--------------------------------------------------------------------------------
 	
 	/// The request arguments for the function, in its raw form
 	public Object[] rawRequestArgs = null;
 	
-	/// The request arguments for the function, after applying default valeus
+	/// The request arguments for the function, after applying default valeus,
+	/// and limiting it to the accepted argument length
 	public Object[] requestArgs = null;
 	
-	public RESTRequest(RESTSet baseSet, Map<String, Object> reqObj, Object[] reqArg) {
+	///
+	public RESTRequest() {
+	}
+	
+	/// [For internal use] Builds the full rest request with the given base, default, and request values
+	/// Note that this constructor is meant for use internally, and not meant to be called directly
+	///
+	/// @param bObj      baseObject representing the "this" for the method call
+	/// @param bMeth     baseMethod is the function which is actually called
+	/// @param bRest     boolean used to indicate if first argument is RESTRequest
+	/// @param defMap    default arguments map
+	/// @param defArg    default request arguments list
+	/// @param reqMap    request argument map, which overrides the default
+	/// @param reqArg    request argument list, which overrides the default
+	public RESTRequest(Object bObj, Method bMeth, boolean bRest, //
+		Map<String, Object> defMap, Object[] defArg, //
+		Map<String, Object> reqMap, Object[] reqArg //
+	) {
+		baseObject = bObj;
+		baseMethod = bMeth;
+		baseMethodUsesRestRequest = bRest;
+		
+		// Make the raw request args avaliable
 		rawRequestArgs = reqArg;
-		requestSet = baseSet;
 		
 		// Setup the default set
-		if (baseSet.defaultMap != null) {
-			for (Map.Entry<String, Object> entry : baseSet.defaultMap.entrySet()) {
+		if (defMap != null) {
+			for (Map.Entry<String, Object> entry : defMap.entrySet()) {
 				this.put(entry.getKey(), entry.getValue());
 			}
 		}
 		
-		// And default args
-		requestArgs = new Object[baseSet.methodArgsLength];
-		for (int a = 0; a < baseSet.methodArgsLength; ++a) {
-			requestArgs[a] = baseSet.defaultArgs[a];
+		// Setup the default args
+		if (defArg != null) {
+			requestArgs = new Object[defArg.length];
+			for (int a = 0; a < defArg.length; ++a) {
+				requestArgs[a] = defArg[a];
+			}
 		}
 		
 		// Overwrite non default map
-		if (reqObj != null) {
-			for (Map.Entry<String, Object> entry : reqObj.entrySet()) {
+		if (reqMap != null) {
+			for (Map.Entry<String, Object> entry : reqMap.entrySet()) {
 				this.put(entry.getKey(), entry.getValue());
 			}
 		}
 		
 		// And non default args
-		if (reqArg != null) {
-			for (int a = 0; a < reqArg.length; ++a) {
+		if (reqArg != null && requestArgs != null) {
+			int aLen = Math.min(reqArg.length, requestArgs.length);
+			for (int a = 0; a < aLen; ++a) {
 				requestArgs[a] = reqArg[a];
 			}
+		}
+		
+		if (requestArgs == null) {
+			requestArgs = new Object[0];
+		}
+		if (rawRequestArgs == null) {
+			rawRequestArgs = new Object[0];
 		}
 	}
 	
@@ -65,23 +119,28 @@ public class RESTRequest extends HashMap<String, Object> {
 	// Internal function / package space
 	//-------------------------------------------------------------------
 	
-	/// The RESTSet that contians the function call
-	RESTSet requestSet = null;
-	
 	/// Does the actual request call, with the current request
-	Object call() {
+	///
+	/// Note that care should be done to make when doing this call by the internal method itself
+	/// which can result into a never ending recursive loop.
+	///
+	/// @returns  the value returned by the method
+	public Object call() {
 		try {
-			// nothing to pass as arguments?
-			if (requestSet.methodArgsClass == null || requestSet.methodArgsLength == 0) {
-				if (requestSet.firstIsRESTRequest) {
-					return requestSet.baseMethod.invoke(requestSet.baseObject, this);
+			if (baseMethodUsesRestRequest) {
+				// The function requires RESTRequest as first argument
+				if (requestArgs.length == 0) {
+					return baseMethod.invoke(baseObject, this);
 				} else {
-					return requestSet.baseMethod.invoke(requestSet.baseObject);
+					return baseMethod.invoke(baseObject, this, requestArgs);
 				}
-			} else if (requestSet.firstIsRESTRequest) {
-				return requestSet.baseMethod.invoke(requestSet.baseObject, this, requestArgs);
 			} else {
-				return requestSet.baseMethod.invoke(requestSet.baseObject, requestArgs);
+				// The function does not accepts RESTRequest as first argument
+				if (requestArgs.length == 0) {
+					return baseMethod.invoke(baseObject);
+				} else {
+					return baseMethod.invoke(baseObject, requestArgs);
+				}
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);

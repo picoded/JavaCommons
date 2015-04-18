@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 
+///
 /// Internal RESTMethod Sub class which handles each function namespace seperately
 ///
 /// CRUD       HTTP
@@ -59,16 +60,28 @@ public class RESTMethod {
 		return this;
 	}
 	
+	//---------------------------------------
+	// Get request handling
+	//---------------------------------------
+	
+	/// Calls a REST GET request with the map & array arguments
+	public Object get(Map<String, Object> reqObject, Object... reqArgs) {
+		return (getMethod != null) ? getMethod.call(reqObject, reqArgs) : null;
+	}
+	
+	/// Calls a REST GET request with the map arguments
+	public Object get(Map<String, Object> reqObject) {
+		return (getMethod != null) ? getMethod.call(reqObject, null) : null;
+	}
+	
+	/// Calls a REST GET request with the array arguments
+	public Object get(Object... reqArgs) {
+		return (getMethod != null) ? getMethod.call(null, reqArgs) : null;
+	}
+	
 	/// Calls a REST GET request without any arguments
 	public Object get() {
-		try {
-			if (getMethod != null) {
-				return getMethod.call();
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		return null;
+		return (getMethod != null) ? getMethod.call() : null;
 	}
 	
 	/*

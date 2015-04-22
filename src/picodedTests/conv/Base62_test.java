@@ -53,24 +53,23 @@ public class Base62_test {
 		assertEquals(3, b.bitToStringLength(9));
 		
 		assertEquals("000", b.encode(new byte[] { 0 }));
-		assertEquals("700", b.encode(new byte[] { 7 }));
+		assertEquals("007", b.encode(new byte[] { 7 }));
 		assertEquals("010", b.encode(new byte[] { 8 }));
 		assertEquals("040", b.encode(new byte[] { 32 }));
-		assertEquals("001", b.encode(new byte[] { 64 }));
+		assertEquals("100", b.encode(new byte[] { 64 }));
 		
 		assertArrayEquals(new byte[] { 0 }, b.decode("000"));
-		assertArrayEquals(new byte[] { 7 }, b.decode("700"));
+		assertArrayEquals(new byte[] { 7 }, b.decode("007"));
 		assertArrayEquals(new byte[] { 8 }, b.decode("010"));
 		assertArrayEquals(new byte[] { 32 }, b.decode("040"));
-		assertArrayEquals(new byte[] { 64 }, b.decode("001"));
+		assertArrayEquals(new byte[] { 64 }, b.decode("100"));
 		
-		//assertEquals("000000", b.encode(new byte[] { 0, 0 }));
-		//assertEquals("004300", b.encode(new byte[] { 7, 0 }));
-		//assertEquals("700000", b.encode(new byte[] { 0, 7 }));
-		
-		//assertArrayEquals(new byte[] { 0, 0 }, b.decode("000000"));
-		//assertArrayEquals(new byte[] { 7, 0 }, b.decode("004300"));
-		//assertArrayEquals(new byte[] { 0, 7 }, b.decode("700000"));
+		assertEquals("000000", b.encode(new byte[] { 0, 0 }));
+		assertEquals("003400", b.encode(new byte[] { 7, 0 }));
+		assertEquals("000007", b.encode(new byte[] { 0, 7 }));
+		assertArrayEquals(new byte[] { 0, 0 }, b.decode("000000", 2));
+		assertArrayEquals(new byte[] { 7, 0 }, b.decode("003400", 2));
+		assertArrayEquals(new byte[] { 0, 7 }, b.decode("000007", 2));
 	}
 	
 	@Test
@@ -95,6 +94,26 @@ public class Base62_test {
 	}
 	
 	@Test
+	public void base64_helloWorld() {
+		BaseX b = null;
+		assertNotNull(b = new BaseX("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"));
+		
+		// raw byteArray to encode
+		byte[] byteArr = ("Hello World!").getBytes();
+		int byteLen = byteArr.length;
+		
+		//encodeBase64String
+		String b64str = null;
+		String bXstr = null;
+		
+		assertNotNull(b64str = Base64.encodeBase64String(byteArr));
+		assertEquals(b64str, (bXstr = b.encode(byteArr)));
+		
+		assertArrayEquals(byteArr, Base64.decodeBase64(b64str));
+		assertArrayEquals(byteArr, b.decode(bXstr));
+	}
+	
+	@Test
 	public void base64_encodeAndDecodeOnce() {
 		BaseX b = null;
 		assertNotNull(b = new BaseX("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"));
@@ -113,14 +132,31 @@ public class Base62_test {
 		assertNotNull(b64str = Base64.encodeBase64String(byteArr));
 		assertEquals(b64str, (bXstr = b.encode(byteArr)));
 		
-		assertArrayEquals(byteArr, Base64.decodeBase64(b64str));
-		assertArrayEquals(byteArr, b.decode(bXstr));
+		assertArrayEquals("For encoded string: " + b64str, byteArr, Base64.decodeBase64(b64str));
+		assertArrayEquals("For encoded string: " + bXstr, byteArr, b.decode(bXstr));
 	}
 	
 	@Test
 	public void base64_encodeAndDecodeMultiple() {
-		for (int a = 0; a < 50; ++a) {
+		for (int a = 0; a < 500; ++a) {
 			base64_encodeAndDecodeOnce();
+		}
+	}
+	
+	@Test
+	public void base64_edgeCases() {
+		BaseX b = null;
+		byte[] byteArr = null;
+		assertNotNull(b = new BaseX("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"));
+		
+		String[] edgeCases = new String[] { "AFvcGhtpwLHfjTWe" };
+		
+		for (int a = 0; a < edgeCases.length; ++a) {
+			assertNotNull(byteArr = Base64.decodeBase64(edgeCases[a]));
+			assertArrayEquals("For encoded string: " + edgeCases[a], byteArr, b.decode(edgeCases[a]));
+			
+			assertEquals(edgeCases[a], Base64.encodeBase64String(byteArr));
+			assertEquals(edgeCases[a], b.encode(byteArr));
 		}
 	}
 	
@@ -138,7 +174,6 @@ public class Base62_test {
 	///
 	@Test
 	public void encodeAndDecodeOnce() {
-		
 		// min, max
 		int byteLen = RandomUtils.nextInt(1, 20);
 		
@@ -149,5 +184,12 @@ public class Base62_test {
 		String encodedString;
 		assertNotNull(encodedString = baseObj.encode(byteArr));
 		assertArrayEquals(byteArr, baseObj.decode(encodedString, byteLen));
+	}
+	
+	@Test
+	public void encodeAndDecodeMultiple() {
+		for (int a = 0; a < 500; ++a) {
+			encodeAndDecodeOnce();
+		}
 	}
 }

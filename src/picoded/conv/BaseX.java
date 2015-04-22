@@ -209,18 +209,24 @@ public class BaseX {
 		
 		// Actual value is larger, NOTE there will be bit value loss
 		if (fullEncodedValue.length > byteLength) {
-			logger.warning("Encoded value loss for givent byteLength(" + byteLength + ") for input encodedString: "
-				+ encodedString);
+			int copyFrom = (fullEncodedValue.length - byteLength);
+			
+			for (int a = 0; a < copyFrom; ++a) {
+				if (fullEncodedValue[a] != 0) {
+					logger.warning("Encoded value loss for givent byteLength(" + byteLength + ") for input encodedString: "
+						+ encodedString);
+				}
+			}
 			
 			System.arraycopy( //
-				fullEncodedValue, 1, //original value
+				fullEncodedValue, copyFrom, //original value
 				retValue, 0, //copy despite data loss?
 				byteLength //all the data
 				);
 		} else { //is less, as equal is already checked above and is hence not possible
 			System.arraycopy( //
 				fullEncodedValue, 0, //original value
-				retValue, 0, //copy despite data loss?
+				retValue, retValue.length - fullEncodedValue.length, //copy despite data loss?
 				fullEncodedValue.length //all the data
 				);
 		}

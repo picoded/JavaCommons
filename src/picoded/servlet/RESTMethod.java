@@ -37,16 +37,16 @@ public class RESTMethod {
 	//---------------------------------------
 	
 	/// The GET method type
-	public static final int GET = 0;
+	public static final int TYPE_GET = 0;
 	
 	/// The PUT method type
-	public static final int PUT = 1;
+	public static final int TYPE_PUT = 1;
 	
 	/// The POST method type
-	public static final int POST = 2;
+	public static final int TYPE_POST = 2;
 	
 	/// The DELETE method type
-	public static final int DELETE = 3;
+	public static final int TYPE_DELETE = 3;
 	
 	/// Maximium range of all method types
 	private static final int methodSetMax = 4;
@@ -111,7 +111,7 @@ public class RESTMethod {
 	}
 	
 	/// Sets the method for the given type via reflection with the method name only,
-	/// in event that 2 overloaded method exists with the same name, an exception is thrown
+	/// in event that 2 overloaded method exists with the same name, a RuntimeException is thrown
 	public RESTMethod setMethod(int methodType, Object baseObject, String methodName) {
 		Method m = null;
 		Method[] mArr = null;
@@ -161,37 +161,37 @@ public class RESTMethod {
 	
 	/// Sets a REST GET request
 	public RESTMethod setGET(Object baseObject, Method baseMethod) {
-		return setMethod(GET, baseObject, baseMethod);
+		return setMethod(TYPE_GET, baseObject, baseMethod);
 	}
 	
 	/// Set a REST GET with just the method name
 	public RESTMethod setGET(Object baseObject, String methodName) {
-		return setMethod(GET, baseObject, methodName);
+		return setMethod(TYPE_GET, baseObject, methodName);
 	}
 	
 	/// Set a REST GET with the given class array
 	public RESTMethod setGET(Object baseObject, String methodName, Class<?> classArr) {
-		return setMethod(GET, baseObject, methodName, classArr);
+		return setMethod(TYPE_GET, baseObject, methodName, classArr);
 	}
 	
 	/// Calls a REST GET request with the map & array arguments
 	public Object GET(Map<String, Object> reqObject, Object... reqArgs) {
-		return callMethod(GET, reqObject, reqArgs);
+		return callMethod(TYPE_GET, reqObject, reqArgs);
 	}
 	
 	/// Calls a REST GET request with the map arguments
 	public Object GET(Map<String, Object> reqObject) {
-		return callMethod(GET, reqObject, null);
+		return callMethod(TYPE_GET, reqObject, null);
 	}
 	
 	/// Calls a REST GET request with the array arguments
 	public Object GET(Object... reqArgs) {
-		return callMethod(GET, null, reqArgs);
+		return callMethod(TYPE_GET, null, reqArgs);
 	}
 	
 	/// Calls a REST GET request without any arguments
 	public Object GET() {
-		return callMethod(GET, null, null);
+		return callMethod(TYPE_GET, null, null);
 	}
 	
 }

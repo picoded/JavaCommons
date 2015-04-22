@@ -126,7 +126,6 @@ public class BaseX {
 		
 		/// Store into the Memoization cache
 		stringToBitCache.put(stringLength, n);
-		
 		return n;
 	}
 	
@@ -137,7 +136,7 @@ public class BaseX {
 		int remainder;
 		int stringlength = bitToStringLength(bArr.length * 8); //Derived string length needed
 		StringBuilder ret = new StringBuilder();
-		BigInteger[] dSplit = new BigInteger[] { (new BigInteger(bArr)), null };
+		BigInteger[] dSplit = new BigInteger[] { (new BigInteger(1, bArr)), null };
 		
 		// For every string character needed (to fit byte array), derive the value
 		for (int a = 0; a < stringlength; ++a) {
@@ -146,7 +145,7 @@ public class BaseX {
 			remainder = dSplit[1].intValue();
 			ret.append(inCharset.charAt((remainder < 0) ? 0 : remainder));
 		}
-		
+		ret.reverse();
 		return ret.toString();
 	}
 	
@@ -172,16 +171,20 @@ public class BaseX {
 		// Derive max byte length : auto if -1
 		if (byteLength < 0) {
 			byteLength = stringToBitLength(stringlength) / 8;
+         int mod = stringToBitLength(stringlength) % 8;
+         if (mod != 0) {
+            byteLength++;
+         }
 		}
 		BigInteger encodedValue = base0BigInteger;
 		
 		// Reverse the encoded string, to process as BigInteger
-		encodedString = new StringBuilder(encodedString).reverse().toString();
+		//encodedString = new StringBuilder(encodedString).reverse().toString();
+		encodedString = new StringBuilder(encodedString).toString();
 		
 		// Iterate the characters and get the encoded value
 		for (char character : encodedString.toCharArray()) {
 			indx = inCharset.indexOf(character);
-			
 			if (indx < 0) {
 				throw new IllegalArgumentException("Invalid character(s) in string: `" + character + "` for full string:"
 					+ encodedString);
@@ -189,10 +192,8 @@ public class BaseX {
 			
 			encodedValue = encodedValue.multiply(inCharsetLength).add(BigInteger.valueOf(indx));
 		}
-		
 		byte[] fullEncodedValue = encodedValue.toByteArray();
 		//ArrayUtils.reverse(fullEncodedValue);
-		
 		if (fullEncodedValue.length == byteLength) {
 			return fullEncodedValue;
 		}
@@ -210,9 +211,9 @@ public class BaseX {
 		if (fullEncodedValue.length > byteLength) {
 			logger.warning("Encoded value loss for givent byteLength(" + byteLength + ") for input encodedString: "
 				+ encodedString);
-			
+         
 			System.arraycopy( //
-				fullEncodedValue, 0, //original value
+				fullEncodedValue, 1, //original value
 				retValue, 0, //copy despite data loss?
 				byteLength //all the data
 				);
@@ -222,9 +223,8 @@ public class BaseX {
 				retValue, 0, //copy despite data loss?
 				fullEncodedValue.length //all the data
 				);
-		}
+      }
 		
-		//
 		return retValue;
 	}
 }

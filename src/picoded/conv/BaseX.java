@@ -171,10 +171,10 @@ public class BaseX {
 		// Derive max byte length : auto if -1
 		if (byteLength < 0) {
 			byteLength = stringToBitLength(stringlength) / 8;
-         int mod = stringToBitLength(stringlength) % 8;
-         if (mod != 0) {
-            byteLength++;
-         }
+			int mod = stringToBitLength(stringlength) % 8;
+			if (mod != 0) {
+				byteLength++;
+			}
 		}
 		BigInteger encodedValue = base0BigInteger;
 		
@@ -211,7 +211,7 @@ public class BaseX {
 		if (fullEncodedValue.length > byteLength) {
 			logger.warning("Encoded value loss for givent byteLength(" + byteLength + ") for input encodedString: "
 				+ encodedString);
-         
+			
 			System.arraycopy( //
 				fullEncodedValue, 1, //original value
 				retValue, 0, //copy despite data loss?
@@ -223,7 +223,7 @@ public class BaseX {
 				retValue, 0, //copy despite data loss?
 				fullEncodedValue.length //all the data
 				);
-      }
+		}
 		
 		return retValue;
 	}

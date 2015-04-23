@@ -152,12 +152,12 @@ public class RESTMethod {
 	}
 	
 	/// Calls the given method type
-	public Object callMethod(int methodType, Map<String, Object> reqObject, Object[] reqArgs) {
+	public Object callMethod(int methodType, Map<String, ?> reqObject, Object[] reqArgs) {
 		return (methodSet[methodType] != null) ? methodSet[methodType].call(reqObject, reqArgs) : null;
 	}
 	
 	/// Set the default for the method
-	public RESTMethod setDefault(int methodType, Map<String, Object> defMap, Object[] defArg) {
+	public RESTMethod setDefault(int methodType, Map<String, ?> defMap, Object[] defArg) {
 		if (methodSet[methodType] != null) {
 			methodSet[methodType].setDefault(defMap, defArg);
 		}
@@ -184,17 +184,17 @@ public class RESTMethod {
 	}
 	
 	/// Set the REST GET default value
-	public RESTMethod setDefaultGET(Map<String, Object> defMap, Object[] defArg) {
+	public RESTMethod setDefaultGET(Map<String, ?> defMap, Object[] defArg) {
 		return setDefault(TYPE_GET, defMap, defArg);
 	}
 	
 	/// Calls a REST GET request with the map & array arguments
-	public Object GET(Map<String, Object> reqObject, Object... reqArgs) {
+	public Object GET(Map<String, ?> reqObject, Object... reqArgs) {
 		return callMethod(TYPE_GET, reqObject, reqArgs);
 	}
 	
 	/// Calls a REST GET request with the map arguments
-	public Object GET(Map<String, Object> reqObject) {
+	public Object GET(Map<String, ?> reqObject) {
 		return callMethod(TYPE_GET, reqObject, null);
 	}
 	

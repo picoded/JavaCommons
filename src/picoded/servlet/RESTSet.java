@@ -35,7 +35,7 @@ class RESTSet {
 	Method baseMethod = null;
 	
 	/// The default map values
-	Map<String, Object> defaultMap = null;
+	Map<String, ?> defaultMap = null;
 	
 	/// The default argument array
 	Object[] defaultArgs = null;
@@ -55,7 +55,7 @@ class RESTSet {
 	/// @param defMap    default arguments map
 	/// @param defArg    default request arguments list
 	///
-	private void commonSetup(Object bObject, Method bMethod, Map<String, Object> defMap, Object[] defArg) {
+	private void commonSetup(Object bObject, Method bMethod, Map<String, ?> defMap, Object[] defArg) {
 		baseObject = bObject;
 		baseMethod = bMethod;
 		
@@ -79,7 +79,7 @@ class RESTSet {
 	/// @param defMap    default arguments map
 	/// @param defArg    default request arguments list
 	///
-	public void setDefault(Map<String, Object> defMap, Object[] defArg) {
+	public void setDefault(Map<String, ?> defMap, Object[] defArg) {
 		
 		// Replace the default map
 		if (defMap != null) {
@@ -123,7 +123,7 @@ class RESTSet {
 	/// @param bMethod     baseMethod is the function which is actually called
 	/// @param defMap    default arguments map
 	/// @param defArg    default request arguments list
-	public RESTSet(Object bObject, Method bMethod, Map<String, Object> defMap, Object[] defArg) {
+	public RESTSet(Object bObject, Method bMethod, Map<String, ?> defMap, Object[] defArg) {
 		commonSetup(bObject, bMethod, defMap, defArg);
 	}
 	
@@ -145,7 +145,7 @@ class RESTSet {
 	}
 	
 	// Calls with provided values
-	public Object call(Map<String, Object> reqObj, Object[] reqArg) {
+	public Object call(Map<String, ?> reqObj, Object[] reqArg) {
 		// new rest request with default values
 		return generateRequest().setupRequestArgs(reqObj, reqArg).call();
 	}

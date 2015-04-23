@@ -209,4 +209,20 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 		}
 	}
 	
+	/// Fetch table Meta Data info
+	@SuppressWarnings("unchecked")
+	public Map<String, String> fetchMetaData() throws JSqlException {
+		Map<String, String> ret = null;
+		if (sqlRes != null) {
+			ret = new HashMap<String, String>();
+			try {
+				while (sqlRes.next()) {
+					ret.put(sqlRes.getString("COLUMN_NAME").toUpperCase(), sqlRes.getString("TYPE_NAME").toUpperCase());
+				}
+			} catch (Exception e) {
+				throw new JSqlException("Error fetching sql meta data", e);
+			}
+		}
+		return ret;
+	}
 }

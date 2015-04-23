@@ -39,13 +39,16 @@ public class RESTBuilder_test {
 		return null;
 	}
 	
-	public static String mapTest(RESTRequest hello, String world) {
+	public static String mapTest(RESTRequest hello, Object world) {
 		String res = "";
 		if (hello.containsKey("hello")) {
 			res += hello.get("hello").toString();
 		}
 		
-		res += world;
+		if (world != null) {
+			res += world.toString();
+		}
+		
 		return res;
 	}
 	
@@ -121,6 +124,8 @@ public class RESTBuilder_test {
 		HashMap<String, String> dMap = new HashMap<String, String>();
 		dMap.put("hello", "hello");
 		
-		//assertNotNull(restObj.apiMethod("test.map").setGET(this, "mapTest").setDefaultGET(dMap, new Object[] { "world" }));
+		assertNotNull(restObj.apiMethod("test.map").setGET(this, "mapTest").setDefaultGET(dMap, new Object[] { "world" }));
+		
+		assertEquals("world", restObj.apiMethod("test.map").GET());
 	}
 }

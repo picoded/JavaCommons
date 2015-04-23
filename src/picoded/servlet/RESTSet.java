@@ -79,7 +79,7 @@ class RESTSet {
 	/// @param defMap    default arguments map
 	/// @param defArg    default request arguments list
 	///
-	public void setDefault(Map<String, ?> defMap, Object[] defArg) {
+	public void setDefault(Map<String, ?> defMap, Object... defArg) {
 		
 		// Replace the default map
 		if (defMap != null) {

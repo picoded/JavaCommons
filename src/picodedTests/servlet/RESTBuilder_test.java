@@ -124,8 +124,19 @@ public class RESTBuilder_test {
 		HashMap<String, String> dMap = new HashMap<String, String>();
 		dMap.put("hello", "hello");
 		
+		HashMap<String, String> tMap = new HashMap<String, String>();
+		tMap.put("hello", "oh wow, hello");
+		
 		assertNotNull(restObj.apiMethod("test.map").setGET(this, "mapTest").setDefaultGET(dMap, new Object[] { "world" }));
 		
-		assertEquals("world", restObj.apiMethod("test.map").GET());
+		assertEquals("helloworld", restObj.apiMethod("test.map").GET());
+		assertEquals("oh wow, helloworld", restObj.apiMethod("test.map").GET(tMap));
+		assertEquals("oh wow, hello new world", restObj.apiMethod("test.map").GET(tMap, " new world"));
+		
+		assertNotNull(restObj.apiMethod("test.map").setGET(this, "mapTest").setDefaultGET(dMap, "world"));
+		
+		assertEquals("helloworld", restObj.apiMethod("test.map").GET());
+		assertEquals("oh wow, helloworld", restObj.apiMethod("test.map").GET(tMap));
+		assertEquals("oh wow, hello new world", restObj.apiMethod("test.map").GET(tMap, " new world"));
 	}
 }

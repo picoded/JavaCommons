@@ -176,7 +176,7 @@ public class RESTRequest extends HashMap<String, Object> {
 				if (requestArgs.length == 0) {
 					return baseMethod.invoke(baseObject, this);
 				} else {
-					return baseMethod.invoke(baseObject, this, requestArgs);
+					return baseMethod.invoke(baseObject, ArrayUtils.addAll(new Object[] { this }, requestArgs));
 				}
 			} else {
 				// The function does not accepts RESTRequest as first argument

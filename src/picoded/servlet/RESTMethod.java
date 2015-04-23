@@ -157,7 +157,7 @@ public class RESTMethod {
 	}
 	
 	/// Set the default for the method
-	public RESTMethod setDefault(int methodType, Map<String, ?> defMap, Object[] defArg) {
+	public RESTMethod setDefault(int methodType, Map<String, ?> defMap, Object... defArg) {
 		if (methodSet[methodType] != null) {
 			methodSet[methodType].setDefault(defMap, defArg);
 		}
@@ -184,7 +184,7 @@ public class RESTMethod {
 	}
 	
 	/// Set the REST GET default value
-	public RESTMethod setDefaultGET(Map<String, ?> defMap, Object[] defArg) {
+	public RESTMethod setDefaultGET(Map<String, ?> defMap, Object... defArg) {
 		return setDefault(TYPE_GET, defMap, defArg);
 	}
 	

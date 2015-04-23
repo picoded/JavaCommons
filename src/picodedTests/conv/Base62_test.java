@@ -166,7 +166,7 @@ public class Base62_test {
 	@Test
 	public void charset() {
 		assertEquals(62, Base62.defaultCharSet.length());
-		assertEquals(Base62.defaultCharSet, baseObj.charset());
+		assertEquals(Base62.defaultCharSet, (new Base62()).charset());
 	}
 	
 	///

@@ -24,11 +24,11 @@ public class Base62 extends BaseX {
 	public Base62(String customCharset) {
 		super(customCharset);
 		if (customCharset.length() != 62) {
-			throw new IllegalArgumentException("Charset string length, must be 62. This is base62 DUH");
+			throw new IllegalArgumentException("Charset string length, must be 62. This is base62 after all my friend.");
 		}
 	}
 	
 	/// Self refencing static copy
-	protected final static Base62 staticCopy = new Base62();
+	public final static Base62 obj = new Base62();
 	
 }

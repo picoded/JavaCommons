@@ -8,7 +8,7 @@ package picoded.conv;
 ///
 /// The default base58 charset is based on bitcoin base58 charset. According to wikipedia: http://en.wikipedia.org/wiki/Base58
 ///
-/// Main advantage of using a base 58 charset, is that for a GUID its length space is the same, while avoiding common typos
+/// Main advantage of using a base 58 charset, is that for a GUID its length space is the same compared to Base64, while avoiding common typos
 ///
 /// Alternate character sets can be specified when constructing the object.
 public class Base58 extends BaseX {
@@ -25,6 +25,7 @@ public class Base58 extends BaseX {
 		super(defaultCharSet);
 	}
 	
+	/// Constructor with alternative charset
 	public Base58(String customCharset) {
 		super(customCharset);
 		if (customCharset.length() != 58) {

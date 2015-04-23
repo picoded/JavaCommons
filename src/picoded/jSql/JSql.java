@@ -3,6 +3,7 @@ package picoded.jSql;
 import java.lang.String;
 import java.io.File;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -592,5 +593,29 @@ public class JSql implements BaseInterface {
 		String columnNames // The column name to create the index on
 	) {
 		return createTableIndexQuerySet(tableName, columnNames, null, null);
+	}
+	
+	/// Executes the table meta data query, and returns the result object
+	public JSqlResult executeQuery_metadata(String table) throws JSqlException {
+		JSqlResult res = null;
+		try {
+			ResultSet rs = null;
+			//Try and finally : prevent memory leaks
+			try {
+				DatabaseMetaData meta = sqlConn.getMetaData();
+				rs = meta.getColumns(null, null, table, null);
+				res = new JSqlResult(null, rs);
+				
+				//let JSqlResult "close" it
+				rs = null;
+				return res;
+			} finally {
+				if (rs != null) {
+					rs.close();
+				}
+			}
+		} catch (Exception e) {
+			throw new JSqlException("executeQuery_metadata exception", e);
+		}
 	}
 }

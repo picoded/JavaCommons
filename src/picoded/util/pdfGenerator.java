@@ -7,85 +7,91 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-/// pdfGenerator is a component class to do HTML to PDF file conversion & saving
-///
-/// As this class , several of its common functionalities are inherited
+/// pdfGenerator is a utility class to covert either a HTML string or a HTML file to a PDF file
 ///
 /// ### Example Usage
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.java}
 ///
-/// String pdfFile = ./picodedTests/testingFiles/pdfFile.pdf
-/// OutputStream os = new FileOutputStream(pdfFile);
+/// // covert a HTML file to a pdf file
 ///
-/// String htmlFilePath =./picodedTests/testingFiles/test.html
-/// String url2 = new File(htmlFilePath).toURI().toString();
+/// String pdfOutputFile = //picodedTests/testingFiles/pdfFile.pdf
+/// String htmlInputFile = //picodedTests/testingFiles/test.html
+/// pdfGenerator.generatePDFfromHTML(pdfOutputFile, htmlInputFile);
 ///
-/// String rawHtml = ./picodedTests/testingFiles/welcome.html
-/// String url2 = rawHtml.toString();
+/// // covert a HTML string to a pdf file
 ///
-/// String outputpdfpath = ./picodedTests/testingFiles/outputpdfpath.pdf
-/// OutputStream os = new FileOutputStream(outputpdfpath);
-///
-/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~Methods~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/// generatePDFfromHTML( String pdfFile, String htmlFilePath );
-///
-/// generatePDFfromRawHTML( String rawHtml, String outputpdfpath );
+/// String pdfOutputFile = //picodedTests/testingFiles/pdfFile.pdf
+/// String htmlString = "<table><tr><th>Cell A</th></tr><tr><td>Cell Data</td></tr></table>"
+/// pdfGenerator.generatePDFfromRawHTML(pdfOutputFile, htmlString);
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+///
 public class pdfGenerator {
-
-	/// Generates a pdf given the HTML file path
+	
+	/// Generates a pdf file given the HTML file path
 	///
-	/// @param   pdfFile         pdfFile string with which the specified pdf File
-	/// @param   htmlFilePath    htmlFilePath string with which the specified html file path
+	/// @param   pdfFile         pdf file path string
+	/// @param   htmlFilePath    HTML file path string
 	///
-	/// @returns  generatePDFfromHTML() return the boolean value (true, false) based on generate PDF has been successfully or
-	/// not if pdf successfully generated then return true otherwaise return false.
-	/// (A fasle return can also indicate that the generate PDF not successfully. @param pdfFile and htmlFilePath values are incorrect).
+	/// @returns  true if the HTML file is converted and saved in a pdf file
 	public static boolean generatePDFfromHTML(String pdfFile, String htmlFilePath) {
+		OutputStream outputStream = null;
 		try {
 			String url2 = new File(htmlFilePath).toURI().toString();
-			OutputStream os = new FileOutputStream(pdfFile);
+			outputStream = new FileOutputStream(pdfFile);
 			ITextRenderer renderer = new ITextRenderer();
-
-			renderer.setDocument(url2);
+			//renderer.setDocument(new File(url2).toURI().toString());
+			renderer.setDocument(new File(htmlFilePath));
 			renderer.writeNextDocument();
 			renderer.layout();
-			renderer.createPDF(os);
-
-			os.close();
+			
+			// generate pdf
+			renderer.createPDF(outputStream);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		} finally {
+			if (outputStream != null) {
+				try {
+					outputStream.close();
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
 		return true;
 	}
-
-	/// Generates a pdf given the RAW html string
+	
+	/// Generates a pdf file given the RAW html string
 	///
-	/// @param   rawHtml     rawHtml string with which the specified raw html
-	/// @param   outputpdfpath    outputpdfpath string with which the specified output pdf path
+	/// @param   rawHtml          raw HTML string
+	/// @param   outputpdfpath    pdf file path string
 	///
-	/// @returns  generatePDFfromRawHTML() return the boolean value (true, false) based on generate PDF has been successfully or
-	/// not if pdf successfully generated then return true otherwaise return false.
-	/// (A fasle return can also indicate that the generate PDF not successfully. @param rawHtml and outputpdfpath values are incorrect).
+	/// @returns  true if the HTML raw string is converted and saved in a pdf file.
 	public static boolean generatePDFfromRawHTML(String rawHtml, String outputpdfpath) {
+		OutputStream outputStream = null;
 		try {
-			OutputStream os = new FileOutputStream(outputpdfpath);
+			outputStream = new FileOutputStream(outputpdfpath);
 			ITextRenderer renderer = new ITextRenderer();
-			
-			String url2 = rawHtml.toString();
-			//renderer.setDocument(url2);
-			renderer.setDocumentFromString(url2);
+			renderer.setDocumentFromString(rawHtml);
 			renderer.layout();
-			renderer.createPDF(os);
-			os.close();
+			
+			// generate pdf
+			renderer.createPDF(outputStream);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		} finally {
+			if (outputStream != null) {
+				try {
+					outputStream.close();
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
 		return true;
 	}

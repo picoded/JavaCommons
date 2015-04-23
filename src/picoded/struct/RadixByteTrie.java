@@ -2,6 +2,9 @@ package picoded.struct;
 
 import java.util.Map;
 
+///
+/// @WARNING This is considered experimental, avoid usage unless truely needed
+///
 /// Implements a byte array RadixTrie, also known as patricia trie, or prefix tree
 ///
 /// See: http://en.wikipedia.org/wiki/Radix_tree
@@ -25,6 +28,8 @@ import java.util.Map;
 ///
 /// *Total = 54 bytes*
 ///
+@SuppressWarnings("deprecation")
+@Deprecated
 public class RadixByteTrie<V> /* implements Map<K,V> */{
 	
 	/// Parent node above this tree node.

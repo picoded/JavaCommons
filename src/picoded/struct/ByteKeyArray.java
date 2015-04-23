@@ -1,5 +1,8 @@
 package picoded.struct;
 
+///
+/// @WARNING This is considered experimental, avoid usage unless truely needed
+///
 /// Implements a dynamic 0~255 dynamic resizing array. Used in accordance to commonly used character syntaxes.
 /// Standard english character set will range byte/char value 32 to 126. Resulting into an effective array size 
 /// of 95 + 3 (for tabs and newlines) bytes.
@@ -27,6 +30,8 @@ package picoded.struct;
 ///
 /// *Total = 29 bytes*
 ///
+@SuppressWarnings("deprecation")
+@Deprecated
 public class ByteKeyArray<V> /* implements Map<K,V> */{
 	
 	//---------------------------------------------

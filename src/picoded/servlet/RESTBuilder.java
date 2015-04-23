@@ -34,7 +34,7 @@ import org.apache.commons.lang3.StringUtils;
  * Simply put, if a standardised REST API builder was built and used, several pages API features can be called directly
  * instead of being usued via a proxy
  *
- * STATUS: PROOF OF CONCEPT ????
+ * STATUS: PROOF OF CONCEPT, for method adding, and direct calling
  *
  **/
 public class RESTBuilder extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {

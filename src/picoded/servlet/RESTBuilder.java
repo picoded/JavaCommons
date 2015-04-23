@@ -56,4 +56,12 @@ public class RESTBuilder extends javax.servlet.http.HttpServlet implements javax
 		return m;
 	}
 	
+	///----------------------------------------
+	/// Utility function
+	///----------------------------------------
+	public Map<String, Object> objectifyMap(Map<?, ?> inMap) {
+		//HashMap<String,
+		return null;
+	}
+	
 }

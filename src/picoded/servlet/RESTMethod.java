@@ -111,7 +111,8 @@ public class RESTMethod {
 	}
 	
 	/// Sets the method for the given type via reflection with the method name only,
-	/// in event that 2 overloaded method exists with the same name, a RuntimeException is thrown
+	/// in event that more then 2 overloaded or 0 method exists with the name,
+	/// a RuntimeException is thrown
 	public RESTMethod setMethod(int methodType, Object baseObject, String methodName) {
 		Method m = null;
 		Method[] mArr = null;
@@ -155,6 +156,14 @@ public class RESTMethod {
 		return (methodSet[methodType] != null) ? methodSet[methodType].call(reqObject, reqArgs) : null;
 	}
 	
+	/// Set the default for the method
+	public RESTMethod setDefault(int methodType, Map<String, Object> defMap, Object[] defArg) {
+		if (methodSet[methodType] != null) {
+			methodSet[methodType].setDefault(defMap, defArg);
+		}
+		return this;
+	}
+	
 	//---------------------------------------
 	// Get request handling
 	//---------------------------------------
@@ -172,6 +181,11 @@ public class RESTMethod {
 	/// Set a REST GET with the given class array
 	public RESTMethod setGET(Object baseObject, String methodName, Class<?> classArr) {
 		return setMethod(TYPE_GET, baseObject, methodName, classArr);
+	}
+	
+	/// Set the REST GET default value
+	public RESTMethod setDefaultGET(Map<String, Object> defMap, Object[] defArg) {
+		return setDefault(TYPE_GET, defMap, defArg);
 	}
 	
 	/// Calls a REST GET request with the map & array arguments

@@ -50,8 +50,8 @@ class RESTSet {
 	///
 	/// @TODO : Preoperly handle auto default values (not just null?), based on the argument basic class types
 	///
-	/// @param bObject      baseObject representing the "this" for the method call
-	/// @param bMethod     baseMethod is the function which is actually called
+	/// @param bObject   baseObject representing the "this" for the method call
+	/// @param bMethod   baseMethod is the function which is actually called
 	/// @param defMap    default arguments map
 	/// @param defArg    default request arguments list
 	///
@@ -71,21 +71,46 @@ class RESTSet {
 				.subList(1, methodArgsClass.length).toArray(new Class<?>[0]);
 		}
 		
-		// Derive the default arguments list
-		defaultArgs = new Object[methodArgsClass.length];
+		setDefault(defMap, defArg);
+	}
+	
+	/// Setsup the default argument
+	///
+	/// @param defMap    default arguments map
+	/// @param defArg    default request arguments list
+	///
+	public void setDefault(Map<String, Object> defMap, Object[] defArg) {
 		
-		// The default arguments, apply if applicable
-		for (int a = 0; a < methodArgsClass.length; ++a) {
-			defaultArgs[a] = null;
-			if (defArg != null && a < defArg.length) {
-				defaultArgs[a] = defArg[a];
-			}
+		// Replace the default map
+		if (defMap != null) {
+			defaultMap = defMap;
 		}
-		
-		defaultMap = defMap;
 		if (defaultMap == null) {
 			defaultMap = new HashMap<String, Object>();
 		}
+		
+		// Replace the default arguments
+		if (defArg != null) {
+			// Derive the default arguments list
+			defaultArgs = new Object[methodArgsClass.length];
+			
+			// The default arguments, apply if applicable
+			for (int a = 0; a < defaultArgs.length; ++a) {
+				defaultArgs[a] = null;
+				if (defArg != null && a < defArg.length) {
+					defaultArgs[a] = defArg[a];
+				}
+			}
+		}
+		if (defaultArgs == null) {
+			defaultArgs = new Object[methodArgsClass.length];
+			
+			// The default arguments, apply if applicable
+			for (int a = 0; a < defaultArgs.length; ++a) {
+				defaultArgs[a] = null;
+			}
+		}
+		
 	}
 	
 	//---------------------------------------------------
@@ -104,7 +129,7 @@ class RESTSet {
 	
 	/// [For internal use] Setsup the RESTSet, and check its various argument classes
 	///
-	/// @param bObject      baseObject representing the "this" for the method call
+	/// @param bObject     baseObject representing the "this" for the method call
 	/// @param bMethod     baseMethod is the function which is actually called
 	public RESTSet(Object bObject, Method bMethod) {
 		commonSetup(bObject, bMethod, null, null);

@@ -1,7 +1,7 @@
 package picodedTests.servlet;
 
 // Target test class
-import picoded.servlet.RESTBuilder;
+import picoded.servlet.*;
 
 // Test Case include
 import org.junit.*;
@@ -37,6 +37,16 @@ public class RESTBuilder_test {
 			return "echo: " + a1;
 		}
 		return null;
+	}
+	
+	public static String mapTest(RESTRequest hello, String world) {
+		String res = "";
+		if (hello.containsKey("hello")) {
+			res += hello.get("hello").toString();
+		}
+		
+		res += world;
+		return res;
 	}
 	
 	//-------------------------------
@@ -103,6 +113,14 @@ public class RESTBuilder_test {
 	public void simpleSet() {
 		assertNotNull(restObj.apiMethod("test.hello").setGET(this, "hello"));
 		assertEquals("world", restObj.apiMethod("test.hello").GET());
+	}
+	
+	@Test
+	public void complexRequest() {
 		
+		HashMap<String, String> dMap = new HashMap<String, String>();
+		dMap.put("hello", "hello");
+		
+		//assertNotNull(restObj.apiMethod("test.map").setGET(this, "mapTest").setDefaultGET(dMap, new Object[] { "world" }));
 	}
 }

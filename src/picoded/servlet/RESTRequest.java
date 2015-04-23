@@ -67,7 +67,7 @@ public class RESTRequest extends HashMap<String, Object> {
 	/// @param defMap    default arguments map
 	/// @param defArg    default request arguments list
 	public RESTRequest(Object bObj, Method bMeth, boolean bRest, //
-		Map<String, Object> defMap, Object[] defArg //
+		Map<String, ?> defMap, Object[] defArg //
 	) {
 		commonSetup(bObj, bMeth, bRest, defMap, defArg);
 	}
@@ -83,8 +83,8 @@ public class RESTRequest extends HashMap<String, Object> {
 	/// @param reqMap    request argument map, which overrides the default
 	/// @param reqArg    request argument list, which overrides the default
 	public RESTRequest(Object bObj, Method bMeth, boolean bRest, //
-		Map<String, Object> defMap, Object[] defArg, //
-		Map<String, Object> reqMap, Object[] reqArg //
+		Map<String, ?> defMap, Object[] defArg, //
+		Map<String, ?> reqMap, Object[] reqArg //
 	) {
 		commonSetup(bObj, bMeth, bRest, defMap, defArg);
 		setupRequestArgs(reqMap, reqArg);
@@ -98,7 +98,7 @@ public class RESTRequest extends HashMap<String, Object> {
 	/// @param defMap    default arguments map
 	/// @param defArg    default request arguments list
 	protected void commonSetup(Object bObj, Method bMeth, boolean bRest, //
-		Map<String, Object> defMap, Object[] defArg //
+		Map<String, ?> defMap, Object[] defArg //
 	) {
 		
 		baseObject = bObj;
@@ -107,7 +107,7 @@ public class RESTRequest extends HashMap<String, Object> {
 		
 		// Setup the default set
 		if (defMap != null) {
-			for (Map.Entry<String, Object> entry : defMap.entrySet()) {
+			for (Map.Entry<String, ?> entry : defMap.entrySet()) {
 				this.put(entry.getKey(), entry.getValue());
 			}
 		}
@@ -129,11 +129,11 @@ public class RESTRequest extends HashMap<String, Object> {
 	/// @param reqArg    request argument list, which overrides the default
 	///
 	/// @returns RESTRequest self object, for function chaining
-	public RESTRequest setupRequestArgs(Map<String, Object> reqMap, Object[] reqArg) {
+	public RESTRequest setupRequestArgs(Map<String, ?> reqMap, Object[] reqArg) {
 		
 		// Overwrite non default map
 		if (reqMap != null) {
-			for (Map.Entry<String, Object> entry : reqMap.entrySet()) {
+			for (Map.Entry<String, ?> entry : reqMap.entrySet()) {
 				this.put(entry.getKey(), entry.getValue());
 			}
 		}

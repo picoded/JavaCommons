@@ -50,7 +50,7 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 		}
 	}
 	
-	/// Internal parser that converts some of the common sql statements to sqlite
+	/// Internal parser that converts some of the common sql statements to mysql
 	public static String genericSqlParser(String inString) {
 		return inString.replaceAll("\'", "`").replaceAll("\"", "`"); //fix table name bracketing
 	}
@@ -87,23 +87,36 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 			try {
 				qStringUpper = qStringUpper.replaceAll("INDEX IF NOT EXISTS", "INDEX");
 				
-				// Append the length to BLOB/TEXT type of columns
+				// It is must to define the The length of the BLOB and TEXT column type
+            // Append the maximum length "333" to BLOB and TEXT columns
+            // Extract the table name and the columns from the sql statement i.e. "CREATE UNIQUE INDEX `JSQLTEST_UNIQUE` ON `JSQLTEST` ( COL1, COL2, COL3 )"
+            // Find the "ON" word index
 				int onIndex = qStringUpper.indexOf("ON");
+            // if index == -1 then it is not a valid sql statement
 				if (onIndex != -1) {
-					// get table name and columns
+					// subtract the table name and columns from the sql statement string
 					String tableAndColumnsName = qStringUpper.substring(onIndex + "ON".length());
+               // Find the index of opening bracket index.
+               // The column names will be enclosed between the opening and closing bracket
+               // And table name will be before the opening bracket
 					int openBracketIndex = tableAndColumnsName.indexOf("(");
 					if (openBracketIndex != -1) {
+                  // extract the table name which is till the opening bracket
 						String tablename = tableAndColumnsName.substring(0, openBracketIndex);
+                  // find the closing bracket index
 						int closeBracketIndex = tableAndColumnsName.lastIndexOf(")");
+                  // extract the columns between the opening and closing brackets
 						String columns = tableAndColumnsName.substring(openBracketIndex + 1, closeBracketIndex);
-						String[] columnsArr = columns.split(",");
+                  // fetch the table meta data info
 						JSqlResult jSql = executeQuery_metadata(tablename.trim());
 						Map<String, String> metadata = jSql.fetchMetaData();
 						if (metadata != null) {
+                     String[] columnsArr = columns.split(",");
 							for (String column : columnsArr) {
 								column = column.trim();
+                        // check if column type is BLOB or TEXT
 								if ("BLOB".equals(metadata.get(column)) || "TEXT".equals(metadata.get(column))) {
+                           // repalce the column name in the origin sql statement with column name and suffic "(333)
 									qStringUpper = qStringUpper.replace(column, column + "(333)");
 								}
 							}
@@ -129,10 +142,10 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 	///
 	/// Note that care should be taken to prevent SQL injection via the given statment strings.
 	///
-	/// The syntax below, is an example of such an UPSERT statement for SQLITE.
+	/// The syntax below, is an example of such an UPSERT statement for MySQL.
 	///
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
-	/// INSERT OR REPLACE INTO Employee (
+	/// REPLACE INTO Employee (
 	///	id,     // Unique Columns to check for upsert
 	///	name,   // Insert Columns to update
 	///	role,   // Default Columns, that has default fallback value
@@ -140,7 +153,7 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 	/// ) VALUES (
 	///	1,      // Unique value
 	/// 	'C3PO', // Insert value
-	///	COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'), // Values with default
+	///	'Benchwarmer', // Values with default
 	///	(SELECT note FROM Employee WHERE id = 1) // Misc values to preserve
 	/// );
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -188,7 +201,7 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 		String innerSelectPrefix = "(SELECT ";
 		String innerSelectSuffix = innerSelectSB.toString();
 		
-		/// Building the query for INSERT OR REPLACE
+		/// Building the query for REPLACE
 		StringBuilder queryBuilder = new StringBuilder("REPLACE INTO `" + tableName + "` (");
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		

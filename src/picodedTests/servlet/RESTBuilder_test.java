@@ -130,13 +130,13 @@ public class RESTBuilder_test {
 		assertNotNull(restObj.apiMethod("test.map").setGET(this, "mapTest").setDefaultGET(dMap, new Object[] { "world" }));
 		
 		assertEquals("helloworld", restObj.apiMethod("test.map").GET());
-		assertEquals("oh wow, helloworld", restObj.apiMethod("test.map").GET(tMap));
-		assertEquals("oh wow, hello new world", restObj.apiMethod("test.map").GET(tMap, " new world"));
+		assertEquals("oh wow, helloworld", restObj.apiMethod("test.map").requestGET(tMap));
+		assertEquals("oh wow, hello new world", restObj.apiMethod("test.map").requestGET(tMap, " new world"));
 		
 		assertNotNull(restObj.apiMethod("test.map").setGET(this, "mapTest").setDefaultGET(dMap, "world"));
 		
 		assertEquals("helloworld", restObj.apiMethod("test.map").GET());
-		assertEquals("oh wow, helloworld", restObj.apiMethod("test.map").GET(tMap));
-		assertEquals("oh wow, hello new world", restObj.apiMethod("test.map").GET(tMap, " new world"));
+		assertEquals("oh wow, helloworld", restObj.apiMethod("test.map").requestGET(tMap));
+		assertEquals("oh wow, hello new world", restObj.apiMethod("test.map").requestGET(tMap, " new world"));
 	}
 }

@@ -88,35 +88,35 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 				qStringUpper = qStringUpper.replaceAll("INDEX IF NOT EXISTS", "INDEX");
 				
 				// It is must to define the The length of the BLOB and TEXT column type
-            // Append the maximum length "333" to BLOB and TEXT columns
-            // Extract the table name and the columns from the sql statement i.e. "CREATE UNIQUE INDEX `JSQLTEST_UNIQUE` ON `JSQLTEST` ( COL1, COL2, COL3 )"
-            // Find the "ON" word index
+				// Append the maximum length "333" to BLOB and TEXT columns
+				// Extract the table name and the columns from the sql statement i.e. "CREATE UNIQUE INDEX `JSQLTEST_UNIQUE` ON `JSQLTEST` ( COL1, COL2, COL3 )"
+				// Find the "ON" word index
 				int onIndex = qStringUpper.indexOf("ON");
-            // if index == -1 then it is not a valid sql statement
+				// if index == -1 then it is not a valid sql statement
 				if (onIndex != -1) {
 					// subtract the table name and columns from the sql statement string
 					String tableAndColumnsName = qStringUpper.substring(onIndex + "ON".length());
-               // Find the index of opening bracket index.
-               // The column names will be enclosed between the opening and closing bracket
-               // And table name will be before the opening bracket
+					// Find the index of opening bracket index.
+					// The column names will be enclosed between the opening and closing bracket
+					// And table name will be before the opening bracket
 					int openBracketIndex = tableAndColumnsName.indexOf("(");
 					if (openBracketIndex != -1) {
-                  // extract the table name which is till the opening bracket
+						// extract the table name which is till the opening bracket
 						String tablename = tableAndColumnsName.substring(0, openBracketIndex);
-                  // find the closing bracket index
+						// find the closing bracket index
 						int closeBracketIndex = tableAndColumnsName.lastIndexOf(")");
-                  // extract the columns between the opening and closing brackets
+						// extract the columns between the opening and closing brackets
 						String columns = tableAndColumnsName.substring(openBracketIndex + 1, closeBracketIndex);
-                  // fetch the table meta data info
+						// fetch the table meta data info
 						JSqlResult jSql = executeQuery_metadata(tablename.trim());
 						Map<String, String> metadata = jSql.fetchMetaData();
 						if (metadata != null) {
-                     String[] columnsArr = columns.split(",");
+							String[] columnsArr = columns.split(",");
 							for (String column : columnsArr) {
 								column = column.trim();
-                        // check if column type is BLOB or TEXT
+								// check if column type is BLOB or TEXT
 								if ("BLOB".equals(metadata.get(column)) || "TEXT".equals(metadata.get(column))) {
-                           // repalce the column name in the origin sql statement with column name and suffic "(333)
+									// repalce the column name in the origin sql statement with column name and suffic "(333)
 									qStringUpper = qStringUpper.replace(column, column + "(333)");
 								}
 							}

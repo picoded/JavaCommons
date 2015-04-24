@@ -36,6 +36,24 @@ import org.apache.commons.lang3.StringUtils;
  *
  * STATUS: PROOF OF CONCEPT, for method adding, and direct calling
  *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.java}
+ * // Function to add to API
+ * static public String helloWorld(String v) {
+ *		return "hello "+(v != null)? v : "no one";
+ * }
+ * 
+ * ....
+ *
+ * // Setting up a method in the RESTBuilder
+ * RESTBuilder r = new RESTBuilder()
+ * r.apiMethod("test.hello").setGET( this, "helloWorld" );
+ *
+ * // Calling the api method
+ * r.apiMethod("test.hello").GET("world"); // "hello world"
+ * r.apiMethod("test.hello").GET(); // "hello no one"
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
  **/
 public class RESTBuilder extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
 	

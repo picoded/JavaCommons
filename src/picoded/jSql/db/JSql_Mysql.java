@@ -38,15 +38,13 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 	
 	/// Runs JSql with the JDBC "MY"SQL engine
 	///
-	/// **Note:** urlString, is just IP:PORT. For example, "127.0.0.1:3306"
-	public JSql_Mysql(String urlStr, String dbName, String dbUser, String dbPass) {
+	/// **Note:** connectionUrl, for example, "jdbc:mysql://54.169.34.78:3306/JAVACOMMONS"
+	public JSql_Mysql(String connectionUrl, Properties connectionProps) {
 		sqlType = JSqlType.mysql;
 		
-		String connectionUrl = "jdbc:mysql://" + urlStr + "/" + dbName
-			+ "?autoReconnect=true&failOverReadOnly=false&maxReconnects=5";
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance(); //ensure jdbc driver is loaded
-			sqlConn = java.sql.DriverManager.getConnection(connectionUrl, dbUser, dbPass);
+			sqlConn = java.sql.DriverManager.getConnection(connectionUrl, connectionProps);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load sql connection: ", e);
 		}

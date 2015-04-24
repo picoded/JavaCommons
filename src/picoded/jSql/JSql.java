@@ -42,8 +42,8 @@ public class JSql implements BaseInterface {
 	}
 	
 	/// MySql static constructor, returns picoded.jSql.JSql_Mysql
-	public static JSql mysql(String urlStr, String dbName, String dbUser, String dbPass) {
-		return new picoded.jSql.db.JSql_Mysql(urlStr, dbName, dbUser, dbPass);
+	public static JSql mysql(String connectionUrl, Properties connectionProps) {
+		return new picoded.jSql.db.JSql_Mysql(connectionUrl, connectionProps);
 	}
 	
 	/// Mssql static constructor, returns picoded.jSql.JSql_Mssql

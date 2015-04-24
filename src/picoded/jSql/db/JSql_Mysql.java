@@ -38,6 +38,23 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 	
 	/// Runs JSql with the JDBC "MY"SQL engine
 	///
+	/// **Note:** dbServerAddress, is just IP:PORT. For example, "127.0.0.1:3306"
+	public JSql_Mysql(String dbServerAddress, String dbName, String dbUser, String dbPass) {
+		sqlType = JSqlType.mysql;
+		
+		String connectionUrl = "jdbc:mysql://" + dbServerAddress + "/" + dbName
+			+ "?autoReconnect=true&failOverReadOnly=false&maxReconnects=5";
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance(); //ensure jdbc driver is loaded
+			sqlConn = java.sql.DriverManager.getConnection(connectionUrl, dbUser, dbPass);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to load sql connection: ", e);
+		}
+	}
+	
+	/// Runs JSql with the JDBC "MY"SQL engine
+	///
 	/// **Note:** connectionUrl, for example, "jdbc:mysql://54.169.34.78:3306/JAVACOMMONS"
 	public JSql_Mysql(String connectionUrl, Properties connectionProps) {
 		sqlType = JSqlType.mysql;
@@ -143,6 +160,7 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 	/// Note that care should be taken to prevent SQL injection via the given statment strings.
 	///
 	/// The syntax below, is an example of such an UPSERT statement for MySQL.
+	/// It will insert the record if not already exists or update the values.
 	///
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
 	/// REPLACE INTO Employee (
@@ -153,7 +171,7 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 	/// ) VALUES (
 	///	1,      // Unique value
 	/// 	'C3PO', // Insert value
-	///	'Benchwarmer', // Values with default
+	///	COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'), // Values with default
 	///	(SELECT note FROM Employee WHERE id = 1) // Misc values to preserve
 	/// );
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

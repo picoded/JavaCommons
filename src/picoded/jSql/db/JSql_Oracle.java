@@ -288,6 +288,57 @@ public class JSql_Oracle extends JSql implements BaseInterface {
 				}
 			}
 			
+			// Fix the pagination query as per the Oracle 12C
+			// The Oracle 12C supports the pagination query with the OFFSET/FETCH keywords
+			/*
+			String prefixQuery = null;
+			int offsetIndex = qString.indexOf("OFFSET");
+			String offsetQuery = "";
+			if (offsetIndex != -1) {
+			   prefixQuery = qString.substring(0, offsetIndex);
+			   offsetQuery = qString.substring(offsetIndex);
+			   offsetQuery += " ROWS ";
+			}
+			int limitIndex = qString.indexOf("LIMIT");
+			String limitQuery = "";
+			if (limitIndex != -1) {
+			   prefixQuery = qString.substring(0, limitIndex);
+			   if (offsetIndex != -1) {
+			      limitQuery = qString.substring(limitIndex, offsetIndex);
+			   } else {
+			      limitQuery = qString.substring(limitIndex);
+			   }
+			   limitQuery = limitQuery.replace("LIMIT", "FETCH NEXT");
+			   limitQuery += " ROWS ONLY ";
+			}
+			if (prefixQuery != null) {
+			   qString = prefixQuery + offsetQuery + limitQuery;
+			}
+			 */
+
+			// Fix the pagination using the ROWNUM which is supported by versions below than Oracle 12C
+			String prefixQuery = null;
+			int startRowNum = -1;
+			int endRowNum = -1;
+			
+			int limitIndex = qString.indexOf("LIMIT");
+			if (limitIndex != -1) {
+				prefixQuery = qString.substring(0, limitIndex);
+			}
+			
+			if (prefixQuery != null) {
+				limitIndex += "LIMIT".length();
+				int offsetIndex = qString.indexOf("OFFSET");
+				if (offsetIndex != -1) {
+					startRowNum = Integer.parseInt(qString.substring(offsetIndex + "OFFSET".length()).trim());
+					endRowNum = Integer.parseInt(qString.substring(limitIndex, offsetIndex).trim()) + startRowNum;
+				}
+			}
+			if (startRowNum != -1 && endRowNum != -1) {
+				qString = "SELECT * FROM (SELECT a.*, rownum AS rnum FROM (" + prefixQuery + ") a WHERE rownum <= "
+					+ endRowNum + ") WHERE rnum > " + startRowNum;
+			}
+			
 		} else if (upperCaseStr.startsWith(deleteFrom)) {
 			prefixOffset = deleteFrom.length() + 1;
 			

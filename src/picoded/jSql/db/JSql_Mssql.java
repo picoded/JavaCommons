@@ -27,10 +27,15 @@ import picoded.jSql.JSqlException;
 import picoded.jSql.JSql;
 import picoded.jSql.db.BaseInterface;
 
+/// Pure SQL Server 2012 implentation of JSql
+/// Support only for SQL Server 2012 and above version for the pagination query, the OFFSET / FETCH keywords
+/// are used which are faster and better in performance in comparison of old ROW_NUMBER()
 public class JSql_Mssql extends JSql implements BaseInterface {
 	
+	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(JSql_Mssql.class.getName());
 	
+	/// Runs JSql with the JDBC sqlite engine
 	public JSql_Mssql(String dbUrl, String dbName, String dbUser, String dbPass) {
 		sqlType = JSqlType.mssql;
 		
@@ -188,7 +193,30 @@ public class JSql_Mssql extends JSql implements BaseInterface {
 					break;
 				}
 			}
-			
+			// Fix the pagination query as per the SQL Server 2012 syntax by using the OFFSET/FETCH
+			String prefixQuery = null;
+			int offsetIndex = qString.indexOf("OFFSET");
+			String offsetQuery = "";
+			if (offsetIndex != -1) {
+				prefixQuery = qString.substring(0, offsetIndex);
+				offsetQuery = qString.substring(offsetIndex);
+				offsetQuery += " ROWS ";
+			}
+			int limitIndex = qString.indexOf("LIMIT");
+			String limitQuery = "";
+			if (limitIndex != -1) {
+				prefixQuery = qString.substring(0, limitIndex);
+				if (offsetIndex != -1) {
+					limitQuery = qString.substring(limitIndex, offsetIndex);
+				} else {
+					limitQuery = qString.substring(limitIndex);
+				}
+				limitQuery = limitQuery.replace("LIMIT", "FETCH NEXT");
+				limitQuery += " ROWS ONLY ";
+			}
+			if (prefixQuery != null) {
+				qString = prefixQuery + offsetQuery + limitQuery;
+			}
 		} else if (upperCaseStr.startsWith(deleteFrom)) {
 			prefixOffset = deleteFrom.length() + 1;
 			

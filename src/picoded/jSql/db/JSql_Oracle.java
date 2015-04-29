@@ -243,6 +243,7 @@ public class JSql_Oracle extends JSql implements BaseInterface {
 								+ tmpStr.substring(0, tmpIndx) + " ON "
 								+ _fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx + 4));
 						}
+						// check if column type is blob
 						
 					}
 				}
@@ -416,20 +417,26 @@ public class JSql_Oracle extends JSql implements BaseInterface {
 	/// The syntax below, is an example of such an UPSERT statement for Oracle.
 	///
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
-	/// MERGE
-	/// INTO    destTable d
-	/// USING   (
-	///         SELECT  *
-	///         FROM    sourceTable
-	///         ) s
-	/// ON      (s.id = d.id)
-	/// WHEN MATCHED THEN
-	/// INSERT  (id, destCol1, destCol2)
-	/// VALUES  (id, sourceCol1, sourceCol2)
-	/// WHEN NOT MATCHED THEN
-	/// UPDATE
-	/// SET     destCol1 = sourceCol1,
-	///         destCol2 = sourceCol2
+	/// BEGIN
+	/// INSERT INTO Employee (
+	///	id,     // Unique Columns to check for upsert
+	///	name,   // Insert Columns to update
+	///	role,   // Default Columns, that has default fallback value
+	///   note,   // Misc Columns, which existing values are preserved (if exists)
+	/// ) VALUES (
+	///	1,      // Unique value
+	/// 	'C3PO', // Insert value
+	///	COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'), // Values with default
+	///	(SELECT note FROM Employee WHERE id = 1) // Misc values to preserve
+	/// );
+	/// EXCEPTION 
+	/// WHEN DUP_VAL_ON_INDEX THEN
+	/// UPDATE Employee
+	/// SET     name = 'C3PO', // Insert Columns to update
+	///         role = COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'), // Values with default
+	///         note = (SELECT note FROM Employee WHERE id = 1) // Misc values to preserve
+	/// WHERE   id       = 1; // Unique Columns to check for upsert
+	/// END; 
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
 	public JSqlQuerySet upsertQuerySet( //

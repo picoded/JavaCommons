@@ -24,7 +24,7 @@ import picoded.jSql.JSqlType;
 import picoded.jSql.JSqlResult;
 import picoded.jSql.JSqlException;
 
-import picoded.jSql.JSql;
+import picoded.jSql.*;
 import picoded.jSql.db.BaseInterface;
 
 /// Pure SQL Server 2012 implentation of JSql
@@ -298,6 +298,235 @@ public class JSql_Mssql extends JSql implements BaseInterface {
 	/// Returns false if no result is given by the execution call, else true on success
 	public boolean execute(String qString, Object... values) throws JSqlException {
 		return execute_raw(genericSqlParser(qString), values);
+	}
+	
+	///
+	/// Helps generate an SQL UPSERT request. This function was created to acommedate the various
+	/// syntax differances of UPSERT across the various SQL vendors.
+	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
+	/// The syntax below, is an example of such an UPSERT statement for Oracle.
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	/// MERGE
+	/// INTO    destTable d
+	/// USING   (
+	///         SELECT  *
+	///         FROM    sourceTable
+	///         ) s
+	/// ON      (s.id = d.id)
+	/// WHEN MATCHED THEN
+	/// INSERT  (id, destCol1, destCol2)
+	/// VALUES  (id, sourceCol1, sourceCol2)
+	/// WHEN NOT MATCHED THEN
+	/// UPDATE
+	/// SET     destCol1 = sourceCol1,
+	///         destCol2 = sourceCol2
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	///
+	public JSqlQuerySet upsertQuerySet( //
+		String tableName, // Table name to upsert on
+		//
+		String[] uniqueColumns, // The unique column names
+		Object[] uniqueValues, // The row unique identifier values
+		//
+		String[] insertColumns, // Columns names to update
+		Object[] insertValues, // Values to update
+		//
+		String[] defaultColumns, // Columns names to apply default value, if not exists
+		Object[] defaultValues, // Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+		//
+		// Various column names where its existing value needs to be maintained (if any),
+		// this is important as some SQL implementation will fallback to default table values, if not properly handled
+		String[] miscColumns //
+	) throws JSqlException {
+		
+		if (tableName.length() > 30) {
+			logger.warning(JSqlException.oracleNameSpaceWarning + tableName);
+		}
+		
+		/// Checks that unique collumn and values length to be aligned
+		if (uniqueColumns == null || uniqueValues == null || uniqueColumns.length != uniqueValues.length) {
+			throw new JSqlException("Upsert query requires unique column and values to be equal length");
+		}
+		
+		/// Preparing inner default select, this will be used repeatingly for COALESCE, DEFAULT and MISC values
+		ArrayList<Object> innerSelectArgs = new ArrayList<Object>();
+		StringBuilder innerSelectSB = new StringBuilder(" FROM ");
+		innerSelectSB.append("`" + tableName + "`");
+		innerSelectSB.append(" WHERE ");
+		for (int a = 0; a < uniqueColumns.length; ++a) {
+			if (a > 0) {
+				innerSelectSB.append(" AND ");
+			}
+			innerSelectSB.append(uniqueColumns[a] + " = ?");
+			innerSelectArgs.add(uniqueValues[a]);
+		}
+		innerSelectSB.append(")");
+		
+		String innerSelectPrefix = "(SELECT ";
+		String innerSelectSuffix = innerSelectSB.toString();
+		
+		/// Building the query for INSERT OR REPLACE
+		StringBuilder queryBuilder = new StringBuilder("MERGE INTO `" + tableName + "` t USING (");
+		ArrayList<Object> queryArgs = new ArrayList<Object>();
+		ArrayList<Object> updateQueryArgs = new ArrayList<Object>();
+		
+		/// Building the query for both sides of '(...columns...) VALUE (...vars...)' clauses in upsert
+		/// Note that the final trailing ", " seperator will be removed prior to final query conversion
+		StringBuilder dualColumnNames = new StringBuilder();
+		StringBuilder updateColumnNames = new StringBuilder();
+		StringBuilder updateUniqueColumnNames = new StringBuilder();
+		StringBuilder columnNames = new StringBuilder();
+		StringBuilder columnValues = new StringBuilder();
+		String columnSeperator = ", ";
+		
+		/// Setting up unique values
+		for (int a = 0; a < uniqueColumns.length; ++a) {
+			//updateColumnNames.append(uniqueColumns[a]+"=?"+columnSeperator);
+			updateUniqueColumnNames.append(uniqueColumns[a] + "=?" + columnSeperator);
+			queryArgs.add(uniqueValues[a]);
+			
+			dualColumnNames.append("? AS " + uniqueColumns[a] + columnSeperator);
+			queryArgs.add(uniqueValues[a]);
+			
+			columnNames.append(uniqueColumns[a]);
+			columnNames.append(columnSeperator);
+			//
+			columnValues.append("?");
+			columnValues.append(columnSeperator);
+			//
+			queryArgs.add(uniqueValues[a]);
+		}
+		
+		/// Inserting updated values
+		if (insertColumns != null) {
+			for (int a = 0; a < insertColumns.length; ++a) {
+				updateColumnNames.append(insertColumns[a] + "=?" + columnSeperator);
+				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				
+				dualColumnNames.append("? AS " + insertColumns[a] + columnSeperator);
+				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				
+				columnNames.append(insertColumns[a]);
+				columnNames.append(columnSeperator);
+				//
+				columnValues.append("?");
+				columnValues.append(columnSeperator);
+				//
+				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+			}
+		}
+		
+		/// Handling default values
+		if (defaultColumns != null) {
+			for (int a = 0; a < defaultColumns.length; ++a) {
+				updateColumnNames.append(defaultColumns[a] + "=");
+				
+				columnNames.append(defaultColumns[a]);
+				columnNames.append(columnSeperator);
+				//
+				columnValues.append("COALESCE(");
+				updateColumnNames.append("COALESCE(");
+				//-
+				columnValues.append(innerSelectPrefix);
+				columnValues.append(defaultColumns[a]);
+				columnValues.append(innerSelectSuffix);
+				
+				updateColumnNames.append(innerSelectPrefix);
+				updateColumnNames.append(defaultColumns[a]);
+				updateColumnNames.append(innerSelectSuffix);
+				
+				queryArgs.addAll(innerSelectArgs);
+				//-
+				columnValues.append(", ?)");
+				columnValues.append(columnSeperator);
+				
+				queryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+				
+				updateColumnNames.append(", ?)");
+				updateColumnNames.append(columnSeperator);
+				queryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+				
+				dualColumnNames.append("? AS " + defaultColumns[a] + columnSeperator);
+				queryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+			}
+		}
+		
+		/// Handling Misc values
+		if (miscColumns != null) {
+			for (int a = 0; a < miscColumns.length; ++a) {
+				
+				columnNames.append(miscColumns[a]);
+				columnNames.append(columnSeperator);
+				//-
+				columnValues.append(innerSelectPrefix);
+				columnValues.append(miscColumns[a]);
+				columnValues.append(innerSelectSuffix);
+				queryArgs.addAll(innerSelectArgs);
+				//-
+				columnValues.append(columnSeperator);
+				
+				updateColumnNames.append(miscColumns[a] + "=");
+				updateColumnNames.append(innerSelectPrefix);
+				updateColumnNames.append(miscColumns[a]);
+				updateColumnNames.append(innerSelectSuffix);
+				updateColumnNames.append(columnSeperator);
+				
+				queryArgs.addAll(innerSelectArgs);
+				
+				dualColumnNames.append("? AS " + miscColumns[a] + columnSeperator);
+				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				
+				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				
+			}
+		}
+		
+		/// Setting up DUAL columns
+		
+		for (int a = 0; a < uniqueColumns.length; ++a) {
+			dualColumnNames.append(uniqueColumns[a]);
+			dualColumnNames.append("=?");
+			dualColumnNames.append(columnSeperator);
+			
+			queryArgs.add(uniqueValues[a]);
+		}
+		
+		/// Building the final query
+		
+		queryBuilder.append(" SELECT ");
+		queryBuilder.append(dualColumnNames.substring(0, dualColumnNames.length() - columnSeperator.length()));
+		queryBuilder.append(") d ");
+		queryBuilder.append(" ON ( t.key = d.key ) ");
+		queryBuilder.append(" WHEN MATCHED ");
+		queryBuilder.append(" THEN UPDATE SET ");
+		queryBuilder.append(updateColumnNames.substring(0, updateColumnNames.length() - columnSeperator.length()));
+		queryBuilder.append(" WHEN NOT MATCHED ");
+		queryBuilder.append(" THEN INSERT (");
+		queryBuilder.append(columnNames.substring(0, columnNames.length() - columnSeperator.length()));
+		queryBuilder.append(") VALUES (");
+		queryBuilder.append(columnValues.substring(0, columnValues.length() - columnSeperator.length()));
+		queryBuilder.append(")");
+		
+		System.out.println("JSql -> upsertQuerySet -> query : " + queryBuilder.toString());
+		System.out.println("JSql -> upsertQuerySet -> queryArgs : " + queryArgs);
+		
+		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
+	}
+	
+	// Helper varient, without default or misc fields
+	public JSqlQuerySet upsertQuerySet( //
+		String tableName, // Table name to upsert on
+		//
+		String[] uniqueColumns, // The unique column names
+		Object[] uniqueValues, // The row unique identifier values
+		//
+		String[] insertColumns, // Columns names to update
+		Object[] insertValues // Values to update
+	) throws JSqlException {
+		return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues, null, null, null);
 	}
 	
 }

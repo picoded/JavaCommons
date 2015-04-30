@@ -310,19 +310,31 @@ public class JSql_Mssql extends JSql implements BaseInterface {
 	///
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
 	/// MERGE
-	/// INTO    destTable d
-	/// USING   (
-	///         SELECT  *
-	///         FROM    sourceTable
-	///         ) s
-	/// ON      (s.id = d.id)
+	/// INTO Employee AS destTable
+	/// USING (SELECT  
+	///	1 AS id,      // Unique value
+	/// 	'C3PO' AS name, // Insert value
+	///	COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer') AS role, // Values with default
+	///	(SELECT note FROM Employee WHERE id = 1) AS note // Misc values to preserve
+	/// ) AS sourceTable
+	/// ON (destTable.id = sourceTable.id)
 	/// WHEN MATCHED THEN
-	/// INSERT  (id, destCol1, destCol2)
-	/// VALUES  (id, sourceCol1, sourceCol2)
+	/// INSERT (
+	///	id,     // Unique Columns to check for upsert
+	///	name,   // Insert Columns to update
+	///	role,   // Default Columns, that has default fallback value
+	///   note,   // Misc Columns, which existing values are preserved (if exists)
+	/// ) VALUES (
+	///	1,      // Unique value
+	/// 	'C3PO', // Insert value
+	///	COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'), // Values with default
+	///	(SELECT note FROM Employee WHERE id = 1) // Misc values to preserve
+	/// )
 	/// WHEN NOT MATCHED THEN
 	/// UPDATE
-	/// SET     destCol1 = sourceCol1,
-	///         destCol2 = sourceCol2
+	/// SET     name = 'C3PO', // Insert value
+	///         role = COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'), // Values with default
+	///         note = (SELECT note FROM Employee WHERE id = 1) // Misc values to preserve
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
 	public JSqlQuerySet upsertQuerySet( //

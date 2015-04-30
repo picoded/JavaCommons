@@ -368,150 +368,207 @@ public class JSql_Mssql extends JSql implements BaseInterface {
 		String innerSelectPrefix = "(SELECT ";
 		String innerSelectSuffix = innerSelectSB.toString();
 		
+		String equalSign = "=";
+		String targetTableAlias = "target";
+		String sourceTableAlias = "source";
+		String statementTerminator = ";";
+		
 		/// Building the query for INSERT OR REPLACE
-		StringBuilder queryBuilder = new StringBuilder("MERGE INTO `" + tableName + "` t USING (");
+		StringBuilder queryBuilder = new StringBuilder("MERGE INTO `" + tableName + "` AS " + targetTableAlias);
+		
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
+		ArrayList<Object> insertQueryArgs = new ArrayList<Object>();
 		ArrayList<Object> updateQueryArgs = new ArrayList<Object>();
+		ArrayList<Object> selectQueryArgs = new ArrayList<Object>();
 		
 		/// Building the query for both sides of '(...columns...) VALUE (...vars...)' clauses in upsert
 		/// Note that the final trailing ", " seperator will be removed prior to final query conversion
-		StringBuilder dualColumnNames = new StringBuilder();
+		StringBuilder selectColumnNames = new StringBuilder();
 		StringBuilder updateColumnNames = new StringBuilder();
-		StringBuilder updateUniqueColumnNames = new StringBuilder();
-		StringBuilder columnNames = new StringBuilder();
-		StringBuilder columnValues = new StringBuilder();
+		StringBuilder insertColumnNames = new StringBuilder();
+		StringBuilder insertColumnValues = new StringBuilder();
+		StringBuilder condition = new StringBuilder();
 		String columnSeperator = ", ";
 		
 		/// Setting up unique values
 		for (int a = 0; a < uniqueColumns.length; ++a) {
-			//updateColumnNames.append(uniqueColumns[a]+"=?"+columnSeperator);
-			updateUniqueColumnNames.append(uniqueColumns[a] + "=?" + columnSeperator);
-			queryArgs.add(uniqueValues[a]);
+			// dual select
+			selectColumnNames.append("?");
+			selectColumnNames.append(" AS ");
+			selectColumnNames.append(uniqueColumns[a]);
+			selectColumnNames.append(columnSeperator);
 			
-			dualColumnNames.append("? AS " + uniqueColumns[a] + columnSeperator);
-			queryArgs.add(uniqueValues[a]);
+			selectQueryArgs.add(uniqueValues[a]);
 			
-			columnNames.append(uniqueColumns[a]);
-			columnNames.append(columnSeperator);
+			// insert column list
+			insertColumnNames.append(uniqueColumns[a]);
+			insertColumnNames.append(columnSeperator);
+			// insert column value list
+			insertColumnValues.append("?");
+			insertColumnValues.append(columnSeperator);
 			//
-			columnValues.append("?");
-			columnValues.append(columnSeperator);
-			//
-			queryArgs.add(uniqueValues[a]);
+			insertQueryArgs.add(uniqueValues[a]);
 		}
 		
 		/// Inserting updated values
 		if (insertColumns != null) {
 			for (int a = 0; a < insertColumns.length; ++a) {
-				updateColumnNames.append(insertColumns[a] + "=?" + columnSeperator);
-				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				// update column
+				updateColumnNames.append(insertColumns[a]);
+				updateColumnNames.append(equalSign);
+				updateColumnNames.append("?");
+				updateColumnNames.append(columnSeperator);
 				
-				dualColumnNames.append("? AS " + insertColumns[a] + columnSeperator);
-				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				updateQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
 				
-				columnNames.append(insertColumns[a]);
-				columnNames.append(columnSeperator);
-				//
-				columnValues.append("?");
-				columnValues.append(columnSeperator);
-				//
-				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				// select dual
+				selectColumnNames.append("?");
+				selectColumnNames.append(" AS ");
+				selectColumnNames.append(insertColumns[a]);
+				selectColumnNames.append(columnSeperator);
+				
+				selectQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				
+				// insert column
+				insertColumnNames.append(insertColumns[a]);
+				insertColumnNames.append(columnSeperator);
+				
+				insertColumnValues.append("?");
+				insertColumnValues.append(columnSeperator);
+				
+				insertQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
 			}
 		}
 		
 		/// Handling default values
 		if (defaultColumns != null) {
 			for (int a = 0; a < defaultColumns.length; ++a) {
-				updateColumnNames.append(defaultColumns[a] + "=");
+				// insert column
+				insertColumnNames.append(defaultColumns[a]);
+				insertColumnNames.append(columnSeperator);
 				
-				columnNames.append(defaultColumns[a]);
-				columnNames.append(columnSeperator);
-				//
-				columnValues.append("COALESCE(");
+				insertColumnValues.append("COALESCE(");
+				insertColumnValues.append(innerSelectPrefix);
+				insertColumnValues.append(defaultColumns[a]);
+				insertColumnValues.append(innerSelectSuffix);
+				
+				insertQueryArgs.addAll(innerSelectArgs);
+				
+				insertColumnValues.append(", ?)");
+				insertColumnValues.append(columnSeperator);
+				
+				insertQueryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+				
+				// update column
+				updateColumnNames.append(defaultColumns[a]);
+				updateColumnNames.append(equalSign);
 				updateColumnNames.append("COALESCE(");
-				//-
-				columnValues.append(innerSelectPrefix);
-				columnValues.append(defaultColumns[a]);
-				columnValues.append(innerSelectSuffix);
-				
 				updateColumnNames.append(innerSelectPrefix);
 				updateColumnNames.append(defaultColumns[a]);
 				updateColumnNames.append(innerSelectSuffix);
 				
-				queryArgs.addAll(innerSelectArgs);
-				//-
-				columnValues.append(", ?)");
-				columnValues.append(columnSeperator);
-				
-				queryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+				updateQueryArgs.addAll(innerSelectArgs);
 				
 				updateColumnNames.append(", ?)");
 				updateColumnNames.append(columnSeperator);
-				queryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+				updateQueryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
 				
-				dualColumnNames.append("? AS " + defaultColumns[a] + columnSeperator);
-				queryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+				// select dual
+				// COALESCE((SELECT col3 from t where a=?), ?) as col3
+				selectColumnNames.append("COALESCE(");
+				selectColumnNames.append(innerSelectPrefix);
+				selectColumnNames.append(defaultColumns[a]);
+				selectColumnNames.append(innerSelectSuffix);
+				selectColumnNames.append(", ?)");
+				
+				selectQueryArgs.addAll(innerSelectArgs);
+				
+				selectColumnNames.append(" AS " + defaultColumns[a] + columnSeperator);
+				selectQueryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
 			}
 		}
 		
 		/// Handling Misc values
 		if (miscColumns != null) {
 			for (int a = 0; a < miscColumns.length; ++a) {
+				// insert column
+				insertColumnNames.append(miscColumns[a]);
+				insertColumnNames.append(columnSeperator);
 				
-				columnNames.append(miscColumns[a]);
-				columnNames.append(columnSeperator);
-				//-
-				columnValues.append(innerSelectPrefix);
-				columnValues.append(miscColumns[a]);
-				columnValues.append(innerSelectSuffix);
-				queryArgs.addAll(innerSelectArgs);
-				//-
-				columnValues.append(columnSeperator);
+				insertColumnValues.append(innerSelectPrefix);
+				insertColumnValues.append(miscColumns[a]);
+				insertColumnValues.append(innerSelectSuffix);
 				
-				updateColumnNames.append(miscColumns[a] + "=");
+				insertQueryArgs.addAll(innerSelectArgs);
+				
+				insertColumnValues.append(columnSeperator);
+				
+				// updtae column
+				updateColumnNames.append(miscColumns[a]);
+				updateColumnNames.append(equalSign);
 				updateColumnNames.append(innerSelectPrefix);
 				updateColumnNames.append(miscColumns[a]);
 				updateColumnNames.append(innerSelectSuffix);
 				updateColumnNames.append(columnSeperator);
 				
-				queryArgs.addAll(innerSelectArgs);
+				updateQueryArgs.addAll(innerSelectArgs);
 				
-				dualColumnNames.append("? AS " + miscColumns[a] + columnSeperator);
-				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				// select dual
+				selectColumnNames.append(innerSelectPrefix);
+				selectColumnNames.append(miscColumns[a]);
+				selectColumnNames.append(innerSelectSuffix);
 				
-				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				selectColumnNames.append(" AS ");
+				selectColumnNames.append(miscColumns[a]);
+				selectColumnNames.append(columnSeperator);
+				
+				selectQueryArgs.addAll(innerSelectArgs);
 				
 			}
 		}
 		
-		/// Setting up DUAL columns
-		
+		/// Setting up the condition
 		for (int a = 0; a < uniqueColumns.length; ++a) {
-			dualColumnNames.append(uniqueColumns[a]);
-			dualColumnNames.append("=?");
-			dualColumnNames.append(columnSeperator);
+			if (a > 0) {
+				condition.append(" and ");
+			}
+			condition.append(targetTableAlias);
+			condition.append(".");
+			condition.append(uniqueColumns[a]);
+			condition.append(equalSign);
+			condition.append(sourceTableAlias);
+			condition.append(".");
 			
-			queryArgs.add(uniqueValues[a]);
+			condition.append(uniqueColumns[a]);
 		}
 		
 		/// Building the final query
 		
-		queryBuilder.append(" SELECT ");
-		queryBuilder.append(dualColumnNames.substring(0, dualColumnNames.length() - columnSeperator.length()));
-		queryBuilder.append(") d ");
-		queryBuilder.append(" ON ( t.key = d.key ) ");
+		queryBuilder.append(" USING (SELECT ");
+		queryBuilder.append(selectColumnNames.substring(0, selectColumnNames.length() - columnSeperator.length()));
+		queryBuilder.append(")");
+		queryBuilder.append(" AS ");
+		queryBuilder.append(sourceTableAlias);
+		queryBuilder.append(" ON ( ");
+		queryBuilder.append(condition.toString());
+		queryBuilder.append(" ) ");
 		queryBuilder.append(" WHEN MATCHED ");
 		queryBuilder.append(" THEN UPDATE SET ");
 		queryBuilder.append(updateColumnNames.substring(0, updateColumnNames.length() - columnSeperator.length()));
 		queryBuilder.append(" WHEN NOT MATCHED ");
 		queryBuilder.append(" THEN INSERT (");
-		queryBuilder.append(columnNames.substring(0, columnNames.length() - columnSeperator.length()));
+		queryBuilder.append(insertColumnNames.substring(0, insertColumnNames.length() - columnSeperator.length()));
 		queryBuilder.append(") VALUES (");
-		queryBuilder.append(columnValues.substring(0, columnValues.length() - columnSeperator.length()));
+		queryBuilder.append(insertColumnValues.substring(0, insertColumnValues.length() - columnSeperator.length()));
 		queryBuilder.append(")");
+		queryBuilder.append(statementTerminator);
 		
-		System.out.println("JSql -> upsertQuerySet -> query : " + queryBuilder.toString());
-		System.out.println("JSql -> upsertQuerySet -> queryArgs : " + queryArgs);
+		queryArgs.addAll(selectQueryArgs);
+		queryArgs.addAll(updateQueryArgs);
+		queryArgs.addAll(insertQueryArgs);
+		
+		//System.out.println("JSql -> upsertQuerySet -> query : " + queryBuilder.toString());
+		//System.out.println("JSql -> upsertQuerySet -> queryArgs : " + queryArgs);
 		
 		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
 	}

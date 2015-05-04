@@ -1,8 +1,10 @@
 package picoded.fileUtils;
 
 import java.io.BufferedWriter;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -49,36 +51,73 @@ public class tempFile {
 	}
 	
 	/// Create a temp file with randomly generated file name 'base58 guid' to system default tmp folder suffix "pjcTemp" i.e. /var/tmp/pjcTemp
-	public static void createTempFile() throws IOException {
-		createTempFile(null);
+	public static void createFile() throws IOException {
+		createFile(null);
 	}
 	
 	/// Create a temp file with specified file name. If file name is NULL / BLANK then file name is randomly generated.
 	/// The file is created at the system default temp folder suffix with "pjcTemp" i.e. /var/tmp/pjcTemp
 	/// @param   tempFileName         temp File Name is user specific file name (test.tmp).
 	/// Throws IOException if file is already exists
-	public static void createTempFile(String tempFileName) throws IOException {
+	public static File createFile(String tempFileName) throws IOException {
 		if (tempFileName == null || tempFileName.trim().length() == 0) {
 			tempFileName = getRandomUUID();
 		}
 		// check file is exits or not in the directory
-		File folder = new File(createTempDir().getPath());
+		File folder = new File(getTempDir().getPath());
 		File file = new File(folder, tempFileName + fileExtension);
-		if (file.isFile()) {
+		if (file.exists()) {
 			throw new IOException("File already exists.");
 		}
-		File temp = File.createTempFile(tempFileName, fileExtension, createTempDir());
+		return file;
 	}
 	
 	/// Create "pjcTemp" folder under the system temp folder if not already exists.
 	/// @returns  File object; system temp folder path i.e. /var/tmp/pjcTemp
-	public static File createTempDir() {
+	private static File getTempDir() {
 		File tempDir = new File(System.getProperty("java.io.tmpdir") + File.separator + tempFolder);
 		// check directory is exits
-		if (tempDir.exists() == false) {
+		if (!tempDir.exists()) {
 			tempDir.mkdir();
 		}
 		return tempDir;
+	}
+	
+	/// Returns specified file from the temp folder.
+	/// @param   filename         filename (test.tmp) is user specific file name .
+	/// Throws IOException if file does not found.
+	public static File getFile(String filename) throws IOException {
+		File file = new File(getTempDir(), filename);
+		if (!file.exists()) {
+			throw new IOException("File does not found.");
+		}
+		return file;
+	}
+	
+	/// Write to specified temp file stored in the temp folder.
+	/// @param   filename         filename (test.tmp) is user specific file name .
+	/// @param   contents         contents ("Hello World") is user specific file contents.
+	/// Throws IOException if file does not found or not a valid file.
+	public static void writeFile(String filename, String contents) throws IOException {
+		filename = getTempDir().getPath() + File.separator + filename;
+		File file = new File(filename);
+		// check if file exits
+		if (!file.exists()) {
+			throw new IOException("File does not found.");
+		}
+		// check if a valid file
+		if (!file.isFile()) {
+			throw new IOException("Not a valid file.");
+		}
+		FileWriter writer = null;
+		try {
+			writer = new FileWriter(file);
+			writer.write(contents);
+		} finally {
+			if (writer != null) {
+				writer.close();
+			}
+		}
 	}
 	
 	/// Delete files from the temp folder older than default hours
@@ -94,7 +133,7 @@ public class tempFile {
 			hours = file_outdated_hours;
 		}
 		long currentTimeMillis = (System.currentTimeMillis() / 1000);
-		File[] files = createTempDir().listFiles();
+		File[] files = getTempDir().listFiles();
 		if (files != null) {
 			for (File file : files) {
 				if (file.isFile()) {
@@ -107,8 +146,7 @@ public class tempFile {
 		}
 	}
 	
-	//TODO: TBI
+	//TODO: To be implemented
 	public static void debouncedCleanup() {
-		
 	}
 }

@@ -19,10 +19,30 @@ public class TestConfig {
 	//-------------------------------//
 	// Default Credentials for MYSQL //
 	//-------------------------------//
-	static private String MYSQL_CONN_URL = "jdbc:mysql://54.169.34.78:3306/JAVACOMMONS";
+	static private String MYSQL_CONN_JDBC = "jdbc:mysql://54.169.34.78:3306/JAVACOMMONS";
+	static private String MYSQL_CONN = "54.169.34.78:3306";
+	static private String MYSQL_DATA = "JAVACOMMONS";
+	static private String MYSQL_USER = "JAVACOMMONS";
+	static private String MYSQL_PASS = "JAVACOMMONS";
 	
-	static public String MYSQL_CONN_URL() {
-		return MYSQL_CONN_URL;
+	static public String MYSQL_CONN() {
+		return MYSQL_CONN;
+	}
+	
+	static public String MYSQL_DATA() {
+		return MYSQL_DATA;
+	}
+	
+	static public String MYSQL_USER() {
+		return MYSQL_USER;
+	}
+	
+	static public String MYSQL_PASS() {
+		return MYSQL_PASS;
+	}
+	
+	static public String MYSQL_CONN_JDBC() {
+		return MYSQL_CONN_JDBC;
 	}
 	
 	static public Properties MYSQL_CONN_PROPS() {

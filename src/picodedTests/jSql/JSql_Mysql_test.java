@@ -13,6 +13,6 @@ public class JSql_Mysql_test extends JSql_Sqlite_test {
 	@Before
 	public void setUp() {
 		//create connection
-		JSqlObj = JSql.mysql(TestConfig.MYSQL_CONN_URL(), TestConfig.MYSQL_CONN_PROPS());
+		JSqlObj = JSql.mysql(TestConfig.MYSQL_CONN_JDBC(), TestConfig.MYSQL_CONN_PROPS());
 	}
 }

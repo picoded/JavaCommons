@@ -16,6 +16,7 @@ public class JSql_Sqlite_test {
 	public static void oneTimeSetUp() {
 		// one-time initialization code
 		testTableName = "JSqlTest_" + TestConfig.randomTablePrefix();
+		testTableName = testTableName.toUpperCase();
 	}
 	
 	@AfterClass

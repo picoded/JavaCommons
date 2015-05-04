@@ -21,7 +21,6 @@ public class ObjectSet_JSql_mysql_test extends ObjectSet_JSql_sqlite_test {
 	
 	/// This function is to be overriden for the various JSQL implementation
 	public void setUpDB() {
-		JSqlObj = JSql.mysql(TestConfig.MYSQL_CONN(), TestConfig.MYSQL_DATA(), TestConfig.MYSQL_USER(), TestConfig
-			.MYSQL_PASS());
+		JSqlObj = JSql.mysql(TestConfig.MYSQL_CONN_JDBC(), TestConfig.MYSQL_CONN_PROPS());
 	}
 }

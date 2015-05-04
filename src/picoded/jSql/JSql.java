@@ -42,8 +42,13 @@ public class JSql implements BaseInterface {
 	}
 	
 	/// MySql static constructor, returns picoded.jSql.JSql_Mysql
-	public static JSql mysql(String urlStr, String dbName, String dbUser, String dbPass) {
-		return new picoded.jSql.db.JSql_Mysql(urlStr, dbName, dbUser, dbPass);
+	public static JSql mysql(String dbServerAddress, String dbName, String dbUser, String dbPass) {
+		return new picoded.jSql.db.JSql_Mysql(dbServerAddress, dbName, dbUser, dbPass);
+	}
+	
+	/// MySql static constructor, returns picoded.jSql.JSql_Mysql
+	public static JSql mysql(String connectionUrl, Properties connectionProps) {
+		return new picoded.jSql.db.JSql_Mysql(connectionUrl, connectionProps);
 	}
 	
 	/// Mssql static constructor, returns picoded.jSql.JSql_Mssql
@@ -373,13 +378,15 @@ public class JSql implements BaseInterface {
 	///
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
 	/// INSERT OR REPLACE INTO Employee (
-	///	id,     // Unique Columns to check for upsert
-	///	name,   // Insert Columns to update
-	///	role,   // Default Columns, that has default fallback value
-	///   note,   // Misc Columns, which existing values are preserved (if exists)
+	///	id,      // Unique Columns to check for upsert
+	///	fname,   // Insert Columns to update
+	///	lname,   // Insert Columns to update
+	///	role,    // Default Columns, that has default fallback value
+	///   note,    // Misc Columns, which existing values are preserved (if exists)
 	/// ) VALUES (
-	///	1,      // Unique value
-	/// 	'C3PO', // Insert value
+	///	1,       // Unique value
+	/// 	'Tom',   // Insert value
+	/// 	'Hanks', // Update value
 	///	COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'), // Values with default
 	///	(SELECT note FROM Employee WHERE id = 1) // Misc values to preserve
 	/// );

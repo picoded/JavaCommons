@@ -31,7 +31,7 @@ public class PDFGenerator_test {
 	
 	@Before
 	public void setUp() {
-		inputHTMLFile = "./test-files/test-specific/fileUtils/PDFGenerator/pdf-generator-html.html";
+		inputHTMLFile = "./test-files/test-specific/fileUtils/PDFGenerator/";
 		outputPdfFile = "./test-files/tmp/fileUtils/PDFGenerator/";
 		
 		// makes the output directory tmporary folder as needed
@@ -47,7 +47,8 @@ public class PDFGenerator_test {
 	///
 	@Test
 	public void generatePDFfromHTMLfile() throws FileNotFoundException, IOException {
-		assertTrue(PDFGenerator.generatePDFfromHTMLfile(outputPdfFile + "test1.pdf", inputHTMLFile));
+		assertTrue(PDFGenerator.generatePDFfromHTMLfile(outputPdfFile + "test1.pdf", inputHTMLFile
+			+ "pdf-generator-html-1.html"));
 	}
 	
 	///
@@ -55,7 +56,8 @@ public class PDFGenerator_test {
 	///
 	@Test
 	public void generatePDFfromRawHTML() throws FileNotFoundException, IOException {
-		assertTrue(PDFGenerator.generatePDFfromRawHTML(outputPdfFile + "test2.pdf", readHTMLFile(inputHTMLFile)));
+		assertTrue(PDFGenerator.generatePDFfromRawHTML(outputPdfFile + "test2.pdf", readHTMLFile(inputHTMLFile
+			+ "pdf-generator-2.html")));
 	}
 	
 	/// Reads a HTML file in a string and returns

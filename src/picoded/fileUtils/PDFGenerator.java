@@ -35,7 +35,7 @@ public class PDFGenerator {
 	/// @param   htmlFilePath    HTML file path string
 	///
 	/// @returns  true if the HTML file is converted and saved in a pdf file
-	public static boolean generatePDFfromHTML(String pdfFile, String htmlFilePath) {
+	public static boolean generatePDFfromHTMLfile(String pdfFile, String htmlFilePath) {
 		OutputStream outputStream = null;
 		try {
 			String url2 = new File(htmlFilePath).toURI().toString();
@@ -66,11 +66,11 @@ public class PDFGenerator {
 	
 	/// Generates a pdf file given the RAW html string
 	///
-	/// @param   rawHtml          raw HTML string
 	/// @param   outputpdfpath    pdf file path string
+	/// @param   rawHtml          raw HTML string
 	///
 	/// @returns  true if the HTML raw string is converted and saved in a pdf file.
-	public static boolean generatePDFfromRawHTML(String rawHtml, String outputpdfpath) {
+	public static boolean generatePDFfromRawHTML(String outputpdfpath, String rawHtml) {
 		OutputStream outputStream = null;
 		try {
 			outputStream = new FileOutputStream(outputpdfpath);

@@ -18,18 +18,18 @@ import java.util.regex.Matcher;
 /// // covert a HTML file to a pdf file
 ///
 /// String pdfOutputFile = //test-files/temp/fileUtils//pdfFile.pdf
-/// String htmlInputFile = //test-files/fileUtils/pdfGenerator/pdf-generator-html.html
-/// pdfGenerator.generatePDFfromHTML(pdfOutputFile, htmlInputFile);
+/// String htmlInputFile = //test-files/fileUtils/PDFGenerator/pdf-generator-html.html
+/// PDFGenerator.generatePDFfromHTML(pdfOutputFile, htmlInputFile);
 ///
 /// // covert a HTML string to a pdf file
 ///
 /// String pdfOutputFile = //test-files/temp/fileUtils//pdfFile.pdf
 /// String htmlString = "<table><tr><th>Cell A</th></tr><tr><td>Cell Data</td></tr></table>"
-/// pdfGenerator.generatePDFfromRawHTML(pdfOutputFile, htmlString);
+/// PDFGenerator.generatePDFfromRawHTML(pdfOutputFile, htmlString);
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
-public class pdfGenerator {
+public class PDFGenerator {
 	
 	/// Generates a pdf file given the HTML file path
 	///
@@ -37,39 +37,21 @@ public class pdfGenerator {
 	/// @param   htmlFilePath    HTML file path string
 	///
 	/// @returns  true if the HTML file is converted and saved in a pdf file
-	public static boolean generatePDFfromHTML(String pdfFile, String htmlFilePath) {
+	public static boolean generatePDFfromHTMLfile(String pdfFile, String htmlFilePath) {
 		OutputStream outputStream = null;
 		try {
 			pdfFile = pdfFile.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System.getProperty("file.separator")));
 			
+			createOutputFolder(pdfFile);
+			
+			outputStream = new FileOutputStream(pdfFile);
+			
 			htmlFilePath = htmlFilePath.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System
 				.getProperty("file.separator")));
 			
-			String outputFolderpath = pdfFile.substring(0, pdfFile.lastIndexOf(File.separator));
-			String outputFilename = pdfFile.substring(pdfFile.lastIndexOf(File.separator) + 1);
-			File outputFolder = new File(outputFolderpath);
-			File outputFile = new File(outputFolder, outputFilename);
-			
-			if (!outputFolder.exists()) {
-				outputFolder.mkdirs();
-			}
-			outputStream = new FileOutputStream(outputFile);
-			
-			String inputFolderpath = htmlFilePath.substring(0, htmlFilePath.lastIndexOf(File.separator));
-			String inputFilename = htmlFilePath.substring(htmlFilePath.lastIndexOf(File.separator) + 1);
-			
-			File inputFolder = new File(inputFolderpath);
-			if (!inputFolder.exists()) {
-				throw new IOException("HTML file path is not valid.");
-			}
-			File inputFile = new File(inputFolder, inputFilename);
-			if (!inputFile.exists()) {
-				throw new IOException("HTML file does not exist.");
-			}
-			
 			ITextRenderer renderer = new ITextRenderer();
-			renderer.setDocument(inputFile);
-			//          renderer.writeNextDocument();
+			renderer.setDocument(new File(htmlFilePath));
+			// renderer.writeNextDocument();
 			renderer.layout();
 			
 			// generate pdf
@@ -91,15 +73,29 @@ public class pdfGenerator {
 		return true;
 	}
 	
+	private static void createOutputFolder(String outputFilePath) throws IOException {
+		String outputFolderpath = outputFilePath.substring(0, outputFilePath.lastIndexOf(File.separator));
+		File outputFolder = new File(outputFolderpath);
+		
+		if (!outputFolder.exists()) {
+			outputFolder.mkdirs();
+		}
+	}
+	
 	/// Generates a pdf file given the RAW html string
 	///
-	/// @param   rawHtml          raw HTML string
 	/// @param   outputpdfpath    pdf file path string
+	/// @param   rawHtml          raw HTML string
 	///
 	/// @returns  true if the HTML raw string is converted and saved in a pdf file.
-	public static boolean generatePDFfromRawHTML(String rawHtml, String outputpdfpath) {
+	public static boolean generatePDFfromRawHTML(String outputpdfpath, String rawHtml) {
 		OutputStream outputStream = null;
 		try {
+			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System
+				.getProperty("file.separator")));
+			
+			createOutputFolder(outputpdfpath);
+			
 			outputStream = new FileOutputStream(outputpdfpath);
 			ITextRenderer renderer = new ITextRenderer();
 			renderer.setDocumentFromString(rawHtml);

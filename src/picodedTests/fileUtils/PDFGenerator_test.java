@@ -1,7 +1,7 @@
 package picodedTests.fileUtils;
 
 import static org.junit.Assert.assertTrue;
-
+import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -10,19 +10,22 @@ import java.io.IOException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import picoded.fileUtils.pdfGenerator;
+import picoded.fileUtils.PDFGenerator;
 
 ///
-/// Test Case for picoded.util.pdfGenerator
+/// Test Case for picoded.util.PDFGenerator
 ///
-public class pdfGenerator_test {
+public class PDFGenerator_test {
 	private String outputPdfFile = null;
 	private String inputHTMLFile = null;
 	
 	@Before
 	public void setUp() {
-		inputHTMLFile = "/home/action/workspace/javacommons/test-files/fileUtils/pdfGenerator/pdf-generator-html.html";
-		outputPdfFile = "/home/action/workspace/javacommons/test-files/tmp/fileUtils/test.pdf";
+		inputHTMLFile = "./test-files/test-specific/fileUtils/PDFGenerator/";
+		outputPdfFile = "./test-files/tmp/fileUtils/PDFGenerator/";
+		
+		// makes the output directory tmporary folder as needed
+		(new File("./test-files/tmp/fileUtils/PDFGenerator")).mkdirs();
 	}
 	
 	@After
@@ -33,8 +36,9 @@ public class pdfGenerator_test {
 	/// Test HTML file conversion to a PDF file
 	///
 	@Test
-	public void generatePDFfromHTML() throws FileNotFoundException, IOException {
-		assertTrue(pdfGenerator.generatePDFfromHTML(outputPdfFile, inputHTMLFile));
+	public void generatePDFfromHTMLfile() throws FileNotFoundException, IOException {
+		assertTrue(PDFGenerator.generatePDFfromHTMLfile(outputPdfFile + "test1.pdf", inputHTMLFile
+			+ "pdf-generator-1.html"));
 	}
 	
 	///
@@ -42,7 +46,8 @@ public class pdfGenerator_test {
 	///
 	@Test
 	public void generatePDFfromRawHTML() throws FileNotFoundException, IOException {
-		assertTrue(pdfGenerator.generatePDFfromRawHTML(readHTMLFile(inputHTMLFile), outputPdfFile));
+		assertTrue(PDFGenerator.generatePDFfromRawHTML(outputPdfFile + "test2.pdf", readHTMLFile(inputHTMLFile
+			+ "pdf-generator-2.html")));
 	}
 	
 	/// Reads a HTML file in a string and returns

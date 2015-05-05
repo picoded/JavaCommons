@@ -19,7 +19,7 @@ import picoded.jSql.*
 ///
 /// Notes
 /// - Hash refers to MD5 of the string to a byte[16] array, then base58 convert them to a string. Produces a compact 22 character hash
-/// -
+/// - Hash collisions are ignored. Really, what are the odds for unintentional hash collision.
 ///
 /// Tricky bits (to settle later):
 /// - how to set the JSql connection to low timeout? or must it be part of the JDBC constructor options parameters
@@ -66,7 +66,8 @@ public class ServletLogging {
 	/// The actual log storage, note that all string values that are larger then a defined size (21?) is stored in PREFIX_logStrHashes instead,
 	/// where its hash value is used. Note that the process to check for existing hashes, is done locally on the sqlite, before the central DB.
 	///
-	/// - instID  (indexed)        // instance ID, used to trace the hashing source
+	/// - instID  (indexed)        // instance ID, used to trace the logging source
+	/// - reqsID  (indexed)        // request ID, used to trace the logging source
 	/// - creTime (indexed)        // created unix timestamp
 	/// - fmtHash (indexed)        // format string hash, see PREFIX_logStrHashes
 	/// - logType (indexed)        // log data type
@@ -78,7 +79,7 @@ public class ServletLogging {
 	/// - lXX-YY  (not indexed)    // long values used in the format that is NOT indexed
 	/// - sXX-YY  (not indexed)    // varchar string value storage, varchar(22)
 	///
-	/// # PREFIX_excTraceHash
+	/// # PREFIX_excStrHash
 	/// Contains the hash values of the stack traces. This function similarly to logStrHashes
 	///
 	/// - hash (indexed)
@@ -89,7 +90,9 @@ public class ServletLogging {
 	/// from flooding the database storage system, when they are essentially, the same messages.
 	///
 	/// - expHash    (indexed)     // Full exception message hash
+	/// - reqsID     (indexed)     // request ID, used to trace the logging source
 	/// - creTime    (indexed)     // Exception created timestamp
+	/// - instID     (indexed)     // instance ID, used to trace the hashing source
 	///
 	/// (note the stack messages is filled in in the following order)
 	/// - excRoot    (indexed)     // Exception root cause message
@@ -114,5 +117,41 @@ public class ServletLogging {
 		return this;
 	}
 	
-	//public
+	/// Returns the instance ID stored inside the SQLite DB, if it does not exists, generate one
+	public String instanceID() {
+		return null;
+	}
+	
+	/// Validate if the instance ID if it belongs to the current physical / virtual server. If it fails, it reissues the ID. Used on servlet startup
+	public String validateInstanceID() {
+		return null;
+	}
+	
+	/// Returns the current request ID
+	public String requestID() {
+		return null;
+	}
+	
+	/// Reissue a new requestID, used at start of servlet call
+	public String reissueRequestID() {
+		return null;
+	}
+	
+	/// Add the format to the system
+	public String addFormat(String formatName, String formatString) {
+		return null;
+	}
+	
+	/// Get / Has / Remove format
+	
+	/// Performs a logging with a format name and argument
+	public void logWithFormat(String formatName, Object[] args) {
+		
+	}
+	
+	/// Performs a logging with a formant name, argument, and attached exception
+	public void logWithFormat(String formatName, Object[] args, Exception e) {
+		
+	}
+	
 }

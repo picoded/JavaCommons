@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import java.util.regex.Matcher;
+
 /// pdfGenerator is a utility class to covert either a HTML string or a HTML file to a PDF file
 ///
 /// ### Example Usage
@@ -38,12 +40,36 @@ public class pdfGenerator {
 	public static boolean generatePDFfromHTML(String pdfFile, String htmlFilePath) {
 		OutputStream outputStream = null;
 		try {
-			String url2 = new File(htmlFilePath).toURI().toString();
-			outputStream = new FileOutputStream(pdfFile);
+			pdfFile = pdfFile.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System.getProperty("file.separator")));
+			
+			htmlFilePath = htmlFilePath.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System
+				.getProperty("file.separator")));
+			
+			String outputFolderpath = pdfFile.substring(0, pdfFile.lastIndexOf(File.separator));
+			String outputFilename = pdfFile.substring(pdfFile.lastIndexOf(File.separator) + 1);
+			File outputFolder = new File(outputFolderpath);
+			File outputFile = new File(outputFolder, outputFilename);
+			
+			if (!outputFolder.exists()) {
+				outputFolder.mkdirs();
+			}
+			outputStream = new FileOutputStream(outputFile);
+			
+			String inputFolderpath = htmlFilePath.substring(0, htmlFilePath.lastIndexOf(File.separator));
+			String inputFilename = htmlFilePath.substring(htmlFilePath.lastIndexOf(File.separator) + 1);
+			
+			File inputFolder = new File(inputFolderpath);
+			if (!inputFolder.exists()) {
+				throw new IOException("HTML file path is not valid.");
+			}
+			File inputFile = new File(inputFolder, inputFilename);
+			if (!inputFile.exists()) {
+				throw new IOException("HTML file does not exist.");
+			}
+			
 			ITextRenderer renderer = new ITextRenderer();
-			//renderer.setDocument(new File(url2).toURI().toString());
-			renderer.setDocument(new File(htmlFilePath));
-			renderer.writeNextDocument();
+			renderer.setDocument(inputFile);
+			//          renderer.writeNextDocument();
 			renderer.layout();
 			
 			// generate pdf
@@ -51,6 +77,7 @@ public class pdfGenerator {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		} finally {
 			if (outputStream != null) {

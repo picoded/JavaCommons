@@ -20,19 +20,22 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.*;
 
-import picoded.fileUtils.pdfGenerator;
+import picoded.fileUtils.PDFGenerator;
 
 ///
-/// Test Case for picoded.util.pdfGenerator
+/// Test Case for picoded.util.PDFGenerator
 ///
-public class pdfGenerator_test {
+public class PDFGenerator_test {
 	private String outputPdfFile = null;
 	private String inputHTMLFile = null;
 	
 	@Before
 	public void setUp() {
-		inputHTMLFile = "./test-files/fileUtils/pdfGenerator/pdf-generator-html.html";
-		outputPdfFile = "./test-files/temp/fileUtils/test.pdf";
+		inputHTMLFile = "./test-files/fileUtils/PDFGenerator/pdf-generator-html.html";
+		outputPdfFile = "./test-files/tmp/fileUtils/PDFGenerator/test.pdf";
+		
+		// makes the output directory tmporary folder as needed
+		(new File("./test-files/tmp/fileUtils/PDFGenerator")).mkdirs();
 	}
 	
 	@After
@@ -44,7 +47,7 @@ public class pdfGenerator_test {
 	///
 	@Test
 	public void generatePDFfromHTML() throws FileNotFoundException, IOException {
-		assertTrue(pdfGenerator.generatePDFfromHTML(outputPdfFile, inputHTMLFile));
+		assertTrue(PDFGenerator.generatePDFfromHTML(outputPdfFile, inputHTMLFile));
 	}
 	
 	///
@@ -52,7 +55,7 @@ public class pdfGenerator_test {
 	///
 	@Test
 	public void generatePDFfromRawHTML() throws FileNotFoundException, IOException {
-		assertTrue(pdfGenerator.generatePDFfromRawHTML(readHTMLFile(inputHTMLFile), outputPdfFile));
+		assertTrue(PDFGenerator.generatePDFfromRawHTML(readHTMLFile(inputHTMLFile), outputPdfFile));
 	}
 	
 	/// Reads a HTML file in a string and returns

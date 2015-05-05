@@ -7,7 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-/// pdfGenerator is a utility class to covert either a HTML string or a HTML file to a PDF file
+/// PDFGenerator is a utility class to covert either a HTML string or a HTML file to a PDF file
 ///
 /// ### Example Usage
 ///
@@ -16,18 +16,18 @@ import java.io.OutputStream;
 /// // covert a HTML file to a pdf file
 ///
 /// String pdfOutputFile = //test-files/temp/fileUtils//pdfFile.pdf
-/// String htmlInputFile = //test-files/fileUtils/pdfGenerator/pdf-generator-html.html
-/// pdfGenerator.generatePDFfromHTML(pdfOutputFile, htmlInputFile);
+/// String htmlInputFile = //test-files/fileUtils/PDFGenerator/pdf-generator-html.html
+/// PDFGenerator.generatePDFfromHTML(pdfOutputFile, htmlInputFile);
 ///
 /// // covert a HTML string to a pdf file
 ///
 /// String pdfOutputFile = //test-files/temp/fileUtils//pdfFile.pdf
 /// String htmlString = "<table><tr><th>Cell A</th></tr><tr><td>Cell Data</td></tr></table>"
-/// pdfGenerator.generatePDFfromRawHTML(pdfOutputFile, htmlString);
+/// PDFGenerator.generatePDFfromRawHTML(pdfOutputFile, htmlString);
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
-public class pdfGenerator {
+public class PDFGenerator {
 	
 	/// Generates a pdf file given the HTML file path
 	///

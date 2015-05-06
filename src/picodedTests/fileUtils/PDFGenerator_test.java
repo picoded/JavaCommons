@@ -34,6 +34,7 @@ public class PDFGenerator_test {
 	
 	///
 	/// Test HTML file conversion to a PDF file
+	/// embeded file path (image, css, js etc.) in input html file should be relative to html file path
 	///
 	@Test
 	public void generatePDFfromHTMLfile() throws FileNotFoundException, IOException {
@@ -43,6 +44,7 @@ public class PDFGenerator_test {
 	
 	///
 	/// Test HTML raw string conversion to a PDF file
+	/// embeded file path (image, css, js etc.) in input html String should be relative to execute location
 	///
 	@Test
 	public void generatePDFfromRawHTML() throws FileNotFoundException, IOException {

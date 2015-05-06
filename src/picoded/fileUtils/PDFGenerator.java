@@ -32,6 +32,7 @@ import java.util.regex.Matcher;
 public class PDFGenerator {
 	
 	/// Generates a pdf file given the HTML file path
+	/// embeded file path (image, css, js etc.) in input html file should be relative to html file path
 	///
 	/// @param   pdfFile         pdf file path string
 	/// @param   htmlFilePath    HTML file path string
@@ -83,6 +84,7 @@ public class PDFGenerator {
 	}
 	
 	/// Generates a pdf file given the RAW html string
+	/// embeded file path (image, css, js etc.) in input html String should be relative to execute location
 	///
 	/// @param   outputpdfpath    pdf file path string
 	/// @param   rawHtml          raw HTML string

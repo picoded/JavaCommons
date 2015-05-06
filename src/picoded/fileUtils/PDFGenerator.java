@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-/// PDFGenerator is a utility class to covert either a HTML string or a HTML file to a PDF file
+import java.util.regex.Matcher;
+
+/// pdfGenerator is a utility class to covert either a HTML string or a HTML file to a PDF file
 ///
 /// ### Example Usage
 ///
@@ -38,12 +40,18 @@ public class PDFGenerator {
 	public static boolean generatePDFfromHTMLfile(String pdfFile, String htmlFilePath) {
 		OutputStream outputStream = null;
 		try {
-			String url2 = new File(htmlFilePath).toURI().toString();
+			pdfFile = pdfFile.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System.getProperty("file.separator")));
+			
+			createOutputFolder(pdfFile);
+			
 			outputStream = new FileOutputStream(pdfFile);
+			
+			htmlFilePath = htmlFilePath.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System
+				.getProperty("file.separator")));
+			
 			ITextRenderer renderer = new ITextRenderer();
-			//renderer.setDocument(new File(url2).toURI().toString());
 			renderer.setDocument(new File(htmlFilePath));
-			renderer.writeNextDocument();
+			// renderer.writeNextDocument();
 			renderer.layout();
 			
 			// generate pdf
@@ -51,6 +59,7 @@ public class PDFGenerator {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		} finally {
 			if (outputStream != null) {
@@ -64,6 +73,15 @@ public class PDFGenerator {
 		return true;
 	}
 	
+	private static void createOutputFolder(String outputFilePath) throws IOException {
+		String outputFolderpath = outputFilePath.substring(0, outputFilePath.lastIndexOf(File.separator));
+		File outputFolder = new File(outputFolderpath);
+		
+		if (!outputFolder.exists()) {
+			outputFolder.mkdirs();
+		}
+	}
+	
 	/// Generates a pdf file given the RAW html string
 	///
 	/// @param   outputpdfpath    pdf file path string
@@ -73,6 +91,11 @@ public class PDFGenerator {
 	public static boolean generatePDFfromRawHTML(String outputpdfpath, String rawHtml) {
 		OutputStream outputStream = null;
 		try {
+			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System
+				.getProperty("file.separator")));
+			
+			createOutputFolder(outputpdfpath);
+			
 			outputStream = new FileOutputStream(outputpdfpath);
 			ITextRenderer renderer = new ITextRenderer();
 			renderer.setDocumentFromString(rawHtml);

@@ -1,25 +1,15 @@
 package picodedTests.fileUtils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.io.IOException;
-import java.io.FileReader;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.*;
-
 import picoded.fileUtils.PDFGenerator;
 
 ///
@@ -48,7 +38,7 @@ public class PDFGenerator_test {
 	@Test
 	public void generatePDFfromHTMLfile() throws FileNotFoundException, IOException {
 		assertTrue(PDFGenerator.generatePDFfromHTMLfile(outputPdfFile + "test1.pdf", inputHTMLFile
-			+ "pdf-generator-html-1.html"));
+			+ "pdf-generator-1.html"));
 	}
 	
 	///

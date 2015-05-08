@@ -66,7 +66,7 @@ public class JSql implements BaseInterface {
 		throw new RuntimeException(JSqlException.invalidDatabaseImplementationException);
 	}
 	
-	/// database connection
+	/// Database connection
 	protected Connection sqlConn = null;
 	
 	/// Internal refrence of the current sqlType the system is running as
@@ -78,7 +78,7 @@ public class JSql implements BaseInterface {
 	/// [private] Helper function, used to prepare the sql statment in multiple situations
 	protected PreparedStatement prepareSqlStatment(String qString, Object... values) throws JSqlException {
 		int pt = 0;
-		final Object parts[] = values;
+		final Object parts[] = (values != null)? values : (new Object[] {});
 		
 		Object argObj;
 		PreparedStatement ps;
@@ -525,6 +525,48 @@ public class JSql implements BaseInterface {
 	) throws JSqlException {
 		return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues, null, null, null);
 	}
+	
+	///
+	/// Helps generate an SQL CREATE TABLE IF NOT EXISTS request. This function was created to acommedate the various
+	/// syntax differances of CREATE TABLE IF NOT EXISTS across the various SQL vendors (if any).
+	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
+	/// The syntax below, is an example of such an CREATE TABLE IF NOT EXISTS statement for SQLITE.
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	/// CREATE TABLE IF NOT EXISTS TABLENAME ( COLLUMNS_NAME TYPE, ... )
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	///
+	public JSqlQuerySet createTable(
+												String tableName, // Table name to create
+												//
+												String[] columnName, // The column names
+												String[] columnDefine  // The column types
+											) {
+		if( columnName == null || columnDefine == null ||
+			 columnDefine.length != columnName.length ) {
+			throw new IllegalArgumentException( "Invalid columnName/Type provided: "+columnName+" : "+columnDefine );
+		}
+		
+		StringBuilder queryBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS `");
+		queryBuilder.append(tableName);
+		queryBuilder.append("` ( ");
+		
+		for(int a=0; a<columnName.length; ++a) {
+			if(a>0) {
+				queryBuilder.append(", ");
+			}
+			queryBuilder.append(columnName[a]);
+			queryBuilder.append(" ");
+			queryBuilder.append(columnDefine[a]);
+		}
+		queryBuilder.append(" )");
+		
+		// Create the query set
+		return new JSqlQuerySet(queryBuilder.toString(), null, this);
+	}
+	
 	
 	///
 	/// Helps generate an SQL SELECT request. This function was created to acommedate the various

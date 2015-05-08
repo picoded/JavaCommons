@@ -1,4 +1,4 @@
-package picoded.jSql;
+package picoded.JSql;
 
 /// JSql type options enum, see JSql.sqlType for its usage
 public enum JSqlType {

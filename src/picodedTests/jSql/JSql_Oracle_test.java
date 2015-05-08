@@ -1,12 +1,12 @@
-package picodedTests.jSql;
+package picodedTests.JSql;
 
 import org.junit.*;
 
 import static org.junit.Assert.*;
 
-import picoded.jSql.*;
-import picoded.jSql.db.JSql_Oracle;
-import picodedTests.jSql.JSql_Sqlite_test;
+import picoded.JSql.*;
+import picoded.JSql.db.JSql_Oracle;
+import picodedTests.JSql.JSql_Sqlite_test;
 import picodedTests.TestConfig;
 
 public class JSql_Oracle_test extends JSql_Sqlite_test {

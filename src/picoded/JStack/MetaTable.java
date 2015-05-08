@@ -1,4 +1,4 @@
-package picoded.jStack;
+package picoded.JStack;
 
 /// Java imports
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.logging.*;
 
 /// Picoded imports
-import picoded.jSql.*;
+import picoded.JSql.*;
 
 /// hazelcast
 import com.hazelcast.core.*;

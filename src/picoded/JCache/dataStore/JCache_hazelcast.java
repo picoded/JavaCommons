@@ -1,7 +1,7 @@
-package picoded.jCache.dataStore;
+package picoded.JCache.dataStore;
 
-import picoded.jCache.*;
-import picoded.jCache.dataStore.BaseInterface;
+import picoded.JCache.*;
+import picoded.JCache.dataStore.BaseInterface;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.Queue;
@@ -15,10 +15,10 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
-/// Implements the jCache interface for hazelcast. Note that this uses hazelcast library
+/// Implements the JCache interface for hazelcast. Note that this uses hazelcast library
 /// internally to handle the actual implementations.
 ///
-/// @see picoded.jCache.JCache
+/// @see picoded.JCache.JCache
 /// @see https://github.com/mrniko/redisson/wiki/Usage-examples
 ///
 public class JCache_hazelcast extends JCache implements BaseInterface {

@@ -1,9 +1,9 @@
-package picoded.jCache;
+package picoded.JCache;
 
 import java.lang.String;
 
-import picoded.jCache.*;
-import picoded.jCache.dataStore.BaseInterface;
+import picoded.JCache.*;
+import picoded.JCache.dataStore.BaseInterface;
 
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -12,13 +12,13 @@ import java.util.Queue;
 /// Database intreface base class.
 public class JCache implements BaseInterface {
 	
-	/// Hazelcast implementation constructor, returns picoded.jCache.dataStore.JCache_redis
+	/// Hazelcast implementation constructor, returns picoded.JCache.dataStore.JCache_redis
 	///
 	/// Setsup Hazelcast client, using the local clsuter name
 	///
 	/// @param  clustername  Hazelcast local cluster name to 'auto search' eg:"LocalHC"
 	public static JCache hazelcast(String clustername) {
-		return new picoded.jCache.dataStore.JCache_hazelcast(clustername);
+		return new picoded.JCache.dataStore.JCache_hazelcast(clustername);
 	}
 	
 	/// @TODO : NOT YET IMPLEMENTED
@@ -31,7 +31,7 @@ public class JCache implements BaseInterface {
 		throw new RuntimeException(JCacheException.invalidDatastoreImplementationException);
 	}
 	
-	/// Hazelcast implementation constructor, returns picoded.jCache.dataStore.JCache_redis
+	/// Hazelcast implementation constructor, returns picoded.JCache.dataStore.JCache_redis
 	///
 	/// Setsup Hazelcast client, using more complex config via HazelcastClientConfigObj
 	/// You may refer to the source material for more complex setups
@@ -41,19 +41,19 @@ public class JCache implements BaseInterface {
 	///
 	/// @param  redissonConfigObj  redisson based config object
 	public static JCache hazelcast(com.hazelcast.client.config.ClientConfig HazelcastClientConfigObj) {
-		return new picoded.jCache.dataStore.JCache_hazelcast(HazelcastClientConfigObj);
+		return new picoded.JCache.dataStore.JCache_hazelcast(HazelcastClientConfigObj);
 	}
 	
-	/// Redis implementation constructor, returns picoded.jCache.dataStore.JCache_redis
+	/// Redis implementation constructor, returns picoded.JCache.dataStore.JCache_redis
 	///
 	/// Setsup Redis client, in single server mode
 	///
 	/// @param  ipAddressWithPort  IP address string, with port. eg:"127.0.0.1:6379"
 	public static JCache redis(String ipAddressWithPort) {
-		return new picoded.jCache.dataStore.JCache_redis(ipAddressWithPort);
+		return new picoded.JCache.dataStore.JCache_redis(ipAddressWithPort);
 	}
 	
-	/// Redis implementation constructor, returns picoded.jCache.dataStore.JCache_redis
+	/// Redis implementation constructor, returns picoded.JCache.dataStore.JCache_redis
 	///
 	/// Setsup Redis client, using more complex config via redissonConfigObject
 	/// You may refer to the source material for more complex setups
@@ -63,7 +63,7 @@ public class JCache implements BaseInterface {
 	///
 	/// @param  redissonConfigObj  redisson based config object
 	public static JCache redis(org.redisson.Config redissonConfigObj) {
-		return new picoded.jCache.dataStore.JCache_redis(redissonConfigObj);
+		return new picoded.JCache.dataStore.JCache_redis(redissonConfigObj);
 	}
 	
 	/// Internal refrence of the current JCache type the system is running as

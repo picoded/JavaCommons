@@ -1,4 +1,4 @@
-package picoded.jCache;
+package picoded.JCache;
 
 import java.lang.String;
 import java.lang.Exception;

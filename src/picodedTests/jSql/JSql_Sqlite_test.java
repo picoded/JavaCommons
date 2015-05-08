@@ -1,10 +1,10 @@
-package picodedTests.jSql;
+package picodedTests.JSql;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 import java.util.*;
 
-import picoded.jSql.*;
+import picoded.JSql.*;
 import picodedTests.TestConfig;
 
 public class JSql_Sqlite_test {
@@ -331,7 +331,7 @@ public class JSql_Sqlite_test {
 		JSqlResult r = null;
 		JSqlQuerySet qSet = null;
 		
-		assertNotNull("query should return a jSql result", r = JSqlObj.query("SELECT * FROM " + testTableName
+		assertNotNull("query should return a JSql result", r = JSqlObj.query("SELECT * FROM " + testTableName
 			+ " ORDER BY col1 ASC"));
 		assertEquals("Initial value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
 		assertEquals("Initial value check failed", "has nothing", r.readRowCol(0, "col2"));
@@ -344,7 +344,7 @@ public class JSql_Sqlite_test {
 			));
 		assertTrue("SQL result should return true", qSet.execute());
 		
-		assertNotNull("query should return a jSql result", r = JSqlObj.query("SELECT * FROM " + testTableName
+		assertNotNull("query should return a JSql result", r = JSqlObj.query("SELECT * FROM " + testTableName
 			+ " ORDER BY col1 ASC"));
 		assertEquals("Upsert value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
 		assertEquals("Upsert value check failed", "not found", r.readRowCol(0, "col2"));

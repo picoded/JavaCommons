@@ -1,8 +1,8 @@
-package picoded.jSql.db;
+package picoded.JSql.db;
 
-import picoded.jSql.JSqlType;
-import picoded.jSql.JSqlResult;
-import picoded.jSql.JSqlException;
+import picoded.JSql.JSqlType;
+import picoded.JSql.JSqlResult;
+import picoded.JSql.JSqlException;
 
 /// Standardised database interface for JSql functionalities.
 /// in which additional database interface types are implemented.

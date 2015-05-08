@@ -1,4 +1,4 @@
-package picodedTests.jCache;
+package picodedTests.JCache;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -6,8 +6,8 @@ import java.lang.System;
 import java.util.*;
 
 import org.redisson.*;
-import picoded.jCache.*;
-import picodedTests.jCache.LocalCacheSetup;
+import picoded.JCache.*;
+import picodedTests.JCache.LocalCacheSetup;
 import java.util.concurrent.ConcurrentMap;
 
 public class JCache_redis_test {

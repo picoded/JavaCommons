@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 
 // Test case config
 import picodedTests.TestConfig;
-import picodedTests.jCache.LocalCacheSetup;
+import picodedTests.JCache.LocalCacheSetup;
 
 // Various utility includes
 import java.util.Random;

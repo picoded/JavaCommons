@@ -1,6 +1,6 @@
 package picoded.util;
 
-import picoded.jSql.*;
+import picoded.JSql.*;
 
 /// SerlvetLogging, is a utility class meant to facilitate the logging of server sideded application events, and errors
 /// This is meant to push the logging into a central SQL database, and fallbacks onto its local SQLite file, in event the

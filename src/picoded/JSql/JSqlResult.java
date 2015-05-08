@@ -1,4 +1,4 @@
-package picoded.jSql;
+package picoded.JSql;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -11,7 +11,7 @@ import java.lang.Exception;
 import java.sql.PreparedStatement;
 
 import picoded.struct.CaseInsensitiveHashMap;
-import picoded.jSql.JSqlException;
+import picoded.JSql.JSqlException;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;

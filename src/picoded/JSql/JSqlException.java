@@ -1,4 +1,4 @@
-package picoded.jSql;
+package picoded.JSql;
 
 import java.lang.String;
 import java.lang.Exception;

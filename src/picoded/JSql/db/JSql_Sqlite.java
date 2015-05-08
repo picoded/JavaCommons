@@ -1,4 +1,4 @@
-package picoded.jSql.db;
+package picoded.JSql.db;
 
 import java.lang.String;
 import java.io.File;
@@ -20,12 +20,12 @@ import java.io.PrintWriter;
 
 import java.util.concurrent.ExecutionException;
 
-import picoded.jSql.JSqlType;
-import picoded.jSql.JSqlResult;
-import picoded.jSql.JSqlException;
+import picoded.JSql.JSqlType;
+import picoded.JSql.JSqlResult;
+import picoded.JSql.JSqlException;
 
-import picoded.jSql.JSql;
-import picoded.jSql.db.BaseInterface;
+import picoded.JSql.JSql;
+import picoded.JSql.db.BaseInterface;
 
 /// Pure SQLite implentation of JSql
 public class JSql_Sqlite extends JSql implements BaseInterface {

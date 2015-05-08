@@ -1,17 +1,17 @@
-package picoded.jCache.dataStore;
+package picoded.JCache.dataStore;
 
-import picoded.jCache.*;
-import picoded.jCache.dataStore.BaseInterface;
+import picoded.JCache.*;
+import picoded.JCache.dataStore.BaseInterface;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.Queue;
 
 import org.redisson.*;
 
-/// Implements the jCache interface for redis. Note that this uses redisson library
+/// Implements the JCache interface for redis. Note that this uses redisson library
 /// internally to handle the actual implementations.
 ///
-/// @see picoded.jCache.JCache
+/// @see picoded.JCache.JCache
 /// @see https://github.com/mrniko/redisson/wiki/Usage-examples
 ///
 public class JCache_redis extends JCache implements BaseInterface {

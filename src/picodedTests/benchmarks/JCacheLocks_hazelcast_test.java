@@ -1,7 +1,7 @@
 package picodedTests.benchmarks;
 
 // Target test class
-import picoded.jCache.*;
+import picoded.JCache.*;
 
 // Test Case include
 import org.junit.*;
@@ -17,7 +17,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.logging.Logger;
 
 import picodedTests.TestConfig;
-import picodedTests.jCache.LocalCacheSetup;
+import picodedTests.JCache.LocalCacheSetup;
 
 ///
 /// Test Case for JCache performance of Locks
@@ -27,7 +27,7 @@ public class JCacheLocks_hazelcast_test {
 	private final static Logger LOGGER = Logger.getLogger(JCacheLocks_hazelcast_test.class.getName());
 	
 	public String descPrefix = "";
-	public JCache jCacheObj = null;
+	public JCache JCacheObj = null;
 	
 	/// Overwriteable test scale, used to modify the test case intensity
 	static int testScale_lockCount = 10000;
@@ -39,16 +39,16 @@ public class JCacheLocks_hazelcast_test {
 	
 	@After
 	public void tearDown() throws InterruptedException {
-		if (jCacheObj != null) {
-			jCacheObj.dispose();
-			jCacheObj = null;
+		if (JCacheObj != null) {
+			JCacheObj.dispose();
+			JCacheObj = null;
 		}
 	}
 	
 	/// Setsup the hazelcast cluster read / write
 	public void setUpJCache() throws InterruptedException {
 		descPrefix = "[Hazelcast] ";
-		jCacheObj = JCache.hazelcast(LocalCacheSetup.setupHazelcastServer());
+		JCacheObj = JCache.hazelcast(LocalCacheSetup.setupHazelcastServer());
 	}
 	
 	//--------------------------------------
@@ -118,7 +118,7 @@ public class JCacheLocks_hazelcast_test {
 		long startTime = System.currentTimeMillis();
 		
 		for (int a = 0; a < testScale_lockCount; ++a) {
-			t = jCacheObj.getLock("lock-" + a);
+			t = JCacheObj.getLock("lock-" + a);
 			try {
 				t.lock();
 			} finally {
@@ -139,12 +139,12 @@ public class JCacheLocks_hazelcast_test {
 		long startTime = System.currentTimeMillis();
 		
 		for (int a = 0; a < testScale_lockCount; ++a) {
-			t = jCacheObj.getLock("slock-" + a);
+			t = JCacheObj.getLock("slock-" + a);
 			t.lock();
 		}
 		
 		for (int a = 0; a < testScale_lockCount; ++a) {
-			t = jCacheObj.getLock("slock-" + a);
+			t = JCacheObj.getLock("slock-" + a);
 			t.unlock();
 		}
 		

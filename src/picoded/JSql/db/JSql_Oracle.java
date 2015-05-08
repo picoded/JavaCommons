@@ -1,4 +1,4 @@
-package picoded.jSql.db;
+package picoded.JSql.db;
 
 import java.lang.String;
 import java.io.File;
@@ -20,12 +20,12 @@ import java.io.PrintWriter;
 
 import java.util.concurrent.ExecutionException;
 
-import picoded.jSql.JSqlType;
-import picoded.jSql.JSqlResult;
-import picoded.jSql.JSqlException;
+import picoded.JSql.JSqlType;
+import picoded.JSql.JSqlResult;
+import picoded.JSql.JSqlException;
 
-import picoded.jSql.*;
-import picoded.jSql.db.BaseInterface;
+import picoded.JSql.*;
+import picoded.JSql.db.BaseInterface;
 
 /// Pure ORACLE-SQL implentation of JSql
 public class JSql_Oracle extends JSql implements BaseInterface {

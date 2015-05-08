@@ -1,13 +1,13 @@
-package picoded.jCache.dataStore;
+package picoded.JCache.dataStore;
 
-import picoded.jCache.JCacheException;
+import picoded.JCache.JCacheException;
 
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.SynchronousQueue;
 import java.util.List;
 
-/// Standardised jCache interface for jCache functionalities.
+/// Standardised JCache interface for JCache functionalities.
 /// in which additional server cache interface types are implemented.
 ///
 /// Note that the interface intentionaly does not include a "constructor" as that may be cache implementation dependent

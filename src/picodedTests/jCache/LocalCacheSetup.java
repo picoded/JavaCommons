@@ -1,4 +1,4 @@
-package picodedTests.jCache;
+package picodedTests.JCache;
 
 import java.lang.Exception;
 import picodedTests.TestConfig;
@@ -57,7 +57,7 @@ public class LocalCacheSetup {
 	///---------------------------------------
 	/// SimpleDB
 	///
-	/// @TODO implement SimpleDB support for unit testing, followed by jCache implementation
+	/// @TODO implement SimpleDB support for unit testing, followed by JCache implementation
 	///---------------------------------------
 	
 	/// The generate redis port

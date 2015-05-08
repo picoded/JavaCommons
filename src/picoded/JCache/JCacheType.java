@@ -1,4 +1,4 @@
-package picoded.jCache;
+package picoded.JCache;
 
 /// JSql type options enum, see JSql.sqlType for its usage
 public enum JCacheType {

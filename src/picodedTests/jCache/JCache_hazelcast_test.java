@@ -1,4 +1,4 @@
-package picodedTests.jCache;
+package picodedTests.JCache;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -13,11 +13,11 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
-import picoded.jCache.*;
-import picodedTests.jCache.LocalCacheSetup;
+import picoded.JCache.*;
+import picodedTests.JCache.LocalCacheSetup;
 import java.util.concurrent.ConcurrentMap;
 
-public class JCache_hazelcast_test extends picodedTests.jCache.JCache_redis_test {
+public class JCache_hazelcast_test extends picodedTests.JCache.JCache_redis_test {
 	
 	static protected String hazelcastClusterName;
 	static protected ClientConfig hazelcastConfig;

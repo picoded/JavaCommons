@@ -1,4 +1,4 @@
-package picoded.jSql;
+package picoded.JSql;
 
 import java.lang.String;
 import java.io.File;
@@ -22,43 +22,43 @@ import java.io.PrintWriter;
 
 import java.util.concurrent.ExecutionException;
 
-import picoded.jSql.JSqlType;
-import picoded.jSql.JSqlResult;
-import picoded.jSql.JSqlException;
+import picoded.JSql.JSqlType;
+import picoded.JSql.JSqlResult;
+import picoded.JSql.JSqlException;
 
-import picoded.jSql.db.BaseInterface;
+import picoded.JSql.db.BaseInterface;
 
 /// Database intreface base class.
 public class JSql implements BaseInterface {
 	
-	/// SQLite static constructor, returns picoded.jSql.JSql_Sqlite
+	/// SQLite static constructor, returns picoded.JSql.JSql_Sqlite
 	public static JSql sqlite() {
-		return new picoded.jSql.db.JSql_Sqlite();
+		return new picoded.JSql.db.JSql_Sqlite();
 	}
 	
-	/// SQLite static constructor, returns picoded.jSql.JSql_Sqlite
+	/// SQLite static constructor, returns picoded.JSql.JSql_Sqlite
 	public static JSql sqlite(String sqliteLoc) {
-		return new picoded.jSql.db.JSql_Sqlite(sqliteLoc);
+		return new picoded.JSql.db.JSql_Sqlite(sqliteLoc);
 	}
 	
-	/// MySql static constructor, returns picoded.jSql.JSql_Mysql
+	/// MySql static constructor, returns picoded.JSql.JSql_Mysql
 	public static JSql mysql(String dbServerAddress, String dbName, String dbUser, String dbPass) {
-		return new picoded.jSql.db.JSql_Mysql(dbServerAddress, dbName, dbUser, dbPass);
+		return new picoded.JSql.db.JSql_Mysql(dbServerAddress, dbName, dbUser, dbPass);
 	}
 	
-	/// MySql static constructor, returns picoded.jSql.JSql_Mysql
+	/// MySql static constructor, returns picoded.JSql.JSql_Mysql
 	public static JSql mysql(String connectionUrl, Properties connectionProps) {
-		return new picoded.jSql.db.JSql_Mysql(connectionUrl, connectionProps);
+		return new picoded.JSql.db.JSql_Mysql(connectionUrl, connectionProps);
 	}
 	
-	/// Mssql static constructor, returns picoded.jSql.JSql_Mssql
+	/// Mssql static constructor, returns picoded.JSql.JSql_Mssql
 	public static JSql mssql(String dbUrl, String dbName, String dbUser, String dbPass) {
-		return new picoded.jSql.db.JSql_Mssql(dbUrl, dbName, dbUser, dbPass);
+		return new picoded.JSql.db.JSql_Mssql(dbUrl, dbName, dbUser, dbPass);
 	}
 	
-	/// Oracle static constructor, returns picoded.jSql.db.JSql_Oracle
+	/// Oracle static constructor, returns picoded.JSql.db.JSql_Oracle
 	public static JSql oracle(String oraclePath, String dbUser, String dbPass) {
-		return new picoded.jSql.db.JSql_Oracle(oraclePath, dbUser, dbPass);
+		return new picoded.JSql.db.JSql_Oracle(oraclePath, dbUser, dbPass);
 	}
 	
 	/// As this is the base class varient, this funciton isnt suported

@@ -1,4 +1,4 @@
-package picoded.jSql.db;
+package picoded.JSql.db;
 
 import java.lang.String;
 import java.io.File;
@@ -22,13 +22,13 @@ import java.io.PrintWriter;
 
 import java.util.concurrent.ExecutionException;
 
-import picoded.jSql.JSqlType;
-import picoded.jSql.JSqlResult;
-import picoded.jSql.JSqlException;
+import picoded.JSql.JSqlType;
+import picoded.JSql.JSqlResult;
+import picoded.JSql.JSqlException;
 
-import picoded.jSql.JSql;
-import picoded.jSql.JSqlQuerySet;
-import picoded.jSql.db.BaseInterface;
+import picoded.JSql.JSql;
+import picoded.JSql.JSqlQuerySet;
+import picoded.JSql.db.BaseInterface;
 
 /// Pure MySQL implentation of JSql
 public class JSql_Mysql extends JSql implements BaseInterface {
@@ -125,8 +125,8 @@ public class JSql_Mysql extends JSql implements BaseInterface {
 						// extract the columns between the opening and closing brackets
 						String columns = tableAndColumnsName.substring(openBracketIndex + 1, closeBracketIndex);
 						// fetch the table meta data info
-						JSqlResult jSql = executeQuery_metadata(tablename.trim());
-						Map<String, String> metadata = jSql.fetchMetaData();
+						JSqlResult JSql = executeQuery_metadata(tablename.trim());
+						Map<String, String> metadata = JSql.fetchMetaData();
 						if (metadata != null) {
 							String[] columnsArr = columns.split(",");
 							for (String column : columnsArr) {

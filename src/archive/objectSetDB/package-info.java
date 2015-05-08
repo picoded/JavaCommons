@@ -1,6 +1,6 @@
 /// objectSetDB setsup the foundation for a structured object sets database system
 ///
-/// Actual data storage is based on picoded.jCache (for caching) and picoded.jSql (for data persistance).
+/// Actual data storage is based on picoded.JCache (for caching) and picoded.JSql (for data persistance).
 ///
 /// This is used to get the benefits of NoSQL movement, while still complying with the "requirment" for SQL
 /// found in several larger coporate environments. While seting up an "easy to use and extend" DB
@@ -19,19 +19,19 @@
 /// + Linked object sets : For all your complex hirachy needs
 /// + Key values are alphanumeric, with underscore/dash/spaces/dots/slashes only : Ensure consistancy across all storage layers
 ///
-/// ## jCache notes
+/// ## JCache notes
 ///
 /// Additionally, one of the key decision factors was to store each object (from an objectset) entirely
-/// (without the LOBS data), and fetch it respectively in its entire form from jCache, even if only a
+/// (without the LOBS data), and fetch it respectively in its entire form from JCache, even if only a
 /// single attribute will eventually be fetched. This may seem counterintuitive, however the main key
 /// decision for this came from bench marking done on picodedTests.libs.HazelcastMetaMapStructure_test
 /// showing a huge factor in performance improvement when doing a complete object in most of the use
 /// cases where multiple attributes per object is fetched.
 ///
-/// Long story short, the overhead to fetch any key-value pair from jCache, far outweights the transmission
+/// Long story short, the overhead to fetch any key-value pair from JCache, far outweights the transmission
 /// size and serialization / deserialization of the object data for 99% of the use cases not involving LOBS.
 ///
-/// ## jCache notes
+/// ## JCache notes
 ///
 /// @TODO Migrate from VARCHAR, to UNIQUEIDENTIFIER, or 2 BIGINT for name keyspace.
 /// @TODO Auto conversion of string keys to UNIQUEIDENTIFIER / 2 BIGINT

@@ -1,4 +1,4 @@
-package picoded.jSql;
+package picoded.JSql;
 
 /// JSql type options enum, see JSql.sqlType for its usage
 public class JSqlQuerySet {
@@ -9,7 +9,7 @@ public class JSqlQuerySet {
 	/// SQL arguments set
 	protected Object[] sqlArgs = null;
 	
-	/// The jSql object to query against
+	/// The JSql object to query against
 	protected JSql JSqlObj = null;
 	
 	/// Initialize the query set with the following options

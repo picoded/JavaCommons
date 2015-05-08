@@ -11,8 +11,8 @@ import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import picoded.jSql.*;
-import picoded.jCache.*;
+import picoded.JSql.*;
+import picoded.JCache.*;
 import picoded.objectSetDB.*;
 
 /// Internal usage only for objectSetDB, this handles the actual core ObjectSetDB logic

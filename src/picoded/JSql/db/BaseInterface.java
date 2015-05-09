@@ -4,11 +4,13 @@ import picoded.JSql.JSqlType;
 import picoded.JSql.JSqlResult;
 import picoded.JSql.JSqlException;
 
+import picoded.JStack.JStackLayer;
+
 /// Standardised database interface for JSql functionalities.
 /// in which additional database interface types are implemented.
 /// 
 /// Note that the interface intentionaly does not include a "constructor" as that may be database implementation dependent
-public abstract class BaseInterface {
+public abstract class BaseInterface extends JStackLayer {
 	
 	/// Internal refrence of the current sqlType the system is running as, or so it should be by default
 	//public JSqlType sqlType = JSqlType.invalid;

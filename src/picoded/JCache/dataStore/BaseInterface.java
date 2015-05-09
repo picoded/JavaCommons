@@ -7,11 +7,13 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.SynchronousQueue;
 import java.util.List;
 
+import picoded.JStack.JStackLayer;
+
 /// Standardised JCache interface for JCache functionalities.
 /// in which additional server cache interface types are implemented.
 ///
 /// Note that the interface intentionaly does not include a "constructor" as that may be cache implementation dependent
-public abstract class BaseInterface {
+public abstract class BaseInterface extends JStackLayer {
 	
 	// Internal refrence of the current JCache type the system is running as, or so it should be by default
 	//public JCacheType cacheType  = JCacheType;

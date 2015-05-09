@@ -30,7 +30,7 @@ import picoded.JSql.db.BaseInterface;
 /// Pure SQL Server 2012 implentation of JSql
 /// Support only for SQL Server 2012 and above version for the pagination query, the OFFSET / FETCH keywords
 /// are used which are faster and better in performance in comparison of old ROW_NUMBER()
-public class JSql_Mssql extends JSql implements BaseInterface {
+public class JSql_Mssql extends JSql {
 	
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(JSql_Mssql.class.getName());

@@ -11,22 +11,22 @@ import java.util.List;
 /// in which additional server cache interface types are implemented.
 ///
 /// Note that the interface intentionaly does not include a "constructor" as that may be cache implementation dependent
-public interface BaseInterface {
+public abstract class BaseInterface {
 	
 	// Internal refrence of the current JCache type the system is running as, or so it should be by default
 	//public JCacheType cacheType  = JCacheType;
 	
 	/// Returns true, if dispose() function was called prior
-	public boolean isDisposed();
+	public abstract boolean isDisposed();
 	
 	/// Dispose of the respective client driver connection
-	public void dispose();
+	public abstract void dispose();
 	
 	/// Gets a ConcurrentMap with the given name
-	public <K, V> ConcurrentMap<K, V> getMap(String name) throws JCacheException;
+	public abstract <K, V> ConcurrentMap<K, V> getMap(String name) throws JCacheException;
 	
 	/// Recreates the JCache connection if it has already been disposed of. Option to forcefully recreate the connection if needed.
-	public void recreate(boolean force);
+	public abstract void recreate(boolean force);
 	
 	/// Gets the distributed list
 	//List<?> getList(String name);

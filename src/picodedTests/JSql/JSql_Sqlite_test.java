@@ -48,23 +48,16 @@ public class JSql_Sqlite_test {
 	public void createTableQueryBuilder() throws JSqlException {
 		JSqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "`").dispose(); //cleanup (just incase)
 		
-		JSqlObj.createTable(
-			testTableName,
-			new String[] { "col1", "col2" },
-			new String[] { "INT PRIMARY KEY", "TEXT" }
-		).execute(); //valid table creation : no exception
+		JSqlObj.createTableQuerySet(testTableName, new String[] { "col1", "col2" },
+			new String[] { "INT PRIMARY KEY", "TEXT" }).execute(); //valid table creation : no exception
 		
-		JSqlObj.createTable(
-			testTableName,
-			new String[] { "col1", "col2" },
-			new String[] { "INT PRIMARY KEY", "TEXT" }
-		).execute(); //run twice to ensure "IF NOT EXISTS" works
+		JSqlObj.createTableQuerySet(testTableName, new String[] { "col1", "col2" },
+			new String[] { "INT PRIMARY KEY", "TEXT" }).execute(); //run twice to ensure "IF NOT EXISTS" works
 		
 		//JSqlObj.executeQuery( "TRUNCATE TABLE "+testTableName+"").dispose(); //run twice to ensure "IF NOT EXISTS" works
 		
-		JSqlObj.executeQuery("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)",
-									404, "has nothing")
-		.dispose();
+		JSqlObj.executeQuery("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing")
+			.dispose();
 	}
 	
 	/// This is the base execute sql test example, in which other examples are built on

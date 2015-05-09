@@ -29,7 +29,7 @@ import picoded.JSql.JSqlException;
 import picoded.JSql.db.BaseInterface;
 
 /// Database intreface base class.
-public class JSql implements BaseInterface {
+public class JSql extends BaseInterface {
 	
 	/// SQLite static constructor, returns picoded.JSql.JSql_Sqlite
 	public static JSql sqlite() {
@@ -78,7 +78,7 @@ public class JSql implements BaseInterface {
 	/// [private] Helper function, used to prepare the sql statment in multiple situations
 	protected PreparedStatement prepareSqlStatment(String qString, Object... values) throws JSqlException {
 		int pt = 0;
-		final Object parts[] = (values != null)? values : (new Object[] {});
+		final Object parts[] = (values != null) ? values : (new Object[] {});
 		
 		Object argObj;
 		PreparedStatement ps;
@@ -538,23 +538,21 @@ public class JSql implements BaseInterface {
 	/// CREATE TABLE IF NOT EXISTS TABLENAME ( COLLUMNS_NAME TYPE, ... )
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
-	public JSqlQuerySet createTable(
-												String tableName, // Table name to create
-												//
-												String[] columnName, // The column names
-												String[] columnDefine  // The column types
-											) {
-		if( columnName == null || columnDefine == null ||
-			 columnDefine.length != columnName.length ) {
-			throw new IllegalArgumentException( "Invalid columnName/Type provided: "+columnName+" : "+columnDefine );
+	public JSqlQuerySet createTableQuerySet(String tableName, // Table name to create
+		//
+		String[] columnName, // The column names
+		String[] columnDefine // The column types
+	) {
+		if (columnName == null || columnDefine == null || columnDefine.length != columnName.length) {
+			throw new IllegalArgumentException("Invalid columnName/Type provided: " + columnName + " : " + columnDefine);
 		}
 		
 		StringBuilder queryBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS `");
 		queryBuilder.append(tableName);
 		queryBuilder.append("` ( ");
 		
-		for(int a=0; a<columnName.length; ++a) {
-			if(a>0) {
+		for (int a = 0; a < columnName.length; ++a) {
+			if (a > 0) {
 				queryBuilder.append(", ");
 			}
 			queryBuilder.append(columnName[a]);
@@ -566,7 +564,6 @@ public class JSql implements BaseInterface {
 		// Create the query set
 		return new JSqlQuerySet(queryBuilder.toString(), null, this);
 	}
-	
 	
 	///
 	/// Helps generate an SQL SELECT request. This function was created to acommedate the various

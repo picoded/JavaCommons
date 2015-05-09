@@ -42,14 +42,13 @@ public class JStack {
 	// Constructor
 	//----------------------------------------------
 	
-	public JStack( JCache[] inJCacheStack, JSql[] inJSqlStack, String inNamespace ) {
+	public JStack(JCache[] inJCacheStack, JSql[] inJSqlStack, String inNamespace) {
 		JCacheStack = inJCacheStack;
 		JSqlStack = inJSqlStack;
 		namespace = inNamespace;
-		if(namespace == null) {
+		if (namespace == null) {
 			namespace = "";
 		}
 	}
-	
 	
 }

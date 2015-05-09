@@ -28,7 +28,7 @@ import picoded.JSql.JSql;
 import picoded.JSql.db.BaseInterface;
 
 /// Pure SQLite implentation of JSql
-public class JSql_Sqlite extends JSql implements BaseInterface {
+public class JSql_Sqlite extends JSql {
 	
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(JSql_Sqlite.class.getName());

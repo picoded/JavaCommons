@@ -28,7 +28,7 @@ import picoded.JSql.*;
 import picoded.JSql.db.BaseInterface;
 
 /// Pure ORACLE-SQL implentation of JSql
-public class JSql_Oracle extends JSql implements BaseInterface {
+public class JSql_Oracle extends JSql {
 	
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(JSql_Oracle.class.getName());

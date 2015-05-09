@@ -14,7 +14,7 @@ import org.redisson.*;
 /// @see picoded.JCache.JCache
 /// @see https://github.com/mrniko/redisson/wiki/Usage-examples
 ///
-public class JCache_redis extends JCache implements BaseInterface {
+public class JCache_redis extends JCache {
 	
 	/// Overwrite as redis
 	public JCacheType cacheType = JCacheType.redis;

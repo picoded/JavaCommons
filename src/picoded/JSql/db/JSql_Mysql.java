@@ -31,7 +31,7 @@ import picoded.JSql.JSqlQuerySet;
 import picoded.JSql.db.BaseInterface;
 
 /// Pure MySQL implentation of JSql
-public class JSql_Mysql extends JSql implements BaseInterface {
+public class JSql_Mysql extends JSql {
 	
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(JSql_Mysql.class.getName());

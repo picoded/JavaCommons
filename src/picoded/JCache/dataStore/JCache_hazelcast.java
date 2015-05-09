@@ -21,7 +21,7 @@ import com.hazelcast.core.IMap;
 /// @see picoded.JCache.JCache
 /// @see https://github.com/mrniko/redisson/wiki/Usage-examples
 ///
-public class JCache_hazelcast extends JCache implements BaseInterface {
+public class JCache_hazelcast extends JCache {
 	
 	/// Overwrite as redis
 	public JCacheType cacheType = JCacheType.hazelcast;

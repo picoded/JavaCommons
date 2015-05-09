@@ -67,24 +67,29 @@ public class MetaTable {
 	///--------------------------------------------------------------------------
 	
 	protected void JSqlSetup(JSql sql) throws JSqlException {
-		sql.createTable(
-											JStackObj.namespace+tableName, //
-											new String[] { //
-												"oID", //objID
-												"kID", //key storage
-												"typ", //type collumn
-												"idx", //type collumn
-												"nVl", //numeric value (if applicable)
-												"sVl"  //string value (if applicable)
-											}, //
-											new String[] { //
-												objColumnType, //
-												keyColumnType, //
-												typeColumnType, //
-												indexColumnType, //
-												numColumnType, //
-												strColumnType
-											} //
-											).execute();
+		
+		sql.createTableQuerySet( //
+			JStackObj.namespace + tableName, //
+			new String[] { //
+			"oID", //objID
+				"kID", //key storage
+				"idx", //index collumn
+				"typ", //type collumn
+				"nVl", //numeric value (if applicable)
+				"sVl" //string value (if applicable)
+			}, //
+			new String[] { //
+			objColumnType, //
+				keyColumnType, //
+				indexColumnType, //
+				typeColumnType, //
+				numColumnType, //
+				strColumnType //
+			} //
+			).execute();
+		
+		//sql.createTableIndexQuerySet(
+		
+		//)
 	}
 }

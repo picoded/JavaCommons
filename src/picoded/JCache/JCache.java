@@ -10,7 +10,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.Queue;
 
 /// Database intreface base class.
-public class JCache implements BaseInterface {
+public class JCache extends BaseInterface {
 	
 	/// Hazelcast implementation constructor, returns picoded.JCache.dataStore.JCache_redis
 	///

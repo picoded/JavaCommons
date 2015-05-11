@@ -349,5 +349,17 @@ public class JSql_Sqlite_test {
 		assertEquals("Upsert value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
 		assertEquals("Upsert value check failed", "not found", r.readRowCol(0, "col2"));
 	}
+	
 	//*/
+	@Test
+	public void recreate() throws JSqlException {
+		// close connection
+		JSqlObj.dispose();
+		// recoreate connection
+		JSqlObj.recreate(true);
+		// query should get executed
+		JSqlResult r = JSqlObj.query("SELECT * FROM " + testTableName + "");
+		assertNotNull("SQL result returns as expected", r);
+	}
+	
 }

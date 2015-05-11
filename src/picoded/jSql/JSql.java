@@ -30,70 +30,96 @@ import picoded.jSql.db.BaseInterface;
 
 /// Database intreface base class.
 public class JSql implements BaseInterface {
-   
-   private static Properties connectionProps = null;
-   
-   /// SQLite static constructor, returns picoded.jSql.JSql_Sqlite
-   public static JSql sqlite() {
-      return new picoded.jSql.db.JSql_Sqlite();
-   }
-
-   /// SQLite static constructor, returns picoded.jSql.JSql_Sqlite
-   public static JSql sqlite(String sqliteLoc) {
-      initializeValues(sqliteLoc, null, null, null, null);
-      return new picoded.jSql.db.JSql_Sqlite(sqliteLoc);
-   }
-
-   /// MySql static constructor, returns picoded.jSql.JSql_Mysql
-   public static JSql mysql(String dbServerAddress, String dbName, String dbUser, String dbPass) {
-      setConnectionPropeties(dbServerAddress, dbName, dbUser, dbPass, null);
-      return new picoded.jSql.db.JSql_Mysql(dbServerAddress, dbName, dbUser, dbPass);
-   }
-
-   /// MySql static constructor, returns picoded.jSql.JSql_Mysql
-   public static JSql mysql(String connectionUrl, Properties connectionProps) {
-      setConnectionPropeties(connectionUrl, null, null, null, connectionProps);
-      return new picoded.jSql.db.JSql_Mysql(connectionUrl, connectionProps);
-   }
-
-   /// Mssql static constructor, returns picoded.jSql.JSql_Mssql
-   public static JSql mssql(String dbUrl, String dbName, String dbUser, String dbPass) {
-      setConnectionPropeties(dbUrl, dbName, dbUser, dbPass, null);
-      return new picoded.jSql.db.JSql_Mssql(dbUrl, dbName, dbUser, dbPass);
-   }
-
-   /// Oracle static constructor, returns picoded.jSql.db.JSql_Oracle
-   public static JSql oracle(String oraclePath, String dbUser, String dbPass) {
-      setConnectionPropeties(oraclePath, null, dbUser, String dbPass, null);
-      return new picoded.jSql.db.JSql_Oracle(oraclePath, dbUser, dbPass);
-   }
 	
-	/// As this is the base class varient, this funciton isnt suported
-   public static JSql recreate(boolean force) {
-      if( JSqlObj.sqlType == JSqlType.sqlite && dbUrl == null ) {
-         return new picoded.jSql.db.JSql_Sqlite();
-      }else if( JSqlObj.sqlType == JSqlType.sqlite ){
-         return new picoded.jSql.db.JSql_Sqlite(connectionProps.get("dbUrl"));
-      }else if(JSqlObj.sqlType == JSqlType.mysql && connectionProps == null){
-         return new picoded.jSql.db.JSql_Mysql(connectionProps.get("dbUrl"), connectionProps.get("dbName"), connectionProps.get("dbUser"), connectionProps.get("dbPass"));
-      }else if( JSqlObj.sqlType == JSqlType.mysql && connectionProps != null ){
-         return new picoded.jSql.db.JSql_Mysql(connectionProps.get("dbUrl"), connectionProps.get("connectionProps"));
-      }else if(JSqlObj.sqlType == JSqlType.mssql){
-         return new picoded.jSql.db.JSql_Mssql(connectionProps.get("dbUrl"), connectionProps.get("dbName"), connectionProps.get("dbUser"), connectionProps.get("dbPass"));
-      }else if(JSqlObj.sqlType == JSqlType.oracle){
-         return new picoded.jSql.db.JSql_Oracle(connectionProps.get("dbUrl"), connectionProps.get("dbUser"), connectionProps.get("dbPass"));
-      }
-      throw new RuntimeException(JSqlException.invalidDatabaseImplementationException);
-   }
-   
 	/// database connection
 	protected Connection sqlConn = null;
 	
 	/// Internal refrence of the current sqlType the system is running as
 	public JSqlType sqlType = JSqlType.invalid;
 	
+	/// database connection properties
+	private Map<String, Object> connectionProps = null;
+	
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(JSql.class.getName());
+	
+	/// store the database connection parameters for recreating the connection
+	public void setConnectionProperties(String dbUrl, String dbName, String dbUser, String dbPass, Properties connProps) {
+		connectionProps = new HashMap<String, Object>();
+		if (dbUrl != null) {
+			connectionProps.put("dbUrl", dbUrl);
+		}
+		if (dbName != null) {
+			connectionProps.put("dbName", dbName);
+		}
+		if (dbUser != null) {
+			connectionProps.put("dbUser", dbUser);
+		}
+		if (dbPass != null) {
+			connectionProps.put("dbPass", dbPass);
+		}
+		if (connProps != null) {
+			connectionProps.put("connectionProps", connProps);
+		}
+	}
+	
+	/// SQLite static constructor, returns picoded.jSql.JSql_Sqlite
+	public static JSql sqlite() {
+		return new picoded.jSql.db.JSql_Sqlite();
+	}
+	
+	/// SQLite static constructor, returns picoded.jSql.JSql_Sqlite
+	public static JSql sqlite(String sqliteLoc) {
+		return new picoded.jSql.db.JSql_Sqlite(sqliteLoc);
+	}
+	
+	/// MySql static constructor, returns picoded.jSql.JSql_Mysql
+	public static JSql mysql(String dbServerAddress, String dbName, String dbUser, String dbPass) {
+		return new picoded.jSql.db.JSql_Mysql(dbServerAddress, dbName, dbUser, dbPass);
+	}
+	
+	/// MySql static constructor, returns picoded.jSql.JSql_Mysql
+	public static JSql mysql(String connectionUrl, Properties connectionProps) {
+		return new picoded.jSql.db.JSql_Mysql(connectionUrl, connectionProps);
+	}
+	
+	/// Mssql static constructor, returns picoded.jSql.JSql_Mssql
+	public static JSql mssql(String dbUrl, String dbName, String dbUser, String dbPass) {
+		return new picoded.jSql.db.JSql_Mssql(dbUrl, dbName, dbUser, dbPass);
+	}
+	
+	/// Oracle static constructor, returns picoded.jSql.db.JSql_Oracle
+	public static JSql oracle(String oraclePath, String dbUser, String dbPass) {
+		return new picoded.jSql.db.JSql_Oracle(oraclePath, dbUser, dbPass);
+	}
+	
+	/// As this is the base class varient, this funciton isnt suported
+	public void recreate(boolean force) {
+		if (force) {
+			dispose();
+		}
+		if (sqlType == JSqlType.sqlite) {
+			if (connectionProps.get("dbUrl") == null) {
+				new picoded.jSql.db.JSql_Sqlite();
+			} else {
+				new picoded.jSql.db.JSql_Sqlite((String) connectionProps.get("dbUrl"));
+			}
+		} else if (sqlType == JSqlType.mysql) {
+			if (connectionProps.get("connectionProps") == null) {
+				new picoded.jSql.db.JSql_Mysql((String) connectionProps.get("dbUrl"), (String) connectionProps
+					.get("dbName"), (String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
+			} else {
+				new picoded.jSql.db.JSql_Mysql((String) connectionProps.get("dbUrl"), (Properties) connectionProps
+					.get("connectionProps"));
+			}
+		} else if (sqlType == JSqlType.mssql) {
+			new picoded.jSql.db.JSql_Mssql((String) connectionProps.get("dbUrl"), (String) connectionProps.get("dbName"),
+				(String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
+		} else if (sqlType == JSqlType.oracle) {
+			new picoded.jSql.db.JSql_Oracle((String) connectionProps.get("dbUrl"), (String) connectionProps.get("dbUser"),
+				(String) connectionProps.get("dbPass"));
+		}
+	}
 	
 	/// [private] Helper function, used to prepare the sql statment in multiple situations
 	protected PreparedStatement prepareSqlStatment(String qString, Object... values) throws JSqlException {
@@ -645,13 +671,4 @@ public class JSql implements BaseInterface {
 			throw new JSqlException("executeQuery_metadata exception", e);
 		}
 	}
-   public static void setConnectionPropeties(String dbUrl, String dbName, String dbUser, String dbPass, Properties connectionProps){
-      connectionProps = new Properties();
-      connectionProps.setProperty("dbUrl", dbUrl);
-      connectionProps.setProperty("dbName", dbName);
-      connectionProps.setProperty("dbUser", dbUser);
-      connectionProps.setProperty("dbPass", dbPass);
-      connectionProps.setProperty("connectionProps", String.valueOf(connectionProps));
-      
-   }
 }

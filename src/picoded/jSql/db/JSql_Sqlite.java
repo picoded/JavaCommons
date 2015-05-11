@@ -48,6 +48,9 @@ public class JSql_Sqlite extends JSql implements BaseInterface {
 	
 	/// Internal common reuse constructor
 	private void setupSqliteConnection(String sqliteLoc) {
+		// store database connection properties
+		setConnectionProperties(sqliteLoc, null, null, null, null);
+		
 		sqlType = JSqlType.sqlite;
 		sqliteLocation = sqliteLoc;
 		
@@ -60,17 +63,6 @@ public class JSql_Sqlite extends JSql implements BaseInterface {
 			sqlConn = java.sql.DriverManager.getConnection("jdbc:sqlite:" + sqliteLocation);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load sqlite connection: ", e);
-		}
-	}
-	
-	/// Creates the connection as needed
-	public void recreate(boolean force) {
-		if (force) {
-			dispose();
-		}
-		
-		if (sqlConn != null || force) {
-			setupSqliteConnection(sqliteLocation);
 		}
 	}
 	

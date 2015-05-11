@@ -39,6 +39,9 @@ public class JSql_Mssql extends JSql implements BaseInterface {
 	public JSql_Mssql(String dbUrl, String dbName, String dbUser, String dbPass) {
 		sqlType = JSqlType.mssql;
 		
+		// store database connection properties
+		setConnectionProperties(dbUrl, dbName, dbUser, dbPass, null);
+		
 		String connectionUrl = "jdbc:jtds:sqlserver://" + dbUrl;
 		
 		if (dbName != null && dbName.length() > 0) {

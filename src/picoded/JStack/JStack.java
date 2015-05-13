@@ -8,47 +8,49 @@ import picoded.JCache.*;
 /// JCache, and JSql instances implementation.
 ///
 /// The design principle is based on the prototyping experience for mmObjDB, and the original servlet-commons implementation of metaTables.
-public class JStack {
+public class JStack extends JStackLayer {
 	
 	//----------------------------------------------
 	// Readonly internal variables
 	//----------------------------------------------
 	
 	/// Internal JCache layers stack used
-	protected JCache[] JCacheStack = null;
+	protected JStackLayer[] stackLayers = null;
 	
-	/// Internal JCache layers stack used
-	public JCache[] JCacheStack() {
-		return JCacheStack;
+	public JStackLayer[] stackLayers() {
+		return stackLayers;
 	}
 	
-	/// Internal JSql database stack used
-	protected JSql[] JSqlStack = null;
+	// Table prefixing filter ??
 	
-	/// Internal JCache layers stack used
-	public JSql[] JSqlStack() {
-		return JSqlStack;
-	}
+	// Object created timestamp prefix filter ??
 	
-	/// Internal namespace prefix, this is used for MetaTables / etc setup
-	protected String namespace = "";
-	
-	/// Internal namespace prefix, this is used for MetaTables / etc setup
-	public String namespace() {
-		return namespace;
-	}
+	// Object GUID prefix filter ??
 	
 	//----------------------------------------------
 	// Constructor
 	//----------------------------------------------
 	
-	public JStack(JCache[] inJCacheStack, JSql[] inJSqlStack, String inNamespace) {
-		JCacheStack = inJCacheStack;
-		JSqlStack = inJSqlStack;
-		namespace = inNamespace;
-		if (namespace == null) {
-			namespace = "";
-		}
+	public JStack(JStackLayer inLayer) {
+		stackLayers = new JStackLayer[] { inLayer };
 	}
+	
+	public JStack(JStackLayer inLayer, String inNamespace) {
+		stackLayers = new JStackLayer[] { inLayer };
+		setNamespace(inNamespace);
+	}
+	
+	public JStack(JStackLayer[] inStack) {
+		stackLayers = inStack;
+	}
+	
+	public JStack(JStackLayer[] inStack, String inNamespace) {
+		stackLayers = inStack;
+		setNamespace(inNamespace);
+	}
+	
+	//----------------------------------------------
+	// Constructor
+	//----------------------------------------------
 	
 }

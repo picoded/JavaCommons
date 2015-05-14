@@ -71,11 +71,11 @@ public class MetaTable_sqlite_test {
 		String guid = GUID.base58();
 		assertNull(mtObj.get(guid));
 		
-		HashMap<String, Object> objMap = new HashMap<String, Object>();
+		HashMap<String, Object> objMap = null;
 		
+		objMap = new HashMap<String, Object>();
 		objMap.put(GUID.base58(), RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
 		objMap.put(GUID.base58(), -(RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3))));
-		
 		objMap.put(GUID.base58(), GUID.base58());
 		objMap.put(GUID.base58(), GUID.base58());
 		
@@ -83,6 +83,15 @@ public class MetaTable_sqlite_test {
 		
 		objMap.put("oid", guid);
 		assertEquals(objMap, mtObj.get(guid));
+		
+		objMap = new HashMap<String, Object>();
+		objMap.put(GUID.base58(), RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
+		objMap.put(GUID.base58(), -(RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3))));
+		objMap.put(GUID.base58(), GUID.base58());
+		objMap.put(GUID.base58(), GUID.base58());
+		
+		assertNotNUll(guid = mtObj.put(null, objMap));
+		assertEquals(guid, mtObj.put(guid, objMap));
 	}
 	
 	@Test

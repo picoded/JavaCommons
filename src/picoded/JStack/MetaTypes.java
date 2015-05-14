@@ -38,20 +38,24 @@ public class MetaTypes {
 	public static int TYPE_UUID = 11;
 	/// 12     - MetaTable
 	public static int TYPE_METATABLE = 12;
+	/// 13     - JSON based object
+	public static int TYPE_JSON = 13;
 	
 	/// 21     - [UUID]
 	public static int TYPE_UUID_ARRAY = 21;
 	/// 22     - [MetaTable]
 	public static int TYPE_METATABLE_ARRAY = 22;
+	/// 23     - [JSON]
+	public static int TYPE_JSON_ARRAY = 23;
 	
 	/// 31     - Integer
-	public static int TYPE_INTEGER = 21;
+	public static int TYPE_INTEGER = 31;
 	/// 32     - Long
-	public static int TYPE_LONG = 22;
+	public static int TYPE_LONG = 32;
 	/// 33     - Double
-	public static int TYPE_DOUBLE = 23;
+	public static int TYPE_DOUBLE = 33;
 	/// 34     - Float
-	public static int TYPE_FLOAT = 24;
+	public static int TYPE_FLOAT = 34;
 	
 	/// 41     - [Integer]
 	public static int TYPE_INTEGER_ARRAY = 41;

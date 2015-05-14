@@ -7,6 +7,11 @@ import java.util.*;
 import picoded.JSql.*;
 import picoded.JCache.*;
 import picoded.JStack.*;
+import picoded.conv.GUID;
+
+import java.util.Random;
+import org.apache.commons.lang3.RandomUtils;
+
 import picodedTests.TestConfig;
 
 public class MetaTable_sqlite_test {
@@ -17,7 +22,7 @@ public class MetaTable_sqlite_test {
 	protected JStack JStackObj = null;
 	
 	protected void JStackSetup() {
-		JStackObj = new JStack( JSql.sqlite() );
+		JStackObj = new JStack(JSql.sqlite());
 	}
 	
 	protected void JStackTearDown() {
@@ -30,7 +35,8 @@ public class MetaTable_sqlite_test {
 	protected MetaTable mtObj = null;
 	
 	protected void mtObjSetup() throws JStackException {
-		mtObj = new MetaTable( JStackObj );
+		mtObj = new MetaTable(JStackObj);
+		mtObj.stackSetup();
 	}
 	
 	protected void mtObjTearDown() {
@@ -60,6 +66,30 @@ public class MetaTable_sqlite_test {
 		assertNotNull(JStackObj);
 	}
 	
+	@Test
+	public void basicTest() throws JStackException {
+		String guid = GUID.base58();
+		assertNull(mtObj.get(guid));
+		
+		HashMap<String, Object> objMap = new HashMap<String, Object>();
+		
+		objMap.put(GUID.base58(), RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
+		objMap.put(GUID.base58(), -(RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3))));
+		
+		objMap.put(GUID.base58(), GUID.base58());
+		objMap.put(GUID.base58(), GUID.base58());
+		
+		assertEquals(guid, mtObj.put(guid, objMap));
+		
+		objMap.put("oid", guid);
+		assertEquals(objMap, mtObj.get(guid));
+	}
 	
-
+	@Test
+	public void basicTestMultiple() throws JStackException {
+		for (int a = 0; a < 5000; ++a) {
+			basicTest();
+		}
+	}
+	
 }

@@ -88,8 +88,11 @@ public class CaseInsensitiveHashMap<K extends String, V> extends HashMap<K, V> {
 	/// overwritten may not be predictable / in sequence.
 	///
 	/// @param    m     Original mappings to be stored in this map
+	@SuppressWarnings("unchecked")
 	@Override
 	public void putAll(Map<? extends K, ? extends V> m) {
-		throw new RuntimeException("Not Yet Implmented");
+		for (Map.Entry<?, ?> entry : m.entrySet()) {
+			this.put((K) (entry.getKey()), (V) (entry.getValue()));
+		}
 	}
 }

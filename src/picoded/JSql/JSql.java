@@ -243,10 +243,13 @@ public class JSql extends BaseInterface {
 	//--------------------------------------------------------------------------
 	// Utility helper functions used to prepare common complex SQL quries
 	//--------------------------------------------------------------------------
+	
+	// Merge the 2 arrays together
 	public Object[] joinArguments(Object[] arr1, Object[] arr2) {
 		return org.apache.commons.lang3.ArrayUtils.addAll(arr1, arr2);
 	}
 	
+	/// Sets the auto commit level
 	public void setAutoCommit(boolean autoCommit) throws JSqlException {
 		try {
 			sqlConn.setAutoCommit(autoCommit);
@@ -255,6 +258,7 @@ public class JSql extends BaseInterface {
 		}
 	}
 	
+	/// Gets the current auto commit setting
 	public boolean getAutoCommit() throws JSqlException {
 		try {
 			return sqlConn.getAutoCommit();
@@ -263,18 +267,32 @@ public class JSql extends BaseInterface {
 		}
 	}
 	
-	public void rollback() throws JSqlException {
+	/// Runs the commit (use only if setAutoCommit is false)
+	public void commit() throws JSqlException {
 		try {
-			sqlConn.rollback();
+			sqlConn.commit();
 		} catch (Exception e) {
 			throw new JSqlException(e);
 		}
 	}
 	
+	// Performs a roll back, this is currently useless without setting checkpoints
+	//public void rollback() throws JSqlException {
+	//	try {
+	//		sqlConn.rollback();
+	//	} catch (Exception e) {
+	//		throw new JSqlException(e);
+	//	}
+	//}
+	
 	//--------------------------------------------------------------------------
 	// Utility helper functions used to prepare common complex SQL quries
 	//--------------------------------------------------------------------------
 	
+	///
+	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
+	/// syntax differances of SELECT across the various SQL vendors (if any).
+	///
 	public JSqlQuerySet selectQuerySet( //
 		String tableName, // Table name to select from
 		String selectStatement, // The Columns to select, null means all

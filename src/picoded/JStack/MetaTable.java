@@ -2,13 +2,18 @@ package picoded.JStack;
 
 /// Java imports
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.*;
+import java.util.List;
+import java.util.ArrayList;
 
 /// Picoded imports
+import picoded.conv.GUID;
 import picoded.JSql.*;
 import picoded.JCache.*;
+import picoded.struct.CaseInsensitiveHashMap;
 
 /// hazelcast
 import com.hazelcast.core.*;
@@ -87,16 +92,16 @@ public class MetaTable {
 	public MetaTable stackSetup() throws JStackException {
 		try {
 			JStackLayer[] sl = JStackObj.stackLayers();
-			for(int a=0; a<sl.length; ++a) {
+			for (int a = 0; a < sl.length; ++a) {
 				// JSql specific setup
-				if(sl[a] instanceof JSql) {
-					JSqlDataTableSetup( (JSql)(sl[a]) );
-					JSqlIndexConfigTableSetup( (JSql)(sl[a]) );
-				} else if( sl[a] instanceof JCache ) {
+				if (sl[a] instanceof JSql) {
+					JSqlDataTableSetup((JSql) (sl[a]));
+					JSqlIndexConfigTableSetup((JSql) (sl[a]));
+				} else if (sl[a] instanceof JCache) {
 					
 				}
 			}
-		} catch(JSqlException e) {
+		} catch (JSqlException e) {
 			throw new JStackException(e);
 		}
 		
@@ -116,7 +121,7 @@ public class MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Default type for all values not defined in the index
-	protected HashMap<String, MetaTypes> typeMapping;
+	protected CaseInsensitiveHashMap<String, MetaTypes> typeMapping = new CaseInsensitiveHashMap<String, MetaTypes>();
 	
 	///
 	/*
@@ -133,29 +138,29 @@ public class MetaTable {
 		
 		return this;
 	}
-	*/
-	
+	 */
+
 	///
 	/// Internal JSql table setup
 	///--------------------------------------------------------------------------
 	protected void JSqlIndexConfigTableSetup(JSql sql) throws JSqlException {
-		String tName = sql.getNamespace() + tableName + "_iConfig" + viewSuffix;
+		String tName = sql.getNamespace() + tableName + "_viewCfg" + viewSuffix;
 		
 		// Table constructor
 		//-------------------
 		sql.createTableQuerySet( //
-										tName, //
-										new String[] { //
-											"nme", //Index column name
-											"typ", //Index column type
-											"con"  //Index type string value
-										}, //
-										new String[] { //
-											keyColumnType, //
-											typeColumnType, //
-											keyColumnType //
-										} //
-		).execute(); //
+			tName, //
+			new String[] { //
+			"nme", //Index column name
+				"typ", //Index column type
+				"con" //Index type string value
+			}, //
+			new String[] { //
+			keyColumnType, //
+				typeColumnType, //
+				keyColumnType //
+			} //
+			).execute(); //
 	}
 	
 	/// JSQL Based tabel data storage
@@ -167,7 +172,7 @@ public class MetaTable {
 		sql.createTableQuerySet( //
 			tName, //
 			new String[] { //
-				// Primary key, as classic int, htis is used to lower SQL
+			// Primary key, as classic int, htis is used to lower SQL
 				// fragmentation level, and index memory usage. And is not accessible.
 				// Sharding and uniqueness of system is still maintained by GUID's
 				"pKy", //
@@ -188,11 +193,9 @@ public class MetaTable {
 				"tVl" //Textual storage, placed last for storage optimization
 			}, //
 			new String[] { //
-				pKeyColumnType, //Primary key
+			pKeyColumnType, //Primary key
 				// Time stamps
-				tStampColumnType,
-				tStampColumnType,
-				tStampColumnType,
+				tStampColumnType, tStampColumnType, tStampColumnType,
 				// Object keys
 				objColumnType, //
 				keyColumnType, //
@@ -202,9 +205,8 @@ public class MetaTable {
 				numColumnType, //
 				strColumnType, //
 				strColumnType, //
-				fullTextColumnType
-			} //
-		).execute();
+				fullTextColumnType } //
+			).execute();
 		
 		// Unique index
 		//
@@ -228,9 +230,11 @@ public class MetaTable {
 		
 		// Full text index, for textual data
 		//------------------------------------------------
-		sql.createTableIndexQuerySet( //
-			tName, "tVl", "FULLTEXT", "tVl" //
-		).execute();
+		if (sql.sqlType != JSqlType.sqlite) {
+			sql.createTableIndexQuerySet( //
+				tName, "tVl", "FULLTEXT", "tVl" //
+			).execute();
+		}
 		
 		// timestamp index, is this needed?
 		//------------------------------------------------
@@ -244,15 +248,232 @@ public class MetaTable {
 	}
 	
 	///
-	/// PUT and GET meta map operations
+	/// JSQL Specific PUT and GET meta map operations
 	///--------------------------------------------------------------------------
 	
-	/// JSQL based GET
-	protected Map<String,Object> JSqlObjectGet(JSql sql, String oid) {
+	/// Fetches the result array position using the filters
+	protected int fetchResultPosition(JSqlResult r, String objID, String key, int idx) {
+		List<Object> oID_list = r.get("oID");
+		List<Object> kID_list = r.get("kID");
+		List<Object> idx_list = r.get("idx");
 		
+		int lim = kID_list.size();
+		for (int i = 0; i < lim; ++i) {
+			
+			if (objID != null && !objID.equals(oID_list.get(i))) {
+				continue;
+			}
+			
+			if (key != null && !key.equals(((String) (kID_list.get(i))).toLowerCase())) {
+				continue;
+			}
+			
+			if (idx > -9 && idx != ((Number) (idx_list.get(i))).intValue()) {
+				continue;
+			}
+			
+			return i;
+		}
+		
+		return -1;
+	}
+	
+	/// Fetches the result array position using the filters
+	protected int fetchResultPosition(JSqlResult r, String key, int idx) {
+		return fetchResultPosition(r, null, key, idx);
+	}
+	
+	/// Extract out all the unique string values from a list array
+	protected String[] extractUnique(List<Object> arr) {
+		HashSet<String> retSet = new HashSet<String>();
+		for (Object t : arr) {
+			retSet.add(((String) t).toLowerCase());
+		}
+		return retSet.toArray(new String[retSet.size()]);
+	}
+	
+	/// Extract the key value
+	///
+	/// @TODO: Support the various numeric value
+	/// @TODO: Support string / text
+	/// @TODO: Support array sets
+	/// @TODO: Support GUID hash
+	/// @TODO: Support MetaTable
+	///
+	protected Object extractKeyValue(JSqlResult r, String key) throws JSqlException {
+		int pos = fetchResultPosition(r, key, 0); //get the 0 pos value
+		
+		if (pos <= -1) {
+			return null;
+		}
+		
+		List<Object> typList = r.get("typ");
+		int baseType = ((Number) (typList.get(pos))).intValue();
+		
+		// Int, Long, Double, Float
+		if (baseType >= MetaTypes.TYPE_INTEGER && baseType <= 34) {
+			if (baseType == MetaTypes.TYPE_INTEGER) {
+				return new Integer(((Number) (r.get("nVl").get(pos))).intValue());
+			}
+		} else if (baseType == MetaTypes.TYPE_STRING) { // String
+			return (String) (r.get("tVl").get(pos));
+		} else if (baseType == 52) { // Text
+			return (String) (r.get("tVl").get(pos));
+		} else {
+			
+		}
+		throw new JSqlException("Object type not yet supported: " + baseType);
+		//return null;
+	}
+	
+	/// MetaTable JSqlResult to CaseInsensitiveHashMap
+	protected Map<String, Object> JSqlResultToMap(JSqlResult r) throws JSqlException {
+		if (r != null && r.rowCount() <= 1) {
+			return null;
+		}
+		
+		// Get all the unique keys
+		String[] keys = extractUnique(r.get("kID"));
+		
+		// Extract the respective key values
+		Map<String, Object> retMap = new CaseInsensitiveHashMap<String, Object>();
+		for (int a = 0; a < keys.length; ++a) {
+			if (keys[a].equals("oid")) { //reserved
+				continue;
+			}
+			retMap.put(keys[a], extractKeyValue(r, keys[a]));
+		}
+		
+		return retMap;
+	}
+	
+	/// JSQL based GET
+	protected Map<String, Object> JSqlObjectGet(JSql sql, String objID) throws JSqlException {
+		String tName = sql.getNamespace() + tableName;
+		
+		// Fetch all the meta fields
+		JSqlResult r = sql.selectQuerySet(tName, "*", "oID=?", new Object[] { objID }).query();
+		
+		// Convert to map object
+		Map<String, Object> retMap = JSqlResultToMap(r);
+		
+		// Enforce policies (if data is valid)
+		if (retMap != null) {
+			// Add object ID (enforce it)
+			retMap.put("oID", objID);
+		}
+		
+		return retMap;
+	}
+	
+	/// Values to option set conversion
+	///
+	/// @TODO: Support the various numeric value
+	/// @TODO: Support string / text
+	/// @TODO: Support array sets
+	/// @TODO: Support GUID hash
+	/// @TODO: Support MetaTable
+	/// @TODO: Check against configured type
+	/// @TODO: Convert to configured type if possible (like numeric)
+	/// @TODO: Support proper timestamp handling (not implemented)
+	///
+	protected Object[] valueToOptionSet(String key, Object value) throws JSqlException {
+		if (value instanceof Integer) {
+			return new Object[] { new Integer(MetaTypes.TYPE_INTEGER), value, null, null, null }; //Typ, N,S,I,T
+		} else if (value instanceof String) {
+			return new Object[] { new Integer(MetaTypes.TYPE_STRING), 0, value, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
+		}
+		
+		throw new JSqlException("Object type not yet supported: " + value);
 	}
 	
 	/// JSQL based PUT
+	protected void JSqlObjectPut(JSql sql, String objID, Map<String, Object> obj) throws JSqlException {
+		String tName = sql.getNamespace() + tableName;
+		
+		boolean sqlMode = sql.getAutoCommit();
+		if (sqlMode) {
+			sql.setAutoCommit(false);
+		}
+		
+		Object[] typSet;
+		String k;
+		Object v;
+		
+		for (Map.Entry<String, Object> entry : obj.entrySet()) {
+			
+			k = (entry.getKey()).toLowerCase();
+			if (k.equals("oid")) { //reserved
+				continue;
+			}
+			
+			v = entry.getValue();
+			typSet = valueToOptionSet(k, v);
+			
+			// This is currently only for NON array mode
+			sql.upsertQuerySet( //
+				tName, //
+				new String[] { "oID", "kID", "idx" }, //
+				new Object[] { objID, k, 0 }, //
+				//
+				new String[] { "typ", "nVl", "sVl", "iVl", "tVl" }, //
+				new Object[] { typSet[0], typSet[1], typSet[2], typSet[3], typSet[4] }, //
+				null, null, null).execute();
+		}
+		
+		sql.commit();
+		if (sqlMode) {
+			sql.setAutoCommit(true);
+		}
+	}
 	
+	///
+	/// PUT and GET meta map operations
+	///--------------------------------------------------------------------------
 	
+	/// GET, returns the stored map, note that oID is reserved for the objectID
+	public Map<String, Object> get(String objID) throws JStackException {
+		Map<String, Object> ret = null;
+		try {
+			JStackLayer[] sl = JStackObj.stackLayers();
+			for (int a = 0; a < sl.length; ++a) {
+				// JSql specific setup
+				if (sl[a] instanceof JSql) {
+					ret = JSqlObjectGet((JSql) (sl[a]), objID);
+					
+					if (ret != null) {
+						return ret;
+					}
+				} else if (sl[a] instanceof JCache) {
+					
+				}
+			}
+		} catch (JSqlException e) {
+			throw new JStackException(e);
+		}
+		return null;
+	}
+	
+	/// PUT, returns the object ID (especially when its generated)
+	public String put(String objID, Map<String, Object> obj) throws JStackException {
+		if (objID == null || objID.length() < 22) {
+			objID = GUID.base58();
+		}
+		
+		try {
+			JStackLayer[] sl = JStackObj.stackLayers();
+			for (int a = 0; a < sl.length; ++a) {
+				// JSql specific setup
+				if (sl[a] instanceof JSql) {
+					JSqlObjectPut((JSql) (sl[a]), objID, obj);
+				} else if (sl[a] instanceof JCache) {
+					
+				}
+			}
+		} catch (JSqlException e) {
+			throw new JStackException(e);
+		}
+		
+		return objID;
+	}
 }

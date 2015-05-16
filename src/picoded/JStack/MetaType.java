@@ -21,7 +21,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
 /// Internal usage, used to setup the various meta indexes types
-public class MetaTypes {
+public class MetaType {
 	
 	///
 	/// Static index values type
@@ -80,24 +80,34 @@ public class MetaTypes {
 	///--------------------------------------------------------------------------
 	
 	/// The meta type int values
-	public int meta_type = 1;
+	int valueType = 1;
+	
+	/// Configured type
+	public int valueType() {
+		return valueType;
+	}
 	
 	/// The meta config string, applicable to only certain meta types
-	public String meta_config = null;
+	String valueConfig = null;
 	
-	/// Note this constructor is not meant to be used directly.
-	public void MetaTypes(int inType, String inConfig) {
-		meta_type = inType;
-		meta_config = inConfig;
+	/// Configured string
+	public String valueConfig() {
+		return valueConfig;
 	}
 	
 	/// Note this constructor is not meant to be used directly.
-	public void MetaTypes(int inType) {
-		meta_type = inType;
+	public MetaType(int inType, String inConfig) {
+		valueType = inType;
+		valueConfig = inConfig;
 	}
 	
 	/// Note this constructor is not meant to be used directly.
-	public void MetaTypes() {
+	public MetaType(int inType) {
+		valueType = inType;
+	}
+	
+	/// Note this constructor is not meant to be used directly.
+	public MetaType() {
 		
 	}
 }

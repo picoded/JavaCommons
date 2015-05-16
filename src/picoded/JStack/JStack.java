@@ -35,19 +35,21 @@ public class JStack extends JStackLayer {
 		stackLayers = new JStackLayer[] { inLayer };
 	}
 	
-	public JStack(JStackLayer inLayer, String inNamespace) {
-		stackLayers = new JStackLayer[] { inLayer };
-		setNamespace(inNamespace);
-	}
-	
 	public JStack(JStackLayer[] inStack) {
 		stackLayers = inStack;
 	}
 	
+	/*
+	public JStack(JStackLayer inLayer, String inNamespace) {
+		stackLayers = new JStackLayer[] { inLayer };
+		setTablePrefix(inNamespace);
+	}
+	
 	public JStack(JStackLayer[] inStack, String inNamespace) {
 		stackLayers = inStack;
-		setNamespace(inNamespace);
+		setTablePrefix(inNamespace);
 	}
+	*/
 	
 	//----------------------------------------------
 	// Constructor

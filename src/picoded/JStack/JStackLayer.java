@@ -5,25 +5,26 @@ package picoded.JStack;
 /// JStackLayer provides the interface which JSql, and JCache extends from to support
 public class JStackLayer {
 	
-	// Store the actual namespace
-	protected String namespace = null;
+	// Store the actual tablePrefix
+	protected String tablePrefix = null;
 	
-	// Returns the JStack configured namespace, this is optional
-	public String getNamespace() {
-		return (namespace == null) ? "" : namespace;
+	/// Returns the JStack configured tablePrefix, this is optional
+	/// Note that tablePrefix refers to the prefix used in the storage on DB. This is not use for sharding
+	public String getTablePrefix() {
+		return (tablePrefix == null) ? "" : tablePrefix;
 	}
 	
-	// Sets the namespace, this can only be done once, throws an exception on repeated attempts
-	public void setNamespace(String name) {
+	/// Sets the tablePrefix, this can only be done once, throws an exception on repeated attempts
+	public void setTablePrefix(String name) {
 		if (name != null && (name = name.trim()).length() <= 0) {
 			name = null;
 		}
 		
-		if (namespace.equals(name)) {
+		if (tablePrefix.equals(name)) {
 			//does nothing, already valid
-		} else if (namespace != null) {
-			//Existing namespace already set, and is different : throw exception
-			throw new RuntimeException("invalid setNamespace(" + name + "), Namespace is already set to: " + namespace);
+		} else if (tablePrefix != null) {
+			//Existing tablePrefix already set, and is different : throw exception
+			throw new RuntimeException("invalid settablePrefix(" + name + "), tablePrefix is already set to: " + tablePrefix);
 		}
 	}
 	

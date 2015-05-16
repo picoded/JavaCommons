@@ -25,7 +25,8 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
-///
+/// @TODO: Convert to Map<String, Map<String, Object>>
+/// @TODO: Documentation =( of class
 public class MetaTable {
 	
 	///
@@ -46,6 +47,16 @@ public class MetaTable {
 	/// Setup the metatable with the given stack
 	public MetaTable(JStack inStack, String inTableName) {
 		JStackObj = inStack;
+		
+		if( inTableName == null ) {
+			throw new RuntimeException("Invalid table name (null): "+inTableName);
+		}
+		
+		final String numericString = "0123456789";
+		if( numericString.indexOf(inTableName.substring(0,1)) > 0 ) {
+			throw new RuntimeException("Invalid table name (cannot start with numbers): "+inTableName);
+		}
+		
 		tableName = inTableName;
 	}
 	
@@ -120,8 +131,25 @@ public class MetaTable {
 	/// Indexed columns setup
 	///--------------------------------------------------------------------------
 	
+	/// SQL view name
+	protected String sqlViewName(JSql sql, String vTyp) {
+		return (sql.getTablePrefix() + tableName + "_" + vTyp + viewSuffix);
+	}
+	
 	/// Default type for all values not defined in the index
-	protected CaseInsensitiveHashMap<String, MetaTypes> typeMapping = new CaseInsensitiveHashMap<String, MetaTypes>();
+	protected CaseInsensitiveHashMap<String, MetaType> typeMapping = new CaseInsensitiveHashMap<String, MetaType>();
+	protected MetaType defaultType = new MetaType( MetaType.TYPE_MIXED );
+	
+	/// Returned the defined metaType for the given key
+	public MetaType getType(String name) {
+		return typeMapping.get(name);
+	}
+	
+	/// Sets the defined metaType for the given key
+	public MetaTable putType(String name, MetaType type) {
+		typeMapping.put(name, type);
+		return this;
+	}
 	
 	///
 	/*
@@ -139,33 +167,72 @@ public class MetaTable {
 		return this;
 	}
 	 */
-
+	
 	///
-	/// Internal JSql table setup
+	/// Internal JSql index setup
 	///--------------------------------------------------------------------------
+	
+	protected String JSqlMakeInnerJoinIndex(JSql sql) {
+		
+		StringBuilder sb = new StringBuilder("CREATE OR REPLACE VIEW ");
+		sb.append( sqlViewName(sql, "view") );
+		sb.append( " AS " );
+		
+		
+		StringBuilder select = new StringBuilder( "SELECT B.oID AS \"oid\"" );
+		
+		StringBuilder from = new StringBuilder( "FROM "+sqlTableName(sql)+".oID AS B " );
+		
+		
+		return sb.toString();
+	}
+	
 	protected void JSqlIndexConfigTableSetup(JSql sql) throws JSqlException {
-		String tName = sql.getNamespace() + tableName + "_viewCfg" + viewSuffix;
+		String tName = sqlViewName(sql, "vCfg");
 		
 		// Table constructor
 		//-------------------
 		sql.createTableQuerySet( //
-			tName, //
-			new String[] { //
-			"nme", //Index column name
-				"typ", //Index column type
-				"con" //Index type string value
-			}, //
-			new String[] { //
-			keyColumnType, //
-				typeColumnType, //
-				keyColumnType //
-			} //
-			).execute(); //
+										tName, //
+										new String[] { //
+											"nme", //Index column name
+											"typ", //Index column type
+											"con" //Index type string value
+										}, //
+										new String[] { //
+											keyColumnType, //
+											typeColumnType, //
+											keyColumnType //
+										} //
+		).execute(); //
+		
+		// Checks if the view needs to be recreated
+		boolean recreatesView = false;
+		
+		// Checks if view actually needs recreation?
+		recreatesView = true;
+		
+		// Recreates the view if needed
+		if(recreatesView) {
+			String vName = sqlViewName(sql, "view");
+			
+			sql.execute("DROP VIEW IF EXISTS "+vName);
+			
+		}
+	}
+	
+	///
+	/// Internal JSql table setup
+	///--------------------------------------------------------------------------
+	
+	/// SQL Table name
+	protected String sqlTableName(JSql sql) {
+		return (sql.getTablePrefix() + tableName );
 	}
 	
 	/// JSQL Based tabel data storage
 	protected void JSqlDataTableSetup(JSql sql) throws JSqlException {
-		String tName = sql.getNamespace() + tableName;
+		String tName = sqlTableName(sql);
 		
 		// Table constructor
 		//-------------------
@@ -205,8 +272,9 @@ public class MetaTable {
 				numColumnType, //
 				strColumnType, //
 				strColumnType, //
-				fullTextColumnType } //
-			).execute();
+				fullTextColumnType //
+			} //
+		).execute();
 		
 		// Unique index
 		//
@@ -311,11 +379,11 @@ public class MetaTable {
 		int baseType = ((Number) (typList.get(pos))).intValue();
 		
 		// Int, Long, Double, Float
-		if (baseType >= MetaTypes.TYPE_INTEGER && baseType <= 34) {
-			if (baseType == MetaTypes.TYPE_INTEGER) {
+		if (baseType >= MetaType.TYPE_INTEGER && baseType <= 34) {
+			if (baseType == MetaType.TYPE_INTEGER) {
 				return new Integer(((Number) (r.get("nVl").get(pos))).intValue());
 			}
-		} else if (baseType == MetaTypes.TYPE_STRING) { // String
+		} else if (baseType == MetaType.TYPE_STRING) { // String
 			return (String) (r.get("tVl").get(pos));
 		} else if (baseType == 52) { // Text
 			return (String) (r.get("tVl").get(pos));
@@ -349,7 +417,7 @@ public class MetaTable {
 	
 	/// JSQL based GET
 	protected Map<String, Object> JSqlObjectGet(JSql sql, String objID) throws JSqlException {
-		String tName = sql.getNamespace() + tableName;
+		String tName = sqlTableName(sql);
 		
 		// Fetch all the meta fields
 		JSqlResult r = sql.selectQuerySet(tName, "*", "oID=?", new Object[] { objID }).query();
@@ -379,19 +447,19 @@ public class MetaTable {
 	///
 	protected Object[] valueToOptionSet(String key, Object value) throws JSqlException {
 		if (value instanceof Integer) {
-			return new Object[] { new Integer(MetaTypes.TYPE_INTEGER), value, null, null, null }; //Typ, N,S,I,T
+			return new Object[] { new Integer(MetaType.TYPE_INTEGER), value, null, null, null }; //Typ, N,S,I,T
 		} else if (value instanceof String) {
-			return new Object[] { new Integer(MetaTypes.TYPE_STRING), 0, value, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
+			return new Object[] { new Integer(MetaType.TYPE_STRING), 0, value, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
 		}
 		
 		throw new JSqlException("Object type not yet supported: " + value);
 	}
 	
-	/// JSQL based PUT
-	protected void JSqlObjectPut(JSql sql, String objID, Map<String, Object> obj) throws JSqlException {
-		String tName = sql.getNamespace() + tableName;
+	/// JSQL based Append
+	protected void JSqlObjectAppend(JSql sql, String objID, Map<String, Object> obj, boolean handleQuery) throws JSqlException {
+		String tName = sqlTableName(sql);
 		
-		boolean sqlMode = sql.getAutoCommit();
+		boolean sqlMode = handleQuery? sql.getAutoCommit() : false;
 		if (sqlMode) {
 			sql.setAutoCommit(false);
 		}
@@ -418,7 +486,8 @@ public class MetaTable {
 				//
 				new String[] { "typ", "nVl", "sVl", "iVl", "tVl" }, //
 				new Object[] { typSet[0], typSet[1], typSet[2], typSet[3], typSet[4] }, //
-				null, null, null).execute();
+				null, null, null//
+			).execute();
 		}
 		
 		sql.commit();
@@ -428,7 +497,7 @@ public class MetaTable {
 	}
 	
 	///
-	/// PUT and GET meta map operations
+	/// APPEND, PUT, GET, REMOVE meta map operations
 	///--------------------------------------------------------------------------
 	
 	/// GET, returns the stored map, note that oID is reserved for the objectID
@@ -454,8 +523,10 @@ public class MetaTable {
 		return null;
 	}
 	
-	/// PUT, returns the object ID (especially when its generated)
-	public String put(String objID, Map<String, Object> obj) throws JStackException {
+	/// PUT, returns the object ID (especially when its generated), note that this
+	/// adds the value in a merger style. Meaning for example, existing values not explicitely
+	/// nulled or replaced are maintained
+	public String append(String objID, Map<String, Object> obj) throws JStackException {
 		if (objID == null || objID.length() < 22) {
 			objID = GUID.base58();
 		}
@@ -465,7 +536,7 @@ public class MetaTable {
 			for (int a = 0; a < sl.length; ++a) {
 				// JSql specific setup
 				if (sl[a] instanceof JSql) {
-					JSqlObjectPut((JSql) (sl[a]), objID, obj);
+					JSqlObjectAppend((JSql) (sl[a]), objID, obj, true);
 				} else if (sl[a] instanceof JCache) {
 					
 				}
@@ -475,5 +546,10 @@ public class MetaTable {
 		}
 		
 		return objID;
+	}
+	
+	/// @TODO: Delete operations
+	public void remove(String objID) {
+		
 	}
 }

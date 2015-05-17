@@ -76,6 +76,8 @@ public class JSql_Sqlite extends JSql {
 	
 	/// Internal parser that converts some of the common sql statements to sqlite
 	public static String genericSqlParser(String inString) {
+		inString = inString.replaceAll("(?i)VARCHAR\\(MAX\\)", "VARCHAR");
+		//System.out.println( inString );
 		return inString;
 	}
 	

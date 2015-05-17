@@ -48,6 +48,9 @@ public class MetaObject extends CaseInsensitiveHashMap<String, Object> {
 	/// Local data cache
 	protected Map<String, Object> remoteDataMap = null;
 	
+	/// Query data cache
+	protected Map<String, Object> queryDataMap = null;
+	
 	/// Boolean indicating if there was a data change, and the "combined storage" needed to be updated
 	protected boolean combinedNeedsUpdate = true;
 	
@@ -154,6 +157,9 @@ public class MetaObject extends CaseInsensitiveHashMap<String, Object> {
 	/// then this method returns v; otherwise it returns null. (There can be at most one such mapping.)
 	/// A return value of null does not necessarily indicate that the map contains no mapping for the key;
 	/// it's also possible that the map explicitly maps the key to null. The containsKey operation may be used to distinguish these two cases.
+	///
+	/// @TODO: Optimize the combineMap(), to trigger only on iterative gets
+	/// @TODO: Optimize to fetch from queryCache, without pulling the full object (if needed)
 	///
 	/// @param    key     the key whose associated value is to be returned
 	///

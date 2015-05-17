@@ -15,7 +15,7 @@ import org.apache.commons.lang3.RandomUtils;
 
 import picodedTests.TestConfig;
 
-public class MetaTable_sqlite_test {
+public class MetaTable_Sqlite_test {
 	
 	// JStack setup
 	//-----------------------------------------------
@@ -39,13 +39,13 @@ public class MetaTable_sqlite_test {
 		mtObj = new MetaTable(JStackObj, "M" + TestConfig.randomTablePrefix());
 		
 		mtObj.putType("num", new MetaType(MetaType.TYPE_INTEGER));
-		mtObj.putType("str", new MetaType(MetaType.TYPE_STRING));
+		mtObj.putType("str_val", new MetaType(MetaType.TYPE_STRING));
 		
 		mtObj.stackSetup();
 	}
 	
-	protected void mtObjTearDown() {
-		
+	protected void mtObjTearDown() throws JStackException {
+		mtObj.stackTeardown();
 	}
 	
 	@Test
@@ -71,7 +71,7 @@ public class MetaTable_sqlite_test {
 	}
 	
 	@After
-	public void tearDown() {
+	public void tearDown() throws JStackException {
 		mtObjTearDown();
 		JStackTearDown();
 	}
@@ -87,7 +87,7 @@ public class MetaTable_sqlite_test {
 		objMap.put(GUID.base58(), GUID.base58());
 		
 		objMap.put("num", RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
-		objMap.put("str", GUID.base58());
+		objMap.put("str_val", GUID.base58());
 		
 		return objMap;
 	}
@@ -126,17 +126,15 @@ public class MetaTable_sqlite_test {
 			basicTest();
 		}
 		
-		Map<String, ArrayList<Object>> qRes = null;
-		
-		assertNotNull(qRes = mtObj.queryData(null, null, null));
-		assertNotNull(qRes.get("_oid"));
-		assertEquals(iteration * 2, qRes.get("_oid").size());
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.queryObjects(null, null));
+		assertEquals(iteration * 2, qRes.length);
 	}
 	
 	HashMap<String, Object> genNumStrObj(int number, String str) {
 		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("num", new Integer(number));
-		objMap.put("str", str);
+		objMap.put("str_val", str);
 		return objMap;
 	}
 	
@@ -151,22 +149,22 @@ public class MetaTable_sqlite_test {
 		mtObj.append(null, genNumStrObj(6, "in"));
 		mtObj.append(null, genNumStrObj(7, "this"));
 		
-		Map<String, ArrayList<Object>> qRes = null;
-		assertNotNull(qRes = mtObj.queryData(null, null, null));
-		assertEquals(7, qRes.get("_oid").size());
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.queryObjects(null, null));
+		assertEquals(7, qRes.length);
 		
-		assertNotNull(qRes = mtObj.queryData(null, "num > ? AND num < ?", new Object[] { 2, 5 }, "num ASC"));
-		assertEquals(2, qRes.get("_oid").size());
-		assertEquals("hello", qRes.get("str").get(0));
-		assertEquals("world", qRes.get("str").get(1));
+		assertNotNull(qRes = mtObj.queryObjects("num > ? AND num < ?", new Object[] { 2, 5 }, "num ASC"));
+		assertEquals(2, qRes.length);
+		assertEquals("hello", qRes[0].get("str_val") );
+		assertEquals("world", qRes[1].get("str_val") );
 		
-		assertNotNull(qRes = mtObj.queryData(null, "str = ?", new Object[] { "this" }));
-		assertEquals(2, qRes.get("_oid").size());
+		assertNotNull(qRes = mtObj.queryObjects("str_val LIKE ?", new Object[] { "this" }));
+		assertEquals(2, qRes.length);
 		
-		assertNotNull(qRes = mtObj.queryData(null, "num > ?", new Object[] { 2 }, "num ASC", 2, 2));
-		assertEquals(2, qRes.get("_oid").size());
-		assertEquals("program", qRes.get("str").get(0));
-		assertEquals("in", qRes.get("str").get(1));
+		assertNotNull(qRes = mtObj.queryObjects("num > ?", new Object[] { 2 }, "num ASC", 2, 2));
+		assertEquals(2, qRes.length);
+		assertEquals("program", qRes[0].get("str_val"));
+		assertEquals("in", qRes[1].get("str_val"));
 		
 	}
 	

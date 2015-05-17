@@ -85,7 +85,7 @@ public class MetaTable {
 	protected String strColumnType = "VARCHAR(64)";
 	
 	/// Full text value field type
-	protected String fullTextColumnType = "TEXT";
+	protected String fullTextColumnType = "VARCHAR(MAX)";
 	
 	/// Timestamp field type
 	protected String tStampColumnType = "BIGINT";
@@ -123,7 +123,20 @@ public class MetaTable {
 	/// Removes all the various application stacklayers
 	///
 	/// WARNING: this deletes all the data, and is not reversable
-	public MetaTable stackTeardown() {
+	public MetaTable stackTeardown() throws JStackException {
+		try {
+			JStackLayer[] sl = JStackObj.stackLayers();
+			for (int a = 0; a < sl.length; ++a) {
+				// JSql specific setup
+				if (sl[a] instanceof JSql) {
+					JSqlTeardown((JSql) (sl[a]));
+				} else if (sl[a] instanceof JCache) {
+					
+				}
+			}
+		} catch (JSqlException e) {
+			throw new JStackException(e);
+		}
 		
 		return this;
 	}
@@ -185,18 +198,37 @@ public class MetaTable {
 	/// Internal JSql index setup
 	///--------------------------------------------------------------------------
 	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
-	protected String JSqlMakeInnerJoinIndexQuery(JSql sql) {
+	protected void JSqlMakeInnerJoinIndexQuery(JSql sql) throws JSqlException {
 		
 		StringBuilder sb = new StringBuilder("CREATE VIEW "); //OR REPLACE
 		sb.append(sqlViewName(sql, "view"));
 		sb.append(" AS ");
 		
+		String lBracket = "'";
+		String rBracket = "'";
+		
+		if(sql.sqlType == JSqlType.mssql) {
+			lBracket = "[";
+			rBracket = "]";
+		}
+		
 		String tableName = sqlTableName(sql);
-		StringBuilder select = new StringBuilder("SELECT DISTINCT B.oID AS '_oid', B.oTm AS '_otm'");
-		StringBuilder from = new StringBuilder("FROM " + tableName + " AS B");
+		
+		StringBuilder select = new StringBuilder(" SELECT B.oID AS ");
+		select.append(lBracket+"_oid"+rBracket);
+		select.append(", B.oTm AS ");
+		select.append(lBracket+"_otm"+rBracket);
+		
+		StringBuilder from = new StringBuilder(" FROM ");
+		
+		from.append("(SELECT DISTINCT oID, oTm FROM "+tableName+")");
+		//from.append( tableName );
+		from.append( " AS B" );
 		
 		String key;
 		MetaType type;
+		
+		ArrayList<Object> argList = new ArrayList<Object>();
 		
 		int joinCount = 0;
 		for (Map.Entry<String, MetaType> e : typeMapping.entrySet()) {
@@ -205,7 +237,8 @@ public class MetaTable {
 			
 			if (type.valueType >= MetaType.TYPE_INTEGER && type.valueType <= MetaType.TYPE_FLOAT) {
 				
-				select.append(", N" + joinCount + ".nVl AS '" + key + "'");
+				select.append(", N" + joinCount + ".nVl AS ");
+				select.append(lBracket + key + rBracket);
 				
 				from.append(" INNER JOIN " + tableName + " AS N" + joinCount);
 				from.append(" ON B.oID = N" + joinCount + ".oID");
@@ -213,8 +246,11 @@ public class MetaTable {
 				
 			} else if (type.valueType == MetaType.TYPE_STRING) {
 				
-				select.append(", S" + joinCount + ".tVl AS '" + key + "'");
-				select.append(", S" + joinCount + ".sVl AS '" + key + "_lc'");
+				select.append(", S" + joinCount + ".tVl AS ");
+				select.append(lBracket + key + rBracket);
+				
+				select.append(", S" + joinCount + ".sVl AS ");
+				select.append(lBracket + key + "_lc" + rBracket);
 				
 				from.append(" INNER JOIN " + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
@@ -222,7 +258,8 @@ public class MetaTable {
 				
 			} else if (type.valueType == MetaType.TYPE_TEXT) {
 				
-				select.append(", S" + joinCount + ".tVl AS '" + key + "'");
+				select.append(", S" + joinCount + ".tVl AS ");
+				select.append(lBracket + key + rBracket);
 				
 				from.append(" INNER JOIN " + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
@@ -236,7 +273,8 @@ public class MetaTable {
 		sb.append(select);
 		sb.append(from);
 		
-		return sb.toString();
+		//System.out.println( sb.toString() );
+		sql.execute_raw( sb.toString() );
 	}
 	
 	protected void JSqlIndexConfigTableSetup(JSql sql) throws JSqlException {
@@ -266,11 +304,15 @@ public class MetaTable {
 		
 		// Recreates the view if needed
 		if (recreatesView) {
-			String vName = sqlViewName(sql, "view");
-			
-			sql.execute("DROP VIEW IF EXISTS " + vName);
-			sql.execute(JSqlMakeInnerJoinIndexQuery(sql));
+			sql.execute("DROP VIEW IF EXISTS " + sqlViewName(sql, "view"));
+			JSqlMakeInnerJoinIndexQuery(sql);
 		}
+	}
+	
+	protected void JSqlTeardown(JSql sql) throws JSqlException {
+		sql.execute("DROP VIEW IF EXISTS " + sqlViewName(sql, "view"));
+		sql.execute("DROP TABLE IF EXISTS " + sqlViewName(sql, "vCfg"));
+		sql.execute("DROP TABLE IF EXISTS " + sqlTableName(sql));
 	}
 	
 	///
@@ -347,16 +389,17 @@ public class MetaTable {
 		).execute();
 		
 		// Full text index, for textual data
+		// @TODO FULLTEXT index support
 		//------------------------------------------------
-		if (sql.sqlType != JSqlType.sqlite) {
-			sql.createTableIndexQuerySet( //
-				tName, "tVl", "FULLTEXT", "tVl" //
-			).execute();
-		} else {
+		//if (sql.sqlType != JSqlType.sqlite) {
+		//	sql.createTableIndexQuerySet( //
+		//		tName, "tVl", "FULLTEXT", "tVl" //
+		//	).execute();
+		//} else {
 			sql.createTableIndexQuerySet( //
 				tName, "tVl", null, "tVl" // Sqlite uses normal index
 			).execute();
-		}
+		//}
 		
 		// timestamp index, is this needed?
 		//------------------------------------------------
@@ -567,9 +610,13 @@ public class MetaTable {
 	protected Map<String, ArrayList<Object>> JSqlQuery(JSql sql, String selectCols, String whereClause,
 		Object[] whereValues, String orderBy, long limit, long offset) throws JSqlException {
 		if (selectCols == null) {
-			selectCols = "*";
+			selectCols = "_oid";
 		} else {
 			selectCols.toLowerCase();
+			
+			if( selectCols.indexOf("_oid") == -1 ) {
+				selectCols = "_oid, "+selectCols;
+			}
 		}
 		
 		if (whereClause != null) {
@@ -582,19 +629,7 @@ public class MetaTable {
 	}
 	
 	/// SQL Query to fetch the relevent data, values are loaded on query
-	public Map<String, ArrayList<Object>> queryData(String selectCols, String whereClause, Object[] whereValues)
-		throws JStackException {
-		return queryData(selectCols, whereClause, whereValues, null, 0, 0);
-	}
-	
-	/// SQL Query to fetch the relevent data, values are loaded on query
-	public Map<String, ArrayList<Object>> queryData(String selectCols, String whereClause, Object[] whereValues,
-		String orderBy) throws JStackException {
-		return queryData(selectCols, whereClause, whereValues, orderBy, 0, 0);
-	}
-	
-	/// SQL Query to fetch the relevent data, values are loaded on query
-	public Map<String, ArrayList<Object>> queryData(String selectCols, String whereClause, Object[] whereValues,
+	protected Map<String, ArrayList<Object>> queryData(String selectCols, String whereClause, Object[] whereValues,
 		String orderBy, long limit, long offset) throws JStackException {
 		Map<String, ArrayList<Object>> ret = null;
 		try {
@@ -617,7 +652,55 @@ public class MetaTable {
 		throw new JStackException("queryData not supported, missing JSql layer?");
 	}
 	
-	//public MetaObject[] queryObjects
+	/// Does a conversion from the JSqlResult map, to the
+	protected MetaObject[] JSqlResultToMetaObjectArray( Map<String, ArrayList<Object>> jRes ) throws JStackException {
+		ArrayList<Object> oID_list = jRes.get("_oid");
+		int len = oID_list.size();
+		
+		MetaObject[] ret = new MetaObject[len];
+		
+		CaseInsensitiveHashMap<String, Object> queryCache = new CaseInsensitiveHashMap<String, Object>();
+		MetaObject mObj;
+		
+		for(int a=0; a<len; ++a) {
+			mObj = lazyGet( (String)(oID_list.get(a)) );
+			queryCache = new CaseInsensitiveHashMap<String, Object>();
+			
+			for (Map.Entry<String, ArrayList<Object>> entry : jRes.entrySet()) {
+				queryCache.put( entry.getKey(), entry.getValue().get(a) );
+			}
+			
+			mObj.queryDataMap = queryCache;
+			ret[a] = mObj;
+		}
+		
+		return ret;
+	}
+	
+	/// Performs a search query, and returns the respective relevent objects
+	public MetaObject[] queryObjects(String whereClause, Object[] whereValues,
+												String orderBy, long limit, long offset, String optimalSelect) throws JStackException {
+		
+		Map<String, ArrayList<Object>> qData = queryData(optimalSelect, whereClause, whereValues, orderBy, limit, offset);
+		return JSqlResultToMetaObjectArray(qData);
+	}
+	
+	/// Performs a search query, and returns the respective relevent objects
+	public MetaObject[] queryObjects(String whereClause, Object[] whereValues,
+												String orderBy, long limit, long offset) throws JStackException {
+		return queryObjects(whereClause, whereValues, orderBy, limit, offset, null);
+	}
+	
+	/// Performs a search query, and returns the respective relevent objects
+	public MetaObject[] queryObjects(String whereClause, Object[] whereValues,
+												String orderBy) throws JStackException {
+		return queryObjects(whereClause, whereValues, orderBy, 0, 0, null);
+	}
+	
+	/// Performs a search query, and returns the respective relevent objects
+	public MetaObject[] queryObjects(String whereClause, Object[] whereValues) throws JStackException {
+		return queryObjects(whereClause, whereValues, null, 0, 0, null);
+	}
 	
 	//
 	// Query pagenation operations (experimental keyset hybrid operations)

@@ -72,6 +72,8 @@ public class JSql_Mssql extends JSql {
 		final String select = "SELECT";
 		final String update = "UPDATE";
 		
+		final String view = "VIEW";
+		
 		final String insertInto = "INSERT INTO";
 		final String deleteFrom = "DELETE FROM";
 		
@@ -103,6 +105,18 @@ public class JSql_Mssql extends JSql {
 				qString = qStringPrefix;
 			} else if (upperCaseStr.startsWith(index, prefixOffset)) { //INDEX
 			
+			} else if(upperCaseStr.startsWith(view, prefixOffset)) { //VIEW
+				prefixOffset += view.length() + 1;
+				
+				if (upperCaseStr.startsWith(ifExists, prefixOffset)) { //IF EXISTS
+					prefixOffset += ifExists.length() + 1;
+					
+					qStringPrefix = "BEGIN TRY IF OBJECT_ID('" + fixedQuotes.substring(prefixOffset).toUpperCase()
+					+ "', 'V')" + " IS NOT NULL DROP VIEW " + fixedQuotes.substring(prefixOffset)
+					+ " END TRY BEGIN CATCH END CATCH";
+				} else {
+					qStringPrefix = "DROP VIEW ";
+				}
 			}
 		} else if (upperCaseStr.startsWith(create)) { //CREATE
 			prefixOffset = create.length() + 1;
@@ -236,9 +250,16 @@ public class JSql_Mssql extends JSql {
 			qString = qStringPrefix + qString + qStringSuffix;
 		}
 		
-		//Convert MY-Sql NUMBER data type to NUMERIC data type for Ms-sql
-		if (qString.contains("CREATE TABLE") && qString.contains("NUMBER")) {
-			qString = qString.replaceAll("NUMBER", "NUMERIC");
+		if (qString.contains("CREATE TABLE")) {
+			// Replace PRIMARY KEY AUTOINCREMENT with IDENTITY
+			if(qString.contains("AUTOINCREMENT")) {
+				qString = qString.replaceAll( "AUTOINCREMENT", "IDENTITY" );
+			}
+			
+			//Convert MY-Sql NUMBER data type to NUMERIC data type for Ms-sql
+			if(qString.contains("NUMBER")) {
+				qString = qString.replaceAll("NUMBER", "NUMERIC");
+			}
 		}
 		
 		//remove ON DELETE FOR CLIENTSTATUSHISTORY---> this block needs to be refined for future.

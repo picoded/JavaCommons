@@ -49,10 +49,9 @@ public class JStack extends JStackLayer {
 		stackLayers = inStack;
 		setTablePrefix(inNamespace);
 	}
-	*/
-	
+	 */
+
 	//----------------------------------------------
 	// Constructor
 	//----------------------------------------------
-	
 }

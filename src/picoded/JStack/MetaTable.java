@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.logging.*;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /// Picoded imports
 import picoded.conv.GUID;
@@ -48,13 +49,13 @@ public class MetaTable {
 	public MetaTable(JStack inStack, String inTableName) {
 		JStackObj = inStack;
 		
-		if( inTableName == null ) {
-			throw new RuntimeException("Invalid table name (null): "+inTableName);
+		if (inTableName == null) {
+			throw new RuntimeException("Invalid table name (null): " + inTableName);
 		}
 		
 		final String numericString = "0123456789";
-		if( numericString.indexOf(inTableName.substring(0,1)) > 0 ) {
-			throw new RuntimeException("Invalid table name (cannot start with numbers): "+inTableName);
+		if (numericString.indexOf(inTableName.substring(0, 1)) > 0) {
+			throw new RuntimeException("Invalid table name (cannot start with numbers): " + inTableName);
 		}
 		
 		tableName = inTableName;
@@ -138,15 +139,27 @@ public class MetaTable {
 	
 	/// Default type for all values not defined in the index
 	protected CaseInsensitiveHashMap<String, MetaType> typeMapping = new CaseInsensitiveHashMap<String, MetaType>();
-	protected MetaType defaultType = new MetaType( MetaType.TYPE_MIXED );
+	protected MetaType defaultType = new MetaType(MetaType.TYPE_MIXED);
 	
 	/// Returned the defined metaType for the given key
 	public MetaType getType(String name) {
+		if (name == null || (name = name.trim().toLowerCase()).length() <= 0) {
+			throw new RuntimeException("Name parameter cannot be NULL or BLANK");
+		}
+		
 		return typeMapping.get(name);
 	}
 	
 	/// Sets the defined metaType for the given key
 	public MetaTable putType(String name, MetaType type) {
+		if (name == null || (name = name.trim().toLowerCase()).length() <= 0) {
+			throw new RuntimeException("Name parameter cannot be NULL or BLANK");
+		}
+		
+		if (name.equals("_oid") || name.equals("_otm")) {
+			throw new RuntimeException("Name parameter uses reserved name " + name);
+		}
+		
 		typeMapping.put(name, type);
 		return this;
 	}
@@ -167,22 +180,61 @@ public class MetaTable {
 		return this;
 	}
 	 */
-	
+
 	///
 	/// Internal JSql index setup
 	///--------------------------------------------------------------------------
-	
-	protected String JSqlMakeInnerJoinIndex(JSql sql) {
+	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
+	protected String JSqlMakeInnerJoinIndexQuery(JSql sql) {
 		
-		StringBuilder sb = new StringBuilder("CREATE OR REPLACE VIEW ");
-		sb.append( sqlViewName(sql, "view") );
-		sb.append( " AS " );
+		StringBuilder sb = new StringBuilder("CREATE VIEW "); //OR REPLACE
+		sb.append(sqlViewName(sql, "view"));
+		sb.append(" AS ");
 		
+		String tableName = sqlTableName(sql);
+		StringBuilder select = new StringBuilder("SELECT DISTINCT B.oID AS '_oid', B.oTm AS '_otm'");
+		StringBuilder from = new StringBuilder("FROM " + tableName + " AS B");
 		
-		StringBuilder select = new StringBuilder( "SELECT B.oID AS \"oid\"" );
+		String key;
+		MetaType type;
 		
-		StringBuilder from = new StringBuilder( "FROM "+sqlTableName(sql)+".oID AS B " );
+		int joinCount = 0;
+		for (Map.Entry<String, MetaType> e : typeMapping.entrySet()) {
+			key = e.getKey();
+			type = e.getValue();
+			
+			if (type.valueType >= MetaType.TYPE_INTEGER && type.valueType <= MetaType.TYPE_FLOAT) {
+				
+				select.append(", N" + joinCount + ".nVl AS '" + key + "'");
+				
+				from.append(" INNER JOIN " + tableName + " AS N" + joinCount);
+				from.append(" ON B.oID = N" + joinCount + ".oID");
+				from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = '" + key + "'");
+				
+			} else if (type.valueType == MetaType.TYPE_STRING) {
+				
+				select.append(", S" + joinCount + ".tVl AS '" + key + "'");
+				select.append(", S" + joinCount + ".sVl AS '" + key + "_lc'");
+				
+				from.append(" INNER JOIN " + tableName + " AS S" + joinCount);
+				from.append(" ON B.oID = S" + joinCount + ".oID");
+				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
+				
+			} else if (type.valueType == MetaType.TYPE_TEXT) {
+				
+				select.append(", S" + joinCount + ".tVl AS '" + key + "'");
+				
+				from.append(" INNER JOIN " + tableName + " AS S" + joinCount);
+				from.append(" ON B.oID = S" + joinCount + ".oID");
+				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
+				
+			}
+			
+			++joinCount;
+		}
 		
+		sb.append(select);
+		sb.append(from);
 		
 		return sb.toString();
 	}
@@ -193,18 +245,18 @@ public class MetaTable {
 		// Table constructor
 		//-------------------
 		sql.createTableQuerySet( //
-										tName, //
-										new String[] { //
-											"nme", //Index column name
-											"typ", //Index column type
-											"con" //Index type string value
-										}, //
-										new String[] { //
-											keyColumnType, //
-											typeColumnType, //
-											keyColumnType //
-										} //
-		).execute(); //
+			tName, //
+			new String[] { //
+			"nme", //Index column name
+				"typ", //Index column type
+				"con" //Index type string value
+			}, //
+			new String[] { //
+			keyColumnType, //
+				typeColumnType, //
+				keyColumnType //
+			} //
+			).execute(); //
 		
 		// Checks if the view needs to be recreated
 		boolean recreatesView = false;
@@ -213,11 +265,11 @@ public class MetaTable {
 		recreatesView = true;
 		
 		// Recreates the view if needed
-		if(recreatesView) {
+		if (recreatesView) {
 			String vName = sqlViewName(sql, "view");
 			
-			sql.execute("DROP VIEW IF EXISTS "+vName);
-			
+			sql.execute("DROP VIEW IF EXISTS " + vName);
+			sql.execute(JSqlMakeInnerJoinIndexQuery(sql));
 		}
 	}
 	
@@ -227,7 +279,7 @@ public class MetaTable {
 	
 	/// SQL Table name
 	protected String sqlTableName(JSql sql) {
-		return (sql.getTablePrefix() + tableName );
+		return (sql.getTablePrefix() + tableName);
 	}
 	
 	/// JSQL Based tabel data storage
@@ -248,14 +300,13 @@ public class MetaTable {
 				"uTm", //value updated time
 				"oTm", //object created time
 				// Object keys
-				"oID", //objID
+				"oID", //_oid
 				"kID", //key storage
 				"idx", //index collumn
 				// Value storage (except text)
 				"typ", //type collumn
 				"nVl", //numeric value (if applicable)
-				"sVl", //string value (if applicable)
-				"iVl", //case insensitive string value (if applicable)
+				"sVl", //case insensitive string value (if applicable), or case sensitive hash
 				// Text value storage
 				"tVl" //Textual storage, placed last for storage optimization
 			}, //
@@ -271,10 +322,9 @@ public class MetaTable {
 				typeColumnType, //
 				numColumnType, //
 				strColumnType, //
-				strColumnType, //
 				fullTextColumnType //
 			} //
-		).execute();
+			).execute();
 		
 		// Unique index
 		//
@@ -287,13 +337,13 @@ public class MetaTable {
 		// Key Values search index 
 		//------------------------------------------------
 		sql.createTableIndexQuerySet( //
-			tName, "kID, nVl, iVl", null, "valMap" //
+			tName, "kID, nVl, sVl", null, "valMap" //
 		).execute();
 		
 		// Object timestamp optimized Key Value indexe
 		//------------------------------------------------
 		sql.createTableIndexQuerySet( //
-			tName, "oTm, kID, nVl, iVl", null, "oTm_valMap" //
+			tName, "oTm, kID, nVl, sVl", null, "oTm_valMap" //
 		).execute();
 		
 		// Full text index, for textual data
@@ -301,6 +351,10 @@ public class MetaTable {
 		if (sql.sqlType != JSqlType.sqlite) {
 			sql.createTableIndexQuerySet( //
 				tName, "tVl", "FULLTEXT", "tVl" //
+			).execute();
+		} else {
+			sql.createTableIndexQuerySet( //
+				tName, "tVl", null, "tVl" // Sqlite uses normal index
 			).execute();
 		}
 		
@@ -320,7 +374,7 @@ public class MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Fetches the result array position using the filters
-	protected int fetchResultPosition(JSqlResult r, String objID, String key, int idx) {
+	protected int fetchResultPosition(JSqlResult r, String _oid, String key, int idx) {
 		List<Object> oID_list = r.get("oID");
 		List<Object> kID_list = r.get("kID");
 		List<Object> idx_list = r.get("idx");
@@ -328,7 +382,7 @@ public class MetaTable {
 		int lim = kID_list.size();
 		for (int i = 0; i < lim; ++i) {
 			
-			if (objID != null && !objID.equals(oID_list.get(i))) {
+			if (_oid != null && !_oid.equals(oID_list.get(i))) {
 				continue;
 			}
 			
@@ -416,11 +470,11 @@ public class MetaTable {
 	}
 	
 	/// JSQL based GET
-	protected Map<String, Object> JSqlObjectGet(JSql sql, String objID) throws JSqlException {
+	protected Map<String, Object> JSqlObjectGet(JSql sql, String _oid) throws JSqlException {
 		String tName = sqlTableName(sql);
 		
 		// Fetch all the meta fields
-		JSqlResult r = sql.selectQuerySet(tName, "*", "oID=?", new Object[] { objID }).query();
+		JSqlResult r = sql.selectQuerySet(tName, "*", "oID=?", new Object[] { _oid }).query();
 		
 		// Convert to map object
 		Map<String, Object> retMap = JSqlResultToMap(r);
@@ -428,10 +482,56 @@ public class MetaTable {
 		// Enforce policies (if data is valid)
 		if (retMap != null) {
 			// Add object ID (enforce it)
-			retMap.put("oID", objID);
+			retMap.put("oID", _oid);
 		}
 		
 		return retMap;
+	}
+	
+	/// JSQL based Append
+	protected void JSqlObjectAppend(JSql sql, String _oid, Map<String, Object> obj, Set<String> keyList,
+		boolean handleQuery) throws JSqlException {
+		String tName = sqlTableName(sql);
+		
+		boolean sqlMode = handleQuery ? sql.getAutoCommit() : false;
+		if (sqlMode) {
+			sql.setAutoCommit(false);
+		}
+		
+		Object[] typSet;
+		String k;
+		Object v;
+		
+		for (Map.Entry<String, Object> entry : obj.entrySet()) {
+			
+			k = (entry.getKey()).toLowerCase();
+			if (k.equals("oid") || k.equals("_oid") || k.equals("_otm")) { //reserved
+				continue;
+			}
+			
+			if (keyList != null && !keyList.contains(k)) {
+				continue;
+			}
+			
+			v = entry.getValue();
+			typSet = valueToOptionSet(k, v);
+			
+			// This is currently only for NON array mode
+			sql.upsertQuerySet( //
+				tName, //
+				new String[] { "oID", "kID", "idx" }, //
+				new Object[] { _oid, k, 0 }, //
+				//
+				new String[] { "typ", "nVl", "sVl", "tVl" }, //
+				new Object[] { typSet[0], typSet[1], typSet[2], typSet[3] }, //
+				null, null, null//
+				).execute();
+		}
+		
+		sql.commit();
+		if (sqlMode) {
+			sql.setAutoCommit(true);
+		}
 	}
 	
 	/// Values to option set conversion
@@ -447,68 +547,102 @@ public class MetaTable {
 	///
 	protected Object[] valueToOptionSet(String key, Object value) throws JSqlException {
 		if (value instanceof Integer) {
-			return new Object[] { new Integer(MetaType.TYPE_INTEGER), value, null, null, null }; //Typ, N,S,I,T
+			return new Object[] { new Integer(MetaType.TYPE_INTEGER), value, null, null }; //Typ, N,S,I,T
 		} else if (value instanceof String) {
-			return new Object[] { new Integer(MetaType.TYPE_STRING), 0, value, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
+			return new Object[] { new Integer(MetaType.TYPE_STRING), 0, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
 		}
 		
 		throw new JSqlException("Object type not yet supported: " + value);
 	}
 	
-	/// JSQL based Append
-	protected void JSqlObjectAppend(JSql sql, String objID, Map<String, Object> obj, boolean handleQuery) throws JSqlException {
-		String tName = sqlTableName(sql);
-		
-		boolean sqlMode = handleQuery? sql.getAutoCommit() : false;
-		if (sqlMode) {
-			sql.setAutoCommit(false);
+	//
+	// Query operations
+	//--------------------------------------------------------------------------
+	
+	/// Query from JSql layer
+	///
+	/// @TODO: support array fetches / searches
+	/// @TODO: support string lower case search index optimization
+	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
+	protected Map<String, ArrayList<Object>> JSqlQuery(JSql sql, String selectCols, String whereClause,
+		Object[] whereValues, String orderBy, long limit, long offset) throws JSqlException {
+		if (selectCols == null) {
+			selectCols = "*";
+		} else {
+			selectCols.toLowerCase();
 		}
 		
-		Object[] typSet;
-		String k;
-		Object v;
-		
-		for (Map.Entry<String, Object> entry : obj.entrySet()) {
-			
-			k = (entry.getKey()).toLowerCase();
-			if (k.equals("oid")) { //reserved
-				continue;
-			}
-			
-			v = entry.getValue();
-			typSet = valueToOptionSet(k, v);
-			
-			// This is currently only for NON array mode
-			sql.upsertQuerySet( //
-				tName, //
-				new String[] { "oID", "kID", "idx" }, //
-				new Object[] { objID, k, 0 }, //
-				//
-				new String[] { "typ", "nVl", "sVl", "iVl", "tVl" }, //
-				new Object[] { typSet[0], typSet[1], typSet[2], typSet[3], typSet[4] }, //
-				null, null, null//
-			).execute();
+		if (whereClause != null) {
+			whereClause = whereClause.toLowerCase();
 		}
 		
-		sql.commit();
-		if (sqlMode) {
-			sql.setAutoCommit(true);
-		}
+		return (sql
+			.selectQuerySet(sqlViewName(sql, "view"), selectCols, whereClause, whereValues, orderBy, limit, offset)
+			.query());
 	}
 	
-	///
-	/// APPEND, PUT, GET, REMOVE meta map operations
-	///--------------------------------------------------------------------------
+	/// SQL Query to fetch the relevent data, values are loaded on query
+	public Map<String, ArrayList<Object>> queryData(String selectCols, String whereClause, Object[] whereValues)
+		throws JStackException {
+		return queryData(selectCols, whereClause, whereValues, null, 0, 0);
+	}
 	
-	/// GET, returns the stored map, note that oID is reserved for the objectID
-	public Map<String, Object> get(String objID) throws JStackException {
+	/// SQL Query to fetch the relevent data, values are loaded on query
+	public Map<String, ArrayList<Object>> queryData(String selectCols, String whereClause, Object[] whereValues,
+		String orderBy) throws JStackException {
+		return queryData(selectCols, whereClause, whereValues, orderBy, 0, 0);
+	}
+	
+	/// SQL Query to fetch the relevent data, values are loaded on query
+	public Map<String, ArrayList<Object>> queryData(String selectCols, String whereClause, Object[] whereValues,
+		String orderBy, long limit, long offset) throws JStackException {
+		Map<String, ArrayList<Object>> ret = null;
+		try {
+			JStackLayer[] sl = JStackObj.stackLayers();
+			for (int a = 0; a < sl.length; ++a) {
+				// JSql specific setup
+				if (sl[a] instanceof JSql) {
+					ret = JSqlQuery((JSql) (sl[a]), selectCols, whereClause, whereValues, orderBy, limit, offset);
+					
+					if (ret != null) {
+						return ret;
+					}
+				} else if (sl[a] instanceof JCache) {
+					
+				}
+			}
+		} catch (JSqlException e) {
+			throw new JStackException(e);
+		}
+		throw new JStackException("queryData not supported, missing JSql layer?");
+	}
+	
+	//public MetaObject[] queryObjects
+	
+	//
+	// Query pagenation operations (experimental keyset hybrid operations)
+	//--------------------------------------------------------------------------
+	
+	/*
+	public Map<String, Map<String, ArrayList<Object>>> queryObjectPage(String selectCols, String whereClause, Object[] whereValues, String orderBy, Map<String, ArrayList<Object>>nowPage, long limit, long offset) throws JStackException {
+	
+		
+	}
+	 */
+
+	//
+	// Internal PUT / GET object functions
+	//--------------------------------------------------------------------------
+	/// GET operation used for lazy loading in MetaObject
+	protected Map<String, Object> lazyLoadGet(String _oid) throws JStackException {
+		// This is the non-lazy load method
 		Map<String, Object> ret = null;
 		try {
 			JStackLayer[] sl = JStackObj.stackLayers();
 			for (int a = 0; a < sl.length; ++a) {
 				// JSql specific setup
 				if (sl[a] instanceof JSql) {
-					ret = JSqlObjectGet((JSql) (sl[a]), objID);
+					ret = JSqlObjectGet((JSql) (sl[a]), _oid);
 					
 					if (ret != null) {
 						return ret;
@@ -523,20 +657,14 @@ public class MetaTable {
 		return null;
 	}
 	
-	/// PUT, returns the object ID (especially when its generated), note that this
-	/// adds the value in a merger style. Meaning for example, existing values not explicitely
-	/// nulled or replaced are maintained
-	public String append(String objID, Map<String, Object> obj) throws JStackException {
-		if (objID == null || objID.length() < 22) {
-			objID = GUID.base58();
-		}
-		
+	/// Update the object map with the given values, List<String> key list is used to 'optimize' sql insertions
+	protected void updateMap(String _oid, Map<String, Object> obj, Set<String> keyList) throws JStackException {
 		try {
 			JStackLayer[] sl = JStackObj.stackLayers();
 			for (int a = 0; a < sl.length; ++a) {
 				// JSql specific setup
 				if (sl[a] instanceof JSql) {
-					JSqlObjectAppend((JSql) (sl[a]), objID, obj, true);
+					JSqlObjectAppend((JSql) (sl[a]), _oid, obj, keyList, true);
 				} else if (sl[a] instanceof JCache) {
 					
 				}
@@ -544,12 +672,49 @@ public class MetaTable {
 		} catch (JSqlException e) {
 			throw new JStackException(e);
 		}
+	}
+	
+	//
+	// APPEND, PUT, GET, REMOVE meta map operations
+	//--------------------------------------------------------------------------
+	
+	/// GET, returns the stored map, note that oID is reserved for the objectID
+	public MetaObject get(String _oid) throws JStackException {
+		// This is the non-lazy load method
+		Map<String, Object> ret = lazyLoadGet(_oid);
+		return (ret == null) ? null : new MetaObject(this, _oid, ret);
+	}
+	
+	/// Lazy GET, returns the the object map, loads it data only when its iterated
+	public MetaObject lazyGet(String _oid) throws JStackException {
+		// This is the lazy load method
+		return new MetaObject(this, _oid, null);
+	}
+	
+	/// Generates a new blank object, with a GUID
+	public MetaObject newObject() {
+		return new MetaObject(this, null, new CaseInsensitiveHashMap<String, Object>());
+	}
+	
+	/// PUT, returns the object ID (especially when its generated), note that this
+	/// adds the value in a merger style. Meaning for example, existing values not explicitely
+	/// nulled or replaced are maintained
+	public MetaObject append(String _oid, Map<String, Object> obj) throws JStackException {
+		MetaObject r = null;
+		if (obj instanceof MetaObject && ((MetaObject) obj)._oid.equals(_oid)) {
+			(r = (MetaObject) obj).saveDelta();
+			return r;
+		}
 		
-		return objID;
+		r = lazyGet(_oid);
+		r.putAll(obj);
+		r.saveDelta();
+		
+		return r;
 	}
 	
 	/// @TODO: Delete operations
-	public void remove(String objID) {
+	public void remove(String _oid) {
 		
 	}
 }

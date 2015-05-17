@@ -345,7 +345,7 @@ public class JSql extends BaseInterface {
 		StringBuilder queryBuilder = new StringBuilder("SELECT ");
 		
 		// Select collumns
-		if (selectStatement == null || selectStatement.length() <= 0) {
+		if (selectStatement == null || (selectStatement = selectStatement.trim()).length() <= 0) {
 			queryBuilder.append("*");
 		} else {
 			queryBuilder.append(selectStatement);
@@ -355,7 +355,7 @@ public class JSql extends BaseInterface {
 		queryBuilder.append(" FROM `" + tableName + "`");
 		
 		// Where clauses
-		if (whereStatement != null && whereStatement.length() > 3) {
+		if (whereStatement != null && (whereStatement = whereStatement.trim()).length() >= 3) {
 			
 			queryBuilder.append(" WHERE ");
 			queryBuilder.append(whereStatement);
@@ -368,7 +368,7 @@ public class JSql extends BaseInterface {
 		}
 		
 		// Order By clause
-		if (orderStatement != null && orderStatement.length() > 3) {
+		if (orderStatement != null && (orderStatement = orderStatement.trim()).length() > 3) {
 			queryBuilder.append(" ORDER BY ");
 			queryBuilder.append(orderStatement);
 		}

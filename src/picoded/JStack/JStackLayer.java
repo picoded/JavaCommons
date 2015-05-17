@@ -24,7 +24,8 @@ public class JStackLayer {
 			//does nothing, already valid
 		} else if (tablePrefix != null) {
 			//Existing tablePrefix already set, and is different : throw exception
-			throw new RuntimeException("invalid settablePrefix(" + name + "), tablePrefix is already set to: " + tablePrefix);
+			throw new RuntimeException("invalid settablePrefix(" + name + "), tablePrefix is already set to: "
+				+ tablePrefix);
 		}
 	}
 	

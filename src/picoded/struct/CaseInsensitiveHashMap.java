@@ -91,8 +91,11 @@ public class CaseInsensitiveHashMap<K extends String, V> extends HashMap<K, V> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void putAll(Map<? extends K, ? extends V> m) {
+		if (m == null) {
+			throw new RuntimeException("putAll cannot be null");
+		}
 		for (Map.Entry<?, ?> entry : m.entrySet()) {
-			this.put((K) (entry.getKey()), (V) (entry.getValue()));
+			super.put((K) (entry.getKey().toString().toLowerCase()), (V) (entry.getValue()));
 		}
 	}
 }

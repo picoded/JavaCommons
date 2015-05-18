@@ -115,6 +115,10 @@
 	<target name="build" depends="compile-src">
 		<delete dir="bin/build" failonerror="false"/>
 		<mkdir dir="bin/build"/>
+		<jar destfile="bin/build/picodedJavaCommons-libsOnly.jar">
+			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
+			<fileset dir="${build-lib}" includes="*.jar" />
+		</jar>
 		<jar destfile="bin/build/picodedJavaCommons-withDependencies.jar">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 			<fileset dir="${build-lib}" includes="*.jar" />

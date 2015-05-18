@@ -79,7 +79,7 @@ public class MetaTable {
 	
 	/// String value field type
 	/// @TODO: Investigate performance issues for this approach
-	protected String numColumnType = "DECIMAL(22,12)";
+	protected String numColumnType = "DECIMAL(36,12)";
 	
 	/// String value field type
 	protected String strColumnType = "VARCHAR(64)";

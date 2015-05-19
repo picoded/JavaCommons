@@ -108,15 +108,15 @@ public class JSql_Mssql extends JSql {
 				qString = qStringPrefix;
 			} else if (upperCaseStr.startsWith(index, prefixOffset)) { //INDEX
 			
-			} else if(upperCaseStr.startsWith(view, prefixOffset)) { //VIEW
+			} else if (upperCaseStr.startsWith(view, prefixOffset)) { //VIEW
 				prefixOffset += view.length() + 1;
 				
 				if (upperCaseStr.startsWith(ifExists, prefixOffset)) { //IF EXISTS
 					prefixOffset += ifExists.length() + 1;
 					
 					qStringPrefix = "BEGIN TRY IF OBJECT_ID('" + fixedQuotes.substring(prefixOffset).toUpperCase()
-					+ "', 'V')" + " IS NOT NULL DROP VIEW " + fixedQuotes.substring(prefixOffset)
-					+ " END TRY BEGIN CATCH END CATCH";
+						+ "', 'V')" + " IS NOT NULL DROP VIEW " + fixedQuotes.substring(prefixOffset)
+						+ " END TRY BEGIN CATCH END CATCH";
 				} else {
 					qStringPrefix = "DROP VIEW ";
 				}
@@ -255,12 +255,12 @@ public class JSql_Mssql extends JSql {
 		
 		if (qString.contains("CREATE TABLE")) {
 			// Replace PRIMARY KEY AUTOINCREMENT with IDENTITY
-			if(qString.contains("AUTOINCREMENT")) {
-				qString = qString.replaceAll( "AUTOINCREMENT", "IDENTITY" );
+			if (qString.contains("AUTOINCREMENT")) {
+				qString = qString.replaceAll("AUTOINCREMENT", "IDENTITY");
 			}
 			
 			//Convert MY-Sql NUMBER data type to NUMERIC data type for Ms-sql
-			if(qString.contains("NUMBER")) {
+			if (qString.contains("NUMBER")) {
 				qString = qString.replaceAll("NUMBER", "NUMERIC");
 			}
 		}

@@ -33,7 +33,7 @@ public class JSql extends BaseInterface {
 	
 	// Database connection settings
 	//-------------------------------------------------------------------------
-
+	
 	/// database connection
 	protected Connection sqlConn = null;
 	
@@ -46,7 +46,7 @@ public class JSql extends BaseInterface {
 	
 	// Database connection caching (used for recreate
 	//-------------------------------------------------------------------------
-
+	
 	/// database connection properties
 	private Map<String, Object> connectionProps = null;
 	

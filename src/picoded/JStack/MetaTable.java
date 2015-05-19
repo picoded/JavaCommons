@@ -207,7 +207,7 @@ public class MetaTable {
 		String lBracket = "'";
 		String rBracket = "'";
 		
-		if(sql.sqlType == JSqlType.mssql) {
+		if (sql.sqlType == JSqlType.mssql) {
 			lBracket = "[";
 			rBracket = "]";
 		}
@@ -215,15 +215,15 @@ public class MetaTable {
 		String tableName = sqlTableName(sql);
 		
 		StringBuilder select = new StringBuilder(" SELECT B.oID AS ");
-		select.append(lBracket+"_oid"+rBracket);
+		select.append(lBracket + "_oid" + rBracket);
 		select.append(", B.oTm AS ");
-		select.append(lBracket+"_otm"+rBracket);
+		select.append(lBracket + "_otm" + rBracket);
 		
 		StringBuilder from = new StringBuilder(" FROM ");
 		
-		from.append("(SELECT DISTINCT oID, oTm FROM "+tableName+")");
+		from.append("(SELECT DISTINCT oID, oTm FROM " + tableName + ")");
 		//from.append( tableName );
-		from.append( " AS B" );
+		from.append(" AS B");
 		
 		String key;
 		MetaType type;
@@ -274,7 +274,7 @@ public class MetaTable {
 		sb.append(from);
 		
 		//System.out.println( sb.toString() );
-		sql.execute_raw( sb.toString() );
+		sql.execute_raw(sb.toString());
 	}
 	
 	protected void JSqlIndexConfigTableSetup(JSql sql) throws JSqlException {
@@ -396,9 +396,9 @@ public class MetaTable {
 		//		tName, "tVl", "FULLTEXT", "tVl" //
 		//	).execute();
 		//} else {
-			sql.createTableIndexQuerySet( //
-				tName, "tVl", null, "tVl" // Sqlite uses normal index
-			).execute();
+		sql.createTableIndexQuerySet( //
+			tName, "tVl", null, "tVl" // Sqlite uses normal index
+		).execute();
 		//}
 		
 		// timestamp index, is this needed?
@@ -614,8 +614,8 @@ public class MetaTable {
 		} else {
 			selectCols.toLowerCase();
 			
-			if( selectCols.indexOf("_oid") == -1 ) {
-				selectCols = "_oid, "+selectCols;
+			if (selectCols.indexOf("_oid") == -1) {
+				selectCols = "_oid, " + selectCols;
 			}
 		}
 		
@@ -653,9 +653,9 @@ public class MetaTable {
 	}
 	
 	/// Does a conversion from the JSqlResult map, to the
-	protected MetaObject[] JSqlResultToMetaObjectArray( Map<String, ArrayList<Object>> jRes ) throws JStackException {
+	protected MetaObject[] JSqlResultToMetaObjectArray(Map<String, ArrayList<Object>> jRes) throws JStackException {
 		ArrayList<Object> oID_list = jRes.get("_oid");
-		if( oID_list == null || oID_list.size() <= 0 ) {
+		if (oID_list == null || oID_list.size() <= 0) {
 			return new MetaObject[0];
 		}
 		
@@ -666,12 +666,12 @@ public class MetaTable {
 		CaseInsensitiveHashMap<String, Object> queryCache = new CaseInsensitiveHashMap<String, Object>();
 		MetaObject mObj;
 		
-		for(int a=0; a<len; ++a) {
-			mObj = lazyGet( (String)(oID_list.get(a)) );
+		for (int a = 0; a < len; ++a) {
+			mObj = lazyGet((String) (oID_list.get(a)));
 			queryCache = new CaseInsensitiveHashMap<String, Object>();
 			
 			for (Map.Entry<String, ArrayList<Object>> entry : jRes.entrySet()) {
-				queryCache.put( entry.getKey(), entry.getValue().get(a) );
+				queryCache.put(entry.getKey(), entry.getValue().get(a));
 			}
 			
 			mObj.queryDataMap = queryCache;
@@ -682,22 +682,21 @@ public class MetaTable {
 	}
 	
 	/// Performs a search query, and returns the respective relevent objects
-	public MetaObject[] queryObjects(String whereClause, Object[] whereValues,
-												String orderBy, long limit, long offset, String optimalSelect) throws JStackException {
+	public MetaObject[] queryObjects(String whereClause, Object[] whereValues, String orderBy, long limit, long offset,
+		String optimalSelect) throws JStackException {
 		
 		Map<String, ArrayList<Object>> qData = queryData(optimalSelect, whereClause, whereValues, orderBy, limit, offset);
 		return JSqlResultToMetaObjectArray(qData);
 	}
 	
 	/// Performs a search query, and returns the respective relevent objects
-	public MetaObject[] queryObjects(String whereClause, Object[] whereValues,
-												String orderBy, long limit, long offset) throws JStackException {
+	public MetaObject[] queryObjects(String whereClause, Object[] whereValues, String orderBy, long limit, long offset)
+		throws JStackException {
 		return queryObjects(whereClause, whereValues, orderBy, limit, offset, null);
 	}
 	
 	/// Performs a search query, and returns the respective relevent objects
-	public MetaObject[] queryObjects(String whereClause, Object[] whereValues,
-												String orderBy) throws JStackException {
+	public MetaObject[] queryObjects(String whereClause, Object[] whereValues, String orderBy) throws JStackException {
 		return queryObjects(whereClause, whereValues, orderBy, 0, 0, null);
 	}
 	

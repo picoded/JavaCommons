@@ -160,7 +160,9 @@ public class NxtCrypt {
 		
 		SecretKey key;
 		try {
-			key = NxtCrypt.pbk.generateSecret(new PBEKeySpec(rawPassword.toCharArray(), salt, iteration, keyLen));
+			PBEKeySpec kSpec = new PBEKeySpec(rawPassword.toCharArray(), salt, iteration, keyLen);
+			
+			key = NxtCrypt.pbk.generateSecret(kSpec);
 		} catch (Exception e) {
 			throw new SecurityException(e);
 		}

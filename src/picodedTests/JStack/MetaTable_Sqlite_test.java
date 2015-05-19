@@ -155,8 +155,8 @@ public class MetaTable_Sqlite_test {
 		
 		assertNotNull(qRes = mtObj.queryObjects("num > ? AND num < ?", new Object[] { 2, 5 }, "num ASC"));
 		assertEquals(2, qRes.length);
-		assertEquals("hello", qRes[0].get("str_val") );
-		assertEquals("world", qRes[1].get("str_val") );
+		assertEquals("hello", qRes[0].get("str_val"));
+		assertEquals("world", qRes[1].get("str_val"));
 		
 		assertNotNull(qRes = mtObj.queryObjects("str_val LIKE ?", new Object[] { "this" }));
 		assertEquals(2, qRes.length);

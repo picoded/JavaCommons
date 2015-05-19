@@ -70,7 +70,7 @@ public class JSql extends BaseInterface {
 		}
 	}
 	
-	/// SQLite static constructor, returns picoded.jSql.JSql_Sqlite
+	/// SQLite static constructor, returns picoded.JSql.JSql_Sqlite
 	public static JSql sqlite() {
 		return new picoded.JSql.db.JSql_Sqlite();
 	}
@@ -107,23 +107,23 @@ public class JSql extends BaseInterface {
 		}
 		if (sqlType == JSqlType.sqlite) {
 			if (connectionProps.get("dbUrl") == null) {
-				new picoded.jSql.db.JSql_Sqlite();
+				new picoded.JSql.db.JSql_Sqlite();
 			} else {
-				new picoded.jSql.db.JSql_Sqlite((String) connectionProps.get("dbUrl"));
+				new picoded.JSql.db.JSql_Sqlite((String) connectionProps.get("dbUrl"));
 			}
 		} else if (sqlType == JSqlType.mysql) {
 			if (connectionProps.get("connectionProps") == null) {
-				new picoded.jSql.db.JSql_Mysql((String) connectionProps.get("dbUrl"), (String) connectionProps
+				new picoded.JSql.db.JSql_Mysql((String) connectionProps.get("dbUrl"), (String) connectionProps
 					.get("dbName"), (String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
 			} else {
-				new picoded.jSql.db.JSql_Mysql((String) connectionProps.get("dbUrl"), (Properties) connectionProps
+				new picoded.JSql.db.JSql_Mysql((String) connectionProps.get("dbUrl"), (Properties) connectionProps
 					.get("connectionProps"));
 			}
 		} else if (sqlType == JSqlType.mssql) {
-			new picoded.jSql.db.JSql_Mssql((String) connectionProps.get("dbUrl"), (String) connectionProps.get("dbName"),
+			new picoded.JSql.db.JSql_Mssql((String) connectionProps.get("dbUrl"), (String) connectionProps.get("dbName"),
 				(String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
 		} else if (sqlType == JSqlType.oracle) {
-			new picoded.jSql.db.JSql_Oracle((String) connectionProps.get("dbUrl"), (String) connectionProps.get("dbUser"),
+			new picoded.JSql.db.JSql_Oracle((String) connectionProps.get("dbUrl"), (String) connectionProps.get("dbUser"),
 				(String) connectionProps.get("dbPass"));
 		}
 	}

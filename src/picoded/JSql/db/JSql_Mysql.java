@@ -42,6 +42,9 @@ public class JSql_Mysql extends JSql {
 	public JSql_Mysql(String dbServerAddress, String dbName, String dbUser, String dbPass) {
 		sqlType = JSqlType.mysql;
 		
+		// store database connection properties
+		setConnectionProperties(dbServerAddress, dbName, dbUser, dbPass, null);
+		
 		String connectionUrl = "jdbc:mysql://" + dbServerAddress + "/" + dbName
 			+ "?autoReconnect=true&failOverReadOnly=false&maxReconnects=5";
 		
@@ -58,6 +61,9 @@ public class JSql_Mysql extends JSql {
 	/// **Note:** connectionUrl, for example, "jdbc:mysql://54.169.34.78:3306/JAVACOMMONS"
 	public JSql_Mysql(String connectionUrl, Properties connectionProps) {
 		sqlType = JSqlType.mysql;
+		
+		// store database connection properties
+		setConnectionProperties(connectionUrl, null, null, null, connectionProps);
 		
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance(); //ensure jdbc driver is loaded

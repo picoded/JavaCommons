@@ -42,6 +42,9 @@ public class JSql_Oracle extends JSql {
 	public JSql_Oracle(String oraclePath, String dbUser, String dbPass) {
 		sqlType = JSqlType.oracle;
 		
+		// store database connection properties
+		setConnectionProperties(oraclePath, null, dbUser, dbPass, null);
+		
 		// Get the assumed oracle table space
 		int tPoint = oraclePath.indexOf("@");
 		if (tPoint > 0) {

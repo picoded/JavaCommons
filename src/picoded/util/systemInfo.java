@@ -40,19 +40,20 @@ public class systemInfo {
 	public static String localMACAddress() throws UnknownHostException, SocketException {
 		InetAddress ip = InetAddress.getLocalHost();
 		NetworkInterface network = NetworkInterface.getByInetAddress(ip);
-		
-		byte[] mac = network.getHardwareAddress();
+		byte[] mac = null;
+		mac = network.getHardwareAddress();
 		
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < mac.length; i++) {
 			sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
 		}
+		/// return UUID.nameUUIDFromBytes(mac).toString();
 		return sb.toString();
 	}
 	
-	/// systemaHash randomly generated Hash (base58 guid)
+	/// systemaHash randomly generate Base58 hashing from host name and mac address
 	/// @returns string generate a hash
-	public static String systemaHash() {
-		return UUID.randomUUID().toString();
+	public static String systemaHash() throws Exception {
+		return UUID.fromString(localHostName() + localMACAddress()).toString();
 	}
 }

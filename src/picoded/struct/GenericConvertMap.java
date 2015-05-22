@@ -22,7 +22,7 @@ import picoded.conv.GenericConvert;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
-public interface GenericConvertMap<K,V> /* implements Map<K,V> */ {
+public interface GenericConvertMap<K, V> {
 	
 	// map interface implementation required
 	//-----------------------------------------

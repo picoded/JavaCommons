@@ -8,17 +8,16 @@ import picoded.struct.CaseInsensitiveHashMap;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-
 ///
 /// Test Case for picoded.struct.CaseInsensitiveHashMap
 ///
 public class GenericConvertMap_test {
 	
-	class GMap<K extends String,V> extends CaseInsensitiveHashMap<K,V> implements GenericConvertMap<K,V>  {
+	class GMap<K extends String, V> extends CaseInsensitiveHashMap<K, V> implements GenericConvertMap<K, V> {
 		/// Java serialversion uid: http://stackoverflow.com/questions/285793/what-is-a-serialversionuid-and-why-should-i-use-it
 		private static final long serialVersionUID = 1L;
 	}
-
+	
 	@Before
 	public void setUp() {
 	}
@@ -53,7 +52,7 @@ public class GenericConvertMap_test {
 		map.put("this", "[\"is\",\"not\",\"the\",\"beginning\"]");
 		map.put("nor", new String[] { "this", "is", "the", "end" });
 		
-		assertArrayEquals( new String[] { "is", "not", "the", "beginning" }, map.getStringArray("this") );
-		assertEquals( "[\"this\",\"is\",\"the\",\"end\"]", map.getString("nor") );
+		assertArrayEquals(new String[] { "is", "not", "the", "beginning" }, map.getStringArray("this"));
+		assertEquals("[\"this\",\"is\",\"the\",\"end\"]", map.getString("nor"));
 	}
 }

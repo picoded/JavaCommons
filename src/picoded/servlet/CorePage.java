@@ -124,8 +124,6 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		return (requestType == TYPE_DELETE);
 	}
 	
-	
-	
 	/*
 	
 	// initialized config getters
@@ -144,8 +142,8 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	protected final CorePage spawnInstance(byte inRequestType, Map<String,String> reqParam, OutputStream outStream ) {
 		
 	}
-	*/
-	
+	 */
+
 	/*
 	
 	////////////////////////////////
@@ -434,5 +432,5 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		
 		return true;
 	}
-	*/
+	 */
 }

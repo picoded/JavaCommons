@@ -32,23 +32,22 @@ public class GenericConvert {
 	///
 	/// @returns         The converted string, always possible unless null
 	public static String toString(Object input, String fallbck) {
-		if(input == null) {
+		if (input == null) {
 			return fallbck;
 		}
 		
-		if(input instanceof String) {
+		if (input instanceof String) {
 			return input.toString();
 		}
 		
 		try {
 			return ConvertJSON.fromObject(input);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			// ignores
 		}
 		
 		return input.toString();
 	}
-	
 	
 	/// Default null fallback, To String conversion of generic object
 	///
@@ -77,38 +76,38 @@ public class GenericConvert {
 	///
 	/// @returns         The converted string, always possible unless null
 	public static boolean toBoolean(Object input, boolean fallbck) {
-		if(input == null) {
+		if (input == null) {
 			return fallbck;
 		}
 		
-		if(input instanceof Boolean) {
-			return ((Boolean)input).booleanValue();
+		if (input instanceof Boolean) {
+			return ((Boolean) input).booleanValue();
 		}
 		
-		if(input instanceof Number) {
-			return ( ((Number)input).floatValue() > 0.0f );
+		if (input instanceof Number) {
+			return (((Number) input).floatValue() > 0.0f);
 		}
 		
-		if(input instanceof String && ((String)input).length() > 0) {
-			char tChar = ((String)input).charAt(0);
+		if (input instanceof String && ((String) input).length() > 0) {
+			char tChar = ((String) input).charAt(0);
 			
 			//String conversion
-			if( tChar == '+' || tChar == 't' || tChar == 'T' || tChar == 'y' || tChar == 'Y' ) {
+			if (tChar == '+' || tChar == 't' || tChar == 'T' || tChar == 'y' || tChar == 'Y') {
 				return true;
-			} else if( tChar == '-' || tChar == 'f' || tChar == 'F' || tChar == 'n' || tChar == 'N' ) {
+			} else if (tChar == '-' || tChar == 'f' || tChar == 'F' || tChar == 'n' || tChar == 'N') {
 				return false;
 			}
 			
 			//Numeric string conversion
 			String s = ((String) input);
 			
-			if(s.length() > 2) {
-				s = s.substring(0,2);
+			if (s.length() > 2) {
+				s = s.substring(0, 2);
 			}
 			try {
 				Integer i = Integer.valueOf(s);
 				return (i.intValue() > 0);
-			} catch(Exception e) {
+			} catch (Exception e) {
 				//does nothing
 			}
 		}
@@ -141,22 +140,22 @@ public class GenericConvert {
 	///
 	/// @returns         The converted string, always possible unless null
 	public static Number toNumber(Object input, Number fallbck) {
-		if(input == null) {
+		if (input == null) {
 			return fallbck;
 		}
 		
-		if(input instanceof Number) {
-			return ((Number)input);
+		if (input instanceof Number) {
+			return ((Number) input);
 		}
 		
-		if(input instanceof String && ((String)input).length() > 0) {
+		if (input instanceof String && ((String) input).length() > 0) {
 			//Numeric string conversion
 			String s = ((String) input);
 			
 			try {
-				BigDecimal bd = new BigDecimal( ((String) input) );
+				BigDecimal bd = new BigDecimal(((String) input));
 				return bd;
-			} catch(Exception e) {
+			} catch (Exception e) {
 				
 			}
 		}
@@ -189,7 +188,7 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	public static int toInt(Object input, int fallbck) {
-		if(input == null) {
+		if (input == null) {
 			return fallbck;
 		}
 		
@@ -221,7 +220,7 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	public static long toLong(Object input, long fallbck) {
-		if(input == null) {
+		if (input == null) {
 			return fallbck;
 		}
 		
@@ -253,7 +252,7 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	public static float toFloat(Object input, float fallbck) {
-		if(input == null) {
+		if (input == null) {
 			return fallbck;
 		}
 		
@@ -285,7 +284,7 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	public static double toDouble(Object input, double fallbck) {
-		if(input == null) {
+		if (input == null) {
 			return fallbck;
 		}
 		
@@ -317,7 +316,7 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	public static byte toByte(Object input, byte fallbck) {
-		if(input == null) {
+		if (input == null) {
 			return fallbck;
 		}
 		
@@ -330,7 +329,7 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	public static byte toByte(Object input) {
-		return toByte(input, (byte)0);
+		return toByte(input, (byte) 0);
 	}
 	
 	// to short
@@ -349,7 +348,7 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	public static short toShort(Object input, short fallbck) {
-		if(input == null) {
+		if (input == null) {
 			return fallbck;
 		}
 		
@@ -362,7 +361,7 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	public static short toShort(Object input) {
-		return toShort(input, (short)0);
+		return toShort(input, (short) 0);
 	}
 	
 	// to UUID aka GUID
@@ -381,21 +380,21 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	public static UUID toUUID(Object input, Object fallbck) {
-		if( input == null ) {
-			if( fallbck == null ) {
+		if (input == null) {
+			if (fallbck == null) {
 				return null;
 			}
 			return toUUID(fallbck, null);
 		}
-		if( input instanceof UUID ) {
-			return (UUID)input;
+		if (input instanceof UUID) {
+			return (UUID) input;
 		}
 		
-		if( input instanceof String ) {
-			if( ((String)input).length() == 22) {
+		if (input instanceof String) {
+			if (((String) input).length() == 22) {
 				try {
-					return GUID.fromBase58( (String)input );
-				} catch(Exception e) {
+					return GUID.fromBase58((String) input);
+				} catch (Exception e) {
 					
 				}
 			}
@@ -426,28 +425,28 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	public static String toGUID(Object input, Object fallbck) {
-		if( input == null ) {
-			if( fallbck == null ) {
+		if (input == null) {
+			if (fallbck == null) {
 				return null;
 			}
 			return toGUID(fallbck, null);
 		}
 		
-		if( input instanceof UUID ) {
+		if (input instanceof UUID) {
 			try {
-				return GUID.base58( (UUID)input );
-			} catch(Exception e) {
+				return GUID.base58((UUID) input);
+			} catch (Exception e) {
 				
 			}
 		}
 		
-		if( input instanceof String ) {
-			if( ((String)input).length() >= 22) {
+		if (input instanceof String) {
+			if (((String) input).length() >= 22) {
 				try {
-					if( GUID.fromBase58( (String)input ) != null ) {
-						return (String)input;
+					if (GUID.fromBase58((String) input) != null) {
+						return (String) input;
 					}
-				} catch(Exception e) {
+				} catch (Exception e) {
 					
 				}
 			}
@@ -496,46 +495,46 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	public static String[] toStringArray(Object input, Object fallbck) {
-		if( input == null ) {
-			if( fallbck == null ) {
+		if (input == null) {
+			if (fallbck == null) {
 				return null;
 			}
 			return toStringArray(fallbck, null);
 		}
 		
-		if(input instanceof String[]) {
-			return (String[])input;
+		if (input instanceof String[]) {
+			return (String[]) input;
 		}
 		
 		// From list conversion (if needed)
 		List<?> list = null;
 		
 		// Conversion to List (if possible)
-		if(input instanceof String) {
+		if (input instanceof String) {
 			try {
-				Object o = ConvertJSON.toList( (String)input );
-				if(o instanceof List) {
-					list = (List<?>)o;
+				Object o = ConvertJSON.toList((String) input);
+				if (o instanceof List) {
+					list = (List<?>) o;
 				}
 			} catch (Exception e) {
 				
 			}
-		} else if(input instanceof List) {
-			list = (List<?>)input;
+		} else if (input instanceof List) {
+			list = (List<?>) input;
 		}
 		
 		// List to string array conversion
-		if(list != null) {
+		if (list != null) {
 			// Try direct conversion?
 			try {
 				return list.toArray(new String[list.size()]);
-			} catch(Exception e) {
+			} catch (Exception e) {
 				
 			}
 			
 			// Try value by value conversion
-			String[] ret = new String[ list.size() ];
-			for(int a=0; a<ret.length; ++a) {
+			String[] ret = new String[list.size()];
+			for (int a = 0; a < ret.length; ++a) {
 				ret[a] = toString(list.get(a));
 			}
 			return ret;
@@ -570,40 +569,40 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	public static Object[] toObjectArray(Object input, Object fallbck) {
-		if( input == null ) {
-			if( fallbck == null ) {
+		if (input == null) {
+			if (fallbck == null) {
 				return null;
 			}
 			return toObjectArray(fallbck, null);
 		}
 		
-		if(input instanceof Object[]) {
-			return (Object[])input;
+		if (input instanceof Object[]) {
+			return (Object[]) input;
 		}
 		
 		// From list conversion (if needed)
 		List<?> list = null;
 		
 		// Conversion to List (if possible)
-		if(input instanceof String) {
+		if (input instanceof String) {
 			try {
-				Object o = ConvertJSON.toList( (String)input );
-				if(o instanceof List) {
-					list = (List<?>)o;
+				Object o = ConvertJSON.toList((String) input);
+				if (o instanceof List) {
+					list = (List<?>) o;
 				}
 			} catch (Exception e) {
 				
 			}
-		} else if(input instanceof List) {
-			list = (List<?>)input;
+		} else if (input instanceof List) {
+			list = (List<?>) input;
 		}
 		
 		// List to string array conversion
-		if(list != null) {
+		if (list != null) {
 			// Try direct conversion? (almost always works for object list)
 			try {
 				return list.toArray(new Object[list.size()]);
-			} catch(Exception e) {
+			} catch (Exception e) {
 				
 			}
 		}
@@ -646,5 +645,5 @@ public class GenericConvert {
 		
 		return null;
 	}
-	*/
+	 */
 }

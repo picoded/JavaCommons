@@ -17,7 +17,7 @@ public class GenericConvert_test {
 	@Test
 	public void toStringTest() {
 		assertEquals("hello world", GenericConvert.toString("hello world"));
-		assertEquals("100", GenericConvert.toString( 100 ));
+		assertEquals("100", GenericConvert.toString(100));
 		assertEquals("hello world", GenericConvert.toString(null, "hello world"));
 	}
 	

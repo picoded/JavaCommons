@@ -14,6 +14,7 @@ import picoded.conv.GUID;
 import picoded.JSql.*;
 import picoded.JCache.*;
 import picoded.struct.CaseInsensitiveHashMap;
+import picoded.struct.GenericConvertMap;
 
 /// hazelcast
 import com.hazelcast.core.*;
@@ -28,7 +29,7 @@ import com.hazelcast.core.IMap;
 /// Represents a single object node in the MetaTable collection.
 ///
 /// NOTE: This class should not be initialized directly, but through MetaTable class
-public class MetaObject extends CaseInsensitiveHashMap<String, Object> {
+public class MetaObject extends CaseInsensitiveHashMap<String, Object> implements GenericConvertMap<String, Object> {
 	
 	/// Java serialversion uid: http://stackoverflow.com/questions/285793/what-is-a-serialversionuid-and-why-should-i-use-it
 	private static final long serialVersionUID = 42L;
@@ -200,6 +201,7 @@ public class MetaObject extends CaseInsensitiveHashMap<String, Object> {
 		remoteDataMap.putAll(cMap);
 	}
 	
+	/// Save all the configured data, ignore delta handling
 	public void saveAll() throws JStackException {
 		Map<String, Object> cMap = combinedMap();
 		

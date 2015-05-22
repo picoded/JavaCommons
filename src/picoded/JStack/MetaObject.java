@@ -140,7 +140,7 @@ public class MetaObject extends CaseInsensitiveHashMap<String, Object> implement
 	/// @param   value   value to be associated with the specified key
 	///
 	/// @returns  the previous value associated with key, or null if there was no mapping for key.
-	///           (A null return can also indicate that the map previously associated null with key.)
+	///           (A null return can also indicate that the map previously associated null with key)
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object put(String key, Object value) {

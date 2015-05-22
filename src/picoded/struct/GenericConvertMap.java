@@ -27,7 +27,7 @@ public interface GenericConvertMap<K,V> /* implements Map<K,V> */ {
 	// map interface implementation required
 	//-----------------------------------------
 	V get(Object key);
-	V put(K key, V value);
+	//V put(K key, V value);
 	
 	// to string conversion
 	//--------------------------------------------------------------------------------------------------

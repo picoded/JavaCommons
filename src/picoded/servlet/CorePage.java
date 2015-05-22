@@ -11,6 +11,7 @@ import java.io.IOException;
 
 // Objects used
 import java.util.HashMap;
+import java.util.Map;
 import java.io.PrintWriter;
 import java.io.OutputStream;
 import java.net.URLDecoder;
@@ -86,6 +87,15 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// Request type indicator
 	protected byte requestType = 0;
 	
+	/// httpRequest used [modification of this value, is highly discouraged]
+	protected HttpServletRequest httpRequest = null;
+	
+	/// httpResponse used [modification of this value, is highly discouraged]
+	protected HttpServletResponse httpResponse = null;
+	
+	/// parameter map, either initialized from httpRequest, or directly
+	Map<String, String[]> requestMap = null;
+	
 	// initialized config getters
 	//-------------------------------------------
 	
@@ -120,12 +130,6 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	// initialized config getters
 	//-------------------------------------------
-	
-	/// httpRequest used [modification of this value, is highly not suggested]
-	protected HttpServletRequest httpRequest = null;
-	
-	/// httpResponse used [modification of this value, is highly not suggested]
-	protected HttpServletResponse httpResponse = null;
 	
 	///
 	protected Map<String,String> reqParam = null;

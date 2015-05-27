@@ -7,6 +7,8 @@ import java.net.UnknownHostException;
 
 import java.util.UUID;
 
+import picoded.conv.Base58;
+
 // systemInfo, is a utility class meant to facilitate the system info quickly.
 ///
 /// Core features
@@ -54,6 +56,6 @@ public class systemInfo {
 	/// systemaHash randomly generate Base58 hashing from host name and mac address
 	/// @returns string generate a hash
 	public static String systemaHash() throws Exception {
-		return UUID.fromString(localHostName() + localMACAddress()).toString();
+		return new Base58().encode((localHostName() + localMACAddress()).getBytes());
 	}
 }

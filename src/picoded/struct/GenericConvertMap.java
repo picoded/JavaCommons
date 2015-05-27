@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Collection;
 
 import picoded.conv.GenericConvert;
 
@@ -22,12 +24,7 @@ import picoded.conv.GenericConvert;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
-public interface GenericConvertMap<K, V> {
-	
-	// map interface implementation required
-	//-----------------------------------------
-	V get(Object key);
-	//V put(K key, V value);
+public interface GenericConvertMap<K, V> extends Map<K,V> {
 	
 	// to string conversion
 	//--------------------------------------------------------------------------------------------------

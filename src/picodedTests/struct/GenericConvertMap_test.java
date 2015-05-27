@@ -3,6 +3,7 @@ package picodedTests.struct;
 // Target test class
 import picoded.struct.GenericConvertMap;
 import picoded.struct.CaseInsensitiveHashMap;
+import picoded.struct.ProxyGenericConvertMap;
 
 // Test Case include
 import org.junit.*;
@@ -28,7 +29,7 @@ public class GenericConvertMap_test {
 	
 	@Test
 	public void intTest() {
-		GMap<String, String> tObj = new GMap<String, String>();
+		GenericConvertMap<String, String> tObj = new GMap<String, String>();
 		
 		assertNull(tObj.put("year", "1965"));
 		
@@ -38,21 +39,51 @@ public class GenericConvertMap_test {
 	
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.java}
 	///
-	/// map.put("this", "[\"is\",\"not\",\"the\",\"beginning\"]");
-	/// map.put("nor", new String[] { "this", "is", "the", "end" });
+	/// tObj.put("this", "[\"is\",\"not\",\"the\",\"beginning\"]");
+	/// tObj.put("nor", new String[] { "this", "is", "the", "end" });
 	///
-	/// assertEquals( new String[] { "is", "not", "the", "beginning" }, map.getStringArray("this") );
-	/// assertEquals( "[\"this\",\"is\",\"the\",\"end\"]", map.getString("nor") );
+	/// assertEquals( new String[] { "is", "not", "the", "beginning" }, tObj.getStringArray("this") );
+	/// assertEquals( "[\"this\",\"is\",\"the\",\"end\"]", tObj.getString("nor") );
 	///
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	@Test
 	public void stringArrayTest() {
-		GMap<String, Object> map = new GMap<String, Object>();
+		GenericConvertMap<String, Object> tObj = new GMap<String, Object>();
 		
-		map.put("this", "[\"is\",\"not\",\"the\",\"beginning\"]");
-		map.put("nor", new String[] { "this", "is", "the", "end" });
+		tObj.put("this", "[\"is\",\"not\",\"the\",\"beginning\"]");
+		tObj.put("nor", new String[] { "this", "is", "the", "end" });
 		
-		assertArrayEquals(new String[] { "is", "not", "the", "beginning" }, map.getStringArray("this"));
-		assertEquals("[\"this\",\"is\",\"the\",\"end\"]", map.getString("nor"));
+		assertArrayEquals(new String[] { "is", "not", "the", "beginning" }, tObj.getStringArray("this"));
+		assertEquals("[\"this\",\"is\",\"the\",\"end\"]", tObj.getString("nor"));
+	}
+	
+	@Test
+	public void proxy_intTest() {
+		GenericConvertMap<String, Object> tObj = ProxyGenericConvertMap.ensureGenericConvertMap( new CaseInsensitiveHashMap<String, Object>() );
+		
+		assertNull(tObj.put("year", "1965"));
+		
+		assertNull(tObj.getStringArray("year"));
+		assertEquals(1965, tObj.getInt("year"));
+	}
+	
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.java}
+	///
+	/// tObj.put("this", "[\"is\",\"not\",\"the\",\"beginning\"]");
+	/// tObj.put("nor", new String[] { "this", "is", "the", "end" });
+	///
+	/// assertEquals( new String[] { "is", "not", "the", "beginning" }, tObj.getStringArray("this") );
+	/// assertEquals( "[\"this\",\"is\",\"the\",\"end\"]", tObj.getString("nor") );
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	@Test
+	public void proxy_stringArrayTest() {
+		GenericConvertMap<String, Object> tObj = ProxyGenericConvertMap.ensureGenericConvertMap( new CaseInsensitiveHashMap<String, Object>() );
+		
+		tObj.put("this", "[\"is\",\"not\",\"the\",\"beginning\"]");
+		tObj.put("nor", new String[] { "this", "is", "the", "end" });
+		
+		assertArrayEquals(new String[] { "is", "not", "the", "beginning" }, tObj.getStringArray("this"));
+		assertEquals("[\"this\",\"is\",\"the\",\"end\"]", tObj.getString("nor"));
 	}
 }

@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import picoded.conv.Base58;
 
-// systemInfo, is a utility class meant to facilitate the system info quickly.
+/// systemInfo, is a utility class meant to facilitate the system info quickly.
 ///
 /// Core features
 /// - get local ip address (local ip address : xx.x.x.x).

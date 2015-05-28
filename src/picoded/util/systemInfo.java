@@ -43,7 +43,7 @@ public class systemInfo {
 		InetAddress ip = InetAddress.getLocalHost();
 		NetworkInterface network = NetworkInterface.getByInetAddress(ip);
 		byte[] mac = null;
-		mac = network.getHardwareAddress();
+		mac = null; //network.getHardwareAddress(); //@TODO: TO FIX, this caused build failure
 		
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < mac.length; i++) {

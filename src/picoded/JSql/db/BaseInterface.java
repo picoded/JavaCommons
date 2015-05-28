@@ -1,5 +1,6 @@
 package picoded.JSql.db;
 
+import picoded.JSql.JSql;
 import picoded.JSql.JSqlType;
 import picoded.JSql.JSqlResult;
 import picoded.JSql.JSqlException;
@@ -48,7 +49,7 @@ public abstract class BaseInterface extends JStackLayer {
 	public abstract void dispose();
 	
 	/// Recreates the JSql connection if it has already been disposed of. Option to forcefully recreate the connection if needed.
-	public abstract void recreate(boolean force);
+	public abstract JSql recreate(boolean force);
 	
 	// Just incase a user forgets to dispose "as per normal"
 	//protected void finalize();

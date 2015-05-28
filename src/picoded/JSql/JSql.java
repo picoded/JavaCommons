@@ -101,31 +101,32 @@ public class JSql extends BaseInterface {
 	}
 	
 	/// As this is the base class varient, this funciton isnt suported
-	public void recreate(boolean force) {
+	public JSql recreate(boolean force) {
 		if (force) {
 			dispose();
 		}
 		if (sqlType == JSqlType.sqlite) {
 			if (connectionProps.get("dbUrl") == null) {
-				new picoded.JSql.db.JSql_Sqlite();
+				return new picoded.JSql.db.JSql_Sqlite();
 			} else {
-				new picoded.JSql.db.JSql_Sqlite((String) connectionProps.get("dbUrl"));
+				return new picoded.JSql.db.JSql_Sqlite((String) connectionProps.get("dbUrl"));
 			}
 		} else if (sqlType == JSqlType.mysql) {
 			if (connectionProps.get("connectionProps") == null) {
-				new picoded.JSql.db.JSql_Mysql((String) connectionProps.get("dbUrl"), (String) connectionProps
+				return new picoded.JSql.db.JSql_Mysql((String) connectionProps.get("dbUrl"), (String) connectionProps
 					.get("dbName"), (String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
 			} else {
-				new picoded.JSql.db.JSql_Mysql((String) connectionProps.get("dbUrl"), (Properties) connectionProps
+				return new picoded.JSql.db.JSql_Mysql((String) connectionProps.get("dbUrl"), (Properties) connectionProps
 					.get("connectionProps"));
 			}
 		} else if (sqlType == JSqlType.mssql) {
-			new picoded.JSql.db.JSql_Mssql((String) connectionProps.get("dbUrl"), (String) connectionProps.get("dbName"),
-				(String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
+			return new picoded.JSql.db.JSql_Mssql((String) connectionProps.get("dbUrl"), (String) connectionProps
+				.get("dbName"), (String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
 		} else if (sqlType == JSqlType.oracle) {
-			new picoded.JSql.db.JSql_Oracle((String) connectionProps.get("dbUrl"), (String) connectionProps.get("dbUser"),
-				(String) connectionProps.get("dbPass"));
+			return new picoded.JSql.db.JSql_Oracle((String) connectionProps.get("dbUrl"), (String) connectionProps
+				.get("dbUser"), (String) connectionProps.get("dbPass"));
 		}
+		return null;
 	}
 	
 	/// [private] Helper function, used to prepare the sql statment in multiple situations

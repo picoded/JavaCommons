@@ -372,8 +372,13 @@ public class JSql_Sqlite_test {
 	public void recreate() throws JSqlException {
 		// close connection
 		JSqlObj.dispose();
+		
 		// recoreate connection
-		JSqlObj.recreate(true);
+		JSqlObj = JSqlObj.recreate(true);
+		
+		// recreate the database and table
+		createTableQueryBuilder();
+		
 		// query should get executed
 		JSqlResult r = JSqlObj.query("SELECT * FROM " + testTableName + "");
 		assertNotNull("SQL result returns as expected", r);

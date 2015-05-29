@@ -198,7 +198,7 @@ public class MetaTable {
 	/// Internal JSql index setup
 	///--------------------------------------------------------------------------
 	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
-	protected void JSqlMakeInnerJoinIndexQuery(JSql sql) throws JSqlException {
+	protected void JSqlMakeIndexViewQuery(JSql sql) throws JSqlException {
 		
 		StringBuilder sb = new StringBuilder("CREATE VIEW "); //OR REPLACE
 		sb.append(sqlViewName(sql, "view"));
@@ -240,7 +240,7 @@ public class MetaTable {
 				select.append(", N" + joinCount + ".nVl AS ");
 				select.append(lBracket + key + rBracket);
 				
-				from.append(" INNER JOIN " + tableName + " AS N" + joinCount);
+				from.append(" LEFT JOIN " + tableName + " AS N" + joinCount);
 				from.append(" ON B.oID = N" + joinCount + ".oID");
 				from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = '" + key + "'");
 				
@@ -252,7 +252,7 @@ public class MetaTable {
 				select.append(", S" + joinCount + ".sVl AS ");
 				select.append(lBracket + key + "_lc" + rBracket);
 				
-				from.append(" INNER JOIN " + tableName + " AS S" + joinCount);
+				from.append(" LEFT JOIN " + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
 				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
 				
@@ -261,7 +261,7 @@ public class MetaTable {
 				select.append(", S" + joinCount + ".tVl AS ");
 				select.append(lBracket + key + rBracket);
 				
-				from.append(" INNER JOIN " + tableName + " AS S" + joinCount);
+				from.append(" LEFT JOIN " + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
 				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
 				
@@ -277,6 +277,7 @@ public class MetaTable {
 		sql.execute_raw(sb.toString());
 	}
 	
+	///
 	protected void JSqlIndexConfigTableSetup(JSql sql) throws JSqlException {
 		String tName = sqlViewName(sql, "vCfg");
 		
@@ -305,10 +306,11 @@ public class MetaTable {
 		// Recreates the view if needed
 		if (recreatesView) {
 			sql.execute("DROP VIEW IF EXISTS " + sqlViewName(sql, "view"));
-			JSqlMakeInnerJoinIndexQuery(sql);
+			JSqlMakeIndexViewQuery(sql);
 		}
 	}
 	
+	/// 
 	protected void JSqlTeardown(JSql sql) throws JSqlException {
 		sql.execute("DROP VIEW IF EXISTS " + sqlViewName(sql, "view"));
 		sql.execute("DROP TABLE IF EXISTS " + sqlViewName(sql, "vCfg"));

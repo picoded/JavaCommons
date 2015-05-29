@@ -168,4 +168,30 @@ public class MetaTable_Sqlite_test {
 		
 	}
 	
+	///
+	/// Bad view index due to inner join instead of left join. Testing.
+	///
+	/// AKA: Incomplete object does not appear in view index
+	///
+	@Test
+	public void innerJoinFlaw() throws JStackException {
+		mtObj.append(null, genNumStrObj(1, "hello world"));
+		
+		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
+		objMap.put("num", new Integer(2));
+		mtObj.append( null, objMap );
+		
+		objMap = new CaseInsensitiveHashMap<String, Object>();
+		objMap.put("str_val", "nope");
+		mtObj.append( null, objMap );
+		
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.queryObjects(null, null));
+		assertEquals(3, qRes.length);
+		
+		assertNotNull(qRes = mtObj.queryObjects("str_val LIKE ?", new Object[] { "nope" }));
+		assertEquals(1, qRes.length);
+	}
+	
+	
 }

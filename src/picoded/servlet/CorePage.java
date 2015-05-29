@@ -94,7 +94,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	protected HttpServletResponse httpResponse = null;
 	
 	/// parameter map, either initialized from httpRequest, or directly
-	Map<String, String[]> requestMap = null;
+	public RequestMap requestMap = null;
 	
 	// initialized config getters
 	//-------------------------------------------
@@ -109,17 +109,17 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		return (requestType == TYPE_GET);
 	}
 	
-	/// Returns if the request is GET
+	/// Returns if the request is POST
 	public boolean isPOST() {
 		return (requestType == TYPE_POST);
 	}
 	
-	/// Returns if the request is GET
+	/// Returns if the request is PUT
 	public boolean isPUT() {
 		return (requestType == TYPE_PUT);
 	}
 	
-	/// Returns if the request is GET
+	/// Returns if the request is DELETE
 	public boolean isDELETE() {
 		return (requestType == TYPE_DELETE);
 	}

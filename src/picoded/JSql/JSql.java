@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.lang.RuntimeException;
@@ -735,5 +736,41 @@ public class JSql extends BaseInterface {
 		} catch (Exception e) {
 			throw new JSqlException("executeQuery_metadata exception", e);
 		}
+	}
+	
+	/// Executes the table meta data query, and returns the result object
+	public Map<String, String> getMetaData(String sql) throws JSqlException {
+		Map<String, String> metaData = null;
+		ResultSet rs = null;
+		//Try and finally : prevent memory leaks
+		try {
+			Statement st = sqlConn.createStatement();
+			st = sqlConn.createStatement();
+			rs = st.executeQuery(sql);
+			ResultSetMetaData rsMetaData = rs.getMetaData();
+			int numberOfColumns = rsMetaData.getColumnCount();
+			for (int i = 1; i <= numberOfColumns; i++) {
+				if (metaData == null) {
+					metaData = new HashMap<String, String>();
+				}
+				metaData.put(rsMetaData.getColumnName(i), rsMetaData.getColumnTypeName(i));
+			}
+		} catch (Exception e) {
+			throw new JSqlException("executeQuery_metadata exception", e);
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (Exception e) {
+					//donothing
+				}
+				rs = null;
+			}
+		}
+		return metaData;
+	}
+	
+	public String genericSqlParser(String inString) throws JSqlException {
+		return null;
 	}
 }

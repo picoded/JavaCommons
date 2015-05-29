@@ -57,7 +57,7 @@ public class JSql_Mssql extends JSql {
 	}
 	
 	// Internal parser that converts some of the common sql statements to mssql
-	public static String genericSqlParser(String inString) {
+	public String genericSqlParser(String inString) {
 		
 		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("'", "\"").replaceAll("`", "\"");
 		String upperCaseStr = fixedQuotes.toUpperCase();

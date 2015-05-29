@@ -74,7 +74,7 @@ public class JSql_Mysql extends JSql {
 	}
 	
 	/// Internal parser that converts some of the common sql statements to mysql
-	public static String genericSqlParser(String inString) {
+	public String genericSqlParser(String inString) {
 		return inString.replaceAll("\'", "`").replaceAll("\"", "`"); //fix table name bracketing
 	}
 	

@@ -157,10 +157,9 @@ public class ServletLogging {
 		// table setup for sqlite
 		tableSetup(sqliteObj);
 		
+		return this;
 		// table setup for db
 		tableSetup(jSqlObj);
-		
-		return this;
 	}
 	
 	private void tableSetup(JSql jSqlObj) throws JSqlException {
@@ -172,8 +171,7 @@ public class ServletLogging {
 		
 		// / logFormat table
 		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `logFormat` ( " + "hash VARCHAR(" + objColumnLength + "), "
-			+ "format VARCHAR(" + keyColumnLength + "), " + "name VARCHAR(" + keyColumnLength + "), "
-			+ "PRIMARY KEY (hash) );");
+			+ "format VARCHAR(" + keyColumnLength + "), " + " PRIMARY KEY (hash) );");
 		
 		// / logStrHashes table
 		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `logStrHashes` ( " + "hash VARCHAR(" + objColumnLength
@@ -233,33 +231,36 @@ public class ServletLogging {
 		return generateHash();
 	}
 	
-	// / Add the format to the system
-	public String addFormat(String formatName, String formatString) throws Exception {
-		String fmtHash = generateHash();
-		jSqlObj.execute("INSERT INTO `logFormat` (hash, format, name) VALUES (?, ?, ?)", fmtHash, formatString,
-			formatName);
-		return fmtHash;
+	// / Add the format to the system ---->will be deleted
+	//hash   (base58 md5, indexed) ,format (indexed, unique)
+	public void addFormat(String fmtHash, String format) throws Exception {
+		jSqlObj.execute("INSERT INTO `logFormat` (hash, format) VALUES (?, ?)", fmtHash, format);
 	}
 	
-	// / Get / Has / Remove format
-	
-	// / Performs a logging with a format name and argument
-	public void logWithFormat(String formatName, Object[] args) throws JSqlException {
-		// jSqlObj.execute( "INSERT INTO `logStrHashes` (hash, sVal) VALUES (?, ?)", "expHash", generateHash() );
-		
-		jSqlObj.execute("INSERT INTO `logTable`"
-			+ " (instID, reqsID, creTime, fmtHash, logType, expHash, offSync, reqID, l01-XX, s01-XX, lXX-YY, sXX-YY) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", args);
+	/// You should not be calling log using format with no arguments
+	public void log(String format) {
+		throw new RuntimeException("Do not use the logger, without arguments (it makes this whole class pointless");
 	}
 	
-	// / Performs a logging with a formant name, argument, and attached
-	// exception
-	public void logWithFormat(String formatName, Object[] args, Exception e) throws JSqlException {
-		// jSqlObj.execute( "INSERT INTO `excStrHash` (hash, sVal) VALUES (?, ?)", "expHash", generateHash() );
-		
+	/// Performs a logging with a format name and argument
+	public void log(String format, Object... args) {
+		//call addFormat to add format
+		addFormat(generateHash(), format);
+		//insert args to `logTable`
 		jSqlObj.execute("INSERT INTO `logTable` "
 			+ "(instID, reqsID, creTime, fmtHash, logType, expHash, offSync, reqID, l01-XX, s01-XX, lXX-YY, sXX-YY) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", args);
+	}
+	
+	/// Performs a logging with a formant name, argument, and attached exception
+	public void logException(Exception e, String format, Object... args) {
+		//call addFormat to add format
+		addFormat(generateHash(), format);
+		//insert args to `exception`
+		jSqlObj.execute("INSERT INTO `exception` "
+			+ "(expHash,reqsID,creTime,instID,excRoot,excTrace,excR01-XX,excT01-XX,excMid,stkRoot"
+			+ ",stkTrace,stkR01-XX,stkT01-XX,stkMid) " + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", args);
+		
 	}
 	
 	// / Returns a 22 character string Base58 encoding of MD5 string
@@ -272,4 +273,5 @@ public class ServletLogging {
 		}
 		return s.substring(0, 22); // remove unneeded
 	}
+	
 }

@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 
 /// A class to convert various data types to BaseX. Where
 /// Its primary usages is to convert large values sets (like UUID) into a format that can be safely
@@ -233,4 +234,29 @@ public class BaseX {
 		
 		return retValue;
 	}
+	
+	//-----------------------------------------------
+	// MD5, SHA1 hashing support utility functions
+	//-----------------------------------------------
+	
+	/// Hashes the input byte array, into the baseX format
+	public String md5hash(byte[] byteArr) {
+		return encode(DigestUtils.md5(byteArr));
+	}
+	
+	/// Hashes the input string, into the baseX format
+	public String md5hash(String str) {
+		return encode(DigestUtils.md5(str));
+	}
+	
+	/// Hashes the input byte array, into the baseX format
+	public String sha1hash(byte[] byteArr) {
+		return encode(DigestUtils.sha1(byteArr));
+	}
+	
+	/// Hashes the input string, into the baseX format
+	public String sha1hash(String str) {
+		return encode(DigestUtils.sha1(str));
+	}
+	
 }

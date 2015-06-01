@@ -91,6 +91,8 @@ public class Base62_test {
 		assertEquals(2, b.bitToStringLength(10));
 		
 		assertEquals(22, b.bitToStringLength(128));
+		
+		assertEquals(27, b.bitToStringLength(160));
 	}
 	
 	@Test
@@ -117,6 +119,8 @@ public class Base62_test {
 	public void base64_encodeAndDecodeOnce() {
 		BaseX b = null;
 		assertNotNull(b = new BaseX("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"));
+		
+		assertEquals(27, b.bitToStringLength(160));
 		
 		// min, max
 		// (2^8)^12 / (64^16) = 1

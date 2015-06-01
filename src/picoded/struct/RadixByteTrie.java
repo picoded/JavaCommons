@@ -3,6 +3,8 @@ package picoded.struct;
 import java.util.Map;
 
 ///
+/// @TODO implementation
+///
 /// @WARNING This is considered experimental, avoid usage unless truely needed
 ///
 /// Implements a byte array RadixTrie, also known as patricia trie, or prefix tree

@@ -60,4 +60,9 @@ public class Base58_test extends Base62_test {
 		
 	}
 	
+	@Test
+	public void base58and62_sha1_test() {
+		assertEquals(27, Base58.obj.bitToStringLength(160));
+		assertEquals(27, Base62.obj.bitToStringLength(160));
+	}
 }

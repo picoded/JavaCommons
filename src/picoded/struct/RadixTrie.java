@@ -1,7 +1,10 @@
 package picoded.struct;
 
 import java.util.Map;
+import java.util.HashMap;
 
+///
+/// @TODO implementation
 ///
 /// @WARNING This is considered experimental, avoid usage unless truely needed
 ///
@@ -17,6 +20,9 @@ import java.util.Map;
 ///
 @SuppressWarnings("deprecation")
 @Deprecated
-public class RadixTrie<K, V> /* implements Map<K,V> */{
+public class RadixTrie<K, V> extends HashMap<K, V> /* implements Map<K,V> */{
+	
+	// Serialize version ID
+	static final long serialVersionUID = 1L;
 	
 }

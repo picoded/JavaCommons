@@ -2,8 +2,8 @@ package picoded.objectSetDB;
 
 import picoded.objectSetDB.*;
 import picoded.objectSetDB.internal.*;
-import picoded.jSql.*;
-import picoded.jCache.*;
+import picoded.JSql.*;
+import picoded.JCache.*;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -164,7 +164,7 @@ public class ObjectMap extends AbstractMap<String, Object> {
 		}
 	}
 	
-	/// Gets the object from jCache layer
+	/// Gets the object from JCache layer
 	protected HashMap<String, Object> getRawObjMapVia_ACID_JCache() throws ObjectSetException {
 		try {
 			HashMap<String, Object> r = null;
@@ -257,7 +257,7 @@ public class ObjectMap extends AbstractMap<String, Object> {
 	/// JCache local copy handling
 	///----------------------------------------
 	
-	/// Gets the raw value from jCache layer
+	/// Gets the raw value from JCache layer
 	protected Object getRawVia_ACID_JCacheCopy(String meta, int idx) throws ObjectSetException {
 		setupJCacheDataCopy();
 		

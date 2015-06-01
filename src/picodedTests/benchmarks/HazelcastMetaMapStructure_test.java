@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 
 import picodedTests.TestConfig;
-import picodedTests.jCache.LocalCacheSetup;
+import picodedTests.JCache.LocalCacheSetup;
 
 // Hazelcast package
 import com.hazelcast.core.*;

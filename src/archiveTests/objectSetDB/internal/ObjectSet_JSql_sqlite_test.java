@@ -1,7 +1,7 @@
 package picodedTests.objectSetDB.internal;
 
 // Target test class
-import picoded.jSql.*;
+import picoded.JSql.*;
 import picoded.objectSetDB.internal.ObjectSet_JSql;
 
 // Test Case include

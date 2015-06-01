@@ -2,8 +2,8 @@ package picodedTests.objectSetDB;
 
 // Target test class
 import picoded.objectSetDB.*;
-import picoded.jSql.*;
-import picoded.jCache.*;
+import picoded.JSql.*;
+import picoded.JCache.*;
 
 // Test Case include
 import org.junit.*;
@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 
 // Test case config
 import picodedTests.TestConfig;
-import picodedTests.jCache.LocalCacheSetup;
+import picodedTests.JCache.LocalCacheSetup;
 
 //
 import java.util.Map;

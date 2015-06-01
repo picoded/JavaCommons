@@ -1,6 +1,6 @@
 <project name="picoded.JavaCommons" default="source" xmlns:jacoco="antlib:org.jacoco.ant">
-	<property name="ant.build.javac.source" value="1.7"/>
-	<property name="ant.build.javac.target" value="1.7"/>
+	<property name="ant.build.javac.source" value="1.8"/>
+	<property name="ant.build.javac.target" value="1.8"/>
 	
 	<property name='lib.dir' value='${basedir}/bin/lib' />
 	
@@ -115,6 +115,10 @@
 	<target name="build" depends="compile-src">
 		<delete dir="bin/build" failonerror="false"/>
 		<mkdir dir="bin/build"/>
+		<jar destfile="bin/build/picodedJavaCommons-libsOnly.jar">
+			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
+			<fileset dir="${build-lib}" includes="*.jar" />
+		</jar>
 		<jar destfile="bin/build/picodedJavaCommons-withDependencies.jar">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 			<fileset dir="${build-lib}" includes="*.jar" />
@@ -173,11 +177,6 @@
 	<!-- Code Beautifier, used for pre-commit hook -->
 	<target name="src-beautify">
 		
-		<!-- Delete cleanedup code -->
-		<delete>
-			<fileset dir="./src" includes="**/formatted_*.java"/>
-		</delete>
-
 		<!-- Scan and beautify the code : spaces only -->
 		<exec executable="java">
 			<arg value="-cp"/>
@@ -186,16 +185,6 @@
 			<arg value="./build-config/code-format.opts"/>
 			<arg value="./src"/>
 		</exec>
-		
-		<!-- Scan and convert to smart tabs -->
-		<!--
-		<replaceregexp flags="g" byline="true">
-			<regexp pattern="(?:^\s*)(\s{3,3})"/>
-			<substitution expression="&#x0009;"/>
-			
-			<fileset dir="./src" includes="**/*.java"/>
-		</replaceregexp>
-		-->
 		
 	</target>
 	

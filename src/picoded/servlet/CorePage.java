@@ -16,6 +16,11 @@ import java.io.PrintWriter;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import javax.servlet.http.Cookie;
+
+import picoded.conv.ConvertJSON;
 
 // Sub modules useds
 
@@ -37,28 +42,37 @@ import java.io.UnsupportedEncodingException;
  * ---------------------------------------------------------------------------------------------------------
  *
  * ##Process flow
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * <pre>
+ * {@code
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * initializePage ---\                                                     /--> doPostRequest --\
- *                   |                                                     |                    |
- * doPost -----------+--> processChain -+-> processRequest --> doRequest --+--> doGetRequest ---+--> doOutput
- *                   |                  |
- * doGet ------------+                  \-> processJson -----> doJson --------> doJsonOutput
+ * spawnInstance ----\
  *                   |
- * doDelete ---------+
+ * doOption ---------+
  *                   |
- * doPut ------------/
+ * doPost -----------+--> processChain --> doAuth -+-> doRequest --> do_X_Request --> doOutput
+ *                   |         |                   |
+ * doGet ------------+         V                   \-> doJson -----> do_X_Json -----> doJsonOutput
+ *                   |      doSetup
+ * doDelete ---------+         |
+ *                   |         V
+ * doPut ------------/     doTeardown
  *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * }
+ * </pre>
  * ---------------------------------------------------------------------------------------------------------
  *
  * ##[TODO]
- *  + Accept a more valid range of "yes" indicator for JSON flag
- *  + Mockito tests
  *
  */
 public class CorePage extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
+	
+	///////////////////////////////////////////////////////
+	//
+	// Static variables
+	//
+	///////////////////////////////////////////////////////
 	
 	// Common not so impt stuff
 	//-------------------------------------------
@@ -81,11 +95,35 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// DELETE type indicator
 	static final byte TYPE_DELETE = 4;
 	
-	// The loaded page configs
+	/// OPTION type indicator
+	static final byte TYPE_OPTION = 5;
+	
+	///////////////////////////////////////////////////////
+	//
+	// Instance variables
+	//
+	///////////////////////////////////////////////////////
+	
+	// Instance variables
 	//-------------------------------------------
 	
 	/// Request type indicator
 	protected byte requestType = 0;
+	
+	/// The actual output stream used
+	protected OutputStream responseOutputStream = null;
+	
+	/// parameter map, either initialized from httpRequest, or directly
+	public RequestMap requestParameters = null;
+	
+	/// The template data object wich is being passed around in each process stage
+	protected Map<String,Object> templateDataObj = new HashMap<String,Object>();
+	
+	/// The JSON output data object, if used in JSON processing mode
+	protected Map<String,Object> jsonDataObj = new HashMap<String,Object>();
+	
+	// Servlet specific variables
+	//-------------------------------------------
 	
 	/// httpRequest used [modification of this value, is highly discouraged]
 	protected HttpServletRequest httpRequest = null;
@@ -93,10 +131,70 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// httpResponse used [modification of this value, is highly discouraged]
 	protected HttpServletResponse httpResponse = null;
 	
-	/// parameter map, either initialized from httpRequest, or directly
-	public RequestMap requestMap = null;
+	// Independent instance variables
+	//-------------------------------------------
 	
-	// initialized config getters
+	/// The header map, this is ignored when httpResponse parameter is already set
+	protected Map<String,String> responseHeaderMap = null;
+	
+	/// The cookie map, this is ignored when httpResponse parameter is already set
+	protected Map<String,Cookie> responseCookieMap = null;
+	
+	/// The cookie map, this is ignored when httpResponse parameter is already set
+	protected Map<String,String> requestHeaderMap = null;
+	
+	/// The cookie map, this is ignored when httpResponse parameter is already set
+	protected Map<String,Cookie> requestCookieMap = null;
+	
+	/// local output stream, used for internal execution / testing
+	protected ByteArrayOutputStream cachedResponseOutputStream = null;
+	
+	///////////////////////////////////////////////////////
+	//
+	// Instance config
+	//
+	///////////////////////////////////////////////////////
+	
+	// JSON request config handling
+	//-------------------------------------------
+	
+	/// Sets the JSON detection flag
+	protected String jsonRequestFlag = null;
+	
+	/// Sets the JSON request flag, used to handle JSON requests.
+	/// Note that NULL, means disabled. While "*" means anything
+	public CorePage setJsonRequestFlag( String in ) {
+		jsonRequestFlag = in;
+		return this;
+	}
+	
+	/// Gets the current JSON request flag
+	public String getJsonRequestFlag() {
+		return jsonRequestFlag;
+	}
+	
+	/// Returns true / false if current request qualifies as JSON
+	/// Note this is used internally by the process chain
+	public boolean isJsonRequest() {
+		if( jsonRequestFlag != null ) {
+			if( jsonRequestFlag.equals("*") ) {
+				return true;
+			}
+			
+			String rStr = getParameter(jsonRequestFlag);
+			if( rStr != null && rStr.length() > 0 ) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	// CORS config handling
+	// @TODO CORS OPTION implementation
+	//-------------------------------------------
+	
+	
+	// Request type config getters
 	//-------------------------------------------
 	
 	/// Returns the request type
@@ -124,38 +222,58 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		return (requestType == TYPE_DELETE);
 	}
 	
-	/*
+	/// Returns if the request is OPTION
+	public boolean isOPTION() {
+		return (requestType == TYPE_OPTION);
+	}
 	
-	// initialized config getters
-	//-------------------------------------------
+	///////////////////////////////////////////////////////
+	//
+	// Constructor, setup and instance spawn
+	//
+	///////////////////////////////////////////////////////
 	
-	///
-	protected Map<String,String> reqParam = null;
+	/// Blank constructor, used for template building, unit testing, etc
+	public CorePage() {
+		super();
+	}
 	
-	///
-	protected final CorePage spawnInstance(byte inRequestType, HttpServletRequest req, HttpServletResponse res) {
+	/// Setup the instance, with the request parameter, and
+	protected CorePage setupInstance(byte inRequestType, Map<String,String> reqParam) throws ServletException {
+		requestType = inRequestType;
+		requestParameters = new RequestMap( reqParam );
+		return this;
+	}
+	
+	/// Setup the instance, with the request parameter, and cookie map
+	protected CorePage setupInstance(byte inRequestType, Map<String,String> reqParam, Map<String,Cookie> reqCookieMap) throws ServletException {
+		requestType = inRequestType;
+		requestParameters = new RequestMap( reqParam );
+		requestCookieMap = reqCookieMap;
+		return this;
+	}
+	
+	/// Setup the instance, with http request & response
+	protected CorePage setupInstance(byte inRequestType, HttpServletRequest req, HttpServletResponse res) throws ServletException {
+		requestType = inRequestType;
 		httpRequest = req;
 		httpResponse = res;
-	}
-	
-	///
-	protected final CorePage spawnInstance(byte inRequestType, Map<String,String> reqParam, OutputStream outStream ) {
 		
-	}
-	 */
-
-	/*
-	
-	////////////////////////////////
-	// page initializing triggers //
-	////////////////////////////////
-	
-	/// Spawns a copy of the current instance class. Not its corePage super class, but its current subclass
-	private final corePage spawnInstance(HttpServletRequest req, HttpServletResponse res, boolean state) throws ServletException {
+		requestParameters = RequestMap.fromStringArrayValueMap( httpRequest.getParameterMap() );
+		
 		try {
-			corePage spawn = this.getClass().newInstance();
-			spawn.initializePage(req, res, state);
-			return spawn;
+			responseOutputStream = httpResponse.getOutputStream();
+		} catch(Exception e) {
+			throw new ServletException(e);
+		}
+		
+		return this;
+	}
+	
+	/// Spawn and instance of the current class
+	public final CorePage spawnInstance() throws ServletException { //, OutputStream outStream
+		try {
+			return this.getClass().newInstance();
 		} catch(InstantiationException e) {
 			throw new ServletException(e);
 		} catch(IllegalAccessException e) {
@@ -163,274 +281,304 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		}
 	}
 	
-	boolean isInitialized = false;
+	///////////////////////////////////////////////////////
+	//
+	// Convinence functions
+	//
+	///////////////////////////////////////////////////////
 	
-	/// Initialize the servlet instance, note that repeated initializing will trigger an IllegalArgumentException
-	/// This is automated via the private doGet / doPost if called directly as a servlet. However when initiated,
-	/// normally as a class object. This function call is a requirment for majority of all the other function.
-	///
-	/// Note that this DOES NOT trigger the processChain() function, unlike doGet / doPost
-	public void initializePage(HttpServletRequest request, HttpServletResponse response, boolean isPost) {
-		//if(isInitialized) {
-		doPurge();
-		//throw new IllegalArgumentException("servlet page has already been initialized previously");
-		//}
-		
-		if(request == null || response == null) {
-			throw new IllegalArgumentException("provided HttpServletRequest/Response cannot be null");
-		}
-		httpRequest = request;
-		httpResponse = response;
-		isPostRequest = isPost;
-		isInitialized = true;
-	}
-	
-	/// Diverts the native doGet / doPost to the respective processing functions, initialize the page,
-	@Override
-	public final void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-		spawnInstance(request, response, false).processChain();
-	}
-	
-	/// Diverts the native doGet / doPost to the respective processing functions
-	@Override
-	public final void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-		spawnInstance(request, response, true).processChain();
-	}
-	
-	///return true if this instance has been initialized
-	public boolean isInitialized() {
-		return isInitialized;
-	}
-	
-	/// Throws an RuntimeException if its not been initialized
-	private final void throwIfNotInitialized() {
-		if(!isInitialized) {
-			throw new RuntimeException("servlet page has not been initialized. see initializePage()");
-		}
-	}
-	
-	////////////////////////////////////////
-	// variables refences used internally //
-	////////////////////////////////////////
-	
-	/// Boolean indicator for post request [modification of this value, is highly not suggested]
-	public boolean isPostRequest = false;
-	
-	/// Boolean indicator for JSON request [modification of this value, is highly not suggested]
-	public boolean isJsonRequest = false;
-	
-	/// The template data object wich is being passed around in each process stage
-	public HashMap<String,Object> templateDataObj = new HashMap<String,Object>();
-	
-	/// The JSON output data object, if used in JSON processing mode
-	public HashMap<String,Object> jsonDataObj = new HashMap<String,Object>();
-	
-	/////////////////////////////////////////////////////
-	// Convienence functions : proxies acutal function //
-	/////////////////////////////////////////////////////
-	
-	/// gets the OutputStream, from the httpResponse.getWriter() object and returns it
-	/// also surpresses IOException, as RuntimeException
-	public OutputStream getOutputStream() {
-		throwIfNotInitialized();
-		try {
-			return httpResponse.getOutputStream();
-		} catch( IOException e ) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	/// gets the PrintWriter, from the httpResponse.getWriter() object and returns it
-	/// also surpresses IOException, as RuntimeException
+	/// gets the PrintWriter, from the getOutputStream() object and returns it
 	public PrintWriter getWriter() {
-		throwIfNotInitialized();
 		return new PrintWriter( getOutputStream(), true );
 	}
 	
-	/// gets a parameter value, from the httpRequest.getParameter
-	public String getParameter(String paramName) {
-		throwIfNotInitialized();
-		return httpRequest.getParameter(paramName);
+	/// gets the OutputStream, from the httpResponse.getOutputStream() object and returns it
+	/// also surpresses IOException, as RuntimeException
+	public OutputStream getOutputStream() {
+		return responseOutputStream;
 	}
 	
 	/// Returns the servlet contextual path : needed for base URI for page redirects / etc
 	public String getContextPath() {
-		//.throwIfNotInitialized();
-		if(httpRequest == null) {
-			try {
-				return (URLDecoder.decode( this.getClass().getClassLoader().getResource("/").getPath(), "UTF-8" )).split("/WEB-INF/classes/")[0];
-			} catch(UnsupportedEncodingException e) {
-				return "../";
-			} catch(NullPointerException e) {
-				return "../";
-			}
+		if(httpRequest != null) {
+			return httpRequest.getContextPath();
 		}
-		return httpRequest.getContextPath();
-	}
-	
-	/// Proxies to httpResponse.sendRedirect
-	public void sendRedirect(String uri) {
-		throwIfNotInitialized();
 		try {
-			httpResponse.sendRedirect(uri);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+			return (URLDecoder.decode( this.getClass().getClassLoader().getResource("/").getPath(), "UTF-8" )).split("/WEB-INF/classes/")[0];
+		} catch(UnsupportedEncodingException e) {
+			return "../";
+		} catch(NullPointerException e) {
+			return "../";
 		}
 	}
 	
-	////////////////////////////////////////
-	// processChain managment
-	////////////////////////////////////////
+	/// gets a parameter value, from the httpRequest.getParameter
+	public String getParameter(String paramName) {
+		if(requestParameters != null) {
+			return requestParameters.get(paramName);
+		}
+		return null;
+	}
 	
-	/// Indicates true if this page processes json data
-	public boolean hasJson = false;
-	
-	/// Indicate the parameter to check to "trigger json" processing,
-	/// note that blank "" string or "*" wild card string, will process all request as JSON
-	public String jsonFlag = "json";
-	
-	/// Does the logical switching between JSON mode processing, or REQUEST mode processing
-	public boolean processChain() throws ServletException {
-		boolean ret = false;
-		if(this.hasJson) {
-			// wild card mode
-			if( this.jsonFlag == null || this.jsonFlag.length() <= 0 || this.jsonFlag.equals("*") ) {
-				isJsonRequest = true;
-				ret = processJson();
-				doPurge();
-				return ret;
+	/// Proxies to httpResponse.sendRedirect,
+	/// Fallsback to responseHeaderMap.location, if httpResponse is null
+	public void sendRedirect(String uri) {
+		if( httpResponse != null ) {
+			try {
+				httpResponse.sendRedirect(uri);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
-			
-			String jValue = getParameter( this.jsonFlag );
-			if(jValue != null && jValue.length() > 0) {
-				isJsonRequest = true;
-				// TODO: Accept a more valid range of chars (lower case), only required to check the first character,
-				// for the 1/y/t. Regardless of the actual parameter length
-				//if( jValue.equals("1") || jValue.equals("Y") || jValue.equals("T") ) {
-				ret =  processJson();
-				doPurge();
-				return ret;
-				//}
+			return;
+		}
+		
+		if( responseHeaderMap == null ) {
+			responseHeaderMap = new HashMap<String, String>();
+		}
+		responseHeaderMap.put("location", uri);
+	}
+	
+	///////////////////////////////////////////////////////
+	//
+	// Process Chain execution
+	//
+	///////////////////////////////////////////////////////
+	
+	/// Triggers the process chain with the current setup, and indicates failure / success
+	public boolean processChain() throws ServletException {
+		boolean ret = true;
+		
+		// Does setup
+		doSetup();
+		
+		// Does authentication check
+		if( ret = doAuth(templateDataObj) ) {
+			// is JSON request?
+			if( isJsonRequest() ) {
+				ret = processChainJSON();
+			} else { // or as per normal
+				ret = processChainRequest();
 			}
 		}
 		
-		//process as per normal
-		ret = processRequest();
-		doPurge();
+		// Does teardwon
+		doTeardown();
+		
+		// Returns success or failure
 		return ret;
 	}
 	
-	/// Triggers the processRequest chain, this can be over-ridden (but not recommended)
-	/// for highly customized process sequences of authentication, request and finally output.
-	public boolean processRequest() throws ServletException {
-		//does authentication step
-		if( !doAuth(templateDataObj) ) {
-			return false;
-		}
-		
-		//does request / postRequest / getRequest chain
+	/// The process chain part specific to a normal request
+	private boolean processChainRequest() throws ServletException {
 		if( !doRequest(templateDataObj) ) {
 			return false;
 		}
 		
-		if( isPostRequest ) {
-			if( !doPostRequest(templateDataObj) ) {
-				return false;
-			}
-		} else {
-			if( !doGetRequest(templateDataObj) ) {
-				return false;
-			}
+		boolean ret = true;
+		
+		// Switch is used over if,else for slight compiler optimization
+		// http://stackoverflow.com/questions/6705955/why-switch-is-faster-than-if
+		//
+		switch (requestType) {
+			case TYPE_GET:
+				ret = doGetRequest(templateDataObj);
+				break;
+			case TYPE_POST:
+				ret = doPostRequest(templateDataObj);
+				break;
+			case TYPE_PUT:
+				ret = doPutRequest(templateDataObj);
+				break;
+			case TYPE_DELETE:
+				ret = doDeleteRequest(templateDataObj);
+				break;
 		}
 		
-		//does the output
-		return doOutput(templateDataObj, getWriter());
+		if(ret) {
+			outputRequest(templateDataObj, getWriter());
+		}
+		
+		return ret;
 	}
 	
-	public boolean processJson() throws ServletException {
-		//does authentication step
-		if( !doAuth(templateDataObj) ) {
+	/// The process chain part specific to JSON request
+	private boolean processChainJSON() throws ServletException {
+		if( !doJSON(jsonDataObj, templateDataObj) ) {
 			return false;
 		}
 		
-		if( !doJson(jsonDataObj, templateDataObj) ) {
-			return false;
+		boolean ret = true;
+		
+		// Switch is used over if,else for slight compiler optimization
+		// http://stackoverflow.com/questions/6705955/why-switch-is-faster-than-if
+		//
+		switch (requestType) {
+			case TYPE_GET:
+				ret = doGetJSON(jsonDataObj, templateDataObj);
+				break;
+			case TYPE_POST:
+				ret = doPostJSON(jsonDataObj, templateDataObj);
+				break;
+			case TYPE_PUT:
+				ret = doPutJSON(jsonDataObj, templateDataObj);
+				break;
+			case TYPE_DELETE:
+				ret = doDeleteJSON(jsonDataObj, templateDataObj);
+				break;
 		}
 		
-		return doJsonOutput(jsonDataObj, templateDataObj, getWriter());
+		if(ret) {
+			outputJSON(jsonDataObj, templateDataObj, getWriter());
+		}
+		
+		return ret;
 	}
 	
-	
-	////////////////////////////////////////
-	// the various do "step" chain
-	////////////////////////////////////////
+	///////////////////////////////////////////////////////
+	//
+	// Process chains overwrites
+	//
+	///////////////////////////////////////////////////////
 	
 	/// [To be extended by sub class, if needed]
-	/// Called once when initialized, to purge all existing data.
-	public void doPurge() {
-		isInitialized = false;
-		httpRequest = null;
-		httpResponse = null;
+	/// Called once when initialized per request
+	public void doSetup() throws ServletException {
 		
-		isPostRequest = false;
-		isJsonRequest = false;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Called once when completed per request, this is called regardless of request status
+	/// PS: This is rarely needed, just rely on java GC =)
+	public void doTeardown() throws ServletException {
 		
-		templateDataObj = new HashMap<String,Object>();
-		jsonDataObj = new HashMap<String,Object>();
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the needed page request authentication, page redirects (if needed), and so forth. Should not do any actual,
 	/// output processing. Returns true to continue process chian (default) or false to terminate the process chain.
-	public boolean doAuth(HashMap<String,Object> templateData) throws ServletException {
+	public boolean doAuth(Map<String,Object> templateData) throws ServletException {
 		return true;
 	}
+	
+	// HTTP request handling
+	//-------------------------------------------
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the required page request processing, this is used if both post / get behaviour is consistent
-	public boolean doRequest(HashMap<String,Object> templateData) throws ServletException {
-		return true;
-	}
-	
-	/// [To be extended by sub class, if needed]
-	/// Does the required page POST processing, AFTER doRequest
-	public boolean doPostRequest(HashMap<String,Object> templateData) throws ServletException {
+	public boolean doRequest(Map<String,Object> templateData) throws ServletException {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the required page GET processing, AFTER doRequest
-	public boolean doGetRequest(HashMap<String,Object> templateData) throws ServletException {
+	public boolean doGetRequest(Map<String,Object> templateData) throws ServletException {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
-	/// Does the output processing, this is after do(Post/Get)Request
-	public boolean doOutput(HashMap<String,Object> templateData, PrintWriter output) throws ServletException {
+	/// Does the required page POST processing, AFTER doRequest
+	public boolean doPostRequest(Map<String,Object> templateData) throws ServletException {
 		return true;
 	}
 	
-	////////////////////////////////////////
-	// the various JSON API related chain
-	////////////////////////////////////////
+	/// [To be extended by sub class, if needed]
+	/// Does the required page PUT processing, AFTER doRequest
+	public boolean doPutRequest(Map<String,Object> templateData) throws ServletException {
+		return true;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the required page DELETE processing, AFTER doRequest
+	public boolean doDeleteRequest(Map<String,Object> templateData) throws ServletException {
+		return true;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the output processing, this is after do(Post/Get/Put/Delete)Request
+	public boolean outputRequest(Map<String,Object> templateData, PrintWriter output) throws ServletException {
+		return true;
+	}
+	
+	// JSON request handling
+	//-------------------------------------------
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doJson(HashMap<String,Object> outputData, HashMap<String,Object> templateData) throws ServletException {
+	public boolean doJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws ServletException {
 		return true;
 	}
 	
-	/// [Avoid Extending]
-	/// Does the actual final json object to json string output, with contentType "application/json"
-	public boolean doJsonOutput(HashMap<String,Object> outputData, HashMap<String,Object> templateData, PrintWriter output) throws ServletException {
-		
-		// Set content type to JSON
-		httpResponse.setContentType("application/json");
-		
-		// Output the data
-		output.println( json.toJson( outputData ) );
-		
+	/// [To be extended by sub class, if needed]
+	/// Does the JSON request processing, and outputs a JSON object
+	public boolean doGetJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws ServletException {
 		return true;
 	}
-	 */
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the JSON request processing, and outputs a JSON object
+	public boolean doPostJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws ServletException {
+		return true;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the JSON request processing, and outputs a JSON object
+	public boolean doPutJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws ServletException {
+		return true;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the JSON request processing, and outputs a JSON object
+	public boolean doDeleteJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws ServletException {
+		return true;
+	}
+	
+	/// [Avoid Extending, this handles all the various headers and JSONP / CORS]
+	/// Does the actual final json object to json string output, with contentType "application/javascript"
+	public boolean outputJSON(Map<String,Object> outputData, Map<String,Object> templateData, PrintWriter output) throws ServletException {
+		// Set content type to JSON
+		if(httpResponse != null) {
+			httpResponse.setContentType("application/javascript");
+		}
+		
+		// Output the data
+		output.println( ConvertJSON.fromObject( outputData ) );
+		return true;
+	}
+	
+	///////////////////////////////////////////////////////
+	//
+	// Native Servlet do overwrites [Avoid overwriting]
+	//
+	///////////////////////////////////////////////////////
+	
+	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
+	@Override
+	public final void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+		spawnInstance().setupInstance(TYPE_GET, request, response).processChain();
+	}
+	
+	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
+	@Override
+	public final void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+		spawnInstance().setupInstance(TYPE_POST, request, response).processChain();
+	}
+	
+	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
+	@Override
+	public final void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+		spawnInstance().setupInstance(TYPE_POST, request, response).processChain();
+	}
+	
+	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
+	@Override
+	public final void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+		spawnInstance().setupInstance(TYPE_DELETE, request, response).processChain();
+	}
+	
+	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
+	@Override
+	public final void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+		spawnInstance().setupInstance(TYPE_OPTION, request, response).processChain();
+	}
+	
 }

@@ -27,12 +27,12 @@ public class RequestMap extends AbstractMapDecorator<String,String> implements G
 	
 	/// basic proxy constructor
 	public RequestMap(Map<String,String> proxy) {
-		super(proxy);
+		super((proxy != null)? proxy : new HashMap<String,String>());
 	}
 	
-	/// http map proxy constructor
-	protected RequestMap(Map<String,String[]> proxy, boolean misc ) {
-		super( mapConvert(proxy) );
+	/// http map proxy builder
+	protected static RequestMap fromStringArrayValueMap(Map<String,String[]> proxy) {
+		return new RequestMap( mapConvert(proxy) );
 	}
 	
 	// Utility functions (internal)

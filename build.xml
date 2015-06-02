@@ -123,11 +123,11 @@
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 			<fileset dir="${build-lib}" includes="*.jar" />
 		</jar>
-		<jar destfile="bin/build/picodedJavaCommons-withDependencies.jar">
+		<jar destfile="bin/build/picodedJavaCommons-withLibs.jar">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 			<fileset dir="${build-lib}" includes="*.jar" />
 		</jar>
-		<jar destfile="bin/build/picodedJavaCommons.jar">
+		<jar destfile="bin/build/picodedJavaCommons-noLibs.jar">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 		</jar>
 	</target>
@@ -142,6 +142,8 @@
 		<javadoc destdir="bin/javadoc" classpathref="lib.path.ref" access="private" author="true" sourcepath="src" packagenames="picoded.*" use="true" version="true">
 			<!--<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>-->
 		</javadoc>
+		
+		<jar destfile="bin/build/picodedJavaCommons-javadocs.jar" basedir="bin/javadoc"/>
 	</target>
 	
 	<!-- jUnit test report runner, used for continuous unit testing -->

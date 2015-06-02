@@ -1,15 +1,14 @@
 package picoded.util;
 
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.security.MessageDigest;
-import java.util.UUID;
+import java.util.logging.*;
 
-import org.apache.commons.codec.binary.Base64;
-
-import picoded.jSql.*;
 import picoded.conv.Base58;
-
+import picoded.conv.GUID;
+import picoded.JSql.JSql;
+import picoded.JSql.JSqlException;
+import picoded.JSql.JSqlResult;
+import picoded.JSql.JSqlType;
+import picoded.util.systemInfo;
 /// SerlvetLogging, is a utility class meant to facilitate the logging of server sideded application events, and errors
 /// This is meant to push the logging into a central SQL database, and fallbacks onto its local SQLite file, in event the
 /// JSql connection fails.
@@ -35,7 +34,9 @@ import picoded.conv.Base58;
 ///
 public class ServletLogging {
 	
-	/// Object byte space default as 260
+	private static Logger logger = Logger.getLogger(ServletLogging.class.getName());
+
+   /// Object byte space default as 260
 	protected int objColumnLength = 260;
 	
 	/// Key byte space default as 260
@@ -46,8 +47,6 @@ public class ServletLogging {
 	
 	protected JSql sqliteObj;
 	protected JSql jSqlObj;
-	
-	protected String requestId;
 	
 	public ServletLogging(JSql sqlite, JSql db) {
 		this.sqliteObj = sqlite;
@@ -95,7 +94,7 @@ public class ServletLogging {
 	// / where its hash value is used. Note that the process to check for
 	// existing hashes, is done locally on the sqlite, before the central DB.
 	// /
-	// / - instID (indexed) // instance ID, used to trace the logging source
+	// / - systemHash (indexed) // systemHash, used to trace the logging source
 	// / - reqsID (indexed) // request ID, used to trace the logging source
 	// / - creTime (indexed) // created unix timestamp
 	// / - fmtHash (indexed) // format string hash, see PREFIX_logStrHashes
@@ -126,7 +125,7 @@ public class ServletLogging {
 	// / - expHash (indexed) // Full exception message hash
 	// / - reqsID (indexed) // request ID, used to trace the logging source
 	// / - creTime (indexed) // Exception created timestamp
-	// / - instID (indexed) // instance ID, used to trace the hashing source
+	// / - systemHash (indexed) // systemHash, used to trace the hashing source
 	// /
 	// / (note the stack messages is filled in in the following order)
 	// / - excRoot (indexed) // Exception root cause message
@@ -147,7 +146,7 @@ public class ServletLogging {
 	// / - stkMid (not indexed) // Stack tracing corresponding to the exception
 	// message, in a JSON array
 	// /
-	// / The following is sqlite only, used to cache configs, such as instanceID
+	// / The following is sqlite only, used to cache configs, such as systemHash
 	// /
 	// / # PREFIX_config
 	// / - key (unique, indexed)
@@ -157,9 +156,10 @@ public class ServletLogging {
 		// table setup for sqlite
 		tableSetup(sqliteObj);
 		
-		return this;
 		// table setup for db
 		tableSetup(jSqlObj);
+
+      return this;
 	}
 	
 	private void tableSetup(JSql jSqlObj) throws JSqlException {
@@ -183,7 +183,7 @@ public class ServletLogging {
 		
 		// / exception table
 		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `exception` ( " + "expHash VARCHAR(" + objColumnLength + "), "
-			+ "reqsID VARCHAR(" + objColumnLength + "), " + "creTime BIGINT, instID VARCHAR(60), " + "excRoot VARCHAR("
+			+ "reqsID VARCHAR(" + objColumnLength + "), " + "creTime BIGINT, systemHash VARCHAR(60), " + "excRoot VARCHAR("
 			+ valColumnLength + "), " + "excTrace VARCHAR(" + valColumnLength + "), " + "excR01-XX VARCHAR("
 			+ valColumnLength + "), " + "excT01-XX VARCHAR(" + valColumnLength + "), " + "excMid VARCHAR("
 			+ valColumnLength + ")," + "stkRoot VARCHAR(" + valColumnLength + "), " + "stkTrace VARCHAR("
@@ -191,7 +191,7 @@ public class ServletLogging {
 			+ valColumnLength + "), " + "stkMid VARCHAR(" + valColumnLength + ")," + "PRIMARY KEY (expHash) );");
 		
 		// / logTable table
-		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `logTable` ( " + "instID VARCHAR(" + objColumnLength + "), "
+		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `logTable` ( " + "systemHash VARCHAR(" + objColumnLength + "), "
 			+ "reqsID VARCHAR(" + objColumnLength + "), " + "creTime BIGINT, " + "fmtHash VARCHAR(" + objColumnLength
 			+ "), " + "logType VARCHAR(" + valColumnLength + "), " + "expHash VARCHAR(" + objColumnLength + "), "
 			+ "offSync BIT, " + "reqID VARCHAR(" + objColumnLength + "), " + "l01-XX VARCHAR(" + valColumnLength + "), "
@@ -199,27 +199,40 @@ public class ServletLogging {
 			+ "sXX-YY VARCHAR(" + valColumnLength + ") )");
 	}
 	
-	// / Returns the instance ID stored inside the SQLite DB, if it does not
+	// / Returns the systemHash stored inside the SQLite DB, if it does not
 	// exists, generate one
-	public String instanceID() throws JSqlException {
+	public String systemHash() throws JSqlException {
 		String val = null;
-		JSqlResult r = sqliteObj.executeQuery("SELECT sVal FROM `config` WHERE key='instanceid'");
+		JSqlResult r = sqliteObj.executeQuery("SELECT sVal FROM `config` WHERE key='systemHash'");
 		if (r.fetchAllRows() > 0) {
 			val = (String) r.readRowCol(0, "sVal");
 		}
 		return val;
 	}
 	
-	// / Validate if the instance ID if it belongs to the current physical /
-	// virtual server. If it fails, it reissues the ID. Used on servlet startup
-	public String validateInstanceID() {
-		return null;
+	// / Validate if the systemHash if it belongs to the current physical 
+	// virtual server. If it fails, it reissues the systemHash. Used on servlet startup
+
+	public String validateSystemHash() {
+      //fetch systemHash from config table
+      String sysHash = systemHash();
+      //compare systemHash
+      if(sysHash != null && sysHash.equalsIgnoreCase(systemInfo.systemaHash())){
+         return sysHash;
+      }
+      // reissues the systemHash if validation failes.
+      sysHash = systemInfo.systemaHash();
+      
+      // persist the hash value in SQLite
+		sqliteObj.execute("INSERT INTO `config` (systemHash, sVal) VALUES (?, ?)", "systemHash", sysHash);
+      
+		return sysHash;
 	}
 	
 	// / Returns the current request ID
 	public String requestID() throws JSqlException {
 		String requestId = null;
-		JSqlResult r = jSqlObj.executeQuery("SELECT reqID FROM `logTable` WHERE instID = " + instanceID());
+		JSqlResult r = jSqlObj.executeQuery("SELECT reqID FROM `logTable` WHERE systemHash = " + systemHash());
 		if (r.fetchAllRows() > 0) {
 			requestId = (String) r.readRowCol(0, "reqID");
 		}
@@ -228,7 +241,7 @@ public class ServletLogging {
 	
 	// / Reissue a new requestID, used at start of servlet call
 	public String reissueRequestID() throws Exception {
-		return generateHash();
+		return GUID.base58();
 	}
 	
 	// / Add the format to the system ---->will be deleted
@@ -245,33 +258,25 @@ public class ServletLogging {
 	/// Performs a logging with a format name and argument
 	public void log(String format, Object... args) {
 		//call addFormat to add format
-		addFormat(generateHash(), format);
+		addFormat(GUID.base58(), format);
+      
 		//insert args to `logTable`
 		jSqlObj.execute("INSERT INTO `logTable` "
-			+ "(instID, reqsID, creTime, fmtHash, logType, expHash, offSync, reqID, l01-XX, s01-XX, lXX-YY, sXX-YY) "
+			+ "(systemHash, reqsID, creTime, fmtHash, logType, expHash, offSync, reqID, l01-XX, s01-XX, lXX-YY, sXX-YY) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", args);
 	}
 	
 	/// Performs a logging with a formant name, argument, and attached exception
 	public void logException(Exception e, String format, Object... args) {
 		//call addFormat to add format
-		addFormat(generateHash(), format);
-		//insert args to `exception`
+		addFormat(GUID.base58(), format);
+
+      //insert args to `exception`
 		jSqlObj.execute("INSERT INTO `exception` "
-			+ "(expHash,reqsID,creTime,instID,excRoot,excTrace,excR01-XX,excT01-XX,excMid,stkRoot"
+			+ "(expHash,reqsID,creTime,systemHash,excRoot,excTrace,excR01-XX,excT01-XX,excMid,stkRoot"
 			+ ",stkTrace,stkR01-XX,stkT01-XX,stkMid) " + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", args);
-		
-	}
-	
-	// / Returns a 22 character string Base58 encoding of MD5 string
-	private String generateHash() throws Exception {
-		MessageDigest md = MessageDigest.getInstance("MD5");
-		byte[] messageDigest = md.digest(UUID.randomUUID().toString().getBytes());
-		String s = new Base58().encode(messageDigest);
-		if (s.length() < 22) {
-			throw new RuntimeException("GUID generation exception, invalid length of " + s.length() + " (" + s + ")");
-		}
-		return s.substring(0, 22); // remove unneeded
+      
+      logger.log(Level.SEVERE, "Exception", e);
 	}
 	
 }

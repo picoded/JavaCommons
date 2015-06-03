@@ -168,6 +168,17 @@ public class MetaTable_Sqlite_test {
 		
 	}
 	
+	
+	///
+	/// An exception occurs, if a query fetch occurs with an empty table
+	///
+	@Test
+	public void issue47_exceptionWhenTableIsEmpty() throws JStackException {
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.queryObjects(null, null));
+		assertEquals(0, qRes.length);
+	}
+	
 	///
 	/// Bad view index due to inner join instead of left join. Testing.
 	///

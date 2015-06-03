@@ -609,6 +609,10 @@ public class MetaTable extends JStackData {
 	
 	/// Does a conversion from the JSqlResult map, to the
 	protected MetaObject[] JSqlResultToMetaObjectArray(Map<String, ArrayList<Object>> jRes) throws JStackException {
+		if( jRes == null ) {
+			return new MetaObject[0];
+		}
+		
 		ArrayList<Object> oID_list = jRes.get("_oid");
 		if (oID_list == null || oID_list.size() <= 0) {
 			return new MetaObject[0];

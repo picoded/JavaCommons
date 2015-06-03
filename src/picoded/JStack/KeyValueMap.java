@@ -26,23 +26,40 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
-/// @TODO: Convert to Map<String, Map<String, Object>>
-/// @TODO: Documentation =( of class
-public class MetaTable extends JStackData {
+/// JStackData represents a standard JStack data interface, in which common setup, and SQL derivatives are formed
+public class KeyValueMap {
 	
+	/*
+	 
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
 	
+	/// Internal JStackObj
+	protected JStack JStackObj = null;
+	
+	/// Internal table name, before prefix?
+	protected String tableName = "MetaTable";
+	
 	/// Setup the metatable with the default table name
-	public MetaTable(JStack inStack) {
-		super( inStack );
-		tableName = "MetaTable";
+	public KeyValueMap(JStack inStack) {
+		JStackObj = inStack;
 	}
 	
 	/// Setup the metatable with the given stack
-	public MetaTable(JStack inStack, String inTableName) {
-		super( inStack, inTableName );
+	public KeyValueMap(JStack inStack, String inTableName) {
+		JStackObj = inStack;
+		
+		if (inTableName == null) {
+			throw new RuntimeException("Invalid table name (null): " + inTableName);
+		}
+		
+		final String numericString = "0123456789";
+		if (numericString.indexOf(inTableName.substring(0, 1)) > 0) {
+			throw new RuntimeException("Invalid table name (cannot start with numbers): " + inTableName);
+		}
+		
+		tableName = inTableName;
 	}
 	
 	///
@@ -81,7 +98,52 @@ public class MetaTable extends JStackData {
 	protected String viewSuffix = "";
 	
 	///
-	/// Indexed columns internal vars
+	/// JStack setup functions
+	///--------------------------------------------------------------------------
+	
+	/// Does the required table setup for the various applicable stack layers
+	public MetaTable stackSetup() throws JStackException {
+		try {
+			JStackLayer[] sl = JStackObj.stackLayers();
+			for (int a = 0; a < sl.length; ++a) {
+				// JSql specific setup
+				if (sl[a] instanceof JSql) {
+					JSqlDataTableSetup((JSql) (sl[a]));
+					JSqlIndexConfigTableSetup((JSql) (sl[a]));
+				} else if (sl[a] instanceof JCache) {
+					
+				}
+			}
+		} catch (JSqlException e) {
+			throw new JStackException(e);
+		}
+		
+		return this;
+	}
+	
+	/// Removes all the various application stacklayers
+	///
+	/// WARNING: this deletes all the data, and is not reversable
+	public MetaTable stackTeardown() throws JStackException {
+		try {
+			JStackLayer[] sl = JStackObj.stackLayers();
+			for (int a = 0; a < sl.length; ++a) {
+				// JSql specific setup
+				if (sl[a] instanceof JSql) {
+					JSqlTeardown((JSql) (sl[a]));
+				} else if (sl[a] instanceof JCache) {
+					
+				}
+			}
+		} catch (JSqlException e) {
+			throw new JStackException(e);
+		}
+		
+		return this;
+	}
+	
+	///
+	/// Indexed columns setup
 	///--------------------------------------------------------------------------
 	
 	/// SQL view name
@@ -92,10 +154,6 @@ public class MetaTable extends JStackData {
 	/// Default type for all values not defined in the index
 	protected CaseInsensitiveHashMap<String, MetaType> typeMapping = new CaseInsensitiveHashMap<String, MetaType>();
 	protected MetaType defaultType = new MetaType(MetaType.TYPE_MIXED);
-	
-	///
-	/// Indexed columns actual setup
-	///--------------------------------------------------------------------------
 	
 	/// Returned the defined metaType for the given key
 	public MetaType getType(String name) {
@@ -120,130 +178,11 @@ public class MetaTable extends JStackData {
 		return this;
 	}
 	
-//	public MetaTable setIndex( String[] inIndxList, Object[] inTypeList ) {
-//		indxList = inIndxList;
-//		//typeList = inTypeList;
-//		return this;
-//	}
-//	
-//	public MetaTable setIndex( Map<String,Object> indexMap ) {
-//		List<String> list = new ArrayList<String>( indexMap.keySet() );
-//		
-//		return this;
-//	}
-	
 	///
-	/// Internal JSql table setup and teardown
-	///--------------------------------------------------------------------------
-	
-	/// Setsup the respective JSql table
-	@Override
-	protected boolean JSqlSetup(JSql sql) throws JSqlException, JStackException {
-		String tName = sqlTableName(sql);
-		
-		// Table constructor
-		//-------------------
-		sql.createTableQuerySet( //
-										tName, //
-										new String[] { //
-											// Primary key, as classic int, htis is used to lower SQL
-											// fragmentation level, and index memory usage. And is not accessible.
-											// Sharding and uniqueness of system is still maintained by GUID's
-											"pKy", //
-											// Time stamps
-											"cTm", //value created time
-											"uTm", //value updated time
-											"oTm", //object created time
-											// Object keys
-											"oID", //_oid
-											"kID", //key storage
-											"idx", //index collumn
-											// Value storage (except text)
-											"typ", //type collumn
-											"nVl", //numeric value (if applicable)
-											"sVl", //case insensitive string value (if applicable), or case sensitive hash
-											// Text value storage
-											"tVl" //Textual storage, placed last for storage optimization
-										}, //
-										new String[] { //
-											pKeyColumnType, //Primary key
-											// Time stamps
-											tStampColumnType, tStampColumnType, tStampColumnType,
-											// Object keys
-											objColumnType, //
-											keyColumnType, //
-											indexColumnType, //
-											// Value storage
-											typeColumnType, //
-											numColumnType, //
-											strColumnType, //
-											fullTextColumnType //
-										} //
-										).execute();
-		
-		// Unique index
-		//
-		// This also optimizes query by object keys
-		//------------------------------------------------
-		sql.createTableIndexQuerySet( //
-											  tName, "oID, kID, idx", "UNIQUE", "unq" //
-											  ).execute();
-		
-		// Key Values search index
-		//------------------------------------------------
-		sql.createTableIndexQuerySet( //
-											  tName, "kID, nVl, sVl", null, "valMap" //
-											  ).execute();
-		
-		// Object timestamp optimized Key Value indexe
-		//------------------------------------------------
-		sql.createTableIndexQuerySet( //
-											  tName, "oTm, kID, nVl, sVl", null, "oTm_valMap" //
-											  ).execute();
-		
-		// Full text index, for textual data
-		// @TODO FULLTEXT index support
-		//------------------------------------------------
-		//if (sql.sqlType != JSqlType.sqlite) {
-		//	sql.createTableIndexQuerySet( //
-		//		tName, "tVl", "FULLTEXT", "tVl" //
-		//	).execute();
-		//} else {
-		sql.createTableIndexQuerySet( //
-											  tName, "tVl", null, "tVl" // Sqlite uses normal index
-											  ).execute();
-		//}
-		
-		// timestamp index, is this needed?
-		//------------------------------------------------
-		//sql.createTableIndexQuerySet( //
-		//	tName, "uTm", null, "uTm" //
-		//).execute();
-		
-		//sql.createTableIndexQuerySet( //
-		//	tName, "cTm", null, "cTm" //
-		//).execute();
-		
-		// Index view config setup
-		//------------------------------------------------
-		JSqlIndexConfigTableSetup(sql);
-		
-		return true;
-	}
-	
-	/// Removes the respective JSQL tables and view (if it exists)
-	@Override
-	protected boolean JSqlTeardown(JSql sql) throws JSqlException, JStackException {
-		sql.execute("DROP VIEW IF EXISTS " + sqlViewName(sql, "view"));
-		sql.execute("DROP TABLE IF EXISTS " + sqlViewName(sql, "vCfg"));
-		sql.execute("DROP TABLE IF EXISTS " + sqlTableName(sql));
-		return true;
-	}
-	
+
 	///
 	/// Internal JSql index setup
 	///--------------------------------------------------------------------------
-	
 	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
 	protected void JSqlMakeIndexViewQuery(JSql sql) throws JSqlException {
 		
@@ -324,8 +263,7 @@ public class MetaTable extends JStackData {
 		sql.execute_raw(sb.toString());
 	}
 	
-	/// Setsup the index view configuration table,
-	/// @TODO : To check against configuration table, and makes the changes ONLY when needed
+	///
 	protected void JSqlIndexConfigTableSetup(JSql sql) throws JSqlException {
 		String tName = sqlViewName(sql, "vCfg");
 		
@@ -348,10 +286,6 @@ public class MetaTable extends JStackData {
 		// Checks if the view needs to be recreated
 		boolean recreatesView = false;
 		
-		//
-		// @TODO Change detection
-		//
-		
 		// Checks if view actually needs recreation?
 		recreatesView = true;
 		
@@ -362,9 +296,108 @@ public class MetaTable extends JStackData {
 		}
 	}
 	
-	/// SQL Table name,
+	/// 
+	protected void JSqlTeardown(JSql sql) throws JSqlException {
+		sql.execute("DROP VIEW IF EXISTS " + sqlViewName(sql, "view"));
+		sql.execute("DROP TABLE IF EXISTS " + sqlViewName(sql, "vCfg"));
+		sql.execute("DROP TABLE IF EXISTS " + sqlTableName(sql));
+	}
+	
+	///
+	/// Internal JSql table setup
+	///--------------------------------------------------------------------------
+	
+	/// SQL Table name
 	protected String sqlTableName(JSql sql) {
 		return (sql.getTablePrefix() + tableName);
+	}
+	
+	/// JSQL Based tabel data storage
+	protected void JSqlDataTableSetup(JSql sql) throws JSqlException {
+		String tName = sqlTableName(sql);
+		
+		// Table constructor
+		//-------------------
+		sql.createTableQuerySet( //
+			tName, //
+			new String[] { //
+			// Primary key, as classic int, htis is used to lower SQL
+				// fragmentation level, and index memory usage. And is not accessible.
+				// Sharding and uniqueness of system is still maintained by GUID's
+				"pKy", //
+				// Time stamps
+				"cTm", //value created time
+				"uTm", //value updated time
+				"oTm", //object created time
+				// Object keys
+				"oID", //_oid
+				"kID", //key storage
+				"idx", //index collumn
+				// Value storage (except text)
+				"typ", //type collumn
+				"nVl", //numeric value (if applicable)
+				"sVl", //case insensitive string value (if applicable), or case sensitive hash
+				// Text value storage
+				"tVl" //Textual storage, placed last for storage optimization
+			}, //
+			new String[] { //
+			pKeyColumnType, //Primary key
+				// Time stamps
+				tStampColumnType, tStampColumnType, tStampColumnType,
+				// Object keys
+				objColumnType, //
+				keyColumnType, //
+				indexColumnType, //
+				// Value storage
+				typeColumnType, //
+				numColumnType, //
+				strColumnType, //
+				fullTextColumnType //
+			} //
+			).execute();
+		
+		// Unique index
+		//
+		// This also optimizes query by object keys
+		//------------------------------------------------
+		sql.createTableIndexQuerySet( //
+			tName, "oID, kID, idx", "UNIQUE", "unq" //
+		).execute();
+		
+		// Key Values search index 
+		//------------------------------------------------
+		sql.createTableIndexQuerySet( //
+			tName, "kID, nVl, sVl", null, "valMap" //
+		).execute();
+		
+		// Object timestamp optimized Key Value indexe
+		//------------------------------------------------
+		sql.createTableIndexQuerySet( //
+			tName, "oTm, kID, nVl, sVl", null, "oTm_valMap" //
+		).execute();
+		
+		// Full text index, for textual data
+		// @TODO FULLTEXT index support
+		//------------------------------------------------
+		//if (sql.sqlType != JSqlType.sqlite) {
+		//	sql.createTableIndexQuerySet( //
+		//		tName, "tVl", "FULLTEXT", "tVl" //
+		//	).execute();
+		//} else {
+		sql.createTableIndexQuerySet( //
+			tName, "tVl", null, "tVl" // Sqlite uses normal index
+		).execute();
+		//}
+		
+		// timestamp index, is this needed?
+		//------------------------------------------------
+		//sql.createTableIndexQuerySet( //
+		//	tName, "uTm", null, "uTm" //
+		//).execute();
+		
+		//sql.createTableIndexQuerySet( //
+		//	tName, "cTm", null, "cTm" //
+		//).execute();
 	}
 	
 	///
@@ -661,17 +694,6 @@ public class MetaTable extends JStackData {
 	}
 	
 	//
-	// Query pagenation operations (experimental keyset hybrid operations)
-	//--------------------------------------------------------------------------
-	
-	/*
-	public Map<String, Map<String, ArrayList<Object>>> queryObjectPage(String selectCols, String whereClause, Object[] whereValues, String orderBy, Map<String, ArrayList<Object>>nowPage, long limit, long offset) throws JStackException {
-	
-		
-	}
-	 */
-
-	//
 	// Internal PUT / GET object functions
 	//--------------------------------------------------------------------------
 	/// GET operation used for lazy loading in MetaObject
@@ -758,4 +780,7 @@ public class MetaTable extends JStackData {
 	public void remove(String _oid) {
 		
 	}
+	
+	// */
+	
 }

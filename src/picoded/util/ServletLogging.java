@@ -189,7 +189,7 @@ public class ServletLogging {
 			+ valColumnLength + ")," + "stkRoot VARCHAR(" + valColumnLength + "), " + "stkTrace VARCHAR("
 			+ valColumnLength + "), " + "stkR01-XX VARCHAR(" + valColumnLength + "), " + "stkT01-XX VARCHAR("
 			+ valColumnLength + "), " + "stkMid VARCHAR(" + valColumnLength + ")," + "PRIMARY KEY (expHash) );");
-		
+      
 		// / logTable table
 		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `logTable` ( " + "systemHash VARCHAR(" + objColumnLength + "), "
 			+ "reqsID VARCHAR(" + objColumnLength + "), " + "creTime BIGINT, " + "fmtHash VARCHAR(" + objColumnLength
@@ -206,8 +206,10 @@ public class ServletLogging {
 		JSqlResult r = sqliteObj.executeQuery("SELECT sVal FROM `config` WHERE key='systemHash'");
 		if (r.fetchAllRows() > 0) {
 			val = (String) r.readRowCol(0, "sVal");
-		}
 		return val;
+      }
+      //if systemHash does not exists generate new
+		return GUID.base58();
 	}
 	
 	// / Validate if the systemHash if it belongs to the current physical 

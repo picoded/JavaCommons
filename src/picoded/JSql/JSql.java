@@ -49,7 +49,7 @@ public class JSql extends BaseInterface {
 	//-------------------------------------------------------------------------
 	
 	/// database connection properties
-	private Map<String, Object> connectionProps = null;
+	protected Map<String, Object> connectionProps = null;
 	
 	/// store the database connection parameters for recreating the connection
 	public void setConnectionProperties(String dbUrl, String dbName, String dbUser, String dbPass, Properties connProps) {
@@ -102,32 +102,8 @@ public class JSql extends BaseInterface {
 	}
 	
 	/// As this is the base class varient, this funciton isnt suported
-	public JSql recreate(boolean force) {
-		if (force) {
-			dispose();
-		}
-		if (sqlType == JSqlType.sqlite) {
-			if (connectionProps.get("dbUrl") == null) {
-				return new picoded.JSql.db.JSql_Sqlite();
-			} else {
-				return new picoded.JSql.db.JSql_Sqlite((String) connectionProps.get("dbUrl"));
-			}
-		} else if (sqlType == JSqlType.mysql) {
-			if (connectionProps.get("connectionProps") == null) {
-				return new picoded.JSql.db.JSql_Mysql((String) connectionProps.get("dbUrl"), (String) connectionProps
-					.get("dbName"), (String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
-			} else {
-				return new picoded.JSql.db.JSql_Mysql((String) connectionProps.get("dbUrl"), (Properties) connectionProps
-					.get("connectionProps"));
-			}
-		} else if (sqlType == JSqlType.mssql) {
-			return new picoded.JSql.db.JSql_Mssql((String) connectionProps.get("dbUrl"), (String) connectionProps
-				.get("dbName"), (String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
-		} else if (sqlType == JSqlType.oracle) {
-			return new picoded.JSql.db.JSql_Oracle((String) connectionProps.get("dbUrl"), (String) connectionProps
-				.get("dbUser"), (String) connectionProps.get("dbPass"));
-		}
-		return null;
+	public void recreate(boolean force) {
+		// donothing, to be overridden in child class
 	}
 	
 	/// [private] Helper function, used to prepare the sql statment in multiple situations

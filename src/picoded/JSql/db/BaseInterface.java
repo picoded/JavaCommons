@@ -49,7 +49,7 @@ public abstract class BaseInterface extends JStackLayer {
 	public abstract void dispose();
 	
 	/// Recreates the JSql connection if it has already been disposed of. Option to forcefully recreate the connection if needed.
-	public abstract JSql recreate(boolean force);
+	public abstract void recreate(boolean force);
 	
 	// Just incase a user forgets to dispose "as per normal"
 	//protected void finalize();

@@ -33,37 +33,38 @@ public class JSql_Sqlite extends JSql {
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(JSql_Sqlite.class.getName());
 	
-	/// Internal reuse sqlite file location, used for recreate
-	private String sqliteLocation = null;
-	
 	/// Runs with in memory SQLite
 	public JSql_Sqlite() {
-		setupSqliteConnection(null);
+		this(":memory:");
 	}
 	
 	/// Runs JSql with the JDBC sqlite engine
 	public JSql_Sqlite(String sqliteLoc) {
-		setupSqliteConnection(sqliteLoc);
+		// store database connection properties
+		setConnectionProperties(sqliteLoc, null, null, null, null);
+		// call internal method to create the connection
+		setupConnection();
 	}
 	
 	/// Internal common reuse constructor
-	private void setupSqliteConnection(String sqliteLoc) {
-		// store database connection properties
-		setConnectionProperties(sqliteLoc, null, null, null, null);
-		
+	private void setupConnection() {
 		sqlType = JSqlType.sqlite;
-		sqliteLocation = sqliteLoc;
-		
-		if (sqliteLocation == null) {
-			sqliteLocation = ":memory:";
-		}
 		
 		try {
 			Class.forName("org.sqlite.JDBC");
-			sqlConn = java.sql.DriverManager.getConnection("jdbc:sqlite:" + sqliteLocation);
+			sqlConn = java.sql.DriverManager.getConnection("jdbc:sqlite:" + (String) connectionProps.get("dbUrl"));
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load sqlite connection: ", e);
 		}
+	}
+	
+	/// As this is the base class varient, this funciton isnt suported
+	public void recreate(boolean force) {
+		if (force) {
+			dispose();
+		}
+		// call internal method to create the connection
+		setupConnection();
 	}
 	
 	/// Internal parser that converts some of the common sql statements to sqlite

@@ -377,7 +377,7 @@ public class JSql_Sqlite_test {
 		JSqlObj.dispose();
 		
 		// recoreate connection
-		JSqlObj = JSqlObj.recreate(true);
+		JSqlObj.recreate(true);
 		
 		// recreate the database and table
 		createTableQueryBuilder();

@@ -26,121 +26,26 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
-/// JStackData represents a standard JStack data interface, in which common setup, and SQL derivatives are formed
+/// @TODO Documentation
 public class KeyValueMap {
-	
-	/*
-	 
-	///
-	/// Constructor setup
-	///--------------------------------------------------------------------------
-	
-	/// Internal JStackObj
-	protected JStack JStackObj = null;
-	
-	/// Internal table name, before prefix?
-	protected String tableName = "MetaTable";
-	
-	/// Setup the metatable with the default table name
-	public KeyValueMap(JStack inStack) {
-		JStackObj = inStack;
-	}
-	
-	/// Setup the metatable with the given stack
-	public KeyValueMap(JStack inStack, String inTableName) {
-		JStackObj = inStack;
-		
-		if (inTableName == null) {
-			throw new RuntimeException("Invalid table name (null): " + inTableName);
-		}
-		
-		final String numericString = "0123456789";
-		if (numericString.indexOf(inTableName.substring(0, 1)) > 0) {
-			throw new RuntimeException("Invalid table name (cannot start with numbers): " + inTableName);
-		}
-		
-		tableName = inTableName;
-	}
 	
 	///
 	/// Internal config vars
 	///--------------------------------------------------------------------------
 	
-	/// Object ID field type
-	protected String objColumnType = "VARCHAR(32)";
-	
-	/// Key name field type
-	protected String keyColumnType = "VARCHAR(32)";
-	
-	/// Type collumn type
-	protected String typeColumnType = "TINYINT";
-	
-	/// Index collumn type
-	protected String indexColumnType = "TINYINT";
-	
-	/// String value field type
-	/// @TODO: Investigate performance issues for this approach
-	protected String numColumnType = "DECIMAL(36,12)";
-	
-	/// String value field type
-	protected String strColumnType = "VARCHAR(64)";
-	
-	/// Full text value field type
-	protected String fullTextColumnType = "VARCHAR(MAX)";
+	/// Primary key type
+	protected String pKeyColumnType = "INTEGER PRIMARY KEY AUTOINCREMENT";
 	
 	/// Timestamp field type
 	protected String tStampColumnType = "BIGINT";
 	
-	/// Primary key type
-	protected String pKeyColumnType = "INTEGER PRIMARY KEY AUTOINCREMENT";
+	/// Key name field type
+	protected String keyColumnType = "VARCHAR(64)";
 	
-	/// Indexed view prefix, this is used to handle index conflicts between "versions" if needed
-	protected String viewSuffix = "";
+	/// Value field type
+	protected String valueColumnType = "VARCHAR(MAX)";
 	
-	///
-	/// JStack setup functions
-	///--------------------------------------------------------------------------
-	
-	/// Does the required table setup for the various applicable stack layers
-	public MetaTable stackSetup() throws JStackException {
-		try {
-			JStackLayer[] sl = JStackObj.stackLayers();
-			for (int a = 0; a < sl.length; ++a) {
-				// JSql specific setup
-				if (sl[a] instanceof JSql) {
-					JSqlDataTableSetup((JSql) (sl[a]));
-					JSqlIndexConfigTableSetup((JSql) (sl[a]));
-				} else if (sl[a] instanceof JCache) {
-					
-				}
-			}
-		} catch (JSqlException e) {
-			throw new JStackException(e);
-		}
-		
-		return this;
-	}
-	
-	/// Removes all the various application stacklayers
-	///
-	/// WARNING: this deletes all the data, and is not reversable
-	public MetaTable stackTeardown() throws JStackException {
-		try {
-			JStackLayer[] sl = JStackObj.stackLayers();
-			for (int a = 0; a < sl.length; ++a) {
-				// JSql specific setup
-				if (sl[a] instanceof JSql) {
-					JSqlTeardown((JSql) (sl[a]));
-				} else if (sl[a] instanceof JCache) {
-					
-				}
-			}
-		} catch (JSqlException e) {
-			throw new JStackException(e);
-		}
-		
-		return this;
-	}
+	/*
 	
 	///
 	/// Indexed columns setup

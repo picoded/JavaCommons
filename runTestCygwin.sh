@@ -28,5 +28,5 @@ do
 	echo "Running test: picodedTests."$ARG"_test"
 	echo "---------------------------------------------------------------------------------"
 	
-	java -Djava.library.path="./bin/lib" -cp "./bin/lib/*:./bin/classes" org.junit.runner.JUnitCore picodedTests."$ARG"_test
+	java -Djava.library.path=".\bin\lib" -cp ".\bin\lib\*;.\bin\classes" org.junit.runner.JUnitCore picodedTests."$ARG"_test
 done

@@ -1,7 +1,9 @@
 package picodedTests.JStack;
 
 import org.junit.*;
+
 import static org.junit.Assert.*;
+
 import java.util.*;
 
 import picoded.JSql.*;
@@ -11,6 +13,7 @@ import picoded.conv.GUID;
 import picoded.struct.CaseInsensitiveHashMap;
 
 import java.util.Random;
+
 import org.apache.commons.lang3.RandomUtils;
 
 import picodedTests.TestConfig;
@@ -49,6 +52,55 @@ public class MetaTable_Sqlite_test {
 	}
 	
 	@Test
+	public void stringTest() {
+		assertEquals("hello", ("hello").toString() );
+		assertEquals("hello", ((Object)"hello").toString() );
+	}
+	
+	@Test
+	public void testSingleMappingSystem() throws JStackException
+	{
+		System.out.println("Starting single mapping test");
+		mtObj.clearTypeMapping();
+		
+		mtObj.putType("num", "INTEGER");
+		mtObj.putType("float", "TYPE_FLOAT");
+		mtObj.putType("double", "double");
+		mtObj.putType("long", "type_long");
+		
+		assertEquals(mtObj.getType("num").valueType(), MetaType.TYPE_INTEGER);
+		assertEquals(mtObj.getType("float").valueType(), MetaType.TYPE_FLOAT);
+		assertEquals(mtObj.getType("double").valueType(), MetaType.TYPE_DOUBLE);
+		assertEquals(mtObj.getType("long").valueType(), MetaType.TYPE_LONG);
+	}
+	
+	@Test
+	public void testMapMappingSystem() throws JStackException
+	{
+		System.out.println("Starting map mapping test");
+		mtObj.clearTypeMapping();
+		
+		HashMap<String, Object> mapping = new HashMap<String, Object>();
+		mapping.put("num", "INTEGER");
+		mapping.put("float", "TYPE_FLOAT");
+		mapping.put("double", "double");
+		mapping.put("long", "type_long");
+		mapping.put("disabled", "disabled");
+		mapping.put("mixed", "TYPE_MIXED");
+		mapping.put("mixed-array", "type_mixed_array");
+		
+		mtObj.setMapping(mapping);
+		
+		assertEquals(mtObj.getType("num").valueType(), MetaType.TYPE_INTEGER);
+		assertEquals(mtObj.getType("float").valueType(), MetaType.TYPE_FLOAT);
+		assertEquals(mtObj.getType("double").valueType(), MetaType.TYPE_DOUBLE);
+		assertEquals(mtObj.getType("long").valueType(), MetaType.TYPE_LONG);
+		assertEquals(mtObj.getType("disabled").valueType(), MetaType.TYPE_DISABLED);
+		assertEquals(mtObj.getType("mixed").valueType(), MetaType.TYPE_MIXED);
+		assertEquals(mtObj.getType("mixed-array").valueType(), MetaType.TYPE_MIXED_ARRAY);
+	}
+	
+	//@Test
 	public void invalidSetup() {
 		MetaTable m;
 		
@@ -92,12 +144,12 @@ public class MetaTable_Sqlite_test {
 		return objMap;
 	}
 	
-	@Test
+	//@Test
 	public void constructor() {
 		assertNotNull(JStackObj);
 	}
 	
-	@Test
+	//@Test
 	public void basicTest() throws JStackException {
 		String guid = GUID.base58();
 		assertNull(mtObj.get(guid));
@@ -114,7 +166,7 @@ public class MetaTable_Sqlite_test {
 		assertEquals(objMap, mtObj.get(guid));
 	}
 	
-	@Test
+	//@Test
 	public void basicTestMultiple() throws JStackException {
 		
 		// Useful for debugging
@@ -138,7 +190,7 @@ public class MetaTable_Sqlite_test {
 		return objMap;
 	}
 	
-	@Test
+	//@Test
 	public void indexBasedTest() throws JStackException {
 		
 		mtObj.append(null, genNumStrObj(1, "this"));
@@ -172,7 +224,7 @@ public class MetaTable_Sqlite_test {
 	///
 	/// An exception occurs, if a query fetch occurs with an empty table
 	///
-	@Test
+	//@Test
 	public void issue47_exceptionWhenTableIsEmpty() throws JStackException {
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.queryObjects(null, null));
@@ -184,7 +236,7 @@ public class MetaTable_Sqlite_test {
 	///
 	/// AKA: Incomplete object does not appear in view index
 	///
-	@Test
+	//@Test
 	public void innerJoinFlaw() throws JStackException {
 		mtObj.append(null, genNumStrObj(1, "hello world"));
 		

@@ -260,25 +260,30 @@ public class ServletLogging {
 	/// Performs a logging with a format name and argument
 	public void log(String format, Object... args) {
 		//call addFormat to add format
-		addFormat(GUID.base58(), format);
+      String fmtHash = GUID.base58();
+		addFormat(fmtHash, format);
       
 		//insert args to `logTable`
 		jSqlObj.execute("INSERT INTO `logTable` "
 			+ "(systemHash, reqsID, creTime, fmtHash, logType, expHash, offSync, reqID, l01-XX, s01-XX, lXX-YY, sXX-YY) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", args);
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", systemHash(), requestID(), createTime(), fmtHash, args);
 	}
 	
 	/// Performs a logging with a formant name, argument, and attached exception
 	public void logException(Exception e, String format, Object... args) {
 		//call addFormat to add format
-		addFormat(GUID.base58(), format);
+		String fmtHash = GUID.base58();
+		addFormat(fmtHash, format);
 
       //insert args to `exception`
 		jSqlObj.execute("INSERT INTO `exception` "
-			+ "(expHash,reqsID,creTime,systemHash,excRoot,excTrace,excR01-XX,excT01-XX,excMid,stkRoot"
-			+ ",stkTrace,stkR01-XX,stkT01-XX,stkMid) " + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", args);
+			+ "(expHash,reqsID,creTime,systemHash,excRoot,excTrace,excR01-XX,excT01-XX,excMid,stkRoot,stkTrace,stkR01-XX,stkT01-XX,stkMid) " 
+         + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", systemHash(), requestID(), createTime(), fmtHash, args);
       
       logger.log(Level.SEVERE, "Exception", e);
 	}
 	
+   private int createTime() {
+      return (int)(System.currentTimeMillis() / 1000);
+   }
 }

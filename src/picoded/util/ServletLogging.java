@@ -177,45 +177,92 @@ public class ServletLogging {
 		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `logStrHashes` ( " + "hash VARCHAR(" + objColumnLength
 			+ "), sVal TEXT, PRIMARY KEY (hash) );");
 		
+		// / logTable table
+		String columns = "systemHash VARCHAR(" + objColumnLength + "), "
+			+ "reqsID VARCHAR(" + objColumnLength + "), " 
+			+ "creTime BIGINT, " 
+			+ "fmtHash VARCHAR(" + objColumnLength + "), " 
+			+ "logType VARCHAR(" + valColumnLength + "), " 
+			+ "expHash VARCHAR(" + objColumnLength + "), "
+			+ "offSync BIT, " 
+			+ "reqID VARCHAR(" + objColumnLength + "), ";
+			
+			// long indexed
+			for (int i=1; i<=longIndexed;i++) {
+				columns += "l"+(i<10?"0"+i:i)+"-XX LONG, ";
+			}
+			// string indexed
+			for (int i=1; i<=longIndexed;i++) {
+				columns += "s"+(i<10?"0"+i:i)+"-XX VARCHAR(22), ";
+			}
+			// long not indexed
+			for (int i=1; i<=longNotIndexed;i++) {
+				columns += "l"+(i<10?"0"+i:i)+"-YY LONG, ";
+			}
+			// string not indexed
+			for (int i=1; i<=longNotIndexed;i++) {
+				columns += "s"+(i<10?"0"+i:i)+"-YY VARCHAR(22), ";
+			}
+			columns += "PRIMARY KEY (expHash)";
+
+		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `logTable` (" +  columns + ")");
+
 		// / excStrHash table
-		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `excStrHash` ( " + "hash VARCHAR(" + objColumnLength
-			+ "), sVal TEXT, PRIMARY KEY (hash) );");
+		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `excStrHash`(hash VARCHAR("+objColumnLength+"), sVal TEXT, PRIMARY KEY (hash));");
 		
 		// / exception table
-		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `exception` ( " + "expHash VARCHAR(" + objColumnLength + "), "
-			+ "reqsID VARCHAR(" + objColumnLength + "), " + "creTime BIGINT, systemHash VARCHAR(60), " + "excRoot VARCHAR("
-			+ valColumnLength + "), " + "excTrace VARCHAR(" + valColumnLength + "), " + "excR01-XX VARCHAR("
-			+ valColumnLength + "), " + "excT01-XX VARCHAR(" + valColumnLength + "), " + "excMid VARCHAR("
-			+ valColumnLength + ")," + "stkRoot VARCHAR(" + valColumnLength + "), " + "stkTrace VARCHAR("
-			+ valColumnLength + "), " + "stkR01-XX VARCHAR(" + valColumnLength + "), " + "stkT01-XX VARCHAR("
-			+ valColumnLength + "), " + "stkMid VARCHAR(" + valColumnLength + ")," + "PRIMARY KEY (expHash) );");
+		columns = "expHash VARCHAR(" + objColumnLength + "), "
+			+ "reqsID VARCHAR(" + objColumnLength + "), " 
+			+ "creTime BIGINT, " 
+			+ "systemHash VARCHAR(60), " 
+			+ "excRoot VARCHAR(" + valColumnLength + "), " 
+			+ "excTrace VARCHAR(" + valColumnLength + "), "
+			+ "excMid VARCHAR(" + valColumnLength + ")," 
+			+ "stkRoot VARCHAR(" + valColumnLength + "), " 
+			+ "stkTrace VARCHAR(" + valColumnLength + "), "
+			+ "stkMid VARCHAR(" + valColumnLength + "),";
+			
+			// Exception Root Trace Indexed
+			for (int i=1; i<=exceptionRootTraceIndexed;i++) {
+				columns += "excR"+(i<10?"0"+i:i)+" VARCHAR(22), " 
+				+ "stkR"+(i<10?"0"+i:i)+" VARCHAR(22), ";
+			}
+			
+			// Exception Thrown Trace Indexed
+			for (int i=1; i<=exceptionThrownTraceIndexed;i++) {
+				columns += "excT"+(i<10?"0"+i:i)+" VARCHAR(22), " 
+				+ "stkT"+(i<10?"0"+i:i)+" VARCHAR(22), ";
+			}
+			// PRIMARY KEY
+			columns += "PRIMARY KEY (expHash)";
+			
+		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `exception` ( " + columns + ");");
       
-		// / logTable table
-		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `logTable` ( " + "systemHash VARCHAR(" + objColumnLength + "), "
-			+ "reqsID VARCHAR(" + objColumnLength + "), " + "creTime BIGINT, " + "fmtHash VARCHAR(" + objColumnLength
-			+ "), " + "logType VARCHAR(" + valColumnLength + "), " + "expHash VARCHAR(" + objColumnLength + "), "
-			+ "offSync BIT, " + "reqID VARCHAR(" + objColumnLength + "), " + "l01-XX VARCHAR(" + valColumnLength + "), "
-			+ "s01-XX VARCHAR(" + valColumnLength + "), " + "lXX-YY VARCHAR(" + valColumnLength + "), "
-			+ "sXX-YY VARCHAR(" + valColumnLength + ") )");
 	}
 	
 	// / Returns the systemHash stored inside the SQLite DB, if it does not
 	// exists, generate one
 	public String systemHash() throws JSqlException {
-		String val = null;
 		JSqlResult r = sqliteObj.executeQuery("SELECT sVal FROM `config` WHERE key='systemHash'");
 		if (r.fetchAllRows() > 0) {
-			val = (String) r.readRowCol(0, "sVal");
-		return val;
+			return (String) r.readRowCol(0, "sVal");
       }
-      //if systemHash does not exists generate new
-		return GUID.base58();
+      //if systemHash does not exists generate new and persist the hash value in SQLite
+		String sysHash = GUID.base58();
+		addConfig("systemHash", sysHash);
+
+		return sysHash;
+	}
+	
+	private void addConfig(String systemHash, String sVal) throws JSqlException {
+		sqliteObj.execute("INSERT INTO `config` (systemHash, sVal) VALUES (?, ?)", systemHash, sVal);
 	}
 	
 	// / Validate if the systemHash if it belongs to the current physical 
 	// virtual server. If it fails, it reissues the systemHash. Used on servlet startup
 
-	public String validateSystemHash() {
+	public String validateSystemHash() throws JSqlException {
+		try {
       //fetch systemHash from config table
       String sysHash = systemHash();
       //compare systemHash
@@ -226,9 +273,12 @@ public class ServletLogging {
       sysHash = systemInfo.systemaHash();
       
       // persist the hash value in SQLite
-		sqliteObj.execute("INSERT INTO `config` (systemHash, sVal) VALUES (?, ?)", "systemHash", sysHash);
-      
+      addConfig("systemHash", sysHash);
+
 		return sysHash;
+		} catch(Exception e) {
+			throw new JSqlException(e.getMessage());
+		}
 	}
 	
 	// / Returns the current request ID
@@ -248,7 +298,7 @@ public class ServletLogging {
 	
 	// / Add the format to the system ---->will be deleted
 	//hash   (base58 md5, indexed) ,format (indexed, unique)
-	public void addFormat(String fmtHash, String format) throws Exception {
+	public void addFormat(String fmtHash, String format) throws JSqlException {
 		jSqlObj.execute("INSERT INTO `logFormat` (hash, format) VALUES (?, ?)", fmtHash, format);
 	}
 	
@@ -258,7 +308,7 @@ public class ServletLogging {
 	}
 	
 	/// Performs a logging with a format name and argument
-	public void log(String format, Object... args) {
+	public void log(String format, Object... args) throws JSqlException {
 		//call addFormat to add format
       String fmtHash = GUID.base58();
 		addFormat(fmtHash, format);
@@ -270,7 +320,7 @@ public class ServletLogging {
 	}
 	
 	/// Performs a logging with a formant name, argument, and attached exception
-	public void logException(Exception e, String format, Object... args) {
+	public void logException(Exception e, String format, Object... args) throws JSqlException {
 		//call addFormat to add format
 		String fmtHash = GUID.base58();
 		addFormat(fmtHash, format);

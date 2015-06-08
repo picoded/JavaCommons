@@ -168,7 +168,7 @@ public class MetaObject extends CaseInsensitiveHashMap<String, Object> implement
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object get(Object key) {
-		//combinedMap();
+		combinedMap();
 		return super.get(key);
 	}
 	

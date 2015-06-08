@@ -36,10 +36,14 @@ public class MetaTable_Sqlite_test {
 	// Metatable setup
 	//-----------------------------------------------
 	
+	protected String mtTableName = null;
+	
 	protected MetaTable mtObj = null;
 	
 	protected void mtObjSetup() throws JStackException {
-		mtObj = new MetaTable(JStackObj, "M" + TestConfig.randomTablePrefix());
+		mtTableName = "M" + TestConfig.randomTablePrefix();
+		
+		mtObj = new MetaTable(JStackObj, mtTableName);
 		
 		mtObj.putType("num", new MetaType(MetaType.TYPE_INTEGER));
 		mtObj.putType("str_val", new MetaType(MetaType.TYPE_STRING));
@@ -100,21 +104,18 @@ public class MetaTable_Sqlite_test {
 		assertEquals(mtObj.getType("mixed-array").valueType(), MetaType.TYPE_MIXED_ARRAY);
 	}
 	
-	//
-	// No longer relevent, as tables are all prefixed now with their type
-	//
-	//@Test
-	//public void invalidSetup() {
-	//	MetaTable m;
-	//
-	//	try {
-	//		m = new MetaTable(JStackObj, "1" + TestConfig.randomTablePrefix());
-	//		fail(); // if we got here, no exception was thrown, which is bad
-	//	} catch (Exception e) {
-	//		final String expected = "Invalid table name (cannot start with numbers)";
-	//		assertTrue("Missing Exception - " + expected, e.getMessage().indexOf(expected) >= 0);
-	//	}
-	//}
+	@Test
+	public void invalidSetup() {
+		MetaTable m;
+	
+		try {
+			m = new MetaTable(JStackObj, "1" + TestConfig.randomTablePrefix());
+			fail(); // if we got here, no exception was thrown, which is bad
+		} catch (Exception e) {
+			final String expected = "Invalid table name (cannot start with numbers)";
+			assertTrue("Missing Exception - " + expected, e.getMessage().indexOf(expected) >= 0);
+		}
+	}
 	
 	// Actual setup / teardown
 	//-----------------------------------------------
@@ -134,7 +135,7 @@ public class MetaTable_Sqlite_test {
 	// Test cases
 	//-----------------------------------------------
 	
-	HashMap<String, Object> randomObjMap() {
+	protected HashMap<String, Object> randomObjMap() {
 		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put(GUID.base58(), RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
 		objMap.put(GUID.base58(), -(RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3))));

@@ -57,12 +57,12 @@ public class KeyValueMap {
 	/// Setup the metatable with the default table name
 	public KeyValueMap(JStack inStack) {
 		super( inStack );
-		tableName = "kv_KeyValueMap";
+		tableName = "KeyValueMap";
 	}
 	
 	/// Setup the metatable with the given stack
 	public KeyValueMap(JStack inStack, String inTableName) {
-		super( inStack, "kv_"+inTableName );
+		super( inStack, inTableName );
 	}
 	
 	

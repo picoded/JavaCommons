@@ -39,12 +39,12 @@ public class MetaTable extends JStackData {
 	/// Setup the metatable with the default table name
 	public MetaTable(JStack inStack) {
 		super( inStack );
-		tableName = "mt_MetaTable";
+		tableName = "MetaTable";
 	}
 	
 	/// Setup the metatable with the given stack
 	public MetaTable(JStack inStack, String inTableName) {
-		super( inStack, "mt_"+inTableName );
+		super( inStack, inTableName );
 	}
 	
 	///

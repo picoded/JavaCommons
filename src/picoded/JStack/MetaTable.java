@@ -39,12 +39,12 @@ public class MetaTable extends JStackData {
 	/// Setup the metatable with the default table name
 	public MetaTable(JStack inStack) {
 		super( inStack );
-		tableName = "MetaTable";
+		tableName = "mt_MetaTable";
 	}
 	
 	/// Setup the metatable with the given stack
 	public MetaTable(JStack inStack, String inTableName) {
-		super( inStack, inTableName );
+		super( inStack, "mt_"+inTableName );
 	}
 	
 	///
@@ -394,11 +394,6 @@ public class MetaTable extends JStackData {
 			sql.execute("DROP VIEW IF EXISTS " + sqlViewName(sql, "view"));
 			JSqlMakeIndexViewQuery(sql);
 		}
-	}
-	
-	/// SQL Table name,
-	protected String sqlTableName(JSql sql) {
-		return (sql.getTablePrefix() + tableName);
 	}
 	
 	///

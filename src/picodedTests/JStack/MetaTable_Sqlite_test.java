@@ -60,7 +60,7 @@ public class MetaTable_Sqlite_test {
 	@Test
 	public void testSingleMappingSystem() throws JStackException
 	{
-		System.out.println("Starting single mapping test");
+		//System.out.println("Starting single mapping test");
 		mtObj.clearTypeMapping();
 		
 		mtObj.putType("num", "INTEGER");
@@ -77,7 +77,7 @@ public class MetaTable_Sqlite_test {
 	@Test
 	public void testMapMappingSystem() throws JStackException
 	{
-		System.out.println("Starting map mapping test");
+		//System.out.println("Starting map mapping test");
 		mtObj.clearTypeMapping();
 		
 		HashMap<String, Object> mapping = new HashMap<String, Object>();
@@ -100,18 +100,21 @@ public class MetaTable_Sqlite_test {
 		assertEquals(mtObj.getType("mixed-array").valueType(), MetaType.TYPE_MIXED_ARRAY);
 	}
 	
+	//
+	// No longer relevent, as tables are all prefixed now with their type
+	//
 	//@Test
-	public void invalidSetup() {
-		MetaTable m;
-		
-		try {
-			m = new MetaTable(JStackObj, "1" + TestConfig.randomTablePrefix());
-			fail(); // if we got here, no exception was thrown, which is bad
-		} catch (Exception e) {
-			final String expected = "Invalid table name (cannot start with numbers)";
-			assertTrue("Missing Exception - " + expected, e.getMessage().indexOf(expected) >= 0);
-		}
-	}
+	//public void invalidSetup() {
+	//	MetaTable m;
+	//
+	//	try {
+	//		m = new MetaTable(JStackObj, "1" + TestConfig.randomTablePrefix());
+	//		fail(); // if we got here, no exception was thrown, which is bad
+	//	} catch (Exception e) {
+	//		final String expected = "Invalid table name (cannot start with numbers)";
+	//		assertTrue("Missing Exception - " + expected, e.getMessage().indexOf(expected) >= 0);
+	//	}
+	//}
 	
 	// Actual setup / teardown
 	//-----------------------------------------------
@@ -144,12 +147,12 @@ public class MetaTable_Sqlite_test {
 		return objMap;
 	}
 	
-	//@Test
+	@Test
 	public void constructor() {
 		assertNotNull(JStackObj);
 	}
 	
-	//@Test
+	@Test
 	public void basicTest() throws JStackException {
 		String guid = GUID.base58();
 		assertNull(mtObj.get(guid));
@@ -166,7 +169,7 @@ public class MetaTable_Sqlite_test {
 		assertEquals(objMap, mtObj.get(guid));
 	}
 	
-	//@Test
+	@Test
 	public void basicTestMultiple() throws JStackException {
 		
 		// Useful for debugging
@@ -190,7 +193,7 @@ public class MetaTable_Sqlite_test {
 		return objMap;
 	}
 	
-	//@Test
+	@Test
 	public void indexBasedTest() throws JStackException {
 		
 		mtObj.append(null, genNumStrObj(1, "this"));
@@ -224,7 +227,7 @@ public class MetaTable_Sqlite_test {
 	///
 	/// An exception occurs, if a query fetch occurs with an empty table
 	///
-	//@Test
+	@Test
 	public void issue47_exceptionWhenTableIsEmpty() throws JStackException {
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.queryObjects(null, null));
@@ -236,7 +239,7 @@ public class MetaTable_Sqlite_test {
 	///
 	/// AKA: Incomplete object does not appear in view index
 	///
-	//@Test
+	@Test
 	public void innerJoinFlaw() throws JStackException {
 		mtObj.append(null, genNumStrObj(1, "hello world"));
 		

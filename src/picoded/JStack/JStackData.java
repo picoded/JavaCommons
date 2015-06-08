@@ -29,6 +29,11 @@ public class JStackData {
 	/// Internal table name, before prefix?
 	protected String tableName = "JStackData";
 	
+	/// SQL Table name, with automated prefix adding
+	protected String sqlTableName(JSql sql) {
+		return (sql.getTablePrefix() + tableName);
+	}
+	
 	//
 	// Constructor setup
 	//--------------------------------------------------------------------------

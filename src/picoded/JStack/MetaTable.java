@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 
+
 /// Picoded imports
 import picoded.conv.GUID;
 import picoded.JSql.*;
 import picoded.JCache.*;
 import picoded.struct.CaseInsensitiveHashMap;
+
 
 /// hazelcast
 import com.hazelcast.core.*;
@@ -120,17 +122,49 @@ public class MetaTable extends JStackData {
 		return this;
 	}
 	
-//	public MetaTable setIndex( String[] inIndxList, Object[] inTypeList ) {
-//		indxList = inIndxList;
-//		//typeList = inTypeList;
-//		return this;
-//	}
-//	
-//	public MetaTable setIndex( Map<String,Object> indexMap ) {
-//		List<String> list = new ArrayList<String>( indexMap.keySet() );
-//		
-//		return this;
-//	}
+	public MetaTable putType(String name, Object type) throws JStackException {
+		if(typeMapping.containsKey(name)) {
+			throw new RuntimeException("Type mapping already contains this key");
+		}
+		
+		if(type instanceof String) {
+			MetaType metaType = MetaType.fromTypeString(type.toString());
+			
+			if( metaType == null ) {
+				throw new JStackException("Invalid MetaTable type for: "+name+"="+type.toString());
+			}
+			
+			typeMapping.put(name, metaType);
+		}
+		
+		return this;
+	}
+	
+	public MetaTable setMapping(Map<String, Object> nameToTypeMap) throws JStackException {
+		for(Map.Entry<String, Object> set : nameToTypeMap.entrySet()) {
+			putType(set.getKey(), set.getValue());
+		}
+		
+		return this;
+	}
+	
+	public void clearTypeMapping()
+	{
+		if(typeMapping != null)
+		{
+			typeMapping.clear();
+		}
+	}
+	
+	public Set<String> listTypeMappingKeys()
+	{
+		return(typeMapping.keySet());
+	}
+	
+	public Collection<MetaType>  listTypeMappingValues()
+	{
+		return typeMapping.values();
+	}
 	
 	///
 	/// Internal JSql table setup and teardown

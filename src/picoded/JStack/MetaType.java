@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.*;
 
+import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
+
 /// Picoded imports
 import picoded.JSql.*;
 import picoded.JCache.*;
@@ -82,6 +84,8 @@ public class MetaType {
 	/// The meta type int values
 	int valueType = 1;
 	
+	private static String metaTypePrefix = "type_";
+	
 	/// Configured type
 	public int valueType() {
 		return valueType;
@@ -109,5 +113,37 @@ public class MetaType {
 	/// Note this constructor is not meant to be used directly.
 	public MetaType() {
 		
+	}
+	
+	public static MetaType fromTypeString(String configName) {
+		String name = configName.toLowerCase();
+		if(name.contains(metaTypePrefix)) {
+			name = name.substring(name.indexOf('_') + 1, name.length());
+		}
+		
+		switch(name) {
+			case "disabled": return new MetaType(MetaType.TYPE_DISABLED);
+			case "mixed": return new MetaType(MetaType.TYPE_MIXED);
+			case "mixed_array": return new MetaType(MetaType.TYPE_MIXED_ARRAY);
+			case "uuid": return new MetaType(MetaType.TYPE_UUID);
+			case "metatable": return new MetaType(MetaType.TYPE_METATABLE);
+			case "json": return new MetaType(MetaType.TYPE_JSON);
+			case "uuid_array": return new MetaType(MetaType.TYPE_UUID_ARRAY);
+			case "metatable_array": return new MetaType(MetaType.TYPE_METATABLE_ARRAY);
+			case "json_array": return new MetaType(MetaType.TYPE_JSON_ARRAY);
+			case "integer": return new MetaType(MetaType.TYPE_INTEGER);
+			case "long": return new MetaType(MetaType.TYPE_LONG);
+			case "double": return new MetaType(MetaType.TYPE_DOUBLE);
+			case "float": return new MetaType(MetaType.TYPE_FLOAT);
+			case "integer_array": return new MetaType(MetaType.TYPE_INTEGER_ARRAY);
+			case "long_array": return new MetaType(MetaType.TYPE_LONG_ARRAY);
+			case "double_array": return new MetaType(MetaType.TYPE_DOUBLE_ARRAY);
+			case "float_array": return new MetaType(MetaType.TYPE_FLOAT_ARRAY);
+			case "string": return new MetaType(MetaType.TYPE_STRING);
+			case "text": return new MetaType(MetaType.TYPE_TEXT);
+			case "string_array": return new MetaType(MetaType.TYPE_STRING_ARRAY);
+			case "text_array": return new MetaType(MetaType.TYPE_TEXT_ARRAY);
+		}
+		return null;
 	}
 }

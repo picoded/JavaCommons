@@ -267,9 +267,10 @@ public class MetaTable_Sqlite_test {
 	}
 	
 	///
-	/// Bad view index part 2?
+	/// This test cases covers a rather nasty bug, where meta objects,
+	/// with 1 or less parameters (excluding _oid) is unloadable.
 	///
-	/// Ok, its actually a bug, where objects with 1 or less parameters are "ignored" (not including oid)
+	/// This was found to be due to a mis-typo of <= 0 to <= 1 in JSqlResultToMap
 	///
 	@Test
 	public void missingNumError() throws JStackException {

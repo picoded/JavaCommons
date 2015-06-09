@@ -287,6 +287,7 @@ public class MetaTable extends JStackData {
 		
 		String lBracket = "'";
 		String rBracket = "'";
+		String joinType = "LEFT";
 		
 		if (sql.sqlType == JSqlType.mssql) {
 			lBracket = "[";
@@ -321,7 +322,7 @@ public class MetaTable extends JStackData {
 				select.append(", N" + joinCount + ".nVl AS ");
 				select.append(lBracket + key + rBracket);
 				
-				from.append(" LEFT JOIN " + tableName + " AS N" + joinCount);
+				from.append(" "+joinType+" JOIN " + tableName + " AS N" + joinCount);
 				from.append(" ON B.oID = N" + joinCount + ".oID");
 				from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = '" + key + "'");
 				
@@ -333,7 +334,7 @@ public class MetaTable extends JStackData {
 				select.append(", S" + joinCount + ".sVl AS ");
 				select.append(lBracket + key + "_lc" + rBracket);
 				
-				from.append(" LEFT JOIN " + tableName + " AS S" + joinCount);
+				from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
 				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
 				
@@ -342,7 +343,7 @@ public class MetaTable extends JStackData {
 				select.append(", S" + joinCount + ".tVl AS ");
 				select.append(lBracket + key + rBracket);
 				
-				from.append(" LEFT JOIN " + tableName + " AS S" + joinCount);
+				from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
 				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
 				
@@ -477,7 +478,7 @@ public class MetaTable extends JStackData {
 	
 	/// MetaTable JSqlResult to CaseInsensitiveHashMap
 	protected Map<String, Object> JSqlResultToMap(JSqlResult r) throws JSqlException {
-		if (r != null && r.rowCount() <= 1) {
+		if (r != null && r.rowCount() <= 0) {
 			return null;
 		}
 		

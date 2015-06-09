@@ -258,7 +258,72 @@ public class MetaTable_Sqlite_test {
 		
 		assertNotNull(qRes = mtObj.queryObjects("str_val LIKE ?", new Object[] { "nope" }));
 		assertEquals(1, qRes.length);
+		
+		assertNotNull(qRes = mtObj.queryObjects("num = ?", new Object[] { 1 }));
+		assertEquals(1, qRes.length);
+		
+		assertNotNull(qRes = mtObj.queryObjects("num <= ?", new Object[] { 2 }));
+		assertEquals(2, qRes.length);
 	}
 	
+	///
+	/// Bad view index part 2?
+	///
+	/// Ok, its actually a bug, where objects with 1 or less parameters are "ignored" (not including oid)
+	///
+	@Test
+	public void missingNumError() throws JStackException {
+		HashMap<String, Object> objMap = new HashMap<String,Object>();
+		objMap.put("str_val", "^_^");
+		
+		String guid = GUID.base58();
+		assertNull(mtObj.get(guid));
+		assertEquals(guid, mtObj.append(guid, objMap)._oid());
+		
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.queryObjects(null, null));
+		assertEquals(1, qRes.length);
+		
+		objMap.put("oid", guid);
+		assertEquals(objMap, mtObj.get(guid));
+	}
+	
+	@Test
+	public void missingStrError() throws JStackException {
+		HashMap<String, Object> objMap = new HashMap<String,Object>();
+		objMap.put("num", 123);
+		
+		String guid = GUID.base58();
+		assertNull(mtObj.get(guid));
+		assertEquals(guid, mtObj.append(guid, objMap)._oid());
+		
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.queryObjects(null, null));
+		assertEquals(1, qRes.length);
+		
+		objMap.put("oid", guid);
+		assertEquals(objMap, mtObj.get(guid));
+	}
+	
+	@Test
+	public void missingNumWithSomeoneElse() throws JStackException {
+		mtObj.append(null, genNumStrObj(1, "hello world"));
+		
+		HashMap<String, Object> objMap = new HashMap<String,Object>();
+		objMap.put("str_val", "^_^");
+		
+		String guid = GUID.base58();
+		assertNull(mtObj.get(guid));
+		assertEquals(guid, mtObj.append(guid, objMap)._oid());
+		
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.queryObjects(null, null));
+		assertEquals(2, qRes.length);
+		
+		assertTrue( guid.equals(qRes[0]._oid()) || guid.equals(qRes[1]._oid()) );
+		
+		objMap.put("oid", guid);
+		assertEquals(objMap, mtObj.get(guid));
+	}
 	
 }

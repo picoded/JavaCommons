@@ -75,6 +75,12 @@ public class JSql_Mysql extends JSql {
 	
 	/// Internal parser that converts some of the common sql statements to mysql
 	public static String genericSqlParser(String inString) {
+		// replace AUTOINCREMENT with AUTO_INCREMENT
+		inString = inString.replace("AUTOINCREMENT", "AUTO_INCREMENT");
+		
+		// replace MAX with 21844
+		inString = inString.replace("MAX", "21844");
+		
 		return inString.replaceAll("\'", "`").replaceAll("\"", "`"); //fix table name bracketing
 	}
 	
@@ -100,6 +106,8 @@ public class JSql_Mysql extends JSql {
 	public boolean execute(String qString, Object... values) throws JSqlException {
 		qString = genericSqlParser(qString);
 		String qStringUpper = qString.toUpperCase();
+		
+		//System.out.println("JSql_Mysql -> execute -> qStringUpper: " + qStringUpper);
 		
 		// Possible "INDEX IF NOT EXISTS" call for mysql, suppress duplicate index error if needed
 		//

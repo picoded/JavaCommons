@@ -55,11 +55,37 @@ public class MetaTable_Sqlite_test {
 		mtObj.stackTeardown();
 	}
 	
+	// Actual setup / teardown
+	//-----------------------------------------------
+	
+	@Before
+	public void setUp() throws JStackException {
+		JStackSetup();
+		mtObjSetup();
+	}
+	
+	@After
+	public void tearDown() throws JStackException {
+		mtObjTearDown();
+		JStackTearDown();
+	}
+	
+	// Misc tests
+	//-----------------------------------------------
+	
+	@Test
+	public void constructor() {
+		assertNotNull(JStackObj);
+	}
+	
 	@Test
 	public void stringTest() {
 		assertEquals("hello", ("hello").toString() );
 		assertEquals("hello", ((Object)"hello").toString() );
 	}
+	
+	// Mapping tests
+	//-----------------------------------------------
 	
 	@Test
 	public void testSingleMappingSystem() throws JStackException
@@ -117,24 +143,10 @@ public class MetaTable_Sqlite_test {
 		}
 	}
 	
-	// Actual setup / teardown
-	//-----------------------------------------------
-	
-	@Before
-	public void setUp() throws JStackException {
-		JStackSetup();
-		mtObjSetup();
-	}
-	
-	@After
-	public void tearDown() throws JStackException {
-		mtObjTearDown();
-		JStackTearDown();
-	}
-	
 	// Test cases
 	//-----------------------------------------------
 	
+	// Test utility used to generate random maps
 	protected HashMap<String, Object> randomObjMap() {
 		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put(GUID.base58(), RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
@@ -146,11 +158,6 @@ public class MetaTable_Sqlite_test {
 		objMap.put("str_val", GUID.base58());
 		
 		return objMap;
-	}
-	
-	@Test
-	public void constructor() {
-		assertNotNull(JStackObj);
 	}
 	
 	@Test

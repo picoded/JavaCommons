@@ -245,6 +245,7 @@ public class JSql extends BaseInterface {
 				}
 			}
 		} catch (Exception e) {
+			System.out.println("##Errrorrr::: "+qString);
 			throw new JSqlException("execute_raw exception", e);
 		}
 		return false;

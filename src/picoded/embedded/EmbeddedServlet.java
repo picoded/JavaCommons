@@ -1,8 +1,17 @@
 package picoded.embedded;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
 import javax.servlet.Servlet;
+
+
+
 
 
 
@@ -19,6 +28,7 @@ public class EmbeddedServlet {
 
 	private Tomcat _tomcat = null;
 	private Context _context = null;
+	private int _port = -1; //tomcats property port is protected, so i keep this as a way to know what the port is
 	
 	//Users are forced to provide a context root folder
 	public EmbeddedServlet(String contextRootName, File contextRootFolder){
@@ -76,11 +86,16 @@ public class EmbeddedServlet {
 	public EmbeddedServlet withPort(int portNum){
 		if(_tomcat != null){
 			_tomcat.setPort(portNum);
+			_port = portNum;
 		} else {
 			System.out.println("Tomcat instance is null");
 		}
 		
 		return this;
+	}
+	
+	public int getPort(){
+		return _port;
 	}
 	
 	public EmbeddedServlet withContextRoot(String contextRootName, File contextRootFolder){
@@ -114,11 +129,36 @@ public class EmbeddedServlet {
 		return this;
 	}
 	
-	public void addServlet(String contextPath, String servletName, Servlet servlet){
-		if(_tomcat != null){
-			_tomcat.addServlet(contextPath, servletName, servlet);
-		} else {
-			System.out.println("Tomcat instance is null");
+//	public EmbeddedServlet withServlet(String contextPath, String servletName, Servlet servlet){
+//		if(_tomcat != null){
+//			_tomcat.addServlet(contextPath, servletName, servlet);
+//		} else {
+//			System.out.println("Tomcat instance is null");
+//		}
+//		
+//		return this;
+//	}
+	
+	public InputStream runServletGETTest(String servletURLName){
+		URL testURL = null;
+		URLConnection conn = null;
+		InputStream response = null;
+		//InputStreamReader inputWr = null;
+		//char[] buffer = new char[20];
+		String urlString = "http://localhost:"+ _port + _context.getPath()+"/date?testValue=test";
+		System.out.println("URL is: " +urlString);
+		try{
+			
+			testURL = new URL(urlString); //create url
+			conn = testURL.openConnection(); //open connection
+			response = conn.getInputStream(); //
+			
+		} catch(MalformedURLException ex){
+			System.out.println("MalformedURL: " +ex.getMessage());
+		} catch (IOException ex){
+			System.out.println("IOException: " +ex.getMessage());
 		}
+		
+		return response;
 	}
 }

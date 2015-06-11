@@ -255,7 +255,7 @@ public class ServletLogging {
 	}
 	
 	private void addConfig(String systemHash, String sVal) throws JSqlException {
-		sqliteObj.execute("INSERT INTO `config` (systemHash, sVal) VALUES (?, ?)", systemHash, sVal);
+		sqliteObj.execute("INSERT OR REPLACE INTO `config` (systemHash, sVal) VALUES (?, ?)", systemHash, sVal);
 	}
 	
 	// / Validate if the systemHash if it belongs to the current physical 
@@ -299,7 +299,7 @@ public class ServletLogging {
 	// / Add the format to the system ---->will be deleted
 	//hash   (base58 md5, indexed) ,format (indexed, unique)
 	public void addFormat(String fmtHash, String format) throws JSqlException {
-		jSqlObj.execute("INSERT INTO `logFormat` (hash, format) VALUES (?, ?)", fmtHash, format);
+		jSqlObj.execute("INSERT OR REPLACE INTO `logFormat` (hash, format) VALUES (?, ?)", fmtHash, format);
 	}
 	
 	/// You should not be calling log using format with no arguments

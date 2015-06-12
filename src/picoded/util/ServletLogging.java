@@ -189,20 +189,20 @@ public class ServletLogging {
 			
 			// long indexed
 			for (int i=1; i<=longIndexed;i++) {
-				columns += "l"+(i<10?"0"+i:i)+"-XX LONG, ";
+				columns += "l"+(i<10?"0"+i:i)+" LONG, ";
 			}
 			// string indexed
 			for (int i=1; i<=longIndexed;i++) {
-				columns += "s"+(i<10?"0"+i:i)+"-XX VARCHAR(22), ";
+				columns += "s"+(i<10?"0"+i:i)+" VARCHAR(22), ";
 			}
 			// long not indexed
-			for (int i=1; i<=longNotIndexed;i++) {
-				columns += "l"+(i<10?"0"+i:i)+"-YY LONG, ";
-			}
+			//for (int i=1; i<=longNotIndexed;i++) {
+			//	columns += "l"+(i<10?"0"+i:i)+"-YY LONG, ";
+			//}
 			// string not indexed
-			for (int i=1; i<=longNotIndexed;i++) {
-				columns += "s"+(i<10?"0"+i:i)+"-YY VARCHAR(22), ";
-			}
+			//for (int i=1; i<=longNotIndexed;i++) {
+			//	columns += "s"+(i<10?"0"+i:i)+"-YY VARCHAR(22), ";
+			//}
 			columns += "PRIMARY KEY (expHash)";
 
 		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `logTable` (" +  columns + ")");

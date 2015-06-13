@@ -101,9 +101,20 @@ public class JStackData_testBase_test {
 		}
 	}
 	
+	// Main over-ride functions
+	//-----------------------------------------------
 	
+	// Over-ride and setup the JCache as needed
+	public JCache JCacheObj() {
+		return null;
+	}
 	
+	// Over-ride and setup the JSql as needed
+	public JSql JSqlObj() {
+		return JSql.sqlite();
+	}
 	
+	// 
 	@Test
 	public void blank() {
 		assertTrue(true);

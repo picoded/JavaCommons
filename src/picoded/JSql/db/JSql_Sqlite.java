@@ -68,7 +68,8 @@ public class JSql_Sqlite extends JSql {
 	
 	/// Internal parser that converts some of the common sql statements to sqlite
 	public static String genericSqlParser(String inString) {
-		inString = inString.replaceAll("(?i)VARCHAR\\(MAX\\)", "VARCHAR");
+		// Enforce certain common type translations for SQLITE
+		inString = inString.replaceAll("(?i)VARCHAR\\(MAX\\)", "VARCHAR").replaceAll("(?i)BIGINT", "INTEGER");
 		//System.out.println( inString );
 		return inString;
 	}

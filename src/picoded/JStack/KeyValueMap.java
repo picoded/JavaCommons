@@ -16,6 +16,7 @@ import picoded.JSql.*;
 import picoded.JCache.*;
 import picoded.struct.CaseInsensitiveHashMap;
 import picoded.struct.GenericConvertMap;
+import picoded.security.NxtCrypt;
 
 /// hazelcast
 import com.hazelcast.core.*;
@@ -193,7 +194,20 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	///
 	/// @returns null
 	public String put(String key, String value) {
-		return put(key, value, 0);
+		return putWithExpiry(key, value, 0);
+	}
+	
+	/// Stores (and overwrites if needed) key, value pair
+	///
+	/// Important note: It does not return the previously stored value
+	///
+	/// @param key as String
+	/// @param value as String
+	/// @param lifespan time to expire in seconds
+	///
+	/// @returns null
+	public String putWithLifespan(String key, String value, long lifespan) {
+		return putWithExpiry(key,value, currentSystemTime_seconds() + lifespan);
 	}
 	
 	/// Stores (and overwrites if needed) key, value pair
@@ -205,7 +219,7 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	/// @param expireTime expire time stamp valu
 	///
 	/// @returns null
-	public String put(String key, String value, long expireTime) {
+	public String putWithExpiry(String key, String value, long expireTime) {
 		try {
 			long now = currentSystemTime_seconds();
 			
@@ -232,6 +246,7 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 		
 		return null;
 	}
+	
 	
 	/// Returns the value, given the key
 	/// @param key param find the thae meta key
@@ -281,22 +296,22 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	}
 	
 	/// @TODO get expirary time (unix time)
-	public long getExpireTime(Object key) {
+	public long getExpiry(Object key) {
 		return 0L;
 	}
 	
 	/// @TODO get expirary time left (seconds)
-	public long getExpireSeconds(Object key) {
+	public long getLifespan(Object key) {
 		return 0L;
 	}
 	
 	/// @TODO set expirary time (unix time)
-	public long setExpireTime(Object key, long time) {
+	public long setExpiry(Object key, long time) {
 		return 0L;
 	}
 	
 	/// @TODO set expirary time (seconds)
-	public long setExpireSeconds(Object key, long time) {
+	public long setLifeSpan(Object key, long time) {
 		return 0L;
 	}
 	
@@ -357,8 +372,54 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 		}
 	}
 	
-	// Map interface compliance (that isnt actually supported)
+	// Nonce support is now backed into KeyValueMap
 	//-------------------------------------------------------------------------
+	
+	/// Default nonce lifetime
+	public int nonce_defaultLifetime = 3600;
+	
+	/// Default nonce string length (22 is chosen to be consistent with base58 GUID's)
+	public int nonce_defaultLength = 22;
+	
+	/// Generates a random nonce hash, and saves the value to it
+	///
+	/// Relies on both nonce_defaultLength & nonce_defaultLifetime for default parameters
+	///
+	/// @param value to store as string
+	///
+	/// @returns String value of the random key generated
+	public String generateNonce(String val) throws RuntimeException {
+		return generateNonce( val, nonce_defaultLifetime, nonce_defaultLength );
+	}
+	
+	/// Generates a random nonce hash, and saves the value to it
+	///
+	/// Relies on nonce_defaultLength for default parameters
+	///
+	/// @param value to store as string
+	/// @param lifespan time to expire in seconds
+	///
+	/// @returns String value of the random key generated
+	public String generateNonce(String val, long lifespan) throws RuntimeException {
+		return generateNonce( val, lifespan, nonce_defaultLength );
+	}
+	
+	/// Generates a random nonce hash, and saves the value to it
+	///
+	/// Note that the random nonce value returned, is based on picoded.security.NxtCrypt.randomString.
+	/// Note that this relies on true random to avoid collisions, and if it occurs. Values are over-written
+	///
+	/// @param keyLength random key length size
+	/// @param value to store as string
+	/// @param lifespan time to expire in seconds
+	///
+	/// @returns String value of the random key generated
+	public String generateNonce(String val, long lifespan, int keyLength) throws RuntimeException {
+		String res = NxtCrypt.randomString(keyLength);
+		putWithLifespan( res, val, lifespan );
+		return res;
+	}
+	
 	
 	//*/
 	

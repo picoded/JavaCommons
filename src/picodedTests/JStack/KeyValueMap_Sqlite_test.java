@@ -51,4 +51,12 @@ public class KeyValueMap_Sqlite_test extends JStackData_testBase_test {
 		
 	}
 	
+	@Test
+	public void simpleNonce() throws JStackException {
+		String nonce;
+		
+		assertNotNull( nonce = kvObj.generateNonce("hello") );
+		assertEquals( "hello", kvObj.get(nonce) );
+	}
+	
 }

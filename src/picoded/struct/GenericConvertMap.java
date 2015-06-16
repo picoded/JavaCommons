@@ -24,7 +24,7 @@ import picoded.conv.GenericConvert;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
-public interface GenericConvertMap<K, V> extends Map<K,V> {
+public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	
 	// to string conversion
 	//--------------------------------------------------------------------------------------------------

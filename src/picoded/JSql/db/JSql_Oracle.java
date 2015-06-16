@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.lang.RuntimeException;
 import java.util.regex.Pattern;
-import java.util.regex.Matcher; //import java.util.*;
+import java.util.regex.Matcher;
+import java.util.Map;
 
 import java.io.StringWriter;
 import java.util.logging.*;
@@ -40,12 +41,19 @@ public class JSql_Oracle extends JSql {
 	///
 	/// **Note:** urlString, is just IP:PORT. For example, "127.0.0.1:3306"
 	public JSql_Oracle(String oraclePath, String dbUser, String dbPass) {
-		sqlType = JSqlType.oracle;
-		
 		// store database connection properties
 		setConnectionProperties(oraclePath, null, dbUser, dbPass, null);
 		
+		// call internal method to create the connection
+		setupConnection();
+	}
+	
+	/// Internal common reuse constructor
+	private void setupConnection() {
+		sqlType = JSqlType.oracle;
+		
 		// Get the assumed oracle table space
+		String oraclePath = (String) connectionProps.get("dbUrl");
 		int tPoint = oraclePath.indexOf("@");
 		if (tPoint > 0) {
 			oracleTablespace = oraclePath.substring(0, tPoint);
@@ -56,7 +64,8 @@ public class JSql_Oracle extends JSql {
 		String connectionUrl = "jdbc:oracle:thin:" + oraclePath;
 		try {
 			Class.forName("oracle.jdbc.OracleDriver").newInstance(); //ensure oracle driver is loaded
-			sqlConn = java.sql.DriverManager.getConnection(connectionUrl, dbUser, dbPass);
+			sqlConn = java.sql.DriverManager.getConnection(connectionUrl, (String) connectionProps.get("dbUser"),
+				(String) connectionProps.get("dbPass"));
 			
 			// Try to alter & ensure the current session roles
 			try {
@@ -77,7 +86,15 @@ public class JSql_Oracle extends JSql {
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load SQL connection: ", e);
 		}
-		
+	}
+	
+	/// As this is the base class varient, this funciton isnt suported
+	public void recreate(boolean force) {
+		if (force) {
+			dispose();
+		}
+		// call internal method to create the connection
+		setupConnection();
 	}
 	
 	/// Collumn type correction from mysql to oracle sql
@@ -146,7 +163,7 @@ public class JSql_Oracle extends JSql {
 	}
 	
 	/// Internal parser that converts some of the common sql statements to sqlite
-	public static String genericSqlParser(String inString) {
+	public String genericSqlParser(String inString) throws JSqlException {
 		//Unique to oracle prefix, automatically terminates all additional conversion attempts
 		final String oracleImmediateExecute = "BEGIN EXECUTE IMMEDIATE";
 		if (inString.startsWith(oracleImmediateExecute)) {
@@ -272,6 +289,26 @@ public class JSql_Oracle extends JSql {
 						
 						tmpStr = _fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 						tmpIndx = tmpStr.indexOf(" ON ");
+						
+						String tableAndColumns = tmpStr.substring(tmpIndx + " ON ".length());
+						// check column's type
+						String metaDataQuery = "SELECT "
+							+ tableAndColumns.substring(tableAndColumns.indexOf("(") + 1, tableAndColumns.indexOf(")"))
+							+ " FROM " + tableAndColumns.substring(0, tableAndColumns.indexOf("("));
+						Map<String, String> metadata = null;
+						try {
+							metadata = getMetaData(metaDataQuery);
+						} catch (JSqlException e) {
+							//throw e;
+						}
+						if (metadata != null && !metadata.isEmpty()) {
+							for (Map.Entry<String, String> entry : metadata.entrySet()) {
+								if (entry.getValue() != null && entry.getValue().trim().toUpperCase().contains("LOB")) {
+									throw new JSqlException("Cannot create index on expression with datatype LOB for field '"
+										+ entry.getKey() + "'.");
+								}
+							}
+						}
 						
 						if (tmpIndx > 0) {
 							qString = "CREATE " + ((indexType != null) ? indexType + " " : "") + "INDEX "

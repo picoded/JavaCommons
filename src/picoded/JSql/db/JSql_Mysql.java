@@ -40,125 +40,59 @@ public class JSql_Mysql extends JSql {
 	///
 	/// **Note:** dbServerAddress, is just IP:PORT. For example, "127.0.0.1:3306"
 	public JSql_Mysql(String dbServerAddress, String dbName, String dbUser, String dbPass) {
-		sqlType = JSqlType.mysql;
+		// set connection properties
+		Properties connectionProps = new Properties();
+		connectionProps.put("user", dbUser);
+		connectionProps.put("password", dbPass);
+		connectionProps.put("autoReconnect", "true");
+		connectionProps.put("failOverReadOnly", "false");
+		connectionProps.put("maxReconnects", "5");
+		
+		String connectionUrl = "jdbc:mysql://" + dbServerAddress + "/" + dbName;
 		
 		// store database connection properties
-		setConnectionProperties(dbServerAddress, dbName, dbUser, dbPass, null);
+		setConnectionProperties(connectionUrl, null, null, null, connectionProps);
 		
-		String connectionUrl = "jdbc:mysql://" + dbServerAddress + "/" + dbName
-			+ "?autoReconnect=true&failOverReadOnly=false&maxReconnects=5";
-		
-		try {
-			Class.forName("com.mysql.jdbc.Driver").newInstance(); //ensure jdbc driver is loaded
-			sqlConn = java.sql.DriverManager.getConnection(connectionUrl, dbUser, dbPass);
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to load sql connection: ", e);
-		}
+		// call internal method to create the connection
+		setupConnection();
 	}
 	
 	/// Runs JSql with the JDBC "MY"SQL engine
 	///
 	/// **Note:** connectionUrl, for example, "jdbc:mysql://54.169.34.78:3306/JAVACOMMONS"
 	public JSql_Mysql(String connectionUrl, Properties connectionProps) {
-		sqlType = JSqlType.mysql;
-		
 		// store database connection properties
 		setConnectionProperties(connectionUrl, null, null, null, connectionProps);
 		
+		// call internal method to create the connection
+		setupConnection();
+	}
+	
+	/// Internal common reuse constructor
+	private void setupConnection() {
+		sqlType = JSqlType.mysql;
+		
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance(); //ensure jdbc driver is loaded
-			sqlConn = java.sql.DriverManager.getConnection(connectionUrl, connectionProps);
+			sqlConn = java.sql.DriverManager.getConnection((String) connectionProps.get("dbUrl"),
+				(Properties) connectionProps.get("connectionProps"));
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load sql connection: ", e);
 		}
 	}
 	
+	/// As this is the base class varient, this funciton isnt suported
+	public void recreate(boolean force) {
+		if (force) {
+			dispose();
+		}
+		// call internal method to create the connection
+		setupConnection();
+	}
+	
 	/// Internal parser that converts some of the common sql statements to mysql
-	public  String genericSqlParser(String inString) throws JSqlException{
-		//fix table name bracketing
-		inString.replaceAll("\'", "`").replaceAll("\"", "`");
-		
-		// replace AUTOINCREMENT with AUTO_INCREMENT
-		inString = inString.replace("AUTOINCREMENT", "AUTO_INCREMENT");
-		
-		// replace MAX with 21844
-		inString = inString.replace("MAX", "333");
-		
-		if(inString.contains("CREATE VIEW")) {
-			// split the query before/after FROM keyword
-			int indexOfFromClause = inString.indexOf("FROM") + "FROM".length();
-			String tempViewStr = inString.substring( indexOfFromClause, inString.indexOf(')')+1 ).replaceAll("[()]", "");
-			
-			// create view from INNER query in SELECT cluase
-			String tempView = inString.substring( inString.indexOf("VIEW") + "VIEW".length(), inString.indexOf("AS") ).trim()+"_temp";
-		   String sqlCreateView = "CREATE VIEW "+tempView +" AS "+ tempViewStr;
-		   
-		   // create view
-	   	execute_raw(sqlCreateView);
-
-			String strBeforeFromClause =inString.substring( 0, indexOfFromClause );
-			String strAfterFromClause = inString.substring( inString.indexOf(')') +1, inString.length() );
-			
-			inString = strBeforeFromClause + " "+ tempView + " " + strAfterFromClause;
-		}
-
-		inString = inString.toUpperCase();
-		
-		// Possible "INDEX IF NOT EXISTS" call for mysql, suppress duplicate index error if needed
-		//
-		// This is a work around for MYSQL not supporting the "CREATE X INDEX IF NOT EXISTS" syntax
-		//
-		if (inString.indexOf("INDEX IF NOT EXISTS") != -1) {
-			// index conflict try catch
-			try {
-				inString = inString.replaceAll("INDEX IF NOT EXISTS", "INDEX");
-				
-				// It is must to define the The length of the BLOB and TEXT column type
-				// Append the maximum length "333" to BLOB and TEXT columns
-				// Extract the table name and the columns from the sql statement i.e. "CREATE UNIQUE INDEX `JSQLTEST_UNIQUE` ON `JSQLTEST` ( COL1, COL2, COL3 )"
-				// Find the "ON" word index
-				int onIndex = inString.indexOf("ON");
-				// if index == -1 then it is not a valid sql statement
-				if (onIndex != -1) {
-					// subtract the table name and columns from the sql onIndexstatement string
-					String tableAndColumnsName = inString.substring(onIndex + "ON".length());
-					// Find the index of opening bracket index.
-					// The column names will be enclosed between the opening and closing bracket
-					// And table name will be before the opening bracket
-					int openBracketIndex = tableAndColumnsName.indexOf("(");
-					if (openBracketIndex != -1) {
-						// extract the table name which is till the opening bracket
-						String tablename = tableAndColumnsName.substring(0, openBracketIndex);
-						// find the closing bracket index
-						int closeBracketIndex = tableAndColumnsName.lastIndexOf(")");
-						// extract the columns between the opening and closing brackets
-						String columns = tableAndColumnsName.substring(openBracketIndex + 1, closeBracketIndex);
-						// fetch the table meta data info
-						JSqlResult JSql = executeQuery_metadata(tablename.trim());
-						Map<String, String> metadata = JSql.fetchMetaData();
-						if (metadata != null) {
-							String[] columnsArr = columns.split(",");
-							for (String column : columnsArr) {
-								column = column.trim();
-								// check if column type is BLOB or TEXT
-								if ("BLOB".equals(metadata.get(column)) || "TEXT".equals(metadata.get(column)) ) {
-									// repalce the column name in the origin sql statement with column name and suffic "(333)
-									inString = inString.replace(column, column + "(333)");
-								}
-							}
-						}
-					}
-				}
-			} catch (JSqlException e) {
-				if (e.getCause().toString().indexOf(
-					"com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Duplicate key name '") == -1) {
-					// throws as its not a duplicate key exception
-					throw e;
-				}
-			}
-		}
-		 
-		return inString;
+	public String genericSqlParser(String inString) {
+		return inString.replaceAll("\'", "`").replaceAll("\"", "`"); //fix table name bracketing
 	}
 	
 	/// Executes the argumented query, and returns the result object *without* 
@@ -184,6 +118,61 @@ public class JSql_Mysql extends JSql {
 		qString = genericSqlParser(qString);
 		String qStringUpper = qString.toUpperCase();
 		
+		// Possible "INDEX IF NOT EXISTS" call for mysql, suppress duplicate index error if needed
+		//
+		// This is a work around for MYSQL not supporting the "CREATE X INDEX IF NOT EXISTS" syntax
+		//
+		if (qStringUpper.indexOf("INDEX IF NOT EXISTS") != -1) {
+			// index conflict try catch
+			try {
+				qStringUpper = qStringUpper.replaceAll("INDEX IF NOT EXISTS", "INDEX");
+				
+				// It is must to define the The length of the BLOB and TEXT column type
+				// Append the maximum length "333" to BLOB and TEXT columns
+				// Extract the table name and the columns from the sql statement i.e. "CREATE UNIQUE INDEX `JSQLTEST_UNIQUE` ON `JSQLTEST` ( COL1, COL2, COL3 )"
+				// Find the "ON" word index
+				int onIndex = qStringUpper.indexOf("ON");
+				// if index == -1 then it is not a valid sql statement
+				if (onIndex != -1) {
+					// subtract the table name and columns from the sql statement string
+					String tableAndColumnsName = qStringUpper.substring(onIndex + "ON".length());
+					// Find the index of opening bracket index.
+					// The column names will be enclosed between the opening and closing bracket
+					// And table name will be before the opening bracket
+					int openBracketIndex = tableAndColumnsName.indexOf("(");
+					if (openBracketIndex != -1) {
+						// extract the table name which is till the opening bracket
+						String tablename = tableAndColumnsName.substring(0, openBracketIndex);
+						// find the closing bracket index
+						int closeBracketIndex = tableAndColumnsName.lastIndexOf(")");
+						// extract the columns between the opening and closing brackets
+						String columns = tableAndColumnsName.substring(openBracketIndex + 1, closeBracketIndex);
+						// fetch the table meta data info
+						JSqlResult JSql = executeQuery_metadata(tablename.trim());
+						Map<String, String> metadata = JSql.fetchMetaData();
+						if (metadata != null) {
+							String[] columnsArr = columns.split(",");
+							for (String column : columnsArr) {
+								column = column.trim();
+								// check if column type is BLOB or TEXT
+								if ("BLOB".equals(metadata.get(column)) || "TEXT".equals(metadata.get(column))) {
+									// repalce the column name in the origin sql statement with column name and suffic "(333)
+									qStringUpper = qStringUpper.replace(column, column + "(333)");
+								}
+							}
+						}
+					}
+				}
+				return execute_raw(qStringUpper);
+			} catch (JSqlException e) {
+				if (e.getCause().toString().indexOf(
+					"com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Duplicate key name '") == -1) {
+					// throws as its not a duplicate key exception
+					throw e;
+				}
+				return true;
+			}
+		}
 		return execute_raw(qString, values);
 	}
 	

@@ -65,15 +65,17 @@ public class JSql_Sqlite_test {
 	public void executeQuery() throws JSqlException {
 		JSqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "`").dispose(); //cleanup (just incase)
 		
-		JSqlObj.executeQuery("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")
+		JSqlObj.executeQuery(
+			"CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50) )")
 			.dispose(); //valid table creation : no exception
-		JSqlObj.executeQuery("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")
+		JSqlObj.executeQuery(
+			"CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50) )")
 			.dispose(); //run twice to ensure "IF NOT EXISTS" works
 		
 		//JSqlObj.executeQuery( "TRUNCATE TABLE "+testTableName+"").dispose(); //run twice to ensure "IF NOT EXISTS" works
 		
-		JSqlObj.executeQuery("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing")
-			.dispose();
+		JSqlObj.executeQuery("INSERT INTO " + testTableName + " ( col1, col2, col3 ) VALUES (?,?,?)", 404, "has nothing",
+			"do nothing").dispose();
 	}
 	
 	///*
@@ -253,8 +255,9 @@ public class JSql_Sqlite_test {
 		
 		assertTrue("1st uniq index", JSqlObj.execute("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName
 			+ "_unique` ON `" + testTableName + "` ( col1, col2 )"));
+		
 		assertTrue("2nd uniq index", JSqlObj.execute("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName
-			+ "_unique` ON `" + testTableName + "` ( col1, col2 )"));
+			+ "_unique` ON `" + testTableName + "` ( col3 )"));
 	}
 	
 	@Test
@@ -357,7 +360,7 @@ public class JSql_Sqlite_test {
 		assertNotNull(qSet = JSqlObj.upsertQuerySet( //
 			testTableName, //
 			new String[] { "col1" }, new Object[] { 404 }, //
-			new String[] { "col2" }, new Object[] { "not found" } //
+			new String[] { "col2", "col3" }, new Object[] { "not found", "not found" } //
 			));
 		assertTrue("SQL result should return true", qSet.execute());
 		
@@ -372,8 +375,13 @@ public class JSql_Sqlite_test {
 	public void recreate() throws JSqlException {
 		// close connection
 		JSqlObj.dispose();
+		
 		// recoreate connection
 		JSqlObj.recreate(true);
+		
+		// recreate the database and table
+		createTableQueryBuilder();
+		
 		// query should get executed
 		JSqlResult r = JSqlObj.query("SELECT * FROM " + testTableName + "");
 		assertNotNull("SQL result returns as expected", r);

@@ -110,6 +110,12 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 											  tName, "kID", "UNIQUE", "unq" //
 											  ).execute();
 		
+		// Value search index
+		//------------------------------------------------
+		sql.createTableIndexQuerySet( //
+											  tName, "kVl", null, "valMap" //
+											  ).execute();
+		
 		return true;
 	}
 	
@@ -128,6 +134,25 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	protected long currentSystemTime_seconds() {
 		return (System.currentTimeMillis())/1000L;
 	}
+	
+	///
+	/// Temp variables optimization, used to indicate pure session like data,
+	/// that does not require persistance (or even SQL)
+	///--------------------------------------------------------------------------
+	
+	/// Gets if temp mode optimization hint is indicated
+	public boolean getTempMode() {
+		return isTempValuesOnly;
+	}
+	
+	/// Sets temp mode optimization indicator hint
+	public boolean setTempMode(boolean mode) {
+		boolean ret = isTempValuesOnly;
+		isTempValuesOnly = mode;
+		
+		return ret;
+	}
+	
 	
 	///
 	/// Standard map operations

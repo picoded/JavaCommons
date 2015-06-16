@@ -1,4 +1,4 @@
-package picodedTests.embedded;
+package picodedTests.servletUtils;
 
 import org.junit.*;
 
@@ -17,7 +17,7 @@ import picoded.JSql.*;
 import picoded.JCache.*;
 import picoded.JStack.*;
 import picoded.conv.GUID;
-import picoded.embedded.EmbeddedServlet;
+import picoded.servletUtils.EmbeddedServlet;
 import picoded.struct.CaseInsensitiveHashMap;
 
 import java.util.Random;
@@ -39,7 +39,7 @@ public class EmbeddedServlet_test
 		
 		tomcat = new EmbeddedServlet("/app", context)
 		.withPort(15000)
-		.withServlet("/date", "datePrintServlet", "picodedTests.embedded.EmbeddedTestServlet");
+		.withServlet("/date", "datePrintServlet", "picodedTests.servletUtils.EmbeddedTestServlet");
 	}
 	
 	@Test

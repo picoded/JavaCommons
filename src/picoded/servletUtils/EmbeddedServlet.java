@@ -1,4 +1,4 @@
-package picoded.embedded;
+package picoded.servletUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,13 +9,6 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import javax.servlet.Servlet;
-
-
-
-
-
-
-
 
 import org.apache.catalina.Context;
 //import org.apache.catalina.Context;

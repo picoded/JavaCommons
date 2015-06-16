@@ -65,7 +65,6 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	/// optimize purely to JCache if possible (JSql will be used if a Jcache isnt provided)
 	protected boolean isTempValuesOnly = false;
 	
-	
 	///
 	/// Internal JSql table setup and teardown
 	///--------------------------------------------------------------------------
@@ -265,7 +264,7 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 						long l = t.longValue();
 						
 						// not expired yet?: its valid
-						if( l == 0 || l <= now ) {
+						if( l == 0 || l > now ) {
 							return r.get("kVl").get(0);
 						}
 					}
@@ -299,6 +298,23 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	/// @TODO set expirary time (seconds)
 	public long setExpireSeconds(Object key, long time) {
 		return 0L;
+	}
+	
+	/// Perform maintenance, mainly removing of expired data if applicable
+	public void maintenance() {
+		try {
+			long now = currentSystemTime_seconds();
+			Object ret = JStackIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					String tName = sqlTableName(sql);
+					sql.execute("DELETE * FROM `" + tName + "` WHERE eTm <= ?", now);
+					return null;
+				}
+			} );
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/// Remove stored key, value pair

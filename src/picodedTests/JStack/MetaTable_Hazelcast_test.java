@@ -39,14 +39,10 @@ import picodedTests.TestConfig;
 public class MetaTable_Hazelcast_test extends MetaTable_Sqlite_test {
 	
 	// JStack objects functions to over-ride
-	// (by sub test cases)
 	//-----------------------------------------------
+	@Override
 	public JCache JCacheObj() {
-		return JCache.hazelcast(hazelcastConfig);
-	}
-	
-	public JSql JSqlObj() {
-		return JSql.sqlite();
+		return JCache.hazelcast( hazelcastSetup() );
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////
@@ -93,73 +89,6 @@ public class MetaTable_Hazelcast_test extends MetaTable_Sqlite_test {
 		
 		// Checks that the JCache layer is not corrupted
 		assertEquals(objMap, mtObj.get(guid));
-	}
-	
-	///////////////////////////////////////////////////////////////////////////////////
-	//
-	// The following is inherited setup / teardown functions for the sub classes
-	//
-	///////////////////////////////////////////////////////////////////////////////////
-	
-	// JStack setup
-	//-----------------------------------------------
-	
-	static protected JCache JCacheObj = null;
-	static protected JSql JSqlObj = null;
-	
-	@Override
-	protected void JStackSetup() {
-		
-		if(JCacheObj == null) {
-			JCacheObj = JCacheObj();
-		}
-		
-		if(JSqlObj == null) {
-			JSqlObj = JSqlObj();
-		}
-		
-		JStackObj = new JStack( new JStackLayer[] { JCacheObj, JSqlObj } );
-	}
-	
-	@Override
-	protected void JStackTearDown() {
-		JStackObj = null;
-	}
-	
-	// Hazelcast setup
-	//-----------------------------------------------
-	
-	static protected String hazelcastClusterName;
-	static protected ClientConfig hazelcastConfig;
-	
-	/// Setsup the testing server
-	@BeforeClass
-	public static void oneTimeSetUp() {
-		// one-time initialization code
-		hazelcastClusterName = LocalCacheSetup.setupHazelcastServer();
-		
-		// Config to use
-		hazelcastConfig = new ClientConfig();
-		hazelcastConfig.getGroupConfig().setName(hazelcastClusterName);
-		hazelcastConfig.setProperty("hazelcast.logging.type", "none");
-		
-	}
-	
-	/// Dispose the testing server
-	@AfterClass
-	public static void oneTimeTearDown() {
-		if (JCacheObj != null) {
-			JCacheObj.dispose();
-			JCacheObj = null;
-		}
-		
-		try {
-			Thread.sleep(5000);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		// one-time cleanup code
-		LocalCacheSetup.teardownHazelcastServer();
 	}
 	
 }

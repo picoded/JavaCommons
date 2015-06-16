@@ -18,20 +18,8 @@ import org.apache.commons.lang3.RandomUtils;
 
 import picodedTests.TestConfig;
 
-public class MetaTable_Sqlite_test {
+public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 	
-	// JStack setup
-	//-----------------------------------------------
-	
-	protected JStack JStackObj = null;
-	
-	protected void JStackSetup() {
-		JStackObj = new JStack(JSql.sqlite());
-	}
-	
-	protected void JStackTearDown() {
-		JStackObj = null;
-	}
 	
 	// Metatable setup
 	//-----------------------------------------------
@@ -40,7 +28,8 @@ public class MetaTable_Sqlite_test {
 	
 	protected MetaTable mtObj = null;
 	
-	protected void mtObjSetup() throws JStackException {
+	@Override
+	public void testObjSetup() throws JStackException {
 		mtTableName = "M" + TestConfig.randomTablePrefix();
 		
 		mtObj = new MetaTable(JStackObj, mtTableName);
@@ -51,23 +40,10 @@ public class MetaTable_Sqlite_test {
 		mtObj.stackSetup();
 	}
 	
-	protected void mtObjTearDown() throws JStackException {
+	@Override
+	public void testObjTeardown() throws JStackException {
 		mtObj.stackTeardown();
-	}
-	
-	// Actual setup / teardown
-	//-----------------------------------------------
-	
-	@Before
-	public void setUp() throws JStackException {
-		JStackSetup();
-		mtObjSetup();
-	}
-	
-	@After
-	public void tearDown() throws JStackException {
-		mtObjTearDown();
-		JStackTearDown();
+		mtObj = null;
 	}
 	
 	// Misc tests
@@ -182,7 +158,7 @@ public class MetaTable_Sqlite_test {
 		
 		// Useful for debugging
 		JStackObj = new JStack(JSql.sqlite("./test-files/tmp/sqliteTest.db"));
-		mtObjSetup();
+		testObjSetup();
 		
 		int iteration = 100;
 		for (int a = 0; a < iteration; ++a) {

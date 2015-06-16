@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import javax.servlet.Servlet;
+import javax.servlet.http.HttpServlet;
 
 import org.apache.catalina.Context;
 //import org.apache.catalina.Context;
@@ -122,36 +123,37 @@ public class EmbeddedServlet {
 		return this;
 	}
 	
-//	public EmbeddedServlet withServlet(String contextPath, String servletName, Servlet servlet){
-//		if(_tomcat != null){
-//			_tomcat.addServlet(contextPath, servletName, servlet);
-//		} else {
-//			System.out.println("Tomcat instance is null");
-//		}
-//		
-//		return this;
-//	}
-	
-	public InputStream runServletGETTest(String servletURLName){
-		URL testURL = null;
-		URLConnection conn = null;
-		InputStream response = null;
-		//InputStreamReader inputWr = null;
-		//char[] buffer = new char[20];
-		String urlString = "http://localhost:"+ _port + _context.getPath()+"/date?testValue=test";
-		System.out.println("URL is: " +urlString);
-		try{
-			
-			testURL = new URL(urlString); //create url
-			conn = testURL.openConnection(); //open connection
-			response = conn.getInputStream(); //
-			
-		} catch(MalformedURLException ex){
-			System.out.println("MalformedURL: " +ex.getMessage());
-		} catch (IOException ex){
-			System.out.println("IOException: " +ex.getMessage());
+	public EmbeddedServlet withServlet(String servletURLName, String servletName, Servlet servlet){
+		if(_tomcat != null){
+			_tomcat.addServlet(_context.getPath(), servletName, servlet);
+			_context.addServletMapping(servletURLName, servletName);
+		} else {
+			System.out.println("Tomcat instance is null");
 		}
 		
-		return response;
+		return this;
 	}
+	
+//	public InputStream runServletGETTest(String servletURLName){
+//		URL testURL = null;
+//		URLConnection conn = null;
+//		InputStream response = null;
+//		//InputStreamReader inputWr = null;
+//		//char[] buffer = new char[20];
+//		String urlString = "http://localhost:"+ _port + _context.getPath()+"/date?testValue=test";
+//		System.out.println("URL is: " +urlString);
+//		try{
+//			
+//			testURL = new URL(urlString); //create url
+//			conn = testURL.openConnection(); //open connection
+//			response = conn.getInputStream(); //
+//			
+//		} catch(MalformedURLException ex){
+//			System.out.println("MalformedURL: " +ex.getMessage());
+//		} catch (IOException ex){
+//			System.out.println("IOException: " +ex.getMessage());
+//		}
+//		
+//		return response;
+//	}
 }

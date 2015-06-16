@@ -18,44 +18,41 @@ import org.apache.commons.lang3.RandomUtils;
 
 import picodedTests.TestConfig;
 
-public class KeyValueMap_Sqlite_test {
+public class KeyValueMap_Sqlite_test extends JStackData_testBase_test {
+	
+	// KeyValueMap setup
+	//-----------------------------------------------
+	
+	protected String kvTableName = null;
+	
+	protected KeyValueMap kvObj = null;
+	
+	// The actual test obj setup, after JStack
+	@Override
+	public void testObjSetup() throws JStackException {
+		kvTableName = "K" + TestConfig.randomTablePrefix();
+		kvObj = new KeyValueMap(JStackObj, kvTableName);
+		kvObj.stackSetup();
+	}
+	
+	// The actual test obj teardown, before JStack
+	@Override
+	public void testObjTeardown() throws JStackException {
+		kvObj.stackTeardown();
+		kvObj = null;
+	}
 	
 	@Test
-	public void blank() {
-		assertTrue(true);
+	public void simpleHasPutHasGet() throws JStackException {
+		assertFalse( kvObj.containsKey("hello") );
+		kvObj.put("hello", "world");
+		assertTrue( kvObj.containsKey("hello") );
+		assertEquals( "world", kvObj.get("hello") );
+		
 	}
 	
 	/*
 	 
-	protected jSql jSqlObj;
-	protected keyValuePair kvpObj;
-	
-	@Before
-	public void setUp() throws jSqlException {
-		//create connection
-		jSqlObj = jSql.sqlite();
-		
-		//resets clean slate
-		jSqlObj.execute( "DROP TABLE IF EXISTS KeyValueTest" );
-		kvpObj = new keyValuePair(jSqlObj, "KeyValueTest");
-		kvpObj.tableSetup();
-	}
-	
-	@After
-	public void tearDown() {
-		if( jSqlObj != null ) {
-			jSqlObj.dispose();
-			jSqlObj = null;
-		}
-		kvpObj = null;
-	}
-	
-	@Test
-	public void constructorTest() {
-		assertNotNull("jSql constructed object must not be null", jSqlObj);
-		assertNotNull("keyValuePair constructed object must not be null", kvpObj);
-	}
-	
 	@Test
 	public void putkeyValue_againstKeyAndValue() throws jSqlException{
 		String kStr = "hello", kyStr = "hi";

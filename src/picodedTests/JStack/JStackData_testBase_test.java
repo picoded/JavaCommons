@@ -26,6 +26,7 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
+import org.redisson.*;
 
 /// This class acts as a test utility, for all the various JStackData type tests
 public class JStackData_testBase_test {
@@ -53,18 +54,18 @@ public class JStackData_testBase_test {
 	
 	/// Redis server related vars
 	static protected String redissonConfigString;
-	static protected Config redissonConfig;
+	static protected org.redisson.Config redissonConfig;
 	static protected int redisPort = 0;
 	
 	/// Setsup the redis testing server, repeated calls are "safe"
-	public static Config redisSetup() {
+	public static org.redisson.Config redisSetup() {
 		if(redissonConfig == null) {
 			// one-time initialization code
 			redisPort = LocalCacheSetup.setupRedisServer();
 			
 			// Config to use
 			redissonConfigString = "127.0.0.1:" + redisPort;
-			redissonConfig = new Config();
+			redissonConfig = new org.redisson.Config();
 			redissonConfig.useSingleServer().setAddress(redissonConfigString);
 		}
 		return redissonConfig;
@@ -104,20 +105,79 @@ public class JStackData_testBase_test {
 	// Main over-ride functions
 	//-----------------------------------------------
 	
+	// JCache object cache
+	JCache JCacheObj = null;
+	
 	// Over-ride and setup the JCache as needed
 	public JCache JCacheObj() {
 		return null;
 	}
+	
+	// JSql object cached
+	JSql JSqlObj = null;
 	
 	// Over-ride and setup the JSql as needed
 	public JSql JSqlObj() {
 		return JSql.sqlite();
 	}
 	
-	// 
+	// The actual test obj setup, after JStack
+	public void testObjSetup() throws JStackException {
+		
+	}
+	
+	// The actual test obj teardown, before JStack
+	public void testObjTeardown() throws JStackException {
+		
+	}
+	
+	@Before
+	public void setUp() throws JStackException {
+		JStackSetup();
+		testObjSetup();
+	}
+	
+	@After
+	public void tearDown() throws JStackException {
+		testObjTeardown();
+		JStackTearDown();
+	}
+	
+	// JStack setup
+	//-----------------------------------------------
+	
+	protected JStack JStackObj = null;
+	protected JStackLayer JStackLayerArray[] = null;
+	
+	protected JStack JStackSetup() {
+		JCacheObj = JCacheObj();
+		JSqlObj = JSqlObj();
+		
+		if( JCacheObj == null && JSqlObj == null ) {
+			throw new RuntimeException("Both JCache, and JSql cannot be blank");
+		}
+		
+		if( JCacheObj == null ) {
+			JStackLayerArray = new JStackLayer[] { JSqlObj };
+		} else if( JSqlObj == null ) {
+			JStackLayerArray = new JStackLayer[] { JCacheObj };
+		} else {
+			JStackLayerArray = new JStackLayer[] { JCacheObj, JSqlObj };
+		}
+		
+		JStackObj = new JStack(JStackLayerArray);
+		
+		return JStackObj;
+	}
+	
+	protected void JStackTearDown() {
+		JStackObj = null;
+	}
+	
+	// Basic JStack unit testing
 	@Test
-	public void blank() {
-		assertTrue(true);
+	public void stackCheck() {
+		assertNotNull(JStackSetup());
 	}
 	
 	

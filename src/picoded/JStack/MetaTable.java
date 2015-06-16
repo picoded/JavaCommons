@@ -28,9 +28,9 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
-/// @TODO: Convert to Map<String, Map<String, Object>>
+/// @TODO: Convert to Map<String, MetaObject>
 /// @TODO: Documentation =( of class
-public class MetaTable extends JStackData {
+public class MetaTable extends JStackData /* Map<String, MetaObject> */ {
 	
 	///
 	/// Constructor setup
@@ -77,7 +77,7 @@ public class MetaTable extends JStackData {
 	protected String tStampColumnType = "BIGINT";
 	
 	/// Primary key type
-	protected String pKeyColumnType = "INTEGER PRIMARY KEY AUTOINCREMENT";
+	protected String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
 	
 	/// Indexed view prefix, this is used to handle index conflicts between "versions" if needed
 	protected String viewSuffix = "";
@@ -188,6 +188,7 @@ public class MetaTable extends JStackData {
 											"cTm", //value created time
 											"uTm", //value updated time
 											"oTm", //object created time
+											"eTm", //value expire time (for future use)
 											// Object keys
 											"oID", //_oid
 											"kID", //key storage
@@ -202,7 +203,7 @@ public class MetaTable extends JStackData {
 										new String[] { //
 											pKeyColumnType, //Primary key
 											// Time stamps
-											tStampColumnType, tStampColumnType, tStampColumnType,
+											tStampColumnType, tStampColumnType, tStampColumnType, tStampColumnType,
 											// Object keys
 											objColumnType, //
 											keyColumnType, //

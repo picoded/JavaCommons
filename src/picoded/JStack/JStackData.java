@@ -69,48 +69,44 @@ public class JStackData {
 	protected interface JStackReader {
 		
 		/// Reads the JStackLayer object (which is everything)
-		public default boolean readJStackLayer(JStackLayer in) throws JStackException {
-			return true;
+		public default Object readJStackLayer(JStackLayer in, Object ret) throws JStackException {
+			return ret;
 		}
 		
 		/// Reads only the JSQL layer
-		public default boolean readJSqlLayer(JSql in) throws JSqlException, JStackException {
-			return true;
+		public default Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+			return ret;
 		}
 		
 		/// Reads only the JCacheLayer
-		public default boolean readJCacheLayer(JCache in) throws JCacheException, JStackException {
-			return true;
+		public default Object readJCacheLayer(JCache jc, Object ret) throws JCacheException, JStackException {
+			return ret;
 		}
 	}
 	
 	/// Iteration function, used to iterate the entire JStack while automatically handling converting exception to a JStackException
-	protected boolean JStackIterate(JStackReader readerClass) throws JStackException {
+	protected Object JStackIterate(JStackReader readerClass) throws JStackException {
 		try {
+			Object ret = null;
 			JStackLayer[] sl = JStackObj.stackLayers();
+			
 			for (int a = 0; a < sl.length; ++a) {
-				
-				if( readerClass.readJStackLayer(sl[a]) == false ) {
-					return false;
-				}
+				ret = readerClass.readJStackLayer(sl[a], ret);
 				
 				// JSql specific setup
 				if (sl[a] instanceof JSql) {
-					if( readerClass.readJSqlLayer((JSql)sl[a]) == false ) {
-						return false;
-					}
+					ret = readerClass.readJSqlLayer((JSql)sl[a], ret);
 				} else if (sl[a] instanceof JCache) {
-					if( readerClass.readJCacheLayer((JCache)sl[a]) == false ) {
-						return false;
-					}
+					ret = readerClass.readJCacheLayer((JCache)sl[a], ret);
 				}
 			}
+			
+			return ret;
 		} catch (JSqlException e) {
 			throw new JStackException(e);
 		} catch (JCacheException e) {
 			throw new JStackException(e);
 		}
-		return true;
 	}
 	
 	//
@@ -118,29 +114,29 @@ public class JStackData {
 	//--------------------------------------------------------------------------
 	
 	/// Performs the full stack setup for the data object
-	public JStackData stackSetup() throws JStackException {
+	public void stackSetup() throws JStackException {
 		JStackIterate(new JStackReader() {
-			public boolean readJSqlLayer(JSql in) throws JSqlException, JStackException {
+			public Object readJSqlLayer(JSql in, Object ret) throws JSqlException, JStackException {
 				return JSqlSetup(in);
 			}
-			public boolean readJCacheLayer(JCache in) throws JCacheException, JStackException {
+			public Object readJCacheLayer(JCache in, Object ret) throws JCacheException, JStackException {
 				return JCacheSetup(in);
 			}
 		} );
-		return this;
+		//return this;
 	}
 	
 	/// Performs the full stack teardown for the data object
-	public JStackData stackTeardown() throws JStackException {
+	public void stackTeardown() throws JStackException {
 		JStackIterate(new JStackReader() {
-			public boolean readJSqlLayer(JSql in) throws JSqlException, JStackException {
+			public Object readJSqlLayer(JSql in, Object ret) throws JSqlException, JStackException {
 				return JSqlTeardown(in);
 			}
-			public boolean readJCacheLayer(JCache in) throws JCacheException, JStackException {
+			public Object readJCacheLayer(JCache in, Object ret) throws JCacheException, JStackException {
 				return JCacheTeardown(in);
 			}
 		} );
-		return this;
+		//return this;
 	}
 	
 	//

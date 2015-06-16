@@ -88,7 +88,7 @@ public class JSql_Oracle extends JSql {
 			//, RAW
 			//.replaceAll("(?i)CHAR","CHAR")
 			//.replaceAll("(?i)DATE","DATE")
-			.replaceAll("(?i)DATETIME", "DATE").replaceAll("(?i)DECIMAL", "FLOAT(24)").replaceAll("(?i)DOUBLE",
+			.replaceAll("(?i)DATETIME", "DATE").replaceAll("(?i)DECIMAL\\(.*?\\)", "FLOAT(24)").replaceAll("(?i)DOUBLE",
 				"FLOAT(24)").replaceAll("(?i)DOUBLE PRECISION", "FLOAT(24)")
 			//.replaceAll("(?i)FLOAT","FLOAT")
 			.replaceAll("(?i)INTEGER", "INT")
@@ -118,7 +118,9 @@ public class JSql_Oracle extends JSql {
 
 			.replaceAll("(?i)VARCHAR(?!\\()", "VARCHAR2(4000)") //, CLOB
 			.replaceAll("(?i)VARCHAR\\(", "VARCHAR2(") //, CLOB
-			.replaceAll("(?i)YEAR", "NUMBER");
+			.replaceAll("(?i)YEAR", "NUMBER").replaceAll("AUTOINCREMENT","")
+			.replaceAll("MAX","4000");
+		
 	}
 	
 	/// Fixes the table name, and removes any trailing ";" if needed
@@ -163,6 +165,7 @@ public class JSql_Oracle extends JSql {
 		
 		final String create = "CREATE";
 		final String drop = "DROP";
+		final String view ="VIEW";
 		final String table = "TABLE";
 		final String select = "SELECT";
 		final String update = "UPDATE";
@@ -182,27 +185,35 @@ public class JSql_Oracle extends JSql {
 		int prefixOffset = 0;
 		if (upperCaseStr.startsWith(drop)) { //DROP
 			prefixOffset = drop.length() + 1;
-			
 			if (upperCaseStr.startsWith(table, prefixOffset)) { //TABLE
 				prefixOffset += table.length() + 1;
-				
 				if (upperCaseStr.startsWith(ifExists, prefixOffset)) { //IF EXISTS
 					prefixOffset += ifExists.length() + 1;
 					qStringPrefix = "BEGIN EXECUTE IMMEDIATE 'DROP TABLE ";
 					qStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;";
-				} else {
+				} 
+				else {
 					qStringPrefix = "DROP TABLE ";
-				}
+				} 
 				qString = _fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
-			} else if (upperCaseStr.startsWith(index, prefixOffset)) { //INDEX
-			
+			} else if (upperCaseStr.startsWith(view, prefixOffset)) { //VIEW
+				prefixOffset += view.length() + 1;
+				if (upperCaseStr.startsWith(ifExists, prefixOffset)) { //IF EXISTS
+					prefixOffset += ifExists.length() + 1;
+					qStringPrefix = "BEGIN EXECUTE IMMEDIATE 'DROP VIEW ";
+					qStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;";
+				} 
+				else {
+					qStringPrefix = "DROP VIEW ";
+				} 
+				qString = _fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 			}
+			
 		} else if (upperCaseStr.startsWith(create)) { //CREATE
 			prefixOffset = create.length() + 1;
 			
 			if (upperCaseStr.startsWith(table, prefixOffset)) { //TABLE
 				prefixOffset += table.length() + 1;
-				
 				if (upperCaseStr.startsWith(ifNotExists, prefixOffset)) { //IF NOT EXISTS
 					prefixOffset += ifNotExists.length() + 1;
 					qStringPrefix = "BEGIN EXECUTE IMMEDIATE 'CREATE TABLE ";
@@ -212,6 +223,27 @@ public class JSql_Oracle extends JSql {
 				}
 				qString = _fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 				qString = _simpleMysqlToOracle_collumnSubstitude(qString);
+			} else if (upperCaseStr.startsWith(view, prefixOffset)) { //VIEW
+				prefixOffset += view.length() + 1;
+				if (upperCaseStr.startsWith(ifNotExists, prefixOffset)) { //IF NOT EXISTS
+					prefixOffset += ifNotExists.length() + 1;
+					qStringPrefix = "BEGIN EXECUTE IMMEDIATE 'CREATE VIEW ";
+					qStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;";
+				} else {
+					qStringPrefix = "CREATE VIEW ";
+				}
+				qString = _fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
+				qString = _simpleMysqlToOracle_collumnSubstitude(qString);
+
+				int fromKeywordIndex = qString.indexOf("FROM") + "FROM".length();
+				String qStringBeforeFromKeyword = qString.substring(0, fromKeywordIndex);
+				// remove 'AS' keywords after table name
+				String qStringAfterFromKeyword =  qString.substring(fromKeywordIndex, qString.length()).replaceAll("AS","");
+				// replace double quotes (") with sinfle quotes
+				qStringAfterFromKeyword = qStringAfterFromKeyword.replace("\"", "'");
+				
+				qString = qStringBeforeFromKeyword + qStringAfterFromKeyword;
+
 			} else {
 				logger.finer("Trying to matched INDEX : " + upperCaseStr.substring(prefixOffset));
 				if (createIndexType.matcher(upperCaseStr.substring(prefixOffset)).matches()) { //UNIQUE|FULLTEXT|SPATIAL|_ INDEX
@@ -358,12 +390,13 @@ public class JSql_Oracle extends JSql {
 		
 		qString = qStringPrefix + qString + qStringSuffix;
 		
-		//logger.finer("Converting MySQL query to oracleSQL query");
-		//logger.finer("MySql -> "+inString);
-		//logger.finer("OracleSql -> "+qString);
-		
-		//logger.warning("MySql -> "+inString);
-		//logger.warning("OracleSql -> "+qString);
+      //logger.finer("Converting MySQL query to oracleSQL query");
+      //logger.finer("MySql -> "+inString);
+      //logger.finer("OracleSql -> "+qString);
+      
+      //logger.warning("MySql -> "+inString);
+      //logger.warning("OracleSql -> "+qString);
+
 		return qString; //no change of data
 	}
 	

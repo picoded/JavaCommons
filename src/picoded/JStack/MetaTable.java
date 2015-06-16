@@ -174,7 +174,6 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	@Override
 	protected boolean JSqlSetup(JSql sql) throws JSqlException, JStackException {
 		String tName = sqlTableName(sql);
-		
 		// Table constructor
 		//-------------------
 		sql.createTableQuerySet( //
@@ -357,7 +356,8 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 		sb.append(from);
 		
 		//System.out.println( sb.toString() );
-		sql.execute_raw(sb.toString());
+		//sql.execute_raw(sb.toString());
+		sql.execute(sb.toString());
 	}
 	
 	/// Setsup the index view configuration table,

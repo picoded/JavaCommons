@@ -10,7 +10,7 @@ import java.util.Collection;
 ///
 /// Simple interface pattern, that implements the default map functions, which throws an UnsupportedOperationException
 ///
-/// @TODO Implment several default functions such as entrySet, using keySet(), etc. Including the test case
+/// @TODO Implment several default functions such as putAll using put / entrySet, using keySet, etc. Including the test case
 ///
 /// ### Example Usage
 ///

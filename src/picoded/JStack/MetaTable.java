@@ -16,7 +16,7 @@ import picoded.conv.GUID;
 import picoded.JSql.*;
 import picoded.JCache.*;
 import picoded.struct.CaseInsensitiveHashMap;
-
+import picoded.struct.UnsupportedDefaultMap;
 
 /// hazelcast
 import com.hazelcast.core.*;
@@ -30,7 +30,7 @@ import com.hazelcast.core.IMap;
 
 /// @TODO: Convert to Map<String, MetaObject>
 /// @TODO: Documentation =( of class
-public class MetaTable extends JStackData /* Map<String, MetaObject> */ {
+public class MetaTable extends JStackData implements UnsupportedDefaultMap<String, MetaObject> {
 	
 	///
 	/// Constructor setup

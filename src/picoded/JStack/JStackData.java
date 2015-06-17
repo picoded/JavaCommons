@@ -109,6 +109,31 @@ public class JStackData {
 		}
 	}
 	
+	/// Same as JStackIterate, but reversed
+	protected Object JStackReverseIterate(JStackReader readerClass) throws JStackException {
+		try {
+			Object ret = null;
+			JStackLayer[] sl = JStackObj.stackLayers();
+			
+			for (int a = sl.length - 1; a >= 0; --a) {
+				ret = readerClass.readJStackLayer(sl[a], ret);
+				
+				// JSql specific setup
+				if (sl[a] instanceof JSql) {
+					ret = readerClass.readJSqlLayer((JSql)sl[a], ret);
+				} else if (sl[a] instanceof JCache) {
+					ret = readerClass.readJCacheLayer((JCache)sl[a], ret);
+				}
+			}
+			
+			return ret;
+		} catch (JSqlException e) {
+			throw new JStackException(e);
+		} catch (JCacheException e) {
+			throw new JStackException(e);
+		}
+	}
+	
 	//
 	// JStack common setup functions
 	//--------------------------------------------------------------------------

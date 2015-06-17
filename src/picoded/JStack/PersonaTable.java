@@ -126,6 +126,24 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 		personaChildMeta.stackTeardown();
 	}
 
-	
+	//
+	// Gets the user using the user ID
+	//--------------------------------------------------------------------------
+
+	/// Persona user exists
+	public boolean containsKey(Object oid) {
+		return personaMeta.containsKey(oid);
+	}
+
+	/// Generates a new persona object
+	public PersonaObject newObject() {
+		try {
+			PersonaObject ret = new PersonaObject(this, null);
+			ret.saveAll();
+			return ret;
+		} catch( JStackException e ) {
+			throw new RuntimeException(e);
+		}
+	}
 
 }

@@ -54,19 +54,33 @@ public class PersonaTable_Sqlite_test extends JStackData_testBase_test {
 	//-----------------------------------------------
 
 	@Test
-	public void basicHasAddHasGet() throws JStackException {
+	public void basicHasAddHasGet_viaID() throws JStackException {
 		String guid;
 		PersonaObject p;
 		
-		assertFalse( ptObj.containsKey("hello") );
-		assertNull( ptObj.get("hello") );
+		assertFalse( ptObj.containsID("hello") );
+		assertNull( ptObj.getFromID("hello") );
 		
 		assertNotNull( p = ptObj.newObject() );
 		assertNotNull( guid = p._oid() );
 
-		assertTrue( ptObj.containsKey(guid) );
-		assertNotNull( p = ptObj.get(guid) );
-
+		assertTrue( ptObj.containsID(guid) );
+		assertNotNull( p = ptObj.getFromID(guid) );
 	}
+	
+	@Test
+	public void basicHasAddHasGet_viaName() throws JStackException {
+		String guid;
+		PersonaObject p;
+		String name = "hello";
+		
+		assertFalse( ptObj.containsKey(name) );
+		assertNull( ptObj.get(name) );
+		
+		assertNotNull( p = ptObj.newObject(name) );
+		assertNotNull( guid = p._oid() );
 
+		assertTrue( ptObj.containsKey(name) );
+		assertNotNull( p = ptObj.get(name) );
+	}
 }

@@ -250,7 +250,7 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 				}
 			} );
 
-			return ret.toString();
+			return (ret != null)? ret.toString() : null;
 		} catch (JStackException e) {
 			throw new RuntimeException(e);
 		}

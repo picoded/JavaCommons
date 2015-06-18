@@ -67,6 +67,7 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 	/// Internal constructor that setsup the underlying MetaTable / KeyValuePair
 	public void internalConstructor(JStack inStack) {
 		personaID = new KeyValueMap(inStack, tableName+PERSONA_ID);
+		personaHash = new KeyValueMap(inStack, tableName+PERSONA_HASH);
 		personaSessions = new KeyValueMap(inStack, tableName+PERSONA_SESSIONS);
 		personaMeta = new MetaTable(inStack, tableName+PERSONA_META);
 		personaChild = new MetaTable(inStack, tableName+PERSONA_CHILD);
@@ -76,9 +77,12 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 	///
 	/// Table suffixes for the variosu sub tables
 	///--------------------------------------------------------------------------
-
+	
 	/// The persona self ID's
 	protected static String PERSONA_ID = "_ID";
+
+	/// The persona self ID's
+	protected static String PERSONA_HASH = "_IH";
 
 	/// The login sessions used for authentication
 	protected static String PERSONA_SESSIONS = "_LS";
@@ -98,7 +102,10 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 
 	/// @TODO better docs
 	protected KeyValueMap personaID = null;
-
+	
+	/// @TODO better docs
+	protected KeyValueMap personaHash = null;
+	
 	/// @TODO better docs
 	protected KeyValueMap personaSessions = null;
 
@@ -118,6 +125,7 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 	/// Performs the full stack setup for the data object
 	public void stackSetup() throws JStackException {
 		personaID.stackSetup();
+		personaHash.stackSetup();
 		personaSessions.stackSetup();
 		personaMeta.stackSetup();
 		personaChild.stackSetup();
@@ -127,6 +135,7 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 	/// Performs the full stack teardown for the data object
 	public void stackTeardown() throws JStackException {
 		personaID.stackTeardown();
+		personaHash.stackTeardown();
 		personaSessions.stackTeardown();
 		personaMeta.stackTeardown();
 		personaChild.stackTeardown();
@@ -134,34 +143,44 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 	}
 
 	//
-	// Map compliant implementation
+	// Map compliant implementation, note most of them are aliases of their name varients
 	//--------------------------------------------------------------------------
 	
-	/// Persona user exists
-	public boolean containsKey(Object oid) {
-		return personaMeta.containsKey(oid);
+	/// Persona exists, this is an alias of containsName
+	public boolean containsKey(Object name) {
+		return containsName(name.toString());
 	}
 
-	/// Gets the user using the user object ID
-	///
-	/// Note: get("new") is syntax sugar for newObject();
-	public PersonaObject get(Object oid) {
+	/// Gets the user using the nice name, this is an alias of getFromName
+	public PersonaObject get(Object name) {
+		return getFromName(name);
+	}
+	
+	//
+	// Additional functionality add on
+	//--------------------------------------------------------------------------
+	
+	/// Gets the persona using the object ID
+	public PersonaObject getFromID(Object oid) {
 		String _oid = oid.toString();
 		
-		if( _oid.toLowerCase().equals("new") ) {
-			return newObject();
-		}
-		
-		if( containsKey(_oid) ) {
+		if( containsID(_oid) ) {
 			return new PersonaObject(this, _oid);
 		}
 		
 		return null; 
 	}
 	
-	//
-	// Additional functionality add on
-	//--------------------------------------------------------------------------
+	/// Gets the persona using the nice name
+	public PersonaObject getFromName(Object name) {
+		String _oid = nameToID(name.toString());
+		
+		if( _oid != null ) {
+			return getFromID(_oid);
+		}
+		
+		return null; 
+	}
 	
 	/// Generates a new persona object
 	public PersonaObject newObject() {
@@ -174,12 +193,46 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 		}
 	}
 	
+	/// Generates a new persona object with the given nice name
+	public PersonaObject newObject(String name) {
+		if(containsName(name)) {
+			return null;
+		}
+		
+		PersonaObject ret = newObject();
+		
+		if( ret.setName(name) ) {
+			return ret;
+		} else {
+			removeFromID( ret._oid() );
+		}
+		
+		return null;
+	}
+	
 	/// Gets the persona UUID, using the configured name
 	public String nameToID(String name) {
 		return personaID.get(name);
 	}
 	
+	/// Returns if the name exists
 	public boolean containsName(String name) {
 		return personaID.containsKey(name);
 	}
+	
+	/// Returns if the persona object id exists
+	public boolean containsID(Object oid) {
+		return personaMeta.containsKey(oid);
+	}
+	
+	/// Removes the personaObject using the name
+	public void removeFromName(String name) {
+		//@TODO implmentation
+	}
+	
+	/// Removes the personaObject using the ID
+	public void removeFromID(String oid) {
+		//@TODO implmentation
+	}
+
 }

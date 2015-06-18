@@ -222,13 +222,17 @@ public class ServletLogging {
 				query.append(", s"+(i<10?"0":"")+i+" VARCHAR(22)");
 			}
 			// long not indexed
-			for (int i=(longIndexed+1); i<=(longIndexed+1+longNotIndexed);i++) {
-				query.append(", l"+(i<10?"0":"")+i+" LONG");
-			}
+			//for (int i=(longIndexed+1); i<=(longIndexed+1+longNotIndexed);i++) {
+			//	query.append(", l"+(i<10?"0":"")+i+" LONG");
+			//}
+			query.append(", l"+(longIndexed+1)+" LONG");
+			
 			// string not indexed
-			for (int i=(stringIndexed+1); i<=(stringIndexed+1+stringNotIndexed);i++) {
-				query.append(", s"+(i<10?"0":"")+i+" VARCHAR(22)");
-			}
+			//for (int i=(stringIndexed+1); i<=(stringIndexed+1+stringNotIndexed);i++) {
+			//	query.append(", s"+(i<10?"0":"")+i+" VARCHAR(22)");
+			//}
+			query.append(", s"+(stringIndexed+1)+" VARCHAR(MAX)");
+			
 
 		jSqlObj.execute(query.toString());
 

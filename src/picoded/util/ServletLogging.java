@@ -165,78 +165,81 @@ public class ServletLogging {
 	private void tableSetup(JSql jSqlObj) throws JSqlException {
 		// / config table
 		if (jSqlObj.sqlType == JSqlType.sqlite) {
-			jSqlObj.execute("CREATE TABLE IF NOT EXISTS `config` ( " + "key VARCHAR(" + objColumnLength
-				+ "), sVal TEXT, PRIMARY KEY (key) );");
+			jSqlObj.execute("CREATE TABLE IF NOT EXISTS `config` (key VARCHAR("+objColumnLength+"), sVal TEXT, PRIMARY KEY (key) );");
 		}
 		
 		// / logFormat table
-		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `logFormat` ( " + "hash VARCHAR(" + objColumnLength + "), "
-			+ "format VARCHAR(" + keyColumnLength + "), " + " PRIMARY KEY (hash) );");
+		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `logFormat` ( "
+			+ "hash VARCHAR("+objColumnLength+"), "
+			+ "format VARCHAR("+keyColumnLength+"), "
+			+ " PRIMARY KEY (hash) );");
 		
 		// / logStrHashes table
-		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `logStrHashes` ( " + "hash VARCHAR(" + objColumnLength
-			+ "), sVal TEXT, PRIMARY KEY (hash) );");
+		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `logStrHashes` ( "
+			+ "hash VARCHAR("+objColumnLength+"), sVal TEXT, PRIMARY KEY (hash) );");
 		
 		// / logTable table
-		String columns = "systemHash VARCHAR(" + objColumnLength + "), "
-			+ "reqsID VARCHAR(" + objColumnLength + "), " 
-			+ "creTime BIGINT, " 
-			+ "fmtHash VARCHAR(" + objColumnLength + "), " 
-			+ "logType VARCHAR(" + valColumnLength + "), " 
-			+ "expHash VARCHAR(" + objColumnLength + "), "
-			+ "offSync BIT, " 
-			+ "reqID VARCHAR(" + objColumnLength + "), ";
+		StringBuilder query = new StringBuilder("CREATE TABLE IF NOT EXISTS `logTable` ("
+		   + "systemHash VARCHAR("+objColumnLength+")"
+			+ ", reqsID VARCHAR("+objColumnLength+")"
+			+ ", creTime BIGINT"
+			+ ", fmtHash VARCHAR("+objColumnLength+")"
+			+ ", logType VARCHAR("+valColumnLength+")"
+			+ ", expHash VARCHAR("+objColumnLength+")"
+			+ ", offSync BIT"
+			+ ", reqID VARCHAR("+objColumnLength+")");
 			
 			// long indexed
 			for (int i=1; i<=longIndexed;i++) {
-				columns += "l"+(i<10?"0"+i:i)+" LONG, ";
+				query.append(", l"+(i<10?"0":"")+i+" LONG");
 			}
 			// string indexed
-			for (int i=1; i<=longIndexed;i++) {
-				columns += "s"+(i<10?"0"+i:i)+" VARCHAR(22), ";
+			for (int i=1; i<=stringIndexed;i++) {
+				query.append(", s"+(i<10?"0":"")+i+" VARCHAR(22)");
 			}
 			// long not indexed
-			//for (int i=1; i<=longNotIndexed;i++) {
-			//	columns += "l"+(i<10?"0"+i:i)+"-YY LONG, ";
-			//}
+			for (int i=(longIndexed+1); i<=(longIndexed+1+longNotIndexed);i++) {
+				query.append(", l"+(i<10?"0":"")+i+" LONG");
+			}
 			// string not indexed
-			//for (int i=1; i<=longNotIndexed;i++) {
-			//	columns += "s"+(i<10?"0"+i:i)+"-YY VARCHAR(22), ";
-			//}
-			columns += "PRIMARY KEY (expHash)";
+			for (int i=(stringIndexed+1); i<=(stringIndexed+1+stringNotIndexed);i++) {
+				query.append(", s"+(i<10?"0":"")+i+" VARCHAR(22)");
+			}
+			query.append(", PRIMARY KEY (expHash) )");
 
-		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `logTable` (" +  columns + ")");
+		jSqlObj.execute(query.toString());
 
 		// / excStrHash table
 		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `excStrHash`(hash VARCHAR("+objColumnLength+"), sVal TEXT, PRIMARY KEY (hash));");
 		
 		// / exception table
-		columns = "expHash VARCHAR(" + objColumnLength + "), "
-			+ "reqsID VARCHAR(" + objColumnLength + "), " 
-			+ "creTime BIGINT, " 
-			+ "systemHash VARCHAR(60), " 
-			+ "excRoot VARCHAR(" + valColumnLength + "), " 
-			+ "excTrace VARCHAR(" + valColumnLength + "), "
-			+ "excMid VARCHAR(" + valColumnLength + ")," 
-			+ "stkRoot VARCHAR(" + valColumnLength + "), " 
-			+ "stkTrace VARCHAR(" + valColumnLength + "), "
-			+ "stkMid VARCHAR(" + valColumnLength + "),";
+		query = new StringBuilder("CREATE TABLE IF NOT EXISTS `exception` ( "
+		   + "expHash VARCHAR(" + objColumnLength + ")"
+			+ ", reqsID VARCHAR(" + objColumnLength + ")"
+			+ ", creTime BIGINT"
+			+ ", systemHash VARCHAR(60)"
+			+ ", excRoot VARCHAR(" + valColumnLength + ")" 
+			+ ", excTrace VARCHAR(" + valColumnLength + ")"
+			+ ", excMid VARCHAR(" + valColumnLength + ")" 
+			+ ", stkRoot VARCHAR(" + valColumnLength + ")" 
+			+ ", stkTrace VARCHAR(" + valColumnLength + ")"
+			+ ", stkMid VARCHAR(" + valColumnLength + ")");
 			
 			// Exception Root Trace Indexed
 			for (int i=1; i<=exceptionRootTraceIndexed;i++) {
-				columns += "excR"+(i<10?"0"+i:i)+" VARCHAR(22), " 
-				+ "stkR"+(i<10?"0"+i:i)+" VARCHAR(22), ";
+				query.append(", excR"+(i<10?"0":"")+i+" VARCHAR(22)"); 
+				query.append(", stkR"+(i<10?"0":"")+i+" VARCHAR(22)");
 			}
 			
 			// Exception Thrown Trace Indexed
 			for (int i=1; i<=exceptionThrownTraceIndexed;i++) {
-				columns += "excT"+(i<10?"0"+i:i)+" VARCHAR(22), " 
-				+ "stkT"+(i<10?"0"+i:i)+" VARCHAR(22), ";
+				query.append(", excT"+(i<10?"0":"")+i+" VARCHAR(22)");
+				query.append(", stkT"+(i<10?"0":"")+i+" VARCHAR(22)");
 			}
 			// PRIMARY KEY
-			columns += "PRIMARY KEY (expHash)";
+			query.append(", PRIMARY KEY (expHash) )");
 			
-		jSqlObj.execute("CREATE TABLE IF NOT EXISTS `exception` ( " + columns + ");");
+		jSqlObj.execute(query.toString());
       
 	}
 	
@@ -284,15 +287,18 @@ public class ServletLogging {
 	// / Returns the current request ID
 	public String requestID() throws JSqlException {
 		String requestId = null;
-		JSqlResult r = jSqlObj.executeQuery("SELECT reqID FROM `logTable` WHERE systemHash = " + systemHash());
+		JSqlResult r = jSqlObj.executeQuery("SELECT reqID FROM `logTable` WHERE systemHash=?", systemHash());
 		if (r.fetchAllRows() > 0) {
 			requestId = (String) r.readRowCol(0, "reqID");
+		}
+		if (requestId == null || requestId.trim().length() == 0) {
+			return reissueRequestID();
 		}
 		return requestId;
 	}
 	
 	// / Reissue a new requestID, used at start of servlet call
-	public String reissueRequestID() throws Exception {
+	public String reissueRequestID() {
 		return GUID.base58();
 	}
 	
@@ -313,10 +319,34 @@ public class ServletLogging {
       String fmtHash = GUID.base58();
 		addFormat(fmtHash, format);
       
+		StringBuilder columns = new StringBuilder("systemHash, reqsID, creTime, fmtHash, logType, expHash, offSync, reqID");
+		StringBuilder columnsIndexed = new StringBuilder("?, ?, ?, ?, ?, ?, ?, ?, ?");
+		// long indexed
+		for (int i=1; i<=longIndexed;i++) {
+			columns.append(", l"+(i<10?"0":"")+i);
+			columnsIndexed.append(", ?");
+		}
+		// string indexed
+		for (int i=1; i<=stringIndexed;i++) {
+			columns.append(", s"+(i<10?"0":"")+i);
+			columnsIndexed.append(", ?");
+		}
+		// long not indexed
+		for (int i=(longIndexed+1); i<=(longIndexed+1+longNotIndexed);i++) {
+			columns.append(", l"+(i<10?"0":"")+i);
+			columnsIndexed.append(", ?");
+		}
+		// string not indexed
+		for (int i=(stringIndexed+1); i<=(stringIndexed+1+stringNotIndexed);i++) {
+			columns.append(", s"+(i<10?"0":"")+i);
+			columnsIndexed.append(", ?");
+		}
+		
+		String query = "INSERT INTO `logTable` ("+columns.toString()+") VALUES ("+columnsIndexed.toString()+")";
+
 		//insert args to `logTable`
-		jSqlObj.execute("INSERT INTO `logTable` "
-			+ "(systemHash, reqsID, creTime, fmtHash, logType, expHash, offSync, reqID, l01-XX, s01-XX, lXX-YY, sXX-YY) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", systemHash(), requestID(), createTime(), fmtHash, args);
+		jSqlObj.execute(query, systemHash(), requestID(), createTime(), fmtHash, args);
+			
 	}
 	
 	/// Performs a logging with a formant name, argument, and attached exception

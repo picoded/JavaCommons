@@ -139,7 +139,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 
 		return this;
 	}
-
+	
 	public MetaTable setMapping(Map<String, Object> nameToTypeMap) throws JStackException {
 		for(Map.Entry<String, Object> set : nameToTypeMap.entrySet()) {
 			putType(set.getKey(), set.getValue());
@@ -467,7 +467,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 			}
 		} else if (baseType == MetaType.TYPE_STRING) { // String
 			return (String) (r.get("tVl").get(pos));
-		} else if (baseType == 52) { // Text
+		} else if (baseType == MetaType.TYPE_TEXT) { // Text
 			return (String) (r.get("tVl").get(pos));
 		} else {
 
@@ -767,9 +767,16 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	}
 
 	/// GET, returns the stored map, note that oID is reserved for the objectID
+	///
+	/// Note: get("new") is syntax sugar for newObject();
 	public MetaObject get(Object oid) {
 		try {
 			String _oid = oid.toString();
+			
+			if( _oid.toLowerCase().equals("new") ) {
+				return newObject();
+			}
+			
 			Map<String, Object> ret = lazyLoadGet(_oid);
 			return (ret == null) ? null : new MetaObject(this, _oid, ret);
 		} catch(JStackException e) {
@@ -787,7 +794,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	public MetaObject newObject() {
 		try {
 			MetaObject ret = new MetaObject(this, null, new CaseInsensitiveHashMap<String, Object>());
-			ret.saveAll();
+			ret.saveAll(); //ensures the blank object is now in DB
 			return ret;
 		} catch(JStackException e) {
 			throw new RuntimeException(e);

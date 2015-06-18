@@ -31,9 +31,11 @@ public class MetaType {
 	
 	/// 0      - Disabled
 	public static int TYPE_DISABLED = 0;
-	/// 1      - Mixed
+	/// 1      - Disabled
+	public static int TYPE_NULL = 1;
+	/// 2      - Mixed
 	public static int TYPE_MIXED = 1;
-	/// 2      - [Mixed]
+	/// 3      - [Mixed]
 	public static int TYPE_MIXED_ARRAY = 2;
 	
 	/// 11     - UUID

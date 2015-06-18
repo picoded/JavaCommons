@@ -59,4 +59,21 @@ public class KeyValueMap_Sqlite_test extends JStackData_testBase_test {
 		assertEquals( "hello", kvObj.get(nonce) );
 	}
 	
+	@Test
+	public void getKeysTest() throws JStackException {
+		assertArrayEquals( new String[] { }, kvObj.getKeys("world") );
+		
+		kvObj.put("yes", "no");
+		kvObj.put("hello", "world");
+		kvObj.put("this", "world");
+		kvObj.put("is", "sparta");
+		
+		assertEquals("no", kvObj.get("yes"));
+		assertEquals("world", kvObj.get("hello"));
+		assertEquals("world", kvObj.get("this"));
+		assertEquals("is", kvObj.get("sparta"));
+		
+		assertArrayEquals( new String[] { "hello", "this" }, kvObj.getKeys("world") );
+	}
+	
 }

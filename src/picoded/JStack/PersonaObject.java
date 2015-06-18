@@ -31,14 +31,23 @@ import com.hazelcast.core.IMap;
 public class PersonaObject extends MetaObject {
 	
 	/// Java serialversion uid: http://stackoverflow.com/questions/285793/what-is-a-serialversionuid-and-why-should-i-use-it
-	private static final long serialVersionUID = 42L;
+	private static final long serialVersionUID = 1L;
 	
 	protected PersonaTable mainTable = null;
-	protected String personaGUID = null;
 	
 	/// Protected constructor as this class is NOT meant to be constructed directly
 	protected PersonaObject(PersonaTable pTable, String inOID) {
 		super(pTable.personaMeta, inOID);
 	}
 	
+	/// Gets and return the various "nice-name" (not UUID) for this persona
+	protected String[] getNames() {
+		return mainTable.personaID.getKeys( _oid );
+	}
+	
+	/// Sets the name for the persona, returns true or false if it succed.
+	protected boolean setName(String name) {
+		
+		return false;
+	}
 }

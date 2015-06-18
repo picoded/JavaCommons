@@ -12,6 +12,7 @@ import java.util.Collection;
 
 /// Picoded imports
 import picoded.conv.GUID;
+import picoded.conv.GenericConvert;
 import picoded.JSql.*;
 import picoded.JCache.*;
 import picoded.struct.CaseInsensitiveHashMap;
@@ -80,7 +81,7 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 		sql.createTableQuerySet( //
 										tName, //
 										new String[] { //
-											// Primary key, as classic int, htis is used to lower SQL
+											// Primary key, as classic int, this is used to lower SQL
 											// fragmentation level, and index memory usage. And is not accessible.
 											// Sharding and uniqueness of system is still maintained by meta keys
 											"pKy", //
@@ -153,7 +154,6 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 		return ret;
 	}
 
-
 	///
 	/// Standard map operations
 	///--------------------------------------------------------------------------
@@ -185,19 +185,13 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 					// Search for the key
 					JSqlResult r = sql.selectQuerySet( //
 															 tName, //
-															 "eTm", //
-															 "kID LIKE ?", //
-															 new Object[] { kID } //
+															 "kID", //
+															 "(eTm == 0 OR eTm > ?) AND kID LIKE ?", //
+															 new Object[] { now, kID } //
 															 ).query();
 					// Has value
-					if( r.rowCount() > 0 && r.containsKey("eTm") ) {
-						Number t = (Number)(r.get("eTm").get(0));
-						long l = t.longValue();
-
-						// not expired yet?: its valid
-						if( l == 0 || l <= now ) {
-							return kID;
-						}
+					if( r.rowCount() > 0 && r.containsKey("kID") ) {
+						return r.get("kID").get(0);
 					}
 
 					return ret;
@@ -220,6 +214,106 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	/// @returns null
 	public String put(String key, String value) {
 		return putWithExpiry(key, value, 0);
+	}
+
+	/// Returns the value, given the key
+	/// @param key param find the thae meta key
+	///
+	/// returns  value of the given key
+	public String get(Object key) {
+		try {
+			long now = currentSystemTime_seconds();
+			String kID = key.toString();
+
+			Object ret = JStackIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					if( ret != null ) {
+						return ret;
+					}
+
+					String tName = sqlTableName(sql);
+
+					// Search for the key
+					JSqlResult r = sql.selectQuerySet( //
+																 tName, //
+																 "kVl", //
+																 "(eTm == 0 OR eTm > ?) AND kID LIKE ?", //
+																 new Object[] { now, kID } //
+																 ).query();
+					// Has value
+					if( r.rowCount() > 0 && r.containsKey("kVl") ) {
+						return r.get("kVl").get(0);
+					}
+
+					return ret;
+				}
+			} );
+
+			return ret.toString();
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		}
+		//return null;
+	}
+
+	/// Clears all the storage layer, without removing the
+	public void clear() {
+		try {
+			Object ret = JStackReverseIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					String tName = sqlTableName(sql);
+
+					sql.execute("DELETE * FROM `" + tName + "`");
+					return null;
+				}
+			} );
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	///
+	/// Extended operations
+	///--------------------------------------------------------------------------
+
+	/// Search using the value, all the relevent key mappings
+	public String[] getKeys(String value) {
+		try {
+			long now = currentSystemTime_seconds();
+
+			String val = (value == null)? null : value.toString();
+			Object r = JStackIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					if( ret != null ) {
+						return ret;
+					}
+
+					String tName = sqlTableName(sql);
+
+					// Search for the key
+					JSqlResult r = sql.selectQuerySet( //
+															 tName, //
+															 "kID", //
+															 "(eTm == 0 OR eTm > ?) AND kVl LIKE ?", //
+															 new Object[] { now, val } //
+															 ).query();
+					// Has value
+					if( r.rowCount() > 0 && r.containsKey("kID") ) {
+						return GenericConvert.toStringArray( r.get("kID") );
+					}
+
+					return ret;
+				}
+			} );
+
+			return ((r != null)? (String[])r : new String[0]);
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		}
+		
 	}
 
 	/// Stores (and overwrites if needed) key, value pair
@@ -270,54 +364,6 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 		}
 
 		return null;
-	}
-
-
-	/// Returns the value, given the key
-	/// @param key param find the thae meta key
-	///
-	/// returns  value of the given key
-	public String get(Object key) {
-		try {
-			long now = currentSystemTime_seconds();
-			String kID = key.toString();
-
-			Object ret = JStackIterate( new JStackReader() {
-				/// Reads only the JSQL layer
-				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
-					if( ret != null ) {
-						return ret;
-					}
-
-					String tName = sqlTableName(sql);
-
-					// Search for the key
-					JSqlResult r = sql.selectQuerySet( //
-																 tName, //
-																 "*", //
-																 "kID LIKE ?", //
-																 new Object[] { kID } //
-																 ).query();
-					// Has value
-					if( r.rowCount() > 0 && r.containsKey("eTm") ) {
-						Number t = (Number)(r.get("eTm").get(0));
-						long l = t.longValue();
-
-						// not expired yet?: its valid
-						if( l == 0 || l > now ) {
-							return r.get("kVl").get(0);
-						}
-					}
-
-					return ret;
-				}
-			} );
-
-			return ret.toString();
-		} catch (JStackException e) {
-			throw new RuntimeException(e);
-		}
-		//return null;
 	}
 
 	/// @TODO get expirary time (unix time)
@@ -380,23 +426,6 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 		return null;
 	}
 
-	/// Clears all the storage layer, without removing the
-	public void clear() {
-		try {
-			Object ret = JStackReverseIterate( new JStackReader() {
-				/// Reads only the JSQL layer
-				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
-					String tName = sqlTableName(sql);
-
-					sql.execute("DELETE * FROM `" + tName + "`");
-					return null;
-				}
-			} );
-		} catch (JStackException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	// Nonce support is now backed into KeyValueMap
 	//-------------------------------------------------------------------------
 
@@ -444,8 +473,8 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 		putWithLifespan( res, val, lifespan );
 		return res;
 	}
-
-
+	
+	
 	//*/
 
 }

@@ -13,6 +13,7 @@ import java.util.Collection;
 
 /// Picoded imports
 import picoded.conv.GUID;
+import picoded.conv.GenericConvert;
 import picoded.JSql.*;
 import picoded.JCache.*;
 import picoded.struct.CaseInsensitiveHashMap;
@@ -35,6 +36,12 @@ import com.hazelcast.core.IMap;
 /// by one of the meta field values.
 ///
 /// The intention here, is to facilitate complex hierachy creations rapidly. Especially against changing specs.
+///
+/// Any refences to the persona game, is completely coincidental
+///
+/// @TODO : Group handling layer
+/// @TODO : Authentication handling
+/// @TODO : 
 ///
 public class PersonaTable extends JStackData implements UnsupportedDefaultMap<String, PersonaObject>  {
 
@@ -127,23 +134,52 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 	}
 
 	//
-	// Gets the user using the user ID
+	// Map compliant implementation
 	//--------------------------------------------------------------------------
-
+	
 	/// Persona user exists
 	public boolean containsKey(Object oid) {
 		return personaMeta.containsKey(oid);
 	}
 
+	/// Gets the user using the user object ID
+	///
+	/// Note: get("new") is syntax sugar for newObject();
+	public PersonaObject get(Object oid) {
+		String _oid = oid.toString();
+		
+		if( _oid.toLowerCase().equals("new") ) {
+			return newObject();
+		}
+		
+		if( containsKey(_oid) ) {
+			return new PersonaObject(this, _oid);
+		}
+		
+		return null; 
+	}
+	
+	//
+	// Additional functionality add on
+	//--------------------------------------------------------------------------
+	
 	/// Generates a new persona object
 	public PersonaObject newObject() {
 		try {
 			PersonaObject ret = new PersonaObject(this, null);
-			ret.saveAll();
+			ret.saveAll(); //ensures the blank object is now in DB
 			return ret;
 		} catch( JStackException e ) {
 			throw new RuntimeException(e);
 		}
 	}
-
+	
+	/// Gets the persona UUID, using the configured name
+	public String nameToID(String name) {
+		return personaID.get(name);
+	}
+	
+	public boolean containsName(String name) {
+		return personaID.containsKey(name);
+	}
 }

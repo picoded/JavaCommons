@@ -57,12 +57,15 @@ public class PersonaTable_Sqlite_test extends JStackData_testBase_test {
 	public void basicHasAddHasGet() throws JStackException {
 		String guid;
 		PersonaObject p;
-
+		
 		assertFalse( ptObj.containsKey("hello") );
+		assertNull( ptObj.get("hello") );
+		
 		assertNotNull( p = ptObj.newObject() );
 		assertNotNull( guid = p._oid() );
 
 		assertTrue( ptObj.containsKey(guid) );
+		assertNotNull( p = ptObj.get(guid) );
 
 	}
 

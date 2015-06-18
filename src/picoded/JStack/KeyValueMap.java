@@ -186,7 +186,7 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 					JSqlResult r = sql.selectQuerySet( //
 															 tName, //
 															 "kID", //
-															 "(eTm == 0 OR eTm > ?) AND kID LIKE ?", //
+															 "(eTm == 0 OR eTm > ?) AND kID = ?", //
 															 new Object[] { now, kID } //
 															 ).query();
 					// Has value
@@ -238,7 +238,7 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 					JSqlResult r = sql.selectQuerySet( //
 																 tName, //
 																 "kVl", //
-																 "(eTm == 0 OR eTm > ?) AND kID LIKE ?", //
+																 "(eTm == 0 OR eTm > ?) AND kID = ?", //
 																 new Object[] { now, kID } //
 																 ).query();
 					// Has value
@@ -297,7 +297,7 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 					JSqlResult r = sql.selectQuerySet( //
 															 tName, //
 															 "kID", //
-															 "(eTm == 0 OR eTm > ?) AND kVl LIKE ?", //
+															 "(eTm == 0 OR eTm > ?) AND kVl = ?", //
 															 new Object[] { now, val } //
 															 ).query();
 					// Has value
@@ -415,7 +415,7 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
 					String tName = sqlTableName(sql);
 
-					sql.execute("DELETE FROM `" + tName + "` WHERE kID LIKE ?", key);
+					sql.execute("DELETE FROM `" + tName + "` WHERE kID = ?", key);
 					return null;
 				}
 			} );

@@ -197,7 +197,7 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		assertEquals("hello", qRes[0].get("str_val"));
 		assertEquals("world", qRes[1].get("str_val"));
 
-		assertNotNull(qRes = mtObj.queryObjects("str_val LIKE ?", new Object[] { "this" }));
+		assertNotNull(qRes = mtObj.queryObjects("str_val = ?", new Object[] { "this" }));
 		assertEquals(2, qRes.length);
 
 		assertNotNull(qRes = mtObj.queryObjects("num > ?", new Object[] { 2 }, "num ASC", 2, 2));
@@ -239,7 +239,7 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		assertNotNull(qRes = mtObj.queryObjects(null, null));
 		assertEquals(3, qRes.length);
 
-		assertNotNull(qRes = mtObj.queryObjects("str_val LIKE ?", new Object[] { "nope" }));
+		assertNotNull(qRes = mtObj.queryObjects("str_val = ?", new Object[] { "nope" }));
 		assertEquals(1, qRes.length);
 
 		assertNotNull(qRes = mtObj.queryObjects("num = ?", new Object[] { 1 }));

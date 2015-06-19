@@ -135,11 +135,11 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 	
 	/// Read a fetched row in a single hashmap
 	@SuppressWarnings("unchecked")
-	public HashMap<String, Object> readRow(int pt) {
+	public Map<String, Object> readRow(int pt) {
 		if (pt >= rowCount) {
 			return null;
 		}
-		HashMap<String, Object> ret = new HashMap<String, Object>();
+		Map<String, Object> ret = new HashMap<String, Object>();
 		Iterator<Map.Entry<String, ArrayList<Object>>> it = this.entrySet().iterator();
 		Map.Entry<String, ArrayList<Object>> pairs;
 		String colName;

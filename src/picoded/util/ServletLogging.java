@@ -1,9 +1,11 @@
 package picoded.util;
 
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 
 import picoded.conv.Base58;
@@ -431,7 +433,24 @@ public class ServletLogging {
       logger.log(Level.SEVERE, "Exception", e);
 	}
 	
+	// / Returns the current time in seconds
    private int createTime() {
       return (int)(System.currentTimeMillis() / 1000);
    }
+   
+   // / Returns all the log messages
+	public List<Map<String, Object>> list() throws JSqlException {
+		List<Map<String, Object>> list = null;
+		JSqlResult r = sqliteObj.executeQuery("SELECT * FROM `logTable`");
+		int rowCount = r.fetchAllRows();
+		if (rowCount > 0) {
+			list = new ArrayList<Map<String, Object>>();
+			
+			for (int pt = 0; pt < rowCount; pt++) {
+				list.add(r.readRow(pt));
+			}
+      }
+
+		return list;
+	}
 }

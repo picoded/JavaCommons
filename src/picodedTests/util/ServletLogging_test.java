@@ -78,13 +78,14 @@ public class ServletLogging_test {
 	
 	@Test
 	public void list() throws JSqlException {
+		int time = (int)(System.currentTimeMillis() / 1000);
 		// save log
-		Object[] args = {"XYZ", (int)(System.currentTimeMillis() / 1000), "SG"};
-		slObj.log("log user %s, at time %i from %s.", args);
-		slObj.log("log user %s, at time %i from %s.", args);
+		Object[] args = {"brown", "dog", "over", "wall", time, time, time, time, "SG"};
+		slObj.log("The %s lazy %s jumps %s the %s, at time %i %i %i %i in %s.", args);
 
 		// fetch all logs
 		List<Map<String, Object>> list = slObj.list();
+		// System.out.println(list);
 		assertNotNull("SQL result returns as expected", list);
 	}
 	

@@ -228,15 +228,15 @@ public class ServletLogging {
 		//for (int i=(longIndexed+1); i<=(longIndexed+1+longNotIndexed);i++) {
 		//	query.append(", l"+(i<10?"0":"")+i+" LONG");
 		//}
-		query.append(", l"+(longIndexed+1)+" LONG");
+		query.append(", l"+((longIndexed+1)<10?"0":"")+(longIndexed+1)+" LONG");
 		
 		// string not indexed
 		//for (int i=(stringIndexed+1); i<=(stringIndexed+1+stringNotIndexed);i++) {
 		//	query.append(", s"+(i<10?"0":"")+i+" VARCHAR(22)");
 		//}
-		query.append(", s"+(stringIndexed+1)+" VARCHAR(MAX)");
+		query.append(", s"+((stringIndexed+1)<10?"0":"")+(stringIndexed+1)+" VARCHAR(MAX)");
 		query.append(")");
-			
+
 		dbObj.execute(query.toString());
 
 		// / excStrHash table
@@ -367,8 +367,8 @@ public class ServletLogging {
 		values.add(requestID());
 		values.add(createTime());
 		values.add(fmtHash);
+		values.add("L");
 		// For now, add blank for the columns where not sure about the exact value
-		values.add("");
 		values.add("");
 		values.add("");
 		values.add("");
@@ -378,19 +378,13 @@ public class ServletLogging {
 		int stringIndexedCount = 1;
 		int lastIndex = 0;
 		int index = 0;
-		boolean notIndexedStringColumnAdded = false;
-		boolean notIndexedLongColumnAdded = false;
+		List<Long> extraLong = new ArrayList<Long>();
 		List<String> extraString = new ArrayList<String>();
 		while (lastIndex != -1) {
 			lastIndex = format.indexOf(findStr, lastIndex);
 			if (lastIndex != -1) {
 				if (format.charAt(lastIndex + 1) == 's') {
 					if (stringIndexedCount > stringIndexed) {
-						if (!notIndexedStringColumnAdded) {
-							sql += ", s" + (stringIndexedCount < 10 ? "0" : "")
-									+ stringIndexedCount++;
-							notIndexedStringColumnAdded = true;
-						}
 						extraString.add((String) args[index++]);
 					} else {
 						sql += ", s" + (stringIndexedCount < 10 ? "0" : "")
@@ -400,12 +394,7 @@ public class ServletLogging {
 					}
 				} else if (format.charAt(lastIndex + 1) == 'i') {
 					if (longIndexedCount > longIndexed) {
-						if (!notIndexedLongColumnAdded) {
-							sql += ", l" + (longIndexedCount < 10 ? "0" : "")
-									+ longIndexedCount++;
-							notIndexedLongColumnAdded = true;
-						}
-						extraString.add((String) args[index++]);
+						extraLong.add(new Long(String.valueOf(args[index++])));
 					} else {
 						sql += ", l" + (longIndexedCount < 10 ? "0" : "")
 								+ longIndexedCount++;
@@ -417,8 +406,16 @@ public class ServletLogging {
 			}
 		}
 		if (!extraString.isEmpty()) {
+			sql += ", s" + (stringIndexedCount < 10 ? "0" : "")
+									+ stringIndexedCount++;
 			sqlValues += ", ?";
-			values.add(StringUtils.join(extraString.toArray(new String[extraString.size()]), ","));
+			values.add(extraString.toString());
+		}
+		if (!extraLong.isEmpty()) {
+			sql += ", l" + (longIndexedCount < 10 ? "0" : "")
+									+ longIndexedCount++;
+			sqlValues += ", ?";
+			values.add(extraLong.toString());
 		}
 		
 		sql += ") VALUES (" + sqlValues + ");";

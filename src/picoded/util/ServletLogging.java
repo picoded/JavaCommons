@@ -2,7 +2,8 @@ package picoded.util;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import picoded.conv.Base58;
@@ -345,39 +346,74 @@ public class ServletLogging {
       String fmtHash = GUID.base58();
 		addFormat(fmtHash, format);
       
-		StringBuilder columns = new StringBuilder("systemHash, reqsID, creTime, fmtHash, logType, expHash, offSync, reqID");
-		StringBuilder columnsIndexed = new StringBuilder("?, ?, ?, ?, ?, ?, ?, ?, ?");
-
-		// check no. of occurrence of string indexed
-		int noOfOccurrence = StringUtils.countMatches(format.toLowerCase(), "%s");
-		int noOfNotIndexed = 0;
-
-		// long indexed
-		for (int i=1; i<=longIndexed;i++) {
-			columns.append(", l"+(i<10?"0":"")+i);
-			columnsIndexed.append(", ?");
+      String sql ="INSERT INTO `logTable` (systemHash, reqsID, creTime, fmtHash, logType, expHash, offSync, reqID ";
+      String sqlValues="?, ?, ?, ?, ?, ?, ?, ?";		
+		
+		List<Object> values = new ArrayList<Object>();
+		values.add(systemHash());
+		values.add(requestID());
+		values.add(createTime());
+		values.add(fmtHash);
+		// For now, add blank for the columns where not sure about the exact value
+		values.add("");
+		values.add("");
+		values.add("");
+		values.add("");
+		
+		String findStr = "%";
+		int longIndexedCount = 1;
+		int stringIndexedCount = 1;
+		int lastIndex = 0;
+		int index = 0;
+		boolean notIndexedStringColumnAdded = false;
+		boolean notIndexedLongColumnAdded = false;
+		List<String> extraString = new ArrayList<String>();
+		while (lastIndex != -1) {
+			lastIndex = format.indexOf(findStr, lastIndex);
+			if (lastIndex != -1) {
+				if (format.charAt(lastIndex + 1) == 's') {
+					if (stringIndexedCount > stringIndexed) {
+						if (!notIndexedStringColumnAdded) {
+							sql += ", S" + (stringIndexedCount < 10 ? "0" : "")
+									+ stringIndexedCount++;
+							notIndexedStringColumnAdded = true;
+						}
+						extraString.add((String) args[index++]);
+					} else {
+						sql += ", S" + (stringIndexedCount < 10 ? "0" : "")
+								+ stringIndexedCount++;
+						sqlValues += ", ?";
+						values.add(args[index++]);
+					}
+				} else if (format.charAt(lastIndex + 1) == 'i') {
+					if (longIndexedCount > longIndexed) {
+						if (!notIndexedLongColumnAdded) {
+							sql += ", I" + (longIndexedCount < 10 ? "0" : "")
+									+ longIndexedCount++;
+							notIndexedLongColumnAdded = true;
+						}
+						extraString.add((String) args[index++]);
+					} else {
+						sql += ", I" + (longIndexedCount < 10 ? "0" : "")
+								+ longIndexedCount++;
+						sqlValues += ", ?";
+						values.add(args[index++]);
+					}
+				}
+				lastIndex += findStr.length();
+			}
+		}
+		if (!extraString.isEmpty()) {
+			String[] tempArr = extraString.toArray(new String[extraString
+					.size()]);
+			sqlValues += ", ?";
+			values.add(tempArr.toString());
 		}
 		
-		// string indexed
-		for (int i=1; i<=stringIndexed;i++) {
-			columns.append(", s"+(i<10?"0":"")+i);
-			columnsIndexed.append(", ?");
-		}
-		// long not indexed
-		for (int i=(longIndexed+1); i<=(longIndexed+1+longNotIndexed);i++) {
-			columns.append(", l"+(i<10?"0":"")+i);
-			columnsIndexed.append(", ?");
-		}
-		// string not indexed
-		for (int i=(stringIndexed+1); i<=(stringIndexed+1+stringNotIndexed);i++) {
-			columns.append(", s"+(i<10?"0":"")+i);
-			columnsIndexed.append(", ?");
-		}
-		
-		String query = "INSERT INTO `logTable` ("+columns.toString()+") VALUES ("+columnsIndexed.toString()+")";
+		sql += ") VALUES (" + sqlValues + ");";
 
-		//insert args to `logTable`
-		jSqlObj.execute(query, systemHash(), requestID(), createTime(), fmtHash, args);
+		// insert to `logTable`
+		jSqlObj.execute(sql, values);
 			
 	}
 	

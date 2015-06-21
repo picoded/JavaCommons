@@ -13,6 +13,10 @@
 	
 	<property name="test-temp" value="${basedir}/test-files/tmp" />
 	
+	<property name="src-path" value="src/picoded" />
+	<property name="src-test" value="src/picodedTests" />
+	<property name="src-experimental" value="src/picodedX" />
+	
 	<!-- jUnit declearation over-ride, see: 'http://stackoverflow.com/questions/9774264/junit-ant-task-junittask-was-not-found' -->
 	<path id="junit-path">
 		<fileset dir="lib-organized/junit" includes="**/*.jar" />
@@ -77,7 +81,7 @@
 		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false" bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:all"/>
-			<src path="src/picoded"/>
+			<src path="${src-path}"/>
 			<exclude name="**/package-info.java"/>
 		</javac>
 	</target>
@@ -90,7 +94,7 @@
 		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false" bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:unchecked"/>
-			<src path="src/picodedX"/>
+			<src path="${src-experimental}"/>
 			<exclude name="**/package-info.java"/>
 		</javac>
 	</target>
@@ -106,8 +110,8 @@
 		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false" bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar">
 			<compilerarg value="-Xlint:all"/>
-			<src path="src/picoded"/>
-			<src path="src/picodedTests"/>
+			<src path="${src-path}"/>
+			<src path="${src-test}"/>
 			<exclude name="**/package-info.java"/>
 		</javac>
 	</target>
@@ -116,16 +120,29 @@
 		<delete dir="bin/build" failonerror="false"/>
 		<mkdir dir="bin/build"/>
 		<jar destfile="bin/build/picodedJavaCommons-libsOnly.jar">
+			<fileset dir="${build-lib}" includes="*.jar" />
+		</jar>
+		<jar destfile="bin/build/picodedJavaCommons-withLibs.jar">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 			<fileset dir="${build-lib}" includes="*.jar" />
 		</jar>
-		<jar destfile="bin/build/picodedJavaCommons-withDependencies.jar">
-			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
-			<fileset dir="${build-lib}" includes="*.jar" />
-		</jar>
-		<jar destfile="bin/build/picodedJavaCommons.jar">
+		<jar destfile="bin/build/picodedJavaCommons-noLibs.jar">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 		</jar>
+	</target>
+	
+	<target name="javadoc" depends="compile-lib">
+		<delete dir="bin/javadoc" failonerror="false"/>
+		<mkdir dir="bin/javadoc"/>
+		
+		<path id="lib.path.ref">
+			<fileset dir="${build-lib}" includes="**/*.jar" />
+		</path>
+		<javadoc destdir="bin/javadoc" classpathref="lib.path.ref" access="private" author="true" sourcepath="src" packagenames="picoded.*" use="true" version="true">
+			<!--<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>-->
+		</javadoc>
+		
+		<jar destfile="bin/build/picodedJavaCommons-javadocs.jar" basedir="bin/javadoc"/>
 	</target>
 	
 	<!-- jUnit test report runner, used for continuous unit testing -->

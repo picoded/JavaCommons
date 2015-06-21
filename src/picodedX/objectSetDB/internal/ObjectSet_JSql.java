@@ -455,7 +455,7 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	/*
 	/// Fetches oKey / key / value, using partial matching search (SQL LIKE)
 	public String[] getMultiple(String oKey, String key) throws JSqlException {
-		JSqlResult r = JSqlObj.query("SELECT * FROM " + sqlTableName + " WHERE obj LIKE ? AND metaKey LIKE ?", oKey, key);
+		JSqlResult r = JSqlObj.query("SELECT * FROM " + sqlTableName + " WHERE obj = ? AND metaKey = ?", oKey, key);
 
 		String[] res = null;
 		int len;
@@ -470,7 +470,7 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 
 	/// Fetches oKey / key / value, using partial matching search (SQL LIKE)
 	public HashMap<String, String> getMultipleSet(String oKey, String key, String val) throws JSqlException {
-		JSqlResult r = JSqlObj.query("SELECT * FROM " + sqlTableName + " WHERE obj LIKE ? AND metaKey LIKE ? AND val LIKE ?", oKey, key, val);
+		JSqlResult r = JSqlObj.query("SELECT * FROM " + sqlTableName + " WHERE obj = ? AND metaKey = ? AND val = ?", oKey, key, val);
 
 		HashMap<String, String> res = new HashMap<String, String>();
 		int pt = r.rowCount();
@@ -566,7 +566,7 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	/// Returns the JSqlResult raw varient
 	/// [TODO: Mid priority]
 	public JSqlResult getKeyMap_JSql(String val) throws JSqlException {
-		return JSqlObj.query("SELECT obj, metaKey FROM `" + sqlTableName + "` WHERE val like ?", val);
+		return JSqlObj.query("SELECT obj, metaKey FROM `" + sqlTableName + "` WHERE val = ?", val);
 	}
 
 	/// Fetches an array of keys, matching the object id and value
@@ -589,7 +589,7 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	/// Returns the JSqlResult raw varient
 	/// [TODO: Mid priority]
 	public JSqlResult getObjKeyMap_JSql(String oKey, String val) throws JSqlException {
-		return JSqlObj.query("SELECT metaKey FROM `" + sqlTableName + "` WHERE obj=? AND val like ?", oKey, val);
+		return JSqlObj.query("SELECT metaKey FROM `" + sqlTableName + "` WHERE obj=? AND val = ?", oKey, val);
 	}
 
 	/// Fetches a HashMap<oKey, val> matched to key
@@ -617,7 +617,7 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 	/// Returns the JSqlResult raw varient
 	/// [TODO: Mid priority]
 	public JSqlResult getValMap_JSql(String key) throws JSqlException {
-		return JSqlObj.query("SELECT obj, val FROM `" + sqlTableName + "` WHERE metaKey like ?", key);
+		return JSqlObj.query("SELECT obj, val FROM `" + sqlTableName + "` WHERE metaKey = ?", key);
 	}
 
 	/// returns true if database table is empty

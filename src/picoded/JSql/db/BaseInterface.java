@@ -1,5 +1,6 @@
 package picoded.JSql.db;
 
+import picoded.JSql.JSql;
 import picoded.JSql.JSqlType;
 import picoded.JSql.JSqlResult;
 import picoded.JSql.JSqlException;

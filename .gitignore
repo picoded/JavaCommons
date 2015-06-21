@@ -1,6 +1,7 @@
 #
-# exclude common file types
+# exclude common hidden file types
 #
+.*
 *.swp
 *._*
 *.unison*

@@ -595,7 +595,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	/// @TODO: support array fetches / searches
 	/// @TODO: support string lower case search index optimization
 	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
-	protected Map<String, ArrayList<Object>> JSqlQuery(JSql sql, String selectCols, String whereClause,
+	protected Map<String, List<Object>> JSqlQuery(JSql sql, String selectCols, String whereClause,
 		Object[] whereValues, String orderBy, long limit, long offset) throws JSqlException {
 		if (selectCols == null) {
 			selectCols = "_oid";
@@ -617,9 +617,9 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	}
 
 	/// SQL Query to fetch the relevent data, values are loaded on query
-	protected Map<String, ArrayList<Object>> queryData(String selectCols, String whereClause, Object[] whereValues,
+	protected Map<String, List<Object>> queryData(String selectCols, String whereClause, Object[] whereValues,
 		String orderBy, long limit, long offset) throws JStackException {
-		Map<String, ArrayList<Object>> ret = null;
+		Map<String, List<Object>> ret = null;
 		try {
 			JStackLayer[] sl = JStackObj.stackLayers();
 			for (int a = 0; a < sl.length; ++a) {
@@ -641,12 +641,12 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	}
 
 	/// Does a conversion from the JSqlResult map, to the
-	protected MetaObject[] JSqlResultToMetaObjectArray(Map<String, ArrayList<Object>> jRes) throws JStackException {
+	protected MetaObject[] JSqlResultToMetaObjectArray(Map<String, List<Object>> jRes) throws JStackException {
 		if( jRes == null ) {
 			return new MetaObject[0];
 		}
 
-		ArrayList<Object> oID_list = jRes.get("_oid");
+		List<Object> oID_list = jRes.get("_oid");
 		if (oID_list == null || oID_list.size() <= 0) {
 			return new MetaObject[0];
 		}
@@ -662,7 +662,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 			mObj = lazyGet((String) (oID_list.get(a)));
 			queryCache = new CaseInsensitiveHashMap<String, Object>();
 
-			for (Map.Entry<String, ArrayList<Object>> entry : jRes.entrySet()) {
+			for (Map.Entry<String, List<Object>> entry : jRes.entrySet()) {
 				queryCache.put(entry.getKey(), entry.getValue().get(a));
 			}
 
@@ -677,7 +677,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	public MetaObject[] queryObjects(String whereClause, Object[] whereValues, String orderBy, long limit, long offset,
 		String optimalSelect) throws JStackException {
 
-		Map<String, ArrayList<Object>> qData = queryData(optimalSelect, whereClause, whereValues, orderBy, limit, offset);
+		Map<String, List<Object>> qData = queryData(optimalSelect, whereClause, whereValues, orderBy, limit, offset);
 		return JSqlResultToMetaObjectArray(qData);
 	}
 

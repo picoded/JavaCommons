@@ -39,6 +39,7 @@ import java.util.Arrays;
 /// *******************************************************************************
 ///
 /// TODO list
+/// * remove apache commons, for apache commons3
 /// * from/toHex usage instead of base64
 /// * validateSaltedHash( saltedHash, salt, rawPassword ) to implement
 /// * [optional] migrate to from/toHex instead of Base64. This removes the apache.commons.* dependancy

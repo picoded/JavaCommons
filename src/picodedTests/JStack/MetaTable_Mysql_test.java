@@ -17,16 +17,10 @@ import picodedTests.TestConfig;
 
 public class MetaTable_Mysql_test extends MetaTable_Sqlite_test {
 	
-	// JStack setup
+	// JSql override setup
 	//-----------------------------------------------
-	protected void JStackSetup() {
-		JStackObj = new JStack(
-			JSql.mysql(TestConfig.MYSQL_CONN_JDBC(), TestConfig.MYSQL_CONN_PROPS())
-		);
-	}
-	
-	protected void JStackTearDown() {
-		JStackObj = null;
+	public JSql JSqlObj() {
+		return JSql.mysql(TestConfig.MYSQL_CONN_JDBC(), TestConfig.MYSQL_CONN_PROPS());
 	}
 	
 }

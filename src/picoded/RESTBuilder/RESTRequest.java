@@ -1,4 +1,4 @@
-package picoded.servlet;
+package picoded.RESTBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

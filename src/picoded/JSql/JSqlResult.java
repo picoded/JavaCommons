@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.*;
@@ -46,7 +47,7 @@ import picoded.conv.ClobString;
 ///   - readRow / readRowCol : To support unfetched rows -> ie, automatically fetchs to the desired row count
 ///   - isFetchedAll / isFetchedRow
 ///
-public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, ArrayList<Object> /*rowNumber array */> {
+public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, List<Object> /*rowNumber array */> {
 	protected static final long serialVersionUID = 1L;
 	
 	/// Internal self used logger
@@ -78,7 +79,7 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 		int pt;
 		int colCount;
 		String colName;
-		ArrayList<Object> colArr;
+		List<Object> colArr;
 		Object tmpObj;
 		
 		if (sqlRes != null) {
@@ -135,15 +136,15 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 	
 	/// Read a fetched row in a single hashmap
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> readRow(int pt) {
+	public HashMap<String, Object> readRow(int pt) {
 		if (pt >= rowCount) {
 			return null;
 		}
-		Map<String, Object> ret = new HashMap<String, Object>();
-		Iterator<Map.Entry<String, ArrayList<Object>>> it = this.entrySet().iterator();
-		Map.Entry<String, ArrayList<Object>> pairs;
+		HashMap<String, Object> ret = new HashMap<String, Object>();
+		Iterator<Map.Entry<String, List<Object>>> it = this.entrySet().iterator();
+		Map.Entry<String, List<Object>> pairs;
 		String colName;
-		ArrayList<Object> colArr;
+		List<Object> colArr;
 		while (it.hasNext()) {
 			pairs = it.next();
 			colName = pairs.getKey();
@@ -155,7 +156,7 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 	
 	/// Read a fetched row column value and returns it (if row/value exists)
 	public Object readRowCol(int pt, String name) {
-		ArrayList<Object> colArr = this.get(name);
+		List<Object> colArr = this.get(name);
 		if (colArr != null) {
 			return colArr.get(pt);
 		}
@@ -164,13 +165,13 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Arr
 	
 	/// JSql result set to an object array, from a single collumn field
 	public Object[] readCol(String field) {
-		ArrayList<Object> resList = get(field);
+		List<Object> resList = get(field);
 		return (resList != null) ? resList.toArray(new Object[resList.size()]) : null;
 	}
 	
 	/// JSql result set to an string array, from a single collumn field
 	public String[] readCol_StringArr(String field) {
-		ArrayList<Object> resList = get(field);
+		List<Object> resList = get(field);
 		int len = resList.size();
 		
 		int pt = 0;

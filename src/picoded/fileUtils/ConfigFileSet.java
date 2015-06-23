@@ -3,12 +3,15 @@ package picoded.fileUtils;
 ///
 import picoded.struct.GenericConvertMap;
 import java.util.Map;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.io.File;
 import java.io.IOException;
 
 import org.ini4j.Ini;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+
 
 ///
 /// Config file loader
@@ -71,4 +74,24 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		
 		return this;
 	}
+	
+	/// Gets the config value string, from the file 
+	public String get(Object key) {
+		
+		String keyString = key.toString();
+		String[] splitKeyString = keyString.split("\\.");
+		
+		for(int splitPt = splitKeyString.length - 1; splitPt >= 0; --splitPt) {
+			String section = StringUtils.join( ArrayUtils.subarray(splitKeyString, 0, splitPt), ".");
+			String ending = StringUtils.join( ArrayUtils.subarray(splitKeyString, splitPt, splitKeyString.length), ".");
+			
+			Map<String,String> subMap = prefixSetMap.get(section);
+			if( subMap != null ) {
+				return subMap.get(ending);
+			}
+		}
+		
+		return null;
+	}
+	
 }

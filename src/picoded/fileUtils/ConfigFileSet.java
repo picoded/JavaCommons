@@ -32,6 +32,19 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		
 	}
 	
+	public ConfigFileSet addConfigSet(String filePath) {
+		return addConfigSet(new File(filePath), null);
+	}
+	
+	public ConfigFileSet addConfigSet(File inFile) {
+		return addConfigSet(inFile, null);
+	}
+	
+	/// Config file set iteration and load with prefix
+	public ConfigFileSet addConfigSet(String filePath, String prefix) {
+		return addConfigSet(new File(filePath), prefix);
+	}
+	
 	/// Config file set iteration and load with prefix
 	public ConfigFileSet addConfigSet(File inFile, String prefix) {
 		if(inFile == null) {

@@ -47,19 +47,19 @@ public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 		if (c <= (char) 0xF) {
 			uri.append("%");
 			uri.append('0');
-			uri.append(hex[ c]);
+			uri.append(hex[c]);
 		} else if (c <= (char) 0xFF) {
 			uri.append("%");
-			uri.append(hex[ c >> 4]);
-			uri.append(hex[ c & 0xF]);
+			uri.append(hex[c >> 4]);
+			uri.append(hex[c & 0xF]);
 		} else {
 			/// unicode
 			uri.append('\\');
 			uri.append('u');
-			uri.append(hex[ c >> 24]);
+			uri.append(hex[c >> 24]);
 			uri.append(hex[(c >> 16) & 0xF]);
 			uri.append(hex[(c >> 8) & 0xF]);
-			uri.append(hex[ c & 0xF]);
+			uri.append(hex[c & 0xF]);
 		}
 	}
 	
@@ -75,12 +75,11 @@ public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 	///
 	public static String encodeURI(String argString) {
 		StringBuilder uri = new StringBuilder();
-
+		
 		char[] chars = argString.toCharArray();
 		for (int i = 0; i < chars.length; i++) {
 			char c = chars[i];
-			if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') ||
-				 (c >= 'A' && c <= 'Z') || mark.indexOf(c) != -1) {
+			if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || mark.indexOf(c) != -1) {
 				uri.append(c);
 			} else {
 				appendEscaped(uri, c);
@@ -90,14 +89,14 @@ public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 	}
 	
 	/// Reverse function for encodeURI. Basically it decodes into UTF-8
-   /// @param argString as String
-   /// @returns String
+	/// @param argString as String
+	/// @returns String
 	public static String decodeURI(String argString) {
 		try {
 			return java.net.URLDecoder.decode(argString, "UTF-8");
-		} catch(java.io.UnsupportedEncodingException e) {
+		} catch (java.io.UnsupportedEncodingException e) {
 			throw new java.lang.RuntimeException(e);
 		}
 	}
-
+	
 }

@@ -43,11 +43,12 @@ public class ServletLogging_test {
 	@After
 	public void tearDown() throws JSqlException {
 		if (JSqlObj != null) {
-			slObj.tearDown();
-			JSqlObj.dispose();
-			JSqlObj = null;
-			}catch(Exception e){
-          e.printStackTrace();
+			try {
+				slObj.tearDown();
+				JSqlObj.dispose();
+				JSqlObj = null;
+			} catch(Exception e) {
+         	e.printStackTrace();
 			}
 		}
 	}

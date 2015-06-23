@@ -81,14 +81,29 @@ public class ServletLogging {
 	
 	private static Logger logger = Logger.getLogger(ServletLogging.class.getName());
 
-   /// Object byte space default as 260
-	protected int objColumnLength = 260;
+	/// Object ID field type
+	protected String objColumnType = "VARCHAR(32)";
+
+	/// Key name field type
+	protected String keyColumnType = "VARCHAR(32)";
+
+	/// Full text value field type
+	protected String fullTextColumnType = "VARCHAR(MAX)";
+
+	/// Text value field type
+	protected String textColumnType = "TEXT";
+
+	/// Timestamp field type
+	protected String tStampColumnType = "BIGINT";
+
+	/// Long collumn type
+	protected String longColumnType = "LONG";
 	
-	/// Key byte space default as 260
-	protected int keyColumnLength = 260;
-	
-	/// Value byte space default as 4000
-	protected int valColumnLength = 4000;
+	/// Bit collumn type
+	protected String bitColumnType = "BIT";
+
+	/// Primary key
+	protected String pKeyColumnType = " PRIMARY KEY";
 	
 	protected JSql sqliteObj;
 	protected JSql jSqlObj;
@@ -189,9 +204,181 @@ public class ServletLogging {
 		}
 	}
 	
-	/**
-	 * Method to dispose all created tables.
-	 */
+	private void tableSetup(JSql dbObj) throws JSqlException {
+		// / config table
+		if (jSqlObj.sqlType == JSqlType.sqlite) {
+			dbObj.createTableQuerySet(
+							"config",
+							new String[] {
+								"key",
+								"sVal"
+							},
+							new String[] {
+								keyColumnType + pKeyColumnType,
+								textColumnType
+							}
+						).execute();
+		}
+
+		// / logFormat table
+		dbObj.createTableQuerySet(
+						"logFormat",
+						new String[] {
+							"hash",
+							"format"
+						},
+						new String[] {
+							keyColumnType + pKeyColumnType,
+							fullTextColumnType
+						}
+					).execute();
+		
+		// / logStrHashes table
+		dbObj.createTableQuerySet(
+						"logStrHashes",
+						new String[] {
+							"hash",
+							"sVal"
+						},
+						new String[] {
+							keyColumnType + pKeyColumnType,
+							textColumnType
+						}
+					).execute();
+		
+		// / logTable table
+		List<String> columnName = new ArrayList<String>();
+		List<String> columnDefine = new ArrayList<String>();
+		
+		columnName.add("systemHash");
+		columnDefine.add(keyColumnType + pKeyColumnType);
+		
+		columnName.add("reqsID");
+		columnDefine.add(keyColumnType);
+		
+		columnName.add("creTime");
+		columnDefine.add(tStampColumnType);
+
+		columnName.add("fmtHash");
+		columnDefine.add(keyColumnType);
+
+		columnName.add("logType");
+		columnDefine.add(keyColumnType);
+
+		columnName.add("expHash");
+		columnDefine.add(keyColumnType);
+
+		columnName.add("offSync");
+		columnDefine.add(bitColumnType);
+
+		columnName.add("reqID");
+		columnDefine.add(keyColumnType);
+
+		// long indexed
+		for (int i=1; i<=longIndexed;i++) {
+			columnName.add("l"+(i<10?"0":"")+i);
+			columnDefine.add(longColumnType);
+		}
+		// string indexed
+		for (int i=1; i<=stringIndexed;i++) {
+			columnName.add("s"+(i<10?"0":"")+i);
+			columnDefine.add(keyColumnType);
+		}
+		// long not indexed
+		//for (int i=(longIndexed+1); i<=(longIndexed+1+longNotIndexed);i++) {
+		//	columnName.add("s"+(i<10?"0":"")+i);
+		//	columnDefine.add(longColumnType);
+		//}
+		columnName.add("l"+((longIndexed+1)<10?"0":"")+(longIndexed+1));
+		columnDefine.add(longColumnType);
+		
+		// string not indexed
+		//for (int i=(stringIndexed+1); i<=(stringIndexed+1+stringNotIndexed);i++) {
+		//	columnName.add("s"+(i<10?"0":"")+i);
+		//	columnDefine.add(keyColumnType);
+		//}
+		columnName.add("s"+((stringIndexed+1)<10?"0":"")+(stringIndexed+1));
+		columnDefine.add(fullTextColumnType);
+
+		dbObj.createTableQuerySet(
+						"logTable",
+						columnName.toArray(new String[columnName.size()]),
+						columnDefine.toArray(new String[columnDefine.size()])
+					).execute();
+
+		// / excStrHash table
+		dbObj.createTableQuerySet(
+						"excStrHash",
+						new String[] {
+							"hash",
+							"sVal"
+						},
+						new String[] {
+							keyColumnType + pKeyColumnType,
+							textColumnType
+						}
+					).execute();
+		
+		// / exception table
+		columnName = new ArrayList<String>();
+		columnDefine = new ArrayList<String>();
+		
+		columnName.add("expHash");
+		columnDefine.add(keyColumnType + pKeyColumnType);
+		
+		columnName.add("reqsID");
+		columnDefine.add(keyColumnType);
+		
+		columnName.add("creTime");
+		columnDefine.add(tStampColumnType);
+
+		columnName.add("systemHash");
+		columnDefine.add(keyColumnType);
+
+		columnName.add("excRoot");
+		columnDefine.add(keyColumnType);
+
+		columnName.add("excTrace");
+		columnDefine.add(keyColumnType);
+
+		columnName.add("excMid");
+		columnDefine.add(keyColumnType);
+
+		columnName.add("stkRoot");
+		columnDefine.add(keyColumnType);
+
+		columnName.add("stkTrace");
+		columnDefine.add(keyColumnType);
+
+		columnName.add("stkMid");
+		columnDefine.add(keyColumnType);
+
+		// Exception Root Trace Indexed
+		for (int i=1; i<=exceptionRootTraceIndexed;i++) {
+			columnName.add("excR"+(i<10?"0":"")+i);
+			columnDefine.add(keyColumnType);
+
+			columnName.add("stkR"+(i<10?"0":"")+i);
+			columnDefine.add(keyColumnType);
+		}
+		
+		// Exception Thrown Trace Indexed
+		for (int i=1; i<=exceptionThrownTraceIndexed;i++) {
+			columnName.add("excT"+(i<10?"0":"")+i);
+			columnDefine.add(keyColumnType);
+
+			columnName.add("stkT"+(i<10?"0":"")+i);
+			columnDefine.add(keyColumnType);
+		}
+		
+		dbObj.createTableQuerySet(
+						"exception",
+						columnName.toArray(new String[columnName.size()]),
+						columnDefine.toArray(new String[columnDefine.size()])
+					).execute();
+	}
+	
+	// / Dispose all created tables
 	public void tearDown() throws Exception {
 			jSqlObj.executeQuery("DROP TABLE IF EXISTS `config`").dispose();
 			jSqlObj.executeQuery("DROP TABLE IF EXISTS `logFormat`").dispose();
@@ -201,99 +388,19 @@ public class ServletLogging {
 			jSqlObj.executeQuery("DROP TABLE IF EXISTS `exception`").dispose();
 	}
 	
-	
-	private void tableSetup(JSql dbObj) throws JSqlException {
-		
-		// / config table
-		if (jSqlObj.sqlType == JSqlType.sqlite) {
-		dbObj.execute("CREATE TABLE IF NOT EXISTS `config` (key VARCHAR("+objColumnLength+"), sVal TEXT, PRIMARY KEY (key) );");
-		}
-		
-		// / logFormat table
-		dbObj.execute("CREATE TABLE IF NOT EXISTS `logFormat` ( "
-			+ "hash VARCHAR("+objColumnLength+"), "
-			+ "format VARCHAR("+keyColumnLength+"), "
-			+ " PRIMARY KEY (hash) );");
-		
-		// / logStrHashes table
-		dbObj.execute("CREATE TABLE IF NOT EXISTS `logStrHashes` ( "
-			+ "hash VARCHAR("+objColumnLength+"), sVal TEXT, PRIMARY KEY (hash) );");
-		
-		// / logTable table
-		StringBuilder query = new StringBuilder("CREATE TABLE IF NOT EXISTS `logTable` ("
-		   + "systemHash VARCHAR("+objColumnLength+")"
-			+ ", reqsID VARCHAR("+objColumnLength+")"
-			+ ", creTime BIGINT"
-			+ ", fmtHash VARCHAR("+objColumnLength+")"
-			+ ", logType VARCHAR("+valColumnLength+")"
-			+ ", expHash VARCHAR("+objColumnLength+")"
-			+ ", offSync BIT"
-			+ ", reqID VARCHAR("+objColumnLength+")");
-			
-		// long indexed
-		for (int i=1; i<=longIndexed;i++) {
-			query.append(", l"+(i<10?"0":"")+i+" LONG");
-		}
-		// string indexed
-		for (int i=1; i<=stringIndexed;i++) {
-			query.append(", s"+(i<10?"0":"")+i+" VARCHAR(22)");
-		}
-		// long not indexed
-		//for (int i=(longIndexed+1); i<=(longIndexed+1+longNotIndexed);i++) {
-		//	query.append(", l"+(i<10?"0":"")+i+" LONG");
-		//}
-		query.append(", l"+((longIndexed+1)<10?"0":"")+(longIndexed+1)+" LONG");
-		
-		// string not indexed
-		//for (int i=(stringIndexed+1); i<=(stringIndexed+1+stringNotIndexed);i++) {
-		//	query.append(", s"+(i<10?"0":"")+i+" VARCHAR(22)");
-		//}
-		query.append(", s"+((stringIndexed+1)<10?"0":"")+(stringIndexed+1)+" VARCHAR(MAX)");
-		query.append(")");
-
-		dbObj.execute(query.toString());
-
-		// / excStrHash table
-		dbObj.execute("CREATE TABLE IF NOT EXISTS `excStrHash`(hash VARCHAR("+objColumnLength+"), sVal TEXT, PRIMARY KEY (hash));");
-		
-		// / exception table
-		query = new StringBuilder("CREATE TABLE IF NOT EXISTS `exception` ( "
-		   + "expHash VARCHAR(" + objColumnLength + ")"
-			+ ", reqsID VARCHAR(" + objColumnLength + ")"
-			+ ", creTime BIGINT"
-			+ ", systemHash VARCHAR(60)"
-			+ ", excRoot VARCHAR(" + valColumnLength + ")" 
-			+ ", excTrace VARCHAR(" + valColumnLength + ")"
-			+ ", excMid VARCHAR(" + valColumnLength + ")" 
-			+ ", stkRoot VARCHAR(" + valColumnLength + ")" 
-			+ ", stkTrace VARCHAR(" + valColumnLength + ")"
-			+ ", stkMid VARCHAR(" + valColumnLength + ")");
-			
-			//excR01-XX,excT01-XX,stkR01-XX,stkT01-XX
-			// Exception Root Trace Indexed
-			for (int i=1; i<=exceptionRootTraceIndexed;i++) {
-				query.append(", excR"+(i<10?"0":"")+i+" VARCHAR(22)"); 
-				query.append(", stkR"+(i<10?"0":"")+i+" VARCHAR(22)");
-			}
-			
-			// Exception Thrown Trace Indexed
-			for (int i=1; i<=exceptionThrownTraceIndexed;i++) {
-				query.append(", excT"+(i<10?"0":"")+i+" VARCHAR(22)");
-				query.append(", stkT"+(i<10?"0":"")+i+" VARCHAR(22)");
-			}
-			// PRIMARY KEY
-			query.append(", PRIMARY KEY (expHash) )");
-			
-		dbObj.execute(query.toString());
-      
-	}
-	
+	// / Returns the current time in seconds
+   private int createTime() {
+      return (int)(System.currentTimeMillis() / 1000);
+   }
+   
 	// / Returns the systemHash stored inside the SQLite DB, if it does not
 	// exists, generate one
 	public String systemHash() throws JSqlException {
 		String sysHash = null;
 		try {
-			JSqlResult r = sqliteObj.executeQuery("SELECT sVal FROM `config` WHERE key=?", "systemHash");
+			// Fetch meta fields
+			JSqlResult r = sqliteObj.selectQuerySet("config", "sVal", "key=?", new Object[] { "systemHash" }).query();
+			
 			if (r.fetchAllRows() > 0) {
 				sysHash = (String) r.readRowCol(0, "sVal");
 	      }
@@ -313,7 +420,15 @@ public class ServletLogging {
 	}
 	
 	private void addConfig(String key, String sVal) throws JSqlException {
-		sqliteObj.execute("INSERT OR REPLACE INTO `config` (key, sVal) VALUES (?, ?)", key, sVal);
+		jSqlObj.upsertQuerySet( //
+					"config", //
+					new String[] { "key" }, //
+					new Object[] { key, }, //
+					//
+					new String[] { "sVal" }, //
+					new Object[] { sVal }, //
+					null, null, null//
+					).execute();
 	}
 	
 	// / Validate if the systemHash if it belongs to the current physical 
@@ -342,10 +457,13 @@ public class ServletLogging {
 	// / Returns the current request ID
 	public String requestID() throws JSqlException {
 		String requestId = null;
-		JSqlResult r = jSqlObj.executeQuery("SELECT reqID FROM `logTable` WHERE systemHash=?", systemHash());
+		// Fetch the meta fields
+		JSqlResult r = jSqlObj.selectQuerySet("logTable", "reqID", "systemHash=?", new Object[] { "systemHash" }).query();
+		
 		if (r.fetchAllRows() > 0) {
 			requestId = (String) r.readRowCol(0, "reqID");
-		}
+      }
+	      
 		if (requestId == null || requestId.trim().length() == 0) {
 			return reissueRequestID();
 		}
@@ -360,7 +478,15 @@ public class ServletLogging {
 	// / Add the format to the system
 	//hash   (base58 md5, indexed) ,format (indexed, unique)
 	public void addFormat(String fmtHash, String format) throws JSqlException {
-		jSqlObj.execute("INSERT OR REPLACE INTO `logFormat` (hash, format) VALUES (?, ?)", fmtHash, format);
+		jSqlObj.upsertQuerySet( //
+					"logFormat", //
+					new String[] { "hash" }, //
+					new Object[] { fmtHash, }, //
+					//
+					new String[] { "format" }, //
+					new Object[] { format }, //
+					null, null, null//
+					).execute();
 	}
 	
 	/// You should not be calling log using format with no arguments
@@ -441,6 +567,22 @@ public class ServletLogging {
 			
 	}
 	
+   // / Returns all the log messages
+	public List<Map<String, Object>> list() throws JSqlException {
+		List<Map<String, Object>> list = null;
+		JSqlResult r = sqliteObj.selectQuerySet("logTable", "*", null, null).query();
+		int rowCount = r.fetchAllRows();
+		if (rowCount > 0) {
+			list = new ArrayList<Map<String, Object>>();
+			
+			for (int pt = 0; pt < rowCount; pt++) {
+				list.add(r.readRow(pt));
+			}
+      }
+
+		return list;
+	}
+
 	/// Performs a logging with a formant name, argument, and attached exception
 	public void logException(Exception e, String format, Object... args) throws JSqlException {
 		//call addFormat to add format
@@ -455,24 +597,4 @@ public class ServletLogging {
       logger.log(Level.SEVERE, "Exception", e);
 	}
 	
-	// / Returns the current time in seconds
-   private int createTime() {
-      return (int)(System.currentTimeMillis() / 1000);
-   }
-   
-   // / Returns all the log messages
-	public List<Map<String, Object>> list() throws JSqlException {
-		List<Map<String, Object>> list = null;
-		JSqlResult r = sqliteObj.executeQuery("SELECT * FROM `logTable`");
-		int rowCount = r.fetchAllRows();
-		if (rowCount > 0) {
-			list = new ArrayList<Map<String, Object>>();
-			
-			for (int pt = 0; pt < rowCount; pt++) {
-				list.add(r.readRow(pt));
-			}
-      }
-
-		return list;
-	}
 }

@@ -49,6 +49,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.IOUtils;
 
 public class EmbeddedServlet_test
 {
@@ -60,21 +61,19 @@ public class EmbeddedServlet_test
 		
 		tomcat = new EmbeddedServlet("/app", context)
 		.withPort(15000)
-		.withServlet("/date", "datePrintServlet", 
+		.withServlet("/public", "publicProxyServlet", 
 		new HttpServlet() {
 			private static final long serialVersionUID = 1L;
 		 
 			@Override
 			protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 				String getValue = req.getParameter("getValue");
-				//System.out.println("Get Request param : " +getValue);
 				resp.getWriter().append(getValue);
 			}
 
 			@Override
 			protected void doPost(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException {
 				String postValue = req.getParameter("postValue");
-				//System.out.println("Post Request param : " +postValue);
 				resp.getWriter().append(postValue);
 			}
 		});
@@ -85,52 +84,12 @@ public class EmbeddedServlet_test
 		
 		tomcat.start();
 		
-//		String getResult = doGetTest();
-//		assertEquals(getResult, "true");
-//		
-//		String postResult = doPostTest();
-//		assertEquals(postResult, "true");
+		String getResult = doGetTest();
+		assertEquals(getResult, "true");
 		
-		String newGetResult = doGetTestWithHttpRequesterClass();
-		assertEquals(newGetResult, "true");
-	}
-	
-	private String doGetTestWithHttpRequesterClass() {
-//		HttpClient client = HttpClients.createDefault();
-//		HttpGet httpGet = new HttpGet("http://localhost:15000/app/date?getValue=true");
+		String postResult = doPostTest();
+		assertEquals(postResult, "true");
 		
-		HashMap<String, String> cookies = new HashMap<String, String>();
-		cookies.put("cookie1", "cookie1Value");
-		
-		PiHttpRequester requester = new PiHttpRequester();
-		PiHttpResponse resp = requester.sendRequest("http://localhost:15000/app/date?getValue=true", HttpRequestType.TYPE_GET, null, cookies, "");
-		System.out.println("Requester returned with response");
-		try {
-//			HttpResponse resp = client.execute(httpGet);
-//			
-//			
-//			HttpEntity entity = resp.getEntity();
-//			InputStream respStream = entity.getContent();
-//			InputStreamReader reader = new InputStreamReader(respStream);
-//			char[] buffer = new char[10];
-//			reader.read(buffer);
-//			String returnVal = String.valueOf(buffer).trim();
-//			return returnVal;
-			
-			InputStream respStream = resp.getResponseBody();
-			InputStreamReader reader = new InputStreamReader(respStream);
-			char[] buffer = new char[10];
-			reader.read(buffer);
-			String returnVal = String.valueOf(buffer).trim();
-			System.out.println("New get test returned with result: " +returnVal);
-			return returnVal;
-		} catch (ClientProtocolException ex) {
-			
-		} catch (IOException ex) {
-			
-		}
-		
-		return null;
 	}
 	
 	private String doGetTest() throws IOException{

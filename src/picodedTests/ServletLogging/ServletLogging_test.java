@@ -66,8 +66,13 @@ public class ServletLogging_test {
 
 	@Test
 	public void addFormat() throws JSqlException {
-		String fmtHash = GUID.base58();
-		slObj.addFormat(fmtHash, "log user %s, at time %s from %s.");
+		String format = "log user %s, at time %s from %s.";
+	  //String fmtHash = GUID.base58();
+	   String fmtHash = slObj.generateHash(format);
+		slObj.addFormat(fmtHash, format);
+
+		assertEquals(fmtHash, slObj.hashFormat(format));
+		
 	}
 	
 	@Test

@@ -17,6 +17,11 @@ import picoded.JSql.JSqlResult;
 import picoded.JSql.JSqlType;
 import picoded.util.systemInfo;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+
+import java.util.Arrays;
+
 /// SerlvetLogging, is a utility class meant to facilitate the logging of server sideded application events, and errors
 /// This is meant to push the logging into a central SQL database, and fallbacks onto its local SQLite file, in event the
 /// JSql connection fails.
@@ -254,33 +259,16 @@ public class ServletLogging {
 					).execute();
 		
 		// / logTable table
-		List<String> columnName = new ArrayList<String>();
-		List<String> columnDefine = new ArrayList<String>();
+	//	List<String> columnName = new ArrayList<String>();
+	//	List<String> columnDefine = new ArrayList<String>();
 		
-		columnName.add("systemHash");
-		columnDefine.add(keyColumnType + pKeyColumnType);
 		
-		columnName.add("reqsID");
-		columnDefine.add(keyColumnType);
+		List<String> columnName =  new ArrayList<String>(Arrays.asList("systemHash", "reqsID","creTime","fmtHash","logType","expHash"
+		,"offSync","reqID"));
 		
-		columnName.add("creTime");
-		columnDefine.add(tStampColumnType);
-
-		columnName.add("fmtHash");
-		columnDefine.add(keyColumnType);
-
-		columnName.add("logType");
-		columnDefine.add(keyColumnType);
-
-		columnName.add("expHash");
-		columnDefine.add(keyColumnType);
-
-		columnName.add("offSync");
-		columnDefine.add( bitColumnType );
-
-		columnName.add("reqID");
-		columnDefine.add( keyColumnType );
-
+		List<String> columnDefine =  new ArrayList<String>(Arrays.asList((keyColumnType + pKeyColumnType),keyColumnType,tStampColumnType,
+		keyColumnType,keyColumnType,keyColumnType,bitColumnType,keyColumnType));
+		
 		// long indexed
 		for (int i=1; i<=longIndexed;i++) {
 			columnName.add( longIndexedPrefix+(i<10?"0":"")+i );
@@ -327,39 +315,12 @@ public class ServletLogging {
 					).execute();
 		
 		// / exception table
-		columnName = new ArrayList<String>();
-		columnDefine = new ArrayList<String>();
+		columnName =  new ArrayList<String>(Arrays.asList("expHash","reqsID","creTime","systemHash","excRoot","excTrace",
+		"excMid","stkRoot","stkTrace","stkMid"));
+	
+		columnDefine = new ArrayList<String>(Arrays.asList((keyColumnType + pKeyColumnType),keyColumnType,tStampColumnType,
+		keyColumnType,keyColumnType,keyColumnType,keyColumnType,keyColumnType,keyColumnType,keyColumnType));
 		
-		columnName.add("expHash");
-		columnDefine.add(keyColumnType + pKeyColumnType);
-		
-		columnName.add("reqsID");
-		columnDefine.add(keyColumnType);
-		
-		columnName.add("creTime");
-		columnDefine.add(tStampColumnType);
-
-		columnName.add("systemHash");
-		columnDefine.add(keyColumnType);
-
-		columnName.add("excRoot");
-		columnDefine.add(keyColumnType);
-
-		columnName.add("excTrace");
-		columnDefine.add(keyColumnType);
-
-		columnName.add("excMid");
-		columnDefine.add(keyColumnType);
-
-		columnName.add("stkRoot");
-		columnDefine.add(keyColumnType);
-
-		columnName.add("stkTrace");
-		columnDefine.add(keyColumnType);
-
-		columnName.add("stkMid");
-		columnDefine.add(keyColumnType);
-
 		// Exception Root Trace Indexed
 		for (int i=1; i<=exceptionRootTraceIndexed;i++) {
 			columnName.add("excR"+(i<10?"0":"")+i);
@@ -504,7 +465,8 @@ public class ServletLogging {
 	/// Performs a logging with a format name and argument
 	public void log(String format, Object... args) throws JSqlException {
 		//call addFormat to add format
-      String fmtHash = GUID.base58();
+     // String fmtHash = GUID.base58();
+		String fmtHash = generateHash(format);
 		addFormat(fmtHash, format);
       
       String sql ="INSERT INTO `logTable` (systemHash, reqsID, creTime, fmtHash, logType, expHash, offSync, reqID ";
@@ -663,7 +625,8 @@ public class ServletLogging {
 	/// Performs a logging with a formant name, argument, and attached exception
 	public void logException(Exception e, String format, Object... args) throws JSqlException {
 		//call addFormat to add format
-		String fmtHash = GUID.base58();
+	   //String fmtHash = GUID.base58();
+		String fmtHash = generateHash(format);
 		addFormat(fmtHash, format);
 
       //insert args to `exception`
@@ -672,6 +635,33 @@ public class ServletLogging {
          + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", systemHash(), requestID(), createTime(), fmtHash, args);
       
       logger.log(Level.SEVERE, "Exception", e);
+	}
+	
+//retrieves hash based on format
+public String hashFormat(String fmtString) throws JSqlException {
+		JSqlResult r = sqliteObj.selectQuerySet("logFormat", "hash", "format=?", new Object[] { fmtString }).query();
+		 int rowCount = r.fetchAllRows();
+		if(rowCount > 0) {
+			return  (String) r.readRowCol(0, "hash");
+		}
+		return null;
+}
+
+	//generate Hash based on format string
+	public String generateHash(String format){
+		String hashtext = null;
+		try {
+			MessageDigest m = MessageDigest.getInstance("MD5");
+			m.reset();
+			m.update(format.getBytes());
+			byte[] digest = m.digest();
+			BigInteger bigInt = new BigInteger(1, digest);
+			hashtext = bigInt.toString(16);
+			//limit hash string to 22 chars
+			hashtext = hashtext.substring(0, 22);
+		} catch (Exception e) {
+		}
+		return hashtext;
 	}
 	
 }

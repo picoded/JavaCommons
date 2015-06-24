@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Calendar;
 import java.util.ArrayList;
+import java.util.Date;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.IOUtils;
@@ -76,8 +78,8 @@ public class PiHttpRequester{
 										Map<String, String> headerMap, 
 										Map<String, String> cookieMap)
 	{
-		HttpClient httpClient = HttpClients.createDefault();
 		CookieStore httpCookieStore = generateCookieStore(cookieMap);
+		HttpClient httpClient = HttpClients.createDefault();
 		
 		//add cookie store to context for request
 		HttpContext localContext = new BasicHttpContext();
@@ -102,31 +104,31 @@ public class PiHttpRequester{
 		return piHttpResponse;
 	}
 	
-	private BasicClientCookie generateCookie(Map<String, String> cookieMap){
-		BasicClientCookie cookie = null;
+	private ArrayList<BasicClientCookie> generateCookieList(Map<String, String> cookieMap){
+		ArrayList<BasicClientCookie> cookieList = null;
 		
 		if(cookieMap != null){
+			cookieList = new ArrayList<BasicClientCookie>();
 			Set<String> keys = cookieMap.keySet();
 			int keyCount = keys.size();
-			int count = 0;
 			for(String key : keys){
-				if(count == 0){
-					cookie = new BasicClientCookie(key, cookieMap.get(key));
-				}
-				else{
-					cookie.setAttribute(key, cookieMap.get(key));
-				}
-				++count;
+				BasicClientCookie newCookie = new BasicClientCookie(key, cookieMap.get(key));
 			}
 		}
 		
-		return cookie;
+		return cookieList;
 	}
 	
 	private CookieStore generateCookieStore(Map<String, String> cookieMap){
-		BasicClientCookie clientCookie = generateCookie(cookieMap);
+		ArrayList<BasicClientCookie> clientCookies = generateCookieList(cookieMap);
 		CookieStore httpCookieStore = new BasicCookieStore();
-		httpCookieStore.addCookie(clientCookie);
+		if(clientCookies != null){
+			for(Cookie cookie : clientCookies){
+				httpCookieStore.addCookie(cookie);
+			}
+		} else {
+			System.out.println("Your clientCookies is null");
+		}
 		return httpCookieStore;
 	}
 	
@@ -266,7 +268,7 @@ public class PiHttpRequester{
 				piHeaders = new HashMap<String, String>();
 				
 				for(Cookie cookie : httpCookieStore.getCookies()){
-					piCookies.put(cookie.getName(), cookie.getValue());
+ 					piCookies.put(cookie.getName(), cookie.getValue());
 				}
 				for(Header header : resp.getAllHeaders()){
 					piHeaders.put(header.getName(), header.getValue());

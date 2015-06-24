@@ -77,6 +77,13 @@ public class PiHttpRequester_test
 
 			@Override
 			protected void doPost(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException {
+				//even though there is a getCookies method in HttpServletRequest, for some reason i have to retrieve my cookie from the header
+				//I am sending a request from apache and that is the only reason I can think of for this happening
+				System.out.println("Value for postCookie is: "+req.getHeader("postCookie"));
+				
+				//test send cookie back
+				resp.addCookie(new javax.servlet.http.Cookie("returnCookie", "returnCookieValue"));
+				
 				String postParam = req.getParameter("postValue");
 				System.out.println("Saw post parameter : "+postParam);
 				resp.getWriter().append("POST");
@@ -152,7 +159,7 @@ public class PiHttpRequester_test
 	
 	private String doPostTest() {
 		HashMap<String, String> cookies = new HashMap<String, String>();
-		cookies.put("cookie1", "cookie1Value");
+		cookies.put("postCookie", "postCookieValue");
 		
 		HashMap<String, String> postParams = new HashMap<String, String>();
 		postParams.put("postValue", "true");
@@ -164,6 +171,19 @@ public class PiHttpRequester_test
 			InputStream respStream = resp.getResponseBody();
 			String value = IOUtils.toString(respStream);
 			returnVal = String.valueOf(value).trim();
+			
+			Map<String, String> respCookies = resp.getCookies();
+			if(respCookies != null){
+				String cookieVal = respCookies.get("returnCookie");
+				if(cookieVal.equals("returnCookieValue")){
+					System.out.println("Cookie from post response found with value: "+cookieVal);
+				} else {
+					System.out.println("Cookie from post response NOT FOUND");
+				}
+			} else {
+				System.out.println("Cookies from post response is null");
+			}
+			
 		} catch (IOException ex) {
 			System.out.println("Exception reading inputstream: "+ex.getMessage());
 		}

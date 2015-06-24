@@ -10,7 +10,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import picoded.conv.Base58;
-import picoded.conv.ConvertJSON;
 import picoded.conv.GUID;
 import picoded.JSql.JSql;
 import picoded.JSql.JSqlException;
@@ -107,6 +106,21 @@ public class ServletLogging {
 	/// Primary key
 	protected String pKeyColumnType = " PRIMARY KEY";
 	
+	/// String indexed column prefix
+	private String stringIndexedPrefix = "s";
+	
+	/// Long indexed column prefix
+	private String longIndexedPrefix = "l";
+	
+	public int longIndexed = 02;
+	public int stringIndexed = 02;
+	
+	public int longNotIndexed = 02;
+	public int stringNotIndexed = 02;
+	
+	public int exceptionRootTraceIndexed = 02;
+	public int exceptionThrownTraceIndexed = 02;
+	
 	protected JSql sqliteObj;
 	protected JSql jSqlObj;
 	
@@ -119,15 +133,6 @@ public class ServletLogging {
 		this.sqliteObj = JSql.sqlite(sqlitePath);
 		this.jSqlObj = dbObj;
 	}
-	
-	public int longIndexed = 02;
-	public int stringIndexed = 02;
-	
-	public int longNotIndexed = 02;
-	public int stringNotIndexed = 02;
-	
-	public int exceptionRootTraceIndexed = 02;
-	public int exceptionThrownTraceIndexed = 02;
 	
 	/// Performs the needed table setup, required for the class. Do note that this includes the setup of logging formats and its respective tables
     /// Note that this table exists on both the sqlite, and the actual DB, all tables keep their data locally on sqlite, except logTable,
@@ -271,36 +276,36 @@ public class ServletLogging {
 		columnDefine.add(keyColumnType);
 
 		columnName.add("offSync");
-		columnDefine.add(bitColumnType);
+		columnDefine.add( bitColumnType );
 
 		columnName.add("reqID");
-		columnDefine.add(keyColumnType);
+		columnDefine.add( keyColumnType );
 
 		// long indexed
 		for (int i=1; i<=longIndexed;i++) {
-			columnName.add("l"+(i<10?"0":"")+i);
-			columnDefine.add(longColumnType);
+			columnName.add( longIndexedPrefix+(i<10?"0":"")+i );
+			columnDefine.add( longColumnType );
 		}
 		// string indexed
 		for (int i=1; i<=stringIndexed;i++) {
-			columnName.add("s"+(i<10?"0":"")+i);
-			columnDefine.add(keyColumnType);
+			columnName.add( stringIndexedPrefix+(i<10?"0":"")+i );
+			columnDefine.add( keyColumnType );
 		}
 		// long not indexed
 		//for (int i=(longIndexed+1); i<=(longIndexed+1+longNotIndexed);i++) {
-		//	columnName.add("s"+(i<10?"0":"")+i);
+		//	columnName.add( longIndexedPrefix+(i<10?"0":"")+i );
 		//	columnDefine.add(longColumnType);
 		//}
-		columnName.add("l"+((longIndexed+1)<10?"0":"")+(longIndexed+1));
-		columnDefine.add(longColumnType);
+		columnName.add( longIndexedPrefix+((longIndexed+1)<10?"0":"")+(longIndexed+1) );
+		columnDefine.add( longColumnType );
 		
 		// string not indexed
 		//for (int i=(stringIndexed+1); i<=(stringIndexed+1+stringNotIndexed);i++) {
-		//	columnName.add("s"+(i<10?"0":"")+i);
+		//	columnName.add( stringIndexedPrefix+(i<10?"0":"")+i );
 		//	columnDefine.add(keyColumnType);
 		//}
-		columnName.add("s"+((stringIndexed+1)<10?"0":"")+(stringIndexed+1));
-		columnDefine.add(fullTextColumnType);
+		columnName.add( stringIndexedPrefix+((stringIndexed+1)<10?"0":"")+(stringIndexed+1) );
+		columnDefine.add( fullTextColumnType );
 
 		dbObj.createTableQuerySet(
 						"logTable",
@@ -530,16 +535,16 @@ public class ServletLogging {
 					if (stringIndexedCount > stringIndexed) {
 						extraString.add((String) args[index++]);
 					} else {
-						sql += ", s" + (stringIndexedCount < 10 ? "0" : "")
+						sql += ", "+ stringIndexedPrefix + (stringIndexedCount < 10 ? "0" : "")
 								+ stringIndexedCount++;
 						sqlValues += ", ?";
 						values.add(args[index++]);
 					}
-				} else if (format.charAt(lastIndex + 1) == 'i') {
+				} else if (format.charAt(lastIndex + 1) == 'i' || format.charAt(lastIndex + 1) == 'd' || format.charAt(lastIndex + 1) == 'f') {
 					if (longIndexedCount > longIndexed) {
 						extraLong.add(new Long(String.valueOf(args[index++])));
 					} else {
-						sql += ", l" + (longIndexedCount < 10 ? "0" : "")
+						sql += ", " + longIndexedPrefix + (longIndexedCount < 10 ? "0" : "")
 								+ longIndexedCount++;
 						sqlValues += ", ?";
 						values.add(args[index++]);
@@ -549,13 +554,13 @@ public class ServletLogging {
 			}
 		}
 		if (!extraString.isEmpty()) {
-			sql += ", s" + (stringIndexedCount < 10 ? "0" : "")
+			sql += ", "+ stringIndexedPrefix + (stringIndexedCount < 10 ? "0" : "")
 									+ stringIndexedCount++;
 			sqlValues += ", ?";
 			values.add(extraString.toString());
 		}
 		if (!extraLong.isEmpty()) {
-			sql += ", l" + (longIndexedCount < 10 ? "0" : "")
+			sql += ", " + longIndexedPrefix + (longIndexedCount < 10 ? "0" : "")
 									+ longIndexedCount++;
 			sqlValues += ", ?";
 			values.add(extraLong.toString());
@@ -595,23 +600,24 @@ public class ServletLogging {
 				int longIndexedCount = 1;
 				int stringIndexedCount = 1;
 				int lastIndex = 0;
-				boolean stringNotIndexedFetched = false;
-				boolean longNotIndexedFetched = false;
+				int stringNotIndexedCount = 0;
+				int longNotIndexedCount = 0;
 				while (lastIndex != -1) {
 					lastIndex = format.indexOf(findStr, lastIndex);
 					if (lastIndex != -1) {
 						if (format.charAt(lastIndex + 1) == 's') {
-							if (stringIndexedCount > stringIndexed && !stringNotIndexedFetched) {
-								// The program should enter to this if block only once
-								stringNotIndexedFetched = true;
-								col = "s"+(stringIndexedCount<10?"0":"")+stringIndexedCount;
+							if (stringIndexedCount > stringIndexed) {
+								col = stringIndexedPrefix + (stringIndexedCount<10?"0":"")+stringIndexedCount;
 								// read column value from db
 								val = r.readRowCol(pt, col);
 								if (val != null && val.toString().trim().length() != 0 && !"null".equalsIgnoreCase(val.toString().trim())) {
-									logMessage.addAllArgs(ConvertJSON.toList((String)val));
+									String[] arr = (val.toString().replaceAll("\\[", "").replaceAll("\\]","")).split(",");
+									if (arr != null && arr.length > 0) {
+										logMessage.addArgs(arr[stringNotIndexedCount++].trim());
+									}
 								}
 							} else {
-								col = "s"+(stringIndexedCount<10?"0":"")+stringIndexedCount;
+								col = stringIndexedPrefix + (stringIndexedCount<10?"0":"")+stringIndexedCount;
 								// read column value from db
 								val = r.readRowCol(pt, col);
 								if (val != null && val.toString().trim().length() != 0 && !"null".equalsIgnoreCase(val.toString().trim())) {
@@ -619,18 +625,23 @@ public class ServletLogging {
 								}
 								stringIndexedCount++;
 							}
-						} else if (format.charAt(lastIndex + 1) == 'i') {
-							if (longIndexedCount > longIndexed && !longNotIndexedFetched) {
-								// The program should enter to this if block only once
-								longNotIndexedFetched = true;
-								col = "s"+(longIndexedCount<10?"0":"")+longIndexedCount;
-								// read column value from db
-								val = r.readRowCol(pt, col);
-								if (val != null) {
-									logMessage.addAllArgs(ConvertJSON.toList((String)val));
-								}
+						} else if (format.charAt(lastIndex + 1) == 'i' || format.charAt(lastIndex + 1) == 'd' || format.charAt(lastIndex + 1) == 'f') {
+							if (longIndexedCount > longIndexed) {
+									col = longIndexedPrefix + (longIndexedCount<10?"0":"")+longIndexedCount;
+									// read column value from db
+									val = r.readRowCol(pt, col);
+									if (val != null) {
+										String[] arr = (val.toString().replaceAll("\\[", "").replaceAll("\\]","")).split(",");
+										if (arr != null && arr.length > 0) {
+											if (arr[longNotIndexedCount].indexOf(".") == -1) {
+												logMessage.addArgs(Integer.valueOf(arr[longNotIndexedCount++].trim()));
+											} else {
+												logMessage.addArgs(Float.valueOf(arr[longNotIndexedCount++].trim()));
+											}
+										}
+									}
 							} else {
-								col = "s"+(longIndexedCount<10?"0":"")+longIndexedCount;
+								col = longIndexedPrefix + (longIndexedCount<10?"0":"")+longIndexedCount;
 								// read column value from db
 								val = r.readRowCol(pt, col);
 								if (val != null) {

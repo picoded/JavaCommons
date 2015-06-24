@@ -3,6 +3,8 @@ package picoded.ServletLogging;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class LogMessage {
 
 	// store format string
@@ -31,11 +33,6 @@ public class LogMessage {
 		return args;
 	}
 	
-	// / Set the arguments list
-	public void setArgs(List<Object> args) {
-		this.args = args;
-	}
-	
 	// / Add object to the arguments list
 	public void addArgs(Object obj) {
 		if (this.args == null) {
@@ -45,7 +42,7 @@ public class LogMessage {
 	}
 	
 	// / Add Object[] array to the arguments list
-	public void addAllArgs(List<Object> list) {
+	public void addArgs(List<Object> list) {
 		if (this.args == null) {
 			this.args = new ArrayList<Object>();
 		}
@@ -55,7 +52,10 @@ public class LogMessage {
 	// / Returns formatted string
 	@Override
 	public String toString() {
-		return String.format( getFormat(), getArgs() );
+		if (StringUtils.isBlank(getFormat()) || getArgs() == null || getArgs().isEmpty()) {
+			return "";
+		}
+		return String.format( getFormat(), getArgs().toArray(new Object[getArgs().size()]) );
 	}
 
 }

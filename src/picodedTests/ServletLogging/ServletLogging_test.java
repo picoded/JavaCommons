@@ -8,6 +8,7 @@ import picoded.JSql.JSql;
 import picoded.JSql.JSqlException;
 
 // Target test class
+import picoded.ServletLogging.LogMessage;
 import picoded.ServletLogging.ServletLogging;
 
 // Test Case include
@@ -75,21 +76,30 @@ public class ServletLogging_test {
 		slObj.log("log user %s, at time %i from %s.", args);
 	}
 	
-/*	@Test
+	@Test
 	public void list() throws JSqlException {
 		int time = (int)(System.currentTimeMillis() / 1000);
 		// save log
+		String formatStr = "The %s lazy %s jumps %s the %s, at time %d %d %d %d in %s.";
 		Object[] args = {"brown", "dog", "over", "wall", time, time, time, time, "SG"};
-		slObj.log("The %s lazy %s jumps %s the %s, at time %i %i %i %i in %s.", args);
+		
+		// save format string and log details
+		slObj.log(formatStr, args);
 
 		// fetch all logs
-		List<Map<String, Object>> list = slObj.list();
-		// System.out.println(list);
+		List<LogMessage> list = slObj.list();
+		
+		// Check for NULL
 		assertNotNull("SQL result returns as expected", list);
-	}*/
-	@Test
-	public void list() throws JSqlException {
-		slObj.list();
-		assertNotNull("SQL result returns as expected", "kkkk");
+
+		// Assert Format string 
+		assertEquals(formatStr, list.get(0).getFormat());
+
+		// Assert agruments size 
+		assertEquals(args.length, list.get(0).getArgs().size());
+		
+		// Assert formatted string 
+		assertEquals(String.format(formatStr, args), list.get(0).toString());
 	}
+
 }

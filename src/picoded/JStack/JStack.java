@@ -50,8 +50,20 @@ public class JStack extends JStackLayer {
 		setTablePrefix(inNamespace);
 	}
 	 */
-
+	
 	//----------------------------------------------
-	// Constructor
+	// JStack modules
 	//----------------------------------------------
+	
+	public MetaTable getMetaTable(String tableName) {
+		return new MetaTable(this, tableName);
+	}
+	
+	public KeyValueMap getKeyValueMap(String tableName) {
+		return new KeyValueMap(this, tableName);
+	}
+	
+	public PersonaTable getPersonaTable(String tableName) {
+		return new PersonaTable(this, tableName);
+	}
 }

@@ -1,5 +1,6 @@
 package picoded.ServletLogging;
 
+import picoded.ServletLogging.LogMessage;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -9,6 +10,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import picoded.conv.Base58;
+import picoded.conv.ConvertJSON;
 import picoded.conv.GUID;
 import picoded.JSql.JSql;
 import picoded.JSql.JSqlException;
@@ -567,19 +569,83 @@ public class ServletLogging {
 			
 	}
 	
-   // / Returns all the log messages
-	public List<Map<String, Object>> list() throws JSqlException {
-		List<Map<String, Object>> list = null;
-		JSqlResult r = sqliteObj.selectQuerySet("logTable", "*", null, null).query();
-		int rowCount = r.fetchAllRows();
-		if (rowCount > 0) {
-			list = new ArrayList<Map<String, Object>>();
-			
+	public List<LogMessage> list() throws JSqlException {
+		List<LogMessage> list = null;
+	
+		JSqlResult r = jSqlObj.executeQuery("SELECT lf.format, lt.* FROM logFormat lf"+
+       " INNER JOIN logTable lt on lf.hash = lt.fmtHash");
+	
+	   int rowCount = r.fetchAllRows();
+		if(rowCount > 0) {
+			list = new ArrayList<LogMessage>();
+			LogMessage logMessage = null;
+			Object val = null;
+			String format = null;
+			String col = null;
 			for (int pt = 0; pt < rowCount; pt++) {
-				list.add(r.readRow(pt));
+				logMessage = new LogMessage();
+				
+				// get format String
+				format = (String) r.readRowCol(pt, "format");
+				logMessage.setFormat(format);
+				
+				// parse the format string
+				// fetch the fields value in the same order as present in the format string
+				String findStr = "%";
+				int longIndexedCount = 1;
+				int stringIndexedCount = 1;
+				int lastIndex = 0;
+				boolean stringNotIndexedFetched = false;
+				boolean longNotIndexedFetched = false;
+				while (lastIndex != -1) {
+					lastIndex = format.indexOf(findStr, lastIndex);
+					if (lastIndex != -1) {
+						if (format.charAt(lastIndex + 1) == 's') {
+							if (stringIndexedCount > stringIndexed && !stringNotIndexedFetched) {
+								// The program should enter to this if block only once
+								stringNotIndexedFetched = true;
+								col = "s"+(stringIndexedCount<10?"0":"")+stringIndexedCount;
+								// read column value from db
+								val = r.readRowCol(pt, col);
+								if (val != null && val.toString().trim().length() != 0 && !"null".equalsIgnoreCase(val.toString().trim())) {
+									logMessage.addAllArgs(ConvertJSON.toList((String)val));
+								}
+							} else {
+								col = "s"+(stringIndexedCount<10?"0":"")+stringIndexedCount;
+								// read column value from db
+								val = r.readRowCol(pt, col);
+								if (val != null && val.toString().trim().length() != 0 && !"null".equalsIgnoreCase(val.toString().trim())) {
+									logMessage.addArgs(val);
+								}
+								stringIndexedCount++;
+							}
+						} else if (format.charAt(lastIndex + 1) == 'i') {
+							if (longIndexedCount > longIndexed && !longNotIndexedFetched) {
+								// The program should enter to this if block only once
+								longNotIndexedFetched = true;
+								col = "s"+(longIndexedCount<10?"0":"")+longIndexedCount;
+								// read column value from db
+								val = r.readRowCol(pt, col);
+								if (val != null) {
+									logMessage.addAllArgs(ConvertJSON.toList((String)val));
+								}
+							} else {
+								col = "s"+(longIndexedCount<10?"0":"")+longIndexedCount;
+								// read column value from db
+								val = r.readRowCol(pt, col);
+								if (val != null) {
+									logMessage.addArgs(val);
+								}
+								longIndexedCount++;
+							}
+						}
+						lastIndex += findStr.length();
+					}
+				}
+				// add the logMessage class to list
+				list.add(logMessage);
 			}
-      }
-
+		}
 		return list;
 	}
 

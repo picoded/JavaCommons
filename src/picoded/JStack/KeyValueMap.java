@@ -12,9 +12,12 @@ import java.util.Collection;
 
 /// Picoded imports
 import picoded.conv.GUID;
+import picoded.conv.GenericConvert;
 import picoded.JSql.*;
 import picoded.JCache.*;
 import picoded.struct.CaseInsensitiveHashMap;
+import picoded.struct.GenericConvertMap;
+import picoded.security.NxtCrypt;
 
 /// hazelcast
 import com.hazelcast.core.*;
@@ -26,761 +29,452 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
-/// JStackData represents a standard JStack data interface, in which common setup, and SQL derivatives are formed
-public class KeyValueMap {
-	
-	/*
-	 
+/// @TODO Documentation
+public class KeyValueMap extends JStackData implements GenericConvertMap<String,String> {
+
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
-	
-	/// Internal JStackObj
-	protected JStack JStackObj = null;
-	
-	/// Internal table name, before prefix?
-	protected String tableName = "MetaTable";
-	
+
 	/// Setup the metatable with the default table name
 	public KeyValueMap(JStack inStack) {
-		JStackObj = inStack;
+		super( inStack );
+		tableName = "KeyValueMap";
 	}
-	
+
 	/// Setup the metatable with the given stack
 	public KeyValueMap(JStack inStack, String inTableName) {
-		JStackObj = inStack;
-		
-		if (inTableName == null) {
-			throw new RuntimeException("Invalid table name (null): " + inTableName);
-		}
-		
-		final String numericString = "0123456789";
-		if (numericString.indexOf(inTableName.substring(0, 1)) > 0) {
-			throw new RuntimeException("Invalid table name (cannot start with numbers): " + inTableName);
-		}
-		
-		tableName = inTableName;
+		super( inStack, inTableName );
 	}
-	
+
 	///
 	/// Internal config vars
 	///--------------------------------------------------------------------------
-	
-	/// Object ID field type
-	protected String objColumnType = "VARCHAR(32)";
-	
-	/// Key name field type
-	protected String keyColumnType = "VARCHAR(32)";
-	
-	/// Type collumn type
-	protected String typeColumnType = "TINYINT";
-	
-	/// Index collumn type
-	protected String indexColumnType = "TINYINT";
-	
-	/// String value field type
-	/// @TODO: Investigate performance issues for this approach
-	protected String numColumnType = "DECIMAL(36,12)";
-	
-	/// String value field type
-	protected String strColumnType = "VARCHAR(64)";
-	
-	/// Full text value field type
-	protected String fullTextColumnType = "VARCHAR(MAX)";
-	
+
+	/// Primary key type
+	protected String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
+
 	/// Timestamp field type
 	protected String tStampColumnType = "BIGINT";
-	
-	/// Primary key type
-	protected String pKeyColumnType = "INTEGER PRIMARY KEY AUTOINCREMENT";
-	
-	/// Indexed view prefix, this is used to handle index conflicts between "versions" if needed
-	protected String viewSuffix = "";
-	
-	///
-	/// JStack setup functions
-	///--------------------------------------------------------------------------
-	
-	/// Does the required table setup for the various applicable stack layers
-	public MetaTable stackSetup() throws JStackException {
-		try {
-			JStackLayer[] sl = JStackObj.stackLayers();
-			for (int a = 0; a < sl.length; ++a) {
-				// JSql specific setup
-				if (sl[a] instanceof JSql) {
-					JSqlDataTableSetup((JSql) (sl[a]));
-					JSqlIndexConfigTableSetup((JSql) (sl[a]));
-				} else if (sl[a] instanceof JCache) {
-					
-				}
-			}
-		} catch (JSqlException e) {
-			throw new JStackException(e);
-		}
-		
-		return this;
-	}
-	
-	/// Removes all the various application stacklayers
-	///
-	/// WARNING: this deletes all the data, and is not reversable
-	public MetaTable stackTeardown() throws JStackException {
-		try {
-			JStackLayer[] sl = JStackObj.stackLayers();
-			for (int a = 0; a < sl.length; ++a) {
-				// JSql specific setup
-				if (sl[a] instanceof JSql) {
-					JSqlTeardown((JSql) (sl[a]));
-				} else if (sl[a] instanceof JCache) {
-					
-				}
-			}
-		} catch (JSqlException e) {
-			throw new JStackException(e);
-		}
-		
-		return this;
-	}
-	
-	///
-	/// Indexed columns setup
-	///--------------------------------------------------------------------------
-	
-	/// SQL view name
-	protected String sqlViewName(JSql sql, String vTyp) {
-		return (sql.getTablePrefix() + tableName + "_" + vTyp + viewSuffix);
-	}
-	
-	/// Default type for all values not defined in the index
-	protected CaseInsensitiveHashMap<String, MetaType> typeMapping = new CaseInsensitiveHashMap<String, MetaType>();
-	protected MetaType defaultType = new MetaType(MetaType.TYPE_MIXED);
-	
-	/// Returned the defined metaType for the given key
-	public MetaType getType(String name) {
-		if (name == null || (name = name.trim().toLowerCase()).length() <= 0) {
-			throw new RuntimeException("Name parameter cannot be NULL or BLANK");
-		}
-		
-		return typeMapping.get(name);
-	}
-	
-	/// Sets the defined metaType for the given key
-	public MetaTable putType(String name, MetaType type) {
-		if (name == null || (name = name.trim().toLowerCase()).length() <= 0) {
-			throw new RuntimeException("Name parameter cannot be NULL or BLANK");
-		}
-		
-		if (name.equals("_oid") || name.equals("_otm")) {
-			throw new RuntimeException("Name parameter uses reserved name " + name);
-		}
-		
-		typeMapping.put(name, type);
-		return this;
-	}
-	
-	///
+
+	/// Key name field type
+	protected String keyColumnType = "VARCHAR(64)";
+
+	/// Value field type
+	protected String valueColumnType = "VARCHAR(MAX)";
+
+	/// Is temp values only flag. This is used to indicate the stack should
+	/// optimize purely to JCache if possible (JSql will be used if a Jcache isnt provided)
+	protected boolean isTempValuesOnly = false;
 
 	///
-	/// Internal JSql index setup
+	/// Internal JSql table setup and teardown
 	///--------------------------------------------------------------------------
-	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
-	protected void JSqlMakeIndexViewQuery(JSql sql) throws JSqlException {
-		
-		StringBuilder sb = new StringBuilder("CREATE VIEW "); //OR REPLACE
-		sb.append(sqlViewName(sql, "view"));
-		sb.append(" AS ");
-		
-		String lBracket = "'";
-		String rBracket = "'";
-		
-		if (sql.sqlType == JSqlType.mssql) {
-			lBracket = "[";
-			rBracket = "]";
-		}
-		
-		String tableName = sqlTableName(sql);
-		
-		StringBuilder select = new StringBuilder(" SELECT B.oID AS ");
-		select.append(lBracket + "_oid" + rBracket);
-		select.append(", B.oTm AS ");
-		select.append(lBracket + "_otm" + rBracket);
-		
-		StringBuilder from = new StringBuilder(" FROM ");
-		
-		from.append("(SELECT DISTINCT oID, oTm FROM " + tableName + ")");
-		//from.append( tableName );
-		from.append(" AS B");
-		
-		String key;
-		MetaType type;
-		
-		ArrayList<Object> argList = new ArrayList<Object>();
-		
-		int joinCount = 0;
-		for (Map.Entry<String, MetaType> e : typeMapping.entrySet()) {
-			key = e.getKey();
-			type = e.getValue();
-			
-			if (type.valueType >= MetaType.TYPE_INTEGER && type.valueType <= MetaType.TYPE_FLOAT) {
-				
-				select.append(", N" + joinCount + ".nVl AS ");
-				select.append(lBracket + key + rBracket);
-				
-				from.append(" LEFT JOIN " + tableName + " AS N" + joinCount);
-				from.append(" ON B.oID = N" + joinCount + ".oID");
-				from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = '" + key + "'");
-				
-			} else if (type.valueType == MetaType.TYPE_STRING) {
-				
-				select.append(", S" + joinCount + ".tVl AS ");
-				select.append(lBracket + key + rBracket);
-				
-				select.append(", S" + joinCount + ".sVl AS ");
-				select.append(lBracket + key + "_lc" + rBracket);
-				
-				from.append(" LEFT JOIN " + tableName + " AS S" + joinCount);
-				from.append(" ON B.oID = S" + joinCount + ".oID");
-				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
-				
-			} else if (type.valueType == MetaType.TYPE_TEXT) {
-				
-				select.append(", S" + joinCount + ".tVl AS ");
-				select.append(lBracket + key + rBracket);
-				
-				from.append(" LEFT JOIN " + tableName + " AS S" + joinCount);
-				from.append(" ON B.oID = S" + joinCount + ".oID");
-				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
-				
-			}
-			
-			++joinCount;
-		}
-		
-		sb.append(select);
-		sb.append(from);
-		
-		//System.out.println( sb.toString() );
-		sql.execute_raw(sb.toString());
-	}
-	
-	///
-	protected void JSqlIndexConfigTableSetup(JSql sql) throws JSqlException {
-		String tName = sqlViewName(sql, "vCfg");
-		
-		// Table constructor
-		//-------------------
-		sql.createTableQuerySet( //
-			tName, //
-			new String[] { //
-			"nme", //Index column name
-				"typ", //Index column type
-				"con" //Index type string value
-			}, //
-			new String[] { //
-			keyColumnType, //
-				typeColumnType, //
-				keyColumnType //
-			} //
-			).execute(); //
-		
-		// Checks if the view needs to be recreated
-		boolean recreatesView = false;
-		
-		// Checks if view actually needs recreation?
-		recreatesView = true;
-		
-		// Recreates the view if needed
-		if (recreatesView) {
-			sql.execute("DROP VIEW IF EXISTS " + sqlViewName(sql, "view"));
-			JSqlMakeIndexViewQuery(sql);
-		}
-	}
-	
-	/// 
-	protected void JSqlTeardown(JSql sql) throws JSqlException {
-		sql.execute("DROP VIEW IF EXISTS " + sqlViewName(sql, "view"));
-		sql.execute("DROP TABLE IF EXISTS " + sqlViewName(sql, "vCfg"));
-		sql.execute("DROP TABLE IF EXISTS " + sqlTableName(sql));
-	}
-	
-	///
-	/// Internal JSql table setup
-	///--------------------------------------------------------------------------
-	
-	/// SQL Table name
-	protected String sqlTableName(JSql sql) {
-		return (sql.getTablePrefix() + tableName);
-	}
-	
-	/// JSQL Based tabel data storage
-	protected void JSqlDataTableSetup(JSql sql) throws JSqlException {
+
+	/// Setsup the respective JSql table
+	@Override
+	protected boolean JSqlSetup(JSql sql) throws JSqlException, JStackException {
 		String tName = sqlTableName(sql);
-		
+
 		// Table constructor
 		//-------------------
 		sql.createTableQuerySet( //
-			tName, //
-			new String[] { //
-			// Primary key, as classic int, htis is used to lower SQL
-				// fragmentation level, and index memory usage. And is not accessible.
-				// Sharding and uniqueness of system is still maintained by GUID's
-				"pKy", //
-				// Time stamps
-				"cTm", //value created time
-				"uTm", //value updated time
-				"oTm", //object created time
-				// Object keys
-				"oID", //_oid
-				"kID", //key storage
-				"idx", //index collumn
-				// Value storage (except text)
-				"typ", //type collumn
-				"nVl", //numeric value (if applicable)
-				"sVl", //case insensitive string value (if applicable), or case sensitive hash
-				// Text value storage
-				"tVl" //Textual storage, placed last for storage optimization
-			}, //
-			new String[] { //
-			pKeyColumnType, //Primary key
-				// Time stamps
-				tStampColumnType, tStampColumnType, tStampColumnType,
-				// Object keys
-				objColumnType, //
-				keyColumnType, //
-				indexColumnType, //
-				// Value storage
-				typeColumnType, //
-				numColumnType, //
-				strColumnType, //
-				fullTextColumnType //
-			} //
-			).execute();
-		
+										tName, //
+										new String[] { //
+											// Primary key, as classic int, this is used to lower SQL
+											// fragmentation level, and index memory usage. And is not accessible.
+											// Sharding and uniqueness of system is still maintained by meta keys
+											"pKy", //
+											// Time stamps
+											"cTm", //value created time
+											"eTm", //value expire time
+											// Storage keys
+											"kID", //
+											// Value storage
+											"kVl" //
+										}, //
+										new String[] { //
+											pKeyColumnType, //Primary key
+											// Time stamps
+											tStampColumnType,
+											tStampColumnType,
+											// Storage keys
+											keyColumnType, //
+											// Value storage
+											valueColumnType
+										} //
+		).execute();
+
 		// Unique index
-		//
-		// This also optimizes query by object keys
 		//------------------------------------------------
 		sql.createTableIndexQuerySet( //
-			tName, "oID, kID, idx", "UNIQUE", "unq" //
-		).execute();
-		
-		// Key Values search index 
+											  tName, "kID", "UNIQUE", "unq" //
+											  ).execute();
+
+		// Value search index
 		//------------------------------------------------
 		sql.createTableIndexQuerySet( //
-			tName, "kID, nVl, sVl", null, "valMap" //
-		).execute();
-		
-		// Object timestamp optimized Key Value indexe
-		//------------------------------------------------
-		sql.createTableIndexQuerySet( //
-			tName, "oTm, kID, nVl, sVl", null, "oTm_valMap" //
-		).execute();
-		
-		// Full text index, for textual data
-		// @TODO FULLTEXT index support
-		//------------------------------------------------
-		//if (sql.sqlType != JSqlType.sqlite) {
-		//	sql.createTableIndexQuerySet( //
-		//		tName, "tVl", "FULLTEXT", "tVl" //
-		//	).execute();
-		//} else {
-		sql.createTableIndexQuerySet( //
-			tName, "tVl", null, "tVl" // Sqlite uses normal index
-		).execute();
-		//}
-		
-		// timestamp index, is this needed?
-		//------------------------------------------------
-		//sql.createTableIndexQuerySet( //
-		//	tName, "uTm", null, "uTm" //
-		//).execute();
-		
-		//sql.createTableIndexQuerySet( //
-		//	tName, "cTm", null, "cTm" //
-		//).execute();
+											  tName, "kVl", null, "valMap" //
+											  ).execute();
+
+		return true;
 	}
-	
+
+	/// Removes the respective JSQL tables and view (if it exists)
+	@Override
+	protected boolean JSqlTeardown(JSql sql) throws JSqlException, JStackException {
+		//sql.execute("DROP TABLE IF EXISTS " + sqlTableName(sql));
+		return true;
+	}
+
 	///
-	/// JSQL Specific PUT and GET meta map operations
+	/// Utility functions used internally
 	///--------------------------------------------------------------------------
-	
-	/// Fetches the result array position using the filters
-	protected int fetchResultPosition(JSqlResult r, String _oid, String key, int idx) {
-		List<Object> oID_list = r.get("oID");
-		List<Object> kID_list = r.get("kID");
-		List<Object> idx_list = r.get("idx");
-		
-		int lim = kID_list.size();
-		for (int i = 0; i < lim; ++i) {
-			
-			if (_oid != null && !_oid.equals(oID_list.get(i))) {
-				continue;
-			}
-			
-			if (key != null && !key.equals(((String) (kID_list.get(i))).toLowerCase())) {
-				continue;
-			}
-			
-			if (idx > -9 && idx != ((Number) (idx_list.get(i))).intValue()) {
-				continue;
-			}
-			
-			return i;
-		}
-		
-		return -1;
+
+	/// Gets the current system time in seconds
+	protected long currentSystemTime_seconds() {
+		return (System.currentTimeMillis())/1000L;
 	}
-	
-	/// Fetches the result array position using the filters
-	protected int fetchResultPosition(JSqlResult r, String key, int idx) {
-		return fetchResultPosition(r, null, key, idx);
-	}
-	
-	/// Extract out all the unique string values from a list array
-	protected String[] extractUnique(List<Object> arr) {
-		HashSet<String> retSet = new HashSet<String>();
-		for (Object t : arr) {
-			retSet.add(((String) t).toLowerCase());
-		}
-		return retSet.toArray(new String[retSet.size()]);
-	}
-	
-	/// Extract the key value
+
 	///
-	/// @TODO: Support the various numeric value
-	/// @TODO: Support string / text
-	/// @TODO: Support array sets
-	/// @TODO: Support GUID hash
-	/// @TODO: Support MetaTable
-	///
-	protected Object extractKeyValue(JSqlResult r, String key) throws JSqlException {
-		int pos = fetchResultPosition(r, key, 0); //get the 0 pos value
-		
-		if (pos <= -1) {
-			return null;
-		}
-		
-		List<Object> typList = r.get("typ");
-		int baseType = ((Number) (typList.get(pos))).intValue();
-		
-		// Int, Long, Double, Float
-		if (baseType >= MetaType.TYPE_INTEGER && baseType <= 34) {
-			if (baseType == MetaType.TYPE_INTEGER) {
-				return new Integer(((Number) (r.get("nVl").get(pos))).intValue());
-			}
-		} else if (baseType == MetaType.TYPE_STRING) { // String
-			return (String) (r.get("tVl").get(pos));
-		} else if (baseType == 52) { // Text
-			return (String) (r.get("tVl").get(pos));
-		} else {
-			
-		}
-		throw new JSqlException("Object type not yet supported: " + baseType);
-		//return null;
+	/// Temp variables optimization, used to indicate pure session like data,
+	/// that does not require persistance (or even SQL)
+	///--------------------------------------------------------------------------
+
+	/// Gets if temp mode optimization hint is indicated
+	public boolean getTempMode() {
+		return isTempValuesOnly;
 	}
-	
-	/// MetaTable JSqlResult to CaseInsensitiveHashMap
-	protected Map<String, Object> JSqlResultToMap(JSqlResult r) throws JSqlException {
-		if (r != null && r.rowCount() <= 1) {
-			return null;
-		}
-		
-		// Get all the unique keys
-		String[] keys = extractUnique(r.get("kID"));
-		
-		// Extract the respective key values
-		Map<String, Object> retMap = new CaseInsensitiveHashMap<String, Object>();
-		for (int a = 0; a < keys.length; ++a) {
-			if (keys[a].equals("oid")) { //reserved
-				continue;
-			}
-			retMap.put(keys[a], extractKeyValue(r, keys[a]));
-		}
-		
-		return retMap;
-	}
-	
-	/// JSQL based GET
-	protected Map<String, Object> JSqlObjectGet(JSql sql, String _oid) throws JSqlException {
-		String tName = sqlTableName(sql);
-		
-		// Fetch all the meta fields
-		JSqlResult r = sql.selectQuerySet(tName, "*", "oID=?", new Object[] { _oid }).query();
-		
-		// Convert to map object
-		Map<String, Object> retMap = JSqlResultToMap(r);
-		
-		// Enforce policies (if data is valid)
-		if (retMap != null) {
-			// Add object ID (enforce it)
-			retMap.put("oID", _oid);
-		}
-		
-		return retMap;
-	}
-	
-	/// JSQL based Append
-	protected void JSqlObjectAppend(JSql sql, String _oid, Map<String, Object> obj, Set<String> keyList,
-		boolean handleQuery) throws JSqlException {
-		String tName = sqlTableName(sql);
-		
-		boolean sqlMode = handleQuery ? sql.getAutoCommit() : false;
-		if (sqlMode) {
-			sql.setAutoCommit(false);
-		}
-		
-		Object[] typSet;
-		String k;
-		Object v;
-		
-		for (Map.Entry<String, Object> entry : obj.entrySet()) {
-			
-			k = (entry.getKey()).toLowerCase();
-			if (k.equals("oid") || k.equals("_oid") || k.equals("_otm")) { //reserved
-				continue;
-			}
-			
-			if (keyList != null && !keyList.contains(k)) {
-				continue;
-			}
-			
-			v = entry.getValue();
-			typSet = valueToOptionSet(k, v);
-			
-			// This is currently only for NON array mode
-			sql.upsertQuerySet( //
-				tName, //
-				new String[] { "oID", "kID", "idx" }, //
-				new Object[] { _oid, k, 0 }, //
-				//
-				new String[] { "typ", "nVl", "sVl", "tVl" }, //
-				new Object[] { typSet[0], typSet[1], typSet[2], typSet[3] }, //
-				null, null, null//
-				).execute();
-		}
-		
-		sql.commit();
-		if (sqlMode) {
-			sql.setAutoCommit(true);
-		}
-	}
-	
-	/// Values to option set conversion
-	///
-	/// @TODO: Support the various numeric value
-	/// @TODO: Support string / text
-	/// @TODO: Support array sets
-	/// @TODO: Support GUID hash
-	/// @TODO: Support MetaTable
-	/// @TODO: Check against configured type
-	/// @TODO: Convert to configured type if possible (like numeric)
-	/// @TODO: Support proper timestamp handling (not implemented)
-	///
-	protected Object[] valueToOptionSet(String key, Object value) throws JSqlException {
-		if (value instanceof Integer) {
-			return new Object[] { new Integer(MetaType.TYPE_INTEGER), value, null, null }; //Typ, N,S,I,T
-		} else if (value instanceof String) {
-			return new Object[] { new Integer(MetaType.TYPE_STRING), 0, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
-		}
-		
-		throw new JSqlException("Object type not yet supported: " + value);
-	}
-	
-	//
-	// Query operations
-	//--------------------------------------------------------------------------
-	
-	/// Query from JSql layer
-	///
-	/// @TODO: support array fetches / searches
-	/// @TODO: support string lower case search index optimization
-	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
-	protected Map<String, ArrayList<Object>> JSqlQuery(JSql sql, String selectCols, String whereClause,
-		Object[] whereValues, String orderBy, long limit, long offset) throws JSqlException {
-		if (selectCols == null) {
-			selectCols = "_oid";
-		} else {
-			selectCols.toLowerCase();
-			
-			if (selectCols.indexOf("_oid") == -1) {
-				selectCols = "_oid, " + selectCols;
-			}
-		}
-		
-		if (whereClause != null) {
-			whereClause = whereClause.toLowerCase();
-		}
-		
-		return (sql
-			.selectQuerySet(sqlViewName(sql, "view"), selectCols, whereClause, whereValues, orderBy, limit, offset)
-			.query());
-	}
-	
-	/// SQL Query to fetch the relevent data, values are loaded on query
-	protected Map<String, ArrayList<Object>> queryData(String selectCols, String whereClause, Object[] whereValues,
-		String orderBy, long limit, long offset) throws JStackException {
-		Map<String, ArrayList<Object>> ret = null;
-		try {
-			JStackLayer[] sl = JStackObj.stackLayers();
-			for (int a = 0; a < sl.length; ++a) {
-				// JSql specific setup
-				if (sl[a] instanceof JSql) {
-					ret = JSqlQuery((JSql) (sl[a]), selectCols, whereClause, whereValues, orderBy, limit, offset);
-					
-					if (ret != null) {
-						return ret;
-					}
-				} else if (sl[a] instanceof JCache) {
-					
-				}
-			}
-		} catch (JSqlException e) {
-			throw new JStackException(e);
-		}
-		throw new JStackException("queryData not supported, missing JSql layer?");
-	}
-	
-	/// Does a conversion from the JSqlResult map, to the
-	protected MetaObject[] JSqlResultToMetaObjectArray(Map<String, ArrayList<Object>> jRes) throws JStackException {
-		ArrayList<Object> oID_list = jRes.get("_oid");
-		if (oID_list == null || oID_list.size() <= 0) {
-			return new MetaObject[0];
-		}
-		
-		int len = oID_list.size();
-		
-		MetaObject[] ret = new MetaObject[len];
-		
-		CaseInsensitiveHashMap<String, Object> queryCache = new CaseInsensitiveHashMap<String, Object>();
-		MetaObject mObj;
-		
-		for (int a = 0; a < len; ++a) {
-			mObj = lazyGet((String) (oID_list.get(a)));
-			queryCache = new CaseInsensitiveHashMap<String, Object>();
-			
-			for (Map.Entry<String, ArrayList<Object>> entry : jRes.entrySet()) {
-				queryCache.put(entry.getKey(), entry.getValue().get(a));
-			}
-			
-			mObj.queryDataMap = queryCache;
-			ret[a] = mObj;
-		}
-		
+
+	/// Sets temp mode optimization indicator hint
+	public boolean setTempMode(boolean mode) {
+		boolean ret = isTempValuesOnly;
+		isTempValuesOnly = mode;
+
 		return ret;
 	}
-	
-	/// Performs a search query, and returns the respective relevent objects
-	public MetaObject[] queryObjects(String whereClause, Object[] whereValues, String orderBy, long limit, long offset,
-		String optimalSelect) throws JStackException {
-		
-		Map<String, ArrayList<Object>> qData = queryData(optimalSelect, whereClause, whereValues, orderBy, limit, offset);
-		return JSqlResultToMetaObjectArray(qData);
-	}
-	
-	/// Performs a search query, and returns the respective relevent objects
-	public MetaObject[] queryObjects(String whereClause, Object[] whereValues, String orderBy, long limit, long offset)
-		throws JStackException {
-		return queryObjects(whereClause, whereValues, orderBy, limit, offset, null);
-	}
-	
-	/// Performs a search query, and returns the respective relevent objects
-	public MetaObject[] queryObjects(String whereClause, Object[] whereValues, String orderBy) throws JStackException {
-		return queryObjects(whereClause, whereValues, orderBy, 0, 0, null);
-	}
-	
-	/// Performs a search query, and returns the respective relevent objects
-	public MetaObject[] queryObjects(String whereClause, Object[] whereValues) throws JStackException {
-		return queryObjects(whereClause, whereValues, null, 0, 0, null);
-	}
-	
-	//
-	// Internal PUT / GET object functions
-	//--------------------------------------------------------------------------
-	/// GET operation used for lazy loading in MetaObject
-	protected Map<String, Object> lazyLoadGet(String _oid) throws JStackException {
-		// This is the non-lazy load method
-		Map<String, Object> ret = null;
+
+	///
+	/// Standard map operations
+	///--------------------------------------------------------------------------
+
+	/// Contains key operation.
+	///
+	/// note that boolean false can either mean no value or expired value
+	///
+	/// @param key as String
+	/// @returns boolean true or false if the key exists
+	public boolean containsKey(Object key) {
+		if( key == null ) {
+			throw new IllegalArgumentException("containKey cannot have null as parmeter");
+		}
+
 		try {
-			JStackLayer[] sl = JStackObj.stackLayers();
-			for (int a = 0; a < sl.length; ++a) {
-				// JSql specific setup
-				if (sl[a] instanceof JSql) {
-					ret = JSqlObjectGet((JSql) (sl[a]), _oid);
-					
-					if (ret != null) {
+			long now = currentSystemTime_seconds();
+
+			String kID = key.toString();
+			Object r = JStackIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					if( ret != null ) {
 						return ret;
 					}
-				} else if (sl[a] instanceof JCache) {
-					
+
+					String tName = sqlTableName(sql);
+
+					// Search for the key
+					JSqlResult r = sql.selectQuerySet( //
+															 tName, //
+															 "kID", //
+															 "(eTm == 0 OR eTm > ?) AND kID = ?", //
+															 new Object[] { now, kID } //
+															 ).query();
+					// Has value
+					if( r.rowCount() > 0 && r.containsKey("kID") ) {
+						return r.get("kID").get(0);
+					}
+
+					return ret;
 				}
-			}
-		} catch (JSqlException e) {
-			throw new JStackException(e);
+			} );
+
+			return (r != null);
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
 		}
+	}
+
+	/// Stores (and overwrites if needed) key, value pair
+	///
+	/// Important note: It does not return the previously stored value
+	///
+	/// @param key as String
+	/// @param value as String
+	///
+	/// @returns null
+	public String put(String key, String value) {
+		return putWithExpiry(key, value, 0);
+	}
+
+	/// Returns the value, given the key
+	/// @param key param find the thae meta key
+	///
+	/// returns  value of the given key
+	public String get(Object key) {
+		try {
+			long now = currentSystemTime_seconds();
+			String kID = key.toString();
+
+			Object ret = JStackIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					if( ret != null ) {
+						return ret;
+					}
+
+					String tName = sqlTableName(sql);
+
+					// Search for the key
+					JSqlResult r = sql.selectQuerySet( //
+																 tName, //
+																 "kVl", //
+																 "(eTm == 0 OR eTm > ?) AND kID = ?", //
+																 new Object[] { now, kID } //
+																 ).query();
+					// Has value
+					if( r.rowCount() > 0 && r.containsKey("kVl") ) {
+						return r.get("kVl").get(0);
+					}
+
+					return ret;
+				}
+			} );
+
+			return (ret != null)? ret.toString() : null;
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		}
+		//return null;
+	}
+
+	/// Clears all the storage layer, without removing the
+	public void clear() {
+		try {
+			Object ret = JStackReverseIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					String tName = sqlTableName(sql);
+
+					sql.execute("DELETE * FROM `" + tName + "`");
+					return null;
+				}
+			} );
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	///
+	/// Extended operations
+	///--------------------------------------------------------------------------
+
+	/// Search using the value, all the relevent key mappings
+	public String[] getKeys(String value) {
+		try {
+			long now = currentSystemTime_seconds();
+
+			String val = (value == null)? null : value.toString();
+			Object r = JStackIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					if( ret != null ) {
+						return ret;
+					}
+
+					String tName = sqlTableName(sql);
+
+					// Search for the key
+					JSqlResult r = sql.selectQuerySet( //
+															 tName, //
+															 "kID", //
+															 "(eTm == 0 OR eTm > ?) AND kVl = ?", //
+															 new Object[] { now, val } //
+															 ).query();
+					// Has value
+					if( r.rowCount() > 0 && r.containsKey("kID") ) {
+						return GenericConvert.toStringArray( r.get("kID") );
+					}
+
+					return ret;
+				}
+			} );
+
+			return ((r != null)? (String[])r : new String[0]);
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		}
+		
+	}
+
+	/// Stores (and overwrites if needed) key, value pair
+	///
+	/// Important note: It does not return the previously stored value
+	///
+	/// @param key as String
+	/// @param value as String
+	/// @param lifespan time to expire in seconds
+	///
+	/// @returns null
+	public String putWithLifespan(String key, String value, long lifespan) {
+		return putWithExpiry(key,value, currentSystemTime_seconds() + lifespan);
+	}
+
+	/// Stores (and overwrites if needed) key, value pair
+	///
+	/// Important note: It does not return the previously stored value
+	///
+	/// @param key as String
+	/// @param value as String
+	/// @param expireTime expire time stamp valu
+	///
+	/// @returns null
+	public String putWithExpiry(String key, String value, long expireTime) {
+		try {
+			long now = currentSystemTime_seconds();
+
+			Object ret = JStackReverseIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					String tName = sqlTableName(sql);
+
+					sql.upsertQuerySet( //
+											 tName, //
+											 new String[] { "kID" }, //unique cols
+											 new Object[] { key }, //unique value
+											 //
+											 new String[] { "cTm", "eTm", "kVl" }, //insert cols
+											 new Object[] { now, expireTime, value } //insert values
+											 ).execute();
+
+					return null;
+				}
+			} );
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		}
+
 		return null;
 	}
-	
-	/// Update the object map with the given values, List<String> key list is used to 'optimize' sql insertions
-	protected void updateMap(String _oid, Map<String, Object> obj, Set<String> keyList) throws JStackException {
+
+	/// @TODO get expirary time (unix time)
+	public long getExpiry(Object key) {
+		return 0L;
+	}
+
+	/// @TODO get expirary time left (seconds)
+	public long getLifespan(Object key) {
+		return 0L;
+	}
+
+	/// @TODO set expirary time (unix time)
+	public long setExpiry(Object key, long time) {
+		return 0L;
+	}
+
+	/// @TODO set expirary time (seconds)
+	public long setLifeSpan(Object key, long time) {
+		return 0L;
+	}
+
+	/// Perform maintenance, mainly removing of expired data if applicable
+	public void maintenance() {
 		try {
-			JStackLayer[] sl = JStackObj.stackLayers();
-			for (int a = 0; a < sl.length; ++a) {
-				// JSql specific setup
-				if (sl[a] instanceof JSql) {
-					JSqlObjectAppend((JSql) (sl[a]), _oid, obj, keyList, true);
-				} else if (sl[a] instanceof JCache) {
-					
+			long now = currentSystemTime_seconds();
+			Object ret = JStackReverseIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					String tName = sqlTableName(sql);
+					sql.execute("DELETE * FROM `" + tName + "` WHERE eTm <= ?", now);
+					return null;
 				}
-			}
-		} catch (JSqlException e) {
-			throw new JStackException(e);
+			} );
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
 		}
 	}
-	
-	//
-	// APPEND, PUT, GET, REMOVE meta map operations
-	//--------------------------------------------------------------------------
-	
-	/// GET, returns the stored map, note that oID is reserved for the objectID
-	public MetaObject get(String _oid) throws JStackException {
-		// This is the non-lazy load method
-		Map<String, Object> ret = lazyLoadGet(_oid);
-		return (ret == null) ? null : new MetaObject(this, _oid, ret);
-	}
-	
-	/// Lazy GET, returns the the object map, loads it data only when its iterated
-	public MetaObject lazyGet(String _oid) throws JStackException {
-		// This is the lazy load method
-		return new MetaObject(this, _oid, null);
-	}
-	
-	/// Generates a new blank object, with a GUID
-	public MetaObject newObject() {
-		return new MetaObject(this, null, new CaseInsensitiveHashMap<String, Object>());
-	}
-	
-	/// PUT, returns the object ID (especially when its generated), note that this
-	/// adds the value in a merger style. Meaning for example, existing values not explicitely
-	/// nulled or replaced are maintained
-	public MetaObject append(String _oid, Map<String, Object> obj) throws JStackException {
-		MetaObject r = null;
-		if (obj instanceof MetaObject && ((MetaObject) obj)._oid.equals(_oid)) {
-			(r = (MetaObject) obj).saveDelta();
-			return r;
+
+	/// Remove stored key, value pair
+	/// @param key  whose value record to be deleted.
+	///
+	/// @returns null
+	public String remove(Object key) {
+
+		try {
+			Object ret = JStackReverseIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					String tName = sqlTableName(sql);
+
+					sql.execute("DELETE FROM `" + tName + "` WHERE kID = ?", key);
+					return null;
+				}
+			} );
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
 		}
-		
-		r = lazyGet(_oid);
-		r.putAll(obj);
-		r.saveDelta();
-		
-		return r;
+
+		return null;
+	}
+
+	// Nonce support is now backed into KeyValueMap
+	//-------------------------------------------------------------------------
+
+	/// Default nonce lifetime
+	public int nonce_defaultLifetime = 3600;
+
+	/// Default nonce string length (22 is chosen to be consistent with base58 GUID's)
+	public int nonce_defaultLength = 22;
+
+	/// Generates a random nonce hash, and saves the value to it
+	///
+	/// Relies on both nonce_defaultLength & nonce_defaultLifetime for default parameters
+	///
+	/// @param value to store as string
+	///
+	/// @returns String value of the random key generated
+	public String generateNonce(String val) throws RuntimeException {
+		return generateNonce( val, nonce_defaultLifetime, nonce_defaultLength );
+	}
+
+	/// Generates a random nonce hash, and saves the value to it
+	///
+	/// Relies on nonce_defaultLength for default parameters
+	///
+	/// @param value to store as string
+	/// @param lifespan time to expire in seconds
+	///
+	/// @returns String value of the random key generated
+	public String generateNonce(String val, long lifespan) throws RuntimeException {
+		return generateNonce( val, lifespan, nonce_defaultLength );
+	}
+
+	/// Generates a random nonce hash, and saves the value to it
+	///
+	/// Note that the random nonce value returned, is based on picoded.security.NxtCrypt.randomString.
+	/// Note that this relies on true random to avoid collisions, and if it occurs. Values are over-written
+	///
+	/// @param keyLength random key length size
+	/// @param value to store as string
+	/// @param lifespan time to expire in seconds
+	///
+	/// @returns String value of the random key generated
+	public String generateNonce(String val, long lifespan, int keyLength) throws RuntimeException {
+		String res = NxtCrypt.randomString(keyLength);
+		putWithLifespan( res, val, lifespan );
+		return res;
 	}
 	
-	/// @TODO: Delete operations
-	public void remove(String _oid) {
-		
-	}
 	
-	// */
-	
+	//*/
+
 }

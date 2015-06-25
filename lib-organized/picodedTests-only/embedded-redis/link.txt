@@ -1,0 +1,1 @@
+https://github.com/kstyrc/embedded-redis

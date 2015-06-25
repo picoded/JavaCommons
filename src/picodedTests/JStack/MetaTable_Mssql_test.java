@@ -17,15 +17,14 @@ import picodedTests.TestConfig;
 
 public class MetaTable_Mssql_test extends MetaTable_Sqlite_test {
 	
-	// JStack setup
+	// JSql override setup
 	//-----------------------------------------------
-	protected void JStackSetup() {
-		JStackObj = new JStack(JSql.mssql(TestConfig.MSSQL_CONN(), TestConfig.MSSQL_NAME(), TestConfig.MSSQL_USER(),
-			TestConfig.MSSQL_PASS()));
-	}
-	
-	protected void JStackTearDown() {
-		JStackObj = null;
+	public JSql JSqlObj() {
+		return JSql.mssql(TestConfig.MSSQL_CONN(),
+								TestConfig.MSSQL_NAME(),
+								TestConfig.MSSQL_USER(),
+								TestConfig.MSSQL_PASS()
+								);
 	}
 	
 }

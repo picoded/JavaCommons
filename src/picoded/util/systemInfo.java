@@ -40,14 +40,18 @@ public class systemInfo {
 	/// @returns  string local mac address 
 	///
 	public static String localMACAddress() throws UnknownHostException, SocketException {
+		StringBuilder sb = new StringBuilder();
+		sb.append("00-16-EA-BB-7A-4E"); //@TODO: REMOVE WHEN network.getHardwareAddress() ISSUE FIXED
+		
 		InetAddress ip = InetAddress.getLocalHost();
 		NetworkInterface network = NetworkInterface.getByInetAddress(ip);
 		byte[] mac = null;
 		mac = null; //network.getHardwareAddress(); //@TODO: TO FIX, this caused build failure
 		
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < mac.length; i++) {
-			sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+		if (mac != null) {
+			for (int i = 0; i < mac.length; i++) {
+				sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+			}
 		}
 		/// return UUID.nameUUIDFromBytes(mac).toString();
 		return sb.toString();

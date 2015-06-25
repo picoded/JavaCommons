@@ -17,16 +17,10 @@ import picodedTests.TestConfig;
 
 public class MetaTable_Oracle_test extends MetaTable_Sqlite_test {
 	
-	// JStack setup
+	// JSql override setup
 	//-----------------------------------------------
-	protected void JStackSetup() {
-		JStackObj = new JStack(
-			 JSql.oracle(TestConfig.ORACLE_PATH(), TestConfig.ORACLE_USER(), TestConfig.ORACLE_PASS())
-		);
-	}
-	
-	protected void JStackTearDown() {
-		JStackObj = null;
+	public JSql JSqlObj() {
+		return JSql.oracle(TestConfig.ORACLE_PATH(), TestConfig.ORACLE_USER(), TestConfig.ORACLE_PASS());
 	}
 	
 }

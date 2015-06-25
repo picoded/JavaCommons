@@ -37,27 +37,42 @@ public class JSql_Mssql extends JSql {
 	
 	/// Runs JSql with the JDBC sqlite engine
 	public JSql_Mssql(String dbUrl, String dbName, String dbUser, String dbPass) {
-		sqlType = JSqlType.mssql;
-		
 		// store database connection properties
 		setConnectionProperties(dbUrl, dbName, dbUser, dbPass, null);
 		
-		String connectionUrl = "jdbc:jtds:sqlserver://" + dbUrl;
+		// call internal method to create the connection
+		setupConnection();
+	}
+	
+	/// Internal common reuse constructor
+	private void setupConnection() {
+		sqlType = JSqlType.mssql;
 		
-		if (dbName != null && dbName.length() > 0) {
-			connectionUrl = connectionUrl + ";DatabaseName=" + dbName + ";uselobs=false;"; //disable clobs
+		String connectionUrl = "jdbc:jtds:sqlserver://" + (String) connectionProps.get("dbUrl");
+		
+		if (connectionProps.get("dbName") != null && connectionProps.get("dbName").toString().trim().length() > 0) {
+			connectionUrl += ";DatabaseName=" + (String) connectionProps.get("dbName") + ";uselobs=false;"; //disable clobs
 		}
-		
 		try {
 			Class.forName("net.sourceforge.jtds.jdbcx.JtdsDataSource"); //connection pooling
-			sqlConn = java.sql.DriverManager.getConnection(connectionUrl, dbUser, dbPass);
+			sqlConn = java.sql.DriverManager.getConnection(connectionUrl, (String) connectionProps.get("dbUser"),
+				(String) connectionProps.get("dbPass"));
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load mssql connection: ", e);
 		}
 	}
 	
+	/// As this is the base class varient, this funciton isnt suported
+	public void recreate(boolean force) {
+		if (force) {
+			dispose();
+		}
+		// call internal method to create the connection
+		setupConnection();
+	}
+	
 	// Internal parser that converts some of the common sql statements to mssql
-	public static String genericSqlParser(String inString) {
+	public String genericSqlParser(String inString) {
 		
 		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("'", "\"").replaceAll("`", "\"");
 		String upperCaseStr = fixedQuotes.toUpperCase();

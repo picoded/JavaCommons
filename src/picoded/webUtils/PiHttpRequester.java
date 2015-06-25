@@ -31,6 +31,7 @@ import com.amazonaws.util.StringUtils;
 
 import picoded.servlet.CorePage;
 import picoded.webUtils.HttpRequestType;
+import picoded.conv.StringEscape;
 
 public class PiHttpRequester{
 	
@@ -78,15 +79,11 @@ public class PiHttpRequester{
 										Map<String, String> headerMap, 
 										Map<String, String> cookieMap)
 	{
-		CookieStore httpCookieStore = generateCookieStore(cookieMap);
 		HttpClient httpClient = HttpClients.createDefault();
 		
-		//add cookie store to context for request
-		HttpContext localContext = new BasicHttpContext();
-		localContext.setAttribute(HttpClientContext.COOKIE_STORE, httpCookieStore);
-		
-		//create the request
+		//create request
 		HttpRequestBase httpRequest = null;
+		
 		if(httpRequestType == HttpRequestType.TYPE_GET){
 			httpRequest = generateGetRequest(requestHostName, contextPath, getParams, headerMap, cookieMap);
 		} else if(httpRequestType == HttpRequestType.TYPE_POST){
@@ -99,37 +96,19 @@ public class PiHttpRequester{
 		
 		//execute request
 		PiHttpResponse piHttpResponse = null;
-		piHttpResponse = executeRequest(httpClient, httpRequest, localContext, httpCookieStore);
+		piHttpResponse = executeRequest(httpClient, httpRequest);
 		
 		return piHttpResponse;
 	}
 	
-	private ArrayList<BasicClientCookie> generateCookieList(Map<String, String> cookieMap){
-		ArrayList<BasicClientCookie> cookieList = null;
-		
+	private HttpRequestBase addCookiesToRequest(HttpRequestBase httpRequestBase, Map<String, String> cookieMap){
 		if(cookieMap != null){
-			cookieList = new ArrayList<BasicClientCookie>();
-			Set<String> keys = cookieMap.keySet();
-			for(String key : keys){
-				BasicClientCookie newCookie = new BasicClientCookie(key, cookieMap.get(key));
-				cookieList.add(newCookie);
+			Set<String> cookieNames = cookieMap.keySet();
+			for(String str : cookieNames){
+				httpRequestBase.addHeader("Cookie", StringEscape.encodeURI(str)+"="+StringEscape.encodeURI(cookieMap.get(str)));
 			}
 		}
-		
-		return cookieList;
-	}
-	
-	private CookieStore generateCookieStore(Map<String, String> cookieMap){
-		ArrayList<BasicClientCookie> clientCookies = generateCookieList(cookieMap);
-		CookieStore httpCookieStore = new BasicCookieStore();
-		if(clientCookies != null){
-			for(Cookie cookie : clientCookies){
-				httpCookieStore.addCookie(cookie);
-			}
-		} else {
-			System.out.println("Your clientCookies is null");
-		}
-		return httpCookieStore;
+		return httpRequestBase;
 	}
 	
 	private String generateGetParams(Map<String, String> getParams){
@@ -159,11 +138,7 @@ public class PiHttpRequester{
 				httpGet.addHeader(kvp.getKey(), kvp.getValue());
 			}
 		}
-		if(cookieMap != null && cookieMap.size() > 0){
-			for(Entry<String, String> kvp : cookieMap.entrySet()){
-				httpGet.addHeader(kvp.getKey(), kvp.getValue());
-			}
-		}
+		httpGet = (HttpGet)addCookiesToRequest(httpGet, cookieMap);
 		
 		return httpGet;
 	}
@@ -182,21 +157,19 @@ public class PiHttpRequester{
 				requestPairs.add(new BasicNameValuePair(kvp.getKey(), kvp.getValue()));
 			}
 		}
+		
 		try {
 			httpPost.setEntity(new UrlEncodedFormEntity(requestPairs));
 		} catch (UnsupportedEncodingException ex) {
 			System.out.println("Unsupported Encoding Exception:" +ex.getMessage());
 		}
-		if(headerMap != null && headerMap.size() > 0){
+		if(headerMap != null){
 			for(Entry<String, String> kvp : headerMap.entrySet()){
 				httpPost.addHeader(kvp.getKey(), kvp.getValue());
 			}
 		}
-		if(cookieMap != null && cookieMap.size() > 0){
-			for(Entry<String, String> kvp : cookieMap.entrySet()){
-				httpPost.addHeader(kvp.getKey(), kvp.getValue());
-			}
-		}
+		
+		httpPost = (HttpPost)addCookiesToRequest(httpPost, cookieMap);
 		
 		return httpPost;
 	}
@@ -224,11 +197,8 @@ public class PiHttpRequester{
 				httpPut.addHeader(kvp.getKey(), kvp.getValue());
 			}
 		}
-		if(cookieMap != null && cookieMap.size() > 0){
-			for(Entry<String, String> kvp : cookieMap.entrySet()){
-				httpPut.addHeader(kvp.getKey(), kvp.getValue());
-			}
-		}
+		
+		httpPut = (HttpPut)addCookiesToRequest(httpPut, cookieMap);
 		
 		return httpPut;
 	}
@@ -244,21 +214,18 @@ public class PiHttpRequester{
 				httpDelete.addHeader(kvp.getKey(), kvp.getValue());
 			}
 		}
-		if(cookieMap != null && cookieMap.size() > 0){
-			for(Entry<String, String> kvp : cookieMap.entrySet()){
-				httpDelete.addHeader(kvp.getKey(), kvp.getValue());
-			}
-		}
+		
+		httpDelete = (HttpDelete)addCookiesToRequest(httpDelete, cookieMap);
 		
 		return httpDelete;
 	}
 	
-	private PiHttpResponse executeRequest(HttpClient httpClient, HttpRequestBase httpRequest, HttpContext localContext, CookieStore httpCookieStore){
+	private PiHttpResponse executeRequest(HttpClient httpClient, HttpRequestBase httpRequest){
 		HttpResponse resp = null;
 		PiHttpResponse piHttpResponse = null;
 		
 		try {
-			resp = httpClient.execute(httpRequest, localContext);
+			resp = httpClient.execute(httpRequest);
 			
 			HashMap<String, String> piCookies = null;
 			HashMap<String, String> piHeaders = null;
@@ -267,9 +234,16 @@ public class PiHttpRequester{
 				piCookies = new HashMap<String, String>();
 				piHeaders = new HashMap<String, String>();
 				
-				for(Cookie cookie : httpCookieStore.getCookies()){
- 					piCookies.put(cookie.getName(), cookie.getValue());
+				Header[] cookies = resp.getHeaders("Set-Cookie");
+				if(cookies != null){
+					for(Header cookie : cookies){
+						String[] cookieKVP = cookie.getValue().split("=");
+						if(cookieKVP != null && cookieKVP.length > 1){
+							piCookies.put(cookieKVP[0], cookieKVP[1]);
+						}
+					}
 				}
+				
 				for(Header header : resp.getAllHeaders()){
 					piHeaders.put(header.getName(), header.getValue());
 				}

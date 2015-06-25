@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import javax.servlet.http.Cookie;
 
 import picoded.conv.ConvertJSON;
+import picoded.webUtils.HttpRequestType;
 
 // Sub modules useds
 
@@ -84,19 +85,19 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	//-------------------------------------------
 	
 	/// GET type indicator
-	static final byte TYPE_GET = 1;
-	
-	/// POST type indicator
-	static final byte TYPE_POST = 2;
-	
-	/// PUT type indicator
-	static final byte TYPE_PUT = 3;
-	
-	/// DELETE type indicator
-	static final byte TYPE_DELETE = 4;
-	
-	/// OPTION type indicator
-	static final byte TYPE_OPTION = 5;
+//	static final byte TYPE_GET = 1;
+//	
+//	/// POST type indicator
+//	static final byte TYPE_POST = 2;
+//	
+//	/// PUT type indicator
+//	static final byte TYPE_PUT = 3;
+//	
+//	/// DELETE type indicator
+//	static final byte TYPE_DELETE = 4;
+//	
+//	/// OPTION type indicator
+//	static final byte TYPE_OPTION = 5;
 	
 	///////////////////////////////////////////////////////
 	//
@@ -108,7 +109,8 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	//-------------------------------------------
 	
 	/// Request type indicator
-	protected byte requestType = 0;
+	//protected byte requestType = 0;
+	protected HttpRequestType requestType = null;
 	
 	/// The actual output stream used
 	protected OutputStream responseOutputStream = null;
@@ -199,32 +201,32 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// Returns the request type
 	public byte requestType() {
-		return requestType;
+		return requestType.value();
 	}
 	
 	/// Returns if the request is GET
 	public boolean isGET() {
-		return (requestType == TYPE_GET);
+		return (requestType == HttpRequestType.TYPE_GET);
 	}
 	
 	/// Returns if the request is POST
 	public boolean isPOST() {
-		return (requestType == TYPE_POST);
+		return (requestType == HttpRequestType.TYPE_POST);
 	}
 	
 	/// Returns if the request is PUT
 	public boolean isPUT() {
-		return (requestType == TYPE_PUT);
+		return (requestType == HttpRequestType.TYPE_PUT);
 	}
 	
 	/// Returns if the request is DELETE
 	public boolean isDELETE() {
-		return (requestType == TYPE_DELETE);
+		return (requestType == HttpRequestType.TYPE_DELETE);
 	}
 	
 	/// Returns if the request is OPTION
 	public boolean isOPTION() {
-		return (requestType == TYPE_OPTION);
+		return (requestType == HttpRequestType.TYPE_OPTION);
 	}
 	
 	///////////////////////////////////////////////////////
@@ -240,14 +242,14 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// Setup the instance, with the request parameter, and
 	protected CorePage setupInstance(byte inRequestType, Map<String,String> reqParam) throws ServletException {
-		requestType = inRequestType;
+		requestType = HttpRequestType.getCorrectHttpRequestType(inRequestType);
 		requestParameters = new RequestMap( reqParam );
 		return this;
 	}
 	
 	/// Setup the instance, with the request parameter, and cookie map
 	protected CorePage setupInstance(byte inRequestType, Map<String,String> reqParam, Map<String,Cookie> reqCookieMap) throws ServletException {
-		requestType = inRequestType;
+		requestType = HttpRequestType.getCorrectHttpRequestType(inRequestType);
 		requestParameters = new RequestMap( reqParam );
 		requestCookieMap = reqCookieMap;
 		return this;
@@ -255,7 +257,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// Setup the instance, with http request & response
 	protected CorePage setupInstance(byte inRequestType, HttpServletRequest req, HttpServletResponse res) throws ServletException {
-		requestType = inRequestType;
+		requestType = HttpRequestType.getCorrectHttpRequestType(inRequestType);
 		httpRequest = req;
 		httpResponse = res;
 		
@@ -379,6 +381,8 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		// Switch is used over if,else for slight compiler optimization
 		// http://stackoverflow.com/questions/6705955/why-switch-is-faster-than-if
 		//
+		//HttpRequestType reqTypeAsEnum = HttpRequestType(requestType);
+		
 		switch (requestType) {
 			case TYPE_GET:
 				ret = doGetRequest(templateDataObj);
@@ -554,31 +558,31 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
 	@Override
 	public final void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-		spawnInstance().setupInstance(TYPE_GET, request, response).processChain();
+		spawnInstance().setupInstance(HttpRequestType.TYPE_GET.value(), request, response).processChain();
 	}
 	
 	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
 	@Override
 	public final void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-		spawnInstance().setupInstance(TYPE_POST, request, response).processChain();
+		spawnInstance().setupInstance(HttpRequestType.TYPE_POST.value(), request, response).processChain();
 	}
 	
 	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
 	@Override
 	public final void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-		spawnInstance().setupInstance(TYPE_POST, request, response).processChain();
+		spawnInstance().setupInstance(HttpRequestType.TYPE_PUT.value(), request, response).processChain();
 	}
 	
 	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
 	@Override
 	public final void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-		spawnInstance().setupInstance(TYPE_DELETE, request, response).processChain();
+		spawnInstance().setupInstance(HttpRequestType.TYPE_DELETE.value(), request, response).processChain();
 	}
 	
 	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
 	@Override
 	public final void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-		spawnInstance().setupInstance(TYPE_OPTION, request, response).processChain();
+		spawnInstance().setupInstance(HttpRequestType.TYPE_OPTION.value(), request, response).processChain();
 	}
 	
 }

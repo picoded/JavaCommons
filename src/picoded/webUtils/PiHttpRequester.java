@@ -249,8 +249,8 @@ public class PiHttpRequester{
 				
 				List<Cookie> cookieList = httpCookieStore.getCookies();
 				for(Cookie cookie : cookieList){
-					System.out.println("Received cookie with name: "+cookie.getName()+" and val: "+cookie.getValue());
-					piCookies.put(cookie.getName(), cookie.getValue());
+					System.out.println("Received cookie with name: "+StringEscape.decodeURI(cookie.getName())+" and val: "+StringEscape.decodeURI(cookie.getValue()));
+					piCookies.put(StringEscape.decodeURI(cookie.getName()), StringEscape.decodeURI(cookie.getValue()));
 				}
 				
 				for(Header header : resp.getAllHeaders()){

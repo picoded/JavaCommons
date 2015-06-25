@@ -82,6 +82,9 @@ public class PiCodeBox extends BasePage{
 			}
 			acc = accountAuthTable().loginAccount(httpRequest, httpResponse, userName, userPW, false);
 			
+			
+			httpResponse.getHeader("Set-Cookie");
+			
 			outputData.put("login-status", ( acc != null ) );
 			
 		} catch (JStackException e) {

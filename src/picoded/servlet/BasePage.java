@@ -120,23 +120,16 @@ public class BasePage extends JStackPage {
 		return currentAccount().getString(meta);
 	}
 	
-	/// Gets the user meta info from the specific user
-	public String accountMetaInfo(String name, String meta) throws JStackException {
-		return accountAuthTable().getFromName(name).getString(meta);
-	}
-	
-	/*
-	
-	//////////////////////////////////////////////////
-	// GroupMeta module is intentionally leftout
-	// As this tends to be highly adjusted according
-	// to the project specific requirments.
-	//////////////////////////////////////////////////
+	// Removed?: Use accountAuthTable() instead
+	// Gets the user meta info from the specific user
+	// public String accountMetaInfo(String name, String meta) throws JStackException {
+	// 	return accountAuthTable().getFromName(name).getString(meta);
+	// }
 	
 	/////////////////////////////////////////////
 	// HTML fetch and JMTE templating
 	/////////////////////////////////////////////
-	protected class currentUserMetaInfo_nr implements NamedRenderer {
+	protected class currentAccountMetaInfo_nr implements NamedRenderer {
 		@Override
 		public RenderFormatInfo getFormatInfo() {
 			return null;
@@ -144,7 +137,7 @@ public class BasePage extends JStackPage {
 		
 		@Override
 		public String getName() {
-			return "currentUserMetaInfo";
+			return "currentAccountMetaInfo";
 		}
 		
 		@Override
@@ -159,26 +152,29 @@ public class BasePage extends JStackPage {
 			}
 			
 			try {
-				return currentUserMetaInfo(format);
-			} catch(jSqlException e) {
+				return currentAccountMetaInfo(format);
+			} catch(JStackException e) {
 				throw new RuntimeException(e);
 			}
 		}
 	}
 	
+	/*
 	/// [Protected] jmte object used
-	protected jmte jmteObj = null;
+	protected jmte _jmteObj = null;
 	
 	/// Loads and setup the jmte object with the "contextPath" parameter, and htmlPartsFolder directory and returns the jmte object
 	public jmte jmteObj() {
-		if(jmteObj != null) { return jmteObj; }
+		if(_jmteObj != null) { return _jmteObj; }
 		
-		jmteObj = new jmte( htmlPartsFolder );
-		jmteObj.baseDataModel.put( "ContextPath", getContextPath() );
-		jmteObj.registerNamedRenderer( new currentUserMetaInfo_nr() );
+		_jmteObj = new jmte( htmlPartsFolder );
+		_jmteObj.baseDataModel.put( "ContextPath", getContextPath() );
+		_jmteObj.registerNamedRenderer( new currentAccountMetaInfo_nr() );
 		
-		return jmteObj;
+		return _jmteObj;
 	}
+	*/
+	/*
 	
 	////////////////////////////////////////////////////
 	// tableSetup calls for various jSql based modules

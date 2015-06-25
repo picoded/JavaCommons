@@ -71,6 +71,7 @@ public class JStackPage extends CorePage {
 	public String _classesPath = null;
 	public String _libraryPath = null;
 	public String _configsPath = null;
+	public String _pagesPath = null;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -96,11 +97,15 @@ public class JStackPage extends CorePage {
 	}
 	
 	public String getLibraryPath() {
-		return ( _libraryPath != null ) ? _libraryPath : (_libraryPath = getWebInfPath()+"/lib/");
+		return ( _libraryPath != null ) ? _libraryPath : (_libraryPath = getWebInfPath()+"lib/");
 	}
 	
 	public String getConfigsPath() {
-		return ( _libraryPath != null ) ? _libraryPath : (_libraryPath = getWebInfPath()+"/configs/");
+		return ( _libraryPath != null ) ? _libraryPath : (_libraryPath = getWebInfPath()+"configs/");
+	}
+	
+	public String getPagesPath() {
+		return ( _pagesPath != null ) ? _pagesPath : (_pagesPath = getWebInfPath()+"pages/");
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,4 +147,17 @@ public class JStackPage extends CorePage {
 		
 		return JStackObj;
 	}
+	
+	////////////////////////////////////////////////////
+	// tableSetup calls for various jSql based modules
+	////////////////////////////////////////////////////
+	public void JStackSetup() throws JStackException {
+		JStack().setup();
+	}
+	
+	/// Called once when initialized, to purge all existing data.
+	public void JStackTeardown() throws JStackException {
+		JStack().teardown();
+	}
+	
 }

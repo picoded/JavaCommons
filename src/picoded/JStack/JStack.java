@@ -63,7 +63,7 @@ public class JStack extends JStackLayer {
 		return new KeyValueMap(this, tableName);
 	}
 	
-	public PersonaTable getPersonaTable(String tableName) {
-		return new PersonaTable(this, tableName);
+	public AccountTable getAccountTable(String tableName) {
+		return new AccountTable(this, tableName);
 	}
 }

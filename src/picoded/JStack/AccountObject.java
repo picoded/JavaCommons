@@ -29,16 +29,16 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
-public class PersonaObject extends MetaObject {
+public class AccountObject extends MetaObject {
 	
 	/// Java serialversion uid: http://stackoverflow.com/questions/285793/what-is-a-serialversionuid-and-why-should-i-use-it
 	private static final long serialVersionUID = 1L;
 	
-	protected PersonaTable mainTable = null;
+	protected AccountTable mainTable = null;
 	
 	/// Protected constructor as this class is NOT meant to be constructed directly
-	protected PersonaObject(PersonaTable pTable, String inOID) {
-		super(pTable.personaMeta, inOID);
+	protected AccountObject(AccountTable pTable, String inOID) {
+		super(pTable.accountMeta, inOID);
 		mainTable = pTable;
 	}
 	
@@ -47,7 +47,7 @@ public class PersonaObject extends MetaObject {
 	
 	/// Gets and returns the stored password hash
 	protected String getPasswordHash() {
-		return mainTable.personaHash.get(_oid);
+		return mainTable.accountHash.get(_oid);
 	}
 	
 	///
@@ -55,16 +55,16 @@ public class PersonaObject extends MetaObject {
 	// Custom additional functions
 	//-------------------------------------------------------------------------
 	
-	/// Indicates if the current persona has a configured password, it is possible there is no password
+	/// Indicates if the current account has a configured password, it is possible there is no password
 	/// if it functions as a group. Or is passwordless login
 	public boolean hasPassword() {
 		String h = getPasswordHash();
 		return (h != null && h.length() > 0);
 	}
 	
-	/// Remove the persona password
+	/// Remove the account password
 	public void removePassword() {
-		mainTable.personaHash.remove(_oid);
+		mainTable.accountHash.remove(_oid);
 	}
 	
 	/// Validate if the given password is valid
@@ -76,17 +76,17 @@ public class PersonaObject extends MetaObject {
 		return false;
 	}
 	
-	/// Set the persona password
+	/// Set the account password
 	public boolean setPassword(String pass) {
 		if (pass == null) {
 			removePassword();
 		} else {
-			mainTable.personaHash.put(_oid, NxtCrypt.getPassHash(pass));
+			mainTable.accountHash.put(_oid, NxtCrypt.getPassHash(pass));
 		}
 		return true;
 	}
 	
-	/// Set the persona password, after checking old password
+	/// Set the account password, after checking old password
 	public boolean setPassword(String pass, String oldPass) {
 		if (validatePassword(oldPass)) {
 			setPassword(pass);
@@ -95,15 +95,15 @@ public class PersonaObject extends MetaObject {
 		return false;
 	}
 	
-	/// Gets and return the various "nice-name" (not UUID) for this persona
+	/// Gets and return the various "nice-name" (not UUID) for this account
 	public String[] getNames() {
-		return mainTable.personaID.getKeys(_oid);
+		return mainTable.accountID.getKeys(_oid);
 	}
 	
-	/// Sets the name for the persona, returns true or false if it succed.
+	/// Sets the name for the account, returns true or false if it succed.
 	public boolean setName(String name) {
 		if (name == null || name.length() <= 0) {
-			throw new RuntimeException("PersonaObject nice name cannot be blank");
+			throw new RuntimeException("AccountObject nice name cannot be blank");
 		}
 		
 		if (mainTable.containsName(name)) {
@@ -111,7 +111,7 @@ public class PersonaObject extends MetaObject {
 		}
 		
 		/// Technically a race condition =X
-		mainTable.personaID.put(name, _oid);
+		mainTable.accountID.put(name, _oid);
 		return true;
 	}
 	

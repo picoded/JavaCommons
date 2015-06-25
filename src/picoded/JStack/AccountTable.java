@@ -276,8 +276,8 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 	/// Sets the session info with the given nonceSalt, IP, and browserAgent
 	protected String generateSession(String oid, int lifespan, String nonceSalt, String ipString, String browserAgent) {
 		String key = oid+"-"+NxtCrypt.randomString(nonceSize);
-		
-		return accountSessions.putWithLifespan( key, ConvertJSON.fromList( Arrays.asList(new String[] {nonceSalt, ipString, browserAgent}) ), lifespan );
+		accountSessions.putWithLifespan( key, ConvertJSON.fromList( Arrays.asList(new String[] {nonceSalt, ipString, browserAgent}) ), lifespan );
+		return key;
 	}
 	
 	///
@@ -425,6 +425,7 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 			if(!rmberMe) { //set to clear on browser close
 				cookieJar[a].setMaxAge(noncLifetime);
 			}
+			
 			if(a < 4 && isHttpOnly) {
 				cookieJar[a].setHttpOnly(isHttpOnly);
 			}

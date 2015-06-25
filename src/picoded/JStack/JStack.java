@@ -1,5 +1,7 @@
 package picoded.JStack;
 
+import java.util.*;
+
 // Picoded imports
 import picoded.JSql.*;
 import picoded.JCache.*;
@@ -52,9 +54,9 @@ public class JStack extends JStackLayer {
 	}
 	 */
 	
-	protected CaseInsensitiveHashMap<String,MetaTable> cachedMetaTable = new CaseInsensitiveHashMap<String,MetaTable>();
-	protected CaseInsensitiveHashMap<String,KeyValueMap> cachedKeyValueMap = new CaseInsensitiveHashMap<String,KeyValueMap>();
-	protected CaseInsensitiveHashMap<String,AccountTable> cachedAccountTable = new CaseInsensitiveHashMap<String,AccountTable>();
+	protected CaseInsensitiveHashMap<String,JStackData> cachedMetaTable = new CaseInsensitiveHashMap<String,JStackData>();
+	protected CaseInsensitiveHashMap<String,JStackData> cachedKeyValueMap = new CaseInsensitiveHashMap<String,JStackData>();
+	protected CaseInsensitiveHashMap<String,JStackData> cachedAccountTable = new CaseInsensitiveHashMap<String,JStackData>();
 	
 	//----------------------------------------------
 	// JStack modules
@@ -76,14 +78,35 @@ public class JStack extends JStackLayer {
 	// JStack automated setup of cached tables
 	//----------------------------------------------
 	
-	/// This does the setup called on all the cached tables, created via get calls
-	public void setup() {
+	/// Gets all the sub stack
+	protected List< CaseInsensitiveHashMap<String,JStackData> > JStackData_stack() {
+		List< CaseInsensitiveHashMap<String,JStackData>> ret = new ArrayList< CaseInsensitiveHashMap<String,JStackData>>();
 		
+		ret.add( cachedMetaTable );
+		ret.add( cachedKeyValueMap );
+		ret.add( cachedAccountTable );
+		
+		return ret;
+	}
+	
+	/// This does the setup called on all the cached tables, created via get calls
+	public void setup() throws JStackException {
+		List< CaseInsensitiveHashMap<String,JStackData> > l =  JStackData_stack();
+		for (CaseInsensitiveHashMap<String,JStackData> m : l) {
+			for (Map.Entry<String, JStackData> e : m.entrySet()) {
+				e.getValue().stackSetup();
+			}
+		}
 	}
 	
 	/// This does the teardown called on all the cached tables, created via get calls
-	public void tearDown() {
-		
+	public void teardown() throws JStackException {
+		List< CaseInsensitiveHashMap<String,JStackData> > l =  JStackData_stack();
+		for (CaseInsensitiveHashMap<String,JStackData> m : l) {
+			for (Map.Entry<String, JStackData> e : m.entrySet()) {
+				e.getValue().stackTeardown();
+			}
+		}
 	}
 	
 }

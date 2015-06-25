@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 import com.floreysoft.jmte.*;
 
 // Sub modules useds
+import picoded.conv.JMTE;
 import picoded.JStack.*;
 
 /**
@@ -159,41 +160,22 @@ public class BasePage extends JStackPage {
 		}
 	}
 	
-	/*
 	/// [Protected] jmte object used
-	protected jmte _jmteObj = null;
+	protected JMTE _jmteObj = null;
 	
 	/// Loads and setup the jmte object with the "contextPath" parameter, and htmlPartsFolder directory and returns the jmte object
-	public jmte jmteObj() {
-		if(_jmteObj != null) { return _jmteObj; }
+	public JMTE JMTE() {
+		if(_jmteObj != null) { 
+			return _jmteObj; 
+		}
 		
-		_jmteObj = new jmte( htmlPartsFolder );
+		_jmteObj = new JMTE( getPagesPath() );
 		_jmteObj.baseDataModel.put( "ContextPath", getContextPath() );
 		_jmteObj.registerNamedRenderer( new currentAccountMetaInfo_nr() );
 		
 		return _jmteObj;
 	}
-	*/
-	/*
 	
-	////////////////////////////////////////////////////
-	// tableSetup calls for various jSql based modules
-	////////////////////////////////////////////////////
-	@Override
-	public void jSqlTableSetups() throws jSqlException {
-		super.jSqlTableSetups();
-		userAuth().tableSetup();
-		userMetaObj().tableSetup();
-		adminLogger().tableSetup();
-	}
 	
-	/// Called once when initialized, to purge all existing data.
-	@Override
-	public void doPurge() {
-		super.doPurge();
-		
-		validatedUser = false;
-		currentUser = null;
-	}
-	*/
+
 }

@@ -225,6 +225,9 @@ public class PiHttpRequester{
 		PiHttpResponse piHttpResponse = null;
 		
 		try {
+			BasicCookieStore httpCookieStore = new BasicCookieStore();
+			httpClient = HttpClientBuilder.create().setDefaultCookieStore(httpCookieStore).build();
+			
 			resp = httpClient.execute(httpRequest);
 			
 			HashMap<String, String> piCookies = null;
@@ -234,14 +237,20 @@ public class PiHttpRequester{
 				piCookies = new HashMap<String, String>();
 				piHeaders = new HashMap<String, String>();
 				
-				Header[] cookies = resp.getHeaders("Set-Cookie");
-				if(cookies != null){
-					for(Header cookie : cookies){
-						String[] cookieKVP = cookie.getValue().split("=");
-						if(cookieKVP != null && cookieKVP.length > 1){
-							piCookies.put(cookieKVP[0], cookieKVP[1]);
-						}
-					}
+//				Header[] cookies = resp.getHeaders("Set-Cookie");
+//				if(cookies != null){
+//					for(Header cookie : cookies){
+//						String[] cookieKVP = cookie.getValue().split("=");
+//						if(cookieKVP != null && cookieKVP.length > 1){
+//							piCookies.put(cookieKVP[0], cookieKVP[1]);
+//						}
+//					}
+//				}
+				
+				List<Cookie> cookieList = httpCookieStore.getCookies();
+				for(Cookie cookie : cookieList){
+					System.out.println("Received cookie with name: "+cookie.getName()+" and val: "+cookie.getValue());
+					piCookies.put(cookie.getName(), cookie.getValue());
 				}
 				
 				for(Header header : resp.getAllHeaders()){

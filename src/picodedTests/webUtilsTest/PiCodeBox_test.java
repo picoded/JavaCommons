@@ -24,9 +24,12 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import picoded.JSql.*;
 import picoded.JCache.*;
 import picoded.JStack.*;
+import picoded.conv.ConvertJSON;
 import picoded.conv.GUID;
 import picoded.servletUtils.EmbeddedServlet;
 import picoded.struct.CaseInsensitiveHashMap;
+import picoded.struct.GenericConvertMap;
+import picoded.struct.ProxyGenericConvertMap;
 import picoded.webUtils.PiHttpRequester;
 import picoded.webUtils.PiHttpResponse;
 import picoded.webUtils.HttpRequestType;
@@ -64,11 +67,12 @@ public class PiCodeBox_test
 	
 	@Before
 	public void setUp(){
-		File context = new File("./test-files/test-specific/embeddedTomcat");
+		File context = new File("./test-files/tmp");
 		
 		piCodeBox = new PiCodeBox();
+		piCodeBox._contextPath = "./text-files/tmp/";
 		
-		tomcat = new EmbeddedServlet("/app", context)
+		tomcat = new EmbeddedServlet("", context)
 		.withPort(15000)
 		.withServlet("/public", "piCodeBoxProxy", piCodeBox);
 	}
@@ -80,8 +84,57 @@ public class PiCodeBox_test
 		
 		httpRequester = new PiHttpRequester();
 		
+		File WEBINFFile = new File("./test-files/tmp/WEB-INF");
+		WEBINFFile.mkdir();
+		
 		DoGetTest();
-
+		
+		String result = DoPostTest();
+		assertEquals("true", result);
+		
+//		DoGetTest();
+	}
+	
+	private String DoPostTest(){
+		HashMap<String, String> postParams = new HashMap<String, String>();
+		HashMap<String, String> cookies = new HashMap<String, String>();
+		
+		postParams.put("user", "Sam");
+		postParams.put("password", "1234"); 
+		
+		//cookies.put("keepLoggedIn", "")
+		
+		PiHttpResponse piResp = httpRequester.sendPostRequest("http://localhost:15000", "public", postParams, null, cookies);
+		
+		try
+		{
+			String response = IOUtils.toString(piResp.getResponseBody());
+			
+			
+			System.out.println(picoded.conv.ConvertJSON.fromMap(piResp.getCookies()));
+			
+			
+			//do second get test
+			HashMap<String, String> getParams = new HashMap<String, String>();
+			HashMap<String, String> newCookies = new HashMap<String, String>();
+			getParams.put("user", "Sam");
+			
+			newCookies.put("Account_Rmbr", "0");
+			newCookies.put("Account_Hash", "fromval");
+			newCookies.put("Account_Puid", "4EEwNNSzKCCKrs825Qy9bg");
+			PiHttpResponse secondGetResp = httpRequester.sendGetRequest("http://localhost:15000", "public", getParams, null, cookies);
+			
+			Map<String,Object> rm = ConvertJSON.toMap(response);
+			GenericConvertMap<String, Object> gm = ProxyGenericConvertMap.ensureGenericConvertMap(rm);
+			//String[] responseSplit = response.split(":");
+			
+			System.out.println(gm.getString("login-status"));
+			
+			return (gm.getString("login-status"));
+		} catch (IOException ex){
+			System.out.println(ex.getMessage());
+			throw new RuntimeException(ex);
+		}
 	}
 	
 	private void DoGetTest(){
@@ -89,17 +142,16 @@ public class PiCodeBox_test
 		HashMap<String, String> cookies = new HashMap<String, String>();
 		
 		getParams.put("user", "Sam");
-		cookies.put("cookieName", "cookieValue");
+		cookies.put("Account_Rmbr", "1");
 		
-		PiHttpResponse piResp = httpRequester.sendGetRequest("http://localhost:15000/app", "public", getParams, null, cookies);
+		PiHttpResponse piResp = httpRequester.sendGetRequest("http://localhost:15000", "public", getParams, null, cookies);
 		
 		try
 		{
 			String response = IOUtils.toString(piResp.getResponseBody());
-			System.out.println("Resp: "+response);
+			System.out.println("Get Resp: "+response);
 		} catch (IOException ex){
 			System.out.println(ex.getMessage());
 		}
-		
 	}
 }

@@ -19,9 +19,8 @@ public class PiCodeBox extends BasePage{
 	static final long serialVersionUID = 1L;
 	
 	@Override
-	public String getWebInfPath() {
-		// TODO Auto-generated method stub
-		return super.getWebInfPath();
+	public String getContextPath(){
+		return "./test-files/tmp/";
 	}
 
 	@Override
@@ -38,38 +37,50 @@ public class PiCodeBox extends BasePage{
 	@Override
 	public boolean doGetJSON(Map<String,Object> outputData, Map<String,Object> templateData)
 			throws ServletException {
-		accountAuthTable();
+		try{
+			accountAuthTable().stackSetup();
+			//JStackSetup();
+		} catch (JStackException ex){
+			throw new ServletException(ex);
+		}
 		
+		//String requestedUser = requestParameters.getString("user", "null");
 		
-		String requestedUser = requestParameters.getString("user", "null");
+		//outputData.put("user", requestedUser);
+		String[] names = null;
+		String loginNames = null;
 		
-		outputData.put("user", requestedUser);
+		if( currentAccount() != null ) {
+			names = currentAccount().getNames();
+			loginNames = StringUtils.join(names, ",");
+		}
 		
-//		String[] names = null;
-//		String loginNames = null;
-//		
-//		if( currentAccount() != null ) {
-//			names = currentAccount().getNames();
-//			loginNames = StringUtils.join(names, ",");
-//		}
-//		
-//		outputData.put("login-names", loginNames); // { "user" : "hello" }
-		
+		outputData.put("user", loginNames); // { "user" : "hello" }
 		return true;
 	}
 
 	@Override
 	public boolean doPostJSON(Map<String, Object> outputData, Map<String,Object> templateData)
 			throws ServletException {
-		// TODO Auto-generated method stub
+		System.out.println("Received post request");
+		
+		for(String str : requestParameters.keySet()){
+			System.out.println("Key: " +str+ " and value: " +requestParameters.get(str));
+		}
+		
 		try {
 			AccountObject acc;
-			if(! accountAuthTable().containsName("sam")) {
-				acc = accountAuthTable().newObject("sam");
-				acc.setPassword("password");
+			
+			String userName = requestParameters.get("user");
+			String userPW = requestParameters.get("password");
+			
+			if(! accountAuthTable().containsName(userName)) {
+				System.out.println(userName+ " not found in account table");
+				acc = accountAuthTable().newObject(userName);
+				acc.setPassword(userPW);
 				acc.saveAll();
 			}
-			acc = accountAuthTable().loginAccount(httpRequest, httpResponse, "sam", "password", false);
+			acc = accountAuthTable().loginAccount(httpRequest, httpResponse, userName, userPW, false);
 			
 			outputData.put("login-status", ( acc != null ) );
 			

@@ -34,34 +34,34 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
 ///
-/// The persona class is considered a hybrid class of both the user, group management class.
+/// The account class is considered a hybrid class of both the user, group management class.
 /// Where both users, and groups are considered the "same". Hence their distinction is normally detirmined
 /// by one of the meta field values.
 ///
 /// The intention here, is to facilitate complex hierachy creations rapidly. Especially against changing specs.
 ///
-/// Any refences to the persona game, is completely coincidental
+/// Any refences to the account game, is completely coincidental
 ///
 /// @TODO : Group handling layer
 /// @TODO : Authentication handling
 /// @TODO : 
 ///
-public class PersonaTable extends JStackData implements UnsupportedDefaultMap<String, PersonaObject>  {
+public class AccountTable extends JStackData implements UnsupportedDefaultMap<String, AccountObject>  {
 
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
 
 	/// Setup the metatable with the default table name
-	public PersonaTable(JStack inStack) {
+	public AccountTable(JStack inStack) {
 		super( inStack );
-		tableName = "PersonaTable";
+		tableName = "AccountTable";
 
 		internalConstructor(inStack);
 	}
 
 	/// Setup the metatable with the given stack
-	public PersonaTable(JStack inStack, String inTableName) {
+	public AccountTable(JStack inStack, String inTableName) {
 		super( inStack, inTableName );
 
 		internalConstructor(inStack);
@@ -69,36 +69,36 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 
 	/// Internal constructor that setsup the underlying MetaTable / KeyValuePair
 	public void internalConstructor(JStack inStack) {
-		personaID = new KeyValueMap(inStack, tableName+PERSONA_ID);
-		personaHash = new KeyValueMap(inStack, tableName+PERSONA_HASH);
-		personaSessions = new KeyValueMap(inStack, tableName+PERSONA_SESSIONS);
-		personaMeta = new MetaTable(inStack, tableName+PERSONA_META);
-		personaChild = new MetaTable(inStack, tableName+PERSONA_CHILD);
-		personaChildMeta = new MetaTable(inStack, tableName+PERSONA_CHILDMETA);
+		accountID = new KeyValueMap(inStack, tableName+PERSONA_ID);
+		accountHash = new KeyValueMap(inStack, tableName+PERSONA_HASH);
+		accountSessions = new KeyValueMap(inStack, tableName+PERSONA_SESSIONS);
+		accountMeta = new MetaTable(inStack, tableName+PERSONA_META);
+		accountChild = new MetaTable(inStack, tableName+PERSONA_CHILD);
+		accountChildMeta = new MetaTable(inStack, tableName+PERSONA_CHILDMETA);
 		
-		personaSessions.setTempMode( true );
+		accountSessions.setTempMode( true );
 	}
 
 	///
 	/// Table suffixes for the variosu sub tables
 	///--------------------------------------------------------------------------
 	
-	/// The persona self ID's
+	/// The account self ID's
 	protected static String PERSONA_ID = "_ID";
 
-	/// The persona self ID's
+	/// The account self ID's
 	protected static String PERSONA_HASH = "_IH";
 
 	/// The login sessions used for authentication
 	protected static String PERSONA_SESSIONS = "_LS";
 
-	/// The persona self meta values
+	/// The account self meta values
 	protected static String PERSONA_META = "_SM";
 
 	/// The child nodes mapping, from self
 	protected static String PERSONA_CHILD = "_SC";
 
-	/// The child persona meta values
+	/// The child account meta values
 	protected static String PERSONA_CHILDMETA = "_CM";
 
 	///
@@ -106,22 +106,22 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 	///--------------------------------------------------------------------------
 
 	/// @TODO better docs
-	protected KeyValueMap personaID = null;
+	protected KeyValueMap accountID = null;
 	
 	/// @TODO better docs
-	protected KeyValueMap personaHash = null;
+	protected KeyValueMap accountHash = null;
 	
 	/// @TODO better docs
-	protected KeyValueMap personaSessions = null;
+	protected KeyValueMap accountSessions = null;
 
 	/// @TODO better docs
-	protected MetaTable personaMeta = null;
+	protected MetaTable accountMeta = null;
 
 	/// @TODO better docs
-	protected MetaTable personaChild = null;
+	protected MetaTable accountChild = null;
 
 	/// @TODO better docs
-	protected MetaTable personaChildMeta = null;
+	protected MetaTable accountChildMeta = null;
 	
 	//
 	// JStack common setup functions
@@ -129,35 +129,35 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 
 	/// Performs the full stack setup for the data object
 	public void stackSetup() throws JStackException {
-		personaID.stackSetup();
-		personaHash.stackSetup();
-		personaSessions.stackSetup();
-		personaMeta.stackSetup();
-		personaChild.stackSetup();
-		personaChildMeta.stackSetup();
+		accountID.stackSetup();
+		accountHash.stackSetup();
+		accountSessions.stackSetup();
+		accountMeta.stackSetup();
+		accountChild.stackSetup();
+		accountChildMeta.stackSetup();
 	}
 
 	/// Performs the full stack teardown for the data object
 	public void stackTeardown() throws JStackException {
-		personaID.stackTeardown();
-		personaHash.stackTeardown();
-		personaSessions.stackTeardown();
-		personaMeta.stackTeardown();
-		personaChild.stackTeardown();
-		personaChildMeta.stackTeardown();
+		accountID.stackTeardown();
+		accountHash.stackTeardown();
+		accountSessions.stackTeardown();
+		accountMeta.stackTeardown();
+		accountChild.stackTeardown();
+		accountChildMeta.stackTeardown();
 	}
 
 	//
 	// Map compliant implementation, note most of them are aliases of their name varients
 	//--------------------------------------------------------------------------
 	
-	/// Persona exists, this is an alias of containsName
+	/// Account exists, this is an alias of containsName
 	public boolean containsKey(Object name) {
 		return containsName(name.toString());
 	}
 
 	/// Gets the user using the nice name, this is an alias of getFromName
-	public PersonaObject get(Object name) {
+	public AccountObject get(Object name) {
 		return getFromName(name);
 	}
 	
@@ -165,19 +165,19 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 	// Additional functionality add on
 	//--------------------------------------------------------------------------
 	
-	/// Gets the persona using the object ID
-	public PersonaObject getFromID(Object oid) {
+	/// Gets the account using the object ID
+	public AccountObject getFromID(Object oid) {
 		String _oid = oid.toString();
 		
 		if( containsID(_oid) ) {
-			return new PersonaObject(this, _oid);
+			return new AccountObject(this, _oid);
 		}
 		
 		return null; 
 	}
 	
-	/// Gets the persona using the nice name
-	public PersonaObject getFromName(Object name) {
+	/// Gets the account using the nice name
+	public AccountObject getFromName(Object name) {
 		String _oid = nameToID(name.toString());
 		
 		if( _oid != null ) {
@@ -187,10 +187,10 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 		return null; 
 	}
 	
-	/// Generates a new persona object
-	public PersonaObject newObject() {
+	/// Generates a new account object
+	public AccountObject newObject() {
 		try {
-			PersonaObject ret = new PersonaObject(this, null);
+			AccountObject ret = new AccountObject(this, null);
 			ret.saveAll(); //ensures the blank object is now in DB
 			return ret;
 		} catch( JStackException e ) {
@@ -198,13 +198,13 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 		}
 	}
 	
-	/// Generates a new persona object with the given nice name
-	public PersonaObject newObject(String name) {
+	/// Generates a new account object with the given nice name
+	public AccountObject newObject(String name) {
 		if(containsName(name)) {
 			return null;
 		}
 		
-		PersonaObject ret = newObject();
+		AccountObject ret = newObject();
 		
 		if( ret.setName(name) ) {
 			return ret;
@@ -215,27 +215,27 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 		return null;
 	}
 	
-	/// Gets the persona UUID, using the configured name
+	/// Gets the account UUID, using the configured name
 	public String nameToID(String name) {
-		return personaID.get(name);
+		return accountID.get(name);
 	}
 	
 	/// Returns if the name exists
 	public boolean containsName(String name) {
-		return personaID.containsKey(name);
+		return accountID.containsKey(name);
 	}
 	
-	/// Returns if the persona object id exists
+	/// Returns if the account object id exists
 	public boolean containsID(Object oid) {
-		return personaMeta.containsKey(oid);
+		return accountMeta.containsKey(oid);
 	}
 	
-	/// Removes the personaObject using the name
+	/// Removes the accountObject using the name
 	public void removeFromName(String name) {
 		//@TODO implmentation
 	}
 	
-	/// Removes the personaObject using the ID
+	/// Removes the accountObject using the ID
 	public void removeFromID(String oid) {
 		//@TODO implmentation
 	}
@@ -263,21 +263,21 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 	public boolean isSecureOnly = false;
 	
 	/// Sets the cookie to be via https only
-	public String cookiePrefix = "Persona_";
+	public String cookiePrefix = "Account_";
 	
 	/// The nonce size
 	public int nonceSize = 22;
 	
 	/// Gets and returns the session info, [nonceSalt, loginIP, browserAgent]
 	protected String[] getSessionInfo(String oid, String nonce) {
-		return personaSessions.getStringArray(oid+"-"+nonce);
+		return accountSessions.getStringArray(oid+"-"+nonce);
 	}
 	
 	/// Sets the session info with the given nonceSalt, IP, and browserAgent
 	protected String generateSession(String oid, int lifespan, String nonceSalt, String ipString, String browserAgent) {
 		String key = oid+"-"+NxtCrypt.randomString(nonceSize);
 		
-		return personaSessions.putWithLifespan( key, ConvertJSON.fromList( Arrays.asList(new String[] {nonceSalt, ipString, browserAgent}) ), lifespan );
+		return accountSessions.putWithLifespan( key, ConvertJSON.fromList( Arrays.asList(new String[] {nonceSalt, ipString, browserAgent}) ), lifespan );
 	}
 	
 	///
@@ -293,12 +293,12 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 	///--------------------------------------------------------------------------
 	
 	/// Validates the user retur true/false, without updating the response cookie
-	public PersonaObject getRequestUser(javax.servlet.http.HttpServletRequest request) {
+	public AccountObject getRequestUser(javax.servlet.http.HttpServletRequest request) {
 		return getRequestUser(request, null);
 	}
 
 	/// Validates the user retur true/false, with an update response cookie / token if needed
-	public PersonaObject getRequestUser(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) {
+	public AccountObject getRequestUser(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) {
 		javax.servlet.http.Cookie[] cookieJar = request.getCookies();
 		
 		if(cookieJar == null) {
@@ -336,16 +336,16 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 		}
 		
 		if(puid.length() < 22 || containsID(puid) ) {
-			logoutPersona(request, response);
+			logoutAccount(request, response);
 			return null;
 		}
 		
-		PersonaObject ret = null;
+		AccountObject ret = null;
 		String[] sessionInfo = getSessionInfo(puid, nonc);
 		if( sessionInfo == null || sessionInfo.length <= 0 || //
 		    sessionInfo[0] == null || (ret=getFromID( puid )) == null //
 			) {
-			logoutPersona(request, response);
+			logoutAccount(request, response);
 			return null;
 		}
 		
@@ -354,7 +354,7 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 		
 		// Invalid cookie hash, exits
 		if( !NxtCrypt.slowEquals(hash, computedCookieHash) ) {
-			logoutPersona(request, response);
+			logoutAccount(request, response);
 			return null;
 		}
 		
@@ -363,11 +363,11 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 		
 		if(response != null) { //assume renewal process check
 			if(rmbr != null && rmbr.equals("1")) {
-				if(personaSessions.getLifespan(nonc) < (rmberMeLifetime-loginRenewal)) { //needs renewal (perform it!)
+				if(accountSessions.getLifespan(nonc) < (rmberMeLifetime-loginRenewal)) { //needs renewal (perform it!)
 					_setLogin(ret, request, response, true);
 				}
 			} else {
-				if(personaSessions.getLifespan(nonc) < (loginLifetime-rmberMeRenewal)) { //needs renewal (perform it!)
+				if(accountSessions.getLifespan(nonc) < (loginLifetime-rmberMeRenewal)) { //needs renewal (perform it!)
 					_setLogin(ret, request, response, false);
 				}
 			}
@@ -377,7 +377,7 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 	}
 	
 	/// Internally sets the login to a user (handles the respective nonce) and set the cookies for the response
-	private boolean _setLogin(PersonaObject po, javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, boolean rmberMe ) {
+	private boolean _setLogin(AccountObject po, javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, boolean rmberMe ) {
 		
 		// Prepare the vars
 		//-----------------------------------------------------
@@ -440,8 +440,8 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 	}
 	
 	/// Login the user if valid
-	public PersonaObject loginPersona(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, String nicename, String rawPassword, boolean rmberMe) {
-		PersonaObject ret = getFromName(nicename);
+	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, String nicename, String rawPassword, boolean rmberMe) {
+		AccountObject ret = getFromName(nicename);
 		
 		if( ret != null && ret.validatePassword(rawPassword) ) {
 			_setLogin(ret, request, response, rmberMe);
@@ -452,7 +452,7 @@ public class PersonaTable extends JStackData implements UnsupportedDefaultMap<St
 	}
 	
 	/// Logout any existing users
-	public boolean logoutPersona(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) {
+	public boolean logoutAccount(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) {
 		if( response == null ) {
 			return false;
 		}

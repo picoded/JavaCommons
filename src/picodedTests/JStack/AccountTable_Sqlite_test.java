@@ -18,7 +18,7 @@ import org.apache.commons.lang3.RandomUtils;
 
 import picodedTests.TestConfig;
 
-public class PersonaTable_Sqlite_test extends JStackData_testBase_test {
+public class AccountTable_Sqlite_test extends JStackData_testBase_test {
 
 
 	// Metatable setup
@@ -26,13 +26,13 @@ public class PersonaTable_Sqlite_test extends JStackData_testBase_test {
 
 	protected String ptTableName = null;
 
-	protected PersonaTable ptObj = null;
+	protected AccountTable ptObj = null;
 
 	@Override
 	public void testObjSetup() throws JStackException {
 		ptTableName = "P" + TestConfig.randomTablePrefix();
 
-		ptObj = new PersonaTable(JStackObj, ptTableName);
+		ptObj = new AccountTable(JStackObj, ptTableName);
 		ptObj.stackSetup();
 	}
 
@@ -56,7 +56,7 @@ public class PersonaTable_Sqlite_test extends JStackData_testBase_test {
 	@Test
 	public void basicHasAddHasGet_viaID() throws JStackException {
 		String guid;
-		PersonaObject p;
+		AccountObject p;
 		
 		assertFalse( ptObj.containsID("hello") );
 		assertNull( ptObj.getFromID("hello") );
@@ -71,7 +71,7 @@ public class PersonaTable_Sqlite_test extends JStackData_testBase_test {
 	@Test
 	public void basicHasAddHasGet_viaName() throws JStackException {
 		String guid;
-		PersonaObject p;
+		AccountObject p;
 		String name = "hello";
 		
 		assertFalse( ptObj.containsKey(name) );

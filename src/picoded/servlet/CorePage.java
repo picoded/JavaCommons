@@ -4,7 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 // Exceptions used
-import javax.servlet.ServletException;
 import java.lang.RuntimeException;
 import java.lang.IllegalArgumentException;
 import java.io.IOException;
@@ -26,7 +25,7 @@ import picoded.webUtils.HttpRequestType;
 // Sub modules useds
 
 /**
- * servletCommons.servlet pages base system, in which all additional pages are extended from.
+ * servletCommons.servlet pages core system, in which all additional pages are extended from.
  * In addition, this is intentionally structured to be "usable" even without the understanding / importing of
  * the various HttpServlet functionalities. Though doing so is still highly recommended.
  *

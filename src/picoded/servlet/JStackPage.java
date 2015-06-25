@@ -1,4 +1,3 @@
-
 package picoded.servlet;
 
 import javax.servlet.ServletContext;
@@ -11,8 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-//import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset; //import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import java.lang.Number;
@@ -81,31 +79,31 @@ public class JStackPage extends CorePage {
 	
 	/// Gets and returns the context path / application folder path
 	public String getContextPath() {
-		if( _contextPath != null ) {
+		if (_contextPath != null) {
 			return _contextPath;
 		} else {
-			return (_contextPath = (super.getServletContext()).getRealPath("/")+"/");
+			return (_contextPath = (super.getServletContext()).getRealPath("/") + "/");
 		}
 	}
 	
 	public String getWebInfPath() {
-		return ( _webInfPath != null )? _webInfPath : (_webInfPath = getContextPath()+"WEB-INF/");
+		return (_webInfPath != null) ? _webInfPath : (_webInfPath = getContextPath() + "WEB-INF/");
 	}
 	
 	public String getClassesPath() {
-		return ( _classesPath != null )? _classesPath : (_classesPath = getWebInfPath()+"classes/");
+		return (_classesPath != null) ? _classesPath : (_classesPath = getWebInfPath() + "classes/");
 	}
 	
 	public String getLibraryPath() {
-		return ( _libraryPath != null ) ? _libraryPath : (_libraryPath = getWebInfPath()+"lib/");
+		return (_libraryPath != null) ? _libraryPath : (_libraryPath = getWebInfPath() + "lib/");
 	}
 	
 	public String getConfigsPath() {
-		return ( _libraryPath != null ) ? _libraryPath : (_libraryPath = getWebInfPath()+"configs/");
+		return (_libraryPath != null) ? _libraryPath : (_libraryPath = getWebInfPath() + "configs/");
 	}
 	
 	public String getPagesPath() {
-		return ( _pagesPath != null ) ? _pagesPath : (_pagesPath = getWebInfPath()+"pages/");
+		return (_pagesPath != null) ? _pagesPath : (_pagesPath = getWebInfPath() + "pages/");
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,12 +115,12 @@ public class JStackPage extends CorePage {
 	protected JConfig JConfigObj = null;
 	
 	public JConfig JConfig() {
-		if( JConfigObj != null ) {
+		if (JConfigObj != null) {
 			return JConfigObj;
 		}
 		
 		JConfigObj = new JConfig();
-		JConfigObj.addConfigSet( getConfigsPath(), null );
+		JConfigObj.addConfigSet(getConfigsPath(), null);
 		// Intentionally DOES NOT setup the JStack config connections?
 		
 		return JConfigObj;
@@ -139,11 +137,11 @@ public class JStackPage extends CorePage {
 	/// Returns the JStack object
 	/// @TODO Actual JStack config loading, now it just loads a blank sqlite file =(
 	public JStack JStack() {
-		if( JStackObj != null ) {
+		if (JStackObj != null) {
 			return JStackObj;
 		}
 		
-		JStackObj = new JStack( JSql.sqlite( getWebInfPath()+"sqlite.db" ) );
+		JStackObj = new JStack(JSql.sqlite(getWebInfPath() + "sqlite.db"));
 		
 		return JStackObj;
 	}
@@ -151,12 +149,12 @@ public class JStackPage extends CorePage {
 	////////////////////////////////////////////////////
 	// tableSetup calls for various jSql based modules
 	////////////////////////////////////////////////////
-	public void JStackSetup() throws JStackException {
-		JStack().setup();
+	public void stackSetup() throws JStackException {
+		JStack().stackSetup();
 	}
 	
 	/// Called once when initialized, to purge all existing data.
-	public void JStackTeardown() throws JStackException {
+	public void stackTeardown() throws JStackException {
 		JStack().teardown();
 	}
 	

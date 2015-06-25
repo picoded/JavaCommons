@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 ///
 public class ServletLogging_test {
 	
-	protected JSql JSqlObj = null;
+	protected JSql jSqlObj = null;
 	protected ServletLogging slObj = null;
 
 	@BeforeClass
@@ -35,19 +35,19 @@ public class ServletLogging_test {
 	
 	@Before
 	public void setUp() throws JSqlException {
-		JSqlObj = JSql.sqlite();
+		jSqlObj = JSql.sqlite();
 		
-		slObj = new ServletLogging(JSqlObj, JSqlObj);
+		slObj = new ServletLogging(jSqlObj, jSqlObj);
 		slObj.tableSetup();
 	}
 	
 	@After
 	public void tearDown() throws JSqlException {
-		if (JSqlObj != null) {
+		if (jSqlObj != null) {
 			try {
-				slObj.tearDown();
-				JSqlObj.dispose();
-				JSqlObj = null;
+				slObj.tearDown(jSqlObj);
+				jSqlObj.dispose();
+				jSqlObj = null;
 			} catch(Exception e) {
          	e.printStackTrace();
 			}
@@ -56,43 +56,43 @@ public class ServletLogging_test {
 	
 	@Test
 	public void validateSystemHash() throws JSqlException {
-		assertNotNull("SQL result returns as expected", slObj.validateSystemHash());
+		assertNotNull("SQL result returns as expected", slObj.validateSystemHash(jSqlObj));
 	}
 
 	@Test
 	public void systemHash() throws JSqlException {
-		assertNotNull("SQL result returns as expected", slObj.systemHash());
+		assertNotNull("SQL result returns as expected", slObj.systemHash(jSqlObj));
 	}
 
 	@Test
-	public void addFormat() throws JSqlException {
+	public void addFormat() throws Exception {
 		String format = "log user %s, at time %s from %s.";
 	  //String fmtHash = GUID.base58();
-	   String fmtHash = slObj.generateHash(format);
-		slObj.addFormat(fmtHash, format);
+	   String fmtHash = slObj.md5Base58(format);
+		slObj.addFormat(jSqlObj, fmtHash, format);
 
-		assertEquals(fmtHash, slObj.hashFormat(format));
+		assertEquals(fmtHash, slObj.hashFormat(jSqlObj, format));
 		
 	}
 	
 	@Test
-	public void log() throws JSqlException {
+	public void log() throws Exception {
 		Object[] args = {"XYZ", (int)(System.currentTimeMillis() / 1000), "SG"};
-		slObj.log("log user %s, at time %i from %s.", args);
+		slObj.log(jSqlObj, "log user %s, at time %i from %s.", args);
 	}
 	
 	@Test
-	public void list() throws JSqlException {
+	public void list() throws Exception {
 		int time = (int)(System.currentTimeMillis() / 1000);
 		// save log
 		String formatStr = "The %s lazy %s jumps %s the %s, at time %d %d %d %d in %s.";
 		Object[] args = {"brown", "dog", "over", "wall", time, time, time, time, "SG"};
 		
 		// save format string and log details
-		slObj.log(formatStr, args);
+		slObj.log(jSqlObj, formatStr, args);
 
 		// fetch all logs
-		List<LogMessage> list = slObj.list();
+		List<LogMessage> list = slObj.list(jSqlObj);
 		
 		// Check for NULL
 		assertNotNull("SQL result returns as expected", list);

@@ -41,7 +41,7 @@ public class LogMessage {
 		this.args.add(obj);
 	}
 	
-	// / Add Object[] array to the arguments list
+	// / Add list of Object to the arguments list
 	public void addArgs(List<Object> list) {
 		if (this.args == null) {
 			this.args = new ArrayList<Object>();

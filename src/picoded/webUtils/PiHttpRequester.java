@@ -110,9 +110,9 @@ public class PiHttpRequester{
 		if(cookieMap != null){
 			cookieList = new ArrayList<BasicClientCookie>();
 			Set<String> keys = cookieMap.keySet();
-			int keyCount = keys.size();
 			for(String key : keys){
 				BasicClientCookie newCookie = new BasicClientCookie(key, cookieMap.get(key));
+				cookieList.add(newCookie);
 			}
 		}
 		

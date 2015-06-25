@@ -79,7 +79,17 @@ public class PiHttpRequester_test
 			protected void doPost(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException {
 				//even though there is a getCookies method in HttpServletRequest, for some reason i have to retrieve my cookie from the header
 				//I am sending a request from apache and that is the only reason I can think of for this happening
-				System.out.println("Value for postCookie is: "+req.getHeader("postCookie"));
+				System.out.println("Value for postCookie using header is: "+req.getHeader("postCookie"));
+
+				javax.servlet.http.Cookie[] javaCookies = req.getCookies();
+				if(javaCookies != null){
+					for(javax.servlet.http.Cookie javaCookie : javaCookies){
+						System.out.println("Cookie using getCookie name:" +javaCookie.getName()+ " and value: "+javaCookie.getValue());
+					}
+				} else {
+					System.out.println("Java Cookies are still null");
+				}
+				
 				
 				//test send cookie back
 				resp.addCookie(new javax.servlet.http.Cookie("returnCookie", "returnCookieValue"));

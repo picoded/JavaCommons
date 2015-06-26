@@ -8,22 +8,22 @@ import java.util.Map.Entry;
 
 public class PiHttpResponse {
 	
-	private Map<String, String> _header;
-	private Map<String, String> _cookie;
+	private Map<String, String> _headers;
+	private Map<String, String> _cookies;
 	private InputStream _responseBody;
 	
-	public PiHttpResponse(Map<String, String> header, Map<String, String> cookie, InputStream responseBody){
-		_header = header;
-		_cookie = cookie;
+	public PiHttpResponse(Map<String, String> headers, Map<String, String> cookies, InputStream responseBody){
+		_headers = headers;
+		_cookies = cookies;
 		_responseBody = responseBody;
 	}
 	
 	public Map<String, String> getHeaders(){
-		return _header;
+		return _headers;
 	}
 	
 	public Map<String, String> getCookies(){
-		return _cookie;
+		return _cookies;
 	}
 	
 	public InputStream getResponseBody(){

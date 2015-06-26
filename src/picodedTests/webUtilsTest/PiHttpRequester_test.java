@@ -1,4 +1,4 @@
-package picodedTests.webUtils;
+package picodedTests.webUtilsTest;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -77,12 +77,15 @@ public class PiHttpRequester_test
 
 			@Override
 			protected void doPost(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException {
-				//even though there is a getCookies method in HttpServletRequest, for some reason i have to retrieve my cookie from the header
-				//I am sending a request from apache and that is the only reason I can think of for this happening
-				System.out.println("Value for postCookie is: "+req.getHeader("postCookie"));
-				
-				//test send cookie back
-				resp.addCookie(new javax.servlet.http.Cookie("returnCookie", "returnCookieValue"));
+				javax.servlet.http.Cookie[] javaCookies = req.getCookies();
+				if(javaCookies != null && javaCookies.length > 0){
+					if(javaCookies[0].getValue().equals("postCookieValue")){
+						//respond with a cookie
+						resp.addCookie(new javax.servlet.http.Cookie("returnCookie", "returnCookieValue"));
+					}
+				} else {
+					System.out.println("Java Cookies are null");
+				}
 				
 				String postParam = req.getParameter("postValue");
 				System.out.println("Saw post parameter : "+postParam);
@@ -119,21 +122,21 @@ public class PiHttpRequester_test
 		
 		tomcat.start();
 		
-		String newGetResult = doGetTest();
-		System.out.println("Finished new get test with result: " +newGetResult);
-		assertEquals(newGetResult, "GET");
+//		String newGetResult = doGetTest();
+//		System.out.println("Finished new get test with result: " +newGetResult);
+//		assertEquals(newGetResult, "GET");
 		
 		String newPostResult = doPostTest();
 		System.out.println("Finished new post test with result: " +newPostResult);
 		assertEquals(newPostResult, "POST");
 		
-		String newPutResult = doPutTest();
-		System.out.println("Finished new put test with result: " +newPutResult);
-		assertEquals(newPutResult, "PUT");
-		
-		String newDeleteResult = doDeleteTest();
-		System.out.println("Finished new delete test with result: " +newDeleteResult);
-		assertEquals(newDeleteResult, "DELETE");
+//		String newPutResult = doPutTest();
+//		System.out.println("Finished new put test with result: " +newPutResult);
+//		assertEquals(newPutResult, "PUT");
+//		
+//		String newDeleteResult = doDeleteTest();
+//		System.out.println("Finished new delete test with result: " +newDeleteResult);
+//		assertEquals(newDeleteResult, "DELETE");
 	}
 	
 	private String doGetTest() {

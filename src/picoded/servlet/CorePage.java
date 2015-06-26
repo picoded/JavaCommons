@@ -582,6 +582,11 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	@Override
 	public final void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		spawnInstance().setupInstance(HttpRequestType.TYPE_OPTION.value(), request, response).processChain();
+		try {
+				super.doOptions(request,response);
+		} catch(Exception e) {
+			throw new ServletException(e);
+		}
 	}
 	
 }

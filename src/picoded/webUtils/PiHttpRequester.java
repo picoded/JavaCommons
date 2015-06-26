@@ -35,6 +35,8 @@ import picoded.conv.StringEscape;
 
 public class PiHttpRequester{
 	
+	private BasicCookieStore httpCookieStore = null;
+	
 	public PiHttpResponse sendGetRequest(String requestHostName, 
 											String context, 
 											Map<String, String> getParams, 
@@ -79,7 +81,8 @@ public class PiHttpRequester{
 										Map<String, String> headerMap, 
 										Map<String, String> cookieMap)
 	{
-		HttpClient httpClient = HttpClients.createDefault();
+		httpCookieStore = new BasicCookieStore();
+		HttpClient httpClient = HttpClientBuilder.create().setDefaultCookieStore(httpCookieStore).build();
 		
 		//create request
 		HttpRequestBase httpRequest = null;
@@ -105,7 +108,7 @@ public class PiHttpRequester{
 		if(cookieMap != null){
 			Set<String> cookieNames = cookieMap.keySet();
 			for(String str : cookieNames){
-				httpRequestBase.addHeader("Cookie", StringEscape.encodeURI(str)+"="+StringEscape.encodeURI(cookieMap.get(str)));
+				httpRequestBase.addHeader("Cookie", str+"="+cookieMap.get(str));
 			}
 		}
 		return httpRequestBase;
@@ -225,9 +228,6 @@ public class PiHttpRequester{
 		PiHttpResponse piHttpResponse = null;
 		
 		try {
-			BasicCookieStore httpCookieStore = new BasicCookieStore();
-			httpClient = HttpClientBuilder.create().setDefaultCookieStore(httpCookieStore).build();
-			
 			resp = httpClient.execute(httpRequest);
 			
 			HashMap<String, String> piCookies = null;
@@ -237,20 +237,9 @@ public class PiHttpRequester{
 				piCookies = new HashMap<String, String>();
 				piHeaders = new HashMap<String, String>();
 				
-//				Header[] cookies = resp.getHeaders("Set-Cookie");
-//				if(cookies != null){
-//					for(Header cookie : cookies){
-//						String[] cookieKVP = cookie.getValue().split("=");
-//						if(cookieKVP != null && cookieKVP.length > 1){
-//							piCookies.put(cookieKVP[0], cookieKVP[1]);
-//						}
-//					}
-//				}
-				
 				List<Cookie> cookieList = httpCookieStore.getCookies();
 				for(Cookie cookie : cookieList){
-					System.out.println("Received cookie with name: "+StringEscape.decodeURI(cookie.getName())+" and val: "+StringEscape.decodeURI(cookie.getValue()));
-					piCookies.put(StringEscape.decodeURI(cookie.getName()), StringEscape.decodeURI(cookie.getValue()));
+					piCookies.put(cookie.getName(), cookie.getValue());
 				}
 				
 				for(Header header : resp.getAllHeaders()){

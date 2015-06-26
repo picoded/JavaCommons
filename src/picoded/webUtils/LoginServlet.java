@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import picoded.servlet.*;
 import picoded.JStack.*;
 
-public class PiCodeBox extends BasePage{
+public class LoginServlet extends BasePage{
 
 	static final long serialVersionUID = 1L;
 	
@@ -39,14 +39,10 @@ public class PiCodeBox extends BasePage{
 			throws ServletException {
 		try{
 			accountAuthTable().stackSetup();
-			//JStackSetup();
 		} catch (JStackException ex){
 			throw new ServletException(ex);
 		}
 		
-		//String requestedUser = requestParameters.getString("user", "null");
-		
-		//outputData.put("user", requestedUser);
 		String[] names = null;
 		String loginNames = null;
 		
@@ -55,19 +51,13 @@ public class PiCodeBox extends BasePage{
 			loginNames = StringUtils.join(names, ",");
 		}
 		
-		outputData.put("user", loginNames); // { "user" : "hello" }
+		outputData.put("user", loginNames);
 		return true;
 	}
 
 	@Override
 	public boolean doPostJSON(Map<String, Object> outputData, Map<String,Object> templateData)
 			throws ServletException {
-		System.out.println("Received post request");
-		
-		for(String str : requestParameters.keySet()){
-			System.out.println("Key: " +str+ " and value: " +requestParameters.get(str));
-		}
-		
 		try {
 			AccountObject acc;
 			
@@ -75,18 +65,17 @@ public class PiCodeBox extends BasePage{
 			String userPW = requestParameters.get("password");
 			
 			if(! accountAuthTable().containsName(userName)) {
-				System.out.println(userName+ " not found in account table");
 				acc = accountAuthTable().newObject(userName);
 				acc.setPassword(userPW);
 				acc.saveAll();
+
+				if( !accountAuthTable().containsName(userName) ) {
+					throw new ServletException("missing user setup");
+				}
 			}
 			acc = accountAuthTable().loginAccount(httpRequest, httpResponse, userName, userPW, false);
 			
-			
-			httpResponse.getHeader("Set-Cookie");
-			
 			outputData.put("login-status", ( acc != null ) );
-			
 		} catch (JStackException e) {
 			throw new ServletException(e);
 		}

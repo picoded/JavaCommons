@@ -274,10 +274,10 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// Spawn and instance of the current class
 	public final CorePage spawnInstance() throws ServletException { //, OutputStream outStream
 		try {
-			return this.getClass().newInstance();
-		} catch(InstantiationException e) {
-			throw new ServletException(e);
-		} catch(IllegalAccessException e) {
+			CorePage ret = this.getClass().newInstance();
+			ret.init( this.getServletConfig() );
+			return ret;
+		} catch(Exception e) {
 			throw new ServletException(e);
 		}
 	}

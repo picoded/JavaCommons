@@ -169,7 +169,7 @@ public class BasePage extends JStackPage {
 			return _jmteObj; 
 		}
 		
-		_jmteObj = new JMTE( getPagesPath() );
+		_jmteObj = new JMTE( getPagesTemplatePath() );
 		_jmteObj.baseDataModel.put( "ContextPath", getContextPath() );
 		_jmteObj.registerNamedRenderer( new currentAccountMetaInfo_nr() );
 		

@@ -59,30 +59,36 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		}
 		
 		// The current file / folder name
-		String fileName = inFile.getName();
-		String fileNameWithoutType = null;
+		
+		String nxtPrefix = "";
+		if(prefix != null && prefix.length() > 0) {
+			nxtPrefix = prefix+".";
+		}
 		
 		// Iterate sub file directory
 		if(inFile.isDirectory()) {
-			String subPrefix = prefix+"."+fileName;
-			
 			File[] subFiles = inFile.listFiles();
+			
 			for (int i = 0; i < subFiles.length; i++){
+				String subFileName = subFiles[i].getName();
+				
+				// @TODO : proper filename without type
+				String subFileNameWithoutType = subFileName;
+				if( subFileName.endsWith(".ini") ) {
+					subFileNameWithoutType = subFileNameWithoutType.substring(0, subFileNameWithoutType.length() - 4 ); 
+				}
+				
+				String subPrefix = nxtPrefix+subFileNameWithoutType;
 				addConfigSet(subFiles[i], subPrefix);
 			}
 			return this;
 		}
 		
 		// Else files
+		String fileName = inFile.getName();
 		if( fileName.endsWith(".ini") ) {
-			fileNameWithoutType = fileName.substring(0, fileName.length() - 4 ); // - (".ini").length() 
-			
-			// its a config.ini, so dun use sub namespace?
-			if(fileNameWithoutType.equals("config")) {
-				prefixSetMap.put(prefix, new ConfigFile(inFile));
-			} else { // Use file name as sub namespace
-				prefixSetMap.put(prefix+"."+fileNameWithoutType, new ConfigFile(inFile));
-			}
+			String fileNameWithoutType = fileName.substring(0, fileName.length() - 4 ); // - (".ini").length() 
+			prefixSetMap.put(prefix, new ConfigFile(inFile));
 		}
 		
 		return this;

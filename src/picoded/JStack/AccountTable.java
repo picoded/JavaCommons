@@ -262,8 +262,11 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 	/// Sets the cookie to be via https only
 	public boolean isSecureOnly = false;
 	
-	/// Sets the cookie to be via https only
+	/// Sets the cookie namespace prefix
 	public String cookiePrefix = "Account_";
+	
+	/// Sets teh cookie domain, defaults is null
+	public String cookieDomain = null;
 	
 	/// The nonce size
 	public int nonceSize = 22;
@@ -434,6 +437,10 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 				cookieJar[a].setSecure(isSecureOnly);
 			}
 			
+			if(cookieDomain != null && cookieDomain.length() > 0) {
+				cookieJar[a].setDomain(cookieDomain);
+			}
+			
 			//Actually inserts the cookie
 			response.addCookie( cookieJar[a] );
 		}
@@ -475,6 +482,10 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 			}
 			if(isSecureOnly) {
 				cookieJar[a].setSecure(isSecureOnly);
+			}
+			
+			if(cookieDomain != null && cookieDomain.length() > 0) {
+				cookieJar[a].setDomain(cookieDomain);
 			}
 			
 			//Actually inserts the cookie

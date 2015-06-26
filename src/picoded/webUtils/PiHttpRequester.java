@@ -134,7 +134,7 @@ public class PiHttpRequester{
 										Map<String, String> cookieMap)
 	{
 		String _httpParams = generateGetParams(getParams);
-		HttpGet httpGet = new HttpGet(requestHostName + "/" + contextPath + _httpParams);
+		HttpGet httpGet = new HttpGet(requestHostName + contextPath + _httpParams);
 		
 		if(headerMap != null && headerMap.size() > 0){
 			for(Entry<String, String> kvp : headerMap.entrySet()){
@@ -152,7 +152,7 @@ public class PiHttpRequester{
 											Map<String, String> headerMap, 
 											Map<String, String> cookieMap)
 	{
-		HttpPost httpPost = new HttpPost(requestHostName + "/" + contextPath);
+		HttpPost httpPost = new HttpPost(requestHostName + contextPath);
 		
 		List<NameValuePair> requestPairs = new ArrayList<NameValuePair>();
 		if(postParams != null){
@@ -183,7 +183,7 @@ public class PiHttpRequester{
 										Map<String, String> headerMap, 
 										Map<String, String> cookieMap)
 	{
-		HttpPut httpPut = new HttpPut(requestHostName + "/" + contextPath);
+		HttpPut httpPut = new HttpPut(requestHostName + contextPath);
 		List<NameValuePair> requestPairs = new ArrayList<NameValuePair>();
 		if(putParams != null){
 			for(Entry<String, String> kvp : putParams.entrySet()){
@@ -211,7 +211,7 @@ public class PiHttpRequester{
 												Map<String, String> headerMap, 
 												Map<String, String> cookieMap)
 	{
-		HttpDelete httpDelete = new HttpDelete(requestHostName + "/" + resourcePathToDelete);
+		HttpDelete httpDelete = new HttpDelete(requestHostName + resourcePathToDelete);
 		if(headerMap != null && headerMap.size() > 0){
 			for(Entry<String, String> kvp : headerMap.entrySet()){
 				httpDelete.addHeader(kvp.getKey(), kvp.getValue());

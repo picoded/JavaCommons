@@ -83,7 +83,7 @@ public class JStackPage extends CorePage {
 		if (_contextPath != null) {
 			return _contextPath;
 		} else {
-			return (_contextPath = (super.getServletContext()).getRealPath("/") + "/");
+			return (_contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/");
 		}
 	}
 	

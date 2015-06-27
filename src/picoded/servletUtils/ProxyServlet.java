@@ -53,44 +53,44 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 public class ProxyServlet extends CorePage {
 
 	/// Serialization UID.
-	private static final long serialVersionUID = 1L;
+	protected static final long serialVersionUID = 1L;
 
 	/// Key for redirect location header.
-	private static final String LOCATION_HEADER = "Location";
+	protected static final String LOCATION_HEADER = "Location";
 
 	/// Key for content type header.
-	private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
+	protected static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
 
 	/// Key for content length header.
-	private static final String CONTENT_LENGTH_HEADER_NAME = "Content-Length";
+	protected static final String CONTENT_LENGTH_HEADER_NAME = "Content-Length";
 
 	/// Key for host header
-	private static final String HOST_HEADER_NAME = "Host";
+	protected static final String HOST_HEADER_NAME = "Host";
 
 	/// The directory to use to temporarily store uploaded files
-	private static final File UPLOAD_TEMP_DIRECTORY = new File(System.getProperty("java.io.tmpdir"));
+	protected static final File UPLOAD_TEMP_DIRECTORY = new File(System.getProperty("java.io.tmpdir"));
 
 	///////////////////////////////////////////////////////////
 	// Proxy host params
 	///////////////////////////////////////////////////////////
 
 	/// The host paramter to proxy request to
-	private String proxyHost = "127.0.0.1";
+	protected String proxyHost = "127.0.0.1";
 
 	/// The port on the proxy host to wihch we are proxying requests. Default value is 80.	
-	private int proxyPort = 80;
+	protected int proxyPort = 80;
 
 	/// The (optional) path on the proxy host to wihch we are proxying requests. Default value is "".
-	private String proxyPath = "";
+	protected String proxyPath = "";
 
 	/// The maximum size for uploaded files in bytes. Default value is 100MB.
-	private int maxFileUploadSize = 100 * 1024 * 1024;
+	protected int maxFileUploadSize = 100 * 1024 * 1024;
 	
 	///////////////////////////////////////////////////////////
 	// Proxy host params PUT/GET
 	///////////////////////////////////////////////////////////
 
-	private String getProxyHostAndPort() {
+	protected String getProxyHostAndPort() {
 		if(getProxyPort() == 80) {
 			return getProxyHost();
 		} else {
@@ -98,35 +98,35 @@ public class ProxyServlet extends CorePage {
 		}
 	}
 
-	private String getProxyHost() {
+	protected String getProxyHost() {
 		return proxyHost;
 	}
 	
-	private void setProxyHost(String stringProxyHostNew) {
+	protected void setProxyHost(String stringProxyHostNew) {
 		proxyHost = stringProxyHostNew;
 	}
 	
-	private int getProxyPort() {
+	protected int getProxyPort() {
 		return proxyPort;
 	}
 	
-	private void setProxyPort(int intProxyPortNew) {
+	protected void setProxyPort(int intProxyPortNew) {
 		proxyPort = intProxyPortNew;
 	}
 	
-	private String getProxyPath() {
+	protected String getProxyPath() {
 		return proxyPath;
 	}
 	
-	private void setProxyPath(String stringProxyPathNew) {
+	protected void setProxyPath(String stringProxyPathNew) {
 		proxyPath = stringProxyPathNew;
 	}
 	
-	private int getMaxFileUploadSize() {
+	protected int getMaxFileUploadSize() {
 		return maxFileUploadSize;
 	}
 	
-	private void setMaxFileUploadSize(int intMaxFileUploadSizeNew) {
+	protected void setMaxFileUploadSize(int intMaxFileUploadSizeNew) {
 		maxFileUploadSize = intMaxFileUploadSizeNew;
 	}
 	
@@ -135,7 +135,7 @@ public class ProxyServlet extends CorePage {
 	///////////////////////////////////////////////////////////
 
 	/// Gets and returns the target proxy URL given the httpServletReqeust
-	private String getProxyURL(HttpServletRequest httpServletRequest) {
+	protected String getProxyURL(HttpServletRequest httpServletRequest) {
 		// Set the protocol to HTTP
 		String stringProxyURL = "http://" + getProxyHostAndPort();
 		// Check if we are proxying to a path other that the document root
@@ -194,7 +194,7 @@ public class ProxyServlet extends CorePage {
 	
 	/// Takes a servelt request, and populate the proxy request parameters / headers
 	@SuppressWarnings("unchecked")
-	private void setProxyRequestHeaders(HttpServletRequest httpServletRequest, HttpUriRequest httpMethodProxyRequest) {
+	protected void setProxyRequestHeaders(HttpServletRequest httpServletRequest, HttpUriRequest httpMethodProxyRequest) {
 		// Get an Enumeration of all of the header names sent by the client
 		Enumeration<String> enumerationOfHeaderNames = httpServletRequest.getHeaderNames();
 		while(enumerationOfHeaderNames.hasMoreElements()) {
@@ -225,7 +225,7 @@ public class ProxyServlet extends CorePage {
 		}
 	}
 	
-	private void executeProxyRequest( HttpUriRequest httpMethodProxyRequest, 
+	protected void executeProxyRequest( HttpUriRequest httpMethodProxyRequest, 
 		HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException {
 		
 		try {
@@ -329,7 +329,7 @@ public class ProxyServlet extends CorePage {
 	// Upload data handling
 	///////////////////////////////////////////////////////////
 
-	private void handleStandardPost( HttpEntityEnclosingRequestBase postMethodProxyRequest, HttpServletRequest httpServletRequest) throws ServletException {
+	protected void handleStandardPost( HttpEntityEnclosingRequestBase postMethodProxyRequest, HttpServletRequest httpServletRequest) throws ServletException {
 		try {
 			// Get the client POST data as a Map
 			Map<String, String[]> mapPostParameters = httpServletRequest.getParameterMap();
@@ -345,7 +345,7 @@ public class ProxyServlet extends CorePage {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleMultipartPost( HttpEntityEnclosingRequestBase postMethodProxyRequest, HttpServletRequest httpServletRequest) throws ServletException {
+	protected void handleMultipartPost( HttpEntityEnclosingRequestBase postMethodProxyRequest, HttpServletRequest httpServletRequest) throws ServletException {
 		// Create a factory for disk-based file items
 		DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
 		// Set factory constraints

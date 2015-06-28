@@ -14,7 +14,7 @@ public class ServletException extends javax.servlet.ServletException {
 	}
 	
 	public ServletException(Throwable cause) {
-		super("JStackException", cause);
+		super("ServletException", cause);
 	}
 	
 }

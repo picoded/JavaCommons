@@ -55,7 +55,9 @@ import org.aspectj.weaver.ast.Var;
 
 public class RequestHttp_test {
 	
-	String httpBinTestUrl = "http://httpbin.org";
+	public String httpBinURL() {
+		return "http://httpbin.org";
+	}
 	
 	RequestHttp reqObj = null;
 	
@@ -69,7 +71,7 @@ public class RequestHttp_test {
 		ResponseHttp res = null;
 		Map<String,Object> resMap = null;
 		
-		assertNotNull( res = RequestHttp.get(httpBinTestUrl+"/get?hello=world") );
+		assertNotNull( res = RequestHttp.get(httpBinURL()+"/get?hello=world") );
 		assertNotNull( resMap = res.toMap() );
 		
 		assertEquals( 200, res.statusCode() );
@@ -79,7 +81,7 @@ public class RequestHttp_test {
 	@Test 
 	public void GET_statusTest() throws IOException {
 		ResponseHttp res = null;
-		assertNotNull( res = RequestHttp.get(httpBinTestUrl+"/status/418") );
+		assertNotNull( res = RequestHttp.get(httpBinURL()+"/status/418") );
 		assertEquals( 418, res.statusCode() );
 	}
 }

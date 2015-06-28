@@ -1,4 +1,4 @@
-package picoded.servlet;
+package picoded.servletUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -80,7 +80,7 @@ public class ProxyServlet extends CorePage {
 	// Proxy host params PUT/GET
 	///////////////////////////////////////////////////////////
 
-	protected String getProxyHostAndPort() {
+	public String getProxyHostAndPort() {
 		if(getProxyPort() == 80) {
 			return getProxyHost();
 		} else {
@@ -88,35 +88,35 @@ public class ProxyServlet extends CorePage {
 		}
 	}
 
-	protected String getProxyHost() {
+	public String getProxyHost() {
 		return proxyHost;
 	}
 	
-	protected void setProxyHost(String stringProxyHostNew) {
+	public void setProxyHost(String stringProxyHostNew) {
 		proxyHost = stringProxyHostNew;
 	}
 	
-	protected int getProxyPort() {
+	public int getProxyPort() {
 		return proxyPort;
 	}
 	
-	protected void setProxyPort(int intProxyPortNew) {
+	public void setProxyPort(int intProxyPortNew) {
 		proxyPort = intProxyPortNew;
 	}
 	
-	protected String getProxyPath() {
+	public String getProxyPath() {
 		return proxyPath;
 	}
 	
-	protected void setProxyPath(String stringProxyPathNew) {
+	public void setProxyPath(String stringProxyPathNew) {
 		proxyPath = stringProxyPathNew;
 	}
 	
-	protected int getMaxFileUploadSize() {
+	public int getMaxFileUploadSize() {
 		return maxFileUploadSize;
 	}
 	
-	protected void setMaxFileUploadSize(int intMaxFileUploadSizeNew) {
+	public void setMaxFileUploadSize(int intMaxFileUploadSizeNew) {
 		maxFileUploadSize = intMaxFileUploadSizeNew;
 	}
 	
@@ -150,35 +150,39 @@ public class ProxyServlet extends CorePage {
 	/// Initialize the <code>ProxyServlet</code>
 	/// @param servletConfig The Servlet configuration passed in by the servlet conatiner
 	@Override
-	public void init(ServletConfig servletConfig) throws ServletException {
-		try {
-			super.init(servletConfig);
-		} catch(Exception e) {
-			throw new ServletException(e);
-		}
+	public void initSetup( CorePage original, ServletConfig servletConfig) throws ServletException {
+		super.initSetup(original, servletConfig);
+		
+		ProxyServlet ori = (ProxyServlet)original;
+		
+		// Load original values?
+		proxyHost = ori.proxyHost;
+		proxyPort = ori.proxyPort;
+		proxyPath = ori.proxyPath;
+		maxFileUploadSize = ori.maxFileUploadSize;
 		
 		// Get the proxy host
 		String newProxyHost = servletConfig.getInitParameter("proxyHost");
 		if (newProxyHost != null && (newProxyHost = newProxyHost.trim()).length() > 0 ) { 
-			proxyHost = newProxyHost;
+			setProxyHost( newProxyHost );
 		}
 
 		// Get the proxy port if specified
 		String newProxyPort = servletConfig.getInitParameter("proxyPort");
 		if (newProxyPort != null && (newProxyPort = newProxyHost.trim()).length() > 0 ) {
-			proxyPort = Integer.parseInt(newProxyPort);
+			setProxyPort( Integer.parseInt(newProxyPort) );
 		}
 
 		// Get the proxy path if specified
 		String newProxyPath = servletConfig.getInitParameter("proxyPath");
 		if (newProxyPath != null && (newProxyPath = newProxyPath.trim()).length() > 0 ) {
-			proxyPath = newProxyPath;
+			setProxyPath( newProxyPath );
 		}
 
 		// Get the maximum file upload size if specified
 		String newMaxFileUploadSize = servletConfig.getInitParameter("maxFileUploadSize");
 		if(newMaxFileUploadSize != null &&  (newMaxFileUploadSize = newMaxFileUploadSize.trim()).length() > 0) {
-			maxFileUploadSize = Integer.parseInt(newMaxFileUploadSize);
+			setMaxFileUploadSize( Integer.parseInt(newMaxFileUploadSize) );
 		}
 	}
 	
@@ -294,24 +298,33 @@ public class ProxyServlet extends CorePage {
 	/// Performs an output request, with special handling of POST / PUT
 	@Override
 	public boolean outputRequest(Map<String,Object> templateData, PrintWriter output) throws ServletException {
-
+		return proxyCorePageRequest(this);
+	}
+	
+	/// Performs a proxy redirect using the given CorePage instance
+	public boolean proxyCorePageRequest(CorePage page) throws ServletException {
+		
+		HttpRequestType rType = page.getHttpRequestType();
+		HttpServletRequest sReq = page.getHttpServletRequest();
+		HttpServletResponse sRes = page.getHttpServletResponse();
+		
 		// Create the respective request URL based on requestType and URL
-		HttpUriRequest methodToProxyRequest = RequestHttpUtils.apache_HttpUriRequest_fromRequestType(requestType, getProxyURL(httpRequest));
+		HttpUriRequest methodToProxyRequest = RequestHttpUtils.apache_HttpUriRequest_fromRequestType(rType, getProxyURL(sReq));
 		
 		// Forward the request headers
-		setProxyRequestHeaders(httpRequest, methodToProxyRequest);
+		setProxyRequestHeaders(sReq, methodToProxyRequest);
 		
 		// Handles post or put
-		if( requestType == HttpRequestType.TYPE_POST || requestType == HttpRequestType.TYPE_PUT ) {
-			if(ServletFileUpload.isMultipartContent(httpRequest)) {
-				handleMultipartPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, httpRequest);
+		if( rType == HttpRequestType.TYPE_POST || rType == HttpRequestType.TYPE_PUT ) {
+			if(ServletFileUpload.isMultipartContent( sReq )) {
+				handleMultipartPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, sReq);
 			} else {
-				handleStandardPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, httpRequest);
+				handleStandardPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, sReq);
 			}
 		}
 		
 		// Execute the proxy request
-		executeProxyRequest(methodToProxyRequest, httpRequest, httpResponse);
+		executeProxyRequest(methodToProxyRequest, sReq, sRes);
 		return true;
 	}
 	

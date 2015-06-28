@@ -2,6 +2,7 @@ package picoded.servlet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.*;
 
 // Exceptions used
 import java.lang.RuntimeException;
@@ -111,6 +112,10 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	//protected byte requestType = 0;
 	protected HttpRequestType requestType = null;
 	
+	public HttpRequestType getHttpRequestType() {
+		return requestType;
+	}
+	
 	/// The actual output stream used
 	protected OutputStream responseOutputStream = null;
 	
@@ -131,6 +136,14 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// httpResponse used [modification of this value, is highly discouraged]
 	protected HttpServletResponse httpResponse = null;
+	
+	public HttpServletRequest getHttpServletRequest() {
+		return httpRequest;
+	}
+	
+	public HttpServletResponse getHttpServletResponse() {
+		return httpResponse;
+	}
 	
 	// Independent instance variables
 	//-------------------------------------------
@@ -274,9 +287,20 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// Spawn and instance of the current class
 	public final CorePage spawnInstance() throws ServletException { //, OutputStream outStream
 		try {
-			CorePage ret = this.getClass().newInstance();
-			ret.init( this.getServletConfig() );
+			Class<? extends CorePage> pageClass = this.getClass();
+			CorePage ret = pageClass.newInstance();
+			pageClass.cast(ret).initSetup( this, this.getServletConfig() );
+			
 			return ret;
+		} catch(Exception e) {
+			throw new ServletException(e);
+		}
+	}
+	
+	/// To be over-ridden
+	public void initSetup( CorePage original, ServletConfig servletConfig ) throws ServletException {
+		try {
+			init( getServletConfig() );
 		} catch(Exception e) {
 			throw new ServletException(e);
 		}

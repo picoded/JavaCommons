@@ -1,7 +1,7 @@
-package picodedTests.servlet;
+package picodedTests.RESTBuilder;
 
 // Target test class
-import picoded.servlet.RESTRequest;
+import picoded.RESTBuilder.RESTRequest;
 
 // Test Case include
 import org.junit.*;

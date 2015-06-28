@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.lang.RuntimeException;
@@ -48,7 +49,7 @@ public class JSql extends BaseInterface {
 	//-------------------------------------------------------------------------
 	
 	/// database connection properties
-	private Map<String, Object> connectionProps = null;
+	protected Map<String, Object> connectionProps = null;
 	
 	/// store the database connection parameters for recreating the connection
 	public void setConnectionProperties(String dbUrl, String dbName, String dbUser, String dbPass, Properties connProps) {
@@ -102,30 +103,7 @@ public class JSql extends BaseInterface {
 	
 	/// As this is the base class varient, this funciton isnt suported
 	public void recreate(boolean force) {
-		if (force) {
-			dispose();
-		}
-		if (sqlType == JSqlType.sqlite) {
-			if (connectionProps.get("dbUrl") == null) {
-				new picoded.JSql.db.JSql_Sqlite();
-			} else {
-				new picoded.JSql.db.JSql_Sqlite((String) connectionProps.get("dbUrl"));
-			}
-		} else if (sqlType == JSqlType.mysql) {
-			if (connectionProps.get("connectionProps") == null) {
-				new picoded.JSql.db.JSql_Mysql((String) connectionProps.get("dbUrl"), (String) connectionProps
-					.get("dbName"), (String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
-			} else {
-				new picoded.JSql.db.JSql_Mysql((String) connectionProps.get("dbUrl"), (Properties) connectionProps
-					.get("connectionProps"));
-			}
-		} else if (sqlType == JSqlType.mssql) {
-			new picoded.JSql.db.JSql_Mssql((String) connectionProps.get("dbUrl"), (String) connectionProps.get("dbName"),
-				(String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
-		} else if (sqlType == JSqlType.oracle) {
-			new picoded.JSql.db.JSql_Oracle((String) connectionProps.get("dbUrl"), (String) connectionProps.get("dbUser"),
-				(String) connectionProps.get("dbPass"));
-		}
+		// donothing, to be overridden in child class
 	}
 	
 	/// [private] Helper function, used to prepare the sql statment in multiple situations
@@ -734,5 +712,41 @@ public class JSql extends BaseInterface {
 		} catch (Exception e) {
 			throw new JSqlException("executeQuery_metadata exception", e);
 		}
+	}
+	
+	/// Executes the table meta data query, and returns the result object
+	public Map<String, String> getMetaData(String sql) throws JSqlException {
+		Map<String, String> metaData = null;
+		ResultSet rs = null;
+		//Try and finally : prevent memory leaks
+		try {
+			Statement st = sqlConn.createStatement();
+			st = sqlConn.createStatement();
+			rs = st.executeQuery(sql);
+			ResultSetMetaData rsMetaData = rs.getMetaData();
+			int numberOfColumns = rsMetaData.getColumnCount();
+			for (int i = 1; i <= numberOfColumns; i++) {
+				if (metaData == null) {
+					metaData = new HashMap<String, String>();
+				}
+				metaData.put(rsMetaData.getColumnName(i), rsMetaData.getColumnTypeName(i));
+			}
+		} catch (Exception e) {
+			throw new JSqlException("executeQuery_metadata exception", e);
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (Exception e) {
+					//donothing
+				}
+				rs = null;
+			}
+		}
+		return metaData;
+	}
+	
+	public String genericSqlParser(String inString) throws JSqlException {
+		return null;
 	}
 }

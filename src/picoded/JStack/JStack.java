@@ -1,8 +1,11 @@
 package picoded.JStack;
 
+import java.util.*;
+
 // Picoded imports
 import picoded.JSql.*;
 import picoded.JCache.*;
+import picoded.struct.CaseInsensitiveHashMap;
 
 /// JStack provides various common data storage format, that utalizes a combination of
 /// JCache, and JSql instances implementation.
@@ -50,8 +53,66 @@ public class JStack extends JStackLayer {
 		setTablePrefix(inNamespace);
 	}
 	 */
-
+	
+	protected CaseInsensitiveHashMap<String,JStackData> cachedMetaTable = new CaseInsensitiveHashMap<String,JStackData>();
+	protected CaseInsensitiveHashMap<String,JStackData> cachedKeyValueMap = new CaseInsensitiveHashMap<String,JStackData>();
+	protected CaseInsensitiveHashMap<String,JStackData> cachedAccountTable = new CaseInsensitiveHashMap<String,JStackData>();
+	
 	//----------------------------------------------
-	// Constructor
+	// JStack modules
 	//----------------------------------------------
+	
+	public MetaTable getMetaTable(String tableName) {
+		MetaTable r = new MetaTable(this, tableName);
+		cachedMetaTable.put(tableName, r);
+		return r;
+	}
+	
+	public KeyValueMap getKeyValueMap(String tableName) {
+		KeyValueMap r = new KeyValueMap(this, tableName);
+		cachedKeyValueMap.put(tableName, r);
+		return r;
+	}
+	
+	public AccountTable getAccountTable(String tableName) {
+		AccountTable r = new AccountTable(this, tableName);
+		cachedAccountTable.put(tableName, r);
+		return r;
+	}
+	
+	//----------------------------------------------
+	// JStack automated setup of cached tables
+	//----------------------------------------------
+	
+	/// Gets all the sub stack
+	protected List< CaseInsensitiveHashMap<String,JStackData> > JStackData_stack() {
+		List< CaseInsensitiveHashMap<String,JStackData>> ret = new ArrayList< CaseInsensitiveHashMap<String,JStackData>>();
+		
+		ret.add( cachedMetaTable );
+		ret.add( cachedKeyValueMap );
+		ret.add( cachedAccountTable );
+		
+		return ret;
+	}
+	
+	/// This does the setup called on all the cached tables, created via get calls
+	public void stackSetup() throws JStackException {
+		List< CaseInsensitiveHashMap<String,JStackData> > l =  JStackData_stack();
+		for (CaseInsensitiveHashMap<String,JStackData> m : l) {
+			for (Map.Entry<String, JStackData> e : m.entrySet()) {
+				e.getValue().stackSetup();
+			}
+		}
+	}
+	
+	/// This does the teardown called on all the cached tables, created via get calls
+	public void teardown() throws JStackException {
+		List< CaseInsensitiveHashMap<String,JStackData> > l =  JStackData_stack();
+		for (CaseInsensitiveHashMap<String,JStackData> m : l) {
+			for (Map.Entry<String, JStackData> e : m.entrySet()) {
+				e.getValue().stackTeardown();
+			}
+		}
+	}
+	
 }

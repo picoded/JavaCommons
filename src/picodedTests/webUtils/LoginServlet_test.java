@@ -1,4 +1,4 @@
-package picodedTests.webUtilsTest;
+package picodedTests.webUtils;
 
 import static org.junit.Assert.*;
 

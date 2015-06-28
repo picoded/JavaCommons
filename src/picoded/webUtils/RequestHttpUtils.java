@@ -35,6 +35,7 @@ import picoded.conv.StringEscape;
 
 public class RequestHttpUtils {
 	
+	/// Returns the apache client HttpUriRequest, based on its type
 	public static org.apache.http.client.methods.HttpUriRequest apache_HttpUriRequest_fromRequestType( HttpRequestType reqType, String reqURL ) {
 		switch (reqType) {
 			case TYPE_GET:
@@ -49,9 +50,11 @@ public class RequestHttpUtils {
 				return new HttpOptions(reqURL);
 		}
 		
-		return null;
+		throw new RuntimeException("Invalid request type not supported: "+reqType);
+		//return null;
 	}
 	
+	/// Helps convert a Map<String, String[]> to a List<NameValuePair>
 	public static List<NameValuePair> parameterMapToList( Map<String, String[]> inMap ) {
 		// Create a List to hold the NameValuePairs to be passed to the PostMethod
 		List<NameValuePair> listNameValuePairs = new ArrayList<NameValuePair>();

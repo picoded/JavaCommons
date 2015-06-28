@@ -1,15 +1,5 @@
 package picoded.servlet;
 
-/* ********************************************************************************************** *\
-* Project        : GidaPort
-* Document       : Messaging.java
-* Authors        : Jason EDWARDS, FÄ±rat KÃœÃ‡ÃœK
-* =================================================================================================
-* HTTP Proxy Servlet
-* =================================================================================================
-* Copyright (C) 2009-2011, Jason EDWARDS, FÄ±rat KÃœÃ‡ÃœK
-\* ********************************************************************************************** */
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -314,7 +304,7 @@ public class ProxyServlet extends CorePage {
 		// Handles post or put
 		if( requestType == HttpRequestType.TYPE_POST || requestType == HttpRequestType.TYPE_PUT ) {
 			if(ServletFileUpload.isMultipartContent(httpRequest)) {
-				
+				handleMultipartPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, httpRequest);
 			} else {
 				handleStandardPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, httpRequest);
 			}

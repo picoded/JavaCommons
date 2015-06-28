@@ -1,4 +1,4 @@
-package picodedTests.webUtilsTest;
+package picodedTests.webUtils;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;

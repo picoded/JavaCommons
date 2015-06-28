@@ -63,9 +63,14 @@ public class ResponseHttp {
 	
 	/// Gets the response content as a string
 	/// @TODO get the response encoding type, and pass "toString"
+	private String _cachedString = null;
 	public String toString() {
+		if( _cachedString != null ) {
+			return _cachedString;
+		}
+		
 		try {
-			return IOUtils.toString(inputStream()); //, encoding 
+			return (_cachedString = IOUtils.toString(inputStream())); //, encoding 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -84,4 +84,22 @@ public class RequestHttp_test {
 		assertNotNull( res = RequestHttp.get(httpBinURL()+"/status/418") );
 		assertEquals( 418, res.statusCode() );
 	}
+	
+	@Test @SuppressWarnings("unchecked")
+	public void POST_basicTest() throws IOException {
+		ResponseHttp res = null;
+		Map<String,Object> resMap = null;
+		
+		Map<String,String[]> postData = new HashMap<String,String[]>();
+		postData.put("hello", new String[] { "world" });
+		
+		assertNotNull( res = RequestHttp.post(httpBinURL()+"/post", postData) );
+		assertNotNull( resMap = res.toMap() );
+		
+		assertEquals( 200, res.statusCode() );
+		
+		//assertEquals( "", res.toString() );
+		assertEquals( "world", ((Map<String,Object>)(resMap.get("form"))).get("hello") );
+	}
+	
 }

@@ -43,7 +43,7 @@ public class RequestHttp {
 	
 	/// Performs a raw HTTP request, this assumes that the function caller has fully handled
 	/// all the various basic aspects of the request, like GET parameters, etc.
-	public static ResponseHttp raw(
+	protected static ResponseHttp raw(
 		HttpRequestType requestType, //request type 
 		String requestURL, //Request URL, with GET parameters if needed
 		Map<String, String[]> headerMap, //Header map to values
@@ -58,7 +58,9 @@ public class RequestHttp {
 		HttpClient httpClient = HttpClientBuilder.create().disableRedirectHandling().disableAuthCaching().build();
 		
 		// Add the http request entity?
-		
+		if(apacheRequestEntity != null) {
+			((HttpEntityEnclosingRequestBase)methodToMakeRequest).setEntity(apacheRequestEntity);
+		}
 		// Call and return
 		HttpResponse response = httpClient.execute(methodToMakeRequest);
 		
@@ -68,6 +70,12 @@ public class RequestHttp {
 	/// Performs the most basic of get requests
 	public static ResponseHttp get( String requestURL ) throws IOException {
 		return raw(HttpRequestType.TYPE_GET, requestURL, null, null);
+	}
+	
+	/// Performs a basic post request
+	public static ResponseHttp post( String requestURL, Map<String,String[]> postMap ) throws IOException {
+		List<NameValuePair> listNameValuePairs = RequestHttpUtils.parameterMapToList(postMap);
+		return raw(HttpRequestType.TYPE_POST, requestURL, null, new UrlEncodedFormEntity(listNameValuePairs) );
 	}
 	
 }

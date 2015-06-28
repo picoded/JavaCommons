@@ -334,14 +334,17 @@ public class ProxyServlet extends CorePage {
 
 	protected void handleStandardPost( HttpEntityEnclosingRequestBase postMethodProxyRequest, HttpServletRequest httpServletRequest) throws ServletException {
 		try {
+			// Gets as raw input stream, and passes it
+			postMethodProxyRequest.setEntity( new InputStreamEntity(httpServletRequest.getInputStream()) );
+			
 			// Get the client POST data as a Map
-			Map<String, String[]> mapPostParameters = httpServletRequest.getParameterMap();
+			// Map<String, String[]> mapPostParameters = httpServletRequest.getParameterMap();
 
 			// Create a List to hold the NameValuePairs to be passed to the PostMethod
-			List<NameValuePair> listNameValuePairs = RequestHttpUtils.parameterMapToList(mapPostParameters);
+			// List<NameValuePair> listNameValuePairs = RequestHttpUtils.parameterMapToList(mapPostParameters);
 
 			// Set the proxy request POST data 
-			postMethodProxyRequest.setEntity( new UrlEncodedFormEntity(listNameValuePairs) ); // listNameValuePairs.toArray(new NameValuePair[] { }) ??
+			// postMethodProxyRequest.setEntity( new UrlEncodedFormEntity(listNameValuePairs) ); // listNameValuePairs.toArray(new NameValuePair[] { }) ??
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}

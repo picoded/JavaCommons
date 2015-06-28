@@ -273,7 +273,9 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		httpRequest = req;
 		httpResponse = res;
 		
-		requestParameters = RequestMap.fromStringArrayValueMap( httpRequest.getParameterMap() );
+		// @TODO: To use IOUtils.buffer for inputstream of httpRequest / parameterMap
+		// THIS IS CRITICAL, for the POST request in proxyServlet to work
+		//requestParameters = RequestMap.fromStringArrayValueMap( httpRequest.getParameterMap() );
 		
 		try {
 			responseOutputStream = httpResponse.getOutputStream();

@@ -20,7 +20,6 @@ public class KeyValueMap{
 	// table set up
 	//key will be column and value will be expiration time
 	public void tableSetup() throws JSqlException {
-		System.out.println("Inside tableSetup()!!!!!!");
 		sqlObj.execute("CREATE TABLE IF NOT EXISTS `" + tableName +
 						 "` (metaKey VARCHAR(60) PRIMARY KEY , val VARCHAR(4000) )");
 		

@@ -204,18 +204,6 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 		}
 	}
 
-	/// Stores (and overwrites if needed) key, value pair
-	///
-	/// Important note: It does not return the previously stored value
-	///
-	/// @param key as String
-	/// @param value as String
-	///
-	/// @returns null
-	public String put(String key, String value) {
-		return putWithExpiry(key, value, 0);
-	}
-
 	/// Returns the value, given the key
 	/// @param key param find the thae meta key
 	///
@@ -322,6 +310,18 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	///
 	/// @param key as String
 	/// @param value as String
+	///
+	/// @returns null
+	public String put(String key, String value) {
+		return putWithExpiry(key, value, 0);
+	}
+
+	/// Stores (and overwrites if needed) key, value pair
+	///
+	/// Important note: It does not return the previously stored value
+	///
+	/// @param key as String
+	/// @param value as String
 	/// @param lifespan time to expire in seconds
 	///
 	/// @returns null
@@ -378,11 +378,15 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 					JSqlResult r = sql.selectQuerySet(tName, "eTm", "kID=?", new Object[] { key }).query();											 
 					// Has value
 					if( r.rowCount() > 0 ) {
-						return Long.parseLong(r.get("eTm").get(0).toString());
+						return r.get("eTm").get(0);
 					}
 					return  0L;
 				}
 			} );
+			
+			if (ret != null) {
+				return Long.parseLong(ret.toString());
+			}
 			
 		} catch (JStackException e) {
 			throw new RuntimeException(e);

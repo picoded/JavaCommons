@@ -335,18 +335,16 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	///
 	/// @param key as String
 	/// @param value as String
-	/// @param expireTime expire time stamp valu
+	/// @param expireTime expire time stamp value
 	///
 	/// @returns null
 	public String putWithExpiry(String key, String value, long expireTime) {
 		try {
 			long now = currentSystemTime_seconds();
-
 			Object ret = JStackReverseIterate( new JStackReader() {
 				/// Reads only the JSQL layer
 				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
 					String tName = sqlTableName(sql);
-
 					sql.upsertQuerySet( //
 											 tName, //
 											 new String[] { "kID" }, //unique cols
@@ -368,6 +366,28 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 
 	/// @TODO get expirary time (unix time)
 	public long getExpiry(Object key) {
+		try {
+			Object ret = JStackIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					if( ret != null ) {
+						return ret;
+					}
+					String tName = sqlTableName(sql);
+					// Search for the key
+					JSqlResult r = sql.selectQuerySet(tName, "eTm", "kID=?", new Object[] { key }).query();											 
+					// Has value
+					if( r.rowCount() > 0 ) {
+						return Long.parseLong(r.get("eTm").get(0).toString());
+					}
+					return  0L;
+				}
+			} );
+			
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		}
+		
 		return 0L;
 	}
 

@@ -3,11 +3,11 @@ package picoded.servlet;
 /* ********************************************************************************************** *\
 * Project        : GidaPort
 * Document       : Messaging.java
-* Authors        : Jason EDWARDS, FÄ±rat KÃœÃ‡ÃœK
+* Authors        : Jason EDWARDS, Firat KUCUK
 * =================================================================================================
 * HTTP Proxy Servlet
 * =================================================================================================
-* Copyright (C) 2009-2011, Jason EDWARDS, FÄ±rat KÃœÃ‡ÃœK
+* Copyright (C) 2009-2011, Jason EDWARDS, Firat KUCUK
 \* ********************************************************************************************** */
 
 import java.io.BufferedInputStream;

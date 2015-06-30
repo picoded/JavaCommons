@@ -397,18 +397,34 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 
 	/// @TODO get expirary time left (seconds)
 	public long getLifespan(Object key) {
-		return 0L;
+		return (getExpiry(key) - currentSystemTime_seconds());
 	}
 
 	/// @TODO set expirary time (unix time)
 	public long setExpiry(Object key, long time) {
+		try {
+			System.out.println("Inside setExpiry!!!!!");
+			Object ret = JStackIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					if( ret != null ) {
+						return ret;
+					}
+					String tName = sqlTableName(sql);
+					sql.execute("UPDATE "+tName+ " SET eTm = "+time+" WHERE kID = ?",key);
+					return 0L;
+				}
+			} );
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		}
 		return 0L;
 	}
 
 	/// @TODO set expirary time (seconds)
-	public long setLifeSpan(Object key, long time) {
-		return 0L;
-	}
+ public long setLifeSpan(Object key, long lifespan) {
+  return setExpiry(key, currentSystemTime_seconds() + lifespan);
+ }
 
 	/// Perform maintenance, mainly removing of expired data if applicable
 	public void maintenance() {

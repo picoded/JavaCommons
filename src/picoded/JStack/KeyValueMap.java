@@ -337,7 +337,7 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	/// @param value as String
 	/// @param expireTime expire time stamp value
 	///
-	/// @returns null
+	/// @returns String
 	public String putWithExpiry(String key, String value, long expireTime) {
 		try {
 			long now = currentSystemTime_seconds();
@@ -364,7 +364,11 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 		return null;
 	}
 
-	/// @TODO get expirary time (unix time)
+	/// Returns the expire time stamp value
+	///
+	/// @param key as String
+	///
+	/// @returns long
 	public long getExpiry(Object key) {
 		try {
 			Object ret = JStackIterate( new JStackReader() {
@@ -380,7 +384,7 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 					if( r.rowCount() > 0 ) {
 						return r.get("eTm").get(0);
 					}
-					return  0L;
+					return 0L;
 				}
 			} );
 			
@@ -395,36 +399,50 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 		return 0L;
 	}
 
-	/// @TODO get expirary time left (seconds)
+	/// Returns the lifespan time stamp value
+	///
+	/// @param key as String
+	///
+	/// @returns long
 	public long getLifespan(Object key) {
 		return (getExpiry(key) - currentSystemTime_seconds());
 	}
 
-	/// @TODO set expirary time (unix time)
+	/// Sets the expiry time stamp value
+	///
+	/// @param key as String
+	/// @param time as long
+	///
+	/// @returns null
 	public long setExpiry(Object key, long time) {
 		try {
-			System.out.println("Inside setExpiry!!!!!");
 			Object ret = JStackIterate( new JStackReader() {
 				/// Reads only the JSQL layer
 				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
 					if( ret != null ) {
 						return ret;
 					}
-					String tName = sqlTableName(sql);
-					sql.execute("UPDATE "+tName+ " SET eTm = "+time+" WHERE kID = ?",key);
+					sql.execute("UPDATE " + sqlTableName(sql) + " SET eTm=? WHERE kID = ?", time, key);
+
 					return 0L;
 				}
 			} );
+
 		} catch (JStackException e) {
 			throw new RuntimeException(e);
 		}
 		return 0L;
 	}
 
-	/// @TODO set expirary time (seconds)
- public long setLifeSpan(Object key, long lifespan) {
-  return setExpiry(key, currentSystemTime_seconds() + lifespan);
- }
+	/// Sets the lifespan time stamp value
+	///
+	/// @param key as String
+	/// @param time as long
+	///
+	/// @returns null
+	public long setLifeSpan(Object key, long lifespan) {
+	 	return setExpiry(key, currentSystemTime_seconds() + lifespan);
+	}
 
 	/// Perform maintenance, mainly removing of expired data if applicable
 	public void maintenance() {

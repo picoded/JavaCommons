@@ -89,20 +89,24 @@ public class KeyValueMap_Sqlite_test extends JStackData_testBase_test {
 	public void setExpireTime() throws JStackException{
 		long expireTime = currentSystemTime_seconds() * 2;
 		kvObj.putWithExpiry("yes", "no", expireTime);
-		System.out.println("Old Time:: "+ kvObj.getExpiry("yes"));
-		long updatedexpTime = kvObj.getExpiry("yes") * 2;
-		kvObj.setExpiry("yes",updatedexpTime);
-		System.out.println("Updated Time:: "+ kvObj.getExpiry("yes"));
-		assertNotNull(updatedexpTime);
+
+		long newExpireTime = kvObj.getExpiry("yes") * 2;
+		kvObj.setExpiry("yes", newExpireTime);
+
+		long fetchedExpireTime = kvObj.getExpiry("yes");
+		
+		assertNotNull(fetchedExpireTime );
+		assertEquals( fetchedExpireTime, newExpireTime );
 	} 
 	
 	@Test
 	public void setLifeSpan() throws JStackException{
-		long expireTime = currentSystemTime_seconds() * 2;
-		kvObj.putWithExpiry("yes", "no", expireTime);
-		System.out.println("Old Time:: "+ kvObj.getExpiry("yes"));
-		kvObj.setLifeSpan("yes",kvObj.getExpiry("yes"));
-		System.out.println("Life Time:: "+ kvObj.getLifespan("yes"));
+		long lifespanTime = 4*24*60*60*60;
+		kvObj.putWithLifespan("yes", "no", lifespanTime);
+		
+		long newLifespanTime = kvObj.getExpiry("yes");
+		kvObj.setLifeSpan("yes", newLifespanTime);
+
 	   assertNotNull(kvObj.getLifespan("yes"));
 	}
 	

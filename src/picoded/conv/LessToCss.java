@@ -19,7 +19,7 @@ public class LessToCss {
 	public String compile(String raw) {
 		try {
 			return lessCompiler.compile(raw);
-		} catch(LessException e) {
+		} catch (LessException e) {
 			throw new RuntimeException(e);
 		}
 	}

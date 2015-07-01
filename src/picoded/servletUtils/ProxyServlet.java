@@ -284,7 +284,9 @@ public class ProxyServlet extends CorePage {
 			int intNextByte;
 			while ( ( intNextByte = bufferedInputStream.read() ) != -1 ) {
 				outputStreamClientResponse.write(intNextByte);
+				outputStreamClientResponse.flush();
 			}
+			outputStreamClientResponse.flush();
 		} catch(Exception e) {
 			throw new ServletException(e);
 		}
@@ -316,21 +318,24 @@ public class ProxyServlet extends CorePage {
 		
 		// Handles post or put
 		if( rType == HttpRequestType.TYPE_POST || rType == HttpRequestType.TYPE_PUT ) {
-			//if(ServletFileUpload.isMultipartContent( sReq )) {
-			//	handleMultipartPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, sReq);
-			//} else {
-			//	handleStandardPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, sReq);
-			//}
-			
-			String reqLength = sReq.getHeader(CONTENT_LENGTH_HEADER_NAME);
-			
-			if( reqLength != null && !(reqLength.equals("0")) ) {
-				// Gets as raw input stream, and passes it
-				try {
-					((HttpEntityEnclosingRequestBase)methodToProxyRequest).setEntity( new InputStreamEntity(sReq.getInputStream()) );
-				} catch(IOException e) {
-					throw new ServletException(e);
+			if(ServletFileUpload.isMultipartContent( sReq )) {
+				handleMultipartPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, sReq);
+			} else {
+				//	handleStandardPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, sReq);
+				
+				String reqLength = sReq.getHeader(CONTENT_LENGTH_HEADER_NAME);
+				
+				if( reqLength.equals("0") ) {
+					// does nothing if req is 0
+				} else {
+					// Gets as raw input stream, and passes it
+					try {
+						((HttpEntityEnclosingRequestBase)methodToProxyRequest).setEntity( new InputStreamEntity(sReq.getInputStream()) );
+					} catch(IOException e) {
+						throw new ServletException(e);
+					}
 				}
+				
 			}
 		}
 		

@@ -150,7 +150,7 @@ public class ProxyServlet extends CorePage {
 	/// Initialize the <code>ProxyServlet</code>
 	/// @param servletConfig The Servlet configuration passed in by the servlet conatiner
 	@Override
-	public void initSetup( CorePage original, ServletConfig servletConfig) throws ServletException {
+	public void initSetup( CorePage original, ServletConfig servletConfig ) throws ServletException {
 		super.initSetup(original, servletConfig);
 		
 		ProxyServlet ori = (ProxyServlet)original;
@@ -220,12 +220,64 @@ public class ProxyServlet extends CorePage {
 	}
 	
 	protected void executeProxyRequest( HttpUriRequest httpMethodProxyRequest, 
-		HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException {
+		HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
+		InputStream socketInputStream ) throws ServletException {
 		
 		try {
 			
 			// Create a default HttpClient with Disabled automated stuff
 			HttpClient httpClient = HttpClientBuilder.create().disableRedirectHandling().disableAuthCaching().build();
+			
+			// Custom 2nd thread to support streaming requests
+			OutputStream[] socketPassOutput = new OutputStream[1];
+			socketPassOutput[0] = null;
+			
+			Thread socketInputStream_thread = new Thread(
+				new Runnable(){
+					public void run(){
+						BufferedInputStream bis = new BufferedInputStream(socketInputStream);
+						int b;
+						
+						try {
+							while ( socketPassOutput[0] != null && ( b = bis.read() ) != -1 ) {
+								socketPassOutput[0].write(b);
+								socketPassOutput[0].flush();
+							}
+						} catch(Exception e) {
+							throw new RuntimeException(e);
+						}
+					}
+				}
+			);
+			
+			if(socketInputStream != null) {
+				
+				AbstractHttpEntity entity = new AbstractHttpEntity() {
+					public boolean isRepeatable() {
+						return false;
+					}
+
+					public long getContentLength() {
+						return -1;
+					}
+
+					public boolean isStreaming() {
+						return true;
+					}
+
+					public InputStream getContent() throws IOException {
+						// Should be implemented as well but is irrelevant for this case
+						throw new UnsupportedOperationException();
+					}
+
+					public void writeTo(final OutputStream outstream) throws IOException {
+						socketPassOutput[0] = outstream;
+						socketInputStream_thread.start();
+					}
+				};
+				
+				((HttpEntityEnclosingRequestBase)httpMethodProxyRequest).setEntity( entity );
+			}
 			
 			HttpResponse response = httpClient.execute(httpMethodProxyRequest);
 			
@@ -280,17 +332,39 @@ public class ProxyServlet extends CorePage {
 			InputStream inputStreamProxyResponse = response.getEntity().getContent();
 			BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStreamProxyResponse);
 			OutputStream outputStreamClientResponse = httpServletResponse.getOutputStream();
+			int outputNextByte;
+			//int bytesToRead = 0;
 			
-			int intNextByte;
-			while ( ( intNextByte = bufferedInputStream.read() ) != -1 ) {
-				outputStreamClientResponse.write(intNextByte);
-				outputStreamClientResponse.flush();
+			/// Send via a second thread?
+			Thread outputStreamClientResponse_thread = new Thread(
+				new Runnable(){
+					public void run(){
+						int b;
+						try {
+							while ( ( b = bufferedInputStream.read() ) != -1 ) {
+								outputStreamClientResponse.write(b);
+								outputStreamClientResponse.flush();
+							}
+						} catch(Exception e) {
+							throw new RuntimeException(e);
+						}
+					}
+				}
+			);
+			outputStreamClientResponse_thread.start();
+				
+			while( (outputStreamClientResponse_thread != null && outputStreamClientResponse_thread.isAlive()) || 
+			       (socketInputStream_thread != null && socketInputStream_thread.isAlive()) ) {
+				Thread.sleep(1);
 			}
-			outputStreamClientResponse.flush();
+			// uses blocking call instead?
+			//while ( ( outputNextByte = bufferedInputStream.read() ) != -1 ) {
+			//	outputStreamClientResponse.write(outputNextByte);
+			//	outputStreamClientResponse.flush();
+			//}
 		} catch(Exception e) {
 			throw new ServletException(e);
 		}
-		
 	}
 	
 	///////////////////////////////////////////////////////////
@@ -306,41 +380,51 @@ public class ProxyServlet extends CorePage {
 	/// Performs a proxy redirect using the given CorePage instance
 	public boolean proxyCorePageRequest(CorePage page) throws ServletException {
 		
-		HttpRequestType rType = page.getHttpRequestType();
-		HttpServletRequest sReq = page.getHttpServletRequest();
-		HttpServletResponse sRes = page.getHttpServletResponse();
-		
-		// Create the respective request URL based on requestType and URL
-		HttpUriRequest methodToProxyRequest = RequestHttpUtils.apache_HttpUriRequest_fromRequestType(rType, getProxyURL(sReq));
-		
-		// Forward the request headers
-		setProxyRequestHeaders(sReq, methodToProxyRequest);
-		
-		// Handles post or put
-		if( rType == HttpRequestType.TYPE_POST || rType == HttpRequestType.TYPE_PUT ) {
-			if(ServletFileUpload.isMultipartContent( sReq )) {
-				handleMultipartPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, sReq);
-			} else {
-				//	handleStandardPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, sReq);
-				
-				String reqLength = sReq.getHeader(CONTENT_LENGTH_HEADER_NAME);
-				
-				if( reqLength.equals("0") ) {
-					// does nothing if req is 0
+		try {
+			HttpRequestType rType = page.getHttpRequestType();
+			HttpServletRequest sReq = page.getHttpServletRequest();
+			HttpServletResponse sRes = page.getHttpServletResponse();
+			
+			// Create the respective request URL based on requestType and URL
+			HttpUriRequest methodToProxyRequest = RequestHttpUtils.apache_HttpUriRequest_fromRequestType(rType, getProxyURL(sReq));
+			
+			// Forward the request headers
+			setProxyRequestHeaders(sReq, methodToProxyRequest);
+			
+			InputStream socketInputStream = null;
+			
+			// Handles post or put
+			if( rType == HttpRequestType.TYPE_POST || rType == HttpRequestType.TYPE_PUT ) {
+				if(ServletFileUpload.isMultipartContent( sReq )) {
+					handleMultipartPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, sReq);
 				} else {
-					// Gets as raw input stream, and passes it
-					try {
-						((HttpEntityEnclosingRequestBase)methodToProxyRequest).setEntity( new InputStreamEntity(sReq.getInputStream()) );
-					} catch(IOException e) {
-						throw new ServletException(e);
+					//	handleStandardPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, sReq);
+					
+					String reqLength = sReq.getHeader(CONTENT_LENGTH_HEADER_NAME);
+					
+					if( reqLength == null || reqLength.length() <= 0 ) {
+						//Streaming request?
+						socketInputStream = sReq.getInputStream();
+					} else if( reqLength.equals("0") ) {
+						// does nothing if req is 0
+					} else {
+						// Gets as raw input stream, and passes it
+						try {
+							((HttpEntityEnclosingRequestBase)methodToProxyRequest).setEntity( new InputStreamEntity(sReq.getInputStream()) );
+						} catch(IOException e) {
+							throw new ServletException(e);
+						}
 					}
+					
 				}
-				
 			}
+			
+			executeProxyRequest(methodToProxyRequest, sReq, sRes, socketInputStream);
+		} catch (Exception e) {
+			throw new ServletException(e);
 		}
 		
 		// Execute the proxy request
-		executeProxyRequest(methodToProxyRequest, sReq, sRes);
 		return true;
 	}
 	

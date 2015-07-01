@@ -78,6 +78,10 @@ public class ResponseHttp {
 	
 	/// Converts the result string into a map, via JSON's
 	public Map<String,Object> toMap() {
-		return ConvertJSON.toMap( toString() );
+		String r = toString();
+		if( r == null || r.length() <= 1 ) {
+			return null;
+		}
+		return ConvertJSON.toMap( r );
 	}
 }

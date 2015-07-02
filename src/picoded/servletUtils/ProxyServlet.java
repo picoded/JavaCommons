@@ -127,7 +127,7 @@ public class ProxyServlet extends CorePage {
 	/// Gets and returns the target proxy URL given the httpServletReqeust
 	protected String getProxyURL(HttpServletRequest httpServletRequest) {
 		// Set the protocol to HTTP
-		String stringProxyURL = "http://" + getProxyHostAndPort();
+		String stringProxyURL = httpServletRequest.getScheme() + "://" + getProxyHostAndPort();
 		// Check if we are proxying to a path other that the document root
 		if(!getProxyPath().equalsIgnoreCase("")){
 			stringProxyURL += getProxyPath();

@@ -499,27 +499,42 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 
 	/// JSQL based GET
 	protected Map<String, Object> JSqlObjectGet(JSql sql, String _oid) throws JSqlException {
-		String tName = sqlTableName(sql);
-
-		// Fetch all the meta fields
-		JSqlResult r = sql.selectQuerySet(tName, "*", "oID=?", new Object[] { _oid }).query();
-
-		// Convert to map object
-		Map<String, Object> retMap = JSqlResultToMap(r);
-
-		// Enforce policies (if data is valid)
-		if (retMap != null) {
-			// Add object ID (enforce it)
-			retMap.put("_oid", _oid);
+		try {
+			Object r = JStackIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					if( ret != null ) {
+						return ret;
+					}
+	
+					String tName = sqlTableName(sql);
+	
+					// Fetch all the meta fields
+					JSqlResult r = sql.selectQuerySet( tName, "*", "oID=?", new Object[] { _oid } ).query();
+					
+					// Convert to map object
+					Map<String, Object> retMap = JSqlResultToMap(r);
+					
+					// Enforce policies (if data is valid)
+					if( retMap != null ) {
+						// Add object ID (enforce it)
+						retMap.put("_oid", _oid);
+					}
+	
+					return retMap;
+				}
+			} );
+			
+			return ((r != null)? (Map<String, Object>)r : null);
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
 		}
 
-		return retMap;
 	}
 
 	/// JSQL based Append
 	protected void JSqlObjectAppend(JSql sql, String _oid, Map<String, Object> obj, Set<String> keyList,
 		boolean handleQuery) throws JSqlException {
-		String tName = sqlTableName(sql);
 
 		boolean sqlMode = handleQuery ? sql.getAutoCommit() : false;
 		if (sqlMode) {
@@ -528,36 +543,46 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 
 		try {
 
-			Object[] typSet;
-			String k;
-			Object v;
+			Object ret = JStackReverseIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					String tName = sqlTableName(sql);
 
-			for (Map.Entry<String, Object> entry : obj.entrySet()) {
-
-				k = (entry.getKey()).toLowerCase();
-				if ( /*k.equals("oid") || k.equals("_oid") ||*/ k.equals("_otm")) { //reserved
-					continue;
+					Object[] typSet;
+					String k;
+					Object v;
+		
+					for (Map.Entry<String, Object> entry : obj.entrySet()) {
+		
+						k = (entry.getKey()).toLowerCase();
+						if ( /*k.equals("oid") || k.equals("_oid") ||*/ k.equals("_otm")) { //reserved
+							continue;
+						}
+		
+						if (keyList != null && !keyList.contains(k)) {
+							continue;
+						}
+		
+						v = entry.getValue();
+						typSet = valueToOptionSet(k, v);
+		
+						// This is currently only for NON array mode
+						sql.upsertQuerySet( //
+							tName, //
+							new String[] { "oID", "kID", "idx" }, //
+							new Object[] { _oid, k, 0 }, //
+							//
+							new String[] { "typ", "nVl", "sVl", "tVl" }, //
+							new Object[] { typSet[0], typSet[1], typSet[2], typSet[3] }, //
+							null, null, null//
+							).execute();
+					}
+					return ret;
 				}
-
-				if (keyList != null && !keyList.contains(k)) {
-					continue;
-				}
-
-				v = entry.getValue();
-				typSet = valueToOptionSet(k, v);
-
-				// This is currently only for NON array mode
-				sql.upsertQuerySet( //
-					tName, //
-					new String[] { "oID", "kID", "idx" }, //
-					new Object[] { _oid, k, 0 }, //
-					//
-					new String[] { "typ", "nVl", "sVl", "tVl" }, //
-					new Object[] { typSet[0], typSet[1], typSet[2], typSet[3] }, //
-					null, null, null//
-					).execute();
-			}
+			} );
 			sql.commit();
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
 		} finally {
 			if (sqlMode) {
 				sql.setAutoCommit(true);
@@ -610,10 +635,40 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 		if (whereClause != null) {
 			whereClause = whereClause.toLowerCase();
 		}
+		
+		return (sql.selectQuerySet(sqlViewName(sql, "view"), selectCols, whereClause, whereValues, orderBy, limit, offset).query());  
 
-		return (sql
-			.selectQuerySet(sqlViewName(sql, "view"), selectCols, whereClause, whereValues, orderBy, limit, offset)
-			.query());
+/*
+		final String where = whereClause;
+		final String cols = selectCols;
+
+		try {
+			Object ret = JStackIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					if( ret != null ) {
+						return ret;
+					}
+	
+					String tName = sqlTableName(sql);
+	
+					JSqlResult r = sql
+						.selectQuerySet(sqlViewName(sql, "view"), cols, where, whereValues, orderBy, limit, offset)
+						.query();
+						
+					// Has value
+					if( r.rowCount() > 0 ) {
+						return r;
+					}
+	
+					return ret;
+				}
+			} );
+	
+			return (ret != null)? (Map<String, List<Object>>) ret : null;
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		}*/
 	}
 
 	/// SQL Query to fetch the relevent data, values are loaded on query

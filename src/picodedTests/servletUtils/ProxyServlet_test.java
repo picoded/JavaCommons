@@ -54,10 +54,16 @@ import picodedTests.webUtils.RequestHttp_test;
 
 public class ProxyServlet_test extends RequestHttp_test {
 	static EmbeddedServlet tomcat = null;
+	static EmbeddedServlet ws_tomcat = null;
 	
 	@Override
 	public String httpBinURL() {
 		return "http://127.0.0.1:16000";
+	}
+	
+	@Override
+	public String echoWebSocketURL() {
+		return "ws://127.0.0.1:16001";
 	}
 	
 	@BeforeClass
@@ -72,6 +78,15 @@ public class ProxyServlet_test extends RequestHttp_test {
 		.withServlet("/*", "publicProxyServlet", proxy);
 		
 		tomcat.start();
+		
+		ProxyServlet ws_proxy = new ProxyServlet();
+		ws_proxy.setProxyHost("echo.websocket.org");
+		
+		ws_tomcat = new EmbeddedServlet("", context)
+		.withPort(16001)
+		.withServlet("/*", "publicProxyServlet", proxy);
+		
+		ws_tomcat.start();
 	}
 	
 	@AfterClass
@@ -80,7 +95,12 @@ public class ProxyServlet_test extends RequestHttp_test {
 			//tomcat.awaitServer(); //manual
 			tomcat.stop();
 		}
+		if(ws_tomcat != null) {
+			//tomcat.awaitServer(); //manual
+			ws_tomcat.stop();
+		}
 		tomcat = null;
+		ws_tomcat = null;
 	}
 	
 	@Test

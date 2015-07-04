@@ -84,7 +84,7 @@ public class ProxyServlet_test extends RequestHttp_test {
 		
 		ws_tomcat = new EmbeddedServlet("", context)
 		.withPort(16001)
-		.withServlet("/*", "publicProxyServlet", proxy);
+		.withServlet("/*", "publicProxyServlet", ws_proxy);
 		
 		ws_tomcat.start();
 	}

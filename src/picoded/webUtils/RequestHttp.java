@@ -10,8 +10,12 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +26,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.*;
 import org.apache.http.cookie.*;
@@ -39,9 +42,10 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 
 import javax.websocket.*;
+
 import java.net.URI;
+
 import picoded.FunctionalInterface.*;
-//import java.util.function;
 
 import com.ning.http.client.*;
 
@@ -170,57 +174,116 @@ public class RequestHttp {
 	
 	protected static ResponseHttp asyncHttp_raw(
 		HttpRequestType requestType, 
-		String requestURL //Request URL, with GET parameters if needed
+		String requestURL, //Request URL, with GET parameters if needed
+		Map<String, String> headers
 	) {
 		AsyncHttpClient.BoundRequestBuilder req = RequestHttpUtils.asyncHttpClient_fromRequestType( requestType, requestURL, true );
 		
+		if(headers != null && headers.size() > 0) {
+			for(String key : headers.keySet()){
+				req.addHeader(key,  headers.get(key));
+			}
+		}
+		
+		final PipedInputStream pipedInput = new PipedInputStream();
+		final PipedOutputStream pipedOutput = new PipedOutputStream();
+		
+//		try{
+//			pipedInput.connect(pipedOutput);
+//		} catch (Exception ex){
+//			
+//		}
+		
 		final ResponseHttp ret = new ResponseHttp();
+		ret.setInputStream(pipedInput);
+		
+		final ArrayList<HttpResponseBodyPart> bodyParts = new ArrayList<HttpResponseBodyPart>();
 		
 		AsyncHandler<ResponseHttp> asyncHandler = new AsyncHandler<ResponseHttp>() {
-		
 			@Override
 			public STATE onBodyPartReceived(final HttpResponseBodyPart content) throws Exception {
-				//builder.accumulate(content);
-				ret.completedHeaders = true;
+				byte[] bytes = content.getBodyPartBytes();
+				String val = "";
+				for(int i = 0 ; i < bytes.length; ++i){
+					val += (char)bytes[i];
+				}
+				
+				System.out.println("Received some stuff" + val);
+				try{
+					pipedOutput.connect(pipedInput);
+					pipedOutput.write( bytes, 0, bytes.length );
+					System.out.println("Finished writing");
+					pipedOutput.flush();
+					
+				} catch (Exception ex){
+					System.out.println("Exception: "+ex.getMessage());
+				}
+				System.out.println("Flushed");
+				ret.completedHeaders.compareAndSet(false, true);
+				
 				return STATE.CONTINUE;
 			}
 			
 			@Override
 			public STATE onStatusReceived(final HttpResponseStatus status) throws Exception {
-				//builder.accumulate(status);
+				ret.setStatusCode(status.getStatusCode());
+				ret.setResponseStatus(status);
 				return STATE.CONTINUE;
 			}
 			
 			@Override
 			public STATE onHeadersReceived(final HttpResponseHeaders headers) throws Exception {
-				//builder.accumulate(headers);
+				System.out.println("onHeadersReceived");
+				ret.setHeaders(headers.getHeaders());
+				
 				return STATE.CONTINUE;
 			}
 			
 			@Override
 			public void onThrowable(Throwable t) {
+				System.out.println("onThrowable");
 				throw new RuntimeException(t);
 			}
 			
 			@Override
 			public ResponseHttp onCompleted() throws Exception {
-				ret.completedHeaders = true;
+				System.out.println("onCompleted");
+				//HttpResponseBodyPartsInputStream httpIS = new HttpResponseBodyPartsInputStream(bodyParts);
+				//ret.setInputStream(httpIS);
+				pipedOutput.close();
+				pipedInput.close();
+				ret.completedHeaders.compareAndSet(false, true);
+				
 				return ret;
 			}
 		};
 		//*/
-		
+		System.out.println("Executing");
 		ListenableFuture<ResponseHttp> r = req.execute(asyncHandler);
 		
+//		try {
+//			r.get();
+//		} catch (ExecutionException ex){
+//			System.out.println(ex.getMessage());
+//		} catch (InterruptedException ex) {
+//			System.out.println(ex.getMessage());
+//		} catch (Exception ex){
+//			System.out.println("Caught exception:" + ex + ex.getMessage());
+//		}
+		System.out.println("About to return");
 		return ret;
 	}
 	
 	
 	/// Performs the most basic of get requests
 	public static ResponseHttp get( String requestURL ) throws IOException {
-		return asyncHttp_raw( HttpRequestType.TYPE_GET, requestURL );
+		return asyncHttp_raw( HttpRequestType.TYPE_GET, requestURL, null );
 		
 		//return apache_raw(HttpRequestType.TYPE_GET, requestURL, null, null);
+	}
+	
+	public static ResponseHttp get(String requestURL, Map<String, String> headers) throws IOException {
+		return asyncHttp_raw( HttpRequestType.TYPE_GET, requestURL, headers );
 	}
 	
 	/// Performs a basic post request

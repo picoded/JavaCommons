@@ -53,7 +53,7 @@ public class ResponseHttp {
 	protected Throwable responseException = null;
 	
 	protected void throwIfResponseException() {
-		if(responseException) {
+		if(responseException != null) {
 			throw new RuntimeException(responseException);
 		}
 	}

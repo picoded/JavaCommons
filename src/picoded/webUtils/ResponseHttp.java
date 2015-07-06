@@ -42,6 +42,28 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 
 public class ResponseHttp {
 	
+	///////////////////////////////////////////////////
+	// Async Http Request mode
+	///////////////////////////////////////////////////
+	
+	protected ResponseHttp() {
+		
+	}
+	
+	protected Throwable responseException = null;
+	
+	protected void throwIfResponseException() {
+		if(responseException != null) {
+			throw new RuntimeException(responseException);
+		}
+	}
+	
+	protected boolean completedHeaders = false;
+	
+	///////////////////////////////////////////////////
+	// Apache HttpResponse mode
+	///////////////////////////////////////////////////
+	
 	protected HttpResponse response = null;
 	protected ResponseHttp(HttpResponse inResponse) {
 		response = inResponse;

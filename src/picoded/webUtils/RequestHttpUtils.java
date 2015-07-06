@@ -33,6 +33,14 @@ import picoded.servlet.CorePage;
 import picoded.webUtils.HttpRequestType;
 import picoded.conv.StringEscape;
 
+import com.ning.http.client.*;
+import com.ning.http.client.AsyncHttpClientConfig.Builder;
+
+/// Utility functions for various RequestHttp functions shared with proxyPage.
+///
+/// Note: See Async Http API for more details on underlying implementation
+/// http://www.javadoc.io/doc/com.ning/async-http-client/1.9.29
+///
 public class RequestHttpUtils {
 	
 	/// Returns the apache client HttpUriRequest, based on its type
@@ -48,6 +56,28 @@ public class RequestHttpUtils {
 				return new HttpDelete(reqURL);
 			case TYPE_OPTION:
 				return new HttpOptions(reqURL);
+		}
+		
+		throw new RuntimeException("Invalid request type not supported: "+reqType);
+		//return null;
+	}
+	
+	/// Returns the async http client, based on its type
+	protected static AsyncHttpClient.BoundRequestBuilder asyncHttpClient_fromRequestType( HttpRequestType reqType, String reqURL, boolean setFollowRedirect ) {
+		AsyncHttpClientConfig config = (new AsyncHttpClientConfig.Builder()).setFollowRedirect( setFollowRedirect ).build();
+		AsyncHttpClient httpClient = new AsyncHttpClient( config );
+		
+		switch (reqType) {
+			case TYPE_GET:
+				return httpClient.prepareGet(reqURL);
+			case TYPE_POST:
+				return httpClient.preparePost(reqURL);
+			case TYPE_PUT:
+				return httpClient.preparePut(reqURL);
+			case TYPE_DELETE:
+				return httpClient.prepareDelete(reqURL);
+			case TYPE_OPTION:
+				return httpClient.prepareOptions(reqURL);
 		}
 		
 		throw new RuntimeException("Invalid request type not supported: "+reqType);

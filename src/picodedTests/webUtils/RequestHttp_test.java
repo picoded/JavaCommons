@@ -28,6 +28,7 @@ import picoded.conv.GUID;
 import picoded.servletUtils.EmbeddedServlet;
 import picoded.struct.CaseInsensitiveHashMap;
 import picoded.webUtils.*;
+import picoded.FunctionalInterface.*;
 
 import java.util.Random;
 
@@ -59,11 +60,16 @@ public class RequestHttp_test {
 		return "http://httpbin.org";
 	}
 	
+	public String echoWebSocketURL() {
+		return "ws://echo.websocket.org";
+	}
+	
 	RequestHttp reqObj = null;
 	
 	@Before
 	public void setUp(){
-		reqObj = new RequestHttp();
+		reqObj = null;
+		//wsObj = new RequestHttp();
 	}
 	
 	@Test @SuppressWarnings("unchecked")
@@ -100,6 +106,16 @@ public class RequestHttp_test {
 		
 		//assertEquals( "", res.toString() );
 		assertEquals( "world", ((Map<String,Object>)(resMap.get("form"))).get("hello") );
+	}
+	
+	@Test
+	public void WEBSOCKET_echoTest() {
+		assertNotNull( reqObj = new RequestHttp( echoWebSocketURL() ) );
+		reqObj.websocketConnect();
+		
+		assertEquals( "hello", reqObj.sendAndWait("hello") );
+		assertEquals( "new", reqObj.sendAndWait("new") );
+		assertEquals( "world", reqObj.sendAndWait("world") );
 	}
 	
 }

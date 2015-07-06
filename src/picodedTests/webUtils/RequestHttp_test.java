@@ -114,10 +114,12 @@ public class RequestHttp_test {
 		System.out.println("Runnin GET_stream20");
 		ResponseHttp res = null;
 		
-		assertNotNull( res = RequestHttp.get(httpBinURL()+"/stream/10") );
+		assertNotNull( res = RequestHttp.get(httpBinURL()+"/stream/100") );
 		assertEquals( 200, res.statusCode() );
+		
+		res.waitForCompletedRequest();
 
-		System.out.println(res.toString());
+		//System.out.println(res.toString());
 		//assertEquals( "world", ((Map<String,Object>)(resMap.get("args"))).get("hello") );
 	}
 	

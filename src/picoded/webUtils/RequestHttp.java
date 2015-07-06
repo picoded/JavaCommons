@@ -49,6 +49,8 @@ import picoded.FunctionalInterface.*;
 
 import com.ning.http.client.*;
 
+import picoded.struct.StreamBuffer;
+
 @ClientEndpoint
 public class RequestHttp {
 
@@ -185,17 +187,21 @@ public class RequestHttp {
 			}
 		}
 		
-		final PipedInputStream pipedInput = new PipedInputStream();
-		final PipedOutputStream pipedOutput = new PipedOutputStream();
-		
+//		final PipedInputStream pipedInput = new PipedInputStream();
+//		final PipedOutputStream pipedOutput = new PipedOutputStream();
+//		
 //		try{
 //			pipedInput.connect(pipedOutput);
 //		} catch (Exception ex){
 //			
 //		}
 		
+		StreamBuffer sb = new StreamBuffer();
+		OutputStream os = sb.getOutputStream();
+		InputStream is = sb.getInputStream();
+		
 		final ResponseHttp ret = new ResponseHttp();
-		ret.setInputStream(pipedInput);
+		ret.setInputStream(is);
 		
 		final ArrayList<HttpResponseBodyPart> bodyParts = new ArrayList<HttpResponseBodyPart>();
 		
@@ -210,11 +216,9 @@ public class RequestHttp {
 				
 				System.out.println("Received some stuff" + val);
 				try{
-					pipedOutput.connect(pipedInput);
-					pipedOutput.write( bytes, 0, bytes.length );
+					os.write(bytes);
 					System.out.println("Finished writing");
-					pipedOutput.flush();
-					
+					os.flush();
 				} catch (Exception ex){
 					System.out.println("Exception: "+ex.getMessage());
 				}
@@ -250,8 +254,7 @@ public class RequestHttp {
 				System.out.println("onCompleted");
 				//HttpResponseBodyPartsInputStream httpIS = new HttpResponseBodyPartsInputStream(bodyParts);
 				//ret.setInputStream(httpIS);
-				pipedOutput.close();
-				pipedInput.close();
+				os.close();
 				ret.completedHeaders.compareAndSet(false, true);
 				
 				return ret;
@@ -259,8 +262,7 @@ public class RequestHttp {
 		};
 		//*/
 		System.out.println("Executing");
-		ListenableFuture<ResponseHttp> r = req.execute(asyncHandler);
-		
+		ret.completedResponse = req.execute(asyncHandler);
 //		try {
 //			r.get();
 //		} catch (ExecutionException ex){

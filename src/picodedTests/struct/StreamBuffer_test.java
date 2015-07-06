@@ -320,7 +320,7 @@ public class StreamBuffer_test {
          */
         sb.getInputStream().read(fromStream);
 
-        assertThat(fromStream[0], is(not((byte) anyValue)));
+        assertThat(fromStream[0], is(not( anyValue)));
     }
 
     /**
@@ -358,7 +358,7 @@ public class StreamBuffer_test {
          */
         sb.getInputStream().read(fromStream);
 
-        assertThat(fromStream[0], is((byte) anyValue));
+        assertThat(fromStream[0], is( anyValue));
     }
 
     @Test

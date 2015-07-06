@@ -11,6 +11,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -67,11 +68,20 @@ public class ResponseHttp {
 	}
 	
 	protected AtomicBoolean completedHeaders = new AtomicBoolean(false);
+	protected ListenableFuture<ResponseHttp> completedResponse = null;
 	
-	protected void waitForCompletedHeaders() {
+	public void waitForCompletedHeaders() {
 		while( completedHeaders.get() == false ) {
 			throwIfResponseException();
 			Thread.yield();
+		}
+	}
+	
+	public void waitForCompletedRequest() {
+		try {
+			completedResponse.get();
+		} catch (Exception ex){
+			throw new RuntimeException(ex);
 		}
 	}
 	

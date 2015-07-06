@@ -43,6 +43,8 @@ import java.net.URI;
 import picoded.FunctionalInterface.*;
 //import java.util.function;
 
+import com.ning.http.client.*;
+
 @ClientEndpoint
 public class RequestHttp {
 
@@ -142,7 +144,7 @@ public class RequestHttp {
 
 	/// Performs a raw HTTP request, this assumes that the function caller has fully handled
 	/// all the various basic aspects of the request, like GET parameters, etc.
-	protected static ResponseHttp raw(
+	protected static ResponseHttp apache_raw(
 		HttpRequestType requestType, //request type 
 		String requestURL, //Request URL, with GET parameters if needed
 		Map<String, String[]> headerMap, //Header map to values
@@ -166,15 +168,65 @@ public class RequestHttp {
 		return new ResponseHttp(response);
 	}
 	
+	protected static ResponseHttp asyncHttp_raw(
+		HttpRequestType requestType, 
+		String requestURL //Request URL, with GET parameters if needed
+	) {
+		AsyncHttpClient.BoundRequestBuilder req = RequestHttpUtils.asyncHttpClient_fromRequestType( requestType, requestURL, true );
+		
+		final ResponseHttp ret = new ResponseHttp();
+		
+		AsyncHandler<ResponseHttp> asyncHandler = new AsyncHandler<ResponseHttp>() {
+		
+			@Override
+			public STATE onBodyPartReceived(final HttpResponseBodyPart content) throws Exception {
+				//builder.accumulate(content);
+				ret.completedHeaders = true;
+				return STATE.CONTINUE;
+			}
+			
+			@Override
+			public STATE onStatusReceived(final HttpResponseStatus status) throws Exception {
+				//builder.accumulate(status);
+				return STATE.CONTINUE;
+			}
+			
+			@Override
+			public STATE onHeadersReceived(final HttpResponseHeaders headers) throws Exception {
+				//builder.accumulate(headers);
+				return STATE.CONTINUE;
+			}
+			
+			@Override
+			public void onThrowable(Throwable t) {
+				throw new RuntimeException(t);
+			}
+			
+			@Override
+			public ResponseHttp onCompleted() throws Exception {
+				ret.completedHeaders = true;
+				return ret;
+			}
+		};
+		//*/
+		
+		ListenableFuture<ResponseHttp> r = req.execute(asyncHandler);
+		
+		return ret;
+	}
+	
+	
 	/// Performs the most basic of get requests
 	public static ResponseHttp get( String requestURL ) throws IOException {
-		return raw(HttpRequestType.TYPE_GET, requestURL, null, null);
+		return asyncHttp_raw( HttpRequestType.TYPE_GET, requestURL );
+		
+		//return apache_raw(HttpRequestType.TYPE_GET, requestURL, null, null);
 	}
 	
 	/// Performs a basic post request
 	public static ResponseHttp post( String requestURL, Map<String,String[]> postMap ) throws IOException {
 		List<NameValuePair> listNameValuePairs = RequestHttpUtils.parameterMapToList(postMap);
-		return raw(HttpRequestType.TYPE_POST, requestURL, null, new UrlEncodedFormEntity(listNameValuePairs) );
+		return apache_raw(HttpRequestType.TYPE_POST, requestURL, null, new UrlEncodedFormEntity(listNameValuePairs) );
 	}
 	
 }

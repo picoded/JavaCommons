@@ -294,7 +294,7 @@ public class ProxyServlet extends CorePage {
 			}
 			
 			/// Execute the proxy request
-			HttpResponse response = httpClient.execute(httpMethodProxyRequest, responseHandler);
+			HttpResponse response = httpClient.execute(httpMethodProxyRequest);
 			
 			/// Pass response headers back to the client
 			Header[] headerArrayResponse = response.getAllHeaders();

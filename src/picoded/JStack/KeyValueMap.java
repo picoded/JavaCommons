@@ -204,18 +204,6 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 		}
 	}
 
-	/// Stores (and overwrites if needed) key, value pair
-	///
-	/// Important note: It does not return the previously stored value
-	///
-	/// @param key as String
-	/// @param value as String
-	///
-	/// @returns null
-	public String put(String key, String value) {
-		return putWithExpiry(key, value, 0);
-	}
-
 	/// Returns the value, given the key
 	/// @param key param find the thae meta key
 	///
@@ -322,6 +310,18 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	///
 	/// @param key as String
 	/// @param value as String
+	///
+	/// @returns null
+	public String put(String key, String value) {
+		return putWithExpiry(key, value, 0);
+	}
+
+	/// Stores (and overwrites if needed) key, value pair
+	///
+	/// Important note: It does not return the previously stored value
+	///
+	/// @param key as String
+	/// @param value as String
 	/// @param lifespan time to expire in seconds
 	///
 	/// @returns null
@@ -335,18 +335,16 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	///
 	/// @param key as String
 	/// @param value as String
-	/// @param expireTime expire time stamp valu
+	/// @param expireTime expire time stamp value
 	///
-	/// @returns null
+	/// @returns String
 	public String putWithExpiry(String key, String value, long expireTime) {
 		try {
 			long now = currentSystemTime_seconds();
-
 			Object ret = JStackReverseIterate( new JStackReader() {
 				/// Reads only the JSQL layer
 				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
 					String tName = sqlTableName(sql);
-
 					sql.upsertQuerySet( //
 											 tName, //
 											 new String[] { "kID" }, //unique cols
@@ -366,24 +364,84 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 		return null;
 	}
 
-	/// @TODO get expirary time (unix time)
+	/// Returns the expire time stamp value
+	///
+	/// @param key as String
+	///
+	/// @returns long
 	public long getExpiry(Object key) {
+		try {
+			Object ret = JStackIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					if( ret != null ) {
+						return ret;
+					}
+					String tName = sqlTableName(sql);
+					// Search for the key
+					JSqlResult r = sql.selectQuerySet(tName, "eTm", "kID=?", new Object[] { key }).query();											 
+					// Has value
+					if( r.rowCount() > 0 ) {
+						return r.get("eTm").get(0);
+					}
+					return 0L;
+				}
+			} );
+			
+			if (ret != null) {
+				return Long.parseLong(ret.toString());
+			}
+			
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		}
+		
 		return 0L;
 	}
 
-	/// @TODO get expirary time left (seconds)
+	/// Returns the lifespan time stamp value
+	///
+	/// @param key as String
+	///
+	/// @returns long
 	public long getLifespan(Object key) {
-		return 0L;
+		return (getExpiry(key) - currentSystemTime_seconds());
 	}
 
-	/// @TODO set expirary time (unix time)
+	/// Sets the expiry time stamp value
+	///
+	/// @param key as String
+	/// @param time as long
+	///
+	/// @returns null
 	public long setExpiry(Object key, long time) {
+		try {
+			Object ret = JStackIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					if( ret != null ) {
+						return ret;
+					}
+					sql.execute("UPDATE " + sqlTableName(sql) + " SET eTm=? WHERE kID = ?", time, key);
+
+					return 0L;
+				}
+			} );
+
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		}
 		return 0L;
 	}
 
-	/// @TODO set expirary time (seconds)
-	public long setLifeSpan(Object key, long time) {
-		return 0L;
+	/// Sets the lifespan time stamp value
+	///
+	/// @param key as String
+	/// @param time as long
+	///
+	/// @returns null
+	public long setLifeSpan(Object key, long lifespan) {
+	 	return setExpiry(key, currentSystemTime_seconds() + lifespan);
 	}
 
 	/// Perform maintenance, mainly removing of expired data if applicable

@@ -81,6 +81,7 @@ public class ResponseHttp {
 		try {
 			completedResponse.get();
 		} catch (Exception ex){
+			System.out.println("Exception: "+ex.getMessage());
 			throw new RuntimeException(ex);
 		}
 	}
@@ -122,6 +123,7 @@ public class ResponseHttp {
 	/// Gets the response content
 	public InputStream inputStream() {
 		waitForCompletedHeaders();
+		waitForCompletedRequest();
 		
 		if(_inputStream != null){
 			return _inputStream;
@@ -135,7 +137,7 @@ public class ResponseHttp {
 	}
 	
 	protected void setInputStream(InputStream is){
-		//write to inputstream here
+		System.out.println("Setting input stream");
 		_inputStream = is;
 	}
 	
@@ -167,20 +169,45 @@ public class ResponseHttp {
 	/// @TODO get the response encoding type, and pass "toString"
 	private String _cachedString = null;
 	public String toString() {
+		waitForCompletedRequest();
+		
 		if( _cachedString != null ) {
 			return _cachedString;
 		}
 		
 		try {
-			return (_cachedString = IOUtils.toString(inputStream())); //, encoding 
+			return (_cachedString = IOUtils.toString(_inputStream)); //, encoding 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
+	//testing function
+	public String streamToStringRaw(){
+		try{
+			int size = _inputStream.available();
+			byte[] bytes = new byte[size];
+			_inputStream.read(bytes);
+			
+			String val = "";
+			for(byte b : bytes){
+				val += (char)b;
+			}
+			return val;
+		}catch(Exception ex){
+			
+		}
+		
+		return "";
+	}
+	
 	/// Converts the result string into a map, via JSON's
 	public Map<String,Object> toMap() {
+		waitForCompletedRequest();
+		
+		System.out.println("Getting map");
 		String r = toString();
+		System.out.println("Val of r: "+r);
 		if( r == null || r.length() <= 1 ) {
 			return null;
 		}

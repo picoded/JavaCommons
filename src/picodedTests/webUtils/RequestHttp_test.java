@@ -60,6 +60,10 @@ public class RequestHttp_test {
 		return "http://httpbin.org";
 	}
 	
+	public String postTestServerURL(){
+		return "http://posttestserver.com";
+	}
+	
 	public String echoWebSocketURL() {
 		return "wss://echo.websocket.org";
 	}
@@ -109,41 +113,35 @@ public class RequestHttp_test {
 		assertEquals( 418, res.statusCode() );
 	}
 
-	@Test @SuppressWarnings("unchecked")
-	public void GET_stream20() throws IOException {
-		System.out.println("Runnin GET_stream20");
-		ResponseHttp res = null;
-		
-		assertNotNull( res = RequestHttp.get(httpBinURL()+"/stream/100") );
-		assertEquals( 200, res.statusCode() );
-		
-		res.waitForCompletedRequest();
-
-		//System.out.println(res.toString());
-		//assertEquals( "world", ((Map<String,Object>)(resMap.get("args"))).get("hello") );
-	}
-	
 //	@Test @SuppressWarnings("unchecked")
-//	public void POST_basicTest() throws IOException {
-//		System.out.println("Running POST_basicTest");
+//	public void GET_stream100() throws IOException {
+//		System.out.println("Runnin GET_stream20");
 //		ResponseHttp res = null;
-//		Map<String,Object> resMap = null;
 //		
-//		Map<String,String[]> postData = new HashMap<String,String[]>();
-//		postData.put("hello", new String[] { "world" });
-//		
-//		assertNotNull( res = RequestHttp.post(httpBinURL()+"/post", postData) );
-//		System.out.println("sent post Request");
-//		assertNotNull( resMap = res.toMap() );
-//		System.out.println("first check");
+//		assertNotNull( res = RequestHttp.get(httpBinURL()+"/stream/100") );
 //		assertEquals( 200, res.statusCode() );
-//		System.out.println("second Check");
-//		//assertEquals( "", res.toString() );
-//		assertEquals( "world", ((Map<String,Object>)(resMap.get("form"))).get("hello") );
-//		System.out.println("last Check");
+//		
+//		System.out.println(res.toString());
+//		
+//		res.waitForCompletedRequest();
 //	}
 	
-//	@Test
+	@Test @SuppressWarnings("unchecked")
+	public void POST_basicTest() throws IOException {
+		ResponseHttp res = null;
+		Map<String,Object> resMap = null;
+		Map<String,String[]> postData = new HashMap<String,String[]>();
+		postData.put("hello", new String[] { "world" });
+		
+		assertNotNull( res = RequestHttp.post(httpBinURL()+"/post", postData) );
+		assertEquals( 200, res.statusCode() );
+		assertNotNull( resMap = res.toMap() );
+		assertEquals( "world", ((Map<String,Object>)(resMap.get("form"))).get("hello") );
+		
+		res.waitForCompletedRequest();
+	}
+	
+	@Test
 	public void WEBSOCKET_echoTest() {
 		System.out.println("Running WEBSOCKET_echoTest");
 		assertNotNull( reqObj = new RequestHttp( echoWebSocketURL() ) );

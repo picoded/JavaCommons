@@ -47,7 +47,7 @@ public class StreamBuffer implements Closeable {
     /**
      * The buffer which contains the raw data.
      */
-    //@SuppressWarnings("unchecked")
+//    @SuppressWarnings("unchecked")
 	private final Deque<byte[]> buffer = new LinkedList<byte[]>();
 
     /**
@@ -238,7 +238,7 @@ public class StreamBuffer implements Closeable {
      * write operation. The method checks itself if the buffer should be trimmed
      * or not.
      */
-    //@SuppressWarnings("unchecked")
+//    @SuppressWarnings("unchecked")
     private void trim() throws IOException {
         if (isTrimShouldBeExecuted()) {
 
@@ -350,6 +350,7 @@ public class StreamBuffer implements Closeable {
 
         @Override
         public int read() throws IOException {
+//        	System.out.println("Overridden read()");
             // we wait for enough bytes (one byte)
             if (tryWaitForEnoughBytes(1) < 1) {
                 // try to wait, but not enough bytes available
@@ -383,6 +384,7 @@ public class StreamBuffer implements Closeable {
         // the method calls internal "read(b, 0, b.length)"
         @Override
         public int read(final byte b[], final int off, final int len) throws IOException {
+//        	System.out.println("Overridden read()"+b.toString()+" offset: " + off + " len: "+len);
             if (!correctOffsetAndLengthToRead(b, off, len)) {
                 return 0;
             }
@@ -399,17 +401,23 @@ public class StreamBuffer implements Closeable {
 
             // we have already copied one byte, initialize with 1
             int copiedBytes = 1;
-
+            
+            // missing bytes refers to the amount of bytes left to copy
             int missingBytes = len - copiedBytes;
             if (noMoreMissingBytes(missingBytes)) {
                 return copiedBytes;
             }
-
+            
             long maximumAvailableBytes = tryWaitForEnoughBytes(missingBytes);
-
             if (maximumAvailableBytes < 1) {
                 // try to wait, but no more bytes available
                 return copiedBytes;
+            }
+            
+            // Ensure missing bytes is never more then avaliable
+            int avaliable = available();
+            if( missingBytes > avaliable ) {
+            	missingBytes = avaliable;
             }
 
             // some or enough bytes are available, lock and modify the FIFO
@@ -422,6 +430,7 @@ public class StreamBuffer implements Closeable {
 
                     // get the first element from FIFO
                     final byte[] first = buffer.getFirst();
+                    
                     // get the maximum bytes which can be copied
                     // from the first element
                     final int maximumBytesToCopy

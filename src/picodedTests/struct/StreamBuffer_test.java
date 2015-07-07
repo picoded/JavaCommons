@@ -23,16 +23,28 @@ package picodedTests.struct;
 
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+
+
+
+
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.output.StringBuilderWriter;
 //import static org.hamcrest.number.OrderingComparison.*;
 import org.junit.Assert;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
+import org.lesscss.deps.org.apache.commons.io.IOUtils;
 
 import picoded.struct.StreamBuffer;
 
@@ -43,6 +55,22 @@ public class StreamBuffer_test {
      */
     private final static byte anyValue = 42;
 
+    /**
+     * Random Utilities
+     */
+    private byte[] randomByteArray(int arraySize){
+    	byte[] byteArr = new byte[arraySize];
+    	(new java.util.Random()).nextBytes(byteArr); 
+    	return byteArr;
+    }
+    
+    private byte randomByte(){
+    	return randomByteArray(1)[0];
+    }
+
+    /**
+     * Unit Test
+     */
     @Test
     public void testSimpleRoundTrip() throws IOException {
         StreamBuffer sb = new StreamBuffer();
@@ -180,7 +208,7 @@ public class StreamBuffer_test {
         for (int i = 1; i <= 255; ++i) {
             byte[] array = new byte[i];
             if (i >= 250) {
-                System.out.println();
+                //System.out.println();
             }
             // fill up with content
             for (int j = 0; j < array.length; ++j) {
@@ -765,5 +793,114 @@ public class StreamBuffer_test {
         int result = bis.available();
         
         assertThat(result, is(3));
+    }
+    
+    @Test
+    public void testReadAgainstParametisedRead_readByByte() throws IOException{
+    	int sampleSize = 10000;
+    	byte[] sample = randomByteArray(sampleSize);
+        byte[] readByByte = new byte[sampleSize];
+    	byte[] endingByte = new byte[1];        
+    	
+        StreamBuffer sb = new StreamBuffer();
+        InputStream is = sb.getInputStream();
+        OutputStream os = sb.getOutputStream();
+        
+        os.write(sample, 0, sampleSize);
+        assertEquals(sampleSize, is.available());
+        for(int i = 0; i < sampleSize; ++i){
+        	readByByte[i] = (byte)is.read();
+        }
+        sb.close();
+        
+        //check ending bytes with all read methods return -1 at the end of the stream
+        assertEquals(-1, is.read());
+        assertEquals(-1, is.read(endingByte, 0, 1));
+        assertEquals(-1, is.read(endingByte));
+        
+        assertArrayEquals("readByByte: ", sample, readByByte);
+    }
+    
+    @Test
+    public void testReadAgainstParametisedRead_readByArrayOnly() throws IOException{
+    	int sampleSize = 10000;
+    	byte[] sample = randomByteArray(sampleSize);
+        byte[] readByArray = new byte[sampleSize];
+        byte[] readByByte = new byte[sampleSize];
+        
+    	byte[] endingByte = new byte[1];        
+    	
+        StreamBuffer sb = new StreamBuffer();
+        InputStream is = sb.getInputStream();
+        OutputStream os = sb.getOutputStream();
+        
+        readByArray = new byte[sampleSize];
+        os.write(sample, 0, sampleSize);
+        assertEquals(sampleSize, is.available()); //assert sample and what is written to input stream is equal
+        
+        sb.close();
+        
+        assertEquals(sampleSize, is.read(readByArray));
+        
+        //check ending bytes with all read methods return -1 at the end of the stream
+        assertEquals(-1, is.read());
+        assertEquals(-1, is.read(endingByte, 0, 1));
+        assertEquals(-1, is.read(endingByte));
+        
+        assertArrayEquals("readByArrayOnly: ", sample, readByArray);
+    }
+    
+    @Test
+    public void testReadAgainstParametisedRead_readByArrayWithOffsetAndLength() throws IOException {
+    	int sampleSize = 10000;
+    	byte[] sample = randomByteArray(sampleSize);
+        byte[] readByArray = new byte[sampleSize];
+    	byte[] endingByte = new byte[1];        
+    	
+        StreamBuffer sb = new StreamBuffer();
+        InputStream is = sb.getInputStream();
+        OutputStream os = sb.getOutputStream();
+        
+        os.write(sample, 0, sampleSize);
+        assertEquals(sampleSize, is.available()); //assert sample and what is written to input stream is equal
+        
+        is.read(readByArray, 0, sampleSize);
+        sb.close();
+        
+        assertArrayEquals("readByArrayWithOffsetAndLength: ", sample, readByArray);
+
+        //check ending bytes with all read methods return -1 at the end of the stream
+        assertEquals(-1, is.read());
+        assertEquals(-1, is.read(endingByte, 0, 1));
+        assertEquals(-1, is.read(endingByte));
+    }
+
+    @Test
+    public void testReadAgainstParametisedRead_readLargerThenSample() throws IOException {
+    	int sampleSize = 10000;
+    	byte[] sample = randomByteArray(sampleSize);
+    	
+        byte[] readByArray = new byte[sampleSize*2];
+    	byte[] endingByte = new byte[1];        
+    	
+        StreamBuffer sb = new StreamBuffer();
+        InputStream is = sb.getInputStream();
+        OutputStream os = sb.getOutputStream();
+        
+        os.write(sample, 0, sampleSize);
+        assertEquals(sampleSize, is.available()); //assert sample and what is written to input stream is equal
+        sb.close();
+        
+        is.read(readByArray, 0, sampleSize*2);
+        byte[] copiedSample = new byte[sampleSize];
+        for(int i = 0; i < sampleSize; i++){
+        	copiedSample[i] = readByArray[i];
+        }
+        assertArrayEquals(sample, copiedSample);
+        
+        //check ending bytes with all read methods return -1 at the end of the stream
+        assertEquals(-1, is.read());
+        assertEquals(-1, is.read(endingByte, 0, 1));
+        assertEquals(-1, is.read(endingByte));
     }
 }

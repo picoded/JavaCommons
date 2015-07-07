@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -50,6 +51,8 @@ import picoded.FunctionalInterface.*;
 import com.ning.http.client.*;
 
 import picoded.struct.StreamBuffer;
+import picoded.struct.StreamBuffer.SBInputStream;
+import picoded.struct.StreamBuffer.SBOutputStream;
 
 @ClientEndpoint
 public class RequestHttp {
@@ -73,29 +76,9 @@ public class RequestHttp {
 	
 	/// 
 	
-	/// Ensures that the websocket is connected
-	public void websocketConnect() {
-		try {
-			if( container == null ) {
-				container = ContainerProvider.getWebSocketContainer();
-			}
-			
-			if( websocketSession == null ) {
-				websocketSession = container.connectToServer(this, new URI(_baseURL) );
-			}
-		} catch(Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
 	/// Response message
 	public void addMessageHandler(Void_String msgHandler) {
 		this.websocketMessageHandler = msgHandler;
-	}
-	
-	/// Sends message
-	public void sendMessage(String message) {
-		this.websocketSession.getAsyncRemote().sendText(message);
 	}
 	
 	/// Sends and waits for a response, needs a more efficent way?
@@ -122,6 +105,30 @@ public class RequestHttp {
 		throw new RuntimeException("TO IMPLEMENT");
 	}
 
+	///////////////////////////////////////////////////////////
+	// Core websocket functions
+	///////////////////////////////////////////////////////////
+	
+	/// Ensures that the websocket is connected
+	public void websocketConnect() {
+		try {
+			if( container == null ) {
+				container = ContainerProvider.getWebSocketContainer();
+			}
+			
+			if( websocketSession == null ) {
+				websocketSession = container.connectToServer(this, new URI(_baseURL) );
+			}
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/// Sends message
+	public void sendMessage(String message) {
+		this.websocketSession.getAsyncRemote().sendText(message);
+	}
+	
 	/// Actual onOpen reciever for the socket protocol
 	@OnOpen
 	public void _onOpen(Session userSession) {
@@ -147,54 +154,32 @@ public class RequestHttp {
 	///////////////////////////////////////////////////////////
 	// Static core functions?
 	///////////////////////////////////////////////////////////
-
-	/// Performs a raw HTTP request, this assumes that the function caller has fully handled
-	/// all the various basic aspects of the request, like GET parameters, etc.
-	protected static ResponseHttp apache_raw(
-		HttpRequestType requestType, //request type 
-		String requestURL, //Request URL, with GET parameters if needed
-		Map<String, String[]> headerMap, //Header map to values
-		HttpEntity apacheRequestEntity //POST / PUT payload, if applicable
-	) throws IOException {
-		// Prepae the HttpUriRequest, based on request type
-		HttpUriRequest methodToMakeRequest = RequestHttpUtils.apache_HttpUriRequest_fromRequestType(requestType, requestURL);
-		
-		// Add in headers as applicable
-		
-		// Create the http client, and get the response
-		HttpClient httpClient = HttpClientBuilder.create().disableRedirectHandling().disableAuthCaching().build();
-		
-		// Add the http request entity?
-		if(apacheRequestEntity != null) {
-			((HttpEntityEnclosingRequestBase)methodToMakeRequest).setEntity(apacheRequestEntity);
-		}
-		// Call and return
-		HttpResponse response = httpClient.execute(methodToMakeRequest);
-		
-		return new ResponseHttp(response);
-	}
-	
 	protected static ResponseHttp asyncHttp_raw(
 		HttpRequestType requestType, 
 		String requestURL, //Request URL, with GET parameters if needed
-		Map<String, String> headers
+		Map<String, String> headers,
+		Map<String, String[]> postParams
 	) {
 		AsyncHttpClient.BoundRequestBuilder req = RequestHttpUtils.asyncHttpClient_fromRequestType( requestType, requestURL, true );
 		
+		//set headers
 		if(headers != null && headers.size() > 0) {
 			for(String key : headers.keySet()){
 				req.addHeader(key,  headers.get(key));
 			}
 		}
 		
-//		final PipedInputStream pipedInput = new PipedInputStream();
-//		final PipedOutputStream pipedOutput = new PipedOutputStream();
-//		
-//		try{
-//			pipedInput.connect(pipedOutput);
-//		} catch (Exception ex){
-//			
-//		}
+		//set form params
+		if(postParams != null && postParams.size() > 0){
+			List<Param> formParams = new ArrayList<Param>();
+			for(String postKey : postParams.keySet()){
+				String[] postVals = postParams.get(postKey);
+				for(String postVal : postVals){
+					formParams.add(new Param(postKey, postVal));
+				}
+			}
+			req.setFormParams(formParams);
+		}
 		
 		StreamBuffer sb = new StreamBuffer();
 		OutputStream os = sb.getOutputStream();
@@ -209,22 +194,15 @@ public class RequestHttp {
 			@Override
 			public STATE onBodyPartReceived(final HttpResponseBodyPart content) throws Exception {
 				byte[] bytes = content.getBodyPartBytes();
-				String val = "";
-				for(int i = 0 ; i < bytes.length; ++i){
-					val += (char)bytes[i];
-				}
 				
-				System.out.println("Received some stuff" + val);
 				try{
 					os.write(bytes);
-					System.out.println("Finished writing");
 					os.flush();
 				} catch (Exception ex){
-					System.out.println("Exception: "+ex.getMessage());
+					throw new RuntimeException(ex);
 				}
-				System.out.println("Flushed");
-				ret.completedHeaders.compareAndSet(false, true);
 				
+				ret.completedHeaders.compareAndSet(false, true);
 				return STATE.CONTINUE;
 			}
 			
@@ -237,61 +215,43 @@ public class RequestHttp {
 			
 			@Override
 			public STATE onHeadersReceived(final HttpResponseHeaders headers) throws Exception {
-				System.out.println("onHeadersReceived");
 				ret.setHeaders(headers.getHeaders());
-				
 				return STATE.CONTINUE;
 			}
 			
 			@Override
 			public void onThrowable(Throwable t) {
-				System.out.println("onThrowable");
 				throw new RuntimeException(t);
 			}
 			
 			@Override
 			public ResponseHttp onCompleted() throws Exception {
-				System.out.println("onCompleted");
-				//HttpResponseBodyPartsInputStream httpIS = new HttpResponseBodyPartsInputStream(bodyParts);
-				//ret.setInputStream(httpIS);
-				os.close();
+				sb.close();
 				ret.completedHeaders.compareAndSet(false, true);
 				
 				return ret;
 			}
 		};
-		//*/
-		System.out.println("Executing");
+		
 		ret.completedResponse = req.execute(asyncHandler);
-//		try {
-//			r.get();
-//		} catch (ExecutionException ex){
-//			System.out.println(ex.getMessage());
-//		} catch (InterruptedException ex) {
-//			System.out.println(ex.getMessage());
-//		} catch (Exception ex){
-//			System.out.println("Caught exception:" + ex + ex.getMessage());
-//		}
-		System.out.println("About to return");
 		return ret;
 	}
 	
-	
 	/// Performs the most basic of get requests
 	public static ResponseHttp get( String requestURL ) throws IOException {
-		return asyncHttp_raw( HttpRequestType.TYPE_GET, requestURL, null );
-		
-		//return apache_raw(HttpRequestType.TYPE_GET, requestURL, null, null);
+		return asyncHttp_raw( HttpRequestType.TYPE_GET, requestURL, null, null );
 	}
 	
 	public static ResponseHttp get(String requestURL, Map<String, String> headers) throws IOException {
-		return asyncHttp_raw( HttpRequestType.TYPE_GET, requestURL, headers );
+		return asyncHttp_raw( HttpRequestType.TYPE_GET, requestURL, headers, null );
 	}
 	
 	/// Performs a basic post request
 	public static ResponseHttp post( String requestURL, Map<String,String[]> postMap ) throws IOException {
-		List<NameValuePair> listNameValuePairs = RequestHttpUtils.parameterMapToList(postMap);
-		return apache_raw(HttpRequestType.TYPE_POST, requestURL, null, new UrlEncodedFormEntity(listNameValuePairs) );
+		return asyncHttp_raw(HttpRequestType.TYPE_POST, requestURL, null, postMap);
 	}
 	
+	public static ResponseHttp post( String requestURL, Map<String, String> headers, Map<String,String[]> postMap ) throws IOException {
+		return asyncHttp_raw(HttpRequestType.TYPE_POST, requestURL, headers, postMap);
+	}
 }

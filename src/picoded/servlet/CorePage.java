@@ -65,7 +65,7 @@ import picoded.webUtils.HttpRequestType;
  * ---------------------------------------------------------------------------------------------------------
  *
  * ##[TODO]
- *
+ * + Websocket support?
  */
 public class CorePage extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
 	
@@ -85,19 +85,19 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	//-------------------------------------------
 	
 	/// GET type indicator
-//	static final byte TYPE_GET = 1;
-//	
-//	/// POST type indicator
-//	static final byte TYPE_POST = 2;
-//	
-//	/// PUT type indicator
-//	static final byte TYPE_PUT = 3;
-//	
-//	/// DELETE type indicator
-//	static final byte TYPE_DELETE = 4;
-//	
-//	/// OPTION type indicator
-//	static final byte TYPE_OPTION = 5;
+	//	static final byte TYPE_GET = 1;
+	//	
+	//	/// POST type indicator
+	//	static final byte TYPE_POST = 2;
+	//	
+	//	/// PUT type indicator
+	//	static final byte TYPE_PUT = 3;
+	//	
+	//	/// DELETE type indicator
+	//	static final byte TYPE_DELETE = 4;
+	//	
+	//	/// OPTION type indicator
+	//	static final byte TYPE_OPTION = 5;
 	
 	///////////////////////////////////////////////////////
 	//

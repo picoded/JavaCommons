@@ -36,7 +36,7 @@ public class LoginServlet extends BasePage{
 	
 	@Override
 	public boolean doGetJSON(Map<String,Object> outputData, Map<String,Object> templateData)
-			throws ServletException {
+			throws Exception {
 		try{
 			accountAuthTable().stackSetup();
 		} catch (JStackException ex){
@@ -57,7 +57,7 @@ public class LoginServlet extends BasePage{
 
 	@Override
 	public boolean doPostJSON(Map<String, Object> outputData, Map<String,Object> templateData)
-			throws ServletException {
+			throws Exception {
 		try {
 			AccountObject acc;
 			

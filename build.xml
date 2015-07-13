@@ -130,19 +130,19 @@
 		</jar>
 
 		<!-- libs only -->
-		<jar destfile="bin/build/picodedJavaCommons-libsOnly-main.jar">
+		<jar destfile="${test-temp}/picodedJavaCommons-libsOnly-main.jar">
 			<fileset dir="${build-lib}" includes="*.jar" />
 		</jar>
 
 		<!-- with libs -->
-		<jar destfile="bin/build/picodedJavaCommons-withLibs-main.jar">
+		<jar destfile="${test-temp}/picodedJavaCommons-withLibs-main.jar">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 			<fileset dir="${build-lib}" includes="*.jar" />
 		</jar>
 		
 		<!-- Construct the One-JAR file for libs only -->
 		<one-jar destfile="bin/build/picodedJavaCommons-libsOnly.jar">
-			<main jar="bin/build/picodedJavaCommons-libsOnly-main.jar">
+			<main jar="${test-temp}/picodedJavaCommons-libsOnly-main.jar">
 			</main>
 			<lib>
 				<fileset dir="${lib.dir}" />
@@ -151,16 +151,13 @@
 
 		<!-- Construct the One-JAR file with libs -->
 		<one-jar destfile="bin/build/picodedJavaCommons-withLibs.jar">
-			<main jar="bin/build/picodedJavaCommons-withLibs-main.jar">
+			<main jar="${test-temp}/picodedJavaCommons-withLibs-main.jar">
 			</main>
 			<lib>
 				<fileset dir="${lib.dir}" />
 			</lib>
 		</one-jar>
 		
-		<!-- Delete main jar files -->
-		<delete file="bin/build/picodedJavaCommons-libsOnly-main.jar"/>
-		<delete file="bin/build/picodedJavaCommons-withLibs-main.jar"/>
 	</target>
 	
 	<target name="javadoc" depends="compile-lib">

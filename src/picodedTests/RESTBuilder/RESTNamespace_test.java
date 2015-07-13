@@ -17,14 +17,14 @@ import java.lang.reflect.*;
 
 import picoded.enums.HttpRequestType;
 
-public class RESTMethod_test {
+public class RESTNamespace_test {
 	
 	//-------------------------------
 	// Test variables
 	//-------------------------------
 	
 	/// Base RESTBuilder object to test on, automatic setup
-	protected RESTMethod restObj = null;
+	protected RESTNamespace restObj = null;
 
 	/// Test hello echo function
 	protected RESTFunction helloFunction = (req,res) -> {
@@ -43,7 +43,7 @@ public class RESTMethod_test {
 	
 	@Before
 	public void setUp() {
-		restObj = new RESTMethod("test");
+		restObj = new RESTNamespace("test");
 	}
 	
 	@After

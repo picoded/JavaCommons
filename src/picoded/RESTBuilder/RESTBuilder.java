@@ -73,35 +73,35 @@ public class RESTBuilder {
 	///----------------------------------------
 	
 	/// Stores the various methods currently in place of the RESTBuilder
-	protected Map<String, RESTMethod> methodMap = new HashMap<String, RESTMethod>();
+	protected Map<String, RESTNamespace> methodMap = new HashMap<String, RESTNamespace>();
 	
-	/// Gets the api RESTMethod, to add the respetive GET/PUT/POST/DELETE calls
-	public RESTMethod apiMethod(String namespace) {
+	/// Gets the api RESTNamespace, to add the respetive GET/PUT/POST/DELETE calls
+	public RESTNamespace apiMethod(String namespace) {
 		return apiMethod(namespace.replaceAll(".", "/").split("/"));
 	}
 	
-	/// Gets the api RESTMethod, to add the respetive GET/PUT/POST/DELETE calls
-	public RESTMethod apiMethod(String[] namespace) {
+	/// Gets the api RESTNamespace, to add the respetive GET/PUT/POST/DELETE calls
+	public RESTNamespace apiMethod(String[] namespace) {
 		String storeStr = StringUtils.join(namespace, "/").split("?")[0]; //Remove the trailing GET paramters if its given
 		
-		RESTMethod m = methodMap.get(storeStr);
+		RESTNamespace m = methodMap.get(storeStr);
 		if (m == null) {
-			m = new RESTMethod(storeStr);
+			m = new RESTNamespace(storeStr);
 			methodMap.put(storeStr, m);
 		}
 		return m;
 	}
 	
 	/// Calls the API method with a query string
-	public Map<String,Object> call(String apiUri, HttpRequestType requestType, Map<String,Object> requestMap, Map<String,Object> resultMap) {
+	public Map<String,Object> call(String apiNamespace, HttpRequestType requestType, Map<String,Object> requestMap, Map<String,Object> resultMap) {
 		return null;
 	}
 	
-	public Map<String,Object> servletCall(String apiUri, CorePage page, Map<String,Object> resultMap) {
+	public Map<String,Object> servletCall(String apiNamespace, picoded.servlet.CorePage page, Map<String,Object> resultMap) {
 		return null;
 	}
 	
-	public Map<String,Object> servletCall(String apiUri, CorePage page, Map<String,Object> resultMap) {
+	public Map<String,Object> servletCall(picoded.servlet.CorePage page, Map<String,Object> resultMap) {
 		return null;
 	}
 }

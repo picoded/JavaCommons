@@ -20,7 +20,7 @@ import java.io.UnsupportedEncodingException;
 import picoded.enums.HttpRequestType;
 
 ///
-/// Internal RESTMethod Sub class which handles each function namespace seperately
+/// Internal RESTNamespace Sub class which handles each function namespace seperately
 ///
 /// CRUD       HTTP
 /// Create     POST
@@ -32,7 +32,7 @@ import picoded.enums.HttpRequestType;
 /// @TODO adding of GET/PUT/POST/DELETE
 /// @TODO adding with default values being supported
 ///
-public class RESTMethod extends HashMap<HttpRequestType, RESTFunction> {
+public class RESTNamespace extends HashMap<HttpRequestType, RESTFunction> {
 	
 	/// Build warning suppression
 	static final long serialVersionUID = 1L;
@@ -54,7 +54,7 @@ public class RESTMethod extends HashMap<HttpRequestType, RESTFunction> {
 	//---------------------------------------
 	
 	/// [internal use only] Setup the rest method with the given namespace
-	public RESTMethod(String nme) {
+	public RESTNamespace(String nme) {
 		namespace = nme;
 	}
 	

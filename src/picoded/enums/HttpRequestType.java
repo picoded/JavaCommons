@@ -9,7 +9,7 @@ public enum HttpRequestType {
 	OPTION;
 	
 	/// TypeMap to be extended, and stored in their respective package usage
-	public static class HttpRequestTypeMap {
+	public static class HttpRequestTypeSet {
 		public static HttpRequestType GET  = HttpRequestType.GET;
 		public static HttpRequestType POST = HttpRequestType.POST;
 		public static HttpRequestType PUT  = HttpRequestType.PUT;

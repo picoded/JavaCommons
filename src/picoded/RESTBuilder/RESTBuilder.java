@@ -62,7 +62,7 @@ public class RESTBuilder {
 	static final long serialVersionUID = 1L;
 	
 	/// RESTBuilder HttpRequestType enum access
-	public static class RequestType extends picoded.enums.HttpRequestType.HttpRequestTypeMap {};
+	public static class RequestTypeSet extends picoded.enums.HttpRequestType.HttpRequestTypeSet {};
 	
 	/// Blank constructor
 	public RESTBuilder() {
@@ -82,7 +82,7 @@ public class RESTBuilder {
 	
 	/// Gets the api RESTMethod, to add the respetive GET/PUT/POST/DELETE calls
 	public RESTMethod apiMethod(String[] namespace) {
-		String storeStr = StringUtils.join(namespace, "/");
+		String storeStr = StringUtils.join(namespace, "/").split("?")[0]; //Remove the trailing GET paramters if its given
 		
 		RESTMethod m = methodMap.get(storeStr);
 		if (m == null) {
@@ -93,6 +93,15 @@ public class RESTBuilder {
 	}
 	
 	/// Calls the API method with a query string
+	public Map<String,Object> call(String apiUri, HttpRequestType requestType, Map<String,Object> requestMap, Map<String,Object> resultMap) {
+		return null;
+	}
 	
+	public Map<String,Object> servletCall(String apiUri, CorePage page, Map<String,Object> resultMap) {
+		return null;
+	}
 	
+	public Map<String,Object> servletCall(String apiUri, CorePage page, Map<String,Object> resultMap) {
+		return null;
+	}
 }

@@ -62,9 +62,9 @@ public class RESTMethod_test {
 	
 	@Test
 	public void equalityTest() {
-		HttpRequestType a = RESTBuilder.RequestType.GET;
-		HttpRequestType b = RESTBuilder.RequestType.GET;
-		HttpRequestType c = RESTBuilder.RequestType.POST;
+		HttpRequestType a = RESTBuilder.RequestTypeSet.GET;
+		HttpRequestType b = RESTBuilder.RequestTypeSet.GET;
+		HttpRequestType c = RESTBuilder.RequestTypeSet.POST;
 		
 		assertEquals(a, b);
 		assertNotEquals(a, c);
@@ -72,16 +72,16 @@ public class RESTMethod_test {
 	
 	@Test
 	public void helloMethod() {
-		restObj.put(RESTBuilder.RequestType.GET, helloFunction );
+		restObj.put(RESTBuilder.RequestTypeSet.GET, helloFunction );
 		
-		Map<String, Object> ret = restObj.call(RESTBuilder.RequestType.GET);
+		Map<String, Object> ret = restObj.call(RESTBuilder.RequestTypeSet.GET);
 		
 		Map<String, Object> retCheck = new HashMap<String, Object>();
 		retCheck.put("hello","world");
 		assertEquals( retCheck, ret );
 		
 		retCheck.put("echo", "echo");
-		ret = restObj.call(RESTBuilder.RequestType.GET, retCheck);
+		ret = restObj.call(RESTBuilder.RequestTypeSet.GET, retCheck);
 		assertEquals( retCheck, ret );
 	}
 	

@@ -220,13 +220,22 @@
 	<target name="onejar" depends="build">
 
 		<!-- Construct the One-JAR file -->
-		<one-jar destfile="${basedir}/javacommons.jar">
+		<one-jar destfile="bin/build/picodedJavaCommons-libsOnly-onejar.jar">
+			<main jar="bin/build/picodedJavaCommons-libsOnly.jar">
+			</main>
+			<lib>
+				<fileset dir="${lib.dir}" />
+			</lib>
+		</one-jar>
+
+		<one-jar destfile="bin/build/picodedJavaCommons-withLibs-onejar.jar">
 			<main jar="bin/build/picodedJavaCommons-withLibs.jar">
 			</main>
 			<lib>
 				<fileset dir="${lib.dir}" />
 			</lib>
 		</one-jar>
+
 	</target>
 
 </project>

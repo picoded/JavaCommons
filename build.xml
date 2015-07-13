@@ -79,7 +79,8 @@
 			<fileset dir="${build-lib}" includes="**/*.jar" />
 		</path>
 		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
-				 includeantruntime="false" bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar">
+				 includeantruntime="false">
+			<!-- bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar" -->
 			<compilerarg value="-Xlint:all"/>
 			<src path="${src-path}"/>
 			<exclude name="**/package-info.java"/>
@@ -92,7 +93,7 @@
 			<fileset dir="${build-lib}" includes="**/*.jar" />
 		</path>
 		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
-				 includeantruntime="false" bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar">
+				 includeantruntime="false">
 			<compilerarg value="-Xlint:unchecked"/>
 			<src path="${src-experimental}"/>
 			<exclude name="**/package-info.java"/>
@@ -108,7 +109,7 @@
 			<fileset dir="${build-lib}" includes="**/*.jar" />
 		</path>
 		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
-				 includeantruntime="false" bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar">
+				 includeantruntime="false">
 			<compilerarg value="-Xlint:all"/>
 			<src path="${src-path}"/>
 			<src path="${src-test}"/>

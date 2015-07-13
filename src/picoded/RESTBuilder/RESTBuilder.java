@@ -19,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.lang3.StringUtils;
 
+import picoded.enums.HttpRequestType;
 /**
  * picoded.servlet.RESTBuilder is a servlet utility class, in which facilitates the building of "RESTful API's"
  * that can be used in the project either via a public API, or even internally, via a direct function call.
@@ -55,10 +56,13 @@ import org.apache.commons.lang3.StringUtils;
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  **/
-public class RESTBuilder extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
+public class RESTBuilder {
 	
 	/// Build warning suppression
 	static final long serialVersionUID = 1L;
+	
+	/// RESTBuilder HttpRequestType enum access
+	public static class RequestType extends picoded.enums.HttpRequestType.HttpRequestTypeMap {};
 	
 	/// Blank constructor
 	public RESTBuilder() {
@@ -69,7 +73,7 @@ public class RESTBuilder extends javax.servlet.http.HttpServlet implements javax
 	///----------------------------------------
 	
 	/// Stores the various methods currently in place of the RESTBuilder
-	protected HashMap<String, RESTMethod> methodMap = new HashMap<String, RESTMethod>();
+	protected Map<String, RESTMethod> methodMap = new HashMap<String, RESTMethod>();
 	
 	/// Gets the api RESTMethod, to add the respetive GET/PUT/POST/DELETE calls
 	public RESTMethod apiMethod(String namespace) {
@@ -87,5 +91,8 @@ public class RESTBuilder extends javax.servlet.http.HttpServlet implements javax
 		}
 		return m;
 	}
+	
+	/// Calls the API method with a query string
+	
 	
 }

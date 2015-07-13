@@ -17,8 +17,11 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 
+import picoded.struct.GenericConvertMap;
+
 // Ext lib used
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.collections4.map.AbstractMapDecorator;
 
 ///
 /// RESTRequest object handler, this is usually the first argument for all
@@ -26,7 +29,7 @@ import org.apache.commons.lang3.ArrayUtils;
 ///
 /// It represents the request object, and include utility functions 
 ///
-public class RESTRequest extends HashMap<String, Object> {
+public class RESTRequest extends AbstractMapDecorator<String, Object> implements GenericConvertMap<String, Object>  {
 	
 	//--------------------------------------------------------------------------------
 	// Protected vars
@@ -35,6 +38,17 @@ public class RESTRequest extends HashMap<String, Object> {
 	/// Build warning suppression
 	static final long serialVersionUID = 1L;
 	
+	/// [internal] avoid use this directly
+	public RESTRequest(Map<String, Object> map) {
+		super(map);
+	}
+	
+	/// [internal] avoid use this directly
+	public RESTRequest() {
+		super(new HashMap<String,Object>());
+	}
+	
+	/*
 	/// Base object which represents the "this" argument during the function call
 	protected Object baseObject = null;
 	
@@ -191,4 +205,6 @@ public class RESTRequest extends HashMap<String, Object> {
 		}
 		//return null;
 	}
+	
+	*/
 }

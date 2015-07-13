@@ -26,8 +26,12 @@ import org.apache.commons.lang3.ArrayUtils;
 /// This object class helps hold all the various default values
 /// and can represent a single GET/PUT/POST/DELETE request
 ///
-class RESTSet {
+public class RESTSet {
 	
+	/// 
+	// protected RESTFunction 
+	
+	/*
 	/// Base object for the method, represents "this"
 	Object baseObject = null;
 	
@@ -155,5 +159,5 @@ class RESTSet {
 		// new rest request with default values
 		return generateRequest().call();
 	}
-	
+	// */
 }

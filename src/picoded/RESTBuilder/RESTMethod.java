@@ -17,7 +17,7 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 
-import picoded.webUtils.HttpRequestType;
+import picoded.enums.HttpRequestType;
 
 ///
 /// Internal RESTMethod Sub class which handles each function namespace seperately
@@ -32,26 +32,10 @@ import picoded.webUtils.HttpRequestType;
 /// @TODO adding of GET/PUT/POST/DELETE
 /// @TODO adding with default values being supported
 ///
-public class RESTMethod {
+public class RESTMethod extends HashMap<HttpRequestType, RESTFunction> {
 	
-	//---------------------------------------
-	// Public static
-	//---------------------------------------
-	
-	/// The GET method type
-//	public static final int TYPE_GET = 0;
-//	
-//	/// The PUT method type
-//	public static final int TYPE_PUT = 1;
-//	
-//	/// The POST method type
-//	public static final int TYPE_POST = 2;
-//	
-//	/// The DELETE method type
-//	public static final int TYPE_DELETE = 3;
-	
-	/// Maximium range of all method types
-	private static final int methodSetMax = 4;
+	/// Build warning suppression
+	static final long serialVersionUID = 1L;
 	
 	//---------------------------------------
 	// Protected vars
@@ -65,9 +49,6 @@ public class RESTMethod {
 		return namespace;
 	}
 	
-	/// The request method set array, representing the various values
-	protected RESTSet[] methodSet = new RESTSet[methodSetMax];
-	
 	//---------------------------------------
 	// Constructor
 	//---------------------------------------
@@ -77,269 +58,27 @@ public class RESTMethod {
 		namespace = nme;
 	}
 	
-	//-------------------------------------------------------------
-	// Adding / Removing method functions, with type parameter
-	//-------------------------------------------------------------
-	
-	/// Indicates if the method exists of the given type
-	public boolean hasMethod(int methodType) {
-		return (methodSet[methodType] != null);
+	/// Calls the method without any arguments
+	public Map<String,Object> call(HttpRequestType type) {
+		return call( type, new RESTRequest(), new HashMap<String,Object>() );
 	}
 	
-	/// Sets the method for the given type
-	public RESTMethod setMethod(int methodType, Object baseObject, Method baseMethod) {
-		RESTSet exist = methodSet[methodType];
-		
-		// ignore if already set
-		if (exist != null && exist.baseObject == baseObject && exist.baseMethod == baseMethod) {
-			return this;
+	/// Calls the method without any arguments
+	public Map<String,Object> call(HttpRequestType type, Map<String,Object>reqMap ) {
+		return call( type, new RESTRequest(reqMap), new HashMap<String,Object>() );
+	}
+	
+	/// Internal call method, with the full request, and result
+	protected Map<String,Object> call(HttpRequestType type, RESTRequest req, Map<String,Object> res) {
+		RESTFunction f = get(type);
+		if( f == null ) {
+			throw new RuntimeException("Missing function for given namespace / type : "+namespace+" / "+type);
 		}
-		
-		// setup the method
-		methodSet[methodType] = new RESTSet(baseObject, baseMethod);
-		return this;
+		return f.apply( req, res );
 	}
 	
-	/// Sets the method for the given type via reflection
-	public RESTMethod setMethod(int methodType, Object baseObject, String methodName, Class<?> classArr) {
-		Method m = null;
-		try {
-			m = baseObject.getClass().getMethod(methodName, classArr);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		
-		return setMethod(methodType, baseObject, m);
-	}
-	
-	/// Sets the method for the given type via reflection with the method name only,
-	/// in event that more then 2 overloaded or 0 method exists with the name,
-	/// a RuntimeException is thrown
-	public RESTMethod setMethod(int methodType, Object baseObject, String methodName) {
-		Method m = null;
-		Method[] mArr = null;
-		
-		try {
-			mArr = baseObject.getClass().getMethods();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		
-		for (int a = 0; a < mArr.length; ++a) {
-			if (methodName.equals(mArr[a].getName())) {
-				//found one,
-				if (m != null) {
-					throw new RuntimeException("Unable to set method, there is more then one overloaded method name : "
-						+ methodName);
-				}
-				m = mArr[a];
-			}
-		}
-		
-		if (m == null) {
-			throw new RuntimeException("Failed to find method with name : " + methodName);
-		}
-		
-		return setMethod(methodType, baseObject, m);
-	}
-	
-	/// Gets the method internal base object
-	public Object getMethodObject(int methodType) {
-		return (methodSet[methodType] != null) ? methodSet[methodType].baseObject : null;
-	}
-	
-	/// Gets the method internal raw method
-	public Method getMethodRaw(int methodType) {
-		return (methodSet[methodType] != null) ? methodSet[methodType].baseMethod : null;
-	}
-	
-	/// Calls the given method type
-	public Object callMethod(int methodType, Map<String, ?> reqObject, Object[] reqArgs) {
-		return (methodSet[methodType] != null) ? methodSet[methodType].call(reqObject, reqArgs) : null;
-	}
-	
-	/// Set the default for the method
-	public RESTMethod setDefault(int methodType, Map<String, ?> defMap, Object... defArg) {
-		if (methodSet[methodType] != null) {
-			methodSet[methodType].setDefault(defMap, defArg);
-		}
-		return this;
-	}
-	
-	//---------------------------------------
-	// GET request handling
-	//---------------------------------------
-	
-	/// Sets a REST GET request
-	public RESTMethod setGET(Object baseObject, Method baseMethod) {
-		return setMethod((int)HttpRequestType.TYPE_GET.value(), baseObject, baseMethod);
-	}
-	
-	/// Set a REST GET with just the method name
-	public RESTMethod setGET(Object baseObject, String methodName) {
-		return setMethod((int)HttpRequestType.TYPE_GET.value(), baseObject, methodName);
-	}
-	
-	/// Set a REST GET with the given class array
-	public RESTMethod setGET(Object baseObject, String methodName, Class<?> classArr) {
-		return setMethod((int)HttpRequestType.TYPE_GET.value(), baseObject, methodName, classArr);
-	}
-	
-	/// Set the REST GET default value
-	public RESTMethod setDefaultGET(Map<String, ?> defMap, Object... defArg) {
-		return setDefault((int)HttpRequestType.TYPE_GET.value(), defMap, defArg);
-	}
-	
-	/// Calls a REST GET request with the map & array arguments
-	public Object requestGET(Map<String, ?> reqObject, Object... reqArgs) {
-		return callMethod((int)HttpRequestType.TYPE_GET.value(), reqObject, reqArgs);
-	}
-	
-	/// Calls a REST GET request with the map arguments
-	public Object requestGET(Map<String, ?> reqObject) {
-		return callMethod((int)HttpRequestType.TYPE_GET.value(), reqObject, null);
-	}
-	
-	/// Calls a REST GET request with the array arguments
-	public Object GET(Object... reqArgs) {
-		return callMethod((int)HttpRequestType.TYPE_GET.value(), null, reqArgs);
-	}
-	
-	/// Calls a REST GET request without any arguments
-	public Object GET() {
-		return callMethod((int)HttpRequestType.TYPE_GET.value(), null, null);
-	}
-	
-	//---------------------------------------
-	// PUT request handling
-	//---------------------------------------
-	
-	/// Sets a REST PUT request
-	public RESTMethod setPUT(Object baseObject, Method baseMethod) {
-		return setMethod((int)HttpRequestType.TYPE_PUT.value(), baseObject, baseMethod);
-	}
-	
-	/// Set a REST PUT with just the method name
-	public RESTMethod setPUT(Object baseObject, String methodName) {
-		return setMethod((int)HttpRequestType.TYPE_PUT.value(), baseObject, methodName);
-	}
-	
-	/// Set a REST PUT with the given class array
-	public RESTMethod setPUT(Object baseObject, String methodName, Class<?> classArr) {
-		return setMethod((int)HttpRequestType.TYPE_PUT.value(), baseObject, methodName, classArr);
-	}
-	
-	/// Set the REST PUT default value
-	public RESTMethod setDefaultPUT(Map<String, ?> defMap, Object... defArg) {
-		return setDefault((int)HttpRequestType.TYPE_PUT.value(), defMap, defArg);
-	}
-	
-	/// Calls a REST PUT request with the map & array arguments
-	public Object requestPUT(Map<String, ?> reqObject, Object... reqArgs) {
-		return callMethod((int)HttpRequestType.TYPE_PUT.value(), reqObject, reqArgs);
-	}
-	
-	/// Calls a REST PUT request with the map arguments
-	public Object requestPUT(Map<String, ?> reqObject) {
-		return callMethod((int)HttpRequestType.TYPE_PUT.value(), reqObject, null);
-	}
-	
-	/// Calls a REST PUT request with the array arguments
-	public Object PUT(Object... reqArgs) {
-		return callMethod((int)HttpRequestType.TYPE_PUT.value(), null, reqArgs);
-	}
-	
-	/// Calls a REST PUT request without any arguments
-	public Object PUT() {
-		return callMethod((int)HttpRequestType.TYPE_PUT.value(), null, null);
-	}
-	
-	//---------------------------------------
-	// POST request handling
-	//---------------------------------------
-	
-	/// Sets a REST POST request
-	public RESTMethod setPOST(Object baseObject, Method baseMethod) {
-		return setMethod((int)HttpRequestType.TYPE_POST.value(), baseObject, baseMethod);
-	}
-	
-	/// Set a REST POST with just the method name
-	public RESTMethod setPOST(Object baseObject, String methodName) {
-		return setMethod((int)HttpRequestType.TYPE_POST.value(), baseObject, methodName);
-	}
-	
-	/// Set a REST POST with the given class array
-	public RESTMethod setPOST(Object baseObject, String methodName, Class<?> classArr) {
-		return setMethod((int)HttpRequestType.TYPE_POST.value(), baseObject, methodName, classArr);
-	}
-	
-	/// Set the REST POST default value
-	public RESTMethod setDefaultPOST(Map<String, ?> defMap, Object... defArg) {
-		return setDefault((int)HttpRequestType.TYPE_POST.value(), defMap, defArg);
-	}
-	
-	/// Calls a REST POST request with the map & array arguments
-	public Object requestPOST(Map<String, ?> reqObject, Object... reqArgs) {
-		return callMethod((int)HttpRequestType.TYPE_POST.value(), reqObject, reqArgs);
-	}
-	
-	/// Calls a REST POST request with the map arguments
-	public Object requestPOST(Map<String, ?> reqObject) {
-		return callMethod((int)HttpRequestType.TYPE_POST.value(), reqObject, null);
-	}
-	
-	/// Calls a REST POST request with the array arguments
-	public Object POST(Object... reqArgs) {
-		return callMethod((int)HttpRequestType.TYPE_POST.value(), null, reqArgs);
-	}
-	
-	/// Calls a REST POST request without any arguments
-	public Object POST() {
-		return callMethod((int)HttpRequestType.TYPE_POST.value(), null, null);
-	}
-	
-	//---------------------------------------
-	// DELETE request handling
-	//---------------------------------------
-	
-	/// Sets a REST DELETE request
-	public RESTMethod setDELETE(Object baseObject, Method baseMethod) {
-		return setMethod((int)HttpRequestType.TYPE_DELETE.value(), baseObject, baseMethod);
-	}
-	
-	/// Set a REST DELETE with just the method name
-	public RESTMethod setDELETE(Object baseObject, String methodName) {
-		return setMethod((int)HttpRequestType.TYPE_DELETE.value(), baseObject, methodName);
-	}
-	
-	/// Set a REST DELETE with the given class array
-	public RESTMethod setDELETE(Object baseObject, String methodName, Class<?> classArr) {
-		return setMethod((int)HttpRequestType.TYPE_DELETE.value(), baseObject, methodName, classArr);
-	}
-	
-	/// Set the REST DELETE default value
-	public RESTMethod setDefaultDELETE(Map<String, ?> defMap, Object... defArg) {
-		return setDefault((int)HttpRequestType.TYPE_DELETE.value(), defMap, defArg);
-	}
-	
-	/// Calls a REST DELETE request with the map & array arguments
-	public Object requestDELETE(Map<String, ?> reqObject, Object... reqArgs) {
-		return callMethod((int)HttpRequestType.TYPE_DELETE.value(), reqObject, reqArgs);
-	}
-	
-	/// Calls a REST DELETE request with the map arguments
-	public Object requestDELETE(Map<String, ?> reqObject) {
-		return callMethod((int)HttpRequestType.TYPE_DELETE.value(), reqObject, null);
-	}
-	
-	/// Calls a REST DELETE request with the array arguments
-	public Object DELETE(Object... reqArgs) {
-		return callMethod((int)HttpRequestType.TYPE_DELETE.value(), null, reqArgs);
-	}
-	
-	/// Calls a REST DELETE request without any arguments
-	public Object DELETE() {
-		return callMethod((int)HttpRequestType.TYPE_DELETE.value(), null, null);
-	}
-	
+	/// Internal call method, with the full request, and result
+	// public Map<String,Object> call(HttpRequestType type, Map<String,Object> reqMap) {
+	// 	return null;
+	// }
 }

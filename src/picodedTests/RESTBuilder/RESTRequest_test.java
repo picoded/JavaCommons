@@ -25,27 +25,12 @@ public class RESTRequest_test {
 	protected RESTRequest restObj = null;
 	
 	//-------------------------------
-	// Test methods to use as "API's"
-	//-------------------------------
-	
-	public static String hello() {
-		return "world";
-	}
-	
-	public static String echo(String a1) {
-		if (a1 != null && a1.length() > 0) {
-			return "echo: " + a1;
-		}
-		return null;
-	}
-	
-	//-------------------------------
 	// Test setup functions
 	//-------------------------------
 	
 	@Before
 	public void setUp() {
-		//restObj = new RESTRequest();
+		restObj = new RESTRequest();
 	}
 	
 	@After
@@ -56,33 +41,10 @@ public class RESTRequest_test {
 	//-------------------------------
 	// Basic sanity test
 	//-------------------------------
-	@Test
-	public void helloMethod() {
-		Method m = null;
-		try {
-			assertNotNull(m = RESTRequest_test.class.getMethod("hello"));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		
-		assertNotNull(restObj = new RESTRequest(this, m, false, null, null, null, null));
-		assertEquals("world", restObj.call());
-	}
 	
 	@Test
-	public void echoMethod() {
-		Method m = null;
-		try {
-			assertNotNull(m = RESTRequest_test.class.getMethod("echo", String.class));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		
-		assertNotNull(restObj = new RESTRequest(this, m, false, null, new Object[] { "one" }, null, null));
-		assertEquals("echo: one", restObj.call());
-		
-		assertNotNull(restObj = new RESTRequest(this, m, false, null, new Object[] { "one" }, null,
-			new Object[] { "two" }));
-		assertEquals("echo: two", restObj.call());
+	public void constructTest() {
+		assertNotNull(restObj);
 	}
+	
 }

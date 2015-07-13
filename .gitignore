@@ -20,5 +20,7 @@ test-files/libs/SimpleDB-Dev/*.pyc
 
 debug.txt
 
+*.log
+
 # XCode workspace
 **/xcuserdata/*

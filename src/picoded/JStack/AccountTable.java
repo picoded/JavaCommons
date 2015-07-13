@@ -262,8 +262,11 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 	/// Sets the cookie to be via https only
 	public boolean isSecureOnly = false;
 	
-	/// Sets the cookie to be via https only
+	/// Sets the cookie namespace prefix
 	public String cookiePrefix = "Account_";
+	
+	/// Sets teh cookie domain, defaults is null
+	public String cookieDomain = null;
 	
 	/// The nonce size
 	public int nonceSize = 22;
@@ -275,9 +278,10 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 	
 	/// Sets the session info with the given nonceSalt, IP, and browserAgent
 	protected String generateSession(String oid, int lifespan, String nonceSalt, String ipString, String browserAgent) {
-		String key = oid+"-"+NxtCrypt.randomString(nonceSize);
-		
-		return accountSessions.putWithLifespan( key, ConvertJSON.fromList( Arrays.asList(new String[] {nonceSalt, ipString, browserAgent}) ), lifespan );
+		String nonce = NxtCrypt.randomString(nonceSize);
+		String key = oid+"-"+nonce;
+		accountSessions.putWithLifespan( key, ConvertJSON.fromList( Arrays.asList(new String[] {nonceSalt, ipString, browserAgent}) ), lifespan );
+		return nonce;
 	}
 	
 	///
@@ -335,7 +339,7 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 			return null;
 		}
 		
-		if(puid.length() < 22 || containsID(puid) ) {
+		if(puid.length() < 22 || !containsID(puid) ) {
 			logoutAccount(request, response);
 			return null;
 		}
@@ -425,11 +429,16 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 			if(!rmberMe) { //set to clear on browser close
 				cookieJar[a].setMaxAge(noncLifetime);
 			}
+			
 			if(a < 4 && isHttpOnly) {
 				cookieJar[a].setHttpOnly(isHttpOnly);
 			}
 			if(isSecureOnly) {
 				cookieJar[a].setSecure(isSecureOnly);
+			}
+			
+			if(cookieDomain != null && cookieDomain.length() > 0) {
+				cookieJar[a].setDomain(cookieDomain);
 			}
 			
 			//Actually inserts the cookie
@@ -473,6 +482,10 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 			}
 			if(isSecureOnly) {
 				cookieJar[a].setSecure(isSecureOnly);
+			}
+			
+			if(cookieDomain != null && cookieDomain.length() > 0) {
+				cookieJar[a].setDomain(cookieDomain);
 			}
 			
 			//Actually inserts the cookie

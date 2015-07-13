@@ -1,0 +1,52 @@
+${MainContentPrefix}
+<style>
+   .ui-dialog .ui-dialog-titlebar-close span{
+    margin: -8px;
+   }
+</style>
+<div style="margin: 0 auto; width: 309px;">
+	<h2 class="loginInfo" style="text-align:center;">${LoginMsg}</h2>
+</div>
+${if NoLoginForm}
+${else}
+<div class="loginBox" style="width:600px; height:250px; position:relative;">
+	<form class="loginForm" method="post" id="loginform" style="position:relative; left:80px; top:50px;" AUTOCOMPLETE=OFF>
+		<div style="margin: 0px auto; width: 241px;">
+			<!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
+			<input style="display:none" type="text" name="fakeusernameremembered"/>
+			<input style="display:none" type="password" name="fakepasswordremembered"/>
+			
+			${if !sessionId}
+				<div class="fl" style="margin: 0px auto; width: 84px;">User Name:</div>
+				<input type="text" class="fl" placeholder="Username" required=""
+					   autofocus="" name="username" autocomplete="off" autocapitalize="off"/><br/><br/>
+				<div class="fl" style="margin: 0px auto; width: 84px;">Password:</div>
+				<input type="password" class="fl" placeholder="Password"
+					   required="" name="password" autocomplete="off" autocapitalize="off"/><br/><br/>
+			${end}
+			<!--
+			 <input class="fl" type="checkbox" name="remember" />
+			 <div class="fl" style="margin: 0px auto; width: 108px; padding-left: 9px;">Remember me</div>
+			 <br/><br/>-->
+			<div style="margin: 0px auto; width: 34px;">
+				<input type="submit" value="Login" name="Submit" />
+			</div>
+		</div>
+	</form>
+	<a style="position:absolute; right:25px; bottom:20px;">${loginContactInfo}</a>
+	<a style="position:absolute; right:25px; bottom:40px;font-size: 0.7em;">(Version: 1.0.60)</a>
+	<!--<a style="position:absolute; right:25px; bottom:20px;" href="./changeLog.html" target="_blank">Version: 1.0.59</a>-->
+</div>
+${end}
+<div id="browserWarning" title="Warning" style="display:none;">
+  <p>Sorry, but Codebox is not accessible through Internet Explorer 8 or below. Please access the site through a compatible browser like Chrome, Mozilla Firefox, Safari or Opera.</p>
+</div>
+<script>
+   var IE_NOT_SUPPORTED_VERSION = 8;
+   jQuery(document).ready(function() {
+      if ( $.browser.msie && parseInt($.browser.version) <= IE_NOT_SUPPORTED_VERSION ){
+         $( "#browserWarning" ).dialog({width: 530});
+      }
+   });
+</script>
+${MainContentSuffix}

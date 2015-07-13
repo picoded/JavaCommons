@@ -2,6 +2,7 @@ package picoded.servlet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.*;
 
 // Exceptions used
 import java.lang.RuntimeException;
@@ -64,7 +65,7 @@ import picoded.webUtils.HttpRequestType;
  * ---------------------------------------------------------------------------------------------------------
  *
  * ##[TODO]
- *
+ * + Websocket support?
  */
 public class CorePage extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
 	
@@ -84,19 +85,19 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	//-------------------------------------------
 	
 	/// GET type indicator
-//	static final byte TYPE_GET = 1;
-//	
-//	/// POST type indicator
-//	static final byte TYPE_POST = 2;
-//	
-//	/// PUT type indicator
-//	static final byte TYPE_PUT = 3;
-//	
-//	/// DELETE type indicator
-//	static final byte TYPE_DELETE = 4;
-//	
-//	/// OPTION type indicator
-//	static final byte TYPE_OPTION = 5;
+	//	static final byte TYPE_GET = 1;
+	//	
+	//	/// POST type indicator
+	//	static final byte TYPE_POST = 2;
+	//	
+	//	/// PUT type indicator
+	//	static final byte TYPE_PUT = 3;
+	//	
+	//	/// DELETE type indicator
+	//	static final byte TYPE_DELETE = 4;
+	//	
+	//	/// OPTION type indicator
+	//	static final byte TYPE_OPTION = 5;
 	
 	///////////////////////////////////////////////////////
 	//
@@ -110,6 +111,10 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// Request type indicator
 	//protected byte requestType = 0;
 	protected HttpRequestType requestType = null;
+	
+	public HttpRequestType getHttpRequestType() {
+		return requestType;
+	}
 	
 	/// The actual output stream used
 	protected OutputStream responseOutputStream = null;
@@ -131,6 +136,14 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// httpResponse used [modification of this value, is highly discouraged]
 	protected HttpServletResponse httpResponse = null;
+	
+	public HttpServletRequest getHttpServletRequest() {
+		return httpRequest;
+	}
+	
+	public HttpServletResponse getHttpServletResponse() {
+		return httpResponse;
+	}
 	
 	// Independent instance variables
 	//-------------------------------------------
@@ -260,7 +273,9 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		httpRequest = req;
 		httpResponse = res;
 		
-		requestParameters = RequestMap.fromStringArrayValueMap( httpRequest.getParameterMap() );
+		// @TODO: To use IOUtils.buffer for inputstream of httpRequest / parameterMap
+		// THIS IS CRITICAL, for the POST request in proxyServlet to work
+		//requestParameters = RequestMap.fromStringArrayValueMap( httpRequest.getParameterMap() );
 		
 		try {
 			responseOutputStream = httpResponse.getOutputStream();
@@ -274,10 +289,21 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// Spawn and instance of the current class
 	public final CorePage spawnInstance() throws ServletException { //, OutputStream outStream
 		try {
-			return this.getClass().newInstance();
-		} catch(InstantiationException e) {
+			Class<? extends CorePage> pageClass = this.getClass();
+			CorePage ret = pageClass.newInstance();
+			pageClass.cast(ret).initSetup( this, this.getServletConfig() );
+			
+			return ret;
+		} catch(Exception e) {
 			throw new ServletException(e);
-		} catch(IllegalAccessException e) {
+		}
+	}
+	
+	/// To be over-ridden
+	public void initSetup( CorePage original, ServletConfig servletConfig ) throws ServletException {
+		try {
+			init( getServletConfig() );
+		} catch(Exception e) {
 			throw new ServletException(e);
 		}
 	}
@@ -352,14 +378,11 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		// Does setup
 		doSetup();
 		
-		// Does authentication check
-		if( ret = doAuth(templateDataObj) ) {
-			// is JSON request?
-			if( isJsonRequest() ) {
-				ret = processChainJSON();
-			} else { // or as per normal
-				ret = processChainRequest();
-			}
+		// is JSON request?
+		if( isJsonRequest() ) {
+			ret = processChainJSON();
+		} else { // or as per normal
+			ret = processChainRequest();
 		}
 		
 		// Does teardwon
@@ -371,70 +394,88 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// The process chain part specific to a normal request
 	private boolean processChainRequest() throws ServletException {
-		if( !doRequest(templateDataObj) ) {
-			return false;
+		try {
+			// Does authentication check
+			if(!doAuth(templateDataObj) ) {
+				return false;
+			}
+			
+			// Does for all requests
+			if( !doRequest(templateDataObj) ) {
+				return false;
+			}
+			boolean ret = true;
+			
+			// Switch is used over if,else for slight compiler optimization
+			// http://stackoverflow.com/questions/6705955/why-switch-is-faster-than-if
+			//
+			// HttpRequestType reqTypeAsEnum = HttpRequestType(requestType);
+			switch (requestType) {
+				case TYPE_GET:
+					ret = doGetRequest(templateDataObj);
+					break;
+				case TYPE_POST:
+					ret = doPostRequest(templateDataObj);
+					break;
+				case TYPE_PUT:
+					ret = doPutRequest(templateDataObj);
+					break;
+				case TYPE_DELETE:
+					ret = doDeleteRequest(templateDataObj);
+					break;
+			}
+			
+			if(ret) {
+				outputRequest(templateDataObj, getWriter());
+			}
+			
+			return ret;
+		} catch(Exception e) {
+			return outputRequestException(templateDataObj, getWriter(), e);
 		}
-		
-		boolean ret = true;
-		
-		// Switch is used over if,else for slight compiler optimization
-		// http://stackoverflow.com/questions/6705955/why-switch-is-faster-than-if
-		//
-		//HttpRequestType reqTypeAsEnum = HttpRequestType(requestType);
-		
-		switch (requestType) {
-			case TYPE_GET:
-				ret = doGetRequest(templateDataObj);
-				break;
-			case TYPE_POST:
-				ret = doPostRequest(templateDataObj);
-				break;
-			case TYPE_PUT:
-				ret = doPutRequest(templateDataObj);
-				break;
-			case TYPE_DELETE:
-				ret = doDeleteRequest(templateDataObj);
-				break;
-		}
-		
-		if(ret) {
-			outputRequest(templateDataObj, getWriter());
-		}
-		
-		return ret;
 	}
 	
 	/// The process chain part specific to JSON request
 	private boolean processChainJSON() throws ServletException {
-		if( !doJSON(jsonDataObj, templateDataObj) ) {
-			return false;
+		try {
+			// Does authentication check
+			if(!doAuth(templateDataObj) ) {
+				return false;
+			}
+			
+			// Does for all JSON
+			if( !doJSON(jsonDataObj, templateDataObj) ) {
+				return false;
+			}
+			
+			boolean ret = true;
+			
+			// Switch is used over if,else for slight compiler optimization
+			// http://stackoverflow.com/questions/6705955/why-switch-is-faster-than-if
+			//
+			switch (requestType) {
+				case TYPE_GET:
+					ret = doGetJSON(jsonDataObj, templateDataObj);
+					break;
+				case TYPE_POST:
+					ret = doPostJSON(jsonDataObj, templateDataObj);
+					break;
+				case TYPE_PUT:
+					ret = doPutJSON(jsonDataObj, templateDataObj);
+					break;
+				case TYPE_DELETE:
+					ret = doDeleteJSON(jsonDataObj, templateDataObj);
+					break;
+			}
+			
+			if(ret) {
+				outputJSON(jsonDataObj, templateDataObj, getWriter());
+			}
+			
+			return ret;
+		} catch(Exception e) {
+			return outputJSONException(jsonDataObj, templateDataObj, getWriter(), e);
 		}
-		
-		boolean ret = true;
-		
-		// Switch is used over if,else for slight compiler optimization
-		// http://stackoverflow.com/questions/6705955/why-switch-is-faster-than-if
-		//
-		switch (requestType) {
-			case TYPE_GET:
-				ret = doGetJSON(jsonDataObj, templateDataObj);
-				break;
-			case TYPE_POST:
-				ret = doPostJSON(jsonDataObj, templateDataObj);
-				break;
-			case TYPE_PUT:
-				ret = doPutJSON(jsonDataObj, templateDataObj);
-				break;
-			case TYPE_DELETE:
-				ret = doDeleteJSON(jsonDataObj, templateDataObj);
-				break;
-		}
-		
-		if(ret) {
-			outputJSON(jsonDataObj, templateDataObj, getWriter());
-		}
-		
-		return ret;
 	}
 	
 	///////////////////////////////////////////////////////
@@ -459,7 +500,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// [To be extended by sub class, if needed]
 	/// Does the needed page request authentication, page redirects (if needed), and so forth. Should not do any actual,
 	/// output processing. Returns true to continue process chian (default) or false to terminate the process chain.
-	public boolean doAuth(Map<String,Object> templateData) throws ServletException {
+	public boolean doAuth(Map<String,Object> templateData) throws Exception {
 		return true;
 	}
 	
@@ -468,38 +509,48 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the required page request processing, this is used if both post / get behaviour is consistent
-	public boolean doRequest(Map<String,Object> templateData) throws ServletException {
+	public boolean doRequest(Map<String,Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the required page GET processing, AFTER doRequest
-	public boolean doGetRequest(Map<String,Object> templateData) throws ServletException {
+	public boolean doGetRequest(Map<String,Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the required page POST processing, AFTER doRequest
-	public boolean doPostRequest(Map<String,Object> templateData) throws ServletException {
+	public boolean doPostRequest(Map<String,Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the required page PUT processing, AFTER doRequest
-	public boolean doPutRequest(Map<String,Object> templateData) throws ServletException {
+	public boolean doPutRequest(Map<String,Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the required page DELETE processing, AFTER doRequest
-	public boolean doDeleteRequest(Map<String,Object> templateData) throws ServletException {
+	public boolean doDeleteRequest(Map<String,Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the output processing, this is after do(Post/Get/Put/Delete)Request
-	public boolean outputRequest(Map<String,Object> templateData, PrintWriter output) throws ServletException {
+	public boolean outputRequest(Map<String,Object> templateData, PrintWriter output) throws Exception {
 		return true;
+	}
+	
+	/// Exception handler for the request stack
+	///
+	/// note that this should return false, or throw a ServletException, UNLESS the exception was gracefully handled.
+	/// which in most cases SHOULD NOT be handled here.
+	public boolean outputRequestException(Map<String,Object> templateData, PrintWriter output, Exception e) throws ServletException {
+		// Throws a runtime Exception, let the servlet manager handle the rest
+		throw new ServletException(e);
+		//return false;
 	}
 	
 	// JSON request handling
@@ -507,31 +558,31 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws ServletException {
+	public boolean doJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doGetJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws ServletException {
+	public boolean doGetJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doPostJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws ServletException {
+	public boolean doPostJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doPutJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws ServletException {
+	public boolean doPutJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doDeleteJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws ServletException {
+	public boolean doDeleteJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
 		return true;
 	}
 	
@@ -546,6 +597,28 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		// Output the data
 		output.println( ConvertJSON.fromObject( outputData ) );
 		return true;
+	}
+	
+	/// Exception handler for the request stack
+	///
+	/// note that this should return false, UNLESS the exception was gracefully handled.
+	/// which in most cases SHOULD NOT be handled here.
+	public boolean outputJSONException(Map<String,Object> outputData, Map<String,Object> templateData, PrintWriter output, Exception e) throws ServletException  {
+		// Converts the stack trace to a string
+		String stackTrace = org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e);
+		
+		// Performs a stack trace, and returns it in a JSON object
+		Map<String,String> ret = new HashMap<String,String>();
+		ret.put("ERROR", stackTrace);
+		
+		// Set content type to JSON
+		if(httpResponse != null) {
+			httpResponse.setContentType("application/javascript");
+		}
+		
+		// Output the data
+		output.println( ConvertJSON.fromObject( ret ) );
+		return false;
 	}
 	
 	///////////////////////////////////////////////////////
@@ -582,6 +655,11 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	@Override
 	public final void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		spawnInstance().setupInstance(HttpRequestType.TYPE_OPTION.value(), request, response).processChain();
+		try {
+				super.doOptions(request,response);
+		} catch(Exception e) {
+			throw new ServletException(e);
+		}
 	}
 	
 }

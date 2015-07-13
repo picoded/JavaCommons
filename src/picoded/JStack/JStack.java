@@ -63,15 +63,21 @@ public class JStack extends JStackLayer {
 	//----------------------------------------------
 	
 	public MetaTable getMetaTable(String tableName) {
-		return new MetaTable(this, tableName);
+		MetaTable r = new MetaTable(this, tableName);
+		cachedMetaTable.put(tableName, r);
+		return r;
 	}
 	
 	public KeyValueMap getKeyValueMap(String tableName) {
-		return new KeyValueMap(this, tableName);
+		KeyValueMap r = new KeyValueMap(this, tableName);
+		cachedKeyValueMap.put(tableName, r);
+		return r;
 	}
 	
 	public AccountTable getAccountTable(String tableName) {
-		return new AccountTable(this, tableName);
+		AccountTable r = new AccountTable(this, tableName);
+		cachedAccountTable.put(tableName, r);
+		return r;
 	}
 	
 	//----------------------------------------------
@@ -90,7 +96,7 @@ public class JStack extends JStackLayer {
 	}
 	
 	/// This does the setup called on all the cached tables, created via get calls
-	public void setup() throws JStackException {
+	public void stackSetup() throws JStackException {
 		List< CaseInsensitiveHashMap<String,JStackData> > l =  JStackData_stack();
 		for (CaseInsensitiveHashMap<String,JStackData> m : l) {
 			for (Map.Entry<String, JStackData> e : m.entrySet()) {

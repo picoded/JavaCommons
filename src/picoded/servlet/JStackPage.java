@@ -69,7 +69,8 @@ public class JStackPage extends CorePage {
 	public String _classesPath = null;
 	public String _libraryPath = null;
 	public String _configsPath = null;
-	public String _pagesPath = null;
+	public String _pagesTemplatePath = null;
+	public String _pagesOutputPath = null;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -82,7 +83,11 @@ public class JStackPage extends CorePage {
 		if (_contextPath != null) {
 			return _contextPath;
 		} else {
+<<<<<<< HEAD
 			return (_contextPath = (super.getServletContext()).getRealPath("/") + "/");
+=======
+			return (_contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/");
+>>>>>>> 1725b1dbb3d2905c94f475aa6658ae062ebe23f3
 		}
 	}
 	
@@ -99,11 +104,23 @@ public class JStackPage extends CorePage {
 	}
 	
 	public String getConfigsPath() {
+<<<<<<< HEAD
 		return (_libraryPath != null) ? _libraryPath : (_libraryPath = getWebInfPath() + "configs/");
 	}
 	
 	public String getPagesPath() {
 		return (_pagesPath != null) ? _pagesPath : (_pagesPath = getWebInfPath() + "pages/");
+=======
+		return (_configsPath != null) ? _configsPath : (_configsPath = getWebInfPath() + "configs/");
+	}
+	
+	public String getPagesTemplatePath() {
+		return (_pagesTemplatePath != null) ? _pagesTemplatePath : (_pagesTemplatePath = getWebInfPath() + "pages/");
+	}
+	
+	public String getPagesOutputPath() {
+		return (_pagesOutputPath != null) ? _pagesOutputPath : (_pagesOutputPath = getContextPath() + "pages/");
+>>>>>>> 1725b1dbb3d2905c94f475aa6658ae062ebe23f3
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,12 +166,12 @@ public class JStackPage extends CorePage {
 	////////////////////////////////////////////////////
 	// tableSetup calls for various jSql based modules
 	////////////////////////////////////////////////////
-	public void JStackSetup() throws JStackException {
-		JStack().setup();
+	public void stackSetup() throws JStackException {
+		JStack().stackSetup();
 	}
 	
 	/// Called once when initialized, to purge all existing data.
-	public void JStackTeardown() throws JStackException {
+	public void stackTeardown() throws JStackException {
 		JStack().teardown();
 	}
 	

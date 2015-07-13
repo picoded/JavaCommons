@@ -83,11 +83,7 @@ public class JStackPage extends CorePage {
 		if (_contextPath != null) {
 			return _contextPath;
 		} else {
-<<<<<<< HEAD
-			return (_contextPath = (super.getServletContext()).getRealPath("/") + "/");
-=======
 			return (_contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/");
->>>>>>> 1725b1dbb3d2905c94f475aa6658ae062ebe23f3
 		}
 	}
 	
@@ -104,13 +100,6 @@ public class JStackPage extends CorePage {
 	}
 	
 	public String getConfigsPath() {
-<<<<<<< HEAD
-		return (_libraryPath != null) ? _libraryPath : (_libraryPath = getWebInfPath() + "configs/");
-	}
-	
-	public String getPagesPath() {
-		return (_pagesPath != null) ? _pagesPath : (_pagesPath = getWebInfPath() + "pages/");
-=======
 		return (_configsPath != null) ? _configsPath : (_configsPath = getWebInfPath() + "configs/");
 	}
 	
@@ -120,7 +109,6 @@ public class JStackPage extends CorePage {
 	
 	public String getPagesOutputPath() {
 		return (_pagesOutputPath != null) ? _pagesOutputPath : (_pagesOutputPath = getContextPath() + "pages/");
->>>>>>> 1725b1dbb3d2905c94f475aa6658ae062ebe23f3
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////

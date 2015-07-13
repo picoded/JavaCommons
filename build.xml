@@ -29,6 +29,10 @@
 		<classpath refid="junit-path"/>
     </taskdef>
     
+	<!-- One-JAR -->
+	<taskdef name="one-jar" classname="com.simontuffs.onejar.ant.OneJarTask" 
+        classpath="./build-tools/one-jar/one-jar-ant-task-0.97.jar" onerror="report"/>
+	
 	<!-- **************************************************
 	The following lists the target sets supported by ant
 	
@@ -119,16 +123,44 @@
 	<target name="build" depends="compile-src">
 		<delete dir="bin/build" failonerror="false"/>
 		<mkdir dir="bin/build"/>
-		<jar destfile="bin/build/picodedJavaCommons-libsOnly.jar">
-			<fileset dir="${build-lib}" includes="*.jar" />
-		</jar>
-		<jar destfile="bin/build/picodedJavaCommons-withLibs.jar">
-			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
-			<fileset dir="${build-lib}" includes="*.jar" />
-		</jar>
+
+		<!-- no libs -->
 		<jar destfile="bin/build/picodedJavaCommons-noLibs.jar">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 		</jar>
+
+		<!-- libs only -->
+		<jar destfile="bin/build/picodedJavaCommons-libsOnly-main.jar">
+			<fileset dir="${build-lib}" includes="*.jar" />
+		</jar>
+
+		<!-- with libs -->
+		<jar destfile="bin/build/picodedJavaCommons-withLibs-main.jar">
+			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
+			<fileset dir="${build-lib}" includes="*.jar" />
+		</jar>
+		
+		<!-- Construct the One-JAR file for libs only -->
+		<one-jar destfile="bin/build/picodedJavaCommons-libsOnly.jar">
+			<main jar="bin/build/picodedJavaCommons-libsOnly-main.jar">
+			</main>
+			<lib>
+				<fileset dir="${lib.dir}" />
+			</lib>
+		</one-jar>
+
+		<!-- Construct the One-JAR file with libs -->
+		<one-jar destfile="bin/build/picodedJavaCommons-withLibs.jar">
+			<main jar="bin/build/picodedJavaCommons-withLibs-main.jar">
+			</main>
+			<lib>
+				<fileset dir="${lib.dir}" />
+			</lib>
+		</one-jar>
+		
+		<!-- Delete main jar files -->
+		<delete file="bin/build/picodedJavaCommons-libsOnly-main.jar"/>
+		<delete file="bin/build/picodedJavaCommons-withLibs-main.jar"/>
 	</target>
 	
 	<target name="javadoc" depends="compile-lib">
@@ -212,30 +244,4 @@
 	<target name="source" depends="compile-src">
 	</target>
 	
-	<!-- One-JAR -->
-	<taskdef name="one-jar" classname="com.simontuffs.onejar.ant.OneJarTask" 
-        classpath="lib-organized/one-jar/one-jar-ant-task-0.97.jar" onerror="report"/>
-	
-	<!-- One-JAR -->
-	<target name="onejar" depends="build">
-
-		<!-- Construct the One-JAR file -->
-		<one-jar destfile="bin/build/picodedJavaCommons-libsOnly-onejar.jar">
-			<main jar="bin/build/picodedJavaCommons-libsOnly.jar">
-			</main>
-			<lib>
-				<fileset dir="${lib.dir}" />
-			</lib>
-		</one-jar>
-
-		<one-jar destfile="bin/build/picodedJavaCommons-withLibs-onejar.jar">
-			<main jar="bin/build/picodedJavaCommons-withLibs.jar">
-			</main>
-			<lib>
-				<fileset dir="${lib.dir}" />
-			</lib>
-		</one-jar>
-
-	</target>
-
 </project>

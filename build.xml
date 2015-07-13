@@ -212,4 +212,30 @@
 	<target name="source" depends="compile-src">
 	</target>
 	
+	<!-- One-JAR -->
+	<taskdef name="one-jar" classname="com.simontuffs.onejar.ant.OneJarTask" 
+        classpath="lib-organized/one-jar/one-jar-ant-task-0.97.jar" onerror="report"/>
+	
+	<!-- One-JAR -->
+	<target name="onejar" depends="build">
+
+		<!-- Construct the One-JAR file -->
+		<one-jar destfile="bin/build/picodedJavaCommons-libsOnly-onejar.jar">
+			<main jar="bin/build/picodedJavaCommons-libsOnly.jar">
+			</main>
+			<lib>
+				<fileset dir="${lib.dir}" />
+			</lib>
+		</one-jar>
+
+		<one-jar destfile="bin/build/picodedJavaCommons-withLibs-onejar.jar">
+			<main jar="bin/build/picodedJavaCommons-withLibs.jar">
+			</main>
+			<lib>
+				<fileset dir="${lib.dir}" />
+			</lib>
+		</one-jar>
+
+	</target>
+
 </project>

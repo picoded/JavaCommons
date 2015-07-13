@@ -81,6 +81,7 @@ public class ProxyServlet_test extends RequestHttp_test {
 		
 		ProxyServlet ws_proxy = new ProxyServlet();
 		ws_proxy.setProxyHost("echo.websocket.org");
+		ws_proxy.setProxyScheme("wss");
 		
 		ws_tomcat = new EmbeddedServlet("", context)
 		.withPort(16001)

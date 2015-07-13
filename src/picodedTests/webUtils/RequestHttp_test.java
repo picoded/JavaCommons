@@ -76,36 +76,36 @@ public class RequestHttp_test {
 		//wsObj = new RequestHttp();
 	}
 	
-	//@Test @SuppressWarnings("unchecked")
-//	public void GET_basicTest() throws IOException {
-//		System.out.println("Runnin GET_basicTest");
-//		ResponseHttp res = null;
-//		Map<String,Object> resMap = null;
-//		
-//		assertNotNull( res = RequestHttp.get(httpBinURL()+"/get?hello=world") );
-//		assertNotNull( resMap = res.toMap() );
-//		
-//		assertEquals( 200, res.statusCode() );
-//		assertEquals( "world", ((Map<String,Object>)(resMap.get("args"))).get("hello") );
-//	}
+	@Test @SuppressWarnings("unchecked")
+	public void GET_basicTest() throws IOException {
+		System.out.println("Runnin GET_basicTest");
+		ResponseHttp res = null;
+		Map<String,Object> resMap = null;
+		
+		assertNotNull( res = RequestHttp.get(httpBinURL()+"/get?hello=world") );
+		assertNotNull( resMap = res.toMap() );
+		
+		assertEquals( 200, res.statusCode() );
+		assertEquals( "world", ((Map<String,Object>)(resMap.get("args"))).get("hello") );
+	}
 	
-//	@Test @SuppressWarnings("unchecked")
-//	public void GET_headerTest() throws IOException {
-//		ResponseHttp resWithHeaders = null;
-//		Map<String, String> headerMap = null;
-//		
-//		headerMap = new HashMap<String, String>();
-//		headerMap.put("Testkey", "testValue");
-//		
-//		assertNotNull(resWithHeaders = RequestHttp.get(httpBinURL()+"/headers", headerMap));
-//		System.out.println(resWithHeaders.getHeaders());
-//		System.out.println(resWithHeaders.toString());
-//
-//		assertEquals( "testValue", ((Map<String,Object>)(resWithHeaders.toMap().get("headers"))).get("Testkey") );
-//		//assertEquals( "testValue", resWithHeaders.getHeaders().get("testKey") );
-//	}
+	@Test @SuppressWarnings("unchecked")
+	public void GET_headerTest() throws IOException {
+		ResponseHttp resWithHeaders = null;
+		Map<String, String> headerMap = null;
+		
+		headerMap = new HashMap<String, String>();
+		headerMap.put("Testkey", "testValue");
+		
+		assertNotNull(resWithHeaders = RequestHttp.get(httpBinURL()+"/headers", headerMap));
+		System.out.println(resWithHeaders.getHeaders());
+		System.out.println(resWithHeaders.toString());
+
+		assertEquals( "testValue", ((Map<String,Object>)(resWithHeaders.toMap().get("headers"))).get("Testkey") );
+		//assertEquals( "testValue", resWithHeaders.getHeaders().get("testKey") );
+	}
 	
-//	@Test 
+	@Test 
 	public void GET_statusTest() throws IOException {
 		System.out.println("Running GET_statusTest");
 		ResponseHttp res = null;

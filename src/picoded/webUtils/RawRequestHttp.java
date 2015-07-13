@@ -141,8 +141,12 @@ public class RawRequestHttp {
 		}
 		try {
 			return (inStream = urlConnection.getInputStream());
-		} catch(Exception e) {
-			throw new RuntimeException(e);
+		} catch(IOException e) {
+			try {
+				return (inStream = urlConnection.getErrorStream());
+			} catch(Exception e2 ) {
+				throw new RuntimeException(e2);
+			}
 		}
 	}
 	

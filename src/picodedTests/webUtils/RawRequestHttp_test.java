@@ -100,17 +100,16 @@ public class RawRequestHttp_test {
 		
 		assertNotNull(reqObj = (new RawRequestHttp(httpBinURL()+"/get?hello=world")).setHeaderMap(headerMap).connect() );
 
-		assertEquals( "testValue", ((Map<String,List<String>>)(reqObj.toMap().get("headers"))).get("Testkey") );
+		assertEquals( "testValue", ((Map<String,String>)(reqObj.toMap().get("headers"))).get("Testkey") );
 		//assertEquals( "testValue", resWithHeaders.getHeaders().get("testKey") );
 	}
 	
 	@Test 
 	public void GET_statusTest() throws IOException {
-		ResponseHttp res = null;
-		assertNotNull( res = RequestHttp.get(httpBinURL()+"/status/418") );
-		assertEquals( 418, res.statusCode() );
+		assertNotNull( reqObj = (new RawRequestHttp(httpBinURL()+"/status/418")).connect() );
+		assertEquals( 418, reqObj.statusCode() );
 	}
-// 
+	
 // 	// @Test @SuppressWarnings("unchecked")
 // 	// public void GET_stream100() throws IOException {
 // 	// 	System.out.println("Runnin GET_stream20");

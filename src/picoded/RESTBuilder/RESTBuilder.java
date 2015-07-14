@@ -19,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.lang3.StringUtils;
 
+import picoded.enums.HttpRequestType;
 /**
  * picoded.servlet.RESTBuilder is a servlet utility class, in which facilitates the building of "RESTful API's"
  * that can be used in the project either via a public API, or even internally, via a direct function call.
@@ -55,10 +56,13 @@ import org.apache.commons.lang3.StringUtils;
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  **/
-public class RESTBuilder extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
+public class RESTBuilder {
 	
 	/// Build warning suppression
 	static final long serialVersionUID = 1L;
+	
+	/// RESTBuilder HttpRequestType enum access
+	public static class RequestTypeSet extends picoded.enums.HttpRequestType.HttpRequestTypeSet {};
 	
 	/// Blank constructor
 	public RESTBuilder() {
@@ -69,23 +73,35 @@ public class RESTBuilder extends javax.servlet.http.HttpServlet implements javax
 	///----------------------------------------
 	
 	/// Stores the various methods currently in place of the RESTBuilder
-	protected HashMap<String, RESTMethod> methodMap = new HashMap<String, RESTMethod>();
+	protected Map<String, RESTNamespace> methodMap = new HashMap<String, RESTNamespace>();
 	
-	/// Gets the api RESTMethod, to add the respetive GET/PUT/POST/DELETE calls
-	public RESTMethod apiMethod(String namespace) {
+	/// Gets the api RESTNamespace, to add the respetive GET/PUT/POST/DELETE calls
+	public RESTNamespace apiMethod(String namespace) {
 		return apiMethod(namespace.replaceAll(".", "/").split("/"));
 	}
 	
-	/// Gets the api RESTMethod, to add the respetive GET/PUT/POST/DELETE calls
-	public RESTMethod apiMethod(String[] namespace) {
-		String storeStr = StringUtils.join(namespace, "/");
+	/// Gets the api RESTNamespace, to add the respetive GET/PUT/POST/DELETE calls
+	public RESTNamespace apiMethod(String[] namespace) {
+		String storeStr = StringUtils.join(namespace, "/").split("?")[0]; //Remove the trailing GET paramters if its given
 		
-		RESTMethod m = methodMap.get(storeStr);
+		RESTNamespace m = methodMap.get(storeStr);
 		if (m == null) {
-			m = new RESTMethod(storeStr);
+			m = new RESTNamespace(storeStr);
 			methodMap.put(storeStr, m);
 		}
 		return m;
 	}
 	
+	/// Calls the API method with a query string
+	public Map<String,Object> call(String apiNamespace, HttpRequestType requestType, Map<String,Object> requestMap, Map<String,Object> resultMap) {
+		return null;
+	}
+	
+	public Map<String,Object> servletCall(String apiNamespace, picoded.servlet.CorePage page, Map<String,Object> resultMap) {
+		return null;
+	}
+	
+	public Map<String,Object> servletCall(picoded.servlet.CorePage page, Map<String,Object> resultMap) {
+		return null;
+	}
 }

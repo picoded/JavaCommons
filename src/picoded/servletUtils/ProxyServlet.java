@@ -11,7 +11,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletConfig;
+import javax.servlet.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -397,7 +397,7 @@ public class ProxyServlet extends CorePage {
 	public boolean proxyCorePageRequest(CorePage page) throws ServletException {
 		
 		try {
-			HttpRequestType rType = page.getHttpRequestType();
+			HttpRequestType rType = HttpRequestType.getCorrectHttpRequestType( picoded.enums.HttpRequestType.enumToByte(page.requestType()) );
 			HttpServletRequest sReq = page.getHttpServletRequest();
 			HttpServletResponse sRes = page.getHttpServletResponse();
 			

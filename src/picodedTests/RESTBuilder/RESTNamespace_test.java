@@ -15,18 +15,16 @@ import picodedTests.JCache.LocalCacheSetup;
 import java.util.*;
 import java.lang.reflect.*;
 
-public class RESTBuilder_test {
+import picoded.enums.HttpRequestType;
+
+public class RESTNamespace_test {
 	
 	//-------------------------------
 	// Test variables
 	//-------------------------------
 	
 	/// Base RESTBuilder object to test on, automatic setup
-	protected RESTBuilder restObj = null;
-	
-	//-------------------------------
-	// Test methods to use as "API's"
-	//-------------------------------
+	protected RESTNamespace restObj = null;
 
 	/// Test hello echo function
 	protected RESTFunction helloFunction = (req,res) -> {
@@ -45,7 +43,7 @@ public class RESTBuilder_test {
 	
 	@Before
 	public void setUp() {
-		restObj = new RESTBuilder();
+		restObj = new RESTNamespace("test");
 	}
 	
 	@After
@@ -63,17 +61,27 @@ public class RESTBuilder_test {
 	}
 	
 	@Test
-	public void helloMethod() {
-		restObj.apiMethod("hello.world").put(RESTBuilder.RequestTypeSet.GET, helloFunction );
+	public void equalityTest() {
+		HttpRequestType a = RESTBuilder.RequestTypeSet.GET;
+		HttpRequestType b = RESTBuilder.RequestTypeSet.GET;
+		HttpRequestType c = RESTBuilder.RequestTypeSet.POST;
 		
-		Map<String, Object> ret = restObj.apiMethod("hello.world").call(RESTBuilder.RequestTypeSet.GET);
+		assertEquals(a, b);
+		assertNotEquals(a, c);
+	}
+	
+	@Test
+	public void helloMethod() {
+		restObj.put(RESTBuilder.RequestTypeSet.GET, helloFunction );
+		
+		Map<String, Object> ret = restObj.call(RESTBuilder.RequestTypeSet.GET);
 		
 		Map<String, Object> retCheck = new HashMap<String, Object>();
 		retCheck.put("hello","world");
 		assertEquals( retCheck, ret );
 		
 		retCheck.put("echo", "echo");
-		ret = restObj.apiMethod("hello.world").call(RESTBuilder.RequestTypeSet.GET, retCheck);
+		ret = restObj.call(RESTBuilder.RequestTypeSet.GET, retCheck);
 		assertEquals( retCheck, ret );
 	}
 	

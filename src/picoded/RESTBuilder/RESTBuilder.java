@@ -47,11 +47,11 @@ import picoded.enums.HttpRequestType;
  *
  * // Setting up a method in the RESTBuilder
  * RESTBuilder r = new RESTBuilder()
- * r.apiMethod("test.hello").setGET( this, "helloWorld" );
+ * r.getNamespace("test.hello").setGET( this, "helloWorld" );
  *
  * // Calling the api method
- * r.apiMethod("test.hello").GET("world"); // "hello world"
- * r.apiMethod("test.hello").GET(); // "hello no one"
+ * r.getNamespace("test.hello").GET("world"); // "hello world"
+ * r.getNamespace("test.hello").GET(); // "hello no one"
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
@@ -69,35 +69,61 @@ public class RESTBuilder {
 	}
 	
 	///----------------------------------------
-	/// Method adding / handling
+	/// Namespace adding / handling
 	///----------------------------------------
 	
 	/// Stores the various methods currently in place of the RESTBuilder
-	protected Map<String, RESTNamespace> methodMap = new HashMap<String, RESTNamespace>();
+	protected Map<String, RESTNamespace> namespaceMap = new HashMap<String, RESTNamespace>();
 	
-	/// Gets the api RESTNamespace, to add the respetive GET/PUT/POST/DELETE calls
-	public RESTNamespace apiMethod(String namespace) {
-		return apiMethod(namespace.replaceAll(".", "/").split("/"));
+	/// Has api namespace check
+	public boolean hasNamespace(String namespace) {
+		return hasNamespace(namespace.replaceAll(".", "/").split("/"));
+	}
+	
+	/// Has api namespace check
+	public boolean hasNamespace(String[] namespace) {
+		String storeStr = StringUtils.join(namespace, "/"); //Filters the trailing GET paramters if its given
+		return (namespaceMap.get(storeStr) != null);
 	}
 	
 	/// Gets the api RESTNamespace, to add the respetive GET/PUT/POST/DELETE calls
-	public RESTNamespace apiMethod(String[] namespace) {
-		String storeStr = StringUtils.join(namespace, "/").split("?")[0]; //Remove the trailing GET paramters if its given
+	public RESTNamespace getNamespace(String namespace) {
+		return getNamespace(namespace.replaceAll(".", "/").split("/"));
+	}
+	
+	/// Gets the api RESTNamespace, to add the respetive GET/PUT/POST/DELETE calls. Note this GENERATES one if it does not exists
+	public RESTNamespace getNamespace(String[] namespace) {
+		String storeStr = StringUtils.join(namespace, "/"); //Filters the trailing GET paramters if its given
 		
-		RESTNamespace m = methodMap.get(storeStr);
+		RESTNamespace m = namespaceMap.get(storeStr);
 		if (m == null) {
 			m = new RESTNamespace(storeStr);
-			methodMap.put(storeStr, m);
+			namespaceMap.put(storeStr, m);
 		}
 		return m;
 	}
 	
+	///----------------------------------------
+	/// Utility function
+	///----------------------------------------
+	
+	
+	
+	///----------------------------------------
+	/// API calling function
+	///----------------------------------------
+	
 	/// Calls the API method with a query string
 	public Map<String,Object> call(String apiNamespace, HttpRequestType requestType, Map<String,Object> requestMap, Map<String,Object> resultMap) {
+		
+		
+		
+		//.split("?")[0]
+		
 		return null;
 	}
 	
-	public Map<String,Object> servletCall(String apiNamespace, picoded.servlet.CorePage page, Map<String,Object> resultMap) {
+	public Map<String,Object> servletCall(String prefixNamespace, picoded.servlet.CorePage page, Map<String,Object> resultMap) {
 		return null;
 	}
 	

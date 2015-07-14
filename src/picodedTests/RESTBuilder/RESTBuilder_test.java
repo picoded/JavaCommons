@@ -64,16 +64,16 @@ public class RESTBuilder_test {
 	
 	@Test
 	public void helloMethod() {
-		restObj.apiMethod("hello.world").put(RESTBuilder.RequestTypeSet.GET, helloFunction );
+		restObj.getNamespace("hello.world").put(RESTBuilder.RequestTypeSet.GET, helloFunction );
 		
-		Map<String, Object> ret = restObj.apiMethod("hello.world").call(RESTBuilder.RequestTypeSet.GET);
+		Map<String, Object> ret = restObj.getNamespace("hello.world").call(RESTBuilder.RequestTypeSet.GET);
 		
 		Map<String, Object> retCheck = new HashMap<String, Object>();
 		retCheck.put("hello","world");
 		assertEquals( retCheck, ret );
 		
 		retCheck.put("echo", "echo");
-		ret = restObj.apiMethod("hello.world").call(RESTBuilder.RequestTypeSet.GET, retCheck);
+		ret = restObj.getNamespace("hello.world").call(RESTBuilder.RequestTypeSet.GET, retCheck);
 		assertEquals( retCheck, ret );
 	}
 	

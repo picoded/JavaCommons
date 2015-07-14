@@ -4,14 +4,19 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +27,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.*;
 import org.apache.http.cookie.*;
@@ -39,11 +43,16 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 
 import javax.websocket.*;
+
 import java.net.URI;
+
 import picoded.FunctionalInterface.*;
-//import java.util.function;
 
 import com.ning.http.client.*;
+
+import picoded.struct.StreamBuffer;
+import picoded.struct.StreamBuffer.SBInputStream;
+import picoded.struct.StreamBuffer.SBOutputStream;
 
 @ClientEndpoint
 public class RequestHttp {
@@ -67,29 +76,9 @@ public class RequestHttp {
 	
 	/// 
 	
-	/// Ensures that the websocket is connected
-	public void websocketConnect() {
-		try {
-			if( container == null ) {
-				container = ContainerProvider.getWebSocketContainer();
-			}
-			
-			if( websocketSession == null ) {
-				websocketSession = container.connectToServer(this, new URI(_baseURL) );
-			}
-		} catch(Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
 	/// Response message
 	public void addMessageHandler(Void_String msgHandler) {
 		this.websocketMessageHandler = msgHandler;
-	}
-	
-	/// Sends message
-	public void sendMessage(String message) {
-		this.websocketSession.getAsyncRemote().sendText(message);
 	}
 	
 	/// Sends and waits for a response, needs a more efficent way?
@@ -116,6 +105,30 @@ public class RequestHttp {
 		throw new RuntimeException("TO IMPLEMENT");
 	}
 
+	///////////////////////////////////////////////////////////
+	// Core websocket functions
+	///////////////////////////////////////////////////////////
+	
+	/// Ensures that the websocket is connected
+	public void websocketConnect() {
+		try {
+			if( container == null ) {
+				container = ContainerProvider.getWebSocketContainer();
+			}
+			
+			if( websocketSession == null ) {
+				websocketSession = container.connectToServer(this, new URI(_baseURL) );
+			}
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/// Sends message
+	public void sendMessage(String message) {
+		this.websocketSession.getAsyncRemote().sendText(message);
+	}
+	
 	/// Actual onOpen reciever for the socket protocol
 	@OnOpen
 	public void _onOpen(Session userSession) {
@@ -141,59 +154,68 @@ public class RequestHttp {
 	///////////////////////////////////////////////////////////
 	// Static core functions?
 	///////////////////////////////////////////////////////////
-
-	/// Performs a raw HTTP request, this assumes that the function caller has fully handled
-	/// all the various basic aspects of the request, like GET parameters, etc.
-	protected static ResponseHttp apache_raw(
-		HttpRequestType requestType, //request type 
-		String requestURL, //Request URL, with GET parameters if needed
-		Map<String, String[]> headerMap, //Header map to values
-		HttpEntity apacheRequestEntity //POST / PUT payload, if applicable
-	) throws IOException {
-		// Prepae the HttpUriRequest, based on request type
-		HttpUriRequest methodToMakeRequest = RequestHttpUtils.apache_HttpUriRequest_fromRequestType(requestType, requestURL);
-		
-		// Add in headers as applicable
-		
-		// Create the http client, and get the response
-		HttpClient httpClient = HttpClientBuilder.create().disableRedirectHandling().disableAuthCaching().build();
-		
-		// Add the http request entity?
-		if(apacheRequestEntity != null) {
-			((HttpEntityEnclosingRequestBase)methodToMakeRequest).setEntity(apacheRequestEntity);
-		}
-		// Call and return
-		HttpResponse response = httpClient.execute(methodToMakeRequest);
-		
-		return new ResponseHttp(response);
-	}
-	
 	protected static ResponseHttp asyncHttp_raw(
 		HttpRequestType requestType, 
-		String requestURL //Request URL, with GET parameters if needed
+		String requestURL, //Request URL, with GET parameters if needed
+		Map<String, String> headers,
+		Map<String, String[]> postParams
 	) {
 		AsyncHttpClient.BoundRequestBuilder req = RequestHttpUtils.asyncHttpClient_fromRequestType( requestType, requestURL, true );
 		
+		//set headers
+		if(headers != null && headers.size() > 0) {
+			for(String key : headers.keySet()){
+				req.addHeader(key,  headers.get(key));
+			}
+		}
+		
+		//set form params
+		if(postParams != null && postParams.size() > 0){
+			List<Param> formParams = new ArrayList<Param>();
+			for(String postKey : postParams.keySet()){
+				String[] postVals = postParams.get(postKey);
+				for(String postVal : postVals){
+					formParams.add(new Param(postKey, postVal));
+				}
+			}
+			req.setFormParams(formParams);
+		}
+		
+		StreamBuffer sb = new StreamBuffer();
+		OutputStream os = sb.getOutputStream();
+		InputStream is = sb.getInputStream();
+		
 		final ResponseHttp ret = new ResponseHttp();
+		ret.setInputStream(is);
+		
+		final ArrayList<HttpResponseBodyPart> bodyParts = new ArrayList<HttpResponseBodyPart>();
 		
 		AsyncHandler<ResponseHttp> asyncHandler = new AsyncHandler<ResponseHttp>() {
-		
 			@Override
 			public STATE onBodyPartReceived(final HttpResponseBodyPart content) throws Exception {
-				//builder.accumulate(content);
-				ret.completedHeaders = true;
+				byte[] bytes = content.getBodyPartBytes();
+				
+				try{
+					os.write(bytes);
+					os.flush();
+				} catch (Exception ex){
+					throw new RuntimeException(ex);
+				}
+				
+				ret.completedHeaders.compareAndSet(false, true);
 				return STATE.CONTINUE;
 			}
 			
 			@Override
 			public STATE onStatusReceived(final HttpResponseStatus status) throws Exception {
-				//builder.accumulate(status);
+				ret.setStatusCode(status.getStatusCode());
+				ret.setResponseStatus(status);
 				return STATE.CONTINUE;
 			}
 			
 			@Override
 			public STATE onHeadersReceived(final HttpResponseHeaders headers) throws Exception {
-				//builder.accumulate(headers);
+				ret.setHeaders(headers.getHeaders());
 				return STATE.CONTINUE;
 			}
 			
@@ -204,29 +226,32 @@ public class RequestHttp {
 			
 			@Override
 			public ResponseHttp onCompleted() throws Exception {
-				ret.completedHeaders = true;
+				sb.close();
+				ret.completedHeaders.compareAndSet(false, true);
+				
 				return ret;
 			}
 		};
-		//*/
 		
-		ListenableFuture<ResponseHttp> r = req.execute(asyncHandler);
-		
+		ret.completedResponse = req.execute(asyncHandler);
 		return ret;
 	}
 	
-	
 	/// Performs the most basic of get requests
 	public static ResponseHttp get( String requestURL ) throws IOException {
-		return asyncHttp_raw( HttpRequestType.TYPE_GET, requestURL );
-		
-		//return apache_raw(HttpRequestType.TYPE_GET, requestURL, null, null);
+		return asyncHttp_raw( HttpRequestType.TYPE_GET, requestURL, null, null );
+	}
+	
+	public static ResponseHttp get(String requestURL, Map<String, String> headers) throws IOException {
+		return asyncHttp_raw( HttpRequestType.TYPE_GET, requestURL, headers, null );
 	}
 	
 	/// Performs a basic post request
 	public static ResponseHttp post( String requestURL, Map<String,String[]> postMap ) throws IOException {
-		List<NameValuePair> listNameValuePairs = RequestHttpUtils.parameterMapToList(postMap);
-		return apache_raw(HttpRequestType.TYPE_POST, requestURL, null, new UrlEncodedFormEntity(listNameValuePairs) );
+		return asyncHttp_raw(HttpRequestType.TYPE_POST, requestURL, null, postMap);
 	}
 	
+	public static ResponseHttp post( String requestURL, Map<String, String> headers, Map<String,String[]> postMap ) throws IOException {
+		return asyncHttp_raw(HttpRequestType.TYPE_POST, requestURL, headers, postMap);
+	}
 }

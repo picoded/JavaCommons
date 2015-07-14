@@ -60,8 +60,12 @@ public class RequestHttp_test {
 		return "http://httpbin.org";
 	}
 	
+	public String postTestServerURL(){
+		return "http://posttestserver.com";
+	}
+	
 	public String echoWebSocketURL() {
-		return "ws://echo.websocket.org";
+		return "wss://echo.websocket.org";
 	}
 	
 	RequestHttp reqObj = null;
@@ -74,6 +78,7 @@ public class RequestHttp_test {
 	
 	@Test @SuppressWarnings("unchecked")
 	public void GET_basicTest() throws IOException {
+		System.out.println("Runnin GET_basicTest");
 		ResponseHttp res = null;
 		Map<String,Object> resMap = null;
 		
@@ -84,32 +89,61 @@ public class RequestHttp_test {
 		assertEquals( "world", ((Map<String,Object>)(resMap.get("args"))).get("hello") );
 	}
 	
+	@Test @SuppressWarnings("unchecked")
+	public void GET_headerTest() throws IOException {
+		ResponseHttp resWithHeaders = null;
+		Map<String, String> headerMap = null;
+		
+		headerMap = new HashMap<String, String>();
+		headerMap.put("Testkey", "testValue");
+		
+		assertNotNull(resWithHeaders = RequestHttp.get(httpBinURL()+"/headers", headerMap));
+		System.out.println(resWithHeaders.getHeaders());
+		System.out.println(resWithHeaders.toString());
+
+		assertEquals( "testValue", ((Map<String,Object>)(resWithHeaders.toMap().get("headers"))).get("Testkey") );
+		//assertEquals( "testValue", resWithHeaders.getHeaders().get("testKey") );
+	}
+	
 	@Test 
 	public void GET_statusTest() throws IOException {
+		System.out.println("Running GET_statusTest");
 		ResponseHttp res = null;
 		assertNotNull( res = RequestHttp.get(httpBinURL()+"/status/418") );
 		assertEquals( 418, res.statusCode() );
 	}
+
+//	@Test @SuppressWarnings("unchecked")
+//	public void GET_stream100() throws IOException {
+//		System.out.println("Runnin GET_stream20");
+//		ResponseHttp res = null;
+//		
+//		assertNotNull( res = RequestHttp.get(httpBinURL()+"/stream/100") );
+//		assertEquals( 200, res.statusCode() );
+//		
+//		System.out.println(res.toString());
+//		
+//		res.waitForCompletedRequest();
+//	}
 	
 	@Test @SuppressWarnings("unchecked")
 	public void POST_basicTest() throws IOException {
 		ResponseHttp res = null;
 		Map<String,Object> resMap = null;
-		
 		Map<String,String[]> postData = new HashMap<String,String[]>();
 		postData.put("hello", new String[] { "world" });
 		
 		assertNotNull( res = RequestHttp.post(httpBinURL()+"/post", postData) );
-		assertNotNull( resMap = res.toMap() );
-		
 		assertEquals( 200, res.statusCode() );
-		
-		//assertEquals( "", res.toString() );
+		assertNotNull( resMap = res.toMap() );
 		assertEquals( "world", ((Map<String,Object>)(resMap.get("form"))).get("hello") );
+		
+		res.waitForCompletedRequest();
 	}
 	
 	@Test
 	public void WEBSOCKET_echoTest() {
+		System.out.println("Running WEBSOCKET_echoTest");
 		assertNotNull( reqObj = new RequestHttp( echoWebSocketURL() ) );
 		reqObj.websocketConnect();
 		

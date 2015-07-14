@@ -51,4 +51,8 @@ public class RESTRequest extends AbstractMapDecorator<String, Object> implements
 	/// The requesting CorePage, if given
 	protected picoded.servlet.CorePage requestPage = null;
 	
+	/// Gets the requestPage if its set 
+	public picoded.servlet.CorePage requestPage() {
+		return requestPage;
+	}
 }

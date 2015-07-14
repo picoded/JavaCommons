@@ -254,59 +254,59 @@ public class ProxyServlet extends CorePage {
 			// Create a default HttpClient with Disabled automated stuff
 			HttpClient httpClient = HttpClientBuilder.create().disableRedirectHandling().disableAuthCaching().build();
 			
-			// Custom 2nd thread to support streaming requests
-			OutputStream[] socketPassOutput = new OutputStream[1];
-			socketPassOutput[0] = null;
+			// // Custom 2nd thread to support streaming requests
+			// OutputStream[] socketPassOutput = new OutputStream[1];
+			// socketPassOutput[0] = null;
+			// 
+			// Thread socketInputStream_thread = new Thread(
+			// 	new Runnable(){
+			// 		public void run(){
+			// 			BufferedInputStream bis = new BufferedInputStream(socketInputStream);
+			// 			int b;
+			// 			
+			// 			try {
+			// 				while ( socketPassOutput[0] != null && ( b = bis.read() ) != -1 ) {
+			// 					socketPassOutput[0].write(b);
+			// 					socketPassOutput[0].flush();
+			// 				}
+			// 			} catch(Exception e) {
+			// 				// INTENTIONALLY SILENCED, to handle socket close events
+			// 				//throw new RuntimeException(e);
+			// 			}
+			// 		}
+			// 	}
+			// );
 			
-			Thread socketInputStream_thread = new Thread(
-				new Runnable(){
-					public void run(){
-						BufferedInputStream bis = new BufferedInputStream(socketInputStream);
-						int b;
-						
-						try {
-							while ( socketPassOutput[0] != null && ( b = bis.read() ) != -1 ) {
-								socketPassOutput[0].write(b);
-								socketPassOutput[0].flush();
-							}
-						} catch(Exception e) {
-							// INTENTIONALLY SILENCED, to handle socket close events
-							//throw new RuntimeException(e);
-						}
-					}
-				}
-			);
-			
-			/// Attach the seperate thread, as an entity
-			if(socketInputStream != null) {
-				AbstractHttpEntity entity = new AbstractHttpEntity() {
-					public boolean isRepeatable() {
-						return false;
-					}
-
-					public long getContentLength() {
-						return -1;
-					}
-
-					public boolean isStreaming() {
-						return true;
-					}
-
-					public InputStream getContent() throws IOException {
-						// Should be implemented as well but is irrelevant for this case
-						throw new UnsupportedOperationException();
-					}
-
-					public void writeTo(final OutputStream outstream) throws IOException {
-						socketPassOutput[0] = outstream;
-						socketInputStream_thread.start();
-					}
-				};
-				
-				((HttpEntityEnclosingRequestBase)httpMethodProxyRequest).setEntity( entity );
-				
-				//System.out.println( "socketInputStream varient" );
-			}
+			// /// Attach the seperate thread, as an entity
+			// if(socketInputStream != null) {
+			// 	AbstractHttpEntity entity = new AbstractHttpEntity() {
+			// 		public boolean isRepeatable() {
+			// 			return false;
+			// 		}
+			// 
+			// 		public long getContentLength() {
+			// 			return -1;
+			// 		}
+			// 
+			// 		public boolean isStreaming() {
+			// 			return true;
+			// 		}
+			// 
+			// 		public InputStream getContent() throws IOException {
+			// 			// Should be implemented as well but is irrelevant for this case
+			// 			throw new UnsupportedOperationException();
+			// 		}
+			// 
+			// 		public void writeTo(final OutputStream outstream) throws IOException {
+			// 			socketPassOutput[0] = outstream;
+			// 			socketInputStream_thread.start();
+			// 		}
+			// 	};
+			// 	
+			// 	((HttpEntityEnclosingRequestBase)httpMethodProxyRequest).setEntity( entity );
+			// 	
+			// 	//System.out.println( "socketInputStream varient" );
+			// }
 			
 			/// Execute the proxy request
 			HttpResponse response = httpClient.execute(httpMethodProxyRequest);
@@ -367,33 +367,34 @@ public class ProxyServlet extends CorePage {
 			//int bytesToRead = 0;
 			
 			/// Send via a second thread?
-			Thread outputStreamClientResponse_thread = new Thread(
-				new Runnable(){
-					public void run(){
-						int b;
-						try {
-							while ( ( b = bufferedInputStream.read() ) != -1 ) {
-								outputStreamClientResponse.write(b);
-								outputStreamClientResponse.flush();
-							}
-						} catch(Exception e) {
-							// INTENTIONALLY SILENCED, to handle socket close events
-							//throw new RuntimeException(e);
-						}
-					}
-				}
-			);
-			outputStreamClientResponse_thread.start();
-				
-			while( (outputStreamClientResponse_thread != null && outputStreamClientResponse_thread.isAlive()) || 
-			       (socketInputStream_thread != null && socketInputStream_thread.isAlive()) ) {
-				Thread.sleep(1);
-			}
+			// Thread outputStreamClientResponse_thread = new Thread(
+			// 	new Runnable(){
+			// 		public void run(){
+			// 			int b;
+			// 			try {
+			// 				while ( ( b = bufferedInputStream.read() ) != -1 ) {
+			// 					outputStreamClientResponse.write(b);
+			// 					outputStreamClientResponse.flush();
+			// 				}
+			// 			} catch(Exception e) {
+			// 				// INTENTIONALLY SILENCED, to handle socket close events
+			// 				//throw new RuntimeException(e);
+			// 			}
+			// 		}
+			// 	}
+			// );
+			// outputStreamClientResponse_thread.start();
+			// 	
+			// while( (outputStreamClientResponse_thread != null && outputStreamClientResponse_thread.isAlive()) || 
+			//        (socketInputStream_thread != null && socketInputStream_thread.isAlive()) ) {
+			// 	Thread.sleep(1);
+			// }
+			
 			// uses blocking call instead?
-			//while ( ( outputNextByte = bufferedInputStream.read() ) != -1 ) {
-			//	outputStreamClientResponse.write(outputNextByte);
-			//	outputStreamClientResponse.flush();
-			//}
+			while ( ( outputNextByte = bufferedInputStream.read() ) != -1 ) {
+				outputStreamClientResponse.write(outputNextByte);
+				outputStreamClientResponse.flush();
+			}
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -476,67 +477,66 @@ public class ProxyServlet extends CorePage {
 			OutputStream outputStreamClientResponse = res.getOutputStream();
 			InputStream inputStreamProxyResponse = getRequest.inputStream();
 			BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStreamProxyResponse);
-			
-			/// Send via a second thread?
-			Thread outputStreamClientResponse_thread = new Thread(
-				new Runnable(){
-					public void run(){
-						int b;
-						try {
-							while ( ( b = bufferedInputStream.read() ) != -1 ) {
-								outputStreamClientResponse.write(b);
-								outputStreamClientResponse.flush();
-							}
-						} catch(Exception e) {
-							// INTENTIONALLY SILENCED, to handle socket close events
-							//throw new RuntimeException(e);
-						}
-					}
-				}
-			);
-			outputStreamClientResponse_thread.start();
-			
-			OutputStream streamToTarget = getRequest.outputStream();
-			InputStream streamFromReq = req.getInputStream();
-			BufferedInputStream bisFromReq = new BufferedInputStream(streamFromReq);
-			
-			Thread socketInputStream_thread = new Thread(
-				new Runnable(){
-					public void run(){
-						int b;
-						
-						try {
-							while ( streamToTarget != null && ( b = bisFromReq.read() ) != -1 ) {
-								streamToTarget.write(b);
-								streamToTarget.flush();
-							}
-						} catch(Exception e) {
-							// INTENTIONALLY SILENCED, to handle socket close events
-							//throw new RuntimeException(e);
-						}
-					}
-				}
-			);
-			
-			while( (outputStreamClientResponse_thread != null && outputStreamClientResponse_thread.isAlive())  || 
-			       (socketInputStream_thread != null && socketInputStream_thread.isAlive()) 
-			) {
-				Thread.sleep(1);
-			}
-			/*
-			
-			StatusLine statusLine = response.getStatusLine();
+			// 
+			// /// Send via a second thread?
+			// Thread outputStreamClientResponse_thread = new Thread(
+			// 	new Runnable(){
+			// 		public void run(){
+			// 			int b;
+			// 			try {
+			// 				while ( ( b = bufferedInputStream.read() ) != -1 ) {
+			// 					outputStreamClientResponse.write(b);
+			// 					outputStreamClientResponse.flush();
+			// 				}
+			// 			} catch(Exception e) {
+			// 				// INTENTIONALLY SILENCED, to handle socket close events
+			// 				//throw new RuntimeException(e);
+			// 				return;
+			// 			}
+			// 		}
+			// 	}
+			// );
+			// outputStreamClientResponse_thread.start();
+			// 
+			// OutputStream streamToTarget = getRequest.outputStream();
+			// InputStream streamFromReq = req.getInputStream();
+			// BufferedInputStream bisFromReq = new BufferedInputStream(streamFromReq);
+			// 
+			// Thread socketInputStream_thread = new Thread(
+			// 	new Runnable(){
+			// 		public void run(){
+			// 			int b;
+			// 			
+			// 			try {
+			// 				while ( streamToTarget != null && ( b = bisFromReq.read() ) != -1 ) {
+			// 					streamToTarget.write(b);
+			// 					streamToTarget.flush();
+			// 				}
+			// 			} catch(Exception e) {
+			// 				// INTENTIONALLY SILENCED, to handle socket close events
+			// 				//throw new RuntimeException(e);
+			// 				return;
+			// 			}
+			// 		}
+			// 	}
+			// );
+			// 
+			// while( (outputStreamClientResponse_thread != null && outputStreamClientResponse_thread.isAlive())  || 
+			//        (socketInputStream_thread != null && socketInputStream_thread.isAlive()) 
+			// ) {
+			// 	Thread.sleep(1);
+			// }
 			
 			int outputNextByte;
-			//int bytesToRead = 0;
+			int bytesToRead = 0;
 			
-			// uses blocking call instead?
-			//while ( ( outputNextByte = bufferedInputStream.read() ) != -1 ) {
-			//	outputStreamClientResponse.write(outputNextByte);
-			//	outputStreamClientResponse.flush();
-			//}
+			//uses blocking call instead?
+			while ( ( outputNextByte = bufferedInputStream.read() ) != -1 ) {
+				outputStreamClientResponse.write(outputNextByte);
+				outputStreamClientResponse.flush();
+			}
 			
-			*/
+			// */
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}

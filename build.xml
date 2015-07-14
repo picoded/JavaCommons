@@ -10,6 +10,7 @@
 	
 	<property name="build-classes" value="${basedir}/bin/classes" />
 	<property name="build-lib" value="${basedir}/bin/lib" />
+	<property name="build-temp" value="${basedir}/bin/build/tmp" />
 	
 	<property name="test-temp" value="${basedir}/test-files/tmp" />
 	
@@ -130,19 +131,19 @@
 		</jar>
 
 		<!-- libs only -->
-		<jar destfile="${test-temp}/picodedJavaCommons-libsOnly-main.jar">
+		<jar destfile="${build-temp}/picodedJavaCommons-libsOnly-main.jar">
 			<fileset dir="${build-lib}" includes="*.jar" />
 		</jar>
 
 		<!-- with libs -->
-		<jar destfile="${test-temp}/picodedJavaCommons-withLibs-main.jar">
+		<jar destfile="${build-temp}/picodedJavaCommons-withLibs-main.jar">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 			<fileset dir="${build-lib}" includes="*.jar" />
 		</jar>
 		
 		<!-- Construct the One-JAR file for libs only -->
 		<one-jar destfile="bin/build/picodedJavaCommons-libsOnly.jar">
-			<main jar="${test-temp}/picodedJavaCommons-libsOnly-main.jar">
+			<main jar="${build-temp}/picodedJavaCommons-libsOnly-main.jar">
 			</main>
 			<lib>
 				<fileset dir="${lib.dir}" />
@@ -151,7 +152,7 @@
 
 		<!-- Construct the One-JAR file with libs -->
 		<one-jar destfile="bin/build/picodedJavaCommons-withLibs.jar">
-			<main jar="${test-temp}/picodedJavaCommons-withLibs-main.jar">
+			<main jar="${build-temp}/picodedJavaCommons-withLibs-main.jar">
 			</main>
 			<lib>
 				<fileset dir="${lib.dir}" />

@@ -270,7 +270,8 @@ public class ProxyServlet extends CorePage {
 								socketPassOutput[0].flush();
 							}
 						} catch(Exception e) {
-							throw new RuntimeException(e);
+							// INTENTIONALLY SILENCED, to handle socket close events
+							//throw new RuntimeException(e);
 						}
 					}
 				}
@@ -376,7 +377,8 @@ public class ProxyServlet extends CorePage {
 								outputStreamClientResponse.flush();
 							}
 						} catch(Exception e) {
-							throw new RuntimeException(e);
+							// INTENTIONALLY SILENCED, to handle socket close events
+							//throw new RuntimeException(e);
 						}
 					}
 				}
@@ -486,7 +488,8 @@ public class ProxyServlet extends CorePage {
 								outputStreamClientResponse.flush();
 							}
 						} catch(Exception e) {
-							throw new RuntimeException(e);
+							// INTENTIONALLY SILENCED, to handle socket close events
+							//throw new RuntimeException(e);
 						}
 					}
 				}
@@ -508,7 +511,8 @@ public class ProxyServlet extends CorePage {
 								streamToTarget.flush();
 							}
 						} catch(Exception e) {
-							throw new RuntimeException(e);
+							// INTENTIONALLY SILENCED, to handle socket close events
+							//throw new RuntimeException(e);
 						}
 					}
 				}

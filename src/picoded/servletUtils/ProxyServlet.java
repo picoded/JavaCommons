@@ -217,10 +217,10 @@ public class ProxyServlet extends CorePage {
   					stringHeaderValue = getProxyHostAndPort();
 				}
 				
-				System.out.println( "Header req - "+stringHeaderName+" = "+stringHeaderValue);
+				//System.out.println( "Header req - "+stringHeaderName+" = "+stringHeaderValue);
 				
 				// Set the same header on the proxy request
-				httpMethodProxyRequest.setHeader(stringHeaderName, stringHeaderValue);
+				httpMethodProxyRequest.addHeader(stringHeaderName, stringHeaderValue);
 			}
 		}
 	}
@@ -235,7 +235,7 @@ public class ProxyServlet extends CorePage {
 		
 		try {
 			
-			System.out.println( "Request Type - "+reqType );
+			//System.out.println( "Request Type - "+reqType );
 			
 			// Create a default HttpClient with Disabled automated stuff
 			HttpClient httpClient = HttpClientBuilder.create().disableRedirectHandling().disableAuthCaching().build();
@@ -290,7 +290,7 @@ public class ProxyServlet extends CorePage {
 				
 				((HttpEntityEnclosingRequestBase)httpMethodProxyRequest).setEntity( entity );
 				
-				System.out.println( "socketInputStream varient" );
+				//System.out.println( "socketInputStream varient" );
 			}
 			
 			/// Execute the proxy request
@@ -299,8 +299,8 @@ public class ProxyServlet extends CorePage {
 			/// Pass response headers back to the client
 			Header[] headerArrayResponse = response.getAllHeaders();
 			for(Header header : headerArrayResponse) {
-				httpServletResponse.setHeader(header.getName(), header.getValue());
-				System.out.println( "Header res - "+header.getName()+" = "+header.getValue());
+				httpServletResponse.addHeader(header.getName(), header.getValue());
+				//System.out.println( "Header res - "+header.getName()+" = "+header.getValue());
 			}
 			
 			StatusLine statusLine = response.getStatusLine();

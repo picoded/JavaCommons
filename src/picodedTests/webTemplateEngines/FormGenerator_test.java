@@ -47,7 +47,7 @@ public class FormGenerator_test {
 		format.put("type", "title");
 		assertEquals("<h3 class=\"title\">title</h3>", FormGenerator.templateObjectToHtml(format));
 		
-		format.put("type", "hello world");
+		format.put("title", "hello world");
 		assertEquals("<h3 class=\"title\">hello world</h3>", FormGenerator.templateObjectToHtml(format));
 		
 	}

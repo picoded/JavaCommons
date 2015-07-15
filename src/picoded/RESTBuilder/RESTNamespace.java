@@ -58,12 +58,12 @@ public class RESTNamespace extends HashMap<HttpRequestType, RESTFunction> {
 		namespace = nme;
 	}
 	
-	/// Calls the method without any arguments
+	/// [FOR TESTING ONLY] Calls the method without any arguments, call via the RESTBuilder instead
 	public Map<String,Object> call(HttpRequestType type) {
 		return call( type, new RESTRequest(), new HashMap<String,Object>() );
 	}
 	
-	/// Calls the method without any arguments
+	/// [FOR TESTING ONLY] Calls the method without any arguments, call via the RESTBuilder instead
 	public Map<String,Object> call(HttpRequestType type, Map<String,Object>reqMap ) {
 		return call( type, new RESTRequest(reqMap), new HashMap<String,Object>() );
 	}

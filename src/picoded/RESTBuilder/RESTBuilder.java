@@ -112,6 +112,11 @@ public class RESTBuilder {
 		String[] raw_ns = apiNamespace.split("?")[0].split("/");
 		String[] ns = raw_ns;
 		
+		// Auto create result map if needed
+		if( res == null ) {
+			res = new HashMap<String,Object>();
+		}
+		
 		/// Set the request values, defaults
 		req.builder = this; //links back to self
 		req.rawRequestNamespace = raw_ns; //the raw requested namespace
@@ -132,7 +137,7 @@ public class RESTBuilder {
 			nsList.add("*");
 			
 			while( nsList.size() >= 1 ) {
-				ns = nsList.toArray( nsList.size() );
+				ns = nsList.toArray( new String[nsList.size()] );
 				
 				if( hasNamespace(ns) ) {
 					nsObj = getNamespace(ns);
@@ -166,17 +171,21 @@ public class RESTBuilder {
 	///----------------------------------------
 	
 	/// Calls the API method with a query string
-	public Map<String,Object> call(String apiNamespace, HttpRequestType requestType, Map<String,Object> requestMap, Map<String,Object> resultMap) {
-		
-		
-		return null;
+	public Map<String,Object> namespaceCall(String apiNamespace, HttpRequestType requestType, Map<String,Object> requestMap, Map<String,Object> resultMap) {
+		return setupAndCall(apiNamespace, requestType, new RESTRequest(requestMap), resultMap);
 	}
 	
-	public Map<String,Object> servletCall(String prefixNamespace, picoded.servlet.CorePage page, Map<String,Object> resultMap) {
-		return null;
+	/// Calls the API method, using the request parameters from the CorePage
+	public Map<String,Object> namespaceCall(String apiNamespace, HttpRequestType requestType, picoded.servlet.CorePage page, Map<String,Object> resultMap) {
+		@SuppressWarnings("unchecked") 
+		RESTRequest rRequest = new RESTRequest( (Map<String,Object>)(Object) (page.requestParameters()) );
+		rRequest.requestPage = page;
+		
+		return setupAndCall(apiNamespace, requestType, rRequest, resultMap );
 	}
 	
+	/// Automatically calls the respective namespace, using the CorePage registered URI wildcard, as "API NameSpace"
 	public Map<String,Object> servletCall(picoded.servlet.CorePage page, Map<String,Object> resultMap) {
-		return null;
+		return namespaceCall(page.requestWildcardUri(), page.requestType(), page, resultMap);
 	}
 }

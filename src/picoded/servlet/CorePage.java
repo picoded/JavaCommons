@@ -104,7 +104,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	protected OutputStream responseOutputStream = null;
 	
 	/// parameter map, either initialized from httpRequest, or directly
-	public RequestMap requestParameters = null;
+	protected RequestMap requestParameters = null;
 	
 	/// The template data object wich is being passed around in each process stage
 	protected Map<String,Object> templateDataObj = new HashMap<String,Object>();
@@ -191,6 +191,33 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	// @TODO CORS OPTION implementation
 	//-------------------------------------------
 	
+	// HTTP Servlet convinence functions
+	//-------------------------------------------
+	
+	/// Gets the server requestURI
+	public String requestURI() {
+		return httpRequest.getRequestURI();
+	}
+	
+	/// Gets the request servlet path
+	public String requestServletPath() {
+		return httpRequest.getServletPath();
+	}
+	
+	/// Gets the serer wildcard segment of the URI
+	public String requestWildcardUri() {
+		String servletPath = requestServletPath();
+		String reqURI = requestURI();
+		
+		while(servletPath.endsWith("*") || servletPath.endsWith("/")) {
+			servletPath = servletPath.substring(0, servletPath.length() - 1);
+		}
+		
+		if( reqURI.startsWith(servletPath) ) {
+			return reqURI.substring(servletPath.length());
+		}
+		return "";
+	}
 	
 	// Request type config getters
 	//-------------------------------------------
@@ -198,6 +225,17 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// Returns the request type
 	public HttpRequestType requestType() {
 		return requestType;
+	}
+	
+	/// Returns the request parameters
+	public RequestMap requestParameters() {
+		if( requestParameters != null ) {
+			return requestParameters;
+		}
+		
+		requestParameters = RequestMap.fromStringArrayValueMap( httpRequest.getParameterMap() );
+		
+		return requestParameters;
 	}
 	
 	/// Returns if the request is GET
@@ -239,14 +277,14 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// Setup the instance, with the request parameter, and
 	protected CorePage setupInstance(HttpRequestType inRequestType, Map<String,String> reqParam) throws ServletException {
 		requestType = inRequestType;
-		requestParameters = new RequestMap( reqParam );
+		//requestParameters = new RequestMap( reqParam );
 		return this;
 	}
 	
 	/// Setup the instance, with the request parameter, and cookie map
 	protected CorePage setupInstance(HttpRequestType inRequestType, Map<String,String> reqParam, Map<String,Cookie> reqCookieMap) throws ServletException {
 		requestType = inRequestType;
-		requestParameters = new RequestMap( reqParam );
+		//requestParameters = new RequestMap( reqParam );
 		requestCookieMap = reqCookieMap;
 		return this;
 	}
@@ -325,8 +363,8 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// gets a parameter value, from the httpRequest.getParameter
 	public String getParameter(String paramName) {
-		if(requestParameters != null) {
-			return requestParameters.get(paramName);
+		if(requestParameters() != null) {
+			return requestParameters().get(paramName);
 		}
 		return null;
 	}

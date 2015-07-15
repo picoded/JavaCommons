@@ -107,7 +107,59 @@ public class RESTBuilder {
 	/// Utility function
 	///----------------------------------------
 	
-	
+	/// Does a search for the relevent api, and additional setup for RESTRequest, relvent to the found api. And perfroms the call
+	protected Map<String,Object> setupAndCall(String apiNamespace, HttpRequestType requestType, RESTRequest req, Map<String,Object> res) {
+		String[] raw_ns = apiNamespace.split("?")[0].split("/");
+		String[] ns = raw_ns;
+		
+		/// Set the request values, defaults
+		req.builder = this; //links back to self
+		req.rawRequestNamespace = raw_ns; //the raw requested namespace
+		
+		RESTNamespace nsObj = null;
+		
+		// The namespace has a non wildcard varient
+		if(hasNamespace(ns)) {
+			nsObj = getNamespace(ns);
+			if( nsObj.get(requestType) == null ) {
+				nsObj = null;
+			}
+		}
+		
+		// Iterates the stored namespace, for the wildcard varient
+		if( nsObj == null ) {
+			List<String> nsList = new ArrayList<String>(Arrays.asList(ns));
+			nsList.add("*");
+			
+			while( nsList.size() >= 1 ) {
+				ns = nsList.toArray( nsList.size() );
+				
+				if( hasNamespace(ns) ) {
+					nsObj = getNamespace(ns);
+					if( nsObj.get(requestType) != null ) {
+						break; //found it
+					} else {
+						nsObj = null; //continue the loop
+					}
+				}
+				
+				//if( hasNamespace() )
+				if( nsList.size() <= 1 ) {
+					break;
+				}
+				nsList.remove( nsList.size() - 2 ); //remove the element before the wildcard
+			}
+		}
+		
+		if( nsObj == null ) {
+			return null;
+		}
+		
+		/// Set the request values, respective to the found API node
+		req.registeredNamespace = ns; //the registered namespace used
+		
+		return nsObj.call(requestType, req, res);
+	}
 	
 	///----------------------------------------
 	/// API calling function
@@ -116,9 +168,6 @@ public class RESTBuilder {
 	/// Calls the API method with a query string
 	public Map<String,Object> call(String apiNamespace, HttpRequestType requestType, Map<String,Object> requestMap, Map<String,Object> resultMap) {
 		
-		
-		
-		//.split("?")[0]
 		
 		return null;
 	}

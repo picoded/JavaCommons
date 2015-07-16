@@ -20,7 +20,6 @@ import picoded.struct.ProxyGenericConvertMap;
 ///
 public class FormGenerator {
 	
-	private static String htmlTypeKey = "type";
 	
 	
 	/// Helps escape html dom parameter quotes, in an "optimal" way
@@ -129,7 +128,32 @@ public class FormGenerator {
 		return "";
 	}
 	
-	public static String applyTemplating(List<FormNode> nodes){
+	//------------------------sam stuff below-----------------------
+	private static String htmlTypeKey = "type";
+	private Map<String, FormWrapperInterface> customFormWrapperTemplates = new HashMap<String, FormWrapperInterface>();
+	private Map<String, FormInputInterface> customFormInputTemplates = new HashMap<String, FormInputInterface>();
+	
+	public FormGenerator(){
+		SetUpDefaultFormTemplates();
+	}
+	
+	private void SetUpDefaultFormTemplates(){
+		customFormWrapperTemplates.put("title", FormWrapperTemplates.titleWrapper);
+		customFormWrapperTemplates.put("div", FormWrapperTemplates.defaultWrapper);
+		
+		customFormInputTemplates.put("title", FormInputTemplates.titleInput);
+		customFormInputTemplates.put("div", FormInputTemplates.divInput);
+	}
+	
+	public void addCustomFormWrapperTemplate(String key, FormWrapperInterface customWrapperTemplate){
+		customFormWrapperTemplates.put(key, customWrapperTemplate);
+	}
+	
+	public void addCustomFormInputTemplate(String key, FormInputInterface customInputTemplate){
+		customFormInputTemplates.put(key, customInputTemplate);
+	}
+	
+	public String applyTemplating(List<FormNode> nodes){
 		
 		StringBuilder htmlBuilder = new StringBuilder("");
 		for(FormNode node : nodes){
@@ -139,38 +163,18 @@ public class FormGenerator {
 		return htmlBuilder.toString();
 	}
 	
-	public static String applyTemplating(FormNode node){
-		//this is the function you call after reading from file
-		//inside here is a switch case, and ill call the appropriate function
-		//input, then wrap
-		
-		//retrieve array of size 2 for wrapper
-		//retrieve string for input
-		//retrieve child data
-		//put em all together
-		
+	public String applyTemplating(FormNode node){
 		//get wrapper and text data
 		String nodeType = node.getString(htmlTypeKey, "div");
 		
 		String[] formWrappers = null;
 		String formTextData = "";
 		
-		switch(nodeType){
-			case "title": 
-				formWrappers = FormWrapperTemplates.titleWrapper.apply(node); 
-				formTextData = FormInputTemplates.titleInput.apply(node); 
-				break;
-				
-			case "div":
-				formWrappers = FormWrapperTemplates.defaultWrapper.apply(node);
-				formTextData = FormInputTemplates.divInput.apply(node);
-				break;
-				
-			default: 
-				formWrappers = new String[]{"", ""};
-				formTextData = "";
-				break;
-		}
+		
+		FormWrapperInterface wrapperFunction = customFormWrapperTemplates.get(nodeType);
+		FormInputInterface inputFunction = customFormInputTemplates.get(nodeType);
+		formWrappers = wrapperFunction.apply(node);
+		formTextData = inputFunction.apply(node);
 		
 		//get inner data for children
 		StringBuilder innerData = new StringBuilder("");

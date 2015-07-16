@@ -50,7 +50,7 @@ public class FormGenerator_test {
 		FormNode singleNode = getTestingNode();
 		nodes.add(singleNode);
 		
-		String finalVal = FormGenerator.applyTemplating(nodes);
+		String finalVal = testObj.applyTemplating(nodes);
 		
 		System.out.println(finalVal);
 	}

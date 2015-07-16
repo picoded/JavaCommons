@@ -20,6 +20,9 @@ import picoded.struct.ProxyGenericConvertMap;
 ///
 public class FormGenerator {
 	
+	private static String htmlTypeKey = "type";
+	
+	
 	/// Helps escape html dom parameter quotes, in an "optimal" way
 	protected static String escapeParameterQuote( String val ) {
 		boolean hasSingleQuote = val.contains("\'");
@@ -126,4 +129,56 @@ public class FormGenerator {
 		return "";
 	}
 	
+	public static String applyTemplating(List<FormNode> nodes){
+		
+		StringBuilder htmlBuilder = new StringBuilder("");
+		for(FormNode node : nodes){
+			htmlBuilder.append(applyTemplating(node));
+		}
+		
+		return htmlBuilder.toString();
+	}
+	
+	public static String applyTemplating(FormNode node){
+		//this is the function you call after reading from file
+		//inside here is a switch case, and ill call the appropriate function
+		//input, then wrap
+		
+		//retrieve array of size 2 for wrapper
+		//retrieve string for input
+		//retrieve child data
+		//put em all together
+		
+		//get wrapper and text data
+		String nodeType = node.getString(htmlTypeKey, "div");
+		
+		String[] formWrappers = null;
+		String formTextData = "";
+		
+		switch(nodeType){
+			case "title": 
+				formWrappers = FormWrapperTemplates.titleWrapper.apply(node); 
+				formTextData = FormInputTemplates.titleInput.apply(node); 
+				break;
+				
+			case "div":
+				formWrappers = FormWrapperTemplates.defaultWrapper.apply(node);
+				formTextData = FormInputTemplates.divInput.apply(node);
+				break;
+				
+			default: 
+				formWrappers = new String[]{"", ""};
+				formTextData = "";
+				break;
+		}
+		
+		//get inner data for children
+		StringBuilder innerData = new StringBuilder("");
+		if(node.childCount() > 0){
+			innerData.append(applyTemplating(node.children()));
+		}
+		
+		String finalNodeValue = formWrappers[0]+formTextData+innerData.toString()+formWrappers[1];
+		return finalNodeValue;
+	}
 }

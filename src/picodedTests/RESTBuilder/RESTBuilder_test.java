@@ -65,9 +65,9 @@ public class RESTBuilder_test {
 	@Test
 	public void helloMethod() {
 		restObj.getNamespace("hello.world").put(RESTBuilder.RequestTypeSet.GET, helloFunction );
+		assertTrue( restObj.hasNamespace("hello.world") );
 		
 		Map<String, Object> ret = restObj.getNamespace("hello.world").call(RESTBuilder.RequestTypeSet.GET);
-		
 		Map<String, Object> retCheck = new HashMap<String, Object>();
 		retCheck.put("hello","world");
 		assertEquals( retCheck, ret );
@@ -77,4 +77,26 @@ public class RESTBuilder_test {
 		assertEquals( retCheck, ret );
 	}
 	
+	@Test
+	public void jsScript() {
+		String blankScript = restObj.generateJS( "rest", "" );
+		assertTrue( blankScript.indexOf("var rest") >= 0 );
+		
+		restObj.getNamespace("hello.world").put(RESTBuilder.RequestTypeSet.GET, helloFunction );
+		assertTrue( restObj.hasNamespace("hello/world") );
+		
+		// sanity check if caliling works
+		Map<String, Object> retCheck = new HashMap<String, Object>();
+		retCheck.put("hello","world");
+		Map<String, Object> ret = restObj.getNamespace("hello/world").call(RESTBuilder.RequestTypeSet.GET);
+		assertEquals( retCheck, ret );
+		
+		// Generates the new script
+		String generatedScript = restObj.generateJS( "REST", "/api/v1" );
+		assertTrue( generatedScript.indexOf("var REST") >= 0 );
+		assertTrue( generatedScript.indexOf("hello/world") >= 0 );
+		assertTrue( generatedScript.indexOf("/api/v1") >= 0 );
+		
+		//assertEquals( "", generatedScript );
+	}
 }

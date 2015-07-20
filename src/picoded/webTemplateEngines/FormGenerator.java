@@ -129,20 +129,29 @@ public class FormGenerator {
 	}
 	
 	//------------------------sam stuff below-----------------------
-	private static String htmlTypeKey = "type";
+	public static String htmlTypeKey = "type";
+	public static String htmlTextKey = "text";
+	
+	public static String divKey = "div";
+	public static String titleTagKey = "title";
+	public static String dropDownListKey = "dropDown";
+	public static String inputFieldKey = "inputField";
+	
+	protected static String htmlDivTagName = "div";
+	protected static String htmlTitleTagName = "h";
+	protected static String htmlDropDownTagName = "select";
+	protected static String htmlInputFieldTagName = "input";
+	
 	private Map<String, FormWrapperInterface> customFormWrapperTemplates = new HashMap<String, FormWrapperInterface>();
 	private Map<String, FormInputInterface> customFormInputTemplates = new HashMap<String, FormInputInterface>();
 	
 	public FormGenerator(){
-		SetUpDefaultFormTemplates();
+		setupDefaultFormTemplates();
 	}
 	
-	private void SetUpDefaultFormTemplates(){
-		customFormWrapperTemplates.put("title", FormWrapperTemplates.titleWrapper);
-		customFormWrapperTemplates.put("div", FormWrapperTemplates.defaultWrapper);
-		
-		customFormInputTemplates.put("title", FormInputTemplates.titleInput);
-		customFormInputTemplates.put("div", FormInputTemplates.divInput);
+	private void setupDefaultFormTemplates(){
+		customFormWrapperTemplates = FormWrapperTemplates.defaultWrapperTemplates();
+		customFormInputTemplates = FormInputTemplates.defaultInputTemplates();
 	}
 	
 	public void addCustomFormWrapperTemplate(String key, FormWrapperInterface customWrapperTemplate){
@@ -154,8 +163,7 @@ public class FormGenerator {
 	}
 	
 	public String applyTemplating(List<FormNode> nodes){
-		
-		StringBuilder htmlBuilder = new StringBuilder("");
+		StringBuilder htmlBuilder = new StringBuilder();
 		for(FormNode node : nodes){
 			htmlBuilder.append(applyTemplating(node));
 		}
@@ -164,17 +172,10 @@ public class FormGenerator {
 	}
 	
 	public String applyTemplating(FormNode node){
-		//get wrapper and text data
-		String nodeType = node.getString(htmlTypeKey, "div");
+		String nodeType = node.getString(htmlTypeKey, htmlDivTagName);
 		
-		String[] formWrappers = null;
-		String formTextData = "";
-		
-		
-		FormWrapperInterface wrapperFunction = customFormWrapperTemplates.get(nodeType);
-		FormInputInterface inputFunction = customFormInputTemplates.get(nodeType);
-		formWrappers = wrapperFunction.apply(node);
-		formTextData = inputFunction.apply(node);
+		String[] formWrappers = customFormWrapperTemplates.get(nodeType).apply(node);
+		String formTextData = customFormInputTemplates.get(nodeType).apply(node);
 		
 		//get inner data for children
 		StringBuilder innerData = new StringBuilder("");

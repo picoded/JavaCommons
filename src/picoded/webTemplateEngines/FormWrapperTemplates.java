@@ -19,42 +19,83 @@ public class FormWrapperTemplates {
 	
 	private static List<String> standardParameters = Arrays.asList(FormGenerator.htmlTypeKey, FormGenerator.htmlTextKey, inputClassKey, inputCssKey, inputLabelKey, "option", "inputType");
 	
-	protected static FormWrapperInterface titleWrapper = (node)->{
-		String[] titleWrappers = new String[2]; //0 is opening tag, 1 is ending tag
-		
-		String tagName = FormGenerator.htmlTitleTagName;
-		int headerNumber = node.getInt("number");
-		tagName += headerNumber;
-		
-		String inputClassName = generateInputClass(node);
-		String inputCss = generateInputCSS(node);
-		titleWrappers = generateTags(tagName, inputClassName, inputCss, "");
-
-		return titleWrappers;
-	};
-	
+	//----------------------------new structure----------------------------------
 	protected static FormWrapperInterface divWrapper = (node)->{
-		String[] divWrapper = new String[2]; //0 is opening tag, 1 is ending tag
+		String[] prefixSuffix = new String[2];
 		
-		String tagName = FormGenerator.htmlDivTagName;
-		String inputClassName = generateInputClass(node);
-		String inputCss = generateInputCSS(node);
+		//generating prefix
+//		String classString = FormGenerator.generateInputClass(node);
+		StringBuilder prefix = new StringBuilder();
+		prefix.append("<div>"); //do the class later
+//		prefix.append("<div "+classString+">");		
 		
-		divWrapper = generateTags(tagName, inputClassName, inputCss, "");
-		return divWrapper;
+		if(node.containsKey("label")){
+			String labelName = node.getString("label");
+			prefix.append("<div>"+labelName+"</div>");
+		}
+		
+		//generating suffix
+		StringBuilder suffix = new StringBuilder();
+		suffix.append("</div>");
+		
+		prefixSuffix[0] = prefix.toString();
+		prefixSuffix[1] = suffix.toString();
+		
+		return prefixSuffix;
 	};
 	
-	protected static FormWrapperInterface selectWrapper = (node)->{
-		String[] selectWrapper = new String[2];
+	protected static FormWrapperInterface noneWrapper = (node)->{
+		String[] prefixSuffix = new String[]{"", ""};
 		
-		String tagName = FormGenerator.htmlDropDownTagName;
-		String inputClassName = generateInputClass(node);
-		String inputCss = generateInputCSS(node);
-		String attributes = generateTagAttributes(node);
-		
-		selectWrapper = generateTags(tagName, inputClassName, inputCss, attributes);
-		return selectWrapper;
+		return prefixSuffix;
 	};
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//----------------------------old structure------------------------------------
+	
+//	protected static FormWrapperInterface titleWrapper = (node)->{
+//		String[] titleWrappers = new String[2]; //0 is opening tag, 1 is ending tag
+//		
+//		String tagName = FormGenerator.htmlTitleTagName;
+//		int headerNumber = node.getInt("number");
+//		tagName += headerNumber;
+//		
+//		String inputClassName = generateInputClass(node);
+//		String inputCss = generateInputCSS(node);
+//		titleWrappers = generateTags(tagName, inputClassName, inputCss, "");
+//
+//		return titleWrappers;
+//	};
+	
+//	protected static FormWrapperInterface divWrapper = (node)->{
+//		String[] divWrapper = new String[2]; //0 is opening tag, 1 is ending tag
+//		
+//		String tagName = FormGenerator.htmlDivTagName;
+//		String inputClassName = generateInputClass(node);
+//		String inputCss = generateInputCSS(node);
+//		
+//		divWrapper = generateTags(tagName, inputClassName, inputCss, "");
+//		return divWrapper;
+//	};
+	
+//	protected static FormWrapperInterface selectWrapper = (node)->{
+//		String[] selectWrapper = new String[2];
+//		
+//		String tagName = FormGenerator.htmlDropDownTagName;
+//		String inputClassName = generateInputClass(node);
+//		String inputCss = generateInputCSS(node);
+//		String attributes = generateTagAttributes(node);
+//		
+//		selectWrapper = generateTags(tagName, inputClassName, inputCss, attributes);
+//		return selectWrapper;
+//	};
 	
 	//special case - needs to handle all in 1 function - nasty
 	protected static FormWrapperInterface inputWrapper = (node)->{
@@ -172,10 +213,11 @@ public class FormWrapperTemplates {
 	
 	protected static Map<String, FormWrapperInterface> defaultWrapperTemplates() {
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();
-		defaultTemplates.put(FormGenerator.titleTagKey, FormWrapperTemplates.titleWrapper);
-		defaultTemplates.put(FormGenerator.divKey, FormWrapperTemplates.divWrapper);
-		defaultTemplates.put(FormGenerator.dropDownListKey, FormWrapperTemplates.selectWrapper);
-		defaultTemplates.put(FormGenerator.inputFieldKey, FormWrapperTemplates.inputWrapper);
+//		defaultTemplates.put("none", FormWrapperTemplates.titleWrapper);
+		defaultTemplates.put("div", FormWrapperTemplates.divWrapper);
+		defaultTemplates.put("none", FormWrapperTemplates.noneWrapper);
+//		defaultTemplates.put(FormGenerator.dropDownListKey, FormWrapperTemplates.selectWrapper);
+//		defaultTemplates.put(FormGenerator.inputFieldKey, FormWrapperTemplates.inputWrapper);
 		
 		return defaultTemplates;
 	}

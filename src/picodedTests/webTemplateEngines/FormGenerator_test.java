@@ -40,89 +40,46 @@ public class FormGenerator_test {
 	
 	@Test
 	public void testNodes(){
-		FormNode normalHeaderNode = getHeaderNode();
-		String headerVal = testObj.applyTemplating(normalHeaderNode);
-		assertEquals("<h1 class=\"pf_titleClass\">Title</h1>", headerVal);
+		FormNode titleNode = getTitleNode();
+		String finalVal = testObj.applyTemplating(titleNode);
+		assertEquals("<div><h3>Title</h3></div>", finalVal);
 		
-		FormNode normalSelectNode_map = getSelectNode_usingMap();
-		String selectVal_map = testObj.applyTemplating(normalSelectNode_map);
-		assertEquals("<select class=\"pf_dropDownClass\"><option value=\"opt1\">Option 1</option><option value=\"opt2\">Option 2</option></select>", selectVal_map);
+		FormNode selectNode = getDropDownNode();
+		String finalSelectVal = testObj.applyTemplating(selectNode);
+		assertEquals("<div><div>Drop Down Title</div><select name=\"dropdowntitle\"><option value=\"option1\">Option 1</option><option value=\"option2\">Option 2</option></select></div>", finalSelectVal);
+	}
+
+	private FormNode getTitleNode(){
+		FormNode titleNode = new FormNode();
 		
-		FormNode normalSelectNode_list = getSelectNode_usingList();
-		String selectVal_list = testObj.applyTemplating(normalSelectNode_list);
-		assertEquals("<select class=\"pf_dropDownClass\"><option>Option 1</option><option>Option 2</option></select>", selectVal_list);
+		titleNode.put("type", "title");
+		titleNode.put("text", "Title");
+		titleNode.put("wrapper", "div");
 		
-		FormNode normalInputFieldNode = getInputFieldNode();
-		String inputFieldVal = testObj.applyTemplating(normalInputFieldNode);
-		assertEquals("Input Field: <input class=\"pf_inputFieldClass\" type=text>", inputFieldVal);
+		return titleNode; 
 	}
 	
-	@Test
-	public void testNodeList(){
-		List<FormNode> nodes = getNestedNodes();
-		String finalVal = testObj.applyTemplating(nodes);
-		System.out.println(finalVal);
-		assertEquals("<div class=\"pf_divClass\">"+
-					 	"<h1 class=\"customClass\">Title</h1>"+
-					 	"<div class=\"pf_divClass\">"+
-					 		"Input Field: <input class=\"pf_inputFieldClass\" type=text>"+
-				 			"<select class=\"pf_dropDownClass\">"+
-			 					"<option value=\"opt1\">Option 1</option>"+
-			 					"<option value=\"opt2\">Option 2</option>"+
-			 				"</select>"+
-		 				"</div>"+
-					 "</div>"+
-	 				 "<h2 class=\"pf_titleClass\">Second Title</h2>",
-				finalVal);
+	private FormNode getDropDownNode(){
+		FormNode dropDownNode = new FormNode();
+		dropDownNode.put("type", "dropdown");
+		dropDownNode.put("label", "Drop Down Title");
+		dropDownNode.put("field", "dropdowntitle"); //this field corresponds to the database key - defaults to label lowercased
+		List<String> options = Arrays.asList("Option 1", "Option 2");
+		dropDownNode.put("options", options); //put map here
+		dropDownNode.put("wrapper", "div");
+		
+		return dropDownNode;
 	}
 	
-	private FormNode getHeaderNode(){
-		FormNode node = new FormNode();
-		node.put(FormGenerator.htmlTypeKey, "title");
-		node.put("number", 1);
-		node.put(FormGenerator.htmlTextKey, "Title");
-		
-		return node;
-	}
 	
-	private FormNode getSelectNode_usingList(){
-		FormNode node = new FormNode();
-		node.put(FormGenerator.htmlTypeKey, FormGenerator.dropDownListKey);
-		
-		List<String> vals = new ArrayList<String>();
-		vals.add("Option 1");
-		vals.add("Option 2");
-		node.put("option", vals);
-		
-		return node;
-	}
-	
-	private FormNode getSelectNode_usingMap(){
-		FormNode node = new FormNode();
-		node.put(FormGenerator.htmlTypeKey, FormGenerator.dropDownListKey);
-		
-		Map<String, String> vals = new LinkedHashMap<String, String>();
-		vals.put("opt1", "Option 1");
-		vals.put("opt2", "Option 2");
-		node.put("option", vals);
-		
-		return node;
-	}
-	
-	private FormNode getInputFieldNode(){
-		FormNode node = new FormNode();
-		node.put(FormGenerator.htmlTypeKey, FormGenerator.inputFieldKey);
-		node.put("inputLabel", "Input Field: ");
-		node.put("inputType", "text");
-		
-		return node;
-	}
 	
 	private List<FormNode> getNestedNodes(){
 		List<FormNode> returnVal = new ArrayList<FormNode>();
 		
-		//Wrapper is the VERY FIRST layer of html
-		//anything nested is an input
+		//wrapper is whatever you define it to be
+		//for example, a titlewrapper will wrap a div
+		//an inputWrapper will wrap a inputfield
+		//each wrapper is a very specific thing
 
 		/*
 		 * <div class="pf_wrapper pf_titleWrapper">  // # This is the prefix output from wrapper
@@ -172,35 +129,6 @@ public class FormGenerator_test {
 		 * <h2>Second Title</h2>
 		 * 
 		 */
-		
-		//create input field and dropdown first
-		FormNode inputNode = getInputFieldNode();
-		FormNode dropDownNode = getSelectNode_usingMap();
-		
-		FormNode innerDivNode = new FormNode();
-		innerDivNode.put("type", "div");
-		
-		innerDivNode.addChild(inputNode);
-		innerDivNode.addChild(dropDownNode);
-		
-		//cxreate header
-		FormNode headerNode = getHeaderNode();
-		headerNode.put("inputClass", "customClass");
-		
-		FormNode outerDivNode = new FormNode();
-		outerDivNode.put("type", "div");
-		
-		
-		outerDivNode.addChild(headerNode);
-		outerDivNode.addChild(innerDivNode);
-		
-		FormNode secondHeader = new FormNode();
-		secondHeader.put("type", "title");
-		secondHeader.put("number", 2);
-		secondHeader.put("text", "Second Title");
-		
-		returnVal.add(outerDivNode);
-		returnVal.add(secondHeader);
 		
 		return returnVal;
 	}

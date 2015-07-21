@@ -173,8 +173,11 @@ public class FormGenerator {
 	
 	public String applyTemplating(FormNode node){
 		String nodeType = node.getString(htmlTypeKey, htmlDivTagName);
+		String[] formWrappers = new String[]{"", ""};
 		
-		String[] formWrappers = customFormWrapperTemplates.get(nodeType).apply(node);
+		String wrapperType = node.getString("wrapper", "div");
+		
+		formWrappers = customFormWrapperTemplates.get(wrapperType).apply(node);
 		String formTextData = customFormInputTemplates.get(nodeType).apply(node);
 		
 		//get inner data for children
@@ -185,5 +188,15 @@ public class FormGenerator {
 		
 		String finalNodeValue = formWrappers[0]+formTextData+innerData.toString()+formWrappers[1];
 		return finalNodeValue;
+	}
+	
+	public static String generateInputClass(FormNode node){
+		StringBuilder sb = new StringBuilder("class=\"");
+		if(node.containsKey("inputClass")){
+			sb.append(node.getString("inputClass") + "\"");
+		} else {
+			sb.append("pf_"+node.getString("type")+"Class\"");
+		}
+		return sb.toString();
 	}
 }

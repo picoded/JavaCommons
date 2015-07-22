@@ -24,8 +24,7 @@ public class FormWrapperTemplates {
 		}
 		
 		//generating suffix
-		StringBuilder suffix = new StringBuilder();
-		suffix.append("</div>");
+		StringBuilder suffix = new StringBuilder("</div>");
 		
 		prefixSuffix[0] = prefix.toString();
 		prefixSuffix[1] = suffix.toString();

@@ -1,24 +1,11 @@
 package picodedTests.webTemplateEngines;
 
-// Target test class
 import picoded.webTemplateEngines.*;
-import picoded.conv.ConvertJSON;
 
-
-
-// Test Case include
 import org.junit.*;
-
 import static org.junit.Assert.*;
-
-import java.io.File;
-import java.io.FileReader;
-// java includes
 import java.util.*;
 
-///
-/// Test Case for picoded.struct.CaseInsensitiveHashMap
-///
 public class FormGenerator_test {
 	
 	public FormGenerator testObj = null;

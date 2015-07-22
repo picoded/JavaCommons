@@ -322,11 +322,11 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	}
 	
 	/// To be over-ridden
-	public void initSetup( CorePage original, ServletConfig servletConfig ) throws ServletException {
+	public void initSetup( CorePage original, ServletConfig servletConfig ) {
 		try {
 			init( getServletConfig() );
 		} catch(Exception e) {
-			throw new ServletException(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

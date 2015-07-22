@@ -449,15 +449,18 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 	}
 	
 	/// Login the user if valid
-	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, String nicename, String rawPassword, boolean rmberMe) {
-		AccountObject ret = getFromName(nicename);
-		
-		if( ret != null && ret.validatePassword(rawPassword) ) {
-			_setLogin(ret, request, response, rmberMe);
-			return ret;
+	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, AccountObject accountObj, String rawPassword, boolean rmberMe) {
+		if( accountObj != null && accountObj.validatePassword(rawPassword) ) {
+			_setLogin(accountObj, request, response, rmberMe);
+			return accountObj;
 		}
 		
-		return null;
+		return accountObj;
+	}
+	
+	/// Login the user if valid
+	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, String nicename, String rawPassword, boolean rmberMe) {
+		return loginAccount( request, response, getFromName(nicename), rawPassword, rmberMe);
 	}
 	
 	/// Logout any existing users

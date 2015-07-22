@@ -31,6 +31,7 @@ import com.floreysoft.jmte.*;
 // Sub modules useds
 import picoded.conv.JMTE;
 import picoded.JStack.*;
+import picoded.RESTBuilder.*;
 
 /**
  * Extends the corePage/jSqlPage functionality, and implements basic UI templating, and accountManagement
@@ -55,6 +56,23 @@ public class BasePage extends JStackPage {
 	
 	// Serialize version ID
 	static final long serialVersionUID = 1L;
+	
+	/////////////////////////////////////////////
+	//
+	// RESTBuilder related convinence 
+	//
+	/////////////////////////////////////////////
+	protected RESTBuilder _restBuilderObj = null;
+	
+	public RESTBuilder restBuilder() {
+		if( _restBuilderObj != null ) {
+			return _restBuilderObj;
+		}
+		
+		_restBuilderObj = new RESTBuilder();
+		
+		return _restBuilderObj;
+	}
 	
 	/////////////////////////////////////////////
 	//

@@ -201,6 +201,11 @@ public class RESTBuilder {
 		return namespaceCall(page.requestWildcardUri(), page.requestType(), page, resultMap);
 	}
 	
+	/// Automatically calls the respective namespace, using the CorePage registered URI wildcard, as "API NameSpace"
+	public Map<String,Object> servletCall(String apiPrefix, picoded.servlet.CorePage page, Map<String,Object> resultMap) {
+		return namespaceCall(apiPrefix+page.requestWildcardUri(), page.requestType(), page, resultMap);
+	}
+	
 	///----------------------------------------
 	/// Namespace tree generator / handling, used for generating the relevent javascript
 	///----------------------------------------

@@ -28,7 +28,7 @@ public class LoginServlet extends BasePage{
 	}
 
 	@Override
-	public void doSetup() throws ServletException {
+	public void doSetup() throws Exception {
 		// TODO Auto-generated method stub
 		super.doSetup();
 	}

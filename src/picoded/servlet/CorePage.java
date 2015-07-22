@@ -395,27 +395,36 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// Triggers the process chain with the current setup, and indicates failure / success
 	public boolean processChain() throws ServletException {
-		boolean ret = true;
-		
-		// Does setup
-		doSetup();
-		
-		// is JSON request?
-		if( isJsonRequest() ) {
-			ret = processChainJSON();
-		} else { // or as per normal
-			ret = processChainRequest();
+		try {
+			try {
+				boolean ret = true;
+				
+				// Does setup
+				doSetup();
+				
+				// is JSON request?
+				if( isJsonRequest() ) {
+					ret = processChainJSON();
+				} else { // or as per normal
+					ret = processChainRequest();
+				}
+				
+				// Does teardwon
+				doTeardown();
+				
+				// Returns success or failure
+				return ret;
+			} catch(Exception e) {
+				doException(e);
+				return false;
+			}
+		} catch(Exception e) {
+			throw new ServletException(e);
 		}
-		
-		// Does teardwon
-		doTeardown();
-		
-		// Returns success or failure
-		return ret;
 	}
 	
 	/// The process chain part specific to a normal request
-	private boolean processChainRequest() throws ServletException {
+	private boolean processChainRequest() throws Exception {
 		try {
 			// Does authentication check
 			if(!doAuth(templateDataObj) ) {
@@ -458,7 +467,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	}
 	
 	/// The process chain part specific to JSON request
-	private boolean processChainJSON() throws ServletException {
+	private boolean processChainJSON() throws Exception {
 		try {
 			// Does authentication check
 			if(!doAuth(templateDataObj) ) {
@@ -508,16 +517,24 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// [To be extended by sub class, if needed]
 	/// Called once when initialized per request
-	public void doSetup() throws ServletException {
+	public void doSetup() throws Exception {
 		
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Called once when completed per request, this is called regardless of request status
 	/// PS: This is rarely needed, just rely on java GC =)
-	public void doTeardown() throws ServletException {
+	public void doTeardown() throws Exception {
 		
 	}
+	
+	/// Handles setup and teardown exception
+	public void doException(Exception e) throws Exception {
+		throw e;
+	}
+	
+	// HTTP request handling
+	//-------------------------------------------
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the needed page request authentication, page redirects (if needed), and so forth. Should not do any actual,
@@ -525,9 +542,6 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	public boolean doAuth(Map<String,Object> templateData) throws Exception {
 		return true;
 	}
-	
-	// HTTP request handling
-	//-------------------------------------------
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the required page request processing, this is used if both post / get behaviour is consistent
@@ -569,9 +583,9 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	///
 	/// note that this should return false, or throw a ServletException, UNLESS the exception was gracefully handled.
 	/// which in most cases SHOULD NOT be handled here.
-	public boolean outputRequestException(Map<String,Object> templateData, PrintWriter output, Exception e) throws ServletException {
+	public boolean outputRequestException(Map<String,Object> templateData, PrintWriter output, Exception e) throws Exception {
 		// Throws a runtime Exception, let the servlet manager handle the rest
-		throw new ServletException(e);
+		throw e;
 		//return false;
 	}
 	
@@ -610,7 +624,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// [Avoid Extending, this handles all the various headers and JSONP / CORS]
 	/// Does the actual final json object to json string output, with contentType "application/javascript"
-	public boolean outputJSON(Map<String,Object> outputData, Map<String,Object> templateData, PrintWriter output) throws ServletException {
+	public boolean outputJSON(Map<String,Object> outputData, Map<String,Object> templateData, PrintWriter output) throws Exception {
 		// Set content type to JSON
 		if(httpResponse != null) {
 			httpResponse.setContentType("application/javascript");
@@ -625,7 +639,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	///
 	/// note that this should return false, UNLESS the exception was gracefully handled.
 	/// which in most cases SHOULD NOT be handled here.
-	public boolean outputJSONException(Map<String,Object> outputData, Map<String,Object> templateData, PrintWriter output, Exception e) throws ServletException  {
+	public boolean outputJSONException(Map<String,Object> outputData, Map<String,Object> templateData, PrintWriter output, Exception e) throws Exception  {
 		// Converts the stack trace to a string
 		String stackTrace = org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e);
 		

@@ -40,12 +40,7 @@ public class AccountLogin extends BasePage {
 	
 	/// Process the request, not the authentication layer
 	public boolean doJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
-		// Calls
-		Map<String,Object> ret = restBuilder().servletCall( _apiSetPrefix, this, outputData );
-		if( ret == null ) {
-			outputData.put("ERROR", "REST API not found");
-		}
-		return true;
+		return restBuilder().servletCall( _apiSetPrefix, this, outputData );
 	}
 	
 	///
@@ -62,7 +57,7 @@ public class AccountLogin extends BasePage {
 	/// # Note the following SHOULD be rewritten / overwritten to fit the app specific security model
 	/// + password
 	///    + POST : accountID, oldPassword, newPassword
-	///
+	///    
 	///
 	///
 	///    + name

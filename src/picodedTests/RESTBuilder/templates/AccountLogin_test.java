@@ -26,7 +26,7 @@ public class AccountLogin_test {
 	
 	EmbeddedServlet tomcat = null;
 	AccountLogin loginServlet;
-	String testAddress = "http://127.0.0.1:5000";
+	String testAddress = "http://127.0.0.1:15000";
 	
 	RequestHttp requester;
 	ResponseHttp response;
@@ -43,7 +43,8 @@ public class AccountLogin_test {
 			
 			tomcat = new EmbeddedServlet("", context)
 			.withPort(15000)
-			.withServlet("/api/account", "loginServlet", loginServlet);
+			.withServlet("/api/account",  "loginServlet1", loginServlet)
+			.withServlet("/api/account/*", "loginServlet2", loginServlet);
 			
 			tomcat.start();
 		}
@@ -53,6 +54,14 @@ public class AccountLogin_test {
 	public void noLoginTest() throws IOException {
 		assertNotNull( response = RequestHttp.get( testAddress+"/api/account/login" ) );
 		assertNotNull( responseMap = response.toMap() );
+		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
+		assertNull( responseMap.get("accountID") );
+		assertNull( responseMap.get("accountNAME") );
+	}
+	
+	@Test
+	public void loginTest() throws IOException {
+		
 	}
 	
 	// 

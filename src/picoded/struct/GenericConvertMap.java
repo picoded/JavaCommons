@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Collection;
+import java.util.function.BiFunction;
 
 import picoded.conv.GenericConvert;
 
@@ -319,6 +320,22 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	/// @default         The converted value
 	public default Object[] getObjectArray(K key) {
 		return GenericConvert.toObjectArray(key);
+	}
+	
+	// Does a simple typecast and put conversion
+	//--------------------------------------------------------------------------------------------------
+	@SuppressWarnings("unchecked")
+	public default V typecastPut(K key, Object value) {
+		return put(key, (V)value);
+	}
+	
+	// Attempts to convert against known V value types, and insert into the map. 
+	// If no conversion is required, please use typecastPut
+	//--------------------------------------------------------------------------------------------------
+	public default V convertPut(K key, Object value) {
+		//BiFunction<Object,Object,V> converter = (BiFunction<Object,Object,V>) GenericConvert.getBiFunction_noisy( V );
+		
+		return null;
 	}
 	
 }

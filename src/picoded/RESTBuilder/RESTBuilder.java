@@ -75,9 +75,14 @@ public class RESTBuilder {
 	/// Stores the various methods currently in place of the RESTBuilder
 	protected Map<String, RESTNamespace> namespaceMap = new HashMap<String, RESTNamespace>();
 	
+	/// Namespace filter, amends common namespace errors
+	protected String namespaceFilter(String namespace) {
+		return namespace.replaceAll("\\.", "/").replaceAll("//", "/").replaceAll("//", "/").split("\\?")[0];
+	}
+	
 	/// Filters and get the storage namespace
 	protected String[] namespaceArray(String namespace) {
-		return namespace.replaceAll("\\.", "/").replaceAll("//", "/").split("/");
+		return namespaceFilter(namespace).split("/");
 	}
 	
 	/// Filters and get the storage namespace
@@ -121,7 +126,7 @@ public class RESTBuilder {
 	
 	/// Does a search for the relevent api, and additional setup for RESTRequest, relvent to the found api. And perfroms the call
 	protected Map<String,Object> setupAndCall(String apiNamespace, HttpRequestType requestType, RESTRequest req, Map<String,Object> res) {
-		String[] raw_ns = apiNamespace.split("?")[0].split("/");
+		String[] raw_ns = namespaceArray( apiNamespace );
 		String[] ns = raw_ns;
 		
 		// Auto create result map if needed
@@ -197,13 +202,24 @@ public class RESTBuilder {
 	}
 	
 	/// Automatically calls the respective namespace, using the CorePage registered URI wildcard, as "API NameSpace"
-	public Map<String,Object> servletCall(picoded.servlet.CorePage page, Map<String,Object> resultMap) {
-		return namespaceCall(page.requestWildcardUri(), page.requestType(), page, resultMap);
+	/// and automatic handling of missing API error
+	///
+	/// This is mainly intended to be call within CorePage doJSON
+	public boolean servletCall(picoded.servlet.CorePage page, Map<String,Object> resultMap) {
+		return servletCall("", page, resultMap);
 	}
 	
 	/// Automatically calls the respective namespace, using the CorePage registered URI wildcard, as "API NameSpace"
-	public Map<String,Object> servletCall(String apiPrefix, picoded.servlet.CorePage page, Map<String,Object> resultMap) {
-		return namespaceCall(apiPrefix+page.requestWildcardUri(), page.requestType(), page, resultMap);
+	/// and automatic handling of missing API error
+	///
+	/// This is mainly intended to be call within CorePage doJSON
+	public boolean servletCall(String apiPrefix, picoded.servlet.CorePage page, Map<String,Object> resultMap) {
+		String namespace = namespaceFilter( apiPrefix+page.requestWildcardUri() );
+		if( namespaceCall(namespace, page.requestType(), page, resultMap) == null ) {
+			resultMap.put("requested API", namespace );
+			resultMap.put("error", "REST API not found");
+		}
+		return true;
 	}
 	
 	///----------------------------------------

@@ -3,7 +3,9 @@ package picoded.conv;
 import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.Map;
+import java.util.HashMap;
 
 /// Provides several autoamted generic conversion, from a given object format to another.
 ///
@@ -31,9 +33,12 @@ public class GenericConvert {
 	/// @param fallbck   The fallback default (if not convertable, aka null)
 	///
 	/// @returns         The converted string, always possible unless null
-	public static String toString(Object input, String fallbck) {
+	public static String toString(Object input, Object fallbck) {
 		if (input == null) {
-			return fallbck;
+			if(fallbck == null) {
+				return null;
+			}
+			return toString(fallbck, null);
 		}
 		
 		if (input instanceof String) {
@@ -504,6 +509,13 @@ public class GenericConvert {
 		
 		if (input instanceof String[]) {
 			return (String[]) input;
+		} else if( input instanceof Object[] ) {
+			Object[] inArr = (Object[])input;
+			String[] ret = new String[inArr.length];
+			for(int a=0; a<inArr.length; ++a) {
+				ret[a] = toString( inArr[a] );
+			}
+			return ret;
 		}
 		
 		// From list conversion (if needed)
@@ -517,10 +529,20 @@ public class GenericConvert {
 					list = (List<?>) o;
 				}
 			} catch (Exception e) {
-				
+				// Silence the exception
 			}
 		} else if (input instanceof List) {
 			list = (List<?>) input;
+		} else { //Force the "toString", then to List conversion
+			try {
+				String inputStr = input.toString();
+				Object o = ConvertJSON.toList(inputStr);
+				if (o instanceof List) {
+					list = (List<?>) o;
+				}
+			} catch (Exception e) {
+				// Silence the exception
+			}
 		}
 		
 		// List to string array conversion
@@ -595,6 +617,16 @@ public class GenericConvert {
 			}
 		} else if (input instanceof List) {
 			list = (List<?>) input;
+		} else { //Force the "toString", then to List conversion
+			try {
+				String inputStr = input.toString();
+				Object o = ConvertJSON.toList(inputStr);
+				if (o instanceof List) {
+					list = (List<?>) o;
+				}
+			} catch (Exception e) {
+				// Silence the exception
+			}
 		}
 		
 		// List to string array conversion
@@ -645,5 +677,39 @@ public class GenericConvert {
 		
 		return null;
 	}
-	 */
+	*/
+	
+	// to BiFunction Map, used to automated put conversion handling
+	//--------------------------------------------------------------------------------------------------
+	public static BiFunction<Object, Object, String> toString_BiFunction = (i,f) -> GenericConvert.toString(i,f);
+	public static BiFunction<Object, Object, String[]> toStringArray_BiFunction = (i,f) -> GenericConvert.toStringArray(i,f);
+	
+	protected static Map<Class<?>, BiFunction<?,?,?> > biFunctionMap = null;
+	public static Map<Class<?>, BiFunction<?,?,?> > biFunctionMap() {
+		if(biFunctionMap != null) {
+			return biFunctionMap;
+		}
+		
+		Map<Class<?>, BiFunction<?,?,?> > ret = new HashMap<Class<?>, BiFunction<?,?,?> >();
+		
+		ret.put( String.class, toString_BiFunction );
+		ret.put( String[].class, toStringArray_BiFunction );
+		
+		biFunctionMap = ret;
+		return biFunctionMap;
+	}
+	
+	/// Gets and return the relevent BiFunction for the given class
+	public static BiFunction<?,?,?> getBiFunction(Class<?> resultClassObj) {
+		return biFunctionMap().get(resultClassObj);
+	}
+	
+	/// Gets and return the relevent BiFunction for the given class, throws an error if not found
+	public static BiFunction<?,?,?> getBiFunction_noisy(Class<?> resultClassObj) {
+		BiFunction<?,?,?> ret = getBiFunction(resultClassObj);
+		if( ret == null ) {
+			throw new RuntimeException("Unable to find specified class object: "+resultClassObj);
+		}
+		return ret;
+	}
 }

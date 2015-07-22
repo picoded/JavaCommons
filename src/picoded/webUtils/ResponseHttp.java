@@ -204,10 +204,7 @@ public class ResponseHttp {
 	/// Converts the result string into a map, via JSON's
 	public Map<String,Object> toMap() {
 		waitForCompletedRequest();
-		
-		System.out.println("Getting map");
 		String r = toString();
-		System.out.println("Val of r: "+r);
 		if( r == null || r.length() <= 1 ) {
 			return null;
 		}

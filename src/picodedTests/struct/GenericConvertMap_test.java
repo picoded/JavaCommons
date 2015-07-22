@@ -5,6 +5,8 @@ import picoded.struct.GenericConvertMap;
 import picoded.struct.CaseInsensitiveHashMap;
 import picoded.struct.ProxyGenericConvertMap;
 
+import java.util.function.BiFunction;
+
 // Test Case include
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -25,6 +27,53 @@ public class GenericConvertMap_test {
 	
 	@After
 	public void tearDown() {
+	}
+	
+	/// The following, test severals assumptions regarding Object[] instanceof tests
+	/// done in java, this is required for the generic toXArray functions.
+	@Test
+	public void arrayInstanceOfTest() {
+		String sample = "a";
+		assertFalse( ((Object)sample instanceof Object[]) );
+		
+		String[] strArr = new String[] { "1", "2", "3" };
+		Object[] objArr = new Object[] { "1", "2", "3" };
+		Integer[] intArr = new Integer[] { 1, 2, 3 };
+		
+		/// String array tests
+		assertTrue( (strArr instanceof Object[]) );
+		assertTrue( ((Object)strArr instanceof Object) );
+		
+		assertTrue( ((Object)strArr instanceof String[]) );
+		assertFalse( ((Object)strArr instanceof Integer[]) );
+		assertFalse( ((Object)strArr instanceof String) );
+		assertFalse( ((Object)strArr instanceof Integer) );
+		
+		/// Integer array tests
+		assertTrue( (intArr instanceof Object[]) );
+		assertTrue( ((Object)intArr instanceof Object) );
+		
+		assertFalse( ((Object)intArr instanceof String[]) );
+		assertTrue( ((Object)intArr instanceof Integer[]) );
+		assertFalse( ((Object)intArr instanceof String) );
+		assertFalse( ((Object)intArr instanceof Integer) );
+		
+		/// Object array tests
+		assertTrue( (objArr instanceof Object[]) );
+		assertTrue( ((Object)objArr instanceof Object) );
+		
+		assertFalse( ((Object)objArr instanceof String[]) );
+		assertFalse( ((Object)objArr instanceof Integer[]) );
+		assertFalse( ((Object)objArr instanceof String) );
+		assertFalse( ((Object)objArr instanceof Integer) );
+	}
+	
+	/// The following, test the class uniqueness of BiFunction types
+	@Test
+	public void classLoockUpTest() {
+		assertEquals( String.class, String.class );
+		assertEquals( String[].class, String[].class );
+		assertNotEquals( String.class, String[].class );
 	}
 	
 	@Test

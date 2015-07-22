@@ -6,16 +6,6 @@ import java.util.List;
 
 import picoded.struct.GenericConvertMap;
 
-/*
- * each node has 
- * type
- * text
- * subnodes (List)
- */
-
-
-
-//Represents a single enclosed html tag
 //may contain child tags, hence , the list of HtmlNodes
 public class FormNode extends HashMap<String, Object> implements GenericConvertMap<String, Object> {
 	static final long serialVersionUID = 1L;

@@ -31,6 +31,8 @@ import com.hazelcast.core.IMap;
 
 /// @TODO Documentation
 public class KeyValueMap extends JStackData implements GenericConvertMap<String,String> {
+    
+    //private String tableName = new String();
 
 	///
 	/// Constructor setup
@@ -165,6 +167,7 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	/// @param key as String
 	/// @returns boolean true or false if the key exists
 	public boolean containsKey(Object key) {
+
 		if( key == null ) {
 			throw new IllegalArgumentException("containKey cannot have null as parmeter");
 		}
@@ -174,14 +177,21 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 
 			String kID = key.toString();
 			Object r = JStackIterate( new JStackReader() {
+			    
+			    /// Read only the Jcache layer
+			    public Object readJCacheLayer(JCache jc, Object ret) throws JCacheException, JStackException {
+                    if( ret != null ) {
+						return ret;
+					}
+                    return jc.getMap(tableName).get(kID);
+				}
+			
 				/// Reads only the JSQL layer
 				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
 					if( ret != null ) {
 						return ret;
 					}
-
-					String tName = sqlTableName(sql);
-
+                    String tName = sqlTableName(sql);
 					// Search for the key
 					JSqlResult r = sql.selectQuerySet( //
 															 tName, //
@@ -199,7 +209,8 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 			} );
 
 			return (r != null);
-		} catch (JStackException e) {
+			
+		}catch (JStackException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -214,6 +225,15 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 			String kID = key.toString();
 
 			Object ret = JStackIterate( new JStackReader() {
+			
+    			/// Reads only the Jcache layer
+    			public Object readJCacheLayer(JCache jc, Object ret) throws JCacheException, JStackException {
+                    if( ret != null ) {
+						return ret;
+					}
+                    return jc.getMap(tableName).get(kID);
+				}
+			
 				/// Reads only the JSQL layer
 				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
 					if( ret != null ) {
@@ -273,6 +293,15 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 
 			String val = (value == null)? null : value.toString();
 			Object r = JStackIterate( new JStackReader() {
+			
+    		    /// Reads only the Jcache layer
+    			public Object readJCacheLayer(JCache jc, Object ret) throws JCacheException, JStackException {
+                    if( ret != null ) {
+						return ret;
+					}
+                    return jc.getMap(tableName).get(val);
+				}
+			
 				/// Reads only the JSQL layer
 				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
 					if( ret != null ) {
@@ -372,6 +401,16 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	public long getExpiry(Object key) {
 		try {
 			Object ret = JStackIterate( new JStackReader() {
+				
+    		    /// Reads only the Jcache layer
+    			public Object readJCacheLayer(JCache jc, Object ret) throws JCacheException, JStackException {
+                    if( ret != null ) {
+						return ret;
+					}
+                    return jc.getMap(tableName).get(key);
+				}
+				
+				
 				/// Reads only the JSQL layer
 				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
 					if( ret != null ) {

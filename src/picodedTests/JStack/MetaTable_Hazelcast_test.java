@@ -60,16 +60,15 @@ public class MetaTable_Hazelcast_test extends MetaTable_Sqlite_test {
 	public void readLayerCheck() throws JStackException {
 		
 		// Read operation as per "normal"
-		HashMap<String, Object> objMap = new HashMap<String,Object>();
+		TreeMap<String, Object> objMap = new TreeMap<String,Object>();
 		objMap.put("str_val", "^_^");
 		objMap.put("num", 123);
-		
 		String guid = GUID.base58();
 		assertNull(mtObj.get(guid));
 		assertEquals(guid, mtObj.append(guid, objMap)._oid());
+		objMap.put("_oid", guid);
 		
-		objMap.put("oid", guid);
-		assertEquals(objMap, mtObj.get(guid));
+		assertEquals(objMap, new TreeMap<String, Object>(mtObj.get(guid)));
 		
 		// Access only the JSql layer
 		JStack sqlStack = new JStack(JSqlObj);
@@ -88,7 +87,8 @@ public class MetaTable_Hazelcast_test extends MetaTable_Sqlite_test {
 		assertEquals(corruptObjMap, sqlMtObj.get(guid)); //check for coorect corruption
 		
 		// Checks that the JCache layer is not corrupted
-		assertEquals(objMap, mtObj.get(guid));
+		assertEquals(guid, mtObj.append(guid, objMap)._oid());
+		assertEquals(objMap, new TreeMap<String, Object>(mtObj.get(guid)));
 	}
 	
 }

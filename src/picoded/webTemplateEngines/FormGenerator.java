@@ -3,42 +3,10 @@ package picoded.webTemplateEngines;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Arrays;
-
-import picoded.conv.GenericConvert;
-import picoded.struct.GenericConvertMap;
-import picoded.struct.ProxyGenericConvertMap;
-
 ///
 /// Web templating engine that helps define and convert a JSON styled template, into the actual web form
 ///
-/// @TODO
-/// + Skip/ShowOnFilter, a common filter would be PDF
-///
-/// @Future Stuff
-/// + Use a tokenizer system? that is more performance efficent??, instead of multiple string/stringBuilder
-///
 public class FormGenerator {
-	
-	
-	
-	/// Helps escape html dom parameter quotes, in an "optimal" way
-	protected static String escapeParameterQuote( String val ) {
-		boolean hasSingleQuote = val.contains("\'");
-		boolean hasDoubleQuote = val.contains("\"");
-		
-		if( hasSingleQuote && hasDoubleQuote ) {
-			//No choice, escape double quotes, and use them
-			return "\""+val.replaceAll("\\\\", "\\\\").replaceAll("\"","\\\"")+"\"";
-		} else if( hasDoubleQuote ) {
-			return "\'"+val+"\'";
-		} else if( hasSingleQuote ) {
-			return "\""+val+"\"";
-		} //else { //quoteless, use single quotes
-		return "\'"+val+"\'";
-		//}
-	}
-	
 	private Map<String, FormWrapperInterface> customFormWrapperTemplates = new HashMap<String, FormWrapperInterface>();
 	private Map<String, FormInputInterface> customFormInputTemplates = new HashMap<String, FormInputInterface>();
 	

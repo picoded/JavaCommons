@@ -12,6 +12,13 @@ import com.hazelcast.instance.Node;
 
 public class FormInputTemplates {
 	
+	//TODO
+	/*
+	 * radio check box
+	 * 
+	 */
+	
+	
 	protected static FormInputInterface header = (node)->{ 
 		String text = node.getString("text", "");
 		

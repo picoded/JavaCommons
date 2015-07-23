@@ -19,15 +19,22 @@ import picoded.fileUtils.*;
 public class ConfigFile_test {
 	
 	public String testDir = "./test-files/test-specific/fileUtils/ConfigFile";
-	
 	protected ConfigFile configObj = null;
+	protected ConfigFile jsConfigObj = null;
 	
 	@Before
 	public void setUp() {
 		File tFile = new File(testDir+"/iniTestFile.ini");
-		assertTrue( tFile.canRead() );
+		boolean canRead = tFile.canRead();
+		assertTrue( canRead );
+		
+		File jsFile = new File(testDir+"/iniTestFileJSON.js");
+		boolean canReadJSON = jsFile.canRead();
+		assertTrue(canReadJSON);
 		
 		configObj = new ConfigFile(testDir+"/iniTestFile.ini");
+		
+		jsConfigObj = new ConfigFile(testDir+"/iniTestFileJSON.js");
 	}
 	
 	@After
@@ -38,6 +45,17 @@ public class ConfigFile_test {
 	@Test
 	public void constructor() {
 		assertNotNull( configObj );
+	}
+	
+	@Test
+	public void samtest(){
+		String helloVal = (String)configObj.get("main.hello");
+	}
+	
+	@Test
+	public void jsonTest(){
+		String jsonHelloVal = (String)jsConfigObj.get("hello");
+		assertEquals("world", jsonHelloVal);
 	}
 	
 	@Test

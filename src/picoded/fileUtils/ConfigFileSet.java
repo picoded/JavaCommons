@@ -20,14 +20,16 @@ import org.apache.commons.lang3.ArrayUtils;
 ///
 /// Note that folder, and filename will be used as the config path. Unless its config.ini
 ///
-public class ConfigFileSet extends ConfigFile implements GenericConvertMap<String, String> {
+public class ConfigFileSet extends ConfigFile implements GenericConvertMap<String, Object> {
 	
 	/// The actual inner prefix set, which is searched when a request is made
 	///
 	/// Note that the inner map are actually ConfigFile 
-	public Map<String, Map<String,String>> prefixSetMap = new HashMap<String, Map<String,String>>();
 	
-	/// 
+	//<main, <main-include.test, hello>>
+	//<related <main-include.text, hi>>
+	public Map<String, Map<String,Object>> prefixSetMap = new HashMap<String, Map<String,Object>>();
+	
 	public ConfigFileSet() {
 		
 	}
@@ -45,6 +47,27 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		return addConfigSet(new File(filePath), prefix);
 	}
 	
+	//return to later, do configfile first
+//	private ConfigFileSet addConfigSet_new(File inFile, String prefix){
+//		if(inFile == null){
+//			return this;
+//		}
+//		
+//		String filePrefix = prefix;
+//		if(filePrefix != null){
+//			filePrefix = filePrefix.trim();
+//		}else{
+//			filePrefix = "";
+//		}
+//		
+//		if(inFile.isDirectory()){
+//			//need to iterate through inner directory and return as period delimited string
+//			//basically full file path starting from root to the inner file name becomes the key
+//			//example <main.inner.inner, <main-include.hello, world>>
+//		}else{
+//		}
+//	}
+
 	/// Config file set iteration and load with prefix
 	public ConfigFileSet addConfigSet(File inFile, String prefix) {
 		if(inFile == null) {
@@ -95,7 +118,9 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 	}
 	
 	/// Gets the config value string, from the file 
-	public String get(Object key) {
+	
+	//if contains map, return map, else do database call
+	public Object get(Object key) {
 		
 		String keyString = key.toString();
 		String[] splitKeyString = keyString.split("\\.");
@@ -104,7 +129,7 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 			String section = StringUtils.join( ArrayUtils.subarray(splitKeyString, 0, splitPt), ".");
 			String ending = StringUtils.join( ArrayUtils.subarray(splitKeyString, splitPt, splitKeyString.length), ".");
 			
-			Map<String,String> subMap = prefixSetMap.get(section);
+			Map<String,Object> subMap = prefixSetMap.get(section);
 			if( subMap != null ) {
 				return subMap.get(ending);
 			}

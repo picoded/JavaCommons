@@ -31,7 +31,7 @@
 	
 	<!-- jUnit declearation over-ride, see: 'http://stackoverflow.com/questions/9774264/junit-ant-task-junittask-was-not-found' -->
 	<path id="junit-path">
-		<fileset dir="${lib-organized-dir}/junit" includes="**/*.jar" />
+		<fileset dir="build-tools/junit" includes="**/*.jar" />
 	</path>
 	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
 		<classpath refid="junit-path"/>
@@ -48,16 +48,22 @@
 	<!-- **************************************************
 	The following lists the target sets supported by ant
 	
-	+ setup
-	+ clean
-	+ build-lib
-	+ compile-src
-	+ compile-srcX
-	+ compile-tests
-	+ compile
-	+ build
-	+ src-beautify
+	+ setup                 - Setup any precommit hooks used by the project
+	+ clean                 - Clean out all build / temporary files
+	+ src-beautify          - Applies a standardised code mint to java files
+	+ build-lib             - ReBuild the library only jar
+	+ build-lib-ifneeded    - Varient of build-lib, only build if not exists
+	+ compile-src           - Compile the source code
+	+ compile-srcX          - Compile experimental temporary files
+	+ compile-tests         - Compile test codes
+	+ build                 - Build all 3 jar varients
+	+ javadoc               - Generate the javadoc and its jar
+	+ junit-all             - Runs the full JUnit suite, with jacoco
 	
+	************************************************** -->
+	
+	<!-- **************************************************
+	* Setup / Cleanup Functions
 	************************************************** -->
 	
 	<!-- setup pre-commit git hook, if needed -->
@@ -83,31 +89,175 @@
 		<mkdir dir="${basedir}/test-files/tmp"/>
 	</target>
 	
-	<!-- rebuild lib jar completely -->
-	<target name="rebuild-lib">
-		<mkdir dir="bin/build"/>
-		<jar jarfile="${build-libOnly}">
-			<zipgroupfileset dir="${lib-organized-dir}">
-				<include name="**/*.jar"/>
-			</zipgroupfileset>
+	<!-- Code Beautifier, used for pre-commit hook -->
+	<target name="src-beautify">
+		<!-- Scan and beautify the code : spaces only -->
+		<exec executable="java">
+			<arg value="-cp"/>
+			<arg value="./build-tools/java-formatter/java-formatter-with-dependencies.jar"/>
+			<arg value="Formatter"/>
+			<arg value="./build-config/code-format.opts"/>
+			<arg value="./src"/>
+		</exec>
+	</target>
+	
+	<!-- **************************************************
+	* Dependency Library management
+	************************************************** -->
+	
+	<!-- Extract and organize all the depency lib-organized files -->
+	<target name="build-lib-tempWorkspace">
+		
+		<!-- resets the temporary lib building folder -->
+		<delete dir="${build-temp}" failonerror="false" />
+		<mkdir dir="${build-temp}"/> 
+		<mkdir dir="${build-temp}/UBER"/> 
+		
+		<!-- iterate over the dependencies -->
+		<for param="file">
+			<path>
+				<!-- scan against every file found on lib-organized -->
+				<fileset dir="${lib-organized-dir}"> 
+					<include name="**/*.jar"/> 
+				</fileset> 
+			</path>
+			<sequential> 
+				<!-- Get the library jar name to organize files under -->
+				<propertyregex override="yes" 
+				property="jarname"  input="@{file}" 
+				regexp=".*/([^/]*)\.jar" replace="\1"/> 
+				
+				<!-- put the spring.* special stuff into sub-directories -->
+				<mkdir dir="${build-temp}/SPRING/${jarname}"/> 
+				<unzip dest="${build-temp}/SPRING/${jarname}" src="@{file}">
+					<patternset>
+						<include name="**/META-INF/spring.*"/>
+					</patternset>
+				</unzip>
+				
+				<!-- Handle license files seperately -->
+				<mkdir dir="${build-temp}/LICENSE/${jarname}"/> 
+				<unzip dest="${build-temp}/LICENSE/${jarname}" src="@{file}">
+					<patternset>
+						<include name="**/LICENSE.*"/>
+						<include name="**/license.*"/>
+						<include name="**/NOTICE.*"/>
+						<include name="**/notice.*"/>
+						<include name="**/LICENSE"/>
+						<include name="**/NOTICE"/>
+						<include name="**/DEPENDENCIES"/>
+						<include name="**/INDEX.LIST"/>
+					</patternset>
+				</unzip>
+				
+				<!-- Handle excluded items seperately -->
+				<mkdir dir="${build-temp}/EXCLUDES/${jarname}"/> 
+				<unzip dest="${build-temp}/EXCLUDES/${jarname}" src="@{file}">
+					<patternset>
+						<include name="**/META-INF/MANIFEST.MF"/>
+						<include name="**/META-INF/*.SF"/>
+						<include name="**/META-INF/*.DSA"/>
+						<include name="**/META-INF/*.RSA"/>
+						<include name="**/META-INF/SIG-*"/>
+					</patternset>
+				</unzip>
+				
+				<!-- put everything else into their CONFLICT directory -->
+				<mkdir dir="${build-temp}/CONFLICT/${jarname}"/> 
+				<unzip dest="${build-temp}/CONFLICT/${jarname}" src="@{file}">
+					<patternset>
+						<exclude name="**/META-INF/spring.*"/>
+						<exclude name="**/META-INF/MANIFEST.MF"/>
+						<exclude name="**/META-INF/*.SF"/>
+						<exclude name="**/META-INF/*.DSA"/>
+						<exclude name="**/META-INF/*.RSA"/>
+						<exclude name="**/META-INF/SIG-*"/>
+						
+						<exclude name="**/LICENSE.*"/>
+						<exclude name="**/license.*"/>
+						<exclude name="**/NOTICE.*"/>
+						<exclude name="**/notice.*"/>
+						<exclude name="**/LICENSE"/>
+						<exclude name="**/NOTICE"/>
+						<exclude name="**/DEPENDENCIES"/>
+						<exclude name="**/INDEX.LIST"/>
+					</patternset>
+				</unzip>
+				
+				<!-- move over only files that are not in conflict into UBER -->
+				<move todir="${build-temp}/UBER/" overwrite="false">
+					<fileset dir="${build-temp}/CONFLICT/${jarname}/">
+					</fileset>
+				</move>
+			</sequential>
+		</for>
+		
+		<!-- build the concatenated spring.* files -->
+		<mkdir dir="${build-temp}/UBER/META-INF"/> 
+		<concat destfile="${build-temp}/UBER/META-INF/spring.handlers" fixlastline="true">
+			<fileset dir="${build-temp}/SPRING/" includes="*/*/spring.handlers"/>
+		</concat>
+		<concat destfile="${build-temp}/UBER/META-INF/spring.schemas" fixlastline="true">
+			<fileset dir="${build-temp}/SPRING/" includes="*/*/spring.schemas"/>
+		</concat>
+		<concat destfile="${build-temp}/UBER/META-INF/spring.tooling" fixlastline="true">
+			<fileset dir="${build-temp}/SPRING/" includes="*/*/spring.tooling"/>
+		</concat>
+		<concat destfile="${build-temp}/UBER/META-INF/spring.factories" fixlastline="true">
+			<fileset dir="${build-temp}/SPRING/" includes="*/*/spring.factories"/>
+		</concat>
+		
+		<!-- empty out unneeded empty directories -->
+		<delete includeemptydirs="true">
+			<fileset dir="${build-temp}"  >
+				<and>
+					<size value="0"/>
+					<type type="dir"/>
+				</and>
+			</fileset>
+		</delete>
+	</target>
+	
+	<!-- rebuilds the dependency libOnly jar from all library organized files -->
+	<target name="build-lib" depends="build-lib-tempWorkspace">
+		<!-- build the uber jar! -->
+		<delete file="${build-libOnly}" failonerror="false"/>
+		<jar destfile="${build-libOnly}">
+			<!-- all dependency files except spring.* -->
+			<fileset dir="${build-temp}/UBER"/> 
+			
+			<!-- my project's classes & etc -->
+			<!--<zipgroupfileset dir="${dist.dir}" includes="myproject.jar" />-->
+			<!--
+			<manifest>
+				<attribute name="Main-Class" value="${main-class}"/>
+			</manifest>  
+			-->
 		</jar>
+		<path id="lib.path.ref">
+			<fileset dir="bin/build" includes="*-libsOnly.jar" />
+		</path>
 	</target>
 	
 	<!-- check if lib jar exists -->
 	<target name="build-lib-check">
 		<available file="${build-libOnly}" property="build-libOnly.present"/>
-	</target>
-	
-	<!-- build the lib jar only if it does noot exists -->
-	<target name="build-lib" depends="build-lib-check" unless="${build-libOnly.present}">
-		<antcall target="rebuild-lib"/>
-	</target>
-	
-	<!-- compile the source -->
-	<target name="compile-src" depends="build-lib">
 		<path id="lib.path.ref">
 			<fileset dir="bin/build" includes="*-libsOnly.jar" />
 		</path>
+	</target>
+	
+	<!-- build the lib jar only if it does noot exists -->
+	<target name="build-lib-ifneeded" depends="build-lib-check" unless="${build-libOnly.present}">
+		<antcall target="build-lib"/>
+	</target>
+	
+	<!-- **************************************************
+	* Source code complation
+	************************************************** -->
+	
+	<!-- compile the source -->
+	<target name="compile-src" depends="build-lib-ifneeded">
 		<mkdir dir="${build-classes}"/>
 		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false">
@@ -118,120 +268,36 @@
 		</javac>
 	</target>
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	<target name="make-bundle">
-		<delete dir="${build-temp}" failonerror="false" />
-		<mkdir dir="${build-temp}"/> 
-		
-		<!-- iterate over the dependencies -->
-		<for param="file">
-			<path>
-				<fileset dir="${lib-organized-dir}"> 
-					<include name="**/*.jar"/> 
-				</fileset> 
-			</path>
-			<sequential> 
-				<propertyregex override="yes" 
-				property="jarname"  input="@{file}" 
-				regexp=".*/([^/]*)\.jar" replace="\1"/> 
-
-				<!-- put the spring.* jars into special sub-directories -->
-				<mkdir dir="${build-temp}/${jarname}"/> 
-				<unzip dest="${build-temp}/${jarname}" src="@{file}">
-					<patternset>
-						<include name="**/META-INF/spring.*"/>
-					</patternset>
-				</unzip>
-				
-				<!-- put everything else in the 'uber' directory -->
-				<unzip dest="${build-temp}/uber" src="@{file}">
-					<patternset>
-						<exclude name="**/META-INF/spring.*"/>
-					</patternset>
-				</unzip>
-			</sequential>
-		</for>
-
-		<!-- build the concatenated spring.* files -->
-		<mkdir dir="${build-temp}/META-INF"/> 
-		<concat destfile="${build-temp}/META-INF/spring.handlers" fixlastline="true">
-			<fileset dir="${build-temp}/" includes="*/*/spring.handlers"/>
-		</concat>
-		<concat destfile="${build-temp}/META-INF/spring.schemas" fixlastline="true">
-			<fileset dir="${build-temp}/" includes="*/*/spring.schemas"/>
-		</concat>
-		<concat destfile="${build-temp}/META-INF/spring.tooling" fixlastline="true">
-			<fileset dir="${build-temp}/" includes="*/*/spring.tooling"/>
-		</concat>
-		<concat destfile="${build-temp}/META-INF/spring.factories" fixlastline="true">
-			<fileset dir="${build-temp}/" includes="*/*/spring.factories"/>
-		</concat>
-		
-		<!-- build the uber jar! -->
-		<delete file="${build-libOnly}" failonerror="false"/>
-		<jar destfile="${build-libOnly}">
-			<!-- all dependency files except spring.* -->
-			<fileset dir="${build-temp}/uber"/> 
-			<!-- the spring.* files -->
-			<fileset dir="${build-temp}/" includes="META-INF/*"/>
-			
-			<!-- my project's classes & etc -->
-			<!--<zipgroupfileset dir="${dist.dir}" includes="myproject.jar" />-->
-			<!--
-			<manifest>
-				<attribute name="Main-Class" value="${main-class}"/>
-			</manifest>  
-			-->
-		</jar>
+	<!-- convinent aliases -->
+	<target name="compile" depends="compile-src">
+	</target>
+	<target name="source" depends="compile-src">
 	</target>
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	<target name="compile-srcX" depends="build-lib">
+	<!-- compile the source with picodedX -->
+	<target name="compile-srcX" depends="build-lib-ifneeded">
 		<mkdir dir="${build-classes}"/>
-		<path id="lib.path.ref">
-			<fileset dir="${build-lib}" includes="**/*.jar" />
-		</path>
 		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false">
 			<compilerarg value="-Xlint:unchecked"/>
+			<src path="${src-path}"/>
 			<src path="${src-experimental}"/>
 			<exclude name="**/package-info.java"/>
 		</javac>
 	</target>
 	
-	<target name="compile-tests" depends="build-lib">
+	<!-- compile the source with picodedTests -->
+	<target name="compile-tests" depends="build-lib-ifneeded">
 		<delete dir="test-files/tmp" failonerror="false"/>
 		<mkdir dir="test-files/tmp"/>
 		
-		<mkdir dir="${build-classes}"/>
-		<path id="lib.path.ref">
-			<fileset dir="${build-lib}" includes="**/*.jar" />
+		<path id="lib.test.ref">
+			<fileset dir="bin/build" includes="*-libsOnly.jar" />
+			<fileset dir="build-tools/junit" includes="*.jar" />
 		</path>
-		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
+		
+		<mkdir dir="${build-classes}"/>
+		<javac destdir="${build-classes}" classpathref="lib.test.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false">
 			<compilerarg value="-Xlint:all"/>
 			<src path="${src-path}"/>
@@ -240,30 +306,31 @@
 		</javac>
 	</target>
 	
-	<target name="build" depends="compile-src">
-		<delete dir="bin/build" failonerror="false"/>
-		<mkdir dir="bin/build"/>
-
+	<!-- **************************************************
+	* Complete build / docs / hybut
+	************************************************** -->
+	
+	<!-- Build all the respective realese jar files -->
+	<target name="build" depends="build-lib">
 		<!-- no libs -->
+		<delete dir="bin/build/picodedJavaCommons-noLibs.jar" failonerror="false"/>
 		<jar destfile="bin/build/picodedJavaCommons-noLibs.jar">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 		</jar>
-		<jar destfile="${build-temp}/picodedJavaCommons-libsOnly-main.jar">
-			<fileset dir="${build-lib}" includes="*.jar" />
-		</jar>
-		<jar destfile="${build-temp}/picodedJavaCommons-withLibs-main.jar">
+		
+		<!-- with dependency files -->
+		<delete dir="bin/build/picodedJavaCommons-withLibs.jar" failonerror="false"/>
+		<jar destfile="${build-temp}/picodedJavaCommons-withLibs.jar">
+			<fileset dir="${build-temp}/UBER"/> 
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
-			<fileset dir="${build-lib}" includes="*.jar" />
 		</jar>
 	</target>
 	
-	<target name="javadoc" depends="build-lib">
+	<!-- Build all the respective javadocs files -->
+	<target name="javadoc" depends="build-lib-ifneeded">
 		<delete dir="bin/javadoc" failonerror="false"/>
 		<mkdir dir="bin/javadoc"/>
 		
-		<path id="lib.path.ref">
-			<fileset dir="${build-lib}" includes="**/*.jar" />
-		</path>
 		<javadoc destdir="bin/javadoc" classpathref="lib.path.ref" access="private" author="true" sourcepath="src" packagenames="picoded.*" use="true" version="true">
 			<!--<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>-->
 		</javadoc>
@@ -272,23 +339,15 @@
 	</target>
 	
 	<!-- jUnit test report runner, used for continuous unit testing -->
-	<target name="junit-all" depends="build,compile-tests">
+	<target name="junit-all" depends="compile-tests">
 		<mkdir dir="${junit-reports}"/>
-		<!--
-		<jacoco:coverage>
-			<java classname="org.jacoco.examples.HelloJaCoCo" fork="true">
-				<classpath>
-					<pathelement location="./bin"/>
-				</classpath>
-			</java>
-		</jacoco:coverage>
-		-->
 		<jacoco:coverage destfile="${junit-reports}/junit-all.exec">
 			<junit printsummary="yes" haltonfailure="yes" fork="true" forkmode="once">
 				<classpath>
 					<pathelement path="${build-classes}"/>
-					<pathelement path="${build-lib}"/>
-					<fileset dir="${build-lib}" includes="**/*.jar" />
+					<pathelement path="${build-libOnly}"/>
+					<fileset dir="build-tools/junit" includes="**/*.jar" />
+					<!--<fileset dir="${build-lib}" includes="**/*.jar" />-->
 				</classpath>
 			
 				<formatter type="plain"/>
@@ -317,25 +376,4 @@
 		</jacoco:coverage>
 	</target>
 
-	<!-- Code Beautifier, used for pre-commit hook -->
-	<target name="src-beautify">
-		
-		<!-- Scan and beautify the code : spaces only -->
-		<exec executable="java">
-			<arg value="-cp"/>
-			<arg value="./build-tools/java-formatter/java-formatter-with-dependencies.jar"/>
-			<arg value="Formatter"/>
-			<arg value="./build-config/code-format.opts"/>
-			<arg value="./src"/>
-		</exec>
-		
-	</target>
-	
-	<!-- convinent aliases -->
-	<target name="compile" depends="compile-src">
-	</target>
-	
-	<target name="source" depends="compile-src">
-	</target>
-	
 </project>

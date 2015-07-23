@@ -9,8 +9,8 @@
 	<property name="junit-html" value="${basedir}/test-files/junit-html" />
 	
 	<property name="build-classes" value="${basedir}/bin/classes" />
-	<property name="build-lib" value="${basedir}/bin/lib" />
-	<property name="build-temp" value="${basedir}/bin/build/tmp" />
+	<property name="build-docs" value="${basedir}/bin/docs" />
+	<property name="build-temp" value="${basedir}/bin/tmp/build-tmp" />
 	
 	<property name="test-temp" value="${basedir}/test-files/tmp" />
 	
@@ -18,9 +18,20 @@
 	<property name="src-test" value="src/picodedTests" />
 	<property name="src-experimental" value="src/picodedX" />
 	
+	<property name="lib-organized-dir" value="lib-organized" />
+	
+	<property name="build-libOnly" value="${basedir}/bin/build/picodedJavaCommons-libsOnly.jar" />
+	
+	<!-- ant contrib add ons -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="${basedir}/build-tools/ant-contrib/ant-contrib-1.0b3.jar"/>
+		</classpath>
+	</taskdef>
+	
 	<!-- jUnit declearation over-ride, see: 'http://stackoverflow.com/questions/9774264/junit-ant-task-junittask-was-not-found' -->
 	<path id="junit-path">
-		<fileset dir="lib-organized/junit" includes="**/*.jar" />
+		<fileset dir="${lib-organized-dir}/junit" includes="**/*.jar" />
 	</path>
 	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
 		<classpath refid="junit-path"/>
@@ -39,7 +50,7 @@
 	
 	+ setup
 	+ clean
-	+ compile-lib
+	+ build-lib
 	+ compile-src
 	+ compile-srcX
 	+ compile-tests
@@ -49,40 +60,55 @@
 	
 	************************************************** -->
 	
+	<!-- setup pre-commit git hook, if needed -->
 	<target name="setup">
 		<mkdir dir=".git/hooks"/>
 		<symlink link=".git/hooks/pre-commit" resource="./pre-commit.sh" failonerror="false"/>
 	</target>
 	
-	
+	<!-- clean and remove all build files / test temp files -->
 	<target name="clean">
-		<delete dir="html-docs" failonerror="false"/>
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="${basedir}/bin" includes="**/*"/>
+			<fileset dir="${basedir}/html-docs" includes="**/*"/>
+			<fileset dir="${basedir}/test-files/tmp" includes="**/*"/>
+		</delete>
 		
-		<delete dir="bin" failonerror="false"/>
-		<mkdir dir="bin"/>
-		<mkdir dir="bin/docs"/>
+		<mkdir dir="${basedir}/bin"/>
+		<mkdir dir="${basedir}/bin/build"/>
+		<mkdir dir="${basedir}/bin/docs"/>
+		<mkdir dir="${basedir}/bin/classes"/>
+		<mkdir dir="${basedir}/bin/tmp"/>
 		
-		<delete dir="test-files/tmp" failonerror="false"/>
-		<mkdir dir="test-files/tmp"/>
+		<mkdir dir="${basedir}/test-files/tmp"/>
 	</target>
 	
-	<target name="compile-lib">
-		<mkdir dir="bin"/>
-		<copy todir="${build-lib}">
-			<fileset dir="lib-organized" includes="*/*.jar"/>
-			<cutdirsmapper dirs="1"/>
-		</copy>
-		<copy todir="${build-lib}">
-			<fileset dir="lib-organized" includes="*/*/*.jar"/>
-			<cutdirsmapper dirs="2"/>
-		</copy>
+	<!-- rebuild lib jar completely -->
+	<target name="rebuild-lib">
+		<mkdir dir="bin/build"/>
+		<jar jarfile="${build-libOnly}">
+			<zipgroupfileset dir="${lib-organized-dir}">
+				<include name="**/*.jar"/>
+			</zipgroupfileset>
+		</jar>
 	</target>
 	
-	<target name="compile-src" depends="compile-lib">
-		<mkdir dir="${build-classes}"/>
+	<!-- check if lib jar exists -->
+	<target name="build-lib-check">
+		<available file="${build-libOnly}" property="build-libOnly.present"/>
+	</target>
+	
+	<!-- build the lib jar only if it does noot exists -->
+	<target name="build-lib" depends="build-lib-check" unless="${build-libOnly.present}">
+		<antcall target="rebuild-lib"/>
+	</target>
+	
+	<!-- compile the source -->
+	<target name="compile-src" depends="build-lib">
 		<path id="lib.path.ref">
-			<fileset dir="${build-lib}" includes="**/*.jar" />
+			<fileset dir="bin/build" includes="*-libsOnly.jar" />
 		</path>
+		<mkdir dir="${build-classes}"/>
 		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
 				 includeantruntime="false">
 			<!-- bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar" -->
@@ -92,7 +118,99 @@
 		</javac>
 	</target>
 	
-	<target name="compile-srcX" depends="compile-lib">
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<target name="make-bundle">
+		<delete dir="${build-temp}" failonerror="false" />
+		<mkdir dir="${build-temp}"/> 
+		
+		<!-- iterate over the dependencies -->
+		<for param="file">
+			<path>
+				<fileset dir="${lib-organized-dir}"> 
+					<include name="**/*.jar"/> 
+				</fileset> 
+			</path>
+			<sequential> 
+				<propertyregex override="yes" 
+				property="jarname"  input="@{file}" 
+				regexp=".*/([^/]*)\.jar" replace="\1"/> 
+
+				<!-- put the spring.* jars into special sub-directories -->
+				<mkdir dir="${build-temp}/${jarname}"/> 
+				<unzip dest="${build-temp}/${jarname}" src="@{file}">
+					<patternset>
+						<include name="**/META-INF/spring.*"/>
+					</patternset>
+				</unzip>
+				
+				<!-- put everything else in the 'uber' directory -->
+				<unzip dest="${build-temp}/uber" src="@{file}">
+					<patternset>
+						<exclude name="**/META-INF/spring.*"/>
+					</patternset>
+				</unzip>
+			</sequential>
+		</for>
+
+		<!-- build the concatenated spring.* files -->
+		<mkdir dir="${build-temp}/META-INF"/> 
+		<concat destfile="${build-temp}/META-INF/spring.handlers" fixlastline="true">
+			<fileset dir="${build-temp}/" includes="*/*/spring.handlers"/>
+		</concat>
+		<concat destfile="${build-temp}/META-INF/spring.schemas" fixlastline="true">
+			<fileset dir="${build-temp}/" includes="*/*/spring.schemas"/>
+		</concat>
+		<concat destfile="${build-temp}/META-INF/spring.tooling" fixlastline="true">
+			<fileset dir="${build-temp}/" includes="*/*/spring.tooling"/>
+		</concat>
+		<concat destfile="${build-temp}/META-INF/spring.factories" fixlastline="true">
+			<fileset dir="${build-temp}/" includes="*/*/spring.factories"/>
+		</concat>
+		
+		<!-- build the uber jar! -->
+		<delete file="${build-libOnly}" failonerror="false"/>
+		<jar destfile="${build-libOnly}">
+			<!-- all dependency files except spring.* -->
+			<fileset dir="${build-temp}/uber"/> 
+			<!-- the spring.* files -->
+			<fileset dir="${build-temp}/" includes="META-INF/*"/>
+			
+			<!-- my project's classes & etc -->
+			<!--<zipgroupfileset dir="${dist.dir}" includes="myproject.jar" />-->
+			<!--
+			<manifest>
+				<attribute name="Main-Class" value="${main-class}"/>
+			</manifest>  
+			-->
+		</jar>
+	</target>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<target name="compile-srcX" depends="build-lib">
 		<mkdir dir="${build-classes}"/>
 		<path id="lib.path.ref">
 			<fileset dir="${build-lib}" includes="**/*.jar" />
@@ -105,7 +223,7 @@
 		</javac>
 	</target>
 	
-	<target name="compile-tests" depends="compile-lib">
+	<target name="compile-tests" depends="build-lib">
 		<delete dir="test-files/tmp" failonerror="false"/>
 		<mkdir dir="test-files/tmp"/>
 		
@@ -130,39 +248,16 @@
 		<jar destfile="bin/build/picodedJavaCommons-noLibs.jar">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 		</jar>
-
-		<!-- libs only -->
 		<jar destfile="${build-temp}/picodedJavaCommons-libsOnly-main.jar">
 			<fileset dir="${build-lib}" includes="*.jar" />
 		</jar>
-
-		<!-- with libs -->
 		<jar destfile="${build-temp}/picodedJavaCommons-withLibs-main.jar">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 			<fileset dir="${build-lib}" includes="*.jar" />
 		</jar>
-		
-		<!-- Construct the One-JAR file for libs only -->
-		<one-jar destfile="bin/build/picodedJavaCommons-libsOnly.jar">
-			<main jar="${build-temp}/picodedJavaCommons-libsOnly-main.jar">
-			</main>
-			<lib>
-				<fileset dir="${lib.dir}" />
-			</lib>
-		</one-jar>
-
-		<!-- Construct the One-JAR file with libs -->
-		<one-jar destfile="bin/build/picodedJavaCommons-withLibs.jar">
-			<main jar="${build-temp}/picodedJavaCommons-withLibs-main.jar">
-			</main>
-			<lib>
-				<fileset dir="${lib.dir}" />
-			</lib>
-		</one-jar>
-		
 	</target>
 	
-	<target name="javadoc" depends="compile-lib">
+	<target name="javadoc" depends="build-lib">
 		<delete dir="bin/javadoc" failonerror="false"/>
 		<mkdir dir="bin/javadoc"/>
 		

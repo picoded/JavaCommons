@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.Collection;
 import java.util.function.BiFunction;
 
+import java.lang.reflect.TypeVariable;
+
 import picoded.conv.GenericConvert;
 
 ///
@@ -332,10 +334,15 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	// Attempts to convert against known V value types, and insert into the map. 
 	// If no conversion is required, please use typecastPut
 	//--------------------------------------------------------------------------------------------------
+	public default V convertPut(K key, Object value, Class<V> valueClass ) {
+		@SuppressWarnings("unchecked")
+		BiFunction<Object,Object,V> bf = (BiFunction<Object,Object,V>)GenericConvert.getBiFunction_noisy( (Class<?>)valueClass );
+		V val = bf.apply(key, value);
+		return put(key, val);
+	}
+	
 	public default V convertPut(K key, Object value) {
-		//BiFunction<Object,Object,V> converter = (BiFunction<Object,Object,V>) GenericConvert.getBiFunction_noisy( V );
-		
-		return null;
+		throw new UnsupportedOperationException("Sadly convertPut without class parameter needs to be manually extended. Eg: 'return convertPut(key, value, V.class)', where V is not a generic");
 	}
 	
 }

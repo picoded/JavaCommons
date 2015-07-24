@@ -1,5 +1,6 @@
-package picoded.util;
+package picoded.ServletLogging;
 
+import picoded.ServletLogging.LogMessage;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,6 +16,11 @@ import picoded.JSql.JSqlException;
 import picoded.JSql.JSqlResult;
 import picoded.JSql.JSqlType;
 import picoded.util.systemInfo;
+
+import java.math.BigInteger;
+import java.security.MessageDigest;
+
+import java.util.Arrays;
 
 /// SerlvetLogging, is a utility class meant to facilitate the logging of server sideded application events, and errors
 /// This is meant to push the logging into a central SQL database, and fallbacks onto its local SQLite file, in event the
@@ -81,14 +87,44 @@ public class ServletLogging {
 	
 	private static Logger logger = Logger.getLogger(ServletLogging.class.getName());
 
-   /// Object byte space default as 260
-	protected int objColumnLength = 260;
+	/// Object ID field type
+	protected String objColumnType = "VARCHAR(32)";
+
+	/// Key name field type
+	protected String keyColumnType = "VARCHAR(32)";
+
+	/// Full text value field type
+	protected String fullTextColumnType = "VARCHAR(MAX)";
+
+	/// Text value field type
+	protected String textColumnType = "TEXT";
+
+	/// Timestamp field type
+	protected String tStampColumnType = "BIGINT";
+
+	/// Long collumn type
+	protected String longColumnType = "LONG";
 	
-	/// Key byte space default as 260
-	protected int keyColumnLength = 260;
+	/// Bit collumn type
+	protected String bitColumnType = "BIT";
+
+	/// Primary key
+	protected String pKeyColumnType = " PRIMARY KEY";
 	
-	/// Value byte space default as 4000
-	protected int valColumnLength = 4000;
+	/// String indexed column prefix
+	private String stringIndexedPrefix = "s";
+	
+	/// Long indexed column prefix
+	private String longIndexedPrefix = "l";
+	
+	public int longIndexed = 02;
+	public int stringIndexed = 02;
+	
+	public int longNotIndexed = 02;
+	public int stringNotIndexed = 02;
+	
+	public int exceptionRootTraceIndexed = 02;
+	public int exceptionThrownTraceIndexed = 02;
 	
 	protected JSql sqliteObj;
 	protected JSql jSqlObj;
@@ -102,15 +138,6 @@ public class ServletLogging {
 		this.sqliteObj = JSql.sqlite(sqlitePath);
 		this.jSqlObj = dbObj;
 	}
-	
-	public int longIndexed = 02;
-	public int stringIndexed = 02;
-	
-	public int longNotIndexed = 02;
-	public int stringNotIndexed = 02;
-	
-	public int exceptionRootTraceIndexed = 02;
-	public int exceptionThrownTraceIndexed = 02;
 	
 	/// Performs the needed table setup, required for the class. Do note that this includes the setup of logging formats and its respective tables
     /// Note that this table exists on both the sqlite, and the actual DB, all tables keep their data locally on sqlite, except logTable,
@@ -189,96 +216,141 @@ public class ServletLogging {
 		}
 	}
 	
-	private void tableSetup(JSql dbObj) throws JSqlException {
+	private void tableSetup(JSql jSql) throws JSqlException {
 		// / config table
-		if (jSqlObj.sqlType == JSqlType.sqlite) {
-			dbObj.execute("CREATE TABLE IF NOT EXISTS `config` (key VARCHAR("+objColumnLength+"), sVal TEXT, PRIMARY KEY (key) );");
+		if (jSql.sqlType == JSqlType.sqlite) {
+			jSql.createTableQuerySet(
+							"config",
+							new String[] {
+								"key",
+								"sVal"
+							},
+							new String[] {
+								keyColumnType + pKeyColumnType,
+								textColumnType
+							}
+						).execute();
 		}
-		
+
 		// / logFormat table
-		dbObj.execute("CREATE TABLE IF NOT EXISTS `logFormat` ( "
-			+ "hash VARCHAR("+objColumnLength+"), "
-			+ "format VARCHAR("+keyColumnLength+"), "
-			+ " PRIMARY KEY (hash) );");
+		jSql.createTableQuerySet(
+						"logFormat",
+						new String[] {
+							"hash",
+							"format"
+						},
+						new String[] {
+							keyColumnType + pKeyColumnType,
+							fullTextColumnType
+						}
+					).execute();
 		
 		// / logStrHashes table
-		dbObj.execute("CREATE TABLE IF NOT EXISTS `logStrHashes` ( "
-			+ "hash VARCHAR("+objColumnLength+"), sVal TEXT, PRIMARY KEY (hash) );");
+		jSql.createTableQuerySet(
+						"logStrHashes",
+						new String[] {
+							"hash",
+							"sVal"
+						},
+						new String[] {
+							keyColumnType + pKeyColumnType,
+							textColumnType
+						}
+					).execute();
 		
 		// / logTable table
-		StringBuilder query = new StringBuilder("CREATE TABLE IF NOT EXISTS `logTable` ("
-		   + "systemHash VARCHAR("+objColumnLength+")"
-			+ ", reqsID VARCHAR("+objColumnLength+")"
-			+ ", creTime BIGINT"
-			+ ", fmtHash VARCHAR("+objColumnLength+")"
-			+ ", logType VARCHAR("+valColumnLength+")"
-			+ ", expHash VARCHAR("+objColumnLength+")"
-			+ ", offSync BIT"
-			+ ", reqID VARCHAR("+objColumnLength+")");
-			
+		List<String> columnName =  new ArrayList<String>(Arrays.asList("systemHash", "reqsID", "creTime", "fmtHash", "logType", "expHash", "offSync","reqID"));
+		List<String> columnDefine =  new ArrayList<String>(Arrays.asList((keyColumnType + pKeyColumnType), keyColumnType, tStampColumnType, keyColumnType, keyColumnType, keyColumnType, bitColumnType, keyColumnType));
+		
 		// long indexed
 		for (int i=1; i<=longIndexed;i++) {
-			query.append(", l"+(i<10?"0":"")+i+" LONG");
+			columnName.add( longIndexedPrefix+(i<10?"0":"")+i );
+			columnDefine.add( longColumnType );
 		}
 		// string indexed
 		for (int i=1; i<=stringIndexed;i++) {
-			query.append(", s"+(i<10?"0":"")+i+" VARCHAR(22)");
+			columnName.add( stringIndexedPrefix+(i<10?"0":"")+i );
+			columnDefine.add( keyColumnType );
 		}
 		// long not indexed
-		//for (int i=(longIndexed+1); i<=(longIndexed+1+longNotIndexed);i++) {
-		//	query.append(", l"+(i<10?"0":"")+i+" LONG");
-		//}
-		query.append(", l"+((longIndexed+1)<10?"0":"")+(longIndexed+1)+" LONG");
+		columnName.add( longIndexedPrefix+((longIndexed+1)<10?"0":"")+(longIndexed+1) );
+		columnDefine.add( longColumnType );
 		
 		// string not indexed
-		//for (int i=(stringIndexed+1); i<=(stringIndexed+1+stringNotIndexed);i++) {
-		//	query.append(", s"+(i<10?"0":"")+i+" VARCHAR(22)");
-		//}
-		query.append(", s"+((stringIndexed+1)<10?"0":"")+(stringIndexed+1)+" VARCHAR(MAX)");
-		query.append(")");
+		columnName.add( stringIndexedPrefix+((stringIndexed+1)<10?"0":"")+(stringIndexed+1) );
+		columnDefine.add( fullTextColumnType );
 
-		dbObj.execute(query.toString());
+		jSql.createTableQuerySet(
+						"logTable",
+						columnName.toArray(new String[columnName.size()]),
+						columnDefine.toArray(new String[columnDefine.size()])
+					).execute();
 
 		// / excStrHash table
-		dbObj.execute("CREATE TABLE IF NOT EXISTS `excStrHash`(hash VARCHAR("+objColumnLength+"), sVal TEXT, PRIMARY KEY (hash));");
+		jSql.createTableQuerySet(
+						"excStrHash",
+						new String[] {
+							"hash",
+							"sVal"
+						},
+						new String[] {
+							keyColumnType + pKeyColumnType,
+							textColumnType
+						}
+					).execute();
 		
 		// / exception table
-		query = new StringBuilder("CREATE TABLE IF NOT EXISTS `exception` ( "
-		   + "expHash VARCHAR(" + objColumnLength + ")"
-			+ ", reqsID VARCHAR(" + objColumnLength + ")"
-			+ ", creTime BIGINT"
-			+ ", systemHash VARCHAR(60)"
-			+ ", excRoot VARCHAR(" + valColumnLength + ")" 
-			+ ", excTrace VARCHAR(" + valColumnLength + ")"
-			+ ", excMid VARCHAR(" + valColumnLength + ")" 
-			+ ", stkRoot VARCHAR(" + valColumnLength + ")" 
-			+ ", stkTrace VARCHAR(" + valColumnLength + ")"
-			+ ", stkMid VARCHAR(" + valColumnLength + ")");
-			
-			// Exception Root Trace Indexed
-			for (int i=1; i<=exceptionRootTraceIndexed;i++) {
-				query.append(", excR"+(i<10?"0":"")+i+" VARCHAR(22)"); 
-				query.append(", stkR"+(i<10?"0":"")+i+" VARCHAR(22)");
-			}
-			
-			// Exception Thrown Trace Indexed
-			for (int i=1; i<=exceptionThrownTraceIndexed;i++) {
-				query.append(", excT"+(i<10?"0":"")+i+" VARCHAR(22)");
-				query.append(", stkT"+(i<10?"0":"")+i+" VARCHAR(22)");
-			}
-			// PRIMARY KEY
-			query.append(", PRIMARY KEY (expHash) )");
-			
-		dbObj.execute(query.toString());
-      
+		columnName =  new ArrayList<String>(Arrays.asList("expHash", "reqsID", "creTime", "systemHash", "excRoot", "excTrace", "excMid", "stkRoot", "stkTrace", "stkMid"));
+		columnDefine = new ArrayList<String>(Arrays.asList((keyColumnType + pKeyColumnType), keyColumnType, tStampColumnType, keyColumnType, keyColumnType, keyColumnType, keyColumnType, keyColumnType, keyColumnType, keyColumnType));
+		
+		// / Exception Root Trace Indexed
+		for (int i=1; i<=exceptionRootTraceIndexed;i++) {
+			columnName.add("excR"+(i<10?"0":"")+i);
+			columnDefine.add(keyColumnType);
+
+			columnName.add("stkR"+(i<10?"0":"")+i);
+			columnDefine.add(keyColumnType);
+		}
+		
+		// / Exception Thrown Trace Indexed
+		for (int i=1; i<=exceptionThrownTraceIndexed;i++) {
+			columnName.add("excT"+(i<10?"0":"")+i);
+			columnDefine.add(keyColumnType);
+
+			columnName.add("stkT"+(i<10?"0":"")+i);
+			columnDefine.add(keyColumnType);
+		}
+		
+		jSql.createTableQuerySet(
+						"exception",
+						columnName.toArray(new String[columnName.size()]),
+						columnDefine.toArray(new String[columnDefine.size()])
+					).execute();
 	}
 	
+	// / Dispose all created tables
+	public void tearDown(JSql jSql) throws Exception {
+			jSql.executeQuery("DROP TABLE IF EXISTS `config`").dispose();
+			jSql.executeQuery("DROP TABLE IF EXISTS `logFormat`").dispose();
+			jSql.executeQuery("DROP TABLE IF EXISTS `logStrHashes`").dispose();
+			jSql.executeQuery("DROP TABLE IF EXISTS `logTable`").dispose();
+			jSql.executeQuery("DROP TABLE IF EXISTS `excStrHash`").dispose();
+			jSql.executeQuery("DROP TABLE IF EXISTS `exception`").dispose();
+	}
+	
+	// / Returns the current time in seconds
+   private int createTime() {
+      return (int)(System.currentTimeMillis() / 1000);
+   }
+   
 	// / Returns the systemHash stored inside the SQLite DB, if it does not
 	// exists, generate one
-	public String systemHash() throws JSqlException {
+	public String systemHash(JSql jSql) throws JSqlException {
 		String sysHash = null;
 		try {
-			JSqlResult r = sqliteObj.executeQuery("SELECT sVal FROM `config` WHERE key=?", "systemHash");
+			// Fetch meta fields
+			JSqlResult r = jSql.selectQuerySet("config", "sVal", "key=?", new Object[] { "systemHash" }).query();
+			
 			if (r.fetchAllRows() > 0) {
 				sysHash = (String) r.readRowCol(0, "sVal");
 	      }
@@ -289,7 +361,7 @@ public class ServletLogging {
 			sysHash = systemInfo.systemaHash();
 
 			// save systemHash
-			addConfig("systemHash", sysHash);
+			addConfig(jSql, "systemHash", sysHash);
 		} catch(Exception e) {
 			e.printStackTrace();
 			throw new JSqlException(e.getMessage());
@@ -297,16 +369,24 @@ public class ServletLogging {
 		return sysHash;
 	}
 	
-	private void addConfig(String key, String sVal) throws JSqlException {
-		sqliteObj.execute("INSERT OR REPLACE INTO `config` (key, sVal) VALUES (?, ?)", key, sVal);
+	private void addConfig(JSql jSql, String key, String sVal) throws JSqlException {
+		jSql.upsertQuerySet( //
+					"config", //
+					new String[] { "key" }, //
+					new Object[] { key, }, //
+					//
+					new String[] { "sVal" }, //
+					new Object[] { sVal }, //
+					null, null, null//
+					).execute();
 	}
 	
 	// / Validate if the systemHash if it belongs to the current physical 
 	// virtual server. If it fails, it reissues the systemHash. Used on servlet startup
-	public String validateSystemHash() throws JSqlException {
+	public String validateSystemHash(JSql jSql) throws JSqlException {
 		try {
 	      // fetch the current systemHash from config table
-	      String sysHash = systemHash();
+	      String sysHash = systemHash(jSql);
 	      
 	      // compare systemHash, if does not match, reissue.
 	      if(!StringUtils.isBlank(sysHash) && sysHash.equals(systemInfo.systemaHash())){
@@ -316,7 +396,7 @@ public class ServletLogging {
 	      sysHash = systemInfo.systemaHash();
 	      
 	      // persist the hash value in SQLite
-	      addConfig("systemHash", sysHash);
+	      addConfig(jSql, "systemHash", sysHash);
 	
 			return sysHash;
 		} catch(Exception e) {
@@ -325,12 +405,15 @@ public class ServletLogging {
 	}
 	
 	// / Returns the current request ID
-	public String requestID() throws JSqlException {
+	public String requestID(JSql jSql) throws JSqlException {
 		String requestId = null;
-		JSqlResult r = jSqlObj.executeQuery("SELECT reqID FROM `logTable` WHERE systemHash=?", systemHash());
+		// Fetch the meta fields
+		JSqlResult r = jSql.selectQuerySet("logTable", "reqID", "systemHash=?", new Object[] { "systemHash" }).query();
+		
 		if (r.fetchAllRows() > 0) {
 			requestId = (String) r.readRowCol(0, "reqID");
-		}
+      }
+	      
 		if (requestId == null || requestId.trim().length() == 0) {
 			return reissueRequestID();
 		}
@@ -342,10 +425,18 @@ public class ServletLogging {
 		return GUID.base58();
 	}
 	
-	// / Add the format to the system ---->will be deleted
+	// / Add the format to the system
 	//hash   (base58 md5, indexed) ,format (indexed, unique)
-	public void addFormat(String fmtHash, String format) throws JSqlException {
-		jSqlObj.execute("INSERT OR REPLACE INTO `logFormat` (hash, format) VALUES (?, ?)", fmtHash, format);
+	public void addFormat(JSql jSql, String fmtHash, String format) throws JSqlException {
+		jSql.upsertQuerySet( //
+					"logFormat", //
+					new String[] { "hash" }, //
+					new Object[] { fmtHash, }, //
+					//
+					new String[] { "format" }, //
+					new Object[] { format }, //
+					null, null, null//
+					).execute();
 	}
 	
 	/// You should not be calling log using format with no arguments
@@ -354,17 +445,17 @@ public class ServletLogging {
 	}
 	
 	/// Performs a logging with a format name and argument
-	public void log(String format, Object... args) throws JSqlException {
-		//call addFormat to add format
-      String fmtHash = GUID.base58();
-		addFormat(fmtHash, format);
+	public void log(JSql jSql, String format, Object... args) throws Exception {
+		// Add format string
+		String fmtHash = md5Base58(format);
+		addFormat(jSql, fmtHash, format);
       
       String sql ="INSERT INTO `logTable` (systemHash, reqsID, creTime, fmtHash, logType, expHash, offSync, reqID ";
       String sqlValues="?, ?, ?, ?, ?, ?, ?, ?";		
 		
 		List<Object> values = new ArrayList<Object>();
-		values.add(systemHash());
-		values.add(requestID());
+		values.add(systemHash(jSql));
+		values.add(requestID(jSql));
 		values.add(createTime());
 		values.add(fmtHash);
 		values.add("L");
@@ -387,16 +478,16 @@ public class ServletLogging {
 					if (stringIndexedCount > stringIndexed) {
 						extraString.add((String) args[index++]);
 					} else {
-						sql += ", s" + (stringIndexedCount < 10 ? "0" : "")
+						sql += ", "+ stringIndexedPrefix + (stringIndexedCount < 10 ? "0" : "")
 								+ stringIndexedCount++;
 						sqlValues += ", ?";
 						values.add(args[index++]);
 					}
-				} else if (format.charAt(lastIndex + 1) == 'i') {
+				} else if (format.charAt(lastIndex + 1) == 'i' || format.charAt(lastIndex + 1) == 'd' || format.charAt(lastIndex + 1) == 'f') {
 					if (longIndexedCount > longIndexed) {
 						extraLong.add(new Long(String.valueOf(args[index++])));
 					} else {
-						sql += ", l" + (longIndexedCount < 10 ? "0" : "")
+						sql += ", " + longIndexedPrefix + (longIndexedCount < 10 ? "0" : "")
 								+ longIndexedCount++;
 						sqlValues += ", ?";
 						values.add(args[index++]);
@@ -406,13 +497,13 @@ public class ServletLogging {
 			}
 		}
 		if (!extraString.isEmpty()) {
-			sql += ", s" + (stringIndexedCount < 10 ? "0" : "")
+			sql += ", "+ stringIndexedPrefix + (stringIndexedCount < 10 ? "0" : "")
 									+ stringIndexedCount++;
 			sqlValues += ", ?";
 			values.add(extraString.toString());
 		}
 		if (!extraLong.isEmpty()) {
-			sql += ", l" + (longIndexedCount < 10 ? "0" : "")
+			sql += ", " + longIndexedPrefix + (longIndexedCount < 10 ? "0" : "")
 									+ longIndexedCount++;
 			sqlValues += ", ?";
 			values.add(extraLong.toString());
@@ -421,43 +512,133 @@ public class ServletLogging {
 		sql += ") VALUES (" + sqlValues + ");";
 
 		// insert to `logTable`
-		jSqlObj.execute(sql, values.toArray(new Object[values
+		jSql.execute(sql, values.toArray(new Object[values
 					.size()]));
 			
 	}
 	
+	public List<LogMessage> list(JSql jSql) throws JSqlException {
+		List<LogMessage> list = null;
+	
+		JSqlResult r = jSql.executeQuery("SELECT lf.format, lt.* FROM logFormat lf"+
+       " INNER JOIN logTable lt on lf.hash = lt.fmtHash");
+	
+	   int rowCount = r.fetchAllRows();
+		if(rowCount > 0) {
+			list = new ArrayList<LogMessage>();
+			LogMessage logMessage = null;
+			Object val = null;
+			String format = null;
+			String col = null;
+			for (int pt = 0; pt < rowCount; pt++) {
+				logMessage = new LogMessage();
+				
+				// get format String
+				format = (String) r.readRowCol(pt, "format");
+				logMessage.setFormat(format);
+				
+				// parse the format string
+				// fetch the fields value in the same order as present in the format string
+				String findStr = "%";
+				int longIndexedCount = 1;
+				int stringIndexedCount = 1;
+				int lastIndex = 0;
+				int stringNotIndexedCount = 0;
+				int longNotIndexedCount = 0;
+				while (lastIndex != -1) {
+					lastIndex = format.indexOf(findStr, lastIndex);
+					if (lastIndex != -1) {
+						if (format.charAt(lastIndex + 1) == 's') {
+							if (stringIndexedCount > stringIndexed) {
+								col = stringIndexedPrefix + (stringIndexedCount<10?"0":"")+stringIndexedCount;
+								// read column value from db
+								val = r.readRowCol(pt, col);
+								if (val != null && val.toString().trim().length() != 0 && !"null".equalsIgnoreCase(val.toString().trim())) {
+									String[] arr = (val.toString().replaceAll("\\[", "").replaceAll("\\]","")).split(",");
+									if (arr != null && arr.length > 0) {
+										logMessage.addArgs(arr[stringNotIndexedCount++].trim());
+									}
+								}
+							} else {
+								col = stringIndexedPrefix + (stringIndexedCount<10?"0":"")+stringIndexedCount;
+								// read column value from db
+								val = r.readRowCol(pt, col);
+								if (val != null && val.toString().trim().length() != 0 && !"null".equalsIgnoreCase(val.toString().trim())) {
+									logMessage.addArgs(val);
+								}
+								stringIndexedCount++;
+							}
+						} else if (format.charAt(lastIndex + 1) == 'i' || format.charAt(lastIndex + 1) == 'd' || format.charAt(lastIndex + 1) == 'f') {
+							if (longIndexedCount > longIndexed) {
+									col = longIndexedPrefix + (longIndexedCount<10?"0":"")+longIndexedCount;
+									// read column value from db
+									val = r.readRowCol(pt, col);
+									if (val != null) {
+										String[] arr = (val.toString().replaceAll("\\[", "").replaceAll("\\]","")).split(",");
+										if (arr != null && arr.length > 0) {
+											if (arr[longNotIndexedCount].indexOf(".") == -1) {
+												logMessage.addArgs(Integer.valueOf(arr[longNotIndexedCount++].trim()));
+											} else {
+												logMessage.addArgs(Float.valueOf(arr[longNotIndexedCount++].trim()));
+											}
+										}
+									}
+							} else {
+								col = longIndexedPrefix + (longIndexedCount<10?"0":"")+longIndexedCount;
+								// read column value from db
+								val = r.readRowCol(pt, col);
+								if (val != null) {
+									logMessage.addArgs(val);
+								}
+								longIndexedCount++;
+							}
+						}
+						lastIndex += findStr.length();
+					}
+				}
+				// add the logMessage class to list
+				list.add(logMessage);
+			}
+		}
+		return list;
+	}
+
 	/// Performs a logging with a formant name, argument, and attached exception
-	public void logException(Exception e, String format, Object... args) throws JSqlException {
-		//call addFormat to add format
-		String fmtHash = GUID.base58();
-		addFormat(fmtHash, format);
+	public void logException(JSql jSql, Exception e, String format, Object... args) throws Exception {
+		// Add format string
+		String fmtHash = md5Base58(format);
+		addFormat(jSql, fmtHash, format);
 
       //insert args to `exception`
-		jSqlObj.execute("INSERT INTO `exception` "
+		jSql.execute("INSERT INTO `exception` "
 			+ "(expHash,reqsID,creTime,systemHash,excRoot,excTrace,excR01-XX,excT01-XX,excMid,stkRoot,stkTrace,stkR01-XX,stkT01-XX,stkMid) " 
-         + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", systemHash(), requestID(), createTime(), fmtHash, args);
+         + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", systemHash(jSql), requestID(jSql), createTime(), fmtHash, args);
       
       logger.log(Level.SEVERE, "Exception", e);
 	}
 	
-	// / Returns the current time in seconds
-   private int createTime() {
-      return (int)(System.currentTimeMillis() / 1000);
-   }
-   
-   // / Returns all the log messages
-	public List<Map<String, Object>> list() throws JSqlException {
-		List<Map<String, Object>> list = null;
-		JSqlResult r = sqliteObj.executeQuery("SELECT * FROM `logTable`");
-		int rowCount = r.fetchAllRows();
-		if (rowCount > 0) {
-			list = new ArrayList<Map<String, Object>>();
-			
-			for (int pt = 0; pt < rowCount; pt++) {
-				list.add(r.readRow(pt));
+	// / Returns format string hash value
+	public String hashFormat(JSql jSql, String fmtString) throws JSqlException {
+			JSqlResult r = jSql.selectQuerySet("logFormat", "hash", "format=?", new Object[] { fmtString }).query();
+			int rowCount = r.fetchAllRows();
+			if(rowCount > 0) {
+				return  (String) r.readRowCol(0, "hash");
 			}
-      }
-
-		return list;
+			return null;
 	}
+
+	//generate Hash based on format string
+	public String md5Base58(String format) throws Exception {
+		MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+		messageDigest.reset();
+		messageDigest.update(format.getBytes());
+		BigInteger bigInt = new BigInteger(1, messageDigest.digest());
+		String hash = bigInt.toString(16);
+		// limit hash string to 22 chars
+		if (hash.length() > 22) {
+			hash = hash.substring(0, 22);
+		}
+		return hash;
+	}
+	
 }

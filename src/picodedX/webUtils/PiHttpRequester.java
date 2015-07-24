@@ -30,7 +30,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import com.amazonaws.util.StringUtils;
 
 import picoded.servlet.CorePage;
-import picoded.webUtils.HttpRequestType;
+import picoded.enums.HttpRequestType;
 import picoded.conv.StringEscape;
 
 public class PiHttpRequester{
@@ -43,7 +43,7 @@ public class PiHttpRequester{
 											Map<String, String> headerMap, 
 											Map<String, String> cookieMap)
 	{
-		return sendRequest(HttpRequestType.TYPE_GET, requestHostName, context, getParams, null, null, headerMap, cookieMap);
+		return sendRequest(HttpRequestType.GET, requestHostName, context, getParams, null, null, headerMap, cookieMap);
 	}
 	
 	public PiHttpResponse sendPostRequest(String requestHostName, 
@@ -52,7 +52,7 @@ public class PiHttpRequester{
 											Map<String, String> headerMap, 
 											Map<String, String> cookieMap)
 	{
-		return sendRequest(HttpRequestType.TYPE_POST, requestHostName, context, null, postParams, null, headerMap, cookieMap);
+		return sendRequest(HttpRequestType.POST, requestHostName, context, null, postParams, null, headerMap, cookieMap);
 	}
 	
 	public PiHttpResponse sendPutRequest(String requestHostName, 
@@ -61,7 +61,7 @@ public class PiHttpRequester{
 											Map<String, String> headerMap, 
 											Map<String, String> cookieMap)
 	{
-		return sendRequest(HttpRequestType.TYPE_PUT, requestHostName, context, null, null, putParams, headerMap, cookieMap);
+		return sendRequest(HttpRequestType.PUT, requestHostName, context, null, null, putParams, headerMap, cookieMap);
 	}
 	
 	public PiHttpResponse sendDeleteRequest(String requestHostName, 
@@ -69,7 +69,7 @@ public class PiHttpRequester{
 											Map<String, String> headerMap, 
 											Map<String, String> cookieMap)
 	{
-		return sendRequest(HttpRequestType.TYPE_DELETE, requestHostName, resourceToDeletePath, null, null, null, headerMap, cookieMap);
+		return sendRequest(HttpRequestType.DELETE, requestHostName, resourceToDeletePath, null, null, null, headerMap, cookieMap);
 	}
 	
 	public PiHttpResponse sendRequest(HttpRequestType httpRequestType, 
@@ -87,13 +87,13 @@ public class PiHttpRequester{
 		//create request
 		HttpRequestBase httpRequest = null;
 		
-		if(httpRequestType == HttpRequestType.TYPE_GET){
+		if(httpRequestType == HttpRequestType.GET){
 			httpRequest = generateGetRequest(requestHostName, contextPath, getParams, headerMap, cookieMap);
-		} else if(httpRequestType == HttpRequestType.TYPE_POST){
+		} else if(httpRequestType == HttpRequestType.POST){
 			httpRequest = generatePostRequest(requestHostName, contextPath, postParams, headerMap, cookieMap);
-		} else if(httpRequestType == HttpRequestType.TYPE_PUT) {
+		} else if(httpRequestType == HttpRequestType.PUT) {
 			httpRequest = generatePutRequest(requestHostName, contextPath, putParams, headerMap, cookieMap);
-		} else if(httpRequestType == HttpRequestType.TYPE_DELETE) {
+		} else if(httpRequestType == HttpRequestType.DELETE) {
 			httpRequest = generateDeleteRequest(requestHostName, contextPath, headerMap, cookieMap);
 		}
 		

@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import picoded.servlet.*;
 import picoded.webUtils.*;
+import picoded.enums.HttpRequestType;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -133,7 +134,7 @@ public class ProxyServlet extends CorePage {
 	public void setMaxFileUploadSize(int intMaxFileUploadSizeNew) {
 		maxFileUploadSize = intMaxFileUploadSizeNew;
 	}
-	
+	/*
 	///////////////////////////////////////////////////////////
 	// Utility functions for Request / Response
 	///////////////////////////////////////////////////////////
@@ -536,7 +537,6 @@ public class ProxyServlet extends CorePage {
 				outputStreamClientResponse.flush();
 			}
 			
-			// */
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -560,7 +560,7 @@ public class ProxyServlet extends CorePage {
 			HttpServletRequest sReq = page.getHttpServletRequest();
 			HttpServletResponse sRes = page.getHttpServletResponse();
 			
-			if( rType == HttpRequestType.TYPE_GET ) {
+			if( rType == HttpRequestType.GET ) {
 				getRequestExecute(sReq, sRes);
 				return true;
 			}
@@ -574,7 +574,7 @@ public class ProxyServlet extends CorePage {
 			InputStream socketInputStream = null;
 			
 			// Handles post or put
-			if( rType == HttpRequestType.TYPE_POST || rType == HttpRequestType.TYPE_PUT ) {
+			if( rType == HttpRequestType.POST || rType == HttpRequestType.PUT ) {
 				// is not needed?
 				if( false && ServletFileUpload.isMultipartContent( sReq )) {
 					handleMultipartPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, sReq);
@@ -680,5 +680,5 @@ public class ProxyServlet extends CorePage {
 			throw new RuntimeException(fileUploadException);
 		}
 	}
-	
+	// */
 }

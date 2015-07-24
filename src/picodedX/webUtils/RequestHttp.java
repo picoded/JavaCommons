@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import picoded.webUtils.*;
-import picoded.enums.HttpRequestType;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -54,8 +53,6 @@ import com.ning.http.client.*;
 import picoded.struct.StreamBuffer;
 import picoded.struct.StreamBuffer.SBInputStream;
 import picoded.struct.StreamBuffer.SBOutputStream;
-
-import picoded.webUtils._RequestHttp.ResponseHttp_asyncOld;
 
 @ClientEndpoint
 public class RequestHttp {
@@ -188,7 +185,7 @@ public class RequestHttp {
 		OutputStream os = sb.getOutputStream();
 		InputStream is = sb.getInputStream();
 		
-		final ResponseHttp_asyncOld ret = new ResponseHttp_asyncOld();
+		final ResponseHttp ret = new ResponseHttp();
 		ret.setInputStream(is);
 		
 		final ArrayList<HttpResponseBodyPart> bodyParts = new ArrayList<HttpResponseBodyPart>();

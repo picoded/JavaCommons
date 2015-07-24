@@ -29,7 +29,7 @@ import picoded.servletUtils.EmbeddedServlet;
 import picoded.struct.CaseInsensitiveHashMap;
 import picoded.webUtils.PiHttpRequester;
 import picoded.webUtils.PiHttpResponse;
-import picoded.webUtils.HttpRequestType;
+import picoded.enums.HttpRequestType;
 
 import java.util.Random;
 

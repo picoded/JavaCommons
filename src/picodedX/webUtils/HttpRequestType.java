@@ -8,11 +8,11 @@ import java.util.Map.Entry;
 
 /// @TODO Migrate to picoded.enums.HttpRequestType
 public enum HttpRequestType {
-	TYPE_GET((byte)0),
-	TYPE_POST((byte)1),
-	TYPE_PUT((byte)2),
-	TYPE_DELETE((byte)3),
-	TYPE_OPTION((byte)4);
+	GET((byte)0),
+	POST((byte)1),
+	PUT((byte)2),
+	DELETE((byte)3),
+	OPTION((byte)4);
 	
 	public static final int totalTypeCount = 5;
 	
@@ -35,11 +35,11 @@ public enum HttpRequestType {
 	
 	public static HttpRequestType getCorrectHttpRequestType(byte val){
 		switch(val){
-			case 0: return HttpRequestType.TYPE_GET;
-			case 1: return HttpRequestType.TYPE_POST;
-			case 2: return HttpRequestType.TYPE_PUT;
-			case 3: return HttpRequestType.TYPE_DELETE;
-			case 4: return HttpRequestType.TYPE_OPTION;
+			case 0: return HttpRequestType.GET;
+			case 1: return HttpRequestType.POST;
+			case 2: return HttpRequestType.PUT;
+			case 3: return HttpRequestType.DELETE;
+			case 4: return HttpRequestType.OPTION;
 		}
 		return null;
 	}

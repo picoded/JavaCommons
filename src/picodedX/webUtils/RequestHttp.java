@@ -54,6 +54,8 @@ import picoded.struct.StreamBuffer;
 import picoded.struct.StreamBuffer.SBInputStream;
 import picoded.struct.StreamBuffer.SBOutputStream;
 
+import picoded.webUtils._RequestHttp.RequestHttp_apache;
+
 @ClientEndpoint
 public class RequestHttp {
 
@@ -104,7 +106,7 @@ public class RequestHttp {
 	public String sendAndWait(String message, long timeout) {
 		throw new RuntimeException("TO IMPLEMENT");
 	}
-
+	
 	///////////////////////////////////////////////////////////
 	// Core websocket functions
 	///////////////////////////////////////////////////////////
@@ -237,11 +239,6 @@ public class RequestHttp {
 		return ret;
 	}
 	
-	/// Performs the most basic of get requests
-	public static ResponseHttp get( String requestURL ) throws IOException {
-		return asyncHttp_raw( HttpRequestType.GET, requestURL, null, null );
-	}
-	
 	public static ResponseHttp get(String requestURL, Map<String, String> headers) throws IOException {
 		return asyncHttp_raw( HttpRequestType.GET, requestURL, headers, null );
 	}
@@ -254,4 +251,5 @@ public class RequestHttp {
 	public static ResponseHttp post( String requestURL, Map<String, String> headers, Map<String,String[]> postMap ) throws IOException {
 		return asyncHttp_raw(HttpRequestType.POST, requestURL, headers, postMap);
 	}
+	
 }

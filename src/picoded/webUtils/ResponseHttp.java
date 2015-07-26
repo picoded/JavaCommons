@@ -1,29 +1,25 @@
 package picoded.webUtils;
 
 import java.io.InputStream;
+import java.util.Map;
+
+import picoded.conv.ConvertJSON;
 import picoded.struct.GenericConvertMap;
+import picoded.struct.ProxyGenericConvertMap;
 
 public interface ResponseHttp {
 	
 	///////////////////////////////////////////////////
-	// Async Http Request waiting handling
+	// Async Http Request wait handling
+	// (implment if needed)
 	///////////////////////////////////////////////////
 	
-	public void waitForCompletedHeaders();
-	public void waitForCompletedRequest();
+	public default void waitForCompletedHeaders() { };
+	public default void waitForCompletedRequest() { };
 	
 	///////////////////////////////////////////////////
-	// Apache HttpResponse mode
+	// Response handling
 	///////////////////////////////////////////////////
-	
-	/// Gets the response code
-	public int statusCode();
-	
-	/// Gets the header map. 
-	public GenericConvertMap<String, String> getHeaders();
-	
-	/// Gets the cookies map. 
-	public GenericConvertMap<String, String> getCookies();
 	
 	/// Gets the response content
 	public InputStream inputStream();
@@ -32,5 +28,29 @@ public interface ResponseHttp {
 	public String toString();
 	
 	/// Converts the result string into a map, via JSON's
-	public GenericConvertMap<String,Object> toMap();
+	public default GenericConvertMap<String,Object> toMap() { 
+		waitForCompletedRequest();
+		
+		String r = toString();
+		if( r == null || r.length() <= 1 ) {
+			return null;
+		}
+		
+		Map<String,Object> rMap = ConvertJSON.toMap( r );
+		if( rMap == null ) {
+			return null;
+		} else {
+			return ProxyGenericConvertMap.ensureGenericConvertMap(rMap);
+		}
+	};
+	
+	/// Gets the response code
+	public default int statusCode() { return 200; };
+	
+	/// Gets the header map. 
+	public default Map<String, String[]> headersMap() { return null; };
+	
+	/// Gets the cookies map. 
+	public default Map<String, String[]> cookiesMap() { return null; };
+	
 }

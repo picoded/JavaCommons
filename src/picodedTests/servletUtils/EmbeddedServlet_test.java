@@ -26,8 +26,7 @@ import picoded.JStack.*;
 import picoded.conv.GUID;
 import picoded.servletUtils.EmbeddedServlet;
 import picoded.struct.CaseInsensitiveHashMap;
-import picoded.webUtils.PiHttpRequester;
-import picoded.webUtils.PiHttpResponse;
+import picoded.webUtils.*;
 import picoded.enums.HttpRequestType;
 
 import java.util.Random;
@@ -79,6 +78,7 @@ public class EmbeddedServlet_test
 		});
 	}
 	
+	/*
 	@Test
 	public void TestServerStartup()throws LifecycleException, IOException{
 		
@@ -150,4 +150,5 @@ public class EmbeddedServlet_test
 		
 		return returnVal;
 	}
+	// */
 }

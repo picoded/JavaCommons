@@ -212,12 +212,4 @@ public class ResponseHttp_asyncOld implements picoded.webUtils.ResponseHttp {
 	// 	return ConvertJSON.toMap( r );
 	// }
 	
-	/// Gets the header map. 
-	public GenericConvertMap<String, String> getHeaders() { return null; };
-	
-	/// Gets the cookies map. 
-	public GenericConvertMap<String, String> getCookies() { return null; };
-	
-	/// Converts the result string into a map, via JSON's
-	public GenericConvertMap<String,Object> toMap() { return null; };
 }

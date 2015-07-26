@@ -158,7 +158,7 @@ public class RequestHttp_apache {
 		Map<String,String[]> headersMap //
 	) {
 		// append get parameters if needed
-		if(reqType == HttpRequestType.GET) { 
+		if(reqType == HttpRequestType.GET || reqType == HttpRequestType.DELETE) { 
 			reqURL = appendGetParameters(reqURL, parametersMap);
 		}
 		

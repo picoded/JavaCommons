@@ -230,12 +230,12 @@ public class RequestHttp {
 	
 	/// Performs GET request : in the most basic form
 	public static ResponseHttp get( String requestURL ) {
-		return get( requestURL, null, null, null );
+		return byType( HttpRequestType.GET, requestURL, null, null, null );
 	}
 	
 	/// Performs GET request : with parameters
 	public static ResponseHttp get( String requestURL, Map<String,String[]> parametersMap ) {
-		return get( requestURL, parametersMap, null, null );
+		return byType( HttpRequestType.GET, requestURL, parametersMap, null, null );
 	}
 	
 	/// Performs GET request with parameters, cookies and headers
@@ -254,7 +254,7 @@ public class RequestHttp {
 	
 	/// Performs (form) POST request : with parameters
 	public static ResponseHttp post( String requestURL, Map<String,String[]> parametersMap ) {
-		return post( requestURL, parametersMap, null, null );
+		return byType( HttpRequestType.POST, requestURL, parametersMap, null, null );
 	}
 	
 	/// Performs (form) POST request with parameters, cookies and headers
@@ -265,5 +265,50 @@ public class RequestHttp {
 		Map<String,String[]> headersMap // 
 	) { //
 		return byType( HttpRequestType.POST, requestURL, parametersMap, cookiesMap, headersMap );
+	}
+	
+	//--------------------------------------------------------
+	// PUT request operations
+	//--------------------------------------------------------
+	
+	/// Performs (form) PUT request : with parameters
+	public static ResponseHttp put( String requestURL, Map<String,String[]> parametersMap ) {
+		return byType( HttpRequestType.PUT, requestURL, parametersMap, null, null );
+	}
+	
+	/// Performs (form) PUT request with parameters, cookies and headers
+	public static ResponseHttp put( //
+		String requestURL, //
+		Map<String,String[]> parametersMap, // 
+		Map<String,String[]> cookiesMap, // 
+		Map<String,String[]> headersMap // 
+	) { //
+		return byType( HttpRequestType.PUT, requestURL, parametersMap, cookiesMap, headersMap );
+	}
+	
+	//--------------------------------------------------------
+	// PUT request operations
+	//--------------------------------------------------------
+	
+	/// Performs delete request
+	public static ResponseHttp delete( String requestURL ) {
+		return byType( HttpRequestType.DELETE, requestURL, null, null, null );
+	}
+	
+	/// Performs DELETE request : with parameters
+	/// Note: parameters are treated the same way as GET request
+	public static ResponseHttp delete( String requestURL, Map<String,String[]> parametersMap ) {
+		return byType( HttpRequestType.DELETE, requestURL, parametersMap, null, null );
+	}
+	
+	/// Performs delete request with parameters, cookies and headers
+	/// Note: parameters are treated the same way as GET request
+	public static ResponseHttp delete( //
+		String requestURL, //
+		Map<String,String[]> parametersMap, // 
+		Map<String,String[]> cookiesMap, // 
+		Map<String,String[]> headersMap // 
+	) { //
+		return byType( HttpRequestType.DELETE, requestURL, parametersMap, cookiesMap, headersMap );
 	}
 }

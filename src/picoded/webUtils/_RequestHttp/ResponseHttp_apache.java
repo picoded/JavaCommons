@@ -6,13 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
-// import picoded.webUtils.ResponseHttp;
-// import picoded.conv.ConvertJSON;
-// import picoded.struct.GenericConvertMap;
-// import picoded.struct.ProxyGenericConvertMap;
-// 
-// import org.apache.commons.io.IOUtils;
-
 import org.apache.http.StatusLine;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.Header;

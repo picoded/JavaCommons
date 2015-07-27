@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 import picoded.conv.MapValueConv;
 
@@ -13,7 +14,7 @@ public class HashMapList<K,V> extends HashMap<K, List<V>> implements GenericConv
 	/// Appends the value to the inner list, creating a new ArrayList if needed
 	///
 	/// @Parameter   key     key to use
-	/// @Parameter   value   value to append
+	/// @Parameter   value   values to append
 	///
 	/// @Returns   returns itself
 	public HashMapList<K,V> append(K key, V value) {
@@ -27,6 +28,25 @@ public class HashMapList<K,V> extends HashMap<K, List<V>> implements GenericConv
 		// Add and update list
 		valArr.add( value );
 		this.put( key, valArr );
+		
+		// Returns self
+		return this;
+	}
+	
+	/// Appends the value to the inner list, creating a new ArrayList if needed
+	///
+	/// @Parameter   key     key to use
+	/// @Parameter   value   values emuneration to append
+	///
+	/// @Returns   returns itself
+	public HashMapList<K,V> append(K key, Enumeration<V> values) {
+		if( values == null ) {
+			return this;
+		}
+		
+		while(values.hasMoreElements()) {
+			append(key, values.nextElement());
+		}
 		
 		// Returns self
 		return this;

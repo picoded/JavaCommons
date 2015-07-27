@@ -2,6 +2,7 @@ package picoded.servlet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.*;
 
 // Exceptions used
@@ -12,16 +13,17 @@ import java.io.IOException;
 // Objects used
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Enumeration;
 import java.io.PrintWriter;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import javax.servlet.http.Cookie;
 
 import picoded.conv.ConvertJSON;
 import picoded.enums.HttpRequestType;
+import picoded.struct.HashMapList;
 
 // Sub modules useds
 
@@ -132,20 +134,74 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	// Independent instance variables
 	//-------------------------------------------
 	
-	/// The header map, this is ignored when httpResponse parameter is already set
-	protected Map<String,String> responseHeaderMap = null;
+	// /// The header map, this is ignored when httpResponse parameter is already set
+	// protected Map<String,String> responseHeaderMap = null;
+	// 
+	// /// The cookie map, this is ignored when httpResponse parameter is already set
+	// protected Map<String,Cookie> responseCookieMap = null;
+	// 
+	// /// local output stream, used for internal execution / testing
+	// protected ByteArrayOutputStream cachedResponseOutputStream = null;
 	
-	/// The cookie map, this is ignored when httpResponse parameter is already set
-	protected Map<String,Cookie> responseCookieMap = null;
+	/// The requested headers map, either set at startup or extracted from httpRequest
+	protected Map<String,String[]> _requestHeaderMap = null;
 	
-	/// The cookie map, this is ignored when httpResponse parameter is already set
-	protected Map<String,String> requestHeaderMap = null;
+	/// Gets and returns the requestHeaderMap
+	public Map<String,String[]> requestHeaderMap() {
+		// gets the constructor set cookies / cached cookies
+		if( _requestHeaderMap != null ) {
+			return _requestHeaderMap;
+		}
+		
+		// if the cached copy not previously set, and request is null, nothing can be done
+		if( httpRequest == null ) {
+			return null;
+		}
+		
+		// Creates the _requestHeaderMap from httpRequest 
+		HashMapList<String, String> mapList = new HashMapList<String, String>();
+		
+		// Get an Enumeration of all of the header names sent by the client
+		Enumeration<String> headerNames = httpRequest.getHeaderNames();
+		while(headerNames.hasMoreElements()) {
+			String name = headerNames.nextElement();
+			
+			// As per the Java Servlet API 2.5 documentation:
+			//        Some headers, such as Accept-Language can be sent by clients
+			//        as several headers each with a different value rather than
+			//        sending the header as a comma separated list.
+			// Thus, we get an Enumeration of the header values sent by the client
+			mapList.append( name, httpRequest.getHeaders(name) );
+		}
+		
+		// Cache and return
+		return ( _requestHeaderMap = mapList.toMapArray() );
+	}
 	
-	/// The cookie map, this is ignored when httpResponse parameter is already set
-	protected Map<String,Cookie> requestCookieMap = null;
+	/// The requested cookie map, either set at startup or extracted from httpRequest
+	protected Map<String,String[]> _requestCookieMap = null;
 	
-	/// local output stream, used for internal execution / testing
-	protected ByteArrayOutputStream cachedResponseOutputStream = null;
+	/// Gets and returns the requestCookieMap
+	public Map<String,String[]> requestCookieMap() {
+		// gets the constructor set cookies / cached cookies
+		if( _requestCookieMap != null ) {
+			return _requestCookieMap;
+		}
+		
+		// if the cached copy not previously set, and request is null, nothing can be done
+		if( httpRequest == null ) {
+			return null;
+		}
+		
+		// Creates the _requestCookieMap from httpRequest 
+		HashMapList<String, String> mapList = new HashMapList<String, String>();
+		for( Cookie oneCookie : httpRequest.getCookies() ) {
+			mapList.append( oneCookie.getName(), oneCookie.getValue() );
+		}
+		
+		// Cache and return
+		return ( _requestCookieMap = mapList.toMapArray() );
+	}
 	
 	///////////////////////////////////////////////////////
 	//
@@ -275,17 +331,17 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	}
 	
 	/// Setup the instance, with the request parameter, and
-	protected CorePage setupInstance(HttpRequestType inRequestType, Map<String,String> reqParam) throws ServletException {
+	protected CorePage setupInstance(HttpRequestType inRequestType, Map<String,String[]> reqParam) throws ServletException {
 		requestType = inRequestType;
 		//requestParameters = new RequestMap( reqParam );
 		return this;
 	}
 	
 	/// Setup the instance, with the request parameter, and cookie map
-	protected CorePage setupInstance(HttpRequestType inRequestType, Map<String,String> reqParam, Map<String,Cookie> reqCookieMap) throws ServletException {
+	protected CorePage setupInstance(HttpRequestType inRequestType, Map<String,String[]> reqParam, Map<String,Cookie[]> reqCookieMap) throws ServletException {
 		requestType = inRequestType;
 		//requestParameters = new RequestMap( reqParam );
-		requestCookieMap = reqCookieMap;
+		//requestCookieMap = reqCookieMap;
 		return this;
 	}
 	
@@ -381,10 +437,10 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 			return;
 		}
 		
-		if( responseHeaderMap == null ) {
-			responseHeaderMap = new HashMap<String, String>();
-		}
-		responseHeaderMap.put("location", uri);
+		// if( responseHeaderMap == null ) {
+		// 	responseHeaderMap = new HashMap<String, String>();
+		// }
+		// responseHeaderMap.put("location", uri);
 	}
 	
 	///////////////////////////////////////////////////////

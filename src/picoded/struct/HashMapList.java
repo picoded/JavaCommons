@@ -45,17 +45,18 @@ public class HashMapList<K,V> extends HashMap<K, List<V>> implements GenericConv
 		}
 		
 		while(values.hasMoreElements()) {
-			append(key, values.nextElement());
+			this.append(key, values.nextElement());
 		}
 		
 		// Returns self
 		return this;
 	}
 	
-	/// Returns a new map, with all the internal List<V> objects cnverted to V[] Array
+	/// Returns a new map, with all the internal List<V> objects converted to V[] Array
 	///
 	/// @Returns   the flatten map array
-	public Map<K,V[]> toMapArray() {
-		return MapValueConv.listToArray(this);
+	public Map<K,V[]> toMapArray(V[] arrayType) {
+		return MapValueConv.listToArray(this, arrayType);
 	}
+	
 }

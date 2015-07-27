@@ -219,13 +219,17 @@ public class ProxyServlet extends CorePage {
 	protected Map<String,String[]> filterRequestHeaderMap(CorePage reqPage) {
 		Map<String,String[]> map = reqPage.requestHeaderMap();
 		
-		for( String key : map.keySet() ) {
+		String[] oriKeys = map.keySet().toArray(new String[map.size()]);
+		String[] proxyHostAndPort = new String[] { getProxyHostAndPort() };
+		
+		for( String key : oriKeys ) {
 			if( key.equalsIgnoreCase(CONTENT_LENGTH_HEADER_NAME) ) {
-				map.remove(key);
+				String val = map.remove(key)[0];
+				map.put(CONTENT_LENGTH_HEADER_NAME, new String[] {val} ); //normalize the key value
 			}
 			
 			if(key.equalsIgnoreCase(HOST_HEADER_NAME) || key.equalsIgnoreCase(ORIGIN_HEADER_NAME)) {
-				map.put(key, new String[] { getProxyHostAndPort() } );
+				map.put(key, proxyHostAndPort );
 			}
 		}
 		
@@ -233,12 +237,50 @@ public class ProxyServlet extends CorePage {
 	}
 	
 	/// Does the proxy request with the given headers, and servlet response
-	protected void proxyRequest(HttpRequestType reqType, String targetURL, Map<String, String[]> filteredHeaders, HttpServletResponse res ) {
+	protected void proxyRequest(
+		HttpRequestType reqType, 
+		String targetURL, 
+		Map<String, String[]> filteredHeaders,
+		InputStream requestStream, 
+		HttpServletRequest req,
+		HttpServletResponse res
+	) {
 		try {
 			
 			// Performs the request
 			//-----------------------------------------------------------------------------
-			ResponseHttp respHttpObj = RequestHttp.byType( reqType, targetURL, null, null, filteredHeaders );
+			
+			// Gets the request length
+			String reqLength = null;
+			if(filteredHeaders.get(CONTENT_LENGTH_HEADER_NAME) != null) {
+				reqLength = filteredHeaders.get(CONTENT_LENGTH_HEADER_NAME)[0];
+			}
+			
+			// The request responese object
+			ResponseHttp respHttpObj = null;
+			
+			// Handles post or put
+			if( requestStream != null && (reqType == HttpRequestType.POST || reqType == HttpRequestType.PUT) ) {
+				// Pass input stream if required
+				if( reqLength != null && reqLength.equals("0") ) {
+					// does standard request if 0
+					respHttpObj = RequestHttp.byType( reqType, targetURL, null, null, filteredHeaders );
+				} else {
+					//if( reqLength != null && reqLength.length() == 0 ) {
+					//	filteredHeaders.remove(CONTENT_LENGTH_HEADER_NAME);
+					//}
+					
+					// Apache RequestHttp varient, only support completed input stream =[
+					// This line should not be removed, to support streaming
+					filteredHeaders.remove(CONTENT_LENGTH_HEADER_NAME);
+					
+					// Passes input stream
+					respHttpObj = RequestHttp.byType( reqType, targetURL, null, null, filteredHeaders, requestStream );
+				}
+			} else {
+				//Handles as get / etc request
+				respHttpObj = RequestHttp.byType( reqType, targetURL, null, null, filteredHeaders );
+			}
 			
 			// Forward the response code back to the client
 			//-----------------------------------------------------------------------------
@@ -265,19 +307,21 @@ public class ProxyServlet extends CorePage {
 			&& intProxyResponseCode < HttpServletResponse.SC_NOT_MODIFIED //304
 			) {
 				// Gets the string location, and check it
-				String stringLocation = headerMap.get(LOCATION_HEADER)[0];
-				if(stringLocation == null || stringLocation.length <= 0) {
+				String stringLocation = headersMap.get(LOCATION_HEADER)[0];
+				if(stringLocation == null || stringLocation.length() <= 0) {
 					throw new RuntimeException("Recieved status code: " + Integer.toString(intProxyResponseCode) 
 					+ " but no " +  LOCATION_HEADER + " header was found in the response");
 				}
 				
-				// Modify the redirect to go to this proxy servlet rather that the proxied host, if applicable
+				// The proxy hostname and port
 				String stringMyHostName = req.getServerName();
 				if(req.getServerPort() != 80) {
 					stringMyHostName += ":" + req.getServerPort();
 				}
-				stringMyHostName += req.getContextPath();
+				// stringMyHostName += req.getContextPath();
 				
+				// Replace the target host path, with the proxy host path,
+				// and sends the redirect
 				res.sendRedirect(stringLocation.replace(getProxyHostAndPort() + getProxyPath(), stringMyHostName));
 				return;
 			} else if(intProxyResponseCode == HttpServletResponse.SC_NOT_MODIFIED) {
@@ -292,67 +336,17 @@ public class ProxyServlet extends CorePage {
 			}
 			
 			// Send the content to the client
+			//-----------------------------------------------------------------------------
 			OutputStream outputStreamClientResponse = res.getOutputStream();
-			InputStream inputStreamProxyResponse = getRequest.inputStream();
+			InputStream inputStreamProxyResponse = respHttpObj.inputStream();
 			BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStreamProxyResponse);
-			// 
-			// /// Send via a second thread?
-			// Thread outputStreamClientResponse_thread = new Thread(
-			// 	new Runnable(){
-			// 		public void run(){
-			// 			int b;
-			// 			try {
-			// 				while ( ( b = bufferedInputStream.read() ) != -1 ) {
-			// 					outputStreamClientResponse.write(b);
-			// 					outputStreamClientResponse.flush();
-			// 				}
-			// 			} catch(Exception e) {
-			// 				// INTENTIONALLY SILENCED, to handle socket close events
-			// 				//throw new RuntimeException(e);
-			// 				return;
-			// 			}
-			// 		}
-			// 	}
-			// );
-			// outputStreamClientResponse_thread.start();
-			// 
-			// OutputStream streamToTarget = getRequest.outputStream();
-			// InputStream streamFromReq = req.getInputStream();
-			// BufferedInputStream bisFromReq = new BufferedInputStream(streamFromReq);
-			// 
-			// Thread socketInputStream_thread = new Thread(
-			// 	new Runnable(){
-			// 		public void run(){
-			// 			int b;
-			// 			
-			// 			try {
-			// 				while ( streamToTarget != null && ( b = bisFromReq.read() ) != -1 ) {
-			// 					streamToTarget.write(b);
-			// 					streamToTarget.flush();
-			// 				}
-			// 			} catch(Exception e) {
-			// 				// INTENTIONALLY SILENCED, to handle socket close events
-			// 				//throw new RuntimeException(e);
-			// 				return;
-			// 			}
-			// 		}
-			// 	}
-			// );
-			// 
-			// while( (outputStreamClientResponse_thread != null && outputStreamClientResponse_thread.isAlive())  || 
-			//        (socketInputStream_thread != null && socketInputStream_thread.isAlive()) 
-			// ) {
-			// 	Thread.sleep(1);
-			// }
-			
 			int outputNextByte;
 			int bytesToRead = 0;
 			
-			//uses blocking call instead?
 			while ( ( outputNextByte = bufferedInputStream.read() ) != -1 ) {
 				outputStreamClientResponse.write(outputNextByte);
-				outputStreamClientResponse.flush();
 			}
+			outputStreamClientResponse.flush();
 			
 		} catch(Exception e) {
 			throw new RuntimeException(e);
@@ -361,172 +355,22 @@ public class ProxyServlet extends CorePage {
 	
 	/// Performs a proxy redirect using the given CorePage instance
 	public boolean proxyCorePageRequest(CorePage page) throws Exception {
-		
 		try {
-			HttpRequestType rType = page.requestType();
-			HttpServletRequest sReq = page.getHttpServletRequest();
-			HttpServletResponse sRes = page.getHttpServletResponse();
-			
-			// if( rType == HttpRequestType.GET ) {
-			// 	getRequestExecute(sReq, sRes);
-			// 	return true;
-			// }
-			// 
-			// // Create the respective request URL based on requestType and URL
-			// HttpUriRequest methodToProxyRequest = RequestHttpUtils.apache_HttpUriRequest_fromRequestType(rType, getProxyURL(sReq));
-			// 
-			// // Forward the request headers
-			// setProxyRequestHeaders(sReq, methodToProxyRequest);
-			// 
-			// InputStream socketInputStream = null;
-			// 
-			// // Handles post or put
-			// if( rType == HttpRequestType.POST || rType == HttpRequestType.PUT ) {
-			// 	// is not needed?
-			// 	if( false && ServletFileUpload.isMultipartContent( sReq )) {
-			// 		handleMultipartPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, sReq);
-			// 	} else {
-			// 		//	handleStandardPost( (HttpEntityEnclosingRequestBase)methodToProxyRequest, sReq);
-			// 		
-			// 		String reqLength = sReq.getHeader(CONTENT_LENGTH_HEADER_NAME);
-			// 		
-			// 		if( reqLength != null && reqLength.equals("0") ) {
-			// 			// does nothing if req is 0
-			// 		//} else if( reqLength == null || reqLength.length() <= 0 ) {
-			// 		//	//Streaming request?
-			// 		//	socketInputStream = sReq.getInputStream();
-			// 		} else {
-			// 			// Gets as raw input stream, and passes it
-			// 			try {
-			// 				((HttpEntityEnclosingRequestBase)methodToProxyRequest).setEntity( new InputStreamEntity(sReq.getInputStream()) );
-			// 			} catch(IOException e) {
-			// 				throw new RuntimeException(e);
-			// 			}
-			// 		}
-			// 		
-			// 	}
-			// }
-			// 
-			// executeProxyRequest(rType, methodToProxyRequest, sReq, sRes, socketInputStream);
+			HttpServletRequest req = page.getHttpServletRequest();
+			proxyRequest( //
+				page.requestType(), //
+				getProxyURL( req ), //
+				filterRequestHeaderMap( page ), //
+				req.getInputStream(), //
+				req, //
+				page.getHttpServletResponse() //
+			);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		
 		// Execute the proxy request
 		return true;
-	}
-	
-	
-	/// Executes the proxy request with the 
-	
-	
-	/*
-	
-	protected void executeProxyRequest( 
-		HttpRequestType reqType, 
-		HttpUriRequest httpMethodProxyRequest, 
-		HttpServletRequest httpServletRequest, 
-		HttpServletResponse httpServletResponse,
-		InputStream socketInputStream 
-	) throws Exception {
-		
-		try {
-			
-			//System.out.println( "Request Type - "+reqType );
-			
-			// Create a default HttpClient with Disabled automated stuff
-			HttpClient httpClient = HttpClientBuilder.create().disableRedirectHandling().disableAuthCaching().build();
-			
-			/// Execute the proxy request
-			HttpResponse response = httpClient.execute(httpMethodProxyRequest);
-			
-			/// Pass response headers back to the client
-			Header[] headerArrayResponse = response.getAllHeaders();
-			for(Header header : headerArrayResponse) {
-				httpServletResponse.addHeader(header.getName(), header.getValue());
-				//System.out.println( "Header res - "+header.getName()+" = "+header.getValue());
-			}
-			
-			StatusLine statusLine = response.getStatusLine();
-			int intProxyResponseCode = statusLine.getStatusCode();
-			
-			// Pass the response code back to the client
-			httpServletResponse.setStatus(intProxyResponseCode);
-			//httpServletResponse.setStatus(intProxyResponseCode);
-			
-			// Check if the proxy response is a redirect
-			// The following code is adapted from org.tigris.noodle.filters.CheckForRedirect
-			// Hooray for open source software
-			if (intProxyResponseCode >= HttpServletResponse.SC_MULTIPLE_CHOICES // 300 
-			&& intProxyResponseCode < HttpServletResponse.SC_NOT_MODIFIED //304
-			) {
-				String stringStatusCode = Integer.toString(intProxyResponseCode);
-				String stringLocation = response.getFirstHeader(LOCATION_HEADER).getValue();
-				
-				if(stringLocation == null) {
-					throw new RuntimeException("Recieved status code: " + stringStatusCode 
-					+ " but no " +  LOCATION_HEADER + " header was found in the response");
-				}
-				
-				// Modify the redirect to go to this proxy servlet rather that the proxied host
-				String stringMyHostName = httpServletRequest.getServerName();
-				if(httpServletRequest.getServerPort() != 80) {
-					stringMyHostName += ":" + httpServletRequest.getServerPort();
-				}
-				stringMyHostName += httpServletRequest.getContextPath();
-				
-				httpServletResponse.sendRedirect(stringLocation.replace(getProxyHostAndPort() + getProxyPath(), stringMyHostName));
-				return;
-			} else if(intProxyResponseCode == HttpServletResponse.SC_NOT_MODIFIED) {
-				// 304 needs special handling.  See:
-				// http://www.ics.uci.edu/pub/ietf/http/rfc1945.html#Code304
-				// We get a 304 whenever passed an 'If-Modified-Since'
-				// header and the data on disk has not changed; server
-				// responds w/ a 304 saying I'm not going to send the
-				// body because the file has not changed.
-				httpServletResponse.setIntHeader(CONTENT_LENGTH_HEADER_NAME, 0);
-				return;
-			}
-			
-			// Send the content to the client
-			InputStream inputStreamProxyResponse = response.getEntity().getContent();
-			BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStreamProxyResponse);
-			OutputStream outputStreamClientResponse = httpServletResponse.getOutputStream();
-			int outputNextByte;
-			//int bytesToRead = 0;
-			
-			/// Send via a second thread?
-			// Thread outputStreamClientResponse_thread = new Thread(
-			// 	new Runnable(){
-			// 		public void run(){
-			// 			int b;
-			// 			try {
-			// 				while ( ( b = bufferedInputStream.read() ) != -1 ) {
-			// 					outputStreamClientResponse.write(b);
-			// 					outputStreamClientResponse.flush();
-			// 				}
-			// 			} catch(Exception e) {
-			// 				// INTENTIONALLY SILENCED, to handle socket close events
-			// 				//throw new RuntimeException(e);
-			// 			}
-			// 		}
-			// 	}
-			// );
-			// outputStreamClientResponse_thread.start();
-			// 	
-			// while( (outputStreamClientResponse_thread != null && outputStreamClientResponse_thread.isAlive()) || 
-			//        (socketInputStream_thread != null && socketInputStream_thread.isAlive()) ) {
-			// 	Thread.sleep(1);
-			// }
-			
-			// uses blocking call instead?
-			while ( ( outputNextByte = bufferedInputStream.read() ) != -1 ) {
-				outputStreamClientResponse.write(outputNextByte);
-				outputStreamClientResponse.flush();
-			}
-		} catch(Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 	
 	///////////////////////////////////////////////////////////
@@ -539,76 +383,4 @@ public class ProxyServlet extends CorePage {
 		return proxyCorePageRequest(this);
 	}
 	
-	///////////////////////////////////////////////////////////
-	// Upload data handling
-	///////////////////////////////////////////////////////////
-
-	protected void handleStandardPost( HttpEntityEnclosingRequestBase postMethodProxyRequest, HttpServletRequest httpServletRequest) throws Exception {
-		try {
-			// Get the client POST data as a Map
-			Map<String, String[]> mapPostParameters = httpServletRequest.getParameterMap();
-
-			// Create a List to hold the NameValuePairs to be passed to the PostMethod
-			List<NameValuePair> listNameValuePairs = RequestHttpUtils.parameterMapToList(mapPostParameters);
-
-			// Set the proxy request POST data 
-			postMethodProxyRequest.setEntity( new UrlEncodedFormEntity(listNameValuePairs) ); // listNameValuePairs.toArray(new NameValuePair[] { }) ??
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void handleMultipartPost( HttpEntityEnclosingRequestBase postMethodProxyRequest, HttpServletRequest httpServletRequest) throws Exception {
-		// Create a factory for disk-based file items
-		DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
-		// Set factory constraints
-		diskFileItemFactory.setSizeThreshold(getMaxFileUploadSize());
-		diskFileItemFactory.setRepository(UPLOAD_TEMP_DIRECTORY);
-		// Create a new file upload handler
-		ServletFileUpload servletFileUpload = new ServletFileUpload(diskFileItemFactory);
-		// Parse the request
-		try {
-			// Get the multipart items as a list
-			List<FileItem> listFileItems = servletFileUpload.parseRequest(httpServletRequest);
-			// Create a list to hold all of the parts
-			MultipartEntityBuilder multipartRequestEntity = MultipartEntityBuilder.create();
-			
-			// Iterate the multipart items list
-			for(FileItem fileItemCurrent : listFileItems) {
-				
-				// If the current item is a form field, then create a string part
-				if (fileItemCurrent.isFormField()) {
-					multipartRequestEntity.addTextBody(
-						fileItemCurrent.getFieldName(), // The field name
-						fileItemCurrent.getString()     // The field value
-					);
-				} else {
-					// The item is a file upload, so we create a FilePart
-					multipartRequestEntity.addBinaryBody(
-						fileItemCurrent.getFieldName(),    // The field name
-						fileItemCurrent.getInputStream()   //The file itself
-					);
-				}
-			}
-			
-			HttpEntity multipartRequestEntity_final = multipartRequestEntity.build();
-			
-			postMethodProxyRequest.setEntity(multipartRequestEntity_final);
-			
-			// The current content-type header (received from the client) IS of
-			// type "multipart/form-data", but the content-type header also
-			// contains the chunk boundary string of the chunks. Currently, this
-			// header is using the boundary of the client request, since we
-			// blindly copied all headers from the client request to the proxy
-			// request. However, we are creating a new request with a new chunk
-			// boundary string, so it is necessary that we re-set the
-			// content-type string to reflect the new chunk boundary string
-			postMethodProxyRequest.setHeader(CONTENT_TYPE_HEADER_NAME, multipartRequestEntity_final.getContentType().getValue() );
-			
-		} catch (Exception fileUploadException) {
-			throw new RuntimeException(fileUploadException);
-		}
-	}
-	// */
 }

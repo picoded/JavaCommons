@@ -2,6 +2,7 @@ package picoded.webUtils;
 
 import java.util.Map;
 
+import java.io.InputStream;
 import java.util.function.Consumer;
 import picoded.enums.HttpRequestType;
 import picoded.webUtils._RequestHttp.RequestHttp_apache;
@@ -30,7 +31,19 @@ public class RequestHttp {
 		Map<String,String[]> cookiesMap, // 
 		Map<String,String[]> headersMap // 
 	) { //
-		return RequestHttp_apache.callRequest( requestType, requestURL, parametersMap, cookiesMap, headersMap );
+		return RequestHttp_apache.callRequest( requestType, requestURL, parametersMap, cookiesMap, headersMap, null );
+	}
+	
+	/// Performs GET request with parameters, cookies and headers
+	public static ResponseHttp byType( //
+		HttpRequestType requestType, //
+		String requestURL, //
+		Map<String,String[]> parametersMap, // 
+		Map<String,String[]> cookiesMap, // 
+		Map<String,String[]> headersMap, // 
+		InputStream requestStream //
+	) { //
+		return RequestHttp_apache.callRequest( requestType, requestURL, parametersMap, cookiesMap, headersMap, requestStream );
 	}
 	
 	//--------------------------------------------------------

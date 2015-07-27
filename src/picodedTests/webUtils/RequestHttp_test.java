@@ -1,5 +1,7 @@
 package picodedTests.webUtils;
 
+import org.junit.*;
+
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -30,11 +32,13 @@ public class RequestHttp_test {
 		return "wss://echo.websocket.org";
 	}
 	
+	ResponseHttp res = null;
 	RequestHttp reqObj = null;
 	
 	@Before
 	public void setUp(){
 		reqObj = null;
+		res = null;
 		//wsObj = new RequestHttp();
 	}
 	
@@ -46,7 +50,7 @@ public class RequestHttp_test {
 	
 	@Test @SuppressWarnings("unchecked")
 	public void GET_basicTest() throws IOException {
-		ResponseHttp res = null;
+		
 		Map<String,Object> resMap = null;
 		
 		assertNotNull( res = RequestHttp.get(httpBinURL()+"/get?hello=world") );
@@ -58,7 +62,7 @@ public class RequestHttp_test {
 	
 	@Test @SuppressWarnings("unchecked")
 	public void GET_parametersTest() throws IOException {
-		ResponseHttp res = null;
+		
 		Map<String,Object> resMap = null;
 		
 		Map<String,String[]> reqMap = new HashMap<String,String[]>();
@@ -105,7 +109,7 @@ public class RequestHttp_test {
 	
 	@Test 
 	public void GET_statusTest() throws IOException {
-		ResponseHttp res = null;
+		
 		assertNotNull( res = RequestHttp.get(httpBinURL()+"/status/418") );
 		assertEquals( 418, res.statusCode() );
 		
@@ -118,7 +122,7 @@ public class RequestHttp_test {
 	
 	@Test @SuppressWarnings("unchecked")
 	public void POST_basicTest() throws IOException {
-		ResponseHttp res = null;
+		
 		Map<String,Object> resMap = null;
 		Map<String,String[]> postData = new HashMap<String,String[]>();
 		postData.put("hello", new String[] { "world" });
@@ -133,17 +137,17 @@ public class RequestHttp_test {
 	
 	@Test
 	public void WEBSOCKET_echoTest() {
-		assertNotNull( reqObj = RequestHttp.websocket( echoWebSocketURL() ) );
+		assertNotNull( res = RequestHttp.websocket( echoWebSocketURL() ) );
 		
-		assertEquals( "hello", reqObj.sendAndWait("hello") );
-		assertEquals( "new", reqObj.sendAndWait("new") );
-		assertEquals( "world", reqObj.sendAndWait("world") );
+		assertEquals( "hello", res.sendAndWait("hello") );
+		assertEquals( "new", res.sendAndWait("new") );
+		assertEquals( "world", res.sendAndWait("world") );
 	}
 	
 //	@Test @SuppressWarnings("unchecked")
 //	public void GET_stream100() throws IOException {
 //		System.out.println("Runnin GET_stream20");
-//		ResponseHttp res = null;
+//		
 //		
 //		assertNotNull( res = RequestHttp.get(httpBinURL()+"/stream/100") );
 //		assertEquals( 200, res.statusCode() );

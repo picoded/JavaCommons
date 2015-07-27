@@ -174,8 +174,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 			mapList.append( name, httpRequest.getHeaders(name) );
 		}
 		
-		// Cache and return
-		return ( _requestHeaderMap = mapList.toMapArray() );
+		return ( _requestHeaderMap = mapList.toMapArray(new String[0]) );
 	}
 	
 	/// The requested cookie map, either set at startup or extracted from httpRequest
@@ -200,7 +199,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		}
 		
 		// Cache and return
-		return ( _requestCookieMap = mapList.toMapArray() );
+		return ( _requestCookieMap = mapList.toMapArray(new String[0]) );
 	}
 	
 	///////////////////////////////////////////////////////

@@ -47,7 +47,7 @@ public class ResponseHttp_apache extends ResponseHttp_basic {
 			mapList.append( header.getName(), header.getValue() );
 		}
 		
-		return ( _headersMap = mapList.toMapArray() );
+		return ( _headersMap = mapList.toMapArray(new String[0]) );
 	}
 	
 	/// Gets the cookies map
@@ -63,7 +63,7 @@ public class ResponseHttp_apache extends ResponseHttp_basic {
 			mapList.append( cookie.getName(), cookie.getValue() );
 		}
 		
-		return ( _cookiesMap = mapList.toMapArray() );
+		return ( _cookiesMap = mapList.toMapArray(new String[0]) );
 	}
 	
 }

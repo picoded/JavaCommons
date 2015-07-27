@@ -15,6 +15,8 @@ import picoded.webUtils.ResponseHttp;
 
 /// Extends the basic implmentation to support websocket
 ///
+/// NOTE: This class is considered EXPERIMENTAL! (you been warned)
+///
 /// NOTE: while the API is deisgned to be thread safe in the future.
 /// the current implmentation is not thread safe for usage. 
 /// (aka multiple processes using a single ResponseHttp object)
@@ -100,6 +102,25 @@ public class ResponseHttp_websocket implements ResponseHttp {
 			throw new RuntimeException("WebSocket is already closed");
 		}
 		_websocketSession.getAsyncRemote().sendText(message);
+	}
+	
+	/// Sends and waits for a response, needs a more efficent way?
+	public String sendAndWait(String message) {
+		_sendAndWait_block = true;
+		_sendAndWait_message = null;
+		
+		try {
+			sendMessage(message);
+			while( _sendAndWait_message == null ) {
+				Thread.sleep(0, 250000);
+			}
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		} finally {
+			_sendAndWait_block = false;
+		}
+		
+		return _sendAndWait_message;
 	}
 	
 	///////////////////////////////////////////////////////////

@@ -1,5 +1,6 @@
 package picoded.webUtils._RequestHttp;
 
+import java.io.InputStream;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.entity.InputStreamEntity;
 
 /// Support the RequestHTTP api via apache
 /// Note that apache requests are synchrnous, and not async
@@ -48,8 +50,9 @@ public class RequestHttp_apache {
 	/// Adds the cookies parameters to cookieJar
 	protected static BasicCookieStore addCookiesIntoCookieJar(BasicCookieStore cookieJar, Map<String, String[]> cookieMap){
 		if(cookieMap != null){
-			for(Map.Entry<String, String[]> entry : cookieMap.entrySet()){
-				for( String val : entry.getValue() ) {
+			for(Map.Entry<String, String[]> entry : cookieMap.entrySet()) {
+				String[] values = entry.getValue();
+				for( String val : values ) {
 					cookieJar.addCookie(new BasicClientCookie(entry.getKey(), val));
 				}
 			}
@@ -60,8 +63,9 @@ public class RequestHttp_apache {
 	/// Adds the header parameters to request
 	protected static HttpRequestBase addHeadersIntoRequest(HttpRequestBase reqBase, Map<String, String[]> headersMap){
 		if(headersMap != null){
-			for(Map.Entry<String, String[]> entry : headersMap.entrySet()){
-				for( String val : entry.getValue() ) {
+			for(Map.Entry<String, String[]> entry : headersMap.entrySet()) {
+				String[] values = entry.getValue();
+				for( String val : values ) {
 					reqBase.addHeader( entry.getKey(), val );
 				}
 			}
@@ -157,6 +161,20 @@ public class RequestHttp_apache {
 		Map<String,String[]> cookiesMap, //
 		Map<String,String[]> headersMap //
 	) {
+		return callRequest( reqType, reqURL, parametersMap, cookiesMap, headersMap, null );
+	}
+	
+	/// Executes the request, given the type and parmeters
+	/// Note that post/put request parameters are sent using
+	/// the input stream if given, else it uses the parameter map
+	public static ResponseHttp callRequest( //
+		HttpRequestType reqType, //
+		String reqURL, //
+		Map<String,String[]> parametersMap, //
+		Map<String,String[]> cookiesMap, //
+		Map<String,String[]> headersMap, //
+		InputStream requestStream //
+	) {
 		// append get parameters if needed
 		if(reqType == HttpRequestType.GET || reqType == HttpRequestType.DELETE) { 
 			reqURL = appendGetParameters(reqURL, parametersMap);
@@ -168,11 +186,15 @@ public class RequestHttp_apache {
 		
 		
 		// POST and PUT parameters 
-		// note that its sent as a form entity
 		if(reqType == HttpRequestType.POST || reqType == HttpRequestType.PUT ) {
 			try {
-				((HttpEntityEnclosingRequestBase)reqBase).setEntity( new UrlEncodedFormEntity( parametersToNameValuePairs(parametersMap) ) );
-				
+				if( requestStream != null ) {
+					// note that its sent as a raw stream (set headers manually please)
+					((HttpEntityEnclosingRequestBase)reqBase).setEntity( new InputStreamEntity(requestStream) );
+				} else if( parametersMap != null ) {
+					// note that its sent as a form entity
+					((HttpEntityEnclosingRequestBase)reqBase).setEntity( new UrlEncodedFormEntity( parametersToNameValuePairs(parametersMap) ) );
+				}
 			} catch(Exception e) {
 				throw new RuntimeException(e);
 			}

@@ -1,16 +1,19 @@
 package picodedTests.fileUtils;
 
 import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import java.util.Map;
+
 // Test Case include
 import org.junit.*;
-import static org.junit.Assert.*;
 
+import static org.junit.Assert.*;
 import picoded.fileUtils.*;
 
 ///
@@ -41,7 +44,7 @@ public class ConfigFile_test {
 	public void tearDown() {
 		configObj = null;
 	}
-	
+
 	@Test
 	public void constructor() {
 		assertNotNull( configObj );

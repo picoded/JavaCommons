@@ -35,10 +35,11 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 	
 	/// The actual inner map storage
 	Ini iniMap = null;
-	
-	Map<String, Object> jsonMap = null;
+	Map<String,Object> jsonMap = null;
 	
 	boolean jsonMode = false;
+	
+	String fileName = "";
 	/// Blank constructor
 	protected ConfigFile() {
 		
@@ -56,19 +57,27 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 	
 	private void innerConstructor(File inFile){
 		try {
-			String fileName = inFile.getName();
+			fileName = inFile.getName();
 			if(fileName.endsWith(".js") || fileName.endsWith(".json")){
 				jsonMode = true;
 				jsonMap = new HashMap<String, Object>();
 				
 				String jsString = FileUtils.readFileToString(inFile);
 				jsonMap = ConvertJSON.toMap(jsString);
+				
+				for(String key : jsonMap.keySet()){
+					jsonMap.put(key, jsonMap.get(key));
+				}
 			}else{
 				iniMap = new Ini(inFile);
 			}
 		} catch(IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public String fileName(){
+		return fileName;
 	}
 	
 	/// Gets the config value string, from the file 

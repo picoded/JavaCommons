@@ -498,6 +498,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	}
 
 	/// JSQL based GET
+	@SuppressWarnings("unchecked")
 	protected Map<String, Object> JSqlObjectGet(JSql sql, String _oid) throws JSqlException {
 		try {
 			Object r = JStackIterate( new JStackReader() {
@@ -525,7 +526,11 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 				}
 			} );
 			
-			return ((r != null)? (Map<String, Object>)r : null);
+			if ( r instanceof Map ) {
+			    return (Map<String, Object>) r;
+			}
+			throw new JStackException("Incompatible types: Object cannot be converted to Map<String, Object>");
+
 		} catch (JStackException e) {
 			throw new RuntimeException(e);
 		}

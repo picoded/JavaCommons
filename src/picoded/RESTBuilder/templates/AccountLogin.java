@@ -91,7 +91,6 @@ public class AccountLogin extends BasePage {
 						BasePage bp = (BasePage)(req.requestPage());
 						
 						AccountObject ao = at.getRequestUser( bp.getHttpServletRequest() );
-						
 						if( ao != null ) {
 							res.put("accountID", ao._oid());
 							

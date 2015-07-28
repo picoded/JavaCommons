@@ -53,4 +53,9 @@ public class MapValueConv {
 		}
 		return target;
 	}
+	
+	/// Converts a single value map, to an array map
+	public static <A, B> Map<A,B[]> singleToArray(Map<A,B> source, B[] arrayType) {
+		return singleToArray(source, new HashMap<A,B[]>(), arrayType);
+	}
 }

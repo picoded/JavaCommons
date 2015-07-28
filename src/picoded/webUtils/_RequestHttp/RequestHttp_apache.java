@@ -64,7 +64,7 @@ public class RequestHttp_apache {
 					// (it is a brand new cookie-jar per request anyway!!!)
 					//
 					// You can put this as default behaviour, fine, but let the 
-					// developer decide how they want to control it.
+					// developer decide how they want to control it. (SOMEWHERE??)
 					//
 					// And no, setting headers directly is not a good idea.
 					// as it will be error prone, etc. Damn you apache!

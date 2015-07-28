@@ -121,6 +121,19 @@ public class RequestHttp_test {
 	}
 	
 	@Test @SuppressWarnings("unchecked")
+	public void GET_cookiesTest() throws IOException {
+		Map<String,Object> resMap = null;
+		Map<String,String[]> reqMap = new HashMap<String,String[]>();
+		
+		reqMap.put("cookie", new String[] {"in the jar"} );
+		
+		assertNotNull( res = RequestHttp.get(httpBinURL()+"/cookies", null, reqMap, null) );
+		assertEquals( 200, res.statusCode() );
+		assertNotNull( resMap = res.toMap() );
+		assertEquals( resMap.toString(), "in the jar", ((Map<String,Object>)(resMap.get("cookies"))).get("cookie") );
+	}
+	
+	@Test @SuppressWarnings("unchecked")
 	public void POST_basicTest() throws IOException {
 		
 		Map<String,Object> resMap = null;

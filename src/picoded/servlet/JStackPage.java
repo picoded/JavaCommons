@@ -83,7 +83,11 @@ public class JStackPage extends CorePage {
 		if (_contextPath != null) {
 			return _contextPath;
 		} else {
-			return (_contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/");
+			if( httpRequest != null ) {
+				return (_contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/");
+			} else {
+				return (_contextPath = getServletContext().getRealPath("/") + "/");
+			}
 		}
 	}
 	
@@ -146,6 +150,7 @@ public class JStackPage extends CorePage {
 			return JStackObj;
 		}
 		
+		//Default is sqlite
 		JStackObj = new JStack(JSql.sqlite(getWebInfPath() + "sqlite.db"));
 		
 		return JStackObj;

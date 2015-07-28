@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.net.URL;
 
 import picoded.conv.StringEscape;
 import picoded.enums.HttpRequestType;
@@ -48,17 +49,49 @@ public class RequestHttp_apache {
 	}
 	
 	/// Adds the cookies parameters to cookieJar
-	protected static BasicCookieStore addCookiesIntoCookieJar(BasicCookieStore cookieJar, Map<String, String[]> cookieMap){
+	protected static BasicCookieStore addCookiesIntoCookieJar(String domain, BasicCookieStore cookieJar, Map<String, String[]> cookieMap){
 		if(cookieMap != null){
 			for(Map.Entry<String, String[]> entry : cookieMap.entrySet()) {
 				String[] values = entry.getValue();
 				for( String val : values ) {
-					cookieJar.addCookie(new BasicClientCookie(entry.getKey(), val));
+					BasicClientCookie cookie = new BasicClientCookie(entry.getKey(), val);
+					
+					//
+					// (╯°□°）╯︵ ┻━┻
+					//
+					// Bloody hell! Domains, and path needs to be explicitely set.
+					// When i just want to set cookie policy as SEND ALL.
+					// (it is a brand new cookie-jar per request anyway!!!)
+					//
+					// You can put this as default behaviour, fine, but let the 
+					// developer decide how they want to control it. (SOMEWHERE??)
+					//
+					// And no, setting headers directly is not a good idea.
+					// as it will be error prone, etc. Damn you apache!
+					//
+					// I hate this nearly as much as i hate java type erasure
+					// (and that is hard to match)
+					//
+					// PS: this whole comment block is used to indicate 
+					// why this useless step is there, in case someone 
+					// (probably me) would think its more efficent to just 
+					// optimize it out... And break everything.
+					//
+					// ~ eugene@picoded.com
+					//
+					cookie.setDomain(domain); 
+					cookie.setPath("/");
+					//
+					// (＃｀д´)ﾉ
+					//
+					
+					cookieJar.addCookie(cookie);
 				}
 			}
 		}
 		return cookieJar;
 	}
+	
 	
 	/// Adds the header parameters to request
 	protected static HttpRequestBase addHeadersIntoRequest(HttpRequestBase reqBase, Map<String, String[]> headersMap){
@@ -128,12 +161,16 @@ public class RequestHttp_apache {
 	
 	/// Request executor taking a HttpRequestBase and returning its response
 	protected static ResponseHttp_apache callRequest( //
+		String reqURL, 
 		HttpRequestBase httpRequest, //
 		Map<String,String[]> cookieMap //
 	){
 		try {
+			// gets the hostname
+			String host = new URL(reqURL).getHost(); 
+			
 			// Prepares the HTTPClient, with a cookieJar =D
-			BasicCookieStore cookieJar = addCookiesIntoCookieJar( new BasicCookieStore(), cookieMap );
+			BasicCookieStore cookieJar = addCookiesIntoCookieJar(host, new BasicCookieStore(), cookieMap );
 			HttpClient apacheClient = HttpClientBuilder.create().setDefaultCookieStore(cookieJar).build();
 			
 			// Executes request
@@ -201,6 +238,6 @@ public class RequestHttp_apache {
 		}
 		
 		// calls request with cookies
-		return callRequest(reqBase, cookiesMap);
+		return callRequest(reqURL, reqBase, cookiesMap);
 	}
 }

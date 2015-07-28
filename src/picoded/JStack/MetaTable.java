@@ -526,11 +526,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 				}
 			} );
 			
-			if ( r instanceof Map ) {
-			    return (Map<String, Object>) r;
-			}
-			throw new JStackException("Incompatible types: Object cannot be converted to Map<String, Object>");
-
+			return ((r != null)? (Map<String, Object>)r : null);
 		} catch (JStackException e) {
 			throw new RuntimeException(e);
 		}

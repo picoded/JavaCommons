@@ -7,8 +7,9 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-
 import java.util.Map;
+
+
 
 // Test Case include
 import org.junit.*;
@@ -59,6 +60,22 @@ public class ConfigFile_test {
 	public void jsonTest(){
 		String jsonHelloVal = (String)jsConfigObj.get("hello");
 		assertEquals("world", jsonHelloVal);
+		
+		String jsonArrayVal = (String)jsConfigObj.get("testArray.hello");
+		assertEquals("world", jsonArrayVal);
+		
+		String jsonInnerArrayVal = (String)jsConfigObj.get("testArray.innerArray.hi");
+		assertEquals("hello", jsonInnerArrayVal);
+		
+		Object jsonMap = jsConfigObj.get("testArray");
+		if(jsonMap instanceof Map){
+			@SuppressWarnings("unchecked")
+			Map<String, Object> innerMap = (Map<String, Object>)jsonMap;
+			assertNotNull(innerMap);
+			assertTrue(innerMap instanceof Map);
+			assertTrue(innerMap.size() > 0);
+			assertEquals("world", innerMap.get("hello"));
+		}
 	}
 	
 	@Test

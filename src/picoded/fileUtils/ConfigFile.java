@@ -83,8 +83,7 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 	/// Gets the config value string, from the file 
 	public Object get(Object key) {
 		if(jsonMode){
-			//read from json map
-			return jsonMap.get(key);
+			return getJson(key, jsonMap);
 		}else{
 			//read from ini
 			String keyString = key.toString();
@@ -96,6 +95,26 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 			Ini.Section iniSection = iniMap.get(section);
 			
 			return (iniSection == null)? null : iniSection.get(sectionKey);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Object getJson(Object key, Object currentResult){
+		String keyString = key.toString();
+		
+		Map<String, Object> currentResultMap = null;
+		if(currentResult instanceof Map){
+			currentResultMap = (Map<String, Object>)currentResult;
+		}
+		
+		if(keyString.contains(".")){
+			String jsonKey = keyString.substring(0, keyString.indexOf("."));
+			String jsonKeyRemainder = keyString.substring(keyString.indexOf(".") + 1, keyString.length());
+			
+			Object jsonObj = currentResultMap.get(jsonKey);
+			return getJson(jsonKeyRemainder, jsonObj);
+		} else {
+			return currentResultMap.get(keyString);
 		}
 	}
 }

@@ -74,8 +74,8 @@ public class RequestHttp_apache {
 					//
 					// PS: this whole comment block is used to indicate 
 					// why this useless step is there, in case someone 
-					// (probably me) would think its more efficent to just 
-					// optimize it out... And break everything.
+					// (probably me in the future) would think its good
+					// to just optimize it out... And break everything.
 					//
 					// ~ eugene@picoded.com
 					//

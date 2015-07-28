@@ -2,6 +2,9 @@ package picoded.fileUtils;
 
 ///
 import picoded.struct.GenericConvertMap;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,97 +23,134 @@ import org.apache.commons.lang3.ArrayUtils;
 ///
 /// Note that folder, and filename will be used as the config path. Unless its config.ini
 ///
-public class ConfigFileSet extends ConfigFile implements GenericConvertMap<String, String> {
+public class ConfigFileSet extends ConfigFile implements GenericConvertMap<String, Object> {
 	
 	/// The actual inner prefix set, which is searched when a request is made
 	///
 	/// Note that the inner map are actually ConfigFile 
-	public Map<String, Map<String,String>> prefixSetMap = new HashMap<String, Map<String,String>>();
 	
-	/// 
+	//<main, <main-include.test, hello>>
+	//<related <main-include.text, hi>>
+	//json-><jsonFileName <jsonKey, jsonValue>>
+	public Map<String, Map<String,Object>> prefixSetMap = new HashMap<String, Map<String,Object>>();
+	
 	public ConfigFileSet() {
 		
 	}
 	
-	public ConfigFileSet addConfigSet(String filePath) {
-		return addConfigSet(new File(filePath), null);
+	public ConfigFileSet addConfigSet(String filePath, String prefix, String separator) {
+		return addConfigSet_recursive(new File(filePath), prefix, separator);
 	}
 	
-	public ConfigFileSet addConfigSet(File inFile) {
-		return addConfigSet(inFile, null);
+	public ConfigFileSet addConfigSet(File inFile, String prefix, String separator) {
+		return addConfigSet_recursive(inFile, prefix, separator);
 	}
 	
-	/// Config file set iteration and load with prefix
-	public ConfigFileSet addConfigSet(String filePath, String prefix) {
-		return addConfigSet(new File(filePath), prefix);
-	}
-	
-	/// Config file set iteration and load with prefix
-	public ConfigFileSet addConfigSet(File inFile, String prefix) {
-		if(inFile == null) {
-			return this;
+	//this can actually be pulled out into a static function on its own
+	//this looks inside the given folder and returns a list of all files inside
+	public List<String> getFileNamesFromFolder(File inFile, String rootFolderName, String separator){
+		List<String> keyList = new ArrayList<String>();
+		
+		if(rootFolderName == null){
+			rootFolderName = "";
 		}
 		
-		// prefix defaults to blank
-		if( prefix == null ) {
-			prefix = "";
-		} else {
-			prefix = prefix.trim();
-		}
-		
-		// The current file / folder name
-		
-		String nxtPrefix = "";
-		if(prefix != null && prefix.length() > 0) {
-			nxtPrefix = prefix+".";
-		}
-		
-		// Iterate sub file directory
-		if(inFile.isDirectory()) {
-			File[] subFiles = inFile.listFiles();
-			
-			for (int i = 0; i < subFiles.length; i++){
-				String subFileName = subFiles[i].getName();
-				
-				// @TODO : proper filename without type
-				String subFileNameWithoutType = subFileName;
-				if( subFileName.endsWith(".ini") ) {
-					subFileNameWithoutType = subFileNameWithoutType.substring(0, subFileNameWithoutType.length() - 4 ); 
+		if(inFile.isDirectory()){
+			File[] innerFiles = inFile.listFiles();
+			for(File innerFile:innerFiles){
+				if(innerFile.isDirectory()){
+					String parentFolderName = innerFile.getName();
+					if(!rootFolderName.isEmpty()){
+						parentFolderName = rootFolderName + separator + parentFolderName;
+					}
+					keyList.addAll(getFileNamesFromFolder(innerFile, parentFolderName, separator));
+				}else{
+					keyList.addAll(getFileNamesFromFolder(innerFile, rootFolderName, separator));
 				}
-				
-				String subPrefix = nxtPrefix+subFileNameWithoutType;
-				addConfigSet(subFiles[i], subPrefix);
 			}
-			return this;
+		}else{
+			String fileName = inFile.getName();
+			fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+			String prefix = "";
+			if(!rootFolderName.isEmpty()){
+				prefix += rootFolderName + separator;
+			}
+			
+			keyList.add(prefix + fileName);
 		}
 		
-		// Else files
-		String fileName = inFile.getName();
-		if( fileName.endsWith(".ini") ) {
-			String fileNameWithoutType = fileName.substring(0, fileName.length() - 4 ); // - (".ini").length() 
-			prefixSetMap.put(prefix, new ConfigFile(inFile));
+		return keyList;
+	}
+	
+	private ConfigFileSet addConfigSet_recursive(File inFile, String rootPrefix, String separator){
+		if(rootPrefix == null){
+			rootPrefix = "";
+		}
+		
+		if(inFile.isDirectory()){
+			File[] innerFiles = inFile.listFiles();
+			for(File innerFile:innerFiles){
+				if(innerFile.isDirectory()){
+					String parentFolderName = innerFile.getName();
+					if(!rootPrefix.isEmpty()){
+						parentFolderName = rootPrefix + separator + parentFolderName;
+					}
+					addConfigSet_recursive(innerFile, parentFolderName, separator);
+				}else{
+					addConfigSet_recursive(innerFile, rootPrefix, separator);
+				}
+			}
+		}else{
+			String fileName = inFile.getName();
+			
+			ConfigFile cFile = new ConfigFile(inFile);
+			
+			fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+			String prefix = "";
+			if(!rootPrefix.isEmpty()){
+				prefix += rootPrefix + separator;
+			}
+			
+			prefixSetMap.put(prefix + fileName, cFile);
 		}
 		
 		return this;
 	}
 	
-	/// Gets the config value string, from the file 
-	public String get(Object key) {
-		
+	public Object get(Object key){
 		String keyString = key.toString();
 		String[] splitKeyString = keyString.split("\\.");
 		
+		//an issue could arise if there are conflicting keys
+		//example
+		//<a.b.c, <d, e>> //json
+		//<a.b, <c.d, e>> //ini file
+		//in this case, passing a key of "a.b.c.d" will always hit the json file first, which might not be intended.
+		//having nonconflicting keys will avoid this, but this is just a heads up
 		for(int splitPt = splitKeyString.length - 1; splitPt >= 0; --splitPt) {
-			String section = StringUtils.join( ArrayUtils.subarray(splitKeyString, 0, splitPt), ".");
-			String ending = StringUtils.join( ArrayUtils.subarray(splitKeyString, splitPt, splitKeyString.length), ".");
+			String fileKey = StringUtils.join( ArrayUtils.subarray(splitKeyString, 0, splitPt), ".");
+			String headerKey = StringUtils.join( ArrayUtils.subarray(splitKeyString, splitPt, splitKeyString.length), ".");
 			
-			Map<String,String> subMap = prefixSetMap.get(section);
-			if( subMap != null ) {
-				return subMap.get(ending);
+			Object returnVal = get_safe(fileKey, headerKey);
+			
+			if(returnVal != null){
+				return returnVal;
 			}
 		}
 		
 		return null;
 	}
 	
+	//use this if you know the exact keyvaluepair you want
+	public Object get_safe(Object fileKey, Object headerKey){
+		String fileKeyString = fileKey.toString();
+		String headerKeyString = headerKey.toString();
+		
+		Map<String, Object> subMap = prefixSetMap.get(fileKeyString);
+		if(subMap != null){
+			return subMap.get(headerKeyString);
+		}
+		
+		return null;
+	}
 }

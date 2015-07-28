@@ -129,7 +129,7 @@ public class JStackPage extends CorePage {
 		}
 		
 		JConfigObj = new JConfig();
-		JConfigObj.addConfigSet(getConfigsPath(), null);
+		JConfigObj.addConfigSet(getConfigsPath(), null, ".");
 		// Intentionally DOES NOT setup the JStack config connections?
 		
 		return JConfigObj;

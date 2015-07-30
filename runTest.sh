@@ -7,27 +7,47 @@ ant compile-tests
 
 for ARG in $*
 do
-
-#
-#	The below no longer applies as the MYSQL database is "centralised" with the rest of the DB's
-#
-#	if [[ $ARG == *mysql* || $ARG == *_all ]]
-#	then
-#	  echo "================================================================================="
-#	  echo "= IMPORTANT NOTE: mysql related tests, assumes the server is 127.0.0.1:3306,    ="
-#	  echo "=                 with the db, user, and pass of 'SERVLETCOMMONS'               ="
-#	  echo "=                                                                               ="
-#	  echo "= 'mysql -uroot' (lets you access mysql as root in most test enviroments)       ="
-#	  echo "= > CREATE DATABASE IF NOT EXISTS SERVLETCOMMONS;                               ="
-#	  echo "= > CREATE USER SERVLETCOMMONS@'localhost' IDENTIFIED BY 'SERVLETCOMMONS';      ="
-#	  echo "= > GRANT ALL PRIVILEGES ON SERVLETCOMMONS.* TO SERVLETCOMMONS@'localhost';     ="
-#	  echo "================================================================================="
-#	fi
-#
 	
-	echo "Running test: picodedTests."$ARG"_test"
-	echo "---------------------------------------------------------------------------------"
+	# Split class and function names if needed
+	#----------------------------------------------------------
+	if [[ $ARG == *"#"* ]]
+	then
+		TESTCLASS=`(echo $ARG | cut -d"#" -f 1)`
+		TESTFUNCTION=`(echo $ARG | cut -d"#" -f 2)`
+	else
+		TESTCLASS="$ARG";
+		TESTFUNCTION="";
+	fi
 	
-	#-Djava.library.path="./build-tools/junit/*.jar:./bin/build/picodedJavaCommons-libsOnly.jar"
-	java -cp "./build-tools/junit/*:./bin/build/picodedJavaCommons-libsOnly.jar:./bin/classes" org.junit.runner.JUnitCore picodedTests."$ARG"_test
+	
+	# Ensure test classes ends with the _test suffixes, and picodedTest prefix
+	#------------------------------------------------------------------------------
+	_TEST="_test";
+	
+	if [[ $TESTCLASS =~ \_test$ ]] 
+	then
+		TESTCLASS="$TESTCLASS";
+	else 
+		TESTCLASS="$TESTCLASS$_TEST";
+	fi
+	
+	if [[ $TESTCLASS == picodedTests* ]] 
+	then
+		TESTCLASS="$TESTCLASS";
+	else 
+		TESTCLASS="picodedTests.$TESTCLASS";
+	fi
+	
+	# Runs the test
+	#----------------------------------------------------------
+	echo "Test Class: $TESTCLASS"
+	if [[ -z "$TESTFUNCTION" ]]
+	then
+		echo "---------------------------------------------------------------------------------"
+		java -cp "./build-tools/junit/*:./bin/build/picodedJavaCommons-libsOnly.jar:./bin/classes" org.junit.runner.JUnitCore "$TESTCLASS"
+	else
+		echo "Function: $TESTFUNCTION"
+		echo "---------------------------------------------------------------------------------"
+		java -cp "./build-tools/junit/*:./bin/build/picodedJavaCommons-libsOnly.jar:./bin/classes" picodedTests.SingleJUnitTestRunner "$TESTCLASS#$TESTFUNCTION"
+	fi
 done

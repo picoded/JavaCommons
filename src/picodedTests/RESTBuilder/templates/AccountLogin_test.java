@@ -128,12 +128,20 @@ public class AccountLogin_test {
 		//assertNotNull( cookieJar.get("Account_Rmbr")[0] );
 		
 		assertNotNull( response = RequestHttp.get( testAddress+"/api/account/login", null, cookieJar, null ) );
-		
 		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
 		assertNotNull( responseMap = response.toMap() );
 		assertNotNull( responseMap.toString(), responseMap.get("accountID") );
 		assertNotNull( responseMap.toString(), responseMap.get("accountNAME") );
 		assertEquals( "the-root", ((List<String>)(responseMap.get("accountNAME"))).get(0) );
+		
+		// Logout validation
+		//---------------------------------------
+		assertNotNull( response = RequestHttp.get( testAddress+"/api/account/logout", null, cookieJar, null ) );
+		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
+		assertNotNull( responseMap = response.toMap() );
+		assertEquals( "true", responseMap.get("logout") );
+		assertNotNull( cookieJar = response.cookiesMap() );
+		
 	}
 	
 	// 

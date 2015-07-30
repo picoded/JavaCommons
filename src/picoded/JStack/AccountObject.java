@@ -31,9 +31,7 @@ import com.hazelcast.core.IMap;
 
 public class AccountObject extends MetaObject {
 	
-	/// Java serialversion uid: http://stackoverflow.com/questions/285793/what-is-a-serialversionuid-and-why-should-i-use-it
-	private static final long serialVersionUID = 1L;
-	
+	/// The original table
 	protected AccountTable mainTable = null;
 	
 	/// Protected constructor as this class is NOT meant to be constructed directly
@@ -49,8 +47,6 @@ public class AccountObject extends MetaObject {
 	protected String getPasswordHash() {
 		return mainTable.accountHash.get(_oid);
 	}
-	
-	///
 	
 	// Custom additional functions
 	//-------------------------------------------------------------------------

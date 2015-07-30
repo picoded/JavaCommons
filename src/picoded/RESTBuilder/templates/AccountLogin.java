@@ -82,10 +82,14 @@ public class AccountLogin extends BasePage {
 		RESTFunction ret = null;
 		
 		if( apiSuffix.equals("login") ) {
+			
+			//
+			// Login functions
+			//
 			if( apiType == HttpRequestType.GET ) {
 				ret = (req, res) -> {
 					res.put("accountID", null);
-					res.put("accountNAME", null);
+					res.put("acßcountNAME", null);
 					
 					if(req.requestPage() != null) {
 						BasePage bp = (BasePage)(req.requestPage());
@@ -133,6 +137,19 @@ public class AccountLogin extends BasePage {
 					return res;
 				};
 			}
+			
+		} else if( apiSuffix.equals("logout") ) {
+			
+			ret = (req, res) -> {
+				res.put("logout", "false");
+				
+				if(req.requestPage() != null) {
+					BasePage bp = (BasePage)(req.requestPage());
+					at.logoutAccount( bp.getHttpServletRequest(), bp.getHttpServletResponse() );
+					res.put("logout", "true");
+				}
+				return res;
+			};
 			
 		}
 		

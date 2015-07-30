@@ -89,7 +89,7 @@ public class AccountLogin extends BasePage {
 			if( apiType == HttpRequestType.GET ) {
 				ret = (req, res) -> {
 					res.put("accountID", null);
-					res.put("acßcountNAME", null);
+					res.put("accountNAME", null);
 					
 					if(req.requestPage() != null) {
 						BasePage bp = (BasePage)(req.requestPage());

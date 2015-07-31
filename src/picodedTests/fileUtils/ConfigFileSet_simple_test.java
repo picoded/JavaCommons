@@ -47,7 +47,7 @@ public class ConfigFileSet_simple_test {
 	//wrote a function to dump out all files in a folder, with a separator...unused at the moment, but might be useful in a utils lib one day
 	public void testKeyGen(){
 		File fileSetFolder = new File(testDir);
-		List<String> keys = configObj.getFileNamesFromFolder(fileSetFolder, "", ".");
+		//List<String> keys = configObj.getFileNamesFromFolder(fileSetFolder, "", ".");
 	}
 	
 	@Test

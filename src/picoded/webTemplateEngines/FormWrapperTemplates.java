@@ -17,17 +17,10 @@ public class FormWrapperTemplates {
 		StringBuilder prefix = new StringBuilder();
 		String classString = FormGenerator.getWrapperClassString(node);
 		String cssString = FormGenerator.getWrapperCssString(node);
-		prefix.append("<div"+classString+cssString+">");	
-		
-		if(node.containsKey("label")){
-			String labelName = node.getString("label");
-			String labelClassString = FormGenerator.getLabelClassString(node);
-			String labelCssString = FormGenerator.getLabelCssString(node);
-			prefix.append("<div"+labelClassString+labelCssString+">"+labelName+"</div>");
-		}
+		prefix.append("<div"+classString+cssString+">\n");	
 		
 		//generating suffix
-		StringBuilder suffix = new StringBuilder("</div>");
+		StringBuilder suffix = new StringBuilder("</div>\n");
 		
 		prefixSuffix[0] = prefix.toString();
 		prefixSuffix[1] = suffix.toString();

@@ -329,7 +329,7 @@
 	</target>
 	
 	<!-- Build all the respective realese jar files, without cleaning out existing files -->
-	<target name="build-quick" depends="build-lib-ifneeded-">
+	<target name="build-quick" depends="build-lib-ifneeded">
 		<!-- no libs -->
 		<delete dir="bin/build/picodedJavaCommons-noLibs.jar" failonerror="false"/>
 		<jar destfile="bin/build/picodedJavaCommons-noLibs.jar">

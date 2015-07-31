@@ -52,21 +52,20 @@ public class AccountLogin extends BasePage {
 	///    + POST : Login with accountNAME / accountID and accountPASS
 	/// + logout
 	///    + GET : Logs out the current login ID
+	/// + password (only works for its own user)
+	///    + POST : accountID, oldPassword, newPassword
 	/// 
 	///
-	/// # Note the following SHOULD be rewritten / overwritten to fit the app specific security model
-	/// + password
-	///    + POST : accountID, oldPassword, newPassword
-	///    
 	///
-	///
+	/// # Note the following default has yet to be implmented
+	/// # And SHOULD be rewritten / overwritten to fit the app specific security model
 	///    + name
 	///        + POST : accountID, oldName, newName, appendName
 	/// + list
 	///    + GET : List all the accounts and their ID, or use a search criteria
 	/// + meta/delta/$(loginID)/
 	///    + GET : 
-	///    
+	/// 
 	/// + info/$(loginID)
 	///    + GET  : Gets the user meta info, and etc
 	///         + names : Array of login names (not login ID)
@@ -140,6 +139,9 @@ public class AccountLogin extends BasePage {
 			
 		} else if( apiSuffix.equals("logout") ) {
 			
+			//
+			// Logout functions
+			//
 			ret = (req, res) -> {
 				res.put("logout", "false");
 				
@@ -151,11 +153,44 @@ public class AccountLogin extends BasePage {
 				return res;
 			};
 			
+		} else if( apiSuffix.equals("password") ) {
+			
+			//
+			// Password change
+			//
+			ret = (req, res) -> {
+				res.put("accountID", null);
+				res.put("passwordChanged", false);
+				
+				if(req.requestPage() != null) {
+					BasePage bp = (BasePage)(req.requestPage());
+					
+					// Allow change password only if it is current user
+					AccountObject ao = at.getRequestUser( bp.getHttpServletRequest() );
+					if( ao != null ) {
+						String accID = req.getString("accountID");
+						if( ao._oid().equals(accID) ) {
+							
+							if( ao.setPassword( req.getString("newPassword"), req.getString("oldPassword") ) ) {
+								res.put("accountID", accID);
+								res.put("passwordChanged", true);
+							} else {
+								res.put("accountID", accID);
+								res.put("error", "Original password is wrong");
+							}
+						}
+						
+					}
+				}
+				return res;
+			};
+			
 		}
 		
 		return ret;
 	}
 	
+	///
 	/// Takes the restbuilder and the account table object and implements its respective default API
 	///
 	public static RESTBuilder setupRESTBuilder(RESTBuilder rb, AccountTable at, String setPrefix ) {

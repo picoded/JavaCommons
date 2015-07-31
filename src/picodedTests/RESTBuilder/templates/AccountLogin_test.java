@@ -73,7 +73,7 @@ public class AccountLogin_test {
 	Map<String,Object> responseMap;
 	
 	@Test
-	public void noLoginTest() throws IOException {
+	public void noLoginTest() {
 		assertNotNull( response = RequestHttp.get( testAddress+"/api/account/login" ) );
 		assertNotNull( responseMap = response.toMap() );
 		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
@@ -82,7 +82,7 @@ public class AccountLogin_test {
 	}
 	
 	@Test @SuppressWarnings("unchecked")
-	public void loginTest() throws IOException {
+	public void loginTest() {
 		
 		// Setup user
 		AccountObject testUser = accTable.newObject("the-root");
@@ -95,7 +95,7 @@ public class AccountLogin_test {
 		// Wrong login attempt
 		//---------------------------------------
 		cred.put("accountPASS", new String[] { "is-not-square" } ); //wrong password
-		assertNotNull( response = RequestHttp.post( testAddress+"/api/account/login", null) );
+		assertNotNull( response = RequestHttp.post( testAddress+"/api/account/login", cred) );
 		assertNotNull( responseMap = response.toMap() );
 		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
 		assertNull( responseMap.get("accountID") );
@@ -134,7 +134,7 @@ public class AccountLogin_test {
 		assertNotNull( responseMap.toString(), responseMap.get("accountNAME") );
 		assertEquals( "the-root", ((List<String>)(responseMap.get("accountNAME"))).get(0) );
 		
-		// Logout validation
+		// Logout attempt
 		//---------------------------------------
 		assertNotNull( response = RequestHttp.get( testAddress+"/api/account/logout", null, cookieJar, null ) );
 		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
@@ -142,72 +142,92 @@ public class AccountLogin_test {
 		assertEquals( "true", responseMap.get("logout") );
 		assertNotNull( cookieJar = response.cookiesMap() );
 		
+		// Logout validation
+		//---------------------------------------
+		assertNotNull( cookieJar = response.cookiesMap() );
+		assertNotNull( response = RequestHttp.get( testAddress+"/api/account/login", null, cookieJar, null ) );
+		assertNotNull( responseMap = response.toMap() );
+		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
+		assertNull( responseMap.get("accountID") );
+		assertNull( responseMap.get("accountNAME") );
+		
 	}
 	
-	// 
-	// @Test
-	// public void TestLoginServletProcess()throws LifecycleException, IOException{
-	// 	tomcat.start();
-	// 	httpRequester = new PiHttpRequester();
-	// 	
-	// 	File WEBINFFile = new File("./test-files/tmp/WEB-INF");
-	// 	WEBINFFile.mkdir();
-	// 	
-	// 	boolean initialLoginCheckShouldBeFalse = amILoggedIn();
-	// 	assertEquals(false, initialLoginCheckShouldBeFalse);
-	// 	
-	// 	boolean didLoginSucceed = sendLoginParams();
-	// 	assertEquals(true, didLoginSucceed);
-	// 	
-	// 	boolean secondLoginCheckShouldBeTrue = amILoggedIn();
-	// 	assertEquals(true, secondLoginCheckShouldBeTrue);
-	// }
-	// 
-	// private boolean amILoggedIn(){
-	// 	HashMap<String, String> getParams = new HashMap<String, String>();
-	// 	getParams.put("user", "testUser");
-	// 	
-	// 	PiHttpResponse piResp = httpRequester.sendGetRequest("http://localhost:15000", "login", getParams, null, cookies);
-	// 	
-	// 	try
-	// 	{
-	// 		String response = IOUtils.toString(piResp.getResponseBody());
-	// 		Map<String,Object> rm = ConvertJSON.toMap(response);
-	// 		GenericConvertMap<String, Object> gm = ProxyGenericConvertMap.ensureGenericConvertMap(rm);
-	// 		
-	// 		if(StringUtils.isNullOrEmpty(gm.getString("user"))){
-	// 			return false;
-	// 		} else {
-	// 			if(gm.getString("user").equals("testUser")){
-	// 				return true;
-	// 			}
-	// 			return false;
-	// 		}
-	// 	} catch (IOException ex){
-	// 		System.out.println(ex.getMessage());
-	// 	}
-	// 	return false;
-	// }
-	// 
-	// private boolean sendLoginParams(){
-	// 	HashMap<String, String> postParams = new HashMap<String, String>();
-	// 	
-	// 	postParams.put("user", "testUser");
-	// 	postParams.put("password", "1234"); 
-	// 	
-	// 	PiHttpResponse piResp = httpRequester.sendPostRequest("http://localhost:15000", "login", postParams, null, cookies);
-	// 	
-	// 	try
-	// 	{
-	// 		cookies = piResp.getCookies();
-	// 		
-	// 		String response = IOUtils.toString(piResp.getResponseBody());
-	// 		
-	// 		Map<String,Object> rm = ConvertJSON.toMap(response);
-	// 		return (boolean)rm.get("login-status");
-	// 	} catch (IOException ex){
-	// 		System.out.println(ex.getMessage());
-	// 		throw new RuntimeException(ex);
-	// 	}
-	// }
+	@Test @SuppressWarnings("unchecked")
+	public void passwordChange() {
+		
+		// Setup user
+		//---------------------------------------
+		AccountObject testUser = accTable.newObject("the-changing-user");
+		testUser.setPassword("is-old");
+		Map<String,String[]> cookieJar = null;
+		
+		HashMap<String,String[]> cred = new HashMap<String,String[]>();
+		cred.put("accountNAME", new String[] { "the-changing-user" } );
+		
+		// Login before change
+		//---------------------------------------
+		cred.put("accountPASS", new String[] { "is-old" } );
+		
+		assertNotNull( response = RequestHttp.post( testAddress+"/api/account/login", cred) );
+		assertNotNull( cookieJar = response.cookiesMap() );
+		assertNotNull( responseMap = response.toMap() );
+		
+		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
+		assertNotNull( responseMap.toString(), responseMap.get("accountID") );
+		assertNotNull( responseMap.toString(), responseMap.get("accountNAME") );
+		assertEquals( "the-changing-user", ((List<String>)(responseMap.get("accountNAME"))).get(0) );
+		
+		String accountID = (String)(responseMap.get("accountID"));
+		
+		// Password change failed
+		//---------------------------------------
+		HashMap<String,String[]> passwordChange = new HashMap<String,String[]>();
+		passwordChange.put( "oldPassword", new String[] {"is-old-WRONG"} );
+		passwordChange.put( "newPassword", new String[] {"is-brand-NEW-world-1"} );
+		passwordChange.put( "accountID", new String[] {accountID} );
+		
+		assertNotNull( response = RequestHttp.post( testAddress+"/api/account/password", passwordChange, cookieJar, null) );
+		assertNotNull( responseMap = response.toMap() );
+		assertFalse( responseMap.toString(), (Boolean)(responseMap.get("passwordChanged")) );
+		assertNotNull( responseMap.toString(), responseMap.get("error") );
+		
+		// Password change works
+		//---------------------------------------
+		passwordChange.put( "oldPassword", new String[] {"is-old"} );
+		
+		assertNotNull( response = RequestHttp.post( testAddress+"/api/account/password", passwordChange, cookieJar, null) );
+		assertNotNull( responseMap = response.toMap() );
+		assertTrue( responseMap.toString(), (Boolean)(responseMap.get("passwordChanged")) );
+		assertNull( responseMap.toString(), responseMap.get("error") );
+		assertEquals( responseMap.toString(), accountID, responseMap.get("accountID") );
+		
+		// Login after change, old password invalid
+		//---------------------------------------
+		cred.put("accountPASS", new String[] { "is-old" } ); //wrong password
+		cred.put("accountNAME", new String[] { "the-changing-user" } );
+		
+		assertNotNull( response = RequestHttp.post( testAddress+"/api/account/login", cred) );
+		assertNotNull( response.cookiesMap() );
+		assertNotNull( responseMap = response.toMap() );
+		
+		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
+		assertNull( responseMap.toString(), responseMap.get("accountID") );
+		assertNull( responseMap.toString(), responseMap.get("accountNAME") );
+		
+		// Login after change, new password
+		//---------------------------------------
+		cred.put("accountPASS", new String[] { "is-brand-NEW-world-1" } );
+		cred.put("accountNAME", new String[] { "the-changing-user" } );
+		
+		assertNotNull( response = RequestHttp.post( testAddress+"/api/account/login", cred) );
+		assertNotNull( response.cookiesMap() );
+		assertNotNull( responseMap = response.toMap() );
+		
+		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
+		assertNotNull( responseMap.toString(), responseMap.get("accountID") );
+		assertNotNull( responseMap.toString(), responseMap.get("accountNAME") );
+		assertEquals( "the-changing-user", ((List<String>)(responseMap.get("accountNAME"))).get(0) );
+		
+	}
 }

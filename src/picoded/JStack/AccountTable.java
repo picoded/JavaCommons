@@ -40,7 +40,7 @@ import com.hazelcast.core.IMap;
 ///
 /// The intention here, is to facilitate complex hierachy creations rapidly. Especially against changing specs.
 ///
-/// Any refences to the account game, is completely coincidental
+/// Any refences to the persona game, is completely coincidental
 ///
 /// @TODO : Group handling layer
 /// @TODO : Authentication handling
@@ -455,7 +455,7 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 			return accountObj;
 		}
 		
-		return accountObj;
+		return null;
 	}
 	
 	/// Login the user if valid

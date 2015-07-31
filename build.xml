@@ -328,6 +328,22 @@
 		</jar>
 	</target>
 	
+	<!-- Build all the respective realese jar files, without cleaning out existing files -->
+	<target name="build-quick" depends="build-lib-ifneeded-">
+		<!-- no libs -->
+		<delete dir="bin/build/picodedJavaCommons-noLibs.jar" failonerror="false"/>
+		<jar destfile="bin/build/picodedJavaCommons-noLibs.jar">
+			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
+		</jar>
+		
+		<!-- with dependency files -->
+		<delete dir="bin/build/picodedJavaCommons-withLibs.jar" failonerror="false"/>
+		<jar destfile="${build-temp}/picodedJavaCommons-withLibs.jar">
+			<fileset dir="${build-temp}/UBER"/> 
+			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
+		</jar>
+	</target>
+	
 	<!-- Build all the respective javadocs files -->
 	<target name="javadoc" depends="build-lib-ifneeded">
 		<delete dir="bin/javadoc" failonerror="false"/>

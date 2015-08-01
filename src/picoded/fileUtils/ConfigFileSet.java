@@ -38,6 +38,19 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		
 	}
 	
+	/// Constructor with the default file path to scan
+	public ConfigFileSet(String filePath) {
+		addConfigSet(filePath);
+	}
+	
+	public ConfigFileSet addConfigSet(File filePath) {
+		return addConfigSet(filePath, "", ".");
+	}
+	
+	public ConfigFileSet addConfigSet(String filePath) {
+		return addConfigSet(filePath, "", ".");
+	}
+	
 	public ConfigFileSet addConfigSet(String filePath, String prefix, String separator) {
 		return addConfigSet_recursive(new File(filePath), prefix, separator);
 	}

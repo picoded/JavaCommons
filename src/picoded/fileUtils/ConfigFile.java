@@ -25,7 +25,17 @@ import org.apache.commons.lang3.ArrayUtils;
 ///
 /// @TO-DO
 /// + Unit test, extended functions
-/// + JSON files
+///
+/// + Variable subsitution (use key values as key names)
+///   eg: sys.${sys.selectedStack; default}.database
+/// + Array support
+///   eg: sys.dbStack[0].database
+/// + Nested substitution
+///   eg: sys.${sys.selectedStack; sys.default}.database
+///
+/// + JSON files delayed load
+/// + Spliting INI, and JSON load into its own seperate class, 
+///   use ConfigFileSet to switch between classes on setup
 ///
 /// @TO-CONSIDER
 /// + Case insensitive key names?

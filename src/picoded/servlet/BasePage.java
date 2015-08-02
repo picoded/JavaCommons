@@ -70,8 +70,14 @@ public class BasePage extends JStackPage {
 		}
 		
 		_restBuilderObj = new RESTBuilder();
+		restBuilderSetup(_restBuilderObj);
 		
 		return _restBuilderObj;
+	}
+	
+	/// Override, to configure the restBuilderSetup steps
+	public void restBuilderSetup( RESTBuilder rbObj ) {
+		
 	}
 	
 	/////////////////////////////////////////////
@@ -194,6 +200,4 @@ public class BasePage extends JStackPage {
 		return _jmteObj;
 	}
 	
-	
-
 }

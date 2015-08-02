@@ -104,7 +104,7 @@ public class JStackPage extends CorePage {
 	}
 	
 	public String getConfigsPath() {
-		return (_configsPath != null) ? _configsPath : (_configsPath = getWebInfPath() + "configs/");
+		return (_configsPath != null) ? _configsPath : (_configsPath = getWebInfPath() + "config/");
 	}
 	
 	public String getPagesTemplatePath() {
@@ -123,14 +123,18 @@ public class JStackPage extends CorePage {
 	
 	protected JConfig JConfigObj = null;
 	
+	/// @TODO, the actual JConfig integration with the DB. Currently its purely via the file system
 	public JConfig JConfig() {
 		if (JConfigObj != null) {
 			return JConfigObj;
 		}
 		
-		JConfigObj = new JConfig();
-		JConfigObj.addConfigSet(getConfigsPath(), null, ".");
-		// Intentionally DOES NOT setup the JStack config connections?
+		if( (new File(getConfigsPath())).exists() ) {
+			JConfigObj = new JConfig( getConfigsPath() );
+		} else {
+			JConfigObj = new JConfig();
+		}
+		
 		
 		return JConfigObj;
 	}
@@ -143,6 +147,68 @@ public class JStackPage extends CorePage {
 	
 	protected JStack JStackObj = null;
 	
+	/// Generates the JSQL layer given the config namespace
+	/// 
+	/// @TODO support other JSQL engines
+	protected JSql JSqlLayerFromConfig( String profileNameSpace ) {
+		
+		// Gets the configuration setup
+		JConfig jc = JConfig();
+		
+		// Gets the config vars
+		String engine =   jc.getString(profileNameSpace+".engine", "");
+		String path =     jc.getString(profileNameSpace+".path", "");
+		String username = jc.getString(profileNameSpace+".username", "");
+		String password = jc.getString(profileNameSpace+".password", "");
+		String database = jc.getString(profileNameSpace+".database", "");
+		
+		// Default fallback on sqlite engine, if the profileNameSpace is default
+		// This is used to ensure existing test cases do not break
+		if(profileNameSpace.equalsIgnoreCase("sys.dataStack.JSqlOnly.sqlite")) {
+			if(engine.length() <= 0) {
+				engine = "sqlite";
+			}
+			if(path.length() <= 0) {
+				path = getWebInfPath()+"/sqlite.db";
+			}
+		}
+		
+		// SQLite implmentation
+		if( engine.equalsIgnoreCase("sqlite") ) {
+			if( path.length() <= 0 ) {
+				throw new RuntimeException("Unsupported "+profileNameSpace+".path: "+path);
+			}
+			
+			// Replaces WEB-INF path
+			path = path.replace("./WEB-INF/", getWebInfPath());
+			path = path.replace("${WEB-INF}", getWebInfPath());
+			
+			// Generates the sqlite connection with the path
+			return JSql.sqlite( path );
+		} else {
+			throw new RuntimeException("Unsupported "+profileNameSpace+".engine: "+engine);
+		}
+	}
+	
+	/// Loads the configurations from JStack, and setup the respective JStackLayers
+	///
+	/// @TODO: Support JStackLayers jsons config
+	protected JStackLayer[] loadConfiguredJStackLayers() {
+		
+		// Gets the configuration setup
+		JConfig jc = JConfig();
+		
+		// Gets the profile name and type
+		String profileName = jc.getString("sys.dataStack.selected.profile.name", "JSqlOnly.sqlite");
+		String profileType = jc.getString("sys.dataStack.selected.profile.type", "JSql");
+		
+		if( profileType.equalsIgnoreCase("JSql") ) {
+			return new JStackLayer[] { JSqlLayerFromConfig("sys.dataStack."+profileName) };
+		} else {
+			throw new RuntimeException("Unsupported sys.dataStack.selected.profile.type: "+profileType);
+		}
+	}
+	
 	/// Returns the JStack object
 	/// @TODO Actual JStack config loading, now it just loads a blank sqlite file =(
 	public JStack JStack() {
@@ -151,7 +217,7 @@ public class JStackPage extends CorePage {
 		}
 		
 		//Default is sqlite
-		JStackObj = new JStack(JSql.sqlite(getWebInfPath() + "sqlite.db"));
+		JStackObj = new JStack( loadConfiguredJStackLayers() );
 		
 		return JStackObj;
 	}

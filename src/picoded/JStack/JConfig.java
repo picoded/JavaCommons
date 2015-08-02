@@ -97,5 +97,11 @@ import picoded.fileUtils.ConfigFileSet;
 /// * [future] Conceptual concept & example code to write / export configuration files
 ///
 public class JConfig extends ConfigFileSet {
+	public JConfig() {
+		super();
+	}
 	
+	public JConfig(String filePath) {
+		super(filePath);
+	}
 }

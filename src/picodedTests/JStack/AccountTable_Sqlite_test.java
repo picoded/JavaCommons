@@ -83,4 +83,29 @@ public class AccountTable_Sqlite_test extends JStackData_testBase_test {
 		assertTrue( ptObj.containsKey(name) );
 		assertNotNull( p = ptObj.get(name) );
 	}
+
+	// Group tests
+	//-----------------------------------------------
+
+	@Test
+	public void basicGroupMembership() throws JStackException {
+		String grpName = "hello-group";
+		String usrName = "user1";
+		AccountObject grpObj;
+		AccountObject usrObj;
+		
+		
+		assertFalse( ptObj.containsKey(grpName) );
+		assertNull( ptObj.get(grpName) );
+		
+		assertNotNull( grpObj = ptObj.newObject(grpName) );
+		assertArrayEquals( new String[0], grpObj.getMembers_id() );
+		
+		assertFalse( ptObj.containsKey(usrName) );
+		assertNull( ptObj.get(usrName) );
+		assertNotNull( usrObj = ptObj.newObject(usrName) );
+		
+		assertNotNull( grpObj.addMember( usrObj, "guest" ) );
+		assertArrayEquals( new String[] { usrObj._oid() }, grpObj.getMembers_id() );
+	}
 }

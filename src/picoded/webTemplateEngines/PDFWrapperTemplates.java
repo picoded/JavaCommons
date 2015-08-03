@@ -3,14 +3,9 @@ package picoded.webTemplateEngines;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FormWrapperTemplates {
+public class PDFWrapperTemplates {
 	
-	//TODO
-	/*
-	 * raw wrapper to inject raw html
-	 */
-	
-	protected static FormWrapperInterface defaultWrapper = (node)->{
+	public static FormWrapperInterface default_pdf=(node)->{
 		String[] prefixSuffix = new String[2];
 		
 		//generating prefix
@@ -28,17 +23,25 @@ public class FormWrapperTemplates {
 		return prefixSuffix;
 	};
 	
-	protected static FormWrapperInterface none = (node)->{
+	public static FormWrapperInterface none_pdf=(node)->{
 		String[] prefixSuffix = new String[]{"", ""};
 		
 		return prefixSuffix;
 	};
 	
-	protected static Map<String, FormWrapperInterface> defaultWrapperTemplates() {
+	private static String getWrapperClassName(FormNode node){
+		if(node.containsKey("wrapperClass")){
+			return node.getString("wrapperClass");
+		}else{
+			return "pf_wrapperClass";
+		}
+	}
+	
+	public static Map<String, FormWrapperInterface> defaultPDFWrapperTemplates(){
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();
 		
-		defaultTemplates.put("div", FormWrapperTemplates.defaultWrapper);
-		defaultTemplates.put("none", FormWrapperTemplates.none);
+		defaultTemplates.put("div", default_pdf);
+		defaultTemplates.put("none", none_pdf);
 		
 		return defaultTemplates;
 	}

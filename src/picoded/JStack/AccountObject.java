@@ -162,6 +162,11 @@ public class AccountObject extends MetaObject {
 	// Group management
 	//-------------------------------------------------------------------------
 	
+	/// Gets and returns the member role, if it exists
+	public String getMemberRole( AccountObject memberObject ) throws JStackException {
+		return childMap().getString( memberObject._oid() ); 
+	}
+	
 	/// Gets and returns the member meta map, if it exists
 	/// Only returns if member exists, else null
 	public MetaObject getMember( AccountObject memberObject ) throws JStackException {
@@ -239,5 +244,15 @@ public class AccountObject extends MetaObject {
 		return retList.toArray( new String[retList.size()] );
 	}
 	
+	/// Gets all the members object related to the group
+	public AccountObject[] getMembers() throws JStackException {
+		String[] idList = getMembers_id();
+		AccountObject[] objList = new AccountObject[idList.length];
+		
+		for(int a=0; a<idList.length; ++a) {
+			objList[a] = mainTable.getFromID( idList[a] );
+		}
+		return objList;
+	}
 	
 }

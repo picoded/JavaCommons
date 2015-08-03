@@ -848,7 +848,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	/// Generates a new blank object, with a GUID
 	public MetaObject newObject() {
 		try {
-			MetaObject ret = new MetaObject(this, null, new CaseInsensitiveHashMap<String, Object>());
+			MetaObject ret = new MetaObject(this, null, new HashMap<String, Object>());
 			ret.saveAll(); //ensures the blank object is now in DB
 			return ret;
 		} catch(JStackException e) {

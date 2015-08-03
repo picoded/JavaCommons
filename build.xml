@@ -274,6 +274,8 @@
 	</target>
 	<target name="source" depends="compile-src">
 	</target>
+	<target name="test" depends="compile-tests">
+	</target>
 	
 	<!-- compile the source with picodedX -->
 	<target name="compile-srcX" depends="build-lib-ifneeded">

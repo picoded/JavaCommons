@@ -14,8 +14,11 @@ public class AccountLogin extends BasePage {
 	// Serialize version ID
 	static final long serialVersionUID = 1L;
 	
+	/// Default api set prefix
+	protected static String _apiSetPrefix_prefix = "account.";
+	
 	/// Internal prefix set for the API
-	protected String _apiSetPrefix = "account.";
+	protected String _apiSetPrefix = _apiSetPrefix_prefix;
 	
 	/// The prefix for the api
 	public String apiSetPrefix() {
@@ -205,6 +208,10 @@ public class AccountLogin extends BasePage {
 			}
 		}
 		return rb;
+	}
+	
+	public static RESTBuilder setupRESTBuilder(RESTBuilder rb, AccountTable at) {
+		return setupRESTBuilder(rb, at, _apiSetPrefix_prefix);
 	}
 	
 }

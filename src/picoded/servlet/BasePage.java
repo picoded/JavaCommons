@@ -62,8 +62,11 @@ public class BasePage extends JStackPage {
 	// RESTBuilder related convinence 
 	//
 	/////////////////////////////////////////////
+	
+	/// Cached restbuilder object
 	protected RESTBuilder _restBuilderObj = null;
 	
+	/// REST API builder
 	public RESTBuilder restBuilder() {
 		if( _restBuilderObj != null ) {
 			return _restBuilderObj;

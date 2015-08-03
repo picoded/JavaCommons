@@ -1,9 +1,16 @@
 package picodedTests.webTemplateEngines;
 
+import picoded.conv.ConvertJSON;
 import picoded.webTemplateEngines.*;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.*;
+
 import static org.junit.Assert.*;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.nio.charset.Charset;
 import java.util.*;
 
 public class FormGenerator_test {
@@ -25,206 +32,138 @@ public class FormGenerator_test {
 		assertNotNull(testObj);
 	}
 	
-	@Test
-	public void testTitleNode(){
-		FormNode titleNodeWithNoWrapper = getTitleNode("none");
-		String titleNodeWithNoWrapper_output = testObj.applyTemplating(titleNodeWithNoWrapper);
-		assertEquals("<h3 class=\"pf_inputClass\">Title</h3>", titleNodeWithNoWrapper_output);
+	private Map<String, Object> getPrefilledData(){
+		Map<String,Object> prefilledData = new HashMap<String, Object>();
+		prefilledData.put("title", "Mr");
+		prefilledData.put("name", "Samuel");
 		
-		FormNode titleNodeWithDefaultWrapper = getTitleNode("default");
-		String titleNodeWithDefaultWrapper_output = testObj.applyTemplating(titleNodeWithDefaultWrapper);
-		assertEquals("<div class=\"pf_titleClass\"><h3 class=\"pf_inputClass\">Title</h3></div>", titleNodeWithDefaultWrapper_output);
+		prefilledData.put("nricpp", "9070462");
+		prefilledData.put("nat", "Singaporean PR");
 		
-		FormNode titleNode_defaultWrapper_customClass = getTitleNode("default");
-		titleNode_defaultWrapper_customClass.put("wrapperClass", "customClass");
-		titleNode_defaultWrapper_customClass.put("inputClass", "customInputClass");
-		String titleNode_defaultWrapper_customClass_output = testObj.applyTemplating(titleNode_defaultWrapper_customClass);
-		assertEquals("<div class=\"customClass\"><h3 class=\"customInputClass\">Title</h3></div>", titleNode_defaultWrapper_customClass_output);
+		prefilledData.put("CoB", "London");
+		prefilledData.put("gender", "Male");
 		
-		//test custom css
-		titleNode_defaultWrapper_customClass.put("wrapperCss", "font-size:5; color:red;");
-		titleNode_defaultWrapper_customClass.put("inputCss", "font-size:10; blue;");
-		String newOutput_withCss = testObj.applyTemplating(titleNode_defaultWrapper_customClass);
-		assertEquals("<div class=\"customClass\" style=\"font-size:5; color:red;\"><h3 class=\"customInputClass\" style=\"font-size:10; blue;\">Title</h3></div>",newOutput_withCss);
+		prefilledData.put("marriage", "Single");
+		prefilledData.put("dob", "17th May 1990");
+		prefilledData.put("isSmoker", "No");
+		
+		prefilledData.put("address", "Blk 450D Tampines St 42 #04-418");
+		prefilledData.put("postcode", "524450");
+		prefilledData.put("country", "Singapore");
+		
+		prefilledData.put("race", "Others");
+		prefilledData.put("language", "English");
+		
+		prefilledData.put("employment", "selfemployed");
+		prefilledData.put("EduLvl", "Tertiary and Above");
+		
+		prefilledData.put("occupation", "Programmer");
+		prefilledData.put("employer", "Picoded");
+		
+		prefilledData.put("contactHome", "67899449");
+		prefilledData.put("contactOffice", "-NA-");
+		prefilledData.put("contactHandphone", "92724850");
+		prefilledData.put("contactFax", "-NA-");
+		prefilledData.put("contactEmail", "samuel@socialoctet.com");
+		
+		prefilledData.put("Income", "Above $15,000");
+		prefilledData.put("dueDiligenceYesNo", "No");
+		
+		return prefilledData;
+	}
+	
+//	@Test
+	public void doPDFOutput(){
+		String htmlFileString = "./test-files/test-specific/htmlGenerator/pdfReadyHtml.html";
+		String pdfFileString = "./test-files/test-specific/htmlGenerator/htmlPDF.pdf";
+		picoded.fileUtils.PDFGenerator.generatePDFfromHTMLfile(pdfFileString, htmlFileString);
 	}
 	
 	@Test
-	public void testDropDownNode(){
-		FormNode dropDownNode_list_noWrapper = getDropDownNode(false, "none");
-		dropDownNode_list_noWrapper.put("field", "dropdowntitle");
-		String dropDownNode_list_noWrapper_Output = testObj.applyTemplating(dropDownNode_list_noWrapper);
+	public void outputPrefilledPDF(){
+		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONObject.js");
+		assertTrue(jsonObjectFile.canRead());
+		String jsonFileString = "";
+		try{
+			jsonFileString = FileUtils.readFileToString(jsonObjectFile, Charset.defaultCharset());
+		} catch (Exception ex){
+		}
+		Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
+		assertNotNull(jsonMap);
 		
-		FormNode dropDownNode_list_defaultWrapper = getDropDownNode(false, "default");
-		dropDownNode_list_defaultWrapper.put("label", "Drop Down Title");
-		String dropDownNode_list_defaultWrapper_Output = testObj.applyTemplating(dropDownNode_list_defaultWrapper);
+		FormNode formNode = new FormNode(jsonMap, getPrefilledData());
+		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(formNode);
 		
-		FormNode dropDownNode_map_noWrapper = getDropDownNode(true, "none");
-		dropDownNode_map_noWrapper.put("field", "dropdowntitle");
-		String dropDownNode_map_noWrapper_Output = testObj.applyTemplating(dropDownNode_map_noWrapper);
+		File pdfReadyHtmlFile = new File("./test-files/test-specific/htmlGenerator/pdfReadyHtml.html");
 		
-		FormNode dropDownNode_map_defaultWrapper = getDropDownNode(true, "default");
-		dropDownNode_map_defaultWrapper.put("label", "Drop Down Title");
-		String dropDownNode_map_defaultWrapper_Output = testObj.applyTemplating(dropDownNode_map_defaultWrapper);
-		
-		//check against no wrapper output
-		assertEquals("<select class=\"pf_inputClass\" name=\"dropdowntitle\">"
-				+ "<option value=\"option1\">Option 1</option>"
-				+ "<option value=\"option2\">Option 2</option>"
-				+ "<option value=\"option3\">Option 3</option>"
-				+ "<option value=\"option4\">Option 4</option>"
-				+ "<option value=\"option5\">Option 5</option>"
-				+ "</select>", dropDownNode_list_noWrapper_Output);
-		
-		assertEquals(dropDownNode_list_noWrapper_Output, dropDownNode_map_noWrapper_Output);
-		
-		//check against default wrapper output
-		assertEquals("<div class=\"pf_dropdownClass\"><div class=\"pf_labelClass\">Drop Down Title</div>"
-				+ "<select class=\"pf_inputClass\" name=\"dropdowntitle\">"
-				+ "<option value=\"option1\">Option 1</option>"
-				+ "<option value=\"option2\">Option 2</option>"
-				+ "<option value=\"option3\">Option 3</option>"
-				+ "<option value=\"option4\">Option 4</option>"
-				+ "<option value=\"option5\">Option 5</option>"
-				+ "</select></div>", dropDownNode_list_defaultWrapper_Output);
-		
-		assertEquals(dropDownNode_list_defaultWrapper_Output, dropDownNode_map_defaultWrapper_Output);
-		
-		//test custom classes
-		dropDownNode_map_defaultWrapper.put("wrapperClass", "customWrapperClass");
-		dropDownNode_map_defaultWrapper.put("labelClass", "customLabelClass");
-		String newOutput = testObj.applyTemplating(dropDownNode_map_defaultWrapper);
-		assertEquals("<div class=\"customWrapperClass\"><div class=\"customLabelClass\">Drop Down Title</div>"
-				+ "<select class=\"pf_inputClass\" name=\"dropdowntitle\">"
-				+ "<option value=\"option1\">Option 1</option>"
-				+ "<option value=\"option2\">Option 2</option>"
-				+ "<option value=\"option3\">Option 3</option>"
-				+ "<option value=\"option4\">Option 4</option>"
-				+ "<option value=\"option5\">Option 5</option>"
-				+ "</select></div>", newOutput);
-	}
-	
-	@Test
-	public void testTextInputNode(){
-		FormNode textInputNode_noWrapper = getTextInputNode("none");
-		String textInputNode_noWrapper_output = testObj.applyTemplating(textInputNode_noWrapper);
-		assertEquals("<input class=\"pf_inputClass\" type=\"text\" name=\"textinputfield\">", textInputNode_noWrapper_output);
-		
-		
-		FormNode textInputNode_defaultWrapper = getTextInputNode("default");
-		String textInputNode_defaultWrapper_output = testObj.applyTemplating(textInputNode_defaultWrapper);
-		assertEquals("<div class=\"pf_textClass\"><div class=\"pf_labelClass\">Text Input Field: </div><input class=\"pf_inputClass\" type=\"text\" name=\"textinputfield\"></div>", textInputNode_defaultWrapper_output);
-		
-		//test custom wrapper, label, and input classes
-		textInputNode_defaultWrapper.put("wrapperClass", "customWrapperClass");
-		textInputNode_defaultWrapper.put("labelClass", "customLabelClass");
-		textInputNode_defaultWrapper.put("inputClass", "customInputClass");
-		String newOutputWithCustomClass = testObj.applyTemplating(textInputNode_defaultWrapper);
-		assertEquals("<div class=\"customWrapperClass\"><div class=\"customLabelClass\">Text Input Field: </div><input class=\"customInputClass\" type=\"text\" name=\"textinputfield\"></div>", newOutputWithCustomClass);
-	}
-	
-	@Test
-	public void testNestedNodes(){
-		/*
-		 * <div class="pf_titleClass">
-		 * 		<h3 class="customTitleClass" style="font-size:20; color:yellow;">Title Here</h3>
-		 * 		<div class="customDropDownClass">
-		 * 			<select class="pf_dropdownClass">
-		 * 				<option value="option1">Option 1</option>
-		 * 				<option value="option2">Option 2</option>
-		 * 				<option value="option3">Option 3</option>
-		 * 				<option value="option4">Option 4</option>
-		 * 				<option value="option5">Option 5</option>
-		 * 			</select>
-		 * 		</div>
-		 * </div>
-		 * <div class="customTextInputClass">
-		 * 		<div class="pf_labelClass" style="font-size:15; color:red;">Text Input Field:</div>
-		 * 		<input class="pf_inputClass" type="text" name="textinputfield>
-		 * </div>
-		 */
-		
-		FormNode titleNode = new FormNode();
-		titleNode.put("type", "title");
-		titleNode.put("text", "Title Here");
-		titleNode.put("inputClass", "customTitleClass");
-		titleNode.put("inputCss", "font-size:20; color:yellow;");
-		
-		FormNode childDropDownNode = getDropDownNode(true, "default");
-		childDropDownNode.put("wrapperClass", "customDropDownClass");
-		
-		titleNode.addChild(childDropDownNode);
-		
-		FormNode textInputNode = getTextInputNode("default");
-		textInputNode.put("wrapperClass", "customTextInputClass");
-		textInputNode.put("labelCss", "font-size:15; color:red;");
-		textInputNode.put("label", "Text Input Field: ");
-		
-		ArrayList<FormNode> nodes = new ArrayList<FormNode>();
-		nodes.add(titleNode);
-		nodes.add(textInputNode);
-		
-		String finalOutput = testObj.applyTemplating(nodes);
-		
-		assertEquals("<div class=\"pf_titleClass\">"
-		  		+"<h3 class=\"customTitleClass\" style=\"font-size:20; color:yellow;\">Title Here</h3>"
-		  		+"<div class=\"customDropDownClass\">"
-		  		+"<select class=\"pf_inputClass\">"
-		  		+"<option value=\"option1\">Option 1</option>"
-		  		+"<option value=\"option2\">Option 2</option>"
-		  		+"<option value=\"option3\">Option 3</option>"
-		  		+"<option value=\"option4\">Option 4</option>"
-		  		+"<option value=\"option5\">Option 5</option>"
-		  		+"</select>"
-		  		+"</div>"
-	  			+"</div>"
-  				+"<div class=\"customTextInputClass\">"
-		  		+"<div class=\"pf_labelClass\" style=\"font-size:15; color:red;\">Text Input Field: </div>"
-		  		+"<input class=\"pf_inputClass\" type=\"text\" name=\"textinputfield\">"
-		  		+"</div>", finalOutput);
-		
-	}
-
-	private FormNode getTitleNode(String wrapperType){
-		FormNode titleNode = new FormNode();
-		
-		titleNode.put("type", "title");
-		titleNode.put("text", "Title");
-		titleNode.put("wrapper", wrapperType);
-		
-		return titleNode; 
-	}
-	
-	private FormNode getDropDownNode(boolean useMap, String wrapperType){
-		FormNode dropDownNode = new FormNode();
-		dropDownNode.put("type", "dropdown");
-		//dropDownNode.put("label", "Drop Down Title");
-		//dropDownNode.put("field", "dropdowntitle"); //this field corresponds to the database key - defaults to label lowercased and trimmed of whitespace
-		
-		if(useMap){
-			LinkedHashMap<String, String> options = new LinkedHashMap<String, String>();
-			options.put("option1", "Option 1");
-			options.put("option2", "Option 2");
-			options.put("option3", "Option 3");
-			options.put("option4", "Option 4");
-			options.put("option5", "Option 5");
-			dropDownNode.put("options", options);
-		}else{
-			List<String> options = Arrays.asList("Option 1", "Option 2", "Option 3", "Option 4", "Option 5");
-			dropDownNode.put("options", options);
+		try{
+			FileWriter writer = new FileWriter(pdfReadyHtmlFile);
+			writer.write(pdfReadyHtmlString);
+			writer.flush();
+			writer.close();
+		}catch(Exception ex){
+			
 		}
 		
-		dropDownNode.put("wrapper", wrapperType);
-		
-		return dropDownNode;
+		String pdfFileString = "./test-files/test-specific/htmlGenerator/htmlPDF.pdf";
+		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
 	
-	private FormNode getTextInputNode(String wrapperType){
-		FormNode textInputNode = new FormNode();
-		textInputNode.put("type", "text");
-		//textInputNode.put("field", "textinputfield");
-		textInputNode.put("label", "Text Input Field: ");
-		textInputNode.put("wrapper", wrapperType);
+	@Test
+	public void outputHTMLFromJSONObject(){
+		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONObject.js");
+		assertTrue(jsonObjectFile.canRead());
+		String jsonFileString = "";
+		try{
+			jsonFileString = FileUtils.readFileToString(jsonObjectFile, Charset.defaultCharset());
+		} catch (Exception ex){
+			
+		}
 		
-		return textInputNode;
+		Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
+		
+		assertNotNull(jsonMap);
+		
+		
+		FormNode formNode = new FormNode(jsonMap, getPrefilledData());
+		
+		String htmlVal = testObj.applyTemplating(formNode);
+		File htmlFile = new File("./test-files/test-specific/htmlGenerator/htmlFromJSONObject.html");
+		
+		try{
+			FileWriter writer = new FileWriter(htmlFile);
+			writer.write(htmlVal);
+			writer.flush();
+			writer.close();
+		}catch(Exception ex){
+			
+		}
+	}
+	
+	@Test
+	public void outputHtmlFromJSONArray(){
+		File jsonArrayFile = new File("./test-files/test-specific/htmlGenerator/testJSONArray.js");
+		assertTrue(jsonArrayFile.canRead());
+		String jsonFileString = "";
+		try{
+			jsonFileString = FileUtils.readFileToString(jsonArrayFile, Charset.defaultCharset());
+		} catch (Exception ex){
+			
+		}
+		
+		List<FormNode> nodeList = FormNode.createFromJSONString(jsonFileString, getPrefilledData());
+		assertNotNull(nodeList);
+		
+		String htmlVal = testObj.applyTemplating(nodeList);
+		File htmlFile = new File("./test-files/test-specific/htmlGenerator/htmlFromJSONArray.html");
+		
+		try{
+			FileWriter writer = new FileWriter(htmlFile);
+			writer.write(htmlVal);
+			writer.flush();
+			writer.close();
+		}catch(Exception ex){
+			
+		}
 	}
 }

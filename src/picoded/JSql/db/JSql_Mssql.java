@@ -74,7 +74,13 @@ public class JSql_Mssql extends JSql {
 	// Internal parser that converts some of the common sql statements to mssql
 	public String genericSqlParser(String inString) {
 		
-		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("'", "\"").replaceAll("`", "\"");
+		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ")
+		                                    .replaceAll("`", "\"")
+		                                    .replaceAll("'", "\"")
+		                                    .replaceAll("\\s+", " ")
+		                                    .replaceAll(" =", "=")
+		                                    .replaceAll("= ", "=").trim();
+
 		String upperCaseStr = fixedQuotes.toUpperCase();
 		String qString = fixedQuotes;
 		
@@ -285,14 +291,27 @@ public class JSql_Mssql extends JSql {
 			qString = qString.replaceAll("ON DELETE SET NULL", "");
 		}
 		
-		//logger.finer("Converting MySQL query to MsSql query");
-		logger.finer("MySql -> " + inString);
-		logger.finer("MsSql -> " + qString);
+		// Replace double quote (") with single quote (') for assignment values 
+		StringBuilder sb = new StringBuilder(qString);
+		int endIndex = qString.indexOf("=");
+		int beginIndex = 0;
+		while (endIndex != -1) {
+			endIndex++;
+			beginIndex = endIndex;
+			if (sb.charAt(beginIndex) == '"') {
+				for (; beginIndex < sb.length(); beginIndex++) {
+					if (sb.charAt(beginIndex) == '"') {
+						sb.setCharAt(beginIndex, '\'');
+					} else if (sb.charAt(beginIndex) == ' ') {
+						break;
+					}
+				}
+			}
+			endIndex = sb.indexOf("=", beginIndex);
+		}
+		qString = sb.toString();
 		
-		//logger.warning("MySql -> "+inString);
-		//logger.warning("OracleSql -> "+qString);
-		//System.out.println("[Query]: "+qString);
-		return qString; //no change of data
+		return qString;
 	}
 	
 	//Method to return table name from incoming query string
@@ -617,9 +636,6 @@ public class JSql_Mssql extends JSql {
 		queryArgs.addAll(selectQueryArgs);
 		queryArgs.addAll(updateQueryArgs);
 		queryArgs.addAll(insertQueryArgs);
-		
-		//System.out.println("JSql -> upsertQuerySet -> query : " + queryBuilder.toString());
-		//System.out.println("JSql -> upsertQuerySet -> queryArgs : " + queryArgs);
 		
 		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
 	}

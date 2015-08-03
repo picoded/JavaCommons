@@ -59,42 +59,6 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		return addConfigSet_recursive(inFile, prefix, separator);
 	}
 	
-	//this can actually be pulled out into a static function on its own
-	//this looks inside the given folder and returns a list of all files inside
-	public List<String> getFileNamesFromFolder(File inFile, String rootFolderName, String separator){
-		List<String> keyList = new ArrayList<String>();
-		
-		if(rootFolderName == null){
-			rootFolderName = "";
-		}
-		
-		if(inFile.isDirectory()){
-			File[] innerFiles = inFile.listFiles();
-			for(File innerFile:innerFiles){
-				if(innerFile.isDirectory()){
-					String parentFolderName = innerFile.getName();
-					if(!rootFolderName.isEmpty()){
-						parentFolderName = rootFolderName + separator + parentFolderName;
-					}
-					keyList.addAll(getFileNamesFromFolder(innerFile, parentFolderName, separator));
-				}else{
-					keyList.addAll(getFileNamesFromFolder(innerFile, rootFolderName, separator));
-				}
-			}
-		}else{
-			String fileName = inFile.getName();
-			fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-			String prefix = "";
-			if(!rootFolderName.isEmpty()){
-				prefix += rootFolderName + separator;
-			}
-			
-			keyList.add(prefix + fileName);
-		}
-		
-		return keyList;
-	}
-	
 	private ConfigFileSet addConfigSet_recursive(File inFile, String rootPrefix, String separator){
 		if(rootPrefix == null){
 			rootPrefix = "";

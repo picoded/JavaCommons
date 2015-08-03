@@ -46,7 +46,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	public MetaTable(JStack inStack, String inTableName) {
 		super( inStack, inTableName );
 	}
-
+	
 	///
 	/// Internal config vars
 	///--------------------------------------------------------------------------
@@ -759,10 +759,9 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 
 	/*
 	public Map<String, Map<String, ArrayList<Object>>> queryObjectPage(String selectCols, String whereClause, Object[] whereValues, String orderBy, Map<String, ArrayList<Object>>nowPage, long limit, long offset) throws JStackException {
-
-
+		
 	}
-	 */
+	*/
 
 	//
 	// Internal PUT / GET object functions

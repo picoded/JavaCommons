@@ -29,7 +29,7 @@ import com.hazelcast.core.IMap;
 /// Represents a single object node in the MetaTable collection.
 ///
 /// NOTE: This class should not be initialized directly, but through MetaTable class
-public class MetaObject extends CaseInsensitiveHashMap<String, Object> implements GenericConvertMap<String, Object> {
+public class MetaObject extends HashMap<String, Object> implements GenericConvertMap<String, Object> {
 
 	/// Java serialversion uid: http://stackoverflow.com/questions/285793/what-is-a-serialversionuid-and-why-should-i-use-it
 	private static final long serialVersionUID = 42L;
@@ -44,7 +44,7 @@ public class MetaObject extends CaseInsensitiveHashMap<String, Object> implement
 	protected String _oid = null;
 
 	/// Written changes
-	protected Map<String, Object> deltaDataMap = new CaseInsensitiveHashMap<String, Object>();
+	protected Map<String, Object> deltaDataMap = new HashMap<String, Object>();
 
 	/// Local data cache
 	protected Map<String, Object> remoteDataMap = null;
@@ -109,12 +109,12 @@ public class MetaObject extends CaseInsensitiveHashMap<String, Object> implement
 			throw new RuntimeException(e);
 		}
 		if (remoteDataMap == null) {
-			remoteDataMap = new CaseInsensitiveHashMap<String, Object>();
+			remoteDataMap = new HashMap<String, Object>();
 		}
 	}
 
 	/// Checks if the combinedNeedsUpdate flag is set, updating and returning it
-	protected CaseInsensitiveHashMap<String, Object> combinedMap() {
+	protected Map<String, Object> combinedMap() {
 		if (combinedNeedsUpdate) {
 			super.clear();
 
@@ -191,7 +191,14 @@ public class MetaObject extends CaseInsensitiveHashMap<String, Object> implement
 			this.put((String) (entry.getKey()), (Object) (entry.getValue()));
 		}
 	}
-
+	
+	/// Get the keySet of the object map
+	@Override
+	public Set<String> keySet() {
+		combinedMap();
+		return super.keySet();
+	}
+	
 	// MetaObject Specific functions
 	//----------------------------------------------
 
@@ -201,8 +208,8 @@ public class MetaObject extends CaseInsensitiveHashMap<String, Object> implement
 
 		mTable.updateMap(_oid, cMap, deltaDataMap.keySet());
 
-		deltaDataMap = new CaseInsensitiveHashMap<String, Object>();
-		remoteDataMap = new CaseInsensitiveHashMap<String, Object>();
+		deltaDataMap = new HashMap<String, Object>();
+		remoteDataMap = new HashMap<String, Object>();
 		remoteDataMap.putAll(cMap);
 	}
 
@@ -212,8 +219,8 @@ public class MetaObject extends CaseInsensitiveHashMap<String, Object> implement
 
 		mTable.updateMap(_oid, cMap, null);
 
-		deltaDataMap = new CaseInsensitiveHashMap<String, Object>();
-		remoteDataMap = new CaseInsensitiveHashMap<String, Object>();
+		deltaDataMap = new HashMap<String, Object>();
+		remoteDataMap = new HashMap<String, Object>();
 		remoteDataMap.putAll(cMap);
 	}
 

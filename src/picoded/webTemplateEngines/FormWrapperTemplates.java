@@ -17,10 +17,10 @@ public class FormWrapperTemplates {
 		StringBuilder prefix = new StringBuilder();
 		String classString = FormGenerator.getWrapperClassString(node);
 		String cssString = FormGenerator.getWrapperCssString(node);
-		prefix.append("<div"+classString+cssString+">\n");	
+		prefix.append("<"+HtmlTag.DIV+""+classString+cssString+">\n");	
 		
 		//generating suffix
-		StringBuilder suffix = new StringBuilder("</div>\n");
+		StringBuilder suffix = new StringBuilder("</"+HtmlTag.DIV+">\n");
 		
 		prefixSuffix[0] = prefix.toString();
 		prefixSuffix[1] = suffix.toString();
@@ -37,7 +37,7 @@ public class FormWrapperTemplates {
 	protected static Map<String, FormWrapperInterface> defaultWrapperTemplates() {
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();
 		
-		defaultTemplates.put("default", FormWrapperTemplates.defaultWrapper);
+		defaultTemplates.put("div", FormWrapperTemplates.defaultWrapper);
 		defaultTemplates.put("none", FormWrapperTemplates.none);
 		
 		return defaultTemplates;

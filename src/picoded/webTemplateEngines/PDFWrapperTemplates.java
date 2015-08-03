@@ -39,7 +39,7 @@ public class PDFWrapperTemplates {
 	public static Map<String, FormWrapperInterface> defaultPDFWrapperTemplates(){
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();
 		
-		defaultTemplates.put("default", default_pdf);
+		defaultTemplates.put("div", default_pdf);
 		defaultTemplates.put("none", none_pdf);
 		
 		return defaultTemplates;

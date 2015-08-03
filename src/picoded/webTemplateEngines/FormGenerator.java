@@ -46,12 +46,12 @@ public class FormGenerator {
 	}
 	
 	public String generatePDFReadyHTML(FormNode node){
-		String nodeType = node.getString(JsonKeys.TYPE, "div");
+		String nodeType = node.getString(JsonKeys.TYPE, HtmlTag.DIV);
 		String[] formWrappers = new String[]{"", ""};
 		
-		String wrapperType = node.getString("wrapper", "default");
+		String wrapperType = node.getString(JsonKeys.WRAPPER, HtmlTag.DIV);
 		
-		formWrappers = customFormWrapperTemplates.get(wrapperType).apply(node);
+		formWrappers = customPDFWrapperTemplates.get(wrapperType).apply(node);
 		
 		String formTextData = customPDFInputTemplates.get(nodeType).apply(node);
 		
@@ -75,10 +75,10 @@ public class FormGenerator {
 	}
 	
 	public String applyTemplating(FormNode node){
-		String nodeType = node.getString(JsonKeys.TYPE, "div");
+		String nodeType = node.getString(JsonKeys.TYPE, HtmlTag.DIV);
 		String[] formWrappers = new String[]{"", ""};
 		
-		String wrapperType = node.getString("wrapper", "default");
+		String wrapperType = node.getString(JsonKeys.WRAPPER, HtmlTag.DIV);
 		
 		formWrappers = customFormWrapperTemplates.get(wrapperType).apply(node);
 		String formTextData = customFormInputTemplates.get(nodeType).apply(node);
@@ -96,8 +96,8 @@ public class FormGenerator {
 	public static String getWrapperClassString(FormNode node){
 		StringBuilder sb = new StringBuilder(" class=\"");
 		
-		if(node.containsKey("wrapperClass")){
-			sb.append(node.getString("wrapperClass") + "\"");
+		if(node.containsKey(JsonKeys.WRAPPER_CLASS)){
+			sb.append(node.getString(JsonKeys.WRAPPER_CLASS) + "\"");
 		} else {
 			sb.append("pf_"+node.getString(JsonKeys.TYPE)+"Class\"");
 		}
@@ -108,8 +108,8 @@ public class FormGenerator {
 	public static String getLabelClassString(FormNode node){
 		StringBuilder sb = new StringBuilder(" class=\"");
 		
-		if(node.containsKey("labelClass")){
-			sb.append(node.getString("labelClass") + "\"");
+		if(node.containsKey(JsonKeys.LABEL_CLASS)){
+			sb.append(node.getString(JsonKeys.LABEL_CLASS) + "\"");
 		} else {
 			sb.append("pf_labelClass\"");
 		}
@@ -120,8 +120,8 @@ public class FormGenerator {
 	public static String getInputClassString(FormNode node){
 		StringBuilder sb = new StringBuilder(" class=\"");
 		
-		if(node.containsKey("inputClass")){
-			sb.append(node.getString("inputClass") + "\"");
+		if(node.containsKey(JsonKeys.INPUT_CLASS)){
+			sb.append(node.getString(JsonKeys.INPUT_CLASS) + "\"");
 		} else {
 			sb.append("pf_inputClass\"");
 		}
@@ -132,8 +132,8 @@ public class FormGenerator {
 	public static String getWrapperCssString(FormNode node){
 		StringBuilder sb = new StringBuilder("");
 		
-		if(node.containsKey("wrapperCss")){
-			sb.append(" style=\""+node.getString("wrapperCss")+"\"");
+		if(node.containsKey(JsonKeys.WRAPPER_CSS)){
+			sb.append(" style=\""+node.getString(JsonKeys.WRAPPER_CSS)+"\"");
 		}
 		
 		return sb.toString();
@@ -142,8 +142,8 @@ public class FormGenerator {
 	public static String getInputCssString(FormNode node){
 		StringBuilder sb = new StringBuilder("");
 		
-		if(node.containsKey("inputCss")){
-			sb.append(" style=\""+node.getString("inputCss")+"\"");
+		if(node.containsKey(JsonKeys.INPUT_CSS)){
+			sb.append(" style=\""+node.getString(JsonKeys.INPUT_CSS)+"\"");
 		}
 		
 		return sb.toString();
@@ -152,8 +152,8 @@ public class FormGenerator {
 	public static String getLabelCssString(FormNode node){
 		StringBuilder sb = new StringBuilder("");
 		
-		if(node.containsKey("labelCss")){
-			sb.append(" style=\""+node.getString("labelCss")+"\"");
+		if(node.containsKey(JsonKeys.LABEL_CSS)){
+			sb.append(" style=\""+node.getString(JsonKeys.LABEL_CSS)+"\"");
 		}
 		
 		return sb.toString();

@@ -8,22 +8,18 @@ import java.util.TreeMap;
 
 import picoded.conv.RegexUtils;
 
+import com.amazonaws.services.datapipeline.model.Field;
 import com.hazelcast.instance.Node;
 import com.mysql.jdbc.StringUtils;
 
 public class FormInputTemplates {
 	
-	//TODO
-	/*
-	 * radio check box
-	 * 
-	 */
 	protected static FormInputInterface div = (node)->{
 		return "";
 	};
 	
 	protected static FormInputInterface header = (node)->{ 
-		String text = node.getString("text", "");
+		String text = node.getString(JsonKeys.TEXT, "");
 		
 		StringBuilder sb = new StringBuilder();
 		
@@ -39,56 +35,51 @@ public class FormInputTemplates {
 	protected static FormInputInterface select = (node)->{
 		StringBuilder sb = new StringBuilder();
 		
-		if(node.containsKey("label")){
-			String labelString = node.getString("label");
-			String id = node.getString("id", RegexUtils.removeAllNonAlphaNumeric(labelString).toLowerCase());
-			sb.append("<label for=\""+id+"\">"+labelString+"</label>\n");
+		String labelValue = node.label();
+		String fieldValue = node.field();
+		if(!labelValue.isEmpty()){
+			sb.append("<"+HtmlTag.LABEL+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
 		}
 		
 		String inputClassString = FormGenerator.getInputClassString(node);
 		
-		String fieldName = "";
 		String selectedOption = "";
-		if(node.containsKey("id")){
-			String idKey = node.getString("id");
-			fieldName = " id=\""+idKey+"\"";
-			selectedOption = (String)node.getDefaultValue(idKey);
+		if(!fieldValue.isEmpty()){
+			String fieldHtmlString = " "+HtmlTag.ID+"=\""+fieldValue+"\"";
+			sb.append("<"+HtmlTag.SELECT+""+inputClassString+fieldHtmlString+">\n");
+			selectedOption = (String)node.getDefaultValue(fieldValue);
 			if(selectedOption != null){
 				selectedOption = RegexUtils.removeAllNonAlphaNumeric(selectedOption).toLowerCase();
 			}
-		}else if(node.containsKey("label")){
-			fieldName = " id=\""+RegexUtils.removeAllNonAlphaNumeric(node.getString("label")).toLowerCase()+"\"";
 		}
 		
-		sb.append("<select"+inputClassString+fieldName+">\n");
-		
-		if(node.containsKey("options")){
-			Object dropDownObject = node.get("options");
+		if(node.containsKey(JsonKeys.OPTIONS)){
+			Object dropDownObject = node.get(JsonKeys.OPTIONS);
 			
 			//if what is passed in is a Map, assume it is LinkedHashMap, to maintain insertion order
 			if(dropDownObject instanceof HashMap<?, ?>){
-				LinkedHashMap<String, String> dropDownListOptions = (LinkedHashMap<String, String>)node.get("options");
+				LinkedHashMap<String, String> dropDownListOptions = (LinkedHashMap<String, String>)dropDownObject;
 				for(String key:dropDownListOptions.keySet()){
-					sb.append("<option value=\""+key+"\"");
+					sb.append("<"+HtmlTag.OPTION+" "+HtmlTag.VALUE+"=\""+key+"\"");
 					if(key.equals(selectedOption)){
-						sb.append(" selected=\"selected\"");
+						sb.append(" "+HtmlTag.SELECTED+"=\"selected\"");
 					}
-					sb.append(">"+dropDownListOptions.get(key)+"</option>\n");
+					sb.append(">"+dropDownListOptions.get(key)+"</"+HtmlTag.OPTION+">\n");
 				}
 			} else if(dropDownObject instanceof List<?>){
 				List<String> dropDownOptions = (List<String>)dropDownObject;
 				for(String str:dropDownOptions){
 					String key = RegexUtils.removeAllNonAlphaNumeric(str).toLowerCase();
-					sb.append("<option value=\""+key+"\"");
+					sb.append("<"+HtmlTag.OPTION+" "+HtmlTag.VALUE+"=\""+key+"\"");
 					if(key.equals(selectedOption)){
-						sb.append(" selected=\"selected\"");
+						sb.append(" "+HtmlTag.SELECTED+"=\"selected\"");
 					}
-					sb.append(">"+str+"</option>\n");
+					sb.append(">"+str+"</"+HtmlTag.OPTION+">\n");
 				}
 			}
 		}
 		
-		sb.append("</select>\n");
+		sb.append("</"+HtmlTag.SELECT+">\n");
 		
 		return sb.toString();
 	};
@@ -96,40 +87,28 @@ public class FormInputTemplates {
 	protected static FormInputInterface input_text = (node)->{
 		StringBuilder sb = new StringBuilder();
 		
-		if(node.containsKey("label")){
-			String labelString = node.getString("label");
-			String id = node.getString("id", RegexUtils.removeAllNonAlphaNumeric(labelString).toLowerCase());
-			sb.append("<label for=\""+id+"\">"+labelString+"</label>\n");
+		String labelValue = node.label();
+		String fieldValue = node.field();
+		if(!labelValue.isEmpty()){
+			sb.append("<"+HtmlTag.LABEL+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
 		}
 		
 		String inputClassString = FormGenerator.getInputClassString(node);
 		 
-		sb.append("<input"+inputClassString+" type=\"text\" ");
+		sb.append("<"+HtmlTag.INPUT+""+inputClassString+" "+HtmlTag.TYPE+"=\"text\" ");
 		
 		//id/field and value elements
-		if(node.containsKey("id")){
-			String idKey = node.getString("id");
-			sb.append("id=\""+idKey+"\"");
-			String idValue = (String)node.getDefaultValue(idKey);
-			if(!StringUtils.isNullOrEmpty(idValue)){
-				sb.append(" value=\""+idValue+"\"></input>\n");
+		if(!fieldValue.isEmpty()){
+			sb.append(""+HtmlTag.ID+"=\""+fieldValue+"\"");
+			String fieldDefaultValue = (String)node.getDefaultValue(fieldValue);
+			if(!StringUtils.isNullOrEmpty(fieldDefaultValue)){
+				sb.append(" "+HtmlTag.VALUE+"=\""+fieldDefaultValue+"\"></"+HtmlTag.INPUT+">\n");
 			}else{
-				sb.append("></input>\n");
+				sb.append("></"+HtmlTag.INPUT+">\n");
 			}
-		}else if(node.containsKey("label")){
-			String derivedFieldName = RegexUtils.removeAllNonAlphaNumeric(node.getString("label")).toLowerCase();
-			sb.append("id=\""+derivedFieldName+"\"");
 		}else{
-			sb.append("></input>\n");
+			sb.append("></"+HtmlTag.INPUT+">\n");
 		}
-		
-		//if form key is available, add form tags
-		//uncomment if needed
-//		if(node.containsKey("form")){
-//			String formName = node.getString("form");
-//			sb.insert(0, "<form action=\""+formName+"\">");
-//			sb.append("</form>");
-//		}
 		
 		return sb.toString();
 	};

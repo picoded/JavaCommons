@@ -94,7 +94,6 @@ public class AccountTable_Sqlite_test extends JStackData_testBase_test {
 		AccountObject grpObj;
 		AccountObject usrObj;
 		
-		
 		assertFalse( ptObj.containsKey(grpName) );
 		assertNull( ptObj.get(grpName) );
 		
@@ -107,5 +106,10 @@ public class AccountTable_Sqlite_test extends JStackData_testBase_test {
 		
 		assertNotNull( grpObj.addMember( usrObj, "guest" ) );
 		assertArrayEquals( new String[] { usrObj._oid() }, grpObj.getMembers_id() );
+		
+		// AccountObject[] usrList = null;
+		// assertNotNull( usrList = grpObj.getMembers() );
+		// assertEquals( 1, usrList.size() );
+		// assertEquals( usrObj._oid(), usrList.get(0)._oid() );
 	}
 }

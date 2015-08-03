@@ -20,7 +20,7 @@ public class PDFInputTemplates {
 	};
 	
 	protected static FormInputInterface header_pdf = (node)->{ 
-		String text = node.getString("text", "");
+		String text = node.getString(JsonKeys.TEXT, "");
 		
 		StringBuilder sb = new StringBuilder();
 		
@@ -38,17 +38,16 @@ public class PDFInputTemplates {
 		String labelClassName = getLabelClassName(node);
 		String pdfOutputClassName = getPdfOutputClassName(node);
 		
-		if(node.containsKey("label")){
-			String labelString = node.getString("label");
-			sb.append("<div class=\""+labelClassName+"\">"+labelString+"</div>");
+		String labelString = node.label();
+		if(!labelString.isEmpty()){
+			sb.append("<"+HtmlTag.DIV+" class=\""+labelClassName+"\">"+labelString+"</"+HtmlTag.DIV+">");
 		}
 		
-		String idValue = "";
-		if(node.containsKey("id")){
-			String idKey = node.getString("id");
-			idValue = (String)node.getDefaultValue(idKey);
-			if(!StringUtils.isNullOrEmpty(idValue)){
-				sb.append("<div class=\""+pdfOutputClassName+"\">"+idValue+"</div>");
+		String fieldName = node.field();
+		if(!fieldName.isEmpty()){
+			String fieldValue = (String)node.getDefaultValue(fieldName);
+			if(!StringUtils.isNullOrEmpty(fieldValue)){
+				sb.append("<"+HtmlTag.DIV+" class=\""+pdfOutputClassName+"\">"+fieldValue+"</"+HtmlTag.DIV+">");
 			}
 		}
 		return sb.toString();

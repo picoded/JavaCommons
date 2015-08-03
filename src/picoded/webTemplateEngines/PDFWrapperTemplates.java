@@ -10,20 +10,21 @@ public class PDFWrapperTemplates {
 		
 		//generating prefix
 		StringBuilder prefix = new StringBuilder();
-		String classString = getWrapperClassName(node);
-		prefix.append("<div"+classString+">\n");	
+		String classString = FormGenerator.getWrapperClassString(node);
+		String cssString = FormGenerator.getWrapperCssString(node);
+		prefix.append("<"+HtmlTag.DIV+""+classString+cssString+">\n");	
 		
 		//generating suffix
-		StringBuilder suffix = new StringBuilder("</div>\n");
+		StringBuilder suffix = new StringBuilder("</"+HtmlTag.DIV+">\n");
 		
 		prefixSuffix[0] = prefix.toString();
 		prefixSuffix[1] = suffix.toString();
-				
+		
 		return prefixSuffix;
 	};
 	
 	public static FormWrapperInterface none_pdf=(node)->{
-		String[] prefixSuffix = null;
+		String[] prefixSuffix = new String[]{"", ""};
 		
 		return prefixSuffix;
 	};

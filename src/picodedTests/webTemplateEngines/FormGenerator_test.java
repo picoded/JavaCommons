@@ -74,20 +74,19 @@ public class FormGenerator_test {
 	
 //	@Test
 	public void doPDFOutput(){
-		String htmlFileString = "./test-files/test-specific/pdfReadyHtml.html";
-		String pdfFileString = "./test-files/test-specific/htmlPDF.pdf";
+		String htmlFileString = "./test-files/test-specific/htmlGenerator/pdfReadyHtml.html";
+		String pdfFileString = "./test-files/test-specific/htmlGenerator/htmlPDF.pdf";
 		picoded.fileUtils.PDFGenerator.generatePDFfromHTMLfile(pdfFileString, htmlFileString);
 	}
 	
-//	@Test
+	@Test
 	public void outputPrefilledPDF(){
-		File jsonObjectFile = new File("./test-files/test-specific/testJSONObject.js");
+		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONObject.js");
 		assertTrue(jsonObjectFile.canRead());
 		String jsonFileString = "";
 		try{
 			jsonFileString = FileUtils.readFileToString(jsonObjectFile, Charset.defaultCharset());
 		} catch (Exception ex){
-			
 		}
 		Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
 		assertNotNull(jsonMap);
@@ -95,7 +94,7 @@ public class FormGenerator_test {
 		FormNode formNode = new FormNode(jsonMap, getPrefilledData());
 		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(formNode);
 		
-		File pdfReadyHtmlFile = new File("./test-files/test-specific/pdfReadyHtml.html");
+		File pdfReadyHtmlFile = new File("./test-files/test-specific/htmlGenerator/pdfReadyHtml.html");
 		
 		try{
 			FileWriter writer = new FileWriter(pdfReadyHtmlFile);
@@ -106,13 +105,13 @@ public class FormGenerator_test {
 			
 		}
 		
-		String pdfFileString = "./test-files/test-specific/htmlPDF.pdf";
+		String pdfFileString = "./test-files/test-specific/htmlGenerator/htmlPDF.pdf";
 		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
 	
-//	@Test
+	@Test
 	public void outputHTMLFromJSONObject(){
-		File jsonObjectFile = new File("./test-files/test-specific/testJSONObject.js");
+		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONObject.js");
 		assertTrue(jsonObjectFile.canRead());
 		String jsonFileString = "";
 		try{
@@ -129,7 +128,7 @@ public class FormGenerator_test {
 		FormNode formNode = new FormNode(jsonMap, getPrefilledData());
 		
 		String htmlVal = testObj.applyTemplating(formNode);
-		File htmlFile = new File("./test-files/test-specific/htmlFromJSONObject.html");
+		File htmlFile = new File("./test-files/test-specific/htmlGenerator/htmlFromJSONObject.html");
 		
 		try{
 			FileWriter writer = new FileWriter(htmlFile);
@@ -141,9 +140,9 @@ public class FormGenerator_test {
 		}
 	}
 	
-//	@Test
+	@Test
 	public void outputHtmlFromJSONArray(){
-		File jsonArrayFile = new File("./test-files/test-specific/testJSONArray.js");
+		File jsonArrayFile = new File("./test-files/test-specific/htmlGenerator/testJSONArray.js");
 		assertTrue(jsonArrayFile.canRead());
 		String jsonFileString = "";
 		try{
@@ -156,7 +155,7 @@ public class FormGenerator_test {
 		assertNotNull(nodeList);
 		
 		String htmlVal = testObj.applyTemplating(nodeList);
-		File htmlFile = new File("./test-files/test-specific/htmlFromJSONArray.html");
+		File htmlFile = new File("./test-files/test-specific/htmlGenerator/htmlFromJSONArray.html");
 		
 		try{
 			FileWriter writer = new FileWriter(htmlFile);

@@ -84,7 +84,7 @@ public class MetaType {
 	///--------------------------------------------------------------------------
 	
 	/// The meta type int values
-	int valueType = 1;
+	protected int valueType = 1;
 	
 	private static String metaTypePrefix = "type_";
 	
@@ -94,7 +94,7 @@ public class MetaType {
 	}
 	
 	/// The meta config string, applicable to only certain meta types
-	String valueConfig = null;
+	protected String valueConfig = null;
 	
 	/// Configured string
 	public String valueConfig() {

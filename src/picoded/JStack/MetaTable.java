@@ -52,10 +52,10 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	///--------------------------------------------------------------------------
 
 	/// Object ID field type
-	protected String objColumnType = "VARCHAR(32)";
+	protected String objColumnType = "VARCHAR(64)";
 
 	/// Key name field type
-	protected String keyColumnType = "VARCHAR(32)";
+	protected String keyColumnType = "VARCHAR(64)";
 
 	/// Type collumn type
 	protected String typeColumnType = "TINYINT";
@@ -92,7 +92,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	}
 
 	/// Default type for all values not defined in the index
-	protected MetaTypeMap typeMapping = new MetaTypeMap();
+	protected MetaTypeMap typeMapping = new MetaTypeMap( this );
 
 	///
 	/// Indexed columns actual setup
@@ -115,7 +115,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	public Set<String> listTypeMappingKeys() { return(typeMapping.keySet()); }
 	
 	/// Returns the list of typemapping values
-	public Collection<MetaType>  listTypeMappingValues() { return typeMapping.values(); }
+	public Collection<MetaType> listTypeMappingValues() { return typeMapping.values(); }
 
 	///
 	/// Internal JSql table setup and teardown
@@ -219,7 +219,14 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	/// Removes the respective JSQL tables and view (if it exists)
 	@Override
 	protected boolean JSqlTeardown(JSql sql) throws JSqlException, JStackException {
-		sql.execute("DROP VIEW IF EXISTS " + sqlViewName(sql, "view"));
+	// Drop the view
+	try {
+		sql.execute("DROP VIEW " + sqlViewName(sql, "view"));
+	} catch(JSqlException e) {
+		// This is silenced, as JSql does not support "DROP VIEW IF NOT EXISTS"
+		// @TODO: drop view if not exists to JSql, this is under issue: 
+		// http://gitlab.picoded-dev.com/picoded/javacommons/issues/69
+	}
 		sql.execute("DROP TABLE IF EXISTS " + sqlViewName(sql, "vCfg"));
 		sql.execute("DROP TABLE IF EXISTS " + sqlTableName(sql));
 		return true;
@@ -229,47 +236,15 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	/// Internal JSql index setup
 	///--------------------------------------------------------------------------
 
-	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
-	protected void JSqlMakeIndexViewQuery(JSql sql) throws JSqlException {
-		typeMapping.JSqlIndexViewSetup(sqlViewName(sql, "view"), sqlTableName(sql), sql);
-	}
-
 	/// Setsup the index view configuration table,
 	/// @TODO : To check against configuration table, and makes the changes ONLY when needed
 	protected void JSqlIndexConfigTableSetup(JSql sql) throws JSqlException {
-		String tName = sqlViewName(sql, "vCfg");
-
-		// Table constructor
-		//-------------------
-		sql.createTableQuerySet( //
-			tName, //
-			new String[] { //
-			"nme", //Index column name
-				"typ", //Index column type
-				"con" //Index type string value
-			}, //
-			new String[] { //
-			keyColumnType, //
-				typeColumnType, //
-				keyColumnType //
-			} //
-			).execute(); //
-
-		// Checks if the view needs to be recreated
-		boolean recreatesView = false;
-
-		//
-		// @TODO Change detection
-		//
-
-		// Checks if view actually needs recreation?
-		recreatesView = true;
-
-		// Recreates the view if needed
-		if (recreatesView) {
-			sql.execute("DROP VIEW IF EXISTS " + sqlViewName(sql, "view"));
-			JSqlMakeIndexViewQuery(sql);
-		}
+		typeMapping.JSqlIndexViewFullBuild( //
+			sqlViewName(sql, "vCfg"), //
+			sqlViewName(sql, "view"), //
+			sqlTableName(sql), //
+			sql // 
+		); //
 	}
 
 	///
@@ -750,6 +725,6 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 
 	/// @TODO: Delete operations
 	public void remove(String _oid) {
-
+		throw new RuntimeException("Not supported yet");
 	}
 }

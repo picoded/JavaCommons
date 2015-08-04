@@ -169,4 +169,18 @@ public class MetaType {
 		}
 		return null;
 	}
+	
+	public static MetaType fromTypeObject(Object type) {
+		MetaType mType = null;
+		if(type instanceof String) {
+			mType = MetaType.fromTypeString(type.toString());
+			
+			if( mType == null ) {
+				throw new RuntimeException("Invalid MetaTable type for: "+type.toString());
+			}
+		} else if(type instanceof MetaType) {
+			mType = (MetaType)type;
+		}
+		return mType;
+	}
 }

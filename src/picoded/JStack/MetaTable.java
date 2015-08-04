@@ -92,79 +92,30 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	}
 
 	/// Default type for all values not defined in the index
-	protected CaseInsensitiveHashMap<String, MetaType> typeMapping = new CaseInsensitiveHashMap<String, MetaType>();
-	protected MetaType defaultType = new MetaType(MetaType.TYPE_MIXED);
+	protected MetaTypeMap typeMapping = new MetaTypeMap();
 
 	///
 	/// Indexed columns actual setup
 	///--------------------------------------------------------------------------
 
 	/// Returned the defined metaType for the given key
-	public MetaType getType(String name) {
-		if (name == null || (name = name.trim().toLowerCase()).length() <= 0) {
-			throw new RuntimeException("Name parameter cannot be NULL or BLANK");
-		}
-
-		return typeMapping.get(name);
-	}
+	public MetaType getType(String name) { return typeMapping.get(name); }
 
 	/// Sets the defined metaType for the given key
-	public MetaTable putType(String name, MetaType type) {
-		if (name == null || (name = name.trim().toLowerCase()).length() <= 0) {
-			throw new RuntimeException("Name parameter cannot be NULL or BLANK");
-		}
-
-		if (name.equals("_oid") || name.equals("_otm")) {
-			throw new RuntimeException("Name parameter uses reserved name " + name);
-		}
-
-		typeMapping.put(name, type);
-		return this;
-	}
-
-	public MetaTable putType(String name, Object type) throws JStackException {
-		if(typeMapping.containsKey(name)) {
-			throw new RuntimeException("Type mapping already contains this key");
-		}
-
-		if(type instanceof String) {
-			MetaType metaType = MetaType.fromTypeString(type.toString());
-
-			if( metaType == null ) {
-				throw new JStackException("Invalid MetaTable type for: "+name+"="+type.toString());
-			}
-
-			typeMapping.put(name, metaType);
-		}
-
-		return this;
-	}
+	public MetaTable putType(String name, MetaType type) { typeMapping.put(name, type); return this; }
+	public MetaTable putType(String name, Object type) { typeMapping.putObject(name, type); return this; }
 	
-	public MetaTable setMapping(Map<String, Object> nameToTypeMap) throws JStackException {
-		for(Map.Entry<String, Object> set : nameToTypeMap.entrySet()) {
-			putType(set.getKey(), set.getValue());
-		}
+	/// Set all type metting
+	public MetaTable setMapping(Map<String, Object> nameToTypeMap) { typeMapping.putObjectMap(nameToTypeMap); return this; }
 
-		return this;
-	}
+	/// Clears the type mapping settings
+	public void clearTypeMapping() { typeMapping.clear();	}
 
-	public void clearTypeMapping()
-	{
-		if(typeMapping != null)
-		{
-			typeMapping.clear();
-		}
-	}
-
-	public Set<String> listTypeMappingKeys()
-	{
-		return(typeMapping.keySet());
-	}
-
-	public Collection<MetaType>  listTypeMappingValues()
-	{
-		return typeMapping.values();
-	}
+	/// Returns the list of typemappign keys
+	public Set<String> listTypeMappingKeys() { return(typeMapping.keySet()); }
+	
+	/// Returns the list of typemapping values
+	public Collection<MetaType>  listTypeMappingValues() { return typeMapping.values(); }
 
 	///
 	/// Internal JSql table setup and teardown
@@ -280,83 +231,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 
 	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
 	protected void JSqlMakeIndexViewQuery(JSql sql) throws JSqlException {
-
-		StringBuilder sb = new StringBuilder("CREATE VIEW "); //OR REPLACE
-		sb.append(sqlViewName(sql, "view"));
-		sb.append(" AS ");
-
-		String lBracket = "'";
-		String rBracket = "'";
-		String joinType = "LEFT";
-
-		if (sql.sqlType == JSqlType.mssql) {
-			lBracket = "[";
-			rBracket = "]";
-		}
-
-		String tableName = sqlTableName(sql);
-
-		StringBuilder select = new StringBuilder(" SELECT B.oID AS ");
-		select.append(lBracket + "_oid" + rBracket);
-		select.append(", B.oTm AS ");
-		select.append(lBracket + "_otm" + rBracket);
-
-		StringBuilder from = new StringBuilder(" FROM ");
-
-		from.append("(SELECT DISTINCT oID, oTm FROM " + tableName + ")");
-		//from.append( tableName );
-		from.append(" AS B");
-
-		String key;
-		MetaType type;
-
-		ArrayList<Object> argList = new ArrayList<Object>();
-
-		int joinCount = 0;
-		for (Map.Entry<String, MetaType> e : typeMapping.entrySet()) {
-			key = e.getKey();
-			type = e.getValue();
-
-			if (type.valueType >= MetaType.TYPE_INTEGER && type.valueType <= MetaType.TYPE_FLOAT) {
-
-				select.append(", N" + joinCount + ".nVl AS ");
-				select.append(lBracket + key + rBracket);
-
-				from.append(" "+joinType+" JOIN " + tableName + " AS N" + joinCount);
-				from.append(" ON B.oID = N" + joinCount + ".oID");
-				from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = '" + key + "'");
-
-			} else if (type.valueType == MetaType.TYPE_STRING) {
-
-				select.append(", S" + joinCount + ".tVl AS ");
-				select.append(lBracket + key + rBracket);
-
-				select.append(", S" + joinCount + ".sVl AS ");
-				select.append(lBracket + key + "_lc" + rBracket);
-
-				from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
-				from.append(" ON B.oID = S" + joinCount + ".oID");
-				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
-
-			} else if (type.valueType == MetaType.TYPE_TEXT) {
-
-				select.append(", S" + joinCount + ".tVl AS ");
-				select.append(lBracket + key + rBracket);
-
-				from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
-				from.append(" ON B.oID = S" + joinCount + ".oID");
-				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
-			}
-
-			++joinCount;
-		}
-
-		sb.append(select);
-		sb.append(from);
-
-		//System.out.println( sb.toString() );
-		//sql.execute_raw(sb.toString());
-		sql.execute(sb.toString());
+		typeMapping.JSqlIndexViewSetup(sqlViewName(sql, "view"), sqlTableName(sql), sql);
 	}
 
 	/// Setsup the index view configuration table,

@@ -159,7 +159,7 @@ public class AccountObject extends MetaObject {
 		return ( _childMap = mainTable.accountChild.lazyGet( this._oid() ) );
 	}
 	
-	// Group management
+	// Group management of users
 	//-------------------------------------------------------------------------
 	
 	/// Gets and returns the member role, if it exists
@@ -233,7 +233,14 @@ public class AccountObject extends MetaObject {
 	}
 	
 	/// Returns the list of members in the group
+	///
 	public String[] getMembers_id() throws JStackException {
+		return mainTable.accountChild.getFromKeyNames_id( _oid() );
+	}
+	
+	/// Returns the list of groups the member is in
+	///
+	public String[] getGroups_id() throws JStackException {
 		List<String> retList = new ArrayList<String>();
 		for( String key : childMap().keySet() ) {
 			if( key.equals("_oid") ) {
@@ -245,14 +252,22 @@ public class AccountObject extends MetaObject {
 	}
 	
 	/// Gets all the members object related to the group
+	///
 	public AccountObject[] getMembers() throws JStackException {
 		String[] idList = getMembers_id();
 		AccountObject[] objList = new AccountObject[idList.length];
-		
 		for(int a=0; a<idList.length; ++a) {
 			objList[a] = mainTable.getFromID( idList[a] );
 		}
 		return objList;
 	}
 	
+	// Group management of users
+	//-------------------------------------------------------------------------
+
+	/// Gets all the groups the user is in
+	///
+	public AccountObject[] getGroups() throws JStackException {
+		return mainTable.getFromIDArray( getGroups_id() );
+	}
 }

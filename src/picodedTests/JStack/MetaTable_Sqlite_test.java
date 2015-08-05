@@ -320,7 +320,6 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		assertNotNull( guid = p._oid() );
 		
 		assertTrue( mtObj.containsKey(guid) );
-
 	}
 	
 	@Test

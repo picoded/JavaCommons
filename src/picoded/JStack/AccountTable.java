@@ -130,7 +130,7 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 	/// Group[member] = role1,role2, ...
 	protected MetaTable accountChild = null;
 
-	/// Handles the Group[member] meta field mapping
+	/// Handles the Group-member meta field mapping
 	protected MetaTable accountChildMeta = null;
 	
 	//
@@ -184,6 +184,16 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 		}
 		
 		return null; 
+	}
+	
+	/// Gets the account using the object ID array, 
+	/// and returns the account object array
+	public AccountObject[] getFromIDArray(String[] _oidList) {
+		AccountObject[] mList = new AccountObject[_oidList.length];
+		for(int a=0; a<_oidList.length; ++a) {
+			mList[a] = getFromID( _oidList[a] );
+		}
+		return mList;
 	}
 	
 	/// Gets the account using the nice name

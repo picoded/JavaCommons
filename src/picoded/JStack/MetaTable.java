@@ -17,6 +17,7 @@ import picoded.JSql.*;
 import picoded.JCache.*;
 import picoded.struct.CaseInsensitiveHashMap;
 import picoded.struct.UnsupportedDefaultMap;
+import picoded.conv.ListValueConv;
 
 /// hazelcast
 import com.hazelcast.core.*;
@@ -28,8 +29,15 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
-/// @TODO: Convert to Map<String, MetaObject>
-/// @TODO: Documentation =( of class
+/// MetaTable, servs as the core flexible backend storage implmentation for the whole
+/// JStack setup. Its role can be viewed similarly to NoSql, or AWS SimpleDB
+/// where almost everything is indexed and cached. 
+/// 
+/// On a performance basis, it is meant to trade off raw query performance of traditional optimized 
+/// SQL lookup, over flexibility in data model. This is however heavily mintigated by the inclusion 
+/// of a JCache layer for non-complex lookup cached reads. Which will in most cases be the main
+/// read request load.
+/// 
 public class MetaTable extends JStackData implements UnsupportedDefaultMap<String, MetaObject> {
 
 	///
@@ -125,89 +133,10 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	@Override
 	protected boolean JSqlSetup(JSql sql) throws JSqlException, JStackException {
 		String tName = sqlTableName(sql);
-		// Table constructor
-		//-------------------
-		sql.createTableQuerySet( //
-										tName, //
-										new String[] { //
-											// Primary key, as classic int, htis is used to lower SQL
-											// fragmentation level, and index memory usage. And is not accessible.
-											// Sharding and uniqueness of system is still maintained by GUID's
-											"pKy", //
-											// Time stamps
-											"cTm", //value created time
-											"uTm", //value updated time
-											"oTm", //object created time
-											"eTm", //value expire time (for future use)
-											// Object keys
-											"oID", //_oid
-											"kID", //key storage
-											"idx", //index collumn
-											// Value storage (except text)
-											"typ", //type collumn
-											"nVl", //numeric value (if applicable)
-											"sVl", //case insensitive string value (if applicable), or case sensitive hash
-											// Text value storage
-											"tVl" //Textual storage, placed last for storage optimization
-										}, //
-										new String[] { //
-											pKeyColumnType, //Primary key
-											// Time stamps
-											tStampColumnType, tStampColumnType, tStampColumnType, tStampColumnType,
-											// Object keys
-											objColumnType, //
-											keyColumnType, //
-											indexColumnType, //
-											// Value storage
-											typeColumnType, //
-											numColumnType, //
-											strColumnType, //
-											fullTextColumnType //
-										} //
-										).execute();
-
-		// Unique index
-		//
-		// This also optimizes query by object keys
+		
+		// Setup the main MetaTable
 		//------------------------------------------------
-		sql.createTableIndexQuerySet( //
-											  tName, "oID, kID, idx", "UNIQUE", "unq" //
-											  ).execute();
-
-		// Key Values search index
-		//------------------------------------------------
-		sql.createTableIndexQuerySet( //
-											  tName, "kID, nVl, sVl", null, "valMap" //
-											  ).execute();
-
-		// Object timestamp optimized Key Value indexe
-		//------------------------------------------------
-		sql.createTableIndexQuerySet( //
-											  tName, "oTm, kID, nVl, sVl", null, "oTm_valMap" //
-											  ).execute();
-
-		// Full text index, for textual data
-		// @TODO FULLTEXT index support
-		//------------------------------------------------
-		//if (sql.sqlType != JSqlType.sqlite) {
-		//	sql.createTableIndexQuerySet( //
-		//		tName, "tVl", "FULLTEXT", "tVl" //
-		//	).execute();
-		//} else {
-		sql.createTableIndexQuerySet( //
-											  tName, "tVl", null, "tVl" // Sqlite uses normal index
-											  ).execute();
-		//}
-
-		// timestamp index, is this needed?
-		//------------------------------------------------
-		//sql.createTableIndexQuerySet( //
-		//	tName, "uTm", null, "uTm" //
-		//).execute();
-
-		//sql.createTableIndexQuerySet( //
-		//	tName, "cTm", null, "cTm" //
-		//).execute();
+		MetaTable_JSql.JSqlSetup(sql, tName, this);
 
 		// Index view config setup
 		//------------------------------------------------
@@ -219,14 +148,14 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	/// Removes the respective JSQL tables and view (if it exists)
 	@Override
 	protected boolean JSqlTeardown(JSql sql) throws JSqlException, JStackException {
-	// Drop the view
-	try {
-		sql.execute("DROP VIEW " + sqlViewName(sql, "view"));
-	} catch(JSqlException e) {
-		// This is silenced, as JSql does not support "DROP VIEW IF NOT EXISTS"
-		// @TODO: drop view if not exists to JSql, this is under issue: 
-		// http://gitlab.picoded-dev.com/picoded/javacommons/issues/69
-	}
+		// Drop the view
+		try {
+			sql.execute("DROP VIEW " + sqlViewName(sql, "view"));
+		} catch(JSqlException e) {
+			// This is silenced, as JSql does not support "DROP VIEW IF NOT EXISTS"
+			// @TODO: drop view if not exists to JSql, this is under issue: 
+			// http://gitlab.picoded-dev.com/picoded/javacommons/issues/69
+		}
 		sql.execute("DROP TABLE IF EXISTS " + sqlViewName(sql, "vCfg"));
 		sql.execute("DROP TABLE IF EXISTS " + sqlTableName(sql));
 		return true;
@@ -727,4 +656,45 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	public void remove(String _oid) {
 		throw new RuntimeException("Not supported yet");
 	}
+	
+	//
+	// Key based operation search. 
+	// 
+	// Note that this does not rely on the complex
+	// query generator, as such has limited functionality.
+	//--------------------------------------------------------------------------
+	
+	/// Gets an array of MetaObject, from the list of string GUID arrays
+	public MetaObject[] lazyGetArray(String[] _oidList) throws JStackException {
+		MetaObject[] mList = new MetaObject[_oidList.length];
+		for(int a=0; a<_oidList.length; ++a) {
+			mList[a] = lazyGet( _oidList[a] );
+		}
+		return mList;
+	}
+	
+	/// Gets the list of meta objects GUID, with any value (even null) 
+	/// from the provided key name
+	protected String[] getFromKeyNames_id(String key) throws JStackException {
+		List<String> sList = new ArrayList<String>();
+		
+		JStackIterate( new JStackReader() {
+			/// Reads only the JSQL layer
+			public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+				JSqlResult r = sql.selectQuerySet( sqlTableName(sql), "oID", "kID = ?", new Object[] { key } ).query();
+				List<Object> oList = r.get("oID");
+				sList.addAll( ListValueConv.objectToString(oList) );
+				return ret;
+			}
+		}, sList );
+	
+		return sList.toArray(new String[sList.size()]);
+	}
+	
+	/// Gets an array of MetaObject, with any value (even null) 
+	/// from the provided key name
+	public MetaObject[] getFromKeyNames(String key) throws JStackException {
+		return lazyGetArray( getFromKeyNames_id(key) );
+	}
+	
 }

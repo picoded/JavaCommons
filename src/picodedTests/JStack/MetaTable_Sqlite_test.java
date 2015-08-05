@@ -318,9 +318,28 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		assertFalse( mtObj.containsKey("hello") );
 		assertNotNull( p = mtObj.newObject() );
 		assertNotNull( guid = p._oid() );
-
+		
 		assertTrue( mtObj.containsKey(guid) );
 
 	}
-
+	
+	@Test
+	public void getFromKeyNames() throws JStackException {
+		
+		mtObj.append(null, genNumStrObj(1, "one"));
+		mtObj.append(null, genNumStrObj(2, "two"));
+		
+		MetaObject[] list = null;
+		assertNotNull( list = mtObj.getFromKeyNames("num") );
+		assertEquals( 2, list.length );
+		
+		String str = null;
+		assertNotNull( str = list[0].getString("str_val") );
+		assertTrue( str.equals("one") || str.equals("two") );
+		
+		assertNotNull( str = list[1].getString("str_val") );
+		assertTrue( str.equals("one") || str.equals("two") );
+		
+	}
+	
 }

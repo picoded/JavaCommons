@@ -263,9 +263,14 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	public String requestWildcardUri() {
 		String servletPath = requestServletPath();
 		String reqURI = requestURI();
+		String contextPath = getContextURI();
 		
 		while(servletPath.endsWith("*") || servletPath.endsWith("/")) {
 			servletPath = servletPath.substring(0, servletPath.length() - 1);
+		}
+		
+		if( reqURI.startsWith(contextPath) ) {
+		    reqURI = reqURI.substring(contextPath.length());
 		}
 		
 		if( reqURI.startsWith(servletPath) ) {
@@ -405,7 +410,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	}
 	
 	/// Returns the servlet contextual path : needed for base URI for page redirects / etc
-	public String getContextPath() {
+	public String getContextURI() {
 		if(httpRequest != null) {
 			return httpRequest.getContextPath();
 		}

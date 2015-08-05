@@ -23,7 +23,9 @@ public class FormNode extends HashMap<String, Object> implements GenericConvertM
 	
 	public FormNode(Map<String, Object> mapObject, Map<String, Object> prefilledJSONData){
 		_children = new ArrayList<FormNode>();
-		this.putAll(innerConstructor(mapObject, prefilledJSONData));
+		FormNode newNode = innerConstructor(mapObject, prefilledJSONData);
+		this.putAll(newNode);
+		this.setChildren(newNode.children());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -46,7 +48,8 @@ public class FormNode extends HashMap<String, Object> implements GenericConvertM
 			return createFromList(nodeList, prefilledJSONData);
 		}else{
 			Map<String, Object> nodeMap = ConvertJSON.toMap(jsonString);
-			formNodes.add(new FormNode(nodeMap, prefilledJSONData));
+			FormNode newNode = new FormNode(nodeMap, prefilledJSONData);
+			formNodes.add(newNode);
 			return formNodes;
 		}
 	}
@@ -86,18 +89,30 @@ public class FormNode extends HashMap<String, Object> implements GenericConvertM
 		formNode.setPrefilledData(prefilledJSONData);
 		formNode.putAll(mapObject); //changed from this to formNode
 		
+		//the commented out code is the "safe" version of the recursion loop
+		
+//		if(mapObject.containsKey("children")){
+//			formNode.remove("children");
+//			
+//			Object children = mapObject.get("children");
+//			if(children instanceof List){
+//				List<Object> childrenList = (List<Object>)children;
+//				for(Object obj:childrenList){
+//					if(obj instanceof Map){
+//						Map<String, Object> childObject = (Map<String, Object>)obj;
+//						String type = (String)childObject.get("type");
+//						formNode.addChild(innerConstructor(childObject, prefilledJSONData));
+//					}
+//				}
+//			}
+//		}
+		
 		if(mapObject.containsKey("children")){
 			formNode.remove("children");
-			
-			Object children = mapObject.get("children");
-			if(children instanceof List){
-				List<Object> childrenList = (List<Object>)children;
-				for(Object obj:childrenList){
-					if(obj instanceof Map){
-						Map<String, Object> childObject = (Map<String, Object>)obj;
-						this.addChild(innerConstructor(childObject, prefilledJSONData));
-					}
-				}
+			List<Object> children = (List<Object>)mapObject.get("children");
+			for(Object child:children){
+				Map<String, Object> nodeObj = (Map<String, Object>)child;
+				formNode.addChild(innerConstructor(nodeObj, prefilledJSONData));
 			}
 		}
 		

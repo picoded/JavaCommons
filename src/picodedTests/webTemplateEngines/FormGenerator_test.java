@@ -79,7 +79,7 @@ public class FormGenerator_test {
 		picoded.fileUtils.PDFGenerator.generatePDFfromHTMLfile(pdfFileString, htmlFileString);
 	}
 	
-	@Test
+//	@Test
 	public void outputPrefilledPDF(){
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONObject.js");
 		assertTrue(jsonObjectFile.canRead());
@@ -109,7 +109,7 @@ public class FormGenerator_test {
 		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
 	
-	@Test
+//	@Test
 	public void outputHTMLFromJSONObject(){
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONObject.js");
 		assertTrue(jsonObjectFile.canRead());
@@ -140,7 +140,7 @@ public class FormGenerator_test {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void outputHtmlFromJSONArray(){
 		File jsonArrayFile = new File("./test-files/test-specific/htmlGenerator/testJSONArray.js");
 		assertTrue(jsonArrayFile.canRead());
@@ -165,5 +165,43 @@ public class FormGenerator_test {
 		}catch(Exception ex){
 			
 		}
+	}
+	
+	@Test
+	public void testSimpleJSONObject(){
+		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/simpleJSONObject.js");
+		assertTrue(jsonObjectFile.canRead());
+		String jsonFileString = "";
+		try{
+			jsonFileString = FileUtils.readFileToString(jsonObjectFile, Charset.defaultCharset());
+		} catch (Exception ex){
+		}
+		
+		Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
+		
+		assertNotNull(jsonMap);
+		
+		List<FormNode> formNodes = FormNode.createFromJSONString(jsonFileString, getPrefilledData());
+		
+		assertEquals(1, formNodes.get(0).childCount());
+		assertEquals(2, formNodes.get(0).children().get(0).childCount());
+		
+		assertEquals("div", formNodes.get(0).getString("type"));
+		assertEquals("title", formNodes.get(0).children().get(0).getString("type"));
+		assertEquals("dropdown", formNodes.get(0).children().get(0).children().get(0).getString("type"));
+		assertEquals("text", formNodes.get(0).children().get(0).children().get(1).getString("type"));
+		
+		
+//		String htmlVal = testObj.applyTemplating(formNodes);
+//		File htmlFile = new File("./test-files/test-specific/htmlGenerator/simpleHtmlObject.html");
+//		
+//		try{
+//			FileWriter writer = new FileWriter(htmlFile);
+//			writer.write(htmlVal);
+//			writer.flush();
+//			writer.close();
+//		}catch(Exception ex){
+//			
+//		}
 	}
 }

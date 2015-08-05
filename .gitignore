@@ -24,3 +24,7 @@ debug.txt
 
 # XCode workspace
 **/xcuserdata/*
+
+# Test-files generated stuff to ignore
+test-files/test-specific/htmlGenerator/**/*.pdf
+test-files/test-specific/htmlGenerator/**/*Html.html

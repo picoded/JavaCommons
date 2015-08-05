@@ -38,7 +38,7 @@ public class FormInputTemplates {
 		String labelValue = node.label();
 		String fieldValue = node.field();
 		if(!labelValue.isEmpty()){
-			sb.append("<"+HtmlTag.LABEL+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
+			sb.append("<"+HtmlTag.LABEL+" "+FormGenerator.getLabelClassString(node)+" "+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
 		}
 		
 		String inputClassString = FormGenerator.getInputClassString(node);
@@ -90,7 +90,7 @@ public class FormInputTemplates {
 		String labelValue = node.label();
 		String fieldValue = node.field();
 		if(!labelValue.isEmpty()){
-			sb.append("<"+HtmlTag.LABEL+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
+			sb.append("<"+HtmlTag.LABEL+" "+FormGenerator.getLabelClassString(node)+" "+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
 		}
 		
 		String inputClassString = FormGenerator.getInputClassString(node);

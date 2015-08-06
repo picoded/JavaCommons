@@ -14,8 +14,6 @@ public class PDFWrapperTemplates {
 		StringBuilder classBuilder = new StringBuilder(" class=\"pf_div");
 		FormWrapperTemplates.getWrapperClass(node,  classBuilder);
 		FormWrapperTemplates.getCustomClass(node,  classBuilder);
-//		FormInputTemplates.getInputClass(node,  classBuilder);
-//		FormInputTemplates.getLabelClass(node,  classBuilder);
 		classBuilder.append("\"");
 		
 		String classString = classBuilder.toString();

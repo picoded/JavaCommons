@@ -93,42 +93,6 @@ public class FormGenerator {
 		return finalNodeValue;
 	}
 	
-//	public static String getWrapperClassString(FormNode node){
-//		StringBuilder sb = new StringBuilder(" class=\"");
-//		
-//		if(node.containsKey(JsonKeys.WRAPPER_CLASS)){
-//			sb.append(node.getString(JsonKeys.WRAPPER_CLASS) + "\"");
-//		} else {
-//			sb.append("pf_"+node.getString(JsonKeys.TYPE)+"Class\"");
-//		}
-//		
-//		return sb.toString();
-//	}
-	
-//	public static String getLabelClassString(FormNode node){
-//		StringBuilder sb = new StringBuilder(" class=\"");
-//		
-//		if(node.containsKey(JsonKeys.LABEL_CLASS)){
-//			sb.append(node.getString(JsonKeys.LABEL_CLASS) + "\"");
-//		} else {
-//			sb.append("pf_labelClass\"");
-//		}
-//		
-//		return sb.toString();
-//	}
-	
-//	public static String getInputClassString(FormNode node){
-//		StringBuilder sb = new StringBuilder(" class=\"");
-//		
-//		if(node.containsKey(JsonKeys.INPUT_CLASS)){
-//			sb.append(node.getString(JsonKeys.INPUT_CLASS) + "\"");
-//		} else {
-//			sb.append("pf_inputClass\"");
-//		}
-//		
-//		return sb.toString();
-//	}
-	
 	public static String getWrapperCssString(FormNode node){
 		StringBuilder sb = new StringBuilder("");
 		

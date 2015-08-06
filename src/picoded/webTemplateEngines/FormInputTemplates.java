@@ -23,6 +23,7 @@ public class FormInputTemplates {
 		
 		StringBuilder sb = new StringBuilder("");
 		StringBuilder classBuilder = new StringBuilder(" class=\"pf_header");
+		getCustomClass(node, classBuilder);
 		getInputClass(node, classBuilder);
 		getLabelClass(node, classBuilder);
 		classBuilder.append("\"");
@@ -53,7 +54,6 @@ public class FormInputTemplates {
 		getCustomClass(node, classStringBuilder);
 		classStringBuilder.append("\"");
 		String inputClassString = classStringBuilder.toString();
-//		String inputClassString = FormGenerator.getInputClassString(node);
 		
 		String selectedOption = "";
 		if(!fieldValue.isEmpty()){
@@ -114,8 +114,7 @@ public class FormInputTemplates {
 		getCustomClass(node, classStringBuilder);
 		classStringBuilder.append("\"");
 		String inputClassString = classStringBuilder.toString();
-//		String inputClassString = FormGenerator.getInputClassString(node);
-		 
+		
 		sb.append("<"+HtmlTag.INPUT+""+inputClassString+" "+HtmlTag.TYPE+"=\"text\" ");
 		
 		//id/field and value elements

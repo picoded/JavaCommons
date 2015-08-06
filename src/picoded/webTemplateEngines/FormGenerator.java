@@ -81,16 +81,24 @@ public class FormGenerator {
 		String wrapperType = node.getString(JsonKeys.WRAPPER, HtmlTag.DIV);
 		
 		formWrappers = customFormWrapperTemplates.get(wrapperType).apply(node);
-		String formTextData = customFormInputTemplates.get(nodeType).apply(node);
-		
-		//get inner data for children
-		StringBuilder innerData = new StringBuilder("");
-		if(node.childCount() > 0){
-			innerData.append(applyTemplating(node.children()));
+		if(node.containsKey(JsonKeys.HTML_INJECTION)){
+			String rawHtml = node.getString(JsonKeys.HTML_INJECTION);
+			String finalNodeValue = formWrappers[0]+rawHtml+formWrappers[1];
+			return finalNodeValue;
+		}else{
+			String formTextData = customFormInputTemplates.get(nodeType).apply(node);
+			
+			//get inner data for children
+			StringBuilder innerData = new StringBuilder("");
+			if(node.childCount() > 0){
+				innerData.append(applyTemplating(node.children()));
+			}
+			
+			String finalNodeValue = formWrappers[0]+formTextData+innerData.toString()+formWrappers[1];
+			return finalNodeValue;
 		}
 		
-		String finalNodeValue = formWrappers[0]+formTextData+innerData.toString()+formWrappers[1];
-		return finalNodeValue;
+		
 	}
 	
 	public static String getWrapperCssString(FormNode node){

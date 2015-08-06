@@ -15,87 +15,137 @@ import picoded.struct.GenericConvertMap;
 ///
 /// @TODO Change class extension to use AbstractMapDecorator, so that it proxy the valeus from the soruce instead
 public class FormNode extends HashMap<String, Object> implements GenericConvertMap<String, Object> {
-    
-    // Utility helper functions
-    //------------------------------------------------------------------------
-    
-    /// Helps escape html dom parameter quotes, in an "optimal" way
-    ///
-    /// @params {String}   val   - The string to be quote escaped
-    ///
-    /// @returns {String}  - The quote escaped value, with either single or double quotes, or quotes with escaped quotes
-    protected static String escapeParameterQuote( String val ) {
-        boolean hasSingleQuote = val.contains("\'");
-        boolean hasDoubleQuote = val.contains("\"");
-        
-        if( hasSingleQuote && hasDoubleQuote ) {
-        	//No choice, escape double quotes, and use them
-        	return "\""+val.replaceAll("\\\\", "\\\\").replaceAll("\"","\\\"")+"\"";
-        } else if( hasDoubleQuote ) {
-        	return "\'"+val+"\'";
-        } else if( hasSingleQuote ) {
-        	return "\""+val+"\"";
-        } //else { //quoteless, use single quotes
-        return "\'"+val+"\'";
-    }
+	
+	//
+	// Utility helper functions
+	//
+	// Consists mainly of helper functions used by the various interface
+	// implmentation for Html string generation
+	//
+	//------------------------------------------------------------------------
+	
+	/// Helps escape html dom parameter quotes, in an "optimal" way
+	///
+	/// @params {String}   val   - The string to be quote escaped
+	///
+	/// @returns {String}  - The quote escaped value, with either single or double quotes, or quotes with escaped quotes
+	protected static String escapeParameterQuote( String val ) {
+		boolean hasSingleQuote = val.contains("\'");
+		boolean hasDoubleQuote = val.contains("\"");
+		
+		if( hasSingleQuote && hasDoubleQuote ) {
+			//No choice, escape double quotes, and use them
+			return "\""+val.replaceAll("\\\\", "\\\\").replaceAll("\"","\\\"")+"\"";
+		} else if( hasDoubleQuote ) {
+			return "\'"+val+"\'";
+		} else if( hasSingleQuote ) {
+			return "\""+val+"\"";
+		} //else { //quoteless, use single quotes
+		return "\'"+val+"\'";
+	}
 
-    /// Generates a HTML node, with its prefix and suffix. Using its type, and parameters
-    ///
-    /// @params {String}              nodeType            - HTML DOM type to generate, such as DIV, or INPUT
-    /// @params {Map<String,Object>}  parameterMap        - Parameters map to input into the DOM
-    /// @params {String}              rawParameterString  - Additional raw parameters to be added (optional)
-    ///
-    /// @returns {StringBuilder[2]}  - A pair of StringBuilder representing the prefix and suffix nodes
+	/// Generates a HTML node, with its prefix and suffix. Using its type, and parameters
+	///
+	/// @params {String}              nodeType            - HTML DOM type to generate, such as DIV, or INPUT
+	/// @params {Map<String,Object>}  parameterMap        - Parameters map to input into the DOM
+	/// @params {String}              rawParameterString  - Additional raw parameters to be added (optional)
+	///
+	/// @returns {StringBuilder[2]}  - A pair of StringBuilder representing the prefix and suffix nodes
 	public static StringBuilder[] htmlNodeGenerator( String nodeType, Map<String,String> parameterMap, String rawParameterString ) {
-	    StringBuilder domNode = new StringBuilder("<"+nodeType);
-    
+		StringBuilder domNode = new StringBuilder("<"+nodeType);
+		
 		if( parameterMap != null ) {
-			for (Map.Entry<String, String> entry : parameterMap.entrySet()) {
-				domNode
-					.append(" ")
-					.append(entry.getKey())
-					.append("=")
-					.append( escapeParameterQuote( GenericConvert.toString(entry.getValue(), "") ) );
+		for (Map.Entry<String, String> entry : parameterMap.entrySet()) {
+				domNode //
+					.append(" ") //
+					.append(entry.getKey()) //
+					.append("=") //
+					.append( escapeParameterQuote( GenericConvert.toString(entry.getValue(), "") ) ); //
 			}
 		}
-
+		
 		if( rawParameterString != null && rawParameterString.length() > 0 ) {
 			domNode.append(" ").append(rawParameterString);
 		}
 		
 		domNode.append(">");
-		
 		return new StringBuilder[] { domNode,  new StringBuilder("</"+nodeType+">") };
 	}
-
-    
-    private Map<String, Object> _prefilledData = null;
 	
-	private List<FormNode> _children = null;
+	//
+	// Constructor reliant vars
+	//
+	//------------------------------------------------------------------------
 	
-	public FormNode(){
-		_children = new ArrayList<FormNode>();
-		_prefilledData = new HashMap<String, Object>();
-	}
+	/// List of children FormNode to be generated / used?
+	protected List<FormNode> _children = new ArrayList<FormNode>();
 	
-	public FormNode(Map<String, Object> mapObject, Map<String, Object> prefilledJSONData){
-		_children = new ArrayList<FormNode>();
-		FormNode newNode = innerConstructor(mapObject, prefilledJSONData);
-		this.putAll(newNode);
-		this.setChildren(newNode.children());
-	}
+	/// List of input data values, used to generate with multiple input fields
+	protected List< Map<String,Object> > _inputValues = new ArrayList<Map<String,Object>> ();
 	
+	//
+	// Constructor
+	//
+	//------------------------------------------------------------------------
+	
+	/// Blank constructor, useful for unit testing
+	public FormNode() { }
+	
+	/// Internal reuse constructor, used to load the very config values
+	///
+	/// @params {Map<String,Object>}  mapObject       - The map object, used to generate this nodes defination
+	/// @params {List<Map<String,Object>>} inputData  - The provided input data values
 	@SuppressWarnings("unchecked")
-	public static List<FormNode> createFromList(List<Object> listObject, Map<String, Object> prefilledJSONData){
-		List<FormNode> formNodes = new ArrayList<FormNode>();
+	private void innerConstructor(Map<String, Object> mapObject, List<Map<String,Object>> inputData){
+		// Fill up stored map
+		this.putAll( mapObject );
 		
-		for(Object obj:listObject){
-			Map<String, Object> nodeMapObject = (Map<String, Object>)obj;
-			formNodes.add(new FormNode(nodeMapObject, prefilledJSONData));
+		// Put in the inputData list
+		this._inputValues = inputData;
+		
+		if( this.containsKey("children") ) {
+			Object childrenRaw = this.get("children");
+			this.remove("children");
+			
+			if( !(childrenRaw instanceof List) ) {
+				throw new IllegalArgumentException("'children' parameter found in defination was not a List: "+childrenRaw);
+			}
+			
+			// Iterate each child object
+			for(Object child : ((List<Object>)childrenRaw)) {
+				
+				if( !(child instanceof Map) ) {
+					throw new IllegalArgumentException("'children' List item found in defination was not a Map: "+child);
+				}
+				
+				_children.add( new FormNode( (Map<String,Object>)child, inputData ) );
+			}
 		}
-		
-		return formNodes;
 	}
+	
+	/// Constructor varient using array of input data
+	///
+	/// @params {Map<String,Object>}  mapObject       - The map object, used to generate this nodes defination
+	/// @params {List<Map<String,Object>>} inputData  - The provided input data values
+	public FormNode(Map<String, Object> mapObject, List<Map<String,Object>> inputData) {
+		innerConstructor(mapObject, inputData);
+	}
+	
+	/// Constructor using a single input data node
+	///
+	/// @params {Map<String,Object>}  mapObject       - The map object, used to generate this nodes defination
+	/// @params {Map<String,Object>}  inputData       - The provided input data values
+	public FormNode(Map<String, Object> mapObject, Map<String, Object> inputData){
+		List<Map<String,Object>> inputDataArr = new ArrayList<Map<String,Object>>();
+		inputDataArr.add(inputData);
+		innerConstructor(mapObject, inputDataArr);
+	}
+	
+	//
+	// Variables access, and getter functions
+	//
+	//------------------------------------------------------------------------
+	
 	
 	public static List<FormNode> createFromJSONString(String jsonString, Map<String, Object> prefilledJSONData){
 		List<FormNode> formNodes = new ArrayList<FormNode>();
@@ -112,7 +162,7 @@ public class FormNode extends HashMap<String, Object> implements GenericConvertM
 	}
 	
 	public void setPrefilledData(Map<String, Object> prefilledJSONData){
-		_prefilledData = prefilledJSONData;
+		_inputValues.set(0,prefilledJSONData);
 	}
 	
 	public void setChildren(List<FormNode> children){
@@ -129,51 +179,14 @@ public class FormNode extends HashMap<String, Object> implements GenericConvertM
 	
 	public List<FormNode> children(){
 		return _children;
-		//return new ArrayList<HtmlNode>(_children); //possible change so caller doesnt get the actual list object
 	}
 	
 	public Object getDefaultValue(String fieldName){
-		if(_prefilledData != null && _prefilledData.containsKey(fieldName)){
-			return _prefilledData.get(fieldName);
+		if(_inputValues.get(0) != null && _inputValues.get(0).containsKey(fieldName)){
+			return _inputValues.get(0).get(fieldName);
 		}
 		
 		return null;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private FormNode innerConstructor(Map<String, Object> mapObject, Map<String, Object> prefilledJSONData){
-		FormNode formNode = new FormNode();
-		formNode.setPrefilledData(prefilledJSONData);
-		formNode.putAll(mapObject); //changed from this to formNode
-		
-		//the commented out code is the "safe" version of the recursion loop
-		
-//		if(mapObject.containsKey("children")){
-//			formNode.remove("children");
-//			
-//			Object children = mapObject.get("children");
-//			if(children instanceof List){
-//				List<Object> childrenList = (List<Object>)children;
-//				for(Object obj:childrenList){
-//					if(obj instanceof Map){
-//						Map<String, Object> childObject = (Map<String, Object>)obj;
-//						String type = (String)childObject.get("type");
-//						formNode.addChild(innerConstructor(childObject, prefilledJSONData));
-//					}
-//				}
-//			}
-//		}
-		
-		if(mapObject.containsKey("children")){
-			formNode.remove("children");
-			List<Object> children = (List<Object>)mapObject.get("children");
-			for(Object child:children){
-				Map<String, Object> nodeObj = (Map<String, Object>)child;
-				formNode.addChild(innerConstructor(nodeObj, prefilledJSONData));
-			}
-		}
-		
-		return formNode;
 	}
 	
 	//helper functions
@@ -185,4 +198,27 @@ public class FormNode extends HashMap<String, Object> implements GenericConvertM
 	public String field(){
 		return this.containsKey(JsonKeys.FIELD) ? this.getString(JsonKeys.FIELD) : RegexUtils.removeAllNonAlphaNumeric(this.label()).toLowerCase();
 	}
+	
+	//
+	// To remove
+	//
+	//------------------------------------------------------------------------
+	
+	
+	@SuppressWarnings("unchecked")
+	public static List<FormNode> createFromList(List<Object> listObject, Map<String, Object> prefilledJSONData){
+		List<FormNode> formNodes = new ArrayList<FormNode>();
+		
+		for(Object obj:listObject){
+			Map<String, Object> nodeMapObject = (Map<String, Object>)obj;
+			formNodes.add(new FormNode(nodeMapObject, prefilledJSONData));
+		}
+		
+		return formNodes;
+	}
+	
+	
+	
+	
+	
 }

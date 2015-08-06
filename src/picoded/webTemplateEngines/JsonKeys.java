@@ -20,11 +20,9 @@ public class JsonKeys {
 	public static String PDFDISPLAY_CLASS = "pdfDisplayClass";
 	public static String PDFOUTPUT_CLASS = "pdfOutputClass";
 	
-	
 	public static String WRAPPER_CSS = "wrapperCss";
 	public static String LABEL_CSS = "labelCss";
 	public static String INPUT_CSS = "inputCss";
-	
 	
 	public static String HTML_INJECTION = "rawHtml"; //can be a type/key in json
 }

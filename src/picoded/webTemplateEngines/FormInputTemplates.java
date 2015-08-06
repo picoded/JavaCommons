@@ -19,15 +19,18 @@ public class FormInputTemplates {
 	};
 	
 	protected static FormInputInterface header = (node)->{ 
-		String text = node.getString(JsonKeys.TEXT, "");
-		//CHANGE TITLE TO USE LABEL AS WELL
+		String text = node.getString(JsonKeys.LABEL, "");
 		
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder("");
+		StringBuilder classBuilder = new StringBuilder(" class=\"pf_header");
+		getCustomClass(node, classBuilder);
+		getInputClass(node, classBuilder);
+		getLabelClass(node, classBuilder);
+		classBuilder.append("\"");
 		
-		String inputClassString = FormGenerator.getInputClassString(node);
 		String inputCssString = FormGenerator.getInputCssString(node);
 		
-		sb.append("<h3"+inputClassString+inputCssString+">"+text+"</h3>\n");
+		sb.append("<h3"+classBuilder.toString() + inputCssString+">"+text+"</h3>\n");
 		
 		return sb.toString(); 
 	};
@@ -39,10 +42,18 @@ public class FormInputTemplates {
 		String labelValue = node.label();
 		String fieldValue = node.field();
 		if(!labelValue.isEmpty()){
-			sb.append("<"+HtmlTag.LABEL+" "+FormGenerator.getLabelClassString(node)+" "+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
+			StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
+			getLabelClass(node, labelClassBuilder);
+			labelClassBuilder.append("\"");
+			
+			sb.append("<"+HtmlTag.LABEL+labelClassBuilder.toString()+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
 		}
 		
-		String inputClassString = FormGenerator.getInputClassString(node);
+		StringBuilder classStringBuilder = new StringBuilder(" class=\"pf_select");
+		getInputClass(node, classStringBuilder);
+		getCustomClass(node, classStringBuilder);
+		classStringBuilder.append("\"");
+		String inputClassString = classStringBuilder.toString();
 		
 		String selectedOption = "";
 		if(!fieldValue.isEmpty()){
@@ -91,11 +102,19 @@ public class FormInputTemplates {
 		String labelValue = node.label();
 		String fieldValue = node.field();
 		if(!labelValue.isEmpty()){
-			sb.append("<"+HtmlTag.LABEL+" "+FormGenerator.getLabelClassString(node)+" "+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
+			StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
+			getLabelClass(node, labelClassBuilder);
+			labelClassBuilder.append("\"");
+			
+			sb.append("<"+HtmlTag.LABEL+" "+labelClassBuilder.toString()+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
 		}
 		
-		String inputClassString = FormGenerator.getInputClassString(node);
-		 
+		StringBuilder classStringBuilder = new StringBuilder(" class=\"pf_inputText");
+		getInputClass(node, classStringBuilder);
+		getCustomClass(node, classStringBuilder);
+		classStringBuilder.append("\"");
+		String inputClassString = classStringBuilder.toString();
+		
 		sb.append("<"+HtmlTag.INPUT+""+inputClassString+" "+HtmlTag.TYPE+"=\"text\" ");
 		
 		//id/field and value elements
@@ -113,6 +132,58 @@ public class FormInputTemplates {
 		
 		return sb.toString();
 	};
+	
+	protected static void getInputClass(FormNode node, StringBuilder sb){
+		if(node.containsKey(JsonKeys.INPUT_CLASS)){
+			String wrapperClass = node.getString(JsonKeys.INPUT_CLASS);
+			String[] wrapperClassSplit = null;
+			if(wrapperClass.contains(" ")){
+				wrapperClassSplit = wrapperClass.split(" ");
+				for(String str:wrapperClassSplit){
+					if(!str.equals(" ")){
+						sb.append(" "+str);
+					}
+				}
+			}else{
+				sb.append(" "+wrapperClass);
+			}
+		}
+	}
+	
+	protected static void getCustomClass(FormNode node, StringBuilder sb){
+		if(node.containsKey(JsonKeys.CUSTOMCLASS)){
+			String wrapperClass = node.getString(JsonKeys.CUSTOMCLASS);
+			String[] wrapperClassSplit = null;
+			if(wrapperClass.contains(" ")){
+				wrapperClassSplit = wrapperClass.split(" ");
+				for(String str:wrapperClassSplit){
+					if(!str.equals(" ")){
+						sb.append(" pf_w"+str);
+					}
+				}
+			}else{
+				sb.append(" pf_"+wrapperClass);
+			}
+		}
+	}
+	
+	protected static void getLabelClass(FormNode node, StringBuilder sb){
+		if(node.containsKey(JsonKeys.LABEL_CLASS)){
+			String wrapperClass = node.getString(JsonKeys.LABEL_CLASS);
+			String[] wrapperClassSplit = null;
+			if(wrapperClass.contains(" ")){
+				wrapperClassSplit = wrapperClass.split(" ");
+				for(String str:wrapperClassSplit){
+					if(!str.equals(" ")){
+						sb.append(" pf_w"+str);
+					}
+				}
+			}else{
+				sb.append(" pf_"+wrapperClass);
+			}
+		}
+	}
+	
 	
 	protected static Map<String, FormInputInterface> defaultInputTemplates() {
 		Map<String, FormInputInterface> defaultTemplates = new HashMap<String, FormInputInterface>();

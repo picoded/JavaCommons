@@ -20,11 +20,16 @@ public class PDFInputTemplates {
 	};
 	
 	protected static FormInputInterface header_pdf = (node)->{ 
-		String text = node.getString(JsonKeys.TEXT, "");
+		String text = node.getString(JsonKeys.LABEL, "");
 		
 		StringBuilder sb = new StringBuilder();
 		
-		String inputClassString = FormGenerator.getInputClassString(node);
+		StringBuilder classBuilder = new StringBuilder(" class=\"pf_header");
+		FormInputTemplates.getCustomClass(node, classBuilder);
+		FormInputTemplates.getInputClass(node, classBuilder);
+		FormInputTemplates.getLabelClass(node, classBuilder);
+		classBuilder.append("\"");
+		String inputClassString = classBuilder.toString();
 		String inputCssString = FormGenerator.getInputCssString(node);
 		
 		sb.append("<h3"+inputClassString+inputCssString+">"+text+"</h3>\n");
@@ -35,29 +40,42 @@ public class PDFInputTemplates {
 	protected static FormInputInterface default_pdf = (node)->{
 		StringBuilder sb = new StringBuilder();
 		
-		String labelClassName = getLabelClassName(node);
-		String pdfOutputClassName = getPdfOutputClassName(node);
+		StringBuilder pdfOutputClassBuilder = new StringBuilder(" class=\"pf_pdfOutput");
+		getPDFOutputClass(node, pdfOutputClassBuilder);
+		pdfOutputClassBuilder.append("\"");
 		
 		String labelString = node.label();
 		if(!labelString.isEmpty()){
-			sb.append("<"+HtmlTag.DIV+" class=\""+labelClassName+"\">"+labelString+"</"+HtmlTag.DIV+">");
+			StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
+			FormInputTemplates.getLabelClass(node,  labelClassBuilder);
+			labelClassBuilder.append("\"");
+			sb.append("<"+HtmlTag.DIV+labelClassBuilder.toString()+">"+labelString+"</"+HtmlTag.DIV+">");
 		}
 		
 		String fieldName = node.field();
 		if(!fieldName.isEmpty()){
 			String fieldValue = (String)node.getDefaultValue(fieldName);
 			if(!StringUtils.isNullOrEmpty(fieldValue)){
-				sb.append("<"+HtmlTag.DIV+" class=\""+pdfOutputClassName+"\">"+fieldValue+"</"+HtmlTag.DIV+">");
+				sb.append("<"+HtmlTag.DIV+pdfOutputClassBuilder.toString()+">"+fieldValue+"</"+HtmlTag.DIV+">");
 			}
 		}
 		return sb.toString();
 	};
 	
-	private static String getLabelClassName(FormNode node){
-		if(node.containsKey("labelClass")){
-			return node.getString("labelClass");
-		}else{
-			return "pf_labelClass";
+	protected static void getPDFOutputClass(FormNode node, StringBuilder sb){
+		if(node.containsKey(JsonKeys.PDFOUTPUT_CLASS)){
+			String wrapperClass = node.getString(JsonKeys.PDFOUTPUT_CLASS);
+			String[] wrapperClassSplit = null;
+			if(wrapperClass.contains(" ")){
+				wrapperClassSplit = wrapperClass.split(" ");
+				for(String str:wrapperClassSplit){
+					if(!str.equals(" ")){
+						sb.append(" "+str);
+					}
+				}
+			}else{
+				sb.append(" "+wrapperClass);
+			}
 		}
 	}
 	

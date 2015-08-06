@@ -26,8 +26,7 @@ public class FormWrapperTemplates {
 		getCustomClass(node, classString);
 		
 		classString.append("\"");
-
-		//String classString = FormGenerator.getWrapperClassString(node);
+		
 		String cssString = FormGenerator.getWrapperCssString(node);
 		prefix.append("<"+HtmlTag.DIV+""+classString+cssString+">\n");	 
 		

@@ -133,6 +133,13 @@ public class FormInputTemplates {
 		return sb.toString();
 	};
 	
+	protected static FormInputInterface raw_html = (node)->{
+		StringBuilder sb = new StringBuilder();
+		sb.append(node.getString(JsonKeys.HTML_INJECTION));
+		
+		return sb.toString();
+	};
+	
 	protected static void getInputClass(FormNode node, StringBuilder sb){
 		if(node.containsKey(JsonKeys.INPUT_CLASS)){
 			String wrapperClass = node.getString(JsonKeys.INPUT_CLASS);
@@ -158,7 +165,7 @@ public class FormInputTemplates {
 				wrapperClassSplit = wrapperClass.split(" ");
 				for(String str:wrapperClassSplit){
 					if(!str.equals(" ")){
-						sb.append(" pf_w"+str);
+						sb.append(" pf_"+str);
 					}
 				}
 			}else{
@@ -175,7 +182,7 @@ public class FormInputTemplates {
 				wrapperClassSplit = wrapperClass.split(" ");
 				for(String str:wrapperClassSplit){
 					if(!str.equals(" ")){
-						sb.append(" pf_w"+str);
+						sb.append(" pf_"+str);
 					}
 				}
 			}else{
@@ -184,13 +191,13 @@ public class FormInputTemplates {
 		}
 	}
 	
-	
 	protected static Map<String, FormInputInterface> defaultInputTemplates() {
 		Map<String, FormInputInterface> defaultTemplates = new HashMap<String, FormInputInterface>();
-		defaultTemplates.put("title", FormInputTemplates.header);
-		defaultTemplates.put("dropdown", FormInputTemplates.select);
-		defaultTemplates.put("text", FormInputTemplates.input_text);
-		defaultTemplates.put("div", FormInputTemplates.div);
+		defaultTemplates.put(JsonKeys.TITLE, FormInputTemplates.header);
+		defaultTemplates.put(JsonKeys.DROPDOWN, FormInputTemplates.select);
+		defaultTemplates.put(JsonKeys.TEXT, FormInputTemplates.input_text);
+		defaultTemplates.put(JsonKeys.DIV, FormInputTemplates.div);
+		defaultTemplates.put(JsonKeys.HTML_INJECTION, FormInputTemplates.raw_html);
 		
 		return defaultTemplates;
 	}

@@ -205,19 +205,19 @@ public class FormGenerator_test {
 		}
 		
 		//pdf section
-		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(formNodes);
-		File pdfReadyHtmlFile = new File("./test-files/test-specific/htmlGenerator/simplePDFHtml.html");
-		
-		try{
-			FileWriter writer = new FileWriter(pdfReadyHtmlFile);
-			writer.write(pdfReadyHtmlString);
-			writer.flush();
-			writer.close();
-		}catch(Exception ex){
-			
-		}
-		
-		String pdfFileString = "./test-files/test-specific/htmlGenerator/simplePDF.pdf";
-		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
+//		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(formNodes);
+//		File pdfReadyHtmlFile = new File("./test-files/test-specific/htmlGenerator/simplePDFHtml.html");
+//		
+//		try{
+//			FileWriter writer = new FileWriter(pdfReadyHtmlFile);
+//			writer.write(pdfReadyHtmlString);
+//			writer.flush();
+//			writer.close();
+//		}catch(Exception ex){
+//			
+//		}
+//		
+//		String pdfFileString = "./test-files/test-specific/htmlGenerator/simplePDF.pdf";
+//		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
 }

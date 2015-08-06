@@ -35,14 +35,6 @@ public class PDFWrapperTemplates {
 		return prefixSuffix;
 	};
 	
-	private static String getWrapperClassName(FormNode node){
-		if(node.containsKey("wrapperClass")){
-			return node.getString("wrapperClass");
-		}else{
-			return "pf_wrapperClass";
-		}
-	}
-	
 	public static Map<String, FormWrapperInterface> defaultPDFWrapperTemplates(){
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();
 		

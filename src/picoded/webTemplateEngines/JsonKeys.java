@@ -2,7 +2,9 @@ package picoded.webTemplateEngines;
 
 public class JsonKeys {
 	public static String TYPE = "type";
-//	public static String TEXT = "text";
+	public static String DIV = "div";
+	public static String TEXT = "text";
+	public static String TITLE = "title";
 	public static String SUBNODES = "subnodes";
 	public static String DROPDOWN = "dropdown";
 	public static String FIELD = "field";
@@ -22,4 +24,7 @@ public class JsonKeys {
 	public static String WRAPPER_CSS = "wrapperCss";
 	public static String LABEL_CSS = "labelCss";
 	public static String INPUT_CSS = "inputCss";
+	
+	
+	public static String HTML_INJECTION = "rawHtml"; //can be a type/key in json
 }

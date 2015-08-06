@@ -167,7 +167,7 @@ public class FormGenerator_test {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void testSimpleJSONObject(){
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/simpleJSONObject.js");
 		assertTrue(jsonObjectFile.canRead());
@@ -218,6 +218,52 @@ public class FormGenerator_test {
 		}
 		
 		String pdfFileString = "./test-files/test-specific/htmlGenerator/simplePDF.pdf";
+		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
+	}
+	
+	@Test
+	public void testDropdownWithOthers(){
+		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testDropDownOthers.js");
+		assertTrue(jsonObjectFile.canRead());
+		String jsonFileString = "";
+		try{
+			jsonFileString = FileUtils.readFileToString(jsonObjectFile, Charset.defaultCharset());
+		} catch (Exception ex){
+		}
+		Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
+		assertNotNull(jsonMap);
+		
+		Map<String, Object> dropdownData = new HashMap<String, Object>();
+		dropdownData.put("natDropDown", "Malay");
+		
+		List<FormNode> formNodes = FormNode.createFromJSONString(jsonFileString, dropdownData);
+		
+		String htmlVal = testObj.applyTemplating(formNodes);
+		File htmlFile = new File("./test-files/test-specific/htmlGenerator/dropdownOthers.html");
+		
+		try{
+			FileWriter writer = new FileWriter(htmlFile);
+			writer.write(htmlVal);
+			writer.flush();
+			writer.close();
+		}catch(Exception ex){
+			
+		}
+		
+		//pdf section
+		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(formNodes);
+		File pdfReadyHtmlFile = new File("./test-files/test-specific/htmlGenerator/dropdownWithOthersPDF.html");
+		
+		try{
+			FileWriter writer = new FileWriter(pdfReadyHtmlFile);
+			writer.write(pdfReadyHtmlString);
+			writer.flush();
+			writer.close();
+		}catch(Exception ex){
+			
+		}
+		
+		String pdfFileString = "./test-files/test-specific/htmlGenerator/dropdownWithOthersPDF.pdf";
 		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
 }

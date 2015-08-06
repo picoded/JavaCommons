@@ -158,6 +158,72 @@ public class FormInputTemplates {
 		}
 	};
 	
+	@SuppressWarnings("unchecked")
+	protected static FormInputInterface dropdownWithOthers = (node)->{
+		StringBuilder sb = new StringBuilder();
+		
+		if(node.containsKey(JsonKeys.HTML_INJECTION)){
+			sb.append(node.getString(JsonKeys.HTML_INJECTION));
+			return sb.toString();
+		}else{
+			String labelValue = node.label();
+			String fieldValue = node.field();
+			if(!labelValue.isEmpty()){
+				StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
+				getLabelClass(node, labelClassBuilder);
+				labelClassBuilder.append("\"");
+				
+				sb.append("<"+HtmlTag.LABEL+labelClassBuilder.toString()+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
+			}
+			
+			StringBuilder classStringBuilder = new StringBuilder(" class=\"pf_select");
+			getInputClass(node, classStringBuilder);
+			getCustomClass(node, classStringBuilder);
+			classStringBuilder.append("\"");
+			String inputClassString = classStringBuilder.toString();
+			
+			String selectedOption = "";
+			if(!fieldValue.isEmpty()){
+				String fieldHtmlString = " "+HtmlTag.ID+"=\""+fieldValue+"\"";
+				sb.append("<"+HtmlTag.SELECT+""+inputClassString+fieldHtmlString+">\n");
+				selectedOption = (String)node.getDefaultValue(fieldValue);
+				if(selectedOption != null){
+					selectedOption = RegexUtils.removeAllNonAlphaNumeric(selectedOption).toLowerCase();
+				}
+			}
+			
+			if(node.containsKey(JsonKeys.OPTIONS)){
+				Object dropDownObject = node.get(JsonKeys.OPTIONS);
+				
+				//if what is passed in is a Map, assume it is LinkedHashMap, to maintain insertion order
+				if(dropDownObject instanceof HashMap<?, ?>){
+					LinkedHashMap<String, String> dropDownListOptions = (LinkedHashMap<String, String>)dropDownObject;
+					for(String key:dropDownListOptions.keySet()){
+						sb.append("<"+HtmlTag.OPTION+" "+HtmlTag.VALUE+"=\""+key+"\"");
+						if(key.equals(selectedOption)){
+							sb.append(" "+HtmlTag.SELECTED+"=\"selected\"");
+						}
+						sb.append(">"+dropDownListOptions.get(key)+"</"+HtmlTag.OPTION+">\n");
+					}
+				} else if(dropDownObject instanceof List<?>){
+					List<String> dropDownOptions = (List<String>)dropDownObject;
+					for(String str:dropDownOptions){
+						String key = RegexUtils.removeAllNonAlphaNumeric(str).toLowerCase();
+						sb.append("<"+HtmlTag.OPTION+" "+HtmlTag.VALUE+"=\""+key+"\"");
+						if(key.equals(selectedOption)){
+							sb.append(" "+HtmlTag.SELECTED+"=\"selected\"");
+						}
+						sb.append(">"+str+"</"+HtmlTag.OPTION+">\n");
+					}
+				}
+			}
+			
+			sb.append("</"+HtmlTag.SELECT+">\n");
+			
+			return sb.toString();
+		}
+	};
+	
 	protected static FormInputInterface raw_html = (node)->{
 		StringBuilder sb = new StringBuilder();
 		sb.append(node.getString(JsonKeys.HTML_INJECTION));
@@ -223,6 +289,7 @@ public class FormInputTemplates {
 		defaultTemplates.put(JsonKeys.TEXT, FormInputTemplates.input_text);
 		defaultTemplates.put(JsonKeys.DIV, FormInputTemplates.div);
 		defaultTemplates.put(JsonKeys.HTML_INJECTION, FormInputTemplates.raw_html);
+		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, dropdownWithOthers);
 		
 		return defaultTemplates;
 	}

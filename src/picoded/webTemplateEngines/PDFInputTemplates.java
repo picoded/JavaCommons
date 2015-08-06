@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import picoded.conv.RegexUtils;
 
@@ -62,6 +63,59 @@ public class PDFInputTemplates {
 		return sb.toString();
 	};
 	
+	@SuppressWarnings("unchecked")
+	protected static FormInputInterface dropdownWithOthers = (node)->{
+		StringBuilder sb = new StringBuilder();
+		
+		StringBuilder pdfOutputClassBuilder = new StringBuilder(" class=\"pf_pdfOutput");
+		getPDFOutputClass(node, pdfOutputClassBuilder);
+		pdfOutputClassBuilder.append("\"");
+		
+		String labelString = node.label();
+		if(!labelString.isEmpty()){
+			StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
+			FormInputTemplates.getLabelClass(node,  labelClassBuilder);
+			labelClassBuilder.append("\"");
+			sb.append("<"+HtmlTag.DIV+labelClassBuilder.toString()+">"+labelString+"</"+HtmlTag.DIV+">");
+		}
+		
+		String fieldName = node.field();
+		if(!fieldName.isEmpty()){
+			String fieldValue = (String)node.getDefaultValue(fieldName);
+//			String othersOption = node.getString(JsonKeys.OTHERS_OPTION);
+			
+			if(node.containsKey(JsonKeys.OPTIONS)){
+				Object dropDownObject = node.get(JsonKeys.OPTIONS);
+				
+				//if what is passed in is a Map, assume it is LinkedHashMap, to maintain insertion order
+				if(dropDownObject instanceof HashMap<?, ?>){
+					LinkedHashMap<String, String> dropDownListOptions = (LinkedHashMap<String, String>)dropDownObject;
+					Set<String> keys = dropDownListOptions.keySet();
+					if(keys.contains(fieldValue.toLowerCase())){
+						sb.append("<"+HtmlTag.DIV+pdfOutputClassBuilder.toString()+">"+dropDownListOptions.get(fieldValue.toLowerCase())+"</"+HtmlTag.DIV+">");
+					}else{
+						sb.append("<"+HtmlTag.DIV+pdfOutputClassBuilder.toString()+">Others: "+fieldValue+"</"+HtmlTag.DIV+">");
+					}
+				}else if(dropDownObject instanceof List<?>){
+					List<String> dropDownOptions = (List<String>)dropDownObject;
+					boolean valueFound = false;
+					for(String str:dropDownOptions){
+						String key = RegexUtils.removeAllNonAlphaNumeric(str).toLowerCase();
+						if(key.equals(fieldValue.toLowerCase())){
+							sb.append("<"+HtmlTag.DIV+pdfOutputClassBuilder.toString()+">"+str+"</"+HtmlTag.DIV+">");
+							valueFound = true;
+							break;
+						}
+					}
+					if(!valueFound){
+						sb.append("<"+HtmlTag.DIV+pdfOutputClassBuilder.toString()+">Others: "+fieldValue+"</"+HtmlTag.DIV+">");
+					}
+				}
+			}
+		}
+		return sb.toString();
+	};
+	
 	protected static FormInputInterface rawHtml_pdf = (node)->{
 		StringBuilder sb = new StringBuilder();
 		sb.append(node.getString(JsonKeys.HTML_INJECTION));
@@ -101,7 +155,7 @@ public class PDFInputTemplates {
 		defaultTemplates.put("div", div_pdf);
 		defaultTemplates.put("title", header_pdf);
 		defaultTemplates.put("rawHtml", rawHtml_pdf);
-	
+		defaultTemplates.put("dropdownWithOthers", dropdownWithOthers);
 		
 		return defaultTemplates;
 	}

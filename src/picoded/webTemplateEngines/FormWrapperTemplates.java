@@ -3,14 +3,16 @@ package picoded.webTemplateEngines;
 import java.util.HashMap;
 import java.util.Map;
 
+/// FormWrapperTemplates
+///
+/// Default implmentation of various FormWrapperInterface used in FormGenerator.
+///
 public class FormWrapperTemplates {
 	
-	//TODO
-	/*
-	 * raw wrapper to inject raw html
-	 */
-	
-	protected static FormWrapperInterface defaultWrapper = (node)->{
+	/// divWrapper
+    ///
+    /// Does a basic div wrapper
+	protected static FormWrapperInterface divWrapper = (node)->{
 		String[] prefixSuffix = new String[2];
 		
 		//generating prefix
@@ -80,7 +82,7 @@ public class FormWrapperTemplates {
 	protected static Map<String, FormWrapperInterface> defaultWrapperTemplates() {
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();
 		
-		defaultTemplates.put("div", FormWrapperTemplates.defaultWrapper);
+		defaultTemplates.put("div", FormWrapperTemplates.divWrapper);
 		defaultTemplates.put("none", FormWrapperTemplates.none);
 		
 		return defaultTemplates;

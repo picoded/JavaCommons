@@ -7,12 +7,69 @@ import java.util.Map;
 
 import picoded.conv.ConvertJSON;
 import picoded.conv.RegexUtils;
+import picoded.conv.GenericConvert;
 import picoded.struct.GenericConvertMap;
 
-//may contain child tags, hence , the list of HtmlNodes
+/// FormNode serves as a map accessor to the form defination structure,
+/// with various utility functions, for Wrapper, and Input interface writers
+///
+/// @TODO Change class extension to use AbstractMapDecorator, so that it proxy the valeus from the soruce instead
 public class FormNode extends HashMap<String, Object> implements GenericConvertMap<String, Object> {
-	static final long serialVersionUID = 1L;
-	private Map<String, Object> _prefilledData = null;
+    
+    // Utility helper functions
+    //------------------------------------------------------------------------
+    
+    /// Helps escape html dom parameter quotes, in an "optimal" way
+    ///
+    /// @params {String}   val   - The string to be quote escaped
+    ///
+    /// @returns {String}  - The quote escaped value, with either single or double quotes, or quotes with escaped quotes
+    protected static String escapeParameterQuote( String val ) {
+        boolean hasSingleQuote = val.contains("\'");
+        boolean hasDoubleQuote = val.contains("\"");
+        
+        if( hasSingleQuote && hasDoubleQuote ) {
+        	//No choice, escape double quotes, and use them
+        	return "\""+val.replaceAll("\\\\", "\\\\").replaceAll("\"","\\\"")+"\"";
+        } else if( hasDoubleQuote ) {
+        	return "\'"+val+"\'";
+        } else if( hasSingleQuote ) {
+        	return "\""+val+"\"";
+        } //else { //quoteless, use single quotes
+        return "\'"+val+"\'";
+    }
+
+    /// Generates a HTML node, with its prefix and suffix. Using its type, and parameters
+    ///
+    /// @params {String}              nodeType            - HTML DOM type to generate, such as DIV, or INPUT
+    /// @params {Map<String,Object>}  parameterMap        - Parameters map to input into the DOM
+    /// @params {String}              rawParameterString  - Additional raw parameters to be added (optional)
+    ///
+    /// @returns {StringBuilder[2]}  - A pair of StringBuilder representing the prefix and suffix nodes
+	public static StringBuilder[] htmlNodeGenerator( String nodeType, Map<String,String> parameterMap, String rawParameterString ) {
+	    StringBuilder domNode = new StringBuilder("<"+nodeType);
+    
+		if( parameterMap != null ) {
+			for (Map.Entry<String, String> entry : parameterMap.entrySet()) {
+				domNode
+					.append(" ")
+					.append(entry.getKey())
+					.append("=")
+					.append( escapeParameterQuote( GenericConvert.toString(entry.getValue(), "") ) );
+			}
+		}
+
+		if( rawParameterString != null && rawParameterString.length() > 0 ) {
+			domNode.append(" ").append(rawParameterString);
+		}
+		
+		domNode.append(">");
+		
+		return new StringBuilder[] { domNode,  new StringBuilder("</"+nodeType+">") };
+	}
+
+    
+    private Map<String, Object> _prefilledData = null;
 	
 	private List<FormNode> _children = null;
 	

@@ -17,11 +17,13 @@ public class FormWrapperTemplates {
 		StringBuilder prefix = new StringBuilder();
 		
 		//new class string goodness
-		StringBuilder classString = new StringBuilder("class=\"pf_div");
+		StringBuilder classString = new StringBuilder(" class=\"pf_div");
 		
 		//put into function which takes in a stringbuilder
 		getWrapperClass(node, classString);
 		getCustomClass(node, classString);
+		
+		classString.append("\"");
 
 		//String classString = FormGenerator.getWrapperClassString(node);
 		String cssString = FormGenerator.getWrapperCssString(node);

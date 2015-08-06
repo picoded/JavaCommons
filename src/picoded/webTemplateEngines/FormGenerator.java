@@ -92,10 +92,11 @@ public class FormGenerator {
 			StringBuilder innerData = new StringBuilder("");
 			if(node.childCount() > 0){
 				innerData.append("<div class=\"pf_childDiv");
-				innerData.append(getChildClass(node));
-				innerData.append("\">");
+				getCustomClass(node, innerData, JsonKeys.CUSTOMCLASS, "pfc_");
+				getCustomClass(node, innerData, JsonKeys.CHILD_CLASS, "");
+				innerData.append("\">\n");
 				innerData.append(applyTemplating(node.children()));
-				innerData.append("</div>");
+				innerData.append("</div>\n");
 			}
 			
 			String finalNodeValue = formWrappers[0]+formTextData+innerData.toString()+formWrappers[1];
@@ -105,24 +106,73 @@ public class FormGenerator {
 		
 	}
 	
-	public String getChildClass(FormNode node){
-		StringBuilder sb = new StringBuilder();
-		if(node.containsKey(JsonKeys.CHILD_CLASS)){
-			String childClass = node.getString(JsonKeys.CHILD_CLASS);
-			if(childClass.contains(" ")){
-				String[] childClassSplit = childClass.split(" ");
-				for(String str:childClassSplit){
+	public static void getCustomClass(FormNode node, StringBuilder sb, String jsonKey, String prefix){
+		if(node.containsKey(jsonKey)){
+			String wrapperClass = node.getString(jsonKey);
+			String[] wrapperClassSplit = null;
+			if(wrapperClass.contains(" ")){
+				wrapperClassSplit = wrapperClass.split(" ");
+				for(String str:wrapperClassSplit){
 					if(!str.equals(" ")){
-						sb.append(" "+str);
+						sb.append(" "+prefix+str);
 					}
 				}
 			}else{
-				sb.append(" "+childClass);
+				sb.append(" "+prefix+wrapperClass);
 			}
 		}
-		
-		return sb.toString();
 	}
+	
+//	public static void getSpecificClass(FormNode node, StringBuilder sb, String jsonKey){
+//		if(node.containsKey(jsonKey)){
+//			String wrapperClass = node.getString(jsonKey);
+//			String[] wrapperClassSplit = null;
+//			if(wrapperClass.contains(" ")){
+//				wrapperClassSplit = wrapperClass.split(" ");
+//				for(String str:wrapperClassSplit){
+//					if(!str.equals(" ")){
+//						sb.append(" "+str);
+//					}
+//				}
+//			}else{
+//				sb.append(" "+wrapperClass);
+//			}
+//		}
+//	}
+	
+//	public static void getChildClass(FormNode node, StringBuilder sb){
+//		if(node.containsKey(JsonKeys.CHILD_CLASS)){
+//			String wrapperClass = node.getString(JsonKeys.CHILD_CLASS);
+//			String[] wrapperClassSplit = null;
+//			if(wrapperClass.contains(" ")){
+//				wrapperClassSplit = wrapperClass.split(" ");
+//				for(String str:wrapperClassSplit){
+//					if(!str.equals(" ")){
+//						sb.append(" "+str);
+//					}
+//				}
+//			}else{
+//				sb.append(" "+wrapperClass);
+//			}
+//		}
+//	}
+//	
+//	public static void getWrapperClass(FormNode node, StringBuilder sb){
+//		if(node.containsKey(JsonKeys.WRAPPER_CLASS)){
+//			String wrapperClass = node.getString(JsonKeys.WRAPPER_CLASS);
+//			String[] wrapperClassSplit = null;
+//			if(wrapperClass.contains(" ")){
+//				wrapperClassSplit = wrapperClass.split(" ");
+//				for(String str:wrapperClassSplit){
+//					if(!str.equals(" ")){
+//						sb.append(" "+str);
+//					}
+//				}
+//			}else{
+//				sb.append(" "+wrapperClass);
+//			}
+//		}
+//	}
 	
 	public static String getWrapperCssString(FormNode node){
 		StringBuilder sb = new StringBuilder("");

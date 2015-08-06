@@ -20,10 +20,7 @@ public class FormWrapperTemplates {
 		
 		//new class string goodness
 		StringBuilder classString = new StringBuilder(" class=\"pf_div");
-		
-		//put into function which takes in a stringbuilder
-		getWrapperClass(node, classString);
-		getCustomClass(node, classString);
+		FormGenerator.getCustomClass(node, classString, JsonKeys.CUSTOMCLASS, "pfw_");
 		
 		classString.append("\"");
 		
@@ -44,40 +41,6 @@ public class FormWrapperTemplates {
 		
 		return prefixSuffix;
 	};
-	
-	protected static void getWrapperClass(FormNode node, StringBuilder sb){
-		if(node.containsKey(JsonKeys.WRAPPER_CLASS)){
-			String wrapperClass = node.getString(JsonKeys.WRAPPER_CLASS);
-			String[] wrapperClassSplit = null;
-			if(wrapperClass.contains(" ")){
-				wrapperClassSplit = wrapperClass.split(" ");
-				for(String str:wrapperClassSplit){
-					if(!str.equals(" ")){
-						sb.append(" pfw_"+str);
-					}
-				}
-			}else{
-				sb.append(" pfw_"+wrapperClass);
-			}
-		}
-	}
-	
-	protected static void getCustomClass(FormNode node, StringBuilder sb){
-		if(node.containsKey(JsonKeys.CUSTOMCLASS)){
-			String wrapperClass = node.getString(JsonKeys.CUSTOMCLASS);
-			String[] wrapperClassSplit = null;
-			if(wrapperClass.contains(" ")){
-				wrapperClassSplit = wrapperClass.split(" ");
-				for(String str:wrapperClassSplit){
-					if(!str.equals(" ")){
-						sb.append(" pfc_"+str);
-					}
-				}
-			}else{
-				sb.append(" pfc_"+wrapperClass);
-			}
-		}
-	}
 	
 	protected static Map<String, FormWrapperInterface> defaultWrapperTemplates() {
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();

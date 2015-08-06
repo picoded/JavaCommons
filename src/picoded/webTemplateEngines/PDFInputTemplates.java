@@ -26,9 +26,9 @@ public class PDFInputTemplates {
 		StringBuilder sb = new StringBuilder();
 		
 		StringBuilder classBuilder = new StringBuilder(" class=\"pf_header");
-		FormInputTemplates.getCustomClass(node, classBuilder);
-		FormInputTemplates.getInputClass(node, classBuilder);
-		FormInputTemplates.getLabelClass(node, classBuilder);
+		FormGenerator.getCustomClass(node, classBuilder, JsonKeys.CUSTOMCLASS, "pfl_");
+		FormGenerator.getCustomClass(node, classBuilder, JsonKeys.INPUT_CLASS, "");
+		FormGenerator.getCustomClass(node, classBuilder, JsonKeys.LABEL_CLASS, "");
 		classBuilder.append("\"");
 		String inputClassString = classBuilder.toString();
 		String inputCssString = FormGenerator.getInputCssString(node);
@@ -48,7 +48,7 @@ public class PDFInputTemplates {
 		String labelString = node.label();
 		if(!labelString.isEmpty()){
 			StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
-			FormInputTemplates.getLabelClass(node,  labelClassBuilder);
+			FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.CUSTOMCLASS, "pfl_");
 			labelClassBuilder.append("\"");
 			sb.append("<"+HtmlTag.DIV+labelClassBuilder.toString()+">"+labelString+"</"+HtmlTag.DIV+">");
 		}
@@ -74,7 +74,8 @@ public class PDFInputTemplates {
 		String labelString = node.label();
 		if(!labelString.isEmpty()){
 			StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
-			FormInputTemplates.getLabelClass(node,  labelClassBuilder);
+			FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.CUSTOMCLASS, "pfi_");
+			FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.INPUT_CLASS, "");
 			labelClassBuilder.append("\"");
 			sb.append("<"+HtmlTag.DIV+labelClassBuilder.toString()+">"+labelString+"</"+HtmlTag.DIV+">");
 		}

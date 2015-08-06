@@ -62,6 +62,12 @@ public class PDFInputTemplates {
 		return sb.toString();
 	};
 	
+	protected static FormInputInterface rawHtml_pdf = (node)->{
+		StringBuilder sb = new StringBuilder();
+		sb.append(node.getString(JsonKeys.HTML_INJECTION));
+		return sb.toString();
+	};
+	
 	protected static void getPDFOutputClass(FormNode node, StringBuilder sb){
 		if(node.containsKey(JsonKeys.PDFOUTPUT_CLASS)){
 			String wrapperClass = node.getString(JsonKeys.PDFOUTPUT_CLASS);
@@ -94,6 +100,8 @@ public class PDFInputTemplates {
 		defaultTemplates.put("text", default_pdf);
 		defaultTemplates.put("div", div_pdf);
 		defaultTemplates.put("title", header_pdf);
+		defaultTemplates.put("rawHtml", rawHtml_pdf);
+	
 		
 		return defaultTemplates;
 	}

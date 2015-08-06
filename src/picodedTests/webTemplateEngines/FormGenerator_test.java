@@ -192,16 +192,16 @@ public class FormGenerator_test {
 		assertEquals("text", formNodes.get(0).children().get(0).children().get(1).getString("type"));
 		
 		
-//		String htmlVal = testObj.applyTemplating(formNodes);
-//		File htmlFile = new File("./test-files/test-specific/htmlGenerator/simpleHtmlObject.html");
-//		
-//		try{
-//			FileWriter writer = new FileWriter(htmlFile);
-//			writer.write(htmlVal);
-//			writer.flush();
-//			writer.close();
-//		}catch(Exception ex){
-//			
-//		}
+		String htmlVal = testObj.applyTemplating(formNodes);
+		File htmlFile = new File("./test-files/test-specific/htmlGenerator/simpleHtmlObject.html");
+		
+		try{
+			FileWriter writer = new FileWriter(htmlFile);
+			writer.write(htmlVal);
+			writer.flush();
+			writer.close();
+		}catch(Exception ex){
+			
+		}
 	}
 }

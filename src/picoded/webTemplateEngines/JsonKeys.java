@@ -11,6 +11,8 @@ public class JsonKeys {
 	public static String DEFAULT = "default";
 	public static String OPTIONS = "options";
 	
+	public static String CUSTOMCLASS = "class";
+	
 	public static String WRAPPER_CLASS = "wrapperClass";
 	public static String LABEL_CLASS = "labelClass";
 	public static String INPUT_CLASS = "inputClass";

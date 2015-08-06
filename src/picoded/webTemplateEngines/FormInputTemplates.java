@@ -20,6 +20,7 @@ public class FormInputTemplates {
 	
 	protected static FormInputInterface header = (node)->{ 
 		String text = node.getString(JsonKeys.TEXT, "");
+		//CHANGE TITLE TO USE LABEL AS WELL
 		
 		StringBuilder sb = new StringBuilder();
 		

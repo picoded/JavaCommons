@@ -15,9 +15,17 @@ public class FormWrapperTemplates {
 		
 		//generating prefix
 		StringBuilder prefix = new StringBuilder();
-		String classString = FormGenerator.getWrapperClassString(node);
+		
+		//new class string goodness
+		StringBuilder classString = new StringBuilder("class=\"pf_div");
+		
+		//put into function which takes in a stringbuilder
+		getWrapperClass(node, classString);
+		getCustomClass(node, classString);
+
+		//String classString = FormGenerator.getWrapperClassString(node);
 		String cssString = FormGenerator.getWrapperCssString(node);
-		prefix.append("<"+HtmlTag.DIV+""+classString+cssString+">\n");	
+		prefix.append("<"+HtmlTag.DIV+""+classString+cssString+">\n");	 
 		
 		//generating suffix
 		StringBuilder suffix = new StringBuilder("</"+HtmlTag.DIV+">\n");
@@ -33,6 +41,40 @@ public class FormWrapperTemplates {
 		
 		return prefixSuffix;
 	};
+	
+	protected static void getWrapperClass(FormNode node, StringBuilder sb){
+		if(node.containsKey(JsonKeys.WRAPPER_CLASS)){
+			String wrapperClass = node.getString(JsonKeys.WRAPPER_CLASS);
+			String[] wrapperClassSplit = null;
+			if(wrapperClass.contains(" ")){
+				wrapperClassSplit = wrapperClass.split(" ");
+				for(String str:wrapperClassSplit){
+					if(!str.equals(" ")){
+						sb.append(" "+str);
+					}
+				}
+			}else{
+				sb.append(" "+wrapperClass);
+			}
+		}
+	}
+	
+	protected static void getCustomClass(FormNode node, StringBuilder sb){
+		if(node.containsKey(JsonKeys.CUSTOMCLASS)){
+			String wrapperClass = node.getString(JsonKeys.CUSTOMCLASS);
+			String[] wrapperClassSplit = null;
+			if(wrapperClass.contains(" ")){
+				wrapperClassSplit = wrapperClass.split(" ");
+				for(String str:wrapperClassSplit){
+					if(!str.equals(" ")){
+						sb.append(" pf_w"+str);
+					}
+				}
+			}else{
+				sb.append(" pf_w"+wrapperClass);
+			}
+		}
+	}
 	
 	protected static Map<String, FormWrapperInterface> defaultWrapperTemplates() {
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();

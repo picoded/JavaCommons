@@ -191,7 +191,7 @@ public class FormGenerator_test {
 		assertEquals("dropdown", formNodes.get(0).children().get(0).children().get(0).getString("type"));
 		assertEquals("text", formNodes.get(0).children().get(0).children().get(1).getString("type"));
 		
-		
+		//html section
 		String htmlVal = testObj.applyTemplating(formNodes);
 		File htmlFile = new File("./test-files/test-specific/htmlGenerator/simpleHtmlObject.html");
 		
@@ -203,5 +203,21 @@ public class FormGenerator_test {
 		}catch(Exception ex){
 			
 		}
+		
+		//pdf section
+		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(formNodes);
+		File pdfReadyHtmlFile = new File("./test-files/test-specific/htmlGenerator/simplePDFHtml.html");
+		
+		try{
+			FileWriter writer = new FileWriter(pdfReadyHtmlFile);
+			writer.write(pdfReadyHtmlString);
+			writer.flush();
+			writer.close();
+		}catch(Exception ex){
+			
+		}
+		
+		String pdfFileString = "./test-files/test-specific/htmlGenerator/simplePDF.pdf";
+		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
 }

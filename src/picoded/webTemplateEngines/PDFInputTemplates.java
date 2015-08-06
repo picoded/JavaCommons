@@ -20,11 +20,15 @@ public class PDFInputTemplates {
 	};
 	
 	protected static FormInputInterface header_pdf = (node)->{ 
-		String text = node.getString(JsonKeys.TEXT, "");
+		String text = node.getString(JsonKeys.LABEL, "");
 		
 		StringBuilder sb = new StringBuilder();
 		
-		String inputClassString = FormGenerator.getInputClassString(node);
+		StringBuilder classBuilder = new StringBuilder(" class=\"pf_header");
+		FormInputTemplates.getInputClass(node, classBuilder);
+		FormInputTemplates.getLabelClass(node, classBuilder);
+		classBuilder.append("\"");
+		String inputClassString = classBuilder.toString();
 		String inputCssString = FormGenerator.getInputCssString(node);
 		
 		sb.append("<h3"+inputClassString+inputCssString+">"+text+"</h3>\n");

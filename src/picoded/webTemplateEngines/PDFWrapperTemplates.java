@@ -10,7 +10,15 @@ public class PDFWrapperTemplates {
 		
 		//generating prefix
 		StringBuilder prefix = new StringBuilder();
-		String classString = FormGenerator.getWrapperClassString(node);
+		
+		StringBuilder classBuilder = new StringBuilder(" class=\"pf_div");
+		FormWrapperTemplates.getWrapperClass(node,  classBuilder);
+		FormWrapperTemplates.getCustomClass(node,  classBuilder);
+//		FormInputTemplates.getInputClass(node,  classBuilder);
+//		FormInputTemplates.getLabelClass(node,  classBuilder);
+		classBuilder.append("\"");
+		
+		String classString = classBuilder.toString();
 		String cssString = FormGenerator.getWrapperCssString(node);
 		prefix.append("<"+HtmlTag.DIV+""+classString+cssString+">\n");	
 		

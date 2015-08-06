@@ -41,7 +41,7 @@ public class PDFInputTemplates {
 	protected static FormInputInterface default_pdf = (node)->{
 		StringBuilder sb = new StringBuilder();
 		
-		StringBuilder pdfOutputClassBuilder = new StringBuilder(" class=\"pf_pdfOutput");
+		StringBuilder pdfOutputClassBuilder = new StringBuilder(" class=\"pf_dOutput");
 		getPDFOutputClass(node, pdfOutputClassBuilder);
 		pdfOutputClassBuilder.append("\"");
 		
@@ -67,7 +67,7 @@ public class PDFInputTemplates {
 	protected static FormInputInterface dropdownWithOthers = (node)->{
 		StringBuilder sb = new StringBuilder();
 		
-		StringBuilder pdfOutputClassBuilder = new StringBuilder(" class=\"pf_pdfOutput");
+		StringBuilder pdfOutputClassBuilder = new StringBuilder(" class=\"pf_dOutput");
 		getPDFOutputClass(node, pdfOutputClassBuilder);
 		pdfOutputClassBuilder.append("\"");
 		
@@ -136,14 +136,6 @@ public class PDFInputTemplates {
 			}else{
 				sb.append(" "+wrapperClass);
 			}
-		}
-	}
-	
-	private static String getPdfOutputClassName(FormNode node){
-		if(node.containsKey("pdfOutputClass")){
-			return node.getString("pdfOutputClass");
-		}else{
-			return "pf_pdfOutputClass";
 		}
 	}
 	

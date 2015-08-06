@@ -239,11 +239,11 @@ public class FormInputTemplates {
 				wrapperClassSplit = wrapperClass.split(" ");
 				for(String str:wrapperClassSplit){
 					if(!str.equals(" ")){
-						sb.append(" "+str);
+						sb.append(" pfi_"+str);
 					}
 				}
 			}else{
-				sb.append(" "+wrapperClass);
+				sb.append(" pfi_"+wrapperClass);
 			}
 		}
 	}
@@ -256,11 +256,11 @@ public class FormInputTemplates {
 				wrapperClassSplit = wrapperClass.split(" ");
 				for(String str:wrapperClassSplit){
 					if(!str.equals(" ")){
-						sb.append(" pf_"+str);
+						sb.append(" pfc_"+str);
 					}
 				}
 			}else{
-				sb.append(" pf_"+wrapperClass);
+				sb.append(" pfc_"+wrapperClass);
 			}
 		}
 	}
@@ -273,11 +273,11 @@ public class FormInputTemplates {
 				wrapperClassSplit = wrapperClass.split(" ");
 				for(String str:wrapperClassSplit){
 					if(!str.equals(" ")){
-						sb.append(" pf_"+str);
+						sb.append(" pfl_"+str);
 					}
 				}
 			}else{
-				sb.append(" pf_"+wrapperClass);
+				sb.append(" pfl_"+wrapperClass);
 			}
 		}
 	}

@@ -53,11 +53,11 @@ public class FormWrapperTemplates {
 				wrapperClassSplit = wrapperClass.split(" ");
 				for(String str:wrapperClassSplit){
 					if(!str.equals(" ")){
-						sb.append(" "+str);
+						sb.append(" pfw_"+str);
 					}
 				}
 			}else{
-				sb.append(" "+wrapperClass);
+				sb.append(" pfw_"+wrapperClass);
 			}
 		}
 	}
@@ -70,11 +70,11 @@ public class FormWrapperTemplates {
 				wrapperClassSplit = wrapperClass.split(" ");
 				for(String str:wrapperClassSplit){
 					if(!str.equals(" ")){
-						sb.append(" pf_w"+str);
+						sb.append(" pfc_"+str);
 					}
 				}
 			}else{
-				sb.append(" pf_w"+wrapperClass);
+				sb.append(" pfc_"+wrapperClass);
 			}
 		}
 	}

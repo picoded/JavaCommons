@@ -19,6 +19,7 @@ public class JsonKeys {
 	public static String INPUT_CLASS = "inputClass";
 	public static String PDFDISPLAY_CLASS = "pdfDisplayClass";
 	public static String PDFOUTPUT_CLASS = "pdfOutputClass";
+	public static String CHILD_CLASS = "childClass";
 	
 	public static String WRAPPER_CSS = "wrapperCss";
 	public static String LABEL_CSS = "labelCss";

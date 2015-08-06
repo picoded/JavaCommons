@@ -91,7 +91,11 @@ public class FormGenerator {
 			//get inner data for children
 			StringBuilder innerData = new StringBuilder("");
 			if(node.childCount() > 0){
+				innerData.append("<div class=\"pf_childDiv");
+				innerData.append(getChildClass(node));
+				innerData.append("\">");
 				innerData.append(applyTemplating(node.children()));
+				innerData.append("</div>");
 			}
 			
 			String finalNodeValue = formWrappers[0]+formTextData+innerData.toString()+formWrappers[1];
@@ -99,6 +103,25 @@ public class FormGenerator {
 		}
 		
 		
+	}
+	
+	public String getChildClass(FormNode node){
+		StringBuilder sb = new StringBuilder();
+		if(node.containsKey(JsonKeys.CHILD_CLASS)){
+			String childClass = node.getString(JsonKeys.CHILD_CLASS);
+			if(childClass.contains(" ")){
+				String[] childClassSplit = childClass.split(" ");
+				for(String str:childClassSplit){
+					if(!str.equals(" ")){
+						sb.append(" "+str);
+					}
+				}
+			}else{
+				sb.append(" "+childClass);
+			}
+		}
+		
+		return sb.toString();
 	}
 	
 	public static String getWrapperCssString(FormNode node){

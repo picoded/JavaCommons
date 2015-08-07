@@ -1,2 +1,2 @@
 /// Misc utility functions
-package picoded.util;
+package picoded.utils;

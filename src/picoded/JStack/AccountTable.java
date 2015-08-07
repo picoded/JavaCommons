@@ -77,8 +77,8 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 		accountHash = new KeyValueMap(inStack, tableName+ACCOUNT_HASH);
 		accountSessions = new KeyValueMap(inStack, tableName+ACCOUNT_SESSIONS);
 		accountMeta = new MetaTable(inStack, tableName+ACCOUNT_META);
-		accountChild = new MetaTable(inStack, tableName+ACCOUNT_CHILD);
-		accountChildMeta = new MetaTable(inStack, tableName+ACCOUNT_CHILDMETA);
+		group_childRole = new MetaTable(inStack, tableName+ACCOUNT_CHILD);
+		groupChild_meta = new MetaTable(inStack, tableName+ACCOUNT_CHILDMETA);
 		
 		accountSessions.setTempMode( true ); //optimization
 	}
@@ -128,10 +128,10 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 	/// Handles the storage of the group mapping
 	///
 	/// Group[member] = role1,role2, ...
-	protected MetaTable accountChild = null;
+	protected MetaTable group_childRole = null;
 
 	/// Handles the Group-member meta field mapping
-	protected MetaTable accountChildMeta = null;
+	protected MetaTable groupChild_meta = null;
 	
 	//
 	// JStack common setup functions
@@ -143,8 +143,8 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 		accountHash.stackSetup();
 		accountSessions.stackSetup();
 		accountMeta.stackSetup();
-		accountChild.stackSetup();
-		accountChildMeta.stackSetup();
+		group_childRole.stackSetup();
+		groupChild_meta.stackSetup();
 	}
 
 	/// Performs the full stack teardown for the data object
@@ -153,8 +153,8 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 		accountHash.stackTeardown();
 		accountSessions.stackTeardown();
 		accountMeta.stackTeardown();
-		accountChild.stackTeardown();
-		accountChildMeta.stackTeardown();
+		group_childRole.stackTeardown();
+		groupChild_meta.stackTeardown();
 	}
 
 	//

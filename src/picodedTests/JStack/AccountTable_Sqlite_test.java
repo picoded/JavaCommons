@@ -104,6 +104,8 @@ public class AccountTable_Sqlite_test extends JStackData_testBase_test {
 		assertNull( ptObj.get(usrName) );
 		assertNotNull( usrObj = ptObj.newObject(usrName) );
 		
+		assertArrayEquals( new String[] { }, grpObj.getMembers_id() );
+		
 		assertNotNull( grpObj.addMember( usrObj, "guest" ) );
 		assertArrayEquals( new String[] { usrObj._oid() }, grpObj.getMembers_id() );
 		

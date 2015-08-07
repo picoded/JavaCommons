@@ -316,10 +316,10 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	protected void JSqlObjectAppend(JSql sql, String _oid, Map<String, Object> obj, Set<String> keyList,
 		boolean handleQuery) throws JSqlException {
 
-		boolean sqlMode = handleQuery ? sql.getAutoCommit() : false;
-		if (sqlMode) {
-			sql.setAutoCommit(false);
-		}
+		// boolean sqlMode = handleQuery ? sql.getAutoCommit() : false;
+		// if (sqlMode) {
+		// 	sql.setAutoCommit(false);
+		// }
 
 		try {
 
@@ -360,13 +360,14 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 					return ret;
 				}
 			} );
-			sql.commit();
+			
+			//sql.commit();
 		} catch (JStackException e) {
 			throw new RuntimeException(e);
 		} finally {
-			if (sqlMode) {
-				sql.setAutoCommit(true);
-			}
+			// if (sqlMode) {
+			// 	sql.setAutoCommit(true);
+			// }
 		}
 	}
 
@@ -683,7 +684,9 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 			public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
 				JSqlResult r = sql.selectQuerySet( sqlTableName(sql), "oID", "kID = ?", new Object[] { key } ).query();
 				List<Object> oList = r.get("oID");
-				sList.addAll( ListValueConv.objectToString(oList) );
+				if( oList != null ) {
+					sList.addAll( ListValueConv.objectToString(oList) );
+				}
 				return ret;
 			}
 		}, sList );

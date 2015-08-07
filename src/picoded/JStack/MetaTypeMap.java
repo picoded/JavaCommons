@@ -127,6 +127,34 @@ public class MetaTypeMap extends HashMap<String, MetaType> {
 	}
 	
 	//
+	// Values handling based on meta map
+	//
+	//--------------------------------------------------------------------------
+
+	/// Values to option set conversion, 
+	/// this takes in the value to be stored, performs any needed checks on it (todo)
+	/// and store it respectively.
+	///
+	/// @TODO: Support the various numeric value
+	/// @TODO: Support string / text
+	/// @TODO: Support array sets
+	/// @TODO: Support GUID hash
+	/// @TODO: Support MetaTable
+	/// @TODO: Check against configured type
+	/// @TODO: Convert to configured type if possible (like numeric)
+	/// @TODO: Support proper timestamp handling (not implemented)
+	///
+	protected Object[] valueToOptionSet(String key, Object value) throws JSqlException {
+		if (value instanceof Integer) {
+			return new Object[] { new Integer(MetaType.TYPE_INTEGER), value, null, null }; //Typ, N,S,I,T
+		} else if (value instanceof String) {
+			return new Object[] { new Integer(MetaType.TYPE_STRING), 0, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
+		}
+
+		throw new JSqlException("Object type not yet supported: "+key+" = "+ value);
+	}
+
+	//
 	// Internal JSql index setup
 	//
 	// The following handles the setup and managment of the (hopefully) optimized

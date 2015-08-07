@@ -36,7 +36,12 @@ import com.hazelcast.core.IMap;
 ///
 class MetaTable_JSql {
 	
+	///
 	/// Setsup the JSql main data storage table for MetaTable
+	/// 
+	/// @param {JSql} sql            - sql connection to setup the table
+	/// @param {String} tName        - table name to setup, this holds the actual meta table data
+	/// @param {MetaTable} mainTable - main MetaTable, where this function shoudl be called from
 	/// 
 	protected static void JSqlSetup(JSql sql, String tName, MetaTable mainTable) throws JSqlException {
 		
@@ -142,6 +147,20 @@ class MetaTable_JSql {
 		//).execute();
 	}
 	
+	///
+	/// Iterates the relevent keyList, and appends its value from the objMap, into the sql mainTable database
+	/// 
+	/// @param {JSql} sql                  - sql connection to setup the table
+	/// @param {String} tName              - table name to setup, this holds the actual meta table data
+	/// @param {MetaTable} mainTable       - main MetaTable, where this function shoudl be called from
+	/// @param {String} _oid               - object id to store the key value pairs into
+	/// @param {Map<String,Object>} objMap - map to extract values to store from
+	/// 
+	protected void JSqlObjectMapAppend(JSql sql, String tName, String _oid, //
+		Map<String, Object> objMap, Set<String> keyList,
+		boolean optimizeAutoCommit) throws JSqlException {
+		
+	}
 	
 	
 }

@@ -323,7 +323,7 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 	}
 	
 	@Test
-	public void getFromKeyNames() throws JStackException {
+	public void getFromKeyNames_basic() throws JStackException {
 		
 		mtObj.append(null, genNumStrObj(1, "one"));
 		mtObj.append(null, genNumStrObj(2, "two"));
@@ -338,6 +338,66 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		
 		assertNotNull( str = list[1].getString("str_val") );
 		assertTrue( str.equals("one") || str.equals("two") );
+		
+	}
+	
+	@Test
+	public void nonIndexedKeySaveCheck() throws JStackException {
+		
+		// Generates single node
+		mtObj.append(null, genNumStrObj(1, "hello world"));
+		MetaObject[] list = null;
+		MetaObject node = null;
+		
+		// Fetch that single node
+		assertNotNull( list = mtObj.getFromKeyNames("num") );
+		assertEquals( 1, list.length );
+		assertNotNull( node = list[0] );
+		
+		// Put non indexed key in node, and save
+		node.put("NotIndexedKey", "123");
+		node.saveDelta();
+		
+		// Refetch node, and get data, and validate
+		assertNotNull( list = mtObj.getFromKeyNames("num") );
+		assertEquals( 1, list.length );
+		assertNotNull( list[0] );
+		assertEquals( node._oid(), list[0]._oid() );
+		assertEquals( "123", node.get("NotIndexedKey") );
+		assertEquals( "123", list[0].get("NotIndexedKey") );
+	}
+	
+	@Test
+	public void getFromKeyNames_customKeys() throws JStackException {
+		
+		// Generates single node
+		mtObj.append(null, genNumStrObj(1, "hello world"));
+		MetaObject[] list = null;
+		MetaObject node = null;
+		
+		// Fetch that single node
+		assertNotNull( list = mtObj.getFromKeyNames("num") );
+		assertEquals( 1, list.length );
+		assertNotNull( node = list[0] );
+		
+		// Put non indexed key in node, and save
+		node.put("NotIndexedKey", "123");
+		node.saveDelta();
+		
+		// Refetch node, and get data, and validate
+		assertNotNull( list = mtObj.getFromKeyNames("num") );
+		assertEquals( 1, list.length );
+		assertNotNull( list[0] );
+		assertEquals( node._oid(), list[0]._oid() );
+		assertEquals( "123", node.get("NotIndexedKey") );
+		assertEquals( "123", list[0].get("NotIndexedKey") );
+		
+		// Fetch non indexed key
+		assertNotNull( list = mtObj.getFromKeyNames("NotIndexedKey") );
+		assertEquals( 1, list.length );
+		
+		// Assert equality
+		assertEquals( node._oid(), list[0]._oid() );
 		
 	}
 	

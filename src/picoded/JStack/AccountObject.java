@@ -148,15 +148,21 @@ public class AccountObject extends MetaObject {
 	//-------------------------------------------------------------------------
 	
 	/// Gets the cached child map
-	protected MetaObject _childMap = null;
+	protected MetaObject _group_userToRoleMap = null;
 	
 	/// Gets the child map (cached?)
-	protected MetaObject childMap() throws JStackException {
-		if( _childMap != null ) {
-			return _childMap;
+	protected MetaObject group_userToRoleMap() throws JStackException {
+		if( _group_userToRoleMap != null ) {
+			return _group_userToRoleMap;
 		}
 		
-		return ( _childMap = mainTable.accountChild.lazyGet( this._oid() ) );
+		return ( _group_userToRoleMap = mainTable.group_childRole.lazyGet( this._oid() ) );
+	}
+	
+	// Group status check
+	//-------------------------------------------------------------------------
+	public boolean isGroup() throws JStackException {
+		return ( group_userToRoleMap().size() > 1 );
 	}
 	
 	// Group management of users
@@ -164,20 +170,20 @@ public class AccountObject extends MetaObject {
 	
 	/// Gets and returns the member role, if it exists
 	public String getMemberRole( AccountObject memberObject ) throws JStackException {
-		return childMap().getString( memberObject._oid() ); 
+		return group_userToRoleMap().getString( memberObject._oid() ); 
 	}
 	
 	/// Gets and returns the member meta map, if it exists
 	/// Only returns if member exists, else null
 	public MetaObject getMember( AccountObject memberObject ) throws JStackException {
 		String memberOID = memberObject._oid();
-		String level = childMap().getString(memberOID);
+		String level = group_userToRoleMap().getString(memberOID);
 		
 		if( level == null || level.length() <= 0 ) {
 			return null;
 		}
 		
-		return mainTable.accountChildMeta.lazyGet( this._oid()+"-"+memberOID );
+		return mainTable.groupChild_meta.lazyGet( this._oid()+"-"+memberOID );
 	}
 	
 	/// Gets and returns the member meta map, if it exists
@@ -186,13 +192,13 @@ public class AccountObject extends MetaObject {
 		role = mainTable.validateMembershipRole( role );
 		
 		String memberOID = memberObject._oid();
-		String level = childMap().getString(memberOID);
+		String level = group_userToRoleMap().getString(memberOID);
 		
 		if( level == null || !level.equals(role) ) {
 			return null;
 		}
 		
-		return mainTable.accountChildMeta.lazyGet( this._oid()+"-"+memberOID );
+		return mainTable.groupChild_meta.lazyGet( this._oid()+"-"+memberOID );
 	}
 	
 	/// Adds the member to the group with the given role, if it was not previously added
@@ -215,18 +221,18 @@ public class AccountObject extends MetaObject {
 		role = mainTable.validateMembershipRole( role );
 		
 		String memberOID = memberObject._oid();
-		String level = childMap().getString(memberOID);
+		String level = group_userToRoleMap().getString(memberOID);
 		MetaObject childMeta = null;
 		
 		if( level == null || !level.equals( role ) ) {
-			childMap().put(memberOID, role);
-			childMap().saveDelta();
+			group_userToRoleMap().put(memberOID, role);
+			group_userToRoleMap().saveDelta();
 			
-			childMeta = mainTable.accountChildMeta.lazyGet( this._oid()+"-"+memberOID );
+			childMeta = mainTable.groupChild_meta.lazyGet( this._oid()+"-"+memberOID );
 			childMeta.put( "role", role );
 			childMeta.saveDelta();
 		} else {
-			childMeta = mainTable.accountChildMeta.lazyGet( this._oid()+"-"+memberOID );
+			childMeta = mainTable.groupChild_meta.lazyGet( this._oid()+"-"+memberOID );
 		}
 		
 		return childMeta;
@@ -235,14 +241,14 @@ public class AccountObject extends MetaObject {
 	/// Returns the list of members in the group
 	///
 	public String[] getMembers_id() throws JStackException {
-		return mainTable.accountChild.getFromKeyNames_id( _oid() );
+		return mainTable.group_childRole.getFromKeyNames_id( _oid() );
 	}
 	
 	/// Returns the list of groups the member is in
 	///
 	public String[] getGroups_id() throws JStackException {
 		List<String> retList = new ArrayList<String>();
-		for( String key : childMap().keySet() ) {
+		for( String key : group_userToRoleMap().keySet() ) {
 			if( key.equals("_oid") ) {
 				continue;
 			}

@@ -51,12 +51,14 @@ public class AccountLogin extends BasePage {
 	/// note that they do not have ANY authentication layer enforced.
 	///
 	/// + login 
-	///    + GET : Returns the current accountID, and accountNAME array
+	///    + GET  : Returns the current accountID, and accountNAME array
 	///    + POST : Login with accountNAME / accountID and accountPASS
 	/// + logout
-	///    + GET : Logs out the current login ID
+	///    + GET  : Logs out the current login ID
 	/// + password (only works for its own user)
 	///    + POST : accountID, oldPassword, newPassword
+	/// + groups_id
+	///    + GET  : Returns the list of groups found in system
 	/// 
 	///
 	///

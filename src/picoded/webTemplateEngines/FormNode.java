@@ -194,7 +194,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	
 	/// Returns the default value of the object, 
 	/// note that this will get the 0th indexed value.
-	@Deprecated
+	// @Deprecated
 	public Object getDefaultValue(String fieldName){
 		if(_inputValues.get(0) != null && _inputValues.get(0).containsKey(fieldName)){
 			return _inputValues.get(0).get(fieldName);
@@ -203,27 +203,27 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return null;
 	}
 	
-	@Deprecated
+	// @Deprecated
 	public void setChildren(List<FormNode> children){
 		_children = new ArrayList<FormNode>(children); //copy constructor behaviour
 	}
 	
-	@Deprecated
+	// @Deprecated
 	public void addChild(FormNode child){
 		_children.add(child);
 	}
 	
-	@Deprecated
+	// @Deprecated
 	public int childCount(){
 		return _children.size();
 	}
 	
-	@Deprecated
+	// @Deprecated
 	public void setPrefilledData(Map<String, Object> prefilledJSONData){
 		_inputValues.set(0,prefilledJSONData);
 	}
 	
-	@Deprecated
+	// @Deprecated
 	public static List<FormNode> createFromJSONString(String jsonString, Map<String, Object> prefilledJSONData){
 		List<FormNode> formNodes = new ArrayList<FormNode>();
 		
@@ -238,7 +238,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		}
 	}
 	
-	@Deprecated
+	// @Deprecated
 	@SuppressWarnings("unchecked")
 	public static List<FormNode> createFromList(List<Object> listObject, Map<String, Object> prefilledJSONData){
 		List<FormNode> formNodes = new ArrayList<FormNode>();

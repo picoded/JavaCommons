@@ -33,7 +33,18 @@ public class FormInputTemplates {
 			sb.append(node.getString(JsonKeys.HTML_INJECTION));
 			return sb.toString();
 		}else{
-			String text = node.getString(JsonKeys.LABEL, "");
+			String labelValue = node.label();
+			String fieldValue = node.field();
+			if(!labelValue.isEmpty()){
+				StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
+				FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.CUSTOMCLASS, "pfl_");
+				FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.LABEL_CLASS, "");
+				labelClassBuilder.append("\"");
+				
+				sb.append("<"+HtmlTag.LABEL+labelClassBuilder.toString()+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
+			}
+			
+			String text = node.getString(JsonKeys.TEXT, "");
 			
 			StringBuilder classBuilder = new StringBuilder(" class=\"pf_header");
 			FormGenerator.getCustomClass(node, classBuilder, JsonKeys.CUSTOMCLASS, "pfl_");
@@ -262,7 +273,7 @@ public class FormInputTemplates {
 	protected static String getDropDownOthersJavascriptFunction(FormNode node){
 		String dropDownField = node.getString("field");
 		String inputField = node.getString("textField");
-		String othersOptionToShowTextField = node.getString("othersOption").toLowerCase();
+		String othersOptionToShowTextField = RegexUtils.removeAllNonAlphaNumeric(node.getString("othersOption")).toLowerCase();
 		String funcName = node.getString("functionName");
 		
 		String injectedScript = "function "+funcName+"() {"+

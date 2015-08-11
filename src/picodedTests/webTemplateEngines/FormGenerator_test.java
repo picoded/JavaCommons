@@ -167,7 +167,7 @@ public class FormGenerator_test {
 		}
 	}
 	
-//	@Test
+	@Test
 	public void testSimpleJSONObject(){
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/simpleJSONObject.js");
 		assertTrue(jsonObjectFile.canRead());
@@ -184,7 +184,7 @@ public class FormGenerator_test {
 		List<FormNode> formNodes = FormNode.createFromJSONString(jsonFileString, getPrefilledData());
 		
 		assertEquals(1, formNodes.get(0).childCount());
-		assertEquals(2, formNodes.get(0).children().get(0).childCount());
+		assertEquals(3, formNodes.get(0).children().get(0).childCount());
 		
 		assertEquals("div", formNodes.get(0).getString("type"));
 		assertEquals("title", formNodes.get(0).children().get(0).getString("type"));
@@ -221,7 +221,7 @@ public class FormGenerator_test {
 //		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
 	
-	@Test
+//	@Test
 	public void testDropdownWithOthers(){
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testDropDownOthers.js");
 		assertTrue(jsonObjectFile.canRead());
@@ -266,4 +266,6 @@ public class FormGenerator_test {
 		String pdfFileString = "./test-files/test-specific/htmlGenerator/dropdownWithOthersPDF.pdf";
 		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
+	
+	
 }

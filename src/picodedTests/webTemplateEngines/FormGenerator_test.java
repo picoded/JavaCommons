@@ -167,7 +167,7 @@ public class FormGenerator_test {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void testSimpleJSONObject(){
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/simpleJSONObject.js");
 		assertTrue(jsonObjectFile.canRead());
@@ -221,7 +221,7 @@ public class FormGenerator_test {
 //		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
 	
-//	@Test
+	@Test
 	public void testDropdownWithOthers(){
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testDropDownOthers.js");
 		assertTrue(jsonObjectFile.canRead());

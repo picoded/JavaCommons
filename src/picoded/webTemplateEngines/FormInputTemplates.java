@@ -168,6 +168,12 @@ public class FormInputTemplates {
 			sb.append(node.getString(JsonKeys.HTML_INJECTION));
 			return sb.toString();
 		}else{
+			//jscript here
+			sb.append("<script>");
+			sb.append(getDropDownOthersJavascriptFunction(node));
+			sb.append("</script>");
+			
+			
 			String labelValue = node.label();
 			String fieldValue = node.field();
 			if(!labelValue.isEmpty()){
@@ -179,10 +185,12 @@ public class FormInputTemplates {
 				sb.append("<"+HtmlTag.LABEL+labelClassBuilder.toString()+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
 			}
 			
-			StringBuilder classStringBuilder = new StringBuilder(" class=\"pf_select");
+			StringBuilder classStringBuilder = new StringBuilder(" class=\"pf_select\"");
 			FormGenerator.getCustomClass(node, classStringBuilder, JsonKeys.CUSTOMCLASS, "pfi_");
 			FormGenerator.getCustomClass(node, classStringBuilder, JsonKeys.LABEL_CLASS, "");
-			classStringBuilder.append("\"");
+			String funcName = node.getString("functionName");
+			classStringBuilder.append(" onchange=\""+funcName+"()\"");
+			
 			String inputClassString = classStringBuilder.toString();
 			
 			String selectedOption = "";
@@ -223,6 +231,23 @@ public class FormInputTemplates {
 			
 			sb.append("</"+HtmlTag.SELECT+">\n");
 			
+			//append input text field
+			StringBuilder inputBuilder = new StringBuilder(" class=\"pf_inputText\"");
+			FormGenerator.getCustomClass(node, inputBuilder, JsonKeys.CUSTOMCLASS, "pfi_");
+			inputBuilder.append(" style=\"display:none\"");
+			String inputBuilderString = inputBuilder.toString();
+			
+			sb.append("<"+HtmlTag.INPUT+""+inputBuilderString+" "+HtmlTag.TYPE+"=\"text\" ");
+			
+			//id/field and value elements
+			String inputTextFieldValue = node.getString("textField");
+			if(!inputTextFieldValue.isEmpty()){
+				sb.append(""+HtmlTag.ID+"=\""+inputTextFieldValue+"\"");
+			}else{
+				sb.append("></"+HtmlTag.INPUT+">\n");
+			}
+			
+			
 			return sb.toString();
 		}
 	};
@@ -234,17 +259,23 @@ public class FormInputTemplates {
 		return sb.toString();
 	};
 	
-	//look at me later
-	protected static void getDropDownOthersScript(FormNode node){
-		String injectedScript = "function onChangeFunction() {"+
-									"var dropDown = document.getElementById(\"natDropDown\");"+
-									"var inputField = document.getElementById(\"inputField\");"+
-									"if(dropDown.value == \"Others\"){"+//replace Others with val
+	protected static String getDropDownOthersJavascriptFunction(FormNode node){
+		String dropDownField = node.getString("field");
+		String inputField = node.getString("textField");
+		String othersOptionToShowTextField = node.getString("othersOption").toLowerCase();
+		String funcName = node.getString("functionName");
+		
+		String injectedScript = "function "+funcName+"() {"+
+									"var dropDown = document.getElementById(\""+dropDownField+"\");"+
+									"var inputField = document.getElementById(\""+inputField+"\");"+
+									"if(dropDown.value == \""+othersOptionToShowTextField+"\"){"+//replace Others with val
 										"inputField.style.display = \"inline\";"+ //replace element by id
 									"}else{"+
 										"inputField.style.display = \"none\";"+ //replace element by id
 									"}"+
 								"};";
+		
+		return injectedScript;
 	}
 	
 	protected static Map<String, FormInputInterface> defaultInputTemplates() {

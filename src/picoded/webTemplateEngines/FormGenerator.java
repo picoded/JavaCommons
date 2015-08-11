@@ -65,6 +65,11 @@ public class FormGenerator {
 		return finalNodeValue;
 	}
 	
+	public String applyTemplating(String jsonString, Map<String, Object> prefilledJSONData){
+		List<FormNode> formNodes = FormNode.createFromJSONString(jsonString, prefilledJSONData);
+		return applyTemplating(formNodes);
+	}
+	
 	public String applyTemplating(List<FormNode> nodes){
 		StringBuilder htmlBuilder = new StringBuilder();
 		for(FormNode node : nodes){

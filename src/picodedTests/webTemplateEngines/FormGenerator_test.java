@@ -167,7 +167,7 @@ public class FormGenerator_test {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void testSimpleJSONObject(){
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/simpleJSONObject.js");
 		assertTrue(jsonObjectFile.canRead());
@@ -267,5 +267,33 @@ public class FormGenerator_test {
 		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
 	
-	
+	@Test
+	public void testExample(){
+		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/JSMLExampleJson.json");
+		assertTrue(jsonObjectFile.canRead());
+		String jsonFileString = "";
+		try{
+			jsonFileString = FileUtils.readFileToString(jsonObjectFile, Charset.defaultCharset());
+		} catch (Exception ex){
+		}
+//		Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
+//		assertNotNull(jsonMap);
+		
+//		Map<String, Object> dropdownData = new HashMap<String, Object>();
+//		dropdownData.put("natDropDown", "Malay");
+		
+//		List<FormNode> formNodes = FormNode.createFromJSONString(jsonFileString, null);
+		
+		String htmlVal = testObj.applyTemplating(jsonFileString, null);
+		File htmlFile = new File("./test-files/test-specific/htmlGenerator/JSMLExampleHtml.html");
+		
+		try{
+			FileWriter writer = new FileWriter(htmlFile);
+			writer.write(htmlVal);
+			writer.flush();
+			writer.close();
+		}catch(Exception ex){
+			
+		}
+	}
 }

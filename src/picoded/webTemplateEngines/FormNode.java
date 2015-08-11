@@ -9,12 +9,13 @@ import picoded.conv.ConvertJSON;
 import picoded.conv.RegexUtils;
 import picoded.conv.GenericConvert;
 import picoded.struct.GenericConvertMap;
+import picoded.struct.CaseInsensitiveHashMap;
 
 /// FormNode serves as a map accessor to the form defination structure,
 /// with various utility functions, for Wrapper, and Input interface writers
 ///
 /// @TODO Change class extension to use AbstractMapDecorator, so that it proxy the valeus from the soruce instead
-public class FormNode extends HashMap<String, Object> implements GenericConvertMap<String, Object> {
+public class FormNode extends CaseInsensitiveHashMap<String, Object> implements GenericConvertMap<String, Object> {
 	
 	//
 	// Utility helper functions
@@ -146,7 +147,83 @@ public class FormNode extends HashMap<String, Object> implements GenericConvertM
 	//
 	//------------------------------------------------------------------------
 	
+	/// Returns all the generated children form nodes
+	/// 
+	/// @returns {List<FormNode>}  the list of formnodes
+	public List<FormNode> children() {
+		return _children;
+	}
 	
+	/// Returns the defined label value. This is used to generate the wrapper text if needed
+	public String label(){
+		return containsKey(JsonKeys.LABEL) ? getString(JsonKeys.LABEL) : "";
+	}
+	
+	/// Returns the defined FIELD parameter if set, else returns the pure alphanumeric (no spaces) varient of label
+	public String field(){
+		if( containsKey(JsonKeys.FIELD) ) {
+			return getString(JsonKeys.FIELD);
+		} else {
+			return RegexUtils.removeAllNonAlphaNumeric(
+				label()
+			).toLowerCase();
+		}
+	}
+	
+	/// Gets the value from the input data array
+	public String getValue( String fieldName, int index ) {
+		String strRet = null;
+		Object objRet = null;
+		
+		if( _inputValues.get(index) != null ) {
+			objRet = _inputValues.get(index).get(fieldName);
+			strRet = GenericConvert.toString(objRet, null);
+		}
+		
+		if( strRet != null ) {
+			return strRet;
+		}
+		
+		return getString( JsonKeys.DEFAULT, null );
+	}
+	
+	//
+	// To remove
+	//
+	//------------------------------------------------------------------------
+	
+	/// Returns the default value of the object, 
+	/// note that this will get the 0th indexed value.
+	@Deprecated
+	public Object getDefaultValue(String fieldName){
+		if(_inputValues.get(0) != null && _inputValues.get(0).containsKey(fieldName)){
+			return _inputValues.get(0).get(fieldName);
+		}
+		
+		return null;
+	}
+	
+	@Deprecated
+	public void setChildren(List<FormNode> children){
+		_children = new ArrayList<FormNode>(children); //copy constructor behaviour
+	}
+	
+	@Deprecated
+	public void addChild(FormNode child){
+		_children.add(child);
+	}
+	
+	@Deprecated
+	public int childCount(){
+		return _children.size();
+	}
+	
+	@Deprecated
+	public void setPrefilledData(Map<String, Object> prefilledJSONData){
+		_inputValues.set(0,prefilledJSONData);
+	}
+	
+	@Deprecated
 	public static List<FormNode> createFromJSONString(String jsonString, Map<String, Object> prefilledJSONData){
 		List<FormNode> formNodes = new ArrayList<FormNode>();
 		
@@ -161,50 +238,7 @@ public class FormNode extends HashMap<String, Object> implements GenericConvertM
 		}
 	}
 	
-	public void setPrefilledData(Map<String, Object> prefilledJSONData){
-		_inputValues.set(0,prefilledJSONData);
-	}
-	
-	public void setChildren(List<FormNode> children){
-		_children = new ArrayList<FormNode>(children); //copy constructor behaviour
-	}
-	
-	public void addChild(FormNode child){
-		_children.add(child);
-	}
-	
-	public int childCount(){
-		return _children.size();
-	}
-	
-	public List<FormNode> children(){
-		return _children;
-	}
-	
-	public Object getDefaultValue(String fieldName){
-		if(_inputValues.get(0) != null && _inputValues.get(0).containsKey(fieldName)){
-			return _inputValues.get(0).get(fieldName);
-		}
-		
-		return null;
-	}
-	
-	//helper functions
-	public String label(){
-		return this.containsKey(JsonKeys.LABEL) ? this.getString(JsonKeys.LABEL) : "";
-	}
-	
-	//return label() lowercased
-	public String field(){
-		return this.containsKey(JsonKeys.FIELD) ? this.getString(JsonKeys.FIELD) : RegexUtils.removeAllNonAlphaNumeric(this.label()).toLowerCase();
-	}
-	
-	//
-	// To remove
-	//
-	//------------------------------------------------------------------------
-	
-	
+	@Deprecated
 	@SuppressWarnings("unchecked")
 	public static List<FormNode> createFromList(List<Object> listObject, Map<String, Object> prefilledJSONData){
 		List<FormNode> formNodes = new ArrayList<FormNode>();
@@ -216,9 +250,5 @@ public class FormNode extends HashMap<String, Object> implements GenericConvertM
 		
 		return formNodes;
 	}
-	
-	
-	
-	
 	
 }

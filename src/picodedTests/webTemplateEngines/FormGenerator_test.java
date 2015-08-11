@@ -267,6 +267,8 @@ public class FormGenerator_test {
 		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
 	
+	/// Missing test case file
+	/*
 	@Test
 	public void testExample(){
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/JSMLExampleJson.json");
@@ -296,4 +298,5 @@ public class FormGenerator_test {
 			
 		}
 	}
+	*/
 }

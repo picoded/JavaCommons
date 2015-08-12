@@ -43,7 +43,7 @@ public class FormGenerator_test {
 		}
 	}
 	
-//	@Test
+	@Test
 	public void getHtmlAndPDFOutputFromJSONObject(){
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONObject.js");
 		assertTrue(jsonObjectFile.canRead());
@@ -90,7 +90,7 @@ public class FormGenerator_test {
 		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
 	
-//	@Test
+	@Test
 	public void getHtmlAndPDFOutputFromJSONArray(){
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONArray.js");
 		assertTrue(jsonObjectFile.canRead());
@@ -137,9 +137,6 @@ public class FormGenerator_test {
 		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
 	
-	/// Missing test case file
-	/// @TODO to fix
-	/*
 	@Test
 	public void getHtmlAndPDFOutputFromJSONKeysObject(){
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONKeys.js");
@@ -186,5 +183,5 @@ public class FormGenerator_test {
 		String pdfFileString = "./test-files/test-specific/htmlGenerator/generatedFiles/pdfFromJSONKeys.pdf";
 		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
-	*/
+	
 }

@@ -48,7 +48,7 @@ public class FormGenerator {
 	
 	/// Returns the inputMap storing all the various FormInputInterface
 	///
-	/// @params {boolean} displayOnly  - Returns the map, in which display only interfaces are provided
+	/// @params {boolean} displayOnly  - Returns the varient for read only display mode (eg: PDF)
 	///
 	/// @returns {Map<String, FormInputInterface>} interface map
 	public Map<String, FormInputInterface> inputInterfaceMap(boolean displayOnly) {
@@ -75,7 +75,7 @@ public class FormGenerator {
 	/// Returns the FormInputInterface, given the display mode and type
 	/// This will automatically fallback to default interface if the requested type is not found
 	///
-	/// @params {boolean} displayOnly  - Returns the map, in which display only interfaces are provided
+	/// @params {boolean} displayOnly  - Returns the varient for read only display mode (eg: PDF)
 	/// @params {String} type          - String representing the input type to request for
 	///
 	/// @returns {FormInputInterface} interface function
@@ -90,7 +90,7 @@ public class FormGenerator {
 	/// Returns the FormWrapperInterface, given the display mode and type
 	/// This will automatically fallback to default interface if the requested type is not found
 	///
-	/// @params {boolean} displayOnly  - Returns the map, in which display only interfaces are provided
+	/// @params {boolean} displayOnly  - Returns the varient for read only display mode (eg: PDF)
 	/// @params {String} type          - String representing the wrapper type to request for
 	///
 	/// @returns {FormWrapperInterface} interface function
@@ -100,61 +100,6 @@ public class FormGenerator {
 			return ret;
 		}
 		return wrapperInterfaceMap(displayOnly).get("*");
-	}
-	
-	
-	/////////////////////////////////////////////////////////////////////////
-	//
-	// Internal vars Accessor : To remove
-	//
-	/////////////////////////////////////////////////////////////////////////
-	
-	protected Map<String, FormInputInterface> formInputsMap() {
-		return customFormInputTemplates;
-	}
-	
-	protected Map<String, FormWrapperInterface> formWrapperMap() {
-		return customFormWrapperTemplates;
-	}
-	
-	protected Map<String, FormInputInterface> displayInputsMap() {
-		return customPDFInputTemplates;
-	}
-	
-	protected Map<String, FormWrapperInterface> displayWrapperMap() {
-		return customPDFWrapperTemplates;
-	}
-	
-	protected FormInputInterface formInput(String name) {
-		FormInputInterface ret = formInputsMap().get(name);
-		if( ret != null ) {
-			return ret;
-		}
-		return formInputsMap().get("*");
-	}
-	
-	protected FormInputInterface displayInput(String name) {
-		FormInputInterface ret = displayInputsMap().get(name);
-		if( ret != null ) {
-			return ret;
-		}
-		return displayInputsMap().get("*");
-	}
-	
-	protected FormWrapperInterface formWrapper(String name) {
-		FormWrapperInterface ret = formWrapperMap().get(name);
-		if( ret != null ) {
-			return ret;
-		}
-		return formWrapperMap().get("*");
-	}
-	
-	protected FormWrapperInterface displayWrapper(String name) {
-		FormWrapperInterface ret = displayWrapperMap().get(name);
-		if( ret != null ) {
-			return ret;
-		}
-		return displayWrapperMap().get("*");
 	}
 	
 	/////////////////////////////////////////////////////////////////////////

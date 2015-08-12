@@ -302,53 +302,64 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	//
 	//------------------------------------------------------------------------
 	
-	/// Gets and returns the input html representing the current 
+	/// Gets and returns the input html representing the current FormNode
+	///
+	/// @params {boolean} displayOnly  - Returns the varient for read only display mode (eg: PDF)
 	///
 	/// @returns {StringBuilder} Full StringBuilder representing the output result
-	public StringBuilder formInputHtml() {
+	public StringBuilder inputHtml(boolean displayMode) {
 		// Gets type
-		String nodeType = getString(JsonKeys.TYPE, HtmlTag.DIV);
+		String nodeType = getString(JsonKeys.INPUT_TYPE, getString(JsonKeys.TYPE, "*"));
 		
 		// Gets the input generator
-		FormInputInterface func = _formGenerator.formInput(nodeType);
+		FormInputInterface func = _formGenerator.inputInterface(displayMode, nodeType);
 		
 		// The node 
 		return func.apply(this);
 	}
 	
-	/// Gets and return the wrapper html, via the wrapper function.
-	/// Which in turn will call the resepective formInputHtml() and/or child nodes
+	/// Gets and return the full wrapper html, via the wrapper function.
+	/// Which in turn will call the resepective inputHtml() and/or child nodes
+	///
+	/// @params {boolean} displayOnly  - Returns the varient for read only display mode (eg: PDF)
 	///
 	/// @returns {StringBuilder} Full StringBuilder representing the output result
-	public StringBuilder formWrapperHtml() {
+	public StringBuilder fullHtml(boolean displayMode) {
 		// Gets type
-		String nodeType = getString(JsonKeys.TYPE, HtmlTag.DIV);
+		String nodeType = getString(JsonKeys.WRAPPER_TYPE, getString(JsonKeys.TYPE, "*"));
 		
 		// Gets the input generator
-		FormWrapperInterface func = _formGenerator.formWrapper(nodeType);
+		FormWrapperInterface func = _formGenerator.wrapperInterface(displayMode, nodeType);
 		
 		// The node 
 		return func.apply(this);
 	}
 	
+	/// [private function used to avoid overload conflict, and to resolve it]
+	/// 
 	/// Generates the children wrapper html, using the function to generate html strings inbetween if needed
 	/// Note that given int is the child index number before the spacer. And spacer is ignored for last child.
 	/// The spacer function is also ignored if its null
 	///
-	/// @params  {Function<int,StringBuilder>}  spacer  - lamda function to call to add a spacer string in between child nodes
-	public StringBuilder formChildrenFullHtml(Function<Integer,StringBuilder> spacer) {
+	/// @params  {boolean}                      displayOnly  - Returns the varient for read only display mode (eg: PDF)
+	/// @params  {Function<int,StringBuilder>}  spacer       - lamda function to call to add a spacer string in between child nodes
+	///
+	/// @returns {StringBuilder} Full StringBuilder representing the output result
+	private StringBuilder _fullChildrenHtml(boolean displayMode, Function<Integer,StringBuilder> spacer) {
 		StringBuilder ret = new StringBuilder();
 		List<FormNode> childList = children();
 		
+		// Skip if no childList (avoid null error)
 		if( childList == null ) {
 			return ret;
 		}
 		
+		// Iterate child list, and generate for each node
 		int childListSize = childList.size();
 		for( int a=0; a<childListSize; ++a ) {
 			
 			// Add the child full html
-			ret.append( childList.get(a).formWrapperHtml() );
+			ret.append( childList.get(a).fullHtml(displayMode) );
 			
 			// Not last child, add spacer
 			if( spacer != null && (a+1)<childListSize ) {
@@ -358,17 +369,38 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		
 		return ret;
 	}
+
+	/// Generates the children wrapper html, using the function to generate html strings inbetween if needed
+	/// Note that given int is the child index number before the spacer. And spacer is ignored for last child.
+	/// The spacer function is also ignored if its null
+	///
+	/// @params  {boolean}                      displayOnly  - Returns the varient for read only display mode (eg: PDF)
+	/// @params  {Function<int,StringBuilder>}  spacer       - lamda function to call to add a spacer string in between child nodes
+	///
+	/// @returns {StringBuilder} Full StringBuilder representing the output result
+	public StringBuilder fullChildrenHtml(boolean displayMode, Function<Integer,StringBuilder> spacer) {
+		return _fullChildrenHtml(displayMode, spacer);
+	}
 	
 	/// Varient of formChildrenFullHtml, without spacer function
-	// public StringBuilder formChildrenFullHtml() {
-	// 	return formChildrenFullHtml(null);
-	// }
+	///
+	/// @params  {boolean}                      displayOnly  - Returns the varient for read only display mode (eg: PDF)
+	///
+	/// @returns {StringBuilder} Full StringBuilder representing the output result
+	public StringBuilder fullChildrenHtml(boolean displayMode) {
+	 	return _fullChildrenHtml(displayMode, null);
+	}
 	
-	/// Varient of formChildrenFullHtml, with fixed spacer function
-	public StringBuilder formChildrenFullHtml(String spacerString) {
+	/// Varient of formChildrenFullHtml, with fixed spacer function 
+	///
+	/// @params  {boolean}  displayOnly  - Returns the varient for read only display mode (eg: PDF)
+	/// @params  {String}   spacer       - spacer string in between child nodes
+	///
+	/// @returns {StringBuilder} Full StringBuilder representing the output result
+	public StringBuilder fullChildrenHtml(boolean displayMode, String spacerString) {
 		final StringBuilder spacerBuilder = new StringBuilder(spacerString);
 		Function<Integer,StringBuilder> spacer = (n) -> { return spacerBuilder; };
-		return formChildrenFullHtml(spacer);
+		return _fullChildrenHtml(displayMode, spacer);
 	}
 	
 	//

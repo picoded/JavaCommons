@@ -4,6 +4,21 @@ public class JsonKeys {
 	
 	////////////////////////////////////////////////
 	//
+	//  Input and wrapper type handling
+	//
+	////////////////////////////////////////////////
+	
+	/// The type to assume for both input and wrapper
+	public static String TYPE = "type";
+	
+	/// Overwrites of each input type
+	public static String INPUT_TYPE = "inputType";
+	
+	/// Overwrites of each wrapper type
+	public static String WRAPPER_TYPE = "wrapperType";
+	
+	////////////////////////////////////////////////
+	//
 	//  Input value handling
 	//
 	////////////////////////////////////////////////
@@ -16,7 +31,7 @@ public class JsonKeys {
 	
 	// Options listing, used to list options in dropdown
 	public static String OPTIONS = "options";
-	
+
 	////////////////////////////////////////////////
 	//
 	//  HTML parameters handling
@@ -59,7 +74,6 @@ public class JsonKeys {
 	
 	public static String TEXT = "text";
 	public static String TITLE = "title";
-	public static String TYPE = "type";
 	public static String SUBNODES = "subnodes";
 	public static String DROPDOWN = "dropdown";
 	public static String LABEL = "label";

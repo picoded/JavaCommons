@@ -307,17 +307,6 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return containsKey(JsonKeys.LABEL) ? getString(JsonKeys.LABEL) : "";
 	}
 	
-	/// Returns the defined FIELD parameter if set, else returns the pure alphanumeric (no spaces) varient of label
-	public String field(){
-		if( containsKey(JsonKeys.FIELD) ) {
-			return getString(JsonKeys.FIELD);
-		} else {
-			return RegexUtils.removeAllNonAlphaNumeric(
-				label()
-			).toLowerCase();
-		}
-	}
-	
 	// /// Gets the value from the input data array
 	// public String getValue( String fieldName, int index ) {
 	// 	String strRet = null;
@@ -347,7 +336,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	/// @TODO
 	/// Returns the default value of the object, 
 	public String getFieldValue(){
-		return null;
+		return GenericConvert.toString(getDefaultValue(getFieldName()));
 	}
 	
 	//

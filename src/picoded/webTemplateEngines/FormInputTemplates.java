@@ -157,7 +157,7 @@ public class FormInputTemplates {
 			
 			
 			String labelValue = node.label();
-			String fieldValue = node.field();
+			String fieldValue = node.getFieldName();
 			if(!labelValue.isEmpty()){
 				StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
 				FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.CUSTOMCLASS, "pfl_");

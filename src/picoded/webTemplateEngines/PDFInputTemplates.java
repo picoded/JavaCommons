@@ -61,7 +61,7 @@ public class PDFInputTemplates {
 			sb.append("<"+HtmlTag.DIV+labelClassBuilder.toString()+">"+labelString+"</"+HtmlTag.DIV+">");
 		}
 		
-		String fieldName = node.field();
+		String fieldName = node.getFieldName();
 		if(!fieldName.isEmpty()){
 			String fieldValue = (String)node.getDefaultValue(fieldName);
 			String finalFieldValue = fieldValue;
@@ -102,10 +102,13 @@ public class PDFInputTemplates {
 			sb.append("<"+HtmlTag.DIV+labelClassBuilder.toString()+">"+labelString+"</"+HtmlTag.DIV+">");
 		}
 		
-		String fieldName = node.field();
+		String fieldName = node.getFieldName();
 		if(!fieldName.isEmpty()){
 			String fieldValue = (String)node.getDefaultValue(fieldName);
-			fieldValue = RegexUtils.removeAllNonAlphaNumeric(fieldValue).toLowerCase();
+			
+			if(fieldValue != null && fieldValue.length() <= 0) {
+				fieldValue = RegexUtils.removeAllNonAlphaNumeric(fieldValue).toLowerCase();
+			}
 			
 			if(node.containsKey(JsonKeys.OPTIONS)){
 				Object dropDownObject = node.get(JsonKeys.OPTIONS);

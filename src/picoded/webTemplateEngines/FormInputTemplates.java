@@ -15,49 +15,40 @@ import com.mysql.jdbc.StringUtils;
 public class FormInputTemplates {
 	
 	protected static FormInputInterface div = (node)->{
-		StringBuilder sb = new StringBuilder("");
-		
-		if(node.containsKey(JsonKeys.HTML_INJECTION)){
-			sb.append(node.getString(JsonKeys.HTML_INJECTION));
-			return sb.toString();
-		}
-		
-		return sb.toString();
-		
+		return node.collapseStringBuilderArray( node.defaultHtmlInput( JsonKeys.DIV, "pf_div", null ) );
 	};
 	
 	protected static FormInputInterface header = (node)->{ 
-		StringBuilder sb = new StringBuilder("");
+		String text = node.getString(JsonKeys.TEXT, "");
+		StringBuilder[] sbArr = node.defaultHtmlInput( JsonKeys.DOM_HEADER, "pf_header", null );
 		
-		if(node.containsKey(JsonKeys.HTML_INJECTION)){
-			sb.append(node.getString(JsonKeys.HTML_INJECTION));
-			return sb.toString();
-		}else{
-			String labelValue = node.label();
-			String fieldValue = node.field();
-			if(!labelValue.isEmpty()){
-				StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
-				FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.CUSTOMCLASS, "pfl_");
-				FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.LABEL_CLASS, "");
-				labelClassBuilder.append("\"");
-				
-				sb.append("<"+HtmlTag.LABEL+labelClassBuilder.toString()+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
-			}
-			
-			String text = node.getString(JsonKeys.TEXT, "");
-			
-			StringBuilder classBuilder = new StringBuilder(" class=\"pf_header");
-			FormGenerator.getCustomClass(node, classBuilder, JsonKeys.CUSTOMCLASS, "pfl_");
-			FormGenerator.getCustomClass(node, classBuilder, JsonKeys.LABEL_CLASS, "");
-			FormGenerator.getCustomClass(node, classBuilder, JsonKeys.INPUT_CLASS, "");
-			classBuilder.append("\"");
-			
-			String inputCssString = FormGenerator.getInputCssString(node);
-			
-			sb.append("<h3"+classBuilder.toString() + inputCssString+">"+text+"</h3>\n");
-			
-			return sb.toString();
-		}
+		return sbArr[0].toString() + text + sbArr[1].toString();
+		
+		
+		// 
+		// StringBuilder sb = new StringBuilder("");
+		// 
+		// if(node.containsKey(JsonKeys.HTML_INJECTION)){
+		// 	sb.append(node.getString(JsonKeys.HTML_INJECTION));
+		// 	return sb.toString();
+		// }else{
+		// 	String fieldValue = node.field();
+		// 	
+		// 	
+		// 	String text = node.getString(JsonKeys.TEXT, "");
+		// 	
+		// 	StringBuilder classBuilder = new StringBuilder(" class=\"pf_header");
+		// 	FormGenerator.getCustomClass(node, classBuilder, JsonKeys.CUSTOMCLASS, "pfl_");
+		// 	FormGenerator.getCustomClass(node, classBuilder, JsonKeys.LABEL_CLASS, "");
+		// 	FormGenerator.getCustomClass(node, classBuilder, JsonKeys.INPUT_CLASS, "");
+		// 	classBuilder.append("\"");
+		// 	
+		// 	String inputCssString = FormGenerator.getInputCssString(node);
+		// 	
+		// 	sb.append("<h3"+classBuilder.toString() + inputCssString+">"+text+"</h3>\n");
+		// 	
+		// 	return sb.toString();
+		// }
 	};
 	
 	@SuppressWarnings("unchecked")

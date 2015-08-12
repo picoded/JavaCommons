@@ -10,8 +10,8 @@ import java.util.Map;
 public class FormWrapperTemplates {
 	
 	/// divWrapper
-    ///
-    /// Does a basic div wrapper
+	///
+	/// Does a basic div wrapper
 	protected static FormWrapperInterface divWrapper = (node)->{
 		String[] prefixSuffix = new String[2];
 		
@@ -26,6 +26,19 @@ public class FormWrapperTemplates {
 		
 		String cssString = FormGenerator.getWrapperCssString(node);
 		prefix.append("<"+HtmlTag.DIV+""+classString+cssString+">\n");	 
+		
+		
+		// Adds the label
+		//---------------------------------------------------------------
+		String labelValue = node.label();
+		if(!labelValue.isEmpty()){
+			StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
+			FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.CUSTOMCLASS, "pfl_");
+			FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.LABEL_CLASS, "");
+			labelClassBuilder.append("\"");
+			
+			prefix.append("<"+HtmlTag.LABEL+labelClassBuilder.toString()+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
+		}
 		
 		//generating suffix
 		StringBuilder suffix = new StringBuilder("</"+HtmlTag.DIV+">\n");

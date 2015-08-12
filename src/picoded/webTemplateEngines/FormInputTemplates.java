@@ -119,6 +119,29 @@ public class FormInputTemplates {
 		return sb;
 	};
 	
+	protected static Map<String, FormInputInterface> defaultInputTemplates() {
+		Map<String, FormInputInterface> defaultTemplates = new CaseInsensitiveHashMap<String, FormInputInterface>();
+		
+		// Wildcard fallback
+		defaultTemplates.put("*", FormInputTemplates.div);
+		
+		// Standard divs
+		defaultTemplates.put(JsonKeys.DIV, FormInputTemplates.div);
+		defaultTemplates.put(JsonKeys.TITLE, FormInputTemplates.header);
+		defaultTemplates.put(JsonKeys.DROPDOWN, FormInputTemplates.select);
+		defaultTemplates.put(JsonKeys.TEXT, FormInputTemplates.input_text);
+		defaultTemplates.put(JsonKeys.HTML_INJECTION, FormInputTemplates.raw_html);
+		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, dropdownWithOthers);
+		
+		return defaultTemplates;
+	}
+	
+	////////////////////////////////////////////////
+	//
+	//  TO-REFACTOR
+	//
+	////////////////////////////////////////////////
+	
 	@SuppressWarnings("unchecked")
 	protected static FormInputInterface dropdownWithOthers = (node)->{
 		StringBuilder sb = new StringBuilder();
@@ -231,20 +254,4 @@ public class FormInputTemplates {
 		return injectedScript;
 	}
 	
-	protected static Map<String, FormInputInterface> defaultInputTemplates() {
-		Map<String, FormInputInterface> defaultTemplates = new CaseInsensitiveHashMap<String, FormInputInterface>();
-		
-		// Wildcard fallback
-		defaultTemplates.put("*", FormInputTemplates.div);
-		
-		// Standard divs
-		defaultTemplates.put(JsonKeys.DIV, FormInputTemplates.div);
-		defaultTemplates.put(JsonKeys.TITLE, FormInputTemplates.header);
-		defaultTemplates.put(JsonKeys.DROPDOWN, FormInputTemplates.select);
-		defaultTemplates.put(JsonKeys.TEXT, FormInputTemplates.input_text);
-		defaultTemplates.put(JsonKeys.HTML_INJECTION, FormInputTemplates.raw_html);
-		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, dropdownWithOthers);
-		
-		return defaultTemplates;
-	}
 }

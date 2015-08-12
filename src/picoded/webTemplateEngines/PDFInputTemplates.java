@@ -13,6 +13,12 @@ import com.mysql.jdbc.StringUtils;
 
 public class PDFInputTemplates {
 	
+	////////////////////////////////////////////////
+	//
+	//  TO-REFACTOR
+	//
+	////////////////////////////////////////////////
+	
 	protected static FormInputInterface defaultOutput_pdf = (node)->{
 		return new StringBuilder("");
 	};

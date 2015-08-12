@@ -103,7 +103,7 @@ public class FormInputTemplates {
 					LinkedHashMap<String, String> dropDownListOptions = (LinkedHashMap<String, String>)dropDownObject;
 					for(String key:dropDownListOptions.keySet()){
 						sb.append("<"+HtmlTag.OPTION+" "+HtmlTag.VALUE+"=\""+key+"\"");
-						if(key.equals(selectedOption)){
+						if(key.equalsIgnoreCase(selectedOption)){
 							sb.append(" "+HtmlTag.SELECTED+"=\"selected\"");
 						}
 						sb.append(">"+dropDownListOptions.get(key)+"</"+HtmlTag.OPTION+">\n");
@@ -113,7 +113,7 @@ public class FormInputTemplates {
 					for(String str:dropDownOptions){
 						String key = RegexUtils.removeAllNonAlphaNumeric(str).toLowerCase();
 						sb.append("<"+HtmlTag.OPTION+" "+HtmlTag.VALUE+"=\""+key+"\"");
-						if(key.equals(selectedOption)){
+						if(key.equalsIgnoreCase(selectedOption)){
 							sb.append(" "+HtmlTag.SELECTED+"=\"selected\"");
 						}
 						sb.append(">"+str+"</"+HtmlTag.OPTION+">\n");

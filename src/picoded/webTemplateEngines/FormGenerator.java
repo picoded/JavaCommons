@@ -35,6 +35,13 @@ public class FormGenerator {
 		return customFormInputTemplates.put(key, customInputTemplate);
 	}
 	
+	public String generatePDFReadyHTML(String jsonString, Map<String, Object> prefilledJSONData){
+		List<FormNode> formNodes = FormNode.createFromJSONString(jsonString, prefilledJSONData);
+		String htmlString = generatePDFReadyHTML(formNodes);
+		htmlString = "<div class=\"pf_root\">"+htmlString+"</div>";
+		return htmlString;
+	}
+	
 	public String generatePDFReadyHTML(List<FormNode> nodes){
 		StringBuilder htmlBuilder = new StringBuilder();
 		for(FormNode node : nodes){
@@ -67,7 +74,9 @@ public class FormGenerator {
 	
 	public String applyTemplating(String jsonString, Map<String, Object> prefilledJSONData){
 		List<FormNode> formNodes = FormNode.createFromJSONString(jsonString, prefilledJSONData);
-		return applyTemplating(formNodes);
+		String htmlString = applyTemplating(formNodes);
+		htmlString = "<div class=\"pf_root\">"+htmlString+"</div>";
+		return htmlString;
 	}
 	
 	public String applyTemplating(List<FormNode> nodes){
@@ -107,8 +116,6 @@ public class FormGenerator {
 			String finalNodeValue = formWrappers[0]+formTextData+innerData.toString()+formWrappers[1];
 			return finalNodeValue;
 		}
-		
-		
 	}
 	
 	public static void getCustomClass(FormNode node, StringBuilder sb, String jsonKey, String prefix){
@@ -127,57 +134,6 @@ public class FormGenerator {
 			}
 		}
 	}
-	
-//	public static void getSpecificClass(FormNode node, StringBuilder sb, String jsonKey){
-//		if(node.containsKey(jsonKey)){
-//			String wrapperClass = node.getString(jsonKey);
-//			String[] wrapperClassSplit = null;
-//			if(wrapperClass.contains(" ")){
-//				wrapperClassSplit = wrapperClass.split(" ");
-//				for(String str:wrapperClassSplit){
-//					if(!str.equals(" ")){
-//						sb.append(" "+str);
-//					}
-//				}
-//			}else{
-//				sb.append(" "+wrapperClass);
-//			}
-//		}
-//	}
-	
-//	public static void getChildClass(FormNode node, StringBuilder sb){
-//		if(node.containsKey(JsonKeys.CHILD_CLASS)){
-//			String wrapperClass = node.getString(JsonKeys.CHILD_CLASS);
-//			String[] wrapperClassSplit = null;
-//			if(wrapperClass.contains(" ")){
-//				wrapperClassSplit = wrapperClass.split(" ");
-//				for(String str:wrapperClassSplit){
-//					if(!str.equals(" ")){
-//						sb.append(" "+str);
-//					}
-//				}
-//			}else{
-//				sb.append(" "+wrapperClass);
-//			}
-//		}
-//	}
-//	
-//	public static void getWrapperClass(FormNode node, StringBuilder sb){
-//		if(node.containsKey(JsonKeys.WRAPPER_CLASS)){
-//			String wrapperClass = node.getString(JsonKeys.WRAPPER_CLASS);
-//			String[] wrapperClassSplit = null;
-//			if(wrapperClass.contains(" ")){
-//				wrapperClassSplit = wrapperClass.split(" ");
-//				for(String str:wrapperClassSplit){
-//					if(!str.equals(" ")){
-//						sb.append(" "+str);
-//					}
-//				}
-//			}else{
-//				sb.append(" "+wrapperClass);
-//			}
-//		}
-//	}
 	
 	public static String getWrapperCssString(FormNode node){
 		StringBuilder sb = new StringBuilder("");

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import picoded.conv.RegexUtils;
+import picoded.struct.CaseInsensitiveHashMap;
 
 import com.mysql.jdbc.StringUtils;
 
@@ -38,6 +39,7 @@ public class PDFInputTemplates {
 		return sb.toString();
 	};
 	
+	@SuppressWarnings("unchecked")
 	protected static FormInputInterface default_pdf = (node)->{
 		StringBuilder sb = new StringBuilder();
 		
@@ -56,8 +58,22 @@ public class PDFInputTemplates {
 		String fieldName = node.field();
 		if(!fieldName.isEmpty()){
 			String fieldValue = (String)node.getDefaultValue(fieldName);
+			String finalFieldValue = fieldValue;
 			if(!StringUtils.isNullOrEmpty(fieldValue)){
-				sb.append("<"+HtmlTag.DIV+pdfOutputClassBuilder.toString()+">"+fieldValue+"</"+HtmlTag.DIV+">");
+				if(node.getString(JsonKeys.TYPE).equals(JsonKeys.DROPDOWN)){
+					//map the fieldvalue to the options
+					Object optionsRaw = node.get(JsonKeys.OPTIONS);
+					if(optionsRaw instanceof Map){
+						Map<String, Object> options = (Map<String, Object>)optionsRaw;
+						for(String key:options.keySet()){
+							if(key.equalsIgnoreCase(fieldValue)){
+								finalFieldValue = (String)options.get(key);
+							}
+						}
+					}
+				}
+				
+				sb.append("<"+HtmlTag.DIV+pdfOutputClassBuilder.toString()+">"+finalFieldValue+"</"+HtmlTag.DIV+">");
 			}
 		}
 		return sb.toString();
@@ -83,7 +99,7 @@ public class PDFInputTemplates {
 		String fieldName = node.field();
 		if(!fieldName.isEmpty()){
 			String fieldValue = (String)node.getDefaultValue(fieldName);
-//			String othersOption = node.getString(JsonKeys.OTHERS_OPTION);
+			fieldValue = RegexUtils.removeAllNonAlphaNumeric(fieldValue).toLowerCase();
 			
 			if(node.containsKey(JsonKeys.OPTIONS)){
 				Object dropDownObject = node.get(JsonKeys.OPTIONS);

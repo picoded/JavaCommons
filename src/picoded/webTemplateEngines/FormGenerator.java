@@ -46,6 +46,69 @@ public class FormGenerator {
 	//
 	/////////////////////////////////////////////////////////////////////////
 	
+	/// Returns the inputMap storing all the various FormInputInterface
+	///
+	/// @params {boolean} displayOnly  - Returns the map, in which display only interfaces are provided
+	///
+	/// @returns {Map<String, FormInputInterface>} interface map
+	protected Map<String, FormInputInterface> inputInterfaceMap(boolean displayOnly) {
+		if(displayOnly) {
+			return customPDFInputTemplates;
+		} else {
+			return customFormInputTemplates;
+		}
+	}
+	
+	/// Returns the wrapperMap storing all the various FormWrapperInterface
+	///
+	/// @params {boolean} displayOnly  - Returns the map, in which display only interfaces are provided
+	///
+	/// @returns {Map<String, FormInputInterface>} interface map
+	protected Map<String, FormWrapperInterface> wrapperInterfaceMap(boolean displayOnly) {
+		if(displayOnly) {
+			return customPDFWrapperTemplates;
+		} else {
+			return customFormWrapperTemplates;
+		}
+	}
+	
+	/// Returns the FormInputInterface, given the display mode and type
+	/// This will automatically fallback to default interface if the requested type is not found
+	///
+	/// @params {boolean} displayOnly  - Returns the map, in which display only interfaces are provided
+	/// @params {String} type          - String representing the input type to request for
+	///
+	/// @returns {FormInputInterface} interface function
+	public FormInputInterface inputInterface(boolean displayOnly, String type) {
+		FormInputInterface ret = inputInterfaceMap(displayOnly).get(type);
+		if( ret != null ) {
+			return ret;
+		}
+		return inputInterfaceMap(displayOnly).get("*");
+	}
+	
+	/// Returns the FormWrapperInterface, given the display mode and type
+	/// This will automatically fallback to default interface if the requested type is not found
+	///
+	/// @params {boolean} displayOnly  - Returns the map, in which display only interfaces are provided
+	/// @params {String} type          - String representing the wrapper type to request for
+	///
+	/// @returns {FormWrapperInterface} interface function
+	public FormWrapperInterface wrapperInterface(boolean displayOnly, String type) {
+		FormWrapperInterface ret = wrapperInterfaceMap(displayOnly).get(type);
+		if( ret != null ) {
+			return ret;
+		}
+		return wrapperInterfaceMap(displayOnly).get("*");
+	}
+	
+	
+	/////////////////////////////////////////////////////////////////////////
+	//
+	// Internal vars Accessor : To remove
+	//
+	/////////////////////////////////////////////////////////////////////////
+	
 	protected Map<String, FormInputInterface> formInputsMap() {
 		return customFormInputTemplates;
 	}
@@ -96,7 +159,7 @@ public class FormGenerator {
 	
 	/////////////////////////////////////////////////////////////////////////
 	//
-	// Internal vars Accessor
+	// To refactor
 	//
 	/////////////////////////////////////////////////////////////////////////
 	

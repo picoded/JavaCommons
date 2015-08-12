@@ -3,152 +3,120 @@ package picoded.webTemplateEngines;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import picoded.conv.ListValueConv;
+import picoded.conv.GenericConvert;
 import picoded.conv.RegexUtils;
 import picoded.struct.CaseInsensitiveHashMap;
-
-import com.amazonaws.services.datapipeline.model.Field;
-import com.hazelcast.instance.Node;
-import com.mysql.jdbc.StringUtils;
 
 public class FormInputTemplates {
 	
 	protected static FormInputInterface div = (node)->{
 		String text = node.getString(JsonKeys.TEXT, "");
+		String fieldValue = node.getFieldValue();
 		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, "pf_div", null );
-		return sbArr[0].append(text).append(sbArr[1]);
+		return sbArr[0].append(text).append(fieldValue).append(sbArr[1]);
 	};
 	
 	protected static FormInputInterface header = (node)->{ 
 		String text = node.getString(JsonKeys.TEXT, "");
+		String fieldValue = node.getFieldValue();
 		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.HEADER, "pf_header", null );
-		return sbArr[0].append(text).append(sbArr[1]);
+		return sbArr[0].append(text).append(fieldValue).append(sbArr[1]);
 	};
 	
+	@SuppressWarnings("unchecked")
 	protected static FormInputInterface select = (node)->{ 
 		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.SELECT, "pf_select", null );
 		StringBuilder ret = sbArr[0];
 		
 		// Prepeare the option key value list
-		List<String> keyList = new ArrayList<String>();
-		List<String> valList = new ArrayList<String>();
+		List<String> keyList = null;
+		List<String> nmeList = null;
+		String key = null; //the key item
+		String nme = null; //the display name
 		
 		// Generates the dropdown list, using either map or list
+		//---------------------------------------------------------
 		Object dropDownObject = node.get(JsonKeys.OPTIONS);
-		if(dropDownObject instanceof Map<?, ?>){
+		if(dropDownObject instanceof List){
+			nmeList = ListValueConv.objectToString( (List<Object>)dropDownObject );
+			keyList = new ArrayList<String>();
 			
-		} else if(dropDownObject instanceof List<?>){
+			for(int a=0; a<nmeList.size(); ++a) {
+				keyList.add( RegexUtils.removeAllNonAlphaNumeric( nmeList.get(a) ).toLowerCase() );
+			}
+		} else if(dropDownObject instanceof Map) {
+			nmeList = new ArrayList<String>();
+			keyList = new ArrayList<String>();
 			
+			Map<Object,Object> dropDownMap = (Map<Object,Object>)dropDownObject;
+			for(Object keyObj : dropDownMap.keySet()) {
+				key = RegexUtils.removeAllNonAlphaNumeric( GenericConvert.toString(keyObj, null) ).toLowerCase();
+				
+				// Skip blank keys 
+				if(key == null || key.length() <= 0) {
+					continue;
+				}
+				
+				nme = GenericConvert.toString( dropDownMap.get(keyObj), null );
+				
+				// Skip blank values 
+				if(nme == null || nme.length() <= 0) {
+					continue;
+				}
+				
+				// Insert key value pair
+				keyList.add(key);
+				nmeList.add(nme);
+			}
 		}
 		
+		// Use the generated list, to populate the option set
+		//---------------------------------------------------------
+		String selectedKey = node.getFieldValue(); 
+		
+		for(int a=0; a<keyList.size(); ++a) {
+			
+			key = keyList.get(a);
+			nme = nmeList.get(a);
+			
+			ret.append("<"+HtmlTag.OPTION+" "+HtmlTag.VALUE+"=\""+key+"\"");
+			
+			// Value is selected
+			if( selectedKey != null && selectedKey.equalsIgnoreCase( key ) ) {
+				ret.append(" "+HtmlTag.SELECTED+"=\""+HtmlTag.SELECTED+"\"");
+			}
+			
+			ret.append(">"+nme+"</"+HtmlTag.OPTION+">");
+		}
 		
 		ret.append(sbArr[1]);
 		
 		return ret;
 	};
 	
-	
-	
-	
-	/*
 	@SuppressWarnings("unchecked")
-	protected static FormInputInterface select = (node)->{
-		StringBuilder sb = new StringBuilder();
+	protected static FormInputInterface input_text = (node)->{
+		CaseInsensitiveHashMap<String,String> paramMap = new CaseInsensitiveHashMap<String, String>();
+		String fieldValue = node.getFieldValue();
 		
-			String labelValue = node.label();
-			String fieldValue = node.field();
-			
-			StringBuilder classStringBuilder = new StringBuilder(" class=\"pf_select");
-			FormGenerator.getCustomClass(node, classStringBuilder, JsonKeys.CUSTOMCLASS, "pfi_");
-			FormGenerator.getCustomClass(node, classStringBuilder, JsonKeys.INPUT_CLASS, "");
-			classStringBuilder.append("\"");
-			String inputClassString = classStringBuilder.toString();
-			
-			String selectedOption = "";
-			if(!fieldValue.isEmpty()){
-				String fieldHtmlString = " "+HtmlTag.ID+"=\""+fieldValue+"\"";
-				sb.append("<"+HtmlTag.SELECT+""+inputClassString+fieldHtmlString+">\n");
-				selectedOption = (String)node.getDefaultValue(fieldValue);
-				if(selectedOption != null){
-					selectedOption = RegexUtils.removeAllNonAlphaNumeric(selectedOption).toLowerCase();
-				}
-			}
-			
-			if(node.containsKey(JsonKeys.OPTIONS)){
-				Object dropDownObject = node.get(JsonKeys.OPTIONS);
-				
-				//if what is passed in is a Map, assume it is LinkedHashMap, to maintain insertion order
-				if(dropDownObject instanceof HashMap<?, ?>){
-					LinkedHashMap<String, String> dropDownListOptions = (LinkedHashMap<String, String>)dropDownObject;
-					for(String key:dropDownListOptions.keySet()){
-						sb.append("<"+HtmlTag.OPTION+" "+HtmlTag.VALUE+"=\""+key+"\"");
-						if(key.equalsIgnoreCase(selectedOption)){
-							sb.append(" "+HtmlTag.SELECTED+"=\"selected\"");
-						}
-						sb.append(">"+dropDownListOptions.get(key)+"</"+HtmlTag.OPTION+">\n");
-					}
-				} else if(dropDownObject instanceof List<?>){
-					List<String> dropDownOptions = (List<String>)dropDownObject;
-					for(String str:dropDownOptions){
-						String key = RegexUtils.removeAllNonAlphaNumeric(str).toLowerCase();
-						sb.append("<"+HtmlTag.OPTION+" "+HtmlTag.VALUE+"=\""+key+"\"");
-						if(key.equalsIgnoreCase(selectedOption)){
-							sb.append(" "+HtmlTag.SELECTED+"=\"selected\"");
-						}
-						sb.append(">"+str+"</"+HtmlTag.OPTION+">\n");
-					}
-				}
-			}
-			
-			sb.append("</"+HtmlTag.SELECT+">\n");
-			
-			return sb.toString();
+		paramMap.put(HtmlTag.TYPE, "text");
+		if( fieldValue != null && fieldValue.length() >= 0 ) {
+			paramMap.put(HtmlTag.VALUE, fieldValue);
+		}
+		
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pf_inputText", paramMap );
+		return sbArr[0].append(sbArr[1]);
 	};
 	
-	protected static FormInputInterface input_text = (node)->{
+	protected static FormInputInterface raw_html = (node)->{
 		StringBuilder sb = new StringBuilder();
-		
-		if(node.containsKey(JsonKeys.HTML_INJECTION)){
-			sb.append(node.getString(JsonKeys.HTML_INJECTION));
-			return sb.toString();
-		}else{
-		
-			String labelValue = node.label();
-			String fieldValue = node.field();
-			if(!labelValue.isEmpty()){
-				StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
-				FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.CUSTOMCLASS, "pfl_");
-				FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.LABEL_CLASS, "");
-				labelClassBuilder.append("\"");
-				
-				sb.append("<"+HtmlTag.LABEL+" "+labelClassBuilder.toString()+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
-			}
-			
-			StringBuilder classStringBuilder = new StringBuilder(" class=\"pf_inputText");
-			FormGenerator.getCustomClass(node, classStringBuilder, JsonKeys.CUSTOMCLASS, "pfi_");
-			FormGenerator.getCustomClass(node, classStringBuilder, JsonKeys.LABEL_CLASS, "");
-			classStringBuilder.append("\"");
-			String inputClassString = classStringBuilder.toString();
-			
-			sb.append("<"+HtmlTag.INPUT+""+inputClassString+" "+HtmlTag.TYPE+"=\"text\" ");
-			
-			//id/field and value elements
-			if(!fieldValue.isEmpty()){
-				sb.append(""+HtmlTag.ID+"=\""+fieldValue+"\"");
-				String fieldDefaultValue = (String)node.getDefaultValue(fieldValue);
-				if(!StringUtils.isNullOrEmpty(fieldDefaultValue)){
-					sb.append(" "+HtmlTag.VALUE+"=\""+fieldDefaultValue+"\"></"+HtmlTag.INPUT+">\n");
-				}else{
-					sb.append("></"+HtmlTag.INPUT+">\n");
-				}
-			}else{
-				sb.append("></"+HtmlTag.INPUT+">\n");
-			}
-			
-			return sb.toString();
-		}
+		sb.append(node.getString(JsonKeys.HTML_INJECTION));
+		return sb;
 	};
 	
 	@SuppressWarnings("unchecked")
@@ -157,7 +125,7 @@ public class FormInputTemplates {
 		
 		if(node.containsKey(JsonKeys.HTML_INJECTION)){
 			sb.append(node.getString(JsonKeys.HTML_INJECTION));
-			return sb.toString();
+			return sb;
 		}else{
 			//jscript here
 			sb.append("<script>");
@@ -239,16 +207,10 @@ public class FormInputTemplates {
 			}
 			
 			
-			return sb.toString();
+			return sb;
 		}
 	};
 	
-	protected static FormInputInterface raw_html = (node)->{
-		StringBuilder sb = new StringBuilder();
-		sb.append(node.getString(JsonKeys.HTML_INJECTION));
-		
-		return sb.toString();
-	};
 	
 	protected static String getDropDownOthersJavascriptFunction(FormNode node){
 		String dropDownField = node.getString("field");
@@ -268,19 +230,20 @@ public class FormInputTemplates {
 		
 		return injectedScript;
 	}
-	*/
 	
 	protected static Map<String, FormInputInterface> defaultInputTemplates() {
 		Map<String, FormInputInterface> defaultTemplates = new CaseInsensitiveHashMap<String, FormInputInterface>();
-		defaultTemplates.put(JsonKeys.DIV, FormInputTemplates.div);
 		
-		/*
+		// Wildcard fallback
+		defaultTemplates.put("*", FormInputTemplates.div);
+		
+		// Standard divs
+		defaultTemplates.put(JsonKeys.DIV, FormInputTemplates.div);
 		defaultTemplates.put(JsonKeys.TITLE, FormInputTemplates.header);
 		defaultTemplates.put(JsonKeys.DROPDOWN, FormInputTemplates.select);
 		defaultTemplates.put(JsonKeys.TEXT, FormInputTemplates.input_text);
 		defaultTemplates.put(JsonKeys.HTML_INJECTION, FormInputTemplates.raw_html);
 		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, dropdownWithOthers);
-		*/
 		
 		return defaultTemplates;
 	}

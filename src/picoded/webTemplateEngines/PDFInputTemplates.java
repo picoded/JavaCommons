@@ -13,13 +13,12 @@ import com.mysql.jdbc.StringUtils;
 
 public class PDFInputTemplates {
 	
-	/*
 	protected static FormInputInterface defaultOutput_pdf = (node)->{
-		return "";
+		return new StringBuilder("");
 	};
 	
 	protected static FormInputInterface div_pdf = (node)->{
-		return "";
+		return new StringBuilder("");
 	};
 	
 	protected static FormInputInterface header_pdf = (node)->{ 
@@ -37,7 +36,7 @@ public class PDFInputTemplates {
 		
 		sb.append("<h3"+inputClassString+inputCssString+">"+text+"</h3>\n");
 		
-		return sb.toString();
+		return sb;
 	};
 	
 	@SuppressWarnings("unchecked")
@@ -77,7 +76,7 @@ public class PDFInputTemplates {
 				sb.append("<"+HtmlTag.DIV+pdfOutputClassBuilder.toString()+">"+finalFieldValue+"</"+HtmlTag.DIV+">");
 			}
 		}
-		return sb.toString();
+		return sb;
 	};
 	
 	@SuppressWarnings("unchecked")
@@ -131,13 +130,13 @@ public class PDFInputTemplates {
 				}
 			}
 		}
-		return sb.toString();
+		return sb;
 	};
 	
 	protected static FormInputInterface rawHtml_pdf = (node)->{
 		StringBuilder sb = new StringBuilder();
 		sb.append(node.getString(JsonKeys.HTML_INJECTION));
-		return sb.toString();
+		return sb;
 	};
 	
 	protected static void getPDFOutputClass(FormNode node, StringBuilder sb){
@@ -156,17 +155,20 @@ public class PDFInputTemplates {
 			}
 		}
 	}
-	*/
 	
 	public static Map<String, FormInputInterface> defaultPDFInputTemplates(){
-		Map<String, FormInputInterface> defaultTemplates = new HashMap<String, FormInputInterface>();
+		Map<String, FormInputInterface> defaultTemplates = new CaseInsensitiveHashMap<String, FormInputInterface>();
 		
-		// defaultTemplates.put("dropdown", default_pdf);
-		// defaultTemplates.put("text", default_pdf);
-		// defaultTemplates.put("div", div_pdf);
-		// defaultTemplates.put("title", header_pdf);
-		// defaultTemplates.put("rawHtml", rawHtml_pdf);
-		// defaultTemplates.put("dropdownWithOthers", dropdownWithOthers);
+		// Wildcard fallback
+		defaultTemplates.put("*", div_pdf);
+		
+		// Standard divs
+		defaultTemplates.put("dropdown", default_pdf);
+		defaultTemplates.put("text", default_pdf);
+		defaultTemplates.put("div", div_pdf);
+		defaultTemplates.put("title", header_pdf);
+		defaultTemplates.put("rawHtml", rawHtml_pdf);
+		defaultTemplates.put("dropdownWithOthers", dropdownWithOthers);
 		
 		return defaultTemplates;
 	}

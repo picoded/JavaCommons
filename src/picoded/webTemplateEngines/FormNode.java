@@ -150,6 +150,13 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 			map.put("id", tmp);
 		}
 		
+		//
+		// Fieldname handling
+		//-----------------------------------
+		if( (tmp = getFieldName()) != null && tmp.length() > 0 ) {
+			map.put("name", tmp);
+		}
+		
 		return map;
 	}
 	
@@ -212,19 +219,6 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	/// @returns {StringBuilder[2]}  - A pair of StringBuilder representing the prefix and suffix nodes
 	public StringBuilder[] defaultHtmlInput( String nodeType, String nodeClass, Map<String,String> parameterMap ) {
 		return htmlNodeGenerator( nodeType, defaultInputParameterMap( nodeClass, parameterMap), null );
-	}
-	
-	/// Collapse the various string builder array into a single string builder
-	///
-	/// @params {StringBuilder[]}  toCollapse  - Array of string builder to collapse together
-	/// 
-	/// @returns {StringBuilder}  - The final collapsed string builder
-	public StringBuilder collapseStringBuilderArray( StringBuilder[] toCollapse ) {
-		StringBuilder ret = new StringBuilder();
-		for(int a=0; a<toCollapse.length; ++a) {
-			ret.append( toCollapse[a] );
-		}
-		return ret;
 	}
 	
 	//
@@ -343,13 +337,16 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	
 	/// @TODO
 	/// Returns the default value of the object, 
-	public String getFieldValue(){
+	public String getFieldName(){
+		if( containsKey(JsonKeys.FIELD) ) {
+			return RegexUtils.removeAllNonAlphaNumeric( getString(JsonKeys.FIELD) ).toLowerCase();
+		}
 		return null;
 	}
 	
 	/// @TODO
 	/// Returns the default value of the object, 
-	public String getFieldValue(String fieldName){
+	public String getFieldValue(){
 		return null;
 	}
 	
@@ -357,6 +354,12 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	// To remove
 	//
 	//------------------------------------------------------------------------
+	
+	/// @TODO
+	/// Returns the default value of the object, 
+	public String getFieldValue(String fieldName){
+		return null;
+	}
 	
 	/// Returns the default value of the object, 
 	/// note that this will get the 0th indexed value.
@@ -415,6 +418,19 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		}
 		
 		return formNodes;
+	}
+	
+	/// Collapse the various string builder array into a single string builder
+	///
+	/// @params {StringBuilder[]}  toCollapse  - Array of string builder to collapse together
+	/// 
+	/// @returns {StringBuilder}  - The final collapsed string builder
+	public StringBuilder collapseStringBuilderArray( StringBuilder[] toCollapse ) {
+		StringBuilder ret = new StringBuilder();
+		for(int a=0; a<toCollapse.length; ++a) {
+			ret.append( toCollapse[a] );
+		}
+		return ret;
 	}
 	
 }

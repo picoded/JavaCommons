@@ -41,6 +41,11 @@ public class JsonKeys {
 	//  JSON Node Types (standard)
 	//
 	////////////////////////////////////////////////
+	
+	/// No wrapper? Used mainly for raw html mode
+	public static String NONE = "none";
+	
+	/// Standard DIV wrapper / input
 	public static String DIV = "div";
 	
 	////////////////////////////////////////////////

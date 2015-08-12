@@ -32,12 +32,6 @@ public class HtmlTag {
 	//
 	////////////////////////////////////////////////
 	
-	
-	
-	
-	
-	
-	
 	public static String LABEL = "label";
 	
 	public static String ID = "id";

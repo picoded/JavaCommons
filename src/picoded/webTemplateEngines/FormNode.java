@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import picoded.conv.ConvertJSON;
 import picoded.conv.RegexUtils;
@@ -301,8 +302,10 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	//
 	//------------------------------------------------------------------------
 	
+	/// Gets and returns the input html representing the current 
+	///
+	/// @returns {StringBuilder} Full StringBuilder representing the output result
 	public StringBuilder formInputHtml() {
-		
 		// Gets type
 		String nodeType = getString(JsonKeys.TYPE, HtmlTag.DIV);
 		
@@ -310,7 +313,62 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		FormInputInterface func = _formGenerator.formInput(nodeType);
 		
 		// The node 
-		return func.apply(nodeType);
+		return func.apply(this);
+	}
+	
+	/// Gets and return the wrapper html, via the wrapper function.
+	/// Which in turn will call the resepective formInputHtml() and/or child nodes
+	///
+	/// @returns {StringBuilder} Full StringBuilder representing the output result
+	public StringBuilder formWrapperHtml() {
+		// Gets type
+		String nodeType = getString(JsonKeys.TYPE, HtmlTag.DIV);
+		
+		// Gets the input generator
+		FormWrapperInterface func = _formGenerator.formWrapper(nodeType);
+		
+		// The node 
+		return func.apply(this);
+	}
+	
+	/// Generates the children wrapper html, using the function to generate html strings inbetween if needed
+	/// Note that given int is the child index number before the spacer. And spacer is ignored for last child.
+	/// The spacer function is also ignored if its null
+	///
+	/// @params  {Function<int,StringBuilder>}  spacer  - lamda function to call to add a spacer string in between child nodes
+	public StringBuilder formChildrenFullHtml(Function<Integer,StringBuilder> spacer) {
+		StringBuilder ret = new StringBuilder();
+		List<FormNode> childList = children();
+		
+		if( childList == null ) {
+			return ret;
+		}
+		
+		int childListSize = childList.size();
+		for( int a=0; a<childListSize; ++a ) {
+			
+			// Add the child full html
+			ret.append( childList.get(a).formWrapperHtml() );
+			
+			// Not last child, add spacer
+			if( spacer != null && (a+1)<childListSize ) {
+				ret.append( spacer.apply(a) );
+			}
+		}
+		
+		return ret;
+	}
+	
+	/// Varient of formChildrenFullHtml, without spacer function
+	// public StringBuilder formChildrenFullHtml() {
+	// 	return formChildrenFullHtml(null);
+	// }
+	
+	/// Varient of formChildrenFullHtml, with fixed spacer function
+	public StringBuilder formChildrenFullHtml(String spacerString) {
+		final StringBuilder spacerBuilder = new StringBuilder(spacerString);
+		Function<Integer,StringBuilder> spacer = (n) -> { return spacerBuilder; };
+		return formChildrenFullHtml(spacer);
 	}
 	
 	//

@@ -18,12 +18,133 @@ import picoded.struct.CaseInsensitiveHashMap;
 public class FormNode extends CaseInsensitiveHashMap<String, Object> implements GenericConvertMap<String, Object> {
 	
 	//
+	// Values function
+	//
+	// Contains functions that provide values such as prefix / suffixes 
+	// that maybe changed / made configurable in future
+	//
+	//------------------------------------------------------------------------
+	
+	/// @returns {String} prefix for the label auto class
+	public String prefix_label() {
+		return "pfl_";
+	}
+	
+	/// @returns {String} prefix for the input auto class
+	public String prefix_input() {
+		return "pfi_";
+	}
+	
+	/// @returns {String} prefix for the wrapper container auto class
+	public String prefix_wrapper() {
+		return "pfw_";
+	}
+	
+	/// @returns {String} prefix for the child container auto class
+	public String prefix_wrapper() {
+		return "pfc_";
+	}
+	
+	//
 	// Utility helper functions
 	//
 	// Consists mainly of helper functions used by the various interface
 	// implmentation for Html string generation
 	//
 	//------------------------------------------------------------------------
+	
+	/// Applies a custom prefix, and suffix to a string split by a seperator
+	/// 
+	/// @params {String}  value   - The value to split and add prefix/suffix
+	/// @params {String}  split   - The string to split the input value
+	/// @params {String}  prefix  - The prefix to add to each split value 
+	/// @params {String}  suffix  - The suffix to add to each split value 
+	/// 
+	/// @returns {StringBuilder}  - The rebuilt value set, with prefix and suffix added
+	public static StringBuilder addPrefixAndSuffix(String value, String split, String prefix, String suffix) {
+		StringBuilder ret = new StringBuilder();
+		
+		if( value != null && value.length() > 0 ) {
+			String[] valueArr = value.split(split);
+			boolean firstElement = true;
+			
+			for(int a=0; a<valueArr.length; ++a) {
+				if(valueArr[a] == null || valueArr[a].length() <= 0) {
+					continue;
+				}
+				
+				if( !firstElement ) {
+					firstElement = false;
+				} else {
+					ret.append(split);
+				}
+				
+				if( prefix != null ) {
+					ret.append(prefix);
+				}
+				ret.append(value);
+				if( suffix != null ) {
+					ret.append(suffix);
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/// Shorten varient of addPrefixAndSuffix, where split is " ", and suffix is null
+	/// 
+	/// @params {String}  value   - The value to split and add prefix/suffix
+	/// @params {String}  prefix  - The prefix to add to each split value
+	/// 
+	/// @returns {StringBuilder}  - The rebuilt value set, with prefix and suffix added
+	public static StringBuilder addPrefix(String value, String prefix) {
+		return addPrefixAndSuffix(value, " ", prefix, null);
+	}
+	
+	/// Generates the standard node parameter map for input. This is useful for shared default behaviour
+	///
+	/// @params {String}  inputBaseClass   - The input class to add, before the automated classes
+	/// @params {Map<String,String>}  map  - The return map to setup, if null it returns a new CaseInsensitiveHashMap
+	///
+	/// @returns {Map<String,String>} - the return parameter map
+	public Map<String,String> defaultInputParameterMap( String inputBaseClass, Map<String,String> map ) {
+		if( map == null ) {
+			map = new CaseInsensitiveHashMap<String,String>();
+		}
+		
+		//
+		// Default class handling
+		//-----------------------------------
+		
+		StringBuilder tmpSB = new StringBuilder(inputBaseClass);
+		String tmp = null;
+		if( (tmp = toString( JsonKeys.AUTO_CLASS )) && tmp.length() > 0 ) {
+			if(tmpSB.length() > 0) {
+				tmpSB.append(" ");
+			}
+			
+			tmpSB.append( addPrefix(tmp, prefix_label()) );
+		}
+		
+		if( (tmp = toString( JsonKeys.INPUT_CLASS )) && tmp.length() > 0 ) {
+			if(tmpSB.length() > 0) {
+				tmpSB.append(" ");
+			}
+			
+			tmpSB.append( tmp );
+		}
+		map.put( "class", class.toString() );
+		
+		//
+		// Style injection handling
+		//-----------------------------------
+		if( (tmp = toString( JsonKeys.INPUT_CSS )) && tmp.length() > 0 ) {
+			map.put("style", tmp);
+		}
+		
+		return map;
+	}
 	
 	/// Helps escape html dom parameter quotes, in an "optimal" way
 	///
@@ -54,9 +175,11 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	/// @returns {StringBuilder[2]}  - A pair of StringBuilder representing the prefix and suffix nodes
 	public static StringBuilder[] htmlNodeGenerator( String nodeType, Map<String,String> parameterMap, String rawParameterString ) {
 		StringBuilder domNode = new StringBuilder("<"+nodeType);
+		String innerHtml = null;
 		
 		if( parameterMap != null ) {
 		for (Map.Entry<String, String> entry : parameterMap.entrySet()) {
+				// Setup rest of parameters
 				domNode //
 					.append(" ") //
 					.append(entry.getKey()) //
@@ -68,9 +191,33 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		if( rawParameterString != null && rawParameterString.length() > 0 ) {
 			domNode.append(" ").append(rawParameterString);
 		}
-		
 		domNode.append(">");
+		
 		return new StringBuilder[] { domNode,  new StringBuilder("</"+nodeType+">") };
+	}
+	
+	/// A combination of defaultInputParameterMap, and htmlNodeGenerator
+	///
+	/// @params {String}  nodeType          - HTML DOM type to generate, such as DIV, or INPUT
+	/// @params {String}  inputBaseClass    - The input class to add, before the automated classes
+	/// @params {Map<String,String>}  map   - The parameter map to setup, if null it uses a new CaseInsensitiveHashMap
+	///
+	/// @returns {StringBuilder[2]}  - A pair of StringBuilder representing the prefix and suffix nodes
+	public StringBuilder[] defaultHtmlInput( String nodeType, String nodeClass, Map<String,String> parameterMap ) {
+		return htmlNodeGenerator( nodeType, defaultInputParameterMap( nodeClass, parameterMap), null );
+	}
+	
+	/// Collapse the various string builder array into a single string builder
+	///
+	/// @params {StringBuilder[]}  toCollapse  - Array of string builder to collapse together
+	/// 
+	/// @returns {StringBuilder}  - The final collapsed string builder
+	public StringBuilder collapseStringBuilderArray( StringBuilder[] toCollapse ) {
+		StringBuilder ret = new StringBuilder();
+		for(int a=0; a<toCollapse.length; ++a) {
+			ret.append( toCollapse[a] );
+		}
+		return ret;
 	}
 	
 	//

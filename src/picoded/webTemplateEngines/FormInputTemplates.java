@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import picoded.conv.RegexUtils;
+import picoded.struct.CaseInsensitiveHashMap;
 
 import com.amazonaws.services.datapipeline.model.Field;
 import com.hazelcast.instance.Node;
@@ -15,60 +16,49 @@ import com.mysql.jdbc.StringUtils;
 public class FormInputTemplates {
 	
 	protected static FormInputInterface div = (node)->{
-		return node.collapseStringBuilderArray( node.defaultHtmlInput( JsonKeys.DIV, "pf_div", null ) ).toString();
+		String text = node.getString(JsonKeys.TEXT, "");
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, "pf_div", null );
+		return sbArr[0].append(text).append(sbArr[1]);
 	};
 	
 	protected static FormInputInterface header = (node)->{ 
 		String text = node.getString(JsonKeys.TEXT, "");
-		StringBuilder[] sbArr = node.defaultHtmlInput( JsonKeys.DOM_HEADER, "pf_header", null );
-		
-		return sbArr[0].toString() + text + sbArr[1].toString();
-		
-		
-		// 
-		// StringBuilder sb = new StringBuilder("");
-		// 
-		// if(node.containsKey(JsonKeys.HTML_INJECTION)){
-		// 	sb.append(node.getString(JsonKeys.HTML_INJECTION));
-		// 	return sb.toString();
-		// }else{
-		// 	String fieldValue = node.field();
-		// 	
-		// 	
-		// 	String text = node.getString(JsonKeys.TEXT, "");
-		// 	
-		// 	StringBuilder classBuilder = new StringBuilder(" class=\"pf_header");
-		// 	FormGenerator.getCustomClass(node, classBuilder, JsonKeys.CUSTOMCLASS, "pfl_");
-		// 	FormGenerator.getCustomClass(node, classBuilder, JsonKeys.LABEL_CLASS, "");
-		// 	FormGenerator.getCustomClass(node, classBuilder, JsonKeys.INPUT_CLASS, "");
-		// 	classBuilder.append("\"");
-		// 	
-		// 	String inputCssString = FormGenerator.getInputCssString(node);
-		// 	
-		// 	sb.append("<h3"+classBuilder.toString() + inputCssString+">"+text+"</h3>\n");
-		// 	
-		// 	return sb.toString();
-		// }
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.HEADER, "pf_header", null );
+		return sbArr[0].append(text).append(sbArr[1]);
 	};
 	
+	protected static FormInputInterface select = (node)->{ 
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.SELECT, "pf_select", null );
+		StringBuilder ret = sbArr[0];
+		
+		// Prepeare the option key value list
+		List<String> keyList = new ArrayList<String>();
+		List<String> valList = new ArrayList<String>();
+		
+		// Generates the dropdown list, using either map or list
+		Object dropDownObject = node.get(JsonKeys.OPTIONS);
+		if(dropDownObject instanceof Map<?, ?>){
+			
+		} else if(dropDownObject instanceof List<?>){
+			
+		}
+		
+		
+		ret.append(sbArr[1]);
+		
+		return ret;
+	};
+	
+	
+	
+	
+	/*
 	@SuppressWarnings("unchecked")
 	protected static FormInputInterface select = (node)->{
 		StringBuilder sb = new StringBuilder();
 		
-		if(node.containsKey(JsonKeys.HTML_INJECTION)){
-			sb.append(node.getString(JsonKeys.HTML_INJECTION));
-			return sb.toString();
-		}else{
 			String labelValue = node.label();
 			String fieldValue = node.field();
-			if(!labelValue.isEmpty()){
-				StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
-				FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.CUSTOMCLASS, "pfl_");
-				FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.LABEL_CLASS, "");
-				labelClassBuilder.append("\"");
-				
-				sb.append("<"+HtmlTag.LABEL+labelClassBuilder.toString()+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
-			}
 			
 			StringBuilder classStringBuilder = new StringBuilder(" class=\"pf_select");
 			FormGenerator.getCustomClass(node, classStringBuilder, JsonKeys.CUSTOMCLASS, "pfi_");
@@ -115,7 +105,6 @@ public class FormInputTemplates {
 			sb.append("</"+HtmlTag.SELECT+">\n");
 			
 			return sb.toString();
-		}
 	};
 	
 	protected static FormInputInterface input_text = (node)->{
@@ -279,15 +268,19 @@ public class FormInputTemplates {
 		
 		return injectedScript;
 	}
+	*/
 	
 	protected static Map<String, FormInputInterface> defaultInputTemplates() {
-		Map<String, FormInputInterface> defaultTemplates = new HashMap<String, FormInputInterface>();
+		Map<String, FormInputInterface> defaultTemplates = new CaseInsensitiveHashMap<String, FormInputInterface>();
+		defaultTemplates.put(JsonKeys.DIV, FormInputTemplates.div);
+		
+		/*
 		defaultTemplates.put(JsonKeys.TITLE, FormInputTemplates.header);
 		defaultTemplates.put(JsonKeys.DROPDOWN, FormInputTemplates.select);
 		defaultTemplates.put(JsonKeys.TEXT, FormInputTemplates.input_text);
-		defaultTemplates.put(JsonKeys.DIV, FormInputTemplates.div);
 		defaultTemplates.put(JsonKeys.HTML_INJECTION, FormInputTemplates.raw_html);
 		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, dropdownWithOthers);
+		*/
 		
 		return defaultTemplates;
 	}

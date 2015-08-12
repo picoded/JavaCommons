@@ -14,6 +14,9 @@ public class JsonKeys {
 	// Default value to extract from json map, if field name value does not exists
 	public static String DEFAULT = "default";
 	
+	// Options listing, used to list options in dropdown
+	public static String OPTIONS = "options";
+	
 	////////////////////////////////////////////////
 	//
 	//  HTML parameters handling
@@ -26,35 +29,19 @@ public class JsonKeys {
 	// The field to setup the class SPECFIC
 	public static String INPUT_CLASS = "inputClass";
 	
-	////////////////////////////////////////////////
-	//
-	//  HTML style overwrites
-	//
-	////////////////////////////////////////////////
+	// The input ID to use
+	public static String INPUT_ID = "inputID";
 	
 	// Input css overwrites
 	public static String INPUT_CSS = "inputCss";
 	
 	
-	
-	
-	
 	////////////////////////////////////////////////
 	//
-	//  HTML DOM types
+	//  JSON Node Types (standard)
 	//
 	////////////////////////////////////////////////
-	
-	// Standard html DIV
 	public static String DIV = "div";
-	
-	// The header class type
-	public static String DOM_HEADER = "h3";
-	
-	
-	
-	
-	
 	
 	////////////////////////////////////////////////
 	//
@@ -72,7 +59,6 @@ public class JsonKeys {
 	public static String DROPDOWN = "dropdown";
 	public static String LABEL = "label";
 	public static String WRAPPER = "wrapper";
-	public static String OPTIONS = "options";
 	public static String DROPDOWN_WITHOTHERS = "dropdownWithOthers";
 	public static String OTHERS_OPTION = "othersOption";
 	

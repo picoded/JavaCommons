@@ -1,9 +1,28 @@
 package picoded.webTemplateEngines;
 
 public class HtmlTag {
+	
+	/// Standard DIV used in most cases
 	public static String DIV = "div";
-	public static String HEADER = "header";
+	
+	// Header HTML type
+	public static String HEADER = "h3";
+	
+	// Select input type
 	public static String SELECT = "select";
+	
+	////////////////////////////////////////////////
+	//
+	//  TO-REFACTOR
+	//
+	////////////////////////////////////////////////
+	
+	
+	
+	
+	
+	
+	
 	public static String INPUT = "input";
 	public static String LABEL = "label";
 	public static String OPTION = "option";

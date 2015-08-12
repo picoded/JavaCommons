@@ -2,6 +2,6 @@ package picoded.webTemplateEngines;
 
 import java.util.function.Function;
 
-public interface FormInputInterface  extends Function<FormNode, String> {
-	public String apply(FormNode node);
+public interface FormInputInterface  extends Function<FormNode, StringBuilder> {
+	public StringBuilder apply(FormNode node);
 }

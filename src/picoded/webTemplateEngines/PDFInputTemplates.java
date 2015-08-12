@@ -13,6 +13,7 @@ import com.mysql.jdbc.StringUtils;
 
 public class PDFInputTemplates {
 	
+	/*
 	protected static FormInputInterface defaultOutput_pdf = (node)->{
 		return "";
 	};
@@ -155,16 +156,17 @@ public class PDFInputTemplates {
 			}
 		}
 	}
+	*/
 	
 	public static Map<String, FormInputInterface> defaultPDFInputTemplates(){
 		Map<String, FormInputInterface> defaultTemplates = new HashMap<String, FormInputInterface>();
 		
-		defaultTemplates.put("dropdown", default_pdf);
-		defaultTemplates.put("text", default_pdf);
-		defaultTemplates.put("div", div_pdf);
-		defaultTemplates.put("title", header_pdf);
-		defaultTemplates.put("rawHtml", rawHtml_pdf);
-		defaultTemplates.put("dropdownWithOthers", dropdownWithOthers);
+		// defaultTemplates.put("dropdown", default_pdf);
+		// defaultTemplates.put("text", default_pdf);
+		// defaultTemplates.put("div", div_pdf);
+		// defaultTemplates.put("title", header_pdf);
+		// defaultTemplates.put("rawHtml", rawHtml_pdf);
+		// defaultTemplates.put("dropdownWithOthers", dropdownWithOthers);
 		
 		return defaultTemplates;
 	}

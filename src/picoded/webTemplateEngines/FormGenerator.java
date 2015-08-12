@@ -60,7 +60,8 @@ public class FormGenerator {
 		
 		formWrappers = customPDFWrapperTemplates.get(wrapperType).apply(node);
 		
-		String formTextData = customPDFInputTemplates.get(nodeType).apply(node);
+		/// This is input data output
+		StringBuilder formTextData = customPDFInputTemplates.get(nodeType).apply(node);
 		
 		//get inner data for children
 		StringBuilder innerData = new StringBuilder("");
@@ -100,7 +101,9 @@ public class FormGenerator {
 			String finalNodeValue = formWrappers[0]+rawHtml+formWrappers[1];
 			return finalNodeValue;
 		}else{
-			String formTextData = customFormInputTemplates.get(nodeType).apply(node);
+			
+			/// This is input data output
+			StringBuilder inputOutputData = customFormInputTemplates.get(nodeType).apply(node);
 			
 			//get inner data for children
 			StringBuilder innerData = new StringBuilder("");
@@ -113,7 +116,7 @@ public class FormGenerator {
 				innerData.append("</div>\n");
 			}
 			
-			String finalNodeValue = formWrappers[0]+formTextData+innerData.toString()+formWrappers[1];
+			String finalNodeValue = formWrappers[0]+inputOutputData+innerData.toString()+formWrappers[1];
 			return finalNodeValue;
 		}
 	}

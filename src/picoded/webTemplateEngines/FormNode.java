@@ -143,6 +143,13 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 			map.put("style", tmp);
 		}
 		
+		//
+		// Input ID handling
+		//-----------------------------------
+		if( (tmp = getString( JsonKeys.INPUT_ID, null )) != null && tmp.length() > 0 ) {
+			map.put("id", tmp);
+		}
+		
 		return map;
 	}
 	
@@ -317,21 +324,33 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		}
 	}
 	
-	/// Gets the value from the input data array
-	public String getValue( String fieldName, int index ) {
-		String strRet = null;
-		Object objRet = null;
-		
-		if( _inputValues.get(index) != null ) {
-			objRet = _inputValues.get(index).get(fieldName);
-			strRet = GenericConvert.toString(objRet, null);
-		}
-		
-		if( strRet != null ) {
-			return strRet;
-		}
-		
-		return getString( JsonKeys.DEFAULT, null );
+	// /// Gets the value from the input data array
+	// public String getValue( String fieldName, int index ) {
+	// 	String strRet = null;
+	// 	Object objRet = null;
+	// 	
+	// 	if( _inputValues.get(index) != null ) {
+	// 		objRet = _inputValues.get(index).get(fieldName);
+	// 		strRet = GenericConvert.toString(objRet, null);
+	// 	}
+	// 	
+	// 	if( strRet != null ) {
+	// 		return strRet;
+	// 	}
+	// 	
+	// 	return getString( JsonKeys.DEFAULT, null );
+	// }
+	
+	/// @TODO
+	/// Returns the default value of the object, 
+	public String getFieldValue(){
+		return null;
+	}
+	
+	/// @TODO
+	/// Returns the default value of the object, 
+	public String getFieldValue(String fieldName){
+		return null;
 	}
 	
 	//

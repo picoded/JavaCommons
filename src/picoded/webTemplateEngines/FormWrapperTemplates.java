@@ -31,14 +31,14 @@ public class FormWrapperTemplates {
 		// Adds the label
 		//---------------------------------------------------------------
 		String labelValue = node.label();
+		String fieldValue = node.field();
 		if(!labelValue.isEmpty()){
 			StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
 			FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.CUSTOMCLASS, "pfl_");
 			FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.LABEL_CLASS, "");
 			labelClassBuilder.append("\"");
 			
-			// for=\""+fieldValue+"\"
-			prefix.append("<"+HtmlTag.LABEL+labelClassBuilder.toString()+">"+labelValue+"</"+HtmlTag.LABEL+">\n");
+			prefix.append("<"+HtmlTag.DIV+labelClassBuilder.toString()+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.DIV+">");
 		}
 		
 		//generating suffix

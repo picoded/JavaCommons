@@ -47,17 +47,24 @@ public class FormWrapperTemplates {
 		prefixSuffix[0] = prefix.toString();
 		prefixSuffix[1] = suffix.toString();
 		
-		return prefixSuffix;
+		
+		StringBuilder ret = new StringBuilder(prefixSuffix[0]);
+		
+		
+		ret.append(prefixSuffix[1]);
+		return ret;
 	};
 	
 	protected static FormWrapperInterface none = (node)->{
-		String[] prefixSuffix = new String[]{"", ""};
+		StringBuilder ret = new StringBuilder();
 		
-		return prefixSuffix;
+		return ret;
 	};
 	
 	protected static Map<String, FormWrapperInterface> defaultWrapperTemplates() {
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();
+		
+		defaultTemplates.put("*", FormWrapperTemplates.divWrapper);
 		
 		defaultTemplates.put("div", FormWrapperTemplates.divWrapper);
 		defaultTemplates.put("none", FormWrapperTemplates.none);

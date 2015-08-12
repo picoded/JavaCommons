@@ -232,6 +232,9 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	/// List of input data values, used to generate with multiple input fields
 	protected List< Map<String,Object> > _inputValues = new ArrayList<Map<String,Object>> ();
 	
+	/// The root form generator
+	protected FormGenerator _formGenerator = null;
+	
 	//
 	// Constructor
 	//
@@ -245,7 +248,10 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	/// @params {Map<String,Object>}  mapObject       - The map object, used to generate this nodes defination
 	/// @params {List<Map<String,Object>>} inputData  - The provided input data values
 	@SuppressWarnings("unchecked")
-	private void innerConstructor(Map<String, Object> mapObject, List<Map<String,Object>> inputData){
+	private void innerConstructor(FormGenerator root, Map<String, Object> mapObject, List<Map<String,Object>> inputData){
+		// Setup the form generator
+		this._formGenerator = root;
+		
 		// Fill up stored map
 		this.putAll( mapObject );
 		
@@ -267,7 +273,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 					throw new IllegalArgumentException("'children' List item found in defination was not a Map: "+child);
 				}
 				
-				_children.add( new FormNode( (Map<String,Object>)child, inputData ) );
+				_children.add( new FormNode( _formGenerator, (Map<String,Object>)child, inputData ) );
 			}
 		}
 	}
@@ -276,18 +282,35 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	///
 	/// @params {Map<String,Object>}  mapObject       - The map object, used to generate this nodes defination
 	/// @params {List<Map<String,Object>>} inputData  - The provided input data values
-	public FormNode(Map<String, Object> mapObject, List<Map<String,Object>> inputData) {
-		innerConstructor(mapObject, inputData);
+	public FormNode(FormGenerator root, Map<String, Object> mapObject, List<Map<String,Object>> inputData) {
+		innerConstructor(root, mapObject, inputData);
 	}
 	
 	/// Constructor using a single input data node
 	///
 	/// @params {Map<String,Object>}  mapObject       - The map object, used to generate this nodes defination
 	/// @params {Map<String,Object>}  inputData       - The provided input data values
-	public FormNode(Map<String, Object> mapObject, Map<String, Object> inputData){
+	public FormNode(FormGenerator root, Map<String, Object> mapObject, Map<String, Object> inputData){
 		List<Map<String,Object>> inputDataArr = new ArrayList<Map<String,Object>>();
 		inputDataArr.add(inputData);
-		innerConstructor(mapObject, inputDataArr);
+		innerConstructor(root, mapObject, inputDataArr);
+	}
+	
+	//
+	// Generates the HTML output via input or wrapper code
+	//
+	//------------------------------------------------------------------------
+	
+	public StringBuilder formInputHtml() {
+		
+		// Gets type
+		String nodeType = getString(JsonKeys.TYPE, HtmlTag.DIV);
+		
+		// Gets the input generator
+		FormInputInterface func = _formGenerator.formInput(nodeType);
+		
+		// The node 
+		return func.apply(nodeType);
 	}
 	
 	//
@@ -382,15 +405,15 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	}
 	
 	// @Deprecated
-	public static List<FormNode> createFromJSONString(String jsonString, Map<String, Object> prefilledJSONData){
+	public static List<FormNode> createFromJSONString(FormGenerator root, String jsonString, Map<String, Object> prefilledJSONData){
 		List<FormNode> formNodes = new ArrayList<FormNode>();
 		
 		if(jsonString.charAt(0) == '['){
 			List<Object> nodeList = ConvertJSON.toList(jsonString);
-			return createFromList(nodeList, prefilledJSONData);
+			return createFromList(root, nodeList, prefilledJSONData);
 		}else{
 			Map<String, Object> nodeMap = ConvertJSON.toMap(jsonString);
-			FormNode newNode = new FormNode(nodeMap, prefilledJSONData);
+			FormNode newNode = new FormNode(root, nodeMap, prefilledJSONData);
 			formNodes.add(newNode);
 			return formNodes;
 		}
@@ -398,12 +421,12 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	
 	// @Deprecated
 	@SuppressWarnings("unchecked")
-	public static List<FormNode> createFromList(List<Object> listObject, Map<String, Object> prefilledJSONData){
+	public static List<FormNode> createFromList(FormGenerator root, List<Object> listObject, Map<String, Object> prefilledJSONData){
 		List<FormNode> formNodes = new ArrayList<FormNode>();
 		
 		for(Object obj:listObject){
 			Map<String, Object> nodeMapObject = (Map<String, Object>)obj;
-			formNodes.add(new FormNode(nodeMapObject, prefilledJSONData));
+			formNodes.add(new FormNode(root, nodeMapObject, prefilledJSONData));
 		}
 		
 		return formNodes;

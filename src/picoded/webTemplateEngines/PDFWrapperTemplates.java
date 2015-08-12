@@ -26,17 +26,23 @@ public class PDFWrapperTemplates {
 		prefixSuffix[0] = prefix.toString();
 		prefixSuffix[1] = suffix.toString();
 		
-		return prefixSuffix;
+		StringBuilder ret = new StringBuilder(prefixSuffix[0]);
+		
+		
+		ret.append(prefixSuffix[1]);
+		return ret;
 	};
 	
 	public static FormWrapperInterface none_pdf=(node)->{
-		String[] prefixSuffix = new String[]{"", ""};
+		StringBuilder ret = new StringBuilder();
 		
-		return prefixSuffix;
+		return ret;
 	};
 	
 	public static Map<String, FormWrapperInterface> defaultPDFWrapperTemplates(){
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();
+		
+		defaultTemplates.put("*", default_pdf);
 		
 		defaultTemplates.put("div", default_pdf);
 		defaultTemplates.put("none", none_pdf);

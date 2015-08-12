@@ -15,7 +15,7 @@ import com.mysql.jdbc.StringUtils;
 public class FormInputTemplates {
 	
 	protected static FormInputInterface div = (node)->{
-		return node.collapseStringBuilderArray( node.defaultHtmlInput( JsonKeys.DIV, "pf_div", null ) );
+		return node.collapseStringBuilderArray( node.defaultHtmlInput( JsonKeys.DIV, "pf_div", null ) ).toString();
 	};
 	
 	protected static FormInputInterface header = (node)->{ 

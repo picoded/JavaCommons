@@ -41,7 +41,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	}
 	
 	/// @returns {String} prefix for the child container auto class
-	public String prefix_wrapper() {
+	public String prefix_childWrapper() {
 		return "pfc_";
 	}
 	
@@ -119,7 +119,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		
 		StringBuilder tmpSB = new StringBuilder(inputBaseClass);
 		String tmp = null;
-		if( (tmp = toString( JsonKeys.AUTO_CLASS )) && tmp.length() > 0 ) {
+		if( (tmp = getString( JsonKeys.AUTO_CLASS, null )) != null && tmp.length() > 0 ) {
 			if(tmpSB.length() > 0) {
 				tmpSB.append(" ");
 			}
@@ -127,19 +127,19 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 			tmpSB.append( addPrefix(tmp, prefix_label()) );
 		}
 		
-		if( (tmp = toString( JsonKeys.INPUT_CLASS )) && tmp.length() > 0 ) {
+		if( (tmp = getString( JsonKeys.INPUT_CLASS, null )) != null && tmp.length() > 0 ) {
 			if(tmpSB.length() > 0) {
 				tmpSB.append(" ");
 			}
 			
 			tmpSB.append( tmp );
 		}
-		map.put( "class", class.toString() );
+		map.put( "class", tmpSB.toString() );
 		
 		//
 		// Style injection handling
 		//-----------------------------------
-		if( (tmp = toString( JsonKeys.INPUT_CSS )) && tmp.length() > 0 ) {
+		if( (tmp = getString( JsonKeys.INPUT_CSS, null )) != null && tmp.length() > 0 ) {
 			map.put("style", tmp);
 		}
 		

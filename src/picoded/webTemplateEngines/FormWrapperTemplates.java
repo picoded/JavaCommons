@@ -37,7 +37,8 @@ public class FormWrapperTemplates {
 			FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.LABEL_CLASS, "");
 			labelClassBuilder.append("\"");
 			
-			prefix.append("<"+HtmlTag.LABEL+labelClassBuilder.toString()+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.LABEL+">\n");
+			// for=\""+fieldValue+"\"
+			prefix.append("<"+HtmlTag.LABEL+labelClassBuilder.toString()+">"+labelValue+"</"+HtmlTag.LABEL+">\n");
 		}
 		
 		//generating suffix

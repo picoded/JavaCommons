@@ -32,7 +32,7 @@
 		"functionName":"exampleDropdownOnChange",
 		"label":"Dropdown with hidden text input field",
 		"options":["Hidden Field 1", "Hidden Field 2", "Shown Field 3"],
-		"othersOption":"Shown Field 3",
+		"othersOption":"Custom Data",
 		"textField":"exampleDropdownTextField"
 	}
 ]

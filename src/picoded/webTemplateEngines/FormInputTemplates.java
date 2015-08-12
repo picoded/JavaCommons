@@ -236,10 +236,10 @@ public class FormInputTemplates {
 	
 	
 	protected static String getDropDownOthersJavascriptFunction(FormNode node){
-		String dropDownField = node.getString("field");
-		String inputField = node.getString("textField");
-		String othersOptionToShowTextField = RegexUtils.removeAllNonAlphaNumeric(node.getString("othersOption")).toLowerCase();
-		String funcName = node.getString("functionName");
+		String dropDownField = node.getString(JsonKeys.FIELD);
+		String inputField = node.getString(JsonKeys.DROPDOWN_WITHOTHERS_TEXTFIELD);
+		String othersOptionToShowTextField = RegexUtils.removeAllNonAlphaNumeric(node.getString(JsonKeys.OTHERS_OPTION)).toLowerCase();
+		String funcName = node.getString(JsonKeys.FUNCTION_NAME);
 		
 		String injectedScript = "function "+funcName+"() {"+
 									"var dropDown = document.getElementById(\""+dropDownField+"\");"+

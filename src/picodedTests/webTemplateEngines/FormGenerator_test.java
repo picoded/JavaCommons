@@ -72,6 +72,7 @@ public class FormGenerator_test {
 		
 		//pdf portion
 		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(jsonFileString, getPrefilledData());
+		pdfReadyHtmlString = "<div class=\"pf_root\">"+pdfReadyHtmlString+"</div>";
 		File pdfReadyHtmlFile = new File("./test-files/test-specific/htmlGenerator/generatedFiles/pdfReadyHtmlFromJSONObject.html");
 		if(pdfReadyHtmlFile.exists()){
 			pdfReadyHtmlFile.delete();
@@ -119,6 +120,7 @@ public class FormGenerator_test {
 		
 		//pdf portion
 		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(jsonFileString, getPrefilledData());
+		pdfReadyHtmlString = "<div class=\"pf_root\">"+pdfReadyHtmlString+"</div>";
 		File pdfReadyHtmlFile = new File("./test-files/test-specific/htmlGenerator/generatedFiles/pdfReadyHtmlFromJSONArray.html");
 		if(pdfReadyHtmlFile.exists()){
 			pdfReadyHtmlFile.delete();
@@ -166,6 +168,7 @@ public class FormGenerator_test {
 		
 		//pdf portion
 		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(jsonFileString, getPrefilledData());
+		pdfReadyHtmlString = "<div class=\"pf_root\">"+pdfReadyHtmlString+"</div>";
 		File pdfReadyHtmlFile = new File("./test-files/test-specific/htmlGenerator/generatedFiles/pdfReadyHtmlFromJSONKeys.html");
 		if(pdfReadyHtmlFile.exists()){
 			pdfReadyHtmlFile.delete();

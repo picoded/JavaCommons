@@ -61,6 +61,8 @@ public class JsonKeys {
 	public static String WRAPPER = "wrapper";
 	public static String DROPDOWN_WITHOTHERS = "dropdownWithOthers";
 	public static String OTHERS_OPTION = "othersOption";
+	public static String DROPDOWN_WITHOTHERS_TEXTFIELD = "textField";
+	public static String FUNCTION_NAME = "functionName";
 	
 	public static String CUSTOMCLASS = "class";
 	public static String WRAPPER_CLASS = "wrapperClass";

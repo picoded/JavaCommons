@@ -51,7 +51,7 @@ public class FormGenerator {
 	/// @params {boolean} displayOnly  - Returns the map, in which display only interfaces are provided
 	///
 	/// @returns {Map<String, FormInputInterface>} interface map
-	protected Map<String, FormInputInterface> inputInterfaceMap(boolean displayOnly) {
+	public Map<String, FormInputInterface> inputInterfaceMap(boolean displayOnly) {
 		if(displayOnly) {
 			return customPDFInputTemplates;
 		} else {
@@ -64,7 +64,7 @@ public class FormGenerator {
 	/// @params {boolean} displayOnly  - Returns the map, in which display only interfaces are provided
 	///
 	/// @returns {Map<String, FormInputInterface>} interface map
-	protected Map<String, FormWrapperInterface> wrapperInterfaceMap(boolean displayOnly) {
+	public Map<String, FormWrapperInterface> wrapperInterfaceMap(boolean displayOnly) {
 		if(displayOnly) {
 			return customPDFWrapperTemplates;
 		} else {

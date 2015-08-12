@@ -38,7 +38,7 @@ public class FormGenerator {
 	public String generatePDFReadyHTML(String jsonString, Map<String, Object> prefilledJSONData){
 		List<FormNode> formNodes = FormNode.createFromJSONString(jsonString, prefilledJSONData);
 		String htmlString = generatePDFReadyHTML(formNodes);
-		htmlString = "<div class=\"pf_root\">"+htmlString+"</div>";
+//		htmlString = "<div class=\"pf_root\">"+htmlString+"</div>";
 		return htmlString;
 	}
 	
@@ -75,7 +75,7 @@ public class FormGenerator {
 	public String applyTemplating(String jsonString, Map<String, Object> prefilledJSONData){
 		List<FormNode> formNodes = FormNode.createFromJSONString(jsonString, prefilledJSONData);
 		String htmlString = applyTemplating(formNodes);
-		htmlString = "<div class=\"pf_root\">"+htmlString+"</div>";
+//		htmlString = "<div class=\"pf_root\">"+htmlString+"</div>";
 		return htmlString;
 	}
 	

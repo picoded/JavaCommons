@@ -47,17 +47,15 @@ public class FormWrapperTemplates {
 		prefixSuffix[0] = prefix.toString();
 		prefixSuffix[1] = suffix.toString();
 		
-		
 		StringBuilder ret = new StringBuilder(prefixSuffix[0]);
-		
-		
+		ret.append( node.fullChildrenHtml(false) );
 		ret.append(prefixSuffix[1]);
 		return ret;
 	};
 	
 	protected static FormWrapperInterface none = (node)->{
 		StringBuilder ret = new StringBuilder();
-		
+		ret.append( node.fullChildrenHtml(false) );
 		return ret;
 	};
 	

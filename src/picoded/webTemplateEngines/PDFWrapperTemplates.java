@@ -27,15 +27,14 @@ public class PDFWrapperTemplates {
 		prefixSuffix[1] = suffix.toString();
 		
 		StringBuilder ret = new StringBuilder(prefixSuffix[0]);
-		
-		
+		ret.append( node.fullChildrenHtml(true) );
 		ret.append(prefixSuffix[1]);
 		return ret;
 	};
 	
 	public static FormWrapperInterface none_pdf=(node)->{
 		StringBuilder ret = new StringBuilder();
-		
+		ret.append( node.fullChildrenHtml(true) );
 		return ret;
 	};
 	

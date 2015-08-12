@@ -42,7 +42,7 @@ public class FormGenerator {
 		return htmlString;
 	}
 	
-	public String generatePDFReadyHTML(List<FormNode> nodes){
+	protected String generatePDFReadyHTML(List<FormNode> nodes){
 		StringBuilder htmlBuilder = new StringBuilder();
 		for(FormNode node : nodes){
 			String nodeHtml = generatePDFReadyHTML(node);
@@ -52,7 +52,7 @@ public class FormGenerator {
 		return htmlBuilder.toString();
 	}
 	
-	public String generatePDFReadyHTML(FormNode node){
+	protected String generatePDFReadyHTML(FormNode node){
 		String nodeType = node.getString(JsonKeys.TYPE, HtmlTag.DIV);
 		String[] formWrappers = new String[]{"", ""};
 		
@@ -79,7 +79,7 @@ public class FormGenerator {
 		return htmlString;
 	}
 	
-	public String applyTemplating(List<FormNode> nodes){
+	protected String applyTemplating(List<FormNode> nodes){
 		StringBuilder htmlBuilder = new StringBuilder();
 		for(FormNode node : nodes){
 			htmlBuilder.append(applyTemplating(node));
@@ -88,7 +88,7 @@ public class FormGenerator {
 		return htmlBuilder.toString();
 	}
 	
-	public String applyTemplating(FormNode node){
+	protected String applyTemplating(FormNode node){
 		String nodeType = node.getString(JsonKeys.TYPE, HtmlTag.DIV);
 		String[] formWrappers = new String[]{"", ""};
 		

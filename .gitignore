@@ -18,6 +18,7 @@ test-files/junit-reports/*
 test-files/libs/SimpleDB-Dev/data/*
 test-files/libs/SimpleDB-Dev/*.pyc
 
+
 debug.txt
 
 *.log
@@ -28,3 +29,4 @@ debug.txt
 # Test-files generated stuff to ignore
 test-files/test-specific/htmlGenerator/**/*.pdf
 test-files/test-specific/htmlGenerator/**/*Html.html
+test-files/test-specific/htmlGenerator/generatedFiles/*

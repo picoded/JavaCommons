@@ -9,48 +9,54 @@ import java.util.Map;
 ///
 public class FormWrapperTemplates {
 	
+	/// The standard div wrapper, with isDisplayMode parameter. This is used in both FormWrapperTemplates
+	/// and DisplayWrapperTemplates.
+	///
+	/// @params {FormNode}  node           - The form node to build the html from
+	/// @params {boolean}   isDisplayMode  - The display mode.
+	///
+	/// @returns {StringBuilder}  the resulting HTML
+	protected static StringBuilder standardDivWrapper(FormNode node, boolean isDisplayMode) {
+		/// Returning string builder
+		StringBuilder ret = new StringBuilder();
+		
+		/// The overlaying wrapper
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, node.prefix_standard()+"div", null );
+		
+		/// The wrapper start
+		ret.append( wrapperArr[0] );
+		
+		/// The label, if given
+		String label = node.label();
+		
+		if( label != null && label.length() > 0 ) {
+			StringBuilder[] labelArr = node.defaultHtmlWrapper( HtmlTag.DIV, node.prefix_standard()+"label", null );
+			
+			ret.append( labelArr[0] );
+			ret.append( label );
+			ret.append( labelArr[1] );
+		}
+		
+		/// The children wrapper if needed
+		List<FormNode> childList = node.children();
+		
+		if(childList != null && childList.size() > 0) {
+			StringBuilder[] childWrap = node.defaultHtmlChildWrapper( HtmlTag.DIV, node.prefix_standard()+"child", null );
+			
+			ret.append( childWrap[0] );
+			ret.append( node.fullChildrenHtml(isDisplayMode) );
+			ret.append( childWrap[1] );
+		}
+		
+		ret.append( wrapperArr[1] );
+		return ret;
+	}
+	
 	/// divWrapper
 	///
 	/// Does a basic div wrapper
 	protected static FormWrapperInterface divWrapper = (node)->{
-		String[] prefixSuffix = new String[2];
-		
-		//generating prefix
-		StringBuilder prefix = new StringBuilder();
-		
-		//new class string goodness
-		StringBuilder classString = new StringBuilder(" class=\"pf_div");
-		FormGenerator.getCustomClass(node, classString, JsonKeys.CUSTOMCLASS, "pfw_");
-		
-		classString.append("\"");
-		
-		String cssString = FormGenerator.getWrapperCssString(node);
-		prefix.append("<"+HtmlTag.DIV+""+classString+cssString+">\n");	 
-		
-		
-		// Adds the label
-		//---------------------------------------------------------------
-		String labelValue = node.label();
-		String fieldValue = node.getFieldName();
-		if(!labelValue.isEmpty()){
-			StringBuilder labelClassBuilder = new StringBuilder(" class=\"pf_label");
-			FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.CUSTOMCLASS, "pfl_");
-			FormGenerator.getCustomClass(node, labelClassBuilder, JsonKeys.LABEL_CLASS, "");
-			labelClassBuilder.append("\"");
-			
-			prefix.append("<"+HtmlTag.DIV+labelClassBuilder.toString()+" for=\""+fieldValue+"\">"+labelValue+"</"+HtmlTag.DIV+">");
-		}
-		
-		//generating suffix
-		StringBuilder suffix = new StringBuilder("</"+HtmlTag.DIV+">\n");
-		
-		prefixSuffix[0] = prefix.toString();
-		prefixSuffix[1] = suffix.toString();
-		
-		StringBuilder ret = new StringBuilder(prefixSuffix[0]);
-		ret.append( node.fullChildrenHtml(false) );
-		ret.append(prefixSuffix[1]);
-		return ret;
+		return FormWrapperTemplates.standardDivWrapper(node, false);
 	};
 	
 	protected static FormWrapperInterface none = (node)->{

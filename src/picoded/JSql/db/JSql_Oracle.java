@@ -135,7 +135,8 @@ public class JSql_Oracle extends JSql {
 
 			.replaceAll("(?i)VARCHAR(?!\\()", "VARCHAR2(4000)") //, CLOB
 			.replaceAll("(?i)VARCHAR\\(", "VARCHAR2(") //, CLOB
-			.replaceAll("(?i)YEAR", "NUMBER").replaceAll("AUTOINCREMENT","")
+			.replaceAll("(?i)YEAR", "NUMBER")
+			//.replaceAll("AUTOINCREMENT","")
 			.replaceAll("MAX","4000");
 		
 	}
@@ -471,8 +472,31 @@ public class JSql_Oracle extends JSql {
 	///
 	/// Returns false if no result is given by the execution call, else true on success
 	public boolean execute(String qString, Object... values) throws JSqlException {
+	    qString = genericSqlParser(qString);
+	    
+	    // Create sequence and trigger if it is CREATE TABLE query and has the AUTO INCREMENT column
+	    int prefixOffset = 0;
+	    if (qString.startsWith(create)) { //CREATE
+			prefixOffset = create.length() + 1;
+			
+			if (qString.startsWith(table, prefixOffset)) { //TABLE
+			    prefixOffset = table.length() + 1;
+			    if (qString.indexOf("AUTOINCREMENT") !=-1 || qString.indexOf("AUTO_INCREMENT") !=-1) {
+			        // get table name
+			        if (qString.startsWith(ifNotExists, prefixOffset)) { //IF NOT EXISTS
+    					prefixOffset += ifNotExists.length() + 1;
+    				} else {
+    				}
+            		// if AUTO INCREMENT, CREATE Sequence
+            		String query = "CREATE SEQUENCE S_COMMENT_ID START WITH 1 INCREMENT BY 1 CACHE 10;"
+			    }
+			}
+	    }
+	    // Replace the AUTO INCREMENT with blank
+	    qString = qString.replaceAll("AUTOINCREMENT","");
+
 		//try {
-		return execute_raw(genericSqlParser(qString), values);
+		return execute_raw(qString, values);
 		//} catch(JSqlException e) {
 		//	logger.log( Level.SEVERE, "Execute Exception" ); //, e 
 		//	logger.log( Level.SEVERE, "-> Original query : " + qString );

@@ -198,6 +198,12 @@ public class JSql extends BaseInterface {
 	/// Executes and dispose the sqliteResult object. Similar to executeQuery
 	/// Returns false if no result object is given by the execution call. This is raw execution.
 	public boolean execute_raw(String qString, Object... values) throws JSqlException {
+	    System.out.println("JSql -> JSqlResult -> qString : " + qString);
+	    if (values != null) {
+	        System.out.println("JSql -> JSqlResult -> values : " + java.util.Arrays.asList(values) );
+	    } else {
+	        System.out.println("JSql -> JSqlResult -> values : null" );
+	    }
 		try {
 			PreparedStatement ps = prepareSqlStatment(qString, values);
 			ResultSet rs = null;

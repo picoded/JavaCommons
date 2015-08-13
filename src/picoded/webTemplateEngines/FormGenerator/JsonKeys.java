@@ -50,6 +50,34 @@ public class JsonKeys {
 	// Input css overwrites
 	public static String INPUT_CSS = "inputCss";
 	
+	// The field to setup the class SPECFIC
+	public static String WRAPPER_CLASS = "wrapperClass";
+	
+	// The input ID to use
+	public static String WRAPPER_ID = "wrapperID";
+	
+	// Input css overwrites
+	public static String WRAPPER_CSS = "wrapperCss";
+	
+	// The field to setup the class SPECFIC
+	public static String LABEL_CLASS = "labelClass";
+	
+	// The input ID to use
+	public static String LABEL_ID = "labelID";
+	
+	// Input css overwrites
+	public static String LABEL_CSS = "labelCss";
+	
+	
+	// The field to setup the class SPECFIC
+	public static String CHILD_CLASS = "childClass";
+	
+	// The input ID to use
+	public static String CHILD_ID = "childID";
+	
+	// Input css overwrites
+	public static String CHILD_CSS = "childCss";
+	
 	
 	////////////////////////////////////////////////
 	//
@@ -78,19 +106,17 @@ public class JsonKeys {
 	public static String DROPDOWN = "dropdown";
 	public static String LABEL = "label";
 	public static String WRAPPER = "wrapper";
+	
 	public static String DROPDOWN_WITHOTHERS = "dropdownWithOthers";
 	public static String OTHERS_OPTION = "othersOption";
 	public static String DROPDOWN_WITHOTHERS_TEXTFIELD = "textField";
 	public static String FUNCTION_NAME = "functionName";
 	
 	public static String CUSTOMCLASS = "class";
-	public static String WRAPPER_CLASS = "wrapperClass";
-	public static String LABEL_CLASS = "labelClass";
+	
 	public static String PDFDISPLAY_CLASS = "pdfDisplayClass";
 	public static String PDFOUTPUT_CLASS = "pdfOutputClass";
-	public static String CHILD_CLASS = "childClass";
 	
-	public static String WRAPPER_CSS = "wrapperCss";
-	public static String LABEL_CSS = "labelCss";
+	
 	
 }

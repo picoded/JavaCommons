@@ -26,13 +26,19 @@ public class HtmlTag {
 	// Html input type
 	public static String INPUT = "input";
 	
-	////////////////////////////////////////////////
-	//
-	//  TO-REFACTOR
-	//
-	////////////////////////////////////////////////
+	// Html ID parameter
+	public static String ID = "id";
 	
+	// Html class parameter
+	public static String CLASS = "class";
+	
+	// Html style parameter
+	public static String STYLE = "style";
+	
+	// Html Label type
 	public static String LABEL = "label";
 	
-	public static String ID = "id";
+	// Form submission name
+	public static String NAME = "name";
+	
 }

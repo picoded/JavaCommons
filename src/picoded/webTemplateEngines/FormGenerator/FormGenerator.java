@@ -19,8 +19,8 @@ public class FormGenerator {
 	private Map<String, FormWrapperInterface> customFormWrapperTemplates = new HashMap<String, FormWrapperInterface>();
 	private Map<String, FormInputInterface> customFormInputTemplates = new HashMap<String, FormInputInterface>();
 	
-	private Map<String, FormWrapperInterface> customPDFWrapperTemplates = new HashMap<String, FormWrapperInterface>();
-	private Map<String, FormInputInterface> customPDFInputTemplates = new HashMap<String, FormInputInterface>();
+	private Map<String, FormWrapperInterface> customDisplayWrapperTemplates = new HashMap<String, FormWrapperInterface>();
+	private Map<String, FormInputInterface> customDisplayInputTemplates = new HashMap<String, FormInputInterface>();
 	
 	/////////////////////////////////////////////////////////////////////////
 	//
@@ -36,8 +36,8 @@ public class FormGenerator {
 		customFormWrapperTemplates = FormWrapperTemplates.defaultWrapperTemplates();
 		customFormInputTemplates = FormInputTemplates.defaultInputTemplates();
 		
-		customPDFWrapperTemplates = PDFWrapperTemplates.defaultPDFWrapperTemplates();
-		customPDFInputTemplates = PDFInputTemplates.defaultPDFInputTemplates();
+		customDisplayWrapperTemplates = DisplayWrapperTemplates.defaultWrapperTemplates();
+		customDisplayInputTemplates = DisplayInputTemplates.defaultInputTemplates();
 	}
 	
 	/////////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ public class FormGenerator {
 	/// @returns {Map<String, FormInputInterface>} interface map
 	public Map<String, FormInputInterface> inputInterfaceMap(boolean displayOnly) {
 		if(displayOnly) {
-			return customPDFInputTemplates;
+			return customDisplayInputTemplates;
 		} else {
 			return customFormInputTemplates;
 		}
@@ -66,7 +66,7 @@ public class FormGenerator {
 	/// @returns {Map<String, FormInputInterface>} interface map
 	public Map<String, FormWrapperInterface> wrapperInterfaceMap(boolean displayOnly) {
 		if(displayOnly) {
-			return customPDFWrapperTemplates;
+			return customDisplayWrapperTemplates;
 		} else {
 			return customFormWrapperTemplates;
 		}
@@ -104,7 +104,45 @@ public class FormGenerator {
 	
 	/////////////////////////////////////////////////////////////////////////
 	//
-	// To refactor
+	// To generate and run
+	//
+	/////////////////////////////////////////////////////////////////////////
+	
+	/// Builds the template and run the form generator
+	///
+	/// @params  {Map<String,Object>}  format       - The JSML format object to generate the form/display
+	/// @params  {Map<String,Object>}  data         - The Data map to extract value from
+	/// @params  {boolean}             displayOnly  - Display mode, html read only or form
+	///
+	/// @returns {StringBuilder} the full returning HTML
+	public StringBuilder build( Map<String,Object> format, Map<String,Object> data, boolean displayOnly ) {
+		FormNode rootNode = new FormNode(this, format, data);
+		return rootNode.fullHtml(displayOnly);
+	}
+	
+	/// Builds the template and run the form generator
+	///
+	/// @params  {List<Map<String,Object>>}  format       - The JSML format object to generate the form/display
+	/// @params  {Map<String,Object>}        data         - The Data map to extract value from
+	/// @params  {boolean}                   displayOnly  - Display mode, html read only or form
+	///
+	/// @returns {StringBuilder} the full returning HTML
+	public StringBuilder build( List<Map<String,Object>> format, Map<String,Object> data, boolean displayOnly ) {
+		Map<String,Object> divWrap = new HashMap<String,Object>();
+		divWrap.put("type", "none");
+		divWrap.put("children", format );
+		
+		return build(divWrap, data, displayOnly);
+	}
+	
+	
+	
+	
+	
+	
+	/////////////////////////////////////////////////////////////////////////
+	//
+	// To remove
 	//
 	/////////////////////////////////////////////////////////////////////////
 	
@@ -119,7 +157,7 @@ public class FormGenerator {
 	public String generatePDFReadyHTML(String jsonString, Map<String, Object> prefilledJSONData){
 		List<FormNode> formNodes = FormNode.createFromJSONString(this, jsonString, prefilledJSONData);
 		String htmlString = generatePDFReadyHTML(formNodes);
-//		htmlString = "<div class=\"pf_root\">"+htmlString+"</div>";
+		// htmlString = "<div class=\"pf_root\">"+htmlString+"</div>";
 		return htmlString;
 	}
 	
@@ -143,7 +181,7 @@ public class FormGenerator {
 		//formWrappers = customPDFWrapperTemplates.get(wrapperType).apply(node);
 		
 		/// This is input data output
-		StringBuilder formTextData = customPDFInputTemplates.get(nodeType).apply(node);
+		StringBuilder formTextData = customDisplayInputTemplates.get(nodeType).apply(node);
 		
 		//get inner data for children
 		StringBuilder innerData = new StringBuilder("");

@@ -46,6 +46,11 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return "pfc_";
 	}
 	
+	/// @returns {String} prefix for the standard classes
+	public String prefix_standard() {
+		return "pf_";
+	}
+	
 	//
 	// Utility helper functions
 	//
@@ -166,7 +171,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	/// @params {String}   val   - The string to be quote escaped
 	///
 	/// @returns {String}  - The quote escaped value, with either single or double quotes, or quotes with escaped quotes
-	protected static String escapeParameterQuote( String val ) {
+	public static String escapeParameterQuote( String val ) {
 		boolean hasSingleQuote = val.contains("\'");
 		boolean hasDoubleQuote = val.contains("\"");
 		
@@ -231,7 +236,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	protected List<FormNode> _children = new ArrayList<FormNode>();
 	
 	/// List of input data values, used to generate with multiple input fields
-	protected List< Map<String,Object> > _inputValues = new ArrayList<Map<String,Object>> ();
+	protected Map<String,Object> _inputValue = new HashMap<String,Object> ();
 	
 	/// The root form generator
 	protected FormGenerator _formGenerator = null;
@@ -249,7 +254,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	/// @params {Map<String,Object>}  mapObject       - The map object, used to generate this nodes defination
 	/// @params {List<Map<String,Object>>} inputData  - The provided input data values
 	@SuppressWarnings("unchecked")
-	private void innerConstructor(FormGenerator root, Map<String, Object> mapObject, List<Map<String,Object>> inputData){
+	private void innerConstructor(FormGenerator root, Map<String, Object> mapObject, Map<String,Object> inputData){
 		// Setup the form generator
 		this._formGenerator = root;
 		
@@ -257,7 +262,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		this.putAll( mapObject );
 		
 		// Put in the inputData list
-		this._inputValues = inputData;
+		this._inputValue = inputData;
 		
 		if( this.containsKey("children") ) {
 			Object childrenRaw = this.get("children");
@@ -283,8 +288,8 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	///
 	/// @params {Map<String,Object>}  mapObject       - The map object, used to generate this nodes defination
 	/// @params {List<Map<String,Object>>} inputData  - The provided input data values
-	public FormNode(FormGenerator root, Map<String, Object> mapObject, List<Map<String,Object>> inputData) {
-		innerConstructor(root, mapObject, inputData);
+	public FormNode(FormGenerator root, Map<String, Object> mapObject) {
+		innerConstructor(root, mapObject, new HashMap<String,Object>());
 	}
 	
 	/// Constructor using a single input data node
@@ -292,9 +297,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	/// @params {Map<String,Object>}  mapObject       - The map object, used to generate this nodes defination
 	/// @params {Map<String,Object>}  inputData       - The provided input data values
 	public FormNode(FormGenerator root, Map<String, Object> mapObject, Map<String, Object> inputData){
-		List<Map<String,Object>> inputDataArr = new ArrayList<Map<String,Object>>();
-		inputDataArr.add(inputData);
-		innerConstructor(root, mapObject, inputDataArr);
+		innerConstructor(root, mapObject, inputData);
 	}
 	
 	//
@@ -382,7 +385,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return _fullChildrenHtml(displayMode, spacer);
 	}
 	
-	/// Varient of formChildrenFullHtml, without spacer function
+	/// Varient of formChildrenFullHtml, without spacer function or string
 	///
 	/// @params  {boolean}                      displayOnly  - Returns the varient for read only display mode (eg: PDF)
 	///
@@ -467,8 +470,8 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	/// note that this will get the 0th indexed value.
 	// @Deprecated
 	public Object getDefaultValue(String fieldName){
-		if(_inputValues.get(0) != null && _inputValues.get(0).containsKey(fieldName)){
-			return _inputValues.get(0).get(fieldName);
+		if(_inputValue != null && _inputValue.containsKey(fieldName)){
+			return _inputValue.get(fieldName);
 		}
 		
 		return null;
@@ -491,7 +494,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	
 	// @Deprecated
 	public void setPrefilledData(Map<String, Object> prefilledJSONData){
-		_inputValues.set(0,prefilledJSONData);
+		_inputValue = prefilledJSONData;
 	}
 	
 	// @Deprecated

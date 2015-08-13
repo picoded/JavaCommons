@@ -110,13 +110,26 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return addPrefixAndSuffix(value, " ", prefix, null);
 	}
 	
-	/// Generates the standard node parameter map for input. This is useful for shared default behaviour
+	/// Generates the standard node parameter map for X type. This is useful for shared default behaviour
+	/// across input, child, wrappers etc.
 	///
-	/// @params {String}  inputBaseClass   - The input class to add, before the automated classes
 	/// @params {Map<String,String>}  map  - The return map to setup, if null it returns a new CaseInsensitiveHashMap
+	/// @params {String}  baseClass        - The input class to add, before the automated classes, ignored if null
+	/// @params {String}  autoClassPrefix  - The class prefix to use for auto class, ignored if null
+	/// @params {String}  insertClassKey   - The class key to use for insertion, ignored if null
+	/// @params {String}  insertCssKey     - The css key to use for css injection, ignored if null
+	/// @params {String}  insertIDKey      - The ID key to use for ID injection, ignored if null
 	///
 	/// @returns {Map<String,String>} - the return parameter map
-	public Map<String,String> defaultInputParameterMap( String inputBaseClass, Map<String,String> map ) {
+	protected Map<String,String> defaultParameterMap( //
+		Map<String,String> map, //
+		String baseClass, //  
+		String autoClassPrefix, //
+		String insertClassKey, //
+		String insertCssKey, //
+		String insertIDKey //
+		) { //
+			
 		if( map == null ) {
 			map = new CaseInsensitiveHashMap<String,String>();
 		}
@@ -124,48 +137,116 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		//
 		// Default class handling
 		//-----------------------------------
+		if( baseClass == null ) {
+			baseClass = "";
+		}
 		
-		StringBuilder tmpSB = new StringBuilder(inputBaseClass);
+		StringBuilder tmpSB = new StringBuilder(baseClass);
 		String tmp = null;
-		if( (tmp = getString( JsonKeys.AUTO_CLASS, null )) != null && tmp.length() > 0 ) {
+		
+		if( //
+			autoClassPrefix != null && //
+			autoClassPrefix.length() > 0 && //
+			(tmp = getString( JsonKeys.AUTO_CLASS, null )) != null && //
+			tmp.length() > 0 //
+		) {
 			if(tmpSB.length() > 0) {
 				tmpSB.append(" ");
 			}
 			
-			tmpSB.append( addPrefix(tmp, prefix_label()) );
+			tmpSB.append( addPrefix(tmp, autoClassPrefix) );
 		}
 		
-		if( (tmp = getString( JsonKeys.INPUT_CLASS, null )) != null && tmp.length() > 0 ) {
+		if( (tmp = getString( insertClassKey, null )) != null && tmp.length() > 0 ) {
 			if(tmpSB.length() > 0) {
 				tmpSB.append(" ");
 			}
 			
 			tmpSB.append( tmp );
 		}
-		map.put( "class", tmpSB.toString() );
+		
+		tmp = tmpSB.toString();
+		
+		if( tmp != null && tmp.length() > 0 ) {
+			map.put( HtmlTag.CLASS, tmp );
+		}
 		
 		//
 		// Style injection handling
 		//-----------------------------------
-		if( (tmp = getString( JsonKeys.INPUT_CSS, null )) != null && tmp.length() > 0 ) {
-			map.put("style", tmp);
-		}
+		if( // 
+			insertCssKey != null && //
+			insertCssKey.length() > 0 && //
+			(tmp = getString( insertCssKey, null )) != null && //
+			tmp.length() > 0 //
+			) { //
+			map.put(HtmlTag.STYLE, tmp);
+		} //
 		
 		//
-		// Input ID handling
+		// ID handling
 		//-----------------------------------
-		if( (tmp = getString( JsonKeys.INPUT_ID, null )) != null && tmp.length() > 0 ) {
-			map.put("id", tmp);
+		if( //
+			insertIDKey != null && //
+			insertIDKey.length() > 0 && //
+			(tmp = getString( insertIDKey, null )) != null && //
+			tmp.length() > 0 //
+			) {
+			map.put(HtmlTag.ID, tmp);
 		}
+		
+		return map;
+	}
+	
+	/// Generates the standard node parameter map for input. This is useful for shared default behaviour
+	///
+	/// @params {String}        baseClass  - The input class to add, before the automated classes
+	/// @params {Map<String,String>}  map  - The return map to setup, if null it returns a new CaseInsensitiveHashMap
+	///
+	/// @returns {Map<String,String>} - the return parameter map
+	public Map<String,String> defaultInputParameterMap( String baseClass, Map<String,String> map ) {
+		
+		String tmp = null;
+		map = defaultParameterMap( map, baseClass, prefix_input(), JsonKeys.INPUT_CLASS, JsonKeys.INPUT_CSS, JsonKeys.INPUT_ID );
 		
 		//
 		// Fieldname handling
 		//-----------------------------------
 		if( (tmp = getFieldName()) != null && tmp.length() > 0 ) {
-			map.put("name", tmp);
+			map.put(HtmlTag.NAME, tmp);
 		}
 		
 		return map;
+	}
+	
+	/// Generates the standard node parameter map for wrapper. This is useful for shared default behaviour
+	///
+	/// @params {String}        baseClass  - The input class to add, before the automated classes
+	/// @params {Map<String,String>}  map  - The return map to setup, if null it returns a new CaseInsensitiveHashMap
+	///
+	/// @returns {Map<String,String>} - the return parameter map
+	public Map<String,String> defaultWrapperParameterMap( String baseClass, Map<String,String> map ) {
+		return defaultParameterMap( map, baseClass, prefix_input(), JsonKeys.WRAPPER_CLASS, JsonKeys.WRAPPER_CSS, JsonKeys.WRAPPER_ID );
+	}
+	
+	/// Generates the standard node parameter map for label. This is useful for shared default behaviour
+	///
+	/// @params {String}        baseClass  - The input class to add, before the automated classes
+	/// @params {Map<String,String>}  map  - The return map to setup, if null it returns a new CaseInsensitiveHashMap
+	///
+	/// @returns {Map<String,String>} - the return parameter map
+	public Map<String,String> defaultLabelParameterMap( String baseClass, Map<String,String> map ) {
+		return defaultParameterMap( map, baseClass, prefix_input(), JsonKeys.LABEL_CLASS, JsonKeys.LABEL_CSS, JsonKeys.LABEL_ID );
+	}
+	
+	/// Generates the standard node parameter map for child nodes. This is useful for shared default behaviour
+	///
+	/// @params {String}        baseClass  - The input class to add, before the automated classes
+	/// @params {Map<String,String>}  map  - The return map to setup, if null it returns a new CaseInsensitiveHashMap
+	///
+	/// @returns {Map<String,String>} - the return parameter map
+	public Map<String,String> defaultChildWrapperParameterMap( String baseClass, Map<String,String> map ) {
+		return defaultParameterMap( map, baseClass, prefix_input(), JsonKeys.CHILD_CLASS, JsonKeys.CHILD_CSS, JsonKeys.CHILD_ID );
 	}
 	
 	/// Helps escape html dom parameter quotes, in an "optimal" way
@@ -221,12 +302,45 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	/// A combination of defaultInputParameterMap, and htmlNodeGenerator
 	///
 	/// @params {String}  nodeType          - HTML DOM type to generate, such as DIV, or INPUT
-	/// @params {String}  inputBaseClass    - The input class to add, before the automated classes
+	/// @params {String}  baseClass         - The base class to add, before the automated classes
 	/// @params {Map<String,String>}  map   - The parameter map to setup, if null it uses a new CaseInsensitiveHashMap
 	///
 	/// @returns {StringBuilder[2]}  - A pair of StringBuilder representing the prefix and suffix nodes
 	public StringBuilder[] defaultHtmlInput( String nodeType, String nodeClass, Map<String,String> parameterMap ) {
 		return htmlNodeGenerator( nodeType, defaultInputParameterMap( nodeClass, parameterMap), null );
+	}
+	
+	/// A combination of defaultInputParameterMap, and htmlNodeGenerator
+	///
+	/// @params {String}  nodeType          - HTML DOM type to generate, such as DIV, or INPUT
+	/// @params {String}  baseClass         - The base class to add, before the automated classes
+	/// @params {Map<String,String>}  map   - The parameter map to setup, if null it uses a new CaseInsensitiveHashMap
+	///
+	/// @returns {StringBuilder[2]}  - A pair of StringBuilder representing the prefix and suffix nodes
+	public StringBuilder[] defaultHtmlWrapper( String nodeType, String nodeClass, Map<String,String> parameterMap ) {
+		return htmlNodeGenerator( nodeType, defaultWrapperParameterMap( nodeClass, parameterMap), null );
+	}
+	
+	/// A combination of defaultInputParameterMap, and htmlNodeGenerator
+	///
+	/// @params {String}  nodeType          - HTML DOM type to generate, such as DIV, or INPUT
+	/// @params {String}  baseClass         - The base class to add, before the automated classes
+	/// @params {Map<String,String>}  map   - The parameter map to setup, if null it uses a new CaseInsensitiveHashMap
+	///
+	/// @returns {StringBuilder[2]}  - A pair of StringBuilder representing the prefix and suffix nodes
+	public StringBuilder[] defaultHtmlLabel( String nodeType, String nodeClass, Map<String,String> parameterMap ) {
+		return htmlNodeGenerator( nodeType, defaultLabelParameterMap( nodeClass, parameterMap), null );
+	}
+	
+	/// A combination of defaultInputParameterMap, and htmlNodeGenerator
+	///
+	/// @params {String}  nodeType          - HTML DOM type to generate, such as DIV, or INPUT
+	/// @params {String}  baseClass         - The base class to add, before the automated classes
+	/// @params {Map<String,String>}  map   - The parameter map to setup, if null it uses a new CaseInsensitiveHashMap
+	///
+	/// @returns {StringBuilder[2]}  - A pair of StringBuilder representing the prefix and suffix nodes
+	public StringBuilder[] defaultHtmlChildWrapper( String nodeType, String nodeClass, Map<String,String> parameterMap ) {
+		return htmlNodeGenerator( nodeType, defaultChildWrapperParameterMap( nodeClass, parameterMap), null );
 	}
 	
 	//

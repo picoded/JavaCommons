@@ -6,29 +6,39 @@ import java.util.Map;
 public class DisplayWrapperTemplates {
 	
 	public static FormWrapperInterface default_pdf=(node)->{
-		String[] prefixSuffix = new String[2];
+		/// Returning string builder
+		StringBuilder ret = new StringBuilder();
 		
-		//generating prefix
-		StringBuilder prefix = new StringBuilder();
+		/// The overlaying wrapper
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, node.prefix_standard()+"div", null );
 		
-		StringBuilder classBuilder = new StringBuilder(" class=\"pf_div");
-		FormGenerator.getCustomClass(node, classBuilder, JsonKeys.CUSTOMCLASS, "pfw_");
-		FormGenerator.getCustomClass(node, classBuilder, JsonKeys.WRAPPER_CLASS, "");
-		classBuilder.append("\"");
+		/// The wrapper start
+		ret.append( wrapperArr[0] );
 		
-		String classString = classBuilder.toString();
-		String cssString = FormGenerator.getWrapperCssString(node);
-		prefix.append("<"+HtmlTag.DIV+""+classString+cssString+">\n");	
+		/// The label, if given
+		String label = node.label();
 		
-		//generating suffix
-		StringBuilder suffix = new StringBuilder("</"+HtmlTag.DIV+">\n");
+		if( label != null && label.size() > 0 ) {
+			StringBuilder[] labelArr = node.defaultHtmlWrapper( HtmlTag.DIV, node.prefix_standard()+"label", null );
+			
+			ret.append( labelArr[0] );
+			ret.append( label );
+			ret.append( labelArr[1] );
+		}
 		
-		prefixSuffix[0] = prefix.toString();
-		prefixSuffix[1] = suffix.toString();
+		/// The children wrapper if needed
+		List<FormNode> childList = node.children();
 		
-		StringBuilder ret = new StringBuilder(prefixSuffix[0]);
-		ret.append( node.fullChildrenHtml(true) );
-		ret.append(prefixSuffix[1]);
+		if(childList != null && childList.size() > 0) {
+			StringBuilder[] childWrap = node.defaultHtmlChildWrapper( HtmlTag.DIV, node.prefix_standard()+"child", null );
+			
+			ret.append( childWrap[0] );
+			ret.append( node.fullChildrenHtml(false) );
+			ret.append( childWrap[1] );
+		}
+		
+		ret.append( wrapperArr[1] );
+		
 		return ret;
 	};
 	

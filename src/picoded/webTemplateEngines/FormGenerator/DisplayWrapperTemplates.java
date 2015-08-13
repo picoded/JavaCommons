@@ -3,7 +3,7 @@ package picoded.webTemplateEngines.FormGenerator;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PDFWrapperTemplates {
+public class DisplayWrapperTemplates {
 	
 	public static FormWrapperInterface default_pdf=(node)->{
 		String[] prefixSuffix = new String[2];
@@ -38,7 +38,7 @@ public class PDFWrapperTemplates {
 		return ret;
 	};
 	
-	public static Map<String, FormWrapperInterface> defaultPDFWrapperTemplates(){
+	public static Map<String, FormWrapperInterface> defaultWrapperTemplates(){
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();
 		
 		defaultTemplates.put("*", default_pdf);

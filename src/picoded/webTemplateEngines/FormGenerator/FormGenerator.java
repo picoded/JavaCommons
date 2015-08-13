@@ -19,8 +19,8 @@ public class FormGenerator {
 	private Map<String, FormWrapperInterface> customFormWrapperTemplates = new HashMap<String, FormWrapperInterface>();
 	private Map<String, FormInputInterface> customFormInputTemplates = new HashMap<String, FormInputInterface>();
 	
-	private Map<String, FormWrapperInterface> customPDFWrapperTemplates = new HashMap<String, FormWrapperInterface>();
-	private Map<String, FormInputInterface> customPDFInputTemplates = new HashMap<String, FormInputInterface>();
+	private Map<String, FormWrapperInterface> customDisplayWrapperTemplates = new HashMap<String, FormWrapperInterface>();
+	private Map<String, FormInputInterface> customDisplayInputTemplates = new HashMap<String, FormInputInterface>();
 	
 	/////////////////////////////////////////////////////////////////////////
 	//
@@ -36,8 +36,8 @@ public class FormGenerator {
 		customFormWrapperTemplates = FormWrapperTemplates.defaultWrapperTemplates();
 		customFormInputTemplates = FormInputTemplates.defaultInputTemplates();
 		
-		customPDFWrapperTemplates = PDFWrapperTemplates.defaultPDFWrapperTemplates();
-		customPDFInputTemplates = PDFInputTemplates.defaultPDFInputTemplates();
+		customDisplayWrapperTemplates = DisplayWrapperTemplates.defaultWrapperTemplates();
+		customDisplayInputTemplates = DisplayInputTemplates.defaultInputTemplates();
 	}
 	
 	/////////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ public class FormGenerator {
 	/// @returns {Map<String, FormInputInterface>} interface map
 	public Map<String, FormInputInterface> inputInterfaceMap(boolean displayOnly) {
 		if(displayOnly) {
-			return customPDFInputTemplates;
+			return customDisplayInputTemplates;
 		} else {
 			return customFormInputTemplates;
 		}
@@ -66,7 +66,7 @@ public class FormGenerator {
 	/// @returns {Map<String, FormInputInterface>} interface map
 	public Map<String, FormWrapperInterface> wrapperInterfaceMap(boolean displayOnly) {
 		if(displayOnly) {
-			return customPDFWrapperTemplates;
+			return customDisplayWrapperTemplates;
 		} else {
 			return customFormWrapperTemplates;
 		}
@@ -143,7 +143,7 @@ public class FormGenerator {
 		//formWrappers = customPDFWrapperTemplates.get(wrapperType).apply(node);
 		
 		/// This is input data output
-		StringBuilder formTextData = customPDFInputTemplates.get(nodeType).apply(node);
+		StringBuilder formTextData = customDisplayInputTemplates.get(nodeType).apply(node);
 		
 		//get inner data for children
 		StringBuilder innerData = new StringBuilder("");

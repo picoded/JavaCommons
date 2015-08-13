@@ -11,7 +11,7 @@ import picoded.struct.CaseInsensitiveHashMap;
 
 import com.mysql.jdbc.StringUtils;
 
-public class PDFInputTemplates {
+public class DisplayInputTemplates {
 	
 	////////////////////////////////////////////////
 	//
@@ -165,7 +165,7 @@ public class PDFInputTemplates {
 		}
 	}
 	
-	public static Map<String, FormInputInterface> defaultPDFInputTemplates(){
+	public static Map<String, FormInputInterface> defaultInputTemplates(){
 		Map<String, FormInputInterface> defaultTemplates = new CaseInsensitiveHashMap<String, FormInputInterface>();
 		
 		// Wildcard fallback

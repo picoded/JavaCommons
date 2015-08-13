@@ -349,7 +349,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	//------------------------------------------------------------------------
 	
 	/// List of children FormNode to be generated / used?
-	protected List<FormNode> _children = new ArrayList<FormNode>();
+	protected List<FormNode> _children = null;
 	
 	/// List of input data values, used to generate with multiple input fields
 	protected Map<String,Object> _inputValue = new HashMap<String,Object> ();
@@ -369,7 +369,6 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	///
 	/// @params {Map<String,Object>}  mapObject       - The map object, used to generate this nodes defination
 	/// @params {List<Map<String,Object>>} inputData  - The provided input data values
-	@SuppressWarnings("unchecked")
 	private void innerConstructor(FormGenerator root, Map<String, Object> mapObject, Map<String,Object> inputData){
 		// Setup the form generator
 		this._formGenerator = root;
@@ -379,25 +378,6 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		
 		// Put in the inputData list
 		this._inputValue = inputData;
-		
-		if( this.containsKey("children") ) {
-			Object childrenRaw = this.get("children");
-			this.remove("children");
-			
-			if( !(childrenRaw instanceof List) ) {
-				throw new IllegalArgumentException("'children' parameter found in defination was not a List: "+childrenRaw);
-			}
-			
-			// Iterate each child object
-			for(Object child : ((List<Object>)childrenRaw)) {
-				
-				if( !(child instanceof Map) ) {
-					throw new IllegalArgumentException("'children' List item found in defination was not a Map: "+child);
-				}
-				
-				_children.add( new FormNode( _formGenerator, (Map<String,Object>)child, inputData ) );
-			}
-		}
 	}
 	
 	/// Constructor varient using array of input data
@@ -528,33 +508,45 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	//------------------------------------------------------------------------
 	
 	/// Returns all the generated children form nodes
+	///
+	/// Note that children FormNode intentionally loads here, instead of constructor. To defer loading
 	/// 
 	/// @returns {List<FormNode>}  the list of formnodes
+	@SuppressWarnings("unchecked")
 	public List<FormNode> children() {
-		return _children;
+		if(_children != null) {
+			return _children;
+		}
+		
+		List<FormNode> cList = new ArrayList<FormNode>();
+		
+		if( this.containsKey("children") ) {
+			Object childrenRaw = this.get("children");
+			this.remove("children");
+			
+			if( !(childrenRaw instanceof List) ) {
+				throw new IllegalArgumentException("'children' parameter found in defination was not a List: "+childrenRaw);
+			}
+			
+			// Iterate each child object
+			for(Object child : ((List<Object>)childrenRaw)) {
+				
+				if( !(child instanceof Map) ) {
+					throw new IllegalArgumentException("'children' List item found in defination was not a Map: "+child);
+				}
+				
+				cList.add( new FormNode( _formGenerator, (Map<String,Object>)child, this._inputValue ) );
+			}
+		}
+		
+		_children = cList;
+		return cList;
 	}
 	
 	/// Returns the defined label value. This is used to generate the wrapper text if needed
 	public String label(){
 		return containsKey(JsonKeys.LABEL) ? getString(JsonKeys.LABEL) : "";
 	}
-	
-	// /// Gets the value from the input data array
-	// public String getValue( String fieldName, int index ) {
-	// 	String strRet = null;
-	// 	Object objRet = null;
-	// 	
-	// 	if( _inputValues.get(index) != null ) {
-	// 		objRet = _inputValues.get(index).get(fieldName);
-	// 		strRet = GenericConvert.toString(objRet, null);
-	// 	}
-	// 	
-	// 	if( strRet != null ) {
-	// 		return strRet;
-	// 	}
-	// 	
-	// 	return getString( JsonKeys.DEFAULT, null );
-	// }
 	
 	/// @TODO
 	/// Returns the default value of the object, 
@@ -575,6 +567,23 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	// To remove
 	//
 	//------------------------------------------------------------------------
+	
+	// /// Gets the value from the input data array
+	// public String getValue( String fieldName, int index ) {
+	// 	String strRet = null;
+	// 	Object objRet = null;
+	// 	
+	// 	if( _inputValues.get(index) != null ) {
+	// 		objRet = _inputValues.get(index).get(fieldName);
+	// 		strRet = GenericConvert.toString(objRet, null);
+	// 	}
+	// 	
+	// 	if( strRet != null ) {
+	// 		return strRet;
+	// 	}
+	// 	
+	// 	return getString( JsonKeys.DEFAULT, null );
+	// }
 	
 	/// @TODO
 	/// Returns the default value of the object, 

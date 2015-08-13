@@ -222,7 +222,8 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	///
 	/// @params {String}  nodeType          - HTML DOM type to generate, such as DIV, or INPUT
 	/// @params {String}  inputBaseClass    - The input class to add, before the automated classes
-	/// @params {Map<String,String>}  map   - The parameter map to setup, if null it uses a new CaseInsensitiveHashMap
+	///                                       This does not refer to pf_baseClass and not its pfi/c/l_ auto class variant
+	/// @params {Map<String,String>}  map   - The parameter map to set-up, if null it uses a new CaseInsensitiveHashMap
 	///
 	/// @returns {StringBuilder[2]}  - A pair of StringBuilder representing the prefix and suffix nodes
 	public StringBuilder[] defaultHtmlInput( String nodeType, String nodeClass, Map<String,String> parameterMap ) {

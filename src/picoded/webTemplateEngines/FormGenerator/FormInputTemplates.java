@@ -23,7 +23,7 @@ public class FormInputTemplates {
 	
 	protected static FormInputInterface header = (node)->{ 
 		String text = node.getString(JsonKeys.TEXT, "");
-		String fieldValue = node.getFieldValue();
+		String fieldValue = node.getFieldValue() != null ? node.getFieldValue():"";
 		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.HEADER, "pf_header", null );
 		return sbArr[0].append(text).append(fieldValue).append(sbArr[1]);
 	};
@@ -177,7 +177,7 @@ public class FormInputTemplates {
 			
 			String selectedOption = "";
 			if(!fieldValue.isEmpty()){
-				String fieldHtmlString = " "+HtmlTag.ID+"=\""+fieldValue+"\"";
+				String fieldHtmlString = " "+"name"+"=\""+fieldValue+"\"";
 				sb.append("<"+HtmlTag.SELECT+""+inputClassString+fieldHtmlString+">\n");
 				selectedOption = (String)node.getDefaultValue(fieldValue);
 				if(selectedOption != null){
@@ -224,7 +224,7 @@ public class FormInputTemplates {
 			//id/field and value elements
 			String inputTextFieldValue = node.getString("textField");
 			if(!inputTextFieldValue.isEmpty()){
-				sb.append(""+HtmlTag.ID+"=\""+inputTextFieldValue+"\"");
+				sb.append(""+"name"+"=\""+inputTextFieldValue+"\">");
 			}else{
 				sb.append("></"+HtmlTag.INPUT+">\n");
 			}

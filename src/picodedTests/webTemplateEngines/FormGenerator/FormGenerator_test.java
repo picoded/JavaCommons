@@ -2,6 +2,7 @@ package picodedTests.webTemplateEngines.FormGenerator;
 
 import picoded.conv.ConvertJSON;
 import picoded.webTemplateEngines.*;
+import picoded.webTemplateEngines.FormGenerator.*;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.*;

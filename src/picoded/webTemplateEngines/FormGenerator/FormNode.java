@@ -522,7 +522,6 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		
 		if( this.containsKey("children") ) {
 			Object childrenRaw = this.get("children");
-			this.remove("children");
 			
 			if( !(childrenRaw instanceof List) ) {
 				throw new IllegalArgumentException("'children' parameter found in defination was not a List: "+childrenRaw);
@@ -548,8 +547,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return containsKey(JsonKeys.LABEL) ? getString(JsonKeys.LABEL) : "";
 	}
 	
-	/// @TODO
-	/// Returns the default value of the object, 
+	/// Returns the field name
 	public String getFieldName(){
 		if( containsKey(JsonKeys.FIELD) ) {
 			return RegexUtils.removeAllNonAlphaNumeric( getString(JsonKeys.FIELD) ).toLowerCase();
@@ -557,10 +555,33 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return null;
 	}
 	
-	/// @TODO
-	/// Returns the default value of the object, 
+	/// Returns the field value as a string
 	public String getFieldValue(){
-		return GenericConvert.toString(getDefaultValue(getFieldName()));
+		Object val = getRawFieldValue();
+		
+		if( val != null ) {
+			return GenericConvert.toString( getRawFieldValue() );
+		}
+		return null;
+	}
+	
+	/// Returns the field value in its raw form
+	public Object getRawFieldValue(){
+		Object val = null;
+		String fieldName = getFieldName();
+		
+		if(_inputValue != null && _inputValue.containsKey(fieldName)){
+			val = _inputValue.get(fieldName);
+		}
+		
+		if(val != null) {
+			val = get(JsonKeys.DEFAULT);
+		}
+		return val;
+	}
+	
+	public Map<String,Object> getValueMap() {
+		return _inputValue;
 	}
 	
 	//
@@ -592,9 +613,8 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	}
 	
 	/// Returns the default value of the object, 
-	/// note that this will get the 0th indexed value.
-	// @Deprecated
-	public Object getDefaultValue(String fieldName){
+	///
+	protected Object getDefaultValue(String fieldName){
 		if(_inputValue != null && _inputValue.containsKey(fieldName)){
 			return _inputValue.get(fieldName);
 		}

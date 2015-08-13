@@ -6,23 +6,37 @@ import java.util.Map;
 
 public class DisplayWrapperTemplates {
 	
-	public static FormWrapperInterface default_pdf=(node)->{
+	/// divWrapper
+	///
+	/// Does a basic div wrapper
+	protected static FormWrapperInterface divWrapper = (node)->{
 		return FormWrapperTemplates.standardDivWrapper(node, true);
 	};
 	
-	public static FormWrapperInterface none_pdf=(node)->{
+	/// forWrapper
+	///
+	/// Does a basic div wrapper
+	protected static FormWrapperInterface forWrapper = (node)->{
+		return FormWrapperTemplates.forListWrapper(node, true);
+	};
+	
+	/// noneWrapper
+	///
+	/// No wrappers
+	protected static FormWrapperInterface none = (node)->{
 		StringBuilder ret = new StringBuilder();
 		ret.append( node.fullChildrenHtml(true) );
 		return ret;
 	};
 	
-	public static Map<String, FormWrapperInterface> defaultWrapperTemplates(){
+	protected static Map<String, FormWrapperInterface> defaultWrapperTemplates() {
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();
 		
-		defaultTemplates.put("*", default_pdf);
+		defaultTemplates.put("*", FormWrapperTemplates.divWrapper);
 		
-		defaultTemplates.put("div", default_pdf);
-		defaultTemplates.put("none", none_pdf);
+		defaultTemplates.put("div", FormWrapperTemplates.divWrapper);
+		defaultTemplates.put("for", FormWrapperTemplates.forWrapper);
+		defaultTemplates.put("none", FormWrapperTemplates.none);
 		
 		return defaultTemplates;
 	}

@@ -1,4 +1,4 @@
-package picoded.webTemplateEngines;
+package picoded.webTemplateEngines.FormGenerator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +14,8 @@ import picoded.struct.CaseInsensitiveHashMap;
 
 /// FormNode serves as a map accessor to the form defination structure,
 /// with various utility functions, for Wrapper, and Input interface writers
+///
+/// Note that this SHOULD NOT be called directly, but through FormGenerator
 ///
 /// @TODO Change class extension to use AbstractMapDecorator, so that it proxy the valeus from the soruce instead
 public class FormNode extends CaseInsensitiveHashMap<String, Object> implements GenericConvertMap<String, Object> {

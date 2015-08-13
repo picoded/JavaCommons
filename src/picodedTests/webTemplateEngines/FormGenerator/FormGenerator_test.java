@@ -1,4 +1,4 @@
-package picodedTests.webTemplateEngines;
+package picodedTests.webTemplateEngines.FormGenerator;
 
 import picoded.conv.ConvertJSON;
 import picoded.webTemplateEngines.*;

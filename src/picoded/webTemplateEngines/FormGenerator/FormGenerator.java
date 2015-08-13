@@ -1,4 +1,4 @@
-package picoded.webTemplateEngines;
+package picoded.webTemplateEngines.FormGenerator;
 
 import java.util.Map;
 import java.util.HashMap;

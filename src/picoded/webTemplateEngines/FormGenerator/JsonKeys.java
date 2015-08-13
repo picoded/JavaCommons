@@ -1,4 +1,4 @@
-package picoded.webTemplateEngines;
+package picoded.webTemplateEngines.FormGenerator;
 
 public class JsonKeys {
 	

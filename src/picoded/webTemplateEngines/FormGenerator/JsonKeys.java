@@ -1,6 +1,21 @@
-package picoded.webTemplateEngines;
+package picoded.webTemplateEngines.FormGenerator;
 
 public class JsonKeys {
+	
+	////////////////////////////////////////////////
+	//
+	//  Input and wrapper type handling
+	//
+	////////////////////////////////////////////////
+	
+	/// The type to assume for both input and wrapper
+	public static String TYPE = "type";
+	
+	/// Overwrites of each input type
+	public static String INPUT_TYPE = "inputType";
+	
+	/// Overwrites of each wrapper type
+	public static String WRAPPER_TYPE = "wrapperType";
 	
 	////////////////////////////////////////////////
 	//
@@ -14,6 +29,9 @@ public class JsonKeys {
 	// Default value to extract from json map, if field name value does not exists
 	public static String DEFAULT = "default";
 	
+	// Options listing, used to list options in dropdown
+	public static String OPTIONS = "options";
+
 	////////////////////////////////////////////////
 	//
 	//  HTML parameters handling
@@ -26,35 +44,52 @@ public class JsonKeys {
 	// The field to setup the class SPECFIC
 	public static String INPUT_CLASS = "inputClass";
 	
-	////////////////////////////////////////////////
-	//
-	//  HTML style overwrites
-	//
-	////////////////////////////////////////////////
+	// The input ID to use
+	public static String INPUT_ID = "inputID";
 	
 	// Input css overwrites
 	public static String INPUT_CSS = "inputCss";
 	
+	// The field to setup the class SPECFIC
+	public static String WRAPPER_CLASS = "wrapperClass";
+	
+	// The input ID to use
+	public static String WRAPPER_ID = "wrapperID";
+	
+	// Input css overwrites
+	public static String WRAPPER_CSS = "wrapperCss";
+	
+	// The field to setup the class SPECFIC
+	public static String LABEL_CLASS = "labelClass";
+	
+	// The input ID to use
+	public static String LABEL_ID = "labelID";
+	
+	// Input css overwrites
+	public static String LABEL_CSS = "labelCss";
 	
 	
+	// The field to setup the class SPECFIC
+	public static String CHILD_CLASS = "childClass";
+	
+	// The input ID to use
+	public static String CHILD_ID = "childID";
+	
+	// Input css overwrites
+	public static String CHILD_CSS = "childCss";
 	
 	
 	////////////////////////////////////////////////
 	//
-	//  HTML DOM types
+	//  JSON Node Types (standard)
 	//
 	////////////////////////////////////////////////
 	
-	// Standard html DIV
+	/// No wrapper? Used mainly for raw html mode
+	public static String NONE = "none";
+	
+	/// Standard DIV wrapper / input
 	public static String DIV = "div";
-	
-	// The header class type
-	public static String DOM_HEADER = "h3";
-	
-	
-	
-	
-	
 	
 	////////////////////////////////////////////////
 	//
@@ -67,25 +102,21 @@ public class JsonKeys {
 	
 	public static String TEXT = "text";
 	public static String TITLE = "title";
-	public static String TYPE = "type";
 	public static String SUBNODES = "subnodes";
 	public static String DROPDOWN = "dropdown";
 	public static String LABEL = "label";
 	public static String WRAPPER = "wrapper";
-	public static String OPTIONS = "options";
+	
 	public static String DROPDOWN_WITHOTHERS = "dropdownWithOthers";
 	public static String OTHERS_OPTION = "othersOption";
 	public static String DROPDOWN_WITHOTHERS_TEXTFIELD = "textField";
 	public static String FUNCTION_NAME = "functionName";
 	
 	public static String CUSTOMCLASS = "class";
-	public static String WRAPPER_CLASS = "wrapperClass";
-	public static String LABEL_CLASS = "labelClass";
+	
 	public static String PDFDISPLAY_CLASS = "pdfDisplayClass";
 	public static String PDFOUTPUT_CLASS = "pdfOutputClass";
-	public static String CHILD_CLASS = "childClass";
 	
-	public static String WRAPPER_CSS = "wrapperCss";
-	public static String LABEL_CSS = "labelCss";
+	
 	
 }

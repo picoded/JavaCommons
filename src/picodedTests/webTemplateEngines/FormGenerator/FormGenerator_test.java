@@ -1,7 +1,8 @@
-package picodedTests.webTemplateEngines;
+package picodedTests.webTemplateEngines.FormGenerator;
 
 import picoded.conv.ConvertJSON;
 import picoded.webTemplateEngines.*;
+import picoded.webTemplateEngines.FormGenerator.*;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.*;
@@ -138,9 +139,6 @@ public class FormGenerator_test {
 		String pdfFileString = "./test-files/test-specific/htmlGenerator/generatedFiles/pdfFromJSONArray.pdf";
 		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
 	}
-	
-	/// Missing test case file
-	/// @TODO to fix
 	
 	@Test
 	public void getHtmlAndPDFOutputFromJSONKeysObject(){

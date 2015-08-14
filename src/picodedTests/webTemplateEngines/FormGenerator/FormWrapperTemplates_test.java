@@ -32,19 +32,18 @@ public class FormWrapperTemplates_test {
 	
 	private String getFullTemplatedJsonWithData(String jsonKeyName){
 		File jsonFile = new File("./test-files/test-specific/htmlGenerator/FormWrapperTemplates_test/"+jsonKeyName+".js");
-		File jsonDataFile = new File("./test-files/test-specific/htmlGenerator/FormWrapperTemplates_test/"+jsonKeyName+"_data.js");
+		File jsonDataFile = new File("./test-files/test-specific/htmlGenerator/FormWrapperTemplates_test/jsonData.js");
+
 		try{
+			FormGenerator formGen = new FormGenerator();
+			
 			String jsonFileString = FileUtils.readFileToString(jsonFile);
 			Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
 			
 			String jsonDataString = FileUtils.readFileToString(jsonDataFile);
 			Map<String, Object> jsonDataMap = ConvertJSON.toMap(jsonDataString);
 			
-			FormGenerator formGen = new FormGenerator();
 			return formGen.build(jsonMap, jsonDataMap, true).toString();
-//			FormNode node = new FormNode(formGen, jsonMap, null);
-			
-			
 		}catch(Exception ex){
 			return "";
 		}
@@ -57,6 +56,7 @@ public class FormWrapperTemplates_test {
 			case "divWithChild": return getChildWrapper();
 			case "fullTest": return getFullTestStringWithLabel();
 			case "fullTestNoLabel": return getFullTestStringWithoutSecondIterationLabel();
+			case "fullTestExtraAttributes" : return getFullTestExtraAttributes();
 		}
 		
 		return "";
@@ -137,6 +137,36 @@ public class FormWrapperTemplates_test {
 			"</div>";
 	}
 	
+	private String getFullTestExtraAttributes(){
+		return "<div mapwrapperattribute='20' mapwrappersecondattribute='40' class='pf_div' singleWrapperAttrib='value' secondSinglWrappereAttrib='value2'>"+
+					"<div maplabelattribute='labelValue' class='pf_label' singleLabelAttrib='value'>TextField</div>"+
+					"<div mapchildwrapperattribute='childProperty' class='pf_child' singleChildWrapperAttrib='value'>"+
+						"<div class='pf_div pff_childX pff_forChild0'>"+
+							"<div class='pf_child'>"+
+								"<div class='pf_div'>"+
+									"<div class='pf_label'>Title Label</div>"+
+									"<h3 class='pf_header' inputatribute='inputProperty'>Title</h3>"+
+								"</div>"+
+								"<div class='pf_div'>"+
+									"<input name='data' type='text' value='Person A' class='pf_inputText'></input>"+
+								"</div>"+
+							"</div>"+
+						"</div>"+
+						"<div class='pf_div pff_childX pff_forChild1'>"+
+							"<div class='pf_child'>"+
+								"<div class='pf_div'>"+
+									"<div class='pf_label'>Title Label</div>"+
+									"<h3 class='pf_header' inputatribute='inputProperty'>Title</h3>"+
+								"</div>"+
+								"<div class='pf_div'>"+
+									"<input name='data' type='text' value='Person B' class='pf_inputText'></input>"+
+								"</div>"+
+							"</div>"+
+						"</div>"+
+					"</div>"+
+				"</div>";
+	}
+	
 	@Test
 	public void standardDivWrapperTest(){
 		String jsonTemplatedOutput = getWrapperTemplatedJsonString("div");
@@ -178,18 +208,14 @@ public class FormWrapperTemplates_test {
 		String jsonTemplatedOutput = getFullTemplatedJsonWithData("fullTest");
 		String rawHtml = getHtmlString("fullTest");
 		
-		//for debugging
-		File output = new File("./test-files/test-specific/htmlGenerator/FormWrapperTemplates_test/debugFile.html");
-		try{
-			FileWriter fw = new FileWriter(output);
-			String cleanedString = jsonTemplatedOutput.replace("><", ">\n<");
-			fw.write(cleanedString);
-			fw.flush();
-			fw.close();
-		}catch(Exception ex){
-			
-		}
-		//for debugging
+		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtml, jsonTemplatedOutput);
+		assertTrue(compliancyCheck);
+	}
+	
+	@Test
+	public void fullTestOfInjectedAttributes(){
+		String jsonTemplatedOutput = getFullTemplatedJsonWithData("fullTestExtraAttributes");
+		String rawHtml = getHtmlString("fullTestExtraAttributes");
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtml, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);

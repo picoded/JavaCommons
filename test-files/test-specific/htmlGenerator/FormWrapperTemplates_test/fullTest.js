@@ -7,6 +7,9 @@
 		{
 			"type":"title",
 			"label":"Title Label",
+			"HTML_inputAttributesMap": {
+				"inputAtribute" : "inputProperty"
+			},
 			"text":"Title"
 		},
 		{

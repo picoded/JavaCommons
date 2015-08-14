@@ -79,7 +79,7 @@ public class FormWrapperTemplates {
 		/// The label, if given
 		String label = node.label();
 		if(label != null && label.length() > 0 ) {
-			StringBuilder[] labelArr = node.defaultHtmlWrapper( HtmlTag.DIV, node.prefix_standard()+"label", null );
+			StringBuilder[] labelArr = node.defaultHtmlLabel( HtmlTag.DIV, node.prefix_standard()+"label", null );
 			
 			ret.append( labelArr[0] );
 			ret.append( label );

@@ -81,6 +81,16 @@ public class JsonKeys {
 	//removal of Label types from inner children if needed
 	public static String REMOVE_LABEL_FROM_SECOND_ITERATION = "removeLabel";
 	
+	//extra properties injection
+	public static String EXTRA_WRAPPER_PROPERTIES = "HTML_wrapperAttributes";
+	public static String EXTRA_CHILD_WRAPPER_PROPERTIES = "HTML_childWrapperAttributes";
+	public static String EXTRA_INPUT_PROPERTIES = "HTML_inputAttributes";
+	public static String EXTRA_LABEL_PROPERTIES = "HTML_labelAttributes";
+	
+	public static String EXTRA_WRAPPER_PROPERTIES_MAP = "HTML_wrapperAttributesMap";
+	public static String EXTRA_CHILD_WRAPPER_PROPERTIES_MAP = "HTML_childWrapperAttributesMap";
+	public static String EXTRA_INPUT_PROPERTIES_MAP = "HTML_inputAttributesMap";
+	public static String EXTRA_LABEL_PROPERTIES_MAP = "HTML_labelAttributesMap";
 	
 	////////////////////////////////////////////////
 	//

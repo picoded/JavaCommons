@@ -8,6 +8,63 @@ import com.amazonaws.util.StringUtils;
 ///
 /// Web templating engine that helps define and convert a JSON styled template, into the actual web form
 ///
+///
+/// ### Code process flow
+///
+/// The following ANSCII digram illustrates the process flow that the code follows for 
+///
+/// + FormGenerator
+/// + FormNode
+/// + FormWrapperInterface
+/// + FormInputInterface
+///
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+///
+///  +----------------+    (Via input/wrapperInterfaceMap)
+///  +  FormGenerator |----------------------------------------\
+///  +----------------+                                        |
+///        |                                                   |
+///        V                                                   |
+///  +-----------------------------------------+               |
+///  | FormGenerator.build(),                  |               |
+///  | Form Definition is (Map<String,Object>) |               |
+///  +-----------------------------------------+               |
+///        |                                                   |
+///        V                                                   |
+///  +-----------+                                             |
+///  +  FormNode |                                             |
+///  +-----------+                                             |
+///        |                                                   |
+///        V         +-----------------+                       |
+///  +-----------+   | For each child  |                       |  
+///  + FulHtml() |<--| Iterate through |                       |
+///  +-----------+   +-----------------+                       | 
+///        |                  ^                                |
+///        V                  |                                |
+///  +--------------------------------------------------+      |
+///  |              FormWrapperInterface                |      |
+///  |                                                  |<-----+
+///  | The respective interface called is selected      |      |
+///  | based on its type, and taken from FormGenerator  |      |
+///  | This also handles the insertion of labels        |      |
+///  | & child wrappers string                          |      |
+///  +--------------------------------------------------+      | 
+///        |                                                   |
+///        V                                                   |
+///  +-------------+                                           |  
+///  + InputHtml() |                                           |
+///  +-------------+                                           | 
+///        |                                                   |
+///        V                                                   |
+///  +--------------------------------------------------+      |
+///  |                FormInputInterface                |      |
+///  |                                                  |<-----/
+///  | The respective interface called is selected      |      
+///  | based on its type, and taken from FormGenerator  |    
+///  +--------------------------------------------------+     
+///
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+///
 public class FormGenerator {
 	
 	/////////////////////////////////////////////////////////////////////////

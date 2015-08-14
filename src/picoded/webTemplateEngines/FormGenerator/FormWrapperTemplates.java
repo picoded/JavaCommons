@@ -1,5 +1,6 @@
 package picoded.webTemplateEngines.FormGenerator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,8 @@ public class FormWrapperTemplates {
 			ret.append( labelArr[1] );
 		}
 		
-		ret.append(node.inputHtml(isDisplayMode));
+		StringBuilder inputHtml = node.inputHtml(isDisplayMode);
+		ret.append(inputHtml);
 		
 		/// The children wrapper if needed
 		List<FormNode> childList = node.children();
@@ -76,8 +78,7 @@ public class FormWrapperTemplates {
 		
 		/// The label, if given
 		String label = node.label();
-		
-		if( label != null && label.length() > 0 ) {
+		if(label != null && label.length() > 0 ) {
 			StringBuilder[] labelArr = node.defaultHtmlWrapper( HtmlTag.DIV, node.prefix_standard()+"label", null );
 			
 			ret.append( labelArr[0] );
@@ -107,17 +108,34 @@ public class FormWrapperTemplates {
 		
 		String subAutoClass = node.getString("class");
 		if(subAutoClass != null && subAutoClass.length() > 0) {
-			subAutoClass = subAutoClass+"_node";
+			subAutoClass = "pff_childX pff_"+subAutoClass+"_forChild";
+		} else {
+			subAutoClass = "pff_childX";
+		}
+		
+		//removal of child labels if needed
+		boolean removeLabel = Boolean.parseBoolean(node.getString(JsonKeys.REMOVE_LABEL_FROM_SECOND_ITERATION, "false"));
+		List<Object> childDefinitionsWithoutLabel = null;
+		
+		if(removeLabel){
+			childDefinitionsWithoutLabel = new ArrayList<Object>();
+			for(Object obj:childDefination){
+				if(obj instanceof Map){
+					Map<String, Object> objMap = (Map<String, Object>)obj;
+					objMap.remove(JsonKeys.LABEL);
+					childDefinitionsWithoutLabel.add(objMap);
+				}
+			}
 		}
 		
 		/// The children wrapper if needed
 		if(childDefination != null && childDefination.size() > 0 && valuesList != null && valuesList.size() > 0) {
-//		if(childDefination != null && childDefination.size() > 0) {
 			StringBuilder[] childWrap = node.defaultHtmlChildWrapper( HtmlTag.DIV, node.prefix_standard()+"child", null );
 			
 			ret.append( childWrap[0] );
 			
 			if(valuesList != null){
+				int a=0;
 				for(Object subValue : valuesList) {
 					// Skip values that are not maps
 					if( !(subValue instanceof Map) ) {
@@ -128,11 +146,17 @@ public class FormWrapperTemplates {
 					
 					Map<String,Object> nodeMap = new HashMap<String,Object>();
 					nodeMap.put("type", "div");
-					nodeMap.put("class", subAutoClass);
-					nodeMap.put("children", childDefination);
+					nodeMap.put("wrapperClass", subAutoClass+" pff_forChild"+a);
+					if(removeLabel){
+						nodeMap.put("children", childDefinitionsWithoutLabel);
+					}else{
+						nodeMap.put("children", childDefination);
+					}
 					
 					FormNode childNode = new FormNode( node._formGenerator, nodeMap, subMapVal );
 					ret.append( childNode.fullHtml(isDisplayMode) );
+					
+					++a;
 				}
 			}
 			

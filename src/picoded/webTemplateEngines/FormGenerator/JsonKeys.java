@@ -78,6 +78,9 @@ public class JsonKeys {
 	// Input css overwrites
 	public static String CHILD_CSS = "childCss";
 	
+	//removal of Label types from inner children if needed
+	public static String REMOVE_LABEL_FROM_SECOND_ITERATION = "removeLabel";
+	
 	
 	////////////////////////////////////////////////
 	//

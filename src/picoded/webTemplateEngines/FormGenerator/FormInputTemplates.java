@@ -17,8 +17,14 @@ public class FormInputTemplates {
 	protected static FormInputInterface div = (node)->{
 		String text = node.getString(JsonKeys.TEXT, "");
 		String fieldValue = node.getFieldValue();
+		
+		String textAndField = text+fieldValue;
+		if(textAndField == null || textAndField.length() <= 0) {
+			return new StringBuilder();
+		}
+		
 		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, "pf_div", null );
-		return sbArr[0].append(text).append(fieldValue).append(sbArr[1]);
+		return sbArr[0].append(textAndField).append(sbArr[1]);
 	};
 	
 	protected static FormInputInterface header = (node)->{ 

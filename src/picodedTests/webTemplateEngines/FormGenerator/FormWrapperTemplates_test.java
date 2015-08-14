@@ -41,9 +41,10 @@ public class FormWrapperTemplates_test {
 			Map<String, Object> jsonDataMap = ConvertJSON.toMap(jsonDataString);
 			
 			FormGenerator formGen = new FormGenerator();
-			FormNode node = new FormNode(formGen, jsonMap, null);
+			return formGen.build(jsonMap, jsonDataMap, true).toString();
+//			FormNode node = new FormNode(formGen, jsonMap, null);
 			
-			return formGen.build(node, jsonDataMap, true).toString();
+			
 		}catch(Exception ex){
 			return "";
 		}
@@ -54,7 +55,8 @@ public class FormWrapperTemplates_test {
 			case "div": return getStandardDivWrapper();
 			case "divWithLabel": return getLabelWrapper();
 			case "divWithChild": return getChildWrapper();
-			case "fullTest": return getFullTestString();
+			case "fullTest": return getFullTestStringWithLabel();
+			case "fullTestNoLabel": return getFullTestStringWithoutSecondIterationLabel();
 		}
 		
 		return "";
@@ -73,7 +75,7 @@ public class FormWrapperTemplates_test {
 		return "<div class='pf_child'></div>";
 	}
 	
-	private String getFullTestString(){
+	private String getFullTestStringWithLabel(){
 		return "<div class='pf_div'>"+
 					"<div class='pf_label'>TextField</div>"+
 					"<div class='pf_child'>"+
@@ -105,6 +107,36 @@ public class FormWrapperTemplates_test {
 				"</div>";
 	}
 	
+	private String getFullTestStringWithoutSecondIterationLabel(){
+		return "<div class='pf_div'>"+
+				"<div class='pf_label'>TextField</div>"+
+				"<div class='pf_child'>"+
+					"<div class='pf_div'>"+
+						"<div class='pf_div'></div>"+
+						"<div class='pf_child'>"+
+							"<div class='pf_div'>"+
+								"<h3 class='pf_header'>Title</h3>"+
+							"</div>"+
+							"<div class='pf_div'>"+
+								"<input name='data' type='text' value='Person A' class='pf_inputText'></input>"+
+							"</div>"+
+						"</div>"+
+					"</div>"+
+					"<div class='pf_div'>"+
+						"<div class='pf_div'></div>"+
+						"<div class='pf_child'>"+
+							"<div class='pf_div'>"+
+								"<h3 class='pf_header'>Title</h3>"+
+							"</div>"+
+							"<div class='pf_div'>"+
+								"<input name='data' type='text' value='Person B' class='pf_inputText'></input>"+
+							"</div>"+
+						"</div>"+
+					"</div>"+
+				"</div>"+
+			"</div>";
+	}
+	
 	@Test
 	public void standardDivWrapperTest(){
 		String jsonTemplatedOutput = getWrapperTemplatedJsonString("div");
@@ -133,9 +165,31 @@ public class FormWrapperTemplates_test {
 	}
 	
 	@Test
+	public void fullTestOfWrapperAndInputWithoutLabel(){
+		String jsonTemplatedOutput = getFullTemplatedJsonWithData("fullTestNoLabel");
+		String rawHtml = getHtmlString("fullTestNoLabel");
+		
+		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtml, jsonTemplatedOutput);
+		assertTrue(compliancyCheck);
+	}
+	
+	@Test
 	public void fullTestOfWrapperAndInput(){
 		String jsonTemplatedOutput = getFullTemplatedJsonWithData("fullTest");
 		String rawHtml = getHtmlString("fullTest");
+		
+		//for debugging
+		File output = new File("./test-files/test-specific/htmlGenerator/FormWrapperTemplates_test/debugFile.html");
+		try{
+			FileWriter fw = new FileWriter(output);
+			String cleanedString = jsonTemplatedOutput.replace("><", ">\n<");
+			fw.write(cleanedString);
+			fw.flush();
+			fw.close();
+		}catch(Exception ex){
+			
+		}
+		//for debugging
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtml, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);

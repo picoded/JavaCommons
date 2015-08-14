@@ -2,7 +2,7 @@
 	"type":"for",
 	"field":"textfield",
 	"label":"TextField",
-	"removeLabel":"false",
+	"removeLabel":"true",
 	"children":[
 		{
 			"type":"title",

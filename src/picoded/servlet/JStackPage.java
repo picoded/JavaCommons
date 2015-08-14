@@ -83,7 +83,7 @@ public class JStackPage extends CorePage {
 		if (_contextPath != null) {
 			return _contextPath;
 		} else {
-			if( httpRequest != null ) {
+			if (httpRequest != null) {
 				return (_contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/");
 			} else {
 				return (_contextPath = getServletContext().getRealPath("/") + "/");
@@ -129,12 +129,11 @@ public class JStackPage extends CorePage {
 			return JConfigObj;
 		}
 		
-		if( (new File(getConfigsPath())).exists() ) {
-			JConfigObj = new JConfig( getConfigsPath() );
+		if ((new File(getConfigsPath())).exists()) {
+			JConfigObj = new JConfig(getConfigsPath());
 		} else {
 			JConfigObj = new JConfig();
 		}
-		
 		
 		return JConfigObj;
 	}
@@ -150,33 +149,33 @@ public class JStackPage extends CorePage {
 	/// Generates the JSQL layer given the config namespace
 	/// 
 	/// @TODO support other JSQL engines
-	protected JSql JSqlLayerFromConfig( String profileNameSpace ) {
+	protected JSql JSqlLayerFromConfig(String profileNameSpace) {
 		
 		// Gets the configuration setup
 		JConfig jc = JConfig();
 		
 		// Gets the config vars
-		String engine =   jc.getString(profileNameSpace+".engine", "");
-		String path =     jc.getString(profileNameSpace+".path", "");
-		String username = jc.getString(profileNameSpace+".username", "");
-		String password = jc.getString(profileNameSpace+".password", "");
-		String database = jc.getString(profileNameSpace+".database", "");
+		String engine = jc.getString(profileNameSpace + ".engine", "");
+		String path = jc.getString(profileNameSpace + ".path", "");
+		String username = jc.getString(profileNameSpace + ".username", "");
+		String password = jc.getString(profileNameSpace + ".password", "");
+		String database = jc.getString(profileNameSpace + ".database", "");
 		
 		// Default fallback on sqlite engine, if the profileNameSpace is default
 		// This is used to ensure existing test cases do not break
-		if(profileNameSpace.equalsIgnoreCase("sys.dataStack.JSqlOnly.sqlite")) {
-			if(engine.length() <= 0) {
+		if (profileNameSpace.equalsIgnoreCase("sys.dataStack.JSqlOnly.sqlite")) {
+			if (engine.length() <= 0) {
 				engine = "sqlite";
 			}
-			if(path.length() <= 0) {
-				path = getWebInfPath()+"/sqlite.db";
+			if (path.length() <= 0) {
+				path = getWebInfPath() + "/sqlite.db";
 			}
 		}
 		
 		// SQLite implmentation
-		if( engine.equalsIgnoreCase("sqlite") ) {
-			if( path.length() <= 0 ) {
-				throw new RuntimeException("Unsupported "+profileNameSpace+".path: "+path);
+		if (engine.equalsIgnoreCase("sqlite")) {
+			if (path.length() <= 0) {
+				throw new RuntimeException("Unsupported " + profileNameSpace + ".path: " + path);
 			}
 			
 			// Replaces WEB-INF path
@@ -184,9 +183,9 @@ public class JStackPage extends CorePage {
 			path = path.replace("${WEB-INF}", getWebInfPath());
 			
 			// Generates the sqlite connection with the path
-			return JSql.sqlite( path );
+			return JSql.sqlite(path);
 		} else {
-			throw new RuntimeException("Unsupported "+profileNameSpace+".engine: "+engine);
+			throw new RuntimeException("Unsupported " + profileNameSpace + ".engine: " + engine);
 		}
 	}
 	
@@ -202,10 +201,10 @@ public class JStackPage extends CorePage {
 		String profileName = jc.getString("sys.dataStack.selected.profile.name", "JSqlOnly.sqlite");
 		String profileType = jc.getString("sys.dataStack.selected.profile.type", "JSql");
 		
-		if( profileType.equalsIgnoreCase("JSql") ) {
-			return new JStackLayer[] { JSqlLayerFromConfig("sys.dataStack."+profileName) };
+		if (profileType.equalsIgnoreCase("JSql")) {
+			return new JStackLayer[] { JSqlLayerFromConfig("sys.dataStack." + profileName) };
 		} else {
-			throw new RuntimeException("Unsupported sys.dataStack.selected.profile.type: "+profileType);
+			throw new RuntimeException("Unsupported sys.dataStack.selected.profile.type: " + profileType);
 		}
 	}
 	
@@ -217,7 +216,7 @@ public class JStackPage extends CorePage {
 		}
 		
 		//Default is sqlite
-		JStackObj = new JStack( loadConfiguredJStackLayers() );
+		JStackObj = new JStack(loadConfiguredJStackLayers());
 		
 		return JStackObj;
 	}
@@ -225,13 +224,15 @@ public class JStackPage extends CorePage {
 	////////////////////////////////////////////////////
 	// tableSetup calls for various jSql based modules
 	////////////////////////////////////////////////////
-	public void stackSetup() throws JStackException {
-		JStack().stackSetup();
-	}
 	
-	/// Called once when initialized, to purge all existing data.
-	public void stackTeardown() throws JStackException {
-		JStack().teardown();
-	}
+	// // Called on setup, 
+	// public void stackSetup() throws JStackException {
+	// 	JStack().stackSetup();
+	// }
+	// 
+	// /// Called once when initialized, to purge all existing data.
+	// public void stackTeardown() throws JStackException {
+	// 	JStack().teardown();
+	// }
 	
 }

@@ -1,4 +1,4 @@
-package picoded.util;
+package picoded.utils;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;

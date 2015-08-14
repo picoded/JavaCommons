@@ -2,6 +2,7 @@ package picoded.servlet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletContextListener;
 
 import java.net.URL;
 import java.lang.String;
@@ -43,7 +44,7 @@ import picoded.RESTBuilder.*;
  * + logger
  * + API module
  */
-public class BasePage extends JStackPage {
+public class BasePage extends JStackPage /* implements ServletContextListener */ {
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -198,9 +199,12 @@ public class BasePage extends JStackPage {
 		
 		_jmteObj = new JMTE( getPagesTemplatePath() );
 		_jmteObj.baseDataModel.put( "ContextPath", getContextPath() );
+		_jmteObj.baseDataModel.put( "ContextURI", getContextURI() );
 		_jmteObj.registerNamedRenderer( new currentAccountMetaInfo_nr() );
 		
 		return _jmteObj;
 	}
 	
+	// @TODO servlet context listener implmentation
+	// contextInitialized(ServletContextEvent sce) 
 }

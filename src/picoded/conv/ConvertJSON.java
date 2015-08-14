@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonParser;
 
 /// json simplification helpers. When you do not need custom object / array structures
 ///
@@ -19,8 +20,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 ///
 public class ConvertJSON {
 	
+	/// cachedMapper builder, used to setup the config
+	private static ObjectMapper cachedMapperBuilder() {
+		ObjectMapper cm = new ObjectMapper();
+		
+		// Allow comments in strings
+		cm.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+		
+		// Allow leading 0's in the int
+		cm.configure(JsonParser.Feature.ALLOW_NUMERIC_LEADING_ZEROS, true);
+		
+		// Allow single quotes in JSON
+		cm.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+		
+		return cm;
+	}
+	
 	/// Internal reused object mapper, this is via jackson json conerter
-	private static ObjectMapper cachedMapper = new ObjectMapper();
+	private static ObjectMapper cachedMapper = cachedMapperBuilder();
 	
 	/////////////////////////////////////////////////
 	// From java objects to JSON string conversion

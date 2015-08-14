@@ -57,7 +57,7 @@ public class RequestHttp_apache {
 					BasicClientCookie cookie = new BasicClientCookie(entry.getKey(), val);
 					
 					//
-					// (╯°□°）╯︵ ┻━┻
+					// T_T
 					//
 					// Bloody hell! Domains, and path needs to be explicitely set.
 					// When i just want to set cookie policy as SEND ALL.
@@ -82,7 +82,7 @@ public class RequestHttp_apache {
 					cookie.setDomain(domain); 
 					cookie.setPath("/");
 					//
-					// (＃｀д´)ﾉ
+					// Q_Q
 					//
 					
 					cookieJar.addCookie(cookie);

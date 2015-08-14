@@ -2,6 +2,7 @@ package picoded.servlet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletContextListener;
 
 import java.net.URL;
 import java.lang.String;
@@ -43,7 +44,7 @@ import picoded.RESTBuilder.*;
  * + logger
  * + API module
  */
-public class BasePage extends JStackPage {
+public class BasePage extends JStackPage /* implements ServletContextListener */ {
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -204,4 +205,6 @@ public class BasePage extends JStackPage {
 		return _jmteObj;
 	}
 	
+	// @TODO servlet context listener implmentation
+	// contextInitialized(ServletContextEvent sce) 
 }

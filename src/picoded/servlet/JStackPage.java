@@ -224,13 +224,15 @@ public class JStackPage extends CorePage {
 	////////////////////////////////////////////////////
 	// tableSetup calls for various jSql based modules
 	////////////////////////////////////////////////////
-	public void stackSetup() throws JStackException {
-		JStack().stackSetup();
-	}
 	
-	/// Called once when initialized, to purge all existing data.
-	public void stackTeardown() throws JStackException {
-		JStack().teardown();
-	}
+	// // Called on setup, 
+	// public void stackSetup() throws JStackException {
+	// 	JStack().stackSetup();
+	// }
+	// 
+	// /// Called once when initialized, to purge all existing data.
+	// public void stackTeardown() throws JStackException {
+	// 	JStack().teardown();
+	// }
 	
 }

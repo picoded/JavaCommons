@@ -38,12 +38,12 @@ public class FormWrapperTemplates_test {
 			FormGenerator formGen = new FormGenerator();
 			
 			String jsonFileString = FileUtils.readFileToString(jsonFile);
-			Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
+//			Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
 			
 			String jsonDataString = FileUtils.readFileToString(jsonDataFile);
 			Map<String, Object> jsonDataMap = ConvertJSON.toMap(jsonDataString);
 			
-			return formGen.build(jsonMap, jsonDataMap, false).toString();
+			return formGen.build(jsonFileString, jsonDataMap, false).toString();
 		}catch(Exception ex){
 			return "";
 		}
@@ -164,7 +164,7 @@ public class FormWrapperTemplates_test {
 				"</div>";
 	}
 	
-//	@Test
+	@Test
 	public void standardDivWrapperTest(){
 		String jsonTemplatedOutput = getWrapperTemplatedJsonString("div");
 		String rawHtmlString = getHtmlString("div");
@@ -173,7 +173,7 @@ public class FormWrapperTemplates_test {
 		assertTrue(compliancyCheck);
 	}
 	
-//	@Test
+	@Test
 	public void divWithLabelWrapperTest(){
 		String jsonTemplatedOutput = getWrapperTemplatedJsonString("divWithLabel");
 		String rawHtmlString = getHtmlString("divWithLabel");
@@ -182,7 +182,7 @@ public class FormWrapperTemplates_test {
 		assertTrue(compliancyCheck);
 	}
 	
-//	@Test
+	@Test
 	public void divWithChildrenWrapperTest(){
 		String jsonTemplatedOutput = getWrapperTemplatedJsonString("divWithChild");
 		String rawHtmlString = getHtmlString("divWithChild");
@@ -200,7 +200,7 @@ public class FormWrapperTemplates_test {
 		assertTrue(compliancyCheck);
 	}
 	
-//	@Test
+	@Test
 	public void fullTestOfWrapperAndInput(){
 		String jsonTemplatedOutput = getFullTemplatedJsonWithData("fullTest");
 		String rawHtml = getHtmlString("fullTest");
@@ -209,7 +209,7 @@ public class FormWrapperTemplates_test {
 		assertTrue(compliancyCheck);
 	}
 	
-//	@Test
+	@Test
 	public void fullTestOfInjectedAttributes(){
 		String jsonTemplatedOutput = getFullTemplatedJsonWithData("fullTestExtraAttributes");
 		String rawHtml = getHtmlString("fullTestExtraAttributes");

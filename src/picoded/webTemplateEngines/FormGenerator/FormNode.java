@@ -353,7 +353,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	protected List<FormNode> _children = null;
 	
 	/// List of input data values, used to generate with multiple input fields
-	protected Map<String,Object> _inputValue = new HashMap<String,Object> ();
+	protected CaseInsensitiveHashMap<String,Object> _inputValue = new CaseInsensitiveHashMap<String,Object> ();
 	
 	/// The root form generator
 	protected FormGenerator _formGenerator = null;
@@ -378,7 +378,9 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		this.putAll( mapObject );
 		
 		// Put in the inputData list
-		this._inputValue = inputData;
+		if(inputData != null){
+			this._inputValue = new CaseInsensitiveHashMap<String, Object>( inputData );
+		}
 	}
 	
 	/// Constructor varient using array of input data
@@ -553,7 +555,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		if( containsKey(JsonKeys.FIELD) ) {
 			return RegexUtils.removeAllNonAlphaNumeric( getString(JsonKeys.FIELD) ).toLowerCase();
 		}
-		return null;
+		return "";
 	}
 	
 	/// Returns the field value as a string
@@ -563,7 +565,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		if( val != null ) {
 			return GenericConvert.toString( getRawFieldValue() );
 		}
-		return null;
+		return "";
 	}
 	
 	/// Returns the field value in its raw form
@@ -575,7 +577,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 			val = _inputValue.get(fieldName);
 		}
 		
-		if(val != null) {
+		if(val == null) {
 			val = get(JsonKeys.DEFAULT);
 		}
 		return val;
@@ -640,7 +642,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	
 	// @Deprecated
 	public void setPrefilledData(Map<String, Object> prefilledJSONData){
-		_inputValue = prefilledJSONData;
+		_inputValue = (CaseInsensitiveHashMap<String, Object>)prefilledJSONData;
 	}
 	
 	// @Deprecated

@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import picoded.conv.ConvertJSON;
+
 /// FormWrapperTemplates
 ///
 /// Default implmentation of various FormWrapperInterface used in FormGenerator.
@@ -31,12 +33,14 @@ public class FormWrapperTemplates {
 		String label = node.label();
 		
 		if( label != null && label.length() > 0 ) {
-			StringBuilder[] labelArr = node.defaultHtmlWrapper( HtmlTag.DIV, node.prefix_standard()+"label", null );
+			StringBuilder[] labelArr = node.defaultHtmlLabel( HtmlTag.DIV, node.prefix_standard()+"label", null );
 			
 			ret.append( labelArr[0] );
 			ret.append( label );
 			ret.append( labelArr[1] );
 		}
+		
+		ret.append(node.inputHtml(isDisplayMode));
 		
 		/// The children wrapper if needed
 		List<FormNode> childList = node.children();
@@ -95,7 +99,7 @@ public class FormWrapperTemplates {
 			childDefination = (List<Object>)childrenRaw;
 		}
 		
-		Object rawValue = node.getFieldValue();
+		Object rawValue = ConvertJSON.toList(node.getFieldValue());
 		List<Object> valuesList = null;
 		if( rawValue != null && rawValue instanceof List ) {
 			valuesList = (List<Object>)rawValue;
@@ -108,24 +112,28 @@ public class FormWrapperTemplates {
 		
 		/// The children wrapper if needed
 		if(childDefination != null && childDefination.size() > 0 && valuesList != null && valuesList.size() > 0) {
+//		if(childDefination != null && childDefination.size() > 0) {
 			StringBuilder[] childWrap = node.defaultHtmlChildWrapper( HtmlTag.DIV, node.prefix_standard()+"child", null );
 			
 			ret.append( childWrap[0] );
 			
-			for(Object subValue : valuesList) {
-				// Skip values that are not maps
-				if( !(subValue instanceof Map) ) {
-					continue;
+			if(valuesList != null){
+				for(Object subValue : valuesList) {
+					// Skip values that are not maps
+					if( !(subValue instanceof Map) ) {
+						continue;
+					}
+					
+					Map<String,Object> subMapVal = (Map<String,Object>)subValue;
+					
+					Map<String,Object> nodeMap = new HashMap<String,Object>();
+					nodeMap.put("type", "div");
+					nodeMap.put("class", subAutoClass);
+					nodeMap.put("children", childDefination);
+					
+					FormNode childNode = new FormNode( node._formGenerator, nodeMap, subMapVal );
+					ret.append( childNode.fullHtml(isDisplayMode) );
 				}
-				
-				Map<String,Object> subMapVal = (Map<String,Object>)subValue;
-				
-				Map<String,Object> nodeMap = new HashMap<String,Object>();
-				nodeMap.put("class", subAutoClass);
-				nodeMap.put("children", childDefination);
-				
-				FormNode childNode = new FormNode( node._formGenerator, nodeMap, subMapVal );
-				ret.append( childNode.fullHtml(isDisplayMode) );
 			}
 			
 			ret.append( childWrap[1] );

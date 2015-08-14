@@ -38,12 +38,12 @@ public class FormWrapperTemplates_test {
 			FormGenerator formGen = new FormGenerator();
 			
 			String jsonFileString = FileUtils.readFileToString(jsonFile);
-			Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
 			
 			String jsonDataString = FileUtils.readFileToString(jsonDataFile);
 			Map<String, Object> jsonDataMap = ConvertJSON.toMap(jsonDataString);
 			
-			return formGen.build(jsonMap, jsonDataMap, false).toString();
+			return formGen.build(jsonFileString, jsonDataMap, false).toString();
+//			Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
 		}catch(Exception ex){
 			return "";
 		}

@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
+import picoded.conv.ConvertJSON;
+
 import com.amazonaws.util.StringUtils;
 ///
 /// Web templating engine that helps define and convert a JSON styled template, into the actual web form
@@ -166,36 +168,56 @@ public class FormGenerator {
 	/////////////////////////////////////////////////////////////////////////
 	
 	/// Builds the template and run the form generator
-	///
-	/// @params  {Map<String,Object>}  format       - The JSML format object to generate the form/display
-	/// @params  {Map<String,Object>}  data         - The Data map to extract value from
-	/// @params  {boolean}             displayOnly  - Display mode, html read only or form
-	///
-	/// @returns {StringBuilder} the full returning HTML
-	public StringBuilder build( Map<String,Object> format, Map<String,Object> data, boolean displayOnly ) {
-		FormNode rootNode = new FormNode(this, format, data);
-		return rootNode.fullHtml(displayOnly);
-	}
-	
-	/// Builds the template and run the form generator
-	///
-	/// @params  {List<Map<String,Object>>}  format       - The JSML format object to generate the form/display
-	/// @params  {Map<String,Object>}        data         - The Data map to extract value from
-	/// @params  {boolean}                   displayOnly  - Display mode, html read only or form
-	///
-	/// @returns {StringBuilder} the full returning HTML
-	public StringBuilder build( List<Map<String,Object>> format, Map<String,Object> data, boolean displayOnly ) {
-		Map<String,Object> divWrap = new HashMap<String,Object>();
-		divWrap.put("type", "none");
-		divWrap.put("children", format );
+		///
+		/// @params  {Map<String,Object>}  format       - The JSML format object to generate the form/display
+		/// @params  {Map<String,Object>}  data         - The Data map to extract value from
+		/// @params  {boolean}             displayOnly  - Display mode, html read only or form
+		///
+		/// @returns {StringBuilder} the full returning HTML
+		public StringBuilder build( Map<String,Object> format, Map<String,Object> data, boolean displayOnly ) {
+			FormNode rootNode = new FormNode(this, format, data);
+			return rootNode.fullHtml(displayOnly);
+		}
 		
-		return build(divWrap, data, displayOnly);
-	}
-	
-	
-	
-	
-	
+		/// Builds the template and run the form generator
+		///
+		/// @params  {List<Map<String,Object>>}  format       - The JSML format object to generate the form/display
+		/// @params  {Map<String,Object>}        data         - The Data map to extract value from
+		/// @params  {boolean}                   displayOnly  - Display mode, html read only or form
+		///
+		/// @returns {StringBuilder} the full returning HTML
+//		public StringBuilder build( List<Map<String,Object>> format, Map<String,Object> data, boolean displayOnly ) {
+//			Map<String,Object> divWrap = new HashMap<String,Object>();
+//			divWrap.put("type", "none");
+//			divWrap.put("children", format );
+//			
+//			return build(divWrap, data, displayOnly);
+//		}
+		
+		public StringBuilder build( List<Object> format, Map<String,Object> data, boolean displayOnly ) {
+			Map<String,Object> divWrap = new HashMap<String,Object>();
+			divWrap.put("type", "none");
+			divWrap.put("children", format );
+			
+			return build(divWrap, data, displayOnly);
+		}
+		
+		/// Builds the template and run the form generator
+		///
+		/// @params  {String}                    jsonFormatString  - The JSML format object in string format to generate the form/display
+		/// @params  {Map<String,Object>}        data              - The Data map to extract value from
+		/// @params  {boolean}                   displayOnly       - Display mode, html read only or form
+		///
+		/// @returns {StringBuilder} the full returning HTML
+		public StringBuilder build( String jsonFormatString, Map<String,Object> data, boolean displayOnly ) {
+			if(jsonFormatString.startsWith("[")){
+				List<Object> jsonArray = ConvertJSON.toList(jsonFormatString);
+				return build(jsonArray, data, displayOnly);
+			}else{
+				Map<String, Object> jsonObj = ConvertJSON.toMap(jsonFormatString);
+				return build(jsonObj, data, displayOnly);
+			}
+		}
 	
 	/////////////////////////////////////////////////////////////////////////
 	//

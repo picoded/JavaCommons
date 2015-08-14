@@ -19,6 +19,7 @@ public class DisplayInputTemplates {
 	//
 	////////////////////////////////////////////////
 	
+	/*
 	protected static FormInputInterface defaultOutput_pdf = (node)->{
 		return new StringBuilder("");
 	};
@@ -164,21 +165,22 @@ public class DisplayInputTemplates {
 			}
 		}
 	}
+	*/
 	
 	public static Map<String, FormInputInterface> defaultInputTemplates(){
 		Map<String, FormInputInterface> defaultTemplates = new CaseInsensitiveHashMap<String, FormInputInterface>();
 		
 		// Wildcard fallback
-		defaultTemplates.put("*", div_pdf);
+		defaultTemplates.put("*", FormInputTemplates.div);
 		
 		// Standard divs
-		defaultTemplates.put("dropdown", default_pdf);
-		defaultTemplates.put("text", default_pdf);
-		defaultTemplates.put("div", div_pdf);
-		defaultTemplates.put("title", header_pdf);
-		defaultTemplates.put("rawHtml", rawHtml_pdf);
-		defaultTemplates.put("dropdownWithOthers", dropdownWithOthers);
-		
+//		defaultTemplates.put("dropdown", default_pdf);
+//		defaultTemplates.put("text", default_pdf);
+//		defaultTemplates.put("div", div_pdf);
+//		defaultTemplates.put("title", header_pdf);
+//		defaultTemplates.put("rawHtml", rawHtml_pdf);
+//		defaultTemplates.put("dropdownWithOthers", dropdownWithOthers);
+
 		return defaultTemplates;
 	}
 }

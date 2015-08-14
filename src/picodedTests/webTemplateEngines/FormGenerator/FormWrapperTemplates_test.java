@@ -43,7 +43,7 @@ public class FormWrapperTemplates_test {
 			String jsonDataString = FileUtils.readFileToString(jsonDataFile);
 			Map<String, Object> jsonDataMap = ConvertJSON.toMap(jsonDataString);
 			
-			return formGen.build(jsonMap, jsonDataMap, true).toString();
+			return formGen.build(jsonMap, jsonDataMap, false).toString();
 		}catch(Exception ex){
 			return "";
 		}
@@ -79,27 +79,26 @@ public class FormWrapperTemplates_test {
 		return "<div class='pf_div'>"+
 					"<div class='pf_label'>TextField</div>"+
 					"<div class='pf_child'>"+
-						"<div class='pf_div'>"+
-							"<div class='pf_div'></div>"+
+						"<div class='pf_div pff_childX pff_forChild0'>"+
 							"<div class='pf_child'>"+
 								"<div class='pf_div'>"+
 									"<div class='pf_label'>Title Label</div>"+
-									"<h3 class='pf_header'>Title</h3>"+
+									"<h3 class='pfi_header'>Title</h3>"+
 								"</div>"+
 								"<div class='pf_div'>"+
-									"<input name='data' type='text' value='Person A' class='pf_inputText'></input>"+
+									"<input name='data' type='text' value='Person A' class='pfi_inputText'></input>"+
 								"</div>"+
 							"</div>"+
 						"</div>"+
-						"<div class='pf_div'>"+
+						"<div class='pf_div pff_childX pff_forChild1'>"+
 							"<div class='pf_div'></div>"+
 							"<div class='pf_child'>"+
 								"<div class='pf_div'>"+
 									"<div class='pf_label'>Title Label</div>"+
-									"<h3 class='pf_header'>Title</h3>"+
+									"<h3 class='pfi_header'>Title</h3>"+
 								"</div>"+
 								"<div class='pf_div'>"+
-									"<input name='data' type='text' value='Person B' class='pf_inputText'></input>"+
+									"<input name='data' type='text' value='Person B' class='pfi_inputText'></input>"+
 								"</div>"+
 							"</div>"+
 						"</div>"+
@@ -109,32 +108,30 @@ public class FormWrapperTemplates_test {
 	
 	private String getFullTestStringWithoutSecondIterationLabel(){
 		return "<div class='pf_div'>"+
-				"<div class='pf_label'>TextField</div>"+
-				"<div class='pf_child'>"+
-					"<div class='pf_div'>"+
-						"<div class='pf_div'></div>"+
-						"<div class='pf_child'>"+
-							"<div class='pf_div'>"+
-								"<h3 class='pf_header'>Title</h3>"+
+					"<div class='pf_label'>TextField</div>"+
+					"<div class='pf_child'>"+
+						"<div class='pf_div pff_childX pff_forChild0'>"+
+							"<div class='pf_child'>"+
+								"<div class='pf_div'>"+
+									"<h3 class='pfi_header'>Title</h3>"+
+								"</div>"+
+								"<div class='pf_div'>"+
+									"<input name='data' type='text' value='Person A' class='pfi_inputText'></input>"+
+								"</div>"+
 							"</div>"+
-							"<div class='pf_div'>"+
-								"<input name='data' type='text' value='Person A' class='pf_inputText'></input>"+
+						"</div>"+
+						"<div class='pf_div pff_childX pff_forChild1'>"+
+							"<div class='pf_child'>"+
+								"<div class='pf_div'>"+
+									"<h3 class='pfi_header'>Title</h3>"+
+								"</div>"+
+								"<div class='pf_div'>"+
+									"<input name='data' type='text' value='Person B' class='pfi_inputText'></input>"+
+								"</div>"+
 							"</div>"+
 						"</div>"+
 					"</div>"+
-					"<div class='pf_div'>"+
-						"<div class='pf_div'></div>"+
-						"<div class='pf_child'>"+
-							"<div class='pf_div'>"+
-								"<h3 class='pf_header'>Title</h3>"+
-							"</div>"+
-							"<div class='pf_div'>"+
-								"<input name='data' type='text' value='Person B' class='pf_inputText'></input>"+
-							"</div>"+
-						"</div>"+
-					"</div>"+
-				"</div>"+
-			"</div>";
+				"</div>";
 	}
 	
 	private String getFullTestExtraAttributes(){
@@ -145,10 +142,10 @@ public class FormWrapperTemplates_test {
 							"<div class='pf_child'>"+
 								"<div class='pf_div'>"+
 									"<div class='pf_label'>Title Label</div>"+
-									"<h3 class='pf_header' inputatribute='inputProperty'>Title</h3>"+
+									"<h3 class='pfi_header' inputatribute='inputProperty'>Title</h3>"+
 								"</div>"+
 								"<div class='pf_div'>"+
-									"<input name='data' type='text' value='Person A' class='pf_inputText'></input>"+
+									"<input name='data' type='text' value='Person A' class='pfi_inputText'></input>"+
 								"</div>"+
 							"</div>"+
 						"</div>"+
@@ -156,10 +153,10 @@ public class FormWrapperTemplates_test {
 							"<div class='pf_child'>"+
 								"<div class='pf_div'>"+
 									"<div class='pf_label'>Title Label</div>"+
-									"<h3 class='pf_header' inputatribute='inputProperty'>Title</h3>"+
+									"<h3 class='pfi_header' inputatribute='inputProperty'>Title</h3>"+
 								"</div>"+
 								"<div class='pf_div'>"+
-									"<input name='data' type='text' value='Person B' class='pf_inputText'></input>"+
+									"<input name='data' type='text' value='Person B' class='pfi_inputText'></input>"+
 								"</div>"+
 							"</div>"+
 						"</div>"+
@@ -219,6 +216,41 @@ public class FormWrapperTemplates_test {
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtml, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);
+	}
+	
+	@Test
+	public void testCompatibility(){
+		File jsonFile = new File("./test-files/test-specific/htmlGenerator/testJSONObject.js");
+		File jsonDataFile = new File("./test-files/test-specific/htmlGenerator/prefilledData.js");
+		
+		File outputHTML = new File("./test-files/test-specific/htmlGenerator/FormWrapperTemplates_test/compatibilityTestObject.html");
+		File outputPDF = new File("./test-files/test-specific/htmlGenerator/FormWrapperTemplates_test/compatibilityTestObjectDisplay.html");
+
+		try{
+			FormGenerator formGen = new FormGenerator();
+			
+			String jsonFileString = FileUtils.readFileToString(jsonFile);
+			Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
+			
+			String jsonDataString = FileUtils.readFileToString(jsonDataFile);
+			Map<String, Object> jsonDataMap = ConvertJSON.toMap(jsonDataString);
+			
+			StringBuilder outHtml = formGen.build(jsonMap, jsonDataMap, false);
+			StringBuilder outPDF = formGen.build(jsonMap, jsonDataMap, true);
+			
+			String finalOutput = outHtml.toString();
+			FileWriter fw = new FileWriter(outputHTML);
+			fw.write(finalOutput);;
+			fw.flush();
+			fw.close();
+			
+			String displayOutput = outPDF.toString();
+			FileWriter writer = new FileWriter(outputPDF);
+			writer.write(displayOutput);;
+			writer.flush();
+			writer.close();
+		}catch(Exception ex){
+		}
 	}
 	
 	/// Prototype lenientStringLookup

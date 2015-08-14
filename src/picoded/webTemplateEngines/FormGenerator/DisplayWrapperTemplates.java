@@ -32,11 +32,11 @@ public class DisplayWrapperTemplates {
 	protected static Map<String, FormWrapperInterface> defaultWrapperTemplates() {
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();
 		
-		defaultTemplates.put("*", FormWrapperTemplates.divWrapper);
+		defaultTemplates.put("*", DisplayWrapperTemplates.divWrapper);
 		
-		defaultTemplates.put("div", FormWrapperTemplates.divWrapper);
-		defaultTemplates.put("for", FormWrapperTemplates.forWrapper);
-		defaultTemplates.put("none", FormWrapperTemplates.none);
+		defaultTemplates.put("div", DisplayWrapperTemplates.divWrapper);
+		defaultTemplates.put("for", DisplayWrapperTemplates.forWrapper);
+		defaultTemplates.put("none", DisplayWrapperTemplates.none);
 		
 		return defaultTemplates;
 	}

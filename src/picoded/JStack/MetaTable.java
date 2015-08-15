@@ -216,7 +216,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	protected String[] extractUnique(List<Object> arr) {
 		HashSet<String> retSet = new HashSet<String>();
 		for (Object t : arr) {
-			retSet.add(((String) t).toLowerCase());
+			retSet.add(((String) t)); //.toLowerCase()
 		}
 		return retSet.toArray(new String[retSet.size()]);
 	}
@@ -255,7 +255,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 		//return null;
 	}
 
-	/// MetaTable JSqlResult to CaseInsensitiveHashMap
+	/// MetaTable JSqlResult to HashMap
 	protected Map<String, Object> JSqlResultToMap(JSqlResult r) throws JSqlException {
 		if (r != null && r.rowCount() <= 0) {
 			return null;
@@ -265,7 +265,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 		String[] keys = extractUnique(r.get("kID"));
 
 		// Extract the respective key values
-		Map<String, Object> retMap = new CaseInsensitiveHashMap<String, Object>();
+		Map<String, Object> retMap = new HashMap<String, Object>();
 		for (int a = 0; a < keys.length; ++a) {
 			//if (keys[a].equals("_oid")) { //reserved
 			//	continue;
@@ -292,6 +292,8 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 					// Fetch all the meta fields
 					JSqlResult r = sql.selectQuerySet( tName, "*", "oID=?", new Object[] { _oid } ).query();
 					
+					//System.out.println("JSqlObjectGet.JSqlResult: "+picoded.conv.ConvertJSON.fromMap(r));
+					
 					// Convert to map object
 					Map<String, Object> retMap = JSqlResultToMap(r);
 					
@@ -300,7 +302,9 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 						// Add object ID (enforce it)
 						retMap.put("_oid", _oid);
 					}
-	
+					
+					//System.out.println("JSqlObjectGet: "+picoded.conv.ConvertJSON.fromMap(retMap));
+					
 					return retMap;
 				}
 			} );
@@ -310,65 +314,6 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 			throw new RuntimeException(e);
 		}
 
-	}
-
-	/// JSQL based Append
-	protected void JSqlObjectAppend(JSql sql, String _oid, Map<String, Object> obj, Set<String> keyList,
-		boolean handleQuery) throws JSqlException {
-
-		// boolean sqlMode = handleQuery ? sql.getAutoCommit() : false;
-		// if (sqlMode) {
-		// 	sql.setAutoCommit(false);
-		// }
-
-		try {
-
-			Object ret = JStackReverseIterate( new JStackReader() {
-				/// Reads only the JSQL layer
-				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
-					String tName = sqlTableName(sql);
-
-					Object[] typSet;
-					String k;
-					Object v;
-		
-					for (Map.Entry<String, Object> entry : obj.entrySet()) {
-		
-						k = (entry.getKey()).toLowerCase();
-						if ( /*k.equals("oid") || k.equals("_oid") ||*/ k.equals("_otm")) { //reserved
-							continue;
-						}
-		
-						if (keyList != null && !keyList.contains(k)) {
-							continue;
-						}
-		
-						v = entry.getValue();
-						typSet = valueToOptionSet(k, v);
-		
-						// This is currently only for NON array mode
-						sql.upsertQuerySet( //
-							tName, //
-							new String[] { "oID", "kID", "idx" }, //
-							new Object[] { _oid, k, 0 }, //
-							//
-							new String[] { "typ", "nVl", "sVl", "tVl" }, //
-							new Object[] { typSet[0], typSet[1], typSet[2], typSet[3] }, //
-							null, null, null//
-							).execute();
-					}
-					return ret;
-				}
-			} );
-			
-			//sql.commit();
-		} catch (JStackException e) {
-			throw new RuntimeException(e);
-		} finally {
-			// if (sqlMode) {
-			// 	sql.setAutoCommit(true);
-			// }
-		}
 	}
 
 	/// Values to option set conversion
@@ -406,7 +351,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 		if (selectCols == null) {
 			selectCols = "_oid";
 		} else {
-			selectCols.toLowerCase();
+			//selectCols = selectCols.toLowerCase();
 
 			if (selectCols.indexOf("_oid") == -1) {
 				selectCols = "_oid, " + selectCols;
@@ -414,7 +359,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 		}
 
 		if (whereClause != null) {
-			whereClause = whereClause.toLowerCase();
+			whereClause = whereClause;
 		}
 		
 		return (sql.selectQuerySet(sqlViewName(sql, "view"), selectCols, whereClause, whereValues, orderBy, limit, offset).query());  
@@ -491,12 +436,12 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 
 		MetaObject[] ret = new MetaObject[len];
 
-		CaseInsensitiveHashMap<String, Object> queryCache = new CaseInsensitiveHashMap<String, Object>();
+		HashMap<String, Object> queryCache = new HashMap<String, Object>();
 		MetaObject mObj;
 
 		for (int a = 0; a < len; ++a) {
 			mObj = lazyGet((String) (oID_list.get(a)));
-			queryCache = new CaseInsensitiveHashMap<String, Object>();
+			queryCache = new HashMap<String, Object>();
 
 			for (Map.Entry<String, List<Object>> entry : jRes.entrySet()) {
 				queryCache.put(entry.getKey(), entry.getValue().get(a));
@@ -536,13 +481,6 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	//
 	// Query pagenation operations (experimental keyset hybrid operations)
 	//--------------------------------------------------------------------------
-
-	/*
-	public Map<String, Map<String, ArrayList<Object>>> queryObjectPage(String selectCols, String whereClause, Object[] whereValues, String orderBy, Map<String, ArrayList<Object>>nowPage, long limit, long offset) throws JStackException {
-		
-	}
-	*/
-
 	//
 	// Internal PUT / GET object functions
 	//--------------------------------------------------------------------------
@@ -571,20 +509,22 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	}
 
 	/// Update the object map with the given values, List<String> key list is used to 'optimize' sql insertions
-	protected void updateMap(String _oid, Map<String, Object> obj, Set<String> keyList) throws JStackException {
+	protected void updateMap(String _oid, Map<String, Object> objMap, Set<String> keyList) throws JStackException {
 		try {
-			JStackLayer[] sl = JStackObj.stackLayers();
-			for (int a = 0; a < sl.length; ++a) {
-				// JSql specific setup
-				if (sl[a] instanceof JSql) {
-					JSqlObjectAppend((JSql) (sl[a]), _oid, obj, keyList, true);
-				} else if (sl[a] instanceof JCache) {
-
+			MetaTable self = this;
+			Object ret = JStackReverseIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					MetaTable_JSql.JSqlObjectMapAppend( //
+						self, sql, sqlTableName(sql), _oid, //
+						objMap, keyList, false
+					); //
+					return ret;
 				}
-			}
-		} catch (JSqlException e) {
-			throw new JStackException(e);
-		}
+			} );
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		} 
 	}
 
 	//

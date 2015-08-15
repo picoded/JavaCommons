@@ -358,6 +358,9 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		node.put("NotIndexedKey", "123");
 		node.saveDelta();
 		
+		// Get the value, to check
+		assertEquals( "123", mtObj.get( node._oid() ).get("NotIndexedKey") );
+		
 		// Refetch node, and get data, and validate
 		assertNotNull( list = mtObj.getFromKeyNames("num") );
 		assertEquals( 1, list.length );

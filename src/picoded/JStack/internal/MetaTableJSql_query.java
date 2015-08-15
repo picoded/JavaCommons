@@ -1,4 +1,4 @@
-package picoded.JStack;
+package picoded.JStack.internal;
 
 /// Java imports
 import java.util.HashMap;
@@ -24,16 +24,19 @@ import picoded.struct.UnsupportedDefaultMap;
 ///
 /// The larger intention is to keep the MetaTable class more maintainable and unit testable
 ///
-class MetaTable_JSql {
+public class MetaTableJSql_query {
 	
 	///
-	/// Setsup the JSql main data storage table for MetaTable
+	/// Setsup the JSql main data storage table for MetaTable. Using the colTypes configured
 	/// 
 	/// @param {JSql} sql            - sql connection to setup the table
 	/// @param {String} tName        - table name to setup, this holds the actual meta table data
-	/// @param {MetaTable} mainTable - main MetaTable, where this function shoudl be called from
+	/// @param {MetaTableJSql_columnTypes} colTypes - main MetaTable, where this function shoudl be called from
 	/// 
-	protected static void JSqlSetup(JSql sql, String tName, MetaTable mainTable) throws JSqlException {
+	public static void JSqlSetup(JSql sql, String tName, MetaTableJSql_columnTypes colTypes) throws JSqlException {
+		if( colTypes == null ) {
+			colTypes = new MetaTableJSql_columnTypes();
+		}
 		
 		// Table constructor
 		//-------------------
@@ -61,24 +64,24 @@ class MetaTable_JSql {
 											"tVl" //Textual storage, placed last for storage optimization
 										}, //
 										new String[] { //
-											mainTable.pKeyColumnType, //Primary key
+											colTypes.pKeyColumnType, //Primary key
 											// Time stamps
-											mainTable.tStampColumnType, //
-											mainTable.tStampColumnType, //
-											mainTable.tStampColumnType, //
-											mainTable.tStampColumnType, //
+											colTypes.tStampColumnType, //
+											colTypes.tStampColumnType, //
+											colTypes.tStampColumnType, //
+											colTypes.tStampColumnType, //
 											// Object keys
-											mainTable.objColumnType, //
-											mainTable.keyColumnType, //
-											mainTable.indexColumnType, //
+											colTypes.objColumnType, //
+											colTypes.keyColumnType, //
+											colTypes.indexColumnType, //
 											// Value storage
-											mainTable.typeColumnType, //
-											mainTable.numColumnType, //
-											mainTable.strColumnType, //
-											mainTable.fullTextColumnType //
+											colTypes.typeColumnType, //
+											colTypes.numColumnType, //
+											colTypes.strColumnType, //
+											colTypes.fullTextColumnType //
 										} //
 										).execute(); //
-
+	
 		// Unique index
 		//
 		// This also optimizes query by object keys
@@ -86,19 +89,19 @@ class MetaTable_JSql {
 		sql.createTableIndexQuerySet( //
 											  tName, "oID, kID, idx", "UNIQUE", "unq" //
 											  ).execute(); //
-
+	
 		// Key Values search index
 		//------------------------------------------------
 		sql.createTableIndexQuerySet( //
 											  tName, "kID, nVl, sVl", null, "valMap" //
 											  ).execute(); //
-
+	
 		// Object timestamp optimized Key Value indexe
 		//------------------------------------------------
 		sql.createTableIndexQuerySet( //
 											  tName, "oTm, kID, nVl, sVl", null, "oTm_valMap" //
 											  ).execute(); //
-
+	
 		// Full text index, for textual data
 		// @TODO FULLTEXT index support
 		//------------------------------------------------
@@ -111,7 +114,7 @@ class MetaTable_JSql {
 											  tName, "tVl", null, "tVl" // Sqlite uses normal index
 											  ).execute(); //
 		//}
-
+	
 		//
 		// timestamp index, is this needed?
 		//
@@ -131,23 +134,44 @@ class MetaTable_JSql {
 		//sql.createTableIndexQuerySet( //
 		//	tName, "uTm", null, "uTm" //
 		//).execute();
-
+	
 		//sql.createTableIndexQuerySet( //
 		//	tName, "cTm", null, "cTm" //
 		//).execute();
 	}
 	
+	/// Values to option set conversion
 	///
-	/// Iterates the relevent keyList, and appends its value from the objMap, into the sql mainTable database
+	/// @TODO: Support the various numeric value
+	/// @TODO: Support string / text
+	/// @TODO: Support array sets
+	/// @TODO: Support GUID hash
+	/// @TODO: Support MetaTable
+	/// @TODO: Check against configured type
+	/// @TODO: Convert to configured type if possible (like numeric)
+	/// @TODO: Support proper timestamp handling (not implemented)
+	///
+	public static Object[] valueToOptionSet(MetaTypeMap mtm, String key, Object value) throws JSqlException {
+		if (value instanceof Integer) {
+			return new Object[] { new Integer(MetaType.TYPE_INTEGER), value, null, null }; //Typ, N,S,I,T
+		} else if (value instanceof String) {
+			return new Object[] { new Integer(MetaType.TYPE_STRING), 0, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
+		}
+
+		throw new JSqlException("Object type not yet supported: "+key+" = "+ value);
+	}
+
+	///
+	/// Iterates the relevent keyList, and appends its value from the objMap, into the sql colTypes database
 	/// 
 	/// @param {JSql} sql                  - sql connection to setup the table
 	/// @param {String} tName              - table name to setup, this holds the actual meta table data
-	/// @param {MetaTable} mainTable       - main MetaTable, where this function shoudl be called from
+	/// @param {MetaTable} colTypes       - main MetaTable, where this function shoudl be called from
 	/// @param {String} _oid               - object id to store the key value pairs into
 	/// @param {Map<String,Object>} objMap - map to extract values to store from
 	/// 
 	@SuppressWarnings("unchecked")
-	protected static void JSqlObjectMapAppend(MetaTable mt, //
+	public static void JSqlObjectMapAppend(MetaTypeMap mt, //
 		JSql sql, String tName, String _oid, //
 		Map<String, Object> objMap, Set<String> keyList, //
 		boolean optimizeAutoCommit //
@@ -162,22 +186,22 @@ class MetaTable_JSql {
 			Object[] typSet;
 			String k;
 			Object v;
-
+	
 			for (Map.Entry<String, Object> entry : objMap.entrySet()) {
-
+	
 				k = entry.getKey(); //(entry.getKey()).toLowerCase();
 				if ( /*k.equals("oid") || k.equals("_oid") ||*/ k.equals("_otm")) { //reserved
 					continue;
 				}
-
+	
 				if (keyList != null && !keyList.contains(k)) {
 					continue;
 				}
-
+	
 				v = entry.getValue();
-				typSet = mt.valueToOptionSet(k, v);
+				valueToOptionSet(mtm, k, v);
 				
-				//System.out.println("APPEND: "+k+" = "+v);
+				System.out.println("APPEND: "+k+" = "+v);
 				
 				// This is currently only for NON array mode
 				sql.upsertQuerySet( //

@@ -3,6 +3,7 @@ package picoded.servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletContextListener;
+import javax.servlet.ServletContextEvent;
 
 import java.net.URL;
 import java.lang.String;
@@ -44,7 +45,7 @@ import picoded.RESTBuilder.*;
  * + logger
  * + API module
  */
-public class BasePage extends JStackPage /* implements ServletContextListener */ {
+public class BasePage extends JStackPage implements ServletContextListener {
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -95,6 +96,53 @@ public class BasePage extends JStackPage /* implements ServletContextListener */
 	
 	protected AccountTable _accountAuthObj = null;
 	
+	/// The default setup process of accountAuthTable
+	public void accountAuthTableSetup() throws JStackException {
+		// Gets the configuration setup
+		JConfig jc = JConfig();
+		
+		// Setup the tables
+		AccountTable at = accountAuthTable();
+		
+		// Setup table
+		at.stackSetup();
+		
+		// Gets the superuser group
+		String superGroup = jc.getString("sys.account.superUsers.groupName", "SuperUsers");
+		String adminUser  = jc.getString("sys.account.superUsers.rootUsername", "admin");
+		String adminPass  = jc.getString("sys.account.superUsers.rootPassword", "P@ssw0rd!");
+		boolean resetPass = jc.getBoolean("sys.account.superUsers.rootPasswordReset", false);
+		
+		// Gets and setup the objects if needed
+		AccountObject grpObject = at.getFromName(superGroup);
+		if(grpObject == null) {
+			grpObject = at.newObject(superGroup);
+		}
+		
+		// Remove password for super group
+		grpObject.removePassword();
+		
+		// Setup the default admin
+		AccountObject userObject = at.getFromName( adminUser );
+		if( userObject == null ) {
+			userObject = at.newObject(adminUser);
+			userObject.setPassword(adminPass);
+		} else if(resetPass) {
+			userObject.setPassword(adminPass);
+		}
+		
+		// Ensure its role
+		String role = grpObject.getMemberRole( userObject );
+		if( !(role.equals("admin")) ) {
+			grpObject.setMember( userObject, "admin" );
+		}
+		
+		// Apply changes
+		userObject.saveDelta();
+		grpObject.saveDelta();
+	}
+	
+	/// The primary accountAuthTable used for user authentication
 	public AccountTable accountAuthTable() {
 		if( _accountAuthObj != null ) {
 			return _accountAuthObj;
@@ -205,6 +253,35 @@ public class BasePage extends JStackPage /* implements ServletContextListener */
 		return _jmteObj;
 	}
 	
-	// @TODO servlet context listener implmentation
-	// contextInitialized(ServletContextEvent sce) 
+	/////////////////////////////////////////////
+	// Servlet context handling
+	/////////////////////////////////////////////
+	
+	/// BasePage initializeContext to be extended / build on
+	public void initializeContext() throws Exception {
+		accountAuthTableSetup();
+	}
+	
+	/// BasePage destroyContext to be extended / build on
+	public void destroyContext() throws Exception {
+		// does nothing
+	}
+	
+	/// [Do not extend] Servlet context initializer handling. 
+	public void contextInitialized(ServletContextEvent sce) {
+		try {
+			initializeContext();
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	} 
+	
+	/// [Do not extend] Servlet context destroyed handling
+	public void contextDestroyed(ServletContextEvent sce) {
+		try {
+			destroyContext();
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

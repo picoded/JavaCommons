@@ -35,8 +35,8 @@ public class JStackData_testBase_test {
 	//-----------------------------------------------
 	
 	/// Hazelcast server related vars
-	static protected String hazelcastClusterName = null;
-	static protected ClientConfig hazelcastConfig = null;
+	static public String hazelcastClusterName = null;
+	static public ClientConfig hazelcastConfig = null;
 	
 	/// Hazelcast setup function, repeated calls are "safe"
 	public static ClientConfig hazelcastSetup() {
@@ -53,9 +53,9 @@ public class JStackData_testBase_test {
 	}
 	
 	/// Redis server related vars
-	static protected String redissonConfigString;
-	static protected org.redisson.Config redissonConfig;
-	static protected int redisPort = 0;
+	static public String redissonConfigString;
+	static public org.redisson.Config redissonConfig;
+	static public int redisPort = 0;
 	
 	/// Setsup the redis testing server, repeated calls are "safe"
 	public static org.redisson.Config redisSetup() {
@@ -106,7 +106,7 @@ public class JStackData_testBase_test {
 	//-----------------------------------------------
 	
 	// JCache object cache
-	JCache JCacheObj = null;
+	public JCache JCacheObj = null;
 	
 	// Over-ride and setup the JCache as needed
 	public JCache JCacheObj() {
@@ -114,7 +114,7 @@ public class JStackData_testBase_test {
 	}
 	
 	// JSql object cached
-	JSql JSqlObj = null;
+	public JSql JSqlObj = null;
 	
 	// Over-ride and setup the JSql as needed
 	public JSql JSqlObj() {
@@ -146,10 +146,10 @@ public class JStackData_testBase_test {
 	// JStack setup
 	//-----------------------------------------------
 	
-	protected JStack JStackObj = null;
-	protected JStackLayer JStackLayerArray[] = null;
+	public JStack JStackObj = null;
+	public JStackLayer JStackLayerArray[] = null;
 	
-	protected JStack JStackSetup() {
+	public JStack JStackSetup() {
 		JCacheObj = JCacheObj();
 		JSqlObj = JSqlObj();
 		
@@ -170,7 +170,7 @@ public class JStackData_testBase_test {
 		return JStackObj;
 	}
 	
-	protected void JStackTearDown() {
+	public void JStackTearDown() {
 		JStackObj = null;
 	}
 	

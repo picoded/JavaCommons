@@ -238,15 +238,9 @@ public class AccountObject extends MetaObject {
 		return childMeta;
 	}
 	
-	/// Returns the list of members in the group
-	///
-	public String[] getMembers_id() throws JStackException {
-		return mainTable.group_childRole.getFromKeyNames_id( _oid() );
-	}
-	
 	/// Returns the list of groups the member is in
 	///
-	public String[] getGroups_id() throws JStackException {
+	public String[] getMembers_id() throws JStackException {
 		List<String> retList = new ArrayList<String>();
 		for( String key : group_userToRoleMap().keySet() ) {
 			if( key.equals("_oid") ) {
@@ -255,6 +249,12 @@ public class AccountObject extends MetaObject {
 			retList.add(key);
 		}
 		return retList.toArray( new String[retList.size()] );
+	}
+	
+	/// Returns the list of members in the group
+	///
+	public String[] getGroups_id() throws JStackException {
+		return mainTable.group_childRole.getFromKeyNames_id( _oid() );
 	}
 	
 	/// Gets all the members object related to the group

@@ -524,7 +524,7 @@ public class KeyValueMap extends JStackData implements GenericConvertMap<String,
 	// Nonce support is now backed into KeyValueMap
 	//-------------------------------------------------------------------------
 
-	/// Default nonce lifetime
+	/// Default nonce lifetime (1 hour)
 	public int nonce_defaultLifetime = 3600;
 
 	/// Default nonce string length (22 is chosen to be consistent with base58 GUID's)

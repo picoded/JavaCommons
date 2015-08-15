@@ -1,22 +1,14 @@
 package picoded.JSql.struct.internal;
 
 /// Java imports
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.*;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collection;
 
 
 /// Picoded imports
-import picoded.conv.GUID;
+import picoded.conv.*;
 import picoded.JSql.*;
-import picoded.JStack.*;
-import picoded.struct.CaseInsensitiveHashMap;
-import picoded.struct.UnsupportedDefaultMap;
+import picoded.struct.*;
 
 ///
 /// Protected class, used to orgainze the various JSql based logic

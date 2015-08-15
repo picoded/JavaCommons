@@ -28,15 +28,15 @@ public class MetaTableJSql_query_Sqlite_test extends JStackData_testBase_test {
 	protected MetaTableJSql_columnTypes colTypes = new MetaTableJSql_columnTypes();
 	
 	/// The table name to test
-	protected String mtTableName = null;
+	protected String testTableName = null;
 	
 	@Override
 	public void testObjSetup() throws JStackException {
-		mtTableName = "M" + TestConfig.randomTablePrefix();
+		testTableName = "M" + TestConfig.randomTablePrefix();
 		assertNotNull(JSqlObj);
 		
 		try {
-			MetaTableJSql_query.JSqlSetup(JSqlObj, mtTableName, colTypes);
+			MetaTableJSql_query.JSqlSetup(JSqlObj, testTableName, colTypes);
 		} catch(JSqlException e) {
 			throw new JStackException(e);
 		}

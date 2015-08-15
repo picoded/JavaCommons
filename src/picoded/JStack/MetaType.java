@@ -34,7 +34,7 @@ public class MetaType {
 	/// 1      - Disabled
 	public static int TYPE_NULL = 1;
 	/// 2      - Mixed
-	public static int TYPE_MIXED = 1;
+	public static int TYPE_MIXED = 2;
 	/// 3      - [Mixed]
 	public static int TYPE_MIXED_ARRAY = 2;
 	

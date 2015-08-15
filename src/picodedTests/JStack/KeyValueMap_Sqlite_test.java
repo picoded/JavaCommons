@@ -48,7 +48,6 @@ public class KeyValueMap_Sqlite_test extends JStackData_testBase_test {
 		kvObj.put("hello", "world");
 		assertTrue( kvObj.containsKey("hello") );
 		assertEquals( "world", kvObj.get("hello") );
-		
 	}
 	
 	@Test

@@ -1,4 +1,4 @@
-package picodedTests.JStack.internal;
+package picodedTests.JSql.struct.internal;
 
 import org.junit.*;
 

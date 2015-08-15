@@ -1,4 +1,4 @@
-package picoded.JStack.internal;
+package picoded.JSql.struct.internal;
 
 /// Java imports
 import java.util.HashMap;
@@ -140,88 +140,88 @@ public class MetaTableJSql_query {
 		//).execute();
 	}
 	
-	/// Values to option set conversion
-	///
-	/// @TODO: Support the various numeric value
-	/// @TODO: Support string / text
-	/// @TODO: Support array sets
-	/// @TODO: Support GUID hash
-	/// @TODO: Support MetaTable
-	/// @TODO: Check against configured type
-	/// @TODO: Convert to configured type if possible (like numeric)
-	/// @TODO: Support proper timestamp handling (not implemented)
-	///
-	public static Object[] valueToOptionSet(MetaTypeMap mtm, String key, Object value) throws JSqlException {
-		if (value instanceof Integer) {
-			return new Object[] { new Integer(MetaType.TYPE_INTEGER), value, null, null }; //Typ, N,S,I,T
-		} else if (value instanceof String) {
-			return new Object[] { new Integer(MetaType.TYPE_STRING), 0, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
-		}
-
-		throw new JSqlException("Object type not yet supported: "+key+" = "+ value);
-	}
-
-	///
-	/// Iterates the relevent keyList, and appends its value from the objMap, into the sql colTypes database
-	/// 
-	/// @param {JSql} sql                  - sql connection to setup the table
-	/// @param {String} tName              - table name to setup, this holds the actual meta table data
-	/// @param {MetaTable} colTypes       - main MetaTable, where this function shoudl be called from
-	/// @param {String} _oid               - object id to store the key value pairs into
-	/// @param {Map<String,Object>} objMap - map to extract values to store from
-	/// 
-	@SuppressWarnings("unchecked")
-	public static void JSqlObjectMapAppend(MetaTypeMap mt, //
-		JSql sql, String tName, String _oid, //
-		Map<String, Object> objMap, Set<String> keyList, //
-		boolean optimizeAutoCommit //
-	) throws JSqlException {
-		
-		// boolean sqlMode = handleQuery ? sql.getAutoCommit() : false;
-		// if (sqlMode) {
-		// 	sql.setAutoCommit(false);
-		// }
-		
-		try {
-			Object[] typSet;
-			String k;
-			Object v;
-	
-			for (Map.Entry<String, Object> entry : objMap.entrySet()) {
-	
-				k = entry.getKey(); //(entry.getKey()).toLowerCase();
-				if ( /*k.equals("oid") || k.equals("_oid") ||*/ k.equals("_otm")) { //reserved
-					continue;
-				}
-	
-				if (keyList != null && !keyList.contains(k)) {
-					continue;
-				}
-	
-				v = entry.getValue();
-				valueToOptionSet(mtm, k, v);
-				
-				System.out.println("APPEND: "+k+" = "+v);
-				
-				// This is currently only for NON array mode
-				sql.upsertQuerySet( //
-					tName, //
-					new String[] { "oID", "kID", "idx" }, //
-					new Object[] { _oid, k, 0 }, //
-					//
-					new String[] { "typ", "nVl", "sVl", "tVl" }, //
-					new Object[] { typSet[0], typSet[1], typSet[2], typSet[3] }, //
-					null, null, null //
-				).execute();
-			}
-			//sql.commit();
-		} catch (Exception e) {
-			throw new JSqlException(e);
-		} finally {
-			// if (sqlMode) {
-			// 	sql.setAutoCommit(true);
-			// }
-		}
-	}
+	// /// Values to option set conversion
+	// ///
+	// /// @TODO: Support the various numeric value
+	// /// @TODO: Support string / text
+	// /// @TODO: Support array sets
+	// /// @TODO: Support GUID hash
+	// /// @TODO: Support MetaTable
+	// /// @TODO: Check against configured type
+	// /// @TODO: Convert to configured type if possible (like numeric)
+	// /// @TODO: Support proper timestamp handling (not implemented)
+	// ///
+	// public static Object[] valueToOptionSet(MetaTypeMap mtm, String key, Object value) throws JSqlException {
+	// 	if (value instanceof Integer) {
+	// 		return new Object[] { new Integer(MetaType.TYPE_INTEGER), value, null, null }; //Typ, N,S,I,T
+	// 	} else if (value instanceof String) {
+	// 		return new Object[] { new Integer(MetaType.TYPE_STRING), 0, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
+	// 	}
+	// 
+	// 	throw new JSqlException("Object type not yet supported: "+key+" = "+ value);
+	// }
+	// 
+	// ///
+	// /// Iterates the relevent keyList, and appends its value from the objMap, into the sql colTypes database
+	// /// 
+	// /// @param {JSql} sql                  - sql connection to setup the table
+	// /// @param {String} tName              - table name to setup, this holds the actual meta table data
+	// /// @param {MetaTable} colTypes       - main MetaTable, where this function shoudl be called from
+	// /// @param {String} _oid               - object id to store the key value pairs into
+	// /// @param {Map<String,Object>} objMap - map to extract values to store from
+	// /// 
+	// @SuppressWarnings("unchecked")
+	// public static void JSqlObjectMapAppend(MetaTypeMap mt, //
+	// 	JSql sql, String tName, String _oid, //
+	// 	Map<String, Object> objMap, Set<String> keyList, //
+	// 	boolean optimizeAutoCommit //
+	// ) throws JSqlException {
+	// 	
+	// 	// boolean sqlMode = handleQuery ? sql.getAutoCommit() : false;
+	// 	// if (sqlMode) {
+	// 	// 	sql.setAutoCommit(false);
+	// 	// }
+	// 	
+	// 	try {
+	// 		Object[] typSet;
+	// 		String k;
+	// 		Object v;
+	// 
+	// 		for (Map.Entry<String, Object> entry : objMap.entrySet()) {
+	// 
+	// 			k = entry.getKey(); //(entry.getKey()).toLowerCase();
+	// 			if ( /*k.equals("oid") || k.equals("_oid") ||*/ k.equals("_otm")) { //reserved
+	// 				continue;
+	// 			}
+	// 
+	// 			if (keyList != null && !keyList.contains(k)) {
+	// 				continue;
+	// 			}
+	// 
+	// 			v = entry.getValue();
+	// 			valueToOptionSet(mtm, k, v);
+	// 			
+	// 			System.out.println("APPEND: "+k+" = "+v);
+	// 			
+	// 			// This is currently only for NON array mode
+	// 			sql.upsertQuerySet( //
+	// 				tName, //
+	// 				new String[] { "oID", "kID", "idx" }, //
+	// 				new Object[] { _oid, k, 0 }, //
+	// 				//
+	// 				new String[] { "typ", "nVl", "sVl", "tVl" }, //
+	// 				new Object[] { typSet[0], typSet[1], typSet[2], typSet[3] }, //
+	// 				null, null, null //
+	// 			).execute();
+	// 		}
+	// 		//sql.commit();
+	// 	} catch (Exception e) {
+	// 		throw new JSqlException(e);
+	// 	} finally {
+	// 		// if (sqlMode) {
+	// 		// 	sql.setAutoCommit(true);
+	// 		// }
+	// 	}
+	// }
 	
 }

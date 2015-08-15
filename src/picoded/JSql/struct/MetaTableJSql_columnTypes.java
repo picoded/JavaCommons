@@ -1,4 +1,4 @@
-package picoded.JStack.internal;
+package picoded.JSql.struct.internal;
 
 public class MetaTableJSql_columnTypes {
 	

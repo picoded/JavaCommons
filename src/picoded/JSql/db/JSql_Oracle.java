@@ -650,6 +650,7 @@ public class JSql_Oracle extends JSql {
 		/// Note that the final trailing ", " seperator will be removed prior to final query conversion
 		StringBuilder selectColumnNames = new StringBuilder();
 		StringBuilder updateColumnNames = new StringBuilder();
+		StringBuilder insertColumnNames = new StringBuilder();
 		StringBuilder insertColumnValues = new StringBuilder();
 		StringBuilder condition = new StringBuilder();
 		String columnSeperator = ", ";
@@ -663,7 +664,11 @@ public class JSql_Oracle extends JSql {
 			
 			queryArgs.add(uniqueValues[a]);
 			
-			// insert column list
+			// insert column names
+			insertColumnNames.append(uniqueColumns[a]);
+			insertColumnNames.append(columnSeperator);
+			
+			// insert column values
 			insertColumnValues.append(sourceTableAlias);
 			insertColumnValues.append(".");
 			insertColumnValues.append(uniqueColumns[a]);
@@ -673,7 +678,11 @@ public class JSql_Oracle extends JSql {
 		/// Inserting updated values
 		if (insertColumns != null) {
 			for (int a = 0; a < insertColumns.length; ++a) {
-				// insert column
+				// insert column names
+				insertColumnNames.append(insertColumns[a]);
+				insertColumnNames.append(columnSeperator);
+				
+				// insert column values
 				insertColumnValues.append(sourceTableAlias);
 				insertColumnValues.append(".");
 				insertColumnValues.append(insertColumns[a]);
@@ -703,7 +712,11 @@ public class JSql_Oracle extends JSql {
 		/// Handling default values
 		if (defaultColumns != null) {
 			for (int a = 0; a < defaultColumns.length; ++a) {
-				// insert column
+				// insert column names
+				insertColumnNames.append(defaultColumns[a]);
+				insertColumnNames.append(columnSeperator);
+				
+				// insert column values
 				insertColumnValues.append(sourceTableAlias);
 				insertColumnValues.append(".");
 				insertColumnValues.append(defaultColumns[a]);
@@ -738,7 +751,11 @@ public class JSql_Oracle extends JSql {
 		/// Handling Misc values
 		if (miscColumns != null) {
 			for (int a = 0; a < miscColumns.length; ++a) {
-				// insert column
+				// insert column names
+				insertColumnNames.append(miscColumns[a]);
+				insertColumnNames.append(columnSeperator);
+
+				// insert column values
 				insertColumnValues.append(sourceTableAlias);
 				insertColumnValues.append(".");
 				insertColumnValues.append(miscColumns[a]);
@@ -795,8 +812,9 @@ public class JSql_Oracle extends JSql {
 		queryBuilder.append(" UPDATE SET ");
 		queryBuilder.append(updateColumnNames.substring(0, updateColumnNames.length() - columnSeperator.length()));
 		queryBuilder.append(" WHEN NOT MATCHED THEN");
-		queryBuilder.append(" INSERT");
-		queryBuilder.append(" VALUES (");
+		queryBuilder.append(" INSERT ( ");
+		queryBuilder.append(insertColumnNames.substring(0, insertColumnNames.length() - columnSeperator.length()));
+		queryBuilder.append(" ) VALUES (");
 		queryBuilder.append(insertColumnValues.substring(0, insertColumnValues.length() - columnSeperator.length()));
 		queryBuilder.append(")");
 		

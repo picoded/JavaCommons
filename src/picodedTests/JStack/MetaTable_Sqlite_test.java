@@ -142,11 +142,8 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		assertNull(mtObj.get(guid));
 
 		HashMap<String, Object> objMap = randomObjMap();
-		System.out.println("MetaTable_Sqlite_test -> basicTest -> mtObj before -> " + mtObj);
-		System.out.println("MetaTable_Sqlite_test -> basicTest -> objMap -> " + objMap);
 		assertEquals(guid, mtObj.append(guid, objMap)._oid());
 
-		System.out.println("MetaTable_Sqlite_test -> basicTest -> mtObj after -> " + mtObj);
 		objMap.put("_oid", guid);
 		assertEquals(objMap, mtObj.get(guid));
 

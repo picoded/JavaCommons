@@ -354,8 +354,6 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 		sb.append(select);
 		sb.append(from);
 
-		//System.out.println( sb.toString() );
-		//sql.execute_raw(sb.toString());
 		sql.execute(sb.toString());
 	}
 
@@ -623,12 +621,12 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	protected Map<String, List<Object>> JSqlQuery(JSql sql, String selectCols, String whereClause,
 		Object[] whereValues, String orderBy, long limit, long offset) throws JSqlException {
 		if (selectCols == null) {
-			selectCols = "_oid";
+			selectCols = "\"_oid\"";
 		} else {
 			selectCols.toLowerCase();
 
 			if (selectCols.indexOf("_oid") == -1) {
-				selectCols = "_oid, " + selectCols;
+				selectCols = "\"_oid\", " + selectCols;
 			}
 		}
 

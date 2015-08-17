@@ -179,7 +179,7 @@ public class JSql extends BaseInterface {
 				}
 			}
 		} catch (Exception e) {
-			throw new JSqlException("executeQuery_raw exception", e);
+			throw new JSqlException("executeQuery_raw exception: " + qString, e);
 		}
 	}
 	
@@ -223,7 +223,7 @@ public class JSql extends BaseInterface {
 				}
 			}
 		} catch (Exception e) {
-			throw new JSqlException("execute_raw exception", e);
+			throw new JSqlException("execute_raw exception : " + qString, e);
 		}
 		return false;
 	}
@@ -248,7 +248,7 @@ public class JSql extends BaseInterface {
 				}
 			}
 		} catch (Exception e) {
-			throw new JSqlException("execute_query exception", e);
+			throw new JSqlException("execute_query exception : " + qString, e);
 		}
 		return false;
 	}

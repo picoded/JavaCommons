@@ -2,6 +2,7 @@ package picodedTests.JStruct;
 
 // Target test class
 import picoded.JStruct.*;
+import picoded.JStruct.internal.*;
 
 // Test Case include
 import org.junit.*;
@@ -21,7 +22,8 @@ public class KeyValueMap_test {
 	/// To override for implementation
 	///------------------------------------------------------
 	public KeyValueMap implementationConstructor() {
-		return new KeyValueMap();
+		JStruct jsObj = new JStruct();
+		return (new JStruct()).getKeyValueMap("test");
 	}
 	
 	/// Setup and sanity test

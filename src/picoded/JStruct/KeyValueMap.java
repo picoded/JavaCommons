@@ -12,51 +12,24 @@ import picoded.security.NxtCrypt;
 /// This is intended to be an optimized key value map data storage
 /// Used mainly in caching or performance critical scenerios.
 ///
-/// As such its sacrifices much utility for usability
+/// As such its sacrifices much utility for performance
 ///
 /// Note that expire timestamps are measured in seconds,
 /// anything smaller then that is pointless over a network
 ///
-public class KeyValueMap implements GenericConvertMap<String,String> {
+public interface KeyValueMap extends GenericConvertMap<String,String> {
 
-	///
-	/// Constructor vars
-	///--------------------------------------------------------------------------
-	
-	/// Stores the key to value map
-	protected ConcurrentHashMap<String,String> valueMap = new ConcurrentHashMap<String,String>();
-	
-	/// Stores the expire timestamp
-	protected ConcurrentHashMap<String,Long> expireMap = new ConcurrentHashMap<String,Long>();
-	
-	/// Read write lock
-	protected ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
-	
-	///
-	/// Constructor setup
-	///--------------------------------------------------------------------------
-	
-	/// Constructor
-	public KeyValueMap() {
-		// does nothing =X
-	}
-	
 	///
 	/// Temp mode optimization, used to indicate pure session like data,
 	/// that does not require persistance (or even SQL)
 	///
 	///--------------------------------------------------------------------------
 	
-	/// Temp value flag, defaults to false
-	protected boolean isTempHint = false;
-	
 	/// Gets if temp mode optimization hint is indicated
 	/// Note that this only serve as a hint, as does not indicate actual setting
 	///
 	/// @returns boolean  temp mode value
-	public boolean getTempHint() {
-		return isTempHint;
-	}
+	public boolean getTempHint();
 
 	/// Sets temp mode optimization indicator hint
 	/// Note that this only serve as a hint, as does not indicate actual setting
@@ -64,135 +37,26 @@ public class KeyValueMap implements GenericConvertMap<String,String> {
 	/// @param  mode  the new temp mode hint
 	///
 	/// @returns boolean  previous value if set
-	public boolean setTempHint(boolean mode) {
-		boolean ret = isTempHint;
-		isTempHint = mode;
-		return ret;
-	}
+	public boolean setTempHint(boolean mode);
 	
 	///
 	/// Backend system setup / teardown
 	///--------------------------------------------------------------------------
 	
 	/// Setsup the backend storage table, etc. If needed
-	public void systemSetup() {
-		clear();
-	}
+	public void systemSetup();
 	
 	/// Teardown and delete the backend storage table, etc. If needed
-	public void systemTeardown() {
-		clear();
-	}
+	public void systemTeardown();
 	
 	/// Perform maintenance, mainly removing of expired data if applicable
-	public void maintenance() {
-		try {
-			accessLock.writeLock().lock();
-			
-			// The time to check against
-			long now = currentSystemTimeInSeconds();
-			
-			// not iterated directly due to remove()
-			Set<String> expireKeySet = expireMap.keySet(); 
-			
-			// The keyset to check against
-			String[] expireKeyArray = expireKeySet.toArray( new String[ expireKeySet.size() ]);
-			
-			// Iterate and evict
-			for( String key : expireKeyArray ) {
-				Long timeObj = expireMap.get(key);
-				long time = (timeObj != null)? timeObj.longValue() : 0;
-				
-				// expired? kick it
-				if( time < now ) {
-					valueMap.remove(key);
-					expireMap.remove(key);
-				}
-			}
-		} finally {
-			accessLock.writeLock().unlock();
-		}
-	}
+	public void maintenance();
 	
 	/// Removes all data, without tearing down setup
 	///
 	/// Handles re-entrant lock where applicable
 	///
-	public void clear() {
-			try {
-				accessLock.writeLock().lock();
-				valueMap.clear();
-				expireMap.clear();
-			} finally {
-				accessLock.writeLock().unlock();
-			}
-	}
-	
-	///
-	/// Utility functions used internally
-	///--------------------------------------------------------------------------
-
-	/// Gets the current system time in seconds
-	protected long currentSystemTimeInSeconds() {
-		return (System.currentTimeMillis())/1000L;
-	}
-	
-	///
-	/// Expiration and lifespan handling (to override)
-	///--------------------------------------------------------------------------
-	
-	/// [Internal use, to be extended in future implementation]
-	/// Returns the expire time stamp value, raw without validation
-	///
-	/// Handles re-entrant lock where applicable
-	///
-	/// @param key as String
-	///
-	/// @returns long
-	protected long getExpiryRaw(String key) {
-		try {
-			accessLock.readLock().lock();
-			
-			// no value fails
-			if( valueMap.get(key) == null ) {
-				return -1;
-			}
-			
-			// Expire value?
-			Long expireObj = expireMap.get(key);
-			if( expireObj == null) {
-				return 0;
-			}
-			return expireObj.longValue();
-		} finally {
-			accessLock.readLock().unlock();
-		}
-	}
-	
-	/// [Internal use, to be extended in future implementation]
-	/// Sets the expire time stamp value, raw without validation
-	///
-	/// Handles re-entrant lock where applicable
-	///
-	/// @param key as String
-	///
-	/// @returns long
-	protected void setExpiryRaw(String key, long time) {
-		try {
-			accessLock.writeLock().lock();
-			
-			// Does nothing if empty
-			if( time <= 0 || valueMap.get(key) == null ) {
-				expireMap.remove(key);
-				return;
-			}
-			
-			// Set expire value
-			expireMap.put(key, new Long(time));
-		} finally {
-			accessLock.writeLock().unlock();
-		}
-	}
+	public void clear();
 	
 	///
 	/// Expiration and lifespan handling (public access)
@@ -203,111 +67,26 @@ public class KeyValueMap implements GenericConvertMap<String,String> {
 	/// @param key as String
 	///
 	/// @returns long, 0 means no expirary, -1 no data / expire
-	public long getExpiry(String key) {
-		long expire = getExpiryRaw(key);
-		if( expire <= 0 ) { //0 = no timestamp, -1 = no data
-			return expire;
-		}
-		if( expire > currentSystemTimeInSeconds() ) {
-			return expire;
-		}
-		return -1; //expired
-	}
+	public long getExpiry(String key);
 	
 	/// Returns the lifespan time stamp value
 	///
 	/// @param key as String
 	///
 	/// @returns long, 0 means no expirary, -1 no data / expire
-	public long getLifespan(String key) {
-		long expire = getExpiryRaw(key);
-		if( expire <= 0 ) { //0 = no timestamp, -1 = no data
-			return expire;
-		}
-		
-		long lifespan = expire - currentSystemTimeInSeconds();
-		if(lifespan <= 0) {
-			return -1; //expired
-		}
-		
-		return lifespan;
-	}
+	public long getLifespan(String key);
 	
 	/// Sets the expire time stamp value, if still valid
 	///
 	/// @param key 
 	/// @param time 
-	public void setExpiry(String key, long time) {
-		setExpiryRaw(key, time);
-	}
+	public void setExpiry(String key, long time);
 	
 	/// Sets the expire time stamp value, if still valid
 	///
 	/// @param key 
 	/// @param lifespan 
-	public void setLifeSpan(String key, long lifespan) {
-		setExpiryRaw(key, lifespan + currentSystemTimeInSeconds());
-	}
-	
-	///
-	/// put, get, etc (to override)
-	///--------------------------------------------------------------------------
-	
-	/// [Internal use, to be extended in future implementation]
-	/// Returns the value, with validation
-	///
-	/// Handles re-entrant lock where applicable
-	///
-	/// @param key as String
-	/// @param now timestamp
-	///
-	/// @returns String value
-	protected String getValueRaw(String key, long now) {
-		try {
-			accessLock.readLock().lock();
-			
-			String val = valueMap.get(key);
-			if( val == null ) {
-				return null;
-			}
-			
-			// Note: 0 = no timestamp, hence valid value
-			long expiry = getExpiryRaw(key);
-			if( expiry != 0 && expiry < now ) {
-				return null;
-			}
-			
-			return val;
-		} finally {
-			accessLock.readLock().unlock();
-		}
-	}
-	
-	/// [Internal use, to be extended in future implementation]
-	/// Sets the value, with validation
-	///
-	/// Handles re-entrant lock where applicable
-	///
-	/// @param key 
-	/// @param value, null means removal
-	/// @param expire timestamp, 0 means not timestamp
-	///
-	/// @returns null
-	protected String setValueRaw(String key, String value, long expire) {
-		try {
-			accessLock.writeLock().lock();
-			
-			if( value == null ) {
-				valueMap.remove(key);
-			} else {
-				valueMap.put(key, value);
-			}
-			setExpiryRaw(key, expire);
-			return null;
-		} finally {
-			accessLock.writeLock().unlock();
-		}
-	}
+	public void setLifeSpan(String key, long lifespan);
 	
 	/// Search using the value, all the relevent key mappings
 	///
@@ -316,32 +95,7 @@ public class KeyValueMap implements GenericConvertMap<String,String> {
 	/// @param key, note that null matches ALL
 	///
 	/// @returns array of keys
-	public Set<String> getKeys(String value) {
-		try {
-			accessLock.readLock().lock();
-			
-			long now = currentSystemTimeInSeconds();
-			Set<String> ret = new HashSet<String>();
-			
-			// The keyset to check against
-			Set<String> valuekeySet = valueMap.keySet();
-			
-			// Iterate and get
-			for( String key : valuekeySet ) {
-				String rawValue = getValueRaw(key, now );
-				
-				if( rawValue != null ) {
-					if( value == null || rawValue.equals(value) ) {
-						ret.add(key);
-					}
-				} 
-			}
-			
-			return ret;
-		} finally {
-			accessLock.readLock().unlock();
-		}
-	}
+	public Set<String> getKeys(String value);
 
 	///
 	/// put, get, etc (public)
@@ -353,7 +107,7 @@ public class KeyValueMap implements GenericConvertMap<String,String> {
 	///
 	/// @param key as String
 	/// @returns boolean true or false if the key exists
-	public boolean containsKey(Object key) {
+	public default boolean containsKey(Object key) {
 		return (getLifespan(key.toString()) >= 0);
 	}
 	
@@ -361,9 +115,7 @@ public class KeyValueMap implements GenericConvertMap<String,String> {
 	/// @param key param find the thae meta key
 	///
 	/// returns  value of the given key
-	public String get(Object key) {
-		return getValueRaw(key.toString(), currentSystemTimeInSeconds());
-	}
+	public String get(Object key);
 	
 	/// Stores (and overwrites if needed) key, value pair
 	///
@@ -373,9 +125,7 @@ public class KeyValueMap implements GenericConvertMap<String,String> {
 	/// @param value as String
 	///
 	/// @returns null
-	public String put(String key, String value) {
-		return setValueRaw(key, value, 0);
-	}
+	public String put(String key, String value);
 
 	/// Stores (and overwrites if needed) key, value pair
 	///
@@ -386,9 +136,7 @@ public class KeyValueMap implements GenericConvertMap<String,String> {
 	/// @param lifespan time to expire in seconds
 	///
 	/// @returns null
-	public String putWithLifespan(String key, String value, long lifespan) {
-		return setValueRaw(key,value, currentSystemTimeInSeconds() + lifespan);
-	}
+	public String putWithLifespan(String key, String value, long lifespan);
 
 	/// Stores (and overwrites if needed) key, value pair
 	///
@@ -399,20 +147,12 @@ public class KeyValueMap implements GenericConvertMap<String,String> {
 	/// @param expireTime expire time stamp value
 	///
 	/// @returns String
-	public String putWithExpiry(String key, String value, long expireTime) {
-		return setValueRaw(key,value,expireTime);
-	}
+	public String putWithExpiry(String key, String value, long expireTime);
 	
 	///
 	/// Nonce operations suppport (public)
 	///--------------------------------------------------------------------------
 	
-	/// Default nonce lifetime (1 hour)
-	public int nonce_defaultLifetime = 3600;
-
-	/// Default nonce string length (22 is chosen to be consistent with base58 GUID's)
-	public int nonce_defaultLength = 22;
-
 	/// Generates a random nonce hash, and saves the value to it
 	///
 	/// Relies on both nonce_defaultLength & nonce_defaultLifetime for default parameters
@@ -420,10 +160,8 @@ public class KeyValueMap implements GenericConvertMap<String,String> {
 	/// @param value to store as string
 	///
 	/// @returns String value of the random key generated
-	public String generateNonce(String val) {
-		return generateNonce( val, nonce_defaultLifetime, nonce_defaultLength );
-	}
-
+	public String generateNonce(String val);
+	
 	/// Generates a random nonce hash, and saves the value to it
 	///
 	/// Relies on nonce_defaultLength for default parameters
@@ -432,9 +170,7 @@ public class KeyValueMap implements GenericConvertMap<String,String> {
 	/// @param lifespan time to expire in seconds
 	///
 	/// @returns String value of the random key generated
-	public String generateNonce(String val, long lifespan) {
-		return generateNonce( val, lifespan, nonce_defaultLength );
-	}
+	public String generateNonce(String val, long lifespan);
 
 	/// Generates a random nonce hash, and saves the value to it
 	///
@@ -446,7 +182,7 @@ public class KeyValueMap implements GenericConvertMap<String,String> {
 	/// @param lifespan time to expire in seconds
 	///
 	/// @returns String value of the random key generated
-	public String generateNonce(String val, long lifespan, int keyLength) {
+	public default String generateNonce(String val, long lifespan, int keyLength) {
 		String res = NxtCrypt.randomString(keyLength);
 		putWithLifespan( res, val, lifespan );
 		return res;

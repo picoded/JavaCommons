@@ -54,41 +54,41 @@ public class JStruct {
 	// MetaTable handling
 	//----------------------------------------------
 
-	protected ConcurrentHashMap<String,KeyValueMap> keyValueMapCache = new ConcurrentHashMap<String,KeyValueMap>();
-	protected ReentrantReadWriteLock keyValueMapCache_lock = new ReentrantReadWriteLock();
+	protected ConcurrentHashMap<String,MetaTable> metaTableCache = new ConcurrentHashMap<String,MetaTable>();
+	protected ReentrantReadWriteLock metaTableCache_lock = new ReentrantReadWriteLock();
 	
-	/// Setsup and return a KeyValueMap object,
+	/// Setsup and return a MetaTable object,
 	/// This is overriden for the various implmentation version
 	///
-	/// @param name - name of map in backend
+	/// @param name - name of MetaTable in backend
 	///
-	/// @returns KeyValueMap
-	public KeyValueMap getKeyValueMap(String name) {
+	/// @returns MetaTable
+	public MetaTable getMetaTable(String name) {
 		
 		// Structure backend name is case insensitive
 		name = name.toUpperCase();
 		
 		// Tries to get 1 time, without locking
-		KeyValueMap cacheCopy = keyValueMapCache.get(name);
+		MetaTable cacheCopy = metaTableCache.get(name);
 		if(cacheCopy != null) {
 			return cacheCopy;
 		}
 		
 		// Tries to get again with lock, creates and put if not exists
 		try {
-			keyValueMapCache_lock.writeLock().lock();
+			metaTableCache_lock.writeLock().lock();
 			
-			cacheCopy = keyValueMapCache.get(name);
+			cacheCopy = metaTableCache.get(name);
 			if(cacheCopy != null) {
 				return cacheCopy;
 			}
 			
-			cacheCopy = new JStruct_KeyValueMap();
-			keyValueMapCache.put( name, cacheCopy );
+			cacheCopy = new JStruct_MetaTable();
+			metaTableCache.put( name, cacheCopy );
 			return cacheCopy;
 			
 		} finally {
-			keyValueMapCache_lock.writeLock().unlock();
+			metaTableCache_lock.writeLock().unlock();
 		}
 	}
 }

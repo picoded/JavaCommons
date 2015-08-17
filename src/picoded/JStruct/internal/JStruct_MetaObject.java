@@ -11,33 +11,32 @@ import picoded.JStruct.*;
 
 /// Represents a single object node in the MetaTable collection.
 ///
+/// This is intended, to handle local, delta, and remote data seperately.
+///
 /// NOTE: This class should not be initialized directly, but through MetaTable class
 public class JStruct_MetaObject extends HashMap<String, Object> implements GenericConvertMap<String, Object> {
 	
+	// Core variables
+	//----------------------------------------------
 	
+	/// MetaTable used for the object
+	protected JStruct_MetaTable mainTable = null;
 	
+	/// GUID used for the object
+	protected String _oid = null;
 	
-	// // Core variables
-	// //----------------------------------------------
-	// 
-	// /// MetaTable used for the object
-	// protected MetaTable mTable = null;
-	// 
-	// /// GUID used for the object
-	// protected String _oid = null;
-	// 
-	// /// Written changes
-	// protected Map<String, Object> deltaDataMap = new HashMap<String, Object>();
-	// 
-	// /// Local data cache
-	// protected Map<String, Object> remoteDataMap = null;
-	// 
-	// /// Query data cache
-	// protected Map<String, Object> queryDataMap = null;
-	// 
-	// /// Boolean indicating if there was a data change, and the "combined storage" needed to be updated
-	// protected boolean combinedNeedsUpdate = true;
-	// 
+	/// Written changes
+	protected Map<String, Object> deltaDataMap = new HashMap<String, Object>();
+	
+	/// Local data cache
+	protected Map<String, Object> remoteDataMap = null;
+	
+	/// Query data cache
+	protected Map<String, Object> queryDataMap = null;
+	
+	/// Boolean indicating if there was a data change, and the "combined storage" needed to be updated
+	protected boolean combinedNeedsUpdate = true;
+	
 	// // Constructor
 	// //----------------------------------------------
 	// 

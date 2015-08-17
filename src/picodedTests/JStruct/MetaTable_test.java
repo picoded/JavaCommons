@@ -21,7 +21,7 @@ public class MetaTable_test {
 	/// To override for implementation
 	///------------------------------------------------------
 	public MetaTable implementationConstructor() {
-		return new MetaTable();
+		return null;
 	}
 	
 	/// Setup and sanity test

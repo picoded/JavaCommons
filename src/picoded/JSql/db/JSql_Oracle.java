@@ -163,6 +163,22 @@ public class JSql_Oracle extends JSql {
 		return qString;
 	}
 	
+	final String ifExists = "IF EXISTS";
+	final String ifNotExists = "IF NOT EXISTS";
+	
+	final String create = "CREATE";
+	final String drop = "DROP";
+	final String view ="VIEW";
+	final String table = "TABLE";
+	final String select = "SELECT";
+	final String update = "UPDATE";
+	
+	final String insertInto = "INSERT INTO";
+	final String deleteFrom = "DELETE FROM";
+	
+	final String[] indexTypeArr = { "UNIQUE", "FULLTEXT", "SPATIAL" };
+	final String index = "INDEX";
+	
 	/// Internal parser that converts some of the common sql statements to sqlite
 	public String genericSqlParser(String inString) throws JSqlException {
 		//Unique to oracle prefix, automatically terminates all additional conversion attempts
@@ -177,22 +193,6 @@ public class JSql_Oracle extends JSql {
 		
 		String qStringPrefix = "";
 		String qStringSuffix = "";
-		
-		final String ifExists = "IF EXISTS";
-		final String ifNotExists = "IF NOT EXISTS";
-		
-		final String create = "CREATE";
-		final String drop = "DROP";
-		final String view ="VIEW";
-		final String table = "TABLE";
-		final String select = "SELECT";
-		final String update = "UPDATE";
-		
-		final String insertInto = "INSERT INTO";
-		final String deleteFrom = "DELETE FROM";
-		
-		final String[] indexTypeArr = { "UNIQUE", "FULLTEXT", "SPATIAL" };
-		final String index = "INDEX";
 		
 		String indexType;
 		String tmpStr;
@@ -474,29 +474,84 @@ public class JSql_Oracle extends JSql {
 	public boolean execute(String qString, Object... values) throws JSqlException {
 	    qString = genericSqlParser(qString);
 	    
-	    // Create sequence and trigger if it is CREATE TABLE query and has the AUTO INCREMENT column
-	    int prefixOffset = 0;
-	    if (qString.startsWith(create)) { //CREATE
-			prefixOffset = create.length() + 1;
-			
-			if (qString.startsWith(table, prefixOffset)) { //TABLE
-			    prefixOffset = table.length() + 1;
-			    if (qString.indexOf("AUTOINCREMENT") !=-1 || qString.indexOf("AUTO_INCREMENT") !=-1) {
-			        // get table name
-			        if (qString.startsWith(ifNotExists, prefixOffset)) { //IF NOT EXISTS
+	    String sequenceQuery = null;
+	    String triggerQuery = null;
+	    
+	    // check if there is any AUTO INCREMENT field
+	    if (qString.indexOf("AUTOINCREMENT") !=-1 || qString.indexOf("AUTO_INCREMENT") !=-1) {
+    
+    	    // Create sequence and trigger if it is CREATE TABLE query and has the AUTO INCREMENT column
+    	    int prefixOffset = qString.indexOf(create);
+    	    // check if create statement
+    	    if (prefixOffset != -1) { //CREATE
+
+    			prefixOffset += create.length() + 1;
+    			
+    			// check if create table statement
+    			if (qString.startsWith(table, prefixOffset)) { //TABLE
+
+    			    prefixOffset += table.length() + 1;
+    			    
+    		        // check if 'IF NOT EXISTS' exists in query
+    	            if (qString.startsWith(ifNotExists, prefixOffset)) {
     					prefixOffset += ifNotExists.length() + 1;
-    				} else {
     				}
-            		// if AUTO INCREMENT, CREATE Sequence
-            		String query = "CREATE SEQUENCE S_COMMENT_ID START WITH 1 INCREMENT BY 1 CACHE 10;"
-			    }
-			}
+    				
+    		        // parse table name
+            		String tableName = qString.substring(prefixOffset, qString.indexOf( "(", prefixOffset) );
+            		tableName = tableName.replaceAll("\"", "").trim();
+            		
+            		prefixOffset += tableName.length();
+                    //prefixOffset = qString.indexOf("(", prefixOffset) + 1;
+                    
+    		        // parse primary key column
+    		   	    String primaryKeyColumn = "";
+    		   	    
+    		        String tmpStr = qString.substring( prefixOffset, qString.indexOf("PRIMARY KEY") ).trim();
+
+    		   	    if (tmpStr.charAt(tmpStr.length() - 1) == ')') {
+        				tmpStr = tmpStr.substring(0, tmpStr.lastIndexOf("(")).trim();
+        			}
+        			// find last space
+        			tmpStr = tmpStr.substring(0, tmpStr.lastIndexOf(" ")).trim();
+        			
+        			for (int i = tmpStr.length() - 1; i >= 0; i--) {
+        				// find space, comma or opening bracket
+        				if (tmpStr.charAt(i) == ' ' || tmpStr.charAt(i) == ','
+        						|| tmpStr.charAt(i) == '(') {
+        					break;
+        				}
+        				primaryKeyColumn = tmpStr.charAt(i) + primaryKeyColumn;
+        			}
+    		   	    
+    		   	    // create sequence sql query
+    		        sequenceQuery = "CREATE SEQUENCE \""+tableName+"_SEQ\" START WITH 1001 INCREMENT BY 1 CACHE 10"; 
+    		        
+    		        // create trigger sql query
+    		        triggerQuery = "CREATE OR REPLACE TRIGGER \""+tableName+"_TRIGGER\" "
+    		                    + " BEFORE INSERT ON \""+tableName+"\" FOR EACH ROW " 
+    		                    + " BEGIN SELECT \""+tableName+"_SEQ\".nextval INTO :NEW."+primaryKeyColumn+" FROM dual; END;";
+    			}
+    	    }
 	    }
 	    // Replace the AUTO INCREMENT with blank
-	    qString = qString.replaceAll("AUTOINCREMENT","");
+	    qString = qString.replaceAll("AUTOINCREMENT", "");
+	    qString = qString.replaceAll("AUTO_INCREMENT", "");
 
 		//try {
-		return execute_raw(qString, values);
+		boolean retvalue = execute_raw(qString, values);
+
+        //Create Sequence
+        if (sequenceQuery != null) {
+            execute_raw( genericSqlParser(sequenceQuery) );
+        }
+
+        //Create trigger
+        if (triggerQuery != null) {
+            execute_query( genericSqlParser(triggerQuery) );
+        }
+
+        return retvalue;
 		//} catch(JSqlException e) {
 		//	logger.log( Level.SEVERE, "Execute Exception" ); //, e 
 		//	logger.log( Level.SEVERE, "-> Original query : " + qString );
@@ -760,5 +815,5 @@ public class JSql_Oracle extends JSql {
 	) throws JSqlException {
 		return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues, null, null, null);
 	}
-	
+
 }

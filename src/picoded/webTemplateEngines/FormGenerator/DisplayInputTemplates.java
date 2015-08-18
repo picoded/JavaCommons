@@ -47,15 +47,15 @@ public class DisplayInputTemplates {
 		Map<String, FormInputInterface> defaultTemplates = new CaseInsensitiveHashMap<String, FormInputInterface>();
 		
 		// Wildcard fallback
-		defaultTemplates.put("*", FormInputTemplates.div);
+		defaultTemplates.put("*", DisplayInputTemplates.div);
 		
 		// Standard divs
-		defaultTemplates.put(JsonKeys.DIV, FormInputTemplates.div);
-		defaultTemplates.put(JsonKeys.TITLE, FormInputTemplates.header);
-		defaultTemplates.put(JsonKeys.DROPDOWN, FormInputTemplates.select);
-		defaultTemplates.put(JsonKeys.TEXT, FormInputTemplates.input_text);
-		defaultTemplates.put(JsonKeys.HTML_INJECTION, FormInputTemplates.raw_html);
-		//defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, dropdownWithOthers);
+		defaultTemplates.put(JsonKeys.DIV, DisplayInputTemplates.div);
+		defaultTemplates.put(JsonKeys.TITLE, DisplayInputTemplates.header);
+		defaultTemplates.put(JsonKeys.DROPDOWN, DisplayInputTemplates.select);
+		defaultTemplates.put(JsonKeys.TEXT, DisplayInputTemplates.input_text);
+		defaultTemplates.put(JsonKeys.HTML_INJECTION, DisplayInputTemplates.raw_html);
+		//defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, DisplayInputTemplates);
 		
 		return defaultTemplates;
 	}

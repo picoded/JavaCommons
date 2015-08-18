@@ -14,7 +14,7 @@ import picoded.struct.CaseInsensitiveHashMap;
 
 public class FormInputTemplates {
 	
-	protected static FormInputInterface div = (node)->{
+	public static StringBuilder displayDiv( FormNode node, String pfiClass ) {
 		String text = node.getString(JsonKeys.TEXT, "");
 		String fieldValue = node.getFieldValue();
 		
@@ -23,8 +23,12 @@ public class FormInputTemplates {
 			return new StringBuilder();
 		}
 		
-		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, "pfi_div", null );
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, pfiClass, null );
 		return sbArr[0].append(textAndField).append(sbArr[1]);
+	}
+	
+	protected static FormInputInterface div = (node)->{
+		return FormInputTemplates.displayDiv(node, "pfi_div");
 	};
 	
 	protected static FormInputInterface header = (node)->{ 

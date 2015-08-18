@@ -66,7 +66,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 	/// @returns the first non-null value the function returned. else return null
 	public Object iterateLayersUntilReturn( Function<Map<K,V>, Object> func ) {
 		Object ret = null;
-		for(int a=0; a<_layers.size(); ++a) {
+		for(int a=0; a<_layers.size(); a++) {
 			Map<K,V> subLayer = _layers.get(a);
 			if( subLayer == null ) {
 				continue;
@@ -93,7 +93,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 		}
 		
 		Object ret = null;
-		for(int a=_layers.size() - 1; a>0; --a) {
+		for(int a=_layers.size() - 1; a>=0; --a) {
 			Map<K,V> subLayer = _layers.get(a);
 			if( subLayer == null ) {
 				continue;
@@ -119,7 +119,6 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 			if( subLayer == null ) {
 				continue;
 			}
-			
 			ret = func.apply(subLayer, ret);
 		}
 		return ret;
@@ -139,12 +138,11 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 			return iterateLayersWithReturn(func, ret);
 		}
 		
-		for(int a=_layers.size() - 1; a>0; --a) {
+		for(int a=_layers.size() - 1; a>=0; --a) {
 			Map<K,V> subLayer = _layers.get(a);
 			if( subLayer == null ) {
 				continue;
 			}
-			
 			ret = func.apply(subLayer, ret);
 		}
 		return ret;
@@ -172,7 +170,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 	public V put(K key, V value) {
 		V ret = null;
 		
-		if( writeToAllLayers ) {
+		if( writeToAllLayers ) { //writes to all layers
 			ret = (V)iterateLayersWithReturn( (map,r) -> {
 				if( r  == null ) {
 					r = map.put(key, value);
@@ -180,19 +178,18 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 					map.put(key, value);
 				}
 				return r;
-			}, ret, reverseWriteLayerOrder );
+			}, null, reverseWriteLayerOrder );
 		} else { //writes only to the first/last layer???
 			ret = (V)iterateLayersUntilReturn( (map) -> {
 				V val = map.put(key, value);
-				
 				if(val == null) {
 					return nullObject;
 				}
-				
 				return val;
 			}, reverseWriteLayerOrder );
 		}
 		
+		// is NULL D=
 		if(ret == nullObject) {
 			return null;
 		}
@@ -258,6 +255,5 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 			return null;
 		} ) != null );
 	}
-	
 	
 }

@@ -247,7 +247,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	///
 	/// @returns {Map<String,String>} - the return parameter map
 	public Map<String,String> defaultWrapperParameterMap( String baseClass, Map<String,String> map ) {
-		return defaultParameterMap( map, baseClass, prefix_input(), JsonKeys.WRAPPER_CLASS, JsonKeys.WRAPPER_CSS, JsonKeys.WRAPPER_ID, JsonKeys.EXTRA_WRAPPER_PROPERTIES_MAP );
+		return defaultParameterMap( map, baseClass, prefix_wrapper(), JsonKeys.WRAPPER_CLASS, JsonKeys.WRAPPER_CSS, JsonKeys.WRAPPER_ID, JsonKeys.EXTRA_WRAPPER_PROPERTIES_MAP );
 	}
 	
 	/// Generates the standard node parameter map for label. This is useful for shared default behaviour
@@ -257,7 +257,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	///
 	/// @returns {Map<String,String>} - the return parameter map
 	public Map<String,String> defaultLabelParameterMap( String baseClass, Map<String,String> map ) {
-		return defaultParameterMap( map, baseClass, prefix_input(), JsonKeys.LABEL_CLASS, JsonKeys.LABEL_CSS, JsonKeys.LABEL_ID, JsonKeys.EXTRA_LABEL_PROPERTIES_MAP );
+		return defaultParameterMap( map, baseClass, prefix_label(), JsonKeys.LABEL_CLASS, JsonKeys.LABEL_CSS, JsonKeys.LABEL_ID, JsonKeys.EXTRA_LABEL_PROPERTIES_MAP );
 	}
 	
 	/// Generates the standard node parameter map for child nodes. This is useful for shared default behaviour
@@ -267,7 +267,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	///
 	/// @returns {Map<String,String>} - the return parameter map
 	public Map<String,String> defaultChildWrapperParameterMap( String baseClass, Map<String,String> map ) {
-		return defaultParameterMap( map, baseClass, prefix_input(), JsonKeys.CHILD_CLASS, JsonKeys.CHILD_CSS, JsonKeys.CHILD_ID, JsonKeys.EXTRA_CHILD_WRAPPER_PROPERTIES_MAP );
+		return defaultParameterMap( map, baseClass, prefix_childWrapper(), JsonKeys.CHILD_CLASS, JsonKeys.CHILD_CSS, JsonKeys.CHILD_ID, JsonKeys.EXTRA_CHILD_WRAPPER_PROPERTIES_MAP );
 	}
 	
 	/// Helps escape html dom parameter quotes, in an "optimal" way

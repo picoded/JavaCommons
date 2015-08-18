@@ -20,21 +20,21 @@ public class DisplayInputTemplates {
 	////////////////////////////////////////////////
 	
 	protected static FormInputInterface div = (node)->{
-		return FormInputTemplates.displayDiv(node, "pfi_div");
+		return FormInputTemplates.displayDiv(node, "pfi_div pfi_display");
 	};
 	
 	protected static FormInputInterface header = (node)->{ 
-		return FormInputTemplates.displayDiv(node, "pfi_header");
+		return FormInputTemplates.displayDiv(node, "pfi_header pfi_display");
 	};
 	
 	@SuppressWarnings("unchecked")
 	protected static FormInputInterface select = (node)->{ 
-		return FormInputTemplates.displayDiv(node, "pfi_select");
+		return FormInputTemplates.displayDiv(node, "pfi_select pfi_display");
 	};
 	
 	@SuppressWarnings("unchecked")
 	protected static FormInputInterface input_text = (node)->{
-		return FormInputTemplates.displayDiv(node, "pfi_inputText");
+		return FormInputTemplates.displayDiv(node, "pfi_inputText pfi_display");
 	};
 	
 	protected static FormInputInterface raw_html = (node)->{

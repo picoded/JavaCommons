@@ -28,19 +28,19 @@ public class FormInputTemplates {
 	}
 	
 	protected static FormInputInterface div = (node)->{
-		return FormInputTemplates.displayDiv(node, "pfi_div");
+		return FormInputTemplates.displayDiv(node, "pfi_div pfi_input");
 	};
 	
 	protected static FormInputInterface header = (node)->{ 
 		String text = node.getString(JsonKeys.TEXT, "");
 		String fieldValue = node.getFieldValue() != null ? node.getFieldValue():"";
-		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.HEADER, "pfi_header", null );
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.HEADER, "pfi_header pfi_input", null );
 		return sbArr[0].append(text).append(fieldValue).append(sbArr[1]);
 	};
 	
 	@SuppressWarnings("unchecked")
 	protected static FormInputInterface select = (node)->{ 
-		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.SELECT, "pfi_select", null );
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.SELECT, "pfi_select pfi_input", null );
 		StringBuilder ret = sbArr[0];
 		
 		// Prepeare the option key value list
@@ -119,7 +119,7 @@ public class FormInputTemplates {
 			paramMap.put(HtmlTag.VALUE, fieldValue);
 		}
 		
-		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputText", paramMap );
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputText pfi_input", paramMap );
 		return sbArr[0].append(sbArr[1]);
 	};
 	
@@ -224,7 +224,7 @@ public class FormInputTemplates {
 			sb.append("</"+HtmlTag.SELECT+">\n");
 			
 			//append input text field
-			StringBuilder inputBuilder = new StringBuilder(" class=\"pfi_inputText\"");
+			StringBuilder inputBuilder = new StringBuilder(" class=\"pfi_inputText pfi_input\"");
 			FormGenerator.getCustomClass(node, inputBuilder, JsonKeys.CUSTOMCLASS, "pfi_");
 			inputBuilder.append(" style=\"display:none\"");
 			String inputBuilderString = inputBuilder.toString();

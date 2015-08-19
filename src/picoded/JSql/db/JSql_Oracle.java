@@ -99,31 +99,33 @@ public class JSql_Oracle extends JSql {
 	
 	/// Collumn type correction from mysql to oracle sql
 	private static String _simpleMysqlToOracle_collumnSubstitude(String qString) {
-		return qString.replaceAll("(?i)BIGINT", "NUMBER(19, 0)")
-			.replaceAll("(?i)BIT", "RAW")
-			.replaceAll("(?i)BLOB", "BLOB")
+		return qString.replaceAll("(?i)BIT", "RAW")
+			.replaceAll("(?i)TINYBLOB", "RAW")
 			//, RAW
 			//.replaceAll("(?i)CHAR","CHAR")
-			//.replaceAll("(?i)DATE","DATE")
-			.replaceAll("(?i)DATETIME", "DATE").replaceAll("(?i)DECIMAL\\(.*?\\)", "FLOAT(24)").replaceAll("(?i)DOUBLE",
-				"FLOAT(24)").replaceAll("(?i)DOUBLE PRECISION", "FLOAT(24)")
+			.replaceAll("(?i)DECIMAL\\(.*?\\)", "FLOAT(24)")
+			.replaceAll("(?i)DOUBLE", "FLOAT(24)")
+			.replaceAll("(?i)DOUBLE PRECISION", "FLOAT(24)")
+			.replaceAll("(?i)REAL", "FLOAT (24)")
 			//.replaceAll("(?i)FLOAT","FLOAT")
 			.replaceAll("(?i)INTEGER", "INT")
 			//.replaceAll("(?i)INT","NUMBER(10,0)")
-			.replaceAll("(?i)LONGBLOB", "BLOB")
-			//, RAW
-			.replaceAll("(?i)LONGTEXT", "CLOB")
-			//, RAW
-			.replaceAll("(?i)MEDIUMBLOB", "BLOB")
-			//, RAW
-			.replaceAll("(?i)MEDIUMINT", "NUMBER(7,0)").replaceAll("(?i)MEDIUMTEXT", "CLOB")
-			//, RAW
-			.replaceAll("(?i)NUMERIC", "NUMBER").replaceAll("(?i)REAL", "FLOAT (24)").replaceAll("(?i)SMALLINT",
-				"NUMBER(5,0)").replaceAll("(?i)TEXT", "CLOB")
-			//VARCHAR2,
-			.replaceAll("(?i)TIME", "DATE").replaceAll("(?i)TIMESTAMP", "DATE").replaceAll("(?i)TINYBLOB", "RAW")
+			.replaceAll("(?i)BIGINT", "NUMBER(19, 0)")
+			.replaceAll("(?i)MEDIUMINT", "NUMBER(7,0)")
+			.replaceAll("(?i)SMALLINT", "NUMBER(5,0)")
 			.replaceAll("(?i)TINYINT", "NUMBER(3,0)")
-
+			.replaceAll("(?i)YEAR", "NUMBER")
+			.replaceAll("(?i)NUMERIC", "NUMBER")
+			.replaceAll("(?i)BLOB", "BLOB")
+			.replaceAll("(?i)LONGBLOB", "BLOB")
+			.replaceAll("(?i)MEDIUMBLOB", "BLOB")
+			.replaceAll("(?i)LONGTEXT", "CLOB")
+			.replaceAll("(?i)MEDIUMTEXT", "CLOB")
+			.replaceAll("(?i)TEXT", "CLOB")
+			//.replaceAll("(?i)DATE","DATE")
+			.replaceAll("(?i)TIME", "DATE")
+			.replaceAll("(?i)TIMESTAMP", "DATE")
+			.replaceAll("(?i)DATETIME", "DATE")
 			/*
 			.replaceAll("(?i)ENUM(?=\\()","VARCHAR2")
 			.replaceAll("(?i)ENUM(?!\\()","VARCHAR2(n)")
@@ -132,13 +134,9 @@ public class JSql_Oracle extends JSql {
 			.replaceAll("(?i)TINYTEXT(?=\\()","VARCHAR2")
 			.replaceAll("(?i)TINYTEXT(?!\\()","VARCHAR2(n)")
 			 */
-
-			.replaceAll("(?i)VARCHAR(?!\\()", "VARCHAR2(4000)") //, CLOB
-			.replaceAll("(?i)VARCHAR\\(", "VARCHAR2(") //, CLOB
-			.replaceAll("(?i)YEAR", "NUMBER")
-			//.replaceAll("AUTOINCREMENT","")
+			.replaceAll("(?i)VARCHAR(?!\\()", "VARCHAR2(4000)")
+			.replaceAll("(?i)VARCHAR\\(", "VARCHAR2(")
 			.replaceAll("MAX","4000");
-		
 	}
 	
 	/// Fixes the table name, and removes any trailing ";" if needed

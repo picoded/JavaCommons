@@ -66,7 +66,6 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 	@Test
 	public void testSingleMappingSystem() throws JStackException
 	{
-		//System.out.println("Starting single mapping test");
 		mtObj.clearTypeMapping();
 
 		mtObj.putType("num", "INTEGER");
@@ -83,7 +82,6 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 	@Test
 	public void testMapMappingSystem() throws JStackException
 	{
-		//System.out.println("Starting map mapping test");
 		mtObj.clearTypeMapping();
 
 		HashMap<String, Object> mapping = new HashMap<String, Object>();
@@ -125,12 +123,12 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 	// Test utility used to generate random maps
 	protected HashMap<String, Object> randomObjMap() {
 		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
-		objMap.put(GUID.base58(), RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
-		objMap.put(GUID.base58(), -(RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3))));
+		objMap.put(GUID.base58(), RandomUtils.nextInt(0, 99999));
+		objMap.put(GUID.base58(), -(RandomUtils.nextInt(0, 99999)));
 		objMap.put(GUID.base58(), GUID.base58());
 		objMap.put(GUID.base58(), GUID.base58());
 
-		objMap.put("num", RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
+		objMap.put("num", RandomUtils.nextFloat(0, Float.MAX_VALUE));
 		objMap.put("str_val", GUID.base58());
 
 		return objMap;
@@ -145,7 +143,7 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		assertEquals(guid, mtObj.append(guid, objMap)._oid());
 
 		objMap.put("_oid", guid);
-		assertEquals(objMap, mtObj.get(guid));
+		assertEquals(new TreeMap<String, Object>(objMap), new TreeMap<String, Object>(mtObj.get(guid)));
 
 		objMap = randomObjMap();
 		assertNotNull(guid = mtObj.append(null, objMap)._oid());

@@ -129,6 +129,8 @@ public class JSql extends BaseInterface {
 					ps.setLong(pt + 1, (Long) argObj);
 				} else if (Double.class.isInstance(argObj)) {
 					ps.setDouble(pt + 1, (Double) argObj);
+				} else if (Float.class.isInstance(argObj)) {
+					ps.setFloat(pt + 1, (Float) argObj);
 				} else {
 					String argClassName = argObj.getClass().getName();
 					throw new JSqlException("Unknown argument type (" + pt + ") : " + (argClassName));

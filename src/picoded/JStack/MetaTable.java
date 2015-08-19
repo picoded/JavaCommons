@@ -462,6 +462,10 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 		if (baseType >= MetaType.TYPE_INTEGER && baseType <= 34) {
 			if (baseType == MetaType.TYPE_INTEGER) {
 				return new Integer(((Number) (r.get("nVl").get(pos))).intValue());
+			} else if (baseType == MetaType.TYPE_FLOAT) {
+				return new Float(((Number) (r.get("nVl").get(pos))).floatValue());
+			} else if (baseType == MetaType.TYPE_DOUBLE) {
+				return new Double(((Number) (r.get("nVl").get(pos))).doubleValue());
 			}
 		} else if (baseType == MetaType.TYPE_STRING) { // String
 			return (String) (r.get("tVl").get(pos));
@@ -563,7 +567,7 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 		
 						v = entry.getValue();
 						typSet = valueToOptionSet(k, v);
-		
+
 						// This is currently only for NON array mode
 						sql.upsertQuerySet( //
 							tName, //
@@ -602,6 +606,10 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	protected Object[] valueToOptionSet(String key, Object value) throws JSqlException {
 		if (value instanceof Integer) {
 			return new Object[] { new Integer(MetaType.TYPE_INTEGER), value, null, null }; //Typ, N,S,I,T
+		} else if (value instanceof Float) {
+			return new Object[] { new Float(MetaType.TYPE_FLOAT), value, null, null }; //Typ, N,S,I,T
+		} else if (value instanceof Double) {
+			return new Object[] { new Double(MetaType.TYPE_DOUBLE), value, null, null }; //Typ, N,S,I,T
 		} else if (value instanceof String) {
 			return new Object[] { new Integer(MetaType.TYPE_STRING), 0, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
 		}

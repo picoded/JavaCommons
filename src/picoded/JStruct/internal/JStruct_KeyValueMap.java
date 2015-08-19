@@ -85,6 +85,12 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 		clear();
 	}
 	
+	/// perform increment maintenance, meant for minor changes between requests
+	public void incrementalMaintenance() {
+		// For JStruct, both is same
+		maintenance();
+	}
+	
 	/// Perform maintenance, mainly removing of expired data if applicable
 	public void maintenance() {
 		try {

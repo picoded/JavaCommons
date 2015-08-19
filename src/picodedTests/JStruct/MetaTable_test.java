@@ -9,10 +9,17 @@ import static org.junit.Assert.*;
 
 // Test depends
 import java.nio.charset.Charset;
-import java.lang.String;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
+import org.apache.commons.lang3.RandomUtils;
+
+import picoded.conv.*;
+import picoded.struct.*;
+
+import picodedTests.TestConfig;
+
+// MetaTable base test class
 public class MetaTable_test {
 	
 	/// Test object
@@ -50,19 +57,19 @@ public class MetaTable_test {
 	// Test cases
 	//-----------------------------------------------
 	
-	// // Test utility used to generate random maps
-	// protected HashMap<String, Object> randomObjMap() {
-	// 	HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
-	// 	objMap.put(GUID.base58(), RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
-	// 	objMap.put(GUID.base58(), -(RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3))));
-	// 	objMap.put(GUID.base58(), GUID.base58());
-	// 	objMap.put(GUID.base58(), GUID.base58());
-	// 
-	// 	objMap.put("num", RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
-	// 	objMap.put("str_val", GUID.base58());
-	// 
-	// 	return objMap;
-	// }
+	// Test utility used to generate random maps
+	protected HashMap<String, Object> randomObjMap() {
+		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
+		objMap.put(GUID.base58(), RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
+		objMap.put(GUID.base58(), -(RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3))));
+		objMap.put(GUID.base58(), GUID.base58());
+		objMap.put(GUID.base58(), GUID.base58());
+	
+		objMap.put("num", RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
+		objMap.put("str_val", GUID.base58());
+	
+		return objMap;
+	}
 	// 
 	// @Test
 	// public void basicTest() throws JStackException {

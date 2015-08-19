@@ -87,6 +87,10 @@ public class JStruct_MetaObject implements GenericConvertMap<String, Object> {
 		if( remoteDataMap == null || isCompleteRemoteDataMap == false ) {
 			remoteDataMap = mainTable.metaObjectRemoteDataMap_get(_oid);
 			isCompleteRemoteDataMap = true;
+			
+			if( remoteDataMap == null ) {
+				remoteDataMap = new HashMap<String,Object>();
+			}
 		}
 	}
 	
@@ -110,6 +114,12 @@ public class JStruct_MetaObject implements GenericConvertMap<String, Object> {
 	
 	/// Gets and return its current value
 	public Object get(Object key) {
+		
+		/// Get key operation
+		if( key.toString().equalsIgnoreCase( "_oid") ) {
+			return _oid;
+		}
+		
 		Object ret = deltaDataMap.get(key);
 		
 		// Get from incomplete map
@@ -165,10 +175,16 @@ public class JStruct_MetaObject implements GenericConvertMap<String, Object> {
 		Set<String> retSet = new HashSet<String>();
 		
 		for( String key : unfilteredForNull ) {
+			
+			if( key.equalsIgnoreCase("_oid") ) {
+				continue;
+			}
+			
 			if( get(key) != null ) {
 				retSet.add(key);
 			}
 		}
+		retSet.add("_oid");
 		
 		return retSet;
 	} 

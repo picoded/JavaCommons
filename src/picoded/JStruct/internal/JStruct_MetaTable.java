@@ -98,5 +98,16 @@ public class JStruct_MetaTable implements MetaTable {
 	// ///
 	// /// Internal functions
 	// ///--------------------------------------------------------------------------
-	// 
+	
+	/// Gets the complete remote data map, for MetaObject
+	protected Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
+		return new HashMap<String,Object>();
+	}
+	
+	/// Updates the actual backend storage of MetaObject 
+	/// either partially (if supported / used), or completely
+	protected void metaObjectRemoteDataMap_update(String _oid, Map<String,Object> fullMap, Set<String> keys) {
+		
+	}
+	
 }

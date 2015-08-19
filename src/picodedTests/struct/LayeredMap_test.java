@@ -45,6 +45,11 @@ public class LayeredMap_test {
 		assertNotNull(lmObj);
 	}
 	
+	@Test
+	public void newObjectEqualitySanityCheck() {
+		assertNotEquals( new Object(), new Object() );
+	}
+	
 	/// Test a simple get, not overlapping
 	@Test
 	public void basicGet() {

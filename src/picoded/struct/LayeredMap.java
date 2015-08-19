@@ -21,7 +21,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 	//----------------------------------------------
 	
 	/// Internal var used to represent null value
-	protected static Object nullObject = new Object();
+	protected static Object nullObject = picoded.enums.ObjectTokens.NULL;
 	
 	/// Internal layers of map to read / write values from
 	protected List<Map<K,V>> _layers = null;

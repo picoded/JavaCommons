@@ -128,7 +128,7 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		objMap.put(GUID.base58(), GUID.base58());
 		objMap.put(GUID.base58(), GUID.base58());
 
-		objMap.put("num", RandomUtils.nextFloat(0, Float.MAX_VALUE));
+		objMap.put("num", RandomUtils.nextFloat(0, 99999));
 		objMap.put("str_val", GUID.base58());
 
 		return objMap;

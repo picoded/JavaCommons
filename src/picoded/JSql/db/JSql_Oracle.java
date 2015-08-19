@@ -340,7 +340,10 @@ public class JSql_Oracle extends JSql {
 			tmpIndx = qString.toUpperCase().indexOf(" FROM ");
 			
 			if (tmpIndx > 0) {
-				qString = "SELECT " + tmpStr.substring(0, tmpIndx - 7).replaceAll("\"", "'").replaceAll("`", "'")
+				qString = "SELECT " 
+				    + tmpStr.substring(0, tmpIndx - 7)
+				    //.replaceAll("\"", "'")
+				    .replaceAll("`", "\"")
 					+ " FROM " + _fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx - 1));
 			} else {
 				qString = _fixTableNameInOracleSubQuery(fixedQuotes);

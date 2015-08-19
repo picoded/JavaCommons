@@ -19,7 +19,7 @@ import picoded.enums.*;
 /// + remoteDataMap (complete)     - full data map, used when the incomplete map is insufficent
 ///
 /// NOTE: This class should not be initialized directly, but through MetaTable class
-public class JStruct_MetaObject implements GenericConvertMap<String, Object> {
+public class JStruct_MetaObject implements MetaObject {
 	
 	// Core variables
 	//----------------------------------------------
@@ -47,18 +47,38 @@ public class JStruct_MetaObject implements GenericConvertMap<String, Object> {
 	/// Common setup function, across constructors
 	protected void commonSetup(JStruct_MetaTable inTable, String inOID, Map<String, Object> inRemoteData, boolean isCompleteData) {
 		mainTable = inTable;
-		_oid = inOID;
 	
 		// Generates a GUID if not given
-		if (_oid == null || _oid.length() < 22) {
+		if (inOID == null || inOID.length() < 22) {
+			// Issue a GUID
 			_oid = GUID.base58();
+			
+			// D= GUID collision check for LOLZ
+			remoteDataMap = mainTable.metaObjectRemoteDataMap_get(_oid);
+			if( remoteDataMap == null ) {
+				remoteDataMap = new HashMap<String,Object>();
+			}
+			
+			if(remoteDataMap.size() > 0 ) {
+				if( remoteDataMap.size() == 1 && remoteDataMap.get("_oid") != null ) {
+					// ignore if its just _oid
+				} else {
+					throw new RuntimeException("GUID Collision (╯°□°）╯︵ ┻━┻ : "+_oid);
+				}
+			}
+			isCompleteRemoteDataMap = true;
+			
+		} else {
+			// _oid setup
+			_oid = inOID;
+			
+			// Loading remote data map, only valid if _oid is given
+			remoteDataMap = inRemoteData;
+			if(remoteDataMap != null) {
+				isCompleteRemoteDataMap = isCompleteData;
+			}
 		}
 		
-		// Local data map
-		remoteDataMap = inRemoteData;
-		if(remoteDataMap != null) {
-			isCompleteRemoteDataMap = isCompleteData;
-		}
 	}
 	
 	/// Constructor, with metaTable and GUID (auto generated if null)
@@ -107,6 +127,17 @@ public class JStruct_MetaObject implements GenericConvertMap<String, Object> {
 			}
 		}
 		deltaDataMap = new HashMap<String, Object>();
+	}
+	
+	/// Raw keyset, that is unfiltered
+	protected Set<String> unfilteredForNullKeySet() {
+		Set<String> unfilteredForNull = new HashSet<String>();
+		
+		ensureCompleteRemoteDataMap();
+		unfilteredForNull.addAll( deltaDataMap.keySet() );
+		unfilteredForNull.addAll( remoteDataMap.keySet() );
+		
+		return unfilteredForNull;
 	}
 	
 	// Critical map functions
@@ -158,24 +189,12 @@ public class JStruct_MetaObject implements GenericConvertMap<String, Object> {
 		return put(key.toString(), null);
 	}
 	
-	/// Raw keyset, that is unfiltered
-	protected Set<String> unfilteredForNullKeySet() {
-		Set<String> unfilteredForNull = new HashSet<String>();
-		
-		ensureCompleteRemoteDataMap();
-		unfilteredForNull.addAll( deltaDataMap.keySet() );
-		unfilteredForNull.addAll( remoteDataMap.keySet() );
-		
-		return unfilteredForNull;
-	}
-	
 	/// Gets and return valid keySet()
 	public Set<String> keySet() {
 		Set<String> unfilteredForNull = unfilteredForNullKeySet();
 		Set<String> retSet = new HashSet<String>();
 		
 		for( String key : unfilteredForNull ) {
-			
 			if( key.equalsIgnoreCase("_oid") ) {
 				continue;
 			}

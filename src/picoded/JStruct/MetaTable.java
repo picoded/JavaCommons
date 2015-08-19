@@ -20,75 +20,53 @@ import picoded.conv.ListValueConv;
 /// 
 public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 
-	// ///
-	// /// Constructor vars
-	// ///--------------------------------------------------------------------------
-	// 
-	// /// Stores the key to value map
-	// protected Map<String, Map<String,Object>> valueMap = new ConcurrentHashMap<String, Map<String,Object>>();
-	// 
-	// /// Read write lock
-	// protected ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
-	// 
-	// ///
-	// /// Constructor setup
-	// ///--------------------------------------------------------------------------
-	// 
-	// /// Constructor
-	// public MetaTable() {
-	// 	// does nothing =X
-	// }
-	// 
-	// ///
-	// /// Temp mode optimization, used to indicate pure session like data,
-	// /// that does not require persistance (or even SQL)
-	// ///
-	// ///--------------------------------------------------------------------------
-	// 
-	// /// Temp value flag, defaults to false
-	// protected boolean isTempHint = false;
-	// 
-	// /// Gets if temp mode optimization hint is indicated
-	// /// Note that this only serve as a hint, as does not indicate actual setting
-	// ///
-	// /// @returns boolean  temp mode value
-	// public boolean getTempHint() {
-	// 	return isTempHint;
-	// }
-	// 
-	// /// Sets temp mode optimization indicator hint
-	// /// Note that this only serve as a hint, as does not indicate actual setting
-	// ///
-	// /// @param  mode  the new temp mode hint
-	// ///
-	// /// @returns boolean  previous value if set
-	// public boolean setTempHint(boolean mode) {
-	// 	boolean ret = isTempHint;
-	// 	isTempHint = mode;
-	// 	return ret;
-	// }
-	// 
-	// ///
-	// /// Backend system setup / teardown
-	// ///--------------------------------------------------------------------------
-	// 
-	// /// Setsup the backend storage table, etc. If needed
-	// public void systemSetup() {
-	// 	
-	// }
-	// 
-	// /// Teardown and delete the backend storage table, etc. If needed
-	// public void systemTeardown() {
-	// 	
-	// }
-	// 
-	// /// Perform maintenance, mainly removing of expired data if applicable
-	// public void maintenance() {
-	// 	
-	// }
-	// 
-	// ///
-	// /// Internal functions
-	// ///--------------------------------------------------------------------------
-	// 
+	///
+	/// Temp mode optimization, used to indicate pure session like data,
+	/// that does not require persistance (or even SQL)
+	///
+	///--------------------------------------------------------------------------
+	
+	/// Gets if temp mode optimization hint is indicated
+	/// Note that this only serve as a hint, as does not indicate actual setting
+	///
+	/// @returns boolean  temp mode value
+	public boolean getTempHint();
+	
+	/// Sets temp mode optimization indicator hint
+	/// Note that this only serve as a hint, as does not indicate actual setting
+	///
+	/// @param  mode  the new temp mode hint
+	///
+	/// @returns boolean  previous value if set
+	public boolean setTempHint(boolean mode);
+	
+	///
+	/// Backend system setup / teardown
+	///--------------------------------------------------------------------------
+	
+	/// Setsup the backend storage table, etc. If needed
+	public void systemSetup();
+	
+	/// Teardown and delete the backend storage table, etc. If needed
+	public void systemTeardown();
+	
+	/// Perform maintenance, mainly removing of expired data if applicable
+	public void maintenance();
+	
+	/// 
+	/// MetaObject operations
+	///--------------------------------------------------------------------------
+	
+	/// Generates a new blank object, with a GUID
+	public MetaObject newObject();
+	
+	/// Gets the MetaObject, regardless of its actual existance
+	public MetaObject uncheckedGet(String _oid);
+	
+	/// PUT, returns the object ID (especially when its generated), note that this
+	/// adds the value in a merger style. Meaning for example, existing values not explicitely
+	/// nulled or replaced are maintained
+	public MetaObject append(String _oid, Map<String, Object> obj);
+	
+	
 }

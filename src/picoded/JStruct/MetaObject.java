@@ -1,43 +1,33 @@
 package picoded.JStruct;
 
 /// Java imports
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.*;
-import java.util.List;
-import java.util.ArrayList;
-
-/// Picoded imports
-import picoded.conv.GUID;
-import picoded.JSql.*;
-import picoded.JCache.*;
-import picoded.struct.CaseInsensitiveHashMap;
-import picoded.struct.GenericConvertMap;
+import java.util.*;
+import picoded.struct.*;
 
 /// Represents a single object node in the MetaTable collection.
 ///
 /// NOTE: This class should not be initialized directly, but through MetaTable class
-public class MetaObject implements GenericConvertMap<String, Object> {
-
-	// ///
-	// /// Constructor vars
-	// ///--------------------------------------------------------------------------
-	// 
-	// /// Stores the key to value map
-	// protected ConcurrentHashMap<String, Object> valueMap = new ConcurrentHashMap<String, Object>();
-	// 
-	// /// Read write lock
-	// protected ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
-	// 
-	// ///
-	// /// Constructor setup
-	// ///--------------------------------------------------------------------------
-	// 
-	// /// Constructor
-	// public MetaObject() {
-	// 	// does nothing =X
-	// }
-	// 
+public interface MetaObject extends GenericConvertMap<String, Object> {
+	
+	/// The object ID
+	public String _oid();
+	
+	/// Gets and return its current value
+	public Object get(Object key);
+	
+	/// Put and set its delta value, set null is considered "remove"
+	public Object put(String key, Object value);
+	
+	/// Remove operation
+	public Object remove(Object key);
+	
+	/// Gets and return valid keySet()
+	public Set<String> keySet();
+	
+	/// Save the delta changes to storage
+	public void saveDelta();
+	
+	/// Save all the configured data, ignore delta handling
+	public void saveAll();
+	
 }

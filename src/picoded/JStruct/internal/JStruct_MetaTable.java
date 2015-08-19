@@ -97,6 +97,71 @@ public class JStruct_MetaTable implements MetaTable {
 		// does nothing?
 	}
 	
+	// MetaObject MAP operations
+	//----------------------------------------------
+
+	/// Gets the MetaObject, if it exists
+	public MetaObject get(Object _oid) {
+		try {
+			accessLock.readLock().lock();
+			
+			String oid = _oid.toString();
+			Map<String,Object> fullMap = metaObjectRemoteDataMap_get(oid);
+			
+			if( fullMap == null ) {
+				return null;
+			}
+			return new JStruct_MetaObject(this, oid, fullMap, true);
+		} finally {
+			accessLock.readLock().unlock();
+		}
+	}
+	
+	/// Gets the full keySet
+	public Set<String> keySet() {
+		return valueMap.keySet();
+	}
+	
+	/// Remove the node
+	public MetaObject remove(Object key) {
+		valueMap.remove(key);
+		return null;
+	}
+	
+	// MetaObject operations
+	//----------------------------------------------
+
+	/// Generates a new blank object, with a GUID
+	public MetaObject newObject() {
+		MetaObject ret = new JStruct_MetaObject(this, null, null, false);
+		return ret;
+	}
+	
+	/// Gets the MetaObject, regardless of its actual existance
+	public MetaObject uncheckedGet(String _oid) {
+		return new JStruct_MetaObject(this, _oid, null, false);
+	}
+	
+	/// PUT, returns the object ID (especially when its generated), note that this
+	/// adds the value in a merger style. Meaning for example, existing values not explicitely
+	/// nulled or replaced are maintained
+	public MetaObject append(String _oid, Map<String, Object> obj) {
+		
+		/// Appending a MetaObject is equivalent of saveDelta
+		MetaObject r = null;
+		if (obj instanceof MetaObject && ((MetaObject) obj)._oid().equals(_oid)) {
+			(r = (MetaObject) obj).saveDelta();
+			return r;
+		}
+		
+		/// Unchecked get, put, and save
+		r = uncheckedGet(_oid);
+		r.putAll(obj);
+		r.saveDelta();
+		
+		return r;
+	}
+
 	///
 	/// Internal functions, used by MetaObject
 	///--------------------------------------------------------------------------
@@ -106,15 +171,17 @@ public class JStruct_MetaTable implements MetaTable {
 		return ConvertJSON.toObject( ConvertJSON.fromObject(in) );
 	}
 	
-	/// Gets the complete remote data map, for MetaObject
+	/// Gets the complete remote data map, for MetaObject.
+	/// Returns null
 	protected Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
 		try {
 			accessLock.readLock().lock();
 			
-			Map<String, Object> ret = new HashMap<String,Object>();
+			Map<String, Object> ret = null;
 			Map<String, Object> storedValue = valueMap.get(_oid);
 			
 			if( storedValue != null ) {
+				ret = new HashMap<String,Object>();
 				for( String key : storedValue.keySet() ) {
 					ret.put( key, detachValue(storedValue.get(key)) );
 				}

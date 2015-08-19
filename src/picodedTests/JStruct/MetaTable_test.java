@@ -28,7 +28,7 @@ public class MetaTable_test {
 	/// To override for implementation
 	///------------------------------------------------------
 	public MetaTable implementationConstructor() {
-		return null;
+		return (new JStruct()).getMetaTable("test");
 	}
 	
 	/// Setup and sanity test
@@ -70,26 +70,54 @@ public class MetaTable_test {
 	
 		return objMap;
 	}
-	// 
+	
+	@Test
+	public void newObjectTest() {
+		MetaObject moObj = null;
+		
+		assertNotNull( moObj = mtObj.newObject() );
+		moObj.put("be", "happy");
+		moObj.saveDelta();
+		
+		String guid = null;
+		assertNotNull( guid = moObj._oid() );
+		
+		assertNotNull( moObj = mtObj.get(guid) );
+		assertEquals( "happy", moObj.get("be") );
+	}
+	
+	@Test
+	public void basicTest()  {
+		String guid = GUID.base58();
+		assertNull(mtObj.get(guid));
+	
+		HashMap<String, Object> objMap = randomObjMap();
+		assertEquals(guid, mtObj.append(guid, objMap)._oid());
+	
+		objMap.put("_oid", guid);
+		assertEquals(objMap, mtObj.get(guid));
+	
+		objMap = randomObjMap();
+		assertNotNull(guid = mtObj.append(null, objMap)._oid());
+		objMap.put("_oid", guid);
+		assertEquals(objMap, mtObj.get(guid));
+	}
+	
+	/// Checks if a blank object gets saved
+	@Test
+	public void blankObjectSave()  {
+		String guid = null;
+		MetaObject p = null;
+		assertFalse( mtObj.containsKey("hello") );
+		assertNotNull( p = mtObj.newObject() );
+		assertNotNull( guid = p._oid() );
+		p.saveDelta();
+		
+		assertTrue( mtObj.containsKey(guid) );
+	}
+	
 	// @Test
-	// public void basicTest() throws JStackException {
-	// 	String guid = GUID.base58();
-	// 	assertNull(mtObj.get(guid));
-	// 
-	// 	HashMap<String, Object> objMap = randomObjMap();
-	// 	assertEquals(guid, mtObj.append(guid, objMap)._oid());
-	// 
-	// 	objMap.put("_oid", guid);
-	// 	assertEquals(objMap, mtObj.get(guid));
-	// 
-	// 	objMap = randomObjMap();
-	// 	assertNotNull(guid = mtObj.append(null, objMap)._oid());
-	// 	objMap.put("_oid", guid);
-	// 	assertEquals(objMap, mtObj.get(guid));
-	// }
-	// 
-	// @Test
-	// public void basicTestMultiple() throws JStackException {
+	// public void basicTestMultiple()  {
 	// 
 	// 	// Useful for debugging
 	// 	JStackObj = new JStack(JSql.sqlite("./test-files/tmp/sqliteTest.db"));
@@ -113,7 +141,7 @@ public class MetaTable_test {
 	// }
 	// 
 	// @Test
-	// public void indexBasedTest() throws JStackException {
+	// public void indexBasedTest()  {
 	// 
 	// 	mtObj.append(null, genNumStrObj(1, "this"));
 	// 	mtObj.append(null, genNumStrObj(2, "is"));
@@ -142,12 +170,11 @@ public class MetaTable_test {
 	// 
 	// }
 	// 
-	// 
 	// ///
 	// /// An exception occurs, if a query fetch occurs with an empty table
 	// ///
 	// @Test
-	// public void issue47_exceptionWhenTableIsEmpty() throws JStackException {
+	// public void issue47_exceptionWhenTableIsEmpty()  {
 	// 	MetaObject[] qRes = null;
 	// 	assertNotNull(qRes = mtObj.queryObjects(null, null));
 	// 	assertEquals(0, qRes.length);
@@ -159,7 +186,7 @@ public class MetaTable_test {
 	// /// AKA: Incomplete object does not appear in view index
 	// ///
 	// @Test
-	// public void innerJoinFlaw() throws JStackException {
+	// public void innerJoinFlaw()  {
 	// 	mtObj.append(null, genNumStrObj(1, "hello world"));
 	// 
 	// 	HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
@@ -184,31 +211,8 @@ public class MetaTable_test {
 	// 	assertEquals(2, qRes.length);
 	// }
 	// 
-	// ///
-	// /// This test cases covers a rather nasty bug, where meta objects,
-	// /// with 1 or less parameters (excluding _oid) is unloadable.
-	// ///
-	// /// This was found to be due to a mis-typo of <= 0 to <= 1 in JSqlResultToMap
-	// ///
 	// @Test
-	// public void missingNumError() throws JStackException {
-	// 	HashMap<String, Object> objMap = new HashMap<String,Object>();
-	// 	objMap.put("str_val", "^_^");
-	// 
-	// 	String guid = GUID.base58();
-	// 	assertNull(mtObj.get(guid));
-	// 	assertEquals(guid, mtObj.append(guid, objMap)._oid());
-	// 
-	// 	MetaObject[] qRes = null;
-	// 	assertNotNull(qRes = mtObj.queryObjects(null, null));
-	// 	assertEquals(1, qRes.length);
-	// 
-	// 	objMap.put("_oid", guid);
-	// 	assertEquals(objMap, mtObj.get(guid));
-	// }
-	// 
-	// @Test
-	// public void missingStrError() throws JStackException {
+	// public void missingStrError()  {
 	// 	HashMap<String, Object> objMap = new HashMap<String,Object>();
 	// 	objMap.put("num", 123);
 	// 
@@ -225,7 +229,7 @@ public class MetaTable_test {
 	// }
 	// 
 	// @Test
-	// public void missingNumWithSomeoneElse() throws JStackException {
+	// public void missingNumWithSomeoneElse()  {
 	// 	mtObj.append(null, genNumStrObj(1, "hello world"));
 	// 
 	// 	HashMap<String, Object> objMap = new HashMap<String,Object>();
@@ -245,20 +249,8 @@ public class MetaTable_test {
 	// 	assertEquals(objMap, mtObj.get(guid));
 	// }
 	// 
-	// /// Checks if a blank object gets saved
 	// @Test
-	// public void blankObjectSave() throws JStackException {
-	// 	String guid = null;
-	// 	MetaObject p = null;
-	// 	assertFalse( mtObj.containsKey("hello") );
-	// 	assertNotNull( p = mtObj.newObject() );
-	// 	assertNotNull( guid = p._oid() );
-	// 	
-	// 	assertTrue( mtObj.containsKey(guid) );
-	// }
-	// 
-	// @Test
-	// public void getFromKeyNames_basic() throws JStackException {
+	// public void getFromKeyNames_basic()  {
 	// 	
 	// 	mtObj.append(null, genNumStrObj(1, "one"));
 	// 	mtObj.append(null, genNumStrObj(2, "two"));
@@ -277,7 +269,7 @@ public class MetaTable_test {
 	// }
 	// 
 	// @Test
-	// public void nonIndexedKeySaveCheck() throws JStackException {
+	// public void nonIndexedKeySaveCheck()  {
 	// 	
 	// 	// Generates single node
 	// 	mtObj.append(null, genNumStrObj(1, "hello world"));
@@ -306,7 +298,7 @@ public class MetaTable_test {
 	// }
 	// 
 	// @Test
-	// public void getFromKeyNames_customKeys() throws JStackException {
+	// public void getFromKeyNames_customKeys()  {
 	// 	
 	// 	// Generates single node
 	// 	mtObj.append(null, genNumStrObj(1, "hello world"));
@@ -344,7 +336,7 @@ public class MetaTable_test {
 	// //-----------------------------------------------
 	// 
 	// @Test
-	// public void testSingleMappingSystem() throws JStackException
+	// public void testSingleMappingSystem() 
 	// {
 	// 	//System.out.println("Starting single mapping test");
 	// 	mtObj.clearTypeMapping();
@@ -361,7 +353,7 @@ public class MetaTable_test {
 	// }
 	// 
 	// @Test
-	// public void testMapMappingSystem() throws JStackException
+	// public void testMapMappingSystem() 
 	// {
 	// 	//System.out.println("Starting map mapping test");
 	// 	mtObj.clearTypeMapping();

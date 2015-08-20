@@ -143,8 +143,13 @@ public class CombinationBase implements Query {
 			++iteration;
 		}
 		
-		if( iteration == 1 ) {
-			return operatorSymbol() + "( "+ret.toString()+" )";
+		if( iteration == 1 && !(operatorSymbol().equals("AND")) ) {
+			String retStr = ret.toString();
+			
+			if( retStr.startsWith("(") ) {
+				return operatorSymbol()+retStr ;
+			}
+			return operatorSymbol() + "( "+retStr+" )";
 		}
 		
 		return ret.toString();

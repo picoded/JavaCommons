@@ -22,21 +22,23 @@ public class AllConditions_test {
 	/// Map sample, used to setup test cases
 	public Map<String,Object> sample_a = null;
 	public Map<String,Object> sample_b = null;
-	public Map<String,Object> sample_c = null;
-	public Map<String,Object> sample_d = null;
+	
+	public Map<String,Object> arguments_a = null;
+	public Map<String,Object> arguments_b = null;
 	
 	@Before
 	public void setUp() {
 		sample_a = new HashMap<String,Object>();
 		sample_b = new HashMap<String,Object>();
-		sample_c = new HashMap<String,Object>();
-		sample_d = new HashMap<String,Object>();
+		
+		arguments_a = new HashMap<String,Object>();
+		arguments_b = new HashMap<String,Object>();
 		
 		sample_a.put("hello", "world");
 		sample_b.put("hello", "perfect world");
 		
-		sample_c.put("my", "world");
-		sample_d.put("my", "perfect world");
+		arguments_a.put("my", "world");
+		arguments_b.put("my", "perfect world");
 	}
 	
 	@After
@@ -57,14 +59,35 @@ public class AllConditions_test {
 	/// Test simple equality checks
 	@Test
 	public void equals() {
-		Query cond = new Equals("hello", "my", sample_c);
 		
+		/// For example, the following SQL query will make this condition query
+		///
+		/// sql.query( "SELECT * FROM collection WHERE hello=:my:", { my:"world"} );
+		///
+		
+		/// arguments_a is the argument value map
+		Query cond = new Equals("hello", "my", arguments_a);
 		assertNotNull(cond);
+		
+		//
+		// Check using constructed arguments
+		//
+		
+		/// sample_a["hello"] == arguments_a["my"]
 		assertTrue( cond.test(sample_a) );
+		
+		/// sample_b["hello"] == arguments_a["my"]
 		assertFalse( cond.test(sample_b) );
 		
-		assertFalse( cond.test(sample_a, sample_d) );
-		assertTrue( cond.test(sample_b, sample_d) );
+		//
+		// Check using provided arguments
+		//	
+		
+		/// sample_a["hello"] == arguments_b["my"]
+		assertFalse( cond.test(sample_a, arguments_b) );
+		
+		/// sample_b["hello"] == arguments_b["my"]
+		assertTrue( cond.test(sample_b, arguments_b) );
 		
 	}
 }

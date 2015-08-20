@@ -149,6 +149,11 @@ public class ConditionBase implements Query {
 	// Public accessors
 	//--------------------------------------------------------------------
 	
+	/// Indicates if its a basic operator 
+	public boolean isBasicOperator() {
+		return true;
+	}
+	
 	/// Gets the query type 
 	///
 	/// [to override on extension]

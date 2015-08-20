@@ -39,16 +39,31 @@ public interface Query extends Predicate<Object> {
 	public QueryType type();
 	
 	//
-	// condition only accessors
+	// Condition only accessors
 	//--------------------------------------------------------------------
 	
 	/// Gets the field name
-	public String fieldName();
+	public default String fieldName() {
+		return null;
+	}
 	
 	/// Gets the argument name
-	public String argumentName();
+	public default String argumentName() {
+		return null;
+	}
 	
 	/// Gets the default argument map
-	public Map<String,Object> defaultArgumentMap();
+	public default Map<String,Object> defaultArgumentMap() {
+		return null;
+	}
+	
+	/// Indicates if its a basic operator
+	public default boolean isBasicOperator() {
+		return false;
+	}
+	
+	//
+	// Combination only accessors
+	//--------------------------------------------------------------------
 	
 }

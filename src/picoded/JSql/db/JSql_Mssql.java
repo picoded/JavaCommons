@@ -212,7 +212,10 @@ public class JSql_Mssql extends JSql {
 			tmpIndx = qString.toUpperCase().indexOf(" FROM ");
 			
 			if (tmpIndx > 0) {
-				qString = "SELECT " + tmpStr.substring(0, tmpIndx - 7).replaceAll("\"", "'").replaceAll("`", "'")
+				qString = "SELECT "
+				    + tmpStr.substring(0, tmpIndx - 7)
+				    //.replaceAll("\"", "'")
+				    .replaceAll("`", "\"")
 					+ " FROM " + _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx - 1));
 			} else {
 				qString = _fixTableNameInMssqlSubQuery(fixedQuotes);

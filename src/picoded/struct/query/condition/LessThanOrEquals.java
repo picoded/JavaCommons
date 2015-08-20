@@ -7,7 +7,7 @@ import java.util.*;
 import picoded.struct.query.QueryType;
 import picoded.struct.query.internal.QueryUtils;
 
-public class MoreThan extends ConditionBase {
+public class LessThanOrEquals extends ConditionBase {
 	
 	//
 	// Constructor Setup
@@ -19,7 +19,7 @@ public class MoreThan extends ConditionBase {
 	/// @param   default argument name to test against
 	/// @param   default argument map to get test value
 	///
-	public MoreThan(String field, String argName, Map<String,Object> defaultArgMap) {
+	public LessThanOrEquals(String field, String argName, Map<String,Object> defaultArgMap) {
 		super(field, argName, defaultArgMap);
 	}
 	
@@ -50,9 +50,9 @@ public class MoreThan extends ConditionBase {
 			if(fieldObj instanceof String && argObj instanceof String){
 				Collator collator = RuleBasedCollator.getInstance(Locale.ENGLISH);
 				int result = collator.compare(fieldObj, argObj);
-				return result > 0 ? true : false;
+				return result <= 0 ? true : false;
 			}else if(fieldObj instanceof Double && argObj instanceof Double){
-				return (Double)fieldObj > (Double)argObj ? true : false;
+				return (Double)fieldObj <= (Double)argObj ? true : false;
 			}else{
 				throw new RuntimeException("These values cannot be compared");
 			}
@@ -64,7 +64,7 @@ public class MoreThan extends ConditionBase {
 	///
 	/// [to override on extension]
 	public QueryType type() {
-		return QueryType.MORE_THAN;
+		return QueryType.LESS_THAN_OR_EQUALS;
 	}
 	
 } 

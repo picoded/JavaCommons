@@ -6,6 +6,7 @@ import java.text.RuleBasedCollator;
 import java.util.*;
 
 import picoded.struct.query.QueryType;
+import picoded.struct.query.internal.QueryUtils;
 
 public class LessThan extends ConditionBase {
 	
@@ -44,42 +45,22 @@ public class LessThan extends ConditionBase {
 				return true;
 			}
 		}else{
-			if(fieldValue instanceof String){
-				if(((String) fieldValue).matches("[0-9]+")){
-					try{
-						Number fieldAsNumber = NumberFormat.getNumberInstance(Locale.ENGLISH).parse((String)fieldValue);
-						Number argAsNumber = NumberFormat.getNumberInstance(Locale.ENGLISH).parse((String)argValue);
-						
-						return fieldAsNumber.doubleValue() < argAsNumber.doubleValue() ? true : false;
-					}catch(Exception ex){
-						throw new RuntimeException("exception in testValues-> " +ex.getMessage());
-					}
-				}else{
-					Collator rbc = RuleBasedCollator.getInstance();
-					int result = rbc.compare(fieldValue, argValue);
-					return result < 0 ? true : false;
-				}
+			Object fieldObj = QueryUtils.normalizeObject(fieldValue);
+			Object argObj = QueryUtils.normalizeObject(argValue);
+			
+			if(fieldObj instanceof String && argObj instanceof String){
+				Collator collator = RuleBasedCollator.getInstance(Locale.ENGLISH);
+				int result = collator.compare(fieldObj, argObj);
+				return result < 0 ? true : false;
+			}else if(fieldObj instanceof Double && argObj instanceof Double){
+				return (Double)fieldObj < (Double)argObj ? true : false;
 			}else{
-				Double a = normalizeNumber(fieldValue);
-				Double b = normalizeNumber(argValue);
-				
-				return a < b ? true : false;
+				throw new RuntimeException("These values cannot be compared");
 			}
 		}
 		return false;
 	}
 	
-	private Double normalizeNumber(Object number){
-		Double val = null;
-		if(number instanceof Integer){
-			val = (Double)((Integer)number * 1.0);
-		}else if(number instanceof Float){
-			val = (Double)((Float)number * 1.0);
-		}else if(number instanceof Double){
-			val = (Double)number;
-		}
-		return val;
-	}
 	
 	
 	/// Gets the query type 

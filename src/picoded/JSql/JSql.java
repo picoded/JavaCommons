@@ -129,6 +129,8 @@ public class JSql extends BaseInterface {
 					ps.setLong(pt + 1, (Long) argObj);
 				} else if (Double.class.isInstance(argObj)) {
 					ps.setDouble(pt + 1, (Double) argObj);
+				} else if (Float.class.isInstance(argObj)) {
+					ps.setFloat(pt + 1, (Float) argObj);
 				} else {
 					String argClassName = argObj.getClass().getName();
 					throw new JSqlException("Unknown argument type (" + pt + ") : " + (argClassName));
@@ -179,7 +181,7 @@ public class JSql extends BaseInterface {
 				}
 			}
 		} catch (Exception e) {
-			throw new JSqlException("executeQuery_raw exception", e);
+			throw new JSqlException("executeQuery_raw exception: " + qString, e);
 		}
 	}
 	
@@ -223,7 +225,32 @@ public class JSql extends BaseInterface {
 				}
 			}
 		} catch (Exception e) {
-			throw new JSqlException("execute_raw exception", e);
+			throw new JSqlException("execute_raw exception : " + qString, e);
+		}
+		return false;
+	}
+	
+	/// Executes and dispose the sqliteResult object. Similar to executeQuery but uses the Statement class
+	/// Returns false if no result object is given by the execution call. This is raw execution.
+	public boolean execute_query(String qString) throws JSqlException {
+		try {
+			Statement ps = sqlConn.createStatement();
+			ResultSet rs = null;
+			try {
+				rs = ps.executeQuery(qString);
+				if (rs != null) {
+					return true;
+				}
+			} finally {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			}
+		} catch (Exception e) {
+			throw new JSqlException("execute_query exception : " + qString, e);
 		}
 		return false;
 	}

@@ -165,15 +165,121 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	/// Internal JSql index setup
 	///--------------------------------------------------------------------------
 
+	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
+	protected void JSqlMakeIndexViewQuery(JSql sql) throws JSqlException {
+
+		StringBuilder sb = new StringBuilder("CREATE VIEW "); //OR REPLACE
+		sb.append(sqlViewName(sql, "view"));
+		sb.append(" AS ");
+
+		String lBracket = "'";
+		String rBracket = "'";
+		String joinType = "LEFT";
+
+		if (sql.sqlType == JSqlType.mssql) {
+			lBracket = "[";
+			rBracket = "]";
+		}
+
+		String tableName = sqlTableName(sql);
+
+		StringBuilder select = new StringBuilder(" SELECT B.oID AS ");
+		select.append(lBracket + "_oid" + rBracket);
+		select.append(", B.oTm AS ");
+		select.append(lBracket + "_otm" + rBracket);
+
+		StringBuilder from = new StringBuilder(" FROM ");
+
+		from.append("(SELECT DISTINCT oID, oTm FROM " + tableName + ")");
+		//from.append( tableName );
+		from.append(" AS B");
+
+		String key;
+		MetaType type;
+
+		ArrayList<Object> argList = new ArrayList<Object>();
+
+		int joinCount = 0;
+		for (Map.Entry<String, MetaType> e : typeMapping.entrySet()) {
+			key = e.getKey();
+			type = e.getValue();
+
+			if (type.valueType >= MetaType.TYPE_INTEGER && type.valueType <= MetaType.TYPE_FLOAT) {
+
+				select.append(", N" + joinCount + ".nVl AS ");
+				select.append(lBracket + key + rBracket);
+
+				from.append(" "+joinType+" JOIN " + tableName + " AS N" + joinCount);
+				from.append(" ON B.oID = N" + joinCount + ".oID");
+				from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = '" + key + "'");
+
+			} else if (type.valueType == MetaType.TYPE_STRING) {
+
+				select.append(", S" + joinCount + ".tVl AS ");
+				select.append(lBracket + key + rBracket);
+
+				select.append(", S" + joinCount + ".sVl AS ");
+				select.append(lBracket + key + "_lc" + rBracket);
+
+				from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
+				from.append(" ON B.oID = S" + joinCount + ".oID");
+				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
+
+			} else if (type.valueType == MetaType.TYPE_TEXT) {
+
+				select.append(", S" + joinCount + ".tVl AS ");
+				select.append(lBracket + key + rBracket);
+
+				from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
+				from.append(" ON B.oID = S" + joinCount + ".oID");
+				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
+			}
+
+			++joinCount;
+		}
+
+		sb.append(select);
+		sb.append(from);
+
+		sql.execute(sb.toString());
+	}
+
 	/// Setsup the index view configuration table,
 	/// @TODO : To check against configuration table, and makes the changes ONLY when needed
 	protected void JSqlIndexConfigTableSetup(JSql sql) throws JSqlException {
-		typeMapping.JSqlIndexViewFullBuild( //
-			sqlViewName(sql, "vCfg"), //
-			sqlViewName(sql, "view"), //
-			sqlTableName(sql), //
-			sql // 
-		); //
+		String tName = sqlViewName(sql, "vCfg");
+
+		// Table constructor
+		//-------------------
+		sql.createTableQuerySet( //
+			tName, //
+			new String[] { //
+			"nme", //Index column name
+				"typ", //Index column type
+				"con" //Index type string value
+			}, //
+			new String[] { //
+			keyColumnType, //
+				typeColumnType, //
+				keyColumnType //
+			} //
+			).execute(); //
+
+		// Checks if the view needs to be recreated
+		boolean recreatesView = false;
+
+		//
+		// @TODO Change detection
+		//
+
+		// Checks if view actually needs recreation?
+		recreatesView = true;
+
+		// Recreates the view if needed
+		if (recreatesView) {
+			sql.execute("DROP VIEW IF EXISTS " + sqlViewName(sql, "view"));
+			JSqlMakeIndexViewQuery(sql);
+		}
 	}
 
 	///
@@ -243,6 +349,10 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 		if (baseType >= MetaType.TYPE_INTEGER && baseType <= 34) {
 			if (baseType == MetaType.TYPE_INTEGER) {
 				return new Integer(((Number) (r.get("nVl").get(pos))).intValue());
+			} else if (baseType == MetaType.TYPE_FLOAT) {
+				return new Float(((Number) (r.get("nVl").get(pos))).floatValue());
+			} else if (baseType == MetaType.TYPE_DOUBLE) {
+				return new Double(((Number) (r.get("nVl").get(pos))).doubleValue());
 			}
 		} else if (baseType == MetaType.TYPE_STRING) { // String
 			return (String) (r.get("tVl").get(pos));
@@ -316,6 +426,64 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 
 	}
 
+	/// JSQL based Append
+	protected void JSqlObjectAppend(JSql sql, String _oid, Map<String, Object> obj, Set<String> keyList,
+		boolean handleQuery) throws JSqlException {
+
+		boolean sqlMode = handleQuery ? sql.getAutoCommit() : false;
+		if (sqlMode) {
+			sql.setAutoCommit(false);
+		}
+
+		try {
+
+			Object ret = JStackReverseIterate( new JStackReader() {
+				/// Reads only the JSQL layer
+				public Object readJSqlLayer(JSql sql, Object ret) throws JSqlException, JStackException {
+					String tName = sqlTableName(sql);
+
+					Object[] typSet;
+					String k;
+					Object v;
+		
+					for (Map.Entry<String, Object> entry : obj.entrySet()) {
+		
+						k = (entry.getKey()).toLowerCase();
+						if ( /*k.equals("oid") || k.equals("_oid") ||*/ k.equals("_otm")) { //reserved
+							continue;
+						}
+		
+						if (keyList != null && !keyList.contains(k)) {
+							continue;
+						}
+		
+						v = entry.getValue();
+						typSet = valueToOptionSet(k, v);
+
+						// This is currently only for NON array mode
+						sql.upsertQuerySet( //
+							tName, //
+							new String[] { "oID", "kID", "idx" }, //
+							new Object[] { _oid, k, 0 }, //
+							//
+							new String[] { "typ", "nVl", "sVl", "tVl" }, //
+							new Object[] { typSet[0], typSet[1], typSet[2], typSet[3] }, //
+							null, null, null//
+							).execute();
+					}
+					return ret;
+				}
+			} );
+			sql.commit();
+		} catch (JStackException e) {
+			throw new RuntimeException(e);
+		} finally {
+			if (sqlMode) {
+				sql.setAutoCommit(true);
+			}
+		}
+	}
+
 	/// Values to option set conversion
 	///
 	/// @TODO: Support the various numeric value
@@ -330,6 +498,10 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	protected Object[] valueToOptionSet(String key, Object value) throws JSqlException {
 		if (value instanceof Integer) {
 			return new Object[] { new Integer(MetaType.TYPE_INTEGER), value, null, null }; //Typ, N,S,I,T
+		} else if (value instanceof Float) {
+			return new Object[] { new Float(MetaType.TYPE_FLOAT), value, null, null }; //Typ, N,S,I,T
+		} else if (value instanceof Double) {
+			return new Object[] { new Double(MetaType.TYPE_DOUBLE), value, null, null }; //Typ, N,S,I,T
 		} else if (value instanceof String) {
 			return new Object[] { new Integer(MetaType.TYPE_STRING), 0, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
 		}
@@ -349,12 +521,12 @@ public class MetaTable extends JStackData implements UnsupportedDefaultMap<Strin
 	protected Map<String, List<Object>> JSqlQuery(JSql sql, String selectCols, String whereClause,
 		Object[] whereValues, String orderBy, long limit, long offset) throws JSqlException {
 		if (selectCols == null) {
-			selectCols = "_oid";
+			selectCols = "\"_oid\"";
 		} else {
 			//selectCols = selectCols.toLowerCase();
 
 			if (selectCols.indexOf("_oid") == -1) {
-				selectCols = "_oid, " + selectCols;
+				selectCols = "\"_oid\", " + selectCols;
 			}
 		}
 

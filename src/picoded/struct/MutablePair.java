@@ -17,7 +17,4 @@ import java.util.ArrayList;
 ///
 public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePair<L, R> /*implements List<Object> */{
 	
-	/// Java serialversion uid: http://stackoverflow.com/questions/285793/what-is-a-serialversionuid-and-why-should-i-use-it
-	private static final long serialVersionUID = 42L;
-	
 }

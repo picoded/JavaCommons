@@ -1,4 +1,4 @@
-package picoded.JStruct;
+package picoded.struct;
 
 import picoded.struct.*;
 

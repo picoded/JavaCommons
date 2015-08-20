@@ -1,6 +1,7 @@
 package picoded.struct.query.condition;
 
 import java.util.*;
+import picoded.struct.query.*;
 
 public class Equals extends ConditionBase {
 	

@@ -4,7 +4,7 @@ import java.util.*;
 
 import picoded.struct.query.QueryType;
 
-public class Equals extends ConditionBase {
+public class MoreThan extends ConditionBase {
 	
 	//
 	// Constructor Setup
@@ -16,7 +16,7 @@ public class Equals extends ConditionBase {
 	/// @param   default argument name to test against
 	/// @param   default argument map to get test value
 	///
-	public Equals(String field, String argName, Map<String,Object> defaultArgMap) {
+	public MoreThan(String field, String argName, Map<String,Object> defaultArgMap) {
 		super(field, argName, defaultArgMap);
 	}
 	

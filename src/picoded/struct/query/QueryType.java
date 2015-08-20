@@ -14,7 +14,7 @@ public enum QueryType {
 	
 	AND(0),
 	OR(1),
-	NOT(2),
+	NOT(2), //Is actually and inverse of AND
 	
 	//
 	// Comparision types

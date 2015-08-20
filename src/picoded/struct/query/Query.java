@@ -66,4 +66,13 @@ public interface Query extends Predicate<Object> {
 	// Combination only accessors
 	//--------------------------------------------------------------------
 	
+	/// Indicates if its a combination operator
+	public default boolean isCombinationOperator() {
+		return false;
+	}
+	
+	/// Gets the children conditions
+	public default Set<Query> childrenQuery() {
+		return null;
+	}
 }

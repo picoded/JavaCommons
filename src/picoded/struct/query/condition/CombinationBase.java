@@ -106,4 +106,48 @@ public class CombinationBase implements Query {
 	public Set<Query> childrenQuery() {
 		return _children;
 	}
+	
+	//
+	// String handling
+	//--------------------------------------------------------------------
+	
+	/// The operator symbol support
+	public String operatorSymbol() {
+		return "AND";
+	}
+	
+	/// The query string
+	public String toString() {
+		StringBuilder ret = new StringBuilder();
+		
+		int iteration = 0;
+		for(Query child : _children) {
+			
+			if( iteration > 0 ) {
+				ret.append( " " );
+				ret.append( operatorSymbol() );
+			}
+			
+			ret.append( " " );
+			
+			if( child.isCombinationOperator() ) {
+				ret.append( "(" );
+			}
+			
+			ret.append( child.toString() );
+			
+			if( child.isCombinationOperator() ) {
+				ret.append( ")" );
+			}
+			
+			++iteration;
+		}
+		
+		if( iteration == 1 ) {
+			return operatorSymbol() + "( "+ret.toString()+" )";
+		}
+		
+		return ret.toString();
+	}
+	
 } 

@@ -75,4 +75,15 @@ public interface Query extends Predicate<Object> {
 	public default Set<Query> childrenQuery() {
 		return null;
 	}
+	
+	//
+	// To string conversion
+	//--------------------------------------------------------------------
+	
+	/// Gets the operator symbol
+	public String operatorSymbol();
+	
+	/// Returns the query string
+	public String toString();
+	
 }

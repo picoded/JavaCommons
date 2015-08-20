@@ -62,4 +62,11 @@ public class Or extends CombinationBase {
 		return QueryType.OR;
 	}
 	
+	/// The operator symbol support
+	///
+	/// [to override on extension]
+	public String operatorSymbol() {
+		return "OR";
+	}
+	
 } 

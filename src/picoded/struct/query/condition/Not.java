@@ -63,4 +63,11 @@ public class Not extends CombinationBase {
 		return QueryType.NOT;
 	}
 	
+	/// The operator symbol support
+	///
+	/// [to override on extension]
+	public String operatorSymbol() {
+		return "NOT";
+	}
+	
 } 

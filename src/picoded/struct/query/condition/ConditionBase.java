@@ -175,4 +175,21 @@ public class ConditionBase implements Query {
 	public Map<String,Object> defaultArgumentMap() {
 		return _argMap;
 	}
+	
+	//
+	// String handling
+	//--------------------------------------------------------------------
+	
+	/// The operator symbol support
+	///
+	/// [to override on extension]
+	public String operatorSymbol() {
+		return "=";
+	}
+	
+	/// The query string
+	public String toString() {
+		return fieldName() + " " + operatorSymbol() + " " + ":" + argumentName();
+	}
+	
 } 

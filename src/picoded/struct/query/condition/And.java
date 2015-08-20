@@ -63,4 +63,11 @@ public class And extends CombinationBase {
 		return QueryType.AND;
 	}
 	
+	/// The operator symbol support
+	///
+	/// [to override on extension]
+	public String operatorSymbol() {
+		return "AND";
+	}
+	
 } 

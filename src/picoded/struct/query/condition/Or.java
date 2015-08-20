@@ -14,15 +14,6 @@ public class Or extends CombinationBase {
 	/// @param   set of children queries
 	/// @param   default argument map to get test value
 	///
-	public Or(Set<Query> child, Map<String,Object> defaultArgMap) {
-		super(child, defaultArgMap);
-	}
-	
-	/// The constructor with the field name, and default argument
-	///
-	/// @param   set of children queries
-	/// @param   default argument map to get test value
-	///
 	public Or(List<Query> child, Map<String,Object> defaultArgMap) {
 		super(child, defaultArgMap);
 	}

@@ -80,6 +80,6 @@ public class AllCombinations_test {
 		assertFalse( cond.test(sample_a, arguments_b) );
 		assertTrue( cond.test(sample_b, arguments_b) );
 		
-		assertNotNull( cond.toString() );
+		assertEquals( "hello = :hello AND my = :my", cond.toString() );
 	}
 }

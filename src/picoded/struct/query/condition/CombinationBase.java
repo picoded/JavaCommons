@@ -19,7 +19,7 @@ public class CombinationBase implements Query {
 	//--------------------------------------------------------------------
 	
 	/// The children query objects
-	protected Set<Query> _children = null;
+	protected List<Query> _children = null;
 	
 	/// The constructed argument map
 	protected Map<String,Object> _argMap = null;
@@ -33,18 +33,8 @@ public class CombinationBase implements Query {
 	/// @param   children conditions to test
 	/// @param   default argument map to get test value
 	///
-	public CombinationBase(Set<Query> childQuery, Map<String,Object> defaultArgMap) {
-		_children = childQuery;
-		_argMap = defaultArgMap;
-	}
-	
-	/// The constructor with the field name, and default argument
-	///
-	/// @param   children conditions to test
-	/// @param   default argument map to get test value
-	///
 	public CombinationBase(List<Query> childQuery, Map<String,Object> defaultArgMap) {
-		_children = new HashSet<Query>(childQuery);
+		_children = childQuery;
 		_argMap = defaultArgMap;
 	}
 	
@@ -103,7 +93,7 @@ public class CombinationBase implements Query {
 	}
 	
 	/// Gets the children conditions
-	public Set<Query> childrenQuery() {
+	public List<Query> childrenQuery() {
 		return _children;
 	}
 	
@@ -152,7 +142,7 @@ public class CombinationBase implements Query {
 			return operatorSymbol() + "( "+retStr+" )";
 		}
 		
-		return ret.toString();
+		return ret.toString().trim();
 	}
 	
 } 

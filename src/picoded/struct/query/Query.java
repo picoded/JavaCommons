@@ -72,7 +72,7 @@ public interface Query extends Predicate<Object> {
 	}
 	
 	/// Gets the children conditions
-	public default Set<Query> childrenQuery() {
+	public default List<Query> childrenQuery() {
 		return null;
 	}
 	

@@ -1,7 +1,6 @@
 package picoded.JStruct;
 
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 /// MetaType enums represents the various data types,
 /// that the struct/JSql/JCache/JStack varients of MetaTable can support.
@@ -85,6 +84,23 @@ public enum MetaType {
 	TEXT_ARRAY(532),
 	BINARY_ARRAY(533);
 	
+	//////////////////////////////////////////////////////////////////////
+	//
+	// The following is cookie cutter code,
+	//
+	// This can be replaced when there is a way to default implement
+	// static function and variabels, etc, etc.
+	// 
+	// Or the unthinkable, java allow typed macros / type annotations
+	// (the closest the language now has to macros)
+	//
+	// As of now just copy this whole chunk downards, search and 
+	// replace the class name to its respective enum class to implment
+	//
+	// Same thing for value type if you want (not recommended)
+	//
+	//////////////////////////////////////////////////////////////////////
+	
 	//
 	// Constructor setup
 	//--------------------------------------------------------------------
@@ -95,28 +111,48 @@ public enum MetaType {
 	public int getValue() { return ID; }
 	
 	//
+	// Public EnumSet
+	//--------------------------------------------------------------------
+	public static final EnumSet<MetaType> typeSet = EnumSet.allOf(MetaType.class);
+	
+	//
 	// Type mapping
 	//--------------------------------------------------------------------
 	
 	/// The type mapping cache
-	private static Map<String,MetaType> nameToTypeMap = new HashMap<String,MetaType>();
-	private static Map<Integer,MetaType> idToTypeMap = new HashMap<Integer,MetaType>();
+	private static Map<String,MetaType> nameToTypeMap = null;
+	private static Map<Integer,MetaType> idToTypeMap = null;
 	
 	/// Setting up the type mapping
-	static {
-		for (MetaType type : MetaType.values()) {
-			nameToTypeMap.put( type.name(), type );
-			idToTypeMap.put( type.getValue(), type );
+	///
+	/// Note that the redundent temp variable, is to ensure the final map is only set
+	/// in an "atomic" fashion. In event of multiple threads triggerint the initializeTypeMaps
+	/// setup process.
+	///
+	protected static void initializeTypeMaps() {
+		if( nameToTypeMap == null || idToTypeMap == null ) {
+			Map<String,MetaType> nameToTypeMap_wip = new HashMap<String,MetaType>();
+			Map<Integer,MetaType> idToTypeMap_wip = new HashMap<Integer,MetaType>();
+			
+			for (MetaType type : MetaType.values()) {
+				nameToTypeMap_wip.put( type.name(), type );
+				idToTypeMap_wip.put( type.getValue(), type );
+			}
+			
+			nameToTypeMap = nameToTypeMap_wip;
+			idToTypeMap_wip = idToTypeMap_wip;
 		}
 	}
 	
 	/// Get from the respective ID values
 	public static MetaType fromID(int id) {
+		initializeTypeMaps();
 		return idToTypeMap.get( id );
 	}
 	
 	/// Get from the respective string name values
 	public static MetaType fromName(String name) {
+		initializeTypeMaps();
 		name = name.toUpperCase();
 		return nameToTypeMap.get( name );
 	}
@@ -137,8 +173,14 @@ public enum MetaType {
 		} 
 		
 		if( mType == null ) {
-			throw new RuntimeException("Invalid MetaTable type for: "+type.toString());
+			throw new RuntimeException("Invalid MetaType for: "+type.toString());
 		}
 		return mType;
 	}
+	
+	//////////////////////////////////////////////////////////////////////
+	//
+	// End of cookie cutter code,
+	//
+	//////////////////////////////////////////////////////////////////////
 }

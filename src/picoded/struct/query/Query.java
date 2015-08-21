@@ -2,11 +2,31 @@ package picoded.struct.query;
 
 import java.util.function.*;
 import java.util.*;
+import picoded.struct.query.internal.QueryFilter;
 
 ///
 /// Representas a query condition, that can be used as a java Predicate against a collection
 ///
 public interface Query extends Predicate<Object> {
+	
+	//
+	// Static builder
+	//--------------------------------------------------------------------
+	
+	/// Build the query using no predefiend arguments
+	public static Query build(String queryString) {
+		return QueryFilter.buildQuery(queryString, null, null);
+	}
+	
+	/// Build the query using argumented array
+	public static Query build(String queryString, Object[] argumentArr) {
+		return QueryFilter.buildQuery(queryString, null, argumentArr);
+	}
+	
+	/// Build the query using the parameter map
+	public static Query build(String queryString, Map<String,Object> paramMap) {
+		return QueryFilter.buildQuery(queryString, paramMap, null);
+	}
 	
 	//
 	// Public test functions
@@ -18,7 +38,7 @@ public interface Query extends Predicate<Object> {
 	/// @param   the object to test against
 	///
 	/// @returns  boolean indicating true / false
-	boolean test(Object t);
+	public boolean test(Object t);
 	
 	/// To test against a specified value map,
 	/// Note that the test varient without the Map
@@ -29,7 +49,7 @@ public interface Query extends Predicate<Object> {
 	/// @param   the argument map, if applicable
 	///
 	/// @returns  boolean indicating true / false
-	boolean test(Object t, Map<String,Object>argMap);
+	public boolean test(Object t, Map<String,Object>argMap);
 	
 	//
 	// Public accessors

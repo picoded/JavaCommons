@@ -69,8 +69,4 @@ public class QueryFilter_test {
 		);
 	}
 	
-	@Test 
-	public void buildBaseicQuery() {
-		
-	}
 }

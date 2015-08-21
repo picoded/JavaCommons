@@ -119,7 +119,7 @@ public class QueryFilter {
 		MutablePair<String,Integer> argReplacment = filterQueryArguments(query);
 		
 		int argReplacmentCount = argReplacment.getRight().intValue();
-		int argArrCount = (argArr != null)? argArr.length : 0;
+		int argArrCount = (argArr != null)? argArr.length : argReplacmentCount;
 		if( argArrCount != argReplacmentCount ) {
 			throw new RuntimeException("Query string argument count ("+argReplacmentCount+"), and argument array length mismatched ("+argArrCount+")");
 		}
@@ -161,6 +161,8 @@ public class QueryFilter {
 		
 		if(namedParam == null || !namedParam.startsWith(":")) {
 			throw new RuntimeException("Unexpected named parameter set: "+before+" "+operator+" "+after);
+		} else {
+			namedParam = namedParam.substring(1);
 		}
 		
 		if(operator.equals("=")) {
@@ -253,6 +255,13 @@ public class QueryFilter {
 	/// Collapses the query token into a single query,
 	/// This only works when basic operators has been processed, and brackets removed
 	public static Query collapseQueryTokensWithoutBrackets( List<Object> tokens, Map<String,Object> paramMap ) {
+		if( tokens.size() == 1 ) {
+			Object t = tokens.get(0);
+			if( t instanceof Query ) {
+				return (Query)t;
+			}
+		}
+		
 		List<Query> childList = new ArrayList<Query>();
 		String combinationType = null;
 		
@@ -323,8 +332,15 @@ public class QueryFilter {
 			List<Object> newList = new ArrayList<Object>();
 			
 			newList.addAll( tokens.subList(0, brackets[0]) );
-			newList.add( collapseQueryTokensWithoutBrackets(tokens.subList( brackets[0]+1, brackets[1]-1 ), paramMap) );
-			newList.addAll( tokens.subList(brackets[0]+1, tokens.size() ) );
+			
+			List<Object> isolatedList = tokens.subList( brackets[0]+1, brackets[1] );
+			//System.out.println( isolatedList );
+			
+			Query isolatedQuery = collapseQueryTokensWithoutBrackets(isolatedList, paramMap);
+			//System.out.println( isolatedQuery.toString() );
+			
+			newList.add( isolatedQuery );
+			newList.addAll( tokens.subList(brackets[1]+1, tokens.size() ) );
 			
 			tokens = newList;
 		}
@@ -351,12 +367,7 @@ public class QueryFilter {
 	) { //
 		MutablePair<String,Map<String,Object>> refac = refactorQuery(query, baseMap, argArr);
 		String[] querySplit = refac.getLeft().split("\\s+");
-		
-		List<Object> tokenArr = new ArrayList<Object>();
-		for(int a=0; a<querySplit.length; ++a) {
-			tokenArr.add(querySplit[a]);
-		}
-		
+		List<Object> tokenArr = buildBasicQuery(querySplit, refac.getRight() );
 		return collapseQueryTokens(tokenArr, refac.getRight() );
 	}
 }

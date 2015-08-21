@@ -10,7 +10,9 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 import java.util.*;
-import java.struct.*;
+import picoded.struct.*;
+import picoded.struct.query.*;
+import picoded.struct.query.internal.*;
 
 ///
 /// Test Case for picoded.struct.query.condition.*
@@ -41,10 +43,30 @@ public class QueryFilter_test {
 	// Conditions test
 	//--------------------------------------------------------------------
 	
-	/// Test simple equality checks
 	@Test
-	public void equals() {
+	public void filterQueryArguments() {
 		MutablePair<String,Integer> res = null;
 		
+		assertNotNull( res = QueryFilter.filterQueryArguments("A = ? AND B = ?") );
+		assertEquals("A = :0 AND B = :1", res.getLeft());
+		assertEquals(2, res.getRight().intValue());
 	}
+	
+	@Test
+	public void argumentsArrayToMap() {
+		Map<String,Object> ref = new HashMap<String,Object>();
+		ref.put("0", "|=");
+		ref.put("1", "$=");
+		
+		assertEquals( ref, QueryFilter.argumentsArrayToMap(null, new Object[]{ "|=", "$=" }) );
+	}
+	
+	@Test
+	public void enforceRequiredWhitespace() {
+		assertEquals( 
+			"A <= :0 AND B >= :1 AND C != :2 AND ( D = :3 AND E = :4 )", 
+			QueryFilter.enforceRequiredWhitespace("A<=:0  AND  B>=:1 AND C!=:2 AND (D=:3 AND E=:4)") 
+		);
+	}
+	
 }

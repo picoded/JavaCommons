@@ -155,7 +155,7 @@ public class QueryFilter {
 	}); //
 	
 	/// Builds and return query
-	public static Query basicQueryFromTokens( Map<String,Object> params, String before, String operator, String after ) {
+	public static Query basicQueryFromTokens( Map<String,Object> paramsMap, String before, String operator, String after ) {
 		String field = before;
 		String namedParam = after;
 		
@@ -164,22 +164,35 @@ public class QueryFilter {
 		}
 		
 		if(operator.equals("=")) {
-			return new Equals(field, namedParam, params);
+			return new Equals(field, namedParam, paramsMap);
 			
 		} else if(operator.equals("<")) {
-			return new LessThan(field, namedParam, params);
+			return new LessThan(field, namedParam, paramsMap);
 			
 		} else if(operator.equals("<=")) {
-			return new LessThanOrEquals(field, namedParam, params);
+			return new LessThanOrEquals(field, namedParam, paramsMap);
 			
 		} else if(operator.equals(">")) {
-			return new MoreThan(field, namedParam, params);
+			return new MoreThan(field, namedParam, paramsMap);
 			
 		} else if(operator.equals(">=")) {
-			return new MoreThanOrEquals(field, namedParam, params);	
+			return new MoreThanOrEquals(field, namedParam, paramsMap);	
 		}
 		
 		throw new RuntimeException("Unknown operator set found: "+before+" "+operator+" "+after);
+	}
+	
+	/// Build combination query
+	public static Query combinationQuery( String combinationType, List<Query> childQuery, Map<String,Object> paramsMap ) {
+		if( combinationType.equals("AND") ) {
+			return new And(childQuery, paramsMap);
+		} else if( combinationType.equals("OR") ) {
+			return new Or(childQuery, paramsMap);
+		} else if( combinationType.equals("NOT") ) {
+			return new Not(childQuery, paramsMap);
+		}
+		
+		throw new RuntimeException("Unknown combination set found: "+combinationType+" "+childQuery);
 	}
 	
 	/// Extract out the string, and build the basic query
@@ -203,27 +216,147 @@ public class QueryFilter {
 		return ret;
 	}
 	
+	/// Finds the first enclosed bracket, without nested brackets, and returns its start and end position
+	public static int[] findCompleteEnclosure( List<Object> queryTokens ) {
+		
+		// Gets the start and end
+		int start = -1;
+		int end = -1;
+		
+		// Iterates the query token
+		for(int a=0; a<queryTokens.size(); ++a) {
+			
+			// Gets the token, and skip if not a string
+			Object token = queryTokens.get(a);
+			if( !(token instanceof String) ) {
+				continue;
+			}
+			
+			if( token.equals("(") ) {
+				start = a;
+			} else if( token.equals(")") ) {
+				if( start == -1 ) {
+					throw new RuntimeException("Found closing bracket ')' without opening bracket");
+				} else {
+					return new int[] { start, a };
+				}
+			}
+		}
+		
+		if( start >= 0 ) {
+			throw new RuntimeException("Found starting bracket '(' without closing bracket");
+		}
+		
+		return new int[] { -1, -1 };
+	}
 	
-	// /// Refactor the query to one that is easily parsed by a tokenizer
-	// ///
-	// /// @params  the query string to filter out
-	// /// @params  named map to build on and return, creates a HashMap if null
-	// /// @params  arguments array to convert from
-	// ///
-	// /// @returns  the query to be built
-	// public static MutablePair<String,Map<String,Object>> refactorQuery( //
-	// 	String query, //
-	// 	Map<String,Object> baseMap, //
-	// 	Object[] argArr //
-	// ) { //
-	// 	MutablePair<String,Map<String,Object>> refac = refactorQuery(query, baseMap, argArr);
-	// 	
-	// 	String[] tokens = refac.getLeft().split(" ");
-	// 	for(int a=0; a<tokens.length; ++a) {
-	// 		
-	// 		
-	// 	}
-	// 	
-	// 	return null;
-	//}
+	/// Collapses the query token into a single query,
+	/// This only works when basic operators has been processed, and brackets removed
+	public static Query collapseQueryTokensWithoutBrackets( List<Object> tokens, Map<String,Object> paramMap ) {
+		List<Query> childList = new ArrayList<Query>();
+		String combinationType = null;
+		
+		for(int a=0; a<tokens.size(); ++a) {
+			Object singleToken = tokens.get(a);
+			if( singleToken instanceof Query ) {
+				childList.add( (Query)singleToken);
+			} else if( singleToken instanceof String ) {
+				String op = singleToken.toString().toUpperCase();
+				
+				if( !(combinationOperators.contains(op)) ) {
+					throw new RuntimeException("Unable to process combination token: "+op);
+				}
+				
+				// Setup combination type
+				if( combinationType == null ) {
+					combinationType = op;
+					continue;
+				} 
+				
+				// Continue the combination processing
+				if( combinationType.equals(op) ) {
+					continue;
+				}
+				
+				// Compiles to list till the current point
+				List<Object> subList = new ArrayList<Object>();
+				
+				// Check child list
+				if( childList.size() <= 0 ) {
+					throw new RuntimeException("Unexpected blank child list: "+childList);
+				}
+				
+				// Adds everything up till the current point
+				subList.add( combinationQuery( combinationType, childList, paramMap ) );
+				
+				// Chain in to the next combination type
+				subList.addAll( tokens.subList(a, tokens.size()) );
+				
+				// Recursive
+				return collapseQueryTokensWithoutBrackets( subList, paramMap );
+				
+			} else {
+				throw new RuntimeException("Unknown token type: "+singleToken);
+			}
+		}
+		
+		if( combinationType == null ) {
+			throw new RuntimeException("Missing combination token: "+tokens);
+		}
+		
+		return combinationQuery( combinationType, childList, paramMap );
+	}
+	
+	/// Collapses the query token into a single query,
+	/// This first isolates out the brackets, before calling collapseQueryTokensWithoutBrackets
+	public static Query collapseQueryTokens( List<Object> tokens, Map<String,Object> paramMap ) {
+		
+		while( tokens.size() > 1 ) {
+			int[] brackets = findCompleteEnclosure(tokens);
+			
+			// Full collapse finally
+			if( brackets[0] == -1 || brackets[1] == -1 ) {
+				return collapseQueryTokensWithoutBrackets(tokens, paramMap);
+			}
+			
+			// Collapse segment by segment
+			List<Object> newList = new ArrayList<Object>();
+			
+			newList.addAll( tokens.subList(0, brackets[0]) );
+			newList.add( collapseQueryTokensWithoutBrackets(tokens.subList( brackets[0]+1, brackets[1]-1 ), paramMap) );
+			newList.addAll( tokens.subList(brackets[0]+1, tokens.size() ) );
+			
+			tokens = newList;
+		}
+		
+		Object singleToken = tokens.get(0);
+		if( singleToken instanceof Query ) {
+			return (Query)singleToken;
+		}
+		
+		throw new RuntimeException("Unexpected collapseQueryTokens end");
+	}
+	
+	/// Refactor the query to one that is easily parsed by a tokenizer
+	///
+	/// @params  the query string to filter out
+	/// @params  named map to build on and return, creates a HashMap if null
+	/// @params  arguments array to convert from
+	///
+	/// @returns  the query to be built
+	public static Query buildQuery( //
+		String query, //
+		Map<String,Object> baseMap, //
+		Object[] argArr //
+	) { //
+		MutablePair<String,Map<String,Object>> refac = refactorQuery(query, baseMap, argArr);
+		String[] querySplit = refac.getLeft().split("\\s+");
+		
+		List<Object> tokenArr = new ArrayList<Object>();
+		for(int a=0; a<querySplit.length; ++a) {
+			tokenArr.add(querySplit[a]);
+		}
+		
+		return collapseQueryTokens(tokenArr, refac.getRight() );
+	}
 }

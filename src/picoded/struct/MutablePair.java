@@ -17,4 +17,12 @@ import java.util.ArrayList;
 ///
 public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePair<L, R> /*implements List<Object> */{
 	
+	public MutablePair() {
+		super();
+	}
+	
+	public MutablePair(L left, R right) {
+		super(left,right);
+	}
+	
 }

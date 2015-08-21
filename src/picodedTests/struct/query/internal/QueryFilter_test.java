@@ -64,9 +64,13 @@ public class QueryFilter_test {
 	@Test
 	public void enforceRequiredWhitespace() {
 		assertEquals( 
-			"A <= :0 AND B >= :1 AND C != :2 AND ( D = :3 AND E = :4 )", 
-			QueryFilter.enforceRequiredWhitespace("A<=:0  AND  B>=:1 AND C!=:2 AND (D=:3 AND E=:4)") 
+			"A <= :0 AND B >= :1 AND C != :2 AND ( D < :3 AND E = :4 )", 
+			QueryFilter.enforceRequiredWhitespace("A<=:0  AND  B>=:1 AND C!=:2 AND (D<:3 AND E=:4)") 
 		);
 	}
 	
+	@Test 
+	public void buildBaseicQuery() {
+		
+	}
 }

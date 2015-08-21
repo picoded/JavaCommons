@@ -60,6 +60,13 @@ public class MoreThan extends ConditionBase {
 		return false;
 	}
 	
+	/// The operator symbol support
+	///
+	/// [to override on extension]
+	public String operatorSymbol() {
+		return ">";
+	}
+	
 	/// Gets the query type 
 	///
 	/// [to override on extension]

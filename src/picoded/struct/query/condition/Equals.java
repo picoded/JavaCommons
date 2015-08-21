@@ -1,9 +1,8 @@
 package picoded.struct.query.condition;
 
 import java.util.*;
-import picoded.struct.query.*;
 
-import picoded.struct.query.QueryType;
+import picoded.struct.query.*;
 
 public class Equals extends ConditionBase {
 	
@@ -45,6 +44,13 @@ public class Equals extends ConditionBase {
 			return true;
 		}
 		return false;
+	}
+	
+	/// The operator symbol support
+	///
+	/// [to override on extension]
+	public String operatorSymbol() {
+		return "=";
 	}
 	
 	/// Gets the query type 

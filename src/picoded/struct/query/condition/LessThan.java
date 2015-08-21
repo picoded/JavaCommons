@@ -61,7 +61,12 @@ public class LessThan extends ConditionBase {
 		return false;
 	}
 	
-	
+	/// The operator symbol support
+	///
+	/// [to override on extension]
+	public String operatorSymbol() {
+		return "<";
+	}
 	
 	/// Gets the query type 
 	///

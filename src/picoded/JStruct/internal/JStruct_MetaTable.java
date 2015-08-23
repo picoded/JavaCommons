@@ -28,10 +28,13 @@ public class JStruct_MetaTable implements MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
-	protected Map<String, Map<String,Object>> valueMap = new ConcurrentHashMap<String, Map<String,Object>>();
+	protected Map<String, Map<String,Object>> _valueMap = new ConcurrentHashMap<String, Map<String,Object>>();
 	
 	/// Read write lock
-	protected ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
+	protected ReentrantReadWriteLock _accessLock = new ReentrantReadWriteLock();
+	
+	/// Internal MetaTypeMap
+	protected MetaTypeMap _typeMap = new MetaTypeMap();
 	
 	///
 	/// Constructor setup
@@ -77,24 +80,12 @@ public class JStruct_MetaTable implements MetaTable {
 	
 	/// Setsup the backend storage table, etc. If needed
 	public void systemSetup() {
-		valueMap.clear();
+		_valueMap.clear();
 	}
 	
 	/// Teardown and delete the backend storage table, etc. If needed
 	public void systemTeardown() {
-		valueMap.clear();
-		
-	}
-	
-	/// perform increment maintenance, meant for minor changes between requests
-	public void incrementalMaintenance() {
-		// For JStruct, both is same
-		maintenance();
-	}
-	
-	/// Perform maintenance, mainly removing of expired data if applicable
-	public void maintenance() {
-		// does nothing?
+		_valueMap.clear();
 	}
 	
 	// MetaObject MAP operations
@@ -103,7 +94,7 @@ public class JStruct_MetaTable implements MetaTable {
 	/// Gets the MetaObject, if it exists
 	public MetaObject get(Object _oid) {
 		try {
-			accessLock.readLock().lock();
+			_accessLock.readLock().lock();
 			
 			String oid = _oid.toString();
 			Map<String,Object> fullMap = metaObjectRemoteDataMap_get(oid);
@@ -113,18 +104,18 @@ public class JStruct_MetaTable implements MetaTable {
 			}
 			return new JStruct_MetaObject(this, oid, fullMap, true);
 		} finally {
-			accessLock.readLock().unlock();
+			_accessLock.readLock().unlock();
 		}
 	}
 	
 	/// Gets the full keySet
 	public Set<String> keySet() {
-		return valueMap.keySet();
+		return _valueMap.keySet();
 	}
 	
 	/// Remove the node
 	public MetaObject remove(Object key) {
-		valueMap.remove(key);
+		_valueMap.remove(key);
 		return null;
 	}
 	
@@ -175,10 +166,10 @@ public class JStruct_MetaTable implements MetaTable {
 	/// Returns null
 	protected Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
 		try {
-			accessLock.readLock().lock();
+			_accessLock.readLock().lock();
 			
 			Map<String, Object> ret = null;
-			Map<String, Object> storedValue = valueMap.get(_oid);
+			Map<String, Object> storedValue = _valueMap.get(_oid);
 			
 			if( storedValue != null ) {
 				ret = new HashMap<String,Object>();
@@ -189,7 +180,7 @@ public class JStruct_MetaTable implements MetaTable {
 			
 			return ret;
 		} finally {
-			accessLock.readLock().unlock();
+			_accessLock.readLock().unlock();
 		}
 	}
 	
@@ -197,13 +188,13 @@ public class JStruct_MetaTable implements MetaTable {
 	/// either partially (if supported / used), or completely
 	protected void metaObjectRemoteDataMap_update(String _oid, Map<String,Object> fullMap, Set<String> keys) {
 		try {
-			accessLock.writeLock().lock();
+			_accessLock.writeLock().lock();
 			
 			if( keys == null ) {
 				keys = fullMap.keySet();
 			}
 			
-			Map<String, Object> storedValue = valueMap.get(_oid);
+			Map<String, Object> storedValue = _valueMap.get(_oid);
 			if( storedValue == null ) {
 				storedValue = new ConcurrentHashMap<String, Object>();
 			}
@@ -218,10 +209,19 @@ public class JStruct_MetaTable implements MetaTable {
 				}
 			}
 			
-			valueMap.put(_oid, storedValue);
+			_valueMap.put(_oid, storedValue);
 		} finally {
-			accessLock.writeLock().unlock();
+			_accessLock.writeLock().unlock();
 		}
+	}
+	
+	/// 
+	/// MetaType handling, does type checking and conversion
+	///--------------------------------------------------------------------------
+	
+	/// Gets and return the internal MetaTypeMap
+	public MetaTypeMap typeMap() {
+		return _typeMap;
 	}
 	
 }

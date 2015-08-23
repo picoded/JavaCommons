@@ -172,7 +172,7 @@ public class ConditionBase implements Query {
 	
 	/// The query string
 	public String toString() {
-		return fieldName() + " " + operatorSymbol() + " " + ":" + argumentName();
+		return "\""+fieldName() + "\" " + operatorSymbol() + " " + ":" + argumentName();
 	}
 	
 } 

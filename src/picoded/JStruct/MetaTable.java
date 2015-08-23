@@ -52,8 +52,16 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// Teardown and delete the backend storage table, etc. If needed
 	public void systemTeardown();
 	
+	/// perform increment maintenance, meant for minor changes between requests
+	public default void incrementalMaintenance() {
+		// For JStruct, both is same
+		maintenance();
+	}
+	
 	/// Perform maintenance, mainly removing of expired data if applicable
-	public void maintenance();
+	public default void maintenance() {
+		// does nothing?
+	}
 	
 	/// 
 	/// MetaObject operations
@@ -168,4 +176,25 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 		return JStructUtils.sortAndOffsetListToArray(retList, orderByStr, offset, limit);
 	}
 	
+	/// 
+	/// MetaType handling, does type checking and conversion
+	///--------------------------------------------------------------------------
+	
+	/// Gets and return the internal MetaTypeMap
+	public MetaTypeMap typeMap();
+	
+	/// Get convinent function
+	public default MetaType getType(String name) {
+		return typeMap().get(name);
+	}
+	
+	/// Put convinent function
+	public default MetaType putType(String name, Object value) {
+		return typeMap().put( name, value );
+	}
+	
+	/// Generic varient of put all
+	public default <K,V> void setMappingType(Map<K, V> m) {
+		typeMap().putAllGeneric(m);
+	}
 }

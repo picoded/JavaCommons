@@ -70,7 +70,20 @@ public class MetaTable_test {
 	
 		return objMap;
 	}
-	
+
+	// @Test
+	// public void invalidSetup() { //Numeric as table prefix tend to cuase problems
+	// 	MetaTable m;
+	// 
+	// 	try {
+	// 		m = new MetaTable(JStackObj, "1" + TestConfig.randomTablePrefix());
+	// 		fail(); // if we got here, no exception was thrown, which is bad
+	// 	} catch (Exception e) {
+	// 		final String expected = "Invalid table name (cannot start with numbers)";
+	// 		assertTrue("Missing Exception - " + expected, e.getMessage().indexOf(expected) >= 0);
+	// 	}
+	// }
+
 	@Test
 	public void newObjectTest() {
 		MetaObject moObj = null;
@@ -315,63 +328,44 @@ public class MetaTable_test {
 	}
 	
 	
-	// // Mapping tests
-	// //-----------------------------------------------
-	// 
-	// @Test
-	// public void testSingleMappingSystem() 
-	// {
-	// 	//System.out.println("Starting single mapping test");
-	// 	mtObj.clearTypeMapping();
-	// 
-	// 	mtObj.putType("num", "INTEGER");
-	// 	mtObj.putType("float", "TYPE_FLOAT");
-	// 	mtObj.putType("double", "double");
-	// 	mtObj.putType("long", "type_long");
-	// 
-	// 	assertEquals(mtObj.getType("num").valueType(), MetaType.TYPE_INTEGER);
-	// 	assertEquals(mtObj.getType("float").valueType(), MetaType.TYPE_FLOAT);
-	// 	assertEquals(mtObj.getType("double").valueType(), MetaType.TYPE_DOUBLE);
-	// 	assertEquals(mtObj.getType("long").valueType(), MetaType.TYPE_LONG);
-	// }
-	// 
-	// @Test
-	// public void testMapMappingSystem() 
-	// {
-	// 	//System.out.println("Starting map mapping test");
-	// 	mtObj.clearTypeMapping();
-	// 
-	// 	HashMap<String, Object> mapping = new HashMap<String, Object>();
-	// 	mapping.put("num", "INTEGER");
-	// 	mapping.put("float", "TYPE_FLOAT");
-	// 	mapping.put("double", "double");
-	// 	mapping.put("long", "type_long");
-	// 	mapping.put("disabled", "disabled");
-	// 	mapping.put("mixed", "TYPE_MIXED");
-	// 	mapping.put("mixed-array", "type_mixed_array");
-	// 
-	// 	mtObj.setMapping(mapping);
-	// 
-	// 	assertEquals(mtObj.getType("num").valueType(), MetaType.TYPE_INTEGER);
-	// 	assertEquals(mtObj.getType("float").valueType(), MetaType.TYPE_FLOAT);
-	// 	assertEquals(mtObj.getType("double").valueType(), MetaType.TYPE_DOUBLE);
-	// 	assertEquals(mtObj.getType("long").valueType(), MetaType.TYPE_LONG);
-	// 	assertEquals(mtObj.getType("disabled").valueType(), MetaType.TYPE_DISABLED);
-	// 	assertEquals(mtObj.getType("mixed").valueType(), MetaType.TYPE_MIXED);
-	// 	assertEquals(mtObj.getType("mixed-array").valueType(), MetaType.TYPE_MIXED_ARRAY);
-	// }
-	// 
-	// @Test
-	// public void invalidSetup() {
-	// 	MetaTable m;
-	// 
-	// 	try {
-	// 		m = new MetaTable(JStackObj, "1" + TestConfig.randomTablePrefix());
-	// 		fail(); // if we got here, no exception was thrown, which is bad
-	// 	} catch (Exception e) {
-	// 		final String expected = "Invalid table name (cannot start with numbers)";
-	// 		assertTrue("Missing Exception - " + expected, e.getMessage().indexOf(expected) >= 0);
-	// 	}
-	// }
-	// 
+	// Mapping tests
+	//-----------------------------------------------
+	
+	@Test
+	public void testSingleMappingSystem() {
+		mtObj.typeMap().clear();
+		
+		mtObj.putType("num", "INTEGER");
+		mtObj.putType("float", "FLOAT");
+		mtObj.putType("double", "double");
+		mtObj.putType("long", "long");
+		
+		assertEquals(mtObj.getType("num"), MetaType.INTEGER);
+		assertEquals(mtObj.getType("float"), MetaType.FLOAT);
+		assertEquals(mtObj.getType("double"), MetaType.DOUBLE);
+		assertEquals(mtObj.getType("long"), MetaType.LONG);
+	}
+	
+	@Test
+	public void testMapMappingSystem() {
+		mtObj.typeMap().clear();
+	
+		HashMap<String, Object> mapping = new HashMap<String, Object>();
+		mapping.put("num", "INTEGER");
+		mapping.put("float", "FLOAT");
+		mapping.put("double", "double");
+		mapping.put("long", "long");
+		mapping.put("mixed", "MIXED");
+		mapping.put("uuid-array", "UUID_ARRAY");
+	
+		mtObj.setMappingType(mapping);
+	
+		assertEquals(mtObj.getType("num"), MetaType.INTEGER);
+		assertEquals(mtObj.getType("float"), MetaType.FLOAT);
+		assertEquals(mtObj.getType("double"), MetaType.DOUBLE);
+		assertEquals(mtObj.getType("long"), MetaType.LONG);
+		assertEquals(mtObj.getType("mixed"), MetaType.MIXED);
+		assertEquals(mtObj.getType("uuid-array"), MetaType.UUID_ARRAY);
+	}
+	
 }

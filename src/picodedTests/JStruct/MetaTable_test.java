@@ -152,48 +152,48 @@ public class MetaTable_test {
 		assertEquals("in", qRes[1].get("str_val"));
 	
 	}
-	// 
-	// ///
-	// /// An exception occurs, if a query fetch occurs with an empty table
-	// ///
-	// @Test
-	// public void issue47_exceptionWhenTableIsEmpty()  {
-	// 	MetaObject[] qRes = null;
-	// 	assertNotNull(qRes = mtObj.queryObjects(null, null));
-	// 	assertEquals(0, qRes.length);
-	// }
-	// 
-	// ///
-	// /// Bad view index due to inner join instead of left join. Testing.
-	// ///
-	// /// AKA: Incomplete object does not appear in view index
-	// ///
-	// @Test
-	// public void innerJoinFlaw()  {
-	// 	mtObj.append(null, genNumStrObj(1, "hello world"));
-	// 
-	// 	HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
-	// 	objMap.put("num", new Integer(2));
-	// 	mtObj.append( null, objMap );
-	// 
-	// 	objMap = new CaseInsensitiveHashMap<String, Object>();
-	// 	objMap.put("str_val", "nope");
-	// 	mtObj.append( null, objMap );
-	// 
-	// 	MetaObject[] qRes = null;
-	// 	assertNotNull(qRes = mtObj.queryObjects(null, null));
-	// 	assertEquals(3, qRes.length);
-	// 
-	// 	assertNotNull(qRes = mtObj.queryObjects("str_val = ?", new Object[] { "nope" }));
-	// 	assertEquals(1, qRes.length);
-	// 
-	// 	assertNotNull(qRes = mtObj.queryObjects("num = ?", new Object[] { 1 }));
-	// 	assertEquals(1, qRes.length);
-	// 
-	// 	assertNotNull(qRes = mtObj.queryObjects("num <= ?", new Object[] { 2 }));
-	// 	assertEquals(2, qRes.length);
-	// }
-	// 
+	
+	///
+	/// An exception occurs, if a query fetch occurs with an empty table
+	///
+	@Test
+	public void issue47_exceptionWhenTableIsEmpty()  {
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.query(null, null));
+		assertEquals(0, qRes.length);
+	}
+	
+	///
+	/// Bad view index due to inner join instead of left join. Testing.
+	///
+	/// AKA: Incomplete object does not appear in view index
+	///
+	@Test
+	public void innerJoinFlaw()  {
+		mtObj.append(null, genNumStrObj(1, "hello world"));
+	
+		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
+		objMap.put("num", new Integer(2));
+		mtObj.append( null, objMap );
+	
+		objMap = new CaseInsensitiveHashMap<String, Object>();
+		objMap.put("str_val", "nope");
+		mtObj.append( null, objMap );
+	
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.query(null, null));
+		assertEquals(3, qRes.length);
+	
+		assertNotNull(qRes = mtObj.query("str_val = ?", new Object[] { "nope" }));
+		assertEquals(1, qRes.length);
+	
+		assertNotNull(qRes = mtObj.query("num = ?", new Object[] { 1 }));
+		assertEquals(1, qRes.length);
+	
+		assertNotNull(qRes = mtObj.query("num <= ?", new Object[] { 2 }));
+		assertEquals(2, qRes.length);
+	}
+	
 	// @Test
 	// public void missingStrError()  {
 	// 	HashMap<String, Object> objMap = new HashMap<String,Object>();
@@ -204,7 +204,7 @@ public class MetaTable_test {
 	// 	assertEquals(guid, mtObj.append(guid, objMap)._oid());
 	// 
 	// 	MetaObject[] qRes = null;
-	// 	assertNotNull(qRes = mtObj.queryObjects(null, null));
+	// 	assertNotNull(qRes = mtObj.query(null, null));
 	// 	assertEquals(1, qRes.length);
 	// 
 	// 	objMap.put("_oid", guid);
@@ -223,7 +223,7 @@ public class MetaTable_test {
 	// 	assertEquals(guid, mtObj.append(guid, objMap)._oid());
 	// 
 	// 	MetaObject[] qRes = null;
-	// 	assertNotNull(qRes = mtObj.queryObjects(null, null));
+	// 	assertNotNull(qRes = mtObj.query(null, null));
 	// 	assertEquals(2, qRes.length);
 	// 
 	// 	assertTrue( guid.equals(qRes[0]._oid()) || guid.equals(qRes[1]._oid()) );

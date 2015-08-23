@@ -36,14 +36,11 @@ public class Equals extends ConditionBase {
 	/// @returns  boolean indicating success or failure
 	///
 	protected boolean testValues(Object fieldValue, Object argValue) {
-		if( argValue == null ) {
-			if( fieldValue == null ) {
-				return true;
-			}
-		} else if( argValue.equals(fieldValue) ) {
-			return true;
+		if( argValue == null || fieldValue == null ) {
+			return false;
+		} else {
+			return CompareUtils.dynamicCompare(fieldValue, argValue) == 0;
 		}
-		return false;
 	}
 	
 	/// The operator symbol support

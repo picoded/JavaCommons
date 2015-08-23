@@ -8,6 +8,8 @@ import java.text.RuleBasedCollator;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
+import picoded.struct.query.internal.*;
+
 /// Comparision utility functions
 ///
 /// Which can be used to create more complex Comperator, or used on its own

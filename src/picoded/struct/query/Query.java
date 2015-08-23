@@ -110,7 +110,7 @@ public interface Query extends Predicate<Object> {
 	// Map based search
 	//--------------------------------------------------------------------
 	
-	// Searhes using the query, and returns the resulting set
+	// Searches using the query, and returns the resulting set
 	public default <K,V> List<V> search(Map<K,V> set) {
 		List<V> ret = new ArrayList<V>();
 		for(K key : set.keySet()) {
@@ -122,7 +122,16 @@ public interface Query extends Predicate<Object> {
 		return ret;
 	}
 	
+	// Searches using the query, and sorted by the comparator
+	public default <K,V> List<V> search(Map<K,V> set, Comparator<V> compareFunc ) {
+		List<V> ret = search(set);
+		Collections.sort(ret, compareFunc);
+		return ret;
+	}
 	
-	
+	// Searches using the query, and sorted by the comparator query
+	public default <K,V> List<V> search(Map<K,V> set, String comperatorString ) {
+		return search(set, new OrderBy<V>(comperatorString));
+	}
 	
 }

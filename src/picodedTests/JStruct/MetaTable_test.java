@@ -138,18 +138,18 @@ public class MetaTable_test {
 		assertNotNull(qRes = mtObj.query(null, null));
 		assertEquals(7, qRes.length);
 		
-		// assertNotNull(qRes = mtObj.queryObjects("num > ? AND num < ?", new Object[] { 2, 5 }, "num ASC"));
-		// assertEquals(2, qRes.length);
-		// assertEquals("hello", qRes[0].get("str_val"));
-		// assertEquals("world", qRes[1].get("str_val"));
+		assertNotNull(qRes = mtObj.query("num > ? AND num < ?", new Object[] { 2, 5 }, "num ASC"));
+		assertEquals(2, qRes.length);
+		assertEquals("hello", qRes[0].get("str_val"));
+		assertEquals("world", qRes[1].get("str_val"));
 		
 		assertNotNull(qRes = mtObj.query("str_val = ?", new Object[] { "this" }));
 		assertEquals(2, qRes.length);
 		
-		// assertNotNull(qRes = mtObj.queryObjects("num > ?", new Object[] { 2 }, "num ASC", 2, 2));
-		// assertEquals(2, qRes.length);
-		// assertEquals("program", qRes[0].get("str_val"));
-		// assertEquals("in", qRes[1].get("str_val"));
+		assertNotNull(qRes = mtObj.query("num > ?", new Object[] { 2 }, "num ASC", 2, 2));
+		assertEquals(2, qRes.length);
+		assertEquals("program", qRes[0].get("str_val"));
+		assertEquals("in", qRes[1].get("str_val"));
 	
 	}
 	// 

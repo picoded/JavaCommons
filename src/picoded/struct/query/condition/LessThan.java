@@ -40,10 +40,8 @@ public class LessThan extends ConditionBase {
 	/// @returns  boolean indicating success or failure
 	///
 	protected boolean testValues(Object fieldValue, Object argValue) {
-		if( argValue == null ) {
-			if( fieldValue == null ) {
-				return true;
-			}
+		if( argValue == null || fieldValue == null ) {
+			return false;
 		}else{
 			Object fieldObj = QueryUtils.normalizeObject(fieldValue);
 			Object argObj = QueryUtils.normalizeObject(argValue);
@@ -58,7 +56,6 @@ public class LessThan extends ConditionBase {
 				throw new RuntimeException("These values cannot be compared");
 			}
 		}
-		return false;
 	}
 	
 	/// The operator symbol support

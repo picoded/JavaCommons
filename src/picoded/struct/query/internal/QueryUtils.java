@@ -6,6 +6,49 @@ import java.util.*;
 
 public class QueryUtils {
 	
+	///
+	/// Gets the field value to test
+	///
+	/// @param   object to extract out the field value 
+	/// @param   field name of extraction
+	///
+	/// @TODO: Support FullyQualifiedDomainName extraction? with arrays even?
+	///
+	/// @returns  The extracted object
+	///
+	public static Object getFieldValue(Object t, String field) {
+		if( field == null || field.toString().equalsIgnoreCase("this") ) {
+			return t;
+		} else if( t instanceof Map ) {
+			return ((Map)t).get(field);
+		}
+		return null;
+	}
+	
+	///
+	/// Remove and returns field name "wrapers" for sql specific versions
+	///
+	/// @returns  Fieldnames after removal
+	///
+	public static String unwrapFieldName(String field) {
+		if( //
+			(field.startsWith("\"") && field.endsWith("\"")) ||
+			(field.startsWith("'") && field.endsWith("'")) ||
+			(field.startsWith("[") && field.endsWith("]"))
+		) { //
+			field = field.substring(1, field.length() - 1);
+		}
+		
+		if( field.length() == 0 ) {
+			throw new RuntimeException("Unexpected blank field");
+		}
+		
+		return field;
+	}
+	
+	// 
+	//--------------------------------------------------------------------
+	
 	public static Double normalizeNumber(Object number){
 		Double val = null;
 		if(number instanceof Integer){

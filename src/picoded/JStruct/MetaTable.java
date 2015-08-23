@@ -75,9 +75,43 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	
 	/// Performs a search query, and returns the respective MetaObjects
 	public default MetaObject[] query(String whereClause, Object[] whereValues) {
+		return query(whereClause, whereValues, null);
+	}
+	
+	/// Performs a search query, and returns the respective MetaObjects
+	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr ) {
+		return query(whereClause, whereValues, orderByStr, 0, 0);
+	}
+	
+	/// Performs a search query, and returns the respective MetaObjects
+	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit ) {
+		
+		// The return list
+		List<MetaObject> retList = null;
+		
+		// Setup the query, if needed
 		if(whereClause == null) { //null gets all
-			return this.values().toArray(new MetaObject[0]);
+			retList = new ArrayList<MetaObject>( this.values() );
+		} else {
+			Query queryObj = Query.build(whereClause, whereValues);
+			retList = queryObj.search(this);
 		}
-		return Query.build(whereClause, whereValues).search(this).toArray(new MetaObject[0]);
+		
+		// Sorting the order, if needed
+		if( orderByStr != null && (orderByStr = orderByStr.trim()).length() > 0 ) {
+			// Creates the order by sorting, with _oid
+			OrderBy<MetaObject> sorter = new OrderBy<MetaObject>( orderByStr+" , _oid");
+			
+			// Sort it
+			Collections.sort(retList, sorter);
+		}
+		
+		// Get sublist if needed
+		if( offset >= 1 ) {
+			retList = retList.subList( offset, offset+limit );
+		}
+		
+		// Convert to array
+		return retList.toArray(new MetaObject[0]);
 	}
 }

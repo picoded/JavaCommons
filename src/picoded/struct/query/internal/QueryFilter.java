@@ -156,7 +156,7 @@ public class QueryFilter {
 	
 	/// Builds and return query
 	public static Query basicQueryFromTokens( Map<String,Object> paramsMap, String before, String operator, String after ) {
-		String field = before;
+		String field = QueryUtils.unwrapFieldName(before);
 		String namedParam = after;
 		
 		if(namedParam == null || !namedParam.startsWith(":")) {

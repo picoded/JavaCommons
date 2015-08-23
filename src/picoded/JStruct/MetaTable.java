@@ -7,6 +7,7 @@ import java.util.*;
 import picoded.conv.GUID;
 import picoded.struct.CaseInsensitiveHashMap;
 import picoded.struct.UnsupportedDefaultMap;
+import picoded.JStruct.internal.*;
 import picoded.struct.query.*;
 import picoded.conv.ListValueConv;
 
@@ -70,20 +71,39 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	public MetaObject append(String _oid, Map<String, Object> obj);
 	
 	/// 
-	/// Query operations
+	/// Query operations (to optimize on specific implementation)
 	///--------------------------------------------------------------------------
 	
 	/// Performs a search query, and returns the respective MetaObjects
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	///
+	/// @returns  The MetaObject[] array
 	public default MetaObject[] query(String whereClause, Object[] whereValues) {
-		return query(whereClause, whereValues, null);
+		return query(whereClause, whereValues, null, 0, 0);
 	}
 	
 	/// Performs a search query, and returns the respective MetaObjects
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	/// @param   query string to sort the order by, use null to ignore
+	///
+	/// @returns  The MetaObject[] array
 	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr ) {
 		return query(whereClause, whereValues, orderByStr, 0, 0);
 	}
 	
 	/// Performs a search query, and returns the respective MetaObjects
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	/// @param   query string to sort the order by, use null to ignore
+	/// @param   offset of the result to display, use -1 to ignore
+	/// @param   number of objects to return max
+	///
+	/// @returns  The MetaObject[] array
 	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit ) {
 		
 		// The return list
@@ -97,21 +117,55 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 			retList = queryObj.search(this);
 		}
 		
-		// Sorting the order, if needed
-		if( orderByStr != null && (orderByStr = orderByStr.trim()).length() > 0 ) {
-			// Creates the order by sorting, with _oid
-			OrderBy<MetaObject> sorter = new OrderBy<MetaObject>( orderByStr+" , _oid");
-			
-			// Sort it
-			Collections.sort(retList, sorter);
-		}
-		
-		// Get sublist if needed
-		if( offset >= 1 ) {
-			retList = retList.subList( offset, offset+limit );
-		}
-		
-		// Convert to array
-		return retList.toArray(new MetaObject[0]);
+		// Sort, offset, convert to array, and return
+		return JStructUtils.sortAndOffsetListToArray(retList, orderByStr, offset, limit);
 	}
+	
+	/// 
+	/// Get from key names operations (to optimize on specific implementation)
+	///--------------------------------------------------------------------------
+	
+	/// Performs a custom search by configured keyname
+	/// 
+	/// @param   keyName to lookup for
+	///
+	/// @returns  The MetaObject[] array
+	public default MetaObject[] getFromKeyName(String keyName) {
+		return getFromKeyName(keyName, null, -1, -1);
+	}
+	
+	/// Performs a custom search by configured keyname
+	/// 
+	/// @param   keyName to lookup for
+	/// @param   query string to sort the order by, use null to ignore
+	///
+	/// @returns  The MetaObject[] array
+	public default MetaObject[] getFromKeyName(String keyName, String orderByStr) {
+		return getFromKeyName(keyName, orderByStr, -1, -1);
+	}
+	
+	/// Performs a custom search by configured keyname
+	/// 
+	/// @param   keyName to lookup for
+	/// @param   query string to sort the order by, use null to ignore
+	/// @param   offset of the result to display, use -1 to ignore
+	/// @param   number of objects to return max
+	///
+	/// @returns  The MetaObject[] array
+	public default MetaObject[] getFromKeyName(String keyName, String orderByStr, int offset, int limit) {
+		
+		// The return list
+		List<MetaObject> retList = new ArrayList<MetaObject>();
+		
+		// Iterate the list, add if containsKey
+		for( MetaObject obj : values() ) {
+			if(obj.containsKey(keyName)) {
+				retList.add(obj);
+			}
+		}
+		
+		// Sort, offset, convert to array, and return
+		return JStructUtils.sortAndOffsetListToArray(retList, orderByStr, offset, limit);
+	}
+	
 }

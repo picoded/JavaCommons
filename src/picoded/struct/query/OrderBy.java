@@ -66,8 +66,31 @@ public class OrderBy<T> implements Comparator<T> {
 	}
 	
 	//
-	// Core protected functions
+	// To String converter
 	//--------------------------------------------------------------------
+	public String toString() {
+		StringBuilder ret = new StringBuilder();
+		
+		boolean first = true;
+		for( MutablePair<String,OrderType> set : _comparisionConfig ) {
+			if(!first) {
+				ret.append(", ");
+			} else {
+				first = false;
+			}
+			
+			ret.append( set.getLeft() );
+			ret.append( " " );
+			
+			if( set.getRight() == OrderType.ASC ) {
+				ret.append( "ASC" );
+			} else {
+				ret.append( "DESC" );
+			}
+		}
+		
+		return ret.toString();
+	}
 	
 	//
 	// Comparator implmentation

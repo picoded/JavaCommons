@@ -194,126 +194,126 @@ public class MetaTable_test {
 		assertEquals(2, qRes.length);
 	}
 	
-	// @Test
-	// public void missingStrError()  {
-	// 	HashMap<String, Object> objMap = new HashMap<String,Object>();
-	// 	objMap.put("num", 123);
-	// 
-	// 	String guid = GUID.base58();
-	// 	assertNull(mtObj.get(guid));
-	// 	assertEquals(guid, mtObj.append(guid, objMap)._oid());
-	// 
-	// 	MetaObject[] qRes = null;
-	// 	assertNotNull(qRes = mtObj.query(null, null));
-	// 	assertEquals(1, qRes.length);
-	// 
-	// 	objMap.put("_oid", guid);
-	// 	assertEquals(objMap, mtObj.get(guid));
-	// }
-	// 
-	// @Test
-	// public void missingNumWithSomeoneElse()  {
-	// 	mtObj.append(null, genNumStrObj(1, "hello world"));
-	// 
-	// 	HashMap<String, Object> objMap = new HashMap<String,Object>();
-	// 	objMap.put("str_val", "^_^");
-	// 
-	// 	String guid = GUID.base58();
-	// 	assertNull(mtObj.get(guid));
-	// 	assertEquals(guid, mtObj.append(guid, objMap)._oid());
-	// 
-	// 	MetaObject[] qRes = null;
-	// 	assertNotNull(qRes = mtObj.query(null, null));
-	// 	assertEquals(2, qRes.length);
-	// 
-	// 	assertTrue( guid.equals(qRes[0]._oid()) || guid.equals(qRes[1]._oid()) );
-	// 
-	// 	objMap.put("_oid", guid);
-	// 	assertEquals(objMap, mtObj.get(guid));
-	// }
-	// 
-	// @Test
-	// public void getFromKeyNames_basic()  {
-	// 	
-	// 	mtObj.append(null, genNumStrObj(1, "one"));
-	// 	mtObj.append(null, genNumStrObj(2, "two"));
-	// 	
-	// 	MetaObject[] list = null;
-	// 	assertNotNull( list = mtObj.getFromKeyNames("num") );
-	// 	assertEquals( 2, list.length );
-	// 	
-	// 	String str = null;
-	// 	assertNotNull( str = list[0].getString("str_val") );
-	// 	assertTrue( str.equals("one") || str.equals("two") );
-	// 	
-	// 	assertNotNull( str = list[1].getString("str_val") );
-	// 	assertTrue( str.equals("one") || str.equals("two") );
-	// 	
-	// }
-	// 
-	// @Test
-	// public void nonIndexedKeySaveCheck()  {
-	// 	
-	// 	// Generates single node
-	// 	mtObj.append(null, genNumStrObj(1, "hello world"));
-	// 	MetaObject[] list = null;
-	// 	MetaObject node = null;
-	// 	
-	// 	// Fetch that single node
-	// 	assertNotNull( list = mtObj.getFromKeyNames("num") );
-	// 	assertEquals( 1, list.length );
-	// 	assertNotNull( node = list[0] );
-	// 	
-	// 	// Put non indexed key in node, and save
-	// 	node.put("NotIndexedKey", "123");
-	// 	node.saveDelta();
-	// 	
-	// 	// Get the value, to check
-	// 	assertEquals( "123", mtObj.get( node._oid() ).get("NotIndexedKey") );
-	// 	
-	// 	// Refetch node, and get data, and validate
-	// 	assertNotNull( list = mtObj.getFromKeyNames("num") );
-	// 	assertEquals( 1, list.length );
-	// 	assertNotNull( list[0] );
-	// 	assertEquals( node._oid(), list[0]._oid() );
-	// 	assertEquals( "123", node.get("NotIndexedKey") );
-	// 	assertEquals( "123", list[0].get("NotIndexedKey") );
-	// }
-	// 
-	// @Test
-	// public void getFromKeyNames_customKeys()  {
-	// 	
-	// 	// Generates single node
-	// 	mtObj.append(null, genNumStrObj(1, "hello world"));
-	// 	MetaObject[] list = null;
-	// 	MetaObject node = null;
-	// 	
-	// 	// Fetch that single node
-	// 	assertNotNull( list = mtObj.getFromKeyNames("num") );
-	// 	assertEquals( 1, list.length );
-	// 	assertNotNull( node = list[0] );
-	// 	
-	// 	// Put non indexed key in node, and save
-	// 	node.put("NotIndexedKey", "123");
-	// 	node.saveDelta();
-	// 	
-	// 	// Refetch node, and get data, and validate
-	// 	assertNotNull( list = mtObj.getFromKeyNames("num") );
-	// 	assertEquals( 1, list.length );
-	// 	assertNotNull( list[0] );
-	// 	assertEquals( node._oid(), list[0]._oid() );
-	// 	assertEquals( "123", node.get("NotIndexedKey") );
-	// 	assertEquals( "123", list[0].get("NotIndexedKey") );
-	// 	
-	// 	// Fetch non indexed key
-	// 	assertNotNull( list = mtObj.getFromKeyNames("NotIndexedKey") );
-	// 	assertEquals( 1, list.length );
-	// 	
-	// 	// Assert equality
-	// 	assertEquals( node._oid(), list[0]._oid() );
-	// 	
-	// }
-	// 
+	@Test
+	public void missingStrError()  {
+		HashMap<String, Object> objMap = new HashMap<String,Object>();
+		objMap.put("num", 123);
+	
+		String guid = GUID.base58();
+		assertNull(mtObj.get(guid));
+		assertEquals(guid, mtObj.append(guid, objMap)._oid());
+	
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.query(null, null));
+		assertEquals(1, qRes.length);
+	
+		objMap.put("_oid", guid);
+		assertEquals(objMap, mtObj.get(guid));
+	}
+	
+	@Test
+	public void missingNumWithSomeoneElse()  {
+		mtObj.append(null, genNumStrObj(1, "hello world"));
+	
+		HashMap<String, Object> objMap = new HashMap<String,Object>();
+		objMap.put("str_val", "^_^");
+	
+		String guid = GUID.base58();
+		assertNull(mtObj.get(guid));
+		assertEquals(guid, mtObj.append(guid, objMap)._oid());
+	
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.query(null, null));
+		assertEquals(2, qRes.length);
+	
+		assertTrue( guid.equals(qRes[0]._oid()) || guid.equals(qRes[1]._oid()) );
+	
+		objMap.put("_oid", guid);
+		assertEquals(objMap, mtObj.get(guid));
+	}
+	
+	@Test
+	public void getFromKeyName_basic()  {
+		
+		mtObj.append(null, genNumStrObj(1, "one"));
+		mtObj.append(null, genNumStrObj(2, "two"));
+		
+		MetaObject[] list = null;
+		assertNotNull( list = mtObj.getFromKeyName("num") );
+		assertEquals( 2, list.length );
+		
+		String str = null;
+		assertNotNull( str = list[0].getString("str_val") );
+		assertTrue( str.equals("one") || str.equals("two") );
+		
+		assertNotNull( str = list[1].getString("str_val") );
+		assertTrue( str.equals("one") || str.equals("two") );
+		
+	}
+	
+	@Test
+	public void nonIndexedKeySaveCheck()  {
+		
+		// Generates single node
+		mtObj.append(null, genNumStrObj(1, "hello world"));
+		MetaObject[] list = null;
+		MetaObject node = null;
+		
+		// Fetch that single node
+		assertNotNull( list = mtObj.getFromKeyName("num") );
+		assertEquals( 1, list.length );
+		assertNotNull( node = list[0] );
+		
+		// Put non indexed key in node, and save
+		node.put("NotIndexedKey", "123");
+		node.saveDelta();
+		
+		// Get the value, to check
+		assertEquals( "123", mtObj.get( node._oid() ).get("NotIndexedKey") );
+		
+		// Refetch node, and get data, and validate
+		assertNotNull( list = mtObj.getFromKeyName("num") );
+		assertEquals( 1, list.length );
+		assertNotNull( list[0] );
+		assertEquals( node._oid(), list[0]._oid() );
+		assertEquals( "123", node.get("NotIndexedKey") );
+		assertEquals( "123", list[0].get("NotIndexedKey") );
+	}
+	
+	@Test
+	public void getFromKeyName_customKeys()  {
+		
+		// Generates single node
+		mtObj.append(null, genNumStrObj(1, "hello world"));
+		MetaObject[] list = null;
+		MetaObject node = null;
+		
+		// Fetch that single node
+		assertNotNull( list = mtObj.getFromKeyName("num") );
+		assertEquals( 1, list.length );
+		assertNotNull( node = list[0] );
+		
+		// Put non indexed key in node, and save
+		node.put("NotIndexedKey", "123");
+		node.saveDelta();
+		
+		// Refetch node, and get data, and validate
+		assertNotNull( list = mtObj.getFromKeyName("num") );
+		assertEquals( 1, list.length );
+		assertNotNull( list[0] );
+		assertEquals( node._oid(), list[0]._oid() );
+		assertEquals( "123", node.get("NotIndexedKey") );
+		assertEquals( "123", list[0].get("NotIndexedKey") );
+		
+		// Fetch non indexed key
+		assertNotNull( list = mtObj.getFromKeyName("NotIndexedKey") );
+		assertEquals( 1, list.length );
+		
+		// Assert equality
+		assertEquals( node._oid(), list[0]._oid() );
+		
+	}
+	
 	
 	// // Mapping tests
 	// //-----------------------------------------------

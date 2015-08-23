@@ -4,6 +4,8 @@ import java.text.NumberFormat;
 import java.util.function.*;
 import java.util.*;
 
+import picoded.struct.query.*;
+
 public class QueryUtils {
 	
 	///

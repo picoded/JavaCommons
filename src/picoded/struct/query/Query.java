@@ -106,4 +106,23 @@ public interface Query extends Predicate<Object> {
 	/// Returns the query string
 	public String toString();
 	
+	//
+	// Map based search
+	//--------------------------------------------------------------------
+	
+	// Searhes using the query, and returns the resulting set
+	public default <K,V> List<V> search(Map<K,V> set) {
+		List<V> ret = new ArrayList<V>();
+		for(K key : set.keySet()) {
+			V val = set.get(key);
+			if( test(val) ) {
+				ret.add(val);
+			}
+		}
+		return ret;
+	}
+	
+	
+	
+	
 }

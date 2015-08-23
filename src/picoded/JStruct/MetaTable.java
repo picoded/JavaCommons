@@ -7,6 +7,7 @@ import java.util.*;
 import picoded.conv.GUID;
 import picoded.struct.CaseInsensitiveHashMap;
 import picoded.struct.UnsupportedDefaultMap;
+import picoded.struct.query.*;
 import picoded.conv.ListValueConv;
 
 /// MetaTable, servs as the core flexible backend storage implmentation for the whole
@@ -68,5 +69,15 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// nulled or replaced are maintained
 	public MetaObject append(String _oid, Map<String, Object> obj);
 	
+	/// 
+	/// Query operations
+	///--------------------------------------------------------------------------
 	
+	/// Performs a search query, and returns the respective MetaObjects
+	public default MetaObject[] query(String whereClause, Object[] whereValues) {
+		if(whereClause == null) { //null gets all
+			return this.values().toArray(new MetaObject[0]);
+		}
+		return Query.build(whereClause, whereValues).search(this).toArray(new MetaObject[0]);
+	}
 }

@@ -116,59 +116,42 @@ public class MetaTable_test {
 		assertTrue( mtObj.containsKey(guid) );
 	}
 	
-	// @Test
-	// public void basicTestMultiple()  {
-	// 
-	// 	// Useful for debugging
-	// 	JStackObj = new JStack(JSql.sqlite("./test-files/tmp/sqliteTest.db"));
-	// 	testObjSetup();
-	// 
-	// 	int iteration = 100;
-	// 	for (int a = 0; a < iteration; ++a) {
-	// 		basicTest();
-	// 	}
-	// 
-	// 	MetaObject[] qRes = null;
-	// 	assertNotNull(qRes = mtObj.queryObjects(null, null));
-	// 	assertEquals(iteration * 2, qRes.length);
-	// }
-	// 
-	// HashMap<String, Object> genNumStrObj(int number, String str) {
-	// 	HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
-	// 	objMap.put("num", new Integer(number));
-	// 	objMap.put("str_val", str);
-	// 	return objMap;
-	// }
-	// 
-	// @Test
-	// public void indexBasedTest()  {
-	// 
-	// 	mtObj.append(null, genNumStrObj(1, "this"));
-	// 	mtObj.append(null, genNumStrObj(2, "is"));
-	// 	mtObj.append(null, genNumStrObj(3, "hello"));
-	// 	mtObj.append(null, genNumStrObj(4, "world"));
-	// 	mtObj.append(null, genNumStrObj(5, "program"));
-	// 	mtObj.append(null, genNumStrObj(6, "in"));
-	// 	mtObj.append(null, genNumStrObj(7, "this"));
-	// 
-	// 	MetaObject[] qRes = null;
-	// 	assertNotNull(qRes = mtObj.queryObjects(null, null));
-	// 	assertEquals(7, qRes.length);
-	// 
-	// 	assertNotNull(qRes = mtObj.queryObjects("num > ? AND num < ?", new Object[] { 2, 5 }, "num ASC"));
-	// 	assertEquals(2, qRes.length);
-	// 	assertEquals("hello", qRes[0].get("str_val"));
-	// 	assertEquals("world", qRes[1].get("str_val"));
-	// 
-	// 	assertNotNull(qRes = mtObj.queryObjects("str_val = ?", new Object[] { "this" }));
-	// 	assertEquals(2, qRes.length);
-	// 
-	// 	assertNotNull(qRes = mtObj.queryObjects("num > ?", new Object[] { 2 }, "num ASC", 2, 2));
-	// 	assertEquals(2, qRes.length);
-	// 	assertEquals("program", qRes[0].get("str_val"));
-	// 	assertEquals("in", qRes[1].get("str_val"));
-	// 
-	// }
+	HashMap<String, Object> genNumStrObj(int number, String str) {
+		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
+		objMap.put("num", new Integer(number));
+		objMap.put("str_val", str);
+		return objMap;
+	}
+	
+	@Test
+	public void indexBasedTest()  {
+	
+		mtObj.append(null, genNumStrObj(1, "this"));
+		mtObj.append(null, genNumStrObj(2, "is"));
+		mtObj.append(null, genNumStrObj(3, "hello"));
+		mtObj.append(null, genNumStrObj(4, "world"));
+		mtObj.append(null, genNumStrObj(5, "program"));
+		mtObj.append(null, genNumStrObj(6, "in"));
+		mtObj.append(null, genNumStrObj(7, "this"));
+		
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.query(null, null));
+		assertEquals(7, qRes.length);
+		
+		// assertNotNull(qRes = mtObj.queryObjects("num > ? AND num < ?", new Object[] { 2, 5 }, "num ASC"));
+		// assertEquals(2, qRes.length);
+		// assertEquals("hello", qRes[0].get("str_val"));
+		// assertEquals("world", qRes[1].get("str_val"));
+		
+		assertNotNull(qRes = mtObj.query("str_val = ?", new Object[] { "this" }));
+		assertEquals(2, qRes.length);
+		
+		// assertNotNull(qRes = mtObj.queryObjects("num > ?", new Object[] { 2 }, "num ASC", 2, 2));
+		// assertEquals(2, qRes.length);
+		// assertEquals("program", qRes[0].get("str_val"));
+		// assertEquals("in", qRes[1].get("str_val"));
+	
+	}
 	// 
 	// ///
 	// /// An exception occurs, if a query fetch occurs with an empty table

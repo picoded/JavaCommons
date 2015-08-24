@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.hazelcast.instance.Node;
+
 import picoded.conv.ListValueConv;
 import picoded.conv.GenericConvert;
 import picoded.conv.RegexUtils;
@@ -38,7 +40,6 @@ public class FormInputTemplates {
 		return sbArr[0].append(text).append(fieldValue).append(sbArr[1]);
 	};
 	
-	@SuppressWarnings("unchecked")
 	protected static FormInputInterface select = (node)->{ 
 		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.SELECT, "pfi_select pfi_input", null );
 		StringBuilder ret = sbArr[0];
@@ -65,7 +66,6 @@ public class FormInputTemplates {
 		return ret;
 	};
 	
-	@SuppressWarnings("unchecked")
 	protected static FormInputInterface input_text = (node)->{
 		CaseInsensitiveHashMap<String,String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getFieldValue();
@@ -117,6 +117,40 @@ public class FormInputTemplates {
 		return ret;
 	};
 	
+	protected static FormInputInterface checkbox = (node)->{
+		CaseInsensitiveHashMap<String,String> paramMap = new CaseInsensitiveHashMap<String, String>();
+		paramMap.put(HtmlTag.TYPE, JsonKeys.CHECKBOX);
+		String selection = "";
+		if(node.containsKey("selected")){
+			selection = RegexUtils.removeAllNonAlphaNumeric(node.getString("selected"));
+		}
+		
+//		List<String> keyList = new ArrayList<String>();
+//		List<String> nameList = new ArrayList<String>();
+		Map<String, String> keyNamePair = new HashMap<String, String>();
+		Object optionsObject = node.get(JsonKeys.OPTIONS);
+		keyNamePair = optionsKeyNamePair(optionsObject);
+//		nameList = dropdownNameList(dropDownObject);
+//		keyList = dropdownKeyList(dropDownObject);
+		
+		StringBuilder ret = new StringBuilder();
+		for(String key:keyNamePair.keySet()){
+			CaseInsensitiveHashMap<String,String> tempMap = new CaseInsensitiveHashMap<String, String>(paramMap);
+			tempMap.put("value", key);
+			
+			
+			if(key.equalsIgnoreCase(selection)){
+				tempMap.put("checked", "checked");
+			}
+			
+			StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputCheckbox pfi_input", tempMap );
+			ret.append(sbArr[0]);
+			ret.append(keyNamePair.get(key));
+			ret.append(sbArr[1]);
+		}
+		return ret;
+	};
+	
 	protected static FormInputInterface raw_html = (node)->{
 		StringBuilder sb = new StringBuilder();
 		sb.append(node.getString(JsonKeys.HTML_INJECTION));
@@ -136,6 +170,7 @@ public class FormInputTemplates {
 		defaultTemplates.put(JsonKeys.TEXT, FormInputTemplates.input_text);
 		defaultTemplates.put(JsonKeys.HTML_INJECTION, FormInputTemplates.raw_html);
 		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, dropdownWithOthers);
+		defaultTemplates.put(JsonKeys.CHECKBOX, checkbox);
 		
 		return defaultTemplates;
 	}
@@ -196,6 +231,27 @@ public class FormInputTemplates {
 		}
 		
 		return keyList;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static Map<String, String> optionsKeyNamePair(Object optionsObject){
+		Map<String, String> ret = new HashMap<String, String>();
+		
+		if(optionsObject instanceof List){
+			List<String> nameList = ListValueConv.objectToString( (List<Object>)optionsObject );
+			for(String name:nameList){
+				ret.put(RegexUtils.removeAllNonAlphaNumeric(name).toLowerCase(), name);
+			}
+		}else if(optionsObject instanceof Map){
+			Map<String,Object> optionsMap = (Map<String,Object>)optionsObject;
+			for(String key : optionsMap.keySet()){
+				String sanitisedKey = RegexUtils.removeAllNonAlphaNumeric(key).toLowerCase();
+				ret.put(sanitisedKey, (String)optionsMap.get(key));
+			}
+			
+		}
+		
+		return ret;
 	}
 	
 	private static void createDropdownHTMLString(StringBuilder sb, List<String> keyList, List<String> nameList, String selectedKey){

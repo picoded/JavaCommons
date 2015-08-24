@@ -115,6 +115,7 @@ public class JsonKeys {
 	
 	public static String TEXT = "text";
 	public static String TITLE = "title";
+	public static String CHECKBOX = "checkbox";
 	public static String SUBNODES = "subnodes";
 	public static String DROPDOWN = "dropdown";
 	public static String LABEL = "label";

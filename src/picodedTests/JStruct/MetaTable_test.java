@@ -327,7 +327,6 @@ public class MetaTable_test {
 		
 	}
 	
-	
 	// Mapping tests
 	//-----------------------------------------------
 	

@@ -42,11 +42,11 @@ public class FormInputTemplates_test {
 	}
 	
 	private String getTitleHtmlString(){
-		return "<h3 class='pf_header'>Hello there</h3>";
+		return "<h3 class='pfi_header pfi_input'>Hello there</h3>";
 	}
 	
 	private String getDropdownHtmlString(){
-		return "<select class='pf_select' name='dropdownfield'>"+
+		return "<select class='pfi_select pfi_input' name='dropdownfield'>"+
 					"<option value=\"option1\">Option 1</option>"+
 					"<option value=\"option2\">Option 2</option>"+
 					"<option value=\"option3\">Option 3</option>"+
@@ -55,7 +55,7 @@ public class FormInputTemplates_test {
 	}
 	
 	private String getTextHtmlString(){
-		return "<input type='text' class='pf_inputText'></input>";
+		return "<input type='text' class='pfi_inputText pfi_input' value=''></input>";
 	}
 	
 	private String getDropdownWithOthersHtmlString(){

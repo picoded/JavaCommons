@@ -14,23 +14,33 @@ import picoded.struct.CaseInsensitiveHashMap;
 
 public class FormInputTemplates {
 	
-	protected static FormInputInterface div = (node)->{
+	public static StringBuilder displayDiv( FormNode node, String pfiClass ) {
 		String text = node.getString(JsonKeys.TEXT, "");
 		String fieldValue = node.getFieldValue();
-		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, "pf_div", null );
-		return sbArr[0].append(text).append(fieldValue).append(sbArr[1]);
+		
+		String textAndField = text+fieldValue;
+		if(textAndField == null || textAndField.length() <= 0) {
+			return new StringBuilder();
+		}
+		
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, pfiClass, null );
+		return sbArr[0].append(textAndField).append(sbArr[1]);
+	}
+	
+	protected static FormInputInterface div = (node)->{
+		return FormInputTemplates.displayDiv(node, "pfi_div pfi_input");
 	};
 	
 	protected static FormInputInterface header = (node)->{ 
 		String text = node.getString(JsonKeys.TEXT, "");
 		String fieldValue = node.getFieldValue() != null ? node.getFieldValue():"";
-		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.HEADER, "pf_header", null );
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.HEADER, "pfi_header pfi_input", null );
 		return sbArr[0].append(text).append(fieldValue).append(sbArr[1]);
 	};
 	
 	@SuppressWarnings("unchecked")
 	protected static FormInputInterface select = (node)->{ 
-		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.SELECT, "pf_select", null );
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.SELECT, "pfi_select pfi_input", null );
 		StringBuilder ret = sbArr[0];
 		
 		// Prepeare the option key value list
@@ -65,7 +75,7 @@ public class FormInputTemplates {
 			paramMap.put(HtmlTag.VALUE, fieldValue);
 		}
 		
-		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pf_inputText", paramMap );
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputText pfi_input", paramMap );
 		return sbArr[0].append(sbArr[1]);
 	};
 	

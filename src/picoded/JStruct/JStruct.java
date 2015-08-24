@@ -16,9 +16,17 @@ public class JStruct {
 	protected ConcurrentHashMap<String,KeyValueMap> keyValueMapCache = new ConcurrentHashMap<String,KeyValueMap>();
 	protected ReentrantReadWriteLock keyValueMapCache_lock = new ReentrantReadWriteLock();
 	
-	/// Setsup and return a KeyValueMap object,
-	/// This is overriden for the various implmentation version
+	/// Actual setup implmentation to overwrite
 	///
+	/// @param name - name of map in backend
+	///
+	/// @returns KeyValueMap
+	protected KeyValueMap setupKeyValueMap(String name) {
+		return new JStruct_KeyValueMap();
+	}
+	
+	/// Setsup and return a KeyValueMap object,
+	/// 
 	/// @param name - name of map in backend
 	///
 	/// @returns KeyValueMap
@@ -42,7 +50,7 @@ public class JStruct {
 				return cacheCopy;
 			}
 			
-			cacheCopy = new JStruct_KeyValueMap();
+			cacheCopy = setupKeyValueMap(name);
 			keyValueMapCache.put( name, cacheCopy );
 			return cacheCopy;
 			

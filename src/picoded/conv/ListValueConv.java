@@ -1,12 +1,6 @@
 package picoded.conv;
 
-import java.util.Map;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /// 
 /// Utility conversion class, that helps convert Map values from one type to another
@@ -26,5 +20,13 @@ public class ListValueConv {
 		Set<String> set = new HashSet<String>();
 		set.addAll(list);
 		return new ArrayList<String>(set);
+	}
+	
+	public static <V> Set<String> toStringSet(List<V> list) {
+		Set<String> ret = new HashSet<String>();
+		for(V item : list) {
+			ret.add( item.toString() );
+		}
+		return ret;
 	}
 }

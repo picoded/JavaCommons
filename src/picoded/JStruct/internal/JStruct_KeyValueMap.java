@@ -77,7 +77,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	
 	/// Setsup the backend storage table, etc. If needed
 	public void systemSetup() {
-		clear();
+		//clear();
 	}
 	
 	/// Teardown and delete the backend storage table, etc. If needed
@@ -257,7 +257,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	}
 	
 	///
-	/// put, get, etc (to override)
+	/// put, get, remove, etc (to override)
 	///--------------------------------------------------------------------------
 	
 	/// [Internal use, to be extended in future implementation]
@@ -306,6 +306,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 			
 			if( value == null ) {
 				valueMap.remove(key);
+				expireMap.remove(key);
 			} else {
 				valueMap.put(key, value);
 			}
@@ -349,11 +350,36 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 			accessLock.readLock().unlock();
 		}
 	}
-
+	
+	/// Remove the value, given the key
+	///
+	/// @param key param find the thae meta key
+	///
+	/// @returns  null
+	public String remove(Object key) {
+		try {
+			accessLock.writeLock().lock();
+			
+			valueMap.remove(key);
+			expireMap.remove(key);
+			
+			return null;
+		} finally {
+			accessLock.writeLock().unlock();
+		}
+	}
+	
 	///
 	/// put, get, etc (public)
 	///--------------------------------------------------------------------------
 	
+	/// Returns all the valid keys
+	///
+	/// @returns  the full keyset
+	public Set<String> keySet() {
+		return getKeys(null);
+	}
+
 	/// Contains key operation.
 	///
 	/// note that boolean false can either mean no value or expired value

@@ -8,12 +8,27 @@ import picoded.struct.query.condition.*;
 /// Internal utilty function for string query filtering,
 /// used before breaking by whitespace and tokenizing it.
 ///
-/// The process goes through the following steps for tokenizing
+/// # String processing
+///
+/// The process goes through the following steps for tokenizing th string
 ///
 /// 1) Replace out the ? numeric arguments with its named equivalent :x
 /// 2) Enforce spaces before ":", before and after <=,=,!=,>=,(,)
 ///    Also, remove redundent whitespace, and normalize them to spaces
-/// 4) Split by whitespace : into string tokens, and build the query object
+/// 3) Split by whitespace : into string tokens, and build the query object
+///
+/// # Token processing
+///
+/// After which the process goes through the steps processing these tokens into Query tokens,
+/// which are linked and reduced till there is only 1 query token.
+///
+/// 1) Scan for basic comparision operators, this is found using the compare operators such as =, <=, >
+///    and build the Query tokens to replace the string tokens.
+/// 2) Scans for an isolated enclosed bracket ( query ), that has no inner enclosed bracket string tokens.
+///    In event the the whole list does not contains inner bracket, the whole token set is chosen
+/// 3) Inside the isolated token set, does a combination merger of all the various Query tokens,
+///    Forming a single large token, per isolated enclosed bracket token set.
+/// 4) Step 2 & 3 is looped till there is only 1 token left, which is returned
 ///
 /// @TODO: Optimize this class haha, generally this whole set of 
 ///        filters are NOT string modification optimized
@@ -24,6 +39,10 @@ public class QueryFilter {
 	// String processors
 	//
 	//---------------------------------
+	
+	//
+	// Step 1) 
+	//
 	
 	/// Searches and replace the query string ? with :QueryNumber
 	///
@@ -60,6 +79,10 @@ public class QueryFilter {
 		return baseMap;
 	}
 	
+	//
+	// Step 2) 
+	//
+	
 	/// Enforcing spaces before & after the critical characters.
 	/// Also, remove redundent whitespace, and normalize them to spaces
 	/// 
@@ -94,6 +117,10 @@ public class QueryFilter {
 		query = query.replaceAll("\\s+"," ").trim(); //remove redundent whitespace
 		return query;
 	}
+	
+	//
+	// Step 1 & 2 Combined) 
+	//
 	
 	/// Refactor the query to one that is easily parsed by a tokenizer
 	///
@@ -138,23 +165,73 @@ public class QueryFilter {
 
 	}
 	
+	//
+	// Step 3) 
+	//
+	
+	/// Splits the refactoed query into string tokens
+	///
+	/// @params  the query string from refactorQuery
+	///
+	/// @returns  string tokens array
+	public static String[] splitRefactoredQuery(String query) {
+		return query.split("\\s+");
+	}
+	
 	//---------------------------------
 	//
 	// Query processors
 	//
 	//---------------------------------
 	
-	/// Standard query tokens
+	//
+	// Step 1) 
+	//
+	
+	/// Basic query operator tokens to search for
 	public static List<String> basicOperators = Arrays.asList(new String[] { //
 		"=", "<", ">", "<=", ">="
 	}); //
 	
-	/// Extended query tokens
+	/// Extended query tokens to search for
 	public static List<String> combinationOperators = Arrays.asList(new String[] { //
 		"AND", "OR", "NOT"
 	}); //
 	
-	/// Builds and return query
+	/// Extract out the string, and build the basic query
+	/// 
+	/// @params  token array containing the original query
+	/// @params  parameter map to use as default
+	///
+	/// @returns  list of objects of which consist either of built operator Query, and string tokens
+	public static List<Object> buildBasicQuery( String[] token, Map<String,Object> paramMap ) {
+		List<Object> ret = new ArrayList<Object>();
+		
+		for(int a=0; (a+2)<token.length; ++a) {
+			
+			/// Found an operator, pushes it
+			if( basicOperators.contains(token[a+1]) ) {
+				// Add query
+				ret.add( basicQueryFromTokens(paramMap, token[a], token[a+1], token[a+2]) );
+				a += 2; // Skip next 2 tokens
+				continue; // next
+			} 
+			
+			/// Failed operator find, push token to return list
+			ret.add( token[a] );
+		}
+		
+		return ret;
+	}
+	
+	/// Refactor the query to one that is easily parsed by a tokenizer
+	///
+	/// @params  parameter map to use as default
+	/// @params  field name token before the operator used 
+	/// @params  operator token used to choose the query
+	/// @params  named argument used after the operator
+	///
+	/// @returns  built query
 	public static Query basicQueryFromTokens( Map<String,Object> paramsMap, String before, String operator, String after ) {
 		String field = QueryUtils.unwrapFieldName(before);
 		String namedParam = after;
@@ -184,41 +261,15 @@ public class QueryFilter {
 		throw new RuntimeException("Unknown operator set found: "+before+" "+operator+" "+after);
 	}
 	
-	/// Build combination query
-	public static Query combinationQuery( String combinationType, List<Query> childQuery, Map<String,Object> paramsMap ) {
-		if( combinationType.equals("AND") ) {
-			return new And(childQuery, paramsMap);
-		} else if( combinationType.equals("OR") ) {
-			return new Or(childQuery, paramsMap);
-		} else if( combinationType.equals("NOT") ) {
-			return new Not(childQuery, paramsMap);
-		}
-		
-		throw new RuntimeException("Unknown combination set found: "+combinationType+" "+childQuery);
-	}
+	//
+	// Step 2) 
+	//
 	
-	/// Extract out the string, and build the basic query
-	public static List<Object> buildBasicQuery( String[] token, Map<String,Object> paramMap ) {
-		List<Object> ret = new ArrayList<Object>();
-		
-		for(int a=0; (a+2)<token.length; ++a) {
-			
-			/// Found an operator, pushes it
-			if( basicOperators.contains(token[a+1]) ) {
-				// Add query
-				ret.add( basicQueryFromTokens(paramMap, token[a], token[a+1], token[a+2]) );
-				a += 2; // Skip next 2 tokens
-				continue; // next
-			} 
-			
-			/// Failed operator find, push token to return list
-			ret.add( token[a] );
-		}
-		
-		return ret;
-	}
-	
-	/// Finds the first enclosed bracket, without nested brackets, and returns its start and end position
+	/// Scans the token set for an isolated set
+	///
+	/// @params  Current list of Query and string tokens
+	///
+	/// @returns  {int[2]}  an array consisting of the left and right position. -1 if not found
 	public static int[] findCompleteEnclosure( List<Object> queryTokens ) {
 		
 		// Gets the start and end
@@ -252,8 +303,36 @@ public class QueryFilter {
 		return new int[] { -1, -1 };
 	}
 	
-	/// Collapses the query token into a single query,
-	/// This only works when basic operators has been processed, and brackets removed
+	//
+	// Step 3) 
+	//
+	
+	/// Builds a combination query and returns
+	///
+	/// @params  The combination type string
+	/// @params  list of child query to join in the combination
+	/// @params  default parameter map of query
+	///
+	/// @returns  The combined query
+	public static Query combinationQuery( String combinationType, List<Query> childQuery, Map<String,Object> paramsMap ) {
+		if( combinationType.equals("AND") ) {
+			return new And(childQuery, paramsMap);
+		} else if( combinationType.equals("OR") ) {
+			return new Or(childQuery, paramsMap);
+		} else if( combinationType.equals("NOT") ) {
+			return new Not(childQuery, paramsMap);
+		}
+		
+		throw new RuntimeException("Unknown combination set found: "+combinationType+" "+childQuery);
+	}
+	
+	
+	/// Builds a combined query given an isolated token set
+	///
+	/// @params  The isolated token set
+	/// @params  default parameter map of query
+	///
+	/// @returns  The combined query
 	public static Query collapseQueryTokensWithoutBrackets( List<Object> tokens, Map<String,Object> paramMap ) {
 		if( tokens.size() == 1 ) {
 			Object t = tokens.get(0);
@@ -316,8 +395,18 @@ public class QueryFilter {
 		return combinationQuery( combinationType, childList, paramMap );
 	}
 	
+	//
+	// Step 4) 
+	//
+	
 	/// Collapses the query token into a single query,
 	/// This first isolates out the brackets, before calling collapseQueryTokensWithoutBrackets
+	/// and does step 4), which does step 2 & 3) till a single query remains
+	///
+	/// @params  list of tokens to combine
+	/// @params  default parameter map of query
+	///
+	/// @returns  The combined query
 	public static Query collapseQueryTokens( List<Object> tokens, Map<String,Object> paramMap ) {
 		
 		while( tokens.size() > 1 ) {
@@ -353,6 +442,10 @@ public class QueryFilter {
 		throw new RuntimeException("Unexpected collapseQueryTokens end");
 	}
 	
+	//
+	// All the string, tokenizer steps combined.
+	//
+	
 	/// Refactor the query to one that is easily parsed by a tokenizer
 	///
 	/// @params  the query string to filter out
@@ -366,7 +459,7 @@ public class QueryFilter {
 		Object[] argArr //
 	) { //
 		MutablePair<String,Map<String,Object>> refac = refactorQuery(query, baseMap, argArr);
-		String[] querySplit = refac.getLeft().split("\\s+");
+		String[] querySplit = splitRefactoredQuery(refac.getLeft());
 		List<Object> tokenArr = buildBasicQuery(querySplit, refac.getRight() );
 		return collapseQueryTokens(tokenArr, refac.getRight() );
 	}

@@ -19,7 +19,7 @@ import java.util.*;
 import picodedTests.JStruct.*;
 import picodedTests.*;
 
-public class KeyValueMap_Sqlite_test extends KeyValueMap_test {
+public class MetaTable_Sqlite_test extends MetaTable_test {
 	
 	/// To override for implementation
 	///------------------------------------------------------
@@ -30,9 +30,9 @@ public class KeyValueMap_Sqlite_test extends KeyValueMap_test {
 	
 	public String tableName = TestConfig.randomTablePrefix();
 	
-	public KeyValueMap implementationConstructor() {
+	public MetaTable implementationConstructor() {
 		JSqlStruct jsObj = new JSqlStruct(sqlImplmentation());
-		return jsObj.getKeyValueMap("KVM_"+tableName);
+		return jsObj.getMetaTable("MT_"+tableName);
 	}
 	
 }

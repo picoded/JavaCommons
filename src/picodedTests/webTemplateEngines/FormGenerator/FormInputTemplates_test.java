@@ -42,11 +42,11 @@ public class FormInputTemplates_test {
 	}
 	
 	private String getTitleHtmlString(){
-		return "<h3 class='pf_header'>Hello there</h3>";
+		return "<h3 class='pfi_header pfi_input'>Hello there</h3>";
 	}
 	
 	private String getDropdownHtmlString(){
-		return "<select class='pf_select' name='dropdownfield'>"+
+		return "<select class='pfi_select pfi_input' name='dropdownfield'>"+
 					"<option value=\"option1\">Option 1</option>"+
 					"<option value=\"option2\">Option 2</option>"+
 					"<option value=\"option3\">Option 3</option>"+
@@ -55,7 +55,7 @@ public class FormInputTemplates_test {
 	}
 	
 	private String getTextHtmlString(){
-		return "<input type='text' class='pf_inputText'></input>";
+		return "<input type='text' class='pfi_inputText pfi_input' value=''></input>";
 	}
 	
 	private String getDropdownWithOthersHtmlString(){
@@ -70,19 +70,21 @@ public class FormInputTemplates_test {
 						"}"+
 					"};"+
 				"</script>"+
-				"<select class=\"pf_select\" onchange=\"OnChangeDropDown()\" name=\"dropdownfield\">"+
+				"<select class=\'pf_select\' onchange=\'OnChangeDropDown()\' name=\'dropdownfield\'>"+
 					"<option value=\"option1\">Option 1</option>"+
 					"<option value=\"option2\">Option 2</option>"+
 					"<option value=\"option3\">Option 3</option>"+
 					"<option value=\"option4\">Option 4</option>"+
 				"</select>"+
-				"<input class=\"pf_inputText\" style=\"display:none\" type=\"text\" name=\"dropdownTextField\">";
+				"<input class=\'pf_inputText\' style=\'display:none\' type=\'text\' name=\'dropdownTextField\'>";
 	}
 	
 	@Test
 	public void titleTest(){
 		String jsonTemplatedOutput = getFinalTemplatedJsonString("title");
 		String rawHtmlString = getHtmlString("title");
+		
+		assertNotNull(jsonTemplatedOutput);
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);
@@ -93,6 +95,8 @@ public class FormInputTemplates_test {
 		String jsonTemplatedOutput = getFinalTemplatedJsonString("dropdown");
 		String rawHtmlString = getHtmlString("dropdown");
 		
+		assertNotNull(jsonTemplatedOutput);
+		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);
 	}
@@ -101,6 +105,8 @@ public class FormInputTemplates_test {
 	public void textTest(){
 		String jsonTemplatedOutput = getFinalTemplatedJsonString("text");
 		String rawHtmlString = getHtmlString("text");
+		
+		assertNotNull(jsonTemplatedOutput);
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);
@@ -111,6 +117,8 @@ public class FormInputTemplates_test {
 		String jsonTemplatedOutput = getFinalTemplatedJsonString("dropdownWithOthers");
 		String rawHtmlString = getHtmlString("dropdownWithOthers");
 
+		assertNotNull(jsonTemplatedOutput);
+		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);
 	}

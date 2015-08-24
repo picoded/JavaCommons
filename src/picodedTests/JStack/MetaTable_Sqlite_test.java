@@ -66,7 +66,6 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 	@Test
 	public void testSingleMappingSystem() throws JStackException
 	{
-		//System.out.println("Starting single mapping test");
 		mtObj.clearTypeMapping();
 
 		mtObj.putType("num", "INTEGER");
@@ -83,7 +82,6 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 	@Test
 	public void testMapMappingSystem() throws JStackException
 	{
-		//System.out.println("Starting map mapping test");
 		mtObj.clearTypeMapping();
 
 		HashMap<String, Object> mapping = new HashMap<String, Object>();
@@ -125,12 +123,12 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 	// Test utility used to generate random maps
 	protected HashMap<String, Object> randomObjMap() {
 		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
-		objMap.put(GUID.base58(), RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
-		objMap.put(GUID.base58(), -(RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3))));
+		objMap.put(GUID.base58(), RandomUtils.nextInt(0, 99999));
+		objMap.put(GUID.base58(), -(RandomUtils.nextInt(0, 99999)));
 		objMap.put(GUID.base58(), GUID.base58());
 		objMap.put(GUID.base58(), GUID.base58());
 
-		objMap.put("num", RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
+		objMap.put("num", RandomUtils.nextFloat(0, 99999));
 		objMap.put("str_val", GUID.base58());
 
 		return objMap;
@@ -145,7 +143,7 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		assertEquals(guid, mtObj.append(guid, objMap)._oid());
 
 		objMap.put("_oid", guid);
-		assertEquals(objMap, mtObj.get(guid));
+		assertEquals(new TreeMap<String, Object>(objMap), new TreeMap<String, Object>(mtObj.get(guid)));
 
 		objMap = randomObjMap();
 		assertNotNull(guid = mtObj.append(null, objMap)._oid());
@@ -192,15 +190,15 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		assertNotNull(qRes = mtObj.queryObjects(null, null));
 		assertEquals(7, qRes.length);
 
-		assertNotNull(qRes = mtObj.queryObjects("num > ? AND num < ?", new Object[] { 2, 5 }, "num ASC"));
+		assertNotNull(qRes = mtObj.queryObjects("\"num\" > ? AND \"num\" < ?", new Object[] { 2, 5 }, "\"num\" ASC"));
 		assertEquals(2, qRes.length);
 		assertEquals("hello", qRes[0].get("str_val"));
 		assertEquals("world", qRes[1].get("str_val"));
 
-		assertNotNull(qRes = mtObj.queryObjects("str_val = ?", new Object[] { "this" }));
+		assertNotNull(qRes = mtObj.queryObjects("\"str_val\" = ?", new Object[] { "this" }));
 		assertEquals(2, qRes.length);
 
-		assertNotNull(qRes = mtObj.queryObjects("num > ?", new Object[] { 2 }, "num ASC", 2, 2));
+		assertNotNull(qRes = mtObj.queryObjects("\"num\" > ?", new Object[] { 2 }, "\"num\" ASC", 2, 2));
 		assertEquals(2, qRes.length);
 		assertEquals("program", qRes[0].get("str_val"));
 		assertEquals("in", qRes[1].get("str_val"));
@@ -239,13 +237,13 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		assertNotNull(qRes = mtObj.queryObjects(null, null));
 		assertEquals(3, qRes.length);
 
-		assertNotNull(qRes = mtObj.queryObjects("str_val = ?", new Object[] { "nope" }));
+		assertNotNull(qRes = mtObj.queryObjects("\"str_val\" = ?", new Object[] { "nope" }));
 		assertEquals(1, qRes.length);
 
-		assertNotNull(qRes = mtObj.queryObjects("num = ?", new Object[] { 1 }));
+		assertNotNull(qRes = mtObj.queryObjects("\"num\" = ?", new Object[] { 1 }));
 		assertEquals(1, qRes.length);
 
-		assertNotNull(qRes = mtObj.queryObjects("num <= ?", new Object[] { 2 }));
+		assertNotNull(qRes = mtObj.queryObjects("\"num\" <= ?", new Object[] { 2 }));
 		assertEquals(2, qRes.length);
 	}
 
@@ -318,9 +316,90 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		assertFalse( mtObj.containsKey("hello") );
 		assertNotNull( p = mtObj.newObject() );
 		assertNotNull( guid = p._oid() );
-
+		
 		assertTrue( mtObj.containsKey(guid) );
-
 	}
-
+	
+	@Test
+	public void getFromKeyNames_basic() throws JStackException {
+		
+		mtObj.append(null, genNumStrObj(1, "one"));
+		mtObj.append(null, genNumStrObj(2, "two"));
+		
+		MetaObject[] list = null;
+		assertNotNull( list = mtObj.getFromKeyNames("num") );
+		assertEquals( 2, list.length );
+		
+		String str = null;
+		assertNotNull( str = list[0].getString("str_val") );
+		assertTrue( str.equals("one") || str.equals("two") );
+		
+		assertNotNull( str = list[1].getString("str_val") );
+		assertTrue( str.equals("one") || str.equals("two") );
+		
+	}
+	
+	@Test
+	public void nonIndexedKeySaveCheck() throws JStackException {
+		
+		// Generates single node
+		mtObj.append(null, genNumStrObj(1, "hello world"));
+		MetaObject[] list = null;
+		MetaObject node = null;
+		
+		// Fetch that single node
+		assertNotNull( list = mtObj.getFromKeyNames("num") );
+		assertEquals( 1, list.length );
+		assertNotNull( node = list[0] );
+		
+		// Put non indexed key in node, and save
+		node.put("NotIndexedKey", "123");
+		node.saveDelta();
+		
+		// Get the value, to check
+		assertEquals( "123", mtObj.get( node._oid() ).get("NotIndexedKey") );
+		
+		// Refetch node, and get data, and validate
+		assertNotNull( list = mtObj.getFromKeyNames("num") );
+		assertEquals( 1, list.length );
+		assertNotNull( list[0] );
+		assertEquals( node._oid(), list[0]._oid() );
+		assertEquals( "123", node.get("NotIndexedKey") );
+		assertEquals( "123", list[0].get("NotIndexedKey") );
+	}
+	
+	@Test
+	public void getFromKeyNames_customKeys() throws JStackException {
+		
+		// Generates single node
+		mtObj.append(null, genNumStrObj(1, "hello world"));
+		MetaObject[] list = null;
+		MetaObject node = null;
+		
+		// Fetch that single node
+		assertNotNull( list = mtObj.getFromKeyNames("num") );
+		assertEquals( 1, list.length );
+		assertNotNull( node = list[0] );
+		
+		// Put non indexed key in node, and save
+		node.put("NotIndexedKey", "123");
+		node.saveDelta();
+		
+		// Refetch node, and get data, and validate
+		assertNotNull( list = mtObj.getFromKeyNames("num") );
+		assertEquals( 1, list.length );
+		assertNotNull( list[0] );
+		assertEquals( node._oid(), list[0]._oid() );
+		assertEquals( "123", node.get("NotIndexedKey") );
+		assertEquals( "123", list[0].get("NotIndexedKey") );
+		
+		// Fetch non indexed key
+		assertNotNull( list = mtObj.getFromKeyNames("NotIndexedKey") );
+		assertEquals( 1, list.length );
+		
+		// Assert equality
+		assertEquals( node._oid(), list[0]._oid() );
+		
+	}
+	
 }

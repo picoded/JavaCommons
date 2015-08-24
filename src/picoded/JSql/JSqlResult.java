@@ -89,6 +89,15 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Lis
 				while (sqlRes.next()) {
 					for (pt = 0; pt < colCount; pt++) {
 						colName = rsmd.getColumnName(pt + 1);
+						// remove single quote if it is first and last character.
+						if (colName != null && colName.trim().length() > 0) {
+							if (colName.charAt(0) == '\'' || colName.charAt(0) == '"') {
+							    colName = colName.substring(1);
+							}
+							if (colName.charAt(colName.length() - 1) == '\'' || colName.charAt(colName.length() - 1) == '"') {
+							    colName = colName.substring(0, colName.length() - 1);
+							}
+						}
 						
 						if (this.containsKey(colName)) {
 							colArr = this.get(colName);

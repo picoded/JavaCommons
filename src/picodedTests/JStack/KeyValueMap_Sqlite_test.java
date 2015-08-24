@@ -48,7 +48,6 @@ public class KeyValueMap_Sqlite_test extends JStackData_testBase_test {
 		kvObj.put("hello", "world");
 		assertTrue( kvObj.containsKey("hello") );
 		assertEquals( "world", kvObj.get("hello") );
-		
 	}
 	
 	@Test
@@ -113,14 +112,14 @@ public class KeyValueMap_Sqlite_test extends JStackData_testBase_test {
 	@Test
 	public void testColumnExpiration() throws Exception {
 	   //set column expiration time to current time + 30 secs.
-	   long expirationTime = currentSystemTime_seconds() + 30;
+	   long expirationTime = currentSystemTime_seconds() + 1;
 	   kvObj.putWithExpiry("yes", "no", expirationTime);
 
 	   //before the expiration time key will not be null.
 	   assertNotNull(kvObj.get("yes"));
 
 	   //sleep the execution for 31 secs so that key gets expired.
-	   Thread.sleep(31000);
+	   Thread.sleep(2000);
 
 	   //key should be null after expiration time.
 	   assertEquals( null, kvObj.get("yes"));

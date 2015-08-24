@@ -471,6 +471,9 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 					ret = processChainRequest();
 				}
 				
+				// Flush any data if exists
+				getWriter().flush();
+				
 				// Does teardwon
 				doTeardown();
 				

@@ -83,4 +83,40 @@ public class AccountTable_Sqlite_test extends JStackData_testBase_test {
 		assertTrue( ptObj.containsKey(name) );
 		assertNotNull( p = ptObj.get(name) );
 	}
+
+	// Group tests
+	//-----------------------------------------------
+
+	@Test
+	public void basicGroupMembership() throws JStackException {
+		String grpName = "hello-group";
+		String usrName = "user1";
+		AccountObject grpObj;
+		AccountObject usrObj;
+		
+		assertFalse( ptObj.containsKey(grpName) );
+		assertNull( ptObj.get(grpName) );
+		
+		assertNotNull( grpObj = ptObj.newObject(grpName) );
+		assertArrayEquals( new String[0], grpObj.getMembers_id() );
+		
+		assertFalse( ptObj.containsKey(usrName) );
+		assertNull( ptObj.get(usrName) );
+		assertNotNull( usrObj = ptObj.newObject(usrName) );
+		
+		assertArrayEquals( new String[] { }, grpObj.getMembers_id() );
+		
+		assertNotNull( grpObj.addMember( usrObj, "guest" ) );
+		assertArrayEquals( "addMember failed?", new String[] { usrObj._oid() }, grpObj.getMembers_id() );
+		
+		AccountObject[] usrList = null;
+		assertNotNull( usrList = grpObj.getMembers() );
+		assertEquals( 1, usrList.length );
+		assertEquals( usrObj._oid(), usrList[0]._oid() );
+		
+		AccountObject[] grpList = null;
+		assertNotNull( grpList = usrObj.getGroups() );
+		assertEquals( 1, grpList.length );
+		assertEquals( grpObj._oid(), grpList[0]._oid() );
+	}
 }

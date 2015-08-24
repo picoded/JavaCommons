@@ -40,11 +40,15 @@ import com.hazelcast.core.IMap;
 ///
 /// The intention here, is to facilitate complex hierachy creations rapidly. Especially against changing specs.
 ///
-/// Any refences to the persona game, is completely coincidental
+/// Any refences to the persona game, is completely coincidental !
+/// (PS: old joke, the original name for this class was PersonaTable)
+///
+/// ──────▄▀▄─────▄▀▄
+/// ─────▄█░░▀▀▀▀▀░░█▄
+/// ─▄▄──█░░░░░░░░░░░█──▄▄
+/// █▄▄█─█░░▀░░┬░░▀░░█─█▄▄█
 ///
 /// @TODO : Group handling layer
-/// @TODO : Authentication handling
-/// @TODO : 
 ///
 public class AccountTable extends JStackData implements UnsupportedDefaultMap<String, AccountObject>  {
 
@@ -69,14 +73,14 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 
 	/// Internal constructor that setsup the underlying MetaTable / KeyValuePair
 	public void internalConstructor(JStack inStack) {
-		accountID = new KeyValueMap(inStack, tableName+PERSONA_ID);
-		accountHash = new KeyValueMap(inStack, tableName+PERSONA_HASH);
-		accountSessions = new KeyValueMap(inStack, tableName+PERSONA_SESSIONS);
-		accountMeta = new MetaTable(inStack, tableName+PERSONA_META);
-		accountChild = new MetaTable(inStack, tableName+PERSONA_CHILD);
-		accountChildMeta = new MetaTable(inStack, tableName+PERSONA_CHILDMETA);
+		accountID = new KeyValueMap(inStack, tableName+ACCOUNT_ID);
+		accountHash = new KeyValueMap(inStack, tableName+ACCOUNT_HASH);
+		accountSessions = new KeyValueMap(inStack, tableName+ACCOUNT_SESSIONS);
+		accountMeta = new MetaTable(inStack, tableName+ACCOUNT_META);
+		group_childRole = new MetaTable(inStack, tableName+ACCOUNT_CHILD);
+		groupChild_meta = new MetaTable(inStack, tableName+ACCOUNT_CHILDMETA);
 		
-		accountSessions.setTempMode( true );
+		accountSessions.setTempMode( true ); //optimization
 	}
 
 	///
@@ -84,44 +88,50 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 	///--------------------------------------------------------------------------
 	
 	/// The account self ID's
-	protected static String PERSONA_ID = "_ID";
+	protected static String ACCOUNT_ID = "_ID";
 
 	/// The account self ID's
-	protected static String PERSONA_HASH = "_IH";
+	protected static String ACCOUNT_HASH = "_IH";
 
 	/// The login sessions used for authentication
-	protected static String PERSONA_SESSIONS = "_LS";
+	protected static String ACCOUNT_SESSIONS = "_LS";
 
 	/// The account self meta values
-	protected static String PERSONA_META = "_SM";
+	protected static String ACCOUNT_META = "_SM";
 
 	/// The child nodes mapping, from self
-	protected static String PERSONA_CHILD = "_SC";
+	protected static String ACCOUNT_CHILD = "_SC";
 
 	/// The child account meta values
-	protected static String PERSONA_CHILDMETA = "_CM";
+	protected static String ACCOUNT_CHILDMETA = "_CM";
 
 	///
 	/// Underlying data structures
 	///--------------------------------------------------------------------------
 
-	/// @TODO better docs
+	/// Provides a key value pair mapping
+	/// of the account "names" to GUID
+	/// 
+	/// "names" are unique, and are usually either group names or emails
+	/// GUID's are not unique, as a single GUID can have multiple "names"
 	protected KeyValueMap accountID = null;
 	
-	/// @TODO better docs
+	/// Stores the account authentication hash, used for password based authentication
 	protected KeyValueMap accountHash = null;
 	
-	/// @TODO better docs
+	/// Stores the account session authentication no-once information 
 	protected KeyValueMap accountSessions = null;
 
-	/// @TODO better docs
+	/// Holds the account object meta table values
 	protected MetaTable accountMeta = null;
 
-	/// @TODO better docs
-	protected MetaTable accountChild = null;
+	/// Handles the storage of the group mapping
+	///
+	/// Group[member] = role1,role2, ...
+	protected MetaTable group_childRole = null;
 
-	/// @TODO better docs
-	protected MetaTable accountChildMeta = null;
+	/// Handles the Group-member meta field mapping
+	protected MetaTable groupChild_meta = null;
 	
 	//
 	// JStack common setup functions
@@ -133,8 +143,8 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 		accountHash.stackSetup();
 		accountSessions.stackSetup();
 		accountMeta.stackSetup();
-		accountChild.stackSetup();
-		accountChildMeta.stackSetup();
+		group_childRole.stackSetup();
+		groupChild_meta.stackSetup();
 	}
 
 	/// Performs the full stack teardown for the data object
@@ -143,8 +153,8 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 		accountHash.stackTeardown();
 		accountSessions.stackTeardown();
 		accountMeta.stackTeardown();
-		accountChild.stackTeardown();
-		accountChildMeta.stackTeardown();
+		group_childRole.stackTeardown();
+		groupChild_meta.stackTeardown();
 	}
 
 	//
@@ -174,6 +184,16 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 		}
 		
 		return null; 
+	}
+	
+	/// Gets the account using the object ID array, 
+	/// and returns the account object array
+	public AccountObject[] getFromIDArray(String[] _oidList) {
+		AccountObject[] mList = new AccountObject[_oidList.length];
+		for(int a=0; a<_oidList.length; ++a) {
+			mList[a] = getFromID( _oidList[a] );
+		}
+		return mList;
 	}
 	
 	/// Gets the account using the nice name
@@ -495,6 +515,43 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 			response.addCookie( cookieJar[a] );
 		}
 		return true;
+	}
+	
+	///
+	/// Group Membership roles
+	///--------------------------------------------------------------------------
+	protected List<String> membershipRoles = new ArrayList<String>( Arrays.asList(new String[] { "guest", "manager" }) );
+	
+	/// Checks if membership role exists
+	public boolean hasMembershipRole( String role ) {
+		// Sanatize the role
+		role = role.toLowerCase();
+		
+		// Returns if it exists
+		return membershipRoles.contains( role );
+	}
+	
+	/// Add membership role if it does not exists
+	public void addMembershipRole( String role ) {
+		// Sanatize the role
+		role = role.toLowerCase();
+		
+		// Already exists terminate
+		if( hasMembershipRole(role) ) {
+			return;
+		}
+		
+		// Add the role
+		membershipRoles.add(role);
+	}
+	
+	/// Checks and validates the membership role, throws if invalid
+	protected String validateMembershipRole( String role ) {
+		role = role.toLowerCase();
+		if( !hasMembershipRole( role ) ) {
+			throw new RuntimeException("Membership role does not exists: "+role);
+		}
+		return role;
 	}
 	
 }

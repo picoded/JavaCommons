@@ -86,8 +86,12 @@ public class JStackData {
 	
 	/// Iteration function, used to iterate the entire JStack while automatically handling converting exception to a JStackException
 	protected Object JStackIterate(JStackReader readerClass) throws JStackException {
+		return JStackIterate(readerClass, null);
+	}
+	
+	/// Iteration function, used to iterate the entire JStack while automatically handling converting exception to a JStackException
+	protected Object JStackIterate(JStackReader readerClass, Object ret) throws JStackException {
 		try {
-			Object ret = null;
 			JStackLayer[] sl = JStackObj.stackLayers();
 			
 			for (int a = 0; a < sl.length; ++a) {
@@ -111,8 +115,12 @@ public class JStackData {
 	
 	/// Same as JStackIterate, but reversed
 	protected Object JStackReverseIterate(JStackReader readerClass) throws JStackException {
+		return JStackReverseIterate(readerClass, null);
+	}
+	
+	/// Same as JStackIterate, but reversed
+	protected Object JStackReverseIterate(JStackReader readerClass, Object ret) throws JStackException {
 		try {
-			Object ret = null;
 			JStackLayer[] sl = JStackObj.stackLayers();
 			
 			for (int a = sl.length - 1; a >= 0; --a) {

@@ -233,8 +233,12 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		//
 		// Fieldname handling
 		//-----------------------------------
-		if( (tmp = getFieldName()) != null && tmp.length() > 0 ) {
-			map.put(HtmlTag.NAME, tmp);
+		if(map.containsKey(HtmlTag.NAME)){
+			map.put(HtmlTag.NAME, (String)map.get(HtmlTag.NAME));
+		}else{
+			if( (tmp = getFieldName()) != null && tmp.length() > 0 ) {
+				map.put(HtmlTag.NAME, tmp);
+			}
 		}
 		
 		return map;

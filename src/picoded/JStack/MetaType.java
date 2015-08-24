@@ -34,7 +34,7 @@ public class MetaType {
 	/// 1      - Disabled
 	public static int TYPE_NULL = 1;
 	/// 2      - Mixed
-	public static int TYPE_MIXED = 1;
+	public static int TYPE_MIXED = 2;
 	/// 3      - [Mixed]
 	public static int TYPE_MIXED_ARRAY = 2;
 	
@@ -84,7 +84,7 @@ public class MetaType {
 	///--------------------------------------------------------------------------
 	
 	/// The meta type int values
-	int valueType = 1;
+	protected int valueType = 1;
 	
 	private static String metaTypePrefix = "type_";
 	
@@ -94,7 +94,7 @@ public class MetaType {
 	}
 	
 	/// The meta config string, applicable to only certain meta types
-	String valueConfig = null;
+	protected String valueConfig = null;
 	
 	/// Configured string
 	public String valueConfig() {
@@ -168,5 +168,19 @@ public class MetaType {
 			return new MetaType(MetaType.TYPE_TEXT_ARRAY);
 		}
 		return null;
+	}
+	
+	public static MetaType fromTypeObject(Object type) {
+		MetaType mType = null;
+		if(type instanceof String) {
+			mType = MetaType.fromTypeString(type.toString());
+			
+			if( mType == null ) {
+				throw new RuntimeException("Invalid MetaTable type for: "+type.toString());
+			}
+		} else if(type instanceof MetaType) {
+			mType = (MetaType)type;
+		}
+		return mType;
 	}
 }

@@ -91,4 +91,48 @@ public class JStruct {
 			metaTableCache_lock.writeLock().unlock();
 		}
 	}
+	
+	// AccountTable handling
+	//----------------------------------------------
+
+	protected ConcurrentHashMap<String,AccountTable> accountTableCache = new ConcurrentHashMap<String,AccountTable>();
+	protected ReentrantReadWriteLock accountTableCache_lock = new ReentrantReadWriteLock();
+	
+	/// Setsup and return a MetaTable object,
+	/// This is overriden for the various implmentation version
+	///
+	/// @param name - name of AccountTable in backend
+	///
+	/// @returns AccountTable
+	public AccountTable getAccountTable(String name) {
+		
+		// Structure backend name is case insensitive
+		name = name.toUpperCase();
+		
+		// Tries to get 1 time, without locking
+		AccountTable cacheCopy = accountTableCache.get(name);
+		if(cacheCopy != null) {
+			return cacheCopy;
+		}
+		
+		// Tries to get again with lock, creates and put if not exists
+		try {
+			accountTableCache_lock.writeLock().lock();
+			
+			cacheCopy = accountTableCache.get(name);
+			if(cacheCopy != null) {
+				return cacheCopy;
+			}
+			
+			cacheCopy = new AccountTable(this, name);
+			accountTableCache.put( name, cacheCopy );
+			return cacheCopy;
+			
+		} finally {
+			accountTableCache_lock.writeLock().unlock();
+		}
+	}
+	
+	
+	
 }

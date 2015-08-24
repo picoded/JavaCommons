@@ -82,7 +82,7 @@ public class JStruct_MetaObject implements MetaObject {
 	}
 	
 	/// Constructor, with metaTable and GUID (auto generated if null)
-	protected JStruct_MetaObject(JStruct_MetaTable inTable, String inOID, boolean isCompleteData) {
+	protected JStruct_MetaObject(JStruct_MetaTable inTable, String inOID) {
 		commonSetup(inTable, inOID, null, false);
 	}
 	

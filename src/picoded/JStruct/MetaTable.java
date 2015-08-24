@@ -176,6 +176,26 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 		return JStructUtils.sortAndOffsetListToArray(retList, orderByStr, offset, limit);
 	}
 	
+	/// Performs a custom search by configured keyname, and returns its ID array
+	/// 
+	/// @param   keyName to lookup for
+	///
+	/// @returns  The MetaObject[] array
+	public default String[] getFromKeyName_id(String keyName) {
+		// The return list
+		List<String> retList = new ArrayList<String>();
+		
+		// Iterate the list, add if containsKey
+		for( MetaObject obj : values() ) {
+			if(obj.containsKey(keyName)) {
+				retList.add(obj._oid());
+			}
+		}
+		
+		// Return
+		return retList.toArray(new String[retList.size()]);
+	}
+	
 	/// 
 	/// MetaType handling, does type checking and conversion
 	///--------------------------------------------------------------------------

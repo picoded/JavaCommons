@@ -36,7 +36,9 @@ public class KeyValueMap_test {
 	
 	@After
 	public void tearDown() {
-		kvmObj.systemTeardown();
+		if( kvmObj != null ) {
+			kvmObj.systemTeardown();
+		}
 		kvmObj = null;
 	}
 	

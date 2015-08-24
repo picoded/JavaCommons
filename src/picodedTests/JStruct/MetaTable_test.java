@@ -36,12 +36,14 @@ public class MetaTable_test {
 	@Before
 	public void setUp() {
 		mtObj = implementationConstructor();
-		// mtObj.systemSetup();
+		mtObj.systemSetup();
 	}
 	
 	@After
 	public void tearDown() {
-		// mtObj.systemTeardown();
+		if( mtObj != null ) {
+			mtObj.systemTeardown();
+		}
 		mtObj = null;
 	}
 	

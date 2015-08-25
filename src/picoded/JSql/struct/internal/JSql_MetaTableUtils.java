@@ -102,14 +102,17 @@ public class JSql_MetaTableUtils {
 		if (value instanceof Integer) {
 			return new Object[] { new Integer(MetaType.INTEGER.getValue()), value, null, null }; //Typ, N,S,I,T
 		} else if (value instanceof Float) {
-			return new Object[] { new Float(MetaType.FLOAT.getValue()), value, null, null }; //Typ, N,S,I,T
+			return new Object[] { new Integer(MetaType.FLOAT.getValue()), value, null, null }; //Typ, N,S,I,T
 		} else if (value instanceof Double) {
-			return new Object[] { new Double(MetaType.DOUBLE.getValue()), value, null, null }; //Typ, N,S,I,T
+			return new Object[] { new Integer(MetaType.DOUBLE.getValue()), value, null, null }; //Typ, N,S,I,T
 		} else if (value instanceof String) {
 			return new Object[] { new Integer(MetaType.STRING.getValue()), 0, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
+		} else {
+			String jsonString = ConvertJSON.fromObject(value);
+			return new Object[] { new Integer(MetaType.JSON.getValue()), 0, null, jsonString };
 		}
 	
-		throw new RuntimeException("Object type not yet supported: "+key+" = "+ value);
+		//throw new RuntimeException("Object type not yet supported: "+key+" = "+ value);
 	}
 	
 	/// Extract the value from a position (ignore array?)
@@ -136,6 +139,8 @@ public class JSql_MetaTableUtils {
 			return (String) (r.get("tVl").get(pos));
 		} else if (baseType == MetaType.TEXT.getValue()) { // Text
 			return (String) (r.get("tVl").get(pos));
+		} else if (baseType == MetaType.JSON.getValue()) { // Text
+			return ConvertJSON.toObject( (String)(r.get("tVl").get(pos)) );
 		} 
 		
 		throw new RuntimeException("Object type not yet supported: oID = "+r.get("oID").get(pos)+

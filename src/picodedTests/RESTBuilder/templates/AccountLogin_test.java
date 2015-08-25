@@ -79,7 +79,7 @@ public class AccountLogin_test {
 		assertNotNull( responseMap = response.toMap() );
 		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
 		assertNull( responseMap.get("accountID") );
-		assertNull( responseMap.get("accountNAME") );
+		assertNull( responseMap.get("accountNames") );
 	}
 	
 	@Test @SuppressWarnings("unchecked")
@@ -91,27 +91,27 @@ public class AccountLogin_test {
 		
 		// Credentials in request
 		HashMap<String,String[]> cred = new HashMap<String,String[]>();
-		cred.put("accountNAME", new String[] { "the-root" } );
+		cred.put("accountName", new String[] { "the-root" } );
 		
 		// Wrong login attempt
 		//---------------------------------------
-		cred.put("accountPASS", new String[] { "is-not-square" } ); //wrong password
+		cred.put("accountPass", new String[] { "is-not-square" } ); //wrong password
 		assertNotNull( response = RequestHttp.post( testAddress+"/api/account/login", cred) );
 		assertNotNull( responseMap = response.toMap() );
 		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
 		assertNull( responseMap.get("accountID") );
-		assertNull( responseMap.get("accountNAME") );
+		assertNull( responseMap.get("accountNames") );
 		
 		// Correct login attempt
 		//---------------------------------------
-		cred.put("accountPASS", new String[] { "is-sudo" } ); //wrong password
+		cred.put("accountPass", new String[] { "is-sudo" } ); //wrong password
 		
 		assertNotNull( response = RequestHttp.post( testAddress+"/api/account/login", cred) );
 		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
 		assertNotNull( responseMap = response.toMap() );
 		assertNotNull( responseMap.get("accountID") );
-		assertNotNull( responseMap.get("accountNAME") );
-		assertEquals( "the-root", ((List<String>)(responseMap.get("accountNAME"))).get(0) );
+		assertNotNull( responseMap.get("accountNames") );
+		assertEquals( "the-root", ((List<String>)(responseMap.get("accountNames"))).get(0) );
 		
 		// Login validation
 		//---------------------------------------
@@ -132,8 +132,8 @@ public class AccountLogin_test {
 		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
 		assertNotNull( responseMap = response.toMap() );
 		assertNotNull( responseMap.toString(), responseMap.get("accountID") );
-		assertNotNull( responseMap.toString(), responseMap.get("accountNAME") );
-		assertEquals( "the-root", ((List<String>)(responseMap.get("accountNAME"))).get(0) );
+		assertNotNull( responseMap.toString(), responseMap.get("accountNames") );
+		assertEquals( "the-root", ((List<String>)(responseMap.get("accountNames"))).get(0) );
 		
 		// Logout attempt
 		//---------------------------------------
@@ -150,7 +150,7 @@ public class AccountLogin_test {
 		assertNotNull( responseMap = response.toMap() );
 		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
 		assertNull( responseMap.get("accountID") );
-		assertNull( responseMap.get("accountNAME") );
+		assertNull( responseMap.get("accountNames") );
 		
 	}
 	
@@ -164,11 +164,11 @@ public class AccountLogin_test {
 		Map<String,String[]> cookieJar = null;
 		
 		HashMap<String,String[]> cred = new HashMap<String,String[]>();
-		cred.put("accountNAME", new String[] { "the-changing-user" } );
+		cred.put("accountName", new String[] { "the-changing-user" } );
 		
 		// Login before change
 		//---------------------------------------
-		cred.put("accountPASS", new String[] { "is-old" } );
+		cred.put("accountPass", new String[] { "is-old" } );
 		
 		assertNotNull( response = RequestHttp.post( testAddress+"/api/account/login", cred) );
 		assertNotNull( cookieJar = response.cookiesMap() );
@@ -176,8 +176,8 @@ public class AccountLogin_test {
 		
 		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
 		assertNotNull( responseMap.toString(), responseMap.get("accountID") );
-		assertNotNull( responseMap.toString(), responseMap.get("accountNAME") );
-		assertEquals( "the-changing-user", ((List<String>)(responseMap.get("accountNAME"))).get(0) );
+		assertNotNull( responseMap.toString(), responseMap.get("accountNames") );
+		assertEquals( "the-changing-user", ((List<String>)(responseMap.get("accountNames"))).get(0) );
 		
 		String accountID = (String)(responseMap.get("accountID"));
 		
@@ -190,7 +190,8 @@ public class AccountLogin_test {
 		
 		assertNotNull( response = RequestHttp.post( testAddress+"/api/account/password", passwordChange, cookieJar, null) );
 		assertNotNull( responseMap = response.toMap() );
-		assertFalse( responseMap.toString(), (Boolean)(responseMap.get("passwordChanged")) );
+		assertNotNull( responseMap.toString(), responseMap.get("success") );
+		assertFalse( responseMap.toString(), (Boolean)(responseMap.get("success")) );
 		assertNotNull( responseMap.toString(), responseMap.get("error") );
 		
 		// Password change works
@@ -199,14 +200,15 @@ public class AccountLogin_test {
 		
 		assertNotNull( response = RequestHttp.post( testAddress+"/api/account/password", passwordChange, cookieJar, null) );
 		assertNotNull( responseMap = response.toMap() );
-		assertTrue( responseMap.toString(), (Boolean)(responseMap.get("passwordChanged")) );
+		assertNotNull( responseMap.toString(), responseMap.get("success") );
+		assertTrue( responseMap.toString(), (Boolean)(responseMap.get("success")) );
 		assertNull( responseMap.toString(), responseMap.get("error") );
 		assertEquals( responseMap.toString(), accountID, responseMap.get("accountID") );
 		
 		// Login after change, old password invalid
 		//---------------------------------------
-		cred.put("accountPASS", new String[] { "is-old" } ); //wrong password
-		cred.put("accountNAME", new String[] { "the-changing-user" } );
+		cred.put("accountPass", new String[] { "is-old" } ); //wrong password
+		cred.put("accountName", new String[] { "the-changing-user" } );
 		
 		assertNotNull( response = RequestHttp.post( testAddress+"/api/account/login", cred) );
 		assertNotNull( response.cookiesMap() );
@@ -214,12 +216,12 @@ public class AccountLogin_test {
 		
 		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
 		assertNull( responseMap.toString(), responseMap.get("accountID") );
-		assertNull( responseMap.toString(), responseMap.get("accountNAME") );
+		assertNull( responseMap.toString(), responseMap.get("accountNames") );
 		
 		// Login after change, new password
 		//---------------------------------------
-		cred.put("accountPASS", new String[] { "is-brand-NEW-world-1" } );
-		cred.put("accountNAME", new String[] { "the-changing-user" } );
+		cred.put("accountPass", new String[] { "is-brand-NEW-world-1" } );
+		cred.put("accountName", new String[] { "the-changing-user" } );
 		
 		assertNotNull( response = RequestHttp.post( testAddress+"/api/account/login", cred) );
 		assertNotNull( response.cookiesMap() );
@@ -227,8 +229,8 @@ public class AccountLogin_test {
 		
 		assertNull( "Full map string of error: "+responseMap.toString()+" -> ", responseMap.get("error") );
 		assertNotNull( responseMap.toString(), responseMap.get("accountID") );
-		assertNotNull( responseMap.toString(), responseMap.get("accountNAME") );
-		assertEquals( "the-changing-user", ((List<String>)(responseMap.get("accountNAME"))).get(0) );
+		assertNotNull( responseMap.toString(), responseMap.get("accountNames") );
+		assertEquals( "the-changing-user", ((List<String>)(responseMap.get("accountNames"))).get(0) );
 		
 	}
 }

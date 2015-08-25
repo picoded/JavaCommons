@@ -59,7 +59,7 @@ public class AccountLogin extends BasePage {
 	///
 	/// # login (GET)
 	///
-	/// The login GET function, this returns the current accountID and accountNAME
+	/// The login GET function, this returns the current accountID and accountName
 	///
 	/// ## HTTP Request Parameters
 	///
@@ -76,14 +76,14 @@ public class AccountLogin extends BasePage {
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | isLogin        | boolean            | indicator if the session is logged in or not                                  |
 	/// | accountID      | String             | account ID of the session                                                     |
-	/// | accountNAME    | String[]           | array of account names representing the session                               |
+	/// | accountNames   | String[]           | array of account names representing the session                               |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | error          | String (Optional)  | Errors encounted if any                                                       |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction login_GET = (req, res) -> {
 		res.put("accountID", null);
-		res.put("accountNAME", null);
+		res.put("accountName", null);
 		res.put("isLogin", false);
 		
 		if(req.requestPage() != null) {
@@ -95,7 +95,7 @@ public class AccountLogin extends BasePage {
 				res.put("accountID", ao._oid());
 				
 				String[] names = ao.getNames().toArray(new String[0]);
-				res.put("accountNAME", Arrays.asList( (names == null)? new String[] {} : names) );
+				res.put("accountNames", Arrays.asList( (names == null)? new String[] {} : names) );
 				
 				res.put("isLogin", true);
 			}
@@ -115,9 +115,9 @@ public class AccountLogin extends BasePage {
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | Parameter Name | Variable Type	   | Description                                                                   |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | accountNAME    | String (Optional)  | Either the accountName or the accountID is needed                             |
+	/// | accountName    | String (Optional)  | Either the accountName or the accountID is needed                             |
 	/// | accountID      | String (Optional)  | Either the accountName or the accountID is needed                             |
-	/// | accountPASS    | String             | The account password used for login                                           |
+	/// | accountPass    | String             | The account password used for login                                           |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
@@ -142,7 +142,7 @@ public class AccountLogin extends BasePage {
 			AccountObject ao = null;
 			AccountTable at = bp.accountAuthTable();
 			
-			String tStr = req.getString("accountNAME");
+			String tStr = req.getString("accountName");
 			if( tStr != null ) {
 				ao = at.getFromName(tStr);
 			}
@@ -153,7 +153,7 @@ public class AccountLogin extends BasePage {
 			
 			// AccountName or AccountID is valid
 			if( ao != null ) {
-				ao = at.loginAccount( bp.getHttpServletRequest(), bp.getHttpServletResponse(), ao, req.getString("accountPASS", ""), false );
+				ao = at.loginAccount( bp.getHttpServletRequest(), bp.getHttpServletResponse(), ao, req.getString("accountPass", ""), false );
 				
 				// Login is valid
 				if( ao != null ) {
@@ -229,7 +229,7 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	    | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | passwordChanged | boolean            | indicator if the password was changed                                         |
+	/// | success         | boolean            | indicator if the password was changed                                         |
 	/// | accountID       | String             | account ID of the session                                                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | error           | String (Optional)  | Errors encounted if any                                                       |
@@ -237,7 +237,7 @@ public class AccountLogin extends BasePage {
 	///
 	public static RESTFunction password_POST = (req, res) -> {
 		res.put("accountID", null);
-		res.put("passwordChanged", false);
+		res.put("success", false);
 		
 		if(req.requestPage() != null) {
 			BasePage bp = (BasePage)(req.requestPage());
@@ -250,7 +250,7 @@ public class AccountLogin extends BasePage {
 				if( ao._oid().equals(accID) ) {
 					if( ao.setPassword( req.getString("newPassword"), req.getString("oldPassword") ) ) {
 						res.put("accountID", accID);
-						res.put("passwordChanged", true);
+						res.put("success", true);
 					} else {
 						res.put("accountID", accID);
 						res.put("error", "Original password is wrong");
@@ -259,10 +259,8 @@ public class AccountLogin extends BasePage {
 					AccountObject subUser = at.getFromID(accID);
 					
 					if( subUser != null ) {
-						subUser.setPassword( req.getString("newPassword") );
-						
 						res.put("accountID", accID);
-						res.put("passwordChanged", true);
+						res.put("success", (subUser.setPassword( req.getString("newPassword") ) == true) );
 					} else {
 						res.put("error", "User does not exists: "+accID);
 					}
@@ -311,11 +309,12 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | groupIDs        | String[]           | array of account ID groups the user is in                                     |
 	/// | groupNames      | String[][]         | array of account Names groups the user is in                                  |
+	/// | groupRoles      | String[]           | array of account groups roles the user is in                                  |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction infoByName_GET = (req, res) -> {
 		return res;
-	}
+	};
 	
 	///
 	/// # info/id/${accountID} (GET) [Requires login]
@@ -345,11 +344,12 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | groupIDs        | String[]           | array of account ID groups the user is in                                     |
 	/// | groupNames      | String[][]         | array of account Names groups the user is in                                  |
+	/// | groupRoles      | String[]           | array of account groups roles the user is in                                  |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction infoByID_GET = (req, res) -> {
 		return res;
-	}
+	};
 	
 	/////////////////////////////////////////////
 	//
@@ -399,7 +399,7 @@ public class AccountLogin extends BasePage {
 	///
 	public static RESTFunction list_GET_and_POST = (req, res) -> {
 		return res;
-	}
+	};
 	
 	/////////////////////////////////////////////
 	//
@@ -427,7 +427,7 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	    | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | accountExists   | boolean            | indicates if the account ID exists in the system                              |
+	/// | accountID_valid | boolean            | indicates if the account ID exists in the system                              |
 	/// | accountID       | String             | account ID used                                                               |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | meta            | {Object}           | Meta object that represents this account                                      |
@@ -437,7 +437,7 @@ public class AccountLogin extends BasePage {
 	///
 	public static RESTFunction meta_GET = (req, res) -> {
 		return res;
-	}
+	};
 	
 	///
 	/// # meta/${accountID} (POST) [Requires login]
@@ -460,17 +460,18 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	    | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | accountExists   | boolean            | indicates if the account ID exists in the system                              |
+	/// | accountID_valid | boolean            | indicates if the account ID exists in the system                              |
 	/// | accountID       | String             | account ID used                                                               |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | meta            | {Object}           | Meta object that represents this account                                      |
+	/// | updateMode      | String             | (Default) "delta" for only updating the given fields, or "full" for all       |
+	/// | updateMeta      | {Object}           | The updated changes done                                                      |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | error           | String (Optional)  | Errors encounted if any                                                       |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction meta_POST = (req, res) -> {
 		return res;
-	}
+	};
 	
 	/////////////////////////////////////////////
 	//
@@ -479,7 +480,7 @@ public class AccountLogin extends BasePage {
 	/////////////////////////////////////////////
 	
 	/// 
-	/// # group/members/${groupID} (GET) [Requires login]
+	/// # members/list/${groupID} (GET) [Requires login]
 	/// 
 	/// Gets the group info of the respective group
 	/// 
@@ -502,86 +503,72 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	    | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | groupID         | String             | group ID used in the request                                                  |
 	/// | groupID_exist   | boolean            | indicates if the account ID exists in the system                              |
 	/// | groupID_valid   | boolean            | indicates if the account ID exists and is a group                             |
+	/// | groupID_admin   | boolean            | indicates if the session has admin rights                                     |
+	/// | groupID_names   | String[]           | the group various names, if ID is valid                                       |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
 	/// | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    |
 	/// | recordsFilterd  | int                | Total amount of records. After all search filter                              |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
+	/// | headers         | String[](optional) | The collumns headers returned                                                 |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | data            | array              | Array of row records                                                          |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error           | String (Optional)  | Errors encounted if any                                                       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
-	public static RESTFunction group_members_GET = (req, res) -> {
+	public static RESTFunction members_list_GET = (req, res) -> {
 		return res;
-	}
-	
-	
-	//-------------------------------------------------------------------------------------------------------------------------
-	//
-	// Work in progress (not final) start
-	//
-	//-------------------------------------------------------------------------------------------------------------------------
+	};
 	
 	/// 
-	/// # group/members/set/${groupID}/${memberID}/${memberRole} (POST) [Requires login]
+	/// # members/list/${groupID} (POST) [Requires login, and group admin rights]
 	/// 
-	/// Add a memeber to the group with the given role. Requires the current user to be either the group itself, 
+	/// Add/remove members to the group with their respective role. Requires the current user to be either the group itself, 
 	/// admin of group, or super user.
 	///
 	/// ## HTTP Request Parameters
 	///
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
-	/// | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
-	/// | length          | int (optional)     | Default 50: The number of records to return                                   |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | headers         | String[](optional) | Default ["_oid", "names", "role"], the collumns to return                     |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	       | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | setMembers      | String[][] (optional) | [ [memberID,role], ... ] : Array of member ID/roles to set                 |
+	/// | delMembers      | String[]   (optional) | [ memberID, ... ] : Array of member ID's to delete                         |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
 	///
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | groupID_exist   | boolean            | indicates if the account ID exists in the system                              |
-	/// | groupID_valid   | boolean            | indicates if the account ID exists and is a group                             |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | success         | boolean            | Draw counter echoed back, and used by the datatables.js server-side API       |
-	/// | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    |
-	/// | recordsFilterd  | int                | Total amount of records. After all search filter                              |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | data            | array              | Array of row records                                                          |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	       | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | groupID         | String                | group ID used in the request                                               |
+	/// | groupID_exist   | boolean               | indicates if the account ID exists in the system                           |
+	/// | groupID_valid   | boolean               | indicates if the account ID exists and is a group                          |
+	/// | groupID_admin   | boolean               | indicates if the session has admin rights                                  |
+	/// | groupID_names   | String[]              | the group various names, if ID is valid                                    |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | setMembers      | String[][] (optional) | [ [memberID,role], ... ] : Array of member ID/roles set                    |
+	/// | delMembers      | String[]   (optional) | [ memberID, ... ] : Array of member ID's deleted                           |
+	/// | success         | boolean               | indicator if logout is successful or not                                   |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | error           | String (Optional)     | Errors encounted if any                                                    |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
-	public static RESTFunction group_members_set_POST = (req, res) -> {
+	public static RESTFunction members_list_POST = (req, res) -> {
 		return res;
-	}
+	};
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	/////////////////////////////////////////////
+	//
+	// Group members meta management
+	//
+	/////////////////////////////////////////////
 	
 	///
-	/// # info/${accountID} (GET)
+	/// # members/meta/${groupID}/${accountID} (GET) [Requires login]
 	///
 	/// Gets and return the current user info
 	/// 
@@ -589,39 +576,79 @@ public class AccountLogin extends BasePage {
 	///
 	/// ## HTTP Request Parameters
 	///
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	       | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// | No parameters options                                                                                                |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
 	///
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | accountExists   | boolean            | indicates if the account ID exists in the system                              |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | accountID       | String             | account ID of the session                                                     |
-	/// | accountNames    | String[]           | array of account names representing the session                               |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | meta            | {Object}           | Meta object that represents this account                                      |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | isSuperUser     | boolean            | indicates if the account is considered a superUser                            |
-	/// | isGroup         | boolean            | indicates if the account is considered a group                                |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | groupIDs        | String[]           | array of account ID groups the user is in                                     |
-	/// | groupNames      | String[][]         | array of account Names groups the user is in                                  |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | memberIDs       | String[]           | array of account ID groups that are memebrs of this account                   |
-	/// | memberNames     | String[][]         | array of account Names groups that are memebrs of this account                |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | error           | String (Optional)  | Errors encounted if any                                                       |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	       | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | groupID         | String                | group ID used in the request                                               |
+	/// | groupID_exist   | boolean               | indicates if the account ID exists in the system                           |
+	/// | groupID_valid   | boolean               | indicates if the account ID exists and is a group                          |
+	/// | groupID_admin   | boolean               | indicates if the session has admin rights                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | accountID       | String                | account ID used                                                            |
+	/// | accountID_valid | boolean               | indicates if the account ID exists in the systen and group                 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | meta            | {Object}              | Meta object that represents this account                                   |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | error           | String (Optional)     | Errors encounted if any                                                    |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
-	public static RESTFunction info_GET = (req, res) -> {
+	public static RESTFunction members_meta_GET = (req, res) -> {
 		return res;
-	}
+	};
+	
+	///
+	/// # members/meta/${groupID}/${accountID} (POST) [Requires login]
+	///
+	/// Updates the accountID meta info, requires either the current user or SuperUser
+	/// 
+	/// Note: if ${accountID} is blank, it assumes the current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	       | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | meta            | {Object}              | Meta object that represents this account                                   |
+	/// | updateMode      | String (Optional)     | (Default) "delta" for only updating the given fields, or "full" for all    |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// 
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	       | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | groupID         | String                | group ID used in the request                                               |
+	/// | groupID_exist   | boolean               | indicates if the account ID exists in the system                           |
+	/// | groupID_valid   | boolean               | indicates if the account ID exists and is a group                          |
+	/// | groupID_admin   | boolean               | indicates if the session has admin rights                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | accountID       | String                | account ID used                                                            |
+	/// | accountID_valid | boolean               | indicates if the account ID exists in the systen and group                 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | updateMode      | String                | (Default) "delta" for only updating the given fields, or "full" for all    |
+	/// | updateMeta      | {Object}              | The updated changes done                                                   |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | error           | String (Optional)     | Errors encounted if any                                                    |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	public static RESTFunction members_meta_POST = (req, res) -> {
+		return res;
+	};
+	
+	//-------------------------------------------------------------------------------------------------------------------------
+	//
+	// Work in progress (not final) start
+	//
+	//-------------------------------------------------------------------------------------------------------------------------
+	
 	
 	//-------------------------------------------------------------------------------------------------------------------------
 	//

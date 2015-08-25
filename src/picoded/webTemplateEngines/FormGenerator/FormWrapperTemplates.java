@@ -5,7 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.omg.CosNaming.IstringHelper;
+
 import picoded.conv.ConvertJSON;
+import picoded.conv.RegexUtils;
+import picoded.struct.CaseInsensitiveHashMap;
 
 /// FormWrapperTemplates
 ///
@@ -168,6 +172,106 @@ public class FormWrapperTemplates {
 		return ret;
 	}
 	
+	@SuppressWarnings("unchecked")
+	protected static StringBuilder tableWrapper(FormNode node, boolean displayMode){
+		StringBuilder ret = new StringBuilder();
+		
+		//<table> tags
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.TABLE, node.prefix_standard()+"div", null );
+		
+		//table header/label
+		if(node.containsKey("tableHeader")){
+			ret.append("<thead>"+node.getString("tableHeader")+"</thead>");
+		}
+		
+		//headers
+		List<Object> tableHeaders = getTableHeaders(node);
+		if(tableHeaders != null && tableHeaders.size() > 0){
+			ret.append("<tr>");
+			for(Object header:tableHeaders){
+				ret.append("<th>"+(String)header+"</th>");
+			}
+			ret.append("</tr>");
+		}
+		
+		//data
+		List<Object> childDefinition = getChildren(node);
+		if(childDefinition != null && childDefinition.size() > 0){
+			
+			List<String> tableFields = getTableFields(childDefinition);
+			Object fieldValue = node.getDefaultValue(node.getFieldName());
+			
+			if(fieldValue != null && fieldValue instanceof List){
+				
+				List<Object> fieldValueList = (List<Object>)fieldValue;
+				for(Object fieldObjRaw:fieldValueList){
+					if(fieldObjRaw instanceof Map){
+						CaseInsensitiveHashMap<String, Object> fieldObjMap = new CaseInsensitiveHashMap<String, Object>((Map<String, Object>)fieldObjRaw);
+						ret.append("<tr>");
+						for(int i = 0; i < tableFields.size(); ++i){ //i want to enforce list order, just in case
+							
+							String tableFieldNameNormalised = RegexUtils.removeAllNonAlphaNumeric(tableFields.get(i)).toLowerCase();
+							if(fieldObjMap.containsKey(tableFields.get(i))){
+								ret.append("<td>"+fieldObjMap.get(tableFields.get(i))+"</td>");
+							}
+						}
+						ret.append("</tr>");
+					}
+				}
+			}
+		}
+		
+		//final squashing
+		ret = wrapperArr[0].append(ret);
+		ret.append(wrapperArr[1]);
+		return ret;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static List<Object> getChildren(FormNode node){
+		if( node.containsKey("children")) {
+			Object childrenRaw = node.get("children");
+			
+			if( !(childrenRaw instanceof List) ) {
+				throw new IllegalArgumentException("'children' parameter found in defination was not a List: "+childrenRaw);
+			}
+			
+			return (List<Object>)childrenRaw;
+		}else{
+			return null;
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static List<String> getTableFields(List<Object> children){
+		List<String> ret = new ArrayList<String>();
+		for(Object childRaw : children){
+			if(childRaw instanceof Map){
+				Map<String, Object> childMap = (Map<String, Object>)childRaw;
+				if(childMap.containsKey("field")){
+					ret.add(RegexUtils.removeAllNonAlphaNumeric((String)childMap.get("field")).toLowerCase());
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static List<Object> getTableHeaders(FormNode node){
+		if( node.containsKey("headers")) {
+			Object tableHeadersRaw = node.get("headers");
+			
+			if( !(tableHeadersRaw instanceof List) ) {
+				throw new IllegalArgumentException("'tableHeader' parameter found in defination was not a List: "+tableHeadersRaw);
+			}
+			
+			return (List<Object>)tableHeadersRaw;
+		}else{
+			return null;
+		}
+	}
+	
 	/// divWrapper
 	///
 	/// Does a basic div wrapper
@@ -180,6 +284,10 @@ public class FormWrapperTemplates {
 	/// Does a basic div wrapper
 	protected static FormWrapperInterface forWrapper = (node)->{
 		return FormWrapperTemplates.forListWrapper(node, false);
+	};
+	
+	protected static FormWrapperInterface tableWrapper = (node)->{
+		return FormWrapperTemplates.tableWrapper(node, false);
 	};
 	
 	/// noneWrapper
@@ -199,6 +307,7 @@ public class FormWrapperTemplates {
 		defaultTemplates.put("div", FormWrapperTemplates.divWrapper);
 		defaultTemplates.put("for", FormWrapperTemplates.forWrapper);
 		defaultTemplates.put("none", FormWrapperTemplates.none);
+		defaultTemplates.put("table", FormWrapperTemplates.tableWrapper);
 		
 		return defaultTemplates;
 	}

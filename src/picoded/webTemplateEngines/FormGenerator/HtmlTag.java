@@ -41,4 +41,6 @@ public class HtmlTag {
 	// Form submission name
 	public static String NAME = "name";
 	
+	public static String TABLE = "table";
+	
 }

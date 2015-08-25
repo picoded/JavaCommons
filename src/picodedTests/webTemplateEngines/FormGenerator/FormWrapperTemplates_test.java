@@ -162,6 +162,28 @@ public class FormWrapperTemplates_test {
 				"</div>";
 	}
 	
+	private String getTableHtmlString(){
+		return "<table>"+
+					"<thead>Table header</thead>"+
+					"<tr>"+
+						"<th>Name</th>"+
+						"<th>Nric</th>"+
+					"</tr>"+
+					"<tr>"+
+						"<td>A</td>"+
+						"<td>X1</td>"+
+					"</tr>"+
+					"<tr>"+
+						"<td>B</td>"+
+						"<td>X2</td>"+
+					"</tr>"+
+					"<tr>"+
+						"<td>C</td>"+
+						"<td>X3</td>"+
+					"</tr>"+
+				"</table>";
+	}
+	
 	@Test
 	public void standardDivWrapperTest(){
 		String jsonTemplatedOutput = getWrapperTemplatedJsonString("div");
@@ -217,6 +239,15 @@ public class FormWrapperTemplates_test {
 	}
 	
 	@Test
+	public void testTable(){
+		String jsonTemplatedOutput = getFullTemplatedJsonWithData("table");
+		String rawHtml = getHtmlString("table");
+		
+		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtml, jsonTemplatedOutput);
+		assertTrue(compliancyCheck);
+	}
+	
+	@Test
 	public void testCompatibility(){
 		File jsonFile = new File("./test-files/test-specific/htmlGenerator/testJSONObject.js");
 		File jsonDataFile = new File("./test-files/test-specific/htmlGenerator/prefilledData.js");
@@ -248,39 +279,6 @@ public class FormWrapperTemplates_test {
 			writer.flush();
 			writer.close();
 		}catch(Exception ex){
-		}
-	}
-	
-	/// Prototype lenientStringLookup
-//	@Test
-	public int lenientStringLookup(String source, String lookup) {
-		int lowestOffset = -1;
-		
-		String singleTag = "";
-		String cleanedTag = "";
-		if(lookup.startsWith("<")){
-			singleTag = lookup.substring(lookup.indexOf('<'), lookup.indexOf('>') + 1);
-			cleanedTag = singleTag.substring(1,  singleTag.length() - 1);
-		}else{
-			char nextCharToBreak = lookup.indexOf('<') < lookup.indexOf('>') ? '<' : '>';
-			singleTag = lookup.substring(0, lookup.indexOf(nextCharToBreak));
-		}
-		lookup = lookup.substring(singleTag.length(), lookup.length());
-		
-		String[] lookupArray = cleanedTag.split(" ");
-		for(int a=0; a<lookupArray.length; ++a) {
-			if(!source.contains(lookupArray[a])){
-				return -1;
-			}else{
-				int index = source.indexOf(lookupArray[a]);
-				lowestOffset = index > lowestOffset ? index + lookupArray[a].length() : lowestOffset;
-			}
-		}
-
-		if(lookup.length() > 0){
-			return lenientStringLookup(source, lookup);
-		}else{
-			return lowestOffset;
 		}
 	}
 	

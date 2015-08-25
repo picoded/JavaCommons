@@ -351,6 +351,12 @@ public class AccountLogin extends BasePage {
 		return res;
 	}
 	
+	/////////////////////////////////////////////
+	//
+	// List searching API
+	//
+	/////////////////////////////////////////////
+	
 	///
 	/// # list (POST / GET) [Requires login]
 	///
@@ -391,6 +397,12 @@ public class AccountLogin extends BasePage {
 	public static RESTFunction list_GET_and_POST = (req, res) -> {
 		return res;
 	}
+	
+	/////////////////////////////////////////////
+	//
+	// Meta details operations
+	//
+	/////////////////////////////////////////////
 	
 	///
 	/// # meta/${accountID} (GET) [Requires login]
@@ -456,7 +468,6 @@ public class AccountLogin extends BasePage {
 	public static RESTFunction meta_POST = (req, res) -> {
 		return res;
 	}
-	
 	
 	
 	//-------------------------------------------------------------------------------------------------------------------------

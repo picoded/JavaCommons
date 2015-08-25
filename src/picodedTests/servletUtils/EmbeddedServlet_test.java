@@ -78,6 +78,43 @@ public class EmbeddedServlet_test
 		});
 	}
 	
+	@Test
+	public void testMultipleServletNames(){
+		tomcat = tomcat.withServlet("/public", "ServletA", new HttpServlet() {
+			private static final long serialVersionUID = 1L;
+		 
+			@Override
+			protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+				String getValue = req.getParameter("getValue");
+				resp.getWriter().append(getValue);
+			}
+
+			@Override
+			protected void doPost(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException {
+				String postValue = req.getParameter("postValue");
+				resp.getWriter().append(postValue);
+			}
+		});
+		
+		tomcat = tomcat.withServlet("/public/*", "ServletA", new HttpServlet() {
+			private static final long serialVersionUID = 1L;
+		 
+			@Override
+			protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+				String getValue = req.getParameter("getValue");
+				resp.getWriter().append(getValue);
+			}
+
+			@Override
+			protected void doPost(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException {
+				String postValue = req.getParameter("postValue");
+				resp.getWriter().append(postValue);
+			}
+		});
+		
+		assertNotNull(tomcat);
+	}
+	
 	/*
 	@Test
 	public void TestServerStartup()throws LifecycleException, IOException{

@@ -362,6 +362,9 @@ public class AccountLogin extends BasePage {
 	///
 	/// Lists the users according to the search criteria 
 	///
+	/// This JSON api is compatible with the datatables.js server side API.
+	/// See: https://web.archive.org/web/20140627100023/http://datatables.net/manual/server-side
+	///
 	/// ## HTTP Request Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -469,12 +472,112 @@ public class AccountLogin extends BasePage {
 		return res;
 	}
 	
+	/////////////////////////////////////////////
+	//
+	// Group management
+	//
+	/////////////////////////////////////////////
+	
+	/// 
+	/// # group/members/${groupID} (GET) [Requires login]
+	/// 
+	/// Gets the group info of the respective group
+	/// 
+	/// Note: if ${groupID} is blank, it assumes the current user
+	/// 
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
+	/// | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
+	/// | length          | int (optional)     | Default 50: The number of records to return                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | headers         | String[](optional) | Default ["_oid", "names", "role"], the collumns to return                     |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// 
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | groupID_exist   | boolean            | indicates if the account ID exists in the system                              |
+	/// | groupID_valid   | boolean            | indicates if the account ID exists and is a group                             |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
+	/// | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    |
+	/// | recordsFilterd  | int                | Total amount of records. After all search filter                              |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | data            | array              | Array of row records                                                          |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	public static RESTFunction group_members_GET = (req, res) -> {
+		return res;
+	}
+	
 	
 	//-------------------------------------------------------------------------------------------------------------------------
 	//
 	// Work in progress (not final) start
 	//
 	//-------------------------------------------------------------------------------------------------------------------------
+	
+	/// 
+	/// # group/members/set/${groupID}/${memberID}/${memberRole} (POST) [Requires login]
+	/// 
+	/// Add a memeber to the group with the given role. Requires the current user to be either the group itself, 
+	/// admin of group, or super user.
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
+	/// | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
+	/// | length          | int (optional)     | Default 50: The number of records to return                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | headers         | String[](optional) | Default ["_oid", "names", "role"], the collumns to return                     |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// 
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | groupID_exist   | boolean            | indicates if the account ID exists in the system                              |
+	/// | groupID_valid   | boolean            | indicates if the account ID exists and is a group                             |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | success         | boolean            | Draw counter echoed back, and used by the datatables.js server-side API       |
+	/// | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    |
+	/// | recordsFilterd  | int                | Total amount of records. After all search filter                              |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | data            | array              | Array of row records                                                          |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	public static RESTFunction group_members_set_POST = (req, res) -> {
+		return res;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	///

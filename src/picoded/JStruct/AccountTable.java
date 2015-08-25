@@ -562,4 +562,27 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		return role;
 	}
 	
+	//
+	// Super Users group managment
+	//--------------------------------------------------------------------------
+	
+	protected String _superUserGroup = "SuperUsers";
+	
+	/// Gets the super user group
+	public String getSuperUserGroupName() {
+		return _superUserGroup;
+	}
+	
+	/// Change the super user group
+	public String setSuperUserGroupName(String userGroup) {
+		String old = _superUserGroup;
+		_superUserGroup = userGroup;
+		return old;
+	}
+	
+	/// Returns the super user group
+	public AccountObject superUserGroup() {
+		return getFromName( getSuperUserGroupName() );
+	}
+	
 }

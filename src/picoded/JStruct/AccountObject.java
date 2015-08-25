@@ -170,8 +170,30 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	// Group status check
 	//-------------------------------------------------------------------------
+	
+	/// Returns if set as group
 	public boolean isGroup() {
-		return ( group_userToRoleMap().size() > 1 );
+		Object status = this.get("isGroup");
+		if( status instanceof Number && //
+		   ((Number)status).intValue() >= 1 ) {
+			return true;
+		} else {
+			return false;
+		}
+		//return ( group_userToRoleMap().size() > 1 );
+	}
+	
+	/// Sets if the account is a group
+	public void isGroup(boolean enabled) {
+		if( enabled ) {
+			this.put("isGroup", new Integer(1));
+		} else {
+			this.put("isGroup", new Integer(0));
+			
+			// group_userToRoleMap().clear();
+			// group_userToRoleMap().saveDelta();
+		}
+		this.saveDelta();
 	}
 	
 	// Group management of users
@@ -234,8 +256,9 @@ public class AccountObject extends JStruct_MetaObject {
 		MetaObject childMeta = null;
 		
 		if( level == null || !level.equals( role ) ) {
+			
 			memberObject.saveDelta();
-			this.saveDelta();
+			isGroup(true);
 			
 			group_userToRoleMap().put(memberOID, role);
 			group_userToRoleMap().saveDelta();
@@ -289,4 +312,13 @@ public class AccountObject extends JStruct_MetaObject {
 		return mainTable.getFromIDArray( getGroups_id() );
 	}
 	
+	// Is super user group handling
+	//-------------------------------------------------------------------------
+	
+	/// Returns if its a super user
+	///
+	public boolean isSuperUser() {
+		String superUserGroupRole = mainTable.superUserGroup().getMemberRole( this );
+		return ( superUserGroupRole.equalsIgnoreCase("admin") );
+	}
 }

@@ -9,6 +9,7 @@ import java.util.TreeMap;
 
 import com.hazelcast.instance.Node;
 
+import picoded.conv.ConvertJSON;
 import picoded.conv.ListValueConv;
 import picoded.conv.GenericConvert;
 import picoded.conv.RegexUtils;
@@ -47,8 +48,6 @@ public class FormInputTemplates {
 		// Prepeare the option key value list
 		List<String> keyList = new ArrayList<String>();
 		List<String> nmeList = new ArrayList<String>();
-//		String key = null; //the key item
-//		String nme = null; //the display name
 		
 		// Generates the dropdown list, using either map or list
 		//---------------------------------------------------------
@@ -117,39 +116,80 @@ public class FormInputTemplates {
 		return ret;
 	};
 	
+	@SuppressWarnings("unchecked")
 	protected static FormInputInterface checkbox = (node)->{
+		return createCheckbox(node, false, "");
+	};
+	
+	@SuppressWarnings("unchecked")
+	protected static StringBuilder createCheckbox(FormNode node, boolean displayMode, String pfiClass){
+		
 		CaseInsensitiveHashMap<String,String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		paramMap.put(HtmlTag.TYPE, JsonKeys.CHECKBOX);
-		String selection = "";
-		if(node.containsKey("selected")){
-			selection = RegexUtils.removeAllNonAlphaNumeric(node.getString("selected"));
+		
+		List<String> checkboxSelections = new ArrayList<String>();
+		if(!node.getFieldName().isEmpty()){
+			Object nodeDefaultVal = node.getDefaultValue(node.getFieldName());
+			if(nodeDefaultVal != null){
+				if(((String)nodeDefaultVal).contains("[")){
+					List<Object> nodeValMap = ConvertJSON.toList((String)nodeDefaultVal);
+					for(Object obj : nodeValMap){
+						checkboxSelections.add((String)obj);
+					}
+				}else{
+					checkboxSelections.add((String)nodeDefaultVal);
+				}
+			}
 		}
 		
-//		List<String> keyList = new ArrayList<String>();
-//		List<String> nameList = new ArrayList<String>();
 		Map<String, String> keyNamePair = new HashMap<String, String>();
 		Object optionsObject = node.get(JsonKeys.OPTIONS);
 		keyNamePair = optionsKeyNamePair(optionsObject);
-//		nameList = dropdownNameList(dropDownObject);
-//		keyList = dropdownKeyList(dropDownObject);
 		
 		StringBuilder ret = new StringBuilder();
 		for(String key:keyNamePair.keySet()){
-			CaseInsensitiveHashMap<String,String> tempMap = new CaseInsensitiveHashMap<String, String>(paramMap);
-			tempMap.put("value", key);
-			
-			
-			if(key.equalsIgnoreCase(selection)){
-				tempMap.put("checked", "checked");
+			if(!displayMode){
+				CaseInsensitiveHashMap<String,String> tempMap = new CaseInsensitiveHashMap<String, String>(paramMap);
+				tempMap.put("value", key);
+				
+				for(String selection : checkboxSelections){
+					if(key.equalsIgnoreCase(selection)){
+						tempMap.put("checked", "checked");
+					}
+				}
+				
+				StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputCheckbox pfi_input", tempMap );
+				ret.append(sbArr[0]);
+				ret.append(keyNamePair.get(key));
+				ret.append(sbArr[1]);
+			}else{
+				StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, "pfi_inputCheckbox pfi_input", null );
+				
+				boolean found = false;
+				for(String selection : checkboxSelections){
+					if(key.equalsIgnoreCase(selection)){
+						sbArr[0].append("<div class=\"pf_displayCheckbox pf_displayCheckbox_selected\">/</div>");
+						found = true;
+					}
+				}
+				
+				if(!found){
+					sbArr[0].append("<div class=\"pf_displayCheckbox pf_displayCheckbox_unselected\"></div>");
+				}
+				
+				sbArr[0].append("<div class=\"pf_displayCheckbox_text\">"+keyNamePair.get(key)+"</div>");
+				
+				ret.append(sbArr[0]);
+				ret.append(sbArr[1]);
 			}
-			
-			StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputCheckbox pfi_input", tempMap );
-			ret.append(sbArr[0]);
-			ret.append(keyNamePair.get(key));
-			ret.append(sbArr[1]);
 		}
+		
+		StringBuilder[] wrapper = node.defaultHtmlInput( HtmlTag.DIV, pfiClass, null );
+		ret = wrapper[0].append(ret);
+		ret.append(wrapper[1]);
+//		
 		return ret;
-	};
+	}
 	
 	protected static FormInputInterface raw_html = (node)->{
 		StringBuilder sb = new StringBuilder();
@@ -235,7 +275,7 @@ public class FormInputTemplates {
 	
 	@SuppressWarnings("unchecked")
 	private static Map<String, String> optionsKeyNamePair(Object optionsObject){
-		Map<String, String> ret = new HashMap<String, String>();
+		Map<String, String> ret = new LinkedHashMap<String, String>();
 		
 		if(optionsObject instanceof List){
 			List<String> nameList = ListValueConv.objectToString( (List<Object>)optionsObject );

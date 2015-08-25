@@ -63,7 +63,7 @@ public class JStruct_MetaObject implements MetaObject {
 				if( remoteDataMap.size() == 1 && remoteDataMap.get("_oid") != null ) {
 					// ignore if its just _oid
 				} else {
-					throw new RuntimeException("GUID Collision (╯°□°）╯︵ ┻━┻ : "+_oid);
+					throw new RuntimeException("GUID Collision T_T Q_Q "+_oid);
 				}
 			}
 			

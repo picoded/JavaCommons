@@ -62,6 +62,44 @@ public class FormWrapperTemplates {
 		return ret;
 	}
 	
+	protected static StringBuilder checkboxWrapper(FormNode node, boolean isDisplayMode) {
+		/// Returning string builder
+		StringBuilder ret = new StringBuilder();
+		
+		/// The overlaying wrapper
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, node.prefix_standard()+"div", null );
+		
+		/// The wrapper start
+		ret.append( wrapperArr[0] );
+		
+		/// The label, if given
+		String label = node.label();
+		
+		if( label != null && label.length() > 0 ) {
+			StringBuilder[] labelArr = node.defaultHtmlLabel( HtmlTag.DIV, node.prefix_standard()+"label", null );
+			
+			ret.append( labelArr[0] );
+			ret.append( label );
+			ret.append( labelArr[1] );
+		}
+		
+		StringBuilder inputHtml = node.inputHtml(isDisplayMode);
+		ret.append(inputHtml);
+		
+		/// The children wrapper if needed
+		List<FormNode> childList = node.children();
+		if(childList != null && childList.size() > 0) {
+			StringBuilder[] childWrap = node.defaultHtmlChildWrapper( HtmlTag.DIV, node.prefix_standard()+"child", null );
+			
+			ret.append( childWrap[0] );
+			ret.append( node.fullChildrenHtml(isDisplayMode) );
+			ret.append( childWrap[1] );
+		}
+		
+		ret.append( wrapperArr[1] );
+		return ret;
+	}
+	
 	/// Iterator for an array of values. This function nearly identical to standard div,
 	/// however it uses the field key, to iterate the data map.
 	/// 
@@ -209,7 +247,7 @@ public class FormWrapperTemplates {
 						CaseInsensitiveHashMap<String, Object> fieldObjMap = new CaseInsensitiveHashMap<String, Object>((Map<String, Object>)fieldObjRaw);
 						ret.append("<tr>");
 						for(int i = 0; i < tableFields.size(); ++i){ //i want to enforce list order, just in case
-							
+							//change this so that each child object gets created by its own input template
 							String tableFieldNameNormalised = RegexUtils.removeAllNonAlphaNumeric(tableFields.get(i)).toLowerCase();
 							if(fieldObjMap.containsKey(tableFields.get(i))){
 								ret.append("<td>"+fieldObjMap.get(tableFields.get(i))+"</td>");

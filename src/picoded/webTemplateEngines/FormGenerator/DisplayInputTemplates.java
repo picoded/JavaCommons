@@ -43,6 +43,11 @@ public class DisplayInputTemplates {
 		return sb;
 	};
 	
+	protected static FormInputInterface checkbox = (node)->{
+		return FormInputTemplates.createCheckbox(node, true, "pf_div pf_displayCheckboxSet");
+	};
+	
+	
 	protected static Map<String, FormInputInterface> defaultInputTemplates() {
 		Map<String, FormInputInterface> defaultTemplates = new CaseInsensitiveHashMap<String, FormInputInterface>();
 		
@@ -55,6 +60,7 @@ public class DisplayInputTemplates {
 		defaultTemplates.put(JsonKeys.DROPDOWN, DisplayInputTemplates.select);
 		defaultTemplates.put(JsonKeys.TEXT, DisplayInputTemplates.input_text);
 		defaultTemplates.put(JsonKeys.HTML_INJECTION, DisplayInputTemplates.raw_html);
+		defaultTemplates.put("checkbox", DisplayInputTemplates.checkbox);
 		//defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, DisplayInputTemplates);
 		
 		return defaultTemplates;

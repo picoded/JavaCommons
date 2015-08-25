@@ -52,7 +52,7 @@ public class AccountLogin extends BasePage {
 	
 	/////////////////////////////////////////////
 	//
-	// The API specific functions
+	// Login, Logout, and password API
 	//
 	/////////////////////////////////////////////
 	
@@ -76,7 +76,7 @@ public class AccountLogin extends BasePage {
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | isLogin        | boolean            | indicator if the session is logged in or not                                  |
 	/// | accountID      | String             | account ID of the session                                                     |
-	/// | accountNAME    | [String]           | array of account names representing the session                               |
+	/// | accountNAME    | String[]           | array of account names representing the session                               |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | error          | String (Optional)  | Errors encounted if any                                                       |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
@@ -127,7 +127,7 @@ public class AccountLogin extends BasePage {
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | isLogin        | boolean            | indicator if the session is logged in or not                                  |
 	/// | accountID      | String             | account ID of the session                                                     |
-	/// | accountNames   | [String]           | array of account names representing the session                               |
+	/// | accountNames   | String[]           | array of account names representing the session                               |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | error          | String (Optional)  | Errors encounted if any                                                       |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
@@ -208,7 +208,7 @@ public class AccountLogin extends BasePage {
 	};
 	
 	///
-	/// # password (POST)
+	/// # password (POST) [Requires login to relevent user, or superuser]
 	///
 	/// The password update POST function.
 	///
@@ -277,8 +277,123 @@ public class AccountLogin extends BasePage {
 		return res;
 	};
 	
+	/////////////////////////////////////////////
+	//
+	// Basic info API
+	//
+	/////////////////////////////////////////////
+	
 	///
-	/// # meta/${accountID} (GET)
+	/// # info/name/${accountName} (GET) [Requires login]
+	///
+	/// Gets and return the accountID for the given accountName
+	///
+	/// Note: if ${accountName} is blank, it assumes the current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | No parameters options                                                                                                |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// 
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | accountID       | String             | account ID used                                                               |
+	/// | accountNames    | String[]           | array of account names representing the account                               |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | isSuperUser     | boolean            | indicates if the account is considered a superUser                            |
+	/// | isGroup         | boolean            | indicates if the account is considered a group                                |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | groupIDs        | String[]           | array of account ID groups the user is in                                     |
+	/// | groupNames      | String[][]         | array of account Names groups the user is in                                  |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	public static RESTFunction infoByName_GET = (req, res) -> {
+		return res;
+	}
+	
+	///
+	/// # info/id/${accountID} (GET) [Requires login]
+	///
+	/// Gets and return the accountID for the given accountName
+	/// 
+	/// Note: if ${accountID} is blank, it assumes the current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | No parameters options                                                                                                |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// 
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | accountID       | String             | account ID used                                                               |
+	/// | accountNames    | String[]           | array of account names representing the account                               |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | isSuperUser     | boolean            | indicates if the account is considered a superUser                            |
+	/// | isGroup         | boolean            | indicates if the account is considered a group                                |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | groupIDs        | String[]           | array of account ID groups the user is in                                     |
+	/// | groupNames      | String[][]         | array of account Names groups the user is in                                  |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	public static RESTFunction infoByID_GET = (req, res) -> {
+		return res;
+	}
+	
+	///
+	/// # list (POST / GET) [Requires login]
+	///
+	/// Lists the users according to the search criteria 
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
+	/// | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
+	/// | length          | int (optional)     | Default 50: The number of records to return                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | insideGroup_any | String[](optional) | Default null, else filters for only accounts inside the listed groups ID      |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | groupStatus     | String (optional)  | Default "both", either "user" or "group". Used to lmit the result set         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// 
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
+	/// | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    |
+	/// | recordsFilterd  | int                | Total amount of records. After all search filter                              |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | data            | array              | Array of row records                                                          |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error           | String (Optional)  | Errors encounted if any                                                       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	public static RESTFunction list_GET_and_POST = (req, res) -> {
+		return res;
+	}
+	
+	///
+	/// # meta/${accountID} (GET) [Requires login]
 	///
 	/// Gets and return the current user info
 	/// 
@@ -309,6 +424,46 @@ public class AccountLogin extends BasePage {
 		return res;
 	}
 	
+	///
+	/// # meta/${accountID} (POST) [Requires login]
+	///
+	/// Updates the accountID meta info, requires either the current user or SuperUser
+	/// 
+	/// Note: if ${accountID} is blank, it assumes the current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | meta            | {Object}           | Meta object that represents this account                                      |
+	/// | updateMode      | String (Optional)  | (Default) "delta" for only updating the given fields, or "full" for all       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// 
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | accountExists   | boolean            | indicates if the account ID exists in the system                              |
+	/// | accountID       | String             | account ID used                                                               |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | meta            | {Object}           | Meta object that represents this account                                      |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error           | String (Optional)  | Errors encounted if any                                                       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	public static RESTFunction meta_POST = (req, res) -> {
+		return res;
+	}
+	
+	
+	
+	//-------------------------------------------------------------------------------------------------------------------------
+	//
+	// Work in progress (not final) start
+	//
+	//-------------------------------------------------------------------------------------------------------------------------
 	
 	
 	///
@@ -334,18 +489,18 @@ public class AccountLogin extends BasePage {
 	/// | accountExists   | boolean            | indicates if the account ID exists in the system                              |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | accountID       | String             | account ID of the session                                                     |
-	/// | accountNames    | [String]           | array of account names representing the session                               |
+	/// | accountNames    | String[]           | array of account names representing the session                               |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | meta            | {Object}           | Meta object that represents this account                                      |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | isSuperUser     | boolean            | indicates if the account is considered a superUser                            |
 	/// | isGroup         | boolean            | indicates if the account is considered a group                                |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | groupIDs        | [String]           | array of account ID groups the user is in                                     |
-	/// | groupNames      | [[String]]         | array of account Names groups the user is in                                  |
+	/// | groupIDs        | String[]           | array of account ID groups the user is in                                     |
+	/// | groupNames      | String[][]         | array of account Names groups the user is in                                  |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | memberIDs       | [String]           | array of account ID groups that are memebrs of this account                   |
-	/// | memberNames     | [[String]]         | array of account Names groups that are memebrs of this account                |
+	/// | memberIDs       | String[]           | array of account ID groups that are memebrs of this account                   |
+	/// | memberNames     | String[][]         | array of account Names groups that are memebrs of this account                |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | error           | String (Optional)  | Errors encounted if any                                                       |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -354,84 +509,22 @@ public class AccountLogin extends BasePage {
 		return res;
 	}
 	
-	
-	
-	
-	
-	///
-	/// Generates the default REST function for the following, 
-	/// note that they do not have ANY authentication layer enforced.
-	///
-	/// + password (only works for its own user)
-	///    + POST : accountID, oldPassword, newPassword
-	/// + groups_id
-	///    + GET  : Returns the list of groups found in system
-	///
-	/// + list
-	///    + GET : List all the accounts and their ID, or use a search criteria
-	///
-	/// # Note the following default has yet to be implmented
-	/// # And SHOULD be rewritten / overwritten to fit the app specific security model if needed
-	///    + name/${nameID}
-	///        + GET : accountID
-	/// + info/$(loginID)
-	///    + GET  : Gets the user meta info, and etc
-	///         + names : Array of login names (not login ID)
-	///         + accountID : The accountID
-	///         + meta : The meta info representing the account
-	///         + 
-	///    + POST : Update the user meta info, and etc
-	///         + isDelta : true / false, indicate if only update changes
-	///         + meta : Object representing the meta info to update
-	///    + DELETE : Deletes the account with the ID
-	/// 
-	public static RESTFunction generateDefaultFunction(AccountTable at, String apiSuffix, HttpRequestType apiType ) {
-		RESTFunction ret = null;
-		
-		if( apiSuffix.equals("login") ) {
-			
-			//
-			// Login functions
-			//
-			if( apiType == HttpRequestType.GET ) {
-				ret = login_GET;
-			} else if( apiType == HttpRequestType.POST ) {
-				ret = login_POST;
-			}
-			
-		} else if( apiSuffix.equals("logout") ) {
-			
-			//
-			// Logout functions
-			//
-			ret = logout_GET;
-			
-		} else if( apiSuffix.equals("password") ) {
-			
-			//
-			// Password change
-			//
-			ret = password_POST;
-			
-		}
-		
-		return ret;
-	}
+	//-------------------------------------------------------------------------------------------------------------------------
+	//
+	// Work in progress (not final) end
+	//
+	//-------------------------------------------------------------------------------------------------------------------------
 	
 	///
 	/// Takes the restbuilder and the account table object and implements its respective default API
 	///
 	public static RESTBuilder setupRESTBuilder(RESTBuilder rb, AccountTable at, String setPrefix ) {
-		String[] apiSuffix = new String[] { "login", "logout", "password", "list" };
 		
-		for( int a=0; a<apiSuffix.length; ++a ) {
-			for( HttpRequestType t : HttpRequestType.values() ) {
-				RESTFunction r = generateDefaultFunction(at, apiSuffix[a], t);
-				if( r != null ) {
-					rb.getNamespace( setPrefix + apiSuffix[a] ).put( t, r );
-				}
-			}
-		}
+		rb.getNamespace( setPrefix + "login" ).put( HttpRequestType.GET, login_GET );
+		rb.getNamespace( setPrefix + "login" ).put( HttpRequestType.POST, login_POST );
+		rb.getNamespace( setPrefix + "logout" ).put( HttpRequestType.GET, logout_GET );
+		rb.getNamespace( setPrefix + "password" ).put( HttpRequestType.POST, password_POST );
+		
 		return rb;
 	}
 	

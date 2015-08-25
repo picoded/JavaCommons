@@ -1,4 +1,4 @@
-package picoded.JStack;
+package picoded.JStruct;
 
 /// Java imports
 import java.util.HashMap;
@@ -16,9 +16,9 @@ import picoded.conv.GUID;
 import picoded.security.NxtCrypt;
 import picoded.JSql.*;
 import picoded.JCache.*;
-import picoded.struct.CaseInsensitiveHashMap;
-import picoded.struct.UnsupportedDefaultMap;
-import picoded.struct.GenericConvertMap;
+import picoded.JStruct.*;
+import picoded.JStruct.internal.*;
+import picoded.struct.*;
 
 /// hazelcast
 import com.hazelcast.core.*;
@@ -30,15 +30,21 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
-public class AccountObject extends MetaObject {
+public class AccountObject extends JStruct_MetaObject {
 	
 	/// The original table
 	protected AccountTable mainTable = null;
 	
-	/// Protected constructor as this class is NOT meant to be constructed directly
-	protected AccountObject(AccountTable pTable, String inOID) {
-		super(pTable.accountMeta, inOID);
-		mainTable = pTable;
+	/// Constructor full setup
+	protected AccountObject(AccountTable accTable, JStruct_MetaTable inTable, String inOID, boolean isCompleteData) {
+		super( inTable, inOID );
+		mainTable = accTable;
+	}
+	
+	/// Simplified Constructor
+	protected AccountObject(AccountTable accTable, String inOID) {
+		super( (JStruct_MetaTable)(accTable.accountMeta), inOID  );
+		mainTable = accTable;
 	}
 	
 	// Internal utility functions
@@ -96,7 +102,7 @@ public class AccountObject extends MetaObject {
 	//-------------------------------------------------------------------------
 	
 	/// Gets and return the various "nice-name" (not UUID) for this account
-	public String[] getNames() {
+	public Set<String> getNames() {
 		return mainTable.accountID.getKeys(_oid);
 	}
 	
@@ -110,6 +116,8 @@ public class AccountObject extends MetaObject {
 			return false;
 		}
 		
+		saveDelta(); //ensure itself is registered
+		
 		/// Technically a race condition =X
 		mainTable.accountID.put(name, _oid);
 		return true;
@@ -121,11 +129,11 @@ public class AccountObject extends MetaObject {
 		mainTable.accountID.remove(name);
 	}
 	
-	/// Sets the name as a unique value
+	/// Sets the name as a unique value, delete all previous alias
 	public boolean setUniqueName(String name) {
 		
 		// The old name list, to check if new name already is set
-		String[] oldNamesList = getNames();
+		Set<String> oldNamesList = getNames();
 		if( !(Arrays.asList(oldNamesList).contains(name)) ) {
 			if( !setName(name) ) { //does not own the name, but fail to set =(
 				return false;
@@ -144,6 +152,7 @@ public class AccountObject extends MetaObject {
 		return true;
 	}
 	
+	
 	// Group management utility function
 	//-------------------------------------------------------------------------
 	
@@ -151,17 +160,17 @@ public class AccountObject extends MetaObject {
 	protected MetaObject _group_userToRoleMap = null;
 	
 	/// Gets the child map (cached?)
-	protected MetaObject group_userToRoleMap() throws JStackException {
+	protected MetaObject group_userToRoleMap() {
 		if( _group_userToRoleMap != null ) {
 			return _group_userToRoleMap;
 		}
 		
-		return ( _group_userToRoleMap = mainTable.group_childRole.lazyGet( this._oid() ) );
+		return ( _group_userToRoleMap = mainTable.group_childRole.uncheckedGet( this._oid() ) );
 	}
 	
 	// Group status check
 	//-------------------------------------------------------------------------
-	public boolean isGroup() throws JStackException {
+	public boolean isGroup() {
 		return ( group_userToRoleMap().size() > 1 );
 	}
 	
@@ -169,13 +178,13 @@ public class AccountObject extends MetaObject {
 	//-------------------------------------------------------------------------
 	
 	/// Gets and returns the member role, if it exists
-	public String getMemberRole( AccountObject memberObject ) throws JStackException {
+	public String getMemberRole( AccountObject memberObject ) {
 		return group_userToRoleMap().getString( memberObject._oid() ); 
 	}
 	
 	/// Gets and returns the member meta map, if it exists
 	/// Only returns if member exists, else null
-	public MetaObject getMember( AccountObject memberObject ) throws JStackException {
+	public MetaObject getMember( AccountObject memberObject ) {
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
 		
@@ -183,12 +192,12 @@ public class AccountObject extends MetaObject {
 			return null;
 		}
 		
-		return mainTable.groupChild_meta.lazyGet( this._oid()+"-"+memberOID );
+		return mainTable.groupChild_meta.uncheckedGet( this._oid()+"-"+memberOID );
 	}
 	
 	/// Gets and returns the member meta map, if it exists
 	/// Only returns if member exists and matches role, else null
-	public MetaObject getMember( AccountObject memberObject, String role ) throws JStackException {
+	public MetaObject getMember( AccountObject memberObject, String role ) {
 		role = mainTable.validateMembershipRole( role );
 		
 		String memberOID = memberObject._oid();
@@ -198,13 +207,13 @@ public class AccountObject extends MetaObject {
 			return null;
 		}
 		
-		return mainTable.groupChild_meta.lazyGet( this._oid()+"-"+memberOID );
+		return mainTable.groupChild_meta.uncheckedGet( this._oid()+"-"+memberOID );
 	}
 	
 	/// Adds the member to the group with the given role, if it was not previously added
 	///
 	/// Returns the group-member unique meta object, null if previously exists
-	public MetaObject addMember( AccountObject memberObject, String role ) throws JStackException {
+	public MetaObject addMember( AccountObject memberObject, String role ) {
 		// Gets the existing object, if exists terminates
 		if( getMember( memberObject ) != null ) {
 			return null;
@@ -217,7 +226,7 @@ public class AccountObject extends MetaObject {
 	/// Adds the member to the group with the given role, or update the role if already added
 	///
 	/// Returns the group-member unique meta object
-	public MetaObject setMember( AccountObject memberObject, String role ) throws JStackException {
+	public MetaObject setMember( AccountObject memberObject, String role ) {
 		role = mainTable.validateMembershipRole( role );
 		
 		String memberOID = memberObject._oid();
@@ -225,14 +234,17 @@ public class AccountObject extends MetaObject {
 		MetaObject childMeta = null;
 		
 		if( level == null || !level.equals( role ) ) {
+			memberObject.saveDelta();
+			this.saveDelta();
+			
 			group_userToRoleMap().put(memberOID, role);
 			group_userToRoleMap().saveDelta();
 			
-			childMeta = mainTable.groupChild_meta.lazyGet( this._oid()+"-"+memberOID );
+			childMeta = mainTable.groupChild_meta.uncheckedGet( this._oid()+"-"+memberOID );
 			childMeta.put( "role", role );
 			childMeta.saveDelta();
 		} else {
-			childMeta = mainTable.groupChild_meta.lazyGet( this._oid()+"-"+memberOID );
+			childMeta = mainTable.groupChild_meta.uncheckedGet( this._oid()+"-"+memberOID );
 		}
 		
 		return childMeta;
@@ -240,7 +252,7 @@ public class AccountObject extends MetaObject {
 	
 	/// Returns the list of groups the member is in
 	///
-	public String[] getMembers_id() throws JStackException {
+	public String[] getMembers_id() {
 		List<String> retList = new ArrayList<String>();
 		for( String key : group_userToRoleMap().keySet() ) {
 			if( key.equals("_oid") ) {
@@ -253,13 +265,13 @@ public class AccountObject extends MetaObject {
 	
 	/// Returns the list of members in the group
 	///
-	public String[] getGroups_id() throws JStackException {
-		return mainTable.group_childRole.getFromKeyNames_id( _oid() );
+	public String[] getGroups_id() {
+		return mainTable.group_childRole.getFromKeyName_id( _oid() );
 	}
 	
 	/// Gets all the members object related to the group
 	///
-	public AccountObject[] getMembers() throws JStackException {
+	public AccountObject[] getMembers() {
 		String[] idList = getMembers_id();
 		AccountObject[] objList = new AccountObject[idList.length];
 		for(int a=0; a<idList.length; ++a) {
@@ -270,10 +282,11 @@ public class AccountObject extends MetaObject {
 	
 	// Group management of users
 	//-------------------------------------------------------------------------
-
+	
 	/// Gets all the groups the user is in
 	///
-	public AccountObject[] getGroups() throws JStackException {
+	public AccountObject[] getGroups() {
 		return mainTable.getFromIDArray( getGroups_id() );
 	}
+	
 }

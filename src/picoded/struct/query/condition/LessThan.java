@@ -5,7 +5,7 @@ import java.text.NumberFormat;
 import java.text.RuleBasedCollator;
 import java.util.*;
 
-import picoded.struct.query.QueryType;
+import picoded.struct.query.*;
 import picoded.struct.query.internal.QueryUtils;
 
 public class LessThan extends ConditionBase {
@@ -40,25 +40,11 @@ public class LessThan extends ConditionBase {
 	/// @returns  boolean indicating success or failure
 	///
 	protected boolean testValues(Object fieldValue, Object argValue) {
-		if( argValue == null ) {
-			if( fieldValue == null ) {
-				return true;
-			}
-		}else{
-			Object fieldObj = QueryUtils.normalizeObject(fieldValue);
-			Object argObj = QueryUtils.normalizeObject(argValue);
-			
-			if(fieldObj instanceof String && argObj instanceof String){
-				Collator collator = RuleBasedCollator.getInstance(Locale.ENGLISH);
-				int result = collator.compare(fieldObj, argObj);
-				return result < 0 ? true : false;
-			}else if(fieldObj instanceof Double && argObj instanceof Double){
-				return (Double)fieldObj < (Double)argObj ? true : false;
-			}else{
-				throw new RuntimeException("These values cannot be compared");
-			}
+		if( argValue == null || fieldValue == null ) {
+			return false;
+		} else {
+			return CompareUtils.dynamicCompare(fieldValue, argValue) < 0;
 		}
-		return false;
 	}
 	
 	/// The operator symbol support

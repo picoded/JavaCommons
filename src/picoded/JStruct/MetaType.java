@@ -110,6 +110,10 @@ public enum MetaType {
 	/// Return the numeric value representing the enum
 	public int getValue() { return ID; }
 	
+	/// Get name and toString alias to name() varient
+	public String getName() { return super.name(); }
+	public String toString() { return super.name(); }
+	
 	//
 	// Public EnumSet
 	//--------------------------------------------------------------------

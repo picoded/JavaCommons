@@ -33,6 +33,7 @@ import com.floreysoft.jmte.*;
 // Sub modules useds
 import picoded.conv.JMTE;
 import picoded.JStack.*;
+import picoded.JStruct.*;
 import picoded.RESTBuilder.*;
 
 /**
@@ -105,7 +106,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		AccountTable at = accountAuthTable();
 		
 		// Setup table
-		at.stackSetup();
+		at.systemSetup();
 		
 		// Gets the superuser group
 		String superGroup = jc.getString("sys.account.superUsers.groupName", "SuperUsers");

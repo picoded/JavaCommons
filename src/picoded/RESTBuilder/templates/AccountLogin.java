@@ -4,6 +4,7 @@ import java.util.*;
 
 import picoded.RESTBuilder.*;
 import picoded.JStack.*;
+import picoded.JStruct.*;
 import picoded.servlet.*;
 
 import picoded.enums.HttpRequestType;
@@ -102,7 +103,7 @@ public class AccountLogin extends BasePage {
 						if( ao != null ) {
 							res.put("accountID", ao._oid());
 							
-							String[] names = ao.getNames();
+							String[] names = ao.getNames().toArray(new String[0]);
 							res.put("accountNAME", Arrays.asList( (names == null)? new String[] {} : names) );
 						}
 					}
@@ -133,7 +134,7 @@ public class AccountLogin extends BasePage {
 							// Login is valid
 							if( ao != null ) {
 								res.put("accountID", ao._oid());
-								String[] names = ao.getNames();
+								String[] names = ao.getNames().toArray(new String[0]);
 								res.put("accountNAME", Arrays.asList( (names == null)? new String[] {} : names) );
 							}
 						}

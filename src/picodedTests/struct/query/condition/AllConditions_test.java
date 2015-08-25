@@ -48,10 +48,12 @@ public class AllConditions_test {
 		sample_b.put("float", "10.5");
 		sample_b.put("string", "bdc");
 		
+		/// Note atleast 1 side should be "numeric", 
+		/// for numeric compare to trigger
 		sample_c.put("my", "world");
-		sample_c.put("int", 5);
-		sample_c.put("double", "5.55");
-		sample_c.put("float", "5.5");
+		sample_c.put("int", new Integer(5));
+		sample_c.put("double", new Double(5.55));
+		sample_c.put("float", new Float(5.5));
 		sample_c.put("string", "bcd");
 		
 		sample_d.put("my", "perfect world");

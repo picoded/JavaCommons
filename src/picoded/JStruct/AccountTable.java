@@ -1,4 +1,4 @@
-package picoded.JStack;
+package picoded.JStruct;
 
 /// Java imports
 import java.util.HashMap;
@@ -18,6 +18,8 @@ import picoded.conv.GenericConvert;
 import picoded.conv.ConvertJSON;
 import picoded.JSql.*;
 import picoded.JCache.*;
+import picoded.JStruct.*;
+import picoded.JStruct.internal.*;
 import picoded.struct.CaseInsensitiveHashMap;
 import picoded.struct.UnsupportedDefaultMap;
 import picoded.struct.GenericConvertMap;
@@ -50,60 +52,7 @@ import com.hazelcast.core.IMap;
 ///
 /// @TODO : Group handling layer
 ///
-public class AccountTable extends JStackData implements UnsupportedDefaultMap<String, AccountObject>  {
-
-	///
-	/// Constructor setup
-	///--------------------------------------------------------------------------
-
-	/// Setup the metatable with the default table name
-	public AccountTable(JStack inStack) {
-		super( inStack );
-		tableName = "AccountTable";
-
-		internalConstructor(inStack);
-	}
-
-	/// Setup the metatable with the given stack
-	public AccountTable(JStack inStack, String inTableName) {
-		super( inStack, inTableName );
-
-		internalConstructor(inStack);
-	}
-
-	/// Internal constructor that setsup the underlying MetaTable / KeyValuePair
-	public void internalConstructor(JStack inStack) {
-		accountID = new KeyValueMap(inStack, tableName+ACCOUNT_ID);
-		accountHash = new KeyValueMap(inStack, tableName+ACCOUNT_HASH);
-		accountSessions = new KeyValueMap(inStack, tableName+ACCOUNT_SESSIONS);
-		accountMeta = new MetaTable(inStack, tableName+ACCOUNT_META);
-		group_childRole = new MetaTable(inStack, tableName+ACCOUNT_CHILD);
-		groupChild_meta = new MetaTable(inStack, tableName+ACCOUNT_CHILDMETA);
-		
-		accountSessions.setTempMode( true ); //optimization
-	}
-
-	///
-	/// Table suffixes for the variosu sub tables
-	///--------------------------------------------------------------------------
-	
-	/// The account self ID's
-	protected static String ACCOUNT_ID = "_ID";
-
-	/// The account self ID's
-	protected static String ACCOUNT_HASH = "_IH";
-
-	/// The login sessions used for authentication
-	protected static String ACCOUNT_SESSIONS = "_LS";
-
-	/// The account self meta values
-	protected static String ACCOUNT_META = "_SM";
-
-	/// The child nodes mapping, from self
-	protected static String ACCOUNT_CHILD = "_SC";
-
-	/// The child account meta values
-	protected static String ACCOUNT_CHILDMETA = "_CM";
+public class AccountTable implements UnsupportedDefaultMap<String, AccountObject> {
 
 	///
 	/// Underlying data structures
@@ -133,42 +82,98 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 	/// Handles the Group-member meta field mapping
 	protected MetaTable groupChild_meta = null;
 	
-	//
-	// JStack common setup functions
-	//--------------------------------------------------------------------------
+	///
+	/// Table suffixes for the variosu sub tables
+	///--------------------------------------------------------------------------
+	
+	/// Account table name prefix
+	protected String tableNamePrefix = null;
+	
+	/// The account self ID's
+	protected static String ACCOUNT_ID = "_ID";
 
-	/// Performs the full stack setup for the data object
-	public void stackSetup() throws JStackException {
-		accountID.stackSetup();
-		accountHash.stackSetup();
-		accountSessions.stackSetup();
-		accountMeta.stackSetup();
-		group_childRole.stackSetup();
-		groupChild_meta.stackSetup();
+	/// The account self ID's
+	protected static String ACCOUNT_HASH = "_IH";
+
+	/// The login sessions used for authentication
+	protected static String ACCOUNT_SESSIONS = "_LS";
+
+	/// The account self meta values
+	protected static String ACCOUNT_META = "_SM";
+
+	/// The child nodes mapping, from self
+	protected static String ACCOUNT_CHILD = "_SC";
+
+	/// The child account meta values
+	protected static String ACCOUNT_CHILDMETA = "_CM";
+	
+	///
+	/// Constructor setup
+	///--------------------------------------------------------------------------
+
+	/// Setup the metatable with the default table name
+	public AccountTable(JStruct jStructObj, String tableName) {
+		tableNamePrefix = tableName;
+		
+		accountID = jStructObj.getKeyValueMap( tableName+ACCOUNT_ID );
+		accountHash = jStructObj.getKeyValueMap( tableName+ACCOUNT_HASH );
+		accountSessions = jStructObj.getKeyValueMap( tableName+ACCOUNT_SESSIONS );
+		accountMeta = jStructObj.getMetaTable( tableName+ACCOUNT_META );
+		group_childRole = jStructObj.getMetaTable( tableName+ACCOUNT_CHILD );
+		groupChild_meta = jStructObj.getMetaTable( tableName+ACCOUNT_CHILDMETA );
+		
+		accountSessions.setTempHint( true ); //optimization
 	}
-
-	/// Performs the full stack teardown for the data object
-	public void stackTeardown() throws JStackException {
-		accountID.stackTeardown();
-		accountHash.stackTeardown();
-		accountSessions.stackTeardown();
-		accountMeta.stackTeardown();
-		group_childRole.stackTeardown();
-		groupChild_meta.stackTeardown();
-	}
-
+	
 	//
-	// Map compliant implementation, note most of them are aliases of their name varients
+	// Stack common setup / teardown functions
 	//--------------------------------------------------------------------------
 	
-	/// Account exists, this is an alias of containsName
-	public boolean containsKey(Object name) {
-		return containsName(name.toString());
+	/// Performs the full stack setup for the data object
+	public void systemSetup() {
+		accountID.systemSetup();
+		accountHash.systemSetup();
+		accountSessions.systemSetup();
+		accountMeta.systemSetup();
+		group_childRole.systemSetup();
+		groupChild_meta.systemSetup();
 	}
-
-	/// Gets the user using the nice name, this is an alias of getFromName
-	public AccountObject get(Object name) {
-		return getFromName(name);
+	
+	/// Performs the full stack teardown for the data object
+	public void systemTeardown() {
+		accountID.systemTeardown();
+		accountHash.systemTeardown();
+		accountSessions.systemTeardown();
+		accountMeta.systemTeardown();
+		group_childRole.systemTeardown();
+		groupChild_meta.systemTeardown();
+	}
+	
+	//
+	// Map compliant implementation,
+	// Keys here refer to object ID
+	//
+	//--------------------------------------------------------------------------
+	
+	/// Gets and return the accounts table from the account ID
+	public AccountObject get(Object oid) {
+		return getFromID(oid);
+	}
+	
+	/// Account exists, this is an alias of containsName
+	public boolean containsKey(Object oid) {
+		return containsID(oid.toString());
+	}
+	
+	/// Removes the object, returns null
+	public AccountObject remove(Object oid) {
+		removeFromID(oid.toString());
+		return null;
+	}
+	
+	// Returns all the account _oid in the system
+	public Set<String> keySet() {
+		return accountMeta.keySet();
 	}
 	
 	//
@@ -209,13 +214,9 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 	
 	/// Generates a new account object
 	public AccountObject newObject() {
-		try {
-			AccountObject ret = new AccountObject(this, null);
-			ret.saveAll(); //ensures the blank object is now in DB
-			return ret;
-		} catch( JStackException e ) {
-			throw new RuntimeException(e);
-		}
+		AccountObject ret = new AccountObject(this, null);
+		//ret.saveAll(); //ensures the blank object is now in DB
+		return ret;
 	}
 	
 	/// Generates a new account object with the given nice name
@@ -253,29 +254,31 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 	/// Removes the accountObject using the name
 	public void removeFromName(String name) {
 		//@TODO implmentation
+		throw new RuntimeException("@TODO");
 	}
 	
 	/// Removes the accountObject using the ID
 	public void removeFromID(String oid) {
 		//@TODO implmentation
+		throw new RuntimeException("@TODO");
 	}
 	
 	///
 	/// login configuration and utiltities
 	///--------------------------------------------------------------------------
-
+	
 	/// defined login lifetime, default as 3600 seconds (aka 1 hr)
 	public int loginLifetime = 3600; // 1 hr = 60 (mins) * 60 (seconds) = 3600 seconds
-
+	
 	/// lifetime for http login token required for renewal, 1800 seconds (or half an hour)
 	public int loginRenewal = loginLifetime / 2; //
-
+	
 	/// Remember me lifetime, default as 2592000 seconds (aka 30 days)
 	public int rmberMeLifetime = 2592000; // 1 mth ~= 30 (days) * 24 (hrs) * 3600 (seconds in an hr)
 	
 	/// Remember me lifetime, default as 15 days
 	public int rmberMeRenewal = rmberMeLifetime / 2; // 15 days
-
+	
 	/// Sets the cookie to be limited to http only
 	public boolean isHttpOnly = false;
 	
@@ -290,7 +293,7 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 	
 	/// The nonce size
 	public int nonceSize = 22;
-	
+	 
 	/// Gets and returns the session info, [nonceSalt, loginIP, browserAgent]
 	protected String[] getSessionInfo(String oid, String nonce) {
 		return accountSessions.getStringArray(oid+"-"+nonce);
@@ -320,7 +323,7 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 	public AccountObject getRequestUser(javax.servlet.http.HttpServletRequest request) {
 		return getRequestUser(request, null);
 	}
-
+	
 	/// Validates the user retur true/false, with an update response cookie / token if needed
 	public AccountObject getRequestUser(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) {
 		javax.servlet.http.Cookie[] cookieJar = request.getCookies();
@@ -518,9 +521,14 @@ public class AccountTable extends JStackData implements UnsupportedDefaultMap<St
 	}
 	
 	///
-	/// Group Membership roles
+	/// Group Membership roles managment
 	///--------------------------------------------------------------------------
-	protected List<String> membershipRoles = new ArrayList<String>( Arrays.asList(new String[] { "guest", "manager" }) );
+	protected List<String> membershipRoles = new ArrayList<String>( Arrays.asList(new String[] { "guest", "member", "manager" }) );
+	
+	/// Returns the internal membership role list
+	public List<String> membershipRoles() {
+		return membershipRoles;
+	}
 	
 	/// Checks if membership role exists
 	public boolean hasMembershipRole( String role ) {

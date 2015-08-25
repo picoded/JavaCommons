@@ -1,6 +1,7 @@
 package picoded.struct.query.condition;
 
 import picoded.struct.query.*;
+import picoded.struct.query.internal.*;
 
 import java.util.function.*;
 import java.util.*;
@@ -46,24 +47,6 @@ public class ConditionBase implements Query {
 	//
 	// Core protected functions
 	//--------------------------------------------------------------------
-	
-	/// Gets the field value to test
-	///
-	/// @param   object to extract out the field value 
-	/// @param   field name of extraction
-	///
-	/// @TODO: Support FullyQualifiedDomainName extraction? with arrays even?
-	///
-	/// @returns  The extracted object
-	///
-	protected Object getFieldValue(Object t, String field) {
-		if( field == null || field.toString().equalsIgnoreCase("this") ) {
-			return t;
-		} else if( t instanceof Map ) {
-			return ((Map)t).get(field);
-		}
-		return null;
-	}
 	
 	/// Gets the arg value to test
 	///
@@ -112,7 +95,7 @@ public class ConditionBase implements Query {
 	/// @returns  boolean indicating success or failure
 	///
 	protected boolean getAndTestFieldValue(Object t, Map<String,Object> argMap) {
-		Object fieldValue = getFieldValue(t, _fieldName);
+		Object fieldValue = QueryUtils.getFieldValue(t, _fieldName);
 		Object argValue = getArgumentValue(argMap, _argName);
 			
 		//System.out.println("> "+fieldValue+" = "+argValue);
@@ -189,7 +172,7 @@ public class ConditionBase implements Query {
 	
 	/// The query string
 	public String toString() {
-		return fieldName() + " " + operatorSymbol() + " " + ":" + argumentName();
+		return "\""+fieldName() + "\" " + operatorSymbol() + " " + ":" + argumentName();
 	}
 	
 } 

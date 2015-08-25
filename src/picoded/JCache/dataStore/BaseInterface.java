@@ -13,7 +13,7 @@ import picoded.JStack.JStackLayer;
 /// in which additional server cache interface types are implemented.
 ///
 /// Note that the interface intentionaly does not include a "constructor" as that may be cache implementation dependent
-public abstract class BaseInterface extends JStackLayer {
+public abstract class BaseInterface implements JStackLayer {
 	
 	// Internal refrence of the current JCache type the system is running as, or so it should be by default
 	//public JCacheType cacheType  = JCacheType;

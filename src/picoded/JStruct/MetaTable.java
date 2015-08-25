@@ -7,6 +7,8 @@ import java.util.*;
 import picoded.conv.GUID;
 import picoded.struct.CaseInsensitiveHashMap;
 import picoded.struct.UnsupportedDefaultMap;
+import picoded.JStruct.internal.*;
+import picoded.struct.query.*;
 import picoded.conv.ListValueConv;
 
 /// MetaTable, servs as the core flexible backend storage implmentation for the whole
@@ -50,8 +52,16 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// Teardown and delete the backend storage table, etc. If needed
 	public void systemTeardown();
 	
+	/// perform increment maintenance, meant for minor changes between requests
+	public default void incrementalMaintenance() {
+		// For JStruct, both is same
+		maintenance();
+	}
+	
 	/// Perform maintenance, mainly removing of expired data if applicable
-	public void maintenance();
+	public default void maintenance() {
+		// does nothing?
+	}
 	
 	/// 
 	/// MetaObject operations
@@ -68,5 +78,143 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// nulled or replaced are maintained
 	public MetaObject append(String _oid, Map<String, Object> obj);
 	
+	/// 
+	/// Query operations (to optimize on specific implementation)
+	///--------------------------------------------------------------------------
 	
+	/// Performs a search query, and returns the respective MetaObjects
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	///
+	/// @returns  The MetaObject[] array
+	public default MetaObject[] query(String whereClause, Object[] whereValues) {
+		return query(whereClause, whereValues, null, 0, 0);
+	}
+	
+	/// Performs a search query, and returns the respective MetaObjects
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	/// @param   query string to sort the order by, use null to ignore
+	///
+	/// @returns  The MetaObject[] array
+	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr ) {
+		return query(whereClause, whereValues, orderByStr, 0, 0);
+	}
+	
+	/// Performs a search query, and returns the respective MetaObjects
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	/// @param   query string to sort the order by, use null to ignore
+	/// @param   offset of the result to display, use -1 to ignore
+	/// @param   number of objects to return max
+	///
+	/// @returns  The MetaObject[] array
+	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit ) {
+		
+		// The return list
+		List<MetaObject> retList = null;
+		
+		// Setup the query, if needed
+		if(whereClause == null) { //null gets all
+			retList = new ArrayList<MetaObject>( this.values() );
+		} else {
+			Query queryObj = Query.build(whereClause, whereValues);
+			retList = queryObj.search(this);
+		}
+		
+		// Sort, offset, convert to array, and return
+		return JStructUtils.sortAndOffsetListToArray(retList, orderByStr, offset, limit);
+	}
+	
+	/// 
+	/// Get from key names operations (to optimize on specific implementation)
+	///--------------------------------------------------------------------------
+	
+	/// Performs a custom search by configured keyname
+	/// 
+	/// @param   keyName to lookup for
+	///
+	/// @returns  The MetaObject[] array
+	public default MetaObject[] getFromKeyName(String keyName) {
+		return getFromKeyName(keyName, null, -1, -1);
+	}
+	
+	/// Performs a custom search by configured keyname
+	/// 
+	/// @param   keyName to lookup for
+	/// @param   query string to sort the order by, use null to ignore
+	///
+	/// @returns  The MetaObject[] array
+	public default MetaObject[] getFromKeyName(String keyName, String orderByStr) {
+		return getFromKeyName(keyName, orderByStr, -1, -1);
+	}
+	
+	/// Performs a custom search by configured keyname
+	/// 
+	/// @param   keyName to lookup for
+	/// @param   query string to sort the order by, use null to ignore
+	/// @param   offset of the result to display, use -1 to ignore
+	/// @param   number of objects to return max
+	///
+	/// @returns  The MetaObject[] array
+	public default MetaObject[] getFromKeyName(String keyName, String orderByStr, int offset, int limit) {
+		
+		// The return list
+		List<MetaObject> retList = new ArrayList<MetaObject>();
+		
+		// Iterate the list, add if containsKey
+		for( MetaObject obj : values() ) {
+			if(obj.containsKey(keyName)) {
+				retList.add(obj);
+			}
+		}
+		
+		// Sort, offset, convert to array, and return
+		return JStructUtils.sortAndOffsetListToArray(retList, orderByStr, offset, limit);
+	}
+	
+	/// Performs a custom search by configured keyname, and returns its ID array
+	/// 
+	/// @param   keyName to lookup for
+	///
+	/// @returns  The MetaObject[] array
+	public default String[] getFromKeyName_id(String keyName) {
+		// The return list
+		List<String> retList = new ArrayList<String>();
+		
+		// Iterate the list, add if containsKey
+		for( MetaObject obj : values() ) {
+			if(obj.containsKey(keyName)) {
+				retList.add(obj._oid());
+			}
+		}
+		
+		// Return
+		return retList.toArray(new String[retList.size()]);
+	}
+	
+	/// 
+	/// MetaType handling, does type checking and conversion
+	///--------------------------------------------------------------------------
+	
+	/// Gets and return the internal MetaTypeMap
+	public MetaTypeMap typeMap();
+	
+	/// Get convinent function
+	public default MetaType getType(String name) {
+		return typeMap().get(name);
+	}
+	
+	/// Put convinent function
+	public default MetaType putType(String name, Object value) {
+		return typeMap().put( name, value );
+	}
+	
+	/// Generic varient of put all
+	public default <K,V> void setMappingType(Map<K, V> m) {
+		typeMap().putAllGeneric(m);
+	}
 }

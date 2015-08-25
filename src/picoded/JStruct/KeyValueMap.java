@@ -114,8 +114,14 @@ public interface KeyValueMap extends GenericConvertMap<String,String> {
 	/// Returns the value, given the key
 	/// @param key param find the thae meta key
 	///
-	/// returns  value of the given key
+	/// @returns  value of the given key
 	public String get(Object key);
+	
+	/// Remove the value, given the key
+	/// @param key param find the thae meta key
+	///
+	/// @returns  null
+	public String remove(Object key);
 	
 	/// Stores (and overwrites if needed) key, value pair
 	///
@@ -126,7 +132,18 @@ public interface KeyValueMap extends GenericConvertMap<String,String> {
 	///
 	/// @returns null
 	public String put(String key, String value);
+	
+	/// Returns all the valid keys
+	///
+	/// @returns  the full keyset
+	public default Set<String> keySet() {
+		return getKeys(null);
+	}
 
+	///
+	/// Extended map operations
+	///--------------------------------------------------------------------------
+	
 	/// Stores (and overwrites if needed) key, value pair
 	///
 	/// Important note: It does not return the previously stored value

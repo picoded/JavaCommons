@@ -34,6 +34,7 @@ import java.lang.Exception;
 
 // Sub modules useds
 import picoded.JStack.*;
+import picoded.JStruct.*;
 import picoded.JSql.*;
 
 /**

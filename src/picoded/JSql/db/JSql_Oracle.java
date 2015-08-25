@@ -103,7 +103,7 @@ public class JSql_Oracle extends JSql {
 			.replaceAll("(?i)TINYBLOB", "RAW")
 			//, RAW
 			//.replaceAll("(?i)CHAR","CHAR")
-			.replaceAll("(?i)DECIMAL\\(.*?\\)", "FLOAT(24)")
+			.replaceAll("(?i)DECIMAL", "NUMBER")
 			.replaceAll("(?i)DOUBLE", "FLOAT(24)")
 			.replaceAll("(?i)DOUBLE PRECISION", "FLOAT(24)")
 			.replaceAll("(?i)REAL", "FLOAT (24)")

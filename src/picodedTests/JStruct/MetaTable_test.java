@@ -110,7 +110,7 @@ public class MetaTable_test {
 		assertEquals(guid, mtObj.append(guid, objMap)._oid());
 	
 		objMap.put("_oid", guid);
-		assertEquals(objMap, mtObj.get(guid));
+		assertEquals(objMap, (Map<String,Object>)mtObj.get(guid));
 	
 		objMap = randomObjMap();
 		assertNotNull(guid = mtObj.append(null, objMap)._oid());

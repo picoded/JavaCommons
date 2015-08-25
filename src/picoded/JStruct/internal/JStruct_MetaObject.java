@@ -228,5 +228,10 @@ public class JStruct_MetaObject implements MetaObject {
 		mainTable.metaObjectRemoteDataMap_update(_oid, this, unfilteredForNullKeySet());
 		collapseDeltaToRemoteMap();
 	}
-
+	
+	// To string operation : aids debugging
+	//----------------------------------------------
+	public String toString() {
+		return ConvertJSON.fromMap(this);
+	}
 }

@@ -31,7 +31,8 @@ import picoded.struct.query.condition.*;
 /// 4) Step 2 & 3 is looped till there is only 1 token left, which is returned
 ///
 /// @TODO: Optimize this class haha, generally this whole set of 
-///        filters are NOT string modification optimized
+///        filters are NOT string modification optimized.
+///
 public class QueryFilter {
 	
 	//---------------------------------

@@ -353,6 +353,17 @@ public class JSql extends BaseInterface {
 	///
 	public JSqlQuerySet selectQuerySet( //
 		String tableName, // Table name to select from
+		String selectStatement // The Columns to select, null means all
+	) {
+		return selectQuerySet(tableName, selectStatement, null, null, null, 0, 0);
+	}
+	
+	///
+	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
+	/// syntax differances of SELECT across the various SQL vendors (if any).
+	///
+	public JSqlQuerySet selectQuerySet( //
+		String tableName, // Table name to select from
 		String selectStatement, // The Columns to select, null means all
 		
 		String whereStatement, // The Columns to apply where clause, this must be sql neutral

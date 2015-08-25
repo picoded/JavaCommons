@@ -65,8 +65,16 @@ public class JStruct {
 	protected ConcurrentHashMap<String,MetaTable> metaTableCache = new ConcurrentHashMap<String,MetaTable>();
 	protected ReentrantReadWriteLock metaTableCache_lock = new ReentrantReadWriteLock();
 	
+	/// Actual setup implmentation to overwrite
+	///
+	/// @param name - name of map in backend
+	///
+	/// @returns MetaTable
+	protected MetaTable setupMetaTable(String name) {
+		return new JStruct_MetaTable();
+	}
+	
 	/// Setsup and return a MetaTable object,
-	/// This is overriden for the various implmentation version
 	///
 	/// @param name - name of MetaTable in backend
 	///
@@ -91,7 +99,7 @@ public class JStruct {
 				return cacheCopy;
 			}
 			
-			cacheCopy = new JStruct_MetaTable();
+			cacheCopy = setupMetaTable(name);
 			metaTableCache.put( name, cacheCopy );
 			return cacheCopy;
 			
@@ -106,8 +114,16 @@ public class JStruct {
 	protected ConcurrentHashMap<String,AccountTable> accountTableCache = new ConcurrentHashMap<String,AccountTable>();
 	protected ReentrantReadWriteLock accountTableCache_lock = new ReentrantReadWriteLock();
 	
+	/// Actual setup implmentation to overwrite
+	///
+	/// @param name - name of map in backend
+	///
+	/// @returns AccountTable
+	protected AccountTable setupAccountTable(String name) {
+		return new AccountTable(this, name);
+	}
+	
 	/// Setsup and return a MetaTable object,
-	/// This is overriden for the various implmentation version
 	///
 	/// @param name - name of AccountTable in backend
 	///
@@ -132,7 +148,7 @@ public class JStruct {
 				return cacheCopy;
 			}
 			
-			cacheCopy = new AccountTable(this, name);
+			cacheCopy = setupAccountTable(name);
 			accountTableCache.put( name, cacheCopy );
 			return cacheCopy;
 			

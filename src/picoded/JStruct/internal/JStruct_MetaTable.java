@@ -80,7 +80,7 @@ public class JStruct_MetaTable implements MetaTable {
 	
 	/// Setsup the backend storage table, etc. If needed
 	public void systemSetup() {
-		_valueMap.clear();
+		// does nothing
 	}
 	
 	/// Teardown and delete the backend storage table, etc. If needed

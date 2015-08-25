@@ -72,5 +72,4 @@ public class JStructUtils {
 		return retList.toArray(new MetaObject[0]);
 	}
 	
-	
 }

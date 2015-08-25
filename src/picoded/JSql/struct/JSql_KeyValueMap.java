@@ -14,16 +14,7 @@ import picoded.security.NxtCrypt;
 
 import org.apache.commons.lang3.RandomUtils;
 
-/// Refence implementation of KeyValueMap data structure
-///
-/// This is intended to be an optimized key value map data storage
-/// Used mainly in caching or performance critical scenerios.
-///
-/// As such its sacrifices much utility for performance
-///
-/// Note that expire timestamps are measured in seconds,
-/// anything smaller then that is pointless over a network
-///
+/// JSql implmentation of KeyValueMap
 public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	
 	///

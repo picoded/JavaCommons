@@ -66,6 +66,10 @@ public class JStruct_MetaObject implements MetaObject {
 					throw new RuntimeException("GUID Collision (╯°□°）╯︵ ┻━┻ : "+_oid);
 				}
 			}
+			
+			// Ensure oid is savable, needed to save blank objects
+			deltaDataMap.put("_oid", _oid);
+			
 			isCompleteRemoteDataMap = true;
 			
 		} else {
@@ -82,12 +86,12 @@ public class JStruct_MetaObject implements MetaObject {
 	}
 	
 	/// Constructor, with metaTable and GUID (auto generated if null)
-	protected JStruct_MetaObject(JStruct_MetaTable inTable, String inOID) {
+	public JStruct_MetaObject(JStruct_MetaTable inTable, String inOID) {
 		commonSetup(inTable, inOID, null, false);
 	}
 	
 	/// Constructor, with metaTable and GUID (auto generated if null)
-	protected JStruct_MetaObject(JStruct_MetaTable inTable, String inOID, Map<String, Object> inRemoteData, boolean isCompleteData) {
+	public JStruct_MetaObject(JStruct_MetaTable inTable, String inOID, Map<String, Object> inRemoteData, boolean isCompleteData) {
 		commonSetup(inTable, inOID, inRemoteData, isCompleteData);
 	}
 	

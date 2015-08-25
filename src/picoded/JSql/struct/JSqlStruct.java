@@ -29,4 +29,22 @@ public class JSqlStruct extends JStruct {
 		return new JSql_KeyValueMap(sqlObj, name);
 	}
 	
+	/// Actual setup implmentation to overwrite
+	///
+	/// @param name - name of map in backend
+	///
+	/// @returns MetaTable
+	protected MetaTable setupMetaTable(String name) {
+		return new JSql_MetaTable(sqlObj, name);
+	}
+	
+	/// Actual setup implmentation to overwrite
+	///
+	/// @param name - name of map in backend
+	///
+	/// @returns AccountTable
+	protected AccountTable setupAccountTable(String name) {
+		return new AccountTable(this, name);
+	}
+	
 }

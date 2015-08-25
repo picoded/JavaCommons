@@ -329,6 +329,25 @@ public class MetaTable_test {
 		
 	}
 	
+	// Array values tests
+	//-----------------------------------------------
+	@Test
+	public void jsonStorageTest()  {
+		Map<String,Object> data = new HashMap<String,Object>();
+		data.put("name", "Hello");
+		data.put("arrs", new ArrayList<String>( Arrays.asList(new String[] { "oh", "no" }) ) );
+		
+		MetaObject mo = null;
+		assertNotNull( mo = mtObj.append(null, data) );
+		mo.saveDelta();
+		
+		MetaObject to = null;
+		assertNotNull( to = mtObj.get( mo._oid() ) );
+		
+		data.put("_oid", mo._oid());
+		assertEquals(data, to);
+	}
+	
 	// Mapping tests
 	//-----------------------------------------------
 	

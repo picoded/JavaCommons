@@ -15,6 +15,11 @@ public class JSqlStruct extends JStruct {
 	/// The sql object implmentation
 	protected JSql sqlObj = null;
 	
+	/// Setup with nothing
+	public JSqlStruct() {
+		// does nothing
+	}
+	
 	/// Setup with sql object
 	public JSqlStruct(JSql sql) {
 		sqlObj = sql;
@@ -26,6 +31,10 @@ public class JSqlStruct extends JStruct {
 	///
 	/// @returns KeyValueMap
 	protected KeyValueMap setupKeyValueMap(String name) {
+		if( sqlObj == null ) {
+			throw new RuntimeException("Missing required SQL Object");
+		}
+		
 		return new JSql_KeyValueMap(sqlObj, name);
 	}
 	
@@ -35,6 +44,10 @@ public class JSqlStruct extends JStruct {
 	///
 	/// @returns MetaTable
 	protected MetaTable setupMetaTable(String name) {
+		if( sqlObj == null ) {
+			throw new RuntimeException("Missing required SQL Object");
+		}
+		
 		return new JSql_MetaTable(sqlObj, name);
 	}
 	
@@ -44,6 +57,10 @@ public class JSqlStruct extends JStruct {
 	///
 	/// @returns AccountTable
 	protected AccountTable setupAccountTable(String name) {
+		if( sqlObj == null ) {
+			throw new RuntimeException("Missing required SQL Object");
+		}
+		
 		return new AccountTable(this, name);
 	}
 	

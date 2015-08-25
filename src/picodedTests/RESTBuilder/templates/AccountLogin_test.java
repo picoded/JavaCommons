@@ -20,6 +20,7 @@ import picoded.struct.ProxyGenericConvertMap;
 
 import picoded.RESTBuilder.*;
 import picoded.JStack.*;
+import picoded.JStruct.*;
 import picoded.RESTBuilder.templates.*;
 import picoded.webUtils.*;
 
@@ -53,7 +54,7 @@ public class AccountLogin_test {
 			
 			// Does the table and account setup
 			accTable = loginServlet.accountAuthTable();
-			accTable.stackSetup();
+			accTable.systemSetup();
 		}
 	}
 	

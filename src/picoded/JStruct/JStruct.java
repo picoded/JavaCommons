@@ -158,5 +158,39 @@ public class JStruct {
 	}
 	
 	
+	//----------------------------------------------
+	// automated setup of cached tables
+	//----------------------------------------------
+	
+	/// This does the setup called on all the cached tables, created via get calls
+	public void systemSetup() {
+		try {
+			keyValueMapCache_lock.readLock().lock();
+			metaTableCache_lock.readLock().lock();
+			
+			keyValueMapCache.entrySet().stream().forEach(e -> e.getValue().systemSetup() );
+			metaTableCache.entrySet().stream().forEach(e -> e.getValue().systemSetup() );
+			
+		} finally {
+			keyValueMapCache_lock.readLock().unlock();
+			metaTableCache_lock.readLock().unlock();
+		}
+	}
+	
+	/// This does the teardown called on all the cached tables, created via get calls
+	public void systemTeardown() {
+		try {
+			keyValueMapCache_lock.readLock().lock();
+			metaTableCache_lock.readLock().lock();
+			
+			keyValueMapCache.entrySet().stream().forEach(e -> e.getValue().systemTeardown() );
+			metaTableCache.entrySet().stream().forEach(e -> e.getValue().systemTeardown() );
+			
+		} finally {
+			keyValueMapCache_lock.readLock().unlock();
+			metaTableCache_lock.readLock().unlock();
+		}
+	}
+	
 	
 }

@@ -4,14 +4,14 @@ import java.util.*;
 
 // Picoded imports
 import picoded.JSql.*;
-import picoded.JCache.*;
-import picoded.struct.CaseInsensitiveHashMap;
+import picoded.JStruct.*;
+import picoded.JSql.struct.*;
 
 /// JStack provides various common data storage format, that utalizes a combination of
 /// JCache, and JSql instances implementation.
 ///
 /// The design principle is based on the prototyping experience for mmObjDB, and the original servlet-commons implementation of metaTables.
-public class JStack extends JStackLayer {
+public class JStack extends JSqlStruct implements JStackLayer {
 	
 	//----------------------------------------------
 	// Readonly internal variables
@@ -36,83 +36,28 @@ public class JStack extends JStackLayer {
 	
 	public JStack(JStackLayer inLayer) {
 		stackLayers = new JStackLayer[] { inLayer };
+		interimJSqlOnly();
 	}
 	
 	public JStack(JStackLayer[] inStack) {
 		stackLayers = inStack;
+		interimJSqlOnly();
 	}
 	
-	/*
-	public JStack(JStackLayer inLayer, String inNamespace) {
-		stackLayers = new JStackLayer[] { inLayer };
-		setTablePrefix(inNamespace);
-	}
-	
-	public JStack(JStackLayer[] inStack, String inNamespace) {
-		stackLayers = inStack;
-		setTablePrefix(inNamespace);
-	}
-	 */
-	
-	protected CaseInsensitiveHashMap<String,JStackData> cachedMetaTable = new CaseInsensitiveHashMap<String,JStackData>();
-	protected CaseInsensitiveHashMap<String,JStackData> cachedKeyValueMap = new CaseInsensitiveHashMap<String,JStackData>();
-	protected CaseInsensitiveHashMap<String,JStackData> cachedAccountTable = new CaseInsensitiveHashMap<String,JStackData>();
-	
-	//----------------------------------------------
-	// JStack modules
-	//----------------------------------------------
-	
-	public MetaTable getMetaTable(String tableName) {
-		MetaTable r = new MetaTable(this, tableName);
-		cachedMetaTable.put(tableName, r);
-		return r;
-	}
-	
-	public KeyValueMap getKeyValueMap(String tableName) {
-		KeyValueMap r = new KeyValueMap(this, tableName);
-		cachedKeyValueMap.put(tableName, r);
-		return r;
-	}
-	
-	public AccountTable getAccountTable(String tableName) {
-		AccountTable r = new AccountTable(this, tableName);
-		cachedAccountTable.put(tableName, r);
-		return r;
-	}
-	
-	//----------------------------------------------
-	// JStack automated setup of cached tables
-	//----------------------------------------------
-	
-	/// Gets all the sub stack
-	protected List< CaseInsensitiveHashMap<String,JStackData> > JStackData_stack() {
-		List< CaseInsensitiveHashMap<String,JStackData>> ret = new ArrayList< CaseInsensitiveHashMap<String,JStackData>>();
+	/// This is used to setup JStack as a JSQL only system.
+	protected void interimJSqlOnly() {
+		JStackLayer[] layers = stackLayers();
 		
-		ret.add( cachedMetaTable );
-		ret.add( cachedKeyValueMap );
-		ret.add( cachedAccountTable );
-		
-		return ret;
-	}
-	
-	/// This does the setup called on all the cached tables, created via get calls
-	public void stackSetup() throws JStackException {
-		List< CaseInsensitiveHashMap<String,JStackData> > l =  JStackData_stack();
-		for (CaseInsensitiveHashMap<String,JStackData> m : l) {
-			for (Map.Entry<String, JStackData> e : m.entrySet()) {
-				e.getValue().stackSetup();
-			}
+		JStackLayer last = layers[layers.length-1];
+		if( last instanceof JSql ) {
+			sqlObj = (JSql)last;
+		} else {
+			throw new RuntimeException("JStack currently supports a single JSql node (@TODO : Fix this)");
 		}
 	}
 	
-	/// This does the teardown called on all the cached tables, created via get calls
-	public void teardown() throws JStackException {
-		List< CaseInsensitiveHashMap<String,JStackData> > l =  JStackData_stack();
-		for (CaseInsensitiveHashMap<String,JStackData> m : l) {
-			for (Map.Entry<String, JStackData> e : m.entrySet()) {
-				e.getValue().stackTeardown();
-			}
-		}
-	}
+	//----------------------------------------------
+	// MetaTable, KeyValueMap handling
+	//----------------------------------------------
 	
 }

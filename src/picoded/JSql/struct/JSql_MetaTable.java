@@ -195,7 +195,7 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	/// Teardown and delete the backend storage table, etc. If needed
 	public void systemTeardown() {
 		try {
-			sqlObj.execute("DROP TABLE " + sqlTableName); //IF EXISTS
+			sqlObj.execute("DROP TABLE IF EXISTS " + sqlTableName); //IF EXISTS
 		} catch( JSqlException e ) {
 			logger.log(Level.SEVERE, "systemTeardown JSqlException (@TODO properly handle this): ", e);
 		}

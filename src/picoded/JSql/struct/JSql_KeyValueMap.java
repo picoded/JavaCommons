@@ -114,7 +114,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	/// @TODO properly handle this: Especially adding (and testing) the IF EXISTS clause
 	public void systemTeardown() {
 		try {
-			sqlObj.execute("DROP TABLE " + sqlTableName); //IF EXISTS
+			sqlObj.execute("DROP TABLE IF EXISTS " + sqlTableName); //IF EXISTS
 		} catch( JSqlException e ) {
 			logger.log(Level.SEVERE, "systemTeardown JSqlException (@TODO properly handle this): ", e);
 		}

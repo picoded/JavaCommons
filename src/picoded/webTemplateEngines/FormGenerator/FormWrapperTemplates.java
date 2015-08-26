@@ -5,10 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.omg.CosNaming.IstringHelper;
-
 import picoded.conv.ConvertJSON;
 import picoded.conv.RegexUtils;
+import picoded.conv.JMTE;
 import picoded.struct.CaseInsensitiveHashMap;
 
 /// FormWrapperTemplates
@@ -275,6 +274,75 @@ public class FormWrapperTemplates {
 		return ret;
 	};
 	
+	/// Reusable JMTE engine
+	protected static JMTE jmteObj = new JMTE();
+	
+	/// JMTE based wrapper, used to include non standard HTML code
+	/// 
+	/// @params {FormNode}  node           - The form node to build the html from
+	/// @params {boolean}   isDisplayMode  - The display mode.
+	///
+	/// @returns {StringBuilder}  the resulting HTML
+	@SuppressWarnings("unchecked")
+	protected static StringBuilder JMTEWrapper(FormNode node, boolean isDisplayMode) {
+		/// Returning string builder
+		StringBuilder ret = new StringBuilder();
+		
+		// Get the JMTE argument map
+		Map<String,Object> jmte_arguments = null;
+		
+		// From the field?
+		String fieldName = node.getFieldName();
+		if( fieldName == null || fieldName.length() <= 0 ) {
+			// Use the value map as the argument Map
+			jmte_arguments = node.getValueMap();
+		} else {
+			// Get the sub argument
+			Object subArgument = node.getValueMap().get(fieldName);
+			
+			if( subArgument != null ) {
+				if( subArgument instanceof Map ) {
+					jmte_arguments = new HashMap<String,Object>( (Map<String,Object>)subArgument );
+				} else {
+					throw new RuntimeException("@TODO: non map field argument handling");
+				}
+			} else {
+				throw new RuntimeException("@TODO: JMTE wrapper default fallback implmentation");
+			}
+		}
+		
+		// Gets the JMTE template to use
+		String jmte_template = null;
+		
+		if( isDisplayMode ) {
+			jmte_template = node.get( JsonKeys.JMTE_DISPLAY ).toString();
+		} else {
+			jmte_template = node.get( JsonKeys.JMTE_INPUT ).toString();
+		}
+		if( jmte_template == null ) {
+			jmte_template = node.get( JsonKeys.JMTE_GENERIC ).toString();
+		}
+		
+		if( jmte_template == null ) {
+			if( isDisplayMode ) {
+				throw new RuntimeException("JMTE Wrapper is missing JMTE_( DISPLAY / GENERIC ) implementation" );
+			} else {
+				throw new RuntimeException("JMTE Wrapper is missing JMTE_( INPUT/ GENERIC ) implementation" );
+			}
+		}
+		
+		// Generate the code
+		ret.append( jmteObj.parseTemplate( jmte_template, jmte_arguments ) );
+		
+		return ret;
+	}
+	
+	/// JMTE wrapper implementation
+	protected static FormWrapperInterface jmteWrapper = (node)->{
+		return FormWrapperTemplates.JMTEWrapper(node, false);
+	};
+	
+	/// Wrapper templates
 	protected static Map<String, FormWrapperInterface> defaultWrapperTemplates() {
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();
 		
@@ -284,6 +352,8 @@ public class FormWrapperTemplates {
 		defaultTemplates.put("for", FormWrapperTemplates.forWrapper);
 		defaultTemplates.put("none", FormWrapperTemplates.none);
 		defaultTemplates.put("table", FormWrapperTemplates.tableWrapper);
+		
+		defaultTemplates.put("jmte", FormWrapperTemplates.jmteWrapper);
 		
 		return defaultTemplates;
 	}

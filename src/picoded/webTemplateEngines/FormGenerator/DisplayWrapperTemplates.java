@@ -28,6 +28,10 @@ public class DisplayWrapperTemplates {
 		return FormWrapperTemplates.tableWrapper(node, true);
 	};
 	
+	protected static FormWrapperInterface verticalTableWrapper = (node)->{
+		return FormWrapperTemplates.verticalTableWrapper(node, true);
+	};
+	
 	/// noneWrapper
 	///
 	/// No wrappers
@@ -52,7 +56,7 @@ public class DisplayWrapperTemplates {
 		defaultTemplates.put("none", DisplayWrapperTemplates.none);
 		defaultTemplates.put("checkbox", DisplayWrapperTemplates.checkboxWrapper);
 		defaultTemplates.put("table", DisplayWrapperTemplates.tableWrapper);
-		defaultTemplates.put("verticalTable", DisplayWrapperTemplates.tableWrapper);
+		defaultTemplates.put("verticalTable", DisplayWrapperTemplates.verticalTableWrapper);
 		
 		defaultTemplates.put("jmte", DisplayWrapperTemplates.jmteWrapper);
 		

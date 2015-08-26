@@ -296,7 +296,7 @@ public class FormInputTemplates_test {
 		assertNotNull(jsonTemplatedOutput);
 	}
 	
-//	@Test
+	@Test
 	public void verticalTableTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("verticalTable", false);
 		String rawHtmlString = getHtmlString("verticalTable");
@@ -307,7 +307,7 @@ public class FormInputTemplates_test {
 //		assertTrue(compliancyCheck);
 	}
 	
-//	@Test
+	@Test
 	public void verticalTableDisplayTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("verticalTable", true);
 		String rawHtmlString = getHtmlString("verticalTable");

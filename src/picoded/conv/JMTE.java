@@ -323,13 +323,13 @@ public class JMTE {
 			
 			if( line != null ) {
 				sb.append(line);
-            line = br.readLine();
+				line = br.readLine();
 			}
 			
 			while (line != null) {
-            sb.append("\n");
-            sb.append(line);
-            line = br.readLine();
+				sb.append("\n");
+				sb.append(line);
+				line = br.readLine();
 			}
 			
 			br.close();

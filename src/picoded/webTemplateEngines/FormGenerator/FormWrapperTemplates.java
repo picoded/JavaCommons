@@ -210,63 +210,31 @@ public class FormWrapperTemplates {
 		return ret;
 	}
 	
-	@SuppressWarnings("unchecked")
-	protected static StringBuilder tableWrapper(FormNode node, boolean displayMode){
+	protected static StringBuilder tableWrapper(FormNode node, boolean isDisplayMode){
 		StringBuilder ret = new StringBuilder();
 		
-		//<table> tags
-		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.TABLE, node.prefix_standard()+"div", null );
+		//wrapper
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, "pf_div pfw_table", null );
+		ret.append(wrapperArr[0]);
 		
-		//table header/label
-		if(node.containsKey("tableHeader")){
-			ret.append("<thead>"+node.getString("tableHeader")+"</thead>");
-		}
-		
-		//headers
-		List<Object> tableHeaders = getTableHeaders(node);
-		if(tableHeaders != null && tableHeaders.size() > 0){
-			ret.append("<tr>");
-			for(Object header:tableHeaders){
-				ret.append("<th>"+(String)header+"</th>");
-			}
-			ret.append("</tr>");
-		}
-		
-		//data
-		List<Object> childDefinition = getChildren(node);
-		if(childDefinition != null && childDefinition.size() > 0){
+		String label = node.label();
+		if( label != null && label.length() > 0 ) {
+			StringBuilder[] labelArr = node.defaultHtmlLabel( HtmlTag.DIV, node.prefix_standard()+"label", null );
 			
-			List<String> tableFields = getTableFields(childDefinition);
-			Object fieldValue = node.getDefaultValue(node.getFieldName());
-			
-			if(fieldValue != null && fieldValue instanceof List){
-				
-				List<Object> fieldValueList = (List<Object>)fieldValue;
-				for(Object fieldObjRaw:fieldValueList){
-					if(fieldObjRaw instanceof Map){
-						CaseInsensitiveHashMap<String, Object> fieldObjMap = new CaseInsensitiveHashMap<String, Object>((Map<String, Object>)fieldObjRaw);
-						ret.append("<tr>");
-						for(int i = 0; i < tableFields.size(); ++i){ //i want to enforce list order, just in case
-							//change this so that each child object gets created by its own input template
-							String tableFieldNameNormalised = RegexUtils.removeAllNonAlphaNumeric(tableFields.get(i)).toLowerCase();
-							if(fieldObjMap.containsKey(tableFields.get(i))){
-								ret.append("<td>"+fieldObjMap.get(tableFields.get(i))+"</td>");
-							}
-						}
-						ret.append("</tr>");
-					}
-				}
-			}
+			ret.append( labelArr[0] );
+			ret.append( label );
+			ret.append( labelArr[1] );
 		}
 		
-		//final squashing
-		ret = wrapperArr[0].append(ret);
-		ret.append(wrapperArr[1]);
+		StringBuilder inputHtml = node.inputHtml(isDisplayMode);
+		
+		ret.append(inputHtml);
+		ret.append("</div>");
 		return ret;
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static List<Object> getChildren(FormNode node){
+	protected static List<Object> getChildren(FormNode node){
 		if( node.containsKey("children")) {
 			Object childrenRaw = node.get("children");
 			
@@ -275,36 +243,6 @@ public class FormWrapperTemplates {
 			}
 			
 			return (List<Object>)childrenRaw;
-		}else{
-			return null;
-		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	private static List<String> getTableFields(List<Object> children){
-		List<String> ret = new ArrayList<String>();
-		for(Object childRaw : children){
-			if(childRaw instanceof Map){
-				Map<String, Object> childMap = (Map<String, Object>)childRaw;
-				if(childMap.containsKey("field")){
-					ret.add(RegexUtils.removeAllNonAlphaNumeric((String)childMap.get("field")).toLowerCase());
-				}
-			}
-		}
-		
-		return ret;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private static List<Object> getTableHeaders(FormNode node){
-		if( node.containsKey("headers")) {
-			Object tableHeadersRaw = node.get("headers");
-			
-			if( !(tableHeadersRaw instanceof List) ) {
-				throw new IllegalArgumentException("'tableHeader' parameter found in defination was not a List: "+tableHeadersRaw);
-			}
-			
-			return (List<Object>)tableHeadersRaw;
 		}else{
 			return null;
 		}

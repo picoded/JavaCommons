@@ -162,28 +162,6 @@ public class FormWrapperTemplates_test {
 				"</div>";
 	}
 	
-	private String getTableHtmlString(){
-		return "<table>"+
-					"<thead>Table header</thead>"+
-					"<tr>"+
-						"<th>Name</th>"+
-						"<th>Nric</th>"+
-					"</tr>"+
-					"<tr>"+
-						"<td>A</td>"+
-						"<td>X1</td>"+
-					"</tr>"+
-					"<tr>"+
-						"<td>B</td>"+
-						"<td>X2</td>"+
-					"</tr>"+
-					"<tr>"+
-						"<td>C</td>"+
-						"<td>X3</td>"+
-					"</tr>"+
-				"</table>";
-	}
-	
 	@Test
 	public void standardDivWrapperTest(){
 		String jsonTemplatedOutput = getWrapperTemplatedJsonString("div");

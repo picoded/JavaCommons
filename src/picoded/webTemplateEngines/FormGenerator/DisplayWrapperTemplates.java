@@ -24,6 +24,10 @@ public class DisplayWrapperTemplates {
 		return FormWrapperTemplates.checkboxWrapper(node, true);
 	};
 	
+	protected static FormWrapperInterface tableWrapper = (node)->{
+		return FormWrapperTemplates.tableWrapper(node, true);
+	};
+	
 	/// noneWrapper
 	///
 	/// No wrappers
@@ -42,6 +46,7 @@ public class DisplayWrapperTemplates {
 		defaultTemplates.put("for", DisplayWrapperTemplates.forWrapper);
 		defaultTemplates.put("none", DisplayWrapperTemplates.none);
 		defaultTemplates.put("checkbox", DisplayWrapperTemplates.checkboxWrapper);
+		defaultTemplates.put("table", DisplayWrapperTemplates.tableWrapper);
 		
 		return defaultTemplates;
 	}

@@ -131,13 +131,17 @@ public class FormInputTemplates {
 		if(!node.getFieldName().isEmpty()){
 			Object nodeDefaultVal = node.getDefaultValue(node.getFieldName());
 			if(nodeDefaultVal != null){
-				if(((String)nodeDefaultVal).contains("[")){
-					List<Object> nodeValMap = ConvertJSON.toList((String)nodeDefaultVal);
-					for(Object obj : nodeValMap){
-						checkboxSelections.add((String)obj);
+				if(nodeDefaultVal instanceof String){
+					if(((String)nodeDefaultVal).contains("[")){
+						List<Object> nodeValMap = ConvertJSON.toList((String)nodeDefaultVal);
+						for(Object obj : nodeValMap){
+							checkboxSelections.add((String)obj);
+						}
+					}else{
+						checkboxSelections.add((String)nodeDefaultVal);
 					}
-				}else{
-					checkboxSelections.add((String)nodeDefaultVal);
+				}else if(nodeDefaultVal instanceof List){
+					checkboxSelections.addAll((List<String>)nodeDefaultVal);
 				}
 			}
 		}
@@ -187,7 +191,95 @@ public class FormInputTemplates {
 		StringBuilder[] wrapper = node.defaultHtmlInput( HtmlTag.DIV, pfiClass, null );
 		ret = wrapper[0].append(ret);
 		ret.append(wrapper[1]);
-//		
+		
+		return ret;
+	}
+	
+	protected static FormInputInterface table = (node)->{
+		return tableWrapper(node, false);
+	};
+
+	@SuppressWarnings("unchecked")
+	protected static StringBuilder tableWrapper(FormNode node, boolean displayMode){
+		StringBuilder ret = new StringBuilder();
+		
+		//<table> tags
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.TABLE, node.prefix_standard()+"div", null );
+		
+		//table header/label
+		ret.append("<thead>");
+		if(node.containsKey("tableHeader")){
+			ret.append("<tr><th>"+node.getString("tableHeader")+"</th></th>");
+		}
+		
+		List<Object> tableHeaders = getTableHeaders(node);
+		if(tableHeaders != null && tableHeaders.size() > 0){
+			ret.append("<tr>");
+			for(Object header:tableHeaders){
+				ret.append("<th>"+(String)header+"</th>");
+			}
+			ret.append("</tr>");
+		}
+		
+		ret.append("</thead>");
+		ret.append("<tbody>");
+		
+		//data
+		List<Map<String, String>> childData = getTableChildrenData(node);
+		CaseInsensitiveHashMap<String, Object> nodeValues = node._inputValue;
+		List<CaseInsensitiveHashMap<String, Object>> clientsValues = (List<CaseInsensitiveHashMap<String, Object>>)node._inputValue.get(node.getFieldName());
+		
+		for(Map<String, Object> childValues : clientsValues){
+			ret.append("<tr>");
+			for(Map<String, String> childMap : childData){
+				String childNodeType = childMap.get(JsonKeys.TYPE);
+				
+				FormNode childNode = new FormNode();
+				childNode._inputValue = new CaseInsensitiveHashMap<String, Object>(childValues);
+				childNode.putAll(childMap);
+				
+				FormInputInterface func = node._formGenerator.inputInterface(displayMode, childNodeType);
+				
+				StringBuilder sb = func.apply(childNode);
+				
+				ret.append("<td>");
+				ret.append(sb);
+				ret.append("</td>");
+			}
+			ret.append("</tr>");
+		}
+		
+//		List<Object> childDefinition = FormWrapperTemplates.getChildren(node);
+//		if(childDefinition != null && childDefinition.size() > 0){
+//			
+//			List<String> tableFields = getTableFields(childDefinition);
+//			Object fieldValue = node.getDefaultValue(node.getFieldName());
+//			
+//			if(fieldValue != null && fieldValue instanceof List){
+//				
+//				List<Object> fieldValueList = (List<Object>)fieldValue;
+//				for(Object fieldObjRaw:fieldValueList){
+//					if(fieldObjRaw instanceof Map){
+//						CaseInsensitiveHashMap<String, Object> fieldObjMap = new CaseInsensitiveHashMap<String, Object>((Map<String, Object>)fieldObjRaw);
+//						ret.append("<tr>");
+//						for(int i = 0; i < tableFields.size(); ++i){ //i want to enforce list order, just in case
+//							//change this so that each child object gets created by its own input template
+//							String tableFieldNameNormalised = RegexUtils.removeAllNonAlphaNumeric(tableFields.get(i)).toLowerCase();
+//							if(fieldObjMap.containsKey(tableFields.get(i))){
+//								ret.append("<td>"+fieldObjMap.get(tableFields.get(i))+"</td>");
+//							}
+//						}
+//						ret.append("</tr>");
+//					}
+//				}
+//			}
+//		}
+		
+		ret.append("</tbody>");
+		
+		//final squashing
+		ret = wrapperArr[0].append(ret);
+		ret.append(wrapperArr[1]);
 		return ret;
 	}
 	
@@ -209,8 +301,9 @@ public class FormInputTemplates {
 		defaultTemplates.put(JsonKeys.DROPDOWN, FormInputTemplates.select);
 		defaultTemplates.put(JsonKeys.TEXT, FormInputTemplates.input_text);
 		defaultTemplates.put(JsonKeys.HTML_INJECTION, FormInputTemplates.raw_html);
-		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, dropdownWithOthers);
-		defaultTemplates.put(JsonKeys.CHECKBOX, checkbox);
+		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, FormInputTemplates.dropdownWithOthers);
+		defaultTemplates.put(JsonKeys.CHECKBOX, FormInputTemplates.checkbox);
+		defaultTemplates.put("table", FormInputTemplates.table);
 		
 		return defaultTemplates;
 	}
@@ -294,6 +387,25 @@ public class FormInputTemplates {
 		return ret;
 	}
 	
+	@SuppressWarnings("unchecked")
+	private static List<Map<String, String>> getTableChildrenData(FormNode node){
+		List<Map<String, String>> ret = new ArrayList<Map<String, String>>();
+		
+		if(node.containsKey("children")){
+			List<Object> childrenList = (List<Object>)node.get("children");
+			for(Object obj : childrenList){
+				if(obj instanceof Map){
+					ret.add((Map<String, String>)obj);
+				}
+			}
+		}else{
+			return null;
+		}
+		
+		
+		return ret;
+	}
+	
 	private static void createDropdownHTMLString(StringBuilder sb, List<String> keyList, List<String> nameList, String selectedKey){
 		for(int a=0; a<keyList.size(); ++a) {
 			
@@ -308,6 +420,36 @@ public class FormInputTemplates {
 			}
 			
 			sb.append(">"+nme+"</"+HtmlTag.OPTION+">");
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static List<String> getTableFields(List<Object> children){
+		List<String> ret = new ArrayList<String>();
+		for(Object childRaw : children){
+			if(childRaw instanceof Map){
+				Map<String, Object> childMap = (Map<String, Object>)childRaw;
+				if(childMap.containsKey("field")){
+					ret.add(RegexUtils.removeAllNonAlphaNumeric((String)childMap.get("field")).toLowerCase());
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static List<Object> getTableHeaders(FormNode node){
+		if( node.containsKey("headers")) {
+			Object tableHeadersRaw = node.get("headers");
+			
+			if( !(tableHeadersRaw instanceof List) ) {
+				throw new IllegalArgumentException("'tableHeader' parameter found in defination was not a List: "+tableHeadersRaw);
+			}
+			
+			return (List<Object>)tableHeadersRaw;
+		}else{
+			return null;
 		}
 	}
 	

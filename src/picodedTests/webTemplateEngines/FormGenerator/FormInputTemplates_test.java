@@ -1,6 +1,7 @@
 package picodedTests.webTemplateEngines.FormGenerator;
 
 import picoded.conv.ConvertJSON;
+import picoded.fileUtils.PDFGenerator;
 import picoded.webTemplateEngines.*;
 import picoded.webTemplateEngines.FormGenerator.*;
 
@@ -30,6 +31,45 @@ public class FormInputTemplates_test {
 		}
 	}
 	
+	private String getTemplatedJsonStringWithData(String jsonKeyName, boolean displayMode){
+		File jsonFile = new File("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/"+jsonKeyName+".js");
+		File jsonDataFile = new File("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/"+jsonKeyName+"Data.js");
+		try{
+			String jsonFileString = FileUtils.readFileToString(jsonFile);
+			Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
+			
+			String jsonDataString = FileUtils.readFileToString(jsonDataFile);
+			Map<String, Object> jsonDataMap = ConvertJSON.toMap(jsonDataString);
+			
+			FormGenerator formGen = new FormGenerator();
+			return formGen.build(jsonMap, jsonDataMap, displayMode).toString();
+//			FormNode node = new FormNode(formGen, jsonMap, jsonDataMap);
+//			return node.inputHtml(false).toString();
+		}catch(Exception ex){
+			return "";
+		}
+	}
+	
+	private String fullChildrenHtml(String jsonKeyName, boolean displayMode){
+		File jsonFile = new File("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/"+jsonKeyName+".js");
+		File jsonDataFile = new File("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/"+jsonKeyName+"Data.js");
+		try{
+			String jsonFileString = FileUtils.readFileToString(jsonFile);
+			Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
+			
+			String jsonDataString = FileUtils.readFileToString(jsonDataFile);
+			Map<String, Object> jsonDataMap = ConvertJSON.toMap(jsonDataString);
+			
+			FormGenerator formGen = new FormGenerator();
+//			return formGen.build(jsonMap, jsonDataMap, displayMode).toString();
+			FormNode node = new FormNode(formGen, jsonMap, jsonDataMap);
+			return node.fullChildrenHtml(false, "").toString();
+//			return node.inputHtml(false).toString();
+		}catch(Exception ex){
+			return "";
+		}
+	}
+	
 	private String getHtmlString(String jsonKeyName){
 		switch(jsonKeyName){
 			case "title": return getTitleHtmlString();
@@ -37,6 +77,8 @@ public class FormInputTemplates_test {
 			case "text": return getTextHtmlString();
 			case "dropdownWithOthers": return getDropdownWithOthersHtmlString();
 			case "checkbox": return getCheckboxHtmlString();
+			case "checkboxData": return getCheckboxWithDataHtmlString();
+			case "table": return getTableHtmlString();
 		}
 		
 		return "";
@@ -82,9 +124,38 @@ public class FormInputTemplates_test {
 	
 	private String getCheckboxHtmlString(){
 		return "<input type=\'checkbox\' value=\'option1\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\'>Option 1</input>"+
-				"<input type=\'checkbox\' value=\'option2\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\' checked=\'checked\'>Option 2</input>"+
+				"<input type=\'checkbox\' value=\'option2\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\'>Option 2</input>"+
 				"<input type=\'checkbox\' value=\'option3\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\'>Option 3</input>"+
 				"<input type=\'checkbox\' value=\'option4\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\'>Option 4</input>";
+	}
+	
+	private String getCheckboxWithDataHtmlString(){
+		return "<input type=\'checkbox\' value=\'option1\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\' checked=\'checked\'>Option 1</input>"+
+				"<input type=\'checkbox\' value=\'option2\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\'>Option 2</input>"+
+				"<input type=\'checkbox\' value=\'option3\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\' checked=\'checked\'>Option 3</input>"+
+				"<input type=\'checkbox\' value=\'option4\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\'>Option 4</input>";
+	}
+	
+	private String getTableHtmlString(){
+		return "<table>"+
+					"<thead>Clients</thead>"+
+					"<tr>"+
+						"<th>Name</th>"+
+						"<th>NRIC</th>"+
+					"</tr>"+
+					"<tr>"+
+						"<td>A</td>"+
+						"<td>X1</td>"+
+					"</tr>"+
+					"<tr>"+
+						"<td>B</td>"+
+						"<td>X2</td>"+
+					"</tr>"+
+					"<tr>"+
+						"<td>C</td>"+
+						"<td>X3</td>"+
+					"</tr>"+
+				"</table>";
 	}
 	
 	@Test
@@ -135,6 +206,39 @@ public class FormInputTemplates_test {
 	public void checkBoxTest(){
 		String jsonTemplatedOutput = getFinalTemplatedJsonString("checkbox");
 		String rawHtmlString = getHtmlString("checkbox");
+
+		assertNotNull(jsonTemplatedOutput);
+		
+		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
+		assertTrue(compliancyCheck);
+	}
+	
+	@Test
+	public void checkBoxDisplayTest(){
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("checkbox", false);
+		String rawHtmlString = getHtmlString("checkboxData");
+
+		assertNotNull(jsonTemplatedOutput);
+		
+		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
+		assertTrue(compliancyCheck);
+	}
+	
+	@Test
+	public void tableTest(){
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("table", false);
+		String rawHtmlString = getHtmlString("table");
+
+		assertNotNull(jsonTemplatedOutput);
+		
+		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
+		assertTrue(compliancyCheck);
+	}
+	
+	@Test
+	public void tableDisplayTest(){
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("table", true);
+		String rawHtmlString = getHtmlString("table");
 
 		assertNotNull(jsonTemplatedOutput);
 		

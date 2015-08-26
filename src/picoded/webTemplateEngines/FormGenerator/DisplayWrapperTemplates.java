@@ -37,6 +37,11 @@ public class DisplayWrapperTemplates {
 		return ret;
 	};
 	
+	/// JMTE wrapper implementation
+	protected static FormWrapperInterface jmteWrapper = (node)->{
+		return FormWrapperTemplates.JMTEWrapper(node, true);
+	};
+	
 	protected static Map<String, FormWrapperInterface> defaultWrapperTemplates() {
 		Map<String, FormWrapperInterface> defaultTemplates = new HashMap<String, FormWrapperInterface>();
 		
@@ -47,6 +52,8 @@ public class DisplayWrapperTemplates {
 		defaultTemplates.put("none", DisplayWrapperTemplates.none);
 		defaultTemplates.put("checkbox", DisplayWrapperTemplates.checkboxWrapper);
 		defaultTemplates.put("table", DisplayWrapperTemplates.tableWrapper);
+		
+		defaultTemplates.put("jmte", DisplayWrapperTemplates.jmteWrapper);
 		
 		return defaultTemplates;
 	}

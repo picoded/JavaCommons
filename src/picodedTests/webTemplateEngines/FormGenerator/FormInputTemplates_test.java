@@ -1,6 +1,7 @@
 package picodedTests.webTemplateEngines.FormGenerator;
 
 import picoded.conv.ConvertJSON;
+import picoded.conv.RegexUtils;
 import picoded.fileUtils.PDFGenerator;
 import picoded.webTemplateEngines.*;
 import picoded.webTemplateEngines.FormGenerator.*;
@@ -283,6 +284,44 @@ public class FormInputTemplates_test {
 
 		assertNotNull(jsonTemplatedOutput);
 	}
+	
+	@Test
+	public void verticalTableTest(){
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("verticalTable", false);
+		String rawHtmlString = getHtmlString("verticalTable");
+
+		assertNotNull(jsonTemplatedOutput);
+		
+//		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
+//		assertTrue(compliancyCheck);
+	}
+	
+	@Test
+	public void verticalTableDisplayTest(){
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("verticalTable", true);
+		String rawHtmlString = getHtmlString("verticalTable");
+
+		assertNotNull(jsonTemplatedOutput);
+		
+//		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
+//		assertTrue(compliancyCheck);
+	}
+	
+	@Test
+	public void verticalTablePDFTest(){
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("verticalTable", true);
+		
+		PDFGenerator.generatePDFfromRawHTML("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/verticalTablePDF.pdf", jsonTemplatedOutput);
+
+		assertNotNull(jsonTemplatedOutput);
+	}
+	
+//	@Test
+//	public void dummy(){
+//		String test = "hello*_-_*there";
+//		String result = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(test);
+//		System.out.println(result);
+//	}
 	
 	/// Prototype lenientStringLookup
 //	@Test

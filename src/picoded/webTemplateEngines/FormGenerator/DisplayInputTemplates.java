@@ -55,6 +55,10 @@ public class DisplayInputTemplates {
 		return FormInputTemplates.tableWrapper(node, true);
 	};
 	
+	protected static FormInputInterface verticalTable = (node)->{
+		return FormInputTemplates.verticalTable(node, true);
+	};
+	
 	protected static Map<String, FormInputInterface> defaultInputTemplates() {
 		Map<String, FormInputInterface> defaultTemplates = new CaseInsensitiveHashMap<String, FormInputInterface>();
 		
@@ -69,6 +73,7 @@ public class DisplayInputTemplates {
 		defaultTemplates.put(JsonKeys.HTML_INJECTION, DisplayInputTemplates.raw_html);
 		defaultTemplates.put("checkbox", DisplayInputTemplates.checkbox);
 		defaultTemplates.put("table", DisplayInputTemplates.table);
+		defaultTemplates.put("verticalTable", DisplayInputTemplates.verticalTable);
 		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, DisplayInputTemplates.dropdown_WithOthers);
 		
 		return defaultTemplates;

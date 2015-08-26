@@ -131,16 +131,15 @@ public class FormWrapperTemplates {
 		//-----------------------------------------------
 		// Varient of child handling / iterator
 		//-----------------------------------------------
-		List<Object> childDefination = null;
+		List<Object> childDefination = null; //Definition list of children items
 		if( node.containsKey("children") ) {
 			Object childrenRaw = node.get("children");
-			
 			if( !(childrenRaw instanceof List) ) {
 				throw new IllegalArgumentException("'children' parameter found in defination was not a List: "+childrenRaw);
 			}
-			
 			childDefination = (List<Object>)childrenRaw;
 		}
+		
 		
 		Object rawValue = ConvertJSON.toList(node.getFieldValue());
 		List<Object> valuesList = null;
@@ -163,7 +162,7 @@ public class FormWrapperTemplates {
 			childDefinitionsWithoutLabel = new ArrayList<Object>();
 			for(Object obj:childDefination){
 				if(obj instanceof Map){
-					Map<String, Object> objMap = (Map<String, Object>)obj;
+					Map<String, Object> objMap = new HashMap<String,Object>( (Map<String, Object>)obj );
 					objMap.remove(JsonKeys.LABEL);
 					childDefinitionsWithoutLabel.add(objMap);
 				}
@@ -284,6 +283,7 @@ public class FormWrapperTemplates {
 		defaultTemplates.put("for", FormWrapperTemplates.forWrapper);
 		defaultTemplates.put("none", FormWrapperTemplates.none);
 		defaultTemplates.put("table", FormWrapperTemplates.tableWrapper);
+		defaultTemplates.put("verticalTable", FormWrapperTemplates.tableWrapper);
 		
 		return defaultTemplates;
 	}

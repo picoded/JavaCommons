@@ -12,4 +12,10 @@ public class RegexUtils {
 	public static String removeAllNonAlphaNumeric(String input) {
 		return input.replaceAll(removeAllNonAlphaNumeric_regexString, "");
 	}
+	
+	public static String removeAllNonAlphaNumeric_allowUnderscoreAndDash_regexString = "[^a-zA-Z0-9-_\\\\s]";
+	
+	public static String removeAllNonAlphaNumeric_allowUnderscoreAndDash(String input) {
+		return input.replaceAll(removeAllNonAlphaNumeric_allowUnderscoreAndDash_regexString, "");
+	}
 }

@@ -47,6 +47,7 @@ public class DisplayWrapperTemplates {
 		defaultTemplates.put("none", DisplayWrapperTemplates.none);
 		defaultTemplates.put("checkbox", DisplayWrapperTemplates.checkboxWrapper);
 		defaultTemplates.put("table", DisplayWrapperTemplates.tableWrapper);
+		defaultTemplates.put("verticalTable", DisplayWrapperTemplates.tableWrapper);
 		
 		return defaultTemplates;
 	}

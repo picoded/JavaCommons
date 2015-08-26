@@ -87,7 +87,7 @@ public class FormInputTemplates {
 		if(!displayMode){
 			Map<String, String> funcMap = new HashMap<String, String>();
 			String funcName = node.getString(JsonKeys.FUNCTION_NAME, "OnChangeDefaultFuncName");
-			String nodeName = RegexUtils.removeAllNonAlphaNumeric(node.getString(JsonKeys.FIELD)).toLowerCase();
+			String nodeName = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(node.getString(JsonKeys.FIELD)).toLowerCase();
 			funcMap.put("onchange", funcName+"()"); //get this value from map
 			funcMap.put("id", nodeName);
 			
@@ -125,14 +125,14 @@ public class FormInputTemplates {
 		}else{
 			StringBuilder ret = new StringBuilder();
 			Map<String, String> funcMap = new HashMap<String, String>();
-			String nodeName = RegexUtils.removeAllNonAlphaNumeric(node.getString(JsonKeys.FIELD)).toLowerCase();
+			String nodeName = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(node.getString(JsonKeys.FIELD)).toLowerCase();
 			funcMap.put("id", nodeName);
 			StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, "pf_select", funcMap );
 			
 			ret.append(sbArr[0]);
 			
 			String val = node.getFieldValue();
-			String valLowercased = RegexUtils.removeAllNonAlphaNumeric(val).toLowerCase();
+			String valLowercased = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(val).toLowerCase();
 			
 			Object dropDownObject = node.get(JsonKeys.OPTIONS);
 			List<String> keyList = dropdownKeyList(dropDownObject);
@@ -168,13 +168,15 @@ public class FormInputTemplates {
 					if(((String)nodeDefaultVal).contains("[")){
 						List<Object> nodeValMap = ConvertJSON.toList((String)nodeDefaultVal);
 						for(Object obj : nodeValMap){
-							checkboxSelections.add((String)obj);
+							checkboxSelections.add(RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash((String)obj).toLowerCase());
 						}
 					}else{
-						checkboxSelections.add((String)nodeDefaultVal);
+						checkboxSelections.add(RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash((String)nodeDefaultVal).toLowerCase());
 					}
 				}else if(nodeDefaultVal instanceof List){
-					checkboxSelections.addAll((List<String>)nodeDefaultVal);
+					for(String str : (List<String>)nodeDefaultVal){
+						checkboxSelections.add(RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(str).toLowerCase());
+					}
 				}
 			}
 		}
@@ -205,7 +207,7 @@ public class FormInputTemplates {
 				boolean found = false;
 				for(String selection : checkboxSelections){
 					if(key.equalsIgnoreCase(selection)){
-						sbArr[0].append("<div class=\"pf_displayCheckbox pf_displayCheckbox_selected\">/</div>");
+						sbArr[0].append("<div class=\"pf_displayCheckbox pf_displayCheckbox_selected\"></div>");
 						found = true;
 					}
 				}
@@ -257,10 +259,14 @@ public class FormInputTemplates {
 		ret.append("</thead>");
 		ret.append("<tbody>");
 		
+		boolean removeLabelFromSecondIteration = false;
+		boolean firstIteration = true;
+		
 		//data
 		List<Map<String, String>> childData = getTableChildrenData(node);
 		CaseInsensitiveHashMap<String, Object> nodeValues = node._inputValue;
 		List<CaseInsensitiveHashMap<String, Object>> clientsValues = (List<CaseInsensitiveHashMap<String, Object>>)node._inputValue.get(node.getFieldName());
+		
 		
 		for(Map<String, Object> childValues : clientsValues){
 			ret.append("<tr>");
@@ -270,8 +276,14 @@ public class FormInputTemplates {
 				FormNode childNode = new FormNode();
 				childNode._inputValue = new CaseInsensitiveHashMap<String, Object>(childValues);
 				childNode.putAll(childMap);
+				childNode._formGenerator = node._formGenerator;
 				
-				FormInputInterface func = node._formGenerator.inputInterface(displayMode, childNodeType);
+				if( removeLabelFromSecondIteration && !firstIteration) {
+					//remove labels
+					//TODO maybe
+				}
+				
+				FormWrapperInterface func = node._formGenerator.wrapperInterface(displayMode, childNodeType);
 				
 				StringBuilder sb = func.apply(childNode);
 				
@@ -279,6 +291,75 @@ public class FormInputTemplates {
 				ret.append(sb);
 				ret.append("</td>");
 			}
+			ret.append("</tr>");
+			
+			firstIteration = false;
+		}
+		
+		ret.append("</tbody>");
+		
+		//final squashing
+		ret = wrapperArr[0].append(ret);
+		ret.append(wrapperArr[1]);
+		return ret;
+	}
+	
+	protected static FormInputInterface verticalTable = (node)->{
+		return verticalTable(node, false);
+	};
+	
+	@SuppressWarnings("unchecked")
+	protected static StringBuilder verticalTable(FormNode node, boolean displayMode){
+		StringBuilder ret = new StringBuilder();
+		
+		//<table> tags
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.TABLE, node.prefix_standard()+"div", null );
+		
+		//table header/label
+		ret.append("<thead>");
+		if(node.containsKey("tableHeader")){
+			ret.append("<tr><th>"+node.getString("tableHeader")+"</th></tr>");
+		}
+		ret.append("</thead>");
+		ret.append("<tbody>");
+		
+		//
+		List<Object> tableHeaders = getTableHeaders(node);
+		
+		//data
+		List<Map<String, String>> childData = getTableChildrenData(node);
+		CaseInsensitiveHashMap<String, Object> nodeValues = node._inputValue;
+		List<CaseInsensitiveHashMap<String, Object>> clientsValues = (List<CaseInsensitiveHashMap<String, Object>>)node._inputValue.get(node.getFieldName());
+		
+		//for each header type, loop through child data values and pull out the corresponding data
+		int childDataCounter = 0;
+		for(Object tableHeaderRaw : tableHeaders){
+			String tableHeader = (String)tableHeaderRaw;
+			
+			ret.append("<tr>");
+			ret.append("<th>"+tableHeader+"</th>");
+			
+			Map<String, String> childMap = childData.get(childDataCounter); //childmap is in declare
+			String type = childMap.get(JsonKeys.TYPE);
+			String field = childMap.get("field");
+			for(Map<String, Object> dataValues : clientsValues){ //data values is in define
+				if(dataValues.containsKey(field)){
+					FormNode childNode = new FormNode();
+					childNode._inputValue = new CaseInsensitiveHashMap<String, Object>(dataValues);
+					childNode.putAll(childMap);
+					childNode._formGenerator = node._formGenerator;
+					
+					FormWrapperInterface func = node._formGenerator.wrapperInterface(displayMode, type);
+					
+					StringBuilder sb = func.apply(childNode);
+					
+					ret.append("<td>");
+					ret.append(sb.toString());
+					ret.append("</td>");
+				}
+			}
+			++childDataCounter;
+			
 			ret.append("</tr>");
 		}
 		
@@ -311,6 +392,7 @@ public class FormInputTemplates {
 		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, FormInputTemplates.dropdownWithOthers);
 		defaultTemplates.put(JsonKeys.CHECKBOX, FormInputTemplates.checkbox);
 		defaultTemplates.put("table", FormInputTemplates.table);
+		defaultTemplates.put("verticalTable", FormInputTemplates.verticalTable);
 		
 		return defaultTemplates;
 	}
@@ -353,12 +435,12 @@ public class FormInputTemplates {
 		
 		if(dropDownObject instanceof List){
 			for(int a=0; a<nameList.size(); ++a) {
-				keyList.add( RegexUtils.removeAllNonAlphaNumeric( nameList.get(a) ).toLowerCase() );
+				keyList.add( RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash( nameList.get(a) ).toLowerCase() );
 			}
 		}else if(dropDownObject instanceof Map){
 			Map<Object,Object> dropDownMap = (Map<Object,Object>)dropDownObject;
 			for(Object keyObj : dropDownMap.keySet()) {
-				String key = RegexUtils.removeAllNonAlphaNumeric( GenericConvert.toString(keyObj, null) ).toLowerCase();
+				String key = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash( GenericConvert.toString(keyObj, null) ).toLowerCase();
 				
 				// Skip blank keys 
 				if(key == null || key.length() <= 0) {
@@ -380,12 +462,12 @@ public class FormInputTemplates {
 		if(optionsObject instanceof List){
 			List<String> nameList = ListValueConv.objectToString( (List<Object>)optionsObject );
 			for(String name:nameList){
-				ret.put(RegexUtils.removeAllNonAlphaNumeric(name).toLowerCase(), name);
+				ret.put(RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(name).toLowerCase(), name);
 			}
 		}else if(optionsObject instanceof Map){
 			Map<String,Object> optionsMap = (Map<String,Object>)optionsObject;
 			for(String key : optionsMap.keySet()){
-				String sanitisedKey = RegexUtils.removeAllNonAlphaNumeric(key).toLowerCase();
+				String sanitisedKey = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(key).toLowerCase();
 				ret.put(sanitisedKey, (String)optionsMap.get(key));
 			}
 			
@@ -437,7 +519,7 @@ public class FormInputTemplates {
 			if(childRaw instanceof Map){
 				Map<String, Object> childMap = (Map<String, Object>)childRaw;
 				if(childMap.containsKey("field")){
-					ret.add(RegexUtils.removeAllNonAlphaNumeric((String)childMap.get("field")).toLowerCase());
+					ret.add(RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash((String)childMap.get("field")).toLowerCase());
 				}
 			}
 		}
@@ -461,9 +543,9 @@ public class FormInputTemplates {
 	}
 	
 	protected static String getDropDownOthersJavascriptFunction(FormNode node){
-		String dropDownField = RegexUtils.removeAllNonAlphaNumeric(node.getString(JsonKeys.FIELD)).toLowerCase();
+		String dropDownField = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(node.getString(JsonKeys.FIELD)).toLowerCase();
 		String inputField = node.getString(JsonKeys.DROPDOWN_WITHOTHERS_TEXTFIELD);
-		String othersOptionToShowTextField = RegexUtils.removeAllNonAlphaNumeric(node.getString(JsonKeys.OTHERS_OPTION)).toLowerCase();
+		String othersOptionToShowTextField = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(node.getString(JsonKeys.OTHERS_OPTION)).toLowerCase();
 		String funcName = node.getString(JsonKeys.FUNCTION_NAME, "OnChangeDefaultFuncName");
 		
 		String injectedScript = "<script>"+

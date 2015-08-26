@@ -313,6 +313,47 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction infoByName_GET = (req, res) -> {
+		res.put("accountID", null);
+		res.put("accountNames", null);
+		res.put("isSuperUser", null);
+		res.put("isGroup", null);
+		res.put("groupIDs", null);
+		res.put("groupNames", null);
+		res.put("groupRoles", null);
+		
+		if(req.requestPage() != null){
+			BasePage bp = (BasePage)(req.requestPage());
+			AccountTable at = bp.accountAuthTable(); //at contains all the user data
+			AccountObject ao = at.getRequestUser( bp.getHttpServletRequest() ); //to check if logged in
+			
+			if(ao != null){
+				String name = "";
+				if(req.containsKey("accountName")){
+					name = req.getString("accountName");
+				};
+				
+				if(!name.isEmpty()){
+					AccountObject account = at.getFromName(name);
+					if(account != null){
+						res.put("accountID", account._oid());
+						
+						String[] accNames = (String[])account.getNames().toArray();
+						res.put("accountNames", accNames);
+						
+						res.put("isSuperUser", account.isSuperUser());
+						res.put("isGroup", account.isGroup());
+						
+						res.put("groupIDs", account.getGroups_id());
+						
+						
+						res.put("groupNames", null);
+						res.put("groupRoles", null);
+					}
+				}
+			}else{
+				res.put("error", "Account object requested is null");
+			}
+		}
 		return res;
 	};
 	
@@ -449,7 +490,7 @@ public class AccountLogin extends BasePage {
 	/// ## HTTP Request Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | meta            | {Object}           | Meta object that represents this account                                      |
 	/// | updateMode      | String (Optional)  | (Default) "delta" for only updating the given fields, or "full" for all       |
@@ -458,7 +499,7 @@ public class AccountLogin extends BasePage {
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | accountID_valid | boolean            | indicates if the account ID exists in the system                              |
 	/// | accountID       | String             | account ID used                                                               |
@@ -475,7 +516,7 @@ public class AccountLogin extends BasePage {
 	
 	/////////////////////////////////////////////
 	//
-	// Group management
+	// Group / Members management
 	//
 	/////////////////////////////////////////////
 	
@@ -607,7 +648,8 @@ public class AccountLogin extends BasePage {
 	///
 	/// # members/meta/${groupID}/${accountID} (POST) [Requires login]
 	///
-	/// Updates the accountID meta info, requires either the current user or SuperUser
+	/// Updates the accountID meta info. Requires the current user to be either the group itself, 
+	/// admin of group, or super user.
 	/// 
 	/// Note: if ${accountID} is blank, it assumes the current user
 	///
@@ -665,6 +707,10 @@ public class AccountLogin extends BasePage {
 		rb.getNamespace( setPrefix + "login" ).put( HttpRequestType.POST, login_POST );
 		rb.getNamespace( setPrefix + "logout" ).put( HttpRequestType.GET, logout_GET );
 		rb.getNamespace( setPrefix + "password" ).put( HttpRequestType.POST, password_POST );
+		
+		rb.getNamespace( setPrefix + "info/name" ).put( HttpRequestType.GET, infoByName_GET );
+		rb.getNamespace( setPrefix + "info/name/*" ).put( HttpRequestType.GET, infoByName_GET );
+		
 		
 		return rb;
 	}

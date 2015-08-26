@@ -184,7 +184,7 @@ public class AccountObject extends JStruct_MetaObject {
 	}
 	
 	/// Sets if the account is a group
-	public void isGroup(boolean enabled) {
+	public void setGroupStatus(boolean enabled) {
 		if( enabled ) {
 			this.put("isGroup", new Integer(1));
 		} else {
@@ -258,7 +258,7 @@ public class AccountObject extends JStruct_MetaObject {
 		if( level == null || !level.equals( role ) ) {
 			
 			memberObject.saveDelta();
-			isGroup(true);
+			setGroupStatus(true);
 			
 			group_userToRoleMap().put(memberOID, role);
 			group_userToRoleMap().saveDelta();

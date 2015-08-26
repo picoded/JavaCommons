@@ -45,10 +45,7 @@ import com.hazelcast.core.IMap;
 /// Any refences to the persona game, is completely coincidental !
 /// (PS: old joke, the original name for this class was PersonaTable)
 ///
-/// ──────▄▀▄─────▄▀▄
-/// ─────▄█░░▀▀▀▀▀░░█▄
-/// ─▄▄──█░░░░░░░░░░░█──▄▄
-/// █▄▄█─█░░▀░░┬░░▀░░█─█▄▄█
+/// 
 ///
 /// @TODO : Group handling layer
 ///

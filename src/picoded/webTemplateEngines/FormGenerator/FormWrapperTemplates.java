@@ -231,6 +231,29 @@ public class FormWrapperTemplates {
 		return ret;
 	}
 	
+	protected static StringBuilder verticalTableWrapper(FormNode node, boolean isDisplayMode){
+		StringBuilder ret = new StringBuilder();
+		
+		//wrapper
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, "pf_div pfw_verticalTable", null );
+		ret.append(wrapperArr[0]);
+		
+		String label = node.label();
+		if( label != null && label.length() > 0 ) {
+			StringBuilder[] labelArr = node.defaultHtmlLabel( HtmlTag.DIV, node.prefix_standard()+"label", null );
+			
+			ret.append( labelArr[0] );
+			ret.append( label );
+			ret.append( labelArr[1] );
+		}
+		
+		StringBuilder inputHtml = node.inputHtml(isDisplayMode);
+		
+		ret.append(inputHtml);
+		ret.append("</div>");
+		return ret;
+	}
+	
 	@SuppressWarnings("unchecked")
 	protected static List<Object> getChildren(FormNode node){
 		if( node.containsKey("children")) {
@@ -262,6 +285,10 @@ public class FormWrapperTemplates {
 	
 	protected static FormWrapperInterface tableWrapper = (node)->{
 		return FormWrapperTemplates.tableWrapper(node, false);
+	};
+	
+	protected static FormWrapperInterface verticalTableWrapper = (node)->{
+		return FormWrapperTemplates.verticalTableWrapper(node, false);
 	};
 	
 	/// noneWrapper
@@ -352,7 +379,7 @@ public class FormWrapperTemplates {
 		defaultTemplates.put("for", FormWrapperTemplates.forWrapper);
 		defaultTemplates.put("none", FormWrapperTemplates.none);
 		defaultTemplates.put("table", FormWrapperTemplates.tableWrapper);
-		defaultTemplates.put("verticalTable", FormWrapperTemplates.tableWrapper);
+		defaultTemplates.put("verticalTable", FormWrapperTemplates.verticalTableWrapper);
 		
 		defaultTemplates.put("jmte", FormWrapperTemplates.jmteWrapper);
 		

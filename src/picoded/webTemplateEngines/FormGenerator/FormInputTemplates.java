@@ -80,41 +80,74 @@ public class FormInputTemplates {
 	
 	
 	protected static FormInputInterface dropdownWithOthers = (node)->{
-		Map<String, String> funcMap = new HashMap<String, String>();
-		String funcName = node.getString(JsonKeys.FUNCTION_NAME, "OnChangeDefaultFuncName");
-		funcMap.put("onchange", funcName+"()"); //get this value from map
-		
-		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.SELECT, "pf_select", funcMap );
-		StringBuilder ret = new StringBuilder(getDropDownOthersJavascriptFunction(node) + sbArr[0].toString());
-		
-		// Prepeare the option key value list
-		List<String> keyList = new ArrayList<String>();
-		List<String> nmeList = new ArrayList<String>();
-		
-		// Generates the dropdown list, using either map or list
-		//---------------------------------------------------------
-		Object dropDownObject = node.get(JsonKeys.OPTIONS);
-		nmeList = dropdownNameList(dropDownObject);
-		keyList = dropdownKeyList(dropDownObject);
-		
-		// Use the generated list, to populate the option set
-		//---------------------------------------------------------
-		String selectedKey = node.getFieldValue(); 
-		createDropdownHTMLString(ret, keyList, nmeList, selectedKey);
-		
-		ret.append(sbArr[1]);
-		
-		//append inputtexthere
-		String inputTextFieldName = node.getString("textField", "dropdownfieldname");
-		Map<String, String> inputParamMap = new HashMap<String, String>();
-		inputParamMap.put("style", "display:none");
-		inputParamMap.put("type", "text");
-		inputParamMap.put("name", inputTextFieldName);
-		StringBuilder[] inputTextArr = node.defaultHtmlInput( HtmlTag.INPUT, "pf_inputText", inputParamMap );
-		ret.append(inputTextArr[0].toString() + inputTextArr[1].toString());
-		
-		return ret;
+		return dropdownWithOthers(node, false);
 	};
+	
+	protected static StringBuilder dropdownWithOthers(FormNode node, boolean displayMode){
+		if(!displayMode){
+			Map<String, String> funcMap = new HashMap<String, String>();
+			String funcName = node.getString(JsonKeys.FUNCTION_NAME, "OnChangeDefaultFuncName");
+			String nodeName = RegexUtils.removeAllNonAlphaNumeric(node.getString(JsonKeys.FIELD)).toLowerCase();
+			funcMap.put("onchange", funcName+"()"); //get this value from map
+			funcMap.put("id", nodeName);
+			
+			StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.SELECT, "pf_select", funcMap );
+			StringBuilder ret = new StringBuilder(getDropDownOthersJavascriptFunction(node) + sbArr[0].toString());
+			
+			// Prepeare the option key value list
+			List<String> keyList = new ArrayList<String>();
+			List<String> nmeList = new ArrayList<String>();
+			
+			// Generates the dropdown list, using either map or list
+			//---------------------------------------------------------
+			Object dropDownObject = node.get(JsonKeys.OPTIONS);
+			nmeList = dropdownNameList(dropDownObject);
+			keyList = dropdownKeyList(dropDownObject);
+			
+			// Use the generated list, to populate the option set
+			//---------------------------------------------------------
+			String selectedKey = node.getFieldValue(); 
+			createDropdownHTMLString(ret, keyList, nmeList, selectedKey);
+			
+			ret.append(sbArr[1]);
+			
+			//append inputtexthere
+			String inputTextFieldName = node.getString("textField", "dropdownfieldname");
+			Map<String, String> inputParamMap = new HashMap<String, String>();
+			inputParamMap.put("style", "display:none");
+			inputParamMap.put("type", "text");
+			inputParamMap.put("name", inputTextFieldName);
+			inputParamMap.put("id", inputTextFieldName);
+			StringBuilder[] inputTextArr = node.defaultHtmlInput( HtmlTag.INPUT, "pf_inputText", inputParamMap );
+			ret.append(inputTextArr[0].toString() + inputTextArr[1].toString());
+			
+			return ret;
+		}else{
+			StringBuilder ret = new StringBuilder();
+			Map<String, String> funcMap = new HashMap<String, String>();
+			String nodeName = RegexUtils.removeAllNonAlphaNumeric(node.getString(JsonKeys.FIELD)).toLowerCase();
+			funcMap.put("id", nodeName);
+			StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, "pf_select", funcMap );
+			
+			ret.append(sbArr[0]);
+			
+			String val = node.getFieldValue();
+			String valLowercased = RegexUtils.removeAllNonAlphaNumeric(val).toLowerCase();
+			
+			Object dropDownObject = node.get(JsonKeys.OPTIONS);
+			List<String> keyList = dropdownKeyList(dropDownObject);
+			List<String> nameList = dropdownNameList(dropDownObject);
+			
+			if(!keyList.contains(valLowercased)){
+				ret.append("Others: "+val);
+			}else{
+				ret.append(val);
+			}
+			
+			ret.append(sbArr[1]);
+			return ret;
+		}
+	}
 	
 	@SuppressWarnings("unchecked")
 	protected static FormInputInterface checkbox = (node)->{
@@ -248,32 +281,6 @@ public class FormInputTemplates {
 			}
 			ret.append("</tr>");
 		}
-		
-//		List<Object> childDefinition = FormWrapperTemplates.getChildren(node);
-//		if(childDefinition != null && childDefinition.size() > 0){
-//			
-//			List<String> tableFields = getTableFields(childDefinition);
-//			Object fieldValue = node.getDefaultValue(node.getFieldName());
-//			
-//			if(fieldValue != null && fieldValue instanceof List){
-//				
-//				List<Object> fieldValueList = (List<Object>)fieldValue;
-//				for(Object fieldObjRaw:fieldValueList){
-//					if(fieldObjRaw instanceof Map){
-//						CaseInsensitiveHashMap<String, Object> fieldObjMap = new CaseInsensitiveHashMap<String, Object>((Map<String, Object>)fieldObjRaw);
-//						ret.append("<tr>");
-//						for(int i = 0; i < tableFields.size(); ++i){ //i want to enforce list order, just in case
-//							//change this so that each child object gets created by its own input template
-//							String tableFieldNameNormalised = RegexUtils.removeAllNonAlphaNumeric(tableFields.get(i)).toLowerCase();
-//							if(fieldObjMap.containsKey(tableFields.get(i))){
-//								ret.append("<td>"+fieldObjMap.get(tableFields.get(i))+"</td>");
-//							}
-//						}
-//						ret.append("</tr>");
-//					}
-//				}
-//			}
-//		}
 		
 		ret.append("</tbody>");
 		
@@ -454,7 +461,7 @@ public class FormInputTemplates {
 	}
 	
 	protected static String getDropDownOthersJavascriptFunction(FormNode node){
-		String dropDownField = node.getString(JsonKeys.FIELD);
+		String dropDownField = RegexUtils.removeAllNonAlphaNumeric(node.getString(JsonKeys.FIELD)).toLowerCase();
 		String inputField = node.getString(JsonKeys.DROPDOWN_WITHOTHERS_TEXTFIELD);
 		String othersOptionToShowTextField = RegexUtils.removeAllNonAlphaNumeric(node.getString(JsonKeys.OTHERS_OPTION)).toLowerCase();
 		String funcName = node.getString(JsonKeys.FUNCTION_NAME, "OnChangeDefaultFuncName");

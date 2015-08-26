@@ -47,6 +47,10 @@ public class DisplayInputTemplates {
 		return FormInputTemplates.createCheckbox(node, true, "pf_div pf_displayCheckboxSet");
 	};
 	
+	protected static FormInputInterface dropdown_WithOthers = (node)->{
+		return FormInputTemplates.dropdownWithOthers(node, true);
+	};
+	
 	protected static FormInputInterface table = (node)->{
 		return FormInputTemplates.tableWrapper(node, true);
 	};
@@ -65,7 +69,7 @@ public class DisplayInputTemplates {
 		defaultTemplates.put(JsonKeys.HTML_INJECTION, DisplayInputTemplates.raw_html);
 		defaultTemplates.put("checkbox", DisplayInputTemplates.checkbox);
 		defaultTemplates.put("table", DisplayInputTemplates.table);
-		//defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, DisplayInputTemplates);
+		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, DisplayInputTemplates.dropdown_WithOthers);
 		
 		return defaultTemplates;
 	}

@@ -113,13 +113,13 @@ public class FormInputTemplates_test {
 						"}"+
 					"};"+
 				"</script>"+
-				"<select class=\'pf_select\' onchange=\'OnChangeDropDown()\' name=\'dropdownfield\'>"+
+				"<select class=\'pf_select\' onchange=\'OnChangeDropDown()\' id=\'dropdownfield\'>"+
 					"<option value=\"option1\">Option 1</option>"+
 					"<option value=\"option2\">Option 2</option>"+
 					"<option value=\"option3\">Option 3</option>"+
 					"<option value=\"option4\">Option 4</option>"+
 				"</select>"+
-				"<input class=\'pf_inputText\' style=\'display:none\' type=\'text\' name=\'dropdownTextField\'>";
+				"<input class=\'pf_inputText\' style=\'display:none\' type=\'text\' id=\'dropdownTextField\'>";
 	}
 	
 	private String getCheckboxHtmlString(){
@@ -203,6 +203,17 @@ public class FormInputTemplates_test {
 	}
 	
 	@Test
+	public void dropdownWithOthersDisplayTest(){
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("dropdownWithOthers", true);
+		String rawHtmlString = getHtmlString("dropdownWithOthers");
+
+		assertNotNull(jsonTemplatedOutput);
+		
+		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
+		assertTrue(compliancyCheck);
+	}
+	
+	@Test
 	public void checkBoxTest(){
 		String jsonTemplatedOutput = getFinalTemplatedJsonString("checkbox");
 		String rawHtmlString = getHtmlString("checkbox");
@@ -215,7 +226,7 @@ public class FormInputTemplates_test {
 	
 	@Test
 	public void checkBoxDisplayTest(){
-		String jsonTemplatedOutput = getTemplatedJsonStringWithData("checkbox", false);
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("checkbox", true);
 		String rawHtmlString = getHtmlString("checkboxData");
 
 		assertNotNull(jsonTemplatedOutput);

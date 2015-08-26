@@ -260,6 +260,26 @@ public class FormWrapperTemplates_test {
 		}
 	}
 	
+	@Test
+	public void testJMTE(){
+		FormGenerator formGen = new FormGenerator();
+		
+		String define = "{ \"type\" : \"jmte\", \"jmte_generic\":\"${hello}\" }";
+		Map<String,Object> data = new HashMap<String,Object>();
+		data.put("hello","world");
+		
+		data.put("display","truth");
+		data.put("input","lies");
+		
+		assertEquals("world", formGen.build(define,data, true).toString());
+		assertEquals("world", formGen.build(define,data, false).toString());
+		
+		define = "{ \"type\" : \"jmte\", \"jmte_input\":\"${input}\", \"jmte_display\":\"${display}\" }";
+		
+		assertEquals("truth", formGen.build(define,data, true).toString());
+		assertEquals("lies", formGen.build(define,data, false).toString());
+	}
+	
 	public boolean htmlTagCompliancyCheck(String source, String lookup){
 		String[] rawHtmlSplit = source.split("(>|<|=|\\s+|\"|\'|/)"); //this becomse "required params"
 		

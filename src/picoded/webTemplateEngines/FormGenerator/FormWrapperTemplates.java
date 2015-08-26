@@ -312,18 +312,19 @@ public class FormWrapperTemplates {
 		}
 		
 		// Gets the JMTE template to use
-		String jmte_template = null;
+		Object jmte_template_obj = null;
 		
 		if( isDisplayMode ) {
-			jmte_template = node.get( JsonKeys.JMTE_DISPLAY ).toString();
+			jmte_template_obj = node.get( JsonKeys.JMTE_DISPLAY );
 		} else {
-			jmte_template = node.get( JsonKeys.JMTE_INPUT ).toString();
-		}
-		if( jmte_template == null ) {
-			jmte_template = node.get( JsonKeys.JMTE_GENERIC ).toString();
+			jmte_template_obj = node.get( JsonKeys.JMTE_INPUT );
 		}
 		
-		if( jmte_template == null ) {
+		if( jmte_template_obj == null ) {
+			jmte_template_obj = node.get( JsonKeys.JMTE_GENERIC );
+		}
+		
+		if( jmte_template_obj == null ) {
 			if( isDisplayMode ) {
 				throw new RuntimeException("JMTE Wrapper is missing JMTE_( DISPLAY / GENERIC ) implementation" );
 			} else {
@@ -332,7 +333,7 @@ public class FormWrapperTemplates {
 		}
 		
 		// Generate the code
-		ret.append( jmteObj.parseTemplate( jmte_template, jmte_arguments ) );
+		ret.append( jmteObj.parseTemplate( jmte_template_obj.toString(), jmte_arguments ) );
 		
 		return ret;
 	}

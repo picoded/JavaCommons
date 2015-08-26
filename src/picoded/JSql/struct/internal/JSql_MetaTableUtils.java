@@ -313,4 +313,113 @@ public class JSql_MetaTableUtils {
 		
 		return ret;
 	}
+	
+	
+	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
+	///
+	/// @params  sql connection used, this is used to detect vendor specific logic =(
+	/// @params  meta table name, used to pull the actual data the view is based on
+	///
+	protected StringBuilder sqlBasicViewQueryBuilder(JSql sql, String tableName, MetaTypeMap mtm ) throws JSqlException {
+		
+		//
+		// Vendor specific custimization
+		//-----------------------------------------
+		
+		String joinType = "LEFT";
+		
+		String lBracket = "'";
+		String rBracket = "'";
+		if (sql.sqlType == JSqlType.mssql) {
+			lBracket = "[";
+			rBracket = "]";
+		}
+		
+		//
+		// Select / From StringBuilder setup
+		//
+		// Also setup the distinct oID collumn
+		//
+		//-----------------------------------------
+		
+		StringBuilder select = new StringBuilder("SELECT B.oID AS ");
+		select.append(lBracket + "_oid" + rBracket);
+		
+		StringBuilder from = new StringBuilder(" FROM ");
+		from.append("(SELECT DISTINCT oID")
+		
+		
+		//
+		// Optional object created time support 
+		// (Commented out)
+		//
+		//-----------------------------------------
+		
+		//select.append(", B.oTm AS ");
+		//select.append(lBracket + "_otm" + rBracket);
+		//from.append(", oTm");
+		
+		//
+		// Distinct table reference
+		//
+		//-----------------------------------------
+		
+		from.append(" FROM " + tableName + ")");
+		//from.append( tableName );
+		from.append(" AS B");
+		
+		//
+		// Distinct table reference
+		//
+		//-----------------------------------------
+		
+		
+		// String key;
+		// MetaType type;
+		// 
+		// ArrayList<Object> argList = new ArrayList<Object>();
+		// 
+		// int joinCount = 0;
+		// for (Map.Entry<String, MetaType> e : typeMapping.entrySet()) {
+		// 	key = e.getKey();
+		// 	type = e.getValue();
+		// 
+		// 	if (type.valueType >= MetaType.TYPE_INTEGER && type.valueType <= MetaType.TYPE_FLOAT) {
+		// 
+		// 		select.append(", N" + joinCount + ".nVl AS ");
+		// 		select.append(lBracket + key + rBracket);
+		// 
+		// 		from.append(" "+joinType+" JOIN " + tableName + " AS N" + joinCount);
+		// 		from.append(" ON B.oID = N" + joinCount + ".oID");
+		// 		from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = '" + key + "'");
+		// 
+		// 	} else if (type.valueType == MetaType.TYPE_STRING) {
+		// 
+		// 		select.append(", S" + joinCount + ".tVl AS ");
+		// 		select.append(lBracket + key + rBracket);
+		// 
+		// 		select.append(", S" + joinCount + ".sVl AS ");
+		// 		select.append(lBracket + key + "_lc" + rBracket);
+		// 
+		// 		from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
+		// 		from.append(" ON B.oID = S" + joinCount + ".oID");
+		// 		from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
+		// 
+		// 	} else if (type.valueType == MetaType.TYPE_TEXT) {
+		// 
+		// 		select.append(", S" + joinCount + ".tVl AS ");
+		// 		select.append(lBracket + key + rBracket);
+		// 
+		// 		from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
+		// 		from.append(" ON B.oID = S" + joinCount + ".oID");
+		// 		from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
+		// 	}
+		// 
+		// 	++joinCount;
+		// }
+		// 
+
+	}
+	
+	
 }

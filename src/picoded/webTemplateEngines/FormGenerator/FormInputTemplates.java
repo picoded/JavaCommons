@@ -242,7 +242,7 @@ public class FormInputTemplates {
 		//table header/label
 		ret.append("<thead>");
 		if(node.containsKey("tableHeader")){
-			ret.append("<tr><th>"+node.getString("tableHeader")+"</th></th>");
+			ret.append("<tr><th>"+node.getString("tableHeader")+"</th></tr>");
 		}
 		
 		List<Object> tableHeaders = getTableHeaders(node);

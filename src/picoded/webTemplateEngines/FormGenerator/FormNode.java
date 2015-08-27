@@ -377,6 +377,9 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	//
 	//------------------------------------------------------------------------
 	
+	/// List of children FormNode definition
+	protected List<Map<String,Object>> _childrenDefine = null;
+	
 	/// List of children FormNode to be generated / used?
 	protected List<FormNode> _children = null;
 	
@@ -538,18 +541,17 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	//
 	//------------------------------------------------------------------------
 	
-	/// Returns all the generated children form nodes
-	///
-	/// Note that children FormNode intentionally loads here, instead of constructor. To defer loading
+	
+	/// Returns all the children form node definition
 	/// 
-	/// @returns {List<FormNode>}  the list of formnodes
+	/// @returns {List<Map<String,Object>>}  the list of formnodes
 	@SuppressWarnings("unchecked")
-	public List<FormNode> children() {
-		if(_children != null) {
-			return _children;
+	public List<Map<String,Object>> childrenDefinition() {
+		if(_childrenDefine != null) {
+			return _childrenDefine;
 		}
 		
-		List<FormNode> cList = new ArrayList<FormNode>();
+		List<Map<String,Object>> cList = new ArrayList<Map<String,Object>>();
 		
 		if( this.containsKey("children") ) {
 			Object childrenRaw = this.get("children");
@@ -560,15 +562,41 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 			
 			// Iterate each child object
 			for(Object child : ((List<Object>)childrenRaw)) {
-				
 				if( !(child instanceof Map) ) {
 					throw new IllegalArgumentException("'children' List item found in defination was not a Map: "+child);
 				}
-				
-				cList.add( new FormNode( _formGenerator, (Map<String,Object>)child, this._inputValue ) );
+				cList.add( (Map<String,Object>)child );
 			}
 		}
 		
+		_childrenDefine = cList;
+		return cList;
+	}
+	
+	///
+	/// Generate NEW children form nodes, using the given datamap.
+	///
+	/// @returns {List<FormNode>}  the list of formnodes
+	@SuppressWarnings("unchecked")
+	public List<FormNode> children( Map<String,Object> inputValue ) {
+		List<FormNode> ret = new ArrayList<FormNode>();
+		for(Map<String,Object> childDefine : childrenDefinition()) {
+			ret.add( new FormNode( _formGenerator, childDefine, inputValue )  );
+		}
+		return ret;
+	}
+	
+	/// Returns all the generated children form nodes
+	///
+	/// Note that children FormNode intentionally loads here, instead of constructor. To defer loading
+	/// 
+	/// @returns {List<FormNode>}  the list of formnodes
+	public List<FormNode> children() {
+		if(_children != null) {
+			return _children;
+		}
+		
+		List<FormNode> cList = children(this._inputValue);
 		_children = cList;
 		return cList;
 	}
@@ -597,7 +625,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	}
 	
 	/// Returns the field value in its raw form
-	public Object getRawFieldValue(){
+	public Object getRawFieldValue() {
 		Object val = null;
 		String fieldName = getFieldName();
 		

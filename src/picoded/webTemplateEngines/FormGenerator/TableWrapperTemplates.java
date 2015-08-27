@@ -1,0 +1,439 @@
+package picoded.webTemplateEngines.FormGenerator;
+
+import java.util.*;
+
+import picoded.conv.ConvertJSON;
+import picoded.conv.RegexUtils;
+import picoded.conv.JMTE;
+import picoded.struct.CaseInsensitiveHashMap;
+
+/// Isolated FormWrapperTemplates, focused entirely on table wrapper implmentation
+///
+/// This is mainly cause the table implmentation alone is complicated sadly =(
+/// so the class files are seperated for easier maintenance
+/// 
+public class TableWrapperTemplates {
+	
+	///
+	/// FunctionalInterface for inserting of table data, inside the shared table builder
+	/// 
+	/// This is used both in injecting header data, and for row data. Note that the index count
+	/// for both are counted differently. 
+	/// 
+	/// Additionally the function should return a NULL for terminating the end of an iteration
+	/// (end of row, or collumn, etc). As the table builder relies on this to "finish"
+	///
+	@FunctionalInterface
+	public interface TableDataInjector {
+		public abstract StringBuilder apply(int rowPos, int colPos);
+	}
+	
+	/// If your printing more then a 100 K rows, you seriously have problems
+	/// This upper limit to iteration is used to prevent infinite loops
+	public static final int tableBuilderSanityLimit = 100000;
+	
+	/// TableBuilder out of bound standard error
+	public static final String tableBuilderLimitError = "WT# - tableBuilder Injector out of bound for: ";
+	
+	///
+	/// Utility function used to build the HTML table structure. With the respective data injectors
+	///
+	public static StringBuilder tableBuilder_ViaInjectors( //
+		FormNode node, //
+		TableDataInjector topHeaderInjector, TableDataInjector leftHeaderInjector, TableDataInjector dataInjector //
+	) { //
+		//
+		// Reuse vars
+		//
+		StringBuilder ret = new StringBuilder(); //return StringBuilder
+		int row = 0; //Row iterator
+		int col = 0; //Collumn iterator
+		StringBuilder injectorData = null;
+		
+		//
+		// Child wrapper: <table class="pfc_table"> ... </table> tags
+		//
+		StringBuilder[] tableTag = node.defaultHtmlChildWrapper( HtmlTag.TABLE, node.prefix_childWrapper()+"table", null );
+		ret.append(tableTag[0]);
+		
+		//
+		// Top header handling: <thead> ... </thead>
+		// 
+		ret.append("<thead>");
+		if( topHeaderInjector != null ) {
+			// Loop top header rows
+			row = 0;
+			while(row >= 0) {
+				injectorData = topHeaderInjector.apply(row, 0);
+				// Terminates the row if it has no 0 index items
+				if( injectorData == null ) {
+					break;
+				}
+				// Creates the row
+				ret.append("<tr class='"+node.prefix_childWrapper()+"row_"+row+"'>");
+				
+				// Insert first 0 index item for the row
+				ret.append("<th class='"+node.prefix_childWrapper()+"col_0'>");
+				ret.append(injectorData);
+				ret.append("</th>");
+				
+				// Next collumn onwards
+				col = 1;
+				while(col >= 1) {
+					// 1 index onwards 
+					injectorData = topHeaderInjector.apply(row, col);
+					// Moves on to next row when no more data
+					if( injectorData == null) {
+						break;
+					}
+					
+					// Insert first 1 index item onwards for the row
+					ret.append("<th class='"+node.prefix_childWrapper()+"col_"+col+"'>");
+					ret.append(injectorData);
+					ret.append("</th>");
+					
+					// Increment to next column within sanity limits
+					if( col++ > tableBuilderSanityLimit ) {
+						throw new RuntimeException(tableBuilderLimitError+"Top Header Columns");
+					}
+				}
+				// Terminates the row
+				ret.append("</tr>");
+				
+				// Increment to next row within sanity limits
+				if( row++ > tableBuilderSanityLimit ) {
+					throw new RuntimeException(tableBuilderLimitError+"Top Header Rows");
+				}
+			}
+		}
+		// End top header rows loop
+		ret.append("</thead>");
+		
+		//
+		// Left header, and actual content handling: <thead> ... </thead>
+		// 
+		ret.append("<tbody>");
+		// Loop body rows
+		row = 0;
+		while(row >= 0) {
+			StringBuilder firstRowHeader = (leftHeaderInjector != null)? leftHeaderInjector.apply(row,0) : null;
+			StringBuilder firstRowData = (dataInjector != null)? dataInjector.apply(row,0) : null;
+			
+			// Terminates the row if it has no 0 index items, for both headers and data
+			if( firstRowHeader == null && firstRowData == null ) {
+				break;
+			}
+			
+			//
+			// Row Header handling 
+			//
+			if( firstRowHeader != null ) {
+				// Insert first 0 index header item for the row
+				ret.append("<th class='"+node.prefix_childWrapper()+"col_0'>");
+				ret.append(firstRowHeader);
+				ret.append("</th>");
+			}
+			
+			// Next collumn onwards
+			col = 1;
+			while(col >= 1) {
+				// 1 index onwards 
+				injectorData = leftHeaderInjector.apply(row, col);
+				// Moves on to next row when no more data
+				if( injectorData == null) {
+					break;
+				}
+				
+				// Insert first 1 index item onwards for the row
+				ret.append("<th class='"+node.prefix_childWrapper()+"col_"+col+"'>");
+				ret.append(injectorData);
+				ret.append("</th>");
+				
+				// Increment to next column within sanity limits
+				if( col++ > tableBuilderSanityLimit ) {
+					throw new RuntimeException(tableBuilderLimitError+"Left Header Columns");
+				}
+			}
+			
+			//
+			// Row Data handling 
+			//
+			if( firstRowData != null ) {
+				// Insert first 0 index header item for the row
+				ret.append("<td class='"+node.prefix_childWrapper()+"col_0'>");
+				ret.append(firstRowData);
+				ret.append("</td>");
+			}
+			
+			
+			// Next collumn onwards
+			col = 1;
+			while(col >= 1) {
+				// 1 index onwards 
+				injectorData = dataInjector.apply(row, col);
+				// Moves on to next row when no more data
+				if( injectorData == null) {
+					break;
+				}
+				
+				// Insert first 1 index item onwards for the row
+				ret.append("<td class='"+node.prefix_childWrapper()+"col_"+col+"'>");
+				ret.append(injectorData);
+				ret.append("</td>");
+				
+				// Increment to next column within sanity limits
+				if( col++ > tableBuilderSanityLimit ) {
+					throw new RuntimeException(tableBuilderLimitError+"Left Header Columns");
+				}
+			}
+			
+			// Increment to next row within sanity limits
+			if( row++ > tableBuilderSanityLimit ) {
+				throw new RuntimeException(tableBuilderLimitError+"Body Rows");
+			}
+		}
+		// End body rows loop
+		ret.append("</tbody>");
+		
+		// Closes table tag
+		ret.append(tableTag[1]);
+		return ret;
+	}
+	
+	///
+	/// Utility function used to build the HTML table structure. With the respective data injectors. And a standard wrapper
+	///
+	public static StringBuilder tableBuilderWithWrapper_ViaInjectors( //
+		FormNode node, String wrapperClass, //
+		TableDataInjector topHeaderInjector, TableDataInjector leftHeaderInjector, TableDataInjector dataInjector //
+	) { //
+		//return
+		StringBuilder ret = new StringBuilder();
+		
+		//wrapper
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, wrapperClass, null );
+		ret.append(wrapperArr[0]);
+		
+		//label
+		String label = node.label();
+		if( label != null && label.length() > 0 ) {
+			StringBuilder[] labelArr = node.defaultHtmlLabel( HtmlTag.DIV, node.prefix_standard()+"label", null );
+			
+			ret.append( labelArr[0] );
+			ret.append( label );
+			ret.append( labelArr[1] );
+		}
+		
+		//table
+		ret.append(tableBuilder_ViaInjectors(node, topHeaderInjector, leftHeaderInjector, dataInjector));
+		
+		//closing up
+		ret.append(wrapperArr[1]);
+		return ret;
+	}
+	
+	///
+	/// Utility function used to build the header injector, based on its definition
+	///
+	@SuppressWarnings("unchecked")
+	public static TableDataInjector topHeaderDefineToInjector(Object topHeaderDefine) {
+		if( topHeaderDefine != null ) {
+			if( topHeaderDefine instanceof List ) {
+				List<Object> mainHeaderList = (List<Object>)topHeaderDefine;
+				//
+				// Empty headers list, will not created the lamda function
+				//
+				if( mainHeaderList.size() > 0 ) {
+					if( mainHeaderList.get(0) instanceof List ) {
+						//
+						// Header is 2 tiers !!!
+						//
+						return (row,col) -> {
+							//
+							// Terminate row iteration, once beyond the list scope
+							//
+							if( row >= mainHeaderList.size() ) {
+								return null;
+							}
+							//
+							// Gets the sub list
+							//
+							Object subTierObj = mainHeaderList.get(row);
+							if( subTierObj instanceof List ) {
+								List<Object> subTierList = (List<Object>)subTierObj;
+								//
+								// Terminate column iteration, once beyond the column limit
+								//
+								if( col >= subTierList.size() ) {
+									return null; //terminate row
+								}
+								//
+								// Gets the tier2 return object
+								//
+								Object ret = subTierList.get(col);
+								return new StringBuilder((ret != null)? ret.toString() : "");
+							} else {
+								//
+								// Fallsback to single collumn if no sublist
+								//
+								if( col == 0 ) {
+									return new StringBuilder((subTierObj != null)? subTierObj.toString() : "");
+								}
+							}
+							// Terminate row / col (all else failed)
+							return null;
+						};
+					} else { 
+						//
+						// Assume is 1 tier, single row only
+						//
+						return (row,col) -> {
+							// Terminate row iteration, after first row
+							if( row > 0 ) {
+								return null;
+							}
+							// Terminate column iteration, once beyond the column limit
+							if( col >= mainHeaderList.size() ) {
+								return null;
+							}
+							Object ret = mainHeaderList.get(col);
+							return new StringBuilder((ret != null)? ret.toString() : "");
+						};
+					}
+				}
+			} else {
+				//
+				// Fallback: output object string ONCE
+				//
+				return (row,col) -> {
+					if(row == 0 && col == 0) {
+						return new StringBuilder(topHeaderDefine.toString());
+					}
+					return null;
+				};
+			}
+		}
+		return null;
+	}
+	
+	///
+	/// Varient of [tableBuilderWithWrapper_ViaInjectors], which does the processing of objects to header injectors
+	///
+	/// This handles the conversion of table header formats to the lamda functions
+	///
+	public static StringBuilder tableBuilderWithWrapper_ViaDefinesAndInjector( 
+		FormNode node, String wrapperClass, //
+		Object topHeaderDefine, Object leftHeaderDefine, TableDataInjector dataInjector //
+	) { //
+		
+		//
+		// Top header handling, if object definition given
+		//
+		TableDataInjector topHeaderInjector = topHeaderDefineToInjector(topHeaderDefine);
+		
+		//
+		// Left header handling, if object definition given
+		//
+		TableDataInjector leftHeaderInjector = null;
+		TableDataInjector leftHeaderInjector_unflipped = topHeaderDefineToInjector(leftHeaderDefine);
+		if( leftHeaderInjector_unflipped != null ) {
+			leftHeaderInjector = (row,col) -> {
+				return leftHeaderInjector_unflipped.apply(col,row);
+			};
+		}
+		
+		// Run with all the applicable injectors
+		return tableBuilderWithWrapper_ViaInjectors(node, wrapperClass, topHeaderInjector, leftHeaderInjector, dataInjector);
+	}
+	
+	///
+	/// Utility function used to build the data injector, based on its field
+	///
+	@SuppressWarnings("unchecked")
+	public static TableDataInjector horizontalDataInjectorFromNode(FormNode node, boolean isDisplayMode) {
+		
+		Object fieldValue = node.getRawFieldValue();
+		List<Map<String,Object>> childrenDefinition = node.childrenDefinition();
+		List<Object> dataRows = (fieldValue instanceof List)? (List<Object>)fieldValue : null;
+		
+		if(dataRows != null) {
+			return (row,col) -> {
+				//
+				// Terminate the rows, when last row is done
+				// 
+				if( row >= dataRows.size() ) {
+					return null;
+				}
+				//
+				// Terminate the cols, when last col is done
+				//
+				if( col >= childrenDefinition.size() ) {
+					return null;
+				}
+				//
+				// Prepare
+				//
+				Object rowObj = dataRows.get(row);
+				Map<String,Object> rowMap = (rowObj instanceof Map)? (Map<String,Object>)rowObj : null;
+				Map<String,Object> child = childrenDefinition.get(col);
+				
+				//
+				// Build if possible
+				//
+				StringBuilder ret = null;
+				if( child != null && rowMap != null) {
+					ret = ( new FormNode( node._formGenerator, child,  rowMap)  ).fullHtml(isDisplayMode);
+				}
+				return (ret != null)? ret : new StringBuilder(""); //blank fallback
+			};
+		}
+		
+		return null;
+	}
+	
+	///
+	/// Horizontal table wrapper implmentation
+	/// 
+	/// Children field values are added as rows
+	///
+	public static StringBuilder tableWrapper_horizontal(FormNode node, boolean isDisplayMode) { 
+		return tableBuilderWithWrapper_ViaDefinesAndInjector(
+			// Base stuff
+			node, node.prefix_wrapper()+"table "+node.prefix_wrapper()+"horizontalTable", //
+			// Top header injector (base header is default also)
+			(node.get("topHeaders") != null)? node.get("topHeaders") : node.get("headers"), //
+			// Left header define
+			node.get("leftHeaders"), //
+			// Data injector
+			horizontalDataInjectorFromNode(node, isDisplayMode) //
+		);
+	}
+	
+	///
+	/// Vertical table wrapper implmentation
+	/// 
+	/// Children field values are added as cols
+	///
+	public static StringBuilder tableWrapper_vertical(FormNode node, boolean isDisplayMode) { 
+		TableDataInjector unflippedDataInjector = horizontalDataInjectorFromNode(node, isDisplayMode);
+		TableDataInjector dataInjector = null;
+		// The same function as horizontal is used, with axis flipped
+		if( unflippedDataInjector != null ) {
+			dataInjector = (row,col) -> {
+				return unflippedDataInjector.apply(col,row);
+			};
+		}
+		// Build it
+		return tableBuilderWithWrapper_ViaDefinesAndInjector(
+			// Base stuff
+			node, node.prefix_wrapper()+"table "+node.prefix_wrapper()+"verticalTable", //
+			// Top header injector
+			node.get("topHeaders"), //
+			// Left header define (base header is default also)
+			(node.get("leftHeaders") != null)? node.get("leftHeaders") : node.get("headers"), //
+			// Data injector
+			dataInjector//
+		);
+	}
+	
+}

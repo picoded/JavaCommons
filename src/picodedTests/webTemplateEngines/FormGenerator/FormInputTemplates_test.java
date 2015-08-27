@@ -240,7 +240,7 @@ public class FormInputTemplates_test {
 		assertNotNull(jsonTemplatedOutput);
 	}
 	
-	@Test
+//	@Test
 	public void checkBoxTest(){
 		String jsonTemplatedOutput = getFinalTemplatedJsonString("checkbox");
 		String rawHtmlString = getHtmlString("checkbox");
@@ -251,7 +251,7 @@ public class FormInputTemplates_test {
 		assertTrue(compliancyCheck);
 	}
 	
-	@Test
+//	@Test
 	public void checkBoxDisplayTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("checkbox", true);
 		String rawHtmlString = getHtmlString("checkboxData");
@@ -333,7 +333,7 @@ public class FormInputTemplates_test {
 		assertNotNull(jsonTemplatedOutput);
 	}
 //	
-//	@Test
+	@Test
 	public void imageTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("image", false);
 		assertNotNull(jsonTemplatedOutput);
@@ -350,7 +350,7 @@ public class FormInputTemplates_test {
 		PDFGenerator.generatePDFfromRawHTML(pdfPath, jsonTemplatedOutput, "");
 	}
 	
-	@Test
+//	@Test
 	public void signatureTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("signature", false);
 		assertNotNull(jsonTemplatedOutput);

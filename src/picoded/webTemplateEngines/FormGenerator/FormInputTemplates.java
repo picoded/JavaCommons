@@ -385,9 +385,17 @@ public class FormInputTemplates {
 	protected static StringBuilder image(FormNode node, boolean displayMode){
 		StringBuilder ret = new StringBuilder();
 		
-		String imgPath = node.getString("relativePath");
+		Map<String, String> params = new HashMap<String, String>();
+		String srcPath = "";
+		if(node.containsKey("relativePath")){
+			srcPath = node.getString("relativePath");
+		}
+		params.put("src", srcPath);
 		
-		ret.append("<img src=\""+imgPath+"\"></img>");
+		StringBuilder[] inputArr = node.defaultHtmlInput("img", "pfi_image", params );
+		
+		ret.append(inputArr[0]);
+		ret.append(inputArr[1]);
 		
 		return ret;
 	}

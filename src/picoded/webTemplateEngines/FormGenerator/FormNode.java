@@ -90,7 +90,10 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 				if( prefix != null ) {
 					ret.append(prefix);
 				}
-				ret.append(value);
+				
+				//ret.append(value);
+				ret.append(valueArr[a]);
+				
 				if( suffix != null ) {
 					ret.append(suffix);
 				}

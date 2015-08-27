@@ -371,6 +371,21 @@ public class FormInputTemplates {
 		return ret;
 	}
 	
+	protected static FormInputInterface image = (node)->{
+		return image(node, false);
+	};
+	
+	//image has no data passed in
+	protected static StringBuilder image(FormNode node, boolean displayMode){
+		StringBuilder ret = new StringBuilder();
+		
+		String imgPath = node.getString("relativePath");
+		
+		ret.append("<img src=\""+imgPath+"\"></img>");
+		
+		return ret;
+	}
+	
 	protected static FormInputInterface raw_html = (node)->{
 		StringBuilder sb = new StringBuilder();
 		sb.append(node.getString(JsonKeys.HTML_INJECTION));
@@ -393,6 +408,7 @@ public class FormInputTemplates {
 		defaultTemplates.put(JsonKeys.CHECKBOX, FormInputTemplates.checkbox);
 		defaultTemplates.put("table", FormInputTemplates.table);
 		defaultTemplates.put("verticalTable", FormInputTemplates.verticalTable);
+		defaultTemplates.put("image", FormInputTemplates.image);
 		
 		return defaultTemplates;
 	}

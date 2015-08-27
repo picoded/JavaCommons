@@ -39,11 +39,17 @@ public class FormInputTemplates_test {
 			String jsonFileString = FileUtils.readFileToString(jsonFile);
 			Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
 			
-			String jsonDataString = FileUtils.readFileToString(jsonDataFile);
-			Map<String, Object> jsonDataMap = ConvertJSON.toMap(jsonDataString);
-			
 			FormGenerator formGen = new FormGenerator();
-			return formGen.build(jsonMap, jsonDataMap, displayMode).toString();
+			
+			if(jsonDataFile.exists()){
+				String jsonDataString = FileUtils.readFileToString(jsonDataFile);
+				Map<String, Object> jsonDataMap = ConvertJSON.toMap(jsonDataString);
+				return formGen.build(jsonMap, jsonDataMap, displayMode).toString();
+			}
+			else{
+				return formGen.build(jsonMap, null, displayMode).toString();
+			}
+			
 //			FormNode node = new FormNode(formGen, jsonMap, jsonDataMap);
 //			return node.inputHtml(false).toString();
 		}catch(Exception ex){
@@ -296,7 +302,7 @@ public class FormInputTemplates_test {
 		assertNotNull(jsonTemplatedOutput);
 	}
 	
-	@Test
+//	@Test
 	public void verticalTableTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("verticalTable", false);
 		String rawHtmlString = getHtmlString("verticalTable");
@@ -307,7 +313,7 @@ public class FormInputTemplates_test {
 //		assertTrue(compliancyCheck);
 	}
 	
-	@Test
+//	@Test
 	public void verticalTableDisplayTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("verticalTable", true);
 		String rawHtmlString = getHtmlString("verticalTable");
@@ -318,13 +324,30 @@ public class FormInputTemplates_test {
 //		assertTrue(compliancyCheck);
 	}
 	
-	@Test
+//	@Test
 	public void verticalTablePDFTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("verticalTable", true);
 		
 		PDFGenerator.generatePDFfromRawHTML("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/verticalTablePDF.pdf", jsonTemplatedOutput);
 
 		assertNotNull(jsonTemplatedOutput);
+	}
+	
+	@Test
+	public void imageTest(){
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("image", false);
+		assertNotNull(jsonTemplatedOutput);
+	}
+	
+	@Test
+	public void imagePDFTest(){
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("imagePDF", false);
+		
+		String pdfPath = "./test-files/test-specific/htmlGenerator/generatedFiles/newImgPDF.pdf";
+//		String htmlPath = "./test-files/test-specific/htmlGenerator/FormInputTemplates_test/imgHTML.html";
+		String context = "file:///C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/FormInputTemplates_test/res/";
+		
+		PDFGenerator.generatePDFfromRawHTML(pdfPath, jsonTemplatedOutput, context);
 	}
 	
 //	@Test

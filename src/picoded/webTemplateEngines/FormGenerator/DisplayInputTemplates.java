@@ -59,6 +59,10 @@ public class DisplayInputTemplates {
 		return FormInputTemplates.verticalTable(node, true);
 	};
 	
+	protected static FormInputInterface signature = (node)->{
+		return FormInputTemplates.signature(node, true);
+	};
+	
 	protected static FormInputInterface image = (node)->{
 		return FormInputTemplates.image(node, true);
 	};
@@ -79,6 +83,7 @@ public class DisplayInputTemplates {
 		defaultTemplates.put("table", DisplayInputTemplates.table);
 		defaultTemplates.put("verticalTable", DisplayInputTemplates.verticalTable);
 		defaultTemplates.put("image", DisplayInputTemplates.image);
+		defaultTemplates.put("signature", DisplayInputTemplates.signature);
 		
 		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, DisplayInputTemplates.dropdown_WithOthers);
 		

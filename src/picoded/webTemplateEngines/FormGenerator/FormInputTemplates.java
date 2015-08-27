@@ -198,11 +198,15 @@ public class FormInputTemplates {
 				}
 				
 				StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputCheckbox pfi_input", tempMap );
+				ret.append("<div class=\"pfc_inputCheckboxWrap\">");
 				ret.append(sbArr[0]);
 				ret.append(keyNamePair.get(key));
 				ret.append(sbArr[1]);
+				ret.append("</div>");
 			}else{
 				StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, "pfi_inputCheckbox pfi_input", null );
+				
+				ret.append("<div class=\"pfc_inputCheckboxWrap_display\">");
 				
 				boolean found = false;
 				for(String selection : checkboxSelections){
@@ -220,6 +224,8 @@ public class FormInputTemplates {
 				
 				ret.append(sbArr[0]);
 				ret.append(sbArr[1]);
+				
+				ret.append("</div>");
 			}
 		}
 		
@@ -386,6 +392,20 @@ public class FormInputTemplates {
 		return ret;
 	}
 	
+	protected static FormInputInterface signature = (node)->{
+		return signature(node, false);
+	};
+	
+	protected static StringBuilder signature(FormNode node, boolean displayMode){
+		StringBuilder ret = new StringBuilder();
+		
+		String fieldValue = node.getFieldName();
+		ret.append("<div class=\"pfi_signatureDisplay\" id=\""+fieldValue+"\" style=\"height:135px;\"></div>");
+		ret.append("<h3>Click along the line to sign.</h3>");
+		
+		return ret;
+	}
+	
 	protected static FormInputInterface raw_html = (node)->{
 		StringBuilder sb = new StringBuilder();
 		sb.append(node.getString(JsonKeys.HTML_INJECTION));
@@ -409,6 +429,7 @@ public class FormInputTemplates {
 		defaultTemplates.put("table", FormInputTemplates.table);
 		defaultTemplates.put("verticalTable", FormInputTemplates.verticalTable);
 		defaultTemplates.put("image", FormInputTemplates.image);
+		defaultTemplates.put("signature", FormInputTemplates.signature);
 		
 		return defaultTemplates;
 	}

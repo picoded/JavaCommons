@@ -37,17 +37,17 @@ public class FormInputTemplates_test {
 		File jsonDataFile = new File("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/"+jsonKeyName+"Data.js");
 		try{
 			String jsonFileString = FileUtils.readFileToString(jsonFile);
-			Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
+			//Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
 			
 			FormGenerator formGen = new FormGenerator();
 			
 			if(jsonDataFile.exists()){
 				String jsonDataString = FileUtils.readFileToString(jsonDataFile);
 				Map<String, Object> jsonDataMap = ConvertJSON.toMap(jsonDataString);
-				return formGen.build(jsonMap, jsonDataMap, displayMode).toString();
+				return formGen.build(jsonFileString, jsonDataMap, displayMode).toString();
 			}
 			else{
-				return formGen.build(jsonMap, null, displayMode).toString();
+				return formGen.build(jsonFileString, null, displayMode).toString();
 			}
 			
 //			FormNode node = new FormNode(formGen, jsonMap, jsonDataMap);
@@ -240,7 +240,7 @@ public class FormInputTemplates_test {
 		assertNotNull(jsonTemplatedOutput);
 	}
 	
-//	@Test
+	@Test
 	public void checkBoxTest(){
 		String jsonTemplatedOutput = getFinalTemplatedJsonString("checkbox");
 		String rawHtmlString = getHtmlString("checkbox");
@@ -251,7 +251,7 @@ public class FormInputTemplates_test {
 		assertTrue(compliancyCheck);
 	}
 	
-//	@Test
+	@Test
 	public void checkBoxDisplayTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("checkbox", true);
 		String rawHtmlString = getHtmlString("checkboxData");
@@ -332,22 +332,44 @@ public class FormInputTemplates_test {
 
 		assertNotNull(jsonTemplatedOutput);
 	}
-	
-	@Test
+//	
+//	@Test
 	public void imageTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("image", false);
 		assertNotNull(jsonTemplatedOutput);
 	}
 	
-	@Test
+//	@Test
 	public void imagePDFTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("imagePDF", false);
 		
 		String pdfPath = "./test-files/test-specific/htmlGenerator/generatedFiles/newImgPDF.pdf";
 //		String htmlPath = "./test-files/test-specific/htmlGenerator/FormInputTemplates_test/imgHTML.html";
-		String context = "file:///C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/FormInputTemplates_test/res/";
+//		String context = "file:///C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/FormInputTemplates_test/res/";
 		
-		PDFGenerator.generatePDFfromRawHTML(pdfPath, jsonTemplatedOutput, context);
+		PDFGenerator.generatePDFfromRawHTML(pdfPath, jsonTemplatedOutput, "");
+	}
+	
+	@Test
+	public void signatureTest(){
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("signature", false);
+		assertNotNull(jsonTemplatedOutput);
+		
+		File prefix = new File("./test-files/test-specific/htmlGenerator/signature/prefix.html");
+		
+		
+		File generatedHtml = new File("./test-files/test-specific/htmlGenerator/generatedFiles/sigHTML.html");
+		try{
+			String prefixString = FileUtils.readFileToString(prefix);
+			
+			FileWriter fw = new FileWriter(generatedHtml);
+			fw.write(prefixString);
+			fw.write(jsonTemplatedOutput);
+			fw.flush();
+			fw.close();
+		}catch(Exception e){
+			
+		}
 	}
 	
 //	@Test

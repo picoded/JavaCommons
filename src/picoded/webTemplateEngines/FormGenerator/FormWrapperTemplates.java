@@ -277,6 +277,34 @@ public class FormWrapperTemplates {
 		return ret;
 	}
 	
+	protected static StringBuilder signatureWrapper(FormNode node, boolean displayMode){
+		StringBuilder ret = new StringBuilder();
+		
+		String fieldValue = node.getFieldName();
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("onclick", "showSignatureBox('"+fieldValue+"')"); //hardcoded function name as it will be part of the prefix, and standardised
+		
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, "pf_div pfw_signatureBox", params );
+		ret.append(wrapperArr[0]);
+		
+		String label = node.label();
+		if( label != null && label.length() > 0 ) {
+			StringBuilder[] labelArr = node.defaultHtmlLabel( HtmlTag.DIV, node.prefix_standard()+"label", null );
+			
+			ret.append( labelArr[0] );
+			ret.append( label );
+			ret.append( labelArr[1] );
+		}
+		
+		StringBuilder inputHtml = node.inputHtml(displayMode);
+		
+		ret.append(inputHtml);
+		ret.append(wrapperArr[1]);
+		
+		return ret;
+	}
+	
 	@SuppressWarnings("unchecked")
 	protected static List<Object> getChildren(FormNode node){
 		if( node.containsKey("children")) {
@@ -316,6 +344,10 @@ public class FormWrapperTemplates {
 	
 	protected static FormWrapperInterface imageWrapper = (node)->{
 		return imageWrapper(node, false);
+	};
+	
+	protected static FormWrapperInterface signatureWrapper = (node)->{
+		return signatureWrapper(node, false);
 	};
 	
 	
@@ -410,6 +442,7 @@ public class FormWrapperTemplates {
 		defaultTemplates.put("table", FormWrapperTemplates.tableWrapper);
 		defaultTemplates.put("verticalTable", FormWrapperTemplates.verticalTableWrapper);
 		defaultTemplates.put("image", FormWrapperTemplates.imageWrapper);
+		defaultTemplates.put("signature", FormWrapperTemplates.signatureWrapper);
 		
 		defaultTemplates.put("jmte", FormWrapperTemplates.jmteWrapper);
 		

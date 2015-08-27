@@ -36,6 +36,10 @@ public class DisplayWrapperTemplates {
 		return FormWrapperTemplates.imageWrapper(node, true);
 	};
 	
+	protected static FormWrapperInterface signatureWrapper = (node)->{
+		return FormWrapperTemplates.signatureWrapper(node, true);
+	};
+	
 	/// noneWrapper
 	///
 	/// No wrappers
@@ -62,6 +66,7 @@ public class DisplayWrapperTemplates {
 		defaultTemplates.put("table", DisplayWrapperTemplates.tableWrapper);
 		defaultTemplates.put("verticalTable", DisplayWrapperTemplates.verticalTableWrapper);
 		defaultTemplates.put("image", DisplayWrapperTemplates.imageWrapper);
+		defaultTemplates.put("signature", DisplayWrapperTemplates.signatureWrapper);
 		
 		defaultTemplates.put("jmte", DisplayWrapperTemplates.jmteWrapper);
 		

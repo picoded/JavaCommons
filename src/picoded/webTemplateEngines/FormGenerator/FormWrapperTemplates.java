@@ -283,7 +283,7 @@ public class FormWrapperTemplates {
 		String fieldValue = node.getFieldName();
 		
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("onclick", "showSignatureBox('"+fieldValue+"')"); //hardcoded function name as it will be part of the prefix, and standardised
+		params.put("onclick", "showSignatureBox('#"+fieldValue+"')"); //hardcoded function name as it will be part of the prefix, and standardised
 		
 		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, "pf_div pfw_signatureBox", params );
 		ret.append(wrapperArr[0]);

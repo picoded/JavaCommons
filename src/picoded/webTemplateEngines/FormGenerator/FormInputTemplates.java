@@ -151,7 +151,7 @@ public class FormInputTemplates {
 	
 	@SuppressWarnings("unchecked")
 	protected static FormInputInterface checkbox = (node)->{
-		return createCheckbox(node, false, "");
+		return createCheckbox(node, false, "pf_div pf_checkboxSet");
 	};
 	
 	@SuppressWarnings("unchecked")

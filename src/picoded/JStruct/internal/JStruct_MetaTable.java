@@ -159,6 +159,16 @@ public class JStruct_MetaTable implements MetaTable {
 	
 	/// Ensures the returned value is not refencing the input value, cloning if needed
 	protected Object detachValue(Object in) {
+		
+		if( in instanceof byte[] ) { //bytearray support
+			byte[] ori = (byte[]) in;
+			byte[] cop = new byte[ori.length];
+			for(int a=0; a<ori.length; ++a) {
+				cop[a] = ori[a];
+			}
+			return cop;
+		}
+		
 		return ConvertJSON.toObject( ConvertJSON.fromObject(in) );
 	}
 	

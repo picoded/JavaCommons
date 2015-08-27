@@ -348,6 +348,25 @@ public class MetaTable_test {
 		assertEquals(data, to);
 	}
 	
+	@Test
+	public void binaryStorageTest()  {
+		Map<String,Object> data = new HashMap<String,Object>();
+		data.put("name", "Hello");
+		data.put("bin", new byte[] { 1,2,3,4,5 } );
+		
+		MetaObject mo = null;
+		assertNotNull( mo = mtObj.append(null, data) );
+		mo.saveDelta();
+		
+		MetaObject to = null;
+		assertNotNull( to = mtObj.get( mo._oid() ) );
+		
+		assertTrue(data.get("bin") instanceof byte[]);
+		assertTrue(to.get("bin") instanceof byte[]);
+		
+		assertArrayEquals( (byte[])(data.get("bin")), (byte[])(to.get("bin")) );
+	}
+	
 	// Mapping tests
 	//-----------------------------------------------
 	

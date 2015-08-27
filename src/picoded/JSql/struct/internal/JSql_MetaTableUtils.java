@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.logging.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+import java.util.Base64;
 
 /// Picoded imports
 import picoded.conv.*;
@@ -107,6 +107,8 @@ public class JSql_MetaTableUtils {
 			return new Object[] { new Integer(MetaType.DOUBLE.getValue()), value, null, null }; //Typ, N,S,I,T
 		} else if (value instanceof String) {
 			return new Object[] { new Integer(MetaType.STRING.getValue()), 0, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
+		} else if (value instanceof byte[]) {
+			return new Object[] { new Integer(MetaType.BINARY.getValue()), 0, null, (Base64.getEncoder().encodeToString( (byte[])value )) }; //Typ, N,S,I,T
 		} else {
 			String jsonString = ConvertJSON.fromObject(value);
 			return new Object[] { new Integer(MetaType.JSON.getValue()), 0, null, jsonString };
@@ -139,7 +141,9 @@ public class JSql_MetaTableUtils {
 			return (String) (r.get("tVl").get(pos));
 		} else if (baseType == MetaType.TEXT.getValue()) { // Text
 			return (String) (r.get("tVl").get(pos));
-		} else if (baseType == MetaType.JSON.getValue()) { // Text
+		} else if(baseType == MetaType.BINARY.getValue()) {
+			return (Base64.getDecoder().decode( (String) (r.get("tVl").get(pos)) ) );
+		} else if (baseType == MetaType.JSON.getValue()) { // JSON
 			return ConvertJSON.toObject( (String)(r.get("tVl").get(pos)) );
 		} 
 		

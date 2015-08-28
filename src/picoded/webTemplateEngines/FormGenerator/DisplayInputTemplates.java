@@ -38,7 +38,7 @@ public class DisplayInputTemplates {
 	};
 	
 	@SuppressWarnings("unchecked")
-	protected static FormInputInterface input_textbox = (node)->{
+	protected static FormInputInterface input_textarea = (node)->{
 		return FormInputTemplates.displayDiv(node, "pfi_inputTextBox pfi_display");
 	};
 	
@@ -83,7 +83,7 @@ public class DisplayInputTemplates {
 		defaultTemplates.put(JsonKeys.TITLE, DisplayInputTemplates.header);
 		defaultTemplates.put(JsonKeys.DROPDOWN, DisplayInputTemplates.select);
 		defaultTemplates.put(JsonKeys.TEXT, DisplayInputTemplates.input_text);
-		defaultTemplates.put(JsonKeys.TEXTBOX, DisplayInputTemplates.input_textbox);
+		defaultTemplates.put(JsonKeys.TEXTAREA, DisplayInputTemplates.input_textarea);
 		defaultTemplates.put(JsonKeys.HTML_INJECTION, DisplayInputTemplates.raw_html);
 		defaultTemplates.put("checkbox", DisplayInputTemplates.checkbox);
 		defaultTemplates.put("table", DisplayInputTemplates.table);

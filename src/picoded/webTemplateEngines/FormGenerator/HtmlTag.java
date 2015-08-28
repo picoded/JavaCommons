@@ -26,8 +26,8 @@ public class HtmlTag {
 	// Html input type
 	public static String INPUT = "input";
 	
-	// Html input textbox type
-	public static String TEXTBOX = "textbox";
+	// Html input textarea type
+	public static String TEXTAREA = "textarea";
 	
 	// Html ID parameter
 	public static String ID = "id";

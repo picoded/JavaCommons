@@ -123,8 +123,8 @@ public class JsonKeys {
 	// Inner HTML injection (discouraged from use)
 	public static String HTML_INJECTION = "innerHTML"; 
 	
-	// Html input textbox type
-	public static String TEXTBOX = "textbox";
+	// Html input textarea type
+	public static String TEXTAREA = "textarea";
 	
 	public static String TEXT = "text";
 	public static String TITLE = "title";

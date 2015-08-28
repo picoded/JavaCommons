@@ -78,7 +78,7 @@ public class FormInputTemplates {
 		return sbArr[0].append(sbArr[1]);
 	};
 	
-	protected static FormInputInterface input_textbox = (node)->{
+	protected static FormInputInterface input_textarea = (node)->{
 		CaseInsensitiveHashMap<String,String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getFieldValue();
 		
@@ -87,7 +87,7 @@ public class FormInputTemplates {
 			paramMap.put(HtmlTag.VALUE, fieldValue);
 		}
 		
-		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.TEXTBOX, "pfi_inputTextBox pfi_input", paramMap );
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.TEXTAREA, "pfi_inputTextBox pfi_input", paramMap );
 		return sbArr[0].append(sbArr[1]);
 	};
 	
@@ -443,7 +443,7 @@ public class FormInputTemplates {
 		defaultTemplates.put(JsonKeys.TITLE, FormInputTemplates.header);
 		defaultTemplates.put(JsonKeys.DROPDOWN, FormInputTemplates.select);
 		defaultTemplates.put(JsonKeys.TEXT, FormInputTemplates.input_text);
-		defaultTemplates.put(JsonKeys.TEXTBOX, FormInputTemplates.input_textbox);
+		defaultTemplates.put(JsonKeys.TEXTAREA, FormInputTemplates.input_textarea);
 		defaultTemplates.put(JsonKeys.HTML_INJECTION, FormInputTemplates.raw_html);
 		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, FormInputTemplates.dropdownWithOthers);
 		defaultTemplates.put(JsonKeys.CHECKBOX, FormInputTemplates.checkbox);

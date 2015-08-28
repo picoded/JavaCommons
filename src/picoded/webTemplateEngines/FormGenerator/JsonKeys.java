@@ -123,6 +123,9 @@ public class JsonKeys {
 	// Inner HTML injection (discouraged from use)
 	public static String HTML_INJECTION = "innerHTML"; 
 	
+	// Html input textbox type
+	public static String TEXTBOX = "textbox";
+	
 	public static String TEXT = "text";
 	public static String TITLE = "title";
 	public static String CHECKBOX = "checkbox";

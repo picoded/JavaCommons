@@ -78,6 +78,18 @@ public class FormInputTemplates {
 		return sbArr[0].append(sbArr[1]);
 	};
 	
+	protected static FormInputInterface input_textbox = (node)->{
+		CaseInsensitiveHashMap<String,String> paramMap = new CaseInsensitiveHashMap<String, String>();
+		String fieldValue = node.getFieldValue();
+		
+		paramMap.put(HtmlTag.TYPE, "text");
+		if( fieldValue != null && fieldValue.length() >= 0 ) {
+			paramMap.put(HtmlTag.VALUE, fieldValue);
+		}
+		
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.TEXTBOX, "pfi_inputTextBox pfi_input", paramMap );
+		return sbArr[0].append(sbArr[1]);
+	};
 	
 	protected static FormInputInterface dropdownWithOthers = (node)->{
 		return dropdownWithOthers(node, false);
@@ -431,6 +443,7 @@ public class FormInputTemplates {
 		defaultTemplates.put(JsonKeys.TITLE, FormInputTemplates.header);
 		defaultTemplates.put(JsonKeys.DROPDOWN, FormInputTemplates.select);
 		defaultTemplates.put(JsonKeys.TEXT, FormInputTemplates.input_text);
+		defaultTemplates.put(JsonKeys.TEXTBOX, FormInputTemplates.input_textbox);
 		defaultTemplates.put(JsonKeys.HTML_INJECTION, FormInputTemplates.raw_html);
 		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, FormInputTemplates.dropdownWithOthers);
 		defaultTemplates.put(JsonKeys.CHECKBOX, FormInputTemplates.checkbox);

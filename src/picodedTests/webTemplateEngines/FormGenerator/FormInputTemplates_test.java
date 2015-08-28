@@ -251,6 +251,17 @@ public class FormInputTemplates_test {
 		assertTrue(compliancyCheck);
 	}
 	
+	@Test
+	public void checkBoxMapTest(){
+		String jsonTemplatedOutput = getFinalTemplatedJsonString("checkboxMap");
+		String rawHtmlString = getHtmlString("checkbox");
+
+		assertNotNull(jsonTemplatedOutput);
+		
+		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
+		assertTrue(compliancyCheck);
+	}
+	
 //	@Test
 	public void checkBoxDisplayTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("checkbox", true);

@@ -125,7 +125,9 @@ public class TableWrapperTemplates {
 			if( firstRowHeader == null && firstRowData == null ) {
 				break;
 			}
-			ret.append("<tr>");
+			
+//			ret.append("<tr>");
+			ret.append("<tr class='"+node.prefix_childWrapper()+"row_"+row+"'>");
 			//
 			// Row Header handling 
 			//

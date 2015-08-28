@@ -132,7 +132,7 @@ public class TempFolder{
 	/// @returns  File object; system temp folder path i.e. /var/tmp/piJCTemp
 	public File getTempFolder() throws IOException{
 		if(_tempFolder == null){
-			String tmpDir = getTempFolderPath();
+			String tmpDir = getSystemTempRootPath();
 			_tempFolder = new File(tmpDir + File.separator + _tempFolderName);
 			
 			boolean createdSuccessfully = true; //will only become false if failed to create a folder
@@ -149,7 +149,7 @@ public class TempFolder{
 		return _tempFolder;
 	}
 	
-	public static String getTempFolderPath(){
+	public static String getSystemTempRootPath(){
 		try{
 			String tmpDir = System.getProperty(_javaTmpDir);
 			return tmpDir + File.separator + _piJCTempFolderName;

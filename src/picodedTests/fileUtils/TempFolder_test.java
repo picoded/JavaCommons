@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -20,7 +21,7 @@ import picoded.fileUtils.TempFolder;
 
 public class TempFolder_test{
 	
-	private String _tempFolderName = "testTempFolder";
+	private static String _tempFolderName = "testTempFolder";
 	private TempFolder _tempFolder = null;
 	private File _tempFile = null;
 	
@@ -31,7 +32,7 @@ public class TempFolder_test{
 	public static void setUp() {
 		File parentFile = null;
 		try{
-			parentFile = new File(TempFolder.getTempFolderPath());
+			parentFile = new File(TempFolder.getSystemTempRootPath()+"/"+_tempFolderName);
 			FileUtils.deleteDirectory(parentFile);
 		}catch(Exception e){
 		}
@@ -41,14 +42,17 @@ public class TempFolder_test{
 	public static void checkWrittenData(){
 		File parentFile = null;
 		try{
-			parentFile = new File(TempFolder.getTempFolderPath());
+			parentFile = new File(TempFolder.getSystemTempRootPath()+"/"+_tempFolderName);
 			
 			File writeStringFile = new File(parentFile.getPath() + "/" +writeStringFileName);
-			assertEquals("hello there", FileUtils.readFileToString(writeStringFile));
+			String val = FileUtils.readFileToString(writeStringFile);
+			assertEquals("hello there", val );
 			
 			
 			File writeByteArrayFile = new File(parentFile.getPath() + "/" +writeByteArrayFileName);
-			assertEquals(new byte[]{1, 2, 3, 4, 5}, FileUtils.readFileToByteArray(writeByteArrayFile));	
+			byte[] byteVal = FileUtils.readFileToByteArray(writeByteArrayFile);
+			byte[] testVal = new byte[]{1, 2, 3, 4, 5};
+			assertTrue(Arrays.equals(byteVal, testVal));
 		}catch(Exception e){
 		}
 	}
@@ -108,7 +112,7 @@ public class TempFolder_test{
 	@Test
 	public void writeStringToChildFile(){
 		_tempFolder = new TempFolder(_tempFolderName);
-		String childFileName = "testFileWriteString.txt";
+		String childFileName = writeStringFileName;
 		
 		assertNotNull(_tempFolder);
 		
@@ -125,7 +129,7 @@ public class TempFolder_test{
 	@Test
 	public void writeByteArrayToChildFile(){
 		_tempFolder = new TempFolder(_tempFolderName);
-		String childFileName = "testFileWriteByteArray.txt";
+		String childFileName = writeByteArrayFileName;
 		
 		assertNotNull(_tempFolder);
 		

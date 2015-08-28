@@ -46,6 +46,8 @@ public class TableWrapperTemplates {
 		// Reuse vars
 		//
 		StringBuilder ret = new StringBuilder(); //return StringBuilder
+		try{
+		
 		int row = 0; //Row iterator
 		int col = 0; //Collumn iterator
 		StringBuilder injectorData = null;
@@ -123,7 +125,7 @@ public class TableWrapperTemplates {
 			if( firstRowHeader == null && firstRowData == null ) {
 				break;
 			}
-			
+			ret.append("<tr>");
 			//
 			// Row Header handling 
 			//
@@ -138,7 +140,8 @@ public class TableWrapperTemplates {
 			col = 1;
 			while(col >= 1) {
 				// 1 index onwards 
-				injectorData = leftHeaderInjector.apply(row, col);
+				
+				injectorData =  (leftHeaderInjector != null)? leftHeaderInjector.apply(row,col) : null;
 				// Moves on to next row when no more data
 				if( injectorData == null) {
 					break;
@@ -148,6 +151,7 @@ public class TableWrapperTemplates {
 				ret.append("<th class='"+node.prefix_childWrapper()+"col_"+col+"'>");
 				ret.append(injectorData);
 				ret.append("</th>");
+				
 				
 				// Increment to next column within sanity limits
 				if( col++ > tableBuilderSanityLimit ) {
@@ -170,22 +174,23 @@ public class TableWrapperTemplates {
 			col = 1;
 			while(col >= 1) {
 				// 1 index onwards 
-				injectorData = dataInjector.apply(row, col);
+				
+				injectorData = (dataInjector != null)? dataInjector.apply(row,col) : null;
 				// Moves on to next row when no more data
 				if( injectorData == null) {
 					break;
 				}
-				
 				// Insert first 1 index item onwards for the row
 				ret.append("<td class='"+node.prefix_childWrapper()+"col_"+col+"'>");
 				ret.append(injectorData);
 				ret.append("</td>");
-				
 				// Increment to next column within sanity limits
 				if( col++ > tableBuilderSanityLimit ) {
 					throw new RuntimeException(tableBuilderLimitError+"Left Header Columns");
 				}
 			}
+			
+			ret.append("</tr>");
 			
 			// Increment to next row within sanity limits
 			if( row++ > tableBuilderSanityLimit ) {
@@ -197,6 +202,9 @@ public class TableWrapperTemplates {
 		
 		// Closes table tag
 		ret.append(tableTag[1]);
+		}catch(Exception e){
+			throw new RuntimeException(e.getMessage());
+		}
 		return ret;
 	}
 	

@@ -285,7 +285,7 @@ public class FormInputTemplates_test {
 		assertTrue(compliancyCheck);
 	}
 	
-	@Test
+//	@Test
 	public void tableDisplayTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("table", true);
 		String rawHtmlString = getHtmlString("table");
@@ -296,7 +296,7 @@ public class FormInputTemplates_test {
 		assertTrue(compliancyCheck);
 	}
 	
-	@Test
+//	@Test
 	public void tablePDFTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("table", true);
 		
@@ -305,7 +305,7 @@ public class FormInputTemplates_test {
 		assertNotNull(jsonTemplatedOutput);
 	}
 	
-	@Test
+//	@Test
 	public void verticalTableTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("verticalTable", false);
 		String rawHtmlString = getHtmlString("verticalTable");
@@ -316,7 +316,7 @@ public class FormInputTemplates_test {
 //		assertTrue(compliancyCheck);
 	}
 	
-	@Test
+//	@Test
 	public void verticalTableDisplayTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("verticalTable", true);
 		String rawHtmlString = getHtmlString("verticalTable");
@@ -336,7 +336,7 @@ public class FormInputTemplates_test {
 		assertNotNull(jsonTemplatedOutput);
 	}
 //	
-	@Test
+//	@Test
 	public void imageTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("image", false);
 		assertNotNull(jsonTemplatedOutput);

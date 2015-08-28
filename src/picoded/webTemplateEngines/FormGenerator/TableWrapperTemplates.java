@@ -244,7 +244,7 @@ public class TableWrapperTemplates {
 	/// Utility function used to build the header injector, based on its definition
 	///
 	@SuppressWarnings("unchecked")
-	public static TableDataInjector topHeaderDefineToInjector(Object topHeaderDefine) {
+	public static TableDataInjector topHeaderDefineToInjector(FormNode node, Object topHeaderDefine, boolean isDisplayMode) {
 		if( topHeaderDefine != null ) {
 			if( topHeaderDefine instanceof List || topHeaderDefine instanceof Map ) {
 				//
@@ -287,6 +287,14 @@ public class TableWrapperTemplates {
 								// Gets the tier2 return object
 								//
 								Object ret = subTierList.get(col);
+								
+								//
+								// Form node in headers D=
+								//
+								if( ret instanceof Map ) {
+									return (new FormNode( node._formGenerator, (Map<String,Object>)ret,  node.getValueMap() )).fullHtml(isDisplayMode);
+								}
+								
 								return new StringBuilder((ret != null)? ret.toString() : "");
 							} else {
 								//
@@ -313,6 +321,14 @@ public class TableWrapperTemplates {
 								return null;
 							}
 							Object ret = mainHeaderList.get(col);
+							
+							//
+							// Form node in headers D=
+							//
+							if( ret instanceof Map ) {
+								return (new FormNode( node._formGenerator, (Map<String,Object>)ret,  node.getValueMap() )).fullHtml(isDisplayMode);
+							}
+							
 							return new StringBuilder((ret != null)? ret.toString() : "");
 						};
 					}
@@ -338,20 +354,20 @@ public class TableWrapperTemplates {
 	/// This handles the conversion of table header formats to the lamda functions
 	///
 	public static StringBuilder tableBuilderWithWrapper_ViaDefinesAndInjector( 
-		FormNode node, String wrapperClass, //
+		FormNode node, String wrapperClass, boolean isDisplayMode, //
 		Object topHeaderDefine, Object leftHeaderDefine, TableDataInjector dataInjector //
 	) { //
 		
 		//
 		// Top header handling, if object definition given
 		//
-		TableDataInjector topHeaderInjector = topHeaderDefineToInjector(topHeaderDefine);
+		TableDataInjector topHeaderInjector = topHeaderDefineToInjector(node, topHeaderDefine, isDisplayMode);
 		
 		//
 		// Left header handling, if object definition given
 		//
 		TableDataInjector leftHeaderInjector = null;
-		TableDataInjector leftHeaderInjector_unflipped = topHeaderDefineToInjector(leftHeaderDefine);
+		TableDataInjector leftHeaderInjector_unflipped = topHeaderDefineToInjector(node, leftHeaderDefine, isDisplayMode);
 		if( leftHeaderInjector_unflipped != null ) {
 			leftHeaderInjector = (row,col) -> {
 				return leftHeaderInjector_unflipped.apply(col,row);
@@ -415,7 +431,7 @@ public class TableWrapperTemplates {
 	public static StringBuilder tableWrapper_horizontal(FormNode node, boolean isDisplayMode) { 
 		return tableBuilderWithWrapper_ViaDefinesAndInjector(
 			// Base stuff
-			node, node.prefix_wrapper()+"table "+node.prefix_wrapper()+"horizontalTable", //
+			node, node.prefix_wrapper()+"table "+node.prefix_wrapper()+"horizontalTable", isDisplayMode, //
 			// Top header injector (base header is default also)
 			(node.get("topHeaders") != null)? node.get("topHeaders") : node.get("headers"), //
 			// Left header define
@@ -442,7 +458,7 @@ public class TableWrapperTemplates {
 		// Build it
 		return tableBuilderWithWrapper_ViaDefinesAndInjector(
 			// Base stuff
-			node, node.prefix_wrapper()+"table "+node.prefix_wrapper()+"verticalTable", //
+			node, node.prefix_wrapper()+"table "+node.prefix_wrapper()+"verticalTable", isDisplayMode, //
 			// Top header injector
 			node.get("topHeaders"), //
 			// Left header define (base header is default also)

@@ -251,7 +251,7 @@ public class FormInputTemplates_test {
 		assertTrue(compliancyCheck);
 	}
 	
-	@Test
+//	@Test
 	public void checkBoxMapTest(){
 		String jsonTemplatedOutput = getFinalTemplatedJsonString("checkboxMap");
 		String rawHtmlString = getHtmlString("checkbox");
@@ -282,7 +282,7 @@ public class FormInputTemplates_test {
 		assertNotNull(jsonTemplatedOutput);
 	}
 	
-	@Test
+//	@Test
 	public void tableTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("table", false);
 		String rawHtmlString = getHtmlString("table");
@@ -364,9 +364,9 @@ public class FormInputTemplates_test {
 		PDFGenerator.generatePDFfromRawHTML(pdfPath, jsonTemplatedOutput, "");
 	}
 	
-//	@Test
+	@Test
 	public void signatureTest(){
-		String jsonTemplatedOutput = getTemplatedJsonStringWithData("signature", false);
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("signature", true);
 		assertNotNull(jsonTemplatedOutput);
 		
 		File prefix = new File("./test-files/test-specific/htmlGenerator/signature/prefix.html");
@@ -384,6 +384,13 @@ public class FormInputTemplates_test {
 		}catch(Exception e){
 			
 		}
+	}
+	
+//	@Test
+	public void signatureDisplay(){
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("signature", false);
+		assertNotNull(jsonTemplatedOutput);
+		
 	}
 	
 //	@Test

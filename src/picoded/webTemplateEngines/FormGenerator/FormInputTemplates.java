@@ -407,9 +407,31 @@ public class FormInputTemplates {
 	protected static StringBuilder signature(FormNode node, boolean displayMode){
 		StringBuilder ret = new StringBuilder();
 		
-		String fieldValue = node.getFieldName();
-		ret.append("<div class=\"pfi_signatureDisplay\" id=\""+fieldValue+"\" style=\"height:135px;\"></div>");
-		ret.append("<h3>Click along the line to sign.</h3>");
+		String sigValue = node.getFieldValue();//will return a file path, e.g. output/outPNG_siga.png
+		StringBuilder sigImgString = new StringBuilder();
+		if(sigValue != null && !sigValue.isEmpty()){
+			FormNode innerImgNode = new FormNode();
+			innerImgNode._inputValue = node._inputValue;
+			innerImgNode._formGenerator = node._formGenerator;
+			innerImgNode.put("type", "image");
+			//innerImgNode.put("inputCss", "height:80px");
+			innerImgNode.put("relativePath", sigValue);
+			
+			sigImgString = innerImgNode.fullHtml(false);
+		}
+		
+		String fieldName = node.getFieldName();
+		ret.append("<div class=\"pfi_signatureDisplay\" id=\""+fieldName+"\" style=\"height:135px;\">");
+		
+		if(sigValue != null && !sigValue.isEmpty() && displayMode){
+			ret.append(sigImgString);
+		}
+		
+		ret.append("</div>");
+		
+		if(!displayMode){
+			ret.append("<h3>Click along the line to sign.</h3>");
+		}
 		
 		return ret;
 	}

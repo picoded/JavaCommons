@@ -335,11 +335,11 @@ public class FormWrapperTemplates {
 	};
 	
 	protected static FormWrapperInterface tableWrapper = (node)->{
-		return FormWrapperTemplates.tableWrapper(node, false);
+		return TableWrapperTemplates.tableWrapper_horizontal(node, false);
 	};
 	
 	protected static FormWrapperInterface verticalTableWrapper = (node)->{
-		return FormWrapperTemplates.verticalTableWrapper(node, false);
+		return TableWrapperTemplates.tableWrapper_vertical(node, false);
 	};
 	
 	protected static FormWrapperInterface imageWrapper = (node)->{

@@ -238,8 +238,16 @@ public class TableWrapperTemplates {
 	@SuppressWarnings("unchecked")
 	public static TableDataInjector topHeaderDefineToInjector(Object topHeaderDefine) {
 		if( topHeaderDefine != null ) {
-			if( topHeaderDefine instanceof List ) {
-				List<Object> mainHeaderList = (List<Object>)topHeaderDefine;
+			if( topHeaderDefine instanceof List || topHeaderDefine instanceof Map ) {
+				//
+				// Setup the header list
+				//
+				List<Object> mainHeaderList = new ArrayList<Object>();
+				if( topHeaderDefine instanceof List ) {
+					mainHeaderList.addAll( (List<Object>)topHeaderDefine );
+				} else { //use map as a single row
+					mainHeaderList.add( topHeaderDefine );
+				}
 				//
 				// Empty headers list, will not created the lamda function
 				//

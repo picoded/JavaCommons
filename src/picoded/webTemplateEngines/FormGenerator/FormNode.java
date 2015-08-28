@@ -629,6 +629,10 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		Object val = null;
 		String fieldName = getFieldName();
 		
+		if( fieldName.equalsIgnoreCase("this") ) {
+			return _inputValue;
+		}
+		
 		if(_inputValue != null && _inputValue.containsKey(fieldName)){
 			val = _inputValue.get(fieldName);
 		}

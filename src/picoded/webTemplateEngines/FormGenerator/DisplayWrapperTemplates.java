@@ -25,11 +25,11 @@ public class DisplayWrapperTemplates {
 	};
 	
 	protected static FormWrapperInterface tableWrapper = (node)->{
-		return FormWrapperTemplates.tableWrapper(node, true);
+		return TableWrapperTemplates.tableWrapper_horizontal(node, true);
 	};
 	
 	protected static FormWrapperInterface verticalTableWrapper = (node)->{
-		return FormWrapperTemplates.verticalTableWrapper(node, true);
+		return TableWrapperTemplates.tableWrapper_vertical(node, true);
 	};
 	
 	protected static FormWrapperInterface imageWrapper = (node)->{

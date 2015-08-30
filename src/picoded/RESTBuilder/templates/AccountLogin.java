@@ -12,9 +12,6 @@ import picoded.enums.HttpRequestType;
 /// Account login template API
 public class AccountLogin extends BasePage {
 	
-	// Serialize version ID
-	static final long serialVersionUID = 1L;
-	
 	/// Default api set prefix
 	protected static String _apiSetPrefix_prefix = "account.";
 	

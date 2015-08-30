@@ -1,6 +1,7 @@
 package picodedTests.webTemplateEngines.JSML;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.util.*;
 
 import org.junit.*;
@@ -16,7 +17,7 @@ public class JSMLForm_test{
 	static Map<String, Object> data = null;
 	
 	static String rootFolder = "./test-files/test-specific/htmlGenerator/JSML";
-	static String resourceFolder = rootFolder + "/resources";
+	static String resourceFolder = rootFolder + "/resources/";
 	
 	@BeforeClass
 	public static void classSetUp(){
@@ -25,6 +26,10 @@ public class JSMLForm_test{
 		assertNotNull(jsmlForm);
 		
 		try{
+			File declareFile = new File(rootFolder + "/formDeclare.json");
+			String declareFileString = FileUtils.readFileToString(declareFile);
+			jsmlForm.setDefinition(declareFileString);
+			
 			File dataFile = new File(rootFolder + "/formData.json");
 			String dataFileString = FileUtils.readFileToString(dataFile);
 			data = ConvertJSON.toMap(dataFileString);
@@ -40,6 +45,15 @@ public class JSMLForm_test{
 		
 		String rawHTML = sb.toString();
 		assertFalse(rawHTML.isEmpty());
+		
+		try{
+			FileWriter fw = new FileWriter(new File(rootFolder+"/generated/generatedHTML.html"));
+			fw.write(rawHTML);
+			fw.flush();
+			fw.close();
+		}catch(Exception e){
+			
+		}
 	}
 	
 	@Test
@@ -49,6 +63,15 @@ public class JSMLForm_test{
 		
 		String rawHTML = sb.toString();
 		assertFalse(rawHTML.isEmpty());
+		
+		try{
+			FileWriter fw = new FileWriter(new File(rootFolder+"/generated/generatedDisplayHTML.html"));
+			fw.write(rawHTML);
+			fw.flush();
+			fw.close();
+		}catch(Exception e){
+			
+		}
 	}
 	
 	@Test
@@ -58,9 +81,18 @@ public class JSMLForm_test{
 		
 		String rawHTML = sb.toString();
 		assertFalse(rawHTML.isEmpty());
+		
+		try{
+			FileWriter fw = new FileWriter(new File(rootFolder+"/generated/generatedDisplay.html"));
+			fw.write(rawHTML);
+			fw.flush();
+			fw.close();
+		}catch(Exception e){
+			
+		}
 	}
 	
-	@Test
+//	@Test
 	public void generatePDFTest(){
 		byte[] pdfData = jsmlForm.generatePDF(data, true);
 		assertNotNull(pdfData);

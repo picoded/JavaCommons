@@ -697,7 +697,11 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	
 	// @Deprecated
 	public int childCount(){
-		return _children.size();
+		if(_children != null){
+			return _children.size();
+		}else{
+			return 0;
+		}
 	}
 	
 	// @Deprecated

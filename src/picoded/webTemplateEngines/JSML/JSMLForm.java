@@ -108,12 +108,14 @@ public class JSMLForm {
 		_formDefinitionMap = inFormDefinition;
 	}
 	
-	public void setBlankData(){
+	public Map<String, Object> getBlankData(){
 		//generate empty data
+		return null;
 	}
 	
-	public void setDummyData(){
+	public Map<String, Object> getDummyData(){
 		//go through the definition and generate random data for each field
+		return null;
 	}
 	
 	private File[] getFilesInRootFolder(){

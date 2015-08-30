@@ -3,6 +3,10 @@ package picoded.webTemplateEngines.JSML;
 import java.io.*;
 import java.util.*;
 
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.lesscss.deps.org.apache.commons.io.FileUtils;
 
 import picoded.fileUtils.PDFGenerator;
@@ -25,7 +29,15 @@ public class JSMLForm {
 	
 	private String _resourceFolderPath = "";
 	
+	private String _contextPath = "";
+	
+	private String _contextIdentifier = "${FormContextPath}";
+	
 	private String _defaultResourceFolderName = "resources";
+	
+	private String _tempFolderName = "";
+	
+	private String _svgPrefix = "data:image/svg+xml;base64,";
 	
 	//file name suffixes
 	private String _bodyPrefix = "prefix";
@@ -105,7 +117,7 @@ public class JSMLForm {
 	}
 	
 	private File[] getFilesInRootFolder(){
-		File rootFolder = new File(_resourceFolderPath);
+		File rootFolder = new File(_formFolderPath);
 		if(rootFolder.exists()){
 			return rootFolder.listFiles();
 		}else{
@@ -151,7 +163,7 @@ public class JSMLForm {
 		File bodyPrefixFile = getFileInRootFolder(_styleSheetSuffix);
 		try{
 			String bodyPrefixString = FileUtils.readFileToString(bodyPrefixFile);
-			return bodyPrefixString;
+			return "<style>" + bodyPrefixString + "</style>";
 		}catch(Exception e){
 			throw new RuntimeException("readStyleSheet() -> " + e.getMessage());
 		}
@@ -168,6 +180,96 @@ public class JSMLForm {
 		String bodySuffix = readBodySuffix();
 		
 		return bodySuffix;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> sanitiseMap(Map<String, Object> inMap){
+		Map<String, Object> tempMap = new HashMap<String, Object>(inMap);
+		for(String key : inMap.keySet()){
+			Object value = inMap.get(key);
+			
+			if(value instanceof String){
+				tempMap.replace(key, sanitiseString((String)value, key));
+			}else if(value instanceof List){
+				tempMap.replace(key,  sanitiseList((List<Object>)value));
+			}else if(value instanceof Map){
+				tempMap.replace(key, sanitiseMap((Map<String, Object>)value));
+			}
+		}
+		
+		return tempMap;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<Object> sanitiseList(List<Object> inList){
+		List<Object> tempList = new ArrayList<Object>(inList);
+		
+		for(int i = 0; i < inList.size(); ++i){
+			if(inList.get(i) instanceof String){
+				tempList.remove(i);
+				tempList.add(i, sanitiseString((String)inList.get(i), ""));
+			}else if(inList.get(i) instanceof List){
+				tempList.remove(i);
+				tempList.add(i, sanitiseList((List<Object>)inList.get(i)));
+			}else if(inList.get(i) instanceof Map){
+				tempList.remove(i);
+				tempList.add(i, sanitiseMap((Map<String, Object>)inList.get(i)));
+			}
+		}
+		
+		return tempList;
+	}
+	
+	private String sanitiseString(String inString, String name){
+		String tempString = inString;
+		if(tempString.contains(_contextIdentifier)){
+			tempString = tempString.replace(_contextIdentifier, _contextPath);
+		}
+		
+		if(tempString.contains(_svgPrefix)){
+			tempString = tempString.substring(_svgPrefix.length(), tempString.length());
+			
+			String svgPrefix = "inSig_";
+			String pngPrefix = "outSig_";
+			String svgFilePath = _contextPath + "/"+svgPrefix+name+".svg";
+			String pngFilePath = _contextPath + "/"+pngPrefix+name+".png";
+			
+			try{
+				svgFileToPngFile(svgFilePath, pngFilePath);
+				//after this, pass the signature path back
+			}catch(Exception ex){
+				
+			}
+			
+			tempString = pngFilePath;
+		}
+		
+		return tempString;
+	}
+	
+	private void svgFileToPngFile( String svgPath, String pngPath ) throws IOException {
+		try {
+			InputStream svg_istream = new FileInputStream(svgPath);
+			TranscoderInput input_svg_image = new TranscoderInput(svg_istream);
+			//Step-2: Define OutputStream to PNG Image and attach to TranscoderOutput
+			OutputStream png_ostream = new FileOutputStream(pngPath);
+			TranscoderOutput output_png_image = new TranscoderOutput(png_ostream);
+			// Step-3: Create PNGTranscoder and define hints if required
+			PNGTranscoder my_converter = new PNGTranscoder();
+			// Step-4: Convert and Write output
+			my_converter.transcode(input_svg_image, output_png_image);
+			// Step 5- close / flush Output Stream
+			png_ostream.flush();
+			png_ostream.close();
+			svg_istream.close();
+			
+		} catch(TranscoderException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public Map<String, Object> requestParamsToParamsMap(Map<String, Object> inRequestParams){
+		return null;
 	}
 	
 	public StringBuilder generateHTML(Map<String, Object> data, boolean isDisplayMode){
@@ -188,14 +290,12 @@ public class JSMLForm {
 	}
 	
 	public StringBuilder generateDisplay(Map<String, Object> data){
-		String pdfResult = "";
+		StringBuilder ret = new StringBuilder();
 		if(!_formDefinitionString.isEmpty()){
-			pdfResult = formGen.generatePDFReadyHTML(_formDefinitionString, data);
+			ret = formGen.build(_formDefinitionString, data, true);
 		}else{
-			pdfResult = formGen.generatePDFReadyHTML(_formDefinitionMap, data);
+			ret = formGen.build(_formDefinitionMap, data, true);
 		}
-		
-		StringBuilder ret = new StringBuilder(pdfResult);
 		
 		String fullPrefix = getFullPrefix();
 		String fullSuffix = getFullSuffix();
@@ -206,23 +306,23 @@ public class JSMLForm {
 	}
 	
 	public byte[] generatePDF(Map<String, Object> data, boolean isDisplayMode){
-		String pdfResult = "";
+		StringBuilder ret = new StringBuilder();
 		if(!_formDefinitionString.isEmpty()){
-			pdfResult = formGen.generatePDFReadyHTML(_formDefinitionString, data);
+			ret = formGen.build(_formDefinitionString, data, true);
 		}else{
-			pdfResult = formGen.generatePDFReadyHTML(_formDefinitionMap, data);
+			ret = formGen.build(_formDefinitionMap, data, true);
 		}
 		
-		if(pdfResult == null || pdfResult.isEmpty()){
+		if(ret == null){
 			throw new RuntimeException("generatePDF() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
 		}
 		
 		String pdfFilePath = _resourceFolderPath + "/generatedPDF.pdf";
 		
 		String styleSheet = readStyleSheet();
-		pdfResult = styleSheet + pdfResult;
+		ret.insert(0, styleSheet);
 		 
-		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, pdfResult, "file:///" + _resourceFolderPath);
+		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), "file:///" + _resourceFolderPath);
 		
 		//read the pdf file now
 		File pdfFile = new File(pdfFilePath);

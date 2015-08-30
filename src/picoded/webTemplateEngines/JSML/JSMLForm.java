@@ -108,7 +108,7 @@ public class JSMLForm {
 		}
 	}
 	
-	private void getDefinition(){
+	public void getDefinition(){
 		File declareFile = new File(_formFolderPath + "/formDeclare.json");
 		
 		if(declareFile.exists()){

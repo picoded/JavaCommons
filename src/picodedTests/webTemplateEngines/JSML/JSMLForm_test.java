@@ -34,6 +34,7 @@ public class JSMLForm_test{
 			File dataFile = new File(rootFolder + "/formData.json");
 			String dataFileString = FileUtils.readFileToString(dataFile);
 			data = ConvertJSON.toMap(dataFileString);
+			
 		}catch(Exception e){
 			throw new RuntimeException(e.getMessage());
 		}

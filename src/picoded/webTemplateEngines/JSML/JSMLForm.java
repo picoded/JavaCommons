@@ -108,6 +108,19 @@ public class JSMLForm {
 		}
 	}
 	
+	private void getDefinition(){
+		File declareFile = new File(_formFolderPath + "/formDeclare.json");
+		
+		if(declareFile.exists()){
+			try{
+				String declareFileString = FileUtils.readFileToString(declareFile);
+				setDefinition(declareFileString);
+			}catch(Exception e){
+				throw new RuntimeException("getDefinition() -> "+e.getMessage());
+			}
+		}
+	}
+	
 	public void setDefinition(String inFormDefinition){
 		_formDefinitionString = sanitiseString(inFormDefinition, "");
 		

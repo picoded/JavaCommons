@@ -72,6 +72,9 @@ public class FileServlet extends HttpServlet {
 	/// This can either be set at initializing, or a constructor.
 	public String basePath = null;
 	
+	/// The base file folder
+	public File baseFolder = null;
+	
 	/// The default expire time (disabled)
 	public long fileExpireTime = 0; //604800000L = 1 week.
 	
@@ -101,6 +104,15 @@ public class FileServlet extends HttpServlet {
 		validateBasePath();
 	}
 	
+	/// Custom constructor with basePath
+	public FileServlet(File inBaseFolder) {
+		super();
+		// Setup
+		baseFolder = inBaseFolder;
+		// Validate
+		validateBasePath();
+	}
+	
 	///////////////////////////////////////////////////////
 	//
 	// Core functions
@@ -111,51 +123,86 @@ public class FileServlet extends HttpServlet {
 	///
 	/// @param  HttpServletRequest to process
 	/// @param  HttpServletResponse to response
-	/// @param  Indicates if data should be return (GET) request (instead of HEAD)
+	/// @param  Indicates if data should be return (HEAD) request (instead of GET)
 	public void processRequest( //
 		HttpServletRequest servletRequest, //
 		HttpServletResponse servletResponse, //
-		boolean withContent //
+		boolean headersOnly //
+	) throws IOException {
+		
+		// requested file by path info, 
+		// relative to the servlet wildcard in web.xml
+		String requestPath = servletRequest.getPathInfo();
+		
+		// Pass the requestPath
+		processRequest( servletRequest, servletResponse, headersOnly, requestPath );
+	}
+	
+	/// Process the full file fetch request
+	///
+	/// @param  HttpServletRequest to process
+	/// @param  HttpServletResponse to response
+	/// @param  Indicates if data should be return (HEAD) request (instead of GET)
+	/// @params Request file path
+	public void processRequest( //
+		HttpServletRequest servletRequest, //
+		HttpServletResponse servletResponse, //
+		boolean headersOnly, //
+		String requestPath //
 	) throws IOException {
 		
 		// Prepare to fetch the file
 		//-------------------------------------------
 		
-		// requested file by path info, 
-		// relative to the servlet wildcard in web.xml
-		String requestedPath = servletRequest.getPathInfo();
-		
-		// Check if basePath is valid
-		
 		// Throws a 404 error if requestedFile is not provided
-		if (requestedPath == null) {
+		if (requestPath == null) {
 		   servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
 		   return;
 		}
 		
-		// URL Decode the requestedPath
-		requestedPath = URLDecoder.decode(requestedPath, "UTF-8");
+		// URL Decode the requestPath
+		requestPath = URLDecoder.decode(requestPath, "UTF-8");
 		
 		// Does some path cleanup (for what???)
 		// requestedFile.replaceAll("\/\.\/", "/").replaceAll("\/\/","\/");
 		
 		// 404 error if directory traversal / esclation as a security measure
 		// Also blocks ".private" file access
-		if (requestedPath.contains("/.") || requestedPath.contains("..")) {
+		if (requestPath.contains("/.") || requestPath.contains("..")) {
 		   servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
 		   return;
 		}
 		
 		// 404 error if accessing possible java servlet protected files
-		String requestedPath_lowerCase = requestedPath.toLowerCase();
-		if (requestedPath_lowerCase.contains("/web-inf/") || requestedPath_lowerCase.contains("/meta-inf/")) {
+		String requestPath_lowerCase = requestPath.toLowerCase();
+		if (requestPath_lowerCase.contains("/web-inf/") || requestPath_lowerCase.contains("/meta-inf/")) {
 		   servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
 		   return;
 		}
 		
 		// Fetch THE file, and validate
 		//-------------------------------------------
-		File file = new File(basePath, requestedPath);
+		File file = new File(basePath, requestPath);
+		
+		// Validate the file and output it
+		processRequest(servletRequest, servletResponse, headersOnly, file);
+	}
+	
+	/// Process the full file fetch request
+	///
+	/// @param  HttpServletRequest to process
+	/// @param  HttpServletResponse to response
+	/// @param  Indicates if data should be return (HEAD) request (instead of GET)
+	/// @param  Request file
+	public void processRequest( //
+		HttpServletRequest servletRequest, //
+		HttpServletResponse servletResponse, //
+		boolean headersOnly, //
+		File file
+	) throws IOException {
+		
+		// Validate the file
+		//-------------------------------------------
 		
 		// Check if file exists
 		if (!file.exists()) {
@@ -334,7 +381,7 @@ public class FileServlet extends HttpServlet {
 				servletResponse.setContentType(contentType);
 				servletResponse.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/" + r.total);
 
-				if (withContent) {
+				if (!headersOnly) {
 					if (acceptsGzip) {
 						// Use GZIP in response
 						servletResponse.setHeader("Content-Encoding", "gzip");
@@ -355,7 +402,7 @@ public class FileServlet extends HttpServlet {
 				servletResponse.setHeader("Content-Length", String.valueOf(r.length));
 				servletResponse.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
 				
-				if (withContent) {
+				if (!headersOnly) {
 					// Copy single part range.
 					copy(input, output, r.start, r.length);
 				}
@@ -365,7 +412,7 @@ public class FileServlet extends HttpServlet {
 				servletResponse.setContentType("multipart/byteranges; boundary=" + MULTIPART_BYTERANGES);
 				servletResponse.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
 
-				if (withContent) {
+				if (!headersOnly) {
 					// Cast back to ServletOutputStream to get the easy println methods.
 					ServletOutputStream sos = (ServletOutputStream) output;
 
@@ -401,26 +448,37 @@ public class FileServlet extends HttpServlet {
 	/// Utility function called by init, or paramtirized startup. To validate basePath
 	public void validateBasePath() {
 		// Validate base path.
-		if (basePath == null) {
-		  throw new RuntimeException("FileServlet init param 'basePath' is required.");
-		} else {
-		  File path = new File(basePath);
-		  if (!path.exists()) {
-				throw new RuntimeException(
-					"FileServlet init param 'basePath' (" + 
-					basePath + ") does actually not exist in file system."
-				);
-		  } else if (!path.isDirectory()) {
-				throw new RuntimeException(
-					"FileServlet init param 'basePath' value (" + 
-					basePath + ") is actually not a directory in file system."
-				);
-		  } else if (!path.canRead()) {
-				throw new RuntimeException(
-					"FileServlet init param 'basePath' value (" + 
-					basePath + ") is actually not readable in file system."
-				);
-		  }
+		if(baseFolder == null) {
+			if (basePath == null) {
+				throw new RuntimeException("FileServlet init param 'basePath' is required.");
+			}
+			baseFolder = new File(basePath);
+		}
+		
+		if (!baseFolder.exists()) {
+			throw new RuntimeException(
+				"FileServlet init param 'basePath' (" + 
+				baseFolder.toString() + ") does actually not exist in file system."
+			);
+		}
+		
+		if (!baseFolder.isDirectory()) {
+			throw new RuntimeException(
+				"FileServlet init param 'basePath' value (" + 
+				baseFolder.toString() + ") is actually not a directory in file system."
+			);
+		} 
+		
+		if (!baseFolder.canRead()) {
+			throw new RuntimeException(
+				"FileServlet init param 'basePath' value (" + 
+				baseFolder.toString() + ") is actually not readable in file system."
+			);
+		}
+		
+		// Use provided file, to extract filepath
+		if( basePath == null ) {
+			basePath = baseFolder.toString();
 		}
 	}
 	
@@ -566,12 +624,12 @@ public class FileServlet extends HttpServlet {
 
 	/// Process HEAD servletRequest. This returns the same headers as GET request, but without content.
 	protected void doHead(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		processRequest(request, response, false);
+		processRequest(request, response, true);
 	}
 
 	/// Process GET request, with headers and content
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		processRequest(request, response, true);
+		processRequest(request, response, false);
 	}
 
 }

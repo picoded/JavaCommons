@@ -406,6 +406,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		this._formGenerator = root;
 		
 		// Fill up stored map
+		
 		this.putAll( mapObject );
 		
 		// Put in the inputData list

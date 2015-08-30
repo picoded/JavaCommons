@@ -149,7 +149,9 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 			return null;
 		}
 		String keyStr = key.toString();
-		return (new JSMLForm( new File(formSetFolder, keyStr), formSetURI+keyStr, new File(formSetFolder, keyStr+"/tmp") ));
+		JSMLForm newForm = new JSMLForm( new File(formSetFolder, keyStr), formSetURI+"/"+keyStr, new File(formSetFolder, keyStr+"/tmp") );
+		newForm.getDefinition();
+		return newForm;
 	}
 	
 	///////////////////////////////////////////////////////
@@ -195,11 +197,19 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 		}
 		
 		// Normalize / delink map data
-		formDataMap = new HashMap<String,Object>( formDataMap );
+		if( formDataMap != null ) {
+	    	formDataMap = new HashMap<String,Object>( formDataMap );
+		} else {
+		    formDataMap = new HashMap<String,Object>();
+		}
 		
 		// Convert parameter map to data map
 		Map<String,Object> processedRequestMap = form.requestParamsToParamsMap( (Map<String,Object>)(Object)reqMap );
 		formDataMap.putAll( processedRequestMap );
+		
+		if( formDataMap == null ) {
+		    formDataMap = new HashMap<String,Object>();
+		}
 		
 		return formDataMap;
 	}
@@ -207,7 +217,7 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 	/// Process the full JSML Form Collection servlet request
 	public void processJSMLFormCollectionServlet( BasePage page ) {
 		try {
-			String[] reqArr = page.requestWilldcardUriArray();
+			String[] reqArr = page.requestWildcardUriArray();
 			String indexPage = "index.html";
 			
 			// Load index page
@@ -220,8 +230,12 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 				params.put("JSMLnames", nameList());
 				
 				if( !(indexFile.exists()) || !(indexFile.canRead()) || !(indexFile.isFile()) ) {
-					indexFileStr = FileUtils.readFileToString(indexFile, "UTF-8");
+					// 404 error if file not found
+					page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
+					return;
 				}
+				
+				indexFileStr = FileUtils.readFileToString(indexFile, "UTF-8");
 				
 				if( indexFileStr == null ) {
 					// 404 error if file not found
@@ -253,6 +267,7 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 					// Index mode
 					if( reqMode == null || reqMode.length() <= 0 || reqMode.equalsIgnoreCase("input") ) {
 						formParams = formDataFromRequest( page, form );
+						
 						String formResult = form.generateHTML( formParams, false ).toString();
 						page.getWriter().println( page.JMTE().parseTemplate(formResult, formParams) );
 						return;

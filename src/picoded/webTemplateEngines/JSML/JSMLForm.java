@@ -70,6 +70,10 @@ public class JSMLForm {
 		setContextPath(uriContext);
 	}
 	
+	public String formDefinitionString(){
+		return _formDefinitionString;
+	}
+	
 	public void setFormFolder(String inFormFolderPath){
 		_formFolderPath = inFormFolderPath;
 	}

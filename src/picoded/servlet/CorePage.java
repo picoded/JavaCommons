@@ -259,7 +259,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	public String requestWildcardUri() {
 		try {
 			String path = httpRequest.getPathInfo();
-			if(path == null) {
+			if(path == null || path.isEmpty()) {
 				return null;
 			}
 			return URLDecoder.decode(path, "UTF-8").trim();
@@ -268,8 +268,12 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		}
 	}
 	
-	public String[] requestWilldcardUriArray() {
+	public String[] requestWildcardUriArray() {
 		String raw = requestWildcardUri();
+		
+		if(raw == null || raw.isEmpty()){
+		    return null;
+		}
 		
 		if(raw.startsWith("/")) {
 			raw = raw.substring(1);

@@ -324,7 +324,7 @@ public class FileServlet extends HttpServlet {
 		//-------------------------------------------
 
 		// Get content type by file name and set default GZIP support and content disposition.
-		String  contentType = getServletContext().getMimeType(fileName);
+		String  contentType = servletRequest.getServletContext().getMimeType(fileName);
 		boolean acceptsGzip = false;
 		String  disposition = "inline";
 

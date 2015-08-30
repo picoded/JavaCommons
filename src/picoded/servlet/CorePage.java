@@ -77,12 +77,6 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	//
 	///////////////////////////////////////////////////////
 	
-	// Common not so impt stuff
-	//-------------------------------------------
-	
-	// Serialize version ID
-	static final long serialVersionUID = 1L;
-	
 	// Static type variables declaration
 	//-------------------------------------------
 	

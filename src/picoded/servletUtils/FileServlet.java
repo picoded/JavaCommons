@@ -156,8 +156,8 @@ public class FileServlet extends HttpServlet {
 		
 		// Throws a 404 error if requestedFile is not provided
 		if (requestPath == null) {
-		   servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
-		   return;
+			servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
 		}
 		
 		// URL Decode the requestPath

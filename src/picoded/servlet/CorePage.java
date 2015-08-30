@@ -20,6 +20,7 @@ import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.net.URLDecoder;
 
 import picoded.conv.ConvertJSON;
 import picoded.enums.HttpRequestType;
@@ -254,23 +255,31 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	}
 	
 	/// Gets the serer wildcard segment of the URI
+	/// Note this does any URL decoding if needed, use httpRequest.getPathInfo() for the raw wild card path
 	public String requestWildcardUri() {
-		String servletPath = requestServletPath();
-		String reqURI = requestURI();
-		String contextPath = getContextURI();
+		try {
+			String path = httpRequest.getPathInfo();
+			if(path == null) {
+				return null;
+			}
+			return URLDecoder.decode(path, "UTF-8").trim();
+		} catch( Exception e ) {
+			return null;
+		}
+	}
+	
+	public String[] requestWilldcardUriArray() {
+		String raw = requestWildcardUri();
 		
-		while(servletPath.endsWith("*") || servletPath.endsWith("/")) {
-			servletPath = servletPath.substring(0, servletPath.length() - 1);
+		if(raw.startsWith("/")) {
+			raw = raw.substring(1);
 		}
 		
-		if( reqURI.startsWith(contextPath) ) {
-		    reqURI = reqURI.substring(contextPath.length());
+		if(raw.endsWith("/")) {
+			raw = raw.substring(0, raw.length() - 1);
 		}
 		
-		if( reqURI.startsWith(servletPath) ) {
-			return reqURI.substring(servletPath.length());
-		}
-		return "";
+		return raw.split("/");
 	}
 	
 	// Request type config getters
@@ -751,10 +760,11 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	public final void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		spawnInstance().setupInstance(HttpRequestType.OPTION, request, response).processChain();
 		try {
-				super.doOptions(request,response);
+			super.doOptions(request,response);
 		} catch(Exception e) {
 			throw new ServletException(e);
 		}
 	}
 	
+	/// @TODO : HEAD SUPPORT, for integration with FileServlet
 }

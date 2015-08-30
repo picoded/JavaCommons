@@ -3,16 +3,23 @@ package picoded.webTemplateEngines.JSML;
 import java.io.*;
 import java.util.*;
 
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+import picoded.enums.*;
+import picoded.conv.*;
 import picoded.struct.*;
 import picoded.servlet.*;
 import picoded.servletUtils.*;
 import picoded.fileUtils.PDFGenerator;
 import picoded.webTemplateEngines.FormGenerator.*;
 
+import org.apache.commons.io.FileUtils;
+
 ///
 /// JSML Form set, which handles all the various utility and servlet functionality
 ///
-public class JSMLFormSet extends UnsupportedDefaultMap<String, JSMLForm> {
+public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 	
 	///////////////////////////////////////////////////////
 	//
@@ -39,7 +46,7 @@ public class JSMLFormSet extends UnsupportedDefaultMap<String, JSMLForm> {
 	
 	/// Constructor with formSetFolder, and formSetURI
 	public JSMLFormSet(File folderPath, String folderUri) {
-		formSetFolder = forlderPath;
+		formSetFolder = folderPath;
 		formSetURI = folderUri;
 		// Validate
 		validateFormSetFolder();
@@ -81,10 +88,6 @@ public class JSMLFormSet extends UnsupportedDefaultMap<String, JSMLForm> {
 			);
 		}
 		
-		// Use provided file, to extract filepath
-		if( basePath == null ) {
-			basePath = formSetFolder.toString();
-		}
 	}
 	
 	///////////////////////////////////////////////////////
@@ -100,7 +103,7 @@ public class JSMLFormSet extends UnsupportedDefaultMap<String, JSMLForm> {
 		List<File> ret = new ArrayList<File>();
 		
 		for(File entry : formSetFolder.listFiles()) {
-			if( entry.getName().startsWith('.') ) {
+			if( entry.getName().startsWith(".") ) {
 				continue; //skip private folders
 			}
 			
@@ -112,7 +115,7 @@ public class JSMLFormSet extends UnsupportedDefaultMap<String, JSMLForm> {
 	}
 	
 	/// Cache for nameList
-	protected _folderNameListCache = null;
+	protected List<String> _folderNameListCache = null;
 	
 	/// Returns the list of names, found in the set. This is equivalent to .keySet()
 	public List<String> nameList() {
@@ -123,7 +126,7 @@ public class JSMLFormSet extends UnsupportedDefaultMap<String, JSMLForm> {
 		List<String> ret = new ArrayList<String>();
 		
 		for(File entry : foldersInFormSet()) {
-			return entry.getName();
+			ret.add( entry.getName() );
 		}
 		
 		return (_folderNameListCache = ret);
@@ -146,7 +149,7 @@ public class JSMLFormSet extends UnsupportedDefaultMap<String, JSMLForm> {
 			return null;
 		}
 		String keyStr = key.toString();
-		new JSMLForm( new File(formSetFolder, keyStr), formSetURI+keyStr, new File(formSetFolder, keyStr+"/tmp") );
+		return (new JSMLForm( new File(formSetFolder, keyStr), formSetURI+keyStr, new File(formSetFolder, keyStr+"/tmp") ));
 	}
 	
 	///////////////////////////////////////////////////////
@@ -156,7 +159,7 @@ public class JSMLFormSet extends UnsupportedDefaultMap<String, JSMLForm> {
 	///////////////////////////////////////////////////////
 	
 	/// Returns the File servlet
-	public FileServer resourseFileServlet() {
+	public FileServlet resourseFileServlet() {
 		if( formSetFolder == null ) {
 			validateFormSetFolder();
 		}
@@ -165,11 +168,138 @@ public class JSMLFormSet extends UnsupportedDefaultMap<String, JSMLForm> {
 	}
 	
 	/// Process the file serving request for resoruces
-	public void processResourcesFileRequest( //
+	protected void processResourcesFileRequest( //
 		HttpServletRequest servletRequest, //
 		HttpServletResponse servletResponse, //
 		boolean headersOnly //
 	) {
-		resourseFileServlet(servletRequest, servletResponse, headersOnly);
+		try {
+			resourseFileServlet().processRequest(servletRequest, servletResponse, headersOnly);
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/// Derive form data from request 
+	@SuppressWarnings("unchecked")
+	public Map<String,Object> formDataFromRequest( BasePage page, JSMLForm form ) {
+		
+		RequestMap reqMap = page.requestParameters();
+		Map<String,Object> formDataMap = null;
+		
+		// Check if its dummy data mode
+		if( reqMap.getBoolean("dummy-data", false) ) {
+			formDataMap = form.getDummyData();
+		} else {
+			formDataMap = form.getBlankData();
+		}
+		
+		// Normalize / delink map data
+		formDataMap = new HashMap<String,Object>( formDataMap );
+		
+		// Convert parameter map to data map
+		Map<String,Object> processedRequestMap = form.requestParamsToParamsMap( (Map<String,Object>)(Object)reqMap );
+		formDataMap.putAll( processedRequestMap );
+		
+		return formDataMap;
+	}
+	
+	/// Process the full JSML Form Collection servlet request
+	public void processJSMLFormCollectionServlet( BasePage page ) {
+		try {
+			String[] reqArr = page.requestWilldcardUriArray();
+			String indexPage = "index.html";
+			
+			// Load index page
+			if(reqArr == null || reqArr.length <= 0 || indexPage.equalsIgnoreCase(reqArr[0]) ) {
+				
+				File indexFile = new File(formSetFolder, "index.html");
+				String indexFileStr = null;
+				
+				Map<String,Object> params = new HashMap<String,Object>();
+				params.put("JSMLnames", nameList());
+				
+				if( !(indexFile.exists()) || !(indexFile.canRead()) || !(indexFile.isFile()) ) {
+					indexFileStr = FileUtils.readFileToString(indexFile, "UTF-8");
+				}
+				
+				if( indexFileStr == null ) {
+					// 404 error if file not found
+					page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
+					return;
+				}
+				
+				page.getWriter().println( page.JMTE().parseTemplate(indexFileStr, params) );
+				return;
+			} 
+			
+			// Get the JSMLForm name
+			String formName = reqArr[0];
+			if( nameList().contains(formName) ) {
+				// JSMLForm
+				JSMLForm form = get(formName);
+				
+				// Note if arr is larger then 2, its normally a file request
+				if( reqArr.length <= 2 ) {
+					// Get the form request mode
+					String reqMode = null;
+					Map<String,Object> formParams = null;
+					
+					// Get request mode parameters
+					if(reqArr.length == 2) {
+						reqMode = reqArr[1];
+					}
+					
+					// Index mode
+					if( reqMode == null || reqMode.length() <= 0 || reqMode.equalsIgnoreCase("input") ) {
+						formParams = formDataFromRequest( page, form );
+						String formResult = form.generateHTML( formParams, false ).toString();
+						page.getWriter().println( page.JMTE().parseTemplate(formResult, formParams) );
+						return;
+					}
+					
+					// Display mode
+					if( reqMode.equalsIgnoreCase("display") ) {
+						formParams = formDataFromRequest( page, form );
+						String formResult = form.generateHTML( formParams, true ).toString();
+						page.getWriter().println( page.JMTE().parseTemplate(formResult, formParams) );
+						return;
+					}
+					
+					// PDF mode
+					if( reqMode.equalsIgnoreCase("pdf") ) {
+						formParams = formDataFromRequest( page, form );
+						byte[] pdfData = form.generatePDF( formParams );
+						HttpServletResponse response = page.getHttpServletResponse();
+						
+						response.setContentType("application/pdf");
+						response.addHeader("Content-Disposition", "attachment; filename=" + formName + ".pdf");
+						response.setContentLength( pdfData.length );
+						
+						page.getOutputStream().write(pdfData);
+						return;
+					}
+				}
+			}
+			
+			String reqStr = page.requestWildcardUri();
+			
+			// Security measure?
+			if( reqStr != null && reqStr.contains("/tmp") ) {
+				// 404 error if file not found
+				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
+				return;
+			}
+			
+			// Fallsback into File Servlet
+			resourseFileServlet().processRequest( //
+				page.getHttpServletRequest(), //
+				page.getHttpServletResponse(), //
+				page.requestType() == HttpRequestType.HEAD
+			);
+			
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

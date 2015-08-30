@@ -6,6 +6,7 @@ public enum HttpRequestType {
 	POST,
 	PUT,
 	DELETE,
+	HEAD,
 	OPTION;
 	
 	/// TypeMap to be extended, and stored in their respective package usage

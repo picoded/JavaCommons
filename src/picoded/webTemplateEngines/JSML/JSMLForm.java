@@ -307,6 +307,10 @@ public class JSMLForm {
 		return ret;
 	}
 	
+	public byte[] generatePDF(Map<String, Object> data){
+		return generatePDF(data, true);
+	}
+	
 	public byte[] generatePDF(Map<String, Object> data, boolean isDisplayMode){
 		StringBuilder ret = new StringBuilder();
 		if(!_formDefinitionString.isEmpty()){

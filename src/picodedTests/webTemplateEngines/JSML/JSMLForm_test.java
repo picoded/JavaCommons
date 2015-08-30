@@ -17,11 +17,12 @@ public class JSMLForm_test{
 	static Map<String, Object> data = null;
 	
 	static String rootFolder = "./test-files/test-specific/htmlGenerator/JSML";
-	static String resourceFolder = rootFolder + "/resources/";
+	static String tempFolder = rootFolder + "/resources/tmp";
+	static String contextFolder = "file:///C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/JSML/";
 	
 	@BeforeClass
 	public static void classSetUp(){
-		jsmlForm = new JSMLForm(rootFolder, "", resourceFolder);
+		jsmlForm = new JSMLForm(rootFolder, contextFolder, tempFolder);
 		
 		assertNotNull(jsmlForm);
 		
@@ -92,7 +93,7 @@ public class JSMLForm_test{
 		}
 	}
 	
-//	@Test
+	@Test
 	public void generatePDFTest(){
 		byte[] pdfData = jsmlForm.generatePDF(data, true);
 		assertNotNull(pdfData);

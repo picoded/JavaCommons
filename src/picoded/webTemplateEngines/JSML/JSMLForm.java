@@ -9,6 +9,8 @@ import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.lesscss.deps.org.apache.commons.io.FileUtils;
 
+import picoded.conv.ConvertJSON;
+import picoded.conv.MapValueConv;
 import picoded.fileUtils.PDFGenerator;
 import picoded.webTemplateEngines.FormGenerator.*;
 
@@ -57,6 +59,7 @@ public class JSMLForm {
 		
 		setFormFolder(formFolder);
 		setResourceFolder(tmpFolder);
+		setContextPath(uriContext);
 	}
 	
 	public JSMLForm(String formFolderPath, String uriContext, String tmpFolderPath){
@@ -64,6 +67,7 @@ public class JSMLForm {
 		
 		setFormFolder(formFolderPath);
 		setResourceFolder(tmpFolderPath);
+		setContextPath(uriContext);
 	}
 	
 	public void setFormFolder(String inFormFolderPath){
@@ -84,6 +88,10 @@ public class JSMLForm {
 		validateResourceFolder();
 	}
 	
+	public void setContextPath(String inContextPath){
+		_contextPath = inContextPath;
+	}
+	
 	private void validateResourceFolder(){
 		if(_resourceFolderPath.isEmpty()){
 			if(!_formFolderPath.isEmpty()){
@@ -101,21 +109,38 @@ public class JSMLForm {
 	}
 	
 	public void setDefinition(String inFormDefinition){
-		_formDefinitionString = inFormDefinition;
+		_formDefinitionString = sanitiseString(inFormDefinition, "");
+		
 	}
 	
 	public void setDefinition(Map<String, Object> inFormDefinition){
-		_formDefinitionMap = inFormDefinition;
+		_formDefinitionMap = sanitiseMap(inFormDefinition);
 	}
 	
 	public Map<String, Object> getBlankData(){
-		//generate empty data
-		return null;
+		File blankDataFile = new File(_formFolderPath + "/blankData.json");
+		String blankDataString = "";
+		try{
+			blankDataString = FileUtils.readFileToString(blankDataFile);
+		}catch(Exception e){
+			throw new RuntimeException("getBlankData() ->" + e.getMessage());
+		}
+		
+		Map<String, Object> ret =  ConvertJSON.toMap(blankDataString);
+		return ret;
 	}
 	
 	public Map<String, Object> getDummyData(){
-		//go through the definition and generate random data for each field
-		return null;
+		File dummyDataFile = new File(_formFolderPath + "/dummyData.json");
+		String dummyDataString = "";
+		try{
+			dummyDataString = FileUtils.readFileToString(dummyDataFile);
+		}catch(Exception e){
+			throw new RuntimeException("getDummyData() ->" + e.getMessage());
+		}
+		
+		Map<String, Object> ret =  ConvertJSON.toMap(dummyDataString);
+		return ret;
 	}
 	
 	private File[] getFilesInRootFolder(){
@@ -141,8 +166,8 @@ public class JSMLForm {
 		}
 	}
 	
-	public String readBodyPrefix(){
-		File bodyPrefixFile = getFileInRootFolder(_bodyPrefix);
+	public String readBodyPrefix(String prefixName){
+		File bodyPrefixFile = getFileInRootFolder(prefixName);
 		try{
 			String bodyPrefixString = FileUtils.readFileToString(bodyPrefixFile);
 			return bodyPrefixString;
@@ -151,41 +176,21 @@ public class JSMLForm {
 		}
 	}
 	
-	public String readBodySuffix(){
-		File bodyPrefixFile = getFileInRootFolder(_bodySuffix);
+	public String readBodySuffix(String suffixName){
+		File bodySuffixFile = getFileInRootFolder(suffixName);
 		try{
-			String bodyPrefixString = FileUtils.readFileToString(bodyPrefixFile);
-			return bodyPrefixString;
+			String bodySuffixString = FileUtils.readFileToString(bodySuffixFile);
+			return bodySuffixString;
 		}catch(Exception e){
 			throw new RuntimeException("readBodySuffix() -> " + e.getMessage());
 		}
 	}
 	
-	public String readStyleSheet(){
-		File bodyPrefixFile = getFileInRootFolder(_styleSheetSuffix);
-		try{
-			String bodyPrefixString = FileUtils.readFileToString(bodyPrefixFile);
-			return "<style>" + bodyPrefixString + "</style>";
-		}catch(Exception e){
-			throw new RuntimeException("readStyleSheet() -> " + e.getMessage());
-		}
-	}
-	
-	public String getFullPrefix(){
-		String bodyPrefix = readBodyPrefix();
-		String styleDeclare = readStyleSheet();
-		
-		return styleDeclare + bodyPrefix;
-	}
-	
-	public String getFullSuffix(){
-		String bodySuffix = readBodySuffix();
-		
-		return bodySuffix;
-	}
-	
 	@SuppressWarnings("unchecked")
-	private Map<String, Object> sanitiseMap(Map<String, Object> inMap){
+	protected Map<String, Object> sanitiseMap(Map<String, Object> inMap){
+		if(inMap == null){
+			return inMap;
+		}
 		Map<String, Object> tempMap = new HashMap<String, Object>(inMap);
 		for(String key : inMap.keySet()){
 			Object value = inMap.get(key);
@@ -203,7 +208,7 @@ public class JSMLForm {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List<Object> sanitiseList(List<Object> inList){
+	protected List<Object> sanitiseList(List<Object> inList){
 		List<Object> tempList = new ArrayList<Object>(inList);
 		
 		for(int i = 0; i < inList.size(); ++i){
@@ -222,7 +227,7 @@ public class JSMLForm {
 		return tempList;
 	}
 	
-	private String sanitiseString(String inString, String name){
+	protected String sanitiseString(String inString, String name){
 		String tempString = inString;
 		if(tempString.contains(_contextIdentifier)){
 			tempString = tempString.replace(_contextIdentifier, _contextPath);
@@ -244,6 +249,15 @@ public class JSMLForm {
 			}
 			
 			tempString = pngFilePath;
+		}
+		
+		return tempString;
+	}
+	
+	protected String sanitiseStringForPDF(String inString, String name){
+		String tempString = inString;
+		if(tempString.contains(_contextIdentifier)){
+			tempString = tempString.replace(_contextIdentifier+"/", "");
 		}
 		
 		return tempString;
@@ -271,11 +285,17 @@ public class JSMLForm {
 	}
 	
 	public Map<String, Object> requestParamsToParamsMap(Map<String, Object> inRequestParams){
-		return null;
+		return MapValueConv.fromFullyQualifiedKeys(inRequestParams);
 	}
 	
 	public StringBuilder generateHTML(Map<String, Object> data, boolean isDisplayMode){
 		StringBuilder ret = new StringBuilder();
+		
+		try{
+			data = sanitiseMap(data);
+		}catch(Exception e){
+			throw new RuntimeException(e.getMessage());
+		}
 		
 		if(!_formDefinitionString.isEmpty()){
 			ret = formGen.build(_formDefinitionString, data, isDisplayMode);
@@ -283,26 +303,20 @@ public class JSMLForm {
 			ret = formGen.build(_formDefinitionMap, data, isDisplayMode);
 		}
 		
-		String fullPrefix = getFullPrefix();
-		String fullSuffix = getFullSuffix();
-		ret.insert(0, fullPrefix);
-		ret.append(fullSuffix);
-		
-		return ret;
-	}
-	
-	public StringBuilder generateDisplay(Map<String, Object> data){
-		StringBuilder ret = new StringBuilder();
-		if(!_formDefinitionString.isEmpty()){
-			ret = formGen.build(_formDefinitionString, data, true);
+		String bodyPrefix = "";
+		if(!isDisplayMode){
+			bodyPrefix = readBodyPrefix("PrefixHTML");
 		}else{
-			ret = formGen.build(_formDefinitionMap, data, true);
+			bodyPrefix = readBodyPrefix("PrefixDisplay");
 		}
-		
-		String fullPrefix = getFullPrefix();
-		String fullSuffix = getFullSuffix();
-		ret.insert(0, fullPrefix);
-		ret.append(fullSuffix);
+		String bodySuffix = "";
+		if(!isDisplayMode){
+			bodySuffix = readBodySuffix("SuffixHTML");
+		}else{
+			bodySuffix = readBodySuffix("SuffixDisplay");
+		}
+		ret.insert(0, sanitiseString(bodyPrefix, ""));
+		ret.append(sanitiseString(bodySuffix, ""));
 		
 		return ret;
 	}
@@ -313,6 +327,9 @@ public class JSMLForm {
 	
 	public byte[] generatePDF(Map<String, Object> data, boolean isDisplayMode){
 		StringBuilder ret = new StringBuilder();
+		
+		data = sanitiseMap(data);
+		
 		if(!_formDefinitionString.isEmpty()){
 			ret = formGen.build(_formDefinitionString, data, true);
 		}else{
@@ -325,10 +342,12 @@ public class JSMLForm {
 		
 		String pdfFilePath = _resourceFolderPath + "/generatedPDF.pdf";
 		
-		String styleSheet = readStyleSheet();
-		ret.insert(0, styleSheet);
-		 
-		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), "file:///" + _resourceFolderPath);
+		String bodyPrefix = readBodyPrefix("PrefixPDF");
+		String bodySuffix = readBodySuffix("SuffixPDF");
+		ret.insert(0,  sanitiseStringForPDF(bodyPrefix, ""));
+		ret.append(bodySuffix);
+		
+		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), _contextPath);
 		
 		//read the pdf file now
 		File pdfFile = new File(pdfFilePath);

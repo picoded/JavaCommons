@@ -59,70 +59,6 @@ public class MapValueConv {
 		return singleToArray(source, new HashMap<A,B[]>(), arrayType);
 	}
 	
-//	/// Converts 
-//	@SuppressWarnings("unchecked")
-//	public static Map<String, Object> toFullyQualifiedKeys (Map<String, Object> source){
-//		Map<String, Object> fullyQualifiedMap = new HashMap<String, Object>();
-//		
-//		for(String str : source.keySet()){
-//			Object rawValue = source.get(str);
-//			
-//			if(rawValue instanceof List){ //List<Map<String, Object>
-//				List<Map<String, Object>> listOfMap = (List<Map<String, Object>>)rawValue;
-//				
-//				int counter = 0;
-//				for(Map<String, Object> innerMap : listOfMap){
-//					for(String innerMapKey : innerMap.keySet()){
-//						fullyQualifiedMap.put(str+"["+counter+"]."+innerMapKey, innerMap.get(innerMapKey));
-//					}
-//					++counter;
-//				}
-//			}else{
-//				fullyQualifiedMap.put(str, rawValue);
-//			}
-//		}
-//		
-//		return fullyQualifiedMap;
-//	}
-	
-//	@SuppressWarnings("unchecked")
-//	public static Map<String, Object> fromFullyQualifiedKeys (Map<String, Object> source){
-//		Map<String, Object> contextQualifiedMap = new HashMap<String, Object>();
-//		
-//		for(String str : source.keySet()){
-//			String[] strSplit = str.split("\\.");
-//			if(strSplit.length > 1){
-//				String[] splitByLeftBracket = strSplit[0].split("\\[");
-//				if(splitByLeftBracket.length > 1){
-//					String listKey = splitByLeftBracket[0];
-//					String mapKey = strSplit[1];
-//					String mapValue = (String)source.get(str);
-//					
-//					List<Map<String, Object>> innerList = (List<Map<String, Object>>)contextQualifiedMap.get(listKey);
-//					if(innerList == null){
-//						innerList = new ArrayList<Map<String, Object>>();
-//						contextQualifiedMap.put(listKey, innerList);
-//					}
-//					
-//					//get index
-//					int index = Integer.parseInt(splitByLeftBracket[1].split("\\]")[0]);
-//					if(innerList.size() == 0 || innerList.size() < index){
-//						for(int i = innerList.size(); i < index + 1; ++i){
-//							innerList.add(new HashMap<String, Object>());
-//						}
-//					}
-//					
-//					Map<String, Object> listMap = innerList.get(index);
-//					listMap.put(mapKey, mapValue);
-//				}
-//			}else{
-//				contextQualifiedMap.put(str, source.get(str));
-//			}
-//			
-//		}
-//		return contextQualifiedMap;
-//	}
-	
 	@SuppressWarnings("unchecked")
 	public static Map<String, Object> toFullyQualifiedKeys(Object source, String rootName, String separator){
 		Map<String, Object> fullyQualifiedMap = new HashMap<String, Object>();
@@ -181,58 +117,6 @@ public class MapValueConv {
 		
 		return fullyQualifiedMap;
 	}
-	
-//	@SuppressWarnings("unchecked")
-//	public static Map<String, Object> fromFullyQualifiedKeys (Map<String, Object> source){
-//		Map<String, Object> contextQualifiedMap = new HashMap<String, Object>();
-//		
-//		for(String sourceKey:source.keySet()){
-//			String[] separatorSplit = sourceKey.split("\\.");
-//			
-//			if(separatorSplit != null && separatorSplit.length > 1){
-//				for(String section:separatorSplit){
-//					String[] sectSplit = section.split("(\\[|\\])");
-//					String baseKey = sectSplit[0];
-//					Object internal = contextQualifiedMap.get(baseKey);
-//					
-//					for(int i = 0; i < sectSplit.length; ++i){
-//						String key = sectSplit[i];
-//						if(internal != null){
-//							if(internal instanceof List){
-//								List<Object> listInternal = (List<Object>)internal;
-//								Object obj = listInternal.get(Integer.parseInt(key));
-//								if(obj != null){
-//									
-//								}else{
-//									if(i < sectSplit.length - 1){
-//	
-//									}else{
-//										Map<String, Object> mapInternal = new HashMap<String, Object>();
-//									}
-//								}
-//							}else{
-//								
-//							}
-//						}else{
-//							if(i < sectSplit.length - 1){
-//								List<Object> listInternal = new ArrayList<Object>();
-//								internal = listInternal;
-//								contextQualifiedMap.put(key, listInternal);
-//							}else{
-////								Map<String, Object> mapInternal = new HashMap<String, Object>();
-//							}
-//						}
-//					}
-//
-//				}
-//			}else{
-//				//just a keyvalue map
-//				contextQualifiedMap.put(sourceKey, source.get(sourceKey));
-//			}
-//		}
-//		
-//		return contextQualifiedMap;
-//	}
 	
 	public static Map<String, Object> fromFullyQualifiedKeys(Map<String, Object> source){
 		Map<String, Object> finalMap = new HashMap<String, Object>();
@@ -336,11 +220,5 @@ public class MapValueConv {
 		else{
 			return false;
 		}
-
-//		if(source.matches("[a-zA-Z]+")){
-//			return true;
-//		}else{
-//			return false;
-//		}
 	}
 }

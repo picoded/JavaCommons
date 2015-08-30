@@ -165,6 +165,14 @@ public class PDFGenerator {
 		return true;
 	}
 	
+	/// Generates a pdf file given the RAW html string
+	/// embeded file path (image, css, js etc.) in input html String should be relative to execute location
+	///
+	/// @param   outputpdfpath    pdf file path string
+	/// @param   rawHtml          raw HTML string
+	/// @param   contextRoot      Absolute file path for the PDF to pull resources from
+	///
+	/// @returns  true if the HTML raw string is converted and saved in a pdf file.
 	public static boolean generatePDFfromRawHTML(String outputpdfpath, String rawHtml, String contextRoot) {
 		OutputStream outputStream = null;
 		try {

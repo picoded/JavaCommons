@@ -149,7 +149,7 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 			return null;
 		}
 		String keyStr = key.toString();
-		JSMLForm newForm = new JSMLForm( new File(formSetFolder, keyStr), formSetURI+"/"+keyStr, new File(formSetFolder, keyStr+"/tmp") );
+		JSMLForm newForm = new JSMLForm( new File(formSetFolder, keyStr), formSetURI+"/"+keyStr+"/", new File(formSetFolder, keyStr+"/tmp") );
 		newForm.getDefinition();
 		return newForm;
 	}
@@ -288,7 +288,7 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 						HttpServletResponse response = page.getHttpServletResponse();
 						
 						response.setContentType("application/pdf");
-						response.addHeader("Content-Disposition", "attachment; filename=" + formName + ".pdf");
+						response.addHeader("Content-Disposition", "filename=" + formName + ".pdf");
 						response.setContentLength( pdfData.length );
 						
 						page.getOutputStream().write(pdfData);

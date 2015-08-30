@@ -10,6 +10,7 @@ import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.lesscss.deps.org.apache.commons.io.FileUtils;
 
 import picoded.conv.ConvertJSON;
+import picoded.conv.GUID;
 import picoded.conv.MapValueConv;
 import picoded.fileUtils.PDFGenerator;
 import picoded.webTemplateEngines.FormGenerator.*;
@@ -274,7 +275,8 @@ public class JSMLForm {
 	protected String sanitiseStringForPDF(String inString, String name){
 		String tempString = inString;
 		if(tempString.contains(_contextIdentifier)){
-			tempString = tempString.replace(_contextIdentifier+"/", "");
+			tempString = tempString.replace(_contextIdentifier+"/", _formFolderPath+"/");
+			tempString = tempString.replace(_contextIdentifier, _formFolderPath+"/");
 		}
 		
 		return tempString;
@@ -339,10 +341,6 @@ public class JSMLForm {
 	}
 	
 	public byte[] generatePDF(Map<String, Object> data){
-		return generatePDF(data, true);
-	}
-	
-	public byte[] generatePDF(Map<String, Object> data, boolean isDisplayMode){
 		StringBuilder ret = new StringBuilder();
 		
 		data = sanitiseMap(data);
@@ -357,14 +355,14 @@ public class JSMLForm {
 			throw new RuntimeException("generatePDF() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
 		}
 		
-		String pdfFilePath = _resourceFolderPath + "/generatedPDF.pdf";
+		String pdfFilePath = _resourceFolderPath + "/pdf/"+GUID.base58()+".pdf";
 		
 		String bodyPrefix = readBodyPrefix("PrefixPDF");
 		String bodySuffix = readBodySuffix("SuffixPDF");
 		ret.insert(0,  sanitiseStringForPDF(bodyPrefix, ""));
 		ret.append(bodySuffix);
 		
-		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), _contextPath);
+		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), _formFolderPath );
 		
 		//read the pdf file now
 		File pdfFile = new File(pdfFilePath);

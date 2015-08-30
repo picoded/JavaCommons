@@ -1,5 +1,6 @@
 package picoded.webTemplateEngines.FormGenerator;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -236,7 +237,14 @@ public class FormGenerator {
 	public String generatePDFReadyHTML(String jsonString, Map<String, Object> prefilledJSONData){
 		List<FormNode> formNodes = FormNode.createFromJSONString(this, jsonString, prefilledJSONData);
 		String htmlString = generatePDFReadyHTML(formNodes);
-		// htmlString = "<div class=\"pf_root\">"+htmlString+"</div>";
+		return htmlString;
+	}
+	
+	public String generatePDFReadyHTML(Map<String, Object> jsonData, Map<String, Object> prefilledJSONData){
+		FormNode rootNode = new FormNode(this, jsonData, prefilledJSONData);
+		List<FormNode> formNodes = new ArrayList<FormNode>();
+		formNodes.add(rootNode);
+		String htmlString = generatePDFReadyHTML(formNodes);
 		return htmlString;
 	}
 	

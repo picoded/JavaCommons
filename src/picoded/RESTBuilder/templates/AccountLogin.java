@@ -14,40 +14,160 @@ public class AccountLogin extends BasePage {
 	
 	/////////////////////////////////////////////
 	//
-	// Servlet constructor and setup
+	// Common error messages
 	//
 	/////////////////////////////////////////////
 	
-	/// Default api set prefix
-	protected static String _apiSetPrefix_prefix = "account.";
+	public static final String MISSING_REQUEST_PAGE = "Unexpected Exception: Missing requestPage()";
+	public static final String MISSING_LOGIN_SESSION = "Authentication Error: Missing login session";
+	public static final String MISSING_PERMISSION = "Permission Error: Missing permission for request (generic)";
+	public static final String MISSING_PERMISSION_GROUP = "Permission Error: Missing group admin rights required for request";
 	
-	/// Internal prefix set for the API
-	protected String _apiSetPrefix = _apiSetPrefix_prefix;
+	/////////////////////////////////////////////
+	//
+	// Utility functions
+	//
+	/////////////////////////////////////////////
 	
-	/// The prefix for the api
-	public String apiSetPrefix() {
-		return _apiSetPrefix;
+	///
+	/// Standardised extension of RESTFunction, for login module, as a functional interface
+	/// This is used in conjunction with prepareAuthenticatedREST, and is called only if user is logged in
+	///
+	/// The interface is called with the following parameters, this is isolated to allow more complex Authentication
+	/// overwrites across all interfaces (except login) in the future
+	///
+	/// @params  {RESTRequest}          RESTREquest used
+	/// @params  {Map<String,Object>}   Returned map expected
+	/// @params  {BasePage}             BasePage object implmentation
+	/// @params  {AccountTable}         Account table from basePage
+	/// @params  {AccountObject}        Currently logged in user
+	/// @params  {AccountObject}        Additional account object, based on utility function
+	/// @params  {AccountObject}        Additional account object, based on utility function
+	///
+	/// @returns {Map<String,Object>}
+	///
+	@FunctionalInterface
+	public interface loginREST {
+		public abstract Map<String,Object> apply( //
+			RESTRequest req, Map<String,Object> res, //
+			BasePage basePageObj, AccountTable accountTableObj, //
+			AccountObject currentUser, //
+			AccountObject accObject_a, //
+			AccountObject accObject_b
+		);
 	}
+	
+	///
+	/// Standardised utility function use to authenticate the login request, and extend on for the respective function
+	///
+	/// @params  {RESTRequest}          RESTREquest used
+	/// @params  {Map<String,Object>}   Returned map expected
+	/// @params  {loginREST}            The function to call after authenticating
+	///
+	/// @returns {Map<String,Object>}
+	///
+	public static Map<String,Object> prepareAuthenticatedREST(RESTRequest req, Map<String,Object> res, loginREST call) {
 		
-	/// The prefix for the api
-	public void setApiSetPrefix(String api) {
-		_apiSetPrefix = api;
+		// Loads and check for request page
+		//----------------------------------------
+		if(req.requestPage() == null) {
+			res.put("error", MISSING_REQUEST_PAGE);
+			return res;
+		}
+		
+		BasePage basePageObj = (BasePage)(req.requestPage());
+		AccountTable accountTableObj = basePageObj.accountAuthTable();
+		AccountObject currentUser = accountTableObj.getRequestUser( basePageObj.getHttpServletRequest() );
+		
+		// Checked for valid login
+		//----------------------------------------
+		if( currentUser == null ) {
+			res.put("error", MISSING_LOGIN_SESSION);
+			return res;
+		}
+		
+		// Run actual logic
+		//----------------------------------------
+		return call.apply( req, res, basePageObj, accountTableObj, currentUser, null, null );
 	}
 	
-	/// Flags as JSON request
-	public boolean isJsonRequest() {
-		return true;
-	}
-	
-	/// Does the default setup
-	public void doSetup() throws Exception {
-		super.doSetup();
-		setupRESTBuilder( this.restBuilder(), this.accountAuthTable(), _apiSetPrefix );
-	}
-	
-	/// Process the request, not the authentication layer
-	public boolean doJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
-		return restBuilder().servletCall( _apiSetPrefix, this, outputData );
+	///
+	/// Standardised utility function use to authenticate the login request, and fetch the first wildcard argument as a group object (if possible)
+	/// Also checks for adminstration rights, and can be set to only call the loginREST function if it has group admin rights
+	///
+	/// @params  {RESTRequest}          RESTREquest used
+	/// @params  {Map<String,Object>}   Returned map expected
+	/// @params  {boolean}              Apply the calling function ONLY if its has group adminstration rights (if true)
+	/// @params  {loginREST}            The function to call after authenticating
+	///
+	/// @returns {Map<String,Object>}
+	///
+	public static Map<String,Object> fetchGroupObject_fromFirstWildcard_orCurrentUser(RESTRequest req, Map<String,Object> res, boolean callOnlyForGroupAdmin, loginREST call) {
+		
+		// Only runs function if logged in
+		return prepareAuthenticatedREST( req, res, 
+			(reqObj, resMap, basePageObj, accountTableObj, currentUser, accObj_a, accObj_b) -> {
+				
+				// Default no data
+				//----------------------------------------
+				resMap.put("groupID", null);
+				resMap.put("groupID_exist", false);
+				resMap.put("groupID_valid", false);
+				resMap.put("groupID_admin", false);
+				resMap.put("groupID_names", null);
+				
+				// Group object
+				AccountObject groupObj = null;
+				
+				// Attemptes to load the wildcard group object
+				String[] wildcard = reqObj.wildCardNamespace();
+				if( wildcard != null && wildcard.length >= 1 ) {
+					resMap.put("groupID", wildcard[0] );
+					groupObj = accountTableObj.getFromID( wildcard[0] );
+				} else {
+					groupObj = currentUser; // Defaults group object to current user
+					resMap.put("groupID", currentUser._oid() );
+				}
+				
+				// Terminates if no group object (null)
+				//----------------------------------------
+				if(groupObj == null) {
+					return resMap;
+				}
+				
+				// Check group object
+				//----------------------------------------
+				resMap.put("groupID_exist", true);
+				resMap.put("groupID_valid", groupObj.isGroup() );
+				
+				// Terminates if group object is not a group
+				//----------------------------------------
+				if( groupObj.isGroup() == false ) {
+					return resMap;
+				}
+				
+				// Add in the group names
+				resMap.put("groupID_names", new ArrayList<String>(groupObj.getNames()) );
+				boolean hasGroupadmin = false;
+				
+				// Check the group admin role
+				if( currentUser.isSuperUser() || 
+					 groupObj.getMemberRole( currentUser ).equalsIgnoreCase("admin")
+				) {
+					hasGroupadmin = true;
+					resMap.put("groupID_admin", true);
+				}
+				
+				if( callOnlyForGroupAdmin && !hasGroupadmin ) {
+					resMap.put("error", MISSING_PERMISSION_GROUP );
+					return resMap;
+				}
+				
+				// Applies the call, only after fetching and validating the group object
+				return call.apply( reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, null );
+			}
+		);
+		
 	}
 	
 	/////////////////////////////////////////////
@@ -100,7 +220,7 @@ public class AccountLogin extends BasePage {
 				res.put("isLogin", true);
 			}
 		} else {
-			res.put("error", "Missing requestPage()");
+			res.put("error", MISSING_REQUEST_PAGE);
 		}
 		return res;
 	};
@@ -164,7 +284,7 @@ public class AccountLogin extends BasePage {
 				}
 			}
 		} else {
-			res.put("error", "Missing requestPage()");
+			res.put("error", MISSING_REQUEST_PAGE);
 		}
 		return res;
 	};
@@ -202,7 +322,7 @@ public class AccountLogin extends BasePage {
 			at.logoutAccount( bp.getHttpServletRequest(), bp.getHttpServletResponse() );
 			res.put("logout", "true");
 		} else {
-			res.put("error", "Missing requestPage()");
+			res.put("error", MISSING_REQUEST_PAGE);
 		}
 		return res;
 	};
@@ -270,7 +390,7 @@ public class AccountLogin extends BasePage {
 				}
 			}
 		} else {
-			res.put("error", "Missing requestPage()");
+			res.put("error", MISSING_REQUEST_PAGE);
 		}
 		return res;
 	};
@@ -547,7 +667,7 @@ public class AccountLogin extends BasePage {
 	/// | groupID         | String             | group ID used in the request                                                  |
 	/// | groupID_exist   | boolean            | indicates if the account ID exists in the system                              |
 	/// | groupID_valid   | boolean            | indicates if the account ID exists and is a group                             |
-	/// | groupID_admin   | boolean            | indicates if the session has admin rights                                     |
+	/// | groupID_admin   | boolean            | indicates if the session has admin rights over the group                      |
 	/// | groupID_names   | String[]           | the group various names, if ID is valid                                       |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
@@ -562,13 +682,19 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction members_list_GET = (req, res) -> {
-		return res;
+		// Only runs function if logged in, and valid group object
+		return fetchGroupObject_fromFirstWildcard_orCurrentUser( req, res, false,
+			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				
+				return resMap;
+			}
+		);
 	};
 	
 	/// 
 	/// # members/list/${groupID} (POST) [Requires login, and group admin rights]
 	/// 
-	/// Add/remove members to the group with their respective role. Requires the current user to be either the group itself, 
+	/// Add/remove members to the group with their respective role. Requires the current user to be, 
 	/// admin of group, or super user.
 	///
 	/// ## HTTP Request Parameters
@@ -599,7 +725,13 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
 	public static RESTFunction members_list_POST = (req, res) -> {
-		return res;
+		// Only runs function if logged in, and valid group object, with admin rights
+		return fetchGroupObject_fromFirstWildcard_orCurrentUser( req, res, true,
+			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				
+				return resMap;
+			}
+		);
 	};
 	
 	/////////////////////////////////////////////
@@ -642,7 +774,13 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
 	public static RESTFunction members_meta_GET = (req, res) -> {
-		return res;
+		// Only runs function if logged in, and valid group object
+		return fetchGroupObject_fromFirstWildcard_orCurrentUser( req, res, false,
+			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				
+				return resMap;
+			}
+		);
 	};
 	
 	///
@@ -682,7 +820,13 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
 	public static RESTFunction members_meta_POST = (req, res) -> {
-		return res;
+		// Only runs function if logged in, and valid group object
+		return fetchGroupObject_fromFirstWildcard_orCurrentUser( req, res, false,
+			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				
+				return resMap;
+			}
+		);
 	};
 	
 	//-------------------------------------------------------------------------------------------------------------------------
@@ -697,6 +841,12 @@ public class AccountLogin extends BasePage {
 	// Work in progress (not final) end
 	//
 	//-------------------------------------------------------------------------------------------------------------------------
+	
+	/////////////////////////////////////////////
+	//
+	// RestBuilder template builder
+	//
+	/////////////////////////////////////////////
 	
 	///
 	/// Takes the restbuilder and the account table object and implements its respective default API
@@ -717,6 +867,44 @@ public class AccountLogin extends BasePage {
 	
 	public static RESTBuilder setupRESTBuilder(RESTBuilder rb, AccountTable at) {
 		return setupRESTBuilder(rb, at, _apiSetPrefix_prefix);
+	}
+	
+	/////////////////////////////////////////////
+	//
+	// Servlet constructor and setup
+	//
+	/////////////////////////////////////////////
+	
+	/// Default api set prefix
+	protected static String _apiSetPrefix_prefix = "account.";
+	
+	/// Internal prefix set for the API
+	protected String _apiSetPrefix = _apiSetPrefix_prefix;
+	
+	/// The prefix for the api
+	public String apiSetPrefix() {
+		return _apiSetPrefix;
+	}
+		
+	/// The prefix for the api
+	public void setApiSetPrefix(String api) {
+		_apiSetPrefix = api;
+	}
+	
+	/// Flags as JSON request
+	public boolean isJsonRequest() {
+		return true;
+	}
+	
+	/// Does the default setup
+	public void doSetup() throws Exception {
+		super.doSetup();
+		setupRESTBuilder( this.restBuilder(), this.accountAuthTable(), _apiSetPrefix );
+	}
+	
+	/// Process the request, not the authentication layer
+	public boolean doJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
+		return restBuilder().servletCall( _apiSetPrefix, this, outputData );
 	}
 	
 }

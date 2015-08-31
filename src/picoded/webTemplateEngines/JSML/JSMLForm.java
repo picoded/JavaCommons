@@ -15,6 +15,9 @@ import picoded.conv.MapValueConv;
 import picoded.fileUtils.PDFGenerator;
 import picoded.webTemplateEngines.FormGenerator.*;
 
+import javax.xml.bind.DatatypeConverter;
+import java.io.FileOutputStream;
+
 public class JSMLForm {
 	
 	FormGenerator formGen = null;
@@ -40,6 +43,8 @@ public class JSMLForm {
 	
 	private String _tempFolderName = "";
 	
+	private String _tempGUIDFolderName = "";
+	
 	private String _svgPrefix = "data:image/svg+xml;base64,";
 	
 	//file name suffixes
@@ -57,7 +62,7 @@ public class JSMLForm {
 	
 	public JSMLForm(File formFolder, String uriContext, File tmpFolder){
 		formGen = new FormGenerator();
-		
+		_tempGUIDFolderName = GUID.base58();
 		setFormFolder(formFolder);
 		setResourceFolder(tmpFolder);
 		setContextPath(uriContext);
@@ -65,7 +70,7 @@ public class JSMLForm {
 	
 	public JSMLForm(String formFolderPath, String uriContext, String tmpFolderPath){
 		formGen = new FormGenerator();
-		
+		_tempGUIDFolderName = GUID.base58();
 		setFormFolder(formFolderPath);
 		setResourceFolder(tmpFolderPath);
 		setContextPath(uriContext);
@@ -85,11 +90,13 @@ public class JSMLForm {
 	
 	public void setResourceFolder(String inResourceFolderPath){
 		_resourceFolderPath = inResourceFolderPath;
+		//_resourceFolderPath = _resourceFolderPath + "/" + _tempGUIDFolderName;
 		validateResourceFolder();
 	}
 	
 	public void setResourceFolder(File inResourceFolder){
 		_resourceFolderPath = inResourceFolder.getPath();
+		//_resourceFolderPath = _resourceFolderPath + "/" + _tempGUIDFolderName;
 		validateResourceFolder();
 	}
 	
@@ -98,7 +105,8 @@ public class JSMLForm {
 	}
 	
 	private void validateResourceFolder(){
-		if(_resourceFolderPath.isEmpty()){
+		String tempResourceFolder = _resourceFolderPath + "/" + _tempGUIDFolderName;
+		if(tempResourceFolder.isEmpty()){
 			if(!_formFolderPath.isEmpty()){
 				_resourceFolderPath = _formFolderPath + "/" + _defaultResourceFolderName;
 			}else{
@@ -106,7 +114,7 @@ public class JSMLForm {
 			}
 		}
 		
-		File resourceFile = new File(_resourceFolderPath);
+		File resourceFile = new File(tempResourceFolder);
 		
 		if(!resourceFile.exists()){
 			resourceFile.mkdirs();
@@ -256,16 +264,23 @@ public class JSMLForm {
 			
 			String svgPrefix = "inSig_";
 			String pngPrefix = "outSig_";
-			String svgFilePath = _contextPath + "/"+svgPrefix+name+".svg";
-			String pngFilePath = _contextPath + "/"+pngPrefix+name+".png";
+			String svgFilePath = _resourceFolderPath + "/" + _tempGUIDFolderName + "/" + svgPrefix+name+".svg";
+			String pngFilePath = _resourceFolderPath + "/" + _tempGUIDFolderName + "/" + pngPrefix+name+".png";
 			
 			try{
+				
+				FileOutputStream fos = new FileOutputStream(svgFilePath);
+				fos.write(DatatypeConverter.parseBase64Binary(tempString));
+				fos.flush();
+				fos.close();
+				
 				svgFileToPngFile(svgFilePath, pngFilePath);
 				//after this, pass the signature path back
 			}catch(Exception ex){
-				
+				throw new RuntimeException("sanitiseString() -> " + ex.getMessage());
 			}
 			
+			pngFilePath = _contextPath + "tmp/" + _tempGUIDFolderName + "/" + pngPrefix+name+".png";
 			tempString = pngFilePath;
 		}
 		
@@ -355,7 +370,7 @@ public class JSMLForm {
 			throw new RuntimeException("generatePDF() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
 		}
 		
-		String pdfFilePath = _resourceFolderPath + "/pdf/"+GUID.base58()+".pdf";
+		String pdfFilePath = _resourceFolderPath + "/pdf/"+".pdf";
 		
 		String bodyPrefix = readBodyPrefix("PrefixPDF");
 		String bodySuffix = readBodySuffix("SuffixPDF");

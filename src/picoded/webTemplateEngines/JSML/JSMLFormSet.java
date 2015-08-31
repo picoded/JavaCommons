@@ -300,11 +300,21 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 			String reqStr = page.requestWildcardUri();
 			
 			// Security measure?
-			if( reqStr != null && reqStr.contains("/tmp") ) {
+			// if( reqStr != null && reqStr.contains("/tmp") ) {
+			// 	// 404 error if file not found
+			// 	page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
+			// 	return;
+			// }
+			
+			if( reqStr == null || reqStr.isEmpty() ) {
 				// 404 error if file not found
 				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
 				return;
 			}
+			
+			
+			
+			
 			
 			// Fallsback into File Servlet
 			resourseFileServlet().processRequest( //

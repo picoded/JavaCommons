@@ -433,7 +433,7 @@ public class FormInputTemplates {
 		}
 		
 		String fieldName = node.getFieldName();
-		ret.append("<div class=\"pfi_signatureDisplay\" id=\""+fieldName+"\" style=\"height:135px;\">");
+		ret.append("<div class=\"pfi_signatureDisplay\" name=\""+fieldName+"\" id=\""+fieldName+"\" style=\"height:135px;\">");
 		
 		if(sigValue != null && !sigValue.isEmpty() && displayMode){
 			ret.append(sigImgString);

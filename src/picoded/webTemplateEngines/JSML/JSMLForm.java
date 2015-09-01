@@ -281,7 +281,8 @@ public class JSMLForm {
 			}
 			
 			pngFilePath = _contextPath + "tmp/" + _tempGUIDFolderName + "/" + pngPrefix+name+".png";
-			tempString = pngFilePath;
+			// tempString = pngFilePath;
+			tempString = pngPrefix+name+".png";
 		}
 		
 		return tempString;
@@ -370,14 +371,14 @@ public class JSMLForm {
 			throw new RuntimeException("generatePDF() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
 		}
 		
-		String pdfFilePath = _resourceFolderPath + "/pdf/"+".pdf";
+		String pdfFilePath = _resourceFolderPath + "/pdf/"+"generatedPDF.pdf";
 		
 		String bodyPrefix = readBodyPrefix("PrefixPDF");
 		String bodySuffix = readBodySuffix("SuffixPDF");
 		ret.insert(0,  sanitiseStringForPDF(bodyPrefix, ""));
 		ret.append(bodySuffix);
 		
-		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), _formFolderPath );
+		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), "file:///" + _formFolderPath + "/tmp/" + _tempGUIDFolderName + "/" );
 		
 		//read the pdf file now
 		File pdfFile = new File(pdfFilePath);
@@ -389,5 +390,28 @@ public class JSMLForm {
 		}
 		
 		return pdfData;
+	}
+	
+	public String[] getPDFLinkTest(Map<String, Object> data){
+		String[] values = new String[5];
+		
+		data = sanitiseMap(data);
+		String pdfFilePath = _resourceFolderPath + "/pdf/"+"generatedPDF.pdf";
+		
+		values[0] = "PDFGenerator context folder given is -> " + _formFolderPath + "/tmp/" + _tempGUIDFolderName + "/";
+		values[1] = "PDFFilePath given to output to is -> " + pdfFilePath;
+		
+		String finalSigA = (String)data.get("finalsig");
+		String finalSigB = (String)data.get("finalsigb");
+		
+		values[2] = "Final Sig A value is -> " + finalSigA;
+		values[3] = "Final Sig B value is -> " + finalSigB;
+		
+		StringBuilder ret = new StringBuilder();
+		ret = formGen.build(_formDefinitionString, data, true);
+		
+		values[4] = "Final html output is -> " + ret.toString();
+		
+		return values;
 	}
 }

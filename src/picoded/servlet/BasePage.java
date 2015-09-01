@@ -143,6 +143,10 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		grpObject.saveDelta();
 	}
 	
+	public String getSuperUserGroupName() {
+		return JConfig().getString("sys.account.superUsers.groupName", "SuperUsers");
+	}
+	
 	/// The primary accountAuthTable used for user authentication
 	public AccountTable accountAuthTable() {
 		if( _accountAuthObj != null ) {
@@ -160,6 +164,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		// httpUserAuthObj.isSecureOnly = cStack.getBoolean( "userAuthCookie.isSecureOnly", httpUserAuthObj.isSecureOnly);
 		
 		_accountAuthObj = JStack().getAccountTable( _JStackAppPrefix + _accountTableSuffix );
+		_accountAuthObj.setSuperUserGroupName( getSuperUserGroupName() );
 		
 		return _accountAuthObj;
 	}

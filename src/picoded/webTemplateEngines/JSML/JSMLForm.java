@@ -31,19 +31,31 @@ public class JSMLForm {
 	
 	private String _formDefinitionString = "";
 	
+	////////////////////////////////////////////////
+	//
+	// File path variables
+	//
+	////////////////////////////////////////////////
+	
+	//Absolute path to form set root
 	private String _formFolderPath = "";
 	
-	private String _resourceFolderPath = "";
-	
+	//context URI path - use this to replace instances of ${FormContextPath}
 	private String _contextPath = "";
 	
+	//Absolute path to tmp folder where i can generate my GUID folder
+	private String _tempFolderPath = ""; //append GUID to this
+	
+	//generated GUID
+	private String _generatedGUID = "";
+	
+	
+	////////////////////////////////////////////////
+	//
+	// Identifiers
+	//
+	////////////////////////////////////////////////
 	private String _contextIdentifier = "${FormContextPath}";
-	
-	private String _defaultResourceFolderName = "resources";
-	
-	private String _tempFolderName = "";
-	
-	private String _tempGUIDFolderName = "";
 	
 	private String _svgPrefix = "data:image/svg+xml;base64,";
 	
@@ -62,17 +74,19 @@ public class JSMLForm {
 	
 	public JSMLForm(File formFolder, String uriContext, File tmpFolder){
 		formGen = new FormGenerator();
-		_tempGUIDFolderName = GUID.base58();
+		_generatedGUID = GUID.base58();
+		
 		setFormFolder(formFolder);
-		setResourceFolder(tmpFolder);
+		setTempFolder(tmpFolder);
 		setContextPath(uriContext);
 	}
 	
 	public JSMLForm(String formFolderPath, String uriContext, String tmpFolderPath){
 		formGen = new FormGenerator();
-		_tempGUIDFolderName = GUID.base58();
+		_generatedGUID = GUID.base58();
+		
 		setFormFolder(formFolderPath);
-		setResourceFolder(tmpFolderPath);
+		setTempFolder(tmpFolderPath);
 		setContextPath(uriContext);
 	}
 	
@@ -88,41 +102,45 @@ public class JSMLForm {
 		_formFolderPath = inFormFolder.getPath();
 	}
 	
-	public void setResourceFolder(String inResourceFolderPath){
-		_resourceFolderPath = inResourceFolderPath;
-		//_resourceFolderPath = _resourceFolderPath + "/" + _tempGUIDFolderName;
-		validateResourceFolder();
+	public void setTempFolder(String inResourceFolderPath){
+		if(inResourceFolderPath == null || inResourceFolderPath.isEmpty()){
+			_tempFolderPath = "tmp";
+		}else{
+			_tempFolderPath = inResourceFolderPath;
+		}
+		validateTempFolder();
 	}
 	
-	public void setResourceFolder(File inResourceFolder){
-		_resourceFolderPath = inResourceFolder.getPath();
-		//_resourceFolderPath = _resourceFolderPath + "/" + _tempGUIDFolderName;
-		validateResourceFolder();
+	public void setTempFolder(File inResourceFolder){
+		if(inResourceFolder == null){
+			setTempFolder("tmp");
+		}else{
+			setTempFolder(inResourceFolder.getPath());
+		}
 	}
 	
 	public void setContextPath(String inContextPath){
 		_contextPath = inContextPath;
 	}
 	
-	private void validateResourceFolder(){
-		String tempResourceFolder = _resourceFolderPath + "/" + _tempGUIDFolderName;
-		if(tempResourceFolder.isEmpty()){
-			if(!_formFolderPath.isEmpty()){
-				_resourceFolderPath = _formFolderPath + "/" + _defaultResourceFolderName;
-			}else{
-				throw new RuntimeException("validateResourceFolder() -> unable to validate resourcefolder without valid resource folder name");
-			}
-		}
-		
-		File resourceFile = new File(tempResourceFolder);
-		
-		if(!resourceFile.exists()){
-			resourceFile.mkdirs();
+	public void setContextIdentifier(String newIdentifier){
+		_contextIdentifier = newIdentifier;
+	}
+	
+	private void validateTempFolder(){
+		String tempFolder = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID;
+		File tempFile = new File(tempFolder);
+		if(!tempFile.exists()){
+			tempFile.mkdirs();
 		}
 	}
 	
 	public void getDefinition(){
-		File declareFile = new File(_formFolderPath + "/formDeclare.json");
+		getDefinition("formDeclare.json");
+	}
+	
+	public void getDefinition(String pathToFormDeclare){
+		File declareFile = new File(_formFolderPath + "/" + pathToFormDeclare);
 		
 		if(declareFile.exists()){
 			try{
@@ -135,34 +153,29 @@ public class JSMLForm {
 	}
 	
 	public void setDefinition(String inFormDefinition){
-		_formDefinitionString = sanitiseString(inFormDefinition, "");
+		_formDefinitionString = sanitiseString(inFormDefinition, "", false);
 		
 	}
 	
 	public void setDefinition(Map<String, Object> inFormDefinition){
-		_formDefinitionMap = sanitiseMap(inFormDefinition);
+		_formDefinitionMap = sanitiseMap(inFormDefinition, false);
 	}
 	
 	public Map<String, Object> getBlankData(){
-		File blankDataFile = new File(_formFolderPath + "/blankData.json");
-		String blankDataString = "";
-		try{
-			blankDataString = FileUtils.readFileToString(blankDataFile);
-		}catch(Exception e){
-			throw new RuntimeException("getBlankData() ->" + e.getMessage());
-		}
-		
-		Map<String, Object> ret =  ConvertJSON.toMap(blankDataString);
-		return ret;
+		return getDataFile("blankData.json");
 	}
 	
 	public Map<String, Object> getDummyData(){
-		File dummyDataFile = new File(_formFolderPath + "/dummyData.json");
+		return getDataFile("dummyData.json");
+	}
+	
+	public Map<String, Object> getDataFile(String pathToDataFile){
+		File dummyDataFile = new File(_formFolderPath + "/" + pathToDataFile);
 		String dummyDataString = "";
 		try{
 			dummyDataString = FileUtils.readFileToString(dummyDataFile);
 		}catch(Exception e){
-			throw new RuntimeException("getDummyData() ->" + e.getMessage());
+			throw new RuntimeException("getDataFile() ->" + e.getMessage());
 		}
 		
 		Map<String, Object> ret =  ConvertJSON.toMap(dummyDataString);
@@ -213,7 +226,7 @@ public class JSMLForm {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected Map<String, Object> sanitiseMap(Map<String, Object> inMap){
+	protected Map<String, Object> sanitiseMap(Map<String, Object> inMap, boolean pdfMode){
 		if(inMap == null){
 			return inMap;
 		}
@@ -222,11 +235,11 @@ public class JSMLForm {
 			Object value = inMap.get(key);
 			
 			if(value instanceof String){
-				tempMap.replace(key, sanitiseString((String)value, key));
+				tempMap.replace(key, sanitiseString((String)value, key, pdfMode));
 			}else if(value instanceof List){
-				tempMap.replace(key,  sanitiseList((List<Object>)value));
+				tempMap.replace(key,  sanitiseList((List<Object>)value, pdfMode));
 			}else if(value instanceof Map){
-				tempMap.replace(key, sanitiseMap((Map<String, Object>)value));
+				tempMap.replace(key, sanitiseMap((Map<String, Object>)value, pdfMode));
 			}
 		}
 		
@@ -234,55 +247,56 @@ public class JSMLForm {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected List<Object> sanitiseList(List<Object> inList){
+	protected List<Object> sanitiseList(List<Object> inList, boolean pdfMode){
 		List<Object> tempList = new ArrayList<Object>(inList);
 		
 		for(int i = 0; i < inList.size(); ++i){
 			if(inList.get(i) instanceof String){
 				tempList.remove(i);
-				tempList.add(i, sanitiseString((String)inList.get(i), ""));
+				tempList.add(i, sanitiseString((String)inList.get(i), "", pdfMode));
 			}else if(inList.get(i) instanceof List){
 				tempList.remove(i);
-				tempList.add(i, sanitiseList((List<Object>)inList.get(i)));
+				tempList.add(i, sanitiseList((List<Object>)inList.get(i), pdfMode));
 			}else if(inList.get(i) instanceof Map){
 				tempList.remove(i);
-				tempList.add(i, sanitiseMap((Map<String, Object>)inList.get(i)));
+				tempList.add(i, sanitiseMap((Map<String, Object>)inList.get(i), pdfMode));
 			}
 		}
 		
 		return tempList;
 	}
 	
-	protected String sanitiseString(String inString, String name){
+	protected String sanitiseString(String inString, String name, boolean pdfMode){
 		String tempString = inString;
 		if(tempString.contains(_contextIdentifier)){
 			tempString = tempString.replace(_contextIdentifier, _contextPath);
+			tempString = tempString.replace(_contextIdentifier+"/", _contextPath);
 		}
 		
 		if(tempString.contains(_svgPrefix)){
 			tempString = tempString.substring(_svgPrefix.length(), tempString.length());
 			
-			String svgPrefix = "inSig_";
-			String pngPrefix = "outSig_";
-			String svgFilePath = _resourceFolderPath + "/" + _tempGUIDFolderName + "/" + svgPrefix+name+".svg";
-			String pngFilePath = _resourceFolderPath + "/" + _tempGUIDFolderName + "/" + pngPrefix+name+".png";
+			String svgFileName = "inSig_" + name + ".svg";
+			String pngFileName = "outSig_" + name + ".png";
+			String svgFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/" + svgFileName;
+			String pngFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/" + pngFileName;
 			
 			try{
-				
 				FileOutputStream fos = new FileOutputStream(svgFilePath);
 				fos.write(DatatypeConverter.parseBase64Binary(tempString));
 				fos.flush();
 				fos.close();
 				
 				svgFileToPngFile(svgFilePath, pngFilePath);
-				//after this, pass the signature path back
 			}catch(Exception ex){
 				throw new RuntimeException("sanitiseString() -> " + ex.getMessage());
 			}
 			
-			pngFilePath = _contextPath + "tmp/" + _tempGUIDFolderName + "/" + pngPrefix+name+".png";
-			// tempString = pngFilePath;
-			tempString = pngPrefix+name+".png";
+			if(pdfMode){
+				tempString = pngFileName;
+			}else{
+				tempString = _contextPath + _tempFolderPath + "/" + _generatedGUID + "/" + pngFileName;
+			}
 		}
 		
 		return tempString;
@@ -291,8 +305,8 @@ public class JSMLForm {
 	protected String sanitiseStringForPDF(String inString, String name){
 		String tempString = inString;
 		if(tempString.contains(_contextIdentifier)){
-			tempString = tempString.replace(_contextIdentifier+"/", _formFolderPath+"/");
-			tempString = tempString.replace(_contextIdentifier, _formFolderPath+"/");
+			tempString = tempString.replace(_contextIdentifier, "file:///" + _formFolderPath+"/");
+			tempString = tempString.replace(_contextIdentifier+"/", "file:///" + _formFolderPath+"/");
 		}
 		
 		return tempString;
@@ -327,7 +341,7 @@ public class JSMLForm {
 		StringBuilder ret = new StringBuilder();
 		
 		try{
-			data = sanitiseMap(data);
+			data = sanitiseMap(data, false);
 		}catch(Exception e){
 			throw new RuntimeException(e.getMessage());
 		}
@@ -350,16 +364,20 @@ public class JSMLForm {
 		}else{
 			bodySuffix = readBodySuffix("SuffixDisplay");
 		}
-		ret.insert(0, sanitiseString(bodyPrefix, ""));
-		ret.append(sanitiseString(bodySuffix, ""));
+		ret.insert(0, sanitiseString(bodyPrefix, "", false));
+		ret.append(sanitiseString(bodySuffix, "", false));
 		
 		return ret;
 	}
 	
 	public byte[] generatePDF(Map<String, Object> data){
+		return generatePDF(data, "file:///" + _formFolderPath + "/" + _tempFolderPath);
+	}
+	
+	public byte[] generatePDF(Map<String, Object> data, String pdfGeneratorContextFolder){
 		StringBuilder ret = new StringBuilder();
 		
-		data = sanitiseMap(data);
+		data = sanitiseMap(data, true);
 		
 		if(!_formDefinitionString.isEmpty()){
 			ret = formGen.build(_formDefinitionString, data, true);
@@ -371,14 +389,16 @@ public class JSMLForm {
 			throw new RuntimeException("generatePDF() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
 		}
 		
-		String pdfFilePath = _resourceFolderPath + "/pdf/"+"generatedPDF.pdf";
+		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/pdf/"+"generatedPDF.pdf";
 		
 		String bodyPrefix = readBodyPrefix("PrefixPDF");
 		String bodySuffix = readBodySuffix("SuffixPDF");
 		ret.insert(0,  sanitiseStringForPDF(bodyPrefix, ""));
 		ret.append(bodySuffix);
 		
-		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), "file:///" + _formFolderPath + "/tmp/" + _tempGUIDFolderName + "/" );
+		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), pdfGeneratorContextFolder + "/" + _generatedGUID + "/" );
+//		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), pdfGeneratorContextFolder +"/" );
+		
 		
 		//read the pdf file now
 		File pdfFile = new File(pdfFilePath);
@@ -392,13 +412,14 @@ public class JSMLForm {
 		return pdfData;
 	}
 	
+	//just for testing
 	public String[] getPDFLinkTest(Map<String, Object> data){
 		String[] values = new String[5];
 		
-		data = sanitiseMap(data);
-		String pdfFilePath = _resourceFolderPath + "/pdf/"+"generatedPDF.pdf";
+		data = sanitiseMap(data, true);
+		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/pdf/generatedPDF.pdf";
 		
-		values[0] = "PDFGenerator context folder given is -> " + _formFolderPath + "/tmp/" + _tempGUIDFolderName + "/";
+		values[0] = "PDFGenerator context folder given is -> " + _formFolderPath + "/tmp/" + _generatedGUID + "/";
 		values[1] = "PDFFilePath given to output to is -> " + pdfFilePath;
 		
 		String finalSigA = (String)data.get("finalsig");

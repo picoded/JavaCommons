@@ -451,7 +451,7 @@ public class FormWrapperTemplates {
 		defaultTemplates.put("verticalTable", FormWrapperTemplates.verticalTableWrapper);
 		defaultTemplates.put("image", FormWrapperTemplates.imageWrapper);
 		defaultTemplates.put("signature", FormWrapperTemplates.signatureWrapper);
-		defaultTemplates.put("date",  FormWrapperTemplates.datePickerWrapper);
+		defaultTemplates.put("date",  FormWrapperTemplates.divWrapper);
 		
 		defaultTemplates.put("jmte", FormWrapperTemplates.jmteWrapper);
 		

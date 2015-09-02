@@ -71,7 +71,7 @@ public class DisplayWrapperTemplates {
 		defaultTemplates.put("verticalTable", DisplayWrapperTemplates.verticalTableWrapper);
 		defaultTemplates.put("image", DisplayWrapperTemplates.imageWrapper);
 		defaultTemplates.put("signature", DisplayWrapperTemplates.signatureWrapper);
-		defaultTemplates.put("date", DisplayWrapperTemplates.datePickerWrapper);
+		defaultTemplates.put("date", DisplayWrapperTemplates.divWrapper);
 		
 		defaultTemplates.put("jmte", DisplayWrapperTemplates.jmteWrapper);
 		

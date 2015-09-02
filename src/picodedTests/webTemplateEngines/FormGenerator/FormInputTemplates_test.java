@@ -20,6 +20,7 @@ import java.util.*;
 public class FormInputTemplates_test {
 	
 	String rootFolder = "./test-files/test-specific/htmlGenerator/FormInputTemplates_test";
+	String generatedFilesFolder = rootFolder + "/testGenerated";
 	
 	private String getFinalTemplatedJsonString(String jsonKeyName){
 		File jsonFile = new File(rootFolder + "/" +jsonKeyName+".js");
@@ -35,45 +36,24 @@ public class FormInputTemplates_test {
 	}
 	
 	private String getTemplatedJsonStringWithData(String jsonKeyName, boolean displayMode){
+		return getTemplatedJSONString(jsonKeyName, displayMode, true);
+	}
+	
+	private String getTemplatedJSONString(String jsonKeyName, boolean isDisplayMode, boolean loadDummyData){
 		File jsonFile = new File(rootFolder + "/"+jsonKeyName+".js");
 		File jsonDataFile = new File(rootFolder + "/" +jsonKeyName+"Data.js");
 		try{
 			String jsonFileString = FileUtils.readFileToString(jsonFile);
-			//Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
-			
 			FormGenerator formGen = new FormGenerator();
 			
-			if(jsonDataFile.exists()){
+			if(loadDummyData && jsonDataFile.exists()){
 				String jsonDataString = FileUtils.readFileToString(jsonDataFile);
 				Map<String, Object> jsonDataMap = ConvertJSON.toMap(jsonDataString);
-				return formGen.build(jsonFileString, jsonDataMap, displayMode).toString();
+				return formGen.build(jsonFileString, jsonDataMap, isDisplayMode).toString();
 			}
 			else{
-				return formGen.build(jsonFileString, null, displayMode).toString();
+				return formGen.build(jsonFileString, null, isDisplayMode).toString();
 			}
-			
-//			FormNode node = new FormNode(formGen, jsonMap, jsonDataMap);
-//			return node.inputHtml(false).toString();
-		}catch(Exception ex){
-			return "";
-		}
-	}
-	
-	private String fullChildrenHtml(String jsonKeyName, boolean displayMode){
-		File jsonFile = new File("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/"+jsonKeyName+".js");
-		File jsonDataFile = new File("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/"+jsonKeyName+"Data.js");
-		try{
-			String jsonFileString = FileUtils.readFileToString(jsonFile);
-			Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
-			
-			String jsonDataString = FileUtils.readFileToString(jsonDataFile);
-			Map<String, Object> jsonDataMap = ConvertJSON.toMap(jsonDataString);
-			
-			FormGenerator formGen = new FormGenerator();
-//			return formGen.build(jsonMap, jsonDataMap, displayMode).toString();
-			FormNode node = new FormNode(formGen, jsonMap, jsonDataMap);
-			return node.fullChildrenHtml(false, "").toString();
-//			return node.inputHtml(false).toString();
 		}catch(Exception ex){
 			return "";
 		}
@@ -94,20 +74,17 @@ public class FormInputTemplates_test {
 	}
 	
 	private String getTitleHtmlString(){
-		return "<h3 class='pfi_header pfi_input'>Hello there</h3>";
+		return "<h3 class></h3>";
 	}
 	
 	private String getDropdownHtmlString(){
-		return "<select class='pfi_select pfi_input' name='dropdownfield'>"+
-					"<option value=\"option1\">Option 1</option>"+
-					"<option value=\"option2\">Option 2</option>"+
-					"<option value=\"option3\">Option 3</option>"+
-					"<option value=\"option4\">Option 4</option>"+
+		return "<select class name>"+
+					"<option value></option>"+
 				"</select>";
 	}
 	
 	private String getTextHtmlString(){
-		return "<input type='text' class='pfi_inputText pfi_input' value=''></input>";
+		return "<input type class value></input>";
 	}
 	
 	private String getDropdownWithOthersHtmlString(){
@@ -122,49 +99,51 @@ public class FormInputTemplates_test {
 						"}"+
 					"};"+
 				"</script>"+
-				"<select class=\'pf_select\' onchange=\'OnChangeDropDown()\' id=\'dropdownfield\'>"+
-					"<option value=\"option1\">Option 1</option>"+
-					"<option value=\"option2\">Option 2</option>"+
-					"<option value=\"option3\">Option 3</option>"+
-					"<option value=\"option4\">Option 4</option>"+
+				"<select class onchange id>"+
+					"<option value></option>"+
 				"</select>"+
-				"<input class=\'pf_inputText\' style=\'display:none\' type=\'text\' id=\'dropdownTextField\'>";
+				"<input class style type id>";
 	}
 	
 	private String getCheckboxHtmlString(){
-		return "<input type=\'checkbox\' value=\'option1\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\'>Option 1</input>"+
-				"<input type=\'checkbox\' value=\'option2\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\'>Option 2</input>"+
-				"<input type=\'checkbox\' value=\'option3\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\'>Option 3</input>"+
-				"<input type=\'checkbox\' value=\'option4\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\'>Option 4</input>";
+		return "<input type value name class></input>";
 	}
 	
 	private String getCheckboxWithDataHtmlString(){
-		return "<input type=\'checkbox\' value=\'option1\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\' checked=\'checked\'>Option 1</input>"+
-				"<input type=\'checkbox\' value=\'option2\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\'>Option 2</input>"+
-				"<input type=\'checkbox\' value=\'option3\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\' checked=\'checked\'>Option 3</input>"+
-				"<input type=\'checkbox\' value=\'option4\' name=\'checkboxa\' class=\'pfi_inputCheckbox pfi_input\'>Option 4</input>";
+		return "<input type value name class></input>";
 	}
 	
 	private String getTableHtmlString(){
 		return "<table>"+
-					"<thead>Clients</thead>"+
+					"<thead></thead>"+
 					"<tr>"+
-						"<th>Name</th>"+
-						"<th>NRIC</th>"+
+						"<th></th>"+
+						"<th></th>"+
 					"</tr>"+
 					"<tr>"+
-						"<td>A</td>"+
-						"<td>X1</td>"+
-					"</tr>"+
-					"<tr>"+
-						"<td>B</td>"+
-						"<td>X2</td>"+
-					"</tr>"+
-					"<tr>"+
-						"<td>C</td>"+
-						"<td>X3</td>"+
+						"<td></td>"+
+						"<td></td>"+
 					"</tr>"+
 				"</table>";
+	}
+	
+	private boolean generateHTMLFile(String fileName, String output){
+		if(output == null || output.isEmpty()){
+			return false;
+		}
+		
+		File outputFile = new File(generatedFilesFolder + "/" + fileName + ".html");
+		
+		try{
+			FileWriter fw = new FileWriter(outputFile);
+			fw.write(output);
+			fw.flush();
+			fw.close();
+			
+			return true;
+		}catch(Exception e){
+			return false;
+		}
 	}
 	
 //	@Test
@@ -176,6 +155,8 @@ public class FormInputTemplates_test {
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);
+		
+		assertTrue(generateHTMLFile("title", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -187,6 +168,8 @@ public class FormInputTemplates_test {
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);
+		
+		assertTrue(generateHTMLFile("dropdown", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -198,6 +181,8 @@ public class FormInputTemplates_test {
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);
+		
+		assertTrue(generateHTMLFile("text", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -209,6 +194,8 @@ public class FormInputTemplates_test {
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);
+		
+		assertTrue(generateHTMLFile("textWithData", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -220,6 +207,8 @@ public class FormInputTemplates_test {
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 //		assertTrue(compliancyCheck);
+		
+		assertTrue(generateHTMLFile("dropdownWithOthers", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -231,15 +220,19 @@ public class FormInputTemplates_test {
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 //		assertTrue(compliancyCheck);
+		
+		assertTrue(generateHTMLFile("dropdownWithOthersDisplay", jsonTemplatedOutput));
 	}
 	
 //	@Test
 	public void dropdownWithOthersPDFTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("dropdownWithOthers", true);
-		
-		PDFGenerator.generatePDFfromRawHTML("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/dropdownWithOthersPDF.pdf", jsonTemplatedOutput);
+		String pdfPath = generatedFilesFolder + "/dropdownWithOthersPDF.pdf";
+		PDFGenerator.generatePDFfromRawHTML(pdfPath, jsonTemplatedOutput);
 
 		assertNotNull(jsonTemplatedOutput);
+		
+		assertTrue(generateHTMLFile("dropdownWithOthersPDF", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -251,6 +244,8 @@ public class FormInputTemplates_test {
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);
+		
+		assertTrue(generateHTMLFile("checkboxList", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -262,6 +257,8 @@ public class FormInputTemplates_test {
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);
+		
+		assertTrue(generateHTMLFile("checkboxMap", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -273,15 +270,19 @@ public class FormInputTemplates_test {
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 //		assertTrue(compliancyCheck);
+		
+		assertTrue(generateHTMLFile("checkboxData", jsonTemplatedOutput));
 	}
 	
 //	@Test
 	public void checkBoxPDFTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("checkbox", true);
-		
-		PDFGenerator.generatePDFfromRawHTML("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/checkboxPDF.pdf", jsonTemplatedOutput);
+		String pdfPath = generatedFilesFolder + "/checkboxPDF.pdf";
+		PDFGenerator.generatePDFfromRawHTML(pdfPath, jsonTemplatedOutput);
 
 		assertNotNull(jsonTemplatedOutput);
+		
+		assertTrue(generateHTMLFile("checkboxPDFOutput", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -296,6 +297,8 @@ public class FormInputTemplates_test {
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);
+		
+		assertTrue(generateHTMLFile("table", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -307,15 +310,19 @@ public class FormInputTemplates_test {
 		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);
+		
+		assertTrue(generateHTMLFile("tableDisplay", jsonTemplatedOutput));
 	}
 	
 //	@Test
 	public void tablePDFTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("table", true);
-		
-		PDFGenerator.generatePDFfromRawHTML("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/tablePDF.pdf", jsonTemplatedOutput);
+		String pdfPath = generatedFilesFolder + "/tablePDF.pdf";
+		PDFGenerator.generatePDFfromRawHTML(pdfPath, jsonTemplatedOutput);
 
 		assertNotNull(jsonTemplatedOutput);
+		
+		assertTrue(generateHTMLFile("tablePDFOutput", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -327,6 +334,8 @@ public class FormInputTemplates_test {
 		
 //		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 //		assertTrue(compliancyCheck);
+		
+		assertTrue(generateHTMLFile("verticalTable", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -338,21 +347,27 @@ public class FormInputTemplates_test {
 		
 //		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 //		assertTrue(compliancyCheck);
+		
+		assertTrue(generateHTMLFile("verticalTableDisplay", jsonTemplatedOutput));
 	}
 	
 	// @Test
 	public void verticalTablePDFTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("verticalTable", true);
-		
-		PDFGenerator.generatePDFfromRawHTML("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/verticalTablePDF.pdf", jsonTemplatedOutput);
+		String pdfPath = generatedFilesFolder + "/verticalTablePDF.pdf";
+		PDFGenerator.generatePDFfromRawHTML(pdfPath, jsonTemplatedOutput);
 
 		assertNotNull(jsonTemplatedOutput);
+		
+		assertTrue(generateHTMLFile("verticalTablePDFOutput", jsonTemplatedOutput));
 	}
 //	
 //	@Test
 	public void imageTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("image", false);
 		assertNotNull(jsonTemplatedOutput);
+		
+		assertTrue(generateHTMLFile("image", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -360,12 +375,12 @@ public class FormInputTemplates_test {
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("imagePDF", false);
 		
 		jsonTemplatedOutput = "<html><head></head><body>"+jsonTemplatedOutput+"</body></html>";
-		
-		String pdfPath = "./test-files/test-specific/htmlGenerator/generatedFiles/newImgPDF.pdf";
-//		String htmlPath = "./test-files/test-specific/htmlGenerator/FormInputTemplates_test/imgHTML.html";
+		String pdfPath = generatedFilesFolder + "/imagePDF.pdf";
 		String context = "file:///C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/FormInputTemplates_test/res/images/";
 		
 		PDFGenerator.generatePDFfromRawHTML(pdfPath, jsonTemplatedOutput, context);
+		
+		assertTrue(generateHTMLFile("imagePDFOutput", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -374,20 +389,14 @@ public class FormInputTemplates_test {
 		assertNotNull(jsonTemplatedOutput);
 		
 		File prefix = new File("./test-files/test-specific/htmlGenerator/signature/prefix.html");
-		
-		
-		File generatedHtml = new File("./test-files/test-specific/htmlGenerator/generatedFiles/sigHTML.html");
+		String prefixString = "";
 		try{
-			String prefixString = FileUtils.readFileToString(prefix);
-			
-			FileWriter fw = new FileWriter(generatedHtml);
-			fw.write(prefixString);
-			fw.write(jsonTemplatedOutput);
-			fw.flush();
-			fw.close();
+			prefixString = FileUtils.readFileToString(prefix);
 		}catch(Exception e){
 			
 		}
+		jsonTemplatedOutput = prefixString + jsonTemplatedOutput;
+		assertTrue(generateHTMLFile("signature", jsonTemplatedOutput));
 	}
 	
 //	@Test
@@ -395,46 +404,23 @@ public class FormInputTemplates_test {
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("signature", false);
 		assertNotNull(jsonTemplatedOutput);
 		
+		assertTrue(generateHTMLFile("signatureDisplay", jsonTemplatedOutput));
 	}
 	
-	@Test
+//	@Test
 	public void datePickerTest(){
-		String jsonTemplatedOutput = getTemplatedJsonStringWithData("date", false);
+		String jsonTemplatedOutput = getTemplatedJSONString("date", false, false);
 
 		assertNotNull(jsonTemplatedOutput);
-	}
-	
-	/// Prototype lenientStringLookup
-//	@Test
-	public int lenientStringLookup(String source, String lookup) {
-		int lowestOffset = -1;
+		assertTrue(generateHTMLFile("date", jsonTemplatedOutput));
 		
-		String singleTag = "";
-		String cleanedTag = "";
-		if(lookup.startsWith("<")){
-			singleTag = lookup.substring(lookup.indexOf('<'), lookup.indexOf('>') + 1);
-			cleanedTag = singleTag.substring(1,  singleTag.length() - 1);
-		}else{
-			char nextCharToBreak = lookup.indexOf('<') < lookup.indexOf('>') ? '<' : '>';
-			singleTag = lookup.substring(0, lookup.indexOf(nextCharToBreak));
-		}
-		lookup = lookup.substring(singleTag.length(), lookup.length());
+		jsonTemplatedOutput = getTemplatedJSONString("date", false, true);
+		assertNotNull(jsonTemplatedOutput);
+		assertTrue(generateHTMLFile("dateWithData", jsonTemplatedOutput));
 		
-		String[] lookupArray = cleanedTag.split(" ");
-		for(int a=0; a<lookupArray.length; ++a) {
-			if(!source.contains(lookupArray[a])){
-				return -1;
-			}else{
-				int index = source.indexOf(lookupArray[a]);
-				lowestOffset = index > lowestOffset ? index + lookupArray[a].length() : lowestOffset;
-			}
-		}
-
-		if(lookup.length() > 0){
-			return lenientStringLookup(source, lookup);
-		}else{
-			return lowestOffset;
-		}
+		jsonTemplatedOutput = getTemplatedJSONString("date", true, true);
+		assertNotNull(jsonTemplatedOutput);
+		assertTrue(generateHTMLFile("dateDisplay", jsonTemplatedOutput));
 	}
 	
 	public boolean htmlTagCompliancyCheck(String source, String lookup){

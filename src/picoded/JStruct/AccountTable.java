@@ -45,10 +45,7 @@ import com.hazelcast.core.IMap;
 /// Any refences to the persona game, is completely coincidental !
 /// (PS: old joke, the original name for this class was PersonaTable)
 ///
-/// ──────▄▀▄─────▄▀▄
-/// ─────▄█░░▀▀▀▀▀░░█▄
-/// ─▄▄──█░░░░░░░░░░░█──▄▄
-/// █▄▄█─█░░▀░░┬░░▀░░█─█▄▄█
+/// 
 ///
 /// @TODO : Group handling layer
 ///
@@ -560,6 +557,29 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 			throw new RuntimeException("Membership role does not exists: "+role);
 		}
 		return role;
+	}
+	
+	//
+	// Super Users group managment
+	//--------------------------------------------------------------------------
+	
+	protected String _superUserGroup = "SuperUsers";
+	
+	/// Gets the super user group
+	public String getSuperUserGroupName() {
+		return _superUserGroup;
+	}
+	
+	/// Change the super user group
+	public String setSuperUserGroupName(String userGroup) {
+		String old = _superUserGroup;
+		_superUserGroup = userGroup;
+		return old;
+	}
+	
+	/// Returns the super user group
+	public AccountObject superUserGroup() {
+		return getFromName( getSuperUserGroupName() );
 	}
 	
 }

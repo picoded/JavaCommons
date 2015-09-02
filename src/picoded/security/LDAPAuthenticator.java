@@ -4,14 +4,27 @@ package picoded.security;
 import java.util.*;
 
 // Javax dependencies
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
-import javax.net.ssl.*;
+import javax.naming.Context;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+import javax.naming.directory.ModificationItem;
+import javax.naming.directory.BasicAttribute;
 import static javax.naming.directory.SearchControls.SUBTREE_SCOPE;
+import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.StartTlsResponse;
+import javax.naming.ldap.StartTlsRequest;
+import javax.net.ssl.*;
 
 // LDAP dependencies
-import com.unboundid.ldap.sdk.*;
+import com.unboundid.ldap.sdk.LDAPConnection;
+import com.unboundid.ldap.sdk.BindResult;
 
 ///
 /// Simple LDAP Authenticator utility.
@@ -21,6 +34,19 @@ import com.unboundid.ldap.sdk.*;
 /// login session to an object.
 ///
 public class LDAPAuthenticator {
+	
+	//////////////////////////////////////////
+	//
+	//  Static vars
+	//
+	//////////////////////////////////////////
+	
+	/// User Info attributes inside LDAP
+	private static String[] userInfoAttributes = { //
+		"distinguishedName", "cn", "name", //
+		"uid", "sn", "givenname", "memberOf", //
+		"samaccountname", "userPrincipalName" //
+	}; //
 	
 	//////////////////////////////////////////
 	//
@@ -72,11 +98,11 @@ public class LDAPAuthenticator {
 	
 	/// Closes the current cached context if any
 	public void close() {
-		closeContext(cachedContext);
-		
-		cachedContext = null;
 		cachedUser = null;
 		cachedDomain = null;
+		
+		closeContext(cachedContext);
+		cachedContext = null;
 	}
 	
 	//////////////////////////////////////////
@@ -232,6 +258,72 @@ public class LDAPAuthenticator {
 		
 		cachedContext = loginContext;
 		return null;
+	}
+	
+	
+	///
+	/// Get some basic user information. Containing the following (userInfoAttributes)
+	///
+	/// Requires a previously valid authentication()
+	///
+	/// "distinguishedName", "cn", "name",
+	/// "uid", "sn", "givenname", "memberOf",
+	/// "samaccountname", "userPrincipalName"
+	///
+	/// @returns Map<String,String> of the user info mentioned above.
+	///
+	public Map<String, String> userInfo() {
+		
+		//
+		// Basic setup and checks
+		//
+		Map<String,String> ret = new HashMap<String,String>();
+		String usedDomain = cachedDomain;
+		String usedUsername = cachedUser;
+		String principalName = usedUsername + "@" + usedDomain;
+		LdapContext usedContext = cachedContext;
+		
+		if( usedContext == null ) {
+			throw new RuntimeException("Missing user context, call authenticate() first");
+		}
+		
+		//
+		// Try to search user
+		//
+		try {
+			SearchControls controls = new SearchControls();
+			controls.setSearchScope(SUBTREE_SCOPE);
+			controls.setReturningAttributes(userInfoAttributes);
+			NamingEnumeration<SearchResult> answer = usedContext.search(domainNameToLdapDC(usedDomain), "(& (userPrincipalName="
+																					  + principalName + ")(objectClass=user))", controls);
+			
+			if (answer.hasMore()) {
+				Attributes attr = answer.next().getAttributes();
+				if (attr != null && attr.get("userPrincipalName") != null) {
+					//
+					// Found it, prepare return values
+					//
+					for(String info : userInfoAttributes) {
+						Object val = attr.get(info).get();
+						
+						if(val != null) {
+							ret.put(info, val.toString());
+						} else {
+							ret.put(info, null);
+						}
+					}
+					//
+					// And returns
+					//
+					return ret;
+				}
+			}
+		} catch( Exception e ) {
+			throw new RuntimeException("Failed to fetch userInfo ("+usedUsername+")", e);
+		}
+		
+		throw new RuntimeException("Failed to fetch userInfo ("+usedUsername+")");
+		//return null; // Failed to get
 	}
 	
 }

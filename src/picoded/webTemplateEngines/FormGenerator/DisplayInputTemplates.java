@@ -17,6 +17,7 @@ public class DisplayInputTemplates {
 	//
 	//  TO-REFACTOR
 	//
+	//
 	////////////////////////////////////////////////
 	
 	protected static FormInputInterface div = (node)->{
@@ -44,7 +45,8 @@ public class DisplayInputTemplates {
 	
 	protected static FormInputInterface raw_html = (node)->{
 		StringBuilder sb = new StringBuilder();
-		sb.append(node.getString(JsonKeys.HTML_INJECTION));
+		String rawHtmlInjection = node.getString(JsonKeys.HTML_INJECTION);
+		sb.append(rawHtmlInjection);
 		return sb;
 	};
 	
@@ -72,6 +74,10 @@ public class DisplayInputTemplates {
 		return FormInputTemplates.image(node, true);
 	};
 	
+	protected static FormInputInterface datePicker = (node)->{
+		return FormInputTemplates.datePicker(node, true);
+	};
+	
 	protected static Map<String, FormInputInterface> defaultInputTemplates() {
 		Map<String, FormInputInterface> defaultTemplates = new CaseInsensitiveHashMap<String, FormInputInterface>();
 		
@@ -90,7 +96,7 @@ public class DisplayInputTemplates {
 		defaultTemplates.put("verticalTable", DisplayInputTemplates.verticalTable);
 		defaultTemplates.put("image", DisplayInputTemplates.image);
 		defaultTemplates.put("signature", DisplayInputTemplates.signature);
-		
+		defaultTemplates.put("date", DisplayInputTemplates.datePicker);
 		defaultTemplates.put(JsonKeys.DROPDOWN_WITHOTHERS, DisplayInputTemplates.dropdown_WithOthers);
 		
 		return defaultTemplates;

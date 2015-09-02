@@ -305,6 +305,12 @@ public class FormWrapperTemplates {
 		return ret;
 	}
 	
+	protected static StringBuilder datePickerWrapper(FormNode node, boolean displayMode){
+		StringBuilder ret = new StringBuilder();
+		
+		return ret;
+	}
+	
 	@SuppressWarnings("unchecked")
 	protected static List<Object> getChildren(FormNode node){
 		if( node.containsKey("children")) {
@@ -350,7 +356,9 @@ public class FormWrapperTemplates {
 		return signatureWrapper(node, false);
 	};
 	
-	
+	protected static FormWrapperInterface datePickerWrapper = (node)->{
+		return datePickerWrapper(node, false);
+	};
 	
 	/// noneWrapper
 	///
@@ -443,6 +451,7 @@ public class FormWrapperTemplates {
 		defaultTemplates.put("verticalTable", FormWrapperTemplates.verticalTableWrapper);
 		defaultTemplates.put("image", FormWrapperTemplates.imageWrapper);
 		defaultTemplates.put("signature", FormWrapperTemplates.signatureWrapper);
+		defaultTemplates.put("date",  FormWrapperTemplates.divWrapper);
 		
 		defaultTemplates.put("jmte", FormWrapperTemplates.jmteWrapper);
 		

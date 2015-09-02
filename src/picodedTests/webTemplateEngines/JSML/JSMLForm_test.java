@@ -16,9 +16,9 @@ public class JSMLForm_test{
 	static JSMLForm jsmlForm = null;
 	static Map<String, Object> data = null;
 	
-	static String rootFolder = "./test-files/test-specific/htmlGenerator/JSML";
-	static String tempFolder = rootFolder + "/resources/tmp";
-	static String contextFolder = "file:///C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/JSML/";
+	static String rootFolder = "C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/JSML"; //absolute root folder path
+	static String contextFolder = "C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/JSML"; //on pc, absolute path, but on tomcat, its contextURI
+	static String tempFolder = rootFolder + "/tmp"; //absolute path to resource folder
 	
 	@BeforeClass
 	public static void classSetUp(){
@@ -96,7 +96,7 @@ public class JSMLForm_test{
 	
 	@Test
 	public void generatePDFTest(){
-		byte[] pdfData = jsmlForm.generatePDF(data, true);
+		byte[] pdfData = jsmlForm.generatePDF(data);
 		assertNotNull(pdfData);
 		assertTrue(pdfData.length > 0);
 	}

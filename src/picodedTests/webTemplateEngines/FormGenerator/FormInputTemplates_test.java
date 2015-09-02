@@ -19,8 +19,10 @@ import java.util.*;
 
 public class FormInputTemplates_test {
 	
+	String rootFolder = "./test-files/test-specific/htmlGenerator/FormInputTemplates_test";
+	
 	private String getFinalTemplatedJsonString(String jsonKeyName){
-		File jsonFile = new File("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/"+jsonKeyName+".js");
+		File jsonFile = new File(rootFolder + "/" +jsonKeyName+".js");
 		try{
 			String jsonFileString = FileUtils.readFileToString(jsonFile);
 			Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
@@ -33,8 +35,8 @@ public class FormInputTemplates_test {
 	}
 	
 	private String getTemplatedJsonStringWithData(String jsonKeyName, boolean displayMode){
-		File jsonFile = new File("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/"+jsonKeyName+".js");
-		File jsonDataFile = new File("./test-files/test-specific/htmlGenerator/FormInputTemplates_test/"+jsonKeyName+"Data.js");
+		File jsonFile = new File(rootFolder + "/"+jsonKeyName+".js");
+		File jsonDataFile = new File(rootFolder + "/" +jsonKeyName+"Data.js");
 		try{
 			String jsonFileString = FileUtils.readFileToString(jsonFile);
 			//Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
@@ -357,14 +359,16 @@ public class FormInputTemplates_test {
 	public void imagePDFTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("imagePDF", false);
 		
+		jsonTemplatedOutput = "<html><head></head><body>"+jsonTemplatedOutput+"</body></html>";
+		
 		String pdfPath = "./test-files/test-specific/htmlGenerator/generatedFiles/newImgPDF.pdf";
 //		String htmlPath = "./test-files/test-specific/htmlGenerator/FormInputTemplates_test/imgHTML.html";
-//		String context = "file:///C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/FormInputTemplates_test/res/";
+		String context = "file:///C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/FormInputTemplates_test/res/images/";
 		
-		PDFGenerator.generatePDFfromRawHTML(pdfPath, jsonTemplatedOutput, "");
+		PDFGenerator.generatePDFfromRawHTML(pdfPath, jsonTemplatedOutput, context);
 	}
 	
-	@Test
+//	@Test
 	public void signatureTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("signature", true);
 		assertNotNull(jsonTemplatedOutput);
@@ -393,12 +397,12 @@ public class FormInputTemplates_test {
 		
 	}
 	
-//	@Test
-//	public void dummy(){
-//		String test = "hello*_-_*there";
-//		String result = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(test);
-//		System.out.println(result);
-//	}
+	@Test
+	public void datePickerTest(){
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("date", false);
+
+		assertNotNull(jsonTemplatedOutput);
+	}
 	
 	/// Prototype lenientStringLookup
 //	@Test

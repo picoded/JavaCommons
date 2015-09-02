@@ -435,7 +435,7 @@ public class FormInputTemplates {
 		String fieldName = node.getFieldName();
 		ret.append("<div class=\"pfi_signatureDisplay\" id=\""+fieldName+"\" style=\"height:135px;\">");
 		
-		if(sigValue != null && !sigValue.isEmpty() && displayMode){
+		if(sigValue != null && !sigValue.isEmpty()){
 			ret.append(sigImgString);
 		}
 		
@@ -444,6 +444,16 @@ public class FormInputTemplates {
 		if(!displayMode){
 			ret.append("<h3>Click along the line to sign.</h3>");
 		}
+		
+		return ret;
+	}
+	
+	protected static FormInputInterface datePicker = (node)->{
+		return datePicker(node, false);
+	};
+	
+	protected static StringBuilder datePicker(FormNode node, boolean displayMode){
+		StringBuilder ret = new StringBuilder();
 		
 		return ret;
 	}
@@ -473,6 +483,7 @@ public class FormInputTemplates {
 		defaultTemplates.put("verticalTable", FormInputTemplates.verticalTable);
 		defaultTemplates.put("image", FormInputTemplates.image);
 		defaultTemplates.put("signature", FormInputTemplates.signature);
+		defaultTemplates.put("date", FormInputTemplates.datePicker);
 		
 		return defaultTemplates;
 	}

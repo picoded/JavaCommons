@@ -105,14 +105,14 @@ public class QueryFilter {
 		};
 		
 		String[] replaceString = new String[] { 
-			"$1", //brackets
-			"$1 $2", //Lesser or more, without equals
-			"$1=", //Less, More, Not equals
-			"$1 =" //Matching equals sign WITHOUT comparision prefixes
+			" $1 ", //brackets
+			" $1 $2 ", //Lesser or more, without equals
+			" $1= ", //Less, More, Not equals
+			"$1 = " //Matching equals sign WITHOUT comparision prefixes
 		};
 		
 		for(int a=0; a<replaceRegex.length; ++a) {
-			query = query.replaceAll(replaceRegex[a], " "+replaceString[a]+" ");
+			query = query.replaceAll(replaceRegex[a], replaceString[a]);
 		}
 		
 		query = query.replaceAll("\\s+"," ").trim(); //remove redundent whitespace

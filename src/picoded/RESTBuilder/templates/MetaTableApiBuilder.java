@@ -1,12 +1,12 @@
 package picoded.RESTBuilder.templates;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import picoded.RESTBuilder.*;
 import picoded.JStack.*;
 import picoded.JStruct.*;
 import picoded.servlet.*;
-
 import picoded.enums.HttpRequestType;
 
 /// Account login template API
@@ -23,9 +23,16 @@ public class MetaTableApiBuilder {
 	public static final String MISSING_PERMISSION = "Permission Error: Missing permission for request (generic)";
 	public static final String MISSING_PERMISSION_GROUP = "Permission Error: Missing group admin rights required for request";
 	
+	private MetaTable _metaTableObj = null;
+	
 	// Constructor
 	public MetaTableApiBuilder(MetaTable metaTableObj) {
 		//
+		//hold a table that is passed in
+		//Map<String(_oid), Map<String,Object>>
+		//_oid = 22 char base58 GUID which is like a "row" in a table
+		//the object i get back is a column name (String key) to value stored (the object)
+		_metaTableObj = metaTableObj;
 	}
 	
 	/////////////////////////////////////////////
@@ -69,13 +76,16 @@ public class MetaTableApiBuilder {
 	/// ## HTTP Request Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// | Parameter Name  | Variable Type	    | Description                                                                  |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
 	/// | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
 	/// | length          | int (optional)     | Default 50: The number of records to return                                   |
+	/// | orderBy         | String (optional)  | Default : order by _oid                                                       |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
+	/// | headers         | String[](optional) | Default ["_oid"], the columns to return                                       |
+	/// | query           | String (optional)  | Requested Query filter                                                        |
+	/// | queryArgs       | String[] (optional)| Requested Query filter arguments                                              |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
@@ -84,10 +94,10 @@ public class MetaTableApiBuilder {
 	/// | Parameter Name  | Variable Type	    | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
-	/// | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    |
-	/// | recordsFilterd  | int                | Total amount of records. After all search filter                              |
+	/// | recordsTotal    | int (not critical) | Total amount of records. Before any search filter (But after base filters)    |
+	/// | recordsFilterd  | int (not critical) | Total amount of records. After all search filter                              |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
+	/// | headers         | String[](optional) | Default ["_oid"], the collumns to return                                      |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | data            | array              | Array of row records                                                          |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -95,8 +105,79 @@ public class MetaTableApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public RESTFunction list_GET_and_POST = (req, res) -> {
+		int draw = req.getInt("draw");
+		int start = req.getInt("start");
+		int limit = req.getInt("length");
+		
+		String orderByStr = req.getString("orderBy");
+		if(orderByStr == null || orderByStr.isEmpty()){
+			orderByStr = "_oid";
+		}
+		
+		String[] headers = req.getStringArray("headers");
+		String query = req.getString("query");
+		String[] queryArgs = req.getStringArray("queryArgs");
+		
+		//put back into response
+		res.put("draw", draw);
+		res.put("headers", headers);
+		
+		//add recordsTotal and recordsFiltered later
+		
+		List<List<String>> data = null;
+		try{
+			data = list_GET_and_POST_inner(draw, start, limit, headers, query, queryArgs, orderByStr);
+			res.put("data",  data);
+		}catch(Exception e){
+			res.put("error",  e.getMessage());
+		}
+		
 		return res;
 	};
+	
+	public List<List<String>> list_GET_and_POST_inner(int draw, int start, int length, String[] headers, String query, String[] queryArgs, String orderBy) throws RuntimeException{
+		if(_metaTableObj == null){
+			return null;
+		}
+		
+		List<List<String>> ret = new ArrayList<List<String>>();
+		
+		try{
+			Map<String, List<String>> tempMap = new HashMap<String, List<String>>();
+			if(headers != null && headers.length > 0){
+				for(String header : headers){
+					MetaObject[] metaObjs = null;
+					
+					if(query.isEmpty() || queryArgs == null){
+						metaObjs = _metaTableObj.getFromKeyName(header, orderBy, start, length);
+					}else{
+						metaObjs = _metaTableObj.query(query, queryArgs, orderBy, start, length);
+					}
+					
+					for(MetaObject metaObj : metaObjs){
+						String objOid = metaObj._oid();
+						if(!tempMap.containsKey(objOid)){
+							tempMap.put(objOid, new ArrayList<String>());
+						}
+						
+						if(metaObj.containsKey(header)){
+							tempMap.get(objOid).add((String)metaObj.get(header));
+						}
+					}
+				}
+			}
+			
+			
+			for(Entry<String, List<String>> mapEntry : tempMap.entrySet()){
+				List<String> mapValue = mapEntry.getValue();
+				ret.add(mapValue);
+			}
+		}catch(Exception e){
+			throw new RuntimeException("list_GET_and_POST_inner() -> " + e.getMessage());
+		}
+		
+		return ret;
+	}
 	
 	/////////////////////////////////////////////
 	//

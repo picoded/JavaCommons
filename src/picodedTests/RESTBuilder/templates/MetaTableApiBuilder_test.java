@@ -128,4 +128,32 @@ public class MetaTableApiBuilder_test {
 		}
 	}
 	
+	@Test
+	public void meta_POST_test(){
+		//test delta
+		Map<String, Object> metaTableDelta = new HashMap<String, Object>();
+		MetaObject metaObjDelta = mtObj.newObject();
+		metaObjDelta.replace("_oid", _oids.get(0));
+		metaObjDelta.put("_name", "deltaReplacedName");
+		metaObjDelta.put("_age", "deltaReplacedAge");
+		MetaObject returnedMObj = mtApi.meta_POST_inner(_oids.get(0), metaObjDelta, "delta");
+		assertNotNull(returnedMObj);
+		
+		//test full
+		MetaObject metaObjFull = mtObj.newObject();
+		metaObjFull.replace("_oid", _oids.get(1));
+		metaObjFull.put("_name", "fullyReplacedName");
+		returnedMObj = mtApi.meta_POST_inner(_oids.get(1), metaObjFull, "full");
+		assertNotNull(returnedMObj);
+		
+		//test create
+		MetaObject metaObjNew = mtObj.newObject();
+		metaObjNew.replace("_oid", "new");
+		metaObjNew.put("_name", "newMetaName");
+		metaObjNew.put("_age", "newMetaAge");
+		returnedMObj = mtApi.meta_POST_inner("new", metaObjNew, null);
+		assertNotNull(returnedMObj);
+		
+	}
+	
 }

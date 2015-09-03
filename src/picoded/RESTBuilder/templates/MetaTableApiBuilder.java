@@ -27,11 +27,6 @@ public class MetaTableApiBuilder {
 	
 	// Constructor
 	public MetaTableApiBuilder(MetaTable metaTableObj) {
-		//
-		//hold a table that is passed in
-		//Map<String(_oid), Map<String,Object>>
-		//_oid = 22 char base58 GUID which is like a "row" in a table
-		//the object i get back is a column name (String key) to value stored (the object)
 		_metaTableObj = metaTableObj;
 	}
 	
@@ -257,7 +252,7 @@ public class MetaTableApiBuilder {
 	/// ## HTTP Request Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | _oid            | String             | The internal object ID used (or created)                                      |
 	/// | meta            | {Object}           | Meta object that represents this account                                      |
@@ -267,7 +262,7 @@ public class MetaTableApiBuilder {
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | updateMode      | String             | (Default) "delta" for only updating the given fields, or "full" for all       |
 	/// | updateMeta      | {Object}           | The updated changes done                                                      |
@@ -276,10 +271,57 @@ public class MetaTableApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public RESTFunction meta_POST = (req, res) -> {
+		String oid = req.getString("_oid");
+		String updateMode = req.getString("updateMode");
+		
+		MetaObject givenMObj = (MetaObject)req.get("meta");
+		try{
+			MetaObject updatedMObj = meta_POST_inner(oid, givenMObj, updateMode);
+			res.put("updateMeta",updatedMObj);
+		}catch(Exception e){
+			res.put("error", e.getMessage());
+		}
+		
+		res.put("updateMode", updateMode);
 		
 		return res;
 	};
 
+	public MetaObject meta_POST_inner(String oid, MetaObject mObj, String updateMode) throws RuntimeException {
+		boolean updateModeFull = false;
+		if(updateMode != null && updateMode.equalsIgnoreCase("full")){
+			updateModeFull = true;
+		}
+		
+		try{
+			if(oid.equalsIgnoreCase("new")){
+				_metaTableObj.append(oid,  mObj).saveAll();
+				return mObj;
+			}else{
+				MetaObject mObjToUpdate = _metaTableObj.get(oid);
+				if(updateModeFull){
+					//full overwrite
+					mObjToUpdate = mObj;
+					mObjToUpdate.saveAll();
+					return mObjToUpdate;
+				}else{
+					//delta update
+					if(mObjToUpdate != null){
+						for(Entry<String, Object> entry : mObj.entrySet()){
+							mObjToUpdate.put(entry.getKey(),  entry.getValue());
+						}
+						mObjToUpdate.saveDelta();
+						return mObjToUpdate;
+					}else{
+						_metaTableObj.append(oid,  mObj).saveAll();
+						return mObj;
+					}
+				}
+			}
+		}catch(Exception e){
+			throw new RuntimeException("meta_POST_inner() -> " + e.getMessage());
+		}
+	}
 
 
 	//-------------------------------------------------------------------------------------------------------------------------

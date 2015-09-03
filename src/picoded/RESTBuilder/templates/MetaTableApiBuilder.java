@@ -196,9 +196,9 @@ public class MetaTableApiBuilder {
 	/// ## HTTP Request Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | No parameters options                                                                                                |
+	/// | _oid            | String             | object ID used to retrieve the meta object. If no oid is given, return null.  |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
@@ -213,8 +213,39 @@ public class MetaTableApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public RESTFunction meta_GET = (req, res) -> {
+		String oid = req.getString("_oid");
+		
+		//put data back into response
+		res.put("_oid", oid);
+		
+		try{
+			MetaObject mObj = meta_GET_inner(oid);
+			res.put("meta", mObj);
+		}catch(Exception e){
+			res.put("error", e.getMessage());
+		}
+		
 		return res;
 	};
+	
+	public MetaObject meta_GET_inner(String oid) throws RuntimeException{
+		if(_metaTableObj == null){
+			return null;
+		}
+		
+		if(oid == null || oid.isEmpty()){
+			return null;
+		}
+		
+		MetaObject[] metaObjs = null;
+		metaObjs = _metaTableObj.query("_oid=?", new String[]{oid});
+		
+		if(metaObjs.length > 1){
+			throw new RuntimeException("meta_GET_inner() -> More than 1 meta object was returned for _oid : "+oid);
+		}else{
+			return metaObjs[0];
+		}
+	}
 	
 	///
 	/// # ${ObjectID} (POST) [Requires login]
@@ -245,6 +276,7 @@ public class MetaTableApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public RESTFunction meta_POST = (req, res) -> {
+		
 		return res;
 	};
 

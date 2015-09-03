@@ -115,15 +115,17 @@ public class MetaTableApiBuilder_test {
 		
 		List<List<Object>> allData = mtApi.list_GET_and_POST_inner(0,  0,  0,  allArgs,  "",  null, "_oid");
 		assertNotNull(allData);
+		
+		List<List<Object>> allDataWithQueryFilter = mtApi.list_GET_and_POST_inner(0,  0,  0,  allArgs,  "_name=? OR _age=?",  new String[]{"name1", "age4"}, "");
+		assertNotNull(allDataWithQueryFilter);
 	}
 	
 	@Test
-	public void list_GET_and_POST_test_withQuery(){
-		String[] allArgs = new String[]{"_oid", "_name", "_age"};
-		
-		List<List<Object>> allData = mtApi.list_GET_and_POST_inner(0,  0,  0,  allArgs,  "_name=? OR _age=?",  new String[]{"name1", "age4"}, "");
-		assertNotNull(allData);
+	public void meta_GET_test(){
+		for(String oid:_oids){
+			MetaObject mObj = mtApi.meta_GET_inner(oid);
+			assertNotNull(mObj);
+		}
 	}
-	
 	
 }

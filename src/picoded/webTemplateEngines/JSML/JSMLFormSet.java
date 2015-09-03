@@ -149,7 +149,7 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 			return null;
 		}
 		String keyStr = key.toString();
-		JSMLForm newForm = new JSMLForm( new File(formSetFolder, keyStr), formSetURI+"/"+keyStr+"/", new File(formSetFolder, keyStr+"/tmp") );
+		JSMLForm newForm = new JSMLForm( new File(formSetFolder, keyStr), formSetURI+"/"+keyStr+"/" , null );
 		newForm.getDefinition();
 		return newForm;
 	}
@@ -294,17 +294,40 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 						page.getOutputStream().write(pdfData);
 						return;
 					}
+					
+					// PDF link test mode
+					// if( reqMode.equalsIgnoreCase("pdfTest") ) {
+					// 	formParams = formDataFromRequest( page, form );
+					// 	String[] pdfTestResults = form.getPDFLinkTest(formParams);
+						
+					// 	for(String str : pdfTestResults){
+					// 		page.getWriter().println( str );
+					// 		page.getWriter().println( "-----------------" );
+					// 	}
+						
+					// 	return;
+					// }
 				}
 			}
 			
 			String reqStr = page.requestWildcardUri();
 			
 			// Security measure?
-			if( reqStr != null && reqStr.contains("/tmp") ) {
+			// if( reqStr != null && reqStr.contains("/tmp") ) {
+			// 	// 404 error if file not found
+			// 	page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
+			// 	return;
+			// }
+			
+			if( reqStr == null || reqStr.isEmpty() ) {
 				// 404 error if file not found
 				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
 				return;
 			}
+			
+			
+			
+			
 			
 			// Fallsback into File Servlet
 			resourseFileServlet().processRequest( //

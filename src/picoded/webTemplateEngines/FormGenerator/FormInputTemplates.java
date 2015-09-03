@@ -433,9 +433,9 @@ public class FormInputTemplates {
 		}
 		
 		String fieldName = node.getFieldName();
-		ret.append("<div class=\"pfi_signatureDisplay\" id=\""+fieldName+"\" style=\"height:135px;\">");
+		ret.append("<div class=\"pfi_signatureDisplay\" name=\""+fieldName+"\" id=\""+fieldName+"\" style=\"height:135px;\">");
 		
-		if(sigValue != null && !sigValue.isEmpty() && displayMode){
+		if(sigValue != null && !sigValue.isEmpty()){
 			ret.append(sigImgString);
 		}
 		
@@ -445,6 +445,46 @@ public class FormInputTemplates {
 			ret.append("<h3>Click along the line to sign.</h3>");
 		}
 		
+		return ret;
+	}
+	
+	protected static FormInputInterface datePicker = (node)->{
+		return datePicker(node, false);
+	};
+	
+	protected static StringBuilder datePicker(FormNode node, boolean displayMode){
+		StringBuilder ret = new StringBuilder();
+		
+		CaseInsensitiveHashMap<String,String> paramMap = new CaseInsensitiveHashMap<String, String>();
+		String fieldValue = node.getFieldValue();
+		
+		if(!displayMode){
+			paramMap.put(HtmlTag.TYPE, "date");
+			
+			if(node.containsKey("max")){
+				String maxDate = sanitiseYMDDateString(node.getString("max"));
+				if(maxDate != null && !maxDate.isEmpty()){
+					paramMap.put("max", maxDate);
+				}
+			}
+			
+			if(node.containsKey("min")){
+				String minDate = sanitiseYMDDateString(node.getString("min"));
+				if(minDate != null && !minDate.isEmpty()){
+					paramMap.put("min", minDate);
+				}
+			}
+		}else{
+			paramMap.put(HtmlTag.TYPE, "text");
+		}
+		
+		if( fieldValue != null && fieldValue.length() >= 0 ) {
+			paramMap.put(HtmlTag.VALUE, sanitiseYMDDateString(fieldValue));
+		}
+		
+		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputDate pfi_input", paramMap );
+		ret.append(sbArr[0]);
+		ret.append(sbArr[1]);
 		return ret;
 	}
 	
@@ -473,6 +513,7 @@ public class FormInputTemplates {
 		defaultTemplates.put("verticalTable", FormInputTemplates.verticalTable);
 		defaultTemplates.put("image", FormInputTemplates.image);
 		defaultTemplates.put("signature", FormInputTemplates.signature);
+		defaultTemplates.put("date", FormInputTemplates.datePicker);
 		
 		return defaultTemplates;
 	}
@@ -605,6 +646,32 @@ public class FormInputTemplates {
 		}
 		
 		return ret;
+	}
+	
+	private static String sanitiseYMDDateString(String inDateString){
+		StringBuilder ret = new StringBuilder();
+		
+		if(inDateString != null && !inDateString.isEmpty()){
+			String[] dateSplit = inDateString.split("-");
+			
+			if(dateSplit != null && dateSplit.length > 1){
+				for(int i = 0; i < dateSplit.length; ++i){
+					if(dateSplit[i].length() == 1){
+						ret.append("0"+dateSplit[i]);
+					}else{
+						ret.append(dateSplit[i]);
+					}
+					
+					if(i < dateSplit.length - 1){
+						ret.append("-");
+					}
+				}
+			}else{
+				ret.append(inDateString);
+			}
+		}
+		
+		return ret.toString();
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -129,6 +129,29 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 		return JStructUtils.sortAndOffsetListToArray(retList, orderByStr, offset, limit);
 	}
 	
+	/// Performs a search query, and returns the respective MetaObjects
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	///
+	/// @returns  The total count for the query
+	public default long queryCount(String whereClause, Object[] whereValues) {
+		
+		// The return list
+		List<MetaObject> retList = null;
+		
+		// Setup the query, if needed
+		if(whereClause == null) { //null gets all
+			retList = new ArrayList<MetaObject>( this.values() );
+		} else {
+			Query queryObj = Query.build(whereClause, whereValues);
+			retList = queryObj.search(this);
+		}
+		
+		// Query and count
+		return retList.size();
+	}
+	
 	/// 
 	/// Get from key names operations (to optimize on specific implementation)
 	///--------------------------------------------------------------------------

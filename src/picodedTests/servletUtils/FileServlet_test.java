@@ -19,12 +19,12 @@ public class FileServlet_test {
 	
 	// Servlet setup
 	//--------------------------------------------------------------------------
-	protected static FileServlet fileServlet = null;
-	protected static EmbeddedServlet tomcat = null;
-	protected static String testAddress = "http://127.0.0.1:15000";
+	protected FileServlet fileServlet = null;
+	protected EmbeddedServlet tomcat = null;
+	protected String testAddress = "http://127.0.0.1:15000";
 	
-	@BeforeClass
-	public static void serverSetUp() throws LifecycleException, IOException {
+	@Before
+	public void serverSetUp() throws LifecycleException, IOException {
 		if( tomcat == null ) {
 			File rootFolder = new File("./test-files/test-specific/servletUtils/FileServlet");
 			File fileFolder = new File("./test-files/test-specific/servletUtils/FileServlet/WEB-INF/innerFiles");
@@ -39,20 +39,24 @@ public class FileServlet_test {
 		}
 	}
 	
-	@AfterClass
-	public static void serverTearDown() throws LifecycleException, IOException {
+	@After
+	public void serverTearDown() throws LifecycleException, IOException {
 		if(tomcat != null) {
 			//tomcat.awaitServer(); //manual
 			tomcat.stop();
 		}
 		tomcat = null;
+		
+		requester = null;
+		response = null;
+		responseString = null;
 	}
 	
 	// Tests 
 	//--------------------------------------------------------------------------
-	RequestHttp requester;
-	ResponseHttp response;
-	String responseString;
+	RequestHttp requester = null;
+	ResponseHttp response = null;
+	String responseString = null;
 	
 	@Test
 	public void helloTest() {

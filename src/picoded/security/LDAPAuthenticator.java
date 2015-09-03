@@ -158,7 +158,7 @@ public class LDAPAuthenticator {
 	///
 	/// @returns  The expected error message, if any. Else simply null for success
 	///
-	public String authenticate(String username, String password) {
+	public String login(String username, String password) {
 		
 		//
 		// Sanity checks
@@ -256,6 +256,8 @@ public class LDAPAuthenticator {
 			return "Failed to acquire login context: "+username;
 		}
 		
+		cachedDomain = domainName;
+		cachedUser = usedUsername;
 		cachedContext = loginContext;
 		return null;
 	}
@@ -304,7 +306,10 @@ public class LDAPAuthenticator {
 					// Found it, prepare return values
 					//
 					for(String info : userInfoAttributes) {
-						Object val = attr.get(info).get();
+						Object val = null;
+						if( attr.get(info) != null ) {
+							val = attr.get(info).get();
+						}
 						
 						if(val != null) {
 							ret.put(info, val.toString());

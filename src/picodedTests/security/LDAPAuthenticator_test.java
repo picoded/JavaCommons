@@ -8,6 +8,9 @@ import java.util.*;
 import picoded.security.*;
 import picodedTests.TestConfig;
 
+///
+/// Basic LDAP testing
+///
 public class LDAPAuthenticator_test {
 	
 	protected LDAPAuthenticator authObj = null;
@@ -30,5 +33,19 @@ public class LDAPAuthenticator_test {
 		assertNotNull( authObj );
 	}
 	
+	@Test
+	public void failedLogin() {
+		assertEquals( "Failed to authenticate: wrong", authObj.login("wrong","wrong") );
+	}
 	
+	@Test
+	public void correctLogin() {
+		assertNull( authObj.login("dummyuser","P@ssw0rd!") );
+	}
+	
+	@Test
+	public void basicLoginInfo() {
+		assertNull( authObj.login("dummyuser","P@ssw0rd!") );
+		assertNotNull( authObj.userInfo() );
+	}
 }

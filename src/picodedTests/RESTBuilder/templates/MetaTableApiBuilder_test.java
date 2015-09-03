@@ -26,9 +26,6 @@ import picoded.RESTBuilder.templates.*;
 import picoded.webUtils.*;
 
 public class MetaTableApiBuilder_test {
-
-	private static String dummyDataFilePath = "./test-files/test-specific/MetaTable/MetaTableApiBuilderDummyData.json";
-	private static Map<String, Object> dummyDataMap = null;
 	private static List<String> _oids = null;
 	
 	/// Test object

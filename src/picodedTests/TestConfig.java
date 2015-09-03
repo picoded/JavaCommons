@@ -98,4 +98,23 @@ public class TestConfig {
 		return ORACLE_PASS;
 	}
 	
+	//-------------------------------//
+	// LDAP Server location          //
+	//-------------------------------//
+	static private String LDAP_HOST = "54.169.34.78";
+	static private String LDAP_DOMAIN = "com.demo";
+	static private int LDAP_PORT = 389;
+	
+	static public String LDAP_HOST() {
+		return LDAP_HOST;
+	}
+	
+	static public String LDAP_DOMAIN() {
+		return LDAP_DOMAIN;
+	}
+	
+	static public int LDAP_PORT() {
+		return LDAP_PORT;
+	}
+	
 }

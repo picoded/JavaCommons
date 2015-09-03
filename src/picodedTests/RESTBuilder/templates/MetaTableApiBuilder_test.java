@@ -94,26 +94,26 @@ public class MetaTableApiBuilder_test {
 		String[] nameArgs = new String[]{"_name"};
 		String[] ageArgs = new String[]{"_age"};
 		
-		List<List<String>> oidData = mtApi.list_GET_and_POST_inner(0,  0,  0,  oidArgs,  "", null, "_oid");
+		List<List<Object>> oidData = mtApi.list_GET_and_POST_inner(0,  0,  0,  oidArgs,  "", null, "_oid");
 		assertNotNull(oidData);
 		
-		List<List<String>> nameData = mtApi.list_GET_and_POST_inner(0,  0,  0,  nameArgs,  "",  null, "_oid");
+		List<List<Object>> nameData = mtApi.list_GET_and_POST_inner(0,  0,  0,  nameArgs,  "",  null, "_oid");
 		assertNotNull(nameData);
 		
-		List<List<String>> ageData = mtApi.list_GET_and_POST_inner(0,  0,  0,  ageArgs,  "",  null, "_oid");
+		List<List<Object>> ageData = mtApi.list_GET_and_POST_inner(0,  0,  0,  ageArgs,  "",  null, "_oid");
 		assertNotNull(ageData);
 		
 		String[] oidNameArgs = new String[]{"_oid", "_name"};
 		String[] nameAgeArgs = new String[]{"_name", "_age"};
 		String[] allArgs = new String[]{"_oid", "_name", "_age"};
 		
-		List<List<String>> oidNameData = mtApi.list_GET_and_POST_inner(0,  0,  0,  oidNameArgs,  "",  null, "_oid");
+		List<List<Object>> oidNameData = mtApi.list_GET_and_POST_inner(0,  0,  0,  oidNameArgs,  "",  null, "_oid");
 		assertNotNull(oidNameData);
 		
-		List<List<String>> nameAgeData = mtApi.list_GET_and_POST_inner(0,  0,  0,  nameAgeArgs,  "",  null, "_oid");
+		List<List<Object>> nameAgeData = mtApi.list_GET_and_POST_inner(0,  0,  0,  nameAgeArgs,  "",  null, "_oid");
 		assertNotNull(nameAgeData);
 		
-		List<List<String>> allData = mtApi.list_GET_and_POST_inner(0,  0,  0,  allArgs,  "",  null, "_oid");
+		List<List<Object>> allData = mtApi.list_GET_and_POST_inner(0,  0,  0,  allArgs,  "",  null, "_oid");
 		assertNotNull(allData);
 	}
 	
@@ -121,7 +121,7 @@ public class MetaTableApiBuilder_test {
 	public void list_GET_and_POST_test_withQuery(){
 		String[] allArgs = new String[]{"_oid", "_name", "_age"};
 		
-		List<List<String>> allData = mtApi.list_GET_and_POST_inner(0,  0,  0,  allArgs,  "_name=? OR _age=?",  new String[]{"name1", "age4"}, "");
+		List<List<Object>> allData = mtApi.list_GET_and_POST_inner(0,  0,  0,  allArgs,  "_name=? OR _age=?",  new String[]{"name1", "age4"}, "");
 		assertNotNull(allData);
 	}
 	

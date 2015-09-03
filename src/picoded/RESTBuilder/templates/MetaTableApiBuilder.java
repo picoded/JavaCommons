@@ -95,7 +95,7 @@ public class MetaTableApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
 	/// | recordsTotal    | int (not critical) | Total amount of records. Before any search filter (But after base filters)    |
-	/// | recordsFilterd  | int (not critical) | Total amount of records. After all search filter                              |
+	/// | recordsFiltered | int (not critical) | Total amount of records. After all search filter                              |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | headers         | String[](optional) | Default ["_oid"], the collumns to return                                      |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -122,9 +122,12 @@ public class MetaTableApiBuilder {
 		res.put("draw", draw);
 		res.put("headers", headers);
 		
-		//add recordsTotal and recordsFiltered later
+		res.put("recordsTotal", _metaTableObj.size());
+		if(query != null && !query.isEmpty() && queryArgs != null && queryArgs.length > 0){
+			res.put("recordsFiltered", _metaTableObj.queryCount(query, queryArgs));
+		}
 		
-		List<List<String>> data = null;
+		List<List<Object>> data = null;
 		try{
 			data = list_GET_and_POST_inner(draw, start, limit, headers, query, queryArgs, orderByStr);
 			res.put("data",  data);
@@ -135,15 +138,15 @@ public class MetaTableApiBuilder {
 		return res;
 	};
 	
-	public List<List<String>> list_GET_and_POST_inner(int draw, int start, int length, String[] headers, String query, String[] queryArgs, String orderBy) throws RuntimeException{
+	public List<List<Object>> list_GET_and_POST_inner(int draw, int start, int length, String[] headers, String query, String[] queryArgs, String orderBy) throws RuntimeException{
 		if(_metaTableObj == null){
 			return null;
 		}
 		
-		List<List<String>> ret = new ArrayList<List<String>>();
+		List<List<Object>> ret = new ArrayList<List<Object>>();
 		
 		try{
-			Map<String, List<String>> tempMap = new HashMap<String, List<String>>();
+			Map<String, List<Object>> tempMap = new HashMap<String, List<Object>>();
 			if(headers != null && headers.length > 0){
 				for(String header : headers){
 					MetaObject[] metaObjs = null;
@@ -157,7 +160,7 @@ public class MetaTableApiBuilder {
 					for(MetaObject metaObj : metaObjs){
 						String objOid = metaObj._oid();
 						if(!tempMap.containsKey(objOid)){
-							tempMap.put(objOid, new ArrayList<String>());
+							tempMap.put(objOid, new ArrayList<Object>());
 						}
 						
 						if(metaObj.containsKey(header)){
@@ -168,8 +171,8 @@ public class MetaTableApiBuilder {
 			}
 			
 			
-			for(Entry<String, List<String>> mapEntry : tempMap.entrySet()){
-				List<String> mapValue = mapEntry.getValue();
+			for(Entry<String, List<Object>> mapEntry : tempMap.entrySet()){
+				List<Object> mapValue = mapEntry.getValue();
 				ret.add(mapValue);
 			}
 		}catch(Exception e){

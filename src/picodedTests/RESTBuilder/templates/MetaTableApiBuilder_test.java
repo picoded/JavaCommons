@@ -41,7 +41,7 @@ public class MetaTableApiBuilder_test {
 		return (new JStruct()).getMetaTable("test");
 	}
 	
-	private static void populateMetaTableDummyData(int max, int min){
+	private static void populateMetaTableDummyData(int min, int max){
 		Random rnd = new Random();
 		int _max = rnd.nextInt(max);
 		_max = _max > min ? _max : min;
@@ -65,7 +65,7 @@ public class MetaTableApiBuilder_test {
 	public static void setup(){
 		mtObj = implementationConstructor();
 		mtObj.systemSetup();
-		populateMetaTableDummyData(10, 5);
+		populateMetaTableDummyData(3, 3);
 		
 		mtApi = new MetaTableApiBuilder(mtObj);
 	}

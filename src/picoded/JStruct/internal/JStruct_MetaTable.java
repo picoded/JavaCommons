@@ -213,7 +213,7 @@ public class JStruct_MetaTable implements MetaTable {
 				Object val = fullMap.get(key);
 				
 				if( val == null || val == ObjectTokens.NULL ) {
-					storedValue.remove(val);
+					storedValue.remove(key);
 				} else {
 					storedValue.put( key, val );
 				}

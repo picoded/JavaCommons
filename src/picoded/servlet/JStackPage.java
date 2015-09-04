@@ -53,12 +53,6 @@ public class JStackPage extends CorePage {
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
-	// Common not so impt stuff
-	//-------------------------------------------
-	
-	// Serialize version ID
-	static final long serialVersionUID = 1L;
-	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Internal variables, can be overwritten. Else it is auto "filled" when needed

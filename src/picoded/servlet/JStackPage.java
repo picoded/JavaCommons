@@ -179,6 +179,12 @@ public class JStackPage extends CorePage {
 			
 			// Generates the sqlite connection with the path
 			return JSql.sqlite(path);
+		} else if(engine.equalsIgnoreCase("mssql")) {
+			return JSql.mssql(path,database,username,password);
+		} else if(engine.equalsIgnoreCase("mysql")) {
+			return JSql.mysql(path,database,username,password);
+		} else if(engine.equalsIgnoreCase("oracle")) {
+			return JSql.oracle(path,username,password);
 		} else {
 			throw new RuntimeException("Unsupported " + profileNameSpace + ".engine: " + engine);
 		}

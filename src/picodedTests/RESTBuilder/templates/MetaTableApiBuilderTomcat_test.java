@@ -79,7 +79,7 @@ public class MetaTableApiBuilderTomcat_test {
 		mtApi = new MetaTableApiBuilder(mtObj);
 		
 		rb = new RESTBuilder();
-		mtApi.setupRESTBuilder(rb,  "meta-test.");
+		mtApi.setupRESTBuilder(rb,  "/meta-test/");
 		
 		if( tomcat == null ) {
 			File webInfFile = new File("./test-files/tmp/WEB-INF");
@@ -114,24 +114,42 @@ public class MetaTableApiBuilderTomcat_test {
 		tomcat = null;
 	}
 	
+//	@Test
+	public void awaitServer(){
+		tomcat.awaitServer();
+	}
+	
 	RequestHttp requester;
 	ResponseHttp response;
 	Map<String,Object> responseMap;
 	
-//	@Test
-	public void list_GET_and_POST_test(){
-		String path = "./test-files/tmp/WEB-INF/list";
+	@Test 
+	@SuppressWarnings("unchecked")
+	public void list_POST_test(){
+		String path = "http://127.0.0.1:15000/api/meta-test/list";
 		
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
 		Map<String, String[]> headersMap = new HashMap<String, String[]>();
-		response = RequestHttp.get(path, paramsMap, null, headersMap);
 		
+		paramsMap.put("headers", new String[]{"[\"_oid\"]"});
+		response = RequestHttp.post(path, paramsMap, null, null);
 		assertNotNull(response);
+		
+		Map<String, Object> resMap = response.toMap();
+		List<List<String>> dataList = (List<List<String>>)resMap.get("data");
+		assertNotNull(dataList);
+		
+		List<String> convList = new ArrayList<String>();
+		for(List<String> innerList : dataList){
+			convList.addAll(innerList);
+		}
+		boolean contains = convList.containsAll(_oids);
+		assertTrue(contains);
 	}
 	
 	@Test
 	public void meta_GET_test(){
-		String path = "http://127.0.0.1:15000/api/meta-test/list";
+		String path = "http://127.0.0.1:15000/api/meta-test/get";
 		
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
 		paramsMap.put("_oid", new String[]{_oids.get(0)});
@@ -145,11 +163,66 @@ public class MetaTableApiBuilderTomcat_test {
 		}
 		
 		assertNotNull(response);
+		Map<String, String[]> resHeaders = response.headersMap();
 	}
 	
-//	@Test
-	public void meta_POST_test(){
+	@Test
+	public void meta_POST_test_delta(){
+		String path = "http://127.0.0.1:15000/api/meta-test/post";
+		String jsonString = "";
 		
+		Map<String, Object> deltaObj = new HashMap<String, Object>();
+		deltaObj.put("_name", "DeltaReplacedName");
+		deltaObj.put("_age", "DeltaReplacedAge");
+		jsonString = ConvertJSON.fromMap(deltaObj);
+		
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("_oid", new String[]{_oids.get(0)});
+		paramsMap.put("updateMode", new String[]{"delta"});
+		paramsMap.put("meta", new String[]{jsonString});
+		
+		response = RequestHttp.post(path, paramsMap, null, null);
+		assertNotNull(response);
+		
+		Map<String, Object> newMetaObj = new HashMap<String, Object>();
+		newMetaObj.put("_name", "NewMetaObjectName");
+		newMetaObj.put("_age", "NewMetaObjectAge");
+	}
+	
+	@Test
+	public void meta_POST_test_full(){
+		String path = "http://127.0.0.1:15000/api/meta-test/post";
+		String jsonString = "";
+		
+		Map<String, Object> fullObj = new HashMap<String, Object>();
+		fullObj.put("_name", "FullReplacedName");
+		jsonString = ConvertJSON.fromMap(fullObj);
+		
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("_oid", new String[]{_oids.get(1)});
+		paramsMap.put("updateMode", new String[]{"full"});
+		paramsMap.put("meta", new String[]{jsonString});
+		
+		response = RequestHttp.post(path, paramsMap, null, null);
+		assertNotNull(response);
+	}
+	
+	@Test
+	public void meta_POST_test_new(){
+		String path = "http://127.0.0.1:15000/api/meta-test/post";
+		String jsonString = "";
+		
+		Map<String, Object> newMetaObj = new HashMap<String, Object>();
+		newMetaObj.put("_name", "NewMetaObjectName");
+		newMetaObj.put("_age", "NewMetaObjectAge");
+		jsonString = ConvertJSON.fromMap(newMetaObj);
+		
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("_oid", new String[]{"new"});
+		paramsMap.put("meta", new String[]{jsonString});
+		
+		response = RequestHttp.post(path, paramsMap, null, null);
+		assertNotNull(response);
 	}
 	
 }

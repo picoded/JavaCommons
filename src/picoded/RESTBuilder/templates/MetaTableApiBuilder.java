@@ -7,6 +7,7 @@ import picoded.RESTBuilder.*;
 import picoded.JStack.*;
 import picoded.JStruct.*;
 import picoded.servlet.*;
+import picoded.conv.ConvertJSON;
 import picoded.enums.HttpRequestType;
 
 /// Account login template API
@@ -146,7 +147,7 @@ public class MetaTableApiBuilder {
 				for(String header : headers){
 					MetaObject[] metaObjs = null;
 					
-					if(query.isEmpty() || queryArgs == null){
+					if(query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0){
 						metaObjs = _metaTableObj.getFromKeyName(header, orderBy, start, length);
 					}else{
 						metaObjs = _metaTableObj.query(query, queryArgs, orderBy, start, length);
@@ -276,8 +277,11 @@ public class MetaTableApiBuilder {
 		String updateMode = req.getString("updateMode");
 		Map<String, Object> givenMObj = null;
 		
-		if( req.get("meta") instanceof Map ){
-			givenMObj = (Map<String,Object>)req.get("meta");
+		if( req.get("meta") instanceof String ){
+			String jsonMetaString = req.getString("meta");
+			if(jsonMetaString != null && !jsonMetaString.isEmpty()){
+				givenMObj = ConvertJSON.toMap(jsonMetaString);
+			}
 		}
 		
 		if(givenMObj != null){

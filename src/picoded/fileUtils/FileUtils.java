@@ -1,6 +1,7 @@
 package picoded.fileUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,5 +46,47 @@ public class FileUtils extends org.apache.commons.io.FileUtils{
 		
 		return keyList;
 	}
+	
+	///
+	/// Extends the readFileToString to include a "fallback" default value,
+	/// which is used if the file does not exists / is not readable / is not a file
+	///
+	/// @param file to read
+	/// @param encoding mode
+	/// @param fallback return value if file is invalid
+	///
+	/// @returns the file value if possible, else returns the fallback value
+	///
+	public static String readFileToString_withFallback(File inFile, String encoding, String fallback) {
+		if(inFile == null || !inFile.exists() || !inFile.isFile() || !inFile.canRead()) {
+			return fallback;
+		}
+		
+		try {
+			return readFileToString(inFile, encoding);
+		} catch(IOException e) {
+			return fallback;
+		}
+	}
+	
+	///
+	/// Write to file only if it differs
+	///
+	/// @param file to write
+	/// @param value to write
+	/// @param encoding mode
+	///
+	/// @returns the boolean indicating true if file was written to
+	///
+	public static boolean writeStringToFile_ifDifferant(File inFile, String encoding, String data) throws IOException {
+		String original = readFileToString_withFallback(inFile, encoding, "");
+		if(original.equals(data)) {
+			return false;
+		}
+		
+		writeStringToFile(inFile, data, encoding);
+		return true;
+	}
+	
 	
 }

@@ -2,13 +2,14 @@ package picoded.fileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+/// Replace with apache StringUtils?
 import com.mysql.jdbc.StringUtils;
 
 public class FileUtils extends org.apache.commons.io.FileUtils{
 	
+	/// @TODO: Sam, documentation =.=
 	public static List<String> getFileNamesFromFolder(File inFile, String separator, String rootFolderName){
 		List<String> keyList = new ArrayList<String>();
 		
@@ -45,6 +46,23 @@ public class FileUtils extends org.apache.commons.io.FileUtils{
 		}
 		
 		return keyList;
+	}
+	
+	/// 
+	/// List only the folders inside a folder
+	///
+	/// @param folder to scan
+	///
+	public static Collection<File> listDirs(File inFile) {
+		List<File> ret = new ArrayList<File>();
+		
+		for( File f : inFile.listFiles() ) {
+			if( f.isDirectory() ) {
+				ret.add(f);
+			}
+		}
+		
+		return ret;
 	}
 	
 	///

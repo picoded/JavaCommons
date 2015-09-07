@@ -342,5 +342,13 @@ public class PagesBuilder {
 		return this;
 	}
 	
+	///
+	/// Builds all the pages
+	///
+	public PagesBuilder buildAllPages() {
+		for( File pageDefine : FileUtils.listDir(pagesFolder) ) {
+			buildPage( pageDefine.getName() );
+		}
+	}
 	
 }

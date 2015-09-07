@@ -1,33 +1,28 @@
 package picoded.servlet;
 
+// Java Serlvet requirments
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletContextEvent;
 
+// Net, io, NIO
 import java.net.URL;
-import java.lang.String;
 import java.io.File;
 import java.io.IOException;
-
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 //import java.nio.charset.StandardCharsets;
-import java.util.*;
-
-import java.lang.Number;
-import java.lang.System;
 
 // Exceptions used
 import javax.servlet.ServletException;
-import java.lang.RuntimeException;
-import java.lang.IllegalArgumentException;
 import java.io.IOException;
 
 // Objects used
-import java.util.HashMap;
+import java.util.*;
 import java.io.PrintWriter;
 
+// JMTE inner functions add-on
 import com.floreysoft.jmte.*;
 
 // Sub modules useds
@@ -35,6 +30,8 @@ import picoded.conv.JMTE;
 import picoded.JStack.*;
 import picoded.JStruct.*;
 import picoded.RESTBuilder.*;
+import picoded.webTemplateEngines.JSML.*;
+import picoded.webTemplateEngines.PagesBuilder.*;
 
 /**
  * Extends the corePage/jSqlPage functionality, and implements basic UI templating, and accountManagement
@@ -48,17 +45,11 @@ import picoded.RESTBuilder.*;
  */
 public class BasePage extends JStackPage implements ServletContextListener {
 	
-	/////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////
 	//
 	// Static variables
 	//
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	
-	// Common not so impt stuff
-	//-------------------------------------------
-	
-	// Serialize version ID
-	static final long serialVersionUID = 1L;
+	/////////////////////////////////////////////
 	
 	/////////////////////////////////////////////
 	//
@@ -81,7 +72,8 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		return _restBuilderObj;
 	}
 	
-	/// Override, to configure the restBuilderSetup steps
+	/// !To Override
+	/// to configure the restBuilderSetup steps
 	public void restBuilderSetup( RESTBuilder rbObj ) {
 		
 	}
@@ -210,7 +202,9 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	// }
 	
 	/////////////////////////////////////////////
+	//
 	// HTML fetch and JMTE templating
+	//
 	/////////////////////////////////////////////
 	protected class currentAccountMetaInfo_nr implements NamedRenderer {
 		@Override
@@ -245,7 +239,9 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	/// [Protected] jmte object used
 	protected JMTE _jmteObj = null;
 	
-	/// Loads and setup the jmte object with the "contextPath" parameter, and htmlPartsFolder directory and returns the jmte object
+	/// Loads and setup the jmte object with the "contextPath" parameter, htmlPartsFolder directory if needed
+	///
+	/// @returns the jmte object
 	public JMTE JMTE() {
 		if(_jmteObj != null) { 
 			return _jmteObj; 
@@ -260,7 +256,54 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	}
 	
 	/////////////////////////////////////////////
+	//
+	// PagesBuilder handling
+	//
+	/////////////////////////////////////////////
+	
+	/// [Protected] PagesBuilder object used
+	protected PagesBuilder _pagesBuilderObj = null;
+	
+	/// Loads and setup the PagesBuilder object if needed
+	///
+	/// @returns the PagesBuilder object
+	public PagesBuilder PagesBuilder() {
+		if(_pagesBuilderObj != null) {
+			return _pagesBuilderObj;
+		}
+		
+		_pagesBuilderObj = new PagesBuilder( getPagesTemplatePath(), getPagesOutputPath() );
+		_pagesBuilderObj.setJMTE( JMTE() );
+		_pagesBuilderObj.setUriRootPrefix( getContextURI() );
+		
+		return _pagesBuilderObj;
+	}
+	
+	/////////////////////////////////////////////
+	//
+	// JSML handling
+	//
+	/////////////////////////////////////////////
+	
+	/// [Protected] JSMLFormSet object used
+	protected JSMLFormSet _formSetObj = null;
+	
+	/// Loads and setup the JSMLFormSet object if needed
+	///
+	/// @returns the JSMLFormSet object
+	public JSMLFormSet JSMLFormSet() {
+		if(_formSetObj != null) {
+			return _formSetObj;
+		}
+		
+		_formSetObj = new JSMLFormSet( getJsmlTemplatePath(), getContextURI() );
+		return _formSetObj;
+	}
+	
+	/////////////////////////////////////////////
+	//
 	// Servlet context handling
+	//
 	/////////////////////////////////////////////
 	
 	/// BasePage initializeContext to be extended / build on

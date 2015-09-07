@@ -177,6 +177,15 @@ public class PagesBuilder {
 	/// @param PageName to build
 	///
 	public PagesBuilder buildPage(String pageName) {
+		
+		// Future extension, possible loop hole abuse. Im protecting against it early
+		if( pageName.startsWith(".") ) {
+			throw new RuntimeException("Unable to load page name, starting with '.' : "+pageName);
+		}
+		if( pageName.toLowerCase().indexOf("web-inf") >= 0 ) {
+			throw new RuntimeException("Unable to load page name, that may bypass WEB-INF : "+pageName);
+		}
+		
 		try {
 			
 			// Prepares output and definition FILE objects, and JMTE map
@@ -346,9 +355,12 @@ public class PagesBuilder {
 	/// Builds all the pages
 	///
 	public PagesBuilder buildAllPages() {
-		for( File pageDefine : FileUtils.listDir(pagesFolder) ) {
+		// For each directory, build it as a page
+		for( File pageDefine : FileUtils.listDirs(pagesFolder) ) {
 			buildPage( pageDefine.getName() );
 		}
+		// End and returns self
+		return this;
 	}
 	
 }

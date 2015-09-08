@@ -54,9 +54,9 @@ import picoded.struct.HashMapList;
  *                   |
  * doOption ---------+
  *                   |
- * doPost -----------+--> processChain --> doAuth -+-> doRequest --> do_X_Request --> doOutput
+ * doPost -----------+--> processChain --> doAuth -+-> doRequest --> do_X_Request --> outputRequest
  *                   |         |                   |
- * doGet ------------+         V                   \-> doJson -----> do_X_Json -----> doJsonOutput
+ * doGet ------------+         V                   \-> doJson -----> do_X_Json -----> outputJSON
  *                   |      doSetup
  * doDelete ---------+         |
  *                   |         V

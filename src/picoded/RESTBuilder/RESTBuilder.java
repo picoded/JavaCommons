@@ -126,7 +126,7 @@ public class RESTBuilder {
 	
 	/// Does a search for the relevent api, and additional setup for RESTRequest, relvent to the found api. And perfroms the call
 	protected Map<String,Object> setupAndCall(String apiNamespace, HttpRequestType requestType, RESTRequest req, Map<String,Object> res) {
-		String[] raw_ns = namespaceArray( apiNamespace );
+		String[] raw_ns = namespaceArray( namespaceFilter( apiNamespace ) );
 		String[] ns = raw_ns;
 		
 		// Auto create result map if needed
@@ -205,8 +205,12 @@ public class RESTBuilder {
 	/// and automatic handling of missing API error
 	///
 	/// This is mainly intended to be call within CorePage doJSON
-	public boolean servletCall(picoded.servlet.CorePage page, Map<String,Object> resultMap) {
-		return servletCall("", page, resultMap);
+	public boolean servletCall(picoded.servlet.CorePage page, Map<String,Object> resultMap, String apiNamespace) {
+		if( namespaceCall(apiNamespace, page.requestType(), page, resultMap) == null ) {
+			resultMap.put("requested-API", apiNamespace );
+			resultMap.put("error", "REST API not found");
+		}
+		return true;
 	}
 	
 	/// Automatically calls the respective namespace, using the CorePage registered URI wildcard, as "API NameSpace"
@@ -214,12 +218,17 @@ public class RESTBuilder {
 	///
 	/// This is mainly intended to be call within CorePage doJSON
 	public boolean servletCall(String apiPrefix, picoded.servlet.CorePage page, Map<String,Object> resultMap) {
-		String namespace = namespaceFilter( apiPrefix+page.requestWildcardUri() );
-		if( namespaceCall(namespace, page.requestType(), page, resultMap) == null ) {
-			resultMap.put("requested API", namespace );
-			resultMap.put("error", "REST API not found");
-		}
-		return true;
+		String apiNamespace = ( apiPrefix+page.requestWildcardUri() ); //namespaceFilter?
+		return servletCall( page, resultMap, apiNamespace );
+	}
+	
+	
+	/// Automatically calls the respective namespace, using the CorePage registered URI wildcard, as "API NameSpace"
+	/// and automatic handling of missing API error
+	///
+	/// This is mainly intended to be call within CorePage doJSON
+	public boolean servletCall(picoded.servlet.CorePage page, Map<String,Object> resultMap) {
+		return servletCall("", page, resultMap);
 	}
 	
 	///----------------------------------------
@@ -379,7 +388,7 @@ public class RESTBuilder {
 			baseURL = "";
 		}
 		
-		ret.append( "var " ) //
+		ret.append( "window." ) //
 			.append( rootVarName ) //
 			.append( "=((function(){ ")
 			.append( "\"use strict\"; ");

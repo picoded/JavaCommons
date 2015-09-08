@@ -398,7 +398,7 @@ public class PagesBuilder {
 	}
 	
 	/// Process the full PageBuilder servlet request
-	public void processJSMLFormCollectionServlet( BasePage page ) {
+	public void processPageBuilderServlet( BasePage page ) {
 		processPageBuilderServlet( page, page.requestWildcardUriArray() );
 	}
 	

@@ -99,6 +99,15 @@ public class CommonsPage extends BasePage {
 		// Gets the wildcard URI
 		String[] wildcardUri = requestWildcardUriArray();
 		
+		// Indicates if its a API.JS request, and returns the JS file
+		if( wildcardUri != null && wildcardUri.length >= 1 && //
+			wildcardUri[0].equalsIgnoreCase("api.js")
+			) {
+			getHttpServletResponse().setContentType("application/javascript");
+			output.println( restBuilder().generateJS( "api", getContextURI() ) );
+			return true;
+		}
+		
 		// Indicates if its a JSML form usage
 		if( wildcardUri != null && wildcardUri.length >= 1 && //
 			wildcardUri[0].equalsIgnoreCase("form") && //
@@ -132,6 +141,5 @@ public class CommonsPage extends BasePage {
 		}
 		return super.outputJSON(outputData, templateData, output);
 	}
-	
 	
 }

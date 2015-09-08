@@ -269,6 +269,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	/// @returns the PagesBuilder object
 	public PagesBuilder PagesBuilder() {
 		if(_pagesBuilderObj != null) {
+			_pagesBuilderObj.setUriRootPrefix( getContextURI() );
 			return _pagesBuilderObj;
 		}
 		

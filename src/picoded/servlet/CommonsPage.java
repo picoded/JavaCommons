@@ -27,6 +27,7 @@ import com.floreysoft.jmte.*;
 
 // Sub modules useds
 import picoded.conv.JMTE;
+import picoded.fileUtils.FileUtils;
 import picoded.JStack.*;
 import picoded.JStruct.*;
 import picoded.RESTBuilder.*;
@@ -49,18 +50,39 @@ public class CommonsPage extends BasePage {
 			wildcardUri = new String[] {};
 		}
 		
-		// Exempt login page from auth
-		if( wildcardUri.length >= 1 && ( wildcardUri[0].equalsIgnoreCase("login") ) ) {
-			return true;
-		}
-		
-		// Exempt login API from auth
-		if( wildcardUri.length >= 1 && 
-			( wildcardUri[0].equalsIgnoreCase("api") ) //&& 
-			//( wildcardUri[1].equalsIgnoreCase("account") ) && 
-			//( wildcardUri[2].equalsIgnoreCase("login") ) 
-			) {
-			return true;
+		if( wildcardUri.length >= 1 ) {
+			// Exempt login page from auth
+			if( wildcardUri[0].equalsIgnoreCase("login") ) {
+				return true;
+			}
+			// Exempt common / index page from auth
+			if( wildcardUri[0].equalsIgnoreCase("common") || wildcardUri[0].equalsIgnoreCase("index") ) {
+				return true;
+			}
+			// Exempt API from auth
+			if( wildcardUri[0].equalsIgnoreCase("api") ) {
+				return true;
+			}
+			
+			// File exemptions
+			String fileStr = wildcardUri[ wildcardUri.length - 1 ].toLowerCase();
+			String[] fileStrArr = fileStr.split("\\.");
+			String fileExt = fileStrArr[ fileStrArr.length - 1 ];
+			
+			// Allow common asset files types
+			if( //
+				fileExt.equalsIgnoreCase("html") || //
+				fileExt.equalsIgnoreCase("js") || //
+				fileExt.equalsIgnoreCase("css") || //
+				fileExt.equalsIgnoreCase("png") || //
+				fileExt.equalsIgnoreCase("jpg") || //
+				fileExt.equalsIgnoreCase("jpeg") || //
+				fileExt.equalsIgnoreCase("svg") || //
+				fileExt.equalsIgnoreCase("pdf") //
+				) {
+				return true;
+			}
+			
 		}
 		
 		// Redirect to login, if current login is not valid
@@ -101,10 +123,13 @@ public class CommonsPage extends BasePage {
 		
 		// Indicates if its a API.JS request, and returns the JS file
 		if( wildcardUri != null && wildcardUri.length >= 1 && //
-			wildcardUri[0].equalsIgnoreCase("api.js")
+			wildcardUri[0].equalsIgnoreCase("api.js") && //api.js request 
+			JConfig().getBoolean("sys.developersMode.enabled", true) //developerMode
 			) {
+			String apiJS = restBuilder().generateJS( "api", (getContextURI()+"/api").replaceAll("//", "/") ) ;
+			FileUtils.writeStringToFile_ifDifferant( new File(getContextPath()+"/api.js"), "UTF-8", apiJS );
 			getHttpServletResponse().setContentType("application/javascript");
-			output.println( restBuilder().generateJS( "api", getContextURI() ) );
+			output.println( apiJS );
 			return true;
 		}
 		

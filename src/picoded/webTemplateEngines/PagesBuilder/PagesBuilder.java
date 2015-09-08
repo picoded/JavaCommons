@@ -273,7 +273,7 @@ public class PagesBuilder {
 				if( (jsonsString = jsonsString.trim()).length() > 0 ) {
 					
 					// Adds the script object wrapper
-					jsonsString = "window.page = window.page | {}; window.page."+pageName+" = ("+jsonsString+");";
+					jsonsString = "window.pages = window.pages | {}; window.pages."+pageName+" = ("+jsonsString+");";
 					
 					// Does a JMTE filter
 					jsonsString = getJMTE().parseTemplate(jsonsString, jmteVarMap);
@@ -303,7 +303,7 @@ public class PagesBuilder {
 				if( (lessString = lessString.trim()).length() > 0 ) {
 					
 					/// Does an outer wrap, if its not index page (which applies style to 'all')
-					if( !pageName.equalsIgnoreCase("index") ) {
+					if( !pageName.equalsIgnoreCase("index") && !pageName.equalsIgnoreCase("common") ) {
 						lessString = ".pageFrame_"+pageName+" { \n"+lessString+"\n } \n";
 					}
 					
@@ -327,27 +327,42 @@ public class PagesBuilder {
 				}
 			}
 			
-			// Build the injector code for this page (before </head>)
-			//-------------------------------------------------------------------
-			StringBuilder injectorStrBuilder = new StringBuilder();
-			if( hasLessFile ) {
-				injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='"+uriRootPrefix+""+pageName+"/"+pageName+".js'/>\n");
-			}
-			if( hasJsFile ) {
-				injectorStrBuilder.append("<script src='"+uriRootPrefix+""+pageName+"/"+pageName+".js'/>\n");
-			}
-			
 			// Build the html page
 			//-------------------------------------------------------------------
 			
 			// The HTML output
 			String indexStr = html().buildFullPageFrame(pageName).toString();
 			
+			// Build the injector code for this page (before </head>)
+			//-------------------------------------------------------------------
+			// StringBuilder injectorStrBuilder = new StringBuilder();
+			// String injectorStr = injectorStrBuilder.toString();
+			// 
+			// if( hasLessFile ) {
+			// 	if( injectorStr.indexOf(pageName+"/"+pageName+".css") > 0 ) {
+			// 		// Skips injection if already included
+			// 	} else {
+			// 		injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='"+uriRootPrefix+""+pageName+"/"+pageName+".css'/>\n");
+			// 	}
+			// }
+			// if( hasJsFile ) {
+			// 	if( injectorStr.indexOf(pageName+"/"+pageName+".js") > 0 ) {
+			// 		// Skips injection if already included
+			// 	} else {
+			// 		injectorStrBuilder.append("<script src='"+uriRootPrefix+""+pageName+"/"+pageName+".js'/>\n");
+			// 	}
+			// }
+			
+			// Ammend the HTML output
+			//-------------------------------------------------------------------
+			
 			// Apply injector code if any
-			String injectorStr = injectorStrBuilder.toString();
-			if( injectorStr.length() > 0 ) {
-				indexStr = indexStr.replace("</head>", injectorStr+"</head>");
-			}
+			// if( injectorStr.length() > 0 ) {
+			// 	indexStr = indexStr.replace("</head>", injectorStr+"</head>");
+			// }
+			
+			// HTML minify
+			//-------------------------------------------------------------------
 			
 			// Apply a simplistic compression (so avoid inline JS with line comments for nuts)
 			//
@@ -355,6 +370,9 @@ public class PagesBuilder {
 			// https://code.google.com/p/htmlcompressor
 			indexStr = indexStr.trim().replaceAll("\\s+", " ");
 			indexStr = indexStr.trim().replaceAll("\\>\\s\\<", "><");
+			
+			// Write out to file
+			//-------------------------------------------------------------------
 			
 			// Write to file if it differ
 			FileUtils.writeStringToFile_ifDifferant( new File(outputPageFolder, "index.html"), "UTF-8", indexStr );

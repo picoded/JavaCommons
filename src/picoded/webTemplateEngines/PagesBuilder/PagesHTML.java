@@ -94,12 +94,17 @@ public class PagesHTML {
 		HashMap<String,Object> ret = new HashMap<String,Object>();
 		String pageURI = uriRootPrefix+"/"+pageName+"/";
 		
-		ret.put("${PagesRootURI}", uriRootPrefix);
-		ret.put("${PageURI}", pageURI);
-		ret.put("${PageName}", pageName);
-		ret.put("${PageAssetsURI}", pageURI+"assets/");
+		ret.put("PagesRootURI", uriRootPrefix);
+		ret.put("PageURI", pageURI);
+		ret.put("PageName", pageName);
 		
 		return ret;
+	}
+	
+	/// Gets the prefix
+	public String prefixHTML(String pageName) {
+		String buffer = FileUtils.readFileToString_withFallback( new File(pagesFolder, "index/prefix.html"), "UTF-8", "");
+		return getJMTE().parseTemplate(buffer, pageJMTEvars(pageName));
 	}
 	
 	/// Gets the prefix
@@ -108,13 +113,14 @@ public class PagesHTML {
 		if( _prefixHTML != null ) {
 			return _prefixHTML;
 		}
-		
-		// Build & Caches it
-		String buffer = FileUtils.readFileToString_withFallback( new File(pagesFolder, "index/prefix.html"), "UTF-8", "");
-		_prefixHTML = getJMTE().parseTemplate(buffer, pageJMTEvars("index"));
-		
 		// Return it
-		return _prefixHTML;
+		return _prefixHTML = prefixHTML("index");
+	}
+	
+	/// Gets the prefix
+	public String suffixHTML(String pageName) {
+		String buffer = FileUtils.readFileToString_withFallback( new File(pagesFolder, "index/suffix.html"), "UTF-8", "");
+		return getJMTE().parseTemplate(buffer, pageJMTEvars(pageName));
 	}
 	
 	/// Gets the suffix
@@ -123,13 +129,8 @@ public class PagesHTML {
 		if( _suffixHTML != null ) {
 			return _suffixHTML;
 		}
-		
-		// Build & Caches it
-		String buffer = FileUtils.readFileToString_withFallback( new File(pagesFolder, "index/suffix.html"), "UTF-8", "");
-		_suffixHTML = getJMTE().parseTemplate(buffer, pageJMTEvars("index"));
-		
 		// Return it
-		return _suffixHTML;
+		return _suffixHTML = suffixHTML("index");
 	}
 	
 	/// Get pageFrame
@@ -152,9 +153,9 @@ public class PagesHTML {
 	/// HTML builder 
 	public StringBuilder buildFullPageFrame(String pageName) {
 		StringBuilder ret = new StringBuilder();
-		ret.append( prefixHTML() );
+		ret.append( prefixHTML(pageName) );
 		ret.append( buildPageFrame(pageName) );
-		ret.append( suffixHTML() );
+		ret.append( suffixHTML(pageName) );
 		return ret;
 	}
 }

@@ -1,12 +1,12 @@
 package picoded.RESTBuilder.templates;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import picoded.RESTBuilder.*;
 import picoded.JStack.*;
 import picoded.JStruct.*;
 import picoded.servlet.*;
-
 import picoded.enums.HttpRequestType;
 
 /// Account login template API
@@ -57,6 +57,8 @@ public class AccountLogin extends BasePage {
 		);
 	}
 	
+	private static MetaTableApiBuilder mtApi = null;
+	
 	///
 	/// Standardised utility function use to authenticate the login request, and extend on for the respective function
 	///
@@ -78,6 +80,9 @@ public class AccountLogin extends BasePage {
 		BasePage basePageObj = (BasePage)(req.requestPage());
 		AccountTable accountTableObj = basePageObj.accountAuthTable();
 		AccountObject currentUser = accountTableObj.getRequestUser( basePageObj.getHttpServletRequest() );
+		
+		mtApi = new MetaTableApiBuilder(accountTableObj.accountMetaTable());
+		
 		
 		// Checked for valid login
 		//----------------------------------------
@@ -411,9 +416,9 @@ public class AccountLogin extends BasePage {
 	/// ## HTTP Request Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | No parameters options                                                                                                |
+	/// | accountName     | String(optional)   | Account name of info to get. If blank, assume current user.                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
@@ -457,8 +462,10 @@ public class AccountLogin extends BasePage {
 					if(account != null){
 						res.put("accountID", account._oid());
 						
-						String[] accNames = (String[])account.getNames().toArray();
-						res.put("accountNames", accNames);
+						Set<String> accNameSet = account.getNames();
+						String[] accNames = new String[accNameSet.size()];
+						accNameSet.toArray(accNames);
+						res.put("accountNames", accNames);;
 						
 						res.put("isSuperUser", account.isSuperUser());
 						res.put("isGroup", account.isGroup());
@@ -487,15 +494,15 @@ public class AccountLogin extends BasePage {
 	/// ## HTTP Request Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | No parameters options                                                                                                |
+	/// | accountID       | String(optional)   | Account id of info to get. If blank, assume current user.                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// | Parameter Name  | Variable Type	    | Description                                                                  |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | accountID       | String             | account ID used                                                               |
 	/// | accountNames    | String[]           | array of account names representing the account                               |
@@ -509,6 +516,50 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction infoByID_GET = (req, res) -> {
+		res.put("accountID", null);
+		res.put("accountNames", null);
+		res.put("isSuperUser", null);
+		res.put("isGroup", null);
+		res.put("groupIDs", null);
+		res.put("groupNames", null);
+		res.put("groupRoles", null);
+		
+		if(req.requestPage() != null){
+			BasePage bp = (BasePage)(req.requestPage());
+			AccountTable at = bp.accountAuthTable(); //at contains all the user data
+			AccountObject ao = at.getRequestUser( bp.getHttpServletRequest() ); //to check if logged in
+			
+			if(ao != null){
+				String id = "";
+				if(req.containsKey("accountID")){
+					id = req.getString("accountID");
+				};
+				
+				if(!id.isEmpty()){
+					AccountObject account = at.getFromID(id); //wrong
+					if(account != null){
+						res.put("accountID", account._oid());
+						
+						Set<String> accNameSet = account.getNames();
+						String[] accNames = new String[accNameSet.size()];
+						accNameSet.toArray(accNames);
+						res.put("accountNames", accNames);
+						
+						res.put("isSuperUser", account.isSuperUser());
+						res.put("isGroup", account.isGroup());
+						
+						res.put("groupIDs", account.getGroups_id());
+						
+						
+						res.put("groupNames", null);
+						res.put("groupRoles", null);
+					}
+				}
+			}else{
+				res.put("error", "Account object requested is null");
+			}
+		}
+		
 		return res;
 	};
 	
@@ -559,7 +610,7 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction list_GET_and_POST = (req, res) -> {
-		return res;
+		return mtApi.list_GET_and_POST.apply(req, req);
 	};
 	
 	/////////////////////////////////////////////
@@ -597,7 +648,7 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction meta_GET = (req, res) -> {
-		return res;
+		return mtApi.meta_GET.apply(req, res);
 	};
 	
 	///
@@ -631,7 +682,7 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction meta_POST = (req, res) -> {
-		return res;
+		return mtApi.meta_POST.apply(req, res);
 	};
 	
 	/////////////////////////////////////////////
@@ -643,26 +694,27 @@ public class AccountLogin extends BasePage {
 	/// 
 	/// # members/list/${groupID} (GET) [Requires login]
 	/// 
-	/// Gets the group info of the respective group
+	/// Gets the info of group members of the respective group
 	/// 
 	/// Note: if ${groupID} is blank, it assumes the current user
 	/// 
 	/// ## HTTP Request Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
 	/// | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
-	/// | length          | int (optional)     | Default 50: The number of records to return                                   |
+	/// | length          | int (optional)     | Default max: The number of records to return                                  |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | headers         | String[](optional) | Default ["_oid", "names", "role"], the collumns to return                     |
+	/// | headers         | String[](optional) | Default ["_oid", "name", "role"], the collumns to return                      |
+	/// | If a header element contains an "account_" prefix, take the data from the curren                   
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | groupID         | String             | group ID used in the request                                                  |
 	/// | groupID_exist   | boolean            | indicates if the account ID exists in the system                              |
@@ -670,9 +722,9 @@ public class AccountLogin extends BasePage {
 	/// | groupID_admin   | boolean            | indicates if the session has admin rights over the group                      |
 	/// | groupID_names   | String[]           | the group various names, if ID is valid                                       |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
-	/// | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    |
-	/// | recordsFilterd  | int                | Total amount of records. After all search filter                              |
+	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       | not returned
+	/// | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    | not returned
+	/// | recordsFilterd  | int                | Total amount of records. After all search filter                              | not returned
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | headers         | String[](optional) | The collumns headers returned                                                 |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -685,6 +737,73 @@ public class AccountLogin extends BasePage {
 		// Only runs function if logged in, and valid group object
 		return fetchGroupObject_fromFirstWildcard_orCurrentUser( req, res, false,
 			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				res.put("data", null);
+				res.put("draw", null);
+				res.put("headers", null);
+				res.put("error", null);
+				
+				if(groupObj == null){
+					return resMap;
+				}
+				
+				try{
+					List<List<Object>> retList = new ArrayList<List<Object>>();
+					
+					String[] headers = reqObj.getStringArray("headers");
+					
+					if(headers == null || headers.length < 1){
+						headers = new String[]{"_oid", "name", "role"};
+					}
+					
+					AccountObject[] members = groupObj.getMembersAccountObject();
+					
+					int listCounter = 0;
+					for(AccountObject accObj : members){
+						MetaObject groupMemberMeta = groupObj.getMember(accObj);
+						retList.add(new ArrayList<Object>());
+						for(String header : headers){
+							if(header.equalsIgnoreCase("_oid")){
+								retList.get(listCounter).add(accObj._oid());
+							}else if(header.equalsIgnoreCase("name")){
+								retList.get(listCounter).add(accObj.getNames());
+							}else if(header.equalsIgnoreCase("role")){
+								String role = groupObj.getMemberRole(accObj);
+								retList.get(listCounter).add(role);
+							} else if(header.toLowerCase().contains("account_")) {
+								String headerSuffix = header.substring(0, "account_".length());
+								Object rawObj = accObj.get(headerSuffix);
+								if(rawObj != null){
+									retList.get(listCounter).add(rawObj);
+								}else{
+									retList.get(listCounter).add("");
+								}
+							} else if (header.toLowerCase().contains("group_")) {
+								String headerSuffix = header.substring(0, "group_".length());
+								Object rawObj = groupObj.get(headerSuffix);
+								if(rawObj != null){
+									retList.get(listCounter).add(rawObj);
+								}else{
+									retList.get(listCounter).add("");
+								}
+							} else  {
+								Object rawObj = groupMemberMeta.get(header);
+								if(rawObj != null){
+									retList.get(listCounter).add(rawObj);
+								}else{
+									retList.get(listCounter).add("");
+								}
+							}
+						}
+						
+						++listCounter;
+						res.put("data", retList);
+						res.put("draw", req.getInt("draw"));
+						res.put("headers", headers);
+					}
+					
+				}catch(Exception e){
+					res.put("error", e.getMessage());
+				}
 				
 				return resMap;
 			}
@@ -700,16 +819,16 @@ public class AccountLogin extends BasePage {
 	/// ## HTTP Request Parameters
 	///
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	       | Description                                                                |
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | setMembers      | String[][] (optional) | [ [memberID,role], ... ] : Array of member ID/roles to set                 |
+	/// | setMembers      | { Map } (optional)    | { memberID : role } : Array of member ID/roles to set                      |
 	/// | delMembers      | String[]   (optional) | [ memberID, ... ] : Array of member ID's to delete                         |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	       | Description                                                                |
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// | groupID         | String                | group ID used in the request                                               |
 	/// | groupID_exist   | boolean               | indicates if the account ID exists in the system                           |
@@ -717,17 +836,74 @@ public class AccountLogin extends BasePage {
 	/// | groupID_admin   | boolean               | indicates if the session has admin rights                                  |
 	/// | groupID_names   | String[]              | the group various names, if ID is valid                                    |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | setMembers      | String[][] (optional) | [ [memberID,role], ... ] : Array of member ID/roles set                    |
+	/// | setMembers      | { Map } (optional)    | { memberID : role } : Array of member ID/roles set                         |
 	/// | delMembers      | String[]   (optional) | [ memberID, ... ] : Array of member ID's deleted                           |
 	/// | success         | boolean               | indicator if logout is successful or not                                   |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// | error           | String (Optional)     | Errors encounted if any                                                    |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
+	@SuppressWarnings("unchecked")
 	public static RESTFunction members_list_POST = (req, res) -> {
 		// Only runs function if logged in, and valid group object, with admin rights
 		return fetchGroupObject_fromFirstWildcard_orCurrentUser( req, res, true,
 			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				
+				res.put("setMembers", null);
+				res.put("delMembers", null);
+				res.put("error", null);
+				
+				if(groupObj == null){
+					return resMap;
+				}
+				
+				try{
+					//do deletes first
+					List<String> successfulDeletes = null;
+					String[] delMember = null;
+					Object delMemberRaw = req.get("delMembers");
+					if(delMemberRaw != null){
+						delMember = (String[])delMemberRaw;
+						successfulDeletes = new ArrayList<String>();
+					}
+					
+					if(delMember != null){
+						for(String str : delMember){
+							if(!str.isEmpty()){
+								if(groupObj.remove(str) != null){
+									successfulDeletes.add(str);
+								}
+							}
+						}
+						
+						res.put("delMembers", successfulDeletes);
+					}
+					
+					//then do additions
+					List<String> successfulAdds = null;
+					Map<String, Object> setMemberMap = null;
+					Object setMemberMapRaw = req.get("setMembers");
+					if(setMemberMapRaw != null){
+						setMemberMap = (Map<String, Object>)setMemberMapRaw;
+						successfulAdds = new ArrayList<String>();
+					}
+					
+					if(setMemberMap != null){
+						for(Entry<String, Object> setMember : setMemberMap.entrySet()){
+							AccountObject newMember = accountTableObj.getFromID(setMember.getKey());
+							if(newMember != null){
+								groupObj.addMember(newMember, (String)setMember.getValue()).saveAll();
+								successfulAdds.add(setMember.getKey());
+							}
+						}
+						
+						res.put("setMembers", successfulAdds);
+					}
+					
+					
+				}catch(Exception e){
+					res.put("error", e.getMessage());
+				}
 				
 				return resMap;
 			}
@@ -750,7 +926,7 @@ public class AccountLogin extends BasePage {
 	/// ## HTTP Request Parameters
 	///
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	       | Description                                                                |
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// | No parameters options                                                                                                |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -758,7 +934,7 @@ public class AccountLogin extends BasePage {
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	       | Description                                                                |
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// | groupID         | String                | group ID used in the request                                               |
 	/// | groupID_exist   | boolean               | indicates if the account ID exists in the system                           |
@@ -777,6 +953,29 @@ public class AccountLogin extends BasePage {
 		// Only runs function if logged in, and valid group object
 		return fetchGroupObject_fromFirstWildcard_orCurrentUser( req, res, false,
 			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				
+				res.put("accountID", null);
+				res.put("accountID_valid", null);
+				res.put("meta", null);
+				res.put("error", null);
+				
+				if(groupObj == null){
+					return resMap;
+				}
+				
+				try{
+					
+					String accountOID = req.getString("acountID");
+					if(accountOID == null || accountOID.isEmpty() && currentUser != null){
+						accountOID = currentUser._oid();
+					}else{
+						return resMap;
+					}
+					
+					
+				}catch(Exception e){
+					res.put("error", e.getMessage());
+				}
 				
 				return resMap;
 			}
@@ -861,6 +1060,12 @@ public class AccountLogin extends BasePage {
 		rb.getNamespace( setPrefix + "info/name" ).put( HttpRequestType.GET, infoByName_GET );
 		rb.getNamespace( setPrefix + "info/name/*" ).put( HttpRequestType.GET, infoByName_GET );
 		
+		rb.getNamespace( setPrefix + "info/id" ).put( HttpRequestType.GET, infoByID_GET );
+		rb.getNamespace( setPrefix + "info/id/*" ).put( HttpRequestType.GET, infoByID_GET );
+		
+		rb.getNamespace( setPrefix + "members/list/*" ).put( HttpRequestType.GET, members_list_GET );
+		rb.getNamespace( setPrefix + "members/list" ).put( HttpRequestType.GET, members_list_GET );
+//		rb.getNamespace( setPrefix + "info/id/*" ).put( HttpRequestType.GET, infoByID_GET );
 		
 		return rb;
 	}

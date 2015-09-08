@@ -134,6 +134,10 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		accountMeta.systemSetup();
 		group_childRole.systemSetup();
 		groupChild_meta.systemSetup();
+		
+		if( superUserGroup() == null ) {
+			newObject(_superUserGroup).saveAll();
+		}
 	}
 	
 	/// Performs the full stack teardown for the data object
@@ -144,6 +148,24 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		accountMeta.systemTeardown();
 		group_childRole.systemTeardown();
 		groupChild_meta.systemTeardown();
+	}
+	
+	//
+	//
+	// Getters for metaTables
+	// Discouraged from use
+	//
+	
+	public MetaTable accountMetaTable(){
+		return accountMeta;
+	}
+	
+	public MetaTable groupChildRole(){
+		return group_childRole;
+	}
+	
+	public MetaTable groupChildMeta(){
+		return groupChild_meta;
 	}
 	
 	//
@@ -520,7 +542,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	///
 	/// Group Membership roles managment
 	///--------------------------------------------------------------------------
-	protected List<String> membershipRoles = new ArrayList<String>( Arrays.asList(new String[] { "guest", "member", "manager" }) );
+	protected List<String> membershipRoles = new ArrayList<String>( Arrays.asList(new String[] { "guest", "member", "manager", "admin" }) );
 	
 	/// Returns the internal membership role list
 	public List<String> membershipRoles() {

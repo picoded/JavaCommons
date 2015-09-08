@@ -430,6 +430,15 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		}
 	}
 	
+	/// Returns the servlet contextual path : needed for base URI for page redirects / etc
+	public String getServletContextURI() {
+		if(httpRequest != null) {
+			return httpRequest.getServletPath();
+		}
+		//return getServletPath();
+		throw new RuntimeException("Unable to process getServletContextURI, outside of servlet request");
+	}
+	
 	/// gets a parameter value, from the httpRequest.getParameter
 	public String getParameter(String paramName) {
 		if(requestParameters() != null) {

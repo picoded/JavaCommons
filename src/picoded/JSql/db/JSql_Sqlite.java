@@ -69,9 +69,18 @@ public class JSql_Sqlite extends JSql {
 	
 	/// Internal parser that converts some of the common sql statements to sqlite
 	public String genericSqlParser(String inString) {
+		final String ifExists = "IF EXISTS";
+		final String ifNotExists = "IF NOT EXISTS";
+		final String drop = "DROP";
+		
+		inString = inString.toUpperCase();
 		inString = inString //
 			.replaceAll("(?i)VARCHAR\\(MAX\\)", "VARCHAR") //
 			.replaceAll("(?i)BIGINT", "INTEGER"); //
+		
+		if (inString.startsWith(drop)) { //DROP
+			inString = inString.replaceAll(ifNotExists, ifExists);
+		}
 		//System.out.println( inString );
 		return inString;
 	}

@@ -112,6 +112,9 @@ public class JSql_Mssql extends JSql {
 		
 		int prefixOffset = 0;
 		if (upperCaseStr.startsWith(drop)) { //DROP
+			upperCaseStr = upperCaseStr.replaceAll(ifNotExists, ifExists);
+			fixedQuotes = fixedQuotes.replaceAll(ifNotExists, ifExists);
+			
 			prefixOffset = drop.length() + 1;
 			
 			if (upperCaseStr.startsWith(table, prefixOffset)) { //TABLE

@@ -412,6 +412,7 @@ public class TableWrapperTemplates {
 				Map<String,Object> rowMap = (rowObj instanceof Map)? (Map<String,Object>)rowObj : null;
 				Map<String,Object> child = childrenDefinition.get(col);
 				
+				//sam single tier "fix"
 				int tierNumber = 0;
 				if(node.getString("type").equalsIgnoreCase("table")){
 					tierNumber = col;
@@ -423,6 +424,7 @@ public class TableWrapperTemplates {
 				String fieldName = (String)tempChild.get("field");
 				fieldName = node.getFieldName() + "[" + tierNumber + "]." + fieldName;
 				tempChild.put("field", fieldName);
+				//and sam "fix"
 				
 				//
 				// Build if possible

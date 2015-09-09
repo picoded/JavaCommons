@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import picoded.conv.ConvertJSON;
+import picoded.conv.MapValueConv;
 import picoded.conv.RegexUtils;
 import picoded.conv.GenericConvert;
 import picoded.struct.GenericConvertMap;
@@ -637,6 +638,20 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		if(_inputValue != null && _inputValue.containsKey(fieldName)){
 			val = _inputValue.get(fieldName);
 		}
+		
+		//SINGLE TIER VALUE LOADING HACK!
+		//this will allow you to load single tier values - however, it -SHOULDNT- crash if no value is found
+		if(val == null){//if val == null, try again by splitting fieldname - THIS IS A HACK HACK HACK
+			String[] fieldNameSplit = fieldName.split("\\.");
+			if(fieldNameSplit != null && fieldNameSplit.length > 1){
+				fieldName = fieldNameSplit[1];
+			}
+			
+			if(_inputValue != null && _inputValue.containsKey(fieldName)){
+				val = _inputValue.get(fieldName);
+			}
+		}
+		//END HACK HACK HACK
 		
 		if(val == null) {
 			val = get(JsonKeys.DEFAULT);

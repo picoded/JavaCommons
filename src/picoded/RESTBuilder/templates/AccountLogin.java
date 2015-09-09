@@ -7,6 +7,7 @@ import picoded.RESTBuilder.*;
 import picoded.JStack.*;
 import picoded.JStruct.*;
 import picoded.servlet.*;
+import picoded.conv.ConvertJSON;
 import picoded.enums.HttpRequestType;
 
 /// Account login template API
@@ -862,23 +863,25 @@ public class AccountLogin extends BasePage {
 				try{
 					//do deletes first
 					List<String> successfulDeletes = null;
-					String[] delMember = null;
+					List<Object> delMember = null;
 					Object delMemberRaw = req.get("delMembers");
 					if(delMemberRaw != null){
-						delMember = (String[])delMemberRaw;
+						delMember = ConvertJSON.toList((String)delMemberRaw);
 						successfulDeletes = new ArrayList<String>();
 					}
 					
 					if(delMember != null){
-						for(String str : delMember){
+						for(Object strRaw : delMember){
+							String str = (String)strRaw;
 							if(!str.isEmpty()){
-								if(groupObj.remove(str) != null){
-									successfulDeletes.add(str);
+								AccountObject memberToDelete = accountTableObj.getFromID(str);
+								if(memberToDelete != null){
+									groupObj.removeMember(memberToDelete);
 								}
 							}
 						}
-						
-						res.put("delMembers", successfulDeletes);
+						groupObj.saveAll();
+						res.put("delMembers", delMember);
 					}
 					
 					//then do additions
@@ -886,7 +889,7 @@ public class AccountLogin extends BasePage {
 					Map<String, Object> setMemberMap = null;
 					Object setMemberMapRaw = req.get("setMembers");
 					if(setMemberMapRaw != null){
-						setMemberMap = (Map<String, Object>)setMemberMapRaw;
+						setMemberMap = ConvertJSON.toMap((String)setMemberMapRaw);
 						successfulAdds = new ArrayList<String>();
 					}
 					
@@ -968,12 +971,13 @@ public class AccountLogin extends BasePage {
 				
 				try{
 					
-					String accountOID = req.getString("acountID");
-					if(accountOID == null || accountOID.isEmpty() && currentUser != null){ 
-						accountOID = currentUser._oid(); //if accountOID is null, try get oid from currentUser object
-					}else{
-						res.put("error", "Unable to obtain oid");
-						return resMap;
+					String accountOID = req.getString("accountID");
+					if(accountOID == null || accountOID.isEmpty()){ 
+						if(currentUser != null){
+							accountOID = currentUser._oid(); //if accountOID is null, try get oid from currentUser object
+						}else{
+							res.put("error", "Unable to obtain oid");
+						}	
 					}
 					
 					res.put("accountID", accountOID);
@@ -1060,12 +1064,13 @@ public class AccountLogin extends BasePage {
 				
 				try{
 					
-					String accountOID = req.getString("acountID");
-					if(accountOID == null || accountOID.isEmpty() && currentUser != null){ 
-						accountOID = currentUser._oid(); //if accountOID is null, try get oid from currentUser object
-					}else{
-						res.put("error", "Unable to obtain oid");
-						return resMap;
+					String accountOID = req.getString("accountID");
+					if(accountOID == null || accountOID.isEmpty()){ 
+						if(currentUser != null){
+							accountOID = currentUser._oid(); //if accountOID is null, try get oid from currentUser object
+						}else{
+							res.put("error", "Unable to obtain oid");
+						}	
 					}
 					
 					res.put("accountID", accountOID);
@@ -1092,7 +1097,8 @@ public class AccountLogin extends BasePage {
 						return resMap;
 					}
 					
-					Map<String, Object> metaObj = (Map<String, Object>)metaObjRaw;
+					Map<String, Object> metaObj = ConvertJSON.toMap((String)metaObjRaw);
+					
 					res.put("updateMeta", metaObj);
 					groupUserInfo.putAll(metaObj);
 					

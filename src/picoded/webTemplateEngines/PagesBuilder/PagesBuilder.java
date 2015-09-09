@@ -273,7 +273,7 @@ public class PagesBuilder {
 				if( (jsonsString = jsonsString.trim()).length() > 0 ) {
 					
 					// Adds the script object wrapper
-					jsonsString = "window.pages = window.pages | {}; window.pages."+pageName+" = ("+jsonsString+");";
+					jsonsString = "window.pageFrames = window.pageFrames || {}; window.pageFrames."+pageName+" = ("+jsonsString+");";
 					
 					// Does a JMTE filter
 					jsonsString = getJMTE().parseTemplate(jsonsString, jmteVarMap);
@@ -443,18 +443,18 @@ public class PagesBuilder {
 			
 			boolean isDeveloperMode = page.JConfig().getBoolean("sys.developersMode.enabled", true);
 			if( isDeveloperMode ) {
-				PagesBuilder servletPagesBuilder =  page.PagesBuilder();
-				
-				// Load the index and common pages (if applicable)
-				if( servletPagesBuilder.hasPageDefinition( "index" ) ) {
-					servletPagesBuilder.buildPage( "index" );
-				}
-				if( servletPagesBuilder.hasPageDefinition( "common" ) ) {
-					servletPagesBuilder.buildPage( "common" );
-				}
-				
 				// Load the respective page
 				if( requestWildcardUri.length == 2 && itemName.equals("index.html") ) {
+					PagesBuilder servletPagesBuilder =  page.PagesBuilder();
+					
+					// Load the index and common pages (if applicable)
+					if( servletPagesBuilder.hasPageDefinition( "index" ) ) {
+						servletPagesBuilder.buildPage( "index" );
+					}
+					if( servletPagesBuilder.hasPageDefinition( "common" ) ) {
+						servletPagesBuilder.buildPage( "common" );
+					}
+					
 					if( servletPagesBuilder.hasPageDefinition( pageName ) ) {
 						servletPagesBuilder.buildPage( pageName );
 					}

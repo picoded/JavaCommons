@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContext;
 
 // Net, io, NIO
 import java.net.URL;
@@ -126,7 +127,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		
 		// Ensure its role
 		String role = grpObject.getMemberRole( userObject );
-		if( !(role.equals("admin")) ) {
+		if( role == null || !(role.equals("admin")) ) {
 			grpObject.setMember( userObject, "admin" );
 		}
 		
@@ -319,6 +320,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	
 	/// [Do not extend] Servlet context initializer handling. 
 	public void contextInitialized(ServletContextEvent sce) {
+		_servletContextEvent = sce;
 		try {
 			initializeContext();
 		} catch(Exception e) {
@@ -328,10 +330,27 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	
 	/// [Do not extend] Servlet context destroyed handling
 	public void contextDestroyed(ServletContextEvent sce) {
+		_servletContextEvent = sce;
 		try {
 			destroyContext();
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/// Cached servlet context event
+	protected ServletContextEvent _servletContextEvent = null;
+	
+	/// Gets and returns the context path / application folder path
+	public String getContextPath() {
+		if (_contextPath != null) {
+			return _contextPath;
+		}
+		
+		if( _servletContextEvent != null ) {
+			ServletContext sc = _servletContextEvent.getServletContext();
+			return (_contextPath = sc.getRealPath("/") ) + "/";
+		}
+		return super.getContextPath();
 	}
 }

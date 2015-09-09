@@ -111,6 +111,11 @@ public class MetaTableApiBuilder {
 		}
 		
 		String[] headers = req.getStringArray("headers");
+		
+		if(headers == null || headers.length < 1){
+			headers = new String[] { "_oid" };
+		}
+		
 		String query = req.getString("query");
 		String[] queryArgs = req.getStringArray("queryArgs");
 		

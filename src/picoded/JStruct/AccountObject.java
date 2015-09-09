@@ -294,7 +294,7 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// Gets all the members object related to the group
 	///
-	public AccountObject[] getMembers() {
+	public AccountObject[] getMembersAccountObject() {
 		String[] idList = getMembers_id();
 		AccountObject[] objList = new AccountObject[idList.length];
 		for(int a=0; a<idList.length; ++a) {
@@ -318,7 +318,12 @@ public class AccountObject extends JStruct_MetaObject {
 	/// Returns if its a super user
 	///
 	public boolean isSuperUser() {
-		String superUserGroupRole = mainTable.superUserGroup().getMemberRole( this );
-		return ( superUserGroupRole.equalsIgnoreCase("admin") );
+		AccountObject superUserGrp = mainTable.superUserGroup();
+		if(superUserGrp == null) {
+			return false;
+		}
+		
+		String superUserGroupRole = superUserGrp.getMemberRole( this );
+		return ( superUserGroupRole != null && superUserGroupRole.equalsIgnoreCase("admin") );
 	}
 }

@@ -99,7 +99,7 @@ public class RESTRequest extends AbstractMapDecorator<String, Object> implements
 		if(registeredNamespace[registeredNamespace.length - 1].equals("*") &&
 			rawRequestNamespace.length > (registeredNamespace.length - 1) ) {
 			
-			wildCardNamespace = Arrays.copyOfRange(rawRequestNamespace, registeredNamespace.length, rawRequestNamespace.length);
+			wildCardNamespace = Arrays.copyOfRange(rawRequestNamespace, registeredNamespace.length - 1, rawRequestNamespace.length);
 		}
 		return wildCardNamespace;
 	}

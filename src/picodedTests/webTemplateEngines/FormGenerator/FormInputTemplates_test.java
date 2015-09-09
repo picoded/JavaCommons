@@ -285,16 +285,13 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("checkboxPDFOutput", jsonTemplatedOutput));
 	}
 	
-//	@Test
+	@Test
 	public void tableTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("table", false);
 		String rawHtmlString = getHtmlString("table");
 
 		assertNotNull(jsonTemplatedOutput);
 		assertNotNull(rawHtmlString);
-		
-		System.out.println(rawHtmlString);
-		
 		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
 		assertTrue(compliancyCheck);
 		

@@ -189,7 +189,7 @@ public class AccountLogin extends BasePage {
 	/// ## HTTP Request Parameters
 	///
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name | Variable Type	   | Description                                                                   |
+	/// | Parameter Name | Variable Type	  | Description                                                                   |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | No parameters options                                                                                               |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
@@ -197,11 +197,13 @@ public class AccountLogin extends BasePage {
 	/// ## JSON Object Output Parameters
 	///
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name | Variable Type	   | Description                                                                   |
+	/// | Parameter Name | Variable Type      | Description                                                                   |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | isLogin        | boolean            | indicator if the session is logged in or not                                  |
 	/// | accountID      | String             | account ID of the session                                                     |
 	/// | accountNames   | String[]           | array of account names representing the session                               |
+	/// | isSuperUser    | boolean            | indicator if user is superuser                                                |
+	/// | isAdmin        | boolean            | indicator if user is admin in ANY of the groups user is in                    |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | error          | String (Optional)  | Errors encounted if any                                                       |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
@@ -919,7 +921,7 @@ public class AccountLogin extends BasePage {
 	///
 	/// # members/meta/${groupID}/${accountID} (GET) [Requires login]
 	///
-	/// Gets and return the current user info
+	/// Gets and return the current user info with relation to the group
 	/// 
 	/// Note: if ${accountID} is blank, it assumes the current user
 	///
@@ -955,23 +957,44 @@ public class AccountLogin extends BasePage {
 			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
 				
 				res.put("accountID", null);
-				res.put("accountID_valid", null);
+				res.put("accountID_valid", false);
 				res.put("meta", null);
 				res.put("error", null);
 				
 				if(groupObj == null){
+					res.put("error", "Group object is null");
 					return resMap;
 				}
 				
 				try{
 					
 					String accountOID = req.getString("acountID");
-					if(accountOID == null || accountOID.isEmpty() && currentUser != null){
-						accountOID = currentUser._oid();
+					if(accountOID == null || accountOID.isEmpty() && currentUser != null){ 
+						accountOID = currentUser._oid(); //if accountOID is null, try get oid from currentUser object
 					}else{
+						res.put("error", "Unable to obtain oid");
 						return resMap;
 					}
 					
+					res.put("accountID", accountOID);
+					
+					AccountObject user = accountTableObj.getFromID(accountOID);
+					MetaObject groupUserInfo = null;
+					
+					if(user != null){
+						groupUserInfo = groupObj.getMember(user);
+					}else{
+						res.put("error", "User account not found in table");
+						return resMap;
+					}
+					
+					if(groupUserInfo != null){
+						res.put("meta",  groupUserInfo);
+						res.put("accountID_valid", true);
+					}else{
+						res.put("error", "User info not found in group");
+						return resMap;
+					}
 					
 				}catch(Exception e){
 					res.put("error", e.getMessage());
@@ -993,16 +1016,16 @@ public class AccountLogin extends BasePage {
 	/// ## HTTP Request Parameters
 	///
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	       | Description                                                                |
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | meta            | {Object}              | Meta object that represents this account                                   |
+	/// | meta            | {Object} Map<S, O>    | Meta object that represents this account                                   |
 	/// | updateMode      | String (Optional)     | (Default) "delta" for only updating the given fields, or "full" for all    |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	       | Description                                                                |
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// | groupID         | String                | group ID used in the request                                               |
 	/// | groupID_exist   | boolean               | indicates if the account ID exists in the system                           |
@@ -1018,10 +1041,73 @@ public class AccountLogin extends BasePage {
 	/// | error           | String (Optional)     | Errors encounted if any                                                    |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
+	@SuppressWarnings("unchecked")
 	public static RESTFunction members_meta_POST = (req, res) -> {
 		// Only runs function if logged in, and valid group object
 		return fetchGroupObject_fromFirstWildcard_orCurrentUser( req, res, false,
 			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				
+				res.put("accountID", null);
+				res.put("accountID_valid", false);
+				res.put("updateMode", null);
+				res.put("updateMeta", null);
+				res.put("error", null);
+				
+				if(groupObj == null){
+					res.put("error", "Group object is null");
+					return resMap;
+				}
+				
+				try{
+					
+					String accountOID = req.getString("acountID");
+					if(accountOID == null || accountOID.isEmpty() && currentUser != null){ 
+						accountOID = currentUser._oid(); //if accountOID is null, try get oid from currentUser object
+					}else{
+						res.put("error", "Unable to obtain oid");
+						return resMap;
+					}
+					
+					res.put("accountID", accountOID);
+					AccountObject user = accountTableObj.getFromID(accountOID);
+					MetaObject groupUserInfo = null;
+					
+					if(user != null){
+						groupUserInfo = groupObj.getMember(user);
+					}else{
+						res.put("error", "User account not found in table");
+						return resMap;
+					}
+					
+					if(groupUserInfo == null){
+						res.put("error", "User info not found in group");
+						return resMap;
+					}
+					
+					res.put("accountID_valid", true);
+					
+					Object metaObjRaw = req.get("meta");
+					if(metaObjRaw == null){
+						res.put("error", "Object to update with not found");
+						return resMap;
+					}
+					
+					Map<String, Object> metaObj = (Map<String, Object>)metaObjRaw;
+					res.put("updateMeta", metaObj);
+					groupUserInfo.putAll(metaObj);
+					
+					String updateMode = req.getString("updateMode", "delta");
+					res.put("updateMode",  updateMode);
+					if(updateMode.equalsIgnoreCase("full")){
+						groupUserInfo.saveAll();
+					}else{
+						groupUserInfo.saveDelta();
+					}
+					
+				}catch(Exception e){
+					res.put("error",  e.getMessage());
+				}
+				
 				
 				return resMap;
 			}
@@ -1065,7 +1151,15 @@ public class AccountLogin extends BasePage {
 		
 		rb.getNamespace( setPrefix + "members/list/*" ).put( HttpRequestType.GET, members_list_GET );
 		rb.getNamespace( setPrefix + "members/list" ).put( HttpRequestType.GET, members_list_GET );
-//		rb.getNamespace( setPrefix + "info/id/*" ).put( HttpRequestType.GET, infoByID_GET );
+		
+		rb.getNamespace( setPrefix + "members/list/*" ).put( HttpRequestType.POST, members_list_POST );
+		rb.getNamespace( setPrefix + "members/list" ).put( HttpRequestType.POST, members_list_POST );
+		
+		rb.getNamespace( setPrefix + "members/meta/*" ).put( HttpRequestType.GET, members_meta_GET );
+		rb.getNamespace( setPrefix + "members/meta/*/*" ).put( HttpRequestType.GET, members_meta_GET );
+		
+		rb.getNamespace( setPrefix + "members/meta/*" ).put( HttpRequestType.POST, members_meta_POST );
+		rb.getNamespace( setPrefix + "members/meta/*/*" ).put( HttpRequestType.POST, members_meta_POST );
 		
 		return rb;
 	}

@@ -273,6 +273,22 @@ public class AccountObject extends JStruct_MetaObject {
 		return childMeta;
 	}
 	
+	public boolean removeMember(AccountObject memberObject){
+		if(!this.isGroup()){
+			return false;
+		}
+		
+		String memberOID = memberObject._oid();
+		String level = group_userToRoleMap().getString(memberOID);
+
+		group_userToRoleMap().remove(memberOID);
+		group_userToRoleMap().saveAll();
+		
+		//mainTable.groupChild_meta.remove( this._oid()+"-"+memberOID );
+		
+		return true;
+	}
+	
 	/// Returns the list of groups the member is in
 	///
 	public String[] getMembers_id() {

@@ -7,8 +7,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.Base64;
 
+
 /// Picoded imports
 import picoded.conv.*;
+import picoded.enums.ObjectTokens;
 import picoded.JSql.*;
 import picoded.JStruct.*;
 import picoded.struct.*;
@@ -204,14 +206,12 @@ public class JSql_MetaTableUtils {
 		
 		try {
 			Object[] typSet;
-			String k;
 			Object v;
 	
-			for (Map.Entry<String, Object> entry : objMap.entrySet()) {
-				k = entry.getKey(); 
+			for (String k : keyList) {
 				
-				// Skip reserved key, oid ke is allowed to be saved (to ensure blank object is saved)
-				if ( /*k.equalsIgnoreCase("oid") || k.equalsIgnoreCase("_oid") || */ k.equalsIgnoreCase("_otm")) { //reserved
+				// Skip reserved key, otm is allowed to be saved (to ensure blank object is saved)
+				if ( k.equalsIgnoreCase("_otm")) { //reserved
 					continue;
 				}
 				
@@ -221,21 +221,29 @@ public class JSql_MetaTableUtils {
 				}
 				
 				// Get the value to insert
-				v = entry.getValue();
+				v = objMap.get(k);
 				
-				// Converts it into a type set, and store it
-				typSet = valueToOptionSet(mtm, k, v);
-				
-				// This is currently only for NON array mode
-				sql.upsertQuerySet( //
-					tName, //
-					new String[] { "oID", "kID", "idx" }, //
-					new Object[] { _oid, k, 0 }, //
-					//
-					new String[] { "typ", "nVl", "sVl", "tVl" }, //
-					new Object[] { typSet[0], typSet[1], typSet[2], typSet[3] }, //
-					null, null, null //
-				).execute();
+				if( v == ObjectTokens.NULL || v == null ) {
+					// Skip reserved key, oid key is allowed to be removed directly
+					if( k.equalsIgnoreCase("oid") || k.equalsIgnoreCase("_oid") ) {
+						continue;
+					}
+					sql.deleteQuerySet( tName, "oID=? AND kID=?", new Object[] { _oid, k } ).execute();
+				} else {
+					// Converts it into a type set, and store it
+					typSet = valueToOptionSet(mtm, k, v);
+					
+					// This is currently only for NON array mode
+					sql.upsertQuerySet( //
+						tName, //
+						new String[] { "oID", "kID", "idx" }, //
+						new Object[] { _oid, k, 0 }, //
+						//
+						new String[] { "typ", "nVl", "sVl", "tVl" }, //
+						new Object[] { typSet[0], typSet[1], typSet[2], typSet[3] }, //
+						null, null, null //
+					).execute();
+				}
 			}
 			//sql.commit();
 		} catch (Exception e) {

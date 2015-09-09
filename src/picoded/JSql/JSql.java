@@ -612,6 +612,54 @@ public class JSql extends BaseInterface {
 	) throws JSqlException {
 		return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues, null, null, null);
 	}
+
+	///
+	/// Helps generate an SQL DELETE request. This function was created to acommedate the various
+	/// syntax differances of DELETE across the various SQL vendors (if any).
+	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
+	/// The syntax below, is an example of such an DELETE statement for SQLITE.
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	/// DELETE
+	/// FROM tableName //table name to select from
+	/// WHERE
+	///	col1=?       //where clause
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	///
+	public JSqlQuerySet deleteQuerySet( //
+		String tableName, // Table name to select from
+		//
+		String whereStatement, // The Columns to apply where clause, this must be sql neutral
+		Object[] whereValues // Values that corresponds to the where statement
+	) {
+		
+		if (tableName.length() > 30) {
+			logger.warning(JSqlException.oracleNameSpaceWarning + tableName);
+		}
+		
+		ArrayList<Object> queryArgs = new ArrayList<Object>();
+		StringBuilder queryBuilder = new StringBuilder("DELETE ");
+		
+		// From table names
+		queryBuilder.append(" FROM `" + tableName + "`");
+		
+		// Where clauses
+		if (whereStatement != null && (whereStatement = whereStatement.trim()).length() >= 3) {
+			queryBuilder.append(" WHERE ");
+			queryBuilder.append(whereStatement);
+			
+			if (whereValues != null) {
+				for (int b = 0; b < whereValues.length; ++b) {
+					queryArgs.add(whereValues[b]);
+				}
+			}
+		}
+		
+		// Create the query set
+		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
+	}
 	
 	///
 	/// Helps generate an SQL CREATE TABLE IF NOT EXISTS request. This function was created to acommedate the various

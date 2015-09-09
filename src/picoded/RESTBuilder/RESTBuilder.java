@@ -280,6 +280,8 @@ public class RESTBuilder {
 					"dataType: 'json', "+//
 					"cache: false, "+//
 					//
+					"xhrFields: { withCredentials:true }, "+
+					//
 					"success: function(d){ c(d,p,null); }, "+//
 					"error: function(j,s,t){ c(null,p, s+' - '+t); } "+//
 				" }); "+//

@@ -468,6 +468,10 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		/// This cookie value is used in JS (checkLogoutTime.js) for validating the login expiry time and show a message to user accordingly.
 		
 		for(int a=0; a<noOfCookies; ++a) {
+			/// Path is required for cross AJAX / domain requests,
+			/// @TODO make this configurable?
+			cookieJar[a].setPath(request.getContextPath());
+			
 			if(!rmberMe) { //set to clear on browser close
 				cookieJar[a].setMaxAge(noncLifetime);
 			}
@@ -521,6 +525,10 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		
 		for(int a=0; a<5; ++a) {
 			cookieJar[a].setMaxAge(1);
+			
+			/// Path is required for cross AJAX / domain requests,
+			/// @TODO make this configurable?
+			cookieJar[a].setPath(request.getContextPath());
 			
 			if(a < 4 && isHttpOnly) {
 				cookieJar[a].setHttpOnly(isHttpOnly);

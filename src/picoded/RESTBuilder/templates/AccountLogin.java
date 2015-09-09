@@ -613,8 +613,93 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction list_GET_and_POST = (req, res) -> {
-		return mtApi.list_GET_and_POST.apply(req, req);
+		return prepareAuthenticatedREST( req, res, 
+		(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+			//cannot fall through
+			int draw = req.getInt("draw");
+			int start = req.getInt("start");
+			int limit = req.getInt("length");
+			
+			String orderByStr = req.getString("orderBy");
+			if(orderByStr == null || orderByStr.isEmpty()){
+				orderByStr = "_oid";
+			}
+			
+			String[] headers = req.getStringArray("headers");
+			
+			if(headers == null || headers.length < 1){
+				headers = new String[] { "_oid", "names" };
+			}
+			
+			String query = req.getString("query");
+			String[] queryArgs = req.getStringArray("queryArgs");
+			
+			MetaTable mtObj = accountTableObj.accountMetaTable();
+			
+			//put back into response
+			res.put("draw", draw);
+			res.put("headers", headers);
+			
+			res.put("recordsTotal", accountTableObj.size());
+			if(query != null && !query.isEmpty() && queryArgs != null && queryArgs.length > 0){
+				res.put("recordsFiltered", mtObj.queryCount(query, queryArgs));
+			}
+			
+			List<List<Object>> data = null;
+			try{
+				data = list_GET_and_POST_inner(mtObj, draw, start, limit, headers, query, queryArgs, orderByStr);
+				res.put("data",  data);
+			}catch(Exception e){
+				res.put("error",  e.getMessage());
+			}
+			
+			return res;
+		});
 	};
+	
+	private static List<List<Object>> list_GET_and_POST_inner(MetaTable _metaTableObj, int draw, int start, int length, String[] headers, String query, String[] queryArgs, String orderBy) throws RuntimeException{
+		if(_metaTableObj == null){
+			return null;
+		}
+		
+		List<List<Object>> ret = new ArrayList<List<Object>>();
+		
+		try{
+			Map<String, List<Object>> tempMap = new HashMap<String, List<Object>>();
+			if(headers != null && headers.length > 0){
+				for(String header : headers){
+					MetaObject[] metaObjs = null;
+					
+					if(query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0){
+						metaObjs = _metaTableObj.getFromKeyName(header, orderBy, start, length);
+					}else{
+						metaObjs = _metaTableObj.query(query, queryArgs, orderBy, start, length);
+					}
+					
+					for(MetaObject metaObj : metaObjs){
+						String objOid = metaObj._oid();
+						if(!tempMap.containsKey(objOid)){
+							tempMap.put(objOid, new ArrayList<Object>());
+						}
+						
+						if(metaObj.containsKey(header)){
+							tempMap.get(objOid).add((String)metaObj.get(header));
+						}
+					}
+				}
+			}
+			
+			
+			for(Entry<String, List<Object>> mapEntry : tempMap.entrySet()){
+				List<Object> mapValue = mapEntry.getValue();
+				ret.add(mapValue);
+			}
+		}catch(Exception e){
+			throw new RuntimeException("list_GET_and_POST_inner() ", e);
+		}
+		
+		return ret;
+	}
 	
 	/////////////////////////////////////////////
 	//
@@ -651,7 +736,10 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction meta_GET = (req, res) -> {
-		return mtApi.meta_GET.apply(req, res);
+		return prepareAuthenticatedREST( req, res, 
+			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				return mtApi.meta_GET.apply(req, res);
+			});
 	};
 	
 	///
@@ -685,7 +773,11 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction meta_POST = (req, res) -> {
-		return mtApi.meta_POST.apply(req, res);
+		// return mtApi.meta_POST.apply(req, res);
+		return prepareAuthenticatedREST( req, res, 
+			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				return mtApi.meta_POST.apply(req, res);
+			});
 	};
 	
 	/////////////////////////////////////////////
@@ -1166,6 +1258,13 @@ public class AccountLogin extends BasePage {
 		
 		rb.getNamespace( setPrefix + "members/meta/*" ).put( HttpRequestType.POST, members_meta_POST );
 		rb.getNamespace( setPrefix + "members/meta/*/*" ).put( HttpRequestType.POST, members_meta_POST );
+		
+		//MetaTableApiBuilder Fall through
+		rb.getNamespace( setPrefix + "info/list" ).put( HttpRequestType.GET, list_GET_and_POST );
+		rb.getNamespace( setPrefix + "info/list" ).put( HttpRequestType.POST, list_GET_and_POST );
+		rb.getNamespace( setPrefix + "info/*" ).put( HttpRequestType.GET, meta_GET );
+		rb.getNamespace( setPrefix + "info/*" ).put( HttpRequestType.POST, meta_POST );
+		//end fall through segment
 		
 		return rb;
 	}

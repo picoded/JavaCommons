@@ -647,7 +647,7 @@ public class AccountLogin extends BasePage {
 			
 			List<List<Object>> data = null;
 			try{
-				data = list_GET_and_POST_inner(mtObj, draw, start, limit, headers, query, queryArgs, orderByStr);
+				data = list_GET_and_POST_inner(accountTableObj, draw, start, limit, headers, query, queryArgs, orderByStr);
 				res.put("data",  data);
 			}catch(Exception e){
 				res.put("error",  e.getMessage());
@@ -657,7 +657,7 @@ public class AccountLogin extends BasePage {
 		});
 	};
 	
-	private static List<List<Object>> list_GET_and_POST_inner(MetaTable _metaTableObj, int draw, int start, int length, String[] headers, String query, String[] queryArgs, String orderBy) throws RuntimeException{
+	private static List<List<Object>> list_GET_and_POST_inner(AccountTable _metaTableObj, int draw, int start, int length, String[] headers, String query, String[] queryArgs, String orderBy) throws RuntimeException{
 		if(_metaTableObj == null){
 			return null;
 		}
@@ -665,35 +665,36 @@ public class AccountLogin extends BasePage {
 		List<List<Object>> ret = new ArrayList<List<Object>>();
 		
 		try{
-			Map<String, List<Object>> tempMap = new HashMap<String, List<Object>>();
 			if(headers != null && headers.length > 0){
-				for(String header : headers){
-					MetaObject[] metaObjs = null;
-					
-					if(query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0){
-						metaObjs = _metaTableObj.getFromKeyName(header, orderBy, start, length);
-					}else{
-						metaObjs = _metaTableObj.query(query, queryArgs, orderBy, start, length);
-					}
-					
-					for(MetaObject metaObj : metaObjs){
-						String objOid = metaObj._oid();
-						if(!tempMap.containsKey(objOid)){
-							tempMap.put(objOid, new ArrayList<Object>());
+				MetaObject[] metaObjs = null;
+				
+				if(query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0){
+					metaObjs = _metaTableObj.accountMetaTable().query(null, null, orderBy, start, length);
+				}else{
+					metaObjs = _metaTableObj.accountMetaTable().query(query, queryArgs, orderBy, start, length);
+				}
+				
+							
+				for(MetaObject metaObj : metaObjs){
+					List<Object> row = new ArrayList<Object>();
+					for(String header : headers){
+						if(header.equalsIgnoreCase("names")){
+							AccountObject ao = _metaTableObj.getFromID(metaObj._oid());
+							if(ao != null){
+								Set<String> aoNames = ao.getNames();
+								if(aoNames != null){
+									List<String> aoNameList = new ArrayList<String>(aoNames);
+									row.add(aoNameList);
+								}
+							}
+						} else {
+							row.add( metaObj.get(header) );
 						}
-						
-						if(metaObj.containsKey(header)){
-							tempMap.get(objOid).add((String)metaObj.get(header));
-						}
 					}
+					ret.add(row);
 				}
 			}
 			
-			
-			for(Entry<String, List<Object>> mapEntry : tempMap.entrySet()){
-				List<Object> mapValue = mapEntry.getValue();
-				ret.add(mapValue);
-			}
 		}catch(Exception e){
 			throw new RuntimeException("list_GET_and_POST_inner() ", e);
 		}

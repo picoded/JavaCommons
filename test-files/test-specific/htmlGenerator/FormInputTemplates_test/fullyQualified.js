@@ -1,0 +1,25 @@
+{
+	"type":"div",
+	"field":"parent",
+	"children":[
+		{
+			"type":"text",
+			"field":"textA"
+		},
+		{
+			"type":"checkBox",
+			"options":["Option 1", "Option 2", "Option 3", "Option 4"],
+			"field":"checkboxA"
+		},
+		{
+			"type":"div",
+			"field":"innerParent",
+			"children":[
+				{
+					"type":"text",
+					"field":"textB"
+				}
+			]
+		}
+	]
+}

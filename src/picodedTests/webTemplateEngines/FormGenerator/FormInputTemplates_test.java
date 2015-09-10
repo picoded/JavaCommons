@@ -1,6 +1,7 @@
 package picodedTests.webTemplateEngines.FormGenerator;
 
 import picoded.conv.ConvertJSON;
+import picoded.conv.MapValueConv;
 import picoded.conv.RegexUtils;
 import picoded.fileUtils.PDFGenerator;
 import picoded.webTemplateEngines.*;
@@ -49,6 +50,7 @@ public class FormInputTemplates_test {
 			if(loadDummyData && jsonDataFile.exists()){
 				String jsonDataString = FileUtils.readFileToString(jsonDataFile);
 				Map<String, Object> jsonDataMap = ConvertJSON.toMap(jsonDataString);
+
 				return formGen.build(jsonFileString, jsonDataMap, isDisplayMode).toString();
 			}
 			else{
@@ -285,7 +287,7 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("checkboxPDFOutput", jsonTemplatedOutput));
 	}
 	
-	@Test
+//	@Test
 	public void tableTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("table", false);
 		String rawHtmlString = getHtmlString("table");
@@ -418,6 +420,15 @@ public class FormInputTemplates_test {
 		jsonTemplatedOutput = getTemplatedJSONString("date", true, true);
 		assertNotNull(jsonTemplatedOutput);
 		assertTrue(generateHTMLFile("dateDisplay", jsonTemplatedOutput));
+	}
+	
+	@Test
+	public void fullyQualifiedTest(){
+		String jsonTemplatedOutput = getTemplatedJSONString("fullyQualified", false, true);
+		
+		assertNotNull(jsonTemplatedOutput);
+		
+		assertTrue(generateHTMLFile("fullyQualified", jsonTemplatedOutput));
 	}
 	
 	public boolean htmlTagCompliancyCheck(String source, String lookup){

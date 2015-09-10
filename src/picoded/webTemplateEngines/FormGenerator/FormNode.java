@@ -494,7 +494,18 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		for( int a=0; a<childListSize; ++a ) {
 			
 			// Add the child full html
-			ret.append( childList.get(a).fullHtml(displayMode) );
+//			ret.append( childList.get(a).fullHtml(displayMode) );
+			
+			//sams multi tier nonsense
+			FormNode childNode = childList.get(a);
+			if(childNode.containsKey("field")){
+				String thisNodeFieldName = this.getFieldName();
+				thisNodeFieldName = thisNodeFieldName + "[" + a + "]." + childNode.getFieldName();
+				childNode.replace("field", thisNodeFieldName);
+			}
+			ret.append(childNode.fullHtml(displayMode));
+			
+			
 			
 			// Not last child, add spacer
 			if( spacer != null && (a+1)<childListSize ) {

@@ -781,6 +781,42 @@ public class AccountLogin extends BasePage {
 			});
 	};
 	
+	///
+	/// # meta/${accountID} (DELETE) [Requires login]
+	///
+	/// Deletes the current oid object from the table
+	/// 
+	/// Note: if ${accountID} is blank, it assumes the current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | _oid            | String             | The internal object ID to delete                                              |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// 
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | accountID_valid | boolean            | indicates if the account ID exists in the system                              |
+	/// | accountID       | String             | account ID used                                                               |
+	/// | _oid            | String             | Returns oid of metaObject to delete                                           |
+	/// | deleted         | boolean            | Returns true ONLY if the element was removed from the table                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error           | String (Optional)  | Errors encounted if any                                                       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	public static RESTFunction meta_DELETE = (req, res) -> {
+		// return mtApi.meta_POST.apply(req, res);
+		return prepareAuthenticatedREST( req, res, 
+			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				return mtApi.meta_DELETE.apply(req, res);
+			});
+	};
+	
 	/////////////////////////////////////////////
 	//
 	// Group / Members management

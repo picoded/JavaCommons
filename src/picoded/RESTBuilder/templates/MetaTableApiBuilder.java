@@ -233,8 +233,11 @@ public class MetaTableApiBuilder {
 		MetaObject[] metaObjs = null;
 		metaObjs = _metaTableObj.query("_oid=?", new String[]{oid});
 		
+		
 		if(metaObjs.length > 1){
 			throw new RuntimeException("meta_GET_inner() -> More than 1 meta object was returned for _oid : "+oid);
+		}else if(metaObjs.length < 1){
+			return null;
 		}else{
 			return metaObjs[0];
 		}
@@ -268,7 +271,6 @@ public class MetaTableApiBuilder {
 	/// | error           | String (Optional)  | Errors encounted if any                                                       |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
-	@SuppressWarnings("unchecked")
 	public RESTFunction meta_POST = (req, res) -> {
 		String oid = req.getString("_oid");
 		if(oid == null) {
@@ -350,6 +352,58 @@ public class MetaTableApiBuilder {
 			throw new RuntimeException("meta_POST_inner()", e);
 		}
 	}
+	
+	///
+	/// # delete/${ObjectID} (DELETE) [Requires login]
+	///
+	/// Deletes the current oid object from the table
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | _oid            | String             | The internal object ID to delete                                              |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// 
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | _oid            | String             | Returns oid of metaObject to delete                                           |
+	/// | deleted         | boolean            | Returns true ONLY if the element was removed from the table                   |
+	/// | error           | String (Optional)  | Errors encounted if any                                                       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	public RESTFunction meta_DELETE = (req, res) -> {
+		String accountID = req.getString("_oid");
+		
+		if(accountID == null || accountID.isEmpty()){
+			return res;
+		}
+		
+		res.put("_oid", accountID);
+		
+		boolean deleted = meta_DELETE_inner(accountID);
+		
+		res.put("deleted", deleted);
+		
+		return res;
+	};
+	
+	public boolean meta_DELETE_inner(String oid){
+		if(_metaTableObj.containsKey(oid)){
+			MetaObject removed = _metaTableObj.remove(oid);
+			if(removed != null){
+				return true;
+			}else{
+				return false;
+			}
+		}else{
+			return false;
+		}
+	}
 
 
 	//-------------------------------------------------------------------------------------------------------------------------
@@ -383,6 +437,9 @@ public class MetaTableApiBuilder {
 		
 		rb.getNamespace( setPrefix + "meta" ).put( HttpRequestType.GET, meta_GET );
 		rb.getNamespace( setPrefix + "meta" ).put( HttpRequestType.POST, meta_POST );
+		
+		rb.getNamespace( setPrefix + "meta" ).put( HttpRequestType.DELETE, meta_DELETE );
+		rb.getNamespace( setPrefix + "meta.*" ).put( HttpRequestType.DELETE, meta_DELETE );
 		
 		return rb;
 	}

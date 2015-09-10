@@ -225,4 +225,28 @@ public class MetaTableApiBuilderTomcat_test {
 		assertNotNull(response);
 	}
 	
+	@Test
+	public void meta_DELETE_test(){
+		String path = "http://127.0.0.1:15000/api/meta-test/meta";
+		String getPath = "http://127.0.0.1:15000/api/meta-test/meta";
+		Map<String, Object> respMap = null;
+		
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("_oid", new String[]{ _oids.get(0) });
+		
+		//first get user
+		response = RequestHttp.get(getPath, paramsMap, null, null);
+		assertNotNull(respMap = response.toMap());
+		assertNotNull(respMap.get("meta"));
+		
+		//then delete
+		response = RequestHttp.delete(path, paramsMap, null, null);
+		assertNotNull(respMap = response.toMap());
+
+		//then check again
+		response = RequestHttp.get(getPath, paramsMap, null, null);
+		assertNotNull(respMap = response.toMap());
+		assertNull(respMap.get("meta"));
+	}
+	
 }

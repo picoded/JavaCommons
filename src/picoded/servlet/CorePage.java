@@ -726,7 +726,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		
 		// Performs a stack trace, and returns it in a JSON object
 		Map<String,String> ret = new HashMap<String,String>();
-		ret.put("ERROR", stackTrace);
+		ret.put("error", stackTrace);
 		
 		// Set content type to JSON
 		if(httpResponse != null) {

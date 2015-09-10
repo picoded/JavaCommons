@@ -133,7 +133,7 @@ public class MetaTableApiBuilder {
 			data = list_GET_and_POST_inner(draw, start, limit, headers, query, queryArgs, orderByStr);
 			res.put("data",  data);
 		}catch(Exception e){
-			res.put("error",  e.getMessage());
+			throw new RuntimeException(e);
 		}
 		
 		return res;
@@ -147,35 +147,24 @@ public class MetaTableApiBuilder {
 		List<List<Object>> ret = new ArrayList<List<Object>>();
 		
 		try{
-			Map<String, List<Object>> tempMap = new HashMap<String, List<Object>>();
 			if(headers != null && headers.length > 0){
-				for(String header : headers){
-					MetaObject[] metaObjs = null;
-					
-					if(query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0){
-						metaObjs = _metaTableObj.getFromKeyName(header, orderBy, start, length);
-					}else{
-						metaObjs = _metaTableObj.query(query, queryArgs, orderBy, start, length);
+				MetaObject[] metaObjs = null;
+				
+				if(query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0){
+					metaObjs = _metaTableObj.query(null, null, orderBy, start, length);
+				}else{
+					metaObjs = _metaTableObj.query(query, queryArgs, orderBy, start, length);
+				}
+				
+				for(MetaObject metaObj : metaObjs){
+					List<Object> row = new ArrayList<Object>();
+					for(String header : headers){
+						row.add( metaObj.get(header) );
 					}
-					
-					for(MetaObject metaObj : metaObjs){
-						String objOid = metaObj._oid();
-						if(!tempMap.containsKey(objOid)){
-							tempMap.put(objOid, new ArrayList<Object>());
-						}
-						
-						if(metaObj.containsKey(header)){
-							tempMap.get(objOid).add((String)metaObj.get(header));
-						}
-					}
+					ret.add(row);
 				}
 			}
 			
-			
-			for(Entry<String, List<Object>> mapEntry : tempMap.entrySet()){
-				List<Object> mapValue = mapEntry.getValue();
-				ret.add(mapValue);
-			}
 		}catch(Exception e){
 			throw new RuntimeException("list_GET_and_POST_inner() ", e);
 		}
@@ -190,7 +179,7 @@ public class MetaTableApiBuilder {
 	/////////////////////////////////////////////
 	
 	///
-	/// # ${ObjectID} (GET) [Requires login]
+	/// # meta/${ObjectID} (GET) [Requires login]
 	///
 	/// Gets and return the meta object user info
 	///
@@ -215,6 +204,9 @@ public class MetaTableApiBuilder {
 	///
 	public RESTFunction meta_GET = (req, res) -> {
 		String oid = req.getString("_oid");
+		if(oid == null) {
+			oid = (req.rawRequestNamespace() != null)? req.rawRequestNamespace()[0] : null;
+		}
 		
 		//put data back into response
 		res.put("_oid", oid);
@@ -223,7 +215,7 @@ public class MetaTableApiBuilder {
 			MetaObject mObj = meta_GET_inner(oid);
 			res.put("meta", mObj);
 		}catch(Exception e){
-			res.put("error", e.getMessage());
+			throw new RuntimeException(e);
 		}
 		
 		return res;
@@ -249,7 +241,7 @@ public class MetaTableApiBuilder {
 	}
 	
 	///
-	/// # ${ObjectID} (POST) [Requires login]
+	/// # meta/${ObjectID} (POST) [Requires login]
 	///
 	/// Updates the accountID meta info, requires either the current user or SuperUser
 	///
@@ -279,9 +271,18 @@ public class MetaTableApiBuilder {
 	@SuppressWarnings("unchecked")
 	public RESTFunction meta_POST = (req, res) -> {
 		String oid = req.getString("_oid");
-		String updateMode = req.getString("updateMode");
-		Map<String, Object> givenMObj = null;
+		if(oid == null) {
+			oid = (req.rawRequestNamespace() != null)? req.rawRequestNamespace()[0] : null;
+		}
 		
+		//put data back into response
+		res.put("_oid", oid);
+		
+		String updateMode = req.getString("updateMode");
+		res.put("updateMode", updateMode);
+		res.put("updateMeta", null);
+		
+		Map<String, Object> givenMObj = null;
 		if( req.get("meta") instanceof String ){
 			String jsonMetaString = req.getString("meta");
 			if(jsonMetaString != null && !jsonMetaString.isEmpty()){
@@ -294,13 +295,11 @@ public class MetaTableApiBuilder {
 				MetaObject updatedMObj = meta_POST_inner(oid, givenMObj, updateMode);
 				res.put("updateMeta",updatedMObj);
 			}catch(Exception e){
-				res.put("error", e.getMessage());
+				throw new RuntimeException(e);
 			}
 		}else{
 			res.put("error", "No meta object was found in the request");
 		}
-		
-		res.put("updateMode", updateMode);
 		
 		return res;
 	};
@@ -348,7 +347,7 @@ public class MetaTableApiBuilder {
 				}
 			}
 		}catch(Exception e){
-			throw new RuntimeException("meta_POST_inner() -> " + e.getMessage());
+			throw new RuntimeException("meta_POST_inner()", e);
 		}
 	}
 
@@ -378,11 +377,16 @@ public class MetaTableApiBuilder {
 	public RESTBuilder setupRESTBuilder(RESTBuilder rb, String setPrefix ) {
 		rb.getNamespace( setPrefix + "list" ).put( HttpRequestType.GET, list_GET_and_POST );
 		rb.getNamespace( setPrefix + "list" ).put( HttpRequestType.POST, list_GET_and_POST );
-		rb.getNamespace( setPrefix + "*" ).put( HttpRequestType.GET, meta_GET );
-		rb.getNamespace( setPrefix + "*" ).put( HttpRequestType.POST, meta_POST );
+		
+		rb.getNamespace( setPrefix + "meta.*" ).put( HttpRequestType.GET, meta_GET );
+		rb.getNamespace( setPrefix + "meta.*" ).put( HttpRequestType.POST, meta_POST );
+		
+		rb.getNamespace( setPrefix + "meta" ).put( HttpRequestType.GET, meta_GET );
+		rb.getNamespace( setPrefix + "meta" ).put( HttpRequestType.POST, meta_POST );
+		
 		return rb;
 	}
-
+	
 	/////////////////////////////////////////////
 	//
 	// Servlet constructor and setup

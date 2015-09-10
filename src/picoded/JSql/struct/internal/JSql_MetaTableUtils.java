@@ -108,7 +108,11 @@ public class JSql_MetaTableUtils {
 		} else if (value instanceof Double) {
 			return new Object[] { new Integer(MetaType.DOUBLE.getValue()), value, null, null }; //Typ, N,S,I,T
 		} else if (value instanceof String) {
-			return new Object[] { new Integer(MetaType.STRING.getValue()), 0, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
+			String shortenValue = ((String) value).toLowerCase();
+			if( shortenValue.length() > 64 ) {
+				shortenValue = shortenValue.substring(0,64);
+			}
+			return new Object[] { new Integer(MetaType.STRING.getValue()), 0, shortenValue, value }; //Typ, N,S,I,T
 		} else if (value instanceof byte[]) {
 			return new Object[] { new Integer(MetaType.BINARY.getValue()), 0, null, (Base64.getEncoder().encodeToString( (byte[])value )) }; //Typ, N,S,I,T
 		} else {
@@ -213,6 +217,10 @@ public class JSql_MetaTableUtils {
 				// Skip reserved key, otm is allowed to be saved (to ensure blank object is saved)
 				if ( k.equalsIgnoreCase("_otm")) { //reserved
 					continue;
+				}
+				
+				if( k.length() > 64 ) {
+					throw new RuntimeException("Attempted to insert a key value larger then 64 for (_oid = "+_oid+"): "+k);
 				}
 				
 				// Checks if keyList given, if so skip if not on keyList

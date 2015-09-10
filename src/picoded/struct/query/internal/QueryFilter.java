@@ -440,7 +440,7 @@ public class QueryFilter {
 			return (Query)singleToken;
 		}
 		
-		throw new RuntimeException("Unexpected collapseQueryTokens end");
+		throw new RuntimeException("Unexpected collapseQueryTokens end -> "+singleToken);
 	}
 	
 	//

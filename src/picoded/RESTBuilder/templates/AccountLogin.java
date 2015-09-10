@@ -1301,6 +1301,8 @@ public class AccountLogin extends BasePage {
 		rb.getNamespace( setPrefix + "info/list" ).put( HttpRequestType.POST, list_GET_and_POST );
 		rb.getNamespace( setPrefix + "info/*" ).put( HttpRequestType.GET, meta_GET );
 		rb.getNamespace( setPrefix + "info/*" ).put( HttpRequestType.POST, meta_POST );
+		rb.getNamespace( setPrefix + "delete" ).put( HttpRequestType.DELETE, meta_DELETE );
+		rb.getNamespace( setPrefix + "delete/*" ).put( HttpRequestType.DELETE, meta_DELETE );
 		//end fall through segment
 		
 		return rb;

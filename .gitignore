@@ -30,3 +30,6 @@ debug.txt
 test-files/test-specific/htmlGenerator/**/*.pdf
 test-files/test-specific/htmlGenerator/**/*Html.html
 test-files/test-specific/htmlGenerator/generatedFiles/*
+
+# sample-WEB-INF
+sample-WEB-INF/**/tmp/**/*

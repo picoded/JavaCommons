@@ -53,12 +53,6 @@ public class JStackPage extends CorePage {
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
-	// Common not so impt stuff
-	//-------------------------------------------
-	
-	// Serialize version ID
-	static final long serialVersionUID = 1L;
-	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Internal variables, can be overwritten. Else it is auto "filled" when needed
@@ -72,6 +66,7 @@ public class JStackPage extends CorePage {
 	public String _configsPath = null;
 	public String _pagesTemplatePath = null;
 	public String _pagesOutputPath = null;
+	public String _jsmlTemplatePath = null;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -83,11 +78,16 @@ public class JStackPage extends CorePage {
 	public String getContextPath() {
 		if (_contextPath != null) {
 			return _contextPath;
+		} 
+		
+		if (httpRequest != null) {
+			return (_contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/");
 		} else {
-			if (httpRequest != null) {
-				return (_contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/");
-			} else {
+			try {
+				// Note this may fail for contextInitialized
 				return (_contextPath = getServletContext().getRealPath("/") + "/");
+			} catch(Exception e) {
+				return (_contextPath = "./");
 			}
 		}
 	}
@@ -113,7 +113,11 @@ public class JStackPage extends CorePage {
 	}
 	
 	public String getPagesOutputPath() {
-		return (_pagesOutputPath != null) ? _pagesOutputPath : (_pagesOutputPath = getContextPath() + "pages/");
+		return (_pagesOutputPath != null) ? _pagesOutputPath : (_pagesOutputPath = getContextPath());
+	}
+	
+	public String getJsmlTemplatePath() {
+		return (_jsmlTemplatePath != null) ? _jsmlTemplatePath : (_jsmlTemplatePath = getWebInfPath() + "jsml/");
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -185,6 +189,12 @@ public class JStackPage extends CorePage {
 			
 			// Generates the sqlite connection with the path
 			return JSql.sqlite(path);
+		} else if(engine.equalsIgnoreCase("mssql")) {
+			return JSql.mssql(path,database,username,password);
+		} else if(engine.equalsIgnoreCase("mysql")) {
+			return JSql.mysql(path,database,username,password);
+		} else if(engine.equalsIgnoreCase("oracle")) {
+			return JSql.oracle(path,username,password);
 		} else {
 			throw new RuntimeException("Unsupported " + profileNameSpace + ".engine: " + engine);
 		}

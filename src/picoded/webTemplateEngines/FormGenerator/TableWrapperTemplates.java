@@ -134,6 +134,7 @@ public class TableWrapperTemplates {
 			if( firstRowHeader != null ) {
 				// Insert first 0 index header item for the row
 				ret.append("<th class='"+node.prefix_childWrapper()+"col_0'>");
+				
 				ret.append(firstRowHeader);
 				ret.append("</th>");
 			}
@@ -411,12 +412,26 @@ public class TableWrapperTemplates {
 				Map<String,Object> rowMap = (rowObj instanceof Map)? (Map<String,Object>)rowObj : null;
 				Map<String,Object> child = childrenDefinition.get(col);
 				
+				//sam single tier "fix"
+				int tierNumber = 0;
+				if(node.getString("type").equalsIgnoreCase("table")){
+					tierNumber = col;
+				}else{
+					tierNumber = row;
+				}
+				
+				Map<String, Object> tempChild = new HashMap<String, Object>(child);
+				String fieldName = (String)tempChild.get("field");
+				fieldName = node.getFieldName() + "[" + tierNumber + "]." + fieldName;
+				tempChild.put("field", fieldName);
+				//and sam "fix"
+				
 				//
 				// Build if possible
 				//
 				StringBuilder ret = null;
 				if( child != null && rowMap != null) {
-					ret = ( new FormNode( node._formGenerator, child,  rowMap)  ).fullHtml(isDisplayMode);
+					ret = ( new FormNode( node._formGenerator, tempChild,  rowMap)  ).fullHtml(isDisplayMode);
 				}
 				return (ret != null)? ret : new StringBuilder(""); //blank fallback
 			};

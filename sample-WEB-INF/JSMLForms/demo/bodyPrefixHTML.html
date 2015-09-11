@@ -1,0 +1,20 @@
+<head>
+	<link href="${FormContextPath}/formStyle.css" rel="stylesheet" type="text/css"></link>
+</head>
+<body>
+	<script src="https://s3-ap-southeast-1.amazonaws.com/wenconsulting-common-resources/FormGenerator/jSignature/jquery-1.11.3.js"></script>
+	<script src="https://s3-ap-southeast-1.amazonaws.com/wenconsulting-common-resources/FormGenerator/jSignature/jSignature.min.js"></script>
+	<script src="${FormContextPath}/formScript.js"></script>
+	<div id="signaturePad" class="signaturePad" style="display:none;">
+		<div id="signatureWhiteBox">
+			<h1 style="width:90%; margin-left:5%;">(please sign along the black line)</h1>
+			<div id="signaturePadLine"></div>
+			<div style="width:90%; margin-left:5%; height:55px;">
+				<button onclick="clearSignature()" style="width:49%; float:left; height:50px;">Clear</button>
+				<button onclick="saveSignature()" style="width:49%; float:right; height:50px;">Save</button>
+			</div>
+		</div>
+	</div>
+	<div class="pf_webPageOuterBox">
+		<div class="pf_webPageBox">
+			<form method="get">

@@ -169,15 +169,15 @@ public class FileServlet extends HttpServlet {
 		// 404 error if directory traversal / esclation as a security measure
 		// Also blocks ".private" file access
 		if (requestPath.contains("/.") || requestPath.contains("..")) {
-		   servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
-		   return;
+			servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
 		}
 		
 		// 404 error if accessing possible java servlet protected files
 		String requestPath_lowerCase = requestPath.toLowerCase();
-		if (requestPath_lowerCase.contains("/web-inf/") || requestPath_lowerCase.contains("/meta-inf/")) {
-		   servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
-		   return;
+		if (requestPath_lowerCase.contains("web-inf") || requestPath_lowerCase.contains("meta-inf")) {
+			servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
 		}
 		
 		// Fetch THE file, and validate

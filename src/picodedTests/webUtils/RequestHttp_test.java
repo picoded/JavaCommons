@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 import picoded.conv.GUID;
+import picoded.conv.StringEscape;
 import picoded.struct.CaseInsensitiveHashMap;
 import picoded.webUtils.*;
 import picoded.FunctionalInterface.*;
@@ -91,6 +92,29 @@ public class RequestHttp_test {
 		assertEquals( 200, res.statusCode() );
 		assertEquals( "motto", ((Map<String,Object>)(resMap.get("args"))).get("hello") );
 		assertEquals( "way", ((Map<String,Object>)(resMap.get("args"))).get("no") );
+	}
+	
+	
+	////////////////////////////////////////////////////////////////
+	//
+	// There is a bug in StringEscape.encodeURI()
+	// Passing in a json array will not be cneoded properly
+	//
+	/////////////////////////////////////////////////////////////////
+	@Test
+	public void GET_parameters_URIEncoding_test() throws IOException {	
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("headers", new String[]{"[\"_oid\", \"_name\"]"});
+		ResponseHttp response = null;
+		boolean failed = false;
+		try{
+			response = RequestHttp.get(httpBinURL(), paramsMap, null, null);
+		}catch(Exception e){
+			failed = true;
+		}
+		
+		assertNull(response);
+		assertTrue(failed);
 	}
 	
 	@Test @SuppressWarnings("unchecked")

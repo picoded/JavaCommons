@@ -16,6 +16,7 @@ public class JSMLForm_test{
 	static JSMLForm jsmlForm = null;
 	static Map<String, Object> data = null;
 	
+	/// @TODO : =.= stop absoluting path to your PC only, this test fails on other computers
 	static String rootFolder = "C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/JSML"; //absolute root folder path
 	static String contextFolder = "C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/JSML"; //on pc, absolute path, but on tomcat, its contextURI
 	static String tempFolder = rootFolder + "/tmp"; //absolute path to resource folder

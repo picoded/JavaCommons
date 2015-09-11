@@ -54,7 +54,7 @@ public class JSql_Sqlite_test {
 		JSqlObj.createTableQuerySet(testTableName, new String[] { "col1", "col2" },
 			new String[] { "INT PRIMARY KEY", "TEXT" }).execute(); //run twice to ensure "IF NOT EXISTS" works
 		
-		//JSqlObj.executeQuery( "TRUNCATE TABLE "+testTableName+"").dispose(); //run twice to ensure "IF NOT EXISTS" works
+		JSqlObj.executeQuery( "TRUNCATE TABLE "+testTableName+"").dispose(); //run twice to ensure "IF NOT EXISTS" works
 		
 		JSqlObj.executeQuery("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing")
 			.dispose();
@@ -72,7 +72,7 @@ public class JSql_Sqlite_test {
 			"CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50) )")
 			.dispose(); //run twice to ensure "IF NOT EXISTS" works
 		
-		//JSqlObj.executeQuery( "TRUNCATE TABLE "+testTableName+"").dispose(); //run twice to ensure "IF NOT EXISTS" works
+		JSqlObj.executeQuery( "TRUNCATE TABLE "+testTableName+"").dispose(); //run twice to ensure "IF NOT EXISTS" works
 		
 		JSqlObj.executeQuery("INSERT INTO " + testTableName + " ( col1, col2, col3 ) VALUES (?,?,?)", 404, "has nothing",
 			"do nothing").dispose();
@@ -127,7 +127,7 @@ public class JSql_Sqlite_test {
 		assertTrue(JSqlObj
 			.execute("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )"));
 		
-		//assertTrue(JSqlObj.execute( "TRUNCATE TABLE "+testTableName+"")); //cleanup (just incase)
+		assertTrue(JSqlObj.execute( "TRUNCATE TABLE "+testTableName+"")); //cleanup (just incase)
 		
 		assertTrue(JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing"));
 	}

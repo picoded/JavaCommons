@@ -7,8 +7,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.Base64;
 
+
 /// Picoded imports
 import picoded.conv.*;
+import picoded.enums.ObjectTokens;
 import picoded.JSql.*;
 import picoded.JStruct.*;
 import picoded.struct.*;
@@ -106,7 +108,11 @@ public class JSql_MetaTableUtils {
 		} else if (value instanceof Double) {
 			return new Object[] { new Integer(MetaType.DOUBLE.getValue()), value, null, null }; //Typ, N,S,I,T
 		} else if (value instanceof String) {
-			return new Object[] { new Integer(MetaType.STRING.getValue()), 0, ((String) value).toLowerCase(), value }; //Typ, N,S,I,T
+			String shortenValue = ((String) value).toLowerCase();
+			if( shortenValue.length() > 64 ) {
+				shortenValue = shortenValue.substring(0,64);
+			}
+			return new Object[] { new Integer(MetaType.STRING.getValue()), 0, shortenValue, value }; //Typ, N,S,I,T
 		} else if (value instanceof byte[]) {
 			return new Object[] { new Integer(MetaType.BINARY.getValue()), 0, null, (Base64.getEncoder().encodeToString( (byte[])value )) }; //Typ, N,S,I,T
 		} else {
@@ -204,15 +210,17 @@ public class JSql_MetaTableUtils {
 		
 		try {
 			Object[] typSet;
-			String k;
 			Object v;
 	
-			for (Map.Entry<String, Object> entry : objMap.entrySet()) {
-				k = entry.getKey(); 
+			for (String k : keyList) {
 				
-				// Skip reserved key, oid ke is allowed to be saved (to ensure blank object is saved)
-				if ( /*k.equalsIgnoreCase("oid") || k.equalsIgnoreCase("_oid") || */ k.equalsIgnoreCase("_otm")) { //reserved
+				// Skip reserved key, otm is allowed to be saved (to ensure blank object is saved)
+				if ( k.equalsIgnoreCase("_otm")) { //reserved
 					continue;
+				}
+				
+				if( k.length() > 64 ) {
+					throw new RuntimeException("Attempted to insert a key value larger then 64 for (_oid = "+_oid+"): "+k);
 				}
 				
 				// Checks if keyList given, if so skip if not on keyList
@@ -221,21 +229,29 @@ public class JSql_MetaTableUtils {
 				}
 				
 				// Get the value to insert
-				v = entry.getValue();
+				v = objMap.get(k);
 				
-				// Converts it into a type set, and store it
-				typSet = valueToOptionSet(mtm, k, v);
-				
-				// This is currently only for NON array mode
-				sql.upsertQuerySet( //
-					tName, //
-					new String[] { "oID", "kID", "idx" }, //
-					new Object[] { _oid, k, 0 }, //
-					//
-					new String[] { "typ", "nVl", "sVl", "tVl" }, //
-					new Object[] { typSet[0], typSet[1], typSet[2], typSet[3] }, //
-					null, null, null //
-				).execute();
+				if( v == ObjectTokens.NULL || v == null ) {
+					// Skip reserved key, oid key is allowed to be removed directly
+					if( k.equalsIgnoreCase("oid") || k.equalsIgnoreCase("_oid") ) {
+						continue;
+					}
+					sql.deleteQuerySet( tName, "oID=? AND kID=?", new Object[] { _oid, k } ).execute();
+				} else {
+					// Converts it into a type set, and store it
+					typSet = valueToOptionSet(mtm, k, v);
+					
+					// This is currently only for NON array mode
+					sql.upsertQuerySet( //
+						tName, //
+						new String[] { "oID", "kID", "idx" }, //
+						new Object[] { _oid, k, 0 }, //
+						//
+						new String[] { "typ", "nVl", "sVl", "tVl" }, //
+						new Object[] { typSet[0], typSet[1], typSet[2], typSet[3] }, //
+						null, null, null //
+					).execute();
+				}
 			}
 			//sql.commit();
 		} catch (Exception e) {

@@ -225,8 +225,13 @@ public class JStruct_MetaObject implements MetaObject {
 	/// Save all the configured data, ignore delta handling
 	public void saveAll() {
 		ensureCompleteRemoteDataMap();
-		mainTable.metaObjectRemoteDataMap_update(_oid, this, unfilteredForNullKeySet());
+		
+		Set<String> keySet = new HashSet<String>( deltaDataMap.keySet() );
+		keySet.addAll( remoteDataMap.keySet() );
+		mainTable.metaObjectRemoteDataMap_update(_oid, this, keySet );
+		
 		collapseDeltaToRemoteMap();
+		unfilteredForNullKeySet();
 	}
 	
 	// To string operation : aids debugging

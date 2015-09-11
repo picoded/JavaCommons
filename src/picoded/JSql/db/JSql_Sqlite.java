@@ -69,10 +69,20 @@ public class JSql_Sqlite extends JSql {
 	
 	/// Internal parser that converts some of the common sql statements to sqlite
 	public String genericSqlParser(String inString) {
-		inString = inString //
-			.replaceAll("(?i)VARCHAR\\(MAX\\)", "VARCHAR") //
-			.replaceAll("(?i)BIGINT", "INTEGER"); //
+		final String truncateTable = "TRUNCATE TABLE";
+		final String deleteFrom = "DELETE FROM";
+		
+		inString = inString.toUpperCase();
+		inString = inString.trim()
+			.replaceAll("(\\s){1}", " ")
+			.replaceAll("\\s+", " ")
+			.replaceAll("(?i)VARCHAR\\(MAX\\)", "VARCHAR")
+			.replaceAll("(?i)BIGINT", "INTEGER");
 		//System.out.println( inString );
+		
+		if (inString.startsWith(truncateTable)) {
+		    inString = inString.replaceAll(truncateTable, deleteFrom);
+		}
 		return inString;
 	}
 	

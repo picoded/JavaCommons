@@ -175,4 +175,21 @@ public class ConditionBase implements Query {
 		return "\""+fieldName() + "\" " + operatorSymbol() + " " + ":" + argumentName();
 	}
 	
+	//
+	// Name value pair extraction from query
+	//--------------------------------------------------------------------
+	
+	/// Extract out the respective query keys, and values
+	public Map<String,List<Object>> keyValuesMap( Map<String,List<Object>> mapToReturn ) {
+		String key = _fieldName;
+		Object val = (_argMap != null)? _argMap.get(_argName) : null;
+		
+		if( mapToReturn.get(key) == null ) {
+			mapToReturn.put(key, new ArrayList<Object>() );
+		}
+		mapToReturn.get(key).add(val);
+		
+		return mapToReturn;
+	}
+	
 } 

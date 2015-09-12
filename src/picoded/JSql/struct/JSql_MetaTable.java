@@ -325,21 +325,8 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The MetaObject[] array
-	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit ) {
-		
-		// The return list
-		List<MetaObject> retList = null;
-		
-		// Setup the query, if needed
-		if(whereClause == null) { //null gets all
-			retList = new ArrayList<MetaObject>( this.values() );
-		} else {
-			Query queryObj = Query.build(whereClause, whereValues);
-			retList = queryObj.search(this);
-		}
-		
-		// Sort, offset, convert to array, and return
-		return JStructUtils.sortAndOffsetListToArray(retList, orderByStr, offset, limit);
+	public MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit ) {
+		return super.query( whereClause, whereValues, orderByStr, offset, limit );
 	}
 	
 }

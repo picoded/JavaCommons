@@ -6,6 +6,8 @@ import java.util.logging.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.Base64;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /// Picoded imports
@@ -14,6 +16,7 @@ import picoded.enums.ObjectTokens;
 import picoded.JSql.*;
 import picoded.JStruct.*;
 import picoded.struct.*;
+import picoded.struct.query.*;
 
 ///
 /// Protected class, used to orgainze the various JSql based logic
@@ -22,6 +25,9 @@ import picoded.struct.*;
 /// The larger intention is to keep the MetaTable class more maintainable and unit testable
 ///
 public class JSql_MetaTableUtils {
+	
+	/// Static local logger
+	protected static Logger logger = Logger.getLogger(JSql_MetaTableUtils.class.getName());
 	
 	//
 	// JSqlResult search
@@ -334,13 +340,17 @@ public class JSql_MetaTableUtils {
 		return ret;
 	}
 	
-	
+	///
+	/// The complex left inner join StringBuilder used for view / query requests
+	///
 	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
 	///
 	/// @params  sql connection used, this is used to detect vendor specific logic =(
 	/// @params  meta table name, used to pull the actual data the view is based on
 	///
-	protected StringBuilder sqlBasicViewQueryBuilder(JSql sql, String tableName, MetaTypeMap mtm ) throws JSqlException {
+	/// @returns StringBuilder for the view building statement, this can be used for creating permenant view / queries
+	///
+	protected static StringBuilder sqlComplexLeftJoinQueryBuilder(JSql sql, String tableName, MetaTypeMap mtm ) {
 		
 		//
 		// Vendor specific custimization
@@ -366,7 +376,7 @@ public class JSql_MetaTableUtils {
 		select.append(lBracket + "_oid" + rBracket);
 		
 		StringBuilder from = new StringBuilder(" FROM ");
-		from.append("(SELECT DISTINCT oID")
+		from.append("(SELECT DISTINCT oID");
 		
 		
 		//
@@ -393,53 +403,173 @@ public class JSql_MetaTableUtils {
 		//
 		//-----------------------------------------
 		
+		String key;
+		MetaType type;
 		
-		// String key;
-		// MetaType type;
-		// 
 		// ArrayList<Object> argList = new ArrayList<Object>();
-		// 
-		// int joinCount = 0;
-		// for (Map.Entry<String, MetaType> e : typeMapping.entrySet()) {
-		// 	key = e.getKey();
-		// 	type = e.getValue();
-		// 
-		// 	if (type.valueType >= MetaType.TYPE_INTEGER && type.valueType <= MetaType.TYPE_FLOAT) {
-		// 
-		// 		select.append(", N" + joinCount + ".nVl AS ");
-		// 		select.append(lBracket + key + rBracket);
-		// 
-		// 		from.append(" "+joinType+" JOIN " + tableName + " AS N" + joinCount);
-		// 		from.append(" ON B.oID = N" + joinCount + ".oID");
-		// 		from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = '" + key + "'");
-		// 
-		// 	} else if (type.valueType == MetaType.TYPE_STRING) {
-		// 
-		// 		select.append(", S" + joinCount + ".tVl AS ");
-		// 		select.append(lBracket + key + rBracket);
-		// 
-		// 		select.append(", S" + joinCount + ".sVl AS ");
-		// 		select.append(lBracket + key + "_lc" + rBracket);
-		// 
-		// 		from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
-		// 		from.append(" ON B.oID = S" + joinCount + ".oID");
-		// 		from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
-		// 
-		// 	} else if (type.valueType == MetaType.TYPE_TEXT) {
-		// 
-		// 		select.append(", S" + joinCount + ".tVl AS ");
-		// 		select.append(lBracket + key + rBracket);
-		// 
-		// 		from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
-		// 		from.append(" ON B.oID = S" + joinCount + ".oID");
-		// 		from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
-		// 	}
-		// 
-		// 	++joinCount;
-		// }
-		// 
-
+		
+		int joinCount = 0;
+		for (Map.Entry<String, MetaType> e : mtm.entrySet()) {
+			key = e.getKey();
+			type = e.getValue();
+		
+			if( //
+				type == MetaType.INTEGER || //
+				type == MetaType.FLOAT   || //
+				type == MetaType.DOUBLE     //
+				) { //
+				
+				select.append(", N" + joinCount + ".nVl AS ");
+				select.append(lBracket + key + rBracket);
+				
+				from.append(" "+joinType+" JOIN " + tableName + " AS N" + joinCount);
+				from.append(" ON B.oID = N" + joinCount + ".oID");
+				from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = '" + key + "'");
+				
+			} else if (type == MetaType.STRING) {
+			
+				select.append(", S" + joinCount + ".tVl AS ");
+				select.append(lBracket + key + rBracket);
+			
+				select.append(", S" + joinCount + ".sVl AS ");
+				select.append(lBracket + key + "_lc" + rBracket);
+			
+				from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
+				from.append(" ON B.oID = S" + joinCount + ".oID");
+				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
+			
+			} else if (type == MetaType.TEXT) {
+			
+				select.append(", S" + joinCount + ".tVl AS ");
+				select.append(lBracket + key + rBracket);
+			
+				from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
+				from.append(" ON B.oID = S" + joinCount + ".oID");
+				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
+				
+			} else {
+				// Unknown MetaType ignored
+				logger.log(Level.WARNING , "sqlComplexLeftJoinQueryBuilder -> Unknown MetaType ("+type+") - for meta key : "+key);
+			}
+			
+			++joinCount;
+		}
+		
+		// The final return string builder
+		StringBuilder ret = new StringBuilder();
+		ret.append( select );
+		ret.append( from );
+		
+		// Return StringBuilder
+		return ret;
 	}
 	
+	/// Does the value to MetaType conversion
+	public static MetaType valueToMetaType(Object value) {
+		if (value instanceof Integer) {
+			return MetaType.INTEGER;
+		} else if (value instanceof Float) {
+			return MetaType.FLOAT;
+		} else if (value instanceof Double) {
+			return MetaType.DOUBLE;
+		} else if (value instanceof String) {
+			return MetaType.STRING;
+		} else if (value instanceof byte[]) {
+			return MetaType.BINARY;
+		} //else {
+		//	return MetaType.JSON;
+		//}
+		return null;
+	}
 	
+	/// Performs a search query, and returns the respective MetaObjects
+	///
+	/// CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
+	/// @TODO: Performs the search pattern using the respective type map
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	/// @param   query string to sort the order by, use null to ignore
+	/// @param   offset of the result to display, use -1 to ignore
+	/// @param   number of objects to return max
+	///
+	/// @returns  The MetaObject[] array
+	public static MetaObject[] metaTableQuery( //
+		//
+		MetaTable metaTableObj, JSql sql, String tablename, //
+		//
+		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
+	) { //
+			
+		/// Query string, for either a newly constructed view, or cached view
+		StringBuilder queryBuilder = new StringBuilder();
+		Object[] queryArgs = null;
+		
+		if( whereClause == null && orderByStr == null ) {
+			
+			queryBuilder.append("SELECT DISTINCT oID FROM "+tablename+"");
+			
+		} else {
+			
+			// Building the MetaTypeMap from where request
+			MetaTypeMap queryTypeMap = new MetaTypeMap();
+			
+			
+			// Validating the Where clause and using it to build the MetaTypeMap
+			Query queryObj = Query.build(whereClause, whereValues);
+			Map<String, List<Object>> queryMap = queryObj.keyValuesMap();
+			for( String key : queryMap.keySet() ) {
+				MetaType subType = valueToMetaType( queryMap.get(key).get(0) );
+				if( subType != null ) {
+					queryTypeMap.put( key, subType );
+				}
+			}
+			
+			// Building the Inner join query
+			StringBuilder innerJoinQuery = sqlComplexLeftJoinQueryBuilder(sql, tablename, queryTypeMap );
+			
+			// Building the complex inner join query
+			queryBuilder.append( "SELECT oID FROM (" );
+			queryBuilder.append( innerJoinQuery );
+			queryBuilder.append( ") ");
+			
+			// @TODO Generate this back from queryObj, with key name sanitization
+			if( whereClause != null ) {
+				queryBuilder.append( "WHERE ");
+				queryBuilder.append( whereClause );
+			}
+			
+			// @TODO sanatize ORDER BY for SQL injection
+			// Support ORDER BY values forming the MetaMap
+			if( orderByStr != null ) {
+				queryBuilder.append( "ORDER BY " );
+				queryBuilder.append( orderByStr );
+			}
+		}
+		
+		
+		// Limit and offset clause
+		if (limit > 0) {
+			queryBuilder.append(" LIMIT " + limit);
+			
+			if (offset > 0) {
+				queryBuilder.append(" OFFSET " + offset);
+			}
+		}
+		
+		try {
+			// Execute and get the OID's
+			JSqlResult r = sql.query( queryBuilder.toString(), queryArgs );
+			List<Object> oID_list = r.get("oID");
+			
+			// Generate the object list
+			if( oID_list != null ) {
+				return metaTableObj.getArrayFromID( ListValueConv.objectListToStringArray(oID_list),true);
+			} else {
+				return new MetaObject[0];
+			}
+		} catch(JSqlException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

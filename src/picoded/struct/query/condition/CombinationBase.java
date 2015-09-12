@@ -145,4 +145,16 @@ public class CombinationBase implements Query {
 		return ret.toString().trim();
 	}
 	
+	//
+	// Name value pair extraction from query
+	//--------------------------------------------------------------------
+	
+	/// Extract out the respective query keys, and values
+	public Map<String,List<Object>> keyValuesMap( Map<String,List<Object>> mapToReturn ) {
+		for(Query child : childrenQuery()) {
+			mapToReturn = keyValuesMap(mapToReturn);
+		}
+		return mapToReturn;
+	}
+	
 } 

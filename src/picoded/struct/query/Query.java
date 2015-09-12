@@ -129,9 +129,21 @@ public interface Query extends Predicate<Object> {
 		return ret;
 	}
 	
-	// Searches using the query, and sorted by the comparator query
-	public default <K,V> List<V> search(Map<K,V> set, String comperatorString ) {
-		return search(set, new OrderBy<V>(comperatorString));
+	// Searches using the query, and sorted by the order by query
+	public default <K,V> List<V> search(Map<K,V> set, String orderBy ) {
+		return search(set, new OrderBy<V>(orderBy));
 	}
+	
+	//
+	// Name value pair extraction from query
+	//--------------------------------------------------------------------
+	
+	/// Extract out the respective query keys, and values
+	public default Map<String,List<Object>> keyValuesMap() {
+		return keyValuesMap( new HashMap<String,List<Object>>() );
+	}
+	
+	/// Extract out the respective query keys, and values
+	public Map<String,List<Object>> keyValuesMap( Map<String,List<Object>> mapToReturn );
 	
 }

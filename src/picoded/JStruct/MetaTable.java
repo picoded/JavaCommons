@@ -68,15 +68,51 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	///--------------------------------------------------------------------------
 	
 	/// Generates a new blank object, with a GUID
+	///
+	/// @returns the MetaObject
 	public MetaObject newObject();
 	
-	/// Gets the MetaObject, regardless of its actual existance
+	/// Gets the MetaObject, regardless of its actual existance.
+	/// Note: get(_oid, isUnchecked) calls this internally when needed
+	///
+	/// @param object GUID to fetch
+	///
+	/// @returns the MetaObject
 	public MetaObject uncheckedGet(String _oid);
+	
+	/// Checked, or unchecked get indicated by a booolean
+	///
+	/// @param object GUID to fetch
+	/// @param boolean indicator for unchecked get (skips existance checks)
+	///
+	/// @returns the MetaObject
+	public default MetaObject get(String _oid, boolean isUnchecked) {
+		if( isUnchecked ) {
+			return uncheckedGet( _oid );
+		} else {
+			return get( _oid );
+		}
+	}
 	
 	/// PUT, returns the object ID (especially when its generated), note that this
 	/// adds the value in a merger style. Meaning for example, existing values not explicitely
 	/// nulled or replaced are maintained
+	///
+	/// @returns the MetaObject
 	public MetaObject append(String _oid, Map<String, Object> obj);
+	
+	/// 
+	/// MetaObject utility operations
+	///--------------------------------------------------------------------------
+	
+	/// Get array of MetaObjects
+	public default MetaObject[] getArrayFromID(String[] idArray, boolean isUnchecked) {
+		MetaObject[] retArr = new MetaObject[idArray.length];
+		for(int i=0; i<idArray.length; ++i) {
+			retArr[i] = get(idArray[i], isUnchecked);
+		}
+		return retArr;
+	}
 	
 	/// 
 	/// Query operations (to optimize on specific implementation)

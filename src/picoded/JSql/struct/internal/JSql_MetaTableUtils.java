@@ -347,10 +347,12 @@ public class JSql_MetaTableUtils {
 	///
 	/// @params  sql connection used, this is used to detect vendor specific logic =(
 	/// @params  meta table name, used to pull the actual data the view is based on
+	/// @params  type mapping to build the complex view from
+	/// @params  additional arguments needed to build the query
 	///
 	/// @returns StringBuilder for the view building statement, this can be used for creating permenant view / queries
 	///
-	protected static StringBuilder sqlComplexLeftJoinQueryBuilder(JSql sql, String tableName, MetaTypeMap mtm ) {
+	protected static StringBuilder sqlComplexLeftJoinQueryBuilder(JSql sql, String tableName, MetaTypeMap mtm, List<Object> queryArgs ) {
 		
 		//
 		// Vendor specific custimization
@@ -363,6 +365,9 @@ public class JSql_MetaTableUtils {
 		if (sql.sqlType == JSqlType.mssql) {
 			lBracket = "[";
 			rBracket = "]";
+		} else {
+			lBracket = "";
+			rBracket = "";
 		}
 		
 		//
@@ -373,7 +378,7 @@ public class JSql_MetaTableUtils {
 		//-----------------------------------------
 		
 		StringBuilder select = new StringBuilder("SELECT B.oID AS ");
-		select.append(lBracket + "_oid" + rBracket);
+		select.append(lBracket + "oID" + rBracket);
 		
 		StringBuilder from = new StringBuilder(" FROM ");
 		from.append("(SELECT DISTINCT oID");
@@ -424,7 +429,9 @@ public class JSql_MetaTableUtils {
 				
 				from.append(" "+joinType+" JOIN " + tableName + " AS N" + joinCount);
 				from.append(" ON B.oID = N" + joinCount + ".oID");
-				from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = '" + key + "'");
+				from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = ?");
+				
+				queryArgs.add(key);
 				
 			} else if (type == MetaType.STRING) {
 			
@@ -436,8 +443,10 @@ public class JSql_MetaTableUtils {
 			
 				from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
-				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
-			
+				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = ?");
+				
+				queryArgs.add(key);
+				
 			} else if (type == MetaType.TEXT) {
 			
 				select.append(", S" + joinCount + ".tVl AS ");
@@ -445,7 +454,9 @@ public class JSql_MetaTableUtils {
 			
 				from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
-				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = '" + key + "'");
+				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = ?");
+				
+				queryArgs.add(key);
 				
 			} else {
 				// Unknown MetaType ignored
@@ -494,9 +505,9 @@ public class JSql_MetaTableUtils {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The MetaObject[] array
-	public static MetaObject[] metaTableQuery( //
+	public static JSqlResult metaTableSelectQueryBuilder( //
 		//
-		MetaTable metaTableObj, JSql sql, String tablename, //
+		MetaTable metaTableObj, JSql sql, String tablename, String selectedCols, //
 		//
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
@@ -507,13 +518,12 @@ public class JSql_MetaTableUtils {
 		
 		if( whereClause == null && orderByStr == null ) {
 			
-			queryBuilder.append("SELECT DISTINCT oID FROM "+tablename+"");
+			queryBuilder.append("SELECT "+selectedCols+" FROM "+tablename+"");
 			
 		} else {
 			
 			// Building the MetaTypeMap from where request
 			MetaTypeMap queryTypeMap = new MetaTypeMap();
-			
 			
 			// Validating the Where clause and using it to build the MetaTypeMap
 			Query queryObj = Query.build(whereClause, whereValues);
@@ -526,25 +536,36 @@ public class JSql_MetaTableUtils {
 			}
 			
 			// Building the Inner join query
-			StringBuilder innerJoinQuery = sqlComplexLeftJoinQueryBuilder(sql, tablename, queryTypeMap );
+			List<Object> complexQueryArgs = new ArrayList<Object>();
+			StringBuilder innerJoinQuery = sqlComplexLeftJoinQueryBuilder(sql, tablename, queryTypeMap , complexQueryArgs);
 			
+			//queryBuilder.append( innerJoinQuery );
 			// Building the complex inner join query
-			queryBuilder.append( "SELECT oID FROM (" );
+			queryBuilder.append( "SELECT "+selectedCols.replaceAll("DISTINCT", "")+" FROM (" );
 			queryBuilder.append( innerJoinQuery );
-			queryBuilder.append( ") ");
+			queryBuilder.append( ") AS R");
 			
-			// @TODO Generate this back from queryObj, with key name sanitization
+			// WHERE query is built from queryObj, this acts as a form of sql sanitization
+			//
+			// @TODO Check that all query col names are SQL escape safe
 			if( whereClause != null ) {
-				queryBuilder.append( "WHERE ");
-				queryBuilder.append( whereClause );
+				queryBuilder.append( " WHERE ");
+				queryBuilder.append( queryObj.toString().replaceAll(":[0-9]+", "?") );
+				complexQueryArgs.addAll( Arrays.asList(whereValues) );
 			}
 			
 			// @TODO sanatize ORDER BY for SQL injection
 			// Support ORDER BY values forming the MetaMap
 			if( orderByStr != null ) {
-				queryBuilder.append( "ORDER BY " );
+				queryBuilder.append( " ORDER BY " );
 				queryBuilder.append( orderByStr );
 			}
+			
+			// Finalize query args
+			queryArgs = complexQueryArgs.toArray( new Object[0] );
+			
+			//logger.log( Level.WARNING, queryBuilder.toString() );
+			//logger.log( Level.WARNING, Arrays.asList(queryArgs).toString() );
 		}
 		
 		
@@ -558,18 +579,75 @@ public class JSql_MetaTableUtils {
 		}
 		
 		try {
-			// Execute and get the OID's
-			JSqlResult r = sql.query( queryBuilder.toString(), queryArgs );
-			List<Object> oID_list = r.get("oID");
-			
-			// Generate the object list
-			if( oID_list != null ) {
-				return metaTableObj.getArrayFromID( ListValueConv.objectListToStringArray(oID_list),true);
-			} else {
-				return new MetaObject[0];
-			}
+			// Execute and get the result
+			return sql.query( queryBuilder.toString(), queryArgs );
 		} catch(JSqlException e) {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	/// Performs a search query, and returns the respective MetaObjects
+	///
+	/// CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
+	/// @TODO: Performs the search pattern using the respective type map
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	/// @param   query string to sort the order by, use null to ignore
+	/// @param   offset of the result to display, use -1 to ignore
+	/// @param   number of objects to return max
+	///
+	/// @returns  The MetaObject[] array
+	public static MetaObject[] metaTableQuery( //
+		//
+		MetaTable metaTableObj, JSql sql, String tablename, //
+		//
+		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
+	) { //
+		JSqlResult r = metaTableSelectQueryBuilder( //
+			metaTableObj, sql, tablename, "DISTINCT oID",
+			whereClause, whereValues, orderByStr, offset, limit
+		);
+		//logger.log( Level.WARNING, r.toString() );
+		List<Object> oID_list = r.get("oID");
+		// Generate the object list
+		if( oID_list != null ) {
+			return metaTableObj.getArrayFromID( ListValueConv.objectListToStringArray(oID_list),true);
+		} 
+		// Blank list as fallback
+		return new MetaObject[0];
+	}
+	
+	/// Performs a search query, and returns the respective MetaObjects
+	///
+	/// CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
+	/// @TODO: Performs the search pattern using the respective type map
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	/// @param   query string to sort the order by, use null to ignore
+	/// @param   offset of the result to display, use -1 to ignore
+	/// @param   number of objects to return max
+	///
+	/// @returns  The MetaObject[] array
+	public static long metaTableCount( //
+		//
+		MetaTable metaTableObj, JSql sql, String tablename, //
+		//
+		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
+	) { //
+		JSqlResult r = metaTableSelectQueryBuilder( //
+			metaTableObj, sql, tablename, "COUNT(DISTINCT oID) AS rcount",
+			whereClause, whereValues, orderByStr, offset, limit
+		);
+		//logger.log( Level.WARNING, r.toString() );
+		List<Object> rcountArr = r.get("rcount");
+		// Generate the object list
+		if( rcountArr != null ) {
+			return ((Number)rcountArr.get(0)).longValue();
+		} 
+		// Blank as fallback
+		return 0;
+	}
+	
 }

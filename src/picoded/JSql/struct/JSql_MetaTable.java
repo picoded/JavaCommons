@@ -326,7 +326,18 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	///
 	/// @returns  The MetaObject[] array
 	public MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit ) {
-		return super.query( whereClause, whereValues, orderByStr, offset, limit );
+		return JSql_MetaTableUtils.metaTableQuery(this, sqlObj, sqlTableName, whereClause, whereValues, orderByStr, offset, limit);
+		//return super.query( whereClause, whereValues, orderByStr, offset, limit );
+	}
+	
+	/// Performs a search query, and returns the respective MetaObjects
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	///
+	/// @returns  The total count for the query
+	public long queryCount(String whereClause, Object[] whereValues) {
+		return JSql_MetaTableUtils.metaTableCount(this, sqlObj, sqlTableName, whereClause, whereValues, null, -1, -1);
 	}
 	
 }

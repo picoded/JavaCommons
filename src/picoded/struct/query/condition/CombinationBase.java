@@ -152,7 +152,7 @@ public class CombinationBase implements Query {
 	/// Extract out the respective query keys, and values
 	public Map<String,List<Object>> keyValuesMap( Map<String,List<Object>> mapToReturn ) {
 		for(Query child : childrenQuery()) {
-			mapToReturn = keyValuesMap(mapToReturn);
+			mapToReturn = child.keyValuesMap(mapToReturn);
 		}
 		return mapToReturn;
 	}

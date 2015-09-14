@@ -12,6 +12,7 @@ import picoded.conv.RegexUtils;
 import picoded.conv.GenericConvert;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.CaseInsensitiveHashMap;
+import picoded.webTemplateEngines.JSML.*;
 
 /// FormNode serves as a map accessor to the form defination structure,
 /// with various utility functions, for Wrapper, and Input interface writers
@@ -432,6 +433,25 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		innerConstructor(root, mapObject, inputData);
 	}
 	
+	////////////////////////////////////////////////
+	//
+	// JSML FormSet, linked if formset exists
+	//
+	////////////////////////////////////////////////
+	
+	/// Inner protected vars
+	protected JSMLFormSet formSetObj = null;
+	
+	/// FormSet Setter
+	public void setFormSet(JSMLFormSet set) {
+		formSetObj = set;
+	}
+	
+	/// FormSet Getter
+	public JSMLFormSet getFormSet() {
+		return formSetObj;
+	}
+	
 	//
 	// Generates the HTML output via input or wrapper code
 	//
@@ -596,7 +616,10 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	public List<FormNode> children( Map<String,Object> inputValue ) {
 		List<FormNode> ret = new ArrayList<FormNode>();
 		for(Map<String,Object> childDefine : childrenDefinition()) {
-			ret.add( new FormNode( _formGenerator, childDefine, inputValue )  );
+			FormNode newNode = new FormNode( _formGenerator, childDefine, inputValue ) ;
+			newNode.setFormSet( getFormSet() );
+			
+			ret.add( newNode );
 		}
 		return ret;
 	}
@@ -755,6 +778,8 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		}else{
 			Map<String, Object> nodeMap = ConvertJSON.toMap(jsonString);
 			FormNode newNode = new FormNode(root, nodeMap, prefilledJSONData);
+			newNode.setFormSet( root.getFormSet() );
+			
 			formNodes.add(newNode);
 			return formNodes;
 		}
@@ -766,8 +791,12 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		List<FormNode> formNodes = new ArrayList<FormNode>();
 		
 		for(Object obj:listObject){
-			Map<String, Object> nodeMapObject = (Map<String, Object>)obj;
-			formNodes.add(new FormNode(root, nodeMapObject, prefilledJSONData));
+			Map<String, Object> nodeMap = (Map<String, Object>)obj;
+			
+			FormNode newNode = new FormNode(root, nodeMap, prefilledJSONData);
+			newNode.setFormSet( root.getFormSet() );
+			
+			formNodes.add( newNode );
 		}
 		
 		return formNodes;

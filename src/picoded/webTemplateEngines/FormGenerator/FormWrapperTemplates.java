@@ -99,6 +99,25 @@ public class FormWrapperTemplates {
 		return ret;
 	}
 	
+	/// Calls another formset, and insert its result,
+	/// it uses the field key, to select the data to pass. and name for the sub form to call
+	/// 
+	/// @params {FormNode}  node           - The form node to build the html from
+	/// @params {boolean}   isDisplayMode  - The display mode.
+	///
+	/// @returns {StringBuilder}  the resulting HTML
+	protected static StringBuilder formSetWrapper(FormNode node, boolean displayMode){
+		StringBuilder ret = new StringBuilder();
+		
+		String name = node.getString("name");
+		
+		if( name == null || name.length() <= 0 ) {
+			throw new RuntimeException("Missing form set name");
+		}
+		
+		return ret;
+	}
+	
 	/// Iterator for an array of values. This function nearly identical to standard div,
 	/// however it uses the field key, to iterate the data map.
 	/// 

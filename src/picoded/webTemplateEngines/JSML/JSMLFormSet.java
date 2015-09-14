@@ -149,7 +149,10 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 			return null;
 		}
 		String keyStr = key.toString();
+		
 		JSMLForm newForm = new JSMLForm( new File(formSetFolder, keyStr), formSetURI+"/"+keyStr+"/" , null );
+		newForm.setFormSet(this);
+		
 		newForm.getDefinition();
 		return newForm;
 	}

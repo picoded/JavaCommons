@@ -516,10 +516,20 @@ public class JSql_MetaTableUtils {
 		StringBuilder queryBuilder = new StringBuilder();
 		Object[] queryArgs = null;
 		
-		if( whereClause == null && orderByStr == null ) {
+		if( orderByStr != null ) {
+			orderByStr.replaceAll("_oid", "oID");
+		}
+		
+		if( whereClause == null ) {
 			
 			queryBuilder.append("SELECT "+selectedCols+" FROM "+tablename+"");
-			
+
+			// @TODO sanatize ORDER BY for SQL injection
+			// Support ORDER BY values forming the MetaMap
+			if( orderByStr != null ) {
+				queryBuilder.append( " ORDER BY " );
+				queryBuilder.append( orderByStr );
+			}
 		} else {
 			
 			// Building the MetaTypeMap from where request

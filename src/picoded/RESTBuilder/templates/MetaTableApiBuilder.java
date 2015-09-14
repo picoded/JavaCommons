@@ -107,7 +107,7 @@ public class MetaTableApiBuilder {
 		
 		String orderByStr = req.getString("orderBy");
 		if(orderByStr == null || orderByStr.isEmpty()){
-			orderByStr = "_oid";
+			orderByStr = "oID";
 		}
 		
 		String[] headers = req.getStringArray("headers");

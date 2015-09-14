@@ -3,6 +3,8 @@ package picoded.RESTBuilder.templates;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import picoded.RESTBuilder.*;
 import picoded.JStack.*;
 import picoded.JStruct.*;
@@ -620,9 +622,12 @@ public class AccountLogin extends BasePage {
 			int start = req.getInt("start");
 			int limit = req.getInt("length");
 			
+			String[] insideGroupAny = req.getStringArray("insideGroup_any");
+			String groupStatus = req.getString("groupStatus");
+			
 			String orderByStr = req.getString("orderBy");
 			if(orderByStr == null || orderByStr.isEmpty()){
-				orderByStr = "_oid";
+				orderByStr = "oID";
 			}
 			
 			String[] headers = req.getStringArray("headers");
@@ -647,7 +652,7 @@ public class AccountLogin extends BasePage {
 			
 			List<List<Object>> data = null;
 			try{
-				data = list_GET_and_POST_inner(accountTableObj, draw, start, limit, headers, query, queryArgs, orderByStr);
+				data = list_GET_and_POST_inner(accountTableObj, draw, start, limit, headers, query, queryArgs, orderByStr, insideGroupAny, groupStatus);
 				res.put("data",  data);
 			}catch(Exception e){
 				res.put("error",  e.getMessage());
@@ -657,7 +662,10 @@ public class AccountLogin extends BasePage {
 		});
 	};
 	
-	private static List<List<Object>> list_GET_and_POST_inner(AccountTable _metaTableObj, int draw, int start, int length, String[] headers, String query, String[] queryArgs, String orderBy) throws RuntimeException{
+	private static List<List<Object>> list_GET_and_POST_inner(AccountTable _metaTableObj, int draw, int start, int length, 
+																String[] headers, String query, String[] queryArgs, String orderBy, 
+																String[] insideGroupAny, String groupStatus) throws RuntimeException
+	{
 		if(_metaTableObj == null){
 			return null;
 		}
@@ -668,18 +676,57 @@ public class AccountLogin extends BasePage {
 			if(headers != null && headers.length > 0){
 				MetaObject[] metaObjs = null;
 				
-				if(query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0){
-					metaObjs = _metaTableObj.accountMetaTable().query(null, null, orderBy, start, length);
-				}else{
-					metaObjs = _metaTableObj.accountMetaTable().query(query, queryArgs, orderBy, start, length);
+				MetaTable accountMetaTable = _metaTableObj.accountMetaTable();
+				
+				if(accountMetaTable == null){
+					return null;
 				}
 				
-							
+				if(query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0){
+					metaObjs = accountMetaTable.query(null, null, orderBy, start, length);
+				}else{
+					metaObjs = accountMetaTable.query(query, queryArgs, orderBy, start, length);
+				}
+				
 				for(MetaObject metaObj : metaObjs){
 					List<Object> row = new ArrayList<Object>();
 					for(String header : headers){
+						AccountObject ao = _metaTableObj.getFromID(metaObj._oid());
+						
+						if(groupStatus != null){
+							if(groupStatus.equalsIgnoreCase("group")){
+								if(!ao.isGroup()){
+									continue;
+								}
+							}else if(groupStatus.equalsIgnoreCase("user")){
+								if(ao.isGroup()){
+									continue;
+								}
+							}
+						}
+						
+						boolean checkInsideGroupAny = (insideGroupAny != null && insideGroupAny.length > 0);
+						boolean partOfGroup = false;
+						if(checkInsideGroupAny){
+							String[] aoGroupIDs = ao.getGroups_id();
+							if(aoGroupIDs != null && aoGroupIDs.length > 0){
+								for(String groupID : aoGroupIDs){
+									if(partOfGroup){
+										break;
+									}
+									
+									if(ArrayUtils.contains(insideGroupAny,  groupID)){
+										partOfGroup = true;
+									}
+								}
+							}
+						}
+						
+						if(checkInsideGroupAny && !partOfGroup){
+							continue;
+						}
+						
 						if(header.equalsIgnoreCase("names")){
-							AccountObject ao = _metaTableObj.getFromID(metaObj._oid());
 							if(ao != null){
 								Set<String> aoNames = ao.getNames();
 								if(aoNames != null){

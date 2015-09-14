@@ -308,7 +308,7 @@ public class AccountLogin_test {
 		assertNotNull(responseMap.get("accountID"));
 	}
 	
-//	@Test
+	@Test
 	@SuppressWarnings("unchecked")
 	public void members_list_GET(){ //group get function
 		//do login now
@@ -320,7 +320,7 @@ public class AccountLogin_test {
 		
 		//create group and add testUser
 		AccountObject groupAObj = getOrCreateGroup("GroupA");
-		groupAObj.addMember(testUser, "guest");
+		groupAObj.addMember(testUser, "admin");
 		groupAObj.saveDelta();
 		
 		//reattempt data retrieval
@@ -336,8 +336,18 @@ public class AccountLogin_test {
 		
 		List<List<Object>> groupData = (List<List<Object>>)obj;
 		assertNotNull(groupData);
-		assertNotNull(groupData.get(0));
-		assertEquals("guest", groupData.get(0).get(2));
+//		assertNotNull(groupData.get(0));
+//		assertEquals("guest", groupData.get(0).get(2));
+		
+		//data retrieval second time
+		getParams = new HashMap<String,String[]>();
+		getParams.put("accountName", new String[]{ "the-root" });
+		getParams.put("accountID", new String[]{userID});
+		String jsonArray = "["+"\""+groupAObj._oid()+"\""+"]";
+		getParams.put("insideGroup_any", new String[]{ jsonArray });
+		response = RequestHttp.post(testAddress+"/api/account/info/list", getParams, cookieJar, null);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull(responseMap);
 	}
 	
 //	@Test
@@ -420,7 +430,7 @@ public class AccountLogin_test {
 		assertNotNull(responseMap = response.toMap());
 	}
 	
-	@Test
+//	@Test
 	@SuppressWarnings("unchecked")
 	public void members_meta_POST(){
 		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");

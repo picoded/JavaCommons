@@ -74,9 +74,12 @@ public class QueryFilter {
 			baseMap = new HashMap<String,Object>();
 		}
 		
-		for(int a=0; a<argArr.length; ++a) {
-			baseMap.put(""+a, argArr[a]);
+		if(argArr != null && argArr.length > 0){
+			for(int a=0; a<argArr.length; ++a) {
+				baseMap.put(""+a, argArr[a]);
+			}
 		}
+		
 		return baseMap;
 	}
 	

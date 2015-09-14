@@ -470,7 +470,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		for(int a=0; a<noOfCookies; ++a) {
 			/// Path is required for cross AJAX / domain requests,
 			/// @TODO make this configurable?
-			cookieJar[a].setPath(request.getContextPath());
+			String cookiePath = (request.getContextPath() == null || request.getContextPath().isEmpty()) ? "/" : request.getContextPath();
+			cookieJar[a].setPath(cookiePath);
 			
 			if(!rmberMe) { //set to clear on browser close
 				cookieJar[a].setMaxAge(noncLifetime);
@@ -528,7 +529,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 			
 			/// Path is required for cross AJAX / domain requests,
 			/// @TODO make this configurable?
-			cookieJar[a].setPath(request.getContextPath());
+			String cookiePath = (request.getContextPath() == null || request.getContextPath().isEmpty()) ? "/" : request.getContextPath();
+			cookieJar[a].setPath(cookiePath);
 			
 			if(a < 4 && isHttpOnly) {
 				cookieJar[a].setHttpOnly(isHttpOnly);

@@ -92,19 +92,12 @@ public class JSql_Mysql extends JSql {
 	
 	/// Internal parser that converts some of the common sql statements to mysql
 	public String genericSqlParser(String inString) {
-		final String ifExists = "IF EXISTS";
-		final String ifNotExists = "IF NOT EXISTS";
-		final String drop = "DROP";
-		
-		String qString = inString.toUpperCase();
-		qString = inString.replaceAll("\"", "`")
-							//.replaceAll("\'", "`")
-							.replaceAll("AUTOINCREMENT", "AUTO_INCREMENT")
-							.replace("VARCHAR(MAX)", "TEXT");
-		
-		if (qString.startsWith(drop)) { //DROP
-			qString = qString.replaceAll(ifNotExists, ifExists);
-		}
+	    String qString = inString.toUpperCase();
+	    qString = inString.replaceAll("\"", "`")
+	                      //.replaceAll("\'", "`")
+	                      .replaceAll("AUTOINCREMENT", "AUTO_INCREMENT")
+	                      .replace("VARCHAR(MAX)", "TEXT");
+
 		return qString;
 	}
 	
@@ -179,6 +172,7 @@ public class JSql_Mysql extends JSql {
     		    // execute query to drop the view if exist
     		    String dropViewQuery = "DROP VIEW IF EXISTS " + tmpViewName;
     		    
+    		    System.out.println("##### dropViewQuery::: "+dropViewQuery);
     		    execute_raw( genericSqlParser(dropViewQuery) );
     		    
     		    /// execute the query to create view

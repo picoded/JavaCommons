@@ -190,11 +190,17 @@ public class JSMLForm {
 	
 	public Map<String, Object> getDataFile(String pathToDataFile){
 		File dummyDataFile = new File(_formFolderPath + "/" + pathToDataFile);
+		
+		if(dummyDataFile != null && !dummyDataFile.exists()){
+			return new HashMap<String, Object>();
+		}
+		
 		String dummyDataString = "";
+		
 		try{
 			dummyDataString = FileUtils.readFileToString(dummyDataFile);
 		}catch(Exception e){
-			throw new RuntimeException("getDataFile() ->" + e.getMessage());
+			throw new RuntimeException("getDataFile() ->" + e);
 		}
 		
 		Map<String, Object> ret =  ConvertJSON.toMap(dummyDataString);

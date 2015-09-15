@@ -123,12 +123,10 @@ public class JSql_Mysql extends JSql {
 	public boolean execute(String qString, Object... values) throws JSqlException {
 		qString = genericSqlParser(qString);
 		String qStringUpper = qString.toUpperCase();
-		
 		/// MySQL does not support the inner query in create view
 		/// Check if create view query has an inner query.
 		/// If yes, create a view from the inner query and replace the inner query with created view.
 		if (qStringUpper.contains("CREATE VIEW")) {
-    		
     		// get view name
     		int indexAs = qStringUpper.indexOf("AS");
     		String viewName = "";
@@ -172,7 +170,6 @@ public class JSql_Mysql extends JSql {
     		    // execute query to drop the view if exist
     		    String dropViewQuery = "DROP VIEW IF EXISTS " + tmpViewName;
     		    
-    		    System.out.println("##### dropViewQuery::: "+dropViewQuery);
     		    execute_raw( genericSqlParser(dropViewQuery) );
     		    
     		    /// execute the query to create view

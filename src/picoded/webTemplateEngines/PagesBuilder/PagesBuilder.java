@@ -75,7 +75,7 @@ public class PagesBuilder {
 	
 	/// @returns Gets the protected JMTE object, used internally
 	public JMTE getJMTE() {
-		if(jmteObj == null) {
+		if (jmteObj == null) {
 			jmteObj = new JMTE();
 		}
 		return jmteObj;
@@ -84,7 +84,7 @@ public class PagesBuilder {
 	/// Overides the default (if loaded) JMTE object. 
 	public void setJMTE(JMTE set) {
 		jmteObj = set;
-		if(html != null) {
+		if (html != null) {
 			html.setJMTE(jmteObj);
 		}
 	}
@@ -96,12 +96,12 @@ public class PagesBuilder {
 	
 	/// Overides the uriRootPrefix. 
 	public void setUriRootPrefix(String set) {
-		if( !set.endsWith("/") ) {
-			set = set+"/";
+		if (!set.endsWith("/")) {
+			set = set + "/";
 		}
 		
 		uriRootPrefix = set;
-		if(html != null) {
+		if (html != null) {
 			html.uriRootPrefix = uriRootPrefix;
 		}
 	}
@@ -113,11 +113,11 @@ public class PagesBuilder {
 	////////////////////////////////////////////////////////////
 	
 	protected PagesHTML html() {
-		if(html != null) {
+		if (html != null) {
 			return html;
 		}
 		html = new PagesHTML(pagesFolder);
-		html.setJMTE( getJMTE() );
+		html.setJMTE(getJMTE());
 		html.uriRootPrefix = uriRootPrefix;
 		return html;
 	}
@@ -132,31 +132,31 @@ public class PagesBuilder {
 		//
 		// NULL check
 		//
-		if( pagesFolder == null ) {
+		if (pagesFolder == null) {
 			throw new RuntimeException("Pages definition folder is not set (null)");
 		}
-		if( outputFolder == null ) {
+		if (outputFolder == null) {
 			throw new RuntimeException("Output folder is not set (null)");
 		}
 		
 		//
 		// Exists checks
 		//
-		if( !pagesFolder.exists() ) {
-			throw new RuntimeException("Pages definition folder does not exists: "+pagesFolder.getPath());
+		if (!pagesFolder.exists()) {
+			throw new RuntimeException("Pages definition folder does not exists: " + pagesFolder.getPath());
 		}
-		if( !outputFolder.exists() ) {
-			throw new RuntimeException("Output folder does not exists: "+outputFolder.getPath());
+		if (!outputFolder.exists()) {
+			throw new RuntimeException("Output folder does not exists: " + outputFolder.getPath());
 		}
 		
 		//
 		// IsDir checks
 		//
-		if( !pagesFolder.isDirectory() ) {
-			throw new RuntimeException("Pages definition folder path is not a 'directory': "+pagesFolder.getPath());
+		if (!pagesFolder.isDirectory()) {
+			throw new RuntimeException("Pages definition folder path is not a 'directory': " + pagesFolder.getPath());
 		}
-		if( !outputFolder.isDirectory() ) {
-			throw new RuntimeException("Output folder path is not a 'directory': "+outputFolder.getPath());
+		if (!outputFolder.isDirectory()) {
+			throw new RuntimeException("Output folder path is not a 'directory': " + outputFolder.getPath());
 		}
 		
 		//
@@ -362,5 +362,4 @@ public class PagesBuilder {
 		// End and returns self
 		return this;
 	}
-	
 }

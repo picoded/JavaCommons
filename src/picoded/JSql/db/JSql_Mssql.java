@@ -316,7 +316,7 @@ public class JSql_Mssql extends JSql {
 			endIndex = sb.indexOf("=", beginIndex);
 		}
 		qString = sb.toString();
-		
+	    System.out.println("###### qString: "+qString);
 		return qString;
 	}
 	

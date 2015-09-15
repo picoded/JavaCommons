@@ -19,10 +19,10 @@ public class QueryUtils {
 	/// @returns  The extracted object
 	///
 	public static Object getFieldValue(Object t, String field) {
-		if( field == null || field.toString().equalsIgnoreCase("this") ) {
+		if (field == null || field.toString().equalsIgnoreCase("this")) {
 			return t;
-		} else if( t instanceof Map ) {
-			return ((Map)t).get(field);
+		} else if (t instanceof Map) {
+			return ((Map) t).get(field);
 		}
 		return null;
 	}
@@ -33,15 +33,13 @@ public class QueryUtils {
 	/// @returns  Fieldnames after removal
 	///
 	public static String unwrapFieldName(String field) {
-		if( //
-			(field.startsWith("\"") && field.endsWith("\"")) ||
-			(field.startsWith("'") && field.endsWith("'")) ||
-			(field.startsWith("[") && field.endsWith("]"))
-		) { //
+		if ( //
+		(field.startsWith("\"") && field.endsWith("\"")) || (field.startsWith("'") && field.endsWith("'"))
+			|| (field.startsWith("[") && field.endsWith("]"))) { //
 			field = field.substring(1, field.length() - 1);
 		}
 		
-		if( field.length() == 0 ) {
+		if (field.length() == 0) {
 			throw new RuntimeException("Unexpected blank field");
 		}
 		
@@ -51,34 +49,34 @@ public class QueryUtils {
 	// 
 	//--------------------------------------------------------------------
 	
-	public static Double normalizeNumber(Object number){
+	public static Double normalizeNumber(Object number) {
 		Double val = null;
-		if(number instanceof Integer){
-			val = (Double)((Integer)number * 1.0);
-		}else if(number instanceof Float){
-			val = (Double)((Float)number * 1.0);
-		}else if(number instanceof Double){
-			val = (Double)number;
+		if (number instanceof Integer) {
+			val = (Double) ((Integer) number * 1.0);
+		} else if (number instanceof Float) {
+			val = (Double) ((Float) number * 1.0);
+		} else if (number instanceof Double) {
+			val = (Double) number;
 		}
 		return val;
 	}
 	
 	//returns String only, and ONLY if it should be compared as a string
 	//if its a number, will return as a double
-	public static Object normalizeObject(Object source){
-		if(source instanceof String){
-			if(((String) source).matches("[0-9]+") || ((String)source).contains(".")){ //extremely rudimentary check for a number, needs to be improved
-				try{
-					Number sourceAsNumber = NumberFormat.getNumberInstance(Locale.ENGLISH).parse((String)source);
+	public static Object normalizeObject(Object source) {
+		if (source instanceof String) {
+			if (((String) source).matches("[0-9]+") || ((String) source).contains(".")) { //extremely rudimentary check for a number, needs to be improved
+				try {
+					Number sourceAsNumber = NumberFormat.getNumberInstance(Locale.ENGLISH).parse((String) source);
 					Double sourceAsDouble = sourceAsNumber.doubleValue();
 					return sourceAsDouble;
-				}catch(Exception ex){
+				} catch (Exception ex) {
 					throw new RuntimeException("exception in normalizeObject-> " + ex.getMessage());
 				}
-			}else{
-				return (String)source;
+			} else {
+				return (String) source;
 			}
-		}else{
+		} else {
 			return normalizeNumber(source);
 		}
 	}

@@ -76,6 +76,13 @@ public class JSql_Sqlite_test {
 		
 		JSqlObj.executeQuery("INSERT INTO " + testTableName + " ( col1, col2, col3 ) VALUES (?,?,?)", 404, "has nothing",
 			"do nothing").dispose();
+			
+		//CREATE VIEW QUERY
+		JSqlObj.executeQuery("CREATE VIEW " + testTableName + "_View AS  SELECT * FROM "+ testTableName).dispose();
+		
+		//DROP VIEW QUERY
+	    JSqlObj.executeQuery("DROP VIEW IF EXISTS `" + testTableName + "_View`").dispose();
+			
 	}
 	
 	///*

@@ -135,7 +135,7 @@ public class FileServlet extends HttpServlet {
 		String requestPath = servletRequest.getPathInfo();
 		
 		// Pass the requestPath
-		processRequest( servletRequest, servletResponse, headersOnly, requestPath );
+		processRequest(servletRequest, servletResponse, headersOnly, requestPath);
 	}
 	
 	/// Process the full file fetch request
@@ -169,15 +169,15 @@ public class FileServlet extends HttpServlet {
 		// 404 error if directory traversal / esclation as a security measure
 		// Also blocks ".private" file access
 		if (requestPath.contains("/.") || requestPath.contains("..")) {
-		   servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
-		   return;
+			servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
 		}
 		
 		// 404 error if accessing possible java servlet protected files
 		String requestPath_lowerCase = requestPath.toLowerCase();
 		if (requestPath_lowerCase.contains("/web-inf/") || requestPath_lowerCase.contains("/meta-inf/")) {
-		   servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
-		   return;
+			servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
 		}
 		
 		// Fetch THE file, and validate
@@ -444,11 +444,11 @@ public class FileServlet extends HttpServlet {
 	// Utility functions
 	//
 	///////////////////////////////////////////////////////
-
+	
 	/// Utility function called by init, or paramtirized startup. To validate basePath
 	public void validateBasePath() {
 		// Validate base path.
-		if(baseFolder == null) {
+		if (baseFolder == null) {
 			if (basePath == null) {
 				throw new RuntimeException("FileServlet init param 'basePath' is required.");
 			}
@@ -456,28 +456,22 @@ public class FileServlet extends HttpServlet {
 		}
 		
 		if (!baseFolder.exists()) {
-			throw new RuntimeException(
-				"FileServlet init param 'basePath' (" + 
-				baseFolder.toString() + ") does actually not exist in file system."
-			);
+			throw new RuntimeException("FileServlet init param 'basePath' (" + baseFolder.toString()
+				+ ") does actually not exist in file system.");
 		}
 		
 		if (!baseFolder.isDirectory()) {
-			throw new RuntimeException(
-				"FileServlet init param 'basePath' value (" + 
-				baseFolder.toString() + ") is actually not a directory in file system."
-			);
-		} 
+			throw new RuntimeException("FileServlet init param 'basePath' value (" + baseFolder.toString()
+				+ ") is actually not a directory in file system.");
+		}
 		
 		if (!baseFolder.canRead()) {
-			throw new RuntimeException(
-				"FileServlet init param 'basePath' value (" + 
-				baseFolder.toString() + ") is actually not readable in file system."
-			);
+			throw new RuntimeException("FileServlet init param 'basePath' value (" + baseFolder.toString()
+				+ ") is actually not readable in file system.");
 		}
 		
 		// Use provided file, to extract filepath
-		if( basePath == null ) {
+		if (basePath == null) {
 			basePath = baseFolder.toString();
 		}
 	}
@@ -501,8 +495,8 @@ public class FileServlet extends HttpServlet {
 		Arrays.sort(headerValues);
 		
 		return Arrays.binarySearch(headerValues, toMatch) > -1
-			||  Arrays.binarySearch(headerValues, toMatch.replaceAll("/.*$", "/*")) >-1
-			||  Arrays.binarySearch(headerValues, "*/*") > -1 ;
+			|| Arrays.binarySearch(headerValues, toMatch.replaceAll("/.*$", "/*")) > -1
+			|| Arrays.binarySearch(headerValues, "*/*") > -1;
 	}
 	
 	/// Returns true if the header accept the given value, or is "*/*" wild
@@ -523,8 +517,7 @@ public class FileServlet extends HttpServlet {
 		String[] headerValues = header.split("\\s*,\\s*");
 		Arrays.sort(headerValues);
 		
-		return Arrays.binarySearch(headerValues, toMatch) > -1
-			||  Arrays.binarySearch(headerValues, "*") > -1 ;
+		return Arrays.binarySearch(headerValues, toMatch) > -1 || Arrays.binarySearch(headerValues, "*") > -1;
 	}
 	
 	/// Inner class representing a byte range
@@ -533,16 +526,16 @@ public class FileServlet extends HttpServlet {
 		long end;
 		long length;
 		long total;
-
+		
 		/// Construct a byte range.
 		/// @param Start of the byte range.
 		/// @param End of the byte range.
 		/// @param Total length of the byte source.
 		public Range(long start, long end, long total) {
-			 this.start = start;
-			 this.end = end;
-			 this.length = end - start + 1;
-			 this.total = total;
+			this.start = start;
+			this.end = end;
+			this.length = end - start + 1;
+			this.total = total;
 		}
 	}
 	
@@ -558,7 +551,6 @@ public class FileServlet extends HttpServlet {
 		String substring = value.substring(beginIndex, endIndex);
 		return (substring.length() > 0) ? Long.parseLong(substring) : -1;
 	}
-
 	
 	/// Copy the given byte range of the given input to the given output.
 	/// 
@@ -572,7 +564,7 @@ public class FileServlet extends HttpServlet {
 	private static void copy(RandomAccessFile input, OutputStream output, long start, long length) throws IOException {
 		byte[] buffer = new byte[64]; //line cache size
 		int read;
-
+		
 		if (input.length() == length) {
 			// Write full range.
 			while ((read = input.read(buffer)) > 0) {
@@ -593,7 +585,7 @@ public class FileServlet extends HttpServlet {
 			}
 		}
 	}
-
+	
 	/// Close the given resource.
 	///
 	/// @param  resource to be closed.
@@ -607,7 +599,7 @@ public class FileServlet extends HttpServlet {
 			}
 		}
 	}
-
+	
 	///////////////////////////////////////////////////////
 	//
 	// HttpServlet implmentation (if used directly)
@@ -621,15 +613,15 @@ public class FileServlet extends HttpServlet {
 		// Validate the base path
 		validateBasePath();
 	}
-
+	
 	/// Process HEAD servletRequest. This returns the same headers as GET request, but without content.
 	protected void doHead(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		processRequest(request, response, true);
 	}
-
+	
 	/// Process GET request, with headers and content
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		processRequest(request, response, false);
 	}
-
+	
 }

@@ -48,9 +48,9 @@ public class JStack extends JSqlStruct implements JStackLayer {
 	protected void interimJSqlOnly() {
 		JStackLayer[] layers = stackLayers();
 		
-		JStackLayer last = layers[layers.length-1];
-		if( last instanceof JSql ) {
-			sqlObj = (JSql)last;
+		JStackLayer last = layers[layers.length - 1];
+		if (last instanceof JSql) {
+			sqlObj = (JSql) last;
 		} else {
 			throw new RuntimeException("JStack currently supports a single JSql node (@TODO : Fix this)");
 		}

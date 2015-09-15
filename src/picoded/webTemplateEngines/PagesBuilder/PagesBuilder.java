@@ -79,7 +79,7 @@ public class PagesBuilder {
 	
 	/// @returns Gets the protected JMTE object, used internally
 	public JMTE getJMTE() {
-		if(jmteObj == null) {
+		if (jmteObj == null) {
 			jmteObj = new JMTE();
 		}
 		return jmteObj;
@@ -88,7 +88,7 @@ public class PagesBuilder {
 	/// Overides the default (if loaded) JMTE object. 
 	public void setJMTE(JMTE set) {
 		jmteObj = set;
-		if(html != null) {
+		if (html != null) {
 			html.setJMTE(jmteObj);
 		}
 	}
@@ -100,12 +100,12 @@ public class PagesBuilder {
 	
 	/// Overides the uriRootPrefix. 
 	public void setUriRootPrefix(String set) {
-		if( !set.endsWith("/") ) {
-			set = set+"/";
+		if (!set.endsWith("/")) {
+			set = set + "/";
 		}
 		
 		uriRootPrefix = set;
-		if(html != null) {
+		if (html != null) {
 			html.uriRootPrefix = uriRootPrefix;
 		}
 	}
@@ -117,11 +117,11 @@ public class PagesBuilder {
 	////////////////////////////////////////////////////////////
 	
 	protected PagesHTML html() {
-		if(html != null) {
+		if (html != null) {
 			return html;
 		}
 		html = new PagesHTML(pagesFolder);
-		html.setJMTE( getJMTE() );
+		html.setJMTE(getJMTE());
 		html.uriRootPrefix = uriRootPrefix;
 		return html;
 	}
@@ -136,31 +136,31 @@ public class PagesBuilder {
 		//
 		// NULL check
 		//
-		if( pagesFolder == null ) {
+		if (pagesFolder == null) {
 			throw new RuntimeException("Pages definition folder is not set (null)");
 		}
-		if( outputFolder == null ) {
+		if (outputFolder == null) {
 			throw new RuntimeException("Output folder is not set (null)");
 		}
 		
 		//
 		// Exists checks
 		//
-		if( !pagesFolder.exists() ) {
-			throw new RuntimeException("Pages definition folder does not exists: "+pagesFolder.getPath());
+		if (!pagesFolder.exists()) {
+			throw new RuntimeException("Pages definition folder does not exists: " + pagesFolder.getPath());
 		}
-		if( !outputFolder.exists() ) {
-			throw new RuntimeException("Output folder does not exists: "+outputFolder.getPath());
+		if (!outputFolder.exists()) {
+			throw new RuntimeException("Output folder does not exists: " + outputFolder.getPath());
 		}
 		
 		//
 		// IsDir checks
 		//
-		if( !pagesFolder.isDirectory() ) {
-			throw new RuntimeException("Pages definition folder path is not a 'directory': "+pagesFolder.getPath());
+		if (!pagesFolder.isDirectory()) {
+			throw new RuntimeException("Pages definition folder path is not a 'directory': " + pagesFolder.getPath());
 		}
-		if( !outputFolder.isDirectory() ) {
-			throw new RuntimeException("Output folder path is not a 'directory': "+outputFolder.getPath());
+		if (!outputFolder.isDirectory()) {
+			throw new RuntimeException("Output folder path is not a 'directory': " + outputFolder.getPath());
 		}
 		
 		//
@@ -182,7 +182,7 @@ public class PagesBuilder {
 		try {
 			File definitionFolder = new File(pagesFolder, pageName);
 			return definitionFolder.exists() && definitionFolder.isDirectory();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			// Failed?
 		}
 		return false;
@@ -409,59 +409,59 @@ public class PagesBuilder {
 	
 	/// Returns the File servlet
 	public FileServlet outputFileServlet() {
-		if( _outputFileServlet != null ) {
+		if (_outputFileServlet != null) {
 			return _outputFileServlet;
 		}
 		return (_outputFileServlet = new FileServlet(outputFolder));
 	}
 	
 	/// Process the full PageBuilder servlet request
-	public void processPageBuilderServlet( BasePage page ) {
-		processPageBuilderServlet( page, page.requestWildcardUriArray() );
+	public void processPageBuilderServlet(BasePage page) {
+		processPageBuilderServlet(page, page.requestWildcardUriArray());
 	}
 	
 	/// Process the full PageBuilder servlet request
-	public void processPageBuilderServlet( BasePage page, String[] requestWildcardUri ) {
+	public void processPageBuilderServlet(BasePage page, String[] requestWildcardUri) {
 		try {
-			if( requestWildcardUri == null ) {
+			if (requestWildcardUri == null) {
 				requestWildcardUri = new String[0];
 			}
 			
 			// Load page name
 			String pageName = "index";
-			if(requestWildcardUri.length >= 1 ) {
+			if (requestWildcardUri.length >= 1) {
 				pageName = requestWildcardUri[0];
 			}
 			
 			// Load page name
 			String itemName = "index.html";
-			if(requestWildcardUri.length >= 2 ) {
+			if (requestWildcardUri.length >= 2) {
 				itemName = requestWildcardUri[1];
 			} else {
 				requestWildcardUri = new String[] { pageName, itemName };
 			}
 			
 			boolean isDeveloperMode = page.JConfig().getBoolean("sys.developersMode.enabled", true);
-			if( isDeveloperMode ) {
+			if (isDeveloperMode) {
 				// Load the respective page
-				if( requestWildcardUri.length == 2 && itemName.equals("index.html") ) {
-					PagesBuilder servletPagesBuilder =  page.PagesBuilder();
+				if (requestWildcardUri.length == 2 && itemName.equals("index.html")) {
+					PagesBuilder servletPagesBuilder = page.PagesBuilder();
 					
 					// Load the index and common pages (if applicable)
-					if( servletPagesBuilder.hasPageDefinition( "index" ) ) {
-						servletPagesBuilder.buildPage( "index" );
+					if (servletPagesBuilder.hasPageDefinition("index")) {
+						servletPagesBuilder.buildPage("index");
 					}
-					if( servletPagesBuilder.hasPageDefinition( "common" ) ) {
-						servletPagesBuilder.buildPage( "common" );
+					if (servletPagesBuilder.hasPageDefinition("common")) {
+						servletPagesBuilder.buildPage("common");
 					}
 					
-					if( servletPagesBuilder.hasPageDefinition( pageName ) ) {
-						servletPagesBuilder.buildPage( pageName );
+					if (servletPagesBuilder.hasPageDefinition(pageName)) {
+						servletPagesBuilder.buildPage(pageName);
 					}
 				}
 			}
 			
-			String reqStr = String.join("/",requestWildcardUri);
+			String reqStr = String.join("/", requestWildcardUri);
 			// Security measure?
 			// if( reqStr != null && reqStr.contains("/tmp") ) {
 			// 	// 404 error if file not found
@@ -469,7 +469,7 @@ public class PagesBuilder {
 			// 	return;
 			// }
 			
-			if( reqStr == null || reqStr.isEmpty() ) {
+			if (reqStr == null || reqStr.isEmpty()) {
 				// 404 error if file not found
 				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
 				return;
@@ -480,10 +480,9 @@ public class PagesBuilder {
 				page.getHttpServletRequest(), //
 				page.getHttpServletResponse(), //
 				page.requestType() == HttpRequestType.HEAD, //
-				reqStr
-			);
+				reqStr);
 			
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

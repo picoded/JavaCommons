@@ -9,6 +9,8 @@ import picoded.conv.ConvertJSON;
 import picoded.conv.RegexUtils;
 import picoded.conv.JMTE;
 import picoded.struct.CaseInsensitiveHashMap;
+import picoded.webTemplateEngines.JSML.JSMLForm;
+import picoded.webTemplateEngines.JSML.JSMLFormSet;
 
 /// FormWrapperTemplates
 ///
@@ -106,14 +108,40 @@ public class FormWrapperTemplates {
 	/// @params {boolean}   isDisplayMode  - The display mode.
 	///
 	/// @returns {StringBuilder}  the resulting HTML
+	@SuppressWarnings("unchecked")
 	protected static StringBuilder formSetWrapper(FormNode node, boolean displayMode){
 		StringBuilder ret = new StringBuilder();
 		
-		String name = node.getString("name");
+		String name = node.getString("formSetName");
 		
 		if( name == null || name.length() <= 0 ) {
 			throw new RuntimeException("Missing form set name");
 		}
+		
+		String nodeName = node.getFieldName();
+		if(nodeName == null || nodeName.isEmpty()){
+			node.put("field", "this");
+		}
+		
+		Object valuesRaw = node.getRawFieldValue();
+		Map<String,Object> values = new HashMap<String, Object>();
+		if(valuesRaw != null){
+			if(valuesRaw instanceof Map){
+				values = (Map<String, Object>)valuesRaw;
+			}else if(valuesRaw instanceof List){
+				List<Object> innerList = (List<Object>)valuesRaw;
+				if(innerList != null && innerList.size() == 1){ //only entertain SINGLE mapping to a file
+					Object innerMapRaw = innerList.get(0);
+					if(innerMapRaw != null && innerMapRaw instanceof Map){
+						values = (Map<String, Object>)innerMapRaw;
+					}
+				}
+			}
+		}
+		
+		JSMLFormSet formSet = node.getFormSet();
+		JSMLForm form = formSet.get(name);
+		ret = form.generateHTML(values, displayMode);
 		
 		return ret;
 	}
@@ -379,6 +407,10 @@ public class FormWrapperTemplates {
 		return datePickerWrapper(node, false);
 	};
 	
+	protected static FormWrapperInterface formSetWrapper = (node) -> {
+		return formSetWrapper(node, false);
+	};
+	
 	/// noneWrapper
 	///
 	/// No wrappers
@@ -471,6 +503,7 @@ public class FormWrapperTemplates {
 		defaultTemplates.put("image", FormWrapperTemplates.imageWrapper);
 		defaultTemplates.put("signature", FormWrapperTemplates.signatureWrapper);
 		defaultTemplates.put("date",  FormWrapperTemplates.divWrapper);
+		defaultTemplates.put("formset", FormWrapperTemplates.formSetWrapper);
 		
 		defaultTemplates.put("jmte", FormWrapperTemplates.jmteWrapper);
 		

@@ -675,7 +675,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 			fieldName.replace("&#91;", "[");
 		}
 		if(fieldName.contains("&#92;")){
-			fieldName.replace("&#92;", "[");
+			fieldName.replace("&#92;", "]");
 		}
 		
 		if(_inputValue != null && _inputValue.containsKey(fieldName)){

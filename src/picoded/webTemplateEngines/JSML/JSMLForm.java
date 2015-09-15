@@ -226,6 +226,15 @@ public class JSMLForm {
 	
 	public String readBodyPrefix(String prefixName){
 		File bodyPrefixFile = getFileInRootFolder(prefixName);
+		
+		if(bodyPrefixFile == null){
+			bodyPrefixFile = getFileInRootFolder("bodyPrefix");
+		}
+		
+		if(bodyPrefixFile == null){
+			return "";
+		}
+		
 		try{
 			String bodyPrefixString = FileUtils.readFileToString(bodyPrefixFile);
 			return bodyPrefixString;
@@ -236,6 +245,15 @@ public class JSMLForm {
 	
 	public String readBodySuffix(String suffixName){
 		File bodySuffixFile = getFileInRootFolder(suffixName);
+		
+		if(bodySuffixFile == null){
+			bodySuffixFile = getFileInRootFolder("bodySuffix");
+		}
+		
+		if(bodySuffixFile == null){
+			return "";
+		}
+		
 		try{
 			String bodySuffixString = FileUtils.readFileToString(bodySuffixFile);
 			return bodySuffixString;

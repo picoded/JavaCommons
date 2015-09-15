@@ -478,13 +478,27 @@ public class FormInputTemplates {
 			paramMap.put(HtmlTag.TYPE, "text");
 		}
 		
+		//retrieve the name, and append _date to it
+		String hiddenInputName = node.getFieldName(); //set the hidden input field to the name given
+		if(hiddenInputName != null && !hiddenInputName.isEmpty()){
+			node.replace("field", hiddenInputName+"_date");
+			
+			String onchangeFunctionString = "changeDateToEpochTime(this.value, '"+hiddenInputName+"')";
+			paramMap.put("onchange", onchangeFunctionString);
+		}
+		
 		if( fieldValue != null && fieldValue.length() >= 0 ) {
 			paramMap.put(HtmlTag.VALUE, sanitiseYMDDateString(fieldValue));
 		}
 		
+		//generate hidden input field
+		String hiddenInputTag = "<input type=\"text\" name=\""+hiddenInputName+"\" style=\"display:none\"></input>";
+		
+		
 		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputDate pfi_input", paramMap );
 		ret.append(sbArr[0]);
 		ret.append(sbArr[1]);
+		ret.append(hiddenInputTag);
 		return ret;
 	}
 	

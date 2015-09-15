@@ -126,7 +126,7 @@ public class JSMLForm_test{
 		assertTrue(pdfData.length > 0);
 	}
 	
-//	@Test
+	@Test
 	public void multipleDeclareTest(){
 		try{
 			File dataFile = new File(rootFolder + "/main/dummyData.json");

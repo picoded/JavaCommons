@@ -49,6 +49,25 @@ public class JSMLForm {
 	//generated GUID
 	private String _generatedGUID = "";
 	
+	////////////////////////////////////////////////
+	//
+	// JSML FormSet, linked if formset exists
+	//
+	////////////////////////////////////////////////
+	
+	/// Inner protected vars
+	protected JSMLFormSet formSetObj = null;
+	
+	/// FormSet Setter
+	public void setFormSet(JSMLFormSet set) {
+		formSetObj = set;
+		formGen.setFormSet(formSetObj);
+	}
+	
+	/// FormSet Getter
+	public JSMLFormSet getFormSet() {
+		return formSetObj;
+	}
 	
 	////////////////////////////////////////////////
 	//

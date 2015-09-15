@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import picoded.conv.ConvertJSON;
+import picoded.webTemplateEngines.JSML.*;
 
 import com.amazonaws.util.StringUtils;
 ///
@@ -162,6 +163,25 @@ public class FormGenerator {
 		return wrapperInterfaceMap(displayOnly).get("*");
 	}
 	
+	////////////////////////////////////////////////
+	//
+	// JSML FormSet, linked if formset exists
+	//
+	////////////////////////////////////////////////
+	
+	/// Inner protected vars
+	protected JSMLFormSet formSetObj = null;
+	
+	/// FormSet Setter
+	public void setFormSet(JSMLFormSet set) {
+		formSetObj = set;
+	}
+	
+	/// FormSet Getter
+	public JSMLFormSet getFormSet() {
+		return formSetObj;
+	}
+	
 	/////////////////////////////////////////////////////////////////////////
 	//
 	// To generate and run
@@ -169,56 +189,58 @@ public class FormGenerator {
 	/////////////////////////////////////////////////////////////////////////
 	
 	/// Builds the template and run the form generator
-		///
-		/// @params  {Map<String,Object>}  format       - The JSML format object to generate the form/display
-		/// @params  {Map<String,Object>}  data         - The Data map to extract value from
-		/// @params  {boolean}             displayOnly  - Display mode, html read only or form
-		///
-		/// @returns {StringBuilder} the full returning HTML
-		public StringBuilder build( Map<String,Object> format, Map<String,Object> data, boolean displayOnly ) {
-			FormNode rootNode = new FormNode(this, format, data);
-			return rootNode.fullHtml(displayOnly);
-		}
+	///
+	/// @params  {Map<String,Object>}  format       - The JSML format object to generate the form/display
+	/// @params  {Map<String,Object>}  data         - The Data map to extract value from
+	/// @params  {boolean}             displayOnly  - Display mode, html read only or form
+	///
+	/// @returns {StringBuilder} the full returning HTML
+	public StringBuilder build( Map<String,Object> format, Map<String,Object> data, boolean displayOnly ) {
+		FormNode rootNode = new FormNode(this, format, data);
+		rootNode.setFormSet( getFormSet() );
 		
-		/// Builds the template and run the form generator
-		///
-		/// @params  {List<Map<String,Object>>}  format       - The JSML format object to generate the form/display
-		/// @params  {Map<String,Object>}        data         - The Data map to extract value from
-		/// @params  {boolean}                   displayOnly  - Display mode, html read only or form
-		///
-		/// @returns {StringBuilder} the full returning HTML
-//		public StringBuilder build( List<Map<String,Object>> format, Map<String,Object> data, boolean displayOnly ) {
-//			Map<String,Object> divWrap = new HashMap<String,Object>();
-//			divWrap.put("type", "none");
-//			divWrap.put("children", format );
-//			
-//			return build(divWrap, data, displayOnly);
-//		}
+		return rootNode.fullHtml(displayOnly);
+	}
 		
-		public StringBuilder build( List<Object> format, Map<String,Object> data, boolean displayOnly ) {
-			Map<String,Object> divWrap = new HashMap<String,Object>();
-			divWrap.put("type", "none");
-			divWrap.put("children", format );
-			
-			return build(divWrap, data, displayOnly);
-		}
+	/// Builds the template and run the form generator
+	///
+	/// @params  {List<Map<String,Object>>}  format       - The JSML format object to generate the form/display
+	/// @params  {Map<String,Object>}        data         - The Data map to extract value from
+	/// @params  {boolean}                   displayOnly  - Display mode, html read only or form
+	///
+	/// @returns {StringBuilder} the full returning HTML
+	// public StringBuilder build( List<Map<String,Object>> format, Map<String,Object> data, boolean displayOnly ) {
+	// 	Map<String,Object> divWrap = new HashMap<String,Object>();
+	// 	divWrap.put("type", "none");
+	// 	divWrap.put("children", format );
+	// 	
+	// 	return build(divWrap, data, displayOnly);
+	// }
 		
-		/// Builds the template and run the form generator
-		///
-		/// @params  {String}                    jsonFormatString  - The JSML format object in string format to generate the form/display
-		/// @params  {Map<String,Object>}        data              - The Data map to extract value from
-		/// @params  {boolean}                   displayOnly       - Display mode, html read only or form
-		///
-		/// @returns {StringBuilder} the full returning HTML
-		public StringBuilder build( String jsonFormatString, Map<String,Object> data, boolean displayOnly ) {
-			if(jsonFormatString.startsWith("[")){
-				List<Object> jsonArray = ConvertJSON.toList(jsonFormatString);
-				return build(jsonArray, data, displayOnly);
-			}else{
-				Map<String, Object> jsonObj = ConvertJSON.toMap(jsonFormatString);
-				return build(jsonObj, data, displayOnly);
-			}
+	public StringBuilder build( List<Object> format, Map<String,Object> data, boolean displayOnly ) {
+		Map<String,Object> divWrap = new HashMap<String,Object>();
+		divWrap.put("type", "none");
+		divWrap.put("children", format );
+		
+		return build(divWrap, data, displayOnly);
+	}
+	
+	/// Builds the template and run the form generator
+	///
+	/// @params  {String}                    jsonFormatString  - The JSML format object in string format to generate the form/display
+	/// @params  {Map<String,Object>}        data              - The Data map to extract value from
+	/// @params  {boolean}                   displayOnly       - Display mode, html read only or form
+	///
+	/// @returns {StringBuilder} the full returning HTML
+	public StringBuilder build( String jsonFormatString, Map<String,Object> data, boolean displayOnly ) {
+		if(jsonFormatString.startsWith("[")){
+			List<Object> jsonArray = ConvertJSON.toList(jsonFormatString);
+			return build(jsonArray, data, displayOnly);
+		}else{
+			Map<String, Object> jsonObj = ConvertJSON.toMap(jsonFormatString);
+			return build(jsonObj, data, displayOnly);
 		}
+	}
 	
 	/////////////////////////////////////////////////////////////////////////
 	//
@@ -242,6 +264,8 @@ public class FormGenerator {
 	
 	public String generatePDFReadyHTML(Map<String, Object> jsonData, Map<String, Object> prefilledJSONData){
 		FormNode rootNode = new FormNode(this, jsonData, prefilledJSONData);
+		rootNode.setFormSet( getFormSet() );
+		
 		List<FormNode> formNodes = new ArrayList<FormNode>();
 		formNodes.add(rootNode);
 		String htmlString = generatePDFReadyHTML(formNodes);

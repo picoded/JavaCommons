@@ -197,19 +197,31 @@ public class FormInputTemplates {
 		Object optionsObject = node.get(JsonKeys.OPTIONS);
 		keyNamePair = optionsKeyNamePair(optionsObject);
 		
+		String realName = node.getFieldName();
+		realName = realName.replace("_dummy", "");
+		FormNode tempNode = new FormNode(node._formGenerator, node);
+		tempNode.replace("field", realName+"_dummy");
+		
 		StringBuilder ret = new StringBuilder();
 		for(String key:keyNamePair.keySet()){
 			if(!displayMode){
 				CaseInsensitiveHashMap<String,String> tempMap = new CaseInsensitiveHashMap<String, String>(paramMap);
 				tempMap.put("value", key);
-				
+				String key_sanitised = RegexUtils.removeAllWhiteSpace(key).toLowerCase();
 				for(String selection : checkboxSelections){
-					if(key.equalsIgnoreCase(selection)){
+					
+					if(key_sanitised.equalsIgnoreCase(selection)){
 						tempMap.put("checked", "checked");
 					}
 				}
 				
-				StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputCheckbox pfi_input", tempMap );
+				//generate onchange function
+				if(realName != null && !realName.isEmpty()){
+					String onChangeFunctionString = "saveCheckboxValueToHiddenField('"+realName+"_dummy"+"', this.checked, '"+realName+"')";
+					tempMap.put("onchange", onChangeFunctionString);
+				}
+				
+				StringBuilder[] sbArr = tempNode.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputCheckbox pfi_input", tempMap );
 				ret.append("<div class=\"pfc_inputCheckboxWrap\">");
 				ret.append("<label class=\"pfi_inputCheckbox_label\">");
 				ret.append(sbArr[0]);
@@ -246,8 +258,11 @@ public class FormInputTemplates {
 			}
 		}
 		
-		StringBuilder[] wrapper = node.defaultHtmlInput( HtmlTag.DIV, pfiClass, null );
+		//generate hidden input here
+		String hiddenInputTag = "<input type=\"text\" style=\"display:none\" name=\""+realName+"\">";
+		StringBuilder[] wrapper = tempNode.defaultHtmlInput( HtmlTag.DIV, pfiClass, null );
 		ret = wrapper[0].append(ret);
+		ret.append(hiddenInputTag);
 		ret.append(wrapper[1]);
 		
 		return ret;

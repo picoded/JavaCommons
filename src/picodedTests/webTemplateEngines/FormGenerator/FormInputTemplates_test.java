@@ -237,9 +237,10 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("dropdownWithOthersPDF", jsonTemplatedOutput));
 	}
 	
-//	@Test
+	@Test
 	public void checkBoxTest(){
-		String jsonTemplatedOutput = getFinalTemplatedJsonString("checkbox");
+//		String jsonTemplatedOutput = getFinalTemplatedJsonString("checkbox");
+		String jsonTemplatedOutput = getTemplatedJSONString("checkbox", false, true);
 		String rawHtmlString = getHtmlString("checkbox");
 
 		assertNotNull(jsonTemplatedOutput);
@@ -406,7 +407,7 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("signatureDisplay", jsonTemplatedOutput));
 	}
 	
-	@Test
+//	@Test
 	public void datePickerTest(){
 		String jsonTemplatedOutput = getTemplatedJSONString("date", false, false);
 

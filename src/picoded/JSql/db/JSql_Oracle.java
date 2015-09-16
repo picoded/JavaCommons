@@ -185,7 +185,12 @@ public class JSql_Oracle extends JSql {
 			return inString;
 		}
 		
-		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("'", "\"").replaceAll("`", "\"");
+		String fixedQuotes = inString.trim()
+			.replaceAll("(\\s){1}", " ")
+			.replaceAll("\\s+", " ")
+			.replaceAll("'", "\"")
+			.replaceAll("`", "\"");
+			
 		String upperCaseStr = fixedQuotes.toUpperCase();
 		String qString = fixedQuotes;
 		

@@ -152,20 +152,24 @@ public class MetaTable_test {
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
 		assertEquals(7, qRes.length);
+		assertEquals(7, mtObj.queryCount(null, null));
 		
 		assertNotNull(qRes = mtObj.query("num > ? AND num < ?", new Object[] { 2, 5 }, "num ASC"));
 		assertEquals(2, qRes.length);
 		assertEquals("hello", qRes[0].get("str_val"));
 		assertEquals("world", qRes[1].get("str_val"));
+		assertEquals(2, mtObj.queryCount("num > ? AND num < ?", new Object[] { 2, 5 }));
 		
 		assertNotNull(qRes = mtObj.query("str_val = ?", new Object[] { "this" }));
 		assertEquals(2, qRes.length);
+		assertEquals(2, mtObj.queryCount("str_val = ?", new Object[] { "this" }));
 		
 		assertNotNull(qRes = mtObj.query("num > ?", new Object[] { 2 }, "num ASC", 2, 2));
 		assertEquals(2, qRes.length);
 		assertEquals("program", qRes[0].get("str_val"));
 		assertEquals("in", qRes[1].get("str_val"));
-	
+		
+		assertEquals(5, mtObj.queryCount("num > ?", new Object[] { 2 }));
 	}
 	
 	///
@@ -189,7 +193,7 @@ public class MetaTable_test {
 	
 		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("num", new Integer(2));
-		mtObj.append( null, objMap );
+		mtObj.append( null, objMap ).saveDelta();
 	
 		objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("str_val", "nope");
@@ -199,14 +203,15 @@ public class MetaTable_test {
 		assertNotNull(qRes = mtObj.query(null, null));
 		assertEquals(3, qRes.length);
 	
-		assertNotNull(qRes = mtObj.query("str_val = ?", new Object[] { "nope" }));
-		assertEquals(1, qRes.length);
-	
 		assertNotNull(qRes = mtObj.query("num = ?", new Object[] { 1 }));
 		assertEquals(1, qRes.length);
 	
 		assertNotNull(qRes = mtObj.query("num <= ?", new Object[] { 2 }));
 		assertEquals(2, qRes.length);
+		
+		assertNotNull(qRes = mtObj.query("str_val = ?", new Object[] { "nope" }));
+		assertEquals(1, qRes.length);
+	
 	}
 	
 	@Test

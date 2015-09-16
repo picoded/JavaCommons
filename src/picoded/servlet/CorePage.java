@@ -54,9 +54,9 @@ import picoded.struct.HashMapList;
  *                   |
  * doOption ---------+
  *                   |
- * doPost -----------+--> processChain --> doAuth -+-> doRequest --> do_X_Request --> doOutput
+ * doPost -----------+--> processChain --> doAuth -+-> doRequest --> do_X_Request --> outputRequest
  *                   |         |                   |
- * doGet ------------+         V                   \-> doJson -----> do_X_Json -----> doJsonOutput
+ * doGet ------------+         V                   \-> doJson -----> do_X_Json -----> outputJSON
  *                   |      doSetup
  * doDelete ---------+         |
  *                   |         V
@@ -430,6 +430,15 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		}
 	}
 	
+	/// Returns the servlet contextual path : needed for base URI for page redirects / etc
+	public String getServletContextURI() {
+		if(httpRequest != null) {
+			return httpRequest.getServletPath();
+		}
+		//return getServletPath();
+		throw new RuntimeException("Unable to process getServletContextURI, outside of servlet request");
+	}
+	
 	/// gets a parameter value, from the httpRequest.getParameter
 	public String getParameter(String paramName) {
 		if(requestParameters() != null) {
@@ -717,7 +726,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		
 		// Performs a stack trace, and returns it in a JSON object
 		Map<String,String> ret = new HashMap<String,String>();
-		ret.put("ERROR", stackTrace);
+		ret.put("error", stackTrace);
 		
 		// Set content type to JSON
 		if(httpResponse != null) {

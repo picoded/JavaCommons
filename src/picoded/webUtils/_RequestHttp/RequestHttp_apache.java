@@ -33,7 +33,7 @@ public class RequestHttp_apache {
 	protected static HttpRequestBase HttpUriRequest_fromRequestType( HttpRequestType reqType, String reqURL ) {
 		switch (reqType) {
 			case GET:
-				return new HttpGet(reqURL);
+				return new HttpGet( reqURL);
 			case POST:
 				return new HttpPost(reqURL);
 			case PUT:

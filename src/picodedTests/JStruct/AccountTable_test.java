@@ -121,7 +121,7 @@ public class AccountTable_test  {
 		grpObj.saveDelta();
 		
 		AccountObject[] usrList = null;
-		assertNotNull( usrList = grpObj.getMembers() );
+		assertNotNull( usrList = grpObj.getMembersAccountObject() );
 		assertEquals( 1, usrList.length );
 		assertEquals( usrObj._oid(), usrList[0]._oid() );
 		

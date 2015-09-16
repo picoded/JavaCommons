@@ -134,6 +134,10 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		accountMeta.systemSetup();
 		group_childRole.systemSetup();
 		groupChild_meta.systemSetup();
+		
+		if( superUserGroup() == null ) {
+			newObject(_superUserGroup).saveAll();
+		}
 	}
 	
 	/// Performs the full stack teardown for the data object
@@ -144,6 +148,24 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		accountMeta.systemTeardown();
 		group_childRole.systemTeardown();
 		groupChild_meta.systemTeardown();
+	}
+	
+	//
+	//
+	// Getters for metaTables
+	// Discouraged from use
+	//
+	
+	public MetaTable accountMetaTable(){
+		return accountMeta;
+	}
+	
+	public MetaTable groupChildRole(){
+		return group_childRole;
+	}
+	
+	public MetaTable groupChildMeta(){
+		return groupChild_meta;
 	}
 	
 	//
@@ -446,6 +468,11 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		/// This cookie value is used in JS (checkLogoutTime.js) for validating the login expiry time and show a message to user accordingly.
 		
 		for(int a=0; a<noOfCookies; ++a) {
+			/// Path is required for cross AJAX / domain requests,
+			/// @TODO make this configurable?
+			String cookiePath = (request.getContextPath() == null || request.getContextPath().isEmpty()) ? "/" : request.getContextPath();
+			cookieJar[a].setPath(cookiePath);
+			
 			if(!rmberMe) { //set to clear on browser close
 				cookieJar[a].setMaxAge(noncLifetime);
 			}
@@ -500,6 +527,11 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		for(int a=0; a<5; ++a) {
 			cookieJar[a].setMaxAge(1);
 			
+			/// Path is required for cross AJAX / domain requests,
+			/// @TODO make this configurable?
+			String cookiePath = (request.getContextPath() == null || request.getContextPath().isEmpty()) ? "/" : request.getContextPath();
+			cookieJar[a].setPath(cookiePath);
+			
 			if(a < 4 && isHttpOnly) {
 				cookieJar[a].setHttpOnly(isHttpOnly);
 			}
@@ -520,7 +552,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	///
 	/// Group Membership roles managment
 	///--------------------------------------------------------------------------
-	protected List<String> membershipRoles = new ArrayList<String>( Arrays.asList(new String[] { "guest", "member", "manager" }) );
+	protected List<String> membershipRoles = new ArrayList<String>( Arrays.asList(new String[] { "guest", "member", "manager", "admin" }) );
 	
 	/// Returns the internal membership role list
 	public List<String> membershipRoles() {

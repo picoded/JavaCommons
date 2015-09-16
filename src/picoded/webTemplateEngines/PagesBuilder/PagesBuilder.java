@@ -2,10 +2,14 @@ package picoded.webTemplateEngines.PagesBuilder;
 
 import java.io.*;
 import java.util.*;
+import javax.servlet.http.HttpServletResponse;
 
+import picoded.enums.*;
 import picoded.conv.*;
+import picoded.struct.*;
 import picoded.fileUtils.*;
 import picoded.servlet.*;
+import picoded.servletUtils.*;
 
 ///
 /// Rapid pages prototyping, support single and multipage mode, caching, etc.
@@ -171,6 +175,19 @@ public class PagesBuilder {
 	//
 	////////////////////////////////////////////////////////////
 	
+	/// 
+	/// Indicates if the page definition folder exists
+	///
+	public boolean hasPageDefinition(String pageName) {
+		try {
+			File definitionFolder = new File(pagesFolder, pageName);
+			return definitionFolder.exists() && definitionFolder.isDirectory();
+		} catch (Exception e) {
+			// Failed?
+		}
+		return false;
+	}
+	
 	///
 	/// Builds all the assets for a single page
 	///
@@ -256,7 +273,7 @@ public class PagesBuilder {
 				if( (jsonsString = jsonsString.trim()).length() > 0 ) {
 					
 					// Adds the script object wrapper
-					jsonsString = "window.page = window.page | {}; window.page."+pageName+" = ("+jsonsString+");";
+					jsonsString = "window.pageFrames = window.pageFrames || {}; window.pageFrames."+pageName+" = ("+jsonsString+");";
 					
 					// Does a JMTE filter
 					jsonsString = getJMTE().parseTemplate(jsonsString, jmteVarMap);
@@ -286,7 +303,7 @@ public class PagesBuilder {
 				if( (lessString = lessString.trim()).length() > 0 ) {
 					
 					/// Does an outer wrap, if its not index page (which applies style to 'all')
-					if( !pageName.equalsIgnoreCase("index") ) {
+					if( !pageName.equalsIgnoreCase("index") && !pageName.equalsIgnoreCase("common") ) {
 						lessString = ".pageFrame_"+pageName+" { \n"+lessString+"\n } \n";
 					}
 					
@@ -310,27 +327,42 @@ public class PagesBuilder {
 				}
 			}
 			
-			// Build the injector code for this page (before </head>)
-			//-------------------------------------------------------------------
-			StringBuilder injectorStrBuilder = new StringBuilder();
-			if( hasLessFile ) {
-				injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='"+uriRootPrefix+""+pageName+"/"+pageName+".js'/>\n");
-			}
-			if( hasJsFile ) {
-				injectorStrBuilder.append("<script src='"+uriRootPrefix+""+pageName+"/"+pageName+".js'/>\n");
-			}
-			
 			// Build the html page
 			//-------------------------------------------------------------------
 			
 			// The HTML output
 			String indexStr = html().buildFullPageFrame(pageName).toString();
 			
+			// Build the injector code for this page (before </head>)
+			//-------------------------------------------------------------------
+			// StringBuilder injectorStrBuilder = new StringBuilder();
+			// String injectorStr = injectorStrBuilder.toString();
+			// 
+			// if( hasLessFile ) {
+			// 	if( injectorStr.indexOf(pageName+"/"+pageName+".css") > 0 ) {
+			// 		// Skips injection if already included
+			// 	} else {
+			// 		injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='"+uriRootPrefix+""+pageName+"/"+pageName+".css'/>\n");
+			// 	}
+			// }
+			// if( hasJsFile ) {
+			// 	if( injectorStr.indexOf(pageName+"/"+pageName+".js") > 0 ) {
+			// 		// Skips injection if already included
+			// 	} else {
+			// 		injectorStrBuilder.append("<script src='"+uriRootPrefix+""+pageName+"/"+pageName+".js'/>\n");
+			// 	}
+			// }
+			
+			// Ammend the HTML output
+			//-------------------------------------------------------------------
+			
 			// Apply injector code if any
-			String injectorStr = injectorStrBuilder.toString();
-			if( injectorStr.length() > 0 ) {
-				indexStr = indexStr.replace("</head>", injectorStr+"</head>");
-			}
+			// if( injectorStr.length() > 0 ) {
+			// 	indexStr = indexStr.replace("</head>", injectorStr+"</head>");
+			// }
+			
+			// HTML minify
+			//-------------------------------------------------------------------
 			
 			// Apply a simplistic compression (so avoid inline JS with line comments for nuts)
 			//
@@ -338,6 +370,9 @@ public class PagesBuilder {
 			// https://code.google.com/p/htmlcompressor
 			indexStr = indexStr.trim().replaceAll("\\s+", " ");
 			indexStr = indexStr.trim().replaceAll("\\>\\s\\<", "><");
+			
+			// Write out to file
+			//-------------------------------------------------------------------
 			
 			// Write to file if it differ
 			FileUtils.writeStringToFile_ifDifferant( new File(outputPageFolder, "index.html"), "UTF-8", indexStr );
@@ -361,5 +396,94 @@ public class PagesBuilder {
 		}
 		// End and returns self
 		return this;
+	}
+	
+	////////////////////////////////////////////////////////////
+	//
+	// Servlet building utility
+	//
+	////////////////////////////////////////////////////////////
+	
+	/// Cached FileServlet
+	protected FileServlet _outputFileServlet = null;
+	
+	/// Returns the File servlet
+	public FileServlet outputFileServlet() {
+		if (_outputFileServlet != null) {
+			return _outputFileServlet;
+		}
+		return (_outputFileServlet = new FileServlet(outputFolder));
+	}
+	
+	/// Process the full PageBuilder servlet request
+	public void processPageBuilderServlet(BasePage page) {
+		processPageBuilderServlet(page, page.requestWildcardUriArray());
+	}
+	
+	/// Process the full PageBuilder servlet request
+	public void processPageBuilderServlet(BasePage page, String[] requestWildcardUri) {
+		try {
+			if (requestWildcardUri == null) {
+				requestWildcardUri = new String[0];
+			}
+			
+			// Load page name
+			String pageName = "index";
+			if (requestWildcardUri.length >= 1) {
+				pageName = requestWildcardUri[0];
+			}
+			
+			// Load page name
+			String itemName = "index.html";
+			if (requestWildcardUri.length >= 2) {
+				itemName = requestWildcardUri[1];
+			} else {
+				requestWildcardUri = new String[] { pageName, itemName };
+			}
+			
+			boolean isDeveloperMode = page.JConfig().getBoolean("sys.developersMode.enabled", true);
+			if (isDeveloperMode) {
+				// Load the respective page
+				if (requestWildcardUri.length == 2 && itemName.equals("index.html")) {
+					PagesBuilder servletPagesBuilder = page.PagesBuilder();
+					
+					// Load the index and common pages (if applicable)
+					if (servletPagesBuilder.hasPageDefinition("index")) {
+						servletPagesBuilder.buildPage("index");
+					}
+					if (servletPagesBuilder.hasPageDefinition("common")) {
+						servletPagesBuilder.buildPage("common");
+					}
+					
+					if (servletPagesBuilder.hasPageDefinition(pageName)) {
+						servletPagesBuilder.buildPage(pageName);
+					}
+				}
+			}
+			
+			String reqStr = String.join("/", requestWildcardUri);
+			// Security measure?
+			// if( reqStr != null && reqStr.contains("/tmp") ) {
+			// 	// 404 error if file not found
+			// 	page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
+			// 	return;
+			// }
+			
+			if (reqStr == null || reqStr.isEmpty()) {
+				// 404 error if file not found
+				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
+				return;
+			}
+			
+			// Fallsback into File Servlet
+			outputFileServlet().processRequest( //
+				page.getHttpServletRequest(), //
+				page.getHttpServletResponse(), //
+				page.requestType() == HttpRequestType.HEAD, //
+				reqStr);
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

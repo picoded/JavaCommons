@@ -149,7 +149,10 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 			return null;
 		}
 		String keyStr = key.toString();
+		
 		JSMLForm newForm = new JSMLForm( new File(formSetFolder, keyStr), formSetURI+"/"+keyStr+"/" , null );
+		newForm.setFormSet(this);
+		
 		newForm.getDefinition();
 		return newForm;
 	}
@@ -160,13 +163,20 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 	//
 	///////////////////////////////////////////////////////
 	
+	/// Cached FileServlet
+	protected FileServlet _resourseFileServlet = null;
+	
 	/// Returns the File servlet
 	public FileServlet resourseFileServlet() {
+		if( _resourseFileServlet != null ) {
+			return _resourseFileServlet;
+		}
+		
 		if( formSetFolder == null ) {
 			validateFormSetFolder();
 		}
 		
-		return (new FileServlet(formSetFolder));
+		return (_resourseFileServlet = new FileServlet(formSetFolder));
 	}
 	
 	/// Process the file serving request for resoruces
@@ -216,12 +226,20 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 	
 	/// Process the full JSML Form Collection servlet request
 	public void processJSMLFormCollectionServlet( BasePage page ) {
+		processJSMLFormCollectionServlet( page, page.requestWildcardUriArray() );
+	}
+	
+	/// Process the full JSML Form Collection servlet request
+	public void processJSMLFormCollectionServlet( BasePage page, String[] requestWildcardUri ) {
 		try {
-			String[] reqArr = page.requestWildcardUriArray();
+			if( requestWildcardUri == null ) {
+				requestWildcardUri = new String[0];
+			}
+			
 			String indexPage = "index.html";
 			
 			// Load index page
-			if(reqArr == null || reqArr.length <= 0 || indexPage.equalsIgnoreCase(reqArr[0]) ) {
+			if(requestWildcardUri == null || requestWildcardUri.length <= 0 || indexPage.equalsIgnoreCase(requestWildcardUri[0]) ) {
 				
 				File indexFile = new File(formSetFolder, "index.html");
 				String indexFileStr = null;
@@ -248,20 +266,20 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 			} 
 			
 			// Get the JSMLForm name
-			String formName = reqArr[0];
+			String formName = requestWildcardUri[0];
 			if( nameList().contains(formName) ) {
 				// JSMLForm
 				JSMLForm form = get(formName);
 				
 				// Note if arr is larger then 2, its normally a file request
-				if( reqArr.length <= 2 ) {
+				if( requestWildcardUri.length <= 2 ) {
 					// Get the form request mode
 					String reqMode = null;
 					Map<String,Object> formParams = null;
 					
 					// Get request mode parameters
-					if(reqArr.length == 2) {
-						reqMode = reqArr[1];
+					if(requestWildcardUri.length == 2) {
+						reqMode = requestWildcardUri[1];
 					}
 					
 					// Index mode
@@ -310,8 +328,7 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 				}
 			}
 			
-			String reqStr = page.requestWildcardUri();
-			
+			String reqStr = String.join("/",requestWildcardUri);
 			// Security measure?
 			// if( reqStr != null && reqStr.contains("/tmp") ) {
 			// 	// 404 error if file not found
@@ -325,15 +342,12 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 				return;
 			}
 			
-			
-			
-			
-			
 			// Fallsback into File Servlet
 			resourseFileServlet().processRequest( //
 				page.getHttpServletRequest(), //
 				page.getHttpServletResponse(), //
-				page.requestType() == HttpRequestType.HEAD
+				page.requestType() == HttpRequestType.HEAD, //
+				reqStr
 			);
 			
 		} catch(Exception e) {

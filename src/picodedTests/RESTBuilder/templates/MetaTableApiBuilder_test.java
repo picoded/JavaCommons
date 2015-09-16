@@ -153,4 +153,12 @@ public class MetaTableApiBuilder_test {
 		
 	}
 	
+	@Test
+	public void meta_DELETE_test(){
+		mtApi.meta_DELETE_inner(_oids.get(0));
+		
+		assertNotNull(mtApi);
+		assertNull(mtApi.meta_GET_inner(_oids.get(0)));
+	}
+	
 }

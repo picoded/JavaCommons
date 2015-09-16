@@ -49,6 +49,25 @@ public class JSMLForm {
 	//generated GUID
 	private String _generatedGUID = "";
 	
+	////////////////////////////////////////////////
+	//
+	// JSML FormSet, linked if formset exists
+	//
+	////////////////////////////////////////////////
+	
+	/// Inner protected vars
+	protected JSMLFormSet formSetObj = null;
+	
+	/// FormSet Setter
+	public void setFormSet(JSMLFormSet set) {
+		formSetObj = set;
+		formGen.setFormSet(formSetObj);
+	}
+	
+	/// FormSet Getter
+	public JSMLFormSet getFormSet() {
+		return formSetObj;
+	}
 	
 	////////////////////////////////////////////////
 	//
@@ -171,11 +190,17 @@ public class JSMLForm {
 	
 	public Map<String, Object> getDataFile(String pathToDataFile){
 		File dummyDataFile = new File(_formFolderPath + "/" + pathToDataFile);
+		
+		if(dummyDataFile != null && !dummyDataFile.exists()){
+			return new HashMap<String, Object>();
+		}
+		
 		String dummyDataString = "";
+		
 		try{
 			dummyDataString = FileUtils.readFileToString(dummyDataFile);
 		}catch(Exception e){
-			throw new RuntimeException("getDataFile() ->" + e.getMessage());
+			throw new RuntimeException("getDataFile() ->" + e);
 		}
 		
 		Map<String, Object> ret =  ConvertJSON.toMap(dummyDataString);
@@ -207,6 +232,15 @@ public class JSMLForm {
 	
 	public String readBodyPrefix(String prefixName){
 		File bodyPrefixFile = getFileInRootFolder(prefixName);
+		
+		if(bodyPrefixFile == null){
+			bodyPrefixFile = getFileInRootFolder("bodyPrefix");
+		}
+		
+		if(bodyPrefixFile == null){
+			return "";
+		}
+		
 		try{
 			String bodyPrefixString = FileUtils.readFileToString(bodyPrefixFile);
 			return bodyPrefixString;
@@ -217,6 +251,15 @@ public class JSMLForm {
 	
 	public String readBodySuffix(String suffixName){
 		File bodySuffixFile = getFileInRootFolder(suffixName);
+		
+		if(bodySuffixFile == null){
+			bodySuffixFile = getFileInRootFolder("bodySuffix");
+		}
+		
+		if(bodySuffixFile == null){
+			return "";
+		}
+		
 		try{
 			String bodySuffixString = FileUtils.readFileToString(bodySuffixFile);
 			return bodySuffixString;

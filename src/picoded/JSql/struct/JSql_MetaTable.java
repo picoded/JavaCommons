@@ -309,4 +309,35 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	// 	return _typeMap;
 	// }
 	
+	/// 
+	/// Query based optimization
+	///--------------------------------------------------------------------------
+	
+	/// Performs a search query, and returns the respective MetaObjects
+	///
+	/// CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
+	/// @TODO: Performs the search pattern using the respective type map
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	/// @param   query string to sort the order by, use null to ignore
+	/// @param   offset of the result to display, use -1 to ignore
+	/// @param   number of objects to return max
+	///
+	/// @returns  The MetaObject[] array
+	public MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit ) {
+		return JSql_MetaTableUtils.metaTableQuery(this, sqlObj, sqlTableName, whereClause, whereValues, orderByStr, offset, limit);
+		//return super.query( whereClause, whereValues, orderByStr, offset, limit );
+	}
+	
+	/// Performs a search query, and returns the respective MetaObjects
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	///
+	/// @returns  The total count for the query
+	public long queryCount(String whereClause, Object[] whereValues) {
+		return JSql_MetaTableUtils.metaTableCount(this, sqlObj, sqlTableName, whereClause, whereValues, null, -1, -1);
+	}
+	
 }

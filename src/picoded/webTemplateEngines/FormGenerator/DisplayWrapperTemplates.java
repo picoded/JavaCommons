@@ -44,6 +44,10 @@ public class DisplayWrapperTemplates {
 		return FormWrapperTemplates.datePickerWrapper(node, true);
 	};
 	
+	protected static FormWrapperInterface formSetWrapper = (node)->{
+		return FormWrapperTemplates.formSetWrapper(node, true);
+	};
+	
 	/// noneWrapper
 	///
 	/// No wrappers
@@ -72,6 +76,7 @@ public class DisplayWrapperTemplates {
 		defaultTemplates.put("image", DisplayWrapperTemplates.imageWrapper);
 		defaultTemplates.put("signature", DisplayWrapperTemplates.signatureWrapper);
 		defaultTemplates.put("date", DisplayWrapperTemplates.divWrapper);
+		defaultTemplates.put("formset", DisplayWrapperTemplates.formSetWrapper);
 		
 		defaultTemplates.put("jmte", DisplayWrapperTemplates.jmteWrapper);
 		

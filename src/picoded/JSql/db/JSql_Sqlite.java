@@ -72,16 +72,23 @@ public class JSql_Sqlite extends JSql {
 		final String ifExists = "IF EXISTS";
 		final String ifNotExists = "IF NOT EXISTS";
 		final String drop = "DROP";
+		final String truncateTable = "TRUNCATE TABLE";
+		final String deleteFrom = "DELETE FROM";
 		
 		inString = inString.toUpperCase();
-		inString = inString //
-			.replaceAll("(?i)VARCHAR\\(MAX\\)", "VARCHAR") //
-			.replaceAll("(?i)BIGINT", "INTEGER"); //
+		inString = inString.trim()
+			.replaceAll("(\\s){1}", " ")
+			.replaceAll("\\s+", " ")
+			.replaceAll("(?i)VARCHAR\\(MAX\\)", "VARCHAR")
+			.replaceAll("(?i)BIGINT", "INTEGER");
 		
 		if (inString.startsWith(drop)) { //DROP
 			inString = inString.replaceAll(ifNotExists, ifExists);
 		}
-		//System.out.println( inString );
+		
+		if (inString.startsWith(truncateTable)) {
+		    inString = inString.replaceAll(truncateTable, deleteFrom);
+		}
 		return inString;
 	}
 	

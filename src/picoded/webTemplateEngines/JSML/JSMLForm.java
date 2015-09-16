@@ -127,7 +127,7 @@ public class JSMLForm {
 		}else{
 			_tempFolderPath = inResourceFolderPath;
 		}
-		validateTempFolder();
+		//validateTempFolder();
 	}
 	
 	public void setTempFolder(File inResourceFolder){
@@ -321,6 +321,8 @@ public class JSMLForm {
 			
 			String svgFileName = "inSig_" + name + ".svg";
 			String pngFileName = "outSig_" + name + ".png";
+			
+			validateTempFolder();
 			String svgFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/" + svgFileName;
 			String pngFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/" + pngFileName;
 			
@@ -414,6 +416,7 @@ public class JSMLForm {
 	}
 	
 	public byte[] generatePDF(Map<String, Object> data){
+	    validateTempFolder();
 		return generatePDF(data, "file:///" + _formFolderPath + "/" + _tempFolderPath);
 	}
 	
@@ -431,7 +434,7 @@ public class JSMLForm {
 		if(ret == null){
 			throw new RuntimeException("generatePDF() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
 		}
-		
+		validateTempFolder();
 		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/pdf/"+"generatedPDF.pdf";
 		
 		String bodyPrefix = readBodyPrefix("PrefixPDF");
@@ -460,6 +463,7 @@ public class JSMLForm {
 		String[] values = new String[5];
 		
 		data = sanitiseMap(data, true);
+		validateTempFolder();
 		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/pdf/generatedPDF.pdf";
 		
 		values[0] = "PDFGenerator context folder given is -> " + _formFolderPath + "/tmp/" + _generatedGUID + "/";

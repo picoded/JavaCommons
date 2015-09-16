@@ -17,10 +17,10 @@ public class StreamRedirectThread extends Thread implements Runnable {
 	// Constructor variables
 	//------------------------------------------------------------------
 	
-	private InputStream  input  = null;
+	private InputStream input = null;
 	private OutputStream output = null;
 	
-	private int    buffer_size = 2048;
+	private int buffer_size = 2048;
 	private byte[] incremental_buffer = null;
 	
 	// Constructor functions
@@ -33,7 +33,7 @@ public class StreamRedirectThread extends Thread implements Runnable {
 	/// @params {OutputStream} output
 	///
 	public StreamRedirectThread(InputStream in, OutputStream out) {
-		this( null, in, out);
+		this(null, in, out);
 	}
 	
 	/// Setup with the input and output stream
@@ -43,10 +43,10 @@ public class StreamRedirectThread extends Thread implements Runnable {
 	/// @params {OutputStream} output
 	/// 
 	public StreamRedirectThread(String name, InputStream in, OutputStream out) {
-		super( (name == null || name.length() <= 0)? "StreamRedirectThread" : name ); //Setup with named
+		super((name == null || name.length() <= 0) ? "StreamRedirectThread" : name); //Setup with named
 		input = in;
 		output = out;
-		setPriority(Thread.MAX_PRIORITY-1);
+		setPriority(Thread.MAX_PRIORITY - 1);
 	}
 	
 	// Redirect incremental, and thread runner
@@ -58,12 +58,12 @@ public class StreamRedirectThread extends Thread implements Runnable {
 	///                 -1 indicates the end of stream
 	/// 
 	public int runStep() throws IOException {
-		if(incremental_buffer == null) {
+		if (incremental_buffer == null) {
 			incremental_buffer = new byte[buffer_size];
 		}
 		
 		int count = input.read(incremental_buffer, 0, buffer_size);
-		if(count > 0) {
+		if (count > 0) {
 			output.write(incremental_buffer, 0, count);
 		}
 		return count;
@@ -79,17 +79,17 @@ public class StreamRedirectThread extends Thread implements Runnable {
 			byte[] run_buffer = new byte[buffer_size];
 			int count;
 			
-			while((count = input.read(run_buffer, 0, buffer_size)) >= 0 ) {
-				if( count == 0 ) {
+			while ((count = input.read(run_buffer, 0, buffer_size)) >= 0) {
+				if (count == 0) {
 					Thread.sleep(0);
 				} else {
 					output.write(run_buffer, 0, count);
 				}
 			}
 			output.flush();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
-		} 
+		}
 	}
 	
 }

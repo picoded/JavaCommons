@@ -180,10 +180,14 @@ public class FormInputTemplates {
 					if(((String)nodeDefaultVal).contains("[")){
 						List<Object> nodeValMap = ConvertJSON.toList((String)nodeDefaultVal);
 						for(Object obj : nodeValMap){
-							checkboxSelections.add(RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash((String)obj).toLowerCase());
+							String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash((String)obj);
+							sanitisedSelection = RegexUtils.removeAllWhiteSpace(sanitisedSelection);
+							checkboxSelections.add(sanitisedSelection.toLowerCase());
 						}
 					}else{
-						checkboxSelections.add(RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash((String)nodeDefaultVal).toLowerCase());
+						String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash((String)nodeDefaultVal);
+						sanitisedSelection = RegexUtils.removeAllWhiteSpace(sanitisedSelection);
+						checkboxSelections.add(sanitisedSelection.toLowerCase());
 					}
 				}else if(nodeDefaultVal instanceof List){
 					for(String str : (List<String>)nodeDefaultVal){

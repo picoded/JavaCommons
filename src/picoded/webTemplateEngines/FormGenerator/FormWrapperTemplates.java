@@ -189,7 +189,7 @@ public class FormWrapperTemplates {
 		}
 		
 		
-		Object rawValue = ConvertJSON.toList(node.getFieldValue());
+		Object rawValue = ConvertJSON.toList(node.getStringValue());
 		List<Object> valuesList = null;
 		if( rawValue != null && rawValue instanceof List ) {
 			valuesList = (List<Object>)rawValue;

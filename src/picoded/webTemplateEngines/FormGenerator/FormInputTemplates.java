@@ -19,7 +19,7 @@ public class FormInputTemplates {
 	
 	public static StringBuilder displayDiv( FormNode node, String pfiClass ) {
 		String text = node.getString(JsonKeys.TEXT, "");
-		String fieldValue = node.getFieldValue();
+		String fieldValue = node.getStringValue();
 		
 		String textAndField = text+fieldValue;
 		if(textAndField == null || textAndField.length() <= 0) {
@@ -36,7 +36,7 @@ public class FormInputTemplates {
 	
 	protected static FormInputInterface header = (node)->{ 
 		String text = node.getString(JsonKeys.TEXT, "");
-		String fieldValue = node.getFieldValue() != null ? node.getFieldValue():"";
+		String fieldValue = node.getStringValue() != null ? node.getStringValue():"";
 		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.HEADER, "pfi_header pfi_input", null );
 		return sbArr[0].append(text).append(fieldValue).append(sbArr[1]);
 	};
@@ -57,7 +57,7 @@ public class FormInputTemplates {
 		
 		// Use the generated list, to populate the option set
 		//---------------------------------------------------------
-		String selectedKey = node.getFieldValue(); 
+		String selectedKey = node.getStringValue(); 
 		createDropdownHTMLString(ret, keyList, nmeList, selectedKey);
 		
 		ret.append(sbArr[1]);
@@ -67,7 +67,7 @@ public class FormInputTemplates {
 	
 	protected static FormInputInterface input_text = (node)->{
 		CaseInsensitiveHashMap<String,String> paramMap = new CaseInsensitiveHashMap<String, String>();
-		String fieldValue = node.getFieldValue();
+		String fieldValue = node.getStringValue();
 		
 		paramMap.put(HtmlTag.TYPE, "text");
 		if( fieldValue != null && fieldValue.length() >= 0 ) {
@@ -80,7 +80,7 @@ public class FormInputTemplates {
 	
 	protected static FormInputInterface input_textarea = (node)->{
 		CaseInsensitiveHashMap<String,String> paramMap = new CaseInsensitiveHashMap<String, String>();
-		String fieldValue = node.getFieldValue();
+		String fieldValue = node.getStringValue();
 		
 		paramMap.put(HtmlTag.TYPE, "text");
 		if( fieldValue != null && fieldValue.length() >= 0 ) {
@@ -118,7 +118,7 @@ public class FormInputTemplates {
 			
 			// Use the generated list, to populate the option set
 			//---------------------------------------------------------
-			String selectedKey = node.getFieldValue(); 
+			String selectedKey = node.getStringValue(); 
 			createDropdownHTMLString(ret, keyList, nmeList, selectedKey);
 			
 			ret.append(sbArr[1]);
@@ -143,7 +143,7 @@ public class FormInputTemplates {
 			
 			ret.append(sbArr[0]);
 			
-			String val = node.getFieldValue();
+			String val = node.getStringValue();
 			String valLowercased = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(val).toLowerCase();
 			
 			Object dropDownObject = node.get(JsonKeys.OPTIONS);
@@ -168,13 +168,13 @@ public class FormInputTemplates {
 	
 	@SuppressWarnings("unchecked")
 	protected static StringBuilder createCheckbox(FormNode node, boolean displayMode, String pfiClass){
-		
+				
 		CaseInsensitiveHashMap<String,String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		paramMap.put(HtmlTag.TYPE, JsonKeys.CHECKBOX);
 		
 		List<String> checkboxSelections = new ArrayList<String>();
 		if(!node.getFieldName().isEmpty()){
-			Object nodeDefaultVal = node.getDefaultValue(node.getFieldName());
+			Object nodeDefaultVal = node.getRawFieldValue();
 			if(nodeDefaultVal != null){
 				if(nodeDefaultVal instanceof String){
 					if(((String)nodeDefaultVal).contains("[")){
@@ -187,7 +187,9 @@ public class FormInputTemplates {
 					}
 				}else if(nodeDefaultVal instanceof List){
 					for(String str : (List<String>)nodeDefaultVal){
-						checkboxSelections.add(RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(str).toLowerCase());
+						String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(str);
+						sanitisedSelection = RegexUtils.removeAllWhiteSpace(sanitisedSelection);
+						checkboxSelections.add(sanitisedSelection.toLowerCase());
 					}
 				}
 			}
@@ -207,9 +209,9 @@ public class FormInputTemplates {
 			if(!displayMode){
 				CaseInsensitiveHashMap<String,String> tempMap = new CaseInsensitiveHashMap<String, String>(paramMap);
 				tempMap.put("value", key);
-				String key_sanitised = RegexUtils.removeAllWhiteSpace(key).toLowerCase();
+				String key_sanitised = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(key);
+				key_sanitised = RegexUtils.removeAllWhiteSpace(key).toLowerCase();
 				for(String selection : checkboxSelections){
-					
 					if(key_sanitised.equalsIgnoreCase(selection)){
 						tempMap.put("checked", "checked");
 					}
@@ -217,6 +219,7 @@ public class FormInputTemplates {
 				
 				//generate onchange function
 				if(realName != null && !realName.isEmpty()){
+					int x = 0;
 					String onChangeFunctionString = "saveCheckboxValueToHiddenField('"+realName+"_dummy', '"+realName+"')";
 					tempMap.put("onchange", onChangeFunctionString);
 				}
@@ -259,7 +262,7 @@ public class FormInputTemplates {
 		}
 		
 		//generate hidden input here
-		String hiddenInputTag = "<input type=\"text\" style=\"display:none\" name=\""+realName+"\">";
+		String hiddenInputTag = "<input type=\"text\" class=\"pfi_input\" style=\"display:none\" name=\""+realName+"\">";
 		StringBuilder[] wrapper = tempNode.defaultHtmlInput( HtmlTag.DIV, pfiClass, null );
 		ret = wrapper[0].append(ret);
 		ret.append(hiddenInputTag);
@@ -439,7 +442,7 @@ public class FormInputTemplates {
 	protected static StringBuilder signature(FormNode node, boolean displayMode){
 		StringBuilder ret = new StringBuilder();
 		
-		String sigValue = node.getFieldValue();//will return a file path, e.g. output/outPNG_siga.png
+		String sigValue = node.getStringValue();//will return a file path, e.g. output/outPNG_siga.png
 		StringBuilder sigImgString = new StringBuilder();
 		if(sigValue != null && !sigValue.isEmpty()){
 			FormNode innerImgNode = new FormNode();
@@ -476,7 +479,7 @@ public class FormInputTemplates {
 		StringBuilder ret = new StringBuilder();
 		
 		CaseInsensitiveHashMap<String,String> paramMap = new CaseInsensitiveHashMap<String, String>();
-		String fieldValue = node.getFieldValue();
+		String fieldValue = node.getStringValue();
 		
 		if(!displayMode){
 			paramMap.put(HtmlTag.TYPE, "date");

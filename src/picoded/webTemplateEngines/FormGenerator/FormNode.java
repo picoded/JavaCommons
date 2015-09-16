@@ -648,6 +648,10 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	
 	protected String namePrefix = "";
 	
+	
+	//getRawValue
+	//getStringValue
+	
 	/// Returns the field name
 	public String getFieldName(){
 		if( containsKey(JsonKeys.FIELD) || !namePrefix.isEmpty()) {
@@ -657,8 +661,14 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	}
 	
 	/// Returns the field value as a string
-	public String getFieldValue(){
-		Object val = getRawFieldValue();
+	public String getStringValue(){
+		String fieldName = getFieldName();
+		return getStringValue(fieldName);
+	}
+	
+	/// Returns the default value of the object, 
+	public String getStringValue(String fieldName){
+		Object val = getRawValue(fieldName);
 		
 		if( val != null ) {
 			return GenericConvert.toString( getRawFieldValue() );
@@ -668,9 +678,13 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	
 	/// Returns the field value in its raw form
 	public Object getRawFieldValue() {
-		Object val = null;
 		String fieldName = getFieldName();
-		
+		return getRawValue(fieldName);
+	}
+	
+	/// Returns the default value of the object
+	protected Object getRawValue(String fieldName){
+		Object val = null;
 		if( fieldName.equalsIgnoreCase("this") ) {
 			return _inputValue;
 		}
@@ -715,38 +729,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	//
 	//------------------------------------------------------------------------
 	
-	// /// Gets the value from the input data array
-	// public String getValue( String fieldName, int index ) {
-	// 	String strRet = null;
-	// 	Object objRet = null;
-	// 	
-	// 	if( _inputValues.get(index) != null ) {
-	// 		objRet = _inputValues.get(index).get(fieldName);
-	// 		strRet = GenericConvert.toString(objRet, null);
-	// 	}
-	// 	
-	// 	if( strRet != null ) {
-	// 		return strRet;
-	// 	}
-	// 	
-	// 	return getString( JsonKeys.DEFAULT, null );
-	// }
 	
-	/// @TODO
-	/// Returns the default value of the object, 
-	public String getFieldValue(String fieldName){
-		return null;
-	}
-	
-	/// Returns the default value of the object, 
-	///
-	protected Object getDefaultValue(String fieldName){
-		if(_inputValue != null && _inputValue.containsKey(fieldName)){
-			return _inputValue.get(fieldName);
-		}
-		
-		return null;
-	}
 	
 	// @Deprecated
 	public void setChildren(List<FormNode> children){

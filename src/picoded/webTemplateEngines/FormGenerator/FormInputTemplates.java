@@ -211,9 +211,14 @@ public class FormInputTemplates {
 				
 				StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputCheckbox pfi_input", tempMap );
 				ret.append("<div class=\"pfc_inputCheckboxWrap\">");
+				ret.append("<label class=\"pfi_inputCheckbox_label\">");
 				ret.append(sbArr[0]);
-				ret.append(keyNamePair.get(key));
 				ret.append(sbArr[1]);
+				ret.append("<div class=\"pfi_inputCheckbox_labelTextPrefix\"></div>");
+				ret.append("<div class=\"pfi_inputCheckbox_labelText\">");
+				ret.append(keyNamePair.get(key));
+				ret.append("</div>");
+				ret.append("</label>");
 				ret.append("</div>");
 			}else{
 				StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, "pfi_inputCheckbox pfi_input", null );

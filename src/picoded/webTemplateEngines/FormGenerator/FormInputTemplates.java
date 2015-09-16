@@ -217,7 +217,7 @@ public class FormInputTemplates {
 				
 				//generate onchange function
 				if(realName != null && !realName.isEmpty()){
-					String onChangeFunctionString = "saveCheckboxValueToHiddenField('"+realName+"_dummy"+"', this.checked, '"+realName+"')";
+					String onChangeFunctionString = "saveCheckboxValueToHiddenField('"+realName+"_dummy', '"+realName+"')";
 					tempMap.put("onchange", onChangeFunctionString);
 				}
 				

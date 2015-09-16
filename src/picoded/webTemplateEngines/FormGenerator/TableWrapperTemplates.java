@@ -422,8 +422,10 @@ public class TableWrapperTemplates {
 				
 				Map<String, Object> tempChild = new HashMap<String, Object>(child);
 				String fieldName = (String)tempChild.get("field");
-				fieldName = node.getFieldName() + "[" + tierNumber + "]." + fieldName;
-				tempChild.put("field", fieldName);
+				if(fieldName != null && !fieldName.isEmpty()){
+					fieldName = node.getFieldName() + "[" + tierNumber + "]." + fieldName;
+					tempChild.put("field", fieldName);
+				}
 				//and sam "fix"
 				
 				//

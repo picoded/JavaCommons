@@ -141,7 +141,9 @@ public class FormWrapperTemplates {
 		
 		JSMLFormSet formSet = node.getFormSet();
 		JSMLForm form = formSet.get(name);
-		ret = form.generateHTML(values, displayMode);
+		if(form != null){
+			ret = form.generateHTML(values, displayMode);
+		}
 		
 		return ret;
 	}

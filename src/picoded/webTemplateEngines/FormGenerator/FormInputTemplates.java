@@ -271,7 +271,7 @@ public class FormInputTemplates {
 		}
 		
 		//generate hidden input here
-		String hiddenInputTag = "<input type=\"text\" class=\"pfi_input\" style=\"display:none\" name=\""+realName+"\">";
+		String hiddenInputTag = "<input type=\"text\" class=\"pfi_input\" style=\"display:none\" name=\""+realName+"\"></input>";
 		StringBuilder[] wrapper = tempNode.defaultHtmlInput( HtmlTag.DIV, pfiClass, null );
 		ret = wrapper[0].append(ret);
 		ret.append(hiddenInputTag);

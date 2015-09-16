@@ -237,7 +237,7 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("dropdownWithOthersPDF", jsonTemplatedOutput));
 	}
 	
-	@Test
+//	@Test
 	public void checkBoxTest(){
 		
 		String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash("actuarial science");
@@ -411,9 +411,9 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("signatureDisplay", jsonTemplatedOutput));
 	}
 	
-//	@Test
+	@Test
 	public void datePickerTest(){
-		String jsonTemplatedOutput = getTemplatedJSONString("date", false, false);
+		String jsonTemplatedOutput = getTemplatedJSONString("date", false, true);
 
 		assertNotNull(jsonTemplatedOutput);
 		assertTrue(generateHTMLFile("date", jsonTemplatedOutput));

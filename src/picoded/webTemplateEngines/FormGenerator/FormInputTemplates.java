@@ -1,5 +1,8 @@
 package picoded.webTemplateEngines.FormGenerator;
 
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -7,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.amazonaws.util.StringUtils;
+import com.fasterxml.jackson.databind.deser.std.DateDeserializers.CalendarDeserializer;
 import com.hazelcast.instance.Node;
 
 import picoded.conv.ConvertJSON;
@@ -482,6 +487,10 @@ public class FormInputTemplates {
 	protected static StringBuilder datePicker(FormNode node, boolean displayMode){
 		StringBuilder ret = new StringBuilder();
 		
+		if(node.getFieldName().equalsIgnoreCase("datePickerWithEpochTime")){
+			System.out.println("Asd");
+		}
+		
 		CaseInsensitiveHashMap<String,String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getStringValue();
 		
@@ -519,7 +528,7 @@ public class FormInputTemplates {
 		}
 		
 		//generate hidden input field
-		String hiddenInputTag = "<input type=\"text\" name=\""+hiddenInputName+"\" style=\"display:none\"></input>";
+		String hiddenInputTag = "<input class=\"pfi_input\" type=\"text\" name=\""+hiddenInputName+"\" style=\"display:none\"></input>";
 		
 		
 		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputDate pfi_input", paramMap );
@@ -689,8 +698,32 @@ public class FormInputTemplates {
 		return ret;
 	}
 	
+	private static String millisecondsTimeToYMD(String inDateString, String separator){
+		//MONTH IS ZERO INDEXED
+		long dateAsLong = Long.parseLong(inDateString);
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(dateAsLong);
+		
+		String year = StringUtils.fromInteger(cal.get(Calendar.YEAR));
+		String month = StringUtils.fromInteger(cal.get(Calendar.MONTH) + 1); //Calendar is zero indexed, but html is not
+		String date = StringUtils.fromInteger(cal.get(Calendar.DATE));
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(year);
+		sb.append(separator);
+		sb.append(month); 
+		sb.append(separator);
+		sb.append(date);
+		
+		return sb.toString();
+	}
+	
 	private static String sanitiseYMDDateString(String inDateString){
 		StringBuilder ret = new StringBuilder();
+		
+		if(!inDateString.isEmpty() && !inDateString.contains("-")){
+			inDateString = millisecondsTimeToYMD(inDateString, "-");
+		}
 		
 		if(inDateString != null && !inDateString.isEmpty()){
 			String[] dateSplit = inDateString.split("-");

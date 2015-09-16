@@ -420,12 +420,19 @@ public class TableWrapperTemplates {
 					tierNumber = row;
 				}
 				
-				Map<String, Object> tempChild = new HashMap<String, Object>(child);
-				String fieldName = (String)tempChild.get("field");
-				if(fieldName != null && !fieldName.isEmpty()){
-					fieldName = node.getFieldName() + "[" + tierNumber + "]." + fieldName;
-					tempChild.put("field", fieldName);
+				FormNode childNode = new FormNode( node._formGenerator, child,  rowMap);
+				String currentNodeName = node.getFieldName();
+				
+				if(currentNodeName != null && !currentNodeName.isEmpty()){
+					childNode.namePrefix = currentNodeName + "[" + tierNumber + "].";
 				}
+//				Map<String, Object> tempChild = new HashMap<String, Object>(child);
+//				String fieldName = (String)tempChild.get("field");
+//				if(fieldName != null && !fieldName.isEmpty()){
+//					
+//					fieldName = node.getFieldName() + "[" + tierNumber + "]." + fieldName;
+//					tempChild.put("field", fieldName);
+//				}
 				//and sam "fix"
 				
 				//
@@ -433,7 +440,7 @@ public class TableWrapperTemplates {
 				//
 				StringBuilder ret = null;
 				if( child != null && rowMap != null) {
-					ret = ( new FormNode( node._formGenerator, tempChild,  rowMap)  ).fullHtml(isDisplayMode);
+					ret = ( childNode  ).fullHtml(isDisplayMode);
 				}
 				return (ret != null)? ret : new StringBuilder(""); //blank fallback
 			};

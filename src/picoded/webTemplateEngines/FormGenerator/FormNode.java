@@ -520,9 +520,11 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 			FormNode childNode = childList.get(a);
 			if(childNode.containsKey("field")){
 				String thisNodeFieldName = this.getFieldName();
+				
 				if(!thisNodeFieldName.isEmpty()){
-					thisNodeFieldName = thisNodeFieldName + "[" + a + "]." + childNode.getFieldName();
-					childNode.replace("field", thisNodeFieldName);
+					childNode.namePrefix = thisNodeFieldName;
+//					thisNodeFieldName = thisNodeFieldName + "[" + a + "]." + childNode.getFieldName();
+//					childNode.replace("field", thisNodeFieldName);
 				}
 			}
 			ret.append(childNode.fullHtml(displayMode));
@@ -644,10 +646,12 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return containsKey(JsonKeys.LABEL) ? getString(JsonKeys.LABEL) : "";
 	}
 	
+	protected String namePrefix = "";
+	
 	/// Returns the field name
 	public String getFieldName(){
-		if( containsKey(JsonKeys.FIELD) ) {
-			return RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash( getString(JsonKeys.FIELD) ).toLowerCase();
+		if( containsKey(JsonKeys.FIELD) || !namePrefix.isEmpty()) {
+			return RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash( namePrefix + getString(JsonKeys.FIELD, "") ).toLowerCase();
 		}
 		return "";
 	}

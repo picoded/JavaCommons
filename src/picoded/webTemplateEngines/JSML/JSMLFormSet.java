@@ -132,6 +132,12 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 		return (_folderNameListCache = ret);
 	}
 	
+	public void clearTempFiles() {
+	    long time = 60 * 60; // one hour
+		for(String name : keySet() ) {
+			get( name ).clearTempFilesOlderThenGivenAgeInSeconds( time );
+		}
+	}
 	///////////////////////////////////////////////////////
 	//
 	// Map operation functions

@@ -189,13 +189,13 @@ public class FormInputTemplates_test {
 	
 //	@Test
 	public void textDisplayTest(){
-		String jsonTemplatedOutput = getTemplatedJsonStringWithData("text", false);
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("text", true);
 		String rawHtmlString = getHtmlString("text");
 		
 		assertNotNull(jsonTemplatedOutput);
 		
-		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
-		assertTrue(compliancyCheck);
+//		boolean compliancyCheck = htmlTagCompliancyCheck(rawHtmlString, jsonTemplatedOutput);
+//		assertTrue(compliancyCheck);
 		
 		assertTrue(generateHTMLFile("textWithData", jsonTemplatedOutput));
 	}

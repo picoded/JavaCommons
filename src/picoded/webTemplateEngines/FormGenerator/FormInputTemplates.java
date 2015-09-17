@@ -487,12 +487,13 @@ public class FormInputTemplates {
 	protected static StringBuilder datePicker(FormNode node, boolean displayMode){
 		StringBuilder ret = new StringBuilder();
 		
-		if(node.getFieldName().equalsIgnoreCase("datePickerWithEpochTime")){
-			System.out.println("Asd");
-		}
-		
 		CaseInsensitiveHashMap<String,String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getStringValue();
+		String hiddenInputTag = "";
+		if( fieldValue != null && fieldValue.length() >= 0 ) {
+			fieldValue = sanitiseYMDDateString(fieldValue);
+			paramMap.put(HtmlTag.VALUE, fieldValue);
+		}
 		
 		if(!displayMode){
 			paramMap.put(HtmlTag.TYPE, "date");
@@ -510,31 +511,35 @@ public class FormInputTemplates {
 					paramMap.put("min", minDate);
 				}
 			}
-		}else{
-			paramMap.put(HtmlTag.TYPE, "text");
-		}
-		
-		//retrieve the name, and append _date to it
-		String hiddenInputName = node.getFieldName(); //set the hidden input field to the name given
-		if(hiddenInputName != null && !hiddenInputName.isEmpty()){
-			node.replace("field", hiddenInputName+"_date");
 			
-			String onchangeFunctionString = "changeDateToEpochTime(this.value, '"+hiddenInputName+"')";
-			paramMap.put("onchange", onchangeFunctionString);
+			//retrieve the name, and append _date to it
+			String hiddenInputName = node.getFieldName(); //set the hidden input field to the name given
+			if(hiddenInputName != null && !hiddenInputName.isEmpty()){
+				node.replace("field", hiddenInputName+"_date");
+				
+				String onchangeFunctionString = "changeDateToEpochTime(this.value, '"+hiddenInputName+"')";
+				paramMap.put("onchange", onchangeFunctionString);
+			}
+			
+			//generate hidden input field
+			hiddenInputTag = "<input class=\"pfi_input\" type=\"text\" name=\""+hiddenInputName+"\" style=\"display:none\"></input>";
+			
+			StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputDate pfi_input", paramMap );
+			ret.append(sbArr[0]);
+			ret.append(sbArr[1]);
+			if(!displayMode){
+				ret.append(hiddenInputTag);
+			}
+		}else{
+			//paramMap.put(HtmlTag.TYPE, "text");
+			if(!fieldValue.isEmpty()){
+				System.out.println(fieldValue);
+			}
+			node.replace("type", "text");
+			
+			StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, "pfi_inputDate pfi_input", null );
+			ret.append(sbArr[0].append(fieldValue).append(sbArr[1]));
 		}
-		
-		if( fieldValue != null && fieldValue.length() >= 0 ) {
-			paramMap.put(HtmlTag.VALUE, sanitiseYMDDateString(fieldValue));
-		}
-		
-		//generate hidden input field
-		String hiddenInputTag = "<input class=\"pfi_input\" type=\"text\" name=\""+hiddenInputName+"\" style=\"display:none\"></input>";
-		
-		
-		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputDate pfi_input", paramMap );
-		ret.append(sbArr[0]);
-		ret.append(sbArr[1]);
-		ret.append(hiddenInputTag);
 		return ret;
 	}
 	

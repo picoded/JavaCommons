@@ -40,6 +40,11 @@ import picoded.webTemplateEngines.PagesBuilder.*;
 ///
 public class CommonsPage extends BasePage {
 	
+	/// Enable or disable commons page Auth redirection
+	public boolean enableCommonWildcardAuthRedirection() {
+		return true;
+	}
+	
 	/// Authenticate the user, or redirects to login page if needed, this is not applied to API page
 	@Override
 	public boolean doAuth(Map<String,Object> templateData) throws Exception {
@@ -50,7 +55,8 @@ public class CommonsPage extends BasePage {
 			wildcardUri = new String[] {};
 		}
 		
-		if( wildcardUri.length >= 1 ) {
+		boolean enableCommonWildcardAuth = enableCommonWildcardAuthRedirection();
+		if( enableCommonWildcardAuth && wildcardUri.length >= 1 ) {
 			// Exempt login page from auth
 			if( wildcardUri[0].equalsIgnoreCase("login") ) {
 				return true;
@@ -92,7 +98,7 @@ public class CommonsPage extends BasePage {
 		}
 		
 		// Blank wildcard redirects to "home" for valid users
-		if( wildcardUri.length <= 0 || wildcardUri[0].length() <= 0 || wildcardUri[0].equals("/") ) {
+		if( enableCommonWildcardAuth && (wildcardUri.length <= 0 || wildcardUri[0].length() <= 0 || wildcardUri[0].equals("/")) ) {
 			sendRedirect( (getContextURI()+"/home").replaceAll("//", "/") );
 			return false;
 		}

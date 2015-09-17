@@ -1331,7 +1331,7 @@ public class AccountLogin extends BasePage {
 		///
 		public static RESTFunction new_account_POST = (req, res) -> {
 			// Only runs function if logged in, and valid group object
-			return fetchGroupObject_fromFirstWildcard_orCurrentUser( req, res, false,
+			return prepareAuthenticatedREST( req, res,
 				(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
 					
 					String userName = req.getString("username");
@@ -1350,6 +1350,7 @@ public class AccountLogin extends BasePage {
 					Map<String, Object> givenMetaObj = new HashMap<String, Object>();
 					if(metaObjRaw instanceof String){
 						String jsonMetaString = (String)metaObjRaw;
+						
 						if(jsonMetaString != null && !jsonMetaString.isEmpty()){
 							givenMetaObj = ConvertJSON.toMap(jsonMetaString);
 						}
@@ -1361,6 +1362,8 @@ public class AccountLogin extends BasePage {
 					
 					res.put("meta", newAccount);
 					res.put("accountID", newAccount._oid());
+					
+					System.out.println("Returning from new_account_POST");
 					
 					return resMap;
 				}

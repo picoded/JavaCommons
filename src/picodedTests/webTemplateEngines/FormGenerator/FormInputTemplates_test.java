@@ -240,7 +240,7 @@ public class FormInputTemplates_test {
 //	@Test
 	public void checkBoxTest(){
 		
-		String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreDashFullstop("actuarial science");
+		String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators("actuarial science");
 		sanitisedSelection = RegexUtils.removeAllWhiteSpace(sanitisedSelection);
 		
 //		String jsonTemplatedOutput = getFinalTemplatedJsonString("checkbox");
@@ -411,7 +411,7 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("signatureDisplay", jsonTemplatedOutput));
 	}
 	
-	@Test
+//	@Test
 	public void datePickerTest(){
 		String jsonTemplatedOutput = getTemplatedJSONString("date", false, true);
 
@@ -434,6 +434,13 @@ public class FormInputTemplates_test {
 		assertNotNull(jsonTemplatedOutput);
 		
 		assertTrue(generateHTMLFile("fullyQualified", jsonTemplatedOutput));
+	}
+	
+	@Test
+	public void dummy(){
+		String test = "client[0].asd_re-csa";
+		String result = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(test);
+		System.out.println(result);
 	}
 	
 	public boolean htmlTagCompliancyCheck(String source, String lookup){

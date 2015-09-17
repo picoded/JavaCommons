@@ -22,6 +22,6 @@ public class RegexUtils {
 	private static String removeAllNonAlphaNumeric_allowCommonSeparators_regexString = "[^a-zA-Z0-9-_\\.\\]\\[]";
 	
 	public static String removeAllNonAlphaNumeric_allowCommonSeparators(String input) {
-		return input.replaceAll(removeAllNonAlphaNumeric_allowUnderscoreDashFullstop_regexString, "");
+		return input.replaceAll(removeAllNonAlphaNumeric_allowCommonSeparators_regexString, "");
 	}
 }

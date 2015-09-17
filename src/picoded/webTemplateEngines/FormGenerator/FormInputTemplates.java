@@ -142,14 +142,14 @@ public class FormInputTemplates {
 		}else{
 			StringBuilder ret = new StringBuilder();
 			Map<String, String> funcMap = new HashMap<String, String>();
-			String nodeName = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreDashFullstop(node.getString(JsonKeys.FIELD)).toLowerCase();
+			String nodeName = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(node.getString(JsonKeys.FIELD)).toLowerCase();
 			funcMap.put("id", nodeName);
 			StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, "pf_select", funcMap );
 			
 			ret.append(sbArr[0]);
 			
 			String val = node.getStringValue();
-			String valLowercased = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreDashFullstop(val).toLowerCase();
+			String valLowercased = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(val).toLowerCase();
 			
 			Object dropDownObject = node.get(JsonKeys.OPTIONS);
 			List<String> keyList = dropdownKeyList(dropDownObject);
@@ -218,7 +218,7 @@ public class FormInputTemplates {
 			if(!displayMode){
 				CaseInsensitiveHashMap<String,String> tempMap = new CaseInsensitiveHashMap<String, String>(paramMap);
 				tempMap.put("value", key);
-				String key_sanitised = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreDashFullstop(key);
+				String key_sanitised = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(key);
 				key_sanitised = RegexUtils.removeAllWhiteSpace(key).toLowerCase();
 				for(String selection : checkboxSelections){
 					if(key_sanitised.equalsIgnoreCase(selection)){

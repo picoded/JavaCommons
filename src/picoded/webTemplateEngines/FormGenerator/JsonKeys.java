@@ -31,7 +31,7 @@ public class JsonKeys {
 	
 	// Options listing, used to list options in dropdown
 	public static String OPTIONS = "options";
-
+	
 	////////////////////////////////////////////////
 	//
 	//  HTML parameters handling
@@ -67,7 +67,6 @@ public class JsonKeys {
 	
 	// Input css overwrites
 	public static String LABEL_CSS = "labelCss";
-	
 	
 	// The field to setup the class SPECFIC
 	public static String CHILD_CLASS = "childClass";
@@ -121,7 +120,7 @@ public class JsonKeys {
 	////////////////////////////////////////////////
 	
 	// Inner HTML injection (discouraged from use)
-	public static String HTML_INJECTION = "innerHTML"; 
+	public static String HTML_INJECTION = "innerHTML";
 	
 	// Html input textarea type
 	public static String TEXTAREA = "textarea";
@@ -143,7 +142,5 @@ public class JsonKeys {
 	
 	public static String PDFDISPLAY_CLASS = "pdfDisplayClass";
 	public static String PDFOUTPUT_CLASS = "pdfOutputClass";
-	
-	
 	
 }

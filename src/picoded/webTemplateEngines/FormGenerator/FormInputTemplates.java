@@ -522,7 +522,7 @@ public class FormInputTemplates {
 			}
 			
 			//generate hidden input field
-			hiddenInputTag = "<input class=\"pfi_input\" type=\"text\" name=\""+hiddenInputName+"\" style=\"display:none\"></input>";
+			hiddenInputTag = "<input class=\"pfi_input\" type=\"text\" name=\""+hiddenInputName+"\" style=\"display:none\" value=\""+fieldValue+"\"></input>";
 			
 			StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.INPUT, "pfi_inputDate pfi_input", paramMap );
 			ret.append(sbArr[0]);

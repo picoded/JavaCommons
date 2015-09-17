@@ -134,6 +134,9 @@ public class CommonsPage extends BasePage {
 		}
 		
 		// Indicates if its a JSML form usage
+		//
+		// @TODO unit test, and fix it, somehow it isnt working =(
+		//
 		if( wildcardUri != null && wildcardUri.length >= 1 && //
 			wildcardUri[0].equalsIgnoreCase("form") && //
 			wildcardUri[0].equalsIgnoreCase("jsml") 

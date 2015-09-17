@@ -704,7 +704,8 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		//this will allow you to load single tier values - however, it -SHOULDNT- crash if no value is found
 		if(val == null){//if val == null, try again by splitting fieldname - THIS IS A HACK HACK HACK
 			String[] fieldNameSplit = fieldName.split("\\.");
-			String tempString = fieldNameSplit[1];
+
+			String tempString = "";
 			if(fieldNameSplit != null && fieldNameSplit.length > 1){
 				tempString = fieldNameSplit[1];
 			}

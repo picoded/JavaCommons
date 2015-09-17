@@ -704,21 +704,21 @@ public class AccountLogin extends BasePage {
 				
 				for(MetaObject metaObj : metaObjs){
 					List<Object> row = new ArrayList<Object>();
-					for(String header : headers){
-						AccountObject ao = _metaTableObj.getFromID(metaObj._oid());
-						
-						if(groupStatus != null){
-							if(groupStatus.equalsIgnoreCase("group")){
-								if(!ao.isGroup()){
-									continue;
-								}
-							}else if(groupStatus.equalsIgnoreCase("user")){
-								if(ao.isGroup()){
-									continue;
-								}
+					
+					AccountObject ao = _metaTableObj.getFromID(metaObj._oid());
+					if(groupStatus != null){
+						if(groupStatus.equalsIgnoreCase("group")){
+							if(!ao.isGroup()){
+								continue;
+							}
+						}else if(groupStatus.equalsIgnoreCase("user")){
+							if(ao.isGroup()){
+								continue;
 							}
 						}
-						
+					}
+					
+					for(String header : headers){
 						boolean checkInsideGroupAny = (insideGroupAny != null && insideGroupAny.length > 0);
 						boolean partOfGroup = false;
 						if(checkInsideGroupAny){

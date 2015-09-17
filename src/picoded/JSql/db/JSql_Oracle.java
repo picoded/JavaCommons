@@ -189,11 +189,11 @@ public class JSql_Oracle extends JSql {
 			.replaceAll("(\\s){1}", " ")
 			.replaceAll("\\s+", " ")
 			.replaceAll("'", "\"")
-			.replaceAll("`", "\"");
+			.replaceAll("`", "\"")
+			.replaceAll("\"", "");
 			
 		String upperCaseStr = fixedQuotes.toUpperCase();
 		String qString = fixedQuotes;
-		
 		String qStringPrefix = "";
 		String qStringSuffix = "";
 		
@@ -353,12 +353,10 @@ public class JSql_Oracle extends JSql {
 			} else {
 				qString = _fixTableNameInOracleSubQuery(fixedQuotes);
 			}
-			
 			prefixOffset = 0;
 			//Fix the "AS" quotation
 			while ((tmpIndx = qString.indexOf(" AS ", prefixOffset)) > 0) {
 				prefixOffset = qString.indexOf(" ", tmpIndx + 4);
-				
 				if (prefixOffset > 0) {
 					qString = qString.substring(0, tmpIndx)
 						+ qString.substring(tmpIndx, prefixOffset).replaceAll("`", "\"").replaceAll("'", "\"")
@@ -367,6 +365,9 @@ public class JSql_Oracle extends JSql {
 					break;
 				}
 			}
+			// Remove 'AS' from table alias
+			qString = removeAsAfterTablename(qString);
+			qString = removeAsAfterOpeningBracket(qString);
 			
 			// Fix the pagination query as per the Oracle 12C
 			// The Oracle 12C supports the pagination query with the OFFSET/FETCH keywords
@@ -444,6 +445,88 @@ public class JSql_Oracle extends JSql {
 		return qString; //no change of data
 	}
 	
+	private static String removeAsAfterTablename(String qString) {
+		int prefixOffset = 0;
+		String tmpStr = null;
+
+		// parse table name
+		String searchString = "FROM";
+		String tablename = "";
+		while ((prefixOffset = qString.indexOf(searchString, prefixOffset)) > 0) {
+			prefixOffset += searchString.length();
+			tmpStr = qString.substring(prefixOffset, qString.length()).trim();
+			if (!tmpStr.startsWith("(")) {
+				// parse table name
+				for (int i = 0; i < tmpStr.length(); i++) {
+					if (tmpStr.charAt(i) == ' ' || tmpStr.charAt(i) == ')') {
+						break;
+					}
+					tablename += tmpStr.charAt(i);
+				}
+				tablename = tablename.replaceAll("\"", "").trim();
+
+			}
+		}
+
+		// Fix the "AS" quotation
+		searchString = " " + tablename + " ";
+		while ((prefixOffset = qString.indexOf(searchString, prefixOffset)) > 0) {
+			prefixOffset += searchString.length();
+			tmpStr = qString.substring(prefixOffset, qString.length()).trim();
+			if (tmpStr.startsWith("AS")) {
+				qString = qString.substring(0, prefixOffset)
+						+ qString.substring(prefixOffset + "AS".length() + 1,
+								qString.length()).trim();
+			}
+		}
+
+		return qString;
+	}
+
+	private static String removeAsAfterOpeningBracket(String qString) {
+		String searchString = " FROM (";
+		int prefixOffset = qString.indexOf(searchString);
+		if (prefixOffset != -1) {
+		    prefixOffset += searchString.length();
+			int offsetIndex = prefixOffset;
+			int obc = 1;
+			int cbc = 0;
+			// find the closing index
+			for (; offsetIndex < qString.length(); offsetIndex++) {
+				if (qString.charAt(offsetIndex) == ')') {
+					cbc++;
+					if (obc == cbc) {
+						break;
+					}
+				} else if (qString.charAt(offsetIndex) == '(') {
+					obc++;
+				}
+			}
+			String strBetweenBracket = qString.substring(prefixOffset,
+					offsetIndex).trim();
+			// Remove AS
+			// increment for space before bracket
+			offsetIndex++;
+			String tmpStr = qString.substring(offsetIndex, qString.length())
+					.trim();
+			if (tmpStr.startsWith("AS")) {
+				// increment for space before bracket
+				offsetIndex++;
+				qString = qString.substring(0, offsetIndex)
+						+ qString.substring(offsetIndex + "AS ".length(),
+								qString.length()).trim();
+				offsetIndex = offsetIndex - "AS".length();
+			}
+			// make recursive call
+			if (strBetweenBracket.indexOf(searchString) != -1) {
+				qString = qString.substring(0, prefixOffset)
+						+ removeAsAfterOpeningBracket(strBetweenBracket)
+						+ qString.substring(offsetIndex, qString.length());
+			}
+		}
+		return qString;
+	}
+
 	/// Executes the argumented query, and returns the result object *without* 
 	/// fetching the result data from the database. (not fetching may not apply to all implementations)
 	/// 

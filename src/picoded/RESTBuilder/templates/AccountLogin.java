@@ -786,6 +786,7 @@ public class AccountLogin extends BasePage {
 	public static RESTFunction meta_GET = (req, res) -> {
 		return prepareAuthenticatedREST( req, res, 
 			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				System.out.println("Calling meta_GET in AccountLogin");
 				return mtApi.meta_GET.apply(req, res);
 			});
 	};
@@ -1134,7 +1135,6 @@ public class AccountLogin extends BasePage {
 		// Only runs function if logged in, and valid group object
 		return fetchGroupObject_fromFirstWildcard_orCurrentUser( req, res, false,
 			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
-				
 				res.put("accountID", null);
 				res.put("accountID_valid", false);
 				res.put("meta", null);
@@ -1344,10 +1344,14 @@ public class AccountLogin extends BasePage {
 		rb.getNamespace( setPrefix + "members/meta/*/*" ).put( HttpRequestType.POST, members_meta_POST );
 		
 		//MetaTableApiBuilder Fall through
-		rb.getNamespace( setPrefix + "info/list" ).put( HttpRequestType.GET, list_GET_and_POST );
-		rb.getNamespace( setPrefix + "info/list" ).put( HttpRequestType.POST, list_GET_and_POST );
-		rb.getNamespace( setPrefix + "info/*" ).put( HttpRequestType.GET, meta_GET );
-		rb.getNamespace( setPrefix + "info/*" ).put( HttpRequestType.POST, meta_POST );
+		rb.getNamespace( setPrefix + "meta/list" ).put( HttpRequestType.GET, list_GET_and_POST );
+		rb.getNamespace( setPrefix + "meta/list" ).put( HttpRequestType.POST, list_GET_and_POST );
+		
+		rb.getNamespace( setPrefix + "meta/*" ).put( HttpRequestType.GET, meta_GET );
+		rb.getNamespace( setPrefix + "meta/*" ).put( HttpRequestType.POST, meta_POST );
+		rb.getNamespace( setPrefix + "meta" ).put( HttpRequestType.GET, meta_GET );
+		rb.getNamespace( setPrefix + "meta" ).put( HttpRequestType.POST, meta_POST );
+		
 		rb.getNamespace( setPrefix + "delete" ).put( HttpRequestType.DELETE, meta_DELETE );
 		rb.getNamespace( setPrefix + "delete/*" ).put( HttpRequestType.DELETE, meta_DELETE );
 		//end fall through segment

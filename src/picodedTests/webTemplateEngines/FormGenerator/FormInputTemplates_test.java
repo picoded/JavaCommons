@@ -240,7 +240,7 @@ public class FormInputTemplates_test {
 //	@Test
 	public void checkBoxTest(){
 		
-		String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash("actuarial science");
+		String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreDashFullstop("actuarial science");
 		sanitisedSelection = RegexUtils.removeAllWhiteSpace(sanitisedSelection);
 		
 //		String jsonTemplatedOutput = getFinalTemplatedJsonString("checkbox");

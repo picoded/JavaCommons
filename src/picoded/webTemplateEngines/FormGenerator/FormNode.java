@@ -655,7 +655,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	/// Returns the field name
 	public String getFieldName(){
 		if( containsKey(JsonKeys.FIELD) || !namePrefix.isEmpty()) {
-			return RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash( namePrefix + getString(JsonKeys.FIELD, "") ).toLowerCase();
+			return RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators( namePrefix + getString(JsonKeys.FIELD, "") ).toLowerCase();
 		}
 		return "";
 	}

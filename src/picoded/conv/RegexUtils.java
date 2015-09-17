@@ -1,22 +1,27 @@
 package picoded.conv;
 
 public class RegexUtils {
-	public static String removeAllWhiteSpace_regexString = "\\s";
+	private static String removeAllWhiteSpace_regexString = "\\s";
 	
 	public static String removeAllWhiteSpace(String input) {
 		return input.replaceAll(removeAllWhiteSpace_regexString, "");
 	}
 	
-	public static String removeAllNonAlphaNumeric_regexString = "[^a-zA-Z0-9]";
+	private static String removeAllNonAlphaNumeric_regexString = "[^a-zA-Z0-9]";
 	
 	public static String removeAllNonAlphaNumeric(String input) {
 		return input.replaceAll(removeAllNonAlphaNumeric_regexString, "");
 	}
 	
-	public static String removeAllNonAlphaNumeric_allowUnderscoreAndDash_regexString = "[^a-zA-Z0-9-_.]";
+	private static String removeAllNonAlphaNumeric_allowUnderscoreDashFullstop_regexString = "[^a-zA-Z0-9-_\\.]";
 	
-	//regex is [^a-zA-Z0-9-_\\\\s]
-	public static String removeAllNonAlphaNumeric_allowUnderscoreAndDash(String input) {
-		return input.replaceAll(removeAllNonAlphaNumeric_allowUnderscoreAndDash_regexString, "");
+	public static String removeAllNonAlphaNumeric_allowUnderscoreDashFullstop(String input) {
+		return input.replaceAll(removeAllNonAlphaNumeric_allowUnderscoreDashFullstop_regexString, "");
+	}
+	
+	private static String removeAllNonAlphaNumeric_allowCommonSeparators_regexString = "[^a-zA-Z0-9-_\\.\\]\\[]";
+	
+	public static String removeAllNonAlphaNumeric_allowCommonSeparators(String input) {
+		return input.replaceAll(removeAllNonAlphaNumeric_allowUnderscoreDashFullstop_regexString, "");
 	}
 }

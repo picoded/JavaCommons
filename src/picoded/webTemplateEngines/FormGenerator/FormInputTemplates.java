@@ -104,7 +104,7 @@ public class FormInputTemplates {
 		if(!displayMode){
 			Map<String, String> funcMap = new HashMap<String, String>();
 			String funcName = node.getString(JsonKeys.FUNCTION_NAME, "OnChangeDefaultFuncName");
-			String nodeName = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(node.getString(JsonKeys.FIELD)).toLowerCase();
+			String nodeName = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(node.getString(JsonKeys.FIELD)).toLowerCase();
 			funcMap.put("onchange", funcName+"()"); //get this value from map
 			funcMap.put("id", nodeName);
 			
@@ -142,14 +142,14 @@ public class FormInputTemplates {
 		}else{
 			StringBuilder ret = new StringBuilder();
 			Map<String, String> funcMap = new HashMap<String, String>();
-			String nodeName = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(node.getString(JsonKeys.FIELD)).toLowerCase();
+			String nodeName = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreDashFullstop(node.getString(JsonKeys.FIELD)).toLowerCase();
 			funcMap.put("id", nodeName);
 			StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, "pf_select", funcMap );
 			
 			ret.append(sbArr[0]);
 			
 			String val = node.getStringValue();
-			String valLowercased = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(val).toLowerCase();
+			String valLowercased = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreDashFullstop(val).toLowerCase();
 			
 			Object dropDownObject = node.get(JsonKeys.OPTIONS);
 			List<String> keyList = dropdownKeyList(dropDownObject);
@@ -185,18 +185,18 @@ public class FormInputTemplates {
 					if(((String)nodeDefaultVal).contains("[")){
 						List<Object> nodeValMap = ConvertJSON.toList((String)nodeDefaultVal);
 						for(Object obj : nodeValMap){
-							String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash((String)obj);
+							String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators((String)obj);
 							sanitisedSelection = RegexUtils.removeAllWhiteSpace(sanitisedSelection);
 							checkboxSelections.add(sanitisedSelection.toLowerCase());
 						}
 					}else{
-						String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash((String)nodeDefaultVal);
+						String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators((String)nodeDefaultVal);
 						sanitisedSelection = RegexUtils.removeAllWhiteSpace(sanitisedSelection);
 						checkboxSelections.add(sanitisedSelection.toLowerCase());
 					}
 				}else if(nodeDefaultVal instanceof List){
 					for(String str : (List<String>)nodeDefaultVal){
-						String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(str);
+						String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(str);
 						sanitisedSelection = RegexUtils.removeAllWhiteSpace(sanitisedSelection);
 						checkboxSelections.add(sanitisedSelection.toLowerCase());
 					}
@@ -218,7 +218,7 @@ public class FormInputTemplates {
 			if(!displayMode){
 				CaseInsensitiveHashMap<String,String> tempMap = new CaseInsensitiveHashMap<String, String>(paramMap);
 				tempMap.put("value", key);
-				String key_sanitised = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(key);
+				String key_sanitised = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreDashFullstop(key);
 				key_sanitised = RegexUtils.removeAllWhiteSpace(key).toLowerCase();
 				for(String selection : checkboxSelections){
 					if(key_sanitised.equalsIgnoreCase(selection)){
@@ -611,12 +611,12 @@ public class FormInputTemplates {
 		
 		if(dropDownObject instanceof List){
 			for(int a=0; a<nameList.size(); ++a) {
-				keyList.add( RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash( nameList.get(a) ).toLowerCase() );
+				keyList.add( RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators( nameList.get(a) ).toLowerCase() );
 			}
 		}else if(dropDownObject instanceof Map){
 			Map<Object,Object> dropDownMap = (Map<Object,Object>)dropDownObject;
 			for(Object keyObj : dropDownMap.keySet()) {
-				String key = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash( GenericConvert.toString(keyObj, null) ).toLowerCase();
+				String key = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators( GenericConvert.toString(keyObj, null) ).toLowerCase();
 				
 				// Skip blank keys 
 				if(key == null || key.length() <= 0) {
@@ -638,12 +638,12 @@ public class FormInputTemplates {
 		if(optionsObject instanceof List){
 			List<String> nameList = ListValueConv.objectToString( (List<Object>)optionsObject );
 			for(String name:nameList){
-				ret.put(RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(name).toLowerCase(), name);
+				ret.put(RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(name).toLowerCase(), name);
 			}
 		}else if(optionsObject instanceof Map){
 			Map<String,Object> optionsMap = (Map<String,Object>)optionsObject;
 			for(String key : optionsMap.keySet()){
-				String sanitisedKey = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(key).toLowerCase();
+				String sanitisedKey = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(key).toLowerCase();
 				ret.put(sanitisedKey, (String)optionsMap.get(key));
 			}
 			
@@ -695,7 +695,7 @@ public class FormInputTemplates {
 			if(childRaw instanceof Map){
 				Map<String, Object> childMap = (Map<String, Object>)childRaw;
 				if(childMap.containsKey("field")){
-					ret.add(RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash((String)childMap.get("field")).toLowerCase());
+					ret.add(RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators((String)childMap.get("field")).toLowerCase());
 				}
 			}
 		}
@@ -769,9 +769,9 @@ public class FormInputTemplates {
 	}
 	
 	protected static String getDropDownOthersJavascriptFunction(FormNode node){
-		String dropDownField = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(node.getString(JsonKeys.FIELD)).toLowerCase();
+		String dropDownField = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(node.getString(JsonKeys.FIELD)).toLowerCase();
 		String inputField = node.getString(JsonKeys.DROPDOWN_WITHOTHERS_TEXTFIELD);
-		String othersOptionToShowTextField = RegexUtils.removeAllNonAlphaNumeric_allowUnderscoreAndDash(node.getString(JsonKeys.OTHERS_OPTION)).toLowerCase();
+		String othersOptionToShowTextField = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(node.getString(JsonKeys.OTHERS_OPTION)).toLowerCase();
 		String funcName = node.getString(JsonKeys.FUNCTION_NAME, "OnChangeDefaultFuncName");
 		
 		String injectedScript = "<script>"+

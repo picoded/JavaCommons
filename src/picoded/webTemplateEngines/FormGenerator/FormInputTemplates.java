@@ -428,7 +428,6 @@ public class FormInputTemplates {
 	//image has no data passed in
 	protected static StringBuilder image(FormNode node, boolean displayMode){
 		StringBuilder ret = new StringBuilder();
-		
 		Map<String, String> params = new HashMap<String, String>();
 		String srcPath = "";
 		if(node.containsKey("relativePath")){

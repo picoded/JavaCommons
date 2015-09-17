@@ -443,48 +443,27 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction infoByName_GET = (req, res) -> {
-		res.put("accountID", null);
-		res.put("accountNames", null);
-		res.put("isSuperUser", null);
-		res.put("isGroup", null);
-		res.put("groupIDs", null);
-		res.put("groupNames", null);
-		res.put("groupRoles", null);
-		
 		if(req.requestPage() != null){
 			BasePage bp = (BasePage)(req.requestPage());
 			AccountTable at = bp.accountAuthTable(); //at contains all the user data
 			AccountObject ao = at.getRequestUser( bp.getHttpServletRequest() ); //to check if logged in
+			AccountObject account = null;
 			
 			if(ao != null){
 				String name = "";
 				if(req.containsKey("accountName")){
 					name = req.getString("accountName");
 				};
-				
 				if(!name.isEmpty()){
-					AccountObject account = at.getFromName(name);
-					if(account != null){
-						res.put("accountID", account._oid());
-						
-						Set<String> accNameSet = account.getNames();
-						String[] accNames = new String[accNameSet.size()];
-						accNameSet.toArray(accNames);
-						res.put("accountNames", accNames);;
-						
-						res.put("isSuperUser", account.isSuperUser());
-						res.put("isGroup", account.isGroup());
-						
-						res.put("groupIDs", account.getGroups_id());
-						
-						
-						res.put("groupNames", null);
-						res.put("groupRoles", null);
-					}
+					account = at.getFromName(name);
 				}
 			}else{
 				res.put("error", "Account object requested is null");
+				
 			}
+			
+			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(account);
+			res.putAll(commonInfo);
 		}
 		return res;
 	};
@@ -513,26 +492,18 @@ public class AccountLogin extends BasePage {
 	/// | accountNames    | String[]           | array of account names representing the account                               |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | isSuperUser     | boolean            | indicates if the account is considered a superUser                            |
+	/// | isAnyGroupAdmin | boolean            | indicates if the account is considered a superUser                            |
 	/// | isGroup         | boolean            | indicates if the account is considered a group                                |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | groupIDs        | String[]           | array of account ID groups the user is in                                     |
-	/// | groupNames      | String[][]         | array of account Names groups the user is in                                  |
-	/// | groupRoles      | String[]           | array of account groups roles the user is in                                  |
+	/// | groups          | object(Map)        | Groups object as a Map<String, List<Map<String, Object>>>                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction infoByID_GET = (req, res) -> {
-		res.put("accountID", null);
-		res.put("accountNames", null);
-		res.put("isSuperUser", null);
-		res.put("isGroup", null);
-		res.put("groupIDs", null);
-		res.put("groupNames", null);
-		res.put("groupRoles", null);
-		
 		if(req.requestPage() != null){
 			BasePage bp = (BasePage)(req.requestPage());
 			AccountTable at = bp.accountAuthTable(); //at contains all the user data
 			AccountObject ao = at.getRequestUser( bp.getHttpServletRequest() ); //to check if logged in
+			AccountObject account = null;
 			
 			if(ao != null){
 				String id = "";
@@ -541,32 +512,75 @@ public class AccountLogin extends BasePage {
 				};
 				
 				if(!id.isEmpty()){
-					AccountObject account = at.getFromID(id); //wrong
-					if(account != null){
-						res.put("accountID", account._oid());
-						
-						Set<String> accNameSet = account.getNames();
-						String[] accNames = new String[accNameSet.size()];
-						accNameSet.toArray(accNames);
-						res.put("accountNames", accNames);
-						
-						res.put("isSuperUser", account.isSuperUser());
-						res.put("isGroup", account.isGroup());
-						
-						res.put("groupIDs", account.getGroups_id());
-						
-						
-						res.put("groupNames", null);
-						res.put("groupRoles", null);
-					}
+					account = at.getFromID(id);
 				}
 			}else{
 				res.put("error", "Account object requested is null");
 			}
+			
+			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(account);
+			res.putAll(commonInfo);
 		}
 		
 		return res;
 	};
+	
+	private static Map<String, Object> extractCommonInfoFromAccountObject(AccountObject account){
+		Map<String, Object> commonInfo = new HashMap<String, Object>();
+		
+		commonInfo.put("accountID", null);
+		commonInfo.put("accountNames", null);
+		commonInfo.put("isSuperUser", null);
+		commonInfo.put("isGroup", null);
+		commonInfo.put("groups", null);
+		commonInfo.put("isAnyGroupAdmin", false);
+		
+		if(account != null){
+			commonInfo.put("accountID", account._oid());
+			
+			Set<String> accNameSet = account.getNames();
+			if(accNameSet != null){
+				String[] accNames = new String[accNameSet.size()];
+				accNameSet.toArray(accNames);
+				commonInfo.put("accountNames", accNames);
+			}else{
+				commonInfo.put("accountNames", null);
+			}
+			
+			commonInfo.put("isSuperUser", account.isSuperUser());
+			commonInfo.put("isGroup", account.isGroup());
+			
+			Map<String, List<Map<String, Object>>> groupMap = new HashMap<String, List<Map<String, Object>>>();
+			AccountObject[] groups = account.getGroups();
+			if(groups != null){
+				List<Map<String, Object>> groupList = new ArrayList<Map<String, Object>>();
+				for(AccountObject group : groups){
+					Map<String, Object> newGroup = new HashMap<String, Object>();
+					newGroup.put("accountID", group._oid());
+					newGroup.put("names", group.getNames());
+					String role = group.getMemberRole(account);
+					newGroup.put("role", role);
+					
+					if(role == null){
+						role = "";
+					}
+					
+					boolean isAdmin = role.equalsIgnoreCase("admin") || role.equalsIgnoreCase("superuser");
+					newGroup.put("isAdmin", isAdmin);
+					
+					if(isAdmin){
+						commonInfo.replace("isAnyGroupAdmin", true);
+					}
+					
+					groupList.add(newGroup);
+				}
+				groupMap.put("groups", groupList);
+			}
+			commonInfo.put("groups", groupMap);
+		}
+		
+		return commonInfo;
+	}
 	
 	/////////////////////////////////////////////
 	//
@@ -786,8 +800,26 @@ public class AccountLogin extends BasePage {
 	public static RESTFunction meta_GET = (req, res) -> {
 		return prepareAuthenticatedREST( req, res, 
 			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
-				System.out.println("Calling meta_GET in AccountLogin");
-				return mtApi.meta_GET.apply(req, res);
+				Map<String, Object> metaMap = mtApi.meta_GET.apply(req, res);
+				
+				AccountObject account = null;
+				if(currentUser != null){
+					String id = "";
+					if(req.containsKey("accountID")){
+						id = req.getString("accountID");
+					};
+					
+					if(!id.isEmpty()){
+						account = accountTableObj.getFromID(id);
+					}
+				}else{
+					res.put("error", "Account object requested is null");
+				}
+				
+				Map<String, Object> commonInfoMap = extractCommonInfoFromAccountObject(account);
+				res.putAll(commonInfoMap);
+				
+				return res;
 			});
 	};
 	

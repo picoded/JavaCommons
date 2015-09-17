@@ -436,11 +436,76 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("fullyQualified", jsonTemplatedOutput));
 	}
 	
-	@Test
+//	@Test
 	public void dummy(){
 		String test = "client[0].asd_re-csa";
 		String result = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(test);
 		System.out.println(result);
+	}
+	
+	@Test
+	public void sanityTest(){
+		
+		Map<String, Object> inputValue = new HashMap<String, Object>();
+		List<Map<String, String>> clientList = new ArrayList<Map<String, String>>();
+		
+		Map<String, String> clientAMap = new HashMap<String, String>();
+		clientAMap.put("name", "Someone");
+		clientAMap.put("title", "mister");
+		clientList.add(clientAMap);
+		
+		Map<String, String> clientBMap = new HashMap<String, String>();
+		clientBMap.put("name", "Someone Else");
+		clientBMap.put("title", "doctor");
+		clientList.add(clientBMap);
+		
+		inputValue.put("client", clientList);
+		
+		
+		Object val = getRawValue("client[0].name", inputValue);
+		
+		System.out.println(val);
+	}
+	
+	protected Object getRawValue(String fieldName, Map<String, Object> valueMap){
+		Object val = null;
+
+		
+		if(fieldName.contains("&#91;")){
+			fieldName.replace("&#91;", "[");
+		}
+		if(fieldName.contains("&#92;")){
+			fieldName.replace("&#92;", "]");
+		}
+		
+		if(valueMap != null && valueMap.containsKey(fieldName)){
+			val = valueMap.get(fieldName);
+		}
+		
+		//SINGLE TIER VALUE LOADING HACK!
+		//this will allow you to load single tier values - however, it -SHOULDNT- crash if no value is found
+		if(val == null){//if val == null, try again by splitting fieldname - THIS IS A HACK HACK HACK
+			String[] fieldNameSplit = fieldName.split("\\.");
+			String tempString = fieldNameSplit[1];
+			if(fieldNameSplit != null && fieldNameSplit.length > 1){
+				tempString = fieldNameSplit[1];
+			}
+			
+			if(valueMap != null && valueMap.containsKey(tempString)){
+				val = valueMap.get(tempString);
+			}
+		}
+		
+		if(val == null){
+			//nukenukenuke
+			Map<String, Object> fullyQualifiedMap = MapValueConv.toFullyQualifiedKeys(valueMap, "", ".");
+			
+			if(fullyQualifiedMap != null){
+				val = fullyQualifiedMap.get(fieldName);
+			}
+		}
+		//END HACK HACK HACK
+		return val;
 	}
 	
 	public boolean htmlTagCompliancyCheck(String source, String lookup){

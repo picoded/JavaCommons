@@ -387,7 +387,7 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("imagePDFOutput", jsonTemplatedOutput));
 	}
 	
-//	@Test
+	@Test
 	public void signatureTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("signature", true);
 		assertNotNull(jsonTemplatedOutput);

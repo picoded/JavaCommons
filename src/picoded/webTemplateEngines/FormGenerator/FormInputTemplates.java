@@ -470,9 +470,9 @@ public class FormInputTemplates {
 		String fieldName = node.getFieldName();
 		
 		Map<String, String> paramsMap = new HashMap<String, String>();
-		paramsMap.put("style", "height:135px");
+		//paramsMap.put("style", "height:135px");
 		paramsMap.put("id", fieldName);
-		StringBuilder[] sb = node.defaultHtmlInput("div", "", paramsMap);
+		StringBuilder[] sb = node.defaultHtmlInput("div", "pfiw_sigBox", paramsMap);
 		ret.append(sb[0]);
 		
 		
@@ -484,7 +484,7 @@ public class FormInputTemplates {
 			innerImgNode._formGenerator = node._formGenerator;
 			innerImgNode.put("type", "image");
 			innerImgNode.put("relativePath", sigValue);
-			innerImgNode.put("style", "height:80px");
+			//innerImgNode.put("style", "height:80px");
 			
 			sigImgString = innerImgNode.fullHtml(false);
 			

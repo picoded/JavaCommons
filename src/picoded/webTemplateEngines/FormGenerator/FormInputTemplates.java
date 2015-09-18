@@ -491,10 +491,10 @@ public class FormInputTemplates {
 		}
 		
 		if(!displayMode){
-			ret.append("<h3 class=\"pfi_input pfi_inputSigDate\" id=\""+dateInputId+"\" value=\""+dateValue+"\">"+textString+"</h3>");
+			ret.append("<h3 class=\"pfi_input pfi_inputSigDate\" name=\""+dateInputId+"\" id=\""+dateInputId+"\" value=\""+dateValue+"\">"+textString+"</h3>");
 		}else{
 			if(!dateValue.isEmpty()){
-				ret.append("<h3 class=\"pfi_input pfi_inputSigDate\" id=\""+dateInputId+"\">"+textString+"</h3>");
+				ret.append("<h3 class=\"pfi_input pfi_inputSigDate\" name=\""+dateInputId+"\" id=\""+dateInputId+"\">"+textString+"</h3>");
 			}
 		}
 		

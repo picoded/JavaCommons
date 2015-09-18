@@ -450,6 +450,15 @@ public class FormInputTemplates {
 	protected static StringBuilder signature(FormNode node, boolean displayMode){
 		StringBuilder ret = new StringBuilder();
 		
+		String fieldName = node.getFieldName();
+		
+		Map<String, String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("style", "height:135px");
+		paramsMap.put("id", fieldName);
+		StringBuilder[] sb = node.defaultHtmlInput("div", "", paramsMap);
+		ret.append(sb[0]);
+		
+		
 		String sigValue = node.getStringValue();//will return a file path, e.g. output/outPNG_siga.png
 		StringBuilder sigImgString = new StringBuilder();
 		if(sigValue != null && !sigValue.isEmpty()){
@@ -460,16 +469,11 @@ public class FormInputTemplates {
 			innerImgNode.put("relativePath", sigValue);
 			
 			sigImgString = innerImgNode.fullHtml(false);
-		}
-		
-		String fieldName = node.getFieldName();
-		ret.append("<div class=\"pfi_signatureDisplay\" name=\""+fieldName+"\" id=\""+fieldName+"\" style=\"height:135px;\">");
-		
-		if(sigValue != null && !sigValue.isEmpty()){
+			
 			ret.append(sigImgString);
 		}
 		
-		ret.append("</div>");
+		ret.append(sb[1]);
 		
 		String dateInputId = fieldName+"_date";
 		String textString = "Click along the line to sign.";
@@ -487,10 +491,10 @@ public class FormInputTemplates {
 		}
 		
 		if(!displayMode){
-			ret.append("<h3 inputClass=\"pfi_input\" id=\""+dateInputId+"\" value=\""+dateValue+"\">"+textString+"</h3>");
+			ret.append("<h3 class=\"pfi_input pfi_inputSigDate\" id=\""+dateInputId+"\" value=\""+dateValue+"\">"+textString+"</h3>");
 		}else{
 			if(!dateValue.isEmpty()){
-				ret.append("<h3 inputClass=\"pfi_input\" id=\""+dateInputId+"\">"+textString+"</h3>");
+				ret.append("<h3 class=\"pfi_input pfi_inputSigDate\" id=\""+dateInputId+"\">"+textString+"</h3>");
 			}
 		}
 		

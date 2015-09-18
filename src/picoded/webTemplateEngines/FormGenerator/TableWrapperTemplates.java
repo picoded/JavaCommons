@@ -126,7 +126,6 @@ public class TableWrapperTemplates {
 				break;
 			}
 			
-//			ret.append("<tr>");
 			ret.append("<tr class='"+node.prefix_childWrapper()+"row_"+row+"'>");
 			//
 			// Row Header handling 
@@ -389,9 +388,29 @@ public class TableWrapperTemplates {
 		
 		Object fieldValue = node.getRawFieldValue();
 		List<Map<String,Object>> childrenDefinition = node.childrenDefinition();
-		List<Object> dataRows = (fieldValue instanceof List)? (List<Object>)fieldValue : null;
+		List<Object> valueRows = (fieldValue instanceof List)? (List<Object>)fieldValue : null;
 		
-		if(dataRows != null) {
+		//
+		// Minimum rows iteration check
+		// @TODO Maximum iteration check
+		//
+		int minIteration = node.getInt("min-iteration", 0);
+		if(minIteration > 0) {
+			List<Object> tmpRows = new ArrayList<Object>();
+			if(valueRows != null) {
+				tmpRows.addAll(valueRows);
+			}
+			while(tmpRows.size() < minIteration) {
+				tmpRows.add(new HashMap<String,Object>());
+			}
+			valueRows = tmpRows;
+		}
+		
+		//
+		// Return the value rows lamda if not null
+		//
+		if(valueRows != null) {
+			final List<Object> dataRows = valueRows;
 			return (row,col) -> {
 				//
 				// Terminate the rows, when last row is done
@@ -415,8 +434,6 @@ public class TableWrapperTemplates {
 				//sam single tier "fix"
 				int tierNumber = 0;
 				if(node.getString("type").equalsIgnoreCase("table")){
-					tierNumber = col;
-				}else{
 					tierNumber = row;
 				}
 				

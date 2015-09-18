@@ -292,7 +292,7 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("checkboxPDFOutput", jsonTemplatedOutput));
 	}
 	
-//	@Test
+	@Test
 	public void tableTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("table", false);
 		String rawHtmlString = getHtmlString("table");
@@ -329,7 +329,7 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("tablePDFOutput", jsonTemplatedOutput));
 	}
 	
-//	@Test
+	@Test
 	public void verticalTableTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("verticalTable", false);
 		String rawHtmlString = getHtmlString("verticalTable");
@@ -387,7 +387,7 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("imagePDFOutput", jsonTemplatedOutput));
 	}
 	
-	@Test
+//	@Test
 	public void signatureTest(){
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("signature", false);
 		assertNotNull(jsonTemplatedOutput);

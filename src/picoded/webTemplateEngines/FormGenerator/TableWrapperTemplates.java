@@ -432,10 +432,7 @@ public class TableWrapperTemplates {
 				Map<String,Object> child = childrenDefinition.get(col);
 				
 				//sam single tier "fix"
-				int tierNumber = 0;
-				if(node.getString("type").equalsIgnoreCase("table")){
-					tierNumber = row;
-				}
+				int tierNumber = row;
 				
 				FormNode childNode = new FormNode( node._formGenerator, child,  rowMap);
 				String currentNodeName = node.getFieldName();
@@ -443,13 +440,6 @@ public class TableWrapperTemplates {
 				if(currentNodeName != null && !currentNodeName.isEmpty()){
 					childNode.namePrefix = currentNodeName + "[" + tierNumber + "].";
 				}
-//				Map<String, Object> tempChild = new HashMap<String, Object>(child);
-//				String fieldName = (String)tempChild.get("field");
-//				if(fieldName != null && !fieldName.isEmpty()){
-//					
-//					fieldName = node.getFieldName() + "[" + tierNumber + "]." + fieldName;
-//					tempChild.put("field", fieldName);
-//				}
 				//and sam "fix"
 				
 				//

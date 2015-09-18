@@ -173,17 +173,19 @@ public class FormInputTemplates {
 	
 	@SuppressWarnings("unchecked")
 	protected static StringBuilder createCheckbox(FormNode node, boolean displayMode, String pfiClass){
-				
+		
 		CaseInsensitiveHashMap<String,String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		paramMap.put(HtmlTag.TYPE, JsonKeys.CHECKBOX);
 		
 		List<String> checkboxSelections = new ArrayList<String>();
 		if(!node.getFieldName().isEmpty()){
 			Object nodeDefaultVal = node.getRawFieldValue();
+
 			if(nodeDefaultVal != null){
 				if(nodeDefaultVal instanceof String){
-					if(((String)nodeDefaultVal).contains("[")){
-						List<Object> nodeValMap = ConvertJSON.toList((String)nodeDefaultVal);
+					String nodeValString = (String)nodeDefaultVal;
+					if(nodeValString.contains("[")){
+						List<Object> nodeValMap = ConvertJSON.toList(nodeValString);
 						for(Object obj : nodeValMap){
 							String sanitisedSelection = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators((String)obj);
 							sanitisedSelection = RegexUtils.removeAllWhiteSpace(sanitisedSelection);
@@ -271,7 +273,16 @@ public class FormInputTemplates {
 		}
 		
 		//generate hidden input here
-		String hiddenInputTag = "<input type=\"text\" class=\"pfi_input\" style=\"display:none\" name=\""+realName+"\"></input>";
+		String jsonValue = "";
+		if(checkboxSelections != null){
+			jsonValue = ConvertJSON.fromList(checkboxSelections);
+		}
+		String hiddenInputTag = "";
+		if(checkboxSelections != null && checkboxSelections.size() > 0){
+			hiddenInputTag = "<input type=\"text\" class=\"pfi_input\" style=\"display:none\" name=\""+realName+"\" value='"+jsonValue+"'></input>";
+		}else{
+			hiddenInputTag = "<input type=\"text\" class=\"pfi_input\" style=\"display:none\" name=\""+realName+"\"></input>";
+		}
 		StringBuilder[] wrapper = tempNode.defaultHtmlInput( HtmlTag.DIV, pfiClass, null );
 		ret = wrapper[0].append(ret);
 		ret.append(hiddenInputTag);

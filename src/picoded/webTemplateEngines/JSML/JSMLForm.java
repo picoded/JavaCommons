@@ -438,27 +438,8 @@ public class JSMLForm {
 	public byte[] generatePDF(Map<String, Object> data, String pdfGeneratorContextFolder){
 		StringBuilder ret = new StringBuilder();
 		
-		//DEBUG CODE
-		System.out.println("Data unsanitised");
-		System.out.println("----------------------------------------------------------------------");
-		for(String str : data.keySet()){
-			System.out.println(str + "--" +data.get(str));
-		}
-		System.out.println("----------------------------------------------------------------------");
-		//DEBUG CODE
-		
-		
 		data = sanitiseMap(data, "", true);
-		
-		//DEBUG CODE
-		System.out.println("Data SANITISED");
-		System.out.println("----------------------------------------------------------------------");
-		for(String str : data.keySet()){
-			System.out.println(str + "--" +data.get(str));
-		}
-		System.out.println("----------------------------------------------------------------------");
-		//DEBUG CODE
-		
+
 		if(!_formDefinitionString.isEmpty()){
 			ret = formGen.build(_formDefinitionString, data, true);
 		}else{

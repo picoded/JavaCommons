@@ -314,17 +314,17 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 					}
 					
 					// PDF link test mode
-					// if( reqMode.equalsIgnoreCase("pdfTest") ) {
-					// 	formParams = formDataFromRequest( page, form );
-					// 	String[] pdfTestResults = form.getPDFLinkTest(formParams);
+					if( reqMode.equalsIgnoreCase("pdfTest") ) {
+					 	formParams = formDataFromRequest( page, form );
+					 	String[] pdfTestResults = form.getPDFLinkTest(formParams);
 						
-					// 	for(String str : pdfTestResults){
-					// 		page.getWriter().println( str );
-					// 		page.getWriter().println( "-----------------" );
-					// 	}
+					 	for(String str : pdfTestResults){
+					 		page.getWriter().println( str );
+					 		page.getWriter().println( "-----------------" );
+					 	}
 						
-					// 	return;
-					// }
+					 	return;
+					 }
 				}
 			}
 			

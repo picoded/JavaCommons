@@ -388,5 +388,10 @@
 			</junit>
 		</jacoco:coverage>
 	</target>
+	
+	<!--Sams own targets -->
+	<target name="b">
+		<antcall target="build-src"></antcall>
+	</target>
 
 </project>

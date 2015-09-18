@@ -177,7 +177,7 @@ public class JSMLForm {
 	}
 	
 	public void setDefinition(Map<String, Object> inFormDefinition){
-		_formDefinitionMap = sanitiseMap(inFormDefinition, false);
+		_formDefinitionMap = sanitiseMap(inFormDefinition, "", false);
 	}
 	
 	public Map<String, Object> getBlankData(){
@@ -269,7 +269,7 @@ public class JSMLForm {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected Map<String, Object> sanitiseMap(Map<String, Object> inMap, boolean pdfMode){
+	protected Map<String, Object> sanitiseMap(Map<String, Object> inMap, String inKey, boolean pdfMode){
 		if(inMap == null){
 			return inMap;
 		}
@@ -277,12 +277,17 @@ public class JSMLForm {
 		for(String key : inMap.keySet()){
 			Object value = inMap.get(key);
 			
+			String innerKey = key;
+			if(inKey != null && !inKey.isEmpty()){
+				innerKey = inKey + "." + key;
+			}
+			
 			if(value instanceof String){
-				tempMap.replace(key, sanitiseString((String)value, key, pdfMode));
+				tempMap.replace(key, sanitiseString((String)value, innerKey, pdfMode));
 			}else if(value instanceof List){
-				tempMap.replace(key,  sanitiseList((List<Object>)value, pdfMode));
+				tempMap.replace(key,  sanitiseList((List<Object>)value, innerKey, pdfMode));
 			}else if(value instanceof Map){
-				tempMap.replace(key, sanitiseMap((Map<String, Object>)value, pdfMode));
+				tempMap.replace(key, sanitiseMap((Map<String, Object>)value, innerKey, pdfMode));
 			}
 		}
 		
@@ -290,19 +295,29 @@ public class JSMLForm {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected List<Object> sanitiseList(List<Object> inList, boolean pdfMode){
+	protected List<Object> sanitiseList(List<Object> inList, String key, boolean pdfMode){
 		List<Object> tempList = new ArrayList<Object>(inList);
 		
 		for(int i = 0; i < inList.size(); ++i){
+			
+			String keyWithIndex = "";
+			if(key != null && !key.isEmpty()){
+				keyWithIndex = key + "[" + i + "]";
+			}
+			
 			if(inList.get(i) instanceof String){
 				tempList.remove(i);
-				tempList.add(i, sanitiseString((String)inList.get(i), "", pdfMode));
+				String val = (String)inList.get(i);
+				if(!keyWithIndex.isEmpty()){
+					keyWithIndex += ".";
+				}
+				tempList.add(i, sanitiseString(val, keyWithIndex+val, pdfMode));
 			}else if(inList.get(i) instanceof List){
 				tempList.remove(i);
-				tempList.add(i, sanitiseList((List<Object>)inList.get(i), pdfMode));
+				tempList.add(i, sanitiseList((List<Object>)inList.get(i), keyWithIndex, pdfMode));
 			}else if(inList.get(i) instanceof Map){
 				tempList.remove(i);
-				tempList.add(i, sanitiseMap((Map<String, Object>)inList.get(i), pdfMode));
+				tempList.add(i, sanitiseMap((Map<String, Object>)inList.get(i), keyWithIndex, pdfMode));
 			}
 		}
 		
@@ -386,7 +401,7 @@ public class JSMLForm {
 		StringBuilder ret = new StringBuilder();
 		
 		try{
-			data = sanitiseMap(data, false);
+			data = sanitiseMap(data, "", false);
 		}catch(Exception e){
 			throw new RuntimeException(e.getMessage());
 		}
@@ -423,7 +438,26 @@ public class JSMLForm {
 	public byte[] generatePDF(Map<String, Object> data, String pdfGeneratorContextFolder){
 		StringBuilder ret = new StringBuilder();
 		
-		data = sanitiseMap(data, true);
+		//DEBUG CODE
+		System.out.println("Data unsanitised");
+		System.out.println("----------------------------------------------------------------------");
+		for(String str : data.keySet()){
+			System.out.println(str + "--" +data.get(str));
+		}
+		System.out.println("----------------------------------------------------------------------");
+		//DEBUG CODE
+		
+		
+		data = sanitiseMap(data, "", true);
+		
+		//DEBUG CODE
+		System.out.println("Data SANITISED");
+		System.out.println("----------------------------------------------------------------------");
+		for(String str : data.keySet()){
+			System.out.println(str + "--" +data.get(str));
+		}
+		System.out.println("----------------------------------------------------------------------");
+		//DEBUG CODE
 		
 		if(!_formDefinitionString.isEmpty()){
 			ret = formGen.build(_formDefinitionString, data, true);
@@ -462,7 +496,7 @@ public class JSMLForm {
 	public String[] getPDFLinkTest(Map<String, Object> data){
 		String[] values = new String[5];
 		
-		data = sanitiseMap(data, true);
+		data = sanitiseMap(data, "", true);
 		validateTempFolder();
 		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/pdf/generatedPDF.pdf";
 		

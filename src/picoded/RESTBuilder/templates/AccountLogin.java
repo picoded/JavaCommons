@@ -5,6 +5,8 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import com.amazonaws.services.ec2.model.AccountAttributeName;
+
 import picoded.RESTBuilder.*;
 import picoded.JStack.*;
 import picoded.JStruct.*;
@@ -1339,7 +1341,6 @@ public class AccountLogin extends BasePage {
 		///
 		/// Creates a new account in the table
 		/// 
-		///
 		/// ## HTTP Request Parameters
 		///
 		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -1348,6 +1349,7 @@ public class AccountLogin extends BasePage {
 		/// | meta            | {Object} Map<S, O>    | Meta object that represents this account                                   |
 		/// | password        | String      	      | Password of new account                                                    |
 		/// | username        | String                | Username of new account                                                    |
+		/// | isGroup         | boolean (optional)    | whether this is a group object (defaults to false)                         |
 		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 		/// 
 		/// ## JSON Object Output Parameters
@@ -1367,6 +1369,8 @@ public class AccountLogin extends BasePage {
 			return prepareAuthenticatedREST( req, res,
 				(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
 					
+					boolean isGroup = req.getBoolean("isGroup", false);
+					
 					String userName = req.getString("username");
 					if(userName == null || userName.isEmpty()){
 						res.put("error", "No username was supplied");
@@ -1374,7 +1378,7 @@ public class AccountLogin extends BasePage {
 					}
 						
 					String password = req.getString("password");
-					if(password == null || password.isEmpty()){
+					if(!isGroup && (password == null || password.isEmpty())){
 						res.put("error", "No password was supplied");
 						return resMap;
 					}
@@ -1389,20 +1393,105 @@ public class AccountLogin extends BasePage {
 						}
 					}
 					
+					
+					
 					AccountObject newAccount = accountTableObj.newObject(userName);
-					newAccount.putAll(givenMetaObj);
-					newAccount.saveAll();
-					
-					res.put("meta", newAccount);
-					res.put("accountID", newAccount._oid());
-					
-					System.out.println("Returning from new_account_POST");
+					if(newAccount != null){
+						if(isGroup){
+							newAccount.setGroupStatus(true);
+						}
+						
+						newAccount.putAll(givenMetaObj);
+						newAccount.saveAll();
+						
+						res.put("meta", newAccount);
+						res.put("accountID", newAccount._oid());
+					}else{
+						res.put("error", "Object already exists in account Table");
+					}
 					
 					return resMap;
 				}
 			);
 		};
 	
+		
+		/// # delete [POST]
+		///
+		/// Deletes an account
+		/// 
+		/// ## HTTP Request Parameters
+		///
+		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+		/// | Parameter Name  | Variable Type	      | Description                                                                |
+		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+		/// | accountID       | String (optional)     | Account ID to delete from accounts table                                   |
+		/// | accountName     | String (optional      | Account Name to delete from accounts table                                 |
+		/// | Be warned, passing both will result in an error unless they match to the same account                                |
+		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+		/// 
+		/// ## JSON Object Output Parameters
+		///
+		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+		/// | Parameter Name  | Variable Type	      | Description                                                                |
+		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+		/// | accountID       | String                | account ID used                                                            |
+		/// | accountName     | String                | account Name used                                                          |
+		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+		/// | error           | String (Optional)     | Errors encounted if any                                                    |
+		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+		///
+		public static RESTFunction delete_account_POST = (req, res) -> {
+			// Only runs function if logged in, and valid group object
+			return prepareAuthenticatedREST( req, res,
+				(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+					
+					String accountID = req.getString("accountID");
+					String accountName = req.getString("accountName");
+					
+					if((accountID == null || accountID.isEmpty())
+							&& (accountName == null || accountName.isEmpty())){
+						res.put("error", "Both accountID and accountName were not supplied");
+						return resMap;
+					}
+					
+					res.put("accountID", accountID);
+					res.put("accountName", accountName);
+					
+					try{
+						AccountObject accObj = null;
+						if(!accountID.isEmpty()){
+							accObj = accountTableObj.getFromID(accountID);
+							
+							if(!accountName.isEmpty()){
+								if(!accObj.getNames().contains(accountName)){
+									res.put("error", "accountName given does not match the names found for this account - delete unsuccessful");
+									return resMap;
+								}
+							}
+							
+							accountTableObj.removeFromID(accountID);
+							
+						}else if(!accountName.isEmpty()){
+							accObj = accountTableObj.getFromName(accountName);
+							
+							if(!accountID.isEmpty()){
+								if(!accObj._oid().equals(accountID)){
+									res.put("error", "accountID given does not match the accounts _oid - delete unsuccessful");
+									return resMap;
+								}
+							}
+							
+							accountTableObj.removeFromName(accountName);
+						}
+					}catch(Exception e){
+						res.put("error", "Remove from table is currently not implemented. Stare at Eugene until this is fixed.");
+					}
+					
+					return resMap;
+				}
+			);
+		};
 	//-------------------------------------------------------------------------------------------------------------------------
 	//
 	// Work in progress (not final) end
@@ -1444,6 +1533,7 @@ public class AccountLogin extends BasePage {
 		rb.getNamespace( setPrefix + "members/meta/*/*" ).put( HttpRequestType.POST, members_meta_POST );
 		
 		rb.getNamespace( setPrefix + "new" ).put( HttpRequestType.POST, new_account_POST );
+		rb.getNamespace( setPrefix + "delete" ).put( HttpRequestType.POST, delete_account_POST );
 		
 		//MetaTableApiBuilder Fall through
 		rb.getNamespace( setPrefix + "meta/list" ).put( HttpRequestType.GET, list_GET_and_POST );

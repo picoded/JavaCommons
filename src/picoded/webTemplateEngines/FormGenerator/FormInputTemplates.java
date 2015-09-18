@@ -435,6 +435,12 @@ public class FormInputTemplates {
 		}
 		params.put("src", srcPath);
 		
+		String styleString = "";
+		if(node.containsKey("style")){
+			styleString = node.getString("style");
+			params.put("style", styleString);
+		}
+		
 		StringBuilder[] inputArr = node.defaultHtmlInput("img", "pfi_image", params );
 		
 		ret.append(inputArr[0]);
@@ -467,6 +473,7 @@ public class FormInputTemplates {
 			innerImgNode._formGenerator = node._formGenerator;
 			innerImgNode.put("type", "image");
 			innerImgNode.put("relativePath", sigValue);
+			innerImgNode.put("style", "height:80px");
 			
 			sigImgString = innerImgNode.fullHtml(false);
 			

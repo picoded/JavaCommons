@@ -918,6 +918,7 @@ public class AccountLogin extends BasePage {
 	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
 	/// | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
 	/// | length          | int (optional)     | Default max: The number of records to return                                  |
+	/// | groupID         | String (optional)  | group ID used in the request instead of inside URI                            | not implemented
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | headers         | String[](optional) | Default ["_oid", "name", "role"], the collumns to return                      |
 	/// | If a header element contains an "account_" prefix, take the data from the curren                   
@@ -981,16 +982,16 @@ public class AccountLogin extends BasePage {
 							}else if(header.equalsIgnoreCase("role")){
 								String role = groupObj.getMemberRole(accObj);
 								retList.get(listCounter).add(role);
-							} else if(header.toLowerCase().contains("account_")) {
-								String headerSuffix = header.substring(0, "account_".length());
+							} else if(header.toLowerCase().startsWith("account_")) {
+								String headerSuffix = header.substring("account_".length());
 								Object rawObj = accObj.get(headerSuffix);
 								if(rawObj != null){
 									retList.get(listCounter).add(rawObj);
 								}else{
 									retList.get(listCounter).add("");
 								}
-							} else if (header.toLowerCase().contains("group_")) {
-								String headerSuffix = header.substring(0, "group_".length());
+							} else if (header.toLowerCase().startsWith("group_")) {
+								String headerSuffix = header.substring("group_".length());
 								Object rawObj = groupObj.get(headerSuffix);
 								if(rawObj != null){
 									retList.get(listCounter).add(rawObj);

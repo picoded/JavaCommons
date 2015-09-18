@@ -331,9 +331,10 @@ public class FormWrapperTemplates {
 		
 		String fieldValue = node.getFieldName();
 		
-		//need to process any square brackets if not javascript wont like it
-		fieldValue.replace("[", "\\[");
-		fieldValue.replace("]", "\\]");
+		//need to process any square brackets or fullstops if not javascript wont like it
+		fieldValue = fieldValue.replace("[", "\\\\[");
+		fieldValue = fieldValue.replace("]", "\\\\]");
+		fieldValue = fieldValue.replace(".", "\\\\.");
 		
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("onclick", "showSignatureBox('#"+fieldValue+"')"); //hardcoded function name as it will be part of the prefix, and standardised

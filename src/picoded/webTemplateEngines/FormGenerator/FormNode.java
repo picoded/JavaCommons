@@ -671,7 +671,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		Object val = getRawValue(fieldName);
 		
 		if( val != null ) {
-			return GenericConvert.toString( getRawFieldValue() );
+			return GenericConvert.toString( val );
 		}
 		return "";
 	}

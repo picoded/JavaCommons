@@ -389,7 +389,7 @@ public class FormInputTemplates_test {
 	
 	@Test
 	public void signatureTest(){
-		String jsonTemplatedOutput = getTemplatedJsonStringWithData("signature", true);
+		String jsonTemplatedOutput = getTemplatedJsonStringWithData("signature", false);
 		assertNotNull(jsonTemplatedOutput);
 		
 		File prefix = new File("./test-files/test-specific/htmlGenerator/signature/prefix.html");
@@ -443,7 +443,7 @@ public class FormInputTemplates_test {
 		System.out.println(result);
 	}
 	
-	@Test
+//	@Test
 	public void sanityTest(){
 		
 		Map<String, Object> inputValue = new HashMap<String, Object>();

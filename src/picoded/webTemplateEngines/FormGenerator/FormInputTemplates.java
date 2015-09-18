@@ -457,7 +457,6 @@ public class FormInputTemplates {
 			innerImgNode._inputValue = node._inputValue;
 			innerImgNode._formGenerator = node._formGenerator;
 			innerImgNode.put("type", "image");
-			//innerImgNode.put("inputCss", "height:80px");
 			innerImgNode.put("relativePath", sigValue);
 			
 			sigImgString = innerImgNode.fullHtml(false);
@@ -472,8 +471,27 @@ public class FormInputTemplates {
 		
 		ret.append("</div>");
 		
+		String dateInputId = fieldName+"_date";
+		String textString = "Click along the line to sign.";
+		String dateValue = "";
+		
+		if(sigValue != null && !sigValue.isEmpty()){
+			dateValue = node.getStringValue(dateInputId);
+			if(dateValue != null && !dateValue.isEmpty()){
+				dateValue = sanitiseYMDDateString(dateValue);
+				
+				if(!dateValue.isEmpty()){
+					textString = "Signed on: " + dateValue;
+				}
+			}
+		}
+		
 		if(!displayMode){
-			ret.append("<h3>Click along the line to sign.</h3>");
+			ret.append("<h3 inputClass=\"pfi_input\" id=\""+dateInputId+"\" value=\""+dateValue+"\">"+textString+"</h3>");
+		}else{
+			if(!dateValue.isEmpty()){
+				ret.append("<h3 inputClass=\"pfi_input\" id=\""+dateInputId+"\">"+textString+"</h3>");
+			}
 		}
 		
 		return ret;

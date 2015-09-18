@@ -27,9 +27,9 @@ public class FormInputTemplates {
 		String fieldValue = node.getStringValue();
 		
 		String textAndField = text+fieldValue;
-		if(textAndField == null || textAndField.length() <= 0) {
-			return new StringBuilder();
-		}
+		// if(textAndField == null || textAndField.length() <= 0) {
+		// 	return new StringBuilder();
+		// }
 		
 		StringBuilder[] sbArr = node.defaultHtmlInput( HtmlTag.DIV, pfiClass, null );
 		return sbArr[0].append(textAndField).append(sbArr[1]);

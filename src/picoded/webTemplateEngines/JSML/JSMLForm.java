@@ -12,6 +12,7 @@ import org.lesscss.deps.org.apache.commons.io.FileUtils;
 import picoded.conv.ConvertJSON;
 import picoded.conv.GUID;
 import picoded.conv.MapValueConv;
+import picoded.fileUtils.DeleteFilesByAge;
 import picoded.fileUtils.PDFGenerator;
 import picoded.webTemplateEngines.FormGenerator.*;
 
@@ -496,5 +497,10 @@ public class JSMLForm {
 		values[4] = "Final html output is -> " + ret.toString();
 		
 		return values;
+	}
+	
+	public void clearTempFilesOlderThenGivenAgeInSeconds(long time) {
+		String tempFolder = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID;
+		DeleteFilesByAge.olderThenGivenAgeInSeconds(tempFolder, time);
 	}
 }

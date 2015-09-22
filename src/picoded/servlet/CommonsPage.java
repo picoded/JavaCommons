@@ -72,9 +72,22 @@ public class CommonsPage extends BasePage {
 			if( wildcardUri[0].equalsIgnoreCase("common") || wildcardUri[0].equalsIgnoreCase("index") ) {
 				return true;
 			}
-			// Exempt API from auth
+			// Exempt login API from auth
 			if( wildcardUri[0].equalsIgnoreCase("api") ) {
-				return true;
+				if(wildcardUri.length >= 3 &&
+					wildcardUri[1].equalsIgnoreCase("account") && 
+					wildcardUri[2].equalsIgnoreCase("login")) {
+					return true;
+				} 
+				
+				// Throw a login error
+				if( currentAccount() == null ) {
+					
+					getHttpServletResponse().setContentType("application/javascript");
+					getWriter().println( "{ \"error\" : \"Missing User Login\" }" );
+					
+					return false;
+				}
 			}
 			
 			// File exemptions

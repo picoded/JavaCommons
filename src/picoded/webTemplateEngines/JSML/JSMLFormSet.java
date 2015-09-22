@@ -132,10 +132,16 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 		return (_folderNameListCache = ret);
 	}
 	
+	/// Deletes the files from the temp folder older than one hour.
 	public void clearTempFiles() {
 	    long time = 60 * 60; // one hour
+		clearTempFiles( time );
+	}
+	
+	/// Deletes the files from the temp folder older than specified time.
+	public void clearTempFiles(long seconds) {
 		for(String name : keySet() ) {
-			get( name ).clearTempFilesOlderThenGivenAgeInSeconds( time );
+			get( name ).clearTempFilesOlderThenGivenAgeInSeconds( seconds );
 		}
 	}
 	///////////////////////////////////////////////////////
@@ -155,7 +161,6 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 			return null;
 		}
 		String keyStr = key.toString();
-		
 		JSMLForm newForm = new JSMLForm( new File(formSetFolder, keyStr), formSetURI+"/"+keyStr+"/" , null );
 		newForm.setFormSet(this);
 		

@@ -499,8 +499,9 @@ public class JSMLForm {
 		return values;
 	}
 	
+	/// Deletes the files from the temp folder older than specified time.
 	public void clearTempFilesOlderThenGivenAgeInSeconds(long time) {
-		String tempFolder = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID;
+		String tempFolder = _formFolderPath + "/" + _tempFolderPath;
 		DeleteFilesByAge.olderThenGivenAgeInSeconds(tempFolder, time);
 	}
 }

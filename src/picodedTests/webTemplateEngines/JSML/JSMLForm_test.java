@@ -151,4 +151,32 @@ public class JSMLForm_test{
 			
 		}
 	}
+	
+	@Test
+	public void clearTempFilesTest(){
+		jsmlForm = jsmlFormSet.get("main");
+		
+		jsmlFormSet.clearTempFiles();
+		
+		int count  = 0;
+		fileCount(tempFolder, count);
+		
+		assertEquals(0, count);
+	}
+	
+    private void fileCount(String dirPath, int count) {
+		File folder = new File(dirPath);
+		File[] files = folder.listFiles();
+		
+		if (files != null)
+			for (int i = 0; i < files.length; i++) {
+				
+				if (files[i].isDirectory()) {
+					fileCount(files[i].getAbsolutePath(), count);
+				} else {
+					count++;
+				}
+		}
+    }
+    
 }

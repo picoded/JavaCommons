@@ -1,7 +1,9 @@
 package picodedTests.webTemplateEngines.JSML;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 import org.junit.*;
@@ -26,7 +28,7 @@ public class JSMLForm_test{
 	
 	static String rootFolder = "./test-files/test-specific/htmlGenerator/JSML"; //absolute root folder path
 	static String contextFolder = "./test-files/test-specific/htmlGenerator/JSML";
-	static String tempFolder = rootFolder + "/tmp"; //absolute path to resource folder
+	static String tempFolder = "tmp"; //absolute path to resource folder
 	
 	@BeforeClass
 	public static void classSetUp(){
@@ -154,12 +156,18 @@ public class JSMLForm_test{
 	
 	@Test
 	public void clearTempFilesTest(){
-		jsmlForm = jsmlFormSet.get("main");
+		//jsmlForm = jsmlFormSet.get("main");
+		String tmpFolderPath  = rootFolder + "/" + tempFolder;
 		
+		// create a file in temp folder
+		createFile(tmpFolderPath);
+		
+		// clear the temp folder
 		jsmlFormSet.clearTempFiles();
+		//jsmlForm.clearTempFilesOlderThenGivenAgeInSeconds(1);
 		
 		int count  = 0;
-		fileCount(tempFolder, count);
+		fileCount(tmpFolderPath, count);
 		
 		assertEquals(0, count);
 	}
@@ -176,6 +184,29 @@ public class JSMLForm_test{
 				} else {
 					count++;
 				}
+		}
+    }
+	
+    private void createFile(String dirPath) {
+		BufferedWriter fileWriter = null;
+		try {
+			File dirFile = new File(dirPath);
+			if(!dirFile.exists()){
+				dirFile.mkdirs();
+			}
+			// Create file
+			fileWriter = new BufferedWriter(new FileWriter(dirPath + "/test.txt"));
+			// Write to output stream
+			fileWriter.write("Hello Java");
+		} catch(IOException ioe) {
+			ioe.printStackTrace();
+		} finally {
+			// Close the output stream
+			if (fileWriter != null) {
+				try {
+					fileWriter.close();
+				} catch(Exception e) {}
+			}
 		}
     }
     

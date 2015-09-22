@@ -952,7 +952,7 @@ public class AccountLogin extends BasePage {
 		// Only runs function if logged in, and valid group object
 		return fetchGroupObject_fromFirstWildcard_orCurrentUser( req, res, false,
 			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
-				res.put("data", null);
+				res.put("data", new ArrayList<Object>()); //blank array as default
 				res.put("draw", null);
 				res.put("headers", null);
 				res.put("error", null);
@@ -1051,7 +1051,7 @@ public class AccountLogin extends BasePage {
 	/// | groupID_admin   | boolean               | indicates if the session has admin rights                                  |
 	/// | groupID_names   | String[]              | the group various names, if ID is valid                                    |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | setMembers      | { Map } (optional)    | { memberID : role } : Array of member ID/roles set                         |
+	/// | setMembers      | { Map } (optional)    | { memberID : role } : Array of member ID/roles set                         |
 	/// | delMembers      | String[]   (optional) | [ memberID, ... ] : Array of member ID's deleted                           |
 	/// | success         | boolean               | indicator if logout is successful or not                                   |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -1068,7 +1068,7 @@ public class AccountLogin extends BasePage {
 				res.put("delMembers", null);
 				res.put("error", null);
 				
-				if(groupObj == null){
+				if(groupObj == null) {
 					return resMap;
 				}
 				
@@ -1337,161 +1337,164 @@ public class AccountLogin extends BasePage {
 	//
 	//-------------------------------------------------------------------------------------------------------------------------
 	///
-		/// # new [POST]
-		///
-		/// Creates a new account in the table
-		/// 
-		/// ## HTTP Request Parameters
-		///
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		/// | Parameter Name  | Variable Type	      | Description                                                                |
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		/// | meta            | {Object} Map<S, O>    | Meta object that represents this account                                   |
-		/// | password        | String      	      | Password of new account                                                    |
-		/// | username        | String                | Username of new account                                                    |
-		/// | isGroup         | boolean (optional)    | whether this is a group object (defaults to false)                         |
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		/// 
-		/// ## JSON Object Output Parameters
-		///
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		/// | Parameter Name  | Variable Type	      | Description                                                                |
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		/// | accountID       | String                | account ID used                                                            |
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		/// | metaObject      | {Object}              | MetaObject representing this account                                       |
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		/// | error           | String (Optional)     | Errors encounted if any                                                    |
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		///
-		public static RESTFunction new_account_POST = (req, res) -> {
-			// Only runs function if logged in, and valid group object
-			return prepareAuthenticatedREST( req, res,
-				(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
-					
-					boolean isGroup = req.getBoolean("isGroup", false);
-					
-					String userName = req.getString("username");
-					if(userName == null || userName.isEmpty()){
-						res.put("error", "No username was supplied");
-						return resMap;
-					}
-						
-					String password = req.getString("password");
-					if(!isGroup && (password == null || password.isEmpty())){
-						res.put("error", "No password was supplied");
-						return resMap;
-					}
-					
-					Object metaObjRaw = req.get("meta");
-					Map<String, Object> givenMetaObj = new HashMap<String, Object>();
-					if(metaObjRaw instanceof String){
-						String jsonMetaString = (String)metaObjRaw;
-						
-						if(jsonMetaString != null && !jsonMetaString.isEmpty()){
-							givenMetaObj = ConvertJSON.toMap(jsonMetaString);
-						}
-					}
-					
-					
-					
-					AccountObject newAccount = accountTableObj.newObject(userName);
-					if(newAccount != null){
-						if(isGroup){
-							newAccount.setGroupStatus(true);
-						}
-						
-						newAccount.putAll(givenMetaObj);
-						newAccount.saveAll();
-						
-						res.put("meta", newAccount);
-						res.put("accountID", newAccount._oid());
-					}else{
-						res.put("error", "Object already exists in account Table");
-					}
-					
+	/// # new [POST]
+	///
+	/// Creates a new account in the table
+	/// 
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | meta            | {Object} Map<S, O>    | Meta object that represents this account                                   |
+	/// | password        | String      	      | Password of new account                                                    |
+	/// | username        | String                | Username of new account                                                    |
+	/// | isGroup         | boolean (optional)    | whether this is a group object (defaults to false)                         |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// 
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | accountID       | String                | account ID used                                                            |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | metaObject      | {Object}              | MetaObject representing this account                                       |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | error           | String (Optional)     | Errors encounted if any                                                    |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	public static RESTFunction new_account_POST = (req, res) -> {
+		// Only runs function if logged in, and valid group object
+		return prepareAuthenticatedREST( req, res,
+			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				
+				boolean isGroup = req.getBoolean("isGroup", false);
+				
+				String userName = req.getString("username");
+				if(userName == null || userName.isEmpty()){
+					res.put("error", "No username was supplied");
 					return resMap;
 				}
-			);
-		};
+					
+				String password = req.getString("password");
+				if(!isGroup && (password == null || password.isEmpty())){
+					res.put("error", "No password was supplied");
+					return resMap;
+				}
+				
+				Object metaObjRaw = req.get("meta");
+				Map<String, Object> givenMetaObj = new HashMap<String, Object>();
+				if(metaObjRaw instanceof String){
+					String jsonMetaString = (String)metaObjRaw;
+					
+					if(jsonMetaString != null && !jsonMetaString.isEmpty()){
+						givenMetaObj = ConvertJSON.toMap(jsonMetaString);
+					}
+				}
+				
+				AccountObject newAccount = accountTableObj.newObject(userName);
+				if(newAccount != null){
+					
+					// Fixes a perculiar bug, where setting isGroup = true, differs from the system value of '1' instead
+					if(isGroup){
+						newAccount.setGroupStatus(true);
+					}
+					
+					// Put all the given meta values
+					newAccount.putAll(givenMetaObj);
+					
+					newAccount.saveAll();
+					
+					res.put("meta", newAccount);
+					res.put("accountID", newAccount._oid());
+				}else{
+					res.put("error", "Object already exists in account Table");
+				}
+				
+				return resMap;
+			}
+		);
+	};
 	
 		
-		/// # delete [POST]
-		///
-		/// Deletes an account
-		/// 
-		/// ## HTTP Request Parameters
-		///
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		/// | Parameter Name  | Variable Type	      | Description                                                                |
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		/// | accountID       | String (optional)     | Account ID to delete from accounts table                                   |
-		/// | accountName     | String (optional      | Account Name to delete from accounts table                                 |
-		/// | Be warned, passing both will result in an error unless they match to the same account                                |
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		/// 
-		/// ## JSON Object Output Parameters
-		///
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		/// | Parameter Name  | Variable Type	      | Description                                                                |
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		/// | accountID       | String                | account ID used                                                            |
-		/// | accountName     | String                | account Name used                                                          |
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		/// | error           | String (Optional)     | Errors encounted if any                                                    |
-		/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-		///
-		public static RESTFunction delete_account_POST = (req, res) -> {
-			// Only runs function if logged in, and valid group object
-			return prepareAuthenticatedREST( req, res,
-				(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
-					
-					String accountID = req.getString("accountID");
-					String accountName = req.getString("accountName");
-					
-					if((accountID == null || accountID.isEmpty())
-							&& (accountName == null || accountName.isEmpty())){
-						res.put("error", "Both accountID and accountName were not supplied");
-						return resMap;
-					}
-					
-					res.put("accountID", accountID);
-					res.put("accountName", accountName);
-					
-					try{
-						AccountObject accObj = null;
-						if(!accountID.isEmpty()){
-							accObj = accountTableObj.getFromID(accountID);
-							
-							if(!accountName.isEmpty()){
-								if(!accObj.getNames().contains(accountName)){
-									res.put("error", "accountName given does not match the names found for this account - delete unsuccessful");
-									return resMap;
-								}
-							}
-							
-							accountTableObj.removeFromID(accountID);
-							
-						}else if(!accountName.isEmpty()){
-							accObj = accountTableObj.getFromName(accountName);
-							
-							if(!accountID.isEmpty()){
-								if(!accObj._oid().equals(accountID)){
-									res.put("error", "accountID given does not match the accounts _oid - delete unsuccessful");
-									return resMap;
-								}
-							}
-							
-							accountTableObj.removeFromName(accountName);
-						}
-					}catch(Exception e){
-						res.put("error", "Remove from table is currently not implemented. Stare at Eugene until this is fixed.");
-					}
-					
+	/// # delete [POST]
+	///
+	/// Deletes an account
+	/// 
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | accountID       | String (optional)     | Account ID to delete from accounts table                                   |
+	/// | accountName     | String (optional      | Account Name to delete from accounts table                                 |
+	/// | Be warned, passing both will result in an error unless they match to the same account                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// 
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | accountID       | String                | account ID used                                                            |
+	/// | accountName     | String                | account Name used                                                          |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | error           | String (Optional)     | Errors encounted if any                                                    |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	public static RESTFunction delete_account_POST = (req, res) -> {
+		// Only runs function if logged in, and valid group object
+		return prepareAuthenticatedREST( req, res,
+			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				
+				String accountID = req.getString("accountID");
+				String accountName = req.getString("accountName");
+				
+				if((accountID == null || accountID.isEmpty())
+						&& (accountName == null || accountName.isEmpty())){
+					res.put("error", "Both accountID and accountName were not supplied");
 					return resMap;
 				}
-			);
-		};
+				
+				res.put("accountID", accountID);
+				res.put("accountName", accountName);
+				
+				try{
+					AccountObject accObj = null;
+					if(!accountID.isEmpty()){
+						accObj = accountTableObj.getFromID(accountID);
+						
+						if(!accountName.isEmpty()){
+							if(!accObj.getNames().contains(accountName)){
+								res.put("error", "accountName given does not match the names found for this account - delete unsuccessful");
+								return resMap;
+							}
+						}
+						
+						accountTableObj.removeFromID(accountID);
+						
+					}else if(!accountName.isEmpty()){
+						accObj = accountTableObj.getFromName(accountName);
+						
+						if(!accountID.isEmpty()){
+							if(!accObj._oid().equals(accountID)){
+								res.put("error", "accountID given does not match the accounts _oid - delete unsuccessful");
+								return resMap;
+							}
+						}
+						
+						accountTableObj.removeFromName(accountName);
+					}
+				}catch(Exception e){
+					res.put("error", "Remove from table is currently not implemented. Stare at Eugene until this is fixed.");
+				}
+				
+				return resMap;
+			}
+		);
+	};
+	
 	//-------------------------------------------------------------------------------------------------------------------------
 	//
 	// Work in progress (not final) end

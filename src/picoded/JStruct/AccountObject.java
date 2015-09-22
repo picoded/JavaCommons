@@ -173,7 +173,7 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// Returns if set as group
 	public boolean isGroup() {
-		Object status = this.get("isGroup");
+		Object status = super.get("isGroup");
 		if( status instanceof Number && //
 		   ((Number)status).intValue() >= 1 ) {
 			return true;
@@ -186,14 +186,29 @@ public class AccountObject extends JStruct_MetaObject {
 	/// Sets if the account is a group
 	public void setGroupStatus(boolean enabled) {
 		if( enabled ) {
-			this.put("isGroup", new Integer(1));
+			super.put("isGroup", new Integer(1));
 		} else {
-			this.put("isGroup", new Integer(0));
+			super.put("isGroup", new Integer(0));
 			
 			// group_userToRoleMap().clear();
 			// group_userToRoleMap().saveDelta();
 		}
 		this.saveDelta();
+	}
+	
+	// PUT overrides (disable isGroup saving via put)
+	//-------------------------------------------------------------------------
+	
+	@Override
+	public Object put(String key, Object value) {
+		
+		// Ignore the insertion of isGroup value
+		if( key != null && key.equals("isGroup") ) {
+			return isGroup();
+		}
+		
+		// The original put
+		return super.put(key,value);
 	}
 	
 	// Group management of users

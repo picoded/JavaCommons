@@ -2,13 +2,15 @@ package picoded.JStruct;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import picoded.JStruct.internal.*;
+import picoded.JStack.JStackLayer;
 
 ///
 /// Base object, where the respective data structure
 /// implmentation is loaded from.
 ///
-public class JStruct {
+public class JStruct extends JStackLayer {
 	
 	// KeyValueMap handling
 	//----------------------------------------------

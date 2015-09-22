@@ -7,8 +7,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import picoded.JSql.*;
 import picoded.JStruct.*;
 import picoded.struct.*;
-import picoded.security.NxtCrypt;
-import picoded.JStruct.KeyValueMap;
 
 public class JSqlStruct extends JStruct {
 	

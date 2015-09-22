@@ -500,7 +500,8 @@ public class JSMLForm {
 	}
 	
 	public void clearTempFilesOlderThenGivenAgeInSeconds(long time) {
-		String tempFolder = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID;
+//		String tempFolder = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID;
+		String tempFolder = _formFolderPath + "/" + _tempFolderPath;
 		DeleteFilesByAge.olderThenGivenAgeInSeconds(tempFolder, time);
 	}
 }

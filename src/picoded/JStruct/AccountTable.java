@@ -151,7 +151,6 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	}
 	
 	//
-	//
 	// Getters for metaTables
 	// Discouraged from use
 	//
@@ -595,6 +594,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	// Super Users group managment
 	//--------------------------------------------------------------------------
 	
+	/// Default super user group
 	protected String _superUserGroup = "SuperUsers";
 	
 	/// Gets the super user group

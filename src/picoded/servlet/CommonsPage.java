@@ -59,6 +59,13 @@ public class CommonsPage extends BasePage {
 		if( enableCommonWildcardAuth && wildcardUri.length >= 1 ) {
 			// Exempt login page from auth
 			if( wildcardUri[0].equalsIgnoreCase("login") ) {
+				String logout = requestParameters().getString("logout");
+				
+				// Handle page logout event
+				if( logout != null && (logout.equals("1") || logout.equals("true")) ) {
+					accountAuthTable().logoutAccount( getHttpServletRequest(), getHttpServletResponse() );
+				}
+				
 				return true;
 			}
 			// Exempt common / index page from auth
@@ -132,7 +139,7 @@ public class CommonsPage extends BasePage {
 			wildcardUri[0].equalsIgnoreCase("api.js") && //api.js request 
 			JConfig().getBoolean("sys.developersMode.enabled", true) //developerMode
 			) {
-			String apiJS = restBuilder().generateJS( "api", (getContextURI()+"/api").replaceAll("//", "/") ) ;
+			String apiJS = restBuilder().generateJS( "api", (getContextURI()+"/api").replaceAll("//", "/") );
 			FileUtils.writeStringToFile_ifDifferant( new File(getContextPath()+"/api.js"), "UTF-8", apiJS );
 			getHttpServletResponse().setContentType("application/javascript");
 			output.println( apiJS );

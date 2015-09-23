@@ -611,6 +611,9 @@ public class AccountLogin extends BasePage {
 	/// | insideGroup_any | String[](optional) | Default null, else filters for only accounts inside the listed groups ID      |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
+	/// | query           | String (optional)  | Requested Query filter                                                        |
+	/// | queryArgs       | String[] (optional)| Requested Query filter arguments                                              |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | groupStatus     | String (optional)  | Default "both", either "user" or "group". Used to lmit the result set         |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+

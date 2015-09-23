@@ -217,6 +217,13 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 			
 		}
 		
+		//
+		// Disable Input
+		//-----------------------------------
+		if(this.getBoolean("readOnly")){
+			map.put("disabled", "disabled");
+		}
+		
 		// if rawAttributeMap is a MAP
 		
 		// map.putAll( the mmap )

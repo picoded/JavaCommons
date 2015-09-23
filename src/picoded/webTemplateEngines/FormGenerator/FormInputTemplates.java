@@ -47,7 +47,9 @@ public class FormInputTemplates {
 	};
 	
 	protected static FormInputInterface select = (node) -> {
-		StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.SELECT, "pfi_select pfi_input", null);
+		Map<String, String> paramsMap = new HashMap<String, String>();
+		
+		StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.SELECT, "pfi_select pfi_input", paramsMap);
 		StringBuilder ret = sbArr[0];
 		
 		// Prepeare the option key value list
@@ -72,6 +74,7 @@ public class FormInputTemplates {
 	
 	protected static FormInputInterface input_text = (node) -> {
 		CaseInsensitiveHashMap<String, String> paramMap = new CaseInsensitiveHashMap<String, String>();
+		
 		String fieldValue = node.getStringValue();
 		
 		paramMap.put(HtmlTag.TYPE, "text");
@@ -115,6 +118,7 @@ public class FormInputTemplates {
 	
 	protected static StringBuilder dropdownWithOthers(FormNode node, boolean displayMode) {
 		if (!displayMode) {
+			
 			Map<String, String> funcMap = new HashMap<String, String>();
 			String funcName = node.getString(JsonKeys.FUNCTION_NAME, "OnChangeDefaultFuncName");
 			String nodeName = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(node.getString(JsonKeys.FIELD))

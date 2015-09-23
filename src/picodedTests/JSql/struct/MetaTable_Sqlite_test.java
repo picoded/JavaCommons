@@ -32,7 +32,7 @@ public class MetaTable_Sqlite_test extends MetaTable_test {
 	
 	public MetaTable implementationConstructor() {
 		JSqlStruct jsObj = new JSqlStruct(sqlImplmentation());
-		return jsObj.getMetaTable("MT_"+tableName);
+		return jsObj.getMetaTable("MT_" + tableName);
 	}
 	
 }

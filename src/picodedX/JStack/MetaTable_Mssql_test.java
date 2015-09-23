@@ -20,11 +20,8 @@ public class MetaTable_Mssql_test extends MetaTable_Sqlite_test {
 	// JSql override setup
 	//-----------------------------------------------
 	public JSql JSqlObj() {
-		return JSql.mssql(TestConfig.MSSQL_CONN(),
-								TestConfig.MSSQL_NAME(),
-								TestConfig.MSSQL_USER(),
-								TestConfig.MSSQL_PASS()
-								);
+		return JSql.mssql(TestConfig.MSSQL_CONN(), TestConfig.MSSQL_NAME(), TestConfig.MSSQL_USER(),
+			TestConfig.MSSQL_PASS());
 	}
 	
 }

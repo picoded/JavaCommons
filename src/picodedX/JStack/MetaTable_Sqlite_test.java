@@ -19,71 +19,68 @@ import org.apache.commons.lang3.RandomUtils;
 import picodedTests.TestConfig;
 
 public class MetaTable_Sqlite_test extends JStackData_testBase_test {
-
-
+	
 	// Metatable setup
 	//-----------------------------------------------
-
+	
 	protected String mtTableName = null;
-
+	
 	protected MetaTable mtObj = null;
-
+	
 	@Override
 	public void testObjSetup() throws JStackException {
 		mtTableName = "M" + TestConfig.randomTablePrefix();
-
+		
 		mtObj = new MetaTable(JStackObj, mtTableName);
-
+		
 		mtObj.putType("num", new MetaType(MetaType.TYPE_INTEGER));
 		mtObj.putType("str_val", new MetaType(MetaType.TYPE_STRING));
-
+		
 		mtObj.stackSetup();
 	}
-
+	
 	@Override
 	public void testObjTeardown() throws JStackException {
 		mtObj.stackTeardown();
 		mtObj = null;
 	}
-
+	
 	// Misc tests
 	//-----------------------------------------------
-
+	
 	@Test
 	public void constructor() {
 		assertNotNull(JStackObj);
 	}
-
+	
 	@Test
 	public void stringTest() {
-		assertEquals("hello", ("hello").toString() );
-		assertEquals("hello", ((Object)"hello").toString() );
+		assertEquals("hello", ("hello").toString());
+		assertEquals("hello", ((Object) "hello").toString());
 	}
-
+	
 	// Mapping tests
 	//-----------------------------------------------
-
+	
 	@Test
-	public void testSingleMappingSystem() throws JStackException
-	{
+	public void testSingleMappingSystem() throws JStackException {
 		mtObj.clearTypeMapping();
-
+		
 		mtObj.putType("num", "INTEGER");
 		mtObj.putType("float", "TYPE_FLOAT");
 		mtObj.putType("double", "double");
 		mtObj.putType("long", "type_long");
-
+		
 		assertEquals(mtObj.getType("num").valueType(), MetaType.TYPE_INTEGER);
 		assertEquals(mtObj.getType("float").valueType(), MetaType.TYPE_FLOAT);
 		assertEquals(mtObj.getType("double").valueType(), MetaType.TYPE_DOUBLE);
 		assertEquals(mtObj.getType("long").valueType(), MetaType.TYPE_LONG);
 	}
-
+	
 	@Test
-	public void testMapMappingSystem() throws JStackException
-	{
+	public void testMapMappingSystem() throws JStackException {
 		mtObj.clearTypeMapping();
-
+		
 		HashMap<String, Object> mapping = new HashMap<String, Object>();
 		mapping.put("num", "INTEGER");
 		mapping.put("float", "TYPE_FLOAT");
@@ -92,9 +89,9 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		mapping.put("disabled", "disabled");
 		mapping.put("mixed", "TYPE_MIXED");
 		mapping.put("mixed-array", "type_mixed_array");
-
+		
 		mtObj.setMapping(mapping);
-
+		
 		assertEquals(mtObj.getType("num").valueType(), MetaType.TYPE_INTEGER);
 		assertEquals(mtObj.getType("float").valueType(), MetaType.TYPE_FLOAT);
 		assertEquals(mtObj.getType("double").valueType(), MetaType.TYPE_DOUBLE);
@@ -103,11 +100,11 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		assertEquals(mtObj.getType("mixed").valueType(), MetaType.TYPE_MIXED);
 		assertEquals(mtObj.getType("mixed-array").valueType(), MetaType.TYPE_MIXED_ARRAY);
 	}
-
+	
 	@Test
 	public void invalidSetup() {
 		MetaTable m;
-
+		
 		try {
 			m = new MetaTable(JStackObj, "1" + TestConfig.randomTablePrefix());
 			fail(); // if we got here, no exception was thrown, which is bad
@@ -116,10 +113,10 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 			assertTrue("Missing Exception - " + expected, e.getMessage().indexOf(expected) >= 0);
 		}
 	}
-
+	
 	// Test cases
 	//-----------------------------------------------
-
+	
 	// Test utility used to generate random maps
 	protected HashMap<String, Object> randomObjMap() {
 		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
@@ -127,57 +124,57 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		objMap.put(GUID.base58(), -(RandomUtils.nextInt(0, 99999)));
 		objMap.put(GUID.base58(), GUID.base58());
 		objMap.put(GUID.base58(), GUID.base58());
-
+		
 		objMap.put("num", RandomUtils.nextFloat(0, 99999));
 		objMap.put("str_val", GUID.base58());
-
+		
 		return objMap;
 	}
-
+	
 	@Test
 	public void basicTest() throws JStackException {
 		String guid = GUID.base58();
 		assertNull(mtObj.get(guid));
-
+		
 		HashMap<String, Object> objMap = randomObjMap();
 		assertEquals(guid, mtObj.append(guid, objMap)._oid());
-
+		
 		objMap.put("_oid", guid);
 		assertEquals(new TreeMap<String, Object>(objMap), new TreeMap<String, Object>(mtObj.get(guid)));
-
+		
 		objMap = randomObjMap();
 		assertNotNull(guid = mtObj.append(null, objMap)._oid());
 		objMap.put("_oid", guid);
 		assertEquals(objMap, mtObj.get(guid));
 	}
-
+	
 	@Test
 	public void basicTestMultiple() throws JStackException {
-
+		
 		// Useful for debugging
 		JStackObj = new JStack(JSql.sqlite("./test-files/tmp/sqliteTest.db"));
 		testObjSetup();
-
+		
 		int iteration = 100;
 		for (int a = 0; a < iteration; ++a) {
 			basicTest();
 		}
-
+		
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.queryObjects(null, null));
 		assertEquals(iteration * 2, qRes.length);
 	}
-
+	
 	HashMap<String, Object> genNumStrObj(int number, String str) {
 		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("num", new Integer(number));
 		objMap.put("str_val", str);
 		return objMap;
 	}
-
+	
 	@Test
 	public void indexBasedTest() throws JStackException {
-
+		
 		mtObj.append(null, genNumStrObj(1, "this"));
 		mtObj.append(null, genNumStrObj(2, "is"));
 		mtObj.append(null, genNumStrObj(3, "hello"));
@@ -185,27 +182,26 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		mtObj.append(null, genNumStrObj(5, "program"));
 		mtObj.append(null, genNumStrObj(6, "in"));
 		mtObj.append(null, genNumStrObj(7, "this"));
-
+		
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.queryObjects(null, null));
 		assertEquals(7, qRes.length);
-
+		
 		assertNotNull(qRes = mtObj.queryObjects("\"num\" > ? AND \"num\" < ?", new Object[] { 2, 5 }, "\"num\" ASC"));
 		assertEquals(2, qRes.length);
 		assertEquals("hello", qRes[0].get("str_val"));
 		assertEquals("world", qRes[1].get("str_val"));
-
+		
 		assertNotNull(qRes = mtObj.queryObjects("\"str_val\" = ?", new Object[] { "this" }));
 		assertEquals(2, qRes.length);
-
+		
 		assertNotNull(qRes = mtObj.queryObjects("\"num\" > ?", new Object[] { 2 }, "\"num\" ASC", 2, 2));
 		assertEquals(2, qRes.length);
 		assertEquals("program", qRes[0].get("str_val"));
 		assertEquals("in", qRes[1].get("str_val"));
-
+		
 	}
-
-
+	
 	///
 	/// An exception occurs, if a query fetch occurs with an empty table
 	///
@@ -215,7 +211,7 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		assertNotNull(qRes = mtObj.queryObjects(null, null));
 		assertEquals(0, qRes.length);
 	}
-
+	
 	///
 	/// Bad view index due to inner join instead of left join. Testing.
 	///
@@ -224,29 +220,29 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 	@Test
 	public void innerJoinFlaw() throws JStackException {
 		mtObj.append(null, genNumStrObj(1, "hello world"));
-
+		
 		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("num", new Integer(2));
-		mtObj.append( null, objMap );
-
+		mtObj.append(null, objMap);
+		
 		objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("str_val", "nope");
-		mtObj.append( null, objMap );
-
+		mtObj.append(null, objMap);
+		
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.queryObjects(null, null));
 		assertEquals(3, qRes.length);
-
+		
 		assertNotNull(qRes = mtObj.queryObjects("\"str_val\" = ?", new Object[] { "nope" }));
 		assertEquals(1, qRes.length);
-
+		
 		assertNotNull(qRes = mtObj.queryObjects("\"num\" = ?", new Object[] { 1 }));
 		assertEquals(1, qRes.length);
-
+		
 		assertNotNull(qRes = mtObj.queryObjects("\"num\" <= ?", new Object[] { 2 }));
 		assertEquals(2, qRes.length);
 	}
-
+	
 	///
 	/// This test cases covers a rather nasty bug, where meta objects,
 	/// with 1 or less parameters (excluding _oid) is unloadable.
@@ -255,69 +251,69 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 	///
 	@Test
 	public void missingNumError() throws JStackException {
-		HashMap<String, Object> objMap = new HashMap<String,Object>();
+		HashMap<String, Object> objMap = new HashMap<String, Object>();
 		objMap.put("str_val", "^_^");
-
+		
 		String guid = GUID.base58();
 		assertNull(mtObj.get(guid));
 		assertEquals(guid, mtObj.append(guid, objMap)._oid());
-
+		
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.queryObjects(null, null));
 		assertEquals(1, qRes.length);
-
+		
 		objMap.put("_oid", guid);
 		assertEquals(objMap, mtObj.get(guid));
 	}
-
+	
 	@Test
 	public void missingStrError() throws JStackException {
-		HashMap<String, Object> objMap = new HashMap<String,Object>();
+		HashMap<String, Object> objMap = new HashMap<String, Object>();
 		objMap.put("num", 123);
-
+		
 		String guid = GUID.base58();
 		assertNull(mtObj.get(guid));
 		assertEquals(guid, mtObj.append(guid, objMap)._oid());
-
+		
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.queryObjects(null, null));
 		assertEquals(1, qRes.length);
-
+		
 		objMap.put("_oid", guid);
 		assertEquals(objMap, mtObj.get(guid));
 	}
-
+	
 	@Test
 	public void missingNumWithSomeoneElse() throws JStackException {
 		mtObj.append(null, genNumStrObj(1, "hello world"));
-
-		HashMap<String, Object> objMap = new HashMap<String,Object>();
+		
+		HashMap<String, Object> objMap = new HashMap<String, Object>();
 		objMap.put("str_val", "^_^");
-
+		
 		String guid = GUID.base58();
 		assertNull(mtObj.get(guid));
 		assertEquals(guid, mtObj.append(guid, objMap)._oid());
-
+		
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.queryObjects(null, null));
 		assertEquals(2, qRes.length);
-
-		assertTrue( guid.equals(qRes[0]._oid()) || guid.equals(qRes[1]._oid()) );
-
+		
+		assertTrue(guid.equals(qRes[0]._oid()) || guid.equals(qRes[1]._oid()));
+		
 		objMap.put("_oid", guid);
 		assertEquals(objMap, mtObj.get(guid));
 	}
-
+	
 	/// Checks if a blank object gets saved
 	@Test
 	public void blankObjectSave() throws JStackException {
 		String guid = null;
 		MetaObject p = null;
-		assertFalse( mtObj.containsKey("hello") );
-		assertNotNull( p = mtObj.newObject() );
-		assertNotNull( guid = p._oid() );
+		assertFalse(mtObj.containsKey("hello"));
+		assertNotNull(p = mtObj.newObject());
+		assertNotNull(guid = p._oid());
 		
-		assertTrue( mtObj.containsKey(guid) );
+		assertTrue(mtObj.containsKey(guid));
 	}
 	
 	@Test
@@ -327,15 +323,15 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		mtObj.append(null, genNumStrObj(2, "two"));
 		
 		MetaObject[] list = null;
-		assertNotNull( list = mtObj.getFromKeyNames("num") );
-		assertEquals( 2, list.length );
+		assertNotNull(list = mtObj.getFromKeyNames("num"));
+		assertEquals(2, list.length);
 		
 		String str = null;
-		assertNotNull( str = list[0].getString("str_val") );
-		assertTrue( str.equals("one") || str.equals("two") );
+		assertNotNull(str = list[0].getString("str_val"));
+		assertTrue(str.equals("one") || str.equals("two"));
 		
-		assertNotNull( str = list[1].getString("str_val") );
-		assertTrue( str.equals("one") || str.equals("two") );
+		assertNotNull(str = list[1].getString("str_val"));
+		assertTrue(str.equals("one") || str.equals("two"));
 		
 	}
 	
@@ -348,24 +344,24 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		MetaObject node = null;
 		
 		// Fetch that single node
-		assertNotNull( list = mtObj.getFromKeyNames("num") );
-		assertEquals( 1, list.length );
-		assertNotNull( node = list[0] );
+		assertNotNull(list = mtObj.getFromKeyNames("num"));
+		assertEquals(1, list.length);
+		assertNotNull(node = list[0]);
 		
 		// Put non indexed key in node, and save
 		node.put("NotIndexedKey", "123");
 		node.saveDelta();
 		
 		// Get the value, to check
-		assertEquals( "123", mtObj.get( node._oid() ).get("NotIndexedKey") );
+		assertEquals("123", mtObj.get(node._oid()).get("NotIndexedKey"));
 		
 		// Refetch node, and get data, and validate
-		assertNotNull( list = mtObj.getFromKeyNames("num") );
-		assertEquals( 1, list.length );
-		assertNotNull( list[0] );
-		assertEquals( node._oid(), list[0]._oid() );
-		assertEquals( "123", node.get("NotIndexedKey") );
-		assertEquals( "123", list[0].get("NotIndexedKey") );
+		assertNotNull(list = mtObj.getFromKeyNames("num"));
+		assertEquals(1, list.length);
+		assertNotNull(list[0]);
+		assertEquals(node._oid(), list[0]._oid());
+		assertEquals("123", node.get("NotIndexedKey"));
+		assertEquals("123", list[0].get("NotIndexedKey"));
 	}
 	
 	@Test
@@ -377,28 +373,28 @@ public class MetaTable_Sqlite_test extends JStackData_testBase_test {
 		MetaObject node = null;
 		
 		// Fetch that single node
-		assertNotNull( list = mtObj.getFromKeyNames("num") );
-		assertEquals( 1, list.length );
-		assertNotNull( node = list[0] );
+		assertNotNull(list = mtObj.getFromKeyNames("num"));
+		assertEquals(1, list.length);
+		assertNotNull(node = list[0]);
 		
 		// Put non indexed key in node, and save
 		node.put("NotIndexedKey", "123");
 		node.saveDelta();
 		
 		// Refetch node, and get data, and validate
-		assertNotNull( list = mtObj.getFromKeyNames("num") );
-		assertEquals( 1, list.length );
-		assertNotNull( list[0] );
-		assertEquals( node._oid(), list[0]._oid() );
-		assertEquals( "123", node.get("NotIndexedKey") );
-		assertEquals( "123", list[0].get("NotIndexedKey") );
+		assertNotNull(list = mtObj.getFromKeyNames("num"));
+		assertEquals(1, list.length);
+		assertNotNull(list[0]);
+		assertEquals(node._oid(), list[0]._oid());
+		assertEquals("123", node.get("NotIndexedKey"));
+		assertEquals("123", list[0].get("NotIndexedKey"));
 		
 		// Fetch non indexed key
-		assertNotNull( list = mtObj.getFromKeyNames("NotIndexedKey") );
-		assertEquals( 1, list.length );
+		assertNotNull(list = mtObj.getFromKeyNames("NotIndexedKey"));
+		assertEquals(1, list.length);
 		
 		// Assert equality
-		assertEquals( node._oid(), list[0]._oid() );
+		assertEquals(node._oid(), list[0]._oid());
 		
 	}
 	

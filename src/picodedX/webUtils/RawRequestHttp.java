@@ -19,12 +19,12 @@ public class RawRequestHttp {
 	////////////////////////////////////////////////////
 	// Constructor
 	////////////////////////////////////////////////////
-
+	
 	/// Creates an instance with the target base URL
 	public RawRequestHttp(String inRequestURL) {
 		try {
 			requestUrl = new URL(inRequestURL);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		commonSetup();
@@ -39,7 +39,7 @@ public class RawRequestHttp {
 	////////////////////////////////////////////////////
 	// Protected common setup / functions and variables
 	////////////////////////////////////////////////////
-
+	
 	/// The actual URL
 	protected URL requestUrl = null;
 	
@@ -66,14 +66,14 @@ public class RawRequestHttp {
 		//-----------------------------------------------------
 		
 		// Websocket extended timeout
-		if( scheme.startsWith("ws") ) {
+		if (scheme.startsWith("ws")) {
 			/// 15 minutes timeout
 			timeout = 15 * 60 * 1000;
 			doOutputStream = true;
 		}
 		
 		// HTTPS Encryption
-		if( scheme.startsWith("wss") || scheme.startsWith("https") ) {
+		if (scheme.startsWith("wss") || scheme.startsWith("https")) {
 			encrypted = true;
 		}
 	}
@@ -85,7 +85,7 @@ public class RawRequestHttp {
 	protected OutputStream outStream = null;
 	
 	/// headers
-	protected Map<String,List<String>> requestHeaders = null;
+	protected Map<String, List<String>> requestHeaders = null;
 	
 	/// Sets the map
 	public RawRequestHttp setHeaderMap(Map<String, List<String>> inMap) {
@@ -101,7 +101,7 @@ public class RawRequestHttp {
 	
 	/// Applies the configuration, and connect to server
 	public RawRequestHttp connect() throws IOException {
-		urlConnection = (HttpURLConnection)requestUrl.openConnection();
+		urlConnection = (HttpURLConnection) requestUrl.openConnection();
 		
 		// Apply config values
 		urlConnection.setAllowUserInteraction(false);
@@ -113,10 +113,10 @@ public class RawRequestHttp {
 		urlConnection.setDoOutput(doOutputStream);
 		
 		//Iterate headers if present, and sets them
-		if( requestHeaders != null ) {
+		if (requestHeaders != null) {
 			for (Map.Entry<String, List<String>> entry : requestHeaders.entrySet()) {
 				for (String val : entry.getValue()) {
-					urlConnection.addRequestProperty( entry.getKey(),val);
+					urlConnection.addRequestProperty(entry.getKey(), val);
 				}
 			}
 		}
@@ -136,30 +136,30 @@ public class RawRequestHttp {
 	////////////////////////////////////////////////////
 	
 	public InputStream inputStream() {
-		if(inStream != null) {
+		if (inStream != null) {
 			return inStream;
 		}
 		try {
 			return (inStream = urlConnection.getInputStream());
-		} catch(IOException e) {
+		} catch (IOException e) {
 			try {
 				return (inStream = urlConnection.getErrorStream());
-			} catch(Exception e2 ) {
+			} catch (Exception e2) {
 				throw new RuntimeException(e2);
 			}
 		}
 	}
 	
 	public OutputStream outputStream() {
-		if(!doOutputStream) {
+		if (!doOutputStream) {
 			return null;
 		}
-		if(outStream != null) {
+		if (outStream != null) {
 			return outStream;
 		}
 		try {
 			return (outStream = urlConnection.getOutputStream());
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -167,7 +167,7 @@ public class RawRequestHttp {
 	public int statusCode() {
 		try {
 			return urlConnection.getResponseCode();
-		} catch(IOException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -175,7 +175,7 @@ public class RawRequestHttp {
 	public Map<String, List<String>> headerMap() {
 		try {
 			return urlConnection.getHeaderFields();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -189,7 +189,7 @@ public class RawRequestHttp {
 	/// Gets the response content as a string
 	/// @TODO get the response encoding type, and pass "toString"
 	public String toString() {
-		if( _cachedString != null ) {
+		if (_cachedString != null) {
 			return _cachedString;
 		}
 		
@@ -201,11 +201,11 @@ public class RawRequestHttp {
 	}
 	
 	/// Converts the result string into a map, via JSON's
-	public Map<String,Object> toMap() {
+	public Map<String, Object> toMap() {
 		String r = toString();
-		if( r == null || r.length() <= 1 ) {
+		if (r == null || r.length() <= 1) {
 			return null;
 		}
-		return ConvertJSON.toMap( r );
+		return ConvertJSON.toMap(r);
 	}
 }

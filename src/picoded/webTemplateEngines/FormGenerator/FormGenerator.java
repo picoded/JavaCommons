@@ -69,6 +69,7 @@ import com.amazonaws.util.StringUtils;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
+
 public class FormGenerator {
 	
 	/////////////////////////////////////////////////////////////////////////
@@ -89,11 +90,11 @@ public class FormGenerator {
 	//
 	/////////////////////////////////////////////////////////////////////////
 	
-	public FormGenerator(){
+	public FormGenerator() {
 		setupDefaultFormTemplates();
 	}
 	
-	private void setupDefaultFormTemplates(){
+	private void setupDefaultFormTemplates() {
 		customFormWrapperTemplates = FormWrapperTemplates.defaultWrapperTemplates();
 		customFormInputTemplates = FormInputTemplates.defaultInputTemplates();
 		
@@ -113,7 +114,7 @@ public class FormGenerator {
 	///
 	/// @returns {Map<String, FormInputInterface>} interface map
 	public Map<String, FormInputInterface> inputInterfaceMap(boolean displayOnly) {
-		if(displayOnly) {
+		if (displayOnly) {
 			return customDisplayInputTemplates;
 		} else {
 			return customFormInputTemplates;
@@ -126,7 +127,7 @@ public class FormGenerator {
 	///
 	/// @returns {Map<String, FormInputInterface>} interface map
 	public Map<String, FormWrapperInterface> wrapperInterfaceMap(boolean displayOnly) {
-		if(displayOnly) {
+		if (displayOnly) {
 			return customDisplayWrapperTemplates;
 		} else {
 			return customFormWrapperTemplates;
@@ -142,7 +143,7 @@ public class FormGenerator {
 	/// @returns {FormInputInterface} interface function
 	public FormInputInterface inputInterface(boolean displayOnly, String type) {
 		FormInputInterface ret = inputInterfaceMap(displayOnly).get(type);
-		if( ret != null ) {
+		if (ret != null) {
 			return ret;
 		}
 		return inputInterfaceMap(displayOnly).get("*");
@@ -157,7 +158,7 @@ public class FormGenerator {
 	/// @returns {FormWrapperInterface} interface function
 	public FormWrapperInterface wrapperInterface(boolean displayOnly, String type) {
 		FormWrapperInterface ret = wrapperInterfaceMap(displayOnly).get(type);
-		if( ret != null ) {
+		if (ret != null) {
 			return ret;
 		}
 		return wrapperInterfaceMap(displayOnly).get("*");
@@ -195,13 +196,13 @@ public class FormGenerator {
 	/// @params  {boolean}             displayOnly  - Display mode, html read only or form
 	///
 	/// @returns {StringBuilder} the full returning HTML
-	public StringBuilder build( Map<String,Object> format, Map<String,Object> data, boolean displayOnly ) {
+	public StringBuilder build(Map<String, Object> format, Map<String, Object> data, boolean displayOnly) {
 		FormNode rootNode = new FormNode(this, format, data);
-		rootNode.setFormSet( getFormSet() );
+		rootNode.setFormSet(getFormSet());
 		
 		return rootNode.fullHtml(displayOnly);
 	}
-		
+	
 	/// Builds the template and run the form generator
 	///
 	/// @params  {List<Map<String,Object>>}  format       - The JSML format object to generate the form/display
@@ -216,11 +217,11 @@ public class FormGenerator {
 	// 	
 	// 	return build(divWrap, data, displayOnly);
 	// }
-		
-	public StringBuilder build( List<Object> format, Map<String,Object> data, boolean displayOnly ) {
-		Map<String,Object> divWrap = new HashMap<String,Object>();
+	
+	public StringBuilder build(List<Object> format, Map<String, Object> data, boolean displayOnly) {
+		Map<String, Object> divWrap = new HashMap<String, Object>();
 		divWrap.put("type", "none");
-		divWrap.put("children", format );
+		divWrap.put("children", format);
 		
 		return build(divWrap, data, displayOnly);
 	}
@@ -232,11 +233,11 @@ public class FormGenerator {
 	/// @params  {boolean}                   displayOnly       - Display mode, html read only or form
 	///
 	/// @returns {StringBuilder} the full returning HTML
-	public StringBuilder build( String jsonFormatString, Map<String,Object> data, boolean displayOnly ) {
-		if(jsonFormatString.startsWith("[")){
+	public StringBuilder build(String jsonFormatString, Map<String, Object> data, boolean displayOnly) {
+		if (jsonFormatString.startsWith("[")) {
 			List<Object> jsonArray = ConvertJSON.toList(jsonFormatString);
 			return build(jsonArray, data, displayOnly);
-		}else{
+		} else {
 			Map<String, Object> jsonObj = ConvertJSON.toMap(jsonFormatString);
 			return build(jsonObj, data, displayOnly);
 		}
@@ -248,23 +249,23 @@ public class FormGenerator {
 	//
 	/////////////////////////////////////////////////////////////////////////
 	
-	public FormWrapperInterface addCustomFormWrapperTemplate(String key, FormWrapperInterface customWrapperTemplate){
+	public FormWrapperInterface addCustomFormWrapperTemplate(String key, FormWrapperInterface customWrapperTemplate) {
 		return customFormWrapperTemplates.put(key, customWrapperTemplate);
 	}
 	
-	public FormInputInterface addCustomFormInputTemplate(String key, FormInputInterface customInputTemplate){
+	public FormInputInterface addCustomFormInputTemplate(String key, FormInputInterface customInputTemplate) {
 		return customFormInputTemplates.put(key, customInputTemplate);
 	}
 	
-	public String generatePDFReadyHTML(String jsonString, Map<String, Object> prefilledJSONData){
+	public String generatePDFReadyHTML(String jsonString, Map<String, Object> prefilledJSONData) {
 		List<FormNode> formNodes = FormNode.createFromJSONString(this, jsonString, prefilledJSONData);
 		String htmlString = generatePDFReadyHTML(formNodes);
 		return htmlString;
 	}
 	
-	public String generatePDFReadyHTML(Map<String, Object> jsonData, Map<String, Object> prefilledJSONData){
+	public String generatePDFReadyHTML(Map<String, Object> jsonData, Map<String, Object> prefilledJSONData) {
 		FormNode rootNode = new FormNode(this, jsonData, prefilledJSONData);
-		rootNode.setFormSet( getFormSet() );
+		rootNode.setFormSet(getFormSet());
 		
 		List<FormNode> formNodes = new ArrayList<FormNode>();
 		formNodes.add(rootNode);
@@ -272,9 +273,9 @@ public class FormGenerator {
 		return htmlString;
 	}
 	
-	protected String generatePDFReadyHTML(List<FormNode> nodes){
+	protected String generatePDFReadyHTML(List<FormNode> nodes) {
 		StringBuilder htmlBuilder = new StringBuilder();
-		for(FormNode node : nodes){
+		for (FormNode node : nodes) {
 			String nodeHtml = generatePDFReadyHTML(node);
 			htmlBuilder.append(nodeHtml);
 		}
@@ -283,9 +284,9 @@ public class FormGenerator {
 	}
 	
 	/// The critical recursive function
-	protected String generatePDFReadyHTML(FormNode node){
+	protected String generatePDFReadyHTML(FormNode node) {
 		String nodeType = node.getString(JsonKeys.TYPE, HtmlTag.DIV);
-		String[] formWrappers = new String[]{"", ""};
+		String[] formWrappers = new String[] { "", "" };
 		
 		String wrapperType = node.getString(JsonKeys.WRAPPER, HtmlTag.DIV);
 		
@@ -296,24 +297,24 @@ public class FormGenerator {
 		
 		//get inner data for children
 		StringBuilder innerData = new StringBuilder("");
-		if(node.childCount() > 0){
+		if (node.childCount() > 0) {
 			innerData.append(generatePDFReadyHTML(node.children()));
 		}
 		
-		String finalNodeValue = formWrappers[0]+formTextData+innerData.toString()+formWrappers[1];
+		String finalNodeValue = formWrappers[0] + formTextData + innerData.toString() + formWrappers[1];
 		return finalNodeValue;
 	}
 	
-	public String applyTemplating(String jsonString, Map<String, Object> prefilledJSONData){
+	public String applyTemplating(String jsonString, Map<String, Object> prefilledJSONData) {
 		List<FormNode> formNodes = FormNode.createFromJSONString(this, jsonString, prefilledJSONData);
 		String htmlString = applyTemplating(formNodes);
 		// htmlString = "<div class=\"pf_root\">"+htmlString+"</div>";
 		return htmlString;
 	}
 	
-	protected String applyTemplating(List<FormNode> nodes){
+	protected String applyTemplating(List<FormNode> nodes) {
 		StringBuilder htmlBuilder = new StringBuilder();
-		for(FormNode node : nodes){
+		for (FormNode node : nodes) {
 			htmlBuilder.append(applyTemplating(node));
 		}
 		
@@ -321,25 +322,25 @@ public class FormGenerator {
 	}
 	
 	/// The critical recursive function
-	protected String applyTemplating(FormNode node){
+	protected String applyTemplating(FormNode node) {
 		String nodeType = node.getString(JsonKeys.TYPE, HtmlTag.DIV);
-		String[] formWrappers = new String[]{"", ""};
+		String[] formWrappers = new String[] { "", "" };
 		
 		String wrapperType = node.getString(JsonKeys.WRAPPER, HtmlTag.DIV);
 		
 		//formWrappers = customFormWrapperTemplates.get(wrapperType).apply(node);
-		if(node.containsKey(JsonKeys.HTML_INJECTION)){
+		if (node.containsKey(JsonKeys.HTML_INJECTION)) {
 			String rawHtml = node.getString(JsonKeys.HTML_INJECTION);
-			String finalNodeValue = formWrappers[0]+rawHtml+formWrappers[1];
+			String finalNodeValue = formWrappers[0] + rawHtml + formWrappers[1];
 			return finalNodeValue;
-		}else{
+		} else {
 			
 			/// This is input data output
 			StringBuilder inputOutputData = customFormInputTemplates.get(nodeType).apply(node);
 			
 			//get inner data for children
 			StringBuilder innerData = new StringBuilder("");
-			if(node.childCount() > 0){
+			if (node.childCount() > 0) {
 				innerData.append("<div class=\"pf_childDiv");
 				getCustomClass(node, innerData, JsonKeys.CUSTOMCLASS, "pfc_");
 				getCustomClass(node, innerData, JsonKeys.CHILD_CLASS, "");
@@ -348,53 +349,53 @@ public class FormGenerator {
 				innerData.append("</div>\n");
 			}
 			
-			String finalNodeValue = formWrappers[0]+inputOutputData+innerData.toString()+formWrappers[1];
+			String finalNodeValue = formWrappers[0] + inputOutputData + innerData.toString() + formWrappers[1];
 			return finalNodeValue;
 		}
 	}
 	
-	public static void getCustomClass(FormNode node, StringBuilder sb, String jsonKey, String prefix){
-		if(node.containsKey(jsonKey)){
+	public static void getCustomClass(FormNode node, StringBuilder sb, String jsonKey, String prefix) {
+		if (node.containsKey(jsonKey)) {
 			String wrapperClass = node.getString(jsonKey);
 			String[] wrapperClassSplit = null;
-			if(wrapperClass.contains(" ")){
+			if (wrapperClass.contains(" ")) {
 				wrapperClassSplit = wrapperClass.split(" ");
-				for(String str:wrapperClassSplit){
-					if(!str.equals(" ")){
-						sb.append(" "+prefix+str);
+				for (String str : wrapperClassSplit) {
+					if (!str.equals(" ")) {
+						sb.append(" " + prefix + str);
 					}
 				}
-			}else{
-				sb.append(" "+prefix+wrapperClass);
+			} else {
+				sb.append(" " + prefix + wrapperClass);
 			}
 		}
 	}
 	
-	public static String getWrapperCssString(FormNode node){
+	public static String getWrapperCssString(FormNode node) {
 		StringBuilder sb = new StringBuilder("");
 		
-		if(node.containsKey(JsonKeys.WRAPPER_CSS)){
-			sb.append(" style=\""+node.getString(JsonKeys.WRAPPER_CSS)+"\"");
+		if (node.containsKey(JsonKeys.WRAPPER_CSS)) {
+			sb.append(" style=\"" + node.getString(JsonKeys.WRAPPER_CSS) + "\"");
 		}
 		
 		return sb.toString();
 	}
 	
-	public static String getInputCssString(FormNode node){
+	public static String getInputCssString(FormNode node) {
 		StringBuilder sb = new StringBuilder("");
 		
-		if(node.containsKey(JsonKeys.INPUT_CSS)){
-			sb.append(" style=\""+node.getString(JsonKeys.INPUT_CSS)+"\"");
+		if (node.containsKey(JsonKeys.INPUT_CSS)) {
+			sb.append(" style=\"" + node.getString(JsonKeys.INPUT_CSS) + "\"");
 		}
 		
 		return sb.toString();
 	}
 	
-	public static String getLabelCssString(FormNode node){
+	public static String getLabelCssString(FormNode node) {
 		StringBuilder sb = new StringBuilder("");
 		
-		if(node.containsKey(JsonKeys.LABEL_CSS)){
-			sb.append(" style=\""+node.getString(JsonKeys.LABEL_CSS)+"\"");
+		if (node.containsKey(JsonKeys.LABEL_CSS)) {
+			sb.append(" style=\"" + node.getString(JsonKeys.LABEL_CSS) + "\"");
 		}
 		
 		return sb.toString();

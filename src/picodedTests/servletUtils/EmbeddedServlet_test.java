@@ -50,47 +50,47 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.io.IOUtils;
 
-public class EmbeddedServlet_test
-{
+public class EmbeddedServlet_test {
 	EmbeddedServlet tomcat = null;
 	
 	@Before
-	public void setUp(){
+	public void setUp() {
 		File context = new File("./test-files/test-specific/embeddedTomcat");
 		
-		tomcat = new EmbeddedServlet("/app", context)
-		.withPort(15000)
-		.withServlet("/public", "publicProxyServlet", 
-		new HttpServlet() {
-			private static final long serialVersionUID = 1L;
-		 
-			@Override
-			protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-				String getValue = req.getParameter("getValue");
-				resp.getWriter().append(getValue);
-			}
-
-			@Override
-			protected void doPost(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException {
-				String postValue = req.getParameter("postValue");
-				resp.getWriter().append(postValue);
-			}
-		});
+		tomcat = new EmbeddedServlet("/app", context).withPort(15000).withServlet("/public", "publicProxyServlet",
+			new HttpServlet() {
+				private static final long serialVersionUID = 1L;
+				
+				@Override
+				protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
+					IOException {
+					String getValue = req.getParameter("getValue");
+					resp.getWriter().append(getValue);
+				}
+				
+				@Override
+				protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
+					IOException {
+					String postValue = req.getParameter("postValue");
+					resp.getWriter().append(postValue);
+				}
+			});
 	}
 	
 	@Test
-	public void testMultipleServletNames(){
+	public void testMultipleServletNames() {
 		tomcat = tomcat.withServlet("/public", "ServletA", new HttpServlet() {
 			private static final long serialVersionUID = 1L;
-		 
+			
 			@Override
-			protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+			protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
+				IOException {
 				String getValue = req.getParameter("getValue");
 				resp.getWriter().append(getValue);
 			}
-
+			
 			@Override
-			protected void doPost(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException {
+			protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 				String postValue = req.getParameter("postValue");
 				resp.getWriter().append(postValue);
 			}
@@ -98,15 +98,16 @@ public class EmbeddedServlet_test
 		
 		tomcat = tomcat.withServlet("/public/*", "ServletA", new HttpServlet() {
 			private static final long serialVersionUID = 1L;
-		 
+			
 			@Override
-			protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+			protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
+				IOException {
 				String getValue = req.getParameter("getValue");
 				resp.getWriter().append(getValue);
 			}
-
+			
 			@Override
-			protected void doPost(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException {
+			protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 				String postValue = req.getParameter("postValue");
 				resp.getWriter().append(postValue);
 			}

@@ -62,7 +62,7 @@ public class ResponseHttp {
 	protected Map<String, String> _headers = null;
 	
 	protected void throwIfResponseException() {
-		if(responseException != null) {
+		if (responseException != null) {
 			throw new RuntimeException(responseException);
 		}
 	}
@@ -71,7 +71,7 @@ public class ResponseHttp {
 	protected ListenableFuture<ResponseHttp> completedResponse = null;
 	
 	public void waitForCompletedHeaders() {
-		while( completedHeaders.get() == false ) {
+		while (completedHeaders.get() == false) {
 			throwIfResponseException();
 			Thread.yield();
 		}
@@ -80,8 +80,8 @@ public class ResponseHttp {
 	public void waitForCompletedRequest() {
 		try {
 			completedResponse.get();
-		} catch (Exception ex){
-			System.out.println("Exception: "+ex.getMessage());
+		} catch (Exception ex) {
+			System.out.println("Exception: " + ex.getMessage());
 			throw new RuntimeException(ex);
 		}
 	}
@@ -91,6 +91,7 @@ public class ResponseHttp {
 	///////////////////////////////////////////////////
 	
 	protected HttpResponse response = null;
+	
 	protected ResponseHttp(HttpResponse inResponse) {
 		response = inResponse;
 	}
@@ -99,7 +100,7 @@ public class ResponseHttp {
 	public int statusCode() {
 		waitForCompletedHeaders();
 		
-		if(_statusCode != -1){
+		if (_statusCode != -1) {
 			return _statusCode;
 		} else {
 			return response.getStatusLine().getStatusCode();
@@ -110,13 +111,13 @@ public class ResponseHttp {
 		_statusCode = statusCode;
 	}
 	
-	public HttpResponseStatus responseStatus(){
+	public HttpResponseStatus responseStatus() {
 		waitForCompletedHeaders();
 		
 		return _httpResponseStatus;
 	}
 	
-	protected void setResponseStatus(HttpResponseStatus respStatus){
+	protected void setResponseStatus(HttpResponseStatus respStatus) {
 		_httpResponseStatus = respStatus;
 	}
 	
@@ -125,7 +126,7 @@ public class ResponseHttp {
 		waitForCompletedHeaders();
 		waitForCompletedRequest();
 		
-		if(_inputStream != null){
+		if (_inputStream != null) {
 			return _inputStream;
 		} else {
 			try {
@@ -136,26 +137,26 @@ public class ResponseHttp {
 		}
 	}
 	
-	protected void setInputStream(InputStream is){
+	protected void setInputStream(InputStream is) {
 		System.out.println("Setting input stream");
 		_inputStream = is;
 	}
 	
-	public Map<String, String> getHeaders(){
+	public Map<String, String> getHeaders() {
 		return _headers;
 	}
 	
-	protected void setHeaders(FluentCaseInsensitiveStringsMap headerMap){
+	protected void setHeaders(FluentCaseInsensitiveStringsMap headerMap) {
 		_headers = new HashMap<String, String>();
 		
-		if(headerMap != null && headerMap.size() > 0){
-			for(String key : headerMap.keySet()){
+		if (headerMap != null && headerMap.size() > 0) {
+			for (String key : headerMap.keySet()) {
 				List<String> keyValueList = headerMap.get(key);
 				StringBuilder strBuilder = new StringBuilder();
 				int keyValCount = keyValueList.size();
-				for(int i = 0; i < keyValCount; ++i){
+				for (int i = 0; i < keyValCount; ++i) {
 					strBuilder.append(keyValueList.get(i));
-					if(keyValCount > 1 && i < keyValCount - 1){
+					if (keyValCount > 1 && i < keyValCount - 1) {
 						strBuilder.append(",");
 					}
 				}
@@ -168,10 +169,11 @@ public class ResponseHttp {
 	/// Gets the response content as a string
 	/// @TODO get the response encoding type, and pass "toString"
 	private String _cachedString = null;
+	
 	public String toString() {
 		waitForCompletedRequest();
 		
-		if( _cachedString != null ) {
+		if (_cachedString != null) {
 			return _cachedString;
 		}
 		
@@ -183,18 +185,18 @@ public class ResponseHttp {
 	}
 	
 	//testing function
-	public String streamToStringRaw(){
-		try{
+	public String streamToStringRaw() {
+		try {
 			int size = _inputStream.available();
 			byte[] bytes = new byte[size];
 			_inputStream.read(bytes);
 			
 			String val = "";
-			for(byte b : bytes){
-				val += (char)b;
+			for (byte b : bytes) {
+				val += (char) b;
 			}
 			return val;
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			
 		}
 		
@@ -202,12 +204,12 @@ public class ResponseHttp {
 	}
 	
 	/// Converts the result string into a map, via JSON's
-	public Map<String,Object> toMap() {
+	public Map<String, Object> toMap() {
 		waitForCompletedRequest();
 		String r = toString();
-		if( r == null || r.length() <= 1 ) {
+		if (r == null || r.length() <= 1) {
 			return null;
 		}
-		return ConvertJSON.toMap( r );
+		return ConvertJSON.toMap(r);
 	}
 }

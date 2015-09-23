@@ -12,8 +12,8 @@ public class JStruct {
 	
 	// KeyValueMap handling
 	//----------------------------------------------
-
-	protected ConcurrentHashMap<String,KeyValueMap> keyValueMapCache = new ConcurrentHashMap<String,KeyValueMap>();
+	
+	protected ConcurrentHashMap<String, KeyValueMap> keyValueMapCache = new ConcurrentHashMap<String, KeyValueMap>();
 	protected ReentrantReadWriteLock keyValueMapCache_lock = new ReentrantReadWriteLock();
 	
 	/// Actual setup implmentation to overwrite
@@ -37,7 +37,7 @@ public class JStruct {
 		
 		// Tries to get 1 time, without locking
 		KeyValueMap cacheCopy = keyValueMapCache.get(name);
-		if(cacheCopy != null) {
+		if (cacheCopy != null) {
 			return cacheCopy;
 		}
 		
@@ -46,12 +46,12 @@ public class JStruct {
 			keyValueMapCache_lock.writeLock().lock();
 			
 			cacheCopy = keyValueMapCache.get(name);
-			if(cacheCopy != null) {
+			if (cacheCopy != null) {
 				return cacheCopy;
 			}
 			
 			cacheCopy = setupKeyValueMap(name);
-			keyValueMapCache.put( name, cacheCopy );
+			keyValueMapCache.put(name, cacheCopy);
 			return cacheCopy;
 			
 		} finally {
@@ -61,8 +61,8 @@ public class JStruct {
 	
 	// MetaTable handling
 	//----------------------------------------------
-
-	protected ConcurrentHashMap<String,MetaTable> metaTableCache = new ConcurrentHashMap<String,MetaTable>();
+	
+	protected ConcurrentHashMap<String, MetaTable> metaTableCache = new ConcurrentHashMap<String, MetaTable>();
 	protected ReentrantReadWriteLock metaTableCache_lock = new ReentrantReadWriteLock();
 	
 	/// Actual setup implmentation to overwrite
@@ -86,7 +86,7 @@ public class JStruct {
 		
 		// Tries to get 1 time, without locking
 		MetaTable cacheCopy = metaTableCache.get(name);
-		if(cacheCopy != null) {
+		if (cacheCopy != null) {
 			return cacheCopy;
 		}
 		
@@ -95,12 +95,12 @@ public class JStruct {
 			metaTableCache_lock.writeLock().lock();
 			
 			cacheCopy = metaTableCache.get(name);
-			if(cacheCopy != null) {
+			if (cacheCopy != null) {
 				return cacheCopy;
 			}
 			
 			cacheCopy = setupMetaTable(name);
-			metaTableCache.put( name, cacheCopy );
+			metaTableCache.put(name, cacheCopy);
 			return cacheCopy;
 			
 		} finally {
@@ -110,8 +110,8 @@ public class JStruct {
 	
 	// AccountTable handling
 	//----------------------------------------------
-
-	protected ConcurrentHashMap<String,AccountTable> accountTableCache = new ConcurrentHashMap<String,AccountTable>();
+	
+	protected ConcurrentHashMap<String, AccountTable> accountTableCache = new ConcurrentHashMap<String, AccountTable>();
 	protected ReentrantReadWriteLock accountTableCache_lock = new ReentrantReadWriteLock();
 	
 	/// Actual setup implmentation to overwrite
@@ -135,7 +135,7 @@ public class JStruct {
 		
 		// Tries to get 1 time, without locking
 		AccountTable cacheCopy = accountTableCache.get(name);
-		if(cacheCopy != null) {
+		if (cacheCopy != null) {
 			return cacheCopy;
 		}
 		
@@ -144,19 +144,18 @@ public class JStruct {
 			accountTableCache_lock.writeLock().lock();
 			
 			cacheCopy = accountTableCache.get(name);
-			if(cacheCopy != null) {
+			if (cacheCopy != null) {
 				return cacheCopy;
 			}
 			
 			cacheCopy = setupAccountTable(name);
-			accountTableCache.put( name, cacheCopy );
+			accountTableCache.put(name, cacheCopy);
 			return cacheCopy;
 			
 		} finally {
 			accountTableCache_lock.writeLock().unlock();
 		}
 	}
-	
 	
 	//----------------------------------------------
 	// automated setup of cached tables
@@ -168,8 +167,8 @@ public class JStruct {
 			keyValueMapCache_lock.readLock().lock();
 			metaTableCache_lock.readLock().lock();
 			
-			keyValueMapCache.entrySet().stream().forEach(e -> e.getValue().systemSetup() );
-			metaTableCache.entrySet().stream().forEach(e -> e.getValue().systemSetup() );
+			keyValueMapCache.entrySet().stream().forEach(e -> e.getValue().systemSetup());
+			metaTableCache.entrySet().stream().forEach(e -> e.getValue().systemSetup());
 			
 		} finally {
 			keyValueMapCache_lock.readLock().unlock();
@@ -183,14 +182,13 @@ public class JStruct {
 			keyValueMapCache_lock.readLock().lock();
 			metaTableCache_lock.readLock().lock();
 			
-			keyValueMapCache.entrySet().stream().forEach(e -> e.getValue().systemTeardown() );
-			metaTableCache.entrySet().stream().forEach(e -> e.getValue().systemTeardown() );
+			keyValueMapCache.entrySet().stream().forEach(e -> e.getValue().systemTeardown());
+			metaTableCache.entrySet().stream().forEach(e -> e.getValue().systemTeardown());
 			
 		} finally {
 			keyValueMapCache_lock.readLock().unlock();
 			metaTableCache_lock.readLock().unlock();
 		}
 	}
-	
 	
 }

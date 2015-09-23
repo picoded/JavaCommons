@@ -25,8 +25,7 @@ public class KeyValueMap_Oracle_test extends KeyValueMap_Sqlite_test {
 	///------------------------------------------------------
 	
 	public JSql sqlImplmentation() {
-		return JSql.oracle(TestConfig.ORACLE_PATH(), TestConfig.ORACLE_USER(), 
-		TestConfig.ORACLE_PASS());
+		return JSql.oracle(TestConfig.ORACLE_PATH(), TestConfig.ORACLE_USER(), TestConfig.ORACLE_PASS());
 	}
 	
 }

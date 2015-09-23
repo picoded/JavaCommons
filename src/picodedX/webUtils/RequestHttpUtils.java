@@ -44,51 +44,53 @@ import com.ning.http.client.AsyncHttpClientConfig.Builder;
 public class RequestHttpUtils {
 	
 	/// Returns the apache client HttpUriRequest, based on its type
-	public static org.apache.http.client.methods.HttpUriRequest apache_HttpUriRequest_fromRequestType( HttpRequestType reqType, String reqURL ) {
+	public static org.apache.http.client.methods.HttpUriRequest apache_HttpUriRequest_fromRequestType(
+		HttpRequestType reqType, String reqURL) {
 		switch (reqType) {
-			case GET:
-				return new HttpGet(reqURL);
-			case POST:
-				return new HttpPost(reqURL);
-			case PUT:
-				return new HttpPut(reqURL);
-			case DELETE:
-				return new HttpDelete(reqURL);
-			case OPTION:
-				return new HttpOptions(reqURL);
+		case GET:
+			return new HttpGet(reqURL);
+		case POST:
+			return new HttpPost(reqURL);
+		case PUT:
+			return new HttpPut(reqURL);
+		case DELETE:
+			return new HttpDelete(reqURL);
+		case OPTION:
+			return new HttpOptions(reqURL);
 		}
 		
-		throw new RuntimeException("Invalid request type not supported: "+reqType);
+		throw new RuntimeException("Invalid request type not supported: " + reqType);
 		//return null;
 	}
 	
 	/// Returns the async http client, based on its type
-	protected static AsyncHttpClient.BoundRequestBuilder asyncHttpClient_fromRequestType( HttpRequestType reqType, String reqURL, boolean setFollowRedirect ) {
-		AsyncHttpClientConfig config = (new AsyncHttpClientConfig.Builder()).setFollowRedirect( setFollowRedirect ).build();
-		AsyncHttpClient httpClient = new AsyncHttpClient( config );
+	protected static AsyncHttpClient.BoundRequestBuilder asyncHttpClient_fromRequestType(HttpRequestType reqType,
+		String reqURL, boolean setFollowRedirect) {
+		AsyncHttpClientConfig config = (new AsyncHttpClientConfig.Builder()).setFollowRedirect(setFollowRedirect).build();
+		AsyncHttpClient httpClient = new AsyncHttpClient(config);
 		
 		switch (reqType) {
-			case GET:
-				return httpClient.prepareGet(reqURL);
-			case POST:
-				return httpClient.preparePost(reqURL);
-			case PUT:
-				return httpClient.preparePut(reqURL);
-			case DELETE:
-				return httpClient.prepareDelete(reqURL);
-			case OPTION:
-				return httpClient.prepareOptions(reqURL);
+		case GET:
+			return httpClient.prepareGet(reqURL);
+		case POST:
+			return httpClient.preparePost(reqURL);
+		case PUT:
+			return httpClient.preparePut(reqURL);
+		case DELETE:
+			return httpClient.prepareDelete(reqURL);
+		case OPTION:
+			return httpClient.prepareOptions(reqURL);
 		}
 		
-		throw new RuntimeException("Invalid request type not supported: "+reqType);
+		throw new RuntimeException("Invalid request type not supported: " + reqType);
 		//return null;
 	}
 	
 	/// Helps convert a Map<String, String[]> to a List<NameValuePair>
-	public static List<NameValuePair> parameterMapToList( Map<String, String[]> inMap ) {
+	public static List<NameValuePair> parameterMapToList(Map<String, String[]> inMap) {
 		// Create a List to hold the NameValuePairs to be passed to the PostMethod
 		List<NameValuePair> listNameValuePairs = new ArrayList<NameValuePair>();
-
+		
 		// Iterate the parameter names
 		for (String stringParameterName : inMap.keySet()) {
 			// Iterate the values for each parameter name

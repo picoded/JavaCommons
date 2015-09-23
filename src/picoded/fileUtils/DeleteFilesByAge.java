@@ -47,9 +47,9 @@ public class DeleteFilesByAge {
 	/// @param   olderThenUnixTimestamp   Unix-timestamp in which files older or equal to it, are deleted
 	static public void olderThenUnixTimestamp(File fileObj, long olderThenUnixTimestamp) {
 		if (fileObj.isDirectory()) {
-			if(fileObj.listFiles().length == 0 && fileObj.lastModified() <= olderThenUnixTimestamp){
+			if (fileObj.listFiles().length == 0 && fileObj.lastModified() <= olderThenUnixTimestamp) {
 				fileObj.delete();
-			}else{
+			} else {
 				for (File f : fileObj.listFiles()) {
 					olderThenUnixTimestamp(f, olderThenUnixTimestamp);
 				}

@@ -22,7 +22,7 @@ public class CombinationBase implements Query {
 	protected List<Query> _children = null;
 	
 	/// The constructed argument map
-	protected Map<String,Object> _argMap = null;
+	protected Map<String, Object> _argMap = null;
 	
 	//
 	// Constructor Setup
@@ -33,7 +33,7 @@ public class CombinationBase implements Query {
 	/// @param   children conditions to test
 	/// @param   default argument map to get test value
 	///
-	public CombinationBase(List<Query> childQuery, Map<String,Object> defaultArgMap) {
+	public CombinationBase(List<Query> childQuery, Map<String, Object> defaultArgMap) {
 		_children = childQuery;
 		_argMap = defaultArgMap;
 	}
@@ -62,11 +62,11 @@ public class CombinationBase implements Query {
 	/// @param   the argument map, if applicable
 	///
 	/// @returns  boolean indicating true / false
-	public boolean test(Object t, Map<String,Object>argMap) {
+	public boolean test(Object t, Map<String, Object> argMap) {
 		boolean result = false; //blank combination is a failure
 		
-		for(Query child : _children) {
-			if( child.test(t, argMap) ) {
+		for (Query child : _children) {
+			if (child.test(t, argMap)) {
 				result = true;
 			} else {
 				return false; //breaks and return false on first failure
@@ -111,35 +111,35 @@ public class CombinationBase implements Query {
 		StringBuilder ret = new StringBuilder();
 		
 		int iteration = 0;
-		for(Query child : _children) {
+		for (Query child : _children) {
 			
-			if( iteration > 0 ) {
-				ret.append( " " );
-				ret.append( operatorSymbol() );
+			if (iteration > 0) {
+				ret.append(" ");
+				ret.append(operatorSymbol());
 			}
 			
-			ret.append( " " );
+			ret.append(" ");
 			
-			if( child.isCombinationOperator() ) {
-				ret.append( "(" );
+			if (child.isCombinationOperator()) {
+				ret.append("(");
 			}
 			
-			ret.append( child.toString() );
+			ret.append(child.toString());
 			
-			if( child.isCombinationOperator() ) {
-				ret.append( ")" );
+			if (child.isCombinationOperator()) {
+				ret.append(")");
 			}
 			
 			++iteration;
 		}
 		
-		if( iteration == 1 && !(operatorSymbol().equals("AND")) ) {
+		if (iteration == 1 && !(operatorSymbol().equals("AND"))) {
 			String retStr = ret.toString();
 			
-			if( retStr.startsWith("(") ) {
-				return operatorSymbol()+retStr ;
+			if (retStr.startsWith("(")) {
+				return operatorSymbol() + retStr;
 			}
-			return operatorSymbol() + "( "+retStr+" )";
+			return operatorSymbol() + "( " + retStr + " )";
 		}
 		
 		return ret.toString().trim();
@@ -150,11 +150,11 @@ public class CombinationBase implements Query {
 	//--------------------------------------------------------------------
 	
 	/// Extract out the respective query keys, and values
-	public Map<String,List<Object>> keyValuesMap( Map<String,List<Object>> mapToReturn ) {
-		for(Query child : childrenQuery()) {
+	public Map<String, List<Object>> keyValuesMap(Map<String, List<Object>> mapToReturn) {
+		for (Query child : childrenQuery()) {
 			mapToReturn = child.keyValuesMap(mapToReturn);
 		}
 		return mapToReturn;
 	}
 	
-} 
+}

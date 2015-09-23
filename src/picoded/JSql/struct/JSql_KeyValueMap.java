@@ -27,7 +27,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
-
+	
 	/// The inner sql object
 	protected JSql sqlObj = null;
 	
@@ -47,13 +47,13 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	
 	/// Primary key type
 	protected String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
-
+	
 	/// Timestamp field type
 	protected String tStampColumnType = "BIGINT";
-
+	
 	/// Key name field type
 	protected String keyColumnType = "VARCHAR(64)";
-
+	
 	/// Value field type
 	protected String valueColumnType = "VARCHAR(MAX)";
 	
@@ -67,44 +67,42 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 			// Table constructor
 			//-------------------
 			sqlObj.createTableQuerySet( //
-											sqlTableName, //
-											new String[] { //
-												// Primary key, as classic int, this is used to lower SQL
-												// fragmentation level, and index memory usage. And is not accessible.
-												// Sharding and uniqueness of system is still maintained by meta keys
-												"pKy", //
-												// Time stamps
-												"cTm", //value created time
-												"eTm", //value expire time
-												// Storage keys
-												"kID", //
-												// Value storage
-												"kVl" //
-											}, //
-											new String[] { //
-												pKeyColumnType, //Primary key
-												// Time stamps
-												tStampColumnType,
-												tStampColumnType,
-												// Storage keys
-												keyColumnType, //
-												// Value storage
-												valueColumnType
-											} //
-			).execute();
-
+				sqlTableName, //
+				new String[] { //
+				// Primary key, as classic int, this is used to lower SQL
+				// fragmentation level, and index memory usage. And is not accessible.
+				// Sharding and uniqueness of system is still maintained by meta keys
+					"pKy", //
+					// Time stamps
+					"cTm", //value created time
+					"eTm", //value expire time
+					// Storage keys
+					"kID", //
+					// Value storage
+					"kVl" //
+				}, //
+				new String[] { //
+				pKeyColumnType, //Primary key
+					// Time stamps
+					tStampColumnType, tStampColumnType,
+					// Storage keys
+					keyColumnType, //
+					// Value storage
+					valueColumnType } //
+				).execute();
+			
 			// Unique index
 			//------------------------------------------------
 			sqlObj.createTableIndexQuerySet( //
-												  sqlTableName, "kID", "UNIQUE", "unq" //
-												  ).execute();
-
+				sqlTableName, "kID", "UNIQUE", "unq" //
+			).execute();
+			
 			// Value search index
 			//------------------------------------------------
 			sqlObj.createTableIndexQuerySet( //
-												  sqlTableName, "kVl", null, "valMap" //
-												  ).execute();
-		} catch( JSqlException e ) {
+				sqlTableName, "kVl", null, "valMap" //
+			).execute();
+		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -115,7 +113,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	public void systemTeardown() {
 		try {
 			sqlObj.execute("DROP TABLE IF EXISTS " + sqlTableName); //IF EXISTS
-		} catch( JSqlException e ) {
+		} catch (JSqlException e) {
 			logger.log(Level.SEVERE, "systemTeardown JSqlException (@TODO properly handle this): ", e);
 		}
 	}
@@ -124,7 +122,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	public void incrementalMaintenance() {
 		// 5 percent chance of trigering maintenance
 		// This is to lower to overall performance cost incrementalMaintenance per request
-		if( RandomUtils.nextInt(0,100) <= 5 ) {
+		if (RandomUtils.nextInt(0, 100) <= 5) {
 			maintenance();
 		}
 	}
@@ -149,7 +147,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 		Object rawTime = null;
 		
 		// Has value
-		if( r != null && r.rowCount() > 0 ) {
+		if (r != null && r.rowCount() > 0) {
 			rawTime = r.get("eTm").get(0);
 		} else {
 			return -1; //No value (-1)
@@ -157,14 +155,14 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 		
 		long ret = 0;
 		if (rawTime != null) {
-			if( rawTime instanceof Number ) {
-				ret = ((Number)rawTime).longValue();
+			if (rawTime instanceof Number) {
+				ret = ((Number) rawTime).longValue();
 			} else {
 				ret = (Long.parseLong(rawTime.toString()));
 			}
 		}
 		
-		if( ret <= 0 ) {
+		if (ret <= 0) {
 			return 0;
 		} else {
 			return ret;
@@ -184,7 +182,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 			// Search for the key
 			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "eTm", "kID=?", new Object[] { key }).query();
 			return getExpiryRaw(r);
-		} catch( JSqlException e ) {
+		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -200,10 +198,10 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	protected void setExpiryRaw(String key, long time) {
 		try {
 			sqlObj.execute("UPDATE " + sqlTableName + " SET eTm=? WHERE kID = ?", time, key);
-		} catch( JSqlException e ) {
+		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
-
+		
 		return;
 	}
 	
@@ -226,12 +224,12 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key }).query();
 			long expiry = getExpiryRaw(r);
 			
-			if( expiry != 0 && expiry < now ) {
+			if (expiry != 0 && expiry < now) {
 				return null;
 			}
 			
 			return r.get("kVl").get(0).toString();
-		} catch( JSqlException e ) {
+		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -250,14 +248,14 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 		try {
 			long now = currentSystemTimeInSeconds();
 			sqlObj.upsertQuerySet( //
-									 sqlTableName, //
-									 new String[] { "kID" }, //unique cols
-									 new Object[] { key }, //unique value
-									 //
-									 new String[] { "cTm", "eTm", "kVl" }, //insert cols
-									 new Object[] { now, expire, value } //insert values
-									 ).execute();
-									 
+				sqlTableName, //
+				new String[] { "kID" }, //unique cols
+				new Object[] { key }, //unique value
+				//
+				new String[] { "cTm", "eTm", "kVl" }, //insert cols
+				new Object[] { now, expire, value } //insert values
+				).execute();
+			
 		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
@@ -275,18 +273,19 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 		try {
 			long now = currentSystemTimeInSeconds();
 			JSqlResult r = null;
-			if( value == null ) {
+			if (value == null) {
 				r = sqlObj.selectQuerySet(sqlTableName, "kID", "eTm <= ? OR eTm > ?", new Object[] { 0, now }).query();
 			} else {
-				r = sqlObj.selectQuerySet(sqlTableName, "kID", "kVl = ? AND (eTm <= ? OR eTm > ?)", new Object[] { value, 0, now }).query();
+				r = sqlObj.selectQuerySet(sqlTableName, "kID", "kVl = ? AND (eTm <= ? OR eTm > ?)",
+					new Object[] { value, 0, now }).query();
 			}
 			
-			if( r == null || r.get("kID") == null ) {
+			if (r == null || r.get("kID") == null) {
 				return new HashSet<String>();
 			}
 			
-			return ListValueConv.toStringSet( r.get("kID") );
-		} catch(JSqlException e) {
+			return ListValueConv.toStringSet(r.get("kID"));
+		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -305,5 +304,5 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 		}
 		return null;
 	}
-
+	
 }

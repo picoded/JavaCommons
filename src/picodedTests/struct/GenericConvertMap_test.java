@@ -34,46 +34,46 @@ public class GenericConvertMap_test {
 	@Test
 	public void arrayInstanceOfTest() {
 		String sample = "a";
-		assertFalse( ((Object)sample instanceof Object[]) );
+		assertFalse(((Object) sample instanceof Object[]));
 		
 		String[] strArr = new String[] { "1", "2", "3" };
 		Object[] objArr = new Object[] { "1", "2", "3" };
 		Integer[] intArr = new Integer[] { 1, 2, 3 };
 		
 		/// String array tests
-		assertTrue( (strArr instanceof Object[]) );
-		assertTrue( ((Object)strArr instanceof Object) );
+		assertTrue((strArr instanceof Object[]));
+		assertTrue(((Object) strArr instanceof Object));
 		
-		assertTrue( ((Object)strArr instanceof String[]) );
-		assertFalse( ((Object)strArr instanceof Integer[]) );
-		assertFalse( ((Object)strArr instanceof String) );
-		assertFalse( ((Object)strArr instanceof Integer) );
+		assertTrue(((Object) strArr instanceof String[]));
+		assertFalse(((Object) strArr instanceof Integer[]));
+		assertFalse(((Object) strArr instanceof String));
+		assertFalse(((Object) strArr instanceof Integer));
 		
 		/// Integer array tests
-		assertTrue( (intArr instanceof Object[]) );
-		assertTrue( ((Object)intArr instanceof Object) );
+		assertTrue((intArr instanceof Object[]));
+		assertTrue(((Object) intArr instanceof Object));
 		
-		assertFalse( ((Object)intArr instanceof String[]) );
-		assertTrue( ((Object)intArr instanceof Integer[]) );
-		assertFalse( ((Object)intArr instanceof String) );
-		assertFalse( ((Object)intArr instanceof Integer) );
+		assertFalse(((Object) intArr instanceof String[]));
+		assertTrue(((Object) intArr instanceof Integer[]));
+		assertFalse(((Object) intArr instanceof String));
+		assertFalse(((Object) intArr instanceof Integer));
 		
 		/// Object array tests
-		assertTrue( (objArr instanceof Object[]) );
-		assertTrue( ((Object)objArr instanceof Object) );
+		assertTrue((objArr instanceof Object[]));
+		assertTrue(((Object) objArr instanceof Object));
 		
-		assertFalse( ((Object)objArr instanceof String[]) );
-		assertFalse( ((Object)objArr instanceof Integer[]) );
-		assertFalse( ((Object)objArr instanceof String) );
-		assertFalse( ((Object)objArr instanceof Integer) );
+		assertFalse(((Object) objArr instanceof String[]));
+		assertFalse(((Object) objArr instanceof Integer[]));
+		assertFalse(((Object) objArr instanceof String));
+		assertFalse(((Object) objArr instanceof Integer));
 	}
 	
 	/// The following, test the class uniqueness of BiFunction types
 	@Test
 	public void classLoockUpTest() {
-		assertEquals( String.class, String.class );
-		assertEquals( String[].class, String[].class );
-		assertNotEquals( String.class, String[].class );
+		assertEquals(String.class, String.class);
+		assertEquals(String[].class, String[].class);
+		assertNotEquals(String.class, String[].class);
 	}
 	
 	@Test
@@ -108,7 +108,8 @@ public class GenericConvertMap_test {
 	
 	@Test
 	public void proxy_intTest() {
-		GenericConvertMap<String, Object> tObj = ProxyGenericConvertMap.ensureGenericConvertMap( new CaseInsensitiveHashMap<String, Object>() );
+		GenericConvertMap<String, Object> tObj = ProxyGenericConvertMap
+			.ensureGenericConvertMap(new CaseInsensitiveHashMap<String, Object>());
 		
 		assertNull(tObj.put("year", "1965"));
 		
@@ -127,7 +128,8 @@ public class GenericConvertMap_test {
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	@Test
 	public void proxy_stringArrayTest() {
-		GenericConvertMap<String, Object> tObj = ProxyGenericConvertMap.ensureGenericConvertMap( new CaseInsensitiveHashMap<String, Object>() );
+		GenericConvertMap<String, Object> tObj = ProxyGenericConvertMap
+			.ensureGenericConvertMap(new CaseInsensitiveHashMap<String, Object>());
 		
 		tObj.put("this", "[\"is\",\"not\",\"the\",\"beginning\"]");
 		tObj.put("nor", new String[] { "this", "is", "the", "end" });

@@ -9,9 +9,9 @@ public class ListValueConv {
 	
 	public static String[] objectListToStringArray(List<Object> listObj) {
 		String[] stringArr = new String[listObj.size()];
-		for (int a=0; a<listObj.size(); ++a) {
+		for (int a = 0; a < listObj.size(); ++a) {
 			Object obj = listObj.get(a);
-			stringArr[a] = (obj != null ? GenericConvert.toString(obj,null) : null);
+			stringArr[a] = (obj != null ? GenericConvert.toString(obj, null) : null);
 		}
 		return stringArr;
 	}
@@ -19,7 +19,7 @@ public class ListValueConv {
 	public static List<String> objectToString(List<Object> listObj) {
 		List<String> stringList = new ArrayList<String>();
 		for (Object obj : listObj) {
-			stringList.add(obj != null ? GenericConvert.toString(obj,null) : null);
+			stringList.add(obj != null ? GenericConvert.toString(obj, null) : null);
 		}
 		return stringList;
 	}
@@ -33,8 +33,8 @@ public class ListValueConv {
 	
 	public static <V> Set<String> toStringSet(List<V> list) {
 		Set<String> ret = new HashSet<String>();
-		for(V item : list) {
-			ret.add( item.toString() );
+		for (V item : list) {
+			ret.add(item.toString());
 		}
 		return ret;
 	}

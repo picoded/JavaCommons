@@ -47,57 +47,56 @@ public class CommonsPage extends BasePage {
 	
 	/// Authenticate the user, or redirects to login page if needed, this is not applied to API page
 	@Override
-	public boolean doAuth(Map<String,Object> templateData) throws Exception {
+	public boolean doAuth(Map<String, Object> templateData) throws Exception {
 		
 		// Gets the wildcard URI
 		String[] wildcardUri = requestWildcardUriArray();
-		if( wildcardUri == null ) {
+		if (wildcardUri == null) {
 			wildcardUri = new String[] {};
 		}
 		
 		boolean enableCommonWildcardAuth = enableCommonWildcardAuthRedirection();
-		if( enableCommonWildcardAuth && wildcardUri.length >= 1 ) {
+		if (enableCommonWildcardAuth && wildcardUri.length >= 1) {
 			// Exempt login page from auth
-			if( wildcardUri[0].equalsIgnoreCase("login") ) {
+			if (wildcardUri[0].equalsIgnoreCase("login")) {
 				String logout = requestParameters().getString("logout");
 				
 				// Handle page logout event
-				if( logout != null && (logout.equals("1") || logout.equals("true")) ) {
-					accountAuthTable().logoutAccount( getHttpServletRequest(), getHttpServletResponse() );
+				if (logout != null && (logout.equals("1") || logout.equals("true"))) {
+					accountAuthTable().logoutAccount(getHttpServletRequest(), getHttpServletResponse());
 				}
 				
 				return true;
 			}
 			// Exempt common / index page from auth
-			if( wildcardUri[0].equalsIgnoreCase("common") || wildcardUri[0].equalsIgnoreCase("index") ) {
+			if (wildcardUri[0].equalsIgnoreCase("common") || wildcardUri[0].equalsIgnoreCase("index")) {
 				return true;
 			}
 			// Exempt login API from auth
-			if( wildcardUri[0].equalsIgnoreCase("api") ) {
-				if(wildcardUri.length >= 3 &&
-					wildcardUri[1].equalsIgnoreCase("account") && 
-					wildcardUri[2].equalsIgnoreCase("login")) {
+			if (wildcardUri[0].equalsIgnoreCase("api")) {
+				if (wildcardUri.length >= 3 && wildcardUri[1].equalsIgnoreCase("account")
+					&& wildcardUri[2].equalsIgnoreCase("login")) {
 					return true;
-				} 
+				}
 				
 				// Throw a login error
-				if( currentAccount() == null ) {
+				if (currentAccount() == null) {
 					
 					getHttpServletResponse().setContentType("application/javascript");
-					getWriter().println( "{ \"error\" : \"Missing User Login\" }" );
+					getWriter().println("{ \"error\" : \"Missing User Login\" }");
 					
 					return false;
 				}
 			}
 			
 			// File exemptions
-			String fileStr = wildcardUri[ wildcardUri.length - 1 ].toLowerCase();
+			String fileStr = wildcardUri[wildcardUri.length - 1].toLowerCase();
 			String[] fileStrArr = fileStr.split("\\.");
-			String fileExt = fileStrArr[ fileStrArr.length - 1 ];
+			String fileExt = fileStrArr[fileStrArr.length - 1];
 			
 			// Allow common asset files types
-			if( //
-				fileExt.equalsIgnoreCase("html") || //
+			if ( //
+			fileExt.equalsIgnoreCase("html") || //
 				fileExt.equalsIgnoreCase("js") || //
 				fileExt.equalsIgnoreCase("css") || //
 				fileExt.equalsIgnoreCase("png") || //
@@ -105,21 +104,22 @@ public class CommonsPage extends BasePage {
 				fileExt.equalsIgnoreCase("jpeg") || //
 				fileExt.equalsIgnoreCase("svg") || //
 				fileExt.equalsIgnoreCase("pdf") //
-				) {
+			) {
 				return true;
 			}
 			
 		}
 		
 		// Redirect to login, if current login is not valid
-		if( currentAccount() == null ) {
-			sendRedirect( (getContextURI()+"/login").replaceAll("//", "/") );
+		if (currentAccount() == null) {
+			sendRedirect((getContextURI() + "/login").replaceAll("//", "/"));
 			return false;
 		}
 		
 		// Blank wildcard redirects to "home" for valid users
-		if( enableCommonWildcardAuth && (wildcardUri.length <= 0 || wildcardUri[0].length() <= 0 || wildcardUri[0].equals("/")) ) {
-			sendRedirect( (getContextURI()+"/home").replaceAll("//", "/") );
+		if (enableCommonWildcardAuth
+			&& (wildcardUri.length <= 0 || wildcardUri[0].length() <= 0 || wildcardUri[0].equals("/"))) {
+			sendRedirect((getContextURI() + "/home").replaceAll("//", "/"));
 			return false;
 		}
 		
@@ -133,7 +133,7 @@ public class CommonsPage extends BasePage {
 		String[] wildcardUri = requestWildcardUriArray();
 		
 		// Indicates its API for API page
-		if( wildcardUri != null && wildcardUri.length >= 1 && wildcardUri[0].equalsIgnoreCase("api") ) {
+		if (wildcardUri != null && wildcardUri.length >= 1 && wildcardUri[0].equalsIgnoreCase("api")) {
 			return true;
 		}
 		
@@ -143,19 +143,19 @@ public class CommonsPage extends BasePage {
 	
 	/// Does the output processing, this is after do(Post/Get/Put/Delete)Request
 	@Override
-	public boolean outputRequest(Map<String,Object> templateData, PrintWriter output) throws Exception {
+	public boolean outputRequest(Map<String, Object> templateData, PrintWriter output) throws Exception {
 		// Gets the wildcard URI
 		String[] wildcardUri = requestWildcardUriArray();
 		
 		// Indicates if its a API.JS request, and returns the JS file
-		if( wildcardUri != null && wildcardUri.length >= 1 && //
+		if (wildcardUri != null && wildcardUri.length >= 1 && //
 			wildcardUri[0].equalsIgnoreCase("api.js") && //api.js request 
 			JConfig().getBoolean("sys.developersMode.enabled", true) //developerMode
-			) {
-			String apiJS = restBuilder().generateJS( "api", (getContextURI()+"/api").replaceAll("//", "/") );
-			FileUtils.writeStringToFile_ifDifferant( new File(getContextPath()+"/api.js"), "UTF-8", apiJS );
+		) {
+			String apiJS = restBuilder().generateJS("api", (getContextURI() + "/api").replaceAll("//", "/"));
+			FileUtils.writeStringToFile_ifDifferant(new File(getContextPath() + "/api.js"), "UTF-8", apiJS);
 			getHttpServletResponse().setContentType("application/javascript");
-			output.println( apiJS );
+			output.println(apiJS);
 			return true;
 		}
 		
@@ -163,35 +163,36 @@ public class CommonsPage extends BasePage {
 		//
 		// @TODO unit test, and fix it, somehow it isnt working =(
 		//
-		if( wildcardUri != null && wildcardUri.length >= 1 && //
+		if (wildcardUri != null && wildcardUri.length >= 1 && //
 			wildcardUri[0].equalsIgnoreCase("form") && //
-			wildcardUri[0].equalsIgnoreCase("jsml") 
-			) {
-			JSMLFormSet().processJSMLFormCollectionServlet( this, Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length) );
+			wildcardUri[0].equalsIgnoreCase("jsml")) {
+			JSMLFormSet().processJSMLFormCollectionServlet(this, Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length));
 			return true;
 		}
 		
 		//generateJS
 		
 		// Pages builder redirect (default)
-		PagesBuilder().processPageBuilderServlet( this );
+		PagesBuilder().processPageBuilderServlet(this);
 		return true;
 	}
 	
 	@Override
-	public void restBuilderSetup( RESTBuilder rbObj ) {
-		AccountLogin.setupRESTBuilder( rbObj, accountAuthTable(), "account." );
+	public void restBuilderSetup(RESTBuilder rbObj) {
+		AccountLogin.setupRESTBuilder(rbObj, accountAuthTable(), "account.");
 	}
 	
 	/// Does the actual final json object to json string output, with contentType "application/javascript"
 	@Override
-	public boolean outputJSON(Map<String,Object> outputData, Map<String,Object> templateData, PrintWriter output) throws Exception {
+	public boolean outputJSON(Map<String, Object> outputData, Map<String, Object> templateData, PrintWriter output)
+		throws Exception {
 		// Gets the wildcard URI
 		String[] wildcardUri = requestWildcardUriArray();
 		
 		// Does the API call
-		if( wildcardUri.length >= 1 && (wildcardUri[0].equalsIgnoreCase("api")) ) {
-			restBuilder().servletCall( this, outputData, String.join(".",Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length)) );
+		if (wildcardUri.length >= 1 && (wildcardUri[0].equalsIgnoreCase("api"))) {
+			restBuilder().servletCall(this, outputData,
+				String.join(".", Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length)));
 		}
 		return super.outputJSON(outputData, templateData, output);
 	}

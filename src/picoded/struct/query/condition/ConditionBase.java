@@ -26,7 +26,7 @@ public class ConditionBase implements Query {
 	protected String _argName = null;
 	
 	/// The constructed argument map
-	protected Map<String,Object> _argMap = null;
+	protected Map<String, Object> _argMap = null;
 	
 	//
 	// Constructor Setup
@@ -38,7 +38,7 @@ public class ConditionBase implements Query {
 	/// @param   default argument name to test against
 	/// @param   default argument map to get test value
 	///
-	public ConditionBase(String field, String argName, Map<String,Object> defaultArgMap) {
+	public ConditionBase(String field, String argName, Map<String, Object> defaultArgMap) {
 		_fieldName = field;
 		_argName = argName;
 		_argMap = defaultArgMap;
@@ -57,8 +57,8 @@ public class ConditionBase implements Query {
 	///
 	/// @returns  The extracted object
 	///
-	protected Object getArgumentValue(Map<String,Object> argMap, String argName) {
-		if( argMap == null || argName == null ) {
+	protected Object getArgumentValue(Map<String, Object> argMap, String argName) {
+		if (argMap == null || argName == null) {
 			return null;
 		}
 		return argMap.get(argName);
@@ -76,11 +76,11 @@ public class ConditionBase implements Query {
 	/// @returns  boolean indicating success or failure
 	///
 	protected boolean testValues(Object fieldValue, Object argValue) {
-		if( argValue == null ) {
-			if( fieldValue == null ) {
+		if (argValue == null) {
+			if (fieldValue == null) {
 				return true;
 			}
-		} else if( argValue.equals(fieldValue) ) {
+		} else if (argValue.equals(fieldValue)) {
 			return true;
 		}
 		return false;
@@ -94,10 +94,10 @@ public class ConditionBase implements Query {
 	///
 	/// @returns  boolean indicating success or failure
 	///
-	protected boolean getAndTestFieldValue(Object t, Map<String,Object> argMap) {
+	protected boolean getAndTestFieldValue(Object t, Map<String, Object> argMap) {
 		Object fieldValue = QueryUtils.getFieldValue(t, _fieldName);
 		Object argValue = getArgumentValue(argMap, _argName);
-			
+		
 		//System.out.println("> "+fieldValue+" = "+argValue);
 		return testValues(fieldValue, argValue);
 	}
@@ -124,7 +124,7 @@ public class ConditionBase implements Query {
 	/// @param   the argument map, if applicable
 	///
 	/// @returns  boolean indicating true / false
-	public boolean test(Object t, Map<String,Object>argMap) {
+	public boolean test(Object t, Map<String, Object> argMap) {
 		return getAndTestFieldValue(t, argMap);
 	}
 	
@@ -155,7 +155,7 @@ public class ConditionBase implements Query {
 	}
 	
 	/// Gets the default argument map
-	public Map<String,Object> defaultArgumentMap() {
+	public Map<String, Object> defaultArgumentMap() {
 		return _argMap;
 	}
 	
@@ -172,7 +172,7 @@ public class ConditionBase implements Query {
 	
 	/// The query string
 	public String toString() {
-		return "\""+fieldName() + "\" " + operatorSymbol() + " " + ":" + argumentName();
+		return "\"" + fieldName() + "\" " + operatorSymbol() + " " + ":" + argumentName();
 	}
 	
 	//
@@ -180,16 +180,16 @@ public class ConditionBase implements Query {
 	//--------------------------------------------------------------------
 	
 	/// Extract out the respective query keys, and values
-	public Map<String,List<Object>> keyValuesMap( Map<String,List<Object>> mapToReturn ) {
+	public Map<String, List<Object>> keyValuesMap(Map<String, List<Object>> mapToReturn) {
 		String key = _fieldName;
-		Object val = (_argMap != null)? _argMap.get(_argName) : null;
+		Object val = (_argMap != null) ? _argMap.get(_argName) : null;
 		
-		if( mapToReturn.get(key) == null ) {
-			mapToReturn.put(key, new ArrayList<Object>() );
+		if (mapToReturn.get(key) == null) {
+			mapToReturn.put(key, new ArrayList<Object>());
 		}
 		mapToReturn.get(key).add(val);
 		
 		return mapToReturn;
 	}
 	
-} 
+}

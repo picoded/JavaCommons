@@ -14,7 +14,7 @@ public class Not extends CombinationBase {
 	/// @param   set of children queries
 	/// @param   default argument map to get test value
 	///
-	public Not(List<Query> child, Map<String,Object> defaultArgMap) {
+	public Not(List<Query> child, Map<String, Object> defaultArgMap) {
 		super(child, defaultArgMap);
 	}
 	
@@ -33,11 +33,11 @@ public class Not extends CombinationBase {
 	/// @param   the argument map, if applicable
 	///
 	/// @returns  boolean indicating true / false
-	public boolean test(Object t, Map<String,Object>argMap) {
+	public boolean test(Object t, Map<String, Object> argMap) {
 		boolean result = false; //blank combination is a failure
 		
-		for(Query child : _children) {
-			if( child.test(t, argMap) ) {
+		for (Query child : _children) {
+			if (child.test(t, argMap)) {
 				return false; //breaks and return false on first failure
 			} else {
 				result = true;
@@ -61,4 +61,4 @@ public class Not extends CombinationBase {
 		return "NOT";
 	}
 	
-} 
+}

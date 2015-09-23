@@ -22,7 +22,7 @@ public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePai
 	}
 	
 	public MutablePair(L left, R right) {
-		super(left,right);
+		super(left, right);
 	}
 	
 }

@@ -20,7 +20,7 @@ public class ResponseHttp_basic implements ResponseHttp {
 	
 	protected InputStream _inputStream = null;
 	protected String _toString = null;
-	protected GenericConvertMap<String,Object> _toMap = null;
+	protected GenericConvertMap<String, Object> _toMap = null;
 	
 	///////////////////////////////////////////////////
 	// Response handling functions
@@ -36,23 +36,23 @@ public class ResponseHttp_basic implements ResponseHttp {
 	public String toString() {
 		// Returns cached copy
 		waitForCompletedRequest();
-		if( _toString != null ) {
+		if (_toString != null) {
 			return _toString;
 		}
 		
 		/// Stores and return
 		try {
-			return (_toString = IOUtils.toString( inputStream() )); //, encoding 
+			return (_toString = IOUtils.toString(inputStream())); //, encoding 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
 	/// Converts the result string into a map, via JSON's
-	public GenericConvertMap<String,Object> toMap() {
+	public GenericConvertMap<String, Object> toMap() {
 		// Returns cached copy
 		waitForCompletedRequest();
-		if( _toMap != null ) {
+		if (_toMap != null) {
 			return _toMap;
 		}
 		

@@ -612,7 +612,7 @@ public class JSql extends BaseInterface {
 	) throws JSqlException {
 		return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues, null, null, null);
 	}
-
+	
 	///
 	/// Helps generate an SQL DELETE request. This function was created to acommedate the various
 	/// syntax differances of DELETE across the various SQL vendors (if any).

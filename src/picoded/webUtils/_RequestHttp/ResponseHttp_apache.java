@@ -30,40 +30,40 @@ public class ResponseHttp_apache extends ResponseHttp_basic {
 	protected Map<String, String[]> _cookiesMap = null;
 	
 	/// Returns the status code
-	public int statusCode() { 
+	public int statusCode() {
 		return _apacheResponse.getStatusLine().getStatusCode();
 	}
 	
 	/// Gets the header map
 	public Map<String, String[]> headersMap() {
 		// Returns cached copy if exists
-		if( _headersMap != null ) {
+		if (_headersMap != null) {
 			return _headersMap;
 		}
 		
 		// Transfer the headers into the HashMapList
-		HashMapList<String,String> mapList = new HashMapList<String,String>();
-		for(Header header : _apacheResponse.getAllHeaders()) {
-			mapList.append( header.getName(), header.getValue() );
+		HashMapList<String, String> mapList = new HashMapList<String, String>();
+		for (Header header : _apacheResponse.getAllHeaders()) {
+			mapList.append(header.getName(), header.getValue());
 		}
 		
-		return ( _headersMap = mapList.toMapArray(new String[0]) );
+		return (_headersMap = mapList.toMapArray(new String[0]));
 	}
 	
 	/// Gets the cookies map
 	public Map<String, String[]> cookiesMap() {
 		// Returns cached copy if exists
-		if( _cookiesMap != null ) {
+		if (_cookiesMap != null) {
 			return _cookiesMap;
 		}
 		
 		// Gets the cookies from the cookie jar =D
-		HashMapList<String,String> mapList = new HashMapList<String,String>();
-		for(Cookie cookie : _cookieJar.getCookies()){
-			mapList.append( cookie.getName(), cookie.getValue() );
+		HashMapList<String, String> mapList = new HashMapList<String, String>();
+		for (Cookie cookie : _cookieJar.getCookies()) {
+			mapList.append(cookie.getName(), cookie.getValue());
 		}
 		
-		return ( _cookiesMap = mapList.toMapArray(new String[0]) );
+		return (_cookiesMap = mapList.toMapArray(new String[0]));
 	}
 	
 }

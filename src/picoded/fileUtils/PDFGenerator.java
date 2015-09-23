@@ -53,8 +53,8 @@ public class PDFGenerator {
 			
 			outputStream = new FileOutputStream(pdfFile);
 			
-			htmlFilePath = htmlFilePath.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System
-				.getProperty("file.separator")));
+			htmlFilePath = htmlFilePath.replaceAll("[/\\\\]+",
+				Matcher.quoteReplacement(System.getProperty("file.separator")));
 			
 			ITextRenderer renderer = new ITextRenderer();
 			renderer.setDocument(new File(htmlFilePath));
@@ -98,8 +98,8 @@ public class PDFGenerator {
 			
 			outputStream = new FileOutputStream(pdfFile);
 			
-			htmlFilePath = htmlFilePath.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System
-				.getProperty("file.separator")));
+			htmlFilePath = htmlFilePath.replaceAll("[/\\\\]+",
+				Matcher.quoteReplacement(System.getProperty("file.separator")));
 			
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			org.w3c.dom.Document doc = builder.parse(new File(htmlFilePath));
@@ -137,8 +137,8 @@ public class PDFGenerator {
 	public static boolean generatePDFfromRawHTML(String outputpdfpath, String rawHtml) {
 		OutputStream outputStream = null;
 		try {
-			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System
-				.getProperty("file.separator")));
+			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+",
+				Matcher.quoteReplacement(System.getProperty("file.separator")));
 			
 			createOutputFolder(outputpdfpath);
 			
@@ -176,8 +176,8 @@ public class PDFGenerator {
 	public static boolean generatePDFfromRawHTML(String outputpdfpath, String rawHtml, String contextRoot) {
 		OutputStream outputStream = null;
 		try {
-			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System
-				.getProperty("file.separator")));
+			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+",
+				Matcher.quoteReplacement(System.getProperty("file.separator")));
 			
 			createOutputFolder(outputpdfpath);
 			

@@ -54,7 +54,7 @@ public class JSql_Sqlite_test {
 		JSqlObj.createTableQuerySet(testTableName, new String[] { "col1", "col2" },
 			new String[] { "INT PRIMARY KEY", "TEXT" }).execute(); //run twice to ensure "IF NOT EXISTS" works
 		
-		JSqlObj.executeQuery( "TRUNCATE TABLE "+testTableName+"").dispose(); //run twice to ensure "IF NOT EXISTS" works
+		JSqlObj.executeQuery("TRUNCATE TABLE " + testTableName + "").dispose(); //run twice to ensure "IF NOT EXISTS" works
 		
 		JSqlObj.executeQuery("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing")
 			.dispose();
@@ -72,7 +72,7 @@ public class JSql_Sqlite_test {
 			"CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50) )")
 			.dispose(); //run twice to ensure "IF NOT EXISTS" works
 		
-		JSqlObj.executeQuery( "TRUNCATE TABLE "+testTableName+"").dispose(); //run twice to ensure "IF NOT EXISTS" works
+		JSqlObj.executeQuery("TRUNCATE TABLE " + testTableName + "").dispose(); //run twice to ensure "IF NOT EXISTS" works
 		
 		JSqlObj.executeQuery("INSERT INTO " + testTableName + " ( col1, col2, col3 ) VALUES (?,?,?)", 404, "has nothing",
 			"do nothing").dispose();
@@ -127,7 +127,7 @@ public class JSql_Sqlite_test {
 		assertTrue(JSqlObj
 			.execute("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )"));
 		
-		assertTrue(JSqlObj.execute( "TRUNCATE TABLE "+testTableName+"")); //cleanup (just incase)
+		assertTrue(JSqlObj.execute("TRUNCATE TABLE " + testTableName + "")); //cleanup (just incase)
 		
 		assertTrue(JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing"));
 	}
@@ -253,11 +253,15 @@ public class JSql_Sqlite_test {
 	public void uniqueIndexIfNotExists() throws JSqlException {
 		executeQuery();
 		
-		assertTrue("1st uniq index", JSqlObj.execute("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName
-			+ "_unique` ON `" + testTableName + "` ( col1, col2 )"));
+		assertTrue(
+			"1st uniq index",
+			JSqlObj.execute("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName + "_unique` ON `" + testTableName
+				+ "` ( col1, col2 )"));
 		
-		assertTrue("2nd uniq index", JSqlObj.execute("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName
-			+ "_unique` ON `" + testTableName + "` ( col3 )"));
+		assertTrue(
+			"2nd uniq index",
+			JSqlObj.execute("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName + "_unique` ON `" + testTableName
+				+ "` ( col3 )"));
 	}
 	
 	@Test
@@ -351,8 +355,8 @@ public class JSql_Sqlite_test {
 		JSqlResult r = null;
 		JSqlQuerySet qSet = null;
 		
-		assertNotNull("query should return a JSql result", r = JSqlObj.query("SELECT * FROM " + testTableName
-			+ " ORDER BY col1 ASC"));
+		assertNotNull("query should return a JSql result",
+			r = JSqlObj.query("SELECT * FROM " + testTableName + " ORDER BY col1 ASC"));
 		assertEquals("Initial value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
 		assertEquals("Initial value check failed", "has nothing", r.readRowCol(0, "col2"));
 		
@@ -364,8 +368,8 @@ public class JSql_Sqlite_test {
 			));
 		assertTrue("SQL result should return true", qSet.execute());
 		
-		assertNotNull("query should return a JSql result", r = JSqlObj.query("SELECT * FROM " + testTableName
-			+ " ORDER BY col1 ASC"));
+		assertNotNull("query should return a JSql result",
+			r = JSqlObj.query("SELECT * FROM " + testTableName + " ORDER BY col1 ASC"));
 		assertEquals("Upsert value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
 		assertEquals("Upsert value check failed", "not found", r.readRowCol(0, "col2"));
 	}

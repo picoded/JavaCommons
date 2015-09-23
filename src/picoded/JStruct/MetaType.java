@@ -71,18 +71,11 @@ public enum MetaType {
 	//
 	// Array based, varients of above
 	//--------------------------------------------------------------------
-	UUID_ARRAY(511),
-	METATABLE_ARRAY(512),
+	UUID_ARRAY(511), METATABLE_ARRAY(512),
 	
-	INTEGER_ARRAY(521),
-	LONG_ARRAY(522),
-	DOUBLE_ARRAY(523),
-	FLOAT_ARRAY(524),
-	STRING_ARRAY(525),
+	INTEGER_ARRAY(521), LONG_ARRAY(522), DOUBLE_ARRAY(523), FLOAT_ARRAY(524), STRING_ARRAY(525),
 	
-	JSON_ARRAY(531),
-	TEXT_ARRAY(532),
-	BINARY_ARRAY(533);
+	JSON_ARRAY(531), TEXT_ARRAY(532), BINARY_ARRAY(533);
 	
 	//////////////////////////////////////////////////////////////////////
 	//
@@ -105,14 +98,24 @@ public enum MetaType {
 	// Constructor setup
 	//--------------------------------------------------------------------
 	private final int ID;
-	private MetaType(final int inID) { ID = inID; }
+	
+	private MetaType(final int inID) {
+		ID = inID;
+	}
 	
 	/// Return the numeric value representing the enum
-	public int getValue() { return ID; }
+	public int getValue() {
+		return ID;
+	}
 	
 	/// Get name and toString alias to name() varient
-	public String getName() { return super.name(); }
-	public String toString() { return super.name(); }
+	public String getName() {
+		return super.name();
+	}
+	
+	public String toString() {
+		return super.name();
+	}
 	
 	//
 	// Public EnumSet
@@ -124,8 +127,8 @@ public enum MetaType {
 	//--------------------------------------------------------------------
 	
 	/// The type mapping cache
-	private static Map<String,MetaType> nameToTypeMap = null;
-	private static Map<Integer,MetaType> idToTypeMap = null;
+	private static Map<String, MetaType> nameToTypeMap = null;
+	private static Map<Integer, MetaType> idToTypeMap = null;
 	
 	/// Setting up the type mapping
 	///
@@ -134,13 +137,13 @@ public enum MetaType {
 	/// setup process.
 	///
 	protected static void initializeTypeMaps() {
-		if( nameToTypeMap == null || idToTypeMap == null ) {
-			Map<String,MetaType> nameToTypeMap_wip = new HashMap<String,MetaType>();
-			Map<Integer,MetaType> idToTypeMap_wip = new HashMap<Integer,MetaType>();
+		if (nameToTypeMap == null || idToTypeMap == null) {
+			Map<String, MetaType> nameToTypeMap_wip = new HashMap<String, MetaType>();
+			Map<Integer, MetaType> idToTypeMap_wip = new HashMap<Integer, MetaType>();
 			
 			for (MetaType type : MetaType.values()) {
-				nameToTypeMap_wip.put( type.name(), type );
-				idToTypeMap_wip.put( type.getValue(), type );
+				nameToTypeMap_wip.put(type.name(), type);
+				idToTypeMap_wip.put(type.getValue(), type);
 			}
 			
 			nameToTypeMap = nameToTypeMap_wip;
@@ -151,33 +154,33 @@ public enum MetaType {
 	/// Get from the respective ID values
 	public static MetaType fromID(int id) {
 		initializeTypeMaps();
-		return idToTypeMap.get( id );
+		return idToTypeMap.get(id);
 	}
 	
 	/// Get from the respective string name values
 	public static MetaType fromName(String name) {
 		initializeTypeMaps();
 		name = name.toUpperCase();
-		return nameToTypeMap.get( name );
+		return nameToTypeMap.get(name);
 	}
 	
 	/// Dynamically switches between name, id, or MetaType. Null returns null
 	public static MetaType fromTypeObject(Object type) {
-		if( type == null ) {
+		if (type == null) {
 			return null;
 		}
 		
 		MetaType mType = null;
-		if(type instanceof MetaType) {
-			mType = (MetaType)type;
-		} else if(type instanceof Number) {
-			mType = MetaType.fromID( ((Number)type).intValue() );
+		if (type instanceof MetaType) {
+			mType = (MetaType) type;
+		} else if (type instanceof Number) {
+			mType = MetaType.fromID(((Number) type).intValue());
 		} else {
 			mType = MetaType.fromName(type.toString());
-		} 
+		}
 		
-		if( mType == null ) {
-			throw new RuntimeException("Invalid MetaType for: "+type.toString());
+		if (mType == null) {
+			throw new RuntimeException("Invalid MetaType for: " + type.toString());
 		}
 		return mType;
 	}

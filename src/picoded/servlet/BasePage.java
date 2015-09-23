@@ -63,7 +63,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	
 	/// REST API builder
 	public RESTBuilder restBuilder() {
-		if( _restBuilderObj != null ) {
+		if (_restBuilderObj != null) {
 			return _restBuilderObj;
 		}
 		
@@ -75,7 +75,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	
 	/// !To Override
 	/// to configure the restBuilderSetup steps
-	public void restBuilderSetup( RESTBuilder rbObj ) {
+	public void restBuilderSetup(RESTBuilder rbObj) {
 		
 	}
 	
@@ -86,7 +86,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	/////////////////////////////////////////////
 	
 	protected String _JStackAppPrefix = "picoded_";
-	protected String _accountTableSuffix = "account"; 
+	protected String _accountTableSuffix = "account";
 	
 	protected AccountTable _accountAuthObj = null;
 	
@@ -103,13 +103,13 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		
 		// Gets the superuser group
 		String superGroup = jc.getString("sys.account.superUsers.groupName", "SuperUsers");
-		String adminUser  = jc.getString("sys.account.superUsers.rootUsername", "admin");
-		String adminPass  = jc.getString("sys.account.superUsers.rootPassword", "P@ssw0rd!");
+		String adminUser = jc.getString("sys.account.superUsers.rootUsername", "admin");
+		String adminPass = jc.getString("sys.account.superUsers.rootPassword", "P@ssw0rd!");
 		boolean resetPass = jc.getBoolean("sys.account.superUsers.rootPasswordReset", false);
 		
 		// Gets and setup the objects if needed
 		AccountObject grpObject = at.getFromName(superGroup);
-		if(grpObject == null) {
+		if (grpObject == null) {
 			grpObject = at.newObject(superGroup);
 		}
 		
@@ -117,18 +117,18 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		grpObject.removePassword();
 		
 		// Setup the default admin
-		AccountObject userObject = at.getFromName( adminUser );
-		if( userObject == null ) {
+		AccountObject userObject = at.getFromName(adminUser);
+		if (userObject == null) {
 			userObject = at.newObject(adminUser);
 			userObject.setPassword(adminPass);
-		} else if(resetPass) {
+		} else if (resetPass) {
 			userObject.setPassword(adminPass);
 		}
 		
 		// Ensure its role
-		String role = grpObject.getMemberRole( userObject );
-		if( role == null || !(role.equals("admin")) ) {
-			grpObject.setMember( userObject, "admin" );
+		String role = grpObject.getMemberRole(userObject);
+		if (role == null || !(role.equals("admin"))) {
+			grpObject.setMember(userObject, "admin");
 		}
 		
 		// Apply changes
@@ -142,7 +142,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	
 	/// The primary accountAuthTable used for user authentication
 	public AccountTable accountAuthTable() {
-		if( _accountAuthObj != null ) {
+		if (_accountAuthObj != null) {
 			return _accountAuthObj;
 		}
 		
@@ -156,8 +156,8 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		// httpUserAuthObj.isHttpOnly = cStack.getBoolean( "userAuthCookie.isHttpOnly", httpUserAuthObj.isHttpOnly);
 		// httpUserAuthObj.isSecureOnly = cStack.getBoolean( "userAuthCookie.isSecureOnly", httpUserAuthObj.isSecureOnly);
 		
-		_accountAuthObj = JStack().getAccountTable( _JStackAppPrefix + _accountTableSuffix );
-		_accountAuthObj.setSuperUserGroupName( getSuperUserGroupName() );
+		_accountAuthObj = JStack().getAccountTable(_JStackAppPrefix + _accountTableSuffix);
+		_accountAuthObj.setSuperUserGroupName(getSuperUserGroupName());
 		
 		return _accountAuthObj;
 	}
@@ -168,7 +168,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	/// Current account that is logged in
 	public AccountObject currentAccount() {
 		
-		if( _currentAccount != null ) {
+		if (_currentAccount != null) {
 			return _currentAccount;
 		}
 		
@@ -180,7 +180,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	/// Diverts the user if not logged in, and returns true.
 	/// Else stored the logged in user name, does setup(), and returns false.
 	public boolean divertInvalidUser(String redirectTo) throws IOException, JStackException {
-		if( currentAccount() == null ) {
+		if (currentAccount() == null) {
 			httpResponse.sendRedirect(redirectTo); // wherever you wanna redirect this page.
 			return true;
 		}
@@ -225,13 +225,13 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		
 		@Override
 		public String render(Object o, String format, Locale L) {
-			if(format == null || format.length() <= 0) {
+			if (format == null || format.length() <= 0) {
 				return null;
 			}
 			
 			try {
 				return currentAccountMetaInfo(format);
-			} catch(JStackException e) {
+			} catch (JStackException e) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -244,14 +244,14 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	///
 	/// @returns the jmte object
 	public JMTE JMTE() {
-		if(_jmteObj != null) { 
-			return _jmteObj; 
+		if (_jmteObj != null) {
+			return _jmteObj;
 		}
 		
-		_jmteObj = new JMTE( getPagesTemplatePath() );
-		_jmteObj.baseDataModel.put( "ContextPath", getContextPath() );
-		_jmteObj.baseDataModel.put( "ContextURI", getContextURI() );
-		_jmteObj.registerNamedRenderer( new currentAccountMetaInfo_nr() );
+		_jmteObj = new JMTE(getPagesTemplatePath());
+		_jmteObj.baseDataModel.put("ContextPath", getContextPath());
+		_jmteObj.baseDataModel.put("ContextURI", getContextURI());
+		_jmteObj.registerNamedRenderer(new currentAccountMetaInfo_nr());
 		
 		return _jmteObj;
 	}
@@ -269,14 +269,14 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	///
 	/// @returns the PagesBuilder object
 	public PagesBuilder PagesBuilder() {
-		if(_pagesBuilderObj != null) {
-			_pagesBuilderObj.setUriRootPrefix( getContextURI() );
+		if (_pagesBuilderObj != null) {
+			_pagesBuilderObj.setUriRootPrefix(getContextURI());
 			return _pagesBuilderObj;
 		}
 		
-		_pagesBuilderObj = new PagesBuilder( getPagesTemplatePath(), getPagesOutputPath() );
-		_pagesBuilderObj.setJMTE( JMTE() );
-		_pagesBuilderObj.setUriRootPrefix( getContextURI() );
+		_pagesBuilderObj = new PagesBuilder(getPagesTemplatePath(), getPagesOutputPath());
+		_pagesBuilderObj.setJMTE(JMTE());
+		_pagesBuilderObj.setUriRootPrefix(getContextURI());
 		
 		return _pagesBuilderObj;
 	}
@@ -294,11 +294,11 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	///
 	/// @returns the JSMLFormSet object
 	public JSMLFormSet JSMLFormSet() {
-		if(_formSetObj != null) {
+		if (_formSetObj != null) {
 			return _formSetObj;
 		}
 		
-		_formSetObj = new JSMLFormSet( getJsmlTemplatePath(), getContextURI() );
+		_formSetObj = new JSMLFormSet(getJsmlTemplatePath(), getContextURI());
 		return _formSetObj;
 	}
 	
@@ -323,17 +323,17 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		_servletContextEvent = sce;
 		try {
 			initializeContext();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	} 
+	}
 	
 	/// [Do not extend] Servlet context destroyed handling
 	public void contextDestroyed(ServletContextEvent sce) {
 		_servletContextEvent = sce;
 		try {
 			destroyContext();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -347,9 +347,9 @@ public class BasePage extends JStackPage implements ServletContextListener {
 			return _contextPath;
 		}
 		
-		if( _servletContextEvent != null ) {
+		if (_servletContextEvent != null) {
 			ServletContext sc = _servletContextEvent.getServletContext();
-			return (_contextPath = sc.getRealPath("/") ) + "/";
+			return (_contextPath = sc.getRealPath("/")) + "/";
 		}
 		return super.getContextPath();
 	}

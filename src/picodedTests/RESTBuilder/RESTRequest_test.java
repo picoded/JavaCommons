@@ -47,17 +47,17 @@ public class RESTRequest_test {
 		assertNotNull(restObj);
 	}
 	
-//	@Test
-	public void namespaceTest(){
+	//	@Test
+	public void namespaceTest() {
 		//if the values seem weird, its because im replicating the values i had when testing account login
 		//also i had to change it from protected to public to test, and ive changed them back to protected so i cant test them.
 		//but it works now. >_> 
 		
-//		restObj.registeredNamespace = new String[]{"account", "members", "list", "*"};
-//		restObj.rawRequestNamespace = new String[]{"account", "members", "list", "GroupA"};
-//		
-//		String[] wildcardNamespace = restObj.wildCardNamespace();
-//		assertNotNull(wildcardNamespace);
+		//		restObj.registeredNamespace = new String[]{"account", "members", "list", "*"};
+		//		restObj.rawRequestNamespace = new String[]{"account", "members", "list", "GroupA"};
+		//		
+		//		String[] wildcardNamespace = restObj.wildCardNamespace();
+		//		assertNotNull(wildcardNamespace);
 	}
 	
 }

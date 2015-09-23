@@ -88,11 +88,11 @@ public class JSMLForm {
 	
 	private Map<String, Object> _formDefinitionMap = null;
 	
-	public JSMLForm(){
+	public JSMLForm() {
 		formGen = new FormGenerator();
 	}
 	
-	public JSMLForm(File formFolder, String uriContext, File tmpFolder){
+	public JSMLForm(File formFolder, String uriContext, File tmpFolder) {
 		formGen = new FormGenerator();
 		_generatedGUID = GUID.base58();
 		
@@ -101,7 +101,7 @@ public class JSMLForm {
 		setContextPath(uriContext);
 	}
 	
-	public JSMLForm(String formFolderPath, String uriContext, String tmpFolderPath){
+	public JSMLForm(String formFolderPath, String uriContext, String tmpFolderPath) {
 		formGen = new FormGenerator();
 		_generatedGUID = GUID.base58();
 		
@@ -110,185 +110,185 @@ public class JSMLForm {
 		setContextPath(uriContext);
 	}
 	
-	public String formDefinitionString(){
+	public String formDefinitionString() {
 		return _formDefinitionString;
 	}
 	
-	public void setFormFolder(String inFormFolderPath){
+	public void setFormFolder(String inFormFolderPath) {
 		_formFolderPath = inFormFolderPath;
 	}
 	
-	public void setFormFolder(File inFormFolder){
+	public void setFormFolder(File inFormFolder) {
 		_formFolderPath = inFormFolder.getPath();
 	}
 	
-	public void setTempFolder(String inResourceFolderPath){
-		if(inResourceFolderPath == null || inResourceFolderPath.isEmpty()){
+	public void setTempFolder(String inResourceFolderPath) {
+		if (inResourceFolderPath == null || inResourceFolderPath.isEmpty()) {
 			_tempFolderPath = "tmp";
-		}else{
+		} else {
 			_tempFolderPath = inResourceFolderPath;
 		}
 		//validateTempFolder();
 	}
 	
-	public void setTempFolder(File inResourceFolder){
-		if(inResourceFolder == null){
+	public void setTempFolder(File inResourceFolder) {
+		if (inResourceFolder == null) {
 			setTempFolder("tmp");
-		}else{
+		} else {
 			setTempFolder(inResourceFolder.getPath());
 		}
 	}
 	
-	public void setContextPath(String inContextPath){
+	public void setContextPath(String inContextPath) {
 		_contextPath = inContextPath;
 	}
 	
-	public void setContextIdentifier(String newIdentifier){
+	public void setContextIdentifier(String newIdentifier) {
 		_contextIdentifier = newIdentifier;
 	}
 	
-	private void validateTempFolder(){
+	private void validateTempFolder() {
 		String tempFolder = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID;
 		File tempFile = new File(tempFolder);
-		if(!tempFile.exists()){
+		if (!tempFile.exists()) {
 			tempFile.mkdirs();
 		}
 	}
 	
-	public void getDefinition(){
+	public void getDefinition() {
 		getDefinition("formDeclare.json");
 	}
 	
-	public void getDefinition(String pathToFormDeclare){
+	public void getDefinition(String pathToFormDeclare) {
 		File declareFile = new File(_formFolderPath + "/" + pathToFormDeclare);
 		
-		if(declareFile.exists()){
-			try{
+		if (declareFile.exists()) {
+			try {
 				String declareFileString = FileUtils.readFileToString(declareFile);
 				setDefinition(declareFileString);
-			}catch(Exception e){
-				throw new RuntimeException("getDefinition() -> "+e.getMessage());
+			} catch (Exception e) {
+				throw new RuntimeException("getDefinition() -> " + e.getMessage());
 			}
 		}
 	}
 	
-	public void setDefinition(String inFormDefinition){
+	public void setDefinition(String inFormDefinition) {
 		_formDefinitionString = sanitiseString(inFormDefinition, "", false);
 		
 	}
 	
-	public void setDefinition(Map<String, Object> inFormDefinition){
+	public void setDefinition(Map<String, Object> inFormDefinition) {
 		_formDefinitionMap = sanitiseMap(inFormDefinition, "", false);
 	}
 	
-	public Map<String, Object> getBlankData(){
+	public Map<String, Object> getBlankData() {
 		return getDataFile("blankData.json");
 	}
 	
-	public Map<String, Object> getDummyData(){
+	public Map<String, Object> getDummyData() {
 		return getDataFile("dummyData.json");
 	}
 	
-	public Map<String, Object> getDataFile(String pathToDataFile){
+	public Map<String, Object> getDataFile(String pathToDataFile) {
 		File dummyDataFile = new File(_formFolderPath + "/" + pathToDataFile);
 		
-		if(dummyDataFile != null && !dummyDataFile.exists()){
+		if (dummyDataFile != null && !dummyDataFile.exists()) {
 			return new HashMap<String, Object>();
 		}
 		
 		String dummyDataString = "";
 		
-		try{
+		try {
 			dummyDataString = FileUtils.readFileToString(dummyDataFile);
-		}catch(Exception e){
+		} catch (Exception e) {
 			throw new RuntimeException("getDataFile() ->" + e);
 		}
 		
-		Map<String, Object> ret =  ConvertJSON.toMap(dummyDataString);
+		Map<String, Object> ret = ConvertJSON.toMap(dummyDataString);
 		return ret;
 	}
 	
-	private File[] getFilesInRootFolder(){
+	private File[] getFilesInRootFolder() {
 		File rootFolder = new File(_formFolderPath);
-		if(rootFolder.exists()){
+		if (rootFolder.exists()) {
 			return rootFolder.listFiles();
-		}else{
+		} else {
 			return null;
 		}
 	}
 	
-	private File getFileInRootFolder(String fileWord){
+	private File getFileInRootFolder(String fileWord) {
 		File[] files = getFilesInRootFolder();
-		if(files != null && files.length > 0){
-			for(File file : files){
-				if(file.getName().toLowerCase().contains(fileWord.toLowerCase())){
+		if (files != null && files.length > 0) {
+			for (File file : files) {
+				if (file.getName().toLowerCase().contains(fileWord.toLowerCase())) {
 					return file;
 				}
 			}
 			return null;
-		}else{
+		} else {
 			return null;
 		}
 	}
 	
-	public String readBodyPrefix(String prefixName){
+	public String readBodyPrefix(String prefixName) {
 		File bodyPrefixFile = getFileInRootFolder(prefixName);
 		
-		if(bodyPrefixFile == null){
+		if (bodyPrefixFile == null) {
 			bodyPrefixFile = getFileInRootFolder("bodyPrefix");
 		}
 		
-		if(bodyPrefixFile == null){
+		if (bodyPrefixFile == null) {
 			return "";
 		}
 		
-		try{
+		try {
 			String bodyPrefixString = FileUtils.readFileToString(bodyPrefixFile);
 			return bodyPrefixString;
-		}catch(Exception e){
+		} catch (Exception e) {
 			throw new RuntimeException("readBodyPrefix() -> " + e.getMessage());
 		}
 	}
 	
-	public String readBodySuffix(String suffixName){
+	public String readBodySuffix(String suffixName) {
 		File bodySuffixFile = getFileInRootFolder(suffixName);
 		
-		if(bodySuffixFile == null){
+		if (bodySuffixFile == null) {
 			bodySuffixFile = getFileInRootFolder("bodySuffix");
 		}
 		
-		if(bodySuffixFile == null){
+		if (bodySuffixFile == null) {
 			return "";
 		}
 		
-		try{
+		try {
 			String bodySuffixString = FileUtils.readFileToString(bodySuffixFile);
 			return bodySuffixString;
-		}catch(Exception e){
+		} catch (Exception e) {
 			throw new RuntimeException("readBodySuffix() -> " + e.getMessage());
 		}
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected Map<String, Object> sanitiseMap(Map<String, Object> inMap, String inKey, boolean pdfMode){
-		if(inMap == null){
+	protected Map<String, Object> sanitiseMap(Map<String, Object> inMap, String inKey, boolean pdfMode) {
+		if (inMap == null) {
 			return inMap;
 		}
 		Map<String, Object> tempMap = new HashMap<String, Object>(inMap);
-		for(String key : inMap.keySet()){
+		for (String key : inMap.keySet()) {
 			Object value = inMap.get(key);
 			
 			String innerKey = key;
-			if(inKey != null && !inKey.isEmpty()){
+			if (inKey != null && !inKey.isEmpty()) {
 				innerKey = inKey + "." + key;
 			}
 			
-			if(value instanceof String){
-				tempMap.replace(key, sanitiseString((String)value, innerKey, pdfMode));
-			}else if(value instanceof List){
-				tempMap.replace(key,  sanitiseList((List<Object>)value, innerKey, pdfMode));
-			}else if(value instanceof Map){
-				tempMap.replace(key, sanitiseMap((Map<String, Object>)value, innerKey, pdfMode));
+			if (value instanceof String) {
+				tempMap.replace(key, sanitiseString((String) value, innerKey, pdfMode));
+			} else if (value instanceof List) {
+				tempMap.replace(key, sanitiseList((List<Object>) value, innerKey, pdfMode));
+			} else if (value instanceof Map) {
+				tempMap.replace(key, sanitiseMap((Map<String, Object>) value, innerKey, pdfMode));
 			}
 		}
 		
@@ -296,43 +296,43 @@ public class JSMLForm {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected List<Object> sanitiseList(List<Object> inList, String key, boolean pdfMode){
+	protected List<Object> sanitiseList(List<Object> inList, String key, boolean pdfMode) {
 		List<Object> tempList = new ArrayList<Object>(inList);
 		
-		for(int i = 0; i < inList.size(); ++i){
+		for (int i = 0; i < inList.size(); ++i) {
 			
 			String keyWithIndex = "";
-			if(key != null && !key.isEmpty()){
+			if (key != null && !key.isEmpty()) {
 				keyWithIndex = key + "[" + i + "]";
 			}
 			
-			if(inList.get(i) instanceof String){
+			if (inList.get(i) instanceof String) {
 				tempList.remove(i);
-				String val = (String)inList.get(i);
-				if(!keyWithIndex.isEmpty()){
+				String val = (String) inList.get(i);
+				if (!keyWithIndex.isEmpty()) {
 					keyWithIndex += ".";
 				}
-				tempList.add(i, sanitiseString(val, keyWithIndex+val, pdfMode));
-			}else if(inList.get(i) instanceof List){
+				tempList.add(i, sanitiseString(val, keyWithIndex + val, pdfMode));
+			} else if (inList.get(i) instanceof List) {
 				tempList.remove(i);
-				tempList.add(i, sanitiseList((List<Object>)inList.get(i), keyWithIndex, pdfMode));
-			}else if(inList.get(i) instanceof Map){
+				tempList.add(i, sanitiseList((List<Object>) inList.get(i), keyWithIndex, pdfMode));
+			} else if (inList.get(i) instanceof Map) {
 				tempList.remove(i);
-				tempList.add(i, sanitiseMap((Map<String, Object>)inList.get(i), keyWithIndex, pdfMode));
+				tempList.add(i, sanitiseMap((Map<String, Object>) inList.get(i), keyWithIndex, pdfMode));
 			}
 		}
 		
 		return tempList;
 	}
 	
-	protected String sanitiseString(String inString, String name, boolean pdfMode){
+	protected String sanitiseString(String inString, String name, boolean pdfMode) {
 		String tempString = inString;
-		if(tempString.contains(_contextIdentifier)){
+		if (tempString.contains(_contextIdentifier)) {
 			tempString = tempString.replace(_contextIdentifier, _contextPath);
-			tempString = tempString.replace(_contextIdentifier+"/", _contextPath);
+			tempString = tempString.replace(_contextIdentifier + "/", _contextPath);
 		}
 		
-		if(tempString.contains(_svgPrefix)){
+		if (tempString.contains(_svgPrefix)) {
 			tempString = tempString.substring(_svgPrefix.length(), tempString.length());
 			
 			String svgFileName = "inSig_" + name + ".svg";
@@ -342,20 +342,20 @@ public class JSMLForm {
 			String svgFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/" + svgFileName;
 			String pngFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/" + pngFileName;
 			
-			try{
+			try {
 				FileOutputStream fos = new FileOutputStream(svgFilePath);
 				fos.write(DatatypeConverter.parseBase64Binary(tempString));
 				fos.flush();
 				fos.close();
 				
 				svgFileToPngFile(svgFilePath, pngFilePath);
-			}catch(Exception ex){
+			} catch (Exception ex) {
 				throw new RuntimeException("sanitiseString() -> " + ex.getMessage());
 			}
 			
-			if(pdfMode){
+			if (pdfMode) {
 				tempString = pngFileName;
-			}else{
+			} else {
 				tempString = _contextPath + _tempFolderPath + "/" + _generatedGUID + "/" + pngFileName;
 			}
 		}
@@ -363,17 +363,17 @@ public class JSMLForm {
 		return tempString;
 	}
 	
-	protected String sanitiseStringForPDF(String inString, String name){
+	protected String sanitiseStringForPDF(String inString, String name) {
 		String tempString = inString;
-		if(tempString.contains(_contextIdentifier)){
-			tempString = tempString.replace(_contextIdentifier, "file:///" + _formFolderPath+"/");
-			tempString = tempString.replace(_contextIdentifier+"/", "file:///" + _formFolderPath+"/");
+		if (tempString.contains(_contextIdentifier)) {
+			tempString = tempString.replace(_contextIdentifier, "file:///" + _formFolderPath + "/");
+			tempString = tempString.replace(_contextIdentifier + "/", "file:///" + _formFolderPath + "/");
 		}
 		
 		return tempString;
 	}
 	
-	private void svgFileToPngFile( String svgPath, String pngPath ) throws IOException {
+	private void svgFileToPngFile(String svgPath, String pngPath) throws IOException {
 		try {
 			InputStream svg_istream = new FileInputStream(svgPath);
 			TranscoderInput input_svg_image = new TranscoderInput(svg_istream);
@@ -389,40 +389,40 @@ public class JSMLForm {
 			png_ostream.close();
 			svg_istream.close();
 			
-		} catch(TranscoderException e) {
+		} catch (TranscoderException e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	public Map<String, Object> requestParamsToParamsMap(Map<String, Object> inRequestParams){
+	public Map<String, Object> requestParamsToParamsMap(Map<String, Object> inRequestParams) {
 		return MapValueConv.fromFullyQualifiedKeys(inRequestParams);
 	}
 	
-	public StringBuilder generateHTML(Map<String, Object> data, boolean isDisplayMode){
+	public StringBuilder generateHTML(Map<String, Object> data, boolean isDisplayMode) {
 		StringBuilder ret = new StringBuilder();
 		
-		try{
+		try {
 			data = sanitiseMap(data, "", false);
-		}catch(Exception e){
+		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
 		
-		if(!_formDefinitionString.isEmpty()){
+		if (!_formDefinitionString.isEmpty()) {
 			ret = formGen.build(_formDefinitionString, data, isDisplayMode);
-		}else{
+		} else {
 			ret = formGen.build(_formDefinitionMap, data, isDisplayMode);
 		}
 		
 		String bodyPrefix = "";
-		if(!isDisplayMode){
+		if (!isDisplayMode) {
 			bodyPrefix = readBodyPrefix("PrefixHTML");
-		}else{
+		} else {
 			bodyPrefix = readBodyPrefix("PrefixDisplay");
 		}
 		String bodySuffix = "";
-		if(!isDisplayMode){
+		if (!isDisplayMode) {
 			bodySuffix = readBodySuffix("SuffixHTML");
-		}else{
+		} else {
 			bodySuffix = readBodySuffix("SuffixDisplay");
 		}
 		ret.insert(0, sanitiseString(bodyPrefix, "", false));
@@ -431,23 +431,23 @@ public class JSMLForm {
 		return ret;
 	}
 	
-	public byte[] generatePDF(Map<String, Object> data){
-	    validateTempFolder();
+	public byte[] generatePDF(Map<String, Object> data) {
+		validateTempFolder();
 		return generatePDF(data, "file:///" + _formFolderPath + "/" + _tempFolderPath);
 	}
 	
-	public byte[] generatePDF(Map<String, Object> data, String pdfGeneratorContextFolder){
+	public byte[] generatePDF(Map<String, Object> data, String pdfGeneratorContextFolder) {
 		StringBuilder ret = new StringBuilder();
 		
 		data = sanitiseMap(data, "", true);
-
-		if(!_formDefinitionString.isEmpty()){
+		
+		if (!_formDefinitionString.isEmpty()) {
 			ret = formGen.build(_formDefinitionString, data, true);
-		}else{
+		} else {
 			ret = formGen.build(_formDefinitionMap, data, true);
 		}
 		
-		if(ret == null){
+		if (ret == null) {
 			throw new RuntimeException("generatePDF() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
 		}
 		validateTempFolder();
@@ -455,19 +455,19 @@ public class JSMLForm {
 		
 		String bodyPrefix = readBodyPrefix("PrefixPDF");
 		String bodySuffix = readBodySuffix("SuffixPDF");
-		ret.insert(0,  sanitiseStringForPDF(bodyPrefix, ""));
+		ret.insert(0, sanitiseStringForPDF(bodyPrefix, ""));
 		ret.append(bodySuffix);
 		
-		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), pdfGeneratorContextFolder + "/" + _generatedGUID + "/" );
-//		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), pdfGeneratorContextFolder +"/" );
-		
+		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), pdfGeneratorContextFolder + "/" + _generatedGUID
+			+ "/");
+		//		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), pdfGeneratorContextFolder +"/" );
 		
 		//read the pdf file now
 		File pdfFile = new File(pdfFilePath);
 		byte[] pdfData = null;
-		try{
+		try {
 			pdfData = FileUtils.readFileToByteArray(pdfFile);
-		}catch(Exception e){
+		} catch (Exception e) {
 			throw new RuntimeException("generatePDF() -> " + e.getMessage());
 		}
 		
@@ -475,7 +475,7 @@ public class JSMLForm {
 	}
 	
 	//just for testing
-	public String[] getPDFLinkTest(Map<String, Object> data){
+	public String[] getPDFLinkTest(Map<String, Object> data) {
 		String[] values = new String[5];
 		
 		data = sanitiseMap(data, "", true);
@@ -485,8 +485,8 @@ public class JSMLForm {
 		values[0] = "PDFGenerator context folder given is -> " + _formFolderPath + "/tmp/" + _generatedGUID + "/";
 		values[1] = "PDFFilePath given to output to is -> " + pdfFilePath;
 		
-		String finalSigA = (String)data.get("finalsig");
-		String finalSigB = (String)data.get("finalsigb");
+		String finalSigA = (String) data.get("finalsig");
+		String finalSigB = (String) data.get("finalsigb");
 		
 		values[2] = "Final Sig A value is -> " + finalSigA;
 		values[3] = "Final Sig B value is -> " + finalSigB;
@@ -500,7 +500,7 @@ public class JSMLForm {
 	}
 	
 	public void clearTempFilesOlderThenGivenAgeInSeconds(long time) {
-//		String tempFolder = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID;
+		//		String tempFolder = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID;
 		String tempFolder = _formFolderPath + "/" + _tempFolderPath;
 		DeleteFilesByAge.olderThenGivenAgeInSeconds(tempFolder, time);
 	}

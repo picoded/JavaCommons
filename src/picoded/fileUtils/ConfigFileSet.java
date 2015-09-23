@@ -15,7 +15,6 @@ import org.ini4j.Ini;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
-
 ///
 /// Config file loader
 ///
@@ -32,7 +31,7 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 	//<main, <main-include.test, hello>>
 	//<related <main-include.text, hi>>
 	//json-><jsonFileName <jsonKey, jsonValue>>
-	public Map<String, Map<String,Object>> prefixSetMap = new HashMap<String, Map<String,Object>>();
+	public Map<String, Map<String, Object>> prefixSetMap = new HashMap<String, Map<String, Object>>();
 	
 	public ConfigFileSet() {
 		
@@ -59,32 +58,32 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		return addConfigSet_recursive(inFile, prefix, separator);
 	}
 	
-	private ConfigFileSet addConfigSet_recursive(File inFile, String rootPrefix, String separator){
-		if(rootPrefix == null){
+	private ConfigFileSet addConfigSet_recursive(File inFile, String rootPrefix, String separator) {
+		if (rootPrefix == null) {
 			rootPrefix = "";
 		}
 		
-		if(inFile.isDirectory()){
+		if (inFile.isDirectory()) {
 			File[] innerFiles = inFile.listFiles();
-			for(File innerFile:innerFiles){
-				if(innerFile.isDirectory()){
+			for (File innerFile : innerFiles) {
+				if (innerFile.isDirectory()) {
 					String parentFolderName = innerFile.getName();
-					if(!rootPrefix.isEmpty()){
+					if (!rootPrefix.isEmpty()) {
 						parentFolderName = rootPrefix + separator + parentFolderName;
 					}
 					addConfigSet_recursive(innerFile, parentFolderName, separator);
-				}else{
+				} else {
 					addConfigSet_recursive(innerFile, rootPrefix, separator);
 				}
 			}
-		}else{
+		} else {
 			String fileName = inFile.getName();
 			
 			ConfigFile cFile = new ConfigFile(inFile);
 			
 			fileName = fileName.substring(0, fileName.lastIndexOf('.'));
 			String prefix = "";
-			if(!rootPrefix.isEmpty()){
+			if (!rootPrefix.isEmpty()) {
 				prefix += rootPrefix + separator;
 			}
 			
@@ -94,7 +93,7 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		return this;
 	}
 	
-	public Object get(Object key){
+	public Object get(Object key) {
 		String keyString = key.toString();
 		String[] splitKeyString = keyString.split("\\.");
 		
@@ -104,13 +103,13 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		//<a.b, <c.d, e>> //ini file
 		//in this case, passing a key of "a.b.c.d" will always hit the json file first, which might not be intended.
 		//having nonconflicting keys will avoid this, but this is just a heads up
-		for(int splitPt = splitKeyString.length - 1; splitPt >= 0; --splitPt) {
-			String fileKey = StringUtils.join( ArrayUtils.subarray(splitKeyString, 0, splitPt), ".");
-			String headerKey = StringUtils.join( ArrayUtils.subarray(splitKeyString, splitPt, splitKeyString.length), ".");
+		for (int splitPt = splitKeyString.length - 1; splitPt >= 0; --splitPt) {
+			String fileKey = StringUtils.join(ArrayUtils.subarray(splitKeyString, 0, splitPt), ".");
+			String headerKey = StringUtils.join(ArrayUtils.subarray(splitKeyString, splitPt, splitKeyString.length), ".");
 			
 			Object returnVal = get_safe(fileKey, headerKey);
 			
-			if(returnVal != null){
+			if (returnVal != null) {
 				return returnVal;
 			}
 		}
@@ -119,12 +118,12 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 	}
 	
 	//use this if you know the exact keyvaluepair you want
-	public Object get_safe(Object fileKey, Object headerKey){
+	public Object get_safe(Object fileKey, Object headerKey) {
 		String fileKeyString = fileKey.toString();
 		String headerKeyString = headerKey.toString();
 		
 		Map<String, Object> subMap = prefixSetMap.get(fileKeyString);
-		if(subMap != null){
+		if (subMap != null) {
 			return subMap.get(headerKeyString);
 		}
 		

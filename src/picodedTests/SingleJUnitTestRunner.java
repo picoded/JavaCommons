@@ -16,21 +16,21 @@ public class SingleJUnitTestRunner {
 		Result result = new JUnitCore().run(request);
 		//System.exit(result.wasSuccessful() ? 0 : 1);
 		
-		System.out.println( "Total Time: "+((result.getRunTime())/1000.0f) );
-		System.out.println( "" );
+		System.out.println("Total Time: " + ((result.getRunTime()) / 1000.0f));
+		System.out.println("");
 		
-		if( result.wasSuccessful() ) {
-			System.out.println( "OK ("+result.getRunCount()+" tests)" );
-			System.out.println( "" );
+		if (result.wasSuccessful()) {
+			System.out.println("OK (" + result.getRunCount() + " tests)");
+			System.out.println("");
 		} else {
-			System.out.println( "FAIL ("+result.getRunCount()+" tests)" );
+			System.out.println("FAIL (" + result.getRunCount() + " tests)");
 			
-			System.out.println( "" );
-			System.out.println( "There was "+result.getFailureCount()+" failure:" );
+			System.out.println("");
+			System.out.println("There was " + result.getFailureCount() + " failure:");
 			
 			Failure fail = result.getFailures().get(0);
-			System.out.println( "1) "+fail.getTestHeader() );
-			System.out.println( fail.getTrace() );
+			System.out.println("1) " + fail.getTestHeader());
+			System.out.println(fail.getTrace());
 		}
 	}
 }

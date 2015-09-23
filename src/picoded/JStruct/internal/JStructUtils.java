@@ -25,47 +25,48 @@ public class JStructUtils {
 	///
 	/// @returns  The MetaObject[] array
 	///
-	public static MetaObject[] sortAndOffsetListToArray(List<MetaObject> retList, String orderByStr, int offset, int limit ) {
+	public static MetaObject[] sortAndOffsetListToArray(List<MetaObject> retList, String orderByStr, int offset,
+		int limit) {
 		
 		// Ensure the list is editable
-		if( !(retList instanceof ArrayList) ) {
+		if (!(retList instanceof ArrayList)) {
 			retList = new ArrayList<MetaObject>(retList);
 		}
 		
 		// Sorting the order, if needed
-		if( orderByStr != null && (orderByStr = orderByStr.trim()).length() > 0 ) {
+		if (orderByStr != null && (orderByStr = orderByStr.trim()).length() > 0) {
 			// Creates the order by sorting, with _oid
-			OrderBy<MetaObject> sorter = new OrderBy<MetaObject>( orderByStr+" , _oid");
+			OrderBy<MetaObject> sorter = new OrderBy<MetaObject>(orderByStr + " , _oid");
 			
 			// Sort it
 			Collections.sort(retList, sorter);
 		}
 		
 		// Get sublist if needed
-		if( offset >= 1 ) {
+		if (offset >= 1) {
 			int size = retList.size();
 			
 			// Out of bound, return blank
-			if(offset >= size) {
+			if (offset >= size) {
 				return new MetaObject[0];
 			}
 			
 			// Ensures the upper end does not go out of bound
 			int end = size;
-			if( limit > -1 ) {
-				end = offset+limit;
+			if (limit > -1) {
+				end = offset + limit;
 			}
-			if(end > size) {
+			if (end > size) {
 				end = size;
 			}
 			
 			// Out of range
-			if(end <= offset) {
+			if (end <= offset) {
 				return new MetaObject[0];
 			}
 			
 			// Get sublist
-			retList = retList.subList( offset, end );
+			retList = retList.subList(offset, end);
 		}
 		
 		// Convert to array, and return

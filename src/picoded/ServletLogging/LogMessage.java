@@ -6,16 +6,15 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 public class LogMessage {
-
+	
 	// store format string
 	private String format;
 	
 	// store format string arguments
 	private List<Object> args;
 	
-	
 	// / Default Constructor
-	public LogMessage(){
+	public LogMessage() {
 	}
 	
 	// / Returns the format string
@@ -55,7 +54,7 @@ public class LogMessage {
 		if (StringUtils.isBlank(getFormat()) || getArgs() == null || getArgs().isEmpty()) {
 			return "";
 		}
-		return String.format( getFormat(), getArgs().toArray(new Object[getArgs().size()]) );
+		return String.format(getFormat(), getArgs().toArray(new Object[getArgs().size()]));
 	}
-
+	
 }

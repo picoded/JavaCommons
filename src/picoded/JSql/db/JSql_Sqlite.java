@@ -73,15 +73,12 @@ public class JSql_Sqlite extends JSql {
 		final String deleteFrom = "DELETE FROM";
 		
 		inString = inString.toUpperCase();
-		inString = inString.trim()
-			.replaceAll("(\\s){1}", " ")
-			.replaceAll("\\s+", " ")
-			.replaceAll("(?i)VARCHAR\\(MAX\\)", "VARCHAR")
-			.replaceAll("(?i)BIGINT", "INTEGER");
+		inString = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("\\s+", " ")
+			.replaceAll("(?i)VARCHAR\\(MAX\\)", "VARCHAR").replaceAll("(?i)BIGINT", "INTEGER");
 		//System.out.println( inString );
 		
 		if (inString.startsWith(truncateTable)) {
-		    inString = inString.replaceAll(truncateTable, deleteFrom);
+			inString = inString.replaceAll(truncateTable, deleteFrom);
 		}
 		return inString;
 	}

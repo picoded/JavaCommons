@@ -213,7 +213,7 @@ public class AccountObject extends JStruct_MetaObject {
 			return null;
 		}
 		
-		return mainTable.groupChild_meta.uncheckedGet(this._oid() + "-" + memberOID);
+		return mainTable.groupChild_meta.uncheckedGet(mainTable.getGroupChildMetaKey(this._oid(), memberOID));
 	}
 	
 	/// Gets and returns the member meta map, if it exists

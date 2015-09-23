@@ -1489,7 +1489,7 @@ return resMap;
 					accountTableObj.removeFromName(accountName);
 				}
 			} catch (Exception e) {
-				res.put("error", "Remove from table is currently not implemented. Stare at Eugene until this is fixed.");
+				res.put("error", "Exception while trying to remove");
 			}
 			
 			return resMap;

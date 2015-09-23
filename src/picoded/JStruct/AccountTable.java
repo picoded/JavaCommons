@@ -59,24 +59,27 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	/// 
 	/// "names" are unique, and are usually either group names or emails
 	/// GUID's are not unique, as a single GUID can have multiple "names"
-	protected KeyValueMap accountID = null;
+	protected KeyValueMap accountID = null; //to delete from
 	
 	/// Stores the account authentication hash, used for password based authentication
-	protected KeyValueMap accountHash = null;
+	protected KeyValueMap accountHash = null; //to delete from
 	
 	/// Stores the account session authentication no-once information 
 	protected KeyValueMap accountSessions = null;
 	
 	/// Holds the account object meta table values
-	protected MetaTable accountMeta = null;
+	protected MetaTable accountMeta = null; //to delete from
 	
 	/// Handles the storage of the group mapping
 	///
 	/// Group[member] = role1,role2, ...
-	protected MetaTable group_childRole = null;
+	/// MetaTable<Group_guid, MetaObject<Member_guid, "String array of roles">
+	protected MetaTable group_childRole = null; //to delete from
 	
 	/// Handles the Group-member meta field mapping
-	protected MetaTable groupChild_meta = null;
+	///
+	/// MetaTable<GroupOID-MemberOID, MetaObject>
+	protected MetaTable groupChild_meta = null; //to delete from
 	
 	///
 	/// Table suffixes for the variosu sub tables
@@ -270,14 +273,48 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	
 	/// Removes the accountObject using the name
 	public void removeFromName(String name) {
-		//@TODO implmentation
-		throw new RuntimeException("@TODO");
+		AccountObject ao = this.getFromName(name);
+		if(ao != null){
+			removeFromID(ao._oid());
+		}
 	}
 	
 	/// Removes the accountObject using the ID
 	public void removeFromID(String oid) {
-		//@TODO implmentation
-		throw new RuntimeException("@TODO");
+		if(oid != null && !oid.isEmpty()){
+			AccountObject ao = this.getFromID(oid);
+			
+//			group_childRole and groupChild_meta
+			if(ao != null){
+				String[] groupIDs = ao.getGroups_id();
+				if(groupIDs != null){
+					for(String groupID : groupIDs){
+						group_childRole.remove(groupID);
+						
+						String groupChildMetaKey = getGroupChildMetaKey(oid, groupID);
+						groupChild_meta.remove(groupChildMetaKey);
+					}
+				}
+			}
+			
+//			accountID
+			Set<String> accountIDNames = accountID.getKeys(oid);
+			if(accountIDNames != null){
+				for(String name : accountIDNames){
+					accountID.remove(name, oid);
+				}
+			}
+			
+//			accountHash
+			accountHash.remove(oid);
+			
+//			accountMeta
+			accountMeta.remove(oid);
+		}
+	}
+	
+	protected String getGroupChildMetaKey(String groupOID, String memberOID){
+		return groupOID + "-" + memberOID;
 	}
 	
 	///

@@ -1105,7 +1105,6 @@ public class AccountLogin extends BasePage {
 			Map<String, Object> setMemberMap = null;
 			Object setMemberMapRaw = req.get("setMembers");
 			if (setMemberMapRaw != null) {
-				
 				setMemberMap = ConvertJSON.toMap((String) setMemberMapRaw);
 				
 				successfulAdds = new ArrayList<String>();
@@ -1401,6 +1400,7 @@ return resMap;
 					newAccount.setGroupStatus(true);
 				}
 				
+				newAccount.setPassword(password);
 				newAccount.putAll(givenMetaObj);
 				newAccount.saveAll();
 				

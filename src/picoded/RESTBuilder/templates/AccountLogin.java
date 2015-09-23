@@ -964,13 +964,14 @@ public class AccountLogin extends BasePage {
 			res.put("headers", null);
 			res.put("error", null);
 			
+			List<List<Object>> retList = new ArrayList<List<Object>>();
+			res.put("data", retList);
+			
 			if (groupObj == null) {
 				return resMap;
 			}
 			
 			try {
-				List<List<Object>> retList = new ArrayList<List<Object>>();
-				
 				String[] headers = reqObj.getStringArray("headers");
 				
 				if (headers == null || headers.length < 1) {
@@ -1018,11 +1019,10 @@ public class AccountLogin extends BasePage {
 					}
 					
 					++listCounter;
+				}
 					res.put("data", retList);
 					res.put("draw", req.getInt("draw"));
 					res.put("headers", headers);
-				}
-				
 			} catch (Exception e) {
 				res.put("error", e.getMessage());
 			}
@@ -1400,12 +1400,15 @@ return resMap;
 			AccountObject newAccount = accountTableObj.newObject(userName);
 			if (newAccount != null) {
 				if (isGroup) {
+					System.out.println("Setting group status to true");
 					newAccount.setGroupStatus(true);
 				}
 				
 				newAccount.setPassword(password);
 				newAccount.putAll(givenMetaObj);
 				newAccount.saveAll();
+				
+				System.out.println("New account group status is: "+newAccount.isGroup());
 				
 				res.put("meta", newAccount);
 				res.put("accountID", newAccount._oid());

@@ -83,6 +83,19 @@ public class FormInputTemplates {
 		return sbArr[0].append(sbArr[1]);
 	};
 	
+	protected static FormInputInterface input_number = (node) -> {
+		CaseInsensitiveHashMap<String, String> paramMap = new CaseInsensitiveHashMap<String, String>();
+		String fieldValue = node.getStringValue();
+		
+		paramMap.put(HtmlTag.TYPE, "number");
+		if (fieldValue != null && fieldValue.length() >= 0) {
+			paramMap.put(HtmlTag.VALUE, fieldValue);
+		}
+		
+		StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.INPUT, "pfi_inputNumber pfi_input", paramMap);
+		return sbArr[0].append(sbArr[1]);
+	};
+	
 	protected static FormInputInterface input_textarea = (node) -> {
 		CaseInsensitiveHashMap<String, String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getStringValue();
@@ -618,6 +631,7 @@ public class FormInputTemplates {
 		defaultTemplates.put("image", FormInputTemplates.image);
 		defaultTemplates.put("signature", FormInputTemplates.signature);
 		defaultTemplates.put("date", FormInputTemplates.datePicker);
+		defaultTemplates.put("number", FormInputTemplates.input_number);
 		
 		return defaultTemplates;
 	}

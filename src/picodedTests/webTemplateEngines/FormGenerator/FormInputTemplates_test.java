@@ -278,7 +278,7 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("checkboxPDFOutput", jsonTemplatedOutput));
 	}
 	
-	@Test
+//	@Test
 	public void tableTest() {
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("table", false);
 		String rawHtmlString = getHtmlString("table");
@@ -315,7 +315,7 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("tablePDFOutput", jsonTemplatedOutput));
 	}
 	
-	@Test
+//	@Test
 	public void verticalTableTest() {
 		String jsonTemplatedOutput = getTemplatedJsonStringWithData("verticalTable", false);
 		String rawHtmlString = getHtmlString("verticalTable");
@@ -412,6 +412,21 @@ public class FormInputTemplates_test {
 		jsonTemplatedOutput = getTemplatedJSONString("date", true, true);
 		assertNotNull(jsonTemplatedOutput);
 		assertTrue(generateHTMLFile("dateDisplay", jsonTemplatedOutput));
+	}
+	
+//	@Test
+	public void inputNumberTest() {
+		String jsonTemplatedOutput = getTemplatedJSONString("number", false, false);
+		assertNotNull(jsonTemplatedOutput);
+		assertTrue(generateHTMLFile("number", jsonTemplatedOutput));
+		
+		jsonTemplatedOutput = getTemplatedJSONString("number", false, true);
+		assertNotNull(jsonTemplatedOutput);
+		assertTrue(generateHTMLFile("numberWithData", jsonTemplatedOutput));
+		
+		jsonTemplatedOutput = getTemplatedJSONString("number", true, true);
+		assertNotNull(jsonTemplatedOutput);
+		assertTrue(generateHTMLFile("numberWithDataDisplay", jsonTemplatedOutput));
 	}
 	
 	//	@Test

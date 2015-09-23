@@ -39,6 +39,11 @@ public class DisplayInputTemplates {
 	};
 	
 	@SuppressWarnings("unchecked")
+	protected static FormInputInterface input_number = (node) -> {
+		return FormInputTemplates.displayDiv(node, "pfi_inputNumber pfi_display");
+	};
+	
+	@SuppressWarnings("unchecked")
 	protected static FormInputInterface input_textarea = (node) -> {
 		return FormInputTemplates.displayDiv(node, "pfi_inputTextBox pfi_display");
 	};

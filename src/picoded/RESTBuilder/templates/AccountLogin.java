@@ -1020,9 +1020,9 @@ public class AccountLogin extends BasePage {
 					
 					++listCounter;
 				}
-					res.put("data", retList);
-					res.put("draw", req.getInt("draw"));
-					res.put("headers", headers);
+				res.put("data", retList);
+				res.put("draw", req.getInt("draw"));
+				res.put("headers", headers);
 			} catch (Exception e) {
 				res.put("error", e.getMessage());
 			}
@@ -1408,7 +1408,7 @@ return resMap;
 				newAccount.putAll(givenMetaObj);
 				newAccount.saveAll();
 				
-				System.out.println("New account group status is: "+newAccount.isGroup());
+				System.out.println("New account group status is: " + newAccount.isGroup());
 				
 				res.put("meta", newAccount);
 				res.put("accountID", newAccount._oid());

@@ -92,10 +92,10 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Lis
 						// remove single quote if it is first and last character.
 						if (colName != null && colName.trim().length() > 0) {
 							if (colName.charAt(0) == '\'' || colName.charAt(0) == '"') {
-							    colName = colName.substring(1);
+								colName = colName.substring(1);
 							}
 							if (colName.charAt(colName.length() - 1) == '\'' || colName.charAt(colName.length() - 1) == '"') {
-							    colName = colName.substring(0, colName.length() - 1);
+								colName = colName.substring(0, colName.length() - 1);
 							}
 						}
 						

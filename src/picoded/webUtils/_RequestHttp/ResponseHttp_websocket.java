@@ -31,12 +31,12 @@ public class ResponseHttp_websocket implements ResponseHttp {
 	public ResponseHttp_websocket(String requestURL, Consumer<String> handler) {
 		
 		// Setup the handler
-		if(handler != null) {
+		if (handler != null) {
 			setMessageHandler(handler);
 		}
 		
 		// Does the connection (if url given)
-		if(requestURL != null) {
+		if (requestURL != null) {
 			websocketConnect(requestURL);
 		}
 	}
@@ -83,7 +83,7 @@ public class ResponseHttp_websocket implements ResponseHttp {
 	///
 	/// @Returns   the previous handler if set, if replace is enabled
 	@Override
-	public Consumer<String> replaceMessageHandler( Consumer<String> handler ) {
+	public Consumer<String> replaceMessageHandler(Consumer<String> handler) {
 		Consumer<String> old = _websocketMessageHandler;
 		_websocketMessageHandler = handler;
 		return old;
@@ -91,14 +91,14 @@ public class ResponseHttp_websocket implements ResponseHttp {
 	
 	/// Gets the currently set message handler
 	@Override
-	public Consumer<String> getMessageHandler() { 
+	public Consumer<String> getMessageHandler() {
 		return _websocketMessageHandler;
 	}
 	
 	/// sends a message via websocket
 	@Override
 	public void sendMessage(String message) {
-		if(_websocketSession == null) {
+		if (_websocketSession == null) {
 			throw new RuntimeException("WebSocket is already closed");
 		}
 		_websocketSession.getAsyncRemote().sendText(message);
@@ -111,10 +111,10 @@ public class ResponseHttp_websocket implements ResponseHttp {
 		
 		try {
 			sendMessage(message);
-			while( _sendAndWait_message == null ) {
+			while (_sendAndWait_message == null) {
 				Thread.sleep(0, 250000);
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
 			_sendAndWait_block = false;
@@ -130,14 +130,14 @@ public class ResponseHttp_websocket implements ResponseHttp {
 	/// Ensures that the websocket is connected to _baseURL
 	public void websocketConnect(String requestURL) {
 		try {
-			if( _container == null ) {
+			if (_container == null) {
 				_container = ContainerProvider.getWebSocketContainer();
 			}
 			
-			if( _websocketSession == null ) {
-				_websocketSession = _container.connectToServer(this, new URI(requestURL) );
+			if (_websocketSession == null) {
+				_websocketSession = _container.connectToServer(this, new URI(requestURL));
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -157,7 +157,7 @@ public class ResponseHttp_websocket implements ResponseHttp {
 	/// Actual onMessage reciever for websocket protocol
 	@OnMessage
 	public void _onMessage(String message) {
-		if( _sendAndWait_block ) {
+		if (_sendAndWait_block) {
 			_sendAndWait_message = message;
 			_sendAndWait_block = false;
 		} else if (_websocketMessageHandler != null) {

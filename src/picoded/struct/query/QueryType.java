@@ -12,9 +12,7 @@ public enum QueryType {
 	// Combination types
 	//--------------------------------------------------------------------
 	
-	AND(0),
-	OR(1),
-	NOT(2), //Is actually and inverse of AND
+	AND(0), OR(1), NOT(2), //Is actually and inverse of AND
 	
 	//
 	// Comparision types
@@ -22,11 +20,9 @@ public enum QueryType {
 	
 	EQUALS(10),
 	
-	LESS_THAN(20),
-	LESS_THAN_OR_EQUALS(21),
+	LESS_THAN(20), LESS_THAN_OR_EQUALS(21),
 	
-	MORE_THAN(30),
-	MORE_THAN_OR_EQUALS(31);
+	MORE_THAN(30), MORE_THAN_OR_EQUALS(31);
 	
 	//////////////////////////////////////////////////////////////////////
 	//
@@ -49,10 +45,15 @@ public enum QueryType {
 	// Constructor setup
 	//--------------------------------------------------------------------
 	private final int ID;
-	private QueryType(final int inID) { ID = inID; }
+	
+	private QueryType(final int inID) {
+		ID = inID;
+	}
 	
 	/// Return the numeric value representing the enum
-	public int getValue() { return ID; }
+	public int getValue() {
+		return ID;
+	}
 	
 	//
 	// Public EnumSet
@@ -64,8 +65,8 @@ public enum QueryType {
 	//--------------------------------------------------------------------
 	
 	/// The type mapping cache
-	private static Map<String,QueryType> nameToTypeMap = null;
-	private static Map<Integer,QueryType> idToTypeMap = null;
+	private static Map<String, QueryType> nameToTypeMap = null;
+	private static Map<Integer, QueryType> idToTypeMap = null;
 	
 	/// Setting up the type mapping
 	///
@@ -74,13 +75,13 @@ public enum QueryType {
 	/// setup process.
 	///
 	protected static void initializeTypeMaps() {
-		if( nameToTypeMap == null || idToTypeMap == null ) {
-			Map<String,QueryType> nameToTypeMap_wip = new HashMap<String,QueryType>();
-			Map<Integer,QueryType> idToTypeMap_wip = new HashMap<Integer,QueryType>();
+		if (nameToTypeMap == null || idToTypeMap == null) {
+			Map<String, QueryType> nameToTypeMap_wip = new HashMap<String, QueryType>();
+			Map<Integer, QueryType> idToTypeMap_wip = new HashMap<Integer, QueryType>();
 			
 			for (QueryType type : QueryType.values()) {
-				nameToTypeMap_wip.put( type.name(), type );
-				idToTypeMap_wip.put( type.getValue(), type );
+				nameToTypeMap_wip.put(type.name(), type);
+				idToTypeMap_wip.put(type.getValue(), type);
 			}
 			
 			nameToTypeMap = nameToTypeMap_wip;
@@ -91,33 +92,33 @@ public enum QueryType {
 	/// Get from the respective ID values
 	public static QueryType fromID(int id) {
 		initializeTypeMaps();
-		return idToTypeMap.get( id );
+		return idToTypeMap.get(id);
 	}
 	
 	/// Get from the respective string name values
 	public static QueryType fromName(String name) {
 		initializeTypeMaps();
 		name = name.toUpperCase();
-		return nameToTypeMap.get( name );
+		return nameToTypeMap.get(name);
 	}
 	
 	/// Dynamically switches between name, id, or QueryType. Null returns null
 	public static QueryType fromTypeObject(Object type) {
-		if( type == null ) {
+		if (type == null) {
 			return null;
 		}
 		
 		QueryType mType = null;
-		if(type instanceof QueryType) {
-			mType = (QueryType)type;
-		} else if(type instanceof Number) {
-			mType = QueryType.fromID( ((Number)type).intValue() );
+		if (type instanceof QueryType) {
+			mType = (QueryType) type;
+		} else if (type instanceof Number) {
+			mType = QueryType.fromID(((Number) type).intValue());
 		} else {
 			mType = QueryType.fromName(type.toString());
-		} 
+		}
 		
-		if( mType == null ) {
-			throw new RuntimeException("Invalid QueryType for: "+type.toString());
+		if (mType == null) {
+			throw new RuntimeException("Invalid QueryType for: " + type.toString());
 		}
 		return mType;
 	}

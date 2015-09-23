@@ -42,7 +42,7 @@ public class MetaTable_Hazelcast_test extends MetaTable_Sqlite_test {
 	//-----------------------------------------------
 	@Override
 	public JCache JCacheObj() {
-		return JCache.hazelcast( hazelcastSetup() );
+		return JCache.hazelcast(hazelcastSetup());
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ public class MetaTable_Hazelcast_test extends MetaTable_Sqlite_test {
 	public void readLayerCheck() throws JStackException {
 		
 		// Read operation as per "normal"
-		TreeMap<String, Object> objMap = new TreeMap<String,Object>();
+		TreeMap<String, Object> objMap = new TreeMap<String, Object>();
 		objMap.put("str_val", "^_^");
 		objMap.put("num", 123);
 		String guid = GUID.base58();
@@ -72,13 +72,13 @@ public class MetaTable_Hazelcast_test extends MetaTable_Sqlite_test {
 		
 		// Access only the JSql layer
 		JStack sqlStack = new JStack(JSqlObj);
-		MetaTable sqlMtObj = new MetaTable(sqlStack, mtTableName );
+		MetaTable sqlMtObj = new MetaTable(sqlStack, mtTableName);
 		
 		// Checks the JSql layer only
 		assertEquals(objMap, sqlMtObj.get(guid));
 		
 		// "Corrupting" the lower JSql layer
-		HashMap<String, Object> corruptObjMap = new HashMap<String, Object>( objMap );
+		HashMap<String, Object> corruptObjMap = new HashMap<String, Object>(objMap);
 		corruptObjMap.put("str_val", "X_X");
 		
 		assertEquals(guid, sqlMtObj.append(guid, corruptObjMap)._oid()); //corrupt it

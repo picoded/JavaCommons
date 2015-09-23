@@ -9,56 +9,56 @@ public class DisplayWrapperTemplates {
 	/// divWrapper
 	///
 	/// Does a basic div wrapper
-	protected static FormWrapperInterface divWrapper = (node)->{
+	protected static FormWrapperInterface divWrapper = (node) -> {
 		return FormWrapperTemplates.standardDivWrapper(node, true);
 	};
 	
 	/// forWrapper
 	///
 	/// Does a basic div wrapper
-	protected static FormWrapperInterface forWrapper = (node)->{
+	protected static FormWrapperInterface forWrapper = (node) -> {
 		return FormWrapperTemplates.forListWrapper(node, true);
 	};
 	
-	protected static FormWrapperInterface checkboxWrapper = (node)->{
+	protected static FormWrapperInterface checkboxWrapper = (node) -> {
 		return FormWrapperTemplates.checkboxWrapper(node, true);
 	};
 	
-	protected static FormWrapperInterface tableWrapper = (node)->{
+	protected static FormWrapperInterface tableWrapper = (node) -> {
 		return TableWrapperTemplates.tableWrapper_horizontal(node, true);
 	};
 	
-	protected static FormWrapperInterface verticalTableWrapper = (node)->{
+	protected static FormWrapperInterface verticalTableWrapper = (node) -> {
 		return TableWrapperTemplates.tableWrapper_vertical(node, true);
 	};
 	
-	protected static FormWrapperInterface imageWrapper = (node)->{
+	protected static FormWrapperInterface imageWrapper = (node) -> {
 		return FormWrapperTemplates.imageWrapper(node, true);
 	};
 	
-	protected static FormWrapperInterface signatureWrapper = (node)->{
+	protected static FormWrapperInterface signatureWrapper = (node) -> {
 		return FormWrapperTemplates.signatureWrapper(node, true);
 	};
 	
-	protected static FormWrapperInterface datePickerWrapper = (node)->{
+	protected static FormWrapperInterface datePickerWrapper = (node) -> {
 		return FormWrapperTemplates.datePickerWrapper(node, true);
 	};
 	
-	protected static FormWrapperInterface formSetWrapper = (node)->{
+	protected static FormWrapperInterface formSetWrapper = (node) -> {
 		return FormWrapperTemplates.formSetWrapper(node, true);
 	};
 	
 	/// noneWrapper
 	///
 	/// No wrappers
-	protected static FormWrapperInterface none = (node)->{
+	protected static FormWrapperInterface none = (node) -> {
 		StringBuilder ret = new StringBuilder();
-		ret.append( node.fullChildrenHtml(true) );
+		ret.append(node.fullChildrenHtml(true));
 		return ret;
 	};
 	
 	/// JMTE wrapper implementation
-	protected static FormWrapperInterface jmteWrapper = (node)->{
+	protected static FormWrapperInterface jmteWrapper = (node) -> {
 		return FormWrapperTemplates.JMTEWrapper(node, true);
 	};
 	

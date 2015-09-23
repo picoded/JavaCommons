@@ -49,18 +49,20 @@ public class Query_test {
 		Query queryObj = null;
 		Object[] paramArr = new Object[] { "world" };
 		
-		assertNotNull( queryObj = Query.build( "my = ?", paramArr ) );
-		assertEquals( "my = :0", queryObj.toString() );
+		assertNotNull(queryObj = Query.build("my = ?", paramArr));
+		assertEquals("my = :0", queryObj.toString());
 	}
 	
 	@Test
 	public void multipleAnd() {
-		assertEquals( "me = :good AND life = :awsome", Query.build("me = :good AND life = :awsome").toString() );
-		assertEquals( "me = :good AND life = :awsome AND new = :world", Query.build("me = :good AND life = :awsome AND new = :world").toString() );	
+		assertEquals("me = :good AND life = :awsome", Query.build("me = :good AND life = :awsome").toString());
+		assertEquals("me = :good AND life = :awsome AND new = :world",
+			Query.build("me = :good AND life = :awsome AND new = :world").toString());
 	}
 	
 	@Test
 	public void nested() {
-		assertEquals( "(me = :good AND life = :awsome) OR every = :one", Query.build("(me = :good AND life = :awsome) OR every = :one").toString() );
+		assertEquals("(me = :good AND life = :awsome) OR every = :one",
+			Query.build("(me = :good AND life = :awsome) OR every = :one").toString());
 	}
 }

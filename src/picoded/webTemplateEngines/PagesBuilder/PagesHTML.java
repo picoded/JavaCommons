@@ -72,7 +72,7 @@ public class PagesHTML {
 	/// @returns Gets the protected JMTE object, used internally. 
 	///          This is autocreated if not set
 	public JMTE getJMTE() {
-		if(jmteObj == null) {
+		if (jmteObj == null) {
 			jmteObj = new JMTE();
 		}
 		return jmteObj;
@@ -90,9 +90,9 @@ public class PagesHTML {
 	////////////////////////////////////////////////////////////
 	
 	/// Generates the needed map string template for the respective page
-	protected Map<String,Object> pageJMTEvars(String pageName) {
-		HashMap<String,Object> ret = new HashMap<String,Object>();
-		String pageURI = uriRootPrefix+"/"+pageName+"/";
+	protected Map<String, Object> pageJMTEvars(String pageName) {
+		HashMap<String, Object> ret = new HashMap<String, Object>();
+		String pageURI = uriRootPrefix + "/" + pageName + "/";
 		
 		ret.put("PagesRootURI", uriRootPrefix);
 		ret.put("PageURI", pageURI);
@@ -103,14 +103,14 @@ public class PagesHTML {
 	
 	/// Gets the prefix
 	public String prefixHTML(String pageName) {
-		String buffer = FileUtils.readFileToString_withFallback( new File(pagesFolder, "index/prefix.html"), "UTF-8", "");
+		String buffer = FileUtils.readFileToString_withFallback(new File(pagesFolder, "index/prefix.html"), "UTF-8", "");
 		return getJMTE().parseTemplate(buffer, pageJMTEvars(pageName));
 	}
 	
 	/// Gets the prefix
 	public String prefixHTML() {
 		// Cached copy
-		if( _prefixHTML != null ) {
+		if (_prefixHTML != null) {
 			return _prefixHTML;
 		}
 		// Return it
@@ -119,14 +119,14 @@ public class PagesHTML {
 	
 	/// Gets the prefix
 	public String suffixHTML(String pageName) {
-		String buffer = FileUtils.readFileToString_withFallback( new File(pagesFolder, "index/suffix.html"), "UTF-8", "");
+		String buffer = FileUtils.readFileToString_withFallback(new File(pagesFolder, "index/suffix.html"), "UTF-8", "");
 		return getJMTE().parseTemplate(buffer, pageJMTEvars(pageName));
 	}
 	
 	/// Gets the suffix
 	public String suffixHTML() {
 		// Cached copy
-		if( _suffixHTML != null ) {
+		if (_suffixHTML != null) {
 			return _suffixHTML;
 		}
 		// Return it
@@ -140,22 +140,23 @@ public class PagesHTML {
 	
 	public String buildPageFrame(String pageName, boolean isHidden) {
 		StringBuilder frame = new StringBuilder();
-		frame.append( "<div class='pageFrame pageFrame_"+pageName+"'" );
-		if(isHidden) {
+		frame.append("<div class='pageFrame pageFrame_" + pageName + "'");
+		if (isHidden) {
 			frame.append(" style='display:none;'");
 		}
-		frame.append( ">\n" );
-		frame.append( FileUtils.readFileToString_withFallback( new File(pagesFolder, pageName+"/"+pageName+".html"), "UTF-8", "") );
-		frame.append( "\n</div>\n" );
+		frame.append(">\n");
+		frame.append(FileUtils.readFileToString_withFallback(new File(pagesFolder, pageName + "/" + pageName + ".html"),
+			"UTF-8", ""));
+		frame.append("\n</div>\n");
 		return getJMTE().parseTemplate(frame.toString(), pageJMTEvars(pageName));
 	}
 	
 	/// HTML builder 
 	public StringBuilder buildFullPageFrame(String pageName) {
 		StringBuilder ret = new StringBuilder();
-		ret.append( prefixHTML(pageName) );
-		ret.append( buildPageFrame(pageName) );
-		ret.append( suffixHTML(pageName) );
+		ret.append(prefixHTML(pageName));
+		ret.append(buildPageFrame(pageName));
+		ret.append(suffixHTML(pageName));
 		return ret;
 	}
 }

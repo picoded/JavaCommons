@@ -23,7 +23,7 @@ public class PagesBuilder_test {
 	
 	protected String templateTestDir = "test-files/test-specific/webTemplateEngines/PagesBuilder/";
 	protected String outputTestDir = "test-files/tmp/webTemplateEngines/PagesBuilder/";
-	protected String basicTemplateDir = templateTestDir+"basic-test-pages/";
+	protected String basicTemplateDir = templateTestDir + "basic-test-pages/";
 	
 	// Test vars
 	//------------------------------------------------------------------------
@@ -42,7 +42,7 @@ public class PagesBuilder_test {
 		// Ensure output directory is set
 		File outputDir = new File(outputTestDir);
 		
-		if( outputDir.exists() ) {
+		if (outputDir.exists()) {
 			outputDir.delete();
 		}
 		outputDir.mkdirs();
@@ -71,21 +71,21 @@ public class PagesBuilder_test {
 	//
 	////////////////////////////////////////////////////////////
 	
-	@Test 
+	@Test
 	public void basicPagesHTMLTest() {
 		constructorTest();
 		String buffer = null;
 		
 		assertNotNull(buffer = html.prefixHTML());
-		assertTrue( buffer, buffer.indexOf("html") >= 0 );
+		assertTrue(buffer, buffer.indexOf("html") >= 0);
 		
 		assertNotNull(buffer = html.suffixHTML());
-		assertTrue( buffer, buffer.indexOf("/html") >= 0 );
+		assertTrue(buffer, buffer.indexOf("/html") >= 0);
 		
 		assertNotNull(buffer = html.buildPageFrame("index"));
-		assertTrue( buffer, buffer.indexOf("hello world") >= 0 );
-		assertTrue( buffer, buffer.indexOf("pageFrame") >= 0 );
-		assertTrue( buffer, buffer.indexOf("pageFrame_index") >= 0 );
+		assertTrue(buffer, buffer.indexOf("hello world") >= 0);
+		assertTrue(buffer, buffer.indexOf("pageFrame") >= 0);
+		assertTrue(buffer, buffer.indexOf("pageFrame_index") >= 0);
 	}
 	
 	@Test
@@ -94,6 +94,6 @@ public class PagesBuilder_test {
 		pages.buildPage("index");
 		
 		// Check asset folder
-		assertEquals("is a COPYCAT: Meow!", FileUtils.readFileToString(new File(outputTestDir+"index/assets/bob.txt")) );
+		assertEquals("is a COPYCAT: Meow!", FileUtils.readFileToString(new File(outputTestDir + "index/assets/bob.txt")));
 	}
 }

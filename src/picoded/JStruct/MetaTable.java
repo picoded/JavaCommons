@@ -21,7 +21,7 @@ import picoded.conv.ListValueConv;
 /// read request load.
 /// 
 public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
-
+	
 	///
 	/// Temp mode optimization, used to indicate pure session like data,
 	/// that does not require persistance (or even SQL)
@@ -87,10 +87,10 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	///
 	/// @returns the MetaObject
 	public default MetaObject get(String _oid, boolean isUnchecked) {
-		if( isUnchecked ) {
-			return uncheckedGet( _oid );
+		if (isUnchecked) {
+			return uncheckedGet(_oid);
 		} else {
-			return get( _oid );
+			return get(_oid);
 		}
 	}
 	
@@ -108,7 +108,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// Get array of MetaObjects
 	public default MetaObject[] getArrayFromID(String[] idArray, boolean isUnchecked) {
 		MetaObject[] retArr = new MetaObject[idArray.length];
-		for(int i=0; i<idArray.length; ++i) {
+		for (int i = 0; i < idArray.length; ++i) {
 			retArr[i] = get(idArray[i], isUnchecked);
 		}
 		return retArr;
@@ -135,7 +135,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param   query string to sort the order by, use null to ignore
 	///
 	/// @returns  The MetaObject[] array
-	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr ) {
+	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr) {
 		return query(whereClause, whereValues, orderByStr, 0, 0);
 	}
 	
@@ -148,14 +148,14 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The MetaObject[] array
-	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit ) {
+	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit) {
 		
 		// The return list
 		List<MetaObject> retList = null;
 		
 		// Setup the query, if needed
-		if(whereClause == null) { //null gets all
-			retList = new ArrayList<MetaObject>( this.values() );
+		if (whereClause == null) { //null gets all
+			retList = new ArrayList<MetaObject>(this.values());
 		} else {
 			Query queryObj = Query.build(whereClause, whereValues);
 			retList = queryObj.search(this);
@@ -177,8 +177,8 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 		List<MetaObject> retList = null;
 		
 		// Setup the query, if needed
-		if(whereClause == null) { //null gets all
-			retList = new ArrayList<MetaObject>( this.values() );
+		if (whereClause == null) { //null gets all
+			retList = new ArrayList<MetaObject>(this.values());
 		} else {
 			Query queryObj = Query.build(whereClause, whereValues);
 			retList = queryObj.search(this);
@@ -225,8 +225,8 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 		List<MetaObject> retList = new ArrayList<MetaObject>();
 		
 		// Iterate the list, add if containsKey
-		for( MetaObject obj : values() ) {
-			if(obj.containsKey(keyName)) {
+		for (MetaObject obj : values()) {
+			if (obj.containsKey(keyName)) {
 				retList.add(obj);
 			}
 		}
@@ -245,8 +245,8 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 		List<String> retList = new ArrayList<String>();
 		
 		// Iterate the list, add if containsKey
-		for( MetaObject obj : values() ) {
-			if(obj.containsKey(keyName)) {
+		for (MetaObject obj : values()) {
+			if (obj.containsKey(keyName)) {
 				retList.add(obj._oid());
 			}
 		}
@@ -269,11 +269,11 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	
 	/// Put convinent function
 	public default MetaType putType(String name, Object value) {
-		return typeMap().put( name, value );
+		return typeMap().put(name, value);
 	}
 	
 	/// Generic varient of put all
-	public default <K,V> void setMappingType(Map<K, V> m) {
+	public default <K, V> void setMappingType(Map<K, V> m) {
 		typeMap().putAllGeneric(m);
 	}
 }

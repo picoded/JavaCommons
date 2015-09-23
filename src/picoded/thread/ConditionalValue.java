@@ -1,6 +1,5 @@
 package picoded.thread;
 
-
 /// Extension of a common IO waiting pattern, such as thread.yield, etc.
 /// used with a registered value, to "wait for". This can be extended to more complex conditions.
 /// 

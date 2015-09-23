@@ -30,30 +30,31 @@ public class RequestHttp_apache {
 	///////////////////////////////////////////////////////////////////////
 	
 	/// Returns the apache client HttpUriRequest, based on its type
-	protected static HttpRequestBase HttpUriRequest_fromRequestType( HttpRequestType reqType, String reqURL ) {
+	protected static HttpRequestBase HttpUriRequest_fromRequestType(HttpRequestType reqType, String reqURL) {
 		switch (reqType) {
-			case GET:
-				return new HttpGet( reqURL);
-			case POST:
-				return new HttpPost(reqURL);
-			case PUT:
-				return new HttpPut(reqURL);
-			case DELETE:
-				return new HttpDelete(reqURL);
-			case OPTION:
-				return new HttpOptions(reqURL);
+		case GET:
+			return new HttpGet(reqURL);
+		case POST:
+			return new HttpPost(reqURL);
+		case PUT:
+			return new HttpPut(reqURL);
+		case DELETE:
+			return new HttpDelete(reqURL);
+		case OPTION:
+			return new HttpOptions(reqURL);
 		}
 		
-		throw new RuntimeException("Invalid request type not supported: "+reqType);
+		throw new RuntimeException("Invalid request type not supported: " + reqType);
 		//return null;
 	}
 	
 	/// Adds the cookies parameters to cookieJar
-	protected static BasicCookieStore addCookiesIntoCookieJar(String domain, BasicCookieStore cookieJar, Map<String, String[]> cookieMap){
-		if(cookieMap != null){
-			for(Map.Entry<String, String[]> entry : cookieMap.entrySet()) {
+	protected static BasicCookieStore addCookiesIntoCookieJar(String domain, BasicCookieStore cookieJar,
+		Map<String, String[]> cookieMap) {
+		if (cookieMap != null) {
+			for (Map.Entry<String, String[]> entry : cookieMap.entrySet()) {
 				String[] values = entry.getValue();
-				for( String val : values ) {
+				for (String val : values) {
 					BasicClientCookie cookie = new BasicClientCookie(entry.getKey(), val);
 					
 					//
@@ -79,7 +80,7 @@ public class RequestHttp_apache {
 					//
 					// ~ eugene@picoded.com
 					//
-					cookie.setDomain(domain); 
+					cookie.setDomain(domain);
 					cookie.setPath("/");
 					//
 					// Q_Q
@@ -92,14 +93,13 @@ public class RequestHttp_apache {
 		return cookieJar;
 	}
 	
-	
 	/// Adds the header parameters to request
-	protected static HttpRequestBase addHeadersIntoRequest(HttpRequestBase reqBase, Map<String, String[]> headersMap){
-		if(headersMap != null){
-			for(Map.Entry<String, String[]> entry : headersMap.entrySet()) {
+	protected static HttpRequestBase addHeadersIntoRequest(HttpRequestBase reqBase, Map<String, String[]> headersMap) {
+		if (headersMap != null) {
+			for (Map.Entry<String, String[]> entry : headersMap.entrySet()) {
 				String[] values = entry.getValue();
-				for( String val : values ) {
-					reqBase.addHeader( entry.getKey(), val );
+				for (String val : values) {
+					reqBase.addHeader(entry.getKey(), val);
 				}
 			}
 		}
@@ -107,29 +107,29 @@ public class RequestHttp_apache {
 	}
 	
 	/// Ammends the GET request URL with the parameters if needed
-	protected static String appendGetParameters(String reqURL, Map<String,String[]> parametersMap) {
-		if(parametersMap != null && parametersMap.size() > 0) {
+	protected static String appendGetParameters(String reqURL, Map<String, String[]> parametersMap) {
+		if (parametersMap != null && parametersMap.size() > 0) {
 			reqURL = reqURL.trim();
 			StringBuilder req = new StringBuilder(reqURL);
 			
-			if(reqURL.endsWith("?")) {
+			if (reqURL.endsWith("?")) {
 				//does nothing
-			} else if(reqURL.indexOf('?') >= 0) {
+			} else if (reqURL.indexOf('?') >= 0) {
 				req.append("&"); //add to previous paremeters
 			} else {
 				req.append("?"); //start of parameters
 			}
 			
 			boolean first = true;
-			for(Map.Entry<String, String[]> entry : parametersMap.entrySet()) {
-				for( String val : entry.getValue() ) {
-					if(!first) {
+			for (Map.Entry<String, String[]> entry : parametersMap.entrySet()) {
+				for (String val : entry.getValue()) {
+					if (!first) {
 						req.append("&"); //add to previous paremeters
 					}
 					
-					req.append( StringEscape.encodeURI(entry.getKey()) );
-					req.append( "=" );
-					req.append( StringEscape.encodeURI(val) );
+					req.append(StringEscape.encodeURI(entry.getKey()));
+					req.append("=");
+					req.append(StringEscape.encodeURI(val));
 					
 					first = false;
 				}
@@ -141,13 +141,13 @@ public class RequestHttp_apache {
 	}
 	
 	/// Helps convert a Map<String, String[]> to a List<NameValuePair>, for put and post
-	public static List<NameValuePair> parametersToNameValuePairs( Map<String, String[]> parametersMap ) {
+	public static List<NameValuePair> parametersToNameValuePairs(Map<String, String[]> parametersMap) {
 		// Create a List to hold the NameValuePairs to be passed to the PostMethod
 		List<NameValuePair> listNameValuePairs = new ArrayList<NameValuePair>();
-		if(parametersMap != null){
-			for(Map.Entry<String, String[]> entry : parametersMap.entrySet()){
-				for( String val : entry.getValue() ) {
-					listNameValuePairs.add( new BasicNameValuePair(entry.getKey(), val) );
+		if (parametersMap != null) {
+			for (Map.Entry<String, String[]> entry : parametersMap.entrySet()) {
+				for (String val : entry.getValue()) {
+					listNameValuePairs.add(new BasicNameValuePair(entry.getKey(), val));
 				}
 			}
 		}
@@ -161,21 +161,20 @@ public class RequestHttp_apache {
 	
 	/// Request executor taking a HttpRequestBase and returning its response
 	protected static ResponseHttp_apache callRequest( //
-		String reqURL, 
-		HttpRequestBase httpRequest, //
-		Map<String,String[]> cookieMap //
-	){
+		String reqURL, HttpRequestBase httpRequest, //
+		Map<String, String[]> cookieMap //
+	) {
 		try {
 			// gets the hostname
-			String host = new URL(reqURL).getHost(); 
+			String host = new URL(reqURL).getHost();
 			
 			// Prepares the HTTPClient, with a cookieJar =D
-			BasicCookieStore cookieJar = addCookiesIntoCookieJar(host, new BasicCookieStore(), cookieMap );
+			BasicCookieStore cookieJar = addCookiesIntoCookieJar(host, new BasicCookieStore(), cookieMap);
 			HttpClient apacheClient = HttpClientBuilder.create().setDefaultCookieStore(cookieJar).build();
 			
 			// Executes request
 			HttpResponse apacheResponse = apacheClient.execute(httpRequest);
-
+			
 			// The response object to return is created
 			ResponseHttp_apache returnResponse = new ResponseHttp_apache();
 			returnResponse._cookieJar = cookieJar;
@@ -184,7 +183,7 @@ public class RequestHttp_apache {
 			
 			// And Return
 			return returnResponse;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -194,11 +193,11 @@ public class RequestHttp_apache {
 	public static ResponseHttp callRequest( //
 		HttpRequestType reqType, //
 		String reqURL, //
-		Map<String,String[]> parametersMap, //
-		Map<String,String[]> cookiesMap, //
-		Map<String,String[]> headersMap //
+		Map<String, String[]> parametersMap, //
+		Map<String, String[]> cookiesMap, //
+		Map<String, String[]> headersMap //
 	) {
-		return callRequest( reqType, reqURL, parametersMap, cookiesMap, headersMap, null );
+		return callRequest(reqType, reqURL, parametersMap, cookiesMap, headersMap, null);
 	}
 	
 	/// Executes the request, given the type and parmeters
@@ -207,13 +206,13 @@ public class RequestHttp_apache {
 	public static ResponseHttp callRequest( //
 		HttpRequestType reqType, //
 		String reqURL, //
-		Map<String,String[]> parametersMap, //
-		Map<String,String[]> cookiesMap, //
-		Map<String,String[]> headersMap, //
+		Map<String, String[]> parametersMap, //
+		Map<String, String[]> cookiesMap, //
+		Map<String, String[]> headersMap, //
 		InputStream requestStream //
 	) {
 		// append get parameters if needed
-		if(reqType == HttpRequestType.GET || reqType == HttpRequestType.DELETE) { 
+		if (reqType == HttpRequestType.GET || reqType == HttpRequestType.DELETE) {
 			reqURL = appendGetParameters(reqURL, parametersMap);
 		}
 		
@@ -221,18 +220,18 @@ public class RequestHttp_apache {
 		HttpRequestBase reqBase = HttpUriRequest_fromRequestType(reqType, reqURL);
 		reqBase = addHeadersIntoRequest(reqBase, headersMap);
 		
-		
 		// POST and PUT parameters 
-		if(reqType == HttpRequestType.POST || reqType == HttpRequestType.PUT ) {
+		if (reqType == HttpRequestType.POST || reqType == HttpRequestType.PUT) {
 			try {
-				if( requestStream != null ) {
+				if (requestStream != null) {
 					// note that its sent as a raw stream (set headers manually please)
-					((HttpEntityEnclosingRequestBase)reqBase).setEntity( new InputStreamEntity(requestStream) );
-				} else if( parametersMap != null ) {
+					((HttpEntityEnclosingRequestBase) reqBase).setEntity(new InputStreamEntity(requestStream));
+				} else if (parametersMap != null) {
 					// note that its sent as a form entity
-					((HttpEntityEnclosingRequestBase)reqBase).setEntity( new UrlEncodedFormEntity( parametersToNameValuePairs(parametersMap) ) );
+					((HttpEntityEnclosingRequestBase) reqBase).setEntity(new UrlEncodedFormEntity(
+						parametersToNameValuePairs(parametersMap)));
 				}
-			} catch(Exception e) {
+			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		}

@@ -14,7 +14,7 @@ public class Or extends CombinationBase {
 	/// @param   set of children queries
 	/// @param   default argument map to get test value
 	///
-	public Or(List<Query> child, Map<String,Object> defaultArgMap) {
+	public Or(List<Query> child, Map<String, Object> defaultArgMap) {
 		super(child, defaultArgMap);
 	}
 	
@@ -33,10 +33,10 @@ public class Or extends CombinationBase {
 	/// @param   the argument map, if applicable
 	///
 	/// @returns  boolean indicating true / false
-	public boolean test(Object t, Map<String,Object>argMap) {
+	public boolean test(Object t, Map<String, Object> argMap) {
 		
-		for(Query child : _children) {
-			if( child.test(t, argMap) ) {
+		for (Query child : _children) {
+			if (child.test(t, argMap)) {
 				return true; //succeds on first success
 			} else {
 				// wait till success
@@ -60,4 +60,4 @@ public class Or extends CombinationBase {
 		return "OR";
 	}
 	
-} 
+}

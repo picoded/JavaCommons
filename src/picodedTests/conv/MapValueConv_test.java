@@ -1,4 +1,5 @@
 package picodedTests.conv;
+
 import static org.junit.Assert.*;
 
 import org.junit.After;
@@ -19,14 +20,14 @@ import picoded.conv.MapValueConv;
 
 public class MapValueConv_test {
 	@Test
-	public void testTo(){
+	public void testTo() {
 		Map<String, Object> unqualifiedMap = new HashMap<String, Object>();
 		
 		File unqualifiedMapFile = new File("./test-files/test-specific/conv/unqualifiedMap.js");
 		String jsonString = "";
-		try{
+		try {
 			jsonString = FileUtils.readFileToString(unqualifiedMapFile);
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			
 		}
 		unqualifiedMap = ConvertJSON.toMap(jsonString);
@@ -45,16 +46,16 @@ public class MapValueConv_test {
 		assertEquals("34567", qualifiedMap.get("clients[2].nric"));
 	}
 	
-	@Test 
+	@Test
 	@SuppressWarnings("unchecked")
-	public void testFrom(){
+	public void testFrom() {
 		Map<String, Object> unqualifiedMap = new HashMap<String, Object>();
 		
 		File unqualifiedMapFile = new File("./test-files/test-specific/conv/unqualifiedMap.js");
 		String jsonString = "";
-		try{
+		try {
 			jsonString = FileUtils.readFileToString(unqualifiedMapFile);
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			
 		}
 		unqualifiedMap = ConvertJSON.toMap(jsonString);
@@ -68,31 +69,30 @@ public class MapValueConv_test {
 		assertEquals("1", unqualifiedMap.get("agentID"));
 		
 		assertTrue(unqualifiedMap.get("clients") instanceof List);
-		List<Object> innerList = (List<Object>)unqualifiedMap.get("clients");
+		List<Object> innerList = (List<Object>) unqualifiedMap.get("clients");
 		assertTrue(innerList.size() == 3);
 		
-		
 		Map<String, Object> innerMap = null;
-		innerMap = (Map<String, Object>)innerList.get(0);
+		innerMap = (Map<String, Object>) innerList.get(0);
 		assertEquals("Sam", innerMap.get("name"));
 		assertEquals("12345", innerMap.get("nric"));
 		
-		innerMap = (Map<String, Object>)innerList.get(1);
+		innerMap = (Map<String, Object>) innerList.get(1);
 		assertEquals("Eugene", innerMap.get("name"));
 		assertEquals("23456", innerMap.get("nric"));
 		
-		innerMap = (Map<String, Object>)innerList.get(2);
+		innerMap = (Map<String, Object>) innerList.get(2);
 		assertEquals("Murong", innerMap.get("name"));
 		assertEquals("34567", innerMap.get("nric"));
 	}
 	
 	@Test
-	public void chaosMonkeyFinal(){
+	public void chaosMonkeyFinal() {
 		File chaosMonkeyFile = new File("./test-files/test-specific/conv/chaosmonkey.js");
 		String jsonString = "";
-		try{
+		try {
 			jsonString = FileUtils.readFileToString(chaosMonkeyFile);
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			
 		}
 		
@@ -104,6 +104,6 @@ public class MapValueConv_test {
 		Map<String, Object> unqualifiedChaosMap = MapValueConv.fromFullyQualifiedKeys(qualifiedChaosMap);
 		assertNotNull(unqualifiedChaosMap);
 		assertTrue(jsonMap.equals(unqualifiedChaosMap));
-		 
+		
 	}
 }

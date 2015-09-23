@@ -73,9 +73,7 @@ public class ProxyServlet_test extends RequestHttp_test {
 		ProxyServlet proxy = new ProxyServlet();
 		proxy.setProxyHost("httpbin.org");
 		
-		tomcat = new EmbeddedServlet("", context)
-		.withPort(16000)
-		.withServlet("/*", "publicProxyServlet", proxy);
+		tomcat = new EmbeddedServlet("", context).withPort(16000).withServlet("/*", "publicProxyServlet", proxy);
 		
 		tomcat.start();
 		
@@ -83,20 +81,18 @@ public class ProxyServlet_test extends RequestHttp_test {
 		ws_proxy.setProxyHost("echo.websocket.org");
 		ws_proxy.setProxyScheme("wss");
 		
-		ws_tomcat = new EmbeddedServlet("", context)
-		.withPort(16001)
-		.withServlet("/*", "publicProxyServlet", ws_proxy);
+		ws_tomcat = new EmbeddedServlet("", context).withPort(16001).withServlet("/*", "publicProxyServlet", ws_proxy);
 		
 		ws_tomcat.start();
 	}
 	
 	@AfterClass
 	public static void serverTearDown() throws LifecycleException, IOException {
-		if(tomcat != null) {
+		if (tomcat != null) {
 			//tomcat.awaitServer(); //manual
 			tomcat.stop();
 		}
-		if(ws_tomcat != null) {
+		if (ws_tomcat != null) {
 			//tomcat.awaitServer(); //manual
 			ws_tomcat.stop();
 		}
@@ -105,7 +101,7 @@ public class ProxyServlet_test extends RequestHttp_test {
 	}
 	
 	@Test
-	public void TestServerStartup() throws LifecycleException, IOException{
+	public void TestServerStartup() throws LifecycleException, IOException {
 		assertNotNull(tomcat);
 	}
 	

@@ -31,35 +31,35 @@ public class MetaTableApiBuilder_test {
 	/// Test object
 	private static MetaTable mtObj = null;
 	private static MetaTableApiBuilder mtApi = null;
-			
+	
 	/// To override for implementation
 	///------------------------------------------------------
 	private static MetaTable implementationConstructor() {
 		return (new JStruct()).getMetaTable("test");
 	}
 	
-	private static void populateMetaTableDummyData(int min, int max){
+	private static void populateMetaTableDummyData(int min, int max) {
 		Random rnd = new Random();
 		int _max = rnd.nextInt(max);
 		_max = _max > min ? _max : min;
 		
 		_oids = new ArrayList<String>();
 		
-		for(int i = 0; i < _max; ++i){
+		for (int i = 0; i < _max; ++i) {
 			String oid = GUID.base58();
 			_oids.add(oid);
 			
 			Map<String, Object> innerObj = new HashMap<String, Object>();
 			innerObj.put("_oid", oid);
-			innerObj.put("_name", "name"+i);
-			innerObj.put("_age", "age"+i);
+			innerObj.put("_name", "name" + i);
+			innerObj.put("_age", "age" + i);
 			
-			mtObj.append(oid,  innerObj).saveAll();
+			mtObj.append(oid, innerObj).saveAll();
 		}
 	}
 	
 	@BeforeClass
-	public static void setup(){
+	public static void setup() {
 		mtObj = implementationConstructor();
 		mtObj.systemSetup();
 		populateMetaTableDummyData(3, 3);
@@ -69,14 +69,12 @@ public class MetaTableApiBuilder_test {
 	
 	@AfterClass
 	public static void tearDown() {
-		if( mtObj != null ) {
+		if (mtObj != null) {
 			mtObj.systemTeardown();
 		}
 		mtObj = null;
 	}
 	
-	
-
 	@Test
 	public void constructorTest() {
 		//not null check
@@ -86,47 +84,48 @@ public class MetaTableApiBuilder_test {
 	}
 	
 	@Test
-	public void list_GET_and_POST_test(){
-		String[] oidArgs = new String[]{"_oid"};
-		String[] nameArgs = new String[]{"_name"};
-		String[] ageArgs = new String[]{"_age"};
+	public void list_GET_and_POST_test() {
+		String[] oidArgs = new String[] { "_oid" };
+		String[] nameArgs = new String[] { "_name" };
+		String[] ageArgs = new String[] { "_age" };
 		
-		List<List<Object>> oidData = mtApi.list_GET_and_POST_inner(0,  0,  0,  oidArgs,  "", null, "_oid");
+		List<List<Object>> oidData = mtApi.list_GET_and_POST_inner(0, 0, 0, oidArgs, "", null, "_oid");
 		assertNotNull(oidData);
 		
-		List<List<Object>> nameData = mtApi.list_GET_and_POST_inner(0,  0,  0,  nameArgs,  "",  null, "_oid");
+		List<List<Object>> nameData = mtApi.list_GET_and_POST_inner(0, 0, 0, nameArgs, "", null, "_oid");
 		assertNotNull(nameData);
 		
-		List<List<Object>> ageData = mtApi.list_GET_and_POST_inner(0,  0,  0,  ageArgs,  "",  null, "_oid");
+		List<List<Object>> ageData = mtApi.list_GET_and_POST_inner(0, 0, 0, ageArgs, "", null, "_oid");
 		assertNotNull(ageData);
 		
-		String[] oidNameArgs = new String[]{"_oid", "_name"};
-		String[] nameAgeArgs = new String[]{"_name", "_age"};
-		String[] allArgs = new String[]{"_oid", "_name", "_age"};
+		String[] oidNameArgs = new String[] { "_oid", "_name" };
+		String[] nameAgeArgs = new String[] { "_name", "_age" };
+		String[] allArgs = new String[] { "_oid", "_name", "_age" };
 		
-		List<List<Object>> oidNameData = mtApi.list_GET_and_POST_inner(0,  0,  0,  oidNameArgs,  "",  null, "_oid");
+		List<List<Object>> oidNameData = mtApi.list_GET_and_POST_inner(0, 0, 0, oidNameArgs, "", null, "_oid");
 		assertNotNull(oidNameData);
 		
-		List<List<Object>> nameAgeData = mtApi.list_GET_and_POST_inner(0,  0,  0,  nameAgeArgs,  "",  null, "_oid");
+		List<List<Object>> nameAgeData = mtApi.list_GET_and_POST_inner(0, 0, 0, nameAgeArgs, "", null, "_oid");
 		assertNotNull(nameAgeData);
 		
-		List<List<Object>> allData = mtApi.list_GET_and_POST_inner(0,  0,  0,  allArgs,  "",  null, "_oid");
+		List<List<Object>> allData = mtApi.list_GET_and_POST_inner(0, 0, 0, allArgs, "", null, "_oid");
 		assertNotNull(allData);
 		
-		List<List<Object>> allDataWithQueryFilter = mtApi.list_GET_and_POST_inner(0,  0,  0,  allArgs,  "_name=? OR _age=?",  new String[]{"name1", "age4"}, "");
+		List<List<Object>> allDataWithQueryFilter = mtApi.list_GET_and_POST_inner(0, 0, 0, allArgs, "_name=? OR _age=?",
+			new String[] { "name1", "age4" }, "");
 		assertNotNull(allDataWithQueryFilter);
 	}
 	
 	@Test
-	public void meta_GET_test(){
-		for(String oid:_oids){
+	public void meta_GET_test() {
+		for (String oid : _oids) {
 			MetaObject mObj = mtApi.meta_GET_inner(oid);
 			assertNotNull(mObj);
 		}
 	}
 	
 	@Test
-	public void meta_POST_test(){
+	public void meta_POST_test() {
 		//test delta
 		Map<String, Object> metaTableDelta = new HashMap<String, Object>();
 		MetaObject metaObjDelta = mtObj.newObject();
@@ -154,7 +153,7 @@ public class MetaTableApiBuilder_test {
 	}
 	
 	@Test
-	public void meta_DELETE_test(){
+	public void meta_DELETE_test() {
 		mtApi.meta_DELETE_inner(_oids.get(0));
 		
 		assertNotNull(mtApi);

@@ -54,89 +54,88 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.aspectj.weaver.ast.Var;
 
-public class PiHttpRequester_test
-{
+public class PiHttpRequester_test {
 	EmbeddedServlet tomcat = null;
 	
 	@Before
-	public void setUp(){
+	public void setUp() {
 		File context = new File("./test-files/test-specific/embeddedTomcat");
 		
-		tomcat = new EmbeddedServlet("/app", context)
-		.withPort(15000)
-		.withServlet("/public/*", "publicProxyServlet", 
-		new HttpServlet() {
-			private static final long serialVersionUID = 1L;
-			 
-			@Override
-			protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-				String getParam = req.getParameter("getValue");
-				System.out.println("Saw get parameter : "+getParam);
-				resp.getWriter().append("GET");
-			}
-
-			@Override
-			protected void doPost(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException {
-				javax.servlet.http.Cookie[] javaCookies = req.getCookies();
-				if(javaCookies != null && javaCookies.length > 0){
-					if(javaCookies[0].getValue().equals("postCookieValue")){
-						//respond with a cookie
-						resp.addCookie(new javax.servlet.http.Cookie("returnCookie", "returnCookieValue"));
+		tomcat = new EmbeddedServlet("/app", context).withPort(15000).withServlet("/public/*", "publicProxyServlet",
+			new HttpServlet() {
+				private static final long serialVersionUID = 1L;
+				
+				@Override
+				protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
+					IOException {
+					String getParam = req.getParameter("getValue");
+					System.out.println("Saw get parameter : " + getParam);
+					resp.getWriter().append("GET");
+				}
+				
+				@Override
+				protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
+					IOException {
+					javax.servlet.http.Cookie[] javaCookies = req.getCookies();
+					if (javaCookies != null && javaCookies.length > 0) {
+						if (javaCookies[0].getValue().equals("postCookieValue")) {
+							//respond with a cookie
+							resp.addCookie(new javax.servlet.http.Cookie("returnCookie", "returnCookieValue"));
+						}
+					} else {
+						System.out.println("Java Cookies are null");
 					}
-				} else {
-					System.out.println("Java Cookies are null");
+					
+					String postParam = req.getParameter("postValue");
+					System.out.println("Saw post parameter : " + postParam);
+					resp.getWriter().append("POST");
 				}
 				
-				String postParam = req.getParameter("postValue");
-				System.out.println("Saw post parameter : "+postParam);
-				resp.getWriter().append("POST");
-			}
-			
-			@Override
-			protected void doPut(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException {
-				String putParam = "";
-				try
-				{
-					ServletInputStream putStream = req.getInputStream();
-					String putStreamString = IOUtils.toString(putStream);
-					String[] putStreamSplit = putStreamString.split("=");
-					putParam = putStreamSplit[1];
-				}catch(IOException ex) {
-					System.out.println("Exception: " +ex.getMessage());
+				@Override
+				protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+					String putParam = "";
+					try {
+						ServletInputStream putStream = req.getInputStream();
+						String putStreamString = IOUtils.toString(putStream);
+						String[] putStreamSplit = putStreamString.split("=");
+						putParam = putStreamSplit[1];
+					} catch (IOException ex) {
+						System.out.println("Exception: " + ex.getMessage());
+					}
+					
+					System.out.println("Saw put parameter : " + putParam);
+					
+					resp.getWriter().append("PUT");
 				}
 				
-				System.out.println("Saw put parameter : "+putParam);
-				
-				resp.getWriter().append("PUT");
-			}
-			
-			@Override
-			protected void doDelete(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException {
-				resp.getWriter().append("DELETE");
-			}
+				@Override
+				protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
+					IOException {
+					resp.getWriter().append("DELETE");
+				}
 			});
 	}
 	
 	@Test
-	public void TestServerStartup()throws LifecycleException, IOException{
+	public void TestServerStartup() throws LifecycleException, IOException {
 		
 		tomcat.start();
 		
-//		String newGetResult = doGetTest();
-//		System.out.println("Finished new get test with result: " +newGetResult);
-//		assertEquals(newGetResult, "GET");
+		//		String newGetResult = doGetTest();
+		//		System.out.println("Finished new get test with result: " +newGetResult);
+		//		assertEquals(newGetResult, "GET");
 		
 		String newPostResult = doPostTest();
-		System.out.println("Finished new post test with result: " +newPostResult);
+		System.out.println("Finished new post test with result: " + newPostResult);
 		assertEquals(newPostResult, "POST");
 		
-//		String newPutResult = doPutTest();
-//		System.out.println("Finished new put test with result: " +newPutResult);
-//		assertEquals(newPutResult, "PUT");
-//		
-//		String newDeleteResult = doDeleteTest();
-//		System.out.println("Finished new delete test with result: " +newDeleteResult);
-//		assertEquals(newDeleteResult, "DELETE");
+		//		String newPutResult = doPutTest();
+		//		System.out.println("Finished new put test with result: " +newPutResult);
+		//		assertEquals(newPutResult, "PUT");
+		//		
+		//		String newDeleteResult = doDeleteTest();
+		//		System.out.println("Finished new delete test with result: " +newDeleteResult);
+		//		assertEquals(newDeleteResult, "DELETE");
 	}
 	
 	private String doGetTest() {
@@ -149,12 +148,12 @@ public class PiHttpRequester_test
 		PiHttpResponse resp = requester.sendGetRequest("http://localhost:15000/app", "public", getParams, null, cookies);
 		
 		String returnVal = "";
-		try{
+		try {
 			InputStream respStream = resp.getResponseBody();
 			String value = IOUtils.toString(respStream);
 			returnVal = String.valueOf(value).trim();
 		} catch (Exception ex) {
-			System.out.println("Exception reading inputstream: "+ex.getMessage());
+			System.out.println("Exception reading inputstream: " + ex.getMessage());
 		}
 		
 		return returnVal;
@@ -168,7 +167,8 @@ public class PiHttpRequester_test
 		postParams.put("postValue", "true");
 		
 		PiHttpRequester requester = new PiHttpRequester();
-		PiHttpResponse resp = requester.sendPostRequest("http://localhost:15000/app", "public", postParams, null, cookies);
+		PiHttpResponse resp = requester
+			.sendPostRequest("http://localhost:15000/app", "public", postParams, null, cookies);
 		String returnVal = "";
 		try {
 			InputStream respStream = resp.getResponseBody();
@@ -176,10 +176,10 @@ public class PiHttpRequester_test
 			returnVal = String.valueOf(value).trim();
 			
 			Map<String, String> respCookies = resp.getCookies();
-			if(respCookies != null){
+			if (respCookies != null) {
 				String cookieVal = respCookies.get("returnCookie");
-				if(cookieVal.equals("returnCookieValue")){
-					System.out.println("Cookie from post response found with value: "+cookieVal);
+				if (cookieVal.equals("returnCookieValue")) {
+					System.out.println("Cookie from post response found with value: " + cookieVal);
 				} else {
 					System.out.println("Cookie from post response NOT FOUND");
 				}
@@ -188,7 +188,7 @@ public class PiHttpRequester_test
 			}
 			
 		} catch (IOException ex) {
-			System.out.println("Exception reading inputstream: "+ex.getMessage());
+			System.out.println("Exception reading inputstream: " + ex.getMessage());
 		}
 		
 		return returnVal;
@@ -206,7 +206,7 @@ public class PiHttpRequester_test
 			String value = IOUtils.toString(respStream);
 			returnVal = String.valueOf(value).trim();
 		} catch (IOException ex) {
-			System.out.println("Exception reading inputstream: "+ex.getMessage());
+			System.out.println("Exception reading inputstream: " + ex.getMessage());
 		}
 		
 		return returnVal;
@@ -221,7 +221,7 @@ public class PiHttpRequester_test
 			String value = IOUtils.toString(respStream);
 			returnVal = String.valueOf(value).trim();
 		} catch (IOException ex) {
-			System.out.println("Exception reading inputstream: "+ex.getMessage());
+			System.out.println("Exception reading inputstream: " + ex.getMessage());
 		}
 		
 		return returnVal;

@@ -19,16 +19,16 @@ import picoded.JStruct.KeyValueMap;
 /// anything smaller then that is pointless over a network
 ///
 public class JStruct_KeyValueMap implements KeyValueMap {
-
+	
 	///
 	/// Constructor vars
 	///--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
-	protected ConcurrentHashMap<String,String> valueMap = new ConcurrentHashMap<String,String>();
+	protected ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
 	
 	/// Stores the expire timestamp
-	protected ConcurrentHashMap<String,Long> expireMap = new ConcurrentHashMap<String,Long>();
+	protected ConcurrentHashMap<String, Long> expireMap = new ConcurrentHashMap<String, Long>();
 	
 	/// Read write lock
 	protected ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
@@ -58,7 +58,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	public boolean getTempHint() {
 		return isTempHint;
 	}
-
+	
 	/// Sets temp mode optimization indicator hint
 	/// Note that this only serve as a hint, as does not indicate actual setting
 	///
@@ -100,18 +100,18 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 			long now = currentSystemTimeInSeconds();
 			
 			// not iterated directly due to remove()
-			Set<String> expireKeySet = expireMap.keySet(); 
+			Set<String> expireKeySet = expireMap.keySet();
 			
 			// The keyset to check against
-			String[] expireKeyArray = expireKeySet.toArray( new String[ expireKeySet.size() ]);
+			String[] expireKeyArray = expireKeySet.toArray(new String[expireKeySet.size()]);
 			
 			// Iterate and evict
-			for( String key : expireKeyArray ) {
+			for (String key : expireKeyArray) {
 				Long timeObj = expireMap.get(key);
-				long time = (timeObj != null)? timeObj.longValue() : 0;
+				long time = (timeObj != null) ? timeObj.longValue() : 0;
 				
 				// expired? kick it
-				if( time < now ) {
+				if (time < now) {
 					valueMap.remove(key);
 					expireMap.remove(key);
 				}
@@ -126,22 +126,22 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	/// Handles re-entrant lock where applicable
 	///
 	public void clear() {
-			try {
-				accessLock.writeLock().lock();
-				valueMap.clear();
-				expireMap.clear();
-			} finally {
-				accessLock.writeLock().unlock();
-			}
+		try {
+			accessLock.writeLock().lock();
+			valueMap.clear();
+			expireMap.clear();
+		} finally {
+			accessLock.writeLock().unlock();
+		}
 	}
 	
 	///
 	/// Utility functions used internally
 	///--------------------------------------------------------------------------
-
+	
 	/// Gets the current system time in seconds
 	protected long currentSystemTimeInSeconds() {
-		return (System.currentTimeMillis())/1000L;
+		return (System.currentTimeMillis()) / 1000L;
 	}
 	
 	///
@@ -161,13 +161,13 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 			accessLock.readLock().lock();
 			
 			// no value fails
-			if( valueMap.get(key) == null ) {
+			if (valueMap.get(key) == null) {
 				return -1;
 			}
 			
 			// Expire value?
 			Long expireObj = expireMap.get(key);
-			if( expireObj == null) {
+			if (expireObj == null) {
 				return 0;
 			}
 			return expireObj.longValue();
@@ -189,7 +189,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 			accessLock.writeLock().lock();
 			
 			// Does nothing if empty
-			if( time <= 0 || valueMap.get(key) == null ) {
+			if (time <= 0 || valueMap.get(key) == null) {
 				expireMap.remove(key);
 				return;
 			}
@@ -212,10 +212,10 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	/// @returns long, 0 means no expirary, -1 no data / expire
 	public long getExpiry(String key) {
 		long expire = getExpiryRaw(key);
-		if( expire <= 0 ) { //0 = no timestamp, -1 = no data
+		if (expire <= 0) { //0 = no timestamp, -1 = no data
 			return expire;
 		}
-		if( expire > currentSystemTimeInSeconds() ) {
+		if (expire > currentSystemTimeInSeconds()) {
 			return expire;
 		}
 		return -1; //expired
@@ -228,12 +228,12 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	/// @returns long, 0 means no expirary, -1 no data / expire
 	public long getLifespan(String key) {
 		long expire = getExpiryRaw(key);
-		if( expire <= 0 ) { //0 = no timestamp, -1 = no data
+		if (expire <= 0) { //0 = no timestamp, -1 = no data
 			return expire;
 		}
 		
 		long lifespan = expire - currentSystemTimeInSeconds();
-		if(lifespan <= 0) {
+		if (lifespan <= 0) {
 			return -1; //expired
 		}
 		
@@ -274,13 +274,13 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 			accessLock.readLock().lock();
 			
 			String val = valueMap.get(key);
-			if( val == null ) {
+			if (val == null) {
 				return null;
 			}
 			
 			// Note: 0 = no timestamp, hence valid value
 			long expiry = getExpiryRaw(key);
-			if( expiry != 0 && expiry < now ) {
+			if (expiry != 0 && expiry < now) {
 				return null;
 			}
 			
@@ -304,7 +304,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 		try {
 			accessLock.writeLock().lock();
 			
-			if( value == null ) {
+			if (value == null) {
 				valueMap.remove(key);
 				expireMap.remove(key);
 			} else {
@@ -335,14 +335,14 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 			Set<String> valuekeySet = valueMap.keySet();
 			
 			// Iterate and get
-			for( String key : valuekeySet ) {
-				String rawValue = getValueRaw(key, now );
+			for (String key : valuekeySet) {
+				String rawValue = getValueRaw(key, now);
 				
-				if( rawValue != null ) {
-					if( value == null || rawValue.equals(value) ) {
+				if (rawValue != null) {
+					if (value == null || rawValue.equals(value)) {
 						ret.add(key);
 					}
-				} 
+				}
 			}
 			
 			return ret;
@@ -379,7 +379,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	public Set<String> keySet() {
 		return getKeys(null);
 	}
-
+	
 	/// Contains key operation.
 	///
 	/// note that boolean false can either mean no value or expired value
@@ -409,7 +409,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	public String put(String key, String value) {
 		return setValueRaw(key, value, 0);
 	}
-
+	
 	/// Stores (and overwrites if needed) key, value pair
 	///
 	/// Important note: It does not return the previously stored value
@@ -420,9 +420,9 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	///
 	/// @returns null
 	public String putWithLifespan(String key, String value, long lifespan) {
-		return setValueRaw(key,value, currentSystemTimeInSeconds() + lifespan);
+		return setValueRaw(key, value, currentSystemTimeInSeconds() + lifespan);
 	}
-
+	
 	/// Stores (and overwrites if needed) key, value pair
 	///
 	/// Important note: It does not return the previously stored value
@@ -433,7 +433,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	///
 	/// @returns String
 	public String putWithExpiry(String key, String value, long expireTime) {
-		return setValueRaw(key,value,expireTime);
+		return setValueRaw(key, value, expireTime);
 	}
 	
 	///
@@ -442,10 +442,10 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	
 	/// Default nonce lifetime (1 hour)
 	public int nonce_defaultLifetime = 3600;
-
+	
 	/// Default nonce string length (22 is chosen to be consistent with base58 GUID's)
 	public int nonce_defaultLength = 22;
-
+	
 	/// Generates a random nonce hash, and saves the value to it
 	///
 	/// Relies on both nonce_defaultLength & nonce_defaultLifetime for default parameters
@@ -454,9 +454,9 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	///
 	/// @returns String value of the random key generated
 	public String generateNonce(String val) {
-		return generateNonce( val, nonce_defaultLifetime, nonce_defaultLength );
+		return generateNonce(val, nonce_defaultLifetime, nonce_defaultLength);
 	}
-
+	
 	/// Generates a random nonce hash, and saves the value to it
 	///
 	/// Relies on nonce_defaultLength for default parameters
@@ -466,9 +466,9 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	///
 	/// @returns String value of the random key generated
 	public String generateNonce(String val, long lifespan) {
-		return generateNonce( val, lifespan, nonce_defaultLength );
+		return generateNonce(val, lifespan, nonce_defaultLength);
 	}
-
+	
 	/// Generates a random nonce hash, and saves the value to it
 	///
 	/// Note that the random nonce value returned, is based on picoded.security.NxtCrypt.randomString.
@@ -481,8 +481,8 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	/// @returns String value of the random key generated
 	public String generateNonce(String val, long lifespan, int keyLength) {
 		String res = NxtCrypt.randomString(keyLength);
-		putWithLifespan( res, val, lifespan );
+		putWithLifespan(res, val, lifespan);
 		return res;
 	}
-		
+	
 }

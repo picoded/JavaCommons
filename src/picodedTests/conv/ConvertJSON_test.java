@@ -57,7 +57,9 @@ public class ConvertJSON_test {
 		tMap.put("Hello", "WORLD");
 		tMap.put("WORLD", "Hello");
 		
-		assertEquals(tMap, ConvertJSON.toMap("{ /* Hello folks. comment here is to break things */ \"Hello\":\"WORLD\",\"WORLD\":\"Hello\"}"));
+		assertEquals(tMap,
+			ConvertJSON
+				.toMap("{ /* Hello folks. comment here is to break things */ \"Hello\":\"WORLD\",\"WORLD\":\"Hello\"}"));
 		assertEquals("{\"Hello\":\"WORLD\",\"WORLD\":\"Hello\"}", (tStr = ConvertJSON.fromMap(tMap)));
 		
 	}

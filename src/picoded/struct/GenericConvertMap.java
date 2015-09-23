@@ -27,7 +27,7 @@ import picoded.conv.GenericConvert;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
-public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
+public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	
 	// to string conversion
 	//--------------------------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default String getString(K key, String fallbck) {
-		return GenericConvert.toString( get(key), fallbck );
+		return GenericConvert.toString(get(key), fallbck);
 	}
 	
 	/// Default null fallback, To String conversion of generic object
@@ -48,7 +48,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default String getString(K key) {
-		return GenericConvert.toString( get(key) );
+		return GenericConvert.toString(get(key));
 	}
 	
 	// to boolean conversion
@@ -61,7 +61,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default boolean getBoolean(K key, boolean fallbck) {
-		return GenericConvert.toBoolean( get(key), fallbck );
+		return GenericConvert.toBoolean(get(key), fallbck);
 	}
 	
 	/// Default boolean fallback, To String conversion of generic object
@@ -70,7 +70,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default boolean getBoolean(K key) {
-		return GenericConvert.toBoolean( get(key) );
+		return GenericConvert.toBoolean(get(key));
 	}
 	
 	// to Number conversion
@@ -83,7 +83,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default Number getNumber(K key, Number fallbck) {
-		return GenericConvert.toNumber( get(key), fallbck );
+		return GenericConvert.toNumber(get(key), fallbck);
 	}
 	
 	/// Default Number fallback, To String conversion of generic object
@@ -92,7 +92,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default Number getNumber(K key) {
-		return GenericConvert.toNumber( get(key) );
+		return GenericConvert.toNumber(get(key));
 	}
 	
 	// to int conversion
@@ -105,7 +105,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default int getInt(K key, int fallbck) {
-		return GenericConvert.toInt( get(key), fallbck );
+		return GenericConvert.toInt(get(key), fallbck);
 	}
 	
 	/// Default int fallback, To String conversion of generic object
@@ -114,7 +114,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default int getInt(K key) {
-		return GenericConvert.toInt( get(key) );
+		return GenericConvert.toInt(get(key));
 	}
 	
 	// to long conversion
@@ -127,7 +127,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default long getLong(K key, long fallbck) {
-		return GenericConvert.toLong( get(key), fallbck );
+		return GenericConvert.toLong(get(key), fallbck);
 	}
 	
 	/// Default long fallback, To String conversion of generic object
@@ -136,7 +136,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default long getLong(K key) {
-		return GenericConvert.toLong( get(key) );
+		return GenericConvert.toLong(get(key));
 	}
 	
 	// to float conversion
@@ -149,7 +149,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default float getFloat(K key, float fallbck) {
-		return GenericConvert.toFloat( get(key), fallbck );
+		return GenericConvert.toFloat(get(key), fallbck);
 	}
 	
 	/// Default float fallback, To String conversion of generic object
@@ -158,7 +158,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default float getFloat(K key) {
-		return GenericConvert.toFloat( get(key) );
+		return GenericConvert.toFloat(get(key));
 	}
 	
 	// to double conversion
@@ -171,7 +171,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default double getDouble(K key, double fallbck) {
-		return GenericConvert.toDouble( get(key), fallbck );
+		return GenericConvert.toDouble(get(key), fallbck);
 	}
 	
 	/// Default float fallback, To String conversion of generic object
@@ -180,7 +180,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default double getDouble(K key) {
-		return GenericConvert.toDouble( get(key) );
+		return GenericConvert.toDouble(get(key));
 	}
 	
 	// to byte conversion
@@ -193,7 +193,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default byte getByte(K key, byte fallbck) {
-		return GenericConvert.toByte( get(key), fallbck );
+		return GenericConvert.toByte(get(key), fallbck);
 	}
 	
 	/// Default float fallback, To String conversion of generic object
@@ -202,7 +202,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default byte getByte(K key) {
-		return GenericConvert.toByte( get(key) );
+		return GenericConvert.toByte(get(key));
 	}
 	
 	// to short conversion
@@ -215,7 +215,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default short getShort(K key, short fallbck) {
-		return GenericConvert.toShort( get(key), fallbck );
+		return GenericConvert.toShort(get(key), fallbck);
 	}
 	
 	/// Default short fallback, To String conversion of generic object
@@ -224,7 +224,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default short getShort(K key) {
-		return GenericConvert.toShort( get(key) );
+		return GenericConvert.toShort(get(key));
 	}
 	
 	// to UUID / GUID
@@ -237,7 +237,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted UUID, always possible unless null
 	public default UUID getUUID(K key, Object fallbck) {
-		return GenericConvert.toUUID( get(key), fallbck );
+		return GenericConvert.toUUID(get(key), fallbck);
 	}
 	
 	/// Default Null fallback, To UUID conversion of generic object
@@ -246,7 +246,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted value
 	public default UUID getUUID(K key) {
-		return GenericConvert.toUUID( get(key) );
+		return GenericConvert.toUUID(get(key));
 	}
 	
 	/// To GUID conversion of generic object
@@ -256,7 +256,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted UUID, always possible unless null
 	public default String getGUID(K key, Object fallbck) {
-		return GenericConvert.toGUID( get(key), fallbck );
+		return GenericConvert.toGUID(get(key), fallbck);
 	}
 	
 	/// Default Null fallback, To GUID conversion of generic object
@@ -265,7 +265,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted value
 	public default String getGUID(K key) {
-		return GenericConvert.toGUID( get(key) );
+		return GenericConvert.toGUID(get(key));
 	}
 	
 	// to list
@@ -290,7 +290,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted String[], always possible unless null
 	public default String[] getStringArray(K key, Object fallbck) {
-		return GenericConvert.toStringArray( get(key), fallbck );
+		return GenericConvert.toStringArray(get(key), fallbck);
 	}
 	
 	/// Default Null fallback, To String[] conversion of generic object
@@ -299,7 +299,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	///
 	/// @returns         The converted value
 	public default String[] getStringArray(K key) {
-		return GenericConvert.toStringArray( get(key) );
+		return GenericConvert.toStringArray(get(key));
 	}
 	
 	// to object array
@@ -328,21 +328,23 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K,V> {
 	//--------------------------------------------------------------------------------------------------
 	@SuppressWarnings("unchecked")
 	public default V typecastPut(K key, Object value) {
-		return put(key, (V)value);
+		return put(key, (V) value);
 	}
 	
 	// Attempts to convert against known V value types, and insert into the map. 
 	// If no conversion is required, please use typecastPut
 	//--------------------------------------------------------------------------------------------------
-	public default V convertPut(K key, Object value, Class<V> valueClass ) {
+	public default V convertPut(K key, Object value, Class<V> valueClass) {
 		@SuppressWarnings("unchecked")
-		BiFunction<Object,Object,V> bf = (BiFunction<Object,Object,V>)GenericConvert.getBiFunction_noisy( (Class<?>)valueClass );
+		BiFunction<Object, Object, V> bf = (BiFunction<Object, Object, V>) GenericConvert
+			.getBiFunction_noisy((Class<?>) valueClass);
 		V val = bf.apply(key, value);
 		return put(key, val);
 	}
 	
 	public default V convertPut(K key, Object value) {
-		throw new UnsupportedOperationException("Sadly convertPut without class parameter needs to be manually extended. Eg: 'return convertPut(key, value, V.class)', where V is not a generic");
+		throw new UnsupportedOperationException(
+			"Sadly convertPut without class parameter needs to be manually extended. Eg: 'return convertPut(key, value, V.class)', where V is not a generic");
 	}
 	
 }

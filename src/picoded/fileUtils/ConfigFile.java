@@ -45,11 +45,12 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 	
 	/// The actual inner map storage
 	Ini iniMap = null;
-	Map<String,Object> jsonMap = null;
+	Map<String, Object> jsonMap = null;
 	
 	boolean jsonMode = false;
 	
 	String fileName = "";
+	
 	/// Blank constructor
 	protected ConfigFile() {
 		
@@ -65,59 +66,59 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 		innerConstructor(new File(filePath));
 	}
 	
-	private void innerConstructor(File inFile){
+	private void innerConstructor(File inFile) {
 		try {
 			fileName = inFile.getName();
-			if(fileName.endsWith(".js") || fileName.endsWith(".json")){
+			if (fileName.endsWith(".js") || fileName.endsWith(".json")) {
 				jsonMode = true;
 				jsonMap = new HashMap<String, Object>();
 				
 				String jsString = FileUtils.readFileToString(inFile);
 				jsonMap = ConvertJSON.toMap(jsString);
 				
-				for(String key : jsonMap.keySet()){
+				for (String key : jsonMap.keySet()) {
 					jsonMap.put(key, jsonMap.get(key));
 				}
-			}else{
+			} else {
 				iniMap = new Ini(inFile);
 			}
-		} catch(IOException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	public String fileName(){
+	public String fileName() {
 		return fileName;
 	}
 	
 	/// Gets the config value string, from the file 
 	public Object get(Object key) {
-		if(jsonMode){
+		if (jsonMode) {
 			return getJson(key, jsonMap);
-		}else{
+		} else {
 			//read from ini
 			String keyString = key.toString();
 			String[] splitKeyString = keyString.split("\\.");
 			
-			String section = StringUtils.join( ArrayUtils.subarray(splitKeyString, 0, splitKeyString.length-1), "."); //name in [] brackets is a section
-			String sectionKey = splitKeyString[ splitKeyString.length - 1 ];
+			String section = StringUtils.join(ArrayUtils.subarray(splitKeyString, 0, splitKeyString.length - 1), "."); //name in [] brackets is a section
+			String sectionKey = splitKeyString[splitKeyString.length - 1];
 			
 			Ini.Section iniSection = iniMap.get(section);
 			
-			return (iniSection == null)? null : iniSection.get(sectionKey);
+			return (iniSection == null) ? null : iniSection.get(sectionKey);
 		}
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Object getJson(Object key, Object currentResult){
+	private Object getJson(Object key, Object currentResult) {
 		String keyString = key.toString();
 		
 		Map<String, Object> currentResultMap = null;
-		if(currentResult instanceof Map){
-			currentResultMap = (Map<String, Object>)currentResult;
+		if (currentResult instanceof Map) {
+			currentResultMap = (Map<String, Object>) currentResult;
 		}
 		
-		if(keyString.contains(".")){
+		if (keyString.contains(".")) {
 			String jsonKey = keyString.substring(0, keyString.indexOf("."));
 			String jsonKeyRemainder = keyString.substring(keyString.indexOf(".") + 1, keyString.length());
 			

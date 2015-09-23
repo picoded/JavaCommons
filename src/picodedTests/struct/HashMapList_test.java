@@ -31,7 +31,7 @@ public class HashMapList_test {
 		list.add(exp[1]);
 		list.add(exp[2]);
 		
-		assertArrayEquals( exp, list.toArray(new String[list.size()]) );
+		assertArrayEquals(exp, list.toArray(new String[list.size()]));
 	}
 	
 	/// The type erasure error?

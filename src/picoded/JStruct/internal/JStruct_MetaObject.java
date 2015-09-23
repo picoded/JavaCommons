@@ -45,9 +45,10 @@ public class JStruct_MetaObject implements MetaObject {
 	//----------------------------------------------
 	
 	/// Common setup function, across constructors
-	protected void commonSetup(JStruct_MetaTable inTable, String inOID, Map<String, Object> inRemoteData, boolean isCompleteData) {
+	protected void commonSetup(JStruct_MetaTable inTable, String inOID, Map<String, Object> inRemoteData,
+		boolean isCompleteData) {
 		mainTable = inTable;
-	
+		
 		// Generates a GUID if not given
 		if (inOID == null || inOID.length() < 22) {
 			// Issue a GUID
@@ -55,15 +56,15 @@ public class JStruct_MetaObject implements MetaObject {
 			
 			// D= GUID collision check for LOLZ
 			remoteDataMap = mainTable.metaObjectRemoteDataMap_get(_oid);
-			if( remoteDataMap == null ) {
-				remoteDataMap = new HashMap<String,Object>();
+			if (remoteDataMap == null) {
+				remoteDataMap = new HashMap<String, Object>();
 			}
 			
-			if(remoteDataMap.size() > 0 ) {
-				if( remoteDataMap.size() == 1 && remoteDataMap.get("_oid") != null ) {
+			if (remoteDataMap.size() > 0) {
+				if (remoteDataMap.size() == 1 && remoteDataMap.get("_oid") != null) {
 					// ignore if its just _oid
 				} else {
-					throw new RuntimeException("GUID Collision T_T Q_Q "+_oid);
+					throw new RuntimeException("GUID Collision T_T Q_Q " + _oid);
 				}
 			}
 			
@@ -78,7 +79,7 @@ public class JStruct_MetaObject implements MetaObject {
 			
 			// Loading remote data map, only valid if _oid is given
 			remoteDataMap = inRemoteData;
-			if(remoteDataMap != null) {
+			if (remoteDataMap != null) {
 				isCompleteRemoteDataMap = isCompleteData;
 			}
 		}
@@ -91,7 +92,8 @@ public class JStruct_MetaObject implements MetaObject {
 	}
 	
 	/// Constructor, with metaTable and GUID (auto generated if null)
-	public JStruct_MetaObject(JStruct_MetaTable inTable, String inOID, Map<String, Object> inRemoteData, boolean isCompleteData) {
+	public JStruct_MetaObject(JStruct_MetaTable inTable, String inOID, Map<String, Object> inRemoteData,
+		boolean isCompleteData) {
 		commonSetup(inTable, inOID, inRemoteData, isCompleteData);
 	}
 	
@@ -108,12 +110,12 @@ public class JStruct_MetaObject implements MetaObject {
 	
 	/// Ensures the complete remote data map is loaded
 	protected void ensureCompleteRemoteDataMap() {
-		if( remoteDataMap == null || isCompleteRemoteDataMap == false ) {
+		if (remoteDataMap == null || isCompleteRemoteDataMap == false) {
 			remoteDataMap = mainTable.metaObjectRemoteDataMap_get(_oid);
 			isCompleteRemoteDataMap = true;
 			
-			if( remoteDataMap == null ) {
-				remoteDataMap = new HashMap<String,Object>();
+			if (remoteDataMap == null) {
+				remoteDataMap = new HashMap<String, Object>();
 			}
 		}
 	}
@@ -121,13 +123,13 @@ public class JStruct_MetaObject implements MetaObject {
 	/// Collapse delta map to remote map
 	protected void collapseDeltaToRemoteMap() {
 		ensureCompleteRemoteDataMap();
-		for( String key : deltaDataMap.keySet() ) {
+		for (String key : deltaDataMap.keySet()) {
 			Object val = deltaDataMap.get(key);
 			
-			if( val == null || val == ObjectTokens.NULL ) {
+			if (val == null || val == ObjectTokens.NULL) {
 				remoteDataMap.remove(key);
 			} else {
-				remoteDataMap.put( key, val );
+				remoteDataMap.put(key, val);
 			}
 		}
 		deltaDataMap = new HashMap<String, Object>();
@@ -138,8 +140,8 @@ public class JStruct_MetaObject implements MetaObject {
 		Set<String> unfilteredForNull = new HashSet<String>();
 		
 		ensureCompleteRemoteDataMap();
-		unfilteredForNull.addAll( deltaDataMap.keySet() );
-		unfilteredForNull.addAll( remoteDataMap.keySet() );
+		unfilteredForNull.addAll(deltaDataMap.keySet());
+		unfilteredForNull.addAll(remoteDataMap.keySet());
 		
 		return unfilteredForNull;
 	}
@@ -151,25 +153,25 @@ public class JStruct_MetaObject implements MetaObject {
 	public Object get(Object key) {
 		
 		/// Get key operation
-		if( key.toString().equalsIgnoreCase( "_oid") ) {
+		if (key.toString().equalsIgnoreCase("_oid")) {
 			return _oid;
 		}
 		
 		Object ret = deltaDataMap.get(key);
 		
 		// Get from incomplete map
-		if( ret == null && !isCompleteRemoteDataMap && remoteDataMap != null) {
+		if (ret == null && !isCompleteRemoteDataMap && remoteDataMap != null) {
 			ret = remoteDataMap.get(key);
 		}
 		
 		// Get from complete map
-		if( ret == null ) {
+		if (ret == null) {
 			ensureCompleteRemoteDataMap();
 			ret = remoteDataMap.get(key);
 		}
 		
 		// Return null value
-		if( ret == ObjectTokens.NULL ) {
+		if (ret == ObjectTokens.NULL) {
 			return null;
 		}
 		return ret;
@@ -179,7 +181,7 @@ public class JStruct_MetaObject implements MetaObject {
 	public Object put(String key, Object value) {
 		Object ret = get(key);
 		
-		if( value == null ) {
+		if (value == null) {
 			deltaDataMap.put(key, ObjectTokens.NULL);
 		} else {
 			deltaDataMap.put(key, value);
@@ -198,19 +200,19 @@ public class JStruct_MetaObject implements MetaObject {
 		Set<String> unfilteredForNull = unfilteredForNullKeySet();
 		Set<String> retSet = new HashSet<String>();
 		
-		for( String key : unfilteredForNull ) {
-			if( key.equalsIgnoreCase("_oid") ) {
+		for (String key : unfilteredForNull) {
+			if (key.equalsIgnoreCase("_oid")) {
 				continue;
 			}
 			
-			if( get(key) != null ) {
+			if (get(key) != null) {
 				retSet.add(key);
 			}
 		}
 		retSet.add("_oid");
 		
 		return retSet;
-	} 
+	}
 	
 	// MetaObject save operations
 	//----------------------------------------------
@@ -226,9 +228,9 @@ public class JStruct_MetaObject implements MetaObject {
 	public void saveAll() {
 		ensureCompleteRemoteDataMap();
 		
-		Set<String> keySet = new HashSet<String>( deltaDataMap.keySet() );
-		keySet.addAll( remoteDataMap.keySet() );
-		mainTable.metaObjectRemoteDataMap_update(_oid, this, keySet );
+		Set<String> keySet = new HashSet<String>(deltaDataMap.keySet());
+		keySet.addAll(remoteDataMap.keySet());
+		mainTable.metaObjectRemoteDataMap_update(_oid, this, keySet);
 		
 		collapseDeltaToRemoteMap();
 		unfilteredForNullKeySet();

@@ -34,8 +34,8 @@ public class MetaTableApiBuilderTomcat_test {
 		}
 		
 		/// Process the request, not the authentication layer
-		public boolean doJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
-			return rb.servletCall( "", this, outputData );
+		public boolean doJSON(Map<String, Object> outputData, Map<String, Object> templateData) throws Exception {
+			return rb.servletCall("", this, outputData);
 		}
 	}
 	
@@ -50,23 +50,23 @@ public class MetaTableApiBuilderTomcat_test {
 		return (new JStruct()).getMetaTable("test");
 	}
 	
-	private static void populateMetaTableDummyData(int min, int max){
+	private static void populateMetaTableDummyData(int min, int max) {
 		Random rnd = new Random();
 		int _max = rnd.nextInt(max);
 		_max = _max > min ? _max : min;
 		
 		_oids = new ArrayList<String>();
 		
-		for(int i = 0; i < _max; ++i){
+		for (int i = 0; i < _max; ++i) {
 			String oid = GUID.base58();
 			_oids.add(oid);
 			
 			Map<String, Object> innerObj = new HashMap<String, Object>();
 			innerObj.put("_oid", oid);
-			innerObj.put("_name", "name"+i);
-			innerObj.put("_age", "age"+i);
+			innerObj.put("_name", "name" + i);
+			innerObj.put("_age", "age" + i);
 			
-			mtObj.append(oid,  innerObj).saveAll();
+			mtObj.append(oid, innerObj).saveAll();
 		}
 	}
 	
@@ -79,12 +79,12 @@ public class MetaTableApiBuilderTomcat_test {
 		mtApi = new MetaTableApiBuilder(mtObj);
 		
 		rb = new RESTBuilder();
-		mtApi.setupRESTBuilder(rb,  "/meta-test/");
+		mtApi.setupRESTBuilder(rb, "/meta-test/");
 		
-		if( tomcat == null ) {
+		if (tomcat == null) {
 			File webInfFile = new File("./test-files/tmp/WEB-INF");
 			
-			for(File file : webInfFile.listFiles()){
+			for (File file : webInfFile.listFiles()) {
 				file.delete(); //to accomodate certain people who do not use command line
 			}
 			
@@ -93,54 +93,53 @@ public class MetaTableApiBuilderTomcat_test {
 			File context = new File("./test-files/tmp");
 			tomcat = new EmbeddedServlet("", context)
 			
-			.withServlet("/api/*", "meta-table-test", new MetaTableApiServlet())
-			.withPort(15000);
+			.withServlet("/api/*", "meta-table-test", new MetaTableApiServlet()).withPort(15000);
 			
 			tomcat.start();
-//			tomcat.awaitServer();
+			//			tomcat.awaitServer();
 		}
 	}
 	
 	@AfterClass
 	public static void serverTearDown() throws LifecycleException, IOException {
-		if( mtObj != null ) {
+		if (mtObj != null) {
 			mtObj.systemTeardown();
 		}
 		mtObj = null;
 		
-		if(tomcat != null) {
+		if (tomcat != null) {
 			tomcat.stop();
 		}
 		tomcat = null;
 	}
 	
-//	@Test
-	public void awaitServer(){
+	//	@Test
+	public void awaitServer() {
 		tomcat.awaitServer();
 	}
 	
 	RequestHttp requester;
 	ResponseHttp response;
-	Map<String,Object> responseMap;
+	Map<String, Object> responseMap;
 	
-	@Test 
+	@Test
 	@SuppressWarnings("unchecked")
-	public void list_POST_test(){
+	public void list_POST_test() {
 		String path = "http://127.0.0.1:15000/api/meta-test/list";
 		
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
 		Map<String, String[]> headersMap = new HashMap<String, String[]>();
 		
-		paramsMap.put("headers", new String[]{"[\"_oid\"]"});
+		paramsMap.put("headers", new String[] { "[\"_oid\"]" });
 		response = RequestHttp.post(path, paramsMap, null, null);
 		assertNotNull(response);
 		
 		Map<String, Object> resMap = response.toMap();
-		List<List<String>> dataList = (List<List<String>>)resMap.get("data");
+		List<List<String>> dataList = (List<List<String>>) resMap.get("data");
 		assertNotNull(dataList);
 		
 		List<String> convList = new ArrayList<String>();
-		for(List<String> innerList : dataList){
+		for (List<String> innerList : dataList) {
 			convList.addAll(innerList);
 		}
 		boolean contains = convList.containsAll(_oids);
@@ -148,17 +147,16 @@ public class MetaTableApiBuilderTomcat_test {
 	}
 	
 	@Test
-	public void meta_GET_test(){
+	public void meta_GET_test() {
 		String path = "http://127.0.0.1:15000/api/meta-test/get";
 		
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
-		paramsMap.put("_oid", new String[]{_oids.get(0)});
-		
+		paramsMap.put("_oid", new String[] { _oids.get(0) });
 		
 		Map<String, String[]> headersMap = new HashMap<String, String[]>();
 		response = RequestHttp.get(path, paramsMap, null, null);
 		
-		if(response.statusCode() == 404){
+		if (response.statusCode() == 404) {
 			System.out.println(404);
 		}
 		
@@ -167,7 +165,7 @@ public class MetaTableApiBuilderTomcat_test {
 	}
 	
 	@Test
-	public void meta_POST_test_delta(){
+	public void meta_POST_test_delta() {
 		String path = "http://127.0.0.1:15000/api/meta-test/post";
 		String jsonString = "";
 		
@@ -177,9 +175,9 @@ public class MetaTableApiBuilderTomcat_test {
 		jsonString = ConvertJSON.fromMap(deltaObj);
 		
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
-		paramsMap.put("_oid", new String[]{_oids.get(0)});
-		paramsMap.put("updateMode", new String[]{"delta"});
-		paramsMap.put("meta", new String[]{jsonString});
+		paramsMap.put("_oid", new String[] { _oids.get(0) });
+		paramsMap.put("updateMode", new String[] { "delta" });
+		paramsMap.put("meta", new String[] { jsonString });
 		
 		response = RequestHttp.post(path, paramsMap, null, null);
 		assertNotNull(response);
@@ -190,7 +188,7 @@ public class MetaTableApiBuilderTomcat_test {
 	}
 	
 	@Test
-	public void meta_POST_test_full(){
+	public void meta_POST_test_full() {
 		String path = "http://127.0.0.1:15000/api/meta-test/post";
 		String jsonString = "";
 		
@@ -199,16 +197,16 @@ public class MetaTableApiBuilderTomcat_test {
 		jsonString = ConvertJSON.fromMap(fullObj);
 		
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
-		paramsMap.put("_oid", new String[]{_oids.get(1)});
-		paramsMap.put("updateMode", new String[]{"full"});
-		paramsMap.put("meta", new String[]{jsonString});
+		paramsMap.put("_oid", new String[] { _oids.get(1) });
+		paramsMap.put("updateMode", new String[] { "full" });
+		paramsMap.put("meta", new String[] { jsonString });
 		
 		response = RequestHttp.post(path, paramsMap, null, null);
 		assertNotNull(response);
 	}
 	
 	@Test
-	public void meta_POST_test_new(){
+	public void meta_POST_test_new() {
 		String path = "http://127.0.0.1:15000/api/meta-test/post";
 		String jsonString = "";
 		
@@ -218,21 +216,21 @@ public class MetaTableApiBuilderTomcat_test {
 		jsonString = ConvertJSON.fromMap(newMetaObj);
 		
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
-		paramsMap.put("_oid", new String[]{"new"});
-		paramsMap.put("meta", new String[]{jsonString});
+		paramsMap.put("_oid", new String[] { "new" });
+		paramsMap.put("meta", new String[] { jsonString });
 		
 		response = RequestHttp.post(path, paramsMap, null, null);
 		assertNotNull(response);
 	}
 	
 	@Test
-	public void meta_DELETE_test(){
+	public void meta_DELETE_test() {
 		String path = "http://127.0.0.1:15000/api/meta-test/meta";
 		String getPath = "http://127.0.0.1:15000/api/meta-test/meta";
 		Map<String, Object> respMap = null;
 		
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
-		paramsMap.put("_oid", new String[]{ _oids.get(0) });
+		paramsMap.put("_oid", new String[] { _oids.get(0) });
 		
 		//first get user
 		response = RequestHttp.get(getPath, paramsMap, null, null);
@@ -242,7 +240,7 @@ public class MetaTableApiBuilderTomcat_test {
 		//then delete
 		response = RequestHttp.delete(path, paramsMap, null, null);
 		assertNotNull(respMap = response.toMap());
-
+		
 		//then check again
 		response = RequestHttp.get(getPath, paramsMap, null, null);
 		assertNotNull(respMap = response.toMap());

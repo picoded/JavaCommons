@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Arrays;
 
-
 /// Picoded imports
 import picoded.conv.GUID;
 import picoded.conv.GenericConvert;
@@ -50,11 +49,11 @@ import com.hazelcast.core.IMap;
 /// @TODO : Group handling layer
 ///
 public class AccountTable implements UnsupportedDefaultMap<String, AccountObject> {
-
+	
 	///
 	/// Underlying data structures
 	///--------------------------------------------------------------------------
-
+	
 	/// Provides a key value pair mapping
 	/// of the account "names" to GUID
 	/// 
@@ -67,15 +66,15 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	
 	/// Stores the account session authentication no-once information 
 	protected KeyValueMap accountSessions = null;
-
+	
 	/// Holds the account object meta table values
 	protected MetaTable accountMeta = null;
-
+	
 	/// Handles the storage of the group mapping
 	///
 	/// Group[member] = role1,role2, ...
 	protected MetaTable group_childRole = null;
-
+	
 	/// Handles the Group-member meta field mapping
 	protected MetaTable groupChild_meta = null;
 	
@@ -88,38 +87,38 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	
 	/// The account self ID's
 	protected static String ACCOUNT_ID = "_ID";
-
+	
 	/// The account self ID's
 	protected static String ACCOUNT_HASH = "_IH";
-
+	
 	/// The login sessions used for authentication
 	protected static String ACCOUNT_SESSIONS = "_LS";
-
+	
 	/// The account self meta values
 	protected static String ACCOUNT_META = "_SM";
-
+	
 	/// The child nodes mapping, from self
 	protected static String ACCOUNT_CHILD = "_SC";
-
+	
 	/// The child account meta values
 	protected static String ACCOUNT_CHILDMETA = "_CM";
 	
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
-
+	
 	/// Setup the metatable with the default table name
 	public AccountTable(JStruct jStructObj, String tableName) {
 		tableNamePrefix = tableName;
 		
-		accountID = jStructObj.getKeyValueMap( tableName+ACCOUNT_ID );
-		accountHash = jStructObj.getKeyValueMap( tableName+ACCOUNT_HASH );
-		accountSessions = jStructObj.getKeyValueMap( tableName+ACCOUNT_SESSIONS );
-		accountMeta = jStructObj.getMetaTable( tableName+ACCOUNT_META );
-		group_childRole = jStructObj.getMetaTable( tableName+ACCOUNT_CHILD );
-		groupChild_meta = jStructObj.getMetaTable( tableName+ACCOUNT_CHILDMETA );
+		accountID = jStructObj.getKeyValueMap(tableName + ACCOUNT_ID);
+		accountHash = jStructObj.getKeyValueMap(tableName + ACCOUNT_HASH);
+		accountSessions = jStructObj.getKeyValueMap(tableName + ACCOUNT_SESSIONS);
+		accountMeta = jStructObj.getMetaTable(tableName + ACCOUNT_META);
+		group_childRole = jStructObj.getMetaTable(tableName + ACCOUNT_CHILD);
+		groupChild_meta = jStructObj.getMetaTable(tableName + ACCOUNT_CHILDMETA);
 		
-		accountSessions.setTempHint( true ); //optimization
+		accountSessions.setTempHint(true); //optimization
 	}
 	
 	//
@@ -135,7 +134,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		group_childRole.systemSetup();
 		groupChild_meta.systemSetup();
 		
-		if( superUserGroup() == null ) {
+		if (superUserGroup() == null) {
 			newObject(_superUserGroup).saveAll();
 		}
 	}
@@ -151,20 +150,19 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	}
 	
 	//
-	//
 	// Getters for metaTables
 	// Discouraged from use
 	//
 	
-	public MetaTable accountMetaTable(){
+	public MetaTable accountMetaTable() {
 		return accountMeta;
 	}
 	
-	public MetaTable groupChildRole(){
+	public MetaTable groupChildRole() {
 		return group_childRole;
 	}
 	
-	public MetaTable groupChildMeta(){
+	public MetaTable groupChildMeta() {
 		return groupChild_meta;
 	}
 	
@@ -203,19 +201,19 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	public AccountObject getFromID(Object oid) {
 		String _oid = oid.toString();
 		
-		if( containsID(_oid) ) {
+		if (containsID(_oid)) {
 			return new AccountObject(this, _oid);
 		}
 		
-		return null; 
+		return null;
 	}
 	
 	/// Gets the account using the object ID array, 
 	/// and returns the account object array
 	public AccountObject[] getFromIDArray(String[] _oidList) {
 		AccountObject[] mList = new AccountObject[_oidList.length];
-		for(int a=0; a<_oidList.length; ++a) {
-			mList[a] = getFromID( _oidList[a] );
+		for (int a = 0; a < _oidList.length; ++a) {
+			mList[a] = getFromID(_oidList[a]);
 		}
 		return mList;
 	}
@@ -224,11 +222,11 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	public AccountObject getFromName(Object name) {
 		String _oid = nameToID(name.toString());
 		
-		if( _oid != null ) {
+		if (_oid != null) {
 			return getFromID(_oid);
 		}
 		
-		return null; 
+		return null;
 	}
 	
 	/// Generates a new account object
@@ -240,16 +238,16 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	
 	/// Generates a new account object with the given nice name
 	public AccountObject newObject(String name) {
-		if(containsName(name)) {
+		if (containsName(name)) {
 			return null;
 		}
 		
 		AccountObject ret = newObject();
 		
-		if( ret.setName(name) ) {
+		if (ret.setName(name)) {
 			return ret;
 		} else {
-			removeFromID( ret._oid() );
+			removeFromID(ret._oid());
 		}
 		
 		return null;
@@ -312,17 +310,18 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	
 	/// The nonce size
 	public int nonceSize = 22;
-	 
+	
 	/// Gets and returns the session info, [nonceSalt, loginIP, browserAgent]
 	protected String[] getSessionInfo(String oid, String nonce) {
-		return accountSessions.getStringArray(oid+"-"+nonce);
+		return accountSessions.getStringArray(oid + "-" + nonce);
 	}
 	
 	/// Sets the session info with the given nonceSalt, IP, and browserAgent
 	protected String generateSession(String oid, int lifespan, String nonceSalt, String ipString, String browserAgent) {
 		String nonce = NxtCrypt.randomString(nonceSize);
-		String key = oid+"-"+nonce;
-		accountSessions.putWithLifespan( key, ConvertJSON.fromList( Arrays.asList(new String[] {nonceSalt, ipString, browserAgent}) ), lifespan );
+		String key = oid + "-" + nonce;
+		accountSessions.putWithLifespan(key,
+			ConvertJSON.fromList(Arrays.asList(new String[] { nonceSalt, ipString, browserAgent })), lifespan);
 		return nonce;
 	}
 	
@@ -344,10 +343,11 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	}
 	
 	/// Validates the user retur true/false, with an update response cookie / token if needed
-	public AccountObject getRequestUser(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) {
+	public AccountObject getRequestUser(javax.servlet.http.HttpServletRequest request,
+		javax.servlet.http.HttpServletResponse response) {
 		javax.servlet.http.Cookie[] cookieJar = request.getCookies();
 		
-		if(cookieJar == null) {
+		if (cookieJar == null) {
 			return null;
 		}
 		
@@ -360,46 +360,46 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		String rmbr = null;
 		String crumbsFlavour = null;
 		
-		for(javax.servlet.http.Cookie crumbs: cookieJar) {
+		for (javax.servlet.http.Cookie crumbs : cookieJar) {
 			crumbsFlavour = crumbs.getName();
 			
-			if(crumbsFlavour == null) {
+			if (crumbsFlavour == null) {
 				continue;
-			} else if(crumbsFlavour.equals(cookiePrefix+"Puid")) {
+			} else if (crumbsFlavour.equals(cookiePrefix + "Puid")) {
 				puid = crumbs.getValue();
-			} else if(crumbsFlavour.equals(cookiePrefix+"Nonc")) {
+			} else if (crumbsFlavour.equals(cookiePrefix + "Nonc")) {
 				nonc = crumbs.getValue();
-			} else if(crumbsFlavour.equals(cookiePrefix+"Hash")) {
+			} else if (crumbsFlavour.equals(cookiePrefix + "Hash")) {
 				hash = crumbs.getValue();
-			} else if(crumbsFlavour.equals(cookiePrefix+"Rmbr")) {
+			} else if (crumbsFlavour.equals(cookiePrefix + "Rmbr")) {
 				rmbr = crumbs.getValue();
 			}
 		}
 		
 		// Check if all values are present, and if user ID is valid
-		if(puid == null || nonc == null || hash == null) {
+		if (puid == null || nonc == null || hash == null) {
 			return null;
 		}
 		
-		if(puid.length() < 22 || !containsID(puid) ) {
+		if (puid.length() < 22 || !containsID(puid)) {
 			logoutAccount(request, response);
 			return null;
 		}
 		
 		AccountObject ret = null;
 		String[] sessionInfo = getSessionInfo(puid, nonc);
-		if( sessionInfo == null || sessionInfo.length <= 0 || //
-		    sessionInfo[0] == null || (ret=getFromID( puid )) == null //
-			) {
+		if (sessionInfo == null || sessionInfo.length <= 0 || //
+			sessionInfo[0] == null || (ret = getFromID(puid)) == null //
+		) {
 			logoutAccount(request, response);
 			return null;
 		}
 		
 		String passHash = ret.getPasswordHash();
-		String computedCookieHash = NxtCrypt.getSaltedHash( passHash, sessionInfo[0] );
+		String computedCookieHash = NxtCrypt.getSaltedHash(passHash, sessionInfo[0]);
 		
 		// Invalid cookie hash, exits
-		if( !NxtCrypt.slowEquals(hash, computedCookieHash) ) {
+		if (!NxtCrypt.slowEquals(hash, computedCookieHash)) {
 			logoutAccount(request, response);
 			return null;
 		}
@@ -407,13 +407,13 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		// From this point onwards, the session is valid. Now it performs checks for the renewal process
 		//---------------------------------------------------------------------------------------------------
 		
-		if(response != null) { //assume renewal process check
-			if(rmbr != null && rmbr.equals("1")) {
-				if(accountSessions.getLifespan(nonc) < (rmberMeLifetime-loginRenewal)) { //needs renewal (perform it!)
+		if (response != null) { //assume renewal process check
+			if (rmbr != null && rmbr.equals("1")) {
+				if (accountSessions.getLifespan(nonc) < (rmberMeLifetime - loginRenewal)) { //needs renewal (perform it!)
 					_setLogin(ret, request, response, true);
 				}
 			} else {
-				if(accountSessions.getLifespan(nonc) < (loginLifetime-rmberMeRenewal)) { //needs renewal (perform it!)
+				if (accountSessions.getLifespan(nonc) < (loginLifetime - rmberMeRenewal)) { //needs renewal (perform it!)
 					_setLogin(ret, request, response, false);
 				}
 			}
@@ -423,7 +423,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	}
 	
 	/// Internally sets the login to a user (handles the respective nonce) and set the cookies for the response
-	private boolean _setLogin(AccountObject po, javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, boolean rmberMe ) {
+	private boolean _setLogin(AccountObject po, javax.servlet.http.HttpServletRequest request,
+		javax.servlet.http.HttpServletResponse response, boolean rmberMe) {
 		
 		// Prepare the vars
 		//-----------------------------------------------------
@@ -431,73 +432,75 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		
 		// Detirmine the login lifetime
 		int noncLifetime;
-		if(rmberMe) {
+		if (rmberMe) {
 			noncLifetime = rmberMeLifetime;
 		} else {
 			noncLifetime = loginLifetime;
 		}
-		long expireTime = (System.currentTimeMillis())/1000L + noncLifetime;
+		long expireTime = (System.currentTimeMillis()) / 1000L + noncLifetime;
 		
 		String passHash = po.getPasswordHash();
-		if( passHash == null || passHash.length() <= 1 ) {
+		if (passHash == null || passHash.length() <= 1) {
 			return false;
 		}
 		String nonceSalt = NxtCrypt.randomString(nonceSize);
 		
 		// @TODO: include session details, such as login IP and BrowserAgent
 		String nonc = generateSession(puid, noncLifetime, nonceSalt, null, null);
-		String cookieHash = NxtCrypt.getSaltedHash( passHash, nonceSalt );
+		String cookieHash = NxtCrypt.getSaltedHash(passHash, nonceSalt);
 		
 		// Store the cookies
 		//-----------------------------------------------------
 		int noOfCookies = 5;
 		javax.servlet.http.Cookie cookieJar[] = new javax.servlet.http.Cookie[noOfCookies];
 		
-		int index=0;
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix+"Puid", puid);
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix+"Nonc", nonc);
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix+"Hash", cookieHash);
-		if(rmberMe) {
-			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix+"Rmbr", "1");
+		int index = 0;
+		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Puid", puid);
+		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Nonc", nonc);
+		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Hash", cookieHash);
+		if (rmberMe) {
+			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "1");
 		} else {
-			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix+"Rmbr", "0");
+			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "0");
 		}
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix+"Expi", String.valueOf(expireTime));
+		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Expi", String.valueOf(expireTime));
 		
 		/// The cookie "Expi" store the other cookies (Rmbr, user, Nonc etc.) expiry life time in seconds.
 		/// This cookie value is used in JS (checkLogoutTime.js) for validating the login expiry time and show a message to user accordingly.
 		
-		for(int a=0; a<noOfCookies; ++a) {
+		for (int a = 0; a < noOfCookies; ++a) {
 			/// Path is required for cross AJAX / domain requests,
 			/// @TODO make this configurable?
-			String cookiePath = (request.getContextPath() == null || request.getContextPath().isEmpty()) ? "/" : request.getContextPath();
+			String cookiePath = (request.getContextPath() == null || request.getContextPath().isEmpty()) ? "/" : request
+				.getContextPath();
 			cookieJar[a].setPath(cookiePath);
 			
-			if(!rmberMe) { //set to clear on browser close
+			if (!rmberMe) { //set to clear on browser close
 				cookieJar[a].setMaxAge(noncLifetime);
 			}
 			
-			if(a < 4 && isHttpOnly) {
+			if (a < 4 && isHttpOnly) {
 				cookieJar[a].setHttpOnly(isHttpOnly);
 			}
-			if(isSecureOnly) {
+			if (isSecureOnly) {
 				cookieJar[a].setSecure(isSecureOnly);
 			}
 			
-			if(cookieDomain != null && cookieDomain.length() > 0) {
+			if (cookieDomain != null && cookieDomain.length() > 0) {
 				cookieJar[a].setDomain(cookieDomain);
 			}
 			
 			//Actually inserts the cookie
-			response.addCookie( cookieJar[a] );
+			response.addCookie(cookieJar[a]);
 		}
 		
 		return true;
 	}
 	
 	/// Login the user if valid
-	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, AccountObject accountObj, String rawPassword, boolean rmberMe) {
-		if( accountObj != null && accountObj.validatePassword(rawPassword) ) {
+	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request,
+		javax.servlet.http.HttpServletResponse response, AccountObject accountObj, String rawPassword, boolean rmberMe) {
+		if (accountObj != null && accountObj.validatePassword(rawPassword)) {
 			_setLogin(accountObj, request, response, rmberMe);
 			return accountObj;
 		}
@@ -506,45 +509,48 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	}
 	
 	/// Login the user if valid
-	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, String nicename, String rawPassword, boolean rmberMe) {
-		return loginAccount( request, response, getFromName(nicename), rawPassword, rmberMe);
+	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request,
+		javax.servlet.http.HttpServletResponse response, String nicename, String rawPassword, boolean rmberMe) {
+		return loginAccount(request, response, getFromName(nicename), rawPassword, rmberMe);
 	}
 	
 	/// Logout any existing users
-	public boolean logoutAccount(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) {
-		if( response == null ) {
+	public boolean logoutAccount(javax.servlet.http.HttpServletRequest request,
+		javax.servlet.http.HttpServletResponse response) {
+		if (response == null) {
 			return false;
 		}
 		
 		javax.servlet.http.Cookie cookieJar[] = new javax.servlet.http.Cookie[5];
 		
-		cookieJar[0] = new javax.servlet.http.Cookie(cookiePrefix+"User", "-");
-		cookieJar[1] = new javax.servlet.http.Cookie(cookiePrefix+"Nonc", "-");
-		cookieJar[2] = new javax.servlet.http.Cookie(cookiePrefix+"Hash", "-");
-		cookieJar[3] = new javax.servlet.http.Cookie(cookiePrefix+"Rmbr", "-");
-		cookieJar[4] = new javax.servlet.http.Cookie(cookiePrefix+"Expi", "-");
+		cookieJar[0] = new javax.servlet.http.Cookie(cookiePrefix + "User", "-");
+		cookieJar[1] = new javax.servlet.http.Cookie(cookiePrefix + "Nonc", "-");
+		cookieJar[2] = new javax.servlet.http.Cookie(cookiePrefix + "Hash", "-");
+		cookieJar[3] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "-");
+		cookieJar[4] = new javax.servlet.http.Cookie(cookiePrefix + "Expi", "-");
 		
-		for(int a=0; a<5; ++a) {
+		for (int a = 0; a < 5; ++a) {
 			cookieJar[a].setMaxAge(1);
 			
 			/// Path is required for cross AJAX / domain requests,
 			/// @TODO make this configurable?
-			String cookiePath = (request.getContextPath() == null || request.getContextPath().isEmpty()) ? "/" : request.getContextPath();
+			String cookiePath = (request.getContextPath() == null || request.getContextPath().isEmpty()) ? "/" : request
+				.getContextPath();
 			cookieJar[a].setPath(cookiePath);
 			
-			if(a < 4 && isHttpOnly) {
+			if (a < 4 && isHttpOnly) {
 				cookieJar[a].setHttpOnly(isHttpOnly);
 			}
-			if(isSecureOnly) {
+			if (isSecureOnly) {
 				cookieJar[a].setSecure(isSecureOnly);
 			}
 			
-			if(cookieDomain != null && cookieDomain.length() > 0) {
+			if (cookieDomain != null && cookieDomain.length() > 0) {
 				cookieJar[a].setDomain(cookieDomain);
 			}
 			
 			//Actually inserts the cookie
-			response.addCookie( cookieJar[a] );
+			response.addCookie(cookieJar[a]);
 		}
 		return true;
 	}
@@ -552,7 +558,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	///
 	/// Group Membership roles managment
 	///--------------------------------------------------------------------------
-	protected List<String> membershipRoles = new ArrayList<String>( Arrays.asList(new String[] { "guest", "member", "manager", "admin" }) );
+	protected List<String> membershipRoles = new ArrayList<String>(Arrays.asList(new String[] { "guest", "member",
+		"manager", "admin" }));
 	
 	/// Returns the internal membership role list
 	public List<String> membershipRoles() {
@@ -560,21 +567,21 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	}
 	
 	/// Checks if membership role exists
-	public boolean hasMembershipRole( String role ) {
+	public boolean hasMembershipRole(String role) {
 		// Sanatize the role
 		role = role.toLowerCase();
 		
 		// Returns if it exists
-		return membershipRoles.contains( role );
+		return membershipRoles.contains(role);
 	}
 	
 	/// Add membership role if it does not exists
-	public void addMembershipRole( String role ) {
+	public void addMembershipRole(String role) {
 		// Sanatize the role
 		role = role.toLowerCase();
 		
 		// Already exists terminate
-		if( hasMembershipRole(role) ) {
+		if (hasMembershipRole(role)) {
 			return;
 		}
 		
@@ -583,10 +590,10 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	}
 	
 	/// Checks and validates the membership role, throws if invalid
-	protected String validateMembershipRole( String role ) {
+	protected String validateMembershipRole(String role) {
 		role = role.toLowerCase();
-		if( !hasMembershipRole( role ) ) {
-			throw new RuntimeException("Membership role does not exists: "+role);
+		if (!hasMembershipRole(role)) {
+			throw new RuntimeException("Membership role does not exists: " + role);
 		}
 		return role;
 	}
@@ -595,6 +602,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	// Super Users group managment
 	//--------------------------------------------------------------------------
 	
+	/// Default super user group
 	protected String _superUserGroup = "SuperUsers";
 	
 	/// Gets the super user group
@@ -611,7 +619,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	
 	/// Returns the super user group
 	public AccountObject superUserGroup() {
-		return getFromName( getSuperUserGroupName() );
+		return getFromName(getSuperUserGroupName());
 	}
 	
 }

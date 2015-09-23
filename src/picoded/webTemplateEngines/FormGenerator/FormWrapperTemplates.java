@@ -30,20 +30,20 @@ public class FormWrapperTemplates {
 		StringBuilder ret = new StringBuilder();
 		
 		/// The overlaying wrapper
-		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, node.prefix_standard()+"div", null );
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper(HtmlTag.DIV, node.prefix_standard() + "div", null);
 		
 		/// The wrapper start
-		ret.append( wrapperArr[0] );
+		ret.append(wrapperArr[0]);
 		
 		/// The label, if given
 		String label = node.label();
 		
-		if( label != null && label.length() > 0 ) {
-			StringBuilder[] labelArr = node.defaultHtmlLabel( HtmlTag.DIV, node.prefix_standard()+"label", null );
+		if (label != null && label.length() > 0) {
+			StringBuilder[] labelArr = node.defaultHtmlLabel(HtmlTag.DIV, node.prefix_standard() + "label", null);
 			
-			ret.append( labelArr[0] );
-			ret.append( label );
-			ret.append( labelArr[1] );
+			ret.append(labelArr[0]);
+			ret.append(label);
+			ret.append(labelArr[1]);
 		}
 		
 		StringBuilder inputHtml = node.inputHtml(isDisplayMode);
@@ -51,15 +51,15 @@ public class FormWrapperTemplates {
 		
 		/// The children wrapper if needed
 		List<FormNode> childList = node.children();
-		if(childList != null && childList.size() > 0) {
-			StringBuilder[] childWrap = node.defaultHtmlChildWrapper( HtmlTag.DIV, node.prefix_standard()+"child", null );
+		if (childList != null && childList.size() > 0) {
+			StringBuilder[] childWrap = node.defaultHtmlChildWrapper(HtmlTag.DIV, node.prefix_standard() + "child", null);
 			
-			ret.append( childWrap[0] );
-			ret.append( node.fullChildrenHtml(isDisplayMode) );
-			ret.append( childWrap[1] );
+			ret.append(childWrap[0]);
+			ret.append(node.fullChildrenHtml(isDisplayMode));
+			ret.append(childWrap[1]);
 		}
 		
-		ret.append( wrapperArr[1] );
+		ret.append(wrapperArr[1]);
 		return ret;
 	}
 	
@@ -68,20 +68,20 @@ public class FormWrapperTemplates {
 		StringBuilder ret = new StringBuilder();
 		
 		/// The overlaying wrapper
-		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, node.prefix_standard()+"div", null );
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper(HtmlTag.DIV, node.prefix_standard() + "div", null);
 		
 		/// The wrapper start
-		ret.append( wrapperArr[0] );
+		ret.append(wrapperArr[0]);
 		
 		/// The label, if given
 		String label = node.label();
 		
-		if( label != null && label.length() > 0 ) {
-			StringBuilder[] labelArr = node.defaultHtmlLabel( HtmlTag.DIV, node.prefix_standard()+"label", null );
+		if (label != null && label.length() > 0) {
+			StringBuilder[] labelArr = node.defaultHtmlLabel(HtmlTag.DIV, node.prefix_standard() + "label", null);
 			
-			ret.append( labelArr[0] );
-			ret.append( label );
-			ret.append( labelArr[1] );
+			ret.append(labelArr[0]);
+			ret.append(label);
+			ret.append(labelArr[1]);
 		}
 		
 		StringBuilder inputHtml = node.inputHtml(isDisplayMode);
@@ -89,15 +89,15 @@ public class FormWrapperTemplates {
 		
 		/// The children wrapper if needed
 		List<FormNode> childList = node.children();
-		if(childList != null && childList.size() > 0) {
-			StringBuilder[] childWrap = node.defaultHtmlChildWrapper( HtmlTag.DIV, node.prefix_standard()+"child", null );
+		if (childList != null && childList.size() > 0) {
+			StringBuilder[] childWrap = node.defaultHtmlChildWrapper(HtmlTag.DIV, node.prefix_standard() + "child", null);
 			
-			ret.append( childWrap[0] );
-			ret.append( node.fullChildrenHtml(isDisplayMode) );
-			ret.append( childWrap[1] );
+			ret.append(childWrap[0]);
+			ret.append(node.fullChildrenHtml(isDisplayMode));
+			ret.append(childWrap[1]);
 		}
 		
-		ret.append( wrapperArr[1] );
+		ret.append(wrapperArr[1]);
 		return ret;
 	}
 	
@@ -109,31 +109,31 @@ public class FormWrapperTemplates {
 	///
 	/// @returns {StringBuilder}  the resulting HTML
 	@SuppressWarnings("unchecked")
-	protected static StringBuilder formSetWrapper(FormNode node, boolean displayMode){
+	protected static StringBuilder formSetWrapper(FormNode node, boolean displayMode) {
 		StringBuilder ret = new StringBuilder();
 		
 		String name = node.getString("formSetName");
 		
-		if( name == null || name.length() <= 0 ) {
+		if (name == null || name.length() <= 0) {
 			throw new RuntimeException("Missing form set name");
 		}
 		
 		String nodeName = node.getFieldName();
-		if(nodeName == null || nodeName.isEmpty()){
+		if (nodeName == null || nodeName.isEmpty()) {
 			node.put("field", "this");
 		}
 		
 		Object valuesRaw = node.getRawFieldValue();
-		Map<String,Object> values = new HashMap<String, Object>();
-		if(valuesRaw != null){
-			if(valuesRaw instanceof Map){
-				values = (Map<String, Object>)valuesRaw;
-			}else if(valuesRaw instanceof List){
-				List<Object> innerList = (List<Object>)valuesRaw;
-				if(innerList != null && innerList.size() == 1){ //only entertain SINGLE mapping to a file
+		Map<String, Object> values = new HashMap<String, Object>();
+		if (valuesRaw != null) {
+			if (valuesRaw instanceof Map) {
+				values = (Map<String, Object>) valuesRaw;
+			} else if (valuesRaw instanceof List) {
+				List<Object> innerList = (List<Object>) valuesRaw;
+				if (innerList != null && innerList.size() == 1) { //only entertain SINGLE mapping to a file
 					Object innerMapRaw = innerList.get(0);
-					if(innerMapRaw != null && innerMapRaw instanceof Map){
-						values = (Map<String, Object>)innerMapRaw;
+					if (innerMapRaw != null && innerMapRaw instanceof Map) {
+						values = (Map<String, Object>) innerMapRaw;
 					}
 				}
 			}
@@ -141,7 +141,7 @@ public class FormWrapperTemplates {
 		
 		JSMLFormSet formSet = node.getFormSet();
 		JSMLForm form = formSet.get(name);
-		if(form != null){
+		if (form != null) {
 			ret = form.generateHTML(values, displayMode);
 		}
 		
@@ -161,43 +161,43 @@ public class FormWrapperTemplates {
 		StringBuilder ret = new StringBuilder();
 		
 		/// The overlaying wrapper
-		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, node.prefix_standard()+"div", null );
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper(HtmlTag.DIV, node.prefix_standard() + "div", null);
 		
 		/// The wrapper start
-		ret.append( wrapperArr[0] );
+		ret.append(wrapperArr[0]);
 		
 		/// The label, if given
 		String label = node.label();
-		if(label != null && label.length() > 0 ) {
-			StringBuilder[] labelArr = node.defaultHtmlLabel( HtmlTag.DIV, node.prefix_standard()+"label", null );
+		if (label != null && label.length() > 0) {
+			StringBuilder[] labelArr = node.defaultHtmlLabel(HtmlTag.DIV, node.prefix_standard() + "label", null);
 			
-			ret.append( labelArr[0] );
-			ret.append( label );
-			ret.append( labelArr[1] );
+			ret.append(labelArr[0]);
+			ret.append(label);
+			ret.append(labelArr[1]);
 		}
 		
 		//-----------------------------------------------
 		// Varient of child handling / iterator
 		//-----------------------------------------------
 		List<Object> childDefination = null; //Definition list of children items
-		if( node.containsKey("children") ) {
+		if (node.containsKey("children")) {
 			Object childrenRaw = node.get("children");
-			if( !(childrenRaw instanceof List) ) {
-				throw new IllegalArgumentException("'children' parameter found in defination was not a List: "+childrenRaw);
+			if (!(childrenRaw instanceof List)) {
+				throw new IllegalArgumentException("'children' parameter found in defination was not a List: "
+					+ childrenRaw);
 			}
-			childDefination = (List<Object>)childrenRaw;
+			childDefination = (List<Object>) childrenRaw;
 		}
-		
 		
 		Object rawValue = ConvertJSON.toList(node.getStringValue());
 		List<Object> valuesList = null;
-		if( rawValue != null && rawValue instanceof List ) {
-			valuesList = (List<Object>)rawValue;
+		if (rawValue != null && rawValue instanceof List) {
+			valuesList = (List<Object>) rawValue;
 		}
 		
 		String subAutoClass = node.getString("class");
-		if(subAutoClass != null && subAutoClass.length() > 0) {
-			subAutoClass = "pff_childX pff_"+subAutoClass+"_forChild";
+		if (subAutoClass != null && subAutoClass.length() > 0) {
+			subAutoClass = "pff_childX pff_" + subAutoClass + "_forChild";
 		} else {
 			subAutoClass = "pff_childX";
 		}
@@ -206,11 +206,11 @@ public class FormWrapperTemplates {
 		boolean removeLabel = Boolean.parseBoolean(node.getString(JsonKeys.REMOVE_LABEL_FROM_SECOND_ITERATION, "false"));
 		List<Object> childDefinitionsWithoutLabel = null;
 		
-		if(removeLabel){
+		if (removeLabel) {
 			childDefinitionsWithoutLabel = new ArrayList<Object>();
-			for(Object obj:childDefination){
-				if(obj instanceof Map){
-					Map<String, Object> objMap = new HashMap<String,Object>( (Map<String, Object>)obj );
+			for (Object obj : childDefination) {
+				if (obj instanceof Map) {
+					Map<String, Object> objMap = new HashMap<String, Object>((Map<String, Object>) obj);
 					objMap.remove(JsonKeys.LABEL);
 					childDefinitionsWithoutLabel.add(objMap);
 				}
@@ -218,59 +218,59 @@ public class FormWrapperTemplates {
 		}
 		
 		/// The children wrapper if needed
-		if(childDefination != null && childDefination.size() > 0 && valuesList != null && valuesList.size() > 0) {
-			StringBuilder[] childWrap = node.defaultHtmlChildWrapper( HtmlTag.DIV, node.prefix_standard()+"child", null );
+		if (childDefination != null && childDefination.size() > 0 && valuesList != null && valuesList.size() > 0) {
+			StringBuilder[] childWrap = node.defaultHtmlChildWrapper(HtmlTag.DIV, node.prefix_standard() + "child", null);
 			
-			ret.append( childWrap[0] );
+			ret.append(childWrap[0]);
 			
-			if(valuesList != null){
-				int a=0;
-				for(Object subValue : valuesList) {
+			if (valuesList != null) {
+				int a = 0;
+				for (Object subValue : valuesList) {
 					// Skip values that are not maps
-					if( !(subValue instanceof Map) ) {
+					if (!(subValue instanceof Map)) {
 						continue;
 					}
 					
-					Map<String,Object> subMapVal = (Map<String,Object>)subValue;
+					Map<String, Object> subMapVal = (Map<String, Object>) subValue;
 					
-					Map<String,Object> nodeMap = new HashMap<String,Object>();
+					Map<String, Object> nodeMap = new HashMap<String, Object>();
 					nodeMap.put("type", "div");
-					nodeMap.put("wrapperClass", subAutoClass+" pff_forChild"+a);
-					if(removeLabel){
+					nodeMap.put("wrapperClass", subAutoClass + " pff_forChild" + a);
+					if (removeLabel) {
 						nodeMap.put("children", childDefinitionsWithoutLabel);
-					}else{
+					} else {
 						nodeMap.put("children", childDefination);
 					}
 					
-					FormNode childNode = new FormNode( node._formGenerator, nodeMap, subMapVal );
-					ret.append( childNode.fullHtml(isDisplayMode) );
+					FormNode childNode = new FormNode(node._formGenerator, nodeMap, subMapVal);
+					ret.append(childNode.fullHtml(isDisplayMode));
 					
 					++a;
 				}
 			}
 			
-			ret.append( childWrap[1] );
+			ret.append(childWrap[1]);
 		}
 		//-----------------------------------------------
 		
-		ret.append( wrapperArr[1] );
+		ret.append(wrapperArr[1]);
 		return ret;
 	}
 	
-	protected static StringBuilder tableWrapper(FormNode node, boolean isDisplayMode){
+	protected static StringBuilder tableWrapper(FormNode node, boolean isDisplayMode) {
 		StringBuilder ret = new StringBuilder();
 		
 		//wrapper
-		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, "pf_div pfw_table", null );
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper(HtmlTag.DIV, "pf_div pfw_table", null);
 		ret.append(wrapperArr[0]);
 		
 		String label = node.label();
-		if( label != null && label.length() > 0 ) {
-			StringBuilder[] labelArr = node.defaultHtmlLabel( HtmlTag.DIV, node.prefix_standard()+"label", null );
+		if (label != null && label.length() > 0) {
+			StringBuilder[] labelArr = node.defaultHtmlLabel(HtmlTag.DIV, node.prefix_standard() + "label", null);
 			
-			ret.append( labelArr[0] );
-			ret.append( label );
-			ret.append( labelArr[1] );
+			ret.append(labelArr[0]);
+			ret.append(label);
+			ret.append(labelArr[1]);
 		}
 		
 		StringBuilder inputHtml = node.inputHtml(isDisplayMode);
@@ -280,20 +280,20 @@ public class FormWrapperTemplates {
 		return ret;
 	}
 	
-	protected static StringBuilder verticalTableWrapper(FormNode node, boolean isDisplayMode){
+	protected static StringBuilder verticalTableWrapper(FormNode node, boolean isDisplayMode) {
 		StringBuilder ret = new StringBuilder();
 		
 		//wrapper
-		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, "pf_div pfw_verticalTable", null );
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper(HtmlTag.DIV, "pf_div pfw_verticalTable", null);
 		ret.append(wrapperArr[0]);
 		
 		String label = node.label();
-		if( label != null && label.length() > 0 ) {
-			StringBuilder[] labelArr = node.defaultHtmlLabel( HtmlTag.DIV, node.prefix_standard()+"label", null );
+		if (label != null && label.length() > 0) {
+			StringBuilder[] labelArr = node.defaultHtmlLabel(HtmlTag.DIV, node.prefix_standard() + "label", null);
 			
-			ret.append( labelArr[0] );
-			ret.append( label );
-			ret.append( labelArr[1] );
+			ret.append(labelArr[0]);
+			ret.append(label);
+			ret.append(labelArr[1]);
 		}
 		
 		StringBuilder inputHtml = node.inputHtml(isDisplayMode);
@@ -303,19 +303,19 @@ public class FormWrapperTemplates {
 		return ret;
 	}
 	
-	protected static StringBuilder imageWrapper(FormNode node, boolean displayMode){
+	protected static StringBuilder imageWrapper(FormNode node, boolean displayMode) {
 		StringBuilder ret = new StringBuilder();
 		
-		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, "pf_div pfw_image", null );
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper(HtmlTag.DIV, "pf_div pfw_image", null);
 		ret.append(wrapperArr[0]);
 		
 		String label = node.label();
-		if( label != null && label.length() > 0 ) {
-			StringBuilder[] labelArr = node.defaultHtmlLabel( HtmlTag.DIV, node.prefix_standard()+"label", null );
+		if (label != null && label.length() > 0) {
+			StringBuilder[] labelArr = node.defaultHtmlLabel(HtmlTag.DIV, node.prefix_standard() + "label", null);
 			
-			ret.append( labelArr[0] );
-			ret.append( label );
-			ret.append( labelArr[1] );
+			ret.append(labelArr[0]);
+			ret.append(label);
+			ret.append(labelArr[1]);
 		}
 		
 		StringBuilder inputHtml = node.inputHtml(displayMode);
@@ -326,24 +326,24 @@ public class FormWrapperTemplates {
 		return ret;
 	}
 	
-	protected static StringBuilder signatureWrapper(FormNode node, boolean displayMode){
+	protected static StringBuilder signatureWrapper(FormNode node, boolean displayMode) {
 		StringBuilder ret = new StringBuilder();
 		
 		String fieldValue = node.getFieldName();
 		
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("onclick", "showSignatureBox('#"+fieldValue+"')"); //hardcoded function name as it will be part of the prefix, and standardised
+		params.put("onclick", "showSignatureBox('#" + fieldValue + "')"); //hardcoded function name as it will be part of the prefix, and standardised
 		
-		StringBuilder[] wrapperArr = node.defaultHtmlWrapper( HtmlTag.DIV, "pf_div pfw_signatureBox", params );
+		StringBuilder[] wrapperArr = node.defaultHtmlWrapper(HtmlTag.DIV, "pf_div pfw_signatureBox", params);
 		ret.append(wrapperArr[0]);
 		
 		String label = node.label();
-		if( label != null && label.length() > 0 ) {
-			StringBuilder[] labelArr = node.defaultHtmlLabel( HtmlTag.DIV, node.prefix_standard()+"label", null );
+		if (label != null && label.length() > 0) {
+			StringBuilder[] labelArr = node.defaultHtmlLabel(HtmlTag.DIV, node.prefix_standard() + "label", null);
 			
-			ret.append( labelArr[0] );
-			ret.append( label );
-			ret.append( labelArr[1] );
+			ret.append(labelArr[0]);
+			ret.append(label);
+			ret.append(labelArr[1]);
 		}
 		
 		StringBuilder inputHtml = node.inputHtml(displayMode);
@@ -354,23 +354,24 @@ public class FormWrapperTemplates {
 		return ret;
 	}
 	
-	protected static StringBuilder datePickerWrapper(FormNode node, boolean displayMode){
+	protected static StringBuilder datePickerWrapper(FormNode node, boolean displayMode) {
 		StringBuilder ret = new StringBuilder();
 		
 		return ret;
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected static List<Object> getChildren(FormNode node){
-		if( node.containsKey("children")) {
+	protected static List<Object> getChildren(FormNode node) {
+		if (node.containsKey("children")) {
 			Object childrenRaw = node.get("children");
 			
-			if( !(childrenRaw instanceof List) ) {
-				throw new IllegalArgumentException("'children' parameter found in defination was not a List: "+childrenRaw);
+			if (!(childrenRaw instanceof List)) {
+				throw new IllegalArgumentException("'children' parameter found in defination was not a List: "
+					+ childrenRaw);
 			}
 			
-			return (List<Object>)childrenRaw;
-		}else{
+			return (List<Object>) childrenRaw;
+		} else {
 			return null;
 		}
 	}
@@ -378,34 +379,34 @@ public class FormWrapperTemplates {
 	/// divWrapper
 	///
 	/// Does a basic div wrapper
-	protected static FormWrapperInterface divWrapper = (node)->{
+	protected static FormWrapperInterface divWrapper = (node) -> {
 		return FormWrapperTemplates.standardDivWrapper(node, false);
 	};
 	
 	/// forWrapper
 	///
 	/// Does a basic div wrapper
-	protected static FormWrapperInterface forWrapper = (node)->{
+	protected static FormWrapperInterface forWrapper = (node) -> {
 		return FormWrapperTemplates.forListWrapper(node, false);
 	};
 	
-	protected static FormWrapperInterface tableWrapper = (node)->{
+	protected static FormWrapperInterface tableWrapper = (node) -> {
 		return TableWrapperTemplates.tableWrapper_horizontal(node, false);
 	};
 	
-	protected static FormWrapperInterface verticalTableWrapper = (node)->{
+	protected static FormWrapperInterface verticalTableWrapper = (node) -> {
 		return TableWrapperTemplates.tableWrapper_vertical(node, false);
 	};
 	
-	protected static FormWrapperInterface imageWrapper = (node)->{
+	protected static FormWrapperInterface imageWrapper = (node) -> {
 		return imageWrapper(node, false);
 	};
 	
-	protected static FormWrapperInterface signatureWrapper = (node)->{
+	protected static FormWrapperInterface signatureWrapper = (node) -> {
 		return signatureWrapper(node, false);
 	};
 	
-	protected static FormWrapperInterface datePickerWrapper = (node)->{
+	protected static FormWrapperInterface datePickerWrapper = (node) -> {
 		return datePickerWrapper(node, false);
 	};
 	
@@ -416,9 +417,9 @@ public class FormWrapperTemplates {
 	/// noneWrapper
 	///
 	/// No wrappers
-	protected static FormWrapperInterface none = (node)->{
+	protected static FormWrapperInterface none = (node) -> {
 		StringBuilder ret = new StringBuilder();
-		ret.append( node.fullChildrenHtml(false) );
+		ret.append(node.fullChildrenHtml(false));
 		return ret;
 	};
 	
@@ -437,20 +438,20 @@ public class FormWrapperTemplates {
 		StringBuilder ret = new StringBuilder();
 		
 		// Get the JMTE argument map
-		Map<String,Object> jmte_arguments = null;
+		Map<String, Object> jmte_arguments = null;
 		
 		// From the field?
 		String fieldName = node.getFieldName();
-		if( fieldName == null || fieldName.length() <= 0 ) {
+		if (fieldName == null || fieldName.length() <= 0) {
 			// Use the value map as the argument Map
 			jmte_arguments = node.getValueMap();
 		} else {
 			// Get the sub argument
 			Object subArgument = node.getValueMap().get(fieldName);
 			
-			if( subArgument != null ) {
-				if( subArgument instanceof Map ) {
-					jmte_arguments = new HashMap<String,Object>( (Map<String,Object>)subArgument );
+			if (subArgument != null) {
+				if (subArgument instanceof Map) {
+					jmte_arguments = new HashMap<String, Object>((Map<String, Object>) subArgument);
 				} else {
 					throw new RuntimeException("@TODO: non map field argument handling");
 				}
@@ -462,32 +463,32 @@ public class FormWrapperTemplates {
 		// Gets the JMTE template to use
 		Object jmte_template_obj = null;
 		
-		if( isDisplayMode ) {
-			jmte_template_obj = node.get( JsonKeys.JMTE_DISPLAY );
+		if (isDisplayMode) {
+			jmte_template_obj = node.get(JsonKeys.JMTE_DISPLAY);
 		} else {
-			jmte_template_obj = node.get( JsonKeys.JMTE_INPUT );
+			jmte_template_obj = node.get(JsonKeys.JMTE_INPUT);
 		}
 		
-		if( jmte_template_obj == null ) {
-			jmte_template_obj = node.get( JsonKeys.JMTE_GENERIC );
+		if (jmte_template_obj == null) {
+			jmte_template_obj = node.get(JsonKeys.JMTE_GENERIC);
 		}
 		
-		if( jmte_template_obj == null ) {
-			if( isDisplayMode ) {
-				throw new RuntimeException("JMTE Wrapper is missing JMTE_( DISPLAY / GENERIC ) implementation" );
+		if (jmte_template_obj == null) {
+			if (isDisplayMode) {
+				throw new RuntimeException("JMTE Wrapper is missing JMTE_( DISPLAY / GENERIC ) implementation");
 			} else {
-				throw new RuntimeException("JMTE Wrapper is missing JMTE_( INPUT/ GENERIC ) implementation" );
+				throw new RuntimeException("JMTE Wrapper is missing JMTE_( INPUT/ GENERIC ) implementation");
 			}
 		}
 		
 		// Generate the code
-		ret.append( jmteObj.parseTemplate( jmte_template_obj.toString(), jmte_arguments ) );
+		ret.append(jmteObj.parseTemplate(jmte_template_obj.toString(), jmte_arguments));
 		
 		return ret;
 	}
 	
 	/// JMTE wrapper implementation
-	protected static FormWrapperInterface jmteWrapper = (node)->{
+	protected static FormWrapperInterface jmteWrapper = (node) -> {
 		return FormWrapperTemplates.JMTEWrapper(node, false);
 	};
 	
@@ -504,7 +505,7 @@ public class FormWrapperTemplates {
 		defaultTemplates.put("verticalTable", FormWrapperTemplates.verticalTableWrapper);
 		defaultTemplates.put("image", FormWrapperTemplates.imageWrapper);
 		defaultTemplates.put("signature", FormWrapperTemplates.signatureWrapper);
-		defaultTemplates.put("date",  FormWrapperTemplates.divWrapper);
+		defaultTemplates.put("date", FormWrapperTemplates.divWrapper);
 		defaultTemplates.put("formset", FormWrapperTemplates.formSetWrapper);
 		
 		defaultTemplates.put("jmte", FormWrapperTemplates.jmteWrapper);

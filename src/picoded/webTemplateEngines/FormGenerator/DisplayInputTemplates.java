@@ -20,61 +20,61 @@ public class DisplayInputTemplates {
 	//
 	////////////////////////////////////////////////
 	
-	protected static FormInputInterface div = (node)->{
+	protected static FormInputInterface div = (node) -> {
 		return FormInputTemplates.displayDiv(node, "pfi_div pfi_display");
 	};
 	
-	protected static FormInputInterface header = (node)->{ 
+	protected static FormInputInterface header = (node) -> {
 		return FormInputTemplates.displayDiv(node, "pfi_header pfi_display");
 	};
 	
 	@SuppressWarnings("unchecked")
-	protected static FormInputInterface select = (node)->{ 
+	protected static FormInputInterface select = (node) -> {
 		return FormInputTemplates.displayDiv(node, "pfi_select pfi_display");
 	};
 	
 	@SuppressWarnings("unchecked")
-	protected static FormInputInterface input_text = (node)->{
+	protected static FormInputInterface input_text = (node) -> {
 		return FormInputTemplates.displayDiv(node, "pfi_inputText pfi_display");
 	};
 	
 	@SuppressWarnings("unchecked")
-	protected static FormInputInterface input_textarea = (node)->{
+	protected static FormInputInterface input_textarea = (node) -> {
 		return FormInputTemplates.displayDiv(node, "pfi_inputTextBox pfi_display");
 	};
 	
-	protected static FormInputInterface raw_html = (node)->{
+	protected static FormInputInterface raw_html = (node) -> {
 		StringBuilder sb = new StringBuilder();
 		String rawHtmlInjection = node.getString(JsonKeys.HTML_INJECTION);
 		sb.append(rawHtmlInjection);
 		return sb;
 	};
 	
-	protected static FormInputInterface checkbox = (node)->{
+	protected static FormInputInterface checkbox = (node) -> {
 		return FormInputTemplates.createCheckbox(node, true, "pf_div pf_displayCheckboxSet");
 	};
 	
-	protected static FormInputInterface dropdown_WithOthers = (node)->{
+	protected static FormInputInterface dropdown_WithOthers = (node) -> {
 		return FormInputTemplates.dropdownWithOthers(node, true);
 	};
 	
-	protected static FormInputInterface table = (node)->{
+	protected static FormInputInterface table = (node) -> {
 		return FormInputTemplates.tableWrapper(node, true);
 	};
 	
-	protected static FormInputInterface verticalTable = (node)->{
+	protected static FormInputInterface verticalTable = (node) -> {
 		return FormInputTemplates.verticalTable(node, true);
 	};
 	
-	protected static FormInputInterface signature = (node)->{
+	protected static FormInputInterface signature = (node) -> {
 		return FormInputTemplates.signature(node, true);
 	};
 	
-	protected static FormInputInterface image = (node)->{
+	protected static FormInputInterface image = (node) -> {
 		return FormInputTemplates.image(node, true);
 	};
 	
-	protected static FormInputInterface datePicker = (node)->{
+	protected static FormInputInterface datePicker = (node) -> {
 		return FormInputTemplates.datePicker(node, true);
 	};
 	

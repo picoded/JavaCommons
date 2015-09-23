@@ -30,7 +30,7 @@ import org.apache.commons.collections4.map.AbstractMapDecorator;
 ///
 /// It represents the request object, and include utility functions 
 ///
-public class RESTRequest extends AbstractMapDecorator<String, Object> implements GenericConvertMap<String, Object>  {
+public class RESTRequest extends AbstractMapDecorator<String, Object> implements GenericConvertMap<String, Object> {
 	
 	//--------------------------------------------------------------------------------
 	// Protected vars
@@ -46,7 +46,7 @@ public class RESTRequest extends AbstractMapDecorator<String, Object> implements
 	
 	/// [internal] avoid use this directly
 	public RESTRequest() {
-		super(new HashMap<String,Object>());
+		super(new HashMap<String, Object>());
 	}
 	
 	//--------------------------------------------------------------------------------
@@ -87,19 +87,20 @@ public class RESTRequest extends AbstractMapDecorator<String, Object> implements
 	
 	/// The wildcard specific namespace
 	public String[] wildCardNamespace() {
-		if(wildCardNamespace != null) {
+		if (wildCardNamespace != null) {
 			return wildCardNamespace;
 		}
 		
-		if(rawRequestNamespace == null || registeredNamespace == null) {
+		if (rawRequestNamespace == null || registeredNamespace == null) {
 			return null;
 		}
 		
 		/// is wildcard request?
-		if(registeredNamespace[registeredNamespace.length - 1].equals("*") &&
-			rawRequestNamespace.length > (registeredNamespace.length - 1) ) {
+		if (registeredNamespace[registeredNamespace.length - 1].equals("*")
+			&& rawRequestNamespace.length > (registeredNamespace.length - 1)) {
 			
-			wildCardNamespace = Arrays.copyOfRange(rawRequestNamespace, registeredNamespace.length - 1, rawRequestNamespace.length);
+			wildCardNamespace = Arrays.copyOfRange(rawRequestNamespace, registeredNamespace.length - 1,
+				rawRequestNamespace.length);
 		}
 		return wildCardNamespace;
 	}

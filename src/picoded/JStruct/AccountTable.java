@@ -274,21 +274,21 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	/// Removes the accountObject using the name
 	public void removeFromName(String name) {
 		AccountObject ao = this.getFromName(name);
-		if(ao != null){
+		if (ao != null) {
 			removeFromID(ao._oid());
 		}
 	}
 	
 	/// Removes the accountObject using the ID
 	public void removeFromID(String oid) {
-		if(oid != null && !oid.isEmpty()){
+		if (oid != null && !oid.isEmpty()) {
 			AccountObject ao = this.getFromID(oid);
 			
-//			group_childRole and groupChild_meta
-			if(ao != null){
+			//			group_childRole and groupChild_meta
+			if (ao != null) {
 				String[] groupIDs = ao.getGroups_id();
-				if(groupIDs != null){
-					for(String groupID : groupIDs){
+				if (groupIDs != null) {
+					for (String groupID : groupIDs) {
 						group_childRole.remove(groupID);
 						
 						String groupChildMetaKey = getGroupChildMetaKey(oid, groupID);
@@ -297,23 +297,23 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 				}
 			}
 			
-//			accountID
+			//			accountID
 			Set<String> accountIDNames = accountID.getKeys(oid);
-			if(accountIDNames != null){
-				for(String name : accountIDNames){
+			if (accountIDNames != null) {
+				for (String name : accountIDNames) {
 					accountID.remove(name, oid);
 				}
 			}
 			
-//			accountHash
+			//			accountHash
 			accountHash.remove(oid);
 			
-//			accountMeta
+			//			accountMeta
 			accountMeta.remove(oid);
 		}
 	}
 	
-	protected String getGroupChildMetaKey(String groupOID, String memberOID){
+	protected String getGroupChildMetaKey(String groupOID, String memberOID) {
 		return groupOID + "-" + memberOID;
 	}
 	

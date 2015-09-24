@@ -20,6 +20,30 @@ public class CompareUtils {
 	//-----------------------------------------------------------------
 	
 	///
+	/// String SQL 'LIKE' comparison
+	///
+	/// @params o1 - the first object to be compared.
+	/// @params o2 - the second object to be compared.
+	///
+	/// @returns -1, 0, or 1 as the first argument is less than, equal to, or greater than the second.
+	public static int stringMatches(String o1, String o2) {
+		
+		// Null handling
+		if (o1 == null) {
+			// Both equals
+			if (o2 == null) {
+				return 0;
+			} else { //o2 has value, therefor o1 is smaller
+				return -1;
+			}
+		} else if (o2 == null) { //o1 has value, therefor o1 is larger
+			return 1;
+		}
+		
+		return stringCompareCollator.compare(o1, o2);
+	}
+	
+	///
 	/// String comparision
 	///
 	/// @params o1 - the first object to be compared.

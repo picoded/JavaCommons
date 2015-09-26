@@ -577,7 +577,7 @@ public class AccountLogin extends BasePage {
 					groupList.add(newGroup);
 				}
 //				groupMap.put("groups", groupList);
-				commonInfo.put("groups", groupMap);
+				commonInfo.put("groups", groupList);
 			}
 //			commonInfo.put("groups", groupMap);
 		}
@@ -645,7 +645,7 @@ public class AccountLogin extends BasePage {
 				int limit = req.getInt("length");
 				
 				String[] insideGroupAny = req.getStringArray("insideGroup_any");
-				String[] insideGroupRole_any = req.getStringArray("insideGroupRole_any");
+				String[] hasGroupRole_any = req.getStringArray("hasGroupRole_any");
 				String groupStatus = req.getString("groupStatus");
 				
 				String orderByStr = req.getString("orderBy");
@@ -676,7 +676,7 @@ public class AccountLogin extends BasePage {
 				List<List<Object>> data = new ArrayList<List<Object>>();
 				try {
 					data = list_GET_and_POST_inner(accountTableObj, draw, start, limit, headers, query, queryArgs,
-						orderByStr, insideGroupAny, insideGroupRole_any, groupStatus);
+						orderByStr, insideGroupAny, hasGroupRole_any, groupStatus);
 					res.put("data", data);
 				} catch (Exception e) {
 					res.put("error", e.getMessage());
@@ -687,8 +687,8 @@ public class AccountLogin extends BasePage {
 	};
 	
 	private static List<List<Object>> list_GET_and_POST_inner(AccountTable _metaTableObj, int draw, int start,
-		int length, String[] headers, String query, String[] queryArgs, String orderBy, String[] insideGroupAny,
-		String[] insideGroupRole_any, String groupStatus) throws RuntimeException {
+		int length, String[] headers, String query, String[] queryArgs, String orderBy, String[] insideGroup_any,
+		String[] hasGroupRole_any, String groupStatus) throws RuntimeException {
 		
 		List<List<Object>> ret = new ArrayList<List<Object>>();
 		
@@ -729,36 +729,36 @@ public class AccountLogin extends BasePage {
 					}
 					
 					//check if part of any group
-					boolean checkInsideGroupAny = (insideGroupAny != null && insideGroupAny.length > 0);
+					boolean checkInsideGroupAny = (insideGroup_any != null && insideGroup_any.length > 0);
 					boolean partOfGroup = false;
 					
-					boolean checkInsideGroupRole_Any = (insideGroupRole_any != null && insideGroupRole_any.length > 0);
+					boolean hasGroupRoleAny = (hasGroupRole_any != null && hasGroupRole_any.length > 0);
 					boolean partOfGroupRole = false;
 					
-					if(checkInsideGroupAny || checkInsideGroupRole_Any){
+					if(checkInsideGroupAny || hasGroupRoleAny){
 						AccountObject[] aoGroups = ao.getGroups();
 						if(aoGroups != null){
 							for(AccountObject aoGroup : aoGroups){
-								if(!partOfGroup && insideGroupAny != null){
-									if (ArrayUtils.contains(insideGroupAny, aoGroup._oid())) { 
+								if(!partOfGroup && insideGroup_any != null){
+									if (ArrayUtils.contains(insideGroup_any, aoGroup._oid())) { 
 										partOfGroup = true;
 									}
 								}
 								
-								if(!partOfGroupRole && insideGroupRole_any != null){
+								if(!partOfGroupRole && hasGroupRole_any != null){
 									String memberRole = aoGroup.getMemberRole(ao);
-									if (ArrayUtils.contains(insideGroupRole_any, memberRole)) {
+									if (ArrayUtils.contains(hasGroupRole_any, memberRole)) {
 										partOfGroupRole = true;
 									}
 								}
 							}
 						}
 						
-						if(checkInsideGroupAny && checkInsideGroupRole_Any && !partOfGroup && !partOfGroupRole){
+						if(checkInsideGroupAny && hasGroupRoleAny && !partOfGroup && !partOfGroupRole){
 							continue;
 						}else if(checkInsideGroupAny && !partOfGroup){
 							continue;
-						}else if(checkInsideGroupRole_Any && !partOfGroupRole){
+						}else if(hasGroupRoleAny && !partOfGroupRole){
 							continue;
 						}
 					}

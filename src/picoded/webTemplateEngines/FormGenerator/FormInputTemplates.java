@@ -29,8 +29,8 @@ public class FormInputTemplates {
 		if(node.getString("type", "").equalsIgnoreCase("dropdown")){
 			String tempfieldValue = getCorrectFieldValue(node);
 			
-			if(tempFieldValue != null && !tempFieldValue.isEmpty()){
-				fieldValue = tempFieldValue;
+			if(tempfieldValue != null && !tempfieldValue.isEmpty()){
+				fieldValue = tempfieldValue;
 			}
 		}
 		

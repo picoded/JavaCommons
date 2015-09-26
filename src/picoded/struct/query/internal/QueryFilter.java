@@ -1,6 +1,7 @@
 package picoded.struct.query.internal;
 
 import java.util.*;
+import picoded.conv.*;
 import picoded.struct.*;
 import picoded.struct.query.*;
 import picoded.struct.query.condition.*;
@@ -56,7 +57,7 @@ public class QueryFilter {
 		
 		String resString = query;
 		while ((strPos = resString.indexOf("?")) >= 0) {
-			resString = resString.substring(0, strPos) + ":" + queryCount + resString.substring(strPos + 1);
+			resString = (resString.substring(0, strPos) + ":" + queryCount + resString.substring(strPos + 1));
 			++queryCount;
 		}
 		
@@ -100,13 +101,15 @@ public class QueryFilter {
 		query = query.replaceAll(":", " :");
 		
 		// Inefficently add extra whitespaces
-		String[] replaceRegex = new String[] { "(\\(|\\))", //brackets
+		String[] replaceRegex = new String[] { //
+			"(\\(|\\))", //brackets
 			"(\\<|\\>)([^\\=])", //Lesser or more, without equals
 			"(\\<|\\>|\\!)\\=", //Less, More, Not equals
 			"([^<|>|!|\\s])(\\=)" //Matching equals sign WITHOUT comparision prefixes
 		};
 		
-		String[] replaceString = new String[] { " $1 ", //brackets
+		String[] replaceString = new String[] { //
+			" $1 ", //brackets
 			" $1 $2 ", //Lesser or more, without equals
 			" $1= ", //Less, More, Not equals
 			"$1 = " //Matching equals sign WITHOUT comparision prefixes
@@ -178,6 +181,7 @@ public class QueryFilter {
 	///
 	/// @returns  string tokens array
 	public static String[] splitRefactoredQuery(String query) {
+		//System.out.println("splitRefactoredQuery: "+query);
 		return query.split("\\s+");
 	}
 	
@@ -208,10 +212,19 @@ public class QueryFilter {
 	public static List<Object> buildBasicQuery(String[] token, Map<String, Object> paramMap) {
 		List<Object> ret = new ArrayList<Object>();
 		
-		for (int a = 0; (a + 2) < token.length; ++a) {
+		//System.out.println( "buildBasicQuery (start)" + ConvertJSON.fromList( Arrays.asList(token) ) );
+		
+		int tokenLength = token.length;
+		for (int a = 0; a < tokenLength; ++a) {
 			
 			/// Found an operator, pushes it
-			if (basicOperators.contains(token[a + 1])) {
+			if( (a + 1) < tokenLength && basicOperators.contains(token[a + 1]) ) {
+				
+				// Check for unexpected end of token
+				if( (a + 2) >= tokenLength ) {
+					throw new RuntimeException("Unexpected end of operator token : "+token[a + 1] );
+				}
+				
 				// Add query
 				ret.add(basicQueryFromTokens(paramMap, token[a], token[a + 1], token[a + 2]));
 				a += 2; // Skip next 2 tokens
@@ -221,6 +234,8 @@ public class QueryFilter {
 			/// Failed operator find, push token to return list
 			ret.add(token[a]);
 		}
+		
+		//System.out.println( "buildBasicQuery (end)" + ConvertJSON.fromList( ret ) );
 		
 		return ret;
 	}
@@ -276,6 +291,8 @@ public class QueryFilter {
 		// Gets the start and end
 		int start = -1;
 		int end = -1;
+		
+		//System.out.println(queryTokens.toString());
 		
 		// Iterates the query token
 		for (int a = 0; a < queryTokens.size(); ++a) {

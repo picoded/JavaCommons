@@ -134,6 +134,15 @@ public class FormInputTemplates_test {
 		}
 	}
 	
+	private boolean generatePDFFile(String fileName, String rawHTML) {
+		if (rawHTML == null || rawHTML.isEmpty()) {
+			return false;
+		}
+		
+		String outputFileString = generatedFilesFolder + "/" + fileName + ".pdf";
+		return PDFGenerator.generatePDFfromRawHTML(outputFileString, rawHTML);
+	}
+	
 	//	@Test
 	public void titleTest() {
 		String jsonTemplatedOutput = getFinalTemplatedJsonString("title");
@@ -438,11 +447,14 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("fullyQualified", jsonTemplatedOutput));
 	}
 	
-	//	@Test
+	@Test
 	public void dummy() {
-		String test = "client[0].asd_re-csa";
-		String result = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(test);
-		System.out.println(result);
+		String jsonTemplatedOutput = getTemplatedJSONString("number", true, true);
+		
+		assertNotNull(jsonTemplatedOutput);
+		
+		assertTrue(generateHTMLFile("number", jsonTemplatedOutput));
+		assertTrue(generatePDFFile("number", jsonTemplatedOutput));
 	}
 	
 	//	@Test

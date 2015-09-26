@@ -284,20 +284,33 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		if (oid != null && !oid.isEmpty()) {
 			AccountObject ao = this.getFromID(oid);
 			
-			//			group_childRole and groupChild_meta
+			//group_childRole and groupChild_meta
 			if (ao != null) {
-				String[] groupIDs = ao.getGroups_id();
-				if (groupIDs != null) {
-					for (String groupID : groupIDs) {
-						group_childRole.remove(groupID);
-						
-						String groupChildMetaKey = getGroupChildMetaKey(oid, groupID);
-						groupChild_meta.remove(groupChildMetaKey);
+				if(ao.isGroup()){
+					MetaObject groupObj = group_childRole.get(oid);
+					group_childRole.remove(oid);
+					
+					if(groupObj != null){
+						for(String userID:groupObj.keySet()){
+							String groupChildMetaKey = getGroupChildMetaKey(oid, userID);
+							groupChild_meta.remove(groupChildMetaKey);
+						}
+					}
+				}else{
+					String[] groupIDs = ao.getGroups_id();
+					if (groupIDs != null) {
+						for (String groupID : groupIDs) {
+							MetaObject groupObj = group_childRole.get(groupID);
+							groupObj.remove(oid);
+							
+							String groupChildMetaKey = getGroupChildMetaKey(groupID, oid);
+							groupChild_meta.remove(groupChildMetaKey);
+						}
 					}
 				}
 			}
 			
-			//			accountID
+			//accountID
 			Set<String> accountIDNames = accountID.getKeys(oid);
 			if (accountIDNames != null) {
 				for (String name : accountIDNames) {
@@ -305,10 +318,10 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 				}
 			}
 			
-			//			accountHash
+			//accountHash
 			accountHash.remove(oid);
 			
-			//			accountMeta
+			//accountMeta
 			accountMeta.remove(oid);
 		}
 	}

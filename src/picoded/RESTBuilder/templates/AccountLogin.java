@@ -1480,7 +1480,7 @@ return resMap;
 				if (!accountID.isEmpty()) {
 					accObj = accountTableObj.getFromID(accountID);
 					
-					if (!accountName.isEmpty()) {
+					if (accountName != null && !accountName.isEmpty()) {
 						if (!accObj.getNames().contains(accountName)) {
 							res.put("error",
 								"accountName given does not match the names found for this account - delete unsuccessful");
@@ -1493,7 +1493,7 @@ return resMap;
 				} else if (!accountName.isEmpty()) {
 					accObj = accountTableObj.getFromName(accountName);
 					
-					if (!accountID.isEmpty()) {
+					if (accountID != null && !accountID.isEmpty()) {
 						if (!accObj._oid().equals(accountID)) {
 							res.put("error", "accountID given does not match the accounts _oid - delete unsuccessful");
 							return resMap;

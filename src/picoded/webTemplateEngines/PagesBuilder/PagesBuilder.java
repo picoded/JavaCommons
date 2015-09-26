@@ -104,6 +104,10 @@ public class PagesBuilder {
 			set = set + "/";
 		}
 		
+		if(set.equals("/")) {
+			set = "./";
+		}
+		
 		uriRootPrefix = set;
 		if (html != null) {
 			html.uriRootPrefix = uriRootPrefix;

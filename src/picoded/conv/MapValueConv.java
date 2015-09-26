@@ -112,10 +112,10 @@ public class MapValueConv {
 				
 				fullyQualifiedMap.putAll(toFullyQualifiedKeys(sourceMap.get(sourceMapKey), parentName, separator));
 			}
-		} else if(source instanceof Number) {
-			fullyQualifiedMap.put(rootName, source );
+		} else if (source instanceof Number) {
+			fullyQualifiedMap.put(rootName, source);
 		} else {
-			fullyQualifiedMap.put(rootName, source.toString() );
+			fullyQualifiedMap.put(rootName, source.toString());
 		}
 		
 		return fullyQualifiedMap;

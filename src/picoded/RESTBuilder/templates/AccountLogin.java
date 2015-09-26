@@ -576,10 +576,10 @@ public class AccountLogin extends BasePage {
 					
 					groupList.add(newGroup);
 				}
-//				groupMap.put("groups", groupList);
+				//				groupMap.put("groups", groupList);
 				commonInfo.put("groups", groupList);
 			}
-//			commonInfo.put("groups", groupMap);
+			//			commonInfo.put("groups", groupMap);
 		}
 		
 		return commonInfo;
@@ -735,17 +735,17 @@ public class AccountLogin extends BasePage {
 					boolean hasGroupRoleAny = (hasGroupRole_any != null && hasGroupRole_any.length > 0);
 					boolean partOfGroupRole = false;
 					
-					if(checkInsideGroupAny || hasGroupRoleAny){
+					if (checkInsideGroupAny || hasGroupRoleAny) {
 						AccountObject[] aoGroups = ao.getGroups();
-						if(aoGroups != null){
-							for(AccountObject aoGroup : aoGroups){
-								if(!partOfGroup && insideGroup_any != null){
-									if (ArrayUtils.contains(insideGroup_any, aoGroup._oid())) { 
+						if (aoGroups != null) {
+							for (AccountObject aoGroup : aoGroups) {
+								if (!partOfGroup && insideGroup_any != null) {
+									if (ArrayUtils.contains(insideGroup_any, aoGroup._oid())) {
 										partOfGroup = true;
 									}
 								}
 								
-								if(!partOfGroupRole && hasGroupRole_any != null){
+								if (!partOfGroupRole && hasGroupRole_any != null) {
 									String memberRole = aoGroup.getMemberRole(ao);
 									if (ArrayUtils.contains(hasGroupRole_any, memberRole)) {
 										partOfGroupRole = true;
@@ -754,11 +754,11 @@ public class AccountLogin extends BasePage {
 							}
 						}
 						
-						if(checkInsideGroupAny && hasGroupRoleAny && !partOfGroup && !partOfGroupRole){
+						if (checkInsideGroupAny && hasGroupRoleAny && !partOfGroup && !partOfGroupRole) {
 							continue;
-						}else if(checkInsideGroupAny && !partOfGroup){
+						} else if (checkInsideGroupAny && !partOfGroup) {
 							continue;
-						}else if(hasGroupRoleAny && !partOfGroupRole){
+						} else if (hasGroupRoleAny && !partOfGroupRole) {
 							continue;
 						}
 					}

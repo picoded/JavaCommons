@@ -102,14 +102,14 @@ public class QueryFilter {
 		
 		// Inefficently add extra whitespaces
 		String[] replaceRegex = new String[] { //
-			"(\\(|\\))", //brackets
+		"(\\(|\\))", //brackets
 			"(\\<|\\>)([^\\=])", //Lesser or more, without equals
 			"(\\<|\\>|\\!)\\=", //Less, More, Not equals
 			"([^<|>|!|\\s])(\\=)" //Matching equals sign WITHOUT comparision prefixes
 		};
 		
 		String[] replaceString = new String[] { //
-			" $1 ", //brackets
+		" $1 ", //brackets
 			" $1 $2 ", //Lesser or more, without equals
 			" $1= ", //Less, More, Not equals
 			"$1 = " //Matching equals sign WITHOUT comparision prefixes
@@ -218,11 +218,11 @@ public class QueryFilter {
 		for (int a = 0; a < tokenLength; ++a) {
 			
 			/// Found an operator, pushes it
-			if( (a + 1) < tokenLength && basicOperators.contains(token[a + 1]) ) {
+			if ((a + 1) < tokenLength && basicOperators.contains(token[a + 1])) {
 				
 				// Check for unexpected end of token
-				if( (a + 2) >= tokenLength ) {
-					throw new RuntimeException("Unexpected end of operator token : "+token[a + 1] );
+				if ((a + 2) >= tokenLength) {
+					throw new RuntimeException("Unexpected end of operator token : " + token[a + 1]);
 				}
 				
 				// Add query

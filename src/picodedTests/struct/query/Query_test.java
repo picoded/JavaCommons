@@ -82,7 +82,7 @@ public class Query_test {
 	@Test
 	public void dualNestedQuery_simple() {
 		Query queryObj = null;
-		Object[] paramArr = new Object[] { "adv", "sup"};
+		Object[] paramArr = new Object[] { "adv", "sup" };
 		assertNotNull(queryObj = Query.build("( adv = ? ) AND ( a = ? )", paramArr));
 	}
 	

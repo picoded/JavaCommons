@@ -148,7 +148,10 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		
 		// @TODO cookiePrefix to be loaded from configurable
 		// @TODO Config loading
-		// 
+		
+		// Gets the configuration setup
+		JConfig jc = JConfig();
+		
 		// httpUserAuthObj.loginLifetime = cStack.getInt( "userAuthCookie.loginLifetime", httpUserAuthObj.loginLifetime);
 		// httpUserAuthObj.loginRenewal = cStack.getInt( "userAuthCookie.loginRenewal", httpUserAuthObj.loginRenewal);
 		// httpUserAuthObj.rmberMeLifetime = cStack.getInt( "userAuthCookie.rememberMeLifetime", httpUserAuthObj.rmberMeLifetime);

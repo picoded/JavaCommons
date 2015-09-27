@@ -27,6 +27,7 @@ import com.floreysoft.jmte.*;
 
 // Sub modules useds
 import picoded.conv.JMTE;
+import picoded.enums.*;
 import picoded.fileUtils.FileUtils;
 import picoded.JStack.*;
 import picoded.JStruct.*;
@@ -150,16 +151,24 @@ public class CommonsPage extends BasePage {
 		String[] wildcardUri = requestWildcardUriArray();
 		
 		// Indicates if its a API.JS request, and returns the JS file
-		// if (wildcardUri != null && wildcardUri.length >= 1 && //
-		// 	wildcardUri[0].equalsIgnoreCase("api.js") //api.js request 
-		// ) {
-		// 	if( JConfig().getBoolean("sys.developersMode.enabled", true) ) { //developerMode 
-		// 		String apiJS = buildApiScript();
-		// 		getHttpServletResponse().setContentType("application/javascript");
-		// 		output.println(apiJS);
-		// 		return true;
-		// 	}
-		// }
+		if (wildcardUri != null && wildcardUri.length >= 1 && //
+			wildcardUri[0].equalsIgnoreCase("api.js") //api.js request 
+		) {
+			// if( JConfig().getBoolean("sys.developersMode.enabled", true) ) { //developerMode 
+			// 	String apiJS = buildApiScript();
+			// 	getHttpServletResponse().setContentType("application/javascript");
+			// 	output.println(apiJS);
+			// 	return true;
+			// }
+			
+			// Fallsback into File Servlet
+			PagesBuilder().outputFileServlet().processRequest( //
+				getHttpServletRequest(), //
+				getHttpServletResponse(), //
+				requestType() == HttpRequestType.HEAD, //
+				"api.js");
+			return true;
+		}
 		
 		// Indicates if its a JSML form usage
 		//

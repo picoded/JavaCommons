@@ -34,6 +34,22 @@ public class FormInputTemplates {
 			}
 		}
 		
+		//thousands separator first
+		if(node.getString("type", "").equalsIgnoreCase("number")){
+			boolean thousandsSeparate = node.getBoolean("thousandsSeparator", true);
+			if(thousandsSeparate){
+				fieldValue = thousandsSeparator(fieldValue);
+			}
+		}else if(node.getString("type", "").equalsIgnoreCase("text")){
+			boolean thousandsSeparate = node.getBoolean("thousandsSeparator", false);
+			if(thousandsSeparate){
+				fieldValue = thousandsSeparator(fieldValue);
+			}
+		}
+		
+		String displayPrefix = node.getString("displayPrefix", "");
+		String displaySuffix = node.getString("displaySuffix", "");
+		fieldValue = displayPrefix + fieldValue + displaySuffix;
 		
 		String textAndField = text + fieldValue;
 		// if(textAndField == null || textAndField.length() <= 0) {
@@ -59,6 +75,20 @@ public class FormInputTemplates {
 		}
 		
 		return "";
+	}
+	
+	private static String thousandsSeparator(String value){
+		String ret = "";
+		if(value != null && !value.isEmpty()){
+			int valAsInt = Integer.parseInt(value);
+			try{
+				ret = String.format("%,d", valAsInt);
+			}catch(Exception e){
+				//silent fail, fallback to non separated numbers
+				ret = ""+valAsInt+"";
+			}
+		}
+		return ret;
 	}
 	
 	protected static FormInputInterface div = (node) -> {

@@ -459,11 +459,11 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		
 		if (response != null) { //assume renewal process check
 			if (rmbr != null && rmbr.equals("1")) {
-				if (accountSessions.getLifespan(nonc) < (rmberMeLifetime - loginRenewal)) { //needs renewal (perform it!)
+				if (accountSessions.getLifespan(nonc) < rmberMeRenewal) { //needs renewal (perform it!)
 					_setLogin(ret, request, response, true);
 				}
 			} else {
-				if (accountSessions.getLifespan(nonc) < (loginLifetime - rmberMeRenewal)) { //needs renewal (perform it!)
+				if (accountSessions.getLifespan(nonc) < loginRenewal) { //needs renewal (perform it!)
 					_setLogin(ret, request, response, false);
 				}
 			}

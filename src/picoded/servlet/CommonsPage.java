@@ -150,16 +150,16 @@ public class CommonsPage extends BasePage {
 		String[] wildcardUri = requestWildcardUriArray();
 		
 		// Indicates if its a API.JS request, and returns the JS file
-		if (wildcardUri != null && wildcardUri.length >= 1 && //
-			wildcardUri[0].equalsIgnoreCase("api.js") && //api.js request 
-			JConfig().getBoolean("sys.developersMode.enabled", true) //developerMode
-		) {
-			String apiJS = restBuilder().generateJS("api", (getContextURI() + "/api").replaceAll("//", "/"));
-			FileUtils.writeStringToFile_ifDifferant(new File(getContextPath() + "/api.js"), "UTF-8", apiJS);
-			getHttpServletResponse().setContentType("application/javascript");
-			output.println(apiJS);
-			return true;
-		}
+		// if (wildcardUri != null && wildcardUri.length >= 1 && //
+		// 	wildcardUri[0].equalsIgnoreCase("api.js") //api.js request 
+		// ) {
+		// 	if( JConfig().getBoolean("sys.developersMode.enabled", true) ) { //developerMode 
+		// 		String apiJS = buildApiScript();
+		// 		getHttpServletResponse().setContentType("application/javascript");
+		// 		output.println(apiJS);
+		// 		return true;
+		// 	}
+		// }
 		
 		// Indicates if its a JSML form usage
 		//
@@ -177,6 +177,12 @@ public class CommonsPage extends BasePage {
 		// Pages builder redirect (default)
 		PagesBuilder().processPageBuilderServlet(this);
 		return true;
+	}
+	
+	public String buildApiScript() throws IOException {
+		String apiJS = restBuilder().generateJS("api", (getContextURI() + "/api").replaceAll("//", "/"));
+		FileUtils.writeStringToFile_ifDifferant(new File(getContextPath() + "/api.js"), "UTF-8", apiJS);
+		return apiJS;
 	}
 	
 	@Override
@@ -199,4 +205,11 @@ public class CommonsPage extends BasePage {
 		return super.outputJSON(outputData, templateData, output);
 	}
 	
+	/// Auto initialize pages builder
+	@Override
+	public void initializeContext() throws Exception {
+		super.initializeContext();
+		PagesBuilder().buildAllPages();
+		buildApiScript();
+	}
 }

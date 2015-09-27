@@ -353,4 +353,20 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		}
 		return super.getContextPath();
 	}
+	
+	/// Cached context path
+	protected String _contextURI = null;
+	
+	/// Returns the servlet contextual path : needed for base URI for page redirects / etc
+	public String getContextURI() {
+		if( _contextURI != null ) {
+			return _contextURI;
+		}
+		
+		if (_servletContextEvent != null) {
+			ServletContext sc = _servletContextEvent.getServletContext();
+			return (_contextURI = sc.getContextPath()) + "/";
+		}
+		return (_contextURI = super.getContextURI());
+	}
 }

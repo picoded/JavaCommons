@@ -62,8 +62,10 @@ public class CommonsPage extends BasePage {
 				String logout = requestParameters().getString("logout");
 				
 				// Handle page logout event
-				if (logout != null && (logout.equals("1") || logout.equals("true"))) {
+				if (logout != null && (logout.equalsIgnoreCase("1") || logout.equalsIgnoreCase("true"))) {
 					accountAuthTable().logoutAccount(getHttpServletRequest(), getHttpServletResponse());
+					sendRedirect((getContextURI() + "/login?logout_status=1").replaceAll("//", "/"));
+					return false;
 				}
 				
 				return true;

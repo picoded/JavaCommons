@@ -182,20 +182,20 @@ public class JStruct_MetaObject implements MetaObject {
 		Object ret = get(key);
 		
 		// Object token null, cleared as null
-		if( ret == ObjectTokens.NULL ) {
+		if (ret == ObjectTokens.NULL) {
 			ret = null;
 		}
 		
 		// If no values are changed, ignore delta
-		if( value == ret ) {
+		if (value == ret) {
 			return ret;
 		}
 		
 		// Value comparision check
-		if( value != null && ret != null ) {
-			if( ret.toString().equals( value.toString() ) ) {
+		if (value != null && ret != null) {
+			if (ret.toString().equals(value.toString())) {
 				return ret;
-			} 
+			}
 		}
 		
 		if (value == null) {

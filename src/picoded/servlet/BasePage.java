@@ -359,7 +359,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	
 	/// Returns the servlet contextual path : needed for base URI for page redirects / etc
 	public String getContextURI() {
-		if( _contextURI != null ) {
+		if (_contextURI != null) {
 			return _contextURI;
 		}
 		

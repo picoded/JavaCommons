@@ -286,17 +286,17 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 			
 			//group_childRole and groupChild_meta
 			if (ao != null) {
-				if(ao.isGroup()){
+				if (ao.isGroup()) {
 					MetaObject groupObj = group_childRole.get(oid);
 					group_childRole.remove(oid);
 					
-					if(groupObj != null){
-						for(String userID:groupObj.keySet()){
+					if (groupObj != null) {
+						for (String userID : groupObj.keySet()) {
 							String groupChildMetaKey = getGroupChildMetaKey(oid, userID);
 							groupChild_meta.remove(groupChildMetaKey);
 						}
 					}
-				}else{
+				} else {
 					String[] groupIDs = ao.getGroups_id();
 					if (groupIDs != null) {
 						for (String groupID : groupIDs) {

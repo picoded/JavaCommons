@@ -1427,6 +1427,8 @@ return resMap;
 				res.put("meta", newAccount);
 				res.put("accountID", newAccount._oid());
 			} else {
+				AccountObject existingAccount = accountTableObj.getFromName(userName);
+				res.put("accountID", existingAccount._oid());
 				res.put("error", "Object already exists in account Table");
 			}
 			

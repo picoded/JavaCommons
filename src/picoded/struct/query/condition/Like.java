@@ -39,7 +39,7 @@ public class Like extends ConditionBase {
 		if (argValue == null || fieldValue == null) {
 			return false;
 		} else {
-			return CompareUtils.dynamicCompare(fieldValue, argValue) == 0;
+			return CompareUtils.dynamicLike(fieldValue, argValue);
 		}
 	}
 	

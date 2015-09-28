@@ -78,7 +78,7 @@ public class AllConditions_test {
 	@Test
 	public void equals() {
 		Query cond = new Equals("hello", "my", sample_c);
-		System.out.println("Query.build() -> " + Query);
+		System.out.println("Query.build() -> " + cond);
 		
 		assertNotNull(cond);
 		assertTrue(cond.test(sample_a));

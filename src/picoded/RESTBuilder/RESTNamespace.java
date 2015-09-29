@@ -59,22 +59,22 @@ public class RESTNamespace extends HashMap<HttpRequestType, RESTFunction> {
 	}
 	
 	/// [FOR TESTING ONLY] Calls the method without any arguments, call via the RESTBuilder instead
-	public Map<String,Object> call(HttpRequestType type) {
-		return call( type, new RESTRequest(), new HashMap<String,Object>() );
+	public Map<String, Object> call(HttpRequestType type) {
+		return call(type, new RESTRequest(), new HashMap<String, Object>());
 	}
 	
 	/// [FOR TESTING ONLY] Calls the method without any arguments, call via the RESTBuilder instead
-	public Map<String,Object> call(HttpRequestType type, Map<String,Object>reqMap ) {
-		return call( type, new RESTRequest(reqMap), new HashMap<String,Object>() );
+	public Map<String, Object> call(HttpRequestType type, Map<String, Object> reqMap) {
+		return call(type, new RESTRequest(reqMap), new HashMap<String, Object>());
 	}
 	
 	/// Internal call method, with the full request, and result
-	protected Map<String,Object> call(HttpRequestType type, RESTRequest req, Map<String,Object> res) {
+	protected Map<String, Object> call(HttpRequestType type, RESTRequest req, Map<String, Object> res) {
 		RESTFunction f = get(type);
-		if( f == null ) {
-			throw new RuntimeException("Missing function for given namespace / type : "+namespace+" / "+type);
+		if (f == null) {
+			throw new RuntimeException("Missing function for given namespace / type : " + namespace + " / " + type);
 		}
-		return f.apply( req, res );
+		return f.apply(req, res);
 	}
 	
 	/// Internal call method, with the full request, and result

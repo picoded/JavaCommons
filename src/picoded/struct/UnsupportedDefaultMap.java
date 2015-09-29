@@ -14,7 +14,7 @@ import java.util.*;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
-public interface UnsupportedDefaultMap<K, V> extends Map<K,V> {
+public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 	
 	// Critical functions that need to over-ride, to support Map
 	//-------------------------------------------------------------------
@@ -64,7 +64,7 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K,V> {
 	
 	/// throws an UnsupportedOperationException
 	public default void clear() {
-		for(K key : keySet()) {
+		for (K key : keySet()) {
 			remove(key);
 		}
 	}
@@ -76,15 +76,15 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K,V> {
 	
 	/// Does an unoptimized check, using keySet9)
 	public default boolean containsValue(Object value) {
-		for(K key : keySet()) {
+		for (K key : keySet()) {
 			V val = get(key);
 			
-			if( value == null ) {
-				if( val == null ) {
+			if (value == null) {
+				if (val == null) {
 					return true;
 				}
 			} else {
-				if( value.equals(val) ) {
+				if (value.equals(val)) {
 					return true;
 				}
 			}
@@ -93,10 +93,10 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K,V> {
 	}
 	
 	/// throws an UnsupportedOperationException
-	public default Set<Map.Entry<K,V>> entrySet() {
-		Set<Map.Entry<K,V>> ret = new HashSet<Map.Entry<K,V>>();
-		for(K key : keySet()) {
-			ret.add( new DeferredMapEntry<K,V>(this, key) );
+	public default Set<Map.Entry<K, V>> entrySet() {
+		Set<Map.Entry<K, V>> ret = new HashSet<Map.Entry<K, V>>();
+		for (K key : keySet()) {
+			ret.add(new DeferredMapEntry<K, V>(this, key));
 		}
 		return ret;
 	}
@@ -109,7 +109,7 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K,V> {
 	/// throws an UnsupportedOperationException
 	public default void putAll(Map<? extends K, ? extends V> m) {
 		for (Map.Entry<? extends K, ? extends V> e : m.entrySet()) {
-			put( e.getKey(), e.getValue() );
+			put(e.getKey(), e.getValue());
 		}
 	}
 	
@@ -121,8 +121,8 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K,V> {
 	/// throws an UnsupportedOperationException
 	public default Collection<V> values() {
 		List<V> ret = new ArrayList<V>();
-		for(K key : keySet()) {
-			ret.add( get(key) );
+		for (K key : keySet()) {
+			ret.add(get(key));
 		}
 		return ret;
 	}

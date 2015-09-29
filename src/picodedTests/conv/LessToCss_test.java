@@ -11,7 +11,7 @@ import java.util.Arrays;
 import picoded.conv.*;
 
 public class LessToCss_test {
-
+	
 	protected LessToCss lcObj = null;
 	
 	@Before
@@ -26,7 +26,7 @@ public class LessToCss_test {
 	
 	@Test
 	public void constructor() {
-		assertNotNull( lcObj );
+		assertNotNull(lcObj);
 	}
-		
+	
 }

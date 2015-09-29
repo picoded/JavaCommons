@@ -24,17 +24,17 @@ public class AllConditions_test {
 	//--------------------------------------------------------------------
 	
 	/// Map sample, used to setup test cases
-	public Map<String,Object> sample_a = null;
-	public Map<String,Object> sample_b = null;
-	public Map<String,Object> sample_c = null;
-	public Map<String,Object> sample_d = null;
+	public Map<String, Object> sample_a = null;
+	public Map<String, Object> sample_b = null;
+	public Map<String, Object> sample_c = null;
+	public Map<String, Object> sample_d = null;
 	
 	@Before
 	public void setUp() {
-		sample_a = new HashMap<String,Object>();
-		sample_b = new HashMap<String,Object>();
-		sample_c = new HashMap<String,Object>();
-		sample_d = new HashMap<String,Object>();
+		sample_a = new HashMap<String, Object>();
+		sample_b = new HashMap<String, Object>();
+		sample_c = new HashMap<String, Object>();
+		sample_d = new HashMap<String, Object>();
 		
 		sample_a.put("hello", "world");
 		sample_a.put("int", 3);
@@ -80,16 +80,16 @@ public class AllConditions_test {
 		Query cond = new Equals("hello", "my", sample_c);
 		
 		assertNotNull(cond);
-		assertTrue( cond.test(sample_a) );
-		assertFalse( cond.test(sample_b) );
+		assertTrue(cond.test(sample_a));
+		assertFalse(cond.test(sample_b));
 		
-		assertFalse( cond.test(sample_a, sample_d) );
-		assertTrue( cond.test(sample_b, sample_d) );
+		assertFalse(cond.test(sample_a, sample_d));
+		assertTrue(cond.test(sample_b, sample_d));
 		
 	}
 	
 	@Test
-	public void lessThan(){
+	public void lessThan() {
 		
 		//if a string starts with a number, number parse will work
 		Query cond = new LessThan("int", "int", sample_c);
@@ -111,7 +111,7 @@ public class AllConditions_test {
 	}
 	
 	@Test
-	public void moreThan(){
+	public void moreThan() {
 		
 		//if a string starts with a number, number parse will work
 		Query cond = new MoreThan("int", "int", sample_c);
@@ -133,7 +133,7 @@ public class AllConditions_test {
 	}
 	
 	@Test
-	public void lessThanOrEquals(){
+	public void lessThanOrEquals() {
 		sample_a = new HashMap<String, Object>();
 		sample_b = new HashMap<String, Object>();
 		sample_c = new HashMap<String, Object>();
@@ -191,7 +191,7 @@ public class AllConditions_test {
 	}
 	
 	@Test
-	public void moreThanOrEquals(){
+	public void moreThanOrEquals() {
 		sample_a = new HashMap<String, Object>();
 		sample_b = new HashMap<String, Object>();
 		sample_c = new HashMap<String, Object>();

@@ -16,7 +16,7 @@ public class Equals extends ConditionBase {
 	/// @param   default argument name to test against
 	/// @param   default argument map to get test value
 	///
-	public Equals(String field, String argName, Map<String,Object> defaultArgMap) {
+	public Equals(String field, String argName, Map<String, Object> defaultArgMap) {
 		super(field, argName, defaultArgMap);
 	}
 	
@@ -36,7 +36,7 @@ public class Equals extends ConditionBase {
 	/// @returns  boolean indicating success or failure
 	///
 	protected boolean testValues(Object fieldValue, Object argValue) {
-		if( argValue == null || fieldValue == null ) {
+		if (argValue == null || fieldValue == null) {
 			return false;
 		} else {
 			return CompareUtils.dynamicCompare(fieldValue, argValue) == 0;
@@ -57,4 +57,4 @@ public class Equals extends ConditionBase {
 		return QueryType.EQUALS;
 	}
 	
-} 
+}

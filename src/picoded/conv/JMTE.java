@@ -47,7 +47,7 @@ public class JMTE {
 	}
 	
 	/// Parses the template, with the provided data & baseDataModel
-	public String parseTemplate(String template, Map<String, Object>dataObj) {
+	public String parseTemplate(String template, Map<String, Object> dataObj) {
 		
 		//Combines the 2 HashMap, with the provided data taking priority
 		HashMap<String, Object> tempObj = new HashMap<String, Object>();
@@ -98,33 +98,33 @@ public class JMTE {
 	
 	/// Project standardised means to display full time stamp (with seconds and timezone)
 	/// This is integrated as a namedRenderer by default with the same name in JMTE
-	public static String unixTimeToFullString( long unixSeconds ) {
-		if( fullTimeFormat == null ) {
+	public static String unixTimeToFullString(long unixSeconds) {
+		if (fullTimeFormat == null) {
 			fullTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz"); //Date format
 		}
 		fullTimeFormat.setTimeZone(unixTimeAssumedTimeZone);
 		
-		return ""+fullTimeFormat.format( new Date(unixSeconds*1000L) );
+		return "" + fullTimeFormat.format(new Date(unixSeconds * 1000L));
 	}
 	
 	/// Project standardised means to display timestamp (date, and hour/min, without seconds/timezone)
 	/// This is integrated as a namedRenderer by default with the same name in JMTE
-	public static String unixTimeToDisplayTime( long unixSeconds ) {
-		if( displayTimeFormat == null ) {
+	public static String unixTimeToDisplayTime(long unixSeconds) {
+		if (displayTimeFormat == null) {
 			displayTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm"); //Date format
 		}
 		displayTimeFormat.setTimeZone(unixTimeAssumedTimeZone);
 		
-		return ""+displayTimeFormat.format( new Date(unixSeconds*1000L) );
+		return "" + displayTimeFormat.format(new Date(unixSeconds * 1000L));
 	}
 	
 	/// UnixTime to display timestamp formetter: Example format 'dd/MM/yyyy HH:mm:ss zzz'
 	/// Allows multiple formats type, however format isnt cached.
-	public static String unixTimeToFormat( long unixSeconds, String format ) {
+	public static String unixTimeToFormat(long unixSeconds, String format) {
 		SimpleDateFormat tFormat = new SimpleDateFormat(format); //Date format
 		tFormat.setTimeZone(unixTimeAssumedTimeZone);
 		
-		return ""+tFormat.format( new Date(unixSeconds*1000L) );
+		return "" + tFormat.format(new Date(unixSeconds * 1000L));
 	}
 	
 	/////////////////////////////////////////////
@@ -150,7 +150,7 @@ public class JMTE {
 		
 		@Override
 		public String render(Object o, String format, Locale L) {
-			return JMTE.unixTimeToDisplayTime( ((Number)o).longValue() );
+			return JMTE.unixTimeToDisplayTime(((Number) o).longValue());
 		}
 	}
 	
@@ -173,7 +173,7 @@ public class JMTE {
 		
 		@Override
 		public String render(Object o, String format, Locale L) {
-			return JMTE.unixTimeToFullString( ((Number)o).longValue() );
+			return JMTE.unixTimeToFullString(((Number) o).longValue());
 		}
 	}
 	
@@ -196,7 +196,7 @@ public class JMTE {
 		
 		@Override
 		public String render(Object o, String format, Locale L) {
-			return JMTE.unixTimeToFormat( ((Number)o).longValue(), format );
+			return JMTE.unixTimeToFormat(((Number) o).longValue(), format);
 		}
 	}
 	
@@ -219,7 +219,7 @@ public class JMTE {
 		
 		@Override
 		public String render(Object o, String format, Locale L) {
-			return picoded.conv.StringEscape.escapeHtml( (String)o );
+			return picoded.conv.StringEscape.escapeHtml((String) o);
 		}
 	}
 	
@@ -242,7 +242,7 @@ public class JMTE {
 		
 		@Override
 		public String render(Object o, String format, Locale L) {
-			return picoded.conv.StringEscape.encodeURI( (String)o );
+			return picoded.conv.StringEscape.encodeURI((String) o);
 		}
 	}
 	
@@ -250,15 +250,15 @@ public class JMTE {
 	// JMTE constructor with default templates
 	/////////////////////////////////////////////
 	public JMTE() {
-		registerNamedRenderer( new unixTimeToFullString()  );
-		registerNamedRenderer( new unixTimeToDisplayTime() );
-		registerNamedRenderer( new unixTimeToFormat() );
+		registerNamedRenderer(new unixTimeToFullString());
+		registerNamedRenderer(new unixTimeToDisplayTime());
+		registerNamedRenderer(new unixTimeToFormat());
 		
-		registerNamedRenderer( new escapeHtml() );
-		registerNamedRenderer( new encodeURI() );
+		registerNamedRenderer(new escapeHtml());
+		registerNamedRenderer(new encodeURI());
 	}
 	
-	public JMTE( String dir ) {
+	public JMTE(String dir) {
 		this();
 		baseDirectory = dir;
 	}
@@ -275,13 +275,13 @@ public class JMTE {
 	/// TODO: Detect absolute path (starting with "/") and use that instead
 	///
 	public String rawHtmlPart(String fileName) throws java.io.IOException {
-		File tFile = new File( baseDirectory+fileName );
+		File tFile = new File(baseDirectory + fileName);
 		
-		if( !tFile.exists() ) {
-			throw new java.io.IOException( "Template file does not exists : "+baseDirectory+fileName );
+		if (!tFile.exists()) {
+			throw new java.io.IOException("Template file does not exists : " + baseDirectory + fileName);
 		}
-		if( !tFile.canRead() ) {
-			throw new java.io.IOException( "Template file is unreadable : "+baseDirectory+fileName );
+		if (!tFile.canRead()) {
+			throw new java.io.IOException("Template file is unreadable : " + baseDirectory + fileName);
 		}
 		
 		return readFileToString(tFile);
@@ -295,7 +295,7 @@ public class JMTE {
 	}
 	
 	/// Fetches and return the template output, with the data object
-	public String htmlTemplatePart(String fileName, Map<String,Object> dataObj) throws java.io.IOException {
+	public String htmlTemplatePart(String fileName, Map<String, Object> dataObj) throws java.io.IOException {
 		String rawStr = rawHtmlPart(fileName);
 		return parseTemplate(rawStr, dataObj);
 	}
@@ -321,7 +321,7 @@ public class JMTE {
 			StringBuilder sb = new StringBuilder();
 			String line = br.readLine();
 			
-			if( line != null ) {
+			if (line != null) {
 				sb.append(line);
 				line = br.readLine();
 			}
@@ -337,7 +337,7 @@ public class JMTE {
 			
 			return sb.toString();
 		} finally {
-			if(br != null) {
+			if (br != null) {
 				br.close();
 			}
 		}

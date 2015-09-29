@@ -45,28 +45,26 @@ public class QueryFilter_test {
 	
 	@Test
 	public void filterQueryArguments() {
-		MutablePair<String,Integer> res = null;
+		MutablePair<String, Integer> res = null;
 		
-		assertNotNull( res = QueryFilter.filterQueryArguments("A = ? AND B = ?") );
+		assertNotNull(res = QueryFilter.filterQueryArguments("A = ? AND B = ?"));
 		assertEquals("A = :0 AND B = :1", res.getLeft());
 		assertEquals(2, res.getRight().intValue());
 	}
 	
 	@Test
 	public void argumentsArrayToMap() {
-		Map<String,Object> ref = new HashMap<String,Object>();
+		Map<String, Object> ref = new HashMap<String, Object>();
 		ref.put("0", "|=");
 		ref.put("1", "$=");
 		
-		assertEquals( ref, QueryFilter.argumentsArrayToMap(null, new Object[]{ "|=", "$=" }) );
+		assertEquals(ref, QueryFilter.argumentsArrayToMap(null, new Object[] { "|=", "$=" }));
 	}
 	
 	@Test
 	public void enforceRequiredWhitespace() {
-		assertEquals( 
-			"A <= :0 AND B >= :1 AND C != :2 AND ( D < :3 AND E = :4 )", 
-			QueryFilter.enforceRequiredWhitespace("A<=:0  AND  B>=:1 AND C!=:2 AND (D<:3 AND E=:4)") 
-		);
+		assertEquals("A <= :0 AND B >= :1 AND C != :2 AND ( D < :3 AND E = :4 )",
+			QueryFilter.enforceRequiredWhitespace("A<=:0  AND  B>=:1 AND C!=:2 AND (D<:3 AND E=:4)"));
 	}
 	
 }

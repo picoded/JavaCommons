@@ -99,7 +99,8 @@ public class JSql_Oracle extends JSql {
 	
 	/// Collumn type correction from mysql to oracle sql
 	private static String _simpleMysqlToOracle_collumnSubstitude(String qString) {
-		return qString.replaceAll("(?i)BIT", "RAW")
+		return qString
+			.replaceAll("(?i)BIT", "RAW")
 			.replaceAll("(?i)TINYBLOB", "RAW")
 			//, RAW
 			//.replaceAll("(?i)CHAR","CHAR")
@@ -110,22 +111,13 @@ public class JSql_Oracle extends JSql {
 			//.replaceAll("(?i)FLOAT","FLOAT")
 			.replaceAll("(?i)INTEGER", "INT")
 			//.replaceAll("(?i)INT","NUMBER(10,0)")
-			.replaceAll("(?i)BIGINT", "NUMBER(19, 0)")
-			.replaceAll("(?i)MEDIUMINT", "NUMBER(7,0)")
-			.replaceAll("(?i)SMALLINT", "NUMBER(5,0)")
-			.replaceAll("(?i)TINYINT", "NUMBER(3,0)")
-			.replaceAll("(?i)YEAR", "NUMBER")
-			.replaceAll("(?i)NUMERIC", "NUMBER")
-			.replaceAll("(?i)BLOB", "BLOB")
-			.replaceAll("(?i)LONGBLOB", "BLOB")
-			.replaceAll("(?i)MEDIUMBLOB", "BLOB")
-			.replaceAll("(?i)LONGTEXT", "CLOB")
-			.replaceAll("(?i)MEDIUMTEXT", "CLOB")
-			.replaceAll("(?i)TEXT", "CLOB")
+			.replaceAll("(?i)BIGINT", "NUMBER(19, 0)").replaceAll("(?i)MEDIUMINT", "NUMBER(7,0)")
+			.replaceAll("(?i)SMALLINT", "NUMBER(5,0)").replaceAll("(?i)TINYINT", "NUMBER(3,0)")
+			.replaceAll("(?i)YEAR", "NUMBER").replaceAll("(?i)NUMERIC", "NUMBER").replaceAll("(?i)BLOB", "BLOB")
+			.replaceAll("(?i)LONGBLOB", "BLOB").replaceAll("(?i)MEDIUMBLOB", "BLOB").replaceAll("(?i)LONGTEXT", "CLOB")
+			.replaceAll("(?i)MEDIUMTEXT", "CLOB").replaceAll("(?i)TEXT", "CLOB")
 			//.replaceAll("(?i)DATE","DATE")
-			.replaceAll("(?i)TIME", "DATE")
-			.replaceAll("(?i)TIMESTAMP", "DATE")
-			.replaceAll("(?i)DATETIME", "DATE")
+			.replaceAll("(?i)TIME", "DATE").replaceAll("(?i)TIMESTAMP", "DATE").replaceAll("(?i)DATETIME", "DATE")
 			/*
 			.replaceAll("(?i)ENUM(?=\\()","VARCHAR2")
 			.replaceAll("(?i)ENUM(?!\\()","VARCHAR2(n)")
@@ -134,9 +126,8 @@ public class JSql_Oracle extends JSql {
 			.replaceAll("(?i)TINYTEXT(?=\\()","VARCHAR2")
 			.replaceAll("(?i)TINYTEXT(?!\\()","VARCHAR2(n)")
 			 */
-			.replaceAll("(?i)VARCHAR(?!\\()", "VARCHAR2(4000)")
-			.replaceAll("(?i)VARCHAR\\(", "VARCHAR2(")
-			.replaceAll("MAX","4000");
+			.replaceAll("(?i)VARCHAR(?!\\()", "VARCHAR2(4000)").replaceAll("(?i)VARCHAR\\(", "VARCHAR2(")
+			.replaceAll("MAX", "4000");
 	}
 	
 	/// Fixes the table name, and removes any trailing ";" if needed
@@ -166,7 +157,7 @@ public class JSql_Oracle extends JSql {
 	
 	final String create = "CREATE";
 	final String drop = "DROP";
-	final String view ="VIEW";
+	final String view = "VIEW";
 	final String table = "TABLE";
 	final String select = "SELECT";
 	final String update = "UPDATE";
@@ -185,13 +176,9 @@ public class JSql_Oracle extends JSql {
 			return inString;
 		}
 		
-		String fixedQuotes = inString.trim()
-			.replaceAll("(\\s){1}", " ")
-			.replaceAll("\\s+", " ")
-			.replaceAll("'", "\"")
-			.replaceAll("`", "\"")
-			.replaceAll("\"", "");
-			
+		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("\\s+", " ").replaceAll("'", "\"")
+			.replaceAll("`", "\"").replaceAll("\"", "");
+		
 		String upperCaseStr = fixedQuotes.toUpperCase();
 		String qString = fixedQuotes;
 		String qStringPrefix = "";
@@ -212,10 +199,9 @@ public class JSql_Oracle extends JSql {
 					prefixOffset += ifExists.length() + 1;
 					qStringPrefix = "BEGIN EXECUTE IMMEDIATE 'DROP TABLE ";
 					qStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;";
-				} 
-				else {
+				} else {
 					qStringPrefix = "DROP TABLE ";
-				} 
+				}
 				qString = _fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 			} else if (upperCaseStr.startsWith(view, prefixOffset)) { //VIEW
 				prefixOffset += view.length() + 1;
@@ -223,10 +209,9 @@ public class JSql_Oracle extends JSql {
 					prefixOffset += ifExists.length() + 1;
 					qStringPrefix = "BEGIN EXECUTE IMMEDIATE 'DROP VIEW ";
 					qStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;";
-				} 
-				else {
+				} else {
 					qStringPrefix = "DROP VIEW ";
-				} 
+				}
 				qString = _fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 			}
 			
@@ -255,16 +240,16 @@ public class JSql_Oracle extends JSql {
 				}
 				qString = _fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 				qString = _simpleMysqlToOracle_collumnSubstitude(qString);
-
+				
 				int fromKeywordIndex = qString.indexOf("FROM") + "FROM".length();
 				String qStringBeforeFromKeyword = qString.substring(0, fromKeywordIndex);
 				// remove 'AS' keywords after table name
-				String qStringAfterFromKeyword =  qString.substring(fromKeywordIndex, qString.length()).replaceAll("AS","");
+				String qStringAfterFromKeyword = qString.substring(fromKeywordIndex, qString.length()).replaceAll("AS", "");
 				// replace double quotes (") with sinfle quotes
 				qStringAfterFromKeyword = qStringAfterFromKeyword.replace("\"", "'");
 				
 				qString = qStringBeforeFromKeyword + qStringAfterFromKeyword;
-
+				
 			} else {
 				logger.finer("Trying to matched INDEX : " + upperCaseStr.substring(prefixOffset));
 				if (createIndexType.matcher(upperCaseStr.substring(prefixOffset)).matches()) { //UNIQUE|FULLTEXT|SPATIAL|_ INDEX
@@ -345,11 +330,9 @@ public class JSql_Oracle extends JSql {
 			tmpIndx = qString.toUpperCase().indexOf(" FROM ");
 			
 			if (tmpIndx > 0) {
-				qString = "SELECT " 
-				    + tmpStr.substring(0, tmpIndx - 7)
-				    //.replaceAll("\"", "'")
-				    .replaceAll("`", "\"")
-					+ " FROM " + _fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx - 1));
+				qString = "SELECT " + tmpStr.substring(0, tmpIndx - 7)
+				//.replaceAll("\"", "'")
+					.replaceAll("`", "\"") + " FROM " + _fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx - 1));
 			} else {
 				qString = _fixTableNameInOracleSubQuery(fixedQuotes);
 			}
@@ -396,7 +379,7 @@ public class JSql_Oracle extends JSql {
 			   qString = prefixQuery + offsetQuery + limitQuery;
 			}
 			 */
-
+			
 			// Fix the pagination using the ROWNUM which is supported by versions below than Oracle 12C
 			String prefixQuery = null;
 			int startRowNum = -1;
@@ -435,20 +418,20 @@ public class JSql_Oracle extends JSql {
 		
 		qString = qStringPrefix + qString + qStringSuffix;
 		
-      //logger.finer("Converting MySQL query to oracleSQL query");
-      //logger.finer("MySql -> "+inString);
-      //logger.finer("OracleSql -> "+qString);
-      
-      //logger.warning("MySql -> "+inString);
-      //logger.warning("OracleSql -> "+qString);
-
+		//logger.finer("Converting MySQL query to oracleSQL query");
+		//logger.finer("MySql -> "+inString);
+		//logger.finer("OracleSql -> "+qString);
+		
+		//logger.warning("MySql -> "+inString);
+		//logger.warning("OracleSql -> "+qString);
+		
 		return qString; //no change of data
 	}
 	
 	private static String removeAsAfterTablename(String qString) {
 		int prefixOffset = 0;
 		String tmpStr = null;
-
+		
 		// parse table name
 		String searchString = "FROM";
 		String tablename = "";
@@ -464,10 +447,10 @@ public class JSql_Oracle extends JSql {
 					tablename += tmpStr.charAt(i);
 				}
 				tablename = tablename.replaceAll("\"", "").trim();
-
+				
 			}
 		}
-
+		
 		// Fix the "AS" quotation
 		searchString = " " + tablename + " ";
 		while ((prefixOffset = qString.indexOf(searchString, prefixOffset)) > 0) {
@@ -475,19 +458,18 @@ public class JSql_Oracle extends JSql {
 			tmpStr = qString.substring(prefixOffset, qString.length()).trim();
 			if (tmpStr.startsWith("AS")) {
 				qString = qString.substring(0, prefixOffset)
-						+ qString.substring(prefixOffset + "AS".length() + 1,
-								qString.length()).trim();
+					+ qString.substring(prefixOffset + "AS".length() + 1, qString.length()).trim();
 			}
 		}
-
+		
 		return qString;
 	}
-
+	
 	private static String removeAsAfterOpeningBracket(String qString) {
 		String searchString = " FROM (";
 		int prefixOffset = qString.indexOf(searchString);
 		if (prefixOffset != -1) {
-		    prefixOffset += searchString.length();
+			prefixOffset += searchString.length();
 			int offsetIndex = prefixOffset;
 			int obc = 1;
 			int cbc = 0;
@@ -502,31 +484,27 @@ public class JSql_Oracle extends JSql {
 					obc++;
 				}
 			}
-			String strBetweenBracket = qString.substring(prefixOffset,
-					offsetIndex).trim();
+			String strBetweenBracket = qString.substring(prefixOffset, offsetIndex).trim();
 			// Remove AS
 			// increment for space before bracket
 			offsetIndex++;
-			String tmpStr = qString.substring(offsetIndex, qString.length())
-					.trim();
+			String tmpStr = qString.substring(offsetIndex, qString.length()).trim();
 			if (tmpStr.startsWith("AS")) {
 				// increment for space before bracket
 				offsetIndex++;
 				qString = qString.substring(0, offsetIndex)
-						+ qString.substring(offsetIndex + "AS ".length(),
-								qString.length()).trim();
+					+ qString.substring(offsetIndex + "AS ".length(), qString.length()).trim();
 				offsetIndex = offsetIndex - "AS".length();
 			}
 			// make recursive call
 			if (strBetweenBracket.indexOf(searchString) != -1) {
-				qString = qString.substring(0, prefixOffset)
-						+ removeAsAfterOpeningBracket(strBetweenBracket)
-						+ qString.substring(offsetIndex, qString.length());
+				qString = qString.substring(0, prefixOffset) + removeAsAfterOpeningBracket(strBetweenBracket)
+					+ qString.substring(offsetIndex, qString.length());
 			}
 		}
 		return qString;
 	}
-
+	
 	/// Executes the argumented query, and returns the result object *without* 
 	/// fetching the result data from the database. (not fetching may not apply to all implementations)
 	/// 
@@ -561,86 +539,85 @@ public class JSql_Oracle extends JSql {
 	///
 	/// Returns false if no result is given by the execution call, else true on success
 	public boolean execute(String qString, Object... values) throws JSqlException {
-	    qString = genericSqlParser(qString);
-	    
-	    String sequenceQuery = null;
-	    String triggerQuery = null;
-	    
-	    // check if there is any AUTO INCREMENT field
-	    if (qString.indexOf("AUTOINCREMENT") !=-1 || qString.indexOf("AUTO_INCREMENT") !=-1) {
-    
-    	    // Create sequence and trigger if it is CREATE TABLE query and has the AUTO INCREMENT column
-    	    int prefixOffset = qString.indexOf(create);
-    	    // check if create statement
-    	    if (prefixOffset != -1) { //CREATE
-
-    			prefixOffset += create.length() + 1;
-    			
-    			// check if create table statement
-    			if (qString.startsWith(table, prefixOffset)) { //TABLE
-
-    			    prefixOffset += table.length() + 1;
-    			    
-    		        // check if 'IF NOT EXISTS' exists in query
-    	            if (qString.startsWith(ifNotExists, prefixOffset)) {
-    					prefixOffset += ifNotExists.length() + 1;
-    				}
-    				
-    		        // parse table name
-            		String tableName = qString.substring(prefixOffset, qString.indexOf( "(", prefixOffset) );
-            		tableName = tableName.replaceAll("\"", "").trim();
-            		
-            		prefixOffset += tableName.length();
-                    //prefixOffset = qString.indexOf("(", prefixOffset) + 1;
-                    
-    		        // parse primary key column
-    		   	    String primaryKeyColumn = "";
-    		   	    
-    		        String tmpStr = qString.substring( prefixOffset, qString.indexOf("PRIMARY KEY") ).trim();
-
-    		   	    if (tmpStr.charAt(tmpStr.length() - 1) == ')') {
-        				tmpStr = tmpStr.substring(0, tmpStr.lastIndexOf("(")).trim();
-        			}
-        			// find last space
-        			tmpStr = tmpStr.substring(0, tmpStr.lastIndexOf(" ")).trim();
-        			
-        			for (int i = tmpStr.length() - 1; i >= 0; i--) {
-        				// find space, comma or opening bracket
-        				if (tmpStr.charAt(i) == ' ' || tmpStr.charAt(i) == ','
-        						|| tmpStr.charAt(i) == '(') {
-        					break;
-        				}
-        				primaryKeyColumn = tmpStr.charAt(i) + primaryKeyColumn;
-        			}
-    		   	    
-    		   	    // create sequence sql query
-    		        sequenceQuery = "CREATE SEQUENCE \""+tableName+"_SEQ\" START WITH 1001 INCREMENT BY 1 CACHE 10"; 
-    		        
-    		        // create trigger sql query
-    		        triggerQuery = "CREATE OR REPLACE TRIGGER \""+tableName+"_TRIGGER\" "
-    		                    + " BEFORE INSERT ON \""+tableName+"\" FOR EACH ROW " 
-    		                    + " BEGIN SELECT \""+tableName+"_SEQ\".nextval INTO :NEW."+primaryKeyColumn+" FROM dual; END;";
-    			}
-    	    }
-	    }
-	    // Replace the AUTO INCREMENT with blank
-	    qString = qString.replaceAll("AUTOINCREMENT", "");
-	    qString = qString.replaceAll("AUTO_INCREMENT", "");
-
+		qString = genericSqlParser(qString);
+		
+		String sequenceQuery = null;
+		String triggerQuery = null;
+		
+		// check if there is any AUTO INCREMENT field
+		if (qString.indexOf("AUTOINCREMENT") != -1 || qString.indexOf("AUTO_INCREMENT") != -1) {
+			
+			// Create sequence and trigger if it is CREATE TABLE query and has the AUTO INCREMENT column
+			int prefixOffset = qString.indexOf(create);
+			// check if create statement
+			if (prefixOffset != -1) { //CREATE
+			
+				prefixOffset += create.length() + 1;
+				
+				// check if create table statement
+				if (qString.startsWith(table, prefixOffset)) { //TABLE
+				
+					prefixOffset += table.length() + 1;
+					
+					// check if 'IF NOT EXISTS' exists in query
+					if (qString.startsWith(ifNotExists, prefixOffset)) {
+						prefixOffset += ifNotExists.length() + 1;
+					}
+					
+					// parse table name
+					String tableName = qString.substring(prefixOffset, qString.indexOf("(", prefixOffset));
+					tableName = tableName.replaceAll("\"", "").trim();
+					
+					prefixOffset += tableName.length();
+					//prefixOffset = qString.indexOf("(", prefixOffset) + 1;
+					
+					// parse primary key column
+					String primaryKeyColumn = "";
+					
+					String tmpStr = qString.substring(prefixOffset, qString.indexOf("PRIMARY KEY")).trim();
+					
+					if (tmpStr.charAt(tmpStr.length() - 1) == ')') {
+						tmpStr = tmpStr.substring(0, tmpStr.lastIndexOf("(")).trim();
+					}
+					// find last space
+					tmpStr = tmpStr.substring(0, tmpStr.lastIndexOf(" ")).trim();
+					
+					for (int i = tmpStr.length() - 1; i >= 0; i--) {
+						// find space, comma or opening bracket
+						if (tmpStr.charAt(i) == ' ' || tmpStr.charAt(i) == ',' || tmpStr.charAt(i) == '(') {
+							break;
+						}
+						primaryKeyColumn = tmpStr.charAt(i) + primaryKeyColumn;
+					}
+					
+					// create sequence sql query
+					sequenceQuery = "CREATE SEQUENCE \"" + tableName + "_SEQ\" START WITH 1001 INCREMENT BY 1 CACHE 10";
+					
+					// create trigger sql query
+					triggerQuery = "CREATE OR REPLACE TRIGGER \"" + tableName + "_TRIGGER\" " + " BEFORE INSERT ON \""
+						+ tableName + "\" FOR EACH ROW " + " BEGIN SELECT \"" + tableName + "_SEQ\".nextval INTO :NEW."
+						+ primaryKeyColumn + " FROM dual; END;";
+				}
+			}
+		}
+		// Replace the AUTO INCREMENT with blank
+		qString = qString.replaceAll("AUTOINCREMENT", "");
+		qString = qString.replaceAll("AUTO_INCREMENT", "");
+		
 		//try {
 		boolean retvalue = execute_raw(qString, values);
-
-        //Create Sequence
-        if (sequenceQuery != null) {
-            execute_raw( genericSqlParser(sequenceQuery) );
-        }
-
-        //Create trigger
-        if (triggerQuery != null) {
-            execute_query( genericSqlParser(triggerQuery) );
-        }
-
-        return retvalue;
+		
+		//Create Sequence
+		if (sequenceQuery != null) {
+			execute_raw(genericSqlParser(sequenceQuery));
+		}
+		
+		//Create trigger
+		if (triggerQuery != null) {
+			execute_query(genericSqlParser(triggerQuery));
+		}
+		
+		return retvalue;
 		//} catch(JSqlException e) {
 		//	logger.log( Level.SEVERE, "Execute Exception" ); //, e 
 		//	logger.log( Level.SEVERE, "-> Original query : " + qString );
@@ -843,7 +820,7 @@ public class JSql_Oracle extends JSql {
 				// insert column names
 				insertColumnNames.append(miscColumns[a]);
 				insertColumnNames.append(columnSeperator);
-
+				
 				// insert column values
 				insertColumnValues.append(sourceTableAlias);
 				insertColumnValues.append(".");
@@ -922,5 +899,5 @@ public class JSql_Oracle extends JSql {
 	) throws JSqlException {
 		return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues, null, null, null);
 	}
-
+	
 }

@@ -644,7 +644,7 @@ public class ObjectSet_JSql extends AbstractMap<String, Map<String, Object>> {
 		throw new JSqlException("Not Yet Implemented");
 	}
 	 */
-
+	
 	///----------------------------------------
 	/// Map compliance
 	///----------------------------------------

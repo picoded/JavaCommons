@@ -17,12 +17,12 @@ public class LDAPAuthenticator_test {
 	
 	@Before
 	public void setUp() {
-		authObj = new LDAPAuthenticator( TestConfig.LDAP_HOST(), TestConfig.LDAP_PORT(), TestConfig.LDAP_DOMAIN() );
+		authObj = new LDAPAuthenticator(TestConfig.LDAP_HOST(), TestConfig.LDAP_PORT(), TestConfig.LDAP_DOMAIN());
 	}
 	
 	@After
 	public void tearDown() {
-		if(authObj != null) {
+		if (authObj != null) {
 			authObj.close();
 		}
 		authObj = null;
@@ -30,22 +30,22 @@ public class LDAPAuthenticator_test {
 	
 	@Test
 	public void constructorTest() {
-		assertNotNull( authObj );
+		assertNotNull(authObj);
 	}
 	
 	@Test
 	public void failedLogin() {
-		assertEquals( "Failed to authenticate: wrong", authObj.login("wrong","wrong") );
+		assertEquals("Failed to authenticate: wrong", authObj.login("wrong", "wrong"));
 	}
 	
 	@Test
 	public void correctLogin() {
-		assertNull( authObj.login("dummyuser","P@ssw0rd!") );
+		assertNull(authObj.login("dummyuser", "P@ssw0rd!"));
 	}
 	
 	@Test
 	public void basicLoginInfo() {
-		assertNull( authObj.login("dummyuser","P@ssw0rd!") );
-		assertNotNull( authObj.userInfo() );
+		assertNull(authObj.login("dummyuser", "P@ssw0rd!"));
+		assertNotNull(authObj.userInfo());
 	}
 }

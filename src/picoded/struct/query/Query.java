@@ -24,7 +24,7 @@ public interface Query extends Predicate<Object> {
 	}
 	
 	/// Build the query using the parameter map
-	public static Query build(String queryString, Map<String,Object> paramMap) {
+	public static Query build(String queryString, Map<String, Object> paramMap) {
 		return QueryFilter.buildQuery(queryString, paramMap, null);
 	}
 	
@@ -49,7 +49,7 @@ public interface Query extends Predicate<Object> {
 	/// @param   the argument map, if applicable
 	///
 	/// @returns  boolean indicating true / false
-	public boolean test(Object t, Map<String,Object>argMap);
+	public boolean test(Object t, Map<String, Object> argMap);
 	
 	//
 	// Public accessors
@@ -73,7 +73,7 @@ public interface Query extends Predicate<Object> {
 	}
 	
 	/// Gets the default argument map
-	public default Map<String,Object> defaultArgumentMap() {
+	public default Map<String, Object> defaultArgumentMap() {
 		return null;
 	}
 	
@@ -111,11 +111,11 @@ public interface Query extends Predicate<Object> {
 	//--------------------------------------------------------------------
 	
 	// Searches using the query, and returns the resulting set
-	public default <K,V> List<V> search(Map<K,V> set) {
+	public default <K, V> List<V> search(Map<K, V> set) {
 		List<V> ret = new ArrayList<V>();
-		for(K key : set.keySet()) {
+		for (K key : set.keySet()) {
 			V val = set.get(key);
-			if( test(val) ) {
+			if (test(val)) {
 				ret.add(val);
 			}
 		}
@@ -123,14 +123,14 @@ public interface Query extends Predicate<Object> {
 	}
 	
 	// Searches using the query, and sorted by the comparator
-	public default <K,V> List<V> search(Map<K,V> set, Comparator<V> compareFunc ) {
+	public default <K, V> List<V> search(Map<K, V> set, Comparator<V> compareFunc) {
 		List<V> ret = search(set);
 		Collections.sort(ret, compareFunc);
 		return ret;
 	}
 	
 	// Searches using the query, and sorted by the order by query
-	public default <K,V> List<V> search(Map<K,V> set, String orderBy ) {
+	public default <K, V> List<V> search(Map<K, V> set, String orderBy) {
 		return search(set, new OrderBy<V>(orderBy));
 	}
 	
@@ -139,11 +139,11 @@ public interface Query extends Predicate<Object> {
 	//--------------------------------------------------------------------
 	
 	/// Extract out the respective query keys, and values
-	public default Map<String,List<Object>> keyValuesMap() {
-		return keyValuesMap( new HashMap<String,List<Object>>() );
+	public default Map<String, List<Object>> keyValuesMap() {
+		return keyValuesMap(new HashMap<String, List<Object>>());
 	}
 	
 	/// Extract out the respective query keys, and values
-	public Map<String,List<Object>> keyValuesMap( Map<String,List<Object>> mapToReturn );
+	public Map<String, List<Object>> keyValuesMap(Map<String, List<Object>> mapToReturn);
 	
 }

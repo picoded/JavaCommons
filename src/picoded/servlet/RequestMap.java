@@ -15,24 +15,24 @@ import picoded.conv.ConvertJSON;
 ///
 /// @TODO: Optimize the class to do the conversion between String[] to String only ON DEMAND, and to cache the result
 ///
-public class RequestMap extends AbstractMapDecorator<String,String> implements GenericConvertMap<String,String> {
+public class RequestMap extends AbstractMapDecorator<String, String> implements GenericConvertMap<String, String> {
 	
 	// Constructor
 	//------------------------------------------------------------------------------
 	
 	/// blank constructor
 	public RequestMap() {
-		super(new HashMap<String,String>());
+		super(new HashMap<String, String>());
 	}
 	
 	/// basic proxy constructor
-	public RequestMap(Map<String,String> proxy) {
-		super((proxy != null)? proxy : new HashMap<String,String>());
+	public RequestMap(Map<String, String> proxy) {
+		super((proxy != null) ? proxy : new HashMap<String, String>());
 	}
 	
 	/// http map proxy builder
-	protected static RequestMap fromStringArrayValueMap(Map<String,String[]> proxy) {
-		return new RequestMap( mapConvert(proxy) );
+	protected static RequestMap fromStringArrayValueMap(Map<String, String[]> proxy) {
+		return new RequestMap(mapConvert(proxy));
 	}
 	
 	// Utility functions (internal)
@@ -41,23 +41,23 @@ public class RequestMap extends AbstractMapDecorator<String,String> implements G
 	/// Does the conversion from string array to string,
 	/// Used internally for all the map conversion
 	private static String stringFromArray(String[] in) {
-		if( in == null || in.length == 0 ) {
+		if (in == null || in.length == 0) {
 			return null;
 		}
 		
-		if( in.length == 1 ) {
+		if (in.length == 1) {
 			return in[0];
 		}
 		
-		return ConvertJSON.fromList( Arrays.asList(in) );
+		return ConvertJSON.fromList(Arrays.asList(in));
 	}
 	
 	/// Does the conversion of a Map<String,String[]> to a Map<String,String>
-	private static Map<String,String> mapConvert( Map<String,String[]> in ) {
-		HashMap<String,String> ret = new HashMap<String,String>();
+	private static Map<String, String> mapConvert(Map<String, String[]> in) {
+		HashMap<String, String> ret = new HashMap<String, String>();
 		
-		for ( Map.Entry<String, String[]> entry : in.entrySet() ) {
-			ret.put( entry.getKey(), stringFromArray( entry.getValue() ) );
+		for (Map.Entry<String, String[]> entry : in.entrySet()) {
+			ret.put(entry.getKey(), stringFromArray(entry.getValue()));
 		}
 		return ret;
 	}

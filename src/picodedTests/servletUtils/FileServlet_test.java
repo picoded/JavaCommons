@@ -25,23 +25,22 @@ public class FileServlet_test {
 	
 	@Before
 	public void serverSetUp() throws LifecycleException, IOException {
-		if( tomcat == null ) {
+		if (tomcat == null) {
 			File rootFolder = new File("./test-files/test-specific/servletUtils/FileServlet");
 			File fileFolder = new File("./test-files/test-specific/servletUtils/FileServlet/WEB-INF/innerFiles");
 			
 			fileServlet = new FileServlet(fileFolder);
 			
-			tomcat = new EmbeddedServlet("", rootFolder)
-				.withPort(15000)
-				.withServlet("/files/*",  "fileServer", fileServlet);
-				
+			tomcat = new EmbeddedServlet("", rootFolder).withPort(15000)
+				.withServlet("/files/*", "fileServer", fileServlet);
+			
 			tomcat.start();
 		}
 	}
 	
 	@After
 	public void serverTearDown() throws LifecycleException, IOException {
-		if(tomcat != null) {
+		if (tomcat != null) {
 			//tomcat.awaitServer(); //manual
 			tomcat.stop();
 		}
@@ -60,7 +59,7 @@ public class FileServlet_test {
 	
 	@Test
 	public void helloTest() {
-		assertNotNull( response = RequestHttp.get( testAddress+"/files/hello.html" ) );
+		assertNotNull(response = RequestHttp.get(testAddress + "/files/hello.html"));
 		assertEquals("world", response.toString());
 	}
 	

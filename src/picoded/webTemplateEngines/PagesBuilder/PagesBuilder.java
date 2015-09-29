@@ -104,6 +104,10 @@ public class PagesBuilder {
 			set = set + "/";
 		}
 		
+		if (set.equals("/")) {
+			set = "./";
+		}
+		
 		uriRootPrefix = set;
 		if (html != null) {
 			html.uriRootPrefix = uriRootPrefix;
@@ -196,11 +200,11 @@ public class PagesBuilder {
 	public PagesBuilder buildPage(String pageName) {
 		
 		// Future extension, possible loop hole abuse. Im protecting against it early
-		if( pageName.startsWith(".") ) {
-			throw new RuntimeException("Unable to load page name, starting with '.' : "+pageName);
+		if (pageName.startsWith(".")) {
+			throw new RuntimeException("Unable to load page name, starting with '.' : " + pageName);
 		}
-		if( pageName.toLowerCase().indexOf("web-inf") >= 0 ) {
-			throw new RuntimeException("Unable to load page name, that may bypass WEB-INF : "+pageName);
+		if (pageName.toLowerCase().indexOf("web-inf") >= 0) {
+			throw new RuntimeException("Unable to load page name, that may bypass WEB-INF : " + pageName);
 		}
 		
 		try {
@@ -209,11 +213,11 @@ public class PagesBuilder {
 			//-------------------------------------------------------------------
 			File outputPageFolder = new File(outputFolder, pageName);
 			File definitionFolder = new File(pagesFolder, pageName);
-			Map<String,Object> jmteVarMap = html().pageJMTEvars(pageName);
+			Map<String, Object> jmteVarMap = html().pageJMTEvars(pageName);
 			
 			// Create the output folder as needed
 			//-------------------------------------------------------------------
-			if(!outputPageFolder.exists()) {
+			if (!outputPageFolder.exists()) {
 				outputPageFolder.mkdirs();
 			}
 			
@@ -224,9 +228,9 @@ public class PagesBuilder {
 			
 			// Folder to copy from
 			File pageAssetsFolder = new File(definitionFolder, "assets");
-			if( pageAssetsFolder.exists() && pageAssetsFolder.isDirectory() ) {
+			if (pageAssetsFolder.exists() && pageAssetsFolder.isDirectory()) {
 				// Copy if folder to target
-				FileUtils.copyDirectory( pageAssetsFolder, new File(outputPageFolder, "assets") );
+				FileUtils.copyDirectory(pageAssetsFolder, new File(outputPageFolder, "assets"));
 			}
 			
 			// Process the JS script (if provided)
@@ -236,20 +240,20 @@ public class PagesBuilder {
 			boolean hasJsFile = false;
 			
 			// The JS file source location
-			File jsFile = new File(definitionFolder, pageName+".js");
+			File jsFile = new File(definitionFolder, pageName + ".js");
 			
 			// Process file only if its readable
-			if( jsFile.exists() && jsFile.isFile() && jsFile.canRead() ) {
+			if (jsFile.exists() && jsFile.isFile() && jsFile.canRead()) {
 				
 				// Gets its string value, and process only if not blank
 				String jsString = FileUtils.readFileToString(jsFile, "UTF-8");
-				if( (jsString = jsString.trim()).length() > 0 ) {
+				if ((jsString = jsString.trim()).length() > 0) {
 					
 					// Does a JMTE filter
 					jsString = getJMTE().parseTemplate(jsString, jmteVarMap);
 					
 					// Write to file if it differ
-					FileUtils.writeStringToFile_ifDifferant( new File(outputPageFolder, pageName+".js"), "UTF-8", jsString );
+					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, pageName + ".js"), "UTF-8", jsString);
 					
 					// Indicate file is "deployed"
 					hasJsFile = true;
@@ -263,23 +267,25 @@ public class PagesBuilder {
 			boolean hasJsonsFile = false;
 			
 			// The JSONS file source location
-			File jsonsFile = new File(definitionFolder, pageName+".jsons");
+			File jsonsFile = new File(definitionFolder, pageName + ".jsons");
 			
 			// Process file only if its readable
-			if( jsonsFile.exists() && jsonsFile.isFile() && jsonsFile.canRead() ) {
+			if (jsonsFile.exists() && jsonsFile.isFile() && jsonsFile.canRead()) {
 				
 				// Gets its string value, and process only if not blank
 				String jsonsString = FileUtils.readFileToString(jsonsFile, "UTF-8");
-				if( (jsonsString = jsonsString.trim()).length() > 0 ) {
+				if ((jsonsString = jsonsString.trim()).length() > 0) {
 					
 					// Adds the script object wrapper
-					jsonsString = "window.pageFrames = window.pageFrames || {}; window.pageFrames."+pageName+" = ("+jsonsString+");";
+					jsonsString = "window.pageFrames = window.pageFrames || {}; window.pageFrames." + pageName + " = ("
+						+ jsonsString + ");";
 					
 					// Does a JMTE filter
 					jsonsString = getJMTE().parseTemplate(jsonsString, jmteVarMap);
 					
 					// Write to file if it differ
-					FileUtils.writeStringToFile_ifDifferant( new File(outputPageFolder, pageName+".jsons.js"), "UTF-8", jsonsString );
+					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, pageName + ".jsons.js"), "UTF-8",
+						jsonsString);
 					
 					// Indicate file is "deployed"
 					hasJsFile = true;
@@ -293,25 +299,26 @@ public class PagesBuilder {
 			boolean hasLessFile = false;
 			
 			// The LESS file source location
-			File lessFile = new File(definitionFolder, pageName+".less");
+			File lessFile = new File(definitionFolder, pageName + ".less");
 			
 			// Process file only if its readable
-			if( lessFile.exists() && lessFile.isFile() && lessFile.canRead() ) {
+			if (lessFile.exists() && lessFile.isFile() && lessFile.canRead()) {
 				
 				// Gets its string value, and process only if not blank
 				String lessString = FileUtils.readFileToString(lessFile, "UTF-8");
-				if( (lessString = lessString.trim()).length() > 0 ) {
+				if ((lessString = lessString.trim()).length() > 0) {
 					
 					/// Does an outer wrap, if its not index page (which applies style to 'all')
-					if( !pageName.equalsIgnoreCase("index") && !pageName.equalsIgnoreCase("common") ) {
-						lessString = ".pageFrame_"+pageName+" { \n"+lessString+"\n } \n";
+					if (!pageName.equalsIgnoreCase("index") && !pageName.equalsIgnoreCase("common")) {
+						lessString = ".pageFrame_" + pageName + " { \n" + lessString + "\n } \n";
 					}
 					
 					// Does a JMTE filter
 					lessString = getJMTE().parseTemplate(lessString, jmteVarMap);
 					
 					/// Write to map file if differ
-					FileUtils.writeStringToFile_ifDifferant( new File(outputPageFolder, pageName+".css.map"), "UTF-8", lessString );
+					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, pageName + ".css.map"), "UTF-8",
+						lessString);
 					
 					/// Convert LESS to CSS
 					String cssString = less.compile(lessString);
@@ -320,7 +327,8 @@ public class PagesBuilder {
 					cssString = cssString.trim().replaceAll("\\s+", " ");
 					
 					// Write to file if it differ
-					FileUtils.writeStringToFile_ifDifferant( new File(outputPageFolder, pageName+".css"), "UTF-8", cssString );
+					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, pageName + ".css"), "UTF-8",
+						cssString);
 					
 					// Indicate file is "deployed"
 					hasLessFile = true;
@@ -375,7 +383,7 @@ public class PagesBuilder {
 			//-------------------------------------------------------------------
 			
 			// Write to file if it differ
-			FileUtils.writeStringToFile_ifDifferant( new File(outputPageFolder, "index.html"), "UTF-8", indexStr );
+			FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, "index.html"), "UTF-8", indexStr);
 			
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -391,8 +399,8 @@ public class PagesBuilder {
 	///
 	public PagesBuilder buildAllPages() {
 		// For each directory, build it as a page
-		for( File pageDefine : FileUtils.listDirs(pagesFolder) ) {
-			buildPage( pageDefine.getName() );
+		for (File pageDefine : FileUtils.listDirs(pagesFolder)) {
+			buildPage(pageDefine.getName());
 		}
 		// End and returns self
 		return this;
@@ -441,7 +449,8 @@ public class PagesBuilder {
 				requestWildcardUri = new String[] { pageName, itemName };
 			}
 			
-			boolean isDeveloperMode = page.JConfig().getBoolean("sys.developersMode.enabled", true);
+			boolean isDeveloperMode = (page.JConfig().getBoolean("developersMode.enabled", true) && page.JConfig()
+				.getBoolean("developersMode.PagesBuilder", true));
 			if (isDeveloperMode) {
 				// Load the respective page
 				if (requestWildcardUri.length == 2 && itemName.equals("index.html")) {

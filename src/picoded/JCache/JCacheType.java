@@ -4,13 +4,13 @@ package picoded.JCache;
 public enum JCacheType {
 	/// invalid type (reserved for base class)
 	invalid,
-
+	
 	/// hazelcast
 	hazelcast,
-
+	
 	/// redis
 	redis,
-
+	
 	/// Others
 	others
 }

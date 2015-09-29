@@ -7,38 +7,38 @@ import java.util.*;
 /// Replace with apache StringUtils?
 import com.mysql.jdbc.StringUtils;
 
-public class FileUtils extends org.apache.commons.io.FileUtils{
+public class FileUtils extends org.apache.commons.io.FileUtils {
 	
 	/// @TODO: Sam, documentation =.=
-	public static List<String> getFileNamesFromFolder(File inFile, String separator, String rootFolderName){
+	public static List<String> getFileNamesFromFolder(File inFile, String separator, String rootFolderName) {
 		List<String> keyList = new ArrayList<String>();
 		
-		if(StringUtils.isNullOrEmpty(rootFolderName)){
+		if (StringUtils.isNullOrEmpty(rootFolderName)) {
 			rootFolderName = "";
 		}
 		
-		if(StringUtils.isNullOrEmpty(separator)){
+		if (StringUtils.isNullOrEmpty(separator)) {
 			separator = "/";
 		}
 		
-		if(inFile.isDirectory()){
+		if (inFile.isDirectory()) {
 			File[] innerFiles = inFile.listFiles();
-			for(File innerFile:innerFiles){
-				if(innerFile.isDirectory()){
+			for (File innerFile : innerFiles) {
+				if (innerFile.isDirectory()) {
 					String parentFolderName = innerFile.getName();
-					if(!rootFolderName.isEmpty()){
+					if (!rootFolderName.isEmpty()) {
 						parentFolderName = rootFolderName + separator + parentFolderName;
 					}
 					keyList.addAll(getFileNamesFromFolder(innerFile, parentFolderName, separator));
-				}else{
+				} else {
 					keyList.addAll(getFileNamesFromFolder(innerFile, rootFolderName, separator));
 				}
 			}
-		}else{
+		} else {
 			String fileName = inFile.getName();
 			fileName = fileName.substring(0, fileName.lastIndexOf('.'));
 			String prefix = "";
-			if(!rootFolderName.isEmpty()){
+			if (!rootFolderName.isEmpty()) {
 				prefix += rootFolderName + separator;
 			}
 			
@@ -56,8 +56,8 @@ public class FileUtils extends org.apache.commons.io.FileUtils{
 	public static Collection<File> listDirs(File inFile) {
 		List<File> ret = new ArrayList<File>();
 		
-		for( File f : inFile.listFiles() ) {
-			if( f.isDirectory() ) {
+		for (File f : inFile.listFiles()) {
+			if (f.isDirectory()) {
 				ret.add(f);
 			}
 		}
@@ -76,13 +76,13 @@ public class FileUtils extends org.apache.commons.io.FileUtils{
 	/// @returns the file value if possible, else returns the fallback value
 	///
 	public static String readFileToString_withFallback(File inFile, String encoding, String fallback) {
-		if(inFile == null || !inFile.exists() || !inFile.isFile() || !inFile.canRead()) {
+		if (inFile == null || !inFile.exists() || !inFile.isFile() || !inFile.canRead()) {
 			return fallback;
 		}
 		
 		try {
 			return readFileToString(inFile, encoding);
-		} catch(IOException e) {
+		} catch (IOException e) {
 			return fallback;
 		}
 	}
@@ -98,13 +98,12 @@ public class FileUtils extends org.apache.commons.io.FileUtils{
 	///
 	public static boolean writeStringToFile_ifDifferant(File inFile, String encoding, String data) throws IOException {
 		String original = readFileToString_withFallback(inFile, encoding, "");
-		if(original.equals(data)) {
+		if (original.equals(data)) {
 			return false;
 		}
 		
 		writeStringToFile(inFile, data, encoding);
 		return true;
 	}
-	
 	
 }

@@ -12,21 +12,21 @@ public class PiHttpResponse {
 	private Map<String, String> _cookies;
 	private InputStream _responseBody;
 	
-	public PiHttpResponse(Map<String, String> headers, Map<String, String> cookies, InputStream responseBody){
+	public PiHttpResponse(Map<String, String> headers, Map<String, String> cookies, InputStream responseBody) {
 		_headers = headers;
 		_cookies = cookies;
 		_responseBody = responseBody;
 	}
 	
-	public Map<String, String> getHeaders(){
+	public Map<String, String> getHeaders() {
 		return _headers;
 	}
 	
-	public Map<String, String> getCookies(){
+	public Map<String, String> getCookies() {
 		return _cookies;
 	}
 	
-	public InputStream getResponseBody(){
+	public InputStream getResponseBody() {
 		return _responseBody;
 	}
 }

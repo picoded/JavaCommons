@@ -198,8 +198,7 @@ public class FileServlet extends HttpServlet {
 		HttpServletRequest servletRequest, //
 		HttpServletResponse servletResponse, //
 		boolean headersOnly, //
-		File file
-	) throws IOException {
+		File file) throws IOException {
 		
 		// Validate the file
 		//-------------------------------------------
@@ -219,27 +218,27 @@ public class FileServlet extends HttpServlet {
 		long length = file.length();
 		long lastModified = file.lastModified();
 		String eTag = fileName + "-" + length + "-" + lastModified;
-		long expires = (fileExpireTime > 0)? (System.currentTimeMillis() + fileExpireTime) : 0;
+		long expires = (fileExpireTime > 0) ? (System.currentTimeMillis() + fileExpireTime) : 0;
 		
 		// If-None-Match header should contain "*" or ETag. If so, then return 304.
 		String ifNoneMatch = servletRequest.getHeader("If-None-Match");
 		if (ifNoneMatch != null && headerMatch(ifNoneMatch, eTag)) {
-			 servletResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-			 servletResponse.setHeader("ETag", eTag); // Required in 304.
-			 if( expires > 0 ) {
-			 	servletResponse.setDateHeader("Expires", expires); 
-			 }
-			 return;
+			servletResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+			servletResponse.setHeader("ETag", eTag); // Required in 304.
+			if (expires > 0) {
+				servletResponse.setDateHeader("Expires", expires);
+			}
+			return;
 		}
-
+		
 		// If-Modified-Since header should be greater than LastModified. If so, then return 304.
 		// This header is ignored if any If-None-Match header is specified.
 		long ifModifiedSince = servletRequest.getDateHeader("If-Modified-Since");
 		if (ifNoneMatch == null && ifModifiedSince != -1 && ifModifiedSince + cacheNetworkJitterTolerance > lastModified) {
 			servletResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
 			servletResponse.setHeader("ETag", eTag); // Required in 304.
-			if( expires > 0 ) {
-			  servletResponse.setDateHeader("Expires", expires); 
+			if (expires > 0) {
+				servletResponse.setDateHeader("Expires", expires);
 			}
 			return;
 		}
@@ -253,7 +252,7 @@ public class FileServlet extends HttpServlet {
 			servletResponse.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
 			return;
 		}
-
+		
 		// If-Unmodified-Since header should be greater than LastModified. If not, then return 412.
 		long ifUnmodifiedSince = servletRequest.getDateHeader("If-Unmodified-Since");
 		if (ifUnmodifiedSince != -1 && ifUnmodifiedSince + 1000 <= lastModified) {
@@ -267,7 +266,7 @@ public class FileServlet extends HttpServlet {
 		// Prepare some variables. The full Range represents the complete file.
 		Range full = new Range(0, length - 1, length);
 		List<Range> ranges = new ArrayList<Range>();
-
+		
 		// Validate and process Range and If-Range headers.
 		String range = servletRequest.getHeader("Range");
 		if (range != null) {
@@ -277,7 +276,7 @@ public class FileServlet extends HttpServlet {
 				servletResponse.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
 				return;
 			}
-
+			
 			// If-Range header should either match ETag or be greater then LastModified. If not,
 			// then return full file.
 			String ifRange = servletRequest.getHeader("If-Range");
@@ -291,7 +290,7 @@ public class FileServlet extends HttpServlet {
 					ranges.add(full);
 				}
 			}
-
+			
 			// If any valid If-Range header, then process each part of byte range.
 			if (ranges.isEmpty()) {
 				for (String part : range.substring(6).split(",")) {
@@ -301,17 +300,17 @@ public class FileServlet extends HttpServlet {
 					long end = sublong(part, part.indexOf("-") + 1, part.length());
 					
 					if (start == -1) {
-					   start = length - end;
-					   end = length - 1;
+						start = length - end;
+						end = length - 1;
 					} else if (end == -1 || end > length - 1) {
-					   end = length - 1;
+						end = length - 1;
 					}
 					
 					// Check if Range is syntactically valid. If not, then return 416.
 					if (start > end) {
-					   servletResponse.setHeader("Content-Range", "bytes */" + length); // Required in 416.
-					   servletResponse.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-					   return;
+						servletResponse.setHeader("Content-Range", "bytes */" + length); // Required in 416.
+						servletResponse.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+						return;
 					}
 					
 					// Add range.
@@ -319,22 +318,22 @@ public class FileServlet extends HttpServlet {
 				}
 			}
 		}
-
+		
 		// Download type and gzip support check
 		//-------------------------------------------
-
+		
 		// Get content type by file name and set default GZIP support and content disposition.
-		String  contentType = servletRequest.getServletContext().getMimeType(fileName);
+		String contentType = servletRequest.getServletContext().getMimeType(fileName);
 		boolean acceptsGzip = false;
-		String  disposition = "inline";
-
+		String disposition = "inline";
+		
 		// If content type is unknown, then set the default value.
 		// For all content types, see: http://www.w3schools.com/media/media_mimeref.asp
 		// To add new content types, add new mime-mapping entry in web.xml.
 		if (contentType == null) {
 			contentType = "application/octet-stream";
 		}
-
+		
 		if (contentType.startsWith("text")) {
 			//
 			// If content type is text, then determine whether GZIP content encoding is supported by
@@ -369,7 +368,7 @@ public class FileServlet extends HttpServlet {
 		// Prepare streams.
 		RandomAccessFile input = null;
 		OutputStream output = null;
-
+		
 		try {
 			// Open streams.
 			input = new RandomAccessFile(file, "r");
@@ -380,7 +379,7 @@ public class FileServlet extends HttpServlet {
 				Range r = full;
 				servletResponse.setContentType(contentType);
 				servletResponse.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/" + r.total);
-
+				
 				if (!headersOnly) {
 					if (acceptsGzip) {
 						// Use GZIP in response
@@ -390,7 +389,7 @@ public class FileServlet extends HttpServlet {
 						// Direct raw ouput (length is predictable, while gzip it isnt)
 						servletResponse.setHeader("Content-Length", String.valueOf(r.length));
 					}
-
+					
 					// Copy full range.
 					copy(input, output, r.start, r.length);
 				}
@@ -407,15 +406,15 @@ public class FileServlet extends HttpServlet {
 					copy(input, output, r.start, r.length);
 				}
 			} else {
-
+				
 				// Return multiple parts of file.
 				servletResponse.setContentType("multipart/byteranges; boundary=" + MULTIPART_BYTERANGES);
 				servletResponse.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
-
+				
 				if (!headersOnly) {
 					// Cast back to ServletOutputStream to get the easy println methods.
 					ServletOutputStream sos = (ServletOutputStream) output;
-
+					
 					// Copy multi part range.
 					for (Range r : ranges) {
 						// Add multipart boundary and header fields for every range.
@@ -423,11 +422,11 @@ public class FileServlet extends HttpServlet {
 						sos.println("--" + MULTIPART_BYTERANGES);
 						sos.println("Content-Type: " + contentType);
 						sos.println("Content-Range: bytes " + r.start + "-" + r.end + "/" + r.total);
-
+						
 						// Copy single part range of multi part range.
 						copy(input, output, r.start, r.length);
 					}
-
+					
 					// End with multipart boundary.
 					sos.println();
 					sos.println("--" + MULTIPART_BYTERANGES + "--");

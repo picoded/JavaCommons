@@ -58,7 +58,7 @@ import picoded.webUtils._RequestHttp.RequestHttp_apache;
 
 @ClientEndpoint
 public class RequestHttp {
-
+	
 	public String _baseURL = "http://localhost";
 	
 	/// Creates an instance with the target base URL
@@ -90,10 +90,10 @@ public class RequestHttp {
 		
 		try {
 			sendMessage(message);
-			while( _sendAndWait_message == null ) {
+			while (_sendAndWait_message == null) {
 				Thread.sleep(0, 250000);
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
 			_sendAndWait_block = false;
@@ -114,14 +114,14 @@ public class RequestHttp {
 	/// Ensures that the websocket is connected
 	public void websocketConnect() {
 		try {
-			if( container == null ) {
+			if (container == null) {
 				container = ContainerProvider.getWebSocketContainer();
 			}
 			
-			if( websocketSession == null ) {
-				websocketSession = container.connectToServer(this, new URI(_baseURL) );
+			if (websocketSession == null) {
+				websocketSession = container.connectToServer(this, new URI(_baseURL));
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -145,7 +145,7 @@ public class RequestHttp {
 	
 	@OnMessage
 	public void _onMessage(String message) {
-		if( _sendAndWait_block ) {
+		if (_sendAndWait_block) {
 			_sendAndWait_message = message;
 			_sendAndWait_block = false;
 		} else if (this.websocketMessageHandler != null) {
@@ -156,27 +156,24 @@ public class RequestHttp {
 	///////////////////////////////////////////////////////////
 	// Static core functions?
 	///////////////////////////////////////////////////////////
-	protected static ResponseHttp asyncHttp_raw(
-		HttpRequestType requestType, 
-		String requestURL, //Request URL, with GET parameters if needed
-		Map<String, String> headers,
-		Map<String, String[]> postParams
-	) {
-		AsyncHttpClient.BoundRequestBuilder req = RequestHttpUtils.asyncHttpClient_fromRequestType( requestType, requestURL, true );
+	protected static ResponseHttp asyncHttp_raw(HttpRequestType requestType, String requestURL, //Request URL, with GET parameters if needed
+		Map<String, String> headers, Map<String, String[]> postParams) {
+		AsyncHttpClient.BoundRequestBuilder req = RequestHttpUtils.asyncHttpClient_fromRequestType(requestType,
+			requestURL, true);
 		
 		//set headers
-		if(headers != null && headers.size() > 0) {
-			for(String key : headers.keySet()){
-				req.addHeader(key,  headers.get(key));
+		if (headers != null && headers.size() > 0) {
+			for (String key : headers.keySet()) {
+				req.addHeader(key, headers.get(key));
 			}
 		}
 		
 		//set form params
-		if(postParams != null && postParams.size() > 0){
+		if (postParams != null && postParams.size() > 0) {
 			List<Param> formParams = new ArrayList<Param>();
-			for(String postKey : postParams.keySet()){
+			for (String postKey : postParams.keySet()) {
 				String[] postVals = postParams.get(postKey);
-				for(String postVal : postVals){
+				for (String postVal : postVals) {
 					formParams.add(new Param(postKey, postVal));
 				}
 			}
@@ -197,10 +194,10 @@ public class RequestHttp {
 			public STATE onBodyPartReceived(final HttpResponseBodyPart content) throws Exception {
 				byte[] bytes = content.getBodyPartBytes();
 				
-				try{
+				try {
 					os.write(bytes);
 					os.flush();
-				} catch (Exception ex){
+				} catch (Exception ex) {
 					throw new RuntimeException(ex);
 				}
 				
@@ -240,15 +237,16 @@ public class RequestHttp {
 	}
 	
 	public static ResponseHttp get(String requestURL, Map<String, String> headers) throws IOException {
-		return asyncHttp_raw( HttpRequestType.GET, requestURL, headers, null );
+		return asyncHttp_raw(HttpRequestType.GET, requestURL, headers, null);
 	}
 	
 	/// Performs a basic post request
-	public static ResponseHttp post( String requestURL, Map<String,String[]> postMap ) throws IOException {
+	public static ResponseHttp post(String requestURL, Map<String, String[]> postMap) throws IOException {
 		return asyncHttp_raw(HttpRequestType.POST, requestURL, null, postMap);
 	}
 	
-	public static ResponseHttp post( String requestURL, Map<String, String> headers, Map<String,String[]> postMap ) throws IOException {
+	public static ResponseHttp post(String requestURL, Map<String, String> headers, Map<String, String[]> postMap)
+		throws IOException {
 		return asyncHttp_raw(HttpRequestType.POST, requestURL, headers, postMap);
 	}
 	

@@ -17,33 +17,37 @@ public interface ResponseHttp {
 	
 	/// Wait for completed header request, called automatically 
 	/// when getting InputStream / cookies / headers
-	public default void waitForCompletedHeaders() { };
+	public default void waitForCompletedHeaders() {
+	};
 	
 	/// Wait for completed request, called automatically
 	/// when using toString / toMap
-	public default void waitForCompletedRequest() { };
+	public default void waitForCompletedRequest() {
+	};
 	
 	///////////////////////////////////////////////////
 	// Response handling
 	///////////////////////////////////////////////////
 	
 	/// Gets the response content
-	public default InputStream inputStream() { return null; };
+	public default InputStream inputStream() {
+		return null;
+	};
 	
 	/// Gets the response content as a string
 	public String toString();
 	
 	/// Converts the result string into a map, via JSON's
-	public default GenericConvertMap<String,Object> toMap() { 
+	public default GenericConvertMap<String, Object> toMap() {
 		waitForCompletedRequest();
 		
 		String r = toString();
-		if( r == null || r.length() <= 1 ) {
+		if (r == null || r.length() <= 1) {
 			return null;
 		}
 		
-		Map<String,Object> rMap = ConvertJSON.toMap( r );
-		if( rMap == null ) {
+		Map<String, Object> rMap = ConvertJSON.toMap(r);
+		if (rMap == null) {
 			return null;
 		} else {
 			return ProxyGenericConvertMap.ensureGenericConvertMap(rMap);
@@ -51,13 +55,19 @@ public interface ResponseHttp {
 	};
 	
 	/// Gets the response code
-	public default int statusCode() { return -1; };
+	public default int statusCode() {
+		return -1;
+	};
 	
 	/// Gets the header map. 
-	public default Map<String, String[]> headersMap() { return null; };
+	public default Map<String, String[]> headersMap() {
+		return null;
+	};
 	
 	/// Gets the cookies map. 
-	public default Map<String, String[]> cookiesMap() { return null; };
+	public default Map<String, String[]> cookiesMap() {
+		return null;
+	};
 	
 	///////////////////////////////////////////////////
 	// Websocket handling
@@ -86,8 +96,8 @@ public interface ResponseHttp {
 	/// @Params    handler, the message handler listener
 	///
 	/// @Returns   the previous handler if set, if replace is enabled
-	public default void setMessageHandler( Consumer<String> handler ) {
-		if( replaceMessageHandler( handler ) != null ) {
+	public default void setMessageHandler(Consumer<String> handler) {
+		if (replaceMessageHandler(handler) != null) {
 			throw new RuntimeException("Previous handler exists, if this is intended use replaceMessageHandler");
 		}
 	}
@@ -98,7 +108,7 @@ public interface ResponseHttp {
 	/// @Params    handler, the message handler listener
 	///
 	/// @Returns   the previous handler if set, if replace is enabled
-	public default Consumer<String> replaceMessageHandler( Consumer<String> handler ) {
+	public default Consumer<String> replaceMessageHandler(Consumer<String> handler) {
 		throw new UnsupportedOperationException("Use RequestHttp.websocket to support websocket operations");
 	};
 	

@@ -14,31 +14,29 @@ import picoded.conv.ConvertJSON;
 import picoded.webTemplateEngines.JSML.JSMLForm;
 import picoded.webTemplateEngines.JSML.JSMLFormSet;
 
-public class JSMLForm_test{
+public class JSMLForm_test {
 	
 	static JSMLForm jsmlForm = null;
 	static JSMLFormSet jsmlFormSet = null;
 	static Map<String, Object> data = null;
 	
 	/// @TODO : =.= stop absoluting path to your PC only, this test fails on other computers
-//	static String rootFolder = "C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/JSML"; //absolute root folder path
-//	static String contextFolder = "C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/JSML"; //on pc, absolute path, but on tomcat, its contextURI
-	
-	
+	//	static String rootFolder = "C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/JSML"; //absolute root folder path
+	//	static String contextFolder = "C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/JSML"; //on pc, absolute path, but on tomcat, its contextURI
 	
 	static String rootFolder = "./test-files/test-specific/htmlGenerator/JSML"; //absolute root folder path
 	static String contextFolder = "./test-files/test-specific/htmlGenerator/JSML";
 	static String tempFolder = "tmp"; //absolute path to resource folder
 	
 	@BeforeClass
-	public static void classSetUp(){
+	public static void classSetUp() {
 		jsmlFormSet = new JSMLFormSet(rootFolder, contextFolder);
 		
 		jsmlForm = new JSMLForm(rootFolder, contextFolder, tempFolder);
 		
 		assertNotNull(jsmlForm);
 		
-		try{
+		try {
 			File declareFile = new File(rootFolder + "/formDeclare.json");
 			String declareFileString = FileUtils.readFileToString(declareFile);
 			jsmlForm.setDefinition(declareFileString);
@@ -47,16 +45,16 @@ public class JSMLForm_test{
 			String dataFileString = FileUtils.readFileToString(dataFile);
 			data = ConvertJSON.toMap(dataFileString);
 			
-		}catch(Exception e){
+		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
 	}
 	
-//	@Test
-	public void generateHTMLTest(){
+	//	@Test
+	public void generateHTMLTest() {
 		//to remove
 		jsmlForm = new JSMLForm(rootFolder + "/prefixtest", contextFolder + "/prefixtest", tempFolder);
-		try{
+		try {
 			File declareFile = new File(rootFolder + "/prefixtest/formDeclare.json");
 			String declareFileString = FileUtils.readFileToString(declareFile);
 			jsmlForm.setDefinition(declareFileString);
@@ -65,7 +63,7 @@ public class JSMLForm_test{
 			String dataFileString = FileUtils.readFileToString(dataFile);
 			data = ConvertJSON.toMap(dataFileString);
 			
-		}catch(Exception e){
+		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}//to remove
 		
@@ -75,67 +73,67 @@ public class JSMLForm_test{
 		String rawHTML = sb.toString();
 		assertFalse(rawHTML.isEmpty());
 		
-		try{
-			FileWriter fw = new FileWriter(new File(rootFolder+"/generated/generatedHTML.html"));
+		try {
+			FileWriter fw = new FileWriter(new File(rootFolder + "/generated/generatedHTML.html"));
 			fw.write(rawHTML);
 			fw.flush();
 			fw.close();
-		}catch(Exception e){
+		} catch (Exception e) {
 			
 		}
 	}
 	
-//	@Test
-	public void generateHTMLDataTest(){
+	//	@Test
+	public void generateHTMLDataTest() {
 		StringBuilder sb = jsmlForm.generateHTML(data, false);
 		assertNotNull(sb);
 		
 		String rawHTML = sb.toString();
 		assertFalse(rawHTML.isEmpty());
 		
-		try{
-			FileWriter fw = new FileWriter(new File(rootFolder+"/generated/generatedDisplayHTML.html"));
+		try {
+			FileWriter fw = new FileWriter(new File(rootFolder + "/generated/generatedDisplayHTML.html"));
 			fw.write(rawHTML);
 			fw.flush();
 			fw.close();
-		}catch(Exception e){
+		} catch (Exception e) {
 			
 		}
 	}
 	
-//	@Test
-	public void generateDisplayTest(){
+	//	@Test
+	public void generateDisplayTest() {
 		StringBuilder sb = jsmlForm.generateHTML(data, true);
 		assertNotNull(sb);
 		
 		String rawHTML = sb.toString();
 		assertFalse(rawHTML.isEmpty());
 		
-		try{
-			FileWriter fw = new FileWriter(new File(rootFolder+"/generated/generatedDisplay.html"));
+		try {
+			FileWriter fw = new FileWriter(new File(rootFolder + "/generated/generatedDisplay.html"));
 			fw.write(rawHTML);
 			fw.flush();
 			fw.close();
-		}catch(Exception e){
+		} catch (Exception e) {
 			
 		}
 	}
 	
-//	@Test
-	public void generatePDFTest(){
+	//	@Test
+	public void generatePDFTest() {
 		byte[] pdfData = jsmlForm.generatePDF(data);
 		assertNotNull(pdfData);
 		assertTrue(pdfData.length > 0);
 	}
 	
 	@Test
-	public void multipleDeclareTest(){
-		try{
+	public void multipleDeclareTest() {
+		try {
 			File dataFile = new File(rootFolder + "/main/dummyData.json");
 			String dataFileString = FileUtils.readFileToString(dataFile);
 			data = ConvertJSON.toMap(dataFileString);
 			
-		}catch(Exception e){
+		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
 		
@@ -144,20 +142,20 @@ public class JSMLForm_test{
 		String rawHTML = jsmlForm.generateHTML(data, false).toString();
 		assertFalse(rawHTML.isEmpty());
 		
-		try{
-			FileWriter fw = new FileWriter(new File(rootFolder+"/main/multipleDeclare.html"));
+		try {
+			FileWriter fw = new FileWriter(new File(rootFolder + "/main/multipleDeclare.html"));
 			fw.write(rawHTML);
 			fw.flush();
 			fw.close();
-		}catch(Exception e){
+		} catch (Exception e) {
 			
 		}
 	}
 	
 	@Test
-	public void clearTempFilesTest(){
+	public void clearTempFilesTest() {
 		//jsmlForm = jsmlFormSet.get("main");
-		String tmpFolderPath  = rootFolder + "/" + tempFolder;
+		String tmpFolderPath = rootFolder + "/" + tempFolder;
 		
 		// create a file in temp folder
 		createFile(tmpFolderPath);
@@ -166,13 +164,13 @@ public class JSMLForm_test{
 		jsmlFormSet.clearTempFiles();
 		//jsmlForm.clearTempFilesOlderThenGivenAgeInSeconds(1);
 		
-		int count  = 0;
+		int count = 0;
 		fileCount(tmpFolderPath, count);
 		
 		assertEquals(0, count);
 	}
 	
-    private void fileCount(String dirPath, int count) {
+	private void fileCount(String dirPath, int count) {
 		File folder = new File(dirPath);
 		File[] files = folder.listFiles();
 		
@@ -184,30 +182,31 @@ public class JSMLForm_test{
 				} else {
 					count++;
 				}
-		}
-    }
+			}
+	}
 	
-    private void createFile(String dirPath) {
+	private void createFile(String dirPath) {
 		BufferedWriter fileWriter = null;
 		try {
 			File dirFile = new File(dirPath);
-			if(!dirFile.exists()){
+			if (!dirFile.exists()) {
 				dirFile.mkdirs();
 			}
 			// Create file
 			fileWriter = new BufferedWriter(new FileWriter(dirPath + "/test.txt"));
 			// Write to output stream
 			fileWriter.write("Hello Java");
-		} catch(IOException ioe) {
+		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		} finally {
 			// Close the output stream
 			if (fileWriter != null) {
 				try {
 					fileWriter.close();
-				} catch(Exception e) {}
+				} catch (Exception e) {
+				}
 			}
 		}
-    }
-    
+	}
+	
 }

@@ -19,7 +19,7 @@ public class MoreThan extends ConditionBase {
 	/// @param   default argument name to test against
 	/// @param   default argument map to get test value
 	///
-	public MoreThan(String field, String argName, Map<String,Object> defaultArgMap) {
+	public MoreThan(String field, String argName, Map<String, Object> defaultArgMap) {
 		super(field, argName, defaultArgMap);
 	}
 	
@@ -39,7 +39,7 @@ public class MoreThan extends ConditionBase {
 	/// @returns  boolean indicating success or failure
 	///
 	protected boolean testValues(Object fieldValue, Object argValue) {
-		if( argValue == null || fieldValue == null ) {
+		if (argValue == null || fieldValue == null) {
 			return false;
 		} else {
 			return CompareUtils.dynamicCompare(fieldValue, argValue) > 0;
@@ -60,4 +60,4 @@ public class MoreThan extends ConditionBase {
 		return QueryType.MORE_THAN;
 	}
 	
-} 
+}

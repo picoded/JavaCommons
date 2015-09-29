@@ -37,13 +37,13 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// Constructor full setup
 	protected AccountObject(AccountTable accTable, JStruct_MetaTable inTable, String inOID, boolean isCompleteData) {
-		super( inTable, inOID );
+		super(inTable, inOID);
 		mainTable = accTable;
 	}
 	
 	/// Simplified Constructor
 	protected AccountObject(AccountTable accTable, String inOID) {
-		super( (JStruct_MetaTable)(accTable.accountMeta), inOID  );
+		super((JStruct_MetaTable) (accTable.accountMeta), inOID);
 		mainTable = accTable;
 	}
 	
@@ -134,16 +134,16 @@ public class AccountObject extends JStruct_MetaObject {
 		
 		// The old name list, to check if new name already is set
 		Set<String> oldNamesList = getNames();
-		if( !(Arrays.asList(oldNamesList).contains(name)) ) {
-			if( !setName(name) ) { //does not own the name, but fail to set =(
+		if (!(Arrays.asList(oldNamesList).contains(name))) {
+			if (!setName(name)) { //does not own the name, but fail to set =(
 				return false;
 			}
 		}
 		
 		// Iterate the names, delete uneeded ones
-		for(String oldName : oldNamesList) {
+		for (String oldName : oldNamesList) {
 			// Skip new name
-			if(oldName.equals(name)) {
+			if (oldName.equals(name)) {
 				continue;
 			}
 			removeName(oldName);
@@ -151,7 +151,6 @@ public class AccountObject extends JStruct_MetaObject {
 		
 		return true;
 	}
-	
 	
 	// Group management utility function
 	//-------------------------------------------------------------------------
@@ -161,11 +160,11 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// Gets the child map (cached?)
 	protected MetaObject group_userToRoleMap() {
-		if( _group_userToRoleMap != null ) {
+		if (_group_userToRoleMap != null) {
 			return _group_userToRoleMap;
 		}
 		
-		return ( _group_userToRoleMap = mainTable.group_childRole.uncheckedGet( this._oid() ) );
+		return (_group_userToRoleMap = mainTable.group_childRole.uncheckedGet(this._oid()));
 	}
 	
 	// Group status check
@@ -174,8 +173,8 @@ public class AccountObject extends JStruct_MetaObject {
 	/// Returns if set as group
 	public boolean isGroup() {
 		Object status = this.get("isGroup");
-		if( status instanceof Number && //
-		   ((Number)status).intValue() >= 1 ) {
+		if (status instanceof Number && //
+			((Number) status).intValue() >= 1) {
 			return true;
 		} else {
 			return false;
@@ -185,7 +184,7 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// Sets if the account is a group
 	public void setGroupStatus(boolean enabled) {
-		if( enabled ) {
+		if (enabled) {
 			this.put("isGroup", new Integer(1));
 		} else {
 			this.put("isGroup", new Integer(0));
@@ -200,62 +199,62 @@ public class AccountObject extends JStruct_MetaObject {
 	//-------------------------------------------------------------------------
 	
 	/// Gets and returns the member role, if it exists
-	public String getMemberRole( AccountObject memberObject ) {
-		return group_userToRoleMap().getString( memberObject._oid() ); 
+	public String getMemberRole(AccountObject memberObject) {
+		return group_userToRoleMap().getString(memberObject._oid());
 	}
 	
 	/// Gets and returns the member meta map, if it exists
 	/// Only returns if member exists, else null
-	public MetaObject getMember( AccountObject memberObject ) {
+	public MetaObject getMember(AccountObject memberObject) {
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
 		
-		if( level == null || level.length() <= 0 ) {
+		if (level == null || level.length() <= 0) {
 			return null;
 		}
 		
-		return mainTable.groupChild_meta.uncheckedGet( this._oid()+"-"+memberOID );
+		return mainTable.groupChild_meta.uncheckedGet(mainTable.getGroupChildMetaKey(this._oid(), memberOID));
 	}
 	
 	/// Gets and returns the member meta map, if it exists
 	/// Only returns if member exists and matches role, else null
-	public MetaObject getMember( AccountObject memberObject, String role ) {
-		role = mainTable.validateMembershipRole( role );
+	public MetaObject getMember(AccountObject memberObject, String role) {
+		role = mainTable.validateMembershipRole(role);
 		
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
 		
-		if( level == null || !level.equals(role) ) {
+		if (level == null || !level.equals(role)) {
 			return null;
 		}
 		
-		return mainTable.groupChild_meta.uncheckedGet( this._oid()+"-"+memberOID );
+		return mainTable.groupChild_meta.uncheckedGet(this._oid() + "-" + memberOID);
 	}
 	
 	/// Adds the member to the group with the given role, if it was not previously added
 	///
 	/// Returns the group-member unique meta object, null if previously exists
-	public MetaObject addMember( AccountObject memberObject, String role ) {
+	public MetaObject addMember(AccountObject memberObject, String role) {
 		// Gets the existing object, if exists terminates
-		if( getMember( memberObject ) != null ) {
+		if (getMember(memberObject) != null) {
 			return null;
 		}
 		
 		// Set and return a new member object
-		return setMember( memberObject, role );
+		return setMember(memberObject, role);
 	}
 	
 	/// Adds the member to the group with the given role, or update the role if already added
 	///
 	/// Returns the group-member unique meta object
-	public MetaObject setMember( AccountObject memberObject, String role ) {
-		role = mainTable.validateMembershipRole( role );
+	public MetaObject setMember(AccountObject memberObject, String role) {
+		role = mainTable.validateMembershipRole(role);
 		
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
 		MetaObject childMeta = null;
 		
-		if( level == null || !level.equals( role ) ) {
+		if (level == null || !level.equals(role)) {
 			
 			memberObject.saveDelta();
 			setGroupStatus(true);
@@ -263,24 +262,24 @@ public class AccountObject extends JStruct_MetaObject {
 			group_userToRoleMap().put(memberOID, role);
 			group_userToRoleMap().saveDelta();
 			
-			childMeta = mainTable.groupChild_meta.uncheckedGet( this._oid()+"-"+memberOID );
-			childMeta.put( "role", role );
+			childMeta = mainTable.groupChild_meta.uncheckedGet(this._oid() + "-" + memberOID);
+			childMeta.put("role", role);
 			childMeta.saveDelta();
 		} else {
-			childMeta = mainTable.groupChild_meta.uncheckedGet( this._oid()+"-"+memberOID );
+			childMeta = mainTable.groupChild_meta.uncheckedGet(this._oid() + "-" + memberOID);
 		}
 		
 		return childMeta;
 	}
 	
-	public boolean removeMember(AccountObject memberObject){
-		if(!this.isGroup()){
+	public boolean removeMember(AccountObject memberObject) {
+		if (!this.isGroup()) {
 			return false;
 		}
 		
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
-
+		
 		group_userToRoleMap().remove(memberOID);
 		group_userToRoleMap().saveAll();
 		
@@ -293,19 +292,19 @@ public class AccountObject extends JStruct_MetaObject {
 	///
 	public String[] getMembers_id() {
 		List<String> retList = new ArrayList<String>();
-		for( String key : group_userToRoleMap().keySet() ) {
-			if( key.equals("_oid") ) {
+		for (String key : group_userToRoleMap().keySet()) {
+			if (key.equals("_oid")) {
 				continue;
 			}
 			retList.add(key);
 		}
-		return retList.toArray( new String[retList.size()] );
+		return retList.toArray(new String[retList.size()]);
 	}
 	
 	/// Returns the list of members in the group
 	///
 	public String[] getGroups_id() {
-		return mainTable.group_childRole.getFromKeyName_id( _oid() );
+		return mainTable.group_childRole.getFromKeyName_id(_oid());
 	}
 	
 	/// Gets all the members object related to the group
@@ -313,8 +312,8 @@ public class AccountObject extends JStruct_MetaObject {
 	public AccountObject[] getMembersAccountObject() {
 		String[] idList = getMembers_id();
 		AccountObject[] objList = new AccountObject[idList.length];
-		for(int a=0; a<idList.length; ++a) {
-			objList[a] = mainTable.getFromID( idList[a] );
+		for (int a = 0; a < idList.length; ++a) {
+			objList[a] = mainTable.getFromID(idList[a]);
 		}
 		return objList;
 	}
@@ -325,7 +324,7 @@ public class AccountObject extends JStruct_MetaObject {
 	/// Gets all the groups the user is in
 	///
 	public AccountObject[] getGroups() {
-		return mainTable.getFromIDArray( getGroups_id() );
+		return mainTable.getFromIDArray(getGroups_id());
 	}
 	
 	// Is super user group handling
@@ -335,11 +334,11 @@ public class AccountObject extends JStruct_MetaObject {
 	///
 	public boolean isSuperUser() {
 		AccountObject superUserGrp = mainTable.superUserGroup();
-		if(superUserGrp == null) {
+		if (superUserGrp == null) {
 			return false;
 		}
 		
-		String superUserGroupRole = superUserGrp.getMemberRole( this );
-		return ( superUserGroupRole != null && superUserGroupRole.equalsIgnoreCase("admin") );
+		String superUserGroupRole = superUserGrp.getMemberRole(this);
+		return (superUserGroupRole != null && superUserGroupRole.equalsIgnoreCase("admin"));
 	}
 }

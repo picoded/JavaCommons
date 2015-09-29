@@ -33,58 +33,59 @@ public class FormGenerator_test {
 		assertNotNull(testObj);
 	}
 	
-	private Map<String, Object> getPrefilledData(){
+	private Map<String, Object> getPrefilledData() {
 		File dataFile = new File("./test-files/test-specific/htmlGenerator/prefilledData.js");
-		try{
+		try {
 			String jsonDataString = FileUtils.readFileToString(dataFile);
-			Map<String,Object> prefilledData = ConvertJSON.toMap(jsonDataString);
+			Map<String, Object> prefilledData = ConvertJSON.toMap(jsonDataString);
 			return prefilledData;
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			return null;
 		}
 	}
 	
 	@Test
-	public void getHtmlAndPDFOutputFromJSONObject(){
+	public void getHtmlAndPDFOutputFromJSONObject() {
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONObject.js");
 		assertTrue(jsonObjectFile.canRead());
 		String jsonFileString = "";
-		try{
+		try {
 			jsonFileString = FileUtils.readFileToString(jsonObjectFile, Charset.defaultCharset());
-		} catch (Exception ex){
+		} catch (Exception ex) {
 			
 		}
 		
 		//html portion
 		String htmlVal = testObj.applyTemplating(jsonFileString, getPrefilledData());
 		File htmlFile = new File("./test-files/test-specific/htmlGenerator/generatedFiles/htmlFromJSONObject.html");
-		if(htmlFile.exists()){
+		if (htmlFile.exists()) {
 			htmlFile.delete();
 		}
 		
-		try{
+		try {
 			FileWriter writer = new FileWriter(htmlFile);
 			writer.write(htmlVal);
 			writer.flush();
 			writer.close();
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			
 		}
 		
 		//pdf portion
 		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(jsonFileString, getPrefilledData());
-		pdfReadyHtmlString = "<div class=\"pf_root\">"+pdfReadyHtmlString+"</div>";
-		File pdfReadyHtmlFile = new File("./test-files/test-specific/htmlGenerator/generatedFiles/pdfReadyHtmlFromJSONObject.html");
-		if(pdfReadyHtmlFile.exists()){
+		pdfReadyHtmlString = "<div class=\"pf_root\">" + pdfReadyHtmlString + "</div>";
+		File pdfReadyHtmlFile = new File(
+			"./test-files/test-specific/htmlGenerator/generatedFiles/pdfReadyHtmlFromJSONObject.html");
+		if (pdfReadyHtmlFile.exists()) {
 			pdfReadyHtmlFile.delete();
 		}
 		
-		try{
+		try {
 			FileWriter writer = new FileWriter(pdfReadyHtmlFile);
 			writer.write(pdfReadyHtmlString);
 			writer.flush();
 			writer.close();
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			
 		}
 		
@@ -93,46 +94,47 @@ public class FormGenerator_test {
 	}
 	
 	@Test
-	public void getHtmlAndPDFOutputFromJSONArray(){
+	public void getHtmlAndPDFOutputFromJSONArray() {
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONArray.js");
 		assertTrue(jsonObjectFile.canRead());
 		String jsonFileString = "";
-		try{
+		try {
 			jsonFileString = FileUtils.readFileToString(jsonObjectFile, Charset.defaultCharset());
-		} catch (Exception ex){
+		} catch (Exception ex) {
 			
 		}
 		
 		//html portion
 		String htmlVal = testObj.applyTemplating(jsonFileString, getPrefilledData());
 		File htmlFile = new File("./test-files/test-specific/htmlGenerator/generatedFiles/htmlFromJSONArray.html");
-		if(htmlFile.exists()){
+		if (htmlFile.exists()) {
 			htmlFile.delete();
 		}
 		
-		try{
+		try {
 			FileWriter writer = new FileWriter(htmlFile);
 			writer.write(htmlVal);
 			writer.flush();
 			writer.close();
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			
 		}
 		
 		//pdf portion
 		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(jsonFileString, getPrefilledData());
-		pdfReadyHtmlString = "<div class=\"pf_root\">"+pdfReadyHtmlString+"</div>";
-		File pdfReadyHtmlFile = new File("./test-files/test-specific/htmlGenerator/generatedFiles/pdfReadyHtmlFromJSONArray.html");
-		if(pdfReadyHtmlFile.exists()){
+		pdfReadyHtmlString = "<div class=\"pf_root\">" + pdfReadyHtmlString + "</div>";
+		File pdfReadyHtmlFile = new File(
+			"./test-files/test-specific/htmlGenerator/generatedFiles/pdfReadyHtmlFromJSONArray.html");
+		if (pdfReadyHtmlFile.exists()) {
 			pdfReadyHtmlFile.delete();
 		}
 		
-		try{
+		try {
 			FileWriter writer = new FileWriter(pdfReadyHtmlFile);
 			writer.write(pdfReadyHtmlString);
 			writer.flush();
 			writer.close();
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			
 		}
 		
@@ -141,46 +143,47 @@ public class FormGenerator_test {
 	}
 	
 	@Test
-	public void getHtmlAndPDFOutputFromJSONKeysObject(){
+	public void getHtmlAndPDFOutputFromJSONKeysObject() {
 		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONKeys.js");
 		assertTrue(jsonObjectFile.canRead());
 		String jsonFileString = "";
-		try{
+		try {
 			jsonFileString = FileUtils.readFileToString(jsonObjectFile, Charset.defaultCharset());
-		} catch (Exception ex){
+		} catch (Exception ex) {
 			
 		}
 		
 		//html portion
 		String htmlVal = testObj.applyTemplating(jsonFileString, getPrefilledData());
 		File htmlFile = new File("./test-files/test-specific/htmlGenerator/generatedFiles/htmlFromJSONKeys.html");
-		if(htmlFile.exists()){
+		if (htmlFile.exists()) {
 			htmlFile.delete();
 		}
 		
-		try{
+		try {
 			FileWriter writer = new FileWriter(htmlFile);
 			writer.write(htmlVal);
 			writer.flush();
 			writer.close();
-		}catch(Exception ex){ 
+		} catch (Exception ex) {
 			
 		}
 		
 		//pdf portion
 		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(jsonFileString, getPrefilledData());
-		pdfReadyHtmlString = "<div class=\"pf_root\">"+pdfReadyHtmlString+"</div>";
-		File pdfReadyHtmlFile = new File("./test-files/test-specific/htmlGenerator/generatedFiles/pdfReadyHtmlFromJSONKeys.html");
-		if(pdfReadyHtmlFile.exists()){
+		pdfReadyHtmlString = "<div class=\"pf_root\">" + pdfReadyHtmlString + "</div>";
+		File pdfReadyHtmlFile = new File(
+			"./test-files/test-specific/htmlGenerator/generatedFiles/pdfReadyHtmlFromJSONKeys.html");
+		if (pdfReadyHtmlFile.exists()) {
 			pdfReadyHtmlFile.delete();
 		}
 		
-		try{
+		try {
 			FileWriter writer = new FileWriter(pdfReadyHtmlFile);
 			writer.write(pdfReadyHtmlString);
 			writer.flush();
 			writer.close();
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			
 		}
 		

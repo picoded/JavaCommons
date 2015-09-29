@@ -24,7 +24,6 @@ public class CorePage_test {
 		testPage = null;
 	}
 	
-	
 	@Test
 	public void constructor() {
 		assertNotNull(testPage);

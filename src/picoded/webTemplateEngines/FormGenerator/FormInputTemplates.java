@@ -159,12 +159,8 @@ public class FormInputTemplates {
 		CaseInsensitiveHashMap<String, String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getStringValue();
 		
-		paramMap.put(HtmlTag.TYPE, "text");
-		if (fieldValue != null && fieldValue.length() >= 0) {
-			paramMap.put(HtmlTag.VALUE, fieldValue);
-		}
-		
-		StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.TEXTAREA, "pfi_inputTextBox pfi_input", paramMap);
+		StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.TEXTAREA, "pfi_inputTextBox pfi_input", null);
+		sbArr[0].append(fieldValue);
 		return sbArr[0].append(sbArr[1]);
 	};
 	

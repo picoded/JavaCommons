@@ -73,7 +73,7 @@ public class MetaTableApiBuilder {
 	/// ## HTTP Request Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                  |
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
 	/// | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
@@ -281,7 +281,7 @@ public class MetaTableApiBuilder {
 		//put data back into response
 		res.put("_oid", oid);
 		
-		String updateMode = req.getString("updateMode");
+		String updateMode = req.getString("updateMode", "delta");
 		res.put("updateMode", updateMode);
 		res.put("updateMeta", null);
 		

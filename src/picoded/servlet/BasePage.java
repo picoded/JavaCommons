@@ -148,7 +148,10 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		
 		// @TODO cookiePrefix to be loaded from configurable
 		// @TODO Config loading
-		// 
+		
+		// Gets the configuration setup
+		JConfig jc = JConfig();
+		
 		// httpUserAuthObj.loginLifetime = cStack.getInt( "userAuthCookie.loginLifetime", httpUserAuthObj.loginLifetime);
 		// httpUserAuthObj.loginRenewal = cStack.getInt( "userAuthCookie.loginRenewal", httpUserAuthObj.loginRenewal);
 		// httpUserAuthObj.rmberMeLifetime = cStack.getInt( "userAuthCookie.rememberMeLifetime", httpUserAuthObj.rmberMeLifetime);
@@ -352,5 +355,21 @@ public class BasePage extends JStackPage implements ServletContextListener {
 			return (_contextPath = sc.getRealPath("/")) + "/";
 		}
 		return super.getContextPath();
+	}
+	
+	/// Cached context path
+	protected String _contextURI = null;
+	
+	/// Returns the servlet contextual path : needed for base URI for page redirects / etc
+	public String getContextURI() {
+		if (_contextURI != null) {
+			return _contextURI;
+		}
+		
+		if (_servletContextEvent != null) {
+			ServletContext sc = _servletContextEvent.getServletContext();
+			return (_contextURI = sc.getContextPath()) + "/";
+		}
+		return (_contextURI = super.getContextURI());
 	}
 }

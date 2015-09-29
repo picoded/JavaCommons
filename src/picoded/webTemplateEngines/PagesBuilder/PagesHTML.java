@@ -92,7 +92,12 @@ public class PagesHTML {
 	/// Generates the needed map string template for the respective page
 	protected Map<String, Object> pageJMTEvars(String pageName) {
 		HashMap<String, Object> ret = new HashMap<String, Object>();
-		String pageURI = uriRootPrefix + "/" + pageName + "/";
+		
+		if (uriRootPrefix.endsWith("/")) {
+			uriRootPrefix = uriRootPrefix.substring(0, uriRootPrefix.length() - 1);
+		}
+		
+		String pageURI = uriRootPrefix + "/" + pageName;
 		
 		ret.put("PagesRootURI", uriRootPrefix);
 		ret.put("PageURI", pageURI);

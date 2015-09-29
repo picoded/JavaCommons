@@ -104,6 +104,10 @@ public class PagesBuilder {
 			set = set + "/";
 		}
 		
+		if (set.equals("/")) {
+			set = "./";
+		}
+		
 		uriRootPrefix = set;
 		if (html != null) {
 			html.uriRootPrefix = uriRootPrefix;
@@ -445,7 +449,8 @@ public class PagesBuilder {
 				requestWildcardUri = new String[] { pageName, itemName };
 			}
 			
-			boolean isDeveloperMode = page.JConfig().getBoolean("sys.developersMode.enabled", true);
+			boolean isDeveloperMode = (page.JConfig().getBoolean("developersMode.enabled", true) && page.JConfig()
+				.getBoolean("developersMode.PagesBuilder", true));
 			if (isDeveloperMode) {
 				// Load the respective page
 				if (requestWildcardUri.length == 2 && itemName.equals("index.html")) {

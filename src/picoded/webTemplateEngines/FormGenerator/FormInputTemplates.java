@@ -26,6 +26,31 @@ public class FormInputTemplates {
 		String text = node.getString(JsonKeys.TEXT, "");
 		String fieldValue = node.getStringValue();
 		
+		if (node.getString("type", "").equalsIgnoreCase("dropdown")) {
+			String tempfieldValue = getCorrectFieldValue(node);
+			
+			if (tempfieldValue != null && !tempfieldValue.isEmpty()) {
+				fieldValue = tempfieldValue;
+			}
+		}
+		
+		//thousands separator first
+		if (node.getString("type", "").equalsIgnoreCase("number")) {
+			boolean thousandsSeparate = node.getBoolean("thousandsSeparator", true);
+			if (thousandsSeparate) {
+				fieldValue = thousandsSeparator(fieldValue);
+			}
+		} else if (node.getString("type", "").equalsIgnoreCase("text")) {
+			boolean thousandsSeparate = node.getBoolean("thousandsSeparator", false);
+			if (thousandsSeparate) {
+				fieldValue = thousandsSeparator(fieldValue);
+			}
+		}
+		
+		String displayPrefix = node.getString("displayPrefix", "");
+		String displaySuffix = node.getString("displaySuffix", "");
+		fieldValue = displayPrefix + fieldValue + displaySuffix;
+		
 		String textAndField = text + fieldValue;
 		// if(textAndField == null || textAndField.length() <= 0) {
 		// 	return new StringBuilder();
@@ -33,6 +58,37 @@ public class FormInputTemplates {
 		
 		StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.DIV, pfiClass, null);
 		return sbArr[0].append(textAndField).append(sbArr[1]);
+	}
+	
+	//dropdown/select handling
+	private static String getCorrectFieldValue(FormNode node) {
+		String fieldValue = node.getStringValue();
+		
+		Object rawObject = node.get("options");
+		Map<String, String> keyValPair = null;
+		if (rawObject != null) {
+			keyValPair = optionsKeyNamePair(rawObject);
+		}
+		
+		if (keyValPair != null) {
+			return keyValPair.get(fieldValue);
+		}
+		
+		return "";
+	}
+	
+	private static String thousandsSeparator(String value) {
+		String ret = "";
+		if (value != null && !value.isEmpty()) {
+			int valAsInt = Integer.parseInt(value);
+			try {
+				ret = String.format("%,d", valAsInt);
+			} catch (Exception e) {
+				//silent fail, fallback to non separated numbers
+				ret = "" + valAsInt + "";
+			}
+		}
+		return ret;
 	}
 	
 	protected static FormInputInterface div = (node) -> {
@@ -103,12 +159,8 @@ public class FormInputTemplates {
 		CaseInsensitiveHashMap<String, String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getStringValue();
 		
-		paramMap.put(HtmlTag.TYPE, "text");
-		if (fieldValue != null && fieldValue.length() >= 0) {
-			paramMap.put(HtmlTag.VALUE, fieldValue);
-		}
-		
-		StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.TEXTAREA, "pfi_inputTextBox pfi_input", paramMap);
+		StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.TEXTAREA, "pfi_inputTextBox pfi_input", null);
+		sbArr[0].append(fieldValue);
 		return sbArr[0].append(sbArr[1]);
 	};
 	
@@ -597,10 +649,6 @@ public class FormInputTemplates {
 				ret.append(hiddenInputTag);
 			}
 		} else {
-			//paramMap.put(HtmlTag.TYPE, "text");
-			if (!fieldValue.isEmpty()) {
-				System.out.println(fieldValue);
-			}
 			node.replace("type", "text");
 			
 			StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.DIV, "pfi_inputDate pfi_input", null);
@@ -658,7 +706,7 @@ public class FormInputTemplates {
 			for (Object keyObj : dropDownMap.keySet()) {
 				String name = GenericConvert.toString(dropDownMap.get(keyObj), null);
 				
-				// Skip blank values 
+				// Skip blank values
 				if (name == null || name.length() <= 0) {
 					continue;
 				}
@@ -686,7 +734,7 @@ public class FormInputTemplates {
 				String key = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(
 					GenericConvert.toString(keyObj, null)).toLowerCase();
 				
-				// Skip blank keys 
+				// Skip blank keys
 				if (key == null || key.length() <= 0) {
 					continue;
 				}
@@ -706,12 +754,15 @@ public class FormInputTemplates {
 		if (optionsObject instanceof List) {
 			List<String> nameList = ListValueConv.objectToString((List<Object>) optionsObject);
 			for (String name : nameList) {
-				ret.put(RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(name).toLowerCase(), name);
+				String sanitisedName = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(name).toLowerCase();
+				sanitisedName = RegexUtils.removeAllWhiteSpace(sanitisedName);
+				ret.put(sanitisedName, name);
 			}
 		} else if (optionsObject instanceof Map) {
 			Map<String, Object> optionsMap = (Map<String, Object>) optionsObject;
 			for (String key : optionsMap.keySet()) {
 				String sanitisedKey = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(key).toLowerCase();
+				sanitisedKey = RegexUtils.removeAllWhiteSpace(sanitisedKey);
 				ret.put(sanitisedKey, (String) optionsMap.get(key));
 			}
 			

@@ -93,7 +93,6 @@ public class AccountLogin extends BasePage {
 			res.put("error", MISSING_LOGIN_SESSION);
 			return res;
 		}
-		
 		// Run actual logic
 		//----------------------------------------
 		return call.apply(req, res, basePageObj, accountTableObj, currentUser, null, null);
@@ -577,9 +576,10 @@ public class AccountLogin extends BasePage {
 					
 					groupList.add(newGroup);
 				}
-				groupMap.put("groups", groupList);
+				//				groupMap.put("groups", groupList);
+				commonInfo.put("groups", groupList);
 			}
-			commonInfo.put("groups", groupMap);
+			//			commonInfo.put("groups", groupMap);
 		}
 		
 		return commonInfo;
@@ -645,6 +645,7 @@ public class AccountLogin extends BasePage {
 				int limit = req.getInt("length");
 				
 				String[] insideGroupAny = req.getStringArray("insideGroup_any");
+				String[] hasGroupRole_any = req.getStringArray("hasGroupRole_any");
 				String groupStatus = req.getString("groupStatus");
 				
 				String orderByStr = req.getString("orderBy");
@@ -672,10 +673,10 @@ public class AccountLogin extends BasePage {
 					res.put("recordsFiltered", mtObj.queryCount(query, queryArgs));
 				}
 				
-				List<List<Object>> data = null;
+				List<List<Object>> data = new ArrayList<List<Object>>();
 				try {
 					data = list_GET_and_POST_inner(accountTableObj, draw, start, limit, headers, query, queryArgs,
-						orderByStr, insideGroupAny, groupStatus);
+						orderByStr, insideGroupAny, hasGroupRole_any, groupStatus);
 					res.put("data", data);
 				} catch (Exception e) {
 					res.put("error", e.getMessage());
@@ -686,8 +687,9 @@ public class AccountLogin extends BasePage {
 	};
 	
 	private static List<List<Object>> list_GET_and_POST_inner(AccountTable _metaTableObj, int draw, int start,
-		int length, String[] headers, String query, String[] queryArgs, String orderBy, String[] insideGroupAny,
-		String groupStatus) throws RuntimeException {
+		int length, String[] headers, String query, String[] queryArgs, String orderBy, String[] insideGroup_any,
+		String[] hasGroupRole_any, String groupStatus) throws RuntimeException {
+		
 		List<List<Object>> ret = new ArrayList<List<Object>>();
 		
 		if (_metaTableObj == null) {
@@ -726,28 +728,42 @@ public class AccountLogin extends BasePage {
 						}
 					}
 					
-					for (String header : headers) {
-						boolean checkInsideGroupAny = (insideGroupAny != null && insideGroupAny.length > 0);
-						boolean partOfGroup = false;
-						if (checkInsideGroupAny) {
-							String[] aoGroupIDs = ao.getGroups_id();
-							if (aoGroupIDs != null && aoGroupIDs.length > 0) {
-								for (String groupID : aoGroupIDs) {
-									if (partOfGroup) {
-										break;
-									}
-									
-									if (ArrayUtils.contains(insideGroupAny, groupID)) {
+					//check if part of any group
+					boolean checkInsideGroupAny = (insideGroup_any != null && insideGroup_any.length > 0);
+					boolean partOfGroup = false;
+					
+					boolean hasGroupRoleAny = (hasGroupRole_any != null && hasGroupRole_any.length > 0);
+					boolean partOfGroupRole = false;
+					
+					if (checkInsideGroupAny || hasGroupRoleAny) {
+						AccountObject[] aoGroups = ao.getGroups();
+						if (aoGroups != null) {
+							for (AccountObject aoGroup : aoGroups) {
+								if (!partOfGroup && insideGroup_any != null) {
+									if (ArrayUtils.contains(insideGroup_any, aoGroup._oid())) {
 										partOfGroup = true;
+									}
+								}
+								
+								if (!partOfGroupRole && hasGroupRole_any != null) {
+									String memberRole = aoGroup.getMemberRole(ao);
+									if (ArrayUtils.contains(hasGroupRole_any, memberRole)) {
+										partOfGroupRole = true;
 									}
 								}
 							}
 						}
 						
-						if (checkInsideGroupAny && !partOfGroup) {
+						if (checkInsideGroupAny && hasGroupRoleAny && !partOfGroup && !partOfGroupRole) {
+							continue;
+						} else if (checkInsideGroupAny && !partOfGroup) {
+							continue;
+						} else if (hasGroupRoleAny && !partOfGroupRole) {
 							continue;
 						}
-						
+					}
+					
+					for (String header : headers) {
 						if (header.equalsIgnoreCase("names")) {
 							if (ao != null) {
 								Set<String> aoNames = ao.getNames();
@@ -760,6 +776,7 @@ public class AccountLogin extends BasePage {
 							row.add(metaObj.get(header));
 						}
 					}
+					
 					ret.add(row);
 				}
 			}
@@ -1400,7 +1417,6 @@ return resMap;
 			AccountObject newAccount = accountTableObj.newObject(userName);
 			if (newAccount != null) {
 				if (isGroup) {
-					System.out.println("Setting group status to true");
 					newAccount.setGroupStatus(true);
 				}
 				
@@ -1408,11 +1424,11 @@ return resMap;
 				newAccount.putAll(givenMetaObj);
 				newAccount.saveAll();
 				
-				System.out.println("New account group status is: " + newAccount.isGroup());
-				
 				res.put("meta", newAccount);
 				res.put("accountID", newAccount._oid());
 			} else {
+				AccountObject existingAccount = accountTableObj.getFromName(userName);
+				res.put("accountID", existingAccount._oid());
 				res.put("error", "Object already exists in account Table");
 			}
 			
@@ -1466,7 +1482,7 @@ return resMap;
 				if (!accountID.isEmpty()) {
 					accObj = accountTableObj.getFromID(accountID);
 					
-					if (!accountName.isEmpty()) {
+					if (accountName != null && !accountName.isEmpty()) {
 						if (!accObj.getNames().contains(accountName)) {
 							res.put("error",
 								"accountName given does not match the names found for this account - delete unsuccessful");
@@ -1479,7 +1495,7 @@ return resMap;
 				} else if (!accountName.isEmpty()) {
 					accObj = accountTableObj.getFromName(accountName);
 					
-					if (!accountID.isEmpty()) {
+					if (accountID != null && !accountID.isEmpty()) {
 						if (!accObj._oid().equals(accountID)) {
 							res.put("error", "accountID given does not match the accounts _oid - delete unsuccessful");
 							return resMap;

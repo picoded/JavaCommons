@@ -78,7 +78,6 @@ public class AllConditions_test {
 	@Test
 	public void equals() {
 		Query cond = new Equals("hello", "my", sample_c);
-		System.out.println("Query.build() -> " + cond);
 		
 		assertNotNull(cond);
 		assertTrue(cond.test(sample_a));
@@ -95,7 +94,7 @@ public class AllConditions_test {
 		
 		assertNotNull(cond);
 		assertTrue(cond.test(sample_a));
-		assertFalse(cond.test(sample_b));
+		assertTrue(cond.test(sample_b));
 		
 		assertFalse(cond.test(sample_a, sample_d));
 		assertTrue(cond.test(sample_b, sample_d));

@@ -176,12 +176,22 @@ public class CompareUtils {
 		}
 	}
 	
-	public static boolean dynamicLike(Object o1, Object o2) {
-		System.out.println("o1.toString()#### " + o1.toString());
-		System.out.println("o2.toString()#### " + o2.toString());
-		if (o1.toString().startsWith(o2.toString()) || o1.toString().contains(o2.toString())) {
-			return true;
+	public static int stringLikeCompare(Object o1, Object o2) {
+		// Null handling
+		if (o1 == null) {
+			// Both equals
+			if (o2 == null) {
+				return 0;
+			} else { //o2 has value, therefor o1 is smaller
+				return -1;
+			}
+		} else if (o2 == null) { //o1 has value, therefor o1 is larger
+			return 1;
 		}
-		return false;
+		
+		if (o1.toString().startsWith(o2.toString()) || o1.toString().contains(o2.toString())) {
+			return 0;
+		}
+		return 1;
 	}
 }

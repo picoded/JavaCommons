@@ -126,57 +126,55 @@ public class JSql_Mysql extends JSql {
 		/// Check if create view query has an inner query.
 		/// If yes, create a view from the inner query and replace the inner query with created view.
 		if (qStringUpper.contains("CREATE VIEW")) {
-    		// get view name
-    		int indexAs = qStringUpper.indexOf("AS");
-    		String viewName = "";
-    		if (indexAs != -1) {
-    			viewName = qStringUpper.substring("CREATE VIEW".length(), indexAs);
-    		}
-    		// check if any inner query
-    		int indexOpeningBracket = -1;
-    		int indexFrom = qStringUpper.indexOf("FROM") + "FROM".length();
-    		// find if next char is bracket
-    		for (int i = indexFrom; i < qStringUpper.length(); i++) {
-    			if (qStringUpper.charAt(i) == ' ') {
-    				continue;
-    			}
-    			if (qStringUpper.charAt(i) == '(') {
-    				indexOpeningBracket = i;
-    			} else {
-    				break;
-    			}
-    		}
-
-            int indexClosingIndex = -1;
-    		String tmpViewName = null;
-    		String createViewQuery = null;
-    		if (indexOpeningBracket != -1) {
-    			tmpViewName = viewName;
-    			if (viewName.indexOf("_") != -1) {
-    				tmpViewName = viewName.split("_")[0];
-    			}
-    			tmpViewName += "_inner_view";
-    			indexClosingIndex = qStringUpper.indexOf(")",
-    					indexOpeningBracket);
-    
-    			String innerQuery = qStringUpper.substring(indexOpeningBracket + 1,
-    					indexClosingIndex);
-    			createViewQuery = "CREATE VIEW " + tmpViewName + " AS "
-    					+ innerQuery;
-    		}
-    		
-    		if ( createViewQuery != null && createViewQuery.trim().length() != 0 ) {
-    		    // execute query to drop the view if exist
-    		    String dropViewQuery = "DROP VIEW IF EXISTS " + tmpViewName;
-    		    
-    		    execute_raw( genericSqlParser(dropViewQuery) );
-    		    
-    		    /// execute the query to create view
-    		    execute_raw( genericSqlParser(createViewQuery) );
-    		    
-    		    // replace the inner query with created view name
-    		    qStringUpper = qStringUpper.substring(0, indexFrom) + tmpViewName + qStringUpper.substring(indexClosingIndex + 1);
-    		}
+			// get view name
+			int indexAs = qStringUpper.indexOf("AS");
+			String viewName = "";
+			if (indexAs != -1) {
+				viewName = qStringUpper.substring("CREATE VIEW".length(), indexAs);
+			}
+			// check if any inner query
+			int indexOpeningBracket = -1;
+			int indexFrom = qStringUpper.indexOf("FROM") + "FROM".length();
+			// find if next char is bracket
+			for (int i = indexFrom; i < qStringUpper.length(); i++) {
+				if (qStringUpper.charAt(i) == ' ') {
+					continue;
+				}
+				if (qStringUpper.charAt(i) == '(') {
+					indexOpeningBracket = i;
+				} else {
+					break;
+				}
+			}
+			
+			int indexClosingIndex = -1;
+			String tmpViewName = null;
+			String createViewQuery = null;
+			if (indexOpeningBracket != -1) {
+				tmpViewName = viewName;
+				if (viewName.indexOf("_") != -1) {
+					tmpViewName = viewName.split("_")[0];
+				}
+				tmpViewName += "_inner_view";
+				indexClosingIndex = qStringUpper.indexOf(")", indexOpeningBracket);
+				
+				String innerQuery = qStringUpper.substring(indexOpeningBracket + 1, indexClosingIndex);
+				createViewQuery = "CREATE VIEW " + tmpViewName + " AS " + innerQuery;
+			}
+			
+			if (createViewQuery != null && createViewQuery.trim().length() != 0) {
+				// execute query to drop the view if exist
+				String dropViewQuery = "DROP VIEW IF EXISTS " + tmpViewName;
+				
+				execute_raw(genericSqlParser(dropViewQuery));
+				
+				/// execute the query to create view
+				execute_raw(genericSqlParser(createViewQuery));
+				
+				// replace the inner query with created view name
+				qStringUpper = qStringUpper.substring(0, indexFrom) + tmpViewName
+					+ qStringUpper.substring(indexClosingIndex + 1);
+			}
 		}
 		// Possible "INDEX IF NOT EXISTS" call for mysql, suppress duplicate index error if needed
 		//

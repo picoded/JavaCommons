@@ -9,6 +9,8 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 
 import picoded.struct.query.internal.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /// Comparision utility functions
 ///
@@ -189,9 +191,13 @@ public class CompareUtils {
 			return 1;
 		}
 		
-		if (o1.toString().startsWith(o2.toString()) || o1.toString().contains(o2.toString())) {
+		Pattern p = Pattern.compile(o2.toString().replaceAll("%", ".*"));
+		Matcher m = p.matcher(o1.toString());
+		
+		if (m.matches()) {
 			return 0;
 		}
+		
 		return 1;
 	}
 }

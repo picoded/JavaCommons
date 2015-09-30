@@ -67,6 +67,15 @@ public class Query_test {
 	}
 	
 	//
+	// Like query check
+	//
+	@Test
+	public void likeQuery() {
+		assertEquals("(\"me\" LIKE :good AND \"life\" LIKE :awsome) OR \"every\" LIKE :one",
+						 Query.build("(me LIKE :good AND life LIKE :awsome) OR every LIKE :one").toString());
+	}
+	
+	//
 	// Complex query exception
 	//
 	@Test

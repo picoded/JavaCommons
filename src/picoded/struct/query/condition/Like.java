@@ -47,7 +47,7 @@ public class Like extends ConditionBase {
 	///
 	/// [to override on extension]
 	public String operatorSymbol() {
-		return "%";
+		return "LIKE";
 	}
 	
 	/// Gets the query type 

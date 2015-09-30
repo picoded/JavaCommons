@@ -175,7 +175,7 @@ public class FileServlet extends HttpServlet {
 		
 		// 404 error if accessing possible java servlet protected files
 		String requestPath_lowerCase = requestPath.toLowerCase();
-		if (requestPath_lowerCase.contains("web-inf") || requestPath_lowerCase.contains("meta-inf")) {
+		if (requestPath_lowerCase.contains("/web-inf/") || requestPath_lowerCase.contains("/meta-inf/")) {
 			servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}

@@ -22,7 +22,9 @@ public enum QueryType {
 	
 	LESS_THAN(20), LESS_THAN_OR_EQUALS(21),
 	
-	MORE_THAN(30), MORE_THAN_OR_EQUALS(31);
+	MORE_THAN(30), MORE_THAN_OR_EQUALS(31),
+	
+	LIKE(40);
 	
 	//////////////////////////////////////////////////////////////////////
 	//

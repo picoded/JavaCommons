@@ -89,6 +89,19 @@ public class AllConditions_test {
 	}
 	
 	@Test
+	public void like() {
+		Query cond = new Like("hello", "my", sample_c);
+		
+		assertNotNull(cond);
+		assertTrue(cond.test(sample_a));
+		assertTrue(cond.test(sample_b));
+		
+		assertFalse(cond.test(sample_a, sample_d));
+		assertTrue(cond.test(sample_b, sample_d));
+		
+	}
+	
+	@Test
 	public void lessThan() {
 		
 		//if a string starts with a number, number parse will work

@@ -93,8 +93,8 @@ public class PagesHTML {
 	protected Map<String, Object> pageJMTEvars(String pageName) {
 		HashMap<String, Object> ret = new HashMap<String, Object>();
 		
-		if( uriRootPrefix.endsWith("/") ) {
-			uriRootPrefix = uriRootPrefix.substring( 0, uriRootPrefix.length() - 1 );
+		if (uriRootPrefix.endsWith("/")) {
+			uriRootPrefix = uriRootPrefix.substring(0, uriRootPrefix.length() - 1);
 		}
 		
 		String pageURI = uriRootPrefix + "/" + pageName;

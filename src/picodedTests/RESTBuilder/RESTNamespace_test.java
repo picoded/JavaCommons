@@ -25,13 +25,13 @@ public class RESTNamespace_test {
 	
 	/// Base RESTBuilder object to test on, automatic setup
 	protected RESTNamespace restObj = null;
-
+	
 	/// Test hello echo function
-	protected RESTFunction helloFunction = (req,res) -> {
-		res.put("hello","world");
+	protected RESTFunction helloFunction = (req, res) -> {
+		res.put("hello", "world");
 		
-		if( req.get("echo") != null ) {
-			res.put( "echo", req.get("echo") );
+		if (req.get("echo") != null) {
+			res.put("echo", req.get("echo"));
 		}
 		
 		return res;
@@ -72,17 +72,17 @@ public class RESTNamespace_test {
 	
 	@Test
 	public void helloMethod() {
-		restObj.put(RESTBuilder.RequestTypeSet.GET, helloFunction );
+		restObj.put(RESTBuilder.RequestTypeSet.GET, helloFunction);
 		
 		Map<String, Object> ret = restObj.call(RESTBuilder.RequestTypeSet.GET);
 		
 		Map<String, Object> retCheck = new HashMap<String, Object>();
-		retCheck.put("hello","world");
-		assertEquals( retCheck, ret );
+		retCheck.put("hello", "world");
+		assertEquals(retCheck, ret);
 		
 		retCheck.put("echo", "echo");
 		ret = restObj.call(RESTBuilder.RequestTypeSet.GET, retCheck);
-		assertEquals( retCheck, ret );
+		assertEquals(retCheck, ret);
 	}
 	
 }

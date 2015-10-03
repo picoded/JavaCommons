@@ -32,7 +32,7 @@ public class KeyValueMap_Sqlite_test extends KeyValueMap_test {
 	
 	public KeyValueMap implementationConstructor() {
 		JSqlStruct jsObj = new JSqlStruct(sqlImplmentation());
-		return jsObj.getKeyValueMap("KVM_"+tableName);
+		return jsObj.getKeyValueMap("KVM_" + tableName);
 	}
 	
 }

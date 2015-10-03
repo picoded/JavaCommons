@@ -74,14 +74,9 @@ public class JSql_Mssql extends JSql {
 	// Internal parser that converts some of the common sql statements to mssql
 	public String genericSqlParser(String inString) {
 		
-		String fixedQuotes = inString.trim()
-			.replaceAll("(\\s){1}", " ")
-			.replaceAll("`", "\"")
-			.replaceAll("'", "\"")
-			.replaceAll("\\s+", " ")
-			.replaceAll(" =", "=")
-			.replaceAll("= ", "=").trim();
-			
+		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("`", "\"").replaceAll("'", "\"")
+			.replaceAll("\\s+", " ").replaceAll(" =", "=").replaceAll("= ", "=").trim();
+		
 		String upperCaseStr = fixedQuotes.toUpperCase();
 		String qString = fixedQuotes;
 		
@@ -113,6 +108,9 @@ public class JSql_Mssql extends JSql {
 		
 		int prefixOffset = 0;
 		if (upperCaseStr.startsWith(drop)) { //DROP
+			upperCaseStr = upperCaseStr.replaceAll(ifNotExists, ifExists);
+			fixedQuotes = fixedQuotes.replaceAll(ifNotExists, ifExists);
+			
 			prefixOffset = drop.length() + 1;
 			
 			if (upperCaseStr.startsWith(table, prefixOffset)) { //TABLE
@@ -213,11 +211,9 @@ public class JSql_Mssql extends JSql {
 			tmpIndx = qString.toUpperCase().indexOf(" FROM ");
 			
 			if (tmpIndx > 0) {
-				qString = "SELECT "
-				    + tmpStr.substring(0, tmpIndx - 7)
-				    //.replaceAll("\"", "'")
-				    .replaceAll("`", "\"")
-					+ " FROM " + _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx - 1));
+				qString = "SELECT " + tmpStr.substring(0, tmpIndx - 7)
+				//.replaceAll("\"", "'")
+					.replaceAll("`", "\"") + " FROM " + _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx - 1));
 			} else {
 				qString = _fixTableNameInMssqlSubQuery(fixedQuotes);
 			}
@@ -314,7 +310,6 @@ public class JSql_Mssql extends JSql {
 			endIndex = sb.indexOf("=", beginIndex);
 		}
 		qString = sb.toString();
-		
 		return qString;
 	}
 	

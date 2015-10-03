@@ -9,7 +9,6 @@ import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /// Picoded imports
 import picoded.conv.*;
 import picoded.enums.ObjectTokens;
@@ -32,7 +31,7 @@ public class JSql_MetaTableUtils {
 	//
 	// JSqlResult search
 	//--------------------------------------------------------------------------
-
+	
 	/// Fetches the result array position using the filters
 	/// 
 	/// This is done, as each row in the SQL query only represents
@@ -52,14 +51,14 @@ public class JSql_MetaTableUtils {
 		List<Object> kID_list = r.get("kID");
 		List<Object> idx_list = r.get("idx");
 		
-		int lim = kID_list.size(); 
+		int lim = kID_list.size();
 		for (int i = 0; i < lim; ++i) {
 			
 			if (_oid != null && !_oid.equals(oID_list.get(i))) {
 				continue;
 			}
 			
-			if (key != null && !key.equals( ((String) (kID_list.get(i))) ) ) {
+			if (key != null && !key.equals(((String) (kID_list.get(i))))) {
 				continue;
 			}
 			
@@ -69,7 +68,7 @@ public class JSql_MetaTableUtils {
 			
 			return i;
 		}
-
+		
 		return -1;
 	}
 	
@@ -89,7 +88,7 @@ public class JSql_MetaTableUtils {
 	protected static int fetchResultPosition(JSqlResult r, String key, int idx) {
 		return fetchResultPosition(r, null, key, idx);
 	}
-
+	
 	//
 	// MetaType and SQL handling
 	//
@@ -106,7 +105,7 @@ public class JSql_MetaTableUtils {
 	/// @TODO: Convert to configured type if possible (like numeric)
 	/// @TODO: Support proper timestamp handling (not implemented)
 	///
-	public static Object[] valueToOptionSet(MetaTypeMap mtm, String key, Object value)  {
+	public static Object[] valueToOptionSet(MetaTypeMap mtm, String key, Object value) {
 		if (value instanceof Integer) {
 			return new Object[] { new Integer(MetaType.INTEGER.getValue()), value, null, null }; //Typ, N,S,I,T
 		} else if (value instanceof Float) {
@@ -115,17 +114,18 @@ public class JSql_MetaTableUtils {
 			return new Object[] { new Integer(MetaType.DOUBLE.getValue()), value, null, null }; //Typ, N,S,I,T
 		} else if (value instanceof String) {
 			String shortenValue = ((String) value).toLowerCase();
-			if( shortenValue.length() > 64 ) {
-				shortenValue = shortenValue.substring(0,64);
+			if (shortenValue.length() > 64) {
+				shortenValue = shortenValue.substring(0, 64);
 			}
 			return new Object[] { new Integer(MetaType.STRING.getValue()), 0, shortenValue, value }; //Typ, N,S,I,T
 		} else if (value instanceof byte[]) {
-			return new Object[] { new Integer(MetaType.BINARY.getValue()), 0, null, (Base64.getEncoder().encodeToString( (byte[])value )) }; //Typ, N,S,I,T
+			return new Object[] { new Integer(MetaType.BINARY.getValue()), 0, null,
+				(Base64.getEncoder().encodeToString((byte[]) value)) }; //Typ, N,S,I,T
 		} else {
 			String jsonString = ConvertJSON.fromObject(value);
 			return new Object[] { new Integer(MetaType.JSON.getValue()), 0, null, jsonString };
 		}
-	
+		
 		//throw new RuntimeException("Object type not yet supported: "+key+" = "+ value);
 	}
 	
@@ -138,10 +138,10 @@ public class JSql_MetaTableUtils {
 	///
 	/// @see extractKeyValue
 	protected static Object extractNonArrayValueFromPos(JSqlResult r, int pos) {
-	
+		
 		List<Object> typList = r.get("typ");
 		int baseType = ((Number) (typList.get(pos))).intValue();
-	
+		
 		// Int, Long, Double, Float
 		if (baseType == MetaType.INTEGER.getValue()) {
 			return new Integer(((Number) (r.get("nVl").get(pos))).intValue());
@@ -153,14 +153,14 @@ public class JSql_MetaTableUtils {
 			return (String) (r.get("tVl").get(pos));
 		} else if (baseType == MetaType.TEXT.getValue()) { // Text
 			return (String) (r.get("tVl").get(pos));
-		} else if(baseType == MetaType.BINARY.getValue()) {
-			return (Base64.getDecoder().decode( (String) (r.get("tVl").get(pos)) ) );
+		} else if (baseType == MetaType.BINARY.getValue()) {
+			return (Base64.getDecoder().decode((String) (r.get("tVl").get(pos))));
 		} else if (baseType == MetaType.JSON.getValue()) { // JSON
-			return ConvertJSON.toObject( (String)(r.get("tVl").get(pos)) );
-		} 
+			return ConvertJSON.toObject((String) (r.get("tVl").get(pos)));
+		}
 		
-		throw new RuntimeException("Object type not yet supported: oID = "+r.get("oID").get(pos)+
-		                           ", kID = "+r.get("kID").get(pos)+", BaseType = "+ baseType);
+		throw new RuntimeException("Object type not yet supported: oID = " + r.get("oID").get(pos) + ", kID = "
+			+ r.get("kID").get(pos) + ", BaseType = " + baseType);
 		
 		//throw new RuntimeException("Object type not yet supported: Pos = "+pos+", BaseType = "+ baseType);
 	}
@@ -177,7 +177,7 @@ public class JSql_MetaTableUtils {
 	///
 	protected static Object extractKeyValue(JSqlResult r, String key) throws JSqlException {
 		int pos = fetchResultPosition(r, key, 0); //get the 0 pos value
-	
+		
 		if (pos <= -1) {
 			return null;
 		}
@@ -217,16 +217,17 @@ public class JSql_MetaTableUtils {
 		try {
 			Object[] typSet;
 			Object v;
-	
+			
 			for (String k : keyList) {
 				
 				// Skip reserved key, otm is allowed to be saved (to ensure blank object is saved)
-				if ( k.equalsIgnoreCase("_otm")) { //reserved
+				if (k.equalsIgnoreCase("_otm")) { //reserved
 					continue;
 				}
 				
-				if( k.length() > 64 ) {
-					throw new RuntimeException("Attempted to insert a key value larger then 64 for (_oid = "+_oid+"): "+k);
+				if (k.length() > 64) {
+					throw new RuntimeException("Attempted to insert a key value larger then 64 for (_oid = " + _oid + "): "
+						+ k);
 				}
 				
 				// Checks if keyList given, if so skip if not on keyList
@@ -237,12 +238,12 @@ public class JSql_MetaTableUtils {
 				// Get the value to insert
 				v = objMap.get(k);
 				
-				if( v == ObjectTokens.NULL || v == null ) {
+				if (v == ObjectTokens.NULL || v == null) {
 					// Skip reserved key, oid key is allowed to be removed directly
-					if( k.equalsIgnoreCase("oid") || k.equalsIgnoreCase("_oid") ) {
+					if (k.equalsIgnoreCase("oid") || k.equalsIgnoreCase("_oid")) {
 						continue;
 					}
-					sql.deleteQuerySet( tName, "oID=? AND kID=?", new Object[] { _oid, k } ).execute();
+					sql.deleteQuerySet(tName, "oID=? AND kID=?", new Object[] { _oid, k }).execute();
 				} else {
 					// Converts it into a type set, and store it
 					typSet = valueToOptionSet(mtm, k, v);
@@ -278,15 +279,15 @@ public class JSql_MetaTableUtils {
 	/// @param {String} _oid               - object id to store the key value pairs into
 	/// @param {Map<String,Object>} ret    - map to populate, and return, created if null if there is data
 	/// 
-	public static Map<String,Object> JSqlObjectMapFetch( //
+	public static Map<String, Object> JSqlObjectMapFetch( //
 		MetaTypeMap mtm, JSql sql, //
 		String sqlTableName, String _oid, //
-		Map<String,Object> ret //
+		Map<String, Object> ret //
 	) {
 		try {
 			JSqlResult r = sql.selectQuerySet(sqlTableName, "*", "oID=?", new Object[] { _oid }).query();
 			return extractObjectMapFromJSqlResult(mtm, r, _oid, ret);
-		} catch( JSqlException e ) {
+		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -299,11 +300,11 @@ public class JSql_MetaTableUtils {
 	/// @param {String} _oid               - object id to store the key value pairs into
 	/// @param {Map<String,Object>} ret    - map to populate, and return, created if null if there is data
 	/// 
-	public static Map<String,Object> extractObjectMapFromJSqlResult(//
+	public static Map<String, Object> extractObjectMapFromJSqlResult(//
 		MetaTypeMap mtm, JSqlResult r, //
-		String _oid, Map<String,Object> ret //
+		String _oid, Map<String, Object> ret //
 	) {
-		if(r == null) {
+		if (r == null) {
 			return ret;
 		}
 		
@@ -312,17 +313,17 @@ public class JSql_MetaTableUtils {
 		List<Object> idx_list = r.get("idx");
 		List<Object> val_list = r.get("tVl");
 		
-		if(kID_list == null) {
+		if (kID_list == null) {
 			return ret;
 		}
 		
-		int lim = kID_list.size(); 
+		int lim = kID_list.size();
 		for (int i = 0; i < lim; ++i) {
 			if (_oid != null && !_oid.equals(oID_list.get(i))) {
 				continue;
 			}
 			
-			if( ((Number) (idx_list.get(i))).intValue() != 0 ) {
+			if (((Number) (idx_list.get(i))).intValue() != 0) {
 				continue; //Now only accepts first value (not an array)
 			}
 			
@@ -330,11 +331,11 @@ public class JSql_MetaTableUtils {
 			
 			/// Only check for ret, at this point, 
 			/// so returning null when no data occurs
-			if( ret == null ) {
-				ret = new ConcurrentHashMap<String,Object>();
+			if (ret == null) {
+				ret = new ConcurrentHashMap<String, Object>();
 			}
 			
-			ret.put( rowData[1].toString(), rowData[2] );
+			ret.put(rowData[1].toString(), rowData[2]);
 		}
 		
 		return ret;
@@ -352,7 +353,8 @@ public class JSql_MetaTableUtils {
 	///
 	/// @returns StringBuilder for the view building statement, this can be used for creating permenant view / queries
 	///
-	protected static StringBuilder sqlComplexLeftJoinQueryBuilder(JSql sql, String tableName, MetaTypeMap mtm, List<Object> queryArgs ) {
+	protected static StringBuilder sqlComplexLeftJoinQueryBuilder(JSql sql, String tableName, MetaTypeMap mtm,
+		List<Object> queryArgs) {
 		
 		//
 		// Vendor specific custimization
@@ -382,7 +384,6 @@ public class JSql_MetaTableUtils {
 		
 		StringBuilder from = new StringBuilder(" FROM ");
 		from.append("(SELECT DISTINCT oID");
-		
 		
 		//
 		// Optional object created time support 
@@ -417,42 +418,42 @@ public class JSql_MetaTableUtils {
 		for (Map.Entry<String, MetaType> e : mtm.entrySet()) {
 			key = e.getKey();
 			type = e.getValue();
-		
-			if( //
-				type == MetaType.INTEGER || //
-				type == MetaType.FLOAT   || //
-				type == MetaType.DOUBLE     //
-				) { //
-				
+			
+			if ( //
+			type == MetaType.INTEGER || //
+				type == MetaType.FLOAT || //
+				type == MetaType.DOUBLE //
+			) { //
+			
 				select.append(", N" + joinCount + ".nVl AS ");
 				select.append(lBracket + key + rBracket);
 				
-				from.append(" "+joinType+" JOIN " + tableName + " AS N" + joinCount);
+				from.append(" " + joinType + " JOIN " + tableName + " AS N" + joinCount);
 				from.append(" ON B.oID = N" + joinCount + ".oID");
 				from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = ?");
 				
 				queryArgs.add(key);
 				
 			} else if (type == MetaType.STRING) {
-			
+				
 				select.append(", S" + joinCount + ".tVl AS ");
 				select.append(lBracket + key + rBracket);
-			
+				
 				select.append(", S" + joinCount + ".sVl AS ");
 				select.append(lBracket + key + "_lc" + rBracket);
-			
-				from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
+				
+				from.append(" " + joinType + " JOIN " + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
 				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = ?");
 				
 				queryArgs.add(key);
 				
 			} else if (type == MetaType.TEXT) {
-			
+				
 				select.append(", S" + joinCount + ".tVl AS ");
 				select.append(lBracket + key + rBracket);
-			
-				from.append(" "+joinType+" JOIN " + tableName + " AS S" + joinCount);
+				
+				from.append(" " + joinType + " JOIN " + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
 				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = ?");
 				
@@ -460,7 +461,8 @@ public class JSql_MetaTableUtils {
 				
 			} else {
 				// Unknown MetaType ignored
-				logger.log(Level.WARNING , "sqlComplexLeftJoinQueryBuilder -> Unknown MetaType ("+type+") - for meta key : "+key);
+				logger.log(Level.WARNING, "sqlComplexLeftJoinQueryBuilder -> Unknown MetaType (" + type
+					+ ") - for meta key : " + key);
 			}
 			
 			++joinCount;
@@ -468,8 +470,8 @@ public class JSql_MetaTableUtils {
 		
 		// The final return string builder
 		StringBuilder ret = new StringBuilder();
-		ret.append( select );
-		ret.append( from );
+		ret.append(select);
+		ret.append(from);
 		
 		// Return StringBuilder
 		return ret;
@@ -488,8 +490,8 @@ public class JSql_MetaTableUtils {
 		} else if (value instanceof byte[]) {
 			return MetaType.BINARY;
 		} //else {
-		//	return MetaType.JSON;
-		//}
+		  //	return MetaType.JSON;
+		  //}
 		return null;
 	}
 	
@@ -511,24 +513,24 @@ public class JSql_MetaTableUtils {
 		//
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
-			
+	
 		/// Query string, for either a newly constructed view, or cached view
 		StringBuilder queryBuilder = new StringBuilder();
 		Object[] queryArgs = null;
 		
-		if( orderByStr != null ) {
+		if (orderByStr != null) {
 			orderByStr.replaceAll("_oid", "oID");
 		}
 		
-		if( whereClause == null ) {
+		if (whereClause == null) {
 			
-			queryBuilder.append("SELECT "+selectedCols+" FROM "+tablename+"");
-
+			queryBuilder.append("SELECT " + selectedCols + " FROM " + tablename + "");
+			
 			// @TODO sanatize ORDER BY for SQL injection
 			// Support ORDER BY values forming the MetaMap
-			if( orderByStr != null ) {
-				queryBuilder.append( " ORDER BY " );
-				queryBuilder.append( orderByStr );
+			if (orderByStr != null) {
+				queryBuilder.append(" ORDER BY ");
+				queryBuilder.append(orderByStr);
 			}
 		} else {
 			
@@ -538,46 +540,45 @@ public class JSql_MetaTableUtils {
 			// Validating the Where clause and using it to build the MetaTypeMap
 			Query queryObj = Query.build(whereClause, whereValues);
 			Map<String, List<Object>> queryMap = queryObj.keyValuesMap();
-			for( String key : queryMap.keySet() ) {
-				MetaType subType = valueToMetaType( queryMap.get(key).get(0) );
-				if( subType != null ) {
-					queryTypeMap.put( key, subType );
+			for (String key : queryMap.keySet()) {
+				MetaType subType = valueToMetaType(queryMap.get(key).get(0));
+				if (subType != null) {
+					queryTypeMap.put(key, subType);
 				}
 			}
 			
 			// Building the Inner join query
 			List<Object> complexQueryArgs = new ArrayList<Object>();
-			StringBuilder innerJoinQuery = sqlComplexLeftJoinQueryBuilder(sql, tablename, queryTypeMap , complexQueryArgs);
+			StringBuilder innerJoinQuery = sqlComplexLeftJoinQueryBuilder(sql, tablename, queryTypeMap, complexQueryArgs);
 			
 			//queryBuilder.append( innerJoinQuery );
 			// Building the complex inner join query
-			queryBuilder.append( "SELECT "+selectedCols.replaceAll("DISTINCT", "")+" FROM (" );
-			queryBuilder.append( innerJoinQuery );
-			queryBuilder.append( ") AS R");
+			queryBuilder.append("SELECT " + selectedCols.replaceAll("DISTINCT", "") + " FROM (");
+			queryBuilder.append(innerJoinQuery);
+			queryBuilder.append(") AS R");
 			
 			// WHERE query is built from queryObj, this acts as a form of sql sanitization
 			//
 			// @TODO Check that all query col names are SQL escape safe
-			if( whereClause != null ) {
-				queryBuilder.append( " WHERE ");
-				queryBuilder.append( queryObj.toString().replaceAll(":[0-9]+", "?") );
-				complexQueryArgs.addAll( Arrays.asList(whereValues) );
+			if (whereClause != null) {
+				queryBuilder.append(" WHERE ");
+				queryBuilder.append(queryObj.toString().replaceAll(":[0-9]+", "?"));
+				complexQueryArgs.addAll(Arrays.asList(whereValues));
 			}
 			
 			// @TODO sanatize ORDER BY for SQL injection
 			// Support ORDER BY values forming the MetaMap
-			if( orderByStr != null ) {
-				queryBuilder.append( " ORDER BY " );
-				queryBuilder.append( orderByStr );
+			if (orderByStr != null) {
+				queryBuilder.append(" ORDER BY ");
+				queryBuilder.append(orderByStr);
 			}
 			
 			// Finalize query args
-			queryArgs = complexQueryArgs.toArray( new Object[0] );
+			queryArgs = complexQueryArgs.toArray(new Object[0]);
 			
 			//logger.log( Level.WARNING, queryBuilder.toString() );
 			//logger.log( Level.WARNING, Arrays.asList(queryArgs).toString() );
 		}
-		
 		
 		// Limit and offset clause
 		if (limit > 0) {
@@ -590,8 +591,8 @@ public class JSql_MetaTableUtils {
 		
 		try {
 			// Execute and get the result
-			return sql.query( queryBuilder.toString(), queryArgs );
-		} catch(JSqlException e) {
+			return sql.query(queryBuilder.toString(), queryArgs);
+		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -615,15 +616,13 @@ public class JSql_MetaTableUtils {
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
 		JSqlResult r = metaTableSelectQueryBuilder( //
-			metaTableObj, sql, tablename, "DISTINCT oID",
-			whereClause, whereValues, orderByStr, offset, limit
-		);
+			metaTableObj, sql, tablename, "DISTINCT oID", whereClause, whereValues, orderByStr, offset, limit);
 		//logger.log( Level.WARNING, r.toString() );
 		List<Object> oID_list = r.get("oID");
 		// Generate the object list
-		if( oID_list != null ) {
-			return metaTableObj.getArrayFromID( ListValueConv.objectListToStringArray(oID_list),true);
-		} 
+		if (oID_list != null) {
+			return metaTableObj.getArrayFromID(ListValueConv.objectListToStringArray(oID_list), true);
+		}
 		// Blank list as fallback
 		return new MetaObject[0];
 	}
@@ -646,16 +645,16 @@ public class JSql_MetaTableUtils {
 		//
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
-		JSqlResult r = metaTableSelectQueryBuilder( //
-			metaTableObj, sql, tablename, "COUNT(DISTINCT oID) AS rcount",
-			whereClause, whereValues, orderByStr, offset, limit
-		);
+		JSqlResult r = metaTableSelectQueryBuilder(
+			//
+			metaTableObj, sql, tablename, "COUNT(DISTINCT oID) AS rcount", whereClause, whereValues, orderByStr, offset,
+			limit);
 		//logger.log( Level.WARNING, r.toString() );
 		List<Object> rcountArr = r.get("rcount");
 		// Generate the object list
-		if( rcountArr != null ) {
-			return ((Number)rcountArr.get(0)).longValue();
-		} 
+		if (rcountArr != null) {
+			return ((Number) rcountArr.get(0)).longValue();
+		}
 		// Blank as fallback
 		return 0;
 	}

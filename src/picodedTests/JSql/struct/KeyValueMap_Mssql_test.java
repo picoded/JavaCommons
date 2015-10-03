@@ -25,8 +25,8 @@ public class KeyValueMap_Mssql_test extends KeyValueMap_Sqlite_test {
 	///------------------------------------------------------
 	
 	public JSql sqlImplmentation() {
-		return JSql.mssql(TestConfig.MSSQL_CONN(), TestConfig.MSSQL_NAME(), TestConfig.MSSQL_USER(), TestConfig
-			.MSSQL_PASS());
+		return JSql.mssql(TestConfig.MSSQL_CONN(), TestConfig.MSSQL_NAME(), TestConfig.MSSQL_USER(),
+			TestConfig.MSSQL_PASS());
 	}
 	
 }

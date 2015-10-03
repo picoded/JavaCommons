@@ -82,7 +82,8 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	//-------------------------------------------
 	
 	/// RESTBuilder HttpRequestType enum access
-	public static class RequestTypeSet extends picoded.enums.HttpRequestType.HttpRequestTypeSet {};
+	public static class RequestTypeSet extends picoded.enums.HttpRequestType.HttpRequestTypeSet {
+	};
 	
 	///////////////////////////////////////////////////////
 	//
@@ -104,10 +105,10 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	protected RequestMap requestParameters = null;
 	
 	/// The template data object wich is being passed around in each process stage
-	protected Map<String,Object> templateDataObj = new HashMap<String,Object>();
+	protected Map<String, Object> templateDataObj = new HashMap<String, Object>();
 	
 	/// The JSON output data object, if used in JSON processing mode
-	protected Map<String,Object> jsonDataObj = new HashMap<String,Object>();
+	protected Map<String, Object> jsonDataObj = new HashMap<String, Object>();
 	
 	// Servlet specific variables
 	//-------------------------------------------
@@ -139,17 +140,17 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	// protected ByteArrayOutputStream cachedResponseOutputStream = null;
 	
 	/// The requested headers map, either set at startup or extracted from httpRequest
-	protected Map<String,String[]> _requestHeaderMap = null;
+	protected Map<String, String[]> _requestHeaderMap = null;
 	
 	/// Gets and returns the requestHeaderMap
-	public Map<String,String[]> requestHeaderMap() {
+	public Map<String, String[]> requestHeaderMap() {
 		// gets the constructor set cookies / cached cookies
-		if( _requestHeaderMap != null ) {
+		if (_requestHeaderMap != null) {
 			return _requestHeaderMap;
 		}
 		
 		// if the cached copy not previously set, and request is null, nothing can be done
-		if( httpRequest == null ) {
+		if (httpRequest == null) {
 			return null;
 		}
 		
@@ -158,7 +159,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		
 		// Get an Enumeration of all of the header names sent by the client
 		Enumeration<String> headerNames = httpRequest.getHeaderNames();
-		while(headerNames.hasMoreElements()) {
+		while (headerNames.hasMoreElements()) {
 			String name = headerNames.nextElement();
 			
 			// As per the Java Servlet API 2.5 documentation:
@@ -166,35 +167,35 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 			//        as several headers each with a different value rather than
 			//        sending the header as a comma separated list.
 			// Thus, we get an Enumeration of the header values sent by the client
-			mapList.append( name, httpRequest.getHeaders(name) );
+			mapList.append(name, httpRequest.getHeaders(name));
 		}
 		
-		return ( _requestHeaderMap = mapList.toMapArray(new String[0]) );
+		return (_requestHeaderMap = mapList.toMapArray(new String[0]));
 	}
 	
 	/// The requested cookie map, either set at startup or extracted from httpRequest
-	protected Map<String,String[]> _requestCookieMap = null;
+	protected Map<String, String[]> _requestCookieMap = null;
 	
 	/// Gets and returns the requestCookieMap
-	public Map<String,String[]> requestCookieMap() {
+	public Map<String, String[]> requestCookieMap() {
 		// gets the constructor set cookies / cached cookies
-		if( _requestCookieMap != null ) {
+		if (_requestCookieMap != null) {
 			return _requestCookieMap;
 		}
 		
 		// if the cached copy not previously set, and request is null, nothing can be done
-		if( httpRequest == null ) {
+		if (httpRequest == null) {
 			return null;
 		}
 		
 		// Creates the _requestCookieMap from httpRequest 
 		HashMapList<String, String> mapList = new HashMapList<String, String>();
-		for( Cookie oneCookie : httpRequest.getCookies() ) {
-			mapList.append( oneCookie.getName(), oneCookie.getValue() );
+		for (Cookie oneCookie : httpRequest.getCookies()) {
+			mapList.append(oneCookie.getName(), oneCookie.getValue());
 		}
 		
 		// Cache and return
-		return ( _requestCookieMap = mapList.toMapArray(new String[0]) );
+		return (_requestCookieMap = mapList.toMapArray(new String[0]));
 	}
 	
 	///////////////////////////////////////////////////////
@@ -211,7 +212,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// Sets the JSON request flag, used to handle JSON requests.
 	/// Note that NULL, means disabled. While "*" means anything
-	public CorePage setJsonRequestFlag( String in ) {
+	public CorePage setJsonRequestFlag(String in) {
 		jsonRequestFlag = in;
 		return this;
 	}
@@ -224,13 +225,13 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// Returns true / false if current request qualifies as JSON
 	/// Note this is used internally by the process chain
 	public boolean isJsonRequest() {
-		if( jsonRequestFlag != null ) {
-			if( jsonRequestFlag.equals("*") ) {
+		if (jsonRequestFlag != null) {
+			if (jsonRequestFlag.equals("*")) {
 				return true;
 			}
 			
 			String rStr = getParameter(jsonRequestFlag);
-			if( rStr != null && rStr.length() > 0 ) {
+			if (rStr != null && rStr.length() > 0) {
 				return true;
 			}
 		}
@@ -259,11 +260,11 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	public String requestWildcardUri() {
 		try {
 			String path = httpRequest.getPathInfo();
-			if(path == null || path.isEmpty()) {
+			if (path == null || path.isEmpty()) {
 				return null;
 			}
 			return URLDecoder.decode(path, "UTF-8").trim();
-		} catch( Exception e ) {
+		} catch (Exception e) {
 			return null;
 		}
 	}
@@ -271,15 +272,15 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	public String[] requestWildcardUriArray() {
 		String raw = requestWildcardUri();
 		
-		if(raw == null || raw.isEmpty()){
-		    return null;
+		if (raw == null || raw.isEmpty()) {
+			return null;
 		}
 		
-		if(raw.startsWith("/")) {
+		if (raw.startsWith("/")) {
 			raw = raw.substring(1);
 		}
 		
-		if(raw.endsWith("/")) {
+		if (raw.endsWith("/")) {
 			raw = raw.substring(0, raw.length() - 1);
 		}
 		
@@ -296,11 +297,11 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// Returns the request parameters
 	public RequestMap requestParameters() {
-		if( requestParameters != null ) {
+		if (requestParameters != null) {
 			return requestParameters;
 		}
 		
-		requestParameters = RequestMap.fromStringArrayValueMap( httpRequest.getParameterMap() );
+		requestParameters = RequestMap.fromStringArrayValueMap(httpRequest.getParameterMap());
 		
 		return requestParameters;
 	}
@@ -342,14 +343,16 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	}
 	
 	/// Setup the instance, with the request parameter, and
-	protected CorePage setupInstance(HttpRequestType inRequestType, Map<String,String[]> reqParam) throws ServletException {
+	protected CorePage setupInstance(HttpRequestType inRequestType, Map<String, String[]> reqParam)
+		throws ServletException {
 		requestType = inRequestType;
 		//requestParameters = new RequestMap( reqParam );
 		return this;
 	}
 	
 	/// Setup the instance, with the request parameter, and cookie map
-	protected CorePage setupInstance(HttpRequestType inRequestType, Map<String,String[]> reqParam, Map<String,Cookie[]> reqCookieMap) throws ServletException {
+	protected CorePage setupInstance(HttpRequestType inRequestType, Map<String, String[]> reqParam,
+		Map<String, Cookie[]> reqCookieMap) throws ServletException {
 		requestType = inRequestType;
 		//requestParameters = new RequestMap( reqParam );
 		//requestCookieMap = reqCookieMap;
@@ -357,7 +360,8 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	}
 	
 	/// Setup the instance, with http request & response
-	protected CorePage setupInstance(HttpRequestType inRequestType, HttpServletRequest req, HttpServletResponse res) throws ServletException {
+	protected CorePage setupInstance(HttpRequestType inRequestType, HttpServletRequest req, HttpServletResponse res)
+		throws ServletException {
 		requestType = inRequestType;
 		httpRequest = req;
 		httpResponse = res;
@@ -368,7 +372,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		
 		try {
 			responseOutputStream = httpResponse.getOutputStream();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new ServletException(e);
 		}
 		
@@ -380,21 +384,21 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		try {
 			Class<? extends CorePage> pageClass = this.getClass();
 			CorePage ret = pageClass.newInstance();
-			pageClass.cast(ret).initSetup( this, this.getServletConfig() );
+			pageClass.cast(ret).initSetup(this, this.getServletConfig());
 			
 			return ret;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new ServletException(e);
 		}
 	}
 	
 	/// To be over-ridden
-	public void initSetup( CorePage original, ServletConfig servletConfig ) {
+	public void initSetup(CorePage original, ServletConfig servletConfig) {
 		try {
-			if( servletConfig != null ) {
-				init( servletConfig );
+			if (servletConfig != null) {
+				init(servletConfig);
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -407,7 +411,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// gets the PrintWriter, from the getOutputStream() object and returns it
 	public PrintWriter getWriter() {
-		return new PrintWriter( getOutputStream(), true );
+		return new PrintWriter(getOutputStream(), true);
 	}
 	
 	/// gets the OutputStream, from the httpResponse.getOutputStream() object and returns it
@@ -418,21 +422,22 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// Returns the servlet contextual path : needed for base URI for page redirects / etc
 	public String getContextURI() {
-		if(httpRequest != null) {
+		if (httpRequest != null) {
 			return httpRequest.getContextPath();
 		}
 		try {
-			return (URLDecoder.decode( this.getClass().getClassLoader().getResource("/").getPath(), "UTF-8" )).split("/WEB-INF/classes/")[0];
-		} catch(UnsupportedEncodingException e) {
+			return (URLDecoder.decode(this.getClass().getClassLoader().getResource("/").getPath(), "UTF-8"))
+				.split("/WEB-INF/classes/")[0];
+		} catch (UnsupportedEncodingException e) {
 			return "../";
-		} catch(NullPointerException e) {
+		} catch (NullPointerException e) {
 			return "../";
 		}
 	}
 	
 	/// Returns the servlet contextual path : needed for base URI for page redirects / etc
 	public String getServletContextURI() {
-		if(httpRequest != null) {
+		if (httpRequest != null) {
 			return httpRequest.getServletPath();
 		}
 		//return getServletPath();
@@ -441,7 +446,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// gets a parameter value, from the httpRequest.getParameter
 	public String getParameter(String paramName) {
-		if(requestParameters() != null) {
+		if (requestParameters() != null) {
 			return requestParameters().get(paramName);
 		}
 		return null;
@@ -450,7 +455,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// Proxies to httpResponse.sendRedirect,
 	/// Fallsback to responseHeaderMap.location, if httpResponse is null
 	public void sendRedirect(String uri) {
-		if( httpResponse != null ) {
+		if (httpResponse != null) {
 			try {
 				httpResponse.sendRedirect(uri);
 			} catch (IOException e) {
@@ -481,7 +486,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 				doSetup();
 				
 				// is JSON request?
-				if( isJsonRequest() ) {
+				if (isJsonRequest()) {
 					ret = processChainJSON();
 				} else { // or as per normal
 					ret = processChainRequest();
@@ -495,11 +500,11 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 				
 				// Returns success or failure
 				return ret;
-			} catch(Exception e) {
+			} catch (Exception e) {
 				doException(e);
 				return false;
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new ServletException(e);
 		}
 	}
@@ -508,12 +513,12 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	private boolean processChainRequest() throws Exception {
 		try {
 			// Does authentication check
-			if(!doAuth(templateDataObj) ) {
+			if (!doAuth(templateDataObj)) {
 				return false;
 			}
 			
 			// Does for all requests
-			if( !doRequest(templateDataObj) ) {
+			if (!doRequest(templateDataObj)) {
 				return false;
 			}
 			boolean ret = true;
@@ -523,26 +528,26 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 			//
 			// HttpRequestType reqTypeAsEnum = HttpRequestType(requestType);
 			switch (requestType) {
-				case GET:
-					ret = doGetRequest(templateDataObj);
-					break;
-				case POST:
-					ret = doPostRequest(templateDataObj);
-					break;
-				case PUT:
-					ret = doPutRequest(templateDataObj);
-					break;
-				case DELETE:
-					ret = doDeleteRequest(templateDataObj);
-					break;
+			case GET:
+				ret = doGetRequest(templateDataObj);
+				break;
+			case POST:
+				ret = doPostRequest(templateDataObj);
+				break;
+			case PUT:
+				ret = doPutRequest(templateDataObj);
+				break;
+			case DELETE:
+				ret = doDeleteRequest(templateDataObj);
+				break;
 			}
 			
-			if(ret) {
+			if (ret) {
 				outputRequest(templateDataObj, getWriter());
 			}
 			
 			return ret;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			return outputRequestException(templateDataObj, getWriter(), e);
 		}
 	}
@@ -551,12 +556,12 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	private boolean processChainJSON() throws Exception {
 		try {
 			// Does authentication check
-			if(!doAuth(templateDataObj) ) {
+			if (!doAuth(templateDataObj)) {
 				return false;
 			}
 			
 			// Does for all JSON
-			if( !doJSON(jsonDataObj, templateDataObj) ) {
+			if (!doJSON(jsonDataObj, templateDataObj)) {
 				return false;
 			}
 			
@@ -566,26 +571,26 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 			// http://stackoverflow.com/questions/6705955/why-switch-is-faster-than-if
 			//
 			switch (requestType) {
-				case GET:
-					ret = doGetJSON(jsonDataObj, templateDataObj);
-					break;
-				case POST:
-					ret = doPostJSON(jsonDataObj, templateDataObj);
-					break;
-				case PUT:
-					ret = doPutJSON(jsonDataObj, templateDataObj);
-					break;
-				case DELETE:
-					ret = doDeleteJSON(jsonDataObj, templateDataObj);
-					break;
+			case GET:
+				ret = doGetJSON(jsonDataObj, templateDataObj);
+				break;
+			case POST:
+				ret = doPostJSON(jsonDataObj, templateDataObj);
+				break;
+			case PUT:
+				ret = doPutJSON(jsonDataObj, templateDataObj);
+				break;
+			case DELETE:
+				ret = doDeleteJSON(jsonDataObj, templateDataObj);
+				break;
 			}
 			
-			if(ret) {
+			if (ret) {
 				outputJSON(jsonDataObj, templateDataObj, getWriter());
 			}
 			
 			return ret;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			return outputJSONException(jsonDataObj, templateDataObj, getWriter(), e);
 		}
 	}
@@ -620,43 +625,43 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// [To be extended by sub class, if needed]
 	/// Does the needed page request authentication, page redirects (if needed), and so forth. Should not do any actual,
 	/// output processing. Returns true to continue process chian (default) or false to terminate the process chain.
-	public boolean doAuth(Map<String,Object> templateData) throws Exception {
+	public boolean doAuth(Map<String, Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the required page request processing, this is used if both post / get behaviour is consistent
-	public boolean doRequest(Map<String,Object> templateData) throws Exception {
+	public boolean doRequest(Map<String, Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the required page GET processing, AFTER doRequest
-	public boolean doGetRequest(Map<String,Object> templateData) throws Exception {
+	public boolean doGetRequest(Map<String, Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the required page POST processing, AFTER doRequest
-	public boolean doPostRequest(Map<String,Object> templateData) throws Exception {
+	public boolean doPostRequest(Map<String, Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the required page PUT processing, AFTER doRequest
-	public boolean doPutRequest(Map<String,Object> templateData) throws Exception {
+	public boolean doPutRequest(Map<String, Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the required page DELETE processing, AFTER doRequest
-	public boolean doDeleteRequest(Map<String,Object> templateData) throws Exception {
+	public boolean doDeleteRequest(Map<String, Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the output processing, this is after do(Post/Get/Put/Delete)Request
-	public boolean outputRequest(Map<String,Object> templateData, PrintWriter output) throws Exception {
+	public boolean outputRequest(Map<String, Object> templateData, PrintWriter output) throws Exception {
 		return true;
 	}
 	
@@ -664,7 +669,8 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	///
 	/// note that this should return false, or throw a ServletException, UNLESS the exception was gracefully handled.
 	/// which in most cases SHOULD NOT be handled here.
-	public boolean outputRequestException(Map<String,Object> templateData, PrintWriter output, Exception e) throws Exception {
+	public boolean outputRequestException(Map<String, Object> templateData, PrintWriter output, Exception e)
+		throws Exception {
 		// Throws a runtime Exception, let the servlet manager handle the rest
 		throw e;
 		//return false;
@@ -675,44 +681,45 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
+	public boolean doJSON(Map<String, Object> outputData, Map<String, Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doGetJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
+	public boolean doGetJSON(Map<String, Object> outputData, Map<String, Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doPostJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
+	public boolean doPostJSON(Map<String, Object> outputData, Map<String, Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doPutJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
+	public boolean doPutJSON(Map<String, Object> outputData, Map<String, Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doDeleteJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
+	public boolean doDeleteJSON(Map<String, Object> outputData, Map<String, Object> templateData) throws Exception {
 		return true;
 	}
 	
 	/// [Avoid Extending, this handles all the various headers and JSONP / CORS]
 	/// Does the actual final json object to json string output, with contentType "application/javascript"
-	public boolean outputJSON(Map<String,Object> outputData, Map<String,Object> templateData, PrintWriter output) throws Exception {
+	public boolean outputJSON(Map<String, Object> outputData, Map<String, Object> templateData, PrintWriter output)
+		throws Exception {
 		// Set content type to JSON
-		if(httpResponse != null) {
+		if (httpResponse != null) {
 			httpResponse.setContentType("application/javascript");
 		}
 		
 		// Output the data
-		output.println( ConvertJSON.fromObject( outputData ) );
+		output.println(ConvertJSON.fromObject(outputData));
 		return true;
 	}
 	
@@ -720,21 +727,22 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	///
 	/// note that this should return false, UNLESS the exception was gracefully handled.
 	/// which in most cases SHOULD NOT be handled here.
-	public boolean outputJSONException(Map<String,Object> outputData, Map<String,Object> templateData, PrintWriter output, Exception e) throws Exception  {
+	public boolean outputJSONException(Map<String, Object> outputData, Map<String, Object> templateData,
+		PrintWriter output, Exception e) throws Exception {
 		// Converts the stack trace to a string
 		String stackTrace = org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e);
 		
 		// Performs a stack trace, and returns it in a JSON object
-		Map<String,String> ret = new HashMap<String,String>();
+		Map<String, String> ret = new HashMap<String, String>();
 		ret.put("error", stackTrace);
 		
 		// Set content type to JSON
-		if(httpResponse != null) {
+		if (httpResponse != null) {
 			httpResponse.setContentType("application/javascript");
 		}
 		
 		// Output the data
-		output.println( ConvertJSON.fromObject( ret ) );
+		output.println(ConvertJSON.fromObject(ret));
 		return false;
 	}
 	
@@ -773,8 +781,8 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	public final void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		spawnInstance().setupInstance(HttpRequestType.OPTION, request, response).processChain();
 		try {
-			super.doOptions(request,response);
-		} catch(Exception e) {
+			super.doOptions(request, response);
+		} catch (Exception e) {
 			throw new ServletException(e);
 		}
 	}

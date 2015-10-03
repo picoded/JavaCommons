@@ -41,7 +41,7 @@ public class MetaTable_test {
 	
 	@After
 	public void tearDown() {
-		if( mtObj != null ) {
+		if (mtObj != null) {
 			mtObj.systemTeardown();
 		}
 		mtObj = null;
@@ -66,13 +66,13 @@ public class MetaTable_test {
 		objMap.put(GUID.base58(), -(RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3))));
 		objMap.put(GUID.base58(), GUID.base58());
 		objMap.put(GUID.base58(), GUID.base58());
-	
+		
 		objMap.put("num", RandomUtils.nextInt(0, (Integer.MAX_VALUE - 3)));
 		objMap.put("str_val", GUID.base58());
-	
+		
 		return objMap;
 	}
-
+	
 	// @Test
 	// public void invalidSetup() { //Numeric as table prefix tend to cuase problems
 	// 	MetaTable m;
@@ -85,33 +85,33 @@ public class MetaTable_test {
 	// 		assertTrue("Missing Exception - " + expected, e.getMessage().indexOf(expected) >= 0);
 	// 	}
 	// }
-
+	
 	@Test
 	public void newObjectTest() {
 		MetaObject moObj = null;
 		
-		assertNotNull( moObj = mtObj.newObject() );
+		assertNotNull(moObj = mtObj.newObject());
 		moObj.put("be", "happy");
 		moObj.saveDelta();
 		
 		String guid = null;
-		assertNotNull( guid = moObj._oid() );
+		assertNotNull(guid = moObj._oid());
 		
-		assertNotNull( moObj = mtObj.get(guid) );
-		assertEquals( "happy", moObj.get("be") );
+		assertNotNull(moObj = mtObj.get(guid));
+		assertEquals("happy", moObj.get("be"));
 	}
 	
 	@Test
-	public void basicTest()  {
+	public void basicTest() {
 		String guid = GUID.base58();
 		assertNull(mtObj.get(guid));
-	
+		
 		HashMap<String, Object> objMap = randomObjMap();
 		assertEquals(guid, mtObj.append(guid, objMap)._oid());
-	
+		
 		objMap.put("_oid", guid);
-		assertEquals(objMap, (Map<String,Object>)mtObj.get(guid));
-	
+		assertEquals(objMap, (Map<String, Object>) mtObj.get(guid));
+		
 		objMap = randomObjMap();
 		assertNotNull(guid = mtObj.append(null, objMap)._oid());
 		objMap.put("_oid", guid);
@@ -120,15 +120,15 @@ public class MetaTable_test {
 	
 	/// Checks if a blank object gets saved
 	@Test
-	public void blankObjectSave()  {
+	public void blankObjectSave() {
 		String guid = null;
 		MetaObject p = null;
-		assertFalse( mtObj.containsKey("hello") );
-		assertNotNull( p = mtObj.newObject() );
-		assertNotNull( guid = p._oid() );
+		assertFalse(mtObj.containsKey("hello"));
+		assertNotNull(p = mtObj.newObject());
+		assertNotNull(guid = p._oid());
 		p.saveDelta();
 		
-		assertTrue( mtObj.containsKey(guid) );
+		assertTrue(mtObj.containsKey(guid));
 	}
 	
 	HashMap<String, Object> genNumStrObj(int number, String str) {
@@ -139,8 +139,8 @@ public class MetaTable_test {
 	}
 	
 	@Test
-	public void indexBasedTest()  {
-	
+	public void indexBasedTest() {
+		
 		mtObj.append(null, genNumStrObj(1, "this"));
 		mtObj.append(null, genNumStrObj(2, "is"));
 		mtObj.append(null, genNumStrObj(3, "hello"));
@@ -176,7 +176,7 @@ public class MetaTable_test {
 	/// An exception occurs, if a query fetch occurs with an empty table
 	///
 	@Test
-	public void issue47_exceptionWhenTableIsEmpty()  {
+	public void issue47_exceptionWhenTableIsEmpty() {
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
 		assertEquals(0, qRes.length);
@@ -188,91 +188,91 @@ public class MetaTable_test {
 	/// AKA: Incomplete object does not appear in view index
 	///
 	@Test
-	public void innerJoinFlaw()  {
+	public void innerJoinFlaw() {
 		mtObj.append(null, genNumStrObj(1, "hello world"));
-	
+		
 		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("num", new Integer(2));
-		mtObj.append( null, objMap ).saveDelta();
-	
+		mtObj.append(null, objMap).saveDelta();
+		
 		objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("str_val", "nope");
-		mtObj.append( null, objMap );
-	
+		mtObj.append(null, objMap);
+		
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
 		assertEquals(3, qRes.length);
-	
+		
 		assertNotNull(qRes = mtObj.query("num = ?", new Object[] { 1 }));
 		assertEquals(1, qRes.length);
-	
+		
 		assertNotNull(qRes = mtObj.query("num <= ?", new Object[] { 2 }));
 		assertEquals(2, qRes.length);
 		
 		assertNotNull(qRes = mtObj.query("str_val = ?", new Object[] { "nope" }));
 		assertEquals(1, qRes.length);
-	
+		
 	}
 	
 	@Test
-	public void missingStrError()  {
-		HashMap<String, Object> objMap = new HashMap<String,Object>();
+	public void missingStrError() {
+		HashMap<String, Object> objMap = new HashMap<String, Object>();
 		objMap.put("num", 123);
-	
+		
 		String guid = GUID.base58();
 		assertNull(mtObj.get(guid));
 		assertEquals(guid, mtObj.append(guid, objMap)._oid());
-	
+		
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
 		assertEquals(1, qRes.length);
-	
+		
 		objMap.put("_oid", guid);
 		assertEquals(objMap, mtObj.get(guid));
 	}
 	
 	@Test
-	public void missingNumWithSomeoneElse()  {
+	public void missingNumWithSomeoneElse() {
 		mtObj.append(null, genNumStrObj(1, "hello world"));
-	
-		HashMap<String, Object> objMap = new HashMap<String,Object>();
+		
+		HashMap<String, Object> objMap = new HashMap<String, Object>();
 		objMap.put("str_val", "^_^");
-	
+		
 		String guid = GUID.base58();
 		assertNull(mtObj.get(guid));
 		assertEquals(guid, mtObj.append(guid, objMap)._oid());
-	
+		
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
 		assertEquals(2, qRes.length);
-	
-		assertTrue( guid.equals(qRes[0]._oid()) || guid.equals(qRes[1]._oid()) );
-	
+		
+		assertTrue(guid.equals(qRes[0]._oid()) || guid.equals(qRes[1]._oid()));
+		
 		objMap.put("_oid", guid);
 		assertEquals(objMap, mtObj.get(guid));
 	}
 	
 	@Test
-	public void getFromKeyName_basic()  {
+	public void getFromKeyName_basic() {
 		
 		mtObj.append(null, genNumStrObj(1, "one"));
 		mtObj.append(null, genNumStrObj(2, "two"));
 		
 		MetaObject[] list = null;
-		assertNotNull( list = mtObj.getFromKeyName("num") );
-		assertEquals( 2, list.length );
+		assertNotNull(list = mtObj.getFromKeyName("num"));
+		assertEquals(2, list.length);
 		
 		String str = null;
-		assertNotNull( str = list[0].getString("str_val") );
-		assertTrue( str.equals("one") || str.equals("two") );
+		assertNotNull(str = list[0].getString("str_val"));
+		assertTrue(str.equals("one") || str.equals("two"));
 		
-		assertNotNull( str = list[1].getString("str_val") );
-		assertTrue( str.equals("one") || str.equals("two") );
+		assertNotNull(str = list[1].getString("str_val"));
+		assertTrue(str.equals("one") || str.equals("two"));
 		
 	}
 	
 	@Test
-	public void nonIndexedKeySaveCheck()  {
+	public void nonIndexedKeySaveCheck() {
 		
 		// Generates single node
 		mtObj.append(null, genNumStrObj(1, "hello world"));
@@ -280,28 +280,28 @@ public class MetaTable_test {
 		MetaObject node = null;
 		
 		// Fetch that single node
-		assertNotNull( list = mtObj.getFromKeyName("num") );
-		assertEquals( 1, list.length );
-		assertNotNull( node = list[0] );
+		assertNotNull(list = mtObj.getFromKeyName("num"));
+		assertEquals(1, list.length);
+		assertNotNull(node = list[0]);
 		
 		// Put non indexed key in node, and save
 		node.put("NotIndexedKey", "123");
 		node.saveDelta();
 		
 		// Get the value, to check
-		assertEquals( "123", mtObj.get( node._oid() ).get("NotIndexedKey") );
+		assertEquals("123", mtObj.get(node._oid()).get("NotIndexedKey"));
 		
 		// Refetch node, and get data, and validate
-		assertNotNull( list = mtObj.getFromKeyName("num") );
-		assertEquals( 1, list.length );
-		assertNotNull( list[0] );
-		assertEquals( node._oid(), list[0]._oid() );
-		assertEquals( "123", node.get("NotIndexedKey") );
-		assertEquals( "123", list[0].get("NotIndexedKey") );
+		assertNotNull(list = mtObj.getFromKeyName("num"));
+		assertEquals(1, list.length);
+		assertNotNull(list[0]);
+		assertEquals(node._oid(), list[0]._oid());
+		assertEquals("123", node.get("NotIndexedKey"));
+		assertEquals("123", list[0].get("NotIndexedKey"));
 	}
 	
 	@Test
-	public void getFromKeyName_customKeys()  {
+	public void getFromKeyName_customKeys() {
 		
 		// Generates single node
 		mtObj.append(null, genNumStrObj(1, "hello world"));
@@ -309,67 +309,67 @@ public class MetaTable_test {
 		MetaObject node = null;
 		
 		// Fetch that single node
-		assertNotNull( list = mtObj.getFromKeyName("num") );
-		assertEquals( 1, list.length );
-		assertNotNull( node = list[0] );
+		assertNotNull(list = mtObj.getFromKeyName("num"));
+		assertEquals(1, list.length);
+		assertNotNull(node = list[0]);
 		
 		// Put non indexed key in node, and save
 		node.put("NotIndexedKey", "123");
 		node.saveDelta();
 		
 		// Refetch node, and get data, and validate
-		assertNotNull( list = mtObj.getFromKeyName("num") );
-		assertEquals( 1, list.length );
-		assertNotNull( list[0] );
-		assertEquals( node._oid(), list[0]._oid() );
-		assertEquals( "123", node.get("NotIndexedKey") );
-		assertEquals( "123", list[0].get("NotIndexedKey") );
+		assertNotNull(list = mtObj.getFromKeyName("num"));
+		assertEquals(1, list.length);
+		assertNotNull(list[0]);
+		assertEquals(node._oid(), list[0]._oid());
+		assertEquals("123", node.get("NotIndexedKey"));
+		assertEquals("123", list[0].get("NotIndexedKey"));
 		
 		// Fetch non indexed key
-		assertNotNull( list = mtObj.getFromKeyName("NotIndexedKey") );
-		assertEquals( 1, list.length );
+		assertNotNull(list = mtObj.getFromKeyName("NotIndexedKey"));
+		assertEquals(1, list.length);
 		
 		// Assert equality
-		assertEquals( node._oid(), list[0]._oid() );
+		assertEquals(node._oid(), list[0]._oid());
 		
 	}
 	
 	// Array values tests
 	//-----------------------------------------------
 	@Test
-	public void jsonStorageTest()  {
-		Map<String,Object> data = new HashMap<String,Object>();
+	public void jsonStorageTest() {
+		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("name", "Hello");
-		data.put("arrs", new ArrayList<String>( Arrays.asList(new String[] { "oh", "no" }) ) );
+		data.put("arrs", new ArrayList<String>(Arrays.asList(new String[] { "oh", "no" })));
 		
 		MetaObject mo = null;
-		assertNotNull( mo = mtObj.append(null, data) );
+		assertNotNull(mo = mtObj.append(null, data));
 		mo.saveDelta();
 		
 		MetaObject to = null;
-		assertNotNull( to = mtObj.get( mo._oid() ) );
+		assertNotNull(to = mtObj.get(mo._oid()));
 		
 		data.put("_oid", mo._oid());
 		assertEquals(data, to);
 	}
 	
 	@Test
-	public void binaryStorageTest()  {
-		Map<String,Object> data = new HashMap<String,Object>();
+	public void binaryStorageTest() {
+		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("name", "Hello");
-		data.put("bin", new byte[] { 1,2,3,4,5 } );
+		data.put("bin", new byte[] { 1, 2, 3, 4, 5 });
 		
 		MetaObject mo = null;
-		assertNotNull( mo = mtObj.append(null, data) );
+		assertNotNull(mo = mtObj.append(null, data));
 		mo.saveDelta();
 		
 		MetaObject to = null;
-		assertNotNull( to = mtObj.get( mo._oid() ) );
+		assertNotNull(to = mtObj.get(mo._oid()));
 		
 		assertTrue(data.get("bin") instanceof byte[]);
 		assertTrue(to.get("bin") instanceof byte[]);
 		
-		assertArrayEquals( (byte[])(data.get("bin")), (byte[])(to.get("bin")) );
+		assertArrayEquals((byte[]) (data.get("bin")), (byte[]) (to.get("bin")));
 	}
 	
 	// Mapping tests
@@ -393,7 +393,7 @@ public class MetaTable_test {
 	@Test
 	public void testMapMappingSystem() {
 		mtObj.typeMap().clear();
-	
+		
 		HashMap<String, Object> mapping = new HashMap<String, Object>();
 		mapping.put("num", "INTEGER");
 		mapping.put("float", "FLOAT");
@@ -401,9 +401,9 @@ public class MetaTable_test {
 		mapping.put("long", "long");
 		mapping.put("mixed", "MIXED");
 		mapping.put("uuid-array", "UUID_ARRAY");
-	
+		
 		mtObj.setMappingType(mapping);
-	
+		
 		assertEquals(mtObj.getType("num"), MetaType.INTEGER);
 		assertEquals(mtObj.getType("float"), MetaType.FLOAT);
 		assertEquals(mtObj.getType("double"), MetaType.DOUBLE);

@@ -17,8 +17,8 @@ import picoded.security.NxtCrypt;
 /// Note that expire timestamps are measured in seconds,
 /// anything smaller then that is pointless over a network
 ///
-public interface KeyValueMap extends GenericConvertMap<String,String> {
-
+public interface KeyValueMap extends GenericConvertMap<String, String> {
+	
 	///
 	/// Temp mode optimization, used to indicate pure session like data,
 	/// that does not require persistance (or even SQL)
@@ -30,7 +30,7 @@ public interface KeyValueMap extends GenericConvertMap<String,String> {
 	///
 	/// @returns boolean  temp mode value
 	public boolean getTempHint();
-
+	
 	/// Sets temp mode optimization indicator hint
 	/// Note that this only serve as a hint, as does not indicate actual setting
 	///
@@ -96,7 +96,7 @@ public interface KeyValueMap extends GenericConvertMap<String,String> {
 	///
 	/// @returns array of keys
 	public Set<String> getKeys(String value);
-
+	
 	///
 	/// put, get, etc (public)
 	///--------------------------------------------------------------------------
@@ -139,7 +139,7 @@ public interface KeyValueMap extends GenericConvertMap<String,String> {
 	public default Set<String> keySet() {
 		return getKeys(null);
 	}
-
+	
 	///
 	/// Extended map operations
 	///--------------------------------------------------------------------------
@@ -154,7 +154,7 @@ public interface KeyValueMap extends GenericConvertMap<String,String> {
 	///
 	/// @returns null
 	public String putWithLifespan(String key, String value, long lifespan);
-
+	
 	/// Stores (and overwrites if needed) key, value pair
 	///
 	/// Important note: It does not return the previously stored value
@@ -188,7 +188,7 @@ public interface KeyValueMap extends GenericConvertMap<String,String> {
 	///
 	/// @returns String value of the random key generated
 	public String generateNonce(String val, long lifespan);
-
+	
 	/// Generates a random nonce hash, and saves the value to it
 	///
 	/// Note that the random nonce value returned, is based on picoded.security.NxtCrypt.randomString.
@@ -201,8 +201,8 @@ public interface KeyValueMap extends GenericConvertMap<String,String> {
 	/// @returns String value of the random key generated
 	public default String generateNonce(String val, long lifespan, int keyLength) {
 		String res = NxtCrypt.randomString(keyLength);
-		putWithLifespan( res, val, lifespan );
+		putWithLifespan(res, val, lifespan);
 		return res;
 	}
-		
+	
 }

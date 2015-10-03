@@ -28,7 +28,7 @@ public class ConfigFileSet_simple_test {
 	@Before
 	public void setUp() {
 		File tFile = new File(testDir);
-		assertTrue( tFile.canRead() );
+		assertTrue(tFile.canRead());
 		
 		configObj = new ConfigFileSet();//.addConfigSet(testDir);
 	}
@@ -40,18 +40,18 @@ public class ConfigFileSet_simple_test {
 	
 	@Test
 	public void constructor() {
-		assertNotNull( configObj );
+		assertNotNull(configObj);
 	}
 	
 	//@Test
 	//wrote a function to dump out all files in a folder, with a separator...unused at the moment, but might be useful in a utils lib one day
-	public void testKeyGen(){
+	public void testKeyGen() {
 		File fileSetFolder = new File(testDir);
 		//List<String> keys = configObj.getFileNamesFromFolder(fileSetFolder, "", ".");
 	}
 	
 	@Test
-	public void testRecursiveFunc(){
+	public void testRecursiveFunc() {
 		File fileSetFolder = new File(testDir);
 		configObj.addConfigSet(fileSetFolder, "", ".");
 		

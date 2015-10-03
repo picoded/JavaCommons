@@ -32,7 +32,7 @@ public class AccountTable_Sqlite_test extends AccountTable_test {
 	
 	public AccountTable implementationConstructor() {
 		JSqlStruct jsObj = new JSqlStruct(sqlImplmentation());
-		return jsObj.getAccountTable("AT_"+tableName);
+		return jsObj.getAccountTable("AT_" + tableName);
 	}
 	
 }

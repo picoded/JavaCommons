@@ -9,7 +9,7 @@ import java.util.function.Function;
 /// input and display code, without recurssion. While FormWrapperInterface generates wrapper
 /// HTML code, and recursively generates its child nodes
 ///
-public interface FormInputInterface  extends Function<FormNode, StringBuilder> {
+public interface FormInputInterface extends Function<FormNode, StringBuilder> {
 	
 	/// The lamda function to implement
 	///

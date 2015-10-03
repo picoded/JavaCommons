@@ -119,7 +119,7 @@ public class EmbeddedServlet {
 	
 	public EmbeddedServlet withServlet(String servletURLName, String servletName, String servletClassName) {
 		if (_tomcat != null && _context != null) {
-			if(!_cachedServletsAdded.contains(servletName)){
+			if (!_cachedServletsAdded.contains(servletName)) {
 				_tomcat.addServlet(_context.getPath(), servletName, servletClassName);
 				_cachedServletsAdded.add(servletName);
 			}
@@ -133,7 +133,7 @@ public class EmbeddedServlet {
 	
 	public EmbeddedServlet withServlet(String servletURLName, String servletName, Servlet servlet) {
 		if (_tomcat != null) {
-			if(!_cachedServletsAdded.contains(servletName)){
+			if (!_cachedServletsAdded.contains(servletName)) {
 				_tomcat.addServlet(_context.getPath(), servletName, servlet);
 				_cachedServletsAdded.add(servletName);
 			}

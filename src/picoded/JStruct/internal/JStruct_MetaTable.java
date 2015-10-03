@@ -22,13 +22,13 @@ import picoded.JStruct.*;
 /// read request load.
 /// 
 public class JStruct_MetaTable implements MetaTable {
-
+	
 	///
 	/// Constructor vars
 	///--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
-	protected Map<String, Map<String,Object>> _valueMap = new ConcurrentHashMap<String, Map<String,Object>>();
+	protected Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
 	
 	/// Read write lock
 	protected ReentrantReadWriteLock _accessLock = new ReentrantReadWriteLock();
@@ -90,16 +90,16 @@ public class JStruct_MetaTable implements MetaTable {
 	
 	// MetaObject MAP operations
 	//----------------------------------------------
-
+	
 	/// Gets the MetaObject, if it exists
 	public MetaObject get(Object _oid) {
 		try {
 			_accessLock.readLock().lock();
 			
 			String oid = _oid.toString();
-			Map<String,Object> fullMap = metaObjectRemoteDataMap_get(oid);
+			Map<String, Object> fullMap = metaObjectRemoteDataMap_get(oid);
 			
-			if( fullMap == null ) {
+			if (fullMap == null) {
 				return null;
 			}
 			return new JStruct_MetaObject(this, oid, fullMap, true);
@@ -121,7 +121,7 @@ public class JStruct_MetaTable implements MetaTable {
 	
 	// MetaObject operations
 	//----------------------------------------------
-
+	
 	/// Generates a new blank object, with a GUID
 	public MetaObject newObject() {
 		MetaObject ret = new JStruct_MetaObject(this, null, null, false);
@@ -152,7 +152,7 @@ public class JStruct_MetaTable implements MetaTable {
 		
 		return r;
 	}
-
+	
 	///
 	/// Internal functions, used by MetaObject
 	///--------------------------------------------------------------------------
@@ -160,16 +160,16 @@ public class JStruct_MetaTable implements MetaTable {
 	/// Ensures the returned value is not refencing the input value, cloning if needed
 	protected Object detachValue(Object in) {
 		
-		if( in instanceof byte[] ) { //bytearray support
+		if (in instanceof byte[]) { //bytearray support
 			byte[] ori = (byte[]) in;
 			byte[] cop = new byte[ori.length];
-			for(int a=0; a<ori.length; ++a) {
+			for (int a = 0; a < ori.length; ++a) {
 				cop[a] = ori[a];
 			}
 			return cop;
 		}
 		
-		return ConvertJSON.toObject( ConvertJSON.fromObject(in) );
+		return ConvertJSON.toObject(ConvertJSON.fromObject(in));
 	}
 	
 	/// Gets the complete remote data map, for MetaObject.
@@ -181,10 +181,10 @@ public class JStruct_MetaTable implements MetaTable {
 			Map<String, Object> ret = null;
 			Map<String, Object> storedValue = _valueMap.get(_oid);
 			
-			if( storedValue != null ) {
-				ret = new HashMap<String,Object>();
-				for( String key : storedValue.keySet() ) {
-					ret.put( key, detachValue(storedValue.get(key)) );
+			if (storedValue != null) {
+				ret = new HashMap<String, Object>();
+				for (String key : storedValue.keySet()) {
+					ret.put(key, detachValue(storedValue.get(key)));
 				}
 			}
 			
@@ -196,26 +196,26 @@ public class JStruct_MetaTable implements MetaTable {
 	
 	/// Updates the actual backend storage of MetaObject 
 	/// either partially (if supported / used), or completely
-	protected void metaObjectRemoteDataMap_update(String _oid, Map<String,Object> fullMap, Set<String> keys) {
+	protected void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap, Set<String> keys) {
 		try {
 			_accessLock.writeLock().lock();
 			
-			if( keys == null ) {
+			if (keys == null) {
 				keys = fullMap.keySet();
 			}
 			
 			Map<String, Object> storedValue = _valueMap.get(_oid);
-			if( storedValue == null ) {
+			if (storedValue == null) {
 				storedValue = new ConcurrentHashMap<String, Object>();
 			}
 			
-			for( String key : keys ) {
+			for (String key : keys) {
 				Object val = fullMap.get(key);
 				
-				if( val == null || val == ObjectTokens.NULL ) {
+				if (val == null || val == ObjectTokens.NULL) {
 					storedValue.remove(key);
 				} else {
-					storedValue.put( key, val );
+					storedValue.put(key, val);
 				}
 			}
 			

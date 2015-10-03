@@ -92,15 +92,11 @@ public class JSql_Mysql extends JSql {
 	
 	/// Internal parser that converts some of the common sql statements to mysql
 	public String genericSqlParser(String inString) {
-	    String qString = inString.toUpperCase();
-	    qString = inString.trim()
-			.replaceAll("(\\s){1}", " ")
-			.replaceAll("\\s+", " ")
-			.replaceAll("\"", "`")
-			//.replaceAll("\'", "`")
-			.replaceAll("AUTOINCREMENT", "AUTO_INCREMENT")
-			.replace("VARCHAR(MAX)", "TEXT");
-			
+		String qString = inString.toUpperCase();
+		qString = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("\\s+", " ").replaceAll("\"", "`")
+		//.replaceAll("\'", "`")
+			.replaceAll("AUTOINCREMENT", "AUTO_INCREMENT").replace("VARCHAR(MAX)", "TEXT");
+		
 		return qString;
 	}
 	
@@ -126,12 +122,10 @@ public class JSql_Mysql extends JSql {
 	public boolean execute(String qString, Object... values) throws JSqlException {
 		qString = genericSqlParser(qString);
 		String qStringUpper = qString.toUpperCase();
-		
 		/// MySQL does not support the inner query in create view
 		/// Check if create view query has an inner query.
 		/// If yes, create a view from the inner query and replace the inner query with created view.
 		if (qStringUpper.contains("CREATE VIEW")) {
-    		
     		// get view name
     		int indexAs = qStringUpper.indexOf("AS");
     		String viewName = "";
@@ -231,8 +225,8 @@ public class JSql_Mysql extends JSql {
 				}
 				return execute_raw(qStringUpper);
 			} catch (JSqlException e) {
-				if (e.getCause().toString().indexOf(
-					"com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Duplicate key name '") == -1) {
+				if (e.getCause().toString()
+					.indexOf("com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Duplicate key name '") == -1) {
 					// throws as its not a duplicate key exception
 					throw e;
 				}

@@ -37,8 +37,8 @@ import java.util.function.Function;
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
 
-public class TempFolder{
-	private interface fileWriterInterface extends BiFunction<File, Object, Boolean>{
+public class TempFolder {
+	private interface fileWriterInterface extends BiFunction<File, Object, Boolean> {
 		public Boolean apply(File file, Object input);
 	}
 	
@@ -59,69 +59,68 @@ public class TempFolder{
 	
 	private File _tempFolder = null;
 	
-	public TempFolder(String tempFolderName){
+	public TempFolder(String tempFolderName) {
 		createFolder(tempFolderName);
 	}
 	
-	public TempFolder(){
+	public TempFolder() {
 		createFolder(null);
 	}
 	
-	public File createFolder(String tempFolderName){
-		if(tempFolderName == null || tempFolderName.trim().isEmpty()){
+	public File createFolder(String tempFolderName) {
+		if (tempFolderName == null || tempFolderName.trim().isEmpty()) {
 			_tempFolderName = getRandomUUID();
-		}else{
+		} else {
 			_tempFolderName = tempFolderName;
 		}
 		
-		try{
+		try {
 			getTempFolder();
-		}catch(IOException ioex){
+		} catch (IOException ioex) {
 			throw new RuntimeException("createFolder() -> " + ioex.getMessage());
 		}
 		
 		return _tempFolder;
 	}
 	
-	public File createChildFile(String childFileName){
-		if(childFileName == null || childFileName.trim().isEmpty()){
+	public File createChildFile(String childFileName) {
+		if (childFileName == null || childFileName.trim().isEmpty()) {
 			return null;
 		}
 		
 		File newFile = new File(_tempFolder.getPath() + "/" + childFileName);
-		if(!newFile.exists()){
+		if (!newFile.exists()) {
 			newFile.mkdir();
 		}
 		
 		return newFile;
 	}
 	
-	public boolean writeToChildFile(String childFileName, Object data){
-		if(childFileName == null || childFileName.trim().isEmpty()){
+	public boolean writeToChildFile(String childFileName, Object data) {
+		if (childFileName == null || childFileName.trim().isEmpty()) {
 			return false;
 		}
 		
-//		File childFile = getChildFile(childFileName);
+		//		File childFile = getChildFile(childFileName);
 		File childFile = new File(_tempFolder.getPath() + File.separator + childFileName);
-		if(data instanceof String){
+		if (data instanceof String) {
 			return writeString.apply(childFile, data);
-		}else if(data instanceof byte[]){
+		} else if (data instanceof byte[]) {
 			return writeByteArray.apply(childFile, data);
-		}else{
+		} else {
 			throw new RuntimeException("Unable to process data other than String or byte[]. Please extend if needed");
 		}
 	}
-	
 	
 	/////////////////////////////////////////
 	//
 	//  HELPER FUNCSSSSSSSSSSSSS
 	//
 	/////////////////////////////////////////
-
-	public File getChildFile(String childFileName){
+	
+	public File getChildFile(String childFileName) {
 		File newFile = new File(_tempFolder.getPath() + "/" + childFileName);
-		if(!newFile.exists()){
+		if (!newFile.exists()) {
 			newFile.mkdir();
 		}
 		
@@ -130,33 +129,33 @@ public class TempFolder{
 	
 	/// Create "piJCTemp" folder under the system temp folder if not already exists.
 	/// @returns  File object; system temp folder path i.e. /var/tmp/piJCTemp
-	public File getTempFolder() throws IOException{
-		if(_tempFolder == null){
+	public File getTempFolder() throws IOException {
+		if (_tempFolder == null) {
 			String tmpDir = getSystemTempRootPath();
 			_tempFolder = new File(tmpDir + File.separator + _tempFolderName);
 			
 			boolean createdSuccessfully = true; //will only become false if failed to create a folder
-			if(!_tempFolder.exists()){
+			if (!_tempFolder.exists()) {
 				createdSuccessfully = _tempFolder.mkdirs();
-			}else{
+			} else {
 				return _tempFolder;
 			}
 			
-			if(!createdSuccessfully){
+			if (!createdSuccessfully) {
 				throw new RuntimeException("getTempFolder() -> Failed to create temp folder");
 			}
 		}
 		return _tempFolder;
 	}
 	
-	public static String getSystemTempRootPath(){
-		try{
+	public static String getSystemTempRootPath() {
+		try {
 			String tmpDir = System.getProperty(_javaTmpDir);
 			return tmpDir + File.separator + _piJCTempFolderName;
-		}catch(SecurityException sex){ //hehehehe
-			throw new RuntimeException("getTempDir() -> Unable to access tmp dir property: "+sex.getMessage());
-		}catch(Exception ex){
-			throw new RuntimeException("getTempDir() -> Error while trying to get tmp dir property: "+ex.getMessage());
+		} catch (SecurityException sex) { //hehehehe
+			throw new RuntimeException("getTempDir() -> Unable to access tmp dir property: " + sex.getMessage());
+		} catch (Exception ex) {
+			throw new RuntimeException("getTempDir() -> Error while trying to get tmp dir property: " + ex.getMessage());
 		}
 	}
 	
@@ -165,36 +164,36 @@ public class TempFolder{
 		return UUID.randomUUID().toString();
 	}
 	
-	private fileWriterInterface writeString = (file, input)->{
-		String inputString = (String)input;
+	private fileWriterInterface writeString = (file, input) -> {
+		String inputString = (String) input;
 		
-		try{
+		try {
 			FileWriter fw = new FileWriter(file);
 			fw.write(inputString);
 			fw.flush();
 			fw.close();
 			
 			return true;
-		}catch(Exception e){
+		} catch (Exception e) {
 			return false;
 		}
 	};
 	
-	private fileWriterInterface writeByteArray = (file, input)->{
-		byte[] inputString = (byte[])input;
+	private fileWriterInterface writeByteArray = (file, input) -> {
+		byte[] inputString = (byte[]) input;
 		
-		try{
+		try {
 			FileOutputStream fos = new FileOutputStream(file);
 			fos.write(inputString);
 			fos.flush();
 			fos.close();
 			
 			return true;
-		}catch(Exception e){
+		} catch (Exception e) {
 			return false;
 		}
 	};
-		
+	
 	/////////////////////////////////////////
 	//
 	//  TO REFACTOR
@@ -214,7 +213,7 @@ public class TempFolder{
 			hours = file_outdated_hours;
 		}
 		long currentTimeMillis = (System.currentTimeMillis() / 1000);
-		try{
+		try {
 			File[] files = getTempFolder().listFiles();
 			if (files != null) {
 				for (File file : files) {
@@ -226,7 +225,7 @@ public class TempFolder{
 					}
 				}
 			}
-		}catch(Exception e){
+		} catch (Exception e) {
 			throw new RuntimeException("cleanupNow() -> " + e.getMessage());
 		}
 	}

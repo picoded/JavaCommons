@@ -35,7 +35,7 @@ public class GenericConvert {
 	/// @returns         The converted string, always possible unless null
 	public static String toString(Object input, Object fallbck) {
 		if (input == null) {
-			if(fallbck == null) {
+			if (fallbck == null) {
 				return null;
 			}
 			return toString(fallbck, null);
@@ -509,11 +509,11 @@ public class GenericConvert {
 		
 		if (input instanceof String[]) {
 			return (String[]) input;
-		} else if( input instanceof Object[] ) {
-			Object[] inArr = (Object[])input;
+		} else if (input instanceof Object[]) {
+			Object[] inArr = (Object[]) input;
 			String[] ret = new String[inArr.length];
-			for(int a=0; a<inArr.length; ++a) {
-				ret[a] = toString( inArr[a] );
+			for (int a = 0; a < inArr.length; ++a) {
+				ret[a] = toString(inArr[a]);
 			}
 			return ret;
 		}
@@ -677,38 +677,40 @@ public class GenericConvert {
 		
 		return null;
 	}
-	*/
+	 */
 	
 	// to BiFunction Map, used to automated put conversion handling
 	//--------------------------------------------------------------------------------------------------
-	public static BiFunction<Object, Object, String> toString_BiFunction = (i,f) -> GenericConvert.toString(i,f);
-	public static BiFunction<Object, Object, String[]> toStringArray_BiFunction = (i,f) -> GenericConvert.toStringArray(i,f);
+	public static BiFunction<Object, Object, String> toString_BiFunction = (i, f) -> GenericConvert.toString(i, f);
+	public static BiFunction<Object, Object, String[]> toStringArray_BiFunction = (i, f) -> GenericConvert
+		.toStringArray(i, f);
 	
-	protected static Map<Class<?>, BiFunction<Object,Object,?> > biFunctionMap = null;
-	public static Map<Class<?>, BiFunction<Object,Object,?> > biFunctionMap() {
-		if(biFunctionMap != null) {
+	protected static Map<Class<?>, BiFunction<Object, Object, ?>> biFunctionMap = null;
+	
+	public static Map<Class<?>, BiFunction<Object, Object, ?>> biFunctionMap() {
+		if (biFunctionMap != null) {
 			return biFunctionMap;
 		}
 		
-		Map<Class<?>, BiFunction<Object,Object,?> > ret = new HashMap<Class<?>, BiFunction<Object,Object,?> >();
+		Map<Class<?>, BiFunction<Object, Object, ?>> ret = new HashMap<Class<?>, BiFunction<Object, Object, ?>>();
 		
-		ret.put( String.class, toString_BiFunction );
-		ret.put( String[].class, toStringArray_BiFunction );
+		ret.put(String.class, toString_BiFunction);
+		ret.put(String[].class, toStringArray_BiFunction);
 		
 		biFunctionMap = ret;
 		return biFunctionMap;
 	}
 	
 	/// Gets and return the relevent BiFunction for the given class
-	public static BiFunction<Object,Object,?> getBiFunction(Class<?> resultClassObj) {
+	public static BiFunction<Object, Object, ?> getBiFunction(Class<?> resultClassObj) {
 		return biFunctionMap().get(resultClassObj);
 	}
 	
 	/// Gets and return the relevent BiFunction for the given class, throws an error if not found
-	public static BiFunction<Object,Object,?> getBiFunction_noisy(Class<?> resultClassObj) {
-		BiFunction<Object,Object,?> ret = getBiFunction(resultClassObj);
-		if( ret == null ) {
-			throw new RuntimeException("Unable to find specified class object: "+resultClassObj);
+	public static BiFunction<Object, Object, ?> getBiFunction_noisy(Class<?> resultClassObj) {
+		BiFunction<Object, Object, ?> ret = getBiFunction(resultClassObj);
+		if (ret == null) {
+			throw new RuntimeException("Unable to find specified class object: " + resultClassObj);
 		}
 		return ret;
 	}

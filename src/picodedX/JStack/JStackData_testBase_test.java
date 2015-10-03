@@ -40,7 +40,7 @@ public class JStackData_testBase_test {
 	
 	/// Hazelcast setup function, repeated calls are "safe"
 	public static ClientConfig hazelcastSetup() {
-		if( hazelcastConfig == null ) {
+		if (hazelcastConfig == null) {
 			// one-time initialization code
 			hazelcastClusterName = LocalCacheSetup.setupHazelcastServer();
 			
@@ -59,7 +59,7 @@ public class JStackData_testBase_test {
 	
 	/// Setsup the redis testing server, repeated calls are "safe"
 	public static org.redisson.Config redisSetup() {
-		if(redissonConfig == null) {
+		if (redissonConfig == null) {
 			// one-time initialization code
 			redisPort = LocalCacheSetup.setupRedisServer();
 			
@@ -76,7 +76,7 @@ public class JStackData_testBase_test {
 	public static void oneTimeTearDown() {
 		
 		// Tears down hazelcast (if needed)
-		if( hazelcastConfig != null ) {
+		if (hazelcastConfig != null) {
 			try {
 				Thread.sleep(5000);
 			} catch (Exception e) {
@@ -89,7 +89,7 @@ public class JStackData_testBase_test {
 		}
 		
 		// Tears down redis (if needed)
-		if( redissonConfig != null ) {
+		if (redissonConfig != null) {
 			//try {
 			//	Thread.sleep(5000);
 			//} catch (Exception e) {
@@ -153,13 +153,13 @@ public class JStackData_testBase_test {
 		JCacheObj = JCacheObj();
 		JSqlObj = JSqlObj();
 		
-		if( JCacheObj == null && JSqlObj == null ) {
+		if (JCacheObj == null && JSqlObj == null) {
 			throw new RuntimeException("Both JCache, and JSql cannot be blank");
 		}
 		
-		if( JCacheObj == null ) {
+		if (JCacheObj == null) {
 			JStackLayerArray = new JStackLayer[] { JSqlObj };
-		} else if( JSqlObj == null ) {
+		} else if (JSqlObj == null) {
 			JStackLayerArray = new JStackLayer[] { JCacheObj };
 		} else {
 			JStackLayerArray = new JStackLayer[] { JCacheObj, JSqlObj };
@@ -179,6 +179,5 @@ public class JStackData_testBase_test {
 	public void stackCheck() {
 		assertNotNull(JStackSetup());
 	}
-	
 	
 }

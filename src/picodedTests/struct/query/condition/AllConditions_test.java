@@ -24,17 +24,17 @@ public class AllConditions_test {
 	//--------------------------------------------------------------------
 	
 	/// Map sample, used to setup test cases
-	public Map<String,Object> sample_a = null;
-	public Map<String,Object> sample_b = null;
-	public Map<String,Object> sample_c = null;
-	public Map<String,Object> sample_d = null;
+	public Map<String, Object> sample_a = null;
+	public Map<String, Object> sample_b = null;
+	public Map<String, Object> sample_c = null;
+	public Map<String, Object> sample_d = null;
 	
 	@Before
 	public void setUp() {
-		sample_a = new HashMap<String,Object>();
-		sample_b = new HashMap<String,Object>();
-		sample_c = new HashMap<String,Object>();
-		sample_d = new HashMap<String,Object>();
+		sample_a = new HashMap<String, Object>();
+		sample_b = new HashMap<String, Object>();
+		sample_c = new HashMap<String, Object>();
+		sample_d = new HashMap<String, Object>();
 		
 		sample_a.put("hello", "world");
 		sample_a.put("int", 3);
@@ -80,16 +80,29 @@ public class AllConditions_test {
 		Query cond = new Equals("hello", "my", sample_c);
 		
 		assertNotNull(cond);
-		assertTrue( cond.test(sample_a) );
-		assertFalse( cond.test(sample_b) );
+		assertTrue(cond.test(sample_a));
+		assertFalse(cond.test(sample_b));
 		
-		assertFalse( cond.test(sample_a, sample_d) );
-		assertTrue( cond.test(sample_b, sample_d) );
+		assertFalse(cond.test(sample_a, sample_d));
+		assertTrue(cond.test(sample_b, sample_d));
 		
 	}
 	
 	@Test
-	public void lessThan(){
+	public void like() {
+		Query cond = new Like("hello", "my", sample_c);
+		
+		assertNotNull(cond);
+		assertTrue(cond.test(sample_a));
+		assertTrue(cond.test(sample_b));
+		
+		assertFalse(cond.test(sample_a, sample_d));
+		assertTrue(cond.test(sample_b, sample_d));
+		
+	}
+	
+	@Test
+	public void lessThan() {
 		
 		//if a string starts with a number, number parse will work
 		Query cond = new LessThan("int", "int", sample_c);
@@ -111,7 +124,7 @@ public class AllConditions_test {
 	}
 	
 	@Test
-	public void moreThan(){
+	public void moreThan() {
 		
 		//if a string starts with a number, number parse will work
 		Query cond = new MoreThan("int", "int", sample_c);
@@ -132,8 +145,8 @@ public class AllConditions_test {
 		assertTrue(cond.test(sample_b));
 	}
 	
-	@Test
-	public void lessThanOrEquals(){
+	public void setupEqualitySamples() {
+		
 		sample_a = new HashMap<String, Object>();
 		sample_b = new HashMap<String, Object>();
 		sample_c = new HashMap<String, Object>();
@@ -162,6 +175,12 @@ public class AllConditions_test {
 		sample_d.put("float", 5.0);
 		sample_d.put("string", "abcde");
 		sample_d.put("stringNumber", "5");
+		
+	}
+	
+	@Test
+	public void lessThanOrEquals() {
+		setupEqualitySamples();
 		
 		//if a string starts with a number, number parse will work
 		Query cond = new LessThanOrEquals("int", "int", sample_d);
@@ -191,35 +210,8 @@ public class AllConditions_test {
 	}
 	
 	@Test
-	public void moreThanOrEquals(){
-		sample_a = new HashMap<String, Object>();
-		sample_b = new HashMap<String, Object>();
-		sample_c = new HashMap<String, Object>();
-		sample_d = new HashMap<String, Object>();
-		
-		sample_a.put("int", 4);
-		sample_a.put("double", 4.99);
-		sample_a.put("float", 4.9);
-		sample_a.put("string", "aacde");
-		sample_a.put("stringNumber", "4.9");
-		
-		sample_b.put("int", 5);
-		sample_b.put("double", 5.00);
-		sample_b.put("float", 5.00);
-		sample_b.put("string", "abcde");
-		sample_b.put("stringNumber", "5");
-		
-		sample_c.put("int", 6);
-		sample_c.put("double", 5.01);
-		sample_c.put("float", 5.1);
-		sample_c.put("string", "accde");
-		sample_c.put("stringNumber", "5.11");
-		
-		sample_d.put("int", 5);
-		sample_d.put("double", 5.00);
-		sample_d.put("float", 5.0);
-		sample_d.put("string", "abcde");
-		sample_d.put("stringNumber", "5");
+	public void moreThanOrEquals() {
+		setupEqualitySamples();
 		
 		//if a string starts with a number, number parse will work
 		Query cond = new MoreThanOrEquals("int", "int", sample_d);
@@ -246,5 +238,43 @@ public class AllConditions_test {
 		assertFalse(cond.test(sample_a));
 		assertTrue(cond.test(sample_b));
 		assertTrue(cond.test(sample_c));
+	}
+	
+	
+	@Test
+	public void likeEquality() {
+		setupEqualitySamples();
+		
+		//if a string starts with a number, number parse will work
+		Map<String,Object> testFields = new HashMap<String,Object>();
+		testFields.put("abcde", "abcde");
+		testFields.put("ab%", "ab%");
+		testFields.put("%bcde", "%bcde");
+		testFields.put("%bcd%", "%bcd%");
+		
+		Query cond = new Like("string", "abcde", testFields);
+		assertFalse(cond.test(sample_a));
+		assertTrue(cond.test(sample_b));
+		assertFalse(cond.test(sample_c));
+		assertTrue(cond.test(sample_d));
+		
+		cond = new Like("string", "ab%", testFields);
+		assertFalse(cond.test(sample_a));
+		assertTrue(cond.test(sample_b));
+		assertFalse(cond.test(sample_c));
+		assertTrue(cond.test(sample_d));
+		
+		cond = new Like("string", "%bcde", testFields);
+		assertFalse(cond.test(sample_a));
+		assertTrue(cond.test(sample_b));
+		assertFalse(cond.test(sample_c));
+		assertTrue(cond.test(sample_d));
+		
+		cond = new Like("string", "%bcd%", testFields);
+		assertFalse(cond.test(sample_a));
+		assertTrue(cond.test(sample_b));
+		assertFalse(cond.test(sample_c));
+		assertTrue(cond.test(sample_d));
+		
 	}
 }

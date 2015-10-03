@@ -43,7 +43,7 @@ public class LDAPAuthenticator {
 	
 	/// User Info attributes inside LDAP
 	private static String[] userInfoAttributes = { //
-		"distinguishedName", "cn", "name", //
+	"distinguishedName", "cn", "name", //
 		"uid", "sn", "givenname", "memberOf", //
 		"samaccountname", "userPrincipalName" //
 	}; //
@@ -87,7 +87,8 @@ public class LDAPAuthenticator {
 	//////////////////////////////////////////
 	
 	/// Blank constructor (will rely on user, and server info for domain, etc)
-	public LDAPAuthenticator() { }
+	public LDAPAuthenticator() {
+	}
 	
 	/// Constructor which setsup the various base config
 	public LDAPAuthenticator(String serverName, int port, String domainName) {
@@ -163,11 +164,11 @@ public class LDAPAuthenticator {
 		//
 		// Sanity checks
 		//
-		if( username == null ) {
+		if (username == null) {
 			return "Invalid blank username (null)";
 		}
 		
-		if( (username = username.trim()).length() <= 0 ) {
+		if ((username = username.trim()).length() <= 0) {
 			return "Invalid blank username (length=0)";
 		}
 		
@@ -176,11 +177,11 @@ public class LDAPAuthenticator {
 		//
 		String usedUsername = username; //username actually used
 		String domainName = defaultDomain; //domain name actually used
-		if( usedUsername.indexOf("@") > 0 ) {
+		if (usedUsername.indexOf("@") > 0) {
 			String[] splitNames = usedUsername.split("@");
 			
-			if(splitNames.length != 2) {
-				return "Unexpected username with improper domain ("+usedUsername+")";
+			if (splitNames.length != 2) {
+				return "Unexpected username with improper domain (" + usedUsername + ")";
 			}
 			
 			usedUsername = splitNames[0];
@@ -192,12 +193,12 @@ public class LDAPAuthenticator {
 		//
 		
 		// Possibly invalid domain name
-		if( (domainName = domainName.trim()).length() <= 0 ) {
+		if ((domainName = domainName.trim()).length() <= 0) {
 			domainName = null;
 		}
 		
 		// Fallback to server domain
-		if( domainName == null ) {
+		if (domainName == null) {
 			try {
 				String fqdn = java.net.InetAddress.getLocalHost().getCanonicalHostName();
 				if (fqdn.split("\\.").length > 1) {
@@ -209,8 +210,8 @@ public class LDAPAuthenticator {
 		}
 		
 		// Missing domain name check
-		if( domainName == null || (domainName = domainName.trim()).length() <= 0 ) {
-			return "Missing domain name parameter for user ("+usedUsername+")";
+		if (domainName == null || (domainName = domainName.trim()).length() <= 0) {
+			return "Missing domain name parameter for user (" + usedUsername + ")";
 		}
 		
 		//
@@ -252,8 +253,8 @@ public class LDAPAuthenticator {
 			return "Failed to authenticate: " + username;
 		}
 		
-		if( loginContext == null ) {
-			return "Failed to acquire login context: "+username;
+		if (loginContext == null) {
+			return "Failed to acquire login context: " + username;
 		}
 		
 		cachedDomain = domainName;
@@ -261,7 +262,6 @@ public class LDAPAuthenticator {
 		cachedContext = loginContext;
 		return null;
 	}
-	
 	
 	///
 	/// Get some basic user information. Containing the following (userInfoAttributes)
@@ -279,13 +279,13 @@ public class LDAPAuthenticator {
 		//
 		// Basic setup and checks
 		//
-		Map<String,String> ret = new HashMap<String,String>();
+		Map<String, String> ret = new HashMap<String, String>();
 		String usedDomain = cachedDomain;
 		String usedUsername = cachedUser;
 		String principalName = usedUsername + "@" + usedDomain;
 		LdapContext usedContext = cachedContext;
 		
-		if( usedContext == null ) {
+		if (usedContext == null) {
 			throw new RuntimeException("Missing user context, call authenticate() first");
 		}
 		
@@ -296,8 +296,8 @@ public class LDAPAuthenticator {
 			SearchControls controls = new SearchControls();
 			controls.setSearchScope(SUBTREE_SCOPE);
 			controls.setReturningAttributes(userInfoAttributes);
-			NamingEnumeration<SearchResult> answer = usedContext.search(domainNameToLdapDC(usedDomain), "(& (userPrincipalName="
-																					  + principalName + ")(objectClass=user))", controls);
+			NamingEnumeration<SearchResult> answer = usedContext.search(domainNameToLdapDC(usedDomain),
+				"(& (userPrincipalName=" + principalName + ")(objectClass=user))", controls);
 			
 			if (answer.hasMore()) {
 				Attributes attr = answer.next().getAttributes();
@@ -305,13 +305,13 @@ public class LDAPAuthenticator {
 					//
 					// Found it, prepare return values
 					//
-					for(String info : userInfoAttributes) {
+					for (String info : userInfoAttributes) {
 						Object val = null;
-						if( attr.get(info) != null ) {
+						if (attr.get(info) != null) {
 							val = attr.get(info).get();
 						}
 						
-						if(val != null) {
+						if (val != null) {
 							ret.put(info, val.toString());
 						} else {
 							ret.put(info, null);
@@ -323,11 +323,11 @@ public class LDAPAuthenticator {
 					return ret;
 				}
 			}
-		} catch( Exception e ) {
-			throw new RuntimeException("Failed to fetch userInfo ("+usedUsername+")", e);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to fetch userInfo (" + usedUsername + ")", e);
 		}
 		
-		throw new RuntimeException("Failed to fetch userInfo ("+usedUsername+")");
+		throw new RuntimeException("Failed to fetch userInfo (" + usedUsername + ")");
 		//return null; // Failed to get
 	}
 	

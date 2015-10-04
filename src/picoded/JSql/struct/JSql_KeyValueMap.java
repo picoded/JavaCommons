@@ -118,15 +118,6 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 		}
 	}
 	
-	/// perform increment maintenance, meant for minor changes between requests
-	public void incrementalMaintenance() {
-		// 5 percent chance of trigering maintenance
-		// This is to lower to overall performance cost incrementalMaintenance per request
-		if (RandomUtils.nextInt(0, 100) <= 5) {
-			maintenance();
-		}
-	}
-	
 	/// Perform maintenance, mainly removing of expired data if applicable
 	public void maintenance() {
 		try {

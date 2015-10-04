@@ -25,30 +25,30 @@ public class JStack extends JSqlStruct implements JStackLayer {
 		return _stackLayers;
 	}
 	
-	/// JStruct layering internal var
-	protected JStruct[] _structLayers = null;
-	
-	/// Final getter for JStruct layers
-	public final JStruct[] structLayers() {
-		if( _structLayers != null ) {
-			return _structLayers;
-		}
-		
-		int len = stackLayers.length;
-		JStruct[] ret = new JStruct[len];
-		for(int i=0; i < len; ++i ) {
-			JStackLayer layer = stackLayers[i];
-			
-			if( layer instanceof JStruct ) {
-				ret[i] = layer;
-			} else if( layer instanceof JSql ) {
-				ret[i] = JSqlStruct( (JSql)layer );
-			} 
-		}
-		
-		return (_structLayers = ret);
-	}
-	
+	// /// JStruct layering internal var
+	// protected JStruct[] _structLayers = null;
+	// 
+	// /// Final getter for JStruct layers
+	// public final JStruct[] structLayers() {
+	// 	if( _structLayers != null ) {
+	// 		return _structLayers;
+	// 	}
+	// 	
+	// 	int len = stackLayers.length;
+	// 	JStruct[] ret = new JStruct[len];
+	// 	for(int i=0; i < len; ++i ) {
+	// 		JStackLayer layer = stackLayers[i];
+	// 		
+	// 		if( layer instanceof JStruct ) {
+	// 			ret[i] = layer;
+	// 		} else if( layer instanceof JSql ) {
+	// 			ret[i] = JSqlStruct( (JSql)layer );
+	// 		} 
+	// 	}
+	// 	
+	// 	return (_structLayers = ret);
+	// }
+	// 
 	// Table prefixing filter ??
 	
 	// Object created timestamp prefix filter ??

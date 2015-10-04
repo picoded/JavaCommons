@@ -10,7 +10,7 @@ import picoded.JStack.JStackLayer;
 /// Base object, where the respective data structure
 /// implmentation is loaded from.
 ///
-public class JStruct extends JStackLayer {
+public class JStruct implements JStackLayer {
 	
 	// KeyValueMap handling
 	//----------------------------------------------

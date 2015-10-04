@@ -19,5 +19,44 @@ public class JCacheStruct extends JStruct {
 		jCacheObj = cache;
 	}
 	
+	/// Actual setup implmentation to overwrite
+	///
+	/// @param name - name of map in backend
+	///
+	/// @returns KeyValueMap
+	protected KeyValueMap setupKeyValueMap(String name) {
+		if (jCacheObj == null) {
+			throw new RuntimeException("Missing required SQL Object");
+		}
+		
+		return new JCache_KeyValueMap(jCacheObj, name);
+	}
 	
+	// 
+	// /// Actual setup implmentation to overwrite
+	// ///
+	// /// @param name - name of map in backend
+	// ///
+	// /// @returns MetaTable
+	// protected MetaTable setupMetaTable(String name) {
+	// 	if (sqlObj == null) {
+	// 		throw new RuntimeException("Missing required SQL Object");
+	// 	}
+	// 	
+	// 	return new JSql_MetaTable(sqlObj, name);
+	// }
+	// 
+	// /// Actual setup implmentation to overwrite
+	// ///
+	// /// @param name - name of map in backend
+	// ///
+	// /// @returns AccountTable
+	// protected AccountTable setupAccountTable(String name) {
+	// 	if (sqlObj == null) {
+	// 		throw new RuntimeException("Missing required SQL Object");
+	// 	}
+	// 	
+	// 	return new AccountTable(this, name);
+	// }
+	// 
 }

@@ -14,6 +14,7 @@ public class JSqlStruct extends JStruct {
 	protected JSql sqlObj = null;
 	
 	/// Setup with nothing
+	/// TEMP: for JStack
 	public JSqlStruct() {
 		// does nothing
 	}

@@ -4,7 +4,7 @@ import picoded.JCache.*;
 import picoded.JCache.dataStore.BaseInterface;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
-import java.util.Queue;
+import java.util.*;
 
 import com.hazelcast.core.*;
 import com.hazelcast.config.*;
@@ -85,9 +85,9 @@ public class JCache_hazelcast extends JCache {
 	/// Gets a ConcurrentMap with the given name
 	///
 	/// @param  name  The concurrent map storage name
-	public <K, V> ConcurrentMap<K, V> getMap(String name) throws JCacheException {
+	public <K, V> JCacheMap<K, V> getMap(String name) throws JCacheException {
 		throwIfIsDispose();
-		return hazelcastObj.getMap(name);
+		return new JCacheMap<K, V>(hazelcastObj.getMap(name));
 	}
 	
 	/// Gets a distributed concurrent lock

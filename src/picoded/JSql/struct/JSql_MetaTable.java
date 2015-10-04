@@ -280,9 +280,9 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	// 	return r;
 	// }
 	
-	///
-	/// Internal functions, used by MetaObject
-	///--------------------------------------------------------------------------
+	//
+	// Internal functions, used by MetaObject
+	//--------------------------------------------------------------------------
 	
 	/// Gets the complete remote data map, for MetaObject.
 	/// Returns null

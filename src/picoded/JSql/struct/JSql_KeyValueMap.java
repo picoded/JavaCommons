@@ -232,7 +232,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	///
 	/// @param key 
 	/// @param value, null means removal
-	/// @param expire timestamp, 0 means not timestamp
+	/// @param expire timestamp in seconds, 0 means NO expire
 	///
 	/// @returns null
 	protected String setValueRaw(String key, String value, long expire) {
@@ -279,6 +279,13 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/// Returns all the valid keys
+	///
+	/// @returns  the full keyset
+	public Set<String> keySet() {
+		return getKeys(null);
 	}
 	
 	/// Remove the value, given the key

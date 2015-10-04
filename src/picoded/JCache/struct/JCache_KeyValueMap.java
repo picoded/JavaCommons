@@ -100,12 +100,56 @@ public class JCache_KeyValueMap extends JStruct_KeyValueMap {
 	///
 	/// @param key 
 	/// @param value, null means removal
-	/// @param expire timestamp, 0 means not timestamp
+	/// @param expire timestamp in seconds, 0 means NO expire
 	///
 	/// @returns null
 	protected String setValueRaw(String key, String value, long expire) {
 		return coreCacheMap().put(key, value, expire);
 	}
+	
+	/// [Internal use, to be extended in future implementation]
+	/// Returns the expire time stamp value, raw without validation
+	///
+	/// Handles re-entrant lock where applicable
+	///
+	/// @param key as String
+	///
+	/// @returns long
+	protected long getExpiryRaw(String key) {
+		return coreCacheMap().getExpiry(key);
+	}
+	
+	/// [Internal use, to be extended in future implementation]
+	/// Sets the expire time stamp value, raw without validation
+	///
+	/// Handles re-entrant lock where applicable
+	///
+	/// @param key as String
+	/// @param expire timestamp in seconds, 0 means NO expire
+	///
+	/// @returns long
+	protected void setExpiryRaw(String key, long expire) {
+		String value = coreCacheMap().get(key);
+		if( value != null ) {
+			coreCacheMap().put(key, value, expire);
+		} 
+		// ignore if there is no value
+	}
+	
+	///
+	/// @TODO : getting this to work (see JCacheMap.java : 103)
+	/// Current low performance fallback used below
+	///
+	/// Search using the value, all the relevent key mappings
+	///
+	/// Handles re-entrant lock where applicable
+	///
+	/// @param key, note that null matches ALL
+	///
+	/// @returns array of keys
+	// public Set<String> getKeys(String value) {
+	// 	return coreCacheMap().getKeys(value);
+	// }
 	
 	/// Search using the value, all the relevent key mappings
 	///
@@ -115,7 +159,31 @@ public class JCache_KeyValueMap extends JStruct_KeyValueMap {
 	///
 	/// @returns array of keys
 	public Set<String> getKeys(String value) {
-		return coreCacheMap().getKeys(value);
+		long now = currentSystemTimeInSeconds();
+		Set<String> ret = new HashSet<String>();
+		
+		// The keyset to check against
+		Set<String> valuekeySet = coreCacheMap().keySet();
+		
+		// Iterate and get
+		for (String key : valuekeySet) {
+			String rawValue = _coreCacheMap.get(key);
+			
+			if (rawValue != null) {
+				if (value == null || rawValue.equals(value)) {
+					ret.add(key);
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/// Returns all the valid keys
+	///
+	/// @returns  the full keyset
+	public Set<String> keySet() {
+		return coreCacheMap().keySet();
 	}
 	
 	/// Remove the value, given the key

@@ -85,7 +85,7 @@ public class JCache_redis_test {
 	
 	@Test
 	public void simplePutAndGet() throws JCacheException {
-		ConcurrentMap<String, String> rMap = JCacheObj.getMap("testMap");
+		Map<String, String> rMap = JCacheObj.getMap("testMap");
 		
 		assertNull(rMap.get("testIsNull"));
 		rMap.put("hello", "world");

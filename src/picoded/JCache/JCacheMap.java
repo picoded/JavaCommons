@@ -78,7 +78,7 @@ public class JCacheMap<K, V> extends ProxyGenericConvertMap<K, V> {
 		// Implmentation specific operation
 		//
 		if(map_hazelcast != null) {
-			map_hazelcast.set(key, value, ttl, TimeUnit.SECONDS);
+			map_hazelcast.put(key, value, ttl, TimeUnit.SECONDS);
 			return null;
 		} else {
 			throw new RuntimeException("Put with expiry not supported yet");
@@ -93,7 +93,20 @@ public class JCacheMap<K, V> extends ProxyGenericConvertMap<K, V> {
 	public long getExpiry(K key) {
 		if(map_hazelcast != null) {
 			EntryView<K,V> ev = map_hazelcast.getEntryView(key);
-			long time = ev.getExpirationTime(); //Do we need to post process this? (ie/1000s)
+			
+			// No value
+			if( ev == null ) {
+				return -1;
+			}
+			
+			// Expiration time in seconds
+			long time = ev.getExpirationTime() / 1000L; //Do we need to post process this? (ie/1000s)
+			
+			// Invalid expire time?
+			if( time <= 0 ) {
+				return 0;
+			}
+			
 			return time;
 		} else {
 			throw new RuntimeException("Put with expiry not supported yet");
@@ -101,6 +114,8 @@ public class JCacheMap<K, V> extends ProxyGenericConvertMap<K, V> {
 	}
 	
 	/// Search using the value, all the relevent key mappings
+	///
+	/// @TODO : getting this to work (see JCache_KeyValueMap.java : 112)
 	///
 	/// Handles re-entrant lock where applicable
 	///
@@ -118,8 +133,11 @@ public class JCacheMap<K, V> extends ProxyGenericConvertMap<K, V> {
 				throw new RuntimeException("Provided value, must be 'java comparable' : "+value);
 			}
 			
+			
+			//isNotNull() 
+			PredicateBuilder pb = new PredicateBuilder();
 			EntryObject eo = new PredicateBuilder().getEntryObject();
-			Predicate<K,V> byValue = eo.equal( (Comparable<V>)value );
+			Predicate<K,V> byValue = eo.isNotNull().and( eo.equal( (Comparable<V>)value ) );
 			
 			return map_hazelcast.keySet(byValue);
 		} else {

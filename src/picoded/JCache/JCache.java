@@ -23,12 +23,12 @@ public class JCache extends BaseInterface {
 	
 	/// @TODO : NOT YET IMPLEMENTED
 	public static JCache hazelcast(String clustername, String password) {
-		throw new RuntimeException(JCacheException.invalidDatastoreImplementationException);
+		return new picoded.JCache.dataStore.JCache_hazelcast(clustername, password);
 	}
 	
 	/// @TODO : NOT YET IMPLEMENTED
 	public static JCache hazelcast(String clustername, String password, String ipAddressWithPort) {
-		throw new RuntimeException(JCacheException.invalidDatastoreImplementationException);
+		return new picoded.JCache.dataStore.JCache_hazelcast(clustername, password, ipAddressWithPort);
 	}
 	
 	/// Hazelcast implementation constructor, returns picoded.JCache.dataStore.JCache_redis

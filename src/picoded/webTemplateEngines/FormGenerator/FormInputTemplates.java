@@ -823,7 +823,8 @@ public class FormInputTemplates {
 		return ret;
 	}
 	
-	private static String millisecondsTimeToYMD(String inDateString, String separator) {
+	public static String millisecondsTimeToYMD(String inDateString, String separator) {
+		
 		//MONTH IS ZERO INDEXED
 		long dateAsLong = Long.parseLong(inDateString);
 		Calendar cal = Calendar.getInstance();
@@ -843,10 +844,19 @@ public class FormInputTemplates {
 		return sb.toString();
 	}
 	
+	private static boolean isDateInMillisecondsFormat(String inDateString){
+		if(inDateString != null && !inDateString.isEmpty() && (inDateString.startsWith("-") || !inDateString.contains("-"))){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
 	private static String sanitiseYMDDateString(String inDateString) {
 		StringBuilder ret = new StringBuilder();
 		
-		if (!inDateString.isEmpty() && !inDateString.contains("-")) {
+		//check that inDateString is DEFINITELY a milliseconds date
+		if (isDateInMillisecondsFormat(inDateString)) {
 			inDateString = millisecondsTimeToYMD(inDateString, "-");
 		}
 		

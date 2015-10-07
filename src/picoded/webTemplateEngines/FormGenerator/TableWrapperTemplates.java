@@ -465,6 +465,11 @@ public class TableWrapperTemplates {
 	/// Children field values are added as rows
 	///
 	public static StringBuilder tableWrapper_horizontal(FormNode node, boolean isDisplayMode) {
+		//exclude from display;
+		if(isDisplayMode && node.getBoolean("excludeFromDisplay", false)){
+			return new StringBuilder("");
+		}
+		
 		return tableBuilderWithWrapper_ViaDefinesAndInjector(
 		// Base stuff
 			node, node.prefix_wrapper() + "table " + node.prefix_wrapper() + "horizontalTable", isDisplayMode, //
@@ -483,6 +488,11 @@ public class TableWrapperTemplates {
 	/// Children field values are added as cols
 	///
 	public static StringBuilder tableWrapper_vertical(FormNode node, boolean isDisplayMode) {
+		//exclude from display;
+		if(isDisplayMode && node.getBoolean("excludeFromDisplay", false)){
+			return new StringBuilder("");
+		}
+		
 		TableDataInjector unflippedDataInjector = horizontalDataInjectorFromNode(node, isDisplayMode);
 		TableDataInjector dataInjector = null;
 		// The same function as horizontal is used, with axis flipped

@@ -22,6 +22,7 @@ public class FormInputTemplates_test {
 	
 	String rootFolder = "./test-files/test-specific/htmlGenerator/FormInputTemplates_test";
 	String generatedFilesFolder = rootFolder + "/testGenerated";
+	String resFolder = rootFolder + "/res";
 	
 	private String getFinalTemplatedJsonString(String jsonKeyName) {
 		File jsonFile = new File(rootFolder + "/" + jsonKeyName + ".js");
@@ -138,7 +139,18 @@ public class FormInputTemplates_test {
 		if (rawHTML == null || rawHTML.isEmpty()) {
 			return false;
 		}
+		String prefix = "";
+		String suffix = "";
+		try{
+			prefix = FileUtils.readFileToString(new File(resFolder + "/prefix.html"));
+			suffix = FileUtils.readFileToString(new File(resFolder + "/suffix.html"));
+			//rawHTML = FileUtils.readFileToString(new File(resFolder + "/sample.html"));
+		} catch (Exception e){
+			
+		}
 		
+		
+		rawHTML = prefix + rawHTML + suffix;
 		String outputFileString = generatedFilesFolder + "/" + fileName + ".pdf";
 		return PDFGenerator.generatePDFfromRawHTML(outputFileString, rawHTML);
 	}
@@ -407,7 +419,7 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("signatureDisplay", jsonTemplatedOutput));
 	}
 	
-	//	@Test
+	//@Test
 	public void datePickerTest() {
 		String jsonTemplatedOutput = getTemplatedJSONString("date", false, true);
 		
@@ -421,6 +433,8 @@ public class FormInputTemplates_test {
 		jsonTemplatedOutput = getTemplatedJSONString("date", true, true);
 		assertNotNull(jsonTemplatedOutput);
 		assertTrue(generateHTMLFile("dateDisplay", jsonTemplatedOutput));
+		
+		//assertTrue(generatePDFFile("datePDF", jsonTemplatedOutput));
 	}
 	
 	//	@Test
@@ -447,14 +461,28 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("fullyQualified", jsonTemplatedOutput));
 	}
 	
-	@Test
+//	@Test
 	public void dummy() {
-		String jsonTemplatedOutput = getTemplatedJSONString("number", true, true);
+		String jsonTemplatedOutput = getTemplatedJSONString("number", false, true);
 		
 		assertNotNull(jsonTemplatedOutput);
 		
 		assertTrue(generateHTMLFile("number", jsonTemplatedOutput));
-		assertTrue(generatePDFFile("number", jsonTemplatedOutput));
+		
+		
+		jsonTemplatedOutput = getTemplatedJSONString("number", true, true);
+		
+		assertNotNull(jsonTemplatedOutput);
+		
+		assertTrue(generateHTMLFile("numberDisplay", jsonTemplatedOutput));
+		
+		assertTrue(generatePDFFile("numberPDF", jsonTemplatedOutput));
+	}
+	
+//	@Test
+	public void asd(){
+		String dateLongVal = "-725328000000";
+		FormInputTemplates.millisecondsTimeToYMD(dateLongVal, "-");
 	}
 	
 	//	@Test

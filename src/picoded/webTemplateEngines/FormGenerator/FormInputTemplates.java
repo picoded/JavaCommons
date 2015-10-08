@@ -606,6 +606,7 @@ public class FormInputTemplates {
 		
 		CaseInsensitiveHashMap<String, String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getStringValue();
+		
 		String hiddenInputTag = "";
 		if (fieldValue != null && fieldValue.length() >= 0) {
 			fieldValue = sanitiseYMDDateString(fieldValue);
@@ -835,11 +836,11 @@ public class FormInputTemplates {
 		String date = StringUtils.fromInteger(cal.get(Calendar.DATE));
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append(year);
+		sb.append(date);
 		sb.append(separator);
 		sb.append(month);
 		sb.append(separator);
-		sb.append(date);
+		sb.append(year);
 		
 		return sb.toString();
 	}

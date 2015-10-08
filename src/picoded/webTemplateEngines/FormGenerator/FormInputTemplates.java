@@ -860,7 +860,7 @@ public class FormInputTemplates {
 		if(ret != null && ret.indexOf('-') == 4){ //first element is year
 			String[] dateISOSplit = ret.split("-");
 			if(dateISOSplit != null && dateISOSplit.length == 3){
-				ret = dateISOSplit[2] + "-" + dateISOSplit[2] + "-" + dateISOSplit[0];
+				ret = dateISOSplit[2] + "-" + dateISOSplit[1] + "-" + dateISOSplit[0];
 			}else{
 				//Date ISO format is malformed
 			}

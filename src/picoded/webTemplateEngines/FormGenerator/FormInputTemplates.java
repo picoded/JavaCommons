@@ -652,6 +652,8 @@ public class FormInputTemplates {
 		} else {
 			node.replace("type", "text");
 			
+			fieldValue = convertISODateToDMYFormat(fieldValue);
+			
 			StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.DIV, "pfi_inputDate pfi_input", null);
 			ret.append(sbArr[0].append(fieldValue).append(sbArr[1]));
 		}
@@ -824,7 +826,7 @@ public class FormInputTemplates {
 		return ret;
 	}
 	
-	public static String millisecondsTimeToDMY(String inDateString, String separator) {
+	public static String millisecondsTimeToYMD(String inDateString, String separator) {
 		
 		//MONTH IS ZERO INDEXED
 		long dateAsLong = Long.parseLong(inDateString);
@@ -836,11 +838,11 @@ public class FormInputTemplates {
 		String date = StringUtils.fromInteger(cal.get(Calendar.DATE));
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append(date);
+		sb.append(year);
 		sb.append(separator);
 		sb.append(month);
 		sb.append(separator);
-		sb.append(year);
+		sb.append(date);
 		
 		return sb.toString();
 	}
@@ -873,10 +875,10 @@ public class FormInputTemplates {
 		
 		//check that inDateString is DEFINITELY a milliseconds date
 		if (isDateInMillisecondsFormat(inDateString)) {
-			inDateString = millisecondsTimeToDMY(inDateString, "-");
+			inDateString = millisecondsTimeToYMD(inDateString, "-");
 		}
 		
-		inDateString = convertISODateToDMYFormat(inDateString);
+		//inDateString = convertISODateToDMYFormat(inDateString);
 		
 		if (inDateString != null && !inDateString.isEmpty()) {
 			String[] dateSplit = inDateString.split("-");

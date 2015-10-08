@@ -434,7 +434,7 @@ public class FormInputTemplates_test {
 		assertNotNull(jsonTemplatedOutput);
 		assertTrue(generateHTMLFile("dateDisplay", jsonTemplatedOutput));
 		
-		//assertTrue(generatePDFFile("datePDF", jsonTemplatedOutput));
+		assertTrue(generatePDFFile("datePDF", jsonTemplatedOutput));
 	}
 	
 	//	@Test
@@ -477,12 +477,6 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("numberDisplay", jsonTemplatedOutput));
 		
 		assertTrue(generatePDFFile("numberPDF", jsonTemplatedOutput));
-	}
-	
-//	@Test
-	public void asd(){
-		String dateLongVal = "-725328000000";
-		FormInputTemplates.millisecondsTimeToYMD(dateLongVal, "-");
 	}
 	
 	//	@Test

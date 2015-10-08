@@ -824,7 +824,7 @@ public class FormInputTemplates {
 		return ret;
 	}
 	
-	public static String millisecondsTimeToYMD(String inDateString, String separator) {
+	public static String millisecondsTimeToDMY(String inDateString, String separator) {
 		
 		//MONTH IS ZERO INDEXED
 		long dateAsLong = Long.parseLong(inDateString);
@@ -853,13 +853,30 @@ public class FormInputTemplates {
 		}
 	}
 	
+	private static String convertISODateToDMYFormat(String inDateStringISO){
+		String ret = inDateStringISO;
+		if(ret != null && ret.indexOf('-') == 4){ //first element is year
+			String[] dateISOSplit = ret.split("-");
+			if(dateISOSplit != null && dateISOSplit.length == 3){
+				ret = dateISOSplit[2] + "-" + dateISOSplit[2] + "-" + dateISOSplit[0];
+			}else{
+				//Date ISO format is malformed
+			}
+		}
+		
+		return ret;
+	}
+	
+	//converts a date string in ISO or milliseconds into dd-mm-yyyy
 	private static String sanitiseYMDDateString(String inDateString) {
 		StringBuilder ret = new StringBuilder();
 		
 		//check that inDateString is DEFINITELY a milliseconds date
 		if (isDateInMillisecondsFormat(inDateString)) {
-			inDateString = millisecondsTimeToYMD(inDateString, "-");
+			inDateString = millisecondsTimeToDMY(inDateString, "-");
 		}
+		
+		inDateString = convertISODateToDMYFormat(inDateString);
 		
 		if (inDateString != null && !inDateString.isEmpty()) {
 			String[] dateSplit = inDateString.split("-");

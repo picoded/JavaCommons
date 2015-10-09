@@ -48,6 +48,32 @@ public class JCache_hazelcast extends JCache {
 		recreate(true);
 	}
 	
+	/// Setsup Redis client, in single server mode
+	///
+	/// @param  clusterName  Local Network cluster name for hazelcast
+	/// @param password password of Local Network cluster
+	public JCache_hazelcast(String clusterName, String password) {
+		hazelcastConfig = new ClientConfig();
+		hazelcastConfig.getGroupConfig().setName(clusterName);
+		hazelcastConfig.getGroupConfig().setPassword(password);
+		hazelcastConfig.setProperty("hazelcast.logging.type", "none");
+		recreate(true);
+	}
+	
+	/// Setsup Redis client, in single server mode
+	///
+	/// @param  clusterName  Local Network cluster name for hazelcast
+	/// @param password password of Local Network cluster
+	/// @param ipAddressWithPort IP address and Port number of the Cluster Name
+	public JCache_hazelcast(String clusterName, String password, String ipAddressWithPort) {
+		hazelcastConfig = new ClientConfig();
+		hazelcastConfig.getGroupConfig().setName(clusterName);
+		hazelcastConfig.getGroupConfig().setPassword(password);
+		hazelcastConfig.getNetworkConfig().addAddress(ipAddressWithPort);
+		hazelcastConfig.setProperty("hazelcast.logging.type", "none");
+		recreate(true);
+	}
+	
 	/// Setsup Redis client, using more complex config via redissonConfigObject
 	/// You may refer to the source material for more complex setups
 	///

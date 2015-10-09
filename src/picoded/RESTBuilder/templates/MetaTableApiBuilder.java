@@ -1,5 +1,6 @@
 package picoded.RESTBuilder.templates;
 
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -173,6 +174,117 @@ public class MetaTableApiBuilder {
 		
 		return ret;
 	}
+	
+	public List<String> csv_list(int draw, int start, int length, String[] headers, String query,
+			String[] queryArgs, String orderBy) throws RuntimeException {
+		
+		List<String> ret = new ArrayList<String>();
+		
+		try{
+			MetaObject[] metaObjs = null;
+			
+			if (query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0) {
+				metaObjs = _metaTableObj.query(null, null, orderBy, start, length);
+			} else {
+				metaObjs = _metaTableObj.query(query, queryArgs, orderBy, start, length);
+			}
+			
+			for (MetaObject metaObj : metaObjs) {
+				List<Object> row = new ArrayList<Object>();
+				for (String header : headers) {
+					row.add(metaObj.get(header));
+				}
+				
+				//for each element in row, stringbuilder and add to ret
+				StringBuilder singleRowCSV = new StringBuilder();
+				int rowSize = row.size();
+				for(int i = 0; i < rowSize; ++i){
+					String valStr = (String)row.get(i);
+					if(valStr == null){
+						valStr = "";
+					}
+					valStr = valStr.replace("\"", ""); //might not be best solution
+					valStr = valStr.replace("\n", "");
+					
+					valStr = "\"" + valStr + "\"";
+					singleRowCSV.append(valStr);
+					
+					if(i < rowSize - 1){
+						singleRowCSV.append(",");
+					} else {
+						//singleRowCSV.append("\n");
+					}
+				}
+				
+				ret.add(singleRowCSV.toString());
+			}
+			
+		} catch (Exception e) {
+			throw new RuntimeException("csv_list() ", e);
+		}
+		
+		return ret;
+	}
+	
+	//csv export function
+	public RESTFunction csv_export = (req, res) -> {
+		
+		int draw = req.getInt("draw");
+		int start = req.getInt("start");
+		int limit = req.getInt("length");
+		
+		String orderByStr = req.getString("orderBy");
+		if (orderByStr == null || orderByStr.isEmpty()) {
+			orderByStr = "oID";
+		}
+		
+		String[] headers = req.getStringArray("headers");
+		
+		if (headers == null || headers.length < 1) {
+			headers = new String[] { "_oid" };
+		}
+		
+		String query = req.getString("query");
+		String[] queryArgs = req.getStringArray("queryArgs");
+		
+		//put back into response
+		res.put("draw", draw);
+		res.put("headers", headers);
+		
+		res.put("recordsTotal", _metaTableObj.size());
+		if (query != null && !query.isEmpty() && queryArgs != null && queryArgs.length > 0) {
+			res.put("recordsFiltered", _metaTableObj.queryCount(query, queryArgs));
+		}
+		
+		List<String> data = null;
+		int count = start;
+		
+		CorePage page = req.requestPage();
+		PrintWriter pWriter = page.getWriter();
+		page.getHttpServletResponse().setContentType("text/csv");
+		page.getHttpServletResponse().setHeader("Content-Disposition", "attachment;filename=reports.csv");
+		
+		try {
+			while((data = csv_list(draw, count, limit, headers, query, queryArgs, orderByStr)).size() >= limit){
+				count += data.size();
+				for(String str : data){
+					pWriter.write(str);
+				}
+				pWriter.flush();
+			}
+			
+			//final batch write
+			for(String str : data){
+				pWriter.write(str);
+			}
+			pWriter.flush();
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
+		return null;
+	};
 	
 	/////////////////////////////////////////////
 	//
@@ -439,6 +551,9 @@ public class MetaTableApiBuilder {
 		
 		rb.getNamespace(setPrefix + "meta").put(HttpRequestType.DELETE, meta_DELETE);
 		rb.getNamespace(setPrefix + "meta.*").put(HttpRequestType.DELETE, meta_DELETE);
+		
+		rb.getNamespace(setPrefix + "csv").put(HttpRequestType.GET, csv_export);
+		rb.getNamespace(setPrefix + "csv").put(HttpRequestType.POST, csv_export);
 		
 		return rb;
 	}

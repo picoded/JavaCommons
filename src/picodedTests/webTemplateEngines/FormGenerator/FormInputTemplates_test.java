@@ -419,7 +419,7 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("signatureDisplay", jsonTemplatedOutput));
 	}
 	
-	//@Test
+//	@Test
 	public void datePickerTest() {
 		String jsonTemplatedOutput = getTemplatedJSONString("date", false, true);
 		
@@ -450,6 +450,18 @@ public class FormInputTemplates_test {
 		jsonTemplatedOutput = getTemplatedJSONString("number", true, true);
 		assertNotNull(jsonTemplatedOutput);
 		assertTrue(generateHTMLFile("numberWithDataDisplay", jsonTemplatedOutput));
+	}
+	
+	@Test
+	public void textAreaTest(){
+		String jsonTemplatedOutput = getTemplatedJSONString("textarea", false, true);
+		assertNotNull(jsonTemplatedOutput);
+		assertTrue(generateHTMLFile("textarea", jsonTemplatedOutput));
+		
+		jsonTemplatedOutput = getTemplatedJSONString("textarea", true, true);
+		assertNotNull(jsonTemplatedOutput);
+		assertTrue(generateHTMLFile("textareaDisplay", jsonTemplatedOutput));
+		assertTrue(generatePDFFile("textarea", jsonTemplatedOutput));
 	}
 	
 	//	@Test

@@ -62,7 +62,7 @@ public class MetaTableApiBuilder_test {
 	public static void setup() {
 		mtObj = implementationConstructor();
 		mtObj.systemSetup();
-		populateMetaTableDummyData(3, 3);
+		populateMetaTableDummyData(4, 4);
 		
 		mtApi = new MetaTableApiBuilder(mtObj);
 	}
@@ -114,6 +114,20 @@ public class MetaTableApiBuilder_test {
 		List<List<Object>> allDataWithQueryFilter = mtApi.list_GET_and_POST_inner(0, 0, 0, allArgs, "_name=? OR _age=?",
 			new String[] { "name1", "age4" }, "");
 		assertNotNull(allDataWithQueryFilter);
+		
+		
+		
+		
+		
+	}
+	
+	@Test
+	public void list_GET_and_POST_queryTest(){
+		//test query start and length
+		String[] allArgs = new String[] { "_oid", "_name", "_age" };
+		List<List<Object>> allData = mtApi.list_GET_and_POST_inner(0, 0, 0, allArgs, null, null, "_oid");
+		List<List<Object>> allDataWithStartAndLengthFilter = mtApi.list_GET_and_POST_inner(0, 0, 2, allArgs, null, null, "_oid");
+		assertNotNull(allDataWithStartAndLengthFilter);
 	}
 	
 	@Test

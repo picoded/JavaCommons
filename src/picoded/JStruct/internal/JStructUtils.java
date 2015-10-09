@@ -43,7 +43,7 @@ public class JStructUtils {
 		}
 		
 		// Get sublist if needed
-		if (offset >= 1) {
+		if (offset >= 1 || limit >= 1) {
 			int size = retList.size();
 			
 			// Out of bound, return blank

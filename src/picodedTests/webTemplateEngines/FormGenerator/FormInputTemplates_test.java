@@ -419,16 +419,12 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("signatureDisplay", jsonTemplatedOutput));
 	}
 	
-	//@Test
+//	@Test
 	public void datePickerTest() {
 		String jsonTemplatedOutput = getTemplatedJSONString("date", false, true);
 		
 		assertNotNull(jsonTemplatedOutput);
 		assertTrue(generateHTMLFile("date", jsonTemplatedOutput));
-		
-		jsonTemplatedOutput = getTemplatedJSONString("date", false, true);
-		assertNotNull(jsonTemplatedOutput);
-		assertTrue(generateHTMLFile("dateWithData", jsonTemplatedOutput));
 		
 		jsonTemplatedOutput = getTemplatedJSONString("date", true, true);
 		assertNotNull(jsonTemplatedOutput);

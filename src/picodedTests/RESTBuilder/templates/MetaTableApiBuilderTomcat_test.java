@@ -84,8 +84,10 @@ public class MetaTableApiBuilderTomcat_test {
 		if (tomcat == null) {
 			File webInfFile = new File("./test-files/tmp/WEB-INF");
 			
-			for (File file : webInfFile.listFiles()) {
-				file.delete(); //to accomodate certain people who do not use command line
+			if(webInfFile.exists()) {
+				for (File file : webInfFile.listFiles()) {
+					file.delete(); //to accomodate certain people who do not use command line
+				}
 			}
 			
 			webInfFile.mkdir();
@@ -96,7 +98,7 @@ public class MetaTableApiBuilderTomcat_test {
 			.withServlet("/api/*", "meta-table-test", new MetaTableApiServlet()).withPort(15000);
 			
 			tomcat.start();
-			//			tomcat.awaitServer();
+			//tomcat.awaitServer();
 		}
 	}
 	
@@ -114,9 +116,9 @@ public class MetaTableApiBuilderTomcat_test {
 	}
 	
 	//	@Test
-	public void awaitServer() {
-		tomcat.awaitServer();
-	}
+	//public void awaitServer() {
+	//	tomcat.awaitServer();
+	//}
 	
 	RequestHttp requester;
 	ResponseHttp response;

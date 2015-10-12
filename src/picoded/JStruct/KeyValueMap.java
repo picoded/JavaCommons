@@ -7,6 +7,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import picoded.struct.*;
 import picoded.security.NxtCrypt;
 
+import org.apache.commons.lang3.RandomUtils;
+
 /// Refence implementation of KeyValueMap data structure
 ///
 /// This is intended to be an optimized key value map data storage
@@ -51,6 +53,15 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	
 	/// Perform maintenance, mainly removing of expired data if applicable
 	public void maintenance();
+	
+	/// perform increment maintenance, meant for minor changes between requests
+	public default void incrementalMaintenance() {
+		// 2 percent chance of trigering maintenance
+		// This is to lower to overall performance cost incrementalMaintenance per request
+		if (RandomUtils.nextInt(0, 100) <= 2) {
+			maintenance();
+		}
+	}
 	
 	/// Removes all data, without tearing down setup
 	///

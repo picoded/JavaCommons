@@ -5,7 +5,7 @@ import picoded.JCache.JCacheException;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.SynchronousQueue;
-import java.util.List;
+import java.util.*;
 
 import picoded.JStack.JStackLayer;
 
@@ -25,7 +25,7 @@ public abstract class BaseInterface implements JStackLayer {
 	public abstract void dispose();
 	
 	/// Gets a ConcurrentMap with the given name
-	public abstract <K, V> ConcurrentMap<K, V> getMap(String name) throws JCacheException;
+	public abstract <K, V> Map<K, V> getMap(String name) throws JCacheException;
 	
 	/// Recreates the JCache connection if it has already been disposed of. Option to forcefully recreate the connection if needed.
 	public abstract void recreate(boolean force);

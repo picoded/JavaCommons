@@ -15,8 +15,8 @@ import org.apache.commons.collections4.map.AbstractMapDecorator;
 ///
 public class ProxyGenericConvertMap<K, V> extends AbstractMapDecorator<K, V> implements GenericConvertMap<K, V> {
 	/// Protected constructor
-	protected ProxyGenericConvertMap(Map<K, V> map) {
-		super(map);
+	protected ProxyGenericConvertMap(Map<K, V> inMap) {
+		super(inMap);
 	}
 	
 	/// The static builder for the map

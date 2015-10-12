@@ -158,13 +158,23 @@ public class FormInputTemplates {
 	};
 	
 	protected static FormInputInterface input_textarea = (node) -> {
+		return input_textarea(node, false);
+	};
+	
+	protected static StringBuilder input_textarea(FormNode node, boolean displayMode){
 		CaseInsensitiveHashMap<String, String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getStringValue();
 		
-		StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.TEXTAREA, "pfi_inputTextBox pfi_input", null);
+		StringBuilder[] sbArr = null;
+		
+		if(!displayMode){
+			sbArr = node.defaultHtmlInput(HtmlTag.TEXTAREA, "pfi_inputTextBox pfi_input", null);
+		}else{
+			sbArr = node.defaultHtmlInput(HtmlTag.DIV, "pfi_inputTextBox pfi_input", null);
+		}
 		sbArr[0].append(fieldValue);
 		return sbArr[0].append(sbArr[1]);
-	};
+	}
 	
 	protected static FormInputInterface dropdownWithOthers = (node) -> {
 		return dropdownWithOthers(node, false);

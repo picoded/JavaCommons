@@ -448,6 +448,20 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("numberWithDataDisplay", jsonTemplatedOutput));
 	}
 	
+//	@Test
+	public void textareaTest() {
+		String jsonTemplatedOutput = getTemplatedJSONString("textarea", false, true);
+		
+		assertNotNull(jsonTemplatedOutput);
+		assertTrue(generateHTMLFile("textarea", jsonTemplatedOutput));
+		
+		jsonTemplatedOutput = getTemplatedJSONString("textarea", true, true);
+		assertNotNull(jsonTemplatedOutput);
+		assertTrue(generateHTMLFile("textareaDisplay", jsonTemplatedOutput));
+		
+		assertTrue(generatePDFFile("textareaPDF", jsonTemplatedOutput));
+	}
+	
 	//	@Test
 	public void fullyQualifiedTest() {
 		String jsonTemplatedOutput = getTemplatedJSONString("fullyQualified", false, true);

@@ -419,8 +419,9 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("signatureDisplay", jsonTemplatedOutput));
 	}
 	
-//	@Test
+	//@Test
 	public void datePickerTest() {
+		
 		String jsonTemplatedOutput = getTemplatedJSONString("date", false, true);
 		
 		assertNotNull(jsonTemplatedOutput);
@@ -510,6 +511,13 @@ public class FormInputTemplates_test {
 		Object val = getRawValue("client[0].name", inputValue);
 		
 		System.out.println(val);
+	}
+	
+//	@Test
+	public void cleanTest(){
+		String exampleValue = "Hello<>`'\"\\ There";
+		String sanitisedString = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(exampleValue);
+		assertEquals("Hello&#60;&#62;&#96;&#8216;&#34;&#92; There", sanitisedString);
 	}
 	
 	protected Object getRawValue(String fieldName, Map<String, Object> valueMap) {

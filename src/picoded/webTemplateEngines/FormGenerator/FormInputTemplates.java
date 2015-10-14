@@ -564,7 +564,8 @@ public class FormInputTemplates {
 		StringBuilder[] sb = node.defaultHtmlInput("div", "pfiw_sigBox", paramsMap);
 		ret.append(sb[0]);
 		
-		String sigValue = node.getStringValue();//will return a file path, e.g. output/outPNG_siga.png
+		String sigValue = GenericConvert.toString(node.getRawFieldValue());//will return a file path, e.g. output/outPNG_siga.png
+		//for signature we use getRawFieldValue to bypass the sanitisation that occurs in getStringValue();
 		StringBuilder sigImgString = new StringBuilder();
 		if (sigValue != null && !sigValue.isEmpty()) {
 			FormNode innerImgNode = new FormNode();

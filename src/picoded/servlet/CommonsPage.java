@@ -33,6 +33,7 @@ import picoded.JStack.*;
 import picoded.JStruct.*;
 import picoded.RESTBuilder.*;
 import picoded.RESTBuilder.templates.*;
+import picoded.webUtils.*;
 import picoded.webTemplateEngines.JSML.*;
 import picoded.webTemplateEngines.PagesBuilder.*;
 
@@ -220,5 +221,41 @@ public class CommonsPage extends BasePage {
 		super.initializeContext();
 		PagesBuilder().buildAllPages();
 		buildApiScript();
+	}
+	
+	//---------------------------------------------------------
+	//
+	// Additional auto loaded modules
+	//
+	//---------------------------------------------------------
+	
+	/// Cached memoizer copy
+	protected EmailBroadcaster _systemEmail = null;
+	
+	/// The system email broadcaster based on config : default to mailinator
+	/// 
+	/// Note if the sys.smtp.enabled is set to false, this function returns null;
+	public EmailBroadcaster systemEmail() {
+		// Returns cached broadcaster if possible
+		if( _systemEmail != null ) {
+			return _systemEmail;
+		}
+		
+		// Gets the configuration setup
+		JConfig jc = JConfig();
+		boolean sysSmtp = jc.getBoolean("sys.smtp.enabled", true);
+		
+		// Returns null if disabled 
+		if( sysSmtp == false ) {
+			return null;
+		}
+		
+		// Get hostname, user, pass, and from account
+		String hostname  = jc.getString("sys.smtp.host", "smtp.mailinator.com:25");
+		String username  = jc.getString("sys.smtp.host", "");
+		String password  = jc.getString("sys.smtp.host", "");
+		String emailFrom = jc.getString("sys.smtp.host", "testingTheEmailSystem@mailinator.com");
+		
+		return (_systemEmail = new EmailBroadcaster(hostname, username, password, emailFrom));
 	}
 }

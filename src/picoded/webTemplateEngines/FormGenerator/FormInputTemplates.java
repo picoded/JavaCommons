@@ -621,17 +621,17 @@ public class FormInputTemplates {
 		CaseInsensitiveHashMap<String, String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getStringValue(); //i expect it to be in String milliseconds format
 		String dateISO = "";
-		long dateMilliseconds = 0;
+		String dateMilliseconds = "";
 		
 		String hiddenInputTag = "";
 		if (fieldValue != null && fieldValue.length() > 0) {
 			
 			if(DateConv.isInMillisecondsFormat(fieldValue)){
 				dateISO = DateConv.toISOFormat(Long.parseLong(fieldValue), ISODateFormat.YYYYMMDD, "-");
-				dateMilliseconds = Long.parseLong(fieldValue);
+				dateMilliseconds = fieldValue;
 			}else{
 				dateISO = fieldValue;
-				dateMilliseconds = Long.parseLong(DateConv.toMillisecondsFormat(fieldValue, ISODateFormat.YYYYMMDD, "-"));
+				dateMilliseconds = DateConv.toMillisecondsFormat(fieldValue, ISODateFormat.YYYYMMDD, "-");
 			}
 			
 			paramMap.put(HtmlTag.VALUE, dateISO);

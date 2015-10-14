@@ -64,6 +64,7 @@ public class KeyValueMap_test {
 	public void simpleHasPutHasGet() throws Exception {
 		assertFalse(kvmObj.containsKey("hello"));
 		kvmObj.put("hello", "world");
+		assertEquals("world", kvmObj.get("hello"));
 		assertTrue(kvmObj.containsKey("hello"));
 		assertEquals("world", kvmObj.get("hello"));
 	}

@@ -168,8 +168,11 @@ public class MetaTableApiBuilder {
 					List<Object> row = new ArrayList<Object>();
 					for (String header : headers) {
 						Object rawVal = metaObj.get(header);
+						
+						//row.add(rawVal);
 						if(sanitiseOutput && rawVal instanceof String){
-							String stringVal = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(GenericConvert.toString(rawVal));
+							String stringVal = GenericConvert.toString(rawVal);
+							stringVal = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(stringVal);
 							row.add(stringVal);
 						}else{
 							row.add(rawVal);
@@ -263,7 +266,11 @@ public class MetaTableApiBuilder {
 				for(String key : keySet){
 					Object rawVal = ret.get(key);
 					if(rawVal instanceof String){
-						ret.put(key, RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(GenericConvert.toString(rawVal)));
+						String stringVal = GenericConvert.toString(rawVal);
+						stringVal = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(stringVal);
+						ret.put(key, stringVal);
+					}else{
+						ret.put(key, rawVal);
 					}
 				}
 			}

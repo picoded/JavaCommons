@@ -29,9 +29,11 @@ public class RegexUtils {
 		String ret = input;
 		ret = ret.replaceAll("\\<", "&#60;");
 		ret = ret.replaceAll("\\>", "&#62;");
-		ret = ret.replaceAll("\\`", "&#96;");
-		ret = ret.replaceAll("\\'", "&#8216;");
-		ret = ret.replaceAll("\\\"", "&#34;");
+		
+		//ret = ret.replaceAll("\\`", "&#96;");
+		//ret = ret.replaceAll("\\'", "&#8216;");
+		//ret = ret.replaceAll("\\\"", "&#34;"); //Removing quote sanitisation as SQL security happens on another layer
+		
 		ret = ret.replaceAll("\\\\", "&#92;");
 		return ret;
 	}

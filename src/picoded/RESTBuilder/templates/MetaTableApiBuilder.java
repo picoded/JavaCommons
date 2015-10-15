@@ -204,6 +204,9 @@ public class MetaTableApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | _oid            | String             | object ID used to retrieve the meta object. If no oid is given, return null.  |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                 |                    | are returned as well.                                                         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
 	///
@@ -225,8 +228,10 @@ public class MetaTableApiBuilder {
 		//put data back into response
 		res.put("_oid", oid);
 		
+		boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
+		
 		try {
-			MetaObject mObj = meta_GET_inner(oid);
+			MetaObject mObj = meta_GET_inner(oid, sanitiseOutput);
 			res.put("meta", mObj);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -235,7 +240,7 @@ public class MetaTableApiBuilder {
 		return res;
 	};
 	
-	public MetaObject meta_GET_inner(String oid) throws RuntimeException {
+	public MetaObject meta_GET_inner(String oid, boolean sanitiseOutput) throws RuntimeException {
 		if (_metaTableObj == null) {
 			return null;
 		}
@@ -252,7 +257,18 @@ public class MetaTableApiBuilder {
 		} else if (metaObjs.length < 1) {
 			return null;
 		} else {
-			return metaObjs[0];
+			MetaObject ret = metaObjs[0];
+			if(sanitiseOutput){
+				Set<String> keySet = ret.keySet();
+				for(String key : keySet){
+					Object rawVal = ret.get(key);
+					if(rawVal instanceof String){
+						ret.put(key, RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(GenericConvert.toString(rawVal)));
+					}
+				}
+			}
+			
+			return ret;
 		}
 	}
 	

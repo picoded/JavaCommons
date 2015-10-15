@@ -88,6 +88,22 @@ public class DateConv {
 		}
 	}
 	
+	public static String getCurrentDateISO(ISODateFormat dateFormat, String separator){
+		if(separator == null){
+			separator = "-";
+		}
+		
+		Calendar cal = Calendar.getInstance();
+		int date = cal.get(Calendar.DATE);
+		int month = cal.get(Calendar.MONTH) + 1;
+		int year = cal.get(Calendar.YEAR);
+		
+		String newDate = "" + date + separator + month + separator + year; //ddmmyyyy
+		newDate = changeISODateFormat(newDate, ISODateFormat.DDMMYYYY, dateFormat, separator);
+		
+		return newDate;
+	}
+	
 	///
 	/// Convert from one ISO date format to another format
 	///

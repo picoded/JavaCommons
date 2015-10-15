@@ -12,6 +12,8 @@ import picoded.JStack.*;
 import picoded.JStruct.*;
 import picoded.servlet.*;
 import picoded.conv.ConvertJSON;
+import picoded.conv.GenericConvert;
+import picoded.conv.RegexUtils;
 import picoded.enums.HttpRequestType;
 
 /// Account login template API
@@ -193,8 +195,9 @@ public class AccountLogin extends BasePage {
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | Parameter Name | Variable Type	  | Description                                                                   |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | No parameters options                                                                                               |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                 |                    | are returned as well.                                                         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
 	///
@@ -216,6 +219,8 @@ public class AccountLogin extends BasePage {
 		res.put("isLogin", false);
 		
 		if (req.requestPage() != null) {
+			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
+			
 			BasePage bp = (BasePage) (req.requestPage());
 			AccountTable at = bp.accountAuthTable();
 			
@@ -224,6 +229,13 @@ public class AccountLogin extends BasePage {
 				res.put("accountID", ao._oid());
 				
 				String[] names = ao.getNames().toArray(new String[0]);
+				
+				if(sanitiseOutput && names != null){
+					for(int i = 0; i < names.length; ++i){
+						names[i] = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(names[i]);
+					}
+				}
+				
 				res.put("accountNames", Arrays.asList((names == null) ? new String[] {} : names));
 				
 				res.put("isLogin", true);
@@ -247,6 +259,9 @@ public class AccountLogin extends BasePage {
 	/// | accountName    | String (Optional)  | Either the accountName or the accountID is needed                             |
 	/// | accountID      | String (Optional)  | Either the accountName or the accountID is needed                             |
 	/// | accountPass    | String             | The account password used for login                                           |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                |                    | are returned as well.                                                         |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
@@ -288,7 +303,14 @@ public class AccountLogin extends BasePage {
 				// Login is valid
 				if (ao != null) {
 					res.put("accountID", ao._oid());
+					
+					boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
 					String[] names = ao.getNames().toArray(new String[0]);
+					if(sanitiseOutput && names != null){
+						for(int i = 0; i < names.length; ++i){
+							names[i] = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(names[i]);
+						}
+					}
 					res.put("accountNames", Arrays.asList((names == null) ? new String[] {} : names));
 					res.put("isLogin", true);
 				}
@@ -396,7 +418,7 @@ public class AccountLogin extends BasePage {
 					}
 					
 				} else {
-					res.put("error", "User does not have permission to edit accountID: " + accID);
+					res.put("error", "User does not have permission to edit password: " + accID);
 				}
 			}
 		} else {
@@ -425,6 +447,9 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | accountName     | String(optional)   | Account name of info to get. If blank, assume current user.                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                |                    | are returned as well.                                                         |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
 	///
@@ -432,14 +457,13 @@ public class AccountLogin extends BasePage {
 	/// | Parameter Name  | Variable Type	    | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | accountID       | String             | account ID used                                                               |
-	/// | accountNames    | String[]           | array of account names representing the account                               |
+	/// | accountNames    | String[]           | array of account names representing the account                               | sanitise
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | isSuperUser     | boolean            | indicates if the account is considered a superUser                            |
+	/// | isAnyGroupAdmin | boolean            | indicates if the account is considered a superUser                            |
 	/// | isGroup         | boolean            | indicates if the account is considered a group                                |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | groupIDs        | String[]           | array of account ID groups the user is in                                     |
-	/// | groupNames      | String[][]         | array of account Names groups the user is in                                  |
-	/// | groupRoles      | String[]           | array of account groups roles the user is in                                  |
+	/// | groups          | object(Map)        | Groups object as a Map<String, List<Map<String, Object>>>                     | sanitise
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction infoByName_GET = (req, res) -> {
@@ -463,7 +487,8 @@ public class AccountLogin extends BasePage {
 				
 			}
 			
-			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(account);
+			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
+			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(account, sanitiseOutput);
 			res.putAll(commonInfo);
 		}
 		return res;
@@ -483,6 +508,9 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | accountID       | String(optional)   | Account id of info to get. If blank, assume current user.                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                |                    | are returned as well.                                                         |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
 	///
@@ -490,13 +518,13 @@ public class AccountLogin extends BasePage {
 	/// | Parameter Name  | Variable Type	    | Description                                                                  |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | accountID       | String             | account ID used                                                               |
-	/// | accountNames    | String[]           | array of account names representing the account                               |
+	/// | accountNames    | String[]           | array of account names representing the account                               | sanitise
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | isSuperUser     | boolean            | indicates if the account is considered a superUser                            |
 	/// | isAnyGroupAdmin | boolean            | indicates if the account is considered a superUser                            |
 	/// | isGroup         | boolean            | indicates if the account is considered a group                                |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | groups          | object(Map)        | Groups object as a Map<String, List<Map<String, Object>>>                     |
+	/// | groups          | object(Map)        | Groups object as a Map<String, List<Map<String, Object>>>                     | sanitise
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public static RESTFunction infoByID_GET = (req, res) -> {
@@ -520,14 +548,17 @@ public class AccountLogin extends BasePage {
 				res.put("error", "Account object requested is null");
 			}
 			
-			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(account);
+			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
+			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(account, sanitiseOutput);
 			res.putAll(commonInfo);
 		}
 		
 		return res;
 	};
 	
-	private static Map<String, Object> extractCommonInfoFromAccountObject(AccountObject account) {
+	private static Map<String, Object> extractCommonInfoFromAccountObject(AccountObject account, boolean sanitiseOutput) {
+		//sanitise accountNames, groupNames, 
+		
 		Map<String, Object> commonInfo = new HashMap<String, Object>();
 		
 		commonInfo.put("accountID", null);
@@ -544,6 +575,13 @@ public class AccountLogin extends BasePage {
 			if (accNameSet != null) {
 				String[] accNames = new String[accNameSet.size()];
 				accNameSet.toArray(accNames);
+				
+				if(sanitiseOutput && accNames != null){
+					for(int i = 0; i < accNames.length; ++i){
+						accNames[i] = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(accNames[i]);
+					}
+				}
+				
 				commonInfo.put("accountNames", accNames);
 			} else {
 				commonInfo.put("accountNames", null);
@@ -559,9 +597,23 @@ public class AccountLogin extends BasePage {
 				for (AccountObject group : groups) {
 					Map<String, Object> newGroup = new HashMap<String, Object>();
 					newGroup.put("accountID", group._oid());
-					newGroup.put("names", group.getNames());
+					
+					//extracting group names and sanitising if needed
+					Set<String> groupNames = group.getNames();
+					if(sanitiseOutput){
+						groupNames.clear();
+						for(String groupName : group.getNames()){
+							groupNames.add(RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(groupName));
+						}
+					}
+					newGroup.put("names", groupNames);
+					
+					//extracting member roles and sanitising if needed
 					String role = group.getMemberRole(account);
-					newGroup.put("role", role);
+					if(sanitiseOutput){
+						role = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(role);
+					}
+					newGroup.put("role", role); //sanitise role just in case
 					
 					if (role == null) {
 						role = "";
@@ -614,9 +666,11 @@ public class AccountLogin extends BasePage {
 	/// | query           | String (optional)  | Requested Query filter                                                        |
 	/// | queryArgs       | String[] (optional)| Requested Query filter arguments                                              |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | groupStatus     | String (optional)  | Default "both", either "user" or "group". Used to lmit the result set         |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                |                    | are returned as well.                                                         |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+s
 	///
 	/// ## JSON Object Output Parameters
 	///
@@ -673,10 +727,12 @@ public class AccountLogin extends BasePage {
 					res.put("recordsFiltered", mtObj.queryCount(query, queryArgs));
 				}
 				
+				boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
+				
 				List<List<Object>> data = new ArrayList<List<Object>>();
 				try {
 					data = list_GET_and_POST_inner(accountTableObj, draw, start, limit, headers, query, queryArgs,
-						orderByStr, insideGroupAny, hasGroupRole_any, groupStatus);
+						orderByStr, insideGroupAny, hasGroupRole_any, groupStatus, sanitiseOutput);
 					res.put("data", data);
 				} catch (Exception e) {
 					res.put("error", e.getMessage());
@@ -688,7 +744,7 @@ public class AccountLogin extends BasePage {
 	
 	private static List<List<Object>> list_GET_and_POST_inner(AccountTable _metaTableObj, int draw, int start,
 		int length, String[] headers, String query, String[] queryArgs, String orderBy, String[] insideGroup_any,
-		String[] hasGroupRole_any, String groupStatus) throws RuntimeException {
+		String[] hasGroupRole_any, String groupStatus, boolean sanitiseOutput) throws RuntimeException {
 		
 		List<List<Object>> ret = new ArrayList<List<Object>>();
 		
@@ -767,13 +823,28 @@ public class AccountLogin extends BasePage {
 						if (header.equalsIgnoreCase("names")) {
 							if (ao != null) {
 								Set<String> aoNames = ao.getNames();
+								
+								if(sanitiseOutput){
+									aoNames.clear();
+									for(String name : ao.getNames()){
+										aoNames.add(RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(name));
+									}
+								}
+								
 								if (aoNames != null) {
 									List<String> aoNameList = new ArrayList<String>(aoNames);
 									row.add(aoNameList);
 								}
 							}
 						} else {
-							row.add(metaObj.get(header));
+							Object rawVal = metaObj.get(header);
+							if(sanitiseOutput && rawVal instanceof String){
+								String stringVal = GenericConvert.toString(rawVal);
+								row.add(stringVal);
+							}else{
+								row.add(rawVal);
+							}
+							
 						}
 					}
 					
@@ -808,6 +879,9 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | No parameters options                                                                                                |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                |                    | are returned as well.                                                         |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
 	///
@@ -842,7 +916,8 @@ public class AccountLogin extends BasePage {
 				res.put("error", "Account object requested is null");
 			}
 			
-			Map<String, Object> commonInfoMap = extractCommonInfoFromAccountObject(account);
+			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
+			Map<String, Object> commonInfoMap = extractCommonInfoFromAccountObject(account, sanitiseOutput);
 			res.putAll(commonInfoMap);
 			
 			return res;
@@ -949,6 +1024,9 @@ public class AccountLogin extends BasePage {
 	/// | headers         | String[](optional) | Default ["_oid", "name", "role"], the collumns to return                      |
 	/// | If a header element contains an "account_" prefix, take the data from the curren
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                 |                    | are returned as well.                                                         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
 	///
@@ -959,7 +1037,7 @@ public class AccountLogin extends BasePage {
 	/// | groupID_exist   | boolean            | indicates if the account ID exists in the system                              |
 	/// | groupID_valid   | boolean            | indicates if the account ID exists and is a group                             |
 	/// | groupID_admin   | boolean            | indicates if the session has admin rights over the group                      |
-	/// | groupID_names   | String[]           | the group various names, if ID is valid                                       |
+	/// | groupID_names   | String[]           | the group various names, if ID is valid                                       | sanitise
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       | not returned
 	/// | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    | not returned
@@ -967,7 +1045,7 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | headers         | String[](optional) | The collumns headers returned                                                 |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | data            | array              | Array of row records                                                          |
+	/// | data            | array              | Array of row records                                                          | sanitise
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | error           | String (Optional)  | Errors encounted if any                                                       |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -995,6 +1073,8 @@ public class AccountLogin extends BasePage {
 					headers = new String[] { "_oid", "name", "role" };
 				}
 				
+				boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
+				
 				AccountObject[] members = groupObj.getMembersAccountObject();
 				
 				int listCounter = 0;
@@ -1005,11 +1085,21 @@ public class AccountLogin extends BasePage {
 						if (header.equalsIgnoreCase("_oid")) {
 							retList.get(listCounter).add(accObj._oid());
 						} else if (header.equalsIgnoreCase("name")) {
-							retList.get(listCounter).add(accObj.getNames());
+							Set<String> names = accObj.getNames();
+							if(sanitiseOutput){
+								names.clear();
+								for(String name : accObj.getNames()){
+									names.add(RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(name));
+								}
+							}
+							retList.get(listCounter).add(names); //sanitise
 						} else if (header.equalsIgnoreCase("role")) {
-							String role = groupObj.getMemberRole(accObj);
+							String role = groupObj.getMemberRole(accObj); //sanitise
+							if(sanitiseOutput){
+								role = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(role);
+							}
 							retList.get(listCounter).add(role);
-						} else if (header.toLowerCase().startsWith("account_")) {
+						} else if (header.toLowerCase().startsWith("account_")) { //might need to sanitise....but will come back to this later
 							String headerSuffix = header.substring("account_".length());
 							Object rawObj = accObj.get(headerSuffix);
 							if (rawObj != null) {
@@ -1017,7 +1107,7 @@ public class AccountLogin extends BasePage {
 							} else {
 								retList.get(listCounter).add("");
 							}
-						} else if (header.toLowerCase().startsWith("group_")) {
+						} else if (header.toLowerCase().startsWith("group_")) { //might need to sanitise....but will come back to this later
 							String headerSuffix = header.substring("group_".length());
 							Object rawObj = groupObj.get(headerSuffix);
 							if (rawObj != null) {
@@ -1062,6 +1152,9 @@ public class AccountLogin extends BasePage {
 	/// | setMembers      | { Map } (optional)    | { memberID : role } : Array of member ID/roles to set                      |
 	/// | delMembers      | String[]   (optional) | [ memberID, ... ] : Array of member ID's to delete                         |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                 |                    | are returned as well.                                                         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
 	///
@@ -1072,7 +1165,7 @@ public class AccountLogin extends BasePage {
 	/// | groupID_exist   | boolean               | indicates if the account ID exists in the system                           |
 	/// | groupID_valid   | boolean               | indicates if the account ID exists and is a group                          |
 	/// | groupID_admin   | boolean               | indicates if the session has admin rights                                  |
-	/// | groupID_names   | String[]              | the group various names, if ID is valid                                    |
+	/// | groupID_names   | String[]              | the group various names, if ID is valid                                    | sanitise
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// | setMembers      | { Map } (optional)    | { memberID : role } : Array of member ID/roles set                         |
 	/// | delMembers      | String[]   (optional) | [ memberID, ... ] : Array of member ID's deleted                           |
@@ -1095,6 +1188,8 @@ public class AccountLogin extends BasePage {
 				res.put("error", "GroupObj is null in fetchGroupObject_fromFirstWildcard_orCurrentUser");
 				return resMap;
 			}
+			
+			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
 			
 			try {
 				//do deletes first
@@ -1135,20 +1230,21 @@ public class AccountLogin extends BasePage {
 					AccountObject newMember = accountTableObj.getFromID(setMember.getKey());
 					if (newMember != null) {
 						//groupObj.addMember(newMember, (String)setMember.getValue()).saveAll();
-			groupObj.setMember(newMember, (String) setMember.getValue()).saveDelta();
-			successfulAdds.add(setMember.getKey());
-		}
-	}
-	
-	res.put("setMembers", successfulAdds);
-}
-
-} catch (Exception e) {
-res.put("error", e.getMessage());
-}
-
-return resMap;
-}	  );
+						groupObj.setMember(newMember, (String) setMember.getValue()).saveDelta();
+						successfulAdds.add(setMember.getKey());
+					}
+				}
+				
+				res.put("setMembers", successfulAdds);
+			}
+			
+			} catch (Exception e) {
+			res.put("error", e.getMessage());
+			}
+			
+			return resMap;
+			}	  
+		);
 	};
 	
 	/////////////////////////////////////////////
@@ -1219,9 +1315,23 @@ return resMap;
 	
 	AccountObject user = accountTableObj.getFromID(accountOID);
 	MetaObject groupUserInfo = null;
+	boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
 	
 	if (user != null) {
 		groupUserInfo = groupObj.getMember(user);
+		
+		if(sanitiseOutput && groupUserInfo != null){
+			Set<String> userInfoKeys = groupUserInfo.keySet();
+			for(String key : userInfoKeys){
+				Object rawVal = groupUserInfo.get(key);
+				if(rawVal instanceof String){
+					groupUserInfo.put(key, RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(GenericConvert.toString(rawVal)));
+				}else{
+					groupUserInfo.put(key, rawVal);
+				}
+			}
+		}
+		
 	} else {
 		res.put("error", "User account not found in table");
 		return resMap;
@@ -1391,6 +1501,7 @@ return resMap;
 			accObj_b) -> {
 			
 			boolean isGroup = req.getBoolean("isGroup", false);
+			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
 			
 			String userName = req.getString("username");
 			if (userName == null || userName.isEmpty()) {

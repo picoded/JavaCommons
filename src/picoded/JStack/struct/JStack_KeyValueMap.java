@@ -41,11 +41,83 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	/// The tablename for the key value pair map
 	protected String stackTablename = null;
 	
-	/// JStack setup 
+	/// JStack setup
 	public JStack_KeyValueMap(JStack inStack, String tablename) {
 		super();
 		stackObj = inStack;
 		stackTablename = tablename;
+	}
+	
+	///
+	/// Internal implementation layers handling
+	///--------------------------------------------------------------------------
+	
+	/// The cached structure implmentation layers
+	protected KeyValueMap[] _implemenationLayers = null;
+	
+	/// Getting the implmentation layers
+	protected KeyValueMap[] implemenationLayers() {
+		if (_implemenationLayers != null) {
+			return _implemenationLayers;
+		}
+		
+		// Get the structure layers
+		JStruct[] struct = stackObj.structLayers();
+		KeyValueMap[] ret = new KeyValueMap[struct.length];
+		
+		// Fetch their respective key value map
+		for (int a = 0; a < struct.length; ++a) {
+			
+			// Safety check
+			if (struct[a] == null) {
+				ret[a] = null;
+				continue;
+			}
+			
+			// Fetch the implementation
+			ret[a] = struct[a].getKeyValueMap(stackTablename);
+		}
+		
+		return (_implemenationLayers = ret);
+	}
+	
+	///
+	/// Backend system setup / teardown
+	///--------------------------------------------------------------------------
+	
+	/// Setsup the backend storage table, etc. If needed
+	public void systemSetup() {
+		for (KeyValueMap i : implemenationLayers()) {
+			i.systemSetup();
+		}
+	}
+	
+	/// Teardown and delete the backend storage table, etc. If needed
+	public void systemTeardown() {
+		for (KeyValueMap i : implemenationLayers()) {
+			i.systemTeardown();
+		}
+	}
+	
+	/// Perform maintenance, mainly removing of expired data if applicable
+	public void maintenance() {
+		for (KeyValueMap i : implemenationLayers()) {
+			i.maintenance();
+		}
+	}
+	
+	/// Perform maintenance, mainly removing of expired data if applicable
+	public void incrementalMaintenance() {
+		for (KeyValueMap i : implemenationLayers()) {
+			i.incrementalMaintenance();
+		}
+	}
+	
+	/// Perform maintenance, mainly removing of expired data if applicable
+	public void clear() {
+		for (KeyValueMap i : implemenationLayers()) {
+			i.clear();
+		}
 	}
 	
 }

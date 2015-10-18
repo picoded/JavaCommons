@@ -42,6 +42,7 @@ public class AllCombinations_test {
 		
 		arguments_a.put("hello", "world");
 		arguments_a.put("my", "perfect world");
+		arguments_a.put("key_hello", "hello");
 		
 		arguments_b.put("hello", "world");
 		arguments_b.put("my", "imperfect world");
@@ -77,4 +78,21 @@ public class AllCombinations_test {
 		
 		assertEquals("\"hello\" = :hello AND \"my\" = :my", cond.toString());
 	}
+	
+	/// Test key / value based search
+	@Test
+	public void keyValueMultipleSearch() {
+		Query cond = new Equals("key", "key_hello", arguments_a);
+		assertTrue(cond.test(sample_a));
+		assertTrue(cond.test(sample_b));
+		
+		cond = new Equals("key", "hello", arguments_a);
+		assertFalse(cond.test(sample_a));
+		assertFalse(cond.test(sample_b));
+		
+		cond = new Equals("val", "my", arguments_a);
+		assertTrue(cond.test(sample_a));
+		assertFalse(cond.test(sample_b));
+	}
+	
 }

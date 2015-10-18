@@ -32,21 +32,21 @@ public class JStack extends JSqlStruct implements JStackLayer {
 	
 	/// Final getter for JStruct layers
 	public final JStruct[] structLayers() {
-		if( _structLayers != null ) {
+		if (_structLayers != null) {
 			return _structLayers;
 		}
 		
 		int len = stackLayers().length;
 		JStruct[] ret = new JStruct[len];
-		for(int i=0; i < len; ++i ) {
+		for (int i = 0; i < len; ++i) {
 			JStackLayer layer = _stackLayers[i];
-			if( layer instanceof JStruct ) {
+			if (layer instanceof JStruct) {
 				ret[i] = (JStruct) layer;
-			} else if( layer instanceof JSql ) {
-				ret[i] = new JSqlStruct( (JSql)layer );
-			} else if( layer instanceof JCache ) {
-				ret[i] = new JCacheStruct( (JCache)layer );
-			} 
+			} else if (layer instanceof JSql) {
+				ret[i] = new JSqlStruct((JSql) layer);
+			} else if (layer instanceof JCache) {
+				ret[i] = new JCacheStruct((JCache) layer);
+			}
 		}
 		
 		return (_structLayers = ret);

@@ -24,7 +24,7 @@ public class RegexUtils {
 	public static String removeAllNonAlphaNumeric_allowCommonSeparators(String input) {
 		return input.replaceAll(removeAllNonAlphaNumeric_allowCommonSeparators_regexString, "");
 	}
-		
+	
 	public static String sanitiseCommonEscapeCharactersIntoAscii(String input) {
 		String ret = input;
 		ret = ret.replaceAll("\\<", "&#60;");

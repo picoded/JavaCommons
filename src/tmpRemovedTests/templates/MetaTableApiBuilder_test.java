@@ -115,18 +115,15 @@ public class MetaTableApiBuilder_test {
 			new String[] { "name1", "age4" }, "");
 		assertNotNull(allDataWithQueryFilter);
 		
-		
-		
-		
-		
 	}
 	
 	@Test
-	public void list_GET_and_POST_queryTest(){
+	public void list_GET_and_POST_queryTest() {
 		//test query start and length
 		String[] allArgs = new String[] { "_oid", "_name", "_age" };
 		List<List<Object>> allData = mtApi.list_GET_and_POST_inner(0, 0, 0, allArgs, null, null, "_oid");
-		List<List<Object>> allDataWithStartAndLengthFilter = mtApi.list_GET_and_POST_inner(0, 0, 2, allArgs, null, null, "_oid");
+		List<List<Object>> allDataWithStartAndLengthFilter = mtApi.list_GET_and_POST_inner(0, 0, 2, allArgs, null, null,
+			"_oid");
 		assertNotNull(allDataWithStartAndLengthFilter);
 	}
 	

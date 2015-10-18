@@ -237,7 +237,7 @@ public class CommonsPage extends BasePage {
 	/// Note if the sys.smtp.enabled is set to false, this function returns null;
 	public EmailBroadcaster systemEmail() {
 		// Returns cached broadcaster if possible
-		if( _systemEmail != null ) {
+		if (_systemEmail != null) {
 			return _systemEmail;
 		}
 		
@@ -246,14 +246,14 @@ public class CommonsPage extends BasePage {
 		boolean sysSmtp = jc.getBoolean("sys.smtp.enabled", true);
 		
 		// Returns null if disabled 
-		if( sysSmtp == false ) {
+		if (sysSmtp == false) {
 			return null;
 		}
 		
 		// Get hostname, user, pass, and from account
-		String hostname  = jc.getString("sys.smtp.host", "smtp.mailinator.com:25");
-		String username  = jc.getString("sys.smtp.host", "");
-		String password  = jc.getString("sys.smtp.host", "");
+		String hostname = jc.getString("sys.smtp.host", "smtp.mailinator.com:25");
+		String username = jc.getString("sys.smtp.host", "");
+		String password = jc.getString("sys.smtp.host", "");
 		String emailFrom = jc.getString("sys.smtp.host", "testingTheEmailSystem@mailinator.com");
 		
 		return (_systemEmail = new EmailBroadcaster(hostname, username, password, emailFrom));

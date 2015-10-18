@@ -141,14 +141,13 @@ public class FormInputTemplates_test {
 		}
 		String prefix = "";
 		String suffix = "";
-		try{
+		try {
 			prefix = FileUtils.readFileToString(new File(resFolder + "/prefix.html"));
 			suffix = FileUtils.readFileToString(new File(resFolder + "/suffix.html"));
 			//rawHTML = FileUtils.readFileToString(new File(resFolder + "/sample.html"));
-		} catch (Exception e){
+		} catch (Exception e) {
 			
 		}
-		
 		
 		rawHTML = prefix + rawHTML + suffix;
 		String outputFileString = generatedFilesFolder + "/" + fileName + ".pdf";
@@ -449,7 +448,7 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("numberWithDataDisplay", jsonTemplatedOutput));
 	}
 	
-//	@Test
+	//	@Test
 	public void textareaTest() {
 		String jsonTemplatedOutput = getTemplatedJSONString("textarea", false, true);
 		
@@ -472,14 +471,13 @@ public class FormInputTemplates_test {
 		assertTrue(generateHTMLFile("fullyQualified", jsonTemplatedOutput));
 	}
 	
-//	@Test
+	//	@Test
 	public void dummy() {
 		String jsonTemplatedOutput = getTemplatedJSONString("number", false, true);
 		
 		assertNotNull(jsonTemplatedOutput);
 		
 		assertTrue(generateHTMLFile("number", jsonTemplatedOutput));
-		
 		
 		jsonTemplatedOutput = getTemplatedJSONString("number", true, true);
 		
@@ -513,8 +511,8 @@ public class FormInputTemplates_test {
 		System.out.println(val);
 	}
 	
-//	@Test
-	public void cleanTest(){
+	//	@Test
+	public void cleanTest() {
 		String exampleValue = "Hello<>`'\"\\ There";
 		String sanitisedString = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(exampleValue);
 		assertEquals("Hello&#60;&#62;&#96;&#8216;&#34;&#92; There", sanitisedString);

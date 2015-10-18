@@ -230,8 +230,8 @@ public class AccountLogin extends BasePage {
 				
 				String[] names = ao.getNames().toArray(new String[0]);
 				
-				if(sanitiseOutput && names != null){
-					for(int i = 0; i < names.length; ++i){
+				if (sanitiseOutput && names != null) {
+					for (int i = 0; i < names.length; ++i) {
 						names[i] = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(names[i]);
 					}
 				}
@@ -306,8 +306,8 @@ public class AccountLogin extends BasePage {
 					
 					boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
 					String[] names = ao.getNames().toArray(new String[0]);
-					if(sanitiseOutput && names != null){
-						for(int i = 0; i < names.length; ++i){
+					if (sanitiseOutput && names != null) {
+						for (int i = 0; i < names.length; ++i) {
 							names[i] = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(names[i]);
 						}
 					}
@@ -576,8 +576,8 @@ public class AccountLogin extends BasePage {
 				String[] accNames = new String[accNameSet.size()];
 				accNameSet.toArray(accNames);
 				
-				if(sanitiseOutput && accNames != null){
-					for(int i = 0; i < accNames.length; ++i){
+				if (sanitiseOutput && accNames != null) {
+					for (int i = 0; i < accNames.length; ++i) {
 						accNames[i] = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(accNames[i]);
 					}
 				}
@@ -600,9 +600,9 @@ public class AccountLogin extends BasePage {
 					
 					//extracting group names and sanitising if needed
 					Set<String> groupNames = group.getNames();
-					if(sanitiseOutput){
+					if (sanitiseOutput) {
 						groupNames.clear();
-						for(String groupName : group.getNames()){
+						for (String groupName : group.getNames()) {
 							groupNames.add(RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(groupName));
 						}
 					}
@@ -610,7 +610,7 @@ public class AccountLogin extends BasePage {
 					
 					//extracting member roles and sanitising if needed
 					String role = group.getMemberRole(account);
-					if(sanitiseOutput){
+					if (sanitiseOutput) {
 						role = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(role);
 					}
 					newGroup.put("role", role); //sanitise role just in case
@@ -824,9 +824,9 @@ public class AccountLogin extends BasePage {
 							if (ao != null) {
 								Set<String> aoNames = ao.getNames();
 								
-								if(sanitiseOutput){
+								if (sanitiseOutput) {
 									aoNames.clear();
-									for(String name : ao.getNames()){
+									for (String name : ao.getNames()) {
 										aoNames.add(RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(name));
 									}
 								}
@@ -838,10 +838,10 @@ public class AccountLogin extends BasePage {
 							}
 						} else {
 							Object rawVal = metaObj.get(header);
-							if(sanitiseOutput && rawVal instanceof String){
+							if (sanitiseOutput && rawVal instanceof String) {
 								String stringVal = GenericConvert.toString(rawVal);
 								row.add(stringVal);
-							}else{
+							} else {
 								row.add(rawVal);
 							}
 							
@@ -1086,56 +1086,56 @@ public class AccountLogin extends BasePage {
 							retList.get(listCounter).add(accObj._oid());
 						} else if (header.equalsIgnoreCase("name")) {
 							Set<String> names = accObj.getNames();
-							if(sanitiseOutput){
+							if (sanitiseOutput) {
 								names.clear();
-								for(String name : accObj.getNames()){
+								for (String name : accObj.getNames()) {
 									names.add(RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(name));
 								}
 							}
 							retList.get(listCounter).add(names); //sanitise
-						} else if (header.equalsIgnoreCase("role")) {
-							String role = groupObj.getMemberRole(accObj); //sanitise
-							if(sanitiseOutput){
-								role = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(role);
-							}
-							retList.get(listCounter).add(role);
-						} else if (header.toLowerCase().startsWith("account_")) { //might need to sanitise....but will come back to this later
-							String headerSuffix = header.substring("account_".length());
-							Object rawObj = accObj.get(headerSuffix);
-							if (rawObj != null) {
-								retList.get(listCounter).add(rawObj);
-							} else {
-								retList.get(listCounter).add("");
-							}
-						} else if (header.toLowerCase().startsWith("group_")) { //might need to sanitise....but will come back to this later
-							String headerSuffix = header.substring("group_".length());
-							Object rawObj = groupObj.get(headerSuffix);
-							if (rawObj != null) {
-								retList.get(listCounter).add(rawObj);
-							} else {
-								retList.get(listCounter).add("");
-							}
-						} else {
-							Object rawObj = groupMemberMeta.get(header);
-							if (rawObj != null) {
-								retList.get(listCounter).add(rawObj);
-							} else {
-								retList.get(listCounter).add("");
-							}
-						}
-					}
-					
-					++listCounter;
-				}
-				res.put("data", retList);
-				res.put("draw", req.getInt("draw"));
-				res.put("headers", headers);
-			} catch (Exception e) {
-				res.put("error", e.getMessage());
+		} else if (header.equalsIgnoreCase("role")) {
+			String role = groupObj.getMemberRole(accObj); //sanitise
+			if (sanitiseOutput) {
+				role = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(role);
 			}
-			
-			return resMap;
-		});
+			retList.get(listCounter).add(role);
+		} else if (header.toLowerCase().startsWith("account_")) { //might need to sanitise....but will come back to this later
+				String headerSuffix = header.substring("account_".length());
+				Object rawObj = accObj.get(headerSuffix);
+				if (rawObj != null) {
+					retList.get(listCounter).add(rawObj);
+				} else {
+					retList.get(listCounter).add("");
+				}
+			} else if (header.toLowerCase().startsWith("group_")) { //might need to sanitise....but will come back to this later
+				String headerSuffix = header.substring("group_".length());
+				Object rawObj = groupObj.get(headerSuffix);
+				if (rawObj != null) {
+					retList.get(listCounter).add(rawObj);
+				} else {
+					retList.get(listCounter).add("");
+				}
+			} else {
+				Object rawObj = groupMemberMeta.get(header);
+				if (rawObj != null) {
+					retList.get(listCounter).add(rawObj);
+				} else {
+					retList.get(listCounter).add("");
+				}
+			}
+		}
+		
+		++listCounter;
+	}
+	res.put("data", retList);
+	res.put("draw", req.getInt("draw"));
+	res.put("headers", headers);
+} catch (Exception e) {
+	res.put("error", e.getMessage());
+}
+
+return resMap;
+}	  );
 	};
 	
 	///
@@ -1230,21 +1230,20 @@ public class AccountLogin extends BasePage {
 					AccountObject newMember = accountTableObj.getFromID(setMember.getKey());
 					if (newMember != null) {
 						//groupObj.addMember(newMember, (String)setMember.getValue()).saveAll();
-						groupObj.setMember(newMember, (String) setMember.getValue()).saveDelta();
-						successfulAdds.add(setMember.getKey());
-					}
-				}
-				
-				res.put("setMembers", successfulAdds);
-			}
-			
-			} catch (Exception e) {
-			res.put("error", e.getMessage());
-			}
-			
-			return resMap;
-			}	  
-		);
+			groupObj.setMember(newMember, (String) setMember.getValue()).saveDelta();
+			successfulAdds.add(setMember.getKey());
+		}
+	}
+	
+	res.put("setMembers", successfulAdds);
+}
+
+} catch (Exception e) {
+res.put("error", e.getMessage());
+}
+
+return resMap;
+}	  );
 	};
 	
 	/////////////////////////////////////////////
@@ -1288,69 +1287,73 @@ public class AccountLogin extends BasePage {
 	///
 	public static RESTFunction members_meta_GET = (req, res) -> {
 		// Only runs function if logged in, and valid group object
-		return fetchGroupObject_fromFirstWildcard_orCurrentUser(req, res, false, (reqObj, resMap, basePageObj,
-			accountTableObj, currentUser, groupObj, accObj_b) -> {
-			res.put("accountID", null);
-			res.put("accountID_valid", false);
-			res.put("meta", null);
-			res.put("error", null);
-			
-			if (groupObj == null) {
-				res.put("error", "Group object is null");
-				return resMap;
-			}
-			
-			try {
+		return fetchGroupObject_fromFirstWildcard_orCurrentUser(
+			req,
+			res,
+			false,
+			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				res.put("accountID", null);
+				res.put("accountID_valid", false);
+				res.put("meta", null);
+				res.put("error", null);
 				
-				String accountOID = req.getString("accountID");
-				if (accountOID == null || accountOID.isEmpty()) {
-					if (currentUser != null) {
-						accountOID = currentUser._oid(); //if accountOID is null, try get oid from currentUser object
-		} else {
-			res.put("error", "Unable to obtain oid");
-		}
-	}
-	
-	res.put("accountID", accountOID);
-	
-	AccountObject user = accountTableObj.getFromID(accountOID);
-	MetaObject groupUserInfo = null;
-	boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
-	
-	if (user != null) {
-		groupUserInfo = groupObj.getMember(user);
-		
-		if(sanitiseOutput && groupUserInfo != null){
-			Set<String> userInfoKeys = groupUserInfo.keySet();
-			for(String key : userInfoKeys){
-				Object rawVal = groupUserInfo.get(key);
-				if(rawVal instanceof String){
-					groupUserInfo.put(key, RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(GenericConvert.toString(rawVal)));
-				}else{
-					groupUserInfo.put(key, rawVal);
+				if (groupObj == null) {
+					res.put("error", "Group object is null");
+					return resMap;
 				}
-			}
-		}
-		
-	} else {
-		res.put("error", "User account not found in table");
-		return resMap;
-	}
-	
-	if (groupUserInfo != null) {
-		res.put("meta", groupUserInfo);
-		res.put("accountID_valid", true);
-	} else {
-		res.put("error", "User info not found in group");
-		return resMap;
-	}
-	
-} catch (Exception e) {
-	res.put("error", e.getMessage());
-}
-
-return resMap;
-}	  );
+				
+				try {
+					
+					String accountOID = req.getString("accountID");
+					if (accountOID == null || accountOID.isEmpty()) {
+						if (currentUser != null) {
+							accountOID = currentUser._oid(); //if accountOID is null, try get oid from currentUser object
+						} else {
+							res.put("error", "Unable to obtain oid");
+						}
+					}
+					
+					res.put("accountID", accountOID);
+					
+					AccountObject user = accountTableObj.getFromID(accountOID);
+					MetaObject groupUserInfo = null;
+					boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
+					
+					if (user != null) {
+						groupUserInfo = groupObj.getMember(user);
+						
+						if (sanitiseOutput && groupUserInfo != null) {
+							Set<String> userInfoKeys = groupUserInfo.keySet();
+							for (String key : userInfoKeys) {
+								Object rawVal = groupUserInfo.get(key);
+								if (rawVal instanceof String) {
+									groupUserInfo.put(key,
+										RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(GenericConvert.toString(rawVal)));
+								} else {
+									groupUserInfo.put(key, rawVal);
+								}
+							}
+						}
+						
+					} else {
+						res.put("error", "User account not found in table");
+						return resMap;
+					}
+					
+					if (groupUserInfo != null) {
+						res.put("meta", groupUserInfo);
+						res.put("accountID_valid", true);
+					} else {
+						res.put("error", "User info not found in group");
+						return resMap;
+					}
+					
+				} catch (Exception e) {
+					res.put("error", e.getMessage());
+				}
+				
+				return resMap;
+			});
 	};
 	
 	///

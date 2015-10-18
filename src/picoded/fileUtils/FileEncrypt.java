@@ -36,7 +36,7 @@ public class FileEncrypt {
 	/// @returns the OutputStream used
 	///
 	public static OutputStream pdf(OutputStream baos, InputStream is, String pdfPassword) {
-		PdfReader  reader = null;
+		PdfReader reader = null;
 		PdfStamper stamper = null;
 		
 		try {
@@ -46,12 +46,12 @@ public class FileEncrypt {
 			/// PDF output stream with encryption password
 			stamper = new PdfStamper(reader, baos);
 			stamper.setEncryption(pdfPassword.getBytes(), pdfPassword.getBytes(), PdfWriter.ALLOW_PRINTING,
-										 PdfWriter.ENCRYPTION_AES_128 | PdfWriter.DO_NOT_ENCRYPT_METADATA);
+				PdfWriter.ENCRYPTION_AES_128 | PdfWriter.DO_NOT_ENCRYPT_METADATA);
 			
 			/// Stream close
 			stamper.close();
 			reader.close();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
 			
@@ -59,12 +59,14 @@ public class FileEncrypt {
 			if (stamper != null) {
 				try {
 					stamper.close();
-				} catch(Exception e) {}
+				} catch (Exception e) {
+				}
 			}
 			if (reader != null) {
 				try {
 					reader.close();
-				} catch(Exception e) {}
+				} catch (Exception e) {
+				}
 			}
 			stamper = null;
 			reader = null;
@@ -98,7 +100,7 @@ public class FileEncrypt {
 	public static ByteArrayOutputStream pdf(File inFile, String pdfPassword) {
 		try {
 			return pdf(new FileInputStream(inFile), pdfPassword);
-		} catch(FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -130,13 +132,14 @@ public class FileEncrypt {
 			// Runs the encryption, and outputs it
 			ze.add(fileName, is, zipPassword);
 			ze.close();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
 			if (ze != null) {
 				try {
 					ze.close();
-				} catch(Exception e) {}
+				} catch (Exception e) {
+				}
 			}
 			ze = null;
 		}
@@ -170,7 +173,7 @@ public class FileEncrypt {
 	public static ByteArrayOutputStream zip(File inFile, String fileName, String zipPassword) {
 		try {
 			return zip(new FileInputStream(inFile), fileName, zipPassword);
-		} catch(FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 	}

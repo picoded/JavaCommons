@@ -161,15 +161,15 @@ public class FormInputTemplates {
 		return input_textarea(node, false);
 	};
 	
-	protected static StringBuilder input_textarea(FormNode node, boolean displayMode){
+	protected static StringBuilder input_textarea(FormNode node, boolean displayMode) {
 		CaseInsensitiveHashMap<String, String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getStringValue();
 		
 		StringBuilder[] sbArr = null;
 		
-		if(!displayMode){
+		if (!displayMode) {
 			sbArr = node.defaultHtmlInput(HtmlTag.TEXTAREA, "pfi_inputTextBox pfi_input", null);
-		}else{
+		} else {
 			sbArr = node.defaultHtmlInput(HtmlTag.DIV, "pfi_inputTextBox pfi_input", null);
 		}
 		sbArr[0].append(fieldValue);
@@ -589,7 +589,7 @@ public class FormInputTemplates {
 		if (sigValue != null && !sigValue.isEmpty()) {
 			dateValue = node.getStringValue(dateInputId);
 			if (dateValue != null && !dateValue.isEmpty()) {
-				if(DateConv.isInMillisecondsFormat(dateValue)){
+				if (DateConv.isInMillisecondsFormat(dateValue)) {
 					dateValue = DateConv.toISOFormat(Long.parseLong(dateValue), ISODateFormat.YYYYMMDD, "-");
 				}
 				
@@ -627,10 +627,10 @@ public class FormInputTemplates {
 		String hiddenInputTag = "";
 		if (fieldValue != null && fieldValue.length() > 0) {
 			
-			if(DateConv.isInMillisecondsFormat(fieldValue)){
+			if (DateConv.isInMillisecondsFormat(fieldValue)) {
 				dateISO = DateConv.toISOFormat(Long.parseLong(fieldValue), ISODateFormat.YYYYMMDD, "-");
 				dateMilliseconds = fieldValue;
-			}else{
+			} else {
 				dateISO = fieldValue;
 				dateMilliseconds = DateConv.toMillisecondsFormat(fieldValue, ISODateFormat.YYYYMMDD, "-");
 			}
@@ -642,14 +642,16 @@ public class FormInputTemplates {
 			paramMap.put(HtmlTag.TYPE, "date");
 			
 			if (node.containsKey("max")) {
-				String maxDate = DateConv.changeISODateFormat(node.getString("max"), ISODateFormat.YYYYMMDD, ISODateFormat.YYYYMMDD, "-");
+				String maxDate = DateConv.changeISODateFormat(node.getString("max"), ISODateFormat.YYYYMMDD,
+					ISODateFormat.YYYYMMDD, "-");
 				if (maxDate != null && !maxDate.isEmpty()) {
 					paramMap.put("max", maxDate);
 				}
 			}
 			
 			if (node.containsKey("min")) {
-				String minDate = DateConv.changeISODateFormat(node.getString("min"), ISODateFormat.YYYYMMDD, ISODateFormat.YYYYMMDD, "-");
+				String minDate = DateConv.changeISODateFormat(node.getString("min"), ISODateFormat.YYYYMMDD,
+					ISODateFormat.YYYYMMDD, "-");
 				if (minDate != null && !minDate.isEmpty()) {
 					paramMap.put("min", minDate);
 				}
@@ -665,8 +667,8 @@ public class FormInputTemplates {
 			}
 			
 			//generate hidden input field
-			hiddenInputTag = "<input class=\"pfi_input pfi_hidden_date_text_field\" type=\"text\" name=\"" + hiddenInputName
-					+ "\" style=\"display:none\" value=\"" + dateMilliseconds + "\"></input>";
+			hiddenInputTag = "<input class=\"pfi_input pfi_hidden_date_text_field\" type=\"text\" name=\""
+				+ hiddenInputName + "\" style=\"display:none\" value=\"" + dateMilliseconds + "\"></input>";
 			
 			StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.INPUT, "pfi_inputDate pfi_input", paramMap);
 			ret.append(sbArr[0]);
@@ -676,7 +678,7 @@ public class FormInputTemplates {
 			}
 		} else {
 			node.replace("type", "text");
-			if(!StringUtils.isNullOrEmpty(fieldValue) && DateConv.isInMillisecondsFormat(fieldValue)){
+			if (!StringUtils.isNullOrEmpty(fieldValue) && DateConv.isInMillisecondsFormat(fieldValue)) {
 				fieldValue = DateConv.toISOFormat(Long.parseLong(fieldValue), ISODateFormat.DDMMYYYY, "-");
 			}
 			

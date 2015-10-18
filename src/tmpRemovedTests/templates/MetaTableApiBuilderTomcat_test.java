@@ -84,7 +84,7 @@ public class MetaTableApiBuilderTomcat_test {
 		if (tomcat == null) {
 			File webInfFile = new File("./test-files/tmp/WEB-INF");
 			
-			if(webInfFile.exists()) {
+			if (webInfFile.exists()) {
 				for (File file : webInfFile.listFiles()) {
 					file.delete(); //to accomodate certain people who do not use command line
 				}

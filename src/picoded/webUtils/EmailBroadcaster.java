@@ -35,38 +35,33 @@ public class EmailBroadcaster {
 	/// @params  Password for sender account
 	/// @Params  Sending email address
 	///
-	public EmailBroadcaster(final String smtpUrl, final String username, final String password, final String fromAddress ){
+	public EmailBroadcaster(final String smtpUrl, final String username, final String password, final String fromAddress) {
 		
 		fromEmail = fromAddress;
 		Properties props = new Properties();
 		
 		String[] parts = smtpUrl.split(":");
-		String smtpAdd  = parts[0];
-		String smtpPort = (parts.length > 1)?parts[1]:"465";
+		String smtpAdd = parts[0];
+		String smtpPort = (parts.length > 1) ? parts[1] : "465";
 		
 		props.put("mail.transport.protocol", "smtp");
-		props.put("mail.smtp.host", smtpAdd );
+		props.put("mail.smtp.host", smtpAdd);
 		//props.put("mail.smtp.socketFactory.port", smtpPort );
 		//props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
-		props.put("mail.smtp.port", smtpPort );
+		props.put("mail.smtp.port", smtpPort);
 		
-		if( username != null && username.trim().length() > 0 ) {
+		if (username != null && username.trim().length() > 0) {
 			props.put("mail.smtp.auth", "true");
-			session = Session.getInstance(
-				props,
-				new javax.mail.Authenticator() {
-					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(username,password);
-					}
+			session = Session.getInstance(props, new javax.mail.Authenticator() {
+				protected PasswordAuthentication getPasswordAuthentication() {
+					return new PasswordAuthentication(username, password);
 				}
-			);
+			});
 		} else {
 			props.put("mail.smtp.auth", "false");
 			props.put("mail.smtp.auth.login.disable", "true");
 			
-			session = Session.getInstance(
-				props
-			);
+			session = Session.getInstance(props);
 		}
 		
 	}
@@ -82,19 +77,20 @@ public class EmailBroadcaster {
 	/// @params  File attachment Map<String filename, String absolute file path>
 	/// @params  Overwrite default, "from address"
 	///
-	public boolean sendEmail(String subject,String htmlContent, String toAddresses[], String ccAddresses[], String bccAddresses[], Map<String,String> fileAttachments, String fromAddress) throws Exception {
+	public boolean sendEmail(String subject, String htmlContent, String toAddresses[], String ccAddresses[],
+		String bccAddresses[], Map<String, String> fileAttachments, String fromAddress) throws Exception {
 		// Actual message contianer used by the function
 		MimeMessage message = new MimeMessage(session);
 		
 		// Process "FROM" address field
-		if( fromAddress != null ) {
+		if (fromAddress != null) {
 			message.setFrom(new InternetAddress(fromAddress));
 		} else {
 			message.setFrom(new InternetAddress(fromEmail));
 		}
 		
 		// Process "TO" address field
-		if(toAddresses == null || toAddresses.length <= 0) {
+		if (toAddresses == null || toAddresses.length <= 0) {
 			throw new Exception("Sending to email address is not allowed to be 'empty'");
 		}
 		InternetAddress[] addressTo = new InternetAddress[toAddresses.length];
@@ -132,16 +128,16 @@ public class EmailBroadcaster {
 		Multipart multipart = new MimeMultipart();
 		
 		// Set email HTML CONTENT
-		if(htmlContent != null) {
+		if (htmlContent != null) {
 			MimeBodyPart messageBodyPart = new MimeBodyPart();
-			messageBodyPart.setContent(htmlContent,"text/html" );
+			messageBodyPart.setContent(htmlContent, "text/html");
 			multipart.addBodyPart(messageBodyPart);
 		}
 		
 		// Loops through file attachments, and add it
-		if( fileAttachments != null ) {
+		if (fileAttachments != null) {
 			MimeBodyPart messageBodyPart = new MimeBodyPart();
-			for(Map.Entry<String, String> entry : fileAttachments.entrySet()) {
+			for (Map.Entry<String, String> entry : fileAttachments.entrySet()) {
 				String key = entry.getKey();
 				String value = entry.getValue();
 				
@@ -162,36 +158,25 @@ public class EmailBroadcaster {
 	}
 	
 	/// Shorten convinence function (does not need testing, test the core function directly instead)
-	public boolean sendEmail(String subject,String htmlContent, String toAddresses[], String ccAddresses[], String bccAddresses[], HashMap<String,String> fileAttachments) throws Exception {
-		return sendEmail(subject,
-							  htmlContent,
-							  toAddresses,
-							  ccAddresses,
-							  bccAddresses,
-							  fileAttachments, null );
+	public boolean sendEmail(String subject, String htmlContent, String toAddresses[], String ccAddresses[],
+		String bccAddresses[], HashMap<String, String> fileAttachments) throws Exception {
+		return sendEmail(subject, htmlContent, toAddresses, ccAddresses, bccAddresses, fileAttachments, null);
 		
 	}
 	
 	/// Shorten convinence function (does not need testing, test the core function directly instead)
-	public boolean sendEmail(String subject, String htmlContent, String toAddresses, String ccAddresses, String bccAddresses, HashMap<String,String> fileAttachments) throws Exception {
-		return sendEmail(subject,
-							  htmlContent,
-							  ((toAddresses!=null)?(toAddresses.split(",")):null),
-							  ((ccAddresses!=null)?(ccAddresses.split(",")):null),
-							  ((bccAddresses!=null)?(bccAddresses.split(",")):null),
-							  fileAttachments, null );
+	public boolean sendEmail(String subject, String htmlContent, String toAddresses, String ccAddresses,
+		String bccAddresses, HashMap<String, String> fileAttachments) throws Exception {
+		return sendEmail(subject, htmlContent, ((toAddresses != null) ? (toAddresses.split(",")) : null),
+			((ccAddresses != null) ? (ccAddresses.split(",")) : null), ((bccAddresses != null) ? (bccAddresses.split(","))
+				: null), fileAttachments, null);
 	}
 	
 	/// Shorten convinence function (does not need testing, test the core function directly instead)
-	public boolean sendEmail(String subject, String htmlContent, String toAddresses, HashMap<String,String> fileAttachments) throws Exception {
-		return sendEmail(subject,
-							  htmlContent,
-							  ((toAddresses!=null)?(toAddresses.split(",")):null),
-							  null,
-							  null,
-							  fileAttachments, null );
+	public boolean sendEmail(String subject, String htmlContent, String toAddresses,
+		HashMap<String, String> fileAttachments) throws Exception {
+		return sendEmail(subject, htmlContent, ((toAddresses != null) ? (toAddresses.split(",")) : null), null, null,
+			fileAttachments, null);
 	}
 	
 }
-
-

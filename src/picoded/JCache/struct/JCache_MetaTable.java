@@ -12,7 +12,6 @@ import picoded.JStruct.*;
 import picoded.JStruct.internal.*;
 import picoded.security.NxtCrypt;
 
-
 import org.apache.commons.lang3.RandomUtils;
 
 /// JSql implmentation of KeyValueMap
@@ -56,12 +55,12 @@ public class JCache_MetaTable extends JStruct_MetaTable {
 	
 	/// Core cache map
 	protected JCacheMap<String, Map<String, Object>> coreCacheMap() {
-		if( _coreCacheMap != null ) {
+		if (_coreCacheMap != null) {
 			return _coreCacheMap;
 		}
 		try {
 			return _coreCacheMap = jCacheObj.getMap(tablename);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -107,13 +106,12 @@ public class JCache_MetaTable extends JStruct_MetaTable {
 		Map<String, Object> storeMap = new HashMap<String, Object>();
 		
 		// Iterate and create a store map, as fullMap 
-		for(Map.Entry<String,Object> entry : fullMap.entrySet()) {
+		for (Map.Entry<String, Object> entry : fullMap.entrySet()) {
 			storeMap.put(entry.getKey(), entry.getValue());
 		}
 		
 		// Store the object
 		coreCacheMap().put(_oid, storeMap);
 	}
-	
 	
 }

@@ -12,7 +12,6 @@ import picoded.JStruct.*;
 import picoded.JStruct.internal.*;
 import picoded.security.NxtCrypt;
 
-
 import org.apache.commons.lang3.RandomUtils;
 
 /// JSql implmentation of KeyValueMap
@@ -56,12 +55,12 @@ public class JCache_KeyValueMap extends JStruct_KeyValueMap {
 	
 	/// Core cache map
 	protected JCacheMap<String, String> coreCacheMap() {
-		if( _coreCacheMap != null ) {
+		if (_coreCacheMap != null) {
 			return _coreCacheMap;
 		}
 		try {
 			return _coreCacheMap = jCacheObj.getMap(tablename);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -130,9 +129,9 @@ public class JCache_KeyValueMap extends JStruct_KeyValueMap {
 	/// @returns long
 	protected void setExpiryRaw(String key, long expire) {
 		String value = coreCacheMap().get(key);
-		if( value != null ) {
+		if (value != null) {
 			coreCacheMap().put(key, value, expire);
-		} 
+		}
 		// ignore if there is no value
 	}
 	
@@ -194,6 +193,5 @@ public class JCache_KeyValueMap extends JStruct_KeyValueMap {
 	public String remove(Object key) {
 		return coreCacheMap().remove(key);
 	}
-	
 	
 }

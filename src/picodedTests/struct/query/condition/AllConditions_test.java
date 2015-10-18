@@ -240,13 +240,12 @@ public class AllConditions_test {
 		assertTrue(cond.test(sample_c));
 	}
 	
-	
 	@Test
 	public void likeEquality() {
 		setupEqualitySamples();
 		
 		//if a string starts with a number, number parse will work
-		Map<String,Object> testFields = new HashMap<String,Object>();
+		Map<String, Object> testFields = new HashMap<String, Object>();
 		testFields.put("abcde", "abcde");
 		testFields.put("ab%", "ab%");
 		testFields.put("%bcde", "%bcde");

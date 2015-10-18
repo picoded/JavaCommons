@@ -76,7 +76,7 @@ public class MetaTable_test {
 	// @Test
 	// public void invalidSetup() { //Numeric as table prefix tend to cuase problems
 	// 	MetaTable m;
-	// 
+	//
 	// 	try {
 	// 		m = new MetaTable(JStackObj, "1" + TestConfig.randomTablePrefix());
 	// 		fail(); // if we got here, no exception was thrown, which is bad

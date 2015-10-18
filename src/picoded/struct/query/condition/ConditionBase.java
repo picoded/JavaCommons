@@ -34,7 +34,7 @@ public class ConditionBase implements Query {
 	
 	/// The constructor with the field name, and default argument
 	///
-	/// @param   default field to test 
+	/// @param   default field to test
 	/// @param   default argument name to test against
 	/// @param   default argument map to get test value
 	///
@@ -50,7 +50,7 @@ public class ConditionBase implements Query {
 	
 	/// Gets the arg value to test
 	///
-	/// @param   map to extract out the field value 
+	/// @param   map to extract out the field value
 	/// @param   field name of extraction
 	///
 	/// @TODO: Support FullyQualifiedDomainName extraction?
@@ -65,7 +65,7 @@ public class ConditionBase implements Query {
 	}
 	
 	/// To test against the specific value, this is the actual
-	/// argument which is being used. After fetching both 
+	/// argument which is being used. After fetching both
 	/// the field and argument value
 	///
 	/// [to override on extension]
@@ -86,20 +86,50 @@ public class ConditionBase implements Query {
 		return false;
 	}
 	
-	/// Gets the field value and tests it, 
+	/// Gets the field value and tests it,
 	/// this is a combination of getFieldValue, and testValues
 	///
-	/// @param   object to extract out the field value 
+	/// @param   object to extract out the field value
 	/// @param   parameter map to use
 	///
 	/// @returns  boolean indicating success or failure
 	///
+	@SuppressWarnings("unchecked")
 	protected boolean getAndTestFieldValue(Object t, Map<String, Object> argMap) {
-		Object fieldValue = QueryUtils.getFieldValue(t, _fieldName);
+		
+		// Argument value to test against
 		Object argValue = getArgumentValue(argMap, _argName);
 		
-		//System.out.println("> "+fieldValue+" = "+argValue);
-		return testValues(fieldValue, argValue);
+		// Allow operation across all key / val mappings, wildcard search
+		if (t instanceof Map) {
+			if (_fieldName.equalsIgnoreCase("key")) {
+				
+				// Test against all the key values
+				for (Map.Entry<Object, Object> e : ((Map<Object, Object>) t).entrySet()) {
+					if (testValues(e.getKey(), argValue)) {
+						return true;
+					}
+				}
+				
+				// Failed to find any key
+				return false;
+			} else if (_fieldName.equalsIgnoreCase("val")) {
+				
+				// Test against all the stored values
+				for (Map.Entry<Object, Object> e : ((Map<Object, Object>) t).entrySet()) {
+					if (testValues(e.getValue(), argValue)) {
+						return true;
+					}
+				}
+				
+				// Failed to find any value
+				return false;
+			}
+		}
+		
+		//System.out.println("> "+ QueryUtils.getFieldValue(t, _fieldName) +" = "+argValue);
+		// Get the target value to test, and test it
+		return testValues(QueryUtils.getFieldValue(t, _fieldName), argValue);
 	}
 	
 	//
@@ -132,12 +162,12 @@ public class ConditionBase implements Query {
 	// Public accessors
 	//--------------------------------------------------------------------
 	
-	/// Indicates if its a basic operator 
+	/// Indicates if its a basic operator
 	public boolean isBasicOperator() {
 		return true;
 	}
 	
-	/// Gets the query type 
+	/// Gets the query type
 	///
 	/// [to override on extension]
 	public QueryType type() {

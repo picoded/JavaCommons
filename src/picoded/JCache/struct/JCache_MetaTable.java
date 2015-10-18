@@ -103,9 +103,15 @@ public class JCache_MetaTable extends JStruct_MetaTable {
 	/// either partially (if supported / used), or completely
 	protected void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap, Set<String> keys) {
 		// Ensure all object refence is lost
-		Map<String, Object> storeMap = ConvertJSON.toMap(ConvertJSON.fromMap(fullMap));
+		Map<String, Object> storeMap = new HashMap<String, Object>();
+		
+		// Iterate and create a store map, as fullMap 
+		for (Map.Entry<String, Object> entry : fullMap.entrySet()) {
+			storeMap.put(entry.getKey(), entry.getValue());
+		}
+		
 		// Store the object
-		coreCacheMap().put(_oid, fullMap);
+		coreCacheMap().put(_oid, storeMap);
 	}
 	
 }

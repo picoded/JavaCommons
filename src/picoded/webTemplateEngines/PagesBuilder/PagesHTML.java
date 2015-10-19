@@ -98,7 +98,11 @@ public class PagesHTML {
 			uriRootPrefix = uriRootPrefix.substring(0, uriRootPrefix.length() - 1);
 		}
 		
+		// 
 		String pageURI = uriRootPrefix + "/" + pageName;
+		while( pageURI.startsWith("//") ) {
+			pageURI = pageURI.substring(1);
+		}
 		
 		ret.put("PagesRootURI", uriRootPrefix);
 		ret.put("PageURI", pageURI);

@@ -16,10 +16,11 @@ import picoded.JSql.*;
 import picoded.JStruct.*;
 import picoded.struct.*;
 import picoded.struct.query.*;
+import picoded.struct.query.internal.*;
 
 ///
 /// Protected class, used to orgainze the various JSql based logic
-/// used in MetaTable. 
+/// used in MetaTable.
 ///
 /// The larger intention is to keep the MetaTable class more maintainable and unit testable
 ///
@@ -33,7 +34,7 @@ public class JSql_MetaTableUtils {
 	//--------------------------------------------------------------------------
 	
 	/// Fetches the result array position using the filters
-	/// 
+	///
 	/// This is done, as each row in the SQL query only represents
 	/// an object, key, value, value index pair.
 	///
@@ -73,7 +74,7 @@ public class JSql_MetaTableUtils {
 	}
 	
 	/// Fetches the result array position using the filters
-	/// 
+	///
 	/// This is done, as each row in the SQL query only represents
 	/// an object, key, value, value index pair.
 	///
@@ -192,7 +193,7 @@ public class JSql_MetaTableUtils {
 	
 	///
 	/// Iterates the relevent keyList, and appends its value from the objMap, into the sql colTypes database
-	/// 
+	///
 	/// @param {MetaTypeMap} mtm           - main MetaTypeMap, to check collumn configuration
 	/// @param {JSql} sql                  - sql connection to setup the table
 	/// @param {String} tName              - table name to setup, this holds the actual meta table data
@@ -200,7 +201,7 @@ public class JSql_MetaTableUtils {
 	/// @param {Map<String,Object>} objMap - map to extract values to store from
 	/// @param {Set<String>} keyList       - keylist to limit append load
 	/// @param {boolean} optimizeAppend    - Used to indicate if append batch should be optimized (not used)
-	/// 
+	///
 	@SuppressWarnings("unchecked")
 	public static void JSqlObjectMapAppend( //
 		MetaTypeMap mtm, //
@@ -272,13 +273,13 @@ public class JSql_MetaTableUtils {
 	
 	///
 	/// Extracts and build the map stored under an _oid
-	/// 
+	///
 	/// @param {MetaTypeMap} mtm           - main MetaTypeMap, to check collumn configuration
 	/// @param {JSql} sql                  - sql connection to setup the table
 	/// @param {String} sqlTableName       - table name to setup, this holds the actual meta table data
 	/// @param {String} _oid               - object id to store the key value pairs into
 	/// @param {Map<String,Object>} ret    - map to populate, and return, created if null if there is data
-	/// 
+	///
 	public static Map<String, Object> JSqlObjectMapFetch( //
 		MetaTypeMap mtm, JSql sql, //
 		String sqlTableName, String _oid, //
@@ -294,12 +295,12 @@ public class JSql_MetaTableUtils {
 	
 	///
 	/// Extracts and build the map stored under an _oid, from the JSqlResult
-	/// 
+	///
 	/// @param {MetaTypeMap} mtm           - main MetaTypeMap, to check collumn configuration
 	/// @param {JSqlResult} r              - sql result
 	/// @param {String} _oid               - object id to store the key value pairs into
 	/// @param {Map<String,Object>} ret    - map to populate, and return, created if null if there is data
-	/// 
+	///
 	public static Map<String, Object> extractObjectMapFromJSqlResult(//
 		MetaTypeMap mtm, JSqlResult r, //
 		String _oid, Map<String, Object> ret //
@@ -329,7 +330,7 @@ public class JSql_MetaTableUtils {
 			
 			Object[] rowData = extractKeyValueNonArrayValueFromPos(r, i);
 			
-			/// Only check for ret, at this point, 
+			/// Only check for ret, at this point,
 			/// so returning null when no data occurs
 			if (ret == null) {
 				ret = new ConcurrentHashMap<String, Object>();
@@ -386,7 +387,7 @@ public class JSql_MetaTableUtils {
 		from.append("(SELECT DISTINCT oID");
 		
 		//
-		// Optional object created time support 
+		// Optional object created time support
 		// (Commented out)
 		//
 		//-----------------------------------------
@@ -495,6 +496,69 @@ public class JSql_MetaTableUtils {
 		return null;
 	}
 	
+	/// Sanatize the order by string, and places the field name as query arguments
+	public static String sanatizeOrderByString(String rawString, List<Object> queryArgs) {
+		// Return string
+		StringBuilder ret = new StringBuilder();
+		
+		// Clear out excess whtiespace
+		rawString = rawString.trim().replaceAll("\\s+", " ");
+		
+		// Split for multiple fields
+		String[] orderByArr = rawString.split(",");
+		
+		if (orderByArr == null || orderByArr[0].length() <= 0) {
+			throw new RuntimeException("Unexpected blank found in OrderBy query : " + rawString);
+		}
+		
+		boolean first = true;
+		for (String orderSet : orderByArr) {
+			
+			// Get orderset, without excess whitespace
+			orderSet = orderSet.trim();
+			if (orderSet.length() <= 0) {
+				throw new RuntimeException("Invalid OrderBy string query: " + rawString);
+			}
+			
+			// Default ordering is asecending
+			OrderBy.OrderType ot = OrderBy.OrderType.ASC;
+			
+			// Check for DESC / ASC suffix
+			if (orderSet.length() > 4) {
+				String lowerCaseOrderSet = orderSet.toLowerCase();
+				if (lowerCaseOrderSet.endsWith(" desc")) {
+					ot = OrderBy.OrderType.DESC;
+					orderSet = orderSet.substring(0, orderSet.length() - 5).trim();
+				} else if (lowerCaseOrderSet.endsWith(" asc")) {
+					ot = OrderBy.OrderType.ASC;
+					orderSet = orderSet.substring(0, orderSet.length() - 4).trim();
+				}
+			}
+			
+			// Unwrap the field name (since they will be passed by params anyway)
+			String field = QueryUtils.unwrapFieldName(orderSet);
+			
+			// Add as query args
+			queryArgs.add(field);
+			
+			// Push the return string, add the seperators when needed
+			if (first != true) {
+				ret.append(", ");
+			} else {
+				first = false;
+			}
+			
+			// Push the actual order by command
+			if (ot == OrderBy.OrderType.DESC) {
+				ret.append("? DESC ");
+			} else {
+				ret.append("? ASC ");
+			}
+		}
+		
+		return ret.toString();
+	}
+	
 	/// Performs a search query, and returns the respective MetaObjects
 	///
 	/// CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
@@ -516,6 +580,7 @@ public class JSql_MetaTableUtils {
 	
 		/// Query string, for either a newly constructed view, or cached view
 		StringBuilder queryBuilder = new StringBuilder();
+		List<Object> complexQueryArgs = new ArrayList<Object>();
 		Object[] queryArgs = null;
 		
 		if (orderByStr != null) {
@@ -530,7 +595,7 @@ public class JSql_MetaTableUtils {
 			// Support ORDER BY values forming the MetaMap
 			if (orderByStr != null) {
 				queryBuilder.append(" ORDER BY ");
-				queryBuilder.append(orderByStr);
+				queryBuilder.append(sanatizeOrderByString(orderByStr, complexQueryArgs));
 			}
 		} else {
 			
@@ -548,7 +613,6 @@ public class JSql_MetaTableUtils {
 			}
 			
 			// Building the Inner join query
-			List<Object> complexQueryArgs = new ArrayList<Object>();
 			StringBuilder innerJoinQuery = sqlComplexLeftJoinQueryBuilder(sql, tablename, queryTypeMap, complexQueryArgs);
 			
 			//queryBuilder.append( innerJoinQuery );
@@ -570,15 +634,15 @@ public class JSql_MetaTableUtils {
 			// Support ORDER BY values forming the MetaMap
 			if (orderByStr != null) {
 				queryBuilder.append(" ORDER BY ");
-				queryBuilder.append(orderByStr);
+				queryBuilder.append(sanatizeOrderByString(orderByStr, complexQueryArgs));
 			}
-			
-			// Finalize query args
-			queryArgs = complexQueryArgs.toArray(new Object[0]);
 			
 			//logger.log( Level.WARNING, queryBuilder.toString() );
 			//logger.log( Level.WARNING, Arrays.asList(queryArgs).toString() );
 		}
+		
+		// Finalize query args
+		queryArgs = complexQueryArgs.toArray(new Object[0]);
 		
 		// Limit and offset clause
 		if (limit > 0) {

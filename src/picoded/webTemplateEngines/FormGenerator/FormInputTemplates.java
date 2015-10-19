@@ -18,6 +18,8 @@ import picoded.conv.ConvertJSON;
 import picoded.conv.ListValueConv;
 import picoded.conv.GenericConvert;
 import picoded.conv.RegexUtils;
+import picoded.conv.DateConv;
+import picoded.conv.DateConv.ISODateFormat;
 import picoded.struct.CaseInsensitiveHashMap;
 
 public class FormInputTemplates {
@@ -156,13 +158,23 @@ public class FormInputTemplates {
 	};
 	
 	protected static FormInputInterface input_textarea = (node) -> {
+		return input_textarea(node, false);
+	};
+	
+	protected static StringBuilder input_textarea(FormNode node, boolean displayMode) {
 		CaseInsensitiveHashMap<String, String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getStringValue();
 		
-		StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.TEXTAREA, "pfi_inputTextBox pfi_input", null);
+		StringBuilder[] sbArr = null;
+		
+		if (!displayMode) {
+			sbArr = node.defaultHtmlInput(HtmlTag.TEXTAREA, "pfi_inputTextBox pfi_input", null);
+		} else {
+			sbArr = node.defaultHtmlInput(HtmlTag.DIV, "pfi_inputTextBox pfi_input", null);
+		}
 		sbArr[0].append(fieldValue);
 		return sbArr[0].append(sbArr[1]);
-	};
+	}
 	
 	protected static FormInputInterface dropdownWithOthers = (node) -> {
 		return dropdownWithOthers(node, false);
@@ -552,7 +564,8 @@ public class FormInputTemplates {
 		StringBuilder[] sb = node.defaultHtmlInput("div", "pfiw_sigBox", paramsMap);
 		ret.append(sb[0]);
 		
-		String sigValue = node.getStringValue();//will return a file path, e.g. output/outPNG_siga.png
+		String sigValue = GenericConvert.toString(node.getRawFieldValue());//will return a file path, e.g. output/outPNG_siga.png
+		//for signature we use getRawFieldValue to bypass the sanitisation that occurs in getStringValue();
 		StringBuilder sigImgString = new StringBuilder();
 		if (sigValue != null && !sigValue.isEmpty()) {
 			FormNode innerImgNode = new FormNode();
@@ -576,7 +589,9 @@ public class FormInputTemplates {
 		if (sigValue != null && !sigValue.isEmpty()) {
 			dateValue = node.getStringValue(dateInputId);
 			if (dateValue != null && !dateValue.isEmpty()) {
-				dateValue = sanitiseYMDDateString(dateValue);
+				if (DateConv.isInMillisecondsFormat(dateValue)) {
+					dateValue = DateConv.toISOFormat(Long.parseLong(dateValue), ISODateFormat.YYYYMMDD, "-");
+				}
 				
 				if (!dateValue.isEmpty()) {
 					textString = "Signed on: " + dateValue;
@@ -605,26 +620,38 @@ public class FormInputTemplates {
 		StringBuilder ret = new StringBuilder();
 		
 		CaseInsensitiveHashMap<String, String> paramMap = new CaseInsensitiveHashMap<String, String>();
-		String fieldValue = node.getStringValue();
+		String fieldValue = node.getStringValue(); //i expect it to be in String milliseconds format
+		String dateISO = "";
+		String dateMilliseconds = "";
 		
 		String hiddenInputTag = "";
-		if (fieldValue != null && fieldValue.length() >= 0) {
-			fieldValue = sanitiseYMDDateString(fieldValue);
-			paramMap.put(HtmlTag.VALUE, fieldValue);
+		if (fieldValue != null && fieldValue.length() > 0) {
+			
+			if (DateConv.isInMillisecondsFormat(fieldValue)) {
+				dateISO = DateConv.toISOFormat(Long.parseLong(fieldValue), ISODateFormat.YYYYMMDD, "-");
+				dateMilliseconds = fieldValue;
+			} else {
+				dateISO = fieldValue;
+				dateMilliseconds = DateConv.toMillisecondsFormat(fieldValue, ISODateFormat.YYYYMMDD, "-");
+			}
+			
+			paramMap.put(HtmlTag.VALUE, dateISO);
 		}
 		
 		if (!displayMode) {
 			paramMap.put(HtmlTag.TYPE, "date");
 			
 			if (node.containsKey("max")) {
-				String maxDate = sanitiseYMDDateString(node.getString("max"));
+				String maxDate = DateConv.changeISODateFormat(node.getString("max"), ISODateFormat.YYYYMMDD,
+					ISODateFormat.YYYYMMDD, "-");
 				if (maxDate != null && !maxDate.isEmpty()) {
 					paramMap.put("max", maxDate);
 				}
 			}
 			
 			if (node.containsKey("min")) {
-				String minDate = sanitiseYMDDateString(node.getString("min"));
+				String minDate = DateConv.changeISODateFormat(node.getString("min"), ISODateFormat.YYYYMMDD,
+					ISODateFormat.YYYYMMDD, "-");
 				if (minDate != null && !minDate.isEmpty()) {
 					paramMap.put("min", minDate);
 				}
@@ -640,8 +667,8 @@ public class FormInputTemplates {
 			}
 			
 			//generate hidden input field
-			hiddenInputTag = "<input class=\"pfi_input\" type=\"text\" name=\"" + hiddenInputName
-				+ "\" style=\"display:none\" value=\"" + fieldValue + "\"></input>";
+			hiddenInputTag = "<input class=\"pfi_input pfi_hidden_date_text_field\" type=\"text\" name=\""
+				+ hiddenInputName + "\" style=\"display:none\" value=\"" + dateMilliseconds + "\"></input>";
 			
 			StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.INPUT, "pfi_inputDate pfi_input", paramMap);
 			ret.append(sbArr[0]);
@@ -651,8 +678,9 @@ public class FormInputTemplates {
 			}
 		} else {
 			node.replace("type", "text");
-			
-			fieldValue = convertISODateToDMYFormat(fieldValue);
+			if (!StringUtils.isNullOrEmpty(fieldValue) && DateConv.isInMillisecondsFormat(fieldValue)) {
+				fieldValue = DateConv.toISOFormat(Long.parseLong(fieldValue), ISODateFormat.DDMMYYYY, "-");
+			}
 			
 			StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.DIV, "pfi_inputDate pfi_input", null);
 			ret.append(sbArr[0].append(fieldValue).append(sbArr[1]));
@@ -824,83 +852,6 @@ public class FormInputTemplates {
 		}
 		
 		return ret;
-	}
-	
-	public static String millisecondsTimeToYMD(String inDateString, String separator) {
-		
-		//MONTH IS ZERO INDEXED
-		long dateAsLong = Long.parseLong(inDateString);
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(dateAsLong);
-		
-		String year = StringUtils.fromInteger(cal.get(Calendar.YEAR));
-		String month = StringUtils.fromInteger(cal.get(Calendar.MONTH) + 1); //Calendar is zero indexed, but html is not
-		String date = StringUtils.fromInteger(cal.get(Calendar.DATE));
-		
-		StringBuilder sb = new StringBuilder();
-		sb.append(year);
-		sb.append(separator);
-		sb.append(month);
-		sb.append(separator);
-		sb.append(date);
-		
-		return sb.toString();
-	}
-	
-	private static boolean isDateInMillisecondsFormat(String inDateString){
-		if(inDateString != null && !inDateString.isEmpty() && (inDateString.startsWith("-") || !inDateString.contains("-"))){
-			return true;
-		}else{
-			return false;
-		}
-	}
-	
-	private static String convertISODateToDMYFormat(String inDateStringISO){
-		String ret = inDateStringISO;
-		if(ret != null && ret.indexOf('-') == 4){ //first element is year
-			String[] dateISOSplit = ret.split("-");
-			if(dateISOSplit != null && dateISOSplit.length == 3){
-				ret = dateISOSplit[2] + "-" + dateISOSplit[1] + "-" + dateISOSplit[0];
-			}else{
-				//Date ISO format is malformed
-			}
-		}
-		
-		return ret;
-	}
-	
-	//converts a date string in ISO or milliseconds into dd-mm-yyyy
-	private static String sanitiseYMDDateString(String inDateString) {
-		StringBuilder ret = new StringBuilder();
-		
-		//check that inDateString is DEFINITELY a milliseconds date
-		if (isDateInMillisecondsFormat(inDateString)) {
-			inDateString = millisecondsTimeToYMD(inDateString, "-");
-		}
-		
-		//inDateString = convertISODateToDMYFormat(inDateString);
-		
-		if (inDateString != null && !inDateString.isEmpty()) {
-			String[] dateSplit = inDateString.split("-");
-			
-			if (dateSplit != null && dateSplit.length > 1) {
-				for (int i = 0; i < dateSplit.length; ++i) {
-					if (dateSplit[i].length() == 1) {
-						ret.append("0" + dateSplit[i]);
-					} else {
-						ret.append(dateSplit[i]);
-					}
-					
-					if (i < dateSplit.length - 1) {
-						ret.append("-");
-					}
-				}
-			} else {
-				ret.append(inDateString);
-			}
-		}
-		
-		return ret.toString();
 	}
 	
 	@SuppressWarnings("unchecked")

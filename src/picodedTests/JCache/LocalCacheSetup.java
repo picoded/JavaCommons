@@ -108,4 +108,56 @@ public class LocalCacheSetup {
 		hcServer = null;
 	}
 	
+	static public String setupHazelcastServer(String password) {
+		if (hcServer != null) {
+			return hcClusterName;
+			//throw new RuntimeException("Local hazelcast server already started");
+		}
+		
+		String clusterName = TestConfig.randomTablePrefix();
+		hcClusterName = clusterName;
+		
+		try {
+			
+			Config clusterConfig = new Config();
+			clusterConfig.getGroupConfig().setName(clusterName);
+			clusterConfig.getGroupConfig().setPassword(password);
+			clusterConfig.setProperty("hazelcast.logging.type", "none");
+			
+			hcServer = Hazelcast.newHazelcastInstance(clusterConfig);
+			
+			return clusterName;
+		} catch (Exception e) {
+			throw new RuntimeException("Local hazelcast server setup error", e);
+		}
+		//return -1;
+	}
+	
+	/// Starts up Hazelcast at the specific port with password
+	static public String setupHazelcastServer(String password, int port) {
+		if (hcServer != null) {
+			return hcClusterName;
+			//throw new RuntimeException("Local hazelcast server already started");
+		}
+		
+		String clusterName = TestConfig.randomTablePrefix();
+		hcClusterName = clusterName;
+		
+		try {
+			
+			Config clusterConfig = new Config();
+			clusterConfig.getGroupConfig().setName(clusterName);
+			clusterConfig.getGroupConfig().setPassword(password);
+			clusterConfig.getNetworkConfig().setPort(port);
+			clusterConfig.setProperty("hazelcast.logging.type", "none");
+			
+			hcServer = Hazelcast.newHazelcastInstance(clusterConfig);
+			
+			return clusterName;
+		} catch (Exception e) {
+			throw new RuntimeException("Local hazelcast server setup error", e);
+		}
+		//return -1;
+	}
+	
 }

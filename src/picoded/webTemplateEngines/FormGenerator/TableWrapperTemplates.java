@@ -466,7 +466,7 @@ public class TableWrapperTemplates {
 	///
 	public static StringBuilder tableWrapper_horizontal(FormNode node, boolean isDisplayMode) {
 		//exclude from display;
-		if(isDisplayMode && node.getBoolean("excludeFromDisplay", false)){
+		if (isDisplayMode && node.getBoolean("excludeFromDisplay", false)) {
 			return new StringBuilder("");
 		}
 		
@@ -489,7 +489,7 @@ public class TableWrapperTemplates {
 	///
 	public static StringBuilder tableWrapper_vertical(FormNode node, boolean isDisplayMode) {
 		//exclude from display;
-		if(isDisplayMode && node.getBoolean("excludeFromDisplay", false)){
+		if (isDisplayMode && node.getBoolean("excludeFromDisplay", false)) {
 			return new StringBuilder("");
 		}
 		

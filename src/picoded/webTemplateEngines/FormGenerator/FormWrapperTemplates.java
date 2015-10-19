@@ -30,7 +30,7 @@ public class FormWrapperTemplates {
 		StringBuilder ret = new StringBuilder();
 		
 		//exclude from display;
-		if(isDisplayMode && node.getBoolean("excludeFromDisplay", false)){
+		if (isDisplayMode && node.getBoolean("excludeFromDisplay", false)) {
 			return ret;
 		}
 		
@@ -73,7 +73,7 @@ public class FormWrapperTemplates {
 		StringBuilder ret = new StringBuilder();
 		
 		//exclude from display;
-		if(isDisplayMode && node.getBoolean("excludeFromDisplay", false)){
+		if (isDisplayMode && node.getBoolean("excludeFromDisplay", false)) {
 			return ret;
 		}
 		
@@ -123,7 +123,7 @@ public class FormWrapperTemplates {
 		StringBuilder ret = new StringBuilder();
 		
 		//exclude from display;
-		if(displayMode && node.getBoolean("excludeFromDisplay", false)){
+		if (displayMode && node.getBoolean("excludeFromDisplay", false)) {
 			return ret;
 		}
 		
@@ -176,7 +176,7 @@ public class FormWrapperTemplates {
 		StringBuilder ret = new StringBuilder();
 		
 		//exclude from display;
-		if(isDisplayMode && node.getBoolean("excludeFromDisplay", false)){
+		if (isDisplayMode && node.getBoolean("excludeFromDisplay", false)) {
 			return ret;
 		}
 		
@@ -280,9 +280,8 @@ public class FormWrapperTemplates {
 	protected static StringBuilder tableWrapper(FormNode node, boolean isDisplayMode) {
 		StringBuilder ret = new StringBuilder();
 		
-		
 		//exclude from display;
-		if(isDisplayMode && node.getBoolean("excludeFromDisplay", false)){
+		if (isDisplayMode && node.getBoolean("excludeFromDisplay", false)) {
 			return ret;
 		}
 		
@@ -310,7 +309,7 @@ public class FormWrapperTemplates {
 		StringBuilder ret = new StringBuilder();
 		
 		//exclude from display;
-		if(isDisplayMode && node.getBoolean("excludeFromDisplay", false)){
+		if (isDisplayMode && node.getBoolean("excludeFromDisplay", false)) {
 			return ret;
 		}
 		
@@ -338,7 +337,7 @@ public class FormWrapperTemplates {
 		StringBuilder ret = new StringBuilder();
 		
 		//exclude from display;
-		if(displayMode && node.getBoolean("excludeFromDisplay", false)){
+		if (displayMode && node.getBoolean("excludeFromDisplay", false)) {
 			return ret;
 		}
 		
@@ -366,7 +365,7 @@ public class FormWrapperTemplates {
 		StringBuilder ret = new StringBuilder();
 		
 		//exclude from display;
-		if(displayMode && node.getBoolean("excludeFromDisplay", false)){
+		if (displayMode && node.getBoolean("excludeFromDisplay", false)) {
 			return ret;
 		}
 		

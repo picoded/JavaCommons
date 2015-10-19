@@ -7,7 +7,7 @@ import picoded.JCache.dataStore.BaseInterface;
 
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
-import java.util.Queue;
+import java.util.*;
 
 /// Database intreface base class.
 public class JCache extends BaseInterface {
@@ -23,12 +23,12 @@ public class JCache extends BaseInterface {
 	
 	/// @TODO : NOT YET IMPLEMENTED
 	public static JCache hazelcast(String clustername, String password) {
-		throw new RuntimeException(JCacheException.invalidDatastoreImplementationException);
+		return new picoded.JCache.dataStore.JCache_hazelcast(clustername, password);
 	}
 	
 	/// @TODO : NOT YET IMPLEMENTED
 	public static JCache hazelcast(String clustername, String password, String ipAddressWithPort) {
-		throw new RuntimeException(JCacheException.invalidDatastoreImplementationException);
+		return new picoded.JCache.dataStore.JCache_hazelcast(clustername, password, ipAddressWithPort);
 	}
 	
 	/// Hazelcast implementation constructor, returns picoded.JCache.dataStore.JCache_redis
@@ -89,7 +89,7 @@ public class JCache extends BaseInterface {
 	}
 	
 	/// Gets a ConcurrentMap with the given name
-	public <K, V> ConcurrentMap<K, V> getMap(String name) throws JCacheException {
+	public <K, V> JCacheMap<K, V> getMap(String name) throws JCacheException {
 		throw new JCacheException(JCacheException.invalidDatastoreImplementationException);
 	}
 	

@@ -15,8 +15,8 @@ public class OrderBy<T> implements Comparator<T> {
 	// Constructor setup
 	//-----------------------------------------------------------------
 	
-	/// Order types used
-	protected enum OrderType {
+	/// Order types used, tracked internally
+	public enum OrderType {
 		ASC, DESC
 	}
 	
@@ -26,7 +26,7 @@ public class OrderBy<T> implements Comparator<T> {
 	/// Constructor built with given order by string
 	public OrderBy(String orderByString) {
 		// Clear out excess whitespace
-		orderByString = orderByString.replaceAll("\\s+", " ").trim();
+		orderByString = orderByString.trim().replaceAll("\\s+", " ");
 		
 		// Order by string split array
 		String[] orderByArr = orderByString.split(",");
@@ -38,26 +38,32 @@ public class OrderBy<T> implements Comparator<T> {
 		
 		// Iterate order by array, and set each configuration up
 		for (String orderSet : orderByArr) {
-			String[] orderByItem = orderSet.trim().split(" ");
 			
-			if (orderByItem.length <= 0) {
+			// Get orderset, without excess whitespace
+			orderSet = orderSet.trim();
+			if (orderSet.length() <= 0) {
 				throw new RuntimeException("Invalid OrderBy string query: " + orderByString);
 			}
 			
-			String field = QueryUtils.unwrapFieldName(orderByItem[0]);
-			OrderType ot = OrderType.ASC;
+			// Default ordering is asecending
+			OrderBy.OrderType ot = OrderBy.OrderType.ASC;
 			
-			if (orderByItem.length >= 2) {
-				String typeStr = orderByItem[1];
-				if (typeStr.equalsIgnoreCase("DESC")) {
-					ot = OrderType.DESC;
-				} else if (typeStr.equalsIgnoreCase("ASC")) {
-					ot = OrderType.ASC;
-				} else {
-					throw new RuntimeException("Invalid OrderType string query: " + orderByString);
+			// Check for DESC / ASC suffix
+			if (orderSet.length() > 4) {
+				String lowerCaseOrderSet = orderSet.toLowerCase();
+				if (lowerCaseOrderSet.endsWith(" desc")) {
+					ot = OrderBy.OrderType.DESC;
+					orderSet = orderSet.substring(0, orderSet.length() - 5).trim();
+				} else if (lowerCaseOrderSet.endsWith(" asc")) {
+					ot = OrderBy.OrderType.ASC;
+					orderSet = orderSet.substring(0, orderSet.length() - 4).trim();
 				}
 			}
 			
+			// Unwrap the field name (since they will be passed by params anyway)
+			String field = QueryUtils.unwrapFieldName(orderSet);
+			
+			// Add the comparision option
 			_comparisionConfig.add(new MutablePair<String, OrderType>(field, ot));
 		}
 		

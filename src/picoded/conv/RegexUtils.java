@@ -24,4 +24,17 @@ public class RegexUtils {
 	public static String removeAllNonAlphaNumeric_allowCommonSeparators(String input) {
 		return input.replaceAll(removeAllNonAlphaNumeric_allowCommonSeparators_regexString, "");
 	}
+	
+	public static String sanitiseCommonEscapeCharactersIntoAscii(String input) {
+		String ret = input;
+		ret = ret.replaceAll("\\<", "&#60;");
+		ret = ret.replaceAll("\\>", "&#62;");
+		
+		//ret = ret.replaceAll("\\`", "&#96;");
+		//ret = ret.replaceAll("\\'", "&#8216;");
+		//ret = ret.replaceAll("\\\"", "&#34;"); //Removing quote sanitisation as SQL security happens on another layer
+		
+		ret = ret.replaceAll("\\\\", "&#92;");
+		return ret;
+	}
 }

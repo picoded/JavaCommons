@@ -9,6 +9,8 @@ import picoded.JStack.*;
 import picoded.JStruct.*;
 import picoded.servlet.*;
 import picoded.conv.ConvertJSON;
+import picoded.conv.GenericConvert;
+import picoded.conv.RegexUtils;
 import picoded.enums.HttpRequestType;
 
 /// Account login template API
@@ -74,7 +76,7 @@ public class MetaTableApiBuilder {
 	/// ## HTTP Request Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
 	/// | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
@@ -85,11 +87,14 @@ public class MetaTableApiBuilder {
 	/// | query           | String (optional)  | Requested Query filter                                                        |
 	/// | queryArgs       | String[] (optional)| Requested Query filter arguments                                              |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                 |                    | are returned as well.                                                         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
 	/// | recordsTotal    | int (not critical) | Total amount of records. Before any search filter (But after base filters)    |
@@ -120,6 +125,7 @@ public class MetaTableApiBuilder {
 		
 		String query = req.getString("query");
 		String[] queryArgs = req.getStringArray("queryArgs");
+		boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
 		
 		//put back into response
 		res.put("draw", draw);
@@ -132,7 +138,7 @@ public class MetaTableApiBuilder {
 		
 		List<List<Object>> data = null;
 		try {
-			data = list_GET_and_POST_inner(draw, start, limit, headers, query, queryArgs, orderByStr);
+			data = list_GET_and_POST_inner(draw, start, limit, headers, query, queryArgs, orderByStr, sanitiseOutput);
 			res.put("data", data);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -142,7 +148,7 @@ public class MetaTableApiBuilder {
 	};
 	
 	public List<List<Object>> list_GET_and_POST_inner(int draw, int start, int length, String[] headers, String query,
-		String[] queryArgs, String orderBy) throws RuntimeException {
+		String[] queryArgs, String orderBy, boolean sanitiseOutput) throws RuntimeException {
 		if (_metaTableObj == null) {
 			return null;
 		}
@@ -162,7 +168,16 @@ public class MetaTableApiBuilder {
 				for (MetaObject metaObj : metaObjs) {
 					List<Object> row = new ArrayList<Object>();
 					for (String header : headers) {
-						row.add(metaObj.get(header));
+						Object rawVal = metaObj.get(header);
+						
+						//row.add(rawVal);
+						if (sanitiseOutput && rawVal instanceof String) {
+							String stringVal = GenericConvert.toString(rawVal);
+							stringVal = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(stringVal);
+							row.add(stringVal);
+						} else {
+							row.add(rawVal);
+						}
 					}
 					ret.add(row);
 				}
@@ -304,6 +319,9 @@ public class MetaTableApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | _oid            | String             | object ID used to retrieve the meta object. If no oid is given, return null.  |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                 |                    | are returned as well.                                                         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
 	///
@@ -325,8 +343,10 @@ public class MetaTableApiBuilder {
 		//put data back into response
 		res.put("_oid", oid);
 		
+		boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
+		
 		try {
-			MetaObject mObj = meta_GET_inner(oid);
+			MetaObject mObj = meta_GET_inner(oid, sanitiseOutput);
 			res.put("meta", mObj);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -335,7 +355,7 @@ public class MetaTableApiBuilder {
 		return res;
 	};
 	
-	public MetaObject meta_GET_inner(String oid) throws RuntimeException {
+	public MetaObject meta_GET_inner(String oid, boolean sanitiseOutput) throws RuntimeException {
 		if (_metaTableObj == null) {
 			return null;
 		}
@@ -352,7 +372,22 @@ public class MetaTableApiBuilder {
 		} else if (metaObjs.length < 1) {
 			return null;
 		} else {
-			return metaObjs[0];
+			MetaObject ret = metaObjs[0];
+			if (sanitiseOutput) {
+				Set<String> keySet = ret.keySet();
+				for (String key : keySet) {
+					Object rawVal = ret.get(key);
+					if (rawVal instanceof String) {
+						String stringVal = GenericConvert.toString(rawVal);
+						stringVal = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(stringVal);
+						ret.put(key, stringVal);
+					} else {
+						ret.put(key, rawVal);
+					}
+				}
+			}
+			
+			return ret;
 		}
 	}
 	

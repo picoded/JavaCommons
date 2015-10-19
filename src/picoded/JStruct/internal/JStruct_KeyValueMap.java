@@ -182,6 +182,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	/// Handles re-entrant lock where applicable
 	///
 	/// @param key as String
+	/// @param expire timestamp in seconds, 0 means NO expire
 	///
 	/// @returns long
 	protected void setExpiryRaw(String key, long time) {
@@ -243,7 +244,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	/// Sets the expire time stamp value, if still valid
 	///
 	/// @param key 
-	/// @param time 
+	/// @param expire timestamp in seconds, 0 means NO expire
 	public void setExpiry(String key, long time) {
 		setExpiryRaw(key, time);
 	}

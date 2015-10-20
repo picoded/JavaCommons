@@ -157,7 +157,7 @@ public class FormInputTemplates {
 		return sbArr[0].append(sbArr[1]);
 	};
 	
-	protected static FormInputInterface input_textarea = (node) -> {
+	protected static FormInputInterface input_textarea  = (node) -> {
 		return input_textarea(node, false);
 	};
 	
@@ -170,7 +170,7 @@ public class FormInputTemplates {
 		if (!displayMode) {
 			sbArr = node.defaultHtmlInput(HtmlTag.TEXTAREA, "pfi_inputTextBox pfi_input", null);
 		} else {
-			sbArr = node.defaultHtmlInput(HtmlTag.DIV, "pfi_inputTextBox pfi_input", null);
+			sbArr = node.defaultHtmlInput("pre", "pfi_inputTextBox pfi_input pfi_display", null);
 		}
 		sbArr[0].append(fieldValue);
 		return sbArr[0].append(sbArr[1]);

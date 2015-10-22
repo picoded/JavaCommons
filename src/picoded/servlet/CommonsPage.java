@@ -251,16 +251,10 @@ public class CommonsPage extends BasePage {
 		}
 		
 		// Get hostname, user, pass, and from account
-		String hostname = jc.getString("sys.smtp.host", "mail.synergy.com.sg:25");
-		String username = jc.getString("sys.smtp.username", "emfc.noreply@synergy.com.sg");
-		String password = jc.getString("sys.smtp.password", "sfaemfc");
-		String emailFrom = jc.getString("sys.smtp.emailFrom", "eMFC.NoReply@synergy.com.sg");
-		
-		//HACK HACK HACK to get synergy out the door before launch
-		hostname = "mail.synergy.com.sg:25";
-		username = "emfc.noreply@synergy.com.sg";
-		password = "sfaemfc";
-		emailFrom = "eMFC.NoReply@synergy.com.sg";
+		String hostname = jc.getString("sys.smtp.dataStack.host", "smtp.mailinator.com:25");
+		String username = jc.getString("sys.smtp.dataStack.username", "");
+		String password = jc.getString("sys.smtp.dataStack.password", "");
+		String emailFrom = jc.getString("sys.smtp.dataStack.emailFrom", "testingTheEmailSystem@mailinator.com");
 		
 		return (_systemEmail = new EmailBroadcaster(hostname, username, password, emailFrom));
 	}

@@ -22,17 +22,17 @@ public class JCache_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	protected static Logger logger = Logger.getLogger(JCache_KeyValueMap.class.getName());
+	public static Logger logger = Logger.getLogger(JCache_KeyValueMap.class.getName());
 	
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
 	
 	/// The inner sql object
-	protected JCache jCacheObj = null;
+	public JCache jCacheObj = null;
 	
 	/// The tablename for the key value pair map
-	protected String tablename = null;
+	public String tablename = null;
 	
 	/// JCache setup 
 	public JCache_KeyValueMap(JCache inCache, String inTablename) {
@@ -51,10 +51,10 @@ public class JCache_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Core cache map
-	protected JCacheMap<String, String> _coreCacheMap = null;
+	public JCacheMap<String, String> _coreCacheMap = null;
 	
 	/// Core cache map
-	protected JCacheMap<String, String> coreCacheMap() {
+	public JCacheMap<String, String> coreCacheMap() {
 		if (_coreCacheMap != null) {
 			return _coreCacheMap;
 		}
@@ -88,7 +88,7 @@ public class JCache_KeyValueMap extends JStruct_KeyValueMap {
 	/// @param now timestamp
 	///
 	/// @returns String value
-	protected String getValueRaw(String key, long now) {
+	public String getValueRaw(String key, long now) {
 		return coreCacheMap().get(key);
 	}
 	
@@ -102,7 +102,7 @@ public class JCache_KeyValueMap extends JStruct_KeyValueMap {
 	/// @param expire timestamp in seconds, 0 means NO expire
 	///
 	/// @returns null
-	protected String setValueRaw(String key, String value, long expire) {
+	public String setValueRaw(String key, String value, long expire) {
 		return coreCacheMap().put(key, value, expire);
 	}
 	
@@ -114,7 +114,7 @@ public class JCache_KeyValueMap extends JStruct_KeyValueMap {
 	/// @param key as String
 	///
 	/// @returns long
-	protected long getExpiryRaw(String key) {
+	public long getExpiryRaw(String key) {
 		return coreCacheMap().getExpiry(key);
 	}
 	
@@ -127,7 +127,7 @@ public class JCache_KeyValueMap extends JStruct_KeyValueMap {
 	/// @param expire timestamp in seconds, 0 means NO expire
 	///
 	/// @returns long
-	protected void setExpiryRaw(String key, long expire) {
+	public void setExpiryRaw(String key, long expire) {
 		String value = coreCacheMap().get(key);
 		if (value != null) {
 			coreCacheMap().put(key, value, expire);

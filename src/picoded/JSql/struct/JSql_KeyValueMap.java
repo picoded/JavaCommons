@@ -22,17 +22,17 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	protected static Logger logger = Logger.getLogger(JSql_KeyValueMap.class.getName());
+	public static Logger logger = Logger.getLogger(JSql_KeyValueMap.class.getName());
 	
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
 	
 	/// The inner sql object
-	protected JSql sqlObj = null;
+	public JSql sqlObj = null;
 	
 	/// The tablename for the key value pair map
-	protected String sqlTableName = null;
+	public String sqlTableName = null;
 	
 	/// JSql setup 
 	public JSql_KeyValueMap(JSql inJSql, String tablename) {
@@ -46,16 +46,16 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Primary key type
-	protected String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
+	public String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
 	
 	/// Timestamp field type
-	protected String tStampColumnType = "BIGINT";
+	public String tStampColumnType = "BIGINT";
 	
 	/// Key name field type
-	protected String keyColumnType = "VARCHAR(64)";
+	public String keyColumnType = "VARCHAR(64)";
 	
 	/// Value field type
-	protected String valueColumnType = "VARCHAR(MAX)";
+	public String valueColumnType = "VARCHAR(MAX)";
 	
 	///
 	/// Backend system setup / teardown
@@ -133,7 +133,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Gets the expire time from the JSqlResult
-	protected long getExpiryRaw(JSqlResult r) throws JSqlException {
+	public long getExpiryRaw(JSqlResult r) throws JSqlException {
 		// Search for the key
 		Object rawTime = null;
 		
@@ -168,7 +168,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	/// @param key as String
 	///
 	/// @returns long
-	protected long getExpiryRaw(String key) {
+	public long getExpiryRaw(String key) {
 		try {
 			// Search for the key
 			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "eTm", "kID=?", new Object[] { key }).query();
@@ -186,7 +186,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	/// @param key as String
 	///
 	/// @returns long
-	protected void setExpiryRaw(String key, long time) {
+	public void setExpiryRaw(String key, long time) {
 		try {
 			sqlObj.execute("UPDATE " + sqlTableName + " SET eTm=? WHERE kID = ?", time, key);
 		} catch (JSqlException e) {
@@ -209,7 +209,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	/// @param now timestamp
 	///
 	/// @returns String value
-	protected String getValueRaw(String key, long now) {
+	public String getValueRaw(String key, long now) {
 		try {
 			// Search for the key
 			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key }).query();
@@ -235,7 +235,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	/// @param expire timestamp in seconds, 0 means NO expire
 	///
 	/// @returns null
-	protected String setValueRaw(String key, String value, long expire) {
+	public String setValueRaw(String key, String value, long expire) {
 		try {
 			long now = currentSystemTimeInSeconds();
 			sqlObj.upsertQuerySet( //

@@ -25,13 +25,13 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
-	protected ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
+	public ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
 	
 	/// Stores the expire timestamp
-	protected ConcurrentHashMap<String, Long> expireMap = new ConcurrentHashMap<String, Long>();
+	public ConcurrentHashMap<String, Long> expireMap = new ConcurrentHashMap<String, Long>();
 	
 	/// Read write lock
-	protected ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
+	public ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
 	
 	///
 	/// Constructor setup
@@ -49,7 +49,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Temp value flag, defaults to false
-	protected boolean isTempHint = false;
+	public boolean isTempHint = false;
 	
 	/// Gets if temp mode optimization hint is indicated
 	/// Note that this only serve as a hint, as does not indicate actual setting
@@ -140,7 +140,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Gets the current system time in seconds
-	protected long currentSystemTimeInSeconds() {
+	public long currentSystemTimeInSeconds() {
 		return (System.currentTimeMillis()) / 1000L;
 	}
 	
@@ -156,7 +156,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	/// @param key as String
 	///
 	/// @returns long
-	protected long getExpiryRaw(String key) {
+	public long getExpiryRaw(String key) {
 		try {
 			accessLock.readLock().lock();
 			
@@ -185,7 +185,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	/// @param expire timestamp in seconds, 0 means NO expire
 	///
 	/// @returns long
-	protected void setExpiryRaw(String key, long time) {
+	public void setExpiryRaw(String key, long time) {
 		try {
 			accessLock.writeLock().lock();
 			
@@ -270,7 +270,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	/// @param now timestamp
 	///
 	/// @returns String value
-	protected String getValueRaw(String key, long now) {
+	public String getValueRaw(String key, long now) {
 		try {
 			accessLock.readLock().lock();
 			
@@ -301,7 +301,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	/// @param expire timestamp, 0 means not timestamp
 	///
 	/// @returns null
-	protected String setValueRaw(String key, String value, long expire) {
+	public String setValueRaw(String key, String value, long expire) {
 		try {
 			accessLock.writeLock().lock();
 			

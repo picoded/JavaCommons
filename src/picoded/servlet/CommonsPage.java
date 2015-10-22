@@ -251,10 +251,10 @@ public class CommonsPage extends BasePage {
 		}
 		
 		// Get hostname, user, pass, and from account
-		String hostname = jc.getString("sys.smtp.dataStack.host", "smtp.mailinator.com:25");
-		String username = jc.getString("sys.smtp.dataStack.username", "");
-		String password = jc.getString("sys.smtp.dataStack.password", "");
-		String emailFrom = jc.getString("sys.smtp.dataStack.emailFrom", "testingTheEmailSystem@mailinator.com");
+		String hostname = JConfigObj.getString("sys.dataStack.smtp.host", "smtp.mailinator.com:25");
+		String username = JConfigObj.getString("sys.dataStack.smtp.username", "");
+		String password = JConfigObj.getString("sys.dataStack.smtp.password", "");
+		String emailFrom = JConfigObj.getString("sys.dataStack.smtp.emailFrom", "testingTheEmailSystem@mailinator.com");
 		
 		return (_systemEmail = new EmailBroadcaster(hostname, username, password, emailFrom));
 	}

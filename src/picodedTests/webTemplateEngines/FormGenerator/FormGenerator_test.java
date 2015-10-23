@@ -3,9 +3,12 @@ package picodedTests.webTemplateEngines.FormGenerator;
 import picoded.conv.ConvertJSON;
 import picoded.webTemplateEngines.*;
 import picoded.webTemplateEngines.FormGenerator.*;
+import picodedTests.BaseTestClass;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.*;
+
+import com.mysql.jdbc.StringUtils;
 
 import static org.junit.Assert.*;
 
@@ -14,9 +17,17 @@ import java.io.FileWriter;
 import java.nio.charset.Charset;
 import java.util.*;
 
-public class FormGenerator_test {
+
+//
+// Tests the actual formgenerator class
+//
+public class FormGenerator_test extends BaseTestClass {
 	
 	public FormGenerator testObj = null;
+	
+	public FormGenerator_test(){
+		super();
+	}
 	
 	@Before
 	public void setUp() {
@@ -33,162 +44,67 @@ public class FormGenerator_test {
 		assertNotNull(testObj);
 	}
 	
-	private Map<String, Object> getPrefilledData() {
-		File dataFile = new File("./test-files/test-specific/htmlGenerator/prefilledData.js");
-		try {
-			String jsonDataString = FileUtils.readFileToString(dataFile);
-			Map<String, Object> prefilledData = ConvertJSON.toMap(jsonDataString);
-			return prefilledData;
-		} catch (Exception ex) {
-			return null;
+	private String getFormGenOutput(String fileName, String dataFileName, boolean useData, boolean displayMode){
+		String textString = readStringFromResourceFile(fileName);
+		assertNotNull(textString);
+		
+		String textDataString = readStringFromResourceFile(dataFileName);
+		assertNotNull(textDataString);
+		
+		Map<String, Object> jsonDataMap = ConvertJSON.toMap(textDataString);
+		
+		FormGenerator formGen = new FormGenerator();
+		
+		formGen.build(textString, jsonDataMap, displayMode);
+		
+		if(useData){
+			return formGen.build(textString, jsonDataMap, displayMode).toString();
+		}else{
+			return formGen.build(textString, null, displayMode).toString();
 		}
 	}
+	
+	private boolean generateOutputFile(String outputFileName, String inputFileName, String inputDataFileName, boolean useData, boolean displayMode, boolean usePrefixAndSuffix){
+		String textOutput = getFormGenOutput(inputFileName, inputDataFileName, useData, displayMode);
+		assertNotNull(textOutput);
+		assertFalse(StringUtils.isNullOrEmpty(textOutput));
+		
+		if(usePrefixAndSuffix){
+			//read prefix and suffix
+			String prefix = readStringFromResourceFile("prefix.html");
+			String suffix = readStringFromResourceFile("suffix.html");
+			textOutput = prefix + textOutput + suffix;
+		}
+		
+		return writeStringToGeneratedFile(textOutput, outputFileName);
+	}
+	
+	private boolean generateOutputPDFFile(String outputFileName, String inputFileName, String inputDataFileName, boolean useData, boolean displayMode, boolean usePrefixAndSuffix){
+		String textOutput = getFormGenOutput(inputFileName, inputDataFileName, useData, displayMode);
+		assertNotNull(textOutput);
+		assertFalse(StringUtils.isNullOrEmpty(textOutput));
+		
+		if(usePrefixAndSuffix){
+			//read prefix and suffix
+			String prefix = readStringFromResourceFile("prefix.html");
+			String suffix = readStringFromResourceFile("suffix.html");
+			textOutput = prefix + textOutput + suffix;
+		}
+		
+		return writeHTMLStringToGeneratedPDF(textOutput, outputFileName);
+	}
+	
 	
 	@Test
-	public void getHtmlAndPDFOutputFromJSONObject() {
-		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONObject.js");
-		assertTrue(jsonObjectFile.canRead());
-		String jsonFileString = "";
-		try {
-			jsonFileString = FileUtils.readFileToString(jsonObjectFile, Charset.defaultCharset());
-		} catch (Exception ex) {
-			
-		}
+	public void generateGenericForm(){
+		assertTrue(generateOutputFile("genericFormNoData.html", "genericForm.js", "genericFormData.js", false, false, false));
+		assertTrue(generateOutputFile("genericFormWithData.html", "genericForm.js", "genericFormData.js", true, false, false));
+		assertTrue(generateOutputFile("genericFormDisplayNoData.html", "genericForm.js", "genericFormData.js", false, true, false));
+		assertTrue(generateOutputFile("genericFormDisplayWithData.html", "genericForm.js", "genericFormData.js", true, true, false));
 		
-		//html portion
-		String htmlVal = testObj.applyTemplating(jsonFileString, getPrefilledData());
-		File htmlFile = new File("./test-files/test-specific/htmlGenerator/generatedFiles/htmlFromJSONObject.html");
-		if (htmlFile.exists()) {
-			htmlFile.delete();
-		}
-		
-		try {
-			FileWriter writer = new FileWriter(htmlFile);
-			writer.write(htmlVal);
-			writer.flush();
-			writer.close();
-		} catch (Exception ex) {
-			
-		}
-		
-		//pdf portion
-		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(jsonFileString, getPrefilledData());
-		pdfReadyHtmlString = "<div class=\"pf_root\">" + pdfReadyHtmlString + "</div>";
-		File pdfReadyHtmlFile = new File(
-			"./test-files/test-specific/htmlGenerator/generatedFiles/pdfReadyHtmlFromJSONObject.html");
-		if (pdfReadyHtmlFile.exists()) {
-			pdfReadyHtmlFile.delete();
-		}
-		
-		try {
-			FileWriter writer = new FileWriter(pdfReadyHtmlFile);
-			writer.write(pdfReadyHtmlString);
-			writer.flush();
-			writer.close();
-		} catch (Exception ex) {
-			
-		}
-		
-		String pdfFileString = "./test-files/test-specific/htmlGenerator/generatedFiles/pdfFromJSONObject.pdf";
-		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
+		assertTrue(generateOutputPDFFile("genericFormNoData.pdf", "genericForm.js", "genericFormData.js", false, false, true));
+		assertTrue(generateOutputPDFFile("genericFormWithData.pdf", "genericForm.js", "genericFormData.js", true, false, true));
+		assertTrue(generateOutputPDFFile("genericFormDisplayNoData.pdf", "genericForm.js", "genericFormData.js", false, true, true));
+		assertTrue(generateOutputPDFFile("genericFormDisplayWithData.pdf", "genericForm.js", "genericFormData.js", true, true, true));
 	}
-	
-	@Test
-	public void getHtmlAndPDFOutputFromJSONArray() {
-		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONArray.js");
-		assertTrue(jsonObjectFile.canRead());
-		String jsonFileString = "";
-		try {
-			jsonFileString = FileUtils.readFileToString(jsonObjectFile, Charset.defaultCharset());
-		} catch (Exception ex) {
-			
-		}
-		
-		//html portion
-		String htmlVal = testObj.applyTemplating(jsonFileString, getPrefilledData());
-		File htmlFile = new File("./test-files/test-specific/htmlGenerator/generatedFiles/htmlFromJSONArray.html");
-		if (htmlFile.exists()) {
-			htmlFile.delete();
-		}
-		
-		try {
-			FileWriter writer = new FileWriter(htmlFile);
-			writer.write(htmlVal);
-			writer.flush();
-			writer.close();
-		} catch (Exception ex) {
-			
-		}
-		
-		//pdf portion
-		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(jsonFileString, getPrefilledData());
-		pdfReadyHtmlString = "<div class=\"pf_root\">" + pdfReadyHtmlString + "</div>";
-		File pdfReadyHtmlFile = new File(
-			"./test-files/test-specific/htmlGenerator/generatedFiles/pdfReadyHtmlFromJSONArray.html");
-		if (pdfReadyHtmlFile.exists()) {
-			pdfReadyHtmlFile.delete();
-		}
-		
-		try {
-			FileWriter writer = new FileWriter(pdfReadyHtmlFile);
-			writer.write(pdfReadyHtmlString);
-			writer.flush();
-			writer.close();
-		} catch (Exception ex) {
-			
-		}
-		
-		String pdfFileString = "./test-files/test-specific/htmlGenerator/generatedFiles/pdfFromJSONArray.pdf";
-		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
-	}
-	
-	@Test
-	public void getHtmlAndPDFOutputFromJSONKeysObject() {
-		File jsonObjectFile = new File("./test-files/test-specific/htmlGenerator/testJSONKeys.js");
-		assertTrue(jsonObjectFile.canRead());
-		String jsonFileString = "";
-		try {
-			jsonFileString = FileUtils.readFileToString(jsonObjectFile, Charset.defaultCharset());
-		} catch (Exception ex) {
-			
-		}
-		
-		//html portion
-		String htmlVal = testObj.applyTemplating(jsonFileString, getPrefilledData());
-		File htmlFile = new File("./test-files/test-specific/htmlGenerator/generatedFiles/htmlFromJSONKeys.html");
-		if (htmlFile.exists()) {
-			htmlFile.delete();
-		}
-		
-		try {
-			FileWriter writer = new FileWriter(htmlFile);
-			writer.write(htmlVal);
-			writer.flush();
-			writer.close();
-		} catch (Exception ex) {
-			
-		}
-		
-		//pdf portion
-		String pdfReadyHtmlString = testObj.generatePDFReadyHTML(jsonFileString, getPrefilledData());
-		pdfReadyHtmlString = "<div class=\"pf_root\">" + pdfReadyHtmlString + "</div>";
-		File pdfReadyHtmlFile = new File(
-			"./test-files/test-specific/htmlGenerator/generatedFiles/pdfReadyHtmlFromJSONKeys.html");
-		if (pdfReadyHtmlFile.exists()) {
-			pdfReadyHtmlFile.delete();
-		}
-		
-		try {
-			FileWriter writer = new FileWriter(pdfReadyHtmlFile);
-			writer.write(pdfReadyHtmlString);
-			writer.flush();
-			writer.close();
-		} catch (Exception ex) {
-			
-		}
-		
-		String pdfFileString = "./test-files/test-specific/htmlGenerator/generatedFiles/pdfFromJSONKeys.pdf";
-		picoded.fileUtils.PDFGenerator.generatePDFfromRawHTML(pdfFileString, pdfReadyHtmlString);
-	}
-	
 }

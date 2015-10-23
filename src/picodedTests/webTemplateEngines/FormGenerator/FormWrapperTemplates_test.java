@@ -17,8 +17,11 @@ import java.util.*;
 
 public class FormWrapperTemplates_test {
 	
+	private String root = "./test-files/test-specific/webTemplateEngines/FormGenerator/FormWrapperTemplates/";
+	private String resFolder = "./test-files/test-specific/webTemplateEngines/FormGenerator/FormWrapperTemplates/res/";
+	
 	private String getWrapperTemplatedJsonString(String jsonKeyName) {
-		File jsonFile = new File("./test-files/test-specific/htmlGenerator/FormWrapperTemplates_test/" + jsonKeyName
+		File jsonFile = new File(resFolder + jsonKeyName
 			+ ".js");
 		try {
 			String jsonFileString = FileUtils.readFileToString(jsonFile);
@@ -32,9 +35,9 @@ public class FormWrapperTemplates_test {
 	}
 	
 	private String getFullTemplatedJsonWithData(String jsonKeyName) {
-		File jsonFile = new File("./test-files/test-specific/htmlGenerator/FormWrapperTemplates_test/" + jsonKeyName
+		File jsonFile = new File(resFolder + jsonKeyName
 			+ ".js");
-		File jsonDataFile = new File("./test-files/test-specific/htmlGenerator/FormWrapperTemplates_test/jsonData.js");
+		File jsonDataFile = new File(resFolder + "jsonData.js");
 		
 		try {
 			FormGenerator formGen = new FormGenerator();

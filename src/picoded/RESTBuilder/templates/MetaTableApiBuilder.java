@@ -158,7 +158,6 @@ public class MetaTableApiBuilder {
 		try {
 			if (headers != null && headers.length > 0) {
 				MetaObject[] metaObjs = null;
-				
 				if (query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0) {
 					metaObjs = _metaTableObj.query(null, null, orderBy, start, length);
 				} else {
@@ -170,10 +169,11 @@ public class MetaTableApiBuilder {
 					for (String header : headers) {
 						Object rawVal = metaObj.get(header);
 						
-						//row.add(rawVal);
-						if (sanitiseOutput && rawVal instanceof String) {
+						if (sanitiseOutput && rawVal != null && rawVal instanceof String) {
 							String stringVal = GenericConvert.toString(rawVal);
-							stringVal = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(stringVal);
+							if(stringVal != null){
+								stringVal = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(stringVal);
+							}
 							row.add(stringVal);
 						} else {
 							row.add(rawVal);

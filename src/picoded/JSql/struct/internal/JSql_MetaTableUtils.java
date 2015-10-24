@@ -661,6 +661,36 @@ public class JSql_MetaTableUtils {
 		}
 	}
 	
+	/// Performs a search query, and returns the respective MetaObjects GUID keys
+	///
+	/// CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
+	/// @TODO: Performs the search pattern using the respective type map
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	/// @param   query string to sort the order by, use null to ignore
+	/// @param   offset of the result to display, use -1 to ignore
+	/// @param   number of objects to return max
+	///
+	/// @returns  The String[] array
+	public static String[] metaTableQueryKey( //
+		//
+		MetaTable metaTableObj, JSql sql, String tablename, //
+		//
+		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
+	) { //
+		JSqlResult r = metaTableSelectQueryBuilder( //
+			metaTableObj, sql, tablename, "DISTINCT oID", whereClause, whereValues, orderByStr, offset, limit);
+		//logger.log( Level.WARNING, r.toString() );
+		List<Object> oID_list = r.get("oID");
+		// Generate the object list
+		if (oID_list != null) {
+			return ListValueConv.objectListToStringArray(oID_list);
+		}
+		// Blank list as fallback
+		return new String[0];
+	}
+	
 	/// Performs a search query, and returns the respective MetaObjects
 	///
 	/// CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria

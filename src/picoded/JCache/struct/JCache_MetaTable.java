@@ -22,17 +22,17 @@ public class JCache_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	protected static Logger logger = Logger.getLogger(JCache_MetaTable.class.getName());
+	public static Logger logger = Logger.getLogger(JCache_MetaTable.class.getName());
 	
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
 	
 	/// The inner sql object
-	protected JCache jCacheObj = null;
+	public JCache jCacheObj = null;
 	
 	/// The tablename for the key value pair map
-	protected String tablename = null;
+	public String tablename = null;
 	
 	/// JCache setup 
 	public JCache_MetaTable(JCache inCache, String inTablename) {
@@ -51,10 +51,10 @@ public class JCache_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Core cache map
-	protected JCacheMap<String, Map<String, Object>> _coreCacheMap = null;
+	public JCacheMap<String, Map<String, Object>> _coreCacheMap = null;
 	
 	/// Core cache map
-	protected JCacheMap<String, Map<String, Object>> coreCacheMap() {
+	public JCacheMap<String, Map<String, Object>> coreCacheMap() {
 		if (_coreCacheMap != null) {
 			return _coreCacheMap;
 		}
@@ -95,13 +95,13 @@ public class JCache_MetaTable extends JStruct_MetaTable {
 	
 	/// Gets the complete remote data map, for MetaObject.
 	/// Returns null
-	protected Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
+	public Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
 		return coreCacheMap().get(_oid);
 	}
 	
 	/// Updates the actual backend storage of MetaObject 
 	/// either partially (if supported / used), or completely
-	protected void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap, Set<String> keys) {
+	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap, Set<String> keys) {
 		// Ensure all object refence is lost
 		Map<String, Object> storeMap = new HashMap<String, Object>();
 		

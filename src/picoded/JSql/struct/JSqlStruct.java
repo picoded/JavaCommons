@@ -26,8 +26,6 @@ public class JSqlStruct extends JStruct {
 	
 	/// Actual setup implmentation to overwrite
 	///
-	/// @TODO: Cache generated object
-	///
 	/// @param name - name of map in backend
 	///
 	/// @returns KeyValueMap
@@ -41,8 +39,6 @@ public class JSqlStruct extends JStruct {
 	
 	/// Actual setup implmentation to overwrite
 	///
-	/// @TODO: Cache generated object
-	///
 	/// @param name - name of map in backend
 	///
 	/// @returns MetaTable
@@ -55,8 +51,6 @@ public class JSqlStruct extends JStruct {
 	}
 	
 	/// Actual setup implmentation to overwrite
-	///
-	/// @TODO: Cache generated object
 	///
 	/// @param name - name of map in backend
 	///

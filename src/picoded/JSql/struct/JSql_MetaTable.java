@@ -26,17 +26,17 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	protected static Logger logger = Logger.getLogger(JSql_KeyValueMap.class.getName());
+	public static Logger logger = Logger.getLogger(JSql_MetaTable.class.getName());
 	
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
 	
 	/// The inner sql object
-	protected JSql sqlObj = null;
+	public JSql sqlObj = null;
 	
 	/// The tablename for the key value pair map
-	protected String sqlTableName = null;
+	public String sqlTableName = null;
 	
 	/// JSql setup 
 	public JSql_MetaTable(JSql inJSql, String tablename) {
@@ -50,35 +50,35 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Object ID field type
-	protected String objColumnType = "VARCHAR(64)";
+	public String objColumnType = "VARCHAR(64)";
 	
 	/// Key name field type
-	protected String keyColumnType = "VARCHAR(64)";
+	public String keyColumnType = "VARCHAR(64)";
 	
 	/// Type collumn type
-	protected String typeColumnType = "TINYINT";
+	public String typeColumnType = "TINYINT";
 	
 	/// Index collumn type
-	protected String indexColumnType = "TINYINT";
+	public String indexColumnType = "TINYINT";
 	
 	/// String value field type
 	/// @TODO: Investigate performance issues for this approach
-	protected String numColumnType = "DECIMAL(36,12)";
+	public String numColumnType = "DECIMAL(36,12)";
 	
 	/// String value field type
-	protected String strColumnType = "VARCHAR(64)";
+	public String strColumnType = "VARCHAR(64)";
 	
 	/// Full text value field type
-	protected String fullTextColumnType = "VARCHAR(MAX)";
+	public String fullTextColumnType = "VARCHAR(MAX)";
 	
 	/// Timestamp field type
-	protected String tStampColumnType = "BIGINT";
+	public String tStampColumnType = "BIGINT";
 	
 	/// Primary key type
-	protected String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
+	public String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
 	
 	/// Indexed view prefix, this is used to handle index conflicts between "versions" if needed
-	protected String viewSuffix = "";
+	public String viewSuffix = "";
 	
 	///
 	/// Backend system setup / teardown
@@ -286,13 +286,13 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	
 	/// Gets the complete remote data map, for MetaObject.
 	/// Returns null
-	protected Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
+	public Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
 		return JSql_MetaTableUtils.JSqlObjectMapFetch(typeMap(), sqlObj, sqlTableName, _oid, null);
 	}
 	
 	/// Updates the actual backend storage of MetaObject 
 	/// either partially (if supported / used), or completely
-	protected void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap, Set<String> keys) {
+	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap, Set<String> keys) {
 		try {
 			JSql_MetaTableUtils.JSqlObjectMapAppend(typeMap(), sqlObj, sqlTableName, _oid, fullMap, keys, true);
 		} catch (JSqlException e) {
@@ -327,6 +327,24 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	/// @returns  The MetaObject[] array
 	public MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit) {
 		return JSql_MetaTableUtils.metaTableQuery(this, sqlObj, sqlTableName, whereClause, whereValues, orderByStr,
+			offset, limit);
+		//return super.query( whereClause, whereValues, orderByStr, offset, limit );
+	}
+	
+	/// Performs a search query, and returns the respective MetaObjects keys
+	///
+	/// CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
+	/// @TODO: Performs the search pattern using the respective type map
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	/// @param   query string to sort the order by, use null to ignore
+	/// @param   offset of the result to display, use -1 to ignore
+	/// @param   number of objects to return max
+	///
+	/// @returns  The String[] array
+	public String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit) {
+		return JSql_MetaTableUtils.metaTableQueryKey(this, sqlObj, sqlTableName, whereClause, whereValues, orderByStr,
 			offset, limit);
 		//return super.query( whereClause, whereValues, orderByStr, offset, limit );
 	}

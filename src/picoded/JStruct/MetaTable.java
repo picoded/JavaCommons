@@ -165,6 +165,43 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 		return JStructUtils.sortAndOffsetListToArray(retList, orderByStr, offset, limit);
 	}
 	
+	/// Performs a search query, and returns the respective MetaObject keys.
+	/// This is the GUID key varient of query, that is relied by JStack
+	///
+	/// @param   where query statement
+	/// @param   where clause values array
+	/// @param   query string to sort the order by, use null to ignore
+	/// @param   offset of the result to display, use -1 to ignore
+	/// @param   number of objects to return max
+	///
+	/// @returns  The String[] array
+	public default String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit) {
+		
+		// The return list
+		List<MetaObject> retList = null;
+		
+		// Setup the query, if needed
+		if (whereClause == null) { //null gets all
+			retList = new ArrayList<MetaObject>(this.values());
+		} else {
+			Query queryObj = Query.build(whereClause, whereValues);
+			retList = queryObj.search(this);
+		}
+		
+		// Sort, offset, convert to array, and return
+		MetaObject[] retArr = JStructUtils.sortAndOffsetListToArray(retList, orderByStr, offset, limit);
+		
+		// Prepare the return object
+		int retLength = retArr.length;
+		String[] ret = new String[retLength];
+		for(int a=0; a<retLength; ++a) {
+			ret[a] = retArr[a]._oid();
+		}
+		
+		// Returns
+		return ret;
+	}
+	
 	/// Performs a search query, and returns the respective MetaObjects
 	///
 	/// @param   where query statement
@@ -213,6 +250,8 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	
 	/// Performs a custom search by configured keyname
 	/// 
+	/// @TODO: Optimize in JSQL layer
+	///
 	/// @param   keyName to lookup for
 	/// @param   query string to sort the order by, use null to ignore
 	/// @param   offset of the result to display, use -1 to ignore
@@ -237,6 +276,8 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	
 	/// Performs a custom search by configured keyname, and returns its ID array
 	/// 
+	/// @TODO: Optimize in JSQL layer
+	///
 	/// @param   keyName to lookup for
 	///
 	/// @returns  The MetaObject[] array

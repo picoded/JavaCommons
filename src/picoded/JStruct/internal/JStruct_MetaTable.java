@@ -28,13 +28,13 @@ public class JStruct_MetaTable implements MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
-	protected Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
+	public Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
 	
 	/// Read write lock
-	protected ReentrantReadWriteLock _accessLock = new ReentrantReadWriteLock();
+	public ReentrantReadWriteLock _accessLock = new ReentrantReadWriteLock();
 	
 	/// Internal MetaTypeMap
-	protected MetaTypeMap _typeMap = new MetaTypeMap();
+	public MetaTypeMap _typeMap = new MetaTypeMap();
 	
 	///
 	/// Constructor setup
@@ -52,7 +52,7 @@ public class JStruct_MetaTable implements MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Temp value flag, defaults to false
-	protected boolean isTempHint = false;
+	public boolean isTempHint = false;
 	
 	/// Gets if temp mode optimization hint is indicated
 	/// Note that this only serve as a hint, as does not indicate actual setting
@@ -158,7 +158,7 @@ public class JStruct_MetaTable implements MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Ensures the returned value is not refencing the input value, cloning if needed
-	protected Object detachValue(Object in) {
+	public Object detachValue(Object in) {
 		
 		if (in instanceof byte[]) { //bytearray support
 			byte[] ori = (byte[]) in;
@@ -174,7 +174,7 @@ public class JStruct_MetaTable implements MetaTable {
 	
 	/// Gets the complete remote data map, for MetaObject.
 	/// Returns null
-	protected Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
+	public Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
 		try {
 			_accessLock.readLock().lock();
 			
@@ -196,7 +196,7 @@ public class JStruct_MetaTable implements MetaTable {
 	
 	/// Updates the actual backend storage of MetaObject 
 	/// either partially (if supported / used), or completely
-	protected void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap, Set<String> keys) {
+	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap, Set<String> keys) {
 		try {
 			_accessLock.writeLock().lock();
 			

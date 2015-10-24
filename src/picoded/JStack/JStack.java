@@ -8,6 +8,7 @@ import picoded.JCache.*;
 import picoded.JStruct.*;
 import picoded.JSql.struct.*;
 import picoded.JCache.struct.*;
+import picoded.JStack.struct.*;
 
 /// JStack provides various common data storage format, that utalizes a combination of
 /// JCache, and JSql instances implementation.
@@ -87,5 +88,14 @@ public class JStack extends JSqlStruct implements JStackLayer {
 	//----------------------------------------------
 	// MetaTable, KeyValueMap handling
 	//----------------------------------------------
+	
+	/// Actual setup implmentation to overwrite
+	///
+	/// @param name - name of map in backend
+	///
+	/// @returns KeyValueMap
+	protected KeyValueMap setupKeyValueMap(String name) {
+		return new JStack_KeyValueMap(this, name);
+	}
 	
 }

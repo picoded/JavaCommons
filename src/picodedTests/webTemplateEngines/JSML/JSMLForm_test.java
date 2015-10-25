@@ -13,19 +13,16 @@ import static org.junit.Assert.*;
 import picoded.conv.ConvertJSON;
 import picoded.webTemplateEngines.JSML.JSMLForm;
 import picoded.webTemplateEngines.JSML.JSMLFormSet;
+import picodedTests.BaseTestClass;
 
-public class JSMLForm_test {
+public class JSMLForm_test{
 	
 	static JSMLForm jsmlForm = null;
 	static JSMLFormSet jsmlFormSet = null;
 	static Map<String, Object> data = null;
 	
-	/// @TODO : =.= stop absoluting path to your PC only, this test fails on other computers
-	//	static String rootFolder = "C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/JSML"; //absolute root folder path
-	//	static String contextFolder = "C:/Users/Samuel/workspace/JavaCommons/test-files/test-specific/htmlGenerator/JSML"; //on pc, absolute path, but on tomcat, its contextURI
-	
-	static String rootFolder = "./test-files/test-specific/htmlGenerator/JSML"; //absolute root folder path
-	static String contextFolder = "./test-files/test-specific/htmlGenerator/JSML";
+	static String rootFolder = "./test-files/test-specific/webTemplateEngines/JSML/JSMLForm"; //absolute root folder path
+	static String contextFolder = "./test-files/test-specific/webTemplateEngines/JSML/JSMLForm";
 	static String tempFolder = "tmp"; //absolute path to resource folder
 	
 	@BeforeClass
@@ -47,39 +44,6 @@ public class JSMLForm_test {
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
-		}
-	}
-	
-	//	@Test
-	public void generateHTMLTest() {
-		//to remove
-		jsmlForm = new JSMLForm(rootFolder + "/prefixtest", contextFolder + "/prefixtest", tempFolder);
-		try {
-			File declareFile = new File(rootFolder + "/prefixtest/formDeclare.json");
-			String declareFileString = FileUtils.readFileToString(declareFile);
-			jsmlForm.setDefinition(declareFileString);
-			
-			File dataFile = new File(rootFolder + "/prefixtest/formData.json");
-			String dataFileString = FileUtils.readFileToString(dataFile);
-			data = ConvertJSON.toMap(dataFileString);
-			
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}//to remove
-		
-		StringBuilder sb = jsmlForm.generateHTML(null, false);
-		assertNotNull(sb);
-		
-		String rawHTML = sb.toString();
-		assertFalse(rawHTML.isEmpty());
-		
-		try {
-			FileWriter fw = new FileWriter(new File(rootFolder + "/generated/generatedHTML.html"));
-			fw.write(rawHTML);
-			fw.flush();
-			fw.close();
-		} catch (Exception e) {
-			
 		}
 	}
 	

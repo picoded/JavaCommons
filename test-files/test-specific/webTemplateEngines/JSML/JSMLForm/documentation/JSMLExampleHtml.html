@@ -1,0 +1,32 @@
+<div class="pf_div">
+<label class="pf_label" for="thisisthelabelforatitleobject">This is the label for a title object</label>
+<h3 class="pf_header" style="color:red; font-size:25;">This is the actual input of a title object</h3>
+</div>
+<div class="pf_div">
+<label class="pf_label" for="exampleListDropdown">Example Dropdown using List</label>
+<select class="pf_select" id="exampleListDropdown">
+<option value="dropdownoption1">Dropdown Option 1</option>
+<option value="dropdownoption2">DropdownOption 2</option>
+<option value="dropdownoption3">Dropdown Option 3</option>
+</select>
+</div>
+<div class="pf_div">
+<label class="pf_label" for="exampleMapDropdown">Example Dropdown using LinkedHashMap</label>
+<select class="pf_select" id="exampleMapDropdown">
+<option value="varForOption1">Option 1</option>
+<option value="varForOption2">Option 2</option>
+<option value="varForOption3">Option 3</option>
+</select>
+</div>
+<div class="pf_div">
+<label  class="pf_label" for="exampleTextInputField">This is a text input field</label>
+<input class="pf_inputText" type="text" id="exampleTextInputField"></input>
+</div>
+<div class="pf_div">
+<script>function exampleDropdownOnChange() {var dropDown = document.getElementById("exampleDropdownWithHiddenField");var inputField = document.getElementById("exampleDropdownTextField");if(dropDown.value == "shownfield3"){inputField.style.display = "inline";}else{inputField.style.display = "none";}};</script><label class="pf_label" for="exampleDropdownWithHiddenField">Dropdown with hidden text input field</label>
+<select class="pf_select" onchange="exampleDropdownOnChange()" id="exampleDropdownWithHiddenField">
+<option value="hiddenfield1">Hidden Field 1</option>
+<option value="hiddenfield2">Hidden Field 2</option>
+<option value="shownfield3">Shown Field 3</option>
+</select>
+<input class="pf_inputText" style="display:none" type="text" id="exampleDropdownTextField"</div>

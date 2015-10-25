@@ -539,7 +539,7 @@ public class JSql_MetaTableUtils {
 			String field = QueryUtils.unwrapFieldName(orderSet);
 			
 			// Add as query args
-			queryArgs.add(field);
+			// queryArgs.add(field);
 			
 			// Push the return string, add the seperators when needed
 			if (first != true) {
@@ -548,11 +548,14 @@ public class JSql_MetaTableUtils {
 				first = false;
 			}
 			
+			// field -> sanatize .[]-_,
+			field = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(field);
+			
 			// Push the actual order by command
-			if (ot == OrderBy.OrderType.DESC) {
-				ret.append("? DESC ");
+			if (ot == OrderBy.OrderType.DESC) {				
+				ret.append( "\""+field+"\""+" DESC ");
 			} else {
-				ret.append("? ASC ");
+				ret.append( "\""+field+"\""+" ASC ");
 			}
 		}
 		

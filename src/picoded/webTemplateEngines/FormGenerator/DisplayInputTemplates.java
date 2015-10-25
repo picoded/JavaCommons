@@ -45,7 +45,8 @@ public class DisplayInputTemplates {
 	
 	@SuppressWarnings("unchecked")
 	protected static FormInputInterface input_textarea = (node) -> {
-		return FormInputTemplates.displayDiv(node, "pfi_inputTextBox pfi_display");
+		return FormInputTemplates.input_textarea(node, true);
+		//return FormInputTemplates.displayDiv(node, "pfi_inputTextBox pfi_display");
 	};
 	
 	protected static FormInputInterface raw_html = (node) -> {

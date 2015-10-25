@@ -1,3 +1,0 @@
-{
-	"dropdownfield":"Option 1"
-}

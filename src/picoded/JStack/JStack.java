@@ -98,4 +98,22 @@ public class JStack extends JSqlStruct implements JStackLayer {
 		return new JStack_KeyValueMap(this, name);
 	}
 	
+	/// Actual setup implmentation to overwrite
+	///
+	/// @param name - name of map in backend
+	///
+	/// @returns MetaTable
+	protected MetaTable setupMetaTable(String name) {
+		return new JStack_MetaTable(this, name);
+	}
+	
+	/// Actual setup implmentation to overwrite
+	///
+	/// @param name - name of map in backend
+	///
+	/// @returns AccountTable
+	protected AccountTable setupAccountTable(String name) {
+		return new AccountTable(this, name);
+	}
+	
 }

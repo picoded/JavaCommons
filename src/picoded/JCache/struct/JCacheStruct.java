@@ -28,7 +28,7 @@ public class JCacheStruct extends JStruct {
 	/// @returns KeyValueMap
 	protected KeyValueMap setupKeyValueMap(String name) {
 		if (jCacheObj == null) {
-			throw new RuntimeException("Missing required SQL Object");
+			throw new RuntimeException("Missing required Cache Object");
 		}
 		
 		return new JCache_KeyValueMap(jCacheObj, name);
@@ -41,7 +41,7 @@ public class JCacheStruct extends JStruct {
 	/// @returns MetaTable
 	protected MetaTable setupMetaTable(String name) {
 		if (jCacheObj == null) {
-			throw new RuntimeException("Missing required SQL Object");
+			throw new RuntimeException("Missing required Cache Object");
 		}
 		
 		return new JCache_MetaTable(jCacheObj, name);
@@ -56,7 +56,7 @@ public class JCacheStruct extends JStruct {
 	/// @returns AccountTable
 	protected AccountTable setupAccountTable(String name) {
 		if (jCacheObj == null) {
-			throw new RuntimeException("Missing required SQL Object");
+			throw new RuntimeException("Missing required Cache Object");
 		}
 		
 		return new AccountTable(this, name);

@@ -15,7 +15,7 @@ import picoded.webTemplateEngines.JSML.JSMLForm;
 import picoded.webTemplateEngines.JSML.JSMLFormSet;
 import picodedTests.BaseTestClass;
 
-public class JSMLForm_test{
+public class JSMLForm_test {
 	
 	static JSMLForm jsmlForm = null;
 	static JSMLFormSet jsmlFormSet = null;

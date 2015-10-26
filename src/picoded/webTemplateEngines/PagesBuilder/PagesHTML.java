@@ -94,13 +94,13 @@ public class PagesHTML {
 		HashMap<String, Object> ret = new HashMap<String, Object>();
 		
 		// Removes trailing /, unless its the only character
-		if(uriRootPrefix.length() > 1 && uriRootPrefix.endsWith("/")) {
+		if (uriRootPrefix.length() > 1 && uriRootPrefix.endsWith("/")) {
 			uriRootPrefix = uriRootPrefix.substring(0, uriRootPrefix.length() - 1);
 		}
 		
 		// 
 		String pageURI = uriRootPrefix + "/" + pageName;
-		while( pageURI.startsWith("//") ) {
+		while (pageURI.startsWith("//")) {
 			pageURI = pageURI.substring(1);
 		}
 		

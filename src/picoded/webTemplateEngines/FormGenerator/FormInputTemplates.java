@@ -157,7 +157,7 @@ public class FormInputTemplates {
 		return sbArr[0].append(sbArr[1]);
 	};
 	
-	protected static FormInputInterface input_textarea  = (node) -> {
+	protected static FormInputInterface input_textarea = (node) -> {
 		return input_textarea(node, false);
 	};
 	

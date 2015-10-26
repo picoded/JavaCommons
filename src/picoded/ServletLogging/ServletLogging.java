@@ -41,11 +41,11 @@ public class ServletLogging {
 	
 	/// Converts from LogLevel, to minimal implementation
 	protected static Level stdLevelFromLogLevel(LogLevel l) {
-		if( l == LogLevel.ERROR ) {
+		if (l == LogLevel.ERROR) {
 			return Level.SEVERE;
-		} else if( l == LogLevel.WARN ) {
+		} else if (l == LogLevel.WARN) {
 			return Level.WARNING;
-		} else if( l == LogLevel.INFO ) {
+		} else if (l == LogLevel.INFO) {
 			return Level.INFO;
 		}
 		return Level.FINE;
@@ -54,7 +54,7 @@ public class ServletLogging {
 	///
 	/// Centralized logging, which the other functions call
 	///
-	protected void logWithLevel(LogLevel level, Exception e, String format, Object ... args ) {
+	protected void logWithLevel(LogLevel level, Exception e, String format, Object... args) {
 		
 		// Build the string and format
 		StringBuilder sb = new StringBuilder();
@@ -62,7 +62,7 @@ public class ServletLogging {
 		formatter.format(format, args);
 		
 		// Logs it in standrad log
-		if(e != null) {
+		if (e != null) {
 			logger.log(stdLevelFromLogLevel(level), sb.toString(), e);
 		} else {
 			logger.log(stdLevelFromLogLevel(level), sb.toString());
@@ -76,42 +76,42 @@ public class ServletLogging {
 	//----------------------------------------------------------------
 	
 	/// Log with exception
-	public void log(Exception e, String format, Object ... args ) {
+	public void log(Exception e, String format, Object... args) {
 		logWithLevel(LogLevel.LOG, e, format, args);
 	}
 	
 	/// Log 
-	public void log(String format, Object ... args ) {
+	public void log(String format, Object... args) {
 		logWithLevel(LogLevel.LOG, null, format, args);
 	}
 	
 	/// Info with exception
-	public void info(Exception e, String format, Object ... args ) {
+	public void info(Exception e, String format, Object... args) {
 		logWithLevel(LogLevel.INFO, e, format, args);
 	}
 	
 	/// Info 
-	public void info(String format, Object ... args ) {
+	public void info(String format, Object... args) {
 		logWithLevel(LogLevel.INFO, null, format, args);
 	}
 	
 	/// Info with exception
-	public void warn(Exception e, String format, Object ... args ) {
+	public void warn(Exception e, String format, Object... args) {
 		logWithLevel(LogLevel.WARN, e, format, args);
 	}
 	
 	/// Info 
-	public void warn(String format, Object ... args ) {
+	public void warn(String format, Object... args) {
 		logWithLevel(LogLevel.WARN, null, format, args);
 	}
 	
 	/// Error with exception
-	public void error(Exception e, String format, Object ... args ) {
+	public void error(Exception e, String format, Object... args) {
 		logWithLevel(LogLevel.ERROR, e, format, args);
 	}
 	
 	/// Error 
-	public void error(String format, Object ... args ) {
+	public void error(String format, Object... args) {
 		logWithLevel(LogLevel.ERROR, null, format, args);
 	}
 	

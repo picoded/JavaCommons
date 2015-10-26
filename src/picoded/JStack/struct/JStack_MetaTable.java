@@ -80,7 +80,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 			}
 			
 			// Fetch the implementation
-			ret[a] = (JStruct_MetaTable)struct[a].getMetaTable(stackTablename);
+			ret[a] = (JStruct_MetaTable) struct[a].getMetaTable(stackTablename);
 		}
 		
 		return (_implementationLayers = ret);
@@ -99,8 +99,8 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 		JStruct_MetaTable[] impleLayers = implementationLayers();
 		int impleLength = impleLayers.length;
 		JStruct_MetaTable[] ret = new JStruct_MetaTable[impleLength];
-		for(int i=0; i < impleLength; i++) {
-			ret[i] = impleLayers[ impleLength - 1 - i ];
+		for (int i = 0; i < impleLength; i++) {
+			ret[i] = impleLayers[impleLength - 1 - i];
 		}
 		
 		// Return the reversed PDF
@@ -132,7 +132,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	public Set<String> keySet() {
 		Set<String> ret = null;
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
-			if( (ret = i.keySet()) != null ) {
+			if ((ret = i.keySet()) != null) {
 				return ret;
 			}
 		}
@@ -156,7 +156,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	public Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
 		Map<String, Object> ret = null;
 		for (JStruct_MetaTable i : implementationLayers()) {
-			if( (ret = i.metaObjectRemoteDataMap_get(_oid)) != null ) {
+			if ((ret = i.metaObjectRemoteDataMap_get(_oid)) != null) {
 				return ret;
 			}
 		}
@@ -191,7 +191,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	public String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit) {
 		String[] ret = null;
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
-			if( (ret = i.queryKeys(whereClause, whereValues, orderByStr, offset, limit)) != null ) {
+			if ((ret = i.queryKeys(whereClause, whereValues, orderByStr, offset, limit)) != null) {
 				return ret;
 			}
 		}
@@ -220,13 +220,11 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	public long queryCount(String whereClause, Object[] whereValues) {
 		long ret = 0;
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
-			if( (ret = i.queryCount(whereClause, whereValues)) >= 0 ) {
+			if ((ret = i.queryCount(whereClause, whereValues)) >= 0) {
 				return ret;
 			}
 		}
 		return 0;
 	}
-	
-	
 	
 }

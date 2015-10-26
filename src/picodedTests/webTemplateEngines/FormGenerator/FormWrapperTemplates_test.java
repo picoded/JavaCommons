@@ -21,8 +21,7 @@ public class FormWrapperTemplates_test {
 	private String resFolder = "./test-files/test-specific/webTemplateEngines/FormGenerator/FormWrapperTemplates/res/";
 	
 	private String getWrapperTemplatedJsonString(String jsonKeyName) {
-		File jsonFile = new File(resFolder + jsonKeyName
-			+ ".js");
+		File jsonFile = new File(resFolder + jsonKeyName + ".js");
 		try {
 			String jsonFileString = FileUtils.readFileToString(jsonFile);
 			Map<String, Object> jsonMap = ConvertJSON.toMap(jsonFileString);
@@ -35,8 +34,7 @@ public class FormWrapperTemplates_test {
 	}
 	
 	private String getFullTemplatedJsonWithData(String jsonKeyName) {
-		File jsonFile = new File(resFolder + jsonKeyName
-			+ ".js");
+		File jsonFile = new File(resFolder + jsonKeyName + ".js");
 		File jsonDataFile = new File(resFolder + "jsonData.js");
 		
 		try {

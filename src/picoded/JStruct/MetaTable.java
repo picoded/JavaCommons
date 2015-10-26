@@ -194,7 +194,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 		// Prepare the return object
 		int retLength = retArr.length;
 		String[] ret = new String[retLength];
-		for(int a=0; a<retLength; ++a) {
+		for (int a = 0; a < retLength; ++a) {
 			ret[a] = retArr[a]._oid();
 		}
 		

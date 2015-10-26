@@ -20,42 +20,42 @@ public class BaseTestClass {
 	
 	private String packageRoot = "picodedTests.";
 	
-	public BaseTestClass(){
+	public BaseTestClass() {
 		baseRootFolder = getTestClassRootFolder();
 		
 		resourceFolder = baseRootFolder + "/res";
 		File resourceFile = new File(resourceFolder);
-		if(!resourceFile.exists()){
+		if (!resourceFile.exists()) {
 			resourceFile.mkdirs();
 		}
 		
 		generatedFolder = baseRootFolder + "/generated";
 		File generatedFile = new File(generatedFolder);
-		if(!generatedFile.exists()){
+		if (!generatedFile.exists()) {
 			generatedFile.mkdirs();
 		}
 	}
 	
-	protected String getTestClassRootFolder(){
+	protected String getTestClassRootFolder() {
 		String ret = "./test-files/test-specific/";
 		
 		Class<?> thisClass = this.getClass();
 		String packageName = thisClass.getName();
 		
-		if(packageName != null && packageName.startsWith(packageRoot)){
+		if (packageName != null && packageName.startsWith(packageRoot)) {
 			packageName = packageName.substring(packageRoot.length(), packageName.length());
 			
 			String[] packageNameSplit = packageName.split("\\.");
-			for(int count = 0; count < packageNameSplit.length; ++count){
-				if(count == packageNameSplit.length - 1){
-					if(packageNameSplit[count].contains("_test")){
-						packageNameSplit[count] = packageNameSplit[count].replace("_test","");
+			for (int count = 0; count < packageNameSplit.length; ++count) {
+				if (count == packageNameSplit.length - 1) {
+					if (packageNameSplit[count].contains("_test")) {
+						packageNameSplit[count] = packageNameSplit[count].replace("_test", "");
 					}
 				}
 				
 				ret += packageNameSplit[count];
 				
-				if(count < packageNameSplit.length - 1){
+				if (count < packageNameSplit.length - 1) {
 					ret += "/";
 				}
 			}
@@ -64,38 +64,38 @@ public class BaseTestClass {
 		return ret;
 	}
 	
-	protected boolean writeStringToGeneratedFile(String input, String fileName){
+	protected boolean writeStringToGeneratedFile(String input, String fileName) {
 		File generatedFile = new File(generatedFolder + "/" + fileName);
 		
-		try{
+		try {
 			FileWriter fw = new FileWriter(generatedFile);
 			fw.write(input);
 			fw.flush();
 			fw.close();
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			return false;
 		}
 		
 		return true;
 	}
 	
-	protected boolean writeHTMLStringToGeneratedPDF(String input, String fileName){
+	protected boolean writeHTMLStringToGeneratedPDF(String input, String fileName) {
 		String outputFileString = generatedFolder + "/" + fileName;
 		return PDFGenerator.generatePDFfromRawHTML(outputFileString, input);
 	}
 	
-	protected String readStringFromResourceFile(String fileName){
+	protected String readStringFromResourceFile(String fileName) {
 		String ret = "";
 		
 		File resourceFile = new File(resourceFolder + "/" + fileName);
 		
-		if(!resourceFile.exists()){
+		if (!resourceFile.exists()) {
 			return null;
 		}
 		
-		try{
+		try {
 			ret = FileUtils.readFileToString(resourceFile);
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			return null;
 		}
 		

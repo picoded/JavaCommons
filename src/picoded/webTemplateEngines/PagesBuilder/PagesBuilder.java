@@ -100,7 +100,7 @@ public class PagesBuilder {
 	
 	/// Overides the uriRootPrefix. 
 	public void setUriRootPrefix(String set) {
-		if(set == null || set.length() <= 0) {
+		if (set == null || set.length() <= 0) {
 			set = "/";
 		}
 		

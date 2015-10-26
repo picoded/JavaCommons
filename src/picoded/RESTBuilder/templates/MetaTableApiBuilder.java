@@ -170,7 +170,7 @@ public class MetaTableApiBuilder {
 						
 						if (sanitiseOutput && rawVal != null && rawVal instanceof String) {
 							String stringVal = GenericConvert.toString(rawVal);
-							if(stringVal != null){
+							if (stringVal != null) {
 								stringVal = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(stringVal);
 							}
 							row.add(stringVal);

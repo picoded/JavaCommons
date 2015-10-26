@@ -13,60 +13,60 @@ import java.util.*;
 //
 // Tests the individual Input Templates
 //
-public class FormInputTemplates_test extends BaseTestClass{
-	public FormInputTemplates_test(){
+public class FormInputTemplates_test extends BaseTestClass {
+	public FormInputTemplates_test() {
 		super();
 	}
 	
 	@Test
-	public void input_text_test(){
+	public void input_text_test() {
 		assertTrue(doNodeTest("text.js", "text"));
 	}
 	
 	@Test
-	public void title_test(){
+	public void title_test() {
 		assertTrue(doNodeTest("title.js", "title"));
 	}
 	
 	@Test
-	public void checkbox_test(){
+	public void checkbox_test() {
 		assertTrue(doNodeTest("checkbox.js", "checkbox"));
 	}
 	
 	@Test
-	public void dropdown_test(){
+	public void dropdown_test() {
 		assertTrue(doNodeTest("dropdown.js", "dropdown"));
 	}
 	
 	@Test
-	public void textarea_test(){
+	public void textarea_test() {
 		assertTrue(doNodeTest("textarea.js", "textarea"));
 	}
 	
 	@Test
-	public void number_test(){
+	public void number_test() {
 		assertTrue(doNodeTest("number.js", "number"));
 	}
 	
 	@Test
-	public void signature_test(){
+	public void signature_test() {
 		
 	}
 	
 	@Test
-	public void date_test(){
+	public void date_test() {
 		assertTrue(doNodeTest("date.js", "date"));
 	}
 	
 	@Test
-	public void image_test(){
+	public void image_test() {
 		assertTrue(doNodeTest("image.js", "image"));
 	}
 	
 	//
 	// Does basic node test against expected output
 	//
-	private boolean doNodeTest(String inputFileName, String nodeType){
+	private boolean doNodeTest(String inputFileName, String nodeType) {
 		String nodeOutput = getNodeOutput(inputFileName);
 		assertNotNull(nodeOutput);
 		assertFalse(StringUtils.isNullOrEmpty(nodeOutput));
@@ -76,7 +76,7 @@ public class FormInputTemplates_test extends BaseTestClass{
 	//
 	// Gets node html output after reading from file
 	//
-	private String getNodeOutput(String fileName){
+	private String getNodeOutput(String fileName) {
 		String textString = readStringFromResourceFile(fileName);
 		assertNotNull(textString);
 		Map<String, Object> jsonMap = ConvertJSON.toMap(textString);
@@ -86,7 +86,7 @@ public class FormInputTemplates_test extends BaseTestClass{
 		return node.inputHtml(false).toString();
 	}
 	
-	private boolean testNodeOutputAgainstExpectedOutput(String nodeOutput, String nodeType){
+	private boolean testNodeOutputAgainstExpectedOutput(String nodeOutput, String nodeType) {
 		String expectedString = getHtmlString(nodeType);
 		return htmlTagCompliancyCheck(nodeOutput, expectedString);
 	}
@@ -141,19 +141,19 @@ public class FormInputTemplates_test extends BaseTestClass{
 		return "<input type checkbox value name class></input>";
 	}
 	
-	private String getDateHtmlString(){
+	private String getDateHtmlString() {
 		return "<input type date value name class></input>";
 	}
 	
-	private String getNumberHtmlString(){
+	private String getNumberHtmlString() {
 		return "<input type number value name class></input>";
 	}
 	
-	private String getImageHtmlString(){
+	private String getImageHtmlString() {
 		return "<img src></img>";
 	}
 	
-	private String getTextAreaHtmlString(){
+	private String getTextAreaHtmlString() {
 		return "<textarea class></input>";
 	}
 }

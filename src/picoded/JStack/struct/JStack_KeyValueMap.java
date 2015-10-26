@@ -81,7 +81,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 			}
 			
 			// Fetch the implementation
-			ret[a] = (JStruct_KeyValueMap)struct[a].getKeyValueMap(stackTablename);
+			ret[a] = (JStruct_KeyValueMap) struct[a].getKeyValueMap(stackTablename);
 		}
 		
 		return (_implementationLayers = ret);
@@ -100,8 +100,8 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 		JStruct_KeyValueMap[] impleLayers = implementationLayers();
 		int impleLength = impleLayers.length;
 		JStruct_KeyValueMap[] ret = new JStruct_KeyValueMap[impleLength];
-		for(int i=0; i < impleLength; i++) {
-			ret[i] = impleLayers[ impleLength - 1 - i ];
+		for (int i = 0; i < impleLength; i++) {
+			ret[i] = impleLayers[impleLength - 1 - i];
 		}
 		
 		// Return the reversed PDF
@@ -162,7 +162,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	public long getExpiryRaw(String key) {
 		long ret = -1;
 		for (JStruct_KeyValueMap i : implementationLayers()) {
-			if( (ret = i.getExpiryRaw(key)) >= 0 ) {
+			if ((ret = i.getExpiryRaw(key)) >= 0) {
 				return ret;
 			}
 		}
@@ -200,7 +200,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	public String getValueRaw(String key, long now) {
 		String val = null;
 		for (JStruct_KeyValueMap i : implementationLayers()) {
-			if( (val = i.getValueRaw(key,now)) != null ) {
+			if ((val = i.getValueRaw(key, now)) != null) {
 				return val;
 			}
 		}
@@ -235,7 +235,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	public Set<String> getKeys(String value) {
 		Set<String> ret = null;
 		for (JStruct_KeyValueMap i : implementationLayers_reverse()) {
-			if( (ret = i.getKeys(value)) != null ) {
+			if ((ret = i.getKeys(value)) != null) {
 				return ret;
 			}
 		}

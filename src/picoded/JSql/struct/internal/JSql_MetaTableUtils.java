@@ -552,10 +552,10 @@ public class JSql_MetaTableUtils {
 			field = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(field);
 			
 			// Push the actual order by command
-			if (ot == OrderBy.OrderType.DESC) {				
-				ret.append( "\""+field+"\""+" DESC ");
+			if (ot == OrderBy.OrderType.DESC) {
+				ret.append("\"" + field + "\"" + " DESC ");
 			} else {
-				ret.append( "\""+field+"\""+" ASC ");
+				ret.append("\"" + field + "\"" + " ASC ");
 			}
 		}
 		

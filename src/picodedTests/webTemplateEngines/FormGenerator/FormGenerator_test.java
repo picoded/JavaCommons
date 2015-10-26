@@ -17,7 +17,6 @@ import java.io.FileWriter;
 import java.nio.charset.Charset;
 import java.util.*;
 
-
 //
 // Tests the actual formgenerator class
 //
@@ -25,7 +24,7 @@ public class FormGenerator_test extends BaseTestClass {
 	
 	public FormGenerator testObj = null;
 	
-	public FormGenerator_test(){
+	public FormGenerator_test() {
 		super();
 	}
 	
@@ -44,7 +43,7 @@ public class FormGenerator_test extends BaseTestClass {
 		assertNotNull(testObj);
 	}
 	
-	private String getFormGenOutput(String fileName, String dataFileName, boolean useData, boolean displayMode){
+	private String getFormGenOutput(String fileName, String dataFileName, boolean useData, boolean displayMode) {
 		String textString = readStringFromResourceFile(fileName);
 		assertNotNull(textString);
 		
@@ -57,19 +56,20 @@ public class FormGenerator_test extends BaseTestClass {
 		
 		formGen.build(textString, jsonDataMap, displayMode);
 		
-		if(useData){
+		if (useData) {
 			return formGen.build(textString, jsonDataMap, displayMode).toString();
-		}else{
+		} else {
 			return formGen.build(textString, null, displayMode).toString();
 		}
 	}
 	
-	private boolean generateOutputFile(String outputFileName, String inputFileName, String inputDataFileName, boolean useData, boolean displayMode, boolean usePrefixAndSuffix){
+	private boolean generateOutputFile(String outputFileName, String inputFileName, String inputDataFileName,
+		boolean useData, boolean displayMode, boolean usePrefixAndSuffix) {
 		String textOutput = getFormGenOutput(inputFileName, inputDataFileName, useData, displayMode);
 		assertNotNull(textOutput);
 		assertFalse(StringUtils.isNullOrEmpty(textOutput));
 		
-		if(usePrefixAndSuffix){
+		if (usePrefixAndSuffix) {
 			//read prefix and suffix
 			String prefix = readStringFromResourceFile("prefix.html");
 			String suffix = readStringFromResourceFile("suffix.html");
@@ -79,12 +79,13 @@ public class FormGenerator_test extends BaseTestClass {
 		return writeStringToGeneratedFile(textOutput, outputFileName);
 	}
 	
-	private boolean generateOutputPDFFile(String outputFileName, String inputFileName, String inputDataFileName, boolean useData, boolean displayMode, boolean usePrefixAndSuffix){
+	private boolean generateOutputPDFFile(String outputFileName, String inputFileName, String inputDataFileName,
+		boolean useData, boolean displayMode, boolean usePrefixAndSuffix) {
 		String textOutput = getFormGenOutput(inputFileName, inputDataFileName, useData, displayMode);
 		assertNotNull(textOutput);
 		assertFalse(StringUtils.isNullOrEmpty(textOutput));
 		
-		if(usePrefixAndSuffix){
+		if (usePrefixAndSuffix) {
 			//read prefix and suffix
 			String prefix = readStringFromResourceFile("prefix.html");
 			String suffix = readStringFromResourceFile("suffix.html");
@@ -94,17 +95,24 @@ public class FormGenerator_test extends BaseTestClass {
 		return writeHTMLStringToGeneratedPDF(textOutput, outputFileName);
 	}
 	
-	
 	@Test
-	public void generateGenericForm(){
-		assertTrue(generateOutputFile("genericFormNoData.html", "genericForm.js", "genericFormData.js", false, false, false));
-		assertTrue(generateOutputFile("genericFormWithData.html", "genericForm.js", "genericFormData.js", true, false, false));
-		assertTrue(generateOutputFile("genericFormDisplayNoData.html", "genericForm.js", "genericFormData.js", false, true, false));
-		assertTrue(generateOutputFile("genericFormDisplayWithData.html", "genericForm.js", "genericFormData.js", true, true, false));
+	public void generateGenericForm() {
+		assertTrue(generateOutputFile("genericFormNoData.html", "genericForm.js", "genericFormData.js", false, false,
+			false));
+		assertTrue(generateOutputFile("genericFormWithData.html", "genericForm.js", "genericFormData.js", true, false,
+			false));
+		assertTrue(generateOutputFile("genericFormDisplayNoData.html", "genericForm.js", "genericFormData.js", false,
+			true, false));
+		assertTrue(generateOutputFile("genericFormDisplayWithData.html", "genericForm.js", "genericFormData.js", true,
+			true, false));
 		
-		assertTrue(generateOutputPDFFile("genericFormNoData.pdf", "genericForm.js", "genericFormData.js", false, false, true));
-		assertTrue(generateOutputPDFFile("genericFormWithData.pdf", "genericForm.js", "genericFormData.js", true, false, true));
-		assertTrue(generateOutputPDFFile("genericFormDisplayNoData.pdf", "genericForm.js", "genericFormData.js", false, true, true));
-		assertTrue(generateOutputPDFFile("genericFormDisplayWithData.pdf", "genericForm.js", "genericFormData.js", true, true, true));
+		assertTrue(generateOutputPDFFile("genericFormNoData.pdf", "genericForm.js", "genericFormData.js", false, false,
+			true));
+		assertTrue(generateOutputPDFFile("genericFormWithData.pdf", "genericForm.js", "genericFormData.js", true, false,
+			true));
+		assertTrue(generateOutputPDFFile("genericFormDisplayNoData.pdf", "genericForm.js", "genericFormData.js", false,
+			true, true));
+		assertTrue(generateOutputPDFFile("genericFormDisplayWithData.pdf", "genericForm.js", "genericFormData.js", true,
+			true, true));
 	}
 }

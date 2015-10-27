@@ -381,6 +381,37 @@ public class JSql_Sqlite_test {
 		assertEquals("Upsert value check failed", "not found", r.readRowCol(0, "col2"));
 	}
 	
+	@Test
+	public void selectRangeSet() throws JSqlException {
+		row1to7setup();
+		JSqlResult r = null;
+		JSqlQuerySet qSet = null;
+		
+		//Select range query
+		assertNotNull(qSet = JSqlObj.selectQuerySet( //
+			testTableName, //
+			"*", //
+			"col1 > ?", //
+			new Object[] { 0 }, //
+			"col1 DESC", //
+			5, //
+			1 //
+		)); //
+		assertNotNull("query should return a JSql result", qSet.query());
+		
+		//Select range query
+		assertNotNull(qSet = JSqlObj.selectQuerySet( //
+			testTableName, //
+			"*", //
+			"col1 > ?", //
+			new Object[] { 0 }, //
+			"col1 DESC", //
+			5, //
+			0 //
+		)); //
+		assertNotNull("query should return a JSql result", qSet.query());
+	}
+	
 	//*/
 	@Test
 	public void recreate() throws JSqlException {

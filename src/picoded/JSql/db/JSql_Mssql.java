@@ -243,6 +243,12 @@ public class JSql_Mssql extends JSql {
 			int limitIndex = qString.indexOf("LIMIT");
 			String limitQuery = "";
 			if (limitIndex != -1) {
+				
+				// Includes offset 0, if its missing (required for MSSQL)
+				if(offsetIndex == -1) {
+					offsetQuery = "OFFSET 0 ROWS ";
+				}
+				
 				prefixQuery = qString.substring(0, limitIndex);
 				if (offsetIndex != -1) {
 					limitQuery = qString.substring(limitIndex, offsetIndex);

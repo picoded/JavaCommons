@@ -396,7 +396,7 @@ public class JSql_Sqlite_test {
 			"col1 DESC", //
 			5, //
 			1 //
-		)); //
+			)); //
 		assertNotNull("query should return a JSql result", qSet.query());
 		
 		//Select range query
@@ -408,7 +408,7 @@ public class JSql_Sqlite_test {
 			"col1 DESC", //
 			5, //
 			0 //
-		)); //
+			)); //
 		assertNotNull("query should return a JSql result", qSet.query());
 	}
 	

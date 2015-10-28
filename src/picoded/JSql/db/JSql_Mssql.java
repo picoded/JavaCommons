@@ -245,7 +245,7 @@ public class JSql_Mssql extends JSql {
 			if (limitIndex != -1) {
 				
 				// Includes offset 0, if its missing (required for MSSQL)
-				if(offsetIndex == -1) {
+				if (offsetIndex == -1) {
 					offsetQuery = "OFFSET 0 ROWS ";
 				}
 				

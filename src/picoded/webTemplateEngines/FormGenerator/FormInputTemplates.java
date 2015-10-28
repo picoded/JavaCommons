@@ -1,6 +1,8 @@
 package picoded.webTemplateEngines.FormGenerator;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -82,12 +84,30 @@ public class FormInputTemplates {
 	private static String thousandsSeparator(String value) {
 		String ret = "";
 		if (value != null && !value.isEmpty()) {
-			int valAsInt = Integer.parseInt(value);
-			try {
-				ret = String.format("%,d", valAsInt);
-			} catch (Exception e) {
-				//silent fail, fallback to non separated numbers
-				ret = "" + valAsInt + "";
+			if(value.equalsIgnoreCase("0")){
+				ret = "0.00";
+			}else{
+				boolean reappendBrackets = false;
+				String tempValue = value;
+				if(value.startsWith("(")){
+					tempValue = tempValue.substring(1, tempValue.length());
+					tempValue = tempValue.substring(0, tempValue.length() - 1);
+					reappendBrackets = true;
+				}
+				
+				DecimalFormat df = new DecimalFormat("#,###.00");
+				BigDecimal bigD = new BigDecimal(tempValue);
+				bigD.setScale(2);
+				
+				try {
+					ret = df.format(bigD);
+					if(reappendBrackets){
+						ret = "(" + ret + ")";
+					}
+				} catch (Exception e) {
+					//silent fail, fallback to default value
+					ret = value;
+				}
 			}
 		}
 		return ret;

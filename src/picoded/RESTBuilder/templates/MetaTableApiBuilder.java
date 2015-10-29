@@ -89,6 +89,12 @@ public class MetaTableApiBuilder {
 	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
 	/// |                 |                    | are returned as well.                                                         |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | wildcardMode    | String (optional)  | Default SUFFIX. Determines SQL query wildcard position. Either prefix,        |
+	/// |                 |                    | suffix, or both.                                                              |
+	/// | search[value]   | String (optional)  | Search string passed in from datatables API.                                  |
+	/// | queryColumns    | String[] (optional)| Query columns used for constructing SQL query                                 |
+	/// | caseSensitive   | boolean (Optional) | Use case sensitive check. Default false                                       | TODO
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
 	///
@@ -110,6 +116,11 @@ public class MetaTableApiBuilder {
 		int draw = req.getInt("draw");
 		int start = req.getInt("start");
 		int limit = req.getInt("length");
+		boolean caseSensitive = req.getBoolean("caseSensitive", true);
+		
+		String searchParams = req.getString("search[value]", "");
+		String[] queryColumns = req.getStringArray("queryColumns");
+		String wildcardMode = req.getString("wildcardMode", "suffix");
 		
 		String orderByStr = req.getString("orderBy");
 		if (orderByStr == null || orderByStr.isEmpty()) {
@@ -122,8 +133,31 @@ public class MetaTableApiBuilder {
 			headers = new String[] { "_oid" };
 		}
 		
-		String query = req.getString("query");
+		String query = req.getString("query", "");
 		String[] queryArgs = req.getStringArray("queryArgs");
+		if(queryArgs == null){
+			queryArgs = new String[0];
+		}
+		
+		if(!searchParams.isEmpty() && queryColumns != null){
+			query = query + " AND " + generateQueryStringForSearchValue(searchParams, queryColumns, wildcardMode); //rebuilding query string
+			
+			List<String> queryArgsList =  new ArrayList<String>(); //rebuild query arguments
+			if(queryArgs != null){
+				for(String queryArg : queryArgs){
+					queryArgsList.add(queryArg);
+				}
+			}
+			
+			String[] searchStringSplit = searchParams.split("\\s");
+			for(String searchString : searchStringSplit){
+				for(String queryColumn : queryColumns){
+					queryArgsList.add(getStringWithPrefix(searchString, wildcardMode));
+				}
+			}
+			queryArgs = queryArgsList.toArray(new String[queryArgsList.size()]);
+		}
+		
 		boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
 		
 		//put back into response
@@ -146,6 +180,45 @@ public class MetaTableApiBuilder {
 		return res;
 	};
 	
+	private String generateQueryStringForSearchValue(String inSearchString, String[] queryColumns, String wildcardMode){
+		if(inSearchString != null && queryColumns != null){
+			String[] searchStringSplit = inSearchString.split("\\s");
+			StringBuilder querySB = new StringBuilder();
+			
+			for(int i = 0; i < searchStringSplit.length; ++i){
+				querySB.append("(");
+				for(int queryCol = 0; queryCol < queryColumns.length; ++queryCol){
+					String searchString = getStringWithPrefix(searchStringSplit[i], wildcardMode);
+					
+					//querySB.append(queryColumns[queryCol] + " LIKE " + searchString);
+					querySB.append(queryColumns[queryCol] + " LIKE ?");
+					
+					if(queryCol < queryColumns.length - 1){
+						querySB.append(" OR ");
+					}
+				}
+				querySB.append(")");
+				
+				if(i < searchStringSplit.length -1){
+					querySB.append(" AND ");
+				}
+			}
+			return querySB.toString();
+		}else{
+			return "";
+		}
+	}
+	
+	private String getStringWithPrefix(String searchString, String wildcardMode){
+		if(wildcardMode.equalsIgnoreCase("prefix")){
+			return "%" + searchString;
+		}else if(wildcardMode.equalsIgnoreCase("suffix")){
+			return searchString + "%";
+		}else{
+			return "%" + searchString + "%";
+		}
+	}
+	
 	public List<List<Object>> list_GET_and_POST_inner(int draw, int start, int length, String[] headers, String query,
 		String[] queryArgs, String orderBy, boolean sanitiseOutput) throws RuntimeException {
 		if (_metaTableObj == null) {
@@ -153,7 +226,6 @@ public class MetaTableApiBuilder {
 		}
 		
 		List<List<Object>> ret = new ArrayList<List<Object>>();
-		
 		try {
 			if (headers != null && headers.length > 0) {
 				MetaObject[] metaObjs = null;

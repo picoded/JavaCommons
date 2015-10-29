@@ -22,7 +22,7 @@ import java.io.PrintWriter;
 
 import java.util.concurrent.ExecutionException;
 
-import picoded.JSql.JSqlType;
+import picoded.enums.JSqlType;
 import picoded.JSql.JSqlResult;
 import picoded.JSql.JSqlException;
 

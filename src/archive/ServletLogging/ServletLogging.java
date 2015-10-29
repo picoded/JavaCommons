@@ -14,7 +14,7 @@ import picoded.conv.GUID;
 import picoded.JSql.JSql;
 import picoded.JSql.JSqlException;
 import picoded.JSql.JSqlResult;
-import picoded.JSql.JSqlType;
+import picoded.enums.JSqlType;
 import picoded.utils.systemInfo;
 
 import java.math.BigInteger;

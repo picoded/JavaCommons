@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 /// Picoded imports
 import picoded.conv.*;
+import picoded.enums.JSqlType;
 import picoded.enums.ObjectTokens;
 import picoded.JSql.*;
 import picoded.JStruct.*;

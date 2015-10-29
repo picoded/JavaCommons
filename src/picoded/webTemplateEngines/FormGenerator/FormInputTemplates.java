@@ -680,7 +680,8 @@ public class FormInputTemplates {
 			//retrieve the name, and append _date to it
 			String hiddenInputName = node.getFieldName(); //set the hidden input field to the name given
 			if (hiddenInputName != null && !hiddenInputName.isEmpty()) {
-				node.replace("field", hiddenInputName + "_date");
+				//node.replace("field", hiddenInputName + "_date");
+				node.replace("field",  node.getFieldNameWithoutPrefix() + "_date");
 				
 				String onchangeFunctionString = "changeDateToEpochTime(this.value, '" + hiddenInputName + "')";
 				paramMap.put("onchange", onchangeFunctionString);

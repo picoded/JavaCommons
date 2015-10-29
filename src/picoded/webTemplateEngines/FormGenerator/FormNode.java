@@ -677,6 +677,14 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return "";
 	}
 	
+	public String getFieldNameWithoutPrefix(){
+		if (containsKey(JsonKeys.FIELD) || !namePrefix.isEmpty()) {
+			return RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(getString(JsonKeys.FIELD, ""))
+				.toLowerCase();
+		}
+		return "";
+	}
+	
 	/// Returns the field value as a string
 	public String getStringValue() {
 		String fieldName = getFieldName();

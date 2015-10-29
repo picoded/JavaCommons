@@ -366,13 +366,12 @@ public class JSql_MetaTableUtils {
 		
 		String lBracket = "'";
 		String rBracket = "'";
-		if (sql.sqlType == JSqlType.mssql) {
-			lBracket = "[";
-			rBracket = "]";
-		} else {
-			lBracket = "";
-			rBracket = "";
-		}
+		
+		// Reserved to overwrite, and to do more complex quotes
+		// if (sql.sqlType == JSqlType.mssql) {
+		// 	lBracket = "[";
+		// 	rBracket = "]";
+		// }
 		
 		//
 		// Select / From StringBuilder setup

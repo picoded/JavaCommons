@@ -214,6 +214,45 @@ public class MetaTable_test {
 		
 	}
 	
+	///
+	/// Handle right outer closign bracket in metatable meta names
+	///
+	@Test
+	public void mssqlOuterBrackerInMetaNameFlaw() {
+		HashMap<String, Object> objMap = null;
+		MetaObject[] qRes = null;
+		
+		//
+		// Setup vars to test against
+		//
+		objMap = new CaseInsensitiveHashMap<String, Object>();
+		objMap.put("num[0].val", new Integer(2));
+		mtObj.append(null, objMap).saveDelta();
+		
+		objMap = new CaseInsensitiveHashMap<String, Object>();
+		objMap.put("str[0].val", "nope");
+		objMap.put("str[1].val", "rawr");
+		mtObj.append(null, objMap);
+		
+		objMap = new CaseInsensitiveHashMap<String, Object>();
+		objMap.put("num[0].val", new Integer(2));
+		objMap.put("str[0].val", "nope");
+		mtObj.append(null, objMap);
+		
+		//
+		// Query to run
+		//
+		assertNotNull(qRes = mtObj.query("num[0].val = ?", new Object[] { 2 }));
+		assertEquals(2, qRes.length);
+		
+		assertNotNull(qRes = mtObj.query("str[0].val = ?", new Object[] { "nope" }));
+		assertEquals(2, qRes.length);
+		
+		assertNotNull(qRes = mtObj.query("str[1].val = ?", new Object[] { "rawr" }));
+		assertEquals(1, qRes.length);
+		
+	}
+	
 	@Test
 	public void missingStrError() {
 		HashMap<String, Object> objMap = new HashMap<String, Object>();

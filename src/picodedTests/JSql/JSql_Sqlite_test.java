@@ -429,4 +429,24 @@ public class JSql_Sqlite_test {
 		assertNotNull("SQL result returns as expected", r);
 	}
 	
+	/// JSQL table collumn with ending bracket ], which may breaks MS-SQL
+	@Test
+	public void mssqlClosingBracketInCollumnName() throws JSqlException {
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); //cleanup (just incase)
+		
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( 'col[1].pk' INT PRIMARY KEY, col2 TEXT )").dispose(); //valid table creation : no exception
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( 'col[1].pk' INT PRIMARY KEY, col2 TEXT )").dispose(); //run twice to ensure "IF NOT EXISTS" works
+		
+		JSqlObj.query("INSERT INTO " + testTableName + " ( 'col[1].pk', col2 ) VALUES (?,?)", 404, "has nothing").dispose();
+		JSqlObj.query("INSERT INTO " + testTableName + " ( 'col[1].pk', col2 ) VALUES (?,?)", 405, "has nothing").dispose();
+		
+		JSqlResult r = null;
+		
+		assertNotNull("SQL result returns as expected", r = JSqlObj.query("SELECT 'col[1].pk' FROM " + testTableName + ""));
+		r.dispose();
+		
+		assertNotNull("SQL result returns as expected", r = JSqlObj.query("SELECT 'col[1].pk' AS 'test[a].pk' FROM " + testTableName + " WHERE \"col[1].pk\" > 404"));
+		r.dispose();
+	}
+	
 }

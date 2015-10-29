@@ -34,7 +34,8 @@ public class PDFUtils {
 	 * @param outputStream
 	 * 
 	 */
-	public void mergePDF(List<InputStream> fileList, OutputStream outputStream) {
+	public static void mergePDF(List<InputStream> fileList, OutputStream outputStream) throws DocumentException,
+		IOException {
 		Document document = null;
 		try {
 			document = new Document();
@@ -53,8 +54,6 @@ public class PDFUtils {
 				}
 			}
 			
-		} catch (Exception e) {
-			e.printStackTrace();
 		} finally {
 			if (document.isOpen())
 				document.close();
@@ -75,48 +74,37 @@ public class PDFUtils {
 	 * @param pdfFileName
 	 * 
 	 */
-	public int countPDFPages(String pdfFileName) {
-		PdfReader reader = null;
-		try {
-			reader = new PdfReader(pdfFileName);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public static int countPDFPages(InputStream pdfFileName) throws IOException {
+		PdfReader reader = new PdfReader(pdfFileName);
 		return reader.getNumberOfPages();
 	}
 	
-	private static void createOutputFolder(String outputFilePath) throws IOException {
-		String outputFolderpath = outputFilePath.substring(0, outputFilePath.lastIndexOf(File.separator));
-		File outputFolder = new File(outputFolderpath);
-		
-		if (!outputFolder.exists()) {
-			outputFolder.mkdirs();
-		}
-	}
-	
 	/**
+	 * This method create new PDF file and add specified range of pages from source file.
 	 * 
-	 * 
-	 * @param inputStream
-	 * @param fromPage
-	 * @param toPage
+	 * @param inputStream InputStram
+	 * @param fromPage int
+	 * @param toPage int
 	 * 
 	 */
-	public void splitPDF(InputStream inputStream, int fromPage, int toPage) {
+	public static void splitPDF(InputStream inputStream, int fromPage, int toPage, OutputStream outputStream)
+		throws DocumentException, IOException {
 		Document document = new Document();
+		if (fromPage <= 0) {
+			fromPage = 1;
+		}
+		if (toPage <= 0) {
+			toPage = 1;
+		}
 		if (fromPage > toPage) {
 			fromPage = toPage;
 		}
 		String pdfFile = "subPage.pdf";
-		OutputStream outputStream = null;
 		try {
-			createOutputFolder(pdfFile.replaceAll("[/\\\\]+",
-				Matcher.quoteReplacement(System.getProperty("file.separator"))));
 			PdfReader pdfReader = new PdfReader(inputStream);
 			if (toPage > pdfReader.getNumberOfPages()) {
 				toPage = pdfReader.getNumberOfPages();
 			}
-			outputStream = new FileOutputStream(pdfFile);
 			PdfWriter writer = PdfWriter.getInstance(document, outputStream);
 			document.open();
 			PdfContentByte content = writer.getDirectContent();
@@ -128,17 +116,9 @@ public class PDFUtils {
 				fromPage++;
 			}
 			outputStream.flush();
-		} catch (Exception e) {
-			e.printStackTrace();
 		} finally {
 			if (document.isOpen())
 				document.close();
-			try {
-				if (outputStream != null)
-					outputStream.close();
-			} catch (IOException ioe) {
-				ioe.printStackTrace();
-			}
 		}
 	}
 	

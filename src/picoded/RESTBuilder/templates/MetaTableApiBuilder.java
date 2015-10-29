@@ -90,9 +90,9 @@ public class MetaTableApiBuilder {
 	/// |                 |                    | are returned as well.                                                         |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | wildcardMode    | String (optional)  | Default SUFFIX. Determines SQL query wildcard position. Either prefix,        |
-	/// |                 |                    | suffix, or both.                                                              |
+	/// |                 |                    | suffix, or both. Defaults to suffix                                           |
 	/// | search[value]   | String (optional)  | Search string passed in from datatables API.                                  |
-	/// | queryColumns    | String[] (optional)| Query columns used for constructing SQL query                                 |
+	/// | queryColumns    | String[] (optional)| Query columns used for searching, defaults to headers                         |
 	/// | caseSensitive   | boolean (Optional) | Use case sensitive check. Default false                                       | TODO
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// 
@@ -118,8 +118,13 @@ public class MetaTableApiBuilder {
 		int limit = req.getInt("length");
 		boolean caseSensitive = req.getBoolean("caseSensitive", true);
 		
-		String searchParams = req.getString("search[value]", "");
-		String[] queryColumns = req.getStringArray("queryColumns");
+		String[] headers = req.getStringArray("headers");
+		if (headers == null || headers.length < 1) {
+			headers = new String[] { "_oid" };
+		}
+		
+		String[] queryColumns = req.getStringArray("queryColumns",headers);
+		String searchParams = req.getString("search[value]", "").trim();
 		String wildcardMode = req.getString("wildcardMode", "suffix");
 		
 		String orderByStr = req.getString("orderBy");
@@ -127,21 +132,22 @@ public class MetaTableApiBuilder {
 			orderByStr = "oID";
 		}
 		
-		String[] headers = req.getStringArray("headers");
-		
-		if (headers == null || headers.length < 1) {
-			headers = new String[] { "_oid" };
-		}
-		
+		// The query to use
 		String query = req.getString("query", "");
 		String[] queryArgs = req.getStringArray("queryArgs");
 		if(queryArgs == null){
 			queryArgs = new String[0];
 		}
 		
-		if(!searchParams.isEmpty() && queryColumns != null){
-			query = query + " AND " + generateQueryStringForSearchValue(searchParams, queryColumns, wildcardMode); //rebuilding query string
-			
+		// The query that was given (needed for recordsTotal counting)
+		String queryOriginal = query;
+		String[] queryOriginalArgs = req.getStringArray("queryArgs");
+		
+		// Indicates if the additional searchParams reduction
+		boolean dataTableSearchFilter = false;
+		
+		// Data tables search refinement
+		if(!searchParams.isEmpty() && queryColumns != null && queryColumns.length > 0){
 			List<String> queryArgsList =  new ArrayList<String>(); //rebuild query arguments
 			if(queryArgs != null){
 				for(String queryArg : queryArgs){
@@ -149,26 +155,37 @@ public class MetaTableApiBuilder {
 				}
 			}
 			
-			String[] searchStringSplit = searchParams.split("\\s");
-			for(String searchString : searchStringSplit){
-				for(String queryColumn : queryColumns){
-					queryArgsList.add(getStringWithPrefix(searchString, wildcardMode));
-				}
-			}
+			query = "" + query + " AND " + generateQueryStringForSearchValue(searchParams, queryColumns, wildcardMode) + ""; //rebuilding query string
+			generateQueryStringArgsForSearchValue_andAddToList(searchParams, queryColumns, wildcardMode, queryArgsList);
 			queryArgs = queryArgsList.toArray(new String[queryArgsList.size()]);
+			
+			dataTableSearchFilter = true;
 		}
 		
+		// Used to sanatize the output result, to protect against HTML injections (by default)
 		boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
 		
-		//put back into response
+		// put back into response, draws and headers
 		res.put("draw", draw);
 		res.put("headers", headers);
 		
-		res.put("recordsTotal", _metaTableObj.size());
-		if (query != null && !query.isEmpty() && queryArgs != null && queryArgs.length > 0) {
-			res.put("recordsFiltered", _metaTableObj.queryCount(query, queryArgs));
+		// Records total handling
+		long recordsTotal = 0;
+		if(queryOriginal != null && queryOriginal.length() > 0) {
+			recordsTotal = _metaTableObj.queryCount(queryOriginal, queryOriginalArgs); //base reduce count
+		} else {
+			recordsTotal = _metaTableObj.size(); //count all
 		}
+		res.put("recordsTotal", recordsTotal);
 		
+		// Records filtered handling
+		long recordsFiltered = recordsTotal;
+		if( dataTableSearchFilter ) {
+			recordsFiltered = _metaTableObj.queryCount(query, queryArgs);
+		}
+		res.put("recordsFiltered", recordsFiltered);
+		
+		// Actual fetching of data
 		List<List<Object>> data = null;
 		try {
 			data = list_GET_and_POST_inner(draw, start, limit, headers, query, queryArgs, orderByStr, sanitiseOutput);
@@ -180,17 +197,29 @@ public class MetaTableApiBuilder {
 		return res;
 	};
 	
-	private String generateQueryStringForSearchValue(String inSearchString, String[] queryColumns, String wildcardMode){
+	private static List<String> generateQueryStringArgsForSearchValue_andAddToList(String inSearchString, String[] queryColumns, String wildcardMode, List<String> ret) {
 		if(inSearchString != null && queryColumns != null){
-			String[] searchStringSplit = inSearchString.split("\\s");
+			String[] searchStringSplit = inSearchString.split("\\s+");
+			StringBuilder querySB = new StringBuilder();
+			
+			for(String searchString : searchStringSplit){
+				for(String queryColumn : queryColumns){
+					ret.add(getStringWithWildcardMode(searchString, wildcardMode));
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	private static String generateQueryStringForSearchValue(String inSearchString, String[] queryColumns, String wildcardMode){
+		if(inSearchString != null && queryColumns != null){
+			String[] searchStringSplit = inSearchString.split("\\s+");
 			StringBuilder querySB = new StringBuilder();
 			
 			for(int i = 0; i < searchStringSplit.length; ++i){
 				querySB.append("(");
 				for(int queryCol = 0; queryCol < queryColumns.length; ++queryCol){
-					String searchString = getStringWithPrefix(searchStringSplit[i], wildcardMode);
-					
-					//querySB.append(queryColumns[queryCol] + " LIKE " + searchString);
 					querySB.append(queryColumns[queryCol] + " LIKE ?");
 					
 					if(queryCol < queryColumns.length - 1){
@@ -204,12 +233,12 @@ public class MetaTableApiBuilder {
 				}
 			}
 			return querySB.toString();
-		}else{
-			return "";
 		}
+		
+		return "";
 	}
 	
-	private String getStringWithPrefix(String searchString, String wildcardMode){
+	private static String getStringWithWildcardMode(String searchString, String wildcardMode){
 		if(wildcardMode.equalsIgnoreCase("prefix")){
 			return "%" + searchString;
 		}else if(wildcardMode.equalsIgnoreCase("suffix")){

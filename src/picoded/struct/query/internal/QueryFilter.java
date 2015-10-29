@@ -408,6 +408,20 @@ public class QueryFilter {
 		}
 		
 		if (combinationType == null) {
+			
+			// Empty token handling
+			if( tokens == null || tokens.size() == 0 ) {
+				if( childList == null || childList.size() == 0 ) {
+					throw new RuntimeException("Missing combination token: Empty tokens and child list");
+				}
+				
+				// Single nested child, promote it
+				if(childList.size() == 1) {
+					return childList.get(0);
+				} else {
+					return combinationQuery("AND", childList, paramMap);
+				}
+			}
 			throw new RuntimeException("Missing combination token: " + tokens);
 		}
 		

@@ -199,13 +199,15 @@ public class MetaTableApiBuilder {
 	
 	private static List<String> generateQueryStringArgsForSearchValue_andAddToList(String inSearchString, String[] queryColumns, String wildcardMode, List<String> ret) {
 		if(inSearchString != null && queryColumns != null){
-			String[] searchStringSplit = inSearchString.split("\\s+");
+			String[] searchStringSplit = inSearchString.trim().split("\\s+");
 			StringBuilder querySB = new StringBuilder();
 			
-			for(String searchString : searchStringSplit){
+			String wildMode = wildcardMode;
+			for(String searchString : searchStringSplit) {
 				for(String queryColumn : queryColumns){
-					ret.add(getStringWithWildcardMode(searchString, wildcardMode));
+					ret.add(getStringWithWildcardMode(searchString, wildMode));
 				}
+				wildMode = "both"; //Second string onwards is both side wildcard
 			}
 		}
 		
@@ -214,7 +216,7 @@ public class MetaTableApiBuilder {
 	
 	private static String generateQueryStringForSearchValue(String inSearchString, String[] queryColumns, String wildcardMode){
 		if(inSearchString != null && queryColumns != null){
-			String[] searchStringSplit = inSearchString.split("\\s+");
+			String[] searchStringSplit = inSearchString.trim().split("\\s+");
 			StringBuilder querySB = new StringBuilder();
 			
 			for(int i = 0; i < searchStringSplit.length; ++i){

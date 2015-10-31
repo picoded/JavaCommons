@@ -141,6 +141,12 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 			
 			// Key Values search index
 			//------------------------------------------------
+			
+			///
+			/// Note as this checks nVl also, 
+			/// its IMPORTANT that nVl = 0 is passed
+			/// For string based search
+			///
 			sqlObj.createTableIndexQuerySet( //
 				sqlTableName, "kID, nVl, sVl", null, "valMap" //
 			).execute(); //
@@ -156,12 +162,12 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 			//------------------------------------------------
 			//if (sqlObj.sqlType != JSqlType.sqlite) {
 			//	sqlObj.createTableIndexQuerySet( //
-			//		tName, "tVl", "FULLTEXT", "tVl" //
+			//		tName, "tVl", "FULLTEXT", "tVlT" //
 			//	).execute();
 			//} else {
-			sqlObj.createTableIndexQuerySet( //
-				sqlTableName, "tVl", null, "tVl" // Sqlite uses normal index
-			).execute(); //
+			// sqlObj.createTableIndexQuerySet( //
+			// 	sqlTableName, "tVl", null, "tVlI" // Sqlite uses normal index
+			// ).execute(); //
 			//}
 			
 			//

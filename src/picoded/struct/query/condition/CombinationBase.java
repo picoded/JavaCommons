@@ -28,6 +28,24 @@ public class CombinationBase implements Query {
 	// Constructor Setup
 	//--------------------------------------------------------------------
 	
+	/// Convienence constructor, and default argument
+	///
+	/// @param   left child query
+	/// @param   right child query
+	/// @param   default argument map to get test value
+	///
+	public CombinationBase(Query leftQuery, Query rightQuery, Map<String, Object> defaultArgMap) {
+		_children = new ArrayList<Query>();
+		if(leftQuery != null) {
+			_children.add(leftQuery);
+		}
+		if(rightQuery != null) {
+			_children.add(rightQuery);
+		}
+		
+		_argMap = defaultArgMap;
+	}
+	
 	/// The constructor with the field name, and default argument
 	///
 	/// @param   children conditions to test

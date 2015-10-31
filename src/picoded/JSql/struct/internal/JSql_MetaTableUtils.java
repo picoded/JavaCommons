@@ -17,6 +17,7 @@ import picoded.JSql.*;
 import picoded.JStruct.*;
 import picoded.struct.*;
 import picoded.struct.query.*;
+import picoded.struct.query.condition.*;
 import picoded.struct.query.internal.*;
 
 ///
@@ -343,6 +344,9 @@ public class JSql_MetaTableUtils {
 		return ret;
 	}
 	
+	/// Lowercase suffix string
+	protected static String lowerCaseSuffix = "#lc";
+	
 	///
 	/// The complex left inner join StringBuilder used for view / query requests
 	///
@@ -441,13 +445,18 @@ public class JSql_MetaTableUtils {
 				select.append(lBracket + key + rBracket);
 				
 				select.append(", S" + joinCount + ".sVl AS ");
-				select.append(lBracket + key + "_lc" + rBracket);
+				select.append(lBracket + key + lowerCaseSuffix + rBracket);
 				
 				from.append(" " + joinType + " JOIN " + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
-				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = ?");
 				
+				// Key based seperation
+				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = ?");
 				queryArgs.add(key);
+				
+				// Numeric value = 0, index optimization
+				from.append(" AND S" + joinCount + ".nVl = ? ");
+				queryArgs.add(0.0);
 				
 			} else if (type == MetaType.TEXT) {
 				
@@ -456,9 +465,14 @@ public class JSql_MetaTableUtils {
 				
 				from.append(" " + joinType + " JOIN " + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
-				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = ?");
 				
+				// Key based seperation
+				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = ?");
 				queryArgs.add(key);
+				
+				// Numeric value = 0, index optimization
+				from.append(" AND S" + joinCount + ".nVl = ? ");
+				queryArgs.add(0.0);
 				
 			} else {
 				// Unknown MetaType ignored
@@ -539,7 +553,10 @@ public class JSql_MetaTableUtils {
 			String field = QueryUtils.unwrapFieldName(orderSet);
 			
 			// Add as query args
+			// No longer used, as its not supported in most SQL
+			//
 			// queryArgs.add(field);
+			//
 			
 			// Push the return string, add the seperators when needed
 			if (first != true) {
@@ -575,9 +592,7 @@ public class JSql_MetaTableUtils {
 	///
 	/// @returns  The MetaObject[] array
 	public static JSqlResult metaTableSelectQueryBuilder( //
-		//
 		MetaTable metaTableObj, JSql sql, String tablename, String selectedCols, //
-		//
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
 	
@@ -600,18 +615,70 @@ public class JSql_MetaTableUtils {
 				queryBuilder.append(" ORDER BY ");
 				queryBuilder.append(sanatizeOrderByString(orderByStr, complexQueryArgs));
 			}
+			
 		} else {
 			
 			// Building the MetaTypeMap from where request
 			MetaTypeMap queryTypeMap = new MetaTypeMap();
 			
 			// Validating the Where clause and using it to build the MetaTypeMap
-			Query queryObj = Query.build(whereClause, whereValues);
-			Map<String, List<Object>> queryMap = queryObj.keyValuesMap();
-			for (String key : queryMap.keySet()) {
-				MetaType subType = valueToMetaType(queryMap.get(key).get(0));
-				if (subType != null) {
-					queryTypeMap.put(key, subType);
+			Query queryObj = null;
+			
+			if (whereClause != null && whereClause.length() >= 0) {
+				
+				// Conversion to query object, round 1 of sanatizing
+				queryObj = Query.build(whereClause, whereValues);
+				
+				// Build the query type map
+				Map<String, List<Object>> queryMap = queryObj.keyValuesMap();
+				for (String key : queryMap.keySet()) {
+					
+					//if( key.endsWith(lowerCaseSuffix) ) {
+					//	
+					//}
+					
+					MetaType subType = valueToMetaType(queryMap.get(key).get(0));
+					if (subType != null) {
+						queryTypeMap.put(key, subType);
+					}
+				}
+				
+				// Gets the original field query map, to do subtitution
+				Map<String,List<Query>> fieldQueryMap = queryObj.fieldQueryMap();
+				
+				//
+				// Parses the where clause with query type map, 
+				// to enforce lower case search for string based nodes
+				//
+				for( String key : queryTypeMap.keySet() ) {
+					
+					// For each string based search, enforce lowercase search
+					MetaType subType = queryTypeMap.get(key);
+					if( subType == MetaType.STRING ) {
+						
+						// The query list to do lower case replacement
+						List<Query> toReplaceQueries = fieldQueryMap.get( key );
+						
+						// Skip if blank
+						if( toReplaceQueries == null || toReplaceQueries.size() <= 0 ) {
+							continue;
+						}
+						
+						// Iterate the queries to replace them
+						for( Query toReplace : toReplaceQueries ) {
+							Query replacement = new And(
+								QueryFilter.basicQueryFromTokens(
+									toReplace.defaultArgumentMap(),
+									toReplace.fieldName(),
+									toReplace.operatorSymbol(),
+									":"+toReplace.argumentName()
+								),
+								toReplace,
+								toReplace.defaultArgumentMap()
+							);
+							queryObj = queryObj.replaceQuery(toReplace, replacement);
+						}
+					}
 				}
 			}
 			
@@ -625,12 +692,10 @@ public class JSql_MetaTableUtils {
 			queryBuilder.append(") AS R");
 			
 			// WHERE query is built from queryObj, this acts as a form of sql sanitization
-			//
-			// @TODO Check that all query col names are SQL escape safe
-			if (whereClause != null) {
+			if (queryObj != null) {
 				queryBuilder.append(" WHERE ");
-				queryBuilder.append(queryObj.toString().replaceAll(":[0-9]+", "?"));
-				complexQueryArgs.addAll(Arrays.asList(whereValues));
+				queryBuilder.append(queryObj.toSqlString());
+				complexQueryArgs.addAll(queryObj.queryArgumentsList());
 			}
 			
 			// @TODO sanatize ORDER BY for SQL injection
@@ -712,16 +777,10 @@ public class JSql_MetaTableUtils {
 		//
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
-		JSqlResult r = metaTableSelectQueryBuilder( //
-			metaTableObj, sql, tablename, "DISTINCT oID", whereClause, whereValues, orderByStr, offset, limit);
-		//logger.log( Level.WARNING, r.toString() );
-		List<Object> oID_list = r.get("oID");
-		// Generate the object list
-		if (oID_list != null) {
-			return metaTableObj.getArrayFromID(ListValueConv.objectListToStringArray(oID_list), true);
-		}
-		// Blank list as fallback
-		return new MetaObject[0];
+		return metaTableObj.getArrayFromID(
+			metaTableQueryKey(metaTableObj, sql, tablename, whereClause, whereValues, orderByStr, offset, limit), 
+			true
+		);
 	}
 	
 	/// Performs a search query, and returns the respective MetaObjects
@@ -743,10 +802,9 @@ public class JSql_MetaTableUtils {
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
 		JSqlResult r = metaTableSelectQueryBuilder(
-			//
 			metaTableObj, sql, tablename, "COUNT(DISTINCT oID) AS rcount", whereClause, whereValues, orderByStr, offset,
 			limit);
-		//logger.log( Level.WARNING, r.toString() );
+			
 		List<Object> rcountArr = r.get("rcount");
 		// Generate the object list
 		if (rcountArr != null) {

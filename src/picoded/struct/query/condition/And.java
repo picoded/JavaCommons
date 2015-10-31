@@ -9,6 +9,16 @@ public class And extends CombinationBase {
 	// Constructor Setup
 	//--------------------------------------------------------------------
 	
+	/// Convienence constructor, and default argument
+	///
+	/// @param   left child query
+	/// @param   right child query
+	/// @param   default argument map to get test value
+	///
+	public And(Query leftQuery, Query rightQuery, Map<String, Object> defaultArgMap) {
+		super(leftQuery, rightQuery, defaultArgMap);
+	}
+	
 	/// The constructor with the field name, and default argument
 	///
 	/// @param   set of children queries

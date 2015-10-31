@@ -2,6 +2,8 @@ package picoded.struct.query;
 
 import java.util.function.*;
 import java.util.*;
+
+import picoded.struct.*;
 import picoded.struct.query.internal.QueryFilter;
 
 ///
@@ -77,6 +79,14 @@ public interface Query extends Predicate<Object> {
 		return null;
 	}
 	
+	/// Gets the default argument map
+	public default Object defaultArgumentValue() {
+		if(defaultArgumentMap() != null) {
+			return defaultArgumentMap().get(argumentName());
+		}
+		return null;
+	}
+	
 	/// Indicates if its a basic operator
 	public default boolean isBasicOperator() {
 		return false;
@@ -97,6 +107,103 @@ public interface Query extends Predicate<Object> {
 	}
 	
 	//
+	// Query mapping search, modification, and arguments output
+	//--------------------------------------------------------------------
+	
+	/// Fetch the nested query map, of basic operators
+	public default Map<String,List<Query>> fieldQueryMap() {
+		return fieldQueryMap(new ArrayListMap<String,Query>());
+	}
+	
+	/// Fetch the nested query map, of basic operators.
+	/// This is the internally used recursive function.
+	public default Map<String,List<Query>> fieldQueryMap(ArrayListMap<String,Query> ret) {
+		
+		if( isBasicOperator() ) {
+			// Basic operator returns self
+			ret.addToListIfNotExists( fieldName(), this );
+			return ret.genericMap();
+		} else if( isCombinationOperator() ){
+			// Child nodes iteration 
+			for(Query child : childrenQuery()) {
+				child.fieldQueryMap(ret);
+			}
+		}
+		
+		// Return as generic
+		return ret.genericMap();
+	}
+	
+	/// Does a replacement of the selected query
+	/// and replace the amended query object (maybe itself)
+	///
+	/// If amendment fail, it replace itself
+	public default Query replaceQuery(Query original, Query replacement) {
+		
+		// The original itself needs replacement
+		if( this == original ) {
+			return replacement;
+		}
+		
+		// Iterate only combination operators
+		if( isCombinationOperator() ){
+			
+			// Does the replacement
+			List<Query> subList = childrenQuery();
+			int subListLen = subList.size();
+			
+			// Replace the nodes, or do recursive calls
+			for(int i=0; i < subListLen; ++i) {
+				Query node = subList.get(i);
+				
+				if( node == original ) {
+					subList.set(i, replacement);
+				} else if( node == replacement ) {
+					// ignroe replacement nodes
+				} else {
+					// recursive call
+					node.replaceQuery(original, replacement);
+				}
+			}
+			
+			// Apply the sublist ?
+			// childrenQuery(subList);
+		}
+		
+		return this;
+	}
+	
+	/// Returns the argument values used,
+	/// In a list, in accordance to their query components order
+	public default List<Object> queryArgumentsList() {
+		return queryArgumentsList(new ArrayList<Object>());
+	}
+	
+	/// Returns the argument values used,
+	/// In a list, in accordance to their query components order
+	///
+	/// This is the internally used recursive function.
+	public default List<Object> queryArgumentsList(List<Object> ret) {
+		
+		if( isBasicOperator() ) {
+			
+			// Push basic operator args to return output
+			ret.add(this.defaultArgumentValue());
+			
+		} else if( isCombinationOperator() ){
+			
+			// Child nodes iteration 
+			// Recursive scan
+			for(Query child : childrenQuery()) {
+				child.queryArgumentsList(ret);
+			}
+			
+		}
+		
+		return ret;
+	}
+	
+	//
 	// To string conversion
 	//--------------------------------------------------------------------
 	
@@ -106,11 +213,16 @@ public interface Query extends Predicate<Object> {
 	/// Returns the query string
 	public String toString();
 	
+	/// Returns the query string, with the SQL array format (not map format)
+	public default String toSqlString() {
+		return toString().replaceAll(":[0-9]+", "?");
+	}
+	
 	//
 	// Map based search
 	//--------------------------------------------------------------------
 	
-	// Searches using the query, and returns the resulting set
+	/// Searches using the query, and returns the resulting set
 	public default <K, V> List<V> search(Map<K, V> set) {
 		List<V> ret = new ArrayList<V>();
 		for (K key : set.keySet()) {
@@ -122,14 +234,14 @@ public interface Query extends Predicate<Object> {
 		return ret;
 	}
 	
-	// Searches using the query, and sorted by the comparator
+	/// Searches using the query, and sorted by the comparator
 	public default <K, V> List<V> search(Map<K, V> set, Comparator<V> compareFunc) {
 		List<V> ret = search(set);
 		Collections.sort(ret, compareFunc);
 		return ret;
 	}
 	
-	// Searches using the query, and sorted by the order by query
+	/// Searches using the query, and sorted by the order by query
 	public default <K, V> List<V> search(Map<K, V> set, String orderBy) {
 		return search(set, new OrderBy<V>(orderBy));
 	}

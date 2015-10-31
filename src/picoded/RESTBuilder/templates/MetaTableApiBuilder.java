@@ -93,7 +93,7 @@ public class MetaTableApiBuilder {
 	/// |                 |                    | suffix, or both. Defaults to suffix                                           |
 	/// | search[value]   | String (optional)  | Search string passed in from datatables API.                                  |
 	/// | queryColumns    | String[] (optional)| Query columns used for searching, defaults to headers                         |
-	/// | caseSensitive   | boolean (Optional) | Use case sensitive check. Default false                                       | TODO
+	/// | caseSensitive   | boolean (Optional) | Use case sensitive check. Default true?                                       | TODO
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters

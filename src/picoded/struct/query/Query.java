@@ -203,6 +203,39 @@ public interface Query extends Predicate<Object> {
 		return ret;
 	}
 	
+	/// Returns all query arguments used,
+	/// As a map, in accordance to the default map, value used
+	///
+	/// This is the internally used recursive function.
+	public default Map<String,Object> queryArgumentsMap() {
+		return queryArgumentsMap(new HashMap<String,Object>());
+	}
+	
+	/// Returns all query arguments used,
+	/// As a map, in accordance to the default map, value used
+	///
+	/// This is the internally used recursive function.
+	public default Map<String,Object> queryArgumentsMap(Map<String,Object> ret) {
+		
+		if( isBasicOperator() ) {
+			
+			// Push basic operator args to return output
+			ret.put(this.argumentName(), this.defaultArgumentValue());
+			
+		} else if( isCombinationOperator() ){
+			
+			// Child nodes iteration 
+			// Recursive scan
+			for(Query child : childrenQuery()) {
+				child.queryArgumentsMap(ret);
+			}
+			
+		}
+		
+		return ret;
+	}
+	
+	
 	//
 	// To string conversion
 	//--------------------------------------------------------------------

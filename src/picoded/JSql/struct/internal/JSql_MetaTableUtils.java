@@ -645,6 +645,8 @@ public class JSql_MetaTableUtils {
 				
 				// Gets the original field query map, to do subtitution
 				Map<String,List<Query>> fieldQueryMap = queryObj.fieldQueryMap();
+				Map<String,Object> queryArgMap = queryObj.queryArgumentsMap();
+				int newQueryArgsPos = queryArgMap.size() + 1;
 				
 				//
 				// Parses the where clause with query type map, 
@@ -666,17 +668,31 @@ public class JSql_MetaTableUtils {
 						
 						// Iterate the queries to replace them
 						for( Query toReplace : toReplaceQueries ) {
-							Query replacement = new And(
-								QueryFilter.basicQueryFromTokens(
-									toReplace.defaultArgumentMap(),
-									toReplace.fieldName(),
-									toReplace.operatorSymbol(),
-									":"+toReplace.argumentName()
-								),
-								toReplace,
-								toReplace.defaultArgumentMap()
+							
+							String argName = toReplace.argumentName();
+							Object argLowerCase = queryArgMap.get(argName);
+							if(argLowerCase != null) {
+								argLowerCase = argLowerCase.toString().toLowerCase();
+							}
+							
+							queryArgMap.put(""+newQueryArgsPos, argLowerCase);
+							Query replacement = QueryFilter.basicQueryFromTokens(
+								queryArgMap,
+								toReplace.fieldName()+lowerCaseSuffix,
+								toReplace.operatorSymbol(),
+								":"+newQueryArgsPos
 							);
+							
+							// Case sensitive varient
+							// replacement = new And(
+							// 	replacement,
+							// 	toReplace,
+							// 	queryArgMap
+							// );
+							
 							queryObj = queryObj.replaceQuery(toReplace, replacement);
+							
+							++newQueryArgsPos;
 						}
 					}
 				}

@@ -1,0 +1,2 @@
+Fix: Issue#-85
+The classpath entry has been removed from MANIFEST.MF file for fixing warning at compile time. The warnings was coming because of wrong classpath, classpath was pointing JARs at wrong path.

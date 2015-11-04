@@ -203,7 +203,7 @@ public class MetaTableApiBuilder {
 			} else {
 				metaObjs = _metaTableObj.query(query, queryArgs, orderBy, start, length);
 			}
-			
+		
 			for (MetaObject metaObj : metaObjs) {
 				List<Object> row = new ArrayList<Object>();
 				for (String header : headers) {
@@ -213,31 +213,25 @@ public class MetaTableApiBuilder {
 				//for each element in row, stringbuilder and add to ret
 				StringBuilder singleRowCSV = new StringBuilder();
 				int rowSize = row.size();
-				for(int i = 0; i < rowSize; ++i){
+				for(int i = 0; i < rowSize; i++){
 					String valStr = (String)row.get(i);
 					if(valStr == null){
 						valStr = "";
 					}
 					valStr = valStr.replace("\"", ""); //might not be best solution
 					valStr = valStr.replace("\n", "");
-					
 					valStr = "\"" + valStr + "\"";
 					singleRowCSV.append(valStr);
 					
-					if(i < rowSize - 1){
-						singleRowCSV.append(",");
-					} else {
-						//singleRowCSV.append("\n");
-					}
+					singleRowCSV.append(",");
+					ret.add(singleRowCSV.toString());
 				}
-				
-				ret.add(singleRowCSV.toString());
 			}
 			
 		} catch (Exception e) {
 			throw new RuntimeException("csv_list() ", e);
 		}
-		
+
 		return ret;
 	}
 	
@@ -256,7 +250,7 @@ public class MetaTableApiBuilder {
 		String[] headers = req.getStringArray("headers");
 		
 		if (headers == null || headers.length < 1) {
-			headers = new String[] { "_oid" };
+			headers = new String[] { "_oid", "accountName"  };
 		}
 		
 		String query = req.getString("query");
@@ -267,6 +261,7 @@ public class MetaTableApiBuilder {
 		res.put("headers", headers);
 		
 		res.put("recordsTotal", _metaTableObj.size());
+		
 		if (query != null && !query.isEmpty() && queryArgs != null && queryArgs.length > 0) {
 			res.put("recordsFiltered", _metaTableObj.queryCount(query, queryArgs));
 		}
@@ -279,25 +274,32 @@ public class MetaTableApiBuilder {
 		page.getHttpServletResponse().setContentType("text/csv");
 		page.getHttpServletResponse().setHeader("Content-Disposition", "attachment;filename=reports.csv");
 		
-		try {
-			while((data = csv_list(draw, count, limit, headers, query, queryArgs, orderByStr)).size() >= limit){
-				count += data.size();
-				for(String str : data){
-					pWriter.write(str);
-				}
-				pWriter.flush();
-			}
-			
-			//final batch write
+		//WHERE IT CLEAR ALL THE <RES> - Reason: Unknonw
+		try {	
+			// if ((data = csv_list(draw, count, limit, headers, query, queryArgs, orderByStr)).size() >= limit){
+				// count += data.size();
+				// for(String str : data){
+					// pWriter.write(str);
+				// }
+				// pWriter.flush();
+			// }
+			data = csv_list (draw, count, limit, headers, query, queryArgs, orderByStr);
+			String d = "";
 			for(String str : data){
-				pWriter.write(str);
+				d += str;
 			}
-			pWriter.flush();
+			res.put("data", d);
+			//final batch write
+			// for(String str : data){
+				// pWriter.write(str);
+			// }
+			// pWriter.flush();
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		
+		//END OF BLOCK
+		res.put("MetaTableApiBuilder", "csv_export");
 		return null;
 	};
 	

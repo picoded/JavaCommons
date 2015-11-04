@@ -1631,7 +1631,14 @@ return resMap;
 	// Work in progress (not final) end
 	//
 	//-------------------------------------------------------------------------------------------------------------------------
-	
+	public static RESTFunction csv_GET = (req, res) -> {
+		return prepareAuthenticatedREST(req, res, (reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj,
+			accObj_b) -> {
+			Map<String, Object> metaMap = mtApi.csv_export.apply(req, res);
+			res.put("AccountLogin", "csv_GET");
+			return res;
+		});
+	};
 	/////////////////////////////////////////////
 	//
 	// RestBuilder template builder
@@ -1681,6 +1688,9 @@ return resMap;
 		rb.getNamespace(setPrefix + "delete").put(HttpRequestType.DELETE, meta_DELETE);
 		rb.getNamespace(setPrefix + "delete/*").put(HttpRequestType.DELETE, meta_DELETE);
 		//end fall through segment
+		
+		//csv_export
+		rb.getNamespace(setPrefix + "csv").put(HttpRequestType.GET, csv_GET);
 		
 		return rb;
 	}

@@ -30,8 +30,36 @@ public class PDFUtils {
 	/**
 	 * Merge multiple pdf into one pdf
 	 * 
-	 * @param fileList
-	 * @param outputStream
+	 * @param fileList List<File>
+	 * @param file File
+	 * 
+	 */
+	public static void mergePDF(List<File> fileList, File outFile) throws DocumentException, IOException {
+		List<InputStream> inputStreams = new ArrayList<InputStream>();
+		OutputStream outputStream = null;
+		try {
+			for (File file : fileList) {
+				inputStreams.add(new FileInputStream(file));
+			}
+			outputStream = new FileOutputStream(outFile);
+			mergePDF(inputStreams, outputStream);
+		} finally {
+			for (InputStream inputStream : inputStreams) {
+				if (inputStream != null) {
+					inputStream.close();
+				}
+			}
+			if (outputStream != null) {
+				outputStream.close();
+			}
+		}
+	}
+	
+	/**
+	 * Merge multiple pdf into one pdf
+	 * 
+	 * @param fileList List<InputStream>
+	 * @param outputStream OutputStream
 	 * 
 	 */
 	public static void mergePDF(List<InputStream> fileList, OutputStream outputStream) throws DocumentException,
@@ -71,7 +99,20 @@ public class PDFUtils {
 	/**
 	 * Count number of pages in pdf document
 	 * 
-	 * @param pdfFileName
+	 * @param pdfFileName InputStream
+	 * 
+	 */
+	public static int countPDFPages(File pdfFileName) throws IOException {
+		InputStream inputStream = new FileInputStream(pdfFileName);
+		int pageCount = countPDFPages(inputStream);
+		inputStream.close();
+		return pageCount;
+	}
+	
+	/**
+	 * Count number of pages in pdf document
+	 * 
+	 * @param pdfFileName InputStream
 	 * 
 	 */
 	public static int countPDFPages(InputStream pdfFileName) throws IOException {
@@ -82,9 +123,38 @@ public class PDFUtils {
 	/**
 	 * This method create new PDF file and add specified range of pages from source file.
 	 * 
+	 * @param inputFile File
+	 * @param fromPage int
+	 * @param toPage int
+	 * @param outputFile File
+	 * 
+	 */
+	public static void splitPDF(File inputFile, int fromPage, int toPage, File outputFile) throws DocumentException,
+		IOException {
+		InputStream inputStream = null;
+		OutputStream outputStream = null;
+		try {
+			inputStream = new FileInputStream(inputFile);
+			outputStream = new FileOutputStream(outputFile);
+			splitPDF(inputStream, fromPage, toPage, outputStream);
+			outputStream.flush();
+		} finally {
+			if (inputStream != null) {
+				inputStream.close();
+			}
+			if (outputStream != null) {
+				outputStream.close();
+			}
+		}
+	}
+	
+	/**
+	 * This method create new PDF file and add specified range of pages from source file.
+	 * 
 	 * @param inputStream InputStram
 	 * @param fromPage int
 	 * @param toPage int
+	 * @param outputStream OutputStream
 	 * 
 	 */
 	public static void splitPDF(InputStream inputStream, int fromPage, int toPage, OutputStream outputStream)
@@ -99,7 +169,6 @@ public class PDFUtils {
 		if (fromPage > toPage) {
 			fromPage = toPage;
 		}
-		String pdfFile = "subPage.pdf";
 		try {
 			PdfReader pdfReader = new PdfReader(inputStream);
 			if (toPage > pdfReader.getNumberOfPages()) {
@@ -117,8 +186,9 @@ public class PDFUtils {
 			}
 			outputStream.flush();
 		} finally {
-			if (document.isOpen())
+			if (document.isOpen()) {
 				document.close();
+			}
 		}
 	}
 	

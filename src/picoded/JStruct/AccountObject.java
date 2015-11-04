@@ -283,7 +283,9 @@ public class AccountObject extends JStruct_MetaObject {
 		group_userToRoleMap().remove(memberOID);
 		group_userToRoleMap().saveAll();
 		
-		//mainTable.groupChild_meta.remove( this._oid()+"-"+memberOID );
+		mainTable.groupChild_meta.remove( this._oid()+"-"+memberOID );
+		
+		System.out.println("Remove member called successfully");
 		
 		return true;
 	}

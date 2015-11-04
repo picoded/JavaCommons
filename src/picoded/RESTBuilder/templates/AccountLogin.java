@@ -755,70 +755,59 @@ public class AccountLogin extends BasePage {
 		try {
 			if (headers != null && headers.length > 0) {
 				MetaObject[] metaObjs = null;
+				AccountObject[] fullUserArray = null;
 				
-				MetaTable accountMetaTable = _metaTableObj.accountMetaTable();
+				if((insideGroup_any == null || insideGroup_any.length == 0) && (hasGroupRole_any == null || hasGroupRole_any.length == 0)){
+					//do normal query
+					MetaTable accountMetaTable = _metaTableObj.accountMetaTable();
+					
+					if (accountMetaTable == null) {
+						return ret;
+					}
+					
+					if (query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0) {
+						metaObjs = accountMetaTable.query(null, null, orderBy, start, length);
+					} else {
+						metaObjs = accountMetaTable.query(query, queryArgs, orderBy, start, length);
+					}
+					
+					List<AccountObject> retUsers = new ArrayList<AccountObject>();
+					for (MetaObject metaObj : metaObjs) {
+						AccountObject ao = _metaTableObj.getFromID(metaObj._oid()); //a single account
+						retUsers.add(ao);
+					}
+					
+					fullUserArray = retUsers.toArray(new AccountObject[retUsers.size()]);
+				}else{
+					//do filtered query
+					fullUserArray = _metaTableObj.getUsersByGroupAndRole(insideGroup_any, hasGroupRole_any);
+				}
 				
-				if (accountMetaTable == null) {
+				if(fullUserArray == null || fullUserArray.length == 0){
 					return ret;
 				}
 				
-				if (query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0) {
-					metaObjs = accountMetaTable.query(null, null, orderBy, start, length);
-				} else {
-					metaObjs = accountMetaTable.query(query, queryArgs, orderBy, start, length);
-				}
-				
-				for (MetaObject metaObj : metaObjs) {
-					List<Object> row = new ArrayList<Object>();
-					
-					AccountObject ao = _metaTableObj.getFromID(metaObj._oid());
-					if (groupStatus != null) {
+				//group status filtering
+				if(groupStatus != null){
+					List<AccountObject> filteredUsers = new ArrayList<AccountObject>();
+					for(AccountObject ao : fullUserArray){
 						if (groupStatus.equalsIgnoreCase("group")) {
-							if (!ao.isGroup()) {
-								continue;
+							if (ao.isGroup()) {
+								filteredUsers.add(ao);
 							}
 						} else if (groupStatus.equalsIgnoreCase("user")) {
-							if (ao.isGroup()) {
-								continue;
+							if (!ao.isGroup()) {
+								filteredUsers.add(ao);
 							}
 						}
 					}
 					
-					//check if part of any group
-					boolean checkInsideGroupAny = (insideGroup_any != null && insideGroup_any.length > 0);
-					boolean partOfGroup = false;
-					
-					boolean hasGroupRoleAny = (hasGroupRole_any != null && hasGroupRole_any.length > 0);
-					boolean partOfGroupRole = false;
-					
-					if (checkInsideGroupAny || hasGroupRoleAny) {
-						AccountObject[] aoGroups = ao.getGroups();
-						if (aoGroups != null) {
-							for (AccountObject aoGroup : aoGroups) {
-								if (!partOfGroup && insideGroup_any != null) {
-									if (ArrayUtils.contains(insideGroup_any, aoGroup._oid())) {
-										partOfGroup = true;
-									}
-								}
-								
-								if (!partOfGroupRole && hasGroupRole_any != null) {
-									String memberRole = aoGroup.getMemberRole(ao);
-									if (ArrayUtils.contains(hasGroupRole_any, memberRole)) {
-										partOfGroupRole = true;
-									}
-								}
-							}
-						}
-						
-						if (checkInsideGroupAny && hasGroupRoleAny && !partOfGroup && !partOfGroupRole) {
-							continue;
-						} else if (checkInsideGroupAny && !partOfGroup) {
-							continue;
-						} else if (hasGroupRoleAny && !partOfGroupRole) {
-							continue;
-						}
-					}
-					
+					fullUserArray = filteredUsers.toArray(new AccountObject[filteredUsers.size()]);
+				}
+				
+				
+				for(AccountObject ao : fullUserArray){
+					List<Object> row = new ArrayList<Object>();
 					for (String header : headers) {
 						if (header.equalsIgnoreCase("names")) {
 							if (ao != null) {
@@ -837,7 +826,8 @@ public class AccountLogin extends BasePage {
 								}
 							}
 						} else {
-							Object rawVal = metaObj.get(header);
+							Object rawVal = ao.get(header); //this used to be metaObj.get
+							
 							if (sanitiseOutput && rawVal instanceof String) {
 								String stringVal = GenericConvert.toString(rawVal);
 								row.add(stringVal);
@@ -847,11 +837,9 @@ public class AccountLogin extends BasePage {
 							
 						}
 					}
-					
 					ret.add(row);
 				}
 			}
-			
 		} catch (Exception e) {
 			throw new RuntimeException("list_GET_and_POST_inner() ", e);
 		}
@@ -1206,6 +1194,7 @@ return resMap;
 					String str = (String) strRaw;
 					if (!str.isEmpty()) {
 						AccountObject memberToDelete = accountTableObj.getFromID(str);
+						
 						if (memberToDelete != null) {
 							groupObj.removeMember(memberToDelete);
 						}

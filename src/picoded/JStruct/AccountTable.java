@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 /// Picoded imports
 import picoded.conv.GUID;
 import picoded.conv.GenericConvert;
@@ -672,4 +674,60 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		return getFromName(getSuperUserGroupName());
 	}
 	
+	//
+	// Getting users based on filters
+	// TODO: To optimise because Sam is dumb
+	// --------------------------------------------------------------------------
+	public AccountObject[] getUsersByGroupAndRole(String[] insideGroupAny, String[] hasRoleAny){
+		List<AccountObject> ret = new ArrayList<AccountObject>();
+		
+		MetaObject[] metaObjs = accountMetaTable().query(null, null, "oID", 0, 0); //initial query just to get everything out so i can filter
+		
+		if(metaObjs == null){
+			return null;
+		}
+		
+		boolean doGroupCheck = (insideGroupAny != null && insideGroupAny.length > 0);
+		boolean doRoleCheck = (hasRoleAny != null && hasRoleAny.length > 0);
+		
+		for(MetaObject metaObj : metaObjs){
+			AccountObject ao = getFromID(metaObj._oid());
+			
+			if(ao == null){
+				continue;
+			}
+			
+			AccountObject[] userGroups = ao.getGroups();
+			
+			if(userGroups == null){
+				continue;
+			}
+			
+			for(AccountObject userGroup : userGroups){
+				if(doGroupCheck){
+					if (ArrayUtils.contains(insideGroupAny, userGroup._oid())) {
+						if(doRoleCheck){
+							String memberRole = userGroup.getMemberRole(ao);
+							if(ArrayUtils.contains(hasRoleAny, memberRole)){
+								ret.add(ao);
+							}
+						}else{
+							ret.add(ao);
+						}
+					}
+				}else{
+					if(doRoleCheck){
+						String memberRole = userGroup.getMemberRole(ao);
+						if(ArrayUtils.contains(hasRoleAny, memberRole)){
+							ret.add(ao);
+						}
+					}else{
+						ret.add(ao);
+					}
+				}
+			}
+		}
+		
+		return ret.toArray(new AccountObject[ret.size()]);
+	}
 }

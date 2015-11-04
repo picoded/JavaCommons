@@ -213,19 +213,25 @@ public class MetaTableApiBuilder {
 				//for each element in row, stringbuilder and add to ret
 				StringBuilder singleRowCSV = new StringBuilder();
 				int rowSize = row.size();
-				for(int i = 0; i < rowSize; i++){
+				for(int i = 0; i < rowSize; ++i){
 					String valStr = (String)row.get(i);
 					if(valStr == null){
 						valStr = "";
 					}
 					valStr = valStr.replace("\"", ""); //might not be best solution
 					valStr = valStr.replace("\n", "");
+					
 					valStr = "\"" + valStr + "\"";
 					singleRowCSV.append(valStr);
 					
-					singleRowCSV.append(",");
-					ret.add(singleRowCSV.toString());
+					if(i < rowSize - 1){
+						singleRowCSV.append(",");
+					} else {
+						singleRowCSV.append("\n");
+					}
 				}
+				
+				ret.add(singleRowCSV.toString());
 			}
 			
 		} catch (Exception e) {
@@ -276,24 +282,31 @@ public class MetaTableApiBuilder {
 		
 		//WHERE IT CLEAR ALL THE <RES> - Reason: Unknonw
 		try {	
-			// if ((data = csv_list(draw, count, limit, headers, query, queryArgs, orderByStr)).size() >= limit){
-				// count += data.size();
-				// for(String str : data){
-					// pWriter.write(str);
-				// }
-				// pWriter.flush();
-			// }
+			
+			// VIEW VIA CONSOLE.LOG()
 			data = csv_list (draw, count, limit, headers, query, queryArgs, orderByStr);
 			String d = "";
 			for(String str : data){
 				d += str;
 			}
 			res.put("data", d);
-			//final batch write
-			// for(String str : data){
-				// pWriter.write(str);
-			// }
-			// pWriter.flush();
+			
+			// IT SEEMS AS THE CSV-WRITER? DISABLE FOR VIEWING OUTPUT AS CONSOLE.LOG
+			
+			/* if ((data = csv_list(draw, count, limit, headers, query, queryArgs, orderByStr)).size() >= limit){
+				count += data.size();
+				for(String str : data){
+					pWriter.write(str);
+				}
+				pWriter.flush();
+			}
+			
+			
+			// final batch write
+			for(String str : data){
+				pWriter.write(str);
+			}
+			pWriter.flush(); */
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);

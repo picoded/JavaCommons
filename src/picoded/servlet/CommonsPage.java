@@ -31,6 +31,7 @@ import picoded.enums.*;
 import picoded.fileUtils.FileUtils;
 import picoded.JStack.*;
 import picoded.JStruct.*;
+import picoded.ServletLogging.*;
 import picoded.RESTBuilder.*;
 import picoded.RESTBuilder.templates.*;
 import picoded.webUtils.*;
@@ -257,5 +258,18 @@ public class CommonsPage extends BasePage {
 		String emailFrom = JConfigObj.getString("sys.dataStack.smtp.emailFrom", "testingTheEmailSystem@mailinator.com");
 		
 		return (_systemEmail = new EmailBroadcaster(hostname, username, password, emailFrom));
+	}
+	
+	/// Cached memoizer copy
+	protected ServletLogging _systemLogging = null;
+	
+	/// the servlet logging module
+	public ServletLogging systemLogging() {
+		// Returns cached copy if posisble
+		if(_systemLogging != null) {
+			return _systemLogging;
+		}
+		
+		return _systemLogging = new ServletLogging();
 	}
 }

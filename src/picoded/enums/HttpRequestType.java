@@ -13,6 +13,15 @@ public enum HttpRequestType {
 		public static HttpRequestType OPTION = HttpRequestType.OPTION;
 	}
 	
+	/// Get name and toString alias to name() varient
+	public String getName() {
+		return super.name();
+	}
+	
+	public String toString() {
+		return super.name();
+	}
+	
 	/// Byte to enum serialization
 	public static HttpRequestType byteToEnum(byte val) {
 		switch (val) {

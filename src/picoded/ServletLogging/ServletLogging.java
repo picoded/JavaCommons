@@ -48,7 +48,7 @@ public class ServletLogging {
 		} else if (l == LogLevel.INFO) {
 			return Level.INFO;
 		}
-		return Level.FINE;
+		return Level.INFO;
 	}
 	
 	///

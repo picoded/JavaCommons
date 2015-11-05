@@ -185,14 +185,26 @@ public class FormInputTemplates {
 		CaseInsensitiveHashMap<String, String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getStringValue();
 		
-		StringBuilder[] sbArr = null;
+		StringBuilder[] sbArr = new StringBuilder[2];
+		sbArr[0] = new StringBuilder();
+		sbArr[1] = new StringBuilder();
 		
 		if (!displayMode) {
 			sbArr = node.defaultHtmlInput(HtmlTag.TEXTAREA, "pfi_inputTextBox pfi_input", null);
+			sbArr[0].append(fieldValue);
 		} else {
-			sbArr = node.defaultHtmlInput("pre", "pfi_inputTextBox pfi_input pfi_display", null);
+			String[] fieldValParaSplit = fieldValue.split("\n");
+			for(String para : fieldValParaSplit){
+				Map<String, Object> newParaMap = new HashMap<String, Object>();
+				newParaMap.put(node.getFieldName(), para);
+				FormNode paraNode = new FormNode(node._formGenerator, node, newParaMap);
+				StringBuilder[] newPara = new StringBuilder[2];
+				newPara = paraNode.defaultHtmlInput("pre", "pfi_inputTextBox pfi_input pfi_display", null);
+				sbArr[0].append(newPara[0]);
+				sbArr[0].append(para);
+				sbArr[0].append(newPara[1]);
+			}
 		}
-		sbArr[0].append(fieldValue);
 		return sbArr[0].append(sbArr[1]);
 	}
 	

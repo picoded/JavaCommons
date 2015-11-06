@@ -256,7 +256,7 @@ public class MetaTableApiBuilder {
 		String[] headers = req.getStringArray("headers");
 		
 		if (headers == null || headers.length < 1) {
-			headers = new String[] { "_oid", "accountName"  };
+			headers = new String[] { "_oid" };
 		}
 		
 		String query = req.getString("query");
@@ -280,20 +280,19 @@ public class MetaTableApiBuilder {
 		page.getHttpServletResponse().setContentType("text/csv");
 		page.getHttpServletResponse().setHeader("Content-Disposition", "attachment;filename=reports.csv");
 		
-		//WHERE IT CLEAR ALL THE <RES> - Reason: Unknonw
 		try {	
 			
 			// VIEW VIA CONSOLE.LOG()
-			data = csv_list (draw, count, limit, headers, query, queryArgs, orderByStr);
-			String d = "";
-			for(String str : data){
-				d += str;
-			}
-			res.put("data", d);
+			// data = csv_list (draw, count, limit, headers, query, queryArgs, orderByStr);
+			// String d = "";
+			// for(String str : data){
+				// d += str;
+			// }
+			// res.put("data", d);
 			
-			// IT SEEMS AS THE CSV-WRITER? DISABLE FOR VIEWING OUTPUT AS CONSOLE.LOG
 			
-			/* if ((data = csv_list(draw, count, limit, headers, query, queryArgs, orderByStr)).size() >= limit){
+			
+			if ((data = csv_list(draw, count, limit, headers, query, queryArgs, orderByStr)).size() >= limit){
 				count += data.size();
 				for(String str : data){
 					pWriter.write(str);
@@ -306,13 +305,13 @@ public class MetaTableApiBuilder {
 			for(String str : data){
 				pWriter.write(str);
 			}
-			pWriter.flush(); */
+			pWriter.flush();
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		//END OF BLOCK
-		res.put("MetaTableApiBuilder", "csv_export");
+		
+		// res.put("MetaTableApiBuilder", "csv_export");
 		return null;
 	};
 	

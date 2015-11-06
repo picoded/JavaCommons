@@ -539,7 +539,7 @@ public class AccountLogin extends BasePage {
 				if (req.containsKey("accountID")) {
 					id = req.getString("accountID");
 				}
-				;
+				
 				
 				if (!id.isEmpty()) {
 					account = at.getFromID(id);

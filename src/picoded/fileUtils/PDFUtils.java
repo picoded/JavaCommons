@@ -10,12 +10,17 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.lowagie.text.Element;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfImportedPage;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.PdfCopy;
+import com.lowagie.text.pdf.ColumnText;
+import com.lowagie.text.Phrase;
+
 import java.util.regex.Matcher;
 
 /**
@@ -93,6 +98,40 @@ public class PDFUtils {
 			} catch (IOException ioe) {
 				ioe.printStackTrace();
 			}
+		}
+	}
+	
+	///
+	/// Taken from http://itextpdf.com/examples/iia.php?id=128
+	/// Takes an input pdf, and outputs to a different location with page numbering
+	///
+	public static void numberPDFPages(File pdfToNumber, File outputFile) throws DocumentException, IOException, FileNotFoundException{
+		Document document = new Document();
+		PdfCopy copy = new PdfCopy(document, new FileOutputStream(outputFile));
+		document.open();
+		
+		PdfReader reader = new PdfReader(pdfToNumber.getAbsolutePath());
+		int totalPages = reader.getNumberOfPages();
+		
+		try{
+			PdfImportedPage page;
+			PdfCopy.PageStamp stamp;
+			for(int i = 0; i < totalPages; ++i){
+				page = copy.getImportedPage(reader, i + 1);
+				stamp = copy.createPageStamp(page);
+				
+				ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_CENTER,
+				new Phrase(String.format("Page %d of %d", i + 1, totalPages)),
+				297.5f, 28, 0);
+				
+				stamp.alterContents();
+				copy.addPage(page);
+			}
+		} catch(Exception ex){
+			throw new RuntimeException(ex);
+		}finally{
+			document.close();
+			reader.close();
 		}
 	}
 	

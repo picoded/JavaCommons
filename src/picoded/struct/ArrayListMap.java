@@ -6,7 +6,7 @@ import java.util.*;
 /// Provides a HashMap<K,A ArrayList<V>>,
 /// with utility functions to edit records
 ///
-public class ArrayListMap<K,V> extends HashMap<K,ArrayList<V>> {
+public class ArrayListMap<K, V> extends HashMap<K, ArrayList<V>> {
 	
 	/// Blank constructor
 	public ArrayListMap() {
@@ -22,7 +22,7 @@ public class ArrayListMap<K,V> extends HashMap<K,ArrayList<V>> {
 	protected ArrayList<V> getSubList(K key) {
 		ArrayList<V> ret = get(key);
 		
-		if( ret == null ) {
+		if (ret == null) {
 			ret = new ArrayList<V>();
 			put(key, ret);
 		}
@@ -47,14 +47,14 @@ public class ArrayListMap<K,V> extends HashMap<K,ArrayList<V>> {
 	///
 	public void addToListIfNotExists(K key, V val) {
 		ArrayList<V> subList = getSubList(key);
-		if( !(subList.contains(val)) ) {
+		if (!(subList.contains(val))) {
 			subList.add(val);
 		}
 	}
 	
 	/// Returns the map object, type casted
 	@SuppressWarnings("unchecked")
-	public Map<K,List<V>> genericMap() {
-		return (Map<K,List<V>>)(Object)this;
+	public Map<K, List<V>> genericMap() {
+		return (Map<K, List<V>>) (Object) this;
 	}
 }

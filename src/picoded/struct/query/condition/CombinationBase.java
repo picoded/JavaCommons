@@ -36,10 +36,10 @@ public class CombinationBase implements Query {
 	///
 	public CombinationBase(Query leftQuery, Query rightQuery, Map<String, Object> defaultArgMap) {
 		_children = new ArrayList<Query>();
-		if(leftQuery != null) {
+		if (leftQuery != null) {
 			_children.add(leftQuery);
 		}
-		if(rightQuery != null) {
+		if (rightQuery != null) {
 			_children.add(rightQuery);
 		}
 		

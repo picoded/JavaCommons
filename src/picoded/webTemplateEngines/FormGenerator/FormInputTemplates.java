@@ -84,12 +84,12 @@ public class FormInputTemplates {
 	private static String thousandsSeparator(String value) {
 		String ret = "";
 		if (value != null && !value.isEmpty()) {
-			if(value.equalsIgnoreCase("0")){
+			if (value.equalsIgnoreCase("0")) {
 				ret = "0.00";
-			}else{
+			} else {
 				boolean reappendBrackets = false;
 				String tempValue = value;
-				if(value.startsWith("(")){
+				if (value.startsWith("(")) {
 					tempValue = tempValue.substring(1, tempValue.length());
 					tempValue = tempValue.substring(0, tempValue.length() - 1);
 					reappendBrackets = true;
@@ -101,7 +101,7 @@ public class FormInputTemplates {
 				
 				try {
 					ret = df.format(bigD);
-					if(reappendBrackets){
+					if (reappendBrackets) {
 						ret = "(" + ret + ")";
 					}
 				} catch (Exception e) {
@@ -194,7 +194,7 @@ public class FormInputTemplates {
 			sbArr[0].append(fieldValue);
 		} else {
 			String[] fieldValParaSplit = fieldValue.split("\n");
-			for(String para : fieldValParaSplit){
+			for (String para : fieldValParaSplit) {
 				Map<String, Object> newParaMap = new HashMap<String, Object>();
 				newParaMap.put(node.getFieldName(), para);
 				FormNode paraNode = new FormNode(node._formGenerator, node, newParaMap);
@@ -693,7 +693,7 @@ public class FormInputTemplates {
 			String hiddenInputName = node.getFieldName(); //set the hidden input field to the name given
 			if (hiddenInputName != null && !hiddenInputName.isEmpty()) {
 				//node.replace("field", hiddenInputName + "_date");
-				node.replace("field",  node.getFieldNameWithoutPrefix() + "_date");
+				node.replace("field", node.getFieldNameWithoutPrefix() + "_date");
 				
 				String onchangeFunctionString = "changeDateToEpochTime(this.value, '" + hiddenInputName + "')";
 				paramMap.put("onchange", onchangeFunctionString);

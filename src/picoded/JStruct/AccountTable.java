@@ -678,50 +678,50 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	// Getting users based on filters
 	// TODO: To optimise because Sam is dumb
 	// --------------------------------------------------------------------------
-	public AccountObject[] getUsersByGroupAndRole(String[] insideGroupAny, String[] hasRoleAny){
+	public AccountObject[] getUsersByGroupAndRole(String[] insideGroupAny, String[] hasRoleAny) {
 		List<AccountObject> ret = new ArrayList<AccountObject>();
 		
 		MetaObject[] metaObjs = accountMetaTable().query(null, null, "oID", 0, 0); //initial query just to get everything out so i can filter
 		
-		if(metaObjs == null){
+		if (metaObjs == null) {
 			return null;
 		}
 		
 		boolean doGroupCheck = (insideGroupAny != null && insideGroupAny.length > 0);
 		boolean doRoleCheck = (hasRoleAny != null && hasRoleAny.length > 0);
 		
-		for(MetaObject metaObj : metaObjs){
+		for (MetaObject metaObj : metaObjs) {
 			AccountObject ao = getFromID(metaObj._oid());
 			
-			if(ao == null){
+			if (ao == null) {
 				continue;
 			}
 			
 			AccountObject[] userGroups = ao.getGroups();
 			
-			if(userGroups == null){
+			if (userGroups == null) {
 				continue;
 			}
 			
-			for(AccountObject userGroup : userGroups){
-				if(doGroupCheck){
+			for (AccountObject userGroup : userGroups) {
+				if (doGroupCheck) {
 					if (ArrayUtils.contains(insideGroupAny, userGroup._oid())) {
-						if(doRoleCheck){
+						if (doRoleCheck) {
 							String memberRole = userGroup.getMemberRole(ao);
-							if(ArrayUtils.contains(hasRoleAny, memberRole)){
+							if (ArrayUtils.contains(hasRoleAny, memberRole)) {
 								ret.add(ao);
 							}
-						}else{
+						} else {
 							ret.add(ao);
 						}
 					}
-				}else{
-					if(doRoleCheck){
+				} else {
+					if (doRoleCheck) {
 						String memberRole = userGroup.getMemberRole(ao);
-						if(ArrayUtils.contains(hasRoleAny, memberRole)){
+						if (ArrayUtils.contains(hasRoleAny, memberRole)) {
 							ret.add(ao);
 						}
-					}else{
+					} else {
 						ret.add(ao);
 					}
 				}

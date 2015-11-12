@@ -17,6 +17,26 @@ public class DateConv {
 		DDMMYYYY, MMDDYYYY, YYYYMMDD, YYYYDDMM
 	}
 	
+	public static ISODateFormat toISODateFormat(String format){
+		if(format == null || format.isEmpty()){
+			return ISODateFormat.DDMMYYYY;
+		}
+		
+		String format_cleaned = RegexUtils.removeAllNonAlphaNumeric(format);
+		
+		if(format_cleaned.equalsIgnoreCase("ddmmyyyy")){
+			return ISODateFormat.DDMMYYYY;
+		} else if(format_cleaned.equalsIgnoreCase("mmddyyyy")){
+			return ISODateFormat.MMDDYYYY;
+		} else if(format_cleaned.equalsIgnoreCase("yyyymmdd")){
+			return ISODateFormat.YYYYMMDD;
+		} else if(format_cleaned.equalsIgnoreCase("yyyyddmm")){
+			return ISODateFormat.YYYYDDMM;
+		} else {
+			return ISODateFormat.DDMMYYYY;
+		}
+	}
+	
 	public static String toISOFormat(long inDate, ISODateFormat dateFormat, String separator) {
 		if (separator == null) {
 			separator = "-";

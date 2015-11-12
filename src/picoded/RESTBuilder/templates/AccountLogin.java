@@ -540,7 +540,6 @@ public class AccountLogin extends BasePage {
 					id = req.getString("accountID");
 				}
 				
-				
 				if (!id.isEmpty()) {
 					account = at.getFromID(id);
 				}
@@ -757,7 +756,8 @@ public class AccountLogin extends BasePage {
 				MetaObject[] metaObjs = null;
 				AccountObject[] fullUserArray = null;
 				
-				if((insideGroup_any == null || insideGroup_any.length == 0) && (hasGroupRole_any == null || hasGroupRole_any.length == 0)){
+				if ((insideGroup_any == null || insideGroup_any.length == 0)
+					&& (hasGroupRole_any == null || hasGroupRole_any.length == 0)) {
 					//do normal query
 					MetaTable accountMetaTable = _metaTableObj.accountMetaTable();
 					
@@ -778,19 +778,19 @@ public class AccountLogin extends BasePage {
 					}
 					
 					fullUserArray = retUsers.toArray(new AccountObject[retUsers.size()]);
-				}else{
+				} else {
 					//do filtered query
 					fullUserArray = _metaTableObj.getUsersByGroupAndRole(insideGroup_any, hasGroupRole_any);
 				}
 				
-				if(fullUserArray == null || fullUserArray.length == 0){
+				if (fullUserArray == null || fullUserArray.length == 0) {
 					return ret;
 				}
 				
 				//group status filtering
-				if(groupStatus != null){
+				if (groupStatus != null) {
 					List<AccountObject> filteredUsers = new ArrayList<AccountObject>();
-					for(AccountObject ao : fullUserArray){
+					for (AccountObject ao : fullUserArray) {
 						if (groupStatus.equalsIgnoreCase("group")) {
 							if (ao.isGroup()) {
 								filteredUsers.add(ao);
@@ -805,8 +805,7 @@ public class AccountLogin extends BasePage {
 					fullUserArray = filteredUsers.toArray(new AccountObject[filteredUsers.size()]);
 				}
 				
-				
-				for(AccountObject ao : fullUserArray){
+				for (AccountObject ao : fullUserArray) {
 					List<Object> row = new ArrayList<Object>();
 					for (String header : headers) {
 						if (header.equalsIgnoreCase("names")) {

@@ -123,7 +123,7 @@ public class MetaTableApiBuilder {
 			headers = new String[] { "_oid" };
 		}
 		
-		String[] queryColumns = req.getStringArray("queryColumns",headers);
+		String[] queryColumns = req.getStringArray("queryColumns", headers);
 		String searchParams = req.getString("search[value]", "").trim();
 		String wildcardMode = req.getString("wildcardMode", "suffix");
 		
@@ -135,7 +135,7 @@ public class MetaTableApiBuilder {
 		// The query to use
 		String query = req.getString("query", "");
 		String[] queryArgs = req.getStringArray("queryArgs");
-		if(queryArgs == null){
+		if (queryArgs == null) {
 			queryArgs = new String[0];
 		}
 		
@@ -147,15 +147,16 @@ public class MetaTableApiBuilder {
 		boolean dataTableSearchFilter = false;
 		
 		// Data tables search refinement
-		if(!searchParams.isEmpty() && queryColumns != null && queryColumns.length > 0){
-			List<String> queryArgsList =  new ArrayList<String>(); //rebuild query arguments
-			if(queryArgs != null){
-				for(String queryArg : queryArgs){
+		if (!searchParams.isEmpty() && queryColumns != null && queryColumns.length > 0) {
+			List<String> queryArgsList = new ArrayList<String>(); //rebuild query arguments
+			if (queryArgs != null) {
+				for (String queryArg : queryArgs) {
 					queryArgsList.add(queryArg);
 				}
 			}
 			
-			query = "" + query + " AND " + generateQueryStringForSearchValue(searchParams, queryColumns, wildcardMode) + ""; //rebuilding query string
+			query = "" + query + " AND " + generateQueryStringForSearchValue(searchParams, queryColumns, wildcardMode)
+				+ ""; //rebuilding query string
 			generateQueryStringArgsForSearchValue_andAddToList(searchParams, queryColumns, wildcardMode, queryArgsList);
 			queryArgs = queryArgsList.toArray(new String[queryArgsList.size()]);
 			
@@ -171,7 +172,7 @@ public class MetaTableApiBuilder {
 		
 		// Records total handling
 		long recordsTotal = 0;
-		if(queryOriginal != null && queryOriginal.length() > 0) {
+		if (queryOriginal != null && queryOriginal.length() > 0) {
 			recordsTotal = _metaTableObj.queryCount(queryOriginal, queryOriginalArgs); //base reduce count
 		} else {
 			recordsTotal = _metaTableObj.size(); //count all
@@ -180,7 +181,7 @@ public class MetaTableApiBuilder {
 		
 		// Records filtered handling
 		long recordsFiltered = recordsTotal;
-		if( dataTableSearchFilter ) {
+		if (dataTableSearchFilter) {
 			recordsFiltered = _metaTableObj.queryCount(query, queryArgs);
 		}
 		res.put("recordsFiltered", recordsFiltered);
@@ -197,14 +198,15 @@ public class MetaTableApiBuilder {
 		return res;
 	};
 	
-	private static List<String> generateQueryStringArgsForSearchValue_andAddToList(String inSearchString, String[] queryColumns, String wildcardMode, List<String> ret) {
-		if(inSearchString != null && queryColumns != null){
+	private static List<String> generateQueryStringArgsForSearchValue_andAddToList(String inSearchString,
+		String[] queryColumns, String wildcardMode, List<String> ret) {
+		if (inSearchString != null && queryColumns != null) {
 			String[] searchStringSplit = inSearchString.trim().split("\\s+");
 			StringBuilder querySB = new StringBuilder();
 			
 			String wildMode = wildcardMode;
-			for(String searchString : searchStringSplit) {
-				for(String queryColumn : queryColumns){
+			for (String searchString : searchStringSplit) {
+				for (String queryColumn : queryColumns) {
 					ret.add(getStringWithWildcardMode(searchString, wildMode));
 				}
 				wildMode = "both"; //Second string onwards is both side wildcard
@@ -214,23 +216,24 @@ public class MetaTableApiBuilder {
 		return ret;
 	}
 	
-	private static String generateQueryStringForSearchValue(String inSearchString, String[] queryColumns, String wildcardMode){
-		if(inSearchString != null && queryColumns != null){
+	private static String generateQueryStringForSearchValue(String inSearchString, String[] queryColumns,
+		String wildcardMode) {
+		if (inSearchString != null && queryColumns != null) {
 			String[] searchStringSplit = inSearchString.trim().split("\\s+");
 			StringBuilder querySB = new StringBuilder();
 			
-			for(int i = 0; i < searchStringSplit.length; ++i){
+			for (int i = 0; i < searchStringSplit.length; ++i) {
 				querySB.append("(");
-				for(int queryCol = 0; queryCol < queryColumns.length; ++queryCol){
+				for (int queryCol = 0; queryCol < queryColumns.length; ++queryCol) {
 					querySB.append(queryColumns[queryCol] + " LIKE ?");
 					
-					if(queryCol < queryColumns.length - 1){
+					if (queryCol < queryColumns.length - 1) {
 						querySB.append(" OR ");
 					}
 				}
 				querySB.append(")");
 				
-				if(i < searchStringSplit.length -1){
+				if (i < searchStringSplit.length - 1) {
 					querySB.append(" AND ");
 				}
 			}
@@ -240,12 +243,12 @@ public class MetaTableApiBuilder {
 		return "";
 	}
 	
-	private static String getStringWithWildcardMode(String searchString, String wildcardMode){
-		if(wildcardMode.equalsIgnoreCase("prefix")){
+	private static String getStringWithWildcardMode(String searchString, String wildcardMode) {
+		if (wildcardMode.equalsIgnoreCase("prefix")) {
 			return "%" + searchString;
-		}else if(wildcardMode.equalsIgnoreCase("suffix")){
+		} else if (wildcardMode.equalsIgnoreCase("suffix")) {
 			return searchString + "%";
-		}else{
+		} else {
 			return "%" + searchString + "%";
 		}
 	}

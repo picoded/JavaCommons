@@ -266,7 +266,7 @@ public class CommonsPage extends BasePage {
 	/// the servlet logging module
 	public ServletLogging systemLogging() {
 		// Returns cached copy if posisble
-		if(_systemLogging != null) {
+		if (_systemLogging != null) {
 			return _systemLogging;
 		}
 		

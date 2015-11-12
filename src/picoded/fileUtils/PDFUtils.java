@@ -105,7 +105,8 @@ public class PDFUtils {
 	/// Taken from http://itextpdf.com/examples/iia.php?id=128
 	/// Takes an input pdf, and outputs to a different location with page numbering
 	///
-	public static void numberPDFPages(File pdfToNumber, File outputFile) throws DocumentException, IOException, FileNotFoundException{
+	public static void numberPDFPages(File pdfToNumber, File outputFile) throws DocumentException, IOException,
+		FileNotFoundException {
 		Document document = new Document();
 		PdfCopy copy = new PdfCopy(document, new FileOutputStream(outputFile));
 		document.open();
@@ -113,23 +114,22 @@ public class PDFUtils {
 		PdfReader reader = new PdfReader(pdfToNumber.getAbsolutePath());
 		int totalPages = reader.getNumberOfPages();
 		
-		try{
+		try {
 			PdfImportedPage page;
 			PdfCopy.PageStamp stamp;
-			for(int i = 0; i < totalPages; ++i){
+			for (int i = 0; i < totalPages; ++i) {
 				page = copy.getImportedPage(reader, i + 1);
 				stamp = copy.createPageStamp(page);
 				
 				ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_CENTER,
-				new Phrase(String.format("Page %d of %d", i + 1, totalPages)),
-				297.5f, 28, 0);
+					new Phrase(String.format("Page %d of %d", i + 1, totalPages)), 297.5f, 28, 0);
 				
 				stamp.alterContents();
 				copy.addPage(page);
 			}
-		} catch(Exception ex){
+		} catch (Exception ex) {
 			throw new RuntimeException(ex);
-		}finally{
+		} finally {
 			document.close();
 			reader.close();
 		}

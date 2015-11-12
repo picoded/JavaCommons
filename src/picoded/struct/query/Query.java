@@ -81,7 +81,7 @@ public interface Query extends Predicate<Object> {
 	
 	/// Gets the default argument map
 	public default Object defaultArgumentValue() {
-		if(defaultArgumentMap() != null) {
+		if (defaultArgumentMap() != null) {
 			return defaultArgumentMap().get(argumentName());
 		}
 		return null;
@@ -111,21 +111,21 @@ public interface Query extends Predicate<Object> {
 	//--------------------------------------------------------------------
 	
 	/// Fetch the nested query map, of basic operators
-	public default Map<String,List<Query>> fieldQueryMap() {
-		return fieldQueryMap(new ArrayListMap<String,Query>());
+	public default Map<String, List<Query>> fieldQueryMap() {
+		return fieldQueryMap(new ArrayListMap<String, Query>());
 	}
 	
 	/// Fetch the nested query map, of basic operators.
 	/// This is the internally used recursive function.
-	public default Map<String,List<Query>> fieldQueryMap(ArrayListMap<String,Query> ret) {
+	public default Map<String, List<Query>> fieldQueryMap(ArrayListMap<String, Query> ret) {
 		
-		if( isBasicOperator() ) {
+		if (isBasicOperator()) {
 			// Basic operator returns self
-			ret.addToListIfNotExists( fieldName(), this );
+			ret.addToListIfNotExists(fieldName(), this);
 			return ret.genericMap();
-		} else if( isCombinationOperator() ){
+		} else if (isCombinationOperator()) {
 			// Child nodes iteration 
-			for(Query child : childrenQuery()) {
+			for (Query child : childrenQuery()) {
 				child.fieldQueryMap(ret);
 			}
 		}
@@ -141,24 +141,24 @@ public interface Query extends Predicate<Object> {
 	public default Query replaceQuery(Query original, Query replacement) {
 		
 		// The original itself needs replacement
-		if( this == original ) {
+		if (this == original) {
 			return replacement;
 		}
 		
 		// Iterate only combination operators
-		if( isCombinationOperator() ){
+		if (isCombinationOperator()) {
 			
 			// Does the replacement
 			List<Query> subList = childrenQuery();
 			int subListLen = subList.size();
 			
 			// Replace the nodes, or do recursive calls
-			for(int i=0; i < subListLen; ++i) {
+			for (int i = 0; i < subListLen; ++i) {
 				Query node = subList.get(i);
 				
-				if( node == original ) {
+				if (node == original) {
 					subList.set(i, replacement);
-				} else if( node == replacement ) {
+				} else if (node == replacement) {
 					// ignroe replacement nodes
 				} else {
 					// recursive call
@@ -185,16 +185,16 @@ public interface Query extends Predicate<Object> {
 	/// This is the internally used recursive function.
 	public default List<Object> queryArgumentsList(List<Object> ret) {
 		
-		if( isBasicOperator() ) {
+		if (isBasicOperator()) {
 			
 			// Push basic operator args to return output
 			ret.add(this.defaultArgumentValue());
 			
-		} else if( isCombinationOperator() ){
+		} else if (isCombinationOperator()) {
 			
 			// Child nodes iteration 
 			// Recursive scan
-			for(Query child : childrenQuery()) {
+			for (Query child : childrenQuery()) {
 				child.queryArgumentsList(ret);
 			}
 			
@@ -207,26 +207,26 @@ public interface Query extends Predicate<Object> {
 	/// As a map, in accordance to the default map, value used
 	///
 	/// This is the internally used recursive function.
-	public default Map<String,Object> queryArgumentsMap() {
-		return queryArgumentsMap(new HashMap<String,Object>());
+	public default Map<String, Object> queryArgumentsMap() {
+		return queryArgumentsMap(new HashMap<String, Object>());
 	}
 	
 	/// Returns all query arguments used,
 	/// As a map, in accordance to the default map, value used
 	///
 	/// This is the internally used recursive function.
-	public default Map<String,Object> queryArgumentsMap(Map<String,Object> ret) {
+	public default Map<String, Object> queryArgumentsMap(Map<String, Object> ret) {
 		
-		if( isBasicOperator() ) {
+		if (isBasicOperator()) {
 			
 			// Push basic operator args to return output
 			ret.put(this.argumentName(), this.defaultArgumentValue());
 			
-		} else if( isCombinationOperator() ){
+		} else if (isCombinationOperator()) {
 			
 			// Child nodes iteration 
 			// Recursive scan
-			for(Query child : childrenQuery()) {
+			for (Query child : childrenQuery()) {
 				child.queryArgumentsMap(ret);
 			}
 			
@@ -234,7 +234,6 @@ public interface Query extends Predicate<Object> {
 		
 		return ret;
 	}
-	
 	
 	//
 	// To string conversion

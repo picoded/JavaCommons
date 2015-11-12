@@ -79,15 +79,26 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		} else {
 			String fileName = inFile.getName();
 			
-			ConfigFile cFile = new ConfigFile(inFile);
-			
-			fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-			String prefix = "";
-			if (!rootPrefix.isEmpty()) {
-				prefix += rootPrefix + separator;
+			// Get the filename extension
+			int endingDot = fileName.lastIndexOf('.');
+			String extension = "";
+			if (endingDot > 0) {
+				extension = fileName.substring(endingDot + 1);
 			}
 			
-			prefixSetMap.put(prefix + fileName, cFile);
+			// Only accept ini or json files
+			if (extension.equalsIgnoreCase("ini") || extension.equalsIgnoreCase("json")) {
+				
+				ConfigFile cFile = new ConfigFile(inFile);
+				
+				fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+				String prefix = "";
+				if (!rootPrefix.isEmpty()) {
+					prefix += rootPrefix + separator;
+				}
+				
+				prefixSetMap.put(prefix + fileName, cFile);
+			}
 		}
 		
 		return this;

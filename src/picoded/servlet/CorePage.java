@@ -56,15 +56,16 @@ import picoded.struct.HashMapList;
  * doPost -----------+--> processChain --> doAuth -+-> doRequest --> do_X_Request --> outputRequest
  *                   |         |                   |
  * doGet ------------+         V                   \-> doJson -----> do_X_Json -----> outputJSON
- *                   |     do(Common)Setup
+ *                   |     doSharedSetup
  * doDelete ---------+         |
  *                   |         V
- * doPut ------------/     do(Common)Teardown
+ * doPut ------------/     doSharedTeardown
  *
  * [CorePage lifecycle process flow]
- * contextInitialized --> doCommonSetup -----> initializeContext
  *
- * contextDestroyed ----> doCommonTeardown --> destroyContext
+ * contextInitialized --> doSharedSetup -----> initializeContext
+ *
+ * contextDestroyed ----> doSharedTeardown --> destroyContext
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * }
@@ -653,7 +654,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// The distinction is important, as certain parameters (such as requesrt details),
 	/// cannot be assumed to be avaliable in initializeContext, but is present for most requests
 	public void doSharedSetup() throws Exception {
-		
+		// Does nothing (to override)
 	}
 	
 	/// [To be extended by sub class, if needed]
@@ -664,20 +665,20 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// The distinction is important, as certain parameters (such as requesrt details),
 	/// cannot be assumed to be avaliable in initializeContext, but is present for most requests
 	public void doSharedTeardown() throws Exception {
-		
+		// Does nothing (to override)
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Called once when initialized per request
 	public void doSetup() throws Exception {
-		
+		// Does nothing (to override)
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Called once when completed per request, regardless of request status
 	/// PS: This is rarely needed, just rely on java GC =)
 	public void doTeardown() throws Exception {
-		
+		// Does nothing (to override)
 	}
 	
 	/// Handles setup and teardown exception

@@ -59,7 +59,6 @@ public class JStackPage extends CorePage {
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public String _contextPath = null;
 	public String _webInfPath = null;
 	public String _classesPath = null;
 	public String _libraryPath = null;
@@ -73,24 +72,6 @@ public class JStackPage extends CorePage {
 	// Path variables, according to standard WAR package convention
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	
-	/// Gets and returns the context path / application folder path
-	public String getContextPath() {
-		if (_contextPath != null) {
-			return _contextPath;
-		}
-		
-		if (httpRequest != null) {
-			return (_contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/");
-		} else {
-			try {
-				// Note this may fail for contextInitialized
-				return (_contextPath = getServletContext().getRealPath("/") + "/");
-			} catch (Exception e) {
-				return (_contextPath = "./");
-			}
-		}
-	}
 	
 	public String getWebInfPath() {
 		return (_webInfPath != null) ? _webInfPath : (_webInfPath = getContextPath() + "WEB-INF/");

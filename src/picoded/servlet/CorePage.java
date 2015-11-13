@@ -29,7 +29,7 @@ import picoded.struct.HashMapList;
 // Sub modules useds
 
 /**
- * servletCommons.servlet pages core system, in which all additional pages are extended from.
+ * JavaCommons.servlet pages core system, in which all additional pages are extended from.
  * In addition, this is intentionally structured to be "usable" even without the understanding / importing of
  * the various HttpServlet functionalities. Though doing so is still highly recommended.
  *
@@ -40,8 +40,6 @@ import picoded.struct.HashMapList;
  *
  * Note that internally, doPost, doGet creates a new class instance for each call/request it recieves.
  * As such, all subclass built can consider all servlet instances are fresh instances on process request.
- * If however, the usage is countrary. doPurge is called on each additonal initilizing step. This may
- * occur due to servlet class used for other "purposes" beyond the intended get/post handling.
  *
  * ---------------------------------------------------------------------------------------------------------
  *
@@ -49,6 +47,7 @@ import picoded.struct.HashMapList;
  * <pre>
  * {@code
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * [CorePage request process flow]
  *
  * spawnInstance ----\
  *                   |
@@ -57,10 +56,15 @@ import picoded.struct.HashMapList;
  * doPost -----------+--> processChain --> doAuth -+-> doRequest --> do_X_Request --> outputRequest
  *                   |         |                   |
  * doGet ------------+         V                   \-> doJson -----> do_X_Json -----> outputJSON
- *                   |      doSetup
+ *                   |     do(Common)Setup
  * doDelete ---------+         |
  *                   |         V
- * doPut ------------/     doTeardown
+ * doPut ------------/     do(Common)Teardown
+ *
+ * [CorePage lifecycle process flow]
+ * contextInitialized --> doCommonSetup -----> initializeContext
+ *
+ * contextDestroyed ----> doCommonTeardown --> destroyContext
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * }
@@ -420,11 +424,51 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		return responseOutputStream;
 	}
 	
+	/// Cached context path
+	public String _contextPath = null;
+	
+	/// Gets and returns the context path / application folder path in absolute terms if possible
+	public String getContextPath() {
+		if (_contextPath != null) {
+			return _contextPath;
+		}
+		
+		if (httpRequest != null) {
+			return (_contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/");
+		} 
+		
+		if (_servletContextEvent != null) {
+			ServletContext sc = _servletContextEvent.getServletContext();
+			return (_contextPath = sc.getRealPath("/")) + "/";
+		}
+		
+		try {
+			// Note this may fail for contextInitialized
+			return (_contextPath = getServletContext().getRealPath("/") + "/");
+		} catch (Exception e) {
+			return (_contextPath = "./");
+		}
+	}
+	
+	
+	/// Cached context path
+	protected String _contextURI = null;
+	
 	/// Returns the servlet contextual path : needed for base URI for page redirects / etc
 	public String getContextURI() {
-		if (httpRequest != null) {
-			return httpRequest.getContextPath();
+		if (_contextURI != null) {
+			return _contextURI;
 		}
+		
+		if (httpRequest != null) {
+			return _contextURI = httpRequest.getContextPath();
+		}
+		
+		if (_servletContextEvent != null) {
+			ServletContext sc = _servletContextEvent.getServletContext();
+			return (_contextURI = sc.getContextPath()) + "/";
+		}
+		
 		try {
 			return (URLDecoder.decode(this.getClass().getClassLoader().getResource("/").getPath(), "UTF-8"))
 				.split("/WEB-INF/classes/")[0];
@@ -483,6 +527,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 				boolean ret = true;
 				
 				// Does setup
+				doSharedSetup();
 				doSetup();
 				
 				// is JSON request?
@@ -496,6 +541,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 				getWriter().flush();
 				
 				// Does teardwon
+				doSharedTeardown();
 				doTeardown();
 				
 				// Returns success or failure
@@ -602,13 +648,33 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	///////////////////////////////////////////////////////
 	
 	/// [To be extended by sub class, if needed]
+	/// Called once when initialized per request, and by the initializeContext thread.
+	///
+	/// The distinction is important, as certain parameters (such as requesrt details),
+	/// cannot be assumed to be avaliable in initializeContext, but is present for most requests
+	public void doSharedSetup() throws Exception {
+		
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Called once when completed per request, regardless of request status, and by the destroyContext thread
+	///
+	/// PS: This is rarely needed, just rely on java GC =)
+	///
+	/// The distinction is important, as certain parameters (such as requesrt details),
+	/// cannot be assumed to be avaliable in initializeContext, but is present for most requests
+	public void doSharedTeardown() throws Exception {
+		
+	}
+	
+	/// [To be extended by sub class, if needed]
 	/// Called once when initialized per request
 	public void doSetup() throws Exception {
 		
 	}
 	
 	/// [To be extended by sub class, if needed]
-	/// Called once when completed per request, this is called regardless of request status
+	/// Called once when completed per request, regardless of request status
 	/// PS: This is rarely needed, just rely on java GC =)
 	public void doTeardown() throws Exception {
 		
@@ -748,6 +814,28 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	///////////////////////////////////////////////////////
 	//
+	// Servlet Context handling
+	//
+	///////////////////////////////////////////////////////
+	
+	/// Cached servlet context event
+	protected ServletContextEvent _servletContextEvent = null;
+	
+	/// [To be extended by sub class, if needed]
+	/// Initialize context setup process
+	public void initializeContext() throws Exception {
+		// does nothing
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Initialize context destroy process
+	public void destroyContext() throws Exception {
+		// does nothing
+	}
+	
+	
+	///////////////////////////////////////////////////////
+	//
 	// Native Servlet do overwrites [Avoid overwriting]
 	//
 	///////////////////////////////////////////////////////
@@ -784,6 +872,28 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 			super.doOptions(request, response);
 		} catch (Exception e) {
 			throw new ServletException(e);
+		}
+	}
+	
+	/// [Do not extend] Servlet context initializer handling. 
+	public void contextInitialized(ServletContextEvent sce) {
+		_servletContextEvent = sce;
+		try {
+			doSharedSetup();
+			initializeContext();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/// [Do not extend] Servlet context destroyed handling
+	public void contextDestroyed(ServletContextEvent sce) {
+		_servletContextEvent = sce;
+		try {
+			doSharedTeardown();
+			destroyContext();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 	

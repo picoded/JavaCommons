@@ -14,9 +14,11 @@ import picoded.conv.GUID;
 import picoded.conv.MapValueConv;
 import picoded.fileUtils.DeleteFilesByAge;
 import picoded.fileUtils.PDFGenerator;
+import picoded.servlet.BasePage;
 import picoded.webTemplateEngines.FormGenerator.*;
 
 import javax.xml.bind.DatatypeConverter;
+
 import java.io.FileOutputStream;
 
 public class JSMLForm {
@@ -431,12 +433,12 @@ public class JSMLForm {
 		return ret;
 	}
 	
-	public byte[] generatePDF(Map<String, Object> data) {
+	public byte[] generatePDF(BasePage page, Map<String, Object> data) {
 		validateTempFolder();
-		return generatePDF(data, "file:///" + _formFolderPath + "/" + _tempFolderPath);
+		return generatePDF(page, data, "file:///" + _formFolderPath + "/" + _tempFolderPath);
 	}
 	
-	public byte[] generatePDF(Map<String, Object> data, String pdfGeneratorContextFolder) {
+	public byte[] generatePDF(BasePage page, Map<String, Object> data, String pdfGeneratorContextFolder) {
 		StringBuilder ret = new StringBuilder();
 		
 		data = sanitiseMap(data, "", true);
@@ -450,6 +452,10 @@ public class JSMLForm {
 		if (ret == null) {
 			throw new RuntimeException("generatePDF() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
 		}
+		
+		//jmte the result
+		ret = new StringBuilder(page.JMTE().parseTemplate(ret.toString()));
+		
 		validateTempFolder();
 		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/generatedPDF.pdf";
 		
@@ -475,7 +481,7 @@ public class JSMLForm {
 	}
 	
 	//just for testing
-	public String[] getPDFLinkTest(Map<String, Object> data) {
+	public String[] getPDFLinkTest(BasePage page, Map<String, Object> data) {
 		String[] values = new String[5];
 		
 		data = sanitiseMap(data, "", true);
@@ -493,6 +499,8 @@ public class JSMLForm {
 		
 		StringBuilder ret = new StringBuilder();
 		ret = formGen.build(_formDefinitionString, data, true);
+		
+		ret = new StringBuilder(page.JMTE().parseTemplate(ret.toString())); //jmte-fy
 		
 		values[4] = "Final html output is -> " + ret.toString();
 		

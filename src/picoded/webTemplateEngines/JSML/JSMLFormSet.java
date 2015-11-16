@@ -309,7 +309,7 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 					// PDF mode
 					if (reqMode.equalsIgnoreCase("pdf")) {
 						formParams = formDataFromRequest(page, form);
-						byte[] pdfData = form.generatePDF(formParams);
+						byte[] pdfData = form.generatePDF(page, formParams);
 						HttpServletResponse response = page.getHttpServletResponse();
 						
 						response.setContentType("application/pdf");
@@ -323,7 +323,7 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 					// PDF link test mode
 					if (reqMode.equalsIgnoreCase("pdfTest")) {
 						formParams = formDataFromRequest(page, form);
-						String[] pdfTestResults = form.getPDFLinkTest(formParams);
+						String[] pdfTestResults = form.getPDFLinkTest(page, formParams);
 						
 						for (String str : pdfTestResults) {
 							page.getWriter().println(str);

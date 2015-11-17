@@ -128,6 +128,7 @@ public class KeyValueMapApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | newMap          | Map<String, String>| Returns current mappings                                                      |
 	/// | error           | String             | Errors, if any                                                                |
 	/// | exceptionMsg    | String             | Exception message, if any                                                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -154,6 +155,8 @@ public class KeyValueMapApiBuilder {
 			return res;
 		}
 		
+		res.put("newMap", _keyValueMap);
+		
 		return res;
 	};
 	
@@ -176,12 +179,13 @@ public class KeyValueMapApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | newMap          | Map<String, String>| Returns current mappings                                                      |
 	/// | error           | String             | Errors, if any                                                                |
 	/// | exceptionMsg    | String             | Exception message, if any                                                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public RESTFunction setValues =(req, res) -> {
-		Object keyValues_raw = req.get("meta");
+		Object keyValues_raw = req.get("keyValues");
 		if(keyValues_raw == null){
 			res.put("error", "No keyValues map was supplied");
 			return res;
@@ -215,6 +219,8 @@ public class KeyValueMapApiBuilder {
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
 		}
+		
+		res.put("newMap", _keyValueMap);
 		
 		return res;
 	};

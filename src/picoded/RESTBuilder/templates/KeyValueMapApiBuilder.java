@@ -43,6 +43,11 @@ public class KeyValueMapApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public RESTFunction getValue = (req, res) -> {
+		if(_keyValueMap == null){
+			res.put("error", "Key Value Map is null");
+			return res;
+		}
+		
 		//Get given key
 		String key = req.getString("key", "");
 		if(key.isEmpty()){
@@ -80,6 +85,11 @@ public class KeyValueMapApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public RESTFunction getValues =(req, res) -> {
+		if(_keyValueMap == null){
+			res.put("error", "Key Value Map is null");
+			return res;
+		}
+		
 		String[] keys = req.getStringArray("keys", null);
 		if(keys == null){
 			res.put("error", "No key array was supplied");
@@ -134,6 +144,11 @@ public class KeyValueMapApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public RESTFunction setValue = (req, res) -> {
+		if(_keyValueMap == null){
+			res.put("error", "Key Value Map is null");
+			return res;
+		}
+		
 		String key = req.getString("key", "");
 		if(key.isEmpty()){
 			res.put("error", "No key was supplied");
@@ -185,6 +200,11 @@ public class KeyValueMapApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public RESTFunction setValues =(req, res) -> {
+		if(_keyValueMap == null){
+			res.put("error", "Key Value Map is null");
+			return res;
+		}
+		
 		Object keyValues_raw = req.get("keyValues");
 		if(keyValues_raw == null){
 			res.put("error", "No keyValues map was supplied");
@@ -224,4 +244,23 @@ public class KeyValueMapApiBuilder {
 		
 		return res;
 	};
+	
+	/////////////////////////////////////////////
+	//
+	// RestBuilder template builder
+	//
+	/////////////////////////////////////////////
+	
+	///
+	/// Takes the restbuilder and implements its respective default API
+	///
+	public RESTBuilder setupRESTBuilder(RESTBuilder rb, String setPrefix) {
+		rb.getNamespace(setPrefix + "getValue").put(HttpRequestType.GET, getValue);
+		rb.getNamespace(setPrefix + "getValues").put(HttpRequestType.GET, getValues);
+		
+		rb.getNamespace(setPrefix + "setValue").put(HttpRequestType.POST, setValue);
+		rb.getNamespace(setPrefix + "setValues").put(HttpRequestType.POST, setValues);
+		
+		return rb;
+	}
 }

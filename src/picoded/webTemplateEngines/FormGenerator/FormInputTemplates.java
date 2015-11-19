@@ -1,6 +1,7 @@
 package picoded.webTemplateEngines.FormGenerator;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -97,7 +98,7 @@ public class FormInputTemplates {
 				
 				DecimalFormat df = new DecimalFormat("#,###.00");
 				BigDecimal bigD = new BigDecimal(tempValue);
-				bigD.setScale(2);
+				bigD = bigD.setScale(2, RoundingMode.HALF_UP);
 				
 				try {
 					ret = df.format(bigD);

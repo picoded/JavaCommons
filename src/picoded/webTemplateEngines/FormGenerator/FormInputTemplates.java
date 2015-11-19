@@ -85,7 +85,7 @@ public class FormInputTemplates {
 	private static String thousandsSeparator(String value) {
 		String ret = "";
 		if (value != null && !value.isEmpty()) {
-			if (value.equalsIgnoreCase("0")) {
+			if (value.equalsIgnoreCase("0") || value.equalsIgnoreCase("0.00")) {
 				ret = "0.00";
 			} else {
 				boolean reappendBrackets = false;

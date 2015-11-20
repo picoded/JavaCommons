@@ -20,6 +20,8 @@ import static org.junit.Assert.*;
 public class GenericConvert_test {
 	
 	private static final double DELTA = 1e-15;
+	private static final String jsonString = "[{\"balance\":1000.21, \"num\":100, \"nickname\":\"tommy\", \"is_vip\":true, \"name\":\"foo\"}]";
+	String output = "{balance:1000.21,num:100,nickname:tommy,is_vip:true,name:foo}";
 	
 	@Test
 	public void toStringTest() {
@@ -129,9 +131,15 @@ public class GenericConvert_test {
 		assertArrayEquals(new String[] { "1", "2", "3" }, GenericConvert.toStringArray(new Integer[] { 1, 2, 3 }, null));
 		assertArrayEquals(new String[] { "100" }, GenericConvert.toStringArray(new Integer[] { 100 }));
 		assertArrayEquals(new String[] { "1.0" }, GenericConvert.toStringArray(new Double[] { 1.0 }, "hello world"));
-		//String json = "{" + "\"Example\": [" + "{" + "\"foo\": \"a1\"," + "\"bar\": \"b1\"," + "\"fubar\": \"c1\"" + "}," + "{" + "\"foo\": \"a2\"," + "\"bar\": \"b2\"," + "\"fubar\": \"c2\"" + "}," + "{" + "\"foo\": \"a3\"," + "\"bar\": \"b3\"," + "\"fubar\": \"c3\"" + "}" + "]" + "}\"";
-		//assertArrayEquals(new String[]{"hello world"}, GenericConvert.toStringArray(json));
-		//assertArrayEquals(ConvertJSON.toList("{balance:1000.21,num:100,nickname:null,is_vip:true,name:foo}").toArray(), GenericConvert.toStringArray(ConvertJSON.toList("{balance:1000.21,num:100,nickname:null,is_vip:true,name:foo}"), null));
+		String[] inputArray = GenericConvert.toStringArray(jsonString);
+		String input = inputArray[0];
+		input = input.replaceAll("\"", "");
+		assertEquals(output, input);
+		
+		inputArray = GenericConvert.toStringArray(ConvertJSON.toList(jsonString), null);
+		input = inputArray[0];
+		input = input.replaceAll("\"", "");
+		assertEquals(output, input);
 	}
 	
 	@Test
@@ -142,8 +150,10 @@ public class GenericConvert_test {
 		assertArrayEquals(new Integer[] { 1, 2, 3 }, GenericConvert.toObjectArray(new Object[] { 1, 2, 3 }, null));
 		assertArrayEquals(new Integer[] { 100 }, GenericConvert.toObjectArray(new Object[] { 100 }));
 		assertArrayEquals(new Double[] { 1.0 }, GenericConvert.toObjectArray(new Object[] { 1.0 }, "hello world"));
-		//assertArrayEquals(ConvertJSON.toList("{balance:1000.21,num:100,nickname:null,is_vip:true,name:foo}").toArray(), GenericConvert.toObjectArray("{balance:1000.21,num:100,nickname:null,is_vip:true,name:foo}"));
-		//assertArrayEquals(ConvertJSON.toList("{balance:1000.21,num:100,nickname:null,is_vip:true,name:foo}").toArray(), GenericConvert.toObjectArray(ConvertJSON.toList("{balance:1000.21,num:100,nickname:null,is_vip:true,name:foo}"), null));
+		
+		assertArrayEquals(ConvertJSON.toList(jsonString).toArray(), GenericConvert.toObjectArray(jsonString));
+		assertArrayEquals(ConvertJSON.toList(jsonString).toArray(),
+			GenericConvert.toObjectArray(ConvertJSON.toList(jsonString), null));
 	}
 	
 }

@@ -17,20 +17,20 @@ public class DateConv {
 		DDMMYYYY, MMDDYYYY, YYYYMMDD, YYYYDDMM
 	}
 	
-	public static ISODateFormat toISODateFormat(String format){
-		if(format == null || format.isEmpty()){
+	public static ISODateFormat toISODateFormat(String format) {
+		if (format == null || format.isEmpty()) {
 			return ISODateFormat.DDMMYYYY;
 		}
 		
 		String format_cleaned = RegexUtils.removeAllNonAlphaNumeric(format);
 		
-		if(format_cleaned.equalsIgnoreCase("ddmmyyyy")){
+		if (format_cleaned.equalsIgnoreCase("ddmmyyyy")) {
 			return ISODateFormat.DDMMYYYY;
-		} else if(format_cleaned.equalsIgnoreCase("mmddyyyy")){
+		} else if (format_cleaned.equalsIgnoreCase("mmddyyyy")) {
 			return ISODateFormat.MMDDYYYY;
-		} else if(format_cleaned.equalsIgnoreCase("yyyymmdd")){
+		} else if (format_cleaned.equalsIgnoreCase("yyyymmdd")) {
 			return ISODateFormat.YYYYMMDD;
-		} else if(format_cleaned.equalsIgnoreCase("yyyyddmm")){
+		} else if (format_cleaned.equalsIgnoreCase("yyyyddmm")) {
 			return ISODateFormat.YYYYDDMM;
 		} else {
 			return ISODateFormat.DDMMYYYY;

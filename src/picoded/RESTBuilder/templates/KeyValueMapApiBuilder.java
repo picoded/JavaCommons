@@ -16,7 +16,7 @@ public class KeyValueMapApiBuilder {
 	
 	private Map<String, String> _keyValueMap;
 	
-	public KeyValueMapApiBuilder(Map<String, String> inMap){
+	public KeyValueMapApiBuilder(Map<String, String> inMap) {
 		_keyValueMap = inMap;
 	}
 	
@@ -43,20 +43,20 @@ public class KeyValueMapApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public RESTFunction getValue = (req, res) -> {
-		if(_keyValueMap == null){
+		if (_keyValueMap == null) {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
 		
 		//Get given key
 		String key = req.getString("key", "");
-		if(key.isEmpty()){
+		if (key.isEmpty()) {
 			res.put("error", "No key was supplied");
 			return res;
 		}
 		
 		//Add found value to map
-		res.put("value",  _keyValueMap.get(key));
+		res.put("value", _keyValueMap.get(key));
 		
 		return res;
 	};
@@ -84,30 +84,30 @@ public class KeyValueMapApiBuilder {
 	/// | exceptionMsg    | String             | Exception message, if any                                                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
-	public RESTFunction getValues =(req, res) -> {
-		if(_keyValueMap == null){
+	public RESTFunction getValues = (req, res) -> {
+		if (_keyValueMap == null) {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
 		
 		String[] keys = req.getStringArray("keys", null);
-		if(keys == null){
+		if (keys == null) {
 			res.put("error", "No key array was supplied");
 			return res;
 		}
 		
-		if(keys.length < 1){
+		if (keys.length < 1) {
 			res.put("error", "Key array supplied was empty");
 			return res;
 		}
 		
 		Map<String, String> valueMap = new HashMap<String, String>();
 		
-		try{
-			for(String key : keys){
+		try {
+			for (String key : keys) {
 				valueMap.put(key, _keyValueMap.get(key));
 			}
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			res.put("error", "An error occured while iterating and getting/setting values");
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
@@ -144,27 +144,27 @@ public class KeyValueMapApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public RESTFunction setValue = (req, res) -> {
-		if(_keyValueMap == null){
+		if (_keyValueMap == null) {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
 		
 		String key = req.getString("key", "");
-		if(key.isEmpty()){
+		if (key.isEmpty()) {
 			res.put("error", "No key was supplied");
 			return res;
 		}
 		
 		boolean allowEmptyValue = req.getBoolean("allowEmptyValue", false);
 		String value = req.getString("value", "");
-		if(value.isEmpty() && !allowEmptyValue){
+		if (value.isEmpty() && !allowEmptyValue) {
 			res.put("error", "An empty value was supplied, and allowEmptyValue is false");
 			return res;
 		}
 		
-		try{
+		try {
 			_keyValueMap.put(key, value);
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			res.put("error", "An error occured while trying to set a value");
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
@@ -199,42 +199,42 @@ public class KeyValueMapApiBuilder {
 	/// | exceptionMsg    | String             | Exception message, if any                                                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
-	public RESTFunction setValues =(req, res) -> {
-		if(_keyValueMap == null){
+	public RESTFunction setValues = (req, res) -> {
+		if (_keyValueMap == null) {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
 		
 		Object keyValues_raw = req.get("keyValues");
-		if(keyValues_raw == null){
+		if (keyValues_raw == null) {
 			res.put("error", "No keyValues map was supplied");
 			return res;
 		}
 		
 		Map<String, Object> keyValues = null;
-		try{
-			if(keyValues_raw instanceof String){
-				keyValues = ConvertJSON.toMap((String)keyValues_raw);
+		try {
+			if (keyValues_raw instanceof String) {
+				keyValues = ConvertJSON.toMap((String) keyValues_raw);
 			}
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			res.put("error", "Conversion to map object failed");
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
 		}
 		
 		boolean allowEmptyValue = req.getBoolean("allowEmptyValue", false);
-		try{
-			for(String key : keyValues.keySet()){
-				String value = (String)keyValues.get(key);
-				if(value.isEmpty()){
-					if(allowEmptyValue){
+		try {
+			for (String key : keyValues.keySet()) {
+				String value = (String) keyValues.get(key);
+				if (value.isEmpty()) {
+					if (allowEmptyValue) {
 						_keyValueMap.put(key, value);
 					}
-				}else{
+				} else {
 					_keyValueMap.put(key, value);
 				}
 			}
-		} catch (Exception ex){
+		} catch (Exception ex) {
 			res.put("error", "An error occured while trying to iterate and set values");
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
@@ -268,21 +268,21 @@ public class KeyValueMapApiBuilder {
 	/// | exceptionMsg    | String             | Exception message, if any                                                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
-	public RESTFunction deleteValue =(req, res) -> {
-		if(_keyValueMap == null){
+	public RESTFunction deleteValue = (req, res) -> {
+		if (_keyValueMap == null) {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
 		
 		String key = req.getString("key", "");
-		if(key.isEmpty()){
+		if (key.isEmpty()) {
 			res.put("error", "An empty key was supplied");
 			return res;
 		}
 		
-		try{
+		try {
 			_keyValueMap.remove(key);
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			res.put("error", "An error occured while trying to delete a value");
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
@@ -316,30 +316,30 @@ public class KeyValueMapApiBuilder {
 	/// | exceptionMsg    | String             | Exception message, if any                                                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
-	public RESTFunction deleteValues =(req, res) -> {
-		if(_keyValueMap == null){
+	public RESTFunction deleteValues = (req, res) -> {
+		if (_keyValueMap == null) {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
 		
 		String[] keys = req.getStringArray("keys", null);
-		if(keys == null){
+		if (keys == null) {
 			res.put("error", "No key array was supplied");
 			return res;
 		}
 		
-		if(keys.length < 1){
+		if (keys.length < 1) {
 			res.put("error", "Key array supplied was empty");
 			return res;
 		}
 		
-		try{
-			for(String key : keys){
-				if(_keyValueMap.containsKey(key)){
+		try {
+			for (String key : keys) {
+				if (_keyValueMap.containsKey(key)) {
 					_keyValueMap.remove(key);
 				}
 			}
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			res.put("error", "An error occured while iterating and deleting mappings");
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
@@ -349,7 +349,6 @@ public class KeyValueMapApiBuilder {
 		
 		return res;
 	};
-	
 	
 	///
 	/// # getMap (GET)
@@ -371,8 +370,8 @@ public class KeyValueMapApiBuilder {
 	/// | map             | Map<String, String>| Returns current mappings                                                      |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
-	public RESTFunction getMap =(req, res) -> {
-		if(_keyValueMap == null){
+	public RESTFunction getMap = (req, res) -> {
+		if (_keyValueMap == null) {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
@@ -381,7 +380,6 @@ public class KeyValueMapApiBuilder {
 		
 		return res;
 	};
-	
 	
 	/////////////////////////////////////////////
 	//
@@ -408,8 +406,6 @@ public class KeyValueMapApiBuilder {
 		//Delete mappings
 		rb.getNamespace(setPrefix + "deleteValue").put(HttpRequestType.POST, deleteValue);
 		rb.getNamespace(setPrefix + "deleteValues").put(HttpRequestType.POST, deleteValues);
-		
-		
 		
 		return rb;
 	}

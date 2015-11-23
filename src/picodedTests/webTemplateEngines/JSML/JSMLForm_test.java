@@ -85,9 +85,9 @@ public class JSMLForm_test {
 	
 	//	@Test
 	public void generatePDFTest() {
-		byte[] pdfData = jsmlForm.generatePDF(data);
-		assertNotNull(pdfData);
-		assertTrue(pdfData.length > 0);
+		// 		byte[] pdfData = jsmlForm.generatePDF(data);
+		// 		assertNotNull(pdfData);
+		// 		assertTrue(pdfData.length > 0);
 	}
 	
 	@Test

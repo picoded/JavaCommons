@@ -210,10 +210,16 @@ public class CommonsPage extends BasePage {
 		
 		// Does the API call
 		if (wildcardUri.length >= 1 && (wildcardUri[0].equalsIgnoreCase("api"))) {
-			restBuilder().servletCall(this, outputData,
-				String.join(".", Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length)));
+			if( 
+				restBuilder().servletCall(this, outputData,
+				String.join(".", Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length)))
+			) {
+				return super.outputJSON(outputData, templateData, output);
+			} else {
+				return false;
+			}
 		}
-		return super.outputJSON(outputData, templateData, output);
+		return false;
 	}
 	
 	/// Auto initialize pages builder

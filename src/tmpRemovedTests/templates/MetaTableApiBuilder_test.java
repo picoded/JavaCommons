@@ -171,4 +171,28 @@ public class MetaTableApiBuilder_test {
 		assertNull(mtApi.meta_GET_inner(_oids.get(0)));
 	}
 	
+	@Test
+	public void csv_exportTest(){
+		int count = 0;
+		List<String> data = new ArrayList<String>();
+		
+		try{
+			FileWriter fw = new FileWriter("./test-files/test-specific/MetaTable/reportsCSV.csv");
+			
+			while((data = mtApi.csv_list(0, count, 2, new String[]{"_oid", "_age", "_name"}, null, null, null)).size() >= 2){ //what if data is null?? oh nooooo
+				count += data.size();
+				for(String str : data){
+					fw.write(str);
+					fw.write("\n");
+				}
+				fw.flush();
+			}
+		}catch(Exception e){
+			
+		}
+		
+		
+		mtApi.csv_export.apply(null,  null);
+	}
+	
 }

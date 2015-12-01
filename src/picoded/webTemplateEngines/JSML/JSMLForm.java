@@ -21,6 +21,11 @@ import javax.xml.bind.DatatypeConverter;
 
 import java.io.FileOutputStream;
 
+import com.floreysoft.jmte.*;
+
+// Sub modules useds
+import picoded.conv.JMTE;
+
 public class JSMLForm {
 	
 	FormGenerator formGen = null;
@@ -454,7 +459,11 @@ public class JSMLForm {
 		}
 		
 		//jmte the result
-		ret = new StringBuilder(page.JMTE().parseTemplate(ret.toString()));
+		JMTE _jmteObj = new JMTE(page.getPagesTemplatePath());
+		_jmteObj.baseDataModel.put("ContextPath", page.getContextURI());
+		_jmteObj.baseDataModel.put("ContextURI","file:///" + page.getContextPath());
+		//_jmteObj.registerNamedRenderer(new page.currentAccountMetaInfo_nr());
+		ret = new StringBuilder(_jmteObj.parseTemplate(ret.toString()));
 		
 		validateTempFolder();
 		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/generatedPDF.pdf";

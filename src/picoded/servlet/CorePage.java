@@ -436,7 +436,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		
 		if (httpRequest != null) {
 			return (_contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/");
-		} 
+		}
 		
 		if (_servletContextEvent != null) {
 			ServletContext sc = _servletContextEvent.getServletContext();
@@ -450,7 +450,6 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 			return (_contextPath = "./");
 		}
 	}
-	
 	
 	/// Cached context path
 	protected String _contextURI = null;
@@ -833,7 +832,6 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	public void destroyContext() throws Exception {
 		// does nothing
 	}
-	
 	
 	///////////////////////////////////////////////////////
 	//

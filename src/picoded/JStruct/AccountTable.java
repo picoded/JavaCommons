@@ -140,7 +140,6 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		groupChild_meta = jStructObj.getMetaTable(tableName + ACCOUNT_CHILDMETA);
 		loginThrottlingAttempt = jStructObj.getKeyValueMap(tableName + ACCOUNT_LOGIN_THROTTLING_ATTEMPT);
 		loginThrottlingElapsed = jStructObj.getKeyValueMap(tableName + ACCOUNT_LOGIN_THROTTLING_ELAPSED);
-		System.out.println(tableName + ACCOUNT_LOGIN_THROTTLING_ELAPSED);
 		accountSessions.setTempHint(true); //optimization
 	}
 	

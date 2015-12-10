@@ -343,4 +343,43 @@ public class AccountObject extends JStruct_MetaObject {
 		String superUserGroupRole = superUserGrp.getMemberRole(this);
 		return (superUserGroupRole != null && superUserGroupRole.equalsIgnoreCase("admin"));
 	}
+	
+	/// This method logs the details about login faailure for the user based on User ID
+	public void logLoginFailure(String userID) {
+	    mainTable.loginThrottlingAttempt.putWithLifespan(userID, "1", 999999999);
+	    mainTable.loginThrottlingElapsed.putWithLifespan(userID, "2", 999999999);
+	}
+	
+	/// This method returns time left before next permitted login attempt for the user based on User ID
+	public int getNextLoginTimeAllowed(String userID) {
+	    String val = mainTable.loginThrottlingElapsed.get(userID);
+	    if (val == null || "".equals(val)) {
+	        return 0;
+	    }
+	    return Integer.parseInt(val);
+	}
+	
+	/// This method would be added in on next login failure for the user based on User ID
+	public long getTimeElapsedNextLogin(String userId) {
+	    String elapsedValueString = mainTable.loginThrottlingElapsed.get(userId);
+	    if (elapsedValueString == null || "".equals(elapsedValueString)) {
+	        return 2l;
+	    }
+	    long elapsedValue = Long.parseLong(elapsedValueString);
+	    return elapsedValue * 2;
+	}
+	
+	/// This method would be added the delay for the user based on User ID
+	public void addDelay(String userId) {
+	    String atteemptValueString = mainTable.loginThrottlingAttempt.get(userId);
+	    if (atteemptValueString == null || "".equals(atteemptValueString)) {
+	       logLoginFailure(userId);
+	    } else {
+	        long elapsedValue = getTimeElapsedNextLogin(userId);
+	        mainTable.loginThrottlingElapsed.putWithLifespan(userId, String.valueOf(elapsedValue), 999999999);
+	        int attemptValue = Integer.parseInt(atteemptValueString);
+	        mainTable.loginThrottlingAttempt.putWithLifespan(userId, String.valueOf(++attemptValue), 999999999);
+	    }
+	    
+	}
 }

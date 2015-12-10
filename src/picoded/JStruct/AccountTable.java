@@ -83,6 +83,16 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	/// MetaTable<GroupOID-MemberOID, MetaObject>
 	protected MetaTable groupChild_meta = null; //to delete from
 	
+	///Handles the Login Throttling Attempt Key (User Id) Value (Attempt) field mapping
+	///
+	/// KeyValueMap<
+	protected KeyValueMap loginThrottlingAttempt = null;
+	
+	///Handles the Login Throttling Elapsed Time Key (User Id) Value (Elapsed) field mapping
+	///
+	/// KeyValueMap<
+	protected KeyValueMap loginThrottlingElapsed = null;
+	
 	///
 	/// Table suffixes for the variosu sub tables
 	///--------------------------------------------------------------------------
@@ -108,6 +118,12 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	/// The child account meta values
 	protected static String ACCOUNT_CHILDMETA = "_CM";
 	
+	/// The Login Throttling Attempt account values
+	protected static String ACCOUNT_LOGIN_THROTTLING_ATTEMPT = "_LA";
+	
+	/// The Login Throttling Elapsed account values
+	protected static String ACCOUNT_LOGIN_THROTTLING_ELAPSED = "_LE";
+	
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
@@ -122,7 +138,9 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		accountMeta = jStructObj.getMetaTable(tableName + ACCOUNT_META);
 		group_childRole = jStructObj.getMetaTable(tableName + ACCOUNT_CHILD);
 		groupChild_meta = jStructObj.getMetaTable(tableName + ACCOUNT_CHILDMETA);
-		
+		loginThrottlingAttempt = jStructObj.getKeyValueMap(tableName + ACCOUNT_LOGIN_THROTTLING_ATTEMPT);
+		loginThrottlingElapsed = jStructObj.getKeyValueMap(tableName + ACCOUNT_LOGIN_THROTTLING_ELAPSED);
+		System.out.println(tableName + ACCOUNT_LOGIN_THROTTLING_ELAPSED);
 		accountSessions.setTempHint(true); //optimization
 	}
 	
@@ -138,7 +156,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		accountMeta.systemSetup();
 		group_childRole.systemSetup();
 		groupChild_meta.systemSetup();
-		
+		loginThrottlingAttempt.systemSetup();
+		loginThrottlingElapsed.systemSetup();
 		if (superUserGroup() == null) {
 			newObject(_superUserGroup).saveAll();
 		}
@@ -152,6 +171,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		accountMeta.systemTeardown();
 		group_childRole.systemTeardown();
 		groupChild_meta.systemTeardown();
+		loginThrottlingAttempt.systemTeardown();
+		loginThrottlingElapsed.systemTeardown();
 	}
 	
 	//
@@ -730,4 +751,5 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		
 		return ret.toArray(new AccountObject[ret.size()]);
 	}
+	
 }

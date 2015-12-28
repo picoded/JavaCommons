@@ -96,6 +96,8 @@ public class PagesHTML {
 		// Removes trailing /, unless its the only character
 		if (uriRootPrefix.length() > 1 && uriRootPrefix.endsWith("/")) {
 			uriRootPrefix = uriRootPrefix.substring(0, uriRootPrefix.length() - 1);
+		} else {
+			uriRootPrefix = "";
 		}
 		
 		// 

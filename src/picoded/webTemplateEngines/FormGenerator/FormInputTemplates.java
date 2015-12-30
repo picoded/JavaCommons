@@ -1,6 +1,7 @@
 package picoded.webTemplateEngines.FormGenerator;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -84,12 +85,12 @@ public class FormInputTemplates {
 	private static String thousandsSeparator(String value) {
 		String ret = "";
 		if (value != null && !value.isEmpty()) {
-			if(value.equalsIgnoreCase("0")){
+			if (value.equalsIgnoreCase("0") || value.equalsIgnoreCase("0.00")) {
 				ret = "0.00";
-			}else{
+			} else {
 				boolean reappendBrackets = false;
 				String tempValue = value;
-				if(value.startsWith("(")){
+				if (value.startsWith("(")) {
 					tempValue = tempValue.substring(1, tempValue.length());
 					tempValue = tempValue.substring(0, tempValue.length() - 1);
 					reappendBrackets = true;
@@ -97,11 +98,11 @@ public class FormInputTemplates {
 				
 				DecimalFormat df = new DecimalFormat("#,###.00");
 				BigDecimal bigD = new BigDecimal(tempValue);
-				bigD.setScale(2);
+				bigD = bigD.setScale(2, RoundingMode.HALF_UP);
 				
 				try {
 					ret = df.format(bigD);
-					if(reappendBrackets){
+					if (reappendBrackets) {
 						ret = "(" + ret + ")";
 					}
 				} catch (Exception e) {
@@ -185,14 +186,26 @@ public class FormInputTemplates {
 		CaseInsensitiveHashMap<String, String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getStringValue();
 		
-		StringBuilder[] sbArr = null;
+		StringBuilder[] sbArr = new StringBuilder[2];
+		sbArr[0] = new StringBuilder();
+		sbArr[1] = new StringBuilder();
 		
 		if (!displayMode) {
 			sbArr = node.defaultHtmlInput(HtmlTag.TEXTAREA, "pfi_inputTextBox pfi_input", null);
+			sbArr[0].append(fieldValue);
 		} else {
-			sbArr = node.defaultHtmlInput("pre", "pfi_inputTextBox pfi_input pfi_display", null);
+			String[] fieldValParaSplit = fieldValue.split("\n");
+			for (String para : fieldValParaSplit) {
+				Map<String, Object> newParaMap = new HashMap<String, Object>();
+				newParaMap.put(node.getFieldName(), para);
+				FormNode paraNode = new FormNode(node._formGenerator, node, newParaMap);
+				StringBuilder[] newPara = new StringBuilder[2];
+				newPara = paraNode.defaultHtmlInput("pre", "pfi_inputTextBox pfi_input pfi_display", null);
+				sbArr[0].append(newPara[0]);
+				sbArr[0].append(para);
+				sbArr[0].append(newPara[1]);
+			}
 		}
-		sbArr[0].append(fieldValue);
 		return sbArr[0].append(sbArr[1]);
 	}
 	
@@ -681,7 +694,7 @@ public class FormInputTemplates {
 			String hiddenInputName = node.getFieldName(); //set the hidden input field to the name given
 			if (hiddenInputName != null && !hiddenInputName.isEmpty()) {
 				//node.replace("field", hiddenInputName + "_date");
-				node.replace("field",  node.getFieldNameWithoutPrefix() + "_date");
+				node.replace("field", node.getFieldNameWithoutPrefix() + "_date");
 				
 				String onchangeFunctionString = "changeDateToEpochTime(this.value, '" + hiddenInputName + "')";
 				paramMap.put("onchange", onchangeFunctionString);

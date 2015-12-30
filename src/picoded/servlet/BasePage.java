@@ -35,7 +35,8 @@ import picoded.webTemplateEngines.JSML.*;
 import picoded.webTemplateEngines.PagesBuilder.*;
 
 /**
- * Extends the corePage/jSqlPage functionality, and implements basic UI templating, and accountManagement
+ * Extends the corePage/jSqlPage functionality, and implements basic UI templating, lifecycle handling, 
+ * and accountsManagement
  *
  * ---------------------------------------------------------------------------------------------------------
  *
@@ -312,64 +313,9 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	/////////////////////////////////////////////
 	
 	/// BasePage initializeContext to be extended / build on
+	@Override
 	public void initializeContext() throws Exception {
 		accountAuthTableSetup();
 	}
 	
-	/// BasePage destroyContext to be extended / build on
-	public void destroyContext() throws Exception {
-		// does nothing
-	}
-	
-	/// [Do not extend] Servlet context initializer handling. 
-	public void contextInitialized(ServletContextEvent sce) {
-		_servletContextEvent = sce;
-		try {
-			initializeContext();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	/// [Do not extend] Servlet context destroyed handling
-	public void contextDestroyed(ServletContextEvent sce) {
-		_servletContextEvent = sce;
-		try {
-			destroyContext();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	/// Cached servlet context event
-	protected ServletContextEvent _servletContextEvent = null;
-	
-	/// Gets and returns the context path / application folder path
-	public String getContextPath() {
-		if (_contextPath != null) {
-			return _contextPath;
-		}
-		
-		if (_servletContextEvent != null) {
-			ServletContext sc = _servletContextEvent.getServletContext();
-			return (_contextPath = sc.getRealPath("/")) + "/";
-		}
-		return super.getContextPath();
-	}
-	
-	/// Cached context path
-	protected String _contextURI = null;
-	
-	/// Returns the servlet contextual path : needed for base URI for page redirects / etc
-	public String getContextURI() {
-		if (_contextURI != null) {
-			return _contextURI;
-		}
-		
-		if (_servletContextEvent != null) {
-			ServletContext sc = _servletContextEvent.getServletContext();
-			return (_contextURI = sc.getContextPath()) + "/";
-		}
-		return (_contextURI = super.getContextURI());
-	}
 }

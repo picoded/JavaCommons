@@ -1,5 +1,6 @@
 package picoded.RESTBuilder.templates;
 
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -123,7 +124,7 @@ public class MetaTableApiBuilder {
 			headers = new String[] { "_oid" };
 		}
 		
-		String[] queryColumns = req.getStringArray("queryColumns",headers);
+		String[] queryColumns = req.getStringArray("queryColumns", headers);
 		String searchParams = req.getString("search[value]", "").trim();
 		String wildcardMode = req.getString("wildcardMode", "suffix");
 		
@@ -135,7 +136,7 @@ public class MetaTableApiBuilder {
 		// The query to use
 		String query = req.getString("query", "");
 		String[] queryArgs = req.getStringArray("queryArgs");
-		if(queryArgs == null){
+		if (queryArgs == null) {
 			queryArgs = new String[0];
 		}
 		
@@ -147,15 +148,16 @@ public class MetaTableApiBuilder {
 		boolean dataTableSearchFilter = false;
 		
 		// Data tables search refinement
-		if(!searchParams.isEmpty() && queryColumns != null && queryColumns.length > 0){
-			List<String> queryArgsList =  new ArrayList<String>(); //rebuild query arguments
-			if(queryArgs != null){
-				for(String queryArg : queryArgs){
+		if (!searchParams.isEmpty() && queryColumns != null && queryColumns.length > 0) {
+			List<String> queryArgsList = new ArrayList<String>(); //rebuild query arguments
+			if (queryArgs != null) {
+				for (String queryArg : queryArgs) {
 					queryArgsList.add(queryArg);
 				}
 			}
 			
-			query = "" + query + " AND " + generateQueryStringForSearchValue(searchParams, queryColumns, wildcardMode) + ""; //rebuilding query string
+			query = "" + query + " AND " + generateQueryStringForSearchValue(searchParams, queryColumns, wildcardMode)
+				+ ""; //rebuilding query string
 			generateQueryStringArgsForSearchValue_andAddToList(searchParams, queryColumns, wildcardMode, queryArgsList);
 			queryArgs = queryArgsList.toArray(new String[queryArgsList.size()]);
 			
@@ -171,7 +173,7 @@ public class MetaTableApiBuilder {
 		
 		// Records total handling
 		long recordsTotal = 0;
-		if(queryOriginal != null && queryOriginal.length() > 0) {
+		if (queryOriginal != null && queryOriginal.length() > 0) {
 			recordsTotal = _metaTableObj.queryCount(queryOriginal, queryOriginalArgs); //base reduce count
 		} else {
 			recordsTotal = _metaTableObj.size(); //count all
@@ -180,7 +182,7 @@ public class MetaTableApiBuilder {
 		
 		// Records filtered handling
 		long recordsFiltered = recordsTotal;
-		if( dataTableSearchFilter ) {
+		if (dataTableSearchFilter) {
 			recordsFiltered = _metaTableObj.queryCount(query, queryArgs);
 		}
 		res.put("recordsFiltered", recordsFiltered);
@@ -197,14 +199,15 @@ public class MetaTableApiBuilder {
 		return res;
 	};
 	
-	private static List<String> generateQueryStringArgsForSearchValue_andAddToList(String inSearchString, String[] queryColumns, String wildcardMode, List<String> ret) {
-		if(inSearchString != null && queryColumns != null){
+	private static List<String> generateQueryStringArgsForSearchValue_andAddToList(String inSearchString,
+		String[] queryColumns, String wildcardMode, List<String> ret) {
+		if (inSearchString != null && queryColumns != null) {
 			String[] searchStringSplit = inSearchString.trim().split("\\s+");
 			StringBuilder querySB = new StringBuilder();
 			
 			String wildMode = wildcardMode;
-			for(String searchString : searchStringSplit) {
-				for(String queryColumn : queryColumns){
+			for (String searchString : searchStringSplit) {
+				for (String queryColumn : queryColumns) {
 					ret.add(getStringWithWildcardMode(searchString, wildMode));
 				}
 				wildMode = "both"; //Second string onwards is both side wildcard
@@ -214,23 +217,24 @@ public class MetaTableApiBuilder {
 		return ret;
 	}
 	
-	private static String generateQueryStringForSearchValue(String inSearchString, String[] queryColumns, String wildcardMode){
-		if(inSearchString != null && queryColumns != null){
+	private static String generateQueryStringForSearchValue(String inSearchString, String[] queryColumns,
+		String wildcardMode) {
+		if (inSearchString != null && queryColumns != null) {
 			String[] searchStringSplit = inSearchString.trim().split("\\s+");
 			StringBuilder querySB = new StringBuilder();
 			
-			for(int i = 0; i < searchStringSplit.length; ++i){
+			for (int i = 0; i < searchStringSplit.length; ++i) {
 				querySB.append("(");
-				for(int queryCol = 0; queryCol < queryColumns.length; ++queryCol){
+				for (int queryCol = 0; queryCol < queryColumns.length; ++queryCol) {
 					querySB.append(queryColumns[queryCol] + " LIKE ?");
 					
-					if(queryCol < queryColumns.length - 1){
+					if (queryCol < queryColumns.length - 1) {
 						querySB.append(" OR ");
 					}
 				}
 				querySB.append(")");
 				
-				if(i < searchStringSplit.length -1){
+				if (i < searchStringSplit.length - 1) {
 					querySB.append(" AND ");
 				}
 			}
@@ -240,12 +244,12 @@ public class MetaTableApiBuilder {
 		return "";
 	}
 	
-	private static String getStringWithWildcardMode(String searchString, String wildcardMode){
-		if(wildcardMode.equalsIgnoreCase("prefix")){
+	private static String getStringWithWildcardMode(String searchString, String wildcardMode) {
+		if (wildcardMode.equalsIgnoreCase("prefix")) {
 			return "%" + searchString;
-		}else if(wildcardMode.equalsIgnoreCase("suffix")){
+		} else if (wildcardMode.equalsIgnoreCase("suffix")) {
 			return searchString + "%";
-		}else{
+		} else {
 			return "%" + searchString + "%";
 		}
 	}
@@ -291,6 +295,131 @@ public class MetaTableApiBuilder {
 		
 		return ret;
 	}
+	
+	public List<String> csv_list(int draw, int start, int length, String[] headers, String query,
+			String[] queryArgs, String orderBy) throws RuntimeException {
+		
+		List<String> ret = new ArrayList<String>();
+		
+		try{
+			MetaObject[] metaObjs = null;
+			
+			if (query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0) {
+				metaObjs = _metaTableObj.query(null, null, orderBy, start, length);
+			} else {
+				metaObjs = _metaTableObj.query(query, queryArgs, orderBy, start, length);
+			}
+		
+			for (MetaObject metaObj : metaObjs) {
+				List<Object> row = new ArrayList<Object>();
+				for (String header : headers) {
+					row.add(metaObj.get(header));
+				}
+				
+				//for each element in row, stringbuilder and add to ret
+				StringBuilder singleRowCSV = new StringBuilder();
+				int rowSize = row.size();
+				for(int i = 0; i < rowSize; ++i){
+					String valStr = (String)row.get(i);
+					if(valStr == null){
+						valStr = "";
+					}
+					valStr = valStr.replace("\"", ""); //might not be best solution
+					valStr = valStr.replace("\n", "");
+					
+					valStr = "\"" + valStr + "\"";
+					singleRowCSV.append(valStr);
+					
+					if(i < rowSize - 1){
+						singleRowCSV.append(",");
+					} else {
+						singleRowCSV.append("\n");
+					}
+				}
+				
+				ret.add(singleRowCSV.toString());
+			}
+			
+		} catch (Exception e) {
+			throw new RuntimeException("csv_list() ", e);
+		}
+
+		return ret;
+	}
+	
+	//csv export function
+	public RESTFunction csv_export = (req, res) -> {
+		
+		int draw = req.getInt("draw");
+		int start = req.getInt("start");
+		int limit = req.getInt("length");
+		
+		String orderByStr = req.getString("orderBy");
+		if (orderByStr == null || orderByStr.isEmpty()) {
+			orderByStr = "oID";
+		}
+		
+		String[] headers = req.getStringArray("headers");
+		
+		if (headers == null || headers.length < 1) {
+			headers = new String[] { "_oid" };
+		}
+		
+		String query = req.getString("query");
+		String[] queryArgs = req.getStringArray("queryArgs");
+		
+		//put back into response
+		res.put("draw", draw);
+		res.put("headers", headers);
+		
+		res.put("recordsTotal", _metaTableObj.size());
+		
+		if (query != null && !query.isEmpty() && queryArgs != null && queryArgs.length > 0) {
+			res.put("recordsFiltered", _metaTableObj.queryCount(query, queryArgs));
+		}
+		
+		List<String> data = null;
+		int count = start;
+		
+		CorePage page = req.requestPage();
+		PrintWriter pWriter = page.getWriter();
+		page.getHttpServletResponse().setContentType("text/csv");
+		page.getHttpServletResponse().setHeader("Content-Disposition", "attachment;filename=reports.csv");
+		
+		try {	
+			
+			// VIEW VIA CONSOLE.LOG()
+			// data = csv_list (draw, count, limit, headers, query, queryArgs, orderByStr);
+			// String d = "";
+			// for(String str : data){
+				// d += str;
+			// }
+			// res.put("data", d);
+			
+			
+			
+			if ((data = csv_list(draw, count, limit, headers, query, queryArgs, orderByStr)).size() >= limit){
+				count += data.size();
+				for(String str : data){
+					pWriter.write(str);
+				}
+				pWriter.flush();
+			}
+			
+			
+			// final batch write
+			for(String str : data){
+				pWriter.write(str);
+			}
+			pWriter.flush();
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
+		// res.put("MetaTableApiBuilder", "csv_export");
+		return null;
+	};
 	
 	/////////////////////////////////////////////
 	//
@@ -577,6 +706,9 @@ public class MetaTableApiBuilder {
 		
 		rb.getNamespace(setPrefix + "meta").put(HttpRequestType.DELETE, meta_DELETE);
 		rb.getNamespace(setPrefix + "meta.*").put(HttpRequestType.DELETE, meta_DELETE);
+		
+		rb.getNamespace(setPrefix + "csv").put(HttpRequestType.GET, csv_export);
+		rb.getNamespace(setPrefix + "csv").put(HttpRequestType.POST, csv_export);
 		
 		return rb;
 	}

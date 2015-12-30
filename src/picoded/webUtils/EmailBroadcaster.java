@@ -136,8 +136,8 @@ public class EmailBroadcaster {
 		
 		// Loops through file attachments, and add it
 		if (fileAttachments != null) {
-			MimeBodyPart messageBodyPart = new MimeBodyPart();
 			for (Map.Entry<String, String> entry : fileAttachments.entrySet()) {
+				MimeBodyPart messageBodyPart = new MimeBodyPart();
 				String key = entry.getKey();
 				String value = entry.getValue();
 				

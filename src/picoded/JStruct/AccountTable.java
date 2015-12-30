@@ -83,6 +83,16 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	/// MetaTable<GroupOID-MemberOID, MetaObject>
 	protected MetaTable groupChild_meta = null; //to delete from
 	
+	///Handles the Login Throttling Attempt Key (User Id) Value (Attempt) field mapping
+	///
+	/// KeyValueMap<
+	protected KeyValueMap loginThrottlingAttempt = null;
+	
+	///Handles the Login Throttling Elapsed Time Key (User Id) Value (Elapsed) field mapping
+	///
+	/// KeyValueMap<
+	protected KeyValueMap loginThrottlingElapsed = null;
+	
 	///
 	/// Table suffixes for the variosu sub tables
 	///--------------------------------------------------------------------------
@@ -108,6 +118,12 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	/// The child account meta values
 	protected static String ACCOUNT_CHILDMETA = "_CM";
 	
+	/// The Login Throttling Attempt account values
+	protected static String ACCOUNT_LOGIN_THROTTLING_ATTEMPT = "_LA";
+	
+	/// The Login Throttling Elapsed account values
+	protected static String ACCOUNT_LOGIN_THROTTLING_ELAPSED = "_LE";
+	
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
@@ -122,7 +138,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		accountMeta = jStructObj.getMetaTable(tableName + ACCOUNT_META);
 		group_childRole = jStructObj.getMetaTable(tableName + ACCOUNT_CHILD);
 		groupChild_meta = jStructObj.getMetaTable(tableName + ACCOUNT_CHILDMETA);
-		
+		loginThrottlingAttempt = jStructObj.getKeyValueMap(tableName + ACCOUNT_LOGIN_THROTTLING_ATTEMPT);
+		loginThrottlingElapsed = jStructObj.getKeyValueMap(tableName + ACCOUNT_LOGIN_THROTTLING_ELAPSED);
 		accountSessions.setTempHint(true); //optimization
 	}
 	
@@ -138,7 +155,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		accountMeta.systemSetup();
 		group_childRole.systemSetup();
 		groupChild_meta.systemSetup();
-		
+		loginThrottlingAttempt.systemSetup();
+		loginThrottlingElapsed.systemSetup();
 		if (superUserGroup() == null) {
 			newObject(_superUserGroup).saveAll();
 		}
@@ -152,6 +170,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		accountMeta.systemTeardown();
 		group_childRole.systemTeardown();
 		groupChild_meta.systemTeardown();
+		loginThrottlingAttempt.systemTeardown();
+		loginThrottlingElapsed.systemTeardown();
 	}
 	
 	//
@@ -678,50 +698,50 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	// Getting users based on filters
 	// TODO: To optimise because Sam is dumb
 	// --------------------------------------------------------------------------
-	public AccountObject[] getUsersByGroupAndRole(String[] insideGroupAny, String[] hasRoleAny){
+	public AccountObject[] getUsersByGroupAndRole(String[] insideGroupAny, String[] hasRoleAny) {
 		List<AccountObject> ret = new ArrayList<AccountObject>();
 		
 		MetaObject[] metaObjs = accountMetaTable().query(null, null, "oID", 0, 0); //initial query just to get everything out so i can filter
 		
-		if(metaObjs == null){
+		if (metaObjs == null) {
 			return null;
 		}
 		
 		boolean doGroupCheck = (insideGroupAny != null && insideGroupAny.length > 0);
 		boolean doRoleCheck = (hasRoleAny != null && hasRoleAny.length > 0);
 		
-		for(MetaObject metaObj : metaObjs){
+		for (MetaObject metaObj : metaObjs) {
 			AccountObject ao = getFromID(metaObj._oid());
 			
-			if(ao == null){
+			if (ao == null) {
 				continue;
 			}
 			
 			AccountObject[] userGroups = ao.getGroups();
 			
-			if(userGroups == null){
+			if (userGroups == null) {
 				continue;
 			}
 			
-			for(AccountObject userGroup : userGroups){
-				if(doGroupCheck){
+			for (AccountObject userGroup : userGroups) {
+				if (doGroupCheck) {
 					if (ArrayUtils.contains(insideGroupAny, userGroup._oid())) {
-						if(doRoleCheck){
+						if (doRoleCheck) {
 							String memberRole = userGroup.getMemberRole(ao);
-							if(ArrayUtils.contains(hasRoleAny, memberRole)){
+							if (ArrayUtils.contains(hasRoleAny, memberRole)) {
 								ret.add(ao);
 							}
-						}else{
+						} else {
 							ret.add(ao);
 						}
 					}
-				}else{
-					if(doRoleCheck){
+				} else {
+					if (doRoleCheck) {
 						String memberRole = userGroup.getMemberRole(ao);
-						if(ArrayUtils.contains(hasRoleAny, memberRole)){
+						if (ArrayUtils.contains(hasRoleAny, memberRole)) {
 							ret.add(ao);
 						}
-					}else{
+					} else {
 						ret.add(ao);
 					}
 				}
@@ -730,4 +750,5 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		
 		return ret.toArray(new AccountObject[ret.size()]);
 	}
+	
 }

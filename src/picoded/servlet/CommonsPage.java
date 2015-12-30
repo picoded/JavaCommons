@@ -31,6 +31,7 @@ import picoded.enums.*;
 import picoded.fileUtils.FileUtils;
 import picoded.JStack.*;
 import picoded.JStruct.*;
+import picoded.ServletLogging.*;
 import picoded.RESTBuilder.*;
 import picoded.RESTBuilder.templates.*;
 import picoded.webUtils.*;
@@ -209,10 +210,16 @@ public class CommonsPage extends BasePage {
 		
 		// Does the API call
 		if (wildcardUri.length >= 1 && (wildcardUri[0].equalsIgnoreCase("api"))) {
-			restBuilder().servletCall(this, outputData,
-				String.join(".", Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length)));
+			if( 
+				restBuilder().servletCall(this, outputData,
+				String.join(".", Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length)))
+			) {
+				return super.outputJSON(outputData, templateData, output);
+			} else {
+				return false;
+			}
 		}
-		return super.outputJSON(outputData, templateData, output);
+		return false;
 	}
 	
 	/// Auto initialize pages builder
@@ -257,5 +264,18 @@ public class CommonsPage extends BasePage {
 		String emailFrom = JConfigObj.getString("sys.dataStack.smtp.emailFrom", "testingTheEmailSystem@mailinator.com");
 		
 		return (_systemEmail = new EmailBroadcaster(hostname, username, password, emailFrom));
+	}
+	
+	/// Cached memoizer copy
+	protected ServletLogging _systemLogging = null;
+	
+	/// the servlet logging module
+	public ServletLogging systemLogging() {
+		// Returns cached copy if posisble
+		if (_systemLogging != null) {
+			return _systemLogging;
+		}
+		
+		return _systemLogging = new ServletLogging();
 	}
 }

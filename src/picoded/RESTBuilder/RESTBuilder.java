@@ -176,8 +176,11 @@ public class RESTBuilder {
 			}
 		}
 		
+		/// Missing name space handling
 		if (nsObj == null) {
-			return null;
+			res.put("requested-API", apiNamespace);
+			res.put("error", "REST API not found");
+			return res;
 		}
 		
 		/// Set the request values, respective to the found API node
@@ -211,10 +214,12 @@ public class RESTBuilder {
 	///
 	/// This is mainly intended to be call within CorePage doJSON
 	public boolean servletCall(picoded.servlet.CorePage page, Map<String, Object> resultMap, String apiNamespace) {
+		/// If null, the assumption is the request process flow is terminated. Hence default behaviour of JSON output is canceled
 		if (namespaceCall(apiNamespace, page.requestType(), page, resultMap) == null) {
-			resultMap.put("requested-API", apiNamespace);
-			resultMap.put("error", "REST API not found");
+			return false;
 		}
+		
+		/// Assume default behaviour (output JSON)
 		return true;
 	}
 	

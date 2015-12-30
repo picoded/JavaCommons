@@ -129,4 +129,46 @@ public class AccountTable_test {
 		assertEquals(1, grpList.length);
 		assertEquals(grpObj._oid(), grpList[0]._oid());
 	}
+	
+	@Test
+	public void logLoginFailureTest() {
+	    AccountObject usrObj;
+	    usrObj = accTableObj.newObject();
+	    assertNotNull(usrObj);
+	    usrObj.logLoginFailure("Test-1");
+	}
+	
+	@Test
+	public void getNextLoginTimeAllowedTest() {
+	    AccountObject usrObj;
+	    usrObj = accTableObj.newObject();
+	    assertNotNull(usrObj);
+	    usrObj.logLoginFailure("Test-1");
+	    assertEquals(usrObj.getNextLoginTimeAllowed("Test-1"), 2);
+	}
+	
+	@Test
+	public void getTimeElapsedNextLoginTest() {
+	    AccountObject usrObj;
+	    usrObj = accTableObj.newObject();
+	    assertEquals(usrObj.getTimeElapsedNextLogin("Test-1"), 2);
+	}
+	
+	@Test
+	public void getTimeElapsedNextLoginTestAfterFailAttempt() {
+	    AccountObject usrObj;
+	    usrObj = accTableObj.newObject();
+	    assertEquals(usrObj.getTimeElapsedNextLogin("Test-1"), 2);
+	    usrObj.addDelay("Test-1");
+	    assertEquals(usrObj.getTimeElapsedNextLogin("Test-1"), 4);
+	}
+	
+	@Test
+	public void addDelayTest() {
+	    AccountObject usrObj;
+	    usrObj = accTableObj.newObject();
+	    usrObj.addDelay("Test-1");
+	    usrObj.addDelay("Test-1");
+	    assertEquals(usrObj.getTimeElapsedNextLogin("Test-1"), 8);
+	}
 }

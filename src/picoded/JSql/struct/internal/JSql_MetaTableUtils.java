@@ -644,44 +644,40 @@ public class JSql_MetaTableUtils {
 				}
 				
 				// Gets the original field query map, to do subtitution
-				Map<String,List<Query>> fieldQueryMap = queryObj.fieldQueryMap();
-				Map<String,Object> queryArgMap = queryObj.queryArgumentsMap();
+				Map<String, List<Query>> fieldQueryMap = queryObj.fieldQueryMap();
+				Map<String, Object> queryArgMap = queryObj.queryArgumentsMap();
 				int newQueryArgsPos = queryArgMap.size() + 1;
 				
 				//
 				// Parses the where clause with query type map, 
 				// to enforce lower case search for string based nodes
 				//
-				for( String key : queryTypeMap.keySet() ) {
+				for (String key : queryTypeMap.keySet()) {
 					
 					// For each string based search, enforce lowercase search
 					MetaType subType = queryTypeMap.get(key);
-					if( subType == MetaType.STRING ) {
+					if (subType == MetaType.STRING) {
 						
 						// The query list to do lower case replacement
-						List<Query> toReplaceQueries = fieldQueryMap.get( key );
+						List<Query> toReplaceQueries = fieldQueryMap.get(key);
 						
 						// Skip if blank
-						if( toReplaceQueries == null || toReplaceQueries.size() <= 0 ) {
+						if (toReplaceQueries == null || toReplaceQueries.size() <= 0) {
 							continue;
 						}
 						
 						// Iterate the queries to replace them
-						for( Query toReplace : toReplaceQueries ) {
+						for (Query toReplace : toReplaceQueries) {
 							
 							String argName = toReplace.argumentName();
 							Object argLowerCase = queryArgMap.get(argName);
-							if(argLowerCase != null) {
+							if (argLowerCase != null) {
 								argLowerCase = argLowerCase.toString().toLowerCase();
 							}
 							
-							queryArgMap.put(""+newQueryArgsPos, argLowerCase);
-							Query replacement = QueryFilter.basicQueryFromTokens(
-								queryArgMap,
-								toReplace.fieldName()+lowerCaseSuffix,
-								toReplace.operatorSymbol(),
-								":"+newQueryArgsPos
-							);
+							queryArgMap.put("" + newQueryArgsPos, argLowerCase);
+							Query replacement = QueryFilter.basicQueryFromTokens(queryArgMap, toReplace.fieldName()
+								+ lowerCaseSuffix, toReplace.operatorSymbol(), ":" + newQueryArgsPos);
 							
 							// Case sensitive varient
 							// replacement = new And(
@@ -794,9 +790,7 @@ public class JSql_MetaTableUtils {
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
 		return metaTableObj.getArrayFromID(
-			metaTableQueryKey(metaTableObj, sql, tablename, whereClause, whereValues, orderByStr, offset, limit), 
-			true
-		);
+			metaTableQueryKey(metaTableObj, sql, tablename, whereClause, whereValues, orderByStr, offset, limit), true);
 	}
 	
 	/// Performs a search query, and returns the respective MetaObjects
@@ -817,10 +811,9 @@ public class JSql_MetaTableUtils {
 		//
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
-		JSqlResult r = metaTableSelectQueryBuilder(
-			metaTableObj, sql, tablename, "COUNT(DISTINCT oID) AS rcount", whereClause, whereValues, orderByStr, offset,
-			limit);
-			
+		JSqlResult r = metaTableSelectQueryBuilder(metaTableObj, sql, tablename, "COUNT(DISTINCT oID) AS rcount",
+			whereClause, whereValues, orderByStr, offset, limit);
+		
 		List<Object> rcountArr = r.get("rcount");
 		// Generate the object list
 		if (rcountArr != null) {

@@ -129,7 +129,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	public void maintenance() {
 		try {
 			long now = currentSystemTimeInSeconds();
-			sqlObj.execute("DELETE FROM `" + sqlTableName + "` WHERE eTm <= ?", now);
+			sqlObj.execute("DELETE FROM `" + sqlTableName + "` WHERE eTm <= ? AND eTm > ?", now, 0);
 		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}

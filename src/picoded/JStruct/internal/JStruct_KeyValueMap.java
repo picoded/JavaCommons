@@ -111,7 +111,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 				long time = (timeObj != null) ? timeObj.longValue() : 0;
 				
 				// expired? kick it
-				if (time < now) {
+				if (time < now && time > 0) {
 					valueMap.remove(key);
 					expireMap.remove(key);
 				}

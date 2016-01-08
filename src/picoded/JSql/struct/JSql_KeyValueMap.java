@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import picoded.struct.*;
+import picoded.enums.JSqlType;
 import picoded.JSql.*;
 import picoded.conv.*;
 import picoded.JStruct.*;
@@ -99,9 +100,15 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 			
 			// Value search index
 			//------------------------------------------------
-			sqlObj.createTableIndexQuerySet( //
-				sqlTableName, "kVl", null, "valMap" //
-			).execute();
+			if( sqlObj.sqlType == JSqlType.mysql ) {
+				sqlObj.createTableIndexQuerySet( //
+					sqlTableName, "kVl(255)", null, "valMap" //
+				).execute();
+			} else {
+				sqlObj.createTableIndexQuerySet( //
+					sqlTableName, "kVl", null, "valMap" //
+				).execute();
+			}
 		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
@@ -122,7 +129,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	public void maintenance() {
 		try {
 			long now = currentSystemTimeInSeconds();
-			sqlObj.execute("DELETE FROM `" + sqlTableName + "` WHERE eTm <= ?", now);
+			sqlObj.execute("DELETE FROM `" + sqlTableName + "` WHERE eTm <= ? AND eTm > ?", now, 0);
 		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}

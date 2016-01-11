@@ -200,6 +200,10 @@ public class JStackPage extends CorePage {
 		}
 	}
 	
+	////////////////////////////////////////////////////
+	// tableSetup calls for various jSql based modules
+	////////////////////////////////////////////////////
+	
 	/// Returns the JStack object
 	/// @TODO Actual JStack config loading, now it just loads a blank sqlite file =(
 	public JStack JStack() {
@@ -213,18 +217,19 @@ public class JStackPage extends CorePage {
 		return JStackObj;
 	}
 	
-	////////////////////////////////////////////////////
-	// tableSetup calls for various jSql based modules
-	////////////////////////////////////////////////////
+	/// JStack.disposeStackLayers only if it was initialized
+	public void JStack_disposeStackLayers() throws JStackException {
+		if (JStackObj != null) {
+			JStackObj.disposeStackLayers();
+			JStackObj = null;
+		}
+	}
 	
-	// // Called on setup, 
-	// public void stackSetup() throws JStackException {
-	// 	JStack().stackSetup();
-	// }
-	// 
-	// /// Called once when initialized, to purge all existing data.
-	// public void stackTeardown() throws JStackException {
-	// 	JStack().teardown();
-	// }
+	/// Does the disposal teardown of all layers (especially JSql in MySql mode)
+	@Override
+	public void doSharedTeardown() throws Exception {
+		JStack_disposeStackLayers();
+		super.doSharedTeardown();
+	}
 	
 }

@@ -72,6 +72,20 @@ public class JStack extends JStruct implements JStackLayer {
 	}
 	
 	//----------------------------------------------
+	// Teardown 
+	//----------------------------------------------
+	
+	public void disposeStackLayers() throws JStackException {
+		try {
+			for( JStackLayer oneLayer : _stackLayers ) {
+				oneLayer.dispose();
+			}
+		} catch (Exception e) {
+			throw new JStackException(e);
+		}
+	}
+	
+	//----------------------------------------------
 	// MetaTable, KeyValueMap handling
 	//----------------------------------------------
 	

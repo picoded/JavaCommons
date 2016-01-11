@@ -29,4 +29,15 @@ public interface JStackLayer {
 	//		}
 	//	}
 	
+	
+	/// Returns true, if dispose() function was called prior
+	public default boolean isDisposed() {
+		return false;
+	}
+	
+	/// Dispose of the respective SQL driver / connection
+	public default void dispose() {
+		// Does nothing by default
+	}
+	
 }

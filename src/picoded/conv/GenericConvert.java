@@ -477,7 +477,45 @@ public class GenericConvert {
 	// @TODO generic map conversion
 	//--------------------------------------------------------------------------------------------------
 	
-	//public static Map<String, Object> toStringObjectMap(Object input, Object fallbck) { }
+	/// To String Object map conversion of generic object
+	///
+	/// Performs the following stretagies in the following order
+	///
+	/// - No conversion (if its a map)
+	/// - JSON String to Map
+	/// - Fallback
+	///
+	/// @param input     The input value to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted value
+	@SuppressWarnings("unchecked")
+	public static Map<String, Object> toStringObjectMap(Object input, Object fallbck) { 
+		
+		// Null handling
+		if( input == null ) {
+			if( fallbck  == null ) {
+				return null;
+			}
+			return toStringObjectMap(fallbck, null);
+		}
+		
+		// If Map instance
+		if( input instanceof Map ) {
+			return (Map<String,Object>)input;
+		}
+		
+		// If String instance, attampt JSON conversion
+		if( input instanceof String ) {
+			try {
+				return ConvertJSON.toMap((String) input);
+			} catch (Exception e) {
+				// Silence the exception
+			}
+		}
+		
+		return toStringObjectMap(fallbck, null);
+	}
 	
 	// to array
 	// @TODO generic array conversion

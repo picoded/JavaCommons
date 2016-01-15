@@ -275,6 +275,9 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// to map
 	// @TODO generic map conversion
 	//--------------------------------------------------------------------------------------------------
+	public default Map<String, Object> toStringObjectMap(K key, Object fallbck) { 
+		return GenericConvert.toStringObjectMap(get(key), fallbck);
+	}
 	
 	// to array
 	// @TODO generic array conversion

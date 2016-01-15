@@ -517,6 +517,15 @@ public class GenericConvert {
 		return toStringObjectMap(fallbck, null);
 	}
 	
+	/// Default Null fallback, To String Object map conversion of generic object
+	///
+	/// @param input     The input value to convert
+	///
+	/// @returns         The converted value
+	public static Map<String, Object> toStringObjectMap(Object input) {
+		return toStringObjectMap(input, null);
+	}
+	
 	// to array
 	// @TODO generic array conversion
 	//--------------------------------------------------------------------------------------------------

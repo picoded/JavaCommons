@@ -346,40 +346,50 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// This method logs the details about login faailure for the user based on User ID
 	public void logLoginFailure(String userID) {
-	    mainTable.loginThrottlingAttempt.putWithLifespan(userID, "1", 999999999);
-	    mainTable.loginThrottlingElapsed.putWithLifespan(userID, "2", 999999999);
+		mainTable.loginThrottlingAttempt.putWithLifespan(userID, "1", 999999999);
+		int elapsedTime = ((int) (System.currentTimeMillis() / 1000)) + 2;
+		mainTable.loginThrottlingElapsed.putWithLifespan(userID, String.valueOf(elapsedTime), 999999999);
 	}
 	
 	/// This method returns time left before next permitted login attempt for the user based on User ID
 	public int getNextLoginTimeAllowed(String userID) {
-	    String val = mainTable.loginThrottlingElapsed.get(userID);
-	    if (val == null || "".equals(val)) {
-	        return 0;
-	    }
-	    return Integer.parseInt(val);
+		String val = mainTable.loginThrottlingElapsed.get(userID);
+		if (val == null || "".equals(val)) {
+			return 0;
+		}
+		int allowedTime = Integer.parseInt(val) - (int) (System.currentTimeMillis() / 1000);
+		return allowedTime > 0 ? allowedTime : 0;
 	}
 	
 	/// This method would be added in on next login failure for the user based on User ID
 	public long getTimeElapsedNextLogin(String userId) {
-	    String elapsedValueString = mainTable.loginThrottlingElapsed.get(userId);
-	    if (elapsedValueString == null || "".equals(elapsedValueString)) {
-	        return 2l;
-	    }
-	    long elapsedValue = Long.parseLong(elapsedValueString);
-	    return elapsedValue * 2;
+		String elapsedValueString = mainTable.loginThrottlingElapsed.get(userId);
+		if (elapsedValueString == null || "".equals(elapsedValueString)) {
+			return (System.currentTimeMillis() / 1000) + 2;
+		}
+		long elapsedValue = Long.parseLong(elapsedValueString);
+		return elapsedValue;
 	}
 	
 	/// This method would be added the delay for the user based on User ID
 	public void addDelay(String userId) {
-	    String atteemptValueString = mainTable.loginThrottlingAttempt.get(userId);
-	    if (atteemptValueString == null || "".equals(atteemptValueString)) {
-	       logLoginFailure(userId);
-	    } else {
-	        long elapsedValue = getTimeElapsedNextLogin(userId);
-	        mainTable.loginThrottlingElapsed.putWithLifespan(userId, String.valueOf(elapsedValue), 999999999);
-	        int attemptValue = Integer.parseInt(atteemptValueString);
-	        mainTable.loginThrottlingAttempt.putWithLifespan(userId, String.valueOf(++attemptValue), 999999999);
-	    }
-	    
+		String atteemptValueString = mainTable.loginThrottlingAttempt.get(userId);
+		if (atteemptValueString == null || "".equals(atteemptValueString)) {
+			logLoginFailure(userId);
+		} else {
+			int attemptValue = Integer.parseInt(atteemptValueString);
+			int elapsedValue = (int) (System.currentTimeMillis() / 1000);
+			attemptValue++;
+			mainTable.loginThrottlingAttempt.putWithLifespan(userId, String.valueOf(attemptValue), 999999999);
+			elapsedValue += attemptValue * 2;
+			mainTable.loginThrottlingElapsed.putWithLifespan(userId, String.valueOf(elapsedValue), 999999999);
+		}
+		
+	}
+	
+	/// This method remove the entries for the user (should call after successful login)
+	public void resetLoginThrottle(String userId) {
+		mainTable.loginThrottlingAttempt.remove(userId);
+		mainTable.loginThrottlingElapsed.remove(userId);
 	}
 }

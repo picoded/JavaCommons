@@ -297,23 +297,37 @@ public class AccountLogin extends BasePage {
 			
 			// AccountName or AccountID is valid
 			if (ao != null) {
-				ao = at.loginAccount(bp.getHttpServletRequest(), bp.getHttpServletResponse(), ao,
-					req.getString("accountPass", ""), false);
-				
-				// Login is valid
-				if (ao != null) {
-					res.put("accountID", ao._oid());
+				int timeAllowed = ao.getNextLoginTimeAllowed(tStr);
+				if (timeAllowed == 0) {
+					ao = at.loginAccount(bp.getHttpServletRequest(), bp.getHttpServletResponse(), ao,
+						req.getString("accountPass", ""), false);
 					
-					boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
-					String[] names = ao.getNames().toArray(new String[0]);
-					if (sanitiseOutput && names != null) {
-						for (int i = 0; i < names.length; ++i) {
-							names[i] = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(names[i]);
+					// Login is valid
+					if (ao != null) {
+						res.put("accountID", ao._oid());
+						ao.resetLoginThrottle(tStr);
+						boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
+						String[] names = ao.getNames().toArray(new String[0]);
+						if (sanitiseOutput && names != null) {
+							for (int i = 0; i < names.length; ++i) {
+								names[i] = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(names[i]);
+							}
 						}
+						res.put("accountNames", Arrays.asList((names == null) ? new String[] {} : names));
+						res.put("isLogin", true);
+					} else {
+						if (at.getFromName(tStr) == null) {
+							at.getFromID(tStr).addDelay(tStr);
+						} else {
+							at.getFromName(tStr).addDelay(tStr);
+						}
+						//res.put("isLogin", false);
 					}
-					res.put("accountNames", Arrays.asList((names == null) ? new String[] {} : names));
-					res.put("isLogin", true);
+				} else {
+					res.put("isLogin", false);
+					res.put("error", "Unable to login, user locked out for " + timeAllowed + " seconds.");
 				}
+				
 			}
 		} else {
 			res.put("error", MISSING_REQUEST_PAGE);
@@ -1627,6 +1641,7 @@ return resMap;
 			return res;
 		});
 	};
+	
 	/////////////////////////////////////////////
 	//
 	// RestBuilder template builder

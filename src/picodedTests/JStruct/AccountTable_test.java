@@ -132,43 +132,47 @@ public class AccountTable_test {
 	
 	@Test
 	public void logLoginFailureTest() {
-	    AccountObject usrObj;
-	    usrObj = accTableObj.newObject();
-	    assertNotNull(usrObj);
-	    usrObj.logLoginFailure("Test-1");
+		AccountObject usrObj;
+		usrObj = accTableObj.newObject();
+		assertNotNull(usrObj);
+		usrObj.logLoginFailure("Test-1");
 	}
 	
 	@Test
 	public void getNextLoginTimeAllowedTest() {
-	    AccountObject usrObj;
-	    usrObj = accTableObj.newObject();
-	    assertNotNull(usrObj);
-	    usrObj.logLoginFailure("Test-1");
-	    assertEquals(usrObj.getNextLoginTimeAllowed("Test-1"), 2);
+		AccountObject usrObj;
+		usrObj = accTableObj.newObject();
+		assertNotNull(usrObj);
+		usrObj.logLoginFailure("Test-1");
+		assertEquals(usrObj.getNextLoginTimeAllowed("Test-1"), 2);
 	}
 	
 	@Test
 	public void getTimeElapsedNextLoginTest() {
-	    AccountObject usrObj;
-	    usrObj = accTableObj.newObject();
-	    assertEquals(usrObj.getTimeElapsedNextLogin("Test-1"), 2);
+		AccountObject usrObj;
+		usrObj = accTableObj.newObject();
+		int elapsedValue = (int) (System.currentTimeMillis() / 1000) + 2;
+		assertEquals(usrObj.getTimeElapsedNextLogin("Test-1"), elapsedValue);
 	}
 	
 	@Test
 	public void getTimeElapsedNextLoginTestAfterFailAttempt() {
-	    AccountObject usrObj;
-	    usrObj = accTableObj.newObject();
-	    assertEquals(usrObj.getTimeElapsedNextLogin("Test-1"), 2);
-	    usrObj.addDelay("Test-1");
-	    assertEquals(usrObj.getTimeElapsedNextLogin("Test-1"), 4);
+		AccountObject usrObj;
+		usrObj = accTableObj.newObject();
+		int elapsedValue = (int) (System.currentTimeMillis() / 1000) + 2;
+		assertEquals(usrObj.getTimeElapsedNextLogin("Test-1"), elapsedValue);
+		usrObj.addDelay("Test-1");
+		elapsedValue = (int) (System.currentTimeMillis() / 1000) + 2;
+		assertEquals(usrObj.getTimeElapsedNextLogin("Test-1"), elapsedValue);
 	}
 	
 	@Test
 	public void addDelayTest() {
-	    AccountObject usrObj;
-	    usrObj = accTableObj.newObject();
-	    usrObj.addDelay("Test-1");
-	    usrObj.addDelay("Test-1");
-	    assertEquals(usrObj.getTimeElapsedNextLogin("Test-1"), 8);
+		AccountObject usrObj;
+		usrObj = accTableObj.newObject();
+		usrObj.addDelay("Test-1");
+		usrObj.addDelay("Test-1");
+		int elapsedValue = (int) (System.currentTimeMillis() / 1000) + 4;
+		assertEquals(usrObj.getTimeElapsedNextLogin("Test-1"), elapsedValue);
 	}
 }

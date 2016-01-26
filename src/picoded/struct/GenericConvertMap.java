@@ -279,7 +279,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	///
 	/// @returns         The converted Object[], always possible unless null
 	public default List<Object> getObjectList(K key, Object fallbck) {
-		return GenericConvert.toObjectList(key, fallbck);
+		return GenericConvert.toObjectList(get(key), fallbck);
 	}
 	
 	/// Default Null fallback, To List<Object> conversion of generic object

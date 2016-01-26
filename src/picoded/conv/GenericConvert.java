@@ -1,11 +1,8 @@
 package picoded.conv;
 
 import java.math.BigDecimal;
-import java.util.UUID;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
-import java.util.Map;
-import java.util.HashMap;
 
 /// Provides several autoamted generic conversion, from a given object format to another.
 ///
@@ -621,10 +618,84 @@ public class GenericConvert {
 		return toStringArray(input, null);
 	}
 	
+	// to object list
+	//--------------------------------------------------------------------------------------------------
+	
+	/// To object list conversion of generic object
+	///
+	/// Performs the following stretagies in the following order
+	///
+	/// - No conversion
+	/// - Array to List
+	/// - String to List
+	/// - Fallback
+	///
+	/// @param input     The input value to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted value
+	@SuppressWarnings("unchecked")
+	public static List<Object> toObjectList(Object input, Object fallbck) {
+		if (input == null) {
+			if (fallbck == null) {
+				return null;
+			}
+			return toObjectList(fallbck, null);
+		}
+		
+		if (input instanceof List) {
+			return (List<Object>) input;
+		}
+		
+		if (input instanceof Object[]) {
+			return (Arrays.asList( ((Object[]) input) ));
+		}
+		
+		List<Object> ret = null;
+		
+		// Conversion to List (if possible)
+		if (input instanceof String) {
+			try {
+				Object o = ConvertJSON.toList((String) input);
+				if (o instanceof List) {
+					ret = (List<Object>) o;
+				}
+			} catch (Exception e) {
+				// Silence the exception
+			}
+		} else { //Force the "toString", then to List conversion
+			try {
+				String inputStr = input.toString();
+				Object o = ConvertJSON.toList(inputStr);
+				if (o instanceof List) {
+					ret = (List<Object>) o;
+				}
+			} catch (Exception e) {
+				// Silence the exception
+			}
+		}
+		
+		// List to string array conversion
+		if (ret != null) {
+			return ret;
+		}
+		
+		return toObjectList(fallbck, null);
+	}
+	
+	/// Default Null fallback, To object list conversion of generic object
+	///
+	/// @param input     The input value to convert
+	///
+	/// @returns         The converted value
+	public static List<Object> toObjectList(Object input) {
+		return toObjectList(input, null);
+	}
+	
 	// to object array
 	//--------------------------------------------------------------------------------------------------
 	
-	/// To String array conversion of generic object
+	/// To object array conversion of generic object
 	///
 	/// Performs the following stretagies in the following order
 	///
@@ -689,7 +760,7 @@ public class GenericConvert {
 		return toObjectArray(fallbck, null);
 	}
 	
-	/// Default Null fallback, To String array conversion of generic object
+	/// Default Null fallback, To object array conversion of generic object
 	///
 	/// @param input     The input value to convert
 	///

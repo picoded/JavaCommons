@@ -3,11 +3,17 @@ package picoded.webTemplateEngines.JSML;
 import java.io.*;
 import java.util.*;
 
-import org.apache.batik.transcoder.TranscoderException;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;
-import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.lesscss.deps.org.apache.commons.io.FileUtils;
+
+import org.apache.batik.bridge.*;
+import org.apache.batik.dom.svg.*;
+import org.apache.batik.gvt.*;
+import org.apache.batik.transcoder.*;
+import org.apache.batik.transcoder.image.*;
+import org.apache.batik.util.*;
+import org.w3c.dom.Document;
+
+import java.awt.geom.Rectangle2D;
 
 import picoded.conv.ConvertJSON;
 import picoded.conv.GUID;
@@ -380,7 +386,31 @@ public class JSMLForm {
 		return tempString;
 	}
 	
+	private boolean isSVGBlankOrEmpty(String svgFilePath){
+		try{
+			String parser = XMLResourceDescriptor.getXMLParserClassName();
+			SAXSVGDocumentFactory f = new SAXSVGDocumentFactory(parser);
+			Document doc = f.createDocument(new File(svgFilePath).toURI().toASCIIString());
+			BridgeContext ctx = new BridgeContext(new UserAgentAdapter());
+			GVTBuilder builder = new GVTBuilder();
+			GraphicsNode gvtRoot = builder.build(ctx, doc);
+			Rectangle2D rc = gvtRoot.getSensitiveBounds();
+			
+			if(rc == null || (rc.getWidth() <= 0 || rc.getHeight() <= 0)){
+				return true;
+			}
+			
+			return false;
+		} catch (Exception e){
+			return true;
+		}
+	}
+	
 	private void svgFileToPngFile(String svgPath, String pngPath) throws IOException {
+		if(isSVGBlankOrEmpty(svgPath)){
+			return;
+		}
+		
 		try {
 			InputStream svg_istream = new FileInputStream(svgPath);
 			TranscoderInput input_svg_image = new TranscoderInput(svg_istream);

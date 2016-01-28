@@ -3,10 +3,6 @@ package picoded.RESTBuilder.templates;
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import com.amazonaws.services.ec2.model.AccountAttributeName;
-
 import picoded.RESTBuilder.*;
 import picoded.JStack.*;
 import picoded.JStruct.*;

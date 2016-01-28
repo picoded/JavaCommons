@@ -275,8 +275,11 @@ public class RESTBuilder {
 	protected static String xmlHttpJS(String functionName) {
 		return "" + //
 			"function " + functionName + "(u,t,p,c) { " + // The function name
-			"if(c === null) { " + // Ensures that even there is no callback, it is handled "gracefully"
-			"c = function() {}; " + //
+			"if(c === undefined) { " + // Default undefined behavious, is to console log the return data
+			"c = function() { console.log(arguments); }; " + //
+			"} " + //
+			"if(c == null) { " + // Ensures that even there is no callback, it is handled "gracefully"
+			"c = function() { }; " + //
 			"} " + //
 			//----------------------------------------------------------------------------
 			// JQuery varient
@@ -292,7 +295,7 @@ public class RESTBuilder {
 			"xhrFields: { withCredentials:true }, " +
 			//
 			"success: function(d){ c(d,p,null); }, " + //
-			"error: function(j,s,t){ c(null,p, s+' - '+t); } " + //
+			"error: function(j,s,t){ c(null,p, s+' - '+t, s, t); } " + //
 			" }); " + //
 			//
 			//----------------------------------------------------------------------------

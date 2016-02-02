@@ -46,6 +46,11 @@ public class EmailBroadcaster {
 		
 		props.put("mail.transport.protocol", "smtp");
 		props.put("mail.smtp.host", smtpAdd);
+		if (smtpAdd.contains("gmail")) {
+			props.put("mail.smtp.starttls.enable", "true");
+			//props.put("mail.smtp.socketFactory.port", "465");
+			//props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		}
 		//props.put("mail.smtp.socketFactory.port", smtpPort );
 		//props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
 		props.put("mail.smtp.port", smtpPort);
@@ -61,7 +66,7 @@ public class EmailBroadcaster {
 			props.put("mail.smtp.auth", "false");
 			props.put("mail.smtp.auth.login.disable", "true");
 			
-			session = Session.getInstance(props);
+			session = Session.getInstance(props, null);
 		}
 		
 	}

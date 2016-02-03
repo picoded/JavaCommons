@@ -46,11 +46,12 @@ public class EmailBroadcaster {
 		
 		props.put("mail.transport.protocol", "smtp");
 		props.put("mail.smtp.host", smtpAdd);
-		if (smtpAdd.contains("gmail")) {
+		if (smtpAdd.contains("gmail") || smtpAdd.contains("live.com")) {
 			props.put("mail.smtp.starttls.enable", "true");
 			//props.put("mail.smtp.socketFactory.port", "465");
 			//props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 		}
+		
 		//props.put("mail.smtp.socketFactory.port", smtpPort );
 		//props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
 		props.put("mail.smtp.port", smtpPort);

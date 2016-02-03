@@ -10,10 +10,10 @@ import picoded.webUtils.EmailBroadcaster;
 
 public class EmailBroadcaster_test {
 	
-	private final String smtpUrl = "smtp.gmail.com:587";
-	private final String username = "amlendu.espire@gmail.com";
-	private final String password = "Bibha1427@GM";
-	private final String fromAddress = "amlendu.espire@gmail.com";
+	private final String smtpUrl = "smtp.live.com:25";
+	private final String username = "abc@xyz.com";
+	private final String password = "xxx";
+	private final String fromAddress = "abc@xyz.com";
 	
 	private EmailBroadcaster emailBroadcaster;
 	
@@ -24,9 +24,9 @@ public class EmailBroadcaster_test {
 	
 	@Test
 	public void sendEmailTest() throws Exception {
-		String subject = "Hi From :" + username;
-		String htmlContent = "Hi, This is " + username + " , how are you? Reards Amlendu";
-		String toAddresses = "amlendu.espire@gmail.com";
+		String subject = "Hi, from :" + username;
+		String htmlContent = "Hi, This is " + username + " , how are you? Regards " + username;
+		String toAddresses = "xyz@abc.com";
 		HashMap<String, String> fileAttachments = new HashMap<String, String>();
 		emailBroadcaster.sendEmail(subject, htmlContent, toAddresses, fileAttachments);
 	}

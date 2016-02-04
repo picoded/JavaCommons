@@ -19,7 +19,7 @@ public class EmailBroadcaster_test {
 	
 	@Before
 	public void setUp() {
-		emailBroadcaster = new EmailBroadcaster(smtpUrl, username, password, fromAddress);
+		emailBroadcaster = new EmailBroadcaster(smtpUrl, username, password, fromAddress, true);
 	}
 	
 	@Test

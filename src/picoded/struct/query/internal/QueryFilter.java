@@ -197,7 +197,7 @@ public class QueryFilter {
 	
 	/// Basic query operator tokens to search for
 	public static List<String> basicOperators = Arrays.asList(new String[] { //
-		"=", "<", ">", "<=", ">=", "LIKE" }); //
+		"=", "<", ">", "<=", ">=", "LIKE", "!=" }); //
 	
 	/// Extended query tokens to search for
 	public static List<String> combinationOperators = Arrays.asList(new String[] { //
@@ -274,6 +274,8 @@ public class QueryFilter {
 			return new MoreThanOrEquals(field, namedParam, paramsMap);
 		} else if (operator.equals("LIKE")) {
 			return new Like(field, namedParam, paramsMap);
+		} else if (operator.equals("!=")) {
+			return new NotEquals(field, namedParam, paramsMap);
 		}
 		
 		throw new RuntimeException("Unknown operator set found: " + before + " " + operator + " " + after);

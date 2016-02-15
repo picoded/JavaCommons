@@ -95,4 +95,16 @@ public class AllCombinations_test {
 		assertFalse(cond.test(sample_b));
 	}
 	
+	/// Test simple equality checks
+	@Test
+	public void notEqualsTest() {
+		
+		Query cond = new NotEquals("key", "key_hello", arguments_a);
+		assertTrue(cond.test(sample_a));
+		assertTrue(cond.test(sample_b));
+		
+		cond = new NotEquals("hello", "hello", arguments_a);
+		assertFalse(cond.test(sample_a));
+	}
+	
 }

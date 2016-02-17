@@ -146,6 +146,40 @@ public class JStruct_MetaObject implements MetaObject {
 		return unfilteredForNull;
 	}
 	
+	/// The aggressive type conversion to int / double types
+	///
+	/// @params  The input object to convert
+	///
+	/// @returns  The converted Integer or Double object, else its default value
+	protected Object agressiveNumericConversion(Object value) {
+		// Ignore byte[] array type conversion
+		if(value instanceof byte[]) {
+			return value;
+		}
+		
+		Object ret = null;
+		String strValue = value.toString();
+		try {
+			ret = Integer.valueOf(ret.toString());
+		} catch(Exception e) {
+			//Silent ignore
+		}
+		try {
+			if(ret == null) {
+				ret = Double.parseDouble(ret.toString());
+			}
+		} catch(Exception e) {
+			//Silent ignore
+		}
+		
+		if( ret != null ) {
+			if( ret.toString().equals(strValue) ) {
+				return ret;
+			}
+		}
+		return value;
+	}
+	
 	// Critical map functions
 	//----------------------------------------------
 	
@@ -186,13 +220,20 @@ public class JStruct_MetaObject implements MetaObject {
 			ret = null;
 		}
 		
+		// Aggressive numeric conversion
+		value = agressiveNumericConversion(value);
+		
 		// If no values are changed, ignore delta
 		if (value == ret) {
 			return ret;
 		}
 		
-		// Value comparision check
-		if (value != null && ret != null) {
+		// Value comparision check, ignore if no change
+		if (
+			value != null && 
+			ret != null && 
+			value.getClass() == ret.getClass()
+		) {
 			if (ret.toString().equals(value.toString())) {
 				return ret;
 			}

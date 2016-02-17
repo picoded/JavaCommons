@@ -24,7 +24,7 @@ public class GenericConvert {
 	/// - No conversion
 	/// - Object to JSON string
 	/// - Object.toString()
-	/// - Fallback (only possible for null values)
+	/// - Fallback (only possible for non-null values)
 	///
 	/// @param input     The input value to convert
 	/// @param fallbck   The fallback default (if not convertable, aka null)

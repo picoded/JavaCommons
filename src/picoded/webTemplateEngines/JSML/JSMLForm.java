@@ -386,8 +386,8 @@ public class JSMLForm {
 		return tempString;
 	}
 	
-	private boolean isSVGBlankOrEmpty(String svgFilePath){
-		try{
+	private boolean isSVGBlankOrEmpty(String svgFilePath) {
+		try {
 			String parser = XMLResourceDescriptor.getXMLParserClassName();
 			SAXSVGDocumentFactory f = new SAXSVGDocumentFactory(parser);
 			Document doc = f.createDocument(new File(svgFilePath).toURI().toASCIIString());
@@ -396,18 +396,18 @@ public class JSMLForm {
 			GraphicsNode gvtRoot = builder.build(ctx, doc);
 			Rectangle2D rc = gvtRoot.getSensitiveBounds();
 			
-			if(rc == null || (rc.getWidth() <= 0 || rc.getHeight() <= 0)){
+			if (rc == null || (rc.getWidth() <= 0 || rc.getHeight() <= 0)) {
 				return true;
 			}
 			
 			return false;
-		} catch (Exception e){
+		} catch (Exception e) {
 			return true;
 		}
 	}
 	
 	private void svgFileToPngFile(String svgPath, String pngPath) throws IOException {
-		if(isSVGBlankOrEmpty(svgPath)){
+		if (isSVGBlankOrEmpty(svgPath)) {
 			return;
 		}
 		
@@ -491,7 +491,7 @@ public class JSMLForm {
 		//jmte the result
 		JMTE _jmteObj = new JMTE(page.getPagesTemplatePath());
 		_jmteObj.baseDataModel.put("ContextPath", page.getContextURI());
-		_jmteObj.baseDataModel.put("ContextURI","file:///" + page.getContextPath());
+		_jmteObj.baseDataModel.put("ContextURI", "file:///" + page.getContextPath());
 		//_jmteObj.registerNamedRenderer(new page.currentAccountMetaInfo_nr());
 		ret = new StringBuilder(_jmteObj.parseTemplate(ret.toString()));
 		

@@ -37,7 +37,7 @@ public class EmailBroadcaster {
 	///
 	public EmailBroadcaster(final String smtpUrl, final String username, final String password, final String fromAddress) {
 		
-        this(smtpUrl, username, password, fromAddress, false);
+		this(smtpUrl, username, password, fromAddress, false);
 	}
 	
 	///
@@ -49,7 +49,8 @@ public class EmailBroadcaster {
 	/// @Params  Sending email address
 	/// @Params  Use SSL over SMTP
 	///
-	public EmailBroadcaster(final String smtpUrl, final String username, final String password, final String fromAddress, boolean isSSL) {
+	public EmailBroadcaster(final String smtpUrl, final String username, final String password,
+		final String fromAddress, boolean isSSL) {
 		
 		fromEmail = fromAddress;
 		Properties props = new Properties();
@@ -65,8 +66,8 @@ public class EmailBroadcaster {
 		}
 		
 		if (isSSL) {
-		    props.put("mail.smtp.socketFactory.port", smtpPort);
-		    props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+			props.put("mail.smtp.socketFactory.port", smtpPort);
+			props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 		}
 		
 		//props.put("mail.smtp.socketFactory.port", smtpPort );

@@ -296,12 +296,12 @@ public class MetaTableApiBuilder {
 		return ret;
 	}
 	
-	public List<String> csv_list(int draw, int start, int length, String[] headers, String query,
-			String[] queryArgs, String orderBy) throws RuntimeException {
+	public List<String> csv_list(int draw, int start, int length, String[] headers, String query, String[] queryArgs,
+		String orderBy) throws RuntimeException {
 		
 		List<String> ret = new ArrayList<String>();
 		
-		try{
+		try {
 			MetaObject[] metaObjs = null;
 			
 			if (query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0) {
@@ -309,7 +309,7 @@ public class MetaTableApiBuilder {
 			} else {
 				metaObjs = _metaTableObj.query(query, queryArgs, orderBy, start, length);
 			}
-		
+			
 			for (MetaObject metaObj : metaObjs) {
 				List<Object> row = new ArrayList<Object>();
 				for (String header : headers) {
@@ -319,9 +319,9 @@ public class MetaTableApiBuilder {
 				//for each element in row, stringbuilder and add to ret
 				StringBuilder singleRowCSV = new StringBuilder();
 				int rowSize = row.size();
-				for(int i = 0; i < rowSize; ++i){
-					String valStr = (String)row.get(i);
-					if(valStr == null){
+				for (int i = 0; i < rowSize; ++i) {
+					String valStr = (String) row.get(i);
+					if (valStr == null) {
 						valStr = "";
 					}
 					valStr = valStr.replace("\"", ""); //might not be best solution
@@ -330,7 +330,7 @@ public class MetaTableApiBuilder {
 					valStr = "\"" + valStr + "\"";
 					singleRowCSV.append(valStr);
 					
-					if(i < rowSize - 1){
+					if (i < rowSize - 1) {
 						singleRowCSV.append(",");
 					} else {
 						singleRowCSV.append("\n");
@@ -343,7 +343,7 @@ public class MetaTableApiBuilder {
 		} catch (Exception e) {
 			throw new RuntimeException("csv_list() ", e);
 		}
-
+		
 		return ret;
 	}
 	
@@ -386,29 +386,26 @@ public class MetaTableApiBuilder {
 		page.getHttpServletResponse().setContentType("text/csv");
 		page.getHttpServletResponse().setHeader("Content-Disposition", "attachment;filename=reports.csv");
 		
-		try {	
+		try {
 			
 			// VIEW VIA CONSOLE.LOG()
 			// data = csv_list (draw, count, limit, headers, query, queryArgs, orderByStr);
 			// String d = "";
 			// for(String str : data){
-				// d += str;
+			// d += str;
 			// }
 			// res.put("data", d);
 			
-			
-			
-			if ((data = csv_list(draw, count, limit, headers, query, queryArgs, orderByStr)).size() >= limit){
+			if ((data = csv_list(draw, count, limit, headers, query, queryArgs, orderByStr)).size() >= limit) {
 				count += data.size();
-				for(String str : data){
+				for (String str : data) {
 					pWriter.write(str);
 				}
 				pWriter.flush();
 			}
 			
-			
 			// final batch write
-			for(String str : data){
+			for (String str : data) {
 				pWriter.write(str);
 			}
 			pWriter.flush();

@@ -201,7 +201,7 @@ public class PagesBuilder {
 		
 		// System.out allowed here, because LESS does a system out ANYWAY.
 		// Help to make more "sense" of the done output
-		System.out.print("> PageBuilder.buildPage(\'"+pageName+"\'): " );
+		System.out.print("> PageBuilder.buildPage(\'" + pageName + "\'): ");
 		
 		// Future extension, possible loop hole abuse. Im protecting against it early
 		if (pageName.startsWith(".")) {

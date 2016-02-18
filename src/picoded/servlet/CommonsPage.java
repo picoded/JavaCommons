@@ -102,7 +102,7 @@ public class CommonsPage extends BasePage {
 			
 			// Allow common asset files types
 			if ( //
-				fileExt.equalsIgnoreCase("html") || //
+			fileExt.equalsIgnoreCase("html") || //
 				fileExt.equalsIgnoreCase("js") || //
 				fileExt.equalsIgnoreCase("css") || //
 				fileExt.equalsIgnoreCase("png") || //
@@ -211,10 +211,8 @@ public class CommonsPage extends BasePage {
 		
 		// Does the API call
 		if (wildcardUri.length >= 1 && (wildcardUri[0].equalsIgnoreCase("api"))) {
-			if( 
-				restBuilder().servletCall(this, outputData,
-				String.join(".", Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length)))
-			) {
+			if (restBuilder().servletCall(this, outputData,
+				String.join(".", Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length)))) {
 				return super.outputJSON(outputData, templateData, output);
 			} else {
 				return false;
@@ -301,19 +299,19 @@ public class CommonsPage extends BasePage {
 		// http://stackoverflow.com/questions/18647613/get-caller-class-name-from-inherited-static-method
 		//
 		String callingClassName = args[0];
-		System.out.println("- Assumed calling class name: "+callingClassName);
+		System.out.println("- Assumed calling class name: " + callingClassName);
 		
 		String contextPath = args[1];
-		if(!contextPath.endsWith("/")) {
+		if (!contextPath.endsWith("/")) {
 			contextPath = contextPath + "/";
 		}
-		System.out.println("- Assumed context path: "+contextPath);
+		System.out.println("- Assumed context path: " + contextPath);
 		
 		String contextURI = args[2];
-		if(!contextURI.endsWith("/")) {
+		if (!contextURI.endsWith("/")) {
 			contextURI = contextURI + "/";
 		}
-		System.out.println("- Assumed context URI: "+contextURI);
+		System.out.println("- Assumed context URI: " + contextURI);
 		
 		System.out.println("---------------------------------------------------");
 		
@@ -322,12 +320,12 @@ public class CommonsPage extends BasePage {
 			Constructor<?> cons = c.getConstructor();
 			
 			Object built = cons.newInstance();
-			if( !CommonsPage.class.isInstance(built) ) {
-				throw new RuntimeException("Provided class name is not extended from CommonsPage: "+callingClassName);
+			if (!CommonsPage.class.isInstance(built)) {
+				throw new RuntimeException("Provided class name is not extended from CommonsPage: " + callingClassName);
 			}
-			mainClass = (CommonsPage)built;
+			mainClass = (CommonsPage) built;
 			
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		
@@ -337,7 +335,7 @@ public class CommonsPage extends BasePage {
 		mainClass._contextURI = contextURI;
 		try {
 			mainClass.initializeContext();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		

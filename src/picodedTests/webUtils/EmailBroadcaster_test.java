@@ -28,7 +28,7 @@ public class EmailBroadcaster_test {
 	
 	@Test
 	public void sendEmailTest() throws Exception {
-		if(!testEnabled) {
+		if (!testEnabled) {
 			return;
 		}
 		

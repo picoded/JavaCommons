@@ -153,7 +153,7 @@ public class JStruct_MetaObject implements MetaObject {
 	/// @returns  The converted Integer or Double object, else its default value
 	protected Object agressiveNumericConversion(Object value) {
 		// Ignore byte[] array type conversion
-		if(value instanceof byte[]) {
+		if (value instanceof byte[]) {
 			return value;
 		}
 		
@@ -161,19 +161,19 @@ public class JStruct_MetaObject implements MetaObject {
 		String strValue = value.toString();
 		try {
 			ret = Integer.valueOf(ret.toString());
-		} catch(Exception e) {
+		} catch (Exception e) {
 			//Silent ignore
 		}
 		try {
-			if(ret == null) {
+			if (ret == null) {
 				ret = Double.parseDouble(ret.toString());
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			//Silent ignore
 		}
 		
-		if( ret != null ) {
-			if( ret.toString().equals(strValue) ) {
+		if (ret != null) {
+			if (ret.toString().equals(strValue)) {
 				return ret;
 			}
 		}
@@ -229,11 +229,7 @@ public class JStruct_MetaObject implements MetaObject {
 		}
 		
 		// Value comparision check, ignore if no change
-		if (
-			value != null && 
-			ret != null && 
-			value.getClass() == ret.getClass()
-		) {
+		if (value != null && ret != null && value.getClass() == ret.getClass()) {
 			if (ret.toString().equals(value.toString())) {
 				return ret;
 			}

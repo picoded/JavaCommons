@@ -29,7 +29,6 @@ public interface JStackLayer {
 	//		}
 	//	}
 	
-	
 	/// Returns true, if dispose() function was called prior
 	public default boolean isDisposed() {
 		return false;

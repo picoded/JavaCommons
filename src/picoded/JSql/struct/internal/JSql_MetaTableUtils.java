@@ -127,11 +127,14 @@ public class JSql_MetaTableUtils {
 	///
 	public static Object[] valueToOptionSet(MetaTypeMap mtm, String key, Object value) {
 		if (value instanceof Integer) {
-			return new Object[] { new Integer(MetaType.INTEGER.getValue()), value,  shortenStringValue(value), value.toString() }; //Typ, N,S,I,T
+			return new Object[] { new Integer(MetaType.INTEGER.getValue()), value, shortenStringValue(value),
+				value.toString() }; //Typ, N,S,I,T
 		} else if (value instanceof Float) {
-			return new Object[] { new Integer(MetaType.FLOAT.getValue()), value,  shortenStringValue(value), value.toString() }; //Typ, N,S,I,T
+			return new Object[] { new Integer(MetaType.FLOAT.getValue()), value, shortenStringValue(value),
+				value.toString() }; //Typ, N,S,I,T
 		} else if (value instanceof Double) {
-			return new Object[] { new Integer(MetaType.DOUBLE.getValue()), value,  shortenStringValue(value), value.toString() }; //Typ, N,S,I,T
+			return new Object[] { new Integer(MetaType.DOUBLE.getValue()), value, shortenStringValue(value),
+				value.toString() }; //Typ, N,S,I,T
 		} else if (value instanceof String) {
 			return new Object[] { new Integer(MetaType.STRING.getValue()), 0, shortenStringValue(value), value.toString() }; //Typ, N,S,I,T
 		} else if (value instanceof byte[]) {

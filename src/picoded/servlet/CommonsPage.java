@@ -225,7 +225,9 @@ public class CommonsPage extends BasePage {
 	@Override
 	public void initializeContext() throws Exception {
 		super.initializeContext();
-		PagesBuilder().buildAllPages();
+		if( !(JConfig().getBoolean("sys.developersMode.PageBuilder_ignoreInitializeContext", false)) ) {
+			PagesBuilder().buildAllPages();
+		}
 		buildApiScript();
 	}
 	

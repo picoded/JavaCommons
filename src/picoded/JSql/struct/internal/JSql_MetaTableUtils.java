@@ -97,6 +97,23 @@ public class JSql_MetaTableUtils {
 	//
 	//------------------------------------------------------------------------------------------
 	
+	/// The shorten string value used to represent the object
+	///
+	/// This is used to truncate the string value to its searchable string length.
+	/// Currently this length is set to atmost 64, maybe extended in the future
+	///
+	/// @params  The input object value
+	///
+	/// @returns the shorten return value
+	///
+	protected static String shortenStringValue(Object value) {
+		String shortenValue = value.toString().toLowerCase();
+		if (shortenValue.length() > 64) {
+			shortenValue = shortenValue.substring(0, 64);
+		}
+		return shortenValue;
+	}
+	
 	/// Values to option set conversion used by JSql
 	///
 	/// @TODO: Support the various numeric value
@@ -110,17 +127,16 @@ public class JSql_MetaTableUtils {
 	///
 	public static Object[] valueToOptionSet(MetaTypeMap mtm, String key, Object value) {
 		if (value instanceof Integer) {
-			return new Object[] { new Integer(MetaType.INTEGER.getValue()), value, null, null }; //Typ, N,S,I,T
+			return new Object[] { new Integer(MetaType.INTEGER.getValue()), value, shortenStringValue(value),
+				value.toString() }; //Typ, N,S,I,T
 		} else if (value instanceof Float) {
-			return new Object[] { new Integer(MetaType.FLOAT.getValue()), value, null, null }; //Typ, N,S,I,T
+			return new Object[] { new Integer(MetaType.FLOAT.getValue()), value, shortenStringValue(value),
+				value.toString() }; //Typ, N,S,I,T
 		} else if (value instanceof Double) {
-			return new Object[] { new Integer(MetaType.DOUBLE.getValue()), value, null, null }; //Typ, N,S,I,T
+			return new Object[] { new Integer(MetaType.DOUBLE.getValue()), value, shortenStringValue(value),
+				value.toString() }; //Typ, N,S,I,T
 		} else if (value instanceof String) {
-			String shortenValue = ((String) value).toLowerCase();
-			if (shortenValue.length() > 64) {
-				shortenValue = shortenValue.substring(0, 64);
-			}
-			return new Object[] { new Integer(MetaType.STRING.getValue()), 0, shortenValue, value }; //Typ, N,S,I,T
+			return new Object[] { new Integer(MetaType.STRING.getValue()), 0, shortenStringValue(value), value.toString() }; //Typ, N,S,I,T
 		} else if (value instanceof byte[]) {
 			return new Object[] { new Integer(MetaType.BINARY.getValue()), 0, null,
 				(Base64.getEncoder().encodeToString((byte[]) value)) }; //Typ, N,S,I,T

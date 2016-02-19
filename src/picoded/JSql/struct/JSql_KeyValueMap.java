@@ -100,7 +100,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 			
 			// Value search index
 			//------------------------------------------------
-			if( sqlObj.sqlType == JSqlType.mysql ) {
+			if (sqlObj.sqlType == JSqlType.mysql) {
 				sqlObj.createTableIndexQuerySet( //
 					sqlTableName, "kVl(255)", null, "valMap" //
 				).execute();

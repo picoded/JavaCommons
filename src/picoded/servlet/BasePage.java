@@ -253,7 +253,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		}
 		
 		_jmteObj = new JMTE(getPagesTemplatePath());
-		JMTE_initialSetup( _jmteObj );
+		JMTE_initialSetup(_jmteObj);
 		
 		return _jmteObj;
 	}
@@ -261,7 +261,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	/// Initial setup of the JMTE logic, and base data model.
 	///
 	/// this is the function to override for extended classes to add to JMTE base data model
-	public void JMTE_initialSetup( JMTE setupObj ) {
+	public void JMTE_initialSetup(JMTE setupObj) {
 		setupObj.baseDataModel.put("ContextPath", getContextPath());
 		setupObj.baseDataModel.put("ContextURI", getContextURI());
 		setupObj.registerNamedRenderer(new currentAccountMetaInfo_nr());

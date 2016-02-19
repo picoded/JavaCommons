@@ -32,8 +32,8 @@ public class ServerTime {
 		String currentDateISO = "";
 		try {
 			currentDateISO = DateConv.getCurrentDateISO(dateFormat, "-");
-		} catch(Exception ex) {
-			res.put("error", "Unable to get ISO Date from ISOFormat " +ISOFormat+ ".");
+		} catch (Exception ex) {
+			res.put("error", "Unable to get ISO Date from ISOFormat " + ISOFormat + ".");
 			return res;
 		}
 		
@@ -44,16 +44,16 @@ public class ServerTime {
 		String currentDateMilli = DateConv.toMillisecondsFormat(currentDateISO, dateFormat, "-");
 		long currentDateMilliAsLong = 0;
 		
-		try{
+		try {
 			currentDateMilliAsLong = Long.parseLong(currentDateMilli);
-		} catch(Exception ex){
-			res.put("error", "Unable to convert ISO Date " +currentDateMilli+ " into a long. ");
+		} catch (Exception ex) {
+			res.put("error", "Unable to convert ISO Date " + currentDateMilli + " into a long. ");
 			return res;
 		}
 		
 		//return milliseconds date
 		res.put("unixMilliseconds", currentDateMilliAsLong);
-		res.put("unixSeconds",      currentDateMilliAsLong/1000);
+		res.put("unixSeconds", currentDateMilliAsLong / 1000);
 		
 		return res;
 	};

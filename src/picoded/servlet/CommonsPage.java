@@ -21,6 +21,7 @@ import java.io.IOException;
 // Objects used
 import java.util.*;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
 
 // JMTE inner functions add-on
 import com.floreysoft.jmte.*;
@@ -210,10 +211,8 @@ public class CommonsPage extends BasePage {
 		
 		// Does the API call
 		if (wildcardUri.length >= 1 && (wildcardUri[0].equalsIgnoreCase("api"))) {
-			if( 
-				restBuilder().servletCall(this, outputData,
-				String.join(".", Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length)))
-			) {
+			if (restBuilder().servletCall(this, outputData,
+				String.join(".", Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length)))) {
 				return super.outputJSON(outputData, templateData, output);
 			} else {
 				return false;
@@ -226,7 +225,11 @@ public class CommonsPage extends BasePage {
 	@Override
 	public void initializeContext() throws Exception {
 		super.initializeContext();
-		PagesBuilder().buildAllPages();
+		
+		boolean ignorePageBuilder = JConfig().getBoolean("developersMode.PagesBuilder_ignoreInitializeContext", false);
+		if( !ignorePageBuilder || this._commandLineInitialized ) {
+			PagesBuilder().buildAllPages();
+		}
 		buildApiScript();
 	}
 	
@@ -277,5 +280,72 @@ public class CommonsPage extends BasePage {
 		}
 		
 		return _systemLogging = new ServletLogging();
+	}
+	
+	//---------------------------------------------------------
+	//
+	// Self constructing, main function. 
+	// Used to build the pages via command line
+	//
+	//---------------------------------------------------------
+	public boolean _commandLineInitialized = false;
+	public static void main(String[] args) {
+		
+		CommonsPage mainClass = null;
+		
+		System.out.println("---------------------------------------------------");
+		System.out.println("- Command line Pages build triggered");
+		
+		//
+		// @TODO : Consider automated stack trace if not given?, 
+		//         Performance is not considered an issue after all for 1 time build scripts
+		//
+		// http://stackoverflow.com/questions/18647613/get-caller-class-name-from-inherited-static-method
+		//
+		String callingClassName = args[0];
+		System.out.println("- Assumed calling class name: " + callingClassName);
+		
+		String contextPath = args[1];
+		if (!contextPath.endsWith("/")) {
+			contextPath = contextPath + "/";
+		}
+		System.out.println("- Assumed context path: " + contextPath);
+		
+		String contextURI = args[2];
+		if (!contextURI.endsWith("/")) {
+			contextURI = contextURI + "/";
+		}
+		System.out.println("- Assumed context URI: " + contextURI);
+		
+		System.out.println("---------------------------------------------------");
+		
+		try {
+			Class<?> c = Class.forName(callingClassName);
+			Constructor<?> cons = c.getConstructor();
+			
+			Object built = cons.newInstance();
+			if (!CommonsPage.class.isInstance(built)) {
+				throw new RuntimeException("Provided class name is not extended from CommonsPage: " + callingClassName);
+			}
+			mainClass = (CommonsPage) built;
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
+		System.out.println("- Initialized calling class, calling initializeContext() next");
+		
+		mainClass._commandLineInitialized = true;
+		mainClass._contextPath = contextPath;
+		mainClass._contextURI = contextURI;
+		try {
+			mainClass.initializeContext();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
+		System.out.println("- initializeContext() called");
+		System.out.println("---------------------------------------------------");
+		
 	}
 }

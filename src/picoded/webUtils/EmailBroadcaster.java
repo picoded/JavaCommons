@@ -37,6 +37,21 @@ public class EmailBroadcaster {
 	///
 	public EmailBroadcaster(final String smtpUrl, final String username, final String password, final String fromAddress) {
 		
+		this(smtpUrl, username, password, fromAddress, false);
+	}
+	
+	///
+	/// Email constructor, used to setup the SMTP over SSL connection
+	///
+	/// @params  SMTP Url address (with port)
+	/// @params  Username for sender account
+	/// @params  Password for sender account
+	/// @Params  Sending email address
+	/// @Params  Use SSL over SMTP
+	///
+	public EmailBroadcaster(final String smtpUrl, final String username, final String password,
+		final String fromAddress, boolean isSSL) {
+		
 		fromEmail = fromAddress;
 		Properties props = new Properties();
 		
@@ -46,6 +61,15 @@ public class EmailBroadcaster {
 		
 		props.put("mail.transport.protocol", "smtp");
 		props.put("mail.smtp.host", smtpAdd);
+		if (smtpAdd.contains("gmail") || smtpAdd.contains("live.com")) {
+			props.put("mail.smtp.starttls.enable", "true");
+		}
+		
+		if (isSSL) {
+			props.put("mail.smtp.socketFactory.port", smtpPort);
+			props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		}
+		
 		//props.put("mail.smtp.socketFactory.port", smtpPort );
 		//props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
 		props.put("mail.smtp.port", smtpPort);
@@ -61,7 +85,7 @@ public class EmailBroadcaster {
 			props.put("mail.smtp.auth", "false");
 			props.put("mail.smtp.auth.login.disable", "true");
 			
-			session = Session.getInstance(props);
+			session = Session.getInstance(props, null);
 		}
 		
 	}

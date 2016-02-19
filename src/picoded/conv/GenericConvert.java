@@ -24,7 +24,7 @@ public class GenericConvert {
 	/// - No conversion
 	/// - Object to JSON string
 	/// - Object.toString()
-	/// - Fallback (only possible for null values)
+	/// - Fallback (only possible for non-null values)
 	///
 	/// @param input     The input value to convert
 	/// @param fallbck   The fallback default (if not convertable, aka null)
@@ -487,23 +487,23 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	@SuppressWarnings("unchecked")
-	public static Map<String, Object> toStringObjectMap(Object input, Object fallbck) { 
+	public static Map<String, Object> toStringObjectMap(Object input, Object fallbck) {
 		
 		// Null handling
-		if( input == null ) {
-			if( fallbck  == null ) {
+		if (input == null) {
+			if (fallbck == null) {
 				return null;
 			}
 			return toStringObjectMap(fallbck, null);
 		}
 		
 		// If Map instance
-		if( input instanceof Map ) {
-			return (Map<String,Object>)input;
+		if (input instanceof Map) {
+			return (Map<String, Object>) input;
 		}
 		
 		// If String instance, attampt JSON conversion
-		if( input instanceof String ) {
+		if (input instanceof String) {
 			try {
 				return ConvertJSON.toMap((String) input);
 			} catch (Exception e) {
@@ -648,7 +648,7 @@ public class GenericConvert {
 		}
 		
 		if (input instanceof Object[]) {
-			return (Arrays.asList( ((Object[]) input) ));
+			return (Arrays.asList(((Object[]) input)));
 		}
 		
 		List<Object> ret = null;

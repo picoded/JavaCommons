@@ -10,22 +10,22 @@ import static org.junit.Assert.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class JStruct_test {
-    
-    private static JStruct jStructObj = new JStruct();
-    private static KeyValueMap keyValueMap;
-    private static MetaTable metaTable;
-    private static AccountTable accountTable;
-    
-    @BeforeClass
- 	public static void setUp() {
- 		jStructObj.systemSetup();
- 	}
+	
+	private static JStruct jStructObj = new JStruct();
+	private static KeyValueMap keyValueMap;
+	private static MetaTable metaTable;
+	private static AccountTable accountTable;
+	
+	@BeforeClass
+	public static void setUp() {
+		jStructObj.systemSetup();
+	}
 	
 	@AfterClass
- 	public static void tearDown() {
- 		jStructObj.systemTeardown();
- 		jStructObj = null;
- 	}
+	public static void tearDown() {
+		jStructObj.systemTeardown();
+		jStructObj = null;
+	}
 	
 	@Test
 	public void getKeyValueMapTest1() {
@@ -43,29 +43,29 @@ public class JStruct_test {
 	
 	@Test
 	public void getMetaTableTest1() {
-	    metaTable = jStructObj.getMetaTable("test");
-	    assertNotNull(metaTable);
+		metaTable = jStructObj.getMetaTable("test");
+		assertNotNull(metaTable);
 		assertTrue(metaTable.isEmpty());
 	}
 	
 	@Test
 	public void getMetaTableTest2() {
-	    MetaTable metaTableLocal = jStructObj.getMetaTable("test");
-	    assertNotNull(metaTableLocal);
+		MetaTable metaTableLocal = jStructObj.getMetaTable("test");
+		assertNotNull(metaTableLocal);
 		assertEquals(metaTable, metaTableLocal);
 	}
 	
 	@Test
 	public void getAccountTableTest1() {
-	    accountTable = jStructObj.getAccountTable("test");
-	    assertNotNull(accountTable);
+		accountTable = jStructObj.getAccountTable("test");
+		assertNotNull(accountTable);
 		assertTrue(accountTable.isEmpty());
 	}
 	
 	@Test
 	public void getAccountTableTest2() {
-	    AccountTable accountTableLocal = jStructObj.getAccountTable("test");
-	    assertNotNull(accountTableLocal);
+		AccountTable accountTableLocal = jStructObj.getAccountTable("test");
+		assertNotNull(accountTableLocal);
 		assertEquals(accountTable, accountTableLocal);
 	}
 	

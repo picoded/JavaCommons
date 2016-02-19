@@ -199,6 +199,10 @@ public class PagesBuilder {
 	///
 	public PagesBuilder buildPage(String pageName) {
 		
+		// System.out allowed here, because LESS does a system out ANYWAY.
+		// Help to make more "sense" of the done output
+		System.out.print("> PageBuilder.buildPage(\'" + pageName + "\'): ");
+		
 		// Future extension, possible loop hole abuse. Im protecting against it early
 		if (pageName.startsWith(".")) {
 			throw new RuntimeException("Unable to load page name, starting with '.' : " + pageName);

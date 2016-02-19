@@ -77,7 +77,7 @@ public class JStack extends JStruct implements JStackLayer {
 	
 	public void disposeStackLayers() throws JStackException {
 		try {
-			for( JStackLayer oneLayer : _stackLayers ) {
+			for (JStackLayer oneLayer : _stackLayers) {
 				oneLayer.dispose();
 			}
 		} catch (Exception e) {

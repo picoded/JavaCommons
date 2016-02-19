@@ -227,7 +227,7 @@ public class CommonsPage extends BasePage {
 		super.initializeContext();
 		
 		boolean ignorePageBuilder = JConfig().getBoolean("developersMode.PagesBuilder_ignoreInitializeContext", false);
-		if( !ignorePageBuilder ) {
+		if( !ignorePageBuilder || this._commandLineInitialized ) {
 			PagesBuilder().buildAllPages();
 		}
 		buildApiScript();
@@ -288,7 +288,7 @@ public class CommonsPage extends BasePage {
 	// Used to build the pages via command line
 	//
 	//---------------------------------------------------------
-	
+	public boolean _commandLineInitialized = false;
 	public static void main(String[] args) {
 		
 		CommonsPage mainClass = null;
@@ -335,6 +335,7 @@ public class CommonsPage extends BasePage {
 		
 		System.out.println("- Initialized calling class, calling initializeContext() next");
 		
+		mainClass._commandLineInitialized = true;
 		mainClass._contextPath = contextPath;
 		mainClass._contextURI = contextURI;
 		try {

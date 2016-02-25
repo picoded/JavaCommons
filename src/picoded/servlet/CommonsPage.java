@@ -253,7 +253,7 @@ public class CommonsPage extends BasePage {
 		
 		// Gets the configuration setup
 		JConfig jc = JConfig();
-		boolean sysSmtp = jc.getBoolean("sys.smtp.enabled", true);
+		boolean sysSmtp = jc.getBoolean("sys.dataStack.smtp.enabled", true);
 		
 		// Returns null if disabled 
 		if (sysSmtp == false) {

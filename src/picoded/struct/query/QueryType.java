@@ -12,7 +12,7 @@ public enum QueryType {
 	// Combination types
 	//--------------------------------------------------------------------
 	
-	AND(0), OR(1), NOT(2), //Is actually and inverse of AND
+	AND(0), OR(1), NOT(2), NOT_EQUALS(3), //Is actually and inverse of AND
 	
 	//
 	// Comparision types

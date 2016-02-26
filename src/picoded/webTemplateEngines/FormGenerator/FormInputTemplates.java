@@ -771,8 +771,8 @@ public class FormInputTemplates {
 			for (Object keyObj : dropDownMap.keySet()) {
 				String name = GenericConvert.toString(dropDownMap.get(keyObj), null);
 				
-				// Skip blank values
-				if (name == null || name.length() <= 0) {
+				// Skip null values
+				if (name == null) {
 					continue;
 				}
 				
@@ -799,8 +799,8 @@ public class FormInputTemplates {
 				String key = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(
 					GenericConvert.toString(keyObj, null)).toLowerCase();
 				
-				// Skip blank keys
-				if (key == null || key.length() <= 0) {
+				// Skip null keys
+				if (key == null) {
 					continue;
 				}
 				

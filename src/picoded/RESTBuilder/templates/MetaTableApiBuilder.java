@@ -125,11 +125,27 @@ public class MetaTableApiBuilder {
 		}
 		
 		String[] queryColumns = req.getStringArray("queryColumns", headers);
-		String searchParams = req.getString("search[value]", "").trim();
+		String searchParams = req.getString("search[value]", "").trim(); //datatables specific key
 		String wildcardMode = req.getString("wildcardMode", "suffix");
 		
 		String orderByStr = req.getString("orderBy");
 		if (orderByStr == null || orderByStr.isEmpty()) {
+			//try and get datatables order data
+			int orderByColumn = req.getInt("order[0][column]", -1);
+			if(orderByColumn <= -1){
+				orderByStr = "oID";
+			}else{
+				boolean isColumnOrderable = req.getBoolean("columns["+orderByColumn+"][orderable]", false);
+				if(!isColumnOrderable || headers.length < orderByColumn){
+					orderByStr = "oID";
+				}else{
+					orderByStr = headers[orderByColumn];
+				}
+			}
+		}
+		
+		//failsafe
+		if(orderByStr == null || orderByStr == ""){
 			orderByStr = "oID";
 		}
 		
@@ -187,10 +203,18 @@ public class MetaTableApiBuilder {
 		}
 		res.put("recordsFiltered", recordsFiltered);
 		
+		//ordering direction
+		String orderDirection = req.getString("order[0][dir]", "asc"); //datatables specific key
+		
 		// Actual fetching of data
 		List<List<Object>> data = null;
 		try {
 			data = list_GET_and_POST_inner(draw, start, limit, headers, query, queryArgs, orderByStr, sanitiseOutput);
+			
+			if(orderDirection.equalsIgnoreCase("desc")){
+				Collections.reverse(data);
+			}
+			
 			res.put("data", data);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

@@ -152,6 +152,10 @@ public class JStruct_MetaObject implements MetaObject {
 	///
 	/// @returns  The converted Integer or Double object, else its default value
 	protected Object agressiveNumericConversion(Object value) {
+		if(value == null){
+			return value;
+		}
+		
 		// Ignore byte[] array type conversion
 		if (value instanceof byte[]) {
 			return value;

@@ -11,7 +11,9 @@ import picoded.JStruct.internal.*;
 import picoded.struct.query.*;
 import picoded.conv.ListValueConv;
 
-/// MetaTable, servs as the core flexible backend storage implmentation for the whole
+import org.apache.commons.lang3.RandomUtils;
+
+/// MetaTable, serves as the core flexible backend storage implmentation for the whole
 /// JStack setup. Its role can be viewed similarly to NoSql, or AWS SimpleDB
 /// where almost everything is indexed and cached. 
 /// 
@@ -54,8 +56,11 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	
 	/// perform increment maintenance, meant for minor changes between requests
 	public default void incrementalMaintenance() {
-		// For JStruct, both is same
-		maintenance();
+		// 2 percent chance of trigering maintenance
+		// This is to lower to overall performance cost incrementalMaintenance per request
+		if (RandomUtils.nextInt(0, 100) <= 2) {
+			maintenance();
+		}
 	}
 	
 	/// Perform maintenance, mainly removing of expired data if applicable

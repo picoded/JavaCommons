@@ -12,7 +12,7 @@ import picoded.struct.*;
 import picoded.enums.*;
 import picoded.JStruct.*;
 
-/// MetaTable, servs as the core flexible backend storage implmentation for the whole
+/// MetaTable, serves as the core flexible backend storage implmentation for the whole
 /// JStack setup. Its role can be viewed similarly to NoSql, or AWS SimpleDB
 /// where almost everything is indexed and cached. 
 /// 

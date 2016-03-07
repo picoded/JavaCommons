@@ -200,7 +200,13 @@ public class FormInputTemplates {
 				newParaMap.put(node.getFieldName(), para);
 				FormNode paraNode = new FormNode(node._formGenerator, node, newParaMap);
 				StringBuilder[] newPara = new StringBuilder[2];
-				newPara = paraNode.defaultHtmlInput("pre", "pfi_inputTextBox pfi_input pfi_display", null);
+				
+				String inputType = node.getString("displayTypeOverride", "");
+				if(inputType == null || inputType.isEmpty()){
+					inputType = "pre";
+				}
+				
+				newPara = paraNode.defaultHtmlInput(inputType, "pfi_inputTextBox pfi_input pfi_display", null);
 				sbArr[0].append(newPara[0]);
 				sbArr[0].append(para);
 				sbArr[0].append(newPara[1]);

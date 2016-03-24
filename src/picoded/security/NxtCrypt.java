@@ -10,8 +10,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import picoded.conv.Base58;
-
 /// Password hashing and crypt function : This uses PBEKeySpec (which will be upgraded in the future).
 /// This is conceptually similar to [PHP password_hash] (http://sg2.php.net/manual/en/function.password-hash.php),
 /// but however is not backwards compatible with older hash methods, like DES
@@ -170,7 +168,7 @@ public class NxtCrypt {
 			throw new SecurityException(e);
 		}
 		
-		return Base58.obj.encode(key.getEncoded());
+		return Base64.encodeBase64String(key.getEncoded());
 	}
 	
 	/// String salt varient of getSaltedHash (instead of byte[])

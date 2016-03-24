@@ -468,7 +468,11 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		}
 		
 		String passHash = ret.getPasswordHash();
+		
 		String computedCookieHash = NxtCrypt.getSaltedHash(passHash, sessionInfo[0]);
+		// Remove the special characters from the hash value
+		// Cookie with special characters failed to save at browser, specially with + and = signs
+		computedCookieHash = computedCookieHash.replaceAll("\\W", "");
 		
 		// Invalid cookie hash, exits
 		if (!NxtCrypt.slowEquals(hash, computedCookieHash)) {
@@ -519,7 +523,11 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		
 		// @TODO: include session details, such as login IP and BrowserAgent
 		String nonc = generateSession(puid, noncLifetime, nonceSalt, null, null);
+		
 		String cookieHash = NxtCrypt.getSaltedHash(passHash, nonceSalt);
+		// Remove the special characters from the hash value
+		// Cookie with special characters failed to save at browser, specially with + and = signs
+		cookieHash = cookieHash.replaceAll("\\W", "");
 		
 		// Store the cookies
 		//-----------------------------------------------------

@@ -75,4 +75,8 @@ public class AmazonS3Helper {
 		
 		s3Client.putObject(por);
 	}
+	
+	public String getFileResourceURL(String bucketName, String fileKey){
+		return s3Client.getResourceUrl(bucketName, fileKey);
+	}
 }

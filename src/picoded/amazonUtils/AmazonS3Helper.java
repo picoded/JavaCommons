@@ -10,7 +10,9 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 
 public class AmazonS3Helper {
 	
@@ -25,11 +27,26 @@ public class AmazonS3Helper {
 		}
 	}
 	
+	///
+	/// Putting file objects
+	///
 	public void putFile(String bucketName, String inFileKeyName, File inFile) throws AmazonServiceException, AmazonClientException, Exception{
-		s3Client.putObject(bucketName, inFileKeyName, inFile);
+		putFile(bucketName, inFileKeyName, inFile, false);
 	}
 	
+	public void putFile(String bucketName, String inFileKeyName, File inFile, boolean makeFilePublic) throws AmazonServiceException, AmazonClientException, Exception{
+		PutObjectRequest por = new PutObjectRequest(bucketName, inFileKeyName, inFile);
+		putFile(por, makeFilePublic);
+	}
+	
+	///
+	/// Putting data stream
+	///
 	public void putFile(String bucketName, String inFileKeyName, InputStream inStream, long contentLength, Map<String, String> metadataMap) throws AmazonServiceException, AmazonClientException, Exception{
+		putFile(bucketName, inFileKeyName, inStream, contentLength, metadataMap, false);
+	}
+	
+	public void putFile(String bucketName, String inFileKeyName, InputStream inStream, long contentLength, Map<String, String> metadataMap, boolean makeFilePublic) throws AmazonServiceException, AmazonClientException, Exception{
 		if(inStream == null){
 			System.out.println("Input stream is null");
 			return;
@@ -44,6 +61,18 @@ public class AmazonS3Helper {
 		
 		metadata.setContentLength(contentLength);
 		
-		s3Client.putObject(bucketName, inFileKeyName, inStream, metadata);
+		PutObjectRequest por = new PutObjectRequest(bucketName, inFileKeyName, inStream, metadata);
+		putFile(por, makeFilePublic);
+	}
+	
+	///
+	/// Actual s3 call
+	///
+	public void putFile(PutObjectRequest por, boolean makeFilePublic) throws AmazonServiceException, AmazonClientException, Exception{
+		if(makeFilePublic){
+			por = por.withCannedAcl(CannedAccessControlList.PublicRead);
+		}
+		
+		s3Client.putObject(por);
 	}
 }

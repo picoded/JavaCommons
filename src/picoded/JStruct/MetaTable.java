@@ -24,11 +24,11 @@ import org.apache.commons.lang3.RandomUtils;
 /// 
 public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	
-	///
-	/// Temp mode optimization, used to indicate pure session like data,
-	/// that does not require persistance (or even SQL)
-	///
-	///--------------------------------------------------------------------------
+	//
+	// Temp mode optimization, used to indicate pure session like data,
+	// that does not require persistance (or even SQL)
+	//
+	//--------------------------------------------------------------------------
 	
 	/// Gets if temp mode optimization hint is indicated
 	/// Note that this only serve as a hint, as does not indicate actual setting
@@ -44,9 +44,9 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @returns boolean  previous value if set
 	public boolean setTempHint(boolean mode);
 	
-	///
-	/// Backend system setup / teardown
-	///--------------------------------------------------------------------------
+	//
+	// Backend system setup / teardown
+	//--------------------------------------------------------------------------
 	
 	/// Setsup the backend storage table, etc. If needed
 	public void systemSetup();
@@ -68,9 +68,9 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 		// does nothing?
 	}
 	
-	/// 
-	/// MetaObject operations
-	///--------------------------------------------------------------------------
+	// 
+	// MetaObject operations
+	//--------------------------------------------------------------------------
 	
 	/// Generates a new blank object, with a GUID
 	///
@@ -106,9 +106,9 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @returns the MetaObject
 	public MetaObject append(String _oid, Map<String, Object> obj);
 	
-	/// 
-	/// MetaObject utility operations
-	///--------------------------------------------------------------------------
+	// 
+	// MetaObject utility operations
+	//--------------------------------------------------------------------------
 	
 	/// Get array of MetaObjects
 	public default MetaObject[] getArrayFromID(String[] idArray, boolean isUnchecked) {
@@ -119,9 +119,9 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 		return retArr;
 	}
 	
-	/// 
-	/// Query operations (to optimize on specific implementation)
-	///--------------------------------------------------------------------------
+	// 
+	// Query operations (to optimize on specific implementation)
+	//--------------------------------------------------------------------------
 	
 	/// Performs a search query, and returns the respective MetaObjects
 	///
@@ -230,9 +230,9 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 		return retList.size();
 	}
 	
-	/// 
-	/// Get from key names operations (to optimize on specific implementation)
-	///--------------------------------------------------------------------------
+	// 
+	// Get from key names operations (to optimize on specific implementation)
+	//--------------------------------------------------------------------------
 	
 	/// Performs a custom search by configured keyname
 	/// 
@@ -301,9 +301,9 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 		return retList.toArray(new String[retList.size()]);
 	}
 	
-	/// 
-	/// MetaType handling, does type checking and conversion
-	///--------------------------------------------------------------------------
+	// 
+	// MetaType handling, does type checking and conversion
+	//--------------------------------------------------------------------------
 	
 	/// Gets and return the internal MetaTypeMap
 	public MetaTypeMap typeMap();

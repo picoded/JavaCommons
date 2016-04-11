@@ -19,8 +19,8 @@ public class TestConfig {
 	//-------------------------------//
 	// Default Credentials for MYSQL //
 	//-------------------------------//
-	static private String MYSQL_CONN_JDBC = "jdbc:mysql://54.169.34.78:3306/JAVACOMMONS";
-	static private String MYSQL_CONN = "54.169.34.78:3306";
+	static private String MYSQL_CONN_JDBC = "jdbc:mysql://demodb-mysql.picoded-dev.com:3306/JAVACOMMONS";
+	static private String MYSQL_CONN = "demodb-mysql.picoded-dev.com:3306";
 	static private String MYSQL_DATA = "JAVACOMMONS";
 	static private String MYSQL_USER = "JAVACOMMONS";
 	static private String MYSQL_PASS = "JAVACOMMONS";
@@ -58,7 +58,7 @@ public class TestConfig {
 	//-------------------------------//
 	// Default Credentials for MSSQL //
 	//-------------------------------//
-	static private String MSSQL_CONN = "54.169.34.78";
+	static private String MSSQL_CONN = "demodb-mssql.picoded-dev.com";
 	static private String MSSQL_NAME = "JAVACOMMONS";
 	static private String MSSQL_USER = "JAVACOMMONS";
 	static private String MSSQL_PASS = "JAVACOMMONS";
@@ -82,7 +82,7 @@ public class TestConfig {
 	//--------------------------------//
 	// Default Credentials for ORACLE //
 	//--------------------------------//
-	static private String ORACLE_PATH = "JAVACOMMONS@//54.169.34.78/xe";
+	static private String ORACLE_PATH = "JAVACOMMONS@//demodb-mysql.picoded-dev.com/xe";
 	static private String ORACLE_USER = "JAVACOMMONS";
 	static private String ORACLE_PASS = "JAVACOMMONS";
 	
@@ -101,7 +101,7 @@ public class TestConfig {
 	//-------------------------------//
 	// LDAP Server location          //
 	//-------------------------------//
-	static private String LDAP_HOST = "54.169.34.78";
+	static private String LDAP_HOST = "demodb-ldap.picoded-dev.com";
 	static private String LDAP_DOMAIN = "com.demo";
 	static private int LDAP_PORT = 389;
 	

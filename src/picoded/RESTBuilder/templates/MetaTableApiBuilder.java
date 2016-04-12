@@ -334,6 +334,26 @@ public class MetaTableApiBuilder {
 				metaObjs = _metaTableObj.query(query, queryArgs, orderBy, start, length);
 			}
 			
+			StringBuilder headerRow = new StringBuilder();
+			for (int i = 0; i < headers.length; ++i) {
+				String header = headers[i];
+				if (header == null) {
+					header = "";
+				}
+				header = header.replace("\"", ""); //might not be best solution
+				header = header.replace("\n", "");
+				
+				header = "\"" + header + "\"";
+				headerRow.append(header);
+				if (i < headers.length - 1) {
+					headerRow.append(",");
+				} else {
+					headerRow.append("\n");
+				}
+			}
+			
+			ret.add(headerRow.toString());
+			
 			for (MetaObject metaObj : metaObjs) {
 				List<Object> row = new ArrayList<Object>();
 				for (String header : headers) {
@@ -344,7 +364,7 @@ public class MetaTableApiBuilder {
 				StringBuilder singleRowCSV = new StringBuilder();
 				int rowSize = row.size();
 				for (int i = 0; i < rowSize; ++i) {
-					String valStr = (String) row.get(i);
+					String valStr = GenericConvert.toString( row.get(i) );
 					if (valStr == null) {
 						valStr = "";
 					}

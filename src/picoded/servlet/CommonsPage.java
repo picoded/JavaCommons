@@ -265,8 +265,9 @@ public class CommonsPage extends BasePage {
 		String username = JConfigObj.getString("sys.dataStack.smtp.username", "");
 		String password = JConfigObj.getString("sys.dataStack.smtp.password", "");
 		String emailFrom = JConfigObj.getString("sys.dataStack.smtp.emailFrom", "testingTheEmailSystem@mailinator.com");
+		boolean isSSL = JConfigObj.getBoolean("sys.dataStack.smtp.ssl", false);
 		
-		return (_systemEmail = new EmailBroadcaster(hostname, username, password, emailFrom));
+		return (_systemEmail = new EmailBroadcaster(hostname, username, password, emailFrom, isSSL));
 	}
 	
 	/// Cached memoizer copy

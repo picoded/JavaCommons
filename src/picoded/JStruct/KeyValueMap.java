@@ -21,11 +21,11 @@ import org.apache.commons.lang3.RandomUtils;
 ///
 public interface KeyValueMap extends GenericConvertMap<String, String> {
 	
-	///
-	/// Temp mode optimization, used to indicate pure session like data,
-	/// that does not require persistance (or even SQL)
-	///
-	///--------------------------------------------------------------------------
+	//
+	// Temp mode optimization, used to indicate pure session like data,
+	// that does not require persistance (or even SQL)
+	//
+	//--------------------------------------------------------------------------
 	
 	/// Gets if temp mode optimization hint is indicated
 	/// Note that this only serve as a hint, as does not indicate actual setting
@@ -41,9 +41,9 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @returns boolean  previous value if set
 	public boolean setTempHint(boolean mode);
 	
-	///
-	/// Backend system setup / teardown
-	///--------------------------------------------------------------------------
+	//
+	// Backend system setup / teardown
+	//--------------------------------------------------------------------------
 	
 	/// Setsup the backend storage table, etc. If needed
 	public void systemSetup();
@@ -69,9 +69,9 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	///
 	public void clear();
 	
-	///
-	/// Expiration and lifespan handling (public access)
-	///--------------------------------------------------------------------------
+	//
+	// Expiration and lifespan handling (public access)
+	//--------------------------------------------------------------------------
 	
 	/// Returns the expire time stamp value, if still valid
 	///
@@ -108,9 +108,9 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @returns array of keys
 	public Set<String> getKeys(String value);
 	
-	///
-	/// put, get, etc (public)
-	///--------------------------------------------------------------------------
+	//
+	// put, get, etc (public)
+	//--------------------------------------------------------------------------
 	
 	/// Contains key operation.
 	///
@@ -151,9 +151,9 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 		return getKeys(null);
 	}
 	
-	///
-	/// Extended map operations
-	///--------------------------------------------------------------------------
+	//
+	// Extended map operations
+	//--------------------------------------------------------------------------
 	
 	/// Stores (and overwrites if needed) key, value pair
 	///
@@ -177,9 +177,9 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @returns String
 	public String putWithExpiry(String key, String value, long expireTime);
 	
-	///
-	/// Nonce operations suppport (public)
-	///--------------------------------------------------------------------------
+	//
+	// Nonce operations suppport (public)
+	//--------------------------------------------------------------------------
 	
 	/// Generates a random nonce hash, and saves the value to it
 	///

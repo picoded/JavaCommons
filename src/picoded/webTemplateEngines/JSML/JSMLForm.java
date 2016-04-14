@@ -492,6 +492,11 @@ public class JSMLForm {
 		JMTE _jmteObj = new JMTE(page.getPagesTemplatePath());
 		_jmteObj.baseDataModel.put("ContextPath", page.getContextURI());
 		_jmteObj.baseDataModel.put("ContextURI", "file:///" + page.getContextPath());
+		if(data != null){
+			for(String key : data.keySet()){
+				_jmteObj.baseDataModel.put(key, data.get(key));
+			}
+		}
 		//_jmteObj.registerNamedRenderer(new page.currentAccountMetaInfo_nr());
 		ret = new StringBuilder(_jmteObj.parseTemplate(ret.toString()));
 		

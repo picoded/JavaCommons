@@ -339,6 +339,8 @@ public class FormInputTemplates {
 		FormNode tempNode = new FormNode(node._formGenerator, node);
 		tempNode.replace("field", realName + "_dummy");
 		
+		boolean showValueAsLabelText = node.getBoolean("displayOptionAsLabel", true);
+		
 		StringBuilder ret = new StringBuilder();
 		for (String key : keyNamePair.keySet()) {
 			if (!displayMode) {
@@ -354,7 +356,6 @@ public class FormInputTemplates {
 				
 				//generate onchange function
 				if (realName != null && !realName.isEmpty()) {
-					int x = 0;
 					String onChangeFunctionString = "saveCheckboxValueToHiddenField('" + realName + "_dummy', '" + realName
 						+ "')";
 					tempMap.put("onchange", onChangeFunctionString);
@@ -366,9 +367,13 @@ public class FormInputTemplates {
 				ret.append(sbArr[0]);
 				ret.append(sbArr[1]);
 				ret.append("<div class=\"pfi_inputCheckbox_labelTextPrefix\"></div>");
-				ret.append("<div class=\"pfi_inputCheckbox_labelText\">");
-				ret.append(keyNamePair.get(key));
-				ret.append("</div>");
+				
+				if(showValueAsLabelText){
+					ret.append("<div class=\"pfi_inputCheckbox_labelText\">");
+					ret.append(keyNamePair.get(key));
+					ret.append("</div>");
+				}
+				
 				ret.append("</label>");
 				ret.append("</div>");
 			} else {

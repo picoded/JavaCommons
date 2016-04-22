@@ -340,6 +340,7 @@ public class FormInputTemplates {
 		tempNode.replace("field", realName + "_dummy");
 		
 		boolean showValueAsLabelText = node.getBoolean("displayOptionAsLabel", true);
+		boolean removeDefaultSaveFunction = node.getBoolean("removeDefaultSaveFunction", false);
 		
 		StringBuilder ret = new StringBuilder();
 		for (String key : keyNamePair.keySet()) {
@@ -355,7 +356,7 @@ public class FormInputTemplates {
 				}
 				
 				//generate onchange function
-				if (realName != null && !realName.isEmpty()) {
+				if (removeDefaultSaveFunction == false && realName != null && !realName.isEmpty()) {
 					String onChangeFunctionString = "saveCheckboxValueToHiddenField('" + realName + "_dummy', '" + realName
 						+ "')";
 					tempMap.put("onchange", onChangeFunctionString);

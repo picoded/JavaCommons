@@ -195,6 +195,7 @@ public class FormInputTemplates {
 			sbArr[0].append(fieldValue);
 		} else {
 			String[] fieldValParaSplit = fieldValue.split("\n");
+			
 			for (String para : fieldValParaSplit) {
 				Map<String, Object> newParaMap = new HashMap<String, Object>();
 				newParaMap.put(node.getFieldName(), para);
@@ -210,6 +211,9 @@ public class FormInputTemplates {
 				sbArr[0].append(newPara[0]);
 				sbArr[0].append(para);
 				sbArr[0].append(newPara[1]);
+				
+				//manually append line break
+				sbArr[0].append("<br></br>");
 			}
 		}
 		return sbArr[0].append(sbArr[1]);

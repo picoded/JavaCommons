@@ -398,7 +398,9 @@ public class FormInputTemplates {
 					sbArr[0].append("<div class=\"pf_displayCheckbox pf_displayCheckbox_unselected\"></div>");
 				}
 				
-				sbArr[0].append("<div class=\"pf_displayCheckbox_text\">" + keyNamePair.get(key) + "</div>");
+				if(showValueAsLabelText){
+					sbArr[0].append("<div class=\"pf_displayCheckbox_text\">" + keyNamePair.get(key) + "</div>");
+				}
 				
 				ret.append(sbArr[0]);
 				ret.append(sbArr[1]);

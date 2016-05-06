@@ -248,7 +248,7 @@ public class JSMLForm {
 		File bodyPrefixFile = getFileInRootFolder(prefixName);
 		
 		if (bodyPrefixFile == null) {
-			bodyPrefixFile = getFileInRootFolder("bodyPrefix");
+			bodyPrefixFile = getFileInRootFolder("bodyPrefix.html");
 		}
 		
 		if (bodyPrefixFile == null) {
@@ -267,7 +267,7 @@ public class JSMLForm {
 		File bodySuffixFile = getFileInRootFolder(suffixName);
 		
 		if (bodySuffixFile == null) {
-			bodySuffixFile = getFileInRootFolder("bodySuffix");
+			bodySuffixFile = getFileInRootFolder("bodySuffix.html");
 		}
 		
 		if (bodySuffixFile == null) {

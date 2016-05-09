@@ -451,4 +451,23 @@ public class MetaTable_test {
 		assertEquals(mtObj.getType("uuid-array"), MetaType.UUID_ARRAY);
 	}
 	
+	// Demo code : kept here for reference
+	//-----------------------------------------------
+	public void demoCode() {
+		// Initiate a meta table
+		MetaTable table = (new JStruct()).getMetaTable("demo");
+		
+		// Adding new object?
+		MetaObject mObj = table.newObject();
+		mObj.put("be", "happy");
+		mObj.put("num", new Integer(1));
+		mObj.saveDelta();
+		
+		// Doing a query
+		MetaObject[] qRes = table.query("num > ? OR be = ?", new Object[] { 0, "happy" } );
+		
+		// Each object has a base68 GUID
+		String guid = qRes[0]._oid();
+	}
+	
 }

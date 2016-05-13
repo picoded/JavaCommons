@@ -1,34 +1,15 @@
 package picoded.JSql.db;
 
-import java.lang.String;
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
-import java.lang.RuntimeException;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.*;
-
-import java.io.StringWriter;
-import java.util.logging.*;
-import java.io.PrintWriter;
-
-import java.util.concurrent.ExecutionException;
-
-import picoded.enums.JSqlType;
-import picoded.JSql.JSqlResult;
-import picoded.JSql.JSqlException;
 
 import picoded.JSql.JSql;
+import picoded.JSql.JSqlException;
 import picoded.JSql.JSqlQuerySet;
-import picoded.JSql.db.BaseInterface;
+import picoded.JSql.JSqlResult;
+import picoded.enums.JSqlType;
 
 /// Pure MySQL implentation of JSql
 public class JSql_Mysql extends JSql {

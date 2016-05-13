@@ -1,10 +1,13 @@
 package picodedTests.JSql;
 
-import org.junit.*;
-import static org.junit.Assert.*;
-import java.util.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-import picoded.JSql.*;
+import picoded.JSql.JSql;
+import picoded.JSql.JSqlException;
 import picodedTests.TestConfig;
 
 public class JSql_Demo_test {

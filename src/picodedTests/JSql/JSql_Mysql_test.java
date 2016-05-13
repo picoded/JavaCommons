@@ -1,11 +1,8 @@
 package picodedTests.JSql;
 
-import org.junit.*;
+import org.junit.Before;
 
-import static org.junit.Assert.*;
-
-import picoded.JSql.*;
-import picodedTests.JSql.JSql_Sqlite_test;
+import picoded.JSql.JSql;
 import picodedTests.TestConfig;
 
 public class JSql_Mysql_test extends JSql_Sqlite_test {

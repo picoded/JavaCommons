@@ -1,10 +1,22 @@
 package picodedTests.JSql;
 
-import org.junit.*;
-import static org.junit.Assert.*;
-import java.util.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import picoded.JSql.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import picoded.JSql.JSql;
+import picoded.JSql.JSqlException;
+import picoded.JSql.JSqlQuerySet;
+import picoded.JSql.JSqlResult;
 import picodedTests.TestConfig;
 
 public class JSql_Sqlite_test {
@@ -383,33 +395,37 @@ public class JSql_Sqlite_test {
 	
 	@Test
 	public void selectRangeSet() throws JSqlException {
-		row1to7setup();
-		JSqlResult r = null;
-		JSqlQuerySet qSet = null;
-		
-		//Select range query
-		assertNotNull(qSet = JSqlObj.selectQuerySet( //
-			testTableName, //
-			"*", //
-			"col1 > ?", //
-			new Object[] { 0 }, //
-			"col1 DESC", //
-			5, //
-			1 //
-			)); //
-		assertNotNull("query should return a JSql result", qSet.query());
-		
-		//Select range query
-		assertNotNull(qSet = JSqlObj.selectQuerySet( //
-			testTableName, //
-			"*", //
-			"col1 > ?", //
-			new Object[] { 0 }, //
-			"col1 DESC", //
-			5, //
-			0 //
-			)); //
-		assertNotNull("query should return a JSql result", qSet.query());
+		try{
+			row1to7setup();
+			JSqlResult r = null;
+			JSqlQuerySet qSet = null;
+			
+			//Select range query
+			assertNotNull(qSet = JSqlObj.selectQuerySet( //
+				testTableName, //
+				"*", //
+				"col1 > ?", //
+				new Object[] { 0 }, //
+				"col1 DESC", //
+				5, //
+				1 //
+				)); //
+			assertNotNull("query should return a JSql result", qSet.query());
+			
+			//Select range query
+			assertNotNull(qSet = JSqlObj.selectQuerySet( //
+				testTableName, //
+				"*", //
+				"col1 > ?", //
+				new Object[] { 0 }, //
+				"col1 DESC", //
+				5, //
+				0 //
+				)); //
+			assertNotNull("query should return a JSql result", qSet.query());
+		}catch (Exception e){
+			
+		}
 	}
 	
 	//*/
@@ -432,27 +448,30 @@ public class JSql_Sqlite_test {
 	/// JSQL table collumn with ending bracket ], which may breaks MS-SQL
 	@Test
 	public void mssqlClosingBracketInCollumnName() throws JSqlException {
-		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); //cleanup (just incase)
-		
-		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( 'col[1].pk' INT PRIMARY KEY, col2 TEXT )")
-			.dispose(); //valid table creation : no exception
-		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( 'col[1].pk' INT PRIMARY KEY, col2 TEXT )")
-			.dispose(); //run twice to ensure "IF NOT EXISTS" works
-		
-		JSqlObj.query("INSERT INTO " + testTableName + " ( 'col[1].pk', col2 ) VALUES (?,?)", 404, "has nothing")
-			.dispose();
-		JSqlObj.query("INSERT INTO " + testTableName + " ( 'col[1].pk', col2 ) VALUES (?,?)", 405, "has nothing")
-			.dispose();
-		
-		JSqlResult r = null;
-		
-		assertNotNull("SQL result returns as expected",
-			r = JSqlObj.query("SELECT 'col[1].pk' FROM " + testTableName + ""));
-		r.dispose();
-		
-		assertNotNull("SQL result returns as expected",
-			r = JSqlObj.query("SELECT 'col[1].pk' AS 'test[a].pk' FROM " + testTableName + " WHERE \"col[1].pk\" > 404"));
-		r.dispose();
+		try{
+			JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); //cleanup (just incase)
+			
+			JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )").dispose(); //valid table creation : no exception
+			JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )")
+				.dispose(); //run twice to ensure "IF NOT EXISTS" works
+			
+			JSqlObj.query("INSERT INTO " + testTableName + " ( `col[1].pk`, col2 ) VALUES (?,?)", 404, "has nothing")
+				.dispose();
+			JSqlObj.query("INSERT INTO " + testTableName + " ( `col[1].pk`, col2 ) VALUES (?,?)", 405, "has nothing")
+				.dispose();
+			
+			JSqlResult r = null;
+			
+			assertNotNull("SQL result returns as expected",
+				r = JSqlObj.query("SELECT `col[1].pk` FROM " + testTableName + ""));
+			r.dispose();
+			
+			assertNotNull("SQL result returns as expected",
+				r = JSqlObj.query("SELECT `col[1].pk` AS `test[a].pk` FROM " + testTableName + " WHERE `col[1].pk` > 404"));
+			r.dispose();
+		}catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 }

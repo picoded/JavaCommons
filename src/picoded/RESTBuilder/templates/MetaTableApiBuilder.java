@@ -91,10 +91,11 @@ public class MetaTableApiBuilder {
 	/// |                 |                    | are returned as well.                                                         |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | wildcardMode    | String (optional)  | Default SUFFIX. Determines SQL query wildcard position. Either prefix,        |
-	/// |                 |                    | suffix, or both. Defaults to suffix                                           |
-	/// | search[value]   | String (optional)  | Search string passed in from datatables API.                                  |
+    /// |                 |                    | suffix, or both. Defaults to suffix                                           |
+    /// | searchValue     | String (optional)  | Search string passed                                                          |
+	/// | search[value]   | String (optional)  | Same as above, this is for datatables API. Uses above if both is given.       |
 	/// | queryColumns    | String[] (optional)| Query columns used for searching, defaults to headers                         |
-	/// | caseSensitive   | boolean (Optional) | Use case sensitive check. Default true?                                       | TODO
+	/// | caseSensitive   | boolean (Optional) | Use case sensitive check. Default true?                                       | @TODO
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// 
 	/// ## JSON Object Output Parameters
@@ -125,7 +126,18 @@ public class MetaTableApiBuilder {
 		}
 		
 		String[] queryColumns = req.getStringArray("queryColumns", headers);
-		String searchParams = req.getString("search[value]", "").trim(); //datatables specific key
+		
+		String searchParams = req.getString("searchValue", "").trim(); //datatables specific key
+
+		if(searchParams.isEmpty()) {
+			searchParams = req.getString("search[value]", "").trim();
+		}
+
+		if(searchParams.length() >= 2 && searchParams.charAt(0)=='"' && searchParams.charAt(searchParams.length()-1)=='"') {
+			searchParams=searchParams.substring(1,searchParams.length()-1);
+		}
+
+		System.out.println("params are : "+searchParams);
 		String wildcardMode = req.getString("wildcardMode", "suffix");
 		
 		String orderByStr = req.getString("orderBy");

@@ -320,6 +320,17 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 						return;
 					}
 					
+					if (reqMode.equalsIgnoreCase("fullPdfHtml")) {
+						formParams = formDataFromRequest(page, form);
+						String fullPdfHtml = form.getFullPdfHTML(page, formParams);
+						
+						page.getWriter().println("-----------------");
+						page.getWriter().println(fullPdfHtml);
+						page.getWriter().println("-----------------");
+						
+						return;
+					}
+					
 					// PDF link test mode
 					if (reqMode.equalsIgnoreCase("pdfTest")) {
 						formParams = formDataFromRequest(page, form);

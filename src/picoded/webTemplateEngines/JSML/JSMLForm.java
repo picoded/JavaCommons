@@ -524,6 +524,41 @@ public class JSMLForm {
 		return pdfData;
 	}
 	
+	public String getFullPdfHTML (BasePage page, Map<String, Object> data) {
+		validateTempFolder();
+		StringBuilder ret = new StringBuilder();
+		
+		data = sanitiseMap(data, "", true);
+		
+		if (!_formDefinitionString.isEmpty()) {
+			ret = formGen.build(_formDefinitionString, data, true);
+		} else {
+			ret = formGen.build(_formDefinitionMap, data, true);
+		}
+		
+		if (ret == null) {
+			throw new RuntimeException("getFullPdfHTML() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
+		}
+		
+		//jmte the result
+		JMTE _jmteObj = new JMTE(page.getPagesTemplatePath());
+		_jmteObj.baseDataModel.put("ContextPath", page.getContextURI());
+		_jmteObj.baseDataModel.put("ContextURI", "file:///" + page.getContextPath());
+		if(data != null){
+			for(String key : data.keySet()){
+				_jmteObj.baseDataModel.put(key, data.get(key));
+			}
+		}
+		ret = new StringBuilder(_jmteObj.parseTemplate(ret.toString()));
+		
+		String bodyPrefix = readBodyPrefix("PrefixPDF");
+		String bodySuffix = readBodySuffix("SuffixPDF");
+		ret.insert(0, sanitiseStringForPDF(bodyPrefix, ""));
+		ret.append(bodySuffix);
+		
+		return ret.toString();
+	}
+	
 	//just for testing
 	public String[] getPDFLinkTest(BasePage page, Map<String, Object> data) {
 		String[] values = new String[5];
@@ -550,6 +585,7 @@ public class JSMLForm {
 		
 		return values;
 	}
+	
 	
 	/// Deletes the files from the temp folder older than specified time.
 	public void clearTempFilesOlderThenGivenAgeInSeconds(long time) {

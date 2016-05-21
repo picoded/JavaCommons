@@ -161,7 +161,7 @@ public class JSql_Oracle extends JSql {
 		}
 		
 		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("\\s+", " ").replaceAll("'", "\"")
-			.replaceAll("`", "\"").replaceAll("\"", "");
+			.replaceAll("`", "\""); //.replaceAll("\"", "'");
 		
 		String upperCaseStr = fixedQuotes.toUpperCase();
 		String qString = fixedQuotes;
@@ -232,7 +232,7 @@ public class JSql_Oracle extends JSql {
 				String qStringBeforeFromKeyword = qString.substring(0, fromKeywordIndex);
 				// remove 'AS' keywords after table name
 				String qStringAfterFromKeyword = qString.substring(fromKeywordIndex, qString.length()).replaceAll("AS", "");
-				// replace double quotes (") with sinfle quotes
+				// replace double quotes (") with single quotes
 				qStringAfterFromKeyword = qStringAfterFromKeyword.replace("\"", "'");
 				
 				qString = qStringBeforeFromKeyword + qStringAfterFromKeyword;

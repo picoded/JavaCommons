@@ -384,8 +384,8 @@ public class JSql_MetaTableUtils {
 		
 		String joinType = "LEFT";
 		
-		String lBracket = "'";
-		String rBracket = "'";
+		String lBracket = "\"";
+		String rBracket = "\"";
 		
 		// Reserved to overwrite, and to do more complex quotes
 		// if (sql.sqlType == JSqlType.mssql) {
@@ -440,6 +440,9 @@ public class JSql_MetaTableUtils {
 			key = e.getKey();
 			type = e.getValue();
 			
+			// SQL safety the key
+			key = key.replaceAll("\\\\","\\\\").replaceAll("\\\"","\\\"").replaceAll("\\'","\\'");
+			
 			if ( //
 			type == MetaType.INTEGER || //
 				type == MetaType.FLOAT || //
@@ -470,9 +473,12 @@ public class JSql_MetaTableUtils {
 				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = ?");
 				queryArgs.add(key);
 				
-				// Numeric value = 0, index optimization
-				from.append(" AND S" + joinCount + ".nVl = ? ");
-				queryArgs.add(0.0);
+				//
+				// Numeric value = 0, index optimization (to reimplment in future)
+				// Disabled, as it PREVENTS sorting of numeric value via the string index (to be optimized later)
+				//
+				// from.append(" AND S" + joinCount + ".nVl = ? ");
+				// queryArgs.add(0.0);
 				
 			} else if (type == MetaType.TEXT) {
 				
@@ -527,72 +533,14 @@ public class JSql_MetaTableUtils {
 	}
 	
 	/// Sanatize the order by string, and places the field name as query arguments
-	public static String sanatizeOrderByString(String rawString, List<Object> queryArgs) {
-		// Return string
-		StringBuilder ret = new StringBuilder();
-		
+	public static OrderBy<MetaObject> getOrderByObject(String rawString) {
 		// Clear out excess whtiespace
 		rawString = rawString.trim().replaceAll("\\s+", " ");
-		
-		// Split for multiple fields
-		String[] orderByArr = rawString.split(",");
-		
-		if (orderByArr == null || orderByArr[0].length() <= 0) {
+		if (rawString.length() <= 0) {
 			throw new RuntimeException("Unexpected blank found in OrderBy query : " + rawString);
 		}
 		
-		boolean first = true;
-		for (String orderSet : orderByArr) {
-			
-			// Get orderset, without excess whitespace
-			orderSet = orderSet.trim();
-			if (orderSet.length() <= 0) {
-				throw new RuntimeException("Invalid OrderBy string query: " + rawString);
-			}
-			
-			// Default ordering is asecending
-			OrderBy.OrderType ot = OrderBy.OrderType.ASC;
-			
-			// Check for DESC / ASC suffix
-			if (orderSet.length() > 4) {
-				String lowerCaseOrderSet = orderSet.toLowerCase();
-				if (lowerCaseOrderSet.endsWith(" desc")) {
-					ot = OrderBy.OrderType.DESC;
-					orderSet = orderSet.substring(0, orderSet.length() - 5).trim();
-				} else if (lowerCaseOrderSet.endsWith(" asc")) {
-					ot = OrderBy.OrderType.ASC;
-					orderSet = orderSet.substring(0, orderSet.length() - 4).trim();
-				}
-			}
-			
-			// Unwrap the field name (since they will be passed by params anyway)
-			String field = QueryUtils.unwrapFieldName(orderSet);
-			
-			// Add as query args
-			// No longer used, as its not supported in most SQL
-			//
-			// queryArgs.add(field);
-			//
-			
-			// Push the return string, add the seperators when needed
-			if (first != true) {
-				ret.append(", ");
-			} else {
-				first = false;
-			}
-			
-			// field -> sanatize .[]-_,
-			field = RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(field);
-			
-			// Push the actual order by command
-			if (ot == OrderBy.OrderType.DESC) {
-				ret.append("\"" + field + "\"" + " DESC ");
-			} else {
-				ret.append("\"" + field + "\"" + " ASC ");
-			}
-		}
-		
-		return ret.toString();
+		return new OrderBy<MetaObject>(rawString);
 	}
 	
 	/// Performs a search query, and returns the respective MetaObjects
@@ -616,30 +564,29 @@ public class JSql_MetaTableUtils {
 		StringBuilder queryBuilder = new StringBuilder();
 		List<Object> complexQueryArgs = new ArrayList<Object>();
 		Object[] queryArgs = null;
+		OrderBy<MetaObject> orderByObj = null;
 		
-		if (orderByStr != null) {
-			orderByStr.replaceAll("_oid", "oID");
-		}
-		
-		if (whereClause == null) {
-			
-			queryBuilder.append("SELECT " + selectedCols + " FROM " + tablename + "");
-			
-			// @TODO sanatize ORDER BY for SQL injection
-			// Support ORDER BY values forming the MetaMap
-			if (orderByStr != null) {
-				queryBuilder.append(" ORDER BY ");
-				queryBuilder.append(sanatizeOrderByString(orderByStr, complexQueryArgs));
-			}
-			
+		/// Quick optimal lookup
+		if (whereClause == null && orderByStr == null && 
+			offset <= 0 && limit <= 0 && (
+			selectedCols.equals("COUNT(DISTINCT \"oID\") AS rcount") ||
+			selectedCols.equals("DISTINCT \"oID\"")
+		)) {
+			// Blank search, quick and easy
+			queryBuilder.append("SELECT " + selectedCols.replaceAll("\\\"","") + " FROM " + tablename + "");
 		} else {
+			
+			// Order by object handling
+			if (orderByStr != null) {
+				orderByStr.replaceAll("_oid", "oID");
+				orderByObj = getOrderByObject(orderByStr);
+			}
 			
 			// Building the MetaTypeMap from where request
 			MetaTypeMap queryTypeMap = new MetaTypeMap();
 			
 			// Validating the Where clause and using it to build the MetaTypeMap
 			Query queryObj = null;
-			
 			if (whereClause != null && whereClause.length() >= 0) {
 				
 				// Conversion to query object, round 1 of sanatizing
@@ -710,6 +657,22 @@ public class JSql_MetaTableUtils {
 				}
 			}
 			
+			// Order by handling for metatype map
+			if(orderByObj != null) {
+				for(String keyName : orderByObj.getKeyNames()) {
+					if( !queryTypeMap.containsKey(keyName) ) {
+						queryTypeMap.put(keyName, MetaType.STRING);
+					}
+					
+					MetaType type = queryTypeMap.get(keyName);
+					
+					// Force lowercase string sorting for string orderby
+					if( queryTypeMap.get(keyName) == MetaType.STRING ) {
+						orderByObj.replaceKeyName(keyName, keyName+"#lc");
+					}
+				}
+			}
+			
 			// Building the Inner join query
 			StringBuilder innerJoinQuery = sqlComplexLeftJoinQueryBuilder(sql, tablename, queryTypeMap, complexQueryArgs);
 			
@@ -726,11 +689,10 @@ public class JSql_MetaTableUtils {
 				complexQueryArgs.addAll(queryObj.queryArgumentsList());
 			}
 			
-			// @TODO sanatize ORDER BY for SQL injection
-			// Support ORDER BY values forming the MetaMap
-			if (orderByStr != null) {
+			// Order by string mapping
+			if (orderByObj != null) {
 				queryBuilder.append(" ORDER BY ");
-				queryBuilder.append(sanatizeOrderByString(orderByStr, complexQueryArgs));
+				queryBuilder.append( orderByObj.toString() );
 			}
 			
 			//logger.log( Level.WARNING, queryBuilder.toString() );
@@ -748,6 +710,9 @@ public class JSql_MetaTableUtils {
 				queryBuilder.append(" OFFSET " + offset);
 			}
 		}
+		
+		// In case you want to debug the query =(
+		// System.out.println(">>> "+queryBuilder.toString());
 		
 		try {
 			// Execute and get the result
@@ -776,7 +741,7 @@ public class JSql_MetaTableUtils {
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
 		JSqlResult r = metaTableSelectQueryBuilder( //
-			metaTableObj, sql, tablename, "DISTINCT oID", whereClause, whereValues, orderByStr, offset, limit);
+			metaTableObj, sql, tablename, "DISTINCT \"oID\"", whereClause, whereValues, orderByStr, offset, limit);
 		//logger.log( Level.WARNING, r.toString() );
 		List<Object> oID_list = r.get("oID");
 		// Generate the object list
@@ -827,7 +792,7 @@ public class JSql_MetaTableUtils {
 		//
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
-		JSqlResult r = metaTableSelectQueryBuilder(metaTableObj, sql, tablename, "COUNT(DISTINCT oID) AS rcount",
+		JSqlResult r = metaTableSelectQueryBuilder(metaTableObj, sql, tablename, "COUNT(DISTINCT \"oID\") AS rcount",
 			whereClause, whereValues, orderByStr, offset, limit);
 		
 		List<Object> rcountArr = r.get("rcount");

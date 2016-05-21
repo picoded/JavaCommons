@@ -91,8 +91,8 @@ public class MetaTableApiBuilder {
 	/// |                 |                    | are returned as well.                                                         |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | wildcardMode    | String (optional)  | Default SUFFIX. Determines SQL query wildcard position. Either prefix,        |
-    /// |                 |                    | suffix, or both. Defaults to suffix                                           |
-    /// | searchValue     | String (optional)  | Search string passed                                                          |
+	/// |                 |                    | suffix, or both. Defaults to suffix                                           |
+	/// | searchValue     | String (optional)  | Search string passed                                                          |
 	/// | search[value]   | String (optional)  | Same as above, this is for datatables API. Uses above if both is given.       |
 	/// | queryColumns    | String[] (optional)| Query columns used for searching, defaults to headers                         |
 	/// | caseSensitive   | boolean (Optional) | Use case sensitive check. Default true?                                       | @TODO

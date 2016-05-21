@@ -411,6 +411,48 @@ public class MetaTable_test {
 		assertArrayEquals((byte[]) (data.get("bin")), (byte[]) (to.get("bin")));
 	}
 	
+	// Orderby sorting 
+	//-----------------------------------------------
+	
+	@Test
+	public void orderByTest() {
+		
+		// Lets just rescycle old test for the names
+		indexBasedTest();
+		
+		// Replicated a bug, where u CANNOT use orderby on a collumn your not doing a where search
+		MetaObject[] qRes = mtObj.query("str_val = ?", new String[]{ "this" }, "num ASC");
+		assertEquals(qRes.length, 2);
+		
+		assertEquals("this",   qRes[0].get("str_val"));
+		assertEquals("this",   qRes[1].get("str_val"));
+		
+		assertEquals(1,   qRes[0].get("num"));
+		assertEquals(7,   qRes[1].get("num"));
+		
+		// Order by with offset
+		qRes = mtObj.query(null, null, "num ASC", 2, 3);
+		assertEquals(qRes.length, 3);
+		
+		assertEquals(3,   qRes[0].get("num"));
+		assertEquals(4,   qRes[1].get("num"));
+		assertEquals(5,   qRes[2].get("num"));
+		
+		assertEquals("hello",   qRes[0].get("str_val"));
+		assertEquals("world",   qRes[1].get("str_val"));
+		assertEquals("program", qRes[2].get("str_val"));
+	}
+	
+	// @Test
+	// public void orderByTestLoop() {
+	// 	for(int i=0; i<25; ++i) {
+	// 		orderByTest();
+	// 		
+	// 		tearDown();
+	// 		setUp();
+	// 	}
+	// }
+	
 	// KeyName fetching test
 	//-----------------------------------------------
 	@Test

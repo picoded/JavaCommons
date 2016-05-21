@@ -71,8 +71,14 @@ public class OrderBy<T> implements Comparator<T> {
 	}
 	
 	//
-	// To String converter
+	// String manipulations
 	//--------------------------------------------------------------------
+	
+	///
+	/// Converts the order by query string to an SQL safe order by query string
+	///
+	/// @returns    the SQL orderby query string
+	///
 	public String toString() {
 		StringBuilder ret = new StringBuilder();
 		
@@ -84,7 +90,8 @@ public class OrderBy<T> implements Comparator<T> {
 				first = false;
 			}
 			
-			ret.append(set.getLeft());
+			String safeKeyName = set.getLeft().replaceAll("\\\\","\\\\").replaceAll("\\\"","\\\"").replaceAll("\\'","\\'");
+			ret.append('"'+safeKeyName+'"');
 			ret.append(" ");
 			
 			if (set.getRight() == OrderType.ASC) {
@@ -95,6 +102,39 @@ public class OrderBy<T> implements Comparator<T> {
 		}
 		
 		return ret.toString();
+	}
+	
+	///
+	/// Does a keyname subtitution
+	///
+	/// @params {String}   The original key string
+	/// @params {String}   The replacement key string
+	///
+	/// @returns  boolean result if all relevent keys were found, and replaced
+	///
+	public boolean replaceKeyName(String original, String replacement) {
+		boolean res = false;
+		for (MutablePair<String, OrderType> set : _comparisionConfig) {
+			if( original.equals(set.getLeft()) ) {
+				set.setLeft( replacement );
+			}
+		}
+		return res;
+	}
+	
+	//
+	// To OrderBy implmentation
+	//--------------------------------------------------------------------
+	
+	///
+	/// Gets the orderby keys used in sorting
+	///
+	public Set<String> getKeyNames() {
+		Set<String> resSet = new HashSet<String>();
+		for (MutablePair<String, OrderType> set : _comparisionConfig) {
+			resSet.add( set.getLeft() );
+		}
+		return resSet;
 	}
 	
 	//

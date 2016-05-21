@@ -227,7 +227,7 @@ public class CommonsPage extends BasePage {
 		super.initializeContext();
 		
 		boolean ignorePageBuilder = JConfig().getBoolean("developersMode.PagesBuilder_ignoreInitializeContext", false);
-		if( !ignorePageBuilder || this._commandLineInitialized ) {
+		if (!ignorePageBuilder || this._commandLineInitialized) {
 			PagesBuilder().buildAllPages();
 		}
 		buildApiScript();
@@ -290,6 +290,7 @@ public class CommonsPage extends BasePage {
 	//
 	//---------------------------------------------------------
 	public boolean _commandLineInitialized = false;
+	
 	public static void main(String[] args) {
 		
 		CommonsPage mainClass = null;

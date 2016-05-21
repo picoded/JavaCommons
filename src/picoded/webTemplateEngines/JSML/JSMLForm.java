@@ -492,8 +492,8 @@ public class JSMLForm {
 		JMTE _jmteObj = new JMTE(page.getPagesTemplatePath());
 		_jmteObj.baseDataModel.put("ContextPath", page.getContextURI());
 		_jmteObj.baseDataModel.put("ContextURI", "file:///" + page.getContextPath());
-		if(data != null){
-			for(String key : data.keySet()){
+		if (data != null) {
+			for (String key : data.keySet()) {
 				_jmteObj.baseDataModel.put(key, data.get(key));
 			}
 		}
@@ -524,7 +524,7 @@ public class JSMLForm {
 		return pdfData;
 	}
 	
-	public String getFullPdfHTML (BasePage page, Map<String, Object> data) {
+	public String getFullPdfHTML(BasePage page, Map<String, Object> data) {
 		validateTempFolder();
 		StringBuilder ret = new StringBuilder();
 		
@@ -537,15 +537,16 @@ public class JSMLForm {
 		}
 		
 		if (ret == null) {
-			throw new RuntimeException("getFullPdfHTML() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
+			throw new RuntimeException(
+				"getFullPdfHTML() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
 		}
 		
 		//jmte the result
 		JMTE _jmteObj = new JMTE(page.getPagesTemplatePath());
 		_jmteObj.baseDataModel.put("ContextPath", page.getContextURI());
 		_jmteObj.baseDataModel.put("ContextURI", "file:///" + page.getContextPath());
-		if(data != null){
-			for(String key : data.keySet()){
+		if (data != null) {
+			for (String key : data.keySet()) {
 				_jmteObj.baseDataModel.put(key, data.get(key));
 			}
 		}
@@ -585,7 +586,6 @@ public class JSMLForm {
 		
 		return values;
 	}
-	
 	
 	/// Deletes the files from the temp folder older than specified time.
 	public void clearTempFilesOlderThenGivenAgeInSeconds(long time) {

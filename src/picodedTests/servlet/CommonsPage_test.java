@@ -22,7 +22,7 @@ import picoded.servlet.CorePage;
 import picoded.webUtils.EmailBroadcaster;
 
 public class CommonsPage_test extends Mockito {
-
+	
 	private CommonsPage testPage = null;
 	
 	@Before
@@ -54,7 +54,7 @@ public class CommonsPage_test extends Mockito {
 	@Test
 	public void isJsonRequest() throws Exception {
 		CorePage corePage = mock(CorePage.class);
-		Mockito.when(corePage.requestWildcardUriArray()).thenReturn(new String[] {"/"});
+		Mockito.when(corePage.requestWildcardUriArray()).thenReturn(new String[] { "/" });
 		Mockito.when(corePage.requestWildcardUri()).thenReturn("/");
 		assertFalse(testPage.isJsonRequest()); //as overridden method already tested
 	}
@@ -69,7 +69,7 @@ public class CommonsPage_test extends Mockito {
 		File file = new File("me.txt");
 		PrintWriter printWriter = new PrintWriter(file);
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		assertTrue(testPage.outputRequest(map, printWriter));
 		printWriter.close();
 	}
@@ -80,37 +80,37 @@ public class CommonsPage_test extends Mockito {
 	}
 	
 	@Test
-	public void restBuilderSetup()  {
+	public void restBuilderSetup() {
 		testPage.restBuilderSetup(new RESTBuilder());
 	}
 	
 	//@Test //can not be tested due to Servlet where request and response is NULL
-	public void outputJSON() throws Exception  {
+	public void outputJSON() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, Object> template = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		File file = new File("me.txt");
 		PrintWriter printWriter = new PrintWriter(file);
 		CorePage corePage = mock(CorePage.class);
-		Mockito.when(corePage.requestWildcardUriArray()).thenReturn(new String[] {"/"});
+		Mockito.when(corePage.requestWildcardUriArray()).thenReturn(new String[] { "/" });
 		Mockito.when(corePage.requestWildcardUri()).thenReturn("/");
 		assertTrue(testPage.outputJSON(map, template, printWriter));
 		printWriter.close();
 	}
 	
 	@Test
-	public void initializeContext() throws Exception  {
+	public void initializeContext() throws Exception {
 		testPage.initializeContext();
 	}
 	
 	@Test
-	public void systemEmail() throws Exception  {
+	public void systemEmail() throws Exception {
 		EmailBroadcaster emailBroadcaster = testPage.systemEmail();
 		assertNotNull(emailBroadcaster);
 	}
 	
 	@Test
-	public void systemLogging() throws Exception  {
+	public void systemLogging() throws Exception {
 		ServletLogging log = testPage.systemLogging();
 		assertNotNull(log);
 	}

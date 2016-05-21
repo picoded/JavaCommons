@@ -327,12 +327,12 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 		for (MetaObject obj : values()) {
 			
 			// Break iteration once seekdepth limits reached
-			if( idx >= seekDepth && seekDepth >= 0 ) {
+			if (idx >= seekDepth && seekDepth >= 0) {
 				break;
 			}
 			
 			// Add all the various key names
-			res.addAll( obj.keySet() );
+			res.addAll(obj.keySet());
 		}
 		
 		return res;

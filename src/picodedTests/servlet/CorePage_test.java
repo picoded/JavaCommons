@@ -39,8 +39,6 @@ public class CorePage_test extends Mockito {
 	
 	public CorePage testPage = null;
 	
-	
-	
 	@Before
 	public void setUp() throws ServletException {
 		testPage = new CorePage();
@@ -65,25 +63,25 @@ public class CorePage_test extends Mockito {
 	@Test
 	public void requestHeaderMap() throws ServletException, IOException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        ServletOutputStream mockOutput = mock(ServletOutputStream.class);
-        Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
+		Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
 		testPage.doGet(request, response);
 		//assertNotNull(testPage.requestHeaderMap()); 
 		//can not be NOT NULL due to Servlet where request and response is NULL
-		assertNull(testPage.requestHeaderMap()); 
+		assertNull(testPage.requestHeaderMap());
 	}
 	
 	@Test
 	public void requestCookieMap() throws ServletException, IOException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        ServletOutputStream mockOutput = mock(ServletOutputStream.class);
-        Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
+		Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
 		testPage.doGet(request, response);
 		//assertNotNull(testPage.requestCookieMap());
 		//can not be NOT NULL due to Servlet where request and response is NULL
-		assertNull(testPage.requestHeaderMap()); 
+		assertNull(testPage.requestHeaderMap());
 	}
 	
 	@Test
@@ -174,11 +172,11 @@ public class CorePage_test extends Mockito {
 	public void getWriter() throws IOException {
 		testPage = mock(CorePage.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
-        ServletOutputStream mockOutput = mock(ServletOutputStream.class);
-        Mockito.when(testPage.getOutputStream()).thenReturn(mockOutput);
-        //assertNotNull(testPage.getWriter());
-      //can not be NOT NULL due to Servlet where request and response is NULL
-        assertNull(testPage.getWriter());
+		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
+		Mockito.when(testPage.getOutputStream()).thenReturn(mockOutput);
+		//assertNotNull(testPage.getWriter());
+		//can not be NOT NULL due to Servlet where request and response is NULL
+		assertNull(testPage.getWriter());
 	}
 	
 	@Test
@@ -228,7 +226,7 @@ public class CorePage_test extends Mockito {
 	public void getParameter() {
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		Map<String, String[]> map = new HashMap<String, String[]>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		Mockito.when(httpRequest.getParameterMap()).thenReturn(map);
 		assertEquals("me", testPage.getParameter("user"));
 	}
@@ -246,49 +244,49 @@ public class CorePage_test extends Mockito {
 	@Test
 	public void doAuth() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		assertTrue(testPage.doAuth(map));
 	}
 	
 	@Test
 	public void doRequest() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		assertTrue(testPage.doRequest(map));
 	}
 	
 	@Test
 	public void doGetRequest() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		assertTrue(testPage.doGetRequest(map));
 	}
 	
 	@Test
 	public void doPostRequest() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		assertTrue(testPage.doPostRequest(map));
 	}
 	
 	@Test
 	public void doPutRequest() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		assertTrue(testPage.doPutRequest(map));
 	}
 	
 	@Test
 	public void doDeleteRequest() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		assertTrue(testPage.doDeleteRequest(map));
 	}
 	
 	@Test
 	public void outputRequest() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		File file = new File("me.txt");
 		PrintWriter printWriter = new PrintWriter(file);
 		assertTrue(testPage.outputRequest(map, printWriter));
@@ -298,7 +296,7 @@ public class CorePage_test extends Mockito {
 	@Test(expected = Exception.class)
 	public void outputRequestException() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		File file = new File("me.txt");
 		PrintWriter printWriter = new PrintWriter(file);
 		assertTrue(testPage.outputRequestException(map, printWriter, new Exception()));
@@ -308,35 +306,35 @@ public class CorePage_test extends Mockito {
 	@Test
 	public void doJSON() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		assertTrue(testPage.doJSON(map, map));
 	}
 	
 	@Test
 	public void doGetJSON() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		assertTrue(testPage.doGetJSON(map, map));
 	}
 	
 	@Test
 	public void doPostJSON() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		assertTrue(testPage.doPostJSON(map, map));
 	}
 	
 	@Test
 	public void doPutJSON() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		assertTrue(testPage.doPutJSON(map, map));
 	}
 	
 	@Test
 	public void doDeleteJSON() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		assertTrue(testPage.doDeleteJSON(map, map));
 	}
 	
@@ -344,7 +342,7 @@ public class CorePage_test extends Mockito {
 	public void outputJSON() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, Object> template = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		File file = new File("me.txt");
 		PrintWriter printWriter = new PrintWriter(file);
 		assertTrue(testPage.outputJSON(map, template, printWriter));
@@ -353,18 +351,18 @@ public class CorePage_test extends Mockito {
 		File rFile = new File("me.txt");
 		BufferedReader expected = new BufferedReader(new FileReader(rFile));
 		String line;
-	    while ((line = expected.readLine()) != null) {
-	      assertEquals(ConvertJSON.fromObject(map), line);
-	    }
-	    expected.close();
-	    rFile.delete();
+		while ((line = expected.readLine()) != null) {
+			assertEquals(ConvertJSON.fromObject(map), line);
+		}
+		expected.close();
+		rFile.delete();
 	}
 	
 	@Test
 	public void outputJSONException() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, Object> template = new HashMap<String, Object>();
-		map.put("user", new String[] {"me"});
+		map.put("user", new String[] { "me" });
 		File file = new File("me.txt");
 		PrintWriter printWriter = new PrintWriter(file);
 		assertFalse(testPage.outputJSONException(map, template, printWriter, new Exception("There is an error")));
@@ -374,67 +372,68 @@ public class CorePage_test extends Mockito {
 		BufferedReader expected = new BufferedReader(new FileReader(rFile));
 		String line;
 		Map<String, String> ret = new HashMap<String, String>();
-		ret.put("error", org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(new Exception("There is an error")));
-	    while ((line = expected.readLine()) != null) {
-	      assertNotNull(line);
-	    }
-	    expected.close();
-	    rFile.delete();
+		ret.put("error",
+			org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(new Exception("There is an error")));
+		while ((line = expected.readLine()) != null) {
+			assertNotNull(line);
+		}
+		expected.close();
+		rFile.delete();
 	}
 	
 	@Test
 	public void doGet() throws ServletException, IOException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        ServletOutputStream mockOutput = mock(ServletOutputStream.class);
-        Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
+		Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
 		testPage.doGet(request, response);
 	}
 	
 	@Test
 	public void doPost() throws ServletException, IOException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        ServletOutputStream mockOutput = mock(ServletOutputStream.class);
-        Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
+		Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
 		testPage.doPost(request, response);
 	}
 	
 	@Test
 	public void doPut() throws ServletException, IOException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        ServletOutputStream mockOutput = mock(ServletOutputStream.class);
-        Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
+		Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
 		testPage.doPut(request, response);
 	}
 	
 	@Test
 	public void doDelete() throws ServletException, IOException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        ServletOutputStream mockOutput = mock(ServletOutputStream.class);
-        Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
+		Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
 		testPage.doDelete(request, response);
 	}
 	
 	@Test
 	public void doOptions() throws ServletException, IOException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        ServletOutputStream mockOutput = mock(ServletOutputStream.class);
-        Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
+		Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
 		testPage.doOptions(request, response);
 	}
 	
 	@Test
-	public void contextInitialized()  {
+	public void contextInitialized() {
 		ServletContextEvent servletContextEvent = new ServletContextEvent(mock(ServletContext.class));
 		testPage.contextInitialized(servletContextEvent);
 	}
 	
 	@Test
-	public void contextDestroyed()  {
+	public void contextDestroyed() {
 		ServletContextEvent servletContextEvent = new ServletContextEvent(mock(ServletContext.class));
 		testPage.contextDestroyed(servletContextEvent);
 	}

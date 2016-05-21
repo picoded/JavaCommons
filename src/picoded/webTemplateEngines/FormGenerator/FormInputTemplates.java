@@ -203,7 +203,7 @@ public class FormInputTemplates {
 				StringBuilder[] newPara = new StringBuilder[2];
 				
 				String inputType = node.getString("displayTypeOverride", "");
-				if(inputType == null || inputType.isEmpty()){
+				if (inputType == null || inputType.isEmpty()) {
 					inputType = "pre";
 				}
 				
@@ -373,7 +373,7 @@ public class FormInputTemplates {
 				ret.append(sbArr[1]);
 				ret.append("<div class=\"pfi_inputCheckbox_labelTextPrefix\"></div>");
 				
-				if(showValueAsLabelText){
+				if (showValueAsLabelText) {
 					ret.append("<div class=\"pfi_inputCheckbox_labelText\">");
 					ret.append(keyNamePair.get(key));
 					ret.append("</div>");
@@ -398,7 +398,7 @@ public class FormInputTemplates {
 					sbArr[0].append("<div class=\"pf_displayCheckbox pf_displayCheckbox_unselected\"></div>");
 				}
 				
-				if(showValueAsLabelText){
+				if (showValueAsLabelText) {
 					sbArr[0].append("<div class=\"pf_displayCheckbox_text\">" + keyNamePair.get(key) + "</div>");
 				}
 				

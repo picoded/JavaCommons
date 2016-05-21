@@ -35,7 +35,6 @@ public class MetaTable_Sqlite_test extends MetaTable_test {
 		return jsObj.getMetaTable("MT_" + tableName);
 	}
 	
-	
 	// @Test
 	// public void orderByTestLoop() {
 	// 	for(int i=0; i<25; ++i) {

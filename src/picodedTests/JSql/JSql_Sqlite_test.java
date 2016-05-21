@@ -395,7 +395,7 @@ public class JSql_Sqlite_test {
 	
 	@Test
 	public void selectRangeSet() throws JSqlException {
-		try{
+		try {
 			row1to7setup();
 			JSqlResult r = null;
 			JSqlQuerySet qSet = null;
@@ -423,7 +423,7 @@ public class JSql_Sqlite_test {
 				0 //
 				)); //
 			assertNotNull("query should return a JSql result", qSet.query());
-		}catch (Exception e){
+		} catch (Exception e) {
 			
 		}
 	}
@@ -448,10 +448,11 @@ public class JSql_Sqlite_test {
 	/// JSQL table collumn with ending bracket ], which may breaks MS-SQL
 	@Test
 	public void mssqlClosingBracketInCollumnName() throws JSqlException {
-		try{
+		try {
 			JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); //cleanup (just incase)
 			
-			JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )").dispose(); //valid table creation : no exception
+			JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )")
+				.dispose(); //valid table creation : no exception
 			JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )")
 				.dispose(); //run twice to ensure "IF NOT EXISTS" works
 			
@@ -469,7 +470,7 @@ public class JSql_Sqlite_test {
 			assertNotNull("SQL result returns as expected",
 				r = JSqlObj.query("SELECT `col[1].pk` AS `test[a].pk` FROM " + testTableName + " WHERE `col[1].pk` > 404"));
 			r.dispose();
-		}catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

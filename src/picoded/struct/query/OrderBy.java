@@ -90,8 +90,9 @@ public class OrderBy<T> implements Comparator<T> {
 				first = false;
 			}
 			
-			String safeKeyName = set.getLeft().replaceAll("\\\\","\\\\").replaceAll("\\\"","\\\"").replaceAll("\\'","\\'");
-			ret.append('"'+safeKeyName+'"');
+			String safeKeyName = set.getLeft().replaceAll("\\\\", "\\\\").replaceAll("\\\"", "\\\"")
+				.replaceAll("\\'", "\\'");
+			ret.append('"' + safeKeyName + '"');
 			ret.append(" ");
 			
 			if (set.getRight() == OrderType.ASC) {
@@ -115,8 +116,8 @@ public class OrderBy<T> implements Comparator<T> {
 	public boolean replaceKeyName(String original, String replacement) {
 		boolean res = false;
 		for (MutablePair<String, OrderType> set : _comparisionConfig) {
-			if( original.equals(set.getLeft()) ) {
-				set.setLeft( replacement );
+			if (original.equals(set.getLeft())) {
+				set.setLeft(replacement);
 			}
 		}
 		return res;
@@ -132,7 +133,7 @@ public class OrderBy<T> implements Comparator<T> {
 	public Set<String> getKeyNames() {
 		Set<String> resSet = new HashSet<String>();
 		for (MutablePair<String, OrderType> set : _comparisionConfig) {
-			resSet.add( set.getLeft() );
+			resSet.add(set.getLeft());
 		}
 		return resSet;
 	}

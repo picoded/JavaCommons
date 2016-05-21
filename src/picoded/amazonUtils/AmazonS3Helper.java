@@ -18,11 +18,11 @@ public class AmazonS3Helper {
 	
 	private AmazonS3Client s3Client;
 	
-	public AmazonS3Helper(String accessKey, String secretKey){
+	public AmazonS3Helper(String accessKey, String secretKey) {
 		BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKey, secretKey);
 		s3Client = new AmazonS3Client(awsCreds);
 		
-		if(s3Client == null){
+		if (s3Client == null) {
 			System.out.println("Unable to initalise S3Client instance");
 		}
 	}
@@ -30,11 +30,13 @@ public class AmazonS3Helper {
 	///
 	/// Putting file objects
 	///
-	public void putFile(String bucketName, String inFileKeyName, File inFile) throws AmazonServiceException, AmazonClientException, Exception{
+	public void putFile(String bucketName, String inFileKeyName, File inFile) throws AmazonServiceException,
+		AmazonClientException, Exception {
 		putFile(bucketName, inFileKeyName, inFile, false);
 	}
 	
-	public void putFile(String bucketName, String inFileKeyName, File inFile, boolean makeFilePublic) throws AmazonServiceException, AmazonClientException, Exception{
+	public void putFile(String bucketName, String inFileKeyName, File inFile, boolean makeFilePublic)
+		throws AmazonServiceException, AmazonClientException, Exception {
 		PutObjectRequest por = new PutObjectRequest(bucketName, inFileKeyName, inFile);
 		putFile(por, makeFilePublic);
 	}
@@ -42,19 +44,22 @@ public class AmazonS3Helper {
 	///
 	/// Putting data stream
 	///
-	public void putFile(String bucketName, String inFileKeyName, InputStream inStream, long contentLength, Map<String, String> metadataMap) throws AmazonServiceException, AmazonClientException, Exception{
+	public void putFile(String bucketName, String inFileKeyName, InputStream inStream, long contentLength,
+		Map<String, String> metadataMap) throws AmazonServiceException, AmazonClientException, Exception {
 		putFile(bucketName, inFileKeyName, inStream, contentLength, metadataMap, false);
 	}
 	
-	public void putFile(String bucketName, String inFileKeyName, InputStream inStream, long contentLength, Map<String, String> metadataMap, boolean makeFilePublic) throws AmazonServiceException, AmazonClientException, Exception{
-		if(inStream == null){
+	public void putFile(String bucketName, String inFileKeyName, InputStream inStream, long contentLength,
+		Map<String, String> metadataMap, boolean makeFilePublic) throws AmazonServiceException, AmazonClientException,
+		Exception {
+		if (inStream == null) {
 			System.out.println("Input stream is null");
 			return;
 		}
 		
 		ObjectMetadata metadata = new ObjectMetadata();
-		if(metadataMap != null){
-			for(String key : metadataMap.keySet()){
+		if (metadataMap != null) {
+			for (String key : metadataMap.keySet()) {
 				metadata.addUserMetadata(key, metadataMap.get(key));
 			}
 		}
@@ -68,15 +73,16 @@ public class AmazonS3Helper {
 	///
 	/// Actual s3 call
 	///
-	public void putFile(PutObjectRequest por, boolean makeFilePublic) throws AmazonServiceException, AmazonClientException, Exception{
-		if(makeFilePublic){
+	public void putFile(PutObjectRequest por, boolean makeFilePublic) throws AmazonServiceException,
+		AmazonClientException, Exception {
+		if (makeFilePublic) {
 			por = por.withCannedAcl(CannedAccessControlList.PublicRead);
 		}
 		
 		s3Client.putObject(por);
 	}
 	
-	public String getFileResourceURL(String bucketName, String fileKey){
+	public String getFileResourceURL(String bucketName, String fileKey) {
 		return s3Client.getResourceUrl(bucketName, fileKey);
 	}
 }

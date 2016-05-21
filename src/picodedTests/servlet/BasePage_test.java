@@ -24,7 +24,7 @@ import picoded.JStruct.AccountTable;
 import picoded.servlet.BasePage;
 
 public class BasePage_test extends Mockito {
-
+	
 	private BasePage basePage = null;
 	
 	@BeforeClass
@@ -32,7 +32,7 @@ public class BasePage_test extends Mockito {
 		//BasePage_test.class
 		new File("./WEB-INF/").mkdir();
 	}
-		
+	
 	@Before
 	public void setUp() {
 		basePage = new BasePage();
@@ -59,7 +59,7 @@ public class BasePage_test extends Mockito {
 		basePage.initializeContext();
 		basePage.accountAuthTableSetup();
 	}
-	 
+	
 	@Test
 	public void getSuperUserGroupName() {
 		assertEquals(basePage.getSuperUserGroupName(), "SuperUsers");
@@ -84,7 +84,7 @@ public class BasePage_test extends Mockito {
 		basePage.initializeContext();
 		AccountTable accountTable = basePage.accountAuthTable();
 		HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
 		accountTable.loginAccount(request, response, "admin", "p@ssw0rd!", false);
 		basePage.currentAccount();
 		assertFalse(basePage.divertInvalidUser(""));
@@ -96,7 +96,7 @@ public class BasePage_test extends Mockito {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
 		Cookie cookie1 = new Cookie("user", "me");
-		Mockito.when(request.getCookies()).thenReturn(new Cookie[]{cookie1});
+		Mockito.when(request.getCookies()).thenReturn(new Cookie[] { cookie1 });
 		Mockito.when(response.getOutputStream()).thenReturn(mockOutput);
 		HttpSession session = request.getSession(true);
 		AccountTable accountTable = basePage.accountAuthTable();

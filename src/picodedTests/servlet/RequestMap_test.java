@@ -12,7 +12,7 @@ import org.junit.Test;
 import picoded.servlet.RequestMap;
 
 public class RequestMap_test {
-
+	
 	private RequestMap requestMap = null;
 	
 	@Before

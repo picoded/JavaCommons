@@ -11,10 +11,9 @@ import org.mockito.Mockito;
 import picoded.servlet.JStackPage;
 import picoded.JStack.*;
 
-
 public class JStackPage_test extends Mockito {
-
-private JStackPage testPage = null;
+	
+	private JStackPage testPage = null;
 	
 	@Before
 	public void setUp() {
@@ -84,7 +83,7 @@ private JStackPage testPage = null;
 	}
 	
 	@Test
-	public void doSharedTeardown() throws Exception  {
+	public void doSharedTeardown() throws Exception {
 		testPage.doSharedTeardown();
 	}
 }

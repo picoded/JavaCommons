@@ -441,7 +441,7 @@ public class JSql_MetaTableUtils {
 			type = e.getValue();
 			
 			// SQL safety the key
-			key = key.replaceAll("\\\\","\\\\").replaceAll("\\\"","\\\"").replaceAll("\\'","\\'");
+			key = key.replaceAll("\\\\", "\\\\").replaceAll("\\\"", "\\\"").replaceAll("\\'", "\\'");
 			
 			if ( //
 			type == MetaType.INTEGER || //
@@ -567,13 +567,10 @@ public class JSql_MetaTableUtils {
 		OrderBy<MetaObject> orderByObj = null;
 		
 		/// Quick optimal lookup
-		if (whereClause == null && orderByStr == null && 
-			offset <= 0 && limit <= 0 && (
-			selectedCols.equals("COUNT(DISTINCT \"oID\") AS rcount") ||
-			selectedCols.equals("DISTINCT \"oID\"")
-		)) {
+		if (whereClause == null && orderByStr == null && offset <= 0 && limit <= 0
+			&& (selectedCols.equals("COUNT(DISTINCT \"oID\") AS rcount") || selectedCols.equals("DISTINCT \"oID\""))) {
 			// Blank search, quick and easy
-			queryBuilder.append("SELECT " + selectedCols.replaceAll("\\\"","") + " FROM " + tablename + "");
+			queryBuilder.append("SELECT " + selectedCols.replaceAll("\\\"", "") + " FROM " + tablename + "");
 		} else {
 			
 			// Order by object handling
@@ -658,17 +655,17 @@ public class JSql_MetaTableUtils {
 			}
 			
 			// Order by handling for metatype map
-			if(orderByObj != null) {
-				for(String keyName : orderByObj.getKeyNames()) {
-					if( !queryTypeMap.containsKey(keyName) ) {
+			if (orderByObj != null) {
+				for (String keyName : orderByObj.getKeyNames()) {
+					if (!queryTypeMap.containsKey(keyName)) {
 						queryTypeMap.put(keyName, MetaType.STRING);
 					}
 					
 					MetaType type = queryTypeMap.get(keyName);
 					
 					// Force lowercase string sorting for string orderby
-					if( queryTypeMap.get(keyName) == MetaType.STRING ) {
-						orderByObj.replaceKeyName(keyName, keyName+"#lc");
+					if (queryTypeMap.get(keyName) == MetaType.STRING) {
+						orderByObj.replaceKeyName(keyName, keyName + "#lc");
 					}
 				}
 			}
@@ -692,7 +689,7 @@ public class JSql_MetaTableUtils {
 			// Order by string mapping
 			if (orderByObj != null) {
 				queryBuilder.append(" ORDER BY ");
-				queryBuilder.append( orderByObj.toString() );
+				queryBuilder.append(orderByObj.toString());
 			}
 			
 			//logger.log( Level.WARNING, queryBuilder.toString() );

@@ -421,25 +421,25 @@ public class MetaTable_test {
 		indexBasedTest();
 		
 		// Replicated a bug, where u CANNOT use orderby on a collumn your not doing a where search
-		MetaObject[] qRes = mtObj.query("str_val = ?", new String[]{ "this" }, "num ASC");
+		MetaObject[] qRes = mtObj.query("str_val = ?", new String[] { "this" }, "num ASC");
 		assertEquals(qRes.length, 2);
 		
-		assertEquals("this",   qRes[0].get("str_val"));
-		assertEquals("this",   qRes[1].get("str_val"));
+		assertEquals("this", qRes[0].get("str_val"));
+		assertEquals("this", qRes[1].get("str_val"));
 		
-		assertEquals(1,   qRes[0].get("num"));
-		assertEquals(7,   qRes[1].get("num"));
+		assertEquals(1, qRes[0].get("num"));
+		assertEquals(7, qRes[1].get("num"));
 		
 		// Order by with offset
 		qRes = mtObj.query(null, null, "num ASC", 2, 3);
 		assertEquals(qRes.length, 3);
 		
-		assertEquals(3,   qRes[0].get("num"));
-		assertEquals(4,   qRes[1].get("num"));
-		assertEquals(5,   qRes[2].get("num"));
+		assertEquals(3, qRes[0].get("num"));
+		assertEquals(4, qRes[1].get("num"));
+		assertEquals(5, qRes[2].get("num"));
 		
-		assertEquals("hello",   qRes[0].get("str_val"));
-		assertEquals("world",   qRes[1].get("str_val"));
+		assertEquals("hello", qRes[0].get("str_val"));
+		assertEquals("world", qRes[1].get("str_val"));
 		assertEquals("program", qRes[2].get("str_val"));
 	}
 	
@@ -462,9 +462,7 @@ public class MetaTable_test {
 		indexBasedTest();
 		
 		Set<String> keyNames = mtObj.getKeyNames();
-		Set<String> expected = new HashSet<String>(Arrays.asList(
-			new String[] { "_oid", "num", "str_val" }
-		));
+		Set<String> expected = new HashSet<String>(Arrays.asList(new String[] { "_oid", "num", "str_val" }));
 		assertNotNull(keyNames);
 		assertEquals(keyNames, expected);
 		
@@ -523,7 +521,7 @@ public class MetaTable_test {
 		mObj.saveDelta();
 		
 		// Doing a query
-		MetaObject[] qRes = table.query("num > ? OR be = ?", new Object[] { 0, "happy" } );
+		MetaObject[] qRes = table.query("num > ? OR be = ?", new Object[] { 0, "happy" });
 		
 		// Each object has a base68 GUID
 		String guid = qRes[0]._oid();

@@ -38,7 +38,8 @@ public class JSql_Demo_test {
 	public void setUp() {
 		sqlite = JSql.sqlite();
 		my_sql = JSql.mysql(TestConfig.MYSQL_CONN_JDBC(), TestConfig.MYSQL_CONN_PROPS());
-		ms_sql = JSql.mssql(TestConfig.MSSQL_CONN(), TestConfig.MSSQL_NAME(), TestConfig.MSSQL_USER(),TestConfig.MSSQL_PASS());
+		ms_sql = JSql.mssql(TestConfig.MSSQL_CONN(), TestConfig.MSSQL_NAME(), TestConfig.MSSQL_USER(),
+			TestConfig.MSSQL_PASS());
 		oracle = JSql.oracle(TestConfig.ORACLE_PATH(), TestConfig.ORACLE_USER(), TestConfig.ORACLE_PASS());
 	}
 	
@@ -126,29 +127,15 @@ public class JSql_Demo_test {
 		//
 		// Native support: MySQL, SQLite
 		//
-		sqlite.execute(
-			"CREATE TABLE IF NOT EXISTS " + testTableName + " ( "+
-				"col1 INT PRIMARY KEY, col2 BIGINT, "+
-				"col3 TEXT, col4 VARCHAR(50) "+
-			")"
-		);
-		my_sql.execute(
-			"CREATE TABLE IF NOT EXISTS " + testTableName + " ( "+
-				"col1 INT PRIMARY KEY, col2 BIGINT, "+
-				"col3 TEXT, col4 VARCHAR(50) "+
-			")"
-		);
+		sqlite.execute("CREATE TABLE IF NOT EXISTS " + testTableName + " ( " + "col1 INT PRIMARY KEY, col2 BIGINT, "
+			+ "col3 TEXT, col4 VARCHAR(50) " + ")");
+		my_sql.execute("CREATE TABLE IF NOT EXISTS " + testTableName + " ( " + "col1 INT PRIMARY KEY, col2 BIGINT, "
+			+ "col3 TEXT, col4 VARCHAR(50) " + ")");
 		
-		sqlite.createTableQuerySet(
-			testTableName,
-			new String[] { "col1", "col2", "col3", "col4" },
-			new String[] { "INT PRIMARY KEY", "BIGINT", "TEXT", "VARCHAR(50)" }
-		).execute();
-		my_sql.createTableQuerySet(
-			testTableName,
-			new String[] { "col1", "col2", "col3", "col4" },
-			new String[] { "INT PRIMARY KEY", "BIGINT", "TEXT", "VARCHAR(50)" }
-		).execute();
+		sqlite.createTableQuerySet(testTableName, new String[] { "col1", "col2", "col3", "col4" },
+			new String[] { "INT PRIMARY KEY", "BIGINT", "TEXT", "VARCHAR(50)" }).execute();
+		my_sql.createTableQuerySet(testTableName, new String[] { "col1", "col2", "col3", "col4" },
+			new String[] { "INT PRIMARY KEY", "BIGINT", "TEXT", "VARCHAR(50)" }).execute();
 		
 		//
 		// MSSQL specific
@@ -166,18 +153,11 @@ public class JSql_Demo_test {
 		//    END
 		//    ```
 		//
-		ms_sql.execute(
-			"CREATE TABLE IF NOT EXISTS " + testTableName + " ( "+
-				"col1 INT PRIMARY KEY, col2 BIGINT, "+
-				"col3 TEXT, col4 VARCHAR(50) "+
-			")"
-		);
+		ms_sql.execute("CREATE TABLE IF NOT EXISTS " + testTableName + " ( " + "col1 INT PRIMARY KEY, col2 BIGINT, "
+			+ "col3 TEXT, col4 VARCHAR(50) " + ")");
 		
-		ms_sql.createTableQuerySet(
-			testTableName,
-			new String[] { "col1", "col2", "col3", "col4" },
-			new String[] { "INT PRIMARY KEY", "BIGINT", "TEXT", "VARCHAR(50)" }
-		).execute();
+		ms_sql.createTableQuerySet(testTableName, new String[] { "col1", "col2", "col3", "col4" },
+			new String[] { "INT PRIMARY KEY", "BIGINT", "TEXT", "VARCHAR(50)" }).execute();
 		
 		//
 		// ORACLE specific
@@ -199,17 +179,10 @@ public class JSql_Demo_test {
 		//       END;
 		//    ```
 		//
-		oracle.execute(
-			"CREATE TABLE IF NOT EXISTS " + testTableName + " ( "+
-				"col1 INT PRIMARY KEY, col2 BIGINT, "+
-				"col3 TEXT, col4 VARCHAR(50) "+
-			")"
-		);
-		oracle.createTableQuerySet(
-			testTableName,
-			new String[] { "col1", "col2", "col3", "col4" },
-			new String[] { "INT PRIMARY KEY", "BIGINT", "TEXT", "VARCHAR(50)" }
-		).execute();
+		oracle.execute("CREATE TABLE IF NOT EXISTS " + testTableName + " ( " + "col1 INT PRIMARY KEY, col2 BIGINT, "
+			+ "col3 TEXT, col4 VARCHAR(50) " + ")");
+		oracle.createTableQuerySet(testTableName, new String[] { "col1", "col2", "col3", "col4" },
+			new String[] { "INT PRIMARY KEY", "BIGINT", "TEXT", "VARCHAR(50)" }).execute();
 		
 	}
 	

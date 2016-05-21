@@ -128,36 +128,37 @@ public class MetaTableApiBuilder {
 		String[] queryColumns = req.getStringArray("queryColumns", headers);
 		
 		String searchParams = req.getString("searchValue", "").trim(); //datatables specific key
-
-		if(searchParams.isEmpty()) {
+		
+		if (searchParams.isEmpty()) {
 			searchParams = req.getString("search[value]", "").trim();
 		}
-
-		if(searchParams.length() >= 2 && searchParams.charAt(0)=='"' && searchParams.charAt(searchParams.length()-1)=='"') {
-			searchParams=searchParams.substring(1,searchParams.length()-1);
+		
+		if (searchParams.length() >= 2 && searchParams.charAt(0) == '"'
+			&& searchParams.charAt(searchParams.length() - 1) == '"') {
+			searchParams = searchParams.substring(1, searchParams.length() - 1);
 		}
-
-		System.out.println("params are : "+searchParams);
+		
+		System.out.println("params are : " + searchParams);
 		String wildcardMode = req.getString("wildcardMode", "suffix");
 		
 		String orderByStr = req.getString("orderBy");
 		if (orderByStr == null || orderByStr.isEmpty()) {
 			//try and get datatables order data
 			int orderByColumn = req.getInt("order[0][column]", -1);
-			if(orderByColumn <= -1){
+			if (orderByColumn <= -1) {
 				orderByStr = "oID";
-			}else{
-				boolean isColumnOrderable = req.getBoolean("columns["+orderByColumn+"][orderable]", false);
-				if(!isColumnOrderable || headers.length < orderByColumn){
+			} else {
+				boolean isColumnOrderable = req.getBoolean("columns[" + orderByColumn + "][orderable]", false);
+				if (!isColumnOrderable || headers.length < orderByColumn) {
 					orderByStr = "oID";
-				}else{
+				} else {
 					orderByStr = headers[orderByColumn];
 				}
 			}
 		}
 		
 		//failsafe
-		if(orderByStr == null || orderByStr == ""){
+		if (orderByStr == null || orderByStr == "") {
 			orderByStr = "oID";
 		}
 		
@@ -223,7 +224,7 @@ public class MetaTableApiBuilder {
 		try {
 			data = list_GET_and_POST_inner(draw, start, limit, headers, query, queryArgs, orderByStr, sanitiseOutput);
 			
-			if(orderDirection.equalsIgnoreCase("desc")){
+			if (orderDirection.equalsIgnoreCase("desc")) {
 				Collections.reverse(data);
 			}
 			
@@ -376,7 +377,7 @@ public class MetaTableApiBuilder {
 				StringBuilder singleRowCSV = new StringBuilder();
 				int rowSize = row.size();
 				for (int i = 0; i < rowSize; ++i) {
-					String valStr = GenericConvert.toString( row.get(i) );
+					String valStr = GenericConvert.toString(row.get(i));
 					if (valStr == null) {
 						valStr = "";
 					}

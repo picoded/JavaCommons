@@ -365,4 +365,31 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 		return JSql_MetaTableUtils.metaTableCount(this, sqlObj, sqlTableName, whereClause, whereValues, null, -1, -1);
 	}
 	
+	/// 
+	/// Get key names handling
+	///--------------------------------------------------------------------------
+	
+	/// Scans the object and get the various keynames used. 
+	/// This is used mainly in adminstration interface, etc.
+	///
+	/// The seekDepth parameter is ignored in JSql mode, as its optimized.
+	///
+	/// @param  seekDepth, which detirmines the upper limit for iterating
+	///         objects for the key names, use -1 to search all
+	///
+	/// @returns  The various key names used in the objects
+	///
+	public Set<String> getKeyNames(int seekDepth) {
+		try {
+			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "DISTINCT kID").query();
+			if (r == null || r.get("kID") == null) {
+				return new HashSet<String>();
+			}
+			
+			return ListValueConv.toStringSet(r.get("kID"));
+		} catch (JSqlException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 }

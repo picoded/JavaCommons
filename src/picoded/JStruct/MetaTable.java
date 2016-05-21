@@ -302,6 +302,51 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	}
 	
 	// 
+	// Get key names handling
+	//--------------------------------------------------------------------------
+	
+	/// Scans the object and get the various keynames used. 
+	/// This is used mainly in adminstration interface, etc.
+	///
+	/// Note however, that in non-JSql mode, this function is not
+	/// optimize, and does and iterative search for the various object keys.
+	/// which is ridiculously expensive. So avoid calling this unless needed.
+	///
+	/// The seekDepth parameter is ignored in JSql mode, as its optimized.
+	///
+	/// @param  seekDepth, which detirmines the upper limit for iterating
+	///         objects for the key names, use -1 to search all
+	///
+	/// @returns  The various key names used in the objects
+	///
+	public default Set<String> getKeyNames(int seekDepth) {
+		Set<String> res = new HashSet<String>();
+		
+		// Iterate the list, get key names
+		int idx = 0;
+		for (MetaObject obj : values()) {
+			
+			// Break iteration once seekdepth limits reached
+			if( idx >= seekDepth && seekDepth >= 0 ) {
+				break;
+			}
+			
+			// Add all the various key names
+			res.addAll( obj.keySet() );
+		}
+		
+		return res;
+	}
+	
+	/// getKeyNames varient with seekDepth defaulted to 10
+	///
+	/// @returns  The various key names used in the objects
+	///
+	public default Set<String> getKeyNames() {
+		return getKeyNames(10);
+	}
+	
+	// 
 	// MetaType handling, does type checking and conversion
 	//--------------------------------------------------------------------------
 	

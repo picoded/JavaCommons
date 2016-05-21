@@ -411,6 +411,23 @@ public class MetaTable_test {
 		assertArrayEquals((byte[]) (data.get("bin")), (byte[]) (to.get("bin")));
 	}
 	
+	// KeyName fetching test
+	//-----------------------------------------------
+	@Test
+	public void getKeyNamesTest() {
+		
+		// Lets just rescycle old test for the names
+		indexBasedTest();
+		
+		Set<String> keyNames = mtObj.getKeyNames();
+		Set<String> expected = new HashSet<String>(Arrays.asList(
+			new String[] { "_oid", "num", "str_val" }
+		));
+		assertNotNull(keyNames);
+		assertEquals(keyNames, expected);
+		
+	}
+	
 	// Mapping tests
 	//-----------------------------------------------
 	

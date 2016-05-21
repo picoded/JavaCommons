@@ -726,6 +726,43 @@ public class MetaTableApiBuilder {
 		}
 	}
 	
+	/////////////////////////////////////////////
+	//
+	// KeyNames look up (for adminstration)
+	//
+	/////////////////////////////////////////////
+	
+	///
+	/// # keyNames (GET) [Requires login]
+	///
+	/// Gets and return the various object keys in meta objects
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +------+
+	/// | None |
+	/// +------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | keyNames        | String[]           | Key names found in the meta object                                            |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error           | String (Optional)  | Errors encounted if any                                                       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	public RESTFunction keyNames_GET = (req, res) -> {
+		try {
+			Set<String> resSet = _metaTableObj.getKeyNames();
+			res.put("keyNames", new ArrayList<String>(resSet));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return res;
+	};
+	
 	//-------------------------------------------------------------------------------------------------------------------------
 	//
 	// Work in progress (not final) start

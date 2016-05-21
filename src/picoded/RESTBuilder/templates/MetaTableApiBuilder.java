@@ -146,11 +146,11 @@ public class MetaTableApiBuilder {
 			//try and get datatables order data
 			int orderByColumn = req.getInt("order[0][column]", -1);
 			if (orderByColumn <= -1) {
-				orderByStr = "oID";
+				orderByStr = "\"oID\"";
 			} else {
 				boolean isColumnOrderable = req.getBoolean("columns[" + orderByColumn + "][orderable]", false);
 				if (!isColumnOrderable || headers.length < orderByColumn) {
-					orderByStr = "oID";
+					orderByStr = "\"oID\"";
 				} else {
 					orderByStr = headers[orderByColumn];
 				}
@@ -159,7 +159,7 @@ public class MetaTableApiBuilder {
 		
 		//failsafe
 		if (orderByStr == null || orderByStr == "") {
-			orderByStr = "oID";
+			orderByStr = "\"oID\"";
 		}
 		
 		// The query to use

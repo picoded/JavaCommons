@@ -657,15 +657,17 @@ public class JSql_MetaTableUtils {
 			// Order by handling for metatype map
 			if (orderByObj != null) {
 				for (String keyName : orderByObj.getKeyNames()) {
-					if (!queryTypeMap.containsKey(keyName)) {
-						queryTypeMap.put(keyName, MetaType.STRING);
-					}
-					
-					MetaType type = queryTypeMap.get(keyName);
-					
-					// Force lowercase string sorting for string orderby
-					if (queryTypeMap.get(keyName) == MetaType.STRING) {
-						orderByObj.replaceKeyName(keyName, keyName + "#lc");
+					if(!keyName.equalsIgnoreCase("oID")) {
+						if (!queryTypeMap.containsKey(keyName)) {
+							queryTypeMap.put(keyName, MetaType.STRING);
+						}
+						
+						MetaType type = queryTypeMap.get(keyName);
+						
+						// Force lowercase string sorting for string orderby
+						if (queryTypeMap.get(keyName) == MetaType.STRING) {
+							orderByObj.replaceKeyName(keyName, keyName + "#lc");
+						}
 					}
 				}
 			}

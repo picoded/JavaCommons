@@ -415,7 +415,7 @@ public class MetaTable_test {
 	//-----------------------------------------------
 	
 	@Test
-	public void orderByTest() {
+	public void T50_orderByTest() {
 		
 		// Lets just rescycle old test for the names
 		indexBasedTest();

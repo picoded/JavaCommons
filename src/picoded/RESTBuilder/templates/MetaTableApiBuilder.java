@@ -91,13 +91,13 @@ public class MetaTableApiBuilder {
 	/// |                 |                    | are returned as well.                                                         |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | wildcardMode    | String (optional)  | Default SUFFIX. Determines SQL query wildcard position. Either prefix,        |
-    /// |                 |                    | suffix, or both. Defaults to suffix                                           |
-    /// | searchValue     | String (optional)  | Search string passed                                                          |
+	/// |                 |                    | suffix, or both. Defaults to suffix                                           |
+	/// | searchValue     | String (optional)  | Search string passed                                                          |
 	/// | search[value]   | String (optional)  | Same as above, this is for datatables API. Uses above if both is given.       |
 	/// | queryColumns    | String[] (optional)| Query columns used for searching, defaults to headers                         |
 	/// | caseSensitive   | boolean (Optional) | Use case sensitive check. Default true?                                       | @TODO
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// 
+	///
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -128,36 +128,37 @@ public class MetaTableApiBuilder {
 		String[] queryColumns = req.getStringArray("queryColumns", headers);
 		
 		String searchParams = req.getString("searchValue", "").trim(); //datatables specific key
-
-		if(searchParams.isEmpty()) {
+		
+		if (searchParams.isEmpty()) {
 			searchParams = req.getString("search[value]", "").trim();
 		}
-
-		if(searchParams.length() >= 2 && searchParams.charAt(0)=='"' && searchParams.charAt(searchParams.length()-1)=='"') {
-			searchParams=searchParams.substring(1,searchParams.length()-1);
+		
+		if (searchParams.length() >= 2 && searchParams.charAt(0) == '"'
+			&& searchParams.charAt(searchParams.length() - 1) == '"') {
+			searchParams = searchParams.substring(1, searchParams.length() - 1);
 		}
-
-		System.out.println("params are : "+searchParams);
+		
+		System.out.println("params are : " + searchParams);
 		String wildcardMode = req.getString("wildcardMode", "suffix");
 		
 		String orderByStr = req.getString("orderBy");
 		if (orderByStr == null || orderByStr.isEmpty()) {
 			//try and get datatables order data
 			int orderByColumn = req.getInt("order[0][column]", -1);
-			if(orderByColumn <= -1){
+			if (orderByColumn <= -1) {
 				orderByStr = "oID";
-			}else{
-				boolean isColumnOrderable = req.getBoolean("columns["+orderByColumn+"][orderable]", false);
-				if(!isColumnOrderable || headers.length < orderByColumn){
+			} else {
+				boolean isColumnOrderable = req.getBoolean("columns[" + orderByColumn + "][orderable]", false);
+				if (!isColumnOrderable || headers.length < orderByColumn) {
 					orderByStr = "oID";
-				}else{
+				} else {
 					orderByStr = headers[orderByColumn];
 				}
 			}
 		}
 		
 		//failsafe
-		if(orderByStr == null || orderByStr == ""){
+		if (orderByStr == null || orderByStr == "") {
 			orderByStr = "oID";
 		}
 		
@@ -223,7 +224,7 @@ public class MetaTableApiBuilder {
 		try {
 			data = list_GET_and_POST_inner(draw, start, limit, headers, query, queryArgs, orderByStr, sanitiseOutput);
 			
-			if(orderDirection.equalsIgnoreCase("desc")){
+			if (orderDirection.equalsIgnoreCase("desc")) {
 				Collections.reverse(data);
 			}
 			
@@ -376,7 +377,7 @@ public class MetaTableApiBuilder {
 				StringBuilder singleRowCSV = new StringBuilder();
 				int rowSize = row.size();
 				for (int i = 0; i < rowSize; ++i) {
-					String valStr = GenericConvert.toString( row.get(i) );
+					String valStr = GenericConvert.toString(row.get(i));
 					if (valStr == null) {
 						valStr = "";
 					}
@@ -495,7 +496,7 @@ public class MetaTableApiBuilder {
 	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
 	/// |                 |                    | are returned as well.                                                         |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// 
+	///
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -580,7 +581,7 @@ public class MetaTableApiBuilder {
 	/// | meta            | {Object}           | Meta object that represents this account                                      |
 	/// | updateMode      | String (Optional)  | (Default) "delta" for only updating the given fields, or "full" for all       |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// 
+	///
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -686,7 +687,7 @@ public class MetaTableApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | _oid            | String             | The internal object ID to delete                                              |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// 
+	///
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -771,34 +772,34 @@ public class MetaTableApiBuilder {
 	// Servlet constructor and setup
 	//
 	/////////////////////////////////////////////
-	//	
+	//
 	//	/// Default api set prefix
 	//	protected static String _apiSetPrefix_prefix = "account.";
-	//	
+	//
 	//	/// Internal prefix set for the API
 	//	protected String _apiSetPrefix = _apiSetPrefix_prefix;
-	//	
+	//
 	//	/// The prefix for the api
 	//	public String apiSetPrefix() {
 	//		return _apiSetPrefix;
 	//	}
-	//		
+	//
 	//	/// The prefix for the api
 	//	public void setApiSetPrefix(String api) {
 	//		_apiSetPrefix = api;
 	//	}
-	//	
+	//
 	//	/// Flags as JSON request
 	//	public boolean isJsonRequest() {
 	//		return true;
 	//	}
-	//	
+	//
 	//	/// Does the default setup
 	//	public void doSetup() throws Exception {
 	//		super.doSetup();
 	//		setupRESTBuilder( this.restBuilder(), this.accountAuthTable(), _apiSetPrefix );
 	//	}
-	//	
+	//
 	//	/// Process the request, not the authentication layer
 	//	public boolean doJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
 	//		return restBuilder().servletCall( _apiSetPrefix, this, outputData );

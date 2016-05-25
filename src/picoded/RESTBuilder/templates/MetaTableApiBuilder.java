@@ -97,7 +97,7 @@ public class MetaTableApiBuilder {
 	/// | queryColumns    | String[] (optional)| Query columns used for searching, defaults to headers                         |
 	/// | caseSensitive   | boolean (Optional) | Use case sensitive check. Default true?                                       | @TODO
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// 
+	///
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -496,7 +496,7 @@ public class MetaTableApiBuilder {
 	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
 	/// |                 |                    | are returned as well.                                                         |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// 
+	///
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -581,7 +581,7 @@ public class MetaTableApiBuilder {
 	/// | meta            | {Object}           | Meta object that represents this account                                      |
 	/// | updateMode      | String (Optional)  | (Default) "delta" for only updating the given fields, or "full" for all       |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// 
+	///
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -687,7 +687,7 @@ public class MetaTableApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | _oid            | String             | The internal object ID to delete                                              |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// 
+	///
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -809,34 +809,34 @@ public class MetaTableApiBuilder {
 	// Servlet constructor and setup
 	//
 	/////////////////////////////////////////////
-	//	
+	//
 	//	/// Default api set prefix
 	//	protected static String _apiSetPrefix_prefix = "account.";
-	//	
+	//
 	//	/// Internal prefix set for the API
 	//	protected String _apiSetPrefix = _apiSetPrefix_prefix;
-	//	
+	//
 	//	/// The prefix for the api
 	//	public String apiSetPrefix() {
 	//		return _apiSetPrefix;
 	//	}
-	//		
+	//
 	//	/// The prefix for the api
 	//	public void setApiSetPrefix(String api) {
 	//		_apiSetPrefix = api;
 	//	}
-	//	
+	//
 	//	/// Flags as JSON request
 	//	public boolean isJsonRequest() {
 	//		return true;
 	//	}
-	//	
+	//
 	//	/// Does the default setup
 	//	public void doSetup() throws Exception {
 	//		super.doSetup();
 	//		setupRESTBuilder( this.restBuilder(), this.accountAuthTable(), _apiSetPrefix );
 	//	}
-	//	
+	//
 	//	/// Process the request, not the authentication layer
 	//	public boolean doJSON(Map<String,Object> outputData, Map<String,Object> templateData) throws Exception {
 	//		return restBuilder().servletCall( _apiSetPrefix, this, outputData );

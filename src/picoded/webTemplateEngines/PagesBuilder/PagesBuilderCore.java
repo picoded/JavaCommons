@@ -2,7 +2,6 @@ package picoded.webTemplateEngines.PagesBuilder;
 
 import java.io.*;
 import java.util.*;
-import javax.servlet.http.HttpServletResponse;
 
 import picoded.enums.*;
 import picoded.conv.*;
@@ -12,12 +11,14 @@ import picoded.servlet.*;
 import picoded.servletUtils.*;
 
 ///
-/// Rapid pages prototyping, support single and multipage mode, caching, etc.
-/// Basically lots of good stuff =)
+/// Core class that handle the conversion and copying process.
 ///
-/// This is extended from the templating format previously used in ServletCommons
+/// NOT the folder iteration
 ///
-public class PagesBuilder {
+/// @TODO
+/// + Minify the pagename/index.html
+///
+public class PagesBuilderCore {
 	
 	////////////////////////////////////////////////////////////
 	//
@@ -26,22 +27,19 @@ public class PagesBuilder {
 	////////////////////////////////////////////////////////////
 	
 	/// The folder to get the various page definition from
-	protected File pagesFolder = null;
+	public File pagesFolder = null;
 	
-	/// The output folder to process the output to
-	protected File outputFolder = null;
+	/// The output folder to process the output to (if given)
+	public File outputFolder = null;
 	
 	/// The local JMTE reference
-	protected JMTE jmteObj = null;
+	public JMTE jmteObj = null;
 	
-	/// The PagesBuilderCore handler
-	protected PagesBuilderCore html = null;
+	/// The URI root context for built files
+	public String uriRootPrefix = "./";
 	
 	/// LESS compiler
 	protected LessToCss less = new LessToCss();
-	
-	/// The URI root context for built files
-	protected String uriRootPrefix = "./";
 	
 	////////////////////////////////////////////////////////////
 	//
@@ -53,12 +51,18 @@ public class PagesBuilder {
 	/// Constructor, with the folders defined
 	///
 	/// @param The various pages definition folder
-	/// @param The target folder to build the result into
 	///
-	public PagesBuilder(File inPagesFolder, File inOutputFolder) {
+	public PagesBuilderCore(File inPagesFolder) {
 		pagesFolder = inPagesFolder;
-		outputFolder = inOutputFolder;
-		validateAndSetup();
+	}
+	
+	///
+	/// Constructor, with the folders defined
+	///
+	/// @param The various pages definition folder
+	///
+	public PagesBuilderCore(String inPagesFolder) {
+		this(new File(inPagesFolder));
 	}
 	
 	///
@@ -67,17 +71,29 @@ public class PagesBuilder {
 	/// @param The various pages definition folder
 	/// @param The target folder to build the result into
 	///
-	public PagesBuilder(String inPagesFolder, String inOutputFolder) {
+	public PagesBuilderCore(File inPagesFolder, File inOutputFolder) {
+		pagesFolder = inPagesFolder;
+		outputFolder = inOutputFolder;
+	}
+	
+	///
+	/// Constructor, with the folders defined
+	///
+	/// @param The various pages definition folder
+	/// @param The target folder to build the result into
+	///
+	public PagesBuilderCore(String inPagesFolder, String inOutputFolder) {
 		this(new File(inPagesFolder), new File(inOutputFolder));
 	}
 	
 	////////////////////////////////////////////////////////////
 	//
-	// Public vars access
+	// Protected vars access
 	//
 	////////////////////////////////////////////////////////////
 	
-	/// @returns Gets the protected JMTE object, used internally
+	/// @returns Gets the protected JMTE object, used internally.
+	///          This is autocreated if not set
 	public JMTE getJMTE() {
 		if (jmteObj == null) {
 			jmteObj = new JMTE();
@@ -85,49 +101,9 @@ public class PagesBuilder {
 		return jmteObj;
 	}
 	
-	/// Overides the default (if loaded) JMTE object. 
+	/// Overides the default (if loaded) JMTE object.
 	public void setJMTE(JMTE set) {
 		jmteObj = set;
-		if (html != null) {
-			html.setJMTE(jmteObj);
-		}
-	}
-	
-	/// @returns Gets the protected uriRootPrefix, used internally
-	public String getUriRootPrefix() {
-		return uriRootPrefix;
-	}
-	
-	/// Overides the uriRootPrefix. 
-	public void setUriRootPrefix(String set) {
-		if (set == null || set.length() <= 0) {
-			set = "/";
-		}
-		
-		if (!set.endsWith("/")) {
-			set = set + "/";
-		}
-		
-		uriRootPrefix = set;
-		if (html != null) {
-			html.uriRootPrefix = uriRootPrefix;
-		}
-	}
-	
-	////////////////////////////////////////////////////////////
-	//
-	// Protected inner vars / functions
-	//
-	////////////////////////////////////////////////////////////
-	
-	protected PagesBuilderCore PagesBuilderCore_obj() {
-		if (html != null) {
-			return html;
-		}
-		html = new PagesBuilderCore(pagesFolder);
-		html.setJMTE(getJMTE());
-		html.uriRootPrefix = uriRootPrefix;
-		return html;
 	}
 	
 	////////////////////////////////////////////////////////////
@@ -136,76 +112,140 @@ public class PagesBuilder {
 	//
 	////////////////////////////////////////////////////////////
 	
-	protected void validateAndSetup() {
-		//
-		// NULL check
-		//
-		if (pagesFolder == null) {
-			throw new RuntimeException("Pages definition folder is not set (null)");
-		}
-		if (outputFolder == null) {
-			throw new RuntimeException("Output folder is not set (null)");
+	/// Utility to get page frame ID
+	protected String pageFrameID(String pageName) {
+		return "pageFrame_"+pageName.replaceAll("/","_");
+	}
+	
+	/// Generates the needed map string template for the respective page
+	protected Map<String, Object> pageJMTEvars(String pageName) {
+		HashMap<String, Object> ret = new HashMap<String, Object>();
+		
+		// Initialize to root if not previously set
+		if(uriRootPrefix == null) {
+			uriRootPrefix = "./";
 		}
 		
-		//
-		// Exists checks
-		//
-		if (!pagesFolder.exists()) {
-			throw new RuntimeException("Pages definition folder does not exists: " + pagesFolder.getPath());
-		}
-		if (!outputFolder.exists()) {
-			throw new RuntimeException("Output folder does not exists: " + outputFolder.getPath());
-		}
+		// Removes trailing /, unless its the only character
+		if (uriRootPrefix.length() > 1 && uriRootPrefix.endsWith("/")) {
+			uriRootPrefix = uriRootPrefix.substring(0, uriRootPrefix.length() - 1);
+		} /*else {
+			uriRootPrefix = "";
+		}*/
 		
 		//
-		// IsDir checks
-		//
-		if (!pagesFolder.isDirectory()) {
-			throw new RuntimeException("Pages definition folder path is not a 'directory': " + pagesFolder.getPath());
-		}
-		if (!outputFolder.isDirectory()) {
-			throw new RuntimeException("Output folder path is not a 'directory': " + outputFolder.getPath());
+		String pageURI = uriRootPrefix + "/" + pageName;
+		while (pageURI.startsWith("//")) {
+			pageURI = pageURI.substring(1);
 		}
 		
-		//
-		// HTML files handling
-		//
-		html = new PagesBuilderCore(pagesFolder);
+		ret.put("PagesRootURI", uriRootPrefix);
+		ret.put("PageURI", pageURI);
+		ret.put("PageName", pageName);
+		ret.put("PageFrameID", pageFrameID(pageName));
+		
+		return ret;
+	}
+	
+	protected String getCommonPrefixOrSuffixHtml(String pageName, String fixType) {
+		// Get from the pageName folder itself (v2)
+		String res = FileUtils.readFileToString_withFallback(new File(pagesFolder, pageName+"/"+fixType+".html"), "UTF-8", null);
+		
+		// Get from the common folder (v2)
+		if(res == null) {
+			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "common/"+fixType+".html"), "UTF-8", null);
+		}
+		
+		// Legacy support (v1) get from index folder
+		if(res == null) {
+			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "index/"+fixType+".html"), "UTF-8", null);
+		}
+		
+		// Fallbacks to blank
+		if(res == null) {
+			return "";
+		}
+		return res;
 	}
 	
 	////////////////////////////////////////////////////////////
 	//
-	// Public function
+	// HTML handling
 	//
 	////////////////////////////////////////////////////////////
 	
-	/// 
-	/// Indicates if the page definition folder exists
-	///
-	public boolean hasPageDefinition(String pageName) {
-		try {
-			File definitionFolder = new File(pagesFolder, pageName);
-			return definitionFolder.exists() && definitionFolder.isDirectory();
-		} catch (Exception e) {
-			// Failed?
-		}
-		return false;
+	/// Gets the prefix
+	public String prefixHTML(String pageName) {
+		return getJMTE().parseTemplate(getCommonPrefixOrSuffixHtml(pageName,"prefix"), pageJMTEvars(pageName));
 	}
+	
+	/// Gets the prefix
+	public String suffixHTML(String pageName) {
+		return getJMTE().parseTemplate(getCommonPrefixOrSuffixHtml(pageName,"suffix"), pageJMTEvars(pageName));
+	}
+	
+	/// Get pageFrame
+	public String buildPageFrame(String pageName) {
+		return buildPageFrame(pageName, false);
+	}
+	
+	public String buildPageFrame(String pageName, boolean isHidden) {
+		String[] pageNamePathSet = pageName.split("/");
+		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, pageName + "/" + pageNamePathSet[pageNamePathSet.length - 1] + ".html"),
+			"UTF-8", null);
+		if( indexFileStr == null ) {
+			indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, pageName + "/index.html"),
+				"UTF-8", "");
+		}
+		
+		StringBuilder frame = new StringBuilder();
+		frame.append("<div class='pageFrame "+pageFrameID(pageName)+"' id='"+pageFrameID(pageName)+"'");
+		if (isHidden) {
+			frame.append(" style='display:none;'");
+		}
+		frame.append(">\n");
+		frame.append(indexFileStr);
+		frame.append("\n</div>\n");
+		return getJMTE().parseTemplate(frame.toString(), pageJMTEvars(pageName));
+	}
+	
+	/// HTML builder
+	public StringBuilder buildFullPageFrame(String pageName) {
+		StringBuilder ret = new StringBuilder();
+		ret.append(prefixHTML(pageName));
+		ret.append(buildPageFrame(pageName));
+		ret.append(suffixHTML(pageName));
+		return ret;
+	}
+	
+	////////////////////////////////////////////////////////////
+	//
+	// Page Building
+	//
+	////////////////////////////////////////////////////////////
 	
 	///
 	/// Builds all the assets for a single page
 	///
 	/// @param PageName to build
 	///
-	public PagesBuilder buildPage(String pageName) {
+	public void buildAndOutputPage(String pageName) {
 		
 		// System.out allowed here, because LESS does a system out ANYWAY.
 		// Help to make more "sense" of the done output
-		System.out.print("> PageBuilder.buildPage(\'" + pageName + "\'): ");
+		System.out.print("> PageBuilder[Core].buildPage(\'" + pageName + "\'): ");
+		
+		// Output folder validitiy check
+		if( outputFolder == null ) {
+			throw new RuntimeException("Missing output folder, unable to generate : " + pageName);
+		}
 		
 		// Future extension, possible loop hole abuse. Im protecting against it early
 		if (pageName.startsWith(".")) {
 			throw new RuntimeException("Unable to load page name, starting with '.' : " + pageName);
+		}
+		if (pageName.indexOf("..") >= 0) {
+			throw new RuntimeException("Unable to load page name, containing '..' : " + pageName);
 		}
 		if (pageName.toLowerCase().indexOf("web-inf") >= 0) {
 			throw new RuntimeException("Unable to load page name, that may bypass WEB-INF : " + pageName);
@@ -217,7 +257,7 @@ public class PagesBuilder {
 			//-------------------------------------------------------------------
 			File outputPageFolder = new File(outputFolder, pageName);
 			File definitionFolder = new File(pagesFolder, pageName);
-			Map<String, Object> jmteVarMap = PagesBuilderCore_obj().pageJMTEvars(pageName);
+			Map<String, Object> jmteVarMap = pageJMTEvars(pageName);
 			
 			// Create the output folder as needed
 			//-------------------------------------------------------------------
@@ -343,7 +383,7 @@ public class PagesBuilder {
 			//-------------------------------------------------------------------
 			
 			// The HTML output
-			String indexStr = PagesBuilderCore_obj().buildFullPageFrame(pageName).toString();
+			String indexStr = buildFullPageFrame(pageName).toString();
 			
 			// Build the injector code for this page (before </head>)
 			//-------------------------------------------------------------------
@@ -398,105 +438,4 @@ public class PagesBuilder {
 		return this;
 	}
 	
-	///
-	/// Builds all the pages
-	///
-	public PagesBuilder buildAllPages() {
-		// For each directory, build it as a page
-		for (File pageDefine : FileUtils.listDirs(pagesFolder)) {
-			buildPage(pageDefine.getName());
-		}
-		// End and returns self
-		return this;
-	}
-	
-	////////////////////////////////////////////////////////////
-	//
-	// Servlet building utility
-	//
-	////////////////////////////////////////////////////////////
-	
-	/// Cached FileServlet
-	protected FileServlet _outputFileServlet = null;
-	
-	/// Returns the File servlet
-	public FileServlet outputFileServlet() {
-		if (_outputFileServlet != null) {
-			return _outputFileServlet;
-		}
-		return (_outputFileServlet = new FileServlet(outputFolder));
-	}
-	
-	/// Process the full PageBuilder servlet request
-	public void processPageBuilderServlet(BasePage page) {
-		processPageBuilderServlet(page, page.requestWildcardUriArray());
-	}
-	
-	/// Process the full PageBuilder servlet request
-	public void processPageBuilderServlet(BasePage page, String[] requestWildcardUri) {
-		try {
-			if (requestWildcardUri == null) {
-				requestWildcardUri = new String[0];
-			}
-			
-			// Load page name
-			String pageName = "index";
-			if (requestWildcardUri.length >= 1) {
-				pageName = requestWildcardUri[0];
-			}
-			
-			// Load page name
-			String itemName = "index.html";
-			if (requestWildcardUri.length >= 2) {
-				itemName = requestWildcardUri[1];
-			} else {
-				requestWildcardUri = new String[] { pageName, itemName };
-			}
-			
-			boolean isDeveloperMode = (page.JConfig().getBoolean("developersMode.enabled", true) && page.JConfig()
-				.getBoolean("developersMode.PagesBuilder", true));
-			if (isDeveloperMode) {
-				// Load the respective page
-				if (requestWildcardUri.length == 2 && itemName.equals("index.html")) {
-					PagesBuilder servletPagesBuilder = page.PagesBuilder();
-					
-					// Load the index and common pages (if applicable)
-					if (servletPagesBuilder.hasPageDefinition("index")) {
-						servletPagesBuilder.buildPage("index");
-					}
-					if (servletPagesBuilder.hasPageDefinition("common")) {
-						servletPagesBuilder.buildPage("common");
-					}
-					
-					if (servletPagesBuilder.hasPageDefinition(pageName)) {
-						servletPagesBuilder.buildPage(pageName);
-					}
-				}
-			}
-			
-			String reqStr = String.join("/", requestWildcardUri);
-			// Security measure?
-			// if( reqStr != null && reqStr.contains("/tmp") ) {
-			// 	// 404 error if file not found
-			// 	page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
-			// 	return;
-			// }
-			
-			if (reqStr == null || reqStr.isEmpty()) {
-				// 404 error if file not found
-				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
-				return;
-			}
-			
-			// Fallsback into File Servlet
-			outputFileServlet().processRequest( //
-				page.getHttpServletRequest(), //
-				page.getHttpServletResponse(), //
-				page.requestType() == HttpRequestType.HEAD, //
-				reqStr);
-			
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
 }

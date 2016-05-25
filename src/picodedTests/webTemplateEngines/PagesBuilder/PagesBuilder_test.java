@@ -29,7 +29,7 @@ public class PagesBuilder_test {
 	//------------------------------------------------------------------------
 	
 	protected PagesBuilder pages = null;
-	protected PagesHTML html = null;
+	protected PagesBuilderCore html = null;
 	
 	////////////////////////////////////////////////////////////
 	//
@@ -62,7 +62,7 @@ public class PagesBuilder_test {
 	@Test
 	public void constructorTest() {
 		assertNotNull(pages = new PagesBuilder(basicTemplateDir, outputTestDir));
-		assertNotNull(html = new PagesHTML(basicTemplateDir));
+		assertNotNull(html = new PagesBuilderCore(basicTemplateDir));
 	}
 	
 	////////////////////////////////////////////////////////////
@@ -72,14 +72,14 @@ public class PagesBuilder_test {
 	////////////////////////////////////////////////////////////
 	
 	@Test
-	public void basicPagesHTMLTest() {
+	public void basicPagesBuilderCoreTest() {
 		constructorTest();
 		String buffer = null;
 		
-		assertNotNull(buffer = html.prefixHTML());
+		assertNotNull(buffer = html.prefixHTML("index"));
 		assertTrue(buffer, buffer.indexOf("html") >= 0);
 		
-		assertNotNull(buffer = html.suffixHTML());
+		assertNotNull(buffer = html.suffixHTML("index"));
 		assertTrue(buffer, buffer.indexOf("/html") >= 0);
 		
 		assertNotNull(buffer = html.buildPageFrame("index"));

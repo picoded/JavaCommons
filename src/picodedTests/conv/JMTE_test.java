@@ -1,22 +1,24 @@
 package picodedTests.conv;
 
-import static org.junit.Assert.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import java.util.HashMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.File;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.text.DateFormat;
+import java.util.HashMap;
 import java.util.Locale;
-import java.io.File;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import picoded.conv.JMTE;
 
 import com.floreysoft.jmte.NamedRenderer;
 import com.floreysoft.jmte.RenderFormatInfo;
-import com.floreysoft.jmte.Engine;
 
 // IMPORTANT! Dun just test NULL, and Succesful cases, test expected failure also!
 public class JMTE_test {

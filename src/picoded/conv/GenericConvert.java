@@ -152,7 +152,6 @@ public class GenericConvert {
 		
 		if (input instanceof String && ((String) input).length() > 0) {
 			//Numeric string conversion
-			String s = ((String) input);
 			
 			try {
 				BigDecimal bd = new BigDecimal(((String) input));
@@ -800,8 +799,7 @@ public class GenericConvert {
 	// to BiFunction Map, used to automated put conversion handling
 	//--------------------------------------------------------------------------------------------------
 	public static BiFunction<Object, Object, String> toString_BiFunction = (i, f) -> GenericConvert.toString(i, f);
-	public static BiFunction<Object, Object, String[]> toStringArray_BiFunction = (i, f) -> GenericConvert
-		.toStringArray(i, f);
+	public static BiFunction<Object, Object, String[]> toStringArray_BiFunction = (i, f) -> GenericConvert.toStringArray(i, f);
 	
 	protected static Map<Class<?>, BiFunction<Object, Object, ?>> biFunctionMap = null;
 	

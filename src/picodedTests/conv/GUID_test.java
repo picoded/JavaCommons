@@ -1,16 +1,19 @@
 package picodedTests.conv;
 
 // Target test class
-import picoded.conv.GUID;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
-// Test Case include
-import org.junit.*;
-import static org.junit.Assert.*;
-
-// Classes used in test case
-import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.UUID;
+
+import org.junit.After;
+// Test Case include
+import org.junit.Before;
+import org.junit.Test;
+
+import picoded.conv.GUID;
+// Classes used in test case
 
 ///
 /// Test Case for picoded.struct.CaseInsensitiveHashMap
@@ -54,7 +57,6 @@ public class GUID_test {
 		assertNotNull(GUID.base64());
 		assertNotNull(GUID.base64(u));
 		assertEquals(u, GUID.fromBase64(GUID.base64(u)));
-		;
 		
 		// base58 test
 		assertNotNull(GUID.base58());

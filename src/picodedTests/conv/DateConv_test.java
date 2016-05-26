@@ -19,7 +19,7 @@ public class DateConv_test {
 		//check case
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(millisecondsDate);
-		String calISODate = "" + cal.get(Calendar.DATE) + "-" + (cal.get(Calendar.MONTH) + 1) + "-"
+		String calISODate = "0" + cal.get(Calendar.DATE) + "-0" + (cal.get(Calendar.MONTH) + 1) + "-"
 			+ cal.get(Calendar.YEAR);
 		
 		String isoDate = DateConv.toISOFormat(millisecondsDate, ISODateFormat.DDMMYYYY, "-");
@@ -29,7 +29,7 @@ public class DateConv_test {
 	
 	@Test
 	public void convISOToMilliseconds() {
-		String isoDate = "1990-5-20";
+		String isoDate = "1990-05-20";
 		
 		String millisecondsDate = DateConv.toMillisecondsFormat(isoDate, ISODateFormat.YYYYMMDD, "-");
 		
@@ -43,18 +43,18 @@ public class DateConv_test {
 		long millisecondsDate = Long.parseLong("1431756800000"); //16-5-2015
 		
 		String isoDate_dmy = DateConv.toISOFormat(millisecondsDate, ISODateFormat.DDMMYYYY, "-");
-		assertEquals("16-5-2015", isoDate_dmy);
+		assertEquals("16-05-2015", isoDate_dmy);
 		
 		String isoDate_ymd = DateConv.changeISODateFormat(isoDate_dmy, ISODateFormat.DDMMYYYY, ISODateFormat.YYYYMMDD,
 			"-");
-		assertEquals("2015-5-16", isoDate_ymd);
+		assertEquals("2015-05-16", isoDate_ymd);
 		
 		String isoDate_mdy = DateConv.changeISODateFormat(isoDate_ymd, ISODateFormat.YYYYMMDD, ISODateFormat.MMDDYYYY,
 			"-");
-		assertEquals("5-16-2015", isoDate_mdy);
+		assertEquals("05-16-2015", isoDate_mdy);
 		
 		String isoDate_ydm = DateConv.changeISODateFormat(isoDate_mdy, ISODateFormat.MMDDYYYY, ISODateFormat.YYYYDDMM,
 			"-");
-		assertEquals("2015-16-5", isoDate_ydm);
+		assertEquals("2015-16-05", isoDate_ydm);
 	}
 }

@@ -1,19 +1,16 @@
 package picodedTests.conv;
 
-import static org.junit.Assert.*;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.lesscss.deps.org.apache.commons.io.FileUtils;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+
+import org.junit.Test;
+import org.lesscss.deps.org.apache.commons.io.FileUtils;
 
 import picoded.conv.ConvertJSON;
 import picoded.conv.MapValueConv;

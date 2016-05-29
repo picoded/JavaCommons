@@ -88,7 +88,7 @@ public class PagesBuilderCore {
 	
 	////////////////////////////////////////////////////////////
 	//
-	// Protected vars access
+	// Public vars access
 	//
 	////////////////////////////////////////////////////////////
 	
@@ -106,18 +106,53 @@ public class PagesBuilderCore {
 		jmteObj = set;
 	}
 	
+	/// @returns Gets the protected uriRootPrefix, used internally
+	public String getUriRootPrefix() {
+		return uriRootPrefix;
+	}
+	
+	/// Overides the uriRootPrefix. 
+	public void setUriRootPrefix(String set) {
+		if (set == null || set.length() <= 0) {
+			set = "/";
+		}
+		
+		if (!set.endsWith("/")) {
+			set = set + "/";
+		}
+		
+		uriRootPrefix = set;
+	}
+	
 	////////////////////////////////////////////////////////////
 	//
 	// Utility functions
 	//
 	////////////////////////////////////////////////////////////
 	
+	/// Utility to get path safe pageName
+	///
+	/// @param  pageName used to generate the vars
+	///
+	/// @returns  The pageName which is subpath safe
+	protected String safePageName(String pageName) {
+		return pageName.replaceAll("/","_");
+	}
+	
 	/// Utility to get page frame ID
+	///
+	/// @param  pageName used to generate the vars
+	///
+	/// @returns  The page frame ID used (that is character safe?)
 	protected String pageFrameID(String pageName) {
-		return "pageFrame_"+pageName.replaceAll("/","_");
+		return "pageFrame_"+safePageName(pageName);
 	}
 	
 	/// Generates the needed map string template for the respective page
+	///
+	/// @param  pageName used to generate the vars
+	///
+	/// @returns The data map used inside JMTE
 	protected Map<String, Object> pageJMTEvars(String pageName) {
 		HashMap<String, Object> ret = new HashMap<String, Object>();
 		
@@ -141,12 +176,20 @@ public class PagesBuilderCore {
 		
 		ret.put("PagesRootURI", uriRootPrefix);
 		ret.put("PageURI", pageURI);
-		ret.put("PageName", pageName);
+		ret.put("PageNameRaw", pageName);
+		ret.put("PageName", safePageName(pageName));
 		ret.put("PageFrameID", pageFrameID(pageName));
 		
 		return ret;
 	}
 	
+	///
+	/// Gets the requested page prefix / suffix from the following priority order
+	///
+	/// 1) The page path itself
+	/// 2) The common folder
+	/// 3) The index folder (legacy support, do not use)
+	///
 	protected String getCommonPrefixOrSuffixHtml(String pageName, String fixType) {
 		// Get from the pageName folder itself (v2)
 		String res = FileUtils.readFileToString_withFallback(new File(pagesFolder, pageName+"/"+fixType+".html"), "UTF-8", null);
@@ -184,18 +227,22 @@ public class PagesBuilderCore {
 		return getJMTE().parseTemplate(getCommonPrefixOrSuffixHtml(pageName,"suffix"), pageJMTEvars(pageName));
 	}
 	
-	/// Get pageFrame
+	/// Builds a pagename HTML frame
 	public String buildPageFrame(String pageName) {
 		return buildPageFrame(pageName, false);
 	}
 	
+	/// Builds a pagename HTML frame, with the hidden property if applicable
 	public String buildPageFrame(String pageName, boolean isHidden) {
-		String[] pageNamePathSet = pageName.split("/");
-		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, pageName + "/" + pageNamePathSet[pageNamePathSet.length - 1] + ".html"),
+		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, pageName + "/" + safePageName(pageName) + ".html"),
 			"UTF-8", null);
 		if( indexFileStr == null ) {
 			indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, pageName + "/index.html"),
 				"UTF-8", "");
+		}
+		
+		if( indexFileStr.trim().length() == 0 ) {
+			return null;
 		}
 		
 		StringBuilder frame = new StringBuilder();
@@ -209,13 +256,18 @@ public class PagesBuilderCore {
 		return getJMTE().parseTemplate(frame.toString(), pageJMTEvars(pageName));
 	}
 	
-	/// HTML builder
+	/// Builds the FULL pagename HTML, with prefix and suffix
 	public StringBuilder buildFullPageFrame(String pageName) {
-		StringBuilder ret = new StringBuilder();
-		ret.append(prefixHTML(pageName));
-		ret.append(buildPageFrame(pageName));
-		ret.append(suffixHTML(pageName));
-		return ret;
+		String frameHTML = buildPageFrame(pageName);
+		
+		if(frameHTML != null) {
+			StringBuilder ret = new StringBuilder();
+			ret.append(prefixHTML(pageName));
+			ret.append(frameHTML);
+			ret.append(suffixHTML(pageName));
+			return ret;
+		}
+		return null;
 	}
 	
 	////////////////////////////////////////////////////////////
@@ -224,12 +276,83 @@ public class PagesBuilderCore {
 	//
 	////////////////////////////////////////////////////////////
 	
+	/// Enum of file types that is processed
+	protected enum PageFileType {
+		js,
+		jsons,
+		jsons_to_js,
+		less,
+		less_to_css,
+		html
+	}
+	
+	/// Process the file, according to its type, and outputs it into the respective file
+	///
+	/// @param  filetype enum
+	/// @param  Source file (returns false if not exists)
+	/// @param  Target file (written if source file exists)
+	/// @param  The page name used, used in certain type logic
+	/// @param  The JMTE variable map to use
+	///
+	/// @return true, if a file was processed and written
+	public boolean processPageFile(PageFileType type, File input, File output, String pageName, Map<String, Object> jmteVarMap) throws IOException {
+		if (input.exists() && input.isFile() && input.canRead()) {
+			// Gets its string value, and process only if not blank
+			String fileVal = FileUtils.readFileToString(input, "UTF-8");
+			if ((fileVal = fileVal.trim()).length() > 0) {
+				
+				// Does a JMTE filter
+				fileVal = getJMTE().parseTemplate(fileVal, jmteVarMap);
+				
+				// Does specific conversions
+				if( type == PageFileType.jsons_to_js ) {
+					// Adds the script object wrapper
+					fileVal = "window.pageFrames = window.pageFrames || {}; window.pageFrames." + safePageName(pageName) + " = ("
+						+ fileVal + ");";
+				} else if( type == PageFileType.less_to_css ) {
+					/// Does an outer wrap, if its not index page (which applies style to 'all')
+					if (!pageName.equalsIgnoreCase("index") && !pageName.equalsIgnoreCase("common")) {
+						fileVal = "." + pageFrameID(pageName) + " { \n" + fileVal + "\n } \n";
+					}
+					
+					// Less to css conversion
+					fileVal = less.compile(fileVal);
+				}
+				
+				// Write to file if it differ
+				FileUtils.writeStringToFile_ifDifferant(output, "UTF-8", fileVal);
+				
+				// Indicate file is "deployed"
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/// Varient of processPageFile, where it iterates an array set of input files till a valid file is found
+	///
+	/// @param  filetype enum
+	/// @param  Source file (returns false if not exists)
+	/// @param  Target file (written if source file exists)
+	/// @param  The page name used, used in certain type logic
+	/// @param  The JMTE variable map to use
+	///
+	/// @return true, if a file was processed and written
+	public boolean processPageFile(PageFileType type, File[] inputArr, File output, String pageName, Map<String, Object> jmteVarMap) throws IOException {
+		for(File input : inputArr) {
+			if( processPageFile(type, input, output, pageName, jmteVarMap) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	///
 	/// Builds all the assets for a single page
 	///
 	/// @param PageName to build
 	///
-	public void buildAndOutputPage(String pageName) {
+	public boolean buildAndOutputPage(String pageName) {
 		
 		// System.out allowed here, because LESS does a system out ANYWAY.
 		// Help to make more "sense" of the done output
@@ -258,6 +381,7 @@ public class PagesBuilderCore {
 			File outputPageFolder = new File(outputFolder, pageName);
 			File definitionFolder = new File(pagesFolder, pageName);
 			Map<String, Object> jmteVarMap = pageJMTEvars(pageName);
+			String pageName_safe = safePageName(pageName);
 			
 			// Create the output folder as needed
 			//-------------------------------------------------------------------
@@ -279,139 +403,87 @@ public class PagesBuilderCore {
 			
 			// Process the JS script (if provided)
 			//-------------------------------------------------------------------
-			
-			// Indicates if there is a JS script
-			boolean hasJsFile = false;
-			
-			// The JS file source location
-			File jsFile = new File(definitionFolder, pageName + ".js");
-			
-			// Process file only if its readable
-			if (jsFile.exists() && jsFile.isFile() && jsFile.canRead()) {
-				
-				// Gets its string value, and process only if not blank
-				String jsString = FileUtils.readFileToString(jsFile, "UTF-8");
-				if ((jsString = jsString.trim()).length() > 0) {
-					
-					// Does a JMTE filter
-					jsString = getJMTE().parseTemplate(jsString, jmteVarMap);
-					
-					// Write to file if it differ
-					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, pageName + ".js"), "UTF-8", jsString);
-					
-					// Indicate file is "deployed"
-					hasJsFile = true;
-				}
-			}
+			boolean hasJsFile = processPageFile(
+				PageFileType.js,
+				new File[] {
+					new File(definitionFolder, "index.js"),
+					new File(definitionFolder, pageName_safe + ".js")
+				},
+				new File(outputPageFolder, pageName_safe + ".js"),
+				pageName,
+				jmteVarMap
+			);
 			
 			// Build the JSONS script (if provided)
 			//-------------------------------------------------------------------
+			boolean hasJsonsFile = processPageFile(
+				PageFileType.jsons_to_js,
+				new File[] {
+					new File(definitionFolder, "index.jsons"),
+					new File(definitionFolder, pageName_safe + ".jsons")
+				},
+				new File(outputPageFolder, pageName_safe + ".jsons.js"),
+				pageName,
+				jmteVarMap
+			);
 			
-			// Indicates if there is a JSONS script
-			boolean hasJsonsFile = false;
-			
-			// The JSONS file source location
-			File jsonsFile = new File(definitionFolder, pageName + ".jsons");
-			
-			// Process file only if its readable
-			if (jsonsFile.exists() && jsonsFile.isFile() && jsonsFile.canRead()) {
-				
-				// Gets its string value, and process only if not blank
-				String jsonsString = FileUtils.readFileToString(jsonsFile, "UTF-8");
-				if ((jsonsString = jsonsString.trim()).length() > 0) {
-					
-					// Adds the script object wrapper
-					jsonsString = "window.pageFrames = window.pageFrames || {}; window.pageFrames." + pageName + " = ("
-						+ jsonsString + ");";
-					
-					// Does a JMTE filter
-					jsonsString = getJMTE().parseTemplate(jsonsString, jmteVarMap);
-					
-					// Write to file if it differ
-					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, pageName + ".jsons.js"), "UTF-8",
-						jsonsString);
-					
-					// Indicate file is "deployed"
-					hasJsFile = true;
-				}
-			}
-			
-			// Build the LESS script
+			// Build the LESS script (if provided)
 			//-------------------------------------------------------------------
-			
-			// Indicates if there is a LESS script
-			boolean hasLessFile = false;
-			
-			// The LESS file source location
-			File lessFile = new File(definitionFolder, pageName + ".less");
-			
-			// Process file only if its readable
-			if (lessFile.exists() && lessFile.isFile() && lessFile.canRead()) {
-				
-				// Gets its string value, and process only if not blank
-				String lessString = FileUtils.readFileToString(lessFile, "UTF-8");
-				if ((lessString = lessString.trim()).length() > 0) {
-					
-					/// Does an outer wrap, if its not index page (which applies style to 'all')
-					if (!pageName.equalsIgnoreCase("index") && !pageName.equalsIgnoreCase("common")) {
-						lessString = ".pageFrame_" + pageName + " { \n" + lessString + "\n } \n";
-					}
-					
-					// Does a JMTE filter
-					lessString = getJMTE().parseTemplate(lessString, jmteVarMap);
-					
-					/// Write to map file if differ
-					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, pageName + ".css.map"), "UTF-8",
-						lessString);
-					
-					/// Convert LESS to CSS
-					String cssString = less.compile(lessString);
-					
-					/// Does a simplistic compression
-					cssString = cssString.trim().replaceAll("\\s+", " ");
-					
-					// Write to file if it differ
-					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, pageName + ".css"), "UTF-8",
-						cssString);
-					
-					// Indicate file is "deployed"
-					hasLessFile = true;
-				}
-			}
+			boolean hasLessFile = processPageFile(
+				PageFileType.jsons_to_js,
+				new File[] {
+					new File(definitionFolder, "index.less"),
+					new File(definitionFolder, pageName_safe + ".less")
+				},
+				new File(outputPageFolder, pageName_safe + ".css"),
+				pageName,
+				jmteVarMap
+			);
 			
 			// Build the html page
 			//-------------------------------------------------------------------
 			
-			// The HTML output
-			String indexStr = buildFullPageFrame(pageName).toString();
+			// The HTML output (if valid)
+			StringBuilder indexStrBuilder = buildFullPageFrame(pageName);
+			if( indexStrBuilder == null ) {
+				return false;
+			}
+			String indexStr = indexStrBuilder.toString();
 			
 			// Build the injector code for this page (before </head>)
 			//-------------------------------------------------------------------
-			// StringBuilder injectorStrBuilder = new StringBuilder();
-			// String injectorStr = injectorStrBuilder.toString();
-			// 
-			// if( hasLessFile ) {
-			// 	if( injectorStr.indexOf(pageName+"/"+pageName+".css") > 0 ) {
-			// 		// Skips injection if already included
-			// 	} else {
-			// 		injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='"+uriRootPrefix+""+pageName+"/"+pageName+".css'/>\n");
-			// 	}
-			// }
-			// if( hasJsFile ) {
-			// 	if( injectorStr.indexOf(pageName+"/"+pageName+".js") > 0 ) {
-			// 		// Skips injection if already included
-			// 	} else {
-			// 		injectorStrBuilder.append("<script src='"+uriRootPrefix+""+pageName+"/"+pageName+".js'/>\n");
-			// 	}
-			// }
+			StringBuilder injectorStrBuilder = new StringBuilder();
+			String injectorStr = injectorStrBuilder.toString();
+			
+			if( hasLessFile ) {
+				if( injectorStr.indexOf(pageName+"/"+pageName_safe+".css") > 0 ) {
+					// Skips injection if already included
+				} else {
+					injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='"+uriRootPrefix+""+pageName+"/"+pageName_safe+".css'/>\n");
+				}
+			}
+			if( hasJsFile ) {
+				if( injectorStr.indexOf(pageName+"/"+pageName_safe+".js") > 0 ) {
+					// Skips injection if already included
+				} else {
+					injectorStrBuilder.append("<script src='"+uriRootPrefix+""+pageName+"/"+pageName_safe+".js'/>\n");
+				}
+			}
+			if( hasJsonsFile ) {
+				if( injectorStr.indexOf(pageName+"/"+pageName_safe+".jsons.js") > 0 ) {
+					// Skips injection if already included
+				} else {
+					injectorStrBuilder.append("<script src='"+uriRootPrefix+""+pageName+"/"+pageName_safe+".jsons.js'/>\n");
+				}
+			}
 			
 			// Ammend the HTML output
 			//-------------------------------------------------------------------
 			
 			// Apply injector code if any
-			// if( injectorStr.length() > 0 ) {
-			// 	indexStr = indexStr.replace("</head>", injectorStr+"</head>");
-			// }
+			if( injectorStr.length() > 0 ) {
+				indexStr = indexStr.replaceAll("\\<\\/head\\>", injectorStr+"</head>");
+			}
 			
 			// HTML minify
 			//-------------------------------------------------------------------
@@ -429,13 +501,15 @@ public class PagesBuilderCore {
 			// Write to file if it differ
 			FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, "index.html"), "UTF-8", indexStr);
 			
+			// Returns success
+			return true;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 		
-		// End and returns self
+		// End and returns failure
 		//-------------------------------------------------------------------
-		return this;
+		// return false;
 	}
 	
 }

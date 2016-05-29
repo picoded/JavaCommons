@@ -16,7 +16,7 @@ import picoded.servletUtils.*;
 /// NOT the folder iteration
 ///
 /// @TODO
-/// + Minify the pagename/index.html
+/// + Minify the rawPageName/index.html
 ///
 public class PagesBuilderCore {
 	
@@ -130,30 +130,30 @@ public class PagesBuilderCore {
 	//
 	////////////////////////////////////////////////////////////
 	
-	/// Utility to get path safe pageName
+	/// Utility to get path safe rawPageName
 	///
-	/// @param  pageName used to generate the vars
+	/// @param  rawPageName used to generate the vars
 	///
-	/// @returns  The pageName which is subpath safe
-	protected String safePageName(String pageName) {
-		return pageName.replaceAll("/","_");
+	/// @returns  The rawPageName which is subpath safe
+	protected String safePageName(String rawPageName) {
+		return rawPageName.replaceAll("/","_");
 	}
 	
 	/// Utility to get page frame ID
 	///
-	/// @param  pageName used to generate the vars
+	/// @param  rawPageName used to generate the vars
 	///
 	/// @returns  The page frame ID used (that is character safe?)
-	protected String pageFrameID(String pageName) {
-		return "pageFrame_"+safePageName(pageName);
+	protected String pageFrameID(String rawPageName) {
+		return "pageFrame_"+safePageName(rawPageName);
 	}
 	
 	/// Generates the needed map string template for the respective page
 	///
-	/// @param  pageName used to generate the vars
+	/// @param  rawPageName used to generate the vars
 	///
 	/// @returns The data map used inside JMTE
-	protected Map<String, Object> pageJMTEvars(String pageName) {
+	protected Map<String, Object> pageJMTEvars(String rawPageName) {
 		HashMap<String, Object> ret = new HashMap<String, Object>();
 		
 		// Initialize to root if not previously set
@@ -169,16 +169,16 @@ public class PagesBuilderCore {
 		}*/
 		
 		//
-		String pageURI = uriRootPrefix + "/" + pageName;
+		String pageURI = uriRootPrefix + "/" + rawPageName;
 		while (pageURI.startsWith("//")) {
 			pageURI = pageURI.substring(1);
 		}
 		
 		ret.put("PagesRootURI", uriRootPrefix);
 		ret.put("PageURI", pageURI);
-		ret.put("PageNameRaw", pageName);
-		ret.put("PageName", safePageName(pageName));
-		ret.put("PageFrameID", pageFrameID(pageName));
+		ret.put("rawPageNameRaw", rawPageName);
+		ret.put("rawPageName", safePageName(rawPageName));
+		ret.put("PageFrameID", pageFrameID(rawPageName));
 		
 		return ret;
 	}
@@ -190,9 +190,9 @@ public class PagesBuilderCore {
 	/// 2) The common folder
 	/// 3) The index folder (legacy support, do not use)
 	///
-	protected String getCommonPrefixOrSuffixHtml(String pageName, String fixType) {
-		// Get from the pageName folder itself (v2)
-		String res = FileUtils.readFileToString_withFallback(new File(pagesFolder, pageName+"/"+fixType+".html"), "UTF-8", null);
+	protected String getCommonPrefixOrSuffixHtml(String rawPageName, String fixType) {
+		// Get from the rawPageName folder itself (v2)
+		String res = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName+"/"+fixType+".html"), "UTF-8", null);
 		
 		// Get from the common folder (v2)
 		if(res == null) {
@@ -218,26 +218,21 @@ public class PagesBuilderCore {
 	////////////////////////////////////////////////////////////
 	
 	/// Gets the prefix
-	public String prefixHTML(String pageName) {
-		return getJMTE().parseTemplate(getCommonPrefixOrSuffixHtml(pageName,"prefix"), pageJMTEvars(pageName));
+	public String prefixHTML(String rawPageName) {
+		return getJMTE().parseTemplate(getCommonPrefixOrSuffixHtml(rawPageName,"prefix"), pageJMTEvars(rawPageName));
 	}
 	
 	/// Gets the prefix
-	public String suffixHTML(String pageName) {
-		return getJMTE().parseTemplate(getCommonPrefixOrSuffixHtml(pageName,"suffix"), pageJMTEvars(pageName));
+	public String suffixHTML(String rawPageName) {
+		return getJMTE().parseTemplate(getCommonPrefixOrSuffixHtml(rawPageName,"suffix"), pageJMTEvars(rawPageName));
 	}
 	
-	/// Builds a pagename HTML frame
-	public String buildPageFrame(String pageName) {
-		return buildPageFrame(pageName, false);
-	}
-	
-	/// Builds a pagename HTML frame, with the hidden property if applicable
-	public String buildPageFrame(String pageName, boolean isHidden) {
-		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, pageName + "/" + safePageName(pageName) + ".html"),
+	/// Gets and returns a page frame string, with its respective JMTE input vars?
+	public String buildPageInnerHTML(String rawPageName, Map<String,Object> jmteTemplate) {
+		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + safePageName(rawPageName) + ".html"),
 			"UTF-8", null);
 		if( indexFileStr == null ) {
-			indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, pageName + "/index.html"),
+			indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/index.html"),
 				"UTF-8", "");
 		}
 		
@@ -245,26 +240,40 @@ public class PagesBuilderCore {
 			return null;
 		}
 		
+		return getJMTE().parseTemplate(indexFileStr.toString(), jmteTemplate);
+	}
+	
+	/// Builds a rawPageName HTML frame
+	public String buildPageFrame(String rawPageName) {
+		return buildPageFrame(rawPageName, false);
+	}
+	
+	/// Builds a rawPageName HTML frame, with the hidden property if applicable
+	public String buildPageFrame(String rawPageName, boolean isHidden) {
+		String innerHTML = buildPageInnerHTML(rawPageName, pageJMTEvars(rawPageName));
+		if( innerHTML == null ) {
+			return null;
+		}
+		
 		StringBuilder frame = new StringBuilder();
-		frame.append("<div class='pageFrame "+pageFrameID(pageName)+"' id='"+pageFrameID(pageName)+"'");
+		frame.append("<div class='pageFrame "+pageFrameID(rawPageName)+"' id='"+pageFrameID(rawPageName)+"'");
 		if (isHidden) {
 			frame.append(" style='display:none;'");
 		}
 		frame.append(">\n");
-		frame.append(indexFileStr);
+		frame.append(innerHTML);
 		frame.append("\n</div>\n");
-		return getJMTE().parseTemplate(frame.toString(), pageJMTEvars(pageName));
+		return frame.toString();
 	}
 	
-	/// Builds the FULL pagename HTML, with prefix and suffix
-	public StringBuilder buildFullPageFrame(String pageName) {
-		String frameHTML = buildPageFrame(pageName);
-		
+	/// Builds the FULL rawPageName HTML, with prefix and suffix
+	public StringBuilder buildFullPageFrame(String rawPageName) {
+		String frameHTML = buildPageFrame(rawPageName);
 		if(frameHTML != null) {
 			StringBuilder ret = new StringBuilder();
-			ret.append(prefixHTML(pageName));
+			ret.append(prefixHTML(rawPageName));
 			ret.append(frameHTML);
-			ret.append(suffixHTML(pageName));
+			ret.append(suffixHTML(rawPageName));
 			return ret;
 		}
 		return null;
@@ -295,7 +304,7 @@ public class PagesBuilderCore {
 	/// @param  The JMTE variable map to use
 	///
 	/// @return true, if a file was processed and written
-	public boolean processPageFile(PageFileType type, File input, File output, String pageName, Map<String, Object> jmteVarMap) throws IOException {
+	public boolean processPageFile(PageFileType type, File input, File output, String rawPageName, Map<String, Object> jmteVarMap) throws IOException {
 		if (input.exists() && input.isFile() && input.canRead()) {
 			// Gets its string value, and process only if not blank
 			String fileVal = FileUtils.readFileToString(input, "UTF-8");
@@ -307,12 +316,12 @@ public class PagesBuilderCore {
 				// Does specific conversions
 				if( type == PageFileType.jsons_to_js ) {
 					// Adds the script object wrapper
-					fileVal = "window.pageFrames = window.pageFrames || {}; window.pageFrames." + safePageName(pageName) + " = ("
+					fileVal = "window.pageFrames = window.pageFrames || {}; window.pageFrames." + safePageName(rawPageName) + " = ("
 						+ fileVal + ");";
 				} else if( type == PageFileType.less_to_css ) {
 					/// Does an outer wrap, if its not index page (which applies style to 'all')
-					if (!pageName.equalsIgnoreCase("index") && !pageName.equalsIgnoreCase("common")) {
-						fileVal = "." + pageFrameID(pageName) + " { \n" + fileVal + "\n } \n";
+					if (!rawPageName.equalsIgnoreCase("index") && !rawPageName.equalsIgnoreCase("common")) {
+						fileVal = "." + pageFrameID(rawPageName) + " { \n" + fileVal + "\n } \n";
 					}
 					
 					// Less to css conversion
@@ -338,9 +347,9 @@ public class PagesBuilderCore {
 	/// @param  The JMTE variable map to use
 	///
 	/// @return true, if a file was processed and written
-	public boolean processPageFile(PageFileType type, File[] inputArr, File output, String pageName, Map<String, Object> jmteVarMap) throws IOException {
+	public boolean processPageFile(PageFileType type, File[] inputArr, File output, String rawPageName, Map<String, Object> jmteVarMap) throws IOException {
 		for(File input : inputArr) {
-			if( processPageFile(type, input, output, pageName, jmteVarMap) ) {
+			if( processPageFile(type, input, output, rawPageName, jmteVarMap) ) {
 				return true;
 			}
 		}
@@ -350,38 +359,39 @@ public class PagesBuilderCore {
 	///
 	/// Builds all the assets for a single page
 	///
-	/// @param PageName to build
+	/// @param rawPageName to build
 	///
-	public boolean buildAndOutputPage(String pageName) {
+	/// @return boolean true, if page had content to be built
+	public boolean buildAndOutputPage(String rawPageName) {
 		
 		// System.out allowed here, because LESS does a system out ANYWAY.
 		// Help to make more "sense" of the done output
-		System.out.print("> PageBuilder[Core].buildPage(\'" + pageName + "\'): ");
+		System.out.print("> PageBuilder[Core].buildPage(\'" + rawPageName + "\'): ");
 		
 		// Output folder validitiy check
 		if( outputFolder == null ) {
-			throw new RuntimeException("Missing output folder, unable to generate : " + pageName);
+			throw new RuntimeException("Missing output folder, unable to generate : " + rawPageName);
 		}
 		
 		// Future extension, possible loop hole abuse. Im protecting against it early
-		if (pageName.startsWith(".")) {
-			throw new RuntimeException("Unable to load page name, starting with '.' : " + pageName);
+		if (rawPageName.startsWith(".")) {
+			throw new RuntimeException("Unable to load page name, starting with '.' : " + rawPageName);
 		}
-		if (pageName.indexOf("..") >= 0) {
-			throw new RuntimeException("Unable to load page name, containing '..' : " + pageName);
+		if (rawPageName.indexOf("..") >= 0) {
+			throw new RuntimeException("Unable to load page name, containing '..' : " + rawPageName);
 		}
-		if (pageName.toLowerCase().indexOf("web-inf") >= 0) {
-			throw new RuntimeException("Unable to load page name, that may bypass WEB-INF : " + pageName);
+		if (rawPageName.toLowerCase().indexOf("web-inf") >= 0) {
+			throw new RuntimeException("Unable to load page name, that may bypass WEB-INF : " + rawPageName);
 		}
 		
 		try {
 			
 			// Prepares output and definition FILE objects, and JMTE map
 			//-------------------------------------------------------------------
-			File outputPageFolder = new File(outputFolder, pageName);
-			File definitionFolder = new File(pagesFolder, pageName);
-			Map<String, Object> jmteVarMap = pageJMTEvars(pageName);
-			String pageName_safe = safePageName(pageName);
+			File outputPageFolder = new File(outputFolder, rawPageName);
+			File definitionFolder = new File(pagesFolder, rawPageName);
+			Map<String, Object> jmteVarMap = pageJMTEvars(rawPageName);
+			String pageName_safe = safePageName(rawPageName);
 			
 			// Create the output folder as needed
 			//-------------------------------------------------------------------
@@ -395,10 +405,12 @@ public class PagesBuilderCore {
 			//-------------------------------------------------------------------
 			
 			// Folder to copy from
+			boolean hasAssets = false;
 			File pageAssetsFolder = new File(definitionFolder, "assets");
 			if (pageAssetsFolder.exists() && pageAssetsFolder.isDirectory()) {
 				// Copy if folder to target
 				FileUtils.copyDirectory(pageAssetsFolder, new File(outputPageFolder, "assets"));
+				hasAssets = true;
 			}
 			
 			// Process the JS script (if provided)
@@ -410,7 +422,7 @@ public class PagesBuilderCore {
 					new File(definitionFolder, pageName_safe + ".js")
 				},
 				new File(outputPageFolder, pageName_safe + ".js"),
-				pageName,
+				rawPageName,
 				jmteVarMap
 			);
 			
@@ -423,7 +435,7 @@ public class PagesBuilderCore {
 					new File(definitionFolder, pageName_safe + ".jsons")
 				},
 				new File(outputPageFolder, pageName_safe + ".jsons.js"),
-				pageName,
+				rawPageName,
 				jmteVarMap
 			);
 			
@@ -436,7 +448,7 @@ public class PagesBuilderCore {
 					new File(definitionFolder, pageName_safe + ".less")
 				},
 				new File(outputPageFolder, pageName_safe + ".css"),
-				pageName,
+				rawPageName,
 				jmteVarMap
 			);
 			
@@ -444,9 +456,9 @@ public class PagesBuilderCore {
 			//-------------------------------------------------------------------
 			
 			// The HTML output (if valid)
-			StringBuilder indexStrBuilder = buildFullPageFrame(pageName);
+			StringBuilder indexStrBuilder = buildFullPageFrame(rawPageName);
 			if( indexStrBuilder == null ) {
-				return false;
+				return hasAssets || hasJsFile || hasJsonsFile || hasLessFile;
 			}
 			String indexStr = indexStrBuilder.toString();
 			
@@ -456,24 +468,24 @@ public class PagesBuilderCore {
 			String injectorStr = injectorStrBuilder.toString();
 			
 			if( hasLessFile ) {
-				if( injectorStr.indexOf(pageName+"/"+pageName_safe+".css") > 0 ) {
+				if( injectorStr.indexOf(rawPageName+"/"+pageName_safe+".css") > 0 ) {
 					// Skips injection if already included
 				} else {
-					injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='"+uriRootPrefix+""+pageName+"/"+pageName_safe+".css'/>\n");
+					injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='"+uriRootPrefix+""+rawPageName+"/"+pageName_safe+".css'/>\n");
 				}
 			}
 			if( hasJsFile ) {
-				if( injectorStr.indexOf(pageName+"/"+pageName_safe+".js") > 0 ) {
+				if( injectorStr.indexOf(rawPageName+"/"+pageName_safe+".js") > 0 ) {
 					// Skips injection if already included
 				} else {
-					injectorStrBuilder.append("<script src='"+uriRootPrefix+""+pageName+"/"+pageName_safe+".js'/>\n");
+					injectorStrBuilder.append("<script src='"+uriRootPrefix+""+rawPageName+"/"+pageName_safe+".js'/>\n");
 				}
 			}
 			if( hasJsonsFile ) {
-				if( injectorStr.indexOf(pageName+"/"+pageName_safe+".jsons.js") > 0 ) {
+				if( injectorStr.indexOf(rawPageName+"/"+pageName_safe+".jsons.js") > 0 ) {
 					// Skips injection if already included
 				} else {
-					injectorStrBuilder.append("<script src='"+uriRootPrefix+""+pageName+"/"+pageName_safe+".jsons.js'/>\n");
+					injectorStrBuilder.append("<script src='"+uriRootPrefix+""+rawPageName+"/"+pageName_safe+".jsons.js'/>\n");
 				}
 			}
 			

@@ -46,6 +46,7 @@ public class PagesBuilder extends PagesBuilderCore {
 		this(new File(inPagesFolder), new File(inOutputFolder));
 	}
 	
+	/// Does some basic validation for the constructor
 	protected void validateAndSetup() {
 		//
 		// NULL check
@@ -89,9 +90,11 @@ public class PagesBuilder extends PagesBuilderCore {
 	//
 	////////////////////////////////////////////////////////////
 	
-	/// 
 	/// Indicates if the page definition folder exists
 	///
+	/// @param PageName to build
+	///
+	/// @return  boolean true if pageName is a folder
 	public boolean hasPageDefinition(String pageName) {
 		try {
 			File definitionFolder = new File(pagesFolder, pageName);
@@ -102,28 +105,28 @@ public class PagesBuilder extends PagesBuilderCore {
 		return false;
 	}
 	
-	///
 	/// Builds all the assets for a single page
 	///
 	/// @param PageName to build
 	///
+	/// @return  Returns itself
 	public PagesBuilder buildPage(String pageName) {
 		buildAndOutputPage(pageName);
 		return this;
 	}
 	
+	/// Scans and builds all the pages
 	///
-	/// Builds all the pages
-	///
+	/// @return  Returns itself
 	public PagesBuilder buildAllPages() {
 		buildAllPages_internal("");
 		// End and returns self
 		return this;
 	}
 	
+	/// The recursive internal function varient of buildAllPages
 	///
-	/// The recursive internal function varient
-	///
+	/// @param  The current prefix path in the recusrive scan
 	public void buildAllPages_internal(String prefixPath) {
 		// For each directory, build it as a page
 		for (File pageDefine : FileUtils.listDirs(new File(pagesFolder, prefixPath))) {

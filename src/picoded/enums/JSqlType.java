@@ -18,5 +18,15 @@ public enum JSqlType {
 	mssql,
 	
 	/// Others
-	others
+	others;
+	
+	/// Get name and toString alias to name() varient
+	public String getName() {
+		return super.name();
+	}
+	
+	public String toString() {
+		return super.name();
+	}
+	
 }

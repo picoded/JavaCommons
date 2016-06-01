@@ -1,6 +1,6 @@
 package picoded.RESTBuilder.templates;
 
-import picoded.RESTBuilder.*;
+import picoded.RESTBuilder.RESTFunction;
 import picoded.conv.DateConv;
 import picoded.conv.DateConv.ISODateFormat;
 

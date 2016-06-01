@@ -1,17 +1,22 @@
 package picoded.RESTBuilder.templates;
 
 import java.io.PrintWriter;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import picoded.RESTBuilder.*;
-import picoded.JStack.*;
-import picoded.JStruct.*;
-import picoded.servlet.*;
+import picoded.JStruct.MetaObject;
+import picoded.JStruct.MetaTable;
+import picoded.RESTBuilder.RESTBuilder;
+import picoded.RESTBuilder.RESTFunction;
 import picoded.conv.ConvertJSON;
 import picoded.conv.GenericConvert;
 import picoded.conv.RegexUtils;
 import picoded.enums.HttpRequestType;
+import picoded.servlet.BasePage;
+import picoded.servlet.CorePage;
 
 /// Account login template API
 public class MetaTableApiBuilder {

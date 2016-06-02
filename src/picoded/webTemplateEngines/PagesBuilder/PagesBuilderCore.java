@@ -136,6 +136,9 @@ public class PagesBuilderCore {
 	///
 	/// @returns  The rawPageName which is subpath safe
 	protected String safePageName(String rawPageName) {
+		if(rawPageName.endsWith("/")) {
+			rawPageName = rawPageName.substring(0, rawPageName.length() - 1);
+		}
 		return rawPageName.replaceAll("/","_");
 	}
 	

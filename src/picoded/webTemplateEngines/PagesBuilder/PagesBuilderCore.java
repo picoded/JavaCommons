@@ -250,32 +250,42 @@ public class PagesBuilderCore {
 		return getJMTE().parseTemplate(indexFileStr.toString(), jmteTemplate);
 	}
 	
-	/// Builds a rawPageName HTML frame
-	public String buildPageFrame(String rawPageName) {
-		return buildPageFrame(rawPageName, false);
+	/// Get the page frame div header, this is used to do a "search replace" for script / css injection
+	protected String pageFrameHeaderDiv(String rawPageName) {
+		return "<div class='pageFrame "+pageFrameID(rawPageName)+"' id='"+pageFrameID(rawPageName)+"'>\n";
 	}
 	
-	/// Builds a rawPageName HTML frame, with the hidden property if applicable
-	public String buildPageFrame(String rawPageName, boolean isHidden) {
+	/// Builds a rawPageName HTML frame
+	public String buildPageFrame(String rawPageName) {
+		return buildPageFrame(rawPageName, null);
+	}
+	
+	/// Builds a rawPageName HTML frame
+	public String buildPageFrame(String rawPageName, String injectionStr) {
 		String innerHTML = buildPageInnerHTML(rawPageName, pageJMTEvars(rawPageName));
 		if( innerHTML == null ) {
 			return null;
 		}
 		
 		StringBuilder frame = new StringBuilder();
-		frame.append("<div class='pageFrame "+pageFrameID(rawPageName)+"' id='"+pageFrameID(rawPageName)+"'");
-		if (isHidden) {
-			frame.append(" style='display:none;'");
+		frame.append( pageFrameHeaderDiv(rawPageName) );
+		if( injectionStr != null ) {
+			frame.append( injectionStr );
 		}
-		frame.append(">\n");
-		frame.append(innerHTML);
+		
+		frame.append( innerHTML );
 		frame.append("\n</div>\n");
 		return frame.toString();
 	}
 	
 	/// Builds the FULL rawPageName HTML, with prefix and suffix
 	public StringBuilder buildFullPageFrame(String rawPageName) {
-		String frameHTML = buildPageFrame(rawPageName);
+		return buildFullPageFrame(rawPageName, null);
+	}
+	
+	/// Builds the FULL rawPageName HTML, with prefix and suffix
+	public StringBuilder buildFullPageFrame(String rawPageName, String injectionStr) {
+		String frameHTML = buildPageFrame(rawPageName, injectionStr);
 		if(frameHTML != null) {
 			StringBuilder ret = new StringBuilder();
 			ret.append(prefixHTML(rawPageName));
@@ -405,6 +415,11 @@ public class PagesBuilderCore {
 	///
 	public boolean buildAndOutputPage(String rawPageName) {
 		
+		// rawPageName here assumes NO "/" suffix
+		if( rawPageName.endsWith("/") ) {
+			rawPageName = rawPageName.substring(0, rawPageName.length() - 1);
+		}
+		
 		// System.out allowed here, because LESS does a system out ANYWAY.
 		// Help to make more "sense" of the done output
 		System.out.print("> PageBuilder[Core].buildPage(\'" + rawPageName + "\'): ");
@@ -506,36 +521,38 @@ public class PagesBuilderCore {
 			// Build the injector code for this page (before </head>)
 			//-------------------------------------------------------------------
 			StringBuilder injectorStrBuilder = new StringBuilder();
-			String injectorStr = injectorStrBuilder.toString();
 			
 			if( hasLessFile ) {
-				if( injectorStr.indexOf(rawPageName+"/"+pageName_safe+".css") > 0 ) {
+				if( indexStr.indexOf(rawPageName+"/"+pageName_safe+".css") > 0 ) {
 					// Skips injection if already included
 				} else {
-					injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='"+uriRootPrefix+""+rawPageName+"/"+pageName_safe+".css'/>\n");
+					injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='"+uriRootPrefix+"/"+rawPageName+"/"+pageName_safe+".css'/>\n");
 				}
 			}
 			if( hasJsFile ) {
-				if( injectorStr.indexOf(rawPageName+"/"+pageName_safe+".js") > 0 ) {
+				if( indexStr.indexOf(rawPageName+"/"+pageName_safe+".js") > 0 ) {
 					// Skips injection if already included
 				} else {
-					injectorStrBuilder.append("<script src='"+uriRootPrefix+""+rawPageName+"/"+pageName_safe+".js'/>\n");
+					injectorStrBuilder.append("<script src='"+uriRootPrefix+"/"+rawPageName+"/"+pageName_safe+".js'/>\n");
 				}
 			}
 			if( hasJsonsFile ) {
-				if( injectorStr.indexOf(rawPageName+"/"+pageName_safe+".jsons.js") > 0 ) {
+				if( indexStr.indexOf(rawPageName+"/"+pageName_safe+".jsons.js") > 0 ) {
 					// Skips injection if already included
 				} else {
-					injectorStrBuilder.append("<script src='"+uriRootPrefix+""+rawPageName+"/"+pageName_safe+".jsons.js'/>\n");
+					injectorStrBuilder.append("<script src='"+uriRootPrefix+"/"+rawPageName+"/"+pageName_safe+".jsons.js'/>\n");
 				}
 			}
+			
+			String injectorStr = injectorStrBuilder.toString();
 			
 			// Ammend the HTML output
 			//-------------------------------------------------------------------
 			
 			// Apply injector code if any
 			if( injectorStr.length() > 0 ) {
-				indexStr = indexStr.replaceAll("\\<\\/head\\>", injectorStr+"</head>");
+				// Rebuild with injection
+				indexStr = buildFullPageFrame(rawPageName, injectorStr).toString();
 			}
 			
 			// HTML minify

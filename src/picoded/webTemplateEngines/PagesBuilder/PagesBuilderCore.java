@@ -295,6 +295,39 @@ public class PagesBuilderCore {
 		html
 	}
 	
+	/// Indicate if the page definition FOLDER exists
+	///
+	/// @param PageName to build
+	///
+	/// @return  boolean true if pageName has folder
+	public boolean hasPageFolder(String pageName) {
+		try {
+			File definitionFolder = new File(pagesFolder, pageName);
+			return definitionFolder.exists() && definitionFolder.isDirectory();
+		} catch (Exception e) {
+			// Failed?
+		}
+		return false;
+	}
+	
+	/// Indicates if the page definition FILE exists
+	///
+	/// @param PageName to build
+	///
+	/// @return  boolean true if pageName is a folder
+	public boolean hasPageFile(String pageName) {
+		try {
+			File definitionFolder = new File(pagesFolder, pageName);
+			return (
+				(new File(definitionFolder, "index.html")).exists() && 
+				(new File(definitionFolder, safePageName(pageName)+".html")).exists()
+			);
+		} catch (Exception e) {
+			// Failed?
+		}
+		return false;
+	}
+	
 	/// Process the file, according to its type, and outputs it into the respective file
 	///
 	/// @param  filetype enum
@@ -362,6 +395,7 @@ public class PagesBuilderCore {
 	/// @param rawPageName to build
 	///
 	/// @return boolean true, if page had content to be built
+	///
 	public boolean buildAndOutputPage(String rawPageName) {
 		
 		// System.out allowed here, because LESS does a system out ANYWAY.
@@ -524,4 +558,60 @@ public class PagesBuilderCore {
 		// return false;
 	}
 	
+	///
+	/// Builds all pages (NOT including itself) inside a page folder
+	///
+	/// @param rawPageName to build
+	///
+	/// @return boolean true, if page had content to be built
+	///
+	public boolean buildPageFolder(String rawPageName) {
+		boolean res = false;
+		if( rawPageName == null || rawPageName.equalsIgnoreCase("/") ) {
+			rawPageName = "";
+		}
+		
+		// The current folder to scan
+		File folder = new File(pagesFolder, rawPageName);
+		
+		// Scan for subdirectories ONLY if this is a directory
+		if(folder.isDirectory()) {
+			// For each sub directory, build it as a page
+			for (File pageDefine : FileUtils.listDirs(folder)) {
+				// Build each page
+				String subPageName = pageDefine.getName();
+				buildAndOutputPage(rawPageName+subPageName);
+				
+				// Scan for sub pages
+				if( 
+					subPageName.equalsIgnoreCase("assets") || 
+					subPageName.equalsIgnoreCase("common") || 
+					subPageName.equalsIgnoreCase("index") || 
+					subPageName.equalsIgnoreCase("web-inf") 
+				) {
+					// ignoring certain reserved folders
+				} else {
+					// Recursive iterate
+					res = buildPageFolder(rawPageName+subPageName+"/") || true;
+				}
+			}
+		}
+		
+		return res;
+	}
+	
+	///
+	/// Builds all pages (INCLUDING itself, if possible) inside a page folder
+	///
+	/// @param rawPageName to build
+	///
+	/// @return boolean true, if page had content to be built
+	///
+	public boolean buildPageFolder_includingSelf(String rawPageName) {
+		boolean res = false;
+		if( hasPageFile(rawPageName) ) {
+			res = buildAndOutputPage(rawPageName) || res;
+		}
+		return buildPageFolder(rawPageName) || res;
+	}
 }

@@ -90,61 +90,13 @@ public class PagesBuilder extends PagesBuilderCore {
 	//
 	////////////////////////////////////////////////////////////
 	
-	/// Indicates if the page definition folder exists
-	///
-	/// @param PageName to build
-	///
-	/// @return  boolean true if pageName is a folder
-	public boolean hasPageDefinition(String pageName) {
-		try {
-			File definitionFolder = new File(pagesFolder, pageName);
-			return definitionFolder.exists() && definitionFolder.isDirectory();
-		} catch (Exception e) {
-			// Failed?
-		}
-		return false;
-	}
-	
-	/// Builds all the assets for a single page
-	///
-	/// @param PageName to build
-	///
-	/// @return  Returns itself
-	public PagesBuilder buildPage(String pageName) {
-		buildAndOutputPage(pageName);
-		return this;
-	}
-	
 	/// Scans and builds all the pages
 	///
 	/// @return  Returns itself
 	public PagesBuilder buildAllPages() {
-		buildAllPages_internal("");
+		buildPageFolder("");
 		// End and returns self
 		return this;
-	}
-	
-	/// The recursive internal function varient of buildAllPages
-	///
-	/// @param  The current prefix path in the recusrive scan
-	public void buildAllPages_internal(String prefixPath) {
-		// For each directory, build it as a page
-		for (File pageDefine : FileUtils.listDirs(new File(pagesFolder, prefixPath))) {
-			// Build each page
-			String subPageName = pageDefine.getName();
-			buildPage(prefixPath+subPageName);
-			
-			// Scan for sub pages
-			if( 
-				subPageName.equalsIgnoreCase("assets") || 
-				subPageName.equalsIgnoreCase("common") || 
-				subPageName.equalsIgnoreCase("index") 
-			) {
-				// ignoring certain reserved folders
-			} else {
-				buildAllPages_internal(prefixPath+subPageName+"/");
-			}
-		}
 	}
 	
 	////////////////////////////////////////////////////////////
@@ -173,40 +125,38 @@ public class PagesBuilder extends PagesBuilderCore {
 	public void processPageBuilderServlet(BasePage page, String[] requestWildcardUri) {
 		try {
 			if (requestWildcardUri == null) {
-				requestWildcardUri = new String[0];
+				requestWildcardUri = new String[] { "" };
 			}
 			
-			// Load page name
-			String pageName = "index";
-			if (requestWildcardUri.length >= 1) {
-				pageName = requestWildcardUri[0];
-			}
-			
-			// Load page name
-			String itemName = "index.html";
-			if (requestWildcardUri.length >= 2) {
-				itemName = requestWildcardUri[1];
-			} else {
-				requestWildcardUri = new String[] { pageName, itemName };
+			// Load base page name (developer mode rebuilds an entire sub-dir, to optimize in future?)
+			String basePageName = "index";
+			if(requestWildcardUri.length >= 1 && requestWildcardUri[0].length() > 0) {
+				basePageName = requestWildcardUri[0];
 			}
 			
 			boolean isDeveloperMode = (page.JConfig().getBoolean("developersMode.enabled", true) && page.JConfig()
 				.getBoolean("developersMode.PagesBuilder", true));
 			if (isDeveloperMode) {
-				// Load the respective page
-				if (requestWildcardUri.length == 2 && itemName.equals("index.html")) {
-					PagesBuilder servletPagesBuilder = page.PagesBuilder();
+				String itemName = "index.html";
+				String suffixName = requestWildcardUri[ requestWildcardUri.length - 1 ];
+				
+				// Check if there is an item request
+				if( suffixName.indexOf(".") > 0 ) {
+					itemName = suffixName; //Update as item name
+				}
+				
+				PagesBuilder servletPagesBuilder = page.PagesBuilder();
+				
+				// Load the respective page, only on main page load
+				if (itemName.equals("index.html") && servletPagesBuilder.hasPageFolder(basePageName)) {
+					servletPagesBuilder.buildPageFolder_includingSelf(basePageName);
 					
-					// Load the index and common pages (if applicable)
-					if (servletPagesBuilder.hasPageDefinition("index")) {
-						servletPagesBuilder.buildPage("index");
+					// Build index / common, skip if its a duplicate build request
+					if( !basePageName.equalsIgnoreCase("index") ) {
+						servletPagesBuilder.buildPageFolder_includingSelf("index");
 					}
-					if (servletPagesBuilder.hasPageDefinition("common")) {
-						servletPagesBuilder.buildPage("common");
-					}
-					
-					if (servletPagesBuilder.hasPageDefinition(pageName)) {
-						servletPagesBuilder.buildPage(pageName);
+					if( !basePageName.equalsIgnoreCase("common") ) {
+						servletPagesBuilder.buildPageFolder_includingSelf("common");
 					}
 				}
 			}

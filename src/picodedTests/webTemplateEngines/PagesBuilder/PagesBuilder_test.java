@@ -91,7 +91,7 @@ public class PagesBuilder_test {
 	@Test
 	public void buildPageBasicTest() throws IOException {
 		constructorTest();
-		pages.buildPage("index");
+		pages.buildAndOutputPage("index");
 		
 		// Check asset folder
 		assertEquals("is a COPYCAT: Meow!", FileUtils.readFileToString(new File(outputTestDir + "index/assets/bob.txt")));
@@ -100,7 +100,7 @@ public class PagesBuilder_test {
 	@Test
 	public void nestedPageTest() throws IOException {
 		constructorTest();
-		pages.buildPage("nested/page");
+		pages.buildAndOutputPage("nested/page");
 		
 		// Check asset folder
 		assertTrue( FileUtils.readFileToString(new File(outputTestDir + "nested/page/index.html")).indexOf("Hello pageFrame_nested_page") > 0 );

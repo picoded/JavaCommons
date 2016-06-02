@@ -95,6 +95,42 @@ public class AccountLogin extends BasePage {
 		//----------------------------------------
 		return call.apply(req, res, basePageObj, accountTableObj, currentUser, null, null);
 	}
+    
+    ///
+    /// Standardised utility function use to allow the login request WITHOUT authentication, and extend on for the respective function
+    ///
+    /// @params  {RESTRequest}          RESTREquest used
+    /// @params  {Map<String,Object>}   Returned map expected
+    /// @params  {loginREST}            The function to call after authenticating
+    ///
+    /// @returns {Map<String,Object>}
+    ///
+    public static Map<String, Object> prepareNoAuthenticationREST(RESTRequest req, Map<String, Object> res, loginREST call) {
+        
+        // Loads and check for request page
+        //----------------------------------------
+        if (req.requestPage() == null) {
+            res.put("error", MISSING_REQUEST_PAGE);
+            return res;
+        }
+        
+        BasePage basePageObj = (BasePage) (req.requestPage());
+        AccountTable accountTableObj = basePageObj.accountAuthTable();
+        AccountObject currentUser = accountTableObj.getRequestUser(basePageObj.getHttpServletRequest());
+        
+        mtApi = new MetaTableApiBuilder(accountTableObj.accountMetaTable());
+        
+        // Checked for valid login
+        //----------------------------------------
+        //if (currentUser == null) {
+        //    res.put("error", MISSING_LOGIN_SESSION);
+        //    return res;
+        //}
+        
+        // Run actual logic
+        //----------------------------------------
+        return call.apply(req, res, basePageObj, accountTableObj, currentUser, null, null);
+    }
 	
 	///
 	/// Standardised utility function use to authenticate the login request, and fetch the first wildcard argument as a group object (if possible)
@@ -1498,7 +1534,7 @@ return resMap;
 	///
 	public static RESTFunction new_account_POST = (req, res) -> {
 		// Only runs function if logged in, and valid group object
-		return prepareAuthenticatedREST(req, res, (reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj,
+		return prepareNoAuthenticationREST(req, res, (reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj,
 			accObj_b) -> {
 			
 			boolean isGroup = req.getBoolean("isGroup", false);

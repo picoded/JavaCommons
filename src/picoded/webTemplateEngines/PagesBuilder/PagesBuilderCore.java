@@ -229,15 +229,16 @@ public class PagesBuilderCore {
 	
 	/// Gets and returns a page frame string, with its respective JMTE input vars?
 	public String buildPageInnerHTML(String rawPageName, Map<String,Object> jmteTemplate) {
-		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + safePageName(rawPageName) + ".html"),
+		String indexFileStr = FileUtils.readFileToString_withFallback(
+			new File(pagesFolder, rawPageName + "/" + safePageName(rawPageName) + ".html"),
 			"UTF-8", null);
 		if( indexFileStr == null ) {
 			indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/index.html"),
 				"UTF-8", "");
 		}
 		
-		if( indexFileStr.trim().length() == 0 ) {
-			if( hasPageFile(rawPageName) ) {
+		if( (indexFileStr = indexFileStr.trim()).length() == 0 ) {
+			if( hasPageFile(rawPageName) ) { //has file
 				return ""; //this is a blank HTML file
 			}
 			return null;
@@ -322,7 +323,7 @@ public class PagesBuilderCore {
 		try {
 			File definitionFolder = new File(pagesFolder, pageName);
 			return (
-				(new File(definitionFolder, "index.html")).exists() && 
+				(new File(definitionFolder, "index.html")).exists() ||
 				(new File(definitionFolder, safePageName(pageName)+".html")).exists()
 			);
 		} catch (Exception e) {

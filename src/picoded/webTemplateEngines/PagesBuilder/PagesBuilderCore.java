@@ -237,6 +237,9 @@ public class PagesBuilderCore {
 		}
 		
 		if( indexFileStr.trim().length() == 0 ) {
+			if( hasPageFile(rawPageName) ) {
+				return ""; //this is a blank HTML file
+			}
 			return null;
 		}
 		
@@ -476,7 +479,7 @@ public class PagesBuilderCore {
 			// Build the LESS script (if provided)
 			//-------------------------------------------------------------------
 			boolean hasLessFile = processPageFile(
-				PageFileType.jsons_to_js,
+				PageFileType.less_to_css,
 				new File[] {
 					new File(definitionFolder, "index.less"),
 					new File(definitionFolder, pageName_safe + ".less")
@@ -538,8 +541,8 @@ public class PagesBuilderCore {
 			//
 			// @TODO: A proper minifier library integration, like:
 			// https://code.google.com/p/htmlcompressor
-			indexStr = indexStr.trim().replaceAll("\\s+", " ");
-			indexStr = indexStr.trim().replaceAll("\\>\\s\\<", "><");
+			// indexStr = indexStr.trim().replaceAll("\\s+", " ");
+			// indexStr = indexStr.trim().replaceAll("\\>\\s\\<", "><");
 			
 			// Write out to file
 			//-------------------------------------------------------------------
@@ -574,13 +577,17 @@ public class PagesBuilderCore {
 		// The current folder to scan
 		File folder = new File(pagesFolder, rawPageName);
 		
+		// Possible page pathing error fix
+		if( rawPageName.length() > 0 && !rawPageName.endsWith("/") ) {
+			rawPageName = rawPageName + "/";
+		}
+		
 		// Scan for subdirectories ONLY if this is a directory
 		if(folder.isDirectory()) {
 			// For each sub directory, build it as a page
 			for (File pageDefine : FileUtils.listDirs(folder)) {
 				// Build each page
 				String subPageName = pageDefine.getName();
-				buildAndOutputPage(rawPageName+subPageName);
 				
 				// Scan for sub pages
 				if( 
@@ -591,6 +598,8 @@ public class PagesBuilderCore {
 				) {
 					// ignoring certain reserved folders
 				} else {
+					// Build the page
+					buildAndOutputPage(rawPageName+subPageName);
 					// Recursive iterate
 					res = buildPageFolder(rawPageName+subPageName+"/") || true;
 				}

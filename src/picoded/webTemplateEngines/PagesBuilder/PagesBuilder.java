@@ -125,7 +125,7 @@ public class PagesBuilder extends PagesBuilderCore {
 	public void processPageBuilderServlet(BasePage page, String[] requestWildcardUri) {
 		try {
 			if (requestWildcardUri == null) {
-				requestWildcardUri = new String[] { "" };
+				requestWildcardUri = new String[] {};
 			}
 			
 			// Load base page name (developer mode rebuilds an entire sub-dir, to optimize in future?)
@@ -134,43 +134,60 @@ public class PagesBuilder extends PagesBuilderCore {
 				basePageName = requestWildcardUri[0];
 			}
 			
-			boolean isDeveloperMode = (page.JConfig().getBoolean("developersMode.enabled", true) && page.JConfig()
-				.getBoolean("developersMode.PagesBuilder", true));
-			if (isDeveloperMode) {
-				String itemName = "index.html";
+			String itemName = "index.html";
+			// Check if there is an item request
+			if( requestWildcardUri.length >= 2 ) {
 				String suffixName = requestWildcardUri[ requestWildcardUri.length - 1 ];
-				
-				// Check if there is an item request
 				if( suffixName.indexOf(".") > 0 ) {
 					itemName = suffixName; //Update as item name
 				}
+			}
+				
+			boolean isDeveloperMode = (page.JConfig().getBoolean("developersMode.enabled", true) && page.JConfig()
+				.getBoolean("developersMode.PagesBuilder", true));
+			if (isDeveloperMode) {
 				
 				PagesBuilder servletPagesBuilder = page.PagesBuilder();
 				
 				// Load the respective page, only on main page load
-				if (itemName.equals("index.html") && servletPagesBuilder.hasPageFolder(basePageName)) {
-					servletPagesBuilder.buildPageFolder_includingSelf(basePageName);
+				if (itemName.equals("index.html") && servletPagesBuilder.hasPageFolder(basePageName+"/")) {
+					servletPagesBuilder.buildPageFolder_includingSelf(basePageName+"/");
 					
 					// Build index / common, skip if its a duplicate build request
-					if( !basePageName.equalsIgnoreCase("index") ) {
-						servletPagesBuilder.buildPageFolder_includingSelf("index");
+					if( !basePageName.equalsIgnoreCase("index") && servletPagesBuilder.hasPageFolder("index") ) {
+						servletPagesBuilder.buildAndOutputPage("index");
 					}
-					if( !basePageName.equalsIgnoreCase("common") ) {
-						servletPagesBuilder.buildPageFolder_includingSelf("common");
+					if( !basePageName.equalsIgnoreCase("common") && servletPagesBuilder.hasPageFolder("common") ) {
+						servletPagesBuilder.buildAndOutputPage("common");
 					}
 				}
 			}
 			
 			String reqStr = String.join("/", requestWildcardUri);
-			// Security measure?
-			// if( reqStr != null && reqStr.contains("/tmp") ) {
-			// 	// 404 error if file not found
-			// 	page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
-			// 	return;
-			// }
+			if(reqStr == null) {
+				reqStr = "";
+			}
+			if(!reqStr.endsWith(itemName)) {
+				reqStr = reqStr + "/" + itemName;
+			}
+			String reqStr_lowerCase = reqStr.toLowerCase();
 			
-			if (reqStr == null || reqStr.isEmpty()) {
+			// Security measure? against possible tmp folder access
+			if( reqStr_lowerCase.contains("/tmp") || reqStr_lowerCase.contains("/web-inf")  ) {
 				// 404 error if file not found
+				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
+				return;
+			}
+			
+			if (reqStr.isEmpty()) {
+				// 404 error if file not found
+				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
+				return;
+			}
+			
+			File requestedFile = (new File(page.getPagesOutputPath(), reqStr));
+			if( !requestedFile.exists() || requestedFile.isDirectory() ) {
+				// 404 error if file does not exists
 				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
 				return;
 			}

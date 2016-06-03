@@ -100,7 +100,7 @@ public class AccountLogin_test {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void loginTest() {
+	public void loginTest() throws InterruptedException {
 
 		// Setup user
 		AccountObject testUser = accTable.newObject("the-root");
@@ -121,7 +121,7 @@ public class AccountLogin_test {
 				+ " -> ", responseMap.get("error"));
 		assertNull(responseMap.get("accountID"));
 		assertNull(responseMap.get("accountNames"));
-
+		Thread.sleep(3 * 1000);
 		// Correct login attempt
 		// ---------------------------------------
 		cred.put("accountPass", new String[] { "is-sudo" }); // correct password
@@ -185,7 +185,7 @@ public class AccountLogin_test {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void passwordChange() {
+	public void passwordChange() throws InterruptedException {
 
 		// Setup user
 		// ---------------------------------------
@@ -261,6 +261,7 @@ public class AccountLogin_test {
 
 		// Login after change, new password
 		// ---------------------------------------
+		Thread.sleep(3 * 1000);
 		cred.put("accountPass", new String[] { "is-brand-NEW-world-1" });
 		cred.put("accountName", new String[] { "the-changing-user" });
 
@@ -499,7 +500,7 @@ public class AccountLogin_test {
 		assertNotNull(responseMap = response.toMap());
 		Map<String, Object> userMeta = (Map<String, Object>) responseMap
 				.get("meta");
-		assertEquals("admin", userMeta.get("role"));
+		assertEquals("guest", userMeta.get("role"));
 
 		// now do a post to change it to guest
 		paramsMap = new HashMap<String, String[]>();
@@ -522,7 +523,7 @@ public class AccountLogin_test {
 				+ groupBObj._oid(), paramsMap, cookieJar, null);
 		assertNotNull(responseMap = response.toMap());
 		userMeta = (Map<String, Object>) responseMap.get("meta");
-		assertEquals("admin", userMeta.get("role"));
+		assertEquals("guest", userMeta.get("role"));
 	}
 
 	private AccountObject getUser(String userName) {

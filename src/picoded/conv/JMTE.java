@@ -102,7 +102,7 @@ public class JMTE {
 		if (fullTimeFormat == null) {
 			fullTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz"); //Date format
 		}
-		fullTimeFormat.setTimeZone(unixTimeAssumedTimeZone);
+		fullTimeFormat.setTimeZone(TimeZone.getTimeZone(String.valueOf(unixTimeAssumedTimeZone)));
 		
 		return "" + fullTimeFormat.format(new Date(unixSeconds * 1000L));
 	}
@@ -113,7 +113,7 @@ public class JMTE {
 		if (displayTimeFormat == null) {
 			displayTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm"); //Date format
 		}
-		displayTimeFormat.setTimeZone(unixTimeAssumedTimeZone);
+		displayTimeFormat.setTimeZone(TimeZone.getTimeZone(String.valueOf(unixTimeAssumedTimeZone)));
 		
 		return "" + displayTimeFormat.format(new Date(unixSeconds * 1000L));
 	}
@@ -342,5 +342,4 @@ public class JMTE {
 			}
 		}
 	}
-	
 }

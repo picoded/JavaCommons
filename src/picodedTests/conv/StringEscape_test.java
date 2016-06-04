@@ -1,8 +1,8 @@
 package picodedTests.conv;
 
-import static org.junit.Assert.*;
-import org.junit.After;
-import org.junit.Before;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Test;
 
 import picoded.conv.StringEscape;
@@ -16,4 +16,21 @@ public class StringEscape_test {
 		assertEquals("qwe abc+xyz", StringEscape.decodeURI("qwe+abc%2Bxyz"));
 	}
 	
+	@Test
+	public void testEscapeHtml() {
+		String str = "A 'quote' is <b>bold</b>";
+		String encodedStr = null;
+		
+		assertNotNull(encodedStr = StringEscape.escapeHtml(str));
+		
+		assertEquals(encodedStr, StringEscape.escapeHtml(str));
+		assertEquals(str, StringEscape.unescapeHtml(encodedStr));
+		
+		assertNotNull(encodedStr = StringEscape.escapeCsv(str));
+		assertEquals(encodedStr, StringEscape.escapeCsv(str));
+		assertEquals(str, StringEscape.unescapeCsv(encodedStr));
+		
+		str = "I didn't  say \"you to run!\"";
+		assertNotNull(encodedStr = StringEscape.escapeCsv(str));
+	}
 }

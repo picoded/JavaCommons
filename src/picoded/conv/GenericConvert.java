@@ -152,7 +152,6 @@ public class GenericConvert {
 		
 		if (input instanceof String && ((String) input).length() > 0) {
 			//Numeric string conversion
-			String s = ((String) input);
 			
 			try {
 				BigDecimal bd = new BigDecimal(((String) input));

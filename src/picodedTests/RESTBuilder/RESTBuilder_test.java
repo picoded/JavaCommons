@@ -8,12 +8,9 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 // Test case config
-import picodedTests.TestConfig;
-import picodedTests.JCache.LocalCacheSetup;
 
 // Various utility includes
 import java.util.*;
-import java.lang.reflect.*;
 
 public class RESTBuilder_test {
 	
@@ -80,7 +77,7 @@ public class RESTBuilder_test {
 	@Test
 	public void jsScript() {
 		String blankScript = restObj.generateJS("rest", "");
-		assertTrue(blankScript.indexOf("var rest") >= 0);
+		assertTrue(blankScript.indexOf("rest") >= 0);
 		
 		restObj.getNamespace("hello.world").put(RESTBuilder.RequestTypeSet.GET, helloFunction);
 		assertTrue(restObj.hasNamespace("hello/world"));
@@ -93,7 +90,7 @@ public class RESTBuilder_test {
 		
 		// Generates the new script
 		String generatedScript = restObj.generateJS("REST", "/api/v1");
-		assertTrue(generatedScript.indexOf("var REST") >= 0);
+		assertTrue(generatedScript.indexOf("REST") >= 0);
 		assertTrue(generatedScript.indexOf("hello/world") >= 0);
 		assertTrue(generatedScript.indexOf("/api/v1") >= 0);
 		

@@ -1,18 +1,20 @@
 package picodedTests.conv;
 
 // Target test class
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.RandomUtils;
+import org.junit.After;
+// Test Case include
+import org.junit.Before;
+import org.junit.Test;
+
 import picoded.conv.Base62;
 import picoded.conv.BaseX;
-
-// Test Case include
-import org.junit.*;
-import static org.junit.Assert.*;
-
 // Classes used in test case
-import java.util.HashMap;
-import java.util.ArrayList;
-import org.apache.commons.lang3.RandomUtils;
-import org.apache.commons.codec.binary.Base64;
 
 ///
 /// Test Case for picoded.struct.CaseInsensitiveHashMap
@@ -31,9 +33,9 @@ public class Base62_test {
 		
 	}
 	
-	///
-	/// Test bit to string length converters
-	///
+	// /
+	// / Test bit to string length converters
+	// /
 	@Test
 	public void base8_specific() {
 		BaseX b = null;
@@ -102,9 +104,8 @@ public class Base62_test {
 		
 		// raw byteArray to encode
 		byte[] byteArr = ("Hello World!").getBytes();
-		int byteLen = byteArr.length;
 		
-		//encodeBase64String
+		// encodeBase64String
 		String b64str = null;
 		String bXstr = null;
 		
@@ -124,12 +125,12 @@ public class Base62_test {
 		
 		// min, max
 		// (2^8)^12 / (64^16) = 1
-		int byteLen = 12; //RandomUtils.nextInt(1, 20);
+		int byteLen = 12; // RandomUtils.nextInt(1, 20);
 		
 		// raw byteArray to encode
 		byte[] byteArr = RandomUtils.nextBytes(byteLen);
 		
-		//encodeBase64String
+		// encodeBase64String
 		String b64str = null;
 		String bXstr = null;
 		
@@ -164,18 +165,18 @@ public class Base62_test {
 		}
 	}
 	
-	///
-	/// Test charset
-	///
+	// /
+	// / Test charset
+	// /
 	@Test
 	public void charset() {
 		assertEquals(62, Base62.defaultCharSet.length());
 		assertEquals(Base62.defaultCharSet, (new Base62()).charset());
 	}
 	
-	///
-	/// random base conversion charset
-	///
+	// /
+	// / random base conversion charset
+	// /
 	@Test
 	public void encodeAndDecodeOnce() {
 		// min, max

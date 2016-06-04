@@ -9,14 +9,14 @@ package picoded.conv;
 /// Alternate character sets can be specified when constructing the object.
 public class Base62 extends BaseX {
 	
-	/// Default charset value
+	// / Default charset value
 	public final static String defaultCharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	
-	//---------------------------------
+	// ---------------------------------
 	// Object instance functions
-	//---------------------------------
+	// ---------------------------------
 	
-	/// Defaultconstructor, use default charset
+	// / Defaultconstructor, use default charset
 	public Base62() {
 		super(defaultCharSet);
 	}
@@ -28,7 +28,7 @@ public class Base62 extends BaseX {
 		}
 	}
 	
-	/// Self refencing static copy
+	// / Self refencing static copy
 	public final static Base62 obj = new Base62();
 	
 }

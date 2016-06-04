@@ -1,16 +1,18 @@
 package picodedTests.conv;
 
 // Target test class
-import picoded.conv.GenericConvert;
-import picoded.conv.ConvertJSON;
-import picoded.conv.GUID;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 // Test Case include
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import picoded.conv.ConvertJSON;
+import picoded.conv.GUID;
+import picoded.conv.GenericConvert;
 
 // Classes used in test case
 
@@ -60,6 +62,7 @@ public class GenericConvert_test {
 	
 	@Test
 	public void toLongTest() {
+		System.out.println(GenericConvert.toLong(null, 1l));
 		assertEquals(1l, GenericConvert.toLong(null, 1l));
 		assertEquals(2l, GenericConvert.toLong(2l, 1l));
 		assertEquals(3l, GenericConvert.toLong(3l));

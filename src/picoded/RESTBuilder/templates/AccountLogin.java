@@ -375,7 +375,7 @@ public class AccountLogin extends BasePage {
 	/// ## HTTP Request Parameters
 	///
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name | Variable Type	   | Description                                                                   |
+	/// | Parameter Name | Variable Type      | Description                                                                   |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | No parameters options                                                                                               |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
@@ -383,7 +383,7 @@ public class AccountLogin extends BasePage {
 	/// ## JSON Object Output Parameters
 	///
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name | Variable Type	   | Description                                                                   |
+	/// | Parameter Name | Variable Type      | Description                                                                   |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | logout         | boolean            | indicator if logout is successful or not                                      |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
@@ -554,14 +554,14 @@ public class AccountLogin extends BasePage {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | accountID       | String(optional)   | Account id of info to get. If blank, assume current user.                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
-	/// |                |                    | are returned as well.                                                         |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                 |                    | are returned as well.                                                         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	    | Description                                                                  |
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | accountID       | String             | account ID used                                                               |
 	/// | accountNames    | String[]           | array of account names representing the account                               | sanitise

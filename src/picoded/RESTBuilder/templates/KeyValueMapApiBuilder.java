@@ -138,7 +138,7 @@ public class KeyValueMapApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | map          | Map<String, String>| Returns current mappings                                                      |
+	/// | map             | Map<String, String>| Returns current mappings                                                      |
 	/// | error           | String             | Errors, if any                                                                |
 	/// | exceptionMsg    | String             | Exception message, if any                                                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+

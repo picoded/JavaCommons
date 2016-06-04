@@ -18,20 +18,19 @@ public class StringEscape_test {
 	
 	@Test
 	public void testEscapeHtml() {
-        String str = "A 'quote' is <b>bold</b>";
-        String encodedStr = null;
-        
-        assertNotNull(encodedStr = StringEscape.escapeHtml(str));
-        
-        assertEquals(encodedStr, StringEscape.escapeHtml(str));
-        assertEquals(str, StringEscape.unescapeHtml(encodedStr));
-        
-        
-        assertNotNull(encodedStr = StringEscape.escapeCsv(str));
-        assertEquals(encodedStr, StringEscape.escapeCsv(str));
-        assertEquals(str, StringEscape.unescapeCsv(encodedStr));
-        
-        str = "I didn't  say \"you to run!\"";
-        assertNotNull(encodedStr = StringEscape.escapeCsv(str));
-    }
+		String str = "A 'quote' is <b>bold</b>";
+		String encodedStr = null;
+		
+		assertNotNull(encodedStr = StringEscape.escapeHtml(str));
+		
+		assertEquals(encodedStr, StringEscape.escapeHtml(str));
+		assertEquals(str, StringEscape.unescapeHtml(encodedStr));
+		
+		assertNotNull(encodedStr = StringEscape.escapeCsv(str));
+		assertEquals(encodedStr, StringEscape.escapeCsv(str));
+		assertEquals(str, StringEscape.unescapeCsv(encodedStr));
+		
+		str = "I didn't  say \"you to run!\"";
+		assertNotNull(encodedStr = StringEscape.escapeCsv(str));
+	}
 }

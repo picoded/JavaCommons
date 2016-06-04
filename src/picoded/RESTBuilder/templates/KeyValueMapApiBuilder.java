@@ -9,13 +9,13 @@ import picoded.conv.ConvertJSON;
 import picoded.enums.HttpRequestType;
 
 public class KeyValueMapApiBuilder {
-
+	
 	private Map<String, String> _keyValueMap;
-
+	
 	public KeyValueMapApiBuilder(Map<String, String> inMap) {
 		_keyValueMap = inMap;
 	}
-
+	
 	// /
 	// / # getValue (GET)
 	// /
@@ -49,20 +49,20 @@ public class KeyValueMapApiBuilder {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
-
+		
 		// Get given key
 		String key = req.getString("key", "");
 		if (key.isEmpty()) {
 			res.put("error", "No key was supplied");
 			return res;
 		}
-
+		
 		// Add found value to map
 		res.put("value", _keyValueMap.get(key));
-
+		
 		return res;
 	};
-
+	
 	// /
 	// / # getValues (GET)
 	// /
@@ -97,36 +97,35 @@ public class KeyValueMapApiBuilder {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
-
+		
 		String[] keys = req.getStringArray("keys", null);
 		if (keys == null) {
 			res.put("error", "No key array was supplied");
 			return res;
 		}
-
+		
 		if (keys.length < 1) {
 			res.put("error", "Key array supplied was empty");
 			return res;
 		}
-
+		
 		Map<String, String> valueMap = new HashMap<String, String>();
-
+		
 		try {
 			for (String key : keys) {
 				valueMap.put(key, _keyValueMap.get(key));
 			}
 		} catch (Exception ex) {
-			res.put("error",
-					"An error occured while iterating and getting/setting values");
+			res.put("error", "An error occured while iterating and getting/setting values");
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
 		}
-
+		
 		res.put("values", valueMap);
-
+		
 		return res;
 	};
-
+	
 	// /
 	// / # setValue (POST)
 	// /
@@ -164,21 +163,20 @@ public class KeyValueMapApiBuilder {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
-
+		
 		String key = req.getString("key", "");
 		if (key.isEmpty()) {
 			res.put("error", "No key was supplied");
 			return res;
 		}
-
+		
 		boolean allowEmptyValue = req.getBoolean("allowEmptyValue", false);
 		String value = req.getString("value", "");
 		if (value.isEmpty() && !allowEmptyValue) {
-			res.put("error",
-					"An empty value was supplied, and allowEmptyValue is false");
+			res.put("error", "An empty value was supplied, and allowEmptyValue is false");
 			return res;
 		}
-
+		
 		try {
 			_keyValueMap.put(key, value);
 		} catch (Exception ex) {
@@ -186,12 +184,12 @@ public class KeyValueMapApiBuilder {
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
 		}
-
+		
 		res.put("map", _keyValueMap);
-
+		
 		return res;
 	};
-
+	
 	// /
 	// / # setValues (POST)
 	// /
@@ -228,13 +226,13 @@ public class KeyValueMapApiBuilder {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
-
+		
 		Object keyValues_raw = req.get("keyValues");
 		if (keyValues_raw == null) {
 			res.put("error", "No keyValues map was supplied");
 			return res;
 		}
-
+		
 		Map<String, Object> keyValues = null;
 		try {
 			if (keyValues_raw instanceof String) {
@@ -245,7 +243,7 @@ public class KeyValueMapApiBuilder {
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
 		}
-
+		
 		boolean allowEmptyValue = req.getBoolean("allowEmptyValue", false);
 		try {
 			for (String key : keyValues.keySet()) {
@@ -259,17 +257,16 @@ public class KeyValueMapApiBuilder {
 				}
 			}
 		} catch (Exception ex) {
-			res.put("error",
-					"An error occured while trying to iterate and set values");
+			res.put("error", "An error occured while trying to iterate and set values");
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
 		}
-
+		
 		res.put("map", _keyValueMap);
-
+		
 		return res;
 	};
-
+	
 	// /
 	// / # deleteValue (POST)
 	// /
@@ -304,13 +301,13 @@ public class KeyValueMapApiBuilder {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
-
+		
 		String key = req.getString("key", "");
 		if (key.isEmpty()) {
 			res.put("error", "An empty key was supplied");
 			return res;
 		}
-
+		
 		try {
 			_keyValueMap.remove(key);
 		} catch (Exception ex) {
@@ -318,12 +315,12 @@ public class KeyValueMapApiBuilder {
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
 		}
-
+		
 		res.put("map", _keyValueMap);
-
+		
 		return res;
 	};
-
+	
 	// /
 	// / # deleteValues (POST)
 	// /
@@ -358,18 +355,18 @@ public class KeyValueMapApiBuilder {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
-
+		
 		String[] keys = req.getStringArray("keys", null);
 		if (keys == null) {
 			res.put("error", "No key array was supplied");
 			return res;
 		}
-
+		
 		if (keys.length < 1) {
 			res.put("error", "Key array supplied was empty");
 			return res;
 		}
-
+		
 		try {
 			for (String key : keys) {
 				if (_keyValueMap.containsKey(key)) {
@@ -377,17 +374,16 @@ public class KeyValueMapApiBuilder {
 				}
 			}
 		} catch (Exception ex) {
-			res.put("error",
-					"An error occured while iterating and deleting mappings");
+			res.put("error", "An error occured while iterating and deleting mappings");
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
 		}
-
+		
 		res.put("map", _keyValueMap);
-
+		
 		return res;
 	};
-
+	
 	// /
 	// / # getMap (GET)
 	// /
@@ -419,44 +415,38 @@ public class KeyValueMapApiBuilder {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
-
+		
 		res.put("map", _keyValueMap);
-
+		
 		return res;
 	};
-
+	
 	// ///////////////////////////////////////////
 	//
 	// RestBuilder template builder
 	//
 	// ///////////////////////////////////////////
-
+	
 	// /
 	// / Takes the restbuilder and implements its respective default API
 	// /
 	public RESTBuilder setupRESTBuilder(RESTBuilder rb, String setPrefix) {
-
+		
 		// Get entire mapping
 		rb.getNamespace(setPrefix + "getMap").put(HttpRequestType.GET, getMap);
-
+		
 		// Get values
-		rb.getNamespace(setPrefix + "getValue").put(HttpRequestType.GET,
-				getValue);
-		rb.getNamespace(setPrefix + "getValues").put(HttpRequestType.GET,
-				getValues);
-
+		rb.getNamespace(setPrefix + "getValue").put(HttpRequestType.GET, getValue);
+		rb.getNamespace(setPrefix + "getValues").put(HttpRequestType.GET, getValues);
+		
 		// Set values
-		rb.getNamespace(setPrefix + "setValue").put(HttpRequestType.POST,
-				setValue);
-		rb.getNamespace(setPrefix + "setValues").put(HttpRequestType.POST,
-				setValues);
-
+		rb.getNamespace(setPrefix + "setValue").put(HttpRequestType.POST, setValue);
+		rb.getNamespace(setPrefix + "setValues").put(HttpRequestType.POST, setValues);
+		
 		// Delete mappings
-		rb.getNamespace(setPrefix + "deleteValue").put(HttpRequestType.POST,
-				deleteValue);
-		rb.getNamespace(setPrefix + "deleteValues").put(HttpRequestType.POST,
-				deleteValues);
-
+		rb.getNamespace(setPrefix + "deleteValue").put(HttpRequestType.POST, deleteValue);
+		rb.getNamespace(setPrefix + "deleteValues").put(HttpRequestType.POST, deleteValues);
+		
 		return rb;
 	}
 }

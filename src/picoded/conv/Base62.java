@@ -8,28 +8,27 @@ package picoded.conv;
 ///
 /// Alternate character sets can be specified when constructing the object.
 public class Base62 extends BaseX {
-
+	
 	// / Default charset value
 	public final static String defaultCharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
+	
 	// ---------------------------------
 	// Object instance functions
 	// ---------------------------------
-
+	
 	// / Defaultconstructor, use default charset
 	public Base62() {
 		super(defaultCharSet);
 	}
-
+	
 	public Base62(String customCharset) {
 		super(customCharset);
 		if (customCharset.length() != 62) {
-			throw new IllegalArgumentException(
-					"Charset string length, must be 62. This is base62 after all my friend.");
+			throw new IllegalArgumentException("Charset string length, must be 62. This is base62 after all my friend.");
 		}
 	}
-
+	
 	// / Self refencing static copy
 	public final static Base62 obj = new Base62();
-
+	
 }

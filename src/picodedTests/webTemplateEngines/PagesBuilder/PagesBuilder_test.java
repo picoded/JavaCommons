@@ -103,7 +103,8 @@ public class PagesBuilder_test {
 		pages.buildAndOutputPage("nested/page");
 		
 		// Check asset folder
-		assertTrue( FileUtils.readFileToString(new File(outputTestDir + "nested/page/index.html")).indexOf("Hello pageFrame_nested_page") > 0 );
+		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "nested/page/index.html")).indexOf(
+			"Hello pageFrame_nested_page") > 0);
 	}
 	
 	@Test
@@ -112,7 +113,9 @@ public class PagesBuilder_test {
 		pages.buildAllPages();
 		
 		// Check asset folder
-		assertTrue( FileUtils.readFileToString(new File(outputTestDir + "nested/page/index.html")).indexOf("Hello pageFrame_nested_page") > 0 );
-		assertTrue( FileUtils.readFileToString(new File(outputTestDir + "nested/two/page/index.html")).indexOf("Hello pageFrame_nested_two_page") > 0 );
+		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "nested/page/index.html")).indexOf(
+			"Hello pageFrame_nested_page") > 0);
+		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "nested/two/page/index.html")).indexOf(
+			"Hello pageFrame_nested_two_page") > 0);
 	}
 }

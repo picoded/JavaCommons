@@ -252,35 +252,31 @@ public class RESTBuilder {
 	/// @params  namespace as array
 	/// @params  namespace object to add
 	///
-	protected void setupNamespaceInTree(Map<String,Object> tree, String[] names, RESTNamespace obj) {
-		if( names == null || names.length == 0 ) {
+	protected void setupNamespaceInTree(Map<String, Object> tree, String[] names, RESTNamespace obj) {
+		if (names == null || names.length == 0) {
 			/// Add in a boolean flag for the respective method
-			for(HttpRequestType type : HttpRequestType.values()) {
-				if( obj.get(type) != null ) {
-					tree.put( type.toString().toUpperCase(), Boolean.TRUE );
+			for (HttpRequestType type : HttpRequestType.values()) {
+				if (obj.get(type) != null) {
+					tree.put(type.toString().toUpperCase(), Boolean.TRUE);
 				}
 			}
 		} else {
 			String item = names[0];
 			String[] subnames = ArraySlice.strings(names, 1);
 			
-			if( //
-				item.equalsIgnoreCase("post") || 
-				item.equalsIgnoreCase("get") || 
-				item.equalsIgnoreCase("put") || 
-				item.equalsIgnoreCase("delete") || 
-				item.equalsIgnoreCase("update") 
-				) {
-				throw new RuntimeException("Protected restnamespace key name used: "+item);
+			if ( //
+			item.equalsIgnoreCase("post") || item.equalsIgnoreCase("get") || item.equalsIgnoreCase("put")
+				|| item.equalsIgnoreCase("delete") || item.equalsIgnoreCase("update")) {
+				throw new RuntimeException("Protected restnamespace key name used: " + item);
 			}
 			@SuppressWarnings("unchecked")
-			Map<String,Object> subtree = (Map<String,Object>)(tree.get( item ));
-			if( subtree == null ) {
+			Map<String, Object> subtree = (Map<String, Object>) (tree.get(item));
+			if (subtree == null) {
 				subtree = new RESTNamespaceTree();
-				tree.put( item, subtree );
+				tree.put(item, subtree);
 			}
 			
-			setupNamespaceInTree( subtree, subnames, obj );
+			setupNamespaceInTree(subtree, subnames, obj);
 		}
 	}
 	
@@ -290,10 +286,10 @@ public class RESTBuilder {
 	/// @returns  A json like structure of the API, where the respective POST/GET/etc methods, 
 	///           are marked with boolean TRUE
 	///
-	public Map<String,Object> namespaceTree() {
-		Map<String,Object> ret = new HashMap<String,Object>();
+	public Map<String, Object> namespaceTree() {
+		Map<String, Object> ret = new HashMap<String, Object>();
 		for (Map.Entry<String, RESTNamespace> entry : namespaceMap.entrySet()) {
-			setupNamespaceInTree( ret, entry.getKey().split("."), entry.getValue() );
+			setupNamespaceInTree(ret, entry.getKey().split("."), entry.getValue());
 		}
 		return ret;
 	}

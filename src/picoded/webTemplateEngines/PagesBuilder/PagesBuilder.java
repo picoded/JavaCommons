@@ -130,19 +130,19 @@ public class PagesBuilder extends PagesBuilderCore {
 			
 			// Load base page name (developer mode rebuilds an entire sub-dir, to optimize in future?)
 			String basePageName = "index";
-			if(requestWildcardUri.length >= 1 && requestWildcardUri[0].length() > 0) {
+			if (requestWildcardUri.length >= 1 && requestWildcardUri[0].length() > 0) {
 				basePageName = requestWildcardUri[0];
 			}
 			
 			String itemName = "index.html";
 			// Check if there is an item request
-			if( requestWildcardUri.length >= 2 ) {
-				String suffixName = requestWildcardUri[ requestWildcardUri.length - 1 ];
-				if( suffixName.indexOf(".") > 0 ) {
+			if (requestWildcardUri.length >= 2) {
+				String suffixName = requestWildcardUri[requestWildcardUri.length - 1];
+				if (suffixName.indexOf(".") > 0) {
 					itemName = suffixName; //Update as item name
 				}
 			}
-				
+			
 			boolean isDeveloperMode = (page.JConfig().getBoolean("developersMode.enabled", true) && page.JConfig()
 				.getBoolean("developersMode.PagesBuilder", true));
 			if (isDeveloperMode) {
@@ -150,30 +150,30 @@ public class PagesBuilder extends PagesBuilderCore {
 				PagesBuilder servletPagesBuilder = page.PagesBuilder();
 				
 				// Load the respective page, only on main page load
-				if (itemName.equals("index.html") && servletPagesBuilder.hasPageFolder(basePageName+"/")) {
-					servletPagesBuilder.buildPageFolder_includingSelf(basePageName+"/");
+				if (itemName.equals("index.html") && servletPagesBuilder.hasPageFolder(basePageName + "/")) {
+					servletPagesBuilder.buildPageFolder_includingSelf(basePageName + "/");
 					
 					// Build index / common, skip if its a duplicate build request
-					if( !basePageName.equalsIgnoreCase("index") && servletPagesBuilder.hasPageFolder("index") ) {
+					if (!basePageName.equalsIgnoreCase("index") && servletPagesBuilder.hasPageFolder("index")) {
 						servletPagesBuilder.buildAndOutputPage("index");
 					}
-					if( !basePageName.equalsIgnoreCase("common") && servletPagesBuilder.hasPageFolder("common") ) {
+					if (!basePageName.equalsIgnoreCase("common") && servletPagesBuilder.hasPageFolder("common")) {
 						servletPagesBuilder.buildAndOutputPage("common");
 					}
 				}
 			}
 			
 			String reqStr = String.join("/", requestWildcardUri);
-			if(reqStr == null) {
+			if (reqStr == null) {
 				reqStr = "";
 			}
-			if(!reqStr.endsWith(itemName)) {
+			if (!reqStr.endsWith(itemName)) {
 				reqStr = reqStr + "/" + itemName;
 			}
 			String reqStr_lowerCase = reqStr.toLowerCase();
 			
 			// Security measure? against possible tmp folder access
-			if( reqStr_lowerCase.contains("/tmp") || reqStr_lowerCase.contains("/web-inf")  ) {
+			if (reqStr_lowerCase.contains("/tmp") || reqStr_lowerCase.contains("/web-inf")) {
 				// 404 error if file not found
 				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
 				return;
@@ -186,7 +186,7 @@ public class PagesBuilder extends PagesBuilderCore {
 			}
 			
 			File requestedFile = (new File(page.getPagesOutputPath(), reqStr));
-			if( !requestedFile.exists() || requestedFile.isDirectory() ) {
+			if (!requestedFile.exists() || requestedFile.isDirectory()) {
 				// 404 error if file does not exists
 				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
 				return;

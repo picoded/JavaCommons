@@ -657,7 +657,7 @@ public class JSql_MetaTableUtils {
 			// Order by handling for metatype map
 			if (orderByObj != null) {
 				for (String keyName : orderByObj.getKeyNames()) {
-					if(!keyName.equalsIgnoreCase("oID")) {
+					if (!keyName.equalsIgnoreCase("oID")) {
 						if (!queryTypeMap.containsKey(keyName)) {
 							queryTypeMap.put(keyName, MetaType.STRING);
 						}

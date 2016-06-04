@@ -144,6 +144,8 @@ public class MetaTableApiBuilderTomcat_test {
 		assertNotNull(response);
 
 		Map<String, Object> resMap = response.toMap();
+		
+		@SuppressWarnings("unchecked")
 		List<List<String>> dataList = (List<List<String>>) resMap.get("data");
 		assertNotNull(dataList);
 

@@ -440,7 +440,7 @@ public class AccountLogin_test {
 		assertNotNull(responseMap = response.toMap());
 	}
 	
-	//@Test
+	@Test
 	@SuppressWarnings("unchecked")
 	public void members_meta_POST() {
 		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");

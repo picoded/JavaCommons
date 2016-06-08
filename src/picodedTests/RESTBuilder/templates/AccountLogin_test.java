@@ -36,7 +36,7 @@ public class AccountLogin_test {
 	protected static String testAddress = "http://127.0.0.1:15000";
 	protected static AccountTable accTable = null;
 	
-	@BeforeClass
+	//@BeforeClass
 	public static void serverSetUp() throws LifecycleException, IOException, JStackException {
 		if (tomcat == null) {
 			File webInfFile = new File("./test-files/tmp/WEB-INF");
@@ -69,7 +69,7 @@ public class AccountLogin_test {
 		}
 	}
 	
-	@AfterClass
+	//@AfterClass
 	public static void serverTearDown() throws LifecycleException, IOException {
 		if (tomcat != null) {
 			// tomcat.awaitServer(); //manual
@@ -84,7 +84,7 @@ public class AccountLogin_test {
 	ResponseHttp response;
 	Map<String, Object> responseMap;
 	
-	@Test
+	//@Test
 	public void noLoginTest() {
 		assertNotNull(response = RequestHttp.get(testAddress + "/api/account/login"));
 		assertNotNull(responseMap = response.toMap());

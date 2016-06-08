@@ -12,6 +12,10 @@
 	<dict>
 		<key>249EF405C9C3B13CA675E8943AEC9AEA1E50C113</key>
 		<string>http://54.255.137.161/picoded/javacommons.git</string>
+		<key>8FE2C8DA0FD68FAB45B13FDE9BCCDD23D60EB764</key>
+		<string>http://gitlab.picoded-dev.com/picoded/JavaCommons-ServletBase.git</string>
+		<key>D0183D352C0FF7E794D564C7856F5747878B8CE8</key>
+		<string>ec2-54-255-137-161.ap-southeast-1.compute.amazonaws.com:social-octet/servlet-dev.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>javacommons.xcodeproj</string>
@@ -19,6 +23,10 @@
 	<dict>
 		<key>249EF405C9C3B13CA675E8943AEC9AEA1E50C113</key>
 		<string>../..</string>
+		<key>8FE2C8DA0FD68FAB45B13FDE9BCCDD23D60EB764</key>
+		<string>../../../..</string>
+		<key>D0183D352C0FF7E794D564C7856F5747878B8CE8</key>
+		<string>../../../../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>http://54.255.137.161/picoded/javacommons.git</string>
@@ -28,6 +36,22 @@
 	<string>249EF405C9C3B13CA675E8943AEC9AEA1E50C113</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>8FE2C8DA0FD68FAB45B13FDE9BCCDD23D60EB764</string>
+			<key>IDESourceControlWCCName</key>
+			<string>..</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>D0183D352C0FF7E794D564C7856F5747878B8CE8</string>
+			<key>IDESourceControlWCCName</key>
+			<string>..</string>
+		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>

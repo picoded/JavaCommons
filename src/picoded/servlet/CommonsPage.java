@@ -200,6 +200,7 @@ public class CommonsPage extends BasePage {
 	@Override
 	public void restBuilderSetup(RESTBuilder rbObj) {
 		AccountLogin.setupRESTBuilder(rbObj, accountAuthTable(), "account.");
+		DevToolsApiBuilder.setupRESTBuilder(rbObj, "dev.");
 	}
 	
 	/// Does the actual final json object to json string output, with contentType "application/javascript"

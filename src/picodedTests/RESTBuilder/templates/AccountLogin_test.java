@@ -280,7 +280,7 @@ public class AccountLogin_test {
 		assertNotNull(responseMap.get("accountID"));
 	}
 	
-	//@Test
+	@Test
 	public void infoByID_test() {
 		// try to get info without logging in
 		response = RequestHttp.get(testAddress + "/api/account/info/id");
@@ -440,7 +440,7 @@ public class AccountLogin_test {
 		assertNotNull(responseMap = response.toMap());
 	}
 	
-	@Test
+	//@Test
 	@SuppressWarnings("unchecked")
 	public void members_meta_POST() {
 		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");

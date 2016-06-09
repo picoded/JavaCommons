@@ -267,7 +267,7 @@ public class RESTBuilder {
 			if ( //
 			item.equalsIgnoreCase("post") || item.equalsIgnoreCase("get") || item.equalsIgnoreCase("put")
 				|| item.equalsIgnoreCase("delete") || item.equalsIgnoreCase("update")) {
-				throw new RuntimeException("Protected restnamespace key name used: " + item);
+				throw new RuntimeException("Protected rest namespace key name used: " + item);
 			}
 			@SuppressWarnings("unchecked")
 			Map<String, Object> subtree = (Map<String, Object>) (tree.get(item));
@@ -289,7 +289,11 @@ public class RESTBuilder {
 	public Map<String, Object> namespaceTree() {
 		Map<String, Object> ret = new HashMap<String, Object>();
 		for (Map.Entry<String, RESTNamespace> entry : namespaceMap.entrySet()) {
-			setupNamespaceInTree(ret, entry.getKey().toString().split("(\\.|/)"), entry.getValue());
+			try {
+				setupNamespaceInTree(ret, entry.getKey().toString().split("(\\.|/)"), entry.getValue());
+			} catch(Exception e) {
+				throw new RuntimeException("Failed to process namespace key :"+entry.getKey()); 
+			}
 		}
 		return ret;
 	}

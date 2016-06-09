@@ -1710,7 +1710,7 @@ return resMap;
 		rb.getNamespace(setPrefix + "members/meta/*/*").put(HttpRequestType.POST, members_meta_POST);
 		
 		rb.getNamespace(setPrefix + "new").put(HttpRequestType.POST, new_account_POST);
-		rb.getNamespace(setPrefix + "delete").put(HttpRequestType.POST, delete_account_POST);
+		rb.getNamespace(setPrefix + "remove").put(HttpRequestType.POST, delete_account_POST);
 		
 		//MetaTableApiBuilder Fall through
 		rb.getNamespace(setPrefix + "meta/list").put(HttpRequestType.GET, list_GET_and_POST);
@@ -1721,8 +1721,8 @@ return resMap;
 		rb.getNamespace(setPrefix + "meta").put(HttpRequestType.GET, meta_GET);
 		rb.getNamespace(setPrefix + "meta").put(HttpRequestType.POST, meta_POST);
 		
-		rb.getNamespace(setPrefix + "delete").put(HttpRequestType.DELETE, meta_DELETE);
-		rb.getNamespace(setPrefix + "delete/*").put(HttpRequestType.DELETE, meta_DELETE);
+		rb.getNamespace(setPrefix + "remove").put(HttpRequestType.DELETE, meta_DELETE);
+		rb.getNamespace(setPrefix + "remove/*").put(HttpRequestType.DELETE, meta_DELETE);
 		//end fall through segment
 		
 		//csv_export

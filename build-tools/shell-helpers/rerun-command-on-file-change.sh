@@ -46,8 +46,8 @@ echo "";
 echo "Waiting for file change event inside : $scan_dir ";
 
 while true; do
-	fswatch -r -1 "$scan_dir" > /dev/null;
-	echo "Possible file changed detecting : running command .... ";
+	fswatch -r -1 "$scan_dir";
+	echo "(Possible file changed detected, running command)";
 	"$scriptDir/clear-screen-and-output-full-command.sh" "$cmd_to_run" "$workingDir"; 
 	echo "";
 	echo "Waiting for file change event inside : $scan_dir ";

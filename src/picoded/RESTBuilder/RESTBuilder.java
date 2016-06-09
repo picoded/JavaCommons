@@ -289,7 +289,7 @@ public class RESTBuilder {
 	public Map<String, Object> namespaceTree() {
 		Map<String, Object> ret = new HashMap<String, Object>();
 		for (Map.Entry<String, RESTNamespace> entry : namespaceMap.entrySet()) {
-			setupNamespaceInTree(ret, entry.getKey().split("."), entry.getValue());
+			setupNamespaceInTree(ret, entry.getKey().toString().split("(\\.|/)"), entry.getValue());
 		}
 		return ret;
 	}

@@ -36,38 +36,38 @@ public class AccountLogin_test {
 	protected static String testAddress = "http://127.0.0.1:15000";
 	protected static AccountTable accTable = null;
 	
-	//@BeforeClass
-//	public static void serverSetUp() throws LifecycleException, IOException, JStackException {
-//		if (tomcat == null) {
-//			File webInfFile = new File("./test-files/tmp/WEB-INF");
-//			
-//			if (webInfFile.listFiles() != null) {
-//				for (File file : webInfFile.listFiles()) {
-//					file.delete(); // to accommodate certain people who do not
-//					// use command line
-//				}
-//			}
-//			
-//			webInfFile.mkdir();
-//			
-//			File context = new File("./test-files/tmp");
-//			loginServlet = new AccountLogin();
-//			
-//			tomcat = new EmbeddedServlet("", context).withPort(15000)
-//				.withServlet("/api/account", "loginServlet1", loginServlet)
-//				.withServlet("/api/account/*", "loginServlet2", loginServlet);
-//			tomcat.start();
-//			
-//			// Setup servlet context path. This is required for the servlet
-//			// dependencies
-//			// to work through a test case. Before the actual request is called
-//			loginServlet._contextPath = "./test-files/tmp/";
-//			
-//			// Does the table and account setup
-//			accTable = loginServlet.accountAuthTable();
-//			accTable.systemSetup();
-//		}
-//	}
+	@BeforeClass
+	public static void serverSetUp() throws LifecycleException, IOException, JStackException {
+		if (tomcat == null) {
+			File webInfFile = new File("./test-files/tmp/WEB-INF");
+			
+			if (webInfFile.listFiles() != null) {
+				for (File file : webInfFile.listFiles()) {
+					file.delete(); // to accommodate certain people who do not
+					// use command line
+				}
+			}
+			
+			webInfFile.mkdir();
+			
+			File context = new File("./test-files/tmp");
+			loginServlet = new AccountLogin();
+			
+			tomcat = new EmbeddedServlet("", context).withPort(15000)
+				.withServlet("/api/account", "loginServlet1", loginServlet)
+				.withServlet("/api/account/*", "loginServlet2", loginServlet);
+			tomcat.start();
+			
+			// Setup servlet context path. This is required for the servlet
+			// dependencies
+			// to work through a test case. Before the actual request is called
+			loginServlet._contextPath = "./test-files/tmp/";
+			
+			// Does the table and account setup
+			accTable = loginServlet.accountAuthTable();
+			accTable.systemSetup();
+		}
+	}
 	
 	//@AfterClass
 //	public static void serverTearDown() throws LifecycleException, IOException {
@@ -576,7 +576,6 @@ public class AccountLogin_test {
 //		}
 //		
 //		return null;
-//	
-
+//	}
 	
 }

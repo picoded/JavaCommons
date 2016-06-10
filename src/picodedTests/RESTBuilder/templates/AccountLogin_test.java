@@ -84,14 +84,14 @@ public class AccountLogin_test {
 	ResponseHttp response;
 	Map<String, Object> responseMap;
 	
-	//@Test
-//	public void noLoginTest() {
-//		assertNotNull(response = RequestHttp.get(testAddress + "/api/account/login"));
-//		assertNotNull(responseMap = response.toMap());
-//		assertNull("Full map string of error: " + responseMap.toString() + " -> ", responseMap.get("error"));
-//		assertNull(responseMap.get("accountID"));
-//		assertNull(responseMap.get("accountNames"));
-//	}
+	@Test
+	public void noLoginTest() {
+		assertNotNull(response = RequestHttp.get(testAddress + "/api/account/login"));
+		assertNotNull(responseMap = response.toMap());
+		assertNull("Full map string of error: " + responseMap.toString() + " -> ", responseMap.get("error"));
+		assertNull(responseMap.get("accountID"));
+		assertNull(responseMap.get("accountNames"));
+	}
 	
 	//@Test
 	//@SuppressWarnings("unchecked")

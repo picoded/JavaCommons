@@ -154,7 +154,7 @@ public class MetaTableApiBuilderTomcat_test {
 		assertTrue(contains);
 	}
 	
-	//@Test
+	@Test
 	public void meta_GET_test() {
 		String path = "http://127.0.0.1:15000/api/meta-test/get";
 		

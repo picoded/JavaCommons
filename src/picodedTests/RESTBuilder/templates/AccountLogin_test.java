@@ -281,38 +281,38 @@ public class AccountLogin_test {
 	}
 	
 	//@Test
-	public void infoByID_test() {
-		// try to get info without logging in
-		response = RequestHttp.get(testAddress + "/api/account/info/id");
-		assertNotNull(responseMap = response.toMap());
-		assertNull(responseMap.get("accountID"));
-		
-		// do login now
-		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");
-		testUser.setPassword("is-sudo");
-		
-		HashMap<String, String[]> cred = new HashMap<String, String[]>();
-		cred.put("accountName", new String[] { "the-root" });
-		cred.put("accountPass", new String[] { "is-sudo" });
-		
-		response = RequestHttp.post(testAddress + "/api/account/login/", cred);
-		assertNotNull(responseMap = response.toMap());
-		assertNotNull(responseMap.get("accountID"));
-		assertNotNull(responseMap.get("accountNames"));
-		
-		String userID = (String) responseMap.get("accountID");
-		
-		Map<String, String[]> cookieJar = null;
-		assertNotNull(cookieJar = response.cookiesMap());
-		
-		// reattempt data retrieval
-		HashMap<String, String[]> getParams = new HashMap<String, String[]>();
-		getParams.put("accountName", new String[] { "the-root" });
-		getParams.put("accountID", new String[] { userID });
-		response = RequestHttp.get(testAddress + "/api/account/info/id", getParams, cookieJar, null);
-		assertNotNull(responseMap = response.toMap());
-		assertNotNull(responseMap.get("accountID"));
-	}
+//	public void infoByID_test() {
+//		// try to get info without logging in
+//		response = RequestHttp.get(testAddress + "/api/account/info/id");
+//		assertNotNull(responseMap = response.toMap());
+//		assertNull(responseMap.get("accountID"));
+//		
+//		// do login now
+//		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");
+//		testUser.setPassword("is-sudo");
+//		
+//		HashMap<String, String[]> cred = new HashMap<String, String[]>();
+//		cred.put("accountName", new String[] { "the-root" });
+//		cred.put("accountPass", new String[] { "is-sudo" });
+//		
+//		response = RequestHttp.post(testAddress + "/api/account/login/", cred);
+//		assertNotNull(responseMap = response.toMap());
+//		assertNotNull(responseMap.get("accountID"));
+//		assertNotNull(responseMap.get("accountNames"));
+//		
+//		String userID = (String) responseMap.get("accountID");
+//		
+//		Map<String, String[]> cookieJar = null;
+//		assertNotNull(cookieJar = response.cookiesMap());
+//		
+//		// reattempt data retrieval
+//		HashMap<String, String[]> getParams = new HashMap<String, String[]>();
+//		getParams.put("accountName", new String[] { "the-root" });
+//		getParams.put("accountID", new String[] { userID });
+//		response = RequestHttp.get(testAddress + "/api/account/info/id", getParams, cookieJar, null);
+//		assertNotNull(responseMap = response.toMap());
+//		assertNotNull(responseMap.get("accountID"));
+//	}
 	
 	@Test
 	public void infoByID_test() {

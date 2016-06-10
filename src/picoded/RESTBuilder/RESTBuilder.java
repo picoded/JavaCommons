@@ -272,7 +272,7 @@ public class RESTBuilder {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> subtree = (Map<String, Object>) (tree.get(item));
 			if (subtree == null) {
-				subtree = new RESTNamespaceTree();
+				subtree = new HashMap<String, Object>();
 				tree.put(item, subtree);
 			}
 			

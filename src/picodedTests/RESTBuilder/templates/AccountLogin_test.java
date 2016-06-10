@@ -249,7 +249,7 @@ public class AccountLogin_test {
 		
 	}
 	
-	//@Test
+	@Test
 	public void infoByNameTest() {
 		// try to get info without logging in
 		response = RequestHttp.get(testAddress + "/api/account/info/name");
@@ -357,7 +357,7 @@ public class AccountLogin_test {
 		assertNotNull(responseMap);
 	}
 	
-	//@Test
+	@Test
 	@SuppressWarnings("unchecked")
 	public void members_list_POST() {
 		// do login now
@@ -420,7 +420,7 @@ public class AccountLogin_test {
 		assertNull(getUserFromGroupData("NewUserB", groupData));
 	}
 	
-	//@Test
+	@Test
 	public void members_meta_GET() {
 		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");
 		//		String userID = (String) responseMap.get("accountID");
@@ -440,7 +440,7 @@ public class AccountLogin_test {
 		assertNotNull(responseMap = response.toMap());
 	}
 	
-	//@Test
+	@Test
 	@SuppressWarnings("unchecked")
 	public void members_meta_POST() {
 		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");

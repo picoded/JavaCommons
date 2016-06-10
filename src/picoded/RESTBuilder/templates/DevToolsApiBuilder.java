@@ -45,7 +45,7 @@ public class DevToolsApiBuilder {
 	/// | data            | Object             | The object map that represents the API structure to return                    |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
-	public RESTFunction api_map_GET = (req, res) -> {
+	public RESTFunction api_tree_GET = (req, res) -> {
 		if (_builder == null) {
 			res.put("error", "RESTBuilder is null");
 			return res;
@@ -53,7 +53,7 @@ public class DevToolsApiBuilder {
 		
 		res.put("data", _builder.namespaceTree());
 		return res;
-	};
+	}; 
 
 	///
 	/// Takes the restbuilder and implements its respective default API
@@ -68,7 +68,7 @@ public class DevToolsApiBuilder {
 	
 	public static RESTBuilder setupRESTBuilder(RESTBuilder rb, DevToolsApiBuilder dev, String setPrefix) {
 		// Get entire mapping
-		rb.getNamespace(setPrefix + "api/map").put(HttpRequestType.GET, dev.api_map_GET);
+		rb.getNamespace(setPrefix + "api/tree").put(HttpRequestType.GET, dev.api_tree_GET);
 		
 		return rb;
 	}

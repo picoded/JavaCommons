@@ -194,19 +194,23 @@ public class PagesBuilderCore {
 	/// 3) The index folder (legacy support, do not use)
 	///
 	protected String getCommonPrefixOrSuffixHtml(String rawPageName, String fixType) {
+		return getCommonFile(rawPageName, fixType+".html");
+	}
+	
+	protected String getCommonFile(String rawPageName, String fileName) {
 		// Get from the rawPageName folder itself (v2)
 		String res = FileUtils.readFileToString_withFallback(
-			new File(pagesFolder, rawPageName + "/" + fixType + ".html"), "UTF-8", null);
+			new File(pagesFolder, rawPageName + "/" + fileName), "UTF-8", null);
 		
 		// Get from the common folder (v2)
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "common/" + fixType + ".html"), "UTF-8",
+			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "common/" + fileName), "UTF-8",
 				null);
 		}
 		
 		// Legacy support (v1) get from index folder
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "index/" + fixType + ".html"), "UTF-8",
+			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "index/" + fileName), "UTF-8",
 				null);
 		}
 		
@@ -353,7 +357,7 @@ public class PagesBuilderCore {
 		Map<String, Object> jmteVarMap) throws IOException {
 		if (input.exists() && input.isFile() && input.canRead()) {
 			// Gets its string value, and process only if not blank
-			String fileVal = FileUtils.readFileToString(input, "UTF-8");
+			String fileVal = FileUtils.readFileToString(input);
 			if ((fileVal = fileVal.trim()).length() > 0) {
 				
 				// Does a JMTE filter
@@ -365,10 +369,18 @@ public class PagesBuilderCore {
 					fileVal = "window.pageFrames = window.pageFrames || {}; window.pageFrames." + safePageName(rawPageName)
 						+ " = (" + fileVal + ");";
 				} else if (type == PageFileType.less_to_css) {
+					
+					/// Add the config .less file
+					String lessPrefix = getCommonFile(rawPageName, "prefix.less");
+					String lessSuffix = getCommonFile(rawPageName, "suffix.less");
+					
 					/// Does an outer wrap, if its not index page (which applies style to 'all')
 					if (!rawPageName.equalsIgnoreCase("index") && !rawPageName.equalsIgnoreCase("common")) {
-						fileVal = "." + pageFrameID(rawPageName) + " { \n" + fileVal + "\n } \n";
+						fileVal =  "." + pageFrameID(rawPageName) + " { \n" + fileVal + "\n } \n";
 					}
+					
+					// Ensure prefix, and suffix are added
+					fileVal = (lessPrefix + "\n" + fileVal + "\n" + lessSuffix).trim();
 					
 					// Less to css conversion
 					fileVal = less.compile(fileVal);
@@ -503,7 +515,7 @@ public class PagesBuilderCore {
 					// Skips injection if already included
 				} else {
 					injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='" + uriRootPrefix + "/"
-						+ rawPageName + "/" + pageName_safe + ".css'/>\n");
+						+ rawPageName + "/" + pageName_safe + ".css'></link>\n");
 				}
 			}
 			if (hasJsFile) {
@@ -511,7 +523,7 @@ public class PagesBuilderCore {
 					// Skips injection if already included
 				} else {
 					injectorStrBuilder.append("<script src='" + uriRootPrefix + "/" + rawPageName + "/" + pageName_safe
-						+ ".js'/>\n");
+						+ ".js'></script>\n");
 				}
 			}
 			if (hasJsonsFile) {
@@ -519,7 +531,7 @@ public class PagesBuilderCore {
 					// Skips injection if already included
 				} else {
 					injectorStrBuilder.append("<script src='" + uriRootPrefix + "/" + rawPageName + "/" + pageName_safe
-						+ ".jsons.js'/>\n");
+						+ ".jsons.js'></script>\n");
 				}
 			}
 			

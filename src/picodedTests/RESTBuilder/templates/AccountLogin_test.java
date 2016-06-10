@@ -248,120 +248,114 @@ public class AccountLogin_test {
 		assertEquals("the-changing-user", ((List<String>) (responseMap.get("accountNames"))).get(0));
 		
 	}
-//	
-//	//@Test
-//	public void infoByNameTest() {
-//		// try to get info without logging in
-//		response = RequestHttp.get(testAddress + "/api/account/info/name");
-//		assertNotNull(responseMap = response.toMap());
-//		assertNull(responseMap.get("accountID"));
-//		
-//		// do login now
-//		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");
-//		testUser.setPassword("is-sudo");
-//		
-//		HashMap<String, String[]> cred = new HashMap<String, String[]>();
-//		cred.put("accountName", new String[] { "the-root" });
-//		cred.put("accountPass", new String[] { "is-sudo" });
-//		
-//		response = RequestHttp.post(testAddress + "/api/account/login/", cred);
-//		assertNotNull(responseMap = response.toMap());
-//		assertNotNull(responseMap.get("accountID"));
-//		assertNotNull(responseMap.get("accountNames"));
-//		
-//		Map<String, String[]> cookieJar = null;
-//		assertNotNull(cookieJar = response.cookiesMap());
-//		
-//		// reattempt data retrieval
-//		HashMap<String, String[]> getParams = new HashMap<String, String[]>();
-//		getParams.put("accountName", new String[] { "the-root" });
-//		response = RequestHttp.get(testAddress + "/api/account/info/name/the-root", getParams, cookieJar, null);
-//		assertNotNull(responseMap = response.toMap());
-//		assertNotNull(responseMap.get("accountID"));
-//	}
 	
 	//@Test
-//	public void infoByID_test() {
-//		// try to get info without logging in
-//		response = RequestHttp.get(testAddress + "/api/account/info/id");
-//		assertNotNull(responseMap = response.toMap());
-//		assertNull(responseMap.get("accountID"));
-//		
-//		// do login now
-//		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");
-//		testUser.setPassword("is-sudo");
-//		
-//		HashMap<String, String[]> cred = new HashMap<String, String[]>();
-//		cred.put("accountName", new String[] { "the-root" });
-//		cred.put("accountPass", new String[] { "is-sudo" });
-//		
-//		response = RequestHttp.post(testAddress + "/api/account/login/", cred);
-//		assertNotNull(responseMap = response.toMap());
-//		assertNotNull(responseMap.get("accountID"));
-//		assertNotNull(responseMap.get("accountNames"));
-//		
-//		String userID = (String) responseMap.get("accountID");
-//		
-//		Map<String, String[]> cookieJar = null;
-//		assertNotNull(cookieJar = response.cookiesMap());
-//		
-//		// reattempt data retrieval
-//		HashMap<String, String[]> getParams = new HashMap<String, String[]>();
-//		getParams.put("accountName", new String[] { "the-root" });
-//		getParams.put("accountID", new String[] { userID });
-//		response = RequestHttp.get(testAddress + "/api/account/info/id", getParams, cookieJar, null);
-//		assertNotNull(responseMap = response.toMap());
-//		assertNotNull(responseMap.get("accountID"));
-//	}
+	public void infoByNameTest() {
+		// try to get info without logging in
+		response = RequestHttp.get(testAddress + "/api/account/info/name");
+		assertNotNull(responseMap = response.toMap());
+		assertNull(responseMap.get("accountID"));
+		
+		// do login now
+		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");
+		testUser.setPassword("is-sudo");
+		
+		HashMap<String, String[]> cred = new HashMap<String, String[]>();
+		cred.put("accountName", new String[] { "the-root" });
+		cred.put("accountPass", new String[] { "is-sudo" });
+		
+		response = RequestHttp.post(testAddress + "/api/account/login/", cred);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull(responseMap.get("accountID"));
+		assertNotNull(responseMap.get("accountNames"));
+		
+		Map<String, String[]> cookieJar = null;
+		assertNotNull(cookieJar = response.cookiesMap());
+		
+		// reattempt data retrieval
+		HashMap<String, String[]> getParams = new HashMap<String, String[]>();
+		getParams.put("accountName", new String[] { "the-root" });
+		response = RequestHttp.get(testAddress + "/api/account/info/name/the-root", getParams, cookieJar, null);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull(responseMap.get("accountID"));
+	}
 	
 	@Test
 	public void infoByID_test() {
-		int i =1;
-		assertEquals(1, i);
+		// try to get info without logging in
+		response = RequestHttp.get(testAddress + "/api/account/info/id");
+		assertNotNull(responseMap = response.toMap());
+		assertNull(responseMap.get("accountID"));
+		
+		// do login now
+		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");
+		testUser.setPassword("is-sudo");
+		
+		HashMap<String, String[]> cred = new HashMap<String, String[]>();
+		cred.put("accountName", new String[] { "the-root" });
+		cred.put("accountPass", new String[] { "is-sudo" });
+		
+		response = RequestHttp.post(testAddress + "/api/account/login/", cred);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull(responseMap.get("accountID"));
+		assertNotNull(responseMap.get("accountNames"));
+		
+		String userID = (String) responseMap.get("accountID");
+		
+		Map<String, String[]> cookieJar = null;
+		assertNotNull(cookieJar = response.cookiesMap());
+		
+		// reattempt data retrieval
+		HashMap<String, String[]> getParams = new HashMap<String, String[]>();
+		getParams.put("accountName", new String[] { "the-root" });
+		getParams.put("accountID", new String[] { userID });
+		response = RequestHttp.get(testAddress + "/api/account/info/id", getParams, cookieJar, null);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull(responseMap.get("accountID"));
 	}
 	
-	//@Test
-//	@SuppressWarnings("unchecked")
-//	public void members_list_GET() { // group get function
-//		// do login now
-//		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");
-//		String userID = (String) responseMap.get("accountID");
-//		
-//		Map<String, String[]> cookieJar = null;
-//		assertNotNull(cookieJar = response.cookiesMap());
-//		
-//		// create group and add testUser
-//		AccountObject groupAObj = getOrCreateGroup("GroupA");
-//		groupAObj.addMember(testUser, "admin");
-//		groupAObj.saveDelta();
-//		
-//		// reattempt data retrieval
-//		HashMap<String, String[]> getParams = new HashMap<String, String[]>();
-//		getParams.put("accountName", new String[] { "the-root" });
-//		getParams.put("accountID", new String[] { userID });
-//		getParams.put("headers", new String[] { "name", "_oid", "role" });
-//		
-//		response = RequestHttp.get(testAddress + "/api/account/members/list/" + groupAObj._oid(), getParams, cookieJar,
-//			null);
-//		assertNotNull(responseMap = response.toMap());
-//		Object obj = responseMap.get("data");
-//		assertNotNull(obj);
-//		
-//		List<List<Object>> groupData = (List<List<Object>>) obj;
-//		assertNotNull(groupData);
-//		assertNotNull(groupData.get(0));
-//		assertEquals("admin", groupData.get(0).get(2));
-//		
-//		// data retrieval second time
-//		getParams = new HashMap<String, String[]>();
-//		getParams.put("accountName", new String[] { "the-root" });
-//		getParams.put("accountID", new String[] { userID });
-//		String jsonArray = "[" + "\"" + groupAObj._oid() + "\"" + "]";
-//		getParams.put("insideGroup_any", new String[] { jsonArray });
-//		response = RequestHttp.post(testAddress + "/api/account/info/list", getParams, cookieJar, null);
-//		assertNotNull(responseMap = response.toMap());
-//		assertNotNull(responseMap);
-//	}
+	@Test
+	@SuppressWarnings("unchecked")
+	public void members_list_GET() { // group get function
+		// do login now
+		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");
+		String userID = (String) responseMap.get("accountID");
+		
+		Map<String, String[]> cookieJar = null;
+		assertNotNull(cookieJar = response.cookiesMap());
+		
+		// create group and add testUser
+		AccountObject groupAObj = getOrCreateGroup("GroupA");
+		groupAObj.addMember(testUser, "admin");
+		groupAObj.saveDelta();
+		
+		// reattempt data retrieval
+		HashMap<String, String[]> getParams = new HashMap<String, String[]>();
+		getParams.put("accountName", new String[] { "the-root" });
+		getParams.put("accountID", new String[] { userID });
+		getParams.put("headers", new String[] { "name", "_oid", "role" });
+		
+		response = RequestHttp.get(testAddress + "/api/account/members/list/" + groupAObj._oid(), getParams, cookieJar,
+			null);
+		assertNotNull(responseMap = response.toMap());
+		Object obj = responseMap.get("data");
+		assertNotNull(obj);
+		
+		List<List<Object>> groupData = (List<List<Object>>) obj;
+		assertNotNull(groupData);
+		assertNotNull(groupData.get(0));
+		assertEquals("admin", groupData.get(0).get(2));
+		
+		// data retrieval second time
+		getParams = new HashMap<String, String[]>();
+		getParams.put("accountName", new String[] { "the-root" });
+		getParams.put("accountID", new String[] { userID });
+		String jsonArray = "[" + "\"" + groupAObj._oid() + "\"" + "]";
+		getParams.put("insideGroup_any", new String[] { jsonArray });
+		response = RequestHttp.post(testAddress + "/api/account/info/list", getParams, cookieJar, null);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull(responseMap);
+	}
 //	
 //	//@Test
 //	@SuppressWarnings("unchecked")
@@ -504,36 +498,36 @@ public class AccountLogin_test {
 //		return accTable.getFromName(userName);
 //	}
 //	
-//	private AccountObject getAndLoginUser(String userName, String password) {
-//		AccountObject user = accTable.getFromName(userName);
-//		if (user == null) {
-//			user = accTable.newObject(userName);
-//			user.setPassword(password);
-//		}
-//		
-//		HashMap<String, String[]> cred = new HashMap<String, String[]>();
-//		cred.put("accountName", new String[] { userName });
-//		cred.put("accountPass", new String[] { password });
-//		
-//		response = RequestHttp.post(testAddress + "/api/account/login/", cred);
-//		assertNotNull(responseMap = response.toMap());
-//		assertNotNull(responseMap.get("accountID"));
-//		assertNotNull(responseMap.get("accountNames"));
-//		
-//		return user;
-//	}
-//	
-//	private AccountObject getOrCreateGroup(String groupName) {
-//		AccountObject group = accTable.getFromName(groupName);
-//		if (group == null) {
-//			accTable.newObject(groupName).saveAll();
-//			group = accTable.getFromName(groupName);
-//		}
-//		
-//		assertNotNull(group);
-//		
-//		return group;
-//	}
+	private AccountObject getAndLoginUser(String userName, String password) {
+		AccountObject user = accTable.getFromName(userName);
+		if (user == null) {
+			user = accTable.newObject(userName);
+			user.setPassword(password);
+		}
+		
+		HashMap<String, String[]> cred = new HashMap<String, String[]>();
+		cred.put("accountName", new String[] { userName });
+		cred.put("accountPass", new String[] { password });
+		
+		response = RequestHttp.post(testAddress + "/api/account/login/", cred);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull(responseMap.get("accountID"));
+		assertNotNull(responseMap.get("accountNames"));
+		
+		return user;
+	}
+	
+	private AccountObject getOrCreateGroup(String groupName) {
+		AccountObject group = accTable.getFromName(groupName);
+		if (group == null) {
+			accTable.newObject(groupName).saveAll();
+			group = accTable.getFromName(groupName);
+		}
+		
+		assertNotNull(group);
+		
+		return group;
+	}
 //	
 //	@SuppressWarnings("unchecked")
 //	private List<Map<String, Object>> getGroupData(String groupOID) {

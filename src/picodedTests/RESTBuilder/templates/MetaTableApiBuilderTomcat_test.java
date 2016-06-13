@@ -172,7 +172,7 @@ public class MetaTableApiBuilderTomcat_test {
 		//		Map<String, String[]> resHeaders = response.headersMap();
 	}
 	
-	//@Test
+	@Test
 	public void meta_POST_test_delta() {
 		String path = "http://127.0.0.1:15000/api/meta-test/post";
 		String jsonString = "";
@@ -195,7 +195,7 @@ public class MetaTableApiBuilderTomcat_test {
 		newMetaObj.put("_age", "NewMetaObjectAge");
 	}
 	
-	//@Test
+	@Test
 	public void meta_POST_test_full() {
 		String path = "http://127.0.0.1:15000/api/meta-test/post";
 		String jsonString = "";
@@ -213,7 +213,7 @@ public class MetaTableApiBuilderTomcat_test {
 		assertNotNull(response);
 	}
 	
-	//@Test
+	@Test
 	public void meta_POST_test_new() {
 		String path = "http://127.0.0.1:15000/api/meta-test/post";
 		String jsonString = "";
@@ -231,7 +231,7 @@ public class MetaTableApiBuilderTomcat_test {
 		assertNotNull(response);
 	}
 	
-	//@Test
+	@Test
 	public void meta_DELETE_test() {
 		String path = "http://127.0.0.1:15000/api/meta-test/meta";
 		String getPath = "http://127.0.0.1:15000/api/meta-test/meta";

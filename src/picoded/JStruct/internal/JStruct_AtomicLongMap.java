@@ -48,13 +48,30 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	/// Important note: It does not return the previously stored value
 	///
 	/// @param key as String
-	/// @param value as String
+	/// @param value as Number
 	///
 	/// @returns null
-	public Long put(String key, long value) {
+	// public default Long put(String key, Number value) {
+	//
+	// 	//update the valuemap
+	// 	valueMap.put(key, value.longValue());
+	//
+	// 	// return put(key, value.longValue());
+	// 	return valueMap.get(key);
+	// }
 
-		return null;
-	}
+	/// Stores (and overwrites if needed) key, value pair
+	///
+	/// Important note: It does not return the previously stored value
+	///
+	/// @param key as String
+	/// @param value as long
+	///
+	/// @returns null
+	// public Long put(String key, long value){
+	//
+	// 	return put(key, value.longValue());
+	// }
 
 	/// Returns the value, given the key
 	/// @param key param find the thae meta key
@@ -62,6 +79,16 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	/// @returns  value of the given key
 	public Long get(Object key) {
 
-		return null;
+
+		return valueMap.get(key);
 	}
+
+	/// Returns the value, given the key
+	/// @param key param find the meta key
+	/// @param delta value to add
+	///
+	/// @returns  value of the given key
+	// public Long get(Object key, Object delta){
+	//
+	// }
 }

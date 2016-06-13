@@ -63,7 +63,7 @@ public class AtomicLongMap_test {
 
 	@Test
 	public void simpleHasPutHasGet() throws Exception {
-		assertNull(almObj.put("hello", 1));
+		// assertNull(almObj.put("hello", 1));
 		assertEquals(1, almObj.getLong("hello"));
 	}
 

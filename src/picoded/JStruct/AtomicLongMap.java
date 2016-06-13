@@ -68,19 +68,32 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long> {
 	/// Important note: It does not return the previously stored value
 	///
 	/// @param key as String
-	/// @param value as String
+	/// @param value as Number
 	///
-	/// @returns null
-	public default Long put(String key, Number value) {
-		return put(key, value.longValue());
-	}
+	/// @returns long
+	// public default Long put(String key, Number value);
 
-	public Long put(String key, long value);
+	/// Stores (and overwrites if needed) key, value pair
+	///
+	/// Important note: It does not return the previously stored value
+	///
+	/// @param key as String
+	/// @param value as long
+	///
+	/// @returns long
+	// public Long put(String key, long value);
 
 	/// Returns the value, given the key
-	/// @param key param find the thae meta key
+	/// @param key param find the meta key
 	///
 	/// @returns  value of the given key
 	public Long get(Object key);
+
+	/// Returns the value, given the key
+	/// @param key param find the meta key
+	/// @param delta value to add
+	///
+	/// @returns  value of the given key
+	// public Long get(Object key, Object delta);
 
 }

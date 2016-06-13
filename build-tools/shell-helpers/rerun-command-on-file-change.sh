@@ -41,14 +41,20 @@ echo "Enjoys =)";
 echo "~ eugene@picoded.com";
 echo "";
 echo "PS: Sam, you may want to port this to windows yourself =x";
-echo "-------------------------------------------------------------------"; 
+echo "-------------------------------------------------------------------";
 echo "";
 echo "Waiting for file change event inside : $scan_dir ";
 
 while true; do
 	fswatch -r -1 "$scan_dir";
+	echo "";
+	echo "-------------------------------------------------------------------";
+	echo "";
 	echo "(Possible file changed detected, running command)";
-	"$scriptDir/clear-screen-and-output-full-command.sh" "$cmd_to_run" "$workingDir"; 
+	echo "";
+	echo "-------------------------------------------------------------------";
+	echo "";
+	"$scriptDir/clear-screen-and-output-full-command.sh" "$cmd_to_run" "$workingDir";
 	echo "";
 	echo "Waiting for file change event inside : $scan_dir ";
 	sleep 1; # Delay induction

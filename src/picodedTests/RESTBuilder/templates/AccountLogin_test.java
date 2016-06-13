@@ -33,7 +33,7 @@ public class AccountLogin_test {
 	// --------------------------------------------------------------------------
 	protected static AccountLogin loginServlet;
 	protected static EmbeddedServlet tomcat = null;
-	protected static String testAddress = "http://127.0.0.1:15000";
+	protected static String testAddress = "http://127.0.0.1:16000";
 	protected static AccountTable accTable = null;
 	
 	@BeforeClass
@@ -53,7 +53,7 @@ public class AccountLogin_test {
 			File context = new File("./test-files/tmp");
 			loginServlet = new AccountLogin();
 			
-			tomcat = new EmbeddedServlet("", context).withPort(15000)
+			tomcat = new EmbeddedServlet("", context).withPort(16000)
 				.withServlet("/api/account", "loginServlet1", loginServlet)
 				.withServlet("/api/account/*", "loginServlet2", loginServlet);
 			tomcat.start();

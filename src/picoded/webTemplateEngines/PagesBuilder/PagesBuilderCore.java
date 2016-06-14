@@ -194,24 +194,22 @@ public class PagesBuilderCore {
 	/// 3) The index folder (legacy support, do not use)
 	///
 	protected String getCommonPrefixOrSuffixHtml(String rawPageName, String fixType) {
-		return getCommonFile(rawPageName, fixType+".html");
+		return getCommonFile(rawPageName, fixType + ".html");
 	}
 	
 	protected String getCommonFile(String rawPageName, String fileName) {
 		// Get from the rawPageName folder itself (v2)
-		String res = FileUtils.readFileToString_withFallback(
-			new File(pagesFolder, rawPageName + "/" + fileName), "UTF-8", null);
+		String res = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + fileName),
+			"UTF-8", null);
 		
 		// Get from the common folder (v2)
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "common/" + fileName), "UTF-8",
-				null);
+			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "common/" + fileName), "UTF-8", null);
 		}
 		
 		// Legacy support (v1) get from index folder
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "index/" + fileName), "UTF-8",
-				null);
+			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "index/" + fileName), "UTF-8", null);
 		}
 		
 		// Fallbacks to blank
@@ -376,7 +374,7 @@ public class PagesBuilderCore {
 					
 					/// Does an outer wrap, if its not index page (which applies style to 'all')
 					if (!rawPageName.equalsIgnoreCase("index") && !rawPageName.equalsIgnoreCase("common")) {
-						fileVal =  "." + pageFrameID(rawPageName) + " { \n" + fileVal + "\n } \n";
+						fileVal = "." + pageFrameID(rawPageName) + " { \n" + fileVal + "\n } \n";
 					}
 					
 					// Ensure prefix, and suffix are added

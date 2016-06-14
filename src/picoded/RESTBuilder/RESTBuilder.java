@@ -291,8 +291,8 @@ public class RESTBuilder {
 		for (Map.Entry<String, RESTNamespace> entry : namespaceMap.entrySet()) {
 			try {
 				setupNamespaceInTree(ret, entry.getKey().toString().split("(\\.|/)"), entry.getValue());
-			} catch(Exception e) {
-				throw new RuntimeException("Failed to process namespace key :"+entry.getKey()); 
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to process namespace key :" + entry.getKey());
 			}
 		}
 		return ret;

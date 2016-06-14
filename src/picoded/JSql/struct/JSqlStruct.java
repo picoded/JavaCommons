@@ -41,6 +41,19 @@ public class JSqlStruct extends JStruct {
 	///
 	/// @param name - name of map in backend
 	///
+	/// @returns AtomicLongMap
+	protected AtomicLongMap setupAtomicLongMap(String name) {
+		if (sqlObj == null) {
+			throw new RuntimeException("Missing required SQL Object");
+		}
+		
+		return new JSql_AtomicLongMap(sqlObj, name);
+	}
+	
+	/// Actual setup implmentation to overwrite
+	///
+	/// @param name - name of map in backend
+	///
 	/// @returns MetaTable
 	protected MetaTable setupMetaTable(String name) {
 		if (sqlObj == null) {

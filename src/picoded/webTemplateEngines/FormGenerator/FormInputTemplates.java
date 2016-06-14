@@ -581,9 +581,22 @@ public class FormInputTemplates {
 		StringBuilder ret = new StringBuilder();
 		Map<String, String> params = new HashMap<String, String>();
 		String srcPath = "";
-		if (node.containsKey("relativePath")) {
+		
+		//try get from field value
+		Object rawFieldValue = node.getRawFieldValue();
+		if(rawFieldValue != null){
+			srcPath = (String) rawFieldValue;
+		}
+		
+		System.out.println("Current val of srcPath: " + srcPath);
+		
+		if(srcPath != null && !srcPath.isEmpty()){
+			//might have to do sanitisation on the path, make sure it points to an image file
+			System.out.println("Using srcPath from fieldValue: " + srcPath);
+		}else if (node.containsKey("relativePath")) {
 			srcPath = node.getString("relativePath");
 		}
+		
 		params.put("src", srcPath);
 		
 		String styleString = "";

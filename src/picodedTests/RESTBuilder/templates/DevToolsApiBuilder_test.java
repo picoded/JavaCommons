@@ -20,7 +20,7 @@ import picoded.JStruct.JStruct;
 import picoded.JStruct.MetaObject;
 import picoded.JStruct.MetaTable;
 import picoded.RESTBuilder.*;
-import picoded.RESTBuilder.templates.*; 
+import picoded.RESTBuilder.templates.*;
 import picoded.conv.GUID;
 
 public class DevToolsApiBuilder_test {
@@ -46,8 +46,8 @@ public class DevToolsApiBuilder_test {
 	
 	@Test
 	public void mapTesting() {
-		assertEquals("{}", ConvertJSON.fromMap( rbObj.namespaceTree() ) );
+		assertEquals("{}", ConvertJSON.fromMap(rbObj.namespaceTree()));
 		DevToolsApiBuilder.setupRESTBuilder(rbObj, "dev.");
-		assertNotEquals("{}", ConvertJSON.fromMap( rbObj.namespaceTree() ) );
+		assertNotEquals("{}", ConvertJSON.fromMap(rbObj.namespaceTree()));
 	}
 }

@@ -588,11 +588,9 @@ public class FormInputTemplates {
 			srcPath = (String) rawFieldValue;
 		}
 		
-		System.out.println("Current val of srcPath: " + srcPath);
 		
 		if(srcPath != null && !srcPath.isEmpty()){
 			//might have to do sanitisation on the path, make sure it points to an image file
-			System.out.println("Using srcPath from fieldValue: " + srcPath);
 		}else if (node.containsKey("relativePath")) {
 			srcPath = node.getString("relativePath");
 		}

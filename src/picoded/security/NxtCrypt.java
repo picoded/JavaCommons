@@ -193,13 +193,22 @@ public class NxtCrypt {
 		return getSaltedHash(rawPassword, salt, defaultIterations, defaultKeyLength);
 	}
 	
+	/// Generates a random alphanumeric string up to length (but not guranteeded in length)
+	private static String someRandomeString(int len) {
+		return Base64.encodeBase64String(NxtCrypt.ran.generateSeed(len)).replaceAll("[^A-Za-z0-9]", "");
+	}
+	
 	/// Generate a random byte array of strings at indicated length
-	/// Note: that the generated string array is strictly "BASE64" character spaces chars,
+	/// Note: that the generated string array is strictly "alphanumeric" character spaces chars,
 	/// This is intentional as this format can be safely stored in databases, and passed around
 	public static String randomString(int len) {
 		setupReuseObjects_generic();
 		//return new String(NxtCrypt.ran.generateSeed(len+len), 0, len);
-		return (Base64.encodeBase64String(NxtCrypt.ran.generateSeed(len))).substring(0, len);
+		String resStr = someRandomeString(len+5);
+		while( resStr.length() < len ) {
+			resStr = resStr + someRandomeString( len - resStr.length() + 5 );
+		}
+		return resStr.substring(0, len);
 	}
 	
 	/// Generate a random byte array at indicated length

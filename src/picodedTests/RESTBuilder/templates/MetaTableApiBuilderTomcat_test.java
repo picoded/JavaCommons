@@ -272,7 +272,7 @@ public class MetaTableApiBuilderTomcat_test {
 				return false;
 			} catch (IOException ignored) {
 				portAvailableCalled = true;
-				System.out.println(" PORT : " + port);
+				//System.out.println(" PORT : " + port);
 				return true;
 			}
 		}

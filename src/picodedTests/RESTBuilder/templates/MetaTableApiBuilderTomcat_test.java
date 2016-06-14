@@ -50,7 +50,7 @@ public class MetaTableApiBuilderTomcat_test {
 	private static MetaTable mtObj = null;
 	private static MetaTableApiBuilder mtApi = null;
 	private static RESTBuilder rb = null;
-	protected static int port = 15000;
+	protected static int port = 16000;
 	protected static boolean portAvailableCalled = false;
 	
 	private static MetaTable implementationConstructor() {
@@ -78,8 +78,15 @@ public class MetaTableApiBuilderTomcat_test {
 	}
 	
 	@BeforeClass
-	public static void serverSetUp() throws LifecycleException, IOException, JStackException {
-		
+	public static void serverSetUp() throws LifecycleException, JStackException {
+		if (!portAvailableCalled) {
+			while (!portAvailableCalled) {
+				available(port);
+				if (!portAvailableCalled) { 
+					port += 100;
+				}
+			}
+		}
 		mtObj = implementationConstructor();
 		mtObj.systemSetup();
 		populateMetaTableDummyData(3, 3);
@@ -88,12 +95,6 @@ public class MetaTableApiBuilderTomcat_test {
 		
 		rb = new RESTBuilder();
 		mtApi.setupRESTBuilder(rb, "/meta-test/");
-		if (!portAvailableCalled) {
-			while (!portAvailableCalled) {
-				available(port);
-				port += 100;
-			}
-		}
 		
 		if (tomcat == null) {
 			File webInfFile = new File("./test-files/tmp/WEB-INF");
@@ -118,7 +119,7 @@ public class MetaTableApiBuilderTomcat_test {
 	}
 	
 	@AfterClass
-	public static void serverTearDown() throws LifecycleException, IOException {
+	public static void serverTearDown() throws LifecycleException {
 		if (mtObj != null) {
 			mtObj.systemTeardown();
 		}
@@ -271,6 +272,7 @@ public class MetaTableApiBuilderTomcat_test {
 				return false;
 			} catch (IOException ignored) {
 				portAvailableCalled = true;
+				System.out.println(" PORT : " + port);
 				return true;
 			}
 		}

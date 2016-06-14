@@ -162,15 +162,7 @@ public class AtomicLongMapApiBuilder {
 			return res;
 		}
 
-		try {
-			_atomicLongMap.put(key, value);
-		} catch (Exception ex) {
-			res.put("error", "An error occured while trying to set a value");
-			res.put("exceptionMsg", ex.getMessage());
-			return res;
-		}
-
-		res.put("map", _atomicLongMap);
+		res.put("map", _atomicLongMap.put(key, value));
 
 		return res;
 	};

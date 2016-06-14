@@ -402,7 +402,7 @@ public class AtomicLongMapApiBuilder {
 
 		Long update = req.getLong("update");
 
-		res.put("map", _atomicLongMap.weakCompareAndSet(key, expect, update););
+		res.put("map", _atomicLongMap.weakCompareAndSet(key, expect, update));
 
 		return res;
 	};
@@ -426,7 +426,7 @@ public class AtomicLongMapApiBuilder {
 			res.put("error", "An empty value was supplied, and allowEmptyValue is false");
 			return res;
 		}
-		
+
 		res.put("value",	_atomicLongMap.getAndAdd(key, delta));
 
 		return res;
@@ -470,15 +470,15 @@ public class AtomicLongMapApiBuilder {
 	public RESTBuilder setupRESTBuilder(RESTBuilder rb, String setPrefix) {
 
 		//Get entire mapping
-		rb.getNamespace(setPrefix + "Map").put(HttpRequestType.GET, getMap);
+		rb.getNamespace(setPrefix + "map").put(HttpRequestType.GET, getMap);
 
 		//Get values
-		rb.getNamespace(setPrefix + "Value").put(HttpRequestType.GET, getValue);
-		rb.getNamespace(setPrefix + "Values").put(HttpRequestType.GET, getValues);
+		rb.getNamespace(setPrefix + "value").put(HttpRequestType.GET, getValue);
+		rb.getNamespace(setPrefix + "values").put(HttpRequestType.GET, getValues);
 
 		//Set values
-		rb.getNamespace(setPrefix + "Value").put(HttpRequestType.POST, setValue);
-		rb.getNamespace(setPrefix + "Values").put(HttpRequestType.POST, setValues);
+		rb.getNamespace(setPrefix + "value").put(HttpRequestType.POST, setValue);
+		rb.getNamespace(setPrefix + "values").put(HttpRequestType.POST, setValues);
 
 		//Delete mappings
 		rb.getNamespace(setPrefix + "deleteValue").put(HttpRequestType.POST, deleteValue);

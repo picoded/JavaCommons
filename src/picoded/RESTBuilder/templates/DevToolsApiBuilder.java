@@ -53,8 +53,8 @@ public class DevToolsApiBuilder {
 		
 		res.put("data", _builder.namespaceTree());
 		return res;
-	}; 
-
+	};
+	
 	///
 	/// Takes the restbuilder and implements its respective default API
 	///

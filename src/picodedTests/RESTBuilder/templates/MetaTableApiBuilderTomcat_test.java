@@ -50,7 +50,7 @@ public class MetaTableApiBuilderTomcat_test {
 	private static MetaTable mtObj = null;
 	private static MetaTableApiBuilder mtApi = null;
 	private static RESTBuilder rb = null;
-	protected static int port = 16000;
+	protected static int port = 15000;
 	protected static boolean portAvailableCalled = false;
 	
 	private static MetaTable implementationConstructor() {

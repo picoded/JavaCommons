@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,12 +34,22 @@ public class AccountLogin_test {
 	// --------------------------------------------------------------------------
 	protected static AccountLogin loginServlet;
 	protected static EmbeddedServlet tomcat = null;
-	protected static String testAddress = "http://127.0.0.1:15000";
+	protected static String testAddress = "http://127.0.0.1:";
 	protected static AccountTable accTable = null;
+	protected static int port = 15000;
+	protected static boolean portAvailableCalled = false;
 	
 	@BeforeClass
 	public static void serverSetUp() throws LifecycleException, IOException, JStackException {
 		if (tomcat == null) {
+			if (!portAvailableCalled) {
+				while (!portAvailableCalled) {
+					available(port);
+					port += 100;
+				}
+				testAddress = "http://127.0.0.1:" + port;
+			}
+			
 			File webInfFile = new File("./test-files/tmp/WEB-INF");
 			
 			if (webInfFile.listFiles() != null) {
@@ -53,7 +64,7 @@ public class AccountLogin_test {
 			File context = new File("./test-files/tmp");
 			loginServlet = new AccountLogin();
 			
-			tomcat = new EmbeddedServlet("", context).withPort(15000)
+			tomcat = new EmbeddedServlet("", context).withPort(port)
 				.withServlet("/api/account", "loginServlet1", loginServlet)
 				.withServlet("/api/account/*", "loginServlet2", loginServlet);
 			tomcat.start();
@@ -570,6 +581,18 @@ public class AccountLogin_test {
 		}
 		
 		return null;
+	}
+	
+	private static boolean available(int port) {
+		if (!portAvailableCalled) {
+			try (Socket ignored = new Socket("localhost", port)) {
+				return false;
+			} catch (IOException ignored) {
+				portAvailableCalled = true;
+				return true;
+			}
+		}
+		return true;
 	}
 	
 }

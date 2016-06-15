@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,8 @@ public class MetaTableApiBuilderTomcat_test {
 	private static MetaTable mtObj = null;
 	private static MetaTableApiBuilder mtApi = null;
 	private static RESTBuilder rb = null;
+	protected static int port = 15000;
+	protected static boolean portAvailableCalled = false;
 	
 	private static MetaTable implementationConstructor() {
 		return (new JStruct()).getMetaTable("test");
@@ -75,7 +78,15 @@ public class MetaTableApiBuilderTomcat_test {
 	}
 	
 	@BeforeClass
-	public static void serverSetUp() throws LifecycleException, IOException, JStackException {
+	public static void serverSetUp() throws LifecycleException, JStackException {
+		if (!portAvailableCalled) {
+			while (!portAvailableCalled) {
+				available(port);
+				if (!portAvailableCalled) {
+					port += 100;
+				}
+			}
+		}
 		mtObj = implementationConstructor();
 		mtObj.systemSetup();
 		populateMetaTableDummyData(3, 3);
@@ -100,7 +111,7 @@ public class MetaTableApiBuilderTomcat_test {
 			File context = new File("./test-files/tmp");
 			tomcat = new EmbeddedServlet("", context)
 			
-			.withServlet("/api/*", "meta-table-test", new MetaTableApiServlet()).withPort(15000);
+			.withServlet("/api/*", "meta-table-test", new MetaTableApiServlet()).withPort(port);
 			
 			tomcat.start();
 			// tomcat.awaitServer();
@@ -108,7 +119,7 @@ public class MetaTableApiBuilderTomcat_test {
 	}
 	
 	@AfterClass
-	public static void serverTearDown() throws LifecycleException, IOException {
+	public static void serverTearDown() throws LifecycleException {
 		if (mtObj != null) {
 			mtObj.systemTeardown();
 		}
@@ -131,7 +142,7 @@ public class MetaTableApiBuilderTomcat_test {
 	
 	@Test
 	public void list_POST_test() {
-		String path = "http://127.0.0.1:15000/api/meta-test/list";
+		String path = "http://127.0.0.1:" + port + "/api/meta-test/list";
 		
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
 		//		Map<String, String[]> headersMap = new HashMap<String, String[]>();
@@ -156,7 +167,7 @@ public class MetaTableApiBuilderTomcat_test {
 	
 	@Test
 	public void meta_GET_test() {
-		String path = "http://127.0.0.1:15000/api/meta-test/get";
+		String path = "http://127.0.0.1:" + port + "/api/meta-test/get";
 		
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
 		paramsMap.put("_oid", new String[] { _oids.get(0) });
@@ -165,7 +176,7 @@ public class MetaTableApiBuilderTomcat_test {
 		response = RequestHttp.get(path, paramsMap, null, null);
 		
 		if (response.statusCode() == 404) {
-			System.out.println(404);
+			System.out.println("RESPONSE STATUS: " + 404);
 		}
 		
 		assertNotNull(response);
@@ -174,7 +185,7 @@ public class MetaTableApiBuilderTomcat_test {
 	
 	@Test
 	public void meta_POST_test_delta() {
-		String path = "http://127.0.0.1:15000/api/meta-test/post";
+		String path = "http://127.0.0.1:" + port + "/api/meta-test/post";
 		String jsonString = "";
 		
 		Map<String, Object> deltaObj = new HashMap<String, Object>();
@@ -197,7 +208,7 @@ public class MetaTableApiBuilderTomcat_test {
 	
 	@Test
 	public void meta_POST_test_full() {
-		String path = "http://127.0.0.1:15000/api/meta-test/post";
+		String path = "http://127.0.0.1:" + port + "/api/meta-test/post";
 		String jsonString = "";
 		
 		Map<String, Object> fullObj = new HashMap<String, Object>();
@@ -215,7 +226,7 @@ public class MetaTableApiBuilderTomcat_test {
 	
 	@Test
 	public void meta_POST_test_new() {
-		String path = "http://127.0.0.1:15000/api/meta-test/post";
+		String path = "http://127.0.0.1:" + port + "/api/meta-test/post";
 		String jsonString = "";
 		
 		Map<String, Object> newMetaObj = new HashMap<String, Object>();
@@ -233,8 +244,8 @@ public class MetaTableApiBuilderTomcat_test {
 	
 	@Test
 	public void meta_DELETE_test() {
-		String path = "http://127.0.0.1:15000/api/meta-test/meta";
-		String getPath = "http://127.0.0.1:15000/api/meta-test/meta";
+		String path = "http://127.0.0.1:" + port + "/api/meta-test/meta";
+		String getPath = "http://127.0.0.1:" + port + "/api/meta-test/meta";
 		Map<String, Object> respMap = null;
 		
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
@@ -253,6 +264,19 @@ public class MetaTableApiBuilderTomcat_test {
 		response = RequestHttp.get(getPath, paramsMap, null, null);
 		assertNotNull(respMap = response.toMap());
 		assertNull(respMap.get("meta"));
+	}
+	
+	private static boolean available(int port) {
+		if (!portAvailableCalled) {
+			try (Socket ignored = new Socket("localhost", port)) {
+				return false;
+			} catch (IOException ignored) {
+				portAvailableCalled = true;
+				//System.out.println(" PORT : " + port);
+				return true;
+			}
+		}
+		return true;
 	}
 	
 }

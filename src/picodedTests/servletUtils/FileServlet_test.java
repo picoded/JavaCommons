@@ -74,6 +74,7 @@ public class FileServlet_test {
 		assertEquals("world", response.toString());
 	}
 	
+	@SuppressWarnings("try")
 	private static boolean available(int port) {
 		if (!portAvailableCalled) {
 			try (Socket ignored = new Socket("localhost", port)) {

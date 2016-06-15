@@ -32,7 +32,7 @@ public class FileServlet_test {
 			if (!portAvailableCalled) {
 				while (!portAvailableCalled) {
 					available(port);
-					if (!portAvailableCalled) { 
+					if (!portAvailableCalled) {
 						port += 100;
 					}
 				}
@@ -43,8 +43,7 @@ public class FileServlet_test {
 			
 			fileServlet = new FileServlet(fileFolder);
 			
-			tomcat = new EmbeddedServlet("", rootFolder).withPort(port)
-				.withServlet("/files/*", "fileServer", fileServlet);
+			tomcat = new EmbeddedServlet("", rootFolder).withPort(port).withServlet("/files/*", "fileServer", fileServlet);
 			
 			tomcat.start();
 		}

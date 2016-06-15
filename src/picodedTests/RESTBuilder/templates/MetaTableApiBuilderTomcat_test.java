@@ -82,7 +82,7 @@ public class MetaTableApiBuilderTomcat_test {
 		if (!portAvailableCalled) {
 			while (!portAvailableCalled) {
 				available(port);
-				if (!portAvailableCalled) { 
+				if (!portAvailableCalled) {
 					port += 100;
 				}
 			}
@@ -150,7 +150,7 @@ public class MetaTableApiBuilderTomcat_test {
 		paramsMap.put("headers", new String[] { "[\"_oid\"]" });
 		response = RequestHttp.post(path, paramsMap, null, null);
 		assertNotNull(response);
-		System.out.println("list_POST_test :: line number 142");
+		
 		Map<String, Object> resMap = response.toMap();
 		
 		@SuppressWarnings("unchecked")
@@ -176,7 +176,7 @@ public class MetaTableApiBuilderTomcat_test {
 		response = RequestHttp.get(path, paramsMap, null, null);
 		
 		if (response.statusCode() == 404) {
-			System.out.println(404);
+			System.out.println("RESPONSE STATUS: " + 404);
 		}
 		
 		assertNotNull(response);

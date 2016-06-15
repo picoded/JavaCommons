@@ -533,8 +533,8 @@ public class JSMLForm {
 		return generatePDF_embeddedImageSupport(page, data, "file:///" + _formFolderPath + "/" + _tempFolderPath);
 	}
 	
-	
-	public byte[] generatePDF_embeddedImageSupport(BasePage page, Map<String, Object> data, String pdfGeneratorContextFolder) {
+	public byte[] generatePDF_embeddedImageSupport(BasePage page, Map<String, Object> data,
+		String pdfGeneratorContextFolder) {
 		StringBuilder ret = new StringBuilder();
 		
 		data = sanitiseMap(data, "", true);
@@ -569,8 +569,8 @@ public class JSMLForm {
 		ret.insert(0, sanitiseStringForPDF(bodyPrefix, ""));
 		ret.append(bodySuffix);
 		
-		PDFGenerator.generatePDFfromRawHTML_embeddedImageSupport(pdfFilePath, ret.toString(), pdfGeneratorContextFolder + "/" + _generatedGUID
-			+ "/");
+		PDFGenerator.generatePDFfromRawHTML_embeddedImageSupport(pdfFilePath, ret.toString(), pdfGeneratorContextFolder
+			+ "/" + _generatedGUID + "/");
 		//		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), pdfGeneratorContextFolder +"/" );
 		
 		//read the pdf file now

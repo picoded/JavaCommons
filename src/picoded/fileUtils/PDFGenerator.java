@@ -39,7 +39,6 @@ import picoded.iTextProcessors.B64ImgReplacedElementFactory;
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
 
-
 /// 
 /// iText supports custom tag handling and using it, we can do stuff like support embedded base64 images.
 /// Related links: 
@@ -48,7 +47,7 @@ import picoded.iTextProcessors.B64ImgReplacedElementFactory;
 ///	http://developers.itextpdf.com/examples/xml-worker/html-images (uses latest itext but principles might be similar)
 /// http://stackoverflow.com/questions/29194405/html-to-pdf-with-base64-images-throws-filenotfoundexception
 ///
-public class PDFGenerator {	
+public class PDFGenerator {
 	/// Generates a pdf file given the HTML file path
 	/// embeded file path (image, css, js etc.) in input html file should be relative to html file path
 	///
@@ -221,7 +220,8 @@ public class PDFGenerator {
 		return true;
 	}
 	
-	public static boolean generatePDFfromRawHTML_embeddedImageSupport(String outputpdfpath, String rawHtml, String contextRoot) {
+	public static boolean generatePDFfromRawHTML_embeddedImageSupport(String outputpdfpath, String rawHtml,
+		String contextRoot) {
 		OutputStream outputStream = null;
 		try {
 			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+",

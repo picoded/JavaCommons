@@ -20,12 +20,12 @@ import picodedTests.JStruct.*;
 import picodedTests.*;
 
 public class AtomicLongMap_Oracle_test extends AtomicLongMap_Sqlite_test {
-
+	
 	/// To override for implementation
 	///------------------------------------------------------
-
+	
 	public JSql sqlImplmentation() {
 		return JSql.oracle(TestConfig.ORACLE_PATH(), TestConfig.ORACLE_USER(), TestConfig.ORACLE_PASS());
 	}
-
+	
 }

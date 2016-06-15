@@ -19,8 +19,9 @@ import com.lowagie.text.Image;
 import java.util.Base64;
 
 public class B64ImgReplacedElementFactory implements ReplacedElementFactory {
-
-    public ReplacedElement createReplacedElement(LayoutContext c, BlockBox box, UserAgentCallback uac, int cssWidth, int cssHeight) {
+	
+	public ReplacedElement createReplacedElement(LayoutContext c, BlockBox box, UserAgentCallback uac, int cssWidth,
+		int cssHeight) {
 		Element e = box.getElement();
 		if (e == null) {
 			return null;
@@ -30,24 +31,24 @@ public class B64ImgReplacedElementFactory implements ReplacedElementFactory {
 			String attribute = e.getAttribute("src");
 			FSImage fsImage;
 			try {
-			fsImage = buildImage(attribute, uac);
+				fsImage = buildImage(attribute, uac);
 			} catch (BadElementException e1) {
-			fsImage = null;
+				fsImage = null;
 			} catch (IOException e1) {
-			fsImage = null;
+				fsImage = null;
 			}
 			if (fsImage != null) {
-			if (cssWidth != -1 || cssHeight != -1) {
-				fsImage.scale(cssWidth, cssHeight);
-			}
-			return new ITextImageElement(fsImage);
+				if (cssWidth != -1 || cssHeight != -1) {
+					fsImage.scale(cssWidth, cssHeight);
+				}
+				return new ITextImageElement(fsImage);
 			}
 		}
-
+		
 		return null;
-    }
-
-    protected FSImage buildImage(String srcAttr, UserAgentCallback uac) throws IOException, BadElementException {
+	}
+	
+	protected FSImage buildImage(String srcAttr, UserAgentCallback uac) throws IOException, BadElementException {
 		FSImage fsImage;
 		if (srcAttr.startsWith("data:image/")) {
 			String b64encoded = srcAttr.substring(srcAttr.indexOf("base64,") + "base64,".length(), srcAttr.length());
@@ -57,20 +58,20 @@ public class B64ImgReplacedElementFactory implements ReplacedElementFactory {
 			//byte[] decodedBytes = Base64.decode(b64encoded);
 			
 			byte[] decodedBytes = Base64.getDecoder().decode(b64encoded);
-
+			
 			fsImage = new ITextFSImage(Image.getInstance(decodedBytes));
 		} else {
 			fsImage = uac.getImageResource(srcAttr).getImage();
 		}
 		return fsImage;
-    }
-
-    public void remove(Element e) {
-    }
-
-    public void reset() {
-    }
+	}
 	
-	public void setFormSubmissionListener(FormSubmissionListener listener){
+	public void remove(Element e) {
+	}
+	
+	public void reset() {
+	}
+	
+	public void setFormSubmissionListener(FormSubmissionListener listener) {
 	}
 }

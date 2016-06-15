@@ -584,14 +584,13 @@ public class FormInputTemplates {
 		
 		//try get from field value
 		Object rawFieldValue = node.getRawFieldValue();
-		if(rawFieldValue != null){
+		if (rawFieldValue != null) {
 			srcPath = (String) rawFieldValue;
 		}
 		
-		
-		if(srcPath != null && !srcPath.isEmpty()){
+		if (srcPath != null && !srcPath.isEmpty()) {
 			//might have to do sanitisation on the path, make sure it points to an image file
-		}else if (node.containsKey("relativePath")) {
+		} else if (node.containsKey("relativePath")) {
 			srcPath = node.getString("relativePath");
 		}
 		

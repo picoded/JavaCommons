@@ -204,9 +204,9 @@ public class NxtCrypt {
 	public static String randomString(int len) {
 		setupReuseObjects_generic();
 		//return new String(NxtCrypt.ran.generateSeed(len+len), 0, len);
-		String resStr = someRandomeString(len+5);
-		while( resStr.length() < len ) {
-			resStr = resStr + someRandomeString( len - resStr.length() + 5 );
+		String resStr = someRandomeString(len + 5);
+		while (resStr.length() < len) {
+			resStr = resStr + someRandomeString(len - resStr.length() + 5);
 		}
 		return resStr.substring(0, len);
 	}

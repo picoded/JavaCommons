@@ -20,13 +20,13 @@ import picodedTests.JStruct.*;
 import picodedTests.*;
 
 public class AtomicLongMap_Mssql_test extends AtomicLongMap_Sqlite_test {
-
+	
 	/// To override for implementation
 	///------------------------------------------------------
-
+	
 	public JSql sqlImplmentation() {
 		return JSql.mssql(TestConfig.MSSQL_CONN(), TestConfig.MSSQL_NAME(), TestConfig.MSSQL_USER(),
 			TestConfig.MSSQL_PASS());
 	}
-
+	
 }

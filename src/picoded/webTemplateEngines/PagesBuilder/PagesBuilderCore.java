@@ -187,20 +187,69 @@ public class PagesBuilderCore {
 	}
 	
 	///
-	/// Gets the requested page prefix / suffix from the following priority order
-	///
-	/// 1) The page path itself
-	/// 2) The common folder
-	/// 3) The index folder (legacy support, do not use)
+	/// HTML specific version of getCommonFile
 	///
 	protected String getCommonPrefixOrSuffixHtml(String rawPageName, String fixType) {
 		return getCommonFile(rawPageName, fixType + ".html");
 	}
 	
+	///
+	/// Filters the rawPageName, into its valid form (remove any pre/suf-fix of slashes)
+	///
+	protected String filterRawPageName(String rawPageName) {
+		rawPageName = rawPageName.trim();
+		while (rawPageName.startsWith("/")) {
+			rawPageName = rawPageName.substring(1);
+		}
+		while (rawPageName.endsWith("/")) {
+			rawPageName = rawPageName.substring(0, rawPageName.length());
+		}
+		return rawPageName;
+	}
+	
+	///
+	/// Takes a pagename, and split in its pathing.
+	/// Used to find parent folders
+	///
+	protected String[] splitPageName(String rawPageName) {
+		return filterRawPageName(rawPageName).split("/");
+	}
+	
+	///
+	/// Gets the requested page prefix / suffix from the following priority order
+	///
+	/// 1) The page path itself
+	/// 2) Any parent path folder (excluding root : use common for that)
+	/// 3) The common folder
+	/// 4) The index folder (legacy support, do not use)
+	///
 	protected String getCommonFile(String rawPageName, String fileName) {
+		String res = null;
+		
 		// Get from the rawPageName folder itself (v2)
-		String res = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + fileName),
+		res = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + fileName),
 			"UTF-8", null);
+		
+		// Gets the parent paths (if valid)
+		if(res == null) {
+			String[] splitNames = splitPageName(rawPageName);
+			if(splitNames.length <= 1) {
+				// There were no parent folders, skip the parent paths checks
+			} else {
+				// Go one "directory" parent upward
+				splitNames = ArrayConv.subarray(splitNames,0,splitNames.length-1);
+				
+				// Breaks once root directory is reached / or result found
+				while(res == null && splitNames.length > 0) {
+					// Join the name path, and get the file
+					res = FileUtils.readFileToString_withFallback(new File(pagesFolder, String.join("/", splitNames) + "/" + fileName),
+						"UTF-8", null);
+					
+					// Go one "directory" parent upward
+					splitNames = ArrayConv.subarray(splitNames,0,splitNames.length-1);
+				}
+			}
+		}
 		
 		// Get from the common folder (v2)
 		if (res == null) {

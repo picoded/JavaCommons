@@ -19,8 +19,8 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.lang3.StringUtils;
 
+import picoded.conv.*;
 import picoded.enums.HttpRequestType;
-import picoded.conv.ArraySlice;
 
 /**
  * picoded.servlet.RESTBuilder is a servlet utility class, in which facilitates the building of "RESTful API's"
@@ -262,7 +262,7 @@ public class RESTBuilder {
 			}
 		} else {
 			String item = names[0];
-			String[] subnames = ArraySlice.strings(names, 1);
+			String[] subnames = ArrayConv.subarray(names, 1, names.length);
 			
 			if ( //
 			item.equalsIgnoreCase("post") || item.equalsIgnoreCase("get") || item.equalsIgnoreCase("put")

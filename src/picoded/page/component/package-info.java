@@ -1,4 +1,6 @@
 /// 
-/// Minimalistic HTML generator. Pass in the parameters, and point to the template folders.
+/// Minimalistic HTML generator. Pass in the parameters, get the output.
 ///
-package picoded.webTemplateEngines.PageComponents;
+/// This is meant to have minmal dependency on the other template engines
+///
+package picoded.page.component;

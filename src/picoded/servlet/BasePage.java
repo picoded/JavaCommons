@@ -32,7 +32,7 @@ import picoded.JStack.*;
 import picoded.JStruct.*;
 import picoded.RESTBuilder.*;
 import picoded.webTemplateEngines.JSML.*;
-import picoded.webTemplateEngines.PagesBuilder.*;
+import picoded.page.builder.*;
 
 /**
  * Extends the corePage/jSqlPage functionality, and implements basic UI templating, lifecycle handling, 
@@ -267,27 +267,27 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	
 	/////////////////////////////////////////////
 	//
-	// PagesBuilder handling
+	// PageBuilder handling
 	//
 	/////////////////////////////////////////////
 	
-	/// [Protected] PagesBuilder object used
-	protected PagesBuilder _pagesBuilderObj = null;
+	/// [Protected] PageBuilder object used
+	protected PageBuilder _pageBuilderObj = null;
 	
-	/// Loads and setup the PagesBuilder object if needed
+	/// Loads and setup the PageBuilder object if needed
 	///
-	/// @returns the PagesBuilder object
-	public PagesBuilder PagesBuilder() {
-		if (_pagesBuilderObj != null) {
-			_pagesBuilderObj.setUriRootPrefix(getContextURI());
-			return _pagesBuilderObj;
+	/// @returns the PageBuilder object
+	public PageBuilder PageBuilder() {
+		if (_pageBuilderObj != null) {
+			_pageBuilderObj.setUriRootPrefix(getContextURI());
+			return _pageBuilderObj;
 		}
 		
-		_pagesBuilderObj = new PagesBuilder(getPagesTemplatePath(), getPagesOutputPath());
-		_pagesBuilderObj.setJMTE(JMTE());
-		_pagesBuilderObj.setUriRootPrefix(getContextURI());
+		_pageBuilderObj = new PageBuilder(getPagesTemplatePath(), getPagesOutputPath());
+		_pageBuilderObj.setJMTE(JMTE());
+		_pageBuilderObj.setUriRootPrefix(getContextURI());
 		
-		return _pagesBuilderObj;
+		return _pageBuilderObj;
 	}
 	
 	/////////////////////////////////////////////

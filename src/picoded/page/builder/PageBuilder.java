@@ -147,7 +147,7 @@ public class PageBuilder extends PageBuilderCore {
 				.getBoolean("developersMode.PageBuilder", true));
 			if (isDeveloperMode) {
 				
-				PageBuilder servletPageBuilder = page.PagesBuilder();
+				PageBuilder servletPageBuilder = page.PageBuilder();
 				
 				// Load the respective page, only on main page load
 				if (itemName.equals("index.html") && servletPageBuilder.hasPageFolder(basePageName + "/")) {

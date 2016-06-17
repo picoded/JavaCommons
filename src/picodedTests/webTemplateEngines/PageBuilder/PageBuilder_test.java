@@ -1,4 +1,4 @@
-package picodedTests.webTemplateEngines.PagesBuilder;
+package picodedTests.webTemplateEngines.PageBuilder;
 
 import java.io.*;
 import java.util.*;
@@ -8,9 +8,9 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import picoded.conv.*;
 import picoded.fileUtils.*;
-import picoded.webTemplateEngines.PagesBuilder.*;
+import picoded.page.builder.*;
 
-public class PagesBuilder_test {
+public class PageBuilder_test {
 	
 	////////////////////////////////////////////////////////////
 	//
@@ -21,15 +21,15 @@ public class PagesBuilder_test {
 	// Test directory define
 	//------------------------------------------------------------------------
 	
-	protected String templateTestDir = "test-files/test-specific/webTemplateEngines/PagesBuilder/";
-	protected String outputTestDir = "test-files/tmp/webTemplateEngines/PagesBuilder/";
+	protected String templateTestDir = "test-files/test-specific/webTemplateEngines/PageBuilder/";
+	protected String outputTestDir = "test-files/tmp/webTemplateEngines/PageBuilder/";
 	protected String basicTemplateDir = templateTestDir + "basic-test-pages/";
 	
 	// Test vars
 	//------------------------------------------------------------------------
 	
-	protected PagesBuilder pages = null;
-	protected PagesBuilderCore html = null;
+	protected PageBuilder pages = null;
+	protected PageBuilderCore html = null;
 	
 	////////////////////////////////////////////////////////////
 	//
@@ -61,8 +61,8 @@ public class PagesBuilder_test {
 	
 	@Test
 	public void constructorTest() {
-		assertNotNull(pages = new PagesBuilder(basicTemplateDir, outputTestDir));
-		assertNotNull(html = new PagesBuilderCore(basicTemplateDir));
+		assertNotNull(pages = new PageBuilder(basicTemplateDir, outputTestDir));
+		assertNotNull(html = new PageBuilderCore(basicTemplateDir));
 	}
 	
 	////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ public class PagesBuilder_test {
 	////////////////////////////////////////////////////////////
 	
 	@Test
-	public void basicPagesBuilderCoreTest() {
+	public void basicPageBuilderCoreTest() {
 		constructorTest();
 		String buffer = null;
 		

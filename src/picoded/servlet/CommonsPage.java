@@ -37,7 +37,7 @@ import picoded.RESTBuilder.*;
 import picoded.RESTBuilder.templates.*;
 import picoded.webUtils.*;
 import picoded.webTemplateEngines.JSML.*;
-import picoded.webTemplateEngines.PagesBuilder.*;
+import picoded.page.builder.*;
 
 ///
 /// Does all the standard USER API, Pages, and forms setup
@@ -165,7 +165,7 @@ public class CommonsPage extends BasePage {
 			// }
 			
 			// Fallsback into File Servlet
-			PagesBuilder().outputFileServlet().processRequest( //
+			PageBuilder().outputFileServlet().processRequest( //
 				getHttpServletRequest(), //
 				getHttpServletResponse(), //
 				requestType() == HttpRequestType.HEAD, //
@@ -187,7 +187,7 @@ public class CommonsPage extends BasePage {
 		//generateJS
 		
 		// Pages builder redirect (default)
-		PagesBuilder().processPageBuilderServlet(this);
+		PageBuilder().processPageBuilderServlet(this);
 		return true;
 	}
 	
@@ -227,9 +227,9 @@ public class CommonsPage extends BasePage {
 	public void initializeContext() throws Exception {
 		super.initializeContext();
 		
-		boolean ignorePageBuilder = JConfig().getBoolean("developersMode.PagesBuilder_ignoreInitializeContext", false);
+		boolean ignorePageBuilder = JConfig().getBoolean("developersMode.PageBuilder_ignoreInitializeContext", false);
 		if (!ignorePageBuilder || this._commandLineInitialized) {
-			PagesBuilder().buildAllPages();
+			PageBuilder().buildAllPages();
 		}
 		buildApiScript();
 	}

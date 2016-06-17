@@ -179,8 +179,8 @@ public class PagesBuilderCore {
 		
 		ret.put("PagesRootURI", uriRootPrefix);
 		ret.put("PageURI", pageURI);
-		ret.put("rawPageNameRaw", rawPageName);
-		ret.put("rawPageName", safePageName(rawPageName));
+		ret.put("PageNameRaw", rawPageName);
+		ret.put("PageName", safePageName(rawPageName));
 		ret.put("PageFrameID", pageFrameID(rawPageName));
 		
 		return ret;

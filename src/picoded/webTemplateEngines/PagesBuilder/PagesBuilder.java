@@ -17,13 +17,7 @@ import picoded.servletUtils.*;
 ///
 /// This is extended from the templating format previously used in ServletCommons
 ///
-public class PagesBuilder extends PagesBuilderCore {
-	
-	////////////////////////////////////////////////////////////
-	//
-	// Constructor
-	//
-	////////////////////////////////////////////////////////////
+public class PagesBuilder extends picoded.page.builder.PageBuilder {
 	
 	///
 	/// Constructor, with the folders defined
@@ -33,7 +27,6 @@ public class PagesBuilder extends PagesBuilderCore {
 	///
 	public PagesBuilder(File inPagesFolder, File inOutputFolder) {
 		super(inPagesFolder, inOutputFolder);
-		validateAndSetup();
 	}
 	
 	///
@@ -43,164 +36,7 @@ public class PagesBuilder extends PagesBuilderCore {
 	/// @param The target folder to build the result into
 	///
 	public PagesBuilder(String inPagesFolder, String inOutputFolder) {
-		this(new File(inPagesFolder), new File(inOutputFolder));
+		super(inPagesFolder, inOutputFolder);
 	}
 	
-	/// Does some basic validation for the constructor
-	protected void validateAndSetup() {
-		//
-		// NULL check
-		//
-		if (pagesFolder == null) {
-			throw new RuntimeException("Pages definition folder is not set (null)");
-		}
-		if (outputFolder == null) {
-			throw new RuntimeException("Output folder is not set (null)");
-		}
-		
-		//
-		// Exists checks
-		//
-		if (!pagesFolder.exists()) {
-			throw new RuntimeException("Pages definition folder does not exists: " + pagesFolder.getPath());
-		}
-		if (!outputFolder.exists()) {
-			throw new RuntimeException("Output folder does not exists: " + outputFolder.getPath());
-		}
-		
-		//
-		// IsDir checks
-		//
-		if (!pagesFolder.isDirectory()) {
-			throw new RuntimeException("Pages definition folder path is not a 'directory': " + pagesFolder.getPath());
-		}
-		if (!outputFolder.isDirectory()) {
-			throw new RuntimeException("Output folder path is not a 'directory': " + outputFolder.getPath());
-		}
-		
-		//
-		// HTML files handling
-		//
-		// html = new PagesBuilderCore(pagesFolder, outputFolder);
-	}
-	
-	////////////////////////////////////////////////////////////
-	//
-	// Public function
-	//
-	////////////////////////////////////////////////////////////
-	
-	/// Scans and builds all the pages
-	///
-	/// @return  Returns itself
-	public PagesBuilder buildAllPages() {
-		buildPageFolder("");
-		// End and returns self
-		return this;
-	}
-	
-	////////////////////////////////////////////////////////////
-	//
-	// Servlet building utility
-	//
-	////////////////////////////////////////////////////////////
-	
-	/// Cached FileServlet
-	protected FileServlet _outputFileServlet = null;
-	
-	/// Returns the File servlet
-	public FileServlet outputFileServlet() {
-		if (_outputFileServlet != null) {
-			return _outputFileServlet;
-		}
-		return (_outputFileServlet = new FileServlet(outputFolder));
-	}
-	
-	/// Process the full PageBuilder servlet request
-	public void processPageBuilderServlet(BasePage page) {
-		processPageBuilderServlet(page, page.requestWildcardUriArray());
-	}
-	
-	/// Process the full PageBuilder servlet request
-	public void processPageBuilderServlet(BasePage page, String[] requestWildcardUri) {
-		try {
-			if (requestWildcardUri == null) {
-				requestWildcardUri = new String[] {};
-			}
-			
-			// Load base page name (developer mode rebuilds an entire sub-dir, to optimize in future?)
-			String basePageName = "index";
-			if (requestWildcardUri.length >= 1 && requestWildcardUri[0].length() > 0) {
-				basePageName = requestWildcardUri[0];
-			}
-			
-			String itemName = "index.html";
-			// Check if there is an item request
-			if (requestWildcardUri.length >= 2) {
-				String suffixName = requestWildcardUri[requestWildcardUri.length - 1];
-				if (suffixName.indexOf(".") > 0) {
-					itemName = suffixName; //Update as item name
-				}
-			}
-			
-			boolean isDeveloperMode = (page.JConfig().getBoolean("developersMode.enabled", true) && page.JConfig()
-				.getBoolean("developersMode.PagesBuilder", true));
-			if (isDeveloperMode) {
-				
-				PagesBuilder servletPagesBuilder = page.PagesBuilder();
-				
-				// Load the respective page, only on main page load
-				if (itemName.equals("index.html") && servletPagesBuilder.hasPageFolder(basePageName + "/")) {
-					servletPagesBuilder.buildPageFolder_includingSelf(basePageName + "/");
-					
-					// Build index / common, skip if its a duplicate build request
-					if (!basePageName.equalsIgnoreCase("index") && servletPagesBuilder.hasPageFolder("index")) {
-						servletPagesBuilder.buildAndOutputPage("index");
-					}
-					if (!basePageName.equalsIgnoreCase("common") && servletPagesBuilder.hasPageFolder("common")) {
-						servletPagesBuilder.buildAndOutputPage("common");
-					}
-				}
-			}
-			
-			String reqStr = String.join("/", requestWildcardUri);
-			if (reqStr == null) {
-				reqStr = "";
-			}
-			if (!reqStr.endsWith(itemName)) {
-				reqStr = reqStr + "/" + itemName;
-			}
-			String reqStr_lowerCase = reqStr.toLowerCase();
-			
-			// Security measure? against possible tmp folder access
-			if (reqStr_lowerCase.contains("/tmp") || reqStr_lowerCase.contains("/web-inf")) {
-				// 404 error if file not found
-				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
-				return;
-			}
-			
-			if (reqStr.isEmpty()) {
-				// 404 error if file not found
-				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
-				return;
-			}
-			
-			File requestedFile = (new File(page.getPagesOutputPath(), reqStr));
-			if (!requestedFile.exists() || requestedFile.isDirectory()) {
-				// 404 error if file does not exists
-				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
-				return;
-			}
-			
-			// Fallsback into File Servlet
-			outputFileServlet().processRequest( //
-				page.getHttpServletRequest(), //
-				page.getHttpServletResponse(), //
-				page.requestType() == HttpRequestType.HEAD, //
-				reqStr);
-			
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
 }

@@ -71,16 +71,16 @@ public class MinimalTemplateEngine {
 	///
 	/// By default this would be the JMTE, and Mustache expression blocks.
 	///
-	/// As followed (in JSON): [[ "${","}" ],[ "{{","}}" ]]
+	/// As followed (in JSON): [[ "${","}" ],[ "{{","}}" ],[ "{{{","}}}" ]]
 	///
 	/// (PS: You probably DO NOT need to modify this)
 	///
-	protected String[][] expressionSet = new String[][] { new String[] { "${", "}" }, new String[] { "{{", "}}" } };
+	protected String[][] expressionSet = new String[][] { new String[] { "${", "}" }, new String[] { "{{", "}}" }, new String[] { "{{{","}}}" } };
 	
 	///
-	/// Template expresion prefix / suffix set for unescaped html
+	/// Template expresion prefix / suffix set for unescaped html strictly 
 	///
-	/// This is a Mustache exclusive, and is checked first.
+	/// This is a Mustache exclusive, and is checked first (before expressionSet).
 	///
 	/// As followed (in JSON): [[ "{{{","}}}" ]]
 	///
@@ -97,7 +97,25 @@ public class MinimalTemplateEngine {
 	///
 	/// (PS: You probably DO NOT need to modify this)
 	///
-	protected String[] escapedSet = new String[] { "\\" };
+	protected String[] escapeStrings = new String[] { "\\" };
+	
+	///
+	/// Closing block statment
+	///
+	/// As followed (in JSON): [ "end" ]
+	///
+	/// (PS: You probably DO NOT need to modify this)
+	///
+	protected String[] closingBlockStatements = new String[] { "end" };
+	
+	///
+	/// Closing block statment indicator
+	///
+	/// As followed (in JSON): [ "/" ]
+	///
+	/// (PS: You probably DO NOT need to modify this)
+	///
+	protected String[] closingBlockStrings = new String[] { "/" };
 	
 	//----------------------------------------------------------------
 	//

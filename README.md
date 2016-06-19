@@ -36,11 +36,13 @@ However, it also means, until the code gets reused and refined across multiple p
 + Generics over custom classes. (If you can use a Map, USE IT)
 + Abstract out commonly use patterns into components
 + REUSE INC.
++ 0 Java Warnings (suppress if you must)
 
 Additionally for components under stable docs, the following is applied.
 
 + High Quality Documentation. Leave nothing unexplained!
 + Unit test, everything!
++ 0 Java Errors (CI will fail otherwise)
 
 # Developer commands
 

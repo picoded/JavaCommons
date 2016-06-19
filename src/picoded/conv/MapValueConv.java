@@ -6,17 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
+import picoded.struct.*;
+
 /// 
 /// Utility conversion class, that helps convert Map values from one type to another
 ///
 public class MapValueConv {
-	
-	protected static <B> B[] sanatizeArray(B[] in) {
-		if (in != null && in.length > 0) {
-			in = Arrays.copyOfRange(in, 0, 0);
-		}
-		return in;
-	}
 	
 	/// Converts a Map with List values, into array values
 	public static <A, B> Map<A, B[]> listToArray(Map<A, List<B>> source, Map<A, B[]> target, B[] arrayType) {
@@ -58,6 +53,12 @@ public class MapValueConv {
 	public static <A, B> Map<A, B[]> singleToArray(Map<A, B> source, B[] arrayType) {
 		return singleToArray(source, new HashMap<A, B[]>(), arrayType);
 	}
+	
+	//--------------------------------------------------------------------------------------------------
+	//
+	//  Fully Qualified KEYS handling
+	//
+	//--------------------------------------------------------------------------------------------------
 	
 	@SuppressWarnings("unchecked")
 	public static Map<String, Object> toFullyQualifiedKeys(Object source, String rootName, String separator) {
@@ -193,6 +194,13 @@ public class MapValueConv {
 			Map<String, Object> sourceMap = (Map<String, Object>) source;
 			sourceMap.put(key, value);
 		}
+	}
+	
+	protected static <B> B[] sanatizeArray(B[] in) {
+		if (in != null && in.length > 0) {
+			in = Arrays.copyOfRange(in, 0, 0);
+		}
+		return in;
 	}
 	
 	private static String[] sanitiseArray(String[] source) {

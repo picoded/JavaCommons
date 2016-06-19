@@ -412,6 +412,36 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 		return GenericConvert.toObjectArray(key);
 	}
 	
+	// NESTED object fetch (related to fully qualified keys handling)
+	//--------------------------------------------------------------------------------------------------
+	
+	///
+	/// Gets an object from the map,
+	/// That could very well be, a map inside a list, inside a map, inside a .....
+	///
+	/// Note that at each iteration step, it attempts to do a FULL key match first, 
+	/// before the next iteration depth
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	public default Object getNestedObject(String key, Object fallbck) {
+		return GenericConvert.fetchNestedObject(this, key, fallbck);
+	}
+	
+	///
+	/// Default Null fallback, for `getNestedObject(key,fallback)`
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	public default Object getNestedObject(String key) {
+		return getNestedObject(key,null); 
+	}
+	
 	// Does a simple typecast and put conversion
 	//--------------------------------------------------------------------------------------------------
 	@SuppressWarnings("unchecked")

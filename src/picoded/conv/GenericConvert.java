@@ -557,7 +557,7 @@ public class GenericConvert {
 		return toStringObjectMap(input, null);
 	}
 	
-	// Generic string object map
+	// Generic string map
 	//--------------------------------------------------------------------------------------------------
 	
 	/// To String GenericConvertMap conversion of generic object
@@ -864,6 +864,179 @@ public class GenericConvert {
 	/// @returns         The converted value
 	public static Object[] toObjectArray(Object input) {
 		return toObjectArray(input, null);
+	}
+	
+	//--------------------------------------------------------------------------------------------------
+	//
+	// NESTED object fetch (related to fully qualified keys handling)
+	//
+	//--------------------------------------------------------------------------------------------------
+	
+	///
+	/// Fetch an Object from either a Map, or a List. By attempting to use the provided key.
+	///
+	/// This attempts to use the key AS IT IS. Only converting it to an int for List if needed.
+	/// It does not do recursive fetch, if that is needed see `fetchNestedObject`
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	///
+	public static Object fetchObject(Object base, String key, Object fallback) {
+		
+		// Base to map / list conversion
+		Map<String,Object> baseMap = null;
+		List<Object> baseList = null;
+		
+		// Base to map / list conversion
+		if( base instanceof Map ) {
+			baseMap = toStringMap(base);
+		} else if( base instanceof List ) {
+			baseList = toObjectList(base);
+		}
+		
+		// Fail on getting base item
+		if( baseMap == null && baseList == null ) {
+			return fallback;
+		}
+		
+		// Reuse vars?
+		Object ret = null;
+		int idxPos = 0;
+		
+		// Full key fetch
+		if( baseMap != null ) {
+			ret = baseMap.get(key);
+		} else { // if( baseList != null ) {
+			idxPos = toInt(key, -1);
+			if(idxPos > 0 && idxPos < baseList.size()) {
+				ret = baseList.get(idxPos);
+			}
+		}
+		
+		// Full key found
+		if( ret != null ) {
+			return ret;
+		}
+		
+		// Fallback
+		return fallback;
+	}
+	
+	///
+	/// Gets an object from the map,
+	/// That could very well be, a map inside a list, inside a map, inside a .....
+	///
+	/// Note that at each iteration step, it attempts to do a FULL key match first, 
+	/// before the next iteration depth
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	public static Object fetchNestedObject(Object base, String key, Object fallback) {
+		
+		// Invalid base -> null, or not ( map OR list ) -> fallback
+		if( base == null || !((base instanceof Map) || (base instanceof List)) ) {
+			return fallback;
+		}
+		
+		// Reuse ret object
+		Object ret = null;
+		
+		// Full key fetching found -> if found it is returned =)
+		ret = fetchObject(base, key, null);
+		if(ret != null) {
+			return ret;
+		}
+		
+		// Fallsback if key is ALREADY EMPTY !
+		// cause nothing is found, and nothing else can be done
+		if( key == null || key.length() <= 0 ) {
+			return fallback;
+		}
+		
+		// Trim off useless spaces, and try again (if applicable)
+		int keyLen = key.length();
+		key = key.trim();
+		if(key.length() != keyLen) {
+			return fetchNestedObject(base, key, fallback);
+		}
+		
+		// Trim off useless starting ".dots" and try again
+		if( key.startsWith(".") ) {
+			return fetchNestedObject(base, key.substring(1), fallback);
+		}
+		
+		// Array bracket fetching
+		// This is most likely an array fetching,
+		// but could also be a case of map fetching with string
+		if( key.startsWith("[") ) {
+			int rightBracketIndex = key.indexOf("]", 1);
+			
+			String bracketKey = key.substring(1, rightBracketIndex).trim();
+			String rightKey = key.substring(rightBracketIndex+1).trim();
+			
+			// Fetch [sub object]
+			Object subObject = fetchObject(base, bracketKey, null);
+			
+			// No sub object, cant go a step down, fallback
+			//
+			// Meaning this can neither be the final object (ending key)
+			// nor could it be a recusive fetch.
+			if(subObject == null) {
+				return fallback;
+			}
+			
+			// subObject is THE object, as its the ending key
+			if(rightKey.length() <= 0) {
+				return subObject;
+			}
+			
+			// ELSE : Time to continue, recusively fetching
+			return fetchNestedObject(subObject, rightKey, fallback);
+		}
+		
+		// Fetch one nested level =(
+		int dotIndex = key.indexOf(".");
+		int leftBracketIndex = key.indexOf("[");
+		
+		if( dotIndex >= 0 && (leftBracketIndex < 0 ||  dotIndex < leftBracketIndex) ) {
+			// Dot Index exists, and is before left bracket index OR there is no left bracket index
+			//
+			// This is most likely a nested object fetch -> so recursion is done
+			
+			// Gets the left.right key
+			String leftKey = key.substring(0, dotIndex); //left
+			String rightKey = key.substring(dotIndex+1); //right
+			
+			// Fetch left
+			Object left = fetchObject(base, leftKey, null);
+			
+			// Time to continue, recusively fetching
+			return fetchNestedObject(left, rightKey, fallback);
+			//
+		} else if(leftBracketIndex > 0) {
+			// Left bracket index exists, and there is no dot before it
+			//
+			// This is most likely a nested object fetch -> so recursion is done
+			
+			// Gets the left[right] key
+			String leftKey = key.substring(0, leftBracketIndex); //left
+			String rightKey = key.substring(leftBracketIndex); //[right]
+			
+			// Fetch left
+			Object left = fetchObject(base, leftKey, null);
+			
+			// Time to continue, recusively fetching [right]
+			return fetchNestedObject(left, rightKey, fallback);
+		}
+		
+		// All else failed, including full key fetch -> fallback
+		return fallback;
 	}
 	
 	// to custom class

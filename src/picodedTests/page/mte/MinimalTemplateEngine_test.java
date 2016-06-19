@@ -36,30 +36,25 @@ public class MinimalTemplateEngine_test {
 	public Map<String,Object> simpleVarMap() {
 		Map<String,Object> ret = new HashMap<String,Object>();
 		
-		ret.put("HelloMsg", "Hello World, How do you do?");
+		ret.put("helloMsg", "Hello World, How do you do?");
+		ret.put("reply", "Good =)");
+		ret.put("falseCond", false);
 		
 		return ret;
 	}
 	
 	@Test
 	public void parseTemplate_helloWorld() {
-		assertEquals("<h1>Hello World, How do you do?</h1>", mteObj.parseTemplate("<h1>${HelloMsg}</h1>", simpleVarMap()));
+		assertEquals("<h1>Hello World, How do you do?</h1>", mteObj.parseTemplate("<h1>${helloMsg}</h1>", simpleVarMap()));
+		assertEquals("<h1>Hello World, How do you do?</h1>", mteObj.parseTemplate("<h1>{{helloMsg}}</h1>", simpleVarMap()));
+		//assertEquals("<h1>Hello World, How do you do?</h1>", mteObj.parseTemplate("<h1>{{{helloMsg}}}</h1>", simpleVarMap()));
 	}
 	
-	// @Test
-	// public void conditionalTemplate_false() {
-	// 	mteObj.baseDataModel.put("helloMsg", "Hello World, How do you do?");
-	// 	mteObj.baseDataModel.put("reply", "Good =)");
-	// 	
-	// 	HashMap<String, Object> dataObj = new HashMap<String, Object>();
-	// 	
-	// 	dataObj.put("cond", false);
-	// 	assertEquals("<h1>Hello World, How do you do?</h1>",
-	// 	
-	// 	mteObj.parseTemplate("<h1>${helloMsg}</h1>" + "${if cond}<h2>${reply}</h2>${end}",
-	// 	
-	// 	dataObj));
-	// }
+	@Test
+	public void conditionalTemplate_false() {
+		assertEquals("<h1>Hello World, How do you do?</h1>",
+			mteObj.parseTemplate("<h1>${helloMsg}</h1>" + "${if falseCond}<h2>${reply}</h2>${end}",simpleVarMap()));
+	}
 	// 
 	// @Test
 	// public void conditionalTemplate_true() {

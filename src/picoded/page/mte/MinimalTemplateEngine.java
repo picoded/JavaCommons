@@ -52,115 +52,10 @@ public class MinimalTemplateEngine {
 	/// @param  The variable map to pull subsitute values from
 	/// 
 	public String parseTemplate(String inTemplate, Map<String,Object> varMap) {
-		return parseTemplate(inTemplate.toCharArray(), varMap);
+		TemplateSession ts = new TemplateSession(this, inTemplate, varMap);
+		return ts.parseRaw(new StringBuilder(), 0, inTemplate.length()).toString();
 	}
 	
-	/// 
-	/// Takes in template, add variable map. Poof magic! 
-	/// 
-	/// @param  The Minimal Template Engine markup string
-	/// @param  The variable map to pull subsitute values from
-	/// 
-	public String parseTemplate(char[] inTemplate, Map<String,Object> varMap) {
-		return parseTemplate_raw(new StringBuilder(), inTemplate, 0, inTemplate.length, varMap).toString();
-	}
-	
-	
-	///
-	/// The internal raw templating function
-	///
-	/// This is without the various preperation step for the LayeredMap,
-	/// or function blocks map. This function recursively as it processes a single char[] array.
-	///
-	/// The decision to use char array was based on the following stack overflow answer
-	/// http://stackoverflow.com/questions/8894258/fastest-way-to-iterate-over-all-the-chars-in-a-string
-	///
-	/// As templates had a very high chance of being beyond 256 characters. The internal core function is 
-	/// designed to primarily use char[] in its scan and parse.
-	///
-	/// @param  The template char array, to recursively scan on.
-	/// @param  Starting char to scan
-	/// @param  Ending char to scan
-	/// @param  Variable map to use
-	///
-	/// @returns  StringBuilder containing the final output
-	///
-	protected StringBuilder parseTemplate_raw(StringBuilder ret, char[] inTemplate, int start, int end, Map<String,Object> varMap) {
-		
-		GenericConvertMap<String,Object> genericVarMap = null; 
-		if(varMap != null) {
-			genericVarMap = ProxyGenericConvertMap.ensureGenericConvertMap(varMap);
-		}
-		
-		// Some vars we need to track
-		// Iterate the chars
-		for(; start < end; ++start) {
-			
-			// Skip escaped characters
-			int idx = CharArray.startsWith_returnNeedleIndex(escapedSet, inTemplate, start, end);
-			if(idx >= 0) {
-				// Add the escaped characters
-				ret.append(escapedSet[idx]);
-				start += escapedSet[idx].length();
-				
-				// Add the character after the escaped chars
-				ret.append(inTemplate[start]);
-				continue; //next
-			}
-			
-			// Scan for unescapedExpressionSet
-			
-			// Scan for expressionSet
-			for(idx = 0; idx<expressionSet.length; ++idx) {
-				int exprStart = CharArray.startsWith_returnOffsetAfterNeedle(expressionSet[idx][0], inTemplate, start, end);
-				if(exprStart >= 0) {
-					int exprEnd = CharArray.indexOf_skipEscapedCharacters(escapedSet, expressionSet[idx][1], inTemplate, start, end);
-					
-					if(exprEnd < 0) {
-						throw invalidTemplateFormatException(inTemplate, start, "Missing expected closing brakcet: "+expressionSet[idx][1]+"");
-					}
-					
-					// Get the expression string, remove uneeded spaces?
-					String expression = String.valueOf( CharArray.slice(inTemplate, exprStart, exprEnd) ).trim();
-					
-					// Check if its a BLOCK expression set : IF / ELSE / FOR / WHILE
-					
-					// Assumes either functional expression, 
-					
-					// OR variable expression
-					if(genericVarMap != null) {
-						if(genericVarMap.containsKey(expression)) {
-							ret.append(genericVarMap.getString(expression)); 
-						}
-					}
-					
-					// Regardless, continue AFTER the expression block
-					start = exprEnd + expressionSet[idx][1].length();
-				}
-			}
-			
-			// No match / action taken, append it to result 
-			ret.append(inTemplate[start]);
-		}
-		
-		return ret; 
-	}
-	
-	//----------------------------------------------------------------
-	//
-	// Critical Internal stuff =)
-	//
-	//----------------------------------------------------------------
-	
-	// ///
-	// /// Scans for expression set, and add processed result to StringBuilder ret if found.
-	// ///
-	// ///
-	// ///
-	// protected int scanForExpressionSet(StringBuilder ret, char[] inTemplate, int start, int end, boolean autoEscape, Map<String,Object> varMap) {
-	// 	
-	// }
-
 	//----------------------------------------------------------------
 	//
 	// Unlikely to need modification configuration variables.
@@ -216,11 +111,6 @@ public class MinimalTemplateEngine {
 	// Internal stuff =)
 	//
 	//----------------------------------------------------------------
-	
-	/// Throws an error, for invalid parsing
-	protected RuntimeException invalidTemplateFormatException(char[] inTemplate, int errorPosition, String errorMessage) {
-		return new RuntimeException(errorMessage);
-	}
 	
 	/// Gets and returned the combined Map stack for variable substitution
 }

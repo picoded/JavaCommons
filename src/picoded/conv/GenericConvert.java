@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.BiFunction;
 
+import picoded.struct.*;
+
 /// Provides several autoamted generic conversion, from a given object format to another.
 ///
 /// This is generally meant for most generic types, and is primarily used to handle
@@ -19,7 +21,7 @@ public class GenericConvert {
 	
 	/// To String conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Object to JSON string
@@ -65,7 +67,7 @@ public class GenericConvert {
 	
 	/// To boolean conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric conversion
@@ -131,7 +133,7 @@ public class GenericConvert {
 	
 	/// To Number conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -178,7 +180,7 @@ public class GenericConvert {
 	
 	/// To int conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -210,7 +212,7 @@ public class GenericConvert {
 	
 	/// To long conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -242,7 +244,7 @@ public class GenericConvert {
 	
 	/// To float conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -274,7 +276,7 @@ public class GenericConvert {
 	
 	/// To double conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -306,7 +308,7 @@ public class GenericConvert {
 	
 	/// To byte conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -338,7 +340,7 @@ public class GenericConvert {
 	
 	/// To short conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -370,7 +372,7 @@ public class GenericConvert {
 	
 	/// To UUID conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -415,7 +417,7 @@ public class GenericConvert {
 	
 	/// To GUID conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -469,13 +471,12 @@ public class GenericConvert {
 	// @TODO generic list conversion
 	//--------------------------------------------------------------------------------------------------
 	
-	// to map
-	// @TODO generic map conversion
+	// to string object map
 	//--------------------------------------------------------------------------------------------------
 	
-	/// To String Object map conversion of generic object
+	/// To String map conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion (if its a map)
 	/// - JSON String to Map
@@ -486,31 +487,31 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	@SuppressWarnings("unchecked")
-	public static Map<String, Object> toStringObjectMap(Object input, Object fallbck) {
+	public static <K extends String, V> Map<K, V> toStringMap(Object input, Object fallbck) {
 		
 		// Null handling
 		if (input == null) {
 			if (fallbck == null) {
 				return null;
 			}
-			return toStringObjectMap(fallbck, null);
+			return toStringMap(fallbck, null);
 		}
 		
 		// If Map instance
 		if (input instanceof Map) {
-			return (Map<String, Object>) input;
+			return (Map<K, V>) input;
 		}
 		
 		// If String instance, attampt JSON conversion
 		if (input instanceof String) {
 			try {
-				return ConvertJSON.toMap((String) input);
+				return (Map<K, V>)ConvertJSON.toMap((String) input);
 			} catch (Exception e) {
 				// Silence the exception
 			}
 		}
 		
-		return toStringObjectMap(fallbck, null);
+		return toStringMap(fallbck, null);
 	}
 	
 	/// Default Null fallback, To String Object map conversion of generic object
@@ -518,8 +519,105 @@ public class GenericConvert {
 	/// @param input     The input value to convert
 	///
 	/// @returns         The converted value
+	public static <K extends String, V> Map<K, V> toStringMap(Object input) {
+		return toStringMap(input, null);
+	}
+	
+	///
+	/// @Deprecated : Use {@link #toStringMap()} instead
+	///
+	/// To String Object map conversion of generic object
+	///
+	/// Performs the following strategies in the following order
+	///
+	/// - No conversion (if its a map)
+	/// - JSON String to Map
+	/// - Fallback
+	///
+	/// @param input     The input value to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted value
+	@Deprecated
+	@SuppressWarnings("unchecked")
+	public static Map<String, Object> toStringObjectMap(Object input, Object fallbck) {
+		return toStringMap(input, fallbck);
+	}
+	
+	///
+	/// @Deprecated : Use {@link #toStringMap()} instead
+	///
+	/// Default Null fallback, To String Object map conversion of generic object
+	///
+	/// @param input     The input value to convert
+	///
+	/// @returns         The converted value
+	@Deprecated
 	public static Map<String, Object> toStringObjectMap(Object input) {
 		return toStringObjectMap(input, null);
+	}
+	
+	// Generic string object map
+	//--------------------------------------------------------------------------------------------------
+	
+	/// To String GenericConvertMap conversion of generic object
+	///
+	/// Performs the following strategies in the following order
+	///
+	/// - No conversion (if its a GenericConvertMap)
+	/// - To GenericConvertMap (if its a Map)
+	/// - toStringObjectMap -> GenericConvertMap conversion
+	/// - Fallback
+	///
+	/// @param input     The input value to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted value
+	@SuppressWarnings("unchecked")
+	public static <K extends String,V> GenericConvertMap<K, V> toGenericConvertStringMap(Object input, Object fallbck) {
+		
+		// Null handling
+		if (input == null) {
+			if (fallbck == null) {
+				return null;
+			}
+			return toGenericConvertStringMap(fallbck, null);
+		}
+		
+		// If GenericConvertMap instance
+		if (input instanceof GenericConvertMap) {
+			return (GenericConvertMap<K, V>) input;
+		}
+		
+		// If Map instance
+		if (input instanceof Map) {
+			return ProxyGenericConvertMap.ensureGenericConvertMap((Map<K, V>) input);
+		}
+		
+		// If String instance, attampt JSON conversion
+		if (input instanceof String) {
+			try {
+				Map<String,Object> strMap = ConvertJSON.toMap((String) input);
+				if(strMap != null) {
+					return ProxyGenericConvertMap.ensureGenericConvertMap((Map<K,V>)strMap);
+				}
+			} catch (Exception e) {
+				// Silence the exception
+			}
+		}
+		
+		// Fallback
+		return toGenericConvertStringMap(fallbck, null);
+	}
+	
+	///
+	/// Default Null fallback, To GenericConvert String map conversion of generic object
+	///
+	/// @param input     The input value to convert
+	///
+	/// @returns         The converted value
+	public static <K extends String,V> GenericConvertMap<K, V> toGenericConvertStringMap(Object input) {
+		return toGenericConvertStringMap(input, null);
 	}
 	
 	// to array
@@ -531,7 +629,7 @@ public class GenericConvert {
 	
 	/// To String array conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - String to List
@@ -622,7 +720,7 @@ public class GenericConvert {
 	
 	/// To object list conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Array to List
@@ -696,7 +794,7 @@ public class GenericConvert {
 	
 	/// To object array conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - String to List

@@ -292,26 +292,76 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to map
-	// @TODO generic map conversion
 	//--------------------------------------------------------------------------------------------------
 	
+	///
+	/// @Deprecated : Use {@link #toStringMap()} instead
+	///
 	/// To String Object Map conversion of generic object
 	///
 	/// @param key       The input value key to convert
 	/// @param fallbck   The fallback default (if not convertable)
 	///
 	/// @returns         The converted Map if possible, else null
+	@Deprecated
 	public default Map<String, Object> toStringObjectMap(K key, Object fallbck) {
 		return GenericConvert.toStringObjectMap(get(key), fallbck);
 	}
 	
+	///
+	/// @Deprecated : Use {@link #toStringMap()} instead
+	///
 	/// Default Null fallback, To String Object Map conversion of generic object
 	///
 	/// @param key       The input value key to convert
 	///
 	/// @returns         The converted Map if possible, else null
+	@Deprecated
 	public default Map<String, Object> toStringObjectMap(K key) {
 		return GenericConvert.toStringObjectMap(get(key));
+	}
+	
+	/// To String Map conversion of generic object
+	///
+	/// @param key       The input value key to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted Map if possible, else null
+	public default <K extends String, V> Map<K, V> toStringMap(K key, Object fallbck) {
+		return GenericConvert.toStringMap(get(key), fallbck);
+	}
+	
+	///
+	/// Default Null fallback, To String Map conversion of generic object
+	///
+	/// @param key       The input value key to convert
+	///
+	/// @returns         The converted Map if possible, else null
+	public default <K extends String, V> Map<K, V> toStringMap(K key) {
+		return GenericConvert.toStringMap(get(key));
+	}
+	
+	// Generic string map
+	//--------------------------------------------------------------------------------------------------
+	
+	/// To String Map conversion of generic object
+	///
+	/// @param key       The input value key to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted Map if possible, else null
+	public default <K extends String, V> Map<K, V> toGenericConvertStringMap(K key, Object fallbck) {
+		return GenericConvert.toGenericConvertStringMap(get(key), fallbck);
+	}
+	
+	///
+	/// Default Null fallback, To String Map conversion of generic object
+	///
+	/// @param key       The input value key to convert
+	///
+	/// @returns         The converted Map if possible, else null
+	public default <K extends String, V> Map<K, V> toGenericConvertStringMap(K key) {
+		return GenericConvert.toGenericConvertStringMap(get(key));
 	}
 	
 	// to array

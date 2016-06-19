@@ -48,6 +48,22 @@ public class TemplateSession {
 		}
 	}
 	
+	///
+	/// Utility function to perform HTML character escaping. Uses: StringEscape.escapeHtml4
+	///
+	/// @param  The raw string to escape
+	///
+	/// @return  The escaped string
+	///
+	public String escapeHtml(String inStr) {
+		return StringEscape.escapeHtml4(inStr);
+	}
+	
+	//----------------------------------------------------------------
+	//
+	// Critical Internal stuff =)
+	//
+	//----------------------------------------------------------------
 	
 	///
 	/// The internal recursive raw templating function
@@ -85,35 +101,21 @@ public class TemplateSession {
 			//
 			// Scan for unescaped expressionSet
 			//
+			idx = scanForExpressionSet(parent.unescapedExpressionSet, ret, start, end, false);
+			if(idx >= 0) {
+				// -1 offset added, as the continue call does an additional +1
+				start = idx - 1;
+				continue;
+			}
 			
 			//
 			// Scan for expressionSet
 			//
-			for(idx = 0; idx<parent.expressionSet.length; ++idx) {
-				int exprStart = CharArray.startsWith_returnOffsetAfterNeedle(parent.expressionSet[idx][0], templateChars, start, end);
-				if(exprStart >= 0) {
-					int exprEnd = CharArray.indexOf_skipEscapedCharacters(parent.escapedSet, parent.expressionSet[idx][1], templateChars, start, end);
-					
-					if(exprEnd < 0) {
-						throw invalidTemplateFormatException(templateChars, start, "Missing expected closing brakcet: "+parent.expressionSet[idx][1]+"");
-					}
-					
-					// Get the expression string, remove uneeded spaces?
-					String expression = String.valueOf( CharArray.slice(templateChars, exprStart, exprEnd) ).trim();
-					
-					// Check if its a BLOCK expression set : IF / ELSE / FOR / WHILE
-					
-					// Assumes either functional expression, 
-					
-					// OR variable expression
-					if(varMap.containsKey(expression)) {
-						ret.append(varMap.getString(expression)); 
-					}
-					
-					// Regardless, continue AFTER the expression block
-					start = exprEnd + parent.expressionSet[idx][1].length();
-					continue;
-				}
+			idx = scanForExpressionSet(parent.expressionSet, ret, start, end, true);
+			if(idx >= 0) {
+				// -1 offset added, as the continue call does an additional +1
+				start = idx - 1;
+				continue;
 			}
 			
 			//
@@ -127,20 +129,55 @@ public class TemplateSession {
 		return ret; 
 	}
 	
-	//----------------------------------------------------------------
-	//
-	// Critical Internal stuff =)
-	//
-	//----------------------------------------------------------------
+	///
+	/// Does the expression set scanning, execute it, push to return StringBuilder, 
+	/// and does automatic HTML escaping for variable substitution if needed.
+	///
+	protected int scanForExpressionSet(String[][] expressionSet, StringBuilder ret, int start, int end, boolean autoEscape) {
+		for(int idx = 0; idx<expressionSet.length; ++idx) {
+			int exprStart = CharArray.startsWith_returnOffsetAfterNeedle(expressionSet[idx][0], templateChars, start, end);
+			if(exprStart >= 0) {
+				int exprEnd = CharArray.indexOf_skipEscapedCharacters(parent.escapedSet, expressionSet[idx][1], templateChars, start, end);
+				
+				if(exprEnd < 0) {
+					throw invalidTemplateFormatException(templateChars, start, "Missing expected closing brakcet: "+expressionSet[idx][1]+"");
+				}
+				
+				// Get the expression string, remove uneeded spaces?
+				String expression = String.valueOf( CharArray.slice(templateChars, exprStart, exprEnd) ).trim();
+				
+				// Check if its a BLOCK expression set : IF / ELSE / FOR / WHILE
+				
+				// Assumes either functional expression, 
+				
+				// OR variable expression
+				ret.append( evaluateVariableExpression(expression, autoEscape) );
+				
+				// Regardless, continue AFTER the expression block
+				return exprEnd + expressionSet[idx][1].length();
+			}
+		}
+		return -1;
+	}
 	
-	// ///
-	// /// Scans for expression set, and add processed result to StringBuilder ret if found.
-	// ///
-	// ///
-	// ///
-	// protected int scanForExpressionSet(StringBuilder ret, char[] inTemplate, int start, int end, boolean autoEscape, Map<String,Object> varMap) {
-	// 	
-	// }
+	///
+	/// Assumes a variable expression, try to fetch it =)
+	///
+	protected String evaluateVariableExpression(String expression, boolean autoEscape) {
+		
+		// FULL variable expression match
+		if(varMap.containsKey(expression)) {
+			return escapeHtml(varMap.getString(expression, "")); 
+		}
+		
+		// Sub object map?
+		
+		// Sub array / map index
+		
+		// No dice =(
+		return "";
+	}
+	
 
 	//----------------------------------------------------------------
 	//

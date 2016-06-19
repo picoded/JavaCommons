@@ -37,7 +37,8 @@ public class MinimalTemplateEngine {
 	//----------------------------------------------------------------
 	
 	/// Blank constructor
-	public MinimalTemplateEngine() { }
+	public MinimalTemplateEngine() {
+	}
 	
 	//----------------------------------------------------------------
 	//
@@ -51,7 +52,7 @@ public class MinimalTemplateEngine {
 	/// @param  The Minimal Template Engine markup string
 	/// @param  The variable map to pull subsitute values from
 	/// 
-	public String parseTemplate(String inTemplate, Map<String,Object> varMap) {
+	public String parseTemplate(String inTemplate, Map<String, Object> varMap) {
 		TemplateSession ts = new TemplateSession(this, inTemplate, varMap);
 		return ts.parseRaw(new StringBuilder(), 0, inTemplate.length()).toString();
 	}
@@ -74,7 +75,7 @@ public class MinimalTemplateEngine {
 	///
 	/// (PS: You probably DO NOT need to modify this)
 	///
-	protected String[][] expressionSet = new String[][] { new String[] { "${", "}" }, new String[] { "{{", "}}"} };
+	protected String[][] expressionSet = new String[][] { new String[] { "${", "}" }, new String[] { "{{", "}}" } };
 	
 	///
 	/// Template expresion prefix / suffix set for unescaped html
@@ -85,7 +86,7 @@ public class MinimalTemplateEngine {
 	///
 	/// (PS: You probably DO NOT need to modify this)
 	///
-	protected String[][] unescapedExpressionSet = new String[][] { new String[] { "{{{","}}}" } };
+	protected String[][] unescapedExpressionSet = new String[][] { new String[] { "{{{", "}}}" } };
 	
 	///
 	/// Escaped characters set
@@ -104,7 +105,6 @@ public class MinimalTemplateEngine {
 	// may get extracted out to external class in future
 	//
 	//----------------------------------------------------------------
-	
 	
 	//----------------------------------------------------------------
 	//

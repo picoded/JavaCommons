@@ -22,7 +22,7 @@ public class TemplateSession {
 	public final char[] templateChars;
 	
 	/// Variable map used
-	public final GenericConvertMap<String,Object> varMap;
+	public final GenericConvertMap<String, Object> varMap;
 	
 	///
 	/// Constructor setup call, done inside MinimalTemplateEngine.
@@ -33,18 +33,18 @@ public class TemplateSession {
 	/// @Param  Template string to use for the session
 	/// @Param  Session unique var map called - will be merged with parent map
 	///
-	public TemplateSession(MinimalTemplateEngine inParent, String inTemplate, Map<String,Object> inVarMap) {
+	public TemplateSession(MinimalTemplateEngine inParent, String inTemplate, Map<String, Object> inVarMap) {
 		parent = inParent;
 		templateString = inTemplate;
 		templateChars = inTemplate.toCharArray();
 		
 		// @TODO : merge and do a layered map with the parent maps
-		if(inVarMap != null) {
+		if (inVarMap != null) {
 			// Gets the generic convert map
 			varMap = ProxyGenericConvertMap.ensureGenericConvertMap(inVarMap);
 		} else {
 			// Uses a blank object, so that the code is less error prone
-			varMap = new GenericConvertHashMap<String,Object>();
+			varMap = new GenericConvertHashMap<String, Object>();
 		}
 	}
 	
@@ -82,13 +82,13 @@ public class TemplateSession {
 	///
 	protected StringBuilder parseRaw(StringBuilder ret, int start, int end) {
 		// Iterate the chars
-		for(; start < end; ++start) {
+		for (; start < end; ++start) {
 			
 			//
 			// Skip escaped characters
 			//
 			int idx = CharArray.startsWith_returnNeedleIndex(parent.escapedSet, templateChars, start, end);
-			if(idx >= 0) {
+			if (idx >= 0) {
 				// Add the escaped characters
 				ret.append(parent.escapedSet[idx]);
 				start += parent.escapedSet[idx].length();
@@ -102,7 +102,7 @@ public class TemplateSession {
 			// Scan for unescaped expressionSet
 			//
 			idx = scanForExpressionSet(parent.unescapedExpressionSet, ret, start, end, false);
-			if(idx >= 0) {
+			if (idx >= 0) {
 				// -1 offset added, as the continue call does an additional +1
 				start = idx - 1;
 				continue;
@@ -112,7 +112,7 @@ public class TemplateSession {
 			// Scan for expressionSet
 			//
 			idx = scanForExpressionSet(parent.expressionSet, ret, start, end, true);
-			if(idx >= 0) {
+			if (idx >= 0) {
 				// -1 offset added, as the continue call does an additional +1
 				start = idx - 1;
 				continue;
@@ -121,37 +121,40 @@ public class TemplateSession {
 			//
 			// No match / action taken, append it to result 
 			//
-			if(start < end) {
+			if (start < end) {
 				ret.append(templateChars[start]);
 			}
 		}
 		
-		return ret; 
+		return ret;
 	}
 	
 	///
 	/// Does the expression set scanning, execute it, push to return StringBuilder, 
 	/// and does automatic HTML escaping for variable substitution if needed.
 	///
-	protected int scanForExpressionSet(String[][] expressionSet, StringBuilder ret, int start, int end, boolean autoEscape) {
-		for(int idx = 0; idx<expressionSet.length; ++idx) {
+	protected int scanForExpressionSet(String[][] expressionSet, StringBuilder ret, int start, int end,
+		boolean autoEscape) {
+		for (int idx = 0; idx < expressionSet.length; ++idx) {
 			int exprStart = CharArray.startsWith_returnOffsetAfterNeedle(expressionSet[idx][0], templateChars, start, end);
-			if(exprStart >= 0) {
-				int exprEnd = CharArray.indexOf_skipEscapedCharacters(parent.escapedSet, expressionSet[idx][1], templateChars, start, end);
+			if (exprStart >= 0) {
+				int exprEnd = CharArray.indexOf_skipEscapedCharacters(parent.escapedSet, expressionSet[idx][1],
+					templateChars, start, end);
 				
-				if(exprEnd < 0) {
-					throw invalidTemplateFormatException(templateChars, start, "Missing expected closing brakcet: "+expressionSet[idx][1]+"");
+				if (exprEnd < 0) {
+					throw invalidTemplateFormatException(templateChars, start, "Missing expected closing brakcet: "
+						+ expressionSet[idx][1] + "");
 				}
 				
 				// Get the expression string, remove uneeded spaces?
-				String expression = String.valueOf( CharArray.slice(templateChars, exprStart, exprEnd) ).trim();
+				String expression = String.valueOf(CharArray.slice(templateChars, exprStart, exprEnd)).trim();
 				
 				// Check if its a BLOCK expression set : IF / ELSE / FOR / WHILE
 				
 				// Assumes either functional expression, 
 				
 				// OR variable expression
-				ret.append( evaluateVariableExpression(expression, autoEscape) );
+				ret.append(evaluateVariableExpression(expression, autoEscape));
 				
 				// Regardless, continue AFTER the expression block
 				return exprEnd + expressionSet[idx][1].length();
@@ -166,8 +169,8 @@ public class TemplateSession {
 	protected String evaluateVariableExpression(String expression, boolean autoEscape) {
 		
 		// FULL variable expression match
-		if(varMap.containsKey(expression)) {
-			return escapeHtml(varMap.getString(expression, "")); 
+		if (varMap.containsKey(expression)) {
+			return escapeHtml(varMap.getString(expression, ""));
 		}
 		
 		// Sub object map?
@@ -178,7 +181,6 @@ public class TemplateSession {
 		return "";
 	}
 	
-
 	//----------------------------------------------------------------
 	//
 	// Internal stuff =)

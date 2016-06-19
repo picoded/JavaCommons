@@ -1,11 +1,11 @@
 package picodedTests.conv;
 
 // Target test class
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
+import java.util.*;
+import java.io.*;
 
 // Test Case include
 import org.junit.Test;
@@ -13,6 +13,7 @@ import org.junit.Test;
 import picoded.conv.ConvertJSON;
 import picoded.conv.GUID;
 import picoded.conv.GenericConvert;
+import picoded.fileUtils.*;
 
 // Classes used in test case
 
@@ -62,7 +63,6 @@ public class GenericConvert_test {
 	
 	@Test
 	public void toLongTest() {
-		System.out.println(GenericConvert.toLong(null, 1l));
 		assertEquals(1l, GenericConvert.toLong(null, 1l));
 		assertEquals(2l, GenericConvert.toLong(2l, 1l));
 		assertEquals(3l, GenericConvert.toLong(3l));
@@ -157,6 +157,58 @@ public class GenericConvert_test {
 		assertArrayEquals(ConvertJSON.toList(jsonString).toArray(), GenericConvert.toObjectArray(jsonString));
 		assertArrayEquals(ConvertJSON.toList(jsonString).toArray(),
 			GenericConvert.toObjectArray(ConvertJSON.toList(jsonString), null));
+	}
+	
+	//--------------------------------------------------------------------------------------------------
+	//
+	//  getObject / getNestedObject test
+	//
+	//--------------------------------------------------------------------------------------------------
+	
+	@Test
+	public void getObject_list() {
+		List<String> list = new ArrayList<String>();
+		list.add("one");
+		list.add("two");
+		list.add("3");
+		
+		assertEquals("one", GenericConvert.fetchObject(list, "0"));
+		assertEquals("two", GenericConvert.fetchObject(list, "1"));
+		assertEquals("3", GenericConvert.fetchObject(list, "2"));
+		
+		assertEquals(0, GenericConvert.fetchObject("[0,1,2]", "0"));
+		assertEquals(1, GenericConvert.fetchObject("[0,1,2]", "1"));
+		assertEquals(2, GenericConvert.fetchObject("[0,1,2]", "2"));
+	}
+	
+	@Test
+	public void getObject_map() {
+		assertEquals("world", GenericConvert.fetchObject("{ \"hello\" : \"world\" }", "hello"));
+	}
+	
+	@Test
+	public void fetchNestedObject() {
+		Map<String, Object> unqualifiedMap = new HashMap<String, Object>();
+		
+		File unqualifiedMapFile = new File("./test-files/test-specific/conv/unqualifiedMap.js");
+		String jsonString = "";
+		try {
+			jsonString = FileUtils.readFileToString(unqualifiedMapFile);
+		} catch (Exception ex) {
+			
+		}
+		unqualifiedMap = ConvertJSON.toMap(jsonString);
+		
+		assertNotNull(unqualifiedMap);
+		assertEquals("1", GenericConvert.fetchNestedObject(unqualifiedMap, "agentID"));
+		
+		assertEquals("Sam", GenericConvert.fetchNestedObject(unqualifiedMap, "clients[0].name"));
+		assertEquals("Eugene", GenericConvert.fetchNestedObject(unqualifiedMap, "clients[1].name"));
+		assertEquals("Murong", GenericConvert.fetchNestedObject(unqualifiedMap, "clients[2].name"));
+		
+		assertEquals("12345", GenericConvert.fetchNestedObject(unqualifiedMap, "clients[0].nric"));
+		assertEquals("23456", GenericConvert.fetchNestedObject(unqualifiedMap, "clients[1].nric"));
+		assertEquals("34567", GenericConvert.fetchNestedObject(unqualifiedMap, "clients[2].nric"));
 	}
 	
 }

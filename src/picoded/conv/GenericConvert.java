@@ -897,6 +897,14 @@ public class GenericConvert {
 			baseList = toObjectList(base);
 		}
 		
+		// Fail on getting base item : attempts conversion
+		if (baseMap == null && baseList == null) {
+			baseMap = toStringMap(base);
+			if (baseMap == null) {
+				baseList = toObjectList(base);
+			}
+		}
+		
 		// Fail on getting base item
 		if (baseMap == null && baseList == null) {
 			return fallback;
@@ -911,7 +919,7 @@ public class GenericConvert {
 			ret = baseMap.get(key);
 		} else { // if( baseList != null ) {
 			idxPos = toInt(key, -1);
-			if (idxPos > 0 && idxPos < baseList.size()) {
+			if (idxPos >= 0 && idxPos < baseList.size()) {
 				ret = baseList.get(idxPos);
 			}
 		}
@@ -923,6 +931,18 @@ public class GenericConvert {
 		
 		// Fallback
 		return fallback;
+	}
+	
+	///
+	/// Default Null fallback, for `fetchObject(base, key, fallback)`
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	///
+	public static Object fetchObject(Object base, String key) {
+		return fetchObject(base, key, null);
 	}
 	
 	///
@@ -1004,7 +1024,7 @@ public class GenericConvert {
 		int dotIndex = key.indexOf(".");
 		int leftBracketIndex = key.indexOf("[");
 		
-		if (dotIndex >= 0 && (leftBracketIndex < 0 || dotIndex < leftBracketIndex)) {
+		if (dotIndex >= 0 && (leftBracketIndex < 0 || dotIndex <= leftBracketIndex)) {
 			// Dot Index exists, and is before left bracket index OR there is no left bracket index
 			//
 			// This is most likely a nested object fetch -> so recursion is done
@@ -1037,6 +1057,18 @@ public class GenericConvert {
 		
 		// All else failed, including full key fetch -> fallback
 		return fallback;
+	}
+	
+	///
+	/// Default Null fallback, for `fetchNestedObject(base, key, fallback)`
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	///
+	public static Object fetchNestedObject(Object base, String key) {
+		return fetchNestedObject(base, key, null);
 	}
 	
 	// to custom class

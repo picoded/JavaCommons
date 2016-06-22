@@ -71,14 +71,14 @@ public class MinimalTemplateEngine {
 	///
 	/// By default this would be the JMTE, and Mustache expression blocks.
 	///
-	/// As followed (in JSON): [[ "${","}" ],[ "{{","}}" ],[ "{{{","}}}" ]]
+	/// As followed (in JSON): [[ "${","}" ],[ "{{#","}}" ],[ "{{","}}" ],[ "{{{","}}}" ]]
 	///
 	/// (PS: You probably DO NOT need to modify this)
 	///
-	protected String[][] expressionSet = new String[][] { new String[] { "${", "}" }, new String[] { "{{", "}}" }, new String[] { "{{{","}}}" } };
+	public String[][] expressionSet = new String[][] { new String[] { "${", "}" }, new String[] { "{{#", "}}" }, new String[] { "{{", "}}" }, new String[] { "{{{","}}}" } };
 	
 	///
-	/// Template expresion prefix / suffix set for unescaped html strictly 
+	/// Template expresion prefix / suffix set for unescaped html strictly, this MUST be a subset of expressionSet
 	///
 	/// This is a Mustache exclusive, and is checked first (before expressionSet).
 	///
@@ -86,7 +86,7 @@ public class MinimalTemplateEngine {
 	///
 	/// (PS: You probably DO NOT need to modify this)
 	///
-	protected String[][] unescapedExpressionSet = new String[][] { new String[] { "{{{", "}}}" } };
+	public String[][] unescapedExpressionSet = new String[][] { new String[] { "{{{", "}}}" } };
 	
 	///
 	/// Escaped characters set
@@ -97,7 +97,7 @@ public class MinimalTemplateEngine {
 	///
 	/// (PS: You probably DO NOT need to modify this)
 	///
-	protected String[] escapeStrings = new String[] { "\\" };
+	public String[] escapeStrings = new String[] { "\\" };
 	
 	///
 	/// Closing block statment
@@ -106,7 +106,7 @@ public class MinimalTemplateEngine {
 	///
 	/// (PS: You probably DO NOT need to modify this)
 	///
-	protected String[] closingBlockStatements = new String[] { "end" };
+	public String[] closingBlockStatements = new String[] { "end" };
 	
 	///
 	/// Closing block statment indicator
@@ -115,7 +115,7 @@ public class MinimalTemplateEngine {
 	///
 	/// (PS: You probably DO NOT need to modify this)
 	///
-	protected String[] closingBlockStrings = new String[] { "/" };
+	public String[] closingBlockStrings = new String[] { "/" };
 	
 	//----------------------------------------------------------------
 	//

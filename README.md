@@ -98,7 +98,12 @@ So that everyone pretty much only need to download ONE dependency (this project)
 Ideally though perhaps I could one day switch back to maven/gradle (or whatever there is),
 after setting up and including into the source control. A proper local repository cache (like how npm works).  
 
-That would certainly make updating libraries much easier. While allowing me to make sure everything is in ONE git package.  
+That would certainly make updating libraries much easier. While allowing me to make sure everything is in ONE git package.
+
+So until THAT is fixed, I am keeping the JARS in GIT's. Even though conventional git/source control advice is to NOT include build files.
+It just makes things much easier.
+
+Note this same philosphy applies to servlet projects i build using this package
 
 PS: This is filed as T231 in picoded phabriator.
 

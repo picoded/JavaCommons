@@ -631,6 +631,8 @@ public class PageBuilderCore {
 		boolean res = false;
 		if (rawPageName == null || rawPageName.equalsIgnoreCase("/")) {
 			rawPageName = "";
+		} else {
+			rawPageName = rawPageName.trim();
 		}
 		
 		// The current folder to scan
@@ -649,8 +651,12 @@ public class PageBuilderCore {
 				String subPageName = pageDefine.getName();
 				
 				// Scan for sub pages
-				if (subPageName.equalsIgnoreCase("assets") || subPageName.equalsIgnoreCase("common")
-					|| subPageName.equalsIgnoreCase("index") || subPageName.equalsIgnoreCase("web-inf")) {
+				if( subPageName.equalsIgnoreCase("common") || subPageName.equalsIgnoreCase("index") ) {
+					if( rawPageName.length() <= 0 ) {
+						// Build the common and index page
+						buildAndOutputPage(rawPageName + subPageName);
+					}
+				} else if (subPageName.equalsIgnoreCase("assets") || subPageName.equalsIgnoreCase("web-inf")) {
 					// ignoring certain reserved folders
 				} else {
 					// Build the page

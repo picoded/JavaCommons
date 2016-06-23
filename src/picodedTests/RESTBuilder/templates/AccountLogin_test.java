@@ -501,6 +501,124 @@ public class AccountLogin_test {
 		assertEquals("guest", userMeta.get("role"));
 	}
 	
+	//Method : login, Type: GET
+	@Test
+	public void loginGetTest() throws InterruptedException {
+		// Setup user
+		AccountObject testUser = accTable.newObject("the-root");
+		testUser.setPassword("is-sudo");
+
+		// Credentials in request
+		HashMap<String, String[]> cred = new HashMap<String, String[]>();
+		cred.put("accountName", new String[] { "the-root" });
+
+		// Wrong login attempt
+		// ---------------------------------------
+		cred.put("accountPass", new String[] { "is-sudo" }); 
+		assertNotNull(response = RequestHttp.post(testAddress + "/api/account/login", cred));
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull(responseMap.get("accountID"));
+		assertNotNull(responseMap.get("accountNames"));
+		assertEquals("the-root", ((List<String>) (responseMap.get("accountNames"))).get(0));
+	}
+	
+	@Test
+	public void passwordChangeThroughSuperUserTest() throws InterruptedException {
+		accTable.setSuperUserGroupName("admin");
+		AccountObject superUser = accTable.newObject("the-super-user");
+		superUser.setPassword("i-super");
+		AccountObject admin = accTable.newObject("admin");
+		admin.setGroupStatus(true);
+		superUser.setMember(admin, "admin");
+		superUser.addMember(superUser, "admin");
+		
+		// Setup user
+		// ---------------------------------------
+		AccountObject testUser = accTable.newObject("the-changing-user");
+		testUser.setPassword("is-old");
+		Map<String, String[]> cookieJar = null;
+		
+		HashMap<String, String[]> cred = new HashMap<String, String[]>();
+		cred.put("accountName", new String[] { "the-super-user" });
+		cred.put("accountPass", new String[] { "i-super" });
+		
+		assertNotNull(response = RequestHttp.post(testAddress + "/api/account/login", cred));
+		assertNotNull(cookieJar = response.cookiesMap());
+		assertNotNull(responseMap = response.toMap());
+		assertNull("Full map string of error: " + responseMap.toString() + " -> ", responseMap.get("error"));
+		assertNotNull(responseMap.toString(), responseMap.get("accountID"));
+		
+		cred.put("accountID", new String[] { "the-changing-user" });
+		cred.put("newPassword", new String[] { "new-pass" });
+		
+		
+		String accountID = (String) (responseMap.get("accountID"));
+		HashMap<String, String[]> passwordChange = new HashMap<String, String[]>();
+		
+		// Password change works
+		// ---------------------------------------
+		passwordChange.put("oldPassword", new String[] { "is-old" });
+		
+		assertNotNull(response = RequestHttp.post(testAddress + "/api/account/password", passwordChange, cookieJar, null));
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull(responseMap.toString(), responseMap.get("success"));
+		assertNull(responseMap.toString(), responseMap.get("error"));
+		assertEquals(responseMap.toString(), accountID, responseMap.get("accountID"));
+		
+		// Login after change, new password
+		// ---------------------------------------
+		cred.put("accountPass", new String[] { "is-brand-NEW-world-1" });
+		cred.put("accountName", new String[] { "the-changing-user" });
+		
+		assertNotNull(response = RequestHttp.post(testAddress + "/api/account/login", cred));
+		assertNotNull(response.cookiesMap());
+		assertNotNull(responseMap = response.toMap());
+		
+		assertNull("Full map string of error: " + responseMap.toString() + " -> ", responseMap.get("error"));
+		assertNotNull(responseMap.toString(), responseMap.get("accountID"));
+		assertNotNull(responseMap.toString(), responseMap.get("accountNames"));
+		assertEquals("the-changing-user", ((List<String>) (responseMap.get("accountNames"))).get(0));
+		
+	}
+	
+	@Test
+	public void passwordChangeThroughSuperUserInvalidTest() throws InterruptedException {
+		accTable.setSuperUserGroupName("admin");
+		AccountObject superUser = accTable.newObject("the-super-user");
+		superUser.setPassword("i-super");
+		superUser.setMember(superUser, "admin");
+		
+		// Setup user
+		// ---------------------------------------
+		AccountObject testUser = accTable.newObject("the-changing-user");
+		testUser.setPassword("is-old");
+		Map<String, String[]> cookieJar = null;
+		
+		HashMap<String, String[]> cred = new HashMap<String, String[]>();
+		cred.put("accountName", new String[] { "the-super-user" });
+		cred.put("accountPass", new String[] { "i-super" });
+		
+		assertNotNull(response = RequestHttp.post(testAddress + "/api/account/login", cred));
+		assertNotNull(cookieJar = response.cookiesMap());
+		assertNotNull(responseMap = response.toMap());
+		assertNull("Full map string of error: " + responseMap.toString() + " -> ", responseMap.get("error"));
+		assertNotNull(responseMap.toString(), responseMap.get("accountID"));
+		
+		cred.put("accountID", new String[] { "the-changing-user" });
+		cred.put("newPassword", new String[] { "new-pass" });
+		
+		
+		HashMap<String, String[]> passwordChange = new HashMap<String, String[]>();
+		
+		passwordChange.put("oldPassword", new String[] { "is-old" });
+		
+		assertNotNull(response = RequestHttp.post(testAddress + "/api/account/password", passwordChange, cookieJar, null));
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull(responseMap.toString(), responseMap.get("error"));
+		assertEquals("User does not have permission to edit password: null", responseMap.get("error"));
+		
+	}
+	
 	private AccountObject getUser(String userName) {
 		if (!accTable.containsName(userName)) {
 			accTable.newObject(userName).saveAll();

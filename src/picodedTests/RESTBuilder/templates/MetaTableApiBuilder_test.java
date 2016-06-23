@@ -3,7 +3,10 @@ package picodedTests.RESTBuilder.templates;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.io.File;
 import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -113,6 +116,17 @@ public class MetaTableApiBuilder_test {
 	}
 	
 	@Test
+	public void list_GET_and_POST_SearchParams_lengthGT2_test() {
+		
+		String[] allArgs = new String[] { "_oid", "_name", "_age" };
+		
+		List<List<Object>> allDataWithQueryFilter = mtApi.list_GET_and_POST_inner(0, 0, 0, allArgs, "_oid=? OR _name=? OR _age=?",
+			new String[] { "*", "name1", "age4" }, "", false);
+		assertNotNull(allDataWithQueryFilter);
+		
+	}
+	
+	@Test
 	public void list_GET_and_POST_queryTest() {
 		//test query start and length
 		String[] allArgs = new String[] { "_oid", "_name", "_age" };
@@ -172,6 +186,10 @@ public class MetaTableApiBuilder_test {
 		List<String> data = new ArrayList<String>();
 		
 		try {
+			if (!new File("./test-files/test-specific/MetaTable").exists()) {
+			    File dir = new File("./test-files/test-specific/MetaTable");
+			    dir.mkdir();
+			}
 			FileWriter fw = new FileWriter("./test-files/test-specific/MetaTable/reportsCSV.csv");
 			
 			while ((data = mtApi.csv_list(0, count, 2, new String[] { "_oid", "_age", "_name" }, null, null, null)).size() >= 2) { //what if data is null?? oh nooooo
@@ -181,6 +199,7 @@ public class MetaTableApiBuilder_test {
 					fw.write("\n");
 				}
 				fw.flush();
+				fw.close();
 			}
 		} catch (Exception e) {
 			

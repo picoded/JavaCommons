@@ -87,7 +87,7 @@ public class TemplateSession {
 			//
 			// Skip escaped characters
 			//
-			int idx = CharArray.startsWith_returnNeedleIndex(parent.escapeStrings, templateChars, start, end);
+			int idx = CharArray.startsWith(parent.escapeStrings, templateChars, start, end);
 			if (idx >= 0) {
 				// Add the escaped characters
 				ret.append(parent.escapeStrings[idx]);
@@ -218,7 +218,7 @@ public class TemplateSession {
 			//
 			// Skip escaped characters
 			//
-			int idx = CharArray.startsWith_returnNeedleIndex(parent.escapeStrings, templateChars, start, end);
+			int idx = CharArray.startsWith(parent.escapeStrings, templateChars, start, end);
 			if (idx >= 0) {
 				// Skipped the escaped chars
 				start += parent.escapeStrings[idx].length();

@@ -74,7 +74,7 @@ public class SyntaxTreeRoot extends SyntaxTreeNode {
 			//
 			// Skip escaped characters
 			//
-			int idx = CharArray.startsWith_returnNeedleIndex(escapeStrings, templateChars, pos, end);
+			int idx = CharArray.startsWith(escapeStrings, templateChars, pos, end);
 			if (idx >= 0) {
 				// Skip the escape string characters
 				pos += escapeStrings[idx].length();

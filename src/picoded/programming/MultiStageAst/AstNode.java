@@ -89,19 +89,23 @@ public class AstNode extends GenericConvertHashMap<String,Object> {
 	/// Children nodes
 	public List<AstNode> children = new ArrayList<AstNode>();
 	
+	/// Previously added child node
+	public AstNode addedChildNode = null;
+	
 	/// Reset the children nodes list
 	public void resetChildren() {
+		addedChildNode = null;
 		children = new ArrayList<AstNode>();
 	}
 	
 	/// Add a child node with the relative starting offset
 	public void addChildNode(String inType, int relativeOffset) {
-		children.add( new AstNode(root, inType, _startPosition+relativeOffset, _endingPosition) );
+		children.add( addedChildNode = new AstNode(root, inType, _startPosition+relativeOffset, _endingPosition) );
 	}
 	
 	/// Add a child node with the relative starting offset, and length
 	public void addChildNode(String inType, int relativeOffset, int length) {
-		children.add( new AstNode(root, inType, _startPosition+relativeOffset, _startPosition+relativeOffset+length) );
+		children.add( addedChildNode = new AstNode(root, inType, _startPosition+relativeOffset, _startPosition+relativeOffset+length) );
 	}
 	
 	//----------------------------------------------------------------
@@ -145,15 +149,115 @@ public class AstNode extends GenericConvertHashMap<String,Object> {
 	
 	//----------------------------------------------------------------
 	//
+	// Common config variables : Used in various processors
+	//
+	//----------------------------------------------------------------
+	
+	// String prefix and suffix, used in echo_stringify
+	public String prefix = null;
+	public String suffix = null;
+	
+	// Mode string flag
+	public String mode = null;
+	
+	//----------------------------------------------------------------
+	//
 	// Node string searching
 	//
 	//----------------------------------------------------------------
 	
-	public int node_startsWith(String[] needleSet, int relativeOffset) {
-		return CharArray.startsWith(needleSet, root.rootChars, _startPosition+relativeOffset, _endingPosition);
+	public boolean startsWith(String needle, int relativeOffset) {
+		return CharArray.startsWith(needle, root.rootChars, _startPosition+relativeOffset,  _endingPosition);
+	}
+	public boolean startsWith(String needle, int relativeOffset, int length) {
+		return CharArray.startsWith(needle, root.rootChars, _startPosition+relativeOffset,  _startPosition+relativeOffset+length);
 	}
 	
-	public int node_startsWith(String[] needleSet, int relativeOffset, int length) {
-		return CharArray.startsWith(needleSet, root.rootChars, _startPosition+relativeOffset,  _startPosition+relativeOffset+length);
+	public int startsWith(String[] needleArray, int relativeOffset) {
+		return CharArray.startsWith(needleArray, root.rootChars, _startPosition+relativeOffset, _endingPosition);
+	}
+	
+	public int startsWith(String[] needleArray, int relativeOffset, int length) {
+		return CharArray.startsWith(needleArray, root.rootChars, _startPosition+relativeOffset,  _startPosition+relativeOffset+length);
+	}
+	
+	public int startsWith(String[][] needleSet, int nestedPos, int relativeOffset) {
+		return CharArray.startsWith(needleSet, nestedPos, root.rootChars, _startPosition+relativeOffset, _endingPosition);
+	}
+	
+	public int startsWith(String[][] needleSet, int nestedPos, int relativeOffset, int length) {
+		return CharArray.startsWith(needleSet, nestedPos, root.rootChars, _startPosition+relativeOffset,  _startPosition+relativeOffset+length);
+	}
+	
+	public int indexOf(String needle, int relativeOffset, int length) {
+		int res = CharArray.indexOf(needle, root.rootChars, _startPosition+relativeOffset, _startPosition+relativeOffset+length);
+		if( res >= _startPosition ) {
+			return res - _startPosition;
+		}
+		return -1;
+	}
+	
+	public int indexOf(String needle, int relativeOffset) {
+		int res = CharArray.indexOf(needle, root.rootChars, _startPosition+relativeOffset, _endingPosition);
+		if( res >= _startPosition ) {
+			return res - _startPosition;
+		}
+		return -1;
+	}
+	
+	public int indexOf_skipEscapedCharacters(String[] escapeStrings, String needle, int relativeOffset, int length) {
+		int res = CharArray.indexOf_skipEscapedCharacters(escapeStrings, needle, root.rootChars, _startPosition+relativeOffset, _startPosition+relativeOffset+length);
+		if( res >= _startPosition ) {
+			return res - _startPosition;
+		} 
+		return -1;
+	}
+	
+	public int indexOf_skipEscapedCharacters(String[] escapeStrings, String needle, int relativeOffset) {
+		int res = CharArray.indexOf_skipEscapedCharacters(escapeStrings, needle, root.rootChars, _startPosition+relativeOffset, _endingPosition);
+		if( res >= _startPosition ) {
+			return res - _startPosition;
+		}
+		return -1;
+	} 
+	
+	//----------------------------------------------------------------
+	//
+	// Creates a SyntaxException, to throw
+	//
+	//----------------------------------------------------------------
+	
+	public AstSyntaxException setupSyntaxException(int errorRelativeOffset, String errorMessage) {
+		String finalMsg = "";
+		finalMsg += "\n";
+		
+		String posPrefix = " ... ";
+		String posSuffix = " ... ";
+		
+		int errorPosition = _startPosition + errorRelativeOffset;
+		int start = errorPosition - 10;
+		int end = errorPosition + 20;
+		
+		if(start < 0) {
+			start = 0;
+			posPrefix = "";
+		}
+		if(end > root.rootString.length()) {
+			end = root.rootString.length();
+			posSuffix = "";
+		}
+		
+		String prefixSegment = root.rootString.substring(start, errorPosition);
+		String suffixSegment = root.rootString.substring(errorPosition, end);
+		String prefixFull = posPrefix + prefixSegment;
+		
+		finalMsg += prefixFull + suffixSegment + posSuffix + "\n";
+		for(int i=0; i<prefixFull.length(); ++i) {
+			finalMsg += " ";
+		}
+		finalMsg += "^\n";
+		finalMsg += errorMessage;
+		
+		return new AstSyntaxException(finalMsg);
 	}
 }

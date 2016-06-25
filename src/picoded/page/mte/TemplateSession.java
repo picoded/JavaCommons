@@ -136,25 +136,25 @@ public class TemplateSession {
 	///
 	protected String[][] fetchStatementSet(String[][] expressionSet, int start, int end) {
 		for (int idx = 0; idx < expressionSet.length; ++idx) {
-			int exprStart = CharArray.startsWith_returnOffsetAfterNeedle(expressionSet[idx][0], templateChars, start, end);
-			if (exprStart >= 0) {
-				int exprEnd = CharArray.indexOf_skipEscapedCharacters(parent.escapeStrings, expressionSet[idx][1],
-					templateChars, start, end);
-				
-				if (exprEnd < 0) {
-					throw invalidTemplateFormatException(start, "Missing expected closing bracket: "
-						+ expressionSet[idx][1] + "");
-				}
-				
-				// Get the expression string, remove uneeded spaces and return it statements
-				String rawStatement = templateString.substring(start, exprEnd+expressionSet[idx][1].length());
-				String fullStatement = templateString.substring(exprStart, exprEnd).trim();
-				
-				return new String[][] {
-					new String[] { rawStatement, fullStatement, expressionSet[idx][0], expressionSet[idx][1] },
-					fullStatement.split("\\s+")
-				};
-			}
+			// int exprStart = CharArray.startsWith_returnOffsetAfterNeedle(expressionSet[idx][0], templateChars, start, end);
+			// if (exprStart >= 0) {
+			// 	int exprEnd = CharArray.indexOf_skipEscapedCharacters(parent.escapeStrings, expressionSet[idx][1],
+			// 		templateChars, start, end);
+			// 	
+			// 	if (exprEnd < 0) {
+			// 		throw invalidTemplateFormatException(start, "Missing expected closing bracket: "
+			// 			+ expressionSet[idx][1] + "");
+			// 	}
+			// 	
+			// 	// Get the expression string, remove uneeded spaces and return it statements
+			// 	String rawStatement = templateString.substring(start, exprEnd+expressionSet[idx][1].length());
+			// 	String fullStatement = templateString.substring(exprStart, exprEnd).trim();
+			// 	
+			// 	return new String[][] {
+			// 		new String[] { rawStatement, fullStatement, expressionSet[idx][0], expressionSet[idx][1] },
+			// 		fullStatement.split("\\s+")
+			// 	};
+			// }
 		}
 		return null; //nothing fouund
 	}

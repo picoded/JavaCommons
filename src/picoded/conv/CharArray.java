@@ -19,10 +19,28 @@ public class CharArray {
 	/// @param  the offset index to start checking from
 	/// @param  the offset index to terminate scan (should be heystack.length)
 	///
-	/// @return  The boolean true, if matches
+	/// @return  The found position in the heystack AFTER the needle
 	/// 
 	public static boolean startsWith(String needle, final char[] heystack, int startOffset, int endOffset) {
-		return startsWith_returnOffsetAfterNeedle(needle, heystack, startOffset, endOffset) >= 0;
+		// Needle size and length check
+		int needleSize = needle.length();
+		
+		// Impossible to match, not enough chars
+		if ((endOffset - startOffset) < needleSize) {
+			return false;
+		} 
+		
+		// Scan the needle
+		for (int needleIndx = 0; needleIndx < needleSize; ++needleIndx) {
+			// Check for char match
+			if (needle.charAt(needleIndx) != heystack[startOffset + needleIndx]) {
+				// No match, terminates
+				return false;
+			}
+		}
+		
+		// Passed all checks
+		return true;
 	}
 	
 	///
@@ -35,10 +53,10 @@ public class CharArray {
 	///
 	/// @return  The found position in the heystack AFTER the needle
 	/// 
-	public int indexOf(String needle, final char[] heystack, int startOffset, int endOffset) {
+	public static int indexOf(String needle, final char[] heystack, int startOffset, int endOffset) {
 		// Iterate till found
 		for (; startOffset < endOffset; ++startOffset) {
-			if (startsWith_returnOffsetAfterNeedle(needle, heystack, startOffset, endOffset) >= 0) {
+			if (startsWith(needle, heystack, startOffset, endOffset)) {
 				return startOffset;
 			}
 		}
@@ -68,38 +86,6 @@ public class CharArray {
 	///
 	/// Takes a string value, and checks the char[] from start to end for the "needle" if it starts with it
 	///
-	/// @param  Value to find
-	/// @param  character array to scan
-	/// @param  the offset index to start checking from
-	/// @param  the offset index to terminate scan (should be heystack.length)
-	///
-	/// @return  The found position in the heystack AFTER the needle
-	/// 
-	public static int startsWith_returnOffsetAfterNeedle(String needle, final char[] heystack, int startOffset, int endOffset) {
-		// Needle size and length check
-		int needleSize = needle.length();
-		
-		// Impossible to match, not enough chars
-		if ((endOffset - startOffset) < needleSize) {
-			return -1;
-		} 
-		
-		// Scan the needle
-		for (int needleIndx = 0; needleIndx < needleSize; ++needleIndx) {
-			// Check for char match
-			if (needle.charAt(needleIndx) != heystack[startOffset + needleIndx]) {
-				// No match, terminates
-				return -1;
-			}
-		}
-		
-		// Passed all checks
-		return startOffset + needleSize;
-	}
-	
-	///
-	/// Takes a string value, and checks the char[] from start to end for the "needle" if it starts with it
-	///
 	/// @param  Needle array value to find
 	/// @param  character array to scan
 	/// @param  the offset index to start checking from
@@ -109,8 +95,38 @@ public class CharArray {
 	/// 
 	public static int startsWith(String[] needleArray, final char[] heystack, int startOffset, int endOffset) {
 		for (int i = 0; i < needleArray.length; ++i) {
-			if (startsWith_returnOffsetAfterNeedle(needleArray[i], heystack, startOffset, endOffset) >= 0) {
+			if (startsWith(needleArray[i], heystack, startOffset, endOffset)) {
 				return i;
+			}
+		}
+		
+		return -1;
+	}
+	
+	///
+	/// Takes a string value, and checks the char[] from start to end for the "needle" if it starts with it
+	///
+	/// @param  Nested Needle array value to find
+	/// @param  The array position used to fetch the scan needle
+	/// @param  character array to scan
+	/// @param  the offset index to start checking from
+	/// @param  the offset index to terminate scan (should be heystack.length)
+	///
+	/// @return  The index of the needle found, else -1
+	/// 
+	public static int startsWith(String[][] needleSet, int nestedPos, final char[] heystack, int startOffset, int endOffset) {
+		for(int idx = 0; idx<needleSet.length; ++idx) {
+			String[] needleArray = needleSet[idx];
+			int found = -1;
+			
+			if(nestedPos >= 0) {
+				if(startsWith(needleArray[nestedPos], heystack, startOffset, endOffset)) {
+					return idx;
+				}
+			} else {
+				if(startsWith(needleArray, heystack, startOffset, endOffset) >= 0) {
+					return idx;
+				}
 			}
 		}
 		
@@ -134,15 +150,14 @@ public class CharArray {
 			
 			// Check for escape string char skipping
 			for (int i = 0; i < escapeStrings.length; ++i) {
-				int nxtOffset = startsWith_returnOffsetAfterNeedle(escapeStrings[i], heystack, startOffset, endOffset);
-				if (nxtOffset >= 0) {
-					startOffset = nxtOffset; //+1 to skip the next character is done in for loop
+				if (startsWith(escapeStrings[i], heystack, startOffset, endOffset)) {
+					startOffset += escapeStrings[i].length(); //+1 to skip the next character is done in for loop
 					continue;
 				}
 			}
 			
 			// Valid match, returns
-			if (startsWith_returnOffsetAfterNeedle(needle, heystack, startOffset, endOffset) >= 0) {
+			if (startsWith(needle, heystack, startOffset, endOffset)) {
 				return startOffset;
 			}
 		}

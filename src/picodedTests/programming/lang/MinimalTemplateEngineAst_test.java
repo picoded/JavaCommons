@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import picoded.programming.lang.MinimalTemplateEngineAst;
+import picoded.programming.MultiStageAst.*;
 
 // IMPORTANT! Dun just test NULL, and Succesful cases, test expected failure also!
 public class MinimalTemplateEngineAst_test {
@@ -29,6 +30,21 @@ public class MinimalTemplateEngineAst_test {
 		assertEquals(1, node.children.size());
 		
 		assertEquals(helloTemplate, node.toString());
+	}
+	
+	@Test
+	public void parseTemplate_missingBracketException() {
+		String helloTemplate = "<h1>${helloMsg</h1>";
+		AstSyntaxException exc = null;
+		MinimalTemplateEngineAst node = new MinimalTemplateEngineAst(helloTemplate);
+		assertEquals(0, node.children.size());
+		
+		try {
+			node.applySingleStage(0);
+		} catch( AstSyntaxException e ) {
+			exc = e;
+		}
+		assertNotNull(exc);
 	}
 	
 	@Test

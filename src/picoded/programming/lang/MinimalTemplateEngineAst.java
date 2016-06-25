@@ -119,6 +119,7 @@ public class MinimalTemplateEngineAst extends AstRoot {
 		Map<String,AstNodeStringify> ret = new HashMap<String,AstNodeStringify>();
 		ret.put("*", AstCommonFunctions.children_stringify);
 		ret.put("text", AstCommonFunctions.echo_stringify);
+		ret.put("expression", AstCommonFunctions.echo_stringify);
 		return ret;
 	}
 	
@@ -128,15 +129,43 @@ public class MinimalTemplateEngineAst extends AstRoot {
 	//
 	//----------------------------------------------------------------
 	
+	/// Scans for an escape block at a fixed node position. And does the needed expression block construction
+	public int stage0_expressionSetScan(AstNode node, int pos, int prvPos, String[][] expSet, String expressionMode) {
+		int idx = node.startsWith(expSet, 0, pos);
+		if( idx >= 0 ) {
+			int endPos = node.indexOf_skipEscapedCharacters(escapeStrings, expSet[idx][1], pos);
+			if (endPos < 0) {
+				throw node.setupSyntaxException(idx, "Missing expected closing bracket: "+expSet[idx][1]);
+			}
+			
+			// Add any characters before block as text node
+			if(prvPos < pos) {
+				root.addChildNode("text",prvPos,pos);
+				prvPos = pos;
+			}
+			
+			// Add the raw expresison block
+			int endLength = endPos-pos;
+			root.addChildNode("expression",pos+expSet[idx][0].length(), endLength-expSet[idx][0].length()-expSet[idx][1].length()+1); 
+			root.addedChildNode.prefix = expSet[idx][0];
+			root.addedChildNode.suffix = expSet[idx][1];
+			root.addedChildNode.mode = expressionMode;
+			
+			return pos+endLength+expSet[idx][1].length(); //prvPos
+			//pos = prvPos - 1; //Deduct, as continue increment +1 already
+		}
+		return -1;
+	}
+	
 	/// Initial root node processing
-	public AstNodeProcessor stage0_root = (root) -> {
+	public AstNodeProcessor stage0_root = (node) -> {
 		// Reset child nodes
-		root.resetChildren();
+		node.resetChildren();
 		
 		// Start scanning with reuse vars
 		int pos = 0;
 		int prvPos = 0;
-		int end = root.nodeLength();
+		int end = node.nodeLength();
 		
 		// Iterate the chars
 		for (; pos < end; ++pos) {
@@ -144,7 +173,7 @@ public class MinimalTemplateEngineAst extends AstRoot {
 			//
 			// Skip escaped characters
 			//
-			int idx = root.node_startsWith(escapeStrings, pos);
+			int idx = root.startsWith(escapeStrings, pos);
 			if (idx >= 0) { 
 				// Skip the escape string characters
 				pos += escapeStrings[idx].length();
@@ -153,45 +182,25 @@ public class MinimalTemplateEngineAst extends AstRoot {
 				// pos += 1 - 1; // Minus 1, as loop adds it on continue
 				continue; //next
 			}
-		// 	
-		// 	//
-		// 	// Scans for escape character block
-		// 	//
-		// 	for(idx = 0; idx<expressionSet.length; ++idx) {
-		// 		int exprStart = CharArray.startsWith_returnOffsetAfterNeedle(expressionSet[idx][0], templateChars, pos, end);
-		// 		if (exprStart >= 0) {
-		// 			int exprEnd = CharArray.indexOf_skipEscapedCharacters(escapeStrings, expressionSet[idx][1],
-		// 				templateChars, pos, end);
-		// 			
-		// 			if (exprEnd < 0) {
-		// 				throw invalidTemplateFormatException(pos, "Missing expected closing bracket: "
-		// 					+ expressionSet[idx][1] + "");
-		// 			}
-		// 			
-		// 			//
-		// 			// Create text node, if there is characters from prvPos to pos.
-		// 			// 
-		// 			if(prvPos < pos) {
-		// 				SyntaxTreeNode prefixNode = new SyntaxTreeNode(this, "text", prvPos);
-		// 				prefixNode.text = templateString.substring(prvPos, pos);
-		// 				childNodes.add(prefixNode);
-		// 				prvPos = pos;
-		// 			}
-		// 			
-		// 			//
-		// 			// Create bracket node
-		// 			//
-		// 			SyntaxTreeNode expresssionNode = new SyntaxTreeNode(this, "expression", exprStart);
-		// 			expresssionNode.storeExpression( templateString.substring(exprStart, exprEnd) );
-		// 			expresssionNode.expressionBrackets = expressionSet[idx];
-		// 			childNodes.add(expresssionNode);
-		// 			
-		// 			// Update pos index
-		// 			prvPos = exprEnd + expressionSet[idx][1].length();
-		// 			pos = prvPos - 1; //Deduct, as continue increment +1 already
-		// 			continue;
-		// 		}
-		// 	}
+			
+			//
+			// Scans for unescapedExpressionSet template block
+			//
+			idx = stage0_expressionSetScan(node, pos, prvPos, unescapedExpressionSet, "unescaped");
+			if( idx >= 0 ) {
+				prvPos = idx; 
+				pos = prvPos - 1; //Deduct, as continue increment +1 already
+			} else {
+				//
+				// Scans for escaped template block
+				//
+				idx = stage0_expressionSetScan(node, pos, prvPos, expressionSet, "standard");
+				if( idx >= 0 ) {
+					prvPos = idx; 
+					pos = prvPos - 1; //Deduct, as continue increment +1 already
+				}
+			}
+			
 		}
 		 
 		//

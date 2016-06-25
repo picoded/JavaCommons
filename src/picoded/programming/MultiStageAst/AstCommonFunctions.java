@@ -14,7 +14,15 @@ public class AstCommonFunctions {
 	
 	/// Takes the full raw text it represents, and echos it
 	public static AstNodeStringify echo_stringify = (node) -> {
-		return new StringBuilder(node.nodeString());
+		StringBuilder res = new StringBuilder();
+		if(node.prefix != null) {
+			res.append(node.prefix);
+		}
+		res.append(node.nodeString());
+		if(node.suffix != null) {
+			res.append(node.suffix);
+		}
+		return res;
 	};
 	
 	/// Stringify all the child nodes, and returns

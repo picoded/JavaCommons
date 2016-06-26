@@ -505,7 +505,7 @@ public class GenericConvert {
 		// If String instance, attampt JSON conversion
 		if (input instanceof String) {
 			try {
-				return (Map<K, V>)ConvertJSON.toMap((String) input);
+				return (Map<K, V>) ConvertJSON.toMap((String) input);
 			} catch (Exception e) {
 				// Silence the exception
 			}
@@ -574,7 +574,7 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	@SuppressWarnings("unchecked")
-	public static <K extends String,V> GenericConvertMap<K, V> toGenericConvertStringMap(Object input, Object fallbck) {
+	public static <K extends String, V> GenericConvertMap<K, V> toGenericConvertStringMap(Object input, Object fallbck) {
 		
 		// Null handling
 		if (input == null) {
@@ -597,9 +597,9 @@ public class GenericConvert {
 		// If String instance, attampt JSON conversion
 		if (input instanceof String) {
 			try {
-				Map<String,Object> strMap = ConvertJSON.toMap((String) input);
-				if(strMap != null) {
-					return ProxyGenericConvertMap.ensureGenericConvertMap((Map<K,V>)strMap);
+				Map<String, Object> strMap = ConvertJSON.toMap((String) input);
+				if (strMap != null) {
+					return ProxyGenericConvertMap.ensureGenericConvertMap((Map<K, V>) strMap);
 				}
 			} catch (Exception e) {
 				// Silence the exception
@@ -616,7 +616,7 @@ public class GenericConvert {
 	/// @param input     The input value to convert
 	///
 	/// @returns         The converted value
-	public static <K extends String,V> GenericConvertMap<K, V> toGenericConvertStringMap(Object input) {
+	public static <K extends String, V> GenericConvertMap<K, V> toGenericConvertStringMap(Object input) {
 		return toGenericConvertStringMap(input, null);
 	}
 	
@@ -887,18 +887,26 @@ public class GenericConvert {
 	public static Object fetchObject(Object base, String key, Object fallback) {
 		
 		// Base to map / list conversion
-		Map<String,Object> baseMap = null;
+		Map<String, Object> baseMap = null;
 		List<Object> baseList = null;
 		
 		// Base to map / list conversion
-		if( base instanceof Map ) {
+		if (base instanceof Map) {
 			baseMap = toStringMap(base);
-		} else if( base instanceof List ) {
+		} else if (base instanceof List) {
 			baseList = toObjectList(base);
 		}
 		
+		// Fail on getting base item : attempts conversion
+		if (baseMap == null && baseList == null) {
+			baseMap = toStringMap(base);
+			if (baseMap == null) {
+				baseList = toObjectList(base);
+			}
+		}
+		
 		// Fail on getting base item
-		if( baseMap == null && baseList == null ) {
+		if (baseMap == null && baseList == null) {
 			return fallback;
 		}
 		
@@ -907,22 +915,34 @@ public class GenericConvert {
 		int idxPos = 0;
 		
 		// Full key fetch
-		if( baseMap != null ) {
+		if (baseMap != null) {
 			ret = baseMap.get(key);
 		} else { // if( baseList != null ) {
 			idxPos = toInt(key, -1);
-			if(idxPos > 0 && idxPos < baseList.size()) {
+			if (idxPos >= 0 && idxPos < baseList.size()) {
 				ret = baseList.get(idxPos);
 			}
 		}
 		
 		// Full key found
-		if( ret != null ) {
+		if (ret != null) {
 			return ret;
 		}
 		
 		// Fallback
 		return fallback;
+	}
+	
+	///
+	/// Default Null fallback, for `fetchObject(base, key, fallback)`
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	///
+	public static Object fetchObject(Object base, String key) {
+		return fetchObject(base, key, null);
 	}
 	
 	///
@@ -940,7 +960,7 @@ public class GenericConvert {
 	public static Object fetchNestedObject(Object base, String key, Object fallback) {
 		
 		// Invalid base -> null, or not ( map OR list ) -> fallback
-		if( base == null || !((base instanceof Map) || (base instanceof List)) ) {
+		if (base == null || !((base instanceof Map) || (base instanceof List))) {
 			return fallback;
 		}
 		
@@ -949,36 +969,36 @@ public class GenericConvert {
 		
 		// Full key fetching found -> if found it is returned =)
 		ret = fetchObject(base, key, null);
-		if(ret != null) {
+		if (ret != null) {
 			return ret;
 		}
 		
 		// Fallsback if key is ALREADY EMPTY !
 		// cause nothing is found, and nothing else can be done
-		if( key == null || key.length() <= 0 ) {
+		if (key == null || key.length() <= 0) {
 			return fallback;
 		}
 		
 		// Trim off useless spaces, and try again (if applicable)
 		int keyLen = key.length();
 		key = key.trim();
-		if(key.length() != keyLen) {
+		if (key.length() != keyLen) {
 			return fetchNestedObject(base, key, fallback);
 		}
 		
 		// Trim off useless starting ".dots" and try again
-		if( key.startsWith(".") ) {
+		if (key.startsWith(".")) {
 			return fetchNestedObject(base, key.substring(1), fallback);
 		}
 		
 		// Array bracket fetching
 		// This is most likely an array fetching,
 		// but could also be a case of map fetching with string
-		if( key.startsWith("[") ) {
+		if (key.startsWith("[")) {
 			int rightBracketIndex = key.indexOf("]", 1);
 			
 			String bracketKey = key.substring(1, rightBracketIndex).trim();
-			String rightKey = key.substring(rightBracketIndex+1).trim();
+			String rightKey = key.substring(rightBracketIndex + 1).trim();
 			
 			// Fetch [sub object]
 			Object subObject = fetchObject(base, bracketKey, null);
@@ -987,12 +1007,12 @@ public class GenericConvert {
 			//
 			// Meaning this can neither be the final object (ending key)
 			// nor could it be a recusive fetch.
-			if(subObject == null) {
+			if (subObject == null) {
 				return fallback;
 			}
 			
 			// subObject is THE object, as its the ending key
-			if(rightKey.length() <= 0) {
+			if (rightKey.length() <= 0) {
 				return subObject;
 			}
 			
@@ -1004,14 +1024,14 @@ public class GenericConvert {
 		int dotIndex = key.indexOf(".");
 		int leftBracketIndex = key.indexOf("[");
 		
-		if( dotIndex >= 0 && (leftBracketIndex < 0 ||  dotIndex < leftBracketIndex) ) {
+		if (dotIndex >= 0 && (leftBracketIndex < 0 || dotIndex <= leftBracketIndex)) {
 			// Dot Index exists, and is before left bracket index OR there is no left bracket index
 			//
 			// This is most likely a nested object fetch -> so recursion is done
 			
 			// Gets the left.right key
 			String leftKey = key.substring(0, dotIndex); //left
-			String rightKey = key.substring(dotIndex+1); //right
+			String rightKey = key.substring(dotIndex + 1); //right
 			
 			// Fetch left
 			Object left = fetchObject(base, leftKey, null);
@@ -1019,7 +1039,7 @@ public class GenericConvert {
 			// Time to continue, recusively fetching
 			return fetchNestedObject(left, rightKey, fallback);
 			//
-		} else if(leftBracketIndex > 0) {
+		} else if (leftBracketIndex > 0) {
 			// Left bracket index exists, and there is no dot before it
 			//
 			// This is most likely a nested object fetch -> so recursion is done
@@ -1037,6 +1057,18 @@ public class GenericConvert {
 		
 		// All else failed, including full key fetch -> fallback
 		return fallback;
+	}
+	
+	///
+	/// Default Null fallback, for `fetchNestedObject(base, key, fallback)`
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	///
+	public static Object fetchNestedObject(Object base, String key) {
+		return fetchNestedObject(base, key, null);
 	}
 	
 	// to custom class

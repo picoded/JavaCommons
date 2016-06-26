@@ -227,26 +227,25 @@ public class PageBuilderCore {
 		String res = null;
 		
 		// Get from the rawPageName folder itself (v2)
-		res = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + fileName),
-			"UTF-8", null);
+		res = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + fileName), "UTF-8", null);
 		
 		// Gets the parent paths (if valid)
-		if(res == null) {
+		if (res == null) {
 			String[] splitNames = splitPageName(rawPageName);
-			if(splitNames.length <= 1) {
+			if (splitNames.length <= 1) {
 				// There were no parent folders, skip the parent paths checks
 			} else {
 				// Go one "directory" parent upward
-				splitNames = ArrayConv.subarray(splitNames,0,splitNames.length-1);
+				splitNames = ArrayConv.subarray(splitNames, 0, splitNames.length - 1);
 				
 				// Breaks once root directory is reached / or result found
-				while(res == null && splitNames.length > 0) {
+				while (res == null && splitNames.length > 0) {
 					// Join the name path, and get the file
-					res = FileUtils.readFileToString_withFallback(new File(pagesFolder, String.join("/", splitNames) + "/" + fileName),
-						"UTF-8", null);
+					res = FileUtils.readFileToString_withFallback(new File(pagesFolder, String.join("/", splitNames) + "/"
+						+ fileName), "UTF-8", null);
 					
 					// Go one "directory" parent upward
-					splitNames = ArrayConv.subarray(splitNames,0,splitNames.length-1);
+					splitNames = ArrayConv.subarray(splitNames, 0, splitNames.length - 1);
 				}
 			}
 		}

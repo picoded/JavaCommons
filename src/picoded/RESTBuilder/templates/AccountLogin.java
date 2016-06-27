@@ -1,69 +1,54 @@
 package picoded.RESTBuilder.templates;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import picoded.JStruct.AccountObject;
-import picoded.JStruct.AccountTable;
-import picoded.JStruct.MetaObject;
-import picoded.JStruct.MetaTable;
-import picoded.RESTBuilder.RESTBuilder;
-import picoded.RESTBuilder.RESTFunction;
-import picoded.RESTBuilder.RESTRequest;
+import picoded.RESTBuilder.*;
+import picoded.JStack.*;
+import picoded.JStruct.*;
+import picoded.servlet.*;
 import picoded.conv.ConvertJSON;
 import picoded.conv.GenericConvert;
 import picoded.conv.RegexUtils;
 import picoded.enums.HttpRequestType;
-import picoded.servlet.BasePage;
 
 /// Account login template API
-@SuppressWarnings("serial")
 public class AccountLogin extends BasePage {
 	
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	//
 	// Common error messages
 	//
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	
 	public static final String MISSING_REQUEST_PAGE = "Unexpected Exception: Missing requestPage()";
 	public static final String MISSING_LOGIN_SESSION = "Authentication Error: Missing login session";
 	public static final String MISSING_PERMISSION = "Permission Error: Missing permission for request (generic)";
 	public static final String MISSING_PERMISSION_GROUP = "Permission Error: Missing group admin rights required for request";
 	
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	//
 	// Utility functions
 	//
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	
-	// /
-	// / StandardRaised extension of RESTFunction, for login module, as a
-	// functional interface
-	// / This is used in conjunction with prepareAuthenticatedREST, and is
-	// called only if user is logged in
-	// /
-	// / The interface is called with the following parameters, this is isolated
-	// to allow more complex Authentication
-	// / overwrites across all interfaces (except login) in the future
-	// /
-	// / @params {RESTRequest} RESTREquest used
-	// / @params {Map<String,Object>} Returned map expected
-	// / @params {BasePage} BasePage object implementation
-	// / @params {AccountTable} Account table from basePage
-	// / @params {AccountObject} Currently logged in user
-	// / @params {AccountObject} Additional account object, based on utility
-	// function
-	// / @params {AccountObject} Additional account object, based on utility
-	// function
-	// /
-	// / @returns {Map<String,Object>}
-	// /
+	///
+	/// Standardised extension of RESTFunction, for login module, as a functional interface
+	/// This is used in conjunction with prepareAuthenticatedREST, and is called only if user is logged in
+	///
+	/// The interface is called with the following parameters, this is isolated to allow more complex Authentication
+	/// overwrites across all interfaces (except login) in the future
+	///
+	/// @params  {RESTRequest}          RESTREquest used
+	/// @params  {Map<String,Object>}   Returned map expected
+	/// @params  {BasePage}             BasePage object implmentation
+	/// @params  {AccountTable}         Account table from basePage
+	/// @params  {AccountObject}        Currently logged in user
+	/// @params  {AccountObject}        Additional account object, based on utility function
+	/// @params  {AccountObject}        Additional account object, based on utility function
+	///
+	/// @returns {Map<String,Object>}
+	///
 	@FunctionalInterface
 	public interface loginREST {
 		public abstract Map<String, Object> apply( //
@@ -76,20 +61,19 @@ public class AccountLogin extends BasePage {
 	
 	private static MetaTableApiBuilder mtApi = null;
 	
-	// /
-	// / StandardRaised utility function use to authenticate the login request,
-	// and extend on for the respective function
-	// /
-	// / @params {RESTRequest} RESTREquest used
-	// / @params {Map<String,Object>} Returned map expected
-	// / @params {loginREST} The function to call after authenticating
-	// /
-	// / @returns {Map<String,Object>}
-	// /
+	///
+	/// Standardised utility function use to authenticate the login request, and extend on for the respective function
+	///
+	/// @params  {RESTRequest}          RESTREquest used
+	/// @params  {Map<String,Object>}   Returned map expected
+	/// @params  {loginREST}            The function to call after authenticating
+	///
+	/// @returns {Map<String,Object>}
+	///
 	public static Map<String, Object> prepareAuthenticatedREST(RESTRequest req, Map<String, Object> res, loginREST call) {
 		
 		// Loads and check for request page
-		// ----------------------------------------
+		//----------------------------------------
 		if (req.requestPage() == null) {
 			res.put("error", MISSING_REQUEST_PAGE);
 			return res;
@@ -102,30 +86,64 @@ public class AccountLogin extends BasePage {
 		mtApi = new MetaTableApiBuilder(accountTableObj.accountMetaTable());
 		
 		// Checked for valid login
-		// ----------------------------------------
+		//----------------------------------------
 		if (currentUser == null) {
 			res.put("error", MISSING_LOGIN_SESSION);
 			return res;
 		}
 		// Run actual logic
-		// ----------------------------------------
+		//----------------------------------------
 		return call.apply(req, res, basePageObj, accountTableObj, currentUser, null, null);
 	}
 	
-	// /
-	// / Standardised utility function use to authenticate the login request,
-	// and fetch the first wildcard argument as a group object (if possible)
-	// / Also checks for adminstration rights, and can be set to only call the
-	// loginREST function if it has group admin rights
-	// /
-	// / @params {RESTRequest} RESTREquest used
-	// / @params {Map<String,Object>} Returned map expected
-	// / @params {boolean} Apply the calling function ONLY if its has group
-	// adminstration rights (if true)
-	// / @params {loginREST} The function to call after authenticating
-	// /
-	// / @returns {Map<String,Object>}
-	// /
+	///
+	/// Standardised utility function use to allow the login request WITHOUT authentication, and extend on for the respective function
+	///
+	/// @params  {RESTRequest}          RESTREquest used
+	/// @params  {Map<String,Object>}   Returned map expected
+	/// @params  {loginREST}            The function to call after authenticating
+	///
+	/// @returns {Map<String,Object>}
+	///
+	public static Map<String, Object> prepareNoAuthenticationREST(RESTRequest req, Map<String, Object> res,
+		loginREST call) {
+		
+		// Loads and check for request page
+		//----------------------------------------
+		if (req.requestPage() == null) {
+			res.put("error", MISSING_REQUEST_PAGE);
+			return res;
+		}
+		
+		BasePage basePageObj = (BasePage) (req.requestPage());
+		AccountTable accountTableObj = basePageObj.accountAuthTable();
+		AccountObject currentUser = accountTableObj.getRequestUser(basePageObj.getHttpServletRequest());
+		
+		mtApi = new MetaTableApiBuilder(accountTableObj.accountMetaTable());
+		
+		// Checked for valid login
+		//----------------------------------------
+		//if (currentUser == null) {
+		//    res.put("error", MISSING_LOGIN_SESSION);
+		//    return res;
+		//}
+		
+		// Run actual logic
+		//----------------------------------------
+		return call.apply(req, res, basePageObj, accountTableObj, currentUser, null, null);
+	}
+	
+	///
+	/// Standardised utility function use to authenticate the login request, and fetch the first wildcard argument as a group object (if possible)
+	/// Also checks for adminstration rights, and can be set to only call the loginREST function if it has group admin rights
+	///
+	/// @params  {RESTRequest}          RESTREquest used
+	/// @params  {Map<String,Object>}   Returned map expected
+	/// @params  {boolean}              Apply the calling function ONLY if its has group adminstration rights (if true)
+	/// @params  {loginREST}            The function to call after authenticating
+	///
+	/// @returns {Map<String,Object>}
+	///
 	public static Map<String, Object> fetchGroupObject_fromFirstWildcard_orCurrentUser(RESTRequest req,
 		Map<String, Object> res, boolean callOnlyForGroupAdmin, loginREST call) {
 		
@@ -134,7 +152,7 @@ public class AccountLogin extends BasePage {
 			accObj_b) -> {
 			
 			// Default no data
-			// ----------------------------------------
+			//----------------------------------------
 			resMap.put("groupID", null);
 			resMap.put("groupID_exist", false);
 			resMap.put("groupID_valid", false);
@@ -150,25 +168,24 @@ public class AccountLogin extends BasePage {
 				resMap.put("groupID", wildcard[0]);
 				groupObj = accountTableObj.getFromID(wildcard[0]);
 			} else {
-				groupObj = currentUser; // Defaults group object to current
-				// user
+				groupObj = currentUser; // Defaults group object to current user
 				resMap.put("groupID", currentUser._oid());
 			}
 			
 			// Terminates if no group object (null)
-			// ----------------------------------------
+			//----------------------------------------
 			if (groupObj == null) {
 				res.put("error", "GroupObj is null in fetchGroupObject_fromFirstWildcard_orCurrentUser");
 				return resMap;
 			}
 			
 			// Check group object
-			// ----------------------------------------
+			//----------------------------------------
 			resMap.put("groupID_exist", true);
 			resMap.put("groupID_valid", groupObj.isGroup());
 			
 			// Terminates if group object is not a group
-			// ----------------------------------------
+			//----------------------------------------
 			if (groupObj.isGroup() == false) {
 				res.put("error", "GroupObj is not group in fetchGroupObject_fromFirstWildcard_orCurrentUser");
 				return resMap;
@@ -189,58 +206,46 @@ public class AccountLogin extends BasePage {
 				return resMap;
 			}
 			
-			// Applies the call, only after fetching and validating the
-			// group object
+			// Applies the call, only after fetching and validating the group object
 			return call.apply(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, null);
 		});
 		
 	}
 	
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	//
 	// Login, Logout, and password API
 	//
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	
-	// /
-	// / # login (GET)
-	// /
-	// / The login GET function, this returns the current accountID and
-	// accountName
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns
-	// UNSANITISED data, so common escape characters |
-	// / | | | are returned as well. |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | isLogin | boolean | indicator if the session is logged in or not |
-	// / | accountID | String | account ID of the session |
-	// / | accountNames | String[] | array of account names representing the
-	// session |
-	// / | isSuperUser | boolean | indicator if user is superuser |
-	// / | isAdmin | boolean | indicator if user is admin in ANY of the groups
-	// user is in |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | error | String (Optional) | Errors encounted if any |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # login (GET)
+	///
+	/// The login GET function, this returns the current accountID and accountName
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name | Variable Type	  | Description                                                                   |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                 |                    | are returned as well.                                                         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name | Variable Type      | Description                                                                   |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | isLogin        | boolean            | indicator if the session is logged in or not                                  |
+	/// | accountID      | String             | account ID of the session                                                     |
+	/// | accountNames   | String[]           | array of account names representing the session                               |
+	/// | isSuperUser    | boolean            | indicator if user is superuser                                                |
+	/// | isAdmin        | boolean            | indicator if user is admin in ANY of the groups user is in                    |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error          | String (Optional)  | Errors encounted if any                                                       |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public static RESTFunction login_GET = (req, res) -> {
 		res.put("accountID", null);
 		res.put("accountName", null);
@@ -274,48 +279,36 @@ public class AccountLogin extends BasePage {
 		return res;
 	};
 	
-	// /
-	// / # login (POST)
-	// /
-	// / The login POST function, used to login a new session
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | accountName | String (Optional) | Either the accountName or the
-	// accountID is needed |
-	// / | accountID | String (Optional) | Either the accountName or the
-	// accountID is needed |
-	// / | accountPass | String | The account password used for login |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns
-	// UNSANITISED data, so common escape characters |
-	// / | | | are returned as well. |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | isLogin | boolean | indicator if the session is logged in or not |
-	// / | accountID | String | account ID of the session |
-	// / | accountNames | String[] | array of account names representing the
-	// session |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | error | String (Optional) | Errors encounted if any |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # login (POST)
+	///
+	/// The login POST function, used to login a new session
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name | Variable Type	   | Description                                                                   |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | accountName    | String (Optional)  | Either the accountName or the accountID is needed                             |
+	/// | accountID      | String (Optional)  | Either the accountName or the accountID is needed                             |
+	/// | accountPass    | String             | The account password used for login                                           |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                |                    | are returned as well.                                                         |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name | Variable Type	   | Description                                                                   |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | isLogin        | boolean            | indicator if the session is logged in or not                                  |
+	/// | accountID      | String             | account ID of the session                                                     |
+	/// | accountNames   | String[]           | array of account names representing the session                               |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error          | String (Optional)  | Errors encounted if any                                                       |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public static RESTFunction login_POST = (req, res) -> {
 		res.put("accountID", null);
 		res.put("accountNames", null);
@@ -361,7 +354,7 @@ public class AccountLogin extends BasePage {
 						} else {
 							at.getFromName(tStr).addDelay(tStr);
 						}
-						// res.put("isLogin", false);
+						//res.put("isLogin", false);
 					}
 				} else {
 					res.put("isLogin", false);
@@ -375,36 +368,29 @@ public class AccountLogin extends BasePage {
 		return res;
 	};
 	
-	// /
-	// / # logout (GET)
-	// /
-	// / The logout GET function, used to logout the current browser session
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | No parameters options |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | logout | boolean | indicator if logout is successful or not |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | error | String (Optional) | Errors encounted if any |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # logout (GET)
+	///
+	/// The logout GET function, used to logout the current browser session
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name | Variable Type      | Description                                                                   |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | No parameters options                                                                                               |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name | Variable Type      | Description                                                                   |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | logout         | boolean            | indicator if logout is successful or not                                      |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error          | String (Optional)  | Errors encounted if any                                                       |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public static RESTFunction logout_GET = (req, res) -> {
 		res.put("logout", "false");
 		
@@ -420,43 +406,34 @@ public class AccountLogin extends BasePage {
 		return res;
 	};
 	
-	// /
-	// / # password (POST) [Requires login to relevent user, or superuser]
-	// /
-	// / The password update POST function.
-	// /
-	// / Note that this requires either the current session to be the same
-	// account, or a superUser
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | accountID | String | accountID to change the password for |
-	// / | newPassword | String | The account password to change to |
-	// / | oldPassword | String | The original password (optional for superuser,
-	// required for own user) |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | success | boolean | indicator if the password was changed |
-	// / | accountID | String | account ID of the session |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | error | String (Optional) | Errors encounted if any |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # password (POST) [Requires login to relevent user, or superuser]
+	///
+	/// The password update POST function.
+	///
+	/// Note that this requires either the current session to be the same account, or a superUser
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | accountID       | String             | accountID to change the password for                                          |
+	/// | newPassword     | String             | The account password to change to                                             |
+	/// | oldPassword     | String             | The original password (optional for superuser, required for own user)         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | success         | boolean            | indicator if the password was changed                                         |
+	/// | accountID       | String             | account ID of the session                                                     |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error           | String (Optional)  | Errors encounted if any                                                       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public static RESTFunction password_POST = (req, res) -> {
 		res.put("accountID", null);
 		res.put("success", false);
@@ -497,70 +474,50 @@ public class AccountLogin extends BasePage {
 		return res;
 	};
 	
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	//
 	// Basic info API
 	//
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	
-	// /
-	// / # info/name/${accountName} (GET) [Requires login]
-	// /
-	// / Gets and return the accountID for the given accountName
-	// /
-	// / Note: if ${accountName} is blank, it assumes the current user
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | accountName | String(optional) | Account name of info to get. If
-	// blank, assume current user. |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns
-	// UNSANITISED data, so common escape characters |
-	// / | | | are returned as well. |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | accountID | String | account ID used |
-	// / | accountNames | String[] | array of account names representing the
-	// account | sanitise
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | isSuperUser | boolean | indicates if the account is considered a
-	// superUser |
-	// / | isAnyGroupAdmin | boolean | indicates if the account is considered a
-	// superUser |
-	// / | isGroup | boolean | indicates if the account is considered a group |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | groups | object(Map) | Groups object as a Map<String,
-	// List<Map<String, Object>>> | sanitise
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # info/name/${accountName} (GET) [Requires login]
+	///
+	/// Gets and return the accountID for the given accountName
+	///
+	/// Note: if ${accountName} is blank, it assumes the current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | accountName     | String(optional)   | Account name of info to get. If blank, assume current user.                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                |                    | are returned as well.                                                         |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | accountID       | String             | account ID used                                                               |
+	/// | accountNames    | String[]           | array of account names representing the account                               | sanitise
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | isSuperUser     | boolean            | indicates if the account is considered a superUser                            |
+	/// | isAnyGroupAdmin | boolean            | indicates if the account is considered a superUser                            |
+	/// | isGroup         | boolean            | indicates if the account is considered a group                                |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | groups          | object(Map)        | Groups object as a Map<String, List<Map<String, Object>>>                     | sanitise
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public static RESTFunction infoByName_GET = (req, res) -> {
 		if (req.requestPage() != null) {
 			BasePage bp = (BasePage) (req.requestPage());
-			AccountTable at = bp.accountAuthTable(); // at contains all the user
-			// data
-			AccountObject ao = at.getRequestUser(bp.getHttpServletRequest()); // to
-			// check
-			// if
-			// logged
-			// in
+			AccountTable at = bp.accountAuthTable(); //at contains all the user data
+			AccountObject ao = at.getRequestUser(bp.getHttpServletRequest()); //to check if logged in
 			AccountObject account = null;
 			
 			if (ao != null) {
@@ -584,64 +541,44 @@ public class AccountLogin extends BasePage {
 		return res;
 	};
 	
-	// /
-	// / # info/id/${accountID} (GET) [Requires login]
-	// /
-	// / Gets and return the accountID for the given accountName
-	// /
-	// / Note: if ${accountID} is blank, it assumes the current user
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | accountID | String(optional) | Account id of info to get. If blank,
-	// assume current user. |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns
-	// UNSANITISED data, so common escape characters |
-	// / | | | are returned as well. |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | accountID | String | account ID used |
-	// / | accountNames | String[] | array of account names representing the
-	// account | sanitise
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | isSuperUser | boolean | indicates if the account is considered a
-	// superUser |
-	// / | isAnyGroupAdmin | boolean | indicates if the account is considered a
-	// superUser |
-	// / | isGroup | boolean | indicates if the account is considered a group |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | groups | object(Map) | Groups object as a Map<String,
-	// List<Map<String, Object>>> | sanitise
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # info/id/${accountID} (GET) [Requires login]
+	///
+	/// Gets and return the accountID for the given accountName
+	///
+	/// Note: if ${accountID} is blank, it assumes the current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | accountID       | String(optional)   | Account id of info to get. If blank, assume current user.                     |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                 |                    | are returned as well.                                                         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | accountID       | String             | account ID used                                                               |
+	/// | accountNames    | String[]           | array of account names representing the account                               | sanitise
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | isSuperUser     | boolean            | indicates if the account is considered a superUser                            |
+	/// | isAnyGroupAdmin | boolean            | indicates if the account is considered a superUser                            |
+	/// | isGroup         | boolean            | indicates if the account is considered a group                                |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | groups          | object(Map)        | Groups object as a Map<String, List<Map<String, Object>>>                     | sanitise
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public static RESTFunction infoByID_GET = (req, res) -> {
 		if (req.requestPage() != null) {
 			BasePage bp = (BasePage) (req.requestPage());
-			AccountTable at = bp.accountAuthTable(); // at contains all the user
-			// data
-			AccountObject ao = at.getRequestUser(bp.getHttpServletRequest()); // to
-			// check
-			// if
-			// logged
-			// in
+			AccountTable at = bp.accountAuthTable(); //at contains all the user data
+			AccountObject ao = at.getRequestUser(bp.getHttpServletRequest()); //to check if logged in
 			AccountObject account = null;
 			
 			if (ao != null) {
@@ -666,7 +603,7 @@ public class AccountLogin extends BasePage {
 	};
 	
 	private static Map<String, Object> extractCommonInfoFromAccountObject(AccountObject account, boolean sanitiseOutput) {
-		// sanitise accountNames, groupNames,
+		//sanitise accountNames, groupNames, 
 		
 		Map<String, Object> commonInfo = new HashMap<String, Object>();
 		
@@ -707,7 +644,7 @@ public class AccountLogin extends BasePage {
 					Map<String, Object> newGroup = new HashMap<String, Object>();
 					newGroup.put("accountID", group._oid());
 					
-					// extracting group names and sanitising if needed
+					//extracting group names and sanitising if needed
 					Set<String> groupNames = group.getNames();
 					if (sanitiseOutput) {
 						groupNames.clear();
@@ -717,12 +654,12 @@ public class AccountLogin extends BasePage {
 					}
 					newGroup.put("names", groupNames);
 					
-					// extracting member roles and sanitising if needed
+					//extracting member roles and sanitising if needed
 					String role = group.getMemberRole(account);
 					if (sanitiseOutput) {
 						role = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(role);
 					}
-					newGroup.put("role", role); // sanitise role just in case
+					newGroup.put("role", role); //sanitise role just in case
 					
 					if (role == null) {
 						role = "";
@@ -737,96 +674,72 @@ public class AccountLogin extends BasePage {
 					
 					groupList.add(newGroup);
 				}
-				// groupMap.put("groups", groupList);
+				//				groupMap.put("groups", groupList);
 				commonInfo.put("groups", groupList);
 			}
-			// commonInfo.put("groups", groupMap);
+			//			commonInfo.put("groups", groupMap);
 		}
 		
 		return commonInfo;
 	}
 	
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	//
 	// List searching API
 	//
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	
-	// /
-	// / # list (POST / GET) [Requires login]
-	// /
-	// / Lists the users according to the search criteria
-	// /
-	// / This JSON api is compatible with the datatables.js server side API.
-	// / See:
-	// https://web.archive.org/web/20140627100023/http://datatables.net/manual/server-side
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | draw | int (optional) | Draw counter echoed back, and used by the
-	// datatables.js server-side API |
-	// / | start | int (optional) | Default 0: Record start listing, 0-indexed |
-	// / | length | int (optional) | Default 50: The number of records to return
-	// |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | insideGroup_any | String[](optional) | Default null, else filters for
-	// only accounts inside the listed groups ID |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | headers | String[](optional) | Default ["_oid", "names"], the
-	// collumns to return |
-	// / | query | String (optional) | Requested Query filter |
-	// / | queryArgs | String[] (optional)| Requested Query filter arguments |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | groupStatus | String (optional) | Default "both", either "user" or
-	// "group". Used to lmit the result set |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns
-	// UNSANITISED data, so common escape characters |
-	// / | | | are returned as well. |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+s
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | draw | int (optional) | Draw counter echoed back, and used by the
-	// datatables.js server-side API |
-	// / | recordsTotal | int | Total amount of records. Before any search
-	// filter (But after base filters) |
-	// / | recordsFilterd | int | Total amount of records. After all search
-	// filter |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | headers | String[](optional) | Default ["_oid", "names"], the
-	// collumns to return |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | data | array | Array of row records |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | error | String (Optional) | Errors encounted if any |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # list (POST / GET) [Requires login]
+	///
+	/// Lists the users according to the search criteria
+	///
+	/// This JSON api is compatible with the datatables.js server side API.
+	/// See: https://web.archive.org/web/20140627100023/http://datatables.net/manual/server-side
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
+	/// | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
+	/// | length          | int (optional)     | Default 50: The number of records to return                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | insideGroup_any | String[](optional) | Default null, else filters for only accounts inside the listed groups ID      |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
+	/// | query           | String (optional)  | Requested Query filter                                                        |
+	/// | queryArgs       | String[] (optional)| Requested Query filter arguments                                              |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | groupStatus     | String (optional)  | Default "both", either "user" or "group". Used to lmit the result set         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                |                    | are returned as well.                                                         |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+s
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
+	/// | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    |
+	/// | recordsFilterd  | int                | Total amount of records. After all search filter                              |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | data            | array              | Array of row records                                                          |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error           | String (Optional)  | Errors encounted if any                                                       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public static RESTFunction list_GET_and_POST = (req, res) -> {
 		return prepareAuthenticatedREST(
 			req,
 			res,
 			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
-				// cannot fall through
+				//cannot fall through
 				int draw = req.getInt("draw");
 				int start = req.getInt("start");
 				int limit = req.getInt("length");
@@ -851,7 +764,7 @@ public class AccountLogin extends BasePage {
 				
 				MetaTable mtObj = accountTableObj.accountMetaTable();
 				
-				// put back into response
+				//put back into response
 				res.put("draw", draw);
 				res.put("headers", headers);
 				
@@ -892,7 +805,7 @@ public class AccountLogin extends BasePage {
 				
 				if ((insideGroup_any == null || insideGroup_any.length == 0)
 					&& (hasGroupRole_any == null || hasGroupRole_any.length == 0)) {
-					// do normal query
+					//do normal query
 					MetaTable accountMetaTable = _metaTableObj.accountMetaTable();
 					
 					if (accountMetaTable == null) {
@@ -907,13 +820,13 @@ public class AccountLogin extends BasePage {
 					
 					List<AccountObject> retUsers = new ArrayList<AccountObject>();
 					for (MetaObject metaObj : metaObjs) {
-						AccountObject ao = _metaTableObj.getFromID(metaObj._oid()); // a single account
+						AccountObject ao = _metaTableObj.getFromID(metaObj._oid()); //a single account
 						retUsers.add(ao);
 					}
 					
 					fullUserArray = retUsers.toArray(new AccountObject[retUsers.size()]);
 				} else {
-					// do filtered query
+					//do filtered query
 					fullUserArray = _metaTableObj.getUsersByGroupAndRole(insideGroup_any, hasGroupRole_any);
 				}
 				
@@ -921,7 +834,7 @@ public class AccountLogin extends BasePage {
 					return ret;
 				}
 				
-				// group status filtering
+				//group status filtering
 				if (groupStatus != null) {
 					List<AccountObject> filteredUsers = new ArrayList<AccountObject>();
 					for (AccountObject ao : fullUserArray) {
@@ -959,8 +872,7 @@ public class AccountLogin extends BasePage {
 								}
 							}
 						} else {
-							Object rawVal = ao.get(header); // this used to be
-							// metaObj.get
+							Object rawVal = ao.get(header); //this used to be metaObj.get
 							
 							if (sanitiseOutput && rawVal instanceof String) {
 								String stringVal = GenericConvert.toString(rawVal);
@@ -981,54 +893,43 @@ public class AccountLogin extends BasePage {
 		return ret;
 	}
 	
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	//
 	// Meta details operations
 	//
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	
-	// /
-	// / # meta/${accountID} (GET) [Requires login]
-	// /
-	// / Gets and return the current user info
-	// /
-	// / Note: if ${accountID} is blank, it assumes the current user
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | No parameters options |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns
-	// UNSANITISED data, so common escape characters |
-	// / | | | are returned as well. |
-	// /
-	// +----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | accountID_valid | boolean | indicates if the account ID exists in the
-	// system |
-	// / | accountID | String | account ID used |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | meta | {Object} | Meta object that represents this account |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | error | String (Optional) | Errors encounted if any |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # meta/${accountID} (GET) [Requires login]
+	///
+	/// Gets and return the current user info
+	///
+	/// Note: if ${accountID} is blank, it assumes the current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | No parameters options                                                                                                |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                |                    | are returned as well.                                                         |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | accountID_valid | boolean            | indicates if the account ID exists in the system                              |
+	/// | accountID       | String             | account ID used                                                               |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | meta            | {Object}           | Meta object that represents this account                                      |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error           | String (Optional)  | Errors encounted if any                                                       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public static RESTFunction meta_GET = (req, res) -> {
 		return prepareAuthenticatedREST(req, res, (reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj,
 			accObj_b) -> {
@@ -1057,48 +958,36 @@ public class AccountLogin extends BasePage {
 		});
 	};
 	
-	// /
-	// / # meta/${accountID} (POST) [Requires login]
-	// /
-	// / Updates the accountID meta info, requires either the current user or
-	// SuperUser
-	// /
-	// / Note: if ${accountID} is blank, it assumes the current user
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | meta | {Object} | Meta object that represents this account |
-	// / | updateMode | String (Optional) | (Default) "delta" for only updating
-	// the given fields, or "full" for all |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | accountID_valid | boolean | indicates if the account ID exists in the
-	// system |
-	// / | accountID | String | account ID used |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | updateMode | String | (Default) "delta" for only updating the given
-	// fields, or "full" for all |
-	// / | updateMeta | {Object} | The updated changes done |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | error | String (Optional) | Errors encounted if any |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # meta/${accountID} (POST) [Requires login]
+	///
+	/// Updates the accountID meta info, requires either the current user or SuperUser
+	///
+	/// Note: if ${accountID} is blank, it assumes the current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | meta            | {Object}           | Meta object that represents this account                                      |
+	/// | updateMode      | String (Optional)  | (Default) "delta" for only updating the given fields, or "full" for all       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | accountID_valid | boolean            | indicates if the account ID exists in the system                              |
+	/// | accountID       | String             | account ID used                                                               |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | updateMode      | String             | (Default) "delta" for only updating the given fields, or "full" for all       |
+	/// | updateMeta      | {Object}           | The updated changes done                                                      |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error           | String (Optional)  | Errors encounted if any                                                       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public static RESTFunction meta_POST = (req, res) -> {
 		// return mtApi.meta_POST.apply(req, res);
 		return prepareAuthenticatedREST(req, res, (reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj,
@@ -1107,43 +996,34 @@ public class AccountLogin extends BasePage {
 		});
 	};
 	
-	// /
-	// / # meta/${accountID} (DELETE) [Requires login]
-	// /
-	// / Deletes the current oid object from the table
-	// /
-	// / Note: if ${accountID} is blank, it assumes the current user
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | _oid | String | The internal object ID to delete |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | accountID_valid | boolean | indicates if the account ID exists in the
-	// system |
-	// / | accountID | String | account ID used |
-	// / | _oid | String | Returns oid of metaObject to delete |
-	// / | deleted | boolean | Returns true ONLY if the element was removed from
-	// the table |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | error | String (Optional) | Errors encounted if any |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # meta/${accountID} (DELETE) [Requires login]
+	///
+	/// Deletes the current oid object from the table
+	///
+	/// Note: if ${accountID} is blank, it assumes the current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | _oid            | String             | The internal object ID to delete                                              |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | accountID_valid | boolean            | indicates if the account ID exists in the system                              |
+	/// | accountID       | String             | account ID used                                                               |
+	/// | _oid            | String             | Returns oid of metaObject to delete                                           |
+	/// | deleted         | boolean            | Returns true ONLY if the element was removed from the table                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error           | String (Optional)  | Errors encounted if any                                                       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public static RESTFunction meta_DELETE = (req, res) -> {
 		// return mtApi.meta_POST.apply(req, res);
 		return prepareAuthenticatedREST(req, res, (reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj,
@@ -1152,83 +1032,58 @@ public class AccountLogin extends BasePage {
 		});
 	};
 	
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	//
 	// Group / Members management
 	//
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	
-	// /
-	// / # members/list/${groupID} (GET) [Requires login]
-	// /
-	// / Gets the info of group members of the respective group
-	// /
-	// / Note: if ${groupID} is blank, it assumes the current user
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | draw | int (optional) | Draw counter echoed back, and used by the
-	// datatables.js server-side API |
-	// / | start | int (optional) | Default 0: Record start listing, 0-indexed |
-	// / | length | int (optional) | Default max: The number of records to
-	// return |
-	// / | groupID | String (optional) | group ID used in the request instead of
-	// inside URI | not implemented
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | headers | String[](optional) | Default ["_oid", "name", "role"], the
-	// collumns to return |
-	// / | If a header element contains an "account_" prefix, take the data from
-	// the curren
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns
-	// UNSANITISED data, so common escape characters |
-	// / | | | are returned as well. |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | groupID | String | group ID used in the request |
-	// / | groupID_exist | boolean | indicates if the account ID exists in the
-	// system |
-	// / | groupID_valid | boolean | indicates if the account ID exists and is a
-	// group |
-	// / | groupID_admin | boolean | indicates if the session has admin rights
-	// over the group |
-	// / | groupID_names | String[] | the group various names, if ID is valid |
-	// sanitise
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | draw | int (optional) | Draw counter echoed back, and used by the
-	// datatables.js server-side API | not returned
-	// / | recordsTotal | int | Total amount of records. Before any search
-	// filter (But after base filters) | not returned
-	// / | recordsFilterd | int | Total amount of records. After all search
-	// filter | not returned
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | headers | String[](optional) | The collumns headers returned |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | data | array | Array of row records | sanitise
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | error | String (Optional) | Errors encounted if any |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # members/list/${groupID} (GET) [Requires login]
+	///
+	/// Gets the info of group members of the respective group
+	///
+	/// Note: if ${groupID} is blank, it assumes the current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
+	/// | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
+	/// | length          | int (optional)     | Default max: The number of records to return                                  |
+	/// | groupID         | String (optional)  | group ID used in the request instead of inside URI                            | not implemented
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | headers         | String[](optional) | Default ["_oid", "name", "role"], the collumns to return                      |
+	/// | If a header element contains an "account_" prefix, take the data from the curren
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                 |                    | are returned as well.                                                         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | groupID         | String             | group ID used in the request                                                  |
+	/// | groupID_exist   | boolean            | indicates if the account ID exists in the system                              |
+	/// | groupID_valid   | boolean            | indicates if the account ID exists and is a group                             |
+	/// | groupID_admin   | boolean            | indicates if the session has admin rights over the group                      |
+	/// | groupID_names   | String[]           | the group various names, if ID is valid                                       | sanitise
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       | not returned
+	/// | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    | not returned
+	/// | recordsFilterd  | int                | Total amount of records. After all search filter                              | not returned
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | headers         | String[](optional) | The collumns headers returned                                                 |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | data            | array              | Array of row records                                                          | sanitise
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error           | String (Optional)  | Errors encounted if any                                                       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public static RESTFunction members_list_GET = (req, res) -> {
 		// Only runs function if logged in, and valid group object
 		return fetchGroupObject_fromFirstWildcard_orCurrentUser(req, res, false, (reqObj, resMap, basePageObj,
@@ -1271,117 +1126,91 @@ public class AccountLogin extends BasePage {
 									names.add(RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(name));
 								}
 							}
-							retList.get(listCounter).add(names); // sanitise
+							retList.get(listCounter).add(names); //sanitise
 		} else if (header.equalsIgnoreCase("role")) {
-			String role = groupObj.getMemberRole(accObj); // sanitise
+			String role = groupObj.getMemberRole(accObj); //sanitise
 			if (sanitiseOutput) {
 				role = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(role);
 			}
 			retList.get(listCounter).add(role);
-		} else if (header.toLowerCase().startsWith("account_")) { // might need to
-				// sanitise....but will
-				// come back to this
-				// later
-			String headerSuffix = header.substring("account_".length());
-			Object rawObj = accObj.get(headerSuffix);
-			if (rawObj != null) {
-				retList.get(listCounter).add(rawObj);
+		} else if (header.toLowerCase().startsWith("account_")) { //might need to sanitise....but will come back to this later
+				String headerSuffix = header.substring("account_".length());
+				Object rawObj = accObj.get(headerSuffix);
+				if (rawObj != null) {
+					retList.get(listCounter).add(rawObj);
+				} else {
+					retList.get(listCounter).add("");
+				}
+			} else if (header.toLowerCase().startsWith("group_")) { //might need to sanitise....but will come back to this later
+				String headerSuffix = header.substring("group_".length());
+				Object rawObj = groupObj.get(headerSuffix);
+				if (rawObj != null) {
+					retList.get(listCounter).add(rawObj);
+				} else {
+					retList.get(listCounter).add("");
+				}
 			} else {
-				retList.get(listCounter).add("");
-			}
-		} else if (header.toLowerCase().startsWith("group_")) { // might need to
-																				  // sanitise....but will
-																				  // come back to this
-																				  // later
-			String headerSuffix = header.substring("group_".length());
-			Object rawObj = groupObj.get(headerSuffix);
-			if (rawObj != null) {
-				retList.get(listCounter).add(rawObj);
-			} else {
-				retList.get(listCounter).add("");
-			}
-		} else {
-			Object rawObj = groupMemberMeta.get(header);
-			if (rawObj != null) {
-				retList.get(listCounter).add(rawObj);
-			} else {
-				retList.get(listCounter).add("");
+				Object rawObj = groupMemberMeta.get(header);
+				if (rawObj != null) {
+					retList.get(listCounter).add(rawObj);
+				} else {
+					retList.get(listCounter).add("");
+				}
 			}
 		}
+		
+		++listCounter;
 	}
-	
-	++listCounter;
-}
-res.put("data", retList);
-res.put("draw", req.getInt("draw"));
-res.put("headers", headers);
+	res.put("data", retList);
+	res.put("draw", req.getInt("draw"));
+	res.put("headers", headers);
 } catch (Exception e) {
-res.put("error", e.getMessage());
+	res.put("error", e.getMessage());
 }
 
 return resMap;
 }	  );
 	};
 	
-	// /
-	// / # members/list/${groupID} (POST) [Requires login, and group admin
-	// rights]
-	// /
-	// / Add/remove members to the group with their respective role. Requires
-	// the current user to be,
-	// / admin of group, or super user.
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | setMembers | { Map } (optional) | { memberID : role } : Array of
-	// member ID/roles to set |
-	// / | delMembers | String[] (optional) | [ memberID, ... ] : Array of
-	// member ID's to delete |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns
-	// UNSANITISED data, so common escape characters |
-	// / | | | are returned as well. |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | groupID | String | group ID used in the request |
-	// / | groupID_exist | boolean | indicates if the account ID exists in the
-	// system |
-	// / | groupID_valid | boolean | indicates if the account ID exists and is a
-	// group |
-	// / | groupID_admin | boolean | indicates if the session has admin rights |
-	// / | groupID_names | String[] | the group various names, if ID is valid |
-	// sanitise
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | setMembers | { Map } (optional) | { memberID : role } : Array of
-	// member ID/roles set |
-	// / | delMembers | String[] (optional) | [ memberID, ... ] : Array of
-	// member ID's deleted |
-	// / | success | boolean | indicator if logout is successful or not |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | error | String (Optional) | Errors encounted if any |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// /
+	///
+	/// # members/list/${groupID} (POST) [Requires login, and group admin rights]
+	///
+	/// Add/remove members to the group with their respective role. Requires the current user to be,
+	/// admin of group, or super user.
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | setMembers      | { Map } (optional)    | { memberID : role } : Array of member ID/roles to set                      |
+	/// | delMembers      | String[]   (optional) | [ memberID, ... ] : Array of member ID's to delete                         |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                 |                    | are returned as well.                                                         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | groupID         | String                | group ID used in the request                                               |
+	/// | groupID_exist   | boolean               | indicates if the account ID exists in the system                           |
+	/// | groupID_valid   | boolean               | indicates if the account ID exists and is a group                          |
+	/// | groupID_admin   | boolean               | indicates if the session has admin rights                                  |
+	/// | groupID_names   | String[]              | the group various names, if ID is valid                                    | sanitise
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | setMembers      | { Map } (optional)    | { memberID : role } : Array of member ID/roles set                         |
+	/// | delMembers      | String[]   (optional) | [ memberID, ... ] : Array of member ID's deleted                           |
+	/// | success         | boolean               | indicator if logout is successful or not                                   |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | error           | String (Optional)     | Errors encounted if any                                                    |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
 	@SuppressWarnings("unchecked")
 	public static RESTFunction members_list_POST = (req, res) -> {
-		// Only runs function if logged in, and valid group object, with admin
-		// rights
+		// Only runs function if logged in, and valid group object, with admin rights
 		return fetchGroupObject_fromFirstWildcard_orCurrentUser(req, res, true, (reqObj, resMap, basePageObj,
 			accountTableObj, currentUser, groupObj, accObj_b) -> {
 			
@@ -1397,7 +1226,7 @@ return resMap;
 			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
 			
 			try {
-				// do deletes first
+				//do deletes first
 			List<String> successfulDeletes = null;
 			List<Object> delMember = null;
 			Object delMemberRaw = req.get("delMembers");
@@ -1421,7 +1250,7 @@ return resMap;
 				res.put("delMembers", delMember);
 			}
 			
-			// then do additions
+			//then do additions
 			List<String> successfulAdds = null;
 			Map<String, Object> setMemberMap = null;
 			Object setMemberMapRaw = req.get("setMembers");
@@ -1435,8 +1264,7 @@ return resMap;
 				for (Entry<String, Object> setMember : setMemberMap.entrySet()) {
 					AccountObject newMember = accountTableObj.getFromID(setMember.getKey());
 					if (newMember != null) {
-						// groupObj.addMember(newMember,
-						// (String)setMember.getValue()).saveAll();
+						//groupObj.addMember(newMember, (String)setMember.getValue()).saveAll();
 			groupObj.setMember(newMember, (String) setMember.getValue()).saveDelta();
 			successfulAdds.add(setMember.getKey());
 		}
@@ -1453,183 +1281,152 @@ return resMap;
 }	  );
 	};
 	
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	//
 	// Group members meta management
 	//
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	
-	// /
-	// / # members/meta/${groupID}/${accountID} (GET) [Requires login]
-	// /
-	// / Gets and return the current user info with relation to the group
-	// /
-	// / Note: if ${accountID} is blank, it assumes the current user
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | No parameters options |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | groupID | String | group ID used in the request |
-	// / | groupID_exist | boolean | indicates if the account ID exists in the
-	// system |
-	// / | groupID_valid | boolean | indicates if the account ID exists and is a
-	// group |
-	// / | groupID_admin | boolean | indicates if the session has admin rights |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | accountID | String | account ID used |
-	// / | accountID_valid | boolean | indicates if the account ID exists in the
-	// systen and group |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | meta | {Object} | Meta object that represents this account |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | error | String (Optional) | Errors encounted if any |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// /
+	///
+	/// # members/meta/${groupID}/${accountID} (GET) [Requires login]
+	///
+	/// Gets and return the current user info with relation to the group
+	///
+	/// Note: if ${accountID} is blank, it assumes the current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | No parameters options                                                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | groupID         | String                | group ID used in the request                                               |
+	/// | groupID_exist   | boolean               | indicates if the account ID exists in the system                           |
+	/// | groupID_valid   | boolean               | indicates if the account ID exists and is a group                          |
+	/// | groupID_admin   | boolean               | indicates if the session has admin rights                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | accountID       | String                | account ID used                                                            |
+	/// | accountID_valid | boolean               | indicates if the account ID exists in the systen and group                 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | meta            | {Object}              | Meta object that represents this account                                   |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | error           | String (Optional)     | Errors encounted if any                                                    |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
 	public static RESTFunction members_meta_GET = (req, res) -> {
 		// Only runs function if logged in, and valid group object
-		return fetchGroupObject_fromFirstWildcard_orCurrentUser(req, res, false, (reqObj, resMap, basePageObj,
-			accountTableObj, currentUser, groupObj, accObj_b) -> {
-			res.put("accountID", null);
-			res.put("accountID_valid", false);
-			res.put("meta", null);
-			res.put("error", null);
-			
-			if (groupObj == null) {
-				res.put("error", "Group object is null");
-				return resMap;
-			}
-			
-			try {
+		return fetchGroupObject_fromFirstWildcard_orCurrentUser(
+			req,
+			res,
+			false,
+			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
+				res.put("accountID", null);
+				res.put("accountID_valid", false);
+				res.put("meta", null);
+				res.put("error", null);
 				
-				String accountOID = req.getString("accountID");
-				if (accountOID == null || accountOID.isEmpty()) {
-					if (currentUser != null) {
-						accountOID = currentUser._oid(); // if
-			// accountOID
-			// is null,
-			// try get
-			// oid from
-			// currentUser
-			// object
-		} else {
-			res.put("error", "Unable to obtain oid");
-		}
-	}
-	
-	res.put("accountID", accountOID);
-	
-	AccountObject user = accountTableObj.getFromID(accountOID);
-	MetaObject groupUserInfo = null;
-	boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
-	
-	if (user != null) {
-		groupUserInfo = groupObj.getMember(user);
-		
-		if (sanitiseOutput && groupUserInfo != null) {
-			Set<String> userInfoKeys = groupUserInfo.keySet();
-			for (String key : userInfoKeys) {
-				Object rawVal = groupUserInfo.get(key);
-				if (rawVal instanceof String) {
-					groupUserInfo.put(key,
-						RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(GenericConvert.toString(rawVal)));
-				} else {
-					groupUserInfo.put(key, rawVal);
+				if (groupObj == null) {
+					res.put("error", "Group object is null");
+					return resMap;
 				}
-			}
-		}
-		
-	} else {
-		res.put("error", "User account not found in table");
-		return resMap;
-	}
-	
-	if (groupUserInfo != null) {
-		res.put("meta", groupUserInfo);
-		res.put("accountID_valid", true);
-	} else {
-		res.put("error", "User info not found in group");
-		return resMap;
-	}
-	
-} catch (Exception e) {
-	res.put("error", e.getMessage());
-}
-
-return resMap;
-}	  );
+				
+				try {
+					
+					String accountOID = req.getString("accountID");
+					if (accountOID == null || accountOID.isEmpty()) {
+						if (currentUser != null) {
+							accountOID = currentUser._oid(); //if accountOID is null, try get oid from currentUser object
+						} else {
+							res.put("error", "Unable to obtain oid");
+						}
+					}
+					
+					res.put("accountID", accountOID);
+					
+					AccountObject user = accountTableObj.getFromID(accountOID);
+					MetaObject groupUserInfo = null;
+					boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
+					
+					if (user != null) {
+						groupUserInfo = groupObj.getMember(user);
+						
+						if (sanitiseOutput && groupUserInfo != null) {
+							Set<String> userInfoKeys = groupUserInfo.keySet();
+							for (String key : userInfoKeys) {
+								Object rawVal = groupUserInfo.get(key);
+								if (rawVal instanceof String) {
+									groupUserInfo.put(key,
+										RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(GenericConvert.toString(rawVal)));
+								} else {
+									groupUserInfo.put(key, rawVal);
+								}
+							}
+						}
+						
+					} else {
+						res.put("error", "User account not found in table");
+						return resMap;
+					}
+					
+					if (groupUserInfo != null) {
+						res.put("meta", groupUserInfo);
+						res.put("accountID_valid", true);
+					} else {
+						res.put("error", "User info not found in group");
+						return resMap;
+					}
+					
+				} catch (Exception e) {
+					res.put("error", e.getMessage());
+				}
+				
+				return resMap;
+			});
 	};
 	
-	// /
-	// / # members/meta/${groupID}/${accountID} (POST) [Requires login]
-	// /
-	// / Updates the accountID meta info. Requires the current user to be either
-	// the group itself,
-	// / admin of group, or super user.
-	// /
-	// / Note: if ${accountID} is blank, it assumes the current user
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | meta | {Object} Map<S, O> | Meta object that represents this account
-	// |
-	// / | updateMode | String (Optional) | (Default) "delta" for only updating
-	// the given fields, or "full" for all |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | groupID | String | group ID used in the request |
-	// / | groupID_exist | boolean | indicates if the account ID exists in the
-	// system |
-	// / | groupID_valid | boolean | indicates if the account ID exists and is a
-	// group |
-	// / | groupID_admin | boolean | indicates if the session has admin rights |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | accountID | String | account ID used |
-	// / | accountID_valid | boolean | indicates if the account ID exists in the
-	// systen and group |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | updateMode | String | (Default) "delta" for only updating the given
-	// fields, or "full" for all |
-	// / | updateMeta | {Object} | The updated changes done |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | error | String (Optional) | Errors encounted if any |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// /
+	///
+	/// # members/meta/${groupID}/${accountID} (POST) [Requires login]
+	///
+	/// Updates the accountID meta info. Requires the current user to be either the group itself,
+	/// admin of group, or super user.
+	///
+	/// Note: if ${accountID} is blank, it assumes the current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | meta            | {Object} Map<S, O>    | Meta object that represents this account                                   |
+	/// | updateMode      | String (Optional)     | (Default) "delta" for only updating the given fields, or "full" for all    |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | groupID         | String                | group ID used in the request                                               |
+	/// | groupID_exist   | boolean               | indicates if the account ID exists in the system                           |
+	/// | groupID_valid   | boolean               | indicates if the account ID exists and is a group                          |
+	/// | groupID_admin   | boolean               | indicates if the session has admin rights                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | accountID       | String                | account ID used                                                            |
+	/// | accountID_valid | boolean               | indicates if the account ID exists in the systen and group                 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | updateMode      | String                | (Default) "delta" for only updating the given fields, or "full" for all    |
+	/// | updateMeta      | {Object}              | The updated changes done                                                   |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | error           | String (Optional)     | Errors encounted if any                                                    |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
 	@SuppressWarnings("unchecked")
 	public static RESTFunction members_meta_POST = (req, res) -> {
 		// Only runs function if logged in, and valid group object
@@ -1652,13 +1449,7 @@ return resMap;
 				String accountOID = req.getString("accountID");
 				if (accountOID == null || accountOID.isEmpty()) {
 					if (currentUser != null) {
-						accountOID = currentUser._oid(); // if
-			// accountOID
-			// is null,
-			// try get
-			// oid from
-			// currentUser
-			// object
+						accountOID = currentUser._oid(); //if accountOID is null, try get oid from currentUser object
 		} else {
 			res.put("error", "Unable to obtain oid");
 		}
@@ -1709,53 +1500,43 @@ return resMap;
 }	  );
 	};
 	
-	// -------------------------------------------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------------------------------------------------
 	//
 	// Work in progress (not final) start
 	//
-	// -------------------------------------------------------------------------------------------------------------------------
-	// /
-	// / # new [POST]
-	// /
-	// / Creates a new account in the table
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | meta | {Object} Map<S, O> | Meta object that represents this account
-	// |
-	// / | password | String | Password of new account |
-	// / | username | String | Username of new account |
-	// / | isGroup | boolean (optional) | whether this is a group object
-	// (defaults to false) |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | accountID | String | account ID used |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | metaObject | {Object} | MetaObject representing this account |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | error | String (Optional) | Errors encounted if any |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// /
+	//-------------------------------------------------------------------------------------------------------------------------
+	///
+	/// # new [POST]
+	///
+	/// Creates a new account in the table
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | meta            | {Object} Map<S, O>    | Meta object that represents this account                                   |
+	/// | password        | String      	      | Password of new account                                                    |
+	/// | username        | String                | Username of new account                                                    |
+	/// | isGroup         | boolean (optional)    | whether this is a group object (defaults to false)                         |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | accountID       | String                | account ID used                                                            |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | metaObject      | {Object}              | MetaObject representing this account                                       |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | error           | String (Optional)     | Errors encounted if any                                                    |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
 	public static RESTFunction new_account_POST = (req, res) -> {
 		// Only runs function if logged in, and valid group object
-		return prepareAuthenticatedREST(req, res, (reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj,
-			accObj_b) -> {
+		return prepareNoAuthenticationREST(req, res, (reqObj, resMap, basePageObj, accountTableObj, currentUser,
+			groupObj, accObj_b) -> {
 			
 			boolean isGroup = req.getBoolean("isGroup", false);
 			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
@@ -1804,41 +1585,31 @@ return resMap;
 		});
 	};
 	
-	// / # delete [POST]
-	// /
-	// / Deletes an account
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | accountID | String (optional) | Account ID to delete from accounts
-	// table |
-	// / | accountName | String (optional | Account Name to delete from accounts
-	// table |
-	// / | Be warned, passing both will result in an error unless they match to
-	// the same account |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | accountID | String | account ID used |
-	// / | accountName | String | account Name used |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// / | error | String (Optional) | Errors encounted if any |
-	// /
-	// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// /
+	/// # delete [POST]
+	///
+	/// Deletes an account
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | accountID       | String (optional)     | Account ID to delete from accounts table                                   |
+	/// | accountName     | String (optional      | Account Name to delete from accounts table                                 |
+	/// | Be warned, passing both will result in an error unless they match to the same account                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | accountID       | String                | account ID used                                                            |
+	/// | accountName     | String                | account Name used                                                          |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | error           | String (Optional)     | Errors encounted if any                                                    |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
 	public static RESTFunction delete_account_POST = (req, res) -> {
 		// Only runs function if logged in, and valid group object
 		return prepareAuthenticatedREST(req, res, (reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj,
@@ -1890,11 +1661,11 @@ return resMap;
 		});
 	};
 	
-	// -------------------------------------------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------------------------------------------------
 	//
 	// Work in progress (not final) end
 	//
-	// -------------------------------------------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------------------------------------------------
 	public static RESTFunction csv_GET = (req, res) -> {
 		return prepareAuthenticatedREST(req, res, (reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj,
 			accObj_b) -> {
@@ -1904,16 +1675,15 @@ return resMap;
 		});
 	};
 	
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	//
 	// RestBuilder template builder
 	//
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	
-	// /
-	// / Takes the restbuilder and the account table object and implements its
-	// respective default API
-	// /
+	///
+	/// Takes the restbuilder and the account table object and implements its respective default API
+	///
 	public static RESTBuilder setupRESTBuilder(RESTBuilder rb, AccountTable at, String setPrefix) {
 		
 		rb.getNamespace(setPrefix + "login").put(HttpRequestType.GET, login_GET);
@@ -1940,9 +1710,9 @@ return resMap;
 		rb.getNamespace(setPrefix + "members/meta/*/*").put(HttpRequestType.POST, members_meta_POST);
 		
 		rb.getNamespace(setPrefix + "new").put(HttpRequestType.POST, new_account_POST);
-		rb.getNamespace(setPrefix + "delete").put(HttpRequestType.POST, delete_account_POST);
+		rb.getNamespace(setPrefix + "remove").put(HttpRequestType.POST, delete_account_POST);
 		
-		// MetaTableApiBuilder Fall through
+		//MetaTableApiBuilder Fall through
 		rb.getNamespace(setPrefix + "meta/list").put(HttpRequestType.GET, list_GET_and_POST);
 		rb.getNamespace(setPrefix + "meta/list").put(HttpRequestType.POST, list_GET_and_POST);
 		
@@ -1951,11 +1721,11 @@ return resMap;
 		rb.getNamespace(setPrefix + "meta").put(HttpRequestType.GET, meta_GET);
 		rb.getNamespace(setPrefix + "meta").put(HttpRequestType.POST, meta_POST);
 		
-		rb.getNamespace(setPrefix + "delete").put(HttpRequestType.DELETE, meta_DELETE);
-		rb.getNamespace(setPrefix + "delete/*").put(HttpRequestType.DELETE, meta_DELETE);
-		// end fall through segment
+		rb.getNamespace(setPrefix + "remove").put(HttpRequestType.DELETE, meta_DELETE);
+		rb.getNamespace(setPrefix + "remove/*").put(HttpRequestType.DELETE, meta_DELETE);
+		//end fall through segment
 		
-		// csv_export
+		//csv_export
 		rb.getNamespace(setPrefix + "csv").put(HttpRequestType.GET, csv_GET);
 		
 		return rb;
@@ -1965,40 +1735,40 @@ return resMap;
 		return setupRESTBuilder(rb, at, _apiSetPrefix_prefix);
 	}
 	
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	//
 	// Servlet constructor and setup
 	//
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	
-	// / Default api set prefix
+	/// Default api set prefix
 	protected static String _apiSetPrefix_prefix = "account.";
 	
-	// / Internal prefix set for the API
+	/// Internal prefix set for the API
 	protected String _apiSetPrefix = _apiSetPrefix_prefix;
 	
-	// / The prefix for the api
+	/// The prefix for the api
 	public String apiSetPrefix() {
 		return _apiSetPrefix;
 	}
 	
-	// / The prefix for the api
+	/// The prefix for the api
 	public void setApiSetPrefix(String api) {
 		_apiSetPrefix = api;
 	}
 	
-	// / Flags as JSON request
+	/// Flags as JSON request
 	public boolean isJsonRequest() {
 		return true;
 	}
 	
-	// / Does the default setup
+	/// Does the default setup
 	public void doSetup() throws Exception {
 		super.doSetup();
 		setupRESTBuilder(this.restBuilder(), this.accountAuthTable(), _apiSetPrefix);
 	}
 	
-	// / Process the request, not the authentication layer
+	/// Process the request, not the authentication layer
 	public boolean doJSON(Map<String, Object> outputData, Map<String, Object> templateData) throws Exception {
 		return restBuilder().servletCall(_apiSetPrefix, this, outputData);
 	}

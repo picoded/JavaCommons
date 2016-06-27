@@ -19,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.lang3.StringUtils;
 
+import picoded.conv.*;
 import picoded.enums.HttpRequestType;
 
 /**
@@ -244,20 +245,58 @@ public class RESTBuilder {
 	/// Namespace tree generator / handling, used for generating the relevent javascript
 	///----------------------------------------
 	
-	// protected class RESTNamespaceTree extends HashMap<String, RESTNamespaceTree> {
-	// 	String registeredNamespace = null;
-	// 	RESTNamespace namespaceObj = null;
-	// }
-	// 
-	// protected RESTNamespaceTree cachedNamespaceTree = null;
-	// 
-	// //protected void addNamespaceToTree( String namespace, )
-	// 
-	// protected RESTNamespaceTree generateNamespaceTree() {
-	// 	cachedNamespaceTree = new RESTNamespaceTree();
-	// 	
-	// 	return cachedNamespaceTree;
-	// }
+	///
+	/// Utility function that recursively setup the namespace for the object
+	///
+	/// @params  The tree object to populate
+	/// @params  namespace as array
+	/// @params  namespace object to add
+	///
+	protected void setupNamespaceInTree(Map<String, Object> tree, String[] names, RESTNamespace obj) {
+		if (names == null || names.length == 0) {
+			/// Add in a boolean flag for the respective method
+			for (HttpRequestType type : HttpRequestType.values()) {
+				if (obj.get(type) != null) {
+					tree.put(type.toString().toUpperCase(), Boolean.TRUE);
+				}
+			}
+		} else {
+			String item = names[0];
+			String[] subnames = ArrayConv.subarray(names, 1, names.length);
+			
+			if ( //
+			item.equalsIgnoreCase("post") || item.equalsIgnoreCase("get") || item.equalsIgnoreCase("put")
+				|| item.equalsIgnoreCase("delete") || item.equalsIgnoreCase("update")) {
+				throw new RuntimeException("Protected rest namespace key name used: " + item);
+			}
+			@SuppressWarnings("unchecked")
+			Map<String, Object> subtree = (Map<String, Object>) (tree.get(item));
+			if (subtree == null) {
+				subtree = new HashMap<String, Object>();
+				tree.put(item, subtree);
+			}
+			
+			setupNamespaceInTree(subtree, subnames, obj);
+		}
+	}
+	
+	///
+	/// Generates the namespace tree using the current RESTBuilder
+	///
+	/// @returns  A json like structure of the API, where the respective POST/GET/etc methods, 
+	///           are marked with boolean TRUE
+	///
+	public Map<String, Object> namespaceTree() {
+		Map<String, Object> ret = new HashMap<String, Object>();
+		for (Map.Entry<String, RESTNamespace> entry : namespaceMap.entrySet()) {
+			try {
+				setupNamespaceInTree(ret, entry.getKey().toString().split("(\\.|/)"), entry.getValue());
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to process namespace key :" + entry.getKey());
+			}
+		}
+		return ret;
+	}
 	
 	///----------------------------------------
 	/// Javascript generator code

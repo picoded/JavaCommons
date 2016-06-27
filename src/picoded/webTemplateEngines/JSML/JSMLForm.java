@@ -524,6 +524,67 @@ public class JSMLForm {
 		return pdfData;
 	}
 	
+	//
+	// Whoever sees these 2 functions, Im so sorry. I wanted to sleep so badly.
+	// To be cleaned up once embedded images and filepath images can coexist peacefully
+	//
+	public byte[] generatePDF_embeddedImageSupport(BasePage page, Map<String, Object> data) {
+		validateTempFolder();
+		return generatePDF_embeddedImageSupport(page, data, "file:///" + _formFolderPath + "/" + _tempFolderPath);
+	}
+	
+	public byte[] generatePDF_embeddedImageSupport(BasePage page, Map<String, Object> data,
+		String pdfGeneratorContextFolder) {
+		StringBuilder ret = new StringBuilder();
+		
+		data = sanitiseMap(data, "", true);
+		
+		if (!_formDefinitionString.isEmpty()) {
+			ret = formGen.build(_formDefinitionString, data, true);
+		} else {
+			ret = formGen.build(_formDefinitionMap, data, true);
+		}
+		
+		if (ret == null) {
+			throw new RuntimeException("generatePDF() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
+		}
+		
+		//jmte the result
+		JMTE _jmteObj = new JMTE(page.getPagesTemplatePath());
+		_jmteObj.baseDataModel.put("ContextPath", page.getContextURI());
+		_jmteObj.baseDataModel.put("ContextURI", "file:///" + page.getContextPath());
+		if (data != null) {
+			for (String key : data.keySet()) {
+				_jmteObj.baseDataModel.put(key, data.get(key));
+			}
+		}
+		//_jmteObj.registerNamedRenderer(new page.currentAccountMetaInfo_nr());
+		ret = new StringBuilder(_jmteObj.parseTemplate(ret.toString()));
+		
+		validateTempFolder();
+		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/generatedPDF.pdf";
+		
+		String bodyPrefix = readBodyPrefix("PrefixPDF");
+		String bodySuffix = readBodySuffix("SuffixPDF");
+		ret.insert(0, sanitiseStringForPDF(bodyPrefix, ""));
+		ret.append(bodySuffix);
+		
+		PDFGenerator.generatePDFfromRawHTML_embeddedImageSupport(pdfFilePath, ret.toString(), pdfGeneratorContextFolder
+			+ "/" + _generatedGUID + "/");
+		//		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), pdfGeneratorContextFolder +"/" );
+		
+		//read the pdf file now
+		File pdfFile = new File(pdfFilePath);
+		byte[] pdfData = null;
+		try {
+			pdfData = FileUtils.readFileToByteArray(pdfFile);
+		} catch (Exception e) {
+			throw new RuntimeException("generatePDF() -> " + e.getMessage());
+		}
+		
+		return pdfData;
+	}
+	
 	public String getFullPdfHTML(BasePage page, Map<String, Object> data) {
 		validateTempFolder();
 		StringBuilder ret = new StringBuilder();

@@ -1,11 +1,15 @@
 package picoded.RESTBuilder.templates;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.Map.Entry;
 
-import picoded.RESTBuilder.RESTBuilder;
-import picoded.RESTBuilder.RESTFunction;
+import picoded.RESTBuilder.*;
+import picoded.JStack.*;
+import picoded.JStruct.*;
+import picoded.servlet.*;
 import picoded.conv.ConvertJSON;
+import picoded.conv.GenericConvert;
+import picoded.conv.RegexUtils;
 import picoded.enums.HttpRequestType;
 
 public class KeyValueMapApiBuilder {
@@ -16,82 +20,70 @@ public class KeyValueMapApiBuilder {
 		_keyValueMap = inMap;
 	}
 	
-	// /
-	// / # getValue (GET)
-	// /
-	// / Gets the value for a key
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | key | String | Key String of a key value pair in _keyValueMap |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | value | String | Value of the key given |
-	// / | error | String | Errors, if any |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # getValue (GET)
+	///
+	/// Gets the value for a key
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | key             | String             | Key String of a key value pair in _keyValueMap                                |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | value           | String             | Value of the key given                                                        |
+	/// | error           | String             | Errors, if any                                                                |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public RESTFunction getValue = (req, res) -> {
 		if (_keyValueMap == null) {
 			res.put("error", "Key Value Map is null");
 			return res;
 		}
 		
-		// Get given key
+		//Get given key
 		String key = req.getString("key", "");
 		if (key.isEmpty()) {
 			res.put("error", "No key was supplied");
 			return res;
 		}
 		
-		// Add found value to map
+		//Add found value to map
 		res.put("value", _keyValueMap.get(key));
 		
 		return res;
 	};
 	
-	// /
-	// / # getValues (GET)
-	// /
-	// / Gets the values for a set of keys
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | keys | String[] | Array of keys to look for |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | values | Map<String, String>| Values for the given keys |
-	// / | error | String | Errors, if any |
-	// / | exceptionMsg | String | Exception message, if any |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # getValues (GET)
+	///
+	/// Gets the values for a set of keys
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | keys            | String[]           | Array of keys to look for                                                     |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | values          | Map<String, String>| Values for the given keys                                                     |
+	/// | error           | String             | Errors, if any                                                                |
+	/// | exceptionMsg    | String             | Exception message, if any                                                     |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public RESTFunction getValues = (req, res) -> {
 		if (_keyValueMap == null) {
 			res.put("error", "Key Value Map is null");
@@ -126,38 +118,31 @@ public class KeyValueMapApiBuilder {
 		return res;
 	};
 	
-	// /
-	// / # setValue (POST)
-	// /
-	// / Sets the value for a key
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | key | String | Key to set value for |
-	// / | value | String | New value for key |
-	// / | allowEmptyValue | boolean {optional) | Allow null values to be set
-	// (default false) |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | map | Map<String, String>| Returns current mappings |
-	// / | error | String | Errors, if any |
-	// / | exceptionMsg | String | Exception message, if any |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # setValue (POST)
+	///
+	/// Sets the value for a key
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | key             | String             | Key to set value for                                                          |
+	/// | value           | String             | New value for key                                                             |
+	/// | allowEmptyValue | boolean {optional) | Allow null values to be set (default false)                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | map             | Map<String, String>| Returns current mappings                                                      |
+	/// | error           | String             | Errors, if any                                                                |
+	/// | exceptionMsg    | String             | Exception message, if any                                                     |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public RESTFunction setValue = (req, res) -> {
 		if (_keyValueMap == null) {
 			res.put("error", "Key Value Map is null");
@@ -190,37 +175,30 @@ public class KeyValueMapApiBuilder {
 		return res;
 	};
 	
-	// /
-	// / # setValues (POST)
-	// /
-	// / Sets the values for given keys
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | keyValues | Map<String, String>| Map of new keyValuePair mappings |
-	// / | allowEmptyValue | boolean {optional) | Allow null values to be set
-	// (default false) |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | map | Map<String, String>| Returns current mappings |
-	// / | error | String | Errors, if any |
-	// / | exceptionMsg | String | Exception message, if any |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # setValues (POST)
+	///
+	/// Sets the values for given keys
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | keyValues       | Map<String, String>| Map of new keyValuePair mappings                                              |
+	/// | allowEmptyValue | boolean {optional) | Allow null values to be set (default false)                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | map          | Map<String, String>| Returns current mappings                                                      |
+	/// | error           | String             | Errors, if any                                                                |
+	/// | exceptionMsg    | String             | Exception message, if any                                                     |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public RESTFunction setValues = (req, res) -> {
 		if (_keyValueMap == null) {
 			res.put("error", "Key Value Map is null");
@@ -267,35 +245,29 @@ public class KeyValueMapApiBuilder {
 		return res;
 	};
 	
-	// /
-	// / # deleteValue (POST)
-	// /
-	// / Deletes the mapping for the given key
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | key | String | Key to delete |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | map | Map<String, String>| Returns current mappings |
-	// / | error | String | Errors, if any |
-	// / | exceptionMsg | String | Exception message, if any |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # deleteValue (POST)
+	///
+	/// Deletes the mapping for the given key
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | key             | String             | Key to delete                                                                 |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | map          | Map<String, String>| Returns current mappings                                                      |
+	/// | error           | String             | Errors, if any                                                                |
+	/// | exceptionMsg    | String             | Exception message, if any                                                     |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public RESTFunction deleteValue = (req, res) -> {
 		if (_keyValueMap == null) {
 			res.put("error", "Key Value Map is null");
@@ -321,35 +293,29 @@ public class KeyValueMapApiBuilder {
 		return res;
 	};
 	
-	// /
-	// / # deleteValues (POST)
-	// /
-	// / Deletes the mappings for the given keys
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | keys | String[] | Array of keys to delete |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | map | Map<String, String>| Returns current mappings |
-	// / | error | String | Errors, if any |
-	// / | exceptionMsg | String | Exception message, if any |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # deleteValues (POST)
+	///
+	/// Deletes the mappings for the given keys
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | keys            | String[]           | Array of keys to delete                                                       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | map          | Map<String, String>| Returns current mappings                                                      |
+	/// | error           | String             | Errors, if any                                                                |
+	/// | exceptionMsg    | String             | Exception message, if any                                                     |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public RESTFunction deleteValues = (req, res) -> {
 		if (_keyValueMap == null) {
 			res.put("error", "Key Value Map is null");
@@ -384,32 +350,26 @@ public class KeyValueMapApiBuilder {
 		return res;
 	};
 	
-	// /
-	// / # getMap (GET)
-	// /
-	// / Get the current map
-	// /
-	// / ## HTTP Request Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
-	// / ## JSON Object Output Parameters
-	// /
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | Parameter Name | Variable Type | Description |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// / | map | Map<String, String>| Returns current mappings |
-	// /
-	// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	// /
+	///
+	/// # getMap (GET)
+	///
+	/// Get the current map
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	   | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | map             | Map<String, String>| Returns current mappings                                                      |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	public RESTFunction getMap = (req, res) -> {
 		if (_keyValueMap == null) {
 			res.put("error", "Key Value Map is null");
@@ -421,29 +381,29 @@ public class KeyValueMapApiBuilder {
 		return res;
 	};
 	
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	//
 	// RestBuilder template builder
 	//
-	// ///////////////////////////////////////////
+	/////////////////////////////////////////////
 	
-	// /
-	// / Takes the restbuilder and implements its respective default API
-	// /
+	///
+	/// Takes the restbuilder and implements its respective default API
+	///
 	public RESTBuilder setupRESTBuilder(RESTBuilder rb, String setPrefix) {
 		
-		// Get entire mapping
+		//Get entire mapping
 		rb.getNamespace(setPrefix + "getMap").put(HttpRequestType.GET, getMap);
 		
-		// Get values
+		//Get values
 		rb.getNamespace(setPrefix + "getValue").put(HttpRequestType.GET, getValue);
 		rb.getNamespace(setPrefix + "getValues").put(HttpRequestType.GET, getValues);
 		
-		// Set values
+		//Set values
 		rb.getNamespace(setPrefix + "setValue").put(HttpRequestType.POST, setValue);
 		rb.getNamespace(setPrefix + "setValues").put(HttpRequestType.POST, setValues);
 		
-		// Delete mappings
+		//Delete mappings
 		rb.getNamespace(setPrefix + "deleteValue").put(HttpRequestType.POST, deleteValue);
 		rb.getNamespace(setPrefix + "deleteValues").put(HttpRequestType.POST, deleteValues);
 		

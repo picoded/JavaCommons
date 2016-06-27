@@ -136,11 +136,11 @@ public class BasePage_test extends Mockito {
 	}
 	
 	@Test
-	public void PagesBuilder() throws Exception {
+	public void PageBuilder() throws Exception {
 		new File("./WEB-INF/").mkdir();
 		new File("./WEB-INF/pages/").mkdir();
 		basePage.initializeContext();
-		assertNotNull(basePage.PagesBuilder());
+		assertNotNull(basePage.PageBuilder());
 	}
 	
 	@Test

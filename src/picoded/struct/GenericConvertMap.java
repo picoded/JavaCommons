@@ -292,26 +292,76 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to map
-	// @TODO generic map conversion
 	//--------------------------------------------------------------------------------------------------
 	
+	///
+	/// @Deprecated : Use {@link #toStringMap()} instead
+	///
 	/// To String Object Map conversion of generic object
 	///
 	/// @param key       The input value key to convert
 	/// @param fallbck   The fallback default (if not convertable)
 	///
 	/// @returns         The converted Map if possible, else null
+	@Deprecated
 	public default Map<String, Object> toStringObjectMap(K key, Object fallbck) {
 		return GenericConvert.toStringObjectMap(get(key), fallbck);
 	}
 	
+	///
+	/// @Deprecated : Use {@link #toStringMap()} instead
+	///
 	/// Default Null fallback, To String Object Map conversion of generic object
 	///
 	/// @param key       The input value key to convert
 	///
 	/// @returns         The converted Map if possible, else null
+	@Deprecated
 	public default Map<String, Object> toStringObjectMap(K key) {
 		return GenericConvert.toStringObjectMap(get(key));
+	}
+	
+	/// To String Map conversion of generic object
+	///
+	/// @param key       The input value key to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted Map if possible, else null
+	public default <K extends String, V> Map<K, V> toStringMap(K key, Object fallbck) {
+		return GenericConvert.toStringMap(get(key), fallbck);
+	}
+	
+	///
+	/// Default Null fallback, To String Map conversion of generic object
+	///
+	/// @param key       The input value key to convert
+	///
+	/// @returns         The converted Map if possible, else null
+	public default <K extends String, V> Map<K, V> toStringMap(K key) {
+		return GenericConvert.toStringMap(get(key));
+	}
+	
+	// Generic string map
+	//--------------------------------------------------------------------------------------------------
+	
+	/// To String Map conversion of generic object
+	///
+	/// @param key       The input value key to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted Map if possible, else null
+	public default <K extends String, V> Map<K, V> toGenericConvertStringMap(K key, Object fallbck) {
+		return GenericConvert.toGenericConvertStringMap(get(key), fallbck);
+	}
+	
+	///
+	/// Default Null fallback, To String Map conversion of generic object
+	///
+	/// @param key       The input value key to convert
+	///
+	/// @returns         The converted Map if possible, else null
+	public default <K extends String, V> Map<K, V> toGenericConvertStringMap(K key) {
+		return GenericConvert.toGenericConvertStringMap(get(key));
 	}
 	
 	// to array
@@ -360,6 +410,36 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	/// @default         The converted value
 	public default Object[] getObjectArray(K key) {
 		return GenericConvert.toObjectArray(key);
+	}
+	
+	// NESTED object fetch (related to fully qualified keys handling)
+	//--------------------------------------------------------------------------------------------------
+	
+	///
+	/// Gets an object from the map,
+	/// That could very well be, a map inside a list, inside a map, inside a .....
+	///
+	/// Note that at each iteration step, it attempts to do a FULL key match first, 
+	/// before the next iteration depth
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	public default Object getNestedObject(String key, Object fallbck) {
+		return GenericConvert.fetchNestedObject(this, key, fallbck);
+	}
+	
+	///
+	/// Default Null fallback, for `getNestedObject(key,fallback)`
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	public default Object getNestedObject(String key) {
+		return getNestedObject(key, null);
 	}
 	
 	// Does a simple typecast and put conversion

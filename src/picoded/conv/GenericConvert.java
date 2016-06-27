@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.BiFunction;
 
+import picoded.struct.*;
+
 /// Provides several autoamted generic conversion, from a given object format to another.
 ///
 /// This is generally meant for most generic types, and is primarily used to handle
@@ -19,7 +21,7 @@ public class GenericConvert {
 	
 	/// To String conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Object to JSON string
@@ -65,7 +67,7 @@ public class GenericConvert {
 	
 	/// To boolean conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric conversion
@@ -131,7 +133,7 @@ public class GenericConvert {
 	
 	/// To Number conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -178,7 +180,7 @@ public class GenericConvert {
 	
 	/// To int conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -210,7 +212,7 @@ public class GenericConvert {
 	
 	/// To long conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -242,7 +244,7 @@ public class GenericConvert {
 	
 	/// To float conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -274,7 +276,7 @@ public class GenericConvert {
 	
 	/// To double conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -306,7 +308,7 @@ public class GenericConvert {
 	
 	/// To byte conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -338,7 +340,7 @@ public class GenericConvert {
 	
 	/// To short conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -370,7 +372,7 @@ public class GenericConvert {
 	
 	/// To UUID conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -415,7 +417,7 @@ public class GenericConvert {
 	
 	/// To GUID conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Numeric string conversion
@@ -469,13 +471,12 @@ public class GenericConvert {
 	// @TODO generic list conversion
 	//--------------------------------------------------------------------------------------------------
 	
-	// to map
-	// @TODO generic map conversion
+	// to string object map
 	//--------------------------------------------------------------------------------------------------
 	
-	/// To String Object map conversion of generic object
+	/// To String map conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion (if its a map)
 	/// - JSON String to Map
@@ -486,31 +487,31 @@ public class GenericConvert {
 	///
 	/// @returns         The converted value
 	@SuppressWarnings("unchecked")
-	public static Map<String, Object> toStringObjectMap(Object input, Object fallbck) {
+	public static <K extends String, V> Map<K, V> toStringMap(Object input, Object fallbck) {
 		
 		// Null handling
 		if (input == null) {
 			if (fallbck == null) {
 				return null;
 			}
-			return toStringObjectMap(fallbck, null);
+			return toStringMap(fallbck, null);
 		}
 		
 		// If Map instance
 		if (input instanceof Map) {
-			return (Map<String, Object>) input;
+			return (Map<K, V>) input;
 		}
 		
 		// If String instance, attampt JSON conversion
 		if (input instanceof String) {
 			try {
-				return ConvertJSON.toMap((String) input);
+				return (Map<K, V>) ConvertJSON.toMap((String) input);
 			} catch (Exception e) {
 				// Silence the exception
 			}
 		}
 		
-		return toStringObjectMap(fallbck, null);
+		return toStringMap(fallbck, null);
 	}
 	
 	/// Default Null fallback, To String Object map conversion of generic object
@@ -518,8 +519,105 @@ public class GenericConvert {
 	/// @param input     The input value to convert
 	///
 	/// @returns         The converted value
+	public static <K extends String, V> Map<K, V> toStringMap(Object input) {
+		return toStringMap(input, null);
+	}
+	
+	///
+	/// @Deprecated : Use {@link #toStringMap()} instead
+	///
+	/// To String Object map conversion of generic object
+	///
+	/// Performs the following strategies in the following order
+	///
+	/// - No conversion (if its a map)
+	/// - JSON String to Map
+	/// - Fallback
+	///
+	/// @param input     The input value to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted value
+	@Deprecated
+	@SuppressWarnings("unchecked")
+	public static Map<String, Object> toStringObjectMap(Object input, Object fallbck) {
+		return toStringMap(input, fallbck);
+	}
+	
+	///
+	/// @Deprecated : Use {@link #toStringMap()} instead
+	///
+	/// Default Null fallback, To String Object map conversion of generic object
+	///
+	/// @param input     The input value to convert
+	///
+	/// @returns         The converted value
+	@Deprecated
 	public static Map<String, Object> toStringObjectMap(Object input) {
 		return toStringObjectMap(input, null);
+	}
+	
+	// Generic string map
+	//--------------------------------------------------------------------------------------------------
+	
+	/// To String GenericConvertMap conversion of generic object
+	///
+	/// Performs the following strategies in the following order
+	///
+	/// - No conversion (if its a GenericConvertMap)
+	/// - To GenericConvertMap (if its a Map)
+	/// - toStringObjectMap -> GenericConvertMap conversion
+	/// - Fallback
+	///
+	/// @param input     The input value to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted value
+	@SuppressWarnings("unchecked")
+	public static <K extends String, V> GenericConvertMap<K, V> toGenericConvertStringMap(Object input, Object fallbck) {
+		
+		// Null handling
+		if (input == null) {
+			if (fallbck == null) {
+				return null;
+			}
+			return toGenericConvertStringMap(fallbck, null);
+		}
+		
+		// If GenericConvertMap instance
+		if (input instanceof GenericConvertMap) {
+			return (GenericConvertMap<K, V>) input;
+		}
+		
+		// If Map instance
+		if (input instanceof Map) {
+			return ProxyGenericConvertMap.ensureGenericConvertMap((Map<K, V>) input);
+		}
+		
+		// If String instance, attampt JSON conversion
+		if (input instanceof String) {
+			try {
+				Map<String, Object> strMap = ConvertJSON.toMap((String) input);
+				if (strMap != null) {
+					return ProxyGenericConvertMap.ensureGenericConvertMap((Map<K, V>) strMap);
+				}
+			} catch (Exception e) {
+				// Silence the exception
+			}
+		}
+		
+		// Fallback
+		return toGenericConvertStringMap(fallbck, null);
+	}
+	
+	///
+	/// Default Null fallback, To GenericConvert String map conversion of generic object
+	///
+	/// @param input     The input value to convert
+	///
+	/// @returns         The converted value
+	public static <K extends String, V> GenericConvertMap<K, V> toGenericConvertStringMap(Object input) {
+		return toGenericConvertStringMap(input, null);
 	}
 	
 	// to array
@@ -531,7 +629,7 @@ public class GenericConvert {
 	
 	/// To String array conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - String to List
@@ -622,7 +720,7 @@ public class GenericConvert {
 	
 	/// To object list conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - Array to List
@@ -696,7 +794,7 @@ public class GenericConvert {
 	
 	/// To object array conversion of generic object
 	///
-	/// Performs the following stretagies in the following order
+	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
 	/// - String to List
@@ -766,6 +864,211 @@ public class GenericConvert {
 	/// @returns         The converted value
 	public static Object[] toObjectArray(Object input) {
 		return toObjectArray(input, null);
+	}
+	
+	//--------------------------------------------------------------------------------------------------
+	//
+	// NESTED object fetch (related to fully qualified keys handling)
+	//
+	//--------------------------------------------------------------------------------------------------
+	
+	///
+	/// Fetch an Object from either a Map, or a List. By attempting to use the provided key.
+	///
+	/// This attempts to use the key AS IT IS. Only converting it to an int for List if needed.
+	/// It does not do recursive fetch, if that is needed see `fetchNestedObject`
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	///
+	public static Object fetchObject(Object base, String key, Object fallback) {
+		
+		// Base to map / list conversion
+		Map<String, Object> baseMap = null;
+		List<Object> baseList = null;
+		
+		// Base to map / list conversion
+		if (base instanceof Map) {
+			baseMap = toStringMap(base);
+		} else if (base instanceof List) {
+			baseList = toObjectList(base);
+		}
+		
+		// Fail on getting base item : attempts conversion
+		if (baseMap == null && baseList == null) {
+			baseMap = toStringMap(base);
+			if (baseMap == null) {
+				baseList = toObjectList(base);
+			}
+		}
+		
+		// Fail on getting base item
+		if (baseMap == null && baseList == null) {
+			return fallback;
+		}
+		
+		// Reuse vars?
+		Object ret = null;
+		int idxPos = 0;
+		
+		// Full key fetch
+		if (baseMap != null) {
+			ret = baseMap.get(key);
+		} else { // if( baseList != null ) {
+			idxPos = toInt(key, -1);
+			if (idxPos >= 0 && idxPos < baseList.size()) {
+				ret = baseList.get(idxPos);
+			}
+		}
+		
+		// Full key found
+		if (ret != null) {
+			return ret;
+		}
+		
+		// Fallback
+		return fallback;
+	}
+	
+	///
+	/// Default Null fallback, for `fetchObject(base, key, fallback)`
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	///
+	public static Object fetchObject(Object base, String key) {
+		return fetchObject(base, key, null);
+	}
+	
+	///
+	/// Gets an object from the map,
+	/// That could very well be, a map inside a list, inside a map, inside a .....
+	///
+	/// Note that at each iteration step, it attempts to do a FULL key match first, 
+	/// before the next iteration depth
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	public static Object fetchNestedObject(Object base, String key, Object fallback) {
+		
+		// Invalid base -> null, or not ( map OR list ) -> fallback
+		if (base == null || !((base instanceof Map) || (base instanceof List))) {
+			return fallback;
+		}
+		
+		// Reuse ret object
+		Object ret = null;
+		
+		// Full key fetching found -> if found it is returned =)
+		ret = fetchObject(base, key, null);
+		if (ret != null) {
+			return ret;
+		}
+		
+		// Fallsback if key is ALREADY EMPTY !
+		// cause nothing is found, and nothing else can be done
+		if (key == null || key.length() <= 0) {
+			return fallback;
+		}
+		
+		// Trim off useless spaces, and try again (if applicable)
+		int keyLen = key.length();
+		key = key.trim();
+		if (key.length() != keyLen) {
+			return fetchNestedObject(base, key, fallback);
+		}
+		
+		// Trim off useless starting ".dots" and try again
+		if (key.startsWith(".")) {
+			return fetchNestedObject(base, key.substring(1), fallback);
+		}
+		
+		// Array bracket fetching
+		// This is most likely an array fetching,
+		// but could also be a case of map fetching with string
+		if (key.startsWith("[")) {
+			int rightBracketIndex = key.indexOf("]", 1);
+			
+			String bracketKey = key.substring(1, rightBracketIndex).trim();
+			String rightKey = key.substring(rightBracketIndex + 1).trim();
+			
+			// Fetch [sub object]
+			Object subObject = fetchObject(base, bracketKey, null);
+			
+			// No sub object, cant go a step down, fallback
+			//
+			// Meaning this can neither be the final object (ending key)
+			// nor could it be a recusive fetch.
+			if (subObject == null) {
+				return fallback;
+			}
+			
+			// subObject is THE object, as its the ending key
+			if (rightKey.length() <= 0) {
+				return subObject;
+			}
+			
+			// ELSE : Time to continue, recusively fetching
+			return fetchNestedObject(subObject, rightKey, fallback);
+		}
+		
+		// Fetch one nested level =(
+		int dotIndex = key.indexOf(".");
+		int leftBracketIndex = key.indexOf("[");
+		
+		if (dotIndex >= 0 && (leftBracketIndex < 0 || dotIndex <= leftBracketIndex)) {
+			// Dot Index exists, and is before left bracket index OR there is no left bracket index
+			//
+			// This is most likely a nested object fetch -> so recursion is done
+			
+			// Gets the left.right key
+			String leftKey = key.substring(0, dotIndex); //left
+			String rightKey = key.substring(dotIndex + 1); //right
+			
+			// Fetch left
+			Object left = fetchObject(base, leftKey, null);
+			
+			// Time to continue, recusively fetching
+			return fetchNestedObject(left, rightKey, fallback);
+			//
+		} else if (leftBracketIndex > 0) {
+			// Left bracket index exists, and there is no dot before it
+			//
+			// This is most likely a nested object fetch -> so recursion is done
+			
+			// Gets the left[right] key
+			String leftKey = key.substring(0, leftBracketIndex); //left
+			String rightKey = key.substring(leftBracketIndex); //[right]
+			
+			// Fetch left
+			Object left = fetchObject(base, leftKey, null);
+			
+			// Time to continue, recusively fetching [right]
+			return fetchNestedObject(left, rightKey, fallback);
+		}
+		
+		// All else failed, including full key fetch -> fallback
+		return fallback;
+	}
+	
+	///
+	/// Default Null fallback, for `fetchNestedObject(base, key, fallback)`
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	///
+	public static Object fetchNestedObject(Object base, String key) {
+		return fetchNestedObject(base, key, null);
 	}
 	
 	// to custom class

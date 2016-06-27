@@ -28,7 +28,7 @@ public class JStruct implements JStackLayer {
 	}
 	
 	/// Setsup and return a KeyValueMap object,
-	/// 
+	///
 	/// @param name - name of map in backend
 	///
 	/// @returns KeyValueMap
@@ -58,6 +58,55 @@ public class JStruct implements JStackLayer {
 			
 		} finally {
 			keyValueMapCache_lock.writeLock().unlock();
+		}
+	}
+	
+	// AtomicLongMap handling
+	//----------------------------------------------
+	
+	protected ConcurrentHashMap<String, AtomicLongMap> atomicLongMapCache = new ConcurrentHashMap<String, AtomicLongMap>();
+	protected ReentrantReadWriteLock atomicLongMapCache_lock = new ReentrantReadWriteLock();
+	
+	/// Actual setup implmentation to overwrite
+	///
+	/// @param name - name of map in backend
+	///
+	/// @returns KeyValueMap
+	protected AtomicLongMap setupAtomicLongMap(String name) {
+		return new JStruct_AtomicLongMap();
+	}
+	
+	/// Setsup and return a KeyValueMap object,
+	///
+	/// @param name - name of map in backend
+	///
+	/// @returns KeyValueMap
+	public AtomicLongMap getAtomicLongMap(String name) {
+		
+		// Structure backend name is case insensitive
+		name = name.toUpperCase();
+		
+		// Tries to get 1 time, without locking
+		AtomicLongMap cacheCopy = atomicLongMapCache.get(name);
+		if (cacheCopy != null) {
+			return cacheCopy;
+		}
+		
+		// Tries to get again with lock, creates and put if not exists
+		try {
+			atomicLongMapCache_lock.writeLock().lock();
+			
+			cacheCopy = atomicLongMapCache.get(name);
+			if (cacheCopy != null) {
+				return cacheCopy;
+			}
+			
+			cacheCopy = setupAtomicLongMap(name);
+			atomicLongMapCache.put(name, cacheCopy);
+			return cacheCopy;
+			
+		} finally {
+			atomicLongMapCache_lock.writeLock().unlock();
 		}
 	}
 	

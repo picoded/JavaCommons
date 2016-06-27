@@ -1,5 +1,6 @@
 package picoded.struct.query.condition;
 
+import picoded.conv.GenericConvert;
 import picoded.struct.query.*;
 import picoded.struct.query.internal.*;
 
@@ -53,15 +54,13 @@ public class ConditionBase implements Query {
 	/// @param   map to extract out the field value
 	/// @param   field name of extraction
 	///
-	/// @TODO: Support FullyQualifiedDomainName extraction?
-	///
 	/// @returns  The extracted object
 	///
 	protected Object getArgumentValue(Map<String, Object> argMap, String argName) {
 		if (argMap == null || argName == null) {
 			return null;
 		}
-		return argMap.get(argName);
+		return GenericConvert.fetchNestedObject(argMap, argName, null);
 	}
 	
 	/// To test against the specific value, this is the actual

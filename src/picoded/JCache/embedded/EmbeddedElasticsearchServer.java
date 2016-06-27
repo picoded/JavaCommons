@@ -47,7 +47,7 @@ public class EmbeddedElasticsearchServer {
 		
 		// Node storage
 		if( storage != null ) {
-			elasticsearchSettings.put("path.data", storage.getAbsolutePath() );
+			elasticsearchSettings.put("path.home", storage.getAbsolutePath() );
 			dataDirectory = storage;
 		} else {
 			dataDirectory = null;

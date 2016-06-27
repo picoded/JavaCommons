@@ -47,4 +47,18 @@ public class Elasticsearch_test {
 	public void notNull() {
 		assertNotNull(esObj);
 	}
+	
+	@Test 
+	public void simpleGetPutGet() {
+		Map<String,Object> data = new HashMap<String,Object>();
+		data.put("hello","world");
+		
+		ElasticsearchClient client = esObj.ElasticsearchClient();
+		
+		assertNotNull( client );
+		assertNull( client.get("this", "is", "1") );
+		assertEquals( "1", client.put("this", "is", "1", data) );
+		assertEquals( data, client.get("this", "is", "1") );
+		
+	}
 }

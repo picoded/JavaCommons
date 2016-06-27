@@ -13,10 +13,10 @@ import java.io.IOException;
 public class EmbeddedElasticsearchServer {
 	
 	/// The actual elasticsearch server node
-	protected final Node elasticNode;
+	public final Node elasticNode;
 	
 	/// The actual data directory used by elastisearch
-	protected final File dataDirectory;
+	public final File dataDirectory;
 	
 	///
 	/// @param  The cluster name
@@ -75,6 +75,13 @@ public class EmbeddedElasticsearchServer {
 	//
 	public Client client() {
 		return elasticNode.client();
+	}
+	
+	//
+	// The more useful client wrapper
+	//
+	public ElasticsearchClient ElasticsearchClient() {
+		return new ElasticsearchClient(client());
 	}
 	
 	public boolean isClosed() {

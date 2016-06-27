@@ -322,7 +322,7 @@ public class AtomicLongMapApiBuilder_test {
 		assertEquals(0, valueMap.get("foo").longValue());	
 	}
 	
-	//@Test
+	//@Test //as API does not support
 	public void getMapTest() {
 		setValueNonEmptyValueTest();
 		response = RequestHttp.get(testAddress + "/api/meta-test/map", null);
@@ -368,6 +368,62 @@ public class AtomicLongMapApiBuilder_test {
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNotNull("An empty value was supplied, and allowEmptyValue is false", responseMap.get("error"));
+	}
+	
+	@Test
+	public void getAndAddTest() {
+		setValueNonEmptyValueTest();
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("key", new String[] { "my_key" });
+		paramsMap.put("delta", new String[] { "5l" });
+		response = RequestHttp.post(testAddress + "/api/meta-test/getAndAdd", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNull("An empty key was supplied", responseMap.get("error"));
+		assertNull("An empty value was supplied, and allowEmptyValue is false", responseMap.get("error"));
+		assertEquals(true, responseMap.get("map"));
+	}
+	
+	@Test
+	public void getAndAddInvalidTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		response = RequestHttp.post(testAddress + "/api/meta-test/getAndAdd", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull("An empty key was supplied", responseMap.get("error"));
+	}
+	
+	@Test
+	public void getAndAddInvalidAllwedTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("key", new String[] { "my_key" });
+		paramsMap.put("delta", new String[] { });
+		response = RequestHttp.post(testAddress + "/api/meta-test/getAndAdd", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull("An empty value was supplied, and allowEmptyValue is false", responseMap.get("error"));
+	}
+	
+	@Test
+	public void incrementTest() {
+		setValueNonEmptyValueTest();
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("key", new String[] { "my_key" });
+		paramsMap.put("delta", new String[] { "5l" });
+		response = RequestHttp.post(testAddress + "/api/meta-test/increment", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNull("An empty key was supplied", responseMap.get("error"));
+		assertEquals(2, responseMap.get("value"));
+	}
+	
+	@Test
+	public void incrementInvalidTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		response = RequestHttp.post(testAddress + "/api/meta-test/increment", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull("An empty key was supplied", responseMap.get("error"));
 	}
 	
 	private static boolean available(int port) {

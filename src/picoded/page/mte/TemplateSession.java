@@ -2,7 +2,7 @@ package picoded.page.mte;
 
 import java.util.*;
 
-import picoded.page.mte.internal.*;
+//import picoded.page.mte.internal.*;
 import picoded.struct.*;
 import picoded.conv.*;
 

@@ -1,17 +1,13 @@
 package picodedTests.RESTBuilder.templates;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.catalina.LifecycleException;
@@ -19,16 +15,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.google.common.util.concurrent.AtomicLongMap;
+
 import picoded.JStack.JStackException;
-import picoded.JStruct.AccountObject;
-import picoded.JStruct.JStruct;
-import picoded.JStruct.MetaTable;
 import picoded.JStruct.internal.JStruct_AtomicLongMap;
-import picoded.JStruct.AccountTable;
 import picoded.RESTBuilder.RESTBuilder;
 import picoded.RESTBuilder.templates.AtomicLongMapApiBuilder;
-import picoded.RESTBuilder.templates.MetaTableApiBuilder;
-import picoded.conv.ConvertJSON;
 import picoded.servlet.BasePage;
 import picoded.servletUtils.EmbeddedServlet;
 import picoded.webUtils.RequestHttp;
@@ -42,7 +34,7 @@ public class AtomicLongMapApiBuilder_test {
 	protected static String testAddress = "http://127.0.0.1:";
 	protected static int port = 15000;
 	protected static boolean portAvailableCalled = false;
-	private RequestHttp requester;
+	//private RequestHttp requester;
 	private ResponseHttp response;
 	private Map<String, Object> responseMap;
 	private static AtomicLongMapApiBuilder builder;
@@ -240,7 +232,142 @@ public class AtomicLongMapApiBuilder_test {
 		response = RequestHttp.post(testAddress + "/api/meta-test/values", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
-		assertNull("No keyValues map was supplied", responseMap.get("error"));
+		
+		paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("keys", new String[] { "foo", "oop" });
+		response = RequestHttp.get(testAddress + "/api/meta-test/values", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNull(responseMap.get("error"));
+		@SuppressWarnings("unchecked")
+		Map<String, Long> valueMap = (Map<String, Long>)responseMap.get("values");
+		assertNotNull(valueMap);
+		assertEquals(2, valueMap.size());
+	}
+	
+	@Test
+	public void deleteValueInvalidTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		response = RequestHttp.post(testAddress + "/api/meta-test/deleteValue", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull("An empty key was supplied", responseMap.get("error"));
+	}
+	
+	@Test
+	public void deleteValueExceptionTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("key", new String[] { "my_key" });
+		response = RequestHttp.post(testAddress + "/api/meta-test/deleteValue", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull("An error occured while trying to delete a value", responseMap.get("error"));
+	}
+	
+	@Test
+	public void deleteValueTest() {
+		setValueNonEmptyValueTest();
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("key", new String[] { "my_key" });
+		response = RequestHttp.post(testAddress + "/api/meta-test/deleteValue", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNull("An empty key was supplied", responseMap.get("error"));
+		@SuppressWarnings("unchecked")
+		Map<String, Long> valueMap = (Map<String, Long>)responseMap.get("values");
+		assertEquals(0, valueMap.get("my_key").longValue());	
+	}
+	
+	@Test
+	public void deleteValuesInvalidTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		response = RequestHttp.post(testAddress + "/api/meta-test/deleteValues", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull("No key array was supplied", responseMap.get("error"));
+	}
+	
+	@Test
+	public void deleteValuesInvalidKeysTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("keys", new String[] { });
+		response = RequestHttp.post(testAddress + "/api/meta-test/deleteValues", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull("No key array was supplied", responseMap.get("error"));
+	}
+	
+	@Test
+	public void deleteValuesExceptionTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("keys", new String[] { "oop", "foo" });
+		response = RequestHttp.post(testAddress + "/api/meta-test/deleteValues", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull("An error occured while trying to delete a value", responseMap.get("error"));
+	}
+	
+	
+	@Test
+	public void deleteValuesTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("keys", new String[] { "oop", "foo" });
+		response = RequestHttp.post(testAddress + "/api/meta-test/deleteValues", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNull("An empty key was supplied", responseMap.get("error"));
+		@SuppressWarnings("unchecked")
+		Map<String, Long> valueMap = (Map<String, Long>)responseMap.get("values");
+		assertEquals(0, valueMap.get("oop").longValue());	
+		assertEquals(0, valueMap.get("foo").longValue());	
+	}
+	
+	//@Test
+	public void getMapTest() {
+		setValueNonEmptyValueTest();
+		response = RequestHttp.get(testAddress + "/api/meta-test/map", null);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNull("error", responseMap.get("error"));
+		@SuppressWarnings("rawtypes")
+		AtomicLongMap valueMap = (AtomicLongMap)responseMap.get("map");
+		assertNotNull(valueMap);
+		assertEquals(1, valueMap.size());
+	}
+	
+	@Test
+	public void weakCompareAndSetTest() {
+		setValueNonEmptyValueTest();
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("key", new String[] { "my_key" });
+		paramsMap.put("expect", new String[] { "1" });
+		paramsMap.put("update", new String[] { "5" });
+		response = RequestHttp.post(testAddress + "/api/meta-test/weakCompareAndSet", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNull("An empty key was supplied", responseMap.get("error"));
+		assertNull("An empty value was supplied, and allowEmptyValue is false", responseMap.get("error"));
+		assertEquals(true, responseMap.get("map"));
+	}
+	
+	@Test
+	public void weakCompareAndSetInvalidTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		response = RequestHttp.post(testAddress + "/api/meta-test/weakCompareAndSet", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull("An empty key was supplied", responseMap.get("error"));
+	}
+	
+	@Test
+	public void weakCompareAndSetInvalidAllwedTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("key", new String[] { "my_key" });
+		paramsMap.put("allowed", new String[] { });
+		response = RequestHttp.post(testAddress + "/api/meta-test/weakCompareAndSet", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNotNull("An empty value was supplied, and allowEmptyValue is false", responseMap.get("error"));
 	}
 	
 	private static boolean available(int port) {

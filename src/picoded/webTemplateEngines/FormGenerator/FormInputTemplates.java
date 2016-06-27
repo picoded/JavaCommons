@@ -101,7 +101,7 @@ public class FormInputTemplates {
 				DecimalFormat df = new DecimalFormat("#,###.00");
 
 				if(!addDecimal){
-					df = new DecimalFormat("#,###");
+					df = showRemoveDecimal();
 				}
 
 				BigDecimal bigD = new BigDecimal(tempValue);
@@ -119,6 +119,20 @@ public class FormInputTemplates {
 			}
 		}
 		return ret;
+	}
+
+	//show decimal places if there are
+	//do not show the decimal places if there are not decimal places
+	//returns a new DecimalFormat object
+	private static DecimalFormat showRemoveDecimal(){
+
+		//if the value has a decimal(.##), then the format will new Decimal Form("#,###.00");
+
+		DecimalFormat df = new DecimalFormat("#,###.00");
+		df.setMinimumFractionDigits(0);
+		df.setMaximumFractionDigits(2);
+
+		return df;
 	}
 
 	protected static FormInputInterface div = (node) -> {

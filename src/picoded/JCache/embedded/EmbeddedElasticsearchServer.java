@@ -66,10 +66,6 @@ public class EmbeddedElasticsearchServer {
 			elasticsearchSettings.put("node.local", "true");
 		}
 		
-		// Some common shard / replication limitation : For custom numbers use a proper elasticsearch setup
-		elasticsearchSettings.put("node.master", "true");
-		elasticsearchSettings.put("node.data", "true");
-		
 		//
 		// Setup elastic node
 		//

@@ -44,6 +44,15 @@ public class Elasticsearch_test {
 		}
 	}
 	
+	// For manual debugging
+	public void debuggingSleep() {
+		try {
+			Thread.sleep(60*60*1000);
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	@Test
 	public void notNull() {
 		assertNotNull(esObj);
@@ -67,12 +76,6 @@ public class Elasticsearch_test {
 		client.createIndexIfNotExists("this");
 		client.createIndexIfNotExists("this");
 		assertTrue( client.hasIndex("this") );
-		
-		// try {
-		// 	Thread.sleep(60*60*1000);
-		// } catch(Exception e) {
-		// 	throw new RuntimeException(e);
-		// }
 		
 		// Data put, and get
 		assertEquals( "1", client.put("this", "is", "1", data) );

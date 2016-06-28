@@ -36,7 +36,7 @@ public class EmbeddedElasticsearchServer {
 		
 		if( port <= 0 ) {
 			// Automate the port assignment : 9300 and above
-			elasticsearchSettings.put("http.port", "9300-9400");
+			elasticsearchSettings.put("http.port", "9200-9300");
 			elasticsearchSettings.put("http.enabled", "true"); 
 		} else if( port > 0 ) {
 			elasticsearchSettings.put("http.port", ""+port);
@@ -65,6 +65,10 @@ public class EmbeddedElasticsearchServer {
 		} else {
 			elasticsearchSettings.put("node.local", "true");
 		}
+		
+		// Some common shard / replication limitation : For custom numbers use a proper elasticsearch setup
+		elasticsearchSettings.put("node.master", "true");
+		elasticsearchSettings.put("node.data", "true");
 		
 		//
 		// Setup elastic node

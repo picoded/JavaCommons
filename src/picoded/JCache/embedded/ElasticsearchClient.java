@@ -8,6 +8,7 @@ import org.elasticsearch.action.get.*;
 import org.elasticsearch.action.update.*;
 import org.elasticsearch.action.index.*;
 import org.elasticsearch.action.*;
+import org.elasticsearch.index.*;
 
 
 import java.util.*;
@@ -53,9 +54,13 @@ public class ElasticsearchClient {
 	///
 	/// @returns The record map
 	public Map<String,Object> get(String index, String type, String id) {
-		GetResponse res = client.prepareGet(index,type,id).get();
-		if( res.isExists() ) {
-			return res.getSource();
+		try {
+			GetResponse res = client.prepareGet(index,type,id).get();
+			if( res.isExists() ) {
+				return res.getSource();
+			}
+		} catch(IndexNotFoundException e) {
+			// Silent index not found, this happens on no value request
 		}
 		return null;
 	}

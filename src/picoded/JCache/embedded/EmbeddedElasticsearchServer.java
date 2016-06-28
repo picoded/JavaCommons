@@ -16,15 +16,15 @@ public class EmbeddedElasticsearchServer {
 	public final Node elasticNode;
 	
 	/// The actual data directory used by elastisearch
-	public final File dataDirectory;
+	public final File homeDirectory;
 	
 	///
 	/// @param  The cluster name
-	/// @param  The HTTP API port if required, use -1 to disable, use 0 for auto
-	/// @param  Persistent storage location, use NULL to use pure in-memory (not recommended)
+	/// @param  The HTTP API port if required, use -1 for auto
+	/// @param  Persistent inHomeDir location, use NULL to use pure in-memory (not recommended)
 	/// @param  Restrict the server to local cluster mode, meaning no cluster networking
 	/// 
-	public EmbeddedElasticsearchServer(String clustername, int port, File storage, boolean localCluster) {
+	public EmbeddedElasticsearchServer(String clustername, int port, File inHomeDir, boolean localCluster) {
 		Settings.Builder elasticsearchSettings = Settings.builder();
 		
 		//
@@ -34,23 +34,29 @@ public class EmbeddedElasticsearchServer {
 			elasticsearchSettings.put("cluster.name", clustername);
 		}
 		
-		if( port < 0 ) {
-			elasticsearchSettings.put("http.enabled", "false");
+		if( port <= 0 ) {
+			// Automate the port assignment : 9300 and above
+			elasticsearchSettings.put("http.port", "9300-9400");
+			elasticsearchSettings.put("http.enabled", "true"); 
 		} else if( port > 0 ) {
-			elasticsearchSettings.put("http.port", port);
-			elasticsearchSettings.put("http.enabled", "true");
-		} else { // (port == 0)
-			// Automate the port assignment : 9200 and above
-			// elasticsearchSettings.put("http.port", port);
+			elasticsearchSettings.put("http.port", ""+port);
 			elasticsearchSettings.put("http.enabled", "true");
 		}
 		
-		// Node storage
-		if( storage != null ) {
-			elasticsearchSettings.put("path.home", storage.getAbsolutePath() );
-			dataDirectory = storage;
+		// Node inHomeDir
+		if( inHomeDir != null ) {
+			// Save the directory
+			homeDirectory = inHomeDir;
+			
+			// Ensure data folder is valid
+			File dataDir = (new File(inHomeDir, "data"));
+			dataDir.mkdirs(); 
+			
+			// Save the file path to config
+			elasticsearchSettings.put("path.home", inHomeDir.getAbsolutePath() );
+			elasticsearchSettings.put("path.data", dataDir.getAbsolutePath() );
 		} else {
-			dataDirectory = null;
+			homeDirectory = null;
 		}
 		
 		// Local mode only
@@ -101,12 +107,12 @@ public class EmbeddedElasticsearchServer {
 	public void closeAndDelete() {
 		close();
 		
-		if( dataDirectory == null ) {
+		if( homeDirectory == null ) {
 			throw new RuntimeException("No data directory set by constructor");
 		}
 		
 		try {
-			FileUtils.deleteDirectory(dataDirectory);
+			FileUtils.deleteDirectory(homeDirectory);
 		} catch (IOException e) {
 			throw new RuntimeException("Could not delete data directory of embedded elasticsearch server", e);
 		}

@@ -317,10 +317,10 @@ public class KeyValueMapApiBuilder_test {
 		assertNull(valueMap.get("foo"));	
 	}
 	
-	//@Test
+	@Test
 	public void getMapTest() {
 		setValueNonEmptyValueTest();
-		response = RequestHttp.get(testAddress + "/api/meta-test/map", null);
+		response = RequestHttp.get(testAddress + "/api/meta-test/getMap", null);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNull("error", responseMap.get("error"));

@@ -3,6 +3,7 @@ package picodedTests.features;
 // Target test class
 import picoded.JCache.*;
 import picoded.JCache.embedded.*;
+import picoded.conv.*;
 
 // Test Case include
 import org.junit.*;
@@ -80,7 +81,52 @@ public class Elasticsearch_test {
 		// Data put, and get
 		assertEquals( "1", client.put("this", "is", "1", data) );
 		assertEquals( data, client.get("this", "is", "1") );
+	}
+	
+	@Test 
+	public void searchQueryAndCount() {
+		// Setup
+		//----------------------------------
 		
+		// Test data
+		Map<String,Object> data = new HashMap<String,Object>();
 		
+		// Client & index setup
+		ElasticsearchClient client = esObj.ElasticsearchClient();
+		assertNotNull( client );
+		client.createIndexIfNotExists("this");
+		
+		// Blank count
+		client.refreshIndex();
+		assertEquals( 0, client.getSearchCount("this","is", ConvertJSON.toMap("{ \"match_all\" : {} }")) );
+		
+		// Data setup
+		//----------------------------------
+		data.put("msg","one");
+		data.put("val",101);
+		assertEquals( "1", client.put("this", "is", "1", data) );
+		
+		data.put("msg","two");
+		data.put("val",102);
+		assertEquals( "2", client.put("this", "is", "2", data) );
+		
+		data.put("msg","three");
+		data.put("val",103);
+		assertEquals( "3", client.put("this", "is", "3", data) );
+		
+		data.put("msg","four");
+		data.put("val",104);
+		assertEquals( "4", client.put("this", "is", "4", data) );
+		
+		client.refreshIndex("this");
+		
+		// Count and search
+		//----------------------------------
+		
+		// Full count
+		assertEquals( 4, client.getSearchCount("this","is", ConvertJSON.toMap("{ \"match_all\" : {} }")) );
+		
+		//assertNotNull( client.getSearchResponse("this","is", ConvertJSON.toMap("{ \"match_all\" : {} }")) );
+		//assertEquals( client.getSearchResponse("this","is", ConvertJSON.toMap("{ \"match_all\" : {} }")) );
 	}
 }

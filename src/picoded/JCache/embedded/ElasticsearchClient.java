@@ -1,5 +1,7 @@
 package picoded.JCache.embedded;
 
+import picoded.conv.*;
+
 import org.elasticsearch.client.*;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
@@ -10,7 +12,10 @@ import org.elasticsearch.action.*;
 import org.elasticsearch.action.admin.indices.exists.indices.*;
 import org.elasticsearch.action.admin.indices.create.*;
 import org.elasticsearch.index.*;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.indices.*;
+import org.elasticsearch.action.search.*;
+import org.elasticsearch.search.*;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -21,6 +26,12 @@ import java.util.concurrent.ExecutionException;
 ///
 public class ElasticsearchClient {
 	
+	//----------------------------------------------------------------------------
+	//
+	// Constructor
+	//
+	//----------------------------------------------------------------------------
+	
 	/// The actual elasticsearch server node
 	public final Client client;
 	public final AdminClient admin;
@@ -30,6 +41,12 @@ public class ElasticsearchClient {
 		client = inClient;
 		admin = client.admin();
 	}
+	
+	//----------------------------------------------------------------------------
+	//
+	// Data put and get
+	//
+	//----------------------------------------------------------------------------
 	
 	/// Inserts the JSON data into elastisearch 
 	///
@@ -71,7 +88,7 @@ public class ElasticsearchClient {
 	
 	//----------------------------------------------------------------------------
 	//
-	// Index handling operation
+	// Index setup & handling operation
 	//
 	//----------------------------------------------------------------------------
 	
@@ -128,4 +145,88 @@ public class ElasticsearchClient {
 	public void createIndexIfNotExists(String index) {
 		createIndexIfNotExists(index, 1, 1);
 	}
+	
+	/// Trigger an index refresh, and wait for result
+	/// Important for unit testing
+	public void refreshIndex() {
+		admin.indices().prepareRefresh().get();
+	}
+	
+	/// Trigger an index refresh, and wait for result
+	/// Important for unit testing
+	///
+	/// @param  Index name to use (required)
+	public void refreshIndex(String index) {
+		admin.indices().prepareRefresh(index).get();
+	}
+	
+	//----------------------------------------------------------------------------
+	//
+	// Data Search : Helpers
+	//
+	//----------------------------------------------------------------------------
+	
+	protected QueryBuilder queryBuilderFromMap(Map<String,Object>query) {
+		return QueryBuilders.matchAllQuery();
+		//return QueryBuilders.wrapperQuery(ConvertJSON.fromMap(query));
+	}
+	
+	protected SearchRequestBuilder getSearchRequestBuilder(String index, String type, Map<String,Object> query) {
+		SearchRequestBuilder req = client.prepareSearch(index).setTypes(type);
+		req.setQuery( queryBuilderFromMap(query) );
+		return req;
+	}
+	
+	protected SearchRequestBuilder getSearchRequestBuilder(String index, String type, Map<String,Object> query, int from, int size) {
+		return getSearchRequestBuilder(index,type,query).setFrom(from).setSize(size);
+	}
+	
+	protected SearchResponse getSearchResponse(String index, String type, Map<String,Object> query, int from, int size) {
+		return client.search(getSearchRequestBuilder(index,type,query,from,size).request()).actionGet();
+	}
+	
+	protected SearchResponse getSearchResponse(String index, String type, Map<String,Object> query) {
+		return client.search(getSearchRequestBuilder(index,type,query).request()).actionGet();
+	}
+	
+	protected static List<Map<String,Object>> searchResponseToMaps(SearchResponse res) {
+		List<Map<String,Object>> ret = new ArrayList<Map<String,Object>>();
+		SearchHit[] searchHits = res.getHits().getHits(); //Double tapping hits? lol
+		for( SearchHit hit : searchHits ) {
+			Map<String,Object> node = hit.sourceAsMap();
+			if(node != null) {
+				ret.add(node);
+			}
+		}
+		return ret;
+	}
+	
+	protected static List<String> searchResponseToIds(SearchResponse res) {
+		List<String> ret = new ArrayList<String>();
+		SearchHit[] searchHits = res.getHits().getHits(); //Double tapping hits? lol
+		for( SearchHit hit : searchHits ) {
+			String id = hit.getId();
+			if(id != null) {
+				ret.add(id);
+			}
+		}
+		return ret;
+	}
+	
+	//----------------------------------------------------------------------------
+	//
+	// Data Search : Actual
+	//
+	//----------------------------------------------------------------------------
+	
+	public long getSearchCount(String index, String type, Map<String,Object> query) {
+		return getSearchResponse(index,type,query).getHits().totalHits();
+	}
+	
+	//----------------------------------------------------------------------------
+	//
+	// Data Aggregation
+	//
+	//----------------------------------------------------------------------------
+	
 }

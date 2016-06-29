@@ -90,10 +90,16 @@ public class EmbeddedElasticsearchServer {
 		return new ElasticsearchClient(client());
 	}
 	
+	//
+	// Indicate if the elastic node is clsoed
+	//
 	public boolean isClosed() {
 		return elasticNode.isClosed();
 	}
 	
+	//
+	// Closes the elastic node if it was not already closed
+	//
 	public void close() {
 		if(!isClosed()) {
 			try {
@@ -104,6 +110,9 @@ public class EmbeddedElasticsearchServer {
 		}
 	}
 	
+	//
+	// Closes and delete the elastic node data
+	//
 	public void closeAndDelete() {
 		close();
 		

@@ -167,8 +167,8 @@ public class ElasticsearchClient {
 	//----------------------------------------------------------------------------
 	
 	protected QueryBuilder queryBuilderFromMap(Map<String,Object>query) {
-		return QueryBuilders.matchAllQuery();
-		//return QueryBuilders.wrapperQuery(ConvertJSON.fromMap(query));
+		//return QueryBuilders.matchAllQuery();
+		return QueryBuilders.wrapperQuery(ConvertJSON.fromMap(query));
 	}
 	
 	protected SearchRequestBuilder getSearchRequestBuilder(String index, String type, Map<String,Object> query) {

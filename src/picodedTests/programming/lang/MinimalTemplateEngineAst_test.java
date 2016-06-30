@@ -41,7 +41,7 @@ public class MinimalTemplateEngineAst_test {
 		
 		try {
 			node.applySingleStage(0);
-		} catch( AstSyntaxException e ) {
+		} catch (AstSyntaxException e) {
 			exc = e;
 		}
 		assertNotNull(exc);
@@ -60,7 +60,6 @@ public class MinimalTemplateEngineAst_test {
 		
 		assertEquals(helloTemplate, node.toString());
 	}
-	
 	
 	// @Test
 	// public void parseTemplate_basicIf() {

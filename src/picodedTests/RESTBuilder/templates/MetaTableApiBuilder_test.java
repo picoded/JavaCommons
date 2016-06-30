@@ -120,8 +120,8 @@ public class MetaTableApiBuilder_test {
 		
 		String[] allArgs = new String[] { "_oid", "_name", "_age" };
 		
-		List<List<Object>> allDataWithQueryFilter = mtApi.list_GET_and_POST_inner(0, 0, 0, allArgs, "_oid=? OR _name=? OR _age=?",
-			new String[] { "*", "name1", "age4" }, "", false);
+		List<List<Object>> allDataWithQueryFilter = mtApi.list_GET_and_POST_inner(0, 0, 0, allArgs,
+			"_oid=? OR _name=? OR _age=?", new String[] { "*", "name1", "age4" }, "", false);
 		assertNotNull(allDataWithQueryFilter);
 		
 	}
@@ -187,8 +187,8 @@ public class MetaTableApiBuilder_test {
 		
 		try {
 			if (!new File("./test-files/test-specific/MetaTable").exists()) {
-			    File dir = new File("./test-files/test-specific/MetaTable");
-			    dir.mkdir();
+				File dir = new File("./test-files/test-specific/MetaTable");
+				dir.mkdir();
 			}
 			FileWriter fw = new FileWriter("./test-files/test-specific/MetaTable/reportsCSV.csv");
 			

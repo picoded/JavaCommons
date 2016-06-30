@@ -15,11 +15,11 @@ public class AstCommonFunctions {
 	/// Takes the full raw text it represents, and echos it
 	public static AstNodeStringify echo_stringify = (node) -> {
 		StringBuilder res = new StringBuilder();
-		if(node.prefix != null) {
+		if (node.prefix != null) {
 			res.append(node.prefix);
 		}
 		res.append(node.nodeString());
-		if(node.suffix != null) {
+		if (node.suffix != null) {
 			res.append(node.suffix);
 		}
 		return res;
@@ -28,8 +28,8 @@ public class AstCommonFunctions {
 	/// Stringify all the child nodes, and returns
 	public static AstNodeStringify children_stringify = (node) -> {
 		StringBuilder res = new StringBuilder();
-		for(AstNode child : node.children) {
-			res.append( child.toString() );
+		for (AstNode child : node.children) {
+			res.append(child.toString());
 		}
 		return res;
 	};

@@ -56,12 +56,12 @@ public class ElasticsearchClient {
 	/// @param  The map data to insert
 	///
 	/// @returns The record ID, returns the auto generated ID if it was not previously given.
-	public String put(String index, String type, String id, Map<String,Object> data) {
+	public String put(String index, String type, String id, Map<String, Object> data) {
 		IndexRequestBuilder req;
-		if(id != null && id.length() > 0) {
-			req = client.prepareIndex(index,type,id);
+		if (id != null && id.length() > 0) {
+			req = client.prepareIndex(index, type, id);
 		} else {
-			req = client.prepareIndex(index,type);
+			req = client.prepareIndex(index, type);
 		}
 		IndexResponse res = req.setSource(data).get();
 		return res.getId();
@@ -74,13 +74,13 @@ public class ElasticsearchClient {
 	/// @param  ID to use required)
 	///
 	/// @returns The record map
-	public Map<String,Object> get(String index, String type, String id) {
+	public Map<String, Object> get(String index, String type, String id) {
 		try {
-			GetResponse res = client.prepareGet(index,type,id).get();
-			if( res.isExists() ) {
+			GetResponse res = client.prepareGet(index, type, id).get();
+			if (res.isExists()) {
 				return res.getSource();
 			}
-		} catch(IndexNotFoundException e) {
+		} catch (IndexNotFoundException e) {
 			// Silent index not found, this happens on no value request
 		}
 		return null;
@@ -99,10 +99,10 @@ public class ElasticsearchClient {
 	/// @returns Boolean if it exists
 	public boolean hasIndex(String index) {
 		try {
-			return admin.indices().exists( new IndicesExistsRequest(index) ).get().isExists();
-		} catch(InterruptedException e) {
+			return admin.indices().exists(new IndicesExistsRequest(index)).get().isExists();
+		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
-		} catch(ExecutionException e) {
+		} catch (ExecutionException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -120,7 +120,8 @@ public class ElasticsearchClient {
 	/// @oaran  Shards count to use
 	/// @oaran  Replicas count to use
 	public void createIndex(String index, int shards, int replicas) {
-		Settings indexSettings = Settings.builder().put("number_of_shards", shards).put("number_of_replicas", replicas).build();
+		Settings indexSettings = Settings.builder().put("number_of_shards", shards).put("number_of_replicas", replicas)
+			.build();
 		CreateIndexRequest indexRequest = new CreateIndexRequest(index, indexSettings);
 		
 		client.admin().indices().create(indexRequest).actionGet();
@@ -134,7 +135,7 @@ public class ElasticsearchClient {
 	public void createIndexIfNotExists(String index, int shards, int replicas) {
 		try {
 			createIndex(index, shards, replicas);
-		} catch( IndexAlreadyExistsException e ) {
+		} catch (IndexAlreadyExistsException e) {
 			// Silence
 		}
 	}
@@ -166,35 +167,36 @@ public class ElasticsearchClient {
 	//
 	//----------------------------------------------------------------------------
 	
-	protected QueryBuilder queryBuilderFromMap(Map<String,Object>query) {
+	protected QueryBuilder queryBuilderFromMap(Map<String, Object> query) {
 		//return QueryBuilders.matchAllQuery();
 		return QueryBuilders.wrapperQuery(ConvertJSON.fromMap(query));
 	}
 	
-	protected SearchRequestBuilder getSearchRequestBuilder(String index, String type, Map<String,Object> query) {
+	protected SearchRequestBuilder getSearchRequestBuilder(String index, String type, Map<String, Object> query) {
 		SearchRequestBuilder req = client.prepareSearch(index).setTypes(type);
-		req.setQuery( queryBuilderFromMap(query) );
+		req.setQuery(queryBuilderFromMap(query));
 		return req;
 	}
 	
-	protected SearchRequestBuilder getSearchRequestBuilder(String index, String type, Map<String,Object> query, int from, int size) {
-		return getSearchRequestBuilder(index,type,query).setFrom(from).setSize(size);
+	protected SearchRequestBuilder getSearchRequestBuilder(String index, String type, Map<String, Object> query,
+		int from, int size) {
+		return getSearchRequestBuilder(index, type, query).setFrom(from).setSize(size);
 	}
 	
-	protected SearchResponse getSearchResponse(String index, String type, Map<String,Object> query, int from, int size) {
-		return client.search(getSearchRequestBuilder(index,type,query,from,size).request()).actionGet();
+	protected SearchResponse getSearchResponse(String index, String type, Map<String, Object> query, int from, int size) {
+		return client.search(getSearchRequestBuilder(index, type, query, from, size).request()).actionGet();
 	}
 	
-	protected SearchResponse getSearchResponse(String index, String type, Map<String,Object> query) {
-		return client.search(getSearchRequestBuilder(index,type,query).request()).actionGet();
+	protected SearchResponse getSearchResponse(String index, String type, Map<String, Object> query) {
+		return client.search(getSearchRequestBuilder(index, type, query).request()).actionGet();
 	}
 	
-	protected static List<Map<String,Object>> searchResponseToMaps(SearchResponse res) {
-		List<Map<String,Object>> ret = new ArrayList<Map<String,Object>>();
+	protected static List<Map<String, Object>> searchResponseToMaps(SearchResponse res) {
+		List<Map<String, Object>> ret = new ArrayList<Map<String, Object>>();
 		SearchHit[] searchHits = res.getHits().getHits(); //Double tapping hits? lol
-		for( SearchHit hit : searchHits ) {
-			Map<String,Object> node = hit.sourceAsMap();
-			if(node != null) {
+		for (SearchHit hit : searchHits) {
+			Map<String, Object> node = hit.sourceAsMap();
+			if (node != null) {
 				ret.add(node);
 			}
 		}
@@ -204,9 +206,9 @@ public class ElasticsearchClient {
 	protected static List<String> searchResponseToIds(SearchResponse res) {
 		List<String> ret = new ArrayList<String>();
 		SearchHit[] searchHits = res.getHits().getHits(); //Double tapping hits? lol
-		for( SearchHit hit : searchHits ) {
+		for (SearchHit hit : searchHits) {
 			String id = hit.getId();
-			if(id != null) {
+			if (id != null) {
 				ret.add(id);
 			}
 		}
@@ -226,8 +228,8 @@ public class ElasticsearchClient {
 	/// @param  Elasticsearch query map
 	///
 	/// @returns The search count
-	public long getSearchCount(String index, String type, Map<String,Object> query) {
-		return getSearchResponse(index,type,query).getHits().totalHits();
+	public long getSearchCount(String index, String type, Map<String, Object> query) {
+		return getSearchResponse(index, type, query).getHits().totalHits();
 	}
 	
 	/// Does a search, and return the result maps
@@ -239,8 +241,9 @@ public class ElasticsearchClient {
 	/// @param  Search size
 	///
 	/// @returns The record map list
-	public List<Map<String,Object>> getSearchMaps(String index, String type, Map<String,Object> query, int from, int size) {
-		return searchResponseToMaps( getSearchResponse(index,type,query,from,size) );
+	public List<Map<String, Object>> getSearchMaps(String index, String type, Map<String, Object> query, int from,
+		int size) {
+		return searchResponseToMaps(getSearchResponse(index, type, query, from, size));
 	}
 	
 	/// Does a search, and return the result id
@@ -252,8 +255,8 @@ public class ElasticsearchClient {
 	/// @param  Search size
 	///
 	/// @returns The id list
-	public List<String> getSearchMapIds(String index, String type, Map<String,Object> query, int from, int size) {
-		return searchResponseToIds( getSearchResponse(index,type,query,from,size) );
+	public List<String> getSearchMapIds(String index, String type, Map<String, Object> query, int from, int size) {
+		return searchResponseToIds(getSearchResponse(index, type, query, from, size));
 	}
 	
 	//----------------------------------------------------------------------------

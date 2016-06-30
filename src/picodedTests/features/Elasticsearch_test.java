@@ -38,7 +38,7 @@ public class Elasticsearch_test {
 	}
 	
 	@After
-	public void tearDown() throws InterruptedException { 
+	public void tearDown() throws InterruptedException {
 		if (esObj != null) {
 			esObj.closeAndDelete();
 			esObj = null;
@@ -48,8 +48,8 @@ public class Elasticsearch_test {
 	// For manual debugging
 	public void debuggingSleep() {
 		try {
-			Thread.sleep(60*60*1000);
-		} catch(Exception e) {
+			Thread.sleep(60 * 60 * 1000);
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -59,64 +59,64 @@ public class Elasticsearch_test {
 		assertNotNull(esObj);
 	}
 	
-	@Test 
+	@Test
 	public void simpleGetPutGet() {
 		// Test data
-		Map<String,Object> data = new HashMap<String,Object>();
-		data.put("hello","world");
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("hello", "world");
 		
 		// Client connection
 		ElasticsearchClient client = esObj.ElasticsearchClient();
-		assertNotNull( client );
+		assertNotNull(client);
 		
 		// Empty data check
-		assertFalse( client.hasIndex("this") );
-		assertNull( client.get("this", "is", "1") );
+		assertFalse(client.hasIndex("this"));
+		assertNull(client.get("this", "is", "1"));
 		
 		// Index "table" setup check
 		client.createIndexIfNotExists("this");
 		client.createIndexIfNotExists("this");
-		assertTrue( client.hasIndex("this") );
+		assertTrue(client.hasIndex("this"));
 		
 		// Data put, and get
-		assertEquals( "1", client.put("this", "is", "1", data) );
-		assertEquals( data, client.get("this", "is", "1") );
+		assertEquals("1", client.put("this", "is", "1", data));
+		assertEquals(data, client.get("this", "is", "1"));
 	}
 	
-	@Test 
+	@Test
 	public void searchQueryAndCount() {
 		// Setup
 		//----------------------------------
 		
 		// Test data
-		Map<String,Object> data = new HashMap<String,Object>();
+		Map<String, Object> data = new HashMap<String, Object>();
 		
 		// Client & index setup
 		ElasticsearchClient client = esObj.ElasticsearchClient();
-		assertNotNull( client );
+		assertNotNull(client);
 		client.createIndexIfNotExists("this");
 		
 		// Blank count
 		client.refreshIndex();
-		assertEquals( 0, client.getSearchCount("this","is", ConvertJSON.toMap("{ \"match_all\" : {} }")) );
+		assertEquals(0, client.getSearchCount("this", "is", ConvertJSON.toMap("{ \"match_all\" : {} }")));
 		
 		// Data setup
 		//----------------------------------
-		data.put("msg","one");
-		data.put("val",101);
-		assertEquals( "1", client.put("this", "is", "1", data) );
+		data.put("msg", "one");
+		data.put("val", 101);
+		assertEquals("1", client.put("this", "is", "1", data));
 		
-		data.put("msg","to two");
-		data.put("val",102);
-		assertEquals( "2", client.put("this", "is", "2", data) );
+		data.put("msg", "to two");
+		data.put("val", 102);
+		assertEquals("2", client.put("this", "is", "2", data));
 		
-		data.put("msg","to three");
-		data.put("val",103);
-		assertEquals( "3", client.put("this", "is", "3", data) );
+		data.put("msg", "to three");
+		data.put("val", 103);
+		assertEquals("3", client.put("this", "is", "3", data));
 		
-		data.put("msg","to four");
-		data.put("val",104);
-		assertEquals( "4", client.put("this", "is", "4", data) );
+		data.put("msg", "to four");
+		data.put("val", 104);
+		assertEquals("4", client.put("this", "is", "4", data));
 		
 		client.refreshIndex("this");
 		
@@ -124,26 +124,35 @@ public class Elasticsearch_test {
 		//----------------------------------
 		
 		// Full count
-		assertEquals( 4, client.getSearchCount("this","is", ConvertJSON.toMap("{ \"match_all\" : {} }")) );
+		assertEquals(4, client.getSearchCount("this", "is", ConvertJSON.toMap("{ \"match_all\" : {} }")));
 		
 		// Partial matching
-		assertEquals( 3, client.getSearchCount("this","is", ConvertJSON.toMap("{ \"term\" : { \"msg\" : \"to\" } }")) );
+		assertEquals(3, client.getSearchCount("this", "is", ConvertJSON.toMap("{ \"term\" : { \"msg\" : \"to\" } }")));
 		
 		// Filtered matching
-		assertEquals( 1, client.getSearchCount("this","is", ConvertJSON.toMap("{ \"bool\" : { \"filter\" : { \"term\" : { \"val\" : 102 } } } }")) );
+		assertEquals(
+			1,
+			client.getSearchCount("this", "is",
+				ConvertJSON.toMap("{ \"bool\" : { \"filter\" : { \"term\" : { \"val\" : 102 } } } }")));
 		
 		// Search checking
 		//----------------------------------
 		
 		// Search for ID's
-		ArrayList<String> ref3 = new ArrayList<String> ();
+		ArrayList<String> ref3 = new ArrayList<String>();
 		ref3.add("3");
-		assertEquals(ref3 , client.getSearchMapIds("this","is", ConvertJSON.toMap("{ \"bool\" : { \"filter\" : { \"term\" : { \"val\" : 103 } } } }"), 0, 10) );
+		assertEquals(
+			ref3,
+			client.getSearchMapIds("this", "is",
+				ConvertJSON.toMap("{ \"bool\" : { \"filter\" : { \"term\" : { \"val\" : 103 } } } }"), 0, 10));
 		
 		// Search for map
-		ArrayList<Map<String,Object>> ref4 = new ArrayList<Map<String,Object>> ();
+		ArrayList<Map<String, Object>> ref4 = new ArrayList<Map<String, Object>>();
 		ref4.add(data);
-		assertEquals( ref4, client.getSearchMaps("this","is", ConvertJSON.toMap("{ \"bool\" : { \"filter\" : { \"term\" : { \"val\" : 104 } } } }"), 0, 10) );
+		assertEquals(
+			ref4,
+			client.getSearchMaps("this", "is",
+				ConvertJSON.toMap("{ \"bool\" : { \"filter\" : { \"term\" : { \"val\" : 104 } } } }"), 0, 10));
 		
 	}
 }

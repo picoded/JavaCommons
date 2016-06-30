@@ -6,13 +6,12 @@ import picoded.conv.*;
 
 import java.util.*;
 
-
 ///
 /// Takes in the string, grow out (build) an abstract syntax tree.
 ///
 /// This works by processing the given string through the various stages of AstNodeProcessor
 ///
-public class MinimalTemplateEngineAst extends AstRoot { 
+public class MinimalTemplateEngineAst extends AstRoot {
 	
 	//----------------------------------------------------------------
 	//
@@ -43,7 +42,8 @@ public class MinimalTemplateEngineAst extends AstRoot {
 	///
 	/// (PS: You probably DO NOT need to modify this)
 	///
-	public String[][] expressionSet = new String[][] { new String[] { "${", "}" }, new String[] { "{{#", "}}" }, new String[] { "{{", "}}" }, new String[] { "{{{","}}}" } };
+	public String[][] expressionSet = new String[][] { new String[] { "${", "}" }, new String[] { "{{#", "}}" },
+		new String[] { "{{", "}}" }, new String[] { "{{{", "}}}" } };
 	
 	///
 	/// Template expresion prefix / suffix set for unescaped html strictly, this MUST be a subset of expressionSet
@@ -103,10 +103,10 @@ public class MinimalTemplateEngineAst extends AstRoot {
 	//----------------------------------------------------------------
 	
 	/// setup the AST processor function stack 
-	public List<Map<String,AstNodeProcessor>> setupAstProcessorStages() {
-		List<Map<String,AstNodeProcessor>> ret = new ArrayList<Map<String,AstNodeProcessor>>();
+	public List<Map<String, AstNodeProcessor>> setupAstProcessorStages() {
+		List<Map<String, AstNodeProcessor>> ret = new ArrayList<Map<String, AstNodeProcessor>>();
 		
-		HashMap<String,AstNodeProcessor> stage0 = new HashMap<String,AstNodeProcessor>();
+		HashMap<String, AstNodeProcessor> stage0 = new HashMap<String, AstNodeProcessor>();
 		stage0.put("root", stage0_root);
 		
 		ret.add(stage0);
@@ -115,8 +115,8 @@ public class MinimalTemplateEngineAst extends AstRoot {
 	}
 	
 	/// setup the stringify function map
-	public Map<String,AstNodeStringify> setupAstStringifyMap() {
-		Map<String,AstNodeStringify> ret = new HashMap<String,AstNodeStringify>();
+	public Map<String, AstNodeStringify> setupAstStringifyMap() {
+		Map<String, AstNodeStringify> ret = new HashMap<String, AstNodeStringify>();
 		ret.put("*", AstCommonFunctions.children_stringify);
 		ret.put("text", AstCommonFunctions.echo_stringify);
 		ret.put("expression", AstCommonFunctions.echo_stringify);
@@ -132,26 +132,27 @@ public class MinimalTemplateEngineAst extends AstRoot {
 	/// Scans for an escape block at a fixed node position. And does the needed expression block construction
 	public int stage0_expressionSetScan(AstNode node, int pos, int prvPos, String[][] expSet, String expressionMode) {
 		int idx = node.startsWith(expSet, 0, pos);
-		if( idx >= 0 ) {
+		if (idx >= 0) {
 			int endPos = node.indexOf_skipEscapedCharacters(escapeStrings, expSet[idx][1], pos);
 			if (endPos < 0) {
-				throw node.setupSyntaxException(idx, "Missing expected closing bracket: "+expSet[idx][1]);
+				throw node.setupSyntaxException(idx, "Missing expected closing bracket: " + expSet[idx][1]);
 			}
 			
 			// Add any characters before block as text node
-			if(prvPos < pos) {
-				root.addChildNode("text",prvPos,pos);
+			if (prvPos < pos) {
+				root.addChildNode("text", prvPos, pos);
 				prvPos = pos;
 			}
 			
 			// Add the raw expresison block
-			int endLength = endPos-pos;
-			root.addChildNode("expression",pos+expSet[idx][0].length(), endLength-expSet[idx][0].length()-expSet[idx][1].length()+1); 
+			int endLength = endPos - pos;
+			root.addChildNode("expression", pos + expSet[idx][0].length(), endLength - expSet[idx][0].length()
+				- expSet[idx][1].length() + 1);
 			root.addedChildNode.prefix = expSet[idx][0];
 			root.addedChildNode.suffix = expSet[idx][1];
 			root.addedChildNode.mode = expressionMode;
 			
-			return pos+endLength+expSet[idx][1].length(); //prvPos
+			return pos + endLength + expSet[idx][1].length(); //prvPos
 			//pos = prvPos - 1; //Deduct, as continue increment +1 already
 		}
 		return -1;
@@ -174,7 +175,7 @@ public class MinimalTemplateEngineAst extends AstRoot {
 			// Skip escaped characters
 			//
 			int idx = root.startsWith(escapeStrings, pos);
-			if (idx >= 0) { 
+			if (idx >= 0) {
 				// Skip the escape string characters
 				pos += escapeStrings[idx].length();
 				
@@ -187,27 +188,27 @@ public class MinimalTemplateEngineAst extends AstRoot {
 			// Scans for unescapedExpressionSet template block
 			//
 			idx = stage0_expressionSetScan(node, pos, prvPos, unescapedExpressionSet, "unescaped");
-			if( idx >= 0 ) {
-				prvPos = idx; 
+			if (idx >= 0) {
+				prvPos = idx;
 				pos = prvPos - 1; //Deduct, as continue increment +1 already
 			} else {
 				//
 				// Scans for escaped template block
 				//
 				idx = stage0_expressionSetScan(node, pos, prvPos, expressionSet, "standard");
-				if( idx >= 0 ) {
-					prvPos = idx; 
+				if (idx >= 0) {
+					prvPos = idx;
 					pos = prvPos - 1; //Deduct, as continue increment +1 already
 				}
 			}
 			
 		}
-		 
+		
 		//
 		// Create text node, if there is unprocessed characters from prvPos to pos.
 		// 
-		if(prvPos < pos) {
-			root.addChildNode("text",prvPos);
+		if (prvPos < pos) {
+			root.addChildNode("text", prvPos);
 		}
 	};
 }

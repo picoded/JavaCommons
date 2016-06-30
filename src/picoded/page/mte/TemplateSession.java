@@ -166,7 +166,7 @@ public class TemplateSession {
 	protected int evaluateIfExpressionSet(String[][] expressionSet, StringBuilder ret, int start, int end,
 		boolean autoEscape) {
 		String[][] statementSet = fetchStatementSet(expressionSet, start, end);
-		if(statementSet == null) {
+		if (statementSet == null) {
 			return -1;
 		}
 		
@@ -181,16 +181,16 @@ public class TemplateSession {
 		//------------------------------------------------------------------------
 		
 		// IF expression block
-		if( functionString.equalsIgnoreCase("if") ) {
+		if (functionString.equalsIgnoreCase("if")) {
 			int closingBlock = scanForClosingBlock("if", postExpressionOffset, end, false);
 			
-			if( closingBlock < 0 ) {
-				throw invalidTemplateFormatException(start, "Missing expected if closing block: "+
-				statementSet[0][2]+"/if"+statementSet[0][3]+" OR "+statementSet[0][2]+"end"+statementSet[0][3]+" OR "+statementSet[0][2]+"else"+statementSet[0][3]);
+			if (closingBlock < 0) {
+				throw invalidTemplateFormatException(start, "Missing expected if closing block: " + statementSet[0][2]
+					+ "/if" + statementSet[0][3] + " OR " + statementSet[0][2] + "end" + statementSet[0][3] + " OR "
+					+ statementSet[0][2] + "else" + statementSet[0][3]);
 			}
 			
 			int elseBlock = scanForClosingBlock("if", postExpressionOffset, end, true);
-			
 			
 		}
 		
@@ -199,8 +199,8 @@ public class TemplateSession {
 		
 		// Fallsback variable expression (using fullStatement)
 		//------------------------------------------------------------------------
-		if(ret != null) {
-			ret.append(evaluateVariableExpression(/*fullStatement*/ statementSet[0][1], autoEscape));
+		if (ret != null) {
+			ret.append(evaluateVariableExpression(/*fullStatement*/statementSet[0][1], autoEscape));
 		}
 		
 		// Regardless, continue AFTER the expression block
@@ -230,7 +230,7 @@ public class TemplateSession {
 			String[][] statementSet = fetchStatementSet(parent.expressionSet, start, end);
 			
 			// No statment, next!
-			if( statementSet == null ) {
+			if (statementSet == null) {
 				continue;
 			}
 			
@@ -242,20 +242,20 @@ public class TemplateSession {
 			// RECURSION ? (get into next statement nesting)
 			
 			// ELSE block found???
-			if( acceptElseBlock && functionString.equalsIgnoreCase("else") ) {
+			if (acceptElseBlock && functionString.equalsIgnoreCase("else")) {
 				return start;
 			}
 			
 			// Closing statement block found???
-			for( idx = 0; idx < parent.closingBlockStatements.length; ++idx ) {
-				if( functionString.equalsIgnoreCase(parent.closingBlockStatements[idx]) ) {
+			for (idx = 0; idx < parent.closingBlockStatements.length; ++idx) {
+				if (functionString.equalsIgnoreCase(parent.closingBlockStatements[idx])) {
 					return start;
 				}
 			}
 			
 			// Closing statement block string + type found???
-			for( idx = 0; idx < parent.closingBlockStrings.length; ++idx ) {
-				if( functionString.equalsIgnoreCase(parent.closingBlockStrings[idx]+blockType) ) {
+			for (idx = 0; idx < parent.closingBlockStrings.length; ++idx) {
+				if (functionString.equalsIgnoreCase(parent.closingBlockStrings[idx] + blockType)) {
 					return start;
 				}
 			}
@@ -272,9 +272,9 @@ public class TemplateSession {
 		Object value = modelMap.getNestedObject(expression);
 		String strValue = GenericConvert.toString(value, "");
 		
-		if(autoEscape) {
-			return escapeHtml( strValue );
-		} else { 
+		if (autoEscape) {
+			return escapeHtml(strValue);
+		} else {
 			return strValue;
 		}
 	}
@@ -296,11 +296,11 @@ public class TemplateSession {
 		int start = errorPosition - 10;
 		int end = errorPosition + 20;
 		
-		if(start < 0) {
+		if (start < 0) {
 			start = 0;
 			posPrefix = "";
 		}
-		if(end > templateChars.length) {
+		if (end > templateChars.length) {
 			end = templateChars.length;
 			posSuffix = "";
 		}
@@ -310,7 +310,7 @@ public class TemplateSession {
 		String prefixFull = posPrefix + prefixSegment;
 		
 		finalMsg += prefixFull + suffixSegment + posSuffix + "\n";
-		for(int i=0; i<prefixFull.length(); ++i) {
+		for (int i = 0; i < prefixFull.length(); ++i) {
 			finalMsg += " ";
 		}
 		finalMsg += "^\n";

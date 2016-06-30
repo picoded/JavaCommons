@@ -8,7 +8,7 @@ import java.util.*;
 ///
 /// ASTNode 
 ///
-public class AstNode extends GenericConvertHashMap<String,Object> {
+public class AstNode extends GenericConvertHashMap<String, Object> {
 	
 	//----------------------------------------------------------------
 	//
@@ -61,7 +61,7 @@ public class AstNode extends GenericConvertHashMap<String,Object> {
 	
 	/// Get the node string slice from the root node
 	public String nodeString() {
-		if(_nodeString == null) {
+		if (_nodeString == null) {
 			_nodeString = root.rootString.substring(_startPosition, _endingPosition);
 		}
 		return _nodeString;
@@ -69,7 +69,7 @@ public class AstNode extends GenericConvertHashMap<String,Object> {
 	
 	/// Get the node char array slice from the root node
 	public char[] nodeChars() {
-		if(_nodeChars == null) {
+		if (_nodeChars == null) {
 			_nodeChars = CharArray.slice(root.rootChars, _startPosition, _endingPosition - _startPosition);
 		}
 		return _nodeChars;
@@ -100,12 +100,13 @@ public class AstNode extends GenericConvertHashMap<String,Object> {
 	
 	/// Add a child node with the relative starting offset
 	public void addChildNode(String inType, int relativeOffset) {
-		children.add( addedChildNode = new AstNode(root, inType, _startPosition+relativeOffset, _endingPosition) );
+		children.add(addedChildNode = new AstNode(root, inType, _startPosition + relativeOffset, _endingPosition));
 	}
 	
 	/// Add a child node with the relative starting offset, and length
 	public void addChildNode(String inType, int relativeOffset, int length) {
-		children.add( addedChildNode = new AstNode(root, inType, _startPosition+relativeOffset, _startPosition+relativeOffset+length) );
+		children.add(addedChildNode = new AstNode(root, inType, _startPosition + relativeOffset, _startPosition
+			+ relativeOffset + length));
 	}
 	
 	//----------------------------------------------------------------
@@ -115,14 +116,14 @@ public class AstNode extends GenericConvertHashMap<String,Object> {
 	//----------------------------------------------------------------
 	
 	/// Takes a single stage map, and iterate itself and all child node
-	protected void applyStageMap(Map<String,AstNodeProcessor> stageMap) {
-		if(stageMap.get(type) != null) {
+	protected void applyStageMap(Map<String, AstNodeProcessor> stageMap) {
+		if (stageMap.get(type) != null) {
 			stageMap.get(type).accept(this);
-		} else if(stageMap.get("*") != null) {
+		} else if (stageMap.get("*") != null) {
 			stageMap.get("*").accept(this);
 		}
 		
-		for(AstNode child : children) {
+		for (AstNode child : children) {
 			child.applyStageMap(stageMap);
 		}
 	}
@@ -135,9 +136,9 @@ public class AstNode extends GenericConvertHashMap<String,Object> {
 	
 	public StringBuilder stringify() {
 		Map<String, AstNodeStringify> stringifyMap = root.astStringifyMap();
-		if(stringifyMap.get(type) != null) {
+		if (stringifyMap.get(type) != null) {
 			return stringifyMap.get(type).apply(this);
-		} else if(stringifyMap.get("*") != null) {
+		} else if (stringifyMap.get("*") != null) {
 			return stringifyMap.get("*").apply(this);
 		}
 		return new StringBuilder();
@@ -167,59 +168,67 @@ public class AstNode extends GenericConvertHashMap<String,Object> {
 	//----------------------------------------------------------------
 	
 	public boolean startsWith(String needle, int relativeOffset) {
-		return CharArray.startsWith(needle, root.rootChars, _startPosition+relativeOffset,  _endingPosition);
+		return CharArray.startsWith(needle, root.rootChars, _startPosition + relativeOffset, _endingPosition);
 	}
+	
 	public boolean startsWith(String needle, int relativeOffset, int length) {
-		return CharArray.startsWith(needle, root.rootChars, _startPosition+relativeOffset,  _startPosition+relativeOffset+length);
+		return CharArray.startsWith(needle, root.rootChars, _startPosition + relativeOffset, _startPosition
+			+ relativeOffset + length);
 	}
 	
 	public int startsWith(String[] needleArray, int relativeOffset) {
-		return CharArray.startsWith(needleArray, root.rootChars, _startPosition+relativeOffset, _endingPosition);
+		return CharArray.startsWith(needleArray, root.rootChars, _startPosition + relativeOffset, _endingPosition);
 	}
 	
 	public int startsWith(String[] needleArray, int relativeOffset, int length) {
-		return CharArray.startsWith(needleArray, root.rootChars, _startPosition+relativeOffset,  _startPosition+relativeOffset+length);
+		return CharArray.startsWith(needleArray, root.rootChars, _startPosition + relativeOffset, _startPosition
+			+ relativeOffset + length);
 	}
 	
 	public int startsWith(String[][] needleSet, int nestedPos, int relativeOffset) {
-		return CharArray.startsWith(needleSet, nestedPos, root.rootChars, _startPosition+relativeOffset, _endingPosition);
+		return CharArray.startsWith(needleSet, nestedPos, root.rootChars, _startPosition + relativeOffset,
+			_endingPosition);
 	}
 	
 	public int startsWith(String[][] needleSet, int nestedPos, int relativeOffset, int length) {
-		return CharArray.startsWith(needleSet, nestedPos, root.rootChars, _startPosition+relativeOffset,  _startPosition+relativeOffset+length);
+		return CharArray.startsWith(needleSet, nestedPos, root.rootChars, _startPosition + relativeOffset, _startPosition
+			+ relativeOffset + length);
 	}
 	
 	public int indexOf(String needle, int relativeOffset, int length) {
-		int res = CharArray.indexOf(needle, root.rootChars, _startPosition+relativeOffset, _startPosition+relativeOffset+length);
-		if( res >= _startPosition ) {
+		int res = CharArray.indexOf(needle, root.rootChars, _startPosition + relativeOffset, _startPosition
+			+ relativeOffset + length);
+		if (res >= _startPosition) {
 			return res - _startPosition;
 		}
 		return -1;
 	}
 	
 	public int indexOf(String needle, int relativeOffset) {
-		int res = CharArray.indexOf(needle, root.rootChars, _startPosition+relativeOffset, _endingPosition);
-		if( res >= _startPosition ) {
+		int res = CharArray.indexOf(needle, root.rootChars, _startPosition + relativeOffset, _endingPosition);
+		if (res >= _startPosition) {
 			return res - _startPosition;
 		}
 		return -1;
 	}
 	
 	public int indexOf_skipEscapedCharacters(String[] escapeStrings, String needle, int relativeOffset, int length) {
-		int res = CharArray.indexOf_skipEscapedCharacters(escapeStrings, needle, root.rootChars, _startPosition+relativeOffset, _startPosition+relativeOffset+length);
-		if( res >= _startPosition ) {
+		int res = CharArray.indexOf_skipEscapedCharacters(escapeStrings, needle, root.rootChars, _startPosition
+			+ relativeOffset, _startPosition + relativeOffset + length);
+		if (res >= _startPosition) {
 			return res - _startPosition;
-		} 
+		}
 		return -1;
 	}
 	
 	public int indexOf_skipEscapedCharacters(String[] escapeStrings, String needle, int relativeOffset) {
-		int res = CharArray.indexOf_skipEscapedCharacters(escapeStrings, needle, root.rootChars, _startPosition+relativeOffset, _endingPosition);
-		if( res >= _startPosition ) {
+		int res = CharArray.indexOf_skipEscapedCharacters(escapeStrings, needle, root.rootChars, _startPosition
+			+ relativeOffset, _endingPosition);
+		if (res >= _startPosition) {
 			return res - _startPosition;
 		}
 		return -1;
-	} 
+	}
 	
 	//----------------------------------------------------------------
 	//
@@ -238,11 +247,11 @@ public class AstNode extends GenericConvertHashMap<String,Object> {
 		int start = errorPosition - 10;
 		int end = errorPosition + 20;
 		
-		if(start < 0) {
+		if (start < 0) {
 			start = 0;
 			posPrefix = "";
 		}
-		if(end > root.rootString.length()) {
+		if (end > root.rootString.length()) {
 			end = root.rootString.length();
 			posSuffix = "";
 		}
@@ -252,7 +261,7 @@ public class AstNode extends GenericConvertHashMap<String,Object> {
 		String prefixFull = posPrefix + prefixSegment;
 		
 		finalMsg += prefixFull + suffixSegment + posSuffix + "\n";
-		for(int i=0; i<prefixFull.length(); ++i) {
+		for (int i = 0; i < prefixFull.length(); ++i) {
 			finalMsg += " ";
 		}
 		finalMsg += "^\n";

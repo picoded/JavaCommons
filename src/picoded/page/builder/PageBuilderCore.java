@@ -632,9 +632,9 @@ public class PageBuilderCore {
 			rawPageName = rawPageName.trim();
 		}
 		
-		if(rawPageName.equalsIgnoreCase("/")) {
+		if (rawPageName.equalsIgnoreCase("/")) {
 			rawPageName = "";
-		} 
+		}
 		
 		// The current folder to scan
 		File folder = new File(pagesFolder, rawPageName);
@@ -652,12 +652,13 @@ public class PageBuilderCore {
 				String subPageName = pageDefine.getName();
 				
 				// Scan for sub pages
-				if( subPageName.equalsIgnoreCase("common") || subPageName.equalsIgnoreCase("index") ) {
+				if (subPageName.equalsIgnoreCase("common") || subPageName.equalsIgnoreCase("index")) {
 					buildAndOutputPage(rawPageName + subPageName);
-					if( rawPageName.length() <= 0 ) {
+					if (rawPageName.length() <= 0) {
 						//buildAndOutputPage(rawPageName + subPageName);
 					} else {
-						System.out.print("> PageBuilder[Core].buildPageFolder - WARNING, common / index nested build (\'" + rawPageName + "\', \'" + subPageName + "\'): ");
+						System.out.print("> PageBuilder[Core].buildPageFolder - WARNING, common / index nested build (\'"
+							+ rawPageName + "\', \'" + subPageName + "\'): ");
 					}
 				} else if (subPageName.equalsIgnoreCase("assets") || subPageName.equalsIgnoreCase("web-inf")) {
 					// ignoring certain reserved folders

@@ -507,14 +507,14 @@ public class AccountLogin_test {
 		// Setup user
 		AccountObject testUser = accTable.newObject("the-root");
 		testUser.setPassword("is-sudo");
-
+		
 		// Credentials in request
 		HashMap<String, String[]> cred = new HashMap<String, String[]>();
 		cred.put("accountName", new String[] { "the-root" });
-
+		
 		// Wrong login attempt
 		// ---------------------------------------
-		cred.put("accountPass", new String[] { "is-sudo" }); 
+		cred.put("accountPass", new String[] { "is-sudo" });
 		assertNotNull(response = RequestHttp.post(testAddress + "/api/account/login", cred));
 		assertNotNull(responseMap = response.toMap());
 		assertNotNull(responseMap.get("accountID"));
@@ -550,7 +550,6 @@ public class AccountLogin_test {
 		
 		cred.put("accountID", new String[] { "the-changing-user" });
 		cred.put("newPassword", new String[] { "new-pass" });
-		
 		
 		String accountID = (String) (responseMap.get("accountID"));
 		HashMap<String, String[]> passwordChange = new HashMap<String, String[]>();
@@ -606,7 +605,6 @@ public class AccountLogin_test {
 		
 		cred.put("accountID", new String[] { "the-changing-user" });
 		cred.put("newPassword", new String[] { "new-pass" });
-		
 		
 		HashMap<String, String[]> passwordChange = new HashMap<String, String[]>();
 		

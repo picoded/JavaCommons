@@ -30,37 +30,37 @@ public class EmbeddedElasticsearchServer {
 		//
 		// Setup config file
 		//
-		if( clustername != null && clustername.length() > 0 ) {
+		if (clustername != null && clustername.length() > 0) {
 			elasticsearchSettings.put("cluster.name", clustername);
 		}
 		
-		if( port <= 0 ) {
+		if (port <= 0) {
 			// Automate the port assignment : 9300 and above
 			elasticsearchSettings.put("http.port", "9200-9300");
-			elasticsearchSettings.put("http.enabled", "true"); 
-		} else if( port > 0 ) {
-			elasticsearchSettings.put("http.port", ""+port);
+			elasticsearchSettings.put("http.enabled", "true");
+		} else if (port > 0) {
+			elasticsearchSettings.put("http.port", "" + port);
 			elasticsearchSettings.put("http.enabled", "true");
 		}
 		
 		// Node inHomeDir
-		if( inHomeDir != null ) {
+		if (inHomeDir != null) {
 			// Save the directory
 			homeDirectory = inHomeDir;
 			
 			// Ensure data folder is valid
 			File dataDir = (new File(inHomeDir, "data"));
-			dataDir.mkdirs(); 
+			dataDir.mkdirs();
 			
 			// Save the file path to config
-			elasticsearchSettings.put("path.home", inHomeDir.getAbsolutePath() );
-			elasticsearchSettings.put("path.data", dataDir.getAbsolutePath() );
+			elasticsearchSettings.put("path.home", inHomeDir.getAbsolutePath());
+			elasticsearchSettings.put("path.data", dataDir.getAbsolutePath());
 		} else {
 			homeDirectory = null;
 		}
 		
 		// Local mode only
-		if( localCluster ) {
+		if (localCluster) {
 			elasticsearchSettings.put("node.local", "false");
 		} else {
 			elasticsearchSettings.put("node.local", "true");
@@ -101,10 +101,10 @@ public class EmbeddedElasticsearchServer {
 	// Closes the elastic node if it was not already closed
 	//
 	public void close() {
-		if(!isClosed()) {
+		if (!isClosed()) {
 			try {
 				elasticNode.close();
-			} catch(IOException e) {
+			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -116,7 +116,7 @@ public class EmbeddedElasticsearchServer {
 	public void closeAndDelete() {
 		close();
 		
-		if( homeDirectory == null ) {
+		if (homeDirectory == null) {
 			throw new RuntimeException("No data directory set by constructor");
 		}
 		

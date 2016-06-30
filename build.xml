@@ -54,7 +54,6 @@
 	+ build-lib             - ReBuild the library only jar
 	+ build-lib-ifneeded    - Varient of build-lib, only build if not exists
 	+ compile-src           - Compile the source code
-	+ compile-srcX          - Compile experimental temporary files
 	+ compile-tests         - Compile test codes
 	+ build                 - Build all 3 jar varients
 	+ javadoc               - Generate the javadoc and its jar
@@ -218,8 +217,18 @@
 		</delete>
 	</target>
 	
-	<!-- rebuilds the dependency libOnly jar from all library organized files -->
-	<target name="build-lib" depends="build-lib-tempWorkspace">
+	<!-- Flatten the libs : Used the lib folder for runtime (similar to tomcat) -->
+	<target name="flattenLibs">
+		<copy todir="bin/libs" flatten="true">
+			<!-- scan against every file found on lib-organized -->
+			<fileset dir="${lib-organized-dir}"> 
+				<include name="**/*.jar"/> 
+			</fileset> 
+		</copy>
+	</target>
+	
+	<!-- Build the one GIANT jar : This is depreciated, as it always seem to cause problems somehow -->
+	<target name="build-uberJar" depends="build-lib-tempWorkspace">
 		<!-- build the uber jar! -->
 		<delete file="${build-libOnly}" failonerror="false"/>
 		<jar destfile="${build-libOnly}">
@@ -235,15 +244,21 @@
 			-->
 		</jar>
 		<path id="lib.path.ref">
-			<fileset dir="bin/build" includes="*-libsOnly.jar" />
+			<!--<fileset dir="bin/build" includes="*-libsOnly.jar" />-->
+			<fileset dir="bin/libs" includes="*.jar" />
 		</path>
+	</target>
+	
+	<!-- rebuilds the flatten libs jar from all library organized files -->
+	<target name="build-lib" depends="flattenLibs">
 	</target>
 	
 	<!-- check if lib jar exists -->
 	<target name="build-lib-check">
 		<available file="${build-libOnly}" property="build-libOnly.present"/>
 		<path id="lib.path.ref">
-			<fileset dir="bin/build" includes="*-libsOnly.jar" />
+			<!--<fileset dir="bin/build" includes="*-libsOnly.jar" />-->
+			<fileset dir="bin/libs" includes="*.jar" />
 		</path>
 	</target>
 	
@@ -277,25 +292,14 @@
 	<target name="test" depends="compile-tests">
 	</target>
 	
-	<!-- compile the source with picodedX -->
-	<target name="compile-srcX" depends="build-lib-ifneeded">
-		<mkdir dir="${build-classes}"/>
-		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
-				 includeantruntime="false">
-			<compilerarg value="-Xlint:all"/>
-			<src path="${src-path}"/>
-			<src path="${src-experimental}"/>
-			<exclude name="**/package-info.java"/>
-		</javac>
-	</target>
-	
 	<!-- compile the source with picodedTests -->
 	<target name="compile-tests" depends="build-lib-ifneeded">
 		<delete dir="test-files/tmp" failonerror="false"/>
 		<mkdir dir="test-files/tmp"/>
 		
 		<path id="lib.test.ref">
-			<fileset dir="bin/build" includes="*-libsOnly.jar" />
+			<!--<fileset dir="bin/build" includes="*-libsOnly.jar" />-->
+			<fileset dir="bin/libs" includes="*.jar" />
 			<fileset dir="build-tools/junit" includes="*.jar" />
 		</path>
 		
@@ -358,8 +362,9 @@
 			<junit printsummary="yes" haltonfailure="yes" fork="true" forkmode="once">
 				<classpath>
 					<pathelement path="${build-classes}"/>
-					<pathelement path="${build-libOnly}"/>
+					<!--<pathelement path="${build-libOnly}"/>-->
 					<fileset dir="build-tools/junit" includes="**/*.jar" />
+					<fileset dir="bin/libs" includes="**/*.jar" />
 					<!--<fileset dir="${build-lib}" includes="**/*.jar" />-->
 				</classpath>
 			

@@ -106,27 +106,44 @@ public class Elasticsearch_test {
 		data.put("val",101);
 		assertEquals( "1", client.put("this", "is", "1", data) );
 		
-		data.put("msg","two");
+		data.put("msg","to two");
 		data.put("val",102);
 		assertEquals( "2", client.put("this", "is", "2", data) );
 		
-		data.put("msg","three");
+		data.put("msg","to three");
 		data.put("val",103);
 		assertEquals( "3", client.put("this", "is", "3", data) );
 		
-		data.put("msg","four");
+		data.put("msg","to four");
 		data.put("val",104);
 		assertEquals( "4", client.put("this", "is", "4", data) );
 		
 		client.refreshIndex("this");
 		
-		// Count and search
+		// Count checking
 		//----------------------------------
 		
 		// Full count
 		assertEquals( 4, client.getSearchCount("this","is", ConvertJSON.toMap("{ \"match_all\" : {} }")) );
 		
-		//assertNotNull( client.getSearchResponse("this","is", ConvertJSON.toMap("{ \"match_all\" : {} }")) );
-		//assertEquals( client.getSearchResponse("this","is", ConvertJSON.toMap("{ \"match_all\" : {} }")) );
+		// Partial matching
+		assertEquals( 3, client.getSearchCount("this","is", ConvertJSON.toMap("{ \"term\" : { \"msg\" : \"to\" } }")) );
+		
+		// Filtered matching
+		assertEquals( 1, client.getSearchCount("this","is", ConvertJSON.toMap("{ \"bool\" : { \"filter\" : { \"term\" : { \"val\" : 102 } } } }")) );
+		
+		// Search checking
+		//----------------------------------
+		
+		// Search for ID's
+		ArrayList<String> ref3 = new ArrayList<String> ();
+		ref3.add("3");
+		assertEquals(ref3 , client.getSearchMapIds("this","is", ConvertJSON.toMap("{ \"bool\" : { \"filter\" : { \"term\" : { \"val\" : 103 } } } }"), 0, 10) );
+		
+		// Search for map
+		ArrayList<Map<String,Object>> ref4 = new ArrayList<Map<String,Object>> ();
+		ref4.add(data);
+		assertEquals( ref4, client.getSearchMaps("this","is", ConvertJSON.toMap("{ \"bool\" : { \"filter\" : { \"term\" : { \"val\" : 104 } } } }"), 0, 10) );
+		
 	}
 }

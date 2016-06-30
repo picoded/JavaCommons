@@ -219,8 +219,41 @@ public class ElasticsearchClient {
 	//
 	//----------------------------------------------------------------------------
 	
+	/// Does a search, and return the result count
+	///
+	/// @param  Index name to use (required)
+	/// @param  Type to use (required)
+	/// @param  Elasticsearch query map
+	///
+	/// @returns The search count
 	public long getSearchCount(String index, String type, Map<String,Object> query) {
 		return getSearchResponse(index,type,query).getHits().totalHits();
+	}
+	
+	/// Does a search, and return the result maps
+	///
+	/// @param  Index name to use (required)
+	/// @param  Type to use (required)
+	/// @param  Elasticsearch query map
+	/// @param  From index
+	/// @param  Search size
+	///
+	/// @returns The record map list
+	public List<Map<String,Object>> getSearchMaps(String index, String type, Map<String,Object> query, int from, int size) {
+		return searchResponseToMaps( getSearchResponse(index,type,query,from,size) );
+	}
+	
+	/// Does a search, and return the result id
+	///
+	/// @param  Index name to use (required)
+	/// @param  Type to use (required)
+	/// @param  Elasticsearch query map
+	/// @param  From index
+	/// @param  Search size
+	///
+	/// @returns The id list
+	public List<String> getSearchMapIds(String index, String type, Map<String,Object> query, int from, int size) {
+		return searchResponseToIds( getSearchResponse(index,type,query,from,size) );
 	}
 	
 	//----------------------------------------------------------------------------

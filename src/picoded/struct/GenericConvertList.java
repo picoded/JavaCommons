@@ -44,7 +44,7 @@ import picoded.conv.GenericConvert;
  * @see List
  */
 
-public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
+public interface GenericConvertList<E> extends UnsupportedDefaultList<E>{
 	
 	// to string conversion
 	//--------------------------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @param index       The input value index to convert
 	///
-	/// @returns         The converted string, always possible unless null
+	/// @returns         The converted string to boolean, always possible 
 	public default boolean getBoolean(int index) {
 		return GenericConvert.toBoolean(get(index));
 	}
@@ -360,13 +360,12 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	//--------------------------------------------------------------------------------------------------
 	
 	///
-	/// Gets an object from the map,
-	/// That could very well be, a map inside a list, inside a map, inside a .....
+	/// Gets an object from the List,
+	/// That could very well be, a list inside a list, inside a map, inside a .....
 	///
 	/// Note that at each iteration step, it attempts to do a FULL index match first, 
 	/// before the next iteration depth
 	///
-	/// @param base      Map / List to manipulate from
 	/// @param index       The input index to fetch, possibly nested
 	/// @param fallbck   The fallback default (if not convertable)
 	///
@@ -378,12 +377,12 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// Default Null fallback, for `getNestedObject(index,fallback)`
 	///
-	/// @param base      Map / List to manipulate from
 	/// @param index       The input index to fetch, possibly nested
 	///
 	/// @returns         The fetched object, always possible unless fallbck null
 	public default Object getNestedObject(String index) {
-		return getNestedObject(index, null);
+		return getNestedObject(index,null); 
 	}
+	
 	
 }

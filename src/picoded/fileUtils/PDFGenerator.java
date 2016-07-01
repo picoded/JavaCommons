@@ -54,25 +54,23 @@ public class PDFGenerator {
 	// / @param htmlFilePath HTML file path string
 	// /
 	// / @returns true if the HTML file is converted and saved in a pdf file
-	public static boolean generatePDFfromHTMLfile(String pdfFile,
-			String htmlFilePath) {
+	public static boolean generatePDFfromHTMLfile(String pdfFile, String htmlFilePath) {
 		OutputStream outputStream = null;
 		try {
-			pdfFile = pdfFile.replaceAll("[/\\\\]+", Matcher
-					.quoteReplacement(System.getProperty("file.separator")));
-
+			pdfFile = pdfFile.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System.getProperty("file.separator")));
+			
 			createOutputFolder(pdfFile);
-
+			
 			outputStream = new FileOutputStream(pdfFile);
-
-			htmlFilePath = htmlFilePath.replaceAll("[/\\\\]+", Matcher
-					.quoteReplacement(System.getProperty("file.separator")));
-
+			
+			htmlFilePath = htmlFilePath.replaceAll("[/\\\\]+",
+				Matcher.quoteReplacement(System.getProperty("file.separator")));
+			
 			ITextRenderer renderer = new ITextRenderer();
 			renderer.setDocument(new File(htmlFilePath));
 			// renderer.writeNextDocument();
 			renderer.layout();
-
+			
 			// generate pdf
 			renderer.createPDF(outputStream);
 		} catch (IOException e) {
@@ -91,40 +89,35 @@ public class PDFGenerator {
 		}
 		return true;
 	}
-
-	private static void createOutputFolder(String outputFilePath)
-			throws IOException {
-		String outputFolderpath = outputFilePath.substring(0,
-				outputFilePath.lastIndexOf(File.separator));
+	
+	private static void createOutputFolder(String outputFilePath) throws IOException {
+		String outputFolderpath = outputFilePath.substring(0, outputFilePath.lastIndexOf(File.separator));
 		File outputFolder = new File(outputFolderpath);
-
+		
 		if (!outputFolder.exists()) {
 			outputFolder.mkdirs();
 		}
 	}
-
-	public static boolean generatePDFfromHTMLfile(String pdfFile,
-			String htmlFilePath, String contextRoot) {
+	
+	public static boolean generatePDFfromHTMLfile(String pdfFile, String htmlFilePath, String contextRoot) {
 		OutputStream outputStream = null;
 		try {
-			pdfFile = pdfFile.replaceAll("[/\\\\]+", Matcher
-					.quoteReplacement(System.getProperty("file.separator")));
-
+			pdfFile = pdfFile.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System.getProperty("file.separator")));
+			
 			createOutputFolder(pdfFile);
-
+			
 			outputStream = new FileOutputStream(pdfFile);
-
-			htmlFilePath = htmlFilePath.replaceAll("[/\\\\]+", Matcher
-					.quoteReplacement(System.getProperty("file.separator")));
-
-			DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-					.newDocumentBuilder();
+			
+			htmlFilePath = htmlFilePath.replaceAll("[/\\\\]+",
+				Matcher.quoteReplacement(System.getProperty("file.separator")));
+			
+			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			org.w3c.dom.Document doc = builder.parse(new File(htmlFilePath));
-
+			
 			ITextRenderer renderer = new ITextRenderer();
 			renderer.setDocument(doc, contextRoot);
 			renderer.layout();
-
+			
 			// generate pdf
 			renderer.createPDF(outputStream);
 		} catch (IOException e) {
@@ -143,7 +136,7 @@ public class PDFGenerator {
 		}
 		return true;
 	}
-
+	
 	// / Generates a pdf file given the RAW html string
 	// / embeded file path (image, css, js etc.) in input html String should be
 	// relative to execute location
@@ -153,20 +146,19 @@ public class PDFGenerator {
 	// /
 	// / @returns true if the HTML raw string is converted and saved in a pdf
 	// file.
-	public static boolean generatePDFfromRawHTML(String outputpdfpath,
-			String rawHtml) {
+	public static boolean generatePDFfromRawHTML(String outputpdfpath, String rawHtml) {
 		OutputStream outputStream = null;
 		try {
-			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+", Matcher
-					.quoteReplacement(System.getProperty("file.separator")));
-
+			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+",
+				Matcher.quoteReplacement(System.getProperty("file.separator")));
+			
 			createOutputFolder(outputpdfpath);
-
+			
 			outputStream = new FileOutputStream(outputpdfpath);
 			ITextRenderer renderer = new ITextRenderer();
 			renderer.setDocumentFromString(rawHtml);
 			renderer.layout();
-
+			
 			// generate pdf
 			renderer.createPDF(outputStream);
 		} catch (IOException e) {
@@ -184,7 +176,7 @@ public class PDFGenerator {
 		}
 		return true;
 	}
-
+	
 	// / Generates a pdf file given the RAW html string
 	// / embeded file path (image, css, js etc.) in input html String should be
 	// relative to execute location
@@ -196,26 +188,24 @@ public class PDFGenerator {
 	// /
 	// / @returns true if the HTML raw string is converted and saved in a pdf
 	// file.
-	public static boolean generatePDFfromRawHTML(String outputpdfpath,
-			String rawHtml, String contextRoot) {
+	public static boolean generatePDFfromRawHTML(String outputpdfpath, String rawHtml, String contextRoot) {
 		OutputStream outputStream = null;
 		try {
-			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+", Matcher
-					.quoteReplacement(System.getProperty("file.separator")));
-
+			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+",
+				Matcher.quoteReplacement(System.getProperty("file.separator")));
+			
 			createOutputFolder(outputpdfpath);
-
-			DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-					.newDocumentBuilder();
+			
+			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			StringReader sr = new StringReader(rawHtml);
 			InputSource is = new InputSource(sr);
 			org.w3c.dom.Document doc = builder.parse(is);
-
+			
 			outputStream = new FileOutputStream(outputpdfpath);
 			ITextRenderer renderer = new ITextRenderer();
 			renderer.setDocument(doc, contextRoot);
 			renderer.layout();
-
+			
 			// generate pdf
 			renderer.createPDF(outputStream);
 		} catch (IOException e) {
@@ -233,34 +223,32 @@ public class PDFGenerator {
 		}
 		return true;
 	}
-
-	public static boolean generatePDFfromRawHTML_embeddedImageSupport(
-			String outputpdfpath, String rawHtml, String contextRoot) {
+	
+	public static boolean generatePDFfromRawHTML_embeddedImageSupport(String outputpdfpath, String rawHtml,
+		String contextRoot) {
 		OutputStream outputStream = null;
 		try {
-			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+", Matcher
-					.quoteReplacement(System.getProperty("file.separator")));
-
+			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+",
+				Matcher.quoteReplacement(System.getProperty("file.separator")));
+			
 			createOutputFolder(outputpdfpath);
-
-			DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-					.newDocumentBuilder();
+			
+			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			StringReader sr = new StringReader(rawHtml);
 			InputSource is = new InputSource(sr);
 			org.w3c.dom.Document doc = builder.parse(is);
-
+			
 			outputStream = new FileOutputStream(outputpdfpath);
 			ITextRenderer renderer = new ITextRenderer();
-
+			
 			// setup the b64 replaced factory
 			System.out.println("About to setup sharedContext thingy");
 			SharedContext sharedContext = renderer.getSharedContext();
-			sharedContext
-					.setReplacedElementFactory(new B64ImgReplacedElementFactory());
+			sharedContext.setReplacedElementFactory(new B64ImgReplacedElementFactory());
 			System.out.println("Done setting up sharedContext thingy");
 			renderer.setDocument(doc, contextRoot);
 			renderer.layout();
-
+			
 			// generate pdf
 			renderer.createPDF(outputStream);
 		} catch (IOException e) {

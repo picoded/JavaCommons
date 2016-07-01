@@ -10,34 +10,30 @@ import java.util.List;
 import com.mysql.jdbc.StringUtils;
 
 public class FileUtils extends org.apache.commons.io.FileUtils {
-
+	
 	// / @TODO: Sam, documentation =.=
-	public static List<String> getFileNamesFromFolder(File inFile,
-			String separator, String rootFolderName) {
+	public static List<String> getFileNamesFromFolder(File inFile, String separator, String rootFolderName) {
 		List<String> keyList = new ArrayList<String>();
-
+		
 		if (StringUtils.isNullOrEmpty(rootFolderName)) {
 			rootFolderName = "";
 		}
-
+		
 		if (StringUtils.isNullOrEmpty(separator)) {
 			separator = "/";
 		}
-
+		
 		if (inFile.isDirectory()) {
 			File[] innerFiles = inFile.listFiles();
 			for (File innerFile : innerFiles) {
 				if (innerFile.isDirectory()) {
 					String parentFolderName = innerFile.getName();
 					if (!rootFolderName.isEmpty()) {
-						parentFolderName = rootFolderName + separator
-								+ parentFolderName;
+						parentFolderName = rootFolderName + separator + parentFolderName;
 					}
-					keyList.addAll(getFileNamesFromFolder(innerFile,
-							parentFolderName, separator));
+					keyList.addAll(getFileNamesFromFolder(innerFile, parentFolderName, separator));
 				} else {
-					keyList.addAll(getFileNamesFromFolder(innerFile,
-							rootFolderName, separator));
+					keyList.addAll(getFileNamesFromFolder(innerFile, rootFolderName, separator));
 				}
 			}
 		} else {
@@ -47,13 +43,13 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 			if (!rootFolderName.isEmpty()) {
 				prefix += rootFolderName + separator;
 			}
-
+			
 			keyList.add(prefix + fileName);
 		}
-
+		
 		return keyList;
 	}
-
+	
 	// /
 	// / List only the folders inside a folder
 	// /
@@ -61,16 +57,16 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	// /
 	public static Collection<File> listDirs(File inFile) {
 		List<File> ret = new ArrayList<File>();
-
+		
 		for (File f : inFile.listFiles()) {
 			if (f.isDirectory()) {
 				ret.add(f);
 			}
 		}
-
+		
 		return ret;
 	}
-
+	
 	// /
 	// / Extends the readFileToString to include a "fallback" default value,
 	// / which is used if the file does not exists / is not readable / is not a
@@ -82,20 +78,18 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	// /
 	// / @returns the file value if possible, else returns the fallback value
 	// /
-	public static String readFileToString_withFallback(File inFile,
-			String encoding, String fallback) {
-		if (inFile == null || !inFile.exists() || !inFile.isFile()
-				|| !inFile.canRead()) {
+	public static String readFileToString_withFallback(File inFile, String encoding, String fallback) {
+		if (inFile == null || !inFile.exists() || !inFile.isFile() || !inFile.canRead()) {
 			return fallback;
 		}
-
+		
 		try {
 			return readFileToString(inFile, encoding);
 		} catch (IOException e) {
 			return fallback;
 		}
 	}
-
+	
 	// /
 	// / Write to file only if it differs
 	// /
@@ -105,15 +99,14 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	// /
 	// / @returns the boolean indicating true if file was written to
 	// /
-	public static boolean writeStringToFile_ifDifferant(File inFile,
-			String encoding, String data) throws IOException {
+	public static boolean writeStringToFile_ifDifferant(File inFile, String encoding, String data) throws IOException {
 		String original = readFileToString_withFallback(inFile, encoding, "");
 		if (original.equals(data)) {
 			return false;
 		}
-
+		
 		writeStringToFile(inFile, data, encoding);
 		return true;
 	}
-
+	
 }

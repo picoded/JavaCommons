@@ -2,7 +2,7 @@ package picoded.page.mte;
 
 import java.util.*;
 
-import picoded.page.mte.internal.*;
+//import picoded.page.mte.internal.*;
 import picoded.struct.*;
 import picoded.conv.*;
 
@@ -37,7 +37,8 @@ public class MinimalTemplateEngine {
 	//----------------------------------------------------------------
 	
 	/// Blank constructor
-	public MinimalTemplateEngine() { }
+	public MinimalTemplateEngine() {
+	}
 	
 	//----------------------------------------------------------------
 	//
@@ -51,7 +52,7 @@ public class MinimalTemplateEngine {
 	/// @param  The Minimal Template Engine markup string
 	/// @param  The variable map to pull subsitute values from
 	/// 
-	public String parseTemplate(String inTemplate, Map<String,Object> varMap) {
+	public String parseTemplate(String inTemplate, Map<String, Object> varMap) {
 		TemplateSession ts = new TemplateSession(this, inTemplate, varMap);
 		return ts.parseRaw(new StringBuilder(), 0, inTemplate.length()).toString();
 	}
@@ -70,22 +71,23 @@ public class MinimalTemplateEngine {
 	///
 	/// By default this would be the JMTE, and Mustache expression blocks.
 	///
-	/// As followed (in JSON): [[ "${","}" ],[ "{{","}}" ]]
+	/// As followed (in JSON): [[ "${","}" ],[ "{{#","}}" ],[ "{{","}}" ],[ "{{{","}}}" ]]
 	///
 	/// (PS: You probably DO NOT need to modify this)
 	///
-	protected String[][] expressionSet = new String[][] { new String[] { "${", "}" }, new String[] { "{{", "}}"} };
+	public String[][] expressionSet = new String[][] { new String[] { "${", "}" }, new String[] { "{{#", "}}" },
+		new String[] { "{{", "}}" }, new String[] { "{{{", "}}}" } };
 	
 	///
-	/// Template expresion prefix / suffix set for unescaped html
+	/// Template expresion prefix / suffix set for unescaped html strictly, this MUST be a subset of expressionSet
 	///
-	/// This is a Mustache exclusive, and is checked first.
+	/// This is a Mustache exclusive, and is checked first (before expressionSet).
 	///
 	/// As followed (in JSON): [[ "{{{","}}}" ]]
 	///
 	/// (PS: You probably DO NOT need to modify this)
 	///
-	protected String[][] unescapedExpressionSet = new String[][] { new String[] { "{{{","}}}" } };
+	public String[][] unescapedExpressionSet = new String[][] { new String[] { "{{{", "}}}" } };
 	
 	///
 	/// Escaped characters set
@@ -96,7 +98,25 @@ public class MinimalTemplateEngine {
 	///
 	/// (PS: You probably DO NOT need to modify this)
 	///
-	protected String[] escapedSet = new String[] { "\\" };
+	public String[] escapeStrings = new String[] { "\\" };
+	
+	///
+	/// Closing block statment
+	///
+	/// As followed (in JSON): [ "end" ]
+	///
+	/// (PS: You probably DO NOT need to modify this)
+	///
+	public String[] closingBlockStatements = new String[] { "end" };
+	
+	///
+	/// Closing block statment indicator
+	///
+	/// As followed (in JSON): [ "/" ]
+	///
+	/// (PS: You probably DO NOT need to modify this)
+	///
+	public String[] closingBlockStrings = new String[] { "/" };
 	
 	//----------------------------------------------------------------
 	//
@@ -104,7 +124,6 @@ public class MinimalTemplateEngine {
 	// may get extracted out to external class in future
 	//
 	//----------------------------------------------------------------
-	
 	
 	//----------------------------------------------------------------
 	//

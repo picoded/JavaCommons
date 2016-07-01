@@ -8,4 +8,9 @@ fi
 
 cd "$workingDir" || exit 1
 
-ant src-beautify
+# Permission nuke
+chmod -R 0777 .;
+chmod -R +x .;
+
+# Source beautify
+ant src-beautify;

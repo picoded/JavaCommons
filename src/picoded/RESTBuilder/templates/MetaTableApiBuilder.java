@@ -516,7 +516,8 @@ public class MetaTableApiBuilder {
 	public RESTFunction meta_GET = (req, res) -> {
 		String oid = req.getString("_oid");
 		if (oid == null) {
-			oid = (req.rawRequestNamespace() != null) ? req.rawRequestNamespace()[0] : null;
+			oid = (req.rawRequestNamespace() != null) ? req.rawRequestNamespace()[req.rawRequestNamespace().length - 1]
+				: null;
 		}
 		
 		//put data back into response
@@ -573,7 +574,7 @@ public class MetaTableApiBuilder {
 	///
 	/// # meta/${ObjectID} (POST) [Requires login]
 	///
-	/// Updates the accountID meta info, requires either the current user or SuperUser
+	/// Updates the oid meta info, requires either the current user or SuperUser
 	///
 	/// Note: if ${ObjectID} is "new", it creates a new object
 	///
@@ -601,7 +602,8 @@ public class MetaTableApiBuilder {
 	public RESTFunction meta_POST = (req, res) -> {
 		String oid = req.getString("_oid");
 		if (oid == null) {
-			oid = (req.rawRequestNamespace() != null) ? req.rawRequestNamespace()[0] : null;
+			oid = (req.rawRequestNamespace() != null) ? req.rawRequestNamespace()[req.rawRequestNamespace().length - 1]
+				: null;
 		}
 		
 		//put data back into response
@@ -704,29 +706,28 @@ public class MetaTableApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	public RESTFunction meta_DELETE = (req, res) -> {
-		String accountID = req.getString("_oid");
+		String oid = req.getString("_oid");
+		if (oid == null) {
+			oid = (req.rawRequestNamespace() != null) ? req.rawRequestNamespace()[req.rawRequestNamespace().length - 1]
+				: null;
+		}
 		
-		if (accountID == null || accountID.isEmpty()) {
+		if (oid == null || oid.isEmpty()) {
 			return res;
 		}
 		
-		res.put("_oid", accountID);
+		res.put("_oid", oid);
 		
-		boolean deleted = meta_DELETE_inner(accountID);
-		
-		res.put("deleted", deleted);
+		boolean foundKeyToDelete = meta_DELETE_inner(oid);
+		res.put("foundKeyToDelete", foundKeyToDelete);
 		
 		return res;
 	};
 	
 	public boolean meta_DELETE_inner(String oid) {
 		if (_metaTableObj.containsKey(oid)) {
-			MetaObject removed = _metaTableObj.remove(oid);
-			if (removed != null) {
-				return true;
-			} else {
-				return false;
-			}
+			_metaTableObj.remove(oid);
+			return true;
 		} else {
 			return false;
 		}

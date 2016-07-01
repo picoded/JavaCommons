@@ -42,13 +42,15 @@ public class FormInputTemplates {
 		//thousands separator first
 		if (node.getString("type", "").equalsIgnoreCase("number")) {
 			boolean thousandsSeparate = node.getBoolean("thousandsSeparator", true);
+			boolean addDecimal = node.getBoolean("addDecimal", true);
 			if (thousandsSeparate) {
-				fieldValue = thousandsSeparator(fieldValue);
+				fieldValue = thousandsSeparator(fieldValue, addDecimal);
 			}
 		} else if (node.getString("type", "").equalsIgnoreCase("text")) {
 			boolean thousandsSeparate = node.getBoolean("thousandsSeparator", false);
+			boolean addDecimal = node.getBoolean("addDecimal", true);
 			if (thousandsSeparate) {
-				fieldValue = thousandsSeparator(fieldValue);
+				fieldValue = thousandsSeparator(fieldValue, addDecimal);
 			}
 		}
 		
@@ -82,7 +84,7 @@ public class FormInputTemplates {
 		return "";
 	}
 	
-	private static String thousandsSeparator(String value) {
+	private static String thousandsSeparator(String value, boolean addDecimal) {
 		String ret = "";
 		if (value != null && !value.isEmpty()) {
 			if (value.equalsIgnoreCase("0") || value.equalsIgnoreCase("0.00")) {
@@ -97,6 +99,11 @@ public class FormInputTemplates {
 				}
 				
 				DecimalFormat df = new DecimalFormat("#,###.00");
+				
+				if (!addDecimal) {
+					df = showRemoveDecimal();
+				}
+				
 				BigDecimal bigD = new BigDecimal(tempValue);
 				bigD = bigD.setScale(2, RoundingMode.HALF_UP);
 				
@@ -112,6 +119,20 @@ public class FormInputTemplates {
 			}
 		}
 		return ret;
+	}
+	
+	//show decimal places if there are
+	//do not show the decimal places if there are not decimal places
+	//returns a new DecimalFormat object
+	private static DecimalFormat showRemoveDecimal() {
+		
+		//if the value has a decimal(.##), then the format will new Decimal Form("#,###.00");
+		
+		DecimalFormat df = new DecimalFormat("#,###.00");
+		df.setMinimumFractionDigits(0);
+		df.setMaximumFractionDigits(2);
+		
+		return df;
 	}
 	
 	protected static FormInputInterface div = (node) -> {

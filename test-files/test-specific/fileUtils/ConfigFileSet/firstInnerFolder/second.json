@@ -8,7 +8,7 @@
 		"int":"foo",
 		"bool":"bar"
 	},
-	"function 1":{
+	"function1":{
 		"return":"result"
 	}
 }

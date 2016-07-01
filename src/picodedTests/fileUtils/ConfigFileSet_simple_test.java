@@ -2,6 +2,7 @@ package picodedTests.fileUtils;
 
 import static org.junit.Assert.*;
 import java.io.File;
+import java.util.*;
 
 import org.junit.After;
 // Test Case include
@@ -91,15 +92,11 @@ public class ConfigFileSet_simple_test {
 		assertNull(configObj.get("ThisShouldNotExists")); // should be a map
 	}
 
-	@Test
-	public void notSimple() {
-		assertNotNull(configObj.get("not-simple"));
-		assertNotNull(configObj.get("not-simple.test"));
-		assertNotNull(configObj.getExact("not-simple","test"));
-		assertEquals("testing", configObj.getExact("not-simple","test.subtest"));
-		assertEquals("testing", configObj.get("not-simple.test.subtest"));
-	}
-
+	///
+	/// I blame yiwei for not making this readable
+	///
+	/// #_# : ROARS!
+	///
 	@Test
 	public void multiMapFetch() {
 		assertNotNull(configObj.getGenericConvertStringMap("firstInnerFolder")); // should be a map
@@ -115,22 +112,25 @@ public class ConfigFileSet_simple_test {
 		assertNotNull(configObj.getGenericConvertStringMap("firstInnerFolder").getGenericConvertStringMap("second"));
 		assertEquals("2+1",configObj.getGenericConvertStringMap("firstInnerFolder").getGenericConvertStringMap("second").get("3"));
 
-		assertNotNull(configObj.get("firstInnerFolder.secondLayerInnerFolder.2"));
-		assertEquals("world",configObj.get("firstInnerFolder.secondLayerInnerFolder.2.hello"));
-
-		assertNotNull(configObj.get("firstInnerFolder.secondLayerInnerFolder.2.test"));
-		assertEquals("testing",configObj.get("firstInnerFolder.secondLayerInnerFolder.2.test.subtest"));
-
+		assertNotNull("Quarter",configObj.get("firstInnerFolder.secondLayerInnerFolder.2"));
 		assertEquals("Quarter",configObj.get("firstInnerFolder.secondLayerInnerFolder.2.test.test.test.testing"));
 		assertEquals("Quarter",configObj.getGenericConvertStringMap("firstInnerFolder.secondLayerInnerFolder").get("2.test.test.test.testing"));
 
 		assertEquals("final",configObj.getGenericConvertStringMap("firstInnerFolder.secondLayerInnerFolder").get("2.test.test.test.test.test.test"));
 		assertEquals("foo",configObj.getGenericConvertStringMap("firstInnerFolder.second").get("main.int"));
+		assertEquals("testing",configObj.getGenericConvertStringMap("firstInnerFolder").get("secondLayerInnerFolder.2.test.subtest"));
 		assertNotNull(configObj.get("firstInnerFolder.second.include"));
-		assertNull(configObj.get("firstInnerFolder.secondLayerInnerFolder.2.test.test.test.test.test.nulltesT"));
+		assertNull(configObj.getGenericConvertStringMap("firstInnerFolder.secondLayerInnerFolder.2.test.test.test.test.test.nulltesT"));
 		assertNotNull(configObj.get("firstInnerFolder.second"));
-		assertEquals("result",configObj.get("firstInnerFolder.second.function 1.return"));
+		assertEquals("result",configObj.get("firstInnerFolder.second.function1.return"));
 		assertEquals("InnerFolder",configObj.getGenericConvertStringMap("firstInnerFolder").getGenericConvertStringMap("second").get("Layer"));
 		assertEquals("2+1",configObj.get("firstInnerFolder.second.3"));
+	}
+
+	@Test
+	public void getKeySetTest(){
+		Set<String> set=configObj.getGenericConvertStringMap("keySetTest").keySet();
+		assertTrue(set.contains("one"));
+		assertTrue(set.contains("two"));
 	}
 }

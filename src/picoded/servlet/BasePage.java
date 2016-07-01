@@ -262,6 +262,10 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	public void JMTE_initialSetup(JMTE setupObj) {
 		setupObj.baseDataModel.put("ContextPath", getContextPath());
 		setupObj.baseDataModel.put("ContextURI", getContextURI());
+		
+		// Pass the configuration settings in JConfig to JMTE, but filter system
+		setupObj.baseDataModel.put("config", JConfig().createSubMap(null,"sys"));
+		
 		setupObj.registerNamedRenderer(new currentAccountMetaInfo_nr());
 	}
 	

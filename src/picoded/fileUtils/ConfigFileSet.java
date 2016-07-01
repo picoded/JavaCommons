@@ -248,6 +248,30 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 	
 	//-----------------------------------------------------------------------------------
 	//
+	// KeySet handling
+	//
+	//-----------------------------------------------------------------------------------
+	
+	///
+	/// Top layer keySet fetching
+	///
+	public Set<String> keySet() {
+		HashSet<String> ret = new HashSet<String>();
+		
+		//
+		// Iterate across all the ConfigFile items : and populate the result
+		//
+		for(String key : configFileMap.keySet()) {
+			String keyString = key.toString();
+			String[] splitKeyString = keyString.split("\\.");
+			ret.add(splitKeyString[0]);
+		}
+		
+		return ret;
+	}
+	
+	//-----------------------------------------------------------------------------------
+	//
 	// Get request handling
 	//
 	//-----------------------------------------------------------------------------------

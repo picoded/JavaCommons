@@ -3,8 +3,7 @@ package picoded.fileUtils;
 ///
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -42,7 +41,7 @@ import picoded.struct.GenericConvertMap;
 ///
 public class ConfigFile implements GenericConvertMap<String, Object> {
 	
-	// / The actual inner map storage
+	/// The actual inner map storage
 	Ini iniMap = null;
 	GenericConvertMap<String, Object> jsonMap = null;
 	
@@ -50,17 +49,17 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 	
 	String fileName = "";
 	
-	// / Blank constructor
+	/// Blank constructor
 	protected ConfigFile() {
 		
 	}
 	
-	// / Constructor, which takes in an INI file object and stores it
+	/// Constructor, which takes in an INI file object and stores it
 	public ConfigFile(File fileObj) {
 		innerConstructor(fileObj);
 	}
 	
-	// / Constructor, which takes in an INI file path and stores it
+	/// Constructor, which takes in an INI file path and stores it
 	public ConfigFile(String filePath) {
 		innerConstructor(new File(filePath));
 	}
@@ -84,10 +83,10 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 		return fileName;
 	}
 	
-	// / Gets the config value string, from the file
+	/// Gets the config value string, from the file
 	public Object get(Object key) {
 		String keyString = key.toString();
-		if (jsonMode) {
+		if (jsonMode) { 
 			return jsonMap.getNestedObject(keyString);
 		} else {
 			// read from ini
@@ -103,4 +102,14 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 		}
 	}
 	
+	///
+	/// Top layer keySet fetching
+	///
+	public Set<String> keySet() {
+		if (jsonMode) {
+			return jsonMap.keySet();
+		} else {
+			return iniMap.keySet();
+		}
+	}
 }

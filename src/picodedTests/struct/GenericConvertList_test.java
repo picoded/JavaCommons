@@ -314,7 +314,7 @@ public class GenericConvertArrayList_test {
 		list.add("aa");
 		list.add("bb");
 		convertArrayList.add(list);
-		assertEquals(list, convertArrayList.getObjectList(0));
+		assertEquals(list, convertArrayList.getObjectList(1));
 	}
 	
 	@Test
@@ -361,5 +361,23 @@ public class GenericConvertArrayList_test {
 		list.add("bb");
 		convertArrayList.add(list);
 		assertEquals(list.toArray(), convertArrayList.getStringArray(0, list));
+	}
+	
+	@Test 
+	public void getNestedObjectTest() {
+		convertArrayList = new GenericConvertArrayList<String>();
+		convertArrayList.add("a");
+		convertArrayList.add("b");
+		assertEquals("b", convertArrayList.getNestedObject("1"));
+	}
+	
+	@Test
+	public void getNestedObject2ParamTest() {
+		convertArrayList = new GenericConvertArrayList<String>();
+		List<String> list = new ArrayList<>();
+		list.add("aa");
+		list.add("bb");
+		convertArrayList.add(list);
+		assertEquals(list, convertArrayList.getNestedObject("1", list));
 	}
 }

@@ -17,7 +17,7 @@ import org.junit.Test;
 import picoded.conv.GUID;
 import picoded.struct.GenericConvertArrayList;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"deprecation", "rawtypes", "unchecked" })
 public class GenericConvertArrayList_test {
 
 	private GenericConvertArrayList convertArrayList = null;
@@ -334,6 +334,7 @@ public class GenericConvertArrayList_test {
 		convertArrayList.add(list);
 		assertEquals(list, convertArrayList.getStringArray("a,b,c,d"));
 	}
+	
 	
 	@Test
 	public void getStringArray2ParamTest() {

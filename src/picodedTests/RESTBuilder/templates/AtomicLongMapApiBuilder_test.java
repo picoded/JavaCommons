@@ -25,7 +25,7 @@ import picoded.servlet.BasePage;
 import picoded.servletUtils.EmbeddedServlet;
 import picoded.webUtils.RequestHttp;
 import picoded.webUtils.ResponseHttp;
-
+@SuppressWarnings({"unchecked","try"})
 public class AtomicLongMapApiBuilder_test {
 	
 	// Servlet setup
@@ -239,7 +239,6 @@ public class AtomicLongMapApiBuilder_test {
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNull(responseMap.get("error"));
-		@SuppressWarnings("unchecked")
 		Map<String, Long> valueMap = (Map<String, Long>)responseMap.get("values");
 		assertNotNull(valueMap);
 		assertEquals(2, valueMap.size());
@@ -273,7 +272,6 @@ public class AtomicLongMapApiBuilder_test {
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNull("An empty key was supplied", responseMap.get("error"));
-		@SuppressWarnings("unchecked")
 		Map<String, Long> valueMap = (Map<String, Long>)responseMap.get("values");
 		assertEquals(0, valueMap.get("my_key").longValue());	
 	}
@@ -316,7 +314,6 @@ public class AtomicLongMapApiBuilder_test {
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNull("An empty key was supplied", responseMap.get("error"));
-		@SuppressWarnings("unchecked")
 		Map<String, Long> valueMap = (Map<String, Long>)responseMap.get("values");
 		assertEquals(0, valueMap.get("oop").longValue());	
 		assertEquals(0, valueMap.get("foo").longValue());	

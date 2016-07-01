@@ -1,34 +1,34 @@
 <project name="picoded.JavaCommons" default="source" xmlns:jacoco="antlib:org.jacoco.ant">
 	<property name="ant.build.javac.source" value="1.8"/>
 	<property name="ant.build.javac.target" value="1.8"/>
-	
+
 	<property name='lib.dir' value='${basedir}/bin/lib' />
-	
+
 	<!-- Sets the property variables to point to respective directories -->
 	<property name="junit-reports" value="${basedir}/test-files/junit-reports"/>
 	<property name="junit-html" value="${basedir}/test-files/junit-html" />
-	
+
 	<property name="build-classes" value="${basedir}/bin/classes" />
 	<property name="build-docs" value="${basedir}/bin/docs" />
 	<property name="build-temp" value="${basedir}/bin/tmp/build-tmp" />
-	
+
 	<property name="test-temp" value="${basedir}/test-files/tmp" />
-	
+
 	<property name="src-path" value="src/picoded" />
 	<property name="src-test" value="src/picodedTests" />
 	<property name="src-experimental" value="src/picodedX" />
-	
+
 	<property name="lib-organized-dir" value="lib-organized" />
-	
+
 	<property name="build-libOnly" value="${basedir}/bin/build/picodedJavaCommons-libsOnly.jar" />
-	
+
 	<!-- ant contrib add ons -->
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<pathelement location="${basedir}/build-tools/ant-contrib/ant-contrib-1.0b3.jar"/>
 		</classpath>
 	</taskdef>
-	
+
 	<!-- jUnit declearation over-ride, see: 'http://stackoverflow.com/questions/9774264/junit-ant-task-junittask-was-not-found' -->
 	<path id="junit-path">
 		<fileset dir="build-tools/junit" includes="**/*.jar" />
@@ -36,18 +36,18 @@
 	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
 		<classpath refid="junit-path"/>
 	</taskdef>
-	
+
 	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
 		<classpath refid="junit-path"/>
     </taskdef>
-    
+
 	<!-- One-JAR -->
-	<taskdef name="one-jar" classname="com.simontuffs.onejar.ant.OneJarTask" 
+	<taskdef name="one-jar" classname="com.simontuffs.onejar.ant.OneJarTask"
         classpath="./build-tools/one-jar/one-jar-ant-task-0.97.jar" onerror="report"/>
-	
+
 	<!-- **************************************************
 	The following lists the target sets supported by ant
-	
+
 	+ setup                 - Setup any precommit hooks used by the project
 	+ clean                 - Clean out all build / temporary files
 	+ src-beautify          - Applies a standardised code mint to java files
@@ -58,19 +58,19 @@
 	+ build                 - Build all 3 jar varients
 	+ javadoc               - Generate the javadoc and its jar
 	+ junit-all             - Runs the full JUnit suite, with jacoco
-	
+
 	************************************************** -->
-	
+
 	<!-- **************************************************
 	* Setup / Cleanup Functions
 	************************************************** -->
-	
+
 	<!-- setup pre-commit git hook, if needed -->
 	<target name="setup">
 		<mkdir dir=".git/hooks"/>
 		<symlink link=".git/hooks/pre-commit" resource="./pre-commit.sh" failonerror="false"/>
 	</target>
-	
+
 	<!-- clean and remove all build files / test temp files -->
 	<target name="clean">
 		<delete includeemptydirs="true" failonerror="false">
@@ -78,16 +78,16 @@
 			<fileset dir="${basedir}/html-docs" includes="**/*"/>
 			<fileset dir="${basedir}/test-files/tmp" includes="**/*"/>
 		</delete>
-		
+
 		<mkdir dir="${basedir}/bin"/>
 		<mkdir dir="${basedir}/bin/build"/>
 		<mkdir dir="${basedir}/bin/docs"/>
 		<mkdir dir="${basedir}/bin/classes"/>
 		<mkdir dir="${basedir}/bin/tmp"/>
-		
+
 		<mkdir dir="${basedir}/test-files/tmp"/>
 	</target>
-	
+
 	<!-- Code Beautifier, used for pre-commit hook -->
 	<target name="src-beautify">
 		<!-- Scan and beautify the code : spaces only -->
@@ -99,43 +99,43 @@
 			<arg value="./src"/>
 		</exec>
 	</target>
-	
+
 	<!-- **************************************************
 	* Dependency Library management
 	************************************************** -->
-	
+
 	<!-- Extract and organize all the depency lib-organized files -->
 	<target name="build-lib-tempWorkspace">
-		
+
 		<!-- resets the temporary lib building folder -->
 		<delete dir="${build-temp}" failonerror="false" />
-		<mkdir dir="${build-temp}"/> 
-		<mkdir dir="${build-temp}/UBER"/> 
-		
+		<mkdir dir="${build-temp}"/>
+		<mkdir dir="${build-temp}/UBER"/>
+
 		<!-- iterate over the dependencies -->
 		<for param="file">
 			<path>
 				<!-- scan against every file found on lib-organized -->
-				<fileset dir="${lib-organized-dir}"> 
-					<include name="**/*.jar"/> 
-				</fileset> 
+				<fileset dir="${lib-organized-dir}">
+					<include name="**/*.jar"/>
+				</fileset>
 			</path>
-			<sequential> 
+			<sequential>
 				<!-- Get the library jar name to organize files under -->
-				<propertyregex override="yes" 
-				property="jarname"  input="@{file}" 
-				regexp=".*/([^/]*)\.jar" replace="\1"/> 
-				
+				<propertyregex override="yes"
+				property="jarname"  input="@{file}"
+				regexp=".*/([^/]*)\.jar" replace="\1"/>
+
 				<!-- put the spring.* special stuff into sub-directories -->
-				<mkdir dir="${build-temp}/SPRING/${jarname}"/> 
+				<mkdir dir="${build-temp}/SPRING/${jarname}"/>
 				<unzip dest="${build-temp}/SPRING/${jarname}" src="@{file}">
 					<patternset>
 						<include name="**/META-INF/spring.*"/>
 					</patternset>
 				</unzip>
-				
+
 				<!-- Handle license files seperately -->
-				<mkdir dir="${build-temp}/LICENSE/${jarname}"/> 
+				<mkdir dir="${build-temp}/LICENSE/${jarname}"/>
 				<unzip dest="${build-temp}/LICENSE/${jarname}" src="@{file}">
 					<patternset>
 						<include name="**/LICENSE.*"/>
@@ -148,9 +148,9 @@
 						<include name="**/INDEX.LIST"/>
 					</patternset>
 				</unzip>
-				
+
 				<!-- Handle excluded items seperately -->
-				<mkdir dir="${build-temp}/EXCLUDES/${jarname}"/> 
+				<mkdir dir="${build-temp}/EXCLUDES/${jarname}"/>
 				<unzip dest="${build-temp}/EXCLUDES/${jarname}" src="@{file}">
 					<patternset>
 						<include name="**/META-INF/MANIFEST.MF"/>
@@ -160,9 +160,9 @@
 						<include name="**/META-INF/SIG-*"/>
 					</patternset>
 				</unzip>
-				
+
 				<!-- put everything else into their CONFLICT directory -->
-				<mkdir dir="${build-temp}/CONFLICT/${jarname}"/> 
+				<mkdir dir="${build-temp}/CONFLICT/${jarname}"/>
 				<unzip dest="${build-temp}/CONFLICT/${jarname}" src="@{file}">
 					<patternset>
 						<exclude name="**/META-INF/spring.*"/>
@@ -171,7 +171,7 @@
 						<exclude name="**/META-INF/*.DSA"/>
 						<exclude name="**/META-INF/*.RSA"/>
 						<exclude name="**/META-INF/SIG-*"/>
-						
+
 						<exclude name="**/LICENSE.*"/>
 						<exclude name="**/license.*"/>
 						<exclude name="**/NOTICE.*"/>
@@ -182,7 +182,7 @@
 						<exclude name="**/INDEX.LIST"/>
 					</patternset>
 				</unzip>
-				
+
 				<!-- move over only files that are not in conflict into UBER -->
 				<move todir="${build-temp}/UBER/" overwrite="false">
 					<fileset dir="${build-temp}/CONFLICT/${jarname}/">
@@ -190,9 +190,9 @@
 				</move>
 			</sequential>
 		</for>
-		
+
 		<!-- build the concatenated spring.* files -->
-		<mkdir dir="${build-temp}/UBER/META-INF"/> 
+		<mkdir dir="${build-temp}/UBER/META-INF"/>
 		<concat destfile="${build-temp}/UBER/META-INF/spring.handlers" fixlastline="true">
 			<fileset dir="${build-temp}/SPRING/" includes="*/*/spring.handlers"/>
 		</concat>
@@ -205,7 +205,7 @@
 		<concat destfile="${build-temp}/UBER/META-INF/spring.factories" fixlastline="true">
 			<fileset dir="${build-temp}/SPRING/" includes="*/*/spring.factories"/>
 		</concat>
-		
+
 		<!-- empty out unneeded empty directories -->
 		<delete includeemptydirs="true">
 			<fileset dir="${build-temp}"  >
@@ -216,31 +216,32 @@
 			</fileset>
 		</delete>
 	</target>
-	
+
 	<!-- Flatten the libs : Used the lib folder for runtime (similar to tomcat) -->
 	<target name="flattenLibs">
+		<mkdir dir="bin/libs"/> 
 		<copy todir="bin/libs" flatten="true">
 			<!-- scan against every file found on lib-organized -->
-			<fileset dir="${lib-organized-dir}"> 
-				<include name="**/*.jar"/> 
-			</fileset> 
+			<fileset dir="${lib-organized-dir}">
+				<include name="**/*.jar"/>
+			</fileset>
 		</copy>
 	</target>
-	
+
 	<!-- Build the one GIANT jar : This is depreciated, as it always seem to cause problems somehow -->
 	<target name="build-uberJar" depends="build-lib-tempWorkspace">
 		<!-- build the uber jar! -->
 		<delete file="${build-libOnly}" failonerror="false"/>
 		<jar destfile="${build-libOnly}">
 			<!-- all dependency files except spring.* -->
-			<fileset dir="${build-temp}/UBER"/> 
-			
+			<fileset dir="${build-temp}/UBER"/>
+
 			<!-- my project's classes & etc -->
 			<!--<zipgroupfileset dir="${dist.dir}" includes="myproject.jar" />-->
 			<!--
 			<manifest>
 				<attribute name="Main-Class" value="${main-class}"/>
-			</manifest>  
+			</manifest>
 			-->
 		</jar>
 		<path id="lib.path.ref">
@@ -248,11 +249,11 @@
 			<fileset dir="bin/libs" includes="*.jar" />
 		</path>
 	</target>
-	
+
 	<!-- rebuilds the flatten libs jar from all library organized files -->
 	<target name="build-lib" depends="flattenLibs">
 	</target>
-	
+
 	<!-- check if lib jar exists -->
 	<target name="build-lib-check">
 		<available file="${build-libOnly}" property="build-libOnly.present"/>
@@ -261,20 +262,20 @@
 			<fileset dir="bin/libs" includes="*.jar" />
 		</path>
 	</target>
-	
+
 	<!-- build the lib jar only if it does noot exists -->
 	<target name="build-lib-ifneeded" depends="build-lib-check" unless="${build-libOnly.present}">
 		<antcall target="build-lib"/>
 	</target>
-	
+
 	<!-- **************************************************
 	* Source code complation
 	************************************************** -->
-	
+
 	<!-- compile the source -->
 	<target name="compile-src" depends="build-lib-ifneeded">
 		<mkdir dir="${build-classes}"/>
-		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source" 
+		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source"
 				 includeantruntime="false">
 			<!-- bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar" -->
 			<compilerarg value="-Xlint:all"/>
@@ -283,7 +284,7 @@
 			<exclude name="**/package-info.java"/>
 		</javac>
 	</target>
-	
+
 	<!-- convinent aliases -->
 	<target name="compile" depends="compile-src">
 	</target>
@@ -291,20 +292,20 @@
 	</target>
 	<target name="test" depends="compile-tests">
 	</target>
-	
+
 	<!-- compile the source with picodedTests -->
 	<target name="compile-tests" depends="build-lib-ifneeded">
 		<delete dir="test-files/tmp" failonerror="false"/>
 		<mkdir dir="test-files/tmp"/>
-		
+
 		<path id="lib.test.ref">
 			<!--<fileset dir="bin/build" includes="*-libsOnly.jar" />-->
 			<fileset dir="bin/libs" includes="*.jar" />
 			<fileset dir="build-tools/junit" includes="*.jar" />
 		</path>
-		
+
 		<mkdir dir="${build-classes}"/>
-		<javac destdir="${build-classes}" classpathref="lib.test.ref" debug="true" debuglevel="lines,source" 
+		<javac destdir="${build-classes}" classpathref="lib.test.ref" debug="true" debuglevel="lines,source"
 				 includeantruntime="false">
  			<compilerarg value="-Xlint:all"/>
  			<compilerarg value="-Xlint:-serial"/>
@@ -313,11 +314,11 @@
 			<exclude name="**/package-info.java"/>
 		</javac>
 	</target>
-	
+
 	<!-- **************************************************
 	* Complete build / docs / hybut
 	************************************************** -->
-	
+
 	<!-- Build all the respective realese jar files -->
 	<target name="build" depends="build-lib,compile-src">
 		<!-- no libs -->
@@ -325,15 +326,15 @@
 		<jar destfile="bin/build/picodedJavaCommons-noLibs.jar">
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 		</jar>
-		
+
 		<!-- with dependency files -->
 		<delete dir="bin/build/picodedJavaCommons-withLibs.jar" failonerror="false"/>
 		<jar destfile="bin/build/picodedJavaCommons-withLibs.jar">
-			<fileset dir="${build-temp}/UBER"/> 
+			<fileset dir="${build-temp}/UBER"/>
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 		</jar>
 	</target>
-	
+
 	<!-- Build all the respective realese jar files, without cleaning out existing files -->
 	<target name="build-src" depends="compile-src">
 		<!-- no libs -->
@@ -342,19 +343,19 @@
 			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
 		</jar>
 	</target>
-	
+
 	<!-- Build all the respective javadocs files -->
 	<target name="javadoc" depends="build-lib-ifneeded">
 		<delete dir="bin/javadoc" failonerror="false"/>
 		<mkdir dir="bin/javadoc"/>
-		
+
 		<javadoc destdir="bin/javadoc" classpathref="lib.path.ref" access="private" author="true" sourcepath="src" packagenames="picoded.*" use="true" version="true">
 			<!--<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>-->
 		</javadoc>
-		
+
 		<jar destfile="bin/build/picodedJavaCommons-javadocs.jar" basedir="bin/javadoc"/>
 	</target>
-	
+
 	<!-- jUnit test report runner, used for continuous unit testing -->
 	<target name="junit-all" depends="compile-tests">
 		<mkdir dir="${junit-reports}"/>
@@ -367,10 +368,10 @@
 					<fileset dir="bin/libs" includes="**/*.jar" />
 					<!--<fileset dir="${build-lib}" includes="**/*.jar" />-->
 				</classpath>
-			
+
 				<formatter type="plain"/>
 				<formatter type="xml"/>
-				
+
 				<!--
 				<test name="picodedTests.all_test"
 					haltonfailure="no" todir="${junit-reports}" outfile="junit-all">
@@ -378,22 +379,22 @@
 					<formatter type="xml"/>
 				</test>
 				 -->
-				
+
 				<batchtest haltonfailure="no" todir="${junit-reports}">
-					
+
 					<fileset dir="src">
 						<include name="picodedTests/**/*_test.java"/>
 					</fileset>
-					
+
 					<formatter type="plain"/>
 					<formatter type="xml"/>
-					
+
 				</batchtest>
-				
+
 			</junit>
 		</jacoco:coverage>
 	</target>
-	
+
 	<!--Sams own targets -->
 	<target name="b">
 		<antcall target="build-src"></antcall>

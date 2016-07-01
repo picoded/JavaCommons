@@ -99,12 +99,7 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 			String[] splitKeyString = keyString.split("\\.");
 			
 			String section = StringUtils.join(ArrayUtils.subarray(splitKeyString, 0, splitKeyString.length - 1), "."); // name
-			// in
-			// []
-			// brackets
-			// is
-			// a
-			// section
+			// [keys] in brackets are considered a section
 			String sectionKey = splitKeyString[splitKeyString.length - 1];
 			
 			Ini.Section iniSection = iniMap.get(section);

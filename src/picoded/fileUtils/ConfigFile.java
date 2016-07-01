@@ -11,6 +11,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ini4j.Ini;
 
+import picoded.conv.GenericConvert;
 import picoded.conv.ConvertJSON;
 import picoded.struct.GenericConvertMap;
 
@@ -43,7 +44,7 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 	
 	// / The actual inner map storage
 	Ini iniMap = null;
-	Map<String, Object> jsonMap = null;
+	GenericConvertMap<String, Object> jsonMap = null;
 	
 	boolean jsonMode = false;
 	
@@ -69,14 +70,8 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 			fileName = inFile.getName();
 			if (fileName.endsWith(".js") || fileName.endsWith(".json")) {
 				jsonMode = true;
-				jsonMap = new HashMap<String, Object>();
-				
 				String jsString = FileUtils.readFileToString(inFile);
-				jsonMap = ConvertJSON.toMap(jsString);
-				
-				for (String key : jsonMap.keySet()) {
-					jsonMap.put(key, jsonMap.get(key));
-				}
+				jsonMap = GenericConvert.toGenericConvertStringMap(jsString, new HashMap<String, Object>());
 			} else {
 				iniMap = new Ini(inFile);
 			}
@@ -91,11 +86,11 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 	
 	// / Gets the config value string, from the file
 	public Object get(Object key) {
+		String keyString = key.toString();
 		if (jsonMode) {
-			return getJson(key, jsonMap);
+			return jsonMap.getNestedObject(keyString);
 		} else {
 			// read from ini
-			String keyString = key.toString();
 			String[] splitKeyString = keyString.split("\\.");
 			
 			String section = StringUtils.join(ArrayUtils.subarray(splitKeyString, 0, splitKeyString.length - 1), "."); // name
@@ -108,23 +103,4 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	private Object getJson(Object key, Object currentResult) {
-		String keyString = key.toString();
-		
-		Map<String, Object> currentResultMap = null;
-		if (currentResult instanceof Map) {
-			currentResultMap = (Map<String, Object>) currentResult;
-		}
-		
-		if (keyString.contains(".")) {
-			String jsonKey = keyString.substring(0, keyString.indexOf("."));
-			String jsonKeyRemainder = keyString.substring(keyString.indexOf(".") + 1, keyString.length());
-			
-			Object jsonObj = currentResultMap.get(jsonKey);
-			return getJson(jsonKeyRemainder, jsonObj);
-		} else {
-			return currentResultMap.get(keyString);
-		}
-	}
 }

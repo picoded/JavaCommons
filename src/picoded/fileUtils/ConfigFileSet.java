@@ -2,8 +2,7 @@ package picoded.fileUtils;
 
 ///
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,12 +39,18 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 	//
 	//-----------------------------------------------------------------------------------
 	
+	/// Blank constructor
 	public ConfigFileSet() {
 		
 	}
 	
 	/// Constructor with the default file path to scan
 	public ConfigFileSet(String filePath) {
+		addConfigSet(filePath);
+	}
+	
+	/// Constructor with the default file path to scan
+	public ConfigFileSet(File filePath) {
 		addConfigSet(filePath);
 	}
 	
@@ -128,10 +133,42 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 	/// Getting sub map under a prefix, filtering out restricted namespace
 	///
 	/// @param  The prefix to filter for. Example ("sys.")
+	///
+	/// @returns  The created sub map
+	public ConfigFileSet createSubMap(String prefix) {
+		return createSubMapInternal(prefix, null);
+	}
+	
+	///
+	/// Getting sub map under a prefix, filtering out restricted namespace
+	///
+	/// @param  The prefix to filter for. Example ("sys.")
 	/// @param  The namespace to ignore
 	///
 	/// @returns  The created sub map
-	public ConfigFileSet createSubMap(String prefix, String[] ignore) {
+	public ConfigFileSet createSubMap(String prefix, String ignore) {
+		return createSubMapInternal(prefix, new String[] { ignore });
+	}
+	
+	///
+	/// Getting sub map under a prefix, filtering out restricted namespace
+	///
+	/// @param  The prefix to filter for. Example ("sys.")
+	/// @param  The namespace to ignore
+	///
+	/// @returns  The created sub map
+	public ConfigFileSet createSubMap(String prefix, String... ignore) {
+		return createSubMapInternal(prefix, ignore);
+	}
+	
+	///
+	/// Getting sub map under a prefix, filtering out restricted namespace
+	///
+	/// @param  The prefix to filter for. Example ("sys.")
+	/// @param  The namespace to ignore
+	///
+	/// @returns  The created sub map
+	protected ConfigFileSet createSubMapInternal(String prefix, String[] ignore) {
 		ConfigFileSet ret = new ConfigFileSet();
 		
 		// Blank is as good as null
@@ -148,10 +185,16 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 			// Check for items to ignore
 			//
 			if(ignore != null) {
+				boolean breakOut = false;
 				for(String ignorePart : ignore) {
-					if( key.startsWith(ignorePart) ) {
+					if( ignorePart != null && key.startsWith(ignorePart) ) {
+						breakOut = true;
 						continue;
-					}
+					} 
+				}
+				
+				if( breakOut == true ) {
+					continue;
 				}
 			}
 			
@@ -199,7 +242,7 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 			return _subMapCache.get(prefix);
 		}
 		
-		_subMapCache.put(prefix, createSubMap(prefix, null));
+		_subMapCache.put(prefix, createSubMapInternal(prefix, null));
 		return _subMapCache.get(prefix);
 	}
 	
@@ -231,7 +274,7 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		// file first, which might not be intended.
 		// having nonconflicting keys will avoid this, but this is just a heads
 		// up
-		for (int splitPt = splitKeyString.length - 1; splitPt >= 0; --splitPt) {
+		for (int splitPt = splitKeyString.length; splitPt > 0; --splitPt) {
 			String fileKey = StringUtils.join(ArrayUtils.subarray(splitKeyString, 0, splitPt), ".");
 			String headerKey = StringUtils.join(ArrayUtils.subarray(splitKeyString, splitPt, splitKeyString.length), ".");
 			
@@ -252,11 +295,14 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 	public Object getExact(Object fileKey, Object headerKey) {
 		String fileKeyString = fileKey.toString();
 		String headerKeyString = headerKey.toString();
+		
 		Map<String, Object> subMap = configFileMap.get(fileKeyString);
 		if (subMap != null) {
+			if(headerKeyString.length() <= 0) {
+				return subMap;
+			}
 			return subMap.get(headerKeyString);
 		}
-		
 		return null;
 	}
 }

@@ -23,6 +23,7 @@ import picoded.servletUtils.EmbeddedServlet;
 import picoded.webUtils.RequestHttp;
 import picoded.webUtils.ResponseHttp;
 
+@SuppressWarnings({"unchecked","try"})
 public class KeyValueMapApiBuilder_test {
 	
 	// Servlet setup
@@ -234,7 +235,6 @@ public class KeyValueMapApiBuilder_test {
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNull(responseMap.get("error"));
-		@SuppressWarnings("unchecked")
 		Map<String, Long> valueMap = (Map<String, Long>)responseMap.get("values");
 		assertNotNull(valueMap);
 		assertEquals(2, valueMap.size());
@@ -268,7 +268,6 @@ public class KeyValueMapApiBuilder_test {
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNull("An empty key was supplied", responseMap.get("error"));
-		@SuppressWarnings("unchecked")
 		Map<String, String> valueMap = (Map<String, String>)responseMap.get("map");
 		assertNull(valueMap.get("my_key"));	
 	}
@@ -311,7 +310,6 @@ public class KeyValueMapApiBuilder_test {
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNull("An empty key was supplied", responseMap.get("error"));
-		@SuppressWarnings("unchecked")
 		Map<String, String> valueMap = (Map<String, String>)responseMap.get("map");
 		assertNull(valueMap.get("oop"));	
 		assertNull(valueMap.get("foo"));	

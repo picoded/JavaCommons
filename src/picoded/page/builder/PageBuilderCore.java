@@ -90,42 +90,6 @@ public class PageBuilderCore {
 		this(new File(inPagesFolder), new File(inOutputFolder));
 	}
 	
-	
-	/////////////////////////////////////////////
-	//
-	// Page components building
-	//
-	/////////////////////////////////////////////
-	
-	/// JMTE named renderer for sub pages
-	protected class pageComponent_nr implements NamedRenderer {
-		@Override
-		public RenderFormatInfo getFormatInfo() {
-			return null;
-		}
-		
-		@Override
-		public String getName() {
-			return "pageComponent";
-		}
-		
-		@Override
-		public Class<?>[] getSupportedClasses() {
-			return new Class<?>[] { Object.class };
-		}
-		
-		@Override
-		public String render(Object o, String format, Locale L) {
-			// if (format == null || format.length() <= 0) {
-			// 	return "";
-			// }
-			
-			return format;
-			//Map<String,Object> refMap = GenericConvert.toGenericConvertStringMap(o, new HashMap<String,Object>());
-			//return buildPageInnerHTML(format, refMap).toString();
-		}
-	}
-	
 	////////////////////////////////////////////////////////////
 	//
 	// Public vars access
@@ -136,8 +100,7 @@ public class PageBuilderCore {
 	///          This is autocreated if not set
 	public JMTE getJMTE() {
 		if (jmteObj == null) {
-			jmteObj = new JMTE();
-			jmteObj.registerNamedRenderer(new pageComponent_nr());
+			setJMTE(new JMTE());
 		}
 		return jmteObj;
 	}
@@ -145,7 +108,6 @@ public class PageBuilderCore {
 	/// Overides the default (if loaded) JMTE object.
 	public void setJMTE(JMTE set) {
 		jmteObj = set;
-		jmteObj.registerNamedRenderer(new pageComponent_nr());
 	}
 	
 	/// @returns Gets the protected uriRootPrefix, used internally
@@ -601,7 +563,7 @@ public class PageBuilderCore {
 			if (hasLessFile) {
 				if (indexStr.indexOf(rawPageName + "/" + pageName_safe + ".css") > 0) {
 					// Skips injection if already included
-				} else {
+				} else {\
 					injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='" + uriRootPrefix + "/"
 						+ rawPageName + "/" + pageName_safe + ".css'></link>\n");
 				}

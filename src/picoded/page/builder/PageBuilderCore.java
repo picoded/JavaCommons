@@ -111,16 +111,18 @@ public class PageBuilderCore {
 		
 		@Override
 		public Class<?>[] getSupportedClasses() {
-			return new Class<?>[] { (new Object()).getClass() };
+			return new Class<?>[] { Object.class };
 		}
 		
 		@Override
 		public String render(Object o, String format, Locale L) {
-			if (format == null || format.length() <= 0) {
-				return null;
-			}
-			Map<String,Object> refMap = GenericConvert.toGenericConvertStringMap(o, null);
-			return buildPageInnerHTML(format, refMap).toString();
+			// if (format == null || format.length() <= 0) {
+			// 	return "";
+			// }
+			
+			return format;
+			//Map<String,Object> refMap = GenericConvert.toGenericConvertStringMap(o, new HashMap<String,Object>());
+			//return buildPageInnerHTML(format, refMap).toString();
 		}
 	}
 	

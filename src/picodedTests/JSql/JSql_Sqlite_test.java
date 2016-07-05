@@ -2,6 +2,7 @@ package picodedTests.JSql;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -543,5 +544,124 @@ public class JSql_Sqlite_test {
 			e.printStackTrace();
 		}
 	}
+	
+	@Test
+	public void commitTest() throws JSqlException {
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); //cleanup (just incase)
+		
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )")
+			.dispose();
+		JSqlObj.setAutoCommit(false);
+		assertFalse(JSqlObj.getAutoCommit());
+		JSqlObj.query("INSERT INTO " + testTableName + " ( `col[1].pk`, col2 ) VALUES (?,?)", 404, "has nothing")
+			.dispose();
+		JSqlObj.commit();
+		JSqlResult r = JSqlObj.executeQuery("SELECT * FROM " + testTableName + "");
+		assertNotNull("SQL result returns as expected", r);
+		r.fetchAllRows();
+		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col[1].pk")).intValue());
+	}
+	
+	@Test
+	public void createTableIndexQuerySetTest() throws JSqlException {
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col1` INT PRIMARY KEY, col2 TEXT )")
+			.dispose(); 
+		JSqlObj.createTableIndexQuerySet(testTableName, "col2");
+	}
+	
+	@Test
+	public void createTableIndexQuerySetTestThreeParam() throws JSqlException {
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )")
+			.dispose(); 
+		JSqlObj.createTableIndexQuerySet(testTableName, "col2", "ASC");
+	}
+	
+	@Test
+	public void createTableIndexQuerySetTestFourParam() throws JSqlException {
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )")
+			.dispose(); 
+		JSqlObj.createTableIndexQuerySet(testTableName, "col2", "DESC", "IDX");
+	}
+	
+	@Test
+	public void executeTest() throws JSqlException {
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")
+			.dispose(); 
+		boolean b = JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing");
+		assertTrue(b);
+		JSqlResult r = JSqlObj.executeQuery("SELECT * FROM " + testTableName + "");
+		assertNotNull("SQL result returns as expected", r);
+		r.fetchAllRows();
+		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col1")).intValue());
+	}
+	
+	@Test
+	public void executeQueryTest() throws JSqlException {
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")
+			.dispose(); 
+		assertFalse(JSqlObj.isDisposed());
+		boolean b = JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing");
+		assertTrue(b);
+		JSqlResult r = JSqlObj.executeQuery("SELECT * FROM " + testTableName + " where col1 = ?", 404);
+		assertNotNull("SQL result returns as expected", r);
+		r.fetchAllRows();
+		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col1")).intValue());
+	}
+	
+	@Test
+	public void genericSqlParserTest() throws JSqlException {
+		String s = JSqlObj.genericSqlParser("SELECT * FROM " + testTableName + " WHERE COL1 = ?");
+		assertEquals("SELECT * FROM " + testTableName + " WHERE COL1=?", s);
+	}
+	
+	@Test
+	public void joinArgumentsTest() throws JSqlException {
+		Object[] array1 = new Object[] {1, 2, 3};
+		Object[] array2 = new Object[] {4, 5, 6};
+		Object[] array = new Object[] {1, 2, 3, 4, 5, 6};
+		Object[] rArray = JSqlObj.joinArguments(array1, array2);
+		assertEquals(array, rArray);
+	}
+	
+	@Test
+	public void queryTest() throws JSqlException {
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")
+			.dispose(); 
+		assertFalse(JSqlObj.isDisposed());
+		boolean b = JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing");
+		assertTrue(b);
+		JSqlResult r = JSqlObj.query("SELECT * FROM " + testTableName + " where col1 = ?", 404);
+		assertNotNull("SQL result returns as expected", r);
+		r.fetchAllRows();
+		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col1")).intValue());
+	}
+	
+	@Test
+	public void recreateTest() throws JSqlException {
+		JSqlObj.recreate(true);
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")
+			.dispose(); 
+		boolean b = JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing");
+		JSqlResult r = JSqlObj.query("SELECT * FROM " + testTableName + " where col1 = ? ", 404);
+		assertNotNull("SQL result returns as expected", r);
+		r.fetchAllRows();
+		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col1")).intValue());
+	}
+	
+	
 	
 }

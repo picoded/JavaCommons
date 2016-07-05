@@ -34,13 +34,6 @@ public class JSql_Mssql_test extends JSql_Sqlite_test {
 			"CREATE TABLE IF NOT EXISTS " + testTableName + "_1 ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 bit default 1)")
 			.dispose(); //valid table creation : no exception
 		
-		//JSqlObj.executeQuery("ALTER TABLE " + testTableName + "_1 ADD DEFAULT 1 FOR col4;");
-		
-		assertNotNull("query should return a JSql result",
-			r = JSqlObj.query("SELECT * FROM " + testTableName + " ORDER BY col1 ASC"));
-		assertEquals("Initial value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
-		assertEquals("Initial value check failed", "has nothing", r.readRowCol(0, "col2"));
-		
 		//Upsert query
 		assertNotNull(qSet = JSqlObj.upsertQuerySet( //
 			testTableName + "_1", //

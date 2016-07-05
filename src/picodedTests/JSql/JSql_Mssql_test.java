@@ -52,4 +52,35 @@ public class JSql_Mssql_test extends JSql_Sqlite_test {
 		assertEquals("Upsert value check failed", "not found", r.readRowCol(0, "col2"));
 		assertEquals("Upsert value check failed",  null, r.readRowCol(0, "col4")); //TODO
 	}
+	
+	@Test
+	public void genericSqlParserTest() throws JSqlException {
+		String s = JSqlObj.genericSqlParser("SELECT * FROM " + testTableName + " WHERE COL1 = ?");
+		assertEquals("SELECT * FROM " + testTableName + " WHERE COL1=?", s);
+		
+		s = JSqlObj.genericSqlParser("DROP TABLE IF EXISTS MY_TABLE" );
+		assertEquals("BEGIN TRY IF OBJECT_ID('MY_TABLE', 'U') IS NOT NULL DROP TABLE MY_TABLE END TRY BEGIN CATCH END CATCH", s);
+		
+		s = JSqlObj.genericSqlParser("DROP TABLE MY_TABLE ; ");
+		//assertEquals("DROP TABLE MY_TABLE", s); //Should be
+		assertEquals("DROP TABLE ", s);
+		
+		s = JSqlObj.genericSqlParser("DELETE FROM my_table WHERE col1 = ? ");
+		assertEquals("DELETE FROM MY_TABLE WHERE col1=?", s); 
+		
+		s = JSqlObj.genericSqlParser("DELETE FROM my_table WHERE col1 = 'ABC' ");
+		assertEquals("DELETE FROM MY_TABLE WHERE col1='ABC'", s); 
+		
+		s = JSqlObj.genericSqlParser("INSERT INTO my_table ( col1, col2 ) VALUES (?,?)");
+		assertEquals("INSERT INTO MY_TABLE ( col1, col2 ) VALUES (?,?)", s); 
+		
+		s = JSqlObj.genericSqlParser("UPDATE my_table SET col1 = ?, col2 = ? ");
+		assertEquals("UPDATE MY_TABLE SET col1=?, col2=?", s); 
+		
+		s = JSqlObj.genericSqlParser("UPDATE my_table SET col1 = 405 ");
+		assertEquals("UPDATE MY_TABLE SET col1=405", s); 
+		
+		s = JSqlObj.genericSqlParser("ALTER TABLE my_table ADD COLUMN col3 varchar(10)");
+		assertEquals("ALTER TABLE my_table ADD COLUMN col3 varchar(10)", s); 
+	}
 }

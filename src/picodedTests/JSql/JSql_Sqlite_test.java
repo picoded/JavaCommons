@@ -8,6 +8,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.HashMap;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -659,7 +661,10 @@ public class JSql_Sqlite_test {
 		JSqlResult r = JSqlObj.query("SELECT * FROM " + testTableName + " where col1 = ? ", 404);
 		assertNotNull("SQL result returns as expected", r);
 		r.fetchAllRows();
-		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col1")).intValue());
+		HashMap<String, Object> row =  r.readRow(0);
+		assertEquals("via readRow", 404, ((Number)row.get("col1")).intValue());
+		assertEquals("via readCol", "has nothing", r.readCol("col2")[0]);
+		assertEquals("via readCol", "has nothing", r.readCol_StringArr("col2")[0]);
 	}
 	
 	

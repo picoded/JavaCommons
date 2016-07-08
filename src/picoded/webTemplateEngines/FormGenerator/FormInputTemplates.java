@@ -104,6 +104,8 @@ public class FormInputTemplates {
 					df = showRemoveDecimal();
 				}
 
+				tempValue = RegexUtils.removeAllNonNumeric(tempValue);
+
 				BigDecimal bigD = new BigDecimal(tempValue);
 				bigD = bigD.setScale(2, RoundingMode.HALF_UP);
 

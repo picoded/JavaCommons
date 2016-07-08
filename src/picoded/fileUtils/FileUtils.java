@@ -11,7 +11,7 @@ import com.mysql.jdbc.StringUtils;
 
 public class FileUtils extends org.apache.commons.io.FileUtils {
 	
-	// / @TODO: Sam, documentation =.=
+	/// @TODO: Sam, documentation =.=
 	public static List<String> getFileNamesFromFolder(File inFile, String separator, String rootFolderName) {
 		List<String> keyList = new ArrayList<String>();
 		
@@ -51,9 +51,9 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	}
 	
 	// /
-	// / List only the folders inside a folder
+	/// List only the folders inside a folder
 	// /
-	// / @param folder to scan
+	/// @param folder to scan
 	// /
 	public static Collection<File> listDirs(File inFile) {
 		List<File> ret = new ArrayList<File>();
@@ -68,15 +68,15 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	}
 	
 	// /
-	// / Extends the readFileToString to include a "fallback" default value,
-	// / which is used if the file does not exists / is not readable / is not a
+	/// Extends the readFileToString to include a "fallback" default value,
+	/// which is used if the file does not exists / is not readable / is not a
 	// file
 	// /
-	// / @param file to read
-	// / @param encoding mode
-	// / @param fallback return value if file is invalid
+	/// @param file to read
+	/// @param encoding mode
+	/// @param fallback return value if file is invalid
 	// /
-	// / @returns the file value if possible, else returns the fallback value
+	/// @returns the file value if possible, else returns the fallback value
 	// /
 	public static String readFileToString_withFallback(File inFile, String encoding, String fallback) {
 		if (inFile == null || !inFile.exists() || !inFile.isFile() || !inFile.canRead()) {
@@ -91,13 +91,13 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	}
 	
 	// /
-	// / Write to file only if it differs
+	/// Write to file only if it differs
 	// /
-	// / @param file to write
-	// / @param value to write
-	// / @param encoding mode
+	/// @param file to write
+	/// @param value to write
+	/// @param encoding mode
 	// /
-	// / @returns the boolean indicating true if file was written to
+	/// @returns the boolean indicating true if file was written to
 	// /
 	public static boolean writeStringToFile_ifDifferant(File inFile, String encoding, String data) throws IOException {
 		String original = readFileToString_withFallback(inFile, encoding, "");

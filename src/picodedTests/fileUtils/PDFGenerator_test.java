@@ -33,8 +33,8 @@ public class PDFGenerator_test {
 	}
 	
 	// /
-	// / Test HTML file conversion to a PDF file
-	// / embeded file path (image, css, js etc.) in input html file should be
+	/// Test HTML file conversion to a PDF file
+	/// embeded file path (image, css, js etc.) in input html file should be
 	// relative to html file path
 	// /
 	@Test
@@ -44,8 +44,8 @@ public class PDFGenerator_test {
 	}
 	
 	// /
-	// / Test HTML raw string conversion to a PDF file
-	// / embeded file path (image, css, js etc.) in input html String should be
+	/// Test HTML raw string conversion to a PDF file
+	/// embeded file path (image, css, js etc.) in input html String should be
 	// relative to execute location
 	// /
 	@Test
@@ -54,7 +54,7 @@ public class PDFGenerator_test {
 			+ "pdf-generator-2.html")));
 	}
 	
-	// / Reads a HTML file in a string and returns
+	/// Reads a HTML file in a string and returns
 	private String readHTMLFile(String inputHTMLFile) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(inputHTMLFile));
 		StringBuilder stringBuilder = new StringBuilder();

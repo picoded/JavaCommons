@@ -46,14 +46,14 @@ import picoded.iTextProcessors.B64ImgReplacedElementFactory;
 /// http://stackoverflow.com/questions/29194405/html-to-pdf-with-base64-images-throws-filenotfoundexception
 ///
 public class PDFGenerator {
-	// / Generates a pdf file given the HTML file path
-	// / embeded file path (image, css, js etc.) in input html file should be
+	/// Generates a pdf file given the HTML file path
+	/// embeded file path (image, css, js etc.) in input html file should be
 	// relative to html file path
 	// /
-	// / @param pdfFile pdf file path string
-	// / @param htmlFilePath HTML file path string
+	/// @param pdfFile pdf file path string
+	/// @param htmlFilePath HTML file path string
 	// /
-	// / @returns true if the HTML file is converted and saved in a pdf file
+	/// @returns true if the HTML file is converted and saved in a pdf file
 	public static boolean generatePDFfromHTMLfile(String pdfFile, String htmlFilePath) {
 		OutputStream outputStream = null;
 		try {
@@ -137,14 +137,14 @@ public class PDFGenerator {
 		return true;
 	}
 	
-	// / Generates a pdf file given the RAW html string
-	// / embeded file path (image, css, js etc.) in input html String should be
+	/// Generates a pdf file given the RAW html string
+	/// embeded file path (image, css, js etc.) in input html String should be
 	// relative to execute location
 	// /
-	// / @param outputpdfpath pdf file path string
-	// / @param rawHtml raw HTML string
+	/// @param outputpdfpath pdf file path string
+	/// @param rawHtml raw HTML string
 	// /
-	// / @returns true if the HTML raw string is converted and saved in a pdf
+	/// @returns true if the HTML raw string is converted and saved in a pdf
 	// file.
 	public static boolean generatePDFfromRawHTML(String outputpdfpath, String rawHtml) {
 		OutputStream outputStream = null;
@@ -177,16 +177,16 @@ public class PDFGenerator {
 		return true;
 	}
 	
-	// / Generates a pdf file given the RAW html string
-	// / embeded file path (image, css, js etc.) in input html String should be
+	/// Generates a pdf file given the RAW html string
+	/// embeded file path (image, css, js etc.) in input html String should be
 	// relative to execute location
 	// /
-	// / @param outputpdfpath pdf file path string
-	// / @param rawHtml raw HTML string
-	// / @param contextRoot Absolute file path for the PDF to pull resources
+	/// @param outputpdfpath pdf file path string
+	/// @param rawHtml raw HTML string
+	/// @param contextRoot Absolute file path for the PDF to pull resources
 	// from
 	// /
-	// / @returns true if the HTML raw string is converted and saved in a pdf
+	/// @returns true if the HTML raw string is converted and saved in a pdf
 	// file.
 	public static boolean generatePDFfromRawHTML(String outputpdfpath, String rawHtml, String contextRoot) {
 		OutputStream outputStream = null;

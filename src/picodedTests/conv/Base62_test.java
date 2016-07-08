@@ -34,7 +34,7 @@ public class Base62_test {
 	}
 	
 	// /
-	// / Test bit to string length converters
+	/// Test bit to string length converters
 	// /
 	@Test
 	public void base8_specific() {
@@ -166,7 +166,7 @@ public class Base62_test {
 	}
 	
 	// /
-	// / Test charset
+	/// Test charset
 	// /
 	@Test
 	public void charset() {
@@ -175,7 +175,7 @@ public class Base62_test {
 	}
 	
 	// /
-	// / random base conversion charset
+	/// random base conversion charset
 	// /
 	@Test
 	public void encodeAndDecodeOnce() {

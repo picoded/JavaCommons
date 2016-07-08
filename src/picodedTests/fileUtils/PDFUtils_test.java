@@ -45,7 +45,7 @@ public class PDFUtils_test {
 	// }
 	
 	// /
-	// / Test PDF merge two files into single file.
+	/// Test PDF merge two files into single file.
 	// /
 	@Test
 	public void mergePDFfile() throws FileNotFoundException, IOException, DocumentException {
@@ -62,7 +62,7 @@ public class PDFUtils_test {
 	}
 	
 	// /
-	// / Test PDF subPage generates a new PDF file which contains range of pages
+	/// Test PDF subPage generates a new PDF file which contains range of pages
 	// as per parameter.
 	// /
 	@Test
@@ -76,7 +76,7 @@ public class PDFUtils_test {
 	}
 	
 	// /
-	// / Test PDF countPDFPages return number of pages contains the PDF file.
+	/// Test PDF countPDFPages return number of pages contains the PDF file.
 	// /
 	@Test
 	public void countPDFPages() throws FileNotFoundException, IOException, DocumentException {
@@ -87,7 +87,7 @@ public class PDFUtils_test {
 	}
 	
 	// /
-	// / Test PDF countPDFPages return number of pages contains the PDF file.
+	/// Test PDF countPDFPages return number of pages contains the PDF file.
 	// /
 	@Test
 	public void countPDFPagesFileInput() throws FileNotFoundException, IOException, DocumentException {
@@ -97,7 +97,7 @@ public class PDFUtils_test {
 	}
 	
 	// /
-	// / Test PDF merge two files into single file.
+	/// Test PDF merge two files into single file.
 	// /
 	@Test
 	public void mergePDFfileInputFile() throws FileNotFoundException, IOException, DocumentException {
@@ -117,7 +117,7 @@ public class PDFUtils_test {
 	}
 	
 	// /
-	// / Test PDF subPage generates a new PDF file which contains range of pages
+	/// Test PDF subPage generates a new PDF file which contains range of pages
 	// as per parameter.
 	// /
 	@Test

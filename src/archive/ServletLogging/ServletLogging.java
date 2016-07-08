@@ -217,21 +217,21 @@ public class ServletLogging {
 	}
 	
 	private void tableSetup(JSql jSql) throws JSqlException {
-		// / config table
+		/// config table
 		if (jSql.sqlType == JSqlType.sqlite) {
 			jSql.createTableQuerySet("config", new String[] { "key", "sVal" },
 				new String[] { keyColumnType + pKeyColumnType, textColumnType }).execute();
 		}
 		
-		// / logFormat table
+		/// logFormat table
 		jSql.createTableQuerySet("logFormat", new String[] { "hash", "format" },
 			new String[] { keyColumnType + pKeyColumnType, fullTextColumnType }).execute();
 		
-		// / logStrHashes table
+		/// logStrHashes table
 		jSql.createTableQuerySet("logStrHashes", new String[] { "hash", "sVal" },
 			new String[] { keyColumnType + pKeyColumnType, textColumnType }).execute();
 		
-		// / logTable table
+		/// logTable table
 		List<String> columnName = new ArrayList<String>(Arrays.asList("systemHash", "reqsID", "creTime", "fmtHash",
 			"logType", "expHash", "offSync", "reqID"));
 		List<String> columnDefine = new ArrayList<String>(Arrays.asList((keyColumnType + pKeyColumnType), keyColumnType,
@@ -258,18 +258,18 @@ public class ServletLogging {
 		jSql.createTableQuerySet("logTable", columnName.toArray(new String[columnName.size()]),
 			columnDefine.toArray(new String[columnDefine.size()])).execute();
 		
-		// / excStrHash table
+		/// excStrHash table
 		jSql.createTableQuerySet("excStrHash", new String[] { "hash", "sVal" },
 			new String[] { keyColumnType + pKeyColumnType, textColumnType }).execute();
 		
-		// / exception table
+		/// exception table
 		columnName = new ArrayList<String>(Arrays.asList("expHash", "reqsID", "creTime", "systemHash", "excRoot",
 			"excTrace", "excMid", "stkRoot", "stkTrace", "stkMid"));
 		columnDefine = new ArrayList<String>(Arrays.asList((keyColumnType + pKeyColumnType), keyColumnType,
 			tStampColumnType, keyColumnType, keyColumnType, keyColumnType, keyColumnType, keyColumnType, keyColumnType,
 			keyColumnType));
 		
-		// / Exception Root Trace Indexed
+		/// Exception Root Trace Indexed
 		for (int i = 1; i <= exceptionRootTraceIndexed; i++) {
 			columnName.add("excR" + (i < 10 ? "0" : "") + i);
 			columnDefine.add(keyColumnType);
@@ -278,7 +278,7 @@ public class ServletLogging {
 			columnDefine.add(keyColumnType);
 		}
 		
-		// / Exception Thrown Trace Indexed
+		/// Exception Thrown Trace Indexed
 		for (int i = 1; i <= exceptionThrownTraceIndexed; i++) {
 			columnName.add("excT" + (i < 10 ? "0" : "") + i);
 			columnDefine.add(keyColumnType);
@@ -291,7 +291,7 @@ public class ServletLogging {
 			columnDefine.toArray(new String[columnDefine.size()])).execute();
 	}
 	
-	// / Dispose all created tables
+	/// Dispose all created tables
 	public void tearDown(JSql jSql) throws Exception {
 		jSql.executeQuery("DROP TABLE IF EXISTS `config`").dispose();
 		jSql.executeQuery("DROP TABLE IF EXISTS `logFormat`").dispose();
@@ -301,12 +301,12 @@ public class ServletLogging {
 		jSql.executeQuery("DROP TABLE IF EXISTS `exception`").dispose();
 	}
 	
-	// / Returns the current time in seconds
+	/// Returns the current time in seconds
 	private int createTime() {
 		return (int) (System.currentTimeMillis() / 1000);
 	}
 	
-	// / Returns the systemHash stored inside the SQLite DB, if it does not
+	/// Returns the systemHash stored inside the SQLite DB, if it does not
 	// exists, generate one
 	public String systemHash(JSql jSql) throws JSqlException {
 		String sysHash = null;
@@ -344,7 +344,7 @@ public class ServletLogging {
 			).execute();
 	}
 	
-	// / Validate if the systemHash if it belongs to the current physical 
+	/// Validate if the systemHash if it belongs to the current physical 
 	// virtual server. If it fails, it reissues the systemHash. Used on servlet startup
 	public String validateSystemHash(JSql jSql) throws JSqlException {
 		try {
@@ -367,7 +367,7 @@ public class ServletLogging {
 		}
 	}
 	
-	// / Returns the current request ID
+	/// Returns the current request ID
 	public String requestID(JSql jSql) throws JSqlException {
 		String requestId = null;
 		// Fetch the meta fields
@@ -383,12 +383,12 @@ public class ServletLogging {
 		return requestId;
 	}
 	
-	// / Reissue a new requestID, used at start of servlet call
+	/// Reissue a new requestID, used at start of servlet call
 	public String reissueRequestID() {
 		return GUID.base58();
 	}
 	
-	// / Add the format to the system
+	/// Add the format to the system
 	//hash   (base58 md5, indexed) ,format (indexed, unique)
 	public void addFormat(JSql jSql, String fmtHash, String format) throws JSqlException {
 		jSql.upsertQuerySet( //
@@ -582,7 +582,7 @@ public class ServletLogging {
 		logger.log(Level.SEVERE, "Exception", e);
 	}
 	
-	// / Returns format string hash value
+	/// Returns format string hash value
 	public String hashFormat(JSql jSql, String fmtString) throws JSqlException {
 		JSqlResult r = jSql.selectQuerySet("logFormat", "hash", "format=?", new Object[] { fmtString }).query();
 		int rowCount = r.fetchAllRows();

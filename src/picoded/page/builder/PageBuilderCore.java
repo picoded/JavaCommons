@@ -45,6 +45,9 @@ public class PageBuilderCore {
 	/// LESS compiler
 	protected LessToCss less = new LessToCss();
 	
+	/// Dependency chain tracking
+	protected GenericConvertListSet<String> dependencyTracker = new GenericConvertListSet<String>();
+	
 	////////////////////////////////////////////////////////////
 	//
 	// Constructor
@@ -240,7 +243,7 @@ public class PageBuilderCore {
 		String res = null;
 		
 		// Get from the rawPageName folder itself (v2)
-		res = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + fileName), "UTF-8", null);
+		res = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + fileName), null /*"UTF-8"*/, null);
 		
 		// Gets the parent paths (if valid)
 		if (res == null) {
@@ -255,7 +258,7 @@ public class PageBuilderCore {
 				while (res == null && splitNames.length > 0) {
 					// Join the name path, and get the file
 					res = FileUtils.readFileToString_withFallback(new File(pagesFolder, String.join("/", splitNames) + "/"
-						+ fileName), "UTF-8", null);
+						+ fileName), null /*"UTF-8"*/, null);
 					
 					// Go one "directory" parent upward
 					splitNames = ArrayConv.subarray(splitNames, 0, splitNames.length - 1);
@@ -265,17 +268,17 @@ public class PageBuilderCore {
 		
 		// Get from the root folder (v2)
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, fileName), "UTF-8", null);
+			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, fileName), null /*"UTF-8"*/, null);
 		}
 		
 		// Get from the common folder (v2)
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "common/" + fileName), "UTF-8", null);
+			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "common/" + fileName), null /*"UTF-8"*/, null);
 		}
 		
 		// Legacy support (v1) get from index folder
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "index/" + fileName), "UTF-8", null);
+			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "index/" + fileName), null /*"UTF-8"*/, null);
 		}
 		
 		// Fallbacks to blank
@@ -303,11 +306,15 @@ public class PageBuilderCore {
 	
 	/// Gets and returns a page frame raw string without going through the JMTE parser
 	public String buildPageInnerRawHTML(String rawPageName) {
+		// Depenency chain tracking
+		rawPageName = filterRawPageName(rawPageName);
+		dependencyTracker.add(rawPageName);
+		
 		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/"
-			+ safePageName(rawPageName) + ".html"), "UTF-8", null);
+			+ safePageName(rawPageName) + ".html"), null /*"UTF-8"*/, null);
 		if (indexFileStr == null) {
 			indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/index.html"),
-				"UTF-8", "");
+				null /*"UTF-8"*/, "");
 		}
 		
 		if ((indexFileStr = indexFileStr.trim()).length() == 0) {
@@ -328,10 +335,10 @@ public class PageBuilderCore {
 	/// Gets and returns a page frame string, with its respective JMTE input vars?
 	public String buildPageInnerHTML(String rawPageName, Map<String, Object> jmteTemplate) {
 		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/"
-			+ safePageName(rawPageName) + ".html"), "UTF-8", null);
+			+ safePageName(rawPageName) + ".html"), null /*"UTF-8"*/, null);
 		if (indexFileStr == null) {
 			indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/index.html"),
-				"UTF-8", "");
+				null /*"UTF-8"*/, "");
 		}
 		
 		if ((indexFileStr = indexFileStr.trim()).length() == 0) {
@@ -530,7 +537,7 @@ public class PageBuilderCore {
 				}
 				
 				// Write to file if it differ
-				FileUtils.writeStringToFile_ifDifferant(output, "UTF-8", fileVal);
+				FileUtils.writeStringToFile_ifDifferant(output, null /*"UTF-8"*/, fileVal);
 				
 				// Indicate file is "deployed"
 				return true;
@@ -709,7 +716,7 @@ public class PageBuilderCore {
 			//-------------------------------------------------------------------
 			
 			// Write to file if it differ
-			FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, "index.html"), "UTF-8", indexStr);
+			FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, "index.html"), null /*"UTF-8"*/, indexStr);
 			
 			// Returns success
 			return true;
@@ -763,7 +770,7 @@ public class PageBuilderCore {
 						System.out.print("> PageBuilder[Core].buildPageFolder - WARNING, common / index nested build (\'"
 							+ rawPageName + "\', \'" + subPageName + "\'): ");
 					}
-				} else if (subPageName.equalsIgnoreCase("assets") || subPageName.equalsIgnoreCase("web-inf")) {
+				} else if (subPageName.equalsIgnoreCase("assets") || subPageName.equalsIgnoreCase("web-inf") || subPageName.equalsIgnoreCase("build")) {
 					// ignoring certain reserved folders
 				} else {
 					// Build the page
@@ -790,5 +797,49 @@ public class PageBuilderCore {
 			res = buildAndOutputPage(rawPageName) || res;
 		}
 		return buildPageFolder(rawPageName) || res;
+	}
+	
+	////////////////////////////////////////////////////////////
+	//
+	// Dependency chain management
+	//
+	////////////////////////////////////////////////////////////
+	
+	/// Dependency chain tracking
+	public GenericConvertListSet<String> dependencyTracker() {
+		return dependencyTracker();
+	}
+	
+	/// Reset the Dependency tracking
+	public void dependencyTrackerReset() {
+		dependencyTracker.clear();
+	}
+	
+	/// Recursively get the sub depencies, and do the full tracking
+	protected GenericConvertListSet<String> fullDependencyTracker() {
+		// @TODO Recursive pulls
+		return dependencyTracker();
+	}
+	
+	/// Build the depency for a raw file
+	protected String dependencyBuildFile(String filename) {
+		StringBuilder res = new StringBuilder();
+		for(String name : dependencyTracker) {
+			String pageData = FileUtils.readFileToString_withFallback(new File(pagesFolder, name + "/"+filename), null /*"UTF-8"*/, null);
+			if( pageData != null ) {
+				res.append(pageData);
+			}
+		}
+		return res.toString();
+	}
+	
+	/// Builds the LESS from the depency chain
+	public String dependencyLess() {
+		return dependencyBuildFile("depend.less");
+	}
+	
+	/// Builds the CSS from the depency chain
+	public String dependencyCss() {
+		return less.compile(dependencyLess());
 	}
 }

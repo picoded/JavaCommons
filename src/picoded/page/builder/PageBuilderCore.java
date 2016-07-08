@@ -158,13 +158,74 @@ public class PageBuilderCore {
 		return "pageFrame_" + safePageName(rawPageName);
 	}
 	
+	///
+	/// Gets the requested page template.json from the following priority order
+	///
+	/// 1) The page path itself
+	/// 2) Any parent path folder 
+	/// 3) The root folder
+	///
+	protected Map<String,Object> getTemplateJson(String rawPageName) {
+		String resStr = null;
+		String fileName = "template.json";
+		List<Map<String,Object>> templateList = new ArrayList<Map<String,Object>>();
+		
+		// Page path itself
+		templateList.add(
+			GenericConvert.toStringMap( 
+				FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + fileName), null /*"UTF-8"*/, null), null 
+			)
+		);
+		
+		// Gets the parent paths (if valid)
+		String[] splitNames = splitPageName(rawPageName);
+		if (splitNames.length <= 1) {
+			// There were no parent folders, skip the parent paths checks
+		} else {
+			// Go one "directory" parent upward
+			splitNames = ArrayConv.subarray(splitNames, 0, splitNames.length - 1);
+			
+			// Breaks once root directory is reached / or result found
+			while (splitNames.length > 0) {
+				// Join the name path, and get the file
+				templateList.add(
+					GenericConvert.toStringMap( 
+						FileUtils.readFileToString_withFallback(new File(pagesFolder, String.join("/", splitNames) + "/" + fileName), null /*"UTF-8"*/, null), null 
+					)
+				);
+				
+				// Go one "directory" parent upward
+				splitNames = ArrayConv.subarray(splitNames, 0, splitNames.length - 1);
+			}
+		}
+		
+		// Get from the root folder (v2)
+		templateList.add(
+			GenericConvert.toStringMap( 
+				FileUtils.readFileToString_withFallback(new File(pagesFolder, fileName), null /*"UTF-8"*/, null), null 
+			)
+		);
+		
+		// Flips the list
+		Collections.reverse(templateList);
+		
+		Map<String,Object> res = new HashMap<String,Object>();
+		for(Map<String,Object> template : templateList) {
+			if(template != null) {
+				res.putAll(template);
+			}
+		}
+		return res;
+	}
+	
 	/// Generates the needed map string template for the respective page
 	///
 	/// @param  rawPageName used to generate the vars
 	///
 	/// @returns The data map used inside JMTE
 	protected Map<String, Object> pageJMTEvars(String rawPageName) {
-		HashMap<String, Object> ret = new HashMap<String, Object>();
+		// Basic filter safety
+		rawPageName = filterRawPageName(rawPageName);
 		
 		// Initialize to root if not previously set
 		if (uriRootPrefix == null) {
@@ -178,11 +239,14 @@ public class PageBuilderCore {
 		  uriRootPrefix = "";
 		  }*/
 		
-		//
+		// Uri slash fixing (in case of double slash)
 		String pageURI = uriRootPrefix + "/" + rawPageName;
-		while (pageURI.startsWith("//")) {
-			pageURI = pageURI.substring(1);
+		while (pageURI.indexOf("//") >= 0) {
+			pageURI = pageURI.replaceAll("//", "/");
 		}
+		
+		// Get the template json stack
+		Map<String, Object> ret = getTemplateJson(rawPageName);
 		
 		ret.put("PagesRootURI", uriRootPrefix);
 		ret.put("PageURI", pageURI);
@@ -234,7 +298,7 @@ public class PageBuilderCore {
 	/// Gets the requested page prefix / suffix from the following priority order
 	///
 	/// 1) The page path itself
-	/// 2) Any parent path folder (excluding root : use common for that)
+	/// 2) Any parent path folder
 	/// 3) The root folder (v3)
 	/// 4) The common folder (v2)
 	/// 5) The index folder (legacy support, do not use)

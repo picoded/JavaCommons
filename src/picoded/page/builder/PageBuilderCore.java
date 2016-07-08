@@ -165,7 +165,7 @@ public class PageBuilderCore {
 		
 		// Initialize to root if not previously set
 		if (uriRootPrefix == null) {
-			uriRootPrefix = "./";
+			uriRootPrefix = ".";
 		}
 		
 		// Removes trailing /, unless its the only character
@@ -187,6 +187,8 @@ public class PageBuilderCore {
 		ret.put("PageName", safePageName(rawPageName));
 		ret.put("PageFrameID", pageFrameID(rawPageName));
 		
+		ret.put("PageComponent", buildPageComponentMap());
+		
 		return ret;
 	}
 	
@@ -201,7 +203,13 @@ public class PageBuilderCore {
 	/// Filters the rawPageName, into its valid form (remove any pre/suf-fix of slashes)
 	///
 	protected String filterRawPageName(String rawPageName) {
+		if(rawPageName == null) {
+			rawPageName = "";
+		}
+		
 		rawPageName = rawPageName.trim();
+		rawPageName = rawPageName.replaceAll("\\.","/");
+		
 		while (rawPageName.startsWith("/")) {
 			rawPageName = rawPageName.substring(1);
 		}
@@ -224,8 +232,9 @@ public class PageBuilderCore {
 	///
 	/// 1) The page path itself
 	/// 2) Any parent path folder (excluding root : use common for that)
-	/// 3) The common folder
-	/// 4) The index folder (legacy support, do not use)
+	/// 3) The root folder (v3)
+	/// 4) The common folder (v2)
+	/// 5) The index folder (legacy support, do not use)
 	///
 	protected String getCommonFile(String rawPageName, String fileName) {
 		String res = null;
@@ -252,6 +261,11 @@ public class PageBuilderCore {
 					splitNames = ArrayConv.subarray(splitNames, 0, splitNames.length - 1);
 				}
 			}
+		}
+		
+		// Get from the root folder (v2)
+		if (res == null) {
+			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, fileName), "UTF-8", null);
 		}
 		
 		// Get from the common folder (v2)
@@ -287,6 +301,30 @@ public class PageBuilderCore {
 		return getJMTE().parseTemplate(getCommonPrefixOrSuffixHtml(rawPageName, "suffix"), pageJMTEvars(rawPageName));
 	}
 	
+	/// Gets and returns a page frame raw string without going through the JMTE parser
+	public String buildPageInnerRawHTML(String rawPageName) {
+		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/"
+			+ safePageName(rawPageName) + ".html"), "UTF-8", null);
+		if (indexFileStr == null) {
+			indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/index.html"),
+				"UTF-8", "");
+		}
+		
+		if ((indexFileStr = indexFileStr.trim()).length() == 0) {
+			if (hasPageFile(rawPageName)) { //has file
+				return ""; //this is a blank HTML file
+			}
+			return null;
+		}
+		
+		return indexFileStr.toString();
+	}
+	
+	/// Gets and returns a page frame string, with its respective JMTE input vars?
+	public String buildPageInnerHTML(String rawPageName) {
+		return buildPageInnerHTML(rawPageName, null);
+	}
+	
 	/// Gets and returns a page frame string, with its respective JMTE input vars?
 	public String buildPageInnerHTML(String rawPageName, Map<String, Object> jmteTemplate) {
 		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/"
@@ -301,6 +339,10 @@ public class PageBuilderCore {
 				return ""; //this is a blank HTML file
 			}
 			return null;
+		}
+		
+		if( jmteTemplate == null ) {
+			jmteTemplate = pageJMTEvars(rawPageName);
 		}
 		
 		return getJMTE().parseTemplate(indexFileStr.toString(), jmteTemplate);
@@ -354,7 +396,58 @@ public class PageBuilderCore {
 	
 	////////////////////////////////////////////////////////////
 	//
-	// Page Building
+	// Subpages searching handling
+	//
+	////////////////////////////////////////////////////////////
+	
+	///
+	/// Sub page name listing
+	///
+	/// @param rawPageName Parent page to search from
+	///
+	/// @return Collection of sub pages name from the parent page
+	///
+	public Set<String> subPagesList(String rawPageName) {
+		rawPageName = filterRawPageName(rawPageName);
+		HashSet<String> res = new HashSet<String>();
+		
+		// The current folder to scan
+		File folder = new File(pagesFolder, rawPageName);
+		
+		// Scan for subdirectories ONLY if this is a directory
+		if (folder.isDirectory()) {
+			// For each sub directory, build it as a page
+			for (File pageDefine : FileUtils.listDirs(folder)) {
+				// Get sub page name
+				String subPageName = pageDefine.getName();
+				
+				// Common and index zone only if its top layer
+				if (subPageName.equalsIgnoreCase("common") || subPageName.equalsIgnoreCase("index")) {
+					if (rawPageName.length() <= 0) {
+						res.add(subPageName);
+					}
+				} else if (subPageName.equalsIgnoreCase("assets") || subPageName.equalsIgnoreCase("web-inf")) {
+					// ignoring certain reserved folders
+				} else {
+					res.add(subPageName);
+				}
+			}
+		}
+		
+		// Return result set
+		return res;
+	}
+	
+	///
+	/// Build and returns the page components map
+	///
+	public PageComponentMap buildPageComponentMap() {
+		return new PageComponentMap(this, "");
+	}
+	
+	////////////////////////////////////////////////////////////
+	//
+	// Page Building parts
 	//
 	////////////////////////////////////////////////////////////
 	
@@ -465,6 +558,12 @@ public class PageBuilderCore {
 		return false;
 	}
 	
+	////////////////////////////////////////////////////////////
+	//
+	// Full Page Building
+	//
+	////////////////////////////////////////////////////////////
+	
 	///
 	/// Builds all the assets for a single page
 	///
@@ -563,7 +662,7 @@ public class PageBuilderCore {
 			if (hasLessFile) {
 				if (indexStr.indexOf(rawPageName + "/" + pageName_safe + ".css") > 0) {
 					// Skips injection if already included
-				} else {\
+				} else {
 					injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='" + uriRootPrefix + "/"
 						+ rawPageName + "/" + pageName_safe + ".css'></link>\n");
 				}

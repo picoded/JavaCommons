@@ -1,0 +1,20 @@
+<!-- Start of IE restriction -->
+<!--[if lte IE 9]>
+<div id="browserWarning" title="Warning">
+	<p>Sorry, but this site is not accessible through your current version of Internet Explorer.</p>
+	<br/>
+	<p>Please access the site through a compatible browser like Chrome, Mozilla Firefox, Safari or Opera.</p>
+</div>
+<![endif]-->
+<!-- FOR IE 10 -->
+<div id="browserWarning" style="display:none" title="Warning">
+	<p>Sorry, but this site is not accessible through your current version of Internet Explorer.</p>
+	<br/>
+	<p>Please access the site through a compatible browser like Chrome, Mozilla Firefox, Safari or Opera.</p>
+</div>
+<script>
+	if (navigator.appVersion.indexOf("MSIE 10") !== -1) {
+		document.getElementById("browserWarning").style.display = "block";
+	}
+</script>
+<!-- End of IE restriction -->

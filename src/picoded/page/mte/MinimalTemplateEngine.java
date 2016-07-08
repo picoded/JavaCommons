@@ -75,7 +75,8 @@ public class MinimalTemplateEngine {
 	///
 	/// (PS: You probably DO NOT need to modify this)
 	///
-	public String[][] expressionSet = new String[][] { new String[] { "${", "}" }, new String[] { "{{#", "}}" }, new String[] { "{{", "}}" }, new String[] { "{{{","}}}" } };
+	public String[][] expressionSet = new String[][] { new String[] { "${", "}" }, new String[] { "{{#", "}}" },
+		new String[] { "{{", "}}" }, new String[] { "{{{", "}}}" } };
 	
 	///
 	/// Template expresion prefix / suffix set for unescaped html strictly, this MUST be a subset of expressionSet

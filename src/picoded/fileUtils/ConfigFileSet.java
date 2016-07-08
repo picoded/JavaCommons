@@ -13,104 +13,216 @@ import picoded.struct.GenericConvertMap;
 ///
 /// Config file loader
 ///
-/// Iterates a filepath and loads all ini config files
+/// Iterates a filepath and loads all the various config files
 ///
 /// Note that folder, and filename will be used as the config path. Unless its config.ini
 ///
-public class ConfigFileSet extends ConfigFile implements
-		GenericConvertMap<String, Object> {
-
-	// / The actual inner prefix set, which is searched when a request is made
-	// /
-	// / Note that the inner map are actually ConfigFile
-
-	// <main, <main-include.test, hello>>
-	// <related <main-include.text, hi>>
-	// json-><jsonFileName <jsonKey, jsonValue>>
-	public Map<String, Map<String, Object>> prefixSetMap = new HashMap<String, Map<String, Object>>();
-
+public class ConfigFileSet extends ConfigFile implements GenericConvertMap<String, Object> {
+	
+	//-----------------------------------------------------------------------------------
+	//
+	// Internal config file map
+	//
+	//-----------------------------------------------------------------------------------
+	
+	///
+	/// The actual internal config file set mapping
+	///
+	/// <main, <main-include.test, hello>>
+	/// <related <main-include.text, hi>>
+	/// <jsonFileName <jsonKey, jsonValue>>
+	///
+	protected Map<String, ConfigFile> configFileMap = new HashMap<String, ConfigFile>();
+	
+	//-----------------------------------------------------------------------------------
+	//
+	// Constructors
+	//
+	//-----------------------------------------------------------------------------------
+	
 	public ConfigFileSet() {
-
+		
 	}
-
-	// / Constructor with the default file path to scan
+	
+	/// Constructor with the default file path to scan
 	public ConfigFileSet(String filePath) {
 		addConfigSet(filePath);
 	}
-
+	
+	//-----------------------------------------------------------------------------------
+	//
+	// Config File folder importing
+	//
+	//-----------------------------------------------------------------------------------
+	
 	public ConfigFileSet addConfigSet(File filePath) {
 		return addConfigSet(filePath, "", ".");
 	}
-
+	
 	public ConfigFileSet addConfigSet(String filePath) {
 		return addConfigSet(filePath, "", ".");
 	}
-
-	public ConfigFileSet addConfigSet(String filePath, String prefix,
-			String separator) {
+	
+	public ConfigFileSet addConfigSet(String filePath, String prefix, String separator) {
 		return addConfigSet_recursive(new File(filePath), prefix, separator);
 	}
-
-	public ConfigFileSet addConfigSet(File inFile, String prefix,
-			String separator) {
+	
+	public ConfigFileSet addConfigSet(File inFile, String prefix, String separator) {
 		return addConfigSet_recursive(inFile, prefix, separator);
 	}
-
-	private ConfigFileSet addConfigSet_recursive(File inFile,
-			String rootPrefix, String separator) {
+	
+	private ConfigFileSet addConfigSet_recursive(File inFile, String rootPrefix, String separator) {
 		if (rootPrefix == null) {
 			rootPrefix = "";
 		}
-
+		
 		if (inFile.isDirectory()) {
 			File[] innerFiles = inFile.listFiles();
 			for (File innerFile : innerFiles) {
 				if (innerFile.isDirectory()) {
 					String parentFolderName = innerFile.getName();
 					if (!rootPrefix.isEmpty()) {
-						parentFolderName = rootPrefix + separator
-								+ parentFolderName;
+						parentFolderName = rootPrefix + separator + parentFolderName;
 					}
-					addConfigSet_recursive(innerFile, parentFolderName,
-							separator);
+					addConfigSet_recursive(innerFile, parentFolderName, separator);
 				} else {
 					addConfigSet_recursive(innerFile, rootPrefix, separator);
 				}
 			}
 		} else {
 			String fileName = inFile.getName();
-
+			
 			// Get the filename extension
 			int endingDot = fileName.lastIndexOf('.');
 			String extension = "";
 			if (endingDot > 0) {
 				extension = fileName.substring(endingDot + 1);
 			}
-
+			
 			// Only accept ini or json files
-			if (extension.equalsIgnoreCase("ini")
-					|| extension.equalsIgnoreCase("json")
-					|| extension.equalsIgnoreCase("js")) {
-
+			if (extension.equalsIgnoreCase("ini") || extension.equalsIgnoreCase("json")
+				|| extension.equalsIgnoreCase("js")) {
+				
 				ConfigFile cFile = new ConfigFile(inFile);
-
+				
 				fileName = fileName.substring(0, fileName.lastIndexOf('.'));
 				String prefix = "";
 				if (!rootPrefix.isEmpty()) {
 					prefix += rootPrefix + separator;
 				}
-
-				prefixSetMap.put(prefix + fileName, cFile);
+				
+				configFileMap.put(prefix + fileName, cFile);
 			}
 		}
-
+		
 		return this;
 	}
-
+	
+	//-----------------------------------------------------------------------------------
+	//
+	// Getting a sub mapping clone
+	//
+	//-----------------------------------------------------------------------------------
+	
+	///
+	/// Getting sub map under a prefix, filtering out restricted namespace
+	///
+	/// @param  The prefix to filter for. Example ("sys.")
+	/// @param  The namespace to ignore
+	///
+	/// @returns  The created sub map
+	public ConfigFileSet createSubMap(String prefix, String[] ignore) {
+		ConfigFileSet ret = new ConfigFileSet();
+		
+		// Blank is as good as null
+		if(prefix != null && prefix.length() <= 0) {
+			prefix = null;
+		}
+		
+		//
+		// Iterate across all the ConfigFile items : and populate the result
+		//
+		for(String key : configFileMap.keySet()) {
+			
+			//
+			// Check for items to ignore
+			//
+			if(ignore != null) {
+				for(String ignorePart : ignore) {
+					if( key.startsWith(ignorePart) ) {
+						continue;
+					}
+				}
+			}
+			
+			// 
+			// Add if prefix is null (all valid), or valid
+			//
+			if(prefix == null) {
+				ret.configFileMap.put(key, configFileMap.get(key));
+			} else {
+				if(key.startsWith(prefix)) {
+					
+					// Get the subkey without prefix filter
+					String subkey = key.substring( prefix.length() ).trim();
+					
+					// The subkey without starting "."
+					while(subkey.startsWith(".")) {
+						subkey = subkey.substring(1).trim();
+					}
+					
+					// Skip if subkey ends up being blank
+					if(subkey.length() <= 0) {
+						continue;
+					}
+					
+					// Insert the sub map key without the prefix
+					ret.configFileMap.put(subkey, configFileMap.get(key));
+				}
+			}
+		}
+		
+		if(ret.configFileMap.size() <= 0) {
+			return null;
+		} 
+		return ret;
+	}
+	
+	/// Memoizer cache for getCachedSubMap()
+	protected Map<String,ConfigFileSet> _subMapCache = new HashMap<String,ConfigFileSet>();
+	
+	///
+	/// Gets an internally cached submap (with prefix)
+	///
+	protected ConfigFileSet getCachedSubMap(String prefix) {
+		if( _subMapCache.containsKey(prefix) ) {
+			return _subMapCache.get(prefix);
+		}
+		
+		_subMapCache.put(prefix, createSubMap(prefix, null));
+		return _subMapCache.get(prefix);
+	}
+	
+	//-----------------------------------------------------------------------------------
+	//
+	// Get request handling
+	//
+	//-----------------------------------------------------------------------------------
+	
+	/// When a get request is called here, it attempts to pull from the resepective sub map, by splitting the request key.
+	///
+	/// For example: config.main.header.test
+	/// 
+	/// Will be split as "config.main.header", and "test",
+	/// It will then attempt to fetch from the "config.main.header" file if it exists.
+	///
+	/// If it fails to find, it will then resepectively search 1 level higher
+	/// Splitting it as followed "config.main", and "header.test"
+	///
 	public Object get(Object key) {
 		String keyString = key.toString();
 		String[] splitKeyString = keyString.split("\\.");
-
+		
 		// an issue could arise if there are conflicting keys
 		// example
 		// <a.b.c, <d, e>> //json
@@ -120,30 +232,31 @@ public class ConfigFileSet extends ConfigFile implements
 		// having nonconflicting keys will avoid this, but this is just a heads
 		// up
 		for (int splitPt = splitKeyString.length - 1; splitPt >= 0; --splitPt) {
-			String fileKey = StringUtils.join(
-					ArrayUtils.subarray(splitKeyString, 0, splitPt), ".");
-			String headerKey = StringUtils.join(ArrayUtils.subarray(
-					splitKeyString, splitPt, splitKeyString.length), ".");
-
-			Object returnVal = get_safe(fileKey, headerKey);
-
+			String fileKey = StringUtils.join(ArrayUtils.subarray(splitKeyString, 0, splitPt), ".");
+			String headerKey = StringUtils.join(ArrayUtils.subarray(splitKeyString, splitPt, splitKeyString.length), ".");
+			
+			Object returnVal = getExact(fileKey, headerKey);
+			
 			if (returnVal != null) {
 				return returnVal;
 			}
 		}
-
-		return null;
+		
+		// 
+		// Attempts to get a submap if possible, else returns null
+		//
+		return getCachedSubMap(keyString);
 	}
-
+	
 	// use this if you know the exact keyvaluepair you want
-	public Object get_safe(Object fileKey, Object headerKey) {
+	public Object getExact(Object fileKey, Object headerKey) {
 		String fileKeyString = fileKey.toString();
 		String headerKeyString = headerKey.toString();
-		Map<String, Object> subMap = prefixSetMap.get(fileKeyString);
+		Map<String, Object> subMap = configFileMap.get(fileKeyString);
 		if (subMap != null) {
 			return subMap.get(headerKeyString);
 		}
-
+		
 		return null;
 	}
 }

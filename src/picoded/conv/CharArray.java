@@ -28,7 +28,7 @@ public class CharArray {
 		// Impossible to match, not enough chars
 		if ((endOffset - startOffset) < needleSize) {
 			return false;
-		} 
+		}
 		
 		// Scan the needle
 		for (int needleIndx = 0; needleIndx < needleSize; ++needleIndx) {
@@ -114,17 +114,18 @@ public class CharArray {
 	///
 	/// @return  The index of the needle found, else -1
 	/// 
-	public static int startsWith(String[][] needleSet, int nestedPos, final char[] heystack, int startOffset, int endOffset) {
-		for(int idx = 0; idx<needleSet.length; ++idx) {
+	public static int startsWith(String[][] needleSet, int nestedPos, final char[] heystack, int startOffset,
+		int endOffset) {
+		for (int idx = 0; idx < needleSet.length; ++idx) {
 			String[] needleArray = needleSet[idx];
 			int found = -1;
 			
-			if(nestedPos >= 0) {
-				if(startsWith(needleArray[nestedPos], heystack, startOffset, endOffset)) {
+			if (nestedPos >= 0) {
+				if (startsWith(needleArray[nestedPos], heystack, startOffset, endOffset)) {
 					return idx;
 				}
 			} else {
-				if(startsWith(needleArray, heystack, startOffset, endOffset) >= 0) {
+				if (startsWith(needleArray, heystack, startOffset, endOffset) >= 0) {
 					return idx;
 				}
 			}

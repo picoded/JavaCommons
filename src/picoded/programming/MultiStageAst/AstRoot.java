@@ -37,7 +37,7 @@ public class AstRoot extends AstNode {
 		rootChars = rawString.toCharArray();
 		
 		// Language specific root setup process
-		setupRootNode(); 
+		setupRootNode();
 	}
 	
 	//----------------------------------------------------------------
@@ -52,15 +52,15 @@ public class AstRoot extends AstNode {
 	}
 	
 	/// setup the AST processor function stack 
-	public List<Map<String,AstNodeProcessor>> setupAstProcessorStages() {
-		List<Map<String,AstNodeProcessor>> ret = new ArrayList<Map<String,AstNodeProcessor>>();
+	public List<Map<String, AstNodeProcessor>> setupAstProcessorStages() {
+		List<Map<String, AstNodeProcessor>> ret = new ArrayList<Map<String, AstNodeProcessor>>();
 		
 		return ret;
 	}
 	
 	/// setup the stringify function map
-	public Map<String,AstNodeStringify> setupAstStringifyMap() {
-		Map<String,AstNodeStringify> ret = new HashMap<String,AstNodeStringify>();
+	public Map<String, AstNodeStringify> setupAstStringifyMap() {
+		Map<String, AstNodeStringify> ret = new HashMap<String, AstNodeStringify>();
 		ret.put("*", AstCommonFunctions.children_stringify);
 		return ret;
 	}
@@ -72,22 +72,22 @@ public class AstRoot extends AstNode {
 	//----------------------------------------------------------------
 	
 	/// Internal cached copy
-	protected List<Map<String,AstNodeProcessor>> _astProcessorStages = null;
+	protected List<Map<String, AstNodeProcessor>> _astProcessorStages = null;
 	
 	/// Internal cached copy
-	protected Map<String,AstNodeStringify> _astStringifyMap = null;
+	protected Map<String, AstNodeStringify> _astStringifyMap = null;
 	
 	/// Get the cached setupAstProcessorStages result
-	public List<Map<String,AstNodeProcessor>> astProcessorStages() {
-		if(_astProcessorStages == null) {
+	public List<Map<String, AstNodeProcessor>> astProcessorStages() {
+		if (_astProcessorStages == null) {
 			_astProcessorStages = setupAstProcessorStages();
 		}
 		return _astProcessorStages;
 	}
 	
 	/// Get the cached setupAstProcessorStages result
-	public Map<String,AstNodeStringify> astStringifyMap() {
-		if(_astStringifyMap == null) {
+	public Map<String, AstNodeStringify> astStringifyMap() {
+		if (_astStringifyMap == null) {
 			_astStringifyMap = setupAstStringifyMap();
 		}
 		return _astStringifyMap;
@@ -101,12 +101,11 @@ public class AstRoot extends AstNode {
 	
 	/// Parses a single selected stage
 	public void applySingleStage(int stageNumber) {
-		Map<String,AstNodeProcessor> stageMap = astProcessorStages().get(stageNumber);
-		if(stageMap != null) {
+		Map<String, AstNodeProcessor> stageMap = astProcessorStages().get(stageNumber);
+		if (stageMap != null) {
 			applyStageMap(stageMap);
 		}
 	}
-	
 	
 	// 
 	// ///

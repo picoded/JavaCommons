@@ -80,9 +80,10 @@ Alternatively you can loop the code compile
 Please do the following before merge-requests (hopefully jenkins will properly to do this automatically in future)
 `ant src-beautify` 
 
-Alternatively you can use the following pre-commit hook, to automate java beautifier on commit (use either of the following commands)
-	+ `ant setup` 
-	+ `ln -s ./pre-commit.sh .git/hooks/pre-commit` 
+Alternatively you can use either of the following pre-commit hook, to automate java beautifier on commit (use either of the following commands)
+
++ `ant setup` 
++ `ln -s ./pre-commit.sh .git/hooks/pre-commit` 
 
 # Some rant notes
 

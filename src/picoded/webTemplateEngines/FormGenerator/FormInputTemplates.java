@@ -100,7 +100,7 @@ public class FormInputTemplates {
 
 				DecimalFormat df = new DecimalFormat("#,###.00");
 
-				if(!addDecimal){
+				if (!addDecimal) {
 					df = showRemoveDecimal();
 				}
 
@@ -126,7 +126,7 @@ public class FormInputTemplates {
 	//show decimal places if there are
 	//do not show the decimal places if there are not decimal places
 	//returns a new DecimalFormat object
-	private static DecimalFormat showRemoveDecimal(){
+	private static DecimalFormat showRemoveDecimal() {
 
 		//if the value has a decimal(.##), then the format will new Decimal Form("#,###.00");
 

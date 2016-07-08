@@ -1,9 +1,6 @@
 package picodedTests.fileUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.*;
 import java.io.File;
 
 import org.junit.After;
@@ -61,20 +58,40 @@ public class ConfigFileSet_simple_test {
 
 		// related.ini
 		assertEquals("hi", configObj.get("related.main-include.test"));
-		assertEquals("relatedHeaderHi",configObj.get("related.relatedHeader.test"));
+		assertEquals("relatedHeaderHi", configObj.get("related.relatedHeader.test"));
 
 		// firstInnerFolder.firstInner
 		assertEquals("hello", configObj.get("firstInnerFolder.firstInner.main-include.test"));
 		assertEquals("headerHello", configObj.get("firstInnerFolder.firstInner.header.test"));
 
 		// firstInnerFolder.secondInnerFolder.secondInner
-		assertEquals("hello",configObj.get("firstInnerFolder.secondInnerFolder.secondInner.main-include.test"));
-		assertEquals("12",configObj.get("firstInnerFolder.secondInnerFolder.secondInner.main-include.number"));
+		assertEquals("hello", configObj.get("firstInnerFolder.secondInnerFolder.secondInner.main-include.test"));
+		assertEquals("12", configObj.get("firstInnerFolder.secondInnerFolder.secondInner.main-include.number"));
 		assertEquals("headerHello", configObj.get("firstInnerFolder.secondInnerFolder.secondInner.header.test"));
-		assertEquals("13",configObj.get("firstInnerFolder.secondInnerFolder.secondInner.header.number"));
+		assertEquals("13", configObj.get("firstInnerFolder.secondInnerFolder.secondInner.header.number"));
 
-//		// test json
+		//		// test json
 		assertEquals("hello", configObj.get("iniTestFileJSON.test"));
 		assertEquals("123", configObj.get("iniTestFileJSON.number"));
+	}
+
+	@Test
+	public void multiMap_firstLayerTest() {
+		assertNotNull(configObj.get("firstInnerFolder")); // should be a map
+	}
+
+	@Test
+	public void multiMapFetch() {
+		assertNotNull(configObj.getGenericConvertStringMap("firstInnerFolder")); // should be a map
+		assertNotNull(configObj.getGenericConvertStringMap("firstInnerFolder").get("secon")); // should be a map
+		assertEquals("Quarter",configObj.getGenericConvertStringMap("firstInnerFolder.secondLayerInnerFolder").get("2.test.test.test.testing"));
+		assertEquals("final",configObj.getGenericConvertStringMap("firstInnerFolder.secondLayerInnerFolder").get("2.test.test.test.test.test.test"));
+		assertEquals("foo",configObj.getGenericConvertStringMap("firstInnerFolder.second").get("main.int"));
+		assertEquals("testing",configObj.getGenericConvertStringMap("firstInnerFolder").get("secondLayerInnerFolder.2.test.teST"));
+		assertNotNull(configObj.get("firstInnerFolder.second.include"));
+		assertNull(configObj.getGenericConvertStringMap("firstInnerFolder.secondLayerInnerFolder.2.test.test.test.test.test.tesT"));
+		assertNotNull(configObj.get("firstInnerFolder.second"));
+		assertEquals("result",configObj.getGenericConvertStringMap("firstInnerFolder.second.function 1.return"));
+		assertEquals("2+1",configObj.getGenericConvertStringMap("firstInnerFolder.second.3"));
 	}
 }

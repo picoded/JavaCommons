@@ -1,4 +1,5 @@
 package picoded.programming.MultiStageAst;
+
 import java.util.function.Consumer;
 
 /// AstNodeProcessor represents the lamda function used to create

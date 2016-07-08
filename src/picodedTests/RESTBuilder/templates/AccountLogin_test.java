@@ -27,7 +27,7 @@ import picoded.conv.ConvertJSON;
 import picoded.servletUtils.EmbeddedServlet;
 import picoded.webUtils.RequestHttp;
 import picoded.webUtils.ResponseHttp;
-
+@SuppressWarnings({"unchecked","try"})
 public class AccountLogin_test {
 	
 	// Servlet setup
@@ -105,7 +105,6 @@ public class AccountLogin_test {
 	}
 	
 	@Test
-	@SuppressWarnings("unchecked")
 	public void loginTest() throws InterruptedException {
 		
 		// Setup user
@@ -179,7 +178,6 @@ public class AccountLogin_test {
 	}
 	
 	@Test
-	@SuppressWarnings("unchecked")
 	public void passwordChange() throws InterruptedException {
 		
 		// Setup user
@@ -326,7 +324,6 @@ public class AccountLogin_test {
 	}
 	
 	@Test
-	@SuppressWarnings("unchecked")
 	public void members_list_GET() { // group get function
 		// do login now
 		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");
@@ -369,7 +366,6 @@ public class AccountLogin_test {
 	}
 	
 	@Test
-	@SuppressWarnings("unchecked")
 	public void members_list_POST() {
 		// do login now
 		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");
@@ -452,7 +448,6 @@ public class AccountLogin_test {
 	}
 	
 	@Test
-	@SuppressWarnings("unchecked")
 	public void members_meta_POST() {
 		AccountObject testUser = getAndLoginUser("the-root", "is-sudo");
 		//		String userID = (String) responseMap.get("accountID");
@@ -502,19 +497,20 @@ public class AccountLogin_test {
 	}
 	
 	//Method : login, Type: GET
+	
 	@Test
 	public void loginGetTest() throws InterruptedException {
 		// Setup user
 		AccountObject testUser = accTable.newObject("the-root");
 		testUser.setPassword("is-sudo");
-
+		
 		// Credentials in request
 		HashMap<String, String[]> cred = new HashMap<String, String[]>();
 		cred.put("accountName", new String[] { "the-root" });
-
+		
 		// Wrong login attempt
 		// ---------------------------------------
-		cred.put("accountPass", new String[] { "is-sudo" }); 
+		cred.put("accountPass", new String[] { "is-sudo" });
 		assertNotNull(response = RequestHttp.post(testAddress + "/api/account/login", cred));
 		assertNotNull(responseMap = response.toMap());
 		assertNotNull(responseMap.get("accountID"));
@@ -550,7 +546,6 @@ public class AccountLogin_test {
 		
 		cred.put("accountID", new String[] { "the-changing-user" });
 		cred.put("newPassword", new String[] { "new-pass" });
-		
 		
 		String accountID = (String) (responseMap.get("accountID"));
 		HashMap<String, String[]> passwordChange = new HashMap<String, String[]>();
@@ -607,7 +602,6 @@ public class AccountLogin_test {
 		cred.put("accountID", new String[] { "the-changing-user" });
 		cred.put("newPassword", new String[] { "new-pass" });
 		
-		
 		HashMap<String, String[]> passwordChange = new HashMap<String, String[]>();
 		
 		passwordChange.put("oldPassword", new String[] { "is-old" });
@@ -658,7 +652,6 @@ public class AccountLogin_test {
 		return group;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private List<Map<String, Object>> getGroupData(String groupOID) {
 		HashMap<String, String[]> getParams = new HashMap<String, String[]>();
 		// getParams.put("accountName", new String[]{ userName });
@@ -687,7 +680,6 @@ public class AccountLogin_test {
 		return ret;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private Map<String, Object> getUserFromGroupData(String userName, List<Map<String, Object>> groupData) {
 		for (Map<String, Object> userData : groupData) {
 			Object nameRaw = userData.get("name");
@@ -701,7 +693,6 @@ public class AccountLogin_test {
 		return null;
 	}
 	
-	@SuppressWarnings("try")
 	private static boolean available(int port) {
 		if (!portAvailableCalled) {
 			try (Socket ignored = new Socket("localhost", port)) {

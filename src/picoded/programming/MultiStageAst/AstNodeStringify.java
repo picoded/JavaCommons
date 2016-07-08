@@ -1,4 +1,5 @@
 package picoded.programming.MultiStageAst;
+
 import java.util.function.Function;
 
 /// AstNodeStringify represents the lamda function used to stringify the AstNdoe

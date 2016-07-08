@@ -3,6 +3,10 @@ package picoded.page.builder;
 import java.io.*;
 import java.util.*;
 
+// JMTE inner functions add-on
+import com.floreysoft.jmte.*;
+
+// Sub modules useds
 import picoded.enums.*;
 import picoded.conv.*;
 import picoded.struct.*;
@@ -86,6 +90,40 @@ public class PageBuilderCore {
 		this(new File(inPagesFolder), new File(inOutputFolder));
 	}
 	
+	
+	/////////////////////////////////////////////
+	//
+	// Page components building
+	//
+	/////////////////////////////////////////////
+	
+	/// JMTE named renderer for sub pages
+	protected class pageComponent_nr implements NamedRenderer {
+		@Override
+		public RenderFormatInfo getFormatInfo() {
+			return null;
+		}
+		
+		@Override
+		public String getName() {
+			return "pageComponent";
+		}
+		
+		@Override
+		public Class<?>[] getSupportedClasses() {
+			return new Class<?>[] { (new Object()).getClass() };
+		}
+		
+		@Override
+		public String render(Object o, String format, Locale L) {
+			if (format == null || format.length() <= 0) {
+				return null;
+			}
+			Map<String,Object> refMap = GenericConvert.toGenericConvertStringMap(o, null);
+			return buildPageInnerHTML(format, refMap).toString();
+		}
+	}
+	
 	////////////////////////////////////////////////////////////
 	//
 	// Public vars access
@@ -97,6 +135,7 @@ public class PageBuilderCore {
 	public JMTE getJMTE() {
 		if (jmteObj == null) {
 			jmteObj = new JMTE();
+			jmteObj.registerNamedRenderer(new pageComponent_nr());
 		}
 		return jmteObj;
 	}
@@ -104,6 +143,7 @@ public class PageBuilderCore {
 	/// Overides the default (if loaded) JMTE object.
 	public void setJMTE(JMTE set) {
 		jmteObj = set;
+		jmteObj.registerNamedRenderer(new pageComponent_nr());
 	}
 	
 	/// @returns Gets the protected uriRootPrefix, used internally
@@ -632,9 +672,9 @@ public class PageBuilderCore {
 			rawPageName = rawPageName.trim();
 		}
 		
-		if(rawPageName.equalsIgnoreCase("/")) {
+		if (rawPageName.equalsIgnoreCase("/")) {
 			rawPageName = "";
-		} 
+		}
 		
 		// The current folder to scan
 		File folder = new File(pagesFolder, rawPageName);
@@ -652,12 +692,13 @@ public class PageBuilderCore {
 				String subPageName = pageDefine.getName();
 				
 				// Scan for sub pages
-				if( subPageName.equalsIgnoreCase("common") || subPageName.equalsIgnoreCase("index") ) {
+				if (subPageName.equalsIgnoreCase("common") || subPageName.equalsIgnoreCase("index")) {
 					buildAndOutputPage(rawPageName + subPageName);
-					if( rawPageName.length() <= 0 ) {
+					if (rawPageName.length() <= 0) {
 						//buildAndOutputPage(rawPageName + subPageName);
 					} else {
-						System.out.print("> PageBuilder[Core].buildPageFolder - WARNING, common / index nested build (\'" + rawPageName + "\', \'" + subPageName + "\'): ");
+						System.out.print("> PageBuilder[Core].buildPageFolder - WARNING, common / index nested build (\'"
+							+ rawPageName + "\', \'" + subPageName + "\'): ");
 					}
 				} else if (subPageName.equalsIgnoreCase("assets") || subPageName.equalsIgnoreCase("web-inf")) {
 					// ignoring certain reserved folders

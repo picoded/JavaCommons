@@ -23,18 +23,28 @@ import picodedTests.TestConfig;
 import picodedTests.JCache.LocalCacheSetup;
 
 ///
-/// Test Case for JCache performance of Locks
+/// Test feature implementation of elasticsearch
 ///
 public class Elasticsearch_test {
 	
 	private final static Logger LOGGER = Logger.getLogger(Elasticsearch_test.class.getName());
 	
+	// Cluster name
+	public String clusterName = null;
+	
+	// Embedded server
 	public EmbeddedElasticsearchServer esObj = null;
+	
+	// Client connection
+	ElasticsearchClient client = null;
 	
 	@Before
 	public void setUp() throws InterruptedException {
+		clusterName = TestConfig.randomTablePrefix();
+		
 		File store = new File("./test-files/tmp/elasticsearch");
-		esObj = new EmbeddedElasticsearchServer(TestConfig.randomTablePrefix(), -1, store, true);
+		esObj = new EmbeddedElasticsearchServer(clusterName, null, store, true);
+		setupClient();
 	}
 	
 	@After
@@ -43,6 +53,11 @@ public class Elasticsearch_test {
 			esObj.closeAndDelete();
 			esObj = null;
 		}
+	}
+	
+	/// To override for differentt test?
+	public void setupClient() {
+		client = esObj.ElasticsearchClient();
 	}
 	
 	// For manual debugging
@@ -92,7 +107,6 @@ public class Elasticsearch_test {
 		Map<String, Object> data = new HashMap<String, Object>();
 		
 		// Client & index setup
-		ElasticsearchClient client = esObj.ElasticsearchClient();
 		assertNotNull(client);
 		client.createIndexIfNotExists("this");
 		

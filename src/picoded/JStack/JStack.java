@@ -53,12 +53,6 @@ public class JStack extends JStruct implements JStackLayer {
 		return (_structLayers = ret);
 	}
 	
-	// Table prefixing filter ??
-	
-	// Object created timestamp prefix filter ??
-	
-	// Object GUID prefix filter ??
-	
 	//----------------------------------------------
 	// Constructor
 	//----------------------------------------------

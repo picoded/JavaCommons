@@ -138,6 +138,14 @@ public class MetaTable_test {
 		return objMap;
 	}
 	
+	HashMap<String, Object> genNumStrObj(int number, String str, int orderCol) {
+		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
+		objMap.put("num", new Integer(number));
+		objMap.put("order", new Integer(orderCol));
+		objMap.put("str_val", str);
+		return objMap;
+	}
+	
 	@Test
 	public void indexBasedTest() {
 		
@@ -418,7 +426,13 @@ public class MetaTable_test {
 	public void T50_orderByTest() {
 		
 		// Lets just rescycle old test for the names
-		indexBasedTest();
+		mtObj.append(null, genNumStrObj(1, "this", 5));
+		mtObj.append(null, genNumStrObj(2, "is", 4));
+		mtObj.append(null, genNumStrObj(3, "hello", 3));
+		mtObj.append(null, genNumStrObj(4, "world", 2));
+		mtObj.append(null, genNumStrObj(5, "program", 1));
+		mtObj.append(null, genNumStrObj(6, "in", 6));
+		mtObj.append(null, genNumStrObj(7, "this", 7));
 		
 		// Replicated a bug, where u CANNOT use orderby on a collumn your not doing a where search
 		MetaObject[] qRes = mtObj.query("str_val = ?", new String[] { "this" }, "num ASC");
@@ -441,6 +455,21 @@ public class MetaTable_test {
 		assertEquals("hello", qRes[0].get("str_val"));
 		assertEquals("world", qRes[1].get("str_val"));
 		assertEquals("program", qRes[2].get("str_val"));
+		
+		// Search
+		qRes = mtObj.query("num >= ? AND num <= ?", new Object[] { 2, 6 });
+		assertEquals(5, qRes.length);
+		
+		// Search with order by
+		qRes = mtObj.query("num >= ? AND num <= ?", new Object[] { 2, 6 }, "order ASC");
+		assertEquals(5, qRes.length);
+		// To validate results
+		
+		// Search with order by with range
+		qRes = mtObj.query("num >= ? AND num <= ?", new Object[] { 2, 6 }, "order ASC", 2, 2);
+		assertEquals(2, qRes.length);
+		
+		
 	}
 	
 	// @Test

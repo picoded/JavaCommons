@@ -29,5 +29,5 @@ do
 	echo "---------------------------------------------------------------------------------"
 	
 	#-Djava.library.path=".\build-tools\junit;.\bin\build\picodedJavaCommons-libsOnly.jar" 
-	java -cp ".\build-tools\junit\*;.\bin\build\picodedJavaCommons-libsOnly.jar;.\bin\classes" org.junit.runner.JUnitCore picodedTests."$ARG"_test
+	java -cp ".\build-tools\junit\*;.\bin\libs\*;.\bin\classes" org.junit.runner.JUnitCore picodedTests."$ARG"_test
 done

@@ -143,7 +143,6 @@ public class MetaTableApiBuilder {
 			searchParams = searchParams.substring(1, searchParams.length() - 1);
 		}
 		
-		System.out.println("params are : " + searchParams);
 		String wildcardMode = req.getString("wildcardMode", "suffix");
 		
 		String orderByStr = req.getString("orderBy");
@@ -165,6 +164,12 @@ public class MetaTableApiBuilder {
 		//failsafe
 		if (orderByStr == null || orderByStr == "") {
 			orderByStr = "\"oID\"";
+		}
+		
+		//ordering direction
+		String orderDirection = req.getString("order[0][dir]", "asc"); //datatables specific key
+		if(orderByStr != ""){
+			orderByStr += (" " + orderDirection);
 		}
 		
 		// The query to use
@@ -221,18 +226,10 @@ public class MetaTableApiBuilder {
 		}
 		res.put("recordsFiltered", recordsFiltered);
 		
-		//ordering direction
-		String orderDirection = req.getString("order[0][dir]", "asc"); //datatables specific key
-		
 		// Actual fetching of data
 		List<List<Object>> data = null;
 		try {
 			data = list_GET_and_POST_inner(draw, start, limit, headers, query, queryArgs, orderByStr, sanitiseOutput);
-			
-			if (orderDirection.equalsIgnoreCase("desc")) {
-				Collections.reverse(data);
-			}
-			
 			res.put("data", data);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -301,6 +298,8 @@ public class MetaTableApiBuilder {
 		if (_metaTableObj == null) {
 			return null;
 		}
+		
+		
 		
 		List<List<Object>> ret = new ArrayList<List<Object>>();
 		try {

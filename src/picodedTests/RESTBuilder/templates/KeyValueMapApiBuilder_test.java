@@ -153,7 +153,7 @@ public class KeyValueMapApiBuilder_test {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
 		paramsMap.put("key", new String[] { });
 		paramsMap.put("allowEmptyValue", new String[] {"false" });
-		response = RequestHttp.post(testAddress + "/api/meta-test/value", paramsMap);
+		response = RequestHttp.post(testAddress + "/api/meta-test/setValue", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNotNull("An empty value was supplied, and allowEmptyValue is false", responseMap.get("error"));
@@ -193,7 +193,7 @@ public class KeyValueMapApiBuilder_test {
 	@Test
 	public void setValueInvalidWithoutValueTest() {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
-		response = RequestHttp.post(testAddress + "/api/meta-test/value", paramsMap);
+		response = RequestHttp.post(testAddress + "/api/meta-test/setValue", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNotNull("No key was supplied", responseMap.get("error"));
@@ -202,7 +202,7 @@ public class KeyValueMapApiBuilder_test {
 	@Test
 	public void setValuesInvalidWithoutValueTest() {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
-		response = RequestHttp.post(testAddress + "/api/meta-test/values", paramsMap);
+		response = RequestHttp.post(testAddress + "/api/meta-test/setValue", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNotNull("No key was supplied", responseMap.get("error"));
@@ -213,7 +213,7 @@ public class KeyValueMapApiBuilder_test {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
 		paramsMap.put("keyValues", new String[] { });
 		paramsMap.put("allowEmptyValue", new String[] {"false" });
-		response = RequestHttp.post(testAddress + "/api/meta-test/values", paramsMap);
+		response = RequestHttp.post(testAddress + "/api/meta-test/setValue", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNotNull("An empty value was supplied, and allowEmptyValue is false", responseMap.get("error"));

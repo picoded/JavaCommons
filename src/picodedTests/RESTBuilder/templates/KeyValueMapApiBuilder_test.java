@@ -156,7 +156,18 @@ public class KeyValueMapApiBuilder_test {
 		response = RequestHttp.post(testAddress + "/api/meta-test/setValue", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
-		assertNotNull("An empty value was supplied, and allowEmptyValue is false", responseMap.get("error"));
+		assertEquals("No key was supplied", responseMap.get("error"));
+	}
+	
+	@Test
+	public void setValueInvalid1Test() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("key", new String[] { "kiy" });
+		paramsMap.put("allowEmptyValue", new String[] {"false" });
+		response = RequestHttp.post(testAddress + "/api/meta-test/setValue", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertEquals("An empty value was supplied, and allowEmptyValue is false", responseMap.get("error"));
 	}
 	
 	@Test
@@ -211,20 +222,30 @@ public class KeyValueMapApiBuilder_test {
 	@Test
 	public void setValuesInvalidTest() {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
-		paramsMap.put("keyValues", new String[] { });
+		paramsMap.put("keyValues", new String[] { "kiy" });
 		paramsMap.put("allowEmptyValue", new String[] {"false" });
 		response = RequestHttp.post(testAddress + "/api/meta-test/setValues", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
-		assertNotNull("An empty value was supplied, and allowEmptyValue is false", responseMap.get("error"));
+		assertEquals("Conversion to map object failed", responseMap.get("error"));
+	}
+	
+	@Test
+	public void setValuesValidTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("keyValues", new String[] {"{\"oop\":\"java\",\"foo\":\"class\"}"});
+		paramsMap.put("allowEmptyValue", new String[] {"false" });
+		response = RequestHttp.post(testAddress + "/api/meta-test/setValues", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNull("An empty value was supplied, and allowEmptyValue is false", responseMap.get("error"));
 	}
 	
 	@Test
 	public void setValuesTest() {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
-		paramsMap.put("keyValues", new String[] { "oop", "foo" });
+		paramsMap.put("keyValues", new String[] {"{\"oop\":\"java\",\"foo\":\"class\"}"});
 		paramsMap.put("allowEmptyValue", new String[] {"true" });
-		paramsMap.put("values", new String[] { "first", "second" });
 		response = RequestHttp.post(testAddress + "/api/meta-test/setValues", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
@@ -278,7 +299,17 @@ public class KeyValueMapApiBuilder_test {
 		response = RequestHttp.post(testAddress + "/api/meta-test/deleteValues", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
-		assertNotNull("No key array was supplied", responseMap.get("error"));
+		assertEquals("No key array was supplied", responseMap.get("error"));
+	}
+	
+	//@Test
+	public void deleteValuesInvalidArrayTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("keys", new String[] { "" });
+		response = RequestHttp.post(testAddress + "/api/meta-test/deleteValues", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertEquals("Key array supplied was empty", responseMap.get("error"));
 	}
 	
 	@Test
@@ -288,7 +319,7 @@ public class KeyValueMapApiBuilder_test {
 		response = RequestHttp.post(testAddress + "/api/meta-test/deleteValues", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
-		assertNotNull("No key array was supplied", responseMap.get("error"));
+		assertEquals("No key array was supplied", responseMap.get("error"));
 	}
 	
 	@Test
@@ -304,6 +335,7 @@ public class KeyValueMapApiBuilder_test {
 	
 	@Test
 	public void deleteValuesTest() {
+		setValuesValidTest();
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
 		paramsMap.put("keys", new String[] { "oop", "foo" });
 		response = RequestHttp.post(testAddress + "/api/meta-test/deleteValues", paramsMap);

@@ -1,14 +1,13 @@
 package picodedTests.RESTBuilder.templates;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -20,6 +19,7 @@ import org.junit.Test;
 
 import picoded.JStack.JStackException;
 import picoded.JStruct.JStruct;
+import picoded.JStruct.MetaObject;
 import picoded.JStruct.MetaTable;
 import picoded.RESTBuilder.RESTBuilder;
 import picoded.RESTBuilder.templates.MetaTableApiBuilder;
@@ -355,6 +355,43 @@ public class MetaTableApiBuilderTomcat_test {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
 		response = RequestHttp.post("http://127.0.0.1:" + port + "/api/meta-test/csv", paramsMap);
 		assertNotNull(response);
+	}
+	
+	@Test
+	public void meta_POSTInvalidTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("_oid", new String[] { _oids.get(0) });
+		response = RequestHttp.post("http://127.0.0.1:" + port + "/api/meta-test/meta", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertEquals("No meta object was found in the request", responseMap.get("error"));
+	}
+	
+	@Test
+	public void meta_POSTTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("_oid", new String[] { _oids.get(0) });
+		paramsMap.put("meta", new String[] { "{\"oop\":\"java\",\"foo\":\"class\"}" });
+		response = RequestHttp.post("http://127.0.0.1:" + port + "/api/meta-test/meta", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNull("No meta object was found in the request", responseMap.get("error"));
+		LinkedHashMap updatedMObj = (LinkedHashMap)responseMap.get("updateMeta");
+		assertEquals("java", updatedMObj.get("oop"));
+	}
+	
+	@Test
+	public void meta_POSTAllParamTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("_oid", new String[] { _oids.get(0) });
+		paramsMap.put("meta", new String[] { "{\"oop\":\"java\",\"foo\":\"class\"}" });
+		paramsMap.put("updateMode", new String[] { "updateMode" });
+		response = RequestHttp.post("http://127.0.0.1:" + port + "/api/meta-test/meta", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNull("No meta object was found in the request", responseMap.get("error"));
+		LinkedHashMap updatedMObj = (LinkedHashMap)responseMap.get("updateMeta");
+		assertEquals("java", updatedMObj.get("oop"));
 	}
 	
 }

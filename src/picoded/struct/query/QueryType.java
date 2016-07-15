@@ -1,6 +1,8 @@
 package picoded.struct.query;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 /// Represents the variosu query types used
 ///

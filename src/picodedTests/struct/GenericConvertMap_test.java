@@ -1,15 +1,21 @@
 package picodedTests.struct;
 
 // Target test class
-import picoded.struct.GenericConvertMap;
-import picoded.struct.CaseInsensitiveHashMap;
-import picoded.struct.ProxyGenericConvertMap;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import java.util.function.BiFunction;
-
+import org.junit.After;
 // Test Case include
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+
+import picoded.struct.CaseInsensitiveHashMap;
+import picoded.struct.GenericConvertMap;
+import picoded.struct.ProxyGenericConvertMap;
 
 ///
 /// Test Case for picoded.struct.CaseInsensitiveHashMap

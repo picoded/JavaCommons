@@ -20,7 +20,6 @@ public class ProxyGenericConvertMap<K, V> extends AbstractMapDecorator<K, V> imp
 	}
 	
 	/// The static builder for the map
-	@SuppressWarnings("unchecked")
 	public static <A, B> GenericConvertMap<A, B> ensureGenericConvertMap(Map<A, B> inMap) {
 		if (inMap instanceof GenericConvertMap) { // <A,B>
 			return (GenericConvertMap<A, B>) inMap;

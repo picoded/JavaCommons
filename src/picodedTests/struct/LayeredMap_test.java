@@ -1,15 +1,21 @@
 package picodedTests.struct;
 
 // Target test class
-import picoded.JStruct.*;
-import picoded.struct.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-// Test Case include
-import org.junit.*;
-import static org.junit.Assert.*;
-
+import java.util.HashMap;
 // other includes
-import java.util.*;
+import java.util.Map;
+
+import org.junit.After;
+// Test Case include
+import org.junit.Before;
+import org.junit.Test;
+
+import picoded.struct.LayeredMap;
 
 ///
 /// Test Case for picoded.struct.LayeredMap

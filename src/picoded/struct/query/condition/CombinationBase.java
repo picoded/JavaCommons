@@ -1,9 +1,11 @@
 package picoded.struct.query.condition;
 
-import picoded.struct.query.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import java.util.function.*;
-import java.util.*;
+import picoded.struct.query.Query;
+import picoded.struct.query.QueryType;
 
 /// Acts as the base for all conditional types,
 ///

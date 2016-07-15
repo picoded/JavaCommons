@@ -18,29 +18,35 @@
 //package renamed
 package picodedTests.struct;
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.output.StringBuilderWriter;
-//import static org.hamcrest.number.OrderingComparison.*;
-import org.junit.Assert;
-
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
+
+
+//import static org.hamcrest.number.OrderingComparison.*;
+import org.junit.Assert;
 import org.junit.Test;
-import org.lesscss.deps.org.apache.commons.io.IOUtils;
 
 import picoded.struct.StreamBuffer;
 
+
+@SuppressWarnings({"unused", "resource"})
 public class StreamBuffer_test {
 	
 	/**
@@ -56,6 +62,7 @@ public class StreamBuffer_test {
 		(new java.util.Random()).nextBytes(byteArr);
 		return byteArr;
 	}
+	
 	
 	private byte randomByte() {
 		return randomByteArray(1)[0];
@@ -190,6 +197,7 @@ public class StreamBuffer_test {
 		assertEquals(t2[1], 6);
 		assertEquals(t2[2], 6);
 	}
+	
 	
 	@Test
 	public void testLoopedRoundtrip() throws IOException {

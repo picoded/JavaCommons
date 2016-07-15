@@ -1,10 +1,23 @@
 package picoded.struct.query.internal;
 
-import java.util.*;
-import picoded.conv.*;
-import picoded.struct.*;
-import picoded.struct.query.*;
-import picoded.struct.query.condition.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import picoded.struct.MutablePair;
+import picoded.struct.query.Query;
+import picoded.struct.query.condition.And;
+import picoded.struct.query.condition.Equals;
+import picoded.struct.query.condition.LessThan;
+import picoded.struct.query.condition.LessThanOrEquals;
+import picoded.struct.query.condition.Like;
+import picoded.struct.query.condition.MoreThan;
+import picoded.struct.query.condition.MoreThanOrEquals;
+import picoded.struct.query.condition.Not;
+import picoded.struct.query.condition.NotEquals;
+import picoded.struct.query.condition.Or;
 
 /// Internal utilty function for string query filtering,
 /// used before breaking by whitespace and tokenizing it.
@@ -290,6 +303,7 @@ public class QueryFilter {
 	/// @params  Current list of Query and string tokens
 	///
 	/// @returns  {int[2]}  an array consisting of the left and right position. -1 if not found
+	@SuppressWarnings("unused")
 	public static int[] findCompleteEnclosure(List<Object> queryTokens) {
 		
 		// Gets the start and end

@@ -1,16 +1,6 @@
 package picoded.struct;
 
 import java.util.HashMap;
-import java.util.UUID;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Collection;
-import java.util.function.BiFunction;
-
-import java.lang.reflect.TypeVariable;
-
-import picoded.conv.GenericConvert;
 
 ///
 /// HashMap implmentation of GenericConvertMap. 
@@ -30,5 +20,6 @@ import picoded.conv.GenericConvert;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
+@SuppressWarnings("serial")
 public class GenericConvertHashMap<K, V> extends HashMap<K, V> implements GenericConvertMap<K, V> {
 }

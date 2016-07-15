@@ -1,18 +1,25 @@
 package picodedTests.struct.query.condition;
 
 // Target test class
-import picoded.struct.query.condition.*;
-import picoded.struct.query.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.After;
 // Test Case include
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.Assert.*;
-
-import java.text.Collator;
-import java.text.NumberFormat;
-import java.text.RuleBasedCollator;
-import java.util.*;
+import picoded.struct.query.Query;
+import picoded.struct.query.condition.Equals;
+import picoded.struct.query.condition.LessThan;
+import picoded.struct.query.condition.LessThanOrEquals;
+import picoded.struct.query.condition.Like;
+import picoded.struct.query.condition.MoreThan;
+import picoded.struct.query.condition.MoreThanOrEquals;
 
 ///
 /// Test Case for picoded.struct.query.condition.*
@@ -233,7 +240,7 @@ public class AllConditions_test {
 		
 		assertNotNull(cond);
 		assertTrue(cond.test(sample_a));
-		assertTrue(cond.test(sample_b));
+		assertFalse(cond.test(sample_b));
 		
 		assertFalse(cond.test(sample_a, sample_d));
 		assertTrue(cond.test(sample_b, sample_d));

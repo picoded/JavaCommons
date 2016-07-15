@@ -1,12 +1,9 @@
 package picoded.struct.query.condition;
 
-import java.text.Collator;
-import java.text.NumberFormat;
-import java.text.RuleBasedCollator;
-import java.util.*;
+import java.util.Map;
 
-import picoded.struct.query.*;
-import picoded.struct.query.internal.QueryUtils;
+import picoded.struct.query.CompareUtils;
+import picoded.struct.query.QueryType;
 
 public class LessThan extends ConditionBase {
 	

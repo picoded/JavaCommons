@@ -1,6 +1,5 @@
 package picoded.struct;
 
-import java.util.Map;
 
 ///
 /// @TODO implementation
@@ -30,12 +29,13 @@ import java.util.Map;
 ///
 /// *Total = 54 bytes*
 ///
-@SuppressWarnings("deprecation")
+@SuppressWarnings("unused")
 @Deprecated
 public class RadixByteTrie<V> /* implements Map<K,V> */{
 	
 	/// Parent node above this tree node.
 	/// if this is null, node is considered root
+	
 	private RadixByteTrie<V> parentNode = null;
 	
 	/// Stored value of the node, if any

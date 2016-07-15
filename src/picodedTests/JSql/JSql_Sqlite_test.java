@@ -625,7 +625,7 @@ public class JSql_Sqlite_test {
 		String s = JSqlObj.genericSqlParser("SELECT * FROM " + testTableName + " WHERE COL1 = ?");
 		assertEquals("SELECT * FROM " + testTableName + " WHERE COL1=?", s);
 	}
-	
+	@SuppressWarnings("deprecation")
 	@Test
 	public void joinArgumentsTest() throws JSqlException {
 		Object[] array1 = new Object[] {1, 2, 3};

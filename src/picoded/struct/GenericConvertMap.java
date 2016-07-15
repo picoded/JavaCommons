@@ -1,14 +1,9 @@
 package picoded.struct;
 
-import java.util.HashMap;
-import java.util.UUID;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Collection;
+import java.util.UUID;
 import java.util.function.BiFunction;
-
-import java.lang.reflect.TypeVariable;
 
 import picoded.conv.GenericConvert;
 
@@ -27,6 +22,7 @@ import picoded.conv.GenericConvert;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
+@SuppressWarnings("hiding")
 public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 
 	// to string conversion
@@ -337,6 +333,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	/// @param key       The input value key to convert
 	///
 	/// @returns         The converted Map if possible, else null
+	
 	@Deprecated
 	public default <K extends String, V> Map<K, V> toStringMap(K key) {
 		return GenericConvert.toStringMap(get(key));

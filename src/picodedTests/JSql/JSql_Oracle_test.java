@@ -544,6 +544,7 @@ public class JSql_Oracle_test {
 		JSqlObj.createTableIndexQuerySet(testTableName, "col2", "DESC", "IDX");
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Test
 	public void joinArgumentsTest() throws JSqlException {
 		Object[] array1 = new Object[] {1, 2, 3};

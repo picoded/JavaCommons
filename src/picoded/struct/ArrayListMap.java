@@ -1,11 +1,15 @@
 package picoded.struct;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 ///
 /// Provides a HashMap<K,A ArrayList<V>>,
 /// with utility functions to edit records
 ///
+@SuppressWarnings("serial")
 public class ArrayListMap<K, V> extends HashMap<K, ArrayList<V>> {
 	
 	/// Blank constructor

@@ -280,4 +280,81 @@ public class MetaTableApiBuilderTomcat_test {
 		return true;
 	}
 	
+	@Test
+	public void list_GET_and_POST_AllBlankTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		response = RequestHttp.get("http://127.0.0.1:" + port + "/api/meta-test/list", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNull(responseMap.get("error"));
+		assertNotNull(responseMap.get("data"));
+	}
+	
+	@Test
+	public void list_GET_and_POSTTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("caseSensitive", new String[] { "true" });
+		paramsMap.put("queryColumns", new String[] { "_name", "_age" });
+		paramsMap.put("searchValue", new String[] { "abc", "def", "xyz" });
+		response = RequestHttp.get("http://127.0.0.1:" + port + "/api/meta-test/list", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNull(responseMap.get("error"));
+		assertNotNull(responseMap.get("data"));
+	}
+	
+	@Test
+	public void list_GET_and_POSTOrderByTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("caseSensitive", new String[] { "true" });
+		paramsMap.put("queryColumns", new String[] { "_name", "_age" });
+		paramsMap.put("searchValue", new String[] { "xyz" });
+		paramsMap.put("orderBy", new String[] { "_name" });
+		response = RequestHttp.get("http://127.0.0.1:" + port + "/api/meta-test/list", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNull(responseMap.get("error"));
+		assertNotNull(responseMap.get("data"));
+		assertNotNull(responseMap.get("draw"));
+		assertNotNull(responseMap.get("headers"));
+	}
+	
+	@Test
+	public void list_GET_and_POSTQueryTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("caseSensitive", new String[] { "true" });
+		paramsMap.put("queryColumns", new String[] { "_name", "_oid" });
+		paramsMap.put("searchValue", new String[] { "xyz", "123456" });
+		paramsMap.put("queryArgs", new String[] { "25", "65" });
+		paramsMap.put("orderBy", new String[] { "_name" });
+		paramsMap.put("query", new String[] { "_age > ? AND _age < ? " });
+		response = RequestHttp.post("http://127.0.0.1:" + port + "/api/meta-test/list", paramsMap);
+		assertNotNull(response);
+		assertNotNull(responseMap = response.toMap());
+		assertNull(responseMap.get("error"));
+		assertNotNull(responseMap.get("data"));
+		assertNotNull(responseMap.get("draw"));
+		assertNotNull(responseMap.get("headers"));
+	}
+	
+	@Test
+	public void csv_exportAllParamest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		paramsMap.put("caseSensitive", new String[] { "true" });
+		paramsMap.put("queryColumns", new String[] { "_name", "_oid" });
+		paramsMap.put("searchValue", new String[] { "xyz", "123456" });
+		paramsMap.put("queryArgs", new String[] { "25", "65" });
+		paramsMap.put("orderBy", new String[] { "_name" });
+		paramsMap.put("query", new String[] { "_age > ? AND _age < ? " });
+		response = RequestHttp.get("http://127.0.0.1:" + port + "/api/meta-test/csv", paramsMap);
+		assertNotNull(response);
+	}
+	
+	@Test
+	public void csv_exportRESTTest() {
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		response = RequestHttp.post("http://127.0.0.1:" + port + "/api/meta-test/csv", paramsMap);
+		assertNotNull(response);
+	}
+	
 }

@@ -1,7 +1,5 @@
 package picoded.struct;
 
-import java.util.List;
-import java.util.ArrayList;
 
 /// Java MutablePair implementation
 ///
@@ -15,6 +13,7 @@ import java.util.ArrayList;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
+@SuppressWarnings("serial")
 public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePair<L, R> /*implements List<Object> */{
 	
 	public MutablePair() {

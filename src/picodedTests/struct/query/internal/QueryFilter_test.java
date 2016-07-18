@@ -1,18 +1,19 @@
 package picodedTests.struct.query.internal;
 
 // Target test class
-import picoded.struct.query.condition.*;
-import picoded.struct.query.internal.*;
-import picoded.struct.query.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.After;
 // Test Case include
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
-import java.util.*;
-import picoded.struct.*;
-import picoded.struct.query.*;
-import picoded.struct.query.internal.*;
+import picoded.struct.MutablePair;
+import picoded.struct.query.internal.QueryFilter;
 
 ///
 /// Test Case for picoded.struct.query.condition.*

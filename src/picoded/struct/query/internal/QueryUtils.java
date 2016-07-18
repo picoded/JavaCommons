@@ -1,10 +1,8 @@
 package picoded.struct.query.internal;
 
 import java.text.NumberFormat;
-import java.util.function.*;
-import java.util.*;
-
-import picoded.struct.query.*;
+import java.util.Locale;
+import java.util.Map;
 
 public class QueryUtils {
 	
@@ -18,6 +16,7 @@ public class QueryUtils {
 	///
 	/// @returns  The extracted object
 	///
+	@SuppressWarnings("rawtypes")
 	public static Object getFieldValue(Object t, String field) {
 		if (field == null || field.toString().equalsIgnoreCase("this")) {
 			return t;

@@ -1,14 +1,15 @@
 package picoded.struct;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import picoded.conv.MapValueConv;
 
 /// Convinent class, for creating a Map containing list values, and appending them
+@SuppressWarnings("serial")
 public class HashMapList<K, V> extends HashMap<K, List<V>> implements GenericConvertMap<K, List<V>> {
 	
 	/// Appends the value to the inner list, creating a new ArrayList if needed

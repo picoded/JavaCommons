@@ -30,8 +30,7 @@ package picoded.struct;
 ///
 /// *Total = 29 bytes*
 ///
-@SuppressWarnings("deprecation")
-@Deprecated
+@SuppressWarnings("unused")
 public class ByteKeyArray<V> /* implements Map<K,V> */{
 	
 	//---------------------------------------------

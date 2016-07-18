@@ -314,7 +314,7 @@ public class GenericConvertArrayList_test {
 		list.add("aa");
 		list.add("bb");
 		convertArrayList.add(list);
-		assertEquals(list, convertArrayList.getObjectList(1));
+		assertEquals(list, convertArrayList.getObjectList(0, list));
 	}
 	
 	@Test

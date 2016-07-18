@@ -1,14 +1,10 @@
 package picoded.struct.query;
 
-import java.util.function.*;
-import java.util.*;
-
 import java.text.Collator;
-import java.text.RuleBasedCollator;
 import java.text.NumberFormat;
 import java.text.ParseException;
-
-import picoded.struct.query.internal.*;
+import java.text.RuleBasedCollator;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

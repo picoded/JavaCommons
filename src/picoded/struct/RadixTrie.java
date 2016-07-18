@@ -1,6 +1,5 @@
 package picoded.struct;
 
-import java.util.Map;
 import java.util.HashMap;
 
 ///
@@ -18,7 +17,6 @@ import java.util.HashMap;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
-@SuppressWarnings("deprecation")
 @Deprecated
 public class RadixTrie<K, V> extends HashMap<K, V> /* implements Map<K,V> */{
 	

@@ -1,16 +1,15 @@
 package picodedTests.struct;
 
 // Target test class
-import picoded.struct.*;
+import static org.junit.Assert.assertEquals;
 
+import org.junit.After;
 // Test Case include
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
+import picoded.struct.ByteKeyArray;
 // Test depends
-import java.nio.charset.Charset;
-import java.lang.String;
-import java.io.UnsupportedEncodingException;
 
 ///
 /// Test Case for picoded.struct.ByteKeyArray

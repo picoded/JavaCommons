@@ -1,7 +1,6 @@
 package picoded.struct;
 
 import java.util.Map;
-import java.util.HashMap;
 
 /// Case Insensitive HashMap, useful for various things.
 /// Normalizes, stores, and retrives all keys in lowercase.

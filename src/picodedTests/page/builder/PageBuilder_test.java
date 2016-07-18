@@ -1,4 +1,4 @@
-package picodedTests.webTemplateEngines.PageBuilder;
+package picodedTests.page.builder;
 
 import java.io.*;
 import java.util.*;
@@ -21,8 +21,8 @@ public class PageBuilder_test {
 	// Test directory define
 	//------------------------------------------------------------------------
 	
-	protected String templateTestDir = "test-files/test-specific/webTemplateEngines/PageBuilder/";
-	protected String outputTestDir = "test-files/tmp/webTemplateEngines/PageBuilder/";
+	protected String templateTestDir = "test-files/test-specific/page/builder/";
+	protected String outputTestDir = "test-files/tmp/page/builder/";
 	protected String basicTemplateDir = templateTestDir + "basic-test-pages/";
 	
 	// Test vars
@@ -117,5 +117,14 @@ public class PageBuilder_test {
 			"Hello pageFrame_nested_page") > 0);
 		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "nested/two/page/index.html")).indexOf(
 			"Hello pageFrame_nested_two_page") > 0);
+	}
+	
+	@Test 
+	public void componentsMapTest() {
+		constructorTest();
+		
+		assertEquals("Hello ${PageFrameID}", pages.buildPageComponentMap().getSubMap("nested").getSubMap("page").get("html") );
+		assertEquals("Hello ${PageFrameID}", pages.buildPageComponentMap().getSubMap("nested").getSubMap("two").getSubMap("page").get("html") );
+		assertNotNull( pages.buildPageComponentMap().getSubMap("components").getSubMap("utils").getSubMap("IEWarning").get("html") );
 	}
 }

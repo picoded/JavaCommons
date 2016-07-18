@@ -200,6 +200,29 @@ public class JMTE {
 		}
 	}
 	
+	/// [protected] internal unixTimeToFormat NamedRanderer for jmte implementation
+	protected static class toString implements NamedRenderer {
+		@Override
+		public RenderFormatInfo getFormatInfo() {
+			return null;
+		}
+		
+		@Override
+		public String getName() {
+			return "toString";
+		}
+		
+		@Override
+		public Class<?>[] getSupportedClasses() {
+			return new Class<?>[] { Object.class };
+		}
+		
+		@Override
+		public String render(Object o, String format, Locale L) {
+			return GenericConvert.toString(o, format);
+		}
+	}
+	
 	/// [protected] internal unixTimeToDisplayTime NamedRanderer for jmte implementation
 	protected static class escapeHtml implements NamedRenderer {
 		@Override
@@ -254,6 +277,7 @@ public class JMTE {
 		registerNamedRenderer(new unixTimeToDisplayTime());
 		registerNamedRenderer(new unixTimeToFormat());
 		
+		registerNamedRenderer(new toString());
 		registerNamedRenderer(new escapeHtml());
 		registerNamedRenderer(new encodeURI());
 	}

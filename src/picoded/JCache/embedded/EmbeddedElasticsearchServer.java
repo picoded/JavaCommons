@@ -20,11 +20,11 @@ public class EmbeddedElasticsearchServer {
 	
 	///
 	/// @param  The cluster name
-	/// @param  The HTTP API port if required, use -1 for auto
+	/// @param  The HTTP API port range if required, use null for default 9200/9300
 	/// @param  Persistent inHomeDir location, use NULL to use pure in-memory (not recommended)
 	/// @param  Restrict the server to local cluster mode, meaning no cluster networking
 	/// 
-	public EmbeddedElasticsearchServer(String clustername, int port, File inHomeDir, boolean localCluster) {
+	public EmbeddedElasticsearchServer(String clustername, String portRange, File inHomeDir, boolean localCluster) {
 		Settings.Builder elasticsearchSettings = Settings.builder();
 		
 		//
@@ -34,13 +34,13 @@ public class EmbeddedElasticsearchServer {
 			elasticsearchSettings.put("cluster.name", clustername);
 		}
 		
-		if (port <= 0) {
-			// Automate the port assignment : 9300 and above
+		if (portRange == null) {
+			// Automate the port assignment : 9200 (http) and 9300 (protocall)
 			elasticsearchSettings.put("http.port", "9200-9300");
-			elasticsearchSettings.put("http.enabled", "true");
-		} else if (port > 0) {
-			elasticsearchSettings.put("http.port", "" + port);
-			elasticsearchSettings.put("http.enabled", "true");
+			elasticsearchSettings.put("http.enabled", true);
+		} else {
+			elasticsearchSettings.put("http.port", portRange);
+			elasticsearchSettings.put("http.enabled", true);
 		}
 		
 		// Node inHomeDir

@@ -3,14 +3,14 @@ package picoded.fileUtils;
 ///
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ini4j.Ini;
 
+import picoded.conv.GenericConvert;
 import picoded.conv.ConvertJSON;
 import picoded.struct.GenericConvertMap;
 
@@ -41,25 +41,25 @@ import picoded.struct.GenericConvertMap;
 ///
 public class ConfigFile implements GenericConvertMap<String, Object> {
 	
-	// / The actual inner map storage
+	/// The actual inner map storage
 	Ini iniMap = null;
-	Map<String, Object> jsonMap = null;
+	GenericConvertMap<String, Object> jsonMap = null;
 	
 	boolean jsonMode = false;
 	
 	String fileName = "";
 	
-	// / Blank constructor
+	/// Blank constructor
 	protected ConfigFile() {
 		
 	}
 	
-	// / Constructor, which takes in an INI file object and stores it
+	/// Constructor, which takes in an INI file object and stores it
 	public ConfigFile(File fileObj) {
 		innerConstructor(fileObj);
 	}
 	
-	// / Constructor, which takes in an INI file path and stores it
+	/// Constructor, which takes in an INI file path and stores it
 	public ConfigFile(String filePath) {
 		innerConstructor(new File(filePath));
 	}
@@ -69,14 +69,8 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 			fileName = inFile.getName();
 			if (fileName.endsWith(".js") || fileName.endsWith(".json")) {
 				jsonMode = true;
-				jsonMap = new HashMap<String, Object>();
-				
 				String jsString = FileUtils.readFileToString(inFile);
-				jsonMap = ConvertJSON.toMap(jsString);
-				
-				for (String key : jsonMap.keySet()) {
-					jsonMap.put(key, jsonMap.get(key));
-				}
+				jsonMap = GenericConvert.toGenericConvertStringMap(jsString, new HashMap<String, Object>());
 			} else {
 				iniMap = new Ini(inFile);
 			}
@@ -89,13 +83,13 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 		return fileName;
 	}
 	
-	// / Gets the config value string, from the file
+	/// Gets the config value string, from the file
 	public Object get(Object key) {
-		if (jsonMode) {
-			return getJson(key, jsonMap);
+		String keyString = key.toString();
+		if (jsonMode) { 
+			return jsonMap.getNestedObject(keyString);
 		} else {
 			// read from ini
-			String keyString = key.toString();
 			String[] splitKeyString = keyString.split("\\.");
 			
 			String section = StringUtils.join(ArrayUtils.subarray(splitKeyString, 0, splitKeyString.length - 1), "."); // name
@@ -108,23 +102,14 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	private Object getJson(Object key, Object currentResult) {
-		String keyString = key.toString();
-		
-		Map<String, Object> currentResultMap = null;
-		if (currentResult instanceof Map) {
-			currentResultMap = (Map<String, Object>) currentResult;
-		}
-		
-		if (keyString.contains(".")) {
-			String jsonKey = keyString.substring(0, keyString.indexOf("."));
-			String jsonKeyRemainder = keyString.substring(keyString.indexOf(".") + 1, keyString.length());
-			
-			Object jsonObj = currentResultMap.get(jsonKey);
-			return getJson(jsonKeyRemainder, jsonObj);
+	///
+	/// Top layer keySet fetching
+	///
+	public Set<String> keySet() {
+		if (jsonMode) {
+			return jsonMap.keySet();
 		} else {
-			return currentResultMap.get(keyString);
+			return iniMap.keySet();
 		}
 	}
 }

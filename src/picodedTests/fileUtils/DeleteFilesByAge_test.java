@@ -48,10 +48,10 @@ public class DeleteFilesByAge_test {
 		// (new File("./test-files/tmp/newerFile.txt")).delete();
 	}
 	
-	// / Test the following functions
+	/// Test the following functions
 	// /
-	// / + DeleteFilesByAge.olderThenGivenAgeInSeconds
-	// / + DeleteFilesByAge.olderThenUnixTimestamp (via
+	/// + DeleteFilesByAge.olderThenGivenAgeInSeconds
+	/// + DeleteFilesByAge.olderThenUnixTimestamp (via
 	// olderThenGivenAgeInSeconds)
 	@Test
 	public void basicFileAgeTesting() {

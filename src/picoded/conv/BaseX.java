@@ -40,7 +40,7 @@ public class BaseX {
 	protected HashMap<Integer, Integer> bitToStringCache = null;
 	protected HashMap<Integer, Integer> stringToBitCache = null;
 	
-	// / Builds the object with the custom charspace
+	/// Builds the object with the custom charspace
 	public BaseX(String customCharset) {
 		if (customCharset == null || customCharset.length() <= 1) {
 			throw new IllegalArgumentException("Charset needs atleast 2 characters");
@@ -61,32 +61,32 @@ public class BaseX {
 		}
 	}
 	
-	// / Returns the current charspace
+	/// Returns the current charspace
 	public String charset() {
 		return inCharset;
 	}
 	
 	// /
-	// / Calculate the String length needed for the given bit count,
+	/// Calculate the String length needed for the given bit count,
 	// /
-	// / The following is the condition needed to be met with the lowest N
-	// / value to the given bit length, to satisfy the condition.
+	/// The following is the condition needed to be met with the lowest N
+	/// value to the given bit length, to satisfy the condition.
 	// /
-	// / (2^B) - (X^N) <= 0
+	/// (2^B) - (X^N) <= 0
 	// /
-	// / B - the Bit length count
-	// / X - the Base numeric length
-	// / N - the Required string length (the return value)
+	/// B - the Bit length count
+	/// X - the Base numeric length
+	/// N - the Required string length (the return value)
 	// /
 	public int bitToStringLength(int bitlength) {
 		int n = 1;
 		
-		// / Load from Memoization cache
+		/// Load from Memoization cache
 		if (bitToStringCache.containsKey(bitlength)) {
 			return bitToStringCache.get(bitlength);
 		}
 		
-		// / Derive the n value
+		/// Derive the n value
 		BigInteger base = base2BigInteger.pow(bitlength);
 		BigInteger comp = inCharsetLength; // (BigInteger.valueOf(x));
 		
@@ -96,24 +96,24 @@ public class BaseX {
 			// divd = inCharsetLength.pow(n);
 		}
 		
-		// / Store into the Memoization cache
+		/// Store into the Memoization cache
 		bitToStringCache.put(bitlength, n);
 		
 		return n;
 	}
 	
 	// /
-	// / Calculate the maximum bit length possible for the given string length
+	/// Calculate the maximum bit length possible for the given string length
 	// /
 	public int stringToBitLength(int stringLength) {
 		int n = 1;
 		
-		// / Load from Memoization cache
+		/// Load from Memoization cache
 		if (stringToBitCache.containsKey(stringLength)) {
 			return stringToBitCache.get(stringLength);
 		}
 		
-		// / Derive the N value
+		/// Derive the N value
 		BigInteger base = inCharsetLength.pow(stringLength);
 		BigInteger comp = base2BigInteger;
 		
@@ -124,12 +124,12 @@ public class BaseX {
 		}
 		--n; // get the last known valid value
 		
-		// / Store into the Memoization cache
+		/// Store into the Memoization cache
 		stringToBitCache.put(stringLength, n);
 		return n;
 	}
 	
-	// / Conversion from string to byte array to baseX string
+	/// Conversion from string to byte array to baseX string
 	public String encode(byte[] bArr) {
 		
 		// Variables setup
@@ -151,24 +151,24 @@ public class BaseX {
 		return ret.toString();
 	}
 	
-	// / Conversion from encoded string to the byte array, note that if the
+	/// Conversion from encoded string to the byte array, note that if the
 	// maximum value of the custom base,
-	// / does not match standard byte spacing, the final byte array count may be
+	/// does not match standard byte spacing, the final byte array count may be
 	// higher then actually needed.
 	// /
-	// / Use the byteLength varient, if the exact byte space is known before
+	/// Use the byteLength varient, if the exact byte space is known before
 	// hand
 	public byte[] decode(String encodedString) {
 		return decode(encodedString, -1);
 	}
 	
-	// / The byteLength varients outputs the data up to the given size. Note
+	/// The byteLength varients outputs the data up to the given size. Note
 	// that prefix extra bits will be loss
-	// / if encoded string value is larger then the byteLength can hold.
+	/// if encoded string value is larger then the byteLength can hold.
 	// Similarly, blank byte values will preced
-	// / if byteLength is larger then the actual encoded value.
+	/// if byteLength is larger then the actual encoded value.
 	// /
-	// / byteLength of -1, will use the automatically derived byte length base
+	/// byteLength of -1, will use the automatically derived byte length base
 	// on the string length.
 	public byte[] decode(String encodedString, int byteLength) {
 		
@@ -252,22 +252,22 @@ public class BaseX {
 	// MD5, SHA1 hashing support utility functions
 	// -----------------------------------------------
 	
-	// / Hashes the input byte array, into the baseX format
+	/// Hashes the input byte array, into the baseX format
 	public String md5hash(byte[] byteArr) {
 		return encode(DigestUtils.md5(byteArr));
 	}
 	
-	// / Hashes the input string, into the baseX format
+	/// Hashes the input string, into the baseX format
 	public String md5hash(String str) {
 		return encode(DigestUtils.md5(str));
 	}
 	
-	// / Hashes the input byte array, into the baseX format
+	/// Hashes the input byte array, into the baseX format
 	public String sha1hash(byte[] byteArr) {
 		return encode(DigestUtils.sha1(byteArr));
 	}
 	
-	// / Hashes the input string, into the baseX format
+	/// Hashes the input string, into the baseX format
 	public String sha1hash(String str) {
 		return encode(DigestUtils.sha1(str));
 	}

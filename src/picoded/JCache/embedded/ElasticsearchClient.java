@@ -16,8 +16,12 @@ import org.elasticsearch.index.query.*;
 import org.elasticsearch.indices.*;
 import org.elasticsearch.action.search.*;
 import org.elasticsearch.search.*;
+import org.elasticsearch.client.transport.*;
+import org.elasticsearch.common.transport.*;
 
 import java.util.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.concurrent.ExecutionException;
 
 ///
@@ -40,6 +44,31 @@ public class ElasticsearchClient {
 	public ElasticsearchClient(Client inClient) {
 		client = inClient;
 		admin = client.admin();
+	}
+	
+	public ElasticsearchClient(String clustername, String host, int port) {
+		this(buildRawClient(clustername, host, port));
+	}
+	
+	protected static TransportClient buildRawClient(String clustername, String host, int port) {
+		try {
+			// Setup config file
+			Settings.Builder elasticsearchSettings = Settings.builder();
+			if (clustername != null && clustername.length() > 0) {
+				elasticsearchSettings.put("cluster.name", clustername);
+			}
+			elasticsearchSettings.put("http.enabled", true);
+			
+			// Build client connection obj
+			TransportClient inClient = TransportClient.builder().settings(elasticsearchSettings.build()).build();
+			
+			// Does the actual connection
+			inClient.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
+			
+			return inClient;
+		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	//----------------------------------------------------------------------------

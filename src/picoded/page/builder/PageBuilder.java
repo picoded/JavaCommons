@@ -90,11 +90,26 @@ public class PageBuilder extends PageBuilderCore {
 	//
 	////////////////////////////////////////////////////////////
 	
+	/// Build depenecy files, this should only be called after all the various standard pages are built
+	protected void buildDependency() {
+		try {
+			FileUtils.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.less"), null /*"UTF-8"*/, dependencyLess());
+			FileUtils.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.css"), null /*"UTF-8"*/, dependencyCss());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	/// Scans and builds all the pages
 	///
 	/// @return  Returns itself
 	public PageBuilder buildAllPages() {
+		// Recusively build all pages
 		buildPageFolder("");
+		
+		// Build the depency
+		buildDependency();
+		
 		// End and returns self
 		return this;
 	}

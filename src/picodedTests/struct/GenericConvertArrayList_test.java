@@ -31,9 +31,9 @@ public class GenericConvertArrayList_test {
 	public void tearDown() {
 	}
 
-	// / The following, test severals assumptions regarding Object[] instanceof
+	/// The following, test severals assumptions regarding Object[] instanceof
 	// tests
-	// / done in java, this is required for the generic toXArray functions.
+	/// done in java, this is required for the generic toXArray functions.
 	@Test
 	public void arrayInstanceOfTest() {
 		String sample = "a";
@@ -43,7 +43,7 @@ public class GenericConvertArrayList_test {
 		Object[] objArr = new Object[] { "1", "2", "3" };
 		Integer[] intArr = new Integer[] { 1, 2, 3 };
 
-		// / String array tests
+		/// String array tests
 		assertTrue((strArr instanceof Object[]));
 		assertTrue(((Object) strArr instanceof Object));
 
@@ -52,7 +52,7 @@ public class GenericConvertArrayList_test {
 		assertFalse(((Object) strArr instanceof String));
 		assertFalse(((Object) strArr instanceof Integer));
 
-		// / Integer array tests
+		/// Integer array tests
 		assertTrue((intArr instanceof Object[]));
 		assertTrue(((Object) intArr instanceof Object));
 
@@ -61,7 +61,7 @@ public class GenericConvertArrayList_test {
 		assertFalse(((Object) intArr instanceof String));
 		assertFalse(((Object) intArr instanceof Integer));
 
-		// / Object array tests
+		/// Object array tests
 		assertTrue((objArr instanceof Object[]));
 		assertTrue(((Object) objArr instanceof Object));
 

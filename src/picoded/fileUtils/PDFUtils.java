@@ -104,8 +104,8 @@ public class PDFUtils {
 	}
 	
 	// /
-	// / Taken from http://itextpdf.com/examples/iia.php?id=128
-	// / Takes an input pdf, and outputs to a different location with page
+	/// Taken from http://itextpdf.com/examples/iia.php?id=128
+	/// Takes an input pdf, and outputs to a different location with page
 	// numbering
 	// /
 	public static void numberPDFPages(File pdfToNumber, File outputFile) throws DocumentException, IOException,

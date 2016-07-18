@@ -34,13 +34,13 @@ public class TempFolder {
 		public Boolean apply(File file, Object input);
 	}
 	
-	// / default to 48 hours i.e. 172800 seconds
+	/// default to 48 hours i.e. 172800 seconds
 	private final static int file_outdated_hours = 48;
 	
-	// / temp folder name to be appened in system default temp folder
+	/// temp folder name to be appened in system default temp folder
 	//	private final static String tempFolder = "piJCTemp";
 	
-	// / default temp file extension
+	/// default temp file extension
 	//	private final static String fileExtension = ".tmp";
 	
 	private final static String _javaTmpDir = "java.io.tmpdir";
@@ -119,9 +119,9 @@ public class TempFolder {
 		return newFile;
 	}
 	
-	// / Create "piJCTemp" folder under the system temp folder if not already
+	/// Create "piJCTemp" folder under the system temp folder if not already
 	// exists.
-	// / @returns File object; system temp folder path i.e. /var/tmp/piJCTemp
+	/// @returns File object; system temp folder path i.e. /var/tmp/piJCTemp
 	public File getTempFolder() throws IOException {
 		if (_tempFolder == null) {
 			String tmpDir = getSystemTempRootPath();
@@ -153,7 +153,7 @@ public class TempFolder {
 		}
 	}
 	
-	// / Temp files randomly generated names (base58 guid)
+	/// Temp files randomly generated names (base58 guid)
 	private static String getRandomUUID() {
 		return UUID.randomUUID().toString();
 	}
@@ -194,15 +194,15 @@ public class TempFolder {
 	//
 	// ///////////////////////////////////////
 	
-	// / Delete files from the temp folder older than default hours
+	/// Delete files from the temp folder older than default hours
 	public void cleanupNow() {
 		cleanupNow(file_outdated_hours);
 	}
 	
-	// / Delete files from the temp folder older than specified hours. If hours
+	/// Delete files from the temp folder older than specified hours. If hours
 	// is <=0 then default hours are considered
-	// / @param hours hours is user specific hours (1 hour or 2 ).
-	// / Before Cleanup check user hours is '< 0 or > 0' if '< 0' then hous
+	/// @param hours hours is user specific hours (1 hour or 2 ).
+	/// Before Cleanup check user hours is '< 0 or > 0' if '< 0' then hous
 	// should be default to 48 hours.
 	public void cleanupNow(int hours) {
 		if (hours <= 0) {

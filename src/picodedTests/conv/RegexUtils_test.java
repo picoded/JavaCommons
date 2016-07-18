@@ -8,7 +8,7 @@ import org.junit.Test;
 import picoded.conv.RegexUtils;
 
 public class RegexUtils_test {
-	// / Dummy constructor test
+	/// Dummy constructor test
 	protected RegexUtils regexUtils = null;
 	
 	@Before

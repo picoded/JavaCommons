@@ -385,7 +385,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	/// @param key       The input value key to convert
 	///
 	/// @returns         The converted Map if possible, else null
-	@Deprecated	
+	@Deprecated
 	public default <K extends String, V> Map<K, V> toGenericConvertStringMap(K key) {
 		return GenericConvert.toGenericConvertStringMap(get(key));
 	}
@@ -396,7 +396,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	/// @param fallbck   The fallback default (if not convertable)
 	///
 	/// @returns         The converted Map if possible, else null
-	public default <K extends String, V> Map<K, V> getGenericConvertStringMap(K key, Object fallbck) {
+	public default <K extends String, V> GenericConvertMap<K, V> getGenericConvertStringMap(K key, Object fallbck) {
 		return GenericConvert.toGenericConvertStringMap(get(key), fallbck);
 	}
 
@@ -406,7 +406,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	/// @param key       The input value key to convert
 	///
 	/// @returns         The converted Map if possible, else null
-	public default <K extends String, V> Map<K, V> getGenericConvertStringMap(K key) {
+	public default <K extends String, V> GenericConvertMap<K, V> getGenericConvertStringMap(K key) {
 		return GenericConvert.toGenericConvertStringMap(get(key));
 	}
 

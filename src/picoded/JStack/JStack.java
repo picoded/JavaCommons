@@ -118,24 +118,91 @@ public class JStack extends JStruct implements JStackLayer {
 	
 	/// Generate a single JStack layer using a config map representing it
 	///
-	public static JStackLayer stackConfigToJStackLayer(Map<String,Object> inConfig) {
+	public static JStackLayer stackConfigToJStackLayer(Map<String,Object> inConfig, String fullWebInfPath) {
 		if( inConfig == null ) {
 			return null;
 		}
 		
 		GenericConvertMap<String,Object> configMap = GenericConvertMap.build(inConfig);
+		String type = configMap.getString("type");
 		JStackLayer ret = null;
 		
-		// Get the type, and apply the relevent build logic
-		String type = configMap.getString("type");
+		// Using the type, apply the relevent build logic
 		if( type.equalsIgnoreCase("jsql") ) {
 			
-		} else if( type.equalsIgnoreCase("jcache") ) {
+			// Gets the config vars
+			String engine = configMap.getString("engine", "");
+			String path = configMap.getString("path", "");
+			String username = configMap.getString("username", "");
+			String password = configMap.getString("password", "");
+			String database = configMap.getString("database", "");
 			
+			// SQLite implmentation
+			if (engine.equalsIgnoreCase("sqlite")) {
+				
+				//-------- Sample config --------//
+				// // [Sqlite] database implmentation
+				// // This is obviously not meant for production, but for testing,
+				// // Path here refers to file path.
+				// // Note that the database, username, password parameters are meaningless for sqlite
+				// "engine" : "sqlite",
+				// "path" : "./WEB-INF/storage/db.sqlite",
+
+				if (path.length() <= 0) {
+					throw new RuntimeException("Unsupported " + "path: " + path);
+				}
+				
+				if( fullWebInfPath == null ) {
+					fullWebInfPath = "./WEB-INF/";
+				}
+				
+				// Replaces WEB-INF path
+				path = path.replace("./WEB-INF/", fullWebInfPath);
+				path = path.replace("${WEB-INF}", fullWebInfPath);
+				
+				// Generates the sqlite connection with the path
+				return JSql.sqlite(path);
+			} else if (engine.equalsIgnoreCase("mssql")) {
+				
+				//-------- Sample config --------//
+				// // [MS-SQL] database implmentation
+				// // Note that uselobs=false should be used, this is known to resolve
+				// // Certain data competebility problems
+				// "engine" : "mssql",
+				// "path" : "54.169.34.78:1433;uselobs=false;",
+
+				return JSql.mssql(path, database, username, password);
+			} else if (engine.equalsIgnoreCase("mysql")) {
+				
+				//-------- Sample config --------//
+				// // [MY-SQL] database implmentation
+				// "engine" : "mysql",
+				// "path" : "54.169.34.78:3306",
+				// 
+				// "database" : "JAVACOMMONS",
+				// "username" : "JAVACOMMONS",
+				// "password" : "JAVACOMMONS"
+				
+				return JSql.mysql(path, database, username, password);
+			} else if (engine.equalsIgnoreCase("oracle")) {
+				
+				//-------- Sample config --------//
+				// // [Oracle] database implmentation
+				// // Note that as the database chosen is normally part of the pathing
+				// // The database attribute is ignored.
+				// "engine" : "oracle",
+				// "path" : "JAVACOMMONS@//54.169.34.78:1521/xe",
+				
+				return JSql.oracle(path, username, password);
+			} else {
+				throw new RuntimeException("Unexpected JStack.stack JSql engine: " + engine);
+			}
+		} else if( type.equalsIgnoreCase("jcache") ) {
+			// @TODO : JCache support
 		} else if( type.equalsIgnoreCase("jstruct") ) {
 			
 		} else {
-			throw new RuntimeException("Unexpected JStack.stack config type : "+type);
+			throw new RuntimeException("Unexpected JStack.stack type : "+type);
 		}
 		
 		return ret;
@@ -143,14 +210,14 @@ public class JStack extends JStruct implements JStackLayer {
 	
 	/// Generate JStack layers based on the configuration format of 
 	///
-	public static JStackLayer[] stackConfigLayersToJStackLayers(List<Object> inConfig) {
+	public static JStackLayer[] stackConfigLayersToJStackLayers(List<Object> inConfig, String fullWebInfPath) {
 		if( inConfig == null ) {
 			return null;
 		}
 		
 		List<JStackLayer> ret = new ArrayList<JStackLayer>();
 		for( Object config : inConfig ) {
-			JStackLayer subLayer = stackConfigToJStackLayer( GenericConvert.toStringMap(config, null) );
+			JStackLayer subLayer = stackConfigToJStackLayer( GenericConvert.toStringMap(config, null), fullWebInfPath );
 			if( subLayer != null ) {
 				ret.add( subLayer );
 			}

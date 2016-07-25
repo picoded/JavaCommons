@@ -134,7 +134,7 @@ public class JStackPage extends CorePage {
 	
 	/// Generates the JSQL layer given the config namespace
 	/// 
-	/// @TODO support other JSQL engines
+	/// @TODO : To Deprecate after full roll out of sys.JStack.stack config
 	protected JSql JSqlLayerFromConfig(String profileNameSpace) {
 		
 		// Gets the configuration setup
@@ -188,6 +188,17 @@ public class JStackPage extends CorePage {
 		
 		// Gets the configuration setup
 		JConfig jc = JConfig();
+		JStackLayer[] ret = null;
+		
+		// Gets the JStack configuration, and use it (if exists)
+		//---------------------------------------------------------------
+		ret = JStack.stackConfigLayersToJStackLayers( jc.getObjectList("sys.JStack.stack", null) );
+		if( ret != null ) {
+			return ret;
+		}
+		
+		// Else falls back to legacy support
+		//---------------------------------------------------------------
 		
 		// Gets the profile name and type
 		String profileName = jc.getString("sys.dataStack.selected.profile.name", "JSqlOnly.sqlite");

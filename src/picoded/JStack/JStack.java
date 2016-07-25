@@ -9,6 +9,8 @@ import picoded.JStruct.*;
 import picoded.JSql.struct.*;
 import picoded.JCache.struct.*;
 import picoded.JStack.struct.*;
+import picoded.conv.*;
+import picoded.struct.*;
 
 /// JStack provides various common data storage format, that utalizes a combination of
 /// JCache, and JSql instances implementation.
@@ -110,4 +112,53 @@ public class JStack extends JStruct implements JStackLayer {
 		return new AccountTable(this, name);
 	}
 	
+	//----------------------------------------------
+	// Static public helper functions
+	//----------------------------------------------
+	
+	/// Generate a single JStack layer using a config map representing it
+	///
+	public static JStackLayer stackConfigToJStackLayer(Map<String,Object> inConfig) {
+		if( inConfig == null ) {
+			return null;
+		}
+		
+		GenericConvertMap<String,Object> configMap = GenericConvertMap.build(inConfig);
+		JStackLayer ret = null;
+		
+		// Get the type, and apply the relevent build logic
+		String type = configMap.getString("type");
+		if( type.equalsIgnoreCase("jsql") ) {
+			
+		} else if( type.equalsIgnoreCase("jcache") ) {
+			
+		} else if( type.equalsIgnoreCase("jstruct") ) {
+			
+		} else {
+			throw new RuntimeException("Unexpected JStack.stack config type : "+type);
+		}
+		
+		return ret;
+	}
+	
+	/// Generate JStack layers based on the configuration format of 
+	///
+	public static JStackLayer[] stackConfigLayersToJStackLayers(List<Object> inConfig) {
+		if( inConfig == null ) {
+			return null;
+		}
+		
+		List<JStackLayer> ret = new ArrayList<JStackLayer>();
+		for( Object config : inConfig ) {
+			JStackLayer subLayer = stackConfigToJStackLayer( GenericConvert.toStringMap(config, null) );
+			if( subLayer != null ) {
+				ret.add( subLayer );
+			}
+		}
+		
+		if( ret.size() > 0 ) {
+			return ret.toArray(new JStackLayer[0]);
+		}
+		return null;
+	}
 }

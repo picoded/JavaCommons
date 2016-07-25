@@ -119,6 +119,14 @@ public class JStruct_MetaTable implements MetaTable {
 		return null;
 	}
 	
+	// MetaObject MAP optimizations
+	//----------------------------------------------
+	
+	/// Does an unoptimized check, using keySet
+	public boolean containsKey(Object key) {
+		return (get(key) != null);
+	}
+	
 	// MetaObject operations
 	//----------------------------------------------
 	

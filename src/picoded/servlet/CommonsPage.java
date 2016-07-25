@@ -109,7 +109,10 @@ public class CommonsPage extends BasePage {
 				fileExt.equalsIgnoreCase("jpg") || //
 				fileExt.equalsIgnoreCase("jpeg") || //
 				fileExt.equalsIgnoreCase("svg") || //
-				fileExt.equalsIgnoreCase("pdf") //
+				fileExt.equalsIgnoreCase("pdf") || //
+				fileExt.equalsIgnoreCase("md") || //
+				fileExt.equalsIgnoreCase("less") || //
+				fileExt.equalsIgnoreCase("es6") 
 			) {
 				return true;
 			}

@@ -200,7 +200,7 @@ public class JStack extends JStruct implements JStackLayer {
 		} else if( type.equalsIgnoreCase("jcache") ) {
 			// @TODO : JCache support
 		} else if( type.equalsIgnoreCase("jstruct") ) {
-			
+			return new JStruct();
 		} else {
 			throw new RuntimeException("Unexpected JStack.stack type : "+type);
 		}

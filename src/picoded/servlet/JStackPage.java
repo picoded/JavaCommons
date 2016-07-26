@@ -192,11 +192,6 @@ public class JStackPage extends CorePage {
 		
 		// Gets the JStack configuration, and use it (if exists)
 		//---------------------------------------------------------------
-		
-		System.out.println( "--------hmmmm----------");
-		System.out.println( jc.getString("sys") );
-		System.out.println( jc.getString("sys.JStack.stack") );
-		
 		ret = JStack.stackConfigLayersToJStackLayers( jc.getObjectList("sys.JStack.stack", null), getWebInfPath() );
 		if( ret != null ) {
 			return ret;

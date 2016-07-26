@@ -133,4 +133,15 @@ public class ConfigFileSet_simple_test {
 		assertTrue(set.contains("one"));
 		assertTrue(set.contains("two"));
 	}
+	
+	///
+	/// Get the config file set for sys.JStack.stack bug
+	///
+	@Test
+	public void jstackConfig() {
+		assertNotNull( configObj.getGenericConvertStringMap("sys.JStack") );
+		assertNotNull( configObj.get("sys.JStack.stack") );
+		
+		
+	}
 }

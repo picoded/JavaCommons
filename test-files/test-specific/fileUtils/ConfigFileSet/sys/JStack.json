@@ -73,7 +73,7 @@
 				"MetaTable" : ["*"],
 				"KeyValueMap" : ["*"],
 				"AccountTable" : ["*"]
-			},
+			}
 			
 			// // Pulls from the single source of truth
 			// // in the background to ensure data consistency.

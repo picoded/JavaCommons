@@ -222,8 +222,11 @@ public class JStackPage extends CorePage {
 			return JStackObj;
 		}
 		
-		//Default is sqlite
+		// Load the JStack object
 		JStackObj = new JStack(loadConfiguredJStackLayers());
+		
+		// And preload the tables
+		JStackUtils.preloadJStruct(JStackObj, JConfig().getStringMap("sys.JStack.struct", null));
 		
 		return JStackObj;
 	}

@@ -208,6 +208,23 @@ public class JStruct implements JStackLayer {
 		}
 	}
 	
+	///
+	/// Preload a single JStruct type object. This is use to prime the JStruct object for systemSetup calls.
+	///
+	public void preloadJStructType(String type, String name) {
+		if(type.equalsIgnoreCase("AccountTable")) {
+			this.getAccountTable(name);
+		} else if(type.equalsIgnoreCase("MetaTable")) {
+			this.getMetaTable(name);
+		} else if(type.equalsIgnoreCase("KeyValueMap")) {
+			this.getKeyValueMap(name);
+		} else if(type.equalsIgnoreCase("AtomicLongMap")) {
+			this.getAtomicLongMap(name);
+		} else {
+			throw new RuntimeException("Unknown struct type : "+type);
+		}
+	}
+	
 	//----------------------------------------------
 	// automated setup of cached tables
 	//----------------------------------------------
@@ -217,13 +234,15 @@ public class JStruct implements JStackLayer {
 		try {
 			keyValueMapCache_lock.readLock().lock();
 			metaTableCache_lock.readLock().lock();
+			atomicLongMapCache_lock.readLock().lock();
 			
 			keyValueMapCache.entrySet().stream().forEach(e -> e.getValue().systemSetup());
 			metaTableCache.entrySet().stream().forEach(e -> e.getValue().systemSetup());
-			
+			atomicLongMapCache.entrySet().stream().forEach(e -> e.getValue().systemSetup());
 		} finally {
 			keyValueMapCache_lock.readLock().unlock();
 			metaTableCache_lock.readLock().unlock();
+			atomicLongMapCache_lock.readLock().unlock();
 		}
 	}
 	
@@ -232,13 +251,15 @@ public class JStruct implements JStackLayer {
 		try {
 			keyValueMapCache_lock.readLock().lock();
 			metaTableCache_lock.readLock().lock();
+			atomicLongMapCache_lock.readLock().lock();
 			
 			keyValueMapCache.entrySet().stream().forEach(e -> e.getValue().systemTeardown());
 			metaTableCache.entrySet().stream().forEach(e -> e.getValue().systemTeardown());
-			
+			atomicLongMapCache.entrySet().stream().forEach(e -> e.getValue().systemTeardown());
 		} finally {
 			keyValueMapCache_lock.readLock().unlock();
 			metaTableCache_lock.readLock().unlock();
+			atomicLongMapCache_lock.readLock().unlock();
 		}
 	}
 	

@@ -21,6 +21,36 @@ public class JStackUtils {
 	//
 	//--------------------------------------------------
 	
+	///
+	/// Preload a single JStruct type object 
+	///
+	protected static void preloadJStructType(JStruct struct, String type, Map<String,Object> nameMap) {
+		if(nameMap == null) {
+			return;
+		}
+		for (String name : nameMap.keySet()) {
+			struct.preloadJStructType(type, name);
+		}
+	}
+	
+	///
+	/// Preload various table structures according to config. This would be the "sys.JStack.struct"
+	///
+	/// @param   The jstruct to build on
+	/// @param   The structure map containing { type : { name : configObj } }
+	///
+	public static void preloadJStruct(JStruct struct, Map<String,Object> structMap) {
+		if( structMap == null ) {
+			return;
+		}
+		
+		GenericConvertMap<String,Object> configMap = GenericConvertMap.build(structMap);
+		String[] structTypes = { "AccountTable", "KeyValueMap", "AtomicLongMap", "MetaTable" };   
+		for (String s: structTypes) {
+			preloadJStructType(struct, s, configMap.getStringMap(s));
+		}
+	}
+	
 	//--------------------------------------------------
 	//
 	// JStack layer handling

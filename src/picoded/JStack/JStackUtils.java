@@ -11,13 +11,63 @@ import picoded.JCache.struct.*;
 import picoded.JStack.struct.*;
 import picoded.conv.*;
 import picoded.struct.*;
+import picoded.RESTBuilder.*;
+import picoded.RESTBuilder.templates.*;
 
 /// JStack utility to build up complex JStack structures from the JStack config file.
 public class JStackUtils {
 	
+	public final static String[] structTypes = { "AccountTable", "KeyValueMap", "AtomicLongMap", "MetaTable" };   
+	
 	//--------------------------------------------------
 	//
-	// JStack MetaTable
+	// JStack MetaTable setups
+	//
+	//--------------------------------------------------
+	
+	///
+	/// Build the RESTBuilder to a single JStruct type object 
+	///
+	protected static void setupRESTBuilderType(RESTBuilder rbObj, JStruct struct, String type, Map<String,Object> nameMap) {
+		if(nameMap == null) {
+			return;
+		}
+		for (String name : nameMap.keySet()) {
+			if(type.equalsIgnoreCase("AccountTable")) {
+				AccountLogin.setupRESTBuilder(rbObj, struct.getAccountTable(name), name+".");
+			} else if(type.equalsIgnoreCase("KeyValueMap")) {
+				(new KeyValueMapApiBuilder(struct.getKeyValueMap(name))).setupRESTBuilder(rbObj, name+".");
+			} else if(type.equalsIgnoreCase("AtomicLongMap")) {
+				(new AtomicLongMapApiBuilder(struct.getAtomicLongMap(name))).setupRESTBuilder(rbObj, name+".");
+			} else if(type.equalsIgnoreCase("MetaTable")) {
+				(new MetaTableApiBuilder(struct.getMetaTable(name))).setupRESTBuilder(rbObj, name+".");
+			} else {
+				throw new RuntimeException("Unknown struct type : "+type);
+			}
+		}
+	}
+	
+	///
+	/// Preload various table structures according to config. This would be the "sys.JStack.struct"
+	///
+	/// @param   The RESTBuilder object to build the api on
+	/// @param   The jstruct to build on
+	/// @param   The structure map containing { type : { name : configObj } }
+	///
+	public static void setupRESTBuilderStruct(RESTBuilder rbObj, JStruct struct, Map<String,Object> structMap) {
+		if( structMap == null ) {
+			return;
+		}
+		
+		GenericConvertMap<String,Object> configMap = GenericConvertMap.build(structMap);
+		for (String s: structTypes) {
+			setupRESTBuilderType(rbObj, struct, s, configMap.getStringMap(s));
+		}
+	}
+	
+	//--------------------------------------------------
+	//
+	// JStack structure setups
 	//
 	//--------------------------------------------------
 	

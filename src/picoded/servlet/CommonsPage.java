@@ -202,6 +202,10 @@ public class CommonsPage extends BasePage {
 	
 	@Override
 	public void restBuilderSetup(RESTBuilder rbObj) {
+		// Setup in accordance to the defined JStruct tables
+		super.restBuilderSetup(rbObj);
+		
+		// Base account / dev setup
 		AccountLogin.setupRESTBuilder(rbObj, accountAuthTable(), "account.");
 		DevToolsApiBuilder.setupRESTBuilder(rbObj, "dev.");
 	}

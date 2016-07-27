@@ -28,9 +28,11 @@ import com.floreysoft.jmte.*;
 
 // Sub modules useds
 import picoded.conv.JMTE;
+import picoded.enums.*;
 import picoded.JStack.*;
 import picoded.JStruct.*;
 import picoded.RESTBuilder.*;
+import picoded.RESTBuilder.templates.*;
 import picoded.webTemplateEngines.JSML.*;
 import picoded.page.builder.*;
 
@@ -77,7 +79,11 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	/// !To Override
 	/// to configure the restBuilderSetup steps
 	public void restBuilderSetup(RESTBuilder rbObj) {
+		// The server timestamp fetching
+		rbObj.getNamespace("server.now").put(HttpRequestType.GET, ServerTime.now);
 		
+		// Preload RESBUilder stack
+		JStackUtils.setupRESTBuilderStruct(rbObj, JStackObj, JConfig().getStringMap("sys.JStack.struct", null));
 	}
 	
 	/////////////////////////////////////////////

@@ -146,7 +146,7 @@ public class PageBuilderCore {
 		if (rawPageName.endsWith("/")) {
 			rawPageName = rawPageName.substring(0, rawPageName.length() - 1);
 		}
-		return rawPageName.replaceAll("/", "_");
+		return rawPageName.replaceAll("/", "-");
 	}
 	
 	/// Utility to get page frame ID
@@ -155,6 +155,15 @@ public class PageBuilderCore {
 	///
 	/// @returns  The page frame ID used (that is character safe?)
 	protected String pageFrameID(String rawPageName) {
+		return "page-" + safePageName(rawPageName);
+	}
+	
+	/// Utility to get page frame ID : legacy format specific to IFAM (to phase out)
+	///
+	/// @param  rawPageName used to generate the vars
+	///
+	/// @returns  The page frame ID used (that is character safe?)
+	protected String pageFrameID_ifamLegacy(String rawPageName) {
 		return "pageFrame_" + safePageName(rawPageName);
 	}
 	
@@ -218,6 +227,20 @@ public class PageBuilderCore {
 		return res;
 	}
 	
+	/// Gets and extract out a page specific configuration. In its respective page.json file
+	///
+	/// @param  rawPageName used to generate the vars
+	///
+	/// @returns The data hash map
+	protected Map<String,Object> pageConfigFetch(String rawPageName) {
+		// Basic filter safety
+		rawPageName = filterRawPageName(rawPageName);
+		
+		// Get the config from rawPageName folder itself
+		return GenericConvert.toStringMap( FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/page.json" ), null /*"UTF-8"*/, "{}") );
+	}
+	
+	
 	/// Generates the needed map string template for the respective page
 	///
 	/// @param  rawPageName used to generate the vars
@@ -250,10 +273,18 @@ public class PageBuilderCore {
 		
 		ret.put("PagesRootURI", uriRootPrefix);
 		ret.put("PageURI", pageURI);
+		
 		ret.put("PageNameRaw", rawPageName);
 		ret.put("PageName", safePageName(rawPageName));
-		ret.put("PageFrameID", pageFrameID(rawPageName));
+		ret.put("PageClass", pageFrameID(rawPageName));
 		
+		ret.put("Page", buildPageComponentMap());
+		ret.put("PageConfig", pageConfigFetch(rawPageName));
+		
+		// Legacy to phase out
+		// @TODO : Phase Out
+		//-----------------------------
+		ret.put("PageFrameID", pageFrameID_ifamLegacy(rawPageName));
 		ret.put("PageComponent", buildPageComponentMap());
 		
 		return ret;
@@ -277,12 +308,16 @@ public class PageBuilderCore {
 		rawPageName = rawPageName.trim();
 		rawPageName = rawPageName.replaceAll("\\.","/");
 		
+		while (rawPageName.indexOf("//") >= 0) {
+			rawPageName = rawPageName.replaceAll("//", "/");
+		}
 		while (rawPageName.startsWith("/")) {
 			rawPageName = rawPageName.substring(1);
 		}
 		while (rawPageName.endsWith("/")) {
 			rawPageName = rawPageName.substring(0, rawPageName.length());
 		}
+		
 		return rawPageName;
 	}
 	
@@ -421,7 +456,7 @@ public class PageBuilderCore {
 	
 	/// Get the page frame div header, this is used to do a "search replace" for script / css injection
 	protected String pageFrameHeaderDiv(String rawPageName) {
-		return "<div class='pageFrame " + pageFrameID(rawPageName) + "' id='" + pageFrameID(rawPageName) + "'>\n";
+		return "<div class='pageFrame " + pageFrameID(rawPageName) + " "+ pageFrameID_ifamLegacy(rawPageName)+ "' id='" + pageFrameID_ifamLegacy(rawPageName) + "'>\n";
 	}
 	
 	/// Builds a rawPageName HTML frame

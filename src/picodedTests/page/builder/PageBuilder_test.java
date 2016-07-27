@@ -85,7 +85,7 @@ public class PageBuilder_test {
 		assertNotNull(buffer = html.buildPageFrame("index"));
 		assertTrue(buffer, buffer.indexOf("hello world") >= 0);
 		assertTrue(buffer, buffer.indexOf("pageFrame") >= 0);
-		assertTrue(buffer, buffer.indexOf("pageFrame_index") >= 0);
+		assertTrue(buffer, buffer.indexOf("page-index") >= 0);
 	}
 	
 	@Test
@@ -104,7 +104,7 @@ public class PageBuilder_test {
 		
 		// Check asset folder
 		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "nested/page/index.html")).indexOf(
-			"Hello pageFrame_nested_page") > 0);
+			"Hello page-nested-page") > 0);
 	}
 	
 	@Test
@@ -114,17 +114,31 @@ public class PageBuilder_test {
 		
 		// Check asset folder
 		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "nested/page/index.html")).indexOf(
-			"Hello pageFrame_nested_page") > 0);
+			"Hello page-nested-page") > 0);
 		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "nested/two/page/index.html")).indexOf(
-			"Hello pageFrame_nested_two_page") > 0);
+			"Hello page-nested-two-page") > 0);
 	}
 	
 	@Test 
 	public void componentsMapTest() {
 		constructorTest();
 		
-		assertEquals("Hello ${PageFrameID}", pages.buildPageComponentMap().getSubMap("nested").getSubMap("page").get("html") );
-		assertEquals("Hello ${PageFrameID}", pages.buildPageComponentMap().getSubMap("nested").getSubMap("two").getSubMap("page").get("html") );
+		assertEquals("Hello ${PageClass}", pages.buildPageComponentMap().getSubMap("nested").getSubMap("page").get("html") );
+		assertEquals("Hello ${PageClass}", pages.buildPageComponentMap().getSubMap("nested").getSubMap("two").getSubMap("page").get("html") );
+		
 		assertNotNull( pages.buildPageComponentMap().getSubMap("components").getSubMap("utils").getSubMap("IEWarning").get("html") );
+	}
+	
+	@Test
+	public void componentsSubstitute() throws IOException {
+		constructorTest();
+		pages.buildAllPages();
+		
+		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "helloComponents/msg/index.html")).indexOf(
+			"<h1>Hello World</h1>") >= 0);
+		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "helloComponents/world/index.html")).indexOf(
+			"<page-helloComponents-msg/>") < 0);
+		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "helloComponents/world/index.html")).indexOf(
+			"<h1>Hello World</h1>") >= 0);
 	}
 }

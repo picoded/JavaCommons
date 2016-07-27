@@ -111,7 +111,7 @@ public class PageComponentMap implements GenericConvertMap<String,Object> {
 	public String toString() {
 		String ret = getHtml();
 		if( ret == null || ret.trim().length() <= 0 ) {
-			return ("(PageComponent."+prefixPath+")").replaceAll("/",".");
+			return ("(Page."+prefixPath+")").replaceAll("/",".");
 		}
 		return ret;
 	}

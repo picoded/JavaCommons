@@ -57,7 +57,6 @@ public class PageComponentFilter {
 			String innerHTML = e.html();
 
 			if(tagname.startsWith("page-") || tagname.startsWith("PAGE-")) {
-
 				//Extract attributes from tag
 				List<Attribute> attributes = e.attributes().asList();
 				Map<String, Object> tagArgs = new HashMap<String, Object>();
@@ -93,8 +92,9 @@ public class PageComponentFilter {
 		Map<String, Object> componentProtectedArgs = new HashMap<String, Object>();
 		componentProtectedArgs.put("newUniqueNumber", core.newUniqueNumber());
 		componentProtectedArgs.put("uniqueNumber", core.uniqueNumber());
+		componentProtectedArgs.put("innerHTML", innerHTML);
 		genericJMTE.put("Component", componentProtectedArgs);
-		
+
 		String jmteProcessedHtml = core.getJMTE().parseTemplate( rawHtml, genericJMTE );
 		String resolvedHtml = resolveParts(jmteProcessedHtml);
 

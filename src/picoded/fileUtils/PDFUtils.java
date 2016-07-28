@@ -61,32 +61,29 @@ public class PDFUtils {
 	}
 	
 	/**
-	 * Merge multiple pdf into one pdf
-	 * 
-	 * @param fileList
-	 *            List<InputStream>
-	 * @param outputStream
-	 *            OutputStream
-	 * 
-	 */
+	* Merge multiple pdf into one pdf
+	*
+	* @param fileList
+	*            List<InputStream>
+	* @param outputStream
+	*            OutputStream
+	*
+	*/
 	public static void mergePDF(List<InputStream> fileList, OutputStream outputStream) throws DocumentException,
 		IOException {
 		Document document = null;
 		try {
 			document = new Document();
-			PdfWriter writer = PdfWriter.getInstance(document, outputStream);
+			PdfCopy copy = new PdfCopy(document, outputStream);
 			document.open();
-			PdfContentByte cb = writer.getDirectContent();
 			
 			for (InputStream in : fileList) {
 				PdfReader reader = new PdfReader(in);
-				for (int i = 1; i <= reader.getNumberOfPages(); i++) {
-					document.newPage();
-					// import the page from source pdf
-					PdfImportedPage page = writer.getImportedPage(reader, i);
-					// add the page to the destination pdf
-					cb.addTemplate(page, 0, 0);
+				for (int page = 1; page <= reader.getNumberOfPages(); ++page) {
+					copy.addPage(copy.getImportedPage(reader, page));
 				}
+				copy.freeReader(reader);
+				reader.close();
 			}
 			
 		} finally {

@@ -36,8 +36,8 @@ public class PageComponentFilter {
 	
 	/// Filtering a html string, and resolving all the page components
 	public String resolve(Document doc) {
-		resolveElements( doc.select("page-*") );
-		resolveElements( doc.select("PAGE-*") );
+		//resolveElements( doc.select("page-*") );
+		resolveElements( doc.select("*") );
 		return doc.toString();
 	}
 	
@@ -56,7 +56,9 @@ public class PageComponentFilter {
 		for(Element e : eArr) {
 			String tagname = e.tagName();
 			String innerHTML = e.html();
-			e.replaceWith( createElementComponent(tagname, innerHTML) );
+			if(tagname.startsWith("page-") || tagname.startsWith("PAGE-")) {
+				e.replaceWith( createElementComponent(tagname, innerHTML) );
+			}
 		}
 	}
 	

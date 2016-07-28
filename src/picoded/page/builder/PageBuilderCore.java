@@ -288,6 +288,7 @@ public class PageBuilderCore {
 		Map<String, Object> ret = getTemplateJson(rawPageName);
 
 		ret.put("PagesRootURI", uriRootPrefix);
+		ret.put("PageRootURI", uriRootPrefix); //because FAportal and orgeva
 		ret.put("PageURI", pageURI);
 
 		ret.put("PageNameRaw", rawPageName);

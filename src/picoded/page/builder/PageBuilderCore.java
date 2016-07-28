@@ -48,6 +48,9 @@ public class PageBuilderCore {
 	/// Dependency chain tracking
 	protected GenericConvertListSet<String> dependencyTracker = new GenericConvertListSet<String>();
 	
+	/// Components filter utility
+	protected PageComponentFilter componentsFilter = null;
+	
 	////////////////////////////////////////////////////////////
 	//
 	// Constructor
@@ -61,6 +64,7 @@ public class PageBuilderCore {
 	///
 	public PageBuilderCore(File inPagesFolder) {
 		pagesFolder = inPagesFolder;
+		componentsFilter = new PageComponentFilter(this);
 	}
 	
 	///
@@ -81,6 +85,7 @@ public class PageBuilderCore {
 	public PageBuilderCore(File inPagesFolder, File inOutputFolder) {
 		pagesFolder = inPagesFolder;
 		outputFolder = inOutputFolder;
+		componentsFilter = new PageComponentFilter(this);
 	}
 	
 	///
@@ -800,6 +805,10 @@ public class PageBuilderCore {
 				// Rebuild with injection
 				indexStr = buildFullPageFrame(rawPageName, injectorStr).toString();
 			}
+			
+			// Components resolution
+			//-------------------------------------------------------------------
+			indexStr = componentsFilter.resolve(indexStr);
 			
 			// HTML minify
 			//-------------------------------------------------------------------

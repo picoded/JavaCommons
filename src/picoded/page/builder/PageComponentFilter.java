@@ -56,14 +56,25 @@ public class PageComponentFilter {
 		for(Element e : eArr) {
 			String tagname = e.tagName();
 			String innerHTML = e.html();
+			
 			if(tagname.startsWith("page-") || tagname.startsWith("PAGE-")) {
-				e.replaceWith( createElementComponent(tagname, innerHTML) );
+				
+				//Extract attributes from tag
+				List<Attribute> attributes = e.attributes().asList(); 
+				Map<String, Object> tagArgs = new HashMap<String, Object>();
+				if(attributes != null && attributes.size() > 0){
+					for(Attribute attr : attributes){
+						tagArgs.put(attr.getKey(), attr.getValue());
+					}
+				}
+				
+				e.replaceWith( createElementComponent(tagname, innerHTML, tagArgs) );
 			}
 		}
 	}
 	
 	/// Create the element node, to inject
-	protected Element createElementComponent(String tagname, String innerHTML) {
+	protected Element createElementComponent(String tagname, String innerHTML, Map<String,Object> tagArgs) {
 		if(tagname.startsWith("page-") || tagname.startsWith("PAGE-")) {
 			tagname = tagname.substring(5);
 		}
@@ -71,6 +82,12 @@ public class PageComponentFilter {
 		
 		String rawHtml = core.buildPageInnerRawHTML(tagname);
 		GenericConvertMap<String,Object> genericJMTE = GenericConvertMap.build( core.pageJMTEvars(tagname) );
+		
+		if(tagArgs != null && tagArgs.size() > 0){
+			//Final namespace remains undecided
+			genericJMTE.put("this", tagArgs);
+			genericJMTE.put("ThisComponent", tagArgs);
+		}
 		
 		String jmteProcessedHtml = core.getJMTE().parseTemplate( rawHtml, genericJMTE );
 		String resolvedHtml = resolveParts(jmteProcessedHtml);

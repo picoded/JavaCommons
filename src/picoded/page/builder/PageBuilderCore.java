@@ -614,11 +614,12 @@ public class PageBuilderCore {
 			String fileVal = FileUtils.readFileToString(input);
 			if ((fileVal = fileVal.trim()).length() > 0) {
 				
-				// Does a JMTE filter
-				fileVal = getJMTE().parseTemplate(fileVal, jmteVarMap);
-				
 				// Does specific conversions
 				if (type == PageFileType.jsons_to_js) {
+					
+					// Does a JMTE filter
+					fileVal = getJMTE().parseTemplate(fileVal, jmteVarMap);
+					
 					// Adds the script object wrapper
 					fileVal = "window.pageFrames = window.pageFrames || {}; window.pageFrames." + safePageName(rawPageName)
 						+ " = (" + fileVal + ");";
@@ -636,8 +637,14 @@ public class PageBuilderCore {
 					// Ensure prefix, and suffix are added
 					fileVal = (lessPrefix + "\n" + fileVal + "\n" + lessSuffix).trim();
 					
+					// Does a JMTE filter
+					fileVal = getJMTE().parseTemplate(fileVal, jmteVarMap);
+					
 					// Less to css conversion
 					fileVal = less.compile(fileVal);
+				} else {
+					// Does a JMTE filter
+					fileVal = getJMTE().parseTemplate(fileVal, jmteVarMap);
 				}
 				
 				// Write to file if it differ

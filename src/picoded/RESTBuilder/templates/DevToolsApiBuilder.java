@@ -1,15 +1,7 @@
 package picoded.RESTBuilder.templates;
 
-import java.util.*;
-import java.util.Map.Entry;
-
-import picoded.RESTBuilder.*;
-import picoded.JStack.*;
-import picoded.JStruct.*;
-import picoded.servlet.*;
-import picoded.conv.ConvertJSON;
-import picoded.conv.GenericConvert;
-import picoded.conv.RegexUtils;
+import picoded.RESTBuilder.RESTBuilder;
+import picoded.RESTBuilder.RESTFunction;
 import picoded.enums.HttpRequestType;
 
 public class DevToolsApiBuilder {

@@ -9,51 +9,19 @@ import java.util.List;
 /// Replace with apache StringUtils?
 import com.mysql.jdbc.StringUtils;
 
+///
+/// Small extension of apache FileUtils, for some additional features that we needed
+///
+/// @See https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtils.html
+///
 public class FileUtils extends org.apache.commons.io.FileUtils {
-	
-	/// @TODO: Sam, documentation =.=
-	public static List<String> getFileNamesFromFolder(File inFile, String separator, String rootFolderName) {
-		List<String> keyList = new ArrayList<String>();
-		
-		if (StringUtils.isNullOrEmpty(rootFolderName)) {
-			rootFolderName = "";
-		}
-		
-		if (StringUtils.isNullOrEmpty(separator)) {
-			separator = "/";
-		}
-		
-		if (inFile.isDirectory()) {
-			File[] innerFiles = inFile.listFiles();
-			for (File innerFile : innerFiles) {
-				if (innerFile.isDirectory()) {
-					String parentFolderName = innerFile.getName();
-					if (!rootFolderName.isEmpty()) {
-						parentFolderName = rootFolderName + separator + parentFolderName;
-					}
-					keyList.addAll(getFileNamesFromFolder(innerFile, parentFolderName, separator));
-				} else {
-					keyList.addAll(getFileNamesFromFolder(innerFile, rootFolderName, separator));
-				}
-			}
-		} else {
-			String fileName = inFile.getName();
-			fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-			String prefix = "";
-			if (!rootFolderName.isEmpty()) {
-				prefix += rootFolderName + separator;
-			}
-			
-			keyList.add(prefix + fileName);
-		}
-		
-		return keyList;
-	}
 	
 	///
 	/// List only the folders inside a folder
 	///
 	/// @param folder to scan
+	///
+	/// @return Collection of folders within the current folder
 	///
 	public static Collection<File> listDirs(File inFile) {
 		List<File> ret = new ArrayList<File>();
@@ -70,7 +38,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	///
 	/// Extends the readFileToString to include a "fallback" default value,
 	/// which is used if the file does not exists / is not readable / is not a
-	// file
+	/// file
 	///
 	/// @param file to read
 	/// @param encoding mode
@@ -107,6 +75,73 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 		
 		writeStringToFile(inFile, data, encoding);
 		return true;
+	}
+	
+	///
+	/// Recursively copy all directories, and files only if the file content is different
+	///
+	/// @TODO : Implmenent the existing file checks, ignoring if it has same content
+	///
+	/// @param folder to scan and copy from
+	///
+	public static void copyDirectory_ifDifferent(File inDir) {
+		copyDirectory(inDir);
+	}
+	
+	///
+	/// Recursively copy all directories, and files only if the file content is different
+	///
+	/// @TODO : Implmenent the existing file checks, ignoring if it has same content
+	///
+	/// @param file to scan and copy from
+	///
+	public static void copyFile_ifDifferent(File inFile) {
+		copyFile(inFile);
+	}
+	
+	//------------------------------------------------------------------------------------------------------------------
+	//
+	// Items below here, requires cleanup : not considered stable
+	//
+	//------------------------------------------------------------------------------------------------------------------
+	
+	// @TODO: Sam, documentation =.= on what this is for?
+	public static List<String> getFileNamesFromFolder(File inFile, String separator, String rootFolderName) {
+		List<String> keyList = new ArrayList<String>();
+		
+		if (StringUtils.isNullOrEmpty(rootFolderName)) {
+			rootFolderName = "";
+		}
+		
+		if (StringUtils.isNullOrEmpty(separator)) {
+			separator = "/";
+		}
+		
+		if (inFile.isDirectory()) {
+			File[] innerFiles = inFile.listFiles();
+			for (File innerFile : innerFiles) {
+				if (innerFile.isDirectory()) {
+					String parentFolderName = innerFile.getName();
+					if (!rootFolderName.isEmpty()) {
+						parentFolderName = rootFolderName + separator + parentFolderName;
+					}
+					keyList.addAll(getFileNamesFromFolder(innerFile, parentFolderName, separator));
+				} else {
+					keyList.addAll(getFileNamesFromFolder(innerFile, rootFolderName, separator));
+				}
+			}
+		} else {
+			String fileName = inFile.getName();
+			fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+			String prefix = "";
+			if (!rootFolderName.isEmpty()) {
+				prefix += rootFolderName + separator;
+			}
+			
+			keyList.add(prefix + fileName);
+		}
+		
+		return keyList;
 	}
 	
 }

@@ -979,6 +979,11 @@ public class PageBuilderCore {
 	/// Reset the Dependency tracking
 	public void dependencyTrackerReset() {
 		dependencyTracker.clear();
+		
+		addDependncyTracking("");
+		addDependncyTracking("components");
+		addDependncyTracking("common");
+		addDependncyTracking("index");
 	}
 	
 	/// Recursively pull add in the depency of a existing module, if its not already on the list

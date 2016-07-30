@@ -28,14 +28,6 @@ public class PageComponentFilter {
 	/// Page builder core to use
 	public PageBuilderCore core = null;
 	
-	/// Running number
-	public long componentUniqueNumber = 1;
-	
-	/// Returns and issue a unique number for a component
-	public String newUniqueNumber(){
-		return String.valueOf(++componentUniqueNumber);
-	}
-
 	/// Constructor setting up the page builder core
 	public PageComponentFilter(PageBuilderCore inCore) {
 		core = inCore;
@@ -115,4 +107,19 @@ public class PageComponentFilter {
 			throw new RuntimeException("Unexpected element children count for : "+tagname+" - "+elementSet.size());
 		}
 	}
+	
+	//-----------------------------------------------------------
+	//
+	// Component unique number handling
+	//
+	//-----------------------------------------------------------
+	
+	/// Running number
+	public long componentUniqueNumber = 1;
+	
+	/// Returns and issue a unique number for a component
+	public String newUniqueNumber(){
+		return String.valueOf(++componentUniqueNumber);
+	}
+
 }

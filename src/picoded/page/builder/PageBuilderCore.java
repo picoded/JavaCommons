@@ -682,9 +682,10 @@ public class PageBuilderCore {
 	// Full Page Building
 	//
 	////////////////////////////////////////////////////////////
-
+	
 	///
 	/// Builds all the assets for a single page
+	/// Copies out the various files, and does direct conversion on them if needed.
 	///
 	/// @param rawPageName to build
 	///
@@ -745,7 +746,38 @@ public class PageBuilderCore {
 				FileUtils.copyDirectory(pageAssetsFolder, new File(outputPageFolder, "assets"));
 				hasAssets = true;
 			}
-
+			
+			// Copy out all the various other files
+			//
+			// @TODO: Optimize this to only copy IF newer
+			//
+			// Ignores: index files (as of now)
+			//-------------------------------------------------------------------
+			
+			// For each sub directory, build it as a page
+			for (File inFile : FileUtils.listFiles(definitionFolder, null, false)) {
+				String fileName = inFile.getName();
+				String[] splitFileName = fileName.split(".");
+				
+				// Ignore index based files
+				if(splitFileName[0].equalsIgnoreCase("index")) {
+					continue;
+				}
+				
+				// File to output to
+				File outFile = new File(outputPageFolder, fileName);
+				
+				// Copy over the file
+				FileUtils.copyFile(inFile, outFile);
+				
+				String fileExt = (splitFileName.length > 1)? splitFileName[ splitFileName.length - 1 ] : "";
+				if(fileExt.equalsIgnoreCase("less")) {
+					
+				} else if(fileExt.equalsIgnoreCase("es6")) {
+					
+				}
+			}
+			
 			// Process the JS script (if provided)
 			//-------------------------------------------------------------------
 			boolean hasJsFile = processPageFile(PageFileType.js, new File[] { new File(definitionFolder, "index.js"),

@@ -104,6 +104,10 @@ public class PageBuilder extends PageBuilderCore {
 	///
 	/// @return  Returns itself
 	public PageBuilder buildAllPages() {
+		
+		// Reset dependency tracking
+		dependencyTrackerReset();
+		
 		// Recusively build all pages
 		buildPageFolder("");
 		
@@ -164,17 +168,21 @@ public class PageBuilder extends PageBuilderCore {
 				
 				PageBuilder servletPageBuilder = page.PageBuilder();
 				
-				// Load the respective page, only on main page load
+				// Reloads only on index page request, instead of every http request
 				if (itemName.equals("index.html") && servletPageBuilder.hasPageFolder(basePageName + "/")) {
-					servletPageBuilder.buildPageFolder_includingSelf(basePageName + "/");
 					
-					// Build index / common, skip if its a duplicate build request
-					if (!basePageName.equalsIgnoreCase("index") && servletPageBuilder.hasPageFolder("index")) {
-						servletPageBuilder.buildAndOutputPage("index");
-					}
-					if (!basePageName.equalsIgnoreCase("common") && servletPageBuilder.hasPageFolder("common")) {
-						servletPageBuilder.buildAndOutputPage("common");
-					}
+					// Changed to build everything, slower on page load but ensures components changes get propagated properly.
+					servletPageBuilder.buildAllPages();
+					
+					// servletPageBuilder.buildPageFolder_includingSelf(basePageName + "/");
+					// 
+					//// Build index / common, skip if its a duplicate build request
+					// if (!basePageName.equalsIgnoreCase("index") && servletPageBuilder.hasPageFolder("index")) {
+					// 	servletPageBuilder.buildAndOutputPage("index");
+					// }
+					// if (!basePageName.equalsIgnoreCase("common") && servletPageBuilder.hasPageFolder("common")) {
+					// 	servletPageBuilder.buildAndOutputPage("common");
+					// }
 				}
 			}
 			

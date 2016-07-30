@@ -181,7 +181,7 @@ public class PageBuilderCore {
 	///
 	protected Map<String,Object> getTemplateJson(String rawPageName) {
 		String resStr = null;
-		String fileName = "template.json";
+		String fileName = "page.json";
 		List<Map<String,Object>> templateList = new ArrayList<Map<String,Object>>();
 
 		// Page path itself
@@ -313,10 +313,8 @@ public class PageBuilderCore {
 
 		rawPageName = rawPageName.trim();
 		rawPageName = rawPageName.replaceAll("\\.","/");
-
-		while (rawPageName.indexOf("//") >= 0) {
-			rawPageName = rawPageName.replaceAll("//", "/");
-		}
+		rawPageName = FileUtils.normalize(rawPageName);
+		
 		while (rawPageName.startsWith("/")) {
 			rawPageName = rawPageName.substring(1);
 		}
@@ -413,7 +411,7 @@ public class PageBuilderCore {
 	public String buildPageInnerRawHTML(String rawPageName) {
 		// Depenency chain tracking
 		rawPageName = filterRawPageName(rawPageName);
-		dependencyTracker.add(rawPageName);
+		addDependncyTracking(rawPageName);
 
 		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/"
 			+ safePageName(rawPageName) + ".html"), null /*"UTF-8"*/, null);
@@ -532,6 +530,11 @@ public class PageBuilderCore {
 			for (File pageDefine : FileUtils.listDirs(folder)) {
 				// Get sub page name
 				String subPageName = pageDefine.getName();
+				
+				// Could be hidden, or invalid folder format
+				if( subPageName.startsWith(".") || !subPageName.equalsIgnoreCase(FileUtils.getBaseName(subPageName)) ) {
+					continue;
+				}
 
 				// Common and index zone only if its top layer
 				if (subPageName.equalsIgnoreCase("common") || subPageName.equalsIgnoreCase("index")) {
@@ -757,11 +760,11 @@ public class PageBuilderCore {
 			// For each sub directory, build it as a page
 			for (File inFile : FileUtils.listFiles(definitionFolder, null, false)) {
 				String fileName = inFile.getName();
+				
+				// Ignore hidden files, or index based files
 				String baseName = FileUtils.getBaseName(fileName);
 				String fileExtn = FileUtils.getExtension(fileName);
-				
-				// Ignore index based files
-				if(baseName.equalsIgnoreCase("index")) {
+				if(baseName == null || baseName.length() <= 0 || baseName.equalsIgnoreCase("index") || baseName.equalsIgnoreCase("depend") || baseName.equalsIgnoreCase("component") || baseName.equalsIgnoreCase("page") ) {
 					continue;
 				}
 				
@@ -771,13 +774,18 @@ public class PageBuilderCore {
 				// Copy over the file
 				FileUtils.copyFile_ifDifferent(inFile, outFile);
 				
+				// Ignore conversions on certain same filepath - name (legacy files)
+				if( rawPageName.equalsIgnoreCase(baseName) ) {
+					continue;
+				} 
+				
 				// Less and es6 specific conversion
 				if(fileExtn.equalsIgnoreCase("less")) {
-					String fileVal = FileUtils.readFileToString(inFile,"");
+					String fileVal = FileUtils.readFileToString_withFallback(inFile,null,"");
 					fileVal = less.compile(fileVal);
 					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".css"), null /*"UTF-8"*/, fileVal);
 				} else if(fileExtn.equalsIgnoreCase("es6")) {
-					String fileVal = FileUtils.readFileToString(inFile,"");
+					String fileVal = FileUtils.readFileToString_withFallback(inFile,null,"");
 					fileVal = CompileES6.compile(fileVal, fileName);
 					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".js"), null /*"UTF-8"*/, fileVal);
 				}
@@ -913,7 +921,12 @@ public class PageBuilderCore {
 			for (File pageDefine : FileUtils.listDirs(folder)) {
 				// Build each page
 				String subPageName = pageDefine.getName();
-
+				
+				// Could be hidden, or invalid folder format
+				if( subPageName.startsWith(".") || !subPageName.equalsIgnoreCase(FileUtils.getBaseName(subPageName)) ) {
+					continue;
+				}
+				
 				// Scan for sub pages
 				if (subPageName.equalsIgnoreCase("common") || subPageName.equalsIgnoreCase("index")) {
 					buildAndOutputPage(rawPageName + subPageName);
@@ -960,32 +973,52 @@ public class PageBuilderCore {
 
 	/// Dependency chain tracking
 	public GenericConvertListSet<String> dependencyTracker() {
-		return dependencyTracker();
+		return dependencyTracker;
 	}
 
 	/// Reset the Dependency tracking
 	public void dependencyTrackerReset() {
 		dependencyTracker.clear();
 	}
-
-	/// Recursively get the sub depencies, and do the full tracking
-	protected GenericConvertListSet<String> fullDependencyTracker() {
-		// @TODO Recursive pulls
-		return dependencyTracker();
+	
+	/// Recursively pull add in the depency of a existing module, if its not already on the list
+	protected void addDependncyTracking(String dependPath) {
+		// Normalize the path
+		dependPath = filterRawPageName(dependPath);
+		
+		// Check if it already exists
+		if(dependencyTracker.contains(dependPath)) {
+			return;
+		}
+		
+		// Add to track
+		dependencyTracker.add(dependPath);
+		
+		// Get submodules
+		String dependJson = FileUtils.readFileToString_withFallback(new File(pagesFolder, dependPath+"/depend.json"), null /*"UTF-8"*/, null);
+		GenericConvertMap<String, Object> dependMap = GenericConvert.toGenericConvertStringMap( dependJson, null );
+		if( dependMap != null ) {
+			String[] sublist = dependMap.getStringArray("components", "[]");
+			for( String submodule : sublist ) {
+				addDependncyTracking(submodule);
+			}
+		}
 	}
-
+	
 	/// Build the depency for a raw file
 	protected String dependencyBuildFile(String filename) {
 		StringBuilder res = new StringBuilder();
-		for(String name : dependencyTracker) {
-			String pageData = FileUtils.readFileToString_withFallback(new File(pagesFolder, name + "/"+filename), null /*"UTF-8"*/, null);
+		for(String path : dependencyTracker) {
+			String pageData = FileUtils.readFileToString_withFallback(new File(pagesFolder, path + "/"+filename), null /*"UTF-8"*/, null);
 			if( pageData != null ) {
+				res.append("/** file:"+path+"/"+filename+" **/\n");
 				res.append(pageData);
+				res.append("\n");
 			}
 		}
 		return res.toString();
 	}
-
+	
 	/// Builds the LESS from the depency chain
 	public String dependencyLess() {
 		return dependencyBuildFile("depend.less");
@@ -994,5 +1027,15 @@ public class PageBuilderCore {
 	/// Builds the CSS from the depency chain
 	public String dependencyCss() {
 		return less.compile(dependencyLess());
+	}
+	
+	/// Builds the ES6 from the depency chain
+	public String dependencyES6() {
+		return dependencyBuildFile("depend.es6");
+	}
+
+	/// Builds the CSS from the depency chain
+	public String dependencyJS() {
+		return less.compile(dependencyES6());
 	}
 }

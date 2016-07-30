@@ -95,6 +95,8 @@ public class PageBuilder extends PageBuilderCore {
 		try {
 			FileUtils.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.less"), null /*"UTF-8"*/, dependencyLess());
 			FileUtils.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.css"), null /*"UTF-8"*/, dependencyCss());
+			FileUtils.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.es6"), null /*"UTF-8"*/, dependencyES6());
+			FileUtils.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.js"), null /*"UTF-8"*/, dependencyJS());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

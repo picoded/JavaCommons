@@ -200,10 +200,12 @@ public class TempFolder {
 	}
 	
 	/// Delete files from the temp folder older than specified hours. If hours
-	// is <=0 then default hours are considered
-	/// @param hours hours is user specific hours (1 hour or 2 ).
+	/// is <=0 then default hours are considered
+	///
 	/// Before Cleanup check user hours is '< 0 or > 0' if '< 0' then hous
-	// should be default to 48 hours.
+	/// should be default to 48 hours.
+	///
+	/// @param hours hours is user specific hours (1 hour or 2 ).
 	public void cleanupNow(int hours) {
 		if (hours <= 0) {
 			hours = file_outdated_hours;

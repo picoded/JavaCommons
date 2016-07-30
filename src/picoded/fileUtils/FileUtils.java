@@ -10,11 +10,18 @@ import java.util.List;
 import com.mysql.jdbc.StringUtils;
 
 ///
-/// Small extension of apache FileUtils, for some additional features that we needed
+/// Small extension of apache FileUtils, for some additional features that we needed.
+/// Additionally several FilenameUtils is made avaliable here
 ///
 /// @See https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtils.html
 ///
 public class FileUtils extends org.apache.commons.io.FileUtils {
+	
+	//------------------------------------------------------------------------------------------------------------------
+	//
+	// JavaCommons extensions
+	//
+	//------------------------------------------------------------------------------------------------------------------
 	
 	///
 	/// List only the folders inside a folder
@@ -97,6 +104,68 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	///
 	public static void copyFile_ifDifferent(File inFile, File outFile) throws IOException {
 		copyFile(inFile, outFile);
+	}
+	
+	//------------------------------------------------------------------------------------------------------------------
+	//
+	// FilenameUtils functions
+	//
+	//------------------------------------------------------------------------------------------------------------------
+	
+	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getBaseName(java.lang.String)
+	/// @param raw file name/path
+	/// @return filename only without the the type extension
+	public static String getBaseName(String filename) { 
+		return org.apache.commons.io.FilenameUtils.getBaseName(filename);
+	}
+	
+	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getExtension(java.lang.String)
+	/// @param raw file name/path
+	/// @return filename type extension
+	public static String getExtension(String filename) { 
+		return org.apache.commons.io.FilenameUtils.getExtension(filename);
+	}
+	
+	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getFullPath(java.lang.String)
+	/// @param raw file name/path
+	/// @return full resolved path with ending / for directories
+	public static String getFullPath(String filename) { 
+		return org.apache.commons.io.FilenameUtils.getFullPath(filename);
+	}
+	
+	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getFullPathNoEndSeparator(java.lang.String)
+	/// @param raw file name/path
+	/// @return full resolved path without ending / for directories
+	public static String getFullPathNoEndSeparator(String filename) { 
+		return org.apache.commons.io.FilenameUtils.getFullPathNoEndSeparator(filename);
+	}
+	
+	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getName(java.lang.String)
+	/// @param raw file name/path
+	/// @return filename without the path
+	public static String getName(String filename) { 
+		return org.apache.commons.io.FilenameUtils.getName(filename);
+	}
+	
+	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getPath(java.lang.String)
+	/// @param raw file name/path
+	/// @return full resolved path with ending / for directories
+	public static String getPath(String filename) { 
+		return org.apache.commons.io.FilenameUtils.getPath(filename);
+	}
+	
+	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getPathNoEndSeparator(java.lang.String)
+	/// @param raw file name/path
+	/// @return full resolved path without ending / for directories
+	public static String getPathNoEndSeparator(String filename) { 
+		return org.apache.commons.io.FilenameUtils.getPathNoEndSeparator(filename);
+	}
+	
+	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#normalize(java.lang.String)
+	/// @param raw file name/path
+	/// @return full resolved path with ending / for directories
+	public static String normalize(String filename) { 
+		return org.apache.commons.io.FilenameUtils.normalize(filename);
 	}
 	
 	//------------------------------------------------------------------------------------------------------------------

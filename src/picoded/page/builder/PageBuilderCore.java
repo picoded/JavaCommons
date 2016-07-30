@@ -772,8 +772,10 @@ public class PageBuilderCore {
 				
 				String fileExt = (splitFileName.length > 1)? splitFileName[ splitFileName.length - 1 ] : "";
 				if(fileExt.equalsIgnoreCase("less")) {
-					
+					String fileVal = FileUtils.readFileToString(inFile,"");
+					less.compile(fileVal);
 				} else if(fileExt.equalsIgnoreCase("es6")) {
+					String fileVal = FileUtils.readFileToString(inFile,"");
 					
 				}
 			}

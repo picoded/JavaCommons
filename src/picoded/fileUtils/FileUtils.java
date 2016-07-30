@@ -84,8 +84,8 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	///
 	/// @param folder to scan and copy from
 	///
-	public static void copyDirectory_ifDifferent(File inDir) {
-		copyDirectory(inDir);
+	public static void copyDirectory_ifDifferent(File inDir, File outDir) throws IOException {
+		copyDirectory(inDir, outDir);
 	}
 	
 	///
@@ -95,8 +95,8 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	///
 	/// @param file to scan and copy from
 	///
-	public static void copyFile_ifDifferent(File inFile) {
-		copyFile(inFile);
+	public static void copyFile_ifDifferent(File inFile, File outFile) throws IOException {
+		copyFile(inFile, outFile);
 	}
 	
 	//------------------------------------------------------------------------------------------------------------------

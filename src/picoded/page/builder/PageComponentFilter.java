@@ -27,6 +27,14 @@ public class PageComponentFilter {
 
 	/// Page builder core to use
 	public PageBuilderCore core = null;
+	
+	/// Running number
+	public long componentUniqueNumber = 1;
+	
+	/// Returns and issue a unique number for a component
+	public String newUniqueNumber(){
+		return String.valueOf(++componentUniqueNumber);
+	}
 
 	/// Constructor setting up the page builder core
 	public PageComponentFilter(PageBuilderCore inCore) {
@@ -90,8 +98,7 @@ public class PageComponentFilter {
 
 		//then add the component protected keywords
 		Map<String, Object> componentProtectedArgs = new HashMap<String, Object>();
-		componentProtectedArgs.put("newUniqueNumber", core.newUniqueNumber());
-		componentProtectedArgs.put("uniqueNumber", core.uniqueNumber());
+		componentProtectedArgs.put("uniqueNumber", newUniqueNumber());
 		componentProtectedArgs.put("innerHTML", innerHTML);
 		genericJMTE.put("Component", componentProtectedArgs);
 

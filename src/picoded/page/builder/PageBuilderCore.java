@@ -51,9 +51,6 @@ public class PageBuilderCore {
 	/// Components filter utility
 	protected PageComponentFilter componentsFilter = null;
 
-	/// Running number
-	public long componentUniqueNumber = 1;
-
 	////////////////////////////////////////////////////////////
 	//
 	// Constructor
@@ -137,14 +134,6 @@ public class PageBuilderCore {
 		}
 
 		uriRootPrefix = set;
-	}
-
-	public String newUniqueNumber(){
-		return String.valueOf(++componentUniqueNumber);
-	}
-
-	public String uniqueNumber(){
-		return String.valueOf(componentUniqueNumber);
 	}
 
 	////////////////////////////////////////////////////////////

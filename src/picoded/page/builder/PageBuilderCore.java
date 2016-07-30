@@ -757,10 +757,11 @@ public class PageBuilderCore {
 			// For each sub directory, build it as a page
 			for (File inFile : FileUtils.listFiles(definitionFolder, null, false)) {
 				String fileName = inFile.getName();
-				String[] splitFileName = fileName.split(".");
+				String baseName = FileUtils.getBaseName(fileName);
+				String fileExtn = FileUtils.getExtension(fileName);
 				
 				// Ignore index based files
-				if(splitFileName[0].equalsIgnoreCase("index")) {
+				if(baseName.equalsIgnoreCase("index")) {
 					continue;
 				}
 				
@@ -770,13 +771,15 @@ public class PageBuilderCore {
 				// Copy over the file
 				FileUtils.copyFile_ifDifferent(inFile, outFile);
 				
-				String fileExt = (splitFileName.length > 1)? splitFileName[ splitFileName.length - 1 ] : "";
-				if(fileExt.equalsIgnoreCase("less")) {
+				// Less and es6 specific conversion
+				if(fileExtn.equalsIgnoreCase("less")) {
 					String fileVal = FileUtils.readFileToString(inFile,"");
-					less.compile(fileVal);
-				} else if(fileExt.equalsIgnoreCase("es6")) {
+					fileVal = less.compile(fileVal);
+					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".css"), null /*"UTF-8"*/, fileVal);
+				} else if(fileExtn.equalsIgnoreCase("es6")) {
 					String fileVal = FileUtils.readFileToString(inFile,"");
-					
+					fileVal = CompileES6.compile(fileVal, fileName);
+					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".js"), null /*"UTF-8"*/, fileVal);
 				}
 			}
 			

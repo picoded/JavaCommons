@@ -23,10 +23,10 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 	// Internal vars
 	// ----------------------------------------------
 
-	// / Internal var used to represent null value
+	/// Internal var used to represent null value
 	protected static Object nullObject = picoded.enums.ObjectTokens.NULL;
 
-	// / Internal layers of map to read / write values from
+	/// Internal layers of map to read / write values from
 	protected List<Map<K, V>> _layers = null;
 
 	// Constructor
@@ -36,7 +36,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 		_layers = new ArrayList<Map<K, V>>();
 	}
 
-	// / Setsup the tiered map, with the various layers
+	/// Setsup the tiered map, with the various layers
 	public LayeredMap(List<Map<K, V>> list) {
 		_layers = list;
 	}
@@ -44,7 +44,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 	// Layer list handling
 	// ----------------------------------------------
 
-	// / Gets and return the layers
+	/// Gets and return the layers
 	public List<Map<K, V>> layers() {
 		return _layers;
 	}
@@ -52,21 +52,21 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 	// Configuration vars to adjust logic
 	// ----------------------------------------------
 
-	// / Writes to all layers, and not the first layer only
+	/// Writes to all layers, and not the first layer only
 	protected boolean writeToAllLayers = true;
 
-	// / Reverse write order, from last to first.
+	/// Reverse write order, from last to first.
 	protected boolean reverseWriteLayerOrder = true;
 
 	// Utility lamda iterators.
 	// Used to build more complex layer functions
 	// ----------------------------------------------
 
-	// / Iterates all the layers, for non null layer starting from 0
+	/// Iterates all the layers, for non null layer starting from 0
 	// /
-	// / @params func the function used
+	/// @params func the function used
 	// /
-	// / @returns the first non-null value the function returned. else return
+	/// @returns the first non-null value the function returned. else return
 	// null
 	public Object iterateLayersUntilReturn(Function<Map<K, V>, Object> func) {
 		Object ret = null;
@@ -84,17 +84,17 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 		return null;
 	}
 
-	// / Iterates all the layers, for non null layers
+	/// Iterates all the layers, for non null layers
 	// /
-	// / @params func the function used
-	// / @params isReverse runs from last node to first if in reverse order.
+	/// @params func the function used
+	/// @params isReverse runs from last node to first if in reverse order.
 	// Else runs in normal order
 	// /
-	// / @returns the first non-null value the function returned. else return
+	/// @returns the first non-null value the function returned. else return
 	// null
 	public Object iterateLayersUntilReturn(Function<Map<K, V>, Object> func,
 			boolean isReverse) {
-		// / Iterate in normal order
+		/// Iterate in normal order
 		if (!isReverse) {
 			return iterateLayersUntilReturn(func);
 		}
@@ -114,12 +114,12 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 		return null;
 	}
 
-	// / Iterates all the layers, for non null layer starting from 0
+	/// Iterates all the layers, for non null layer starting from 0
 	// /
-	// / @params func the function used
-	// / @params ret the return parameter to pass forward
+	/// @params func the function used
+	/// @params ret the return parameter to pass forward
 	// /
-	// / @returns the first non-null value the function returned. else return
+	/// @returns the first non-null value the function returned. else return
 	// null
 	public Object iterateLayersWithReturn(
 			BiFunction<Map<K, V>, Object, Object> func, Object ret) {
@@ -133,20 +133,20 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 		return ret;
 	}
 
-	// / Iterates all the layers, for non null layers
+	/// Iterates all the layers, for non null layers
 	// /
-	// / @params func the function used
-	// / @params ret the return parameter to pass forward
+	/// @params func the function used
+	/// @params ret the return parameter to pass forward
 	// /
-	// / @params isReverse runs from last node to first if in reverse order.
+	/// @params isReverse runs from last node to first if in reverse order.
 	// Else runs in normal order
 	// /
-	// / @returns the first non-null value the function returned. else return
+	/// @returns the first non-null value the function returned. else return
 	// null
 	public Object iterateLayersWithReturn(
 			BiFunction<Map<K, V>, Object, Object> func, Object ret,
 			boolean isReverse) {
-		// / Iterate in normal order
+		/// Iterate in normal order
 		if (!isReverse) {
 			return iterateLayersWithReturn(func, ret);
 		}
@@ -164,7 +164,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 	// Critical functions for map support
 	// ----------------------------------------------
 
-	// / Get operators
+	/// Get operators
 	@SuppressWarnings("unchecked")
 	public V get(Object key) {
 		return (V) iterateLayersUntilReturn((map) -> {
@@ -178,7 +178,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 		});
 	}
 
-	// / Put the operation
+	/// Put the operation
 	@SuppressWarnings("unchecked")
 	public V put(K key, V value) {
 		V ret = null;
@@ -209,7 +209,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 		return ret;
 	}
 
-	// / Removes all values from a key
+	/// Removes all values from a key
 	@SuppressWarnings("unchecked")
 	public V remove(Object key) {
 		V ret = null;
@@ -226,7 +226,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 		return ret;
 	}
 
-	// / Iterate all layers and form a combined keySet
+	/// Iterate all layers and form a combined keySet
 	@SuppressWarnings("unchecked")
 	public Set<K> keySet() {
 		Set<K> ret = new HashSet<K>();
@@ -249,9 +249,9 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 	// + values
 	// ----------------------------------------------
 
-	// / Clears all layers
+	/// Clears all layers
 	// /
-	// / Please be careful of the implications
+	/// Please be careful of the implications
 	public void clear() {
 		iterateLayersUntilReturn((map) -> {
 			map.clear();
@@ -259,7 +259,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 		});
 	}
 
-	// / Check if it contains key
+	/// Check if it contains key
 	public boolean containsKey(Object key) {
 		return (iterateLayersUntilReturn((map) -> {
 			if (map.containsKey(key)) {

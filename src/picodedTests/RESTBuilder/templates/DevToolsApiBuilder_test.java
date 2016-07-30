@@ -48,7 +48,7 @@ public class DevToolsApiBuilder_test {
 			return true;
 		}
 		
-		// / Process the request, not the authentication layer
+		/// Process the request, not the authentication layer
 		public boolean doJSON(Map<String, Object> outputData, Map<String, Object> templateData) throws Exception {
 			return rbObj.servletCall("", this, outputData);
 		}

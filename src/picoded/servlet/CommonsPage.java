@@ -196,7 +196,7 @@ public class CommonsPage extends BasePage {
 	
 	public String buildApiScript() throws IOException {
 		String apiJS = restBuilder().generateJS("api", (getContextURI() + "/api").replaceAll("//", "/"));
-		FileUtils.writeStringToFile_ifDifferant(new File(getContextPath() + "/api.js"), "UTF-8", apiJS);
+		FileUtils.writeStringToFile_ifDifferant(new File(getContextPath() + "/api.js"), apiJS, null /*"UTF-8"*/);
 		return apiJS;
 	}
 	

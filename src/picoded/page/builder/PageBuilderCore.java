@@ -652,7 +652,7 @@ public class PageBuilderCore {
 				}
 
 				// Write to file if it differ
-				FileUtils.writeStringToFile_ifDifferant(output, null /*"UTF-8"*/, fileVal);
+				FileUtils.writeStringToFile_ifDifferant(output, fileVal, null /*"UTF-8"*/);
 
 				// Indicate file is "deployed"
 				return true;
@@ -783,11 +783,11 @@ public class PageBuilderCore {
 				if(fileExtn.equalsIgnoreCase("less")) {
 					String fileVal = FileUtils.readFileToString_withFallback(inFile,null,"");
 					fileVal = less.compile(fileVal);
-					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".css"), null /*"UTF-8"*/, fileVal);
+					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".css"), fileVal, null /*"UTF-8"*/);
 				} else if(fileExtn.equalsIgnoreCase("es6")) {
 					String fileVal = FileUtils.readFileToString_withFallback(inFile,null,"");
 					fileVal = CompileES6.compile(fileVal, fileName);
-					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".js"), null /*"UTF-8"*/, fileVal);
+					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".js"), fileVal, null /*"UTF-8"*/);
 				}
 			}
 			
@@ -877,7 +877,7 @@ public class PageBuilderCore {
 			//-------------------------------------------------------------------
 
 			// Write to file if it differ
-			FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, "index.html"), null /*"UTF-8"*/, indexStr);
+			FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, "index.html"), indexStr, null /*"UTF-8"*/);
 
 			// Returns success
 			return true;
@@ -1011,7 +1011,7 @@ public class PageBuilderCore {
 	}
 	
 	/// Build the depency for a raw file
-	protected String dependencyBuildFile(String filename) {
+	protected String dependencyBuildFile(String filename, String altFilename) {
 		StringBuilder res = new StringBuilder();
 		for(String path : dependencyTracker) {
 			String pageData = FileUtils.readFileToString_withFallback(new File(pagesFolder, path + "/"+filename), null /*"UTF-8"*/, null);
@@ -1020,13 +1020,22 @@ public class PageBuilderCore {
 				res.append(pageData);
 				res.append("\n");
 			}
+			
+			if(altFilename != null) {
+				pageData = FileUtils.readFileToString_withFallback(new File(pagesFolder, path + "/"+altFilename), null /*"UTF-8"*/, null);
+				if( pageData != null ) {
+					res.append("/** file:"+path+"/"+filename+" **/\n");
+					res.append(pageData);
+					res.append("\n");
+				}
+			}
 		}
 		return res.toString();
 	}
 	
 	/// Builds the LESS from the depency chain
 	public String dependencyLess() {
-		return dependencyBuildFile("depend.less");
+		return getJMTE().parseTemplate(dependencyBuildFile("depend.less", "depend.css"),pageJMTEvars(""));
 	}
 
 	/// Builds the CSS from the depency chain
@@ -1036,11 +1045,11 @@ public class PageBuilderCore {
 	
 	/// Builds the ES6 from the depency chain
 	public String dependencyES6() {
-		return dependencyBuildFile("depend.es6");
+		return getJMTE().parseTemplate(dependencyBuildFile("depend.es6", "depend.js"),pageJMTEvars(""));
 	}
 
 	/// Builds the CSS from the depency chain
 	public String dependencyJS() {
-		return less.compile(dependencyES6());
+		return CompileES6.compile(dependencyES6(), "depend.es6");
 	}
 }

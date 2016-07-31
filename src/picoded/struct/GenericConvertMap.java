@@ -465,7 +465,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 
 	// NESTED object fetch (related to fully qualified keys handling)
 	//--------------------------------------------------------------------------------------------------
-
+	
 	///
 	/// Gets an object from the map,
 	/// That could very well be, a map inside a list, inside a map, inside a .....

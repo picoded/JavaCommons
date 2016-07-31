@@ -946,6 +946,142 @@ public class GenericConvert {
 	}
 	
 	///
+	/// Split the key path into their respective components
+	///
+	/// @param key       The input key to fetch, possibly nested
+	///
+	/// @returns         The fetched object, possibly empty array if key is invalid?
+	///
+	protected static List<String> splitObjectPath(String key, List<String> ret) {
+		// Return array list of string
+		if( ret == null ) {
+			ret = new ArrayList<String>();
+		}
+		
+		//
+		// No more key parts, terminates
+		//
+		// This is the actual termination point for the recursive function
+		//
+		if(key == null || key.length() <= 0) {
+			if(ret.size() < 0) {
+				ret.add("");
+			}
+			return ret;
+		}
+		
+		// Trim off useless spaces, and try again (if applicable)
+		int keyLen = key.length();
+		key = key.trim();
+		if (key.length() != keyLen) {
+			return splitObjectPath(key, ret);
+		}
+		
+		// Trim off useless starting ".dots" and try again
+		if (key.startsWith(".")) {
+			return splitObjectPath(key.substring(1), ret);
+		}
+		
+		// Left and right string parts to recursively process
+		String leftPart = null;
+		String rightPart = null;
+		
+		// Fetches the next 2 index points (most probably seperator of token parts)
+		int dotIndex = key.indexOf(".");
+		int leftBracketIndex = key.indexOf("[");
+		
+		// No match found, assume last key
+		if( dotIndex < 0 && leftBracketIndex < 0 ) {
+			ret.add(key);
+			return ret;
+		}
+		
+		// Begins left/right part splitting and processing
+		if (leftBracketIndex == 0) {
+			//
+			// Array bracket fetching start
+			// This is most likely an array fetching,
+			// but could also be a case of map fetching with string
+			//
+			int rightBracketIndex = key.indexOf("]", 1);
+			if(rightBracketIndex <= 0) {
+				throw new RuntimeException("Missing closing ']' right bracket for key : "+key);
+			}
+			
+			//
+			// Get the left part within the bracket, and the right part after it
+			// 
+			// Format: [leftPart]rightPart___
+			//
+			leftPart = key.substring(1, rightBracketIndex).trim();
+			rightPart = key.substring(rightBracketIndex + 1).trim();
+			
+			// Sanatize the left path from quotation marks
+			if(leftPart.length() > 1 && (
+				(leftPart.startsWith("\"") && leftPart.endsWith("\"")) ||
+				(leftPart.startsWith("\'") && leftPart.endsWith("\'"))
+			)) {
+				leftPart = leftPart.substring(1, leftPart.length() - 1);
+			}
+			
+		} else if (dotIndex >= 0 && (leftBracketIndex < 0 || dotIndex <= leftBracketIndex)) {
+			//
+			// Dot Index exists, and is before left bracket index OR there is no left bracket index
+			//
+			// This is most likely a nested object fetch -> so recursion is done
+			//
+			
+			//
+			// Get the left part before the dot, and right part after it
+			//
+			// Format: leftPart.rightPart___
+			//
+			leftPart = key.substring(0, dotIndex); //left
+			rightPart = key.substring(dotIndex + 1); //right
+			
+		} else if (leftBracketIndex > 0) {
+			//
+			// Left bracket index exists, and there is no dot before it
+			//
+			// This is most likely a nested object fetch -> so recursion is done
+			//
+			
+			//
+			// Get the left part before the left bracket, and right part INCLUDING the left bracket it
+			//
+			// Format: leftPart[rightPart___
+			//
+			leftPart = key.substring(0, leftBracketIndex); //left
+			rightPart = key.substring(leftBracketIndex); //[right]
+			
+		} else {
+			throw new RuntimeException("Unexpected key format : "+key);
+		}
+		
+		// Add left key to return set
+		ret.add(leftPart);
+		
+		// There is no right key, ends and terminate at recusive termination point above
+		if(rightPart == null || rightPart.length() <= 0) {
+			return splitObjectPath(null, ret);
+		}
+		
+		// ELSE : recursively process the right keys
+		return splitObjectPath(rightPart, ret);
+	}
+	
+	///
+	/// Split the key path into their respective components
+	///
+	/// @param key       The input key to fetch, possibly nested
+	///
+	/// @returns         The fetched object, possibly empty array if key is invalid?
+	///
+	public static String[] splitObjectPath(String key) {
+		return toStringArray(splitObjectPath(key,null));
+	}
+	
+	///
 	/// Gets an object from the map,
 	/// That could very well be, a map inside a list, inside a map, inside a .....
 	///
@@ -996,6 +1132,9 @@ public class GenericConvert {
 		// but could also be a case of map fetching with string
 		if (key.startsWith("[")) {
 			int rightBracketIndex = key.indexOf("]", 1);
+			if(rightBracketIndex <= 0) {
+				throw new RuntimeException("Missing closing ']' right bracket for key : "+key);
+			}
 			
 			String bracketKey = key.substring(1, rightBracketIndex).trim();
 			String rightKey = key.substring(rightBracketIndex + 1).trim();
@@ -1069,6 +1208,135 @@ public class GenericConvert {
 	///
 	public static Object fetchNestedObject(Object base, String key) {
 		return fetchNestedObject(base, key, null);
+	}
+	
+	///
+	/// Takes a possibly case insensitive key, and normalize it to the actual key path (if found) for the selected object
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param objPath   The input key to fetch, possibly nested
+	///
+	/// @returns         The normalized key
+	///
+	public static String normalizeObjectPath(Object base, String key) {
+		return normalizeObjectPath(base, splitObjectPath(key, null), null).toString();
+	}
+	
+	///
+	/// Takes a possibly case insensitive key, and normalize it to the actual key path (if found) for the selected object
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	///
+	/// @returns         The normalized key
+	///
+	protected static StringBuilder normalizeObjectPath(Object base, List<String> splitKeyPath, StringBuilder res) {
+		
+		//
+		// Result string builder setup
+		//--------------------------------------------------------
+		
+		if( res == null ) {
+			res = new StringBuilder();
+		}
+		
+		//
+		// End of path recursion
+		//--------------------------------------------------------
+		
+		/// No additional parts, return existing path
+		if(splitKeyPath.size() <= 0) {
+			return res;
+		}
+		
+		//
+		// Get base respective array or map type
+		//--------------------------------------------------------
+		
+		// Base to map / list conversion
+		Map<String, Object> baseMap = null;
+		List<Object> baseList = null;
+		
+		// Base to map / list conversion
+		if (base instanceof Map) {
+			baseMap = toStringMap(base);
+		} else if (base instanceof List) {
+			baseList = toObjectList(base);
+		}
+		
+		// Fail on getting base item : attempts conversion
+		if (baseMap == null && baseList == null) {
+			baseMap = toStringMap(base);
+			if (baseMap == null) {
+				baseList = toObjectList(base);
+			}
+		}
+		
+		if(baseMap == null && baseList == null) {
+			throw new RuntimeException("Unexpected key path format : "+ConvertJSON.fromList(splitKeyPath));
+		}
+		
+		//
+		// Process if its map or list respectively
+		//--------------------------------------------------------
+		
+		String currentKey = splitKeyPath.get(0);
+		List<String> nextKeyPathSet = splitKeyPath.subList(1, splitKeyPath.size());
+		Object subObject = fetchObject(base, currentKey);
+		
+		// Failed fetch with currentKey
+		if( subObject == null ) {
+			
+			// Fails if its an array : no such thing as case insensitive number
+			if( baseList != null ) {
+				return new StringBuilder();
+			}
+			
+			//System.out.println("normalize search - "+currentKey); 
+			//System.out.println("normalize keySet - "+baseMap.keySet());
+			
+			// Attempt to correct the case insensitivty issue
+			for( String oneKey : baseMap.keySet() ) {
+				if(oneKey.equalsIgnoreCase(currentKey)) {
+					currentKey = oneKey;
+					subObject = baseMap.get(currentKey);
+					if( subObject != null ) {
+						break;
+					}
+				}
+			}
+			
+			// Still invalid after search
+			if( subObject == null ) {
+				return new StringBuilder();
+			}
+		}
+		
+		if( baseMap != null ) {
+			//
+			// Base is a map
+			//
+			if( res.length() > 0 ) {
+				res.append(".");
+			}
+			res.append(currentKey);
+			
+		} else if( baseList != null ) {
+			//
+			// Base is a list
+			//
+			res.append("["); 
+			res.append(currentKey);
+			res.append("]");
+		}
+		
+		// Terminate when done
+		if(nextKeyPathSet.size() <= 0) {
+			return res;
+		}
+		
+		// Else recursive fetch
+		return normalizeObjectPath( subObject, nextKeyPathSet, res );
 	}
 	
 	// to custom class

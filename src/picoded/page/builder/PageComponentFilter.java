@@ -70,22 +70,45 @@ public class PageComponentFilter {
 			}
 		}
 	}
-
+	
+	/// Gets the component raw html using the component path
+	protected String getRawComponentHtml(String tagname) {
+		return core.buildPageInnerRawHTML(tagname);
+	}
+	
+	/// Normalize case sensitivity of path
+	public String normalizeComponentPath(String tagname) {
+		tagname = tagname.replaceAll("-",".");
+		
+		String normalized = GenericConvert.normalizeObjectPath(core.buildPageComponentMap(), tagname);
+		if( normalized != null && normalized.length() > 0 ) {
+			//System.out.println("createElementComponent.normalized - "+normalized);
+			return normalized.replaceAll("\\.","/");
+		}
+		
+		return tagname.replaceAll("\\.","/");
+	}
+	
 	/// Create the element node, to inject
 	protected Element createElementComponent(String tagname, String innerHTML, Map<String,Object> tagArgs) {
 		if(tagname.startsWith("page-") || tagname.startsWith("PAGE-")) {
 			tagname = tagname.substring(5);
 		}
-		tagname = tagname.replaceAll("-","/");
+		
+		String componentPath = normalizeComponentPath(tagname);
+		//System.out.println("createElementComponent.tagname - "+tagname);
+		//System.out.println("createElementComponent.componentPath - "+componentPath); 
+		componentPath = core.filterRawPageName(componentPath);
 
-		String rawHtml = core.buildPageInnerRawHTML(tagname);
-		GenericConvertMap<String,Object> genericJMTE = GenericConvertMap.build( core.pageJMTEvars(tagname) );
+		String rawHtml = getRawComponentHtml(componentPath);
+		GenericConvertMap<String,Object> genericJMTE = GenericConvertMap.build( core.pageJMTEvars(componentPath) );
 
 		//Add user defined html tags first
-		if(tagArgs != null && tagArgs.size() > 0){
-			//Final namespace remains undecided
+		if(componentPath != null && componentPath.length() > 0){
+			// Case insensitive components args
+			tagArgs = new CaseInsensitiveHashMap<String,Object>(tagArgs);
+			// Components "this" reference
 			genericJMTE.put("this", tagArgs);
-			genericJMTE.put("ThisComponent", tagArgs);
 		}
 
 		//then add the component protected keywords
@@ -104,7 +127,7 @@ public class PageComponentFilter {
 			return elementSet.get(0);
 		} else {
 			// To do a container wrapper
-			throw new RuntimeException("Unexpected element children count for : "+tagname+" - "+elementSet.size());
+			throw new RuntimeException("Unexpected element children count for : "+componentPath+" - "+elementSet.size());
 		}
 	}
 	

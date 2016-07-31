@@ -306,14 +306,16 @@ public class PageBuilderCore {
 	///
 	/// Filters the rawPageName, into its valid form (remove any pre/suf-fix of slashes)
 	///
-	protected String filterRawPageName(String rawPageName) {
+	public String filterRawPageName(String rawPageName) {
 		if(rawPageName == null) {
 			rawPageName = "";
 		}
 
 		rawPageName = rawPageName.trim();
 		rawPageName = rawPageName.replaceAll("\\.","/");
-		rawPageName = FileUtils.normalize(rawPageName);
+		rawPageName = rawPageName.replaceAll("\\-","/");
+		
+		rawPageName = FileUtils.normalize(rawPageName).trim();
 		
 		while (rawPageName.startsWith("/")) {
 			rawPageName = rawPageName.substring(1);
@@ -322,7 +324,7 @@ public class PageBuilderCore {
 			rawPageName = rawPageName.substring(0, rawPageName.length());
 		}
 
-		return rawPageName;
+		return rawPageName.trim();
 	}
 
 	///
@@ -411,7 +413,7 @@ public class PageBuilderCore {
 	public String buildPageInnerRawHTML(String rawPageName) {
 		// Depenency chain tracking
 		rawPageName = filterRawPageName(rawPageName);
-		addDependncyTracking(rawPageName);
+		addDependencyTracking(rawPageName);
 
 		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/"
 			+ safePageName(rawPageName) + ".html"), null );
@@ -550,7 +552,7 @@ public class PageBuilderCore {
 		// Return result set
 		return res;
 	}
-
+	
 	///
 	/// Build and returns the page components map
 	///
@@ -978,14 +980,25 @@ public class PageBuilderCore {
 	public void dependencyTrackerReset() {
 		dependencyTracker.clear();
 		
-		addDependncyTracking("");
-		addDependncyTracking("components");
-		addDependncyTracking("common");
-		addDependncyTracking("index");
+		addDependencyTracking("");
+		addDependencyTracking("components");
+		addDependencyTracking("common");
+		addDependencyTracking("index");
+	}
+	
+	/// Gets the dependency map for path
+	protected GenericConvertMap<String, Object> depenencyConfig(String rawPageName) {
+		String dependJson = FileUtils.readFileToString_withFallback(new File(pagesFolder, filterRawPageName(rawPageName)+"/depend.json"), "{}" );
+		return GenericConvert.toGenericConvertStringMap( dependJson, "{}" );
+	}
+	
+	/// Normalize case sensitivity of path
+	protected String normalizeDependencyPath(String dependPath) {
+		return componentsFilter.normalizeComponentPath(dependPath);
 	}
 	
 	/// Recursively pull add in the depency of a existing module, if its not already on the list
-	protected void addDependncyTracking(String dependPath) {
+	protected void addDependencyTracking(String dependPath) {
 		// Normalize the path
 		dependPath = filterRawPageName(dependPath);
 		
@@ -994,47 +1007,102 @@ public class PageBuilderCore {
 			return;
 		}
 		
-		// Add to track
+		// Normalize the path
+		dependPath = normalizeDependencyPath(dependPath);
+		
+		// Check if it already exists after normalizing
+		if(dependencyTracker.contains(dependPath)) {
+			return;
+		}
+		
+		// Add to track (prevent circular reference conflict)
 		dependencyTracker.add(dependPath);
 		
 		// Get submodules
-		String dependJson = FileUtils.readFileToString_withFallback(new File(pagesFolder, dependPath+"/depend.json"), null );
-		GenericConvertMap<String, Object> dependMap = GenericConvert.toGenericConvertStringMap( dependJson, null );
-		if( dependMap != null ) {
-			String[] sublist = dependMap.getStringArray("components", "[]");
-			for( String submodule : sublist ) {
-				addDependncyTracking(submodule);
-			}
-		}
-	}
-	
-	/// Build the depency for a raw file
-	protected String dependencyBuildFile(String filename, String altFilename) {
-		StringBuilder res = new StringBuilder();
-		for(String path : dependencyTracker) {
-			String pageData = FileUtils.readFileToString_withFallback(new File(pagesFolder, path + "/"+filename), null );
-			if( pageData != null ) {
-				res.append("/** file:"+path+"/"+filename+" **/\n");
-				res.append(pageData);
-				res.append("\n");
-			}
-			
-			if(altFilename != null) {
-				pageData = FileUtils.readFileToString_withFallback(new File(pagesFolder, path + "/"+altFilename), null );
-				if( pageData != null ) {
-					res.append("/** file:"+path+"/"+filename+" **/\n");
-					res.append(pageData);
-					res.append("\n");
-				}
-			}
+		String[] sublist = depenencyConfig(dependPath).getStringArray("components", "[]");
+		for( String submodule : sublist ) {
+			addDependencyTracking(submodule);
 		}
 		
+		// Actual add (at the end), remove from position first
+		dependencyTracker.remove(dependPath);
+		dependencyTracker.add(dependPath);
+	}
+	
+	/// Get dependency file into a string builder utility
+	protected StringBuilder dependencyGetSingleFile(StringBuilder res, String pagesFilePath) {
+		String fileData = FileUtils.readFileToString_withFallback(new File(pagesFolder, pagesFilePath), null );
+		if( fileData != null ) {
+			res.append("/** file:"+pagesFilePath+" **/\n"); //Added file name reference
+			res.append(fileData);
+			res.append("\n");
+		}
+		return res;
+	}
+	
+	/// Dependency build a single set, no recursion calls
+	protected StringBuilder dependencyBuiltPagePart(StringBuilder res, String rawPageName, String type) {
+		//
+		// Get pathing, and does safety checks
+		//
+		String path = filterRawPageName(rawPageName);
+		if( !(type.equalsIgnoreCase("less") || type.equalsIgnoreCase("es6")) ) {
+			throw new RuntimeException("Unexpected dpendency type : "+type);
+		}
+		
+		//
+		// Process JMTE filtered scripts
+		// 
+		JMTE jmte = getJMTE();
+		Map<String,Object> jmteVars = pageJMTEvars(path);
+		StringBuilder toJMTEParse = new StringBuilder();
+		if( type.equalsIgnoreCase("less") ) {
+			dependencyGetSingleFile(toJMTEParse, path+"/depend.less");
+			dependencyGetSingleFile(toJMTEParse, path+"/depend.css");
+		} else {
+			dependencyGetSingleFile(toJMTEParse, path+"/depend.es6");
+			dependencyGetSingleFile(toJMTEParse, path+"/depend.js");
+		}
+		res.append( jmte.parseTemplate(toJMTEParse.toString(), jmteVars) );
+		
+		//
+		// Process non fitlered scripts
+		//
+		String[] fileList = depenencyConfig(path).getStringArray(type, "[]");
+		for(String filePath : fileList) {
+			// Parse any templates if need be
+			filePath = jmte.parseTemplate(filePath, jmteVars);
+			
+			// Changes relative path to fixed path
+			if( !filePath.startsWith("/") ) {
+				filePath = FileUtils.normalize(rawPageName+"/"+filePath);
+			} 
+			
+			// Get and inject, without JMTE parsing
+			dependencyGetSingleFile(res, filePath);
+		}
+		return res;
+	}
+	
+	/// Build the whole dependency file for a single type
+	protected String dependencyBuildFile(String type) {
+		StringBuilder res = new StringBuilder();
+		
+		res.append("/**** "+type+" dependcies for the following components ****\n\n");
+		for(String path : dependencyTracker) {
+			res.append("+ '"+path+"'\n");
+		}
+		res.append("\n*******************************************************/\n\n");
+		
+		for(String path : dependencyTracker) {
+			dependencyBuiltPagePart(res, path, type);
+		}
 		return res.toString();
 	}
 	
 	/// Builds the LESS from the depency chain
 	public String dependencyLess() {
-		return getJMTE().parseTemplate(dependencyBuildFile("depend.less", "depend.css"),pageJMTEvars(""));
+		return dependencyBuildFile("less");
 	}
 
 	/// Builds the CSS from the depency chain
@@ -1044,7 +1112,7 @@ public class PageBuilderCore {
 	
 	/// Builds the ES6 from the depency chain
 	public String dependencyES6() {
-		return getJMTE().parseTemplate(dependencyBuildFile("depend.es6", "depend.js"),pageJMTEvars(""));
+		return dependencyBuildFile("es6");
 	}
 
 	/// Builds the CSS from the depency chain

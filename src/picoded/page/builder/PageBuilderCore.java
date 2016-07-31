@@ -757,14 +757,14 @@ public class PageBuilderCore {
 			// Ignores: index files (as of now)
 			//-------------------------------------------------------------------
 			
-			// For each sub directory, build it as a page
+			// For each sub file, clone it
 			for (File inFile : FileUtils.listFiles(definitionFolder, null, false)) {
 				String fileName = inFile.getName();
 				
 				// Ignore hidden files, or index based files
 				String baseName = FileUtils.getBaseName(fileName);
 				String fileExtn = FileUtils.getExtension(fileName);
-				if(baseName == null || baseName.length() <= 0 || baseName.equalsIgnoreCase("index") || baseName.equalsIgnoreCase("depend") || baseName.equalsIgnoreCase("component") || baseName.equalsIgnoreCase("page") ) {
+				if(baseName == null || baseName.length() <= 0 || baseName.equalsIgnoreCase("index") /* || baseName.equalsIgnoreCase("depend") || baseName.equalsIgnoreCase("component") || baseName.equalsIgnoreCase("page") */ ) {
 					continue;
 				}
 				
@@ -781,11 +781,11 @@ public class PageBuilderCore {
 				
 				// Less and es6 specific conversion
 				if(fileExtn.equalsIgnoreCase("less")) {
-					String fileVal = FileUtils.readFileToString_withFallback(inFile,null,"");
+					String fileVal = FileUtils.readFileToString_withFallback(inFile,"");
 					fileVal = less.compile(fileVal);
 					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".css"), fileVal);
 				} else if(fileExtn.equalsIgnoreCase("es6")) {
-					String fileVal = FileUtils.readFileToString_withFallback(inFile,null,"");
+					String fileVal = FileUtils.readFileToString_withFallback(inFile,"");
 					fileVal = CompileES6.compile(fileVal, fileName);
 					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".js"), fileVal);
 				}

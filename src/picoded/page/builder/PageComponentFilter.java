@@ -71,8 +71,26 @@ public class PageComponentFilter {
 		}
 	}
 	
-	/// Gets the component raw html using the component path
-	protected String getRawComponentHtml(String tagname) {
+	/// Gets and returns a comopnent.html strictly without going through the JMTE parser
+	protected String getRawComponentHtml(String rawPageName) {
+		// Depenency chain tracking
+		rawPageName = core.filterRawPageName(rawPageName);
+		core.addDependencyTracking(rawPageName);
+
+		// Get the component html
+		String indexFileStr = FileUtils.readFileToString_withFallback(new File(core.pagesFolder, rawPageName + "/component.html"), "");
+		if ((indexFileStr = indexFileStr.trim()).length() == 0) {
+			return null;
+		}
+		return indexFileStr.toString();
+	}
+
+	/// Gets the component raw html using the component path, fallsback to index.html for legacy behaviour
+	protected String getComponentHtml(String tagname) {
+		String ret = getRawComponentHtml(tagname);
+		if( ret != null ) {
+			return ret;
+		}
 		return core.buildPageInnerRawHTML(tagname);
 	}
 	
@@ -100,7 +118,7 @@ public class PageComponentFilter {
 		//System.out.println("createElementComponent.componentPath - "+componentPath); 
 		componentPath = core.filterRawPageName(componentPath);
 
-		String rawHtml = getRawComponentHtml(componentPath);
+		String rawHtml = getComponentHtml(componentPath);
 		GenericConvertMap<String,Object> genericJMTE = GenericConvertMap.build( core.pageJMTEvars(componentPath) );
 
 		//Add user defined html tags first
@@ -125,9 +143,9 @@ public class PageComponentFilter {
 
 		if( elementSet.size() == 1 ) {
 			return elementSet.get(0);
-		} else {
-			// To do a container wrapper
-			throw new RuntimeException("Unexpected element children count for : "+componentPath+" - "+elementSet.size());
+		} else { //container wrapper
+			newDom = Jsoup.parse("<div pageComponent='"+tagname.replaceAll("\\.","-")+"'>"+resolvedHtml+"</div>");
+			return newDom.children().get(0);
 		}
 	}
 	

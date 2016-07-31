@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
 
 /// jmte provides a convinence wrapper around the core functionality of "Java Minimal Template Engine"
 ///
@@ -41,9 +42,15 @@ public class JMTE {
 	/// The baseDataModel, that is used to populate the template variables
 	public HashMap<String, Object> baseDataModel = new HashMap<String, Object>();
 	
+	/// Directly parse the template without modifying the data obj stack
+	protected String parseTemplateRaw(String template, Map<String,Object>dataObj) {
+		// Yes the many "\" slashes is to make sure all slash is escaped once before engine.transform, because the engine will escape them again X_X
+		return engine.transform(template.replaceAll("\\\\","\\\\\\\\"), dataObj); 
+	}
+	
 	/// Parses the template, with the baseDataModel data
 	public String parseTemplate(String template) {
-		return engine.transform(template, baseDataModel);
+		return parseTemplateRaw(template, baseDataModel);
 	}
 	
 	/// Parses the template, with the provided data & baseDataModel
@@ -54,7 +61,7 @@ public class JMTE {
 		tempObj.putAll(baseDataModel);
 		tempObj.putAll(dataObj);
 		
-		return engine.transform(template, tempObj);
+		return parseTemplateRaw(template, tempObj); 
 	}
 	
 	/// Registers a class renderer. Note that you will need to import

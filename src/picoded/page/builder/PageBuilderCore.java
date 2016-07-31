@@ -187,7 +187,7 @@ public class PageBuilderCore {
 		// Page path itself
 		templateList.add(
 			GenericConvert.toStringMap(
-				FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + fileName), null /*"UTF-8"*/, null), null
+				FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + fileName), null ), null
 			)
 		);
 
@@ -204,7 +204,7 @@ public class PageBuilderCore {
 				// Join the name path, and get the file
 				templateList.add(
 					GenericConvert.toStringMap(
-						FileUtils.readFileToString_withFallback(new File(pagesFolder, String.join("/", splitNames) + "/" + fileName), null /*"UTF-8"*/, null), null
+						FileUtils.readFileToString_withFallback(new File(pagesFolder, String.join("/", splitNames) + "/" + fileName), null ), null
 					)
 				);
 
@@ -216,7 +216,7 @@ public class PageBuilderCore {
 		// Get from the root folder (v2)
 		templateList.add(
 			GenericConvert.toStringMap(
-				FileUtils.readFileToString_withFallback(new File(pagesFolder, fileName), null /*"UTF-8"*/, null), null
+				FileUtils.readFileToString_withFallback(new File(pagesFolder, fileName), null ), null
 			)
 		);
 
@@ -242,7 +242,7 @@ public class PageBuilderCore {
 		rawPageName = filterRawPageName(rawPageName);
 
 		// Get the config from rawPageName folder itself
-		return GenericConvert.toStringMap( FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/page.json" ), null /*"UTF-8"*/, "{}") );
+		return GenericConvert.toStringMap( FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/page.json" ), "{}") );
 	}
 
 
@@ -346,7 +346,7 @@ public class PageBuilderCore {
 		String res = null;
 
 		// Get from the rawPageName folder itself (v2)
-		res = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + fileName), null /*"UTF-8"*/, null);
+		res = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + fileName), null );
 
 		// Gets the parent paths (if valid)
 		if (res == null) {
@@ -361,7 +361,7 @@ public class PageBuilderCore {
 				while (res == null && splitNames.length > 0) {
 					// Join the name path, and get the file
 					res = FileUtils.readFileToString_withFallback(new File(pagesFolder, String.join("/", splitNames) + "/"
-						+ fileName), null /*"UTF-8"*/, null);
+						+ fileName), null );
 
 					// Go one "directory" parent upward
 					splitNames = ArrayConv.subarray(splitNames, 0, splitNames.length - 1);
@@ -371,17 +371,17 @@ public class PageBuilderCore {
 
 		// Get from the root folder (v2)
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, fileName), null /*"UTF-8"*/, null);
+			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, fileName), null );
 		}
 
 		// Get from the common folder (v2)
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "common/" + fileName), null /*"UTF-8"*/, null);
+			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "common/" + fileName), null );
 		}
 
 		// Legacy support (v1) get from index folder
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "index/" + fileName), null /*"UTF-8"*/, null);
+			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "index/" + fileName), null );
 		}
 
 		// Fallbacks to blank
@@ -414,10 +414,9 @@ public class PageBuilderCore {
 		addDependncyTracking(rawPageName);
 
 		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/"
-			+ safePageName(rawPageName) + ".html"), null /*"UTF-8"*/, null);
+			+ safePageName(rawPageName) + ".html"), null );
 		if (indexFileStr == null) {
-			indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/index.html"),
-				null /*"UTF-8"*/, "");
+			indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/index.html"),"");
 		}
 
 		if ((indexFileStr = indexFileStr.trim()).length() == 0) {
@@ -438,10 +437,9 @@ public class PageBuilderCore {
 	/// Gets and returns a page frame string, with its respective JMTE input vars?
 	public String buildPageInnerHTML(String rawPageName, Map<String, Object> jmteTemplate) {
 		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/"
-			+ safePageName(rawPageName) + ".html"), null /*"UTF-8"*/, null);
+			+ safePageName(rawPageName) + ".html"), null );
 		if (indexFileStr == null) {
-			indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/index.html"),
-				null /*"UTF-8"*/, "");
+			indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/index.html"), "");
 		}
 
 		if ((indexFileStr = indexFileStr.trim()).length() == 0) {
@@ -652,7 +650,7 @@ public class PageBuilderCore {
 				}
 
 				// Write to file if it differ
-				FileUtils.writeStringToFile_ifDifferant(output, fileVal, null /*"UTF-8"*/);
+				FileUtils.writeStringToFile_ifDifferant(output, fileVal);
 
 				// Indicate file is "deployed"
 				return true;
@@ -783,11 +781,11 @@ public class PageBuilderCore {
 				if(fileExtn.equalsIgnoreCase("less")) {
 					String fileVal = FileUtils.readFileToString_withFallback(inFile,null,"");
 					fileVal = less.compile(fileVal);
-					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".css"), fileVal, null /*"UTF-8"*/);
+					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".css"), fileVal);
 				} else if(fileExtn.equalsIgnoreCase("es6")) {
 					String fileVal = FileUtils.readFileToString_withFallback(inFile,null,"");
 					fileVal = CompileES6.compile(fileVal, fileName);
-					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".js"), fileVal, null /*"UTF-8"*/);
+					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".js"), fileVal);
 				}
 			}
 			
@@ -877,7 +875,7 @@ public class PageBuilderCore {
 			//-------------------------------------------------------------------
 
 			// Write to file if it differ
-			FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, "index.html"), indexStr, null /*"UTF-8"*/);
+			FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, "index.html"), indexStr);
 
 			// Returns success
 			return true;
@@ -1000,7 +998,7 @@ public class PageBuilderCore {
 		dependencyTracker.add(dependPath);
 		
 		// Get submodules
-		String dependJson = FileUtils.readFileToString_withFallback(new File(pagesFolder, dependPath+"/depend.json"), null /*"UTF-8"*/, null);
+		String dependJson = FileUtils.readFileToString_withFallback(new File(pagesFolder, dependPath+"/depend.json"), null );
 		GenericConvertMap<String, Object> dependMap = GenericConvert.toGenericConvertStringMap( dependJson, null );
 		if( dependMap != null ) {
 			String[] sublist = dependMap.getStringArray("components", "[]");
@@ -1014,7 +1012,7 @@ public class PageBuilderCore {
 	protected String dependencyBuildFile(String filename, String altFilename) {
 		StringBuilder res = new StringBuilder();
 		for(String path : dependencyTracker) {
-			String pageData = FileUtils.readFileToString_withFallback(new File(pagesFolder, path + "/"+filename), null /*"UTF-8"*/, null);
+			String pageData = FileUtils.readFileToString_withFallback(new File(pagesFolder, path + "/"+filename), null );
 			if( pageData != null ) {
 				res.append("/** file:"+path+"/"+filename+" **/\n");
 				res.append(pageData);
@@ -1022,7 +1020,7 @@ public class PageBuilderCore {
 			}
 			
 			if(altFilename != null) {
-				pageData = FileUtils.readFileToString_withFallback(new File(pagesFolder, path + "/"+altFilename), null /*"UTF-8"*/, null);
+				pageData = FileUtils.readFileToString_withFallback(new File(pagesFolder, path + "/"+altFilename), null );
 				if( pageData != null ) {
 					res.append("/** file:"+path+"/"+filename+" **/\n");
 					res.append(pageData);
@@ -1030,6 +1028,7 @@ public class PageBuilderCore {
 				}
 			}
 		}
+		
 		return res.toString();
 	}
 	
@@ -1050,6 +1049,10 @@ public class PageBuilderCore {
 
 	/// Builds the CSS from the depency chain
 	public String dependencyJS() {
+		// System.out.println("dependencyBuildFile - es6");
+		// System.out.println(dependencyBuildFile("depend.es6", "depend.js"));
+		// System.out.println("dependencyBuildFile - es6 + JMTE");
+		// System.out.println(dependencyES6());
 		return CompileES6.compile(dependencyES6(), "depend.es6");
 	}
 }

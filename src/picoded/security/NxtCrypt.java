@@ -253,7 +253,7 @@ public class NxtCrypt {
 		String[] splitStr = passHash.split(seperator, 3);
 		
 		if (splitStr.length < 3) {
-			throw new SecurityException("Invalid salted hash of less then 3 components");
+			throw new SecurityException("Invalid salted hash of less then 3 component");
 		}
 		
 		return splitStr[2];
@@ -264,7 +264,7 @@ public class NxtCrypt {
 		String[] splitStr = passHash.split(seperator, 3);
 		
 		if (splitStr.length < 3) {
-			throw new SecurityException("Invalid salted hash of less then 3 components");
+			throw new SecurityException("Invalid salted hash of less then 3 component");
 		}
 		
 		return splitStr[0];
@@ -275,7 +275,7 @@ public class NxtCrypt {
 		String[] splitStr = passHash.split(seperator, 3);
 		
 		if (splitStr.length < 3) {
-			throw new SecurityException("Invalid salted hash of less then 3 components: " + Arrays.toString(splitStr));
+			throw new SecurityException("Invalid salted hash of less then 3 component: " + Arrays.toString(splitStr));
 		}
 		
 		String salt = splitStr[0];

@@ -173,7 +173,7 @@ public class PageBuilder extends PageBuilderCore {
 				// Reloads only on index page request, instead of every http request
 				if (itemName.equals("index.html") && servletPageBuilder.hasPageFolder(basePageName + "/")) {
 					
-					// Changed to build everything, slower on page load but ensures components changes get propagated properly.
+					// Changed to build everything, slower on page load but ensures component changes get propagated properly.
 					servletPageBuilder.buildAllPage();
 					
 					// servletPageBuilder.buildPageFolder_includingSelf(basePageName + "/");

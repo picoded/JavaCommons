@@ -49,7 +49,7 @@ public class PageBuilderCore {
 	protected GenericConvertListSet<String> dependencyTracker = new GenericConvertListSet<String>();
 
 	/// Component filter utility
-	protected PageComponentFilter componentsFilter = null;
+	protected PageComponentFilter componentFilter = null;
 
 	////////////////////////////////////////////////////////////
 	//
@@ -64,7 +64,7 @@ public class PageBuilderCore {
 	///
 	public PageBuilderCore(File inPageFolder) {
 		pageFolder = inPageFolder;
-		componentsFilter = new PageComponentFilter(this);
+		componentFilter = new PageComponentFilter(this);
 	}
 
 	///
@@ -85,7 +85,7 @@ public class PageBuilderCore {
 	public PageBuilderCore(File inPageFolder, File inOutputFolder) {
 		pageFolder = inPageFolder;
 		outputFolder = inOutputFolder;
-		componentsFilter = new PageComponentFilter(this);
+		componentFilter = new PageComponentFilter(this);
 	}
 
 	///
@@ -277,7 +277,7 @@ public class PageBuilderCore {
 		Map<String, Object> ret = getTemplateJson(rawPageName);
 
 		ret.put("PageRootURI", uriRootPrefix);
-		ret.put("PageRootURI", uriRootPrefix); //because FAportal and orgeva
+		ret.put("PagesRootURI", uriRootPrefix); //because FAportal and orgeva //@TODO: Remove this
 		ret.put("PageURI", pageURI);
 
 		ret.put("PageNameRaw", rawPageName);
@@ -554,7 +554,7 @@ public class PageBuilderCore {
 	}
 	
 	///
-	/// Build and returns the page components map
+	/// Build and returns the page component map
 	///
 	public PageComponentMap buildPageComponentMap() {
 		return new PageComponentMap(this, "");
@@ -861,7 +861,7 @@ public class PageBuilderCore {
 
 			// Component resolution
 			//-------------------------------------------------------------------
-			indexStr = componentsFilter.resolve(indexStr);
+			indexStr = componentFilter.resolve(indexStr);
 
 			// HTML minify
 			//-------------------------------------------------------------------
@@ -981,7 +981,7 @@ public class PageBuilderCore {
 		dependencyTracker.clear();
 		
 		addDependencyTracking("");
-		addDependencyTracking("components");
+		addDependencyTracking("component");
 		addDependencyTracking("common");
 		addDependencyTracking("index");
 	}
@@ -994,7 +994,7 @@ public class PageBuilderCore {
 	
 	/// Normalize case sensitivity of path
 	protected String normalizeDependencyPath(String dependPath) {
-		return componentsFilter.normalizeComponentPath(dependPath);
+		return componentFilter.normalizeComponentPath(dependPath);
 	}
 	
 	/// Recursively pull add in the depency of a existing module, if its not already on the list
@@ -1019,7 +1019,7 @@ public class PageBuilderCore {
 		dependencyTracker.add(dependPath);
 		
 		// Get submodules
-		String[] sublist = depenencyConfig(dependPath).getStringArray("components", "[]");
+		String[] sublist = depenencyConfig(dependPath).getStringArray("component", "[]");
 		for( String submodule : sublist ) {
 			addDependencyTracking(submodule);
 		}
@@ -1088,7 +1088,7 @@ public class PageBuilderCore {
 	protected String dependencyBuildFile(String type) {
 		StringBuilder res = new StringBuilder();
 		
-		res.append("/**** "+type+" dependcies for the following components ****\n\n");
+		res.append("/**** "+type+" dependcies for the following component ****\n\n");
 		for(String path : dependencyTracker) {
 			res.append("+ '"+path+"'\n");
 		}

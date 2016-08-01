@@ -120,17 +120,17 @@ public class PageBuilder_test {
 	}
 	
 	@Test 
-	public void componentsMapTest() {
+	public void componentMapTest() {
 		constructorTest();
 		
 		assertEquals("Hello ${PageClass}", page.buildPageComponentMap().getSubMap("nested").getSubMap("page").get("html") );
 		assertEquals("Hello ${PageClass}", page.buildPageComponentMap().getSubMap("nested").getSubMap("two").getSubMap("page").get("html") );
 		
-		assertNotNull( page.buildPageComponentMap().getSubMap("components").getSubMap("utils").getSubMap("IEWarning").get("html") );
+		assertNotNull( page.buildPageComponentMap().getSubMap("component").getSubMap("utils").getSubMap("IEWarning").get("html") );
 	}
 	
 	@Test
-	public void componentsSubstitute() throws IOException {
+	public void componentSubstitute() throws IOException {
 		constructorTest();
 		page.buildAllPage();
 		

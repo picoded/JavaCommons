@@ -21,7 +21,7 @@ import org.jsoup.nodes.*;
 import org.jsoup.select.*;
 
 ///
-/// Using a PageBuilder, filters out the various HTML for their respective components
+/// Using a PageBuilder, filters out the various HTML for their respective component
 ///
 public class PageComponentFilter {
 
@@ -33,19 +33,19 @@ public class PageComponentFilter {
 		core = inCore;
 	}
 
-	/// Filtering a html string, and resolving all the page components
+	/// Filtering a html string, and resolving all the page component
 	public String resolve(Document doc) {
 		//resolveElements( doc.select("page-*") );
 		resolveElements( doc.select("*") );
 		return doc.toString();
 	}
 
-	/// Filtering a html string, and resolving all the page components
+	/// Filtering a html string, and resolving all the page component
 	public String resolve(String inHTML) {
 		return resolve( Jsoup.parse(inHTML) );
 	}
 
-	/// Filtering a html string, and resolving all the page components
+	/// Filtering a html string, and resolving all the page component
 	public String resolveParts(String inHTML) {
 		return resolve( Jsoup.parseBodyFragment(inHTML) );
 	}
@@ -139,7 +139,7 @@ public class PageComponentFilter {
 
 		//Add user defined html tags first
 		if(componentPath != null && componentPath.length() > 0){
-			// Case insensitive components args
+			// Case insensitive component args
 			tagArgs = new CaseInsensitiveHashMap<String,Object>(tagArgs);
 			// Component "this" reference
 			genericJMTE.put("this", tagArgs);

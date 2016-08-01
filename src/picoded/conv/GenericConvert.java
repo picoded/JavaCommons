@@ -946,7 +946,7 @@ public class GenericConvert {
 	}
 	
 	///
-	/// Split the key path into their respective components
+	/// Split the key path into their respective component
 	///
 	/// @param key       The input key to fetch, possibly nested
 	///
@@ -1071,7 +1071,7 @@ public class GenericConvert {
 	}
 	
 	///
-	/// Split the key path into their respective components
+	/// Split the key path into their respective component
 	///
 	/// @param key       The input key to fetch, possibly nested
 	///

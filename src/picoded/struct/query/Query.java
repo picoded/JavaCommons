@@ -174,13 +174,13 @@ public interface Query extends Predicate<Object> {
 	}
 	
 	/// Returns the argument values used,
-	/// In a list, in accordance to their query components order
+	/// In a list, in accordance to their query component order
 	public default List<Object> queryArgumentsList() {
 		return queryArgumentsList(new ArrayList<Object>());
 	}
 	
 	/// Returns the argument values used,
-	/// In a list, in accordance to their query components order
+	/// In a list, in accordance to their query component order
 	///
 	/// This is the internally used recursive function.
 	public default List<Object> queryArgumentsList(List<Object> ret) {

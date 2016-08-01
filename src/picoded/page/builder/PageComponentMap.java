@@ -15,7 +15,7 @@ import picoded.servlet.*;
 import picoded.servletUtils.*;
 
 ///
-/// Map interface wrapper for page components, for use within JMTE and PageBuilder
+/// Map interface wrapper for page component, for use within JMTE and PageBuilder
 ///
 public class PageComponentMap implements GenericConvertMap<String,Object> {
 	

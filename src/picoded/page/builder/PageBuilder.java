@@ -31,8 +31,8 @@ public class PageBuilder extends PageBuilderCore {
 	/// @param The various page definition folder
 	/// @param The target folder to build the result into
 	///
-	public PageBuilder(File inPagesFolder, File inOutputFolder) {
-		super(inPagesFolder, inOutputFolder);
+	public PageBuilder(File inPageFolder, File inOutputFolder) {
+		super(inPageFolder, inOutputFolder);
 		validateAndSetup();
 	}
 	
@@ -42,8 +42,8 @@ public class PageBuilder extends PageBuilderCore {
 	/// @param The various page definition folder
 	/// @param The target folder to build the result into
 	///
-	public PageBuilder(String inPagesFolder, String inOutputFolder) {
-		this(new File(inPagesFolder), new File(inOutputFolder));
+	public PageBuilder(String inPageFolder, String inOutputFolder) {
+		this(new File(inPageFolder), new File(inOutputFolder));
 	}
 	
 	/// Does some basic validation for the constructor
@@ -52,7 +52,7 @@ public class PageBuilder extends PageBuilderCore {
 		// NULL check 
 		//
 		if (pageFolder == null) {
-			throw new RuntimeException("Pages definition folder is not set (null)");
+			throw new RuntimeException("Page definition folder is not set (null)");
 		}
 		if (outputFolder == null) {
 			throw new RuntimeException("Output folder is not set (null)");
@@ -62,7 +62,7 @@ public class PageBuilder extends PageBuilderCore {
 		// Exists checks
 		//
 		if (!pageFolder.exists()) {
-			throw new RuntimeException("Pages definition folder does not exists: " + pageFolder.getPath());
+			throw new RuntimeException("Page definition folder does not exists: " + pageFolder.getPath());
 		}
 		if (!outputFolder.exists()) {
 			throw new RuntimeException("Output folder does not exists: " + outputFolder.getPath());
@@ -72,7 +72,7 @@ public class PageBuilder extends PageBuilderCore {
 		// IsDir checks
 		//
 		if (!pageFolder.isDirectory()) {
-			throw new RuntimeException("Pages definition folder path is not a 'directory': " + pageFolder.getPath());
+			throw new RuntimeException("Page definition folder path is not a 'directory': " + pageFolder.getPath());
 		}
 		if (!outputFolder.isDirectory()) {
 			throw new RuntimeException("Output folder path is not a 'directory': " + outputFolder.getPath());
@@ -105,7 +105,7 @@ public class PageBuilder extends PageBuilderCore {
 	/// Scans and builds all the page
 	///
 	/// @return  Returns itself
-	public PageBuilder buildAllPages() {
+	public PageBuilder buildAllPage() {
 		
 		// Reset dependency tracking
 		dependencyTrackerReset();
@@ -174,7 +174,7 @@ public class PageBuilder extends PageBuilderCore {
 				if (itemName.equals("index.html") && servletPageBuilder.hasPageFolder(basePageName + "/")) {
 					
 					// Changed to build everything, slower on page load but ensures components changes get propagated properly.
-					servletPageBuilder.buildAllPages();
+					servletPageBuilder.buildAllPage();
 					
 					// servletPageBuilder.buildPageFolder_includingSelf(basePageName + "/");
 					// 
@@ -210,7 +210,7 @@ public class PageBuilder extends PageBuilderCore {
 				return;
 			}
 			
-			File requestedFile = (new File(page.getPagesOutputPath(), reqStr));
+			File requestedFile = (new File(page.getPageOutputPath(), reqStr));
 			if (!requestedFile.exists() || requestedFile.isDirectory()) {
 				// 404 error if file does not exists
 				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);

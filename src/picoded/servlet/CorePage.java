@@ -33,7 +33,7 @@ import picoded.struct.HashMapList;
  * In addition, this is intentionally structured to be "usable" even without the understanding / importing of
  * the various HttpServlet functionalities. Though doing so is still highly recommended.
  *
- * corePages, and its sub page is designed to facilitate rapid servlet page creation, and extension across
+ * corePage, and its sub page is designed to facilitate rapid servlet page creation, and extension across
  * 3 distinct processing layers/roles : Authentication, Data, and output.
  *
  * in addition, it has built in mechanism to facilitate the handling of JSON data request

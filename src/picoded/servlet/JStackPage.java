@@ -89,11 +89,11 @@ public class JStackPage extends CorePage {
 		return (_configsPath != null) ? _configsPath : (_configsPath = getWebInfPath() + "config/");
 	}
 	
-	public String getPagesTemplatePath() {
+	public String getPageTemplatePath() {
 		return (_pageTemplatePath != null) ? _pageTemplatePath : (_pageTemplatePath = getWebInfPath() + "page/");
 	}
 	
-	public String getPagesOutputPath() {
+	public String getPageOutputPath() {
 		return (_pageOutputPath != null) ? _pageOutputPath : (_pageOutputPath = getContextPath());
 	}
 	

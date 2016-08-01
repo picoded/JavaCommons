@@ -110,7 +110,7 @@ public class PageBuilder_test {
 	@Test
 	public void nestedPageAutoTest() throws IOException {
 		constructorTest();
-		page.buildAllPages();
+		page.buildAllPage();
 		
 		// Check asset folder
 		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "nested/page/index.html")).indexOf(
@@ -132,7 +132,7 @@ public class PageBuilder_test {
 	@Test
 	public void componentsSubstitute() throws IOException {
 		constructorTest();
-		page.buildAllPages();
+		page.buildAllPage();
 		
 		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "helloComponents/msg/index.html")).indexOf(
 			"<h1>Hello World</h1>") >= 0);

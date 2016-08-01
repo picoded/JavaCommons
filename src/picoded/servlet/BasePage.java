@@ -256,7 +256,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 			return _jmteObj;
 		}
 		
-		_jmteObj = new JMTE(getPagesTemplatePath());
+		_jmteObj = new JMTE(getPageTemplatePath());
 		JMTE_initialSetup(_jmteObj);
 		
 		return _jmteObj;
@@ -296,7 +296,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 			return _pageBuilderObj;
 		}
 		
-		_pageBuilderObj = new PageBuilder(getPagesTemplatePath(), getPagesOutputPath());
+		_pageBuilderObj = new PageBuilder(getPageTemplatePath(), getPageOutputPath());
 		_pageBuilderObj.setJMTE(JMTE());
 		_pageBuilderObj.setUriRootPrefix(getContextURI());
 		

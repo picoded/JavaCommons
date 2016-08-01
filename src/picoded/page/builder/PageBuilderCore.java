@@ -62,8 +62,8 @@ public class PageBuilderCore {
 	///
 	/// @param The various page definition folder
 	///
-	public PageBuilderCore(File inPagesFolder) {
-		pageFolder = inPagesFolder;
+	public PageBuilderCore(File inPageFolder) {
+		pageFolder = inPageFolder;
 		componentsFilter = new PageComponentFilter(this);
 	}
 
@@ -72,8 +72,8 @@ public class PageBuilderCore {
 	///
 	/// @param The various page definition folder
 	///
-	public PageBuilderCore(String inPagesFolder) {
-		this(new File(inPagesFolder));
+	public PageBuilderCore(String inPageFolder) {
+		this(new File(inPageFolder));
 	}
 
 	///
@@ -82,8 +82,8 @@ public class PageBuilderCore {
 	/// @param The various page definition folder
 	/// @param The target folder to build the result into
 	///
-	public PageBuilderCore(File inPagesFolder, File inOutputFolder) {
-		pageFolder = inPagesFolder;
+	public PageBuilderCore(File inPageFolder, File inOutputFolder) {
+		pageFolder = inPageFolder;
 		outputFolder = inOutputFolder;
 		componentsFilter = new PageComponentFilter(this);
 	}
@@ -94,8 +94,8 @@ public class PageBuilderCore {
 	/// @param The various page definition folder
 	/// @param The target folder to build the result into
 	///
-	public PageBuilderCore(String inPagesFolder, String inOutputFolder) {
-		this(new File(inPagesFolder), new File(inOutputFolder));
+	public PageBuilderCore(String inPageFolder, String inOutputFolder) {
+		this(new File(inPageFolder), new File(inOutputFolder));
 	}
 
 	////////////////////////////////////////////////////////////
@@ -276,7 +276,7 @@ public class PageBuilderCore {
 		// Get the template json stack
 		Map<String, Object> ret = getTemplateJson(rawPageName);
 
-		ret.put("PagesRootURI", uriRootPrefix);
+		ret.put("PageRootURI", uriRootPrefix);
 		ret.put("PageRootURI", uriRootPrefix); //because FAportal and orgeva
 		ret.put("PageURI", pageURI);
 
@@ -517,7 +517,7 @@ public class PageBuilderCore {
 	///
 	/// @return Collection of sub page name from the parent page
 	///
-	public Set<String> subPagesList(String rawPageName) {
+	public Set<String> subPageList(String rawPageName) {
 		rawPageName = filterRawPageName(rawPageName);
 		HashSet<String> res = new HashSet<String>();
 

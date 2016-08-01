@@ -40,7 +40,7 @@ import picoded.webTemplateEngines.JSML.*;
 import picoded.page.builder.*;
 
 ///
-/// Does all the standard USER API, Pages, and forms setup
+/// Does all the standard USER API, Page, and forms setup
 ///
 public class CommonsPage extends BasePage {
 	
@@ -189,7 +189,7 @@ public class CommonsPage extends BasePage {
 		
 		//generateJS
 		
-		// Pages builder redirect (default)
+		// Page builder redirect (default)
 		PageBuilder().processPageBuilderServlet(this);
 		return true;
 	}
@@ -235,9 +235,9 @@ public class CommonsPage extends BasePage {
 		super.initializeContext();
 		
 		boolean ignorePageBuilder = JConfig().getBoolean("developersMode.PageBuilder_ignoreInitializeContext", false)
-			|| JConfig().getBoolean("developersMode.PagesBuilder_ignoreInitializeContext", false);
+			|| JConfig().getBoolean("developersMode.PageBuilder_ignoreInitializeContext", false);
 		if (!ignorePageBuilder || this._commandLineInitialized) {
-			PageBuilder().buildAllPages();
+			PageBuilder().buildAllPage();
 		}
 		buildApiScript();
 	}
@@ -305,7 +305,7 @@ public class CommonsPage extends BasePage {
 		CommonsPage mainClass = null;
 		
 		System.out.println("---------------------------------------------------");
-		System.out.println("- Command line Pages build triggered");
+		System.out.println("- Command line Page build triggered");
 		
 		//
 		// @TODO : Consider automated stack trace if not given?,

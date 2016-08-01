@@ -135,6 +135,9 @@ public class PageComponentFilter {
 		componentPath = core.filterRawPageName(componentPath);
 
 		String rawHtml = getComponentHtml(componentPath);
+		if(rawHtml == null) {
+			rawHtml = "";
+		}
 		GenericConvertMap<String,Object> genericJMTE = GenericConvertMap.build( core.pageJMTEvars(componentPath) );
 
 		//Add user defined html tags first

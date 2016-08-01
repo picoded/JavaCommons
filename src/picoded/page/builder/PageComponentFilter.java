@@ -141,7 +141,7 @@ public class PageComponentFilter {
 		if(componentPath != null && componentPath.length() > 0){
 			// Case insensitive components args
 			tagArgs = new CaseInsensitiveHashMap<String,Object>(tagArgs);
-			// Components "this" reference
+			// Component "this" reference
 			genericJMTE.put("this", tagArgs);
 		}
 

@@ -48,7 +48,7 @@ public class PageBuilderCore {
 	/// Dependency chain tracking
 	protected GenericConvertListSet<String> dependencyTracker = new GenericConvertListSet<String>();
 
-	/// Components filter utility
+	/// Component filter utility
 	protected PageComponentFilter componentsFilter = null;
 
 	////////////////////////////////////////////////////////////
@@ -859,7 +859,7 @@ public class PageBuilderCore {
 				indexStr = buildFullPageFrame(rawPageName, injectorStr).toString();
 			}
 
-			// Components resolution
+			// Component resolution
 			//-------------------------------------------------------------------
 			indexStr = componentsFilter.resolve(indexStr);
 

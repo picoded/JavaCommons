@@ -134,11 +134,11 @@ public class PageBuilder_test {
 		constructorTest();
 		page.buildAllPage();
 		
-		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "helloComponents/msg/index.html")).indexOf(
+		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "helloComponent/msg/index.html")).indexOf(
 			"<h1>Hello World</h1>") >= 0);
-		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "helloComponents/world/index.html")).indexOf(
-			"<page-helloComponents-msg/>") < 0);
-		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "helloComponents/world/index.html")).indexOf(
+		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "helloComponent/world/index.html")).indexOf(
+			"<page-helloComponent-msg/>") < 0);
+		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "helloComponent/world/index.html")).indexOf(
 			"<h1>Hello World</h1>") >= 0);
 	}
 }

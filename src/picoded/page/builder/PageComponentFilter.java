@@ -94,6 +94,20 @@ public class PageComponentFilter {
 		return core.buildPageInnerRawHTML(tagname);
 	}
 	
+	/// Normalize case sensitivity of path, throws an exception if there is no match
+	public String normalizeComponentPath_strict(String tagname) {
+		tagname = tagname.replaceAll("-",".");
+		
+		String normalized = GenericConvert.normalizeObjectPath(core.buildPageComponentMap(), tagname);
+		if( normalized != null && normalized.length() > 0 ) {
+			//System.out.println("createElementComponent.normalized - "+normalized);
+			return normalized.replaceAll("\\.","/");
+		}
+		
+		throw new RuntimeException("Unknown tagname : "+tagname.replaceAll("\\.","/")); 
+		//return tagname.replaceAll("\\.","/");
+	}
+	
 	/// Normalize case sensitivity of path
 	public String normalizeComponentPath(String tagname) {
 		tagname = tagname.replaceAll("-",".");
@@ -104,6 +118,7 @@ public class PageComponentFilter {
 			return normalized.replaceAll("\\.","/");
 		}
 		
+		//throw new RuntimeException("Unknown tagname : "+tagname); 
 		return tagname.replaceAll("\\.","/");
 	}
 	
@@ -113,7 +128,7 @@ public class PageComponentFilter {
 			tagname = tagname.substring(5);
 		}
 		
-		String componentPath = normalizeComponentPath(tagname);
+		String componentPath = normalizeComponentPath_strict(tagname);
 		//System.out.println("createElementComponent.tagname - "+tagname);
 		//System.out.println("createElementComponent.componentPath - "+componentPath); 
 		componentPath = core.filterRawPageName(componentPath);

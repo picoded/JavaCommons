@@ -63,8 +63,8 @@ public class JStackPage extends CorePage {
 	public String _classesPath = null;
 	public String _libraryPath = null;
 	public String _configsPath = null;
-	public String _pagesTemplatePath = null;
-	public String _pagesOutputPath = null;
+	public String _pageTemplatePath = null;
+	public String _pageOutputPath = null;
 	public String _jsmlTemplatePath = null;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,11 +90,11 @@ public class JStackPage extends CorePage {
 	}
 	
 	public String getPagesTemplatePath() {
-		return (_pagesTemplatePath != null) ? _pagesTemplatePath : (_pagesTemplatePath = getWebInfPath() + "pages/");
+		return (_pageTemplatePath != null) ? _pageTemplatePath : (_pageTemplatePath = getWebInfPath() + "page/");
 	}
 	
 	public String getPagesOutputPath() {
-		return (_pagesOutputPath != null) ? _pagesOutputPath : (_pagesOutputPath = getContextPath());
+		return (_pageOutputPath != null) ? _pageOutputPath : (_pageOutputPath = getContextPath());
 	}
 	
 	public String getJsmlTemplatePath() {

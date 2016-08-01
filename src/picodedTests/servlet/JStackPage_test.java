@@ -52,7 +52,7 @@ public class JStackPage_test extends Mockito {
 	
 	@Test
 	public void getPagesTemplatePath() {
-		assertEquals("./WEB-INF/pages/", testPage.getPagesTemplatePath());
+		assertEquals("./WEB-INF/page/", testPage.getPagesTemplatePath());
 	}
 	
 	@Test

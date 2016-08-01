@@ -78,7 +78,7 @@ public class PageComponentFilter {
 		core.addDependencyTracking(rawPageName);
 
 		// Get the component html
-		String indexFileStr = FileUtils.readFileToString_withFallback(new File(core.pagesFolder, rawPageName + "/component.html"), "");
+		String indexFileStr = FileUtils.readFileToString_withFallback(new File(core.pageFolder, rawPageName + "/component.html"), "");
 		if ((indexFileStr = indexFileStr.trim()).length() == 0) {
 			return null;
 		}

@@ -12,7 +12,7 @@ import picoded.servlet.*;
 import picoded.servletUtils.*;
 
 ///
-/// Rapid pages prototyping, support single and multipage mode, caching, etc.
+/// Rapid page prototyping, support single and multipage mode, caching, etc.
 /// Basically lots of good stuff =)
 ///
 /// This is extended from the templating format previously used in ServletCommons
@@ -28,7 +28,7 @@ public class PageBuilder extends PageBuilderCore {
 	///
 	/// Constructor, with the folders defined
 	///
-	/// @param The various pages definition folder
+	/// @param The various page definition folder
 	/// @param The target folder to build the result into
 	///
 	public PageBuilder(File inPagesFolder, File inOutputFolder) {
@@ -39,7 +39,7 @@ public class PageBuilder extends PageBuilderCore {
 	///
 	/// Constructor, with the folders defined
 	///
-	/// @param The various pages definition folder
+	/// @param The various page definition folder
 	/// @param The target folder to build the result into
 	///
 	public PageBuilder(String inPagesFolder, String inOutputFolder) {
@@ -51,7 +51,7 @@ public class PageBuilder extends PageBuilderCore {
 		//
 		// NULL check 
 		//
-		if (pagesFolder == null) {
+		if (pageFolder == null) {
 			throw new RuntimeException("Pages definition folder is not set (null)");
 		}
 		if (outputFolder == null) {
@@ -61,8 +61,8 @@ public class PageBuilder extends PageBuilderCore {
 		//
 		// Exists checks
 		//
-		if (!pagesFolder.exists()) {
-			throw new RuntimeException("Pages definition folder does not exists: " + pagesFolder.getPath());
+		if (!pageFolder.exists()) {
+			throw new RuntimeException("Pages definition folder does not exists: " + pageFolder.getPath());
 		}
 		if (!outputFolder.exists()) {
 			throw new RuntimeException("Output folder does not exists: " + outputFolder.getPath());
@@ -71,8 +71,8 @@ public class PageBuilder extends PageBuilderCore {
 		//
 		// IsDir checks
 		//
-		if (!pagesFolder.isDirectory()) {
-			throw new RuntimeException("Pages definition folder path is not a 'directory': " + pagesFolder.getPath());
+		if (!pageFolder.isDirectory()) {
+			throw new RuntimeException("Pages definition folder path is not a 'directory': " + pageFolder.getPath());
 		}
 		if (!outputFolder.isDirectory()) {
 			throw new RuntimeException("Output folder path is not a 'directory': " + outputFolder.getPath());
@@ -81,7 +81,7 @@ public class PageBuilder extends PageBuilderCore {
 		//
 		// HTML files handling
 		//
-		// html = new PageBuilderCore(pagesFolder, outputFolder);
+		// html = new PageBuilderCore(pageFolder, outputFolder);
 	}
 	
 	////////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ public class PageBuilder extends PageBuilderCore {
 	//
 	////////////////////////////////////////////////////////////
 	
-	/// Build depenecy files, this should only be called after all the various standard pages are built
+	/// Build depenecy files, this should only be called after all the various standard page are built
 	protected void buildDependency() {
 		try {
 			FileUtils.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.less"), dependencyLess(), null /*"UTF-8"*/);
@@ -102,7 +102,7 @@ public class PageBuilder extends PageBuilderCore {
 		}
 	}
 	
-	/// Scans and builds all the pages
+	/// Scans and builds all the page
 	///
 	/// @return  Returns itself
 	public PageBuilder buildAllPages() {
@@ -110,7 +110,7 @@ public class PageBuilder extends PageBuilderCore {
 		// Reset dependency tracking
 		dependencyTrackerReset();
 		
-		// Recusively build all pages
+		// Recusively build all page
 		buildPageFolder("");
 		
 		// Build the depency

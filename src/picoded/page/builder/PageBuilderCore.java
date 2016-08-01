@@ -31,7 +31,7 @@ public class PageBuilderCore {
 	////////////////////////////////////////////////////////////
 
 	/// The folder to get the various page definition from
-	public File pagesFolder = null;
+	public File pageFolder = null;
 
 	/// The output folder to process the output to (if given)
 	public File outputFolder = null;
@@ -60,17 +60,17 @@ public class PageBuilderCore {
 	///
 	/// Constructor, with the folders defined
 	///
-	/// @param The various pages definition folder
+	/// @param The various page definition folder
 	///
 	public PageBuilderCore(File inPagesFolder) {
-		pagesFolder = inPagesFolder;
+		pageFolder = inPagesFolder;
 		componentsFilter = new PageComponentFilter(this);
 	}
 
 	///
 	/// Constructor, with the folders defined
 	///
-	/// @param The various pages definition folder
+	/// @param The various page definition folder
 	///
 	public PageBuilderCore(String inPagesFolder) {
 		this(new File(inPagesFolder));
@@ -79,11 +79,11 @@ public class PageBuilderCore {
 	///
 	/// Constructor, with the folders defined
 	///
-	/// @param The various pages definition folder
+	/// @param The various page definition folder
 	/// @param The target folder to build the result into
 	///
 	public PageBuilderCore(File inPagesFolder, File inOutputFolder) {
-		pagesFolder = inPagesFolder;
+		pageFolder = inPagesFolder;
 		outputFolder = inOutputFolder;
 		componentsFilter = new PageComponentFilter(this);
 	}
@@ -91,7 +91,7 @@ public class PageBuilderCore {
 	///
 	/// Constructor, with the folders defined
 	///
-	/// @param The various pages definition folder
+	/// @param The various page definition folder
 	/// @param The target folder to build the result into
 	///
 	public PageBuilderCore(String inPagesFolder, String inOutputFolder) {
@@ -187,7 +187,7 @@ public class PageBuilderCore {
 		// Page path itself
 		templateList.add(
 			GenericConvert.toStringMap(
-				FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + fileName), null ), null
+				FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/" + fileName), null ), null
 			)
 		);
 
@@ -204,7 +204,7 @@ public class PageBuilderCore {
 				// Join the name path, and get the file
 				templateList.add(
 					GenericConvert.toStringMap(
-						FileUtils.readFileToString_withFallback(new File(pagesFolder, String.join("/", splitNames) + "/" + fileName), null ), null
+						FileUtils.readFileToString_withFallback(new File(pageFolder, String.join("/", splitNames) + "/" + fileName), null ), null
 					)
 				);
 
@@ -216,7 +216,7 @@ public class PageBuilderCore {
 		// Get from the root folder (v2)
 		templateList.add(
 			GenericConvert.toStringMap(
-				FileUtils.readFileToString_withFallback(new File(pagesFolder, fileName), null ), null
+				FileUtils.readFileToString_withFallback(new File(pageFolder, fileName), null ), null
 			)
 		);
 
@@ -242,7 +242,7 @@ public class PageBuilderCore {
 		rawPageName = filterRawPageName(rawPageName);
 
 		// Get the config from rawPageName folder itself
-		return GenericConvert.toStringMap( FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/page.json" ), "{}") );
+		return GenericConvert.toStringMap( FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/page.json" ), "{}") );
 	}
 
 
@@ -348,7 +348,7 @@ public class PageBuilderCore {
 		String res = null;
 
 		// Get from the rawPageName folder itself (v2)
-		res = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/" + fileName), null );
+		res = FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/" + fileName), null );
 
 		// Gets the parent paths (if valid)
 		if (res == null) {
@@ -362,7 +362,7 @@ public class PageBuilderCore {
 				// Breaks once root directory is reached / or result found
 				while (res == null && splitNames.length > 0) {
 					// Join the name path, and get the file
-					res = FileUtils.readFileToString_withFallback(new File(pagesFolder, String.join("/", splitNames) + "/"
+					res = FileUtils.readFileToString_withFallback(new File(pageFolder, String.join("/", splitNames) + "/"
 						+ fileName), null );
 
 					// Go one "directory" parent upward
@@ -373,17 +373,17 @@ public class PageBuilderCore {
 
 		// Get from the root folder (v2)
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, fileName), null );
+			res = FileUtils.readFileToString_withFallback(new File(pageFolder, fileName), null );
 		}
 
 		// Get from the common folder (v2)
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "common/" + fileName), null );
+			res = FileUtils.readFileToString_withFallback(new File(pageFolder, "common/" + fileName), null );
 		}
 
 		// Legacy support (v1) get from index folder
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pagesFolder, "index/" + fileName), null );
+			res = FileUtils.readFileToString_withFallback(new File(pageFolder, "index/" + fileName), null );
 		}
 
 		// Fallbacks to blank
@@ -415,10 +415,10 @@ public class PageBuilderCore {
 		rawPageName = filterRawPageName(rawPageName);
 		addDependencyTracking(rawPageName);
 
-		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/"
+		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/"
 			+ safePageName(rawPageName) + ".html"), null );
 		if (indexFileStr == null) {
-			indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/index.html"),"");
+			indexFileStr = FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/index.html"),"");
 		}
 
 		if ((indexFileStr = indexFileStr.trim()).length() == 0) {
@@ -438,10 +438,10 @@ public class PageBuilderCore {
 
 	/// Gets and returns a page frame string, with its respective JMTE input vars?
 	public String buildPageInnerHTML(String rawPageName, Map<String, Object> jmteTemplate) {
-		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/"
+		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/"
 			+ safePageName(rawPageName) + ".html"), null );
 		if (indexFileStr == null) {
-			indexFileStr = FileUtils.readFileToString_withFallback(new File(pagesFolder, rawPageName + "/index.html"), "");
+			indexFileStr = FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/index.html"), "");
 		}
 
 		if ((indexFileStr = indexFileStr.trim()).length() == 0) {
@@ -506,7 +506,7 @@ public class PageBuilderCore {
 
 	////////////////////////////////////////////////////////////
 	//
-	// Subpages searching handling
+	// Subpage searching handling
 	//
 	////////////////////////////////////////////////////////////
 
@@ -515,14 +515,14 @@ public class PageBuilderCore {
 	///
 	/// @param rawPageName Parent page to search from
 	///
-	/// @return Collection of sub pages name from the parent page
+	/// @return Collection of sub page name from the parent page
 	///
 	public Set<String> subPagesList(String rawPageName) {
 		rawPageName = filterRawPageName(rawPageName);
 		HashSet<String> res = new HashSet<String>();
 
 		// The current folder to scan
-		File folder = new File(pagesFolder, rawPageName);
+		File folder = new File(pageFolder, rawPageName);
 
 		// Scan for subdirectories ONLY if this is a directory
 		if (folder.isDirectory()) {
@@ -578,7 +578,7 @@ public class PageBuilderCore {
 	/// @return  boolean true if pageName has folder
 	public boolean hasPageFolder(String pageName) {
 		try {
-			File definitionFolder = new File(pagesFolder, pageName);
+			File definitionFolder = new File(pageFolder, pageName);
 			return definitionFolder.exists() && definitionFolder.isDirectory();
 		} catch (Exception e) {
 			// Failed?
@@ -593,7 +593,7 @@ public class PageBuilderCore {
 	/// @return  boolean true if pageName is a folder
 	public boolean hasPageFile(String pageName) {
 		try {
-			File definitionFolder = new File(pagesFolder, pageName);
+			File definitionFolder = new File(pageFolder, pageName);
 			return ((new File(definitionFolder, "index.html")).exists() || (new File(definitionFolder,
 				safePageName(pageName) + ".html")).exists());
 		} catch (Exception e) {
@@ -726,7 +726,7 @@ public class PageBuilderCore {
 			// Prepares output and definition FILE objects, and JMTE map
 			//-------------------------------------------------------------------
 			File outputPageFolder = new File(outputFolder, rawPageName);
-			File definitionFolder = new File(pagesFolder, rawPageName);
+			File definitionFolder = new File(pageFolder, rawPageName);
 			Map<String, Object> jmteVarMap = pageJMTEvars(rawPageName);
 			String pageName_safe = safePageName(rawPageName);
 
@@ -891,7 +891,7 @@ public class PageBuilderCore {
 	}
 
 	///
-	/// Builds all pages (NOT including itself) inside a page folder
+	/// Builds all page (NOT including itself) inside a page folder
 	///
 	/// @param rawPageName to build
 	///
@@ -908,7 +908,7 @@ public class PageBuilderCore {
 		}
 
 		// The current folder to scan
-		File folder = new File(pagesFolder, rawPageName);
+		File folder = new File(pageFolder, rawPageName);
 
 		// Possible page pathing error fix
 		if (rawPageName.length() > 0 && !rawPageName.endsWith("/")) {
@@ -927,7 +927,7 @@ public class PageBuilderCore {
 					continue;
 				}
 				
-				// Scan for sub pages
+				// Scan for sub page
 				if (subPageName.equalsIgnoreCase("common") || subPageName.equalsIgnoreCase("index")) {
 					buildAndOutputPage(rawPageName + subPageName);
 					if (rawPageName.length() <= 0) {
@@ -951,7 +951,7 @@ public class PageBuilderCore {
 	}
 
 	///
-	/// Builds all pages (INCLUDING itself, if possible) inside a page folder
+	/// Builds all page (INCLUDING itself, if possible) inside a page folder
 	///
 	/// @param rawPageName to build
 	///
@@ -988,7 +988,7 @@ public class PageBuilderCore {
 	
 	/// Gets the dependency map for path
 	protected GenericConvertMap<String, Object> depenencyConfig(String rawPageName) {
-		String dependJson = FileUtils.readFileToString_withFallback(new File(pagesFolder, filterRawPageName(rawPageName)+"/depend.json"), "{}" );
+		String dependJson = FileUtils.readFileToString_withFallback(new File(pageFolder, filterRawPageName(rawPageName)+"/depend.json"), "{}" );
 		return GenericConvert.toGenericConvertStringMap( dependJson, "{}" );
 	}
 	
@@ -1030,10 +1030,10 @@ public class PageBuilderCore {
 	}
 	
 	/// Get dependency file into a string builder utility
-	protected StringBuilder dependencyGetSingleFile(StringBuilder res, String pagesFilePath) {
-		String fileData = FileUtils.readFileToString_withFallback(new File(pagesFolder, pagesFilePath), null );
+	protected StringBuilder dependencyGetSingleFile(StringBuilder res, String pageFilePath) {
+		String fileData = FileUtils.readFileToString_withFallback(new File(pageFolder, pageFilePath), null );
 		if( fileData != null ) {
-			res.append("/** file:"+pagesFilePath+" **/\n"); //Added file name reference
+			res.append("/** file:"+pageFilePath+" **/\n"); //Added file name reference
 			res.append(fileData);
 			res.append("\n");
 		}

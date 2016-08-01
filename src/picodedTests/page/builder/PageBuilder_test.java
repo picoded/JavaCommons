@@ -23,12 +23,12 @@ public class PageBuilder_test {
 	
 	protected String templateTestDir = "test-files/test-specific/page/builder/";
 	protected String outputTestDir = "test-files/tmp/page/builder/";
-	protected String basicTemplateDir = templateTestDir + "basic-test-pages/";
+	protected String basicTemplateDir = templateTestDir + "basic-test-page/";
 	
 	// Test vars
 	//------------------------------------------------------------------------
 	
-	protected PageBuilder pages = null;
+	protected PageBuilder page = null;
 	protected PageBuilderCore html = null;
 	
 	////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ public class PageBuilder_test {
 	
 	@After
 	public void tearDown() {
-		pages = null;
+		page = null;
 	}
 	
 	////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ public class PageBuilder_test {
 	
 	@Test
 	public void constructorTest() {
-		assertNotNull(pages = new PageBuilder(basicTemplateDir, outputTestDir));
+		assertNotNull(page = new PageBuilder(basicTemplateDir, outputTestDir));
 		assertNotNull(html = new PageBuilderCore(basicTemplateDir));
 	}
 	
@@ -91,7 +91,7 @@ public class PageBuilder_test {
 	@Test
 	public void buildPageBasicTest() throws IOException {
 		constructorTest();
-		pages.buildAndOutputPage("index");
+		page.buildAndOutputPage("index");
 		
 		// Check asset folder
 		assertEquals("is a COPYCAT: Meow!", FileUtils.readFileToString(new File(outputTestDir + "index/assets/bob.txt")));
@@ -100,7 +100,7 @@ public class PageBuilder_test {
 	@Test
 	public void nestedPageTest() throws IOException {
 		constructorTest();
-		pages.buildAndOutputPage("nested/page");
+		page.buildAndOutputPage("nested/page");
 		
 		// Check asset folder
 		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "nested/page/index.html")).indexOf(
@@ -110,7 +110,7 @@ public class PageBuilder_test {
 	@Test
 	public void nestedPageAutoTest() throws IOException {
 		constructorTest();
-		pages.buildAllPages();
+		page.buildAllPages();
 		
 		// Check asset folder
 		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "nested/page/index.html")).indexOf(
@@ -123,16 +123,16 @@ public class PageBuilder_test {
 	public void componentsMapTest() {
 		constructorTest();
 		
-		assertEquals("Hello ${PageClass}", pages.buildPageComponentMap().getSubMap("nested").getSubMap("page").get("html") );
-		assertEquals("Hello ${PageClass}", pages.buildPageComponentMap().getSubMap("nested").getSubMap("two").getSubMap("page").get("html") );
+		assertEquals("Hello ${PageClass}", page.buildPageComponentMap().getSubMap("nested").getSubMap("page").get("html") );
+		assertEquals("Hello ${PageClass}", page.buildPageComponentMap().getSubMap("nested").getSubMap("two").getSubMap("page").get("html") );
 		
-		assertNotNull( pages.buildPageComponentMap().getSubMap("components").getSubMap("utils").getSubMap("IEWarning").get("html") );
+		assertNotNull( page.buildPageComponentMap().getSubMap("components").getSubMap("utils").getSubMap("IEWarning").get("html") );
 	}
 	
 	@Test
 	public void componentsSubstitute() throws IOException {
 		constructorTest();
-		pages.buildAllPages();
+		page.buildAllPages();
 		
 		assertTrue(FileUtils.readFileToString(new File(outputTestDir + "helloComponents/msg/index.html")).indexOf(
 			"<h1>Hello World</h1>") >= 0);

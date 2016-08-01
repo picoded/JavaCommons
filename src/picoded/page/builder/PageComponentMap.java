@@ -98,7 +98,7 @@ public class PageComponentMap implements GenericConvertMap<String,Object> {
 		return null;
 	}
 	
-	/// Returns the potential sub pages in the current directory
+	/// Returns the potential sub page in the current directory
 	@Override
 	public Set<String> keySet() {
 		Set<String> ret = core.subPagesList(prefixPath.toString());

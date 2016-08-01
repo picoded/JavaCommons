@@ -23,7 +23,7 @@ import com.lowagie.text.pdf.PdfWriter;
 
 /**
  * PDFUtils is a utility class to merge multile pdf files , count number of
- * pages in pdf and extract out a segment of the PDF into another PDF.
+ * page in pdf and extract out a segment of the PDF into another PDF.
  * 
  * @author Dheeraj
  *
@@ -136,7 +136,7 @@ public class PDFUtils {
 	}
 	
 	/**
-	 * Count number of pages in pdf document
+	 * Count number of page in pdf document
 	 * 
 	 * @param pdfFileName
 	 *            InputStream
@@ -150,7 +150,7 @@ public class PDFUtils {
 	}
 	
 	/**
-	 * Count number of pages in pdf document
+	 * Count number of page in pdf document
 	 * 
 	 * @param pdfFileName
 	 *            InputStream
@@ -162,7 +162,7 @@ public class PDFUtils {
 	}
 	
 	/**
-	 * This method create new PDF file and add specified range of pages from
+	 * This method create new PDF file and add specified range of page from
 	 * source file.
 	 * 
 	 * @param inputFile
@@ -195,7 +195,7 @@ public class PDFUtils {
 	}
 	
 	/**
-	 * This method create new PDF file and add specified range of pages from
+	 * This method create new PDF file and add specified range of page from
 	 * source file.
 	 * 
 	 * @param inputStream

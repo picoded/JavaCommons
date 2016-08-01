@@ -29,12 +29,12 @@ import picoded.enums.HttpRequestType;
  * The main role of RESTBuilder, is to facilitate the packaging of all the web project core functionalities,
  * into a single API Framework. Where it can be called directly.
  *
- * While, it replaces the original servlet framework role of creating JSON output pages. The framework is also meant to
+ * While, it replaces the original servlet framework role of creating JSON output page. The framework is also meant to
  * facilitate intra project function calls. One of the examples learnt from the LMS project, in handling the encryption
  * of export files (for example). Is that instead of rewriting the entire export module code to be "callable" by a function
  * a rather indirect and "inefficent" method of calling its local page directly was used. Aka an encryption proxy.
  *
- * Simply put, if a standardised REST API builder was built and used, several pages API features can be called directly
+ * Simply put, if a standardised REST API builder was built and used, several page API features can be called directly
  * instead of being usued via a proxy
  *
  * STATUS: PROOF OF CONCEPT, for method adding, and direct calling

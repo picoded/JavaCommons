@@ -62,7 +62,7 @@ public class PDFUtils_test {
 	}
 	
 	// /
-	/// Test PDF subPage generates a new PDF file which contains range of pages
+	/// Test PDF subPage generates a new PDF file which contains range of page
 	// as per parameter.
 	// /
 	@Test
@@ -76,7 +76,7 @@ public class PDFUtils_test {
 	}
 	
 	// /
-	/// Test PDF countPDFPages return number of pages contains the PDF file.
+	/// Test PDF countPDFPages return number of page contains the PDF file.
 	// /
 	@Test
 	public void countPDFPages() throws FileNotFoundException, IOException, DocumentException {
@@ -87,7 +87,7 @@ public class PDFUtils_test {
 	}
 	
 	// /
-	/// Test PDF countPDFPages return number of pages contains the PDF file.
+	/// Test PDF countPDFPages return number of page contains the PDF file.
 	// /
 	@Test
 	public void countPDFPagesFileInput() throws FileNotFoundException, IOException, DocumentException {
@@ -104,20 +104,20 @@ public class PDFUtils_test {
 		List<File> sourceFiles = new ArrayList<File>();
 		sourceFiles.add(new File(inputPDFFileDir + mergeSourceFile1));
 		sourceFiles.add(new File(inputPDFFileDir + mergeSourceFile2));
-		// count pages in sourced files
+		// count page in sourced files
 		int pageCount1 = PDFUtils.countPDFPages(new File(inputPDFFileDir + mergeSourceFile1));
 		int pageCount2 = PDFUtils.countPDFPages(new File(inputPDFFileDir + mergeSourceFile2));
 		// merge the files
 		File file = new File(outputPDFFileDir + mergeDestinationOPFile);
 		PDFUtils.mergePDF(sourceFiles, file);
-		// count pages in merged file
+		// count page in merged file
 		int pageCount = PDFUtils.countPDFPages(new File(outputPDFFileDir + mergeDestinationOPFile));
 		
 		assertEquals(pageCount, pageCount1 + pageCount2);
 	}
 	
 	// /
-	/// Test PDF subPage generates a new PDF file which contains range of pages
+	/// Test PDF subPage generates a new PDF file which contains range of page
 	// as per parameter.
 	// /
 	@Test

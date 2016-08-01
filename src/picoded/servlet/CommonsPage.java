@@ -135,7 +135,7 @@ public class CommonsPage extends BasePage {
 		return true;
 	}
 	
-	/// Set the request mode to JSON, for API pages
+	/// Set the request mode to JSON, for API page
 	@Override
 	public boolean isJsonRequest() {
 		// Gets the wildcard URI
@@ -229,7 +229,7 @@ public class CommonsPage extends BasePage {
 		return false;
 	}
 	
-	/// Auto initialize pages builder
+	/// Auto initialize page builder
 	@Override
 	public void initializeContext() throws Exception {
 		super.initializeContext();
@@ -295,7 +295,7 @@ public class CommonsPage extends BasePage {
 	//---------------------------------------------------------
 	//
 	// Self constructing, main function.
-	// Used to build the pages via command line
+	// Used to build the page via command line
 	//
 	//---------------------------------------------------------
 	public boolean _commandLineInitialized = false;

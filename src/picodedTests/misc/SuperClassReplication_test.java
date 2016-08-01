@@ -12,7 +12,7 @@ import java.lang.Class;
 /// being able to call its own subclass type.
 ///
 /// This test case, is to ensure this functionality,
-/// which is used in servlet pages, is functional.
+/// which is used in servlet page, is functional.
 public class SuperClassReplication_test {
 	
 	// Class objects used in test

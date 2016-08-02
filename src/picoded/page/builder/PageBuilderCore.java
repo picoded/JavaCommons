@@ -632,11 +632,15 @@ public class PageBuilderCore {
 					/// Add the config .less file
 					String lessPrefix = getCommonFile(rawPageName, "prefix.less");
 					String lessSuffix = getCommonFile(rawPageName, "suffix.less");
-
-					/// Does an outer wrap, if its not index page (which applies style to 'all')
-					if (!rawPageName.equalsIgnoreCase("index") && !rawPageName.equalsIgnoreCase("common")) {
-						fileVal = "." + pageFrameID(rawPageName) + " { \n" + fileVal + "\n } \n";
-					}
+					
+					///
+					/// Outerwrap class isolation, is now deprecated 
+					///
+					
+					// /// Does an outer wrap, if its not index page (which applies style to 'all')
+					// if (!rawPageName.equalsIgnoreCase("index") && !rawPageName.equalsIgnoreCase("common")) {
+					// 	fileVal = "." + pageFrameID(rawPageName) + " { \n" + fileVal + "\n } \n";
+					// }
 
 					// Ensure prefix, and suffix are added
 					fileVal = (lessPrefix + "\n" + fileVal + "\n" + lessSuffix).trim();
@@ -791,6 +795,27 @@ public class PageBuilderCore {
 				}
 			}
 			
+			// For each sub file, clone it
+			for (File inFile : FileUtils.listDirs(definitionFolder)) {
+				
+				// Ignore hidden files, or index based files
+				String fileName = inFile.getName();
+				
+				// Ignore protected folders
+				if(fileName.startsWith(".")) {
+					continue;
+				}
+				
+				// Clone files, these are not processed recursively
+				if(fileName.indexOf(".") >= 0 || fileName.indexOf("-") >= 0) {
+					// File to output to
+					File outFile = new File(outputPageFolder, fileName);
+					
+					// Copy over the file
+					FileUtils.copyDirectory_ifDifferent(inFile, outFile);
+				}
+			}
+			
 			// Process the JS script (if provided)
 			//-------------------------------------------------------------------
 			boolean hasJsFile = processPageFile(PageFileType.js, new File[] { new File(definitionFolder, "index.js"),
@@ -924,6 +949,11 @@ public class PageBuilderCore {
 				
 				// Could be hidden, or invalid folder format
 				if( subPageName.startsWith(".") || !subPageName.equalsIgnoreCase(FileUtils.getBaseName(subPageName)) ) {
+					continue;
+				}
+				
+				// these are not processed recursively, avoid pathing ambiguity
+				if(subPageName.indexOf(".") >= 0 || subPageName.indexOf("-") >= 0) {
 					continue;
 				}
 				

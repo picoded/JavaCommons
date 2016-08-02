@@ -145,7 +145,21 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/// @param folder to scan and copy from
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir) throws IOException {
-		copyDirectory(inDir, outDir);
+		if(inDir ==null || outDir == null){
+			new IOException("Invalid directory");
+		}
+		File[] dir_inDir = inDir.listFiles();
+		for (int i = 0; i < dir_inDir.length; i++) {
+			File infile = dir_inDir[i];
+			if (infile.isFile()) {
+				File outfile =new File(outDir, infile.getName());
+				copyFile_ifDifferent(infile, outfile);
+			} else if (infile.isDirectory()) {
+				File newOutDir= new File(outDir.getAbsolutePath()+File.separator+ infile.getName());
+				newOutDir.mkdir();
+				copyDirectory_ifDifferent(infile, newOutDir);
+			}
+		}
 	}
 	
 	///
@@ -156,7 +170,9 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/// @param file to scan and copy from
 	///
 	public static void copyFile_ifDifferent(File inFile, File outFile) throws IOException {
-		copyFile(inFile, outFile);
+		if (!FileUtils.contentEqualsIgnoreEOL(inFile, outFile, null)) {
+			copyFile(inFile, outFile);
+		}
 	}
 	
 	//------------------------------------------------------------------------------------------------------------------

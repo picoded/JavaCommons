@@ -231,6 +231,13 @@ public class JStackPage extends CorePage {
 		return JStackObj;
 	}
 	
+	/// Auto initialize page builder
+	@Override
+	public void initializeContext() throws Exception {
+		super.initializeContext();
+		JStack().systemSetup();
+	}
+	
 	/// JStack.disposeStackLayers only if it was initialized
 	public void JStack_disposeStackLayers() throws JStackException {
 		if (JStackObj != null) {

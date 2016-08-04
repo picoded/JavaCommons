@@ -625,7 +625,7 @@ public class PageBuilderCore {
 					fileVal = getJMTE().parseTemplate(fileVal, jmteVarMap);
 
 					// Adds the script object wrapper
-					fileVal = "window.pageFrames = window.pageFrames || {}; window.pageFrames." + safePageName(rawPageName)
+					fileVal = "window.PageComponent = window.PageComponent || {}; window.PageComponent." + safePageName(rawPageName)
 						+ " = (" + fileVal + ");";
 				} else if (type == PageFileType.less_to_css) {
 

@@ -163,7 +163,7 @@ public class PageComponentFilter {
 		if( elementSet.size() == 1 ) {
 			return elementSet.get(0);
 		} else { //container wrapper
-			newDom = Jsoup.parse("<div pageComponent='"+tagname.replaceAll("\\.","-")+"'>"+resolvedHtml+"</div>");
+			newDom = Jsoup.parse("<div PageComponent='"+tagname.replaceAll("\\.","-")+"'>"+resolvedHtml+"</div>");
 			return newDom.children().get(0);
 		}
 	}

@@ -954,7 +954,7 @@ public class GenericConvert {
 	///
 	protected static List<String> splitObjectPath(String key, List<String> ret) {
 		// Return array list of string
-		if( ret == null ) {
+		if (ret == null) {
 			ret = new ArrayList<String>();
 		}
 		
@@ -963,8 +963,8 @@ public class GenericConvert {
 		//
 		// This is the actual termination point for the recursive function
 		//
-		if(key == null || key.length() <= 0) {
-			if(ret.size() < 0) {
+		if (key == null || key.length() <= 0) {
+			if (ret.size() < 0) {
 				ret.add("");
 			}
 			return ret;
@@ -991,7 +991,7 @@ public class GenericConvert {
 		int leftBracketIndex = key.indexOf("[");
 		
 		// No match found, assume last key
-		if( dotIndex < 0 && leftBracketIndex < 0 ) {
+		if (dotIndex < 0 && leftBracketIndex < 0) {
 			ret.add(key);
 			return ret;
 		}
@@ -1004,8 +1004,8 @@ public class GenericConvert {
 			// but could also be a case of map fetching with string
 			//
 			int rightBracketIndex = key.indexOf("]", 1);
-			if(rightBracketIndex <= 0) {
-				throw new RuntimeException("Missing closing ']' right bracket for key : "+key);
+			if (rightBracketIndex <= 0) {
+				throw new RuntimeException("Missing closing ']' right bracket for key : " + key);
 			}
 			
 			//
@@ -1017,10 +1017,9 @@ public class GenericConvert {
 			rightPart = key.substring(rightBracketIndex + 1).trim();
 			
 			// Sanatize the left path from quotation marks
-			if(leftPart.length() > 1 && (
-				(leftPart.startsWith("\"") && leftPart.endsWith("\"")) ||
-				(leftPart.startsWith("\'") && leftPart.endsWith("\'"))
-			)) {
+			if (leftPart.length() > 1
+				&& ((leftPart.startsWith("\"") && leftPart.endsWith("\"")) || (leftPart.startsWith("\'") && leftPart
+					.endsWith("\'")))) {
 				leftPart = leftPart.substring(1, leftPart.length() - 1);
 			}
 			
@@ -1055,14 +1054,14 @@ public class GenericConvert {
 			rightPart = key.substring(leftBracketIndex); //[right]
 			
 		} else {
-			throw new RuntimeException("Unexpected key format : "+key);
+			throw new RuntimeException("Unexpected key format : " + key);
 		}
 		
 		// Add left key to return set
 		ret.add(leftPart);
 		
 		// There is no right key, ends and terminate at recusive termination point above
-		if(rightPart == null || rightPart.length() <= 0) {
+		if (rightPart == null || rightPart.length() <= 0) {
 			return splitObjectPath(null, ret);
 		}
 		
@@ -1078,7 +1077,7 @@ public class GenericConvert {
 	/// @returns         The fetched object, possibly empty array if key is invalid?
 	///
 	public static String[] splitObjectPath(String key) {
-		return toStringArray(splitObjectPath(key,null));
+		return toStringArray(splitObjectPath(key, null));
 	}
 	
 	///
@@ -1132,8 +1131,8 @@ public class GenericConvert {
 		// but could also be a case of map fetching with string
 		if (key.startsWith("[")) {
 			int rightBracketIndex = key.indexOf("]", 1);
-			if(rightBracketIndex <= 0) {
-				throw new RuntimeException("Missing closing ']' right bracket for key : "+key);
+			if (rightBracketIndex <= 0) {
+				throw new RuntimeException("Missing closing ']' right bracket for key : " + key);
 			}
 			
 			String bracketKey = key.substring(1, rightBracketIndex).trim();
@@ -1236,7 +1235,7 @@ public class GenericConvert {
 		// Result string builder setup
 		//--------------------------------------------------------
 		
-		if( res == null ) {
+		if (res == null) {
 			res = new StringBuilder();
 		}
 		
@@ -1245,7 +1244,7 @@ public class GenericConvert {
 		//--------------------------------------------------------
 		
 		/// No additional parts, return existing path
-		if(splitKeyPath.size() <= 0) {
+		if (splitKeyPath.size() <= 0) {
 			return res;
 		}
 		
@@ -1272,8 +1271,8 @@ public class GenericConvert {
 			}
 		}
 		
-		if(baseMap == null && baseList == null) {
-			throw new RuntimeException("Unexpected key path format : "+ConvertJSON.fromList(splitKeyPath));
+		if (baseMap == null && baseList == null) {
+			throw new RuntimeException("Unexpected key path format : " + ConvertJSON.fromList(splitKeyPath));
 		}
 		
 		//
@@ -1285,10 +1284,10 @@ public class GenericConvert {
 		Object subObject = fetchObject(base, currentKey);
 		
 		// Failed fetch with currentKey
-		if( subObject == null ) {
+		if (subObject == null) {
 			
 			// Fails if its an array : no such thing as case insensitive number
-			if( baseList != null ) {
+			if (baseList != null) {
 				return new StringBuilder();
 			}
 			
@@ -1296,47 +1295,47 @@ public class GenericConvert {
 			//System.out.println("normalize keySet - "+baseMap.keySet());
 			
 			// Attempt to correct the case insensitivty issue
-			for( String oneKey : baseMap.keySet() ) {
-				if(oneKey.equalsIgnoreCase(currentKey)) {
+			for (String oneKey : baseMap.keySet()) {
+				if (oneKey.equalsIgnoreCase(currentKey)) {
 					currentKey = oneKey;
 					subObject = baseMap.get(currentKey);
-					if( subObject != null ) {
+					if (subObject != null) {
 						break;
 					}
 				}
 			}
 			
 			// Still invalid after search
-			if( subObject == null ) {
+			if (subObject == null) {
 				return new StringBuilder();
 			}
 		}
 		
-		if( baseMap != null ) {
+		if (baseMap != null) {
 			//
 			// Base is a map
 			//
-			if( res.length() > 0 ) {
+			if (res.length() > 0) {
 				res.append(".");
 			}
 			res.append(currentKey);
 			
-		} else if( baseList != null ) {
+		} else if (baseList != null) {
 			//
 			// Base is a list
 			//
-			res.append("["); 
+			res.append("[");
 			res.append(currentKey);
 			res.append("]");
 		}
 		
 		// Terminate when done
-		if(nextKeyPathSet.size() <= 0) {
+		if (nextKeyPathSet.size() <= 0) {
 			return res;
 		}
 		
 		// Else recursive fetch
-		return normalizeObjectPath( subObject, nextKeyPathSet, res );
+		return normalizeObjectPath(subObject, nextKeyPathSet, res);
 	}
 	
 	// to custom class

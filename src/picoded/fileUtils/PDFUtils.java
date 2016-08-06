@@ -61,14 +61,14 @@ public class PDFUtils {
 	}
 	
 	/**
-	* Merge multiple pdf into one pdf
-	*
-	* @param fileList
-	*            List<InputStream>
-	* @param outputStream
-	*            OutputStream
-	*
-	*/
+	 * Merge multiple pdf into one pdf
+	 *
+	 * @param fileList
+	 *            List<InputStream>
+	 * @param outputStream
+	 *            OutputStream
+	 *
+	 */
 	public static void mergePDF(List<InputStream> fileList, OutputStream outputStream) throws DocumentException,
 		IOException {
 		Document document = null;

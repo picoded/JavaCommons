@@ -405,18 +405,17 @@ public class JSql_Sqlite_test {
 		JSqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "_1`").dispose(); //cleanup (just incase)
 		
 		JSqlObj.executeQuery(
-			"CREATE TABLE IF NOT EXISTS " + testTableName + "_1 ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(100) )")
-			.dispose(); //valid table creation : no exception
+			"CREATE TABLE IF NOT EXISTS " + testTableName
+				+ "_1 ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(100) )").dispose(); //valid table creation : no exception
 		
 		//Upsert query
 		assertNotNull(qSet = JSqlObj.upsertQuerySet( //
 			testTableName + "_1", //
 			new String[] { "col1" }, new Object[] { 404 }, //
 			//new String[] { "col2", "col3" }, new Object[] { "not found", "not found" },  //
-			new String[] { "col2" }, new Object[] { "not found" },  //
+			new String[] { "col2" }, new Object[] { "not found" }, //
 			//new String[] { "col4", "col5" }, new Object[] { "not found", "not found" },
-			new String[] { "col3" }, new Object[] { "3 not found" },
-			new String[] { "col4" } //
+			new String[] { "col3" }, new Object[] { "3 not found" }, new String[] { "col4" } //
 			));
 		assertTrue("SQL result should return true", qSet.execute());
 		
@@ -436,7 +435,8 @@ public class JSql_Sqlite_test {
 		JSqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "_1`").dispose(); //cleanup (just incase)
 		
 		JSqlObj.executeQuery(
-			"CREATE TABLE IF NOT EXISTS " + testTableName + "_1 ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(100) DEFAULT 'ABC' NOT NULL )")
+			"CREATE TABLE IF NOT EXISTS " + testTableName
+				+ "_1 ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(100) DEFAULT 'ABC' NOT NULL )")
 			.dispose(); //valid table creation : no exception
 		
 		//JSqlObj.executeQuery("ALTER TABLE " + testTableName + "_1 ADD CONSTRAINT c_col4 DEFAULT (ABC) FOR col4;");
@@ -451,10 +451,9 @@ public class JSql_Sqlite_test {
 			testTableName + "_1", //
 			new String[] { "col1" }, new Object[] { 404 }, //
 			//new String[] { "col2", "col3" }, new Object[] { "not found", "not found" },  //
-			new String[] { "col2" }, new Object[] { "not found" },  //
+			new String[] { "col2" }, new Object[] { "not found" }, //
 			//new String[] { "col4", "col5" }, new Object[] { "not found", "not found" },
-			new String[] { "col3" }, new Object[] { "3 not found" },
-			new String[] { "col4" } //
+			new String[] { "col3" }, new Object[] { "3 not found" }, new String[] { "col4" } //
 			));
 		assertTrue("SQL result should return true", qSet.execute());
 		
@@ -566,37 +565,35 @@ public class JSql_Sqlite_test {
 	
 	@Test
 	public void createTableIndexQuerySetTest() throws JSqlException {
-		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
-		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col1` INT PRIMARY KEY, col2 TEXT )")
-			.dispose(); 
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col1` INT PRIMARY KEY, col2 TEXT )").dispose();
 		JSqlObj.createTableIndexQuerySet(testTableName, "col2");
 	}
 	
 	@Test
 	public void createTableIndexQuerySetTestThreeParam() throws JSqlException {
-		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
 		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )")
-			.dispose(); 
+			.dispose();
 		JSqlObj.createTableIndexQuerySet(testTableName, "col2", "ASC");
 	}
 	
 	@Test
 	public void createTableIndexQuerySetTestFourParam() throws JSqlException {
-		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
 		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )")
-			.dispose(); 
+			.dispose();
 		JSqlObj.createTableIndexQuerySet(testTableName, "col2", "DESC", "IDX");
 	}
 	
 	@Test
 	public void executeTest() throws JSqlException {
-		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
-		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")
-			.dispose(); 
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )").dispose();
 		boolean b = JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing");
 		assertTrue(b);
 		JSqlResult r = JSqlObj.executeQuery("SELECT * FROM " + testTableName + "");
@@ -607,10 +604,9 @@ public class JSql_Sqlite_test {
 	
 	@Test
 	public void executeQueryTest() throws JSqlException {
-		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
-		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")
-			.dispose(); 
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )").dispose();
 		assertFalse(JSqlObj.isDisposed());
 		boolean b = JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing");
 		assertTrue(b);
@@ -625,22 +621,22 @@ public class JSql_Sqlite_test {
 		String s = JSqlObj.genericSqlParser("SELECT * FROM " + testTableName + " WHERE COL1 = ?");
 		assertEquals("SELECT * FROM " + testTableName + " WHERE COL1=?", s);
 	}
+	
 	@SuppressWarnings("deprecation")
 	@Test
 	public void joinArgumentsTest() throws JSqlException {
-		Object[] array1 = new Object[] {1, 2, 3};
-		Object[] array2 = new Object[] {4, 5, 6};
-		Object[] array = new Object[] {1, 2, 3, 4, 5, 6};
+		Object[] array1 = new Object[] { 1, 2, 3 };
+		Object[] array2 = new Object[] { 4, 5, 6 };
+		Object[] array = new Object[] { 1, 2, 3, 4, 5, 6 };
 		Object[] rArray = JSqlObj.joinArguments(array1, array2);
 		assertEquals(array, rArray);
 	}
 	
 	@Test
 	public void queryTest() throws JSqlException {
-		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
-		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")
-			.dispose(); 
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )").dispose();
 		assertFalse(JSqlObj.isDisposed());
 		boolean b = JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing");
 		assertTrue(b);
@@ -653,20 +649,17 @@ public class JSql_Sqlite_test {
 	@Test
 	public void recreateTest() throws JSqlException {
 		JSqlObj.recreate(true);
-		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
-		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")
-			.dispose(); 
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )").dispose();
 		boolean b = JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404, "has nothing");
 		JSqlResult r = JSqlObj.query("SELECT * FROM " + testTableName + " where col1 = ? ", 404);
 		assertNotNull("SQL result returns as expected", r);
 		r.fetchAllRows();
-		HashMap<String, Object> row =  r.readRow(0);
-		assertEquals("via readRow", 404, ((Number)row.get("col1")).intValue());
+		HashMap<String, Object> row = r.readRow(0);
+		assertEquals("via readRow", 404, ((Number) row.get("col1")).intValue());
 		assertEquals("via readCol", "has nothing", r.readCol("col2")[0]);
 		assertEquals("via readCol", "has nothing", r.readCol_StringArr("col2")[0]);
 	}
-	
-	
 	
 }

@@ -14,24 +14,24 @@ import picoded.enums.HttpRequestType;
 
 /// Account login template API
 public class AccountLogin extends BasePage {
-
+	
 	/////////////////////////////////////////////
 	//
 	// Common error messages
 	//
 	/////////////////////////////////////////////
-
+	
 	public static final String MISSING_REQUEST_PAGE = "Unexpected Exception: Missing requestPage()";
 	public static final String MISSING_LOGIN_SESSION = "Authentication Error: Missing login session";
 	public static final String MISSING_PERMISSION = "Permission Error: Missing permission for request (generic)";
 	public static final String MISSING_PERMISSION_GROUP = "Permission Error: Missing group admin rights required for request";
-
+	
 	/////////////////////////////////////////////
 	//
 	// Utility functions
 	//
 	/////////////////////////////////////////////
-
+	
 	///
 	/// Standardised extension of RESTFunction, for login module, as a functional interface
 	/// This is used in conjunction with prepareAuthenticatedREST, and is called only if user is logged in
@@ -58,9 +58,9 @@ public class AccountLogin extends BasePage {
 			AccountObject accObject_a, //
 			AccountObject accObject_b);
 	}
-
+	
 	private static MetaTableApiBuilder mtApi = null;
-
+	
 	///
 	/// Standardised utility function use to authenticate the login request, and extend on for the respective function
 	///
@@ -71,20 +71,20 @@ public class AccountLogin extends BasePage {
 	/// @returns {Map<String,Object>}
 	///
 	public static Map<String, Object> prepareAuthenticatedREST(RESTRequest req, Map<String, Object> res, loginREST call) {
-
+		
 		// Loads and check for request page
 		//----------------------------------------
 		if (req.requestPage() == null) {
 			res.put("error", MISSING_REQUEST_PAGE);
 			return res;
 		}
-
+		
 		BasePage basePageObj = (BasePage) (req.requestPage());
 		AccountTable accountTableObj = basePageObj.accountAuthTable();
 		AccountObject currentUser = accountTableObj.getRequestUser(basePageObj.getHttpServletRequest());
-
+		
 		mtApi = new MetaTableApiBuilder(accountTableObj.accountMetaTable());
-
+		
 		// Checked for valid login
 		//----------------------------------------
 		if (currentUser == null) {
@@ -95,7 +95,7 @@ public class AccountLogin extends BasePage {
 		//----------------------------------------
 		return call.apply(req, res, basePageObj, accountTableObj, currentUser, null, null);
 	}
-
+	
 	///
 	/// Standardised utility function use to allow the login request WITHOUT authentication, and extend on for the respective function
 	///
@@ -107,32 +107,32 @@ public class AccountLogin extends BasePage {
 	///
 	public static Map<String, Object> prepareNoAuthenticationREST(RESTRequest req, Map<String, Object> res,
 		loginREST call) {
-
+		
 		// Loads and check for request page
 		//----------------------------------------
 		if (req.requestPage() == null) {
 			res.put("error", MISSING_REQUEST_PAGE);
 			return res;
 		}
-
+		
 		BasePage basePageObj = (BasePage) (req.requestPage());
 		AccountTable accountTableObj = basePageObj.accountAuthTable();
 		AccountObject currentUser = accountTableObj.getRequestUser(basePageObj.getHttpServletRequest());
-
+		
 		mtApi = new MetaTableApiBuilder(accountTableObj.accountMetaTable());
-
+		
 		// Checked for valid login
 		//----------------------------------------
 		//if (currentUser == null) {
 		//    res.put("error", MISSING_LOGIN_SESSION);
 		//    return res;
 		//}
-
+		
 		// Run actual logic
 		//----------------------------------------
 		return call.apply(req, res, basePageObj, accountTableObj, currentUser, null, null);
 	}
-
+	
 	///
 	/// Standardised utility function use to authenticate the login request, and fetch the first wildcard argument as a group object (if possible)
 	/// Also checks for adminstration rights, and can be set to only call the loginREST function if it has group admin rights
@@ -146,11 +146,11 @@ public class AccountLogin extends BasePage {
 	///
 	public static Map<String, Object> fetchGroupObject_fromFirstWildcard_orCurrentUser(RESTRequest req,
 		Map<String, Object> res, boolean callOnlyForGroupAdmin, loginREST call) {
-
+		
 		// Only runs function if logged in
 		return prepareAuthenticatedREST(req, res, (reqObj, resMap, basePageObj, accountTableObj, currentUser, accObj_a,
 			accObj_b) -> {
-
+			
 			// Default no data
 			//----------------------------------------
 			resMap.put("groupID", null);
@@ -158,10 +158,10 @@ public class AccountLogin extends BasePage {
 			resMap.put("groupID_valid", false);
 			resMap.put("groupID_admin", false);
 			resMap.put("groupID_names", null);
-
+			
 			// Group object
 			AccountObject groupObj = null;
-
+			
 			// Attemptes to load the wildcard group object
 			String[] wildcard = reqObj.wildCardNamespace();
 			if (wildcard != null && wildcard.length >= 1) {
@@ -171,53 +171,53 @@ public class AccountLogin extends BasePage {
 				groupObj = currentUser; // Defaults group object to current user
 				resMap.put("groupID", currentUser._oid());
 			}
-
+			
 			// Terminates if no group object (null)
 			//----------------------------------------
 			if (groupObj == null) {
 				res.put("error", "GroupObj is null in fetchGroupObject_fromFirstWildcard_orCurrentUser");
 				return resMap;
 			}
-
+			
 			// Check group object
 			//----------------------------------------
 			resMap.put("groupID_exist", true);
 			resMap.put("groupID_valid", groupObj.isGroup());
-
+			
 			// Terminates if group object is not a group
 			//----------------------------------------
 			if (groupObj.isGroup() == false) {
 				res.put("error", "GroupObj is not group in fetchGroupObject_fromFirstWildcard_orCurrentUser");
 				return resMap;
 			}
-
+			
 			// Add in the group names
 			resMap.put("groupID_names", new ArrayList<String>(groupObj.getNames()));
 			boolean hasGroupadmin = false;
-
+			
 			// Check the group admin role
 			if (currentUser.isSuperUser() || groupObj.getMemberRole(currentUser).equalsIgnoreCase("admin")) {
 				hasGroupadmin = true;
 				resMap.put("groupID_admin", true);
 			}
-
+			
 			if (callOnlyForGroupAdmin && !hasGroupadmin) {
 				resMap.put("error", MISSING_PERMISSION_GROUP);
 				return resMap;
 			}
-
+			
 			// Applies the call, only after fetching and validating the group object
 			return call.apply(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, null);
 		});
-
+		
 	}
-
+	
 	/////////////////////////////////////////////
 	//
 	// Login, Logout, and password API
 	//
 	/////////////////////////////////////////////
-
+	
 	///
 	/// # login (GET)
 	///
@@ -250,27 +250,27 @@ public class AccountLogin extends BasePage {
 		res.put("accountID", null);
 		res.put("accountName", null);
 		res.put("isLogin", false);
-
+		
 		if (req.requestPage() != null) {
 			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
-
+			
 			BasePage bp = (BasePage) (req.requestPage());
 			AccountTable at = bp.accountAuthTable();
-
+			
 			AccountObject ao = at.getRequestUser(bp.getHttpServletRequest());
 			if (ao != null) {
 				res.put("accountID", ao._oid());
-
+				
 				String[] names = ao.getNames().toArray(new String[0]);
-
+				
 				if (sanitiseOutput && names != null) {
 					for (int i = 0; i < names.length; ++i) {
 						names[i] = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(names[i]);
 					}
 				}
-
+				
 				res.put("accountNames", Arrays.asList((names == null) ? new String[] {} : names));
-
+				
 				res.put("isLogin", true);
 			}
 		} else {
@@ -278,7 +278,7 @@ public class AccountLogin extends BasePage {
 		}
 		return res;
 	};
-
+	
 	///
 	/// # login (POST)
 	///
@@ -313,28 +313,28 @@ public class AccountLogin extends BasePage {
 		res.put("accountID", null);
 		res.put("accountNames", null);
 		res.put("isLogin", false);
-
+		
 		if (req.requestPage() != null) {
 			BasePage bp = (BasePage) (req.requestPage());
 			AccountObject ao = null;
 			AccountTable at = bp.accountAuthTable();
-
+			
 			String tStr = req.getString("accountName");
 			if (tStr != null) {
 				ao = at.getFromName(tStr);
 			}
-
+			
 			if (ao == null && (tStr = req.getString("accountID")) != null) {
 				ao = at.getFromID(tStr);
 			}
-
+			
 			// AccountName or AccountID is valid
 			if (ao != null) {
 				int timeAllowed = ao.getNextLoginTimeAllowed(tStr);
 				if (timeAllowed == 0) {
 					ao = at.loginAccount(bp.getHttpServletRequest(), bp.getHttpServletResponse(), ao,
 						req.getString("accountPass", ""), false);
-
+					
 					// Login is valid
 					if (ao != null) {
 						res.put("accountID", ao._oid());
@@ -360,14 +360,14 @@ public class AccountLogin extends BasePage {
 					res.put("isLogin", false);
 					res.put("error", "Unable to login, user locked out for " + timeAllowed + " seconds.");
 				}
-
+				
 			}
 		} else {
 			res.put("error", MISSING_REQUEST_PAGE);
 		}
 		return res;
 	};
-
+	
 	///
 	/// # logout (GET)
 	///
@@ -393,11 +393,11 @@ public class AccountLogin extends BasePage {
 	///
 	public static RESTFunction logout_GET = (req, res) -> {
 		res.put("logout", "false");
-
+		
 		if (req.requestPage() != null) {
 			BasePage bp = (BasePage) (req.requestPage());
 			AccountTable at = bp.accountAuthTable();
-
+			
 			at.logoutAccount(bp.getHttpServletRequest(), bp.getHttpServletResponse());
 			res.put("logout", "true");
 		} else {
@@ -405,7 +405,7 @@ public class AccountLogin extends BasePage {
 		}
 		return res;
 	};
-
+	
 	///
 	/// # password (POST) [Requires login to relevent user, or superuser]
 	///
@@ -437,11 +437,11 @@ public class AccountLogin extends BasePage {
 	public static RESTFunction password_POST = (req, res) -> {
 		res.put("accountID", null);
 		res.put("success", false);
-
+		
 		if (req.requestPage() != null) {
 			BasePage bp = (BasePage) (req.requestPage());
 			AccountTable at = bp.accountAuthTable();
-
+			
 			// Allow change password only if it is current user
 			AccountObject ao = at.getRequestUser(bp.getHttpServletRequest());
 			if (ao != null) {
@@ -456,14 +456,14 @@ public class AccountLogin extends BasePage {
 					}
 				} else if (ao.isSuperUser()) {
 					AccountObject subUser = at.getFromID(accID);
-
+					
 					if (subUser != null) {
 						res.put("accountID", accID);
 						res.put("success", (subUser.setPassword(req.getString("newPassword")) == true));
 					} else {
 						res.put("error", "User does not exists: " + accID);
 					}
-
+					
 				} else {
 					res.put("error", "User does not have permission to edit password: " + accID);
 				}
@@ -473,13 +473,13 @@ public class AccountLogin extends BasePage {
 		}
 		return res;
 	};
-
+	
 	/////////////////////////////////////////////
 	//
 	// Basic info API
 	//
 	/////////////////////////////////////////////
-
+	
 	///
 	/// # info/name/${accountName} (GET) [Requires login]
 	///
@@ -519,7 +519,7 @@ public class AccountLogin extends BasePage {
 			AccountTable at = bp.accountAuthTable(); //at contains all the user data
 			AccountObject ao = at.getRequestUser(bp.getHttpServletRequest()); //to check if logged in
 			AccountObject account = null;
-
+			
 			if (ao != null) {
 				String name = "";
 				if (req.containsKey("accountName")) {
@@ -531,16 +531,16 @@ public class AccountLogin extends BasePage {
 				}
 			} else {
 				res.put("error", "Account object requested is null");
-
+				
 			}
-
+			
 			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
 			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(account, sanitiseOutput);
 			res.putAll(commonInfo);
 		}
 		return res;
 	};
-
+	
 	///
 	/// # info/id/${accountID} (GET) [Requires login]
 	///
@@ -580,62 +580,62 @@ public class AccountLogin extends BasePage {
 			AccountTable at = bp.accountAuthTable(); //at contains all the user data
 			AccountObject ao = at.getRequestUser(bp.getHttpServletRequest()); //to check if logged in
 			AccountObject account = null;
-
+			
 			if (ao != null) {
 				String id = "";
 				if (req.containsKey("accountID")) {
 					id = req.getString("accountID");
 				}
-
+				
 				if (!id.isEmpty()) {
 					account = at.getFromID(id);
 				}
 			} else {
 				res.put("error", "Account object requested is null");
 			}
-
+			
 			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
 			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(account, sanitiseOutput);
 			res.putAll(commonInfo);
 		}
-
+		
 		return res;
 	};
-
+	
 	private static Map<String, Object> extractCommonInfoFromAccountObject(AccountObject account, boolean sanitiseOutput) {
 		//sanitise accountNames, groupNames,
-
+		
 		Map<String, Object> commonInfo = new HashMap<String, Object>();
-
+		
 		commonInfo.put("accountID", null);
 		commonInfo.put("accountNames", null);
 		commonInfo.put("isSuperUser", null);
 		commonInfo.put("isGroup", null);
 		commonInfo.put("groups", null);
 		commonInfo.put("isAnyGroupAdmin", false);
-
+		
 		if (account != null) {
 			commonInfo.put("accountID", account._oid());
-
+			
 			Set<String> accNameSet = account.getNames();
 			if (accNameSet != null) {
 				String[] accNames = new String[accNameSet.size()];
 				accNameSet.toArray(accNames);
-
+				
 				if (sanitiseOutput && accNames != null) {
 					for (int i = 0; i < accNames.length; ++i) {
 						accNames[i] = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(accNames[i]);
 					}
 				}
-
+				
 				commonInfo.put("accountNames", accNames);
 			} else {
 				commonInfo.put("accountNames", null);
 			}
-
+			
 			commonInfo.put("isSuperUser", account.isSuperUser());
 			commonInfo.put("isGroup", account.isGroup());
-
+			
 			Map<String, List<Map<String, Object>>> groupMap = new HashMap<String, List<Map<String, Object>>>();
 			AccountObject[] groups = account.getGroups();
 			if (groups != null) {
@@ -643,7 +643,7 @@ public class AccountLogin extends BasePage {
 				for (AccountObject group : groups) {
 					Map<String, Object> newGroup = new HashMap<String, Object>();
 					newGroup.put("accountID", group._oid());
-
+					
 					//extracting group names and sanitising if needed
 					Set<String> groupNames = group.getNames();
 					if (sanitiseOutput) {
@@ -653,25 +653,25 @@ public class AccountLogin extends BasePage {
 						}
 					}
 					newGroup.put("names", groupNames);
-
+					
 					//extracting member roles and sanitising if needed
 					String role = group.getMemberRole(account);
 					if (sanitiseOutput) {
 						role = RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(role);
 					}
 					newGroup.put("role", role); //sanitise role just in case
-
+					
 					if (role == null) {
 						role = "";
 					}
-
+					
 					boolean isAdmin = role.equalsIgnoreCase("admin") || role.equalsIgnoreCase("superuser");
 					newGroup.put("isAdmin", isAdmin);
-
+					
 					if (isAdmin) {
 						commonInfo.replace("isAnyGroupAdmin", true);
 					}
-
+					
 					groupList.add(newGroup);
 				}
 				//				groupMap.put("groups", groupList);
@@ -679,16 +679,16 @@ public class AccountLogin extends BasePage {
 			}
 			//			commonInfo.put("groups", groupMap);
 		}
-
+		
 		return commonInfo;
 	}
-
+	
 	/////////////////////////////////////////////
 	//
 	// List searching API
 	//
 	/////////////////////////////////////////////
-
+	
 	///
 	/// # list (POST / GET) [Requires login]
 	///
@@ -743,38 +743,38 @@ public class AccountLogin extends BasePage {
 				int draw = req.getInt("draw");
 				int start = req.getInt("start");
 				int limit = req.getInt("length");
-
+				
 				String[] insideGroupAny = req.getStringArray("insideGroup_any");
 				String[] hasGroupRole_any = req.getStringArray("hasGroupRole_any");
 				String groupStatus = req.getString("groupStatus");
-
+				
 				String orderByStr = req.getString("orderBy");
 				if (orderByStr == null || orderByStr.isEmpty()) {
 					orderByStr = "oID";
 				}
-
+				
 				String[] headers = req.getStringArray("headers");
-
+				
 				if (headers == null || headers.length < 1) {
 					headers = new String[] { "_oid", "names" };
 				}
-
+				
 				String query = req.getString("query");
 				String[] queryArgs = req.getStringArray("queryArgs");
-
+				
 				MetaTable mtObj = accountTableObj.accountMetaTable();
-
+				
 				//put back into response
 				res.put("draw", draw);
 				res.put("headers", headers);
-
+				
 				res.put("recordsTotal", accountTableObj.size());
 				if (query != null && !query.isEmpty() && queryArgs != null && queryArgs.length > 0) {
 					res.put("recordsFiltered", mtObj.queryCount(query, queryArgs));
 				}
-
+				
 				boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
-
+				
 				List<List<Object>> data = new ArrayList<List<Object>>();
 				try {
 					data = list_GET_and_POST_inner(accountTableObj, draw, start, limit, headers, query, queryArgs,
@@ -783,57 +783,57 @@ public class AccountLogin extends BasePage {
 				} catch (Exception e) {
 					res.put("error", e.getMessage());
 				}
-
+				
 				return res;
 			});
 	};
-
+	
 	private static List<List<Object>> list_GET_and_POST_inner(AccountTable _metaTableObj, int draw, int start,
 		int length, String[] headers, String query, String[] queryArgs, String orderBy, String[] insideGroup_any,
 		String[] hasGroupRole_any, String groupStatus, boolean sanitiseOutput) throws RuntimeException {
-
+		
 		List<List<Object>> ret = new ArrayList<List<Object>>();
-
+		
 		if (_metaTableObj == null) {
 			return ret;
 		}
-
+		
 		try {
 			if (headers != null && headers.length > 0) {
 				MetaObject[] metaObjs = null;
 				AccountObject[] fullUserArray = null;
-
+				
 				if ((insideGroup_any == null || insideGroup_any.length == 0)
 					&& (hasGroupRole_any == null || hasGroupRole_any.length == 0)) {
 					//do normal query
 					MetaTable accountMetaTable = _metaTableObj.accountMetaTable();
-
+					
 					if (accountMetaTable == null) {
 						return ret;
 					}
-
+					
 					if (query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0) {
 						metaObjs = accountMetaTable.query(null, null, orderBy, start, length);
 					} else {
 						metaObjs = accountMetaTable.query(query, queryArgs, orderBy, start, length);
 					}
-
+					
 					List<AccountObject> retUsers = new ArrayList<AccountObject>();
 					for (MetaObject metaObj : metaObjs) {
 						AccountObject ao = _metaTableObj.getFromID(metaObj._oid()); //a single account
 						retUsers.add(ao);
 					}
-
+					
 					fullUserArray = retUsers.toArray(new AccountObject[retUsers.size()]);
 				} else {
 					//do filtered query
 					fullUserArray = _metaTableObj.getUsersByGroupAndRole(insideGroup_any, hasGroupRole_any);
 				}
-
+				
 				if (fullUserArray == null || fullUserArray.length == 0) {
 					return ret;
 				}
-
+				
 				//group status filtering
 				if (groupStatus != null) {
 					List<AccountObject> filteredUsers = new ArrayList<AccountObject>();
@@ -848,24 +848,24 @@ public class AccountLogin extends BasePage {
 							}
 						}
 					}
-
+					
 					fullUserArray = filteredUsers.toArray(new AccountObject[filteredUsers.size()]);
 				}
-
+				
 				for (AccountObject ao : fullUserArray) {
 					List<Object> row = new ArrayList<Object>();
 					for (String header : headers) {
 						if (header.equalsIgnoreCase("names")) {
 							if (ao != null) {
 								Set<String> aoNames = ao.getNames();
-
+								
 								if (sanitiseOutput) {
 									aoNames.clear();
 									for (String name : ao.getNames()) {
 										aoNames.add(RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(name));
 									}
 								}
-
+								
 								if (aoNames != null) {
 									List<String> aoNameList = new ArrayList<String>(aoNames);
 									row.add(aoNameList);
@@ -873,14 +873,14 @@ public class AccountLogin extends BasePage {
 							}
 						} else {
 							Object rawVal = ao.get(header); //this used to be metaObj.get
-
+							
 							if (sanitiseOutput && rawVal instanceof String) {
 								String stringVal = GenericConvert.toString(rawVal);
 								row.add(stringVal);
 							} else {
 								row.add(rawVal);
 							}
-
+							
 						}
 					}
 					ret.add(row);
@@ -889,16 +889,16 @@ public class AccountLogin extends BasePage {
 		} catch (Exception e) {
 			throw new RuntimeException("list_GET_and_POST_inner() ", e);
 		}
-
+		
 		return ret;
 	}
-
+	
 	/////////////////////////////////////////////
 	//
 	// Meta details operations
 	//
 	/////////////////////////////////////////////
-
+	
 	///
 	/// # meta/${accountID} (GET) [Requires login]
 	///
@@ -934,7 +934,7 @@ public class AccountLogin extends BasePage {
 		return prepareAuthenticatedREST(req, res, (reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj,
 			accObj_b) -> {
 			Map<String, Object> metaMap = mtApi.meta_GET.apply(req, res);
-
+			
 			AccountObject account = null;
 			if (currentUser != null) {
 				String id = "";
@@ -942,22 +942,22 @@ public class AccountLogin extends BasePage {
 					id = req.getString("accountID");
 				}
 				;
-
+				
 				if (!id.isEmpty()) {
 					account = accountTableObj.getFromID(id);
 				}
 			} else {
 				res.put("error", "Account object requested is null");
 			}
-
+			
 			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
 			Map<String, Object> commonInfoMap = extractCommonInfoFromAccountObject(account, sanitiseOutput);
 			res.putAll(commonInfoMap);
-
+			
 			return res;
 		});
 	};
-
+	
 	///
 	/// # meta/${accountID} (POST) [Requires login]
 	///
@@ -995,7 +995,7 @@ public class AccountLogin extends BasePage {
 			return mtApi.meta_POST.apply(req, res);
 		});
 	};
-
+	
 	///
 	/// # meta/${accountID} (DELETE) [Requires login]
 	///
@@ -1031,13 +1031,13 @@ public class AccountLogin extends BasePage {
 			return mtApi.meta_DELETE.apply(req, res);
 		});
 	};
-
+	
 	/////////////////////////////////////////////
 	//
 	// Group / Members management
 	//
 	/////////////////////////////////////////////
-
+	
 	///
 	/// # members/list/${groupID} (GET) [Requires login]
 	///
@@ -1092,25 +1092,25 @@ public class AccountLogin extends BasePage {
 			res.put("draw", null);
 			res.put("headers", null);
 			res.put("error", null);
-
+			
 			List<List<Object>> retList = new ArrayList<List<Object>>();
 			res.put("data", retList);
-
+			
 			if (groupObj == null) {
 				return resMap;
 			}
-
+			
 			try {
 				String[] headers = reqObj.getStringArray("headers");
-
+				
 				if (headers == null || headers.length < 1) {
 					headers = new String[] { "_oid", "name", "role" };
 				}
-
+				
 				boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
-
+				
 				AccountObject[] members = groupObj.getMembersAccountObject();
-
+				
 				int listCounter = 0;
 				for (AccountObject accObj : members) {
 					MetaObject groupMemberMeta = groupObj.getMember(accObj);
@@ -1158,7 +1158,7 @@ public class AccountLogin extends BasePage {
 				}
 			}
 		}
-
+		
 		++listCounter;
 	}
 	res.put("data", retList);
@@ -1171,7 +1171,7 @@ public class AccountLogin extends BasePage {
 return resMap;
 }	  );
 	};
-
+	
 	///
 	/// # members/list/${groupID} (POST) [Requires login, and group admin rights]
 	///
@@ -1213,18 +1213,18 @@ return resMap;
 		// Only runs function if logged in, and valid group object, with admin rights
 		return fetchGroupObject_fromFirstWildcard_orCurrentUser(req, res, true, (reqObj, resMap, basePageObj,
 			accountTableObj, currentUser, groupObj, accObj_b) -> {
-
+			
 			res.put("setMembers", null);
 			res.put("delMembers", null);
 			res.put("error", null);
-
+			
 			if (groupObj == null) {
 				res.put("error", "GroupObj is null in fetchGroupObject_fromFirstWildcard_orCurrentUser");
 				return resMap;
 			}
-
+			
 			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
-
+			
 			try {
 				//do deletes first
 			List<String> successfulDeletes = null;
@@ -1234,13 +1234,13 @@ return resMap;
 				delMember = ConvertJSON.toList((String) delMemberRaw);
 				successfulDeletes = new ArrayList<String>();
 			}
-
+			
 			if (delMember != null) {
 				for (Object strRaw : delMember) {
 					String str = (String) strRaw;
 					if (!str.isEmpty()) {
 						AccountObject memberToDelete = accountTableObj.getFromID(str);
-
+						
 						if (memberToDelete != null) {
 							groupObj.removeMember(memberToDelete);
 						}
@@ -1249,17 +1249,17 @@ return resMap;
 				groupObj.saveDelta();
 				res.put("delMembers", delMember);
 			}
-
+			
 			//then do additions
 			List<String> successfulAdds = null;
 			Map<String, Object> setMemberMap = null;
 			Object setMemberMapRaw = req.get("setMembers");
 			if (setMemberMapRaw != null) {
 				setMemberMap = ConvertJSON.toMap((String) setMemberMapRaw);
-
+				
 				successfulAdds = new ArrayList<String>();
 			}
-
+			
 			if (setMemberMap != null) {
 				for (Entry<String, Object> setMember : setMemberMap.entrySet()) {
 					AccountObject newMember = accountTableObj.getFromID(setMember.getKey());
@@ -1269,7 +1269,7 @@ return resMap;
 			successfulAdds.add(setMember.getKey());
 		}
 	}
-
+	
 	res.put("setMembers", successfulAdds);
 }
 
@@ -1280,13 +1280,13 @@ res.put("error", e.getMessage());
 return resMap;
 }	  );
 	};
-
+	
 	/////////////////////////////////////////////
 	//
 	// Group members meta management
 	//
 	/////////////////////////////////////////////
-
+	
 	///
 	/// # members/meta/${groupID}/${accountID} (GET) [Requires login]
 	///
@@ -1331,14 +1331,14 @@ return resMap;
 				res.put("accountID_valid", false);
 				res.put("meta", null);
 				res.put("error", null);
-
+				
 				if (groupObj == null) {
 					res.put("error", "Group object is null");
 					return resMap;
 				}
-
+				
 				try {
-
+					
 					String accountOID = req.getString("accountID");
 					if (accountOID == null || accountOID.isEmpty()) {
 						if (currentUser != null) {
@@ -1347,16 +1347,16 @@ return resMap;
 							res.put("error", "Unable to obtain oid");
 						}
 					}
-
+					
 					res.put("accountID", accountOID);
-
+					
 					AccountObject user = accountTableObj.getFromID(accountOID);
 					MetaObject groupUserInfo = null;
 					boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
-
+					
 					if (user != null) {
 						groupUserInfo = groupObj.getMember(user);
-
+						
 						if (sanitiseOutput && groupUserInfo != null) {
 							Set<String> userInfoKeys = groupUserInfo.keySet();
 							for (String key : userInfoKeys) {
@@ -1369,12 +1369,12 @@ return resMap;
 								}
 							}
 						}
-
+						
 					} else {
 						res.put("error", "User account not found in table");
 						return resMap;
 					}
-
+					
 					if (groupUserInfo != null) {
 						res.put("meta", groupUserInfo);
 						res.put("accountID_valid", true);
@@ -1382,15 +1382,15 @@ return resMap;
 						res.put("error", "User info not found in group");
 						return resMap;
 					}
-
+					
 				} catch (Exception e) {
 					res.put("error", e.getMessage());
 				}
-
+				
 				return resMap;
 			});
 	};
-
+	
 	///
 	/// # members/meta/${groupID}/${accountID} (POST) [Requires login]
 	///
@@ -1432,20 +1432,20 @@ return resMap;
 		// Only runs function if logged in, and valid group object
 		return fetchGroupObject_fromFirstWildcard_orCurrentUser(req, res, false, (reqObj, resMap, basePageObj,
 			accountTableObj, currentUser, groupObj, accObj_b) -> {
-
+			
 			res.put("accountID", null);
 			res.put("accountID_valid", false);
 			res.put("updateMode", null);
 			res.put("updateMeta", null);
 			res.put("error", null);
-
+			
 			if (groupObj == null) {
 				res.put("error", "Group object is null");
 				return resMap;
 			}
-
+			
 			try {
-
+				
 				String accountOID = req.getString("accountID");
 				if (accountOID == null || accountOID.isEmpty()) {
 					if (currentUser != null) {
@@ -1454,36 +1454,36 @@ return resMap;
 			res.put("error", "Unable to obtain oid");
 		}
 	}
-
+	
 	res.put("accountID", accountOID);
 	AccountObject user = accountTableObj.getFromID(accountOID);
 	MetaObject groupUserInfo = null;
-
+	
 	if (user != null) {
 		groupUserInfo = groupObj.getMember(user);
 	} else {
 		res.put("error", "User account not found in table");
 		return resMap;
 	}
-
+	
 	if (groupUserInfo == null) {
 		res.put("error", "User info not found in group");
 		return resMap;
 	}
-
+	
 	res.put("accountID_valid", true);
-
+	
 	Object metaObjRaw = req.get("meta");
 	if (metaObjRaw == null) {
 		res.put("error", "Object to update with not found");
 		return resMap;
 	}
-
+	
 	Map<String, Object> metaObj = ConvertJSON.toMap((String) metaObjRaw);
-
+	
 	res.put("updateMeta", metaObj);
 	groupUserInfo.putAll(metaObj);
-
+	
 	String updateMode = req.getString("updateMode", "delta");
 	res.put("updateMode", updateMode);
 	if (updateMode.equalsIgnoreCase("full")) {
@@ -1491,7 +1491,7 @@ return resMap;
 	} else {
 		groupUserInfo.saveDelta();
 	}
-
+	
 } catch (Exception e) {
 	res.put("error", e.getMessage());
 }
@@ -1499,7 +1499,7 @@ return resMap;
 return resMap;
 }	  );
 	};
-
+	
 	//-------------------------------------------------------------------------------------------------------------------------
 	//
 	// Work in progress (not final) start
@@ -1537,59 +1537,59 @@ return resMap;
 		// Only runs function if logged in, and valid group object
 		return prepareNoAuthenticationREST(req, res, (reqObj, resMap, basePageObj, accountTableObj, currentUser,
 			groupObj, accObj_b) -> {
-
+			
 			boolean isGroup = req.getBoolean("isGroup", false);
 			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
-
+			
 			String userName = req.getString("username");
 			if (userName == null || userName.isEmpty()) {
 				res.put("error", "No username was supplied");
 				return resMap;
 			}
-
+			
 			String password = req.getString("password");
 			if (!isGroup && (password == null || password.isEmpty())) {
 				res.put("error", "No password was supplied");
 				return resMap;
 			}
-
+			
 			Object metaObjRaw = req.get("meta");
 			Map<String, Object> givenMetaObj = new HashMap<String, Object>();
 			if (metaObjRaw instanceof String) {
 				String jsonMetaString = (String) metaObjRaw;
-
+				
 				if (jsonMetaString != null && !jsonMetaString.isEmpty()) {
 					givenMetaObj = ConvertJSON.toMap(jsonMetaString);
 				}
 			}
-
+			
 			AccountObject newAccount = accountTableObj.newObject(userName);
 			if (newAccount != null) {
 				if (isGroup) {
 					newAccount.setGroupStatus(true);
 				}
-
+				
 				newAccount.setPassword(password);
 				newAccount.putAll(givenMetaObj);
 				newAccount.saveAll();
-
+				
 				res.put("meta", newAccount);
 				res.put("accountID", newAccount._oid());
 			} else {
 				AccountObject existingAccount = accountTableObj.getFromName(userName);
-				if(existingAccount != null){
+				if (existingAccount != null) {
 					res.put("accountID", existingAccount._oid());
 					res.put("error", "Object already exists in account Table");
-				}else{
+				} else {
 					res.put("accountID", null);
 					res.put("error", "Object already exists in account Table");
 				}
 			}
-
+			
 			return resMap;
 		});
 	};
-
+	
 	/// # delete [POST]
 	///
 	/// Deletes an account
@@ -1619,23 +1619,23 @@ return resMap;
 		// Only runs function if logged in, and valid group object
 		return prepareAuthenticatedREST(req, res, (reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj,
 			accObj_b) -> {
-
+			
 			String accountID = req.getString("accountID");
 			String accountName = req.getString("accountName");
-
+			
 			if ((accountID == null || accountID.isEmpty()) && (accountName == null || accountName.isEmpty())) {
 				res.put("error", "Both accountID and accountName were not supplied");
 				return resMap;
 			}
-
+			
 			res.put("accountID", accountID);
 			res.put("accountName", accountName);
-
+			
 			try {
 				AccountObject accObj = null;
 				if (!accountID.isEmpty()) {
 					accObj = accountTableObj.getFromID(accountID);
-
+					
 					if (accountName != null && !accountName.isEmpty()) {
 						if (!accObj.getNames().contains(accountName)) {
 							res.put("error",
@@ -1643,29 +1643,29 @@ return resMap;
 							return resMap;
 						}
 					}
-
+					
 					accountTableObj.removeFromID(accountID);
-
+					
 				} else if (!accountName.isEmpty()) {
 					accObj = accountTableObj.getFromName(accountName);
-
+					
 					if (accountID != null && !accountID.isEmpty()) {
 						if (!accObj._oid().equals(accountID)) {
 							res.put("error", "accountID given does not match the accounts _oid - delete unsuccessful");
 							return resMap;
 						}
 					}
-
+					
 					accountTableObj.removeFromName(accountName);
 				}
 			} catch (Exception e) {
 				res.put("error", "Exception while trying to remove");
 			}
-
+			
 			return resMap;
 		});
 	};
-
+	
 	//-------------------------------------------------------------------------------------------------------------------------
 	//
 	// Work in progress (not final) end
@@ -1679,103 +1679,103 @@ return resMap;
 			return res;
 		});
 	};
-
+	
 	/////////////////////////////////////////////
 	//
 	// RestBuilder template builder
 	//
 	/////////////////////////////////////////////
-
+	
 	///
 	/// Takes the restbuilder and the account table object and implements its respective default API
 	///
 	public static RESTBuilder setupRESTBuilder(RESTBuilder rb, AccountTable at, String setPrefix) {
-
+		
 		rb.getNamespace(setPrefix + "login").put(HttpRequestType.GET, login_GET);
 		rb.getNamespace(setPrefix + "login").put(HttpRequestType.POST, login_POST);
 		rb.getNamespace(setPrefix + "logout").put(HttpRequestType.GET, logout_GET);
 		rb.getNamespace(setPrefix + "password").put(HttpRequestType.POST, password_POST);
-
+		
 		rb.getNamespace(setPrefix + "info/name").put(HttpRequestType.GET, infoByName_GET);
 		rb.getNamespace(setPrefix + "info/name/*").put(HttpRequestType.GET, infoByName_GET);
-
+		
 		rb.getNamespace(setPrefix + "info/id").put(HttpRequestType.GET, infoByID_GET);
 		rb.getNamespace(setPrefix + "info/id/*").put(HttpRequestType.GET, infoByID_GET);
-
+		
 		rb.getNamespace(setPrefix + "members/list/*").put(HttpRequestType.GET, members_list_GET);
 		rb.getNamespace(setPrefix + "members/list").put(HttpRequestType.GET, members_list_GET);
-
+		
 		rb.getNamespace(setPrefix + "members/list/*").put(HttpRequestType.POST, members_list_POST);
 		rb.getNamespace(setPrefix + "members/list").put(HttpRequestType.POST, members_list_POST);
-
+		
 		rb.getNamespace(setPrefix + "members/meta/*").put(HttpRequestType.GET, members_meta_GET);
 		rb.getNamespace(setPrefix + "members/meta/*/*").put(HttpRequestType.GET, members_meta_GET);
-
+		
 		rb.getNamespace(setPrefix + "members/meta/*").put(HttpRequestType.POST, members_meta_POST);
 		rb.getNamespace(setPrefix + "members/meta/*/*").put(HttpRequestType.POST, members_meta_POST);
-
+		
 		rb.getNamespace(setPrefix + "new").put(HttpRequestType.POST, new_account_POST);
 		rb.getNamespace(setPrefix + "remove").put(HttpRequestType.POST, delete_account_POST);
-
+		
 		//MetaTableApiBuilder Fall through
 		rb.getNamespace(setPrefix + "meta/list").put(HttpRequestType.GET, list_GET_and_POST);
 		rb.getNamespace(setPrefix + "meta/list").put(HttpRequestType.POST, list_GET_and_POST);
-
+		
 		rb.getNamespace(setPrefix + "meta/*").put(HttpRequestType.GET, meta_GET);
 		rb.getNamespace(setPrefix + "meta/*").put(HttpRequestType.POST, meta_POST);
 		rb.getNamespace(setPrefix + "meta").put(HttpRequestType.GET, meta_GET);
 		rb.getNamespace(setPrefix + "meta").put(HttpRequestType.POST, meta_POST);
-
+		
 		rb.getNamespace(setPrefix + "remove").put(HttpRequestType.DELETE, meta_DELETE);
 		rb.getNamespace(setPrefix + "remove/*").put(HttpRequestType.DELETE, meta_DELETE);
 		//end fall through segment
-
+		
 		//csv_export
 		rb.getNamespace(setPrefix + "csv").put(HttpRequestType.GET, csv_GET);
-
+		
 		return rb;
 	}
-
+	
 	public static RESTBuilder setupRESTBuilder(RESTBuilder rb, AccountTable at) {
 		return setupRESTBuilder(rb, at, _apiSetPrefix_prefix);
 	}
-
+	
 	/////////////////////////////////////////////
 	//
 	// Servlet constructor and setup
 	//
 	/////////////////////////////////////////////
-
+	
 	/// Default api set prefix
 	protected static String _apiSetPrefix_prefix = "account.";
-
+	
 	/// Internal prefix set for the API
 	protected String _apiSetPrefix = _apiSetPrefix_prefix;
-
+	
 	/// The prefix for the api
 	public String apiSetPrefix() {
 		return _apiSetPrefix;
 	}
-
+	
 	/// The prefix for the api
 	public void setApiSetPrefix(String api) {
 		_apiSetPrefix = api;
 	}
-
+	
 	/// Flags as JSON request
 	public boolean isJsonRequest() {
 		return true;
 	}
-
+	
 	/// Does the default setup
 	public void doSetup() throws Exception {
 		super.doSetup();
 		setupRESTBuilder(this.restBuilder(), this.accountAuthTable(), _apiSetPrefix);
 	}
-
+	
 	/// Process the request, not the authentication layer
 	public boolean doJSON(Map<String, Object> outputData, Map<String, Object> templateData) throws Exception {
 		return restBuilder().servletCall(_apiSetPrefix, this, outputData);
 	}
-
+	
 }

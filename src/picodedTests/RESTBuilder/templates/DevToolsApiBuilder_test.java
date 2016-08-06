@@ -72,8 +72,8 @@ public class DevToolsApiBuilder_test {
 			webInfFile.mkdir();
 			
 			File context = new File("./test-files/tmp");
-			tomcat = new EmbeddedServlet("", context)
-			.withServlet("/api/*", "meta-table-test", new DevToolsApiBuilderServlet()).withPort(port);
+			tomcat = new EmbeddedServlet("", context).withServlet("/api/*", "meta-table-test",
+				new DevToolsApiBuilderServlet()).withPort(port);
 			tomcat.start();
 			// tomcat.awaitServer();
 		}

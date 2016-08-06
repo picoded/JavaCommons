@@ -17,20 +17,20 @@ import org.junit.Test;
 import picoded.conv.GUID;
 import picoded.struct.GenericConvertArrayList;
 
-@SuppressWarnings({"deprecation", "rawtypes", "unchecked" })
+@SuppressWarnings({ "deprecation", "rawtypes", "unchecked" })
 public class GenericConvertArrayList_test {
-
+	
 	private GenericConvertArrayList convertArrayList = null;
-
+	
 	@Before
 	public void setUp() {
 		
 	}
-
+	
 	@After
 	public void tearDown() {
 	}
-
+	
 	/// The following, test severals assumptions regarding Object[] instanceof
 	// tests
 	/// done in java, this is required for the generic toXArray functions.
@@ -38,46 +38,46 @@ public class GenericConvertArrayList_test {
 	public void arrayInstanceOfTest() {
 		String sample = "a";
 		assertFalse(((Object) sample instanceof Object[]));
-
+		
 		String[] strArr = new String[] { "1", "2", "3" };
 		Object[] objArr = new Object[] { "1", "2", "3" };
 		Integer[] intArr = new Integer[] { 1, 2, 3 };
-
+		
 		/// String array tests
 		assertTrue((strArr instanceof Object[]));
 		assertTrue(((Object) strArr instanceof Object));
-
+		
 		assertTrue(((Object) strArr instanceof String[]));
 		assertFalse(((Object) strArr instanceof Integer[]));
 		assertFalse(((Object) strArr instanceof String));
 		assertFalse(((Object) strArr instanceof Integer));
-
+		
 		/// Integer array tests
 		assertTrue((intArr instanceof Object[]));
 		assertTrue(((Object) intArr instanceof Object));
-
+		
 		assertFalse(((Object) intArr instanceof String[]));
 		assertTrue(((Object) intArr instanceof Integer[]));
 		assertFalse(((Object) intArr instanceof String));
 		assertFalse(((Object) intArr instanceof Integer));
-
+		
 		/// Object array tests
 		assertTrue((objArr instanceof Object[]));
 		assertTrue(((Object) objArr instanceof Object));
-
+		
 		assertFalse(((Object) objArr instanceof String[]));
 		assertFalse(((Object) objArr instanceof Integer[]));
 		assertFalse(((Object) objArr instanceof String));
 		assertFalse(((Object) objArr instanceof Integer));
 	}
-
+	
 	@Test
 	public void classLoockUpTest() {
 		assertEquals(String.class, String.class);
 		assertEquals(String[].class, String[].class);
 		assertNotEquals(String.class, String[].class);
 	}
-
+	
 	@Test
 	public void intTest() {
 		convertArrayList = new GenericConvertArrayList<String>();
@@ -85,9 +85,9 @@ public class GenericConvertArrayList_test {
 		convertArrayList.add("itemA");
 		assertEquals(1, convertArrayList.size());
 		convertArrayList.add("itemB");
-        assertEquals(2, convertArrayList.size());
+		assertEquals(2, convertArrayList.size());
 	}
-
+	
 	@Test
 	public void testAddAndGet() {
 		convertArrayList = new GenericConvertArrayList<String>();
@@ -102,7 +102,7 @@ public class GenericConvertArrayList_test {
 		assertEquals("second attempt", 42, convertArrayList.get(0));
 		assertEquals("second attempt", 99, convertArrayList.get(3));
 	}
-
+	
 	@Test
 	public void testSize() {
 		convertArrayList = new GenericConvertArrayList<String>();
@@ -117,7 +117,7 @@ public class GenericConvertArrayList_test {
 		assertEquals(4, convertArrayList.size());
 		assertEquals("second attempt", 4, convertArrayList.size());
 	}
-
+	
 	@Test
 	public void testIsEmpty() {
 		convertArrayList = new GenericConvertArrayList<String>();
@@ -127,7 +127,7 @@ public class GenericConvertArrayList_test {
 		convertArrayList.add(-3);
 		assertFalse("should have two elements", convertArrayList.isEmpty());
 	}
-
+	
 	@Test
 	public void testIsEmpty1() {
 		convertArrayList = new GenericConvertArrayList<String>();
@@ -183,7 +183,7 @@ public class GenericConvertArrayList_test {
 		assertEquals(24, convertArrayList.getNumber(0, 24));
 	}
 	
-	@Test (expected = java.lang.UnsupportedOperationException.class)
+	@Test(expected = java.lang.UnsupportedOperationException.class)
 	public void getIntTest() {
 		convertArrayList = new GenericConvertArrayList<String>();
 		convertArrayList.add(42);
@@ -250,7 +250,7 @@ public class GenericConvertArrayList_test {
 	public void getByte2ParamTest() {
 		convertArrayList = new GenericConvertArrayList<String>();
 		convertArrayList.add("");
-		assertEquals(97, convertArrayList.getByte(0, (byte)'a'));
+		assertEquals(97, convertArrayList.getByte(0, (byte) 'a'));
 	}
 	
 	@Test
@@ -264,7 +264,7 @@ public class GenericConvertArrayList_test {
 	public void getShort2ParamTest() {
 		convertArrayList = new GenericConvertArrayList<String>();
 		convertArrayList.add("");
-		assertEquals(97, convertArrayList.getShort(0, (short)'a'));
+		assertEquals(97, convertArrayList.getShort(0, (short) 'a'));
 	}
 	
 	@Test
@@ -327,14 +327,13 @@ public class GenericConvertArrayList_test {
 		assertEquals(list, convertArrayList.getObjectList(0, list));
 	}
 	
-	@Test (expected = java.lang.UnsupportedOperationException.class)
+	@Test(expected = java.lang.UnsupportedOperationException.class)
 	public void getStringArrayTest() {
 		convertArrayList = new GenericConvertArrayList<String>();
 		List<String> list = new ArrayList<>();
 		convertArrayList.add(list);
 		assertEquals(list, convertArrayList.getStringArray("a,b,c,d"));
 	}
-	
 	
 	@Test
 	public void getStringArray2ParamTest() {
@@ -346,7 +345,7 @@ public class GenericConvertArrayList_test {
 		assertEquals(list.toArray(), convertArrayList.getStringArray(0, list));
 	}
 	
-	@Test 
+	@Test
 	public void getObjectArrayTest() {
 		convertArrayList = new GenericConvertArrayList<String>();
 		List<String> list = new ArrayList<>();
@@ -364,7 +363,7 @@ public class GenericConvertArrayList_test {
 		assertEquals(list.toArray(), convertArrayList.getStringArray(0, list));
 	}
 	
-	@Test 
+	@Test
 	public void getNestedObjectTest() {
 		convertArrayList = new GenericConvertArrayList<String>();
 		convertArrayList.add("a");

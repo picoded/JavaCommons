@@ -23,40 +23,40 @@ import picoded.servletUtils.*;
 /// + Minify the rawPageName/index.html
 ///
 public class PageBuilderCore {
-
+	
 	////////////////////////////////////////////////////////////
 	//
 	// Local variables
 	//
 	////////////////////////////////////////////////////////////
-
+	
 	/// The folder to get the various page definition from
 	public File pageFolder = null;
-
+	
 	/// The output folder to process the output to (if given)
 	public File outputFolder = null;
-
+	
 	/// The local JMTE reference
 	public JMTE jmteObj = null;
-
+	
 	/// The URI root context for built files
 	public String uriRootPrefix = "./";
-
+	
 	/// LESS compiler
 	protected LessToCss less = new LessToCss();
-
+	
 	/// Dependency chain tracking
 	protected GenericConvertListSet<String> dependencyTracker = new GenericConvertListSet<String>();
-
+	
 	/// Component filter utility
 	protected PageComponentFilter componentFilter = null;
-
+	
 	////////////////////////////////////////////////////////////
 	//
 	// Constructor
 	//
 	////////////////////////////////////////////////////////////
-
+	
 	///
 	/// Constructor, with the folders defined
 	///
@@ -66,7 +66,7 @@ public class PageBuilderCore {
 		pageFolder = inPageFolder;
 		componentFilter = new PageComponentFilter(this);
 	}
-
+	
 	///
 	/// Constructor, with the folders defined
 	///
@@ -75,7 +75,7 @@ public class PageBuilderCore {
 	public PageBuilderCore(String inPageFolder) {
 		this(new File(inPageFolder));
 	}
-
+	
 	///
 	/// Constructor, with the folders defined
 	///
@@ -87,7 +87,7 @@ public class PageBuilderCore {
 		outputFolder = inOutputFolder;
 		componentFilter = new PageComponentFilter(this);
 	}
-
+	
 	///
 	/// Constructor, with the folders defined
 	///
@@ -97,13 +97,13 @@ public class PageBuilderCore {
 	public PageBuilderCore(String inPageFolder, String inOutputFolder) {
 		this(new File(inPageFolder), new File(inOutputFolder));
 	}
-
+	
 	////////////////////////////////////////////////////////////
 	//
 	// Public vars access
 	//
 	////////////////////////////////////////////////////////////
-
+	
 	/// @returns Gets the protected JMTE object, used internally.
 	///          This is autocreated if not set
 	public JMTE getJMTE() {
@@ -112,36 +112,36 @@ public class PageBuilderCore {
 		}
 		return jmteObj;
 	}
-
+	
 	/// Overides the default (if loaded) JMTE object.
 	public void setJMTE(JMTE set) {
 		jmteObj = set;
 	}
-
+	
 	/// @returns Gets the protected uriRootPrefix, used internally
 	public String getUriRootPrefix() {
 		return uriRootPrefix;
 	}
-
+	
 	/// Overides the uriRootPrefix.
 	public void setUriRootPrefix(String set) {
 		if (set == null || set.length() <= 0) {
 			set = "/";
 		}
-
+		
 		if (!set.endsWith("/")) {
 			set = set + "/";
 		}
-
+		
 		uriRootPrefix = set;
 	}
-
+	
 	////////////////////////////////////////////////////////////
 	//
 	// Utility functions
 	//
 	////////////////////////////////////////////////////////////
-
+	
 	/// Utility to get path safe rawPageName
 	///
 	/// @param  rawPageName used to generate the vars
@@ -153,7 +153,7 @@ public class PageBuilderCore {
 		}
 		return rawPageName.replaceAll("/", "-");
 	}
-
+	
 	/// Utility to get page frame ID
 	///
 	/// @param  rawPageName used to generate the vars
@@ -162,7 +162,7 @@ public class PageBuilderCore {
 	protected String pageFrameID(String rawPageName) {
 		return "page-" + safePageName(rawPageName);
 	}
-
+	
 	/// Utility to get page frame ID : legacy format specific to IFAM (to phase out)
 	///
 	/// @param  rawPageName used to generate the vars
@@ -171,7 +171,7 @@ public class PageBuilderCore {
 	protected String pageFrameID_ifamLegacy(String rawPageName) {
 		return "pageFrame_" + safePageName(rawPageName);
 	}
-
+	
 	///
 	/// Gets the requested page template.json from the following priority order
 	///
@@ -179,18 +179,15 @@ public class PageBuilderCore {
 	/// 2) Any parent path folder
 	/// 3) The root folder
 	///
-	protected Map<String,Object> getTemplateJson(String rawPageName) {
+	protected Map<String, Object> getTemplateJson(String rawPageName) {
 		String resStr = null;
 		String fileName = "page.json";
-		List<Map<String,Object>> templateList = new ArrayList<Map<String,Object>>();
-
+		List<Map<String, Object>> templateList = new ArrayList<Map<String, Object>>();
+		
 		// Page path itself
-		templateList.add(
-			GenericConvert.toStringMap(
-				FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/" + fileName), null ), null
-			)
-		);
-
+		templateList.add(GenericConvert.toStringMap(
+			FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/" + fileName), null), null));
+		
 		// Gets the parent paths (if valid)
 		String[] splitNames = splitPageName(rawPageName);
 		if (splitNames.length <= 1) {
@@ -198,54 +195,49 @@ public class PageBuilderCore {
 		} else {
 			// Go one "directory" parent upward
 			splitNames = ArrayConv.subarray(splitNames, 0, splitNames.length - 1);
-
+			
 			// Breaks once root directory is reached / or result found
 			while (splitNames.length > 0) {
 				// Join the name path, and get the file
-				templateList.add(
-					GenericConvert.toStringMap(
-						FileUtils.readFileToString_withFallback(new File(pageFolder, String.join("/", splitNames) + "/" + fileName), null ), null
-					)
-				);
-
+				templateList.add(GenericConvert.toStringMap(
+					FileUtils.readFileToString_withFallback(new File(pageFolder, String.join("/", splitNames) + "/"
+						+ fileName), null), null));
+				
 				// Go one "directory" parent upward
 				splitNames = ArrayConv.subarray(splitNames, 0, splitNames.length - 1);
 			}
 		}
-
+		
 		// Get from the root folder (v2)
-		templateList.add(
-			GenericConvert.toStringMap(
-				FileUtils.readFileToString_withFallback(new File(pageFolder, fileName), null ), null
-			)
-		);
-
+		templateList.add(GenericConvert.toStringMap(
+			FileUtils.readFileToString_withFallback(new File(pageFolder, fileName), null), null));
+		
 		// Flips the list
 		Collections.reverse(templateList);
-
-		Map<String,Object> res = new HashMap<String,Object>();
-		for(Map<String,Object> template : templateList) {
-			if(template != null) {
+		
+		Map<String, Object> res = new HashMap<String, Object>();
+		for (Map<String, Object> template : templateList) {
+			if (template != null) {
 				res.putAll(template);
 			}
 		}
 		return res;
 	}
-
+	
 	/// Gets and extract out a page specific configuration. In its respective page.json file
 	///
 	/// @param  rawPageName used to generate the vars
 	///
 	/// @returns The data hash map
-	protected Map<String,Object> pageConfigFetch(String rawPageName) {
+	protected Map<String, Object> pageConfigFetch(String rawPageName) {
 		// Basic filter safety
 		rawPageName = filterRawPageName(rawPageName);
-
+		
 		// Get the config from rawPageName folder itself
-		return GenericConvert.toStringMap( FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/page.json" ), "{}") );
+		return GenericConvert.toStringMap(FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName
+			+ "/page.json"), "{}"));
 	}
-
-
+	
 	/// Generates the needed map string template for the respective page
 	///
 	/// @param  rawPageName used to generate the vars
@@ -254,66 +246,66 @@ public class PageBuilderCore {
 	protected Map<String, Object> pageJMTEvars(String rawPageName) {
 		// Basic filter safety
 		rawPageName = filterRawPageName(rawPageName);
-
+		
 		// Initialize to root if not previously set
 		if (uriRootPrefix == null) {
 			uriRootPrefix = ".";
 		}
-
+		
 		// Removes trailing /, unless its the only character
 		if (uriRootPrefix.length() > 1 && uriRootPrefix.endsWith("/")) {
 			uriRootPrefix = uriRootPrefix.substring(0, uriRootPrefix.length() - 1);
 		} /*else {
 		  uriRootPrefix = "";
 		  }*/
-
+		
 		// Uri slash fixing (in case of double slash)
 		String pageURI = uriRootPrefix + "/" + rawPageName;
 		while (pageURI.indexOf("//") >= 0) {
 			pageURI = pageURI.replaceAll("//", "/");
 		}
-
+		
 		// Get the template json stack
 		Map<String, Object> ret = getTemplateJson(rawPageName);
-
+		
 		ret.put("PageRootURI", uriRootPrefix);
 		ret.put("PagesRootURI", uriRootPrefix); //because FAportal and orgeva //@TODO: Remove this
 		ret.put("PageURI", pageURI);
-
+		
 		ret.put("PageNameRaw", rawPageName);
 		ret.put("PageName", safePageName(rawPageName));
 		ret.put("PageClass", pageFrameID(rawPageName));
-
+		
 		ret.put("Page", buildPageComponentMap());
 		ret.put("PageConfig", pageConfigFetch(rawPageName));
-
+		
 		// Legacy to phase out
 		// @TODO : Phase Out
 		//-----------------------------
 		ret.put("PageFrameID", pageFrameID_ifamLegacy(rawPageName));
 		ret.put("PageComponent", buildPageComponentMap());
-
+		
 		return ret;
 	}
-
+	
 	///
 	/// HTML specific version of getCommonFile
 	///
 	protected String getCommonPrefixOrSuffixHtml(String rawPageName, String fixType) {
 		return getCommonFile(rawPageName, fixType + ".html");
 	}
-
+	
 	///
 	/// Filters the rawPageName, into its valid form (remove any pre/suf-fix of slashes)
 	///
 	public String filterRawPageName(String rawPageName) {
-		if(rawPageName == null) {
+		if (rawPageName == null) {
 			rawPageName = "";
 		}
-
+		
 		rawPageName = rawPageName.trim();
-		rawPageName = rawPageName.replaceAll("\\.","/");
-		rawPageName = rawPageName.replaceAll("\\-","/");
+		rawPageName = rawPageName.replaceAll("\\.", "/");
+		rawPageName = rawPageName.replaceAll("\\-", "/");
 		
 		rawPageName = FileUtils.normalize(rawPageName).trim();
 		
@@ -323,10 +315,10 @@ public class PageBuilderCore {
 		while (rawPageName.endsWith("/")) {
 			rawPageName = rawPageName.substring(0, rawPageName.length());
 		}
-
+		
 		return rawPageName.trim();
 	}
-
+	
 	///
 	/// Takes a pagename, and split in its pathing.
 	/// Used to find parent folders
@@ -334,7 +326,7 @@ public class PageBuilderCore {
 	protected String[] splitPageName(String rawPageName) {
 		return filterRawPageName(rawPageName).split("/");
 	}
-
+	
 	///
 	/// Gets the requested page prefix / suffix from the following priority order
 	///
@@ -346,10 +338,10 @@ public class PageBuilderCore {
 	///
 	protected String getCommonFile(String rawPageName, String fileName) {
 		String res = null;
-
+		
 		// Get from the rawPageName folder itself (v2)
-		res = FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/" + fileName), null );
-
+		res = FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/" + fileName), null);
+		
 		// Gets the parent paths (if valid)
 		if (res == null) {
 			String[] splitNames = splitPageName(rawPageName);
@@ -358,139 +350,140 @@ public class PageBuilderCore {
 			} else {
 				// Go one "directory" parent upward
 				splitNames = ArrayConv.subarray(splitNames, 0, splitNames.length - 1);
-
+				
 				// Breaks once root directory is reached / or result found
 				while (res == null && splitNames.length > 0) {
 					// Join the name path, and get the file
 					res = FileUtils.readFileToString_withFallback(new File(pageFolder, String.join("/", splitNames) + "/"
-						+ fileName), null );
-
+						+ fileName), null);
+					
 					// Go one "directory" parent upward
 					splitNames = ArrayConv.subarray(splitNames, 0, splitNames.length - 1);
 				}
 			}
 		}
-
+		
 		// Get from the root folder (v2)
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pageFolder, fileName), null );
+			res = FileUtils.readFileToString_withFallback(new File(pageFolder, fileName), null);
 		}
-
+		
 		// Get from the common folder (v2)
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pageFolder, "common/" + fileName), null );
+			res = FileUtils.readFileToString_withFallback(new File(pageFolder, "common/" + fileName), null);
 		}
-
+		
 		// Legacy support (v1) get from index folder
 		if (res == null) {
-			res = FileUtils.readFileToString_withFallback(new File(pageFolder, "index/" + fileName), null );
+			res = FileUtils.readFileToString_withFallback(new File(pageFolder, "index/" + fileName), null);
 		}
-
+		
 		// Fallbacks to blank
 		if (res == null) {
 			return "";
 		}
 		return res;
 	}
-
+	
 	////////////////////////////////////////////////////////////
 	//
 	// HTML handling
 	//
 	////////////////////////////////////////////////////////////
-
+	
 	/// Gets the prefix
 	public String prefixHTML(String rawPageName) {
 		return getJMTE().parseTemplate(getCommonPrefixOrSuffixHtml(rawPageName, "prefix"), pageJMTEvars(rawPageName));
 	}
-
+	
 	/// Gets the prefix
 	public String suffixHTML(String rawPageName) {
 		return getJMTE().parseTemplate(getCommonPrefixOrSuffixHtml(rawPageName, "suffix"), pageJMTEvars(rawPageName));
 	}
-
+	
 	/// Gets and returns a page frame raw string without going through the JMTE parser
 	public String buildPageInnerRawHTML(String rawPageName) {
 		// Depenency chain tracking
 		rawPageName = filterRawPageName(rawPageName);
 		addDependencyTracking(rawPageName);
-
+		
 		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/"
-			+ safePageName(rawPageName) + ".html"), null );
+			+ safePageName(rawPageName) + ".html"), null);
 		if (indexFileStr == null) {
-			indexFileStr = FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/index.html"),"");
+			indexFileStr = FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/index.html"), "");
 		}
-
+		
 		if ((indexFileStr = indexFileStr.trim()).length() == 0) {
 			if (hasPageFile(rawPageName)) { //has file
 				return ""; //this is a blank HTML file
 			}
 			return null;
 		}
-
+		
 		return indexFileStr.toString();
 	}
-
+	
 	/// Gets and returns a page frame string, with its respective JMTE input vars?
 	public String buildPageInnerHTML(String rawPageName) {
 		return buildPageInnerHTML(rawPageName, null);
 	}
-
+	
 	/// Gets and returns a page frame string, with its respective JMTE input vars?
 	public String buildPageInnerHTML(String rawPageName, Map<String, Object> jmteTemplate) {
 		String indexFileStr = FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/"
-			+ safePageName(rawPageName) + ".html"), null );
+			+ safePageName(rawPageName) + ".html"), null);
 		if (indexFileStr == null) {
 			indexFileStr = FileUtils.readFileToString_withFallback(new File(pageFolder, rawPageName + "/index.html"), "");
 		}
-
+		
 		if ((indexFileStr = indexFileStr.trim()).length() == 0) {
 			if (hasPageFile(rawPageName)) { //has file
 				return ""; //this is a blank HTML file
 			}
 			return null;
 		}
-
-		if( jmteTemplate == null ) {
+		
+		if (jmteTemplate == null) {
 			jmteTemplate = pageJMTEvars(rawPageName);
 		}
-
+		
 		return getJMTE().parseTemplate(indexFileStr.toString(), jmteTemplate);
 	}
-
+	
 	/// Get the page frame div header, this is used to do a "search replace" for script / css injection
 	protected String pageFrameHeaderDiv(String rawPageName) {
-		return "<div class='pageFrame " + pageFrameID(rawPageName) + " "+ pageFrameID_ifamLegacy(rawPageName)+ "' id='" + pageFrameID_ifamLegacy(rawPageName) + "'>\n";
+		return "<div class='pageFrame " + pageFrameID(rawPageName) + " " + pageFrameID_ifamLegacy(rawPageName) + "' id='"
+			+ pageFrameID_ifamLegacy(rawPageName) + "'>\n";
 	}
-
+	
 	/// Builds a rawPageName HTML frame
 	public String buildPageFrame(String rawPageName) {
 		return buildPageFrame(rawPageName, null);
 	}
-
+	
 	/// Builds a rawPageName HTML frame
 	public String buildPageFrame(String rawPageName, String injectionStr) {
 		String innerHTML = buildPageInnerHTML(rawPageName, pageJMTEvars(rawPageName));
 		if (innerHTML == null) {
 			return null;
 		}
-
+		
 		StringBuilder frame = new StringBuilder();
 		frame.append(pageFrameHeaderDiv(rawPageName));
 		if (injectionStr != null) {
 			frame.append(injectionStr);
 		}
-
+		
 		frame.append(innerHTML);
 		frame.append("\n</div>\n");
 		return frame.toString();
 	}
-
+	
 	/// Builds the FULL rawPageName HTML, with prefix and suffix
 	public StringBuilder buildFullPageFrame(String rawPageName) {
 		return buildFullPageFrame(rawPageName, null);
 	}
-
+	
 	/// Builds the FULL rawPageName HTML, with prefix and suffix
 	public StringBuilder buildFullPageFrame(String rawPageName, String injectionStr) {
 		String frameHTML = buildPageFrame(rawPageName, injectionStr);
@@ -503,13 +496,13 @@ public class PageBuilderCore {
 		}
 		return null;
 	}
-
+	
 	////////////////////////////////////////////////////////////
 	//
 	// Subpage searching handling
 	//
 	////////////////////////////////////////////////////////////
-
+	
 	///
 	/// Sub page name listing
 	///
@@ -520,10 +513,10 @@ public class PageBuilderCore {
 	public Set<String> subPageList(String rawPageName) {
 		rawPageName = filterRawPageName(rawPageName);
 		HashSet<String> res = new HashSet<String>();
-
+		
 		// The current folder to scan
 		File folder = new File(pageFolder, rawPageName);
-
+		
 		// Scan for subdirectories ONLY if this is a directory
 		if (folder.isDirectory()) {
 			// For each sub directory, build it as a page
@@ -532,10 +525,10 @@ public class PageBuilderCore {
 				String subPageName = pageDefine.getName();
 				
 				// Could be hidden, or invalid folder format
-				if( subPageName.startsWith(".") || !subPageName.equalsIgnoreCase(FileUtils.getBaseName(subPageName)) ) {
+				if (subPageName.startsWith(".") || !subPageName.equalsIgnoreCase(FileUtils.getBaseName(subPageName))) {
 					continue;
 				}
-
+				
 				// Common and index zone only if its top layer
 				if (subPageName.equalsIgnoreCase("common") || subPageName.equalsIgnoreCase("index")) {
 					if (rawPageName.length() <= 0) {
@@ -548,7 +541,7 @@ public class PageBuilderCore {
 				}
 			}
 		}
-
+		
 		// Return result set
 		return res;
 	}
@@ -559,18 +552,18 @@ public class PageBuilderCore {
 	public PageComponentMap buildPageComponentMap() {
 		return new PageComponentMap(this, "");
 	}
-
+	
 	////////////////////////////////////////////////////////////
 	//
 	// Page Building parts
 	//
 	////////////////////////////////////////////////////////////
-
+	
 	/// Enum of file types that is processed
 	protected enum PageFileType {
 		js, jsons, jsons_to_js, less, less_to_css, html
 	}
-
+	
 	/// Indicate if the page definition FOLDER exists
 	///
 	/// @param PageName to build
@@ -585,7 +578,7 @@ public class PageBuilderCore {
 		}
 		return false;
 	}
-
+	
 	/// Indicates if the page definition FILE exists
 	///
 	/// @param PageName to build
@@ -601,7 +594,7 @@ public class PageBuilderCore {
 		}
 		return false;
 	}
-
+	
 	/// Process the file, according to its type, and outputs it into the respective file
 	///
 	/// @param  filetype enum
@@ -617,18 +610,18 @@ public class PageBuilderCore {
 			// Gets its string value, and process only if not blank
 			String fileVal = FileUtils.readFileToString(input);
 			if ((fileVal = fileVal.trim()).length() > 0) {
-
+				
 				// Does specific conversions
 				if (type == PageFileType.jsons_to_js) {
-
+					
 					// Does a JMTE filter
 					fileVal = getJMTE().parseTemplate(fileVal, jmteVarMap);
-
+					
 					// Adds the script object wrapper
-					fileVal = "window.PageComponent = window.PageComponent || {}; window.PageComponent." + safePageName(rawPageName)
-						+ " = (" + fileVal + ");";
+					fileVal = "window.PageComponent = window.PageComponent || {}; window.PageComponent."
+						+ safePageName(rawPageName) + " = (" + fileVal + ");";
 				} else if (type == PageFileType.less_to_css) {
-
+					
 					/// Add the config .less file
 					String lessPrefix = getCommonFile(rawPageName, "prefix.less");
 					String lessSuffix = getCommonFile(rawPageName, "suffix.less");
@@ -641,30 +634,30 @@ public class PageBuilderCore {
 					// if (!rawPageName.equalsIgnoreCase("index") && !rawPageName.equalsIgnoreCase("common")) {
 					// 	fileVal = "." + pageFrameID(rawPageName) + " { \n" + fileVal + "\n } \n";
 					// }
-
+					
 					// Ensure prefix, and suffix are added
 					fileVal = (lessPrefix + "\n" + fileVal + "\n" + lessSuffix).trim();
-
+					
 					// Does a JMTE filter
 					fileVal = getJMTE().parseTemplate(fileVal, jmteVarMap);
-
+					
 					// Less to css conversion
 					fileVal = less.compile(fileVal);
 				} else {
 					// Does a JMTE filter
 					fileVal = getJMTE().parseTemplate(fileVal, jmteVarMap);
 				}
-
+				
 				// Write to file if it differ
 				FileUtils.writeStringToFile_ifDifferant(output, fileVal);
-
+				
 				// Indicate file is "deployed"
 				return true;
 			}
 		}
 		return false;
 	}
-
+	
 	/// Varient of processPageFile, where it iterates an array set of input files till a valid file is found
 	///
 	/// @param  filetype enum
@@ -683,7 +676,7 @@ public class PageBuilderCore {
 		}
 		return false;
 	}
-
+	
 	////////////////////////////////////////////////////////////
 	//
 	// Full Page Building
@@ -699,21 +692,21 @@ public class PageBuilderCore {
 	/// @return boolean true, if page had content to be built
 	///
 	public boolean buildAndOutputPage(String rawPageName) {
-
+		
 		// rawPageName here assumes NO "/" suffix
 		if (rawPageName.endsWith("/")) {
 			rawPageName = rawPageName.substring(0, rawPageName.length() - 1);
 		}
-
+		
 		// System.out allowed here, because LESS does a system out ANYWAY.
 		// Help to make more "sense" of the done output
 		System.out.print("> PageBuilder[Core].buildPage(\'" + rawPageName + "\'): ");
-
+		
 		// Output folder validitiy check
 		if (outputFolder == null) {
 			throw new RuntimeException("Missing output folder, unable to generate : " + rawPageName);
 		}
-
+		
 		// Future extension, possible loop hole abuse. Im protecting against it early
 		if (rawPageName.startsWith(".")) {
 			throw new RuntimeException("Unable to load page name, starting with '.' : " + rawPageName);
@@ -724,27 +717,27 @@ public class PageBuilderCore {
 		if (rawPageName.toLowerCase().indexOf("web-inf") >= 0) {
 			throw new RuntimeException("Unable to load page name, that may bypass WEB-INF : " + rawPageName);
 		}
-
+		
 		try {
-
+			
 			// Prepares output and definition FILE objects, and JMTE map
 			//-------------------------------------------------------------------
 			File outputPageFolder = new File(outputFolder, rawPageName);
 			File definitionFolder = new File(pageFolder, rawPageName);
 			Map<String, Object> jmteVarMap = pageJMTEvars(rawPageName);
 			String pageName_safe = safePageName(rawPageName);
-
+			
 			// Create the output folder as needed
 			//-------------------------------------------------------------------
 			if (!outputPageFolder.exists()) {
 				outputPageFolder.mkdirs();
 			}
-
+			
 			// Copy the page assets folder
 			//
 			// @TODO: Optimize this to only copy IF newer
 			//-------------------------------------------------------------------
-
+			
 			// Folder to copy from
 			boolean hasAssets = false;
 			File pageAssetsFolder = new File(definitionFolder, "assets");
@@ -768,7 +761,7 @@ public class PageBuilderCore {
 				// Ignore hidden files, or index based files
 				String baseName = FileUtils.getBaseName(fileName);
 				String fileExtn = FileUtils.getExtension(fileName);
-				if(baseName == null || baseName.length() <= 0 || baseName.equalsIgnoreCase("index") /* || baseName.equalsIgnoreCase("depend") || baseName.equalsIgnoreCase("component") || baseName.equalsIgnoreCase("page") */ ) {
+				if (baseName == null || baseName.length() <= 0 || baseName.equalsIgnoreCase("index") /* || baseName.equalsIgnoreCase("depend") || baseName.equalsIgnoreCase("component") || baseName.equalsIgnoreCase("page") */) {
 					continue;
 				}
 				
@@ -779,19 +772,19 @@ public class PageBuilderCore {
 				FileUtils.copyFile_ifDifferent(inFile, outFile);
 				
 				// Ignore conversions on certain same filepath - name (legacy files)
-				if( rawPageName.equalsIgnoreCase(baseName) ) {
+				if (rawPageName.equalsIgnoreCase(baseName)) {
 					continue;
-				} 
+				}
 				
 				// Less and es6 specific conversion
-				if(fileExtn.equalsIgnoreCase("less")) {
-					String fileVal = FileUtils.readFileToString_withFallback(inFile,"");
+				if (fileExtn.equalsIgnoreCase("less")) {
+					String fileVal = FileUtils.readFileToString_withFallback(inFile, "");
 					fileVal = less.compile(fileVal);
-					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".css"), fileVal);
-				} else if(fileExtn.equalsIgnoreCase("es6")) {
-					String fileVal = FileUtils.readFileToString_withFallback(inFile,"");
+					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName + ".css"), fileVal);
+				} else if (fileExtn.equalsIgnoreCase("es6")) {
+					String fileVal = FileUtils.readFileToString_withFallback(inFile, "");
 					fileVal = CompileES6.compile(fileVal, fileName);
-					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName+".js"), fileVal);
+					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName + ".js"), fileVal);
 				}
 			}
 			
@@ -802,12 +795,12 @@ public class PageBuilderCore {
 				String fileName = inFile.getName();
 				
 				// Ignore protected folders
-				if(fileName.startsWith(".")) {
+				if (fileName.startsWith(".")) {
 					continue;
 				}
 				
 				// Clone files, these are not processed recursively
-				if(fileName.indexOf(".") >= 0 || fileName.indexOf("-") >= 0) {
+				if (fileName.indexOf(".") >= 0 || fileName.indexOf("-") >= 0) {
 					// File to output to
 					File outFile = new File(outputPageFolder, fileName);
 					
@@ -821,33 +814,33 @@ public class PageBuilderCore {
 			boolean hasJsFile = processPageFile(PageFileType.js, new File[] { new File(definitionFolder, "index.js"),
 				new File(definitionFolder, pageName_safe + ".js") }, new File(outputPageFolder, pageName_safe + ".js"),
 				rawPageName, jmteVarMap);
-
+			
 			// Build the JSONS script (if provided)
 			//-------------------------------------------------------------------
 			boolean hasJsonsFile = processPageFile(PageFileType.jsons_to_js, new File[] {
 				new File(definitionFolder, "index.jsons"), new File(definitionFolder, pageName_safe + ".jsons") },
 				new File(outputPageFolder, pageName_safe + ".jsons.js"), rawPageName, jmteVarMap);
-
+			
 			// Build the LESS script (if provided)
 			//-------------------------------------------------------------------
 			boolean hasLessFile = processPageFile(PageFileType.less_to_css, new File[] {
 				new File(definitionFolder, "index.less"), new File(definitionFolder, pageName_safe + ".less") }, new File(
 				outputPageFolder, pageName_safe + ".css"), rawPageName, jmteVarMap);
-
+			
 			// Build the html page
 			//-------------------------------------------------------------------
-
+			
 			// The HTML output (if valid)
 			StringBuilder indexStrBuilder = buildFullPageFrame(rawPageName);
 			if (indexStrBuilder == null) {
 				return hasAssets || hasJsFile || hasJsonsFile || hasLessFile;
 			}
 			String indexStr = indexStrBuilder.toString();
-
+			
 			// Build the injector code for this page (before </head>)
 			//-------------------------------------------------------------------
 			StringBuilder injectorStrBuilder = new StringBuilder();
-
+			
 			if (hasLessFile) {
 				if (indexStr.indexOf(rawPageName + "/" + pageName_safe + ".css") > 0) {
 					// Skips injection if already included
@@ -872,49 +865,49 @@ public class PageBuilderCore {
 						+ ".jsons.js'></script>\n");
 				}
 			}
-
+			
 			String injectorStr = injectorStrBuilder.toString();
-
+			
 			// Ammend the HTML output
 			//-------------------------------------------------------------------
-
+			
 			// Apply injector code if any
 			if (injectorStr.length() > 0) {
 				// Rebuild with injection
 				indexStr = buildFullPageFrame(rawPageName, injectorStr).toString();
 			}
-
+			
 			// Component resolution
 			//-------------------------------------------------------------------
 			indexStr = componentFilter.resolve(indexStr);
-
+			
 			// HTML minify
 			//-------------------------------------------------------------------
-
+			
 			// Apply a simplistic compression (so avoid inline JS with line comments for nuts)
 			//
 			// @TODO: A proper minifier library integration, like:
 			// https://code.google.com/p/htmlcompressor
 			// indexStr = indexStr.trim().replaceAll("\\s+", " ");
 			// indexStr = indexStr.trim().replaceAll("\\>\\s\\<", "><");
-
+			
 			// Write out to file
 			//-------------------------------------------------------------------
-
+			
 			// Write to file if it differ
 			FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, "index.html"), indexStr);
-
+			
 			// Returns success
 			return true;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-
+		
 		// End and returns failure
 		//-------------------------------------------------------------------
 		// return false;
 	}
-
+	
 	///
 	/// Builds all page (NOT including itself) inside a page folder
 	///
@@ -927,19 +920,19 @@ public class PageBuilderCore {
 		if (rawPageName != null) {
 			rawPageName = rawPageName.trim();
 		}
-
+		
 		if (rawPageName.equalsIgnoreCase("/")) {
 			rawPageName = "";
 		}
-
+		
 		// The current folder to scan
 		File folder = new File(pageFolder, rawPageName);
-
+		
 		// Possible page pathing error fix
 		if (rawPageName.length() > 0 && !rawPageName.endsWith("/")) {
 			rawPageName = rawPageName + "/";
 		}
-
+		
 		// Scan for subdirectories ONLY if this is a directory
 		if (folder.isDirectory()) {
 			// For each sub directory, build it as a page
@@ -948,12 +941,12 @@ public class PageBuilderCore {
 				String subPageName = pageDefine.getName();
 				
 				// Could be hidden, or invalid folder format
-				if( subPageName.startsWith(".") || !subPageName.equalsIgnoreCase(FileUtils.getBaseName(subPageName)) ) {
+				if (subPageName.startsWith(".") || !subPageName.equalsIgnoreCase(FileUtils.getBaseName(subPageName))) {
 					continue;
 				}
 				
 				// these are not processed recursively, avoid pathing ambiguity
-				if(subPageName.indexOf(".") >= 0 || subPageName.indexOf("-") >= 0) {
+				if (subPageName.indexOf(".") >= 0 || subPageName.indexOf("-") >= 0) {
 					continue;
 				}
 				
@@ -966,7 +959,8 @@ public class PageBuilderCore {
 						System.out.print("> PageBuilder[Core].buildPageFolder - WARNING, common / index nested build (\'"
 							+ rawPageName + "\', \'" + subPageName + "\'): ");
 					}
-				} else if (subPageName.equalsIgnoreCase("assets") || subPageName.equalsIgnoreCase("web-inf") || subPageName.equalsIgnoreCase("build")) {
+				} else if (subPageName.equalsIgnoreCase("assets") || subPageName.equalsIgnoreCase("web-inf")
+					|| subPageName.equalsIgnoreCase("build")) {
 					// ignoring certain reserved folders
 				} else {
 					// Build the page
@@ -976,10 +970,10 @@ public class PageBuilderCore {
 				}
 			}
 		}
-
+		
 		return res;
 	}
-
+	
 	///
 	/// Builds all page (INCLUDING itself, if possible) inside a page folder
 	///
@@ -994,18 +988,18 @@ public class PageBuilderCore {
 		}
 		return buildPageFolder(rawPageName) || res;
 	}
-
+	
 	////////////////////////////////////////////////////////////
 	//
 	// Dependency chain management
 	//
 	////////////////////////////////////////////////////////////
-
+	
 	/// Dependency chain tracking
 	public GenericConvertListSet<String> dependencyTracker() {
 		return dependencyTracker;
 	}
-
+	
 	/// Reset the Dependency tracking
 	public void dependencyTrackerReset() {
 		dependencyTracker.clear();
@@ -1018,8 +1012,9 @@ public class PageBuilderCore {
 	
 	/// Gets the dependency map for path
 	protected GenericConvertMap<String, Object> depenencyConfig(String rawPageName) {
-		String dependJson = FileUtils.readFileToString_withFallback(new File(pageFolder, filterRawPageName(rawPageName)+"/depend.json"), "{}" );
-		return GenericConvert.toGenericConvertStringMap( dependJson, "{}" );
+		String dependJson = FileUtils.readFileToString_withFallback(new File(pageFolder, filterRawPageName(rawPageName)
+			+ "/depend.json"), "{}");
+		return GenericConvert.toGenericConvertStringMap(dependJson, "{}");
 	}
 	
 	/// Normalize case sensitivity of path
@@ -1033,7 +1028,7 @@ public class PageBuilderCore {
 		dependPath = filterRawPageName(dependPath);
 		
 		// Check if it already exists
-		if(dependencyTracker.contains(dependPath)) {
+		if (dependencyTracker.contains(dependPath)) {
 			return;
 		}
 		
@@ -1041,7 +1036,7 @@ public class PageBuilderCore {
 		dependPath = normalizeDependencyPath(dependPath);
 		
 		// Check if it already exists after normalizing
-		if(dependencyTracker.contains(dependPath)) {
+		if (dependencyTracker.contains(dependPath)) {
 			return;
 		}
 		
@@ -1050,7 +1045,7 @@ public class PageBuilderCore {
 		
 		// Get submodules
 		String[] sublist = depenencyConfig(dependPath).getStringArray("component", "[]");
-		for( String submodule : sublist ) {
+		for (String submodule : sublist) {
 			addDependencyTracking(submodule);
 		}
 		
@@ -1061,9 +1056,9 @@ public class PageBuilderCore {
 	
 	/// Get dependency file into a string builder utility
 	protected StringBuilder dependencyGetSingleFile(StringBuilder res, String pageFilePath) {
-		String fileData = FileUtils.readFileToString_withFallback(new File(pageFolder, pageFilePath), null );
-		if( fileData != null ) {
-			res.append("/** file:"+pageFilePath+" **/\n"); //Added file name reference
+		String fileData = FileUtils.readFileToString_withFallback(new File(pageFolder, pageFilePath), null);
+		if (fileData != null) {
+			res.append("/** file:" + pageFilePath + " **/\n"); //Added file name reference
 			res.append(fileData);
 			res.append("\n");
 		}
@@ -1076,37 +1071,37 @@ public class PageBuilderCore {
 		// Get pathing, and does safety checks
 		//
 		String path = filterRawPageName(rawPageName);
-		if( !(type.equalsIgnoreCase("less") || type.equalsIgnoreCase("es6")) ) {
-			throw new RuntimeException("Unexpected dpendency type : "+type);
+		if (!(type.equalsIgnoreCase("less") || type.equalsIgnoreCase("es6"))) {
+			throw new RuntimeException("Unexpected dpendency type : " + type);
 		}
 		
 		//
 		// Process JMTE filtered scripts
 		// 
 		JMTE jmte = getJMTE();
-		Map<String,Object> jmteVars = pageJMTEvars(path);
+		Map<String, Object> jmteVars = pageJMTEvars(path);
 		StringBuilder toJMTEParse = new StringBuilder();
-		if( type.equalsIgnoreCase("less") ) {
-			dependencyGetSingleFile(toJMTEParse, path+"/depend.less");
-			dependencyGetSingleFile(toJMTEParse, path+"/depend.css");
+		if (type.equalsIgnoreCase("less")) {
+			dependencyGetSingleFile(toJMTEParse, path + "/depend.less");
+			dependencyGetSingleFile(toJMTEParse, path + "/depend.css");
 		} else {
-			dependencyGetSingleFile(toJMTEParse, path+"/depend.es6");
-			dependencyGetSingleFile(toJMTEParse, path+"/depend.js");
+			dependencyGetSingleFile(toJMTEParse, path + "/depend.es6");
+			dependencyGetSingleFile(toJMTEParse, path + "/depend.js");
 		}
-		res.append( jmte.parseTemplate(toJMTEParse.toString(), jmteVars) );
+		res.append(jmte.parseTemplate(toJMTEParse.toString(), jmteVars));
 		
 		//
 		// Process non fitlered scripts
 		//
 		String[] fileList = depenencyConfig(path).getStringArray(type, "[]");
-		for(String filePath : fileList) {
+		for (String filePath : fileList) {
 			// Parse any templates if need be
 			filePath = jmte.parseTemplate(filePath, jmteVars);
 			
 			// Changes relative path to fixed path
-			if( !filePath.startsWith("/") ) {
-				filePath = FileUtils.normalize(rawPageName+"/"+filePath);
-			} 
+			if (!filePath.startsWith("/")) {
+				filePath = FileUtils.normalize(rawPageName + "/" + filePath);
+			}
 			
 			// Get and inject, without JMTE parsing
 			dependencyGetSingleFile(res, filePath);
@@ -1118,13 +1113,13 @@ public class PageBuilderCore {
 	protected String dependencyBuildFile(String type) {
 		StringBuilder res = new StringBuilder();
 		
-		res.append("/**** "+type+" dependcies for the following component ****\n\n");
-		for(String path : dependencyTracker) {
-			res.append("+ '"+path+"'\n");
+		res.append("/**** " + type + " dependcies for the following component ****\n\n");
+		for (String path : dependencyTracker) {
+			res.append("+ '" + path + "'\n");
 		}
 		res.append("\n*******************************************************/\n\n");
 		
-		for(String path : dependencyTracker) {
+		for (String path : dependencyTracker) {
 			dependencyBuiltPagePart(res, path, type);
 		}
 		return res.toString();
@@ -1134,7 +1129,7 @@ public class PageBuilderCore {
 	public String dependencyLess() {
 		return dependencyBuildFile("less");
 	}
-
+	
 	/// Builds the CSS from the depency chain
 	public String dependencyCss() {
 		return less.compile(dependencyLess());
@@ -1144,7 +1139,7 @@ public class PageBuilderCore {
 	public String dependencyES6() {
 		return dependencyBuildFile("es6");
 	}
-
+	
 	/// Builds the CSS from the depency chain
 	public String dependencyJS() {
 		// System.out.println("dependencyBuildFile - es6");

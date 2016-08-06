@@ -27,7 +27,8 @@ import picoded.conv.ConvertJSON;
 import picoded.servletUtils.EmbeddedServlet;
 import picoded.webUtils.RequestHttp;
 import picoded.webUtils.ResponseHttp;
-@SuppressWarnings({"unchecked","try"})
+
+@SuppressWarnings({ "unchecked", "try" })
 public class AccountLogin_test {
 	
 	// Servlet setup

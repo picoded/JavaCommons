@@ -25,7 +25,8 @@ import picoded.servlet.BasePage;
 import picoded.servletUtils.EmbeddedServlet;
 import picoded.webUtils.RequestHttp;
 import picoded.webUtils.ResponseHttp;
-@SuppressWarnings({"unchecked","try"})
+
+@SuppressWarnings({ "unchecked", "try" })
 public class AtomicLongMapApiBuilder_test {
 	
 	// Servlet setup
@@ -135,7 +136,7 @@ public class AtomicLongMapApiBuilder_test {
 	@Test
 	public void getValuesInvalidEmptyKeysTest() {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
-		paramsMap.put("keys", new String[] { });
+		paramsMap.put("keys", new String[] {});
 		response = RequestHttp.get(testAddress + "/api/meta-test/values", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
@@ -155,8 +156,8 @@ public class AtomicLongMapApiBuilder_test {
 	@Test
 	public void setValueInvalidTest() {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
-		paramsMap.put("key", new String[] { });
-		paramsMap.put("allowEmptyValue", new String[] {"false" });
+		paramsMap.put("key", new String[] {});
+		paramsMap.put("allowEmptyValue", new String[] { "false" });
 		response = RequestHttp.post(testAddress + "/api/meta-test/value", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
@@ -167,8 +168,8 @@ public class AtomicLongMapApiBuilder_test {
 	public void setValueTest() {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
 		paramsMap.put("key", new String[] { "my_key" });
-		paramsMap.put("allowEmptyValue", new String[] {"true" });
-		paramsMap.put("value", new String[] { });
+		paramsMap.put("allowEmptyValue", new String[] { "true" });
+		paramsMap.put("value", new String[] {});
 		response = RequestHttp.post(testAddress + "/api/meta-test/value", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
@@ -215,8 +216,8 @@ public class AtomicLongMapApiBuilder_test {
 	@Test
 	public void setValuesInvalidTest() {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
-		paramsMap.put("keyValues", new String[] { });
-		paramsMap.put("allowEmptyValue", new String[] {"false" });
+		paramsMap.put("keyValues", new String[] {});
+		paramsMap.put("allowEmptyValue", new String[] { "false" });
 		response = RequestHttp.post(testAddress + "/api/meta-test/values", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
@@ -227,7 +228,7 @@ public class AtomicLongMapApiBuilder_test {
 	public void setValuesTest() {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
 		paramsMap.put("keyValues", new String[] { "oop", "foo" });
-		paramsMap.put("allowEmptyValue", new String[] {"true" });
+		paramsMap.put("allowEmptyValue", new String[] { "true" });
 		paramsMap.put("values", new String[] { "1", "2" });
 		response = RequestHttp.post(testAddress + "/api/meta-test/values", paramsMap);
 		assertNotNull(response);
@@ -239,7 +240,7 @@ public class AtomicLongMapApiBuilder_test {
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNull(responseMap.get("error"));
-		Map<String, Long> valueMap = (Map<String, Long>)responseMap.get("values");
+		Map<String, Long> valueMap = (Map<String, Long>) responseMap.get("values");
 		assertNotNull(valueMap);
 		assertEquals(2, valueMap.size());
 	}
@@ -272,8 +273,8 @@ public class AtomicLongMapApiBuilder_test {
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNull("An empty key was supplied", responseMap.get("error"));
-		Map<String, Long> valueMap = (Map<String, Long>)responseMap.get("values");
-		assertEquals(0, valueMap.get("my_key").longValue());	
+		Map<String, Long> valueMap = (Map<String, Long>) responseMap.get("values");
+		assertEquals(0, valueMap.get("my_key").longValue());
 	}
 	
 	@Test
@@ -288,7 +289,7 @@ public class AtomicLongMapApiBuilder_test {
 	@Test
 	public void deleteValuesInvalidKeysTest() {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
-		paramsMap.put("keys", new String[] { });
+		paramsMap.put("keys", new String[] {});
 		response = RequestHttp.post(testAddress + "/api/meta-test/deleteValues", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
@@ -305,7 +306,6 @@ public class AtomicLongMapApiBuilder_test {
 		assertNotNull("An error occured while trying to delete a value", responseMap.get("error"));
 	}
 	
-	
 	@Test
 	public void deleteValuesTest() {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
@@ -314,9 +314,9 @@ public class AtomicLongMapApiBuilder_test {
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
 		assertNull("An empty key was supplied", responseMap.get("error"));
-		Map<String, Long> valueMap = (Map<String, Long>)responseMap.get("values");
-		assertEquals(0, valueMap.get("oop").longValue());	
-		assertEquals(0, valueMap.get("foo").longValue());	
+		Map<String, Long> valueMap = (Map<String, Long>) responseMap.get("values");
+		assertEquals(0, valueMap.get("oop").longValue());
+		assertEquals(0, valueMap.get("foo").longValue());
 	}
 	
 	//@Test //as API does not support
@@ -327,7 +327,7 @@ public class AtomicLongMapApiBuilder_test {
 		assertNotNull(responseMap = response.toMap());
 		assertNull("error", responseMap.get("error"));
 		@SuppressWarnings("rawtypes")
-		AtomicLongMap valueMap = (AtomicLongMap)responseMap.get("map");
+		AtomicLongMap valueMap = (AtomicLongMap) responseMap.get("map");
 		assertNotNull(valueMap);
 		assertEquals(1, valueMap.size());
 	}
@@ -360,7 +360,7 @@ public class AtomicLongMapApiBuilder_test {
 	public void weakCompareAndSetInvalidAllwedTest() {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
 		paramsMap.put("key", new String[] { "my_key" });
-		paramsMap.put("allowed", new String[] { });
+		paramsMap.put("allowed", new String[] {});
 		response = RequestHttp.post(testAddress + "/api/meta-test/weakCompareAndSet", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());
@@ -394,7 +394,7 @@ public class AtomicLongMapApiBuilder_test {
 	public void getAndAddInvalidAllwedTest() {
 		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
 		paramsMap.put("key", new String[] { "my_key" });
-		paramsMap.put("delta", new String[] { });
+		paramsMap.put("delta", new String[] {});
 		response = RequestHttp.post(testAddress + "/api/meta-test/getAndAdd", paramsMap);
 		assertNotNull(response);
 		assertNotNull(responseMap = response.toMap());

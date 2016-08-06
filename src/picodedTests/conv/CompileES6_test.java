@@ -17,7 +17,7 @@ public class CompileES6_test {
 		String es6 = "class hello { echo() { return 'hello world'; } };";
 		String es5 = "";
 		
-		assertNotNull( es5 = CompileES6.compile(es6) );
+		assertNotNull(es5 = CompileES6.compile(es6));
 		//assertEquals( es6, es5 );
 	}
 }

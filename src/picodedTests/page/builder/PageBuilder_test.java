@@ -119,14 +119,16 @@ public class PageBuilder_test {
 			"Hello page-nested-two-page") > 0);
 	}
 	
-	@Test 
+	@Test
 	public void componentMapTest() {
 		constructorTest();
 		
-		assertEquals("Hello ${PageClass}", page.buildPageComponentMap().getSubMap("nested").getSubMap("page").get("html") );
-		assertEquals("Hello ${PageClass}", page.buildPageComponentMap().getSubMap("nested").getSubMap("two").getSubMap("page").get("html") );
+		assertEquals("Hello ${PageClass}", page.buildPageComponentMap().getSubMap("nested").getSubMap("page").get("html"));
+		assertEquals("Hello ${PageClass}",
+			page.buildPageComponentMap().getSubMap("nested").getSubMap("two").getSubMap("page").get("html"));
 		
-		assertNotNull( page.buildPageComponentMap().getSubMap("component").getSubMap("utils").getSubMap("IEWarning").get("html") );
+		assertNotNull(page.buildPageComponentMap().getSubMap("component").getSubMap("utils").getSubMap("IEWarning")
+			.get("html"));
 	}
 	
 	@Test

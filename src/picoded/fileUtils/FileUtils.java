@@ -44,27 +44,27 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	
 	/// Overwrites null encoding with US-ASCII
 	public static String readFileToString(File inFile) throws IOException {
-		return picoded.fileUtils.FileUtils.readFileToString(inFile, (String)null);
+		return picoded.fileUtils.FileUtils.readFileToString(inFile, (String) null);
 	}
 	
 	/// Overwrites null encoding with US-ASCII
 	public static String readFileToString(File inFile, String encoding) throws IOException {
-		if(encoding == null) {
+		if (encoding == null) {
 			encoding = "US-ASCII";
-		} 
+		}
 		return org.apache.commons.io.FileUtils.readFileToString(inFile, encoding);
 	}
 	
 	/// Overwrites null encoding with US-ASCII
 	public static void writeStringToFile(File inFile, String data) throws IOException {
-		picoded.fileUtils.FileUtils.writeStringToFile(inFile, data, (String)null);
+		picoded.fileUtils.FileUtils.writeStringToFile(inFile, data, (String) null);
 	}
 	
 	/// Overwrites null encoding with US-ASCII
 	public static void writeStringToFile(File inFile, String data, String encoding) throws IOException {
-		if(encoding == null) {
+		if (encoding == null) {
 			encoding = "US-ASCII";
-		} 
+		}
 		org.apache.commons.io.FileUtils.writeStringToFile(inFile, data, encoding);
 	}
 	
@@ -145,17 +145,17 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/// @param folder to scan and copy from
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir) throws IOException {
-		if(inDir ==null || outDir == null){
+		if (inDir == null || outDir == null) {
 			new IOException("Invalid directory");
 		}
 		File[] dir_inDir = inDir.listFiles();
 		for (int i = 0; i < dir_inDir.length; i++) {
 			File infile = dir_inDir[i];
 			if (infile.isFile()) {
-				File outfile =new File(outDir, infile.getName());
+				File outfile = new File(outDir, infile.getName());
 				copyFile_ifDifferent(infile, outfile);
 			} else if (infile.isDirectory()) {
-				File newOutDir= new File(outDir.getAbsolutePath()+File.separator+ infile.getName());
+				File newOutDir = new File(outDir.getAbsolutePath() + File.separator + infile.getName());
 				newOutDir.mkdir();
 				copyDirectory_ifDifferent(infile, newOutDir);
 			}
@@ -184,56 +184,56 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getBaseName(java.lang.String)
 	/// @param raw file name/path
 	/// @return filename only without the the type extension
-	public static String getBaseName(String filename) { 
+	public static String getBaseName(String filename) {
 		return org.apache.commons.io.FilenameUtils.getBaseName(filename);
 	}
 	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getExtension(java.lang.String)
 	/// @param raw file name/path
 	/// @return filename type extension
-	public static String getExtension(String filename) { 
+	public static String getExtension(String filename) {
 		return org.apache.commons.io.FilenameUtils.getExtension(filename);
 	}
 	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getFullPath(java.lang.String)
 	/// @param raw file name/path
 	/// @return full resolved path with ending / for directories
-	public static String getFullPath(String filename) { 
+	public static String getFullPath(String filename) {
 		return org.apache.commons.io.FilenameUtils.getFullPath(filename);
 	}
 	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getFullPathNoEndSeparator(java.lang.String)
 	/// @param raw file name/path
 	/// @return full resolved path without ending / for directories
-	public static String getFullPathNoEndSeparator(String filename) { 
+	public static String getFullPathNoEndSeparator(String filename) {
 		return org.apache.commons.io.FilenameUtils.getFullPathNoEndSeparator(filename);
 	}
 	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getName(java.lang.String)
 	/// @param raw file name/path
 	/// @return filename without the path
-	public static String getName(String filename) { 
+	public static String getName(String filename) {
 		return org.apache.commons.io.FilenameUtils.getName(filename);
 	}
 	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getPath(java.lang.String)
 	/// @param raw file name/path
 	/// @return full resolved path with ending / for directories
-	public static String getPath(String filename) { 
+	public static String getPath(String filename) {
 		return org.apache.commons.io.FilenameUtils.getPath(filename);
 	}
 	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getPathNoEndSeparator(java.lang.String)
 	/// @param raw file name/path
 	/// @return full resolved path without ending / for directories
-	public static String getPathNoEndSeparator(String filename) { 
+	public static String getPathNoEndSeparator(String filename) {
 		return org.apache.commons.io.FilenameUtils.getPathNoEndSeparator(filename);
 	}
 	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#normalize(java.lang.String)
 	/// @param raw file name/path
 	/// @return full resolved path with ending / for directories
-	public static String normalize(String filename) { 
+	public static String normalize(String filename) {
 		return org.apache.commons.io.FilenameUtils.normalize(filename);
 	}
 	

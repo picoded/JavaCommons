@@ -168,7 +168,7 @@ public class MetaTableApiBuilder {
 		
 		//ordering direction
 		String orderDirection = req.getString("order[0][dir]", "asc"); //datatables specific key
-		if(orderByStr != ""){
+		if (orderByStr != "") {
 			orderByStr += (" " + orderDirection);
 		}
 		
@@ -298,8 +298,6 @@ public class MetaTableApiBuilder {
 		if (_metaTableObj == null) {
 			return null;
 		}
-		
-		
 		
 		List<List<Object>> ret = new ArrayList<List<Object>>();
 		try {

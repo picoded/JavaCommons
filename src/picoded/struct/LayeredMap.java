@@ -19,49 +19,49 @@ import java.util.function.Function;
 /// without careful consideration of its implication
 ///
 public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
-
+	
 	// Internal vars
 	// ----------------------------------------------
-
+	
 	/// Internal var used to represent null value
 	protected static Object nullObject = picoded.enums.ObjectTokens.NULL;
-
+	
 	/// Internal layers of map to read / write values from
 	protected List<Map<K, V>> _layers = null;
-
+	
 	// Constructor
 	// ----------------------------------------------
-
+	
 	public LayeredMap() {
 		_layers = new ArrayList<Map<K, V>>();
 	}
-
+	
 	/// Setsup the tiered map, with the various layers
 	public LayeredMap(List<Map<K, V>> list) {
 		_layers = list;
 	}
-
+	
 	// Layer list handling
 	// ----------------------------------------------
-
+	
 	/// Gets and return the layers
 	public List<Map<K, V>> layers() {
 		return _layers;
 	}
-
+	
 	// Configuration vars to adjust logic
 	// ----------------------------------------------
-
+	
 	/// Writes to all layers, and not the first layer only
 	protected boolean writeToAllLayers = true;
-
+	
 	/// Reverse write order, from last to first.
 	protected boolean reverseWriteLayerOrder = true;
-
+	
 	// Utility lamda iterators.
 	// Used to build more complex layer functions
 	// ----------------------------------------------
-
+	
 	/// Iterates all the layers, for non null layer starting from 0
 	// /
 	/// @params func the function used
@@ -75,7 +75,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 			if (subLayer == null) {
 				continue;
 			}
-
+			
 			ret = func.apply(subLayer);
 			if (ret != null) {
 				return ret;
@@ -83,7 +83,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 		}
 		return null;
 	}
-
+	
 	/// Iterates all the layers, for non null layers
 	// /
 	/// @params func the function used
@@ -92,20 +92,19 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 	// /
 	/// @returns the first non-null value the function returned. else return
 	// null
-	public Object iterateLayersUntilReturn(Function<Map<K, V>, Object> func,
-			boolean isReverse) {
+	public Object iterateLayersUntilReturn(Function<Map<K, V>, Object> func, boolean isReverse) {
 		/// Iterate in normal order
 		if (!isReverse) {
 			return iterateLayersUntilReturn(func);
 		}
-
+		
 		Object ret = null;
 		for (int a = _layers.size() - 1; a >= 0; --a) {
 			Map<K, V> subLayer = _layers.get(a);
 			if (subLayer == null) {
 				continue;
 			}
-
+			
 			ret = func.apply(subLayer);
 			if (ret != null) {
 				return ret;
@@ -113,7 +112,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 		}
 		return null;
 	}
-
+	
 	/// Iterates all the layers, for non null layer starting from 0
 	// /
 	/// @params func the function used
@@ -121,8 +120,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 	// /
 	/// @returns the first non-null value the function returned. else return
 	// null
-	public Object iterateLayersWithReturn(
-			BiFunction<Map<K, V>, Object, Object> func, Object ret) {
+	public Object iterateLayersWithReturn(BiFunction<Map<K, V>, Object, Object> func, Object ret) {
 		for (int a = 0; a < _layers.size(); ++a) {
 			Map<K, V> subLayer = _layers.get(a);
 			if (subLayer == null) {
@@ -132,7 +130,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 		}
 		return ret;
 	}
-
+	
 	/// Iterates all the layers, for non null layers
 	// /
 	/// @params func the function used
@@ -143,14 +141,12 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 	// /
 	/// @returns the first non-null value the function returned. else return
 	// null
-	public Object iterateLayersWithReturn(
-			BiFunction<Map<K, V>, Object, Object> func, Object ret,
-			boolean isReverse) {
+	public Object iterateLayersWithReturn(BiFunction<Map<K, V>, Object, Object> func, Object ret, boolean isReverse) {
 		/// Iterate in normal order
 		if (!isReverse) {
 			return iterateLayersWithReturn(func, ret);
 		}
-
+		
 		for (int a = _layers.size() - 1; a >= 0; --a) {
 			Map<K, V> subLayer = _layers.get(a);
 			if (subLayer == null) {
@@ -160,10 +156,10 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 		}
 		return ret;
 	}
-
+	
 	// Critical functions for map support
 	// ----------------------------------------------
-
+	
 	/// Get operators
 	@SuppressWarnings("unchecked")
 	public V get(Object key) {
@@ -177,12 +173,12 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 			return null;
 		});
 	}
-
+	
 	/// Put the operation
 	@SuppressWarnings("unchecked")
 	public V put(K key, V value) {
 		V ret = null;
-
+		
 		if (writeToAllLayers) { // writes to all layers
 			ret = (V) iterateLayersWithReturn((map, r) -> {
 				if (r == null) {
@@ -201,19 +197,19 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 				return val;
 			}, reverseWriteLayerOrder);
 		}
-
+		
 		// is NULL D=
 		if (ret == nullObject) {
 			return null;
 		}
 		return ret;
 	}
-
+	
 	/// Removes all values from a key
 	@SuppressWarnings("unchecked")
 	public V remove(Object key) {
 		V ret = null;
-
+		
 		ret = (V) iterateLayersWithReturn((map, r) -> {
 			if (r == null) {
 				r = map.remove(key);
@@ -222,23 +218,23 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 			}
 			return r;
 		}, ret, reverseWriteLayerOrder);
-
+		
 		return ret;
 	}
-
+	
 	/// Iterate all layers and form a combined keySet
 	@SuppressWarnings("unchecked")
 	public Set<K> keySet() {
 		Set<K> ret = new HashSet<K>();
-
+		
 		ret = (Set<K>) iterateLayersWithReturn((map, r) -> {
 			((Set<K>) r).addAll(map.keySet());
 			return r;
 		}, ret);
-
+		
 		return ret;
 	}
-
+	
 	// Optimization function for map
 	//
 	// @TODO optimzie sub functions
@@ -248,7 +244,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 	// + size
 	// + values
 	// ----------------------------------------------
-
+	
 	/// Clears all layers
 	// /
 	/// Please be careful of the implications
@@ -258,7 +254,7 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 			return null;
 		});
 	}
-
+	
 	/// Check if it contains key
 	public boolean containsKey(Object key) {
 		return (iterateLayersUntilReturn((map) -> {
@@ -268,5 +264,5 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 			return null;
 		}) != null);
 	}
-
+	
 }

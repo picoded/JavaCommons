@@ -86,7 +86,7 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 	/// Gets the config value string, from the file
 	public Object get(Object key) {
 		String keyString = key.toString();
-		if (jsonMode) { 
+		if (jsonMode) {
 			return jsonMap.getNestedObject(keyString);
 		} else {
 			// read from ini

@@ -44,7 +44,7 @@ import picoded.conv.GenericConvert;
  * @see List
  */
 
-public interface GenericConvertList<E> extends UnsupportedDefaultList<E>{
+public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	
 	// to string conversion
 	//--------------------------------------------------------------------------------------------------
@@ -381,8 +381,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E>{
 	///
 	/// @returns         The fetched object, always possible unless fallbck null
 	public default Object getNestedObject(String index) {
-		return getNestedObject(index,null); 
+		return getNestedObject(index, null);
 	}
-	
 	
 }

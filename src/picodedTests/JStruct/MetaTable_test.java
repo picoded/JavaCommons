@@ -469,7 +469,6 @@ public class MetaTable_test {
 		qRes = mtObj.query("num >= ? AND num <= ?", new Object[] { 2, 6 }, "order ASC", 2, 2);
 		assertEquals(2, qRes.length);
 		
-		
 	}
 	
 	// @Test

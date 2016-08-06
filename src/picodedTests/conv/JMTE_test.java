@@ -71,8 +71,7 @@ public class JMTE_test {
 		dataObj.put("cond", "true boolean, or any non null data will do here");
 		assertEquals("<h1>Hello World, How do you do?</h1><h2>Good =)</h2>",
 		
-		jmteObj.parseTemplate("<h1>${helloMsg}</h1>" + "${if cond}<h2>${reply}</h2>${end}",
-		dataObj));
+		jmteObj.parseTemplate("<h1>${helloMsg}</h1>" + "${if cond}<h2>${reply}</h2>${end}", dataObj));
 	}
 	
 	@Test
@@ -199,6 +198,6 @@ public class JMTE_test {
 	public void issueT477_fixPageBuilderEscapingIssue() {
 		// The JMTE was found to be the root cause sadly 
 		assertEquals("\\\\", "\\\\");
-		assertEquals("\\\\", jmteObj.parseTemplate("\\\\" , new HashMap<String,Object>()));
+		assertEquals("\\\\", jmteObj.parseTemplate("\\\\", new HashMap<String, Object>()));
 	}
 }

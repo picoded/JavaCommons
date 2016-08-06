@@ -188,18 +188,18 @@ public class GenericConvert_test {
 	
 	@Test
 	public void splitObjectPath() {
-		assertArrayEquals(new String[]{ "one" }, GenericConvert.splitObjectPath("one"));
-		assertArrayEquals(new String[]{ "one", "two" }, GenericConvert.splitObjectPath("one.two"));
-		assertArrayEquals(new String[]{ "one", "two", "three" }, GenericConvert.splitObjectPath("one.two[three]"));
+		assertArrayEquals(new String[] { "one" }, GenericConvert.splitObjectPath("one"));
+		assertArrayEquals(new String[] { "one", "two" }, GenericConvert.splitObjectPath("one.two"));
+		assertArrayEquals(new String[] { "one", "two", "three" }, GenericConvert.splitObjectPath("one.two[three]"));
 	}
 	
 	@Test
 	public void normalizeObjectPath() {
-		Map<String,Object> base = GenericConvert.toStringMap("{ \"ONE\" : { \"Two\" : { \"ThRee\" : 100 } } }");
-		assertEquals( "ONE", GenericConvert.normalizeObjectPath(base, "ONE")); 
-		assertEquals( "ONE", GenericConvert.normalizeObjectPath(base, "one")); 
-		assertEquals( "ONE.Two", GenericConvert.normalizeObjectPath(base, "one.TwO")); 
-		assertEquals( "ONE.Two.ThRee", GenericConvert.normalizeObjectPath(base, "one[two].three")); 
+		Map<String, Object> base = GenericConvert.toStringMap("{ \"ONE\" : { \"Two\" : { \"ThRee\" : 100 } } }");
+		assertEquals("ONE", GenericConvert.normalizeObjectPath(base, "ONE"));
+		assertEquals("ONE", GenericConvert.normalizeObjectPath(base, "one"));
+		assertEquals("ONE.Two", GenericConvert.normalizeObjectPath(base, "one.TwO"));
+		assertEquals("ONE.Two.ThRee", GenericConvert.normalizeObjectPath(base, "one[two].three"));
 	}
 	
 	@Test

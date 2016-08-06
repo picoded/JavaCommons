@@ -212,16 +212,16 @@ public class JStruct implements JStackLayer {
 	/// Preload a single JStruct type object. This is use to prime the JStruct object for systemSetup calls.
 	///
 	public void preloadJStructType(String type, String name) {
-		if(type.equalsIgnoreCase("AccountTable")) {
+		if (type.equalsIgnoreCase("AccountTable")) {
 			this.getAccountTable(name);
-		} else if(type.equalsIgnoreCase("MetaTable")) {
+		} else if (type.equalsIgnoreCase("MetaTable")) {
 			this.getMetaTable(name);
-		} else if(type.equalsIgnoreCase("KeyValueMap")) {
+		} else if (type.equalsIgnoreCase("KeyValueMap")) {
 			this.getKeyValueMap(name);
-		} else if(type.equalsIgnoreCase("AtomicLongMap")) {
+		} else if (type.equalsIgnoreCase("AtomicLongMap")) {
 			this.getAtomicLongMap(name);
 		} else {
-			throw new RuntimeException("Unknown struct type : "+type);
+			throw new RuntimeException("Unknown struct type : " + type);
 		}
 	}
 	

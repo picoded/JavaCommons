@@ -22,8 +22,8 @@ import picodedTests.JCache.LocalCacheSetup;
 import picodedTests.JStruct.*;
 import picodedTests.*;
 
-public class JStack_test  {
-	@Test 
+public class JStack_test {
+	@Test
 	public void stackSetupFromJsonConfig() {
 		assertTrue(true);
 	}

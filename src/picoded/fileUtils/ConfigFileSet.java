@@ -172,28 +172,28 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		ConfigFileSet ret = new ConfigFileSet();
 		
 		// Blank is as good as null
-		if(prefix != null && prefix.length() <= 0) {
+		if (prefix != null && prefix.length() <= 0) {
 			prefix = null;
 		}
 		
 		//
 		// Iterate across all the ConfigFile items : and populate the result
 		//
-		for(String key : configFileMap.keySet()) {
+		for (String key : configFileMap.keySet()) {
 			
 			//
 			// Check for items to ignore
 			//
-			if(ignore != null) {
+			if (ignore != null) {
 				boolean breakOut = false;
-				for(String ignorePart : ignore) {
-					if( ignorePart != null && key.startsWith(ignorePart) ) {
+				for (String ignorePart : ignore) {
+					if (ignorePart != null && key.startsWith(ignorePart)) {
 						breakOut = true;
 						continue;
-					} 
+					}
 				}
 				
-				if( breakOut == true ) {
+				if (breakOut == true) {
 					continue;
 				}
 			}
@@ -201,21 +201,21 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 			// 
 			// Add if prefix is null (all valid), or valid
 			//
-			if(prefix == null) {
+			if (prefix == null) {
 				ret.configFileMap.put(key, configFileMap.get(key));
 			} else {
-				if(key.startsWith(prefix)) {
+				if (key.startsWith(prefix)) {
 					
 					// Get the subkey without prefix filter
-					String subkey = key.substring( prefix.length() ).trim();
+					String subkey = key.substring(prefix.length()).trim();
 					
 					// The subkey without starting "."
-					while(subkey.startsWith(".")) {
+					while (subkey.startsWith(".")) {
 						subkey = subkey.substring(1).trim();
 					}
 					
 					// Skip if subkey ends up being blank
-					if(subkey.length() <= 0) {
+					if (subkey.length() <= 0) {
 						continue;
 					}
 					
@@ -225,20 +225,20 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 			}
 		}
 		
-		if(ret.configFileMap.size() <= 0) {
+		if (ret.configFileMap.size() <= 0) {
 			return null;
-		} 
+		}
 		return ret;
 	}
 	
 	/// Memoizer cache for getCachedSubMap()
-	protected Map<String,ConfigFileSet> _subMapCache = new HashMap<String,ConfigFileSet>();
+	protected Map<String, ConfigFileSet> _subMapCache = new HashMap<String, ConfigFileSet>();
 	
 	///
 	/// Gets an internally cached submap (with prefix)
 	///
 	protected ConfigFileSet getCachedSubMap(String prefix) {
-		if( _subMapCache.containsKey(prefix) ) {
+		if (_subMapCache.containsKey(prefix)) {
 			return _subMapCache.get(prefix);
 		}
 		
@@ -261,7 +261,7 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		//
 		// Iterate across all the ConfigFile items : and populate the result
 		//
-		for(String key : configFileMap.keySet()) {
+		for (String key : configFileMap.keySet()) {
 			String keyString = key.toString();
 			String[] splitKeyString = keyString.split("\\.");
 			ret.add(splitKeyString[0]);
@@ -322,7 +322,7 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		
 		Map<String, Object> subMap = configFileMap.get(fileKeyString);
 		if (subMap != null) {
-			if(headerKeyString.length() <= 0) {
+			if (headerKeyString.length() <= 0) {
 				return subMap;
 			}
 			return subMap.get(headerKeyString);

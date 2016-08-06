@@ -426,18 +426,17 @@ public class JSql_Oracle_test {
 		JSqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "_1`").dispose(); //cleanup (just incase)
 		
 		JSqlObj.executeQuery(
-				"CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(10) DEFAULT 'MyDef')")
-			.dispose(); //valid table creation : no exception
+			"CREATE TABLE IF NOT EXISTS " + testTableName
+				+ " ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(10) DEFAULT 'MyDef')").dispose(); //valid table creation : no exception
 		
 		//Upsert query
 		assertNotNull(qSet = JSqlObj.upsertQuerySet( //
 			testTableName + "_1", //
 			new String[] { "col1" }, new Object[] { 404 }, //
 			//new String[] { "col2", "col3" }, new Object[] { "not found", "not found" },  //
-			new String[] { "col2" }, new Object[] { "not found" },  //
+			new String[] { "col2" }, new Object[] { "not found" }, //
 			//new String[] { "col4", "col5" }, new Object[] { "not found", "not found" },
-			new String[] { "col3" }, new Object[] { "3 not found" },
-			new String[] { "col4" } //
+			new String[] { "col3" }, new Object[] { "3 not found" }, new String[] { "col4" } //
 			));
 		assertTrue("SQL result should return true", qSet.execute());
 		
@@ -445,7 +444,7 @@ public class JSql_Oracle_test {
 			r = JSqlObj.query("SELECT * FROM " + testTableName + "_1 ORDER BY col1 ASC"));
 		assertEquals("Upsert value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
 		assertEquals("Upsert value check failed", "not found", r.readRowCol(0, "col2"));
-		assertEquals("Upsert value check failed",  null, r.readRowCol(0, "col4")); //TODO
+		assertEquals("Upsert value check failed", null, r.readRowCol(0, "col4")); //TODO
 	}
 	
 	@Test
@@ -519,37 +518,36 @@ public class JSql_Oracle_test {
 	
 	@Test
 	public void createTableIndexQuerySetTest() throws JSqlException {
-		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
-		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col1` INT PRIMARY KEY, col2 TEXT )")
-			.dispose(); 
+		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col1` INT PRIMARY KEY, col2 TEXT )").dispose();
 		JSqlObj.createTableIndexQuerySet(testTableName, "col2");
 	}
 	
 	@Test
 	public void createTableIndexQuerySetTestThreeParam() throws JSqlException {
-		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
 		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )")
-			.dispose(); 
+			.dispose();
 		JSqlObj.createTableIndexQuerySet(testTableName, "col2", "ASC");
 	}
 	
 	@Test
 	public void createTableIndexQuerySetTestFourParam() throws JSqlException {
-		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); 
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
 		JSqlObj.query("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )")
-			.dispose(); 
+			.dispose();
 		JSqlObj.createTableIndexQuerySet(testTableName, "col2", "DESC", "IDX");
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Test
 	public void joinArgumentsTest() throws JSqlException {
-		Object[] array1 = new Object[] {1, 2, 3};
-		Object[] array2 = new Object[] {4, 5, 6};
-		Object[] array = new Object[] {1, 2, 3, 4, 5, 6};
+		Object[] array1 = new Object[] { 1, 2, 3 };
+		Object[] array2 = new Object[] { 4, 5, 6 };
+		Object[] array = new Object[] { 1, 2, 3, 4, 5, 6 };
 		Object[] rArray = JSqlObj.joinArguments(array1, array2);
 		assertEquals(array, rArray);
 	}
@@ -559,31 +557,33 @@ public class JSql_Oracle_test {
 		String s = JSqlObj.genericSqlParser("SELECT * FROM " + testTableName + " WHERE COL1 = ?");
 		assertEquals("SELECT * FROM " + testTableName + " WHERE COL1 = ?", s);
 		
-		s = JSqlObj.genericSqlParser("DROP TABLE IF EXISTS MY_TABLE" );
-		assertEquals("BEGIN EXECUTE IMMEDIATE 'DROP TABLE MY_TABLE'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;", s);
+		s = JSqlObj.genericSqlParser("DROP TABLE IF EXISTS MY_TABLE");
+		assertEquals(
+			"BEGIN EXECUTE IMMEDIATE 'DROP TABLE MY_TABLE'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;",
+			s);
 		
 		s = JSqlObj.genericSqlParser("DROP TABLE MY_TABLE ; ");
 		//assertEquals("DROP TABLE MY_TABLE", s); //Should be
 		assertEquals("DROP TABLE MY_TABLE ", s);
 		
 		s = JSqlObj.genericSqlParser("DELETE FROM my_table WHERE col1 = ? ");
-		assertEquals("DELETE FROM MY_TABLE WHERE col1 = ?", s); 
+		assertEquals("DELETE FROM MY_TABLE WHERE col1 = ?", s);
 		
 		s = JSqlObj.genericSqlParser("DELETE FROM my_table WHERE col1 = 'ABC' ");
 		String ss = "DELETE FROM MY_TABLE WHERE col1 = " + '"' + "ABC" + '"';
-		assertEquals(ss, s); 
+		assertEquals(ss, s);
 		
 		s = JSqlObj.genericSqlParser("INSERT INTO my_table ( col1, col2 ) VALUES (?,?)");
-		assertEquals("INSERT INTO MY_TABLE ( col1, col2 ) VALUES (?,?)", s); 
+		assertEquals("INSERT INTO MY_TABLE ( col1, col2 ) VALUES (?,?)", s);
 		
 		s = JSqlObj.genericSqlParser("UPDATE my_table SET col1 = ?, col2 = ? ");
-		assertEquals("UPDATE MY_TABLE SET col1 = ?, col2 = ?", s); 
+		assertEquals("UPDATE MY_TABLE SET col1 = ?, col2 = ?", s);
 		
 		s = JSqlObj.genericSqlParser("UPDATE my_table SET col1 = 405 ");
-		assertEquals("UPDATE MY_TABLE SET col1 = 405", s); 
+		assertEquals("UPDATE MY_TABLE SET col1 = 405", s);
 		
 		s = JSqlObj.genericSqlParser("ALTER TABLE my_table ADD COLUMN col3 varchar(10)");
-		assertEquals("ALTER TABLE my_table ADD COLUMN col3 varchar(10)", s); 
+		assertEquals("ALTER TABLE my_table ADD COLUMN col3 varchar(10)", s);
 	}
 	
 }

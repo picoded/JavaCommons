@@ -41,16 +41,16 @@ public class HashMapList_test {
 	}
 	
 	/// The type erasure error?
-	 @Test
-	 public void typeErasureMapError() {
-	 	String[] exp = new String[] { "brand", "new", "world" };
-	 	HashMapList<String, String> tObj = new HashMapList<String, String>();
-	 	
-	 	tObj.append("hello", exp[0]);
-	 	tObj.append("hello", exp[1]);
-	 	tObj.append("hello", exp[2]);
-	 	
-	 	Map<String,String[]> cObj = tObj.toMapArray(exp);
-	 	assertArrayEquals(exp, cObj.get("hello"));
-	 }
+	@Test
+	public void typeErasureMapError() {
+		String[] exp = new String[] { "brand", "new", "world" };
+		HashMapList<String, String> tObj = new HashMapList<String, String>();
+		
+		tObj.append("hello", exp[0]);
+		tObj.append("hello", exp[1]);
+		tObj.append("hello", exp[2]);
+		
+		Map<String, String[]> cObj = tObj.toMapArray(exp);
+		assertArrayEquals(exp, cObj.get("hello"));
+	}
 }

@@ -37,16 +37,13 @@ import java.io.OutputStream;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-
-
 //import static org.hamcrest.number.OrderingComparison.*;
 import org.junit.Assert;
 import org.junit.Test;
 
 import picoded.struct.StreamBuffer;
 
-
-@SuppressWarnings({"unused", "resource"})
+@SuppressWarnings({ "unused", "resource" })
 public class StreamBuffer_test {
 	
 	/**
@@ -62,7 +59,6 @@ public class StreamBuffer_test {
 		(new java.util.Random()).nextBytes(byteArr);
 		return byteArr;
 	}
-	
 	
 	private byte randomByte() {
 		return randomByteArray(1)[0];
@@ -197,7 +193,6 @@ public class StreamBuffer_test {
 		assertEquals(t2[1], 6);
 		assertEquals(t2[2], 6);
 	}
-	
 	
 	@Test
 	public void testLoopedRoundtrip() throws IOException {

@@ -93,10 +93,14 @@ public class PageBuilder extends PageBuilderCore {
 	/// Build depenecy files, this should only be called after all the various standard page are built
 	protected void buildDependency() {
 		try {
-			FileUtils.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.less"), dependencyLess(), null /*"UTF-8"*/);
-			FileUtils.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.css"), dependencyCss(), null /*"UTF-8"*/);
-			FileUtils.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.es6"), dependencyES6(), null /*"UTF-8"*/);
-			FileUtils.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.js"), dependencyJS(), null /*"UTF-8"*/);
+			FileUtils
+				.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.less"), dependencyLess(), null /*"UTF-8"*/);
+			FileUtils
+				.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.css"), dependencyCss(), null /*"UTF-8"*/);
+			FileUtils
+				.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.es6"), dependencyES6(), null /*"UTF-8"*/);
+			FileUtils
+				.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.js"), dependencyJS(), null /*"UTF-8"*/);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -155,7 +155,8 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		
 		// Gets the configuration setup
 		JConfig jc = JConfig();
-		String tablePrefix = jc.getString( "sys.JStack.baseAccount.name", jc.getString("sys.account.tableConfig.tablePrefix", "picoded_account") );
+		String tablePrefix = jc.getString("sys.JStack.baseAccount.name",
+			jc.getString("sys.account.tableConfig.tablePrefix", "picoded_account"));
 		
 		// httpUserAuthObj.loginLifetime = cStack.getInt( "userAuthCookie.loginLifetime", httpUserAuthObj.loginLifetime);
 		// httpUserAuthObj.loginRenewal = cStack.getInt( "userAuthCookie.loginRenewal", httpUserAuthObj.loginRenewal);
@@ -270,7 +271,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		setupObj.baseDataModel.put("ContextURI", getContextURI());
 		
 		// Pass the configuration settings in JConfig to JMTE, but filter system
-		setupObj.baseDataModel.put("Config", JConfig().createSubMap(null,"sys"));
+		setupObj.baseDataModel.put("Config", JConfig().createSubMap(null, "sys"));
 		
 		// The this data model self reference
 		// setupObj.baseDataModel.put("this", setupObj.baseDataModel);

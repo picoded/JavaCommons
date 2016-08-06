@@ -17,7 +17,7 @@ import picoded.servletUtils.*;
 ///
 /// Map interface wrapper for page component, for use within JMTE and PageBuilder
 ///
-public class PageComponentMap implements GenericConvertMap<String,Object> {
+public class PageComponentMap implements GenericConvertMap<String, Object> {
 	
 	////////////////////////////////////////////////////////////
 	//
@@ -60,7 +60,7 @@ public class PageComponentMap implements GenericConvertMap<String,Object> {
 		//
 		// Get the raw HTML 
 		//
-		if( keyStr.equalsIgnoreCase("html") ) {
+		if (keyStr.equalsIgnoreCase("html")) {
 			return getHtml();
 		}
 		
@@ -88,9 +88,9 @@ public class PageComponentMap implements GenericConvertMap<String,Object> {
 		//
 		// Return sub map
 		//
-		if( keySet().contains(keyStr) ) {
-			if(prefixPath.length() > 0) {
-				return new PageComponentMap(core, prefixPath+"/"+keyStr);
+		if (keySet().contains(keyStr)) {
+			if (prefixPath.length() > 0) {
+				return new PageComponentMap(core, prefixPath + "/" + keyStr);
 			} else {
 				return new PageComponentMap(core, keyStr);
 			}
@@ -110,8 +110,8 @@ public class PageComponentMap implements GenericConvertMap<String,Object> {
 	@Override
 	public String toString() {
 		String ret = getHtml();
-		if( ret == null || ret.trim().length() <= 0 ) {
-			return ("(Page."+prefixPath+")").replaceAll("/",".");
+		if (ret == null || ret.trim().length() <= 0) {
+			return ("(Page." + prefixPath + ")").replaceAll("/", ".");
 		}
 		return ret;
 	}

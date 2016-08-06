@@ -1,6 +1,5 @@
 package picoded.struct;
 
-
 ///
 /// @TODO implementation
 ///

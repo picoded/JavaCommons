@@ -43,9 +43,9 @@ public class JMTE {
 	public HashMap<String, Object> baseDataModel = new HashMap<String, Object>();
 	
 	/// Directly parse the template without modifying the data obj stack
-	protected String parseTemplateRaw(String template, Map<String,Object>dataObj) {
+	protected String parseTemplateRaw(String template, Map<String, Object> dataObj) {
 		// Yes the many "\" slashes is to make sure all slash is escaped once before engine.transform, because the engine will escape them again X_X
-		return engine.transform(template.replaceAll("\\\\","\\\\\\\\"), dataObj); 
+		return engine.transform(template.replaceAll("\\\\", "\\\\\\\\"), dataObj);
 	}
 	
 	/// Parses the template, with the baseDataModel data
@@ -61,7 +61,7 @@ public class JMTE {
 		tempObj.putAll(baseDataModel);
 		tempObj.putAll(dataObj);
 		
-		return parseTemplateRaw(template, tempObj); 
+		return parseTemplateRaw(template, tempObj);
 	}
 	
 	/// Registers a class renderer. Note that you will need to import

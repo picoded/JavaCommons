@@ -1,6 +1,5 @@
 package picoded.struct;
 
-
 /// Java MutablePair implementation
 ///
 /// See: http://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/tuple/Pair.html

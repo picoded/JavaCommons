@@ -17,7 +17,7 @@ import picoded.RESTBuilder.templates.*;
 /// JStack utility to build up complex JStack structures from the JStack config file.
 public class JStackUtils {
 	
-	public final static String[] structTypes = { "AccountTable", "KeyValueMap", "AtomicLongMap", "MetaTable" };   
+	public final static String[] structTypes = { "AccountTable", "KeyValueMap", "AtomicLongMap", "MetaTable" };
 	
 	//--------------------------------------------------
 	//
@@ -28,21 +28,22 @@ public class JStackUtils {
 	///
 	/// Build the RESTBuilder to a single JStruct type object 
 	///
-	protected static void setupRESTBuilderType(RESTBuilder rbObj, JStruct struct, String type, Map<String,Object> nameMap) {
-		if(nameMap == null) {
+	protected static void setupRESTBuilderType(RESTBuilder rbObj, JStruct struct, String type,
+		Map<String, Object> nameMap) {
+		if (nameMap == null) {
 			return;
 		}
 		for (String name : nameMap.keySet()) {
-			if(type.equalsIgnoreCase("AccountTable")) {
-				AccountLogin.setupRESTBuilder(rbObj, struct.getAccountTable(name), name+".");
-			} else if(type.equalsIgnoreCase("KeyValueMap")) {
-				(new KeyValueMapApiBuilder(struct.getKeyValueMap(name))).setupRESTBuilder(rbObj, name+".");
-			} else if(type.equalsIgnoreCase("AtomicLongMap")) {
-				(new AtomicLongMapApiBuilder(struct.getAtomicLongMap(name))).setupRESTBuilder(rbObj, name+".");
-			} else if(type.equalsIgnoreCase("MetaTable")) {
-				(new MetaTableApiBuilder(struct.getMetaTable(name))).setupRESTBuilder(rbObj, name+".");
+			if (type.equalsIgnoreCase("AccountTable")) {
+				AccountLogin.setupRESTBuilder(rbObj, struct.getAccountTable(name), name + ".");
+			} else if (type.equalsIgnoreCase("KeyValueMap")) {
+				(new KeyValueMapApiBuilder(struct.getKeyValueMap(name))).setupRESTBuilder(rbObj, name + ".");
+			} else if (type.equalsIgnoreCase("AtomicLongMap")) {
+				(new AtomicLongMapApiBuilder(struct.getAtomicLongMap(name))).setupRESTBuilder(rbObj, name + ".");
+			} else if (type.equalsIgnoreCase("MetaTable")) {
+				(new MetaTableApiBuilder(struct.getMetaTable(name))).setupRESTBuilder(rbObj, name + ".");
 			} else {
-				throw new RuntimeException("Unknown struct type : "+type);
+				throw new RuntimeException("Unknown struct type : " + type);
 			}
 		}
 	}
@@ -54,13 +55,13 @@ public class JStackUtils {
 	/// @param   The jstruct to build on
 	/// @param   The structure map containing { type : { name : configObj } }
 	///
-	public static void setupRESTBuilderStruct(RESTBuilder rbObj, JStruct struct, Map<String,Object> structMap) {
-		if( structMap == null ) {
+	public static void setupRESTBuilderStruct(RESTBuilder rbObj, JStruct struct, Map<String, Object> structMap) {
+		if (structMap == null) {
 			return;
 		}
 		
-		GenericConvertMap<String,Object> configMap = GenericConvertMap.build(structMap);
-		for (String s: structTypes) {
+		GenericConvertMap<String, Object> configMap = GenericConvertMap.build(structMap);
+		for (String s : structTypes) {
 			setupRESTBuilderType(rbObj, struct, s, configMap.getStringMap(s));
 		}
 	}
@@ -74,8 +75,8 @@ public class JStackUtils {
 	///
 	/// Preload a single JStruct type object 
 	///
-	protected static void preloadJStructType(JStruct struct, String type, Map<String,Object> nameMap) {
-		if(nameMap == null) {
+	protected static void preloadJStructType(JStruct struct, String type, Map<String, Object> nameMap) {
+		if (nameMap == null) {
 			return;
 		}
 		for (String name : nameMap.keySet()) {
@@ -89,14 +90,14 @@ public class JStackUtils {
 	/// @param   The jstruct to build on
 	/// @param   The structure map containing { type : { name : configObj } }
 	///
-	public static void preloadJStruct(JStruct struct, Map<String,Object> structMap) {
-		if( structMap == null ) {
+	public static void preloadJStruct(JStruct struct, Map<String, Object> structMap) {
+		if (structMap == null) {
 			return;
 		}
 		
-		GenericConvertMap<String,Object> configMap = GenericConvertMap.build(structMap);
-		String[] structTypes = { "AccountTable", "KeyValueMap", "AtomicLongMap", "MetaTable" };   
-		for (String s: structTypes) {
+		GenericConvertMap<String, Object> configMap = GenericConvertMap.build(structMap);
+		String[] structTypes = { "AccountTable", "KeyValueMap", "AtomicLongMap", "MetaTable" };
+		for (String s : structTypes) {
 			preloadJStructType(struct, s, configMap.getStringMap(s));
 		}
 	}
@@ -110,17 +111,17 @@ public class JStackUtils {
 	///
 	/// Generate a single JStack layer using a config map representing it
 	///
-	public static JStackLayer stackConfigToJStackLayer(Map<String,Object> inConfig, String fullWebInfPath) {
-		if( inConfig == null ) {
+	public static JStackLayer stackConfigToJStackLayer(Map<String, Object> inConfig, String fullWebInfPath) {
+		if (inConfig == null) {
 			return null;
 		}
 		
-		GenericConvertMap<String,Object> configMap = GenericConvertMap.build(inConfig);
+		GenericConvertMap<String, Object> configMap = GenericConvertMap.build(inConfig);
 		String type = configMap.getString("type");
 		JStackLayer ret = null;
 		
 		// Using the type, apply the relevent build logic
-		if( type.equalsIgnoreCase("jsql") ) {
+		if (type.equalsIgnoreCase("jsql")) {
 			
 			// Gets the config vars
 			String engine = configMap.getString("engine", "");
@@ -139,12 +140,12 @@ public class JStackUtils {
 				// // Note that the database, username, password parameters are meaningless for sqlite
 				// "engine" : "sqlite",
 				// "path" : "./WEB-INF/storage/db.sqlite",
-
+				
 				if (path.length() <= 0) {
 					throw new RuntimeException("Unsupported " + "path: " + path);
 				}
 				
-				if( fullWebInfPath == null ) {
+				if (fullWebInfPath == null) {
 					fullWebInfPath = "./WEB-INF/";
 				}
 				
@@ -162,7 +163,7 @@ public class JStackUtils {
 				// // Certain data competebility problems
 				// "engine" : "mssql",
 				// "path" : "54.169.34.78:1433;uselobs=false;",
-
+				
 				return JSql.mssql(path, database, username, password);
 			} else if (engine.equalsIgnoreCase("mysql")) {
 				
@@ -189,12 +190,12 @@ public class JStackUtils {
 			} else {
 				throw new RuntimeException("Unexpected JStack.stack JSql engine: " + engine);
 			}
-		} else if( type.equalsIgnoreCase("jcache") ) {
+		} else if (type.equalsIgnoreCase("jcache")) {
 			// @TODO : JCache support
-		} else if( type.equalsIgnoreCase("jstruct") ) {
+		} else if (type.equalsIgnoreCase("jstruct")) {
 			return new JStruct();
 		} else {
-			throw new RuntimeException("Unexpected JStack.stack type : "+type);
+			throw new RuntimeException("Unexpected JStack.stack type : " + type);
 		}
 		
 		return ret;
@@ -204,19 +205,19 @@ public class JStackUtils {
 	/// Generate JStack layers based on the configuration format of. This would be the "sys.JStack.stack" array
 	///
 	public static JStackLayer[] stackConfigLayersToJStackLayers(List<Object> inConfig, String fullWebInfPath) {
-		if( inConfig == null ) {
+		if (inConfig == null) {
 			return null;
 		}
 		
 		List<JStackLayer> ret = new ArrayList<JStackLayer>();
-		for( Object config : inConfig ) {
-			JStackLayer subLayer = stackConfigToJStackLayer( GenericConvert.toStringMap(config, null), fullWebInfPath );
-			if( subLayer != null ) {
-				ret.add( subLayer );
+		for (Object config : inConfig) {
+			JStackLayer subLayer = stackConfigToJStackLayer(GenericConvert.toStringMap(config, null), fullWebInfPath);
+			if (subLayer != null) {
+				ret.add(subLayer);
 			}
 		}
 		
-		if( ret.size() > 0 ) {
+		if (ret.size() > 0) {
 			return ret.toArray(new JStackLayer[0]);
 		}
 		return null;

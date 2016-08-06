@@ -60,6 +60,20 @@ public class CommonsPage extends BasePage {
 		}
 		
 		boolean enableCommonWildcardAuth = enableCommonWildcardAuthRedirection();
+		
+		//
+		// WEB-INF security
+		//
+		if (wildcardUri.length >= 1) {
+			// Always deny WEB-INF path
+			if (wildcardUri[0].equalsIgnoreCase("WEB-INF") || wildcardUri[0].startsWith(".")) {
+				return false;
+			}
+		}
+		
+		//
+		// Common wildcard pattern
+		//
 		if (enableCommonWildcardAuth && wildcardUri.length >= 1) {
 			// Exempt login page from auth
 			if (wildcardUri[0].equalsIgnoreCase("login")) {
@@ -102,17 +116,44 @@ public class CommonsPage extends BasePage {
 			
 			// Allow common asset files types
 			if ( //
-			fileExt.equalsIgnoreCase("html") || //
+				//
+				// HTML, JS, CSS
+				//
+				fileExt.equalsIgnoreCase("html") || //
 				fileExt.equalsIgnoreCase("js") || //
 				fileExt.equalsIgnoreCase("css") || //
+				fileExt.equalsIgnoreCase("less") || //
+				fileExt.equalsIgnoreCase("scss") || //
+				fileExt.equalsIgnoreCase("es6") ||
+				//
+				// Images
+				//
 				fileExt.equalsIgnoreCase("png") || //
 				fileExt.equalsIgnoreCase("jpg") || //
 				fileExt.equalsIgnoreCase("jpeg") || //
+				fileExt.equalsIgnoreCase("gif") || //
 				fileExt.equalsIgnoreCase("svg") || //
+				//
+				// PDF
+				//
 				fileExt.equalsIgnoreCase("pdf") || //
+				//
+				// Markdown, text
+				//
 				fileExt.equalsIgnoreCase("md") || //
-				fileExt.equalsIgnoreCase("less") || //
-				fileExt.equalsIgnoreCase("es6")) {
+				fileExt.equalsIgnoreCase("txt") || //
+				//
+				// Fonts
+				//
+				fileExt.equalsIgnoreCase("otf") || //
+				fileExt.equalsIgnoreCase("eot") || //
+				fileExt.equalsIgnoreCase("ttf") || //
+				fileExt.equalsIgnoreCase("woff") || //
+				fileExt.equalsIgnoreCase("woff2") || //
+				//
+				// Others?
+				//
+				false ) {
 				return true;
 			}
 			

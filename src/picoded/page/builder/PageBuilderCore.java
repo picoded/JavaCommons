@@ -1088,12 +1088,30 @@ public class PageBuilderCore {
 			dependencyGetSingleFile(toJMTEParse, path + "/depend.es6");
 			dependencyGetSingleFile(toJMTEParse, path + "/depend.js");
 		}
+		
+		//
+		// Process JMTE scripts
+		//
+		String[] fileList = depenencyConfig(path).getStringArray(type+"_jmte", "[]");
+		for (String filePath : fileList) {
+			// Parse any templates if need be
+			filePath = jmte.parseTemplate(filePath, jmteVars);
+			
+			// Changes relative path to fixed path
+			if (!filePath.startsWith("/")) {
+				filePath = FileUtils.normalize(rawPageName + "/" + filePath);
+			}
+			
+			// Get and inject, without JMTE parsing
+			dependencyGetSingleFile(toJMTEParse, filePath);
+		}
+		
 		res.append(jmte.parseTemplate(toJMTEParse.toString(), jmteVars));
 		
 		//
 		// Process non fitlered scripts
 		//
-		String[] fileList = depenencyConfig(path).getStringArray(type, "[]");
+		fileList = depenencyConfig(path).getStringArray(type, "[]");
 		for (String filePath : fileList) {
 			// Parse any templates if need be
 			filePath = jmte.parseTemplate(filePath, jmteVars);

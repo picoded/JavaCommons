@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 
 import picoded.conv.ConvertJSON;
+import picoded.fileUtils.FileUtils;
 import picoded.enums.HttpRequestType;
 import picoded.struct.HashMapList;
 
@@ -264,11 +265,11 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	/// Note this does any URL decoding if needed, use httpRequest.getPathInfo() for the raw wild card path
 	public String requestWildcardUri() {
 		try {
-			String path = httpRequest.getPathInfo();
+			String path = httpRequest.getPathInfo(); //no query values
 			if (path == null || path.isEmpty()) {
 				return null;
 			}
-			return URLDecoder.decode(path, "UTF-8").trim();
+			return FileUtils.normalize(URLDecoder.decode(path, "UTF-8").trim());
 		} catch (Exception e) {
 			return null;
 		}

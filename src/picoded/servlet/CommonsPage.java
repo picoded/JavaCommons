@@ -65,98 +65,108 @@ public class CommonsPage extends BasePage {
 		// WEB-INF security
 		//
 		if (wildcardUri.length >= 1) {
+			
+			//
+			// File name and extension extraction for future processing
+			//
+			String fileName = wildcardUri[wildcardUri.length - 1].toLowerCase();
+			String fileExt = FileUtils.getExtension( fileName );
+			
+			//
 			// Always deny WEB-INF path
+			//
 			if (wildcardUri[0].equalsIgnoreCase("WEB-INF") || wildcardUri[0].startsWith(".")) {
 				return false;
 			}
-		}
-		
-		//
-		// Common wildcard pattern
-		//
-		if (enableCommonWildcardAuth && wildcardUri.length >= 1) {
-			// Exempt login page from auth
-			if (wildcardUri[0].equalsIgnoreCase("login")) {
-				String logout = requestParameters().getString("logout");
-				
-				// Handle page logout event
-				if (logout != null && (logout.equalsIgnoreCase("1") || logout.equalsIgnoreCase("true"))) {
-					accountAuthTable().logoutAccount(getHttpServletRequest(), getHttpServletResponse());
-					sendRedirect((getContextURI() + "/login?logout_status=1").replaceAll("//", "/"));
-					return false;
-				}
-				
+			
+			// 
+			// Public files, grab it direct
+			//
+			if( fileName.equalsIgnoreCase("index.html") && (new File(getContextPath(), requestWildcardUri())).canRead() ) {
 				return true;
 			}
-			// Exempt common / index page from auth
-			if (wildcardUri[0].equalsIgnoreCase("common") || wildcardUri[0].equalsIgnoreCase("index")) {
-				return true;
-			}
-			// Exempt login API from auth
-			if (wildcardUri[0].equalsIgnoreCase("api")) {
-				if (wildcardUri.length >= 3 && wildcardUri[1].equalsIgnoreCase("account")
-					&& wildcardUri[2].equalsIgnoreCase("login")) {
+			
+			//
+			// Common wildcard pattern
+			//
+			if (enableCommonWildcardAuth) {
+				// Exempt login page from auth
+				if (wildcardUri[0].equalsIgnoreCase("login")) {
+					String logout = requestParameters().getString("logout");
+					
+					// Handle page logout event
+					if (logout != null && (logout.equalsIgnoreCase("1") || logout.equalsIgnoreCase("true"))) {
+						accountAuthTable().logoutAccount(getHttpServletRequest(), getHttpServletResponse());
+						sendRedirect((getContextURI() + "/login?logout_status=1").replaceAll("//", "/"));
+						return false;
+					}
+					
 					return true;
 				}
+				// Exempt common / index page from auth
+				if (wildcardUri[0].equalsIgnoreCase("common") || wildcardUri[0].equalsIgnoreCase("index")) {
+					return true;
+				}
+				// Exempt login API from auth
+				if (wildcardUri[0].equalsIgnoreCase("api")) {
+					if (wildcardUri.length >= 3 && wildcardUri[1].equalsIgnoreCase("account")
+						&& wildcardUri[2].equalsIgnoreCase("login")) {
+						return true;
+					}
+					
+					// Throw a login error
+					if (currentAccount() == null) {
+						
+						getHttpServletResponse().setContentType("application/javascript");
+						getWriter().println("{ \"error\" : \"Missing User Login\" }");
+						
+						return false;
+					}
+				}
 				
-				// Throw a login error
-				if (currentAccount() == null) {
-					
-					getHttpServletResponse().setContentType("application/javascript");
-					getWriter().println("{ \"error\" : \"Missing User Login\" }");
-					
-					return false;
+				// Allow common asset files types
+				if ( //
+					//
+					// HTML, JS, CSS
+					//
+					fileExt.equalsIgnoreCase("html") || //
+					fileExt.equalsIgnoreCase("js") || //
+					fileExt.equalsIgnoreCase("css") || //
+					fileExt.equalsIgnoreCase("less") || //
+					fileExt.equalsIgnoreCase("scss") || //
+					fileExt.equalsIgnoreCase("es6") ||
+					//
+					// Images
+					//
+					fileExt.equalsIgnoreCase("png") || //
+					fileExt.equalsIgnoreCase("jpg") || //
+					fileExt.equalsIgnoreCase("jpeg") || //
+					fileExt.equalsIgnoreCase("gif") || //
+					fileExt.equalsIgnoreCase("svg") || //
+					//
+					// PDF
+					//
+					fileExt.equalsIgnoreCase("pdf") || //
+					//
+					// Markdown, text
+					//
+					fileExt.equalsIgnoreCase("md") || //
+					fileExt.equalsIgnoreCase("txt") || //
+					//
+					// Fonts
+					//
+					fileExt.equalsIgnoreCase("otf") || //
+					fileExt.equalsIgnoreCase("eot") || //
+					fileExt.equalsIgnoreCase("ttf") || //
+					fileExt.equalsIgnoreCase("woff") || //
+					fileExt.equalsIgnoreCase("woff2") || //
+					//
+					// Others?
+					//
+					false ) {
+					return true;
 				}
 			}
-			
-			// File exemptions
-			String fileStr = wildcardUri[wildcardUri.length - 1].toLowerCase();
-			String[] fileStrArr = fileStr.split("\\.");
-			String fileExt = fileStrArr[fileStrArr.length - 1];
-			
-			// Allow common asset files types
-			if ( //
-				//
-				// HTML, JS, CSS
-				//
-				fileExt.equalsIgnoreCase("html") || //
-				fileExt.equalsIgnoreCase("js") || //
-				fileExt.equalsIgnoreCase("css") || //
-				fileExt.equalsIgnoreCase("less") || //
-				fileExt.equalsIgnoreCase("scss") || //
-				fileExt.equalsIgnoreCase("es6") ||
-				//
-				// Images
-				//
-				fileExt.equalsIgnoreCase("png") || //
-				fileExt.equalsIgnoreCase("jpg") || //
-				fileExt.equalsIgnoreCase("jpeg") || //
-				fileExt.equalsIgnoreCase("gif") || //
-				fileExt.equalsIgnoreCase("svg") || //
-				//
-				// PDF
-				//
-				fileExt.equalsIgnoreCase("pdf") || //
-				//
-				// Markdown, text
-				//
-				fileExt.equalsIgnoreCase("md") || //
-				fileExt.equalsIgnoreCase("txt") || //
-				//
-				// Fonts
-				//
-				fileExt.equalsIgnoreCase("otf") || //
-				fileExt.equalsIgnoreCase("eot") || //
-				fileExt.equalsIgnoreCase("ttf") || //
-				fileExt.equalsIgnoreCase("woff") || //
-				fileExt.equalsIgnoreCase("woff2") || //
-				//
-				// Others?
-				//
-				false ) {
-				return true;
-			}
-			
 		}
 		
 		// Redirect to login, if current login is not valid

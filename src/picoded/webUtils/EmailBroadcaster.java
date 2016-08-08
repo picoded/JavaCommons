@@ -52,15 +52,6 @@ public class EmailBroadcaster {
 	public EmailBroadcaster(final String smtpUrl, final String username, final String password,
 		final String fromAddress, boolean isSSL, boolean enableSTARTTLS) {
 
-		//DEBUG
-		System.out.println("Setting up emailbroadcaster with smtpUrl: "+smtpUrl);
-		System.out.println("Setting up emailbroadcaster with username: "+username);
-		System.out.println("Setting up emailbroadcaster with password: "+password);
-		System.out.println("Setting up emailbroadcaster with fromAddress: "+fromAddress);
-		System.out.println("Setting up emailbroadcaster with isSSL: "+isSSL);
-		System.out.println("Setting up emailbroadcaster with enableSTARTTLS: "+enableSTARTTLS);
-		//DEBUG
-
 		fromEmail = fromAddress;
 		Properties props = new Properties();
 

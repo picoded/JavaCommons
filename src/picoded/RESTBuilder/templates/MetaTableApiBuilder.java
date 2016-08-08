@@ -801,6 +801,9 @@ public class MetaTableApiBuilder {
 		rb.getNamespace(setPrefix + "meta").put(HttpRequestType.DELETE, meta_DELETE);
 		rb.getNamespace(setPrefix + "meta.*").put(HttpRequestType.DELETE, meta_DELETE);
 		
+		rb.getNamespace(setPrefix + "keyNames").put(HttpRequestType.GET, keyNames_GET);
+		rb.getNamespace(setPrefix + "keyNames").put(HttpRequestType.POST, keyNames_GET);
+		
 		rb.getNamespace(setPrefix + "csv").put(HttpRequestType.GET, csv_export);
 		rb.getNamespace(setPrefix + "csv").put(HttpRequestType.POST, csv_export);
 		

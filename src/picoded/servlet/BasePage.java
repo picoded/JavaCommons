@@ -334,6 +334,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	/// BasePage initializeContext to be extended / build on
 	@Override
 	public void initializeContext() throws Exception {
+		super.initializeContext();
 		accountAuthTableSetup();
 	}
 	

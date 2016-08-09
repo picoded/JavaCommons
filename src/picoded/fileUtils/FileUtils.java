@@ -2,9 +2,14 @@ package picoded.fileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+
 
 /// Replace with apache StringUtils?
 import com.mysql.jdbc.StringUtils;
@@ -145,6 +150,27 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/// @param folder to scan and copy from
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir) throws IOException {
+		copyDirectory_ifDifferent(inDir, outDir, true);
+	}
+	
+ 	///
+	/// Recursively copy all directories, and files only if the file content is different
+	///
+	/// @TODO : Implmenent the existing file checks, ignoring if it has same content
+	///
+	/// @param folder to scan and copy from
+	///
+	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate) throws IOException {
+		copyDirectory_ifDifferent(inDir, outDir, preserveFileDate, true);
+	}
+	///
+	/// Recursively copy all directories, and files only if the file content is different
+	///
+	/// @TODO : Implmenent the existing file checks, ignoring if it has same content
+	///
+	/// @param folder to scan and copy from
+	///
+	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate, boolean tryToUseSymLink) throws IOException {
 		if (inDir == null || outDir == null) {
 			new IOException("Invalid directory");
 		}
@@ -153,13 +179,24 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 			File infile = dir_inDir[i];
 			if (infile.isFile()) {
 				File outfile = new File(outDir, infile.getName());
-				copyFile_ifDifferent(infile, outfile);
+				copyFile_ifDifferent(infile, outfile, preserveFileDate, tryToUseSymLink);
+				
 			} else if (infile.isDirectory()) {
 				File newOutDir = new File(outDir.getAbsolutePath() + File.separator + infile.getName());
 				newOutDir.mkdir();
-				copyDirectory_ifDifferent(infile, newOutDir);
+				copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToUseSymLink);
 			}
 		}
+	}
+	///
+	/// Recursively copy all directories, and files only if the file content is different
+	///
+	/// @TODO : Implmenent the existing file checks, ignoring if it has same content
+	///
+	/// @param file to scan and copy from
+	///
+	public static void copyFile_ifDifferent(File inFile, File outFile) throws IOException {
+		copyFile_ifDifferent(inFile, outFile, true);
 	}
 	
 	///
@@ -169,9 +206,35 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	///
 	/// @param file to scan and copy from
 	///
-	public static void copyFile_ifDifferent(File inFile, File outFile) throws IOException {
-		if (!FileUtils.contentEqualsIgnoreEOL(inFile, outFile, null)) {
-			copyFile(inFile, outFile);
+	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate) throws IOException {
+		copyFile_ifDifferent(inFile, outFile, preserveFileDate, true);
+	}
+	///
+	/// Recursively copy all directories, and files only if the file content is different
+	///
+	/// @TODO : Implmenent the existing file checks, ignoring if it has same content
+	///
+	/// @param file to scan and copy from
+	///
+	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToUseSymLink) throws IOException {
+		if(tryToUseSymLink){
+			try {
+				if(!Files.isSymbolicLink(inFile.toPath())){
+					Files.createSymbolicLink(Paths.get(inFile.getAbsolutePath()), Paths.get(outFile.getAbsolutePath()), new FileAttribute<?>[0]);
+				}
+				if(!Files.isSymbolicLink(outFile.toPath())){
+					Files.createSymbolicLink(Paths.get(inFile.getAbsolutePath()), Paths.get(outFile.getAbsolutePath()), new FileAttribute<?>[0]);
+				}
+				if(Files.readSymbolicLink(inFile.toPath()).toUri().equals(Files.readSymbolicLink(outFile.toPath()).toUri())){
+					return;
+				}
+			} catch (IOException e) {
+			}
+			if(inFile.lastModified()!= outFile.lastModified() && inFile.length() != outFile.length()){
+				if (!FileUtils.contentEqualsIgnoreEOL(inFile, outFile, null)) {
+					copyFile(inFile, outFile, preserveFileDate);
+				}
+			}
 		}
 	}
 	

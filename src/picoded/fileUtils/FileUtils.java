@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -161,7 +162,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/// @param folder to scan and copy from
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate) throws IOException {
-		copyDirectory_ifDifferent(inDir, outDir, preserveFileDate, true);
+		copyDirectory_ifDifferent(inDir, outDir, preserveFileDate, false); //default symlink is false : This is considered advance behaviour
 	}
 	///
 	/// Recursively copy all directories, and files only if the file content is different
@@ -207,7 +208,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/// @param file to scan and copy from
 	///
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate) throws IOException {
-		copyFile_ifDifferent(inFile, outFile, preserveFileDate, true);
+		copyFile_ifDifferent(inFile, outFile, preserveFileDate, false); //default symlink is false : This is considered advance behaviour
 	}
 	///
 	/// Recursively copy all directories, and files only if the file content is different
@@ -217,24 +218,56 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/// @param file to scan and copy from
 	///
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToUseSymLink) throws IOException {
-		if(tryToUseSymLink){
-			try {
-				if(!Files.isSymbolicLink(inFile.toPath())){
-					Files.createSymbolicLink(Paths.get(inFile.getAbsolutePath()), Paths.get(outFile.getAbsolutePath()), new FileAttribute<?>[0]);
-				}
-				if(!Files.isSymbolicLink(outFile.toPath())){
-					Files.createSymbolicLink(Paths.get(inFile.getAbsolutePath()), Paths.get(outFile.getAbsolutePath()), new FileAttribute<?>[0]);
-				}
-				if(Files.readSymbolicLink(inFile.toPath()).toUri().equals(Files.readSymbolicLink(outFile.toPath()).toUri())){
+		
+		try {
+			// Checks if the output file is already a symbolic link
+			// And if its valid. And since both is pratically the same 
+			// final file when linked, the file is considered "not different"
+			//------------------------------------------------------------
+			if(Files.isSymbolicLink(outFile.toPath())) {
+				// Gets the symbolic link source file path, and checks if it points to source file.
+				// See: http://stackoverflow.com/questions/29368308/java-nio-how-is-path-issamefile-different-from-path-equals
+				// for why is `Files.isSameFile()` used
+				if( Files.isSameFile( Files.readSymbolicLink(outFile.toPath()), inFile.toPath() ) ) {
+					// If it points to the same file, the symbolic link is valid
+					// No copy operations is required.
 					return;
 				}
-			} catch (IOException e) {
 			}
+			
+			// Tries to build symlink if possible, hopefully
+			if(tryToUseSymLink){
+				// NOTE: You do not test source file for symbolic link
+				// Only the detination file should be a symbolic link.
+				//------------------------------------------------------------
+				//if(!Files.isSymbolicLink(inFile.toPath())){
+				//	Files.createSymbolicLink(Paths.get(inFile.getAbsolutePath()), Paths.get(outFile.getAbsolutePath()), new FileAttribute<?>[0]);
+				//}
+				
+				// Assumes output file is either NOT a symbolic link
+				// or has the wrong symbolic link reference.
+				//
+				// Creates a symbolic link of the outfile, 
+				// relative to the in file (if possible)
+				//------------------------------------------------------------
+				Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath().toAbsolutePath());
+			}
+		} catch (Exception e) {
+			// Silence the error 
+			// Uses fallback behaviour of copying the file if it occurs
 		}
-		if(inFile.lastModified()!= outFile.lastModified() && inFile.length() != outFile.length()){
-			if (!FileUtils.contentEqualsIgnoreEOL(inFile, outFile, null)) {
-				copyFile(inFile, outFile, preserveFileDate);
-			}
+		
+		// Checks if file has not been modified, and has same data length, for skipping?
+		//---------------------------------------------------------------------------------
+		if(inFile.lastModified() == outFile.lastModified() && inFile.length() == outFile.length()){
+			// returns and skip for optimization
+			return; 
+		}
+		
+		// Final fallback behaviour, copies file if content differs.
+		//---------------------------------------------------------------------------------
+		if (!FileUtils.contentEqualsIgnoreEOL(inFile, outFile, null)) {
+			copyFile(inFile, outFile, preserveFileDate);
 		}
 	}
 	

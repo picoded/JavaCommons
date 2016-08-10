@@ -230,10 +230,10 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 				}
 			} catch (IOException e) {
 			}
-			if(inFile.lastModified()!= outFile.lastModified() && inFile.length() != outFile.length()){
-				if (!FileUtils.contentEqualsIgnoreEOL(inFile, outFile, null)) {
-					copyFile(inFile, outFile, preserveFileDate);
-				}
+		}
+		if(inFile.lastModified()!= outFile.lastModified() && inFile.length() != outFile.length()){
+			if (!FileUtils.contentEqualsIgnoreEOL(inFile, outFile, null)) {
+				copyFile(inFile, outFile, preserveFileDate);
 			}
 		}
 	}

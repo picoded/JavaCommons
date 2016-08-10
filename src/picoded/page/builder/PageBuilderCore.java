@@ -743,7 +743,7 @@ public class PageBuilderCore {
 			File pageAssetsFolder = new File(definitionFolder, "assets");
 			if (pageAssetsFolder.exists() && pageAssetsFolder.isDirectory()) {
 				// Copy if folder to target
-				FileUtils.copyDirectory_ifDifferent(pageAssetsFolder, new File(outputPageFolder, "assets"));
+				FileUtils.copyDirectory_ifDifferent(pageAssetsFolder, new File(outputPageFolder, "assets"), true, true);
 				hasAssets = true;
 			}
 			
@@ -769,7 +769,7 @@ public class PageBuilderCore {
 				File outFile = new File(outputPageFolder, fileName);
 				
 				// Copy over the file
-				FileUtils.copyFile_ifDifferent(inFile, outFile);
+				FileUtils.copyFile_ifDifferent(inFile, outFile, true, true);
 				
 				// Ignore conversions on certain same filepath - name (legacy files)
 				if (rawPageName.equalsIgnoreCase(baseName)) {
@@ -794,8 +794,8 @@ public class PageBuilderCore {
 				// Ignore hidden files, or index based files
 				String fileName = inFile.getName();
 				
-				// Ignore protected folders
-				if (fileName.startsWith(".")) {
+				// Ignore protected folders, ignore already copied assets folder
+				if (fileName.startsWith(".") || fileName.equalsIgnoreCase("WEB-INF") || fileName.equalsIgnoreCase("assets")) {
 					continue;
 				}
 				
@@ -805,7 +805,7 @@ public class PageBuilderCore {
 					File outFile = new File(outputPageFolder, fileName);
 					
 					// Copy over the file
-					FileUtils.copyDirectory_ifDifferent(inFile, outFile);
+					FileUtils.copyDirectory_ifDifferent(inFile, outFile, true, true);
 				}
 			}
 			

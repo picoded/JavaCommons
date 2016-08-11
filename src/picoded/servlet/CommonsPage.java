@@ -38,6 +38,8 @@ import picoded.RESTBuilder.templates.*;
 import picoded.webUtils.*;
 import picoded.webTemplateEngines.JSML.*;
 import picoded.page.builder.*;
+import picoded.struct.GenericConvertMap;
+import picoded.struct.GenericConvertHashMap;
 
 ///
 /// Does all the standard USER API, Pages, and forms setup
@@ -254,23 +256,21 @@ public class CommonsPage extends BasePage {
 		}
 
 		// Gets the configuration setup
-		JConfig jc = JConfig();
-		boolean sysSmtp = jc.getBoolean("sys.dataStack.smtp.enabled", true);
+		boolean sysSmtp = JConfigObj.getBoolean("sys.dataStack.smtp.enabled", true);
 
 		// Returns null if disabled
 		if (sysSmtp == false) {
 			return null;
 		}
 
-		// Get hostname, user, pass, and from account
-		String hostname = JConfigObj.getString("sys.dataStack.smtp.host", "smtp.mailinator.com:25");
-		String username = JConfigObj.getString("sys.dataStack.smtp.username", "");
-		String password = JConfigObj.getString("sys.dataStack.smtp.password", "");
-		String emailFrom = JConfigObj.getString("sys.dataStack.smtp.emailFrom", "testingTheEmailSystem@mailinator.com");
-		boolean isSSL = JConfigObj.getBoolean("sys.dataStack.smtp.ssl", false);
-		boolean enableSTARTTLS = JConfigObj.getBoolean("sys.dataStack.smtp.starttls", false);
+		GenericConvertMap<String, Object> smtpConfigMap = JConfigObj.getGenericConvertStringMap("sys.dataStack.smtp", null);
 
-		return (_systemEmail = new EmailBroadcaster(hostname, username, password, emailFrom, isSSL, enableSTARTTLS));
+		if(smtpConfigMap == null){
+			System.out.println("smtpConfigMap is null");
+			smtpConfigMap = new GenericConvertHashMap<String, Object>();
+		}
+
+		return (_systemEmail = new EmailBroadcaster(smtpConfigMap));
 	}
 
 	/// Cached memoizer copy

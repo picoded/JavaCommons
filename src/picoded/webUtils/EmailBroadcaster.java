@@ -11,11 +11,18 @@ import javax.mail.Message.RecipientType;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.Folder;
+import javax.mail.Flags.Flag;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+
+import picoded.struct.GenericConvertMap;
+import picoded.struct.GenericConvertHashMap;
+import picoded.struct.ProxyGenericConvertMap;
 
 ///
 /// Email broad casting module, used to send out emails =)
@@ -90,6 +97,61 @@ public class EmailBroadcaster {
 
 	}
 
+	public EmailBroadcaster(GenericConvertMap<String, Object> inSmtpConfigMap) {
+		GenericConvertMap<String, Object> smtpConfigMap = ProxyGenericConvertMap.ensureGenericConvertMap(inSmtpConfigMap);
+
+		if(smtpConfigMap == null){
+			System.out.println("EmailBroadcaster -> smtpConfigMap is null");
+			return;
+		}
+
+		fromEmail = smtpConfigMap.getString("emailFrom", "");
+
+		String smtpUrl = smtpConfigMap.getString("host", "");
+		String[] parts = smtpUrl.split(":");
+
+		Properties props = new Properties();
+		props.put("mail.transport.protocol", "smtp");
+
+		String smtpAdd = parts[0];
+		props.put("mail.smtp.host", smtpAdd);
+
+		String smtpPort = (parts.length > 1) ? parts[1] : "465";
+		props.put("mail.smtp.port", smtpPort);
+
+		boolean enableSTARTTLS = smtpConfigMap.getBoolean("starttls", false);
+		if ((smtpAdd.contains("gmail") || smtpAdd.contains("live.com")) || enableSTARTTLS) {
+			props.put("mail.smtp.starttls.enable", "true");
+		}
+
+		boolean isSSL = smtpConfigMap.getBoolean("ssl", false);
+		if (isSSL) {
+			props.put("mail.smtp.socketFactory.port", smtpPort);
+			props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		}
+
+		String username = smtpConfigMap.getString("username", "");
+		String password = smtpConfigMap.getString("password", "");
+		if (username != null && username.trim().length() > 0) {
+			props.put("mail.smtp.auth", "true");
+			session = Session.getInstance(props, new javax.mail.Authenticator() {
+				protected PasswordAuthentication getPasswordAuthentication() {
+					return new PasswordAuthentication(username, password);
+				}
+			});
+		} else {
+			props.put("mail.smtp.auth", "false");
+			props.put("mail.smtp.auth.login.disable", "true");
+
+			session = Session.getInstance(props, null);
+		}
+
+
+
+		System.out.println("Finished setting up emailbroadcaster object");
+
+	}
+
 	///
 	/// Full featured sendEmail function, all other "overloaded" functions are convinence functiosn based on this
 	///
@@ -102,9 +164,14 @@ public class EmailBroadcaster {
 	/// @params  Overwrite default, "from address"
 	///
 	public boolean sendEmail(String subject, String htmlContent, String toAddresses[], String ccAddresses[],
-		String bccAddresses[], Map<String, String> fileAttachments, String fromAddress) throws Exception {
+		String bccAddresses[], Map<String, String> fileAttachments, String fromAddress, Map<String, Object> inextraSendOptions) throws Exception {
 		// Actual message contianer used by the function
 		MimeMessage message = new MimeMessage(session);
+
+		if(inextraSendOptions == null){
+			inextraSendOptions = new HashMap<String, Object>();
+		}
+		GenericConvertMap<String, Object> extraSendOptions = ProxyGenericConvertMap.ensureGenericConvertMap(inextraSendOptions);
 
 		// Process "FROM" address field
 		if (fromAddress != null) {
@@ -178,6 +245,35 @@ public class EmailBroadcaster {
 		//Sends the message
 		Transport.send(message);
 
+		//copy to sent items folder?
+		boolean saveSentEmail = extraSendOptions.getBoolean("saveSentEmail", false);
+		if(saveSentEmail){
+			String smtpUrl = extraSendOptions.getString("host", "");
+			String username = extraSendOptions.getString("username", "");
+			String password = extraSendOptions.getString("password", "");
+			String[] parts = smtpUrl.split(":");
+			String smtpAdd = parts[0];
+			// String smtpPort = (parts.length > 1) ? parts[1] : "465";
+
+			Store store = session.getStore("imap");
+			store.connect(smtpAdd, username, password);
+
+			String sentFolderName = extraSendOptions.getString("sentFolderName", "Sent Items");
+			if(sentFolderName == null){
+				System.out.println("Reverting to default sent items folder name");
+				sentFolderName = "Sent Items";
+			}
+
+			Folder folder = store.getFolder(sentFolderName);
+			folder.open(Folder.READ_WRITE);
+			boolean markAsSeen = extraSendOptions.getBoolean("markAsSeen", false);
+			if(markAsSeen){
+				message.setFlag(Flag.SEEN, true);
+			}
+			folder.appendMessages(new MimeMessage[] {message});
+			store.close();
+		}
+
 		return true;
 	}
 
@@ -203,4 +299,9 @@ public class EmailBroadcaster {
 			fileAttachments, null);
 	}
 
+	/// Shorten convinence function (does not need testing, test the core function directly instead)
+	public boolean sendEmail(String subject, String htmlContent, String toAddresses[], String ccAddresses[],
+		String bccAddresses[], HashMap<String, String> fileAttachments, Map<String, Object> inextraSendOptions) throws Exception {
+		return sendEmail(subject, htmlContent, toAddresses, ccAddresses, bccAddresses, fileAttachments, null, inextraSendOptions);
+	}
 }

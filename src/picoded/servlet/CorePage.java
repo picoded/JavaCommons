@@ -282,11 +282,11 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 			return null;
 		}
 
-		if (raw.startsWith("/") || raw.startsWith("\\\\")) {
+		if (raw.startsWith("/") || raw.startsWith("\\")) {
 			raw = raw.substring(1);
 		}
 
-		if (raw.endsWith("/") || raw.endsWith("\\\\")) {
+		if (raw.endsWith("/") || raw.endsWith("\\")) {
 			raw = raw.substring(0, raw.length() - 1);
 		}
 

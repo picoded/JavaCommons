@@ -51,6 +51,9 @@ public class PageBuilderCore {
 	/// Component filter utility
 	protected PageComponentFilter componentFilter = null;
 	
+	/// Utility functions
+	protected PageBuilderUtil util = null;
+	
 	////////////////////////////////////////////////////////////
 	//
 	// Constructor
@@ -63,8 +66,7 @@ public class PageBuilderCore {
 	/// @param The various page definition folder
 	///
 	public PageBuilderCore(File inPageFolder) {
-		pageFolder = inPageFolder;
-		componentFilter = new PageComponentFilter(this);
+		this(inPageFolder, (File)null);
 	}
 	
 	///
@@ -86,6 +88,7 @@ public class PageBuilderCore {
 		pageFolder = inPageFolder;
 		outputFolder = inOutputFolder;
 		componentFilter = new PageComponentFilter(this);
+		util = new PageBuilderUtil(this);
 	}
 	
 	///
@@ -139,6 +142,7 @@ public class PageBuilderCore {
 	////////////////////////////////////////////////////////////
 	//
 	// Utility functions
+	// @TODO : Migrate all these functions over to PageBuilderUtil class
 	//
 	////////////////////////////////////////////////////////////
 	
@@ -164,6 +168,8 @@ public class PageBuilderCore {
 	}
 	
 	/// Utility to get page frame ID : legacy format specific to IFAM (to phase out)
+	///
+	/// @TODO Drop eventually after everything is migrated into the new system
 	///
 	/// @param  rawPageName used to generate the vars
 	///
@@ -734,8 +740,6 @@ public class PageBuilderCore {
 			}
 			
 			// Copy the page assets folder
-			//
-			// @TODO: Optimize this to only copy IF newer
 			//-------------------------------------------------------------------
 			
 			// Folder to copy from
@@ -748,8 +752,6 @@ public class PageBuilderCore {
 			}
 			
 			// Copy out all the various other files
-			//
-			// @TODO: Optimize this to only copy IF newer
 			//
 			// Ignores: index files (as of now)
 			//-------------------------------------------------------------------
@@ -778,13 +780,9 @@ public class PageBuilderCore {
 				
 				// Less and es6 specific conversion
 				if (fileExtn.equalsIgnoreCase("less")) {
-					String fileVal = FileUtils.readFileToString_withFallback(inFile, "");
-					fileVal = less.compile(fileVal);
-					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName + ".css"), fileVal);
+					util.compileFileIfNewer(fileExtn, inFile, new File(outputPageFolder, baseName + ".css"));
 				} else if (fileExtn.equalsIgnoreCase("es6")) {
-					String fileVal = FileUtils.readFileToString_withFallback(inFile, "");
-					fileVal = CompileES6.compile(fileVal, fileName);
-					FileUtils.writeStringToFile_ifDifferant(new File(outputPageFolder, baseName + ".js"), fileVal);
+					util.compileFileIfNewer(fileExtn, inFile, new File(outputPageFolder, baseName + ".js"));
 				}
 			}
 			

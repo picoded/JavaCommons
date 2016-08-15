@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import picoded.conv.*;
 import picoded.enums.HttpRequestType;
+import picoded.conv.CompileES6;
 
 /**
  * picoded.servlet.RESTBuilder is a servlet utility class, in which facilitates the building of "RESTful API's"
@@ -36,8 +37,6 @@ import picoded.enums.HttpRequestType;
  *
  * Simply put, if a standardised REST API builder was built and used, several page API features can be called directly
  * instead of being usued via a proxy
- *
- * STATUS: PROOF OF CONCEPT, for method adding, and direct calling
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.java}
  * // Function to add to API
@@ -310,32 +309,53 @@ public class RESTBuilder {
 	/// + u : URL
 	/// + t : URL request type "POST" / "GET"
 	/// + p : The request parameters
-	/// + c : The request call back, calls with ( return, argument, error )
+	/// + c : The request call back, calls with ( return )
 	protected static String xmlHttpJS(String functionName) {
 		return "" + //
-			"function " + functionName + "(u,t,p,c) { " + // The function name
-			"if(c === undefined) { " + // Default undefined behavious, is to console log the return data
-			"c = function() { console.log(arguments); }; " + //
-			"} " + //
-			"if(c == null) { " + // Ensures that even there is no callback, it is handled "gracefully"
-			"c = function() { }; " + //
-			"} " + //
+			"function " + functionName + "(url,type,params,callbck) { " +
+			"	/* Default undefined behavious, is to console log the return data */ "+
+			"	if(callbck === undefined) { " + 
+			"		callbck = function() { console.log(url, type, param, res); }; " +
+			"	} " + 
 			//----------------------------------------------------------------------------
-			// JQuery varient
+			// JQuery varient : Promise returns
 			//----------------------------------------------------------------------------
-			"$.ajax({ " + //
-			"url: u, " + //
-			"type: t, " + //
-			"data: p, " + //
-			//
-			"dataType: 'json', " + //
-			"cache: false, " + //
-			//
-			"xhrFields: { withCredentials:true }, " +
-			//
-			"success: function(d){ c(d,p,null); }, " + //
-			"error: function(j,s,t){ c(null,p, s+' - '+t, s, t); } " + //
-			" }); " + //
+			"	return new Promise(function(good,bad) { "+
+			"		$.ajax({ "+
+			"			url:url, type:type, data:param, "+
+			"			dataType:'json', cache:false, "+
+			"			xhrFields: { withCredentials:true }, "+
+			"			success: function(d) { "+
+			"				if(d.error) { "+
+			"					bad('200 - '+d.error); "+
+			"					return; "+
+			"				} "+
+			"				good(d); "+
+			"			}, "+
+			"			error: function(jqxhr, status, error) { "+
+			"				bad(status+' - '+error);"+
+			"			} "+
+			"		}); "+
+			"	}); "+
+			//----------------------------------------------------------------------------
+			// JQuery varient (old)
+			//----------------------------------------------------------------------------
+			// "if(c == null) { " + // Ensures that even there is no callback, it is handled "gracefully"
+			// "c = function() { }; " + //
+			// "} " + //
+			// "$.ajax({ " + //
+			// "url: u, " + //
+			// "type: t, " + //
+			// "data: p, " + //
+			// //
+			// "dataType: 'json', " + //
+			// "cache: false, " + //
+			// //
+			// "xhrFields: { withCredentials:true }, " +
+			// //
+			// "success: function(d){ c(d,p,null); }, " + //
+			// "error: function(j,s,t){ c(null,p, s+' - '+t, s, t); } " + //
+			// " }); " + //
 			//
 			//----------------------------------------------------------------------------
 			// Experimental XMLHttpRequest varient (incomplete -> TODO), 
@@ -364,7 +384,7 @@ public class RESTBuilder {
 		if (baseURL == null) {
 			baseURL = "";
 		}
-		while (baseURL.length() > 0 && baseURL.lastIndexOf("/") == (baseURL.length() - 1)) {
+		while ( baseURL.length() > 0 && baseURL.endsWith("/") ) {
 			baseURL = baseURL.substring(0, baseURL.length() - 1);
 		}
 		
@@ -478,6 +498,6 @@ public class RESTBuilder {
 		ret.append("return ret; ") //
 			.append("})()); ");
 		
-		return ret.toString();
+		return CompileES6.compile(ret.toString());
 	}
 }

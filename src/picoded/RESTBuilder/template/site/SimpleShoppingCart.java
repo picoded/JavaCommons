@@ -101,9 +101,33 @@ public class SimpleShoppingCart {
 		}
 		return res;
 	};
-	
-	
-	
+
+	///
+	/// # cart (GET/POST) 
+	///
+	/// Gets / Updates the current shopping cart stored inside the cookie "cart" parameter
+	///
+	/// ## HTTP Request Parameters (Optional)
+	///
+	/// +-----------------+-------------------------+-----------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	        | Description                                                     |
+	/// +-----------------+-------------------------+-----------------------------------------------------------------+
+	/// | update          | String[[ID,count]]      | Shopping item ID, and count to add/edit/delete (when count=0)   |
+	/// | simple          | boolean                 | Ignore cart content meta, and its checks                        |
+	/// +-----------------+-------------------------+-----------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-------------------------+-----------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	        | Description                                                     |
+	/// +-----------------+-------------------------+-----------------------------------------------------------------+
+	/// | cart            | String[[ID,count,meta]] | Shopping cart content with item ID, count, and content          |
+	/// | itemCount       | Integer                 | Number of unique item ID inside the cart                        |
+	/// | quantityCount   | Integer                 | Total quantity of items                                         |
+	/// +-----------------+-------------------------+-----------------------------------------------------------------+
+	/// | error           | String (Optional)       | Errors encounted if any                                         |
+	/// +-----------------+-------------------------+-----------------------------------------------------------------+
+	///
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//

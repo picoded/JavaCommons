@@ -313,16 +313,18 @@ public class RESTBuilder {
 	protected static String xmlHttpJS(String functionName) {
 		return "" + //
 			"function " + functionName + "(url,type,params,callbck) { " +
-			"	/* Default undefined behavious, is to console log the return data */ "+
+			//----------------------------------------------------------------------------
+			// Default callback handling / logging
+			//----------------------------------------------------------------------------
 			"	if(callbck === undefined) { " + 
-			"		callbck = function() { console.log(url, type, param, res); }; " +
+			"		callbck = function(res) { console.log(url, type, params, res); }; " +
 			"	} " + 
 			//----------------------------------------------------------------------------
 			// JQuery varient : Promise returns
 			//----------------------------------------------------------------------------
-			"	return new Promise(function(good,bad) { "+
+			"	var ret = new Promise(function(good,bad) { "+
 			"		$.ajax({ "+
-			"			url:url, type:type, data:param, "+
+			"			url:url, type:type, data:params || {}, "+
 			"			dataType:'json', cache:false, "+
 			"			xhrFields: { withCredentials:true }, "+
 			"			success: function(d) { "+
@@ -337,6 +339,8 @@ public class RESTBuilder {
 			"			} "+
 			"		}); "+
 			"	}); "+
+			"	if(callbck) { ret.then(callbck); } "+
+			"	return ret; "+
 			//----------------------------------------------------------------------------
 			// JQuery varient (old)
 			//----------------------------------------------------------------------------

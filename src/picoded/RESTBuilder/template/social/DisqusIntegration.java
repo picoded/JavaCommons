@@ -4,6 +4,6 @@ import picoded.RESTBuilder.RESTBuilder;
 import picoded.RESTBuilder.RESTFunction;
 import picoded.enums.HttpRequestType;
 
-public class DisqusIntegrationApiBuilder {
+public class DisqusIntegration {
 	
 }

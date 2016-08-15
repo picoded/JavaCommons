@@ -194,7 +194,7 @@ public class KeyValueMapApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | map          | Map<String, String>| Returns current mappings                                                      |
+	/// | map             | Map<String, String>| Returns current mappings                                                      |
 	/// | error           | String             | Errors, if any                                                                |
 	/// | exceptionMsg    | String             | Exception message, if any                                                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -263,7 +263,7 @@ public class KeyValueMapApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | map          | Map<String, String>| Returns current mappings                                                      |
+	/// | map             | Map<String, String>| Returns current mappings                                                      |
 	/// | error           | String             | Errors, if any                                                                |
 	/// | exceptionMsg    | String             | Exception message, if any                                                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -311,7 +311,7 @@ public class KeyValueMapApiBuilder {
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	   | Description                                                                   |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | map          | Map<String, String>| Returns current mappings                                                      |
+	/// | map             | Map<String, String>| Returns current mappings                                                      |
 	/// | error           | String             | Errors, if any                                                                |
 	/// | exceptionMsg    | String             | Exception message, if any                                                     |
 	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -393,19 +393,19 @@ public class KeyValueMapApiBuilder {
 	public RESTBuilder setupRESTBuilder(RESTBuilder rb, String setPrefix) {
 		
 		//Get entire mapping
-		rb.getNamespace(setPrefix + "getMap").put(HttpRequestType.GET, getMap);
+		rb.getNamespace(setPrefix + "map").put(HttpRequestType.GET, getMap);
 		
 		//Get values
-		rb.getNamespace(setPrefix + "getValue").put(HttpRequestType.GET, getValue);
-		rb.getNamespace(setPrefix + "getValues").put(HttpRequestType.GET, getValues);
+		rb.getNamespace(setPrefix + "value").put(HttpRequestType.GET, getValue);
+		rb.getNamespace(setPrefix + "valueList").put(HttpRequestType.GET, getValues);
 		
 		//Set values
-		rb.getNamespace(setPrefix + "setValue").put(HttpRequestType.POST, setValue);
-		rb.getNamespace(setPrefix + "setValues").put(HttpRequestType.POST, setValues);
+		rb.getNamespace(setPrefix + "value").put(HttpRequestType.POST, setValue);
+		rb.getNamespace(setPrefix + "valueList").put(HttpRequestType.POST, setValues);
 		
 		//Delete mappings
-		rb.getNamespace(setPrefix + "deleteValue").put(HttpRequestType.POST, deleteValue);
-		rb.getNamespace(setPrefix + "deleteValues").put(HttpRequestType.POST, deleteValues);
+		rb.getNamespace(setPrefix + "value").put(HttpRequestType.POST, deleteValue);
+		rb.getNamespace(setPrefix + "valueList").put(HttpRequestType.POST, deleteValues);
 		
 		return rb;
 	}

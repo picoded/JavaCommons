@@ -27,11 +27,6 @@ public class MetaTableApiBuilder {
 	//
 	/////////////////////////////////////////////
 	
-	public static final String MISSING_REQUEST_PAGE = "Unexpected Exception: Missing requestPage()";
-	public static final String MISSING_LOGIN_SESSION = "Authentication Error: Missing login session";
-	public static final String MISSING_PERMISSION = "Permission Error: Missing permission for request (generic)";
-	public static final String MISSING_PERMISSION_GROUP = "Permission Error: Missing group admin rights required for request";
-	
 	private MetaTable _metaTableObj = null;
 	
 	// Constructor
@@ -44,25 +39,6 @@ public class MetaTableApiBuilder {
 	// Utility functions
 	//
 	/////////////////////////////////////////////
-	
-	/////////////////////////////////////////////
-	//
-	// Authenticator overwirte
-	//
-	/////////////////////////////////////////////
-	
-	@FunctionalInterface
-	public interface MetaTableAPI_authenticator {
-		public abstract boolean auth(BasePage requestPage, MetaTable requestedTable, MetaObject requestedObject,
-			String apiRequestType);
-	}
-	
-	/// Authentication filter, if null there is no authentication check for GET request (default behaviour)
-	public MetaTableAPI_authenticator list_authenticationFilter = null;
-	/// Authentication filter, if null there is no authentication check for GET request (default behaviour)
-	public MetaTableAPI_authenticator get_authenticationFilter = null;
-	/// Authentication filter, if null there is no authentication check for GET request (default behaviour)
-	public MetaTableAPI_authenticator post_authenticationFilter = null;
 	
 	/////////////////////////////////////////////
 	//

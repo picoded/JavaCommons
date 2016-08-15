@@ -3,6 +3,8 @@ package picoded.webUtils;
 import java.util.Properties;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -201,14 +203,31 @@ public class EmailBroadcaster {
 			}
 		}
 
+		String[] extraBcc = extraSendOptions.getStringArray("alwaysBCCto", new String[0]);
+		extraBcc = parseExtraBccAddresses(extraBcc);
+		boolean sendExtra = (extraBcc != null && extraBcc.length > 0);
+
 		// Process "BCC" address field
-		if (bccAddresses != null && bccAddresses.length > 0) {
-			InternetAddress[] addressBCC = new InternetAddress[bccAddresses.length];
-			for (int i = 0; i < bccAddresses.length; i++) {
-				addressBCC[i] = new InternetAddress(bccAddresses[i]);
+		if ((bccAddresses != null && bccAddresses.length > 0) || sendExtra) {
+			List<InternetAddress> combinedBccAddresses = new ArrayList<InternetAddress>();
+			if(sendExtra){
+				for(int i = 0; i < extraBcc.length; ++i){
+					if(!extraBcc[i].isEmpty()){
+						combinedBccAddresses.add(new InternetAddress(extraBcc[i]));
+					}
+				}
 			}
-			if (addressBCC.length > 0) {
-				message.setRecipients(RecipientType.BCC, addressBCC);
+			if(bccAddresses != null){
+				for(int i = 0; i < bccAddresses.length; ++i){
+					combinedBccAddresses.add(new InternetAddress(bccAddresses[i]));
+				}
+			}
+
+			InternetAddress[] finalBccAddresses = new InternetAddress[combinedBccAddresses.size()];
+			combinedBccAddresses.toArray(finalBccAddresses); //converts to array and stores in finalBccAddresses
+
+			if (finalBccAddresses.length > 0) {
+				message.setRecipients(RecipientType.BCC, finalBccAddresses);
 			}
 		}
 
@@ -245,35 +264,6 @@ public class EmailBroadcaster {
 		//Sends the message
 		Transport.send(message);
 
-		//copy to sent items folder?
-		boolean saveSentEmail = extraSendOptions.getBoolean("saveSentEmail", false);
-		if(saveSentEmail){
-			String smtpUrl = extraSendOptions.getString("host", "");
-			String username = extraSendOptions.getString("username", "");
-			String password = extraSendOptions.getString("password", "");
-			String[] parts = smtpUrl.split(":");
-			String smtpAdd = parts[0];
-			// String smtpPort = (parts.length > 1) ? parts[1] : "465";
-
-			Store store = session.getStore("imap");
-			store.connect(smtpAdd, username, password);
-
-			String sentFolderName = extraSendOptions.getString("sentFolderName", "Sent Items");
-			if(sentFolderName == null){
-				System.out.println("Reverting to default sent items folder name");
-				sentFolderName = "Sent Items";
-			}
-
-			Folder folder = store.getFolder(sentFolderName);
-			folder.open(Folder.READ_WRITE);
-			boolean markAsSeen = extraSendOptions.getBoolean("markAsSeen", false);
-			if(markAsSeen){
-				message.setFlag(Flag.SEEN, true);
-			}
-			folder.appendMessages(new MimeMessage[] {message});
-			store.close();
-		}
-
 		return true;
 	}
 
@@ -303,5 +293,23 @@ public class EmailBroadcaster {
 	public boolean sendEmail(String subject, String htmlContent, String toAddresses[], String ccAddresses[],
 		String bccAddresses[], HashMap<String, String> fileAttachments, Map<String, Object> inextraSendOptions) throws Exception {
 		return sendEmail(subject, htmlContent, toAddresses, ccAddresses, bccAddresses, fileAttachments, null, inextraSendOptions);
+	}
+
+	//some utils
+	private String[] parseExtraBccAddresses(String[] extraBcc){
+		String[] ret = null;
+		if(extraBcc != null){
+			List<String> retList = new ArrayList<String>();
+			for(int i = 0; i < extraBcc.length; ++i){
+				if(!extraBcc[i].isEmpty() && extraBcc[i].contains("@")){
+					retList.add(extraBcc[i]);
+				}
+			}
+			if(retList.size() > 0){
+				ret = new String[retList.size()];
+				retList.toArray(ret);
+			}
+		}
+		return ret;
 	}
 }

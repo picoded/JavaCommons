@@ -34,7 +34,7 @@ import picoded.JStack.*;
 import picoded.JStruct.*;
 import picoded.ServletLogging.*;
 import picoded.RESTBuilder.*;
-import picoded.RESTBuilder.templates.*;
+import picoded.RESTBuilder.template.core.*;
 import picoded.webUtils.*;
 import picoded.webTemplateEngines.JSML.*;
 import picoded.page.builder.*;

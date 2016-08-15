@@ -17,7 +17,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import picoded.RESTBuilder.RESTBuilder;
-import picoded.RESTBuilder.templates.DevToolsApiBuilder;
+import picoded.RESTBuilder.template.core.DevToolsApiBuilder;
 import picoded.conv.ConvertJSON;
 import picoded.servlet.BasePage;
 import picoded.servletUtils.EmbeddedServlet;

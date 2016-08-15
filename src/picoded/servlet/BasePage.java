@@ -32,7 +32,8 @@ import picoded.enums.*;
 import picoded.JStack.*;
 import picoded.JStruct.*;
 import picoded.RESTBuilder.*;
-import picoded.RESTBuilder.templates.*;
+import picoded.RESTBuilder.template.core.*;
+import picoded.RESTBuilder.template.server.*;
 import picoded.webTemplateEngines.JSML.*;
 import picoded.page.builder.*;
 

@@ -1,4 +1,4 @@
-package picoded.RESTBuilder.templates;
+package picoded.RESTBuilder.template.core;
 
 import picoded.RESTBuilder.RESTBuilder;
 import picoded.RESTBuilder.RESTFunction;

@@ -17,7 +17,7 @@ import org.junit.Test;
 
 import picoded.JStack.JStackException;
 import picoded.RESTBuilder.RESTBuilder;
-import picoded.RESTBuilder.templates.KeyValueMapApiBuilder;
+import picoded.RESTBuilder.template.core.KeyValueMapApiBuilder;
 import picoded.servlet.BasePage;
 import picoded.servletUtils.EmbeddedServlet;
 import picoded.webUtils.RequestHttp;

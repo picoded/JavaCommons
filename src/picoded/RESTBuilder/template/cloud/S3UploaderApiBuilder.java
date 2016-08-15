@@ -1,9 +1,9 @@
-package picoded.RESTBuilder.templates.social;
+package picoded.RESTBuilder.template.cloud;
 
 import picoded.RESTBuilder.RESTBuilder;
 import picoded.RESTBuilder.RESTFunction;
 import picoded.enums.HttpRequestType;
 
-public class DisqusIntegrationApiBuilder {
+public class S3UploaderApiBuilder {
 	
 }

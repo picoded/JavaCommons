@@ -12,7 +12,7 @@ import picoded.JStack.struct.*;
 import picoded.conv.*;
 import picoded.struct.*;
 import picoded.RESTBuilder.*;
-import picoded.RESTBuilder.templates.*;
+import picoded.RESTBuilder.template.core.*;
 
 /// JStack utility to build up complex JStack structures from the JStack config file.
 public class JStackUtils {

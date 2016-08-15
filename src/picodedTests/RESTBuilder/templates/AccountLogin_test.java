@@ -22,7 +22,7 @@ import org.junit.Test;
 import picoded.JStack.JStackException;
 import picoded.JStruct.AccountObject;
 import picoded.JStruct.AccountTable;
-import picoded.RESTBuilder.templates.AccountLogin;
+import picoded.RESTBuilder.template.core.AccountLogin;
 import picoded.conv.ConvertJSON;
 import picoded.servletUtils.EmbeddedServlet;
 import picoded.webUtils.RequestHttp;

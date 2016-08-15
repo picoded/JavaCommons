@@ -20,7 +20,7 @@ import com.google.common.util.concurrent.AtomicLongMap;
 import picoded.JStack.JStackException;
 import picoded.JStruct.internal.JStruct_AtomicLongMap;
 import picoded.RESTBuilder.RESTBuilder;
-import picoded.RESTBuilder.templates.AtomicLongMapApiBuilder;
+import picoded.RESTBuilder.template.core.AtomicLongMapApiBuilder;
 import picoded.servlet.BasePage;
 import picoded.servletUtils.EmbeddedServlet;
 import picoded.webUtils.RequestHttp;

@@ -24,7 +24,7 @@ import picoded.JStack.JStackException;
 import picoded.JStruct.JStruct;
 import picoded.JStruct.MetaTable;
 import picoded.RESTBuilder.RESTBuilder;
-import picoded.RESTBuilder.templates.MetaTableApiBuilder;
+import picoded.RESTBuilder.template.core.MetaTableApiBuilder;
 import picoded.conv.ConvertJSON;
 import picoded.conv.GUID;
 import picoded.servlet.BasePage;

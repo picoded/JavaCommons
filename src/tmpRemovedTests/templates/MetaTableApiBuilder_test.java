@@ -22,7 +22,7 @@ import picoded.struct.ProxyGenericConvertMap;
 import picoded.RESTBuilder.*;
 import picoded.JStack.*;
 import picoded.JStruct.*;
-import picoded.RESTBuilder.templates.*;
+import picoded.RESTBuilder.template.core.*;
 import picoded.webUtils.*;
 
 public class MetaTableApiBuilder_test {

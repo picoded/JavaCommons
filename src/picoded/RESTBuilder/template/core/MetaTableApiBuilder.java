@@ -1,4 +1,4 @@
-package picoded.RESTBuilder.templates;
+package picoded.RESTBuilder.template.core;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;

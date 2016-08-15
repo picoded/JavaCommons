@@ -1,4 +1,4 @@
-package picoded.RESTBuilder.templates;
+package picoded.RESTBuilder.template.server;
 
 import picoded.RESTBuilder.RESTFunction;
 import picoded.conv.DateConv;

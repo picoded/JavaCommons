@@ -20,7 +20,7 @@ import org.junit.Test;
 import picoded.JStruct.JStruct;
 import picoded.JStruct.MetaObject;
 import picoded.JStruct.MetaTable;
-import picoded.RESTBuilder.templates.MetaTableApiBuilder;
+import picoded.RESTBuilder.template.core.MetaTableApiBuilder;
 import picoded.conv.GUID;
 
 public class MetaTableApiBuilder_test {

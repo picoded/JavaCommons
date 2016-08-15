@@ -36,41 +36,21 @@ import java.security.MessageDigest;
 ///
 public interface EventLogger {
 	
-	// // Minimal implementation logger
-	// private static Logger logger = Logger.getLogger(EventLogger.class.getName());
-	// 
-	// /// Converts from LogLevel, to minimal implementation
-	// protected static Level stdLevelFromLogLevel(LogLevel l) {
-	// 	if (l == LogLevel.ERROR) {
-	// 		return Level.SEVERE;
-	// 	} else if (l == LogLevel.WARN) {
-	// 		return Level.WARNING;
-	// 	} else if (l == LogLevel.INFO) {
-	// 		return Level.INFO;
-	// 	}
-	// 	return Level.INFO;
-	// }
-	
-	// ///
-	// /// Centralized logging, which the other functions call
-	// ///
-	// protected void logWithLevel(LogLevel level, Exception e, String format, Object... args) {
-	// 	
-	// 	// // Build the string and format
-	// 	// StringBuilder sb = new StringBuilder();
-	// 	// Formatter formatter = new Formatter(sb, Locale.US);
-	// 	// formatter.format(format, args);
-	// 	// 
-	// 	// // Logs it in standrad log
-	// 	// if (e != null) {
-	// 	// 	logger.log(stdLevelFromLogLevel(level), sb.toString(), e);
-	// 	// } else {
-	// 	// 	logger.log(stdLevelFromLogLevel(level), sb.toString());
-	// 	// }
-	// }
-	
 	/// Core logging function
-	public void log(Level l, Exception e, String format, Object... args);
+	public default void log(Level l, Exception e, String format, Object... args) {
+		
+		// Build the string and format
+		StringBuilder sb = new StringBuilder();
+		Formatter formatter = new Formatter(sb, Locale.US);
+		formatter.format(format, args);
+		
+		// Logs it in standrad log
+		if (e != null) {
+			Logger.getLogger(EventLogger.class.getName()).log(l, sb.toString(), e);
+		} else {
+			Logger.getLogger(EventLogger.class.getName()).log(l, sb.toString());
+		}
+	}
 	
 	//----------------------------------------------------------------
 	//

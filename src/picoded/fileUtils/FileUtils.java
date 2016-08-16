@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
-
 /// Replace with apache StringUtils?
 import com.mysql.jdbc.StringUtils;
 
@@ -154,7 +152,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 		copyDirectory_ifDifferent(inDir, outDir, true);
 	}
 	
- 	///
+	///
 	/// Recursively copy all directories, and files only if the file content is different
 	///
 	/// @TODO : Implmenent the existing file checks, ignoring if it has same content
@@ -164,6 +162,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate) throws IOException {
 		copyDirectory_ifDifferent(inDir, outDir, preserveFileDate, false); //default symlink is false : This is considered advance behaviour
 	}
+	
 	///
 	/// Recursively copy all directories, and files only if the file content is different
 	///
@@ -171,7 +170,8 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	///
 	/// @param folder to scan and copy from
 	///
-	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate, boolean tryToUseSymLink) throws IOException {
+	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate,
+		boolean tryToUseSymLink) throws IOException {
 		if (inDir == null || outDir == null) {
 			new IOException("Invalid directory");
 		}
@@ -189,6 +189,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 			}
 		}
 	}
+	
 	///
 	/// Recursively copy all directories, and files only if the file content is different
 	///
@@ -210,6 +211,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate) throws IOException {
 		copyFile_ifDifferent(inFile, outFile, preserveFileDate, false); //default symlink is false : This is considered advance behaviour
 	}
+	
 	///
 	/// Recursively copy all directories, and files only if the file content is different
 	///
@@ -217,18 +219,19 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	///
 	/// @param file to scan and copy from
 	///
-	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToUseSymLink) throws IOException {
+	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToUseSymLink)
+		throws IOException {
 		
 		try {
 			// Checks if the output file is already a symbolic link
 			// And if its valid. And since both is pratically the same 
 			// final file when linked, the file is considered "not different"
 			//------------------------------------------------------------
-			if(Files.isSymbolicLink(outFile.toPath())) {
+			if (Files.isSymbolicLink(outFile.toPath())) {
 				// Gets the symbolic link source file path, and checks if it points to source file.
 				// See: http://stackoverflow.com/questions/29368308/java-nio-how-is-path-issamefile-different-from-path-equals
 				// for why is `Files.isSameFile()` used
-				if( Files.isSameFile( Files.readSymbolicLink(outFile.toPath()), inFile.toPath() ) ) {
+				if (Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath())) {
 					// If it points to the same file, the symbolic link is valid
 					// No copy operations is required.
 					return;
@@ -236,7 +239,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 			}
 			
 			// Tries to build symlink if possible, hopefully
-			if(tryToUseSymLink){
+			if (tryToUseSymLink) {
 				// NOTE: You do not test source file for symbolic link
 				// Only the detination file should be a symbolic link.
 				//------------------------------------------------------------
@@ -259,9 +262,9 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 		
 		// Checks if file has not been modified, and has same data length, for skipping?
 		//---------------------------------------------------------------------------------
-		if(inFile.lastModified() == outFile.lastModified() && inFile.length() == outFile.length()){
+		if (inFile.lastModified() == outFile.lastModified() && inFile.length() == outFile.length()) {
 			// returns and skip for optimization
-			return; 
+			return;
 		}
 		
 		// Final fallback behaviour, copies file if content differs.

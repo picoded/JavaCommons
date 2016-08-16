@@ -46,11 +46,11 @@ public class PageBuilderUtil {
 		long threshold = 3 * 1000; //3 seconds threshold
 		
 		// Source file was modified within the threshold (past 3 seconds)
-		if( srcModified > (System.currentTimeMillis() - threshold) ) {
+		if (srcModified > (System.currentTimeMillis() - threshold)) {
 			// blank if clause : the ^ above was Intentionally structured for readability
 		} else {
 			// file was not modified within the threshold
-			if( outFile.lastModified() > srcFile.lastModified() ) {
+			if (outFile.lastModified() > srcFile.lastModified()) {
 				// Skipped, as output file is newer then src file 
 				return;
 			}
@@ -58,7 +58,7 @@ public class PageBuilderUtil {
 		
 		// Get source file
 		String fileVal = FileUtils.readFileToString_withFallback(srcFile, "");
-			
+		
 		// Less and es6 specific conversion
 		if (fileExtn.equalsIgnoreCase("less")) {
 			fileVal = core.less.compile(fileVal);

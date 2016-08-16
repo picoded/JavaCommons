@@ -48,11 +48,11 @@ public class SimpleShoppingCart {
 	
 	public SimpleShoppingCart(JStruct inStruct, String prefix) {
 		productOwner = inStruct.getMetaTable(prefix);
-		productItems = inStruct.getMetaTable(prefix+"_item");
-		productCount = inStruct.getAtomicLongMap(prefix+"_count");
+		productItems = inStruct.getMetaTable(prefix + "_item");
+		productCount = inStruct.getAtomicLongMap(prefix + "_count");
 		
-		salesOrder = inStruct.getMetaTable(prefix+"_sale"); //Formalised shopping cart?
-		salesOrder = inStruct.getMetaTable(prefix+"_receipt");
+		salesOrder = inStruct.getMetaTable(prefix + "_sale"); //Formalised shopping cart?
+		salesOrder = inStruct.getMetaTable(prefix + "_receipt");
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +101,7 @@ public class SimpleShoppingCart {
 		}
 		return res;
 	};
-
+	
 	///
 	/// # product (GET/POST) 
 	///
@@ -134,7 +134,6 @@ public class SimpleShoppingCart {
 		}
 		return res;
 	};
-
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//

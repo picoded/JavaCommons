@@ -60,7 +60,7 @@ public interface EventLogger {
 	
 	/// Log 
 	public default void log(Level l, String format, Object... args) {
-		log(l, (Exception)null, format, args);
+		log(l, (Exception) null, format, args);
 	}
 	
 	/// Info with exception
@@ -70,7 +70,7 @@ public interface EventLogger {
 	
 	/// Info 
 	public default void info(String format, Object... args) {
-		log(Level.INFO, (Exception)null, format, args);
+		log(Level.INFO, (Exception) null, format, args);
 	}
 	
 	/// Info with exception
@@ -80,7 +80,7 @@ public interface EventLogger {
 	
 	/// Info 
 	public default void warn(String format, Object... args) {
-		log(Level.WARNING, (Exception)null, format, args);
+		log(Level.WARNING, (Exception) null, format, args);
 	}
 	
 	/// Error with exception
@@ -90,7 +90,7 @@ public interface EventLogger {
 	
 	/// Error 
 	public default void error(String format, Object... args) {
-		log(Level.SEVERE, (Exception)null, format, args);
+		log(Level.SEVERE, (Exception) null, format, args);
 	}
 	
 }

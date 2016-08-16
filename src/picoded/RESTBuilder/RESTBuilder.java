@@ -303,145 +303,153 @@ public class RESTBuilder {
 	
 	/// Creates a JS function source with the given name, defaults to "x". 
 	/// With the following parameters.
-	///
 	/// @TODO: remove dependency on jQuery
 	///
+	/// Input params:
 	/// + u : URL
 	/// + t : URL request type "POST" / "GET"
 	/// + p : The request parameters
 	/// + c : The request call back, calls with ( return )
 	protected static String xmlHttpJS(String functionName) {
-		return "" + //
-			"function " + functionName + "(url,type,params,callbck) { " +
+		return "\n" //
+			+ "function "
+			+ functionName
+			+ "(url,type,params,callbck) { \n" //
 			//----------------------------------------------------------------------------
 			// Default callback handling / logging
 			//----------------------------------------------------------------------------
-			"	if(callbck === undefined) { " + 
-			"		callbck = function(res) { console.log(url, type, params, res); }; " +
-			"	} " + 
+			+ "	if(callbck === undefined) { \n" //
+			+ "		callbck = function(res) { console.log(url, type, params, res); }; \n" //
+			+ "	} \n" //
 			//----------------------------------------------------------------------------
 			// JQuery varient : Promise returns
 			//----------------------------------------------------------------------------
-			"	var ret = new Promise(function(good,bad) { "+
-			"		$.ajax({ "+
-			"			url:url, type:type, data:params || {}, "+
-			"			dataType:'json', cache:false, "+
-			"			xhrFields: { withCredentials:true }, "+
-			"			success: function(d) { "+
-			"				if(d.error) { "+
-			"					bad('200 - '+d.error); "+
-			"					return; "+
-			"				} "+
-			"				good(d); "+
-			"			}, "+
-			"			error: function(jqxhr, status, error) { "+
-			"				bad(status+' - '+error);"+
-			"			} "+
-			"		}); "+
-			"	}); "+
-			"	if(callbck) { ret.then(callbck); } "+
-			"	return ret; "+
+			+ "	var ret = new Promise(function(good,bad) { \n" //
+			+ "		$.ajax({ \n" //
+			+ "			url:url, type:type, data:params || {}, \n" //
+			+ "			dataType:'json', cache:false, \n" //
+			+ "			xhrFields: { withCredentials:true }, \n" //
+			+ "			success: function(d) { \n" //
+			+ "				if(d.error) { \n" //
+			+ "					bad('200 - '+d.error); \n" //
+			+ "					return; \n" //
+			+ "				} \n" //
+			+ "				good(d); \n" //
+			+ "			}, \n" //
+			+ "			error: function(jqxhr, status, error) { \n" //
+			+ "				bad(status+' - '+error);\n" //
+			+ "			} \n" //
+			+ "		}); \n" //
+			+ "	}); \n" //
+			+ "	if(callbck) { ret.then(callbck); } \n" //
+			+ "	return ret; \n" //
 			//----------------------------------------------------------------------------
 			// @TODO Experimental XMLHttpRequest varient (Tp Consider), 
 			// it needs a full wrapping implementation of all the various request type
 			//
 			// See: http://youmightnotneedjquery.com/
 			//----------------------------------------------------------------------------
-			"} "; //
+			+ "} "; //
 	}
 	
 	/// Creates the API Node builder JS with the xmlHttpJS script embedded
-	protected static String apiNodeBuilderJS(String builderName, String baseURL) {
+	protected static String apiNodeBuilderJS(String namespaceBuilder, String baseURL) {
 		if (baseURL == null) {
 			baseURL = "";
 		}
-		while ( baseURL.length() > 0 && baseURL.endsWith("/") ) {
+		while (baseURL.length() > 0 && baseURL.endsWith("/")) {
 			baseURL = baseURL.substring(0, baseURL.length() - 1);
 		}
 		
 		String xHttpCall = "xHttpCall";
 		
-		return ""
-			+ //
-			xmlHttpJS(xHttpCall)
-			+ //
-			  //
-			"var apiHost = '"
-			+ baseURL
-			+ "'; "
-			+ //the base url hostname
-			  //
-			"function filterNamespace(n) { "
-			+ //
-			  //
-			"if(n != null && n.length > 0) { "
-			+ //Check if there is content
-			"n=n.replace(/\\/\\*/g, '/').replace(/\\/\\//g, '/').replace(/\\/\\//g, '/'); "
-			+ //
-			  //
-			"if(n.indexOf('/') !== 0) { "
-			+ //Enforces starting / as it is needed
-			"n='/'+n; "
-			+ //
-			"} "
-			+ //
-			  //
-			"if(n[n.length-1] == '/') { "
-			+ //
-			"n=n.substring(0,n.length-1); "
-			+ //
-			"} "
-			+ //
-			"} else { "
-			+ //
-			"n = ''; "
-			+ //
-			"} "
-			+ //
-			  //
-			"return n; "
-			+ "} "
-			+ //
-			  //
-			"function "
-			+ builderName
-			+ "(n) { "
-			+ //
-			"n = filterNamespace(n); "
-			+ //
-			"var api = function(namespace) { "
-			+ //
-			"return "
-			+ builderName
-			+ "(n+'/'+namespace); "
-			+ //
-			"}; "
-			+ //
-			  // The url that this node calls
-			"var tar = apiHost+n; "
-			+ //
-			  // Setsup the various GET,PUT,POST,DELETE
-			"api.GET=function(p,c){ return " + xHttpCall + "(tar, 'GET', p, c); }; " + "api.PUT=function(p,c){ return "
-			+ xHttpCall + "(tar, 'PUT', p, c); }; " + "api.POST=function(p,c){ return " + xHttpCall
-			+ "(tar, 'POST', p, c); }; " + "api.DELETE=function(p,c){ return " + xHttpCall + "(tar, 'DELETE', p, c); }; " +
+		return "\n" //
+			//----------------------------------------------------------------------------
+			// function xHttpCall(url,type,params,callbck) { .. }
+			//----------------------------------------------------------------------------
+			+ xmlHttpJS(xHttpCall) + "\n" //
+			//----------------------------------------------------------------------------
+			// API base host name passing
+			//----------------------------------------------------------------------------
+			+ "var apiHost = '" + baseURL + "'; \n" //
+			//----------------------------------------------------------------------------
+			// Gets and filter the namespace string
 			//
-			"return api; " + //
-			"} "; //
+			// Input params:
+			// + name : Namespace to do normalization on
+			//
+			// Return : The normalized namespace string
+			//----------------------------------------------------------------------------
+			+ "function normalizeNamespace(name) { \n" //
+			+ "		if(name != null && name.length > 0) { \n" //
+			+ "			name=name.replace(/\\/\\*/g, '/').replace(/\\/\\//g, '/').replace(/\\/\\//g, '/'); \n" //
+			// 			// Enforces starting / as it is needed
+			+ "			if(name.indexOf('/') !== 0) { \n" //
+			+ "				name='/'+name; \n" //
+			+ "			} \n" //
+			+ "			if(name[name.length-1] == '/') { \n" //
+			+ "				name=name.substring(0,name.length-1); \n" //
+			+ "			} \n" //
+			+ "		} else { \n" //
+			+ "			name = ''; \n" //
+			+ "		} \n" //
+			+ "		return name; \n" //
+			+ "} \n" //
+			//----------------------------------------------------------------------------
+			// Namespace builder / extender for a single node namespace
+			//
+			// Input params:
+			// + name : Namespace to extend from
+			//
+			// Return : Namespace object with the .ajax function
+			//----------------------------------------------------------------------------
+			+ "var " + namespaceBuilder + " = (function " + namespaceBuilder + "(name) { \n" //
+			+ "		name = normalizeNamespace(name); \n" //
+			//      // Returns a function, allows recursive chaining
+			+ "		var ret = function(namespace) { \n" //
+			+ "			return " + namespaceBuilder + "(name+'/'+namespace); \n" //
+			+ "		}; \n" //
+			+ "		var tar = apiHost+name; \n" // Full URL for this node to request
+			//		// The actual internal AJAX function which calls xHttpCall
+			+ "		ret.ajax = function ajax(type, params, callbck) {\n" //
+			+ "			return " + xHttpCall + " (tar, type, params, callbck) \n" //
+			+ "		} \n" //
+			+ "		return ret; \n" //
+			+ "})(); \n" //
+			+ ""; //end
 	}
 	
 	/// Craetes the api chain builder, which is called by the generateJS, 
 	/// and links with apiNodeBuidlerJS
 	protected static String apiChainBuilder(String chainBuilder, String nodeBuilderName) {
-		return ""
-			+ //
-			"function " + chainBuilder + "(r,n){ " + "n = filterNamespace(n); " + "var nArr = n.split('/'); "
-			+ "var t = r; " + "for( var i=1; i < nArr.length; ++i ) { " + "if( t[ nArr[i] ] == null ) { "
-			+ "t[ nArr[i] ] = t( nArr[i] ); " + "} " + "t = t[ nArr[i] ]; " + "} " + "return r; " + "} ";
+		return "\n" //
+			+ "function " + chainBuilder + "(ret, name, typeArr) { \n" //
+			+ "		name = normalizeNamespace(name); \n" //
+			+ "		var nArr = name.split('/'); \n" //
+			//		// Iterate and build each segment of the chain if needed
+			+ "		for( var i=1; i < nArr.length; ++i ) { \n" //
+			+ "			if( ret[ nArr[i] ] == null ) { \n" //
+			+ "				ret[ nArr[i] ] = ret( nArr[i] ); \n" //
+			+ "			} \n" //
+			+ "			ret = ret[ nArr[i] ]; \n" //
+			+ "		} \n" //
+			//		// Setup in accordance to the type ARR 
+			+ "		if( typeArr && Array.isArray(typeArr) ) { \n" //
+			+ "			typeArr.forEach(function(type) { \n" //
+			+ "				type = type.toUpperCase(); \n" // 
+			+ "				ret[type] = function(params, callbck) { \n" //
+			+ "					ret.ajax(type, params, callbck); \n" //
+			+ "				} \n" //
+			+ "			}); \n" //
+			+ "		}\n" //
+			//		// Return the chain 
+			+ "		return ret; \n" //
+			+ "} ";
 	}
 	
 	public String generateJS(String rootVarName, String baseURL) {
 		StringBuilder ret = new StringBuilder();
-		String builderName = "nodeBuidler";
+		String namespaceBuilder = "namespaceBuilder";
 		String chainBuilder = "chainBuilder";
 		
 		if (rootVarName == null || rootVarName.length() <= 0) {
@@ -451,24 +459,41 @@ public class RESTBuilder {
 			baseURL = "";
 		}
 		
+		// Setup global API namespace (isolated function)
+		//---------------------------------------------------
 		ret.append("window.") //
 			.append(rootVarName) //
-			.append("=((function(){ ").append("\"use strict\"; ");
+			.append("=((function(){ \n").append("\"use strict\"; \n");
 		
-		ret.append(apiNodeBuilderJS(builderName, baseURL));
-		ret.append(apiChainBuilder(chainBuilder, builderName));
+		// Setup namespace and chain builders
+		//---------------------------------------------------
+		ret.append(apiNodeBuilderJS(namespaceBuilder, baseURL));
+		ret.append(apiChainBuilder(chainBuilder, namespaceBuilder));
 		
-		ret.append("var ret=") //
-			.append(builderName) //
-			.append("(); "); //
-		
+		// Iterate setup registered namespaces
+		//---------------------------------------------------
 		for (Map.Entry<String, RESTNamespace> entry : namespaceMap.entrySet()) {
-			ret.append(chainBuilder).append("(ret, '").append(entry.getKey()).append("'); ");
+			ret.append(chainBuilder + "(");
+			ret.append(namespaceBuilder + ", ");
+			ret.append("'" + entry.getKey() + "', [");
+			boolean firstArrItem = true;
+			for (HttpRequestType type : entry.getValue().keySet()) {
+				if (firstArrItem == false) {
+					ret.append(", ");
+				}
+				firstArrItem = false;
+				ret.append("'" + type.toString() + "'");
+			}
+			ret.append("]); \n");
 		}
 		
-		ret.append("return ret; ") //
+		// Actual return and setup
+		//---------------------------------------------------
+		ret.append("return " + namespaceBuilder + "; \n") //
 			.append("})()); ");
 		
+		// Closure compiler compression
+		//---------------------------------------------------
 		return CompileES6.compile(ret.toString());
 	}
 }

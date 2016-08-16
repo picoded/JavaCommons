@@ -58,7 +58,7 @@ public class SimpleShoppingCart {
 
 	public void setupTables(JStruct inStruct, String prefix){
 		productOwner = inStruct.getMetaTable(prefix);
-		productItems = inStruct.getMetaTable(prefix + "_item");
+		productItem = inStruct.getMetaTable(prefix + "_item");
 		productCount = inStruct.getAtomicLongMap(prefix + "_count");
 
 		salesOrder = inStruct.getMetaTable(prefix + "_sale"); //Formalised shopping cart?

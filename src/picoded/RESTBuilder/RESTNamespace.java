@@ -28,10 +28,6 @@ import picoded.enums.HttpRequestType;
 /// Update     PUT
 /// Delete     DELETE
 ///
-/// 
-/// @TODO adding of GET/PUT/POST/DELETE
-/// @TODO adding with default values being supported
-///
 public class RESTNamespace extends HashMap<HttpRequestType, RESTFunction> {
 	
 	/// Build warning suppression

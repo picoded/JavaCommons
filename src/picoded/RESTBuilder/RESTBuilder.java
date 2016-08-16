@@ -342,44 +342,11 @@ public class RESTBuilder {
 			"	if(callbck) { ret.then(callbck); } "+
 			"	return ret; "+
 			//----------------------------------------------------------------------------
-			// JQuery varient (old)
-			//----------------------------------------------------------------------------
-			// "if(c == null) { " + // Ensures that even there is no callback, it is handled "gracefully"
-			// "c = function() { }; " + //
-			// "} " + //
-			// "$.ajax({ " + //
-			// "url: u, " + //
-			// "type: t, " + //
-			// "data: p, " + //
-			// //
-			// "dataType: 'json', " + //
-			// "cache: false, " + //
-			// //
-			// "xhrFields: { withCredentials:true }, " +
-			// //
-			// "success: function(d){ c(d,p,null); }, " + //
-			// "error: function(j,s,t){ c(null,p, s+' - '+t, s, t); } " + //
-			// " }); " + //
-			//
-			//----------------------------------------------------------------------------
-			// Experimental XMLHttpRequest varient (incomplete -> TODO), 
-			// it needs a full wrappign implementation of all the variosu request type
+			// @TODO Experimental XMLHttpRequest varient (Tp Consider), 
+			// it needs a full wrapping implementation of all the various request type
 			//
 			// See: http://youmightnotneedjquery.com/
 			//----------------------------------------------------------------------------
-			// "var r=new XMLHttpRequest(); "+ // The browser XMLHttpRequest function
-			// "r.onload = function(e) { "+ // Onload callback handling
-			// 	"if(r.status >= 200 && r.status < 400) { "+ //
-			// 		"c(JSON.parse(r.responseText), p, null); "+ //
-			// 	"} else { "+ //
-			// 		"c(null, p, e); "+
-			// 	"} "+ //
-			// "}; "+ //
-			// "r.onerror = function(e) { "+ //
-			// 	"s(null, p, e); "+ //
-			// "}; "+ //
-			// "r.open(t,u,true);"+ //
-			// "r.send(p); "+ //
 			"} "; //
 	}
 	
@@ -478,7 +445,7 @@ public class RESTBuilder {
 		String chainBuilder = "chainBuilder";
 		
 		if (rootVarName == null || rootVarName.length() <= 0) {
-			rootVarName = "REST";
+			rootVarName = "api";
 		}
 		if (baseURL == null) {
 			baseURL = "";

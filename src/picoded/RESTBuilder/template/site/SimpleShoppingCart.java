@@ -6,7 +6,7 @@ import picoded.enums.HttpRequestType;
 import picoded.JStruct.*;
 
 ///
-/// Provides a shopping cart and inventory API
+/// Provides a shopping cart and product API
 /// All in a single API package.
 ///
 public class SimpleShoppingCart {
@@ -18,13 +18,13 @@ public class SimpleShoppingCart {
 	/////////////////////////////////////////////////////////////////////////////////////////
 	
 	/// Inventory owner metatable
-	public MetaTable inventoryOwner = null;
+	public MetaTable productOwner = null;
 	
 	/// Inventory listing
-	public MetaTable inventoryItems = null;
+	public MetaTable productItems = null;
 	
-	/// Atomic inventory counting
-	public AtomicLongMap inventoryCount = null;
+	/// Atomic product counting
+	public AtomicLongMap productCount = null;
 	
 	/// Sales order
 	public MetaTable salesOrder = null;
@@ -47,9 +47,9 @@ public class SimpleShoppingCart {
 	}
 	
 	public SimpleShoppingCart(JStruct inStruct, String prefix) {
-		inventoryOwner = inStruct.getMetaTable(prefix);
-		inventoryItems = inStruct.getMetaTable(prefix+"_item");
-		inventoryCount = inStruct.getAtomicLongMap(prefix+"_count");
+		productOwner = inStruct.getMetaTable(prefix);
+		productItems = inStruct.getMetaTable(prefix+"_item");
+		productCount = inStruct.getAtomicLongMap(prefix+"_count");
 		
 		salesOrder = inStruct.getMetaTable(prefix+"_sale"); //Formalised shopping cart?
 		salesOrder = inStruct.getMetaTable(prefix+"_receipt");
@@ -86,7 +86,7 @@ public class SimpleShoppingCart {
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	        | Description                                                     |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
-	/// | cart            | String[[ID,count,meta]] | Shopping cart content with item ID, count, and content          |
+	/// | list            | String[[ID,count,meta]] | Shopping cart content with item ID, count, and content          |
 	/// | itemCount       | Integer                 | Number of unique item ID inside the cart                        |
 	/// | quantityCount   | Integer                 | Total quantity of items                                         |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
@@ -103,7 +103,7 @@ public class SimpleShoppingCart {
 	};
 
 	///
-	/// # cart (GET/POST) 
+	/// # product (GET/POST) 
 	///
 	/// Gets / Updates the current shopping cart stored inside the cookie "cart" parameter
 	///
@@ -112,8 +112,8 @@ public class SimpleShoppingCart {
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	        | Description                                                     |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
-	/// | update          | String[[ID,count]]      | Shopping item ID, and count to add/edit/delete (when count=0)   |
-	/// | simple          | boolean                 | Ignore cart content meta, and its checks                        |
+	/// | _oid            | String                  | The product list owner ID                                       |
+	/// | update          | String[[ID,meta]]       | Shopping item ID, and count to add/edit/delete (when count=0)   |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
@@ -121,13 +121,20 @@ public class SimpleShoppingCart {
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	        | Description                                                     |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
-	/// | cart            | String[[ID,count,meta]] | Shopping cart content with item ID, count, and content          |
-	/// | itemCount       | Integer                 | Number of unique item ID inside the cart                        |
-	/// | quantityCount   | Integer                 | Total quantity of items                                         |
+	/// | list            | String[[ID,meta]]       | Shopping cart content with item ID, count, and content          |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	/// | error           | String (Optional)       | Errors encounted if any                                         |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	///
+	public RESTFunction product_GET_and_POST = (req, res) -> {
+		try {
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return res;
+	};
+
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -141,6 +148,9 @@ public class SimpleShoppingCart {
 	public RESTBuilder setupRESTBuilder(RESTBuilder rb, String setPrefix) {
 		rb.getNamespace(setPrefix + "cart").put(HttpRequestType.GET, cart_GET_and_POST);
 		rb.getNamespace(setPrefix + "cart").put(HttpRequestType.POST, cart_GET_and_POST);
+		
+		rb.getNamespace(setPrefix + "product").put(HttpRequestType.GET, product_GET_and_POST);
+		rb.getNamespace(setPrefix + "product").put(HttpRequestType.POST, product_GET_and_POST);
 		
 		return rb;
 	}

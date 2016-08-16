@@ -70,7 +70,7 @@ public class CommonsPage extends BasePage {
 			// File name and extension extraction for future processing
 			//
 			String fileName = wildcardUri[wildcardUri.length - 1].toLowerCase();
-			String fileExt = FileUtils.getExtension( fileName );
+			String fileExt = FileUtils.getExtension(fileName);
 			
 			//
 			// Always deny WEB-INF path
@@ -82,7 +82,7 @@ public class CommonsPage extends BasePage {
 			// 
 			// Public files, grab it direct
 			//
-			if( fileName.equalsIgnoreCase("index.html") && (new File(getContextPath(), requestWildcardUri())).canRead() ) {
+			if (fileName.equalsIgnoreCase("index.html") && (new File(getContextPath(), requestWildcardUri())).canRead()) {
 				return true;
 			}
 			
@@ -126,10 +126,10 @@ public class CommonsPage extends BasePage {
 				
 				// Allow common asset files types
 				if ( //
-					//
-					// HTML, JS, CSS
-					//
-					fileExt.equalsIgnoreCase("html") || //
+					  //
+					  // HTML, JS, CSS
+					  //
+				fileExt.equalsIgnoreCase("html") || //
 					fileExt.equalsIgnoreCase("js") || //
 					fileExt.equalsIgnoreCase("css") || //
 					fileExt.equalsIgnoreCase("less") || //
@@ -163,7 +163,7 @@ public class CommonsPage extends BasePage {
 					//
 					// Others?
 					//
-					false ) {
+					false) {
 					return true;
 				}
 			}

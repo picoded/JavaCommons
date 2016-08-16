@@ -66,7 +66,7 @@ public class PageBuilderCore {
 	/// @param The various page definition folder
 	///
 	public PageBuilderCore(File inPageFolder) {
-		this(inPageFolder, (File)null);
+		this(inPageFolder, (File) null);
 	}
 	
 	///
@@ -1090,7 +1090,7 @@ public class PageBuilderCore {
 		//
 		// Process JMTE scripts
 		//
-		String[] fileList = depenencyConfig(path).getStringArray(type+"_jmte", "[]");
+		String[] fileList = depenencyConfig(path).getStringArray(type + "_jmte", "[]");
 		for (String filePath : fileList) {
 			// Parse any templates if need be
 			filePath = jmte.parseTemplate(filePath, jmteVars);

@@ -312,9 +312,7 @@ public class RESTBuilder {
 	/// + c : The request call back, calls with ( return )
 	protected static String xmlHttpJS(String functionName) {
 		return "\n" //
-			+ "function "
-			+ functionName
-			+ "(url,type,params,callbck) { \n" //
+			+ "function " + functionName + "(url,type,params,callbck) { \n" //
 			//----------------------------------------------------------------------------
 			// Default callback handling / logging
 			//----------------------------------------------------------------------------

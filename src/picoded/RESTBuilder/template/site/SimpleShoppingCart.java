@@ -126,7 +126,9 @@ public class SimpleShoppingCart {
 	/// | update          | [{meta}]                | Product Details metaobject. "_oid" is needed, and count to      |
 	///	|				  |							| add/edit/delete (when count=0)                                  |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
-	/// Details of the update object
+	///
+	/// ## Details of the update object
+	/// 
 	///	"_oid":owner id MUST BE GIVEN,
 	/// "update":[
 	///	    {

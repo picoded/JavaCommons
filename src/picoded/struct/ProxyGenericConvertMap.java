@@ -27,4 +27,10 @@ public class ProxyGenericConvertMap<K, V> extends AbstractMapDecorator<K, V> imp
 		
 		return (new ProxyGenericConvertMap<A, B>(inMap));
 	}
+	
+	/// Implments a JSON to string conversion
+	@Override
+	public String toString() {
+		return GenericConvert.toString(this);
+	}
 }

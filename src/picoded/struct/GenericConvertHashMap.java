@@ -22,4 +22,10 @@ import java.util.HashMap;
 ///
 @SuppressWarnings("serial")
 public class GenericConvertHashMap<K, V> extends HashMap<K, V> implements GenericConvertMap<K, V> {
+	
+	/// Implments a JSON to string conversion
+	@Override
+	public String toString() {
+		return GenericConvert.toString(this);
+	}
 }

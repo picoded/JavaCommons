@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import picoded.conv.*;
 
 ///
 /// Provides a HashMap<K,A ArrayList<V>>,
@@ -65,6 +66,6 @@ public class ArrayListMap<K, V> extends HashMap<K, ArrayList<V>> {
 	/// Implments a JSON to string conversion
 	@Override
 	public String toString() {
-		return GenericConvert.toString(this);
+		return GenericConvert.toString((Object)this);
 	}
 }

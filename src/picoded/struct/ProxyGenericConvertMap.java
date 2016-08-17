@@ -1,6 +1,7 @@
 package picoded.struct;
 
 import java.util.Map;
+import picoded.conv.*;
 import org.apache.commons.collections4.map.AbstractMapDecorator;
 
 ///
@@ -31,6 +32,6 @@ public class ProxyGenericConvertMap<K, V> extends AbstractMapDecorator<K, V> imp
 	/// Implments a JSON to string conversion
 	@Override
 	public String toString() {
-		return GenericConvert.toString(this);
+		return GenericConvert.toString((Object)this);
 	}
 }

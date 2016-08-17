@@ -1,6 +1,7 @@
 package picoded.struct;
 
 import java.util.ArrayList;
+import picoded.conv.*;
 
 @SuppressWarnings("serial")
 public class GenericConvertArrayList<E> extends ArrayList<E> implements GenericConvertList<E> {
@@ -8,6 +9,6 @@ public class GenericConvertArrayList<E> extends ArrayList<E> implements GenericC
 	/// Implments a JSON to string conversion
 	@Override
 	public String toString() {
-		return GenericConvert.toString(this);
+		return GenericConvert.toString((Object)this);
 	}
 }

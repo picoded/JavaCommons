@@ -1,6 +1,7 @@
 package picoded.struct;
 
 import java.util.Map;
+import picoded.conv.ConvertJSON;
 
 /// Case Insensitive HashMap, useful for various things.
 /// Normalizes, stores, and retrives all keys in lowercase.
@@ -105,5 +106,12 @@ public class CaseInsensitiveHashMap<K extends String, V> extends GenericConvertH
 		for (Map.Entry<?, ?> entry : m.entrySet()) {
 			super.put((K) (entry.getKey().toString().toLowerCase()), (V) (entry.getValue()));
 		}
+	}
+	
+	/// Implments a JSON to string conversion
+	@Override
+	@SuppressWarnings("unchecked")
+	public String toString() {
+		return ConvertJSON.fromMap((Map<String,Object>)this);
 	}
 }

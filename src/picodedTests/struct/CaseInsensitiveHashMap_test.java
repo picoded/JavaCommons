@@ -36,4 +36,20 @@ public class CaseInsensitiveHashMap_test {
 		assertEquals("WORLD", tObj.get("tEsT"));
 		assertEquals("WORLD", tObj.get("hello"));
 	}
+	
+	/// Test the following functions
+	///
+	/// + CaseInsensitiveHashMap.toString
+	@Test
+	public void toStringJson() {
+		CaseInsensitiveHashMap<String, String> tObj = new CaseInsensitiveHashMap<String, String>();
+		
+		assertEquals("{}", tObj.toString());
+		
+		assertNull(tObj.put("TEST", "a"));
+		assertEquals("{\"test\":\"a\"}", tObj.toString());
+		
+		assertNull(tObj.put("Hello", "WORLD"));
+		assertEquals("{\"test\":\"a\",\"hello\":\"WORLD\"}", tObj.toString());
+	}
 }

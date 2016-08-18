@@ -145,6 +145,13 @@ public class PageComponentFilter {
 		if (componentPath != null && componentPath.length() > 0) {
 			// Case insensitive component args
 			tagArgs = new CaseInsensitiveHashMap<String, Object>(tagArgs);
+			
+			// Fix a wierd bug in JMTE when an object is "invalidated", 
+			// if it has no, or only a single property 
+			while(tagArgs.size() < 2) {
+				tagArgs.put("_bug"+tagArgs.size(), 0);
+			}
+			
 			// Component "this" reference
 			genericJMTE.put("this", tagArgs);
 		}

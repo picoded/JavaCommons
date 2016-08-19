@@ -771,6 +771,8 @@ public class AccountLogin extends BasePage {
 				res.put("recordsTotal", accountTableObj.size());
 				if (query != null && !query.isEmpty() && queryArgs != null && queryArgs.length > 0) {
 					res.put("recordsFiltered", mtObj.queryCount(query, queryArgs));
+				} else {
+					res.put("recordsFiltered", mtObj.queryCount(null, null));
 				}
 				
 				boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);

@@ -4,7 +4,8 @@ import picoded.RESTBuilder.RESTBuilder;
 import picoded.RESTBuilder.RESTFunction;
 import picoded.enums.HttpRequestType;
 import picoded.JStruct.*;
-import picoded.conv.GenericConvert;
+import picoded.struct.*;
+import picoded.conv.*;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public class SimpleShoppingCart {
 	public MetaTable salesReceipt = null;
 	
 	/// Shopping cart cookie name
-	public String shoppingCartCookieName = "cart";
+	public String shoppingCartCookieName = "shopping-cart";
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -82,13 +83,16 @@ public class SimpleShoppingCart {
 	///
 	/// Gets / Updates the current shopping cart stored inside the cookie "cart" parameter
 	///
+	/// Cart storage format will be as JSON : [[ID,count]]
+	///
 	/// ## HTTP Request Parameters (Optional)
 	///
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	        | Description                                                     |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
-	/// | update          | String[[ID,count]]      | Shopping item ID, and count to add/edit/delete (when count=0)   |
-	/// | simple          | boolean                 | Ignore cart content meta, and its checks                        |
+	/// | update          | [[ID,count], ... ]      | [optional] Shopping item ID, and count to                       |
+	/// |                 |                         |            add/edit/delete (when count=0)                       |
+	/// | simple          | boolean                 | [default=false] Ignore cart content meta, and its checks        |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
@@ -96,7 +100,7 @@ public class SimpleShoppingCart {
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type	        | Description                                                     |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
-	/// | list            | String[[ID,count,meta]] | Shopping cart content with item ID, count, and content          |
+	/// | list            | [[ID,count,meta], ... ] | Shopping cart content with item ID, count, and content          |
 	/// | itemCount       | Integer                 | Number of unique item ID inside the cart                        |
 	/// | quantityCount   | Integer                 | Total quantity of items                                         |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
@@ -105,6 +109,72 @@ public class SimpleShoppingCart {
 	///
 	public RESTFunction cart_GET_and_POST = (req, res) -> {
 		try {
+			//
+			// Get existing cookie values
+			//
+			String[] cookieSet = req.requestPage().requestCookieMap().get(shoppingCartCookieName);
+			String cartJsonStr = null;
+			
+			if( cookieSet != null && cookieSet.length > 0 ) {
+				cartJsonStr = cookieSet[0];
+			} else {
+				cartJsonStr = "";
+			}
+			GenericConvertList<Object> cartList = GenericConvert.toGenericConvertList( cartJsonStr, new ArrayList<Object>() );
+			
+			//
+			// Get the update list, apply update
+			//
+			GenericConvertList<Object> updateList = req.getGenericConvertList("update");
+			if( updateList != null ) {
+				for( int i=0; i<updateList.size(); ++i) {
+					// Line record of an update
+					GenericConvertList<Object> updateLine = updateList.getGenericConvertList(i, null);
+					// Skip blank lines
+					if(updateLine == null || updateLine.size() < 2) {
+						continue;
+					}
+					
+					String id = updateLine.getString(0);
+					int count = updateLine.getInt(1);
+					
+					//
+					// Find the ID in existing cartList, update count
+					//
+					
+					
+					//
+					// No ID found, append to cartList
+					//
+				}
+			}
+			
+			//
+			// Update the cookie value if needed
+			//
+			String cartJsonStr_new = ConvertJSON.fromList( cartList );
+			if( !cartJsonStr_new.equals(cartJsonStr) ) {
+				javax.servlet.http.Cookie theOneCookie = new javax.servlet.http.Cookie(shoppingCartCookieName, cartJsonStr_new);
+				req.requestPage().getHttpServletResponse().addCookie(theOneCookie);
+			}
+			
+			//
+			// For non simple mode, iterate the list and append the meta
+			//
+			if( req.getBoolean("simple") == true ) {
+				
+			}
+			
+			//
+			// Return values
+			//
+			res.put("list", cartList);
+			res.put("itemCount", cartList.size());
+			
+			//
+			// Iterate the items for total quantity
+			//
+			
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -153,11 +223,6 @@ public class SimpleShoppingCart {
 		try {
 			res.put("error", "");
 			MetaObject ret = null;
-			
-			if (req == null) {
-				res.put("error", "Request object is null");
-				return res;
-			}
 			
 			String oid = req.getString("_oid", "");
 			if (oid.isEmpty()) {

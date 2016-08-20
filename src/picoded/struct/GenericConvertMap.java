@@ -418,8 +418,27 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to array
-	// @TODO generic array conversion
 	//--------------------------------------------------------------------------------------------------
+	
+	/// To String Map conversion of generic object
+	///
+	/// @param key       The input value key to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted Map if possible, else null
+	public default <V> GenericConvertList<V> getGenericConvertList(K key, Object fallbck) {
+		return GenericConvert.toGenericConvertList(get(key), fallbck);
+	}
+	
+	///
+	/// Default Null fallback, To String Map conversion of generic object
+	///
+	/// @param key       The input value key to convert
+	///
+	/// @returns         The converted Map if possible, else null
+	public default <V> GenericConvertList<V> getGenericConvertList(K key) {
+		return GenericConvert.toGenericConvertList(get(key));
+	}
 	
 	// to string array
 	//--------------------------------------------------------------------------------------------------

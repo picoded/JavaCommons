@@ -560,7 +560,7 @@ public class GenericConvert {
 	// Generic string map
 	//--------------------------------------------------------------------------------------------------
 	
-	/// To String GenericConvertMap conversion of generic object
+	/// To GenericConvertMap conversion of generic object
 	///
 	/// Performs the following strategies in the following order
 	///
@@ -621,8 +621,68 @@ public class GenericConvert {
 	}
 	
 	// to array
-	// @TODO generic array conversion
 	//--------------------------------------------------------------------------------------------------
+	
+	/// To GenericConvertList conversion of generic object
+	///
+	/// Performs the following strategies in the following order
+	///
+	/// - No conversion (if its a GenericConvertList)
+	/// - To GenericConvertList (if its a List)
+	/// - toList -> GenericConvertList conversion
+	/// - Fallback
+	///
+	/// @param input     The input value to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted value
+	@SuppressWarnings("unchecked")
+	public static <V> GenericConvertList<V> toGenericConvertList(Object input, Object fallbck) {
+		
+		// Null handling
+		if (input == null) {
+			if (fallbck == null) {
+				return null;
+			}
+			return toGenericConvertList(fallbck, null);
+		}
+		
+		// If GenericConvertMap instance
+		if (input instanceof GenericConvertList) {
+			return (GenericConvertList<V>) input;
+		}
+		
+		// If List instance
+		if (input instanceof List) {
+			return new GenericConvertArrayList<V>( (List<V>)input );
+			//return ProxyGenericConvertMap.ensureGenericConvertMap((Map<K, V>) input);
+		}
+		
+		// If String instance, attampt JSON conversion
+		if (input instanceof String) {
+			try {
+				List<Object> jsonList = ConvertJSON.toList((String) input);
+				if (jsonList != null) {
+					return new GenericConvertArrayList<V>( (List<V>)jsonList );
+				}
+			} catch (Exception e) {
+				// Silence the exception
+			}
+		}
+		
+		// Fallback
+		return toGenericConvertList(fallbck, null);
+	}
+	
+	///
+	/// Default Null fallback, To GenericConvert String map conversion of generic object
+	///
+	/// @param input     The input value to convert
+	///
+	/// @returns         The converted value
+	public static <V> GenericConvertList<V> toGenericConvertList(Object input) {
+		return toGenericConvertList(input, null);
+	}
 	
 	// to string array
 	//--------------------------------------------------------------------------------------------------

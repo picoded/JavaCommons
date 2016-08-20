@@ -130,8 +130,8 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	/// @param index       The input value index to convert
 	///
 	/// @returns         The converted string, always possible unless null
-	public default int getInt(String string) {
-		return GenericConvert.toInt(get(string));
+	public default int getInt(int index) {
+		return GenericConvert.toInt(get(index));
 	}
 	
 	// to long conversion
@@ -384,4 +384,49 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 		return getNestedObject(index, null);
 	}
 	
+	// Generic string map
+	//--------------------------------------------------------------------------------------------------
+	
+	/// To String Map conversion of generic object
+	///
+	/// @param key       The input value key to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted Map if possible, else null
+	public default <K extends String, V> GenericConvertMap<K, V> getGenericConvertStringMap(int index, Object fallbck) {
+		return GenericConvert.toGenericConvertStringMap(get(index), fallbck);
+	}
+	
+	///
+	/// Default Null fallback, To String Map conversion of generic object
+	///
+	/// @param key       The input value key to convert
+	///
+	/// @returns         The converted Map if possible, else null
+	public default <K extends String, V> GenericConvertMap<K, V> getGenericConvertStringMap(int index) {
+		return GenericConvert.toGenericConvertStringMap(get(index));
+	}
+	
+	// to array
+	//--------------------------------------------------------------------------------------------------
+	
+	/// To String Map conversion of generic object
+	///
+	/// @param key       The input value key to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted Map if possible, else null
+	public default <V> GenericConvertList<V> getGenericConvertList(int index, Object fallbck) {
+		return GenericConvert.toGenericConvertList(get(index), fallbck);
+	}
+	
+	///
+	/// Default Null fallback, To String Map conversion of generic object
+	///
+	/// @param key       The input value key to convert
+	///
+	/// @returns         The converted Map if possible, else null
+	public default <V> GenericConvertList<V> getGenericConvertList(int index) {
+		return GenericConvert.toGenericConvertList(get(index));
+	}
 }

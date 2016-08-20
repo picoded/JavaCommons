@@ -142,13 +142,13 @@ public class SimpleShoppingCart {
 					// Find the ID in existing cartList, update count
 					//
 					boolean found = false;
-					for(int i=0;i<cartList.size();i++){
-						GenericConvertList<Object> cartLine = cartList.getGenericConvertList(i);
+					for(int j=0;j<cartList.size();j++){
+						GenericConvertList<Object> cartLine = cartList.getGenericConvertList(j);
 						if(cartLine == null) {
 							continue;
 						}
 						if(cartLine.getString(0).equals(id)) {
-							cartLine.put(1,count);
+							cartLine.add(1,count);
 							found = true;
 							break;
 						}
@@ -191,7 +191,7 @@ public class SimpleShoppingCart {
 					// @TODO SAFETY CHECK? : when meta object is invalid
 					//
 
-					cartLine.put(2, itemMeta);
+					cartLine.add(2, itemMeta);
 				}
 			}
 

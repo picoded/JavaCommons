@@ -4,6 +4,7 @@ import picoded.RESTBuilder.RESTBuilder;
 import picoded.RESTBuilder.RESTFunction;
 import picoded.enums.HttpRequestType;
 import picoded.JStruct.*;
+import picoded.servlet.*;
 import picoded.struct.*;
 import picoded.conv.*;
 
@@ -11,7 +12,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-
 ///
 /// Provides a shopping cart and product API
 /// All in a single API package.
@@ -112,9 +112,14 @@ public class SimpleShoppingCart {
 			//
 			// Get existing cookie values
 			//
-			String[] cookieSet = req.requestPage().requestCookieMap().get(shoppingCartCookieName);
-			String cartJsonStr = null;
+			CorePage requestPage= req.requestPage();
+			Map<String,String[]> cookieMap = requestPage.requestCookieMap();
+			String[] cookieSet = null;
+			if( cookieMap != null ) {
+				cookieSet = cookieMap.get(shoppingCartCookieName);
+			}
 
+			String cartJsonStr = null;
 			if( cookieSet != null && cookieSet.length > 0 ) {
 				cartJsonStr = cookieSet[0];
 			} else {
@@ -125,8 +130,10 @@ public class SimpleShoppingCart {
 			//
 			// Get the update list, apply update
 			//
+
 			GenericConvertList<Object> updateList = req.getGenericConvertList("update");
 			if( updateList != null ) {
+
 				for( int i=0; i<updateList.size(); ++i) {
 					// Line record of an update
 					GenericConvertList<Object> updateLine = updateList.getGenericConvertList(i, null);
@@ -148,7 +155,10 @@ public class SimpleShoppingCart {
 							continue;
 						}
 						if(cartLine.getString(0).equals(id)) {
-							cartLine.add(1,count);
+							cartLine.set(1,count);
+
+							// Replace and update
+							cartList.set(j, cartLine);
 							found = true;
 							break;
 						}
@@ -165,7 +175,6 @@ public class SimpleShoppingCart {
 
 				}
 			}
-
 			//
 			// Update the cookie value if needed
 			//
@@ -178,7 +187,7 @@ public class SimpleShoppingCart {
 			//
 			// For non simple mode, iterate the list and append the meta
 			//
-			if( req.getBoolean("simple") != true ) {
+			if( req.getBoolean("simple", false) != true ) {
 				for(int i=0;i<cartList.size();i++){
 					GenericConvertList<Object> cartLine = cartList.getGenericConvertList(i);
 					if(cartLine == null) {

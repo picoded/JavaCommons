@@ -187,7 +187,7 @@ public class SimpleShoppingCart {
 			//
 			// For non simple mode, iterate the list and append the meta
 			//
-			if( req.getBoolean("simple", false) != true ) {
+			if( req.getBoolean("simple", false) == false ) {
 				for(int i=0;i<cartList.size();i++){
 					GenericConvertList<Object> cartLine = cartList.getGenericConvertList(i);
 					if(cartLine == null) {
@@ -201,6 +201,7 @@ public class SimpleShoppingCart {
 					//
 
 					cartLine.add(2, itemMeta);
+					cartList.set(i, cartLine);
 				}
 			}
 

@@ -86,7 +86,6 @@
 		<mkdir dir="${basedir}/bin/tmp"/>
 
 		<mkdir dir="${basedir}/test-files/tmp"/>
-		<mkdir dir="${basedir}/bin/tmp/build-tmp/UBER"/>
 	</target>
 
 	<!-- Code Beautifier, used for pre-commit hook -->

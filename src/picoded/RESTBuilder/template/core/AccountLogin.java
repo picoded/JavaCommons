@@ -228,9 +228,9 @@ public class AccountLogin extends BasePage {
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | Parameter Name | Variable Type	  | Description                                                                   |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | sanitiseOutput  | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
-	/// |                 |                    | are returned as well.                                                         |
-	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                |                    | are returned as well.                                                         |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
 	///
@@ -272,6 +272,9 @@ public class AccountLogin extends BasePage {
 				res.put("accountNames", Arrays.asList((names == null) ? new String[] {} : names));
 				
 				res.put("isLogin", true);
+				
+				Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, sanitiseOutput);
+				res.putAll(commonInfo);
 			}
 		} else {
 			res.put("error", MISSING_REQUEST_PAGE);
@@ -348,6 +351,10 @@ public class AccountLogin extends BasePage {
 						}
 						res.put("accountNames", Arrays.asList((names == null) ? new String[] {} : names));
 						res.put("isLogin", true);
+						
+						Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, sanitiseOutput);
+						res.putAll(commonInfo);
+						
 					} else {
 						if (at.getFromName(tStr) == null) {
 							at.getFromID(tStr).addDelay(tStr);

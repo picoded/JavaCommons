@@ -11,15 +11,15 @@ import picoded.struct.CaseInsensitiveHashMap;
 ///
 /// This is mainly cause the table implmentation alone is complicated sadly =(
 /// so the class files are seperated for easier maintenance
-/// 
+///
 public class TableWrapperTemplates {
-	
+
 	///
 	/// FunctionalInterface for inserting of table data, inside the shared table builder
-	/// 
+	///
 	/// This is used both in injecting header data, and for row data. Note that the index count
-	/// for both are counted differently. 
-	/// 
+	/// for both are counted differently.
+	///
 	/// Additionally the function should return a NULL for terminating the end of an iteration
 	/// (end of row, or collumn, etc). As the table builder relies on this to "finish"
 	///
@@ -27,14 +27,14 @@ public class TableWrapperTemplates {
 	public interface TableDataInjector {
 		public abstract StringBuilder apply(int rowPos, int colPos);
 	}
-	
+
 	/// If your printing more then a 100 K rows, you seriously have problems
 	/// This upper limit to iteration is used to prevent infinite loops
 	public static final int tableBuilderSanityLimit = 100000;
-	
+
 	/// TableBuilder out of bound standard error
 	public static final String tableBuilderLimitError = "WT# - tableBuilder Injector out of bound for: ";
-	
+
 	///
 	/// Utility function used to build the HTML table structure. With the respective data injectors
 	///
@@ -47,21 +47,21 @@ public class TableWrapperTemplates {
 		 //
 		StringBuilder ret = new StringBuilder(); //return StringBuilder
 		try {
-			
+
 			int row = 0; //Row iterator
 			int col = 0; //Collumn iterator
 			StringBuilder injectorData = null;
-			
+
 			//
 			// Child wrapper: <table class="pfc_table"> ... </table> tags
 			//
 			StringBuilder[] tableTag = node.defaultHtmlChildWrapper(HtmlTag.TABLE, node.prefix_childWrapper() + "table",
 				null);
 			ret.append(tableTag[0]);
-			
+
 			//
 			// Top header handling: <thead> ... </thead>
-			// 
+			//
 			ret.append("<thead>");
 			if (topHeaderInjector != null) {
 				// Loop top header rows
@@ -74,27 +74,27 @@ public class TableWrapperTemplates {
 					}
 					// Creates the row
 					ret.append("<tr class='" + node.prefix_childWrapper() + "row_" + row + "'>");
-					
+
 					// Insert first 0 index item for the row
 					ret.append("<th class='" + node.prefix_childWrapper() + "col_0'>");
 					ret.append(injectorData);
 					ret.append("</th>");
-					
+
 					// Next collumn onwards
 					col = 1;
 					while (col >= 1) {
-						// 1 index onwards 
+						// 1 index onwards
 						injectorData = topHeaderInjector.apply(row, col);
 						// Moves on to next row when no more data
 						if (injectorData == null) {
 							break;
 						}
-						
+
 						// Insert first 1 index item onwards for the row
 						ret.append("<th class='" + node.prefix_childWrapper() + "col_" + col + "'>");
 						ret.append(injectorData);
 						ret.append("</th>");
-						
+
 						// Increment to next column within sanity limits
 						if (col++ > tableBuilderSanityLimit) {
 							throw new RuntimeException(tableBuilderLimitError + "Top Header Columns");
@@ -102,7 +102,7 @@ public class TableWrapperTemplates {
 					}
 					// Terminates the row
 					ret.append("</tr>");
-					
+
 					// Increment to next row within sanity limits
 					if (row++ > tableBuilderSanityLimit) {
 						throw new RuntimeException(tableBuilderLimitError + "Top Header Rows");
@@ -111,58 +111,58 @@ public class TableWrapperTemplates {
 			}
 			// End top header rows loop
 			ret.append("</thead>");
-			
+
 			//
 			// Left header, and actual content handling: <thead> ... </thead>
-			// 
+			//
 			ret.append("<tbody>");
 			// Loop body rows
 			row = 0;
 			while (row >= 0) {
 				StringBuilder firstRowHeader = (leftHeaderInjector != null) ? leftHeaderInjector.apply(row, 0) : null;
 				StringBuilder firstRowData = (dataInjector != null) ? dataInjector.apply(row, 0) : null;
-				
+
 				// Terminates the row if it has no 0 index items, for both headers and data
 				if (firstRowHeader == null && firstRowData == null) {
 					break;
 				}
-				
+
 				ret.append("<tr class='" + node.prefix_childWrapper() + "row_" + row + "'>");
 				//
-				// Row Header handling 
+				// Row Header handling
 				//
 				if (firstRowHeader != null) {
 					// Insert first 0 index header item for the row
 					ret.append("<th class='" + node.prefix_childWrapper() + "col_0'>");
-					
+
 					ret.append(firstRowHeader);
 					ret.append("</th>");
 				}
-				
+
 				// Next collumn onwards
 				col = 1;
 				while (col >= 1) {
-					// 1 index onwards 
-					
+					// 1 index onwards
+
 					injectorData = (leftHeaderInjector != null) ? leftHeaderInjector.apply(row, col) : null;
 					// Moves on to next row when no more data
 					if (injectorData == null) {
 						break;
 					}
-					
+
 					// Insert first 1 index item onwards for the row
 					ret.append("<th class='" + node.prefix_childWrapper() + "col_" + col + "'>");
 					ret.append(injectorData);
 					ret.append("</th>");
-					
+
 					// Increment to next column within sanity limits
 					if (col++ > tableBuilderSanityLimit) {
 						throw new RuntimeException(tableBuilderLimitError + "Left Header Columns");
 					}
 				}
-				
+
 				//
-				// Row Data handling 
+				// Row Data handling
 				//
 				if (firstRowData != null) {
 					// Insert first 0 index header item for the row
@@ -170,12 +170,12 @@ public class TableWrapperTemplates {
 					ret.append(firstRowData);
 					ret.append("</td>");
 				}
-				
+
 				// Next collumn onwards
 				col = 1;
 				while (col >= 1) {
-					// 1 index onwards 
-					
+					// 1 index onwards
+
 					injectorData = (dataInjector != null) ? dataInjector.apply(row, col) : null;
 					// Moves on to next row when no more data
 					if (injectorData == null) {
@@ -190,9 +190,9 @@ public class TableWrapperTemplates {
 						throw new RuntimeException(tableBuilderLimitError + "Left Header Columns");
 					}
 				}
-				
+
 				ret.append("</tr>");
-				
+
 				// Increment to next row within sanity limits
 				if (row++ > tableBuilderSanityLimit) {
 					throw new RuntimeException(tableBuilderLimitError + "Body Rows");
@@ -200,7 +200,7 @@ public class TableWrapperTemplates {
 			}
 			// End body rows loop
 			ret.append("</tbody>");
-			
+
 			// Closes table tag
 			ret.append(tableTag[1]);
 		} catch (Exception e) {
@@ -208,7 +208,7 @@ public class TableWrapperTemplates {
 		}
 		return ret;
 	}
-	
+
 	///
 	/// Utility function used to build the HTML table structure. With the respective data injectors. And a standard wrapper
 	///
@@ -218,29 +218,29 @@ public class TableWrapperTemplates {
 	) { //
 		 //return
 		StringBuilder ret = new StringBuilder();
-		
+
 		//wrapper
 		StringBuilder[] wrapperArr = node.defaultHtmlWrapper(HtmlTag.DIV, wrapperClass, null);
 		ret.append(wrapperArr[0]);
-		
+
 		//label
 		String label = node.label();
 		if (label != null && label.length() > 0) {
 			StringBuilder[] labelArr = node.defaultHtmlLabel(HtmlTag.DIV, node.prefix_standard() + "label", null);
-			
+
 			ret.append(labelArr[0]);
 			ret.append(label);
 			ret.append(labelArr[1]);
 		}
-		
+
 		//table
 		ret.append(tableBuilder_ViaInjectors(node, topHeaderInjector, leftHeaderInjector, dataInjector));
-		
+
 		//closing up
 		ret.append(wrapperArr[1]);
 		return ret;
 	}
-	
+
 	///
 	/// Utility function used to build the header injector, based on its definition
 	///
@@ -289,7 +289,7 @@ public class TableWrapperTemplates {
 								// Gets the tier2 return object
 								//
 								Object ret = subTierList.get(col);
-								
+
 								//
 								// Form node in headers D=
 								//
@@ -297,7 +297,7 @@ public class TableWrapperTemplates {
 									return (new FormNode(node._formGenerator, (Map<String, Object>) ret, node.getValueMap()))
 										.fullHtml(isDisplayMode);
 								}
-								
+
 								return new StringBuilder((ret != null) ? ret.toString() : "");
 							} else {
 								//
@@ -324,7 +324,7 @@ public class TableWrapperTemplates {
 								return null;
 							}
 							Object ret = mainHeaderList.get(col);
-							
+
 							//
 							// Form node in headers D=
 							//
@@ -332,7 +332,7 @@ public class TableWrapperTemplates {
 								return (new FormNode(node._formGenerator, (Map<String, Object>) ret, node.getValueMap()))
 									.fullHtml(isDisplayMode);
 							}
-							
+
 							return new StringBuilder((ret != null) ? ret.toString() : "");
 						};
 					}
@@ -351,7 +351,7 @@ public class TableWrapperTemplates {
 		}
 		return null;
 	}
-	
+
 	///
 	/// Varient of [tableBuilderWithWrapper_ViaInjectors], which does the processing of objects to header injectors
 	///
@@ -361,12 +361,12 @@ public class TableWrapperTemplates {
 		boolean isDisplayMode, //
 		Object topHeaderDefine, Object leftHeaderDefine, TableDataInjector dataInjector //
 	) { //
-	
+
 		//
 		// Top header handling, if object definition given
 		//
 		TableDataInjector topHeaderInjector = topHeaderDefineToInjector(node, topHeaderDefine, isDisplayMode);
-		
+
 		//
 		// Left header handling, if object definition given
 		//
@@ -377,29 +377,29 @@ public class TableWrapperTemplates {
 				return leftHeaderInjector_unflipped.apply(col, row);
 			};
 		}
-		
+
 		// Run with all the applicable injectors
 		return tableBuilderWithWrapper_ViaInjectors(node, wrapperClass, topHeaderInjector, leftHeaderInjector,
 			dataInjector);
 	}
-	
+
 	///
 	/// Utility function used to build the data injector, based on its field
 	///
 	@SuppressWarnings("unchecked")
 	public static TableDataInjector horizontalDataInjectorFromNode(FormNode node, boolean isDisplayMode) {
-		
+
 		Object fieldValue = node.getRawFieldValue();
 		List<Map<String, Object>> childrenDefinition = node.childrenDefinition();
 		List<Object> valueRows = (fieldValue instanceof List) ? (List<Object>) fieldValue : null;
-		
+
 		//
 		// Minimum rows iteration check
 		//
 		int minIteration = node.getInt("min-iteration", 0);
 		int maxIteration = node.getInt("max-iteration", 32767); //short int max
-		
-		if (minIteration > 0) {
+
+		if (minIteration > 0 || maxIteration > 0) {
 			List<Object> tmpRows = new ArrayList<Object>();
 			if (valueRows != null) {
 				tmpRows.addAll(valueRows);
@@ -407,16 +407,19 @@ public class TableWrapperTemplates {
 			while (tmpRows.size() < minIteration) {
 				tmpRows.add(new HashMap<String, Object>());
 			}
+
+			//
+			// Maximum iteration check
+			//
+			while(tmpRows.size() > maxIteration) {
+				tmpRows.remove(tmpRows.size() - 1);
+			}
+
 			valueRows = tmpRows;
 		}
-		
-		// 
-		// Maximum iteration check
-		//
-		while(tmpRows.size() > maxIteration) {
-			tmpRows.remove(tmpRows.size() - 1);
-		}
-		
+
+
+
 		//
 		// Return the value rows lamda if not null
 		//
@@ -425,7 +428,7 @@ public class TableWrapperTemplates {
 			return (row, col) -> {
 				//
 				// Terminate the rows, when last row is done
-				// 
+				//
 				if (row >= dataRows.size()) {
 					return null;
 				}
@@ -441,18 +444,18 @@ public class TableWrapperTemplates {
 				Object rowObj = dataRows.get(row);
 				Map<String, Object> rowMap = (rowObj instanceof Map) ? (Map<String, Object>) rowObj : null;
 				Map<String, Object> child = childrenDefinition.get(col);
-				
+
 				//sam single tier "fix"
 				int tierNumber = row;
-				
+
 				FormNode childNode = new FormNode(node._formGenerator, child, rowMap);
 				String currentNodeName = node.getFieldName();
-				
+
 				if (currentNodeName != null && !currentNodeName.isEmpty()) {
 					childNode.namePrefix = currentNodeName + "[" + tierNumber + "].";
 				}
 				//and sam "fix"
-				
+
 				//
 				// Build if possible
 				//
@@ -463,13 +466,13 @@ public class TableWrapperTemplates {
 				return (ret != null) ? ret : new StringBuilder(""); //blank fallback
 			};
 		}
-		
+
 		return null;
 	}
-	
+
 	///
 	/// Horizontal table wrapper implmentation
-	/// 
+	///
 	/// Children field values are added as rows
 	///
 	public static StringBuilder tableWrapper_horizontal(FormNode node, boolean isDisplayMode) {
@@ -477,7 +480,7 @@ public class TableWrapperTemplates {
 		if (isDisplayMode && node.getBoolean("excludeFromDisplay", false)) {
 			return new StringBuilder("");
 		}
-		
+
 		return tableBuilderWithWrapper_ViaDefinesAndInjector(
 		// Base stuff
 			node, node.prefix_wrapper() + "table " + node.prefix_wrapper() + "horizontalTable", isDisplayMode, //
@@ -489,10 +492,10 @@ public class TableWrapperTemplates {
 			horizontalDataInjectorFromNode(node, isDisplayMode) //
 		);
 	}
-	
+
 	///
 	/// Vertical table wrapper implmentation
-	/// 
+	///
 	/// Children field values are added as cols
 	///
 	public static StringBuilder tableWrapper_vertical(FormNode node, boolean isDisplayMode) {
@@ -500,7 +503,7 @@ public class TableWrapperTemplates {
 		if (isDisplayMode && node.getBoolean("excludeFromDisplay", false)) {
 			return new StringBuilder("");
 		}
-		
+
 		TableDataInjector unflippedDataInjector = horizontalDataInjectorFromNode(node, isDisplayMode);
 		TableDataInjector dataInjector = null;
 		// The same function as horizontal is used, with axis flipped
@@ -521,5 +524,5 @@ public class TableWrapperTemplates {
 			dataInjector//
 		);
 	}
-	
+
 }

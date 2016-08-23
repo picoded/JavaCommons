@@ -395,9 +395,10 @@ public class TableWrapperTemplates {
 		
 		//
 		// Minimum rows iteration check
-		// @TODO Maximum iteration check
 		//
 		int minIteration = node.getInt("min-iteration", 0);
+		int maxIteration = node.getInt("max-iteration", 32767); //short int max
+		
 		if (minIteration > 0) {
 			List<Object> tmpRows = new ArrayList<Object>();
 			if (valueRows != null) {
@@ -407,6 +408,13 @@ public class TableWrapperTemplates {
 				tmpRows.add(new HashMap<String, Object>());
 			}
 			valueRows = tmpRows;
+		}
+		
+		// 
+		// Maximum iteration check
+		//
+		while(tmpRows.size() > maxIteration) {
+			tmpRows.remove(tmpRows.size() - 1);
 		}
 		
 		//

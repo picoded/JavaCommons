@@ -424,11 +424,11 @@ public class SimpleShoppingCart {
 		return cart;
 	}
 	
-	//--------------------------------------------
+	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// shopping cart [util functions]
 	//
-	//--------------------------------------------
+	/////////////////////////////////////////////////////////////////////////////////////////
 	
 	///
 	/// Nulls items with count of 0 or less
@@ -468,14 +468,14 @@ public class SimpleShoppingCart {
 	///
 	/// @return List of meta objects representing the owner
 	///
-	public List<MetaObject> getProductList(String ownerID) {
+	public GenericConvertList<MetaObject> getProductList(String ownerID) {
 		// Sanity check
 		if( ownerID == null || ownerID.isEmpty() ) {
 			throw new RuntimeException("Missing ownerID");
 		}
 		
 		// Return object
-		List<MetaObject> ret = new ArrayList<MetaObject>();
+		GenericConvertList<MetaObject> ret = new GenericConvertArrayList<MetaObject>();
 		
 		// Fetch and populate
 		MetaObject[] queryRet = productItem.query("_ownerID=?", new String[] { ownerID }, "_createdTime", 0, product_max);
@@ -505,7 +505,7 @@ public class SimpleShoppingCart {
 			throw new RuntimeException("Missing ownerID");
 		}
 		
-		MetaObject ownerObj = productOwner.get(oid);
+		MetaObject ownerObj = productOwner.get(ownerID);
 		if (ownerObj == null) {
 			throw new RuntimeException("Missing product owner object for : "+ownerID);
 		}
@@ -513,6 +513,9 @@ public class SimpleShoppingCart {
 		if (inUpdateList == null) {
 			throw new RuntimeException("Missing update list");
 		}
+		
+		// Existing product list from ownerID
+		GenericConvertList<MetaObject> prodList = getProductList(ownerID);
 		
 		// Update list to use
 		GenericConvertList<Object> updateList = GenericConvertList.build(inUpdateList);
@@ -523,7 +526,7 @@ public class SimpleShoppingCart {
 		int iLen = updateList.size();
 		for (int i = 0; i < iLen; ++i) {
 			// Ensure it is a new object, avoid meta object changes bugs
-			Map<String, Object> updateProduct = updateList.getStringMap(i, null);
+			GenericConvertMap<String, Object> updateProduct = updateList.getGenericConvertStringMap(i, null);
 			
 			// Skip null rows
 			if (updateProduct == null) {
@@ -538,8 +541,24 @@ public class SimpleShoppingCart {
 			if( update_oid != null && update_oid.equalsIgnoreCase("new") ) {
 				update_oid = null;
 			}
-			// 
 			
+			// The meta object to create / update
+			MetaObject updateMetaObject = null;
+			
+			if( update_oid != null ) {
+				// Old meta object
+				updateMetaObject = productItem.get( update_oid );
+				
+				// Security validation of owner ID
+				if( !ownerID.equals(updateMetaObject.get("_ownerID")) ) {
+					throw new SecurityException("Unauthorized update call to object "+update_oid+" with invalid ownerID "+ownerID);
+				}
+				
+			} else {
+				// New meta object
+				updateMetaObject = productItem.newObject();
+				prodList.add(updateMetaObject);
+			}
 			
 			// MetaObject productEntryObj = null;
 			// String productID = GenericConvert.toString(singleProduct.get("_oid"), "");
@@ -556,6 +575,30 @@ public class SimpleShoppingCart {
 			// }
 		}
 		
+		return prodList;
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// products [util functions]
+	//
+	/////////////////////////////////////////////////////////////////////////////////////////
+	
+	///
+	/// Converts the cart listing object to JSON string
+	///
+	/// @param  List of metaobject to find
+	/// @param  _oid to find for
+	///
+	/// @return The metaobject found (if found)
+	///
+	protected MetaObject findMetaObjectInList(List<MetaObject> list, String _oid) {
+		for(MetaObject o : list) {
+			if(o._oid().equalsIgnoreCase(_oid)) {
+				return o;
+			}
+		}
+		return null;
 	}
 	
 	// ///

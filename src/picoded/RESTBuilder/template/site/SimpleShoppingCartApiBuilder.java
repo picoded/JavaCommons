@@ -16,7 +16,7 @@ import java.util.ArrayList;
 /// Provides a shopping cart and product API
 /// All in a single API package.
 ///
-public class SimpleShoppingCart {
+public class SimpleShoppingCartApiBuilder {
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -49,11 +49,11 @@ public class SimpleShoppingCart {
 	/////////////////////////////////////////////////////////////////////////////////////////
 
 	/// Empty constructor
-	public SimpleShoppingCart() {
+	public SimpleShoppingCartApiBuilder() {
 		//Does nothing
 	}
 
-	public SimpleShoppingCart(JStruct inStruct, String prefix) {
+	public SimpleShoppingCartApiBuilder(JStruct inStruct, String prefix) {
 		setupTables(inStruct, prefix);
 	}
 

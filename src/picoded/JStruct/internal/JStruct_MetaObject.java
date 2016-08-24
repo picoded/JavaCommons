@@ -45,9 +45,14 @@ public class JStruct_MetaObject implements MetaObject {
 	//----------------------------------------------
 	
 	/// Common setup function, across constructors
-	protected void commonSetup(JStruct_MetaTable inTable, String inOID, Map<String, Object> inRemoteData,
+	protected void commonSetup(MetaTable inTable, String inOID, Map<String, Object> inRemoteData,
 		boolean isCompleteData) {
-		mainTable = inTable;
+			
+		if( !(inTable instanceof JStruct_MetaTable) ) {
+			throw new RuntimeException("Requires MetaTable to be based off JStruct_MetaTable");
+		}
+			
+		mainTable = (JStruct_MetaTable)inTable;
 		
 		// Generates a GUID if not given
 		if (inOID == null || inOID.length() < 22) {
@@ -64,7 +69,8 @@ public class JStruct_MetaObject implements MetaObject {
 				if (remoteDataMap.size() == 1 && remoteDataMap.get("_oid") != null) {
 					// ignore if its just _oid
 				} else {
-					throw new RuntimeException("GUID Collision T_T Q_Q " + _oid);
+					// SERIOUSLY ?????
+					throw new SecurityException("GUID Collision T_T Q_Q " + _oid);
 				}
 			}
 			
@@ -87,12 +93,12 @@ public class JStruct_MetaObject implements MetaObject {
 	}
 	
 	/// Constructor, with metaTable and GUID (auto generated if null)
-	public JStruct_MetaObject(JStruct_MetaTable inTable, String inOID) {
+	public JStruct_MetaObject(MetaTable inTable, String inOID) {
 		commonSetup(inTable, inOID, null, false);
 	}
 	
 	/// Constructor, with metaTable and GUID (auto generated if null)
-	public JStruct_MetaObject(JStruct_MetaTable inTable, String inOID, Map<String, Object> inRemoteData,
+	public JStruct_MetaObject(MetaTable inTable, String inOID, Map<String, Object> inRemoteData,
 		boolean isCompleteData) {
 		commonSetup(inTable, inOID, inRemoteData, isCompleteData);
 	}

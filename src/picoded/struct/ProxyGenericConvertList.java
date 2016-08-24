@@ -16,8 +16,13 @@ import org.apache.commons.collections4.list.AbstractListDecorator;
 ///
 public class ProxyGenericConvertList<V> extends AbstractListDecorator<V> implements GenericConvertList<V> {
 	/// Protected constructor
-	protected ProxyGenericConvertList(List<V> inList) {
+	public ProxyGenericConvertList(List<V> inList) {
 		super(inList);
+	}
+	
+	/// Protected constructor
+	public ProxyGenericConvertList() {
+		super();
 	}
 	
 	/// The static builder for the map

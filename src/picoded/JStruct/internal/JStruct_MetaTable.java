@@ -127,40 +127,6 @@ public class JStruct_MetaTable implements MetaTable {
 		return (get(key) != null);
 	}
 	
-	// MetaObject operations
-	//----------------------------------------------
-	
-	/// Generates a new blank object, with a GUID
-	public MetaObject newObject() {
-		MetaObject ret = new JStruct_MetaObject(this, null, null, false);
-		return ret;
-	}
-	
-	/// Gets the MetaObject, regardless of its actual existance
-	public MetaObject uncheckedGet(String _oid) {
-		return new JStruct_MetaObject(this, _oid, null, false);
-	}
-	
-	/// PUT, returns the object ID (especially when its generated), note that this
-	/// adds the value in a merger style. Meaning for example, existing values not explicitely
-	/// nulled or replaced are maintained
-	public MetaObject append(String _oid, Map<String, Object> obj) {
-		
-		/// Appending a MetaObject is equivalent of saveDelta
-		MetaObject r = null;
-		if (obj instanceof MetaObject && ((MetaObject) obj)._oid().equals(_oid)) {
-			(r = (MetaObject) obj).saveDelta();
-			return r;
-		}
-		
-		/// Unchecked get, put, and save
-		r = uncheckedGet(_oid);
-		r.putAll(obj);
-		r.saveDelta();
-		
-		return r;
-	}
-	
 	///
 	/// Internal functions, used by MetaObject
 	///--------------------------------------------------------------------------

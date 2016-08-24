@@ -1,6 +1,6 @@
 package picoded.struct;
 
-import java.util.HashMap;
+import java.util.*;
 import picoded.conv.*;
 
 ///
@@ -29,4 +29,22 @@ public class GenericConvertHashMap<K, V> extends HashMap<K, V> implements Generi
 	public String toString() {
 		return GenericConvert.toString((Object)this);
 	}
+	
+	//------------------------------------------------------
+	//
+	// Constructors
+	//
+	//------------------------------------------------------
+	
+	/// Consturctor
+	public GenericConvertHashMap() {
+		super();
+	}
+	
+	/// Consturctor
+	@SuppressWarnings("unchecked")
+	public GenericConvertHashMap(Map<? extends K,? extends V> m) {
+		super((Map<K,V>)m);
+	}
+	
 }

@@ -75,15 +75,43 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// Generates a new blank object, with a GUID
 	///
 	/// @returns the MetaObject
-	public MetaObject newObject();
+	public default MetaObject newObject() {
+		MetaObject ret = new JStruct_MetaObject(this, null, null, false);
+		
+		// Baking in _createTime stamp
+		ret.put("_createTime", (System.currentTimeMillis() / 1000L));
+		
+		return ret;
+	}
 	
-	/// Gets the MetaObject, regardless of its actual existance.
-	/// Note: get(_oid, isUnchecked) calls this internally when needed
-	///
-	/// @param object GUID to fetch
+	/// Gets the MetaObject, regardless of its actual existance
 	///
 	/// @returns the MetaObject
-	public MetaObject uncheckedGet(String _oid);
+	public default MetaObject uncheckedGet(String _oid) {
+		return new JStruct_MetaObject(this, _oid, null, false);
+	}
+	
+	/// PUT, returns the object ID (especially when its generated), note that this
+	/// adds the value in a merger style. Meaning for example, existing values not explicitely
+	/// nulled or replaced are maintained
+	///
+	/// @returns the MetaObject
+	public default MetaObject append(String _oid, Map<String, Object> obj) {
+		
+		/// Appending a MetaObject is equivalent of saveDelta
+		MetaObject r = null;
+		if (obj instanceof MetaObject && ((MetaObject) obj)._oid().equals(_oid)) {
+			(r = (MetaObject) obj).saveDelta();
+			return r;
+		}
+		
+		/// Unchecked get, put, and save
+		r = uncheckedGet(_oid);
+		r.putAll(obj);
+		r.saveDelta();
+		
+		return r;
+	}
 	
 	/// Checked, or unchecked get indicated by a booolean
 	///
@@ -98,13 +126,6 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 			return get(_oid);
 		}
 	}
-	
-	/// PUT, returns the object ID (especially when its generated), note that this
-	/// adds the value in a merger style. Meaning for example, existing values not explicitely
-	/// nulled or replaced are maintained
-	///
-	/// @returns the MetaObject
-	public MetaObject append(String _oid, Map<String, Object> obj);
 	
 	// 
 	// MetaObject utility operations

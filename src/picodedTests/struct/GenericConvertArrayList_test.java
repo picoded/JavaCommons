@@ -187,7 +187,8 @@ public class GenericConvertArrayList_test {
 	public void getIntTest() {
 		convertArrayList = new GenericConvertArrayList<String>();
 		convertArrayList.add(42);
-		assertEquals(42, convertArrayList.getInt("24"));
+		assertEquals(42, convertArrayList.getInt(0, 24));
+		assertEquals(24, convertArrayList.getInt(1, 24));
 	}
 	
 	@Test

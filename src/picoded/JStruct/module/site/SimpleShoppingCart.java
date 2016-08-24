@@ -13,54 +13,82 @@ import picoded.struct.query.*;
 /// A simple shopping cart system, which is built ontop of MetaTable, and AtomicLongMap
 /// 
 public class SimpleShoppingCart {
-	// /////////////////////////////////////////////////////////////////////////////////////////
-	// //
-	// // Class variables
-	// //
-	// /////////////////////////////////////////////////////////////////////////////////////////
-	// 
-	// /// Inventory owner metatable
-	// public MetaTable productOwner = null;
-	// 
-	// /// Inventory listing
-	// public MetaTable productItem = null;
-	// 
-	// /// Atomic product counting
-	// public AtomicLongMap productCount = null;
-	// 
-	// /// Sales order
-	// public MetaTable salesOrder = null;
-	// 
-	// /// Sales reciept
-	// public MetaTable salesReceipt = null;
-	// 
-	// /// Shopping cart cookie name
-	// public String shoppingCartCookieName = "shopping-cart";
-	// 
-	// /////////////////////////////////////////////////////////////////////////////////////////
-	// //
-	// // Constructor options
-	// //
-	// /////////////////////////////////////////////////////////////////////////////////////////
-	// 
-	// /// Empty constructor
-	// public SimpleShoppingCartApiBuilder() {
-	// 	//Does nothing
-	// }
-	// 
-	// public SimpleShoppingCartApiBuilder(JStruct inStruct, String prefix) {
-	// 	setupTables(inStruct, prefix);
-	// }
-	// 
-	// public void setupTables(JStruct inStruct, String prefix) {
-	// 	productOwner = inStruct.getMetaTable(prefix);
-	// 	productItem = inStruct.getMetaTable(prefix + "_item");
-	// 	productCount = inStruct.getAtomicLongMap(prefix + "_count");
-	// 
-	// 	salesOrder = inStruct.getMetaTable(prefix + "_sale"); //Formalised shopping cart?
-	// 	salesOrder = inStruct.getMetaTable(prefix + "_receipt");
-	// }
-	// 
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Class variables
+	//
+	/////////////////////////////////////////////////////////////////////////////////////////
+	
+	/// Inventory owner metatable
+	public MetaTable productOwner = null;
+	
+	/// Inventory listing
+	public MetaTable productItem = null;
+	
+	/// Atomic product counting
+	public AtomicLongMap productCount = null;
+	
+	/// Sales order
+	public MetaTable salesOrder = null;
+	
+	/// Sales reciept
+	public MetaTable salesReceipt = null;
+	
+	/// Shopping cart cookie name
+	public String shoppingCartCookieName = "shopping-cart";
+	
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Constructor options
+	//
+	/////////////////////////////////////////////////////////////////////////////////////////
+	
+	/// Empty constructor
+	public SimpleShoppingCart() {
+		//Does nothing : manual setup
+	}
+	
+	public SimpleShoppingCart(JStruct inStruct, String prefix) {
+		setupStandardTables(inStruct, prefix);
+	}
+	
+	///
+	/// Setup the standard tables, with the given JStruct
+	///
+	/// @param   The JStruct object to build ontop of
+	/// @param   The table name prefix to generate the various meta table
+	///
+	public void setupStandardTables(JStruct inStruct, String prefix) {
+		productOwner = inStruct.getMetaTable(prefix);
+		productItem = inStruct.getMetaTable(prefix + "_item");
+		productCount = inStruct.getAtomicLongMap(prefix + "_count");
+	
+		salesOrder = inStruct.getMetaTable(prefix + "_sale"); //Formalised shopping cart?
+		salesReceipt = inStruct.getMetaTable(prefix + "_receipt");
+	}
+	
+	///
+	/// Calls the systemSetup for the underlying MetaTable / AtomicLongMap
+	///
+	public void systemSetup() {
+		productOwner.systemSetup();
+		productItem.systemSetup();
+		productCount.systemSetup();
+		salesOrder.systemSetup();
+		salesReceipt.systemSetup();
+	}
+	
+	///
+	/// Calls the systemSetup for the underlying MetaTable / AtomicLongMap
+	///
+	public void systemTeardown() {
+		productOwner.systemTeardown();
+		productItem.systemTeardown();
+		productCount.systemTeardown();
+		salesOrder.systemTeardown();
+		salesReceipt.systemTeardown();
+	}
+	
 	// /////////////////////////////////////////////////////////////////////////////////////////
 	// //
 	// // Shopping cart API

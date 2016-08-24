@@ -42,7 +42,7 @@ public class SimpleShoppingCart {
 	public int cart_max = 50;
 	
 	/// Product list max size
-	public int product_max = 50;
+	public int product_max = 250;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -461,21 +461,103 @@ public class SimpleShoppingCart {
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
 	
+	///
+	/// Gets a list of products assigned under an ownerID
+	///
+	/// @param  The ownerID assigned
+	///
+	/// @return List of meta objects representing the owner
+	///
 	public List<MetaObject> getProductList(String ownerID) {
+		// Sanity check
+		if( ownerID == null || ownerID.isEmpty() ) {
+			throw new RuntimeException("Missing ownerID");
+		}
 		
+		// Return object
 		List<MetaObject> ret = new ArrayList<MetaObject>();
 		
-		MetaObject[] queryRet = productItem.query("_ownerID=?", new String[] { ownerID }, "_createdTime", 0, 50);
+		// Fetch and populate
+		MetaObject[] queryRet = productItem.query("_ownerID=?", new String[] { ownerID }, "_createdTime", 0, product_max);
 		if (queryRet != null && queryRet.length > 0) {
 			for (int i = 0; i < queryRet.length; ++i) {
 				ret.add(queryRet[i]);
 			}
 		}
 		
+		// Return
 		return ret;
 	}
-
-
+	
+	///
+	/// Updates the product listing under an ownerID
+	///
+	/// @param  The ownerID assigned
+	/// @param  List of product objects to insert / update
+	///
+	/// @return List of meta objects representing the owner
+	///
+	public List<MetaObject> updateProductList(String ownerID, List<Object> inUpdateList) {
+		//
+		// Sanity check
+		//
+		if( ownerID == null || ownerID.isEmpty() ) {
+			throw new RuntimeException("Missing ownerID");
+		}
+		
+		MetaObject ownerObj = productOwner.get(oid);
+		if (ownerObj == null) {
+			throw new RuntimeException("Missing product owner object for : "+ownerID);
+		}
+		
+		if (inUpdateList == null) {
+			throw new RuntimeException("Missing update list");
+		}
+		
+		// Update list to use
+		GenericConvertList<Object> updateList = GenericConvertList.build(inUpdateList);
+		
+		//
+		// Iterate the update list, updating if need be. La, la la
+		//
+		int iLen = updateList.size();
+		for (int i = 0; i < iLen; ++i) {
+			// Ensure it is a new object, avoid meta object changes bugs
+			Map<String, Object> updateProduct = updateList.getStringMap(i, null);
+			
+			// Skip null rows
+			if (updateProduct == null) {
+				continue;
+			}
+			
+			// Make new object, clone the values
+			updateProduct = new GenericConvertHashMap<String,Object>(updateProduct);
+			
+			// Product _oid
+			String update_oid = updateProduct.getString("_oid", null);
+			if( update_oid != null && update_oid.equalsIgnoreCase("new") ) {
+				update_oid = null;
+			}
+			// 
+			
+			
+			// MetaObject productEntryObj = null;
+			// String productID = GenericConvert.toString(singleProduct.get("_oid"), "");
+			// if (productID == null || productID.isEmpty() || productID.equalsIgnoreCase("new")) {
+			// 	productEntryObj = productItem.append(null, productDetails);
+			// 
+			// 	productDetails.put("_createTime", (System.currentTimeMillis() / 1000L));
+			// 
+			// 	productEntryObj.saveAll();
+			// } else {
+			// 	productEntryObj = productItem.get(productID);
+			// 	productEntryObj.putAll(productDetails);
+			// 	productEntryObj.saveDelta();
+			// }
+		}
+		
+	}
+	
 	// ///
 	// /// # product (GET/POST)
 	// ///
@@ -515,21 +597,7 @@ public class SimpleShoppingCart {
 	// ///
 	// public RESTFunction product_GET_and_POST = (req, res) -> {
 	// 	try {
-	// 		res.put("error", "");
-	// 		MetaObject ret = null;
-	// 
-	// 		String oid = req.getString("_oid", "");
-	// 		if (oid.isEmpty()) {
-	// 			res.put("error", "Request object did not contain an oid");
-	// 			return res;
-	// 		}
-	// 
-	// 		MetaObject productOwnerObj = productOwner.get(oid);
-	// 		if (productOwnerObj == null) {
-	// 			res.put("error", "Product Owner table does not contain an object for this oid");
-	// 			return res;
-	// 		}
-	// 
+	
 	// 		//if update is not null, do an update
 	// 		String[] updateArray = null;
 	// 		List<String> updateErrors = new ArrayList<String>();
@@ -568,15 +636,6 @@ public class SimpleShoppingCart {
 	// 
 	// 		res.put("queryLog", updateErrors);
 	// 
-	// 		//then do a get
-	// 		MetaObject[] queryRet = productItem.query("_ownerID=?", new String[] { oid }, "_createdTime", 0, 50);
-	// 		List<Object> retMeta = new ArrayList<Object>();
-	// 		if (queryRet != null && queryRet.length > 0) {
-	// 			for (int i = 0; i < queryRet.length; ++i) {
-	// 				retMeta.add(queryRet[i]);
-	// 			}
-	// 		}
-	// 		res.put("list", retMeta);
 	// 	} catch (Exception e) {
 	// 		throw new RuntimeException(e);
 	// 	}

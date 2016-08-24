@@ -41,7 +41,7 @@ public class TemplateSession {
 		// @TODO : merge and do a layered map with the parent maps
 		if (inModelMap != null) {
 			// Gets the generic convert map
-			modelMap = ProxyGenericConvertMap.ensureGenericConvertMap(inModelMap);
+			modelMap = ProxyGenericConvertMap.ensure(inModelMap);
 		} else {
 			// Uses a blank object, so that the code is less error prone
 			modelMap = new GenericConvertHashMap<String, Object>();

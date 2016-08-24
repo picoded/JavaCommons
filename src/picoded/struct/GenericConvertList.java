@@ -46,6 +46,14 @@ import picoded.conv.GenericConvert;
 
 public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	
+	// Static proxy build
+	//--------------------------------------------------------------------------------------------------
+	
+	/// Ensures the returned map is a GenericConvertMap, doing the conversion if needed.
+	public static <E> GenericConvertList<E> build(List<E> inList) {
+		return ProxyGenericConvertList.ensure(inList);
+	}
+	
 	// to string conversion
 	//--------------------------------------------------------------------------------------------------
 	

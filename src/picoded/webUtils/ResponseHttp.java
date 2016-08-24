@@ -50,7 +50,7 @@ public interface ResponseHttp {
 		if (rMap == null) {
 			return null;
 		} else {
-			return ProxyGenericConvertMap.ensureGenericConvertMap(rMap);
+			return ProxyGenericConvertMap.ensure(rMap);
 		}
 	};
 	

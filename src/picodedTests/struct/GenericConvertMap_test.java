@@ -115,7 +115,7 @@ public class GenericConvertMap_test {
 	@Test
 	public void proxy_intTest() {
 		GenericConvertMap<String, Object> tObj = ProxyGenericConvertMap
-			.ensureGenericConvertMap(new CaseInsensitiveHashMap<String, Object>());
+			.ensure(new CaseInsensitiveHashMap<String, Object>());
 		
 		assertNull(tObj.put("year", "1965"));
 		
@@ -135,7 +135,7 @@ public class GenericConvertMap_test {
 	@Test
 	public void proxy_stringArrayTest() {
 		GenericConvertMap<String, Object> tObj = ProxyGenericConvertMap
-			.ensureGenericConvertMap(new CaseInsensitiveHashMap<String, Object>());
+			.ensure(new CaseInsensitiveHashMap<String, Object>());
 		
 		tObj.put("this", "[\"is\",\"not\",\"the\",\"beginning\"]");
 		tObj.put("nor", new String[] { "this", "is", "the", "end" });

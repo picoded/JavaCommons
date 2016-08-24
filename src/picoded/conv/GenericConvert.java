@@ -591,7 +591,7 @@ public class GenericConvert {
 		
 		// If Map instance
 		if (input instanceof Map) {
-			return ProxyGenericConvertMap.ensureGenericConvertMap((Map<K, V>) input);
+			return ProxyGenericConvertMap.ensure((Map<K, V>) input);
 		}
 		
 		// If String instance, attampt JSON conversion
@@ -599,7 +599,7 @@ public class GenericConvert {
 			try {
 				Map<String, Object> strMap = ConvertJSON.toMap((String) input);
 				if (strMap != null) {
-					return ProxyGenericConvertMap.ensureGenericConvertMap((Map<K, V>) strMap);
+					return ProxyGenericConvertMap.ensure((Map<K, V>) strMap);
 				}
 			} catch (Exception e) {
 				// Silence the exception
@@ -655,7 +655,7 @@ public class GenericConvert {
 		// If List instance
 		if (input instanceof List) {
 			return new GenericConvertArrayList<V>( (List<V>)input );
-			//return ProxyGenericConvertMap.ensureGenericConvertMap((Map<K, V>) input);
+			//return ProxyGenericConvertMap.ensure((Map<K, V>) input);
 		}
 		
 		// If String instance, attampt JSON conversion

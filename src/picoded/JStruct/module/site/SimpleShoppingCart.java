@@ -38,6 +38,12 @@ public class SimpleShoppingCart {
 	/// Shopping cart cookie name
 	public String shoppingCartCookieName = "shopping-cart";
 	
+	/// Cart maximum size
+	public int cart_max = 50;
+	
+	/// Product list max size
+	public int product_max = 50;
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Constructor options
@@ -92,7 +98,7 @@ public class SimpleShoppingCart {
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
-	// Shopping cart functions
+	// Shopping cart functions (Low level)
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -101,22 +107,16 @@ public class SimpleShoppingCart {
 	/// This fetches the JSON stored in the cart, as defined by "shoppingCartCookieName"
 	///
 	/// @param  Request page used, this is used to get the cookie value
-	/// @param  Simple mode indicator, if its false, it runs through 
 	///
-	/// @return Returns a list as `[[ID,count], ... ]` in simple mode, else returns `[[ID,count,meta], ... ]`
+	/// @return Returns the cart cookie JSON string
 	///
-	public List<List<Object>> getCartList(CorePage requestPage, boolean simple) {
+	public String getCartCookieJSON(CorePage requestPage) {
 		//
 		// Safety checks
 		//
 		if( requestPage == null ) {
 			throw new RuntimeException("Missing requestPage parameter");
 		}
-		
-		//
-		// Return var
-		//
-		GenericConvertList<List<Object>> ret = null;
 		
 		//
 		// Get existing cookie values
@@ -133,16 +133,102 @@ public class SimpleShoppingCart {
 		} else {
 			cartJsonStr = "";
 		}
-		ret = GenericConvert.toGenericConvertList( cartJsonStr, new ArrayList<Object>() );
+		return cartJsonStr;
+	}
+	
+	///
+	/// Updates the current CorePage request cookie as defined by "shoppingCartCookieName"
+	///
+	/// @param  Request page used, this is used to get the cookie value
+	/// @param  The cookie cart JSON string
+	///
+	public void setCartCookieJSON(CorePage requestPage, String updateJson) {
+		// Original cookie
+		String ori = getCartCookieJSON(requestPage);
 		
+		// Update the cookie value only if needed
+		if( !updateJson.equals(ori) ) {
+			javax.servlet.http.Cookie theOneCookie = new javax.servlet.http.Cookie(shoppingCartCookieName, updateJson);
+			requestPage.getHttpServletResponse().addCookie(theOneCookie);
+		}
+	}
+	
+	///
+	/// Converts the cart cookie json string, to the cart listing object
+	///
+	/// @param  Cart cookie string
+	///
+	/// @return Returns the cart cookie string
+	///
+	public GenericConvertList<List<Object>> cartCookieJSONToList(String cartJsonStr) {
+		return GenericConvert.toGenericConvertList( cartJsonStr, new ArrayList<Object>() );
+	}
+	
+	///
+	/// Converts the cart listing object to JSON string
+	///
+	/// @param  Cart cookie string
+	///
+	/// @return Returns the cart cookie string
+	///
+	public String cartListToCookieJSON(List<List<Object>> inList) {
+		GenericConvertList<List<Object>> cartList = GenericConvert.toGenericConvertList( inList, new ArrayList<Object>() );
+		
+		// Iterate and ensure valid cart size
+		for(int i=0;i<cartList.size();i++){
+			List<Object> cartLine = cartList.getGenericConvertList(i);
+			if(cartLine == null) {
+				continue;
+			}
+			
+			int lineSize = cartLine.size();
+			if(lineSize <= 1) {
+				// Not enough info
+				cartList.set(i, null);
+			} else if(lineSize > 2) {
+				// Too much info, trim it
+				cartLine = cartLine.subList(0, 2);
+				cartList.set(i, cartLine);
+			}
+		}
+		
+		// Null out items less then zero
+		cartList = nullOutZeroCount(cartList);
+		
+		// Remove null from list
+		cartList.removeAll(Collections.singleton(null));
+		
+		return ConvertJSON.fromList( cartList );
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Shopping cart functions (Higher level)
+	//
+	/////////////////////////////////////////////////////////////////////////////////////////
+	
+	///
+	/// Gets the current shopping cart, from the current CorePage request cookie
+	/// This fetches the JSON stored in the cart, as defined by "shoppingCartCookieName"
+	///
+	/// @param  Request page used, this is used to get the cookie value
+	/// @param  Simple mode indicator, if its false, it runs the validation step for more information 
+	///
+	/// @return Returns a list as `[[ID,count], ... ]` in simple mode, else returns `[[ID,count,meta], ... ]`
+	///
+	public GenericConvertList<List<Object>> getCartList(CorePage requestPage, boolean simple) {
+		//
+		// Return var
+		//
+		GenericConvertList<List<Object>> ret = cartCookieJSONToList(getCartCookieJSON(requestPage));
 		if( !simple ) {
-			return validateCartList(ret);
+			return fetchAndValidateCartList(ret);
 		}
 		return ret;
 	}
 	
 	///
-	/// Takes in a `[[ID,count], ... ]` cart listing and validates it. 
+	/// Takes in a `[[ID,count], ... ]` cart listing, fetch its meta object and validates it. 
 	/// Converting it into a `[[ID,count,meta], ... ]` in the process.
 	///
 	/// Removes items with count 0 or less, will be removed from list
@@ -153,7 +239,7 @@ public class SimpleShoppingCart {
 	///
 	/// @return The processed and validated `[[ID,count,meta], ... ]`
 	///
-	public List<List<Object>> validateCartList(List<List<Object>> inList) {
+	public GenericConvertList<List<Object>> fetchAndValidateCartList(List<List<Object>> inList) {
 		
 		// Ensure valid input list
 		GenericConvertList<List<Object>> cartList = GenericConvertList.build(inList);
@@ -185,7 +271,6 @@ public class SimpleShoppingCart {
 		return cartList;
 	}
 	
-	
 	///
 	/// Merges in two `[[ID,count], ... ]` cart listing into a single listing
 	///
@@ -195,80 +280,82 @@ public class SimpleShoppingCart {
 	///
 	/// @return The processed and validated `[[ID,count,meta], ... ]`
 	///
-	public List<List<Object>> mergeCartList(List<List<Object>> inBaseList, List<List<Object>> addList, boolean removeZeroCount) {
+	public GenericConvertList<List<Object>> mergeCartList(List<List<Object>> inBaseList, List<List<Object>> addList, boolean removeZeroCount) {
 		
 		// Ensure valid input list
 		GenericConvertList<List<Object>> baseList = GenericConvertList.build(inBaseList);
 		GenericConvertList<List<Object>> updateList = GenericConvertList.build(addList);
 		
 		// Iterate the add list
-		int iLen = updateList.size();
-		for( int i=0; i<iLen; ++i) {
-			// Line record of an update
-			GenericConvertList<Object> updateLine = updateList.getGenericConvertList(i, null);
-			
-			// Skip blank / invalid lines
-			if(updateLine == null || updateLine.size() < 2) {
-				continue;
-			}
-
-			// ID and count
-			String id = updateLine.getString(0);
-			int count = updateLine.getInt(1);
-			// Note this maybe null
-			Object meta = updateLine.get(2);
-
-			//
-			// Find the ID in existing cartList, update count
-			//
-			boolean found = false;
-			for(int j=0;j<baseList.size();j++){
-				// Iterate, and ignore blank lines
-				GenericConvertList<Object> baseLine = baseList.getGenericConvertList(j);
-				if(baseLine == null) {
+		if( updateList != null ) {
+			int iLen = updateList.size();
+			for( int i=0; i<iLen; ++i) {
+				// Line record of an update
+				GenericConvertList<Object> updateLine = updateList.getGenericConvertList(i, null);
+				
+				// Skip blank / invalid lines
+				if(updateLine == null || updateLine.size() < 2) {
 					continue;
 				}
-				// ID is valid
-				if(baseLine.getString(0).equals(id)) {
-					
-					// Base count
-					int baseCount = baseLine.getInt(1);
-					
-					// Sum up the count
-					baseLine.set(1, baseCount+count);
-					
-					// Check if meta object needs to be transfered over
-					if( meta != null ) {
-						// Check for base meta object, this takes priority in merge
-						Object baseMeta = baseLine.get(2);
-						// Merge if baseMeta is null
-						if(baseMeta == null) {
-							baseLine.set(2, meta);
+
+				// ID and count
+				String id = updateLine.getString(0);
+				int count = updateLine.getInt(1);
+				// Note this maybe null
+				Object meta = updateLine.get(2);
+
+				//
+				// Find the ID in existing cartList, update count
+				//
+				boolean found = false;
+				for(int j=0;j<baseList.size();j++){
+					// Iterate, and ignore blank lines
+					GenericConvertList<Object> baseLine = baseList.getGenericConvertList(j);
+					if(baseLine == null) {
+						continue;
+					}
+					// ID is valid
+					if(baseLine.getString(0).equals(id)) {
+						
+						// Base count
+						int baseCount = baseLine.getInt(1);
+						
+						// Sum up the count
+						baseLine.set(1, baseCount+count);
+						
+						// Check if meta object needs to be transfered over
+						if( meta != null ) {
+							// Check for base meta object, this takes priority in merge
+							Object baseMeta = baseLine.get(2);
+							// Merge if baseMeta is null
+							if(baseMeta == null) {
+								baseLine.set(2, meta);
+							}
 						}
+						
+						// Replace and update
+						baseList.set(j, baseLine);
+						
+						// Indicate item was found, validate
+						found = true;
+						break;
+					}
+				}
+				
+				//
+				// No ID found, append to cartList
+				//
+				if(!found) {
+					List<Object> newList = new ArrayList<Object>();
+					newList.add(id);
+					newList.add(count);
+					
+					if(meta != null) {
+						newList.add(meta);
 					}
 					
-					// Replace and update
-					baseList.set(j, baseLine);
-					
-					// Indicate item was found, validate
-					found = true;
-					break;
+					baseList.add(newList);
 				}
-			}
-			
-			//
-			// No ID found, append to cartList
-			//
-			if(!found) {
-				List<Object> newList = new ArrayList<Object>();
-				newList.add(id);
-				newList.add(count);
-				
-				if(meta != null) {
-					newList.add(meta);
-				}
-				
-				baseList.add(newList);
 			}
 		}
 		
@@ -285,9 +372,61 @@ public class SimpleShoppingCart {
 		return baseList;
 	}
 	
+	///
+	/// Update and add in the additional  `[[ID,count], ... ]` cart listing into a existing cart
+	///
+	/// @param  Request page used, this is used to get the cookie value
+	/// @param  The `[[ID,count], ... ]` list to add
+	/// @param  Simple mode indicator, if its false, it runs the validation step for more information
+	///
+	/// @return Returns a list as `[[ID,count], ... ]` in simple mode, else returns `[[ID,count,meta], ... ]`
+	///
+	public GenericConvertList<List<Object>> updateCartList(CorePage requestPage, List<List<Object>> addList, boolean simple) {
+		// Get existing cart
+		GenericConvertList<List<Object>> cart = getCartList(requestPage, false);
+		
+		// Merge in addList
+		if( addList != null ) {
+			cart = mergeCartList( cart, addList, true );
+		}
+		
+		// Update, validate, return the cart
+		return replaceCartList(requestPage, cart, simple);
+	}
+	
+	///
+	/// Full replacement varient of updateCartList
+	///
+	/// @param  Request page used, this is used to get the cookie value
+	/// @param  The `[[ID,count], ... ]` list to add
+	/// @param  Simple mode indicator, if its false, it runs the validation step for more information
+	///
+	/// @return Returns a list as `[[ID,count], ... ]` in simple mode, else returns `[[ID,count,meta], ... ]`
+	///
+	public GenericConvertList<List<Object>> replaceCartList(CorePage requestPage, List<List<Object>> cartList, boolean simple) {
+		// Get existing cart
+		GenericConvertList<List<Object>> cart = GenericConvert.toGenericConvertList( cartList, new ArrayList<Object>() );
+		
+		// Validate
+		if(!simple) {
+			cart = fetchAndValidateCartList(cart);
+		}
+		
+		// Max cart size handling
+		if( cart.size() > cart_max ) {
+			throw new RuntimeException("Cart maximum size exceeded : "+cart.size()+"/"+cart_max);
+		}
+		
+		// Update the JSON cookie with cart
+		setCartCookieJSON( requestPage, cartListToCookieJSON(cart) );
+		
+		// Return the cart
+		return cart;
+	}
+	
 	//--------------------------------------------
 	//
-	// shopping cart util functions
+	// shopping cart [util functions]
 	//
 	//--------------------------------------------
 	
@@ -307,7 +446,7 @@ public class SimpleShoppingCart {
 				continue;
 			}
 			// Invalid count check
-			int count = cartLine.getInt(1);
+			int count = cartLine.getInt(1, 0);
 			if( count <= 0 ) {
 				// Removing invalid count
 				cartList.set(i, null);
@@ -316,161 +455,27 @@ public class SimpleShoppingCart {
 		return cartList;
 	}
 	
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Product listing 
+	//
+	/////////////////////////////////////////////////////////////////////////////////////////
+	
+	public List<MetaObject> getProductList(String ownerID) {
+		
+		List<MetaObject> ret = new ArrayList<MetaObject>();
+		
+		MetaObject[] queryRet = productItem.query("_ownerID=?", new String[] { ownerID }, "_createdTime", 0, 50);
+		if (queryRet != null && queryRet.length > 0) {
+			for (int i = 0; i < queryRet.length; ++i) {
+				ret.add(queryRet[i]);
+			}
+		}
+		
+		return ret;
+	}
 
-	// 
-	// ///
-	// /// # cart (GET/POST)
-	// ///
-	// /// Gets / Updates the current shopping cart stored inside the cookie "cart" parameter
-	// ///
-	// /// Cart storage format will be as JSON : [[ID,count],...]
-	// ///
-	// /// ## HTTP Request Parameters (Optional)
-	// ///
-	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
-	// /// | Parameter Name  | Variable Type	        | Description                                                     |
-	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
-	// /// | update          | [[ID,count], ... ]      | [optional] Shopping item ID, and count to                       |
-	// /// |                 |                         |            add/edit/delete (when count=0)                       |
-	// /// | simple          | boolean                 | [default=false] Ignore cart content meta, and its checks        |
-	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
-	// ///
-	// /// ## JSON Object Output Parameters
-	// ///
-	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
-	// /// | Parameter Name  | Variable Type	        | Description                                                     |
-	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
-	// /// | list            | [[ID,count,meta], ... ] | Shopping cart content with item ID, count, and content          |
-	// /// | itemCount       | Integer                 | Number of unique item ID inside the cart                        |
-	// /// | quantityCount   | Integer                 | Total quantity of items                                         |
-	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
-	// /// | error           | String (Optional)       | Errors encounted if any                                         |
-	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
-	// ///
-	// public RESTFunction cart_GET_and_POST = (req, res) -> {
-	// 	try {
-	// 		//
-	// 		// Get existing cookie values
-	// 		//
-	// 		CorePage requestPage= req.requestPage();
-	// 		Map<String,String[]> cookieMap = requestPage.requestCookieMap();
-	// 		String[] cookieSet = null;
-	// 		if( cookieMap != null ) {
-	// 			cookieSet = cookieMap.get(shoppingCartCookieName);
-	// 		}
-	// 
-	// 		String cartJsonStr = null;
-	// 		if( cookieSet != null && cookieSet.length > 0 ) {
-	// 			cartJsonStr = cookieSet[0];
-	// 		} else {
-	// 			cartJsonStr = "";
-	// 		}
-	// 		GenericConvertList<Object> cartList = GenericConvert.toGenericConvertList( cartJsonStr, new ArrayList<Object>() );
-	// 
-	// 		//
-	// 		// Get the update list, apply update
-	// 		//
-	// 
-	// 		GenericConvertList<Object> updateList = req.getGenericConvertList("update");
-	// 		if( updateList != null ) {
-	// 
-	// 			for( int i=0; i<updateList.size(); ++i) {
-	// 				// Line record of an update
-	// 				GenericConvertList<Object> updateLine = updateList.getGenericConvertList(i, null);
-	// 				// Skip blank lines
-	// 				if(updateLine == null || updateLine.size() < 2) {
-	// 					continue;
-	// 				}
-	// 
-	// 				String id = updateLine.getString(0);
-	// 				int count = updateLine.getInt(1);
-	// 
-	// 				//
-	// 				// Find the ID in existing cartList, update count
-	// 				//
-	// 				boolean found = false;
-	// 				for(int j=0;j<cartList.size();j++){
-	// 					GenericConvertList<Object> cartLine = cartList.getGenericConvertList(j);
-	// 					if(cartLine == null) {
-	// 						continue;
-	// 					}
-	// 					if(cartLine.getString(0).equals(id)) {
-	// 						cartLine.set(1,count);
-	// 
-	// 						// Replace and update
-	// 						cartList.set(j, cartLine);
-	// 						found = true;
-	// 						break;
-	// 					}
-	// 				}
-	// 				//
-	// 				// No ID found, append to cartList
-	// 				//
-	// 				if(!found) {
-	// 					List<Object> newList = new ArrayList<Object>();
-	// 					newList.add(id);
-	// 					newList.add(count);
-	// 					cartList.add(newList);
-	// 				}
-	// 
-	// 			}
-	// 		}
-	// 		//
-	// 		// Update the cookie value if needed
-	// 		//
-	// 		String cartJsonStr_new = ConvertJSON.fromList( cartList );
-	// 		if( !cartJsonStr_new.equals(cartJsonStr) ) {
-	// 			javax.servlet.http.Cookie theOneCookie = new javax.servlet.http.Cookie(shoppingCartCookieName, cartJsonStr_new);
-	// 			req.requestPage().getHttpServletResponse().addCookie(theOneCookie);
-	// 		}
-	// 
-	// 		//
-	// 		// For non simple mode, iterate the list and append the meta
-	// 		//
-	// 		if( req.getBoolean("simple", false) == false ) {
-	// 			for(int i=0;i<cartList.size();i++){
-	// 				GenericConvertList<Object> cartLine = cartList.getGenericConvertList(i);
-	// 				if(cartLine == null) {
-	// 					continue;
-	// 				}
-	// 				String itemID = cartLine.getString(0);
-	// 				Map<String,Object> itemMeta = productItem.get(itemID);
-	// 
-	// 				//
-	// 				// @TODO SAFETY CHECK? : when meta object is invalid
-	// 				//
-	// 
-	// 				cartLine.add(2, itemMeta);
-	// 				cartList.set(i, cartLine);
-	// 			}
-	// 		}
-	// 
-	// 		//
-	// 		// Return values
-	// 		//
-	// 		res.put("list", cartList);
-	// 		res.put("itemCount", cartList.size());
-	// 
-	// 		//
-	// 		// Iterate the items for total quantity
-	// 		//
-	// 		int quantityCount = 0;
-	// 		for(int i=0;i<cartList.size();i++){
-	// 			GenericConvertList<Object> cartLine = cartList.getGenericConvertList(i);
-	// 			if(cartLine == null) {
-	// 				continue;
-	// 			}
-	// 			quantityCount += cartLine.getInt(1,0);
-	// 		}
-	// 		res.put("quantityCount", quantityCount);
-	// 
-	// 
-	// 	} catch (Exception e) {
-	// 		throw new RuntimeException(e);
-	// 	}
-	// 	return res;
-	// };
-	// 
+
 	// ///
 	// /// # product (GET/POST)
 	// ///

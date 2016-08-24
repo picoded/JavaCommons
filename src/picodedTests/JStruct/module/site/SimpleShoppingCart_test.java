@@ -64,6 +64,16 @@ public class SimpleShoppingCart_test {
 	// Test cases
 	//-----------------------------------------------
 	
+	@Test
+	public void cartListToCookieJSON() {
+		String testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}]]";
+		GenericConvertList<List<Object>> testCart = GenericConvert.toGenericConvertList( testJSON, new ArrayList<Object>() );
+		
+		String validJSON = "[[\"id-1\",10],[\"id-4\",10]]";
+		assertEquals(validJSON, testObj.cartListToCookieJSON(testCart));
+		assertEquals(validJSON, testObj.cartListToCookieJSON(testObj.cartCookieJSONToList(validJSON)));
+	}
+	
 	// // Test utility used to generate random maps
 	// protected HashMap<String, Object> randomObjMap() {
 	// 	HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();

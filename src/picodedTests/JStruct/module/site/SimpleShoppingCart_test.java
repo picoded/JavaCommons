@@ -58,7 +58,7 @@ public class SimpleShoppingCart_test {
 		assertNotNull(testObj);
 		
 		//run maintaince, no exception?
-		// mtObj.maintenance();
+		// testObj.maintenance();
 	}
 	
 	// Test cases

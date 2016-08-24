@@ -6,6 +6,7 @@ import java.util.*;
 /// Picoded imports
 import picoded.conv.*;
 import picoded.struct.*;
+import picoded.servlet.*;
 import picoded.JStruct.*;
 import picoded.struct.query.*;
 
@@ -89,17 +90,233 @@ public class SimpleShoppingCart {
 		salesReceipt.systemTeardown();
 	}
 	
-	// /////////////////////////////////////////////////////////////////////////////////////////
-	// //
-	// // Shopping cart API
-	// //
-	// /////////////////////////////////////////////////////////////////////////////////////////
-	// 
-	// //--------------------------------------------
-	// //
-	// // Simple shopping cart handling
-	// //
-	// //--------------------------------------------
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Shopping cart functions
+	//
+	/////////////////////////////////////////////////////////////////////////////////////////
+	
+	///
+	/// Gets the current shopping cart, from the current CorePage request cookie
+	/// This fetches the JSON stored in the cart, as defined by "shoppingCartCookieName"
+	///
+	/// @param  Request page used, this is used to get the cookie value
+	/// @param  Simple mode indicator, if its false, it runs through 
+	///
+	/// @return Returns a list as `[[ID,count], ... ]` in simple mode, else returns `[[ID,count,meta], ... ]`
+	///
+	public List<List<Object>> getCartList(CorePage requestPage, boolean simple) {
+		//
+		// Safety checks
+		//
+		if( requestPage == null ) {
+			throw new RuntimeException("Missing requestPage parameter");
+		}
+		
+		//
+		// Return var
+		//
+		GenericConvertList<List<Object>> ret = null;
+		
+		//
+		// Get existing cookie values
+		//
+		String cartJsonStr = null;
+		Map<String,String[]> cookieMap = requestPage.requestCookieMap();
+		String[] cookieSet = null;
+		if( cookieMap != null ) {
+			cookieSet = cookieMap.get(shoppingCartCookieName);
+		}
+		
+		if( cookieSet != null && cookieSet.length > 0 ) {
+			cartJsonStr = cookieSet[0];
+		} else {
+			cartJsonStr = "";
+		}
+		ret = GenericConvert.toGenericConvertList( cartJsonStr, new ArrayList<Object>() );
+		
+		if( !simple ) {
+			return validateCartList(ret);
+		}
+		return ret;
+	}
+	
+	///
+	/// Takes in a `[[ID,count], ... ]` cart listing and validates it. 
+	/// Converting it into a `[[ID,count,meta], ... ]` in the process.
+	///
+	/// Removes items with count 0 or less, will be removed from list
+	///
+	/// @TODO The actual validation, beyond just fetching the meta object
+	///
+	/// @param  The `[[ID,count], ... ]` list to filter
+	///
+	/// @return The processed and validated `[[ID,count,meta], ... ]`
+	///
+	public List<List<Object>> validateCartList(List<List<Object>> inList) {
+		
+		// Ensure valid input list
+		GenericConvertList<List<Object>> cartList = GenericConvertList.build(inList);
+		
+		// Iterate and get meta objects
+		for(int i=0;i<cartList.size();i++){
+			GenericConvertList<Object> cartLine = cartList.getGenericConvertList(i);
+			if(cartLine == null) {
+				continue;
+			}
+			String itemID = cartLine.getString(0);
+			Map<String,Object> itemMeta = productItem.get(itemID);
+
+			//
+			// @TODO SAFETY CHECK? : when meta object is invalid
+			//
+
+			cartLine.add(2, itemMeta);
+			cartList.set(i, cartLine);
+		}
+		
+		// Null out zero counts
+		cartList = nullOutZeroCount(cartList);
+		
+		// Remove null from list
+		cartList.removeAll(Collections.singleton(null));
+		
+		// Return final list
+		return cartList;
+	}
+	
+	
+	///
+	/// Merges in two `[[ID,count], ... ]` cart listing into a single listing
+	///
+	/// @param  The `[[ID,count], ... ]` list to use as base
+	/// @param  The `[[ID,count], ... ]` list to add
+	/// @param  Indicator if items 0 or less, will be removed from list
+	///
+	/// @return The processed and validated `[[ID,count,meta], ... ]`
+	///
+	public List<List<Object>> mergeCartList(List<List<Object>> inBaseList, List<List<Object>> addList, boolean removeZeroCount) {
+		
+		// Ensure valid input list
+		GenericConvertList<List<Object>> baseList = GenericConvertList.build(inBaseList);
+		GenericConvertList<List<Object>> updateList = GenericConvertList.build(addList);
+		
+		// Iterate the add list
+		int iLen = updateList.size();
+		for( int i=0; i<iLen; ++i) {
+			// Line record of an update
+			GenericConvertList<Object> updateLine = updateList.getGenericConvertList(i, null);
+			
+			// Skip blank / invalid lines
+			if(updateLine == null || updateLine.size() < 2) {
+				continue;
+			}
+
+			// ID and count
+			String id = updateLine.getString(0);
+			int count = updateLine.getInt(1);
+			// Note this maybe null
+			Object meta = updateLine.get(2);
+
+			//
+			// Find the ID in existing cartList, update count
+			//
+			boolean found = false;
+			for(int j=0;j<baseList.size();j++){
+				// Iterate, and ignore blank lines
+				GenericConvertList<Object> baseLine = baseList.getGenericConvertList(j);
+				if(baseLine == null) {
+					continue;
+				}
+				// ID is valid
+				if(baseLine.getString(0).equals(id)) {
+					
+					// Base count
+					int baseCount = baseLine.getInt(1);
+					
+					// Sum up the count
+					baseLine.set(1, baseCount+count);
+					
+					// Check if meta object needs to be transfered over
+					if( meta != null ) {
+						// Check for base meta object, this takes priority in merge
+						Object baseMeta = baseLine.get(2);
+						// Merge if baseMeta is null
+						if(baseMeta == null) {
+							baseLine.set(2, meta);
+						}
+					}
+					
+					// Replace and update
+					baseList.set(j, baseLine);
+					
+					// Indicate item was found, validate
+					found = true;
+					break;
+				}
+			}
+			
+			//
+			// No ID found, append to cartList
+			//
+			if(!found) {
+				List<Object> newList = new ArrayList<Object>();
+				newList.add(id);
+				newList.add(count);
+				
+				if(meta != null) {
+					newList.add(meta);
+				}
+				
+				baseList.add(newList);
+			}
+		}
+		
+		// Remove zero count or less rows
+		if(removeZeroCount) {
+			// Null out  zero count
+			baseList = nullOutZeroCount(baseList);
+		}
+		
+		// Remove null from list
+		baseList.removeAll(Collections.singleton(null));
+		
+		// Return final list
+		return baseList;
+	}
+	
+	//--------------------------------------------
+	//
+	// shopping cart util functions
+	//
+	//--------------------------------------------
+	
+	///
+	/// Nulls items with count of 0 or less
+	///
+	/// @param  The `[[ID,count], ... ]` list to use 
+	///
+	/// @return The processed and validated `[[ID,count], ... ]`
+	///
+	protected GenericConvertList<List<Object>> nullOutZeroCount(GenericConvertList<List<Object>> cartList) {
+		// Iterate and get meta objects
+		for(int i=0;i<cartList.size();i++){
+			GenericConvertList<Object> cartLine = cartList.getGenericConvertList(i);
+			// Ignore blank lines
+			if(cartLine == null) {
+				continue;
+			}
+			// Invalid count check
+			int count = cartLine.getInt(1);
+			if( count <= 0 ) {
+				// Removing invalid count
+				cartList.set(i, null);
+			}
+		}
+		return cartList;
+	}
+	
+
 	// 
 	// ///
 	// /// # cart (GET/POST)

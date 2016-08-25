@@ -34,14 +34,16 @@ public class JStackUtils {
 			return;
 		}
 		for (String name : nameMap.keySet()) {
+			String dotSpacedName = name.replaceAll("_",".");
+			
 			if (type.equalsIgnoreCase("AccountTable")) {
-				AccountLogin.setupRESTBuilder(rbObj, struct.getAccountTable(name), name + ".");
+				AccountLogin.setupRESTBuilder(rbObj, struct.getAccountTable(name), dotSpacedName + ".");
 			} else if (type.equalsIgnoreCase("KeyValueMap")) {
-				(new KeyValueMapApiBuilder(struct.getKeyValueMap(name))).setupRESTBuilder(rbObj, name + ".");
+				(new KeyValueMapApiBuilder(struct.getKeyValueMap(name))).setupRESTBuilder(rbObj, dotSpacedName + ".");
 			} else if (type.equalsIgnoreCase("AtomicLongMap")) {
-				(new AtomicLongMapApiBuilder(struct.getAtomicLongMap(name))).setupRESTBuilder(rbObj, name + ".");
+				(new AtomicLongMapApiBuilder(struct.getAtomicLongMap(name))).setupRESTBuilder(rbObj, dotSpacedName + ".");
 			} else if (type.equalsIgnoreCase("MetaTable")) {
-				(new MetaTableApiBuilder(struct.getMetaTable(name))).setupRESTBuilder(rbObj, name + ".");
+				(new MetaTableApiBuilder(struct.getMetaTable(name))).setupRESTBuilder(rbObj, dotSpacedName + ".");
 			} else {
 				throw new RuntimeException("Unknown struct type : " + type);
 			}

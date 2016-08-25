@@ -14,6 +14,7 @@ import picoded.struct.query.*;
 /// A simple shopping cart system, which is built ontop of MetaTable, and AtomicLongMap
 /// 
 public class SimpleShoppingCart {
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Class variables
@@ -32,8 +33,8 @@ public class SimpleShoppingCart {
 	/// Sales order
 	public MetaTable salesOrder = null;
 	
-	/// Sales reciept
-	public MetaTable salesReceipt = null;
+	/// Sales items
+	public MetaTable salesItem = null;
 	
 	/// Shopping cart cookie name
 	public String shoppingCartCookieName = "shopping-cart";
@@ -43,6 +44,11 @@ public class SimpleShoppingCart {
 	
 	/// Product list max size
 	public int product_max = 250;
+	
+	/// Transaction percentage fee
+	public double transaction_percentage = 2.9;
+	public double transaction_fixed = 0.99;
+	public String transaction_productPriceKey = "display_price";
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -67,11 +73,11 @@ public class SimpleShoppingCart {
 	///
 	public void setupStandardTables(JStruct inStruct, String prefix) {
 		productOwner = inStruct.getMetaTable(prefix);
-		productItem = inStruct.getMetaTable(prefix + "_item");
-		productCount = inStruct.getAtomicLongMap(prefix + "_count");
+		productItem = inStruct.getMetaTable(prefix + "_product");
+		productCount = inStruct.getAtomicLongMap(prefix + "_salescount");
 	
-		salesOrder = inStruct.getMetaTable(prefix + "_sale"); //Formalised shopping cart?
-		salesReceipt = inStruct.getMetaTable(prefix + "_receipt");
+		salesOrder = inStruct.getMetaTable(prefix + "_salesorder"); 
+		salesItem = inStruct.getMetaTable(prefix + "_salesitem");
 	}
 	
 	///
@@ -82,7 +88,7 @@ public class SimpleShoppingCart {
 		productItem.systemSetup();
 		productCount.systemSetup();
 		salesOrder.systemSetup();
-		salesReceipt.systemSetup();
+		salesItem.systemSetup();
 	}
 	
 	///
@@ -93,7 +99,7 @@ public class SimpleShoppingCart {
 		productItem.systemTeardown();
 		productCount.systemTeardown();
 		salesOrder.systemTeardown();
-		salesReceipt.systemTeardown();
+		salesItem.systemTeardown();
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -283,11 +289,14 @@ public class SimpleShoppingCart {
 			}
 			String itemID = cartLine.getString(0);
 			Map<String,Object> itemMeta = productItem.get(itemID);
-
-			//
-			// @TODO SAFETY CHECK? : when meta object is invalid
-			//
-
+			
+			// missing item safety
+			if( itemMeta == null ) {
+				cartList.set(i, null);
+				continue;
+			}
+			
+			// Add the item meta
 			cartLine.add(2, itemMeta);
 			cartList.set(i, cartLine);
 		}
@@ -574,8 +583,7 @@ public class SimpleShoppingCart {
 			}
 			
 			// Sanitize updateProduct
-			updateProduct.remove("_oid");
-			updateProduct.remove("_ownerID");
+			updateProduct = sanatizePurchaseData(updateProduct);
 			
 			// The meta object to create / update
 			MetaObject updateMetaObject = null;
@@ -631,8 +639,108 @@ public class SimpleShoppingCart {
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
-	// Purchase order
+	// Sales purchase order
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
 	
+	///
+	/// Creates a purchase order using a cart listing.
+	/// This creates a snapshot of all the tickets. And store it
+	///
+	/// @param  Owner ID - used to identify the purchase owner
+	/// @param  Shopping cart list to create the purchase order
+	/// @param  Meta data to add to the purchase order
+	/// @param  Meta data to add to the purchase order items
+	/// @param  Purchase status "request", "approved", "paid", "rejected"
+	///
+	public GenericConvertMap<String,Object> createPurchaseOrder(String purchaseOwnerID, List<List<Object>> cart, Map<String,Object> orderMeta, Map<String,Object> itemMeta, String status) {
+		// The order object to use
+		MetaObject orderObj = salesOrder.newObject();
+		
+		// Make sure the meta object, is a cloned, and sanatized
+		orderMeta = sanatizePurchaseData(new GenericConvertHashMap<String,Object>(orderMeta));
+		
+		// Building the orderObj, with _ownerID, and _orderStatus link
+		orderObj.putAll(orderMeta);
+		orderObj.put("_ownerID", purchaseOwnerID);
+		orderObj.put("_orderStatus", status);
+		orderObj.saveDelta();
+		
+		// Get the order ID
+		String orderID = orderObj._oid();
+		
+		// Creating the cart items
+		GenericConvertList<List<Object>> cartlist = fetchAndValidateCartList(cart);
+		
+		// The item order list
+		ArrayList<MetaObject> itemList = new ArrayList<MetaObject>();
+		
+		// Build the order items
+		for(List<Object> cartRawRow : cartlist) {
+			// Generic list
+			GenericConvertList<Object> cartRow = GenericConvertList.build(cartRawRow);
+			
+			// Cart item object
+			MetaObject orderItem = salesItem.newObject();
+			
+			// Get the item info, merge it with item meta
+			int itemCount = cartRow.getInt(1);
+			
+			GenericConvertMap<String,Object> rawItemObj = cartRow.getGenericConvertStringMap(2);
+			GenericConvertMap<String,Object> itemObj = new GenericConvertHashMap<String,Object>( rawItemObj );
+			itemObj.putAll(itemMeta);
+			
+			// Sanatize the item info
+			itemObj = sanatizePurchaseData(itemObj);
+			
+			// Merge it into the actual item object
+			orderItem.putAll(itemObj);
+			
+			// Link it all up
+			orderItem.put("_ownerID", purchaseOwnerID);
+			orderItem.put("_orderID", orderID);
+			orderItem.put("_sellerID", rawItemObj.get("_ownerID"));
+			orderItem.put("_productID", rawItemObj.get("_oid"));
+			orderItem.put("_orderStatus", status);
+			
+			// Save it
+			orderItem.saveDelta();
+			
+			// Put into final item list
+			itemList.add(orderItem);
+		}
+		
+		return null;
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Sales purchase order [utils]
+	//
+	/////////////////////////////////////////////////////////////////////////////////////////
+	
+	/// 
+	/// Sanatizes a map data from protected purchase order data
+	///
+	/// @param Map to sanatize and return
+	///
+	/// @return The parameter
+	///
+	protected GenericConvertMap<String,Object> sanatizePurchaseData(GenericConvertMap<String,Object> inMap) {
+		// Sanatize the item info
+		inMap.remove("_oid");
+		inMap.remove("_ownerID");
+		inMap.remove("_orderID");
+		inMap.remove("_sellerID");
+		inMap.remove("_productID");
+		inMap.remove("_orderStatus");
+		
+		// Other systems reserved vars
+		inMap.remove("_createTime");
+		inMap.remove("_updateTime");
+		
+		// Reserved and not in use?
+		inMap.remove("_purchaserID");
+		return inMap;
+	}
 }

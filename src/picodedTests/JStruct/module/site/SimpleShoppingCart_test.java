@@ -26,6 +26,9 @@ public class SimpleShoppingCart_test {
 	/// Test object
 	public SimpleShoppingCart testObj = null;
 	
+	/// The product owner to currently use for testing
+	public MetaObject productOwnerObject = null;
+	
 	/// To override for implementation
 	///------------------------------------------------------
 	public JStruct jstructConstructor() {
@@ -50,6 +53,7 @@ public class SimpleShoppingCart_test {
 			testObj.systemTeardown();
 		}
 		testObj = null;
+		productOwnerObject = null;
 	}
 	
 	@Test
@@ -72,6 +76,27 @@ public class SimpleShoppingCart_test {
 		String validJSON = "[[\"id-1\",10],[\"id-4\",10]]";
 		assertEquals(validJSON, testObj.cartListToCookieJSON(testCart));
 		assertEquals(validJSON, testObj.cartListToCookieJSON(testObj.cartCookieJSONToList(validJSON)));
+	}
+	
+	@Test
+	public void productSetup() {
+		productOwnerObject = testObj.productOwner.newObject();
+		productOwnerObject.put("name", "Scrooge Mcduck");
+		productOwnerObject.saveDelta();
+		
+		assertEquals( 0, testObj.getProductList( productOwnerObject._oid() ).size() );
+		
+		List<Object> prodList = ConvertJSON.toList("["+
+			"{"+
+				"\"name\" : \"product_01\""+
+			"},"+
+			"{"+
+				"\"name\" : \"product_02\""+
+			"}"+
+		"]"); 
+		
+		assertEquals( 2, testObj.updateProductList( productOwnerObject._oid(), prodList ).size() );
+		assertEquals( 2, testObj.getProductList( productOwnerObject._oid() ).size() );
 	}
 	
 	// // Test utility used to generate random maps

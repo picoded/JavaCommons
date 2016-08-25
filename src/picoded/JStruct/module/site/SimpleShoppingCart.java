@@ -167,7 +167,7 @@ public class SimpleShoppingCart {
 	///
 	/// Converts the cart listing object to JSON string
 	///
-	/// @param  Cart cookie string
+	/// @param  Cart list
 	///
 	/// @return Returns the cart cookie string
 	///
@@ -199,6 +199,37 @@ public class SimpleShoppingCart {
 		cartList.removeAll(Collections.singleton(null));
 		
 		return ConvertJSON.fromList( cartList );
+	}
+	
+	///
+	/// Counts the total quantity inside a cart
+	///
+	/// @param  Cart list
+	///
+	/// @return Returns the cart quantity count
+	///
+	public int cartListQuantityCount(List<List<Object>> inList) {
+		GenericConvertList<List<Object>> cartList = GenericConvert.toGenericConvertList( inList, new ArrayList<Object>() );
+		int ret = 0;
+		
+		// Iterate and ensure valid cart size
+		for(int i=0;i<cartList.size();i++){
+			GenericConvertList<Object> cartLine = cartList.getGenericConvertList(i);
+			if(cartLine == null) {
+				continue;
+			}
+			
+			if(cartLine.size() >= 2) {
+				// Get item count
+				int count = cartList.getInt(1, 0);
+				if( count > 0 ) {
+					ret += count;
+				}
+			} 
+		}
+		
+		// Return
+		return ret;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -542,9 +573,14 @@ public class SimpleShoppingCart {
 				update_oid = null;
 			}
 			
+			// Sanitize updateProduct
+			updateProduct.remove("_oid");
+			updateProduct.remove("_ownerID");
+			
 			// The meta object to create / update
 			MetaObject updateMetaObject = null;
 			
+			// Get the meta object to "update"
 			if( update_oid != null ) {
 				// Old meta object
 				updateMetaObject = productItem.get( update_oid );
@@ -553,26 +589,18 @@ public class SimpleShoppingCart {
 				if( !ownerID.equals(updateMetaObject.get("_ownerID")) ) {
 					throw new SecurityException("Unauthorized update call to object "+update_oid+" with invalid ownerID "+ownerID);
 				}
-				
 			} else {
 				// New meta object
 				updateMetaObject = productItem.newObject();
+				updateMetaObject.put("_ownerID", ownerID);
+				updateMetaObject.saveDelta(); 
+				
 				prodList.add(updateMetaObject);
 			}
 			
-			// MetaObject productEntryObj = null;
-			// String productID = GenericConvert.toString(singleProduct.get("_oid"), "");
-			// if (productID == null || productID.isEmpty() || productID.equalsIgnoreCase("new")) {
-			// 	productEntryObj = productItem.append(null, productDetails);
-			// 
-			// 	productDetails.put("_createTime", (System.currentTimeMillis() / 1000L));
-			// 
-			// 	productEntryObj.saveAll();
-			// } else {
-			// 	productEntryObj = productItem.get(productID);
-			// 	productEntryObj.putAll(productDetails);
-			// 	productEntryObj.saveDelta();
-			// }
+			// Update the meta values
+			updateMetaObject.putAll(updateProduct);
+			updateMetaObject.saveDelta(); 
 		}
 		
 		return prodList;
@@ -601,108 +629,10 @@ public class SimpleShoppingCart {
 		return null;
 	}
 	
-	// ///
-	// /// # product (GET/POST)
-	// ///
-	// /// Gets / Updates the current shopping cart stored inside the cookie "cart" parameter
-	// ///
-	// /// ## HTTP Request Parameters (Optional)
-	// ///
-	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
-	// /// | Parameter Name  | Variable Type	        | Description                                                     |
-	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
-	// /// | _oid            | String                  | The product list owner ID                                       |
-	// /// | update          | [{meta}]                | Product Details metaobject. "_oid" is needed, and count to      |
-	// ///	|				  |							| add/edit/delete (when count=0)                                  |
-	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
-	// ///
-	// /// ## Details of the update object
-	// ///
-	// ///	"_oid":owner id MUST BE GIVEN,
-	// /// "update":[
-	// ///	    {
-	// ///		    "_oid":if oid is given, its an update. If null or "new", its a create,
-	// ///		    "meta":{
-	// ///			    product key/values here
-	// ///		    }
-	// ///	    }
-	// /// ]
-	// ///
-	// /// ## JSON Object Output Parameters
-	// ///
-	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
-	// /// | Parameter Name  | Variable Type	        | Description                                                     |
-	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
-	// /// | list            | [{meta}]                | Shopping cart content with item ID, count, and content          |
-	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
-	// /// | error           | String (Optional)       | Errors encounted if any                                         |
-	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
-	// ///
-	// public RESTFunction product_GET_and_POST = (req, res) -> {
-	// 	try {
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Purchase order
+	//
+	/////////////////////////////////////////////////////////////////////////////////////////
 	
-	// 		//if update is not null, do an update
-	// 		String[] updateArray = null;
-	// 		List<String> updateErrors = new ArrayList<String>();
-	// 		updateArray = req.getStringArray("update", null);
-	// 		if (updateArray != null) {
-	// 			for (int i = 0; i < updateArray.length; ++i) {
-	// 				Map<String, Object> singleProduct = GenericConvert.toStringMap(updateArray[i], null);
-	// 				if (singleProduct == null) {
-	// 					updateErrors.add("Single Product for element number " + i + " in updateArray is null");
-	// 				}
-	// 
-	// 				Map<String, Object> productDetails = GenericConvert.toStringMap(singleProduct.get("meta"), null);
-	// 				if (productDetails == null) {
-	// 					updateErrors.add("Product details for element number " + i + " in updateArray is null or empty");
-	// 					continue;
-	// 				}
-	// 				productDetails.put("_ownerID", oid);
-	// 
-	// 				MetaObject productEntryObj = null;
-	// 				String productID = GenericConvert.toString(singleProduct.get("_oid"), "");
-	// 				if (productID == null || productID.isEmpty() || productID.equalsIgnoreCase("new")) {
-	// 					productEntryObj = productItem.append(null, productDetails);
-	// 
-	// 					productDetails.put("_createTime", (System.currentTimeMillis() / 1000L));
-	// 
-	// 					productEntryObj.saveAll();
-	// 				} else {
-	// 					productEntryObj = productItem.get(productID);
-	// 					productEntryObj.putAll(productDetails);
-	// 					productEntryObj.saveDelta();
-	// 				}
-	// 			}
-	// 		} else {
-	// 			updateErrors.add("updateArray is null, no insertion to be done");
-	// 		}
-	// 
-	// 		res.put("queryLog", updateErrors);
-	// 
-	// 	} catch (Exception e) {
-	// 		throw new RuntimeException(e);
-	// 	}
-	// 
-	// 	return res;
-	// };
-	// 
-	// /////////////////////////////////////////////////////////////////////////////////////////
-	// //
-	// // RestBuilder template builder
-	// //
-	// /////////////////////////////////////////////////////////////////////////////////////////
-	// 
-	// ///
-	// /// Takes the restbuilder and implements its respective default API
-	// ///
-	// public RESTBuilder setupRESTBuilder(RESTBuilder rb, String setPrefix) {
-	// 	rb.getNamespace(setPrefix + "cart").put(HttpRequestType.GET, cart_GET_and_POST);
-	// 	rb.getNamespace(setPrefix + "cart").put(HttpRequestType.POST, cart_GET_and_POST);
-	// 
-	// 	rb.getNamespace(setPrefix + "product").put(HttpRequestType.GET, product_GET_and_POST);
-	// 	rb.getNamespace(setPrefix + "product").put(HttpRequestType.POST, product_GET_and_POST);
-	// 
-	// 	return rb;
-	// }
-
 }

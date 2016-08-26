@@ -710,7 +710,16 @@ public class SimpleShoppingCart {
 			itemList.add(orderItem);
 		}
 		
-		return null;
+		// Prepare the actual return object
+		GenericConvertHashMap<String,Object> resMap = new GenericConvertHashMap<String,Object>();
+		
+		// Populate
+		resMap.putAll( orderObj );
+		resMap.put("productList", itemList);
+		
+		
+		
+		return resMap;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////

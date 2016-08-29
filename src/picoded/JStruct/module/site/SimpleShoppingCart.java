@@ -74,10 +74,10 @@ public class SimpleShoppingCart {
 	public void setupStandardTables(JStruct inStruct, String prefix) {
 		productOwner = inStruct.getMetaTable(prefix);
 		productItem = inStruct.getMetaTable(prefix + "_product");
-		productCount = inStruct.getAtomicLongMap(prefix + "_salescount");
+		productCount = inStruct.getAtomicLongMap(prefix + "_sales_count");
 
-		salesOrder = inStruct.getMetaTable(prefix + "_salesorder");
-		salesItem = inStruct.getMetaTable(prefix + "_salesitem");
+		salesOrder = inStruct.getMetaTable(prefix + "_sales_order");
+		salesItem = inStruct.getMetaTable(prefix + "_sales_item");
 	}
 
 	///
@@ -608,6 +608,12 @@ public class SimpleShoppingCart {
 
 			// Update the meta values
 			updateMetaObject.putAll(updateProduct);
+			
+			//
+			// @TODO : inventory quantity management
+			//
+			
+			// Save
 			updateMetaObject.saveDelta();
 		}
 
@@ -645,13 +651,13 @@ public class SimpleShoppingCart {
 
 	///
 	/// Creates a purchase order using a cart listing.
-	/// This creates a snapshot of all the tickets. And store it
+	/// This creates a snapshot of all the products. And store it
 	///
 	/// @param  Owner ID - used to identify the purchase owner
 	/// @param  Shopping cart list to create the purchase order
 	/// @param  Meta data to add to the purchase order
 	/// @param  Meta data to add to the purchase order items
-	/// @param  Purchase status "request", "approved", "paid", "rejected"
+	/// @param  Purchase status "request", "approved", "paid", "rejected", "failed"
 	///
 	public GenericConvertMap<String,Object> createPurchaseOrder(String purchaseOwnerID, List<List<Object>> cart, Map<String,Object> orderMeta, Map<String,Object> itemMeta, String status) {
 		// The order object to use
@@ -705,10 +711,18 @@ public class SimpleShoppingCart {
 
 			// Save it
 			orderItem.saveDelta();
+			
+			//
+			// @TODO : inventory quantity management
+			//
 
 			// Put into final item list
 			itemList.add(orderItem);
 		}
+		
+		// Store the list representation
+		orderObj.put("_productList", itemList);
+		orderObj.saveDelta();
 
 		// Prepare the actual return object
 		GenericConvertHashMap<String,Object> resMap = new GenericConvertHashMap<String,Object>();
@@ -717,11 +731,75 @@ public class SimpleShoppingCart {
 		resMap.putAll( orderObj );
 		resMap.put("productList", itemList);
 
-
-
 		return resMap;
 	}
-
+	
+	///
+	/// Gets a single purchase order, and all its relevent data
+	///
+	/// @param  OrderID - the "createPurchaseOrder" _oid
+	///
+	public GenericConvertMap<String,Object> updatePurchaseOrderStatus(String orderID, String newStatus) {
+		// Prepare the actual return object
+		GenericConvertHashMap<String,Object> resMap = new GenericConvertHashMap<String,Object>();
+		
+		// Sales object
+		MetaObject salesObject = salesOrder.get(orderID);
+		
+		// Update sales object status
+		salesObject.put("_orderStatus", newStatus);
+		salesObject.saveDelta();
+		
+		// Item list
+		List<MetaObject> prodList = fetchSalesItemList(orderID);
+		for(MetaObject item : prodList) {
+			item.put("_orderStatus", newStatus);
+			item.saveDelta();
+		}
+		
+		// Populate
+		resMap.putAll( salesObject );
+		resMap.put("productList", prodList);
+		
+		// Return
+		return resMap;
+	}
+	
+	///
+	/// Gets a single purchase order, and all its relevent data
+	///
+	/// @param  OrderID - the "createPurchaseOrder" _oid
+	///
+	public GenericConvertMap<String,Object> fetchPurchaseOrder(String orderID) {
+		// Prepare the actual return object
+		GenericConvertHashMap<String,Object> resMap = new GenericConvertHashMap<String,Object>();
+		
+		// Sales object
+		MetaObject salesObject = salesOrder.get(orderID);
+		
+		// Populate
+		resMap.putAll( salesObject );
+		resMap.put("productList", fetchSalesItemList(orderID));
+		
+		// Return
+		return resMap;
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Sales purchase order [protected]
+	//
+	/////////////////////////////////////////////////////////////////////////////////////////
+	
+	///
+	/// Gets a single purchase order list of items
+	///
+	/// @param  OrderID - the "createPurchaseOrder" _oid
+	///
+	protected List<MetaObject> fetchSalesItemList(String orderID) {
+		return Arrays.asList( salesItem.query("_orderID = ?", new Object[] { orderID }) );
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Sales purchase order [utils]

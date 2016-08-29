@@ -2,6 +2,7 @@ package picoded.RESTBuilder.template.site;
 
 import picoded.RESTBuilder.RESTBuilder;
 import picoded.RESTBuilder.RESTFunction;
+import picoded.RESTBuilder.template.core.*;
 import picoded.enums.HttpRequestType;
 import picoded.JStruct.*;
 import picoded.JStruct.module.site.*;
@@ -26,7 +27,12 @@ public class SimpleShoppingCartApiBuilder {
 	/////////////////////////////////////////////////////////////////////////////////////////
 	
 	public SimpleShoppingCart core = null;
-
+	
+	public MetaTableApiBuilder ownerApi = null;
+	public MetaTableApiBuilder productApi = null;
+	public MetaTableApiBuilder salesOrderApi = null;
+	public MetaTableApiBuilder salesItemApi = null;
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Constructor options
@@ -47,12 +53,6 @@ public class SimpleShoppingCartApiBuilder {
 	// Shopping cart API
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-
-	//--------------------------------------------
-	//
-	// Simple shopping cart handling
-	//
-	//--------------------------------------------
 
 	///
 	/// # cart (GET/POST)
@@ -213,6 +213,12 @@ public class SimpleShoppingCartApiBuilder {
 		
 		return res;
 	};
+	
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Sales order API
+	//
+	/////////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -229,7 +235,17 @@ public class SimpleShoppingCartApiBuilder {
 
 		rb.getNamespace(setPrefix + "product").put(HttpRequestType.GET, product_GET_and_POST);
 		rb.getNamespace(setPrefix + "product").put(HttpRequestType.POST, product_GET_and_POST);
-
+		
+		ownerApi = new MetaTableApiBuilder(core.productOwner);
+		productApi = new MetaTableApiBuilder(core.productItem);
+		salesOrderApi = new MetaTableApiBuilder(core.salesOrder);
+		salesItemApi = new MetaTableApiBuilder(core.salesItem);
+		
+		//ownerApi.setupRESTBuilder( rb, setPrefix + "owner" );
+		productApi.setupRESTBuilder( rb, setPrefix + "product" );
+		salesOrderApi.setupRESTBuilder( rb, setPrefix + "sale.order" );
+		salesItemApi.setupRESTBuilder( rb, setPrefix + "sale.item" );
+		
 		return rb;
 	}
 

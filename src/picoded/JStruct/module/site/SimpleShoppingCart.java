@@ -342,8 +342,10 @@ public class SimpleShoppingCart {
 				String id = updateLine.getString(0);
 				int count = updateLine.getInt(1);
 				// Note this maybe null
-				Object meta = updateLine.get(2);
-
+				Object meta = null;
+				if(updateLine.size()>2){
+					meta = updateLine.get(2);
+				}
 				//
 				// Find the ID in existing cartList, update count
 				//

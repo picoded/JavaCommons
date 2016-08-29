@@ -256,7 +256,7 @@ public class SimpleShoppingCartApiBuilder {
 		String status = req.getString("status", "");
 		String list = req.getString("list", null);
 		Boolean useShoppingCart = req.getBoolean("useShoppingCart", false);
-		
+
 		// //
 		// // _oid sanity check
 		// //
@@ -301,7 +301,7 @@ public class SimpleShoppingCartApiBuilder {
 		// }
 		// res.put("list", prodList);
 		//
-		// return res;
+		return res;
 	};
 
 	/////////////////////////////////////////////////////////////////////////////////////////

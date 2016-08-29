@@ -54,6 +54,16 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 		return ProxyGenericConvertList.ensure(inList);
 	}
 	
+	// Silent varient of get without OUT OF BOUND exception
+	//--------------------------------------------------------------------------------------------------
+	
+	public default E getSilent(int index) {
+		if( index < this.size() && index >= 0 ) {
+			return getSilent(index);
+		}
+		return null;
+	}
+	
 	// to string conversion
 	//--------------------------------------------------------------------------------------------------
 	
@@ -64,7 +74,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default String getString(int index, String fallbck) {
-		return GenericConvert.toString(get(index), fallbck);
+		return GenericConvert.toString(getSilent(index), fallbck);
 	}
 	
 	/// Default null fallback, To String conversion of generic object
@@ -73,7 +83,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default String getString(int index) {
-		return GenericConvert.toString(get(index));
+		return GenericConvert.toString(getSilent(index));
 	}
 	
 	// to boolean conversion
@@ -86,7 +96,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default boolean getBoolean(int index, boolean fallbck) {
-		return GenericConvert.toBoolean(get(index), fallbck);
+		return GenericConvert.toBoolean(getSilent(index), fallbck);
 	}
 	
 	/// Default boolean fallback, To String conversion of generic object
@@ -95,7 +105,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string to boolean, always possible 
 	public default boolean getBoolean(int index) {
-		return GenericConvert.toBoolean(get(index));
+		return GenericConvert.toBoolean(getSilent(index));
 	}
 	
 	// to Number conversion
@@ -108,7 +118,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default Number getNumber(int index, Number fallbck) {
-		return GenericConvert.toNumber(get(index), fallbck);
+		return GenericConvert.toNumber(getSilent(index), fallbck);
 	}
 	
 	/// Default Number fallback, To String conversion of generic object
@@ -117,7 +127,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default Number getNumber(int index) {
-		return GenericConvert.toNumber(get(index));
+		return GenericConvert.toNumber(getSilent(index));
 	}
 	
 	// to int conversion
@@ -130,7 +140,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default int getInt(int index, int fallbck) {
-		return GenericConvert.toInt(get(index), fallbck);
+		return GenericConvert.toInt(getSilent(index), fallbck);
 	}
 	
 	/// Default int fallback, To String conversion of generic object
@@ -139,7 +149,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default int getInt(int index) {
-		return GenericConvert.toInt(get(index));
+		return GenericConvert.toInt(getSilent(index));
 	}
 	
 	// to long conversion
@@ -152,7 +162,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default long getLong(int index, long fallbck) {
-		return GenericConvert.toLong(get(index), fallbck);
+		return GenericConvert.toLong(getSilent(index), fallbck);
 	}
 	
 	/// Default long fallback, To String conversion of generic object
@@ -161,7 +171,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default long getLong(int index) {
-		return GenericConvert.toLong(get(index));
+		return GenericConvert.toLong(getSilent(index));
 	}
 	
 	// to float conversion
@@ -174,7 +184,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default float getFloat(int index, float fallbck) {
-		return GenericConvert.toFloat(get(index), fallbck);
+		return GenericConvert.toFloat(getSilent(index), fallbck);
 	}
 	
 	/// Default float fallback, To String conversion of generic object
@@ -183,7 +193,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default float getFloat(int index) {
-		return GenericConvert.toFloat(get(index));
+		return GenericConvert.toFloat(getSilent(index));
 	}
 	
 	// to double conversion
@@ -196,7 +206,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default double getDouble(int index, double fallbck) {
-		return GenericConvert.toDouble(get(index), fallbck);
+		return GenericConvert.toDouble(getSilent(index), fallbck);
 	}
 	
 	/// Default float fallback, To String conversion of generic object
@@ -205,7 +215,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default double getDouble(int index) {
-		return GenericConvert.toDouble(get(index));
+		return GenericConvert.toDouble(getSilent(index));
 	}
 	
 	// to byte conversion
@@ -218,7 +228,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default byte getByte(int index, byte fallbck) {
-		return GenericConvert.toByte(get(index), fallbck);
+		return GenericConvert.toByte(getSilent(index), fallbck);
 	}
 	
 	/// Default float fallback, To String conversion of generic object
@@ -227,7 +237,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default byte getByte(int index) {
-		return GenericConvert.toByte(get(index));
+		return GenericConvert.toByte(getSilent(index));
 	}
 	
 	// to short conversion
@@ -240,7 +250,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default short getShort(int index, short fallbck) {
-		return GenericConvert.toShort(get(index), fallbck);
+		return GenericConvert.toShort(getSilent(index), fallbck);
 	}
 	
 	/// Default short fallback, To String conversion of generic object
@@ -249,7 +259,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted string, always possible unless null
 	public default short getShort(int index) {
-		return GenericConvert.toShort(get(index));
+		return GenericConvert.toShort(getSilent(index));
 	}
 	
 	// to UUID / GUID
@@ -262,7 +272,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted UUID, always possible unless null
 	public default UUID getUUID(int index, Object fallbck) {
-		return GenericConvert.toUUID(get(index), fallbck);
+		return GenericConvert.toUUID(getSilent(index), fallbck);
 	}
 	
 	/// Default Null fallback, To UUID conversion of generic object
@@ -271,7 +281,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted value
 	public default UUID getUUID(int index) {
-		return GenericConvert.toUUID(get(index));
+		return GenericConvert.toUUID(getSilent(index));
 	}
 	
 	/// To GUID conversion of generic object
@@ -281,7 +291,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted UUID, always possible unless null
 	public default String getGUID(int index, Object fallbck) {
-		return GenericConvert.toGUID(get(index), fallbck);
+		return GenericConvert.toGUID(getSilent(index), fallbck);
 	}
 	
 	/// Default Null fallback, To GUID conversion of generic object
@@ -290,7 +300,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted value
 	public default String getGUID(int index) {
-		return GenericConvert.toGUID(get(index));
+		return GenericConvert.toGUID(getSilent(index));
 	}
 	
 	// to list
@@ -304,7 +314,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted Object[], always possible unless null
 	public default List<Object> getObjectList(int index, Object fallbck) {
-		return GenericConvert.toObjectList(get(index), fallbck);
+		return GenericConvert.toObjectList(getSilent(index), fallbck);
 	}
 	
 	/// Default Null fallback, To List<Object> conversion of generic object
@@ -330,7 +340,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted String[], always possible unless null
 	public default String[] getStringArray(int index, Object fallbck) {
-		return GenericConvert.toStringArray(get(index), fallbck);
+		return GenericConvert.toStringArray(getSilent(index), fallbck);
 	}
 	
 	/// Default Null fallback, To String[] conversion of generic object
@@ -338,8 +348,8 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	/// @param input     The input value to convert
 	///
 	/// @returns         The converted value
-	public default String[] getStringArray(String string) {
-		return GenericConvert.toStringArray(get(string));
+	public default String[] getStringArray(int index) {
+		return GenericConvert.toStringArray(getSilent(index));
 	}
 	
 	// to object array
@@ -402,7 +412,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted Map if possible, else null
 	public default <K extends String, V> GenericConvertMap<K, V> getGenericConvertStringMap(int index, Object fallbck) {
-		return GenericConvert.toGenericConvertStringMap(get(index), fallbck);
+		return GenericConvert.toGenericConvertStringMap(getSilent(index), fallbck);
 	}
 	
 	///
@@ -412,7 +422,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted Map if possible, else null
 	public default <K extends String, V> GenericConvertMap<K, V> getGenericConvertStringMap(int index) {
-		return GenericConvert.toGenericConvertStringMap(get(index));
+		return GenericConvert.toGenericConvertStringMap(getSilent(index));
 	}
 	
 	// to array
@@ -425,7 +435,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted Map if possible, else null
 	public default <V> GenericConvertList<V> getGenericConvertList(int index, Object fallbck) {
-		return GenericConvert.toGenericConvertList(get(index), fallbck);
+		return GenericConvert.toGenericConvertList(getSilent(index), fallbck);
 	}
 	
 	///
@@ -435,6 +445,6 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted Map if possible, else null
 	public default <V> GenericConvertList<V> getGenericConvertList(int index) {
-		return GenericConvert.toGenericConvertList(get(index));
+		return GenericConvert.toGenericConvertList(getSilent(index));
 	}
 }

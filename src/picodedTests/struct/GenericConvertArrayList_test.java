@@ -328,13 +328,13 @@ public class GenericConvertArrayList_test {
 		assertEquals(list, convertArrayList.getObjectList(0, list));
 	}
 	
-	@Test(expected = java.lang.UnsupportedOperationException.class)
-	public void getStringArrayTest() {
-		convertArrayList = new GenericConvertArrayList<String>();
-		List<String> list = new ArrayList<>();
-		convertArrayList.add(list);
-		assertEquals(list, convertArrayList.getStringArray("a,b,c,d"));
-	}
+	// @Test(expected = java.lang.UnsupportedOperationException.class)
+	// public void getStringArrayTest() {
+	// 	convertArrayList = new GenericConvertArrayList<String>();
+	// 	List<String> list = new ArrayList<>();
+	// 	convertArrayList.add(list);
+	// 	assertEquals(list, convertArrayList.getStringArray(null,"a,b,c,d"));
+	// }
 	
 	@Test
 	public void getStringArray2ParamTest() {

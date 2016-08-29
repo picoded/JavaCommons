@@ -387,7 +387,9 @@ public class MetaTable_test {
 	public void jsonStorageTest() {
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("name", "Hello");
-		data.put("arrs", new ArrayList<String>(Arrays.asList(new String[] { "oh", "no" })));
+		
+		List<String> ohnoArray = Arrays.asList(new String[] { "oh", "no" });
+		data.put("arrs", new ArrayList<String>(ohnoArray));
 		
 		MetaObject mo = null;
 		assertNotNull(mo = mtObj.append(null, data));
@@ -398,6 +400,8 @@ public class MetaTable_test {
 		
 		data.put("_oid", mo._oid());
 		assertEquals(data, to);
+		
+		assertEquals(ohnoArray, to.get("arrs"));
 	}
 	
 	@Test

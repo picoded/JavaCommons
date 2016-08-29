@@ -217,17 +217,15 @@ public class SimpleShoppingCart {
 	public int cartListQuantityCount(List<List<Object>> inList) {
 		GenericConvertList<List<Object>> cartList = GenericConvert.toGenericConvertList( inList, new ArrayList<Object>() );
 		int ret = 0;
-
 		// Iterate and ensure valid cart size
 		for(int i=0;i<cartList.size();i++){
 			GenericConvertList<Object> cartLine = cartList.getGenericConvertList(i);
 			if(cartLine == null) {
 				continue;
 			}
-
 			if(cartLine.size() >= 2) {
 				// Get item count
-				int count = cartList.getInt(1, 0);
+				int count = cartLine.getInt(1, 0);
 				if( count > 0 ) {
 					ret += count;
 				}
@@ -610,11 +608,11 @@ public class SimpleShoppingCart {
 
 			// Update the meta values
 			updateMetaObject.putAll(updateProduct);
-			
+
 			//
 			// @TODO : inventory quantity management
 			//
-			
+
 			// Save
 			updateMetaObject.saveDelta();
 		}
@@ -714,7 +712,7 @@ public class SimpleShoppingCart {
 
 			// Save it
 			orderItem.saveDelta();
-			
+
 			//
 			// @TODO : inventory quantity management
 			//
@@ -722,7 +720,7 @@ public class SimpleShoppingCart {
 			// Put into final item list
 			itemList.add(orderItem);
 		}
-		
+
 		// Store the list representation
 		orderObj.put("_productList", itemList);
 		orderObj.saveDelta();
@@ -736,7 +734,7 @@ public class SimpleShoppingCart {
 
 		return resMap;
 	}
-	
+
 	///
 	/// Gets a single purchase order, and all its relevent data
 	///
@@ -745,29 +743,29 @@ public class SimpleShoppingCart {
 	public GenericConvertMap<String,Object> updatePurchaseOrderStatus(String orderID, String newStatus) {
 		// Prepare the actual return object
 		GenericConvertHashMap<String,Object> resMap = new GenericConvertHashMap<String,Object>();
-		
+
 		// Sales object
 		MetaObject salesObject = salesOrder.get(orderID);
-		
+
 		// Update sales object status
 		salesObject.put("_orderStatus", newStatus);
 		salesObject.saveDelta();
-		
+
 		// Item list
 		List<MetaObject> prodList = fetchSalesItemList(orderID);
 		for(MetaObject item : prodList) {
 			item.put("_orderStatus", newStatus);
 			item.saveDelta();
 		}
-		
+
 		// Populate
 		resMap.putAll( salesObject );
 		resMap.put("productList", prodList);
-		
+
 		// Return
 		return resMap;
 	}
-	
+
 	///
 	/// Gets a single purchase order, and all its relevent data
 	///
@@ -776,24 +774,24 @@ public class SimpleShoppingCart {
 	public GenericConvertMap<String,Object> fetchPurchaseOrder(String orderID) {
 		// Prepare the actual return object
 		GenericConvertHashMap<String,Object> resMap = new GenericConvertHashMap<String,Object>();
-		
+
 		// Sales object
 		MetaObject salesObject = salesOrder.get(orderID);
-		
+
 		// Populate
 		resMap.putAll( salesObject );
 		resMap.put("productList", fetchSalesItemList(orderID));
-		
+
 		// Return
 		return resMap;
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Sales purchase order [protected]
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	///
 	/// Gets a single purchase order list of items
 	///
@@ -802,7 +800,7 @@ public class SimpleShoppingCart {
 	protected List<MetaObject> fetchSalesItemList(String orderID) {
 		return Arrays.asList( salesItem.query("_orderID = ?", new Object[] { orderID }) );
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Sales purchase order [utils]

@@ -25,14 +25,14 @@ public class SimpleShoppingCartApiBuilder {
 	// Class variables
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	public SimpleShoppingCart core = null;
-	
+
 	public MetaTableApiBuilder ownerApi = null;
 	public MetaTableApiBuilder productApi = null;
 	public MetaTableApiBuilder salesOrderApi = null;
 	public MetaTableApiBuilder salesItemApi = null;
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Constructor options
@@ -47,7 +47,7 @@ public class SimpleShoppingCartApiBuilder {
 	public SimpleShoppingCartApiBuilder(JStruct inStruct, String prefix) {
 		core = new SimpleShoppingCart(inStruct, prefix);
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Shopping cart API
@@ -85,27 +85,27 @@ public class SimpleShoppingCartApiBuilder {
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	///
 	public RESTFunction cart_GET_and_POST = (req, res) -> {
-		
+
 		//
 		// Get req params
 		//
 		String mode = req.getString("mode","update");
 		boolean simple = req.getBoolean("simple", false);
 		String listStr = req.getString("list", null);
-		
+
 		//
 		// Function reuse vars
 		//
 		CorePage requestPage= req.requestPage();
 		GenericConvertList<List<Object>> cart = null;
-		
+
 		//
 		// Assumes an update is needed if not pure get
 		//
 		if( listStr != null ) {
 			// Prepare update list
 			GenericConvertList<List<Object>> updateList = core.cartCookieJSONToList(listStr);
-			
+
 			// Check for replacement mode
 			if( mode != null && mode.equalsIgnoreCase("replace") ) {
 				// Run replacement mode
@@ -118,13 +118,13 @@ public class SimpleShoppingCartApiBuilder {
 			//
 			// Simply just get the list instead
 			//
-			cart = core.getCartList(requestPage, simple); 
+			cart = core.getCartList(requestPage, simple);
 		}
-		
+
 		res.put("list", cart);
 		res.put("itemCount", cart.size());
 		res.put("quantityCount", core.cartListQuantityCount(cart));
-		
+
 		return res;
 	};
 
@@ -166,7 +166,7 @@ public class SimpleShoppingCartApiBuilder {
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	///
 	public RESTFunction product_GET_and_POST = (req, res) -> {
-		
+
 		//
 		// _oid sanity check
 		//
@@ -176,27 +176,27 @@ public class SimpleShoppingCartApiBuilder {
 			res.put("error", "Request object did not contain an oid");
 			return res;
 		}
-		
+
 		//
 		// Function reuse vars
 		//
 		List<MetaObject> prodList = null;
-		
+
 		//
 		// Get req params
 		//
 		String mode = req.getString("mode","update");
 		String listStr = req.getString("list", null);
-		
+
 		//
 		// Update / GET
 		//
 		if( listStr != null ) {
 			//
-			// Assumes an update 
+			// Assumes an update
 			//
 			List<Object> updateList = ConvertJSON.toList(listStr);
-			
+
 			// Check for replacement mode
 			if( mode != null && mode.equalsIgnoreCase("replace") ) {
 				throw new RuntimeException("mode=replace not supported");
@@ -210,20 +210,20 @@ public class SimpleShoppingCartApiBuilder {
 			prodList = core.getProductList( oid );
 		}
 		res.put("list", prodList);
-		
+
 		return res;
 	};
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Sales order API
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	// ///
 	// /// # sale.order (GET/POST)
 	// ///
-	// /// Gets or create a sales order, not this is supposingly immutable, beyond change of status. 
+	// /// Gets or create a sales order, not this is supposingly immutable, beyond change of status.
 	// /// Use sale.order.status, to do a change in status.
 	// ///
 	// /// ## HTTP Request Parameters (Optional)
@@ -260,7 +260,7 @@ public class SimpleShoppingCartApiBuilder {
 	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
 	// ///
 	// public RESTFunction saleOrder_GET_and_POST = (req, res) -> {
-	// 	
+	//
 	// 	//
 	// 	// _oid sanity check
 	// 	//
@@ -270,27 +270,27 @@ public class SimpleShoppingCartApiBuilder {
 	// 		res.put("error", "Request object did not contain an oid");
 	// 		return res;
 	// 	}
-	// 	
+	//
 	// 	//
 	// 	// Function reuse vars
 	// 	//
 	// 	List<MetaObject> prodList = null;
-	// 	
+	//
 	// 	//
 	// 	// Get req params
 	// 	//
 	// 	String mode = req.getString("mode","update");
 	// 	String listStr = req.getString("list", null);
-	// 	
+	//
 	// 	//
 	// 	// Update / GET
 	// 	//
 	// 	if( listStr != null ) {
 	// 		//
-	// 		// Assumes an update 
+	// 		// Assumes an update
 	// 		//
 	// 		List<Object> updateList = ConvertJSON.toList(listStr);
-	// 		
+	//
 	// 		// Check for replacement mode
 	// 		if( mode != null && mode.equalsIgnoreCase("replace") ) {
 	// 			throw new RuntimeException("mode=replace not supported");
@@ -304,10 +304,10 @@ public class SimpleShoppingCartApiBuilder {
 	// 		prodList = core.getProductList( oid );
 	// 	}
 	// 	res.put("list", prodList);
-	// 	
+	//
 	// 	return res;
 	// };
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// RestBuilder template builder
@@ -323,17 +323,17 @@ public class SimpleShoppingCartApiBuilder {
 
 		rb.getNamespace(setPrefix + "product").put(HttpRequestType.GET, product_GET_and_POST);
 		rb.getNamespace(setPrefix + "product").put(HttpRequestType.POST, product_GET_and_POST);
-		
+
 		ownerApi = new MetaTableApiBuilder(core.productOwner);
 		productApi = new MetaTableApiBuilder(core.productItem);
 		salesOrderApi = new MetaTableApiBuilder(core.salesOrder);
 		salesItemApi = new MetaTableApiBuilder(core.salesItem);
-		
+
 		//ownerApi.setupRESTBuilder( rb, setPrefix + "owner" );
 		productApi.setupRESTBuilder( rb, setPrefix + "product" );
 		salesOrderApi.setupRESTBuilder( rb, setPrefix + "sale.order" );
 		salesItemApi.setupRESTBuilder( rb, setPrefix + "sale.item" );
-		
+
 		return rb;
 	}
 

@@ -59,7 +59,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	
 	public default E getSilent(int index) {
 		if( index < this.size() && index >= 0 ) {
-			return getSilent(index);
+			return get(index);
 		}
 		return null;
 	}

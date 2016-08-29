@@ -219,7 +219,95 @@ public class SimpleShoppingCartApiBuilder {
 	// Sales order API
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-
+	
+	// ///
+	// /// # sale.order (GET/POST)
+	// ///
+	// /// Gets or create a sales order, not this is supposingly immutable, beyond change of status. 
+	// /// Use sale.order.status, to do a change in status.
+	// ///
+	// /// ## HTTP Request Parameters (Optional)
+	// ///
+	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
+	// /// | Parameter Name  | Variable Type	        | Description                                                     |
+	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
+	// /// | _oid            | String                  | The product list owner ID                                       |
+	// /// | list            | [[ID,count], ... ]      | [optional] Shopping item ID, and count to                       |
+	// /// |                 |                         |            add/edit/delete (when total count=0)                 |
+	// /// | mode            | "update", "replace"     | [default=update] Indicate if list is an update or replacement   |
+	// /// |                 |                         | @TODO : Support "replace"                                       |
+	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
+	// ///
+	// /// ## Details of the update object
+	// ///
+	// ///	"_oid":owner id MUST BE GIVEN,
+	// /// "update":[
+	// ///	    {
+	// ///		    "_oid":if oid is given, its an update. If null or "new", its a create,
+	// ///		    ... product key/values here ...
+	// ///	    }
+	// /// ]
+	// ///
+	// /// ## JSON Object Output Parameters
+	// ///
+	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
+	// /// | Parameter Name  | Variable Type	        | Description                                                     |
+	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
+	// /// | _oid            | String                  | The product list owner ID                                       |
+	// /// | list            | [{meta}]                | Shopping cart content with item ID, count, and content          |
+	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
+	// /// | error           | String (Optional)       | Errors encounted if any                                         |
+	// /// +-----------------+-------------------------+-----------------------------------------------------------------+
+	// ///
+	// public RESTFunction saleOrder_GET_and_POST = (req, res) -> {
+	// 	
+	// 	//
+	// 	// _oid sanity check
+	// 	//
+	// 	String oid = req.getString("_oid", "");
+	// 	res.put("_oid", oid);
+	// 	if (oid.isEmpty()) {
+	// 		res.put("error", "Request object did not contain an oid");
+	// 		return res;
+	// 	}
+	// 	
+	// 	//
+	// 	// Function reuse vars
+	// 	//
+	// 	List<MetaObject> prodList = null;
+	// 	
+	// 	//
+	// 	// Get req params
+	// 	//
+	// 	String mode = req.getString("mode","update");
+	// 	String listStr = req.getString("list", null);
+	// 	
+	// 	//
+	// 	// Update / GET
+	// 	//
+	// 	if( listStr != null ) {
+	// 		//
+	// 		// Assumes an update 
+	// 		//
+	// 		List<Object> updateList = ConvertJSON.toList(listStr);
+	// 		
+	// 		// Check for replacement mode
+	// 		if( mode != null && mode.equalsIgnoreCase("replace") ) {
+	// 			throw new RuntimeException("mode=replace not supported");
+	// 		} else {
+	// 			prodList = core.updateProductList( oid, updateList );
+	// 		}
+	// 	} else {
+	// 		//
+	// 		// Simply get the list instead
+	// 		//
+	// 		prodList = core.getProductList( oid );
+	// 	}
+	// 	res.put("list", prodList);
+	// 	
+	// 	return res;
+	// };
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// RestBuilder template builder

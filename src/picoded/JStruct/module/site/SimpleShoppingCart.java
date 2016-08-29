@@ -703,6 +703,7 @@ public class SimpleShoppingCart {
 			orderItem.putAll(itemObj);
 
 			// Link it all up
+			orderItem.put("_count", itemCount);
 			orderItem.put("_ownerID", purchaseOwnerID);
 			orderItem.put("_orderID", orderID);
 			orderItem.put("_sellerID", rawItemObj.get("_ownerID"));

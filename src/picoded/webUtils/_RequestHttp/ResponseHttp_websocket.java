@@ -20,7 +20,10 @@ import picoded.webUtils.ResponseHttp;
 /// NOTE: while the API is deisgned to be thread safe in the future.
 /// the current implmentation is not thread safe for usage. 
 /// (aka multiple processes using a single ResponseHttp object)
-@ClientEndpoint
+///
+/// NOTE: The @ClientEndpoint is disabled as JBOSS searches for this and hooks to it, causing major errors
+///
+/// @ClientEndpoint
 public class ResponseHttp_websocket implements ResponseHttp {
 	
 	///////////////////////////////////////////////////////////

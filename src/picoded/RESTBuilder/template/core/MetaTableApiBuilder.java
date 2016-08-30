@@ -3,6 +3,7 @@ package picoded.RESTBuilder.template.core;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +19,7 @@ import picoded.enums.HttpRequestType;
 import picoded.servlet.BasePage;
 import picoded.servlet.CorePage;
 
+@SuppressWarnings("unused") 
 /// Account login template API
 public class MetaTableApiBuilder {
 	
@@ -344,9 +346,17 @@ public class MetaTableApiBuilder {
 			}
 			
 			ret.add(headerRow.toString());
-			
+			Set<String> leadsIdsSet = null;
 			for (MetaObject metaObj : metaObjs) {
 				List<Object> row = new ArrayList<Object>();
+
+				leadsIdsSet = new HashSet<String>();
+				// check for duplicate records
+				if(leadsIdsSet.contains(metaObj.get("_oid"))){
+					continue;
+				}
+				leadsIdsSet.add(metaObj.get("_oid").toString());
+
 				for (String header : headers) {
 					row.add(metaObj.get(header));
 				}

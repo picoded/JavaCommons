@@ -286,7 +286,7 @@ public class SimpleShoppingCartApiBuilder {
 				res.put("error","Cannot create order with empty cart list!");
 			}else{
 				//Create new purchase order
-				purchaseOrder = core.createPurchaseOrder(currentUser._oid(), cartList , orderMeta, itemMeta, status);				
+				purchaseOrder = core.createPurchaseOrder(currentUser._oid(), cartList , orderMeta, itemMeta, status);
 			}
 		}else{
 			//Reuse old purchase order oid

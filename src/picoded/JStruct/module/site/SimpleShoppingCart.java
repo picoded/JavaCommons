@@ -664,8 +664,15 @@ public class SimpleShoppingCart {
 		MetaObject orderObj = salesOrder.newObject();
 
 		// Make sure the meta object, is a cloned, and sanatized
-		orderMeta = sanatizePurchaseData(new GenericConvertHashMap<String,Object>(orderMeta));
+		if(orderMeta == null){
+			orderMeta= new GenericConvertHashMap<String,Object>();
+		}else{
+			orderMeta = sanatizePurchaseData(new GenericConvertHashMap<String,Object>(orderMeta));
+		}
 
+		if(itemMeta == null){
+			itemMeta = new GenericConvertHashMap<String,Object>();
+		}
 		// Building the orderObj, with _ownerID, and _orderStatus link
 		orderObj.putAll(orderMeta);
 		orderObj.put("_ownerID", purchaseOwnerID);

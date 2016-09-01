@@ -104,7 +104,12 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		AccountTable at = accountAuthTable();
 
 		// Setup table
-		at.systemSetup();
+		boolean skipAccountAuthTableSetup = JConfig().getBoolean("sys.JStack.skipAccountAuthTableSetup", false);
+		if(!skipAccountAuthTableSetup){
+			at.systemSetup();
+		}else{
+			System.out.println("Skipping systemSetup in BasePage");
+		}
 
 		// Gets the superuser group
 		String superGroup = jc.getString("sys.account.superUsers.groupName", "SuperUsers");
@@ -336,12 +341,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	@Override
 	public void initializeContext() throws Exception {
 		super.initializeContext();
-		boolean skipAccountAuthTableSetup = JConfig().getBoolean("sys.JStack.skipAccountAuthTableSetup", false);
-		if(!skipAccountAuthTableSetup){
-			accountAuthTableSetup();
-		}else{
-			System.out.println("Skipping skipAccountAuthTableSetup in BasePage");
-		}
+		accountAuthTableSetup();
 	}
 
 }

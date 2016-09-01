@@ -49,18 +49,24 @@ import java.util.Arrays;
 /// * configurable class default values, with class functions, in addition of static global defaults. Should fallback to global default if not set.
 public class NxtCrypt {
 	
-	//Reusable crypt objects
+	/// Reusable crypt objects
 	private static SecretKeyFactory pbk = null;
+	
+	/// Reusable Random objects objects
 	private static SecureRandom ran = null;
 	
-	private static String seperator = "@"; //@ is intentionally used as opposed to $, as to make the stored passHash obviously not "php password_hash" format.
+	/// Hash storage seperator, @ is intentionally used as opposed to $, as to make the stored passHash obviously not "php password_hash" format.
+	private static String seperator = "@"; 
 	
-	///Definable default salt length
+	/// Definable default salt length
 	public static int defaultSaltLength = 32; //bytes
-	///Definable default salt iterations
+	/// Definable default salt iterations
 	public static int defaultIterations = 1500;
-	///Definable default salt keylength
+	/// Definable default salt keylength
 	public static int defaultKeyLength = 256;
+	
+	/// Setup the default setting for SecureRandom
+	public static boolean isStrongSecureRandom = false;
 	
 	/**
 	 * Compares two byte arrays in length-constant time. This comparison method
@@ -127,7 +133,31 @@ public class NxtCrypt {
 			NxtCrypt.pbk = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 		}
 		if (NxtCrypt.ran == null) {
-			NxtCrypt.ran = SecureRandom.getInstance("SHA1PRNG");
+			if( NxtCrypt.isStrongSecureRandom == false ) {
+				//
+				// Using just plain old SecureRandom by default now.
+				// Frankly speaking I personally feel this is "secure enough",
+				// Cause its over 9000x easier to do social engineering attacks,
+				// then a side channel timing attack. 
+				//
+				// Unless of course your opponent is NSA. ¯\_(ツ)_/¯
+				//
+				// Or more frankly, one of their admins setting their password as "I-am-@wsome-123"
+				//
+				// https://tersesystems.com/2015/12/17/the-right-way-to-use-securerandom/
+				//
+				NxtCrypt.ran = new SecureRandom();
+			} else {
+				//
+				// Originally the secure random module uses SHA1PRNG AKA
+				// `NxtCrypt.ran = SecureRandom.getInstance("SHA1PRNG");`
+				//
+				// Now it uses java 8 SecureRandom.getInstanceStrong();
+				// Which will hopefully make the entropy starvation issue better
+				// in certain environments.
+				//
+				NxtCrypt.ran = SecureRandom.getInstanceStrong();
+			}
 		}
 	}
 	

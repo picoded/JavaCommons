@@ -38,7 +38,7 @@ import picoded.webTemplateEngines.JSML.*;
 import picoded.page.builder.*;
 
 /**
- * Extends the corePage/jSqlPage functionality, and implements basic UI templating, lifecycle handling, 
+ * Extends the corePage/jSqlPage functionality, and implements basic UI templating, lifecycle handling,
  * and accountsManagement
  *
  * ---------------------------------------------------------------------------------------------------------
@@ -49,78 +49,78 @@ import picoded.page.builder.*;
  * + API module
  */
 public class BasePage extends JStackPage implements ServletContextListener {
-	
+
 	/////////////////////////////////////////////
 	//
 	// Static variables
 	//
 	/////////////////////////////////////////////
-	
+
 	/////////////////////////////////////////////
 	//
-	// RESTBuilder related convinence 
+	// RESTBuilder related convinence
 	//
 	/////////////////////////////////////////////
-	
+
 	/// Cached restbuilder object
 	protected RESTBuilder _restBuilderObj = null;
-	
+
 	/// REST API builder
 	public RESTBuilder restBuilder() {
 		if (_restBuilderObj != null) {
 			return _restBuilderObj;
 		}
-		
+
 		_restBuilderObj = new RESTBuilder();
 		restBuilderSetup(_restBuilderObj);
-		
+
 		return _restBuilderObj;
 	}
-	
+
 	/// !To Override
 	/// to configure the restBuilderSetup steps
 	public void restBuilderSetup(RESTBuilder rbObj) {
 		// The server timestamp fetching
 		rbObj.getNamespace("server.now").put(HttpRequestType.GET, ServerTime.now);
-		
+
 		// Preload RESBUilder stack
 		JStackUtils.setupRESTBuilderStruct(rbObj, JStackObj, JConfig().getStringMap("sys.JStack.struct", null));
 	}
-	
+
 	/////////////////////////////////////////////
 	//
 	// JStack related convinence function
 	//
 	/////////////////////////////////////////////
-	
+
 	protected AccountTable _accountAuthObj = null;
-	
+
 	/// The default setup process of accountAuthTable
 	public void accountAuthTableSetup() throws JStackException {
 		// Gets the configuration setup
 		JConfig jc = JConfig();
-		
+
 		// Setup the tables
 		AccountTable at = accountAuthTable();
-		
+
 		// Setup table
 		at.systemSetup();
-		
+
 		// Gets the superuser group
 		String superGroup = jc.getString("sys.account.superUsers.groupName", "SuperUsers");
 		String adminUser = jc.getString("sys.account.superUsers.rootUsername", "admin");
 		String adminPass = jc.getString("sys.account.superUsers.rootPassword", "P@ssw0rd!");
 		boolean resetPass = jc.getBoolean("sys.account.superUsers.rootPasswordReset", false);
-		
+
 		// Gets and setup the objects if needed
 		AccountObject grpObject = at.getFromName(superGroup);
 		if (grpObject == null) {
 			grpObject = at.newObject(superGroup);
 		}
-		
+
 		// Remove password for super group
 		grpObject.removePassword();
-		
+
 		// Setup the default admin
 		AccountObject userObject = at.getFromName(adminUser);
 		if (userObject == null) {
@@ -129,64 +129,64 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		} else if (resetPass) {
 			userObject.setPassword(adminPass);
 		}
-		
+
 		// Ensure its role
 		String role = grpObject.getMemberRole(userObject);
 		if (role == null || !(role.equals("admin"))) {
 			grpObject.setMember(userObject, "admin");
 		}
-		
+
 		// Apply changes
 		userObject.saveDelta();
 		grpObject.saveDelta();
 	}
-	
+
 	public String getSuperUserGroupName() {
 		return JConfig().getString("sys.account.superUsers.groupName", "SuperUsers");
 	}
-	
+
 	/// The primary accountAuthTable used for user authentication
 	public AccountTable accountAuthTable() {
 		if (_accountAuthObj != null) {
 			return _accountAuthObj;
 		}
-		
+
 		// @TODO cookiePrefix to be loaded from configurable
 		// @TODO Config loading
-		
+
 		// Gets the configuration setup
 		JConfig jc = JConfig();
 		String tablePrefix = jc.getString("sys.JStack.baseAccount.name",
 			jc.getString("sys.account.tableConfig.tablePrefix", "picoded_account"));
-		
+
 		// httpUserAuthObj.loginLifetime = cStack.getInt( "userAuthCookie.loginLifetime", httpUserAuthObj.loginLifetime);
 		// httpUserAuthObj.loginRenewal = cStack.getInt( "userAuthCookie.loginRenewal", httpUserAuthObj.loginRenewal);
 		// httpUserAuthObj.rmberMeLifetime = cStack.getInt( "userAuthCookie.rememberMeLifetime", httpUserAuthObj.rmberMeLifetime);
-		// 
+		//
 		// httpUserAuthObj.isHttpOnly = cStack.getBoolean( "userAuthCookie.isHttpOnly", httpUserAuthObj.isHttpOnly);
 		// httpUserAuthObj.isSecureOnly = cStack.getBoolean( "userAuthCookie.isSecureOnly", httpUserAuthObj.isSecureOnly);
-		
+
 		_accountAuthObj = JStack().getAccountTable(tablePrefix);
 		_accountAuthObj.setSuperUserGroupName(getSuperUserGroupName());
-		
+
 		return _accountAuthObj;
 	}
-	
+
 	/// [Protected] cached current account object
 	public AccountObject _currentAccount = null;
-	
+
 	/// Current account that is logged in
 	public AccountObject currentAccount() {
-		
+
 		if (_currentAccount != null) {
 			return _currentAccount;
 		}
-		
+
 		_currentAccount = accountAuthTable().getRequestUser(httpRequest, httpResponse);
-		
+
 		return _currentAccount;
 	}
-	
+
 	/// Diverts the user if not logged in, and returns true.
 	/// Else stored the logged in user name, does setup(), and returns false.
 	public boolean divertInvalidUser(String redirectTo) throws IOException, JStackException {
@@ -196,7 +196,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		}
 		return false;
 	}
-	
+
 	/// Get the user meta from the current user, this can also be called via JMTE
 	///
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.html}
@@ -205,13 +205,13 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	public String currentAccountMetaInfo(String meta) throws JStackException {
 		return currentAccount().getString(meta);
 	}
-	
+
 	// Removed?: Use accountAuthTable() instead
 	// Gets the user meta info from the specific user
 	// public String accountMetaInfo(String name, String meta) throws JStackException {
 	// 	return accountAuthTable().getFromName(name).getString(meta);
 	// }
-	
+
 	/////////////////////////////////////////////
 	//
 	// HTML fetch and JMTE templating
@@ -222,23 +222,23 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		public RenderFormatInfo getFormatInfo() {
 			return null;
 		}
-		
+
 		@Override
 		public String getName() {
 			return "currentAccountMetaInfo";
 		}
-		
+
 		@Override
 		public Class<?>[] getSupportedClasses() {
 			return new Class<?>[] { (new Object()).getClass() };
 		}
-		
+
 		@Override
 		public String render(Object o, String format, Locale L) {
 			if (format == null || format.length() <= 0) {
 				return null;
 			}
-			
+
 			try {
 				return currentAccountMetaInfo(format);
 			} catch (JStackException e) {
@@ -246,10 +246,10 @@ public class BasePage extends JStackPage implements ServletContextListener {
 			}
 		}
 	}
-	
+
 	/// [Protected] jmte object used
 	protected JMTE _jmteObj = null;
-	
+
 	/// Loads and setup the jmte object with the "contextPath" parameter, htmlPartsFolder directory if needed
 	///
 	/// @returns the jmte object
@@ -257,38 +257,38 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		if (_jmteObj != null) {
 			return _jmteObj;
 		}
-		
+
 		_jmteObj = new JMTE(getPageTemplatePath());
 		JMTE_initialSetup(_jmteObj);
-		
+
 		return _jmteObj;
 	}
-	
+
 	/// Initial setup of the JMTE logic, and base data model.
 	///
 	/// this is the function to override for extended classes to add to JMTE base data model
 	public void JMTE_initialSetup(JMTE setupObj) {
 		setupObj.baseDataModel.put("ContextPath", getContextPath());
 		setupObj.baseDataModel.put("ContextURI", getContextURI());
-		
+
 		// Pass the configuration settings in JConfig to JMTE, but filter system
 		setupObj.baseDataModel.put("Config", JConfig().createSubMap(null, "sys"));
-		
+
 		// The this data model self reference
 		// setupObj.baseDataModel.put("this", setupObj.baseDataModel);
-		
+
 		setupObj.registerNamedRenderer(new currentAccountMetaInfo_nr());
 	}
-	
+
 	/////////////////////////////////////////////
 	//
 	// PageBuilder handling
 	//
 	/////////////////////////////////////////////
-	
+
 	/// [Protected] PageBuilder object used
 	protected PageBuilder _pageBuilderObj = null;
-	
+
 	/// Loads and setup the PageBuilder object if needed
 	///
 	/// @returns the PageBuilder object
@@ -297,23 +297,23 @@ public class BasePage extends JStackPage implements ServletContextListener {
 			_pageBuilderObj.setUriRootPrefix(getContextURI());
 			return _pageBuilderObj;
 		}
-		
+
 		_pageBuilderObj = new PageBuilder(getPageTemplatePath(), getPageOutputPath());
 		_pageBuilderObj.setJMTE(JMTE());
 		_pageBuilderObj.setUriRootPrefix(getContextURI());
-		
+
 		return _pageBuilderObj;
 	}
-	
+
 	/////////////////////////////////////////////
 	//
 	// JSML handling
 	//
 	/////////////////////////////////////////////
-	
+
 	/// [Protected] JSMLFormSet object used
 	protected JSMLFormSet _formSetObj = null;
-	
+
 	/// Loads and setup the JSMLFormSet object if needed
 	///
 	/// @returns the JSMLFormSet object
@@ -321,22 +321,27 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		if (_formSetObj != null) {
 			return _formSetObj;
 		}
-		
+
 		_formSetObj = new JSMLFormSet(getJsmlTemplatePath(), getContextURI());
 		return _formSetObj;
 	}
-	
+
 	/////////////////////////////////////////////
 	//
 	// Servlet context handling
 	//
 	/////////////////////////////////////////////
-	
+
 	/// BasePage initializeContext to be extended / build on
 	@Override
 	public void initializeContext() throws Exception {
 		super.initializeContext();
-		accountAuthTableSetup();
+		boolean skipAccountAuthTableSetup = JConfig().getBoolean("sys.JStack.skipAccountAuthTableSetup", false);
+		if(!skipAccountAuthTableSetup){
+			accountAuthTableSetup();
+		}else{
+			System.out.println("Skipping skipAccountAuthTableSetup in BasePage");
+		}
 	}
-	
+
 }

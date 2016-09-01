@@ -784,7 +784,9 @@ public class SimpleShoppingCart {
 
 		// Sales object
 		MetaObject salesObject = salesOrder.get(orderID);
-
+		if( salesObject == null ) {
+			throw new RuntimeException("Invalid OID");
+		}
 		// Populate
 		resMap.putAll( salesObject );
 		resMap.put("productList", fetchSalesItemList(orderID));

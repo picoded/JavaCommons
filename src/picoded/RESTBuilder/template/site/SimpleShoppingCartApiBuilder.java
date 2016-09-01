@@ -281,7 +281,7 @@ public class SimpleShoppingCartApiBuilder {
 		}
 
 		if(oid.isEmpty()){
-
+			//Makes sure that there are items in the list first
 			if(cartList == null || cartList.isEmpty()){
 				res.put("error","Cannot create order with empty cart list!");
 			}else{
@@ -349,15 +349,23 @@ public class SimpleShoppingCartApiBuilder {
 		String oid = req.getString("_oid", "");
 		//"approved", "paid", "rejected", "failed"
 		String status = req.getString("status", "");
+		GenericConvertMap<String,Object>  purchaseOrder;
 
 		if(oid.isEmpty()){
 			res.put("error","There needs to be a purchase order ID!");
+			return res;
 		}
 
-		GenericConvertMap<String,Object>  updatedPurchaseOrder = core.updatePurchaseOrderStatus( oid, status);
+		if(status == ""){
+			//Fetches the status of the purchase order. User will need to sieve through to find the status
+			purchaseOrder = core.fetchPurchaseOrder( oid );
+		}else{
+			//Updates the status of the purchase order
+			purchaseOrder = core.updatePurchaseOrderStatus( oid, status);
+		}
 
 		res.put("_oid",oid);
-		res.put("data", updatedPurchaseOrder);
+		res.put("data", purchaseOrder);
 
 		return res;
 	};
@@ -391,6 +399,8 @@ public class SimpleShoppingCartApiBuilder {
 		rb.getNamespace(setPrefix + "sale.order.create").put(HttpRequestType.GET, saleOrder_GET_and_POST);
 		rb.getNamespace(setPrefix + "sale.order.create").put(HttpRequestType.POST, saleOrder_GET_and_POST);
 
+		rb.getNamespace(setPrefix + "sale.order.status").put(HttpRequestType.GET, saleOrderstatus_GET_and_POST);
+		rb.getNamespace(setPrefix + "sale.order.status").put(HttpRequestType.POST, saleOrderstatus_GET_and_POST);
 
 		return rb;
 	}

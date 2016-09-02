@@ -45,8 +45,11 @@ public class EmailBroadcaster {
 	/// @Params  Sending email address
 	///
 	public EmailBroadcaster(final String smtpUrl, final String username, final String password, final String fromAddress) {
+		this(smtpUrl, username, password, fromAddress, false);
+	}
 
-		this(smtpUrl, username, password, fromAddress, false, false);
+	public EmailBroadcaster(final String smtpUrl, final String username, final String password, final String fromAddress, boolean isSSL) {
+		this(smtpUrl, username, password, fromAddress, isSSL, false);
 	}
 
 	///
@@ -100,7 +103,7 @@ public class EmailBroadcaster {
 	}
 
 	public EmailBroadcaster(GenericConvertMap<String, Object> inSmtpConfigMap) {
-		GenericConvertMap<String, Object> smtpConfigMap = ProxyGenericConvertMap.ensureGenericConvertMap(inSmtpConfigMap);
+		GenericConvertMap<String, Object> smtpConfigMap = ProxyGenericConvertMap.ensure(inSmtpConfigMap);
 
 		if(smtpConfigMap == null){
 			System.out.println("EmailBroadcaster -> smtpConfigMap is null");
@@ -148,10 +151,7 @@ public class EmailBroadcaster {
 			session = Session.getInstance(props, null);
 		}
 
-
-
 		System.out.println("Finished setting up emailbroadcaster object");
-
 	}
 
 	///
@@ -173,7 +173,7 @@ public class EmailBroadcaster {
 		if(inextraSendOptions == null){
 			inextraSendOptions = new HashMap<String, Object>();
 		}
-		GenericConvertMap<String, Object> extraSendOptions = ProxyGenericConvertMap.ensureGenericConvertMap(inextraSendOptions);
+		GenericConvertMap<String, Object> extraSendOptions = ProxyGenericConvertMap.ensure(inextraSendOptions);
 
 		// Process "FROM" address field
 		if (fromAddress != null) {

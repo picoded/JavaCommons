@@ -3,8 +3,6 @@ package picoded.webTemplateEngines.JSML;
 import java.io.*;
 import java.util.*;
 
-import org.lesscss.deps.org.apache.commons.io.FileUtils;
-
 import org.apache.batik.bridge.*;
 import org.apache.batik.dom.svg.*;
 import org.apache.batik.gvt.*;
@@ -18,8 +16,8 @@ import java.awt.geom.Rectangle2D;
 import picoded.conv.ConvertJSON;
 import picoded.conv.GUID;
 import picoded.conv.MapValueConv;
-import picoded.fileUtils.DeleteFilesByAge;
-import picoded.fileUtils.PDFGenerator;
+import picoded.conv.LessToCss;
+import picoded.fileUtils.*; 
 import picoded.servlet.BasePage;
 import picoded.webTemplateEngines.FormGenerator.*;
 
@@ -51,16 +49,16 @@ public class JSMLForm {
 	//
 	////////////////////////////////////////////////
 	
-	//Absolute path to form set root
+	/// Absolute path to form set root
 	private String _formFolderPath = "";
 	
-	//context URI path - use this to replace instances of ${FormContextPath}
+	/// context URI path - use this to replace instances of ${FormContextPath}
 	private String _contextPath = "";
 	
-	//Absolute path to tmp folder where i can generate my GUID folder
+	/// Absolute path to tmp folder where i can generate my GUID folder
 	private String _tempFolderPath = ""; //append GUID to this
 	
-	//generated GUID
+	/// generated GUID
 	private String _generatedGUID = "";
 	
 	////////////////////////////////////////////////
@@ -85,7 +83,7 @@ public class JSMLForm {
 	
 	////////////////////////////////////////////////
 	//
-	// Identifiers
+	// Identifiers, and setup
 	//
 	////////////////////////////////////////////////
 	private String _contextIdentifier = "${FormContextPath}";
@@ -168,6 +166,75 @@ public class JSMLForm {
 		}
 	}
 	
+	////////////////////////////////////////////////
+	//
+	// Less script styling injection handling
+	//
+	////////////////////////////////////////////////
+	
+	/// Get the style for the form in the style.less
+	protected String getStyleLess() {
+		File styleFile = getFileInRootFolder("style.less");
+		if( styleFile == null ) {
+			return "";
+		}
+		return FileUtils.readFileToString_withFallback( styleFile, "" );
+	}
+
+	/// Get the style for the form as CSS format 
+	protected String getStyleCss() {
+		String less = getStyleLess();
+		if( less == null || less.length() <= 0 ) {
+			return "";
+		}
+		
+		return (new LessToCss()).compile(less);
+	}
+	
+	/// Get the injectable style set
+	protected String injectableCssBlock() {
+		String css = getStyleCss();
+		if( css == null || css.length() <= 0 ) {
+			return "";
+		}
+		return "<style>"+css+"</style>";
+	}
+	
+	
+	/// Sanatize the HTML prefix for PDF
+	protected String sanatizePrefixForPDF(String inStr) {
+		if(inStr.indexOf("<head>") < 0) {
+			inStr = "<head>"+inStr+"</head>";
+		}
+		
+		if(inStr.indexOf("<body>") < 0) {
+			inStr = inStr + "<body>";
+		}
+		
+		if(inStr.indexOf("<html>") < 0) {
+			inStr = "<html>"+inStr;
+		}
+		return inStr;
+	}
+	
+	/// Sanatize the HTML suffix for PDF
+	protected String sanatizeSuffixForPDF(String inStr) {
+		if(inStr.indexOf("</body>") < 0) {
+			inStr = inStr + "</body>";
+		}
+		
+		if(inStr.indexOf("</html>") < 0) {
+			inStr = inStr+"</html>";
+		}
+		return inStr;
+	}
+	
+	////////////////////////////////////////////////
+	//
+	// JSML form generating
+	//
+	////////////////////////////////////////////////
+	
 	public void getDefinition() {
 		getDefinition("formDeclare.json");
 	}
@@ -246,17 +313,17 @@ public class JSMLForm {
 	
 	public String readBodyPrefix(String prefixName) {
 		File bodyPrefixFile = getFileInRootFolder(prefixName);
-		
 		if (bodyPrefixFile == null) {
 			bodyPrefixFile = getFileInRootFolder("bodyPrefix.html");
 		}
 		
+		String cssBlock = injectableCssBlock();
 		if (bodyPrefixFile == null) {
-			return "";
+			return ""+cssBlock;
 		}
 		
 		try {
-			String bodyPrefixString = FileUtils.readFileToString(bodyPrefixFile);
+			String bodyPrefixString = FileUtils.readFileToString(bodyPrefixFile) + cssBlock;
 			return bodyPrefixString;
 		} catch (Exception e) {
 			throw new RuntimeException("readBodyPrefix() -> " + e.getMessage());
@@ -503,8 +570,8 @@ public class JSMLForm {
 		validateTempFolder();
 		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/generatedPDF.pdf";
 		
-		String bodyPrefix = readBodyPrefix("PrefixPDF");
-		String bodySuffix = readBodySuffix("SuffixPDF");
+		String bodyPrefix = sanatizePrefixForPDF(readBodyPrefix("PrefixPDF"));
+		String bodySuffix = sanatizeSuffixForPDF(readBodySuffix("SuffixPDF"));
 		ret.insert(0, sanitiseStringForPDF(bodyPrefix, ""));
 		ret.append(bodySuffix);
 		
@@ -564,8 +631,8 @@ public class JSMLForm {
 		validateTempFolder();
 		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/generatedPDF.pdf";
 		
-		String bodyPrefix = readBodyPrefix("PrefixPDF");
-		String bodySuffix = readBodySuffix("SuffixPDF");
+		String bodyPrefix = sanatizePrefixForPDF(readBodyPrefix("PrefixPDF"));
+		String bodySuffix = sanatizeSuffixForPDF(readBodySuffix("SuffixPDF"));
 		ret.insert(0, sanitiseStringForPDF(bodyPrefix, ""));
 		ret.append(bodySuffix);
 		
@@ -613,8 +680,8 @@ public class JSMLForm {
 		}
 		ret = new StringBuilder(_jmteObj.parseTemplate(ret.toString()));
 		
-		String bodyPrefix = readBodyPrefix("PrefixPDF");
-		String bodySuffix = readBodySuffix("SuffixPDF");
+		String bodyPrefix = sanatizePrefixForPDF(readBodyPrefix("PrefixPDF"));
+		String bodySuffix = sanatizeSuffixForPDF(readBodySuffix("SuffixPDF"));
 		ret.insert(0, sanitiseStringForPDF(bodyPrefix, ""));
 		ret.append(bodySuffix);
 		

@@ -7,6 +7,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
@@ -53,7 +54,7 @@ public class NxtCrypt {
 	private static SecretKeyFactory pbk = null;
 	
 	/// Reusable Random objects objects
-	private static SecureRandom ran = null;
+	private static SecureRandom secureRand = null;
 	
 	/// Hash storage seperator, @ is intentionally used as opposed to $, as to make the stored passHash obviously not "php password_hash" format.
 	private static String seperator = "@"; 
@@ -132,7 +133,7 @@ public class NxtCrypt {
 		if (NxtCrypt.pbk == null) {
 			NxtCrypt.pbk = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 		}
-		if (NxtCrypt.ran == null) {
+		if (NxtCrypt.secureRand == null) {
 			if( NxtCrypt.isStrongSecureRandom == false ) {
 				//
 				// Using just plain old SecureRandom by default now.
@@ -146,17 +147,17 @@ public class NxtCrypt {
 				//
 				// https://tersesystems.com/2015/12/17/the-right-way-to-use-securerandom/
 				//
-				NxtCrypt.ran = new SecureRandom();
+				NxtCrypt.secureRand = new SecureRandom();
 			} else {
 				//
 				// Originally the secure random module uses SHA1PRNG AKA
-				// `NxtCrypt.ran = SecureRandom.getInstance("SHA1PRNG");`
+				// `NxtCrypt.secureRand = SecureRandom.getInstance("SHA1PRNG");`
 				//
 				// Now it uses java 8 SecureRandom.getInstanceStrong();
 				// Which will hopefully make the entropy starvation issue better
 				// in certain environments.
 				//
-				NxtCrypt.ran = SecureRandom.getInstanceStrong();
+				NxtCrypt.secureRand = SecureRandom.getInstanceStrong();
 			}
 		}
 	}
@@ -223,28 +224,46 @@ public class NxtCrypt {
 		return getSaltedHash(rawPassword, salt, defaultIterations, defaultKeyLength);
 	}
 	
-	/// Generates a random alphanumeric string up to length (but not guranteeded in length)
-	private static String someRandomeString(int len) {
-		return Base64.encodeBase64String(NxtCrypt.ran.generateSeed(len)).replaceAll("[^A-Za-z0-9]", "");
-	}
+	/// Valid random string characters
+	private static char[] _randomstring_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456879".toCharArray();
 	
 	/// Generate a random byte array of strings at indicated length
 	/// Note: that the generated string array is strictly "alphanumeric" character spaces chars,
 	/// This is intentional as this format can be safely stored in databases, and passed around
+	///
+	/// @param   Length of string to output
+	///
+	/// @return  Random string output of specified length
 	public static String randomString(int len) {
+		// Setup the SecureRandom or reuse if possible
 		setupReuseObjects_generic();
-		//return new String(NxtCrypt.ran.generateSeed(len+len), 0, len);
-		String resStr = someRandomeString(len + 5);
-		while (resStr.length() < len) {
-			resStr = resStr + someRandomeString(len - resStr.length() + 5);
+		
+		// Entropy resuffling
+		Random rand = new Random();
+		char[] buff = new char[len];
+		
+		// For each character extract it
+		for (int i = 0; i < len; ++i) {
+			// reseed rand once you've used up all available entropy bits
+			if ((i % 10) == 0) {
+				rand.setSeed(secureRand.nextLong()); // 64 bits of random!
+			}
+			buff[i] = _randomstring_chars[rand.nextInt(_randomstring_chars.length)];
 		}
-		return resStr.substring(0, len);
+		return new String(buff);
 	}
 	
 	/// Generate a random byte array at indicated length
 	public static byte[] randomBytes(int len) {
+		// Setup the SecureRandom or reuse if possible
 		setupReuseObjects_generic();
-		return NxtCrypt.ran.generateSeed(len);
+		
+		// Get those random bytes
+		byte[] ret = new byte[len];
+		secureRand.nextBytes(ret);
+		
+		// And return it
+		return ret;
 	}
 	
 	/// Gets the full password hash of [salt@protocall@hash] (currently only PBKeySpec)
@@ -267,7 +286,7 @@ public class NxtCrypt {
 		
 		setupReuseObjects_generic();
 		
-		byte[] salt = NxtCrypt.ran.generateSeed(saltLen);
+		byte[] salt = NxtCrypt.secureRand.generateSeed(saltLen);
 		
 		return Base64.encodeBase64String(salt) + seperator + "P" + iteration + "-" + keyLen + seperator
 			+ getSaltedHash(rawPassword, salt, iteration, keyLen);

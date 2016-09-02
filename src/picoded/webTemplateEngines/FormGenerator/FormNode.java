@@ -21,40 +21,40 @@ import picoded.webTemplateEngines.JSML.*;
 ///
 /// @TODO Change class extension to use AbstractMapDecorator, so that it proxy the valeus from the soruce instead
 public class FormNode extends CaseInsensitiveHashMap<String, Object> implements GenericConvertMap<String, Object> {
-	
+
 	//
 	// Values function
 	//
-	// Contains functions that provide values such as prefix / suffixes 
+	// Contains functions that provide values such as prefix / suffixes
 	// that maybe changed / made configurable in future
 	//
 	//------------------------------------------------------------------------
-	
+
 	/// @returns {String} prefix for the label auto class
 	public String prefix_label() {
 		return "pfl_";
 	}
-	
+
 	/// @returns {String} prefix for the input auto class
 	public String prefix_input() {
 		return "pfi_";
 	}
-	
+
 	/// @returns {String} prefix for the wrapper container auto class
 	public String prefix_wrapper() {
 		return "pfw_";
 	}
-	
+
 	/// @returns {String} prefix for the child container auto class
 	public String prefix_childWrapper() {
 		return "pfc_";
 	}
-	
+
 	/// @returns {String} prefix for the standard classes
 	public String prefix_standard() {
 		return "pf_";
 	}
-	
+
 	//
 	// Utility helper functions
 	//
@@ -62,59 +62,59 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	// implmentation for Html string generation
 	//
 	//------------------------------------------------------------------------
-	
+
 	/// Applies a custom prefix, and suffix to a string split by a seperator
-	/// 
+	///
 	/// @params {String}  value   - The value to split and add prefix/suffix
 	/// @params {String}  split   - The string to split the input value
-	/// @params {String}  prefix  - The prefix to add to each split value 
-	/// @params {String}  suffix  - The suffix to add to each split value 
-	/// 
+	/// @params {String}  prefix  - The prefix to add to each split value
+	/// @params {String}  suffix  - The suffix to add to each split value
+	///
 	/// @returns {StringBuilder}  - The rebuilt value set, with prefix and suffix added
 	public static StringBuilder addPrefixAndSuffix(String value, String split, String prefix, String suffix) {
 		StringBuilder ret = new StringBuilder();
-		
+
 		if (value != null && value.length() > 0) {
 			String[] valueArr = value.split(split);
 			boolean firstElement = true;
-			
+
 			for (int a = 0; a < valueArr.length; ++a) {
 				if (valueArr[a] == null || valueArr[a].length() <= 0) {
 					continue;
 				}
-				
+
 				if (!firstElement) {
 					firstElement = false;
 				} else {
 					ret.append(split);
 				}
-				
+
 				if (prefix != null) {
 					ret.append(prefix);
 				}
-				
+
 				//ret.append(value);
 				ret.append(valueArr[a]);
-				
+
 				if (suffix != null) {
 					ret.append(suffix);
 				}
 			}
 		}
-		
+
 		return ret;
 	}
-	
+
 	/// Shorten varient of addPrefixAndSuffix, where split is " ", and suffix is null
-	/// 
+	///
 	/// @params {String}  value   - The value to split and add prefix/suffix
 	/// @params {String}  prefix  - The prefix to add to each split value
-	/// 
+	///
 	/// @returns {StringBuilder}  - The rebuilt value set, with prefix and suffix added
 	public static StringBuilder addPrefix(String value, String prefix) {
 		return addPrefixAndSuffix(value, " ", prefix, null);
 	}
-	
+
 	/// Generates the standard node parameter map for X type. This is useful for shared default behaviour
 	/// across input, child, wrappers etc.
 	///
@@ -129,28 +129,28 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	@SuppressWarnings("unchecked")
 	protected Map<String, String> defaultParameterMap( //
 		Map<String, String> map, //
-		String baseClass, //  
+		String baseClass, //
 		String autoClassPrefix, //
 		String insertClassKey, //
 		String insertCssKey, //
 		String insertIDKey, //
 		String insertAttributeMapKey //
 	) { //
-	
+
 		if (map == null) {
 			map = new CaseInsensitiveHashMap<String, String>();
 		}
-		
+
 		//
 		// Default class handling
 		//-----------------------------------
 		if (baseClass == null) {
 			baseClass = "";
 		}
-		
+
 		StringBuilder tmpSB = new StringBuilder(baseClass);
 		String tmp = null;
-		
+
 		if ( //
 		autoClassPrefix != null && //
 			autoClassPrefix.length() > 0 && //
@@ -160,28 +160,28 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 			if (tmpSB.length() > 0) {
 				tmpSB.append(" ");
 			}
-			
+
 			tmpSB.append(addPrefix(tmp, autoClassPrefix));
 		}
-		
+
 		if ((tmp = getString(insertClassKey, null)) != null && tmp.length() > 0) {
 			if (tmpSB.length() > 0) {
 				tmpSB.append(" ");
 			}
-			
+
 			tmpSB.append(tmp);
 		}
-		
+
 		tmp = tmpSB.toString();
-		
+
 		if (tmp != null && tmp.length() > 0) {
 			map.put(HtmlTag.CLASS, tmp);
 		}
-		
+
 		//
 		// Style injection handling
 		//-----------------------------------
-		if ( // 
+		if ( //
 		insertCssKey != null && //
 			insertCssKey.length() > 0 && //
 			(tmp = getString(insertCssKey, null)) != null && //
@@ -189,7 +189,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		) { //
 			map.put(HtmlTag.STYLE, tmp);
 		} //
-		
+
 		//
 		// ID handling
 		//-----------------------------------
@@ -201,36 +201,36 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		) {
 			map.put(HtmlTag.ID, tmp);
 		}
-		
+
 		//
 		// Attribute Map overwrite
 		//-----------------------------------
-		
+
 		// if insertAttributeMapKey != null ......
-		
+
 		if (insertAttributeMapKey != null && !insertAttributeMapKey.isEmpty()) {
 			Object rawAttributeMap = get(insertAttributeMapKey);
 			if (rawAttributeMap instanceof Map) {
-				
+
 				map.putAll((Map<String, String>) rawAttributeMap);
 			}
-			
+
 		}
-		
+
 		//
 		// Disable Input
 		//-----------------------------------
 		if (this.getBoolean("readOnly")) {
 			map.put("disabled", "disabled");
 		}
-		
+
 		// if rawAttributeMap is a MAP
-		
+
 		// map.putAll( the mmap )
-		
+
 		return map;
 	}
-	
+
 	/// Generates the standard node parameter map for input. This is useful for shared default behaviour
 	///
 	/// @params {String}        baseClass  - The input class to add, before the automated classes
@@ -238,11 +238,11 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	///
 	/// @returns {Map<String,String>} - the return parameter map
 	public Map<String, String> defaultInputParameterMap(String baseClass, Map<String, String> map) {
-		
+
 		String tmp = null;
 		map = defaultParameterMap(map, baseClass, prefix_input(), JsonKeys.INPUT_CLASS, JsonKeys.INPUT_CSS,
 			JsonKeys.INPUT_ID, JsonKeys.EXTRA_INPUT_PROPERTIES_MAP);
-		
+
 		//
 		// Fieldname handling
 		//-----------------------------------
@@ -253,10 +253,10 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 				map.put(HtmlTag.NAME, tmp);
 			}
 		}
-		
+
 		return map;
 	}
-	
+
 	/// Generates the standard node parameter map for wrapper. This is useful for shared default behaviour
 	///
 	/// @params {String}        baseClass  - The input class to add, before the automated classes
@@ -267,7 +267,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return defaultParameterMap(map, baseClass, prefix_wrapper(), JsonKeys.WRAPPER_CLASS, JsonKeys.WRAPPER_CSS,
 			JsonKeys.WRAPPER_ID, JsonKeys.EXTRA_WRAPPER_PROPERTIES_MAP);
 	}
-	
+
 	/// Generates the standard node parameter map for label. This is useful for shared default behaviour
 	///
 	/// @params {String}        baseClass  - The input class to add, before the automated classes
@@ -278,7 +278,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return defaultParameterMap(map, baseClass, prefix_label(), JsonKeys.LABEL_CLASS, JsonKeys.LABEL_CSS,
 			JsonKeys.LABEL_ID, JsonKeys.EXTRA_LABEL_PROPERTIES_MAP);
 	}
-	
+
 	/// Generates the standard node parameter map for child nodes. This is useful for shared default behaviour
 	///
 	/// @params {String}        baseClass  - The input class to add, before the automated classes
@@ -289,7 +289,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return defaultParameterMap(map, baseClass, prefix_childWrapper(), JsonKeys.CHILD_CLASS, JsonKeys.CHILD_CSS,
 			JsonKeys.CHILD_ID, JsonKeys.EXTRA_CHILD_WRAPPER_PROPERTIES_MAP);
 	}
-	
+
 	/// Helps escape html dom parameter quotes, in an "optimal" way
 	///
 	/// @params {String}   val   - The string to be quote escaped
@@ -298,7 +298,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	public static String escapeParameterQuote(String val) {
 		boolean hasSingleQuote = val.contains("\'");
 		boolean hasDoubleQuote = val.contains("\"");
-		
+
 		if (hasSingleQuote && hasDoubleQuote) {
 			//No choice, escape double quotes, and use them
 			return "\"" + val.replaceAll("\\\\", "\\\\").replaceAll("\"", "\\\"") + "\"";
@@ -309,7 +309,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		} //else { //quoteless, use single quotes
 		return "\'" + val + "\'";
 	}
-	
+
 	/// Generates a HTML node, with its prefix and suffix. Using its type, and parameters
 	///
 	/// @params {String}              nodeType            - HTML DOM type to generate, such as DIV, or INPUT
@@ -321,7 +321,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		String rawParameterString) {
 		StringBuilder domNode = new StringBuilder("<" + nodeType);
 		String innerHtml = null;
-		
+
 		if (parameterMap != null) {
 			for (Map.Entry<String, String> entry : parameterMap.entrySet()) {
 				// Setup rest of parameters
@@ -332,15 +332,15 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 					.append(escapeParameterQuote(GenericConvert.toString(entry.getValue(), ""))); //
 			}
 		}
-		
+
 		if (rawParameterString != null && rawParameterString.length() > 0) {
 			domNode.append(" ").append(rawParameterString);
 		}
 		domNode.append(">");
-		
+
 		return new StringBuilder[] { domNode, new StringBuilder("</" + nodeType + ">") };
 	}
-	
+
 	/// A combination of defaultInputParameterMap, and htmlNodeGenerator
 	///
 	/// @params {String}  nodeType          - HTML DOM type to generate, such as DIV, or INPUT
@@ -353,7 +353,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return htmlNodeGenerator(nodeType, defaultInputParameterMap(nodeClass, parameterMap),
 			getString(JsonKeys.EXTRA_INPUT_PROPERTIES, null));
 	}
-	
+
 	/// A combination of defaultInputParameterMap, and htmlNodeGenerator
 	///
 	/// @params {String}  nodeType          - HTML DOM type to generate, such as DIV, or INPUT
@@ -365,7 +365,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return htmlNodeGenerator(nodeType, defaultWrapperParameterMap(nodeClass, parameterMap),
 			getString(JsonKeys.EXTRA_WRAPPER_PROPERTIES, null));
 	}
-	
+
 	/// A combination of defaultInputParameterMap, and htmlNodeGenerator
 	///
 	/// @params {String}  nodeType          - HTML DOM type to generate, such as DIV, or INPUT
@@ -377,7 +377,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return htmlNodeGenerator(nodeType, defaultLabelParameterMap(nodeClass, parameterMap),
 			getString(JsonKeys.EXTRA_LABEL_PROPERTIES, null));
 	}
-	
+
 	/// A combination of defaultInputParameterMap, and htmlNodeGenerator
 	///
 	/// @params {String}  nodeType          - HTML DOM type to generate, such as DIV, or INPUT
@@ -389,33 +389,33 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		return htmlNodeGenerator(nodeType, defaultChildWrapperParameterMap(nodeClass, parameterMap),
 			getString(JsonKeys.EXTRA_CHILD_WRAPPER_PROPERTIES, null));
 	}
-	
+
 	//
 	// Constructor reliant vars
 	//
 	//------------------------------------------------------------------------
-	
+
 	/// List of children FormNode definition
 	protected List<Map<String, Object>> _childrenDefine = null;
-	
+
 	/// List of children FormNode to be generated / used?
 	protected List<FormNode> _children = null;
-	
+
 	/// List of input data values, used to generate with multiple input fields
 	protected CaseInsensitiveHashMap<String, Object> _inputValue = new CaseInsensitiveHashMap<String, Object>();
-	
+
 	/// The root form generator
 	protected FormGenerator _formGenerator = null;
-	
+
 	//
 	// Constructor
 	//
 	//------------------------------------------------------------------------
-	
+
 	/// Blank constructor, useful for unit testing
 	public FormNode() {
 	}
-	
+
 	/// Internal reuse constructor, used to load the very config values
 	///
 	/// @params {Map<String,Object>}  mapObject       - The map object, used to generate this nodes defination
@@ -423,17 +423,18 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	private void innerConstructor(FormGenerator root, Map<String, Object> mapObject, Map<String, Object> inputData) {
 		// Setup the form generator
 		this._formGenerator = root;
-		
+
 		// Fill up stored map
-		
-		this.putAll(mapObject);
-		
+		if( mapObject != null ) {
+			this.putAll(mapObject);
+		}
+
 		// Put in the inputData list
 		if (inputData != null) {
 			this._inputValue = new CaseInsensitiveHashMap<String, Object>(inputData);
 		}
 	}
-	
+
 	/// Constructor varient using array of input data
 	///
 	/// @params {Map<String,Object>}  mapObject       - The map object, used to generate this nodes defination
@@ -441,7 +442,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	public FormNode(FormGenerator root, Map<String, Object> mapObject) {
 		innerConstructor(root, mapObject, new HashMap<String, Object>());
 	}
-	
+
 	/// Constructor using a single input data node
 	///
 	/// @params {Map<String,Object>}  mapObject       - The map object, used to generate this nodes defination
@@ -449,31 +450,31 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	public FormNode(FormGenerator root, Map<String, Object> mapObject, Map<String, Object> inputData) {
 		innerConstructor(root, mapObject, inputData);
 	}
-	
+
 	////////////////////////////////////////////////
 	//
 	// JSML FormSet, linked if formset exists
 	//
 	////////////////////////////////////////////////
-	
+
 	/// Inner protected vars
 	protected JSMLFormSet formSetObj = null;
-	
+
 	/// FormSet Setter
 	public void setFormSet(JSMLFormSet set) {
 		formSetObj = set;
 	}
-	
+
 	/// FormSet Getter
 	public JSMLFormSet getFormSet() {
 		return formSetObj;
 	}
-	
+
 	//
 	// Generates the HTML output via input or wrapper code
 	//
 	//------------------------------------------------------------------------
-	
+
 	/// Gets and returns the input html representing the current FormNode
 	///
 	/// @params {boolean} displayOnly  - Returns the varient for read only display mode (eg: PDF)
@@ -482,14 +483,14 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	public StringBuilder inputHtml(boolean displayMode) {
 		// Gets type
 		String nodeType = getString(JsonKeys.INPUT_TYPE, getString(JsonKeys.TYPE, "*"));
-		
+
 		// Gets the input generator
 		FormInputInterface func = _formGenerator.inputInterface(displayMode, nodeType);
-		
-		// The node 
+
+		// The node
 		return func.apply(this);
 	}
-	
+
 	/// Gets and return the full wrapper html, via the wrapper function.
 	/// Which in turn will call the resepective inputHtml() and/or child nodes
 	///
@@ -499,16 +500,16 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	public StringBuilder fullHtml(boolean displayMode) {
 		// Gets type
 		String nodeType = getString(JsonKeys.WRAPPER_TYPE, getString(JsonKeys.TYPE, "*"));
-		
+
 		// Gets the input generator
 		FormWrapperInterface func = _formGenerator.wrapperInterface(displayMode, nodeType);
-		
-		// The node 
+
+		// The node
 		return func.apply(this);
 	}
-	
+
 	/// [private function used to avoid overload conflict, and to resolve it]
-	/// 
+	///
 	/// Generates the children wrapper html, using the function to generate html strings inbetween if needed
 	/// Note that given int is the child index number before the spacer. And spacer is ignored for last child.
 	/// The spacer function is also ignored if its null
@@ -520,24 +521,24 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	private StringBuilder _fullChildrenHtml(boolean displayMode, Function<Integer, StringBuilder> spacer) {
 		StringBuilder ret = new StringBuilder();
 		List<FormNode> childList = children();
-		
+
 		// Skip if no childList (avoid null error)
 		if (childList == null) {
 			return ret;
 		}
-		
+
 		// Iterate child list, and generate for each node
 		int childListSize = childList.size();
 		for (int a = 0; a < childListSize; ++a) {
-			
+
 			// Add the child full html
 			//			ret.append( childList.get(a).fullHtml(displayMode) );
-			
+
 			//sams multi tier nonsense
 			FormNode childNode = childList.get(a);
 			if (childNode.containsKey("field")) {
 				String thisNodeFieldName = this.getFieldName();
-				
+
 				if (!thisNodeFieldName.isEmpty()) {
 					childNode.namePrefix = thisNodeFieldName;
 					//					thisNodeFieldName = thisNodeFieldName + "[" + a + "]." + childNode.getFieldName();
@@ -545,16 +546,16 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 				}
 			}
 			ret.append(childNode.fullHtml(displayMode));
-			
+
 			// Not last child, add spacer
 			if (spacer != null && (a + 1) < childListSize) {
 				ret.append(spacer.apply(a));
 			}
 		}
-		
+
 		return ret;
 	}
-	
+
 	/// Generates the children wrapper html, using the function to generate html strings inbetween if needed
 	/// Note that given int is the child index number before the spacer. And spacer is ignored for last child.
 	/// The spacer function is also ignored if its null
@@ -566,7 +567,7 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	public StringBuilder fullChildrenHtml(boolean displayMode, Function<Integer, StringBuilder> spacer) {
 		return _fullChildrenHtml(displayMode, spacer);
 	}
-	
+
 	/// Varient of formChildrenFullHtml, without spacer function or string
 	///
 	/// @params  {boolean}                      displayOnly  - Returns the varient for read only display mode (eg: PDF)
@@ -575,8 +576,8 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 	public StringBuilder fullChildrenHtml(boolean displayMode) {
 		return _fullChildrenHtml(displayMode, null);
 	}
-	
-	/// Varient of formChildrenFullHtml, with fixed spacer function 
+
+	/// Varient of formChildrenFullHtml, with fixed spacer function
 	///
 	/// @params  {boolean}  displayOnly  - Returns the varient for read only display mode (eg: PDF)
 	/// @params  {String}   spacer       - spacer string in between child nodes
@@ -589,31 +590,31 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		};
 		return _fullChildrenHtml(displayMode, spacer);
 	}
-	
+
 	//
 	// Variables access, and getter functions
 	//
 	//------------------------------------------------------------------------
-	
+
 	/// Returns all the children form node definition
-	/// 
+	///
 	/// @returns {List<Map<String,Object>>}  the list of formnodes
 	@SuppressWarnings("unchecked")
 	public List<Map<String, Object>> childrenDefinition() {
 		if (_childrenDefine != null) {
 			return _childrenDefine;
 		}
-		
+
 		List<Map<String, Object>> cList = new ArrayList<Map<String, Object>>();
-		
+
 		if (this.containsKey("children")) {
 			Object childrenRaw = this.get("children");
-			
+
 			if (!(childrenRaw instanceof List)) {
 				throw new IllegalArgumentException("'children' parameter found in defination was not a List: "
 					+ childrenRaw);
 			}
-			
+
 			// Iterate each child object
 			for (Object child : ((List<Object>) childrenRaw)) {
 				if (!(child instanceof Map)) {
@@ -622,11 +623,11 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 				cList.add((Map<String, Object>) child);
 			}
 		}
-		
+
 		_childrenDefine = cList;
 		return cList;
 	}
-	
+
 	///
 	/// Generate NEW children form nodes, using the given datamap.
 	///
@@ -637,37 +638,37 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		for (Map<String, Object> childDefine : childrenDefinition()) {
 			FormNode newNode = new FormNode(_formGenerator, childDefine, inputValue);
 			newNode.setFormSet(getFormSet());
-			
+
 			ret.add(newNode);
 		}
 		return ret;
 	}
-	
+
 	/// Returns all the generated children form nodes
 	///
 	/// Note that children FormNode intentionally loads here, instead of constructor. To defer loading
-	/// 
+	///
 	/// @returns {List<FormNode>}  the list of formnodes
 	public List<FormNode> children() {
 		if (_children != null) {
 			return _children;
 		}
-		
+
 		List<FormNode> cList = children(this._inputValue);
 		_children = cList;
 		return cList;
 	}
-	
+
 	/// Returns the defined label value. This is used to generate the wrapper text if needed
 	public String label() {
 		return containsKey(JsonKeys.LABEL) ? getString(JsonKeys.LABEL) : "";
 	}
-	
+
 	protected String namePrefix = "";
-	
+
 	//getRawValue
 	//getStringValue
-	
+
 	/// Returns the field name
 	public String getFieldName() {
 		if (containsKey(JsonKeys.FIELD) || !namePrefix.isEmpty()) {
@@ -676,105 +677,105 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		}
 		return "";
 	}
-	
+
 	public String getFieldNameWithoutPrefix() {
 		if (containsKey(JsonKeys.FIELD) || !namePrefix.isEmpty()) {
 			return RegexUtils.removeAllNonAlphaNumeric_allowCommonSeparators(getString(JsonKeys.FIELD, "")).toLowerCase();
 		}
 		return "";
 	}
-	
+
 	/// Returns the field value as a string
 	public String getStringValue() {
 		String fieldName = getFieldName();
 		return getStringValue(fieldName);
 	}
-	
-	/// Returns the default value of the object, 
+
+	/// Returns the default value of the object,
 	public String getStringValue(String fieldName) {
 		Object val = getRawValue(fieldName);
-		
+
 		if (val != null) {
 			String ret = GenericConvert.toString(val);
 			return RegexUtils.sanitiseCommonEscapeCharactersIntoAscii(ret);
 		}
 		return "";
 	}
-	
+
 	/// Returns the field value in its raw form
 	public Object getRawFieldValue() {
 		String fieldName = getFieldName();
 		return getRawValue(fieldName);
 	}
-	
+
 	/// Returns the default value of the object
 	protected Object getRawValue(String fieldName) {
 		Object val = null;
 		if (fieldName.equalsIgnoreCase("this")) {
 			return _inputValue;
 		}
-		
+
 		if (fieldName.contains("&#91;")) {
 			fieldName.replace("&#91;", "[");
 		}
 		if (fieldName.contains("&#92;")) {
 			fieldName.replace("&#92;", "]");
 		}
-		
+
 		if (_inputValue != null && _inputValue.containsKey(fieldName)) {
 			val = _inputValue.get(fieldName);
 		}
-		
+
 		//SINGLE TIER VALUE LOADING HACK!
 		//this will allow you to load single tier values - however, it -SHOULDNT- crash if no value is found
 		if (val == null) {//if val == null, try again by splitting fieldname - THIS IS A HACK HACK HACK
 			String[] fieldNameSplit = fieldName.split("\\.");
-			
+
 			String tempString = "";
 			if (fieldNameSplit != null && fieldNameSplit.length > 1) {
 				tempString = fieldNameSplit[1];
 			}
-			
+
 			if (_inputValue != null && _inputValue.containsKey(tempString)) {
 				val = _inputValue.get(tempString);
 			}
 		}
-		
+
 		if (val == null) {
 			//nukenukenuke
 			Map<String, Object> fullyQualifiedMap = MapValueConv.toFullyQualifiedKeys(_inputValue, "", ".");
-			
+
 			if (fullyQualifiedMap != null) {
 				val = fullyQualifiedMap.get(fieldName);
 			}
 		}
 		//END HACK HACK HACK
-		
+
 		if (val == null) {
 			val = get(JsonKeys.DEFAULT);
 		}
 		return val;
 	}
-	
+
 	public Map<String, Object> getValueMap() {
 		return _inputValue;
 	}
-	
+
 	//
 	// To remove
 	//
 	//------------------------------------------------------------------------
-	
+
 	// @Deprecated
 	public void setChildren(List<FormNode> children) {
 		_children = new ArrayList<FormNode>(children); //copy constructor behaviour
 	}
-	
+
 	// @Deprecated
 	public void addChild(FormNode child) {
 		_children.add(child);
 	}
-	
+
 	// @Deprecated
 	public int childCount() {
 		if (_children != null) {
@@ -783,17 +784,17 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 			return 0;
 		}
 	}
-	
+
 	// @Deprecated
 	public void setPrefilledData(Map<String, Object> prefilledJSONData) {
 		_inputValue = (CaseInsensitiveHashMap<String, Object>) prefilledJSONData;
 	}
-	
+
 	// @Deprecated
 	public static List<FormNode> createFromJSONString(FormGenerator root, String jsonString,
 		Map<String, Object> prefilledJSONData) {
 		List<FormNode> formNodes = new ArrayList<FormNode>();
-		
+
 		if (jsonString.charAt(0) == '[') {
 			List<Object> nodeList = ConvertJSON.toList(jsonString);
 			return createFromList(root, nodeList, prefilledJSONData);
@@ -801,34 +802,34 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 			Map<String, Object> nodeMap = ConvertJSON.toMap(jsonString);
 			FormNode newNode = new FormNode(root, nodeMap, prefilledJSONData);
 			newNode.setFormSet(root.getFormSet());
-			
+
 			formNodes.add(newNode);
 			return formNodes;
 		}
 	}
-	
+
 	// @Deprecated
 	@SuppressWarnings("unchecked")
 	public static List<FormNode> createFromList(FormGenerator root, List<Object> listObject,
 		Map<String, Object> prefilledJSONData) {
 		List<FormNode> formNodes = new ArrayList<FormNode>();
-		
+
 		for (Object obj : listObject) {
 			Map<String, Object> nodeMap = (Map<String, Object>) obj;
-			
+
 			FormNode newNode = new FormNode(root, nodeMap, prefilledJSONData);
 			newNode.setFormSet(root.getFormSet());
-			
+
 			formNodes.add(newNode);
 		}
-		
+
 		return formNodes;
 	}
-	
+
 	/// Collapse the various string builder array into a single string builder
 	///
 	/// @params {StringBuilder[]}  toCollapse  - Array of string builder to collapse together
-	/// 
+	///
 	/// @returns {StringBuilder}  - The final collapsed string builder
 	public StringBuilder collapseStringBuilderArray(StringBuilder[] toCollapse) {
 		StringBuilder ret = new StringBuilder();
@@ -837,5 +838,5 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements 
 		}
 		return ret;
 	}
-	
+
 }

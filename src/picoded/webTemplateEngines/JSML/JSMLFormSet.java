@@ -33,6 +33,9 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 	/// The form set URI base
 	protected String formSetURI = null;
 	
+	/// The BasePage underneath
+	protected BasePage basePage = null;
+	
 	///////////////////////////////////////////////////////
 	//
 	// Constructor
@@ -42,6 +45,15 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 	/// Blank constructor (will crash if not configured properly)
 	public JSMLFormSet() {
 		//Does nothing
+	}
+	
+	/// BasePage constructor
+	public JSMLFormSet(BasePage inPage) {
+		basePage = inPage;
+		formSetFolder = new File(inPage.getJsmlTemplatePath()); 
+		formSetURI = inPage.getContextURI();
+		// Validate
+		validateFormSetFolder();
 	}
 	
 	/// Constructor with formSetFolder, and formSetURI

@@ -398,7 +398,26 @@ public class TableWrapperTemplates {
 		//
 		int minIteration = node.getInt("min-iteration", 0);
 		int maxIteration = node.getInt("max-iteration", 32767); //short int max
+		
+		// Fixed iteration overwrite, min/max
+		int fixedIteration = node.getInt("iteration", -1);
+		if( fixedIteration >= 0 ) {
+			minIteration = fixedIteration;
+			maxIteration = fixedIteration;
+		}
+		
+		//
+		// Named iteration mode ?
+		//
+		String[] namedIteration = node.getStringArray("name-iteration", null);
+		if( namedIteration != null ) {
+			minIteration = namedIteration.length;
+			maxIteration = namedIteration.length;
+		}
 
+		//
+		// Table iteration row values setup
+		//
 		if (minIteration > 0 || maxIteration > 0) {
 			List<Object> tmpRows = new ArrayList<Object>();
 			if (valueRows != null) {
@@ -417,14 +436,14 @@ public class TableWrapperTemplates {
 
 			valueRows = tmpRows;
 		}
-
-
-
+		
 		//
 		// Return the value rows lamda if not null
 		//
 		if (valueRows != null) {
 			final List<Object> dataRows = valueRows;
+			final List<String> namedIteration_final = (namedIteration == null)? null : Arrays.asList(namedIteration);
+			
 			return (row, col) -> {
 				//
 				// Terminate the rows, when last row is done
@@ -452,7 +471,11 @@ public class TableWrapperTemplates {
 				String currentNodeName = node.getFieldName();
 
 				if (currentNodeName != null && !currentNodeName.isEmpty()) {
-					childNode.namePrefix = currentNodeName + "[" + tierNumber + "].";
+					if( namedIteration_final != null ) {
+						childNode.namePrefix = currentNodeName+"."+namedIteration_final.get(tierNumber)+".";
+					} else {
+						childNode.namePrefix = currentNodeName + "[" + tierNumber + "].";
+					}
 				}
 				//and sam "fix"
 

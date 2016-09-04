@@ -370,6 +370,7 @@ public class FormInputTemplates {
 		boolean removeDefaultSaveFunction = node.getBoolean("removeDefaultSaveFunction", false);
 		
 		StringBuilder ret = new StringBuilder();
+		int count = 0;
 		for (String key : keyNamePair.keySet()) {
 			if (!displayMode) {
 				CaseInsensitiveHashMap<String, String> tempMap = new CaseInsensitiveHashMap<String, String>(paramMap);
@@ -389,7 +390,7 @@ public class FormInputTemplates {
 					tempMap.put("onchange", onChangeFunctionString);
 				}
 				
-				StringBuilder[] sbArr = tempNode.defaultHtmlInput(HtmlTag.INPUT, "pfi_inputCheckbox pfi_input", tempMap);
+				StringBuilder[] sbArr = tempNode.defaultHtmlInput(HtmlTag.INPUT, "pfi_inputCheckbox pfi_input pfc_inputCheckboxWrap_" + count, tempMap);
 				ret.append("<div class=\"pfc_inputCheckboxWrap\">");
 				ret.append("<label class=\"pfi_inputCheckbox_label\">");
 				ret.append(sbArr[0]);
@@ -407,7 +408,7 @@ public class FormInputTemplates {
 			} else {
 				StringBuilder[] sbArr = node.defaultHtmlInput(HtmlTag.DIV, "pfi_inputCheckbox pfi_input", null);
 				
-				ret.append("<div class=\"pfc_inputCheckboxWrap_display\">");
+				ret.append("<div class=\"pfc_inputCheckboxWrap_display pfc_inputCheckboxWrap_" + count + "\">");
 				
 				boolean found = false;
 				for (String selection : checkboxSelections) {
@@ -430,6 +431,7 @@ public class FormInputTemplates {
 				
 				ret.append("</div>");
 			}
+			count++;
 		}
 		
 		//generate hidden input here

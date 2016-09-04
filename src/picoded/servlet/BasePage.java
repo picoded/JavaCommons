@@ -275,9 +275,12 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	public void JMTE_initialSetup(JMTE setupObj) {
 		setupObj.baseDataModel.put("ContextPath", getContextPath());
 		setupObj.baseDataModel.put("ContextURI", getContextURI());
-
+		
 		// Pass the configuration settings in JConfig to JMTE, but filter system
 		setupObj.baseDataModel.put("Config", JConfig().createSubMap(null, "sys"));
+		
+		// JSML integration
+		setupObj.baseDataModel.put("JSML", JSMLFormSet());
 
 		// The this data model self reference
 		// setupObj.baseDataModel.put("this", setupObj.baseDataModel);
@@ -327,7 +330,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 			return _formSetObj;
 		}
 
-		_formSetObj = new JSMLFormSet(getJsmlTemplatePath(), getContextURI());
+		_formSetObj = new JSMLFormSet(this);
 		return _formSetObj;
 	}
 

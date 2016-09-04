@@ -13,6 +13,7 @@ import org.w3c.dom.Document;
 
 import java.awt.geom.Rectangle2D;
 
+import picoded.conv.JMTE;
 import picoded.conv.ConvertJSON;
 import picoded.conv.GUID;
 import picoded.conv.MapValueConv;
@@ -86,6 +87,7 @@ public class JSMLForm {
 	// Identifiers, and setup
 	//
 	////////////////////////////////////////////////
+	
 	private String _contextIdentifier = "${FormContextPath}";
 	
 	private String _svgPrefix = "data:image/svg+xml;base64,";
@@ -203,15 +205,15 @@ public class JSMLForm {
 	
 	/// Sanatize the HTML prefix for PDF
 	protected String sanatizePrefixForPDF(String inStr) {
-		if(inStr.indexOf("<head>") < 0) {
+		if(inStr.indexOf("<head") < 0) {
 			inStr = "<head>"+inStr+"</head>";
 		}
 		
-		if(inStr.indexOf("<body>") < 0) {
+		if(inStr.indexOf("<body") < 0) {
 			inStr = inStr + "<body>";
 		}
 		
-		if(inStr.indexOf("<html>") < 0) {
+		if(inStr.indexOf("<html") < 0) {
 			inStr = "<html>"+inStr;
 		}
 		return inStr;
@@ -352,7 +354,7 @@ public class JSMLForm {
 	@SuppressWarnings("unchecked")
 	protected Map<String, Object> sanitiseMap(Map<String, Object> inMap, String inKey, boolean pdfMode) {
 		if (inMap == null) {
-			return inMap;
+			return new HashMap<String, Object>();
 		}
 		Map<String, Object> tempMap = new HashMap<String, Object>(inMap);
 		for (String key : inMap.keySet()) {
@@ -719,5 +721,39 @@ public class JSMLForm {
 	public void clearTempFilesOlderThenGivenAgeInSeconds(long time) {
 		String tempFolder = _formFolderPath + "/" + _tempFolderPath;
 		DeleteFilesByAge.olderThenGivenAgeInSeconds(tempFolder, time);
+	}
+	
+	//---------------------------------------------------------------
+	//
+	//   JMTE Integration, this is for integration with page
+	//   components system. As such no map parameter forwarding.
+	//
+	//---------------------------------------------------------------
+	
+	//
+	// Get the full HTML for input / display
+	//
+	public String getFullHtml(boolean displayOnly) {
+		Map<String,Object> templateVars = new HashMap<String,Object>();
+		templateVars.put("PagesRootURI", formSetObj.basePage.getContextURI());
+		templateVars.put("ContextURI", formSetObj.basePage.getContextURI());
+		return (new JMTE(formSetObj.basePage.getPageTemplatePath())).parseTemplate(
+			generateHTML(templateVars, displayOnly).toString()
+		);
+	}
+	
+	/// JMTE fallback support
+	public String getHtml() {
+		return getFullHtml(false);
+	}
+	
+	/// JMTE fallback support
+	public String toString() {
+		return getFullHtml(false);
+	}
+	
+	/// JMTE display support
+	public String getDisplayHtml() {
+		return getFullHtml(true);
 	}
 }

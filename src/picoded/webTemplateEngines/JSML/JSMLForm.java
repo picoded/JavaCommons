@@ -86,6 +86,7 @@ public class JSMLForm {
 	// Identifiers, and setup
 	//
 	////////////////////////////////////////////////
+	
 	private String _contextIdentifier = "${FormContextPath}";
 	
 	private String _svgPrefix = "data:image/svg+xml;base64,";

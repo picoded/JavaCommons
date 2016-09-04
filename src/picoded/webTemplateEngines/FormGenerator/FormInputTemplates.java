@@ -390,8 +390,8 @@ public class FormInputTemplates {
 					tempMap.put("onchange", onChangeFunctionString);
 				}
 				
-				StringBuilder[] sbArr = tempNode.defaultHtmlInput(HtmlTag.INPUT, "pfi_inputCheckbox pfi_input pfc_inputCheckboxWrap_" + count, tempMap);
-				ret.append("<div class=\"pfc_inputCheckboxWrap\">");
+				StringBuilder[] sbArr = tempNode.defaultHtmlInput(HtmlTag.INPUT, "pfi_inputCheckbox pfi_input", tempMap);
+				ret.append("<div class=\"pfc_inputCheckboxWrap pfc_inputCheckboxWrap_" + count + "\">");
 				ret.append("<label class=\"pfi_inputCheckbox_label\">");
 				ret.append(sbArr[0]);
 				ret.append(sbArr[1]);

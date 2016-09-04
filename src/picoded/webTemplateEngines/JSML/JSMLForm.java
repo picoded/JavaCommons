@@ -735,10 +735,14 @@ public class JSMLForm {
 	//
 	public String getFullHtml(boolean displayOnly) {
 		Map<String,Object> templateVars = new HashMap<String,Object>();
-		templateVars.put("PagesRootURI", formSetObj.basePage.getContextURI());
-		templateVars.put("ContextURI", formSetObj.basePage.getContextURI());
+		String context = formSetObj.basePage.getContextURI();
+		
+		templateVars.put("PagesRootURI", context);
+		templateVars.put("ContextURI", context);
+		
 		return (new JMTE(formSetObj.basePage.getPageTemplatePath())).parseTemplate(
-			generateHTML(templateVars, displayOnly).toString()
+			generateHTML(null, displayOnly).toString(),
+			templateVars
 		);
 	}
 	

@@ -417,6 +417,12 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	/// Validates the user retur true/false, with an update response cookie / token if needed
 	public AccountObject getRequestUser(javax.servlet.http.HttpServletRequest request,
 		javax.servlet.http.HttpServletResponse response) {
+
+		// don't set cookies if it is logout request
+		if( request.getPathInfo() != null && request.getPathInfo().indexOf("logout") != -1 ) {
+			return null;
+		}
+
 		javax.servlet.http.Cookie[] cookieJar = request.getCookies();
 		
 		if (cookieJar == null) {

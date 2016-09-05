@@ -2,6 +2,9 @@ package picodedTests.fileUtils;
 
 import static org.junit.Assert.assertEquals;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,6 +14,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +37,10 @@ public class PDFUtils_test {
 	private String subPageSourceFile = "PDFMerge1.pdf";
 	private String subPageOutputFile = "PDFSubPageOutput.pdf";
 	private String subPageOutputOPFile = "PDFSubPageOFile.pdf";
-	
+
+	private String pdfToImageSourceFile = "PDFToImageFile.pdf";
+	private String pdfToImageOutputOPFile = "PDFToImageOFile.jpg";
+
 	@Before
 	public void setUp() {
 		inputPDFFileDir = "./test-files/test-specific/fileUtils/PDFUtils/";
@@ -44,9 +52,9 @@ public class PDFUtils_test {
 	// public void tearDown() {
 	// }
 	
-	// /
+	///
 	/// Test PDF merge two files into single file.
-	// /
+	///
 	@Test
 	public void mergePDFfile() throws FileNotFoundException, IOException, DocumentException {
 		List<InputStream> sourceFiles = new ArrayList<InputStream>();
@@ -61,10 +69,10 @@ public class PDFUtils_test {
 		assertEquals(pageCount, pageCount1 + pageCount2);
 	}
 	
-	// /
+	///
 	/// Test PDF subPage generates a new PDF file which contains range of page
 	// as per parameter.
-	// /
+	///
 	@Test
 	public void subPagePDFfile() throws FileNotFoundException, IOException, DocumentException {
 		InputStream inputStream = new FileInputStream(inputPDFFileDir + subPageSourceFile);
@@ -75,9 +83,9 @@ public class PDFUtils_test {
 		assertEquals(pageCount, 1);
 	}
 	
-	// /
+	///
 	/// Test PDF countPDFPages return number of page contains the PDF file.
-	// /
+	///
 	@Test
 	public void countPDFPages() throws FileNotFoundException, IOException, DocumentException {
 		InputStream inputStream = new FileInputStream(inputPDFFileDir + mergeSourceFile1);
@@ -86,9 +94,9 @@ public class PDFUtils_test {
 		assertEquals(3, pageCount);
 	}
 	
-	// /
+	///
 	/// Test PDF countPDFPages return number of page contains the PDF file.
-	// /
+	///
 	@Test
 	public void countPDFPagesFileInput() throws FileNotFoundException, IOException, DocumentException {
 		File file = new File(inputPDFFileDir + mergeSourceFile1);
@@ -96,9 +104,9 @@ public class PDFUtils_test {
 		assertEquals(3, pageCount);
 	}
 	
-	// /
+	///
 	/// Test PDF merge two files into single file.
-	// /
+	///
 	@Test
 	public void mergePDFfileInputFile() throws FileNotFoundException, IOException, DocumentException {
 		List<File> sourceFiles = new ArrayList<File>();
@@ -116,10 +124,10 @@ public class PDFUtils_test {
 		assertEquals(pageCount, pageCount1 + pageCount2);
 	}
 	
-	// /
+	///
 	/// Test PDF subPage generates a new PDF file which contains range of page
 	// as per parameter.
-	// /
+	///
 	@Test
 	public void subPagePDFInputFile() throws FileNotFoundException, IOException, DocumentException {
 		File inputFile = new File(inputPDFFileDir + subPageSourceFile);
@@ -127,5 +135,31 @@ public class PDFUtils_test {
 		PDFUtils.splitPDF(inputFile, 1, 1, outputFile);
 		int pageCount = PDFUtils.countPDFPages(new File(outputPDFFileDir + subPageOutputOPFile));
 		assertEquals(pageCount, 1);
+	}
+	
+	///
+	/// Test PDF byte array to image byte array conversion 
+	/// as per parameter. PDF byte array and number of page
+	/// page number in the pdf doc to return, page start from 0
+	///
+	@Test
+	@SuppressWarnings("resource")
+	public void testToJPEG() throws IOException {
+		FileInputStream stream = new FileInputStream(inputPDFFileDir + pdfToImageSourceFile); 
+		byte[] buffer = new byte[1000];
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		int bytesRead;
+		while ((bytesRead = stream.read(buffer)) != -1) {
+			baos.write(buffer, 0, bytesRead);
+		}
+		// made call without page number 
+		byte[] jpgByteArray = PDFUtils.toJPEG(baos.toByteArray());
+		BufferedImage imag = ImageIO.read(new ByteArrayInputStream(jpgByteArray));
+		ImageIO.write(imag, "jpg", new File(outputPDFFileDir + pdfToImageOutputOPFile));
+		
+		// made call with page number 
+		jpgByteArray = PDFUtils.toJPEG(baos.toByteArray(), 0);
+		imag = ImageIO.read(new ByteArrayInputStream(jpgByteArray));
+		ImageIO.write(imag, "jpg", new File(outputPDFFileDir + 1+"_"+pdfToImageOutputOPFile));
 	}
 }

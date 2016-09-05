@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 import picoded.webUtils.EmailBroadcaster;
 
 public class EmailBroadcaster_test {
-
+	
 	// Manually set this to true, to run the email tests
 	// This is currently disabled to prevent accidental "email spam"
 	// By the automated build system.
@@ -18,20 +18,20 @@ public class EmailBroadcaster_test {
 	private final String username = "";
 	private final String password = "";
 	private final String fromAddress = "abc@xyz.com";
-
+	
 	private EmailBroadcaster emailBroadcaster;
-
+	
 	@Before
 	public void setUp() {
 		emailBroadcaster = new EmailBroadcaster(smtpUrl, username, password, fromAddress, true, false);
 	}
-
+	
 	@Test
 	public void sendEmailTest() throws Exception {
 		if (!testEnabled) {
 			return;
 		}
-
+		
 		String subject = "Hi, from :" + username;
 		String htmlContent = "Hi, This is " + username + " , how are you? Regards " + username;
 		String[] toAddresses = new String[] { "xyz@abc.com" };

@@ -18,42 +18,43 @@ import java.util.ArrayList;
 /// Provides a shopping cart and product API
 /// All in a single API package.
 ///
-public class SimpleShoppingCartApiBuilder {
 
+public class SimpleShoppingCartApiBuilder {
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Class variables
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	public SimpleShoppingCart core = null;
-
+	
 	public MetaTableApiBuilder ownerApi = null;
 	public MetaTableApiBuilder productApi = null;
 	public MetaTableApiBuilder salesOrderApi = null;
 	public MetaTableApiBuilder salesItemApi = null;
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Constructor options
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	/// Empty constructor
 	public SimpleShoppingCartApiBuilder(SimpleShoppingCart inCore) {
 		core = inCore;
 	}
-
+	
 	public SimpleShoppingCartApiBuilder(JStruct inStruct, String prefix) {
 		core = new SimpleShoppingCart(inStruct, prefix);
 	}
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Shopping cart API
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	///
 	/// # cart (GET/POST)
 	///
@@ -85,29 +86,29 @@ public class SimpleShoppingCartApiBuilder {
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	///
 	public RESTFunction cart_GET_and_POST = (req, res) -> {
-
+		
 		//
 		// Get req params
 		//
-		String mode = req.getString("mode","update");
+		String mode = req.getString("mode", "update");
 		boolean simple = req.getBoolean("simple", false);
 		String listStr = req.getString("list", null);
-
+		
 		//
 		// Function reuse vars
 		//
-		CorePage requestPage= req.requestPage();
+		CorePage requestPage = req.requestPage();
 		GenericConvertList<List<Object>> cart = null;
-
+		
 		//
 		// Assumes an update is needed if not pure get
 		//
-		if( listStr != null ) {
+		if (listStr != null) {
 			// Prepare update list
 			GenericConvertList<List<Object>> updateList = core.cartCookieJSONToList(listStr);
-
+			
 			// Check for replacement mode
-			if( mode != null && mode.equalsIgnoreCase("replace") ) {
+			if (mode != null && mode.equalsIgnoreCase("replace")) {
 				// Run replacement mode
 				cart = core.replaceCartList(requestPage, updateList, simple);
 			} else {
@@ -120,14 +121,14 @@ public class SimpleShoppingCartApiBuilder {
 			//
 			cart = core.getCartList(requestPage, simple);
 		}
-
+		
 		res.put("list", cart);
 		res.put("itemCount", cart.size());
 		res.put("quantityCount", core.cartListQuantityCount(cart));
-
+		
 		return res;
 	};
-
+	
 	///
 	/// # product (GET/POST)
 	///
@@ -166,7 +167,7 @@ public class SimpleShoppingCartApiBuilder {
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	///
 	public RESTFunction product_GET_and_POST = (req, res) -> {
-
+		
 		//
 		// _oid sanity check
 		//
@@ -176,50 +177,50 @@ public class SimpleShoppingCartApiBuilder {
 			res.put("error", "Request object did not contain an oid");
 			return res;
 		}
-
+		
 		//
 		// Function reuse vars
 		//
 		List<MetaObject> prodList = null;
-
+		
 		//
 		// Get req params
 		//
-		String mode = req.getString("mode","update");
+		String mode = req.getString("mode", "update");
 		String listStr = req.getString("list", null);
-
+		
 		//
 		// Update / GET
 		//
-		if( listStr != null ) {
+		if (listStr != null) {
 			//
 			// Assumes an update
 			//
 			List<Object> updateList = ConvertJSON.toList(listStr);
-
+			
 			// Check for replacement mode
-			if( mode != null && mode.equalsIgnoreCase("replace") ) {
+			if (mode != null && mode.equalsIgnoreCase("replace")) {
 				throw new RuntimeException("mode=replace not supported");
 			} else {
-				prodList = core.updateProductList( oid, updateList );
+				prodList = core.updateProductList(oid, updateList);
 			}
 		} else {
 			//
 			// Simply get the list instead
 			//
-			prodList = core.getProductList( oid );
+			prodList = core.getProductList(oid);
 		}
 		res.put("list", prodList);
-
+		
 		return res;
 	};
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Sales order API
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	///
 	/// # sale.order (GET/POST)
 	///
@@ -253,56 +254,56 @@ public class SimpleShoppingCartApiBuilder {
 	///
 	@SuppressWarnings("unchecked")
 	public RESTFunction saleOrder_GET_and_POST = (req, res) -> {
-
+		
 		//
 		// User safety check
 		//
-		MetaObject currentUser = ((BasePage)(req.requestPage())).currentAccount();
-		if(currentUser == null){
-			res.put("error","User is not login");
+		MetaObject currentUser = ((BasePage) (req.requestPage())).currentAccount();
+		if (currentUser == null) {
+			res.put("error", "User is not login");
 			return res;
 		}
-
+		
 		//
 		// Get params
 		//
 		String oid = req.getString("_oid", "");
 		//"approved", "paid", "rejected", "failed"
 		String status = req.getString("status", "");
-
+		
 		Boolean useShoppingCart = req.getBoolean("useShoppingCart", false);
-		List<List<Object>> cartList = (List<List<Object>>)(Object)req.getObjectList("list", null);
-
-		GenericConvertMap<String,Object> orderMeta = req.getGenericConvertStringMap("orderMeta", null);
-		GenericConvertMap<String,Object> itemMeta = req.getGenericConvertStringMap("itemMeta", null);
-		GenericConvertMap<String,Object> purchaseOrder = null;
-		if( useShoppingCart ) {
+		List<List<Object>> cartList = (List<List<Object>>) (Object) req.getObjectList("list", null);
+		
+		GenericConvertMap<String, Object> orderMeta = req.getGenericConvertStringMap("orderMeta", null);
+		GenericConvertMap<String, Object> itemMeta = req.getGenericConvertStringMap("itemMeta", null);
+		GenericConvertMap<String, Object> purchaseOrder = null;
+		if (useShoppingCart) {
 			cartList = core.getCartList(req.requestPage(), true);
 		}
-
-		if(oid.isEmpty()){
+		
+		if (oid.isEmpty()) {
 			//Makes sure that there are items in the list first
-			if(cartList == null || cartList.isEmpty()){
-				res.put("error","Cannot create order with empty cart list!");
-			}else{
+			if (cartList == null || cartList.isEmpty()) {
+				res.put("error", "Cannot create order with empty cart list!");
+			} else {
 				//Create new purchase order
-				purchaseOrder = core.createPurchaseOrder(currentUser._oid(), cartList , orderMeta, itemMeta, status);
+				purchaseOrder = core.createPurchaseOrder(currentUser._oid(), cartList, orderMeta, itemMeta, status);
 			}
-		}else{
+		} else {
 			//Reuse old purchase order oid
 			res.put("_oid", oid);
-			if(cartList != null){
-				res.put("error","You cannot update a list / with a purchase order");
+			if (cartList != null) {
+				res.put("error", "You cannot update a list / with a purchase order");
 			}
-
+			
 			//Gets the respective purchase order
 			purchaseOrder = core.fetchPurchaseOrder(oid);
 		}
-		res.put("data",purchaseOrder);
-
+		res.put("data", purchaseOrder);
+		
 		return res;
 	};
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Update status API
@@ -338,9 +339,9 @@ public class SimpleShoppingCartApiBuilder {
 		//
 		// User safety check
 		//
-		MetaObject currentUser = ((BasePage)(req.requestPage())).currentAccount();
-		if(currentUser == null){
-			res.put("error","User is not login");
+		MetaObject currentUser = ((BasePage) (req.requestPage())).currentAccount();
+		if (currentUser == null) {
+			res.put("error", "User is not login");
 			return res;
 		}
 		//
@@ -349,60 +350,60 @@ public class SimpleShoppingCartApiBuilder {
 		String oid = req.getString("_oid", "");
 		//"approved", "paid", "rejected", "failed"
 		String status = req.getString("status", "");
-		GenericConvertMap<String,Object>  purchaseOrder;
-
-		if(oid.isEmpty()){
-			res.put("error","There needs to be a purchase order ID!");
+		GenericConvertMap<String, Object> purchaseOrder;
+		
+		if (oid.isEmpty()) {
+			res.put("error", "There needs to be a purchase order ID!");
 			return res;
 		}
-
-		if(status == ""){
+		
+		if (status == "") {
 			//Fetches the status of the purchase order. User will need to sieve through to find the status
-			purchaseOrder = core.fetchPurchaseOrder( oid );
-		}else{
+			purchaseOrder = core.fetchPurchaseOrder(oid);
+		} else {
 			//Updates the status of the purchase order
-			purchaseOrder = core.updatePurchaseOrderStatus( oid, status);
+			purchaseOrder = core.updatePurchaseOrderStatus(oid, status);
 		}
-
-		res.put("_oid",oid);
+		
+		res.put("_oid", oid);
 		res.put("data", purchaseOrder);
-
+		
 		return res;
 	};
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// RestBuilder template builder
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	///
 	/// Takes the restbuilder and implements its respective default API
 	///
 	public RESTBuilder setupRESTBuilder(RESTBuilder rb, String setPrefix) {
 		rb.getNamespace(setPrefix + "cart").put(HttpRequestType.GET, cart_GET_and_POST);
 		rb.getNamespace(setPrefix + "cart").put(HttpRequestType.POST, cart_GET_and_POST);
-
+		
 		rb.getNamespace(setPrefix + "product").put(HttpRequestType.GET, product_GET_and_POST);
 		rb.getNamespace(setPrefix + "product").put(HttpRequestType.POST, product_GET_and_POST);
-
+		
 		ownerApi = new MetaTableApiBuilder(core.productOwner);
 		productApi = new MetaTableApiBuilder(core.productItem);
 		salesOrderApi = new MetaTableApiBuilder(core.salesOrder);
 		salesItemApi = new MetaTableApiBuilder(core.salesItem);
-
+		
 		//ownerApi.setupRESTBuilder( rb, setPrefix + "owner" );
-		productApi.setupRESTBuilder( rb, setPrefix + "product." );
-		salesOrderApi.setupRESTBuilder( rb, setPrefix + "sale.order." );
-		salesItemApi.setupRESTBuilder( rb, setPrefix + "sale.item." );
-
-
+		productApi.setupRESTBuilder(rb, setPrefix + "product.");
+		salesOrderApi.setupRESTBuilder(rb, setPrefix + "sale.order.");
+		salesItemApi.setupRESTBuilder(rb, setPrefix + "sale.item.");
+		
 		rb.getNamespace(setPrefix + "sale.order.create").put(HttpRequestType.GET, saleOrder_GET_and_POST);
 		rb.getNamespace(setPrefix + "sale.order.create").put(HttpRequestType.POST, saleOrder_GET_and_POST);
-
+		
 		rb.getNamespace(setPrefix + "sale.order.status").put(HttpRequestType.GET, saleOrderstatus_GET_and_POST);
 		rb.getNamespace(setPrefix + "sale.order.status").put(HttpRequestType.POST, saleOrderstatus_GET_and_POST);
-
+		
 		return rb;
 	}
-
+	
 }

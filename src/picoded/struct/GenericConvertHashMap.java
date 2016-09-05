@@ -27,7 +27,7 @@ public class GenericConvertHashMap<K, V> extends HashMap<K, V> implements Generi
 	/// Implments a JSON to string conversion
 	@Override
 	public String toString() {
-		return GenericConvert.toString((Object)this);
+		return GenericConvert.toString((Object) this);
 	}
 	
 	//------------------------------------------------------
@@ -43,8 +43,8 @@ public class GenericConvertHashMap<K, V> extends HashMap<K, V> implements Generi
 	
 	/// Consturctor
 	@SuppressWarnings("unchecked")
-	public GenericConvertHashMap(Map<? extends K,? extends V> m) {
-		super((Map<K,V>)m);
+	public GenericConvertHashMap(Map<? extends K, ? extends V> m) {
+		super((Map<K, V>) m);
 	}
 	
 }

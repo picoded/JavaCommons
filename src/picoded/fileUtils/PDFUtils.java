@@ -256,18 +256,18 @@ public class PDFUtils {
 	/// @Returns the image byet array of the specified page in pdf doc.
 	/// @exception throws IndexOutOfBoundsException if the page number is out of range (page < 0 || page >= total pages)
 	///
-	public static byte[] toJPEG(byte[] pdfData, int page) throws IOException  {
+	public static byte[] toJPEG(byte[] pdfData, int page) throws IOException {
 		System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
 		// create document object from byte[]
-		PDDocument document = PDDocument.load( new ByteArrayInputStream(pdfData));
+		PDDocument document = PDDocument.load(new ByteArrayInputStream(pdfData));
 		PDFRenderer pdfRenderer = new PDFRenderer(document);
 		// throw exeception if invalid page 
-		if(page < 0 || page >= document.getNumberOfPages()){
+		if (page < 0 || page >= document.getNumberOfPages()) {
 			throw new IndexOutOfBoundsException("page number is out of range");
 		}
 		// create buffered image for the specified page of pdf
 		BufferedImage bufferedImage = pdfRenderer.renderImageWithDPI(page, 300, ImageType.RGB);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();            
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ImageIO.write(bufferedImage, "jpeg", baos);
 		document.close();
 		

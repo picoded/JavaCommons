@@ -37,10 +37,10 @@ public class PDFUtils_test {
 	private String subPageSourceFile = "PDFMerge1.pdf";
 	private String subPageOutputFile = "PDFSubPageOutput.pdf";
 	private String subPageOutputOPFile = "PDFSubPageOFile.pdf";
-
+	
 	private String pdfToImageSourceFile = "PDFToImageFile.pdf";
 	private String pdfToImageOutputOPFile = "PDFToImageOFile.jpg";
-
+	
 	@Before
 	public void setUp() {
 		inputPDFFileDir = "./test-files/test-specific/fileUtils/PDFUtils/";
@@ -145,7 +145,7 @@ public class PDFUtils_test {
 	@Test
 	@SuppressWarnings("resource")
 	public void testToJPEG() throws IOException {
-		FileInputStream stream = new FileInputStream(inputPDFFileDir + pdfToImageSourceFile); 
+		FileInputStream stream = new FileInputStream(inputPDFFileDir + pdfToImageSourceFile);
 		byte[] buffer = new byte[1000];
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		int bytesRead;
@@ -160,6 +160,6 @@ public class PDFUtils_test {
 		// made call with page number 
 		jpgByteArray = PDFUtils.toJPEG(baos.toByteArray(), 0);
 		imag = ImageIO.read(new ByteArrayInputStream(jpgByteArray));
-		ImageIO.write(imag, "jpg", new File(outputPDFFileDir + 1+"_"+pdfToImageOutputOPFile));
+		ImageIO.write(imag, "jpg", new File(outputPDFFileDir + 1 + "_" + pdfToImageOutputOPFile));
 	}
 }

@@ -34,7 +34,7 @@ public class JStackUtils {
 			return;
 		}
 		for (String name : nameMap.keySet()) {
-			String dotSpacedName = name.replaceAll("_",".");
+			String dotSpacedName = name.replaceAll("_", ".");
 			
 			if (type.equalsIgnoreCase("AccountTable")) {
 				AccountLogin.setupRESTBuilder(rbObj, struct.getAccountTable(name), dotSpacedName + ".");

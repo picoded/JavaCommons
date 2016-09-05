@@ -44,22 +44,15 @@ import picoded.page.builder.*;
 ///
 public class CommonsPage extends BasePage {
 	
-	/// Enable or disable commons page Auth redirection
-	public boolean enableCommonWildcardAuthRedirection() {
-		return true;
-	}
-	
 	/// Authenticate the user, or redirects to login page if needed, this is not applied to API page
 	@Override
 	public boolean doAuth(Map<String, Object> templateData) throws Exception {
 		
 		// Gets the wildcard URI
 		String[] wildcardUri = requestWildcardUriArray();
-		if (wildcardUri == null) {
-			wildcardUri = new String[] {};
-		}
 		
-		boolean enableCommonWildcardAuth = enableCommonWildcardAuthRedirection();
+		// Enable or disable commons page Auth redirection
+		boolean enableCommonWildcardAuth = JConfig().getBoolean("sys.CommonsPage.commonWildcardAuth", true);
 		
 		//
 		// WEB-INF security
@@ -79,22 +72,26 @@ public class CommonsPage extends BasePage {
 				return false;
 			}
 			
-			// 
-			// Public files, grab it direct
-			//
-			if (fileName.equalsIgnoreCase("index.html") && (new File(getContextPath(), requestWildcardUri())).canRead()) {
-				return true;
-			}
-			
 			//
 			// Common wildcard pattern
 			//
 			if (enableCommonWildcardAuth) {
+				
+				// 
+				// Public index.html? files, grab it direct
+				//
+				if (fileName.equalsIgnoreCase("index.html") && (new File(getContextPath(), requestWildcardUri())).canRead()) {
+					return true;
+				}
+				
+				//
 				// Exempt login page from auth
+				//
 				if (wildcardUri[0].equalsIgnoreCase("login")) {
-					String logout = requestParameters().getString("logout");
-					
+					//
 					// Handle page logout event
+					//
+					String logout = requestParameters().getString("logout");
 					if (logout != null && (logout.equalsIgnoreCase("1") || logout.equalsIgnoreCase("true"))) {
 						accountAuthTable().logoutAccount(getHttpServletRequest(), getHttpServletResponse());
 						sendRedirect((getContextURI() + "/login?logout_status=1").replaceAll("//", "/"));
@@ -103,11 +100,18 @@ public class CommonsPage extends BasePage {
 					
 					return true;
 				}
-				// Exempt common / index page from auth
-				if (wildcardUri[0].equalsIgnoreCase("common") || wildcardUri[0].equalsIgnoreCase("index")) {
+				
+				//
+				// Exempt common / index / build / login page from auth
+				//
+				if (wildcardUri[0].equalsIgnoreCase("common") || wildcardUri[0].equalsIgnoreCase("index")
+					|| wildcardUri[0].equalsIgnoreCase("login") || wildcardUri[0].equalsIgnoreCase("build")) {
 					return true;
 				}
+				
+				//
 				// Exempt login API from auth
+				//
 				if (wildcardUri[0].equalsIgnoreCase("api")) {
 					if (wildcardUri.length >= 3 && wildcardUri[1].equalsIgnoreCase("account")
 						&& wildcardUri[2].equalsIgnoreCase("login")) {
@@ -169,13 +173,17 @@ public class CommonsPage extends BasePage {
 			}
 		}
 		
+		//
 		// Redirect to login, if current login is not valid
+		//
 		if (currentAccount() == null) {
 			sendRedirect((getContextURI() + "/login").replaceAll("//", "/"));
 			return false;
 		}
 		
+		//
 		// Blank wildcard redirects to "home" for valid users
+		//
 		if (enableCommonWildcardAuth
 			&& (wildcardUri.length <= 0 || wildcardUri[0].length() <= 0 || wildcardUri[0].equals("/"))) {
 			sendRedirect((getContextURI() + "/home").replaceAll("//", "/"));

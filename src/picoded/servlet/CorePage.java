@@ -25,6 +25,7 @@ import java.net.URLDecoder;
 import picoded.conv.ConvertJSON;
 import picoded.fileUtils.FileUtils;
 import picoded.enums.HttpRequestType;
+import picoded.enums.EmptyArrays;
 import picoded.struct.HashMapList;
 
 // Sub modules useds
@@ -279,7 +280,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		String raw = requestWildcardUri();
 		
 		if (raw == null || raw.isEmpty()) {
-			return null;
+			return EmptyArrays.STRING;
 		}
 		
 		if (raw.startsWith("/") || raw.startsWith("\\")) {

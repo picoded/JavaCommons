@@ -6,6 +6,8 @@ import org.apache.commons.lang3.ArrayUtils;
 ///
 /// @TODO Migrate the remaining variables from ArrayUtils to EmptyArrays
 public class EmptyArrays {
+	
+	// An empty immutable string array
 	public static String[] STRING = ArrayUtils.EMPTY_STRING_ARRAY;
 	
 	// static boolean[]	EMPTY_BOOLEAN_ARRAY 

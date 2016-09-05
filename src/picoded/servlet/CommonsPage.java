@@ -78,7 +78,7 @@ public class CommonsPage extends BasePage {
 			String fileExt = FileUtils.getExtension(fileName);
 			
 			//
-			// Always deny WEB-INF path
+			// Always deny WEB-INF path, and potential invisibles (safety)
 			//
 			if (wildcardUri[0].equalsIgnoreCase("WEB-INF") || wildcardUri[0].startsWith(".")) {
 				return false;

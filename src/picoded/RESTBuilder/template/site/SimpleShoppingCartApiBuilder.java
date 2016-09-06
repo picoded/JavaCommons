@@ -14,6 +14,19 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+
+//For HMAC key generation
+import java.nio.charset.Charset;
+import java.security.SignatureException;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+import com.google.common.io.BaseEncoding;
 ///
 /// Provides a shopping cart and product API
 /// All in a single API package.
@@ -33,6 +46,8 @@ public class SimpleShoppingCartApiBuilder {
 	public MetaTableApiBuilder salesOrderApi = null;
 	public MetaTableApiBuilder salesItemApi = null;
 
+	private static final String HMAC_SHA256_ALGORITHM = "HmacSHA256";
+	private static final Charset C_UTF8 = Charset.forName("UTF8");
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Constructor options
@@ -369,6 +384,111 @@ public class SimpleShoppingCartApiBuilder {
 
 		return res;
 	};
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Adyen HMAC key generator(aka Merchant Signature) API
+	//
+	/////////////////////////////////////////////////////////////////////////////////////////
+
+	///
+	/// # adyen.hmac (GET/POST)
+	///
+	/// Gets or create a sales order, not this is supposingly immutable, beyond change of status.
+	/// Use sale.order.status, to do a change in status.
+	///
+	/// ## HTTP Request Parameters (Optional)
+	///
+	/// +-----------------+-------------------------+-----------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	         | Description                                                     |
+	/// +-----------------+-------------------------+-----------------------------------------------------------------+
+	/// | hmacMeta        |{meta}                   | Contains the following:                                         |
+   /// |                 |                         |  Key                                                            |
+   /// |                 |                         |  shopperLocale                                                  |
+   /// |                 |                         |  merchantReference                                              |
+   /// |                 |                         |  merchantAccount                                                |
+   /// |                 |                         |  currencyCode                                                   |
+   /// |                 |                         |  paymentAmount                                                  |
+   /// |                 |                         |  sessionValidity                                                |
+   /// |                 |                         |  shipBeforeDate                                                 |
+   /// |                 |                         |  skinCode                                                       |
+	/// +-----------------+-------------------------+-----------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-------------------------+-----------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	         | Description                                                     |
+	/// +-----------------+-------------------------+-----------------------------------------------------------------+
+	/// | merchantSig     | String                  | The merchant signature/hmac                                     |
+	/// +-----------------+-------------------------+-----------------------------------------------------------------+
+	/// | error           | String (Optional)       | Errors encounted if any                                         |
+	/// +-----------------+-------------------------+-----------------------------------------------------------------+
+	///
+	public RESTFunction adyenHmac_POST = (req, res) -> {
+
+		byte[] hmacKey = BaseEncoding.base16().decode("D63E4FDD9DF3AE2CED1C0EE4F0F4B71646C0CD2EA0FCF59E9C9546E338BA721D");
+		String hmacSig = null;
+
+		GenericConvertMap<String,Object> hmacMeta = req.getGenericConvertStringMap("hmacMeta", null);
+
+		if(hmacMeta == null){
+			res.put("error","Cannot create HMAC Key without any details!");
+		}else{
+			// Sort order is important (using natural ordering)
+         SortedMap<String, String> params = new TreeMap<>();
+         params.put("merchantAccount", hmacMeta.getString("merchantAccount"));
+         params.put("currencyCode", hmacMeta.getString("currencyCode"));
+         params.put("paymentAmount", hmacMeta.getString("paymentAmount"));
+         params.put("sessionValidity", hmacMeta.getString("sessionValidity"));
+         params.put("shipBeforeDate", hmacMeta.getString("shipBeforeDate"));
+         params.put("shopperLocale", hmacMeta.getString("shopperLocale"));
+         params.put("merchantReference", hmacMeta.getString("merchantReference"));
+         params.put("skinCode", hmacMeta.getString("skinCode"));
+
+			// Calculate the data to sign
+         String signingData = Stream.concat(params.keySet().stream(), params.values().stream())
+                 .map(SimpleShoppingCartApiBuilder::escapeVal)
+                 .collect(Collectors.joining(":"));
+
+         // Create the signature and add it to the parameter map
+         try {
+				 hmacSig = calculateHMAC(signingData, hmacKey);
+				res.put("merchantSig" , hmacSig);
+         } catch (SignatureException e) {
+             res.put("error" , e);
+         }
+         // Expected sig: GJ1asjR5VmkvihDJxCd8yE2DGYOKwWwJCBiV3R51NFg=
+         System.out.println(hmacSig);
+
+		}
+
+		return res;
+	};
+
+	private static String escapeVal(String val) {
+		 if(val == null) { return ""; }
+		 return val.replace("\\", "\\\\").replace(":", "\\:");
+	};
+
+	private static String calculateHMAC(String data, byte[] key)  throws java.security.SignatureException {
+		 try {
+			  // Create an hmac_sha256 key from the raw key bytes
+			  SecretKeySpec signingKey = new SecretKeySpec(key, HMAC_SHA256_ALGORITHM);
+
+			  // Get an hmac_sha256 Mac instance and initialize with the signing key
+			  Mac mac = Mac.getInstance(HMAC_SHA256_ALGORITHM);
+			  mac.init(signingKey);
+
+			  // Compute the hmac on input data bytes
+			  byte[] rawHmac = mac.doFinal(data.getBytes(C_UTF8));
+
+			  // Base64-encode the hmac
+			  return  BaseEncoding.base64().encode(rawHmac);
+
+		 } catch (Exception e) {
+			  throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
+		 }
+	};
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// RestBuilder template builder
@@ -401,6 +521,8 @@ public class SimpleShoppingCartApiBuilder {
 
 		rb.getNamespace(setPrefix + "sale.order.status").put(HttpRequestType.GET, saleOrderstatus_GET_and_POST);
 		rb.getNamespace(setPrefix + "sale.order.status").put(HttpRequestType.POST, saleOrderstatus_GET_and_POST);
+
+		rb.getNamespace(setPrefix + "sale.order.adyen").put(HttpRequestType.POST, adyenHmac_POST);
 
 		return rb;
 	}

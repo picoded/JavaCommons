@@ -192,7 +192,7 @@ public class JStackUtils {
 
 				String jndiName = configMap.getString("jndi-name", "");
 				if(!jndiName.isEmpty()){
-					
+
 					java.sql.Connection connectionObj = null;
 					try{
 						connectionObj = getConnectionByJNDI(jndiName);
@@ -203,11 +203,6 @@ public class JStackUtils {
 					jsql_oracle = JSql.oracle(connectionObj);
 				}else{
 					jsql_oracle = JSql.oracle(path, username, password);
-				}
-
-				String schemaPrefix = configMap.getString("schemaPrefix", "");
-				if(!schemaPrefix.isEmpty()){
-					jsql_oracle.schemaPrefix = schemaPrefix;
 				}
 
 				return jsql_oracle;

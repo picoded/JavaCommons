@@ -38,6 +38,7 @@ import picoded.RESTBuilder.template.core.*;
 import picoded.webUtils.*;
 import picoded.webTemplateEngines.JSML.*;
 import picoded.page.builder.*;
+import picoded.page.jsml.*;
 
 ///
 /// Does all the standard USER API, Page, and forms setup
@@ -262,9 +263,17 @@ public class CommonsPage extends BasePage {
 			return true;
 		}
 		
-		// Indicates if its a JSML form usage
 		//
-		// @TODO unit test, and fix it, somehow it isnt working =(
+		// Indicates if its a FormSet page
+		//
+		if (wildcardUri != null && wildcardUri.length >= 1 && //
+			wildcardUri[0].equalsIgnoreCase("formset") ) {
+			(new FormSet(this)).processServletPageRequest(this, Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length));
+			return true;
+		}
+		
+		//
+		// Indicates if its a JSML form usage
 		//
 		if (wildcardUri != null && wildcardUri.length >= 1 && //
 			wildcardUri[0].equalsIgnoreCase("form") && //

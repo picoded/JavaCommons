@@ -426,7 +426,7 @@ public class SimpleShoppingCartApiBuilder {
 	///
 	public RESTFunction adyenHmac_POST = (req, res) -> {
 
-		byte[] hmacKey = BaseEncoding.base16().decode("D63E4FDD9DF3AE2CED1C0EE4F0F4B71646C0CD2EA0FCF59E9C9546E338BA721D");
+		byte[] hmacKey = BaseEncoding.base16().decode("3828FF32B8689BE3ECA4028B0C4D85C2677C1184BF563C9F4E57D561CF27412E");
 		String hmacSig = null;
 
 		GenericConvertMap<String,Object> hmacMeta = req.getGenericConvertStringMap("hmacMeta", null);
@@ -435,30 +435,33 @@ public class SimpleShoppingCartApiBuilder {
 			res.put("error","Cannot create HMAC Key without any details!");
 		}else{
 			// Sort order is important (using natural ordering)
-         SortedMap<String, String> params = new TreeMap<>();
-         params.put("merchantAccount", hmacMeta.getString("merchantAccount"));
-         params.put("currencyCode", hmacMeta.getString("currencyCode"));
-         params.put("paymentAmount", hmacMeta.getString("paymentAmount"));
-         params.put("sessionValidity", hmacMeta.getString("sessionValidity"));
-         params.put("shipBeforeDate", hmacMeta.getString("shipBeforeDate"));
-         params.put("shopperEmail", hmacMeta.getString("shopperEmail"));
-         params.put("merchantReference", hmacMeta.getString("merchantReference"));
-         params.put("skinCode", hmacMeta.getString("skinCode"));
+			SortedMap<String, String> params = new TreeMap<>();
+
+			// Get all the params, and sort / filter it
+			for( String keyName : hmacMeta.keySet() ) {
+				if( keyName.equalsIgnoreCase("sig") || keyName.equalsIgnoreCase("merchantSig") || keyName.startsWith("ignore.") ) {
+					continue;
+				}
+
+				if( hmacMeta.getString(keyName, "").trim().length() > 0 ) {
+					params.put(keyName, hmacMeta.getString(keyName).trim());
+				}
+			}
 
 			// Calculate the data to sign
-         String signingData = Stream.concat(params.keySet().stream(), params.values().stream())
-                 .map(SimpleShoppingCartApiBuilder::escapeVal)
-                 .collect(Collectors.joining(":"));
+			String signingData = Stream.concat(params.keySet().stream(), params.values().stream())
+					  .map(SimpleShoppingCartApiBuilder::escapeVal)
+					  .collect(Collectors.joining(":"));
 
-         // Create the signature and add it to the parameter map
-         try {
+			// Create the signature and add it to the parameter map
+			try {
 				 hmacSig = calculateHMAC(signingData, hmacKey);
 				res.put("merchantSig" , hmacSig);
-         } catch (SignatureException e) {
-             res.put("error" , e);
-         }
-         // Expected sig: GJ1asjR5VmkvihDJxCd8yE2DGYOKwWwJCBiV3R51NFg=
-         System.out.println(hmacSig);
+			} catch (SignatureException e) {
+				 res.put("error" , e);
+			}
+			// Expected sig: GJ1asjR5VmkvihDJxCd8yE2DGYOKwWwJCBiV3R51NFg=
+			System.out.println(hmacSig);
 
 		}
 

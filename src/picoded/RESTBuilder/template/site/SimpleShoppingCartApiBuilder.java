@@ -404,7 +404,7 @@ public class SimpleShoppingCartApiBuilder {
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	/// | hmacMeta        |{meta}                   | Contains the following:                                         |
    /// |                 |                         |  Key                                                            |
-   /// |                 |                         |  shopperLocale                                                  |
+   /// |                 |                         |  shopperEmail                                                   |
    /// |                 |                         |  merchantReference                                              |
    /// |                 |                         |  merchantAccount                                                |
    /// |                 |                         |  currencyCode                                                   |
@@ -441,7 +441,7 @@ public class SimpleShoppingCartApiBuilder {
          params.put("paymentAmount", hmacMeta.getString("paymentAmount"));
          params.put("sessionValidity", hmacMeta.getString("sessionValidity"));
          params.put("shipBeforeDate", hmacMeta.getString("shipBeforeDate"));
-         params.put("shopperLocale", hmacMeta.getString("shopperLocale"));
+         params.put("shopperEmail", hmacMeta.getString("shopperEmail"));
          params.put("merchantReference", hmacMeta.getString("merchantReference"));
          params.put("skinCode", hmacMeta.getString("skinCode"));
 

@@ -23,32 +23,32 @@ import picoded.page.builder.*;
 
 ///
 /// FormSet class that handles JSML, integration with the MetaTable inteface
-/// 
+///
 public class FormSet {
-	
+
 	//-------------------------------------------------
 	//
 	//  Constructor setup
 	//
 	//-------------------------------------------------
-	
+
 	/// The base CommonsPage to refence to
 	public CommonsPage base = null;
-	
+
 	/// Automated default setup using the commons page
 	public FormSet(CommonsPage inPage) {
 		base = inPage;
 	}
-	
+
 	//-------------------------------------------------
 	//
 	//  Mapping config handling
 	//
 	//-------------------------------------------------
-	
+
 	/// Cached mapping
 	GenericConvertMap<String,Object> _mapping = null;
-	
+
 	/// The config mapping
 	GenericConvertMap<String,Object> fullFormMap() {
 		if( _mapping != null ) {
@@ -57,28 +57,28 @@ public class FormSet {
 		_mapping = base.JConfig().getGenericConvertStringMap("site.FormSet.FormMap", "{}");
 		return _mapping;
 	}
-	
+
 	/// The sub mapping, for a keyname, if it exists
 	GenericConvertMap<String,Object> formMap(String name) {
 		return fullFormMap().getGenericConvertStringMap(name, null);
 	}
-	
+
 	//-------------------------------------------------
 	//
 	//  Servlet page run integration
 	//
 	//-------------------------------------------------
-	
+
 	/// Process the full servlet request handling
 	public void processServletPageRequest() {
 		processServletPageRequest(base);
 	}
-	
+
 	/// Process the full servlet request handling
 	public void processServletPageRequest(BasePage page) {
 		processServletPageRequest(page, page.requestWildcardUriArray());
 	}
-	
+
 	/// Process the full servlet request handling
 	public void processServletPageRequest(BasePage page, String[] requestWildcardUri) {
 		try {
@@ -91,14 +91,14 @@ public class FormSet {
 			if( page == null || base == null ) {
 				throw new RuntimeException("Invalid FormSet object, missing both page/base parameters");
 			}
-			
+
 			//
 			// Wildcard string handling
 			//
 			if (requestWildcardUri == null) {
 				requestWildcardUri = new String[] {};
 			}
-			
+
 			//
 			// Check for minimum parameters : 404 if not valid
 			//
@@ -106,29 +106,29 @@ public class FormSet {
 				page.getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
 				return;
 			}
-			
+
 			//
 			// Time to fetch it =)
 			//
 			String formName = requestWildcardUri[0];
 			String formType = requestWildcardUri[1];
-			
+
 			//
 			// Get the form config
 			//
 			GenericConvertMap<String,Object> formConfig = formMap(formName);
-			
+
 			// The form config object
 			if(formConfig == null) {
 				throw new RuntimeException("Missing formset configuration for - "+formName);
 			}
-			
+
 			//
 			// MetaTable integration
 			//
 			Map<String,Object> data = new HashMap<String,Object>();
 			String metaTableName = formConfig.getString("MetaTable",null);
-			
+
 			if( metaTableName != null ) {
 				// Get the _oid
 				String req_oid = null;
@@ -136,25 +136,31 @@ public class FormSet {
 					req_oid = requestWildcardUri[2];
 				}
 				req_oid = page.requestParameters().getString("_oid", req_oid);
-				
+
+				System.out.println("--- FormSet about to generate pdf for : " + req_oid);
+
 				// And the meta object (if valid)
 				MetaObject dataMObj = base.JStack().getMetaTable(metaTableName).get(req_oid);
 				if( dataMObj != null ) {
 					data = dataMObj;
 				}
 			}
-			
+
+			//Sanitisation of mappings with empty or null key names
+			//store into data after sanitisation
+			data = sanitiseEmptyOrNullMapKeys(data);
+
 			//
 			// The form object
 			//
 			String jsmlName = formConfig.getString("jsml", formName);
 			JSMLForm jsmlFormObj = base.JSMLFormSet().get(jsmlName);
-			
+
 			// Missing form name
 			if( jsmlFormObj == null ) {
 				throw new RuntimeException("Invalid JSML name provided - "+jsmlName);
 			}
-			
+
 			// Form type to check
 			if( formType.equalsIgnoreCase("input") ) {
 				String formResult = jsmlFormObj.generateHTML(data, false).toString();
@@ -167,7 +173,7 @@ public class FormSet {
 			} else if( formType.equalsIgnoreCase("pdf") ) {
 				byte[] pdfData = jsmlFormObj.generatePDF(base, data);
 				HttpServletResponse response = page.getHttpServletResponse();
-				
+
 				response.setContentType("application/pdf");
 				response.addHeader("Content-Disposition", "filename=" + formName + ".pdf");
 				response.setContentLength(pdfData.length);
@@ -176,7 +182,7 @@ public class FormSet {
 			} else {
 				throw new RuntimeException("Invalid form type provided - "+formType);
 			}
-			
+
 			//
 			// All failed, file not found response =(
 			//
@@ -186,5 +192,52 @@ public class FormSet {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> sanitiseEmptyOrNullMapKeys(Map<String, Object> dataMap){
+		Map<String, Object> retMap = new HashMap<String, Object>();
+
+		for(String key : dataMap.keySet()){
+			if(key == null || key.isEmpty()){
+				//do nothing
+				continue;
+			}else{
+				Object value = dataMap.get(key);
+				if(value instanceof Map){
+					retMap.put(key, sanitiseEmptyOrNullMapKeys((Map<String, Object>) value ));
+				}else if(value instanceof List){
+					retMap.put(key, sanitiseList((List<Object>) value ));
+				}else if (value instanceof String){
+					retMap.put(key, (String)dataMap.get(key));
+				}else{
+					retMap.put(key, dataMap.get(key));
+				}
+			}
+		}
+
+		return retMap;
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<Object> sanitiseList (List<Object> dataList){
+		List<Object> retList = new ArrayList<Object>();
+
+		if(dataList == null){
+			return retList;
+		}
+
+		for(Object listObj : dataList){
+			if(listObj instanceof Map){
+				retList.add(sanitiseEmptyOrNullMapKeys((Map<String, Object>) listObj ));
+			}else if (listObj instanceof List){
+				retList.add(sanitiseList((List<Object>) listObj ));
+			}else if(listObj instanceof String){
+				retList.add((String) listObj);
+			}else{
+				retList.add(listObj);
+			}
+		}
+
+		return retList;
+	}
 }

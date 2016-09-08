@@ -199,6 +199,9 @@ public class PageBuilder extends PageBuilderCore {
 						// if (!basePageName.equalsIgnoreCase("common") && servletPageBuilder.hasPageFolder("common")) {
 						// 	servletPageBuilder.buildAndOutputPage("common");
 						// }
+						
+						// Anchoring changes (to make sure destTimestamp will be newer)
+						FileUtils.touch(new File(outputFolder, "._pageAnchor"));
 					}
 				}
 			}

@@ -146,6 +146,9 @@ public class PageBuilder extends PageBuilderCore {
 		processPageBuilderServlet(page, page.requestWildcardUriArray());
 	}
 	
+	/// reserved keynames for timestamp scan
+	protected final List<String> resevedTimestampScanNames = Arrays.asList(new String[]{"WEB-INF", ".git"});
+	
 	/// Process the full PageBuilder servlet request
 	public void processPageBuilderServlet(BasePage page, String[] requestWildcardUri) {
 		try {
@@ -177,18 +180,26 @@ public class PageBuilder extends PageBuilderCore {
 				// Reloads only on index page request, instead of every http request
 				if (itemName.equals("index.html") && servletPageBuilder.hasPageFolder(basePageName + "/")) {
 					
-					// Changed to build everything, slower on page load but ensures component changes get propagated properly.
-					servletPageBuilder.buildAllPage();
+					// Newest timestamp in destination
+					long destTimestamp = FileUtils.newestFileTimestamp(outputFolder, resevedTimestampScanNames);
+					// Newest timestamp from source
+					long sourceTimestamp = FileUtils.newestFileTimestamp(pageFolder, resevedTimestampScanNames);
 					
-					// servletPageBuilder.buildPageFolder_includingSelf(basePageName + "/");
-					// 
-					//// Build index / common, skip if its a duplicate build request
-					// if (!basePageName.equalsIgnoreCase("index") && servletPageBuilder.hasPageFolder("index")) {
-					// 	servletPageBuilder.buildAndOutputPage("index");
-					// }
-					// if (!basePageName.equalsIgnoreCase("common") && servletPageBuilder.hasPageFolder("common")) {
-					// 	servletPageBuilder.buildAndOutputPage("common");
-					// }
+					// Source / Dest timestamp handling check
+					if( sourceTimestamp <= 0 || destTimestamp <= 0 || sourceTimestamp > destTimestamp ) {
+						// Changed to build everything, slower on page load but ensures component changes get propagated properly.
+						servletPageBuilder.buildAllPage();
+						
+						// servletPageBuilder.buildPageFolder_includingSelf(basePageName + "/");
+						// 
+						//// Build index / common, skip if its a duplicate build request
+						// if (!basePageName.equalsIgnoreCase("index") && servletPageBuilder.hasPageFolder("index")) {
+						// 	servletPageBuilder.buildAndOutputPage("index");
+						// }
+						// if (!basePageName.equalsIgnoreCase("common") && servletPageBuilder.hasPageFolder("common")) {
+						// 	servletPageBuilder.buildAndOutputPage("common");
+						// }
+					}
 				}
 			}
 			

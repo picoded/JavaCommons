@@ -276,6 +276,63 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	
 	//------------------------------------------------------------------------------------------------------------------
 	//
+	// JavaCommons time utility functions
+	//
+	//------------------------------------------------------------------------------------------------------------------
+	
+	///
+	/// Recursively scan for the newest file
+	///
+	/// @param folder to scan
+	/// @param List of names to skip
+	///
+	/// @return The newest timestamp found, else 0 if failed
+	///
+	public static long newestFileTimestamp(File inFile, List<String> excludeNames) {
+		if(inFile.isDirectory()) {
+			long retTimestamp = 0L;
+			
+			for (File f : inFile.listFiles()) {
+				
+				if(excludeNames != null) {
+					String baseName = f.getName();
+					if( excludeNames.contains(baseName) ) {
+						continue;
+					}
+				}
+				
+				long tmpTimestamp = 0L;
+				if (f.isDirectory()) {
+					tmpTimestamp = newestFileTimestamp(f, excludeNames);
+				} else if(f.isFile()) {
+					tmpTimestamp = f.lastModified();
+				}
+				
+				if( tmpTimestamp > retTimestamp ) {
+					retTimestamp = tmpTimestamp;
+				}
+			}
+			
+			return retTimestamp;
+		} else {
+			return inFile.lastModified();
+		}
+	}
+	
+	///
+	/// Recursively scan for the newest file
+	///
+	/// @param folder to scan
+	/// @param List of names to skip
+	///
+	/// @return The newest timestamp found, else 0 if failed
+	///
+	public static long newestFileTimestamp(File inFile) {
+		return newestFileTimestamp(inFile, null);
+	}
+	
+	//------------------------------------------------------------------------------------------------------------------
+	//
 	// FilenameUtils functions
 	//
 	//------------------------------------------------------------------------------------------------------------------

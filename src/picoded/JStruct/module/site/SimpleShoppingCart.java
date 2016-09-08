@@ -704,15 +704,25 @@ public class SimpleShoppingCart {
 			// Get the item info, merge it with item meta
 			int itemCount = cartRow.getInt(1);
 			
+			// Item object mapping
 			GenericConvertMap<String, Object> rawItemObj = cartRow.getGenericConvertStringMap(2);
 			GenericConvertMap<String, Object> itemObj = new GenericConvertHashMap<String, Object>(rawItemObj);
-			itemObj.putAll(itemMeta);
-			
-			// Sanatize the item info
-			itemObj = sanatizePurchaseData(itemObj);
 			
 			// Merge it into the actual item object
-			orderItem.putAll(itemObj);
+			orderItem.putAll(sanatizePurchaseData(itemObj));
+			orderItem.putAll(sanatizePurchaseData(
+				new GenericConvertHashMap<String, Object>(new HashMap<String,Object>(itemMeta))
+			));
+			
+			// Owner meta mapping
+			GenericConvertMap<String, Object> ownerMetaObj = new GenericConvertHashMap<String, Object>(
+				productOwner.get(rawItemObj.get("_ownerID"))
+			);
+			
+			// Item meta mapping
+			GenericConvertMap<String, Object> itemMetaObj = new GenericConvertHashMap<String, Object>(
+				productItem.get(rawItemObj.get("_oid"))
+			);
 			
 			// Link it all up
 			orderItem.put("_count", itemCount);
@@ -721,6 +731,10 @@ public class SimpleShoppingCart {
 			orderItem.put("_sellerID", rawItemObj.get("_ownerID"));
 			orderItem.put("_productID", rawItemObj.get("_oid"));
 			orderItem.put("_orderStatus", status);
+			
+			// Product meta information
+			orderItem.put("_productMeta", itemMetaObj);
+			orderItem.put("_ownerMeta", ownerMetaObj);
 			
 			// Save it
 			orderItem.saveDelta();
@@ -831,10 +845,15 @@ public class SimpleShoppingCart {
 	protected GenericConvertMap<String, Object> sanatizePurchaseData(GenericConvertMap<String, Object> inMap) {
 		// Sanatize the item info
 		inMap.remove("_oid");
-		inMap.remove("_ownerID");
 		inMap.remove("_orderID");
 		inMap.remove("_sellerID");
+		
+		inMap.remove("_ownerID");
+		inMap.remove("_ownerMeta");
+		
 		inMap.remove("_productID");
+		inMap.remove("_productMeta");
+		
 		inMap.remove("_orderStatus");
 		
 		// Other systems reserved vars

@@ -74,10 +74,10 @@ public class SimpleShoppingCart {
 	public void setupStandardTables(JStruct inStruct, String prefix) {
 		productOwner = inStruct.getMetaTable(prefix);
 		productItem = inStruct.getMetaTable(prefix + "_product");
-		productCount = inStruct.getAtomicLongMap(prefix + "_sales_count");
+		productCount = inStruct.getAtomicLongMap(prefix + "_sale_count");
 		
-		salesOrder = inStruct.getMetaTable(prefix + "_sales_order");
-		salesItem = inStruct.getMetaTable(prefix + "_sales_item");
+		salesOrder = inStruct.getMetaTable(prefix + "_sale_order");
+		salesItem = inStruct.getMetaTable(prefix + "_sale_item");
 	}
 	
 	///

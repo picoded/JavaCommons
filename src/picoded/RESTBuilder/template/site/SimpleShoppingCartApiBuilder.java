@@ -244,7 +244,7 @@ public class SimpleShoppingCartApiBuilder {
 	/// ## HTTP Request Parameters (Optional)
 	///
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	         | Description                                                     |
+	/// | Parameter Name  | Variable Type	        | Description                                                     |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	/// | _oid            | String                  | [optional] The purchase order ID                                |
 	/// | status          | String                  | [optional] The order status                                     |
@@ -258,7 +258,7 @@ public class SimpleShoppingCartApiBuilder {
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	         | Description                                                     |
+	/// | Parameter Name  | Variable Type	        | Description                                                     |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	/// | _oid            | String                  | The purchase order request OID                                  |
 	/// | data            | {meta}                  | Purchase order details                                          |
@@ -400,24 +400,24 @@ public class SimpleShoppingCartApiBuilder {
 	/// ## HTTP Request Parameters (Optional)
 	///
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	         | Description                                                     |
+	/// | Parameter Name  | Variable Type	         | Description                                                    |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	/// | hmacMeta        |{meta}                   | Contains the following:                                         |
-   /// |                 |                         |  Key                                                            |
-   /// |                 |                         |  shopperEmail                                                   |
-   /// |                 |                         |  merchantReference                                              |
-   /// |                 |                         |  merchantAccount                                                |
-   /// |                 |                         |  currencyCode                                                   |
-   /// |                 |                         |  paymentAmount                                                  |
-   /// |                 |                         |  sessionValidity                                                |
-   /// |                 |                         |  shipBeforeDate                                                 |
-   /// |                 |                         |  skinCode                                                       |
+	/// |                 |                         |  Key                                                            |
+	/// |                 |                         |  shopperEmail                                                   |
+	/// |                 |                         |  merchantReference                                              |
+	/// |                 |                         |  merchantAccount                                                |
+	/// |                 |                         |  currencyCode                                                   |
+	/// |                 |                         |  paymentAmount                                                  |
+	/// |                 |                         |  sessionValidity                                                |
+	/// |                 |                         |  shipBeforeDate                                                 |
+	/// |                 |                         |  skinCode                                                       |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	         | Description                                                     |
+	/// | Parameter Name  | Variable Type	         | Description                                                    |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	/// | merchantSig     | String                  | The merchant signature/hmac                                     |
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
@@ -474,24 +474,24 @@ public class SimpleShoppingCartApiBuilder {
 	};
 
 	private static String calculateHMAC(String data, byte[] key)  throws java.security.SignatureException {
-		 try {
-			  // Create an hmac_sha256 key from the raw key bytes
-			  SecretKeySpec signingKey = new SecretKeySpec(key, HMAC_SHA256_ALGORITHM);
+		try {
+			// Create an hmac_sha256 key from the raw key bytes
+			SecretKeySpec signingKey = new SecretKeySpec(key, HMAC_SHA256_ALGORITHM);
 
-			  // Get an hmac_sha256 Mac instance and initialize with the signing key
-			  Mac mac = Mac.getInstance(HMAC_SHA256_ALGORITHM);
-			  mac.init(signingKey);
+			// Get an hmac_sha256 Mac instance and initialize with the signing key
+			Mac mac = Mac.getInstance(HMAC_SHA256_ALGORITHM);
+			mac.init(signingKey);
 
-			  // Compute the hmac on input data bytes
-			  byte[] rawHmac = mac.doFinal(data.getBytes(C_UTF8));
+			// Compute the hmac on input data bytes
+			byte[] rawHmac = mac.doFinal(data.getBytes(C_UTF8));
 
-			  // Base64-encode the hmac
-			  return  BaseEncoding.base64().encode(rawHmac);
-
-		 } catch (Exception e) {
-			  throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
-		 }
+			// Base64-encode the hmac
+			return  BaseEncoding.base64().encode(rawHmac);
+		} catch (Exception e) {
+			throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
+		}
 	};
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// RestBuilder template builder
@@ -517,7 +517,6 @@ public class SimpleShoppingCartApiBuilder {
 		productApi.setupRESTBuilder( rb, setPrefix + "product." );
 		salesOrderApi.setupRESTBuilder( rb, setPrefix + "sale.order." );
 		salesItemApi.setupRESTBuilder( rb, setPrefix + "sale.item." );
-
 
 		rb.getNamespace(setPrefix + "sale.order.create").put(HttpRequestType.GET, saleOrder_GET_and_POST);
 		rb.getNamespace(setPrefix + "sale.order.create").put(HttpRequestType.POST, saleOrder_GET_and_POST);

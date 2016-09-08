@@ -148,7 +148,7 @@ public class FormSet {
 
 			//Sanitisation of mappings with empty or null key names
 			//store into data after sanitisation
-			data = sanitiseEmptyOrNullMapKeys(data);
+			data = FormSet.sanitiseEmptyOrNullMapKeys(data);
 
 			//
 			// The form object
@@ -194,7 +194,7 @@ public class FormSet {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map<String, Object> sanitiseEmptyOrNullMapKeys(Map<String, Object> dataMap){
+	public static Map<String, Object> sanitiseEmptyOrNullMapKeys(Map<String, Object> dataMap){
 		Map<String, Object> retMap = new HashMap<String, Object>();
 
 		for(String key : dataMap.keySet()){
@@ -219,7 +219,7 @@ public class FormSet {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Object> sanitiseList (List<Object> dataList){
+	public static List<Object> sanitiseList (List<Object> dataList){
 		List<Object> retList = new ArrayList<Object>();
 
 		if(dataList == null){

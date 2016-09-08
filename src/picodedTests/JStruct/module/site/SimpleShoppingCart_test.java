@@ -49,7 +49,7 @@ public class SimpleShoppingCart_test {
 	
 	@After
 	public void tearDown() {
-		if(testObj != null) {
+		if (testObj != null) {
 			testObj.systemTeardown();
 		}
 		testObj = null;
@@ -71,7 +71,8 @@ public class SimpleShoppingCart_test {
 	@Test
 	public void cartListToCookieJSON() {
 		String testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}]]";
-		GenericConvertList<List<Object>> testCart = GenericConvert.toGenericConvertList( testJSON, new ArrayList<Object>() );
+		GenericConvertList<List<Object>> testCart = GenericConvert
+			.toGenericConvertList(testJSON, new ArrayList<Object>());
 		
 		String validJSON = "[[\"id-1\",10],[\"id-4\",10]]";
 		assertEquals(validJSON, testObj.cartListToCookieJSON(testCart));
@@ -84,19 +85,13 @@ public class SimpleShoppingCart_test {
 		productOwnerObject.put("name", "Scrooge Mcduck");
 		productOwnerObject.saveDelta();
 		
-		assertEquals( 0, testObj.getProductList( productOwnerObject._oid() ).size() );
+		assertEquals(0, testObj.getProductList(productOwnerObject._oid()).size());
 		
-		List<Object> prodList = ConvertJSON.toList("["+
-			"{"+
-				"\"name\" : \"product_01\""+
-			"},"+
-			"{"+
-				"\"name\" : \"product_02\""+
-			"}"+
-		"]"); 
+		List<Object> prodList = ConvertJSON.toList("[" + "{" + "\"name\" : \"product_01\"" + "}," + "{"
+			+ "\"name\" : \"product_02\"" + "}" + "]");
 		
-		assertEquals( 2, testObj.updateProductList( productOwnerObject._oid(), prodList ).size() );
-		assertEquals( 2, testObj.getProductList( productOwnerObject._oid() ).size() );
+		assertEquals(2, testObj.updateProductList(productOwnerObject._oid(), prodList).size());
+		assertEquals(2, testObj.getProductList(productOwnerObject._oid()).size());
 	}
 	
 	// // Test utility used to generate random maps

@@ -1,5 +1,8 @@
 package picoded.fileUtils;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,6 +12,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.imageio.ImageIO;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -33,10 +42,8 @@ public class PDFUtils {
 	/**
 	 * Merge multiple pdf into one pdf
 	 * 
-	 * @param fileList
-	 *            List<File>
-	 * @param file
-	 *            File
+	 * @param fileList List<File>
+	 * @param file File
 	 * 
 	 */
 	public static void mergePDF(List<File> fileList, File outFile) throws DocumentException, IOException {
@@ -63,10 +70,8 @@ public class PDFUtils {
 	/**
 	 * Merge multiple pdf into one pdf
 	 *
-	 * @param fileList
-	 *            List<InputStream>
-	 * @param outputStream
-	 *            OutputStream
+	 * @param fileList List<InputStream>
+	 * @param outputStream OutputStream
 	 *
 	 */
 	public static void mergePDF(List<InputStream> fileList, OutputStream outputStream) throws DocumentException,
@@ -138,8 +143,7 @@ public class PDFUtils {
 	/**
 	 * Count number of page in pdf document
 	 * 
-	 * @param pdfFileName
-	 *            InputStream
+	 * @param pdfFileName InputStream
 	 * 
 	 */
 	public static int countPDFPages(File pdfFileName) throws IOException {
@@ -152,8 +156,7 @@ public class PDFUtils {
 	/**
 	 * Count number of page in pdf document
 	 * 
-	 * @param pdfFileName
-	 *            InputStream
+	 * @param pdfFileName InputStream
 	 * 
 	 */
 	public static int countPDFPages(InputStream pdfFileName) throws IOException {
@@ -165,14 +168,10 @@ public class PDFUtils {
 	 * This method create new PDF file and add specified range of page from
 	 * source file.
 	 * 
-	 * @param inputFile
-	 *            File
-	 * @param fromPage
-	 *            int
-	 * @param toPage
-	 *            int
-	 * @param outputFile
-	 *            File
+	 * @param inputFile File
+	 * @param fromPage int
+	 * @param toPage int
+	 * @param outputFile File
 	 * 
 	 */
 	public static void splitPDF(File inputFile, int fromPage, int toPage, File outputFile) throws DocumentException,
@@ -198,14 +197,10 @@ public class PDFUtils {
 	 * This method create new PDF file and add specified range of page from
 	 * source file.
 	 * 
-	 * @param inputStream
-	 *            InputStram
-	 * @param fromPage
-	 *            int
-	 * @param toPage
-	 *            int
-	 * @param outputStream
-	 *            OutputStream
+	 * @param inputStream InputStram
+	 * @param fromPage int
+	 * @param toPage int
+	 * @param outputStream OutputStream
 	 * 
 	 */
 	public static void splitPDF(InputStream inputStream, int fromPage, int toPage, OutputStream outputStream)
@@ -243,4 +238,39 @@ public class PDFUtils {
 		}
 	}
 	
+	///
+	/// Convert first page of PDF doc to image byte array
+	///
+	/// @param byte[] pdfData pdf byte array
+	/// @Returns the image byet array of the first page in pdf doc
+	///
+	public static byte[] toJPEG(byte[] pdfData) throws IOException {
+		return toJPEG(pdfData, 0);
+	}
+	
+	///
+	/// Convert specified page of PDF doc to image byte array
+	///
+	/// @param byte[] pdfData pdf byte array
+	/// @param int page, page number in the pdf doc to return, page start from 0
+	/// @Returns the image byet array of the specified page in pdf doc.
+	/// @exception throws IndexOutOfBoundsException if the page number is out of range (page < 0 || page >= total pages)
+	///
+	public static byte[] toJPEG(byte[] pdfData, int page) throws IOException {
+		System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
+		// create document object from byte[]
+		PDDocument document = PDDocument.load(new ByteArrayInputStream(pdfData));
+		PDFRenderer pdfRenderer = new PDFRenderer(document);
+		// throw exeception if invalid page 
+		if (page < 0 || page >= document.getNumberOfPages()) {
+			throw new IndexOutOfBoundsException("page number is out of range");
+		}
+		// create buffered image for the specified page of pdf
+		BufferedImage bufferedImage = pdfRenderer.renderImageWithDPI(page, 300, ImageType.RGB);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "jpeg", baos);
+		document.close();
+		
+		return baos.toByteArray();
+	}
 }

@@ -158,14 +158,14 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 		JStruct_MetaTable[] layers = implementationLayers();
 		
 		// Final return obj
-		Map<String, Object> ret = null;  
+		Map<String, Object> ret = null;
 		for (int i = 0; i < layers.length; ++i) {
 			// Found a valid layer
 			if ((ret = layers[i].metaObjectRemoteDataMap_get(_oid)) != null) {
 				// Iterate back upwards and populate the upper layers
 				// And cache the layers inbetween =)
 				i = i - 1; // Start immediately at previous layer
-				for(; i >= 0; --i) {
+				for (; i >= 0; --i) {
 					layers[i].metaObjectRemoteDataMap_update(_oid, ret, null);
 				}
 				return ret;

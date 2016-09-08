@@ -36,6 +36,6 @@ public class ProxyGenericConvertList<V> extends AbstractListDecorator<V> impleme
 	/// Implments a JSON to string conversion
 	@Override
 	public String toString() {
-		return GenericConvert.toString((Object)this);
+		return GenericConvert.toString((Object) this);
 	}
 }

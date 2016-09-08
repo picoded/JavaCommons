@@ -50,7 +50,7 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 	/// BasePage constructor
 	public JSMLFormSet(BasePage inPage) {
 		basePage = inPage;
-		formSetFolder = new File(inPage.getJsmlTemplatePath()); 
+		formSetFolder = new File(inPage.getJsmlTemplatePath());
 		formSetURI = inPage.getContextURI();
 		// Validate
 		validateFormSetFolder();

@@ -34,6 +34,6 @@ public class GenericConvertArrayList<E> extends ArrayList<E> implements GenericC
 	/// Implments a JSON to string conversion
 	@Override
 	public String toString() {
-		return GenericConvert.toString((Object)this);
+		return GenericConvert.toString((Object) this);
 	}
 }

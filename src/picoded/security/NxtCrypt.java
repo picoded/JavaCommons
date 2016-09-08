@@ -57,7 +57,7 @@ public class NxtCrypt {
 	private static SecureRandom secureRand = null;
 	
 	/// Hash storage seperator, @ is intentionally used as opposed to $, as to make the stored passHash obviously not "php password_hash" format.
-	private static String seperator = "@"; 
+	private static String seperator = "@";
 	
 	/// Definable default salt length
 	public static int defaultSaltLength = 32; //bytes
@@ -134,7 +134,7 @@ public class NxtCrypt {
 			NxtCrypt.pbk = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 		}
 		if (NxtCrypt.secureRand == null) {
-			if( NxtCrypt.isStrongSecureRandom == false ) {
+			if (NxtCrypt.isStrongSecureRandom == false) {
 				//
 				// Using just plain old SecureRandom by default now.
 				// Frankly speaking I personally feel this is "secure enough",
@@ -225,7 +225,8 @@ public class NxtCrypt {
 	}
 	
 	/// Valid random string characters
-	private static char[] _randomstring_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456879".toCharArray();
+	private static char[] _randomstring_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456879"
+		.toCharArray();
 	
 	/// Generate a random byte array of strings at indicated length
 	/// Note: that the generated string array is strictly "alphanumeric" character spaces chars,

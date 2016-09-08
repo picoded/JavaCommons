@@ -18,7 +18,7 @@ import picoded.conv.ConvertJSON;
 import picoded.conv.GUID;
 import picoded.conv.MapValueConv;
 import picoded.conv.LessToCss;
-import picoded.fileUtils.*; 
+import picoded.fileUtils.*;
 import picoded.servlet.BasePage;
 import picoded.webTemplateEngines.FormGenerator.*;
 
@@ -177,16 +177,16 @@ public class JSMLForm {
 	/// Get the style for the form in the style.less
 	protected String getStyleLess() {
 		File styleFile = getFileInRootFolder("style.less");
-		if( styleFile == null ) {
+		if (styleFile == null) {
 			return "";
 		}
-		return FileUtils.readFileToString_withFallback( styleFile, "" );
+		return FileUtils.readFileToString_withFallback(styleFile, "");
 	}
-
+	
 	/// Get the style for the form as CSS format 
 	protected String getStyleCss() {
 		String less = getStyleLess();
-		if( less == null || less.length() <= 0 ) {
+		if (less == null || less.length() <= 0) {
 			return "";
 		}
 		
@@ -196,37 +196,36 @@ public class JSMLForm {
 	/// Get the injectable style set
 	protected String injectableCssBlock() {
 		String css = getStyleCss();
-		if( css == null || css.length() <= 0 ) {
+		if (css == null || css.length() <= 0) {
 			return "";
 		}
-		return "<style>"+css+"</style>";
+		return "<style>" + css + "</style>";
 	}
-	
 	
 	/// Sanatize the HTML prefix for PDF
 	protected String sanatizePrefixForPDF(String inStr) {
-		if(inStr.indexOf("<head") < 0) {
-			inStr = "<head>"+inStr+"</head>";
+		if (inStr.indexOf("<head") < 0) {
+			inStr = "<head>" + inStr + "</head>";
 		}
 		
-		if(inStr.indexOf("<body") < 0) {
+		if (inStr.indexOf("<body") < 0) {
 			inStr = inStr + "<body>";
 		}
 		
-		if(inStr.indexOf("<html") < 0) {
-			inStr = "<html>"+inStr;
+		if (inStr.indexOf("<html") < 0) {
+			inStr = "<html>" + inStr;
 		}
 		return inStr;
 	}
 	
 	/// Sanatize the HTML suffix for PDF
 	protected String sanatizeSuffixForPDF(String inStr) {
-		if(inStr.indexOf("</body>") < 0) {
+		if (inStr.indexOf("</body>") < 0) {
 			inStr = inStr + "</body>";
 		}
 		
-		if(inStr.indexOf("</html>") < 0) {
-			inStr = inStr+"</html>";
+		if (inStr.indexOf("</html>") < 0) {
+			inStr = inStr + "</html>";
 		}
 		return inStr;
 	}
@@ -321,7 +320,7 @@ public class JSMLForm {
 		
 		String cssBlock = injectableCssBlock();
 		if (bodyPrefixFile == null) {
-			return ""+cssBlock;
+			return "" + cssBlock;
 		}
 		
 		try {
@@ -734,16 +733,14 @@ public class JSMLForm {
 	// Get the full HTML for input / display
 	//
 	public String getFullHtml(boolean displayOnly) {
-		Map<String,Object> templateVars = new HashMap<String,Object>();
+		Map<String, Object> templateVars = new HashMap<String, Object>();
 		String context = formSetObj.basePage.getContextURI();
 		
 		templateVars.put("PagesRootURI", context);
 		templateVars.put("ContextURI", context);
 		
-		return (new JMTE(formSetObj.basePage.getPageTemplatePath())).parseTemplate(
-			generateHTML(null, displayOnly).toString(),
-			templateVars
-		);
+		return (new JMTE(formSetObj.basePage.getPageTemplatePath())).parseTemplate(generateHTML(null, displayOnly)
+			.toString(), templateVars);
 	}
 	
 	/// JMTE fallback support

@@ -1171,8 +1171,11 @@ public class AccountLogin extends BasePage {
 		++listCounter;
 	}
 	res.put("data", retList);
-	res.put("draw", req.getInt("draw"));
 	res.put("headers", headers);
+	res.put("draw", req.getInt("draw"));
+	res.put("recordsTotal", retList.size());
+	res.put("recordsFiltered", retList.size());
+	
 } catch (Exception e) {
 	res.put("error", e.getMessage());
 }

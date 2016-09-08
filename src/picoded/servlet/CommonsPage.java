@@ -38,16 +38,12 @@ import picoded.RESTBuilder.template.core.*;
 import picoded.webUtils.*;
 import picoded.webTemplateEngines.JSML.*;
 import picoded.page.builder.*;
+import picoded.page.jsml.*;
 
 ///
 /// Does all the standard USER API, Page, and forms setup
 ///
 public class CommonsPage extends BasePage {
-	
-	/// Enable or disable commons page Auth redirection
-	public boolean enableCommonWildcardAuthRedirection() {
-		return true;
-	}
 	
 	/// Authenticate the user, or redirects to login page if needed, this is not applied to API page
 	@Override
@@ -55,11 +51,21 @@ public class CommonsPage extends BasePage {
 		
 		// Gets the wildcard URI
 		String[] wildcardUri = requestWildcardUriArray();
-		if (wildcardUri == null) {
-			wildcardUri = new String[] {};
+		
+		//
+		// Blank wildcard redirects to "home" for root page request
+		// COMPULSORY as we do not support root page as of now
+		//
+		if (wildcardUri.length <= 0 || wildcardUri[0].trim().length() <= 0 || wildcardUri[0].equals("/")) {
+			sendRedirect((getContextURI() + "/" + JConfig().getString("sys.CommonsPage.rootPageRedirect", "home") ).replaceAll("//", "/"));
+			return false;
 		}
 		
-		boolean enableCommonWildcardAuth = enableCommonWildcardAuthRedirection();
+		// Enable or disable commons page Auth redirection
+		boolean commonWildcardAuth = JConfig().getBoolean("sys.CommonsPage.commonWildcardAuth", true);
+		boolean annoymousApiAccess = JConfigObj.getBoolean("sys.CommonsPage.annoymousApiAccess", false);
+		boolean publicSiteMode = JConfigObj.getBoolean("sys.CommonsPage.publicSiteMode", false);
+		boolean squashErrorMsg = JConfigObj.getBoolean("sys.CommonsPage.squashErrorMsg", false);
 		
 		//
 		// WEB-INF security
@@ -73,28 +79,41 @@ public class CommonsPage extends BasePage {
 			String fileExt = FileUtils.getExtension(fileName);
 			
 			//
-			// Always deny WEB-INF path
+			// Always deny WEB-INF path, and potential invisibles (safety)
 			//
 			if (wildcardUri[0].equalsIgnoreCase("WEB-INF") || wildcardUri[0].startsWith(".")) {
 				return false;
 			}
 			
-			// 
-			// Public files, grab it direct
-			//
-			if (fileName.equalsIgnoreCase("index.html") && (new File(getContextPath(), requestWildcardUri())).canRead()) {
-				return true;
-			}
-			
 			//
 			// Common wildcard pattern
 			//
-			if (enableCommonWildcardAuth) {
+			if (commonWildcardAuth) {
+				
+				//
+				// Public Site file mode - allow all outside "reserved keywords"
+				//
+				if( publicSiteMode ) {
+					if( !wildcardUri[0].equalsIgnoreCase("api") && !wildcardUri[0].equalsIgnoreCase("formset") ) {
+						return true;
+					}
+				}
+				
+				// 
+				// Public index.html? files, grab it direct
+				//
+				if (fileName.equalsIgnoreCase("index.html") && (new File(getContextPath(), requestWildcardUri())).canRead()) {
+					return true;
+				}
+				
+				//
 				// Exempt login page from auth
+				//
 				if (wildcardUri[0].equalsIgnoreCase("login")) {
-					String logout = requestParameters().getString("logout");
-					
+					//
 					// Handle page logout event
+					//
+					String logout = requestParameters().getString("logout");
 					if (logout != null && (logout.equalsIgnoreCase("1") || logout.equalsIgnoreCase("true"))) {
 						accountAuthTable().logoutAccount(getHttpServletRequest(), getHttpServletResponse());
 						sendRedirect((getContextURI() + "/login?logout_status=1").replaceAll("//", "/"));
@@ -103,18 +122,37 @@ public class CommonsPage extends BasePage {
 					
 					return true;
 				}
-				// Exempt common / index page from auth
-				if (wildcardUri[0].equalsIgnoreCase("common") || wildcardUri[0].equalsIgnoreCase("index")) {
+				
+				//
+				// Exempt common / index / build / login page from auth
+				//
+				if (wildcardUri[0].equalsIgnoreCase("common") || wildcardUri[0].equalsIgnoreCase("index")
+					|| wildcardUri[0].equalsIgnoreCase("login") || wildcardUri[0].equalsIgnoreCase("build")) {
 					return true;
 				}
-				// Exempt login API from auth
+				
+				//
+				// API based control
+				//
 				if (wildcardUri[0].equalsIgnoreCase("api")) {
+					//
+					// Allow annoymous API access
+					//
+					if( annoymousApiAccess ) {
+						return true;
+					}
+					
+					//
+					// Exempt login API from auth
+					//
 					if (wildcardUri.length >= 3 && wildcardUri[1].equalsIgnoreCase("account")
 						&& wildcardUri[2].equalsIgnoreCase("login")) {
 						return true;
 					}
 					
-					// Throw a login error
+					//
+					// Throw a login error - requires login object
+					//
 					if (currentAccount() == null) {
 						
 						getHttpServletResponse().setContentType("application/javascript");
@@ -124,61 +162,60 @@ public class CommonsPage extends BasePage {
 					}
 				}
 				
-				// Allow common asset files types
-				if ( //
-					  //
-					  // HTML, JS, CSS
-					  //
-				fileExt.equalsIgnoreCase("html") || //
-					fileExt.equalsIgnoreCase("js") || //
-					fileExt.equalsIgnoreCase("css") || //
-					fileExt.equalsIgnoreCase("less") || //
-					fileExt.equalsIgnoreCase("scss") || //
-					fileExt.equalsIgnoreCase("es6") ||
-					//
-					// Images
-					//
-					fileExt.equalsIgnoreCase("png") || //
-					fileExt.equalsIgnoreCase("jpg") || //
-					fileExt.equalsIgnoreCase("jpeg") || //
-					fileExt.equalsIgnoreCase("gif") || //
-					fileExt.equalsIgnoreCase("svg") || //
-					//
-					// PDF
-					//
-					fileExt.equalsIgnoreCase("pdf") || //
-					//
-					// Markdown, text
-					//
-					fileExt.equalsIgnoreCase("md") || //
-					fileExt.equalsIgnoreCase("txt") || //
-					//
-					// Fonts
-					//
-					fileExt.equalsIgnoreCase("otf") || //
-					fileExt.equalsIgnoreCase("eot") || //
-					fileExt.equalsIgnoreCase("ttf") || //
-					fileExt.equalsIgnoreCase("woff") || //
-					fileExt.equalsIgnoreCase("woff2") || //
-					//
-					// Others?
-					//
-					false) {
-					return true;
-				}
+				//
+				// Public site mode : Allow generated files outside protected zones
+				//
+				
+				// // Allow common asset files types
+				// if ( //
+				// 	  //
+				// 	  // HTML, JS, CSS
+				// 	  //
+				// fileExt.equalsIgnoreCase("html") || //
+				// 	fileExt.equalsIgnoreCase("js") || //
+				// 	fileExt.equalsIgnoreCase("css") || //
+				// 	fileExt.equalsIgnoreCase("less") || //
+				// 	fileExt.equalsIgnoreCase("scss") || //
+				// 	fileExt.equalsIgnoreCase("es6") ||
+				// 	//
+				// 	// Images
+				// 	//
+				// 	fileExt.equalsIgnoreCase("png") || //
+				// 	fileExt.equalsIgnoreCase("jpg") || //
+				// 	fileExt.equalsIgnoreCase("jpeg") || //
+				// 	fileExt.equalsIgnoreCase("gif") || //
+				// 	fileExt.equalsIgnoreCase("svg") || //
+				// 	//
+				// 	// PDF
+				// 	//
+				// 	fileExt.equalsIgnoreCase("pdf") || //
+				// 	//
+				// 	// Markdown, text
+				// 	//
+				// 	fileExt.equalsIgnoreCase("md") || //
+				// 	fileExt.equalsIgnoreCase("txt") || //
+				// 	//
+				// 	// Fonts
+				// 	//
+				// 	fileExt.equalsIgnoreCase("otf") || //
+				// 	fileExt.equalsIgnoreCase("eot") || //
+				// 	fileExt.equalsIgnoreCase("ttf") || //
+				// 	fileExt.equalsIgnoreCase("woff") || //
+				// 	fileExt.equalsIgnoreCase("woff2") || //
+				// 	//
+				// 	// Others?
+				// 	//
+				// 	false) {
+				// 	return true;
+				// }
 			}
 		}
 		
-		// Redirect to login, if current login is not valid
-		if (currentAccount() == null) {
-			sendRedirect((getContextURI() + "/login").replaceAll("//", "/"));
-			return false;
-		}
-		
-		// Blank wildcard redirects to "home" for valid users
-		if (enableCommonWildcardAuth
-			&& (wildcardUri.length <= 0 || wildcardUri[0].length() <= 0 || wildcardUri[0].equals("/"))) {
-			sendRedirect((getContextURI() + "/home").replaceAll("//", "/"));
+		//
+		// Redirect to login, if current login is not valid - and its not public mode
+		//
+		if (!publicSiteMode && currentAccount() == null) {
+			sendRedirect((getContextURI() + "/" + JConfigObj.getString("sys.CommonsPage.loginPage", "login") ).replaceAll("//", "/"));
 			return false;
 		}
 		
@@ -226,9 +263,17 @@ public class CommonsPage extends BasePage {
 			return true;
 		}
 		
-		// Indicates if its a JSML form usage
 		//
-		// @TODO unit test, and fix it, somehow it isnt working =(
+		// Indicates if its a FormSet page
+		//
+		if (wildcardUri != null && wildcardUri.length >= 1 && //
+			wildcardUri[0].equalsIgnoreCase("formset") ) {
+			(new FormSet(this)).processServletPageRequest(this, Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length));
+			return true;
+		}
+		
+		//
+		// Indicates if its a JSML form usage
 		//
 		if (wildcardUri != null && wildcardUri.length >= 1 && //
 			wildcardUri[0].equalsIgnoreCase("form") && //

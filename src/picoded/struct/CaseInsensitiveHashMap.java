@@ -112,6 +112,6 @@ public class CaseInsensitiveHashMap<K extends String, V> extends GenericConvertH
 	@Override
 	@SuppressWarnings("unchecked")
 	public String toString() {
-		return ConvertJSON.fromMap((Map<String,Object>)this);
+		return ConvertJSON.fromMap((Map<String, Object>) this);
 	}
 }

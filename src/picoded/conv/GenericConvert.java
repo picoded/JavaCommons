@@ -654,7 +654,7 @@ public class GenericConvert {
 		
 		// If List instance
 		if (input instanceof List) {
-			return new GenericConvertArrayList<V>( (List<V>)input );
+			return new GenericConvertArrayList<V>((List<V>) input);
 			//return ProxyGenericConvertMap.ensure((Map<K, V>) input);
 		}
 		
@@ -663,7 +663,7 @@ public class GenericConvert {
 			try {
 				List<Object> jsonList = ConvertJSON.toList((String) input);
 				if (jsonList != null) {
-					return new GenericConvertArrayList<V>( (List<V>)jsonList );
+					return new GenericConvertArrayList<V>((List<V>) jsonList);
 				}
 			} catch (Exception e) {
 				// Silence the exception

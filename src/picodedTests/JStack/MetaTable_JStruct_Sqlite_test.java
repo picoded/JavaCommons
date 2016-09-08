@@ -61,7 +61,7 @@ public class MetaTable_JStruct_Sqlite_test extends MetaTable_test {
 		JStruct[] structLayers = jsObj.structLayers();
 		
 		// Source of truth layer
-		JStruct sourceOfTruth = structLayers[ structLayers.length - 1 ];
+		JStruct sourceOfTruth = structLayers[structLayers.length - 1];
 		MetaTable trueMetaTable = sourceOfTruth.getMetaTable("MT_" + tableName);
 		
 		//

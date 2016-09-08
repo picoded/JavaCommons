@@ -66,6 +66,6 @@ public class ArrayListMap<K, V> extends HashMap<K, ArrayList<V>> {
 	/// Implments a JSON to string conversion
 	@Override
 	public String toString() {
-		return GenericConvert.toString((Object)this);
+		return GenericConvert.toString((Object) this);
 	}
 }

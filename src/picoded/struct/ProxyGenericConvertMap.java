@@ -21,16 +21,16 @@ public class ProxyGenericConvertMap<K, V> extends AbstractMapDecorator<K, V> imp
 	// Constructors
 	//
 	//------------------------------------------------------
-
+	
 	/// Consturctor
 	public ProxyGenericConvertMap() {
 		super();
 	}
-
+	
 	/// Consturctor
 	@SuppressWarnings("unchecked")
-	public ProxyGenericConvertMap(Map<? extends K,? extends V> m) {
-		super((Map<K,V>)m);
+	public ProxyGenericConvertMap(Map<? extends K, ? extends V> m) {
+		super((Map<K, V>) m);
 	}
 	
 	//------------------------------------------------------
@@ -38,7 +38,7 @@ public class ProxyGenericConvertMap<K, V> extends AbstractMapDecorator<K, V> imp
 	// ensure its type
 	//
 	//------------------------------------------------------
-
+	
 	/// The static builder for the map
 	@Deprecated
 	public static <A, B> GenericConvertMap<A, B> ensureGenericConvertMap(Map<A, B> inMap) {
@@ -63,10 +63,10 @@ public class ProxyGenericConvertMap<K, V> extends AbstractMapDecorator<K, V> imp
 	// Overwrites
 	//
 	//------------------------------------------------------
-
+	
 	/// Implments a JSON to string conversion
 	@Override
 	public String toString() {
-		return GenericConvert.toString((Object)this);
+		return GenericConvert.toString((Object) this);
 	}
 }

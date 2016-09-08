@@ -148,8 +148,8 @@ public class PageComponentFilter {
 			
 			// Fix a wierd bug in JMTE when an object is "invalidated", 
 			// if it has no, or only a single property 
-			while(tagArgs.size() < 2) {
-				tagArgs.put("_bug"+tagArgs.size(), 0);
+			while (tagArgs.size() < 2) {
+				tagArgs.put("_bug" + tagArgs.size(), 0);
 			}
 			
 			// Component "this" reference

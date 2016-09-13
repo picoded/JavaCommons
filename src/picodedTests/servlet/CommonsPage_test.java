@@ -40,10 +40,10 @@ public class CommonsPage_test extends Mockito {
 		assertNotNull(testPage);
 	}
 	
-	@Test
-	public void enableCommonWildcardAuthRedirection() {
-		assertTrue(testPage.enableCommonWildcardAuthRedirection());
-	}
+//	@Test
+//	public void enableCommonWildcardAuthRedirection() {
+//		assertTrue(testPage.enableCommonWildcardAuthRedirection());
+//	}
 	
 	//@Test //can not be tested due to Servlet where request and response is NULL
 	public void doAuth() throws Exception {

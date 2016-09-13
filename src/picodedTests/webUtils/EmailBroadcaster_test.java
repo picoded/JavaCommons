@@ -26,16 +26,16 @@ public class EmailBroadcaster_test {
 		emailBroadcaster = new EmailBroadcaster(smtpUrl, username, password, fromAddress, true, false);
 	}
 	
-	@Test
-	public void sendEmailTest() throws Exception {
-		if (!testEnabled) {
-			return;
-		}
-		
-		String subject = "Hi, from :" + username;
-		String htmlContent = "Hi, This is " + username + " , how are you? Regards " + username;
-		String[] toAddresses = new String[] { "xyz@abc.com" };
-		// HashMap<String, String> fileAttachments = new HashMap<String, String>();
-		emailBroadcaster.sendEmail(subject, htmlContent, toAddresses, null, null, null, fromAddress);
-	}
+//	@Test
+//	public void sendEmailTest() throws Exception {
+//		if (!testEnabled) {
+//			return;
+//		}
+//		
+//		String subject = "Hi, from :" + username;
+//		String htmlContent = "Hi, This is " + username + " , how are you? Regards " + username;
+//		String[] toAddresses = new String[] { "xyz@abc.com" };
+//		// HashMap<String, String> fileAttachments = new HashMap<String, String>();
+//		emailBroadcaster.sendEmail(subject, htmlContent, toAddresses, null, null, null, fromAddress);
+//	}
 }

@@ -606,4 +606,23 @@ public class JSql_Oracle_test {
 			new String[] { "CDATE", "CBY", "LDATE" }
 		).execute();
 	}
+	
+	@Test 
+	public void upsertWithDate() throws JSqlException {
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
+		
+		JSqlObj.execute_raw("CREATE TABLE " + testTableName + " ( PTK VARCHAR2(32), RNO VARCHAR2(32), CDATE DATE, ACODE VARCHAR2(5), CBY VARCHAR2(50), LDATE TIMESTAMP(6) )");
+		JSqlObj.createTableIndexQuerySet(testTableName, "PTK", "PRIMARY KEY");
+		
+		JSqlObj.upsertQuerySet( 
+			testTableName,
+			new String[] { "PTK" },
+			new Object[] { "TEST_KEY" },
+			new String[] { "CDATE", "RNO", "ACODE" },
+			new Object[] { new Date(), "12345",  "CODE" },
+			null,
+			null,
+			new String[] { "CBY", "LDATE" }
+		).execute();
+	}
 }

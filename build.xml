@@ -15,7 +15,8 @@
 	<property name="test-temp" value="${basedir}/test-files/tmp" />
 
 	<property name="src-path" value="src/picoded" />
-	<property name="src-test" value="src/picodedTests" />
+	<property name="src-test" value="test/picoded" />
+	<property name="src-test-old" value="src/picodedTests" />
 	<property name="src-experimental" value="src/picodedX" />
 
 	<property name="lib-organized-dir" value="lib-organized" />
@@ -303,14 +304,18 @@
 			<fileset dir="bin/libs" includes="*.jar" />
 			<fileset dir="build-tools/junit" includes="*.jar" />
 		</path>
-
+		
 		<mkdir dir="${build-classes}"/>
+		<mkdir dir="${src-test}"/>
+		<mkdir dir="${src-test-old}"/>
+		
 		<javac destdir="${build-classes}" classpathref="lib.test.ref" debug="true" debuglevel="lines,source"
 				 includeantruntime="false">
  			<compilerarg value="-Xlint:all"/>
  			<compilerarg value="-Xlint:-serial"/>
 			<src path="${src-path}"/>
 			<src path="${src-test}"/>
+			<src path="${src-test-old}"/>
 			<exclude name="**/package-info.java"/>
 		</javac>
 	</target>
@@ -383,7 +388,7 @@
 				<batchtest haltonfailure="no" todir="${junit-reports}">
 
 					<fileset dir="src">
-						<include name="picodedTests/**/*_test.java"/>
+						<include name="picoded/**/*_test.java"/>
 					</fileset>
 
 					<formatter type="plain"/>

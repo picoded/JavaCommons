@@ -24,7 +24,7 @@ else
 		fi
 		
 		
-		# Ensure test classes ends with the _test suffixes
+		# Ensure test classes ends with the _test suffixes, and picodedTest prefix
 		#------------------------------------------------------------------------------
 		_TEST="_test";
 		
@@ -35,14 +35,12 @@ else
 			TESTCLASS="$TESTCLASS$_TEST";
 		fi
 		
-		# No more test case prefix adding : Test cases now run in same namespace
-		#------------------------------------------------------------------------------
-		# if [[ $TESTCLASS == picodedTests* ]] 
-		# then
-		# 	TESTCLASS="$TESTCLASS";
-		# else 
-		# 	TESTCLASS="picodedTests.$TESTCLASS";
-		# fi
+		if [[ $TESTCLASS == picodedTests* ]] 
+		then
+			TESTCLASS="$TESTCLASS";
+		else 
+			TESTCLASS="picodedTests.$TESTCLASS";
+		fi
 		
 		# Runs the test
 		#----------------------------------------------------------

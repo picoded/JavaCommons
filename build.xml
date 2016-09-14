@@ -387,7 +387,7 @@
 
 				<batchtest haltonfailure="no" todir="${junit-reports}">
 
-					<fileset dir="src">
+					<fileset dir="test">
 						<include name="picoded/**/*_test.java"/>
 					</fileset>
 

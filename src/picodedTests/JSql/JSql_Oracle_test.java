@@ -14,6 +14,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Date;
+
 import picoded.JSql.JSql;
 import picoded.JSql.JSqlException;
 import picoded.JSql.JSqlQuerySet;
@@ -417,7 +419,7 @@ public class JSql_Oracle_test {
 		assertEquals("Upsert value check failed", "not found", r.readRowCol(0, "col2"));
 	}
 	
-	//@Test
+	@Test
 	public void upsertQuerySetWithDefault() throws JSqlException {
 		row1to7setup();
 		JSqlResult r = null;
@@ -426,8 +428,8 @@ public class JSql_Oracle_test {
 		JSqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "_1`").dispose(); //cleanup (just incase)
 		
 		JSqlObj.executeQuery(
-			"CREATE TABLE IF NOT EXISTS " + testTableName
-				+ " ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(10) DEFAULT 'MyDef')").dispose(); //valid table creation : no exception
+			"CREATE TABLE IF NOT EXISTS " + testTableName + "_1"
+				+ " ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(10) )").dispose(); //valid table creation : no exception
 		
 		//Upsert query
 		assertNotNull(qSet = JSqlObj.upsertQuerySet( //
@@ -586,4 +588,22 @@ public class JSql_Oracle_test {
 		assertEquals("ALTER TABLE my_table ADD COLUMN col3 varchar(10)", s);
 	}
 	
+	@Test 
+	public void upsertWithMisc() throws JSqlException {
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
+		
+		JSqlObj.execute_raw("CREATE TABLE " + testTableName + " ( PTK VARCHAR2(32), RNO VARCHAR2(32), CDATE DATE, ACODE VARCHAR2(5), CBY VARCHAR2(50), LDATE TIMESTAMP(6) )");
+		JSqlObj.createTableIndexQuerySet(testTableName, "PTK", "PRIMARY KEY");
+		
+		JSqlObj.upsertQuerySet( 
+			testTableName,
+			new String[] { "PTK" },
+			new Object[] { "TEST_KEY" },
+			new String[] { "RNO", "ACODE" },
+			new Object[] { "12345",  "CODE" },
+			null,
+			null,
+			new String[] { "CDATE", "CBY", "LDATE" }
+		).execute();
+	}
 }

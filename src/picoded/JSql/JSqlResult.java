@@ -16,6 +16,7 @@ import picoded.JSql.JSqlException;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.sql.Blob;
 import java.io.IOException;
 
 // OracleSQL types
@@ -119,7 +120,11 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Lis
 							} catch (IOException e) {
 								throw new JSqlException("CLOB Processing Error", e);
 							}
-						}
+						} else if (Blob.class.isInstance(tmpObj)) {
+							Blob bob = (Blob)tmpObj;
+							tmpObj = bob.getBytes(1, (int)bob.length());
+							bob.free();
+						} 
 						
 						colArr.add(rowCount, tmpObj);
 					}

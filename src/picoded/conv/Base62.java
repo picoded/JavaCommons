@@ -28,7 +28,24 @@ public class Base62 extends BaseX {
 		}
 	}
 	
+	// ---------------------------------
+	// Singleton
+	// ---------------------------------
+	
+	/// Singleton cache
+	private static Base62 instance = null;
+	
+	/// Singleton copy 
+	public Base62 getInstance() {
+		if(instance != null) {
+			return instance;
+		}
+		return instance = new Base62();
+	}
+	
+	
 	/// Self refencing static copy
+	@Deprecated 
 	public final static Base62 obj = new Base62();
 	
 }

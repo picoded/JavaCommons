@@ -35,14 +35,14 @@ else
 			TESTCLASS="$TESTCLASS$_TEST";
 		fi
 		
-		# No more test case prefix adding : Test cases now run in same namespace
+		# No more picodedTest case prefix adding : Test cases now run in same namespace
 		#------------------------------------------------------------------------------
-		# if [[ $TESTCLASS == picodedTests* ]] 
-		# then
-		# 	TESTCLASS="$TESTCLASS";
-		# else 
-		# 	TESTCLASS="picodedTests.$TESTCLASS";
-		# fi
+		if [[ $TESTCLASS == picoded* ]] 
+		then
+			TESTCLASS="$TESTCLASS";
+		else 
+			TESTCLASS="picoded.$TESTCLASS";
+		fi
 		
 		# Runs the test
 		#----------------------------------------------------------

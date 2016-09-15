@@ -54,7 +54,7 @@ else
 		else
 			echo "Function: $TESTFUNCTION"
 			echo "---------------------------------------------------------------------------------"
-			java -cp "./build-tools/junit/*:./bin/libs/*:./bin/classes" picoded.JUnit.SingleJUnitTestRunner "$TESTCLASS#$TESTFUNCTION"
+			java -cp "./build-tools/junit/*:./bin/libs/*:./bin/classes" picoded.junit.SingleJUnitTestRunner "$TESTCLASS#$TESTFUNCTION"
 		fi
 	done
 fi

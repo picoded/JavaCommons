@@ -842,4 +842,15 @@ public class JSql extends BaseInterface {
 	public String genericSqlParser(String inString) throws JSqlException {
 		return null;
 	}
+
+	//
+	// Added by Sam
+	//
+	public java.sql.Blob createBlob() throws Exception {
+		try{
+			return sqlConn.createBlob();
+		}catch(Exception ex){
+			throw new RuntimeException(ex);
+		}
+	}
 }

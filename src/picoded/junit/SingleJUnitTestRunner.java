@@ -18,6 +18,7 @@ public class SingleJUnitTestRunner {
 	
 	/// System out print ln handling
 	private static void println(String in) {
+		// Note: this is intentionally not using logger, to ensure same output format with JUnit.
 		System.out.println(in);
 	}
 	
@@ -25,6 +26,8 @@ public class SingleJUnitTestRunner {
 	///
 	/// @param  Class name to run test
 	/// @param  Method/Function name to run test
+	///
+	/// @return  Number of successful test cases ( 1 ) or failure ( -1 )
 	public static int runTestMethod(String className, String methodName) {
 		try {
 			Request request = Request.method(Class.forName(className), methodName);
@@ -53,13 +56,15 @@ public class SingleJUnitTestRunner {
 				return -result.getFailureCount();
 			}
 		} catch(ClassNotFoundException e) {
-			throw new IllegalArgumentException("Class not found for : "+className);
+			throw new IllegalArgumentException("Class not found for : "+className, e);
 		}
 	}
 	
 	/// Calls a method name in a test class
 	///
 	/// @param  ClassName#MethodName format string
+	///
+	/// @return  Number of successful test cases ( 1 ) or failure ( -1 )
 	public static int runTestMethod(String classAndMethod) {
 		String[] formatPair = classAndMethod.split("#");
 		
@@ -80,6 +85,8 @@ public class SingleJUnitTestRunner {
 	
 	///
 	/// Used internally to help provide code coverage testing of failure conditons. Do not use
+	/// 
+	/// Note: Intentionally breaking convention, to indicate with an _underscore, that this *should not be used*.
 	///
 	@Test
 	public void _thisAssertsFailure() {

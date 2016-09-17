@@ -1,5 +1,7 @@
 package picoded.junit;
 
+// Junit includes
+import static org.junit.Assert.*;
 import org.junit.*;
 import org.junit.runner.*;
 import org.junit.runner.notification.Failure;
@@ -13,11 +15,6 @@ import org.junit.runner.notification.Failure;
 /// `./runTest.sh  package.namespace.classname#testFunction`
 ///
 public class SingleJUnitTestRunner {
-	
-	/// Disable constructor
-	private SingleJUnitTestRunner() {
-		// blank intentionally
-	}
 	
 	/// System out print ln handling
 	private static void println(String in) {
@@ -80,4 +77,13 @@ public class SingleJUnitTestRunner {
 			runTestMethod(pair);
 		}
 	}
+	
+	///
+	/// Used internally to help provide code coverage testing of failure conditons. Do not use
+	///
+	@Test
+	public void _thisAssertsFailure() {
+		assertTrue(false);
+	}
+	
 }

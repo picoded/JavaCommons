@@ -29,6 +29,11 @@ public class SingleJUnitTestRunner_test {
 		assertEquals(1, SingleJUnitTestRunner.runTestMethod("picoded.junit.SingleJUnitTestRunner_test#isTrue"));
 	}
 	
+	@Test 
+	public void checkFailure() {
+		assertEquals(-1, SingleJUnitTestRunner.runTestMethod("picoded.junit.SingleJUnitTestRunner#_thisAssertsFailure"));
+	}
+	
 	@Test(expected=IllegalArgumentException.class)
 	public void classNotFoundTest() {
 		SingleJUnitTestRunner.main("picoded.junit.ThisClassDoesNotExsits#methodName");

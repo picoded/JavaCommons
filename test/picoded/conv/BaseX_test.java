@@ -14,6 +14,11 @@ import java.lang.reflect.InvocationTargetException;
 /// The actual test suite
 public class BaseX_test {
 	
+	// Test run multiplier
+	protected int testRunMultiplier = 500;
+	protected int stringAndByteMaxLength = 100;
+	protected int stringAndByteFixedLength = 22;
+	
 	// The actual test object
 	protected BaseX baseObj = null;
 	
@@ -51,15 +56,19 @@ public class BaseX_test {
 	@Test
 	public void stringToBitLengthAndBack() {
 		// min, max
-		int strLen = RandomUtils.nextInt(1, 50);
+		int strLen = RandomUtils.nextInt(1, stringAndByteMaxLength);
 		
 		// Convert string length and back
+		assertEquals( strLen, baseObj.bitToStringLength(baseObj.stringToBitLength(strLen)) );
+		
+		// Fixed length test (gurantee memoizer hit)
+		strLen = stringAndByteFixedLength;
 		assertEquals( strLen, baseObj.bitToStringLength(baseObj.stringToBitLength(strLen)) );
 	}
 	
 	@Test
 	public void stringToBitLengthAndBackMultiple() {
-		for (int a = 0; a < 500; ++a) {
+		for (int a = 0; a < testRunMultiplier; ++a) {
 			stringToBitLengthAndBack();
 		}
 	}
@@ -70,21 +79,74 @@ public class BaseX_test {
 	@Test
 	public void encodeAndDecodeOnce() {
 		// min, max
-		int byteLen = RandomUtils.nextInt(1, 50);
+		int byteLen = RandomUtils.nextInt(1, stringAndByteMaxLength);
 		
 		// raw byteArray to encode
+		String encodedString;
 		byte[] byteArr = RandomUtils.nextBytes(byteLen);
 		
 		// Encode the byte array to string
-		String encodedString;
 		assertNotNull(encodedString = baseObj.encode(byteArr));
 		assertArrayEquals(byteArr, baseObj.decode(encodedString, byteLen));
+		
+		// Fixed length test (gurantee memoizer hit)
+		byteLen = stringAndByteFixedLength;
+		byteArr = RandomUtils.nextBytes(byteLen);
+		
+		// Encode the byte array to string
+		assertNotNull(encodedString = baseObj.encode(byteArr));
+		assertArrayEquals(byteArr, baseObj.decode(encodedString, byteLen));
+		
 	}
 	
 	@Test
 	public void encodeAndDecodeMultiple() {
-		for (int a = 0; a < 500; ++a) {
+		for (int a = 0; a < testRunMultiplier; ++a) {
 			encodeAndDecodeOnce();
 		}
 	}
+	
+	///
+	/// random hash test
+	///
+	@Test
+	public void hashAllTheStuff() {
+		// min, max
+		int byteLen = RandomUtils.nextInt(1, stringAndByteMaxLength);
+		
+		// raw byteArray to encode
+		byte[] randArr = RandomUtils.nextBytes(byteLen);
+		String randStr = baseObj.encode(randArr);
+		
+		assertNotNull( baseObj.md5hash(randArr) );
+		assertNotNull( baseObj.md5hash(randStr) );
+		
+		assertNotNull( baseObj.sha1hash(randArr) );
+		assertNotNull( baseObj.sha1hash(randStr) );
+		
+		assertNotNull( baseObj.sha256hash(randArr) );
+		assertNotNull( baseObj.sha256hash(randStr) );
+		
+		// Fixed length test varient
+		byteLen = stringAndByteFixedLength;
+		randArr = RandomUtils.nextBytes(byteLen);
+		randStr = baseObj.encode(randArr);
+		
+		assertNotNull( baseObj.md5hash(randArr) );
+		assertNotNull( baseObj.md5hash(randStr) );
+		
+		assertNotNull( baseObj.sha1hash(randArr) );
+		assertNotNull( baseObj.sha1hash(randStr) );
+		
+		assertNotNull( baseObj.sha256hash(randArr) );
+		assertNotNull( baseObj.sha256hash(randStr) );
+	}
+	
+	@Test
+	public void hashAllTheStuffMultiple() {
+		for (int a = 0; a < testRunMultiplier; ++a) {
+			hashAllTheStuff();
+		}
+	}
+	
 }

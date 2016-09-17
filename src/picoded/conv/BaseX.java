@@ -2,7 +2,6 @@ package picoded.conv;
 
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -68,13 +67,17 @@ public class BaseX {
 	/// Calculate the String length needed for the given bit count,
 	///
 	/// The following is the condition needed to be met with the lowest N
-	/// value to the given bit length, to satisfy the condition.
+	/// value to the given bit length, for a valid return result.
 	///
 	/// (2^B) - (X^N) <= 0
 	///
-	/// B - the Bit length count
+	/// B - the Bit length count (input parameter)
 	/// X - the Base numeric length
 	/// N - the Required string length (the return value)
+	///
+	/// @param  Bit length to use
+	/// 
+	/// @return Lowest string length where valid
 	///
 	public int bitToStringLength(int bitlength) {
 		int n = 1;
@@ -106,6 +109,10 @@ public class BaseX {
 	/// Note due to the encoding differences, this value can be higher then its,
 	/// reverse function `bitToStringLength`
 	///
+	/// @param  The string length
+	///
+	/// @return Highest bit length possible
+	///
 	public int stringToBitLength(int stringLength) {
 		int n = 1;
 		
@@ -130,26 +137,49 @@ public class BaseX {
 		return n;
 	}
 	
+	///
 	/// Conversion from string to byte array to baseX string
+	///
+	/// @param  Byte Array values to encode
+	///
+	/// @return Encoded string
+	///
 	public String encode(byte[] bArr) {
+		
+		// String length needed
+		int stringlength = bitToStringLength(bArr.length * 8);
 		
 		// Variables setup
 		int remainder;
-		int stringlength = bitToStringLength(bArr.length * 8); // Derived string
-		// length needed
 		StringBuilder ret = new StringBuilder();
-		BigInteger[] dSplit = new BigInteger[] { (new BigInteger(1, bArr)), null };
 		
-		// For every string character needed (to fit byte array), derive the
-		// value
+		// Byte array as a single huge BigInt
+		BigInteger bArrValue = new BigInteger(1, bArr);
+		
+		// Pair of divided value, and remaider
+		BigInteger[] dSplit = new BigInteger[] { bArrValue, null };
+		
+		// For every string character needed (to fit the byte array), 
+		// derive its value, by dividing the current value by charlength.
 		for (int a = 0; a < stringlength; ++a) {
 			dSplit = dSplit[0].divideAndRemainder(inCharsetLength);
 			
+			// Use the remainder, to get the char
 			remainder = dSplit[1].intValue();
-			ret.append(inCharset.charAt((remainder < 0) ? 0 : remainder));
+			
+			// As the bArrValue is always positive based,
+			// Remainder can always be assumed to be positive.
+			//
+			// Its simply elementry math =)
+			//
+			// Hence no remainder <= 0 checks is required
+			ret.append(inCharset.charAt(remainder));
+			
 		}
-		ret.reverse();
-		return ret.toString();
+		
+		// Reverse the string value before returning
+		// This confroms to most base encoding format
+		return ret.reverse().toString();
 	}
 	
 	///
@@ -159,22 +189,45 @@ public class BaseX {
 	///
 	/// Use the byteLength varient, if the exact byte space is known.
 	///
+	/// @param  Encoded string to convert
+	///
+	/// @return Decoded byte array
+	///
 	public byte[] decode(String encodedString) {
 		return decode(encodedString, -1);
 	}
 	
-	/// The byteLength varients outputs the data up to the given size. Note
-	/// that prefix extra bits will be loss
-	/// if encoded string value is larger then the byteLength can hold.
-	/// Similarly, blank byte values will preced
+	///
+	/// The byteLength varients outputs the data up to the given size. 
+	///
+	/// Note that prefix extra bits will be loss if encoded string value 
+	/// is larger then the byteLength can hold.
+	///
+	/// Similarly, blank byte values will be appeneded
 	/// if byteLength is larger then the actual encoded value.
 	///
-	/// byteLength of -1, will use the automatically derived byte length base
-	/// on the string length.
+	/// byteLength of -1, will use the automatically derived byte length from
+	/// string length.
+	///
+	/// @param  Encoded string to convert
+	/// @param  Byte length to use
+	///
+	/// @return Decoded byte array
+	///
 	public byte[] decode(String encodedString, int byteLength) {
-		return decode(encodedString, byteLength, false);
+		return decode(encodedString, byteLength, true);
 	}
 	
+	///
+	/// A varient where, encoding loss handling can be set as strict,
+	/// Such that an exception is thrown on mismatch of data length.
+	///
+	/// @param  Encoded string to convert
+	/// @param  Byte length to use
+	/// @param  Set this to false, to make the byte encoding length strict
+	///
+	/// @return Decoded byte array
+	///
 	public byte[] decode(String encodedString, int byteLength, boolean acceptEncodingLoss) {
 		
 		// Variable setup
@@ -189,69 +242,94 @@ public class BaseX {
 				byteLength++;
 			}
 		}
+		
+		// Start off with blank value
 		BigInteger encodedValue = value0_BigInteger;
 		
-		// Reverse the encoded string, to process as BigInteger
-		// encodedString = new
-		// StringBuilder(encodedString).reverse().toString();
-		encodedString = new StringBuilder(encodedString).toString();
+		// No reversal is done, as reversal is performed on the "encode" step
+		// This is the same as base64 format.
+		//
+		// encodedString = StringBuilder(encodedString).reverse().toString();
 		
 		// Iterate the characters and get the encoded value
 		for (char character : encodedString.toCharArray()) {
 			indx = inCharset.indexOf(character);
 			if (indx < 0) {
-				throw new IllegalArgumentException("Invalid character(s) in string: `" + character + "` for full string:"
+				throw new IllegalArgumentException("Invalid character `" + character + "` for encoded string:"
 					+ encodedString);
 			}
 			
+			// Process each character into the BigInteger value
 			encodedValue = encodedValue.multiply(inCharsetLength).add(BigInteger.valueOf(indx));
 		}
+		
+		// Converts the BigInteger to a byte array value
 		byte[] fullEncodedValue = encodedValue.toByteArray();
-		// ArrayUtils.reverse(fullEncodedValue);
+		
+		// Exact desired byteLength match found, returns
 		if (fullEncodedValue.length == byteLength) {
 			return fullEncodedValue;
 		}
 		
-		// The actual return array
+		// The actual return array (to format to new byte length)
 		byte[] retValue = new byte[byteLength];
 		
-		// Initialize the array, is this needed???
-		// @TODO: Check if this step is even needed in java, it is for C. If it
-		// isnt, optimize it out
-		for (int a = 0; a < byteLength; ++a) {
-			retValue[a] = 0;
-		}
+		// Note that initializing the array with 0 is not needed in java
+		// as this will be its default behaviour
+		//
+		// See: http://stackoverflow.com/a/16475488
+		//-----------------------------------------------------------------
+		// for (int a = 0; a < byteLength; ++a) {
+		// 	retValue[a] = 0;
+		// }
 		
-		// Actual value is larger, NOTE there will be bit value loss
 		if (fullEncodedValue.length > byteLength) {
+			//
+			// Actual value is larger, then the targeted length. Note there might be bit value loss
+			//
+			
+			// Position to start the data copy from, position prior values is "discarded"
 			int copyFrom = (fullEncodedValue.length - byteLength);
 			
-			for (int a = 0; a < copyFrom; ++a) {
-				if (fullEncodedValue[a] != 0) {
-					if (!acceptEncodingLoss) {
-						throw new RuntimeException("Encoded value loss for givent byteLength(" + byteLength
+			// Does an encoding loss check if acceptEncodingLoss is set to false.
+			//
+			// Check the first few additional bytes, if its "zero", and hence suffer from no encoding lost.
+			// If a non zero value is found. Assume values will be lost to encoding, hence throw an error.
+			if (!acceptEncodingLoss) {
+				for (int a = 0; a < copyFrom; ++a) {
+					if (fullEncodedValue[a] != 0) {
+						throw new IllegalArgumentException("Encoded value loss for given byteLength(" + byteLength
 							+ ") for input encodedString: " + encodedString);
 					}
 				}
 			}
 			
+			// Copies the value over to the final return array
 			System.arraycopy( //
-				fullEncodedValue, copyFrom, // original value
-				retValue, 0, // copy despite data loss?
-				byteLength // all the data
-				);
-		} else { // is less, as equal is already checked above and is hence not
-					// possible
+				fullEncodedValue, // original value
+				copyFrom, // Start copying from
+				retValue, // Copy to target
+				0, // Start from position 0
+				byteLength // With all the remainding data
+				); //
+			
+		} else {
+			//
+			// is definately less, as equal is already checked above
+			//
+			
+			// Copies the value over to the final return array
 			System.arraycopy( //
-				fullEncodedValue, 0, // original value
-				retValue, retValue.length - fullEncodedValue.length, // copy
-				// despite
-				// data
-				// loss?
+				fullEncodedValue, // original value
+				0, // Start from 0 position
+				retValue, //Return value
+				// start position (all before it will be zero)
+				retValue.length - fullEncodedValue.length, //
 				fullEncodedValue.length // all the data
 				);
 		}
 		
+		// The actual return array
 		return retValue;
 	}
 	
@@ -260,31 +338,55 @@ public class BaseX {
 	//-----------------------------------------------
 	
 	/// Hashes the input byte array, into the baseX format
+	///
+	/// @param  The byte array to do md5 hash
+	///
+	/// @return  Hash result in the encoded base format
 	public String md5hash(byte[] byteArr) {
 		return encode(DigestUtils.md5(byteArr));
 	}
 	
-	/// Hashes the input string, into the baseX format
+	/// Hashes the input byte array, into the baseX format
+	///
+	/// @param  The byte array to do md5 hash
+	///
+	/// @return  Hash result in the encoded base format
 	public String md5hash(String str) {
 		return encode(DigestUtils.md5(str));
 	}
 	
 	/// Hashes the input byte array, into the baseX format
+	///
+	/// @param  The byte array to do sha1 hash
+	///
+	/// @return  Hash result in the encoded base format
 	public String sha1hash(byte[] byteArr) {
 		return encode(DigestUtils.sha1(byteArr));
 	}
 	
-	/// Hashes the input string, into the baseX format
+	/// Hashes the input byte array, into the baseX format
+	///
+	/// @param  The byte array to do sha1 hash
+	///
+	/// @return  Hash result in the encoded base format
 	public String sha1hash(String str) {
 		return encode(DigestUtils.sha1(str));
 	}
 	
 	/// Hashes the input byte array, into the baseX format
+	///
+	/// @param  The byte array to do sha256 hash
+	///
+	/// @return  Hash result in the encoded base format
 	public String sha256hash(byte[] byteArr) {
 		return encode(DigestUtils.sha256(byteArr));
 	}
 	
-	/// Hashes the input string, into the baseX format
+	/// Hashes the input byte array, into the baseX format
+	///
+	/// @param  The byte array to do sha256 hash
+	///
+	/// @return  Hash result in the encoded base format
 	public String sha256hash(String str) {
 		return encode(DigestUtils.sha256(str));
 	}

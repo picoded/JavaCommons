@@ -1,24 +1,20 @@
 package picoded.conv;
 
-// Target test class
+// Junit includes
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.After;
-// Test Case include
 import org.junit.Before;
 import org.junit.Test;
 
+// Classes used in test case
 import picoded.conv.Base62;
 import picoded.conv.BaseX;
-// Classes used in test case
 
-///
-/// Test Case for picoded.struct.CaseInsensitiveHashMap
-///
+/// The actual test suite
 public class Base62_test {
 	
 	protected BaseX baseObj = null;
@@ -33,9 +29,9 @@ public class Base62_test {
 		
 	}
 	
-	// /
+	///
 	/// Test bit to string length converters
-	// /
+	///
 	@Test
 	public void base8_specific() {
 		BaseX b = null;
@@ -165,18 +161,18 @@ public class Base62_test {
 		}
 	}
 	
-	// /
+	///
 	/// Test charset
-	// /
+	///
 	@Test
 	public void charset() {
 		assertEquals(62, Base62.defaultCharSet.length());
 		assertEquals(Base62.defaultCharSet, (new Base62()).charset());
 	}
 	
-	// /
+	///
 	/// random base conversion charset
-	// /
+	///
 	@Test
 	public void encodeAndDecodeOnce() {
 		// min, max

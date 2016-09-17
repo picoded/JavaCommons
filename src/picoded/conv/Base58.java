@@ -14,7 +14,7 @@ package picoded.conv;
 public class Base58 extends BaseX {
 	
 	/// Default charset value
-	public static final String defaultCharSet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+	public static final String DEFAULT_CHARSET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 	
 	//---------------------------------
 	// Object instance functions
@@ -22,7 +22,7 @@ public class Base58 extends BaseX {
 	
 	/// Defaultconstructor, use default charset
 	public Base58() {
-		super(defaultCharSet);
+		super(DEFAULT_CHARSET);
 	}
 	
 	/// Constructor with alternative charset
@@ -45,10 +45,11 @@ public class Base58 extends BaseX {
 		if (instance != null) {
 			return instance;
 		}
-		return instance = new Base58();
+		return (instance = new Base58());
 	}
 	
 	/// Self refencing static copy
+	/// @deprecated Use getInstance() instead
 	@Deprecated
 	public static final Base58 obj = new Base58();
 	

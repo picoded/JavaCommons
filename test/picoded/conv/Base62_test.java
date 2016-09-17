@@ -23,6 +23,11 @@ public class Base62_test {
 		
 	}
 	
+	@Test(expected=IllegalArgumentException.class)
+	public void invalidCharsetLength() {
+		new Base62("notValid");
+	}
+	
 	///
 	/// Test bit to string length converters
 	///
@@ -160,8 +165,8 @@ public class Base62_test {
 	///
 	@Test
 	public void charset() {
-		assertEquals(62, Base62.defaultCharSet.length());
-		assertEquals(Base62.defaultCharSet, (new Base62()).charset());
+		assertEquals(62, Base62.DEFAULT_CHARSET.length());
+		assertEquals(Base62.DEFAULT_CHARSET, (new Base62()).charset());
 	}
 	
 	///

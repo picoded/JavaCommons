@@ -10,7 +10,7 @@ package picoded.conv;
 public class Base62 extends BaseX {
 	
 	/// Default charset value
-	public static final String defaultCharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	public static final String DEFAULT_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	
 	// ---------------------------------
 	// Object instance functions
@@ -18,7 +18,7 @@ public class Base62 extends BaseX {
 	
 	/// Defaultconstructor, use default charset
 	public Base62() {
-		super(defaultCharSet);
+		super(DEFAULT_CHARSET);
 	}
 	
 	public Base62(String customCharset) {
@@ -40,10 +40,11 @@ public class Base62 extends BaseX {
 		if (instance != null) {
 			return instance;
 		}
-		return instance = new Base62();
+		return (instance = new Base62());
 	}
 	
 	/// Self refencing static copy
+	/// @deprecated Use getInstance() instead
 	@Deprecated
 	public static final Base62 obj = new Base62();
 	

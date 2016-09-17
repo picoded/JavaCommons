@@ -18,6 +18,11 @@ public class Base58_test extends Base62_test {
 		baseObj = new Base58();
 	}
 	
+	@Test(expected=IllegalArgumentException.class)
+	public void invalidCharsetLength() {
+		new Base62("notValid");
+	}
+	
 	@Test
 	public void guid_length_test() {
 		

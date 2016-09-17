@@ -89,7 +89,7 @@ public class BaseX {
 		BigInteger base = value2_BigInteger.pow(bitlength);
 		BigInteger comp = inCharsetLength; // (BigInteger.valueOf(x));
 		int n = 1;
-			
+		
 		while (base.compareTo(comp) > 0) {
 			++n;
 			comp = comp.multiply(inCharsetLength);

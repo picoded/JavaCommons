@@ -273,4 +273,14 @@ public class BaseX {
 		return encode(DigestUtils.sha1(str));
 	}
 	
+	/// Hashes the input byte array, into the baseX format
+	public String sha256hash(byte[] byteArr) {
+		return encode(DigestUtils.sha256(byteArr));
+	}
+	
+	/// Hashes the input string, into the baseX format
+	public String sha256hash(String str) {
+		return encode(DigestUtils.sha256(str));
+	}
+	
 }

@@ -90,8 +90,8 @@ public class SingleJUnitTestRunner {
 	/// Note: Intentionally breaking convention, to indicate with an _underscore, that this *should not be used*.
 	///
 	@Test
-	public void _thisAssertsFailure() {
-		assertTrue(false);
+	public void _thisThrowsException() {
+		throw new IllegalArgumentException("This function should never be called");
 	}
 	
 }

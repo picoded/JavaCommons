@@ -28,7 +28,7 @@ public class SingleJUnitTestRunner_test {
 	
 	@Test 
 	public void checkFailure() {
-		assertEquals(-1, SingleJUnitTestRunner.runTestMethod("picoded.junit.SingleJUnitTestRunner#_thisAssertsFailure"));
+		assertEquals(-1, SingleJUnitTestRunner.runTestMethod("picoded.junit.SingleJUnitTestRunner#_thisThrowsException"));
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -44,8 +44,8 @@ public class SingleJUnitTestRunner_test {
 	@Test
 	public void callAssertFalseForCodeCoverage() {
 		try {
-			(new SingleJUnitTestRunner())._thisAssertsFailure();
-		} catch (AssertionError e) {
+			(new SingleJUnitTestRunner())._thisThrowsException();
+		} catch (RuntimeException e) {
 			assertTrue(true);
 			return;
 		}

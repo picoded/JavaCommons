@@ -80,9 +80,14 @@ public class GUID {
 		
 		// Convert a byte array to base64 string : for safe storing of GUID in JSql
 		String s = new Base64().encodeAsString(uuidArr).replaceAll("=", "");
-		if (s.length() < 22) {
-			throw new RuntimeException("GUID generation exception, invalid length of " + s.length() + " (" + s + ")");
-		}
+		
+		// Conversion to base64, with blank is impossible (as 0 still produces a valid char)
+		// Hence a length less then 22 check is pointless (will not happen)
+		//
+		// if (s.length() < 22) {
+		// 	throw new RuntimeException("GUID generation exception, invalid length of " + s.length() + " (" + s + ")");
+		// }
+		
 		return s.substring(0, 22); //remove uneeded
 	}
 	

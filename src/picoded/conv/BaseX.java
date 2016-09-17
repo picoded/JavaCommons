@@ -22,8 +22,8 @@ public class BaseX {
 	private final static Logger logger = Logger.getLogger(BaseX.class.getName());
 	
 	// The bitToString length (or vice visa) global Memoization cache
-	protected static HashMap<Integer, HashMap<Integer, Integer>> sharedBitToStringLengthCache = new HashMap<Integer, HashMap<Integer, Integer>>();
-	protected static HashMap<Integer, HashMap<Integer, Integer>> sharedStringToBitLengthCache = new HashMap<Integer, HashMap<Integer, Integer>>();
+	protected static HashMap<Integer, HashMap<Integer, Integer>> sharedBitToStringLengthCache = new HashMap<>();
+	protected static HashMap<Integer, HashMap<Integer, Integer>> sharedStringToBitLengthCache = new HashMap<>();
 	
 	// Reusable big integer of value 2
 	protected static final BigInteger base2BigInteger = BigInteger.valueOf(2);
@@ -249,9 +249,9 @@ public class BaseX {
 		return retValue;
 	}
 	
-	// -----------------------------------------------
+	//-----------------------------------------------
 	// MD5, SHA1 hashing support utility functions
-	// -----------------------------------------------
+	//-----------------------------------------------
 	
 	/// Hashes the input byte array, into the baseX format
 	public String md5hash(byte[] byteArr) {

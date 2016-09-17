@@ -33,24 +33,6 @@ public class BaseX_test {
 	}
 	
 	///
-	/// Intentionally recreates the class object with a single char string - which is always invalid
-	///
-	/// Note: (expected=IllegalArgumentException.class), was recasted as InvocationTargetException
-	@Test (expected=InvocationTargetException.class)
-	public void invalidCharsetLength() throws Exception {
-		baseObj.getClass().getDeclaredConstructor(String.class).newInstance("i");
-	}
-	
-	///
-	/// Intentionally recreates the class object with a single char string - which is always invalid
-	///
-	/// Note: (expected=IllegalArgumentException.class), was recasted as InvocationTargetException
-	@Test (expected=InvocationTargetException.class)
-	public void nullCharset() throws Exception {
-		baseObj.getClass().getDeclaredConstructor(String.class).newInstance(new Object[] {null});
-	}
-	
-	///
 	/// Charset fetch / length
 	///
 	@Test
@@ -156,6 +138,55 @@ public class BaseX_test {
 		for (int a = 0; a < testRunMultiplier; ++a) {
 			hashAllTheStuff();
 		}
+	}
+	
+	///-----------------------------------------------
+	///
+	/// Exception testing coverage
+	///
+	///-----------------------------------------------
+	
+	///
+	/// Intentionally recreates the class object with a single char string - which is always invalid
+	///
+	/// Note: (expected=IllegalArgumentException.class), was recasted as InvocationTargetException
+	@Test (expected=InvocationTargetException.class)
+	public void invalidCharsetLength() throws Exception {
+		baseObj.getClass().getDeclaredConstructor(String.class).newInstance("i");
+	}
+	
+	///
+	/// Intentionally recreates the class object with a null char string - which is always invalid
+	///
+	/// Note: (expected=IllegalArgumentException.class), was recasted as InvocationTargetException
+	@Test (expected=InvocationTargetException.class)
+	public void nullCharset() throws Exception {
+		baseObj.getClass().getDeclaredConstructor(String.class).newInstance(new Object[] {null});
+	}
+	
+	///
+	/// Intentionally calls with special characters, to induce error
+	///
+	@Test (expected=IllegalArgumentException.class)
+	public void invalidDecodeChar() throws Exception {
+		baseObj.decode("invalidChars->~!@#$%^&*()_+[]\\;',./<>");
+	}
+	
+	///
+	/// Intentionally induce encoding error
+	///
+	@Test (expected=IllegalArgumentException.class)
+	public void decodingLossError() throws Exception {
+		
+		// Byte to use for initialize
+		byte fb = (byte)255;
+		
+		// 8 bytes long btw
+		byte[] lotsOfBits = new byte[] { fb, fb, fb, fb, fb, fb, fb, fb };
+		String encoded = baseObj.encode(lotsOfBits);
+		
+		// Decode with strict check, and insufficent bytes (throws an error)
+		baseObj.decode(encoded, lotsOfBits.length - 1, false);
 	}
 	
 }

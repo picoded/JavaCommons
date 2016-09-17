@@ -20,7 +20,7 @@ public class SingleJUnitTestRunner_test {
 	public static volatile boolean failureFlag = false;
 	
 	//
-	// Call the sub test within itself
+	// Call the sub test within itself : For code coverage !
 	//
 	
 	@Test 
@@ -42,5 +42,10 @@ public class SingleJUnitTestRunner_test {
 	@Test(expected=IllegalArgumentException.class)
 	public void invalidFormat() {
 		SingleJUnitTestRunner.runTestMethod("picoded.junit.SingleJUnitTestRunner_test");
+	}
+	
+	@Test(expected = AssertionError.class)
+	public void callAssertFalseForCodeCoverage() {
+		(new SingleJUnitTestRunner())._thisAssertsFailure();
 	}
 }

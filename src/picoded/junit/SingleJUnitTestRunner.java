@@ -30,6 +30,7 @@ public class SingleJUnitTestRunner {
 	/// @return  Number of successful test cases ( 1 ) or failure ( -1 )
 	public static int runTestMethod(String className, String methodName) {
 		try {
+			// Note: Dynamic loading of class is intentional. Exempted from vulnerability check.
 			Request request = Request.method(Class.forName(className), methodName);
 			Result result = new JUnitCore().run(request);
 			

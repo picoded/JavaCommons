@@ -16,6 +16,9 @@ public class SingleJUnitTestRunner_test {
 		assertTrue(true);
 	}
 	
-	/// Call itself?
-	
+	/// Call the hello world test case in itself.
+	@Test 
+	public void selfRunnerTest() throws ClassNotFoundException {
+		SingleJUnitTestRunner.main("picoded.junit.SingleJUnitTestRunner_test#helloWorld");
+	}
 }

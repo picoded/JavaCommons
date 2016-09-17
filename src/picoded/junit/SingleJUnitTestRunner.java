@@ -54,14 +54,14 @@ public class SingleJUnitTestRunner {
 		String[] formatPair = classAndMethod.split("#");
 		
 		if(formatPair.length != 2) {
-			throw new RuntimeException("Unknown class and method format : "+formatPair);
+			throw new IllegalArgumentException("Unknown class and method format : "+formatPair);
 		}
 		runTestMethod(formatPair[0],formatPair[1]);
 	}
 	
 	/// The main command line test runner, see example in class above
 	///
-	/// @param  Arguments of class#method name pairs.
+	/// @param  Arguments of class#method name pairs
 	public static void main(String... args) throws ClassNotFoundException {
 		for(String pair : args) {
 			runTestMethod(pair);

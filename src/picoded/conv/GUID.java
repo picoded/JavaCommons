@@ -12,6 +12,11 @@ import org.apache.commons.codec.binary.Base64;
 ///
 public class GUID {
 	
+	/// Invalid constructor (throws exception)
+	protected GUID() {
+		throw new IllegalAccessError("Utility class");
+	}
+	
 	/// Proxies UUID.randomUUID();
 	///
 	/// @returns UUID representing the GUID

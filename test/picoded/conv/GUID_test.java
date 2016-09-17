@@ -20,21 +20,20 @@ import picoded.conv.GUID;
 ///
 public class GUID_test {
 	
-	@Before
-	public void setUp() {
-		
-	}
+	// Test run multiplier
+	protected int testRunMultiplier = 5000;
 	
-	@After
-	public void tearDown() {
-		
+	/// Invalid constructor test
+	@Test(expected = IllegalAccessError.class)
+	public void invalidConstructor() throws Exception {
+		new GUID();
 	}
 	
 	///
 	/// GUID basic tests
 	///
 	@Test
-	public void basicTests() {
+	public void guidTestSet() {
 		
 		// basic test
 		UUID u = null;
@@ -63,4 +62,12 @@ public class GUID_test {
 		assertNotNull(GUID.base58(u));
 		assertEquals(u, GUID.fromBase58(GUID.base58(u)));
 	}
+	
+	@Test
+	public void guidTestMultiple() {
+		for (int a = 0; a < testRunMultiplier; ++a) {
+			guidTestSet();
+		}
+	}
+	
 }

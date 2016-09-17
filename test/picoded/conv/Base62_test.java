@@ -13,21 +13,21 @@ public class Base62_test extends BaseX_test {
 	
 	@Before
 	public void setUp() {
-		baseObj = base62.getInstance();
+		baseObj = Base62.getInstance();
 	}
 	
 	@Test
 	public void validCharset() {
-		baseObj = new base62(base62.DEFAULT_CHARSET);
+		baseObj = new Base62(Base62.DEFAULT_CHARSET);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void invalidCharset() {
-		baseObj = new base62(base58.DEFAULT_CHARSET);
+		baseObj = new Base62(Base58.DEFAULT_CHARSET);
 	}
 	
 	@Test
-	public void base62_specific() {
+	public void Base62_specific() {
 		BaseX b = null;
 		
 		assertNotNull(b = new Base62());

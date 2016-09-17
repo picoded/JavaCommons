@@ -15,17 +15,17 @@ public class Base58_test extends BaseX_test {
 	
 	@Before
 	public void setUp() {
-		baseObj = base58.getInstance();
+		baseObj = Base58.getInstance();
 	}
 	
 	@Test
 	public void validCharset() {
-		baseObj = new base58(base58.DEFAULT_CHARSET);
+		baseObj = new Base58(Base58.DEFAULT_CHARSET);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void invalidCharset() {
-		baseObj = new base58(base62.DEFAULT_CHARSET);
+		baseObj = new Base58(Base62.DEFAULT_CHARSET);
 	}
 	
 	@Test
@@ -63,7 +63,7 @@ public class Base58_test extends BaseX_test {
 	}
 	
 	@Test
-	public void base58and62_string_test() {
+	public void Base58and62_string_test() {
 		assertEquals(27, Base58.getInstance().bitToStringLength(160) - 1);
 		assertEquals(27, Base62.getInstance().bitToStringLength(160));
 	}

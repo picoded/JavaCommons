@@ -42,14 +42,14 @@ public class Base58 extends BaseX {
 	
 	/// Singleton copy 
 	public Base58 getInstance() {
-		if(instance != null) {
+		if (instance != null) {
 			return instance;
 		}
 		return instance = new Base58();
 	}
 	
 	/// Self refencing static copy
-	@Deprecated 
+	@Deprecated
 	public final static Base58 obj = new Base58();
 	
 }

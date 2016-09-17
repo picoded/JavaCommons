@@ -37,15 +37,14 @@ public class Base62 extends BaseX {
 	
 	/// Singleton copy 
 	public Base62 getInstance() {
-		if(instance != null) {
+		if (instance != null) {
 			return instance;
 		}
 		return instance = new Base62();
 	}
 	
-	
 	/// Self refencing static copy
-	@Deprecated 
+	@Deprecated
 	public final static Base62 obj = new Base62();
 	
 }

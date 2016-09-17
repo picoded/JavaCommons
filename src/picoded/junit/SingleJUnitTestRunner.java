@@ -56,8 +56,8 @@ public class SingleJUnitTestRunner {
 				
 				return -result.getFailureCount();
 			}
-		} catch(ClassNotFoundException e) {
-			throw new IllegalArgumentException("Class not found for : "+className, e);
+		} catch (ClassNotFoundException e) {
+			throw new IllegalArgumentException("Class not found for : " + className, e);
 		}
 	}
 	
@@ -69,17 +69,17 @@ public class SingleJUnitTestRunner {
 	public static int runTestMethod(String classAndMethod) {
 		String[] formatPair = classAndMethod.split("#");
 		
-		if(formatPair.length != 2) {
-			throw new IllegalArgumentException("Unknown class and method format : "+formatPair);
+		if (formatPair.length != 2) {
+			throw new IllegalArgumentException("Unknown class and method format : " + formatPair);
 		}
-		return runTestMethod(formatPair[0],formatPair[1]);
+		return runTestMethod(formatPair[0], formatPair[1]);
 	}
 	
 	/// The main command line test runner, see example in class above
 	///
 	/// @param  Arguments of class#method name pairs
 	public static void main(String... args) {
-		for(String pair : args) {
+		for (String pair : args) {
 			runTestMethod(pair);
 		}
 	}

@@ -47,5 +47,6 @@ public class SingleJUnitTestRunner_test {
 	@Test(expected = AssertionError.class)
 	public void callAssertFalseForCodeCoverage() {
 		(new SingleJUnitTestRunner())._thisAssertsFailure();
+		assertTrue(false);
 	}
 }

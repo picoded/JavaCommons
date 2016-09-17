@@ -1,19 +1,21 @@
 package picoded.conv;
 
-import org.apache.commons.codec.binary.Base64;
-
+// Java includes
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
-import picoded.conv.Base58;
+// Apache includes
+import org.apache.commons.codec.binary.Base64;
 
+///
 /// Provides several core GUID functionalities
 ///
-/// ------------------------------------------------
-///
-/// @TODO Unit Testing
-///
 public class GUID {
+	
+	/// Invalid constructor (throws exception)
+	protected GUID() {
+		throw new IllegalAccessError("Utility class");
+	}
 	
 	/// Proxies UUID.randomUUID();
 	///
@@ -98,7 +100,7 @@ public class GUID {
 	/// @returns string of 22 characters representing the GUID
 	public static String base58(UUID uuid) {
 		byte[] uuidArr = byteArray(uuid);
-		return Base58.obj.encode(uuidArr);
+		return Base58.getInstance().encode(uuidArr);
 	}
 	
 	//---------------------------------------------------------------------------------------------
@@ -144,7 +146,7 @@ public class GUID {
 	/// @param   base64 string to convert from
 	/// @returns A UUID object
 	public static UUID fromBase58(String base58str) {
-		return fromByteArray(Base58.obj.decode(base58str));
+		return fromByteArray(Base58.getInstance().decode(base58str));
 	}
 	
 }

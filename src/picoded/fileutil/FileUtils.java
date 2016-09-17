@@ -49,7 +49,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	
 	/// Overwrites null encoding with US-ASCII
 	public static String readFileToString(File inFile) throws IOException {
-		return picoded.fileutils.FileUtils.readFileToString(inFile, (String) null);
+		return picoded.fileutil.FileUtils.readFileToString(inFile, (String) null);
 	}
 	
 	/// Overwrites null encoding with US-ASCII
@@ -62,7 +62,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	
 	/// Overwrites null encoding with US-ASCII
 	public static void writeStringToFile(File inFile, String data) throws IOException {
-		picoded.fileutils.FileUtils.writeStringToFile(inFile, data, (String) null);
+		picoded.fileutil.FileUtils.writeStringToFile(inFile, data, (String) null);
 	}
 	
 	/// Overwrites null encoding with US-ASCII
@@ -85,7 +85,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/// @returns the file value if possible, else returns the fallback value
 	///
 	public static String readFileToString_withFallback(File inFile, String fallback) {
-		return picoded.fileutils.FileUtils.readFileToString_withFallback(inFile, fallback, null);
+		return picoded.fileutil.FileUtils.readFileToString_withFallback(inFile, fallback, null);
 	}
 	
 	///
@@ -105,7 +105,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 		}
 		
 		try {
-			return picoded.fileutils.FileUtils.readFileToString(inFile, encoding);
+			return picoded.fileutil.FileUtils.readFileToString(inFile, encoding);
 		} catch (IOException e) {
 			return fallback;
 		}
@@ -139,7 +139,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/// @returns the boolean indicating true if file was written to
 	///
 	public static boolean writeStringToFile_ifDifferant(File inFile, String data) throws IOException {
-		return picoded.fileutils.FileUtils.writeStringToFile_ifDifferant(inFile, data, null);
+		return picoded.fileutil.FileUtils.writeStringToFile_ifDifferant(inFile, data, null);
 	}
 	
 	///

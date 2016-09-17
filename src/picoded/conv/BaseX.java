@@ -8,40 +8,42 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 ///
 /// A class to convert various data types to BaseX. Where
-/// Its primary usages is to convert large values sets (like UUID) into a format that can be safely
+/// Its primary usages is to convert values sets (like UUID) into a format that can be safely
 /// transmitted over the internet / is readable
 ///
-/// Note that unlike general usage base64 this is not built for performance on large input values.
+/// Note that unlike general usage base64 this is not built for performance on large input streams.
 /// Or anything in ~20 bytes and above, as the input values are internally collected into a BigInteger.
-/// However it allows the conversion of any abitaray base types, in a reliable manner.
+/// And hence process everything in memory in one go.
 ///
-/// @TODO: Performance optimization?: How??? : index maps?
+/// However it allows the conversion of any abitaray base types, in a reliable manner.
 ///
 public class BaseX {
 	
-	private final static Logger logger = Logger.getLogger(BaseX.class.getName());
+	//----------------------------------------
+	// Static reuse vars
+	//----------------------------------------
 	
-	// The bitToString length (or vice visa) global Memoization cache
-	protected static HashMap<Integer, HashMap<Integer, Integer>> sharedBitToStringLengthCache = new HashMap<>();
-	protected static HashMap<Integer, HashMap<Integer, Integer>> sharedStringToBitLengthCache = new HashMap<>();
+	/// Reusable big integer of value 2
+	protected static final BigInteger value2_BigInteger = BigInteger.valueOf(2);
+	/// Reusable big integer of value 0
+	protected static final BigInteger value0_BigInteger = BigInteger.valueOf(0);
 	
-	// Reusable big integer of value 2
-	protected static final BigInteger base2BigInteger = BigInteger.valueOf(2);
-	protected static final BigInteger base0BigInteger = BigInteger.valueOf(0);
+	//----------------------------------------
+	// Object instance / variables / memoizers 
+	//----------------------------------------
 	
-	// ---------------------------------
-	// Object instance functions
-	// ---------------------------------
-	
-	// The set char set for base object
+	/// The set char set for base object
 	protected String inCharset = null;
+	/// The char set length as big int
 	protected BigInteger inCharsetLength = null;
-	
-	// The Memoization cache for bit to string length (or vice visa) calculation
+	/// The Memoization cache for bit to string length
 	protected HashMap<Integer, Integer> bitToStringCache = null;
+	/// The Memoization cache for string to bit length
 	protected HashMap<Integer, Integer> stringToBitCache = null;
 	
 	/// Builds the object with the custom charspace
+	///
+	/// @param  The custom charset to use for bit to string conversion
 	public BaseX(String customCharset) {
 		if (customCharset == null || customCharset.length() <= 1) {
 			throw new IllegalArgumentException("Charset needs atleast 2 characters");
@@ -49,23 +51,18 @@ public class BaseX {
 		
 		inCharset = customCharset;
 		inCharsetLength = BigInteger.valueOf(customCharset.length());
-		
-		bitToStringCache = sharedBitToStringLengthCache.get(customCharset.length());
-		stringToBitCache = sharedStringToBitLengthCache.get(customCharset.length());
-		
-		if (bitToStringCache == null) {
-			bitToStringCache = new HashMap<Integer, Integer>();
-			sharedBitToStringLengthCache.put(inCharset.length(), bitToStringCache);
-			
-			stringToBitCache = new HashMap<Integer, Integer>();
-			sharedStringToBitLengthCache.put(inCharset.length(), stringToBitCache);
-		}
+		bitToStringCache = new HashMap<Integer, Integer>();
+		stringToBitCache = new HashMap<Integer, Integer>();
 	}
 	
 	/// Returns the current charspace
 	public String charset() {
 		return inCharset;
 	}
+	
+	//--------------------------------------------
+	// Bit-to-string length conversion handling 
+	//--------------------------------------------
 	
 	///
 	/// Calculate the String length needed for the given bit count,
@@ -88,7 +85,7 @@ public class BaseX {
 		}
 		
 		/// Derive the n value
-		BigInteger base = base2BigInteger.pow(bitlength);
+		BigInteger base = value2_BigInteger.pow(bitlength);
 		BigInteger comp = inCharsetLength; // (BigInteger.valueOf(x));
 		
 		while (base.compareTo(comp) > 0) {
@@ -106,6 +103,9 @@ public class BaseX {
 	///
 	/// Calculate the maximum bit length possible for the given string length
 	///
+	/// Note due to the encoding differences, this value can be higher then its,
+	/// reverse function `bitToStringLength`
+	///
 	public int stringToBitLength(int stringLength) {
 		int n = 1;
 		
@@ -116,11 +116,11 @@ public class BaseX {
 		
 		/// Derive the N value
 		BigInteger base = inCharsetLength.pow(stringLength);
-		BigInteger comp = base2BigInteger;
+		BigInteger comp = value2_BigInteger;
 		
 		while (base.compareTo(comp) > 0) {
 			++n;
-			comp = comp.multiply(base2BigInteger);
+			comp = comp.multiply(value2_BigInteger);
 			// divd = inCharsetLength.pow(n);
 		}
 		--n; // get the last known valid value
@@ -152,13 +152,13 @@ public class BaseX {
 		return ret.toString();
 	}
 	
-	/// Conversion from encoded string to the byte array, note that if the
-	/// maximum value of the custom base,
-	/// does not match standard byte spacing, the final byte array count may be
-	/// higher then actually needed.
 	///
-	/// Use the byteLength varient, if the exact byte space is known before
-	/// hand
+	/// Conversion from encoded string to the byte array, note that if the
+	/// maximum value of the custom base, does not match standard byte spacing, 
+	/// the final byte array count may be higher then actually needed.
+	///
+	/// Use the byteLength varient, if the exact byte space is known.
+	///
 	public byte[] decode(String encodedString) {
 		return decode(encodedString, -1);
 	}
@@ -172,6 +172,10 @@ public class BaseX {
 	/// byteLength of -1, will use the automatically derived byte length base
 	/// on the string length.
 	public byte[] decode(String encodedString, int byteLength) {
+		return decode(encodedString, byteLength, false);
+	}
+	
+	public byte[] decode(String encodedString, int byteLength, boolean acceptEncodingLoss) {
 		
 		// Variable setup
 		int stringlength = encodedString.length();
@@ -185,7 +189,7 @@ public class BaseX {
 				byteLength++;
 			}
 		}
-		BigInteger encodedValue = base0BigInteger;
+		BigInteger encodedValue = value0_BigInteger;
 		
 		// Reverse the encoded string, to process as BigInteger
 		// encodedString = new
@@ -224,8 +228,10 @@ public class BaseX {
 			
 			for (int a = 0; a < copyFrom; ++a) {
 				if (fullEncodedValue[a] != 0) {
-					logger.warning("Encoded value loss for givent byteLength(" + byteLength + ") for input encodedString: "
-						+ encodedString);
+					if (!acceptEncodingLoss) {
+						throw new RuntimeException("Encoded value loss for givent byteLength(" + byteLength
+							+ ") for input encodedString: " + encodedString);
+					}
 				}
 			}
 			

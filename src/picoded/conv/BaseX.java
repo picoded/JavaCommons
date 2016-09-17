@@ -80,8 +80,6 @@ public class BaseX {
 	/// @return Lowest string length where valid
 	///
 	public int bitToStringLength(int bitlength) {
-		int n = 1;
-		
 		/// Load from Memoization cache
 		if (bitToStringCache.containsKey(bitlength)) {
 			return bitToStringCache.get(bitlength);
@@ -90,7 +88,8 @@ public class BaseX {
 		/// Derive the n value
 		BigInteger base = value2_BigInteger.pow(bitlength);
 		BigInteger comp = inCharsetLength; // (BigInteger.valueOf(x));
-		
+		int n = 1;
+			
 		while (base.compareTo(comp) > 0) {
 			++n;
 			comp = comp.multiply(inCharsetLength);
@@ -99,7 +98,6 @@ public class BaseX {
 		
 		/// Store into the Memoization cache
 		bitToStringCache.put(bitlength, n);
-		
 		return n;
 	}
 	
@@ -114,8 +112,6 @@ public class BaseX {
 	/// @return Highest bit length possible
 	///
 	public int stringToBitLength(int stringLength) {
-		int n = 1;
-		
 		/// Load from Memoization cache
 		if (stringToBitCache.containsKey(stringLength)) {
 			return stringToBitCache.get(stringLength);
@@ -124,6 +120,7 @@ public class BaseX {
 		/// Derive the N value
 		BigInteger base = inCharsetLength.pow(stringLength);
 		BigInteger comp = value2_BigInteger;
+		int n = 1;
 		
 		while (base.compareTo(comp) > 0) {
 			++n;

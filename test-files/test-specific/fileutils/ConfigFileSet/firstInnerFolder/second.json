@@ -1,0 +1,14 @@
+{
+	"1":"one",
+	"2":"two",
+	"3":"2+1",
+	"Layer":"InnerFolder",
+	"include":"<stdio.h>",
+	"main":{
+		"int":"foo",
+		"bool":"bar"
+	},
+	"function1":{
+		"return":"result"
+	}
+}

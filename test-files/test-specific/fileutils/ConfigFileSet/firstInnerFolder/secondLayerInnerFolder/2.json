@@ -1,0 +1,28 @@
+{
+	"hello":"world",
+	"number":"123",
+	"dd":"12.5",
+	"symbol1":"//..$%^&",
+	"testArray": {
+		"hello" : "world",
+		"innerArray" : {
+			"hi":"hello"
+		}
+	},
+	"test":{
+		"test":{
+			"test":{
+				"test":{
+					"test":{
+						"test":"final",
+						"nulltesT":null
+					},
+					"semiTest":"Semi"
+				},
+				"testing":"Quarter"
+			},
+			"stesting":"Octet"
+		},
+		"subtest":"testing"
+	}
+}

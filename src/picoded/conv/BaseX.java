@@ -138,6 +138,28 @@ public class BaseX {
 	}
 	
 	///
+	/// Varient of stringToBitLength for minimum bytelength support required
+	///
+	/// @param  The string length to decode
+	///
+	/// @return Lowest byte length required to fit the whole string
+	///
+	protected int stringToDecodeByteLength(int stringLength) {
+		// Gets maximum byte length that can fill bit space
+		int byteLength = stringToBitLength(stringlength) / 8;
+		
+		// Check for excess bit space, which would require 1 more byte
+		int mod = stringToBitLength(stringlength) % 8;
+		if (mod != 0) {
+			// Return with 1 more
+			return byteLength+1;
+		}
+		
+		// Return the exact fit
+		return byteLength;
+	}
+	
+	///
 	/// Conversion from string to byte array to baseX string
 	///
 	/// @param  Byte Array values to encode
@@ -236,11 +258,7 @@ public class BaseX {
 		
 		// Derive max byte length : auto if -1
 		if (byteLength < 0) {
-			byteLength = stringToBitLength(stringlength) / 8;
-			int mod = stringToBitLength(stringlength) % 8;
-			if (mod != 0) {
-				byteLength++;
-			}
+			byteLength = stringToDecodeByteLength(stringlength);
 		}
 		
 		// Start off with blank value

@@ -42,6 +42,15 @@ public class BaseX_test {
 	}
 	
 	///
+	/// Intentionally recreates the class object with a single char string - which is always invalid
+	///
+	/// Note: (expected=IllegalArgumentException.class), was recasted as InvocationTargetException
+	@Test (expected=InvocationTargetException.class)
+	public void nullCharset() throws Exception {
+		baseObj.getClass().getDeclaredConstructor(String.class).newInstance(null);
+	}
+	
+	///
 	/// Charset fetch / length
 	///
 	@Test

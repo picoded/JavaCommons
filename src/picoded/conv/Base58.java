@@ -14,7 +14,7 @@ package picoded.conv;
 public class Base58 extends BaseX {
 	
 	/// Default charset value
-	public final static String defaultCharSet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+	public static final String defaultCharSet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 	
 	//---------------------------------
 	// Object instance functions
@@ -38,7 +38,7 @@ public class Base58 extends BaseX {
 	// ---------------------------------
 	
 	/// Singleton cache
-	private static Base58 instance = null;
+	private static volatile Base58 instance = null;
 	
 	/// Singleton copy 
 	public static Base58 getInstance() {
@@ -50,6 +50,6 @@ public class Base58 extends BaseX {
 	
 	/// Self refencing static copy
 	@Deprecated
-	public final static Base58 obj = new Base58();
+	public static final Base58 obj = new Base58();
 	
 }

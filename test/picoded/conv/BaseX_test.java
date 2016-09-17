@@ -98,6 +98,39 @@ public class BaseX_test {
 	}
 	
 	///
+	/// random base conversion charset
+	///
+	@Test
+	public void encodeAndDecodeOnce_strict() {
+		// min, max
+		int byteLen = RandomUtils.nextInt(1, stringAndByteMaxLength);
+		
+		// raw byteArray to encode
+		String encodedString;
+		byte[] byteArr = RandomUtils.nextBytes(byteLen);
+		
+		// Encode the byte array to string
+		assertNotNull(encodedString = baseObj.encode(byteArr));
+		assertArrayEquals(byteArr, baseObj.decode(encodedString, byteLen, false));
+		
+		// Fixed length test (gurantee memoizer hit)
+		byteLen = stringAndByteFixedLength;
+		byteArr = RandomUtils.nextBytes(byteLen);
+		
+		// Encode the byte array to string
+		assertNotNull(encodedString = baseObj.encode(byteArr));
+		assertArrayEquals(byteArr, baseObj.decode(encodedString, byteLen, false));
+		
+	}
+	
+	@Test
+	public void encodeAndDecodeMultiple_strict() {
+		for (int a = 0; a < testRunMultiplier; ++a) {
+			encodeAndDecodeOnce();
+		}
+	}
+	
+	///
 	/// random hash test
 	///
 	@Test

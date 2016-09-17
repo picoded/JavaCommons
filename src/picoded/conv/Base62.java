@@ -40,7 +40,7 @@ public class Base62 extends BaseX {
 		if (instance != null) {
 			return instance;
 		}
-		return (instance = new Base62());
+		return instance = new Base62();
 	}
 	
 	/// Self refencing static copy

@@ -41,7 +41,7 @@ public class Base58 extends BaseX {
 	private static Base58 instance = null;
 	
 	/// Singleton copy 
-	public Base58 getInstance() {
+	public static Base58 getInstance() {
 		if (instance != null) {
 			return instance;
 		}

@@ -4,9 +4,6 @@ package picoded.junit;
 import static org.junit.Assert.*;
 import org.junit.*;
 
-// Classes used in test case
-import picoded.junit.SingleJUnitTestRunner;
-
 /// The actual test suite
 public class SingleJUnitTestRunner_test {
 	

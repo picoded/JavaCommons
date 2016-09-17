@@ -36,7 +36,7 @@ public class Base62 extends BaseX {
 	private static Base62 instance = null;
 	
 	/// Singleton copy 
-	public Base62 getInstance() {
+	public static Base62 getInstance() {
 		if (instance != null) {
 			return instance;
 		}

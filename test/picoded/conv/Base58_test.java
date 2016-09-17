@@ -1,0 +1,60 @@
+package picoded.conv;
+
+// Junit includes
+import static org.junit.Assert.*;
+import org.junit.*;
+
+// Apache reference
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.RandomUtils;
+
+///
+/// Test Case for picoded.struct.CaseInsensitiveHashMap
+///
+public class Base58_test extends Base62_test {
+	
+	@Before
+	public void setUp() {
+		baseObj = new Base58();
+	}
+	
+	@Test
+	public void guid_length_test() {
+		
+		int byteLen = 16; //RandomUtils.nextInt(1, 20);
+		
+		// raw byteArray to encode
+		byte[] byteArr = RandomUtils.nextBytes(byteLen);
+		
+		//encodeBase64String
+		String b58str = null;
+		String b62str = null;
+		
+		assertNotNull(b58str = Base58.getInstance().encode(byteArr));
+		assertNotNull(b62str = Base62.getInstance().encode(byteArr));
+		
+		assertArrayEquals(byteArr, Base58.getInstance().decode(b58str, byteLen));
+		assertArrayEquals(byteArr, Base62.getInstance().decode(b62str, byteLen));
+		
+		assertEquals(b58str.length(), b62str.length());
+	}
+	
+	@Test
+	public void guid_range_test() {
+		String b64Range = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+		
+		int max = 64;
+		int min = 57;
+		
+		for (int i = max; i >= min; --i) {
+			BaseX b = new BaseX(b64Range.substring(0, i));
+			assertEquals("GUID range test failed, when X = " + i, 22, b.bitToStringLength(128));
+		}
+	}
+	
+	@Test
+	public void base58and62_sha1_test() {
+		assertEquals(27, Base58.getInstance().bitToStringLength(160) - 1);
+		assertEquals(27, Base62.getInstance().bitToStringLength(160));
+	}
+}

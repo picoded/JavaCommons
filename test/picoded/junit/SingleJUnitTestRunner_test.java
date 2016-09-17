@@ -41,9 +41,14 @@ public class SingleJUnitTestRunner_test {
 		SingleJUnitTestRunner.runTestMethod("picoded.junit.SingleJUnitTestRunner_test");
 	}
 	
-	@Test(expected = AssertionError.class)
+	@Test
 	public void callAssertFalseForCodeCoverage() {
-		(new SingleJUnitTestRunner())._thisAssertsFailure();
+		try {
+			(new SingleJUnitTestRunner())._thisAssertsFailure();
+		} catch (AssertionError e) {
+			assertTrue(true);
+			return;
+		}
 		assertTrue(false);
 	}
 }

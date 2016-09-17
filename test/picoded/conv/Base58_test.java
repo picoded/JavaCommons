@@ -15,7 +15,17 @@ public class Base58_test extends BaseX_test {
 	
 	@Before
 	public void setUp() {
-		baseObj = new Base58();
+		baseObj = base58.getInstance();
+	}
+	
+	@Test
+	public void validCharset() {
+		baseObj = new base58(base58.DEFAULT_CHARSET);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void invalidCharset() {
+		baseObj = new base58(base62.DEFAULT_CHARSET);
 	}
 	
 	@Test

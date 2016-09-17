@@ -12,13 +12,30 @@ public class SingleJUnitTestRunner_test {
 	
 	/// A blank, assertTrue test case to call internally
 	@Test
-	public void helloWorld() {
+	public void isTrue() {
 		assertTrue(true);
 	}
 	
-	/// Call the hello world test case in itself.
+	/// Boolean control for "shouldFailWhenSet"
+	public static volatile boolean failureFlag = false;
+	
+	//
+	// Call the sub test within itself
+	//
+	
 	@Test 
-	public void selfRunnerTest() throws ClassNotFoundException {
-		SingleJUnitTestRunner.main("picoded.junit.SingleJUnitTestRunner_test#helloWorld");
+	public void mainIsTrue() {
+		SingleJUnitTestRunner.main("picoded.junit.SingleJUnitTestRunner_test#isTrue");
+		assertEquals(1, SingleJUnitTestRunner.runTestMethod("picoded.junit.SingleJUnitTestRunner_test#isTrue"));
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void classNotFoundTest() {
+		SingleJUnitTestRunner.main("picoded.junit.ThisClassDoesNotExsits#methodName");
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void invalidFormat() {
+		SingleJUnitTestRunner.runTestMethod("picoded.junit.SingleJUnitTestRunner_test");
 	}
 }

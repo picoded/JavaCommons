@@ -11,16 +11,11 @@ import org.apache.commons.lang3.RandomUtils;
 ///
 /// Test Case for picoded.struct.CaseInsensitiveHashMap
 ///
-public class Base58_test extends Base62_test {
+public class Base58_test extends BaseX_test {
 	
 	@Before
 	public void setUp() {
 		baseObj = new Base58();
-	}
-	
-	@Test(expected = IllegalArgumentException.class)
-	public void invalidCharsetLength() {
-		new Base62("notValid");
 	}
 	
 	@Test
@@ -58,7 +53,7 @@ public class Base58_test extends Base62_test {
 	}
 	
 	@Test
-	public void base58and62_sha1_test() {
+	public void base58and62_string_test() {
 		assertEquals(27, Base58.getInstance().bitToStringLength(160) - 1);
 		assertEquals(27, Base62.getInstance().bitToStringLength(160));
 	}

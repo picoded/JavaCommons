@@ -146,10 +146,10 @@ public class BaseX {
 	///
 	protected int stringToDecodeByteLength(int stringLength) {
 		// Gets maximum byte length that can fill bit space
-		int byteLength = stringToBitLength(stringlength) / 8;
+		int byteLength = stringToBitLength(stringLength) / 8;
 		
 		// Check for excess bit space, which would require 1 more byte
-		int mod = stringToBitLength(stringlength) % 8;
+		int mod = stringToBitLength(stringLength) % 8;
 		if (mod != 0) {
 			// Return with 1 more
 			return byteLength+1;

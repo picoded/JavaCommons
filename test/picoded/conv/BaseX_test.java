@@ -47,7 +47,7 @@ public class BaseX_test {
 	/// Note: (expected=IllegalArgumentException.class), was recasted as InvocationTargetException
 	@Test (expected=InvocationTargetException.class)
 	public void nullCharset() throws Exception {
-		baseObj.getClass().getDeclaredConstructor(String.class).newInstance(null);
+		baseObj.getClass().getDeclaredConstructor(String.class).newInstance(new Object[] {null});
 	}
 	
 	///

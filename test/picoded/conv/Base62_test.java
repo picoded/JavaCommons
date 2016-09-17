@@ -23,7 +23,7 @@ public class Base62_test {
 		
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void invalidCharsetLength() {
 		new Base62("notValid");
 	}

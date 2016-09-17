@@ -18,7 +18,7 @@ public class Base58_test extends Base62_test {
 		baseObj = new Base58();
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void invalidCharsetLength() {
 		new Base62("notValid");
 	}

@@ -50,11 +50,11 @@ public class BaseX_test {
 		int strLen = RandomUtils.nextInt(1, stringAndByteMaxLength);
 		
 		// Convert string length and back
-		assertEquals( strLen, baseObj.bitToStringLength(baseObj.stringToBitLength(strLen)) );
+		assertEquals(strLen, baseObj.bitToStringLength(baseObj.stringToBitLength(strLen)));
 		
 		// Fixed length test (gurantee memoizer hit)
 		strLen = stringAndByteFixedLength;
-		assertEquals( strLen, baseObj.bitToStringLength(baseObj.stringToBitLength(strLen)) );
+		assertEquals(strLen, baseObj.bitToStringLength(baseObj.stringToBitLength(strLen)));
 	}
 	
 	@Test
@@ -109,28 +109,28 @@ public class BaseX_test {
 		byte[] randArr = RandomUtils.nextBytes(byteLen);
 		String randStr = baseObj.encode(randArr);
 		
-		assertNotNull( baseObj.md5hash(randArr) );
-		assertNotNull( baseObj.md5hash(randStr) );
+		assertNotNull(baseObj.md5hash(randArr));
+		assertNotNull(baseObj.md5hash(randStr));
 		
-		assertNotNull( baseObj.sha1hash(randArr) );
-		assertNotNull( baseObj.sha1hash(randStr) );
+		assertNotNull(baseObj.sha1hash(randArr));
+		assertNotNull(baseObj.sha1hash(randStr));
 		
-		assertNotNull( baseObj.sha256hash(randArr) );
-		assertNotNull( baseObj.sha256hash(randStr) );
+		assertNotNull(baseObj.sha256hash(randArr));
+		assertNotNull(baseObj.sha256hash(randStr));
 		
 		// Fixed length test varient
 		byteLen = stringAndByteFixedLength;
 		randArr = RandomUtils.nextBytes(byteLen);
 		randStr = baseObj.encode(randArr);
 		
-		assertNotNull( baseObj.md5hash(randArr) );
-		assertNotNull( baseObj.md5hash(randStr) );
+		assertNotNull(baseObj.md5hash(randArr));
+		assertNotNull(baseObj.md5hash(randStr));
 		
-		assertNotNull( baseObj.sha1hash(randArr) );
-		assertNotNull( baseObj.sha1hash(randStr) );
+		assertNotNull(baseObj.sha1hash(randArr));
+		assertNotNull(baseObj.sha1hash(randStr));
 		
-		assertNotNull( baseObj.sha256hash(randArr) );
-		assertNotNull( baseObj.sha256hash(randStr) );
+		assertNotNull(baseObj.sha256hash(randArr));
+		assertNotNull(baseObj.sha256hash(randStr));
 	}
 	
 	@Test
@@ -150,7 +150,7 @@ public class BaseX_test {
 	/// Intentionally recreates the class object with a single char string - which is always invalid
 	///
 	/// Note: (expected=IllegalArgumentException.class), was recasted as InvocationTargetException
-	@Test (expected=InvocationTargetException.class)
+	@Test(expected = InvocationTargetException.class)
 	public void invalidCharsetLength() throws Exception {
 		baseObj.getClass().getDeclaredConstructor(String.class).newInstance("i");
 	}
@@ -159,15 +159,15 @@ public class BaseX_test {
 	/// Intentionally recreates the class object with a null char string - which is always invalid
 	///
 	/// Note: (expected=IllegalArgumentException.class), was recasted as InvocationTargetException
-	@Test (expected=InvocationTargetException.class)
+	@Test(expected = InvocationTargetException.class)
 	public void nullCharset() throws Exception {
-		baseObj.getClass().getDeclaredConstructor(String.class).newInstance(new Object[] {null});
+		baseObj.getClass().getDeclaredConstructor(String.class).newInstance(new Object[] { null });
 	}
 	
 	///
 	/// Intentionally calls with special characters, to induce error
 	///
-	@Test (expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void invalidDecodeChar() throws Exception {
 		baseObj.decode("invalidChars->~!@#$%^&*()_+[]\\;',./<>");
 	}
@@ -175,13 +175,11 @@ public class BaseX_test {
 	///
 	/// Intentionally induce encoding error
 	///
-	@Test (expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void decodingLossError() throws Exception {
 		
 		// Byte to use for initialize
-		byte fb = (byte)255;
-		
-		// 8 bytes long btw
+		byte fb = (byte) 255;
 		byte[] lotsOfBits = new byte[] { fb, fb, fb, fb, fb, fb, fb, fb };
 		String encoded = baseObj.encode(lotsOfBits);
 		
@@ -189,4 +187,31 @@ public class BaseX_test {
 		baseObj.decode(encoded, lotsOfBits.length - 1, false);
 	}
 	
+	///
+	/// Intentionally induce encoding error
+	///
+	@Test(expected = IllegalArgumentException.class)
+	public void decodingLossErrorWithZero() throws Exception {
+		
+		// Byte to use for initialize
+		byte fb = (byte) 255;
+		byte[] lotsOfBits = new byte[] { 0, 0, 0, fb, fb, fb, fb, fb };
+		String encoded = baseObj.encode(lotsOfBits);
+		
+		// Decode with strict check, and insufficent bytes (throws an error)
+		baseObj.decode(encoded, lotsOfBits.length - 5, false);
+	}
+	
+	/// Safely decoding
+	public void safeDecodingError() throws Exception {
+		
+		// Byte to use for initialize
+		byte fb = (byte) 255;
+		byte[] lotsOfBits = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, fb, fb, fb, fb, fb, fb, fb, fb };
+		
+		String encoded = baseObj.encode(lotsOfBits);
+		
+		// Decode with strict check, and insufficent bytes (throws an error)
+		baseObj.decode(encoded, lotsOfBits.length - 5, false);
+	}
 }

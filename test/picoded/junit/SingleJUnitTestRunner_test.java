@@ -20,23 +20,23 @@ public class SingleJUnitTestRunner_test {
 	// Call the sub test within itself : For code coverage !
 	//
 	
-	@Test 
+	@Test
 	public void mainIsTrue() {
 		SingleJUnitTestRunner.main("picoded.junit.SingleJUnitTestRunner_test#isTrue");
 		assertEquals(1, SingleJUnitTestRunner.runTestMethod("picoded.junit.SingleJUnitTestRunner_test#isTrue"));
 	}
 	
-	@Test 
+	@Test
 	public void checkFailure() {
 		assertEquals(-1, SingleJUnitTestRunner.runTestMethod("picoded.junit.SingleJUnitTestRunner#_thisThrowsException"));
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void classNotFoundTest() {
 		SingleJUnitTestRunner.main("picoded.junit.ThisClassDoesNotExsits#methodName");
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void invalidFormat() {
 		SingleJUnitTestRunner.runTestMethod("picoded.junit.SingleJUnitTestRunner_test");
 	}

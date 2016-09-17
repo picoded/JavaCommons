@@ -152,7 +152,7 @@ public class BaseX {
 		int mod = stringToBitLength(stringLength) % 8;
 		if (mod != 0) {
 			// Return with 1 more
-			return byteLength+1;
+			return byteLength + 1;
 		}
 		
 		// Return the exact fit

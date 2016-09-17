@@ -203,7 +203,7 @@ public class BaseX_test {
 	}
 	
 	/// Safely decoding
-	public void safeDecodingError() throws Exception {
+	public void safeDecoding() throws Exception {
 		
 		// Byte to use for initialize
 		byte fb = (byte) 255;
@@ -213,5 +213,21 @@ public class BaseX_test {
 		
 		// Decode with strict check, and insufficent bytes (throws an error)
 		baseObj.decode(encoded, lotsOfBits.length - 5, false);
+	}
+	
+	/// Safely decoding blanks
+	public void blankDecoding() throws Exception {
+		
+		// Byte to use for initialize
+		byte[] lotsOfBits = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		
+		String encoded = baseObj.encode(lotsOfBits);
+		
+		// Decode with strict check, and insufficent bytes (throws an error)
+		baseObj.decode(encoded, lotsOfBits.length - 5, false);
+		baseObj.decode(encoded, lotsOfBits.length + 5, false);
+		
+		// Lets just call the check for encoding loss directly =.= for code coverage !
+		baseObj.checkForEncodingLoss(lotsOfBits, 2, 5, "coverage-test");
 	}
 }

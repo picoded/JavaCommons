@@ -314,12 +314,7 @@ public class BaseX {
 			// Check the first few additional bytes, if its "zero", and hence suffer from no encoding lost.
 			// If a non zero value is found. Assume values will be lost to encoding, hence throw an error.
 			if (!acceptEncodingLoss) {
-				for (int a = 0; a < copyFrom; ++a) {
-					if (fullEncodedValue[a] != 0) {
-						throw new IllegalArgumentException("Encoded value loss for given byteLength(" + byteLength
-							+ ") for input encodedString: " + encodedString);
-					}
-				}
+				checkForEncodingLoss(fullEncodedValue, copyFrom, byteLength, encodedString);
 			}
 			
 			// Copies the value over to the final return array
@@ -349,6 +344,24 @@ public class BaseX {
 		
 		// The actual return array
 		return retValue;
+	}
+	
+	/// Does an encoding loss check if acceptEncodingLoss is set to false.
+	///
+	/// Check the first few additional bytes, if its "zero", and hence suffer from no encoding lost.
+	/// If a non zero value is found. Assume values will be lost to encoding, hence throw an error.
+	///
+	/// @param  The byte array to check
+	/// @param  The byte values positions to check up to (not including)
+	/// @param  Byte length targeted (for error throwing)
+	/// @param  Encoding string (for error throwing)
+	protected void checkForEncodingLoss(byte[] fullEncodedValue, int limit, int byteLength, String encodedString) {
+		for (int a = 0; a < limit; ++a) {
+			if (fullEncodedValue[a] != 0) {
+				throw new IllegalArgumentException("Encoded value loss for given byteLength(" + byteLength
+					+ ") for input encodedString: " + encodedString);
+			}
+		}
 	}
 	
 	//-----------------------------------------------

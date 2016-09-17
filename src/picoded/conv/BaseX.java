@@ -304,7 +304,7 @@ public class BaseX {
 			//
 			
 			// Position to start the data copy from, position prior values is "discarded"
-			int copyFrom = (fullEncodedValue.length - byteLength);
+			int copyFrom = fullEncodedValue.length - byteLength;
 			
 			// Does an encoding loss check if acceptEncodingLoss is set to false.
 			//

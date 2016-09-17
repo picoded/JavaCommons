@@ -36,7 +36,7 @@ public class SingleJUnitTestRunner {
 			
 			// This is following the standard JUnit output format
 			//------------------------------------------------------------
-			println("Total Time: " + ((result.getRunTime()) / 1000.0f));
+			println("Total Time: " + ((result.getRunTime()) / 1000.0F));
 			println("");
 			
 			if (result.wasSuccessful()) {

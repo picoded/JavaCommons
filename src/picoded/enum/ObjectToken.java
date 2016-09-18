@@ -19,9 +19,9 @@ public class ObjectToken {
 	public static final Object NULL = new Object();
 	
 	/// Represents a BOOLEAN true
-	public static Boolean BOOLEAN_TRUE = Boolean.TRUE;
+	public static final Boolean BOOLEAN_TRUE = Boolean.TRUE;
 	
 	/// Represents a BOOLEAN false
-	public static Boolean BOOLEAN_FALSE = Boolean.FALSE;
+	public static final Boolean BOOLEAN_FALSE = Boolean.FALSE;
 	
 }

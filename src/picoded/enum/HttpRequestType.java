@@ -8,11 +8,11 @@ public enum HttpRequestType {
 	
 	/// TypeMap to be extended, and stored in their respective package usage
 	public static class HttpRequestTypeSet {
-		public static HttpRequestType GET = HttpRequestType.GET;
-		public static HttpRequestType POST = HttpRequestType.POST;
-		public static HttpRequestType PUT = HttpRequestType.PUT;
-		public static HttpRequestType DELETE = HttpRequestType.DELETE;
-		public static HttpRequestType OPTION = HttpRequestType.OPTION;
+		public static final HttpRequestType GET = HttpRequestType.GET;
+		public static final HttpRequestType POST = HttpRequestType.POST;
+		public static final HttpRequestType PUT = HttpRequestType.PUT;
+		public static final HttpRequestType DELETE = HttpRequestType.DELETE;
+		public static final HttpRequestType OPTION = HttpRequestType.OPTION;
 	}
 	
 	/// Get name and toString alias to name() varient

@@ -39,13 +39,13 @@ public enum JSqlType {
 	
 	/// TypeMap to be extended, and stored in their respective package usage
 	public static class JSqlTypeSet {
-		public static JSqlType INVALID = JSqlType.INVALID;
-		public static JSqlType OTHERS = JSqlType.OTHERS;
+		public static final JSqlType INVALID = JSqlType.INVALID;
+		public static final JSqlType OTHERS = JSqlType.OTHERS;
 		
-		public static JSqlType SQLITE = JSqlType.SQLITE;
-		public static JSqlType MYSQL = JSqlType.MYSQL;
-		public static JSqlType ORACLE = JSqlType.ORACLE;
-		public static JSqlType MSSQL = JSqlType.MSSQL;
+		public static final JSqlType SQLITE = JSqlType.SQLITE;
+		public static final JSqlType MYSQL = JSqlType.MYSQL;
+		public static final JSqlType ORACLE = JSqlType.ORACLE;
+		public static final JSqlType MSSQL = JSqlType.MSSQL;
 	}
 	
 	/// Byte to enum serialization

@@ -43,9 +43,4 @@ public class Base62 extends BaseX {
 		return instance = new Base62();
 	}
 	
-	/// Self refencing static copy
-	/// @deprecated Use getInstance() instead
-	@Deprecated
-	public static final Base62 obj = new Base62();
-	
 }

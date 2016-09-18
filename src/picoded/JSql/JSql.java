@@ -138,6 +138,8 @@ public class JSql extends BaseInterface {
 				} else if (Date.class.isInstance(argObj)) {
 					java.sql.Date sqlDate = new java.sql.Date( ((Date)argObj).getTime() );
 					ps.setDate(pt + 1, sqlDate);
+				} else if (java.sql.Blob.class.isInstance(argObj)) {
+					ps.setBlob(pt + 1, (java.sql.Blob) argObj);
 				} else {
 					String argClassName = argObj.getClass().getName();
 					throw new JSqlException("Unknown argument type (" + pt + ") : " + (argClassName));

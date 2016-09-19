@@ -154,11 +154,11 @@ public class ConvertJSON {
 	/// Converts a json string into a Object[] array
 	public static Object[] toObjectArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
-		if (rawList == null) {
-			return new Object[0];
+		Object[] ret = new Object[rawList.size()];
+		if (rawList.isEmpty()) {
+			return ret;
 		}
 		
-		Object[] ret = new Object[rawList.size()];
 		for (int a = 0; a < rawList.size(); ++a) {
 			ret[a] = rawList.get(a);
 		}

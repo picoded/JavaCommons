@@ -5,21 +5,19 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonParser;
 // Jackson library
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.JsonParser;
 
 ///
 /// json simplification helpers. When you do not need custom object / array structures
 ///
-/// @TODO : fromStringArray, fromDoubleArray, fromIntArray
 ///
 /// ---------------------------------------------------------------------------------------------------
 ///
 /// Technical notes: Jackson is used internally.
 ///
 public class ConvertJSON {
-	
 	/// cachedMapper builder, used to setup the config
 	private static ObjectMapper cachedMapperBuilder() {
 		ObjectMapper cm = new ObjectMapper();
@@ -112,13 +110,12 @@ public class ConvertJSON {
 	/// Converts a json string into a string[] array
 	public static String[] toStringArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
-		if (rawList == null || rawList.size() <= 0) {
+		if (rawList == null) {
 			return null;
 		}
 		
-		int len = rawList.size();
-		String[] ret = new String[len];
-		for (int a = 0; a < len; ++a) {
+		String[] ret = new String[rawList.size()];
+		for (int a = 0; a < rawList.size(); ++a) {
 			ret[a] = (String) rawList.get(a);
 		}
 		return ret;
@@ -127,13 +124,12 @@ public class ConvertJSON {
 	/// Converts a json string into a double[] array
 	public static double[] toDoubleArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
-		if (rawList == null || rawList.size() <= 0) {
+		if (rawList == null) {
 			return null;
 		}
-		
-		int len = rawList.size();
-		double[] ret = new double[len];
-		for (int a = 0; a < len; ++a) {
+
+		double[] ret = new double[rawList.size()];
+		for (int a = 0; a < rawList.size(); ++a) {
 			ret[a] = ((Number) rawList.get(a)).doubleValue();
 		}
 		return ret;
@@ -142,13 +138,12 @@ public class ConvertJSON {
 	/// Converts a json string into a int[] array
 	public static int[] toIntArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
-		if (rawList == null || rawList.size() <= 0) {
+		if (rawList == null) {
 			return null;
 		}
 		
-		int len = rawList.size();
-		int[] ret = new int[len];
-		for (int a = 0; a < len; ++a) {
+		int[] ret = new int[rawList.size()];
+		for (int a = 0; a < rawList.size(); ++a) {
 			ret[a] = ((Number) rawList.get(a)).intValue();
 		}
 		return ret;
@@ -157,13 +152,12 @@ public class ConvertJSON {
 	/// Converts a json string into a Object[] array
 	public static Object[] toObjectArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
-		if (rawList == null || rawList.size() <= 0) {
+		if (rawList == null) {
 			return null;
 		}
 		
-		int len = rawList.size();
-		Object[] ret = new Object[len];
-		for (int a = 0; a < len; ++a) {
+		Object[] ret = new Object[rawList.size()];
+		for (int a = 0; a < rawList.size(); ++a) {
 			ret[a] = rawList.get(a);
 		}
 		return ret;

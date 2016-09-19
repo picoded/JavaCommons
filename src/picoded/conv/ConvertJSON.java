@@ -19,9 +19,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 ///
 public class ConvertJSON {
 	
-	private  ConvertJSON(){
-		
-	}
+	private static String exceptionString ="to implement";
+	
 	/// cachedMapper builder, used to setup the config
 	private static ObjectMapper cachedMapperBuilder() {
 		ObjectMapper cm = new ObjectMapper();
@@ -173,21 +172,21 @@ public class ConvertJSON {
 	
 	/// Converts a Object[] to a json string
 	public static String fromArray(Object[] input) {
-		throw new IllegalArgumentException("to implement");
+		throw new IllegalArgumentException(exceptionString);
 	}
 	
 	/// Converts a String[] to a json string
 	public static String fromArray(String[] input) {
-		throw new IllegalArgumentException("to implement");
+		throw new IllegalArgumentException(exceptionString);
 	}
 	
 	/// Converts a double[] to a json string
 	public static String fromArray(double[] input) {
-		throw new IllegalArgumentException("to implement");
+		throw new IllegalArgumentException(exceptionString);
 	}
 	
 	/// Converts a int[] to a json string
 	public static String fromArray(int[] input) {
-		throw new IllegalArgumentException("to implement");
+		throw new IllegalArgumentException(exceptionString);
 	}
 }

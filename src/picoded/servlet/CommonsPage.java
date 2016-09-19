@@ -219,7 +219,7 @@ public class CommonsPage extends BasePage {
 			return false;
 		}
 		
-		return true;
+		return super.doAuth(templateData);
 	}
 	
 	/// Set the request mode to JSON, for API page

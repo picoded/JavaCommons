@@ -426,7 +426,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 				queryString = "?"+queryString;
 			}
 			
-			//
+			//	
 			// Enforce proper URL handling
 			//
 			httpResponse.sendRedirect( fullURI+"/"+queryString );

@@ -20,8 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ConvertJSON {
 	
 	private ConvertJSON(){
-		
 	}
+	
 	private static String errorMsg="to implement"; 
 	/// cachedMapper builder, used to setup the config
 	private static ObjectMapper cachedMapperBuilder() {
@@ -78,13 +78,13 @@ public class ConvertJSON {
 	/////////////////////////////////////////////////
 	
 	/// Converts json string into an mapping object
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("all")
 	public static Map<String, Object> toMap(String input) {
 		return (Map<String, Object>) toCustomClass(input, Map.class);
 	}
 	
 	/// Converts json string into an list array
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("all")
 	public static List<Object> toList(String input) {
 		return (List<Object>) toCustomClass(input, List.class);
 	}

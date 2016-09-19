@@ -61,6 +61,13 @@ public class CommonsPage extends BasePage {
 			return false;
 		}
 		
+		//
+		// Does parent handling first (including enforceProperRequestPathEnding)
+		//
+		if( super.doAuth(templateData) == false ) {
+			return false;
+		}
+		
 		// Enable or disable commons page Auth redirection
 		boolean commonWildcardAuth = JConfig().getBoolean("sys.CommonsPage.commonWildcardAuth", true);
 		boolean annoymousApiAccess = JConfigObj.getBoolean("sys.CommonsPage.annoymousApiAccess", false);

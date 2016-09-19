@@ -127,7 +127,7 @@ public class ConvertJSON {
 		if (rawList == null) {
 			return null;
 		}
-
+		
 		double[] ret = new double[rawList.size()];
 		for (int a = 0; a < rawList.size(); ++a) {
 			ret[a] = ((Number) rawList.get(a)).doubleValue();

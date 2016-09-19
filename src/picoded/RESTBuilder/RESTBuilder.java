@@ -369,7 +369,12 @@ public class RESTBuilder {
 			//----------------------------------------------------------------------------
 			// API base host name passing
 			//----------------------------------------------------------------------------
-			+ "var apiHost = '" + baseURL + "'; \n" //
+			+ "function apiHost() {\n" //
+			+ "		if(PageComponent == null || PageComponent.apiRootURI == null) {\n" //
+			+ "			return '"+baseURL+"';\n" //
+			+ "		}\n" //
+			+ "		return PageComponent.apiRootURI;\n" //
+			+ "}\n" //
 			//----------------------------------------------------------------------------
 			// Gets and filter the namespace string
 			//
@@ -407,9 +412,9 @@ public class RESTBuilder {
 			+ "		var ret = function(namespace) { \n" //
 			+ "			return " + namespaceBuilder + "(name+'/'+namespace); \n" //
 			+ "		}; \n" //
-			+ "		var tar = apiHost+name; \n" // Full URL for this node to request
 			//		// The actual internal AJAX function which calls xHttpCall
 			+ "		ret.ajax = function ajax(type, params, callbck) {\n" //
+			+ "			var tar = apiHost()+name; \n" // Full URL for this node to request
 			+ "			return " + xHttpCall + " (tar, type, params, callbck) \n" //
 			+ "		} \n" //
 			+ "		return ret; \n" //

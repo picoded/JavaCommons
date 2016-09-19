@@ -27,7 +27,7 @@ import java.lang.reflect.Constructor;
 import com.floreysoft.jmte.*;
 
 // Sub modules useds
-import picoded.conv.JMTE;
+import picoded.conv.*;
 import picoded.enums.*;
 import picoded.fileUtils.FileUtils;
 import picoded.JStack.*;
@@ -402,9 +402,29 @@ public class CommonsPage extends BasePage {
 	//---------------------------------------------------------
 	public boolean _commandLineInitialized = false;
 	
+	private static String getFromArray(String[] args, int pos, String fallback) {
+		if(args.length > pos) {
+			if( args[pos] != null && args[pos].length() > 0 ) {
+				return args[pos];
+			}
+		}
+		return fallback;
+	}
+	
+	///
+	/// Command line build call : Used to setup the pages, for more advance builds via CLI
+	///
 	public static void main(String[] args) {
 		
+		//-----------------------------
+		// The main class to run
+		//-----------------------------
+		
 		CommonsPage mainClass = null;
+		
+		//-----------------------------
+		// Get the parameters
+		//-----------------------------
 		
 		System.out.println("---------------------------------------------------");
 		System.out.println("- Command line Page build triggered");
@@ -415,22 +435,30 @@ public class CommonsPage extends BasePage {
 		//
 		// http://stackoverflow.com/questions/18647613/get-caller-class-name-from-inherited-static-method
 		//
-		String callingClassName = args[0];
-		System.out.println("- Assumed calling class name: " + callingClassName);
+		String callingClassName = getFromArray(args, 0, "picoded.servlet.CommonsPage");
+		String contextPath = getFromArray(args, 1, "./");
+		String contextURI = getFromArray(args, 2, "/");
 		
-		String contextPath = args[1];
 		if (!contextPath.endsWith("/")) {
 			contextPath = contextPath + "/";
 		}
-		System.out.println("- Assumed context path: " + contextPath);
-		
-		String contextURI = args[2];
 		if (!contextURI.endsWith("/")) {
 			contextURI = contextURI + "/";
 		}
-		System.out.println("- Assumed context URI: " + contextURI);
 		
+		String relativeMode = getFromArray(args, 3, "false");
+		String fullApiRootPath = getFromArray(args, 4, contextURI+"api");
+		
+		System.out.println("- Assumed calling class name: " + callingClassName);
+		System.out.println("- Assumed context path: " + contextPath);
+		System.out.println("- Assumed context URI: " + contextURI);
+		System.out.println("- Assumed relative URI mode: " + relativeMode);
+		System.out.println("- Assumed fullApiRootPath: " + fullApiRootPath);
 		System.out.println("---------------------------------------------------");
+		
+		//----------------------------------
+		// Try to load the relevent class
+		//----------------------------------
 		
 		try {
 			Class<?> c = Class.forName(callingClassName);
@@ -441,16 +469,28 @@ public class CommonsPage extends BasePage {
 				throw new RuntimeException("Provided class name is not extended from CommonsPage: " + callingClassName);
 			}
 			mainClass = (CommonsPage) built;
-			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		
 		System.out.println("- Initialized calling class, calling initializeContext() next");
 		
+		//-----------------------------
+		// Setup the config
+		//-----------------------------
+		
 		mainClass._commandLineInitialized = true;
 		mainClass._contextPath = contextPath;
 		mainClass._contextURI = contextURI;
+		
+		PageBuilder page = mainClass.PageBuilder();
+		page.enableRelativeURI = GenericConvert.toBoolean(relativeMode, true);
+		page.fullApiRootPath = fullApiRootPath;
+		
+		//-----------------------------
+		// Run via the command line
+		//-----------------------------
+		
 		try {
 			mainClass.initializeContext();
 		} catch (Exception e) {

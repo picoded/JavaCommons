@@ -578,7 +578,8 @@ public class PageBuilderCore {
 	
 	/// Builds a rawPageName HTML frame
 	public String buildPageFrame(String rawPageName, String injectionStr) {
-		String innerHTML = buildPageInnerHTML(rawPageName, pageJMTEvars(rawPageName));
+		Map<String,Object> templateVars = pageJMTEvars(rawPageName);
+		String innerHTML = buildPageInnerHTML(rawPageName, templateVars);
 		if (innerHTML == null) {
 			return null;
 		}
@@ -586,6 +587,7 @@ public class PageBuilderCore {
 		StringBuilder frame = new StringBuilder();
 		frame.append(pageFrameHeaderDiv(rawPageName));
 		if (injectionStr != null) {
+			injectionStr = processJMTE(injectionStr, templateVars, rawPageName);
 			frame.append(injectionStr);
 		}
 		
@@ -954,7 +956,7 @@ public class PageBuilderCore {
 				if (indexStr.indexOf(rawPageName + "/" + pageName_safe + ".css") > 0) {
 					// Skips injection if already included
 				} else {
-					injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='" + uriRootPrefix + "/"
+					injectorStrBuilder.append("<link rel='stylesheet' type='text/css' href='${PageRootURI}/"
 						+ rawPageName + "/" + pageName_safe + ".css'></link>\n");
 				}
 			}
@@ -962,7 +964,7 @@ public class PageBuilderCore {
 				if (indexStr.indexOf(rawPageName + "/" + pageName_safe + ".js") > 0) {
 					// Skips injection if already included
 				} else {
-					injectorStrBuilder.append("<script src='" + uriRootPrefix + "/" + rawPageName + "/" + pageName_safe
+					injectorStrBuilder.append("<script src='${PageRootURI}/" + rawPageName + "/" + pageName_safe
 						+ ".js'></script>\n");
 				}
 			}
@@ -970,7 +972,7 @@ public class PageBuilderCore {
 				if (indexStr.indexOf(rawPageName + "/" + pageName_safe + ".jsons.js") > 0) {
 					// Skips injection if already included
 				} else {
-					injectorStrBuilder.append("<script src='" + uriRootPrefix + "/" + rawPageName + "/" + pageName_safe
+					injectorStrBuilder.append("<script src='${PageRootURI}/" + rawPageName + "/" + pageName_safe
 						+ ".jsons.js'></script>\n");
 				}
 			}

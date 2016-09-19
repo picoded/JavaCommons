@@ -309,9 +309,15 @@ public class BasePage extends JStackPage implements ServletContextListener {
 			return _pageBuilderObj;
 		}
 		
+		JConfig jc = JConfig();
+		
 		_pageBuilderObj = new PageBuilder(getPageTemplatePath(), getPageOutputPath());
 		_pageBuilderObj.setJMTE(JMTE());
 		_pageBuilderObj.setUriRootPrefix(getContextURI());
+		
+		// Page builder config
+		_pageBuilderObj.enableRelativeURI = jc.getBoolean("sys.pageBuilder.enableRelativeURI", false);
+		_pageBuilderObj.fullApiRootPath = jc.getString("sys.pageBuilder.fullApiRootPath", null);
 		
 		return _pageBuilderObj;
 	}

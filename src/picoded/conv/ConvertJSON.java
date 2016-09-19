@@ -18,6 +18,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /// Technical notes: Jackson is used internally.
 ///
 public class ConvertJSON {
+	
+	private  ConvertJSON(){
+		
+	}
 	/// cachedMapper builder, used to setup the config
 	private static ObjectMapper cachedMapperBuilder() {
 		ObjectMapper cm = new ObjectMapper();
@@ -110,11 +114,10 @@ public class ConvertJSON {
 	/// Converts a json string into a string[] array
 	public static String[] toStringArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
-		if (rawList == null) {
-			return null;
-		}
-		
 		String[] ret = new String[rawList.size()];
+		if (rawList.isEmpty()) {
+			return ret;
+		}
 		for (int a = 0; a < rawList.size(); ++a) {
 			ret[a] = (String) rawList.get(a);
 		}
@@ -124,11 +127,10 @@ public class ConvertJSON {
 	/// Converts a json string into a double[] array
 	public static double[] toDoubleArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
-		if (rawList == null) {
-			return null;
-		}
-		
 		double[] ret = new double[rawList.size()];
+		if (rawList.isEmpty() || rawList == null) {
+			return ret;
+		}
 		for (int a = 0; a < rawList.size(); ++a) {
 			ret[a] = ((Number) rawList.get(a)).doubleValue();
 		}
@@ -138,11 +140,11 @@ public class ConvertJSON {
 	/// Converts a json string into a int[] array
 	public static int[] toIntArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
-		if (rawList == null) {
-			return null;
+		int[] ret = new int[rawList.size()];
+		if (rawList.isEmpty()) {
+			return ret;
 		}
 		
-		int[] ret = new int[rawList.size()];
 		for (int a = 0; a < rawList.size(); ++a) {
 			ret[a] = ((Number) rawList.get(a)).intValue();
 		}
@@ -153,7 +155,7 @@ public class ConvertJSON {
 	public static Object[] toObjectArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
 		if (rawList == null) {
-			return null;
+			return new Object[0];
 		}
 		
 		Object[] ret = new Object[rawList.size()];
@@ -170,25 +172,21 @@ public class ConvertJSON {
 	/////////////////////////////////////////////////
 	
 	/// Converts a Object[] to a json string
-	/// @TODO : Actual implementation
 	public static String fromArray(Object[] input) {
 		throw new IllegalArgumentException("to implement");
 	}
 	
 	/// Converts a String[] to a json string
-	/// @TODO : Actual implementation
 	public static String fromArray(String[] input) {
 		throw new IllegalArgumentException("to implement");
 	}
 	
 	/// Converts a double[] to a json string
-	/// @TODO : Actual implementation
 	public static String fromArray(double[] input) {
 		throw new IllegalArgumentException("to implement");
 	}
 	
 	/// Converts a int[] to a json string
-	/// @TODO : Actual implementation
 	public static String fromArray(int[] input) {
 		throw new IllegalArgumentException("to implement");
 	}

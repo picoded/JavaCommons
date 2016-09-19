@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 ///
 /// Technical notes: Jackson is used internally.
 ///
-public class ConvertJSON {
+public final class ConvertJSON {
 	
 	private ConvertJSON(){
 	}

@@ -128,7 +128,7 @@ public class ConvertJSON {
 	public static double[] toDoubleArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
 		double[] ret = new double[rawList.size()];
-		if (rawList.isEmpty() || rawList == null) {
+		if (rawList.isEmpty()) {
 			return ret;
 		}
 		for (int a = 0; a < rawList.size(); ++a) {

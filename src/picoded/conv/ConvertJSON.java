@@ -19,6 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 ///
 public class ConvertJSON {
 	
+	private ConvertJSON(){
+		
+	}
 	private static String errorMsg="to implement"; 
 	/// cachedMapper builder, used to setup the config
 	private static ObjectMapper cachedMapperBuilder() {
@@ -113,7 +116,7 @@ public class ConvertJSON {
 	public static String[] toStringArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
 		if (rawList == null) {
-			return null;
+			return new String[0];
 		}
 		
 		String[] ret = new String[rawList.size()];
@@ -127,7 +130,7 @@ public class ConvertJSON {
 	public static double[] toDoubleArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
 		if (rawList == null) {
-			return null;
+			return new double[0];
 		}
 		
 		double[] ret = new double[rawList.size()];
@@ -141,7 +144,7 @@ public class ConvertJSON {
 	public static int[] toIntArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
 		if (rawList == null) {
-			return null;
+			return new int[0];
 		}
 		
 		int[] ret = new int[rawList.size()];
@@ -155,7 +158,7 @@ public class ConvertJSON {
 	public static Object[] toObjectArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
 		if (rawList == null) {
-			return null;
+			return new Object[0];
 		}
 		
 		Object[] ret = new Object[rawList.size()];
@@ -172,25 +175,21 @@ public class ConvertJSON {
 	/////////////////////////////////////////////////
 	
 	/// Converts a Object[] to a json string
-	/// @TODO : Actual implementation
 	public static String fromArray(Object[] input) {
 		throw new IllegalArgumentException(errorMsg);
 	}
 	
 	/// Converts a String[] to a json string
-	/// @TODO : Actual implementation
 	public static String fromArray(String[] input) {
 		throw new IllegalArgumentException(errorMsg);
 	}
 	
 	/// Converts a double[] to a json string
-	/// @TODO : Actual implementation
 	public static String fromArray(double[] input) {
 		throw new IllegalArgumentException(errorMsg);
 	}
 	
 	/// Converts a int[] to a json string
-	/// @TODO : Actual implementation
 	public static String fromArray(int[] input) {
 		throw new IllegalArgumentException(errorMsg);
 	}

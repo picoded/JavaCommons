@@ -34,24 +34,23 @@ public class PageComponentFilter {
 	}
 	
 	/// Filtering a html string, and resolving all the page component
-	public String resolve(Document doc) {
-		//resolveElements( doc.select("page-*") );
-		resolveElements(doc.select("*"));
+	public String resolve(Document doc, String requestingRawPageName) {
+		resolveElements(doc.select("*"), requestingRawPageName);
 		return doc.toString();
 	}
 	
 	/// Filtering a html string, and resolving all the page component
-	public String resolve(String inHTML) {
-		return resolve(Jsoup.parse(inHTML));
+	public String resolve(String inHTML, String requestingRawPageName) {
+		return resolve(Jsoup.parse(inHTML), requestingRawPageName);
 	}
 	
 	/// Filtering a html string, and resolving all the page component
-	public String resolveParts(String inHTML) {
-		return resolve(Jsoup.parseBodyFragment(inHTML));
+	public String resolveParts(String inHTML, String requestingRawPageName) {
+		return resolve(Jsoup.parseBodyFragment(inHTML), requestingRawPageName);
 	}
 	
 	/// Process page elements
-	protected void resolveElements(Elements eArr) {
+	protected void resolveElements(Elements eArr, String requestingRawPageName) {
 		for (Element e : eArr) {
 			String tagname = e.tagName();
 			String innerHTML = e.html();
@@ -66,7 +65,7 @@ public class PageComponentFilter {
 					}
 				}
 				
-				e.replaceWith(createElementComponent(tagname, innerHTML, tagArgs));
+				e.replaceWith(createElementComponent(tagname, innerHTML, tagArgs, requestingRawPageName));
 			}
 		}
 	}
@@ -121,7 +120,7 @@ public class PageComponentFilter {
 	}
 	
 	/// Create the element node, to inject
-	protected Element createElementComponent(String tagname, String innerHTML, Map<String, Object> tagArgs) {
+	protected Element createElementComponent(String tagname, String innerHTML, Map<String, Object> tagArgs, String requestingRawPageName) {
 		if (tagname.startsWith("page-") || tagname.startsWith("PAGE-")) {
 			tagname = tagname.substring(5);
 		}
@@ -162,8 +161,8 @@ public class PageComponentFilter {
 		componentProtectedArgs.put("innerHTML", innerHTML);
 		genericJMTE.put("Component", componentProtectedArgs);
 		
-		String jmteProcessedHtml = core.getJMTE().parseTemplate(rawHtml, genericJMTE);
-		String resolvedHtml = resolveParts(jmteProcessedHtml);
+		String jmteProcessedHtml = core.processJMTE(rawHtml, genericJMTE, requestingRawPageName);
+		String resolvedHtml = resolveParts(jmteProcessedHtml, requestingRawPageName);
 		
 		Document newDom = Jsoup.parse(resolvedHtml);
 		Elements elementSet = newDom.children();

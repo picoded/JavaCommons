@@ -139,6 +139,22 @@ public class PageBuilderCore {
 		uriRootPrefix = set;
 	}
 	
+	///
+	/// Internal centralized point (for the class) to process JMTE tempaltes
+	///
+	/// Used to centralizes the handling of "filterRawTemplateForRelativeURImode" and etc.
+	///
+	/// @param  
+	///
+	///
+	protected String processJMTE(String template, Map<String,Object> templateObj, String relativeRawPageName) {
+		if( relativeRawPageName != null ) {
+			templateObj = overwriteTemplateObjectForRleativePathIfNeeded(templateObj, relativeRawPageName);
+		}
+		
+		return getJMTE().parseTemplate(filterRawTemplateForRelativeURImode(template), templateObj);
+	}
+	
 	////////////////////////////////////////////////////////////
 	//
 	// Utility functions
@@ -275,7 +291,7 @@ public class PageBuilderCore {
 		Map<String, Object> ret = getTemplateJson(rawPageName);
 		
 		ret.put("PageRootURI", uriRootPrefix);
-		ret.put("PagesRootURI", uriRootPrefix); //because FAportal and orgeva //@TODO: Remove this
+		ret.put("ApiRootURI", uriRootPrefix+"/api");
 		ret.put("PageURI", pageURI);
 		
 		ret.put("PageNameRaw", rawPageName);
@@ -290,6 +306,7 @@ public class PageBuilderCore {
 		//-----------------------------
 		ret.put("PageFrameID", pageFrameID_ifamLegacy(rawPageName));
 		ret.put("PageComponent", buildPageComponentMap());
+		ret.put("PagesRootURI", uriRootPrefix); //because FAportal and orgeva //@TODO: Remove this
 		
 		return ret;
 	}
@@ -313,11 +330,15 @@ public class PageBuilderCore {
 		rawPageName = rawPageName.replaceAll("\\.", "/");
 		rawPageName = rawPageName.replaceAll("\\-", "/");
 		
+		// Double slashses are normalized here as well, complex relative paths are condensed
 		rawPageName = FileUtils.normalize(rawPageName).trim();
 		
+		// Remove starting slashes
 		while (rawPageName.startsWith("/")) {
 			rawPageName = rawPageName.substring(1);
 		}
+		
+		// Remove ending slashes
 		while (rawPageName.endsWith("/")) {
 			rawPageName = rawPageName.substring(0, rawPageName.length());
 		}
@@ -393,18 +414,106 @@ public class PageBuilderCore {
 	
 	////////////////////////////////////////////////////////////
 	//
+	// Relative path handling (Phabricator T605)
+	//
+	////////////////////////////////////////////////////////////
+	
+	/// Boolean switch to enable RelativeURI mode (or not)
+	public boolean enableRelativeURI = false;
+	
+	/// The full API to use, if null. It fallsback to ${PageRootURI}/api
+	public String fullApiRootPath = null;
+	
+	/// Filters the template in preperation for RelativeURI mode
+	///
+	/// AKA: replace_PageRootURI_to_ApiRootURI_whereApplicable
+	protected String filterRawTemplateForRelativeURImode(String input) {
+		// Also normalizes the PagesRootURI to PageRootURI
+		return input.replaceAll("\\$\\{PagesRootURI\\}", "\\${PageRootURI}/").replaceAll("\\$\\{PageRootURI\\}/api", "\\${ApiRootURI}");
+	}
+	
+	/// Process and overwrite the template object for the relative path mode
+	/// 
+	/// @param  Template object to overwrite
+	/// @param  The raw page name (used to process the relative pathing)
+	///
+	/// @return The overwritten template object
+	protected Map<String,Object> overwriteTemplateObjectForRleativePathIfNeeded(Map<String,Object> templateObj, String rawPageName) {
+		
+		// Skip if enableRelativeURI is disabled (no processing)
+		if(!enableRelativeURI) {
+			return templateObj;
+		}
+		
+		// Tabulate the root path
+		String relativeRoot = tabulateRelativePath(rawPageName);
+		
+		// Does the actual substitution
+		templateObj.put("PageRootURI", relativeRoot);
+		
+		if( fullApiRootPath != null ) {
+			templateObj.put("ApiRootURI", fullApiRootPath);
+		} else {
+			//
+			// NOTE: Relative API path is a VERY complex problem,
+			// as it will be passed around as a string in JS, losing much contextual infromation.
+			// 
+			templateObj.put("ApiRootURI", relativeRoot+"/api" );
+		}
+		
+		// Return template object
+		return templateObj;
+	}
+	
+	///
+	/// Derive the relative path using the rawPageName after filtering it
+	///
+	/// The following is the expected input, and its output
+	///
+	/// | input string    | Relative ROOT path    |
+	/// |-----------------|-----------------------|
+	/// | (blank)         | .                     |
+	/// | abc             | ./..                  |
+	/// | /abc/           | ./..                  |
+	/// | abc/xyz         | ./../..               |
+	/// | abc/xyz/        | ./../..               |
+	///
+	protected String tabulateRelativePath(String rawPageName) {
+		// Processing relative path mode =x
+		rawPageName = filterRawPageName(rawPageName);
+		
+		// Check for blank
+		if( rawPageName == null || rawPageName.length() <= 0 ) {
+			return "./";
+		}
+		
+		// Split the raw page name
+		String[] splitPageName = rawPageName.split("/");
+		
+		// Return the path in accordance to the length
+		StringBuilder ret = new StringBuilder(".");
+		for(int i=0; i<splitPageName.length; ++i) {
+			ret.append("/..");
+		}
+		
+		// Return the result
+		return ret.toString();
+	}
+	
+	////////////////////////////////////////////////////////////
+	//
 	// HTML handling
 	//
 	////////////////////////////////////////////////////////////
 	
 	/// Gets the prefix
 	public String prefixHTML(String rawPageName) {
-		return getJMTE().parseTemplate(getCommonPrefixOrSuffixHtml(rawPageName, "prefix"), pageJMTEvars(rawPageName));
+		return processJMTE(getCommonPrefixOrSuffixHtml(rawPageName, "prefix"), pageJMTEvars(rawPageName), rawPageName);
 	}
 	
 	/// Gets the prefix
 	public String suffixHTML(String rawPageName) {
-		return getJMTE().parseTemplate(getCommonPrefixOrSuffixHtml(rawPageName, "suffix"), pageJMTEvars(rawPageName));
+		return processJMTE(getCommonPrefixOrSuffixHtml(rawPageName, "suffix"), pageJMTEvars(rawPageName), rawPageName);
 	}
 	
 	/// Gets and returns a page frame raw string without going through the JMTE parser
@@ -453,7 +562,7 @@ public class PageBuilderCore {
 			jmteTemplate = pageJMTEvars(rawPageName);
 		}
 		
-		return getJMTE().parseTemplate(indexFileStr.toString(), jmteTemplate);
+		return processJMTE(indexFileStr.toString(), jmteTemplate, rawPageName);
 	}
 	
 	/// Get the page frame div header, this is used to do a "search replace" for script / css injection
@@ -607,10 +716,11 @@ public class PageBuilderCore {
 	/// @param  Source file (returns false if not exists)
 	/// @param  Target file (written if source file exists)
 	/// @param  The page name used, used in certain type logic
+	/// @param  The page name used, used in deriving relative file path logic
 	/// @param  The JMTE variable map to use
 	///
 	/// @return true, if a file was processed and written
-	public boolean processPageFile(PageFileType type, File input, File output, String rawPageName,
+	public boolean processPageFile(PageFileType type, File input, File output, String rawPageName, String relativeRawPageName,
 		Map<String, Object> jmteVarMap) throws IOException {
 		if (input.exists() && input.isFile() && input.canRead()) {
 			// Gets its string value, and process only if not blank
@@ -621,7 +731,7 @@ public class PageBuilderCore {
 				if (type == PageFileType.jsons_to_js) {
 					
 					// Does a JMTE filter
-					fileVal = getJMTE().parseTemplate(fileVal, jmteVarMap);
+					fileVal = processJMTE(fileVal, jmteVarMap, relativeRawPageName);
 					
 					// Adds the script object wrapper
 					fileVal = "window.PageComponent = window.PageComponent || {}; window.PageComponent."
@@ -645,13 +755,13 @@ public class PageBuilderCore {
 					fileVal = (lessPrefix + "\n" + fileVal + "\n" + lessSuffix).trim();
 					
 					// Does a JMTE filter
-					fileVal = getJMTE().parseTemplate(fileVal, jmteVarMap);
+					fileVal = processJMTE(fileVal, jmteVarMap, relativeRawPageName);
 					
 					// Less to css conversion
 					fileVal = less.compile(fileVal);
 				} else {
 					// Does a JMTE filter
-					fileVal = getJMTE().parseTemplate(fileVal, jmteVarMap);
+					fileVal = processJMTE(fileVal, jmteVarMap, relativeRawPageName);
 				}
 				
 				// Write to file if it differ
@@ -670,13 +780,14 @@ public class PageBuilderCore {
 	/// @param  Source file (returns false if not exists)
 	/// @param  Target file (written if source file exists)
 	/// @param  The page name used, used in certain type logic
+	/// @param  The page name used, used in deriving relative file path logic
 	/// @param  The JMTE variable map to use
 	///
 	/// @return true, if a file was processed and written
-	public boolean processPageFile(PageFileType type, File[] inputArr, File output, String rawPageName,
+	public boolean processPageFile(PageFileType type, File[] inputArr, File output, String rawPageName, String relativeRawPageName,
 		Map<String, Object> jmteVarMap) throws IOException {
 		for (File input : inputArr) {
-			if (processPageFile(type, input, output, rawPageName, jmteVarMap)) {
+			if (processPageFile(type, input, output, rawPageName, relativeRawPageName, jmteVarMap)) {
 				return true;
 			}
 		}
@@ -811,19 +922,19 @@ public class PageBuilderCore {
 			//-------------------------------------------------------------------
 			boolean hasJsFile = processPageFile(PageFileType.js, new File[] { new File(definitionFolder, "index.js"),
 				new File(definitionFolder, pageName_safe + ".js") }, new File(outputPageFolder, pageName_safe + ".js"),
-				rawPageName, jmteVarMap);
+				rawPageName, rawPageName, jmteVarMap);
 			
 			// Build the JSONS script (if provided)
 			//-------------------------------------------------------------------
 			boolean hasJsonsFile = processPageFile(PageFileType.jsons_to_js, new File[] {
 				new File(definitionFolder, "index.jsons"), new File(definitionFolder, pageName_safe + ".jsons") },
-				new File(outputPageFolder, pageName_safe + ".jsons.js"), rawPageName, jmteVarMap);
+				new File(outputPageFolder, pageName_safe + ".jsons.js"), rawPageName, rawPageName, jmteVarMap);
 			
 			// Build the LESS script (if provided)
 			//-------------------------------------------------------------------
 			boolean hasLessFile = processPageFile(PageFileType.less_to_css, new File[] {
 				new File(definitionFolder, "index.less"), new File(definitionFolder, pageName_safe + ".less") }, new File(
-				outputPageFolder, pageName_safe + ".css"), rawPageName, jmteVarMap);
+				outputPageFolder, pageName_safe + ".css"), rawPageName, rawPageName, jmteVarMap);
 			
 			// Build the html page
 			//-------------------------------------------------------------------
@@ -877,7 +988,7 @@ public class PageBuilderCore {
 			
 			// Component resolution
 			//-------------------------------------------------------------------
-			indexStr = componentFilter.resolve(indexStr);
+			indexStr = componentFilter.resolve(indexStr, rawPageName);
 			
 			// HTML minify
 			//-------------------------------------------------------------------
@@ -1053,9 +1164,15 @@ public class PageBuilderCore {
 	}
 	
 	/// Get dependency file into a string builder utility
-	protected StringBuilder dependencyGetSingleFile(StringBuilder res, String pageFilePath) {
+	protected StringBuilder dependencyGetSingleFile(StringBuilder res, String pageFilePath, String checkType) {
 		String fileData = FileUtils.readFileToString_withFallback(new File(pageFolder, pageFilePath), null);
 		if (fileData != null) {
+			if( checkType.equalsIgnoreCase("es6") ) {
+				if( fileData.indexOf("${PageRootURI}") >= 0 || fileData.indexOf("${ApiRootURI}") >= 0 ) {
+					throw new RuntimeException("("+pageFilePath+") Do not use ${Page/ApiRootURI} inside depend.es6 scripts as it does not resolve properly. Use PageComponent.page/apiRootURI instead");
+				}
+			}
+			
 			res.append("/** file:" + pageFilePath + " **/\n"); //Added file name reference
 			res.append(fileData);
 			res.append("\n");
@@ -1076,15 +1193,14 @@ public class PageBuilderCore {
 		//
 		// Process JMTE filtered scripts
 		// 
-		JMTE jmte = getJMTE();
 		Map<String, Object> jmteVars = pageJMTEvars(path);
 		StringBuilder toJMTEParse = new StringBuilder();
 		if (type.equalsIgnoreCase("less")) {
-			dependencyGetSingleFile(toJMTEParse, path + "/depend.less");
-			dependencyGetSingleFile(toJMTEParse, path + "/depend.css");
+			dependencyGetSingleFile(toJMTEParse, path + "/depend.less", type);
+			dependencyGetSingleFile(toJMTEParse, path + "/depend.css", type);
 		} else {
-			dependencyGetSingleFile(toJMTEParse, path + "/depend.es6");
-			dependencyGetSingleFile(toJMTEParse, path + "/depend.js");
+			dependencyGetSingleFile(toJMTEParse, path + "/depend.es6", type);
+			dependencyGetSingleFile(toJMTEParse, path + "/depend.js", type);
 		}
 		
 		//
@@ -1093,7 +1209,7 @@ public class PageBuilderCore {
 		String[] fileList = depenencyConfig(path).getStringArray(type + "_jmte", "[]");
 		for (String filePath : fileList) {
 			// Parse any templates if need be
-			filePath = jmte.parseTemplate(filePath, jmteVars);
+			filePath = processJMTE(filePath, jmteVars, path);
 			
 			// Changes relative path to fixed path
 			if (!filePath.startsWith("/")) {
@@ -1101,10 +1217,11 @@ public class PageBuilderCore {
 			}
 			
 			// Get and inject, without JMTE parsing
-			dependencyGetSingleFile(toJMTEParse, filePath);
+			dependencyGetSingleFile(toJMTEParse, filePath, type);
 		}
 		
-		res.append(jmte.parseTemplate(toJMTEParse.toString(), jmteVars));
+		String toJMTEParseString = toJMTEParse.toString();
+		res.append(processJMTE(toJMTEParseString, jmteVars, "build"));
 		
 		//
 		// Process non fitlered scripts
@@ -1112,7 +1229,7 @@ public class PageBuilderCore {
 		fileList = depenencyConfig(path).getStringArray(type, "[]");
 		for (String filePath : fileList) {
 			// Parse any templates if need be
-			filePath = jmte.parseTemplate(filePath, jmteVars);
+			filePath = processJMTE(filePath, jmteVars, path);
 			
 			// Changes relative path to fixed path
 			if (!filePath.startsWith("/")) {
@@ -1120,7 +1237,7 @@ public class PageBuilderCore {
 			}
 			
 			// Get and inject, without JMTE parsing
-			dependencyGetSingleFile(res, filePath);
+			dependencyGetSingleFile(res, filePath, type);
 		}
 		return res;
 	}
@@ -1129,7 +1246,7 @@ public class PageBuilderCore {
 	protected String dependencyBuildFile(String type) {
 		StringBuilder res = new StringBuilder();
 		
-		res.append("/**** " + type + " dependcies for the following component ****\n\n");
+		res.append("/**** " + type + " dependencies for the following component ****\n\n");
 		for (String path : dependencyTracker) {
 			res.append("+ '" + path + "'\n");
 		}

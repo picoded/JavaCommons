@@ -4,29 +4,67 @@ package picoded.conv;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntFunction;
 
+// Apache array utils used
 import org.apache.commons.lang3.ArrayUtils;
 
+// Jackson library used
 import com.fasterxml.jackson.core.JsonParser;
-// Jackson library
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 ///
 /// json simplification helpers. When you do not need custom object / array structures
 ///
+/// Which is frankly speaking should be 99.99% of the time. Seriously just use Map, 
+/// instead of custom classes. It will save you alot of headache in the future.
+///
 /// ---------------------------------------------------------------------------------------------------
 ///
 /// Technical notes: Jackson is used internally.
 ///
-public final class ConvertJSON {
+public class ConvertJSON {
 	
-	private ConvertJSON() {
-		cachedMapperBuilder();
-		
+	/// Invalid constructor (throws exception)
+	protected ConvertJSON() {
+		throw new IllegalAccessError("Utility class");
 	}
 	
-	/// cachedMapper builder, used to setup the config
-	private static ObjectMapper cachedMapperBuilder() {
+	/// Illegal JSON format type. Used to handle all format exceptions in this class
+	///
+	/// Can be treated as a RuntimeException, and IllegalArgumentException
+	public static class InvalidFormatJSON extends IllegalArgumentException {
+		/// Common message
+		public InvalidFormatJSON(Throwable cause) {
+			this("Invalid Format JSON", cause);
+		}
+		
+		/// Cloning the constructor
+		public InvalidFormatJSON(String message, Throwable cause) {
+			super(message, cause);
+		}
+	}
+	
+	/// Internal reused object mapper, this is via jackson json converter
+	///
+	/// Memoizer for cachedMapper()
+	private static ObjectMapper _cachedMapper = null;
+	
+	/// cachedMapper used for JSON string parsing, this is generated once,
+	/// and reused for each return call
+	///
+	/// Note that the JSON formatting here ALLOW COMMENTS, and single quotes.
+	/// Basically making it as "linent" as a valid JSON structure in JS.
+	///
+	/// @returns The Jacksons cached map builder
+	private static ObjectMapper cachedMapper() {
+		
+		// Reuse old object mapping
+		if (_cachedMapper != null) {
+			return _cachedMapper;
+		}
+		
+		// New object mapping
 		ObjectMapper cm = new ObjectMapper();
 		
 		// Allow comments in strings
@@ -39,11 +77,8 @@ public final class ConvertJSON {
 		cm.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
 		
 		// Actual map builder
-		return cm;
+		return _cachedMapper = cm;
 	}
-	
-	/// Internal reused object mapper, this is via jackson json conerter
-	private static ObjectMapper cachedMapper = cachedMapperBuilder();
 	
 	/////////////////////////////////////////////////
 	//
@@ -51,26 +86,77 @@ public final class ConvertJSON {
 	//
 	/////////////////////////////////////////////////
 	
-	/// Converts input object into a json string
+	/// Converts input Map into a json string
+	///
+	/// @param  Input map to convert
+	///
+	/// @return The json string
 	public static String fromMap(Map<String, ?> input) {
 		return fromObject(input);
 	}
 	
-	/// Converts input object into a json string
+	/// Converts input List into a json string
+	///
+	/// @param  Input map to convert
+	///
+	/// @return The json string
 	public static String fromList(List<?> input) {
 		return fromObject(input);
 	}
 	
 	/// Converts input object into a json string
 	///
-	/// Note that this is the core "to JSON string" function that all
+	/// Note: This refers to java object types, not arrays
+	///
+	/// Note: that this is the core "to JSON string" function that all
 	/// other type strict varient is built ontop of.
+	///
+	/// @param  Input object to convert
+	///
+	/// @return The json string
 	public static String fromObject(Object input) {
 		try {
-			return cachedMapper.writeValueAsString(input);
-		} catch (IOException e) { // IOException shdnt occur, as input is not a file
-			throw new IllegalArgumentException(e);
+			return cachedMapper().writeValueAsString(input);
+		} catch (IOException e) {
+			// Any exception is recasted as InvalidFormatJSON
+			throw new InvalidFormatJSON(e);
 		}
+	}
+	
+	/////////////////////////////////////////////////
+	//
+	// From array conversion to JSON string conversion
+	//
+	/////////////////////////////////////////////////
+	
+	/// Converts a Object[] to a json string
+	public static String fromArray(Object[] input) {
+		return ConvertJSON.fromObject(input);
+	}
+	
+	/// Converts a String[] to a json string
+	public static String fromArray(String[] input) {
+		return ConvertJSON.fromObject(input);
+	}
+	
+	/// Converts a double[] to a json string
+	public static String fromArray(double[] input) {
+		return ConvertJSON.fromObject(input);
+	}
+	
+	/// Converts a int[] to a json string
+	public static String fromArray(int[] input) {
+		return ConvertJSON.fromObject(input);
+	}
+	
+	/// Converts a long[] to a json string
+	public static String fromArray(long[] input) {
+		return ConvertJSON.fromObject(input);
+	}
+	
+	/// Converts a long[] to a json string
+	public static String fromArray(float[] input) {
+		return ConvertJSON.fromObject(input);
 	}
 	
 	/////////////////////////////////////////////////
@@ -80,18 +166,30 @@ public final class ConvertJSON {
 	/////////////////////////////////////////////////
 	
 	/// Converts json string into an mapping object
-	@SuppressWarnings("all")
+	///
+	/// @param  JSON string
+	///
+	/// @return  Output Map if successful, else throws an error
+	@SuppressWarnings("unchecked")
 	public static Map<String, Object> toMap(String input) {
 		return (Map<String, Object>) toCustomClass(input, Map.class);
 	}
 	
 	/// Converts json string into an list array
-	@SuppressWarnings("all")
+	///
+	/// @param  JSON string
+	///
+	/// @return  Output List if successful, else throws an error
+	@SuppressWarnings("unchecked")
 	public static List<Object> toList(String input) {
 		return (List<Object>) toCustomClass(input, List.class);
 	}
 	
 	/// Converts json string into any output object (depends on input)
+	///
+	/// @param  JSON string
+	///
+	/// @return  Output object (either map or list)
 	public static Object toObject(String input) {
 		return toCustomClass(input, Object.class);
 	}
@@ -100,11 +198,16 @@ public final class ConvertJSON {
 	///
 	/// Note that this is the core "to java object" function that all
 	/// other type strict varient is built ontop of.
+	///
+	/// @param  JSON string
+	///
+	/// @return  Output object (either map or list, or other class)
 	public static Object toCustomClass(String input, Class<?> c) {
 		try {
-			return cachedMapper.readValue(input, c);
-		} catch (IOException e) { // IOException shdnt occur, as input is not a file
-			throw new IllegalArgumentException(e);
+			return cachedMapper().readValue(input, c);
+		} catch (Exception e) {
+			// Any exception is recasted as InvalidFormatJSON
+			throw new InvalidFormatJSON(e);
 		}
 	}
 	
@@ -114,21 +217,46 @@ public final class ConvertJSON {
 	//
 	/////////////////////////////////////////////////
 	
+	/// Converts a json string into a Object[] array
+	///
+	/// @param  Input JSON string
+	///
+	/// @return Converted Object[] array, or Null for input 'null'
+	public static Object[] toObjectArray(String input) {
+		List<Object> rawList = ConvertJSON.toList(input);
+		if (rawList == null) {
+			return null;
+		}
+		
+		// Using stream() - optimizing a microbenchmark
+		// See: http://stackoverflow.com/questions/16635398/java-8-iterable-foreach-vs-foreach-loop
+		return rawList.stream().toArray(Object[]::new);
+	}
+	
 	/// Converts a json string into a string[] array
+	///
+	/// @param  Input JSON string
+	///
+	/// @return Converted String[] array, or Null for input 'null'
 	public static String[] toStringArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
 		if (rawList == null) {
-			return new String[0];
+			return null;
 		}
-		
 		String[] ret = new String[rawList.size()];
 		for (int a = 0; a < rawList.size(); ++a) {
-			ret[a] = (String) rawList.get(a);
+			if (rawList.get(a) != null) {
+				ret[a] = rawList.get(a).toString();
+			}
 		}
 		return ret;
 	}
 	
 	/// Converts a json string into a double[] array
+	///
+	/// @param  Input JSON string
+	///
+	/// @return Converted double[] array, or Null for input 'null'
 	public static double[] toDoubleArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
 		if (rawList == null) {
@@ -143,10 +271,14 @@ public final class ConvertJSON {
 	}
 	
 	/// Converts a json string into a int[] array
+	///
+	/// @param  Input JSON string
+	///
+	/// @return Converted int[] array, or Null for input 'null'
 	public static int[] toIntArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
 		if (rawList == null) {
-			return new int[0];
+			return null;
 		}
 		
 		int[] ret = new int[rawList.size()];
@@ -156,62 +288,40 @@ public final class ConvertJSON {
 		return ret;
 	}
 	
-	/// Converts a json string into a Object[] array
-	public static Object[] toObjectArray(String input) {
+	/// Converts a json string into a float[] array
+	///
+	/// @param  Input JSON string
+	///
+	/// @return Converted float[] array, or Null for input 'null'
+	public static float[] toFloatArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
 		if (rawList == null) {
-			return new Object[0];
+			return null;
 		}
 		
-		Object[] ret = new Object[rawList.size()];
+		float[] ret = new float[rawList.size()];
 		for (int a = 0; a < rawList.size(); ++a) {
-			ret[a] = rawList.get(a);
+			ret[a] = ((Number) rawList.get(a)).floatValue();
 		}
 		return ret;
 	}
 	
-	/////////////////////////////////////////////////
-	//
-	// From array conversion to string
-	//
-	/////////////////////////////////////////////////
-	
-	/// Converts a Object[] to a json string
-	public static String fromArray(Object[] input) {
-		return jsonStringfromArray(input);
-	}
-	
-	/// Converts a String[] to a json string
-	public static String fromArray(String[] input) {
-		return jsonStringfromArray(input);
-	}
-	
-	/// Converts a double[] to a json string
-	public static String fromArray(double[] input) {
-		return jsonStringfromArray(ArrayUtils.toObject(input));
-	}
-	
-	/// Converts a int[] to a json string
-	public static String fromArray(int[] input) {
-		return jsonStringfromArray(ArrayUtils.toObject(input));
-	}
-	
-	/// Converts a object[] to a json string
-	public static String jsonStringfromArray(Object[] input) {
-		String jsonString = "";
-		if (input == null) {
-			return jsonString;
-		} else if (input.length == 0) {
-			jsonString += "[]";
-		} else {
-			jsonString += "[";
-			jsonString += String.valueOf(input[0]);
-			for (int i = 1; i < input.length; i++) {
-				jsonString += ",";
-				jsonString += String.valueOf(input[i]);
-			}
-			jsonString += "]";
+	/// Converts a json string into a long[] array
+	///
+	/// @param  Input JSON string
+	///
+	/// @return Converted long[] array, or Null for input 'null'
+	public static long[] toLongArray(String input) {
+		List<Object> rawList = ConvertJSON.toList(input);
+		if (rawList == null) {
+			return null;
 		}
-		return jsonString;
+		
+		long[] ret = new long[rawList.size()];
+		for (int a = 0; a < rawList.size(); ++a) {
+			ret[a] = ((Number) rawList.get(a)).longValue();
+		}
+		return ret;
 	}
+	
 }

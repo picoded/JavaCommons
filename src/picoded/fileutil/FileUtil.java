@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+
+import javax.annotation.CheckForNull;
+
 //apache includes
 import org.apache.commons.lang3.StringUtils;
 
@@ -162,21 +165,12 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @param folder to scan and copy from
 	///
-	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate,
+	public static void copyDirectory_ifDifferent(@CheckForNull File inDir, @CheckForNull File outDir, boolean preserveFileDate,
 		boolean tryToUseSymLink) throws IOException {
 		if (inDir == null || outDir == null) {
 			new IOException("Invalid directory");
 		}
-		File[] dir_inDir = null;
-		try{
-			dir_inDir = inDir.listFiles();
-			if(dir_inDir == null){
-				return;
-			}
-		} catch(Exception e){
-			e.printStackTrace();
-			return;
-		}
+		File[] dir_inDir = inDir.listFiles();
 		for (int i = 0; i < dir_inDir.length; i++) {
 			File infile = dir_inDir[i];
 			if (infile.isFile()) {
@@ -184,14 +178,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 				copyFile_ifDifferent(infile, outfile, preserveFileDate, tryToUseSymLink);
 				
 			} else if (infile.isDirectory()) {
-				try{
-					File newOutDir = new File(outDir.getAbsolutePath() + File.separator + infile.getName());
-					newOutDir.mkdir();
-					copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToUseSymLink);
-				} catch(Exception e){
-					e.printStackTrace();
-					return;
-				}
+				File newOutDir = new File(outDir.getAbsolutePath() + File.separator + infile.getName());
+				newOutDir.mkdir();
+				copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToUseSymLink);
 			}
 		}
 	}
@@ -219,7 +208,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @param file to scan and copy from
 	///
-	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToUseSymLink)
+	public static void copyFile_ifDifferent(@CheckForNull File inFile, @CheckForNull File outFile, boolean preserveFileDate, boolean tryToUseSymLink)
 		throws IOException {
 		
 		try {
@@ -288,7 +277,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @return The newest timestamp found, else 0 if failed
 	///
-	public static long newestFileTimestamp(File inFile, List<String> excludeNames) {
+	public static long newestFileTimestamp(@CheckForNull File inFile, @CheckForNull List<String> excludeNames) {
 		if(inFile.isDirectory()) {
 			long retTimestamp = 0L;
 			

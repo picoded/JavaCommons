@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +16,7 @@ import org.junit.Test;
 /// Test Case for picoded.FileUtil.ConfigFileSet
 ///
 public class FileUtil_test {
-	
+
 	// Test directories and setup
 	//----------------------------------------------------------------------------------------------------
 	public String testDirStr = "./test-files/test-specific/fileutils/FileUtils/";
@@ -27,6 +29,7 @@ public class FileUtil_test {
 	public void setUp() {
 		outputDir.mkdirs();
 		test_res = null;
+		fileCollection=new ArrayList<File>();
 	}
 	
 	// Test variables
@@ -35,7 +38,7 @@ public class FileUtil_test {
 	String test_jsRegex = "pathname = pathname.replace(/\\\\/g, '/');";
 	
 	String test_res = null; //tmp testing variable
-	
+	Collection<File> fileCollection = null;
 	// Read only test cases
 	//----------------------------------------------------------------------------------------------------
 	
@@ -74,4 +77,11 @@ public class FileUtil_test {
 		assertEquals(test_jsRegex, test_res.trim());
 	}
 	
+	/// Test for list Dirs
+	@Test
+	public void testListDirs() throws IOException {
+		assertNotNull(fileCollection = FileUtil.listDirs(new File(testDir, "jsRegex.js")));
+		assertNotNull(fileCollection = FileUtil.listDirs(new File(testDir, "doubleSlash.txt")));
+
+	}
 }

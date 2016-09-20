@@ -223,6 +223,18 @@ public class ConvertJSON_test {
 	}
 	
 	@Test
+	public void testLongArrayToString() {
+		assertEquals("null", ConvertJSON.fromArray((long[]) null));
+		assertEquals("[]", ConvertJSON.fromArray(new long[0]));
+		assertEquals("[12]", ConvertJSON.fromArray(new long[] { 12 }));
+		assertEquals("[-7,22,86,-99]", ConvertJSON.fromArray(new long[] { -7, 22, 86, -99 }));
+		assertEquals("null", ConvertJSON.fromArray((long[]) null).toString());
+		assertEquals("[]", ConvertJSON.fromArray(new long[0]).toString());
+		assertEquals("[12]", ConvertJSON.fromArray(new long[] { 12 }).toString());
+		assertEquals("[-7,22,86,-99]", ConvertJSON.fromArray(new long[] { -7, 22, 86, -99 }).toString());
+	}
+	
+	@Test
 	public void testDoubleArrayToString() {
 		assertEquals("null", ConvertJSON.fromArray((double[]) null));
 		assertEquals("[]", ConvertJSON.fromArray(new double[0]));
@@ -255,5 +267,16 @@ public class ConvertJSON_test {
 		assertEquals(2, res.length);
 		assertEquals(0.5f, res[0], 0.0001f);
 		assertEquals(1.5f, res[1], 0.0001f);
+		
+		assertNotNull( ConvertJSON.fromArray(res) );
+	}
+	
+	@Test
+	public void nullInStringArray() {
+		assertArrayEquals(new String[] { "one", null, "two" }, ConvertJSON.toStringArray("[\"one\",null,\"two\"]"));
+	}
+	@Test
+	public void nullInObjectArray() {
+		assertArrayEquals(new Object[] { "one", null, "two" }, ConvertJSON.toObjectArray("[\"one\",null,\"two\"]"));
 	}
 }

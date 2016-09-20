@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 //apache includes
 import org.apache.commons.lang3.StringUtils;
 
@@ -164,8 +162,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @param folder to scan and copy from
 	///
-	public static void copyDirectory_ifDifferent(@Nonnull File inDir, @Nonnull File outDir, boolean preserveFileDate,
+	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate,
 		boolean tryToUseSymLink) throws IOException {
+		try{
 		if (inDir == null || outDir == null) {
 			new IOException("Invalid directory");
 		}
@@ -181,6 +180,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 				newOutDir.mkdir();
 				copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToUseSymLink);
 			}
+		}
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 	}
 	

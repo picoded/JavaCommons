@@ -54,37 +54,37 @@ public class ConvertJSON_test {
 	}
 	
 	/// Inavlid map, format
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ConvertJSON.InvalidFormatJSON.class)
 	public void invalidObject() {
 		ConvertJSON.fromObject(System.out);
 	}
 	
 	/// Inavlid map, as list
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ConvertJSON.InvalidFormatJSON.class)
 	public void invalidMapToList() {
 		ConvertJSON.toList("{}");
 	}
 	
 	/// Inavlid map, as array
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ConvertJSON.InvalidFormatJSON.class)
 	public void invalidMapToArray() {
 		ConvertJSON.toObjectArray("{}");
 	}
 	
 	/// Inavlid map, as array
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ConvertJSON.InvalidFormatJSON.class)
 	public void invalidMapToStringArray() {
 		ConvertJSON.toStringArray("{}");
 	}
 	
 	/// Inavlid array as map
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ConvertJSON.InvalidFormatJSON.class)
 	public void invalidArrayToMap() {
 		ConvertJSON.toMap("[]");
 	}
 	
 	/// Inavlid blank json string
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ConvertJSON.InvalidFormatJSON.class)
 	public void invalidBlankJSON() {
 		assertEquals("", ConvertJSON.toObject(""));
 	}

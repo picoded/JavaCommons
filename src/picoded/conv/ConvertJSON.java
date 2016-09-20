@@ -201,7 +201,7 @@ public class ConvertJSON {
 	public static Object toCustomClass(String input, Class<?> c) {
 		try {
 			return cachedMapper().readValue(input, c);
-		} catch (Exception e) {
+		} catch (IOException e) {
 			// Any exception is recasted as InvalidFormatJSON
 			throw new InvalidFormatJSON(e);
 		}

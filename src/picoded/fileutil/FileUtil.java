@@ -275,35 +275,35 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @return The newest timestamp found, else 0 if failed
 	///
-	public static long newestFileTimestamp(File inFile, List<String> excludeNames) {
-		if(inFile.isDirectory()) {
-			long retTimestamp = 0L;
-			
-			for (File f : inFile.listFiles()) {
-				
-				if(excludeNames != null) {
-					String baseName = f.getName();
-					if( excludeNames.contains(baseName) ) {
-						continue;
-					}
-				}
-				
-				long tmpTimestamp = 0L;
-				if (f.isDirectory()) {
-					tmpTimestamp = newestFileTimestamp(f, excludeNames);
-				} else if(f.isFile()) {
-					tmpTimestamp = f.lastModified();
-				}
-				
-				if( tmpTimestamp > retTimestamp ) {
-					retTimestamp = tmpTimestamp;
-				}
-			}
-			
-			return retTimestamp;
-		} else {
+	public static long newestFileTimestamp(File inFile,
+			List<String> excludeNames) {
+		if (!inFile.isDirectory()) {
 			return inFile.lastModified();
 		}
+		long retTimestamp = 0L;
+		for (File f : inFile.listFiles()) {
+			if (excludeNames == null) {
+			// do nothing
+			} else {
+				String baseName = f.getName();
+				if (excludeNames.contains(baseName)) {
+					continue;
+				}
+			}
+
+			long tmpTimestamp = 0L;
+			if (f.isDirectory()) {
+				tmpTimestamp = newestFileTimestamp(f, excludeNames);
+			} else if (f.isFile()) {
+				tmpTimestamp = f.lastModified();
+			}
+
+			if (tmpTimestamp > retTimestamp) {
+				retTimestamp = tmpTimestamp;
+			}
+		}
+
+		return retTimestamp;
 	}
 	
 	///

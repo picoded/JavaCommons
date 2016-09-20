@@ -78,13 +78,13 @@ public final class ConvertJSON {
 	/////////////////////////////////////////////////
 	
 	/// Converts json string into an mapping object
-	@SuppressWarnings("all")
+	@SuppressWarnings("unchecked")
 	public static Map<String, Object> toMap(String input) {
 		return (Map<String, Object>) toCustomClass(input, Map.class);
 	}
 	
 	/// Converts json string into an list array
-	@SuppressWarnings("all")
+	@SuppressWarnings("unchecked")
 	public static List<Object> toList(String input) {
 		return (List<Object>) toCustomClass(input, List.class);
 	}

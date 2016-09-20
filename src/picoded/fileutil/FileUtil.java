@@ -382,20 +382,41 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	//
 	//------------------------------------------------------------------------------------------------------------------
 	
-	// @TODO: Documentation
+	///
+	/// Recursively scan for the List Of files Path
+	///
+	/// @param raw file name/path
+	///
+	/// @return List of files path
+	///
 	public static Collection<String> getFilePaths(File inFile) {
 		return getFilePaths(inFile, null, null);
 	}
 	
-	// @TODO: Documentation
+	///
+	/// Recursively scan for the Collection Of files Path
+	///
+	/// @param raw file name/path
+	/// @param raw String separator
+	///
+	/// @return List of files path
+	///
 	public static Collection<String> getFilePaths(File inFile, String separator) {
 		return getFilePaths(inFile, separator, null);
 	}
 	
-	// @TODO: Documentation
+	///
+	/// Recursively scan for the Collection Of files Path
+	///
+	/// @param raw file name/path
+	/// @param raw String separator
+	/// @param raw String folderPrefix
+	///
+	/// @return List of files path
+	///
 	public static Collection<String> getFilePaths(File inFile, String separator, String folderPrefix) {
 		List<String> keyList = new ArrayList<String>();
-		
+		//check folder Prefix is not empt
 		if (StringUtils.isEmpty(folderPrefix)) {
 			folderPrefix = "";
 		}

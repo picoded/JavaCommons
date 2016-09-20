@@ -4,6 +4,9 @@ package picoded.fileutil;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -144,7 +147,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @param folder to scan and copy from
 	///
-	public static void copyDirectory_ifDifferent(File inDir, File outDir) throws IOException {
+	public static void copyDirectory_ifDifferent(File inDir, File outDir) throws IOException, IllegalArgumentException {
 		copyDirectory_ifDifferent(inDir, outDir, true);
 	}
 	
@@ -153,7 +156,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @param folder to scan and copy from
 	///
-	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate) throws IOException {
+	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate) throws IOException, IllegalArgumentException {
 		copyDirectory_ifDifferent(inDir, outDir, preserveFileDate, false); //default symlink is false : This is considered advance behaviour
 	}
 	
@@ -163,8 +166,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param folder to scan and copy from
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate,
-		boolean tryToUseSymLink) throws IOException {
-		try{
+		boolean tryToUseSymLink) throws IOException, IllegalArgumentException{
 		if (inDir == null || outDir == null) {
 			new IOException("Invalid directory");
 		}
@@ -180,9 +182,6 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 				newOutDir.mkdir();
 				copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToUseSymLink);
 			}
-		}
-		}catch(Exception e){
-			e.printStackTrace();
 		}
 	}
 	

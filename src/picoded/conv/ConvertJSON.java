@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.fasterxml.jackson.core.JsonParser;
 // Jackson library
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,10 +21,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 ///
 public final class ConvertJSON {
 	
-	private ConvertJSON(){
+	public ConvertJSON() {
+		cachedMapperBuilder();
+		
 	}
 	
-	private static String errorMsg="to implement"; 
 	/// cachedMapper builder, used to setup the config
 	private static ObjectMapper cachedMapperBuilder() {
 		ObjectMapper cm = new ObjectMapper();
@@ -176,21 +179,40 @@ public final class ConvertJSON {
 	
 	/// Converts a Object[] to a json string
 	public static String fromArray(Object[] input) {
-		throw new IllegalArgumentException(errorMsg);
+		return jsonStringfromArray(input);
 	}
 	
 	/// Converts a String[] to a json string
 	public static String fromArray(String[] input) {
-		throw new IllegalArgumentException(errorMsg);
+		return jsonStringfromArray(input);
 	}
 	
 	/// Converts a double[] to a json string
 	public static String fromArray(double[] input) {
-		throw new IllegalArgumentException(errorMsg);
+		return jsonStringfromArray(ArrayUtils.toObject(input));
 	}
 	
 	/// Converts a int[] to a json string
 	public static String fromArray(int[] input) {
-		throw new IllegalArgumentException(errorMsg);
+		return jsonStringfromArray(ArrayUtils.toObject(input));
+	}
+	
+	/// Converts a object[] to a json string
+	public static String jsonStringfromArray(Object[] input) {
+		String jsonString = "";
+		if (input == null) {
+			return jsonString;
+		} else if (input.length == 0) {
+			jsonString += "[]";
+		} else {
+			jsonString += "[";
+			jsonString += String.valueOf(input[0]);
+			for (int i = 1; i < input.length; i++) {
+				jsonString += ",";
+				jsonString += String.valueOf(input[i]);
+			}
+			jsonString += "]";
+		}
+		return jsonString;
 	}
 }

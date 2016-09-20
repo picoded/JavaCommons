@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+
 //apache includes
 import org.apache.commons.lang3.StringUtils;
 
@@ -167,9 +168,6 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		if (inDir == null || outDir == null) {
 			new IOException("Invalid directory");
 		}
-		if(!inDir.exists()){
-			return;
-		}
 		File[] dir_inDir = inDir.listFiles();
 		for (int i = 0; i < dir_inDir.length; i++) {
 			File infile = dir_inDir[i];
@@ -179,9 +177,6 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 				
 			} else if (infile.isDirectory()) {
 				File newOutDir = new File(outDir.getAbsolutePath() + File.separator + infile.getName());
-//				if(!newOutDir.exists()){
-//					return;
-//				}
 				newOutDir.mkdir();
 				copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToUseSymLink);
 			}
@@ -435,5 +430,4 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		
 		return keyList;
 	}
-	
 }

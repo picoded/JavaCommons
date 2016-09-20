@@ -1,17 +1,19 @@
 package picoded.fileutil;
 
-import java.io.IOException;
-import java.io.File;
-import java.util.*;
-
+import static org.junit.Assert.assertEquals;
 // Test Case include
-import static org.junit.Assert.*;
-import org.junit.*;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.junit.Before;
+import org.junit.Test;
 
 ///
-/// Test Case for picoded.fileUtils.ConfigFileSet
+/// Test Case for picoded.FileUtil.ConfigFileSet
 ///
-public class FileUtils_test {
+public class FileUtil_test {
 	
 	// Test directories and setup
 	//----------------------------------------------------------------------------------------------------
@@ -40,20 +42,20 @@ public class FileUtils_test {
 	/// Test for double slash safely taken
 	@Test
 	public void readDoubleSlash() throws IOException {
-		assertNotNull(test_res = FileUtils.readFileToString(new File(testDir, "doubleSlash.txt")));
+		assertNotNull(test_res = FileUtil.readFileToString(new File(testDir, "doubleSlash.txt")));
 		assertEquals(test_doubleSlash, test_res.trim());
 		
-		assertNotNull(test_res = FileUtils.readFileToString_withFallback(new File(testDir, "doubleSlash.txt"), null));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "doubleSlash.txt"), null));
 		assertEquals(test_doubleSlash, test_res.trim());
 	}
 	
 	/// Test for double slash safely taken
 	@Test
 	public void readJSRegex() throws IOException {
-		assertNotNull(test_res = FileUtils.readFileToString(new File(testDir, "jsRegex.js")));
+		assertNotNull(test_res = FileUtil.readFileToString(new File(testDir, "jsRegex.js")));
 		assertEquals(test_jsRegex, test_res.trim());
 		
-		assertNotNull(test_res = FileUtils.readFileToString_withFallback(new File(testDir, "jsRegex.js"), null));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "jsRegex.js"), null));
 		assertEquals(test_jsRegex, test_res.trim());
 	}
 	
@@ -63,12 +65,12 @@ public class FileUtils_test {
 	@Test
 	public void writeReadDoubleSlash() throws IOException {
 		File outFile = new File(outputDir, "jsRegex.js");
-		FileUtils.writeStringToFile(outFile, test_jsRegex);
+		FileUtil.writeStringToFile(outFile, test_jsRegex);
 		
-		assertNotNull(test_res = FileUtils.readFileToString(outFile));
+		assertNotNull(test_res = FileUtil.readFileToString(outFile));
 		assertEquals(test_jsRegex, test_res.trim());
 		
-		assertNotNull(test_res = FileUtils.readFileToString_withFallback(outFile, null));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(outFile, null));
 		assertEquals(test_jsRegex, test_res.trim());
 	}
 	

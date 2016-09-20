@@ -1,26 +1,23 @@
 package picoded.fileutil;
 
-// java incldues
+//java incldues
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-// apache includes
+//apache includes
 import org.apache.commons.lang3.StringUtils;
 
 ///
-/// Small extension of apache FileUtils, for some additional features that we needed.
+/// Small extension of apache FileUtil, for some additional features that we needed.
 /// Additionally several FilenameUtils is made avaliable here
 ///
-/// @See https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtils.html
+/// @See https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtil.html
 ///
-public class FileUtils extends org.apache.commons.io.FileUtils {
+public class FileUtil extends org.apache.commons.io.FileUtils {
 	
 	//------------------------------------------------------------------------------------------------------------------
 	//
@@ -49,7 +46,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	
 	/// Overwrites null encoding with US-ASCII
 	public static String readFileToString(File inFile) throws IOException {
-		return picoded.fileutil.FileUtils.readFileToString(inFile, (String) null);
+		return picoded.fileutil.FileUtil.readFileToString(inFile, (String) null);
 	}
 	
 	/// Overwrites null encoding with US-ASCII
@@ -62,7 +59,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	
 	/// Overwrites null encoding with US-ASCII
 	public static void writeStringToFile(File inFile, String data) throws IOException {
-		picoded.fileutil.FileUtils.writeStringToFile(inFile, data, (String) null);
+		picoded.fileutil.FileUtil.writeStringToFile(inFile, data, (String) null);
 	}
 	
 	/// Overwrites null encoding with US-ASCII
@@ -85,7 +82,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/// @returns the file value if possible, else returns the fallback value
 	///
 	public static String readFileToString_withFallback(File inFile, String fallback) {
-		return picoded.fileutil.FileUtils.readFileToString_withFallback(inFile, fallback, null);
+		return picoded.fileutil.FileUtil.readFileToString_withFallback(inFile, fallback, null);
 	}
 	
 	///
@@ -105,7 +102,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 		}
 		
 		try {
-			return picoded.fileutil.FileUtils.readFileToString(inFile, encoding);
+			return picoded.fileutil.FileUtil.readFileToString(inFile, encoding);
 		} catch (IOException e) {
 			return fallback;
 		}
@@ -139,7 +136,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/// @returns the boolean indicating true if file was written to
 	///
 	public static boolean writeStringToFile_ifDifferant(File inFile, String data) throws IOException {
-		return picoded.fileutil.FileUtils.writeStringToFile_ifDifferant(inFile, data, null);
+		return picoded.fileutil.FileUtil.writeStringToFile_ifDifferant(inFile, data, null);
 	}
 	
 	///
@@ -171,6 +168,9 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 			new IOException("Invalid directory");
 		}
 		File[] dir_inDir = inDir.listFiles();
+		if(dir_inDir == null){
+			return;
+		}
 		for (int i = 0; i < dir_inDir.length; i++) {
 			File infile = dir_inDir[i];
 			if (infile.isFile()) {
@@ -178,6 +178,9 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 				copyFile_ifDifferent(infile, outfile, preserveFileDate, tryToUseSymLink);
 				
 			} else if (infile.isDirectory()) {
+				if(outDir.getAbsolutePath()== null){
+					return;
+				}
 				File newOutDir = new File(outDir.getAbsolutePath() + File.separator + infile.getName());
 				newOutDir.mkdir();
 				copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToUseSymLink);
@@ -244,7 +247,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 				//------------------------------------------------------------
 				Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath().toAbsolutePath());
 			}
-		} catch (Exception e) {
+		} catch (IOException e) {
 			// Silence the error 
 			// Uses fallback behaviour of copying the file if it occurs
 		}
@@ -258,7 +261,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 		
 		// Final fallback behaviour, copies file if content differs.
 		//---------------------------------------------------------------------------------
-		if (!FileUtils.contentEqualsIgnoreEOL(inFile, outFile, null)) {
+		if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null)) {
 			copyFile(inFile, outFile, preserveFileDate);
 		}
 	}

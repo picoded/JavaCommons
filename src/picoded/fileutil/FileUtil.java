@@ -213,8 +213,6 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToUseSymLink)
 		throws IOException {
-		
-		try {
 			// Checks if the output file is already a symbolic link
 			// And if its valid. And since both is pratically the same 
 			// final file when linked, the file is considered "not different"
@@ -247,10 +245,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 				//------------------------------------------------------------
 				Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath().toAbsolutePath());
 			}
-		} catch (IOException e) {
 			// Silence the error 
 			// Uses fallback behaviour of copying the file if it occurs
-		}
 		
 		// Checks if file has not been modified, and has same data length, for skipping?
 		//---------------------------------------------------------------------------------

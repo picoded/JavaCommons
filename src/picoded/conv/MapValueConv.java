@@ -60,6 +60,16 @@ public class MapValueConv {
 	//
 	//--------------------------------------------------------------------------------------------------
 	
+	public static Map<String, Object> fromFullyQualifiedKeys(Map<String, Object> source) {
+		Map<String, Object> finalMap = new HashMap<String, Object>();
+		
+		for (String sourceKey : source.keySet()) {
+			recreateObject(finalMap, sourceKey, source.get(sourceKey));
+		}
+		
+		return finalMap;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static Map<String, Object> toFullyQualifiedKeys(Object source, String rootName, String separator) {
 		Map<String, Object> fullyQualifiedMap = new HashMap<String, Object>();
@@ -120,16 +130,6 @@ public class MapValueConv {
 		}
 		
 		return fullyQualifiedMap;
-	}
-	
-	public static Map<String, Object> fromFullyQualifiedKeys(Map<String, Object> source) {
-		Map<String, Object> finalMap = new HashMap<String, Object>();
-		
-		for (String sourceKey : source.keySet()) {
-			recreateObject(finalMap, sourceKey, source.get(sourceKey));
-		}
-		
-		return finalMap;
 	}
 	
 	@SuppressWarnings("unchecked")

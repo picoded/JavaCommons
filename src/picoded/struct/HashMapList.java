@@ -11,6 +11,9 @@ import picoded.conv.MapValueConv;
 ///
 public class HashMapList<K, V> extends HashMap<K, List<V>> /* implements GenericConvertMap<K, List<V>> */ {
 	
+	/// "Serializable" classes should have a version id 
+	private static final long serialVersionUID = 1L;
+	
 	/// Appends the value to the inner list, creating a new ArrayList if needed
 	///
 	/// @Parameter   key     key to use
@@ -40,6 +43,9 @@ public class HashMapList<K, V> extends HashMap<K, List<V>> /* implements Generic
 	///
 	/// @Returns   returns itself
 	public HashMapList<K, V> append(K key, Collection<V> values) {
+		if(values == null) {
+			return this;
+		}
 		return append(key, Collections.enumeration(values));
 	}
 	

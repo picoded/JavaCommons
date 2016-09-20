@@ -62,13 +62,22 @@ public class HashMapList_test {
 	///
 	/// Testing against multiple append
 	///
+	@SuppressWarnings("unchecked")
 	@Test
 	public void multiArrayAppendTest() {
+		
 		String[] dataArr = new String[] { "one", "two", "three" };
 		List<String> data = Arrays.asList( dataArr );
+		List<String> blankList = Arrays.asList( new String[] {} );
 		
 		HashMapList<String, String> tObj = new HashMapList<String, String>();
+		
+		// Data to test
 		tObj.append("hello", data);
+		
+		// Test that blank data is handled peacefully
+		tObj.append("hello", (List)null);
+		tObj.append("hello", blankList);
 		
 		Map<String, String[]> cObj = tObj.toMapArray(dataArr);
 		assertArrayEquals(dataArr, cObj.get("hello"));

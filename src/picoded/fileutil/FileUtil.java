@@ -432,20 +432,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			separator = "/";
 		}
 		
-		if (inFile.isDirectory()) {
-			File[] innerFiles = inFile.listFiles();
-			for (File innerFile : innerFiles) {
-				if (innerFile.isDirectory()) {
-					String parentFolderName = innerFile.getName();
-					if (!folderPrefix.isEmpty()) {
-						parentFolderName = folderPrefix + separator + parentFolderName;
-					}
-					keyList.addAll(getFilePaths(innerFile, parentFolderName, separator));
-				} else {
-					keyList.addAll(getFilePaths(innerFile, folderPrefix, separator));
-				}
-			}
-		} else {
+		if (!inFile.isDirectory()) {
+
 			String fileName = inFile.getName();
 			fileName = fileName.substring(0, fileName.lastIndexOf('.'));
 			String prefix = "";
@@ -454,8 +442,21 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			}
 			
 			keyList.add(prefix + fileName);
+			
+			return keyList;
 		}
-		
+			File[] innerFiles = inFile.listFiles();
+			for (File innerFile : innerFiles) {
+				if (!innerFile.isDirectory()) {
+					keyList.addAll(getFilePaths(innerFile, folderPrefix, separator));
+				} else {
+					String parentFolderName = innerFile.getName();
+					if (!folderPrefix.isEmpty()) {
+						parentFolderName = folderPrefix + separator + parentFolderName;
+					}
+					keyList.addAll(getFilePaths(innerFile, parentFolderName, separator));
+				}
+			}
 		return keyList;
 	}
 }

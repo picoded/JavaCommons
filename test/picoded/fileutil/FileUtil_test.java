@@ -76,4 +76,11 @@ public class FileUtil_test {
 		assertNotNull(test_res = FileUtil.readFileToString_withFallback(outFile, null));
 		assertEquals(test_jsRegex, test_res.trim());
 	}
+	
+	/// Test for list Dirs
+	@Test
+	public void testListDirs() throws IOException {
+		assertNotNull(FileUtil.listDirs(testDir));
+		assertNotNull(FileUtil.listDirs(outputDir));
+	}
 }

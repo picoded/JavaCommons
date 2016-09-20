@@ -35,7 +35,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static Collection<File> listDirs(File inFile) {
 		List<File> ret = new ArrayList<File>();
-		
+		if(inFile== null){
+			return ret;
+		}
 		for (File f : inFile.listFiles()) {
 			if (f.isDirectory()) {
 				ret.add(f);
@@ -145,7 +147,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @param folder to scan and copy from
 	///
-	public static void copyDirectory_ifDifferent(File inDir, File outDir) throws IOException, IllegalArgumentException {
+	public static void copyDirectory_ifDifferent(File inDir, File outDir) throws IOException {
 		copyDirectory_ifDifferent(inDir, outDir, true);
 	}
 	
@@ -154,7 +156,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @param folder to scan and copy from
 	///
-	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate) throws IOException, IllegalArgumentException {
+	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate) throws IOException {
 		copyDirectory_ifDifferent(inDir, outDir, preserveFileDate, false); //default symlink is false : This is considered advance behaviour
 	}
 	
@@ -164,7 +166,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param folder to scan and copy from
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate,
-		boolean tryToUseSymLink) throws IOException, IllegalArgumentException{
+		boolean tryToUseSymLink) throws IOException{
 		if (inDir == null || outDir == null) {
 			new IOException("Invalid directory");
 		}
@@ -198,7 +200,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param file to scan and copy from
 	///
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate) throws IOException {
-		copyFile_ifDifferent(inFile, outFile, preserveFileDate, false); //default symlink is false : This is considered advance behaviour
+		 //default symlink is false :This is considered advance behaviour
+		copyFile_ifDifferent(inFile, outFile, preserveFileDate, false);
 	}
 	
 	///
@@ -383,36 +386,39 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	//------------------------------------------------------------------------------------------------------------------
 	
 	///
-	/// Recursively scan for the List Of files Path
+	/// Get List only the files path
 	///
-	/// @param raw file name/path
+	/// @param folder to scan
+	/// @param raw File inFile
 	///
-	/// @return List of files path
+	/// @return Collection of files Path within the current folder
 	///
 	public static Collection<String> getFilePaths(File inFile) {
 		return getFilePaths(inFile, null, null);
 	}
 	
 	///
-	/// Recursively scan for the Collection Of files Path
+	/// Get List only the files path
 	///
-	/// @param raw file name/path
+	/// @param folder to scan
+	/// @param raw File inFile
 	/// @param raw String separator
 	///
-	/// @return List of files path
+	/// @return Collection of files Path within the current folder
 	///
 	public static Collection<String> getFilePaths(File inFile, String separator) {
 		return getFilePaths(inFile, separator, null);
 	}
 	
 	///
-	/// Recursively scan for the Collection Of files Path
+	/// Get List only the files path
 	///
-	/// @param raw file name/path
+	/// @param folder to scan
+	/// @param raw File inFile
 	/// @param raw String separator
 	/// @param raw String folderPrefix
 	///
-	/// @return List of files path
+	/// @return Collection of files Path within the current folder
 	///
 	public static Collection<String> getFilePaths(File inFile, String separator, String folderPrefix) {
 		List<String> keyList = new ArrayList<String>();

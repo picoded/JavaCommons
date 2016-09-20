@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 ///
 public final class ConvertJSON {
 	
-	private ConvertJSON(){
+	private ConvertJSON() {
 		cachedMapperBuilder();
 		
 	}
@@ -180,7 +180,7 @@ public final class ConvertJSON {
 	public static String fromArray(Object[] input) {
 		return jsonStringfromArray(input);
 	}
-
+	
 	/// Converts a String[] to a json string
 	public static String fromArray(String[] input) {
 		return jsonStringfromArray(input);
@@ -199,14 +199,14 @@ public final class ConvertJSON {
 	/// Converts a object[] to a json string
 	public static String jsonStringfromArray(Object[] input) {
 		String jsonString = "";
-		if(input == null){
+		if (input == null) {
 			return jsonString;
-		} else if(input.length == 0) {
+		} else if (input.length == 0) {
 			jsonString += "[]";
 		} else {
 			jsonString += "[";
 			jsonString += String.valueOf(input[0]);
-			for(int i = 1; i < input.length; i++){
+			for (int i = 1; i < input.length; i++) {
 				jsonString += ",";
 				jsonString += String.valueOf(input[i]);
 			}

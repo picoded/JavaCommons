@@ -44,7 +44,7 @@ public class ConvertJSON {
 	/// Internal reused object mapper, this is via jackson json converter
 	///
 	/// Memoizer for cachedMapper()
-	private static ObjectMapper cachedMapper = null;
+	private static volatile ObjectMapper cachedMapper = null;
 	
 	/// cachedMapper used for JSON string parsing, this is generated once,
 	/// and reused for each return call

@@ -53,6 +53,12 @@ public class ConvertJSON_test {
 		new ConvertJSON();
 	}
 	
+	/// Inavlid map, format
+	@Test(expected = IllegalArgumentException.class)
+	public void invalidObject() {
+		ConvertJSON.fromObject(System.out);
+	}
+	
 	/// Inavlid map, as list
 	@Test(expected = IllegalArgumentException.class)
 	public void invalidMapToList() {

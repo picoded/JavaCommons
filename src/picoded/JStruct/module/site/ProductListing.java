@@ -45,9 +45,9 @@ public class ProductListing {
 	public void setupStandardTables(JStruct inStruct, String prefix , String listing) {
 		productOwner = inStruct.getMetaTable(prefix);
 		if(listing == null || listing.length() < 4){
-			productItem = inStruct.getMetaTable(prefix + "_" + listing);
-		}else{
 			productItem = inStruct.getMetaTable(prefix + "_productList");
+		}else{
+			productItem = inStruct.getMetaTable(prefix + "_" + listing);
 		}
 	}
 

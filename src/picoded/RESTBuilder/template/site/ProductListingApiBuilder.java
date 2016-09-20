@@ -157,7 +157,7 @@ public class ProductListingApiBuilder {
 		rb.getNamespace(setPrefix + "productList").put(HttpRequestType.GET, productListings_GET_and_POST);
 		rb.getNamespace(setPrefix + "productList").put(HttpRequestType.POST, productListings_GET_and_POST);
 
-		listingsApi = new MetaTableApiBuilder(core.productOwner);
+		listingsApi = new MetaTableApiBuilder(core.productItem);
 
 		//ownerApi.setupRESTBuilder( rb, setPrefix + "owner" );
 		listingsApi.setupRESTBuilder( rb, setPrefix + "productList." );

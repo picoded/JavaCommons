@@ -157,7 +157,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param folder to scan and copy from
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate) throws IOException {
-		copyDirectory_ifDifferent(inDir, outDir, preserveFileDate, false); //default symlink is false : This is considered advance behaviour
+		//default symlink is false : This is considered advance behaviour
+		copyDirectory_ifDifferent(inDir, outDir, preserveFileDate, false); 
 	}
 	
 	///
@@ -215,15 +216,14 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			// And if its valid. And since both is pratically the same 
 			// final file when linked, the file is considered "not different"
 			//------------------------------------------------------------
-			if (Files.isSymbolicLink(outFile.toPath())) {
+			if (Files.isSymbolicLink(outFile.toPath()) && 
+					Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath())) {
 				// Gets the symbolic link source file path, and checks if it points to source file.
 				// See: http://stackoverflow.com/questions/29368308/java-nio-how-is-path-issamefile-different-from-path-equals
 				// for why is `Files.isSameFile()` used
-				if (Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath())) {
-					// If it points to the same file, the symbolic link is valid
-					// No copy operations is required.
-					return;
-				}
+				// If it points to the same file, the symbolic link is valid
+				// No copy operations is required.
+				return;
 			}
 			
 			// Tries to build symlink if possible, hopefully
@@ -232,7 +232,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 				// Only the detination file should be a symbolic link.
 				//------------------------------------------------------------
 				//if(!Files.isSymbolicLink(inFile.toPath())){
-				//	Files.createSymbolicLink(Paths.get(inFile.getAbsolutePath()), Paths.get(outFile.getAbsolutePath()), new FileAttribute<?>[0]);
+				//	Files.createSymbolicLink(Paths.get(inFile.getAbsolutePath()), 
+				// Paths.get(outFile.getAbsolutePath()), new FileAttribute<?>[0]);
 				//}
 				
 				// Assumes output file is either NOT a symbolic link

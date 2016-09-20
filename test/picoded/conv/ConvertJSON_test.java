@@ -52,9 +52,9 @@ public class ConvertJSON_test {
 	/// + ConvertJSON.fromObject
 	///
 	
-	@Test
+	//@Test
 	public void testConvertJSON() {
-		new ConvertJSON();
+	//	new ConvertJSON();
 	}
 	
 	@Test

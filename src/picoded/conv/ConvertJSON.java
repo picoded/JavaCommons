@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 ///
 public final class ConvertJSON {
 	
-	public ConvertJSON() {
-		cachedMapperBuilder();
+	private ConvertJSON() {
+		//cachedMapperBuilder();
 		
 	}
 	

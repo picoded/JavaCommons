@@ -179,9 +179,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 				
 			} else if (infile.isDirectory()) {
 				File newOutDir = new File(outDir.getAbsolutePath() + File.separator + infile.getName());
-				if(!newOutDir.exists()){
-					return;
-				}
+//				if(!newOutDir.exists()){
+//					return;
+//				}
 				newOutDir.mkdir();
 				copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToUseSymLink);
 			}
@@ -247,7 +247,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 				//------------------------------------------------------------
 				Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath().toAbsolutePath());
 			}
-		} catch (Exception e) {
+		} catch (IOException e) {
 			// Silence the error 
 			// Uses fallback behaviour of copying the file if it occurs
 		}

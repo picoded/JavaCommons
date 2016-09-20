@@ -1,15 +1,14 @@
 package picoded.struct;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import picoded.conv.MapValueConv;
 
-/// Convinent class, for creating a Map containing list values, and appending them
-@SuppressWarnings("serial")
+///
+/// Convinence class, for creating a Map containing list values, and appending them
+///
+/// @TODO : Implement the GenericConvertMap interface, once that class is transfered to RC
+///
 public class HashMapList<K, V> extends HashMap<K, List<V>> /* implements GenericConvertMap<K, List<V>> */ {
 	
 	/// Appends the value to the inner list, creating a new ArrayList if needed
@@ -32,6 +31,16 @@ public class HashMapList<K, V> extends HashMap<K, List<V>> /* implements Generic
 		
 		// Returns self
 		return this;
+	}
+	
+	/// Appends the value to the inner list, creating a new ArrayList if needed
+	///
+	/// @Parameter   key     key to use
+	/// @Parameter   value   values emuneration to append
+	///
+	/// @Returns   returns itself
+	public HashMapList<K, V> append(K key, Collection<V> values) {
+		return append(key, Collections.enumeration(values));
 	}
 	
 	/// Appends the value to the inner list, creating a new ArrayList if needed

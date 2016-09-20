@@ -7,6 +7,7 @@ import java.util.ArrayList;
 // Test Case include
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
@@ -27,9 +28,11 @@ public class HashMapList_test {
 	public void tearDown() {
 	}
 	
-	/// The type erasure error?
+	///
+	/// Testing against one append at a time
+	///
 	@Test
-	public void typeErasureListError() {
+	public void arrayAppendTest() {
 		String[] exp = new String[] { "brand", "new", "world" };
 		List<String> list = new ArrayList<String>();
 		
@@ -40,9 +43,11 @@ public class HashMapList_test {
 		assertArrayEquals(exp, list.toArray(new String[list.size()]));
 	}
 	
-	/// The type erasure error?
+	///
+	/// Testing against .toMapArray conversion
+	///
 	@Test
-	public void typeErasureMapError() {
+	public void toMapArrayConversion() {
 		String[] exp = new String[] { "brand", "new", "world" };
 		HashMapList<String, String> tObj = new HashMapList<String, String>();
 		
@@ -52,5 +57,20 @@ public class HashMapList_test {
 		
 		Map<String, String[]> cObj = tObj.toMapArray(exp);
 		assertArrayEquals(exp, cObj.get("hello"));
+	}
+	
+	///
+	/// Testing against multiple append
+	///
+	@Test
+	public void multiArrayAppendTest() {
+		String[] dataArr = new String[] { "one", "two", "three" };
+		List<String> data = Arrays.asList( dataArr );
+		
+		HashMapList<String, String> tObj = new HashMapList<String, String>();
+		tObj.append("hello", data);
+		
+		Map<String, String[]> cObj = tObj.toMapArray(dataArr);
+		assertArrayEquals(dataArr, cObj.get("hello"));
 	}
 }

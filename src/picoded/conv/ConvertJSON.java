@@ -4,10 +4,6 @@ package picoded.conv;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.function.IntFunction;
-
-// Apache array utils used
-import org.apache.commons.lang3.ArrayUtils;
 
 // Jackson library used
 import com.fasterxml.jackson.core.JsonParser;
@@ -48,7 +44,7 @@ public class ConvertJSON {
 	/// Internal reused object mapper, this is via jackson json converter
 	///
 	/// Memoizer for cachedMapper()
-	private static ObjectMapper _cachedMapper = null;
+	private static ObjectMapper cachedMapper = null;
 	
 	/// cachedMapper used for JSON string parsing, this is generated once,
 	/// and reused for each return call
@@ -60,8 +56,8 @@ public class ConvertJSON {
 	private static ObjectMapper cachedMapper() {
 		
 		// Reuse old object mapping
-		if (_cachedMapper != null) {
-			return _cachedMapper;
+		if (cachedMapper != null) {
+			return cachedMapper;
 		}
 		
 		// New object mapping
@@ -77,7 +73,7 @@ public class ConvertJSON {
 		cm.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
 		
 		// Actual map builder
-		return _cachedMapper = cm;
+		return cachedMapper = cm;
 	}
 	
 	/////////////////////////////////////////////////
@@ -260,7 +256,7 @@ public class ConvertJSON {
 	public static double[] toDoubleArray(String input) {
 		List<Object> rawList = ConvertJSON.toList(input);
 		if (rawList == null) {
-			return new double[0];
+			return null;
 		}
 		
 		double[] ret = new double[rawList.size()];

@@ -1,21 +1,14 @@
 package picoded.conv;
 
-// Target test class
-import static org.junit.Assert.assertEquals;
+// Junit includes
+import static org.junit.Assert.*;
+import org.junit.*;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-// Classes used in test case
-import java.util.HashMap;
+// Java libs used
+import java.util.*;
 
+// Apache lib used
 import org.apache.commons.lang3.ArrayUtils;
-import org.junit.After;
-// Test Case include
-import org.junit.Before;
-import org.junit.Test;
-
-import picoded.conv.ConvertJSON;
 
 ///
 /// Test Case for picoded.conv.ConvertJSON
@@ -168,6 +161,18 @@ public class ConvertJSON_test {
 	}
 	
 	@Test
+	public void basicToLongArrayConversion() {
+		objectArray = ArrayUtils.toObject(ConvertJSON.toLongArray("[]"));
+		assertEquals("[]", Arrays.deepToString(objectArray));
+		objectArray = ArrayUtils.toObject(ConvertJSON.toLongArray("[121, 129, 239, 40]"));
+		assertEquals("[121, 129, 239, 40]", Arrays.deepToString(objectArray));
+		objectArray = ArrayUtils.toObject(ConvertJSON.toLongArray("[-71, 22234, 867, -9902]"));
+		assertEquals("[-71, 22234, 867, -9902]", Arrays.deepToString(objectArray));
+		objectArray = ArrayUtils.toObject(ConvertJSON.toLongArray("[-10, 29]"));
+		assertEquals("[-10, 29]", Arrays.deepToString(objectArray));
+	}
+	
+	@Test
 	public void basicToObjectArrayConversion() {
 		objectArray = ConvertJSON.toObjectArray("[\"Hello\",\"WORLD\",\"WORLD\",\"Hello\"]");
 		assertEquals("[Hello, WORLD, WORLD, Hello]", Arrays.deepToString(objectArray));
@@ -224,8 +229,25 @@ public class ConvertJSON_test {
 			.toString());
 	}
 	
-	// @Test
-	// public void arrayToJSON() {
-	// 	assertEquals("[1,2,3]",ConvertJSON.fromObject(new int[] {1,2,3}));
-	// }
+	@Test
+	public void toArrayNullTest() {
+		assertNull( ConvertJSON.toObjectArray("null") );
+		assertNull( ConvertJSON.toStringArray("null") );
+		assertNull( ConvertJSON.toDoubleArray("null") );
+		assertNull( ConvertJSON.toIntArray("null") );
+		assertNull( ConvertJSON.toFloatArray("null") );
+		assertNull( ConvertJSON.toLongArray("null") );
+	}
+	
+	//
+	// Note, due to the nature of floats. Accuracy cannot be fully tested
+	//
+	@Test
+	public void toFloatTest() {
+		float[] res = ConvertJSON.toFloatArray("[0.5, 1.5]");
+		
+		assertEquals(2, res.length);
+		assertEquals(0.5f, res[0], 0.0001f);
+		assertEquals(1.5f, res[1], 0.0001f);
+	}
 }

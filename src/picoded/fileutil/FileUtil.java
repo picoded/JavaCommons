@@ -167,8 +167,14 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		if (inDir == null || outDir == null) {
 			new IOException("Invalid directory");
 		}
-		File[] dir_inDir = inDir.listFiles();
-		if(dir_inDir == null){
+		File[] dir_inDir = null;
+		try{
+			dir_inDir = inDir.listFiles();
+			if(dir_inDir == null){
+				return;
+			}
+		} catch(Exception e){
+			e.printStackTrace();
 			return;
 		}
 		for (int i = 0; i < dir_inDir.length; i++) {
@@ -178,12 +184,14 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 				copyFile_ifDifferent(infile, outfile, preserveFileDate, tryToUseSymLink);
 				
 			} else if (infile.isDirectory()) {
-				if(outDir.getAbsolutePath()== null){
+				try{
+					File newOutDir = new File(outDir.getAbsolutePath() + File.separator + infile.getName());
+					newOutDir.mkdir();
+					copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToUseSymLink);
+				} catch(Exception e){
+					e.printStackTrace();
 					return;
 				}
-				File newOutDir = new File(outDir.getAbsolutePath() + File.separator + infile.getName());
-				newOutDir.mkdir();
-				copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToUseSymLink);
 			}
 		}
 	}

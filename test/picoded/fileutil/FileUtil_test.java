@@ -23,6 +23,12 @@ public class FileUtil_test {
 	public String outputDirStr = "./test-files/tmp/fileutils/FileUtils/";
 	public File outputDir = new File(outputDirStr);
 	
+	/// Invalid constructor test
+		@Test(expected = IllegalAccessError.class)
+		public void invalidConstructor() throws Exception {
+			new FileUtil();
+	}
+		
 	@Before
 	public void setUp() {
 		outputDir.mkdirs();

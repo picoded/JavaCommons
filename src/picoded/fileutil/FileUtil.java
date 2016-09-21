@@ -12,7 +12,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 ///
-/// Small extension of apache FileUtil, for some additional features that we needed.
+/// Small extension of apache FileUtil, 
+// for some additional features that we needed.
 /// Additionally several FilenameUtils is made avaliable here
 ///
 /// @See https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtil.html

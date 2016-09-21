@@ -156,7 +156,7 @@ public class FileUtil_test {
 	public void testNormalize() throws IOException {
 		assertEquals(null, FileUtil.normalize(null));
 		assertEquals("", FileUtil.normalize(""));
-		String path = testDirStr.substring(2).replace("/", "\\");
+		String path = testDirStr.substring(2);
 		assertEquals(path+"jsRegex.js", FileUtil.normalize(testDirStr+"jsRegex.js"));
 		assertEquals(path+"doubleSlash.txt", FileUtil.normalize(testDirStr+"doubleSlash.txt"));
 	}

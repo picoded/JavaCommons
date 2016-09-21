@@ -8,10 +8,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
 //apache includes
 import org.apache.commons.lang3.StringUtils;
-import org.ini4j.InvalidFileFormatException;
 
 ///
 /// Small extension of apache FileUtil, for some additional features that we needed.
@@ -172,24 +170,20 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate,
 		boolean tryToUseSymLink) throws IOException {
-		try{
-			if (inDir == null || outDir == null) {
-				new IOException("Invalid directory");
+		if (inDir == null || outDir == null) {
+			new IOException("Invalid directory");
+		}
+		File[] dir_inDir = inDir.listFiles();
+		for (int i = 0; i < dir_inDir.length; i++) {
+			File infile = dir_inDir[i];
+			if (infile.isFile()) {
+				File outfile = new File(outDir, infile.getName());
+				copyFile_ifDifferent(infile, outfile, preserveFileDate, tryToUseSymLink);
+			} else if (infile.isDirectory()) {
+				File newOutDir = new File(outDir.getAbsolutePath() + File.separator + infile.getName());
+				newOutDir.mkdir();
+				copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToUseSymLink);
 			}
-			File[] dir_inDir = inDir.listFiles();
-			for (int i = 0; i < dir_inDir.length; i++) {
-				File infile = dir_inDir[i];
-				if (infile.isFile()) {
-					File outfile = new File(outDir, infile.getName());
-					copyFile_ifDifferent(infile, outfile, preserveFileDate, tryToUseSymLink);
-				} else if (infile.isDirectory()) {
-					File newOutDir = new File(outDir.getAbsolutePath() + File.separator + infile.getName());
-					newOutDir.mkdir();
-					copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToUseSymLink);
-				}
-			}
-		}catch(IOException e){
-			throw new InvalidFileFormatException(e.getMessage());
 		}
 	}
 	

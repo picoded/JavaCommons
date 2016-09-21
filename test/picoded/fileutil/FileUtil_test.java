@@ -60,6 +60,7 @@ public class FileUtil_test {
 	public void readJSRegex() throws IOException {
 		assertNotNull(test_res = FileUtil.readFileToString(new File(testDir, "jsRegex.js")));
 		assertEquals(test_jsRegex, test_res.trim());
+		assertEquals(null, FileUtil.readFileToString_withFallback(null, null));
 		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "jsRegex.js"), null));
 		assertEquals(test_jsRegex, test_res.trim());
 	}
@@ -75,6 +76,16 @@ public class FileUtil_test {
 		assertEquals(test_jsRegex, test_res.trim());
 		assertNotNull(test_res = FileUtil.readFileToString_withFallback(outFile, null));
 		assertEquals(test_jsRegex, test_res.trim());
+	}
+	
+	@Test
+	public void writeStringToFileIfDifferant() throws IOException {
+		File outFile = new File(outputDir, "jsRegex.js");
+		FileUtil.writeStringToFile_ifDifferant(outFile, test_jsRegex);
+		outFile = new File(outputDir, "doubleSlash.txt");
+		FileUtil.writeStringToFile_ifDifferant(outFile, test_jsRegex);
+		outFile = new File(outputDir, "test.js");
+		FileUtil.writeStringToFile_ifDifferant(outFile, test_jsRegex);
 	}
 	
 	/// Test for list Dirs

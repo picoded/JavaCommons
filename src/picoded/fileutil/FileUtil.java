@@ -167,7 +167,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate,
 		boolean tryToUseSymLink) throws IOException {
-		if (inDir == null || outDir == null) {
+		if ((inDir == null || outDir == null) || (!inDir.exists() || !outDir.exists())) {
 			new IOException("Invalid directory");
 		}
 		File[] dir_inDir = inDir.listFiles();

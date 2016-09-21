@@ -87,7 +87,14 @@ public class FileUtil_test {
 		assertEquals(new ArrayList<File>(), FileUtil.listDirs(null));
 	}
 	
-	/// Test for Get Base Name
+	/// Test for Newest File Timestamp
+	@Test
+	public void testCopyDirectoryIfDifferent() throws IOException {
+		FileUtil.copyDirectory_ifDifferent(testDir, outputDir);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File("./test-files/tmp/"));
+	}
+	
+	/// Test for Newest File Timestamp
 	@Test
 	public void testNewestFileTimestamp() throws IOException {
 		assertEquals(0L, FileUtil.newestFileTimestamp(null));

@@ -19,7 +19,7 @@ public class FileUtil_test {
 
 	// Test directories and setup
 	//----------------------------------------------------------------------------------------------------
-	public String testDirStr = "./test-files/test-specific/fileutils/FileUtils/";
+	public static String testDirStr = "./test-files/test-specific/fileutils/FileUtils/";
 	public File testDir = new File(testDirStr);
 	
 	public String outputDirStr = "./test-files/tmp/fileutils/FileUtils/";
@@ -80,7 +80,54 @@ public class FileUtil_test {
 	/// Test for list Dirs
 	@Test
 	public void testListDirs() throws IOException {
+		assertNotNull(FileUtil.listDirs(new File("./test-files/test-specific/fileutils/")));
 		assertNotNull(FileUtil.listDirs(testDir));
 		assertNotNull(FileUtil.listDirs(outputDir));
+		assertEquals(new ArrayList<File>(), FileUtil.listDirs(null));
+	}
+	/// Test for Get Base Name
+	@Test
+	public void testGetBaseName() throws IOException {
+		assertEquals(null, FileUtil.getBaseName(null));
+		assertEquals("", FileUtil.getBaseName(""));
+		assertEquals("jsRegex", FileUtil.getBaseName("jsRegex.js"));
+		assertEquals("doubleSlash", FileUtil.getBaseName("doubleSlash.txt"));
+	}
+	
+	/// Test for Get Base Name
+	@Test
+	public void testGetExtension() throws IOException {
+		assertEquals(null, FileUtil.getExtension(null));
+		assertEquals("", FileUtil.getExtension(""));
+		assertEquals("js", FileUtil.getExtension("jsRegex.js"));
+		assertEquals("txt", FileUtil.getExtension("doubleSlash.txt"));
+	}
+	
+	/// Test for Get Full Path
+	@Test
+	public void testGetFullPath() throws IOException {
+		assertEquals(null, FileUtil.getFullPath(null));
+		assertEquals("", FileUtil.getFullPath(""));
+		assertEquals(testDirStr, FileUtil.getFullPath(testDirStr+"jsRegex.js"));
+		assertEquals(testDirStr, FileUtil.getFullPath(testDirStr+"doubleSlash.txt"));
+	}
+	
+	/// Test for Get Full Path No End Separator
+	@Test
+	public void testGetFullPathNoEndSeparator() throws IOException {
+		assertEquals(null, FileUtil.getFullPathNoEndSeparator(null));
+		assertEquals("", FileUtil.getFullPathNoEndSeparator(""));
+		String path = testDirStr.substring(0,testDirStr.length()-1);
+		assertEquals(path, FileUtil.getFullPathNoEndSeparator(testDirStr+"jsRegex.js"));
+		assertEquals(path, FileUtil.getFullPathNoEndSeparator(testDirStr+"doubleSlash.txt"));
+	}
+
+	/// Test for Get Name
+	@Test
+	public void testGetName() throws IOException {
+		assertEquals(null, FileUtil.getName(null));
+		assertEquals("", FileUtil.getName(""));
+		assertEquals("jsRegex.js", FileUtil.getName(testDirStr+"jsRegex.js"));
+		assertEquals("doubleSlash.txt", FileUtil.getName(testDirStr+"doubleSlash.txt"));
 	}
 }

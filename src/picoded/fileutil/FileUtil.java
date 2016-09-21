@@ -275,12 +275,16 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @return The newest timestamp found, else 0 if failed
 	///
-	public static long newestFileTimestamp(File inFile,
-			List<String> excludeNames) {
+	public static long newestFileTimestamp(File inFile, List<String> excludeNames) {
+		
+		long retTimestamp = 0L;
+		if (inFile == null || !inFile.exists()) {
+			return retTimestamp;
+		}
 		if (!inFile.isDirectory()) {
 			return inFile.lastModified();
 		}
-		long retTimestamp = 0L;
+		
 		for (File f : inFile.listFiles()) {
 			if (excludeNames == null) {
 			// do nothing

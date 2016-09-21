@@ -86,6 +86,22 @@ public class FileUtil_test {
 		assertNotNull(FileUtil.listDirs(outputDir));
 		assertEquals(new ArrayList<File>(), FileUtil.listDirs(null));
 	}
+	
+	/// Test for Get Base Name
+	@Test
+	public void testNewestFileTimestamp() throws IOException {
+		assertEquals(0L, FileUtil.newestFileTimestamp(null));
+		assertEquals(0L, FileUtil.newestFileTimestamp(new File("")));
+		assertNotNull(FileUtil.newestFileTimestamp(new File(testDirStr+"jsRegex.js")));
+		assertNotNull(FileUtil.newestFileTimestamp(new File(testDirStr+"doubleSlash.txt")));
+		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/")));
+		List<String> excludeNames = new ArrayList<String>();
+		excludeNames.add("jsRegex.js");
+		excludeNames.add("doubleSlash.txt");
+		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/"), excludeNames));
+
+	}
+		
 	/// Test for Get Base Name
 	@Test
 	public void testGetBaseName() throws IOException {
@@ -168,10 +184,13 @@ public class FileUtil_test {
 		assertEquals(filePathsList, FileUtil.getFilePaths(null));
 		assertEquals(filePathsList, FileUtil.getFilePaths(new File("")));
 		assertNotNull(FileUtil.getFilePaths(new File(testDirStr)));
+		assertNotNull(FileUtil.getFilePaths(new File("./test-files/test-specific/fileutils/")));
 		filePathsList.add("jsRegex");
 		assertEquals(filePathsList, FileUtil.getFilePaths(new File(testDirStr+"jsRegex.js")));
+		assertEquals(filePathsList, FileUtil.getFilePaths(new File(testDirStr+"jsRegex.js"), "/"));
 		filePathsList = new ArrayList<String>();
 		filePathsList.add("doubleSlash");
+		assertEquals(filePathsList, FileUtil.getFilePaths(new File(testDirStr+"doubleSlash.txt"), "/"));
 		assertEquals(filePathsList, FileUtil.getFilePaths(new File(testDirStr+"doubleSlash.txt")));
 	}
 

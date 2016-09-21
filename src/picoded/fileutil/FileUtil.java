@@ -423,6 +423,10 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static Collection<String> getFilePaths(File inFile, String separator, String folderPrefix) {
 		List<String> keyList = new ArrayList<String>();
+		
+		if(inFile == null || !inFile.exists()){
+			return keyList;
+		}
 		//check folder Prefix is not empt
 		if (StringUtils.isEmpty(folderPrefix)) {
 			folderPrefix = "";

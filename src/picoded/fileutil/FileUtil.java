@@ -87,7 +87,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @returns the file value if possible, else returns the fallback value
 	///
-	public static String readFileToString_withFallback(File inFile, String fallback) {
+	public static String readFileToString_withFallback(File inFile, String fallback) throws IOException {
 		return picoded.fileutil.FileUtil.readFileToString_withFallback(inFile, fallback, null);
 	}
 	
@@ -102,16 +102,12 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @returns the file value if possible, else returns the fallback value
 	///
-	public static String readFileToString_withFallback(File inFile, String fallback, String encoding) {
+	public static String readFileToString_withFallback(File inFile, String fallback, String encoding) throws IOException {
 		if (inFile == null || !inFile.exists() || !inFile.isFile() || !inFile.canRead()) {
 			return fallback;
 		}
 		
-		try {
 			return picoded.fileutil.FileUtil.readFileToString(inFile, encoding);
-		} catch (IOException e) {
-			return fallback;
-		}
 	}
 	
 	///

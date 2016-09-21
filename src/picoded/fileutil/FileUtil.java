@@ -42,7 +42,6 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 				ret.add(f);
 			}
 		}
-		
 		return ret;
 	}
 	
@@ -124,7 +123,6 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		if (original.equals(data)) {
 			return false;
 		}
-		
 		writeStringToFile(inFile, data, encoding);
 		return true;
 	}
@@ -176,7 +174,6 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			if (infile.isFile()) {
 				File outfile = new File(outDir, infile.getName());
 				copyFile_ifDifferent(infile, outfile, preserveFileDate, tryToUseSymLink);
-				
 			} else if (infile.isDirectory()) {
 				File newOutDir = new File(outDir.getAbsolutePath() + File.separator + infile.getName());
 				newOutDir.mkdir();
@@ -234,7 +231,6 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			//	Files.createSymbolicLink(Paths.get(inFile.getAbsolutePath()), 
 			// Paths.get(outFile.getAbsolutePath()), new FileAttribute<?>[0]);
 			//}
-			
 			// Assumes output file is either NOT a symbolic link
 			// or has the wrong symbolic link reference.
 			//
@@ -275,7 +271,6 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @return The newest timestamp found, else 0 if failed
 	///
 	public static long newestFileTimestamp(File inFile, List<String> excludeNames) {
-		
 		long retTimestamp = 0L;
 		if (inFile == null || !inFile.exists()) {
 			return retTimestamp;
@@ -283,7 +278,6 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		if (!inFile.isDirectory()) {
 			return inFile.lastModified();
 		}
-		
 		for (File f : inFile.listFiles()) {
 			if (excludeNames == null) {
 				// do nothing
@@ -293,19 +287,16 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 					continue;
 				}
 			}
-			
 			long tmpTimestamp = 0L;
 			if (f.isDirectory()) {
 				tmpTimestamp = newestFileTimestamp(f, excludeNames);
 			} else if (f.isFile()) {
 				tmpTimestamp = f.lastModified();
 			}
-			
 			if (tmpTimestamp > retTimestamp) {
 				retTimestamp = tmpTimestamp;
 			}
 		}
-		
 		return retTimestamp;
 	}
 	
@@ -426,7 +417,6 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static Collection<String> getFilePaths(File inFile, String separator, String folderPrefix) {
 		List<String> keyList = new ArrayList<String>();
-		
 		if (inFile == null || !inFile.exists()) {
 			return keyList;
 		}
@@ -434,22 +424,17 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		if (StringUtils.isEmpty(folderPrefix)) {
 			folderPrefix = "";
 		}
-		
 		if (StringUtils.isEmpty(separator)) {
 			separator = "/";
 		}
-		
 		if (!inFile.isDirectory()) {
-			
 			String fileName = inFile.getName();
 			fileName = fileName.substring(0, fileName.lastIndexOf('.'));
 			String prefix = "";
 			if (!folderPrefix.isEmpty()) {
 				prefix += folderPrefix + separator;
 			}
-			
 			keyList.add(prefix + fileName);
-			
 			return keyList;
 		}
 		File[] innerFiles = inFile.listFiles();

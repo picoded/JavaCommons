@@ -80,14 +80,21 @@ public class FileUtil_test {
 		assertEquals(new ArrayList<File>(), FileUtil.listDirs(null));
 	}
 	
-	/// Test for Newest File Timestamp
+	/// Test for Copy Directory If Different
 	@Test
 	public void testCopyDirectoryIfDifferent() throws IOException {
+		FileUtil.copyDirectory_ifDifferent(null, null);
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
 			"./test-files/tmp/"));
 	}
 	
+	/// Test for Copy Directory If Different
+	@Test
+	public void testCopyFileIfDifferent() throws IOException {
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"));
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"));
+	}
 	/// Test for Newest File Timestamp
 	@Test
 	public void testNewestFileTimestamp() throws IOException {

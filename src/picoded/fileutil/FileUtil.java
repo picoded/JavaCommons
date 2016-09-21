@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
 //apache includes
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,7 +34,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static Collection<File> listDirs(File inFile) {
 		List<File> ret = new ArrayList<File>();
-		if(inFile== null){
+		if (inFile == null) {
 			return ret;
 		}
 		for (File f : inFile.listFiles()) {
@@ -158,7 +157,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate) throws IOException {
 		//default symlink is false : This is considered advance behaviour
-		copyDirectory_ifDifferent(inDir, outDir, preserveFileDate, false); 
+		copyDirectory_ifDifferent(inDir, outDir, preserveFileDate, false);
 	}
 	
 	///
@@ -167,7 +166,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param folder to scan and copy from
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate,
-		boolean tryToUseSymLink) throws IOException{
+		boolean tryToUseSymLink) throws IOException {
 		if (inDir == null || outDir == null) {
 			new IOException("Invalid directory");
 		}
@@ -201,7 +200,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param file to scan and copy from
 	///
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate) throws IOException {
-		 //default symlink is false :This is considered advance behaviour
+		//default symlink is false :This is considered advance behaviour
 		copyFile_ifDifferent(inFile, outFile, preserveFileDate, false);
 	}
 	
@@ -212,40 +211,40 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToUseSymLink)
 		throws IOException {
-			// Checks if the output file is already a symbolic link
-			// And if its valid. And since both is pratically the same 
-			// final file when linked, the file is considered "not different"
+		// Checks if the output file is already a symbolic link
+		// And if its valid. And since both is pratically the same 
+		// final file when linked, the file is considered "not different"
+		//------------------------------------------------------------
+		if (Files.isSymbolicLink(outFile.toPath())
+			&& Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath())) {
+			// Gets the symbolic link source file path, and checks if it points to source file.
+			// See: http://stackoverflow.com/questions/29368308/java-nio-how-is-path-issamefile-different-from-path-equals
+			// for why is `Files.isSameFile()` used
+			// If it points to the same file, the symbolic link is valid
+			// No copy operations is required.
+			return;
+		}
+		
+		// Tries to build symlink if possible, hopefully
+		if (tryToUseSymLink) {
+			// NOTE: You do not test source file for symbolic link
+			// Only the detination file should be a symbolic link.
 			//------------------------------------------------------------
-			if (Files.isSymbolicLink(outFile.toPath()) && 
-					Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath())) {
-				// Gets the symbolic link source file path, and checks if it points to source file.
-				// See: http://stackoverflow.com/questions/29368308/java-nio-how-is-path-issamefile-different-from-path-equals
-				// for why is `Files.isSameFile()` used
-				// If it points to the same file, the symbolic link is valid
-				// No copy operations is required.
-				return;
-			}
+			//if(!Files.isSymbolicLink(inFile.toPath())){
+			//	Files.createSymbolicLink(Paths.get(inFile.getAbsolutePath()), 
+			// Paths.get(outFile.getAbsolutePath()), new FileAttribute<?>[0]);
+			//}
 			
-			// Tries to build symlink if possible, hopefully
-			if (tryToUseSymLink) {
-				// NOTE: You do not test source file for symbolic link
-				// Only the detination file should be a symbolic link.
-				//------------------------------------------------------------
-				//if(!Files.isSymbolicLink(inFile.toPath())){
-				//	Files.createSymbolicLink(Paths.get(inFile.getAbsolutePath()), 
-				// Paths.get(outFile.getAbsolutePath()), new FileAttribute<?>[0]);
-				//}
-				
-				// Assumes output file is either NOT a symbolic link
-				// or has the wrong symbolic link reference.
-				//
-				// Creates a symbolic link of the outfile, 
-				// relative to the in file (if possible)
-				//------------------------------------------------------------
-				Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath().toAbsolutePath());
-			}
-			// Silence the error 
-			// Uses fallback behaviour of copying the file if it occurs
+			// Assumes output file is either NOT a symbolic link
+			// or has the wrong symbolic link reference.
+			//
+			// Creates a symbolic link of the outfile, 
+			// relative to the in file (if possible)
+			//------------------------------------------------------------
+			Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath().toAbsolutePath());
+		}
+		// Silence the error 
+		// Uses fallback behaviour of copying the file if it occurs
 		
 		// Checks if file has not been modified, and has same data length, for skipping?
 		//---------------------------------------------------------------------------------
@@ -287,26 +286,26 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		
 		for (File f : inFile.listFiles()) {
 			if (excludeNames == null) {
-			// do nothing
+				// do nothing
 			} else {
 				String baseName = f.getName();
 				if (excludeNames.contains(baseName)) {
 					continue;
 				}
 			}
-
+			
 			long tmpTimestamp = 0L;
 			if (f.isDirectory()) {
 				tmpTimestamp = newestFileTimestamp(f, excludeNames);
 			} else if (f.isFile()) {
 				tmpTimestamp = f.lastModified();
 			}
-
+			
 			if (tmpTimestamp > retTimestamp) {
 				retTimestamp = tmpTimestamp;
 			}
 		}
-
+		
 		return retTimestamp;
 	}
 	
@@ -428,7 +427,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	public static Collection<String> getFilePaths(File inFile, String separator, String folderPrefix) {
 		List<String> keyList = new ArrayList<String>();
 		
-		if(inFile == null || !inFile.exists()){
+		if (inFile == null || !inFile.exists()) {
 			return keyList;
 		}
 		//check folder Prefix is not empt
@@ -441,7 +440,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		}
 		
 		if (!inFile.isDirectory()) {
-
+			
 			String fileName = inFile.getName();
 			fileName = fileName.substring(0, fileName.lastIndexOf('.'));
 			String prefix = "";
@@ -453,18 +452,18 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			
 			return keyList;
 		}
-			File[] innerFiles = inFile.listFiles();
-			for (File innerFile : innerFiles) {
-				if (!innerFile.isDirectory()) {
-					keyList.addAll(getFilePaths(innerFile, folderPrefix, separator));
-				} else {
-					String parentFolderName = innerFile.getName();
-					if (!folderPrefix.isEmpty()) {
-						parentFolderName = folderPrefix + separator + parentFolderName;
-					}
-					keyList.addAll(getFilePaths(innerFile, parentFolderName, separator));
+		File[] innerFiles = inFile.listFiles();
+		for (File innerFile : innerFiles) {
+			if (!innerFile.isDirectory()) {
+				keyList.addAll(getFilePaths(innerFile, folderPrefix, separator));
+			} else {
+				String parentFolderName = innerFile.getName();
+				if (!folderPrefix.isEmpty()) {
+					parentFolderName = folderPrefix + separator + parentFolderName;
 				}
+				keyList.addAll(getFilePaths(innerFile, parentFolderName, separator));
 			}
+		}
 		return keyList;
 	}
 }

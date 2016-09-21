@@ -429,7 +429,7 @@ public class PageBuilderCore {
 	/// AKA: replace_PageRootURI_to_ApiRootURI_whereApplicable
 	protected String filterRawTemplateForRelativeURImode(String input) {
 		// Also normalizes the PagesRootURI to PageRootURI
-		return input.replaceAll("\\$\\{PagesRootURI\\}", "\\${PageRootURI}/").replaceAll("\\$\\{PageRootURI\\}/api", "\\${ApiRootURI}");
+		return input.replaceAll("\\$\\{PagesRootURI\\}", "\\${PageRootURI}").replaceAll("\\$\\{PageRootURI\\}/api", "\\${ApiRootURI}");
 	}
 	
 	/// Process and overwrite the template object for the relative path mode

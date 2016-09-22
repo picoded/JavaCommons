@@ -58,7 +58,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	
 	/// Overwrites null encoding with US-ASCII
 	public static String readFileToString(File inFile, String encoding) throws IOException {
-		if (encoding == null) {
+		if (encoding == null || encoding == "") {
 			encoding = "US-ASCII";
 		}
 		return org.apache.commons.io.FileUtils.readFileToString(inFile, encoding);
@@ -71,7 +71,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	
 	/// Overwrites null encoding with US-ASCII
 	public static void writeStringToFile(File inFile, String data, String encoding) throws IOException {
-		if (encoding == null) {
+		if (encoding == null || encoding == "") {
 			encoding = "US-ASCII";
 		}
 		org.apache.commons.io.FileUtils.writeStringToFile(inFile, data, encoding);

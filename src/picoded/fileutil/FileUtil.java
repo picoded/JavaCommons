@@ -209,8 +209,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @param file to scan and copy from
 	///
-	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToUseSymLink)
-		throws IOException {
+	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, 
+	boolean tryToUseSymLink)throws IOException {
 		if ((inFile == null || outFile == null)|| !inFile.exists() || !outFile.exists()) {
 			return;
 		}

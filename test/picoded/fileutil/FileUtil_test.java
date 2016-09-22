@@ -72,12 +72,6 @@ public class FileUtil_test {
 		// encoding not empty
 		str = "US-ASCII";
 		assertNotNull(FileUtil.readFileToString(new File(testDir, "doubleSlash.txt"), str));
-		
-		assertEquals(null, FileUtil.readFileToString_withFallback(null, null));
-		assertEquals(null, FileUtil.readFileToString_withFallback(null, null, null));
-		assertEquals("", FileUtil.readFileToString_withFallback(new File(""), "", ""));
-		assertNotNull(FileUtil.readFileToString_withFallback(new File(testDir, "jsRegex.js"), null, null));
-		assertNotNull(FileUtil.readFileToString_withFallback(new File(testDir, "jsRegex.js"), "", ""));
 	}
 	
 	// Write read test cases
@@ -89,7 +83,12 @@ public class FileUtil_test {
 		FileUtil.writeStringToFile(outFile, test_jsRegex);
 		assertNotNull(test_res = FileUtil.readFileToString(outFile));
 		assertEquals(test_jsRegex, test_res.trim());
+		
 		assertNotNull(test_res = FileUtil.readFileToString_withFallback(outFile, null));
+		assertEquals(null, FileUtil.readFileToString_withFallback(null, null));
+		assertEquals(test_res, FileUtil.readFileToString_withFallback(outFile, "test"));
+		assertEquals("", FileUtil.readFileToString_withFallback(new File(""), ""));
+
 		assertEquals(test_jsRegex, test_res.trim());
 		String str = null;
 		FileUtil.writeStringToFile(outFile, test_jsRegex, str);
@@ -97,7 +96,8 @@ public class FileUtil_test {
 		FileUtil.writeStringToFile(outFile, test_jsRegex, str);
 		// encoding not empty
 		str = "US-ASCII";
-		FileUtil.writeStringToFile(new File(testDir, "doubleSlash.txt"), str);
+		
+		FileUtil.writeStringToFile(outFile, test_jsRegex, str);
 	}
 	
 	@Test
@@ -246,4 +246,3 @@ public class FileUtil_test {
 		assertEquals(filePathsList, FileUtil.getFilePaths(new File(testDirStr + "doubleSlash.txt")));
 	}
 }
-

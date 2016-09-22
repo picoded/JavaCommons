@@ -255,6 +255,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		//---------------------------------------------------------------------------------
 		if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null)) {
 			copyFile(inFile, outFile, preserveFileDate);
+			tryToUseSymLink = false;
 		}
 	}
 	

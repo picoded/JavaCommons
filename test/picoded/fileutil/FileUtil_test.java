@@ -185,7 +185,6 @@ public class FileUtil_test {
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"));
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(testDirStr + "jsRegex.js"), false, true);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), false, true);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);

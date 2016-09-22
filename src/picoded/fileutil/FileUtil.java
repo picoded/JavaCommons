@@ -3,9 +3,11 @@ package picoded.fileutil;
 //java incldues
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 
 //apache includes
 import org.apache.commons.lang3.StringUtils;
@@ -216,18 +218,18 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		// And if its valid. And since both is pratically the same 
 		// final file when linked, the file is considered "not different"
 		//------------------------------------------------------------
-		//if (Files.isSymbolicLink(outFile.toPath())
-		//	&& Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath())) {
+		if (Files.isSymbolicLink(outFile.toPath())
+			&& Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath())) {
 			// Gets the symbolic link source file path, and checks if it points to source file.
 			// See: http://stackoverflow.com/questions/29368308/java-nio-how-is-path-issamefile-different-from-path-equals
 			// for why is `Files.isSameFile()` used
 			// If it points to the same file, the symbolic link is valid
 			// No copy operations is required.
-		//	return;
-		//}
+			return;
+		}
 		
 		// Tries to build symlink if possible, hopefully
-		//if (tryToUseSymLink) {
+		if (tryToUseSymLink) {
 			// NOTE: You do not test source file for symbolic link
 			// Only the detination file should be a symbolic link.
 			//------------------------------------------------------------
@@ -241,8 +243,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			// Creates a symbolic link of the outfile, 
 			// relative to the in file (if possible)
 			//------------------------------------------------------------
-			//Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath().toAbsolutePath());
-		//}
+			Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath().toAbsolutePath());
+		}
 		// Silence the error 
 		// Uses fallback behaviour of copying the file if it occurs
 		
@@ -255,7 +257,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		
 		// Final fallback behaviour, copies file if content differs.
 		//---------------------------------------------------------------------------------
-		if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null) && !tryToUseSymLink) {
+		if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null)) {
 			copyFile(inFile, outFile, preserveFileDate);
 		}
 	}

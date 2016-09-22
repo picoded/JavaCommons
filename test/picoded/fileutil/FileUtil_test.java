@@ -62,10 +62,17 @@ public class FileUtil_test {
 		assertEquals(test_jsRegex, test_res.trim());
 		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "jsRegex.js"), null));
 		assertEquals(test_jsRegex, test_res.trim());
+		
+		// encoding null test
 		String str = null;
 		assertNotNull(FileUtil.readFileToString(new File(testDir, "doubleSlash.txt"), str));
-		str="";
+		// encoding empty test
+		str = "";
 		assertNotNull(FileUtil.readFileToString(new File(testDir, "doubleSlash.txt"), str));
+		// encoding not empty
+		str = "US-ASCII";
+		assertNotNull(FileUtil.readFileToString(new File(testDir, "doubleSlash.txt"), str));
+		
 		assertEquals(null, FileUtil.readFileToString_withFallback(null, null));
 		assertEquals(null, FileUtil.readFileToString_withFallback(null, null, null));
 		assertEquals("", FileUtil.readFileToString_withFallback(new File(""), "", ""));
@@ -88,6 +95,9 @@ public class FileUtil_test {
 		FileUtil.writeStringToFile(outFile, test_jsRegex, str);
 		str="";
 		FileUtil.writeStringToFile(outFile, test_jsRegex, str);
+		// encoding not empty
+		str = "US-ASCII";
+		FileUtil.writeStringToFile(new File(testDir, "doubleSlash.txt"), str);
 	}
 	
 	@Test
@@ -122,8 +132,8 @@ public class FileUtil_test {
 	@Test
 	public void testCopyFileIfDifferent() throws IOException {
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"));
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "jsRegex.js"), true);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "jsRegex.js"), true, false);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"));
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
@@ -140,6 +150,8 @@ public class FileUtil_test {
 		excludeNames.add("jsRegex.js");
 		excludeNames.add("doubleSlash.txt");
 		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/"), excludeNames));
+		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/ConfigFile"), null));
+		
 	}
 	
 	/// Test for Get Base Name
@@ -234,3 +246,4 @@ public class FileUtil_test {
 		assertEquals(filePathsList, FileUtil.getFilePaths(new File(testDirStr + "doubleSlash.txt")));
 	}
 }
+

@@ -86,7 +86,7 @@ public class FileUtil_test {
 		
 		assertNotNull(test_res = FileUtil.readFileToString_withFallback(outFile, null));
 		assertEquals(null, FileUtil.readFileToString_withFallback(null, null));
-		assertEquals("test", FileUtil.readFileToString_withFallback(testDir, "test"));
+		assertEquals(test_res, FileUtil.readFileToString_withFallback(outFile, "test"));
 		assertEquals("", FileUtil.readFileToString_withFallback(new File(""), ""));
 		
 		String str = null;
@@ -95,9 +95,9 @@ public class FileUtil_test {
 		assertEquals("", FileUtil.readFileToString_withFallback(new File(""), "", str));
 		// encoding not empty
 		str = "US-ASCII";
-		assertEquals(null, FileUtil.readFileToString_withFallback(testDir, null, str));
-		assertEquals("test", FileUtil.readFileToString_withFallback(testDir, "test", str));
-		assertEquals("", FileUtil.readFileToString_withFallback(testDir, "", str));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(outFile, null, str));
+		assertEquals(test_res, FileUtil.readFileToString_withFallback(outFile, "test", str));
+		assertEquals(test_res, FileUtil.readFileToString_withFallback(outFile, "", str));
 		
 		
 		assertEquals(test_jsRegex, test_res.trim());
@@ -164,6 +164,11 @@ public class FileUtil_test {
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
 				new File("./test-files/tmp/"), true, false);
 		
+		FileUtil.copyDirectory_ifDifferent(null, null, false, true);
+		FileUtil.copyDirectory_ifDifferent(new File(""), new File(""), false, true);
+		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, false, true);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
+			"./test-files/tmp/"), false, true);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
 				new File("./test-files/tmp/"), false, true);
 		FileUtil.copyDirectory_ifDifferent(new File(""),
@@ -180,6 +185,8 @@ public class FileUtil_test {
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"));
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true, false);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(testDirStr + "jsRegex.js"), false, true);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), false, true);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true);

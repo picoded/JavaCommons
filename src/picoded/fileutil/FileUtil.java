@@ -57,6 +57,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	
 	/// Overwrites null encoding with US-ASCII
 	public static String readFileToString(File inFile, String encoding) throws IOException {
+		if (inFile == null || !inFile.exists() || !inFile.isFile() || !inFile.canRead()) {
+			return;
+		}
 		if (encoding == null || encoding.isEmpty()) {
 			encoding = "US-ASCII";
 		}
@@ -70,6 +73,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	
 	/// Overwrites null encoding with US-ASCII
 	public static void writeStringToFile(File inFile, String data, String encoding) throws IOException {
+		if (inFile == null || !inFile.exists() || !inFile.isFile() || !inFile.canRead()) {
+			return;
+		}
 		if (encoding == null || encoding.isEmpty()) {
 			encoding = "US-ASCII";
 		}
@@ -103,7 +109,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @returns the file value if possible, else returns the fallback value
 	///
 	public static String readFileToString_withFallback(File inFile, String fallback, String encoding) throws IOException {
-		if (inFile == null || !inFile.exists() || !inFile.isFile() || !inFile.canRead()) {
+
+	if (inFile == null || !inFile.exists() || !inFile.isFile() || !inFile.canRead()) {
 			return fallback;
 		}
 		

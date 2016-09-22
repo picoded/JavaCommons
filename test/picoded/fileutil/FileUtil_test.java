@@ -164,17 +164,17 @@ public class FileUtil_test {
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
 				new File("./test-files/tmp/"), true, false);
 		
-		FileUtil.copyDirectory_ifDifferent(null, null, false, true);
-		FileUtil.copyDirectory_ifDifferent(new File(""), new File(""), false, true);
-		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, false, true);
+		FileUtil.copyDirectory_ifDifferent(null, null, false, false);
+		FileUtil.copyDirectory_ifDifferent(new File(""), new File(""), false, false);
+		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, false, false);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
-			"./test-files/tmp/"), false, true);
+			"./test-files/tmp/"), false, false);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
-				new File("./test-files/tmp/"), false, true);
+				new File("./test-files/tmp/"), false, false);
 		FileUtil.copyDirectory_ifDifferent(new File(""),
-				new File("./test-files/tmp/"), false, true);
+				new File("./test-files/tmp/"), false, false);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
-				new File(""), false, true);
+				new File(""), false, false);
 	}
 	
 	/// Test for Copy Directory If Different
@@ -185,8 +185,8 @@ public class FileUtil_test {
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"));
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(testDirStr + "jsRegex.js"), false, true);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), false, true);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(testDirStr + "jsRegex.js"), false, false);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), false, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true);

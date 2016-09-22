@@ -103,8 +103,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @returns the file value if possible, else returns the fallback value
 	///
 	public static String readFileToString_withFallback(File inFile, String fallback, String encoding) throws IOException {
-
-	if (inFile == null || !inFile.exists() || !inFile.isFile() || !inFile.canRead()) {
+		if (inFile == null || !inFile.exists() || !inFile.isFile() || !inFile.canRead()) {
 			return fallback;
 		}
 		
@@ -167,7 +166,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate,
 		boolean tryToUseSymLink) throws IOException {
-		if (inDir == null || outDir == null) {
+		if ((inDir == null || outDir == null)|| !inDir.exists() || !outDir.exists()) {
 			return;
 		}
 		File[] dir_inDir = inDir.listFiles();

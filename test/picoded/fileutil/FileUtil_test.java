@@ -60,9 +60,17 @@ public class FileUtil_test {
 	public void readJSRegex() throws IOException {
 		assertNotNull(test_res = FileUtil.readFileToString(new File(testDir, "jsRegex.js")));
 		assertEquals(test_jsRegex, test_res.trim());
-		assertEquals(null, FileUtil.readFileToString_withFallback(null, null));
 		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "jsRegex.js"), null));
 		assertEquals(test_jsRegex, test_res.trim());
+		String str = null;
+		assertNotNull(FileUtil.readFileToString(new File(testDir, "doubleSlash.txt"), str));
+		str="";
+		assertNotNull(FileUtil.readFileToString(new File(testDir, "doubleSlash.txt"), str));
+		assertEquals(null, FileUtil.readFileToString_withFallback(null, null));
+		assertEquals(null, FileUtil.readFileToString_withFallback(null, null, null));
+		assertEquals("", FileUtil.readFileToString_withFallback(new File(""), "", ""));
+		assertNotNull(FileUtil.readFileToString_withFallback(new File(testDir, "jsRegex.js"), null, null));
+		assertNotNull(FileUtil.readFileToString_withFallback(new File(testDir, "jsRegex.js"), "", ""));
 	}
 	
 	// Write read test cases
@@ -76,6 +84,10 @@ public class FileUtil_test {
 		assertEquals(test_jsRegex, test_res.trim());
 		assertNotNull(test_res = FileUtil.readFileToString_withFallback(outFile, null));
 		assertEquals(test_jsRegex, test_res.trim());
+		String str = null;
+		FileUtil.writeStringToFile(outFile, test_jsRegex, str);
+		str="";
+		FileUtil.writeStringToFile(outFile, test_jsRegex, str);
 	}
 	
 	@Test
@@ -110,7 +122,11 @@ public class FileUtil_test {
 	@Test
 	public void testCopyFileIfDifferent() throws IOException {
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"));
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "jsRegex.js"), true);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "jsRegex.js"), true, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"));
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
 	}
 	/// Test for Newest File Timestamp
 	@Test

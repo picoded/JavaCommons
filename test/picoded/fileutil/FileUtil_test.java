@@ -123,18 +123,58 @@ public class FileUtil_test {
 	@Test
 	public void testCopyDirectoryIfDifferent() throws IOException {
 		FileUtil.copyDirectory_ifDifferent(null, null);
+		FileUtil.copyDirectory_ifDifferent(new File(""), new File(""));
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
 			"./test-files/tmp/"));
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
+				new File("./test-files/tmp/"));
+		
+		FileUtil.copyDirectory_ifDifferent(null, null, true);
+		FileUtil.copyDirectory_ifDifferent(new File(""), new File(""), true);
+		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, true);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
+			"./test-files/tmp/"), true);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
+				new File("./test-files/tmp/"), true);
+	
+		FileUtil.copyDirectory_ifDifferent(null, null, false);
+		FileUtil.copyDirectory_ifDifferent(new File(""), new File(""), false);
+		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, false);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
+			"./test-files/tmp/"), false);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
+				new File("./test-files/tmp/"), false);
+		
+		FileUtil.copyDirectory_ifDifferent(null, null, true, false);
+		FileUtil.copyDirectory_ifDifferent(new File(""), new File(""), true, false);
+		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, true, false);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
+			"./test-files/tmp/"), true, false);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
+				new File("./test-files/tmp/"), true, false);
+		
+		FileUtil.copyDirectory_ifDifferent(null, null, false, true);
+		FileUtil.copyDirectory_ifDifferent(new File(""), new File(""), false, true);
+		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, false, true);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
+			"./test-files/tmp/"), false, true);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
+				new File("./test-files/tmp/"), false, true);
 	}
 	
 	/// Test for Copy Directory If Different
 	@Test
 	public void testCopyFileIfDifferent() throws IOException {
+		FileUtil.copyFile_ifDifferent(null, null, false, true);
+		FileUtil.copyFile_ifDifferent(new File(""), new File(""), false, true);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"));
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"));
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(testDirStr + "jsRegex.js"), false, true);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), false, true);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true, false);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
 	}

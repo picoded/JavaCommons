@@ -209,6 +209,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToUseSymLink)
 		throws IOException {
+		if ((inFile == null || outFile == null)|| !inFile.exists() || !outFile.exists()) {
+			return;
+		}
 		// Checks if the output file is already a symbolic link
 		// And if its valid. And since both is pratically the same 
 		// final file when linked, the file is considered "not different"

@@ -97,6 +97,7 @@ public class FileUtil_test {
 		str = "US-ASCII";
 		assertNotNull(test_res = FileUtil.readFileToString_withFallback(outFile, null, str));
 		assertEquals(test_res, FileUtil.readFileToString_withFallback(outFile, "test", str));
+		assertEquals(test_res, FileUtil.readFileToString_withFallback(outFile, "", str));
 		
 		
 		assertEquals(test_jsRegex, test_res.trim());
@@ -135,8 +136,7 @@ public class FileUtil_test {
 		FileUtil.copyDirectory_ifDifferent(null, null);
 		FileUtil.copyDirectory_ifDifferent(new File(""), new File(""));
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
-			"./test-files/tmp/"));
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File("./test-files/tmp/"));
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
 				new File("./test-files/tmp/"));
 		
@@ -171,6 +171,10 @@ public class FileUtil_test {
 			"./test-files/tmp/"), false, true);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
 				new File("./test-files/tmp/"), false, true);
+		FileUtil.copyDirectory_ifDifferent(new File(""),
+				new File("./test-files/tmp/"), false, true);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
+				new File(""), false, true);
 	}
 	
 	/// Test for Copy Directory If Different

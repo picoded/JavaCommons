@@ -88,9 +88,19 @@ public class FileUtil_test {
 		assertEquals(null, FileUtil.readFileToString_withFallback(null, null));
 		assertEquals(test_res, FileUtil.readFileToString_withFallback(outFile, "test"));
 		assertEquals("", FileUtil.readFileToString_withFallback(new File(""), ""));
-
-		assertEquals(test_jsRegex, test_res.trim());
+		
 		String str = null;
+		assertEquals(null, FileUtil.readFileToString_withFallback(null, null, str));
+		str="";
+		assertEquals("", FileUtil.readFileToString_withFallback(new File(""), "", str));
+		// encoding not empty
+		str = "US-ASCII";
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(outFile, null, str));
+		assertEquals(test_res, FileUtil.readFileToString_withFallback(outFile, "test", str));
+		
+		
+		assertEquals(test_jsRegex, test_res.trim());
+		str = null;
 		FileUtil.writeStringToFile(outFile, test_jsRegex, str);
 		str="";
 		FileUtil.writeStringToFile(outFile, test_jsRegex, str);

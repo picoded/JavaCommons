@@ -253,9 +253,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		
 		// Final fallback behaviour, copies file if content differs.
 		//---------------------------------------------------------------------------------
-		if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null)) {
+		if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null) && !tryToUseSymLink) {
 			copyFile(inFile, outFile, preserveFileDate);
-			tryToUseSymLink = false;
 		}
 	}
 	

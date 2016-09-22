@@ -104,7 +104,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @returns the file value if possible, else returns the fallback value
 	///
 	public static String readFileToString_withFallback(File inFile, String fallback, String encoding) throws IOException {
-		if (inFile == null || !inFile.exists() || !inFile.isFile() || !inFile.canRead() || encoding.equals("")) {
+		if (inFile == null || !inFile.exists() || !inFile.isFile() || !inFile.canRead()) {
 			return fallback;
 		}
 		

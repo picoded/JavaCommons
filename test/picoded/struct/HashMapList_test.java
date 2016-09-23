@@ -67,8 +67,8 @@ public class HashMapList_test {
 	public void multiArrayAppendTest() {
 		
 		String[] dataArr = new String[] { "one", "two", "three" };
-		List<String> data = Arrays.asList( dataArr );
-		List<String> blankList = Arrays.asList( new String[] {} );
+		List<String> data = Arrays.asList(dataArr);
+		List<String> blankList = Arrays.asList(new String[] {});
 		
 		HashMapList<String, String> tObj = new HashMapList<String, String>();
 		
@@ -76,7 +76,7 @@ public class HashMapList_test {
 		tObj.append("hello", data);
 		
 		// Test that blank data is handled peacefully
-		tObj.append("hello", (List)null);
+		tObj.append("hello", (List) null);
 		tObj.append("hello", blankList);
 		
 		Map<String, String[]> cObj = tObj.toMapArray(dataArr);

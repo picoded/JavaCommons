@@ -1,19 +1,11 @@
 package picoded.conv;
 
-// Target test class
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+// Junit includes
+import static org.junit.Assert.*;
+import org.junit.*;
 
+// Java libs used
 import java.util.UUID;
-
-import org.junit.After;
-// Test Case include
-import org.junit.Before;
-import org.junit.Test;
-
-import picoded.conv.GUID;
-// Classes used in test case
 
 ///
 /// Test Case for picoded.struct.CaseInsensitiveHashMap

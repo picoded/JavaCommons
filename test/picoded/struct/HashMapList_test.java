@@ -5,9 +5,7 @@ import static org.junit.Assert.assertArrayEquals;
 
 import java.util.ArrayList;
 // Test Case include
-import java.util.List;
-import java.util.Map;
-import java.util.Arrays;
+import java.util.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -76,8 +74,9 @@ public class HashMapList_test {
 		tObj.append("hello", data);
 		
 		// Test that blank data is handled peacefully
-		tObj.append("hello", (List) null);
 		tObj.append("hello", blankList);
+		tObj.append("hello", (List) null);
+		tObj.append("hello", (Enumeration) null);
 		
 		Map<String, String[]> cObj = tObj.toMapArray(dataArr);
 		assertArrayEquals(dataArr, cObj.get("hello"));

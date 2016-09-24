@@ -29,6 +29,16 @@ Additionally __we can and will make breaking changes__ (see below)
 
 So if you like what you see, just star it or something and come back here sometime later.
 
+The following two images kinda summarizes the situation.
+
+### Sonarqube for master (24 sept 2016)
+
+![SonarQube status of master](./docs/readme-imgs/sonarqube-RC.png)
+
+### Sonarqube for ServletBase (24 sept 2016)
+
+![SonarQube status of ServletBase](./docs/readme-imgs/sonarqube-ServletBase.png)
+
 ## Legal status?
 
 AGPL as of now. The longer term plan is to make this whole package GPL (to-be-confirmed).
@@ -40,6 +50,8 @@ We will NOT be accepting any pushes, unless you do push with a disclaimer of all
 (If someone suggest a good contributors agreement process flow, it will be much appreciated).
 
 Note: WE HAVE 0 LAWYERS in our company, as such we cannot advice on legal status of this project. Worse case scenario, just view this as an accidental dump of our internal code.
+
+This is also more reasons why you should not use this library unless your working directly with us.
 
 ## Where is the code?
 

@@ -17,7 +17,6 @@ import picoded.conv.GUID;
 import picoded.conv.StringEscape;
 import picoded.struct.CaseInsensitiveHashMap;
 import picoded.webUtils.*;
-import picoded.FunctionalInterface.*;
 
 import java.util.Random;
 import java.io.IOException;

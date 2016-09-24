@@ -1,7 +1,8 @@
 # Java-Commons License
-All rights reserved for all files under the **picoded** package that represents JavaCommons components.
 
-The rest of this documentation, is to clarify the various libraries and dependencies licenses.
+This documentation, is to clarify the various dependencies licenses.
+
+Note this is not completed and needs to be updated.
 
 -----------------------------------------------------------------------------------------------------------------
 

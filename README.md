@@ -51,7 +51,7 @@ We will NOT be accepting any pushes, unless you do push with a disclaimer of all
 
 Note: WE HAVE 0 LAWYERS in our company, as such we cannot advice on legal status of this project. Worse case scenario, just view this as an accidental dump of our internal code.
 
-This is also more reasons why you should not use this library unless your working directly with us.
+This is also more reasons why you should not use this library unless your working directly with us / contract us. And in that case, normally you will have a formal agreement in which we give full rights to use the library. With either a GPL or LGPL licensing.
 
 ## Where is the code?
 

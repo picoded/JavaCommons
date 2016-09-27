@@ -76,6 +76,22 @@ public class FileUtil_test {
 	
 	// Write read test cases
 	//----------------------------------------------------------------------------------------------------
+	@Test
+	public void readFileToStringWithFallback() throws IOException {
+		assertEquals(null, FileUtil.readFileToString_withFallback(null, null, null));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "jsRegex.js"), null, null));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(null, "test", "US-ASCII"));
+		assertEquals("test", FileUtil.readFileToString_withFallback(null, "test", "US-ASCII"));
+		assertEquals(null, FileUtil.readFileToString_withFallback(null, null, "US-ASCII"));
+		assertEquals("test", FileUtil.readFileToString_withFallback(null, "test", null));
+		assertEquals("", FileUtil.readFileToString_withFallback(new File(""), "", ""));
+		assertEquals("", FileUtil.readFileToString_withFallback(new File(""), "", ""));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "jsRegex.js"), "", ""));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "doubleSlash.txt"), "", ""));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "doubleSlash.txt"), "", "US-ASCII"));
+		assertEquals("test", FileUtil.readFileToString_withFallback(new File(""), "test", "US-ASCII"));
+		assertEquals("test", FileUtil.readFileToString_withFallback(new File(""), "test", "US-ASCII"));
+	}
 	
 	@Test
 	public void writeReadDoubleSlash() throws IOException {

@@ -204,6 +204,7 @@ public class FileUtil_test {
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(testDirStr + "jsRegex.js"), false, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), false, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true, false);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "jsRegex.js"), true, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
@@ -220,6 +221,8 @@ public class FileUtil_test {
 		List<String> excludeNames = new ArrayList<String>();
 		excludeNames.add("jsRegex.js");
 		excludeNames.add("doubleSlash.txt");
+		assertEquals(0L, FileUtil.newestFileTimestamp(null, null));
+		assertEquals(0L, FileUtil.newestFileTimestamp(new File(""), new ArrayList<String>()));
 		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/"), excludeNames));
 		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/ConfigFile"), null));
 		

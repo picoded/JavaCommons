@@ -225,9 +225,6 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 //			// No copy operations is required.
 //			return;
 //		}
-		if(tryToUseSymLink){
-			return;
-		}
 		
 		// Tries to build symlink if possible, hopefully
 //		if (tryToUseSymLink) {
@@ -258,7 +255,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		
 		// Final fallback behaviour, copies file if content differs.
 		//---------------------------------------------------------------------------------
-		if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null)) {
+		if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null)&& !tryToUseSymLink) {
 			copyFile(inFile, outFile, preserveFileDate);
 		}
 	}
@@ -297,7 +294,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			long tmpTimestamp = 0L;
 			if (f.isDirectory()) {
 				tmpTimestamp = newestFileTimestamp(f, excludeNames);
-			} else if (f.isFile() && f.canRead()) {
+			} else {
 				tmpTimestamp = f.lastModified();
 			}
 			if (tmpTimestamp > retTimestamp) {

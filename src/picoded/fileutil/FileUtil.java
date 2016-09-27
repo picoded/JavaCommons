@@ -3,9 +3,11 @@ package picoded.fileutil;
 //java incldues
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 
 //apache includes
 import org.apache.commons.lang3.StringUtils;
@@ -210,46 +212,46 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		// And if its valid. And since both is pratically the same 
 		// final file when linked, the file is considered "not different"
 		//------------------------------------------------------------
-//		if (Files.isSymbolicLink(outFile.toPath())
-//			&& Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath())) {
-//			// Gets the symbolic link source file path, and checks if it points to source file.
-//			// See: http://stackoverflow.com/questions/29368308/java-nio-how-is-path-issamefile-different-from-path-equals
-//			// for why is `Files.isSameFile()` used
-//			// If it points to the same file, the symbolic link is valid
-//			// No copy operations is required.
-//			return;
-//		}
+		if (Files.isSymbolicLink(outFile.toPath())
+			&& Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath())) {
+			// Gets the symbolic link source file path, and checks if it points to source file.
+			// See: http://stackoverflow.com/questions/29368308/java-nio-how-is-path-issamefile-different-from-path-equals
+			// for why is `Files.isSameFile()` used
+			// If it points to the same file, the symbolic link is valid
+			// No copy operations is required.
+			return;
+		}
 		
 		// Tries to build symlink if possible, hopefully
-//		if (tryToUseSymLink) {
-//			// NOTE: You do not test source file for symbolic link
-//			// Only the detination file should be a symbolic link.
-//			//------------------------------------------------------------
-//			//if(!Files.isSymbolicLink(inFile.toPath())){
-//			//	Files.createSymbolicLink(Paths.get(inFile.getAbsolutePath()), 
-//			// Paths.get(outFile.getAbsolutePath()), new FileAttribute<?>[0]);
-//			//}
-//			// Assumes output file is either NOT a symbolic link
-//			// or has the wrong symbolic link reference.
-//			//
-//			// Creates a symbolic link of the outfile, 
-//			// relative to the in file (if possible)
-//			//------------------------------------------------------------
-//			Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath().toAbsolutePath());
-//		}
+		if (tryToUseSymLink) {
+			// NOTE: You do not test source file for symbolic link
+			// Only the detination file should be a symbolic link.
+			//------------------------------------------------------------
+			//if(!Files.isSymbolicLink(inFile.toPath())){
+			//	Files.createSymbolicLink(Paths.get(inFile.getAbsolutePath()), 
+			// Paths.get(outFile.getAbsolutePath()), new FileAttribute<?>[0]);
+			//}
+			// Assumes output file is either NOT a symbolic link
+			// or has the wrong symbolic link reference.
+			//
+			// Creates a symbolic link of the outfile, 
+			// relative to the in file (if possible)
+			//------------------------------------------------------------
+			Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath().toAbsolutePath());
+		}
 		// Silence the error 
 		// Uses fallback behaviour of copying the file if it occurs
 		
 		// Checks if file has not been modified, and has same data length, for skipping?
 		//---------------------------------------------------------------------------------
-//		if (inFile.lastModified() == outFile.lastModified() && inFile.length() == outFile.length()) {
-//			// returns and skip for optimization
-//			return;
-//		}
+		if (inFile.lastModified() == outFile.lastModified() && inFile.length() == outFile.length()) {
+			// returns and skip for optimization
+			return;
+		}
 		
 		// Final fallback behaviour, copies file if content differs.
 		//---------------------------------------------------------------------------------
-		if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null)&& !tryToUseSymLink) {
+		if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null)) {
 			copyFile(inFile, outFile, preserveFileDate);
 		}
 	}

@@ -166,7 +166,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate,
 		boolean tryToUseSymLink) throws IOException {
-		if ((inDir == null || outDir == null)|| !inDir.exists() || !outDir.exists()) {
+		if (inDir == null || outDir == null ) {
 			return;
 		}
 		File[] dir_inDir = inDir.listFiles();
@@ -175,7 +175,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			if (infile.isFile()) {
 				File outfile = new File(outDir, infile.getName());
 				copyFile_ifDifferent(infile, outfile, preserveFileDate, tryToUseSymLink);
-			} else if (infile.isDirectory()) {
+			} else {
 				File newOutDir = new File(outDir.getAbsolutePath() + File.separator + infile.getName());
 				newOutDir.mkdir();
 				copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToUseSymLink);
@@ -209,9 +209,6 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToUseSymLink)
 		throws IOException {
-		if ((inFile == null || outFile == null)|| !inFile.exists() || !outFile.exists()) {
-			return;
-		}
 		// Checks if the output file is already a symbolic link
 		// And if its valid. And since both is pratically the same 
 		// final file when linked, the file is considered "not different"

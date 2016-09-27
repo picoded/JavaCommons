@@ -275,9 +275,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @return The newest timestamp found, else 0 if failed
 	///
 	public static long newestFileTimestamp(File inFile, List<String> excludeNames) {
-		long retTimestamp = 0L;
+		long tmpTimestamp = 0L;
 		if (inFile == null || !inFile.exists()) {
-			return retTimestamp;
+			return tmpTimestamp;
 		}
 		if (!inFile.isDirectory()) {
 			return inFile.lastModified();
@@ -291,17 +291,13 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 					continue;
 				}
 			}
-			long tmpTimestamp = 0L;
 			if (f.isDirectory()) {
 				tmpTimestamp = newestFileTimestamp(f, excludeNames);
 			} else {
 				tmpTimestamp = f.lastModified();
 			}
-			if (tmpTimestamp > retTimestamp) {
-				retTimestamp = tmpTimestamp;
-			}
 		}
-		return retTimestamp;
+		return tmpTimestamp;
 	}
 	
 	///

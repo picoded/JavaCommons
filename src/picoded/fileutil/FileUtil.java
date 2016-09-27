@@ -166,9 +166,6 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate,
 		boolean tryToUseSymLink) throws IOException {
-		if (inDir == null || outDir == null ) {
-			return;
-		}
 		File[] dir_inDir = inDir.listFiles();
 		for (int i = 0; i < dir_inDir.length; i++) {
 			File infile = dir_inDir[i];

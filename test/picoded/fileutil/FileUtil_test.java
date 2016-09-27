@@ -149,34 +149,29 @@ public class FileUtil_test {
 	/// Test for Copy Directory If Different
 	@Test
 	public void testCopyDirectoryIfDifferent() throws IOException {
-		FileUtil.copyDirectory_ifDifferent(null, null);
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File("./test-files/tmp/"));
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
 				new File("./test-files/tmp/"));
 		
-		FileUtil.copyDirectory_ifDifferent(null, null, true);
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, true);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
 			"./test-files/tmp/"), true);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
 				new File("./test-files/tmp/"), true);
 	
-		FileUtil.copyDirectory_ifDifferent(null, null, false);
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, false);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
 			"./test-files/tmp/"), false);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
 				new File("./test-files/tmp/"), false);
 		
-		FileUtil.copyDirectory_ifDifferent(null, null, true, false);
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, true, false);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
 			"./test-files/tmp/"), true, false);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
 				new File("./test-files/tmp/"), true, false);
 		
-		FileUtil.copyDirectory_ifDifferent(null, null, false, false);
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, false, false);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
 			"./test-files/tmp/"), false, false);

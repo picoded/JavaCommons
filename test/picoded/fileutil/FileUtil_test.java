@@ -207,6 +207,7 @@ public class FileUtil_test {
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, true);
 	}
 	/// Test for Newest File Timestamp
 	@Test
@@ -221,7 +222,6 @@ public class FileUtil_test {
 		excludeNames.add("doubleSlash.txt");
 		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/"), excludeNames));
 		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/ConfigFile"), null));
-		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/ConfigFile/iniTestFileJSON.js"), null));
 		
 	}
 	

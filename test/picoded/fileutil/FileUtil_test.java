@@ -221,6 +221,7 @@ public class FileUtil_test {
 		excludeNames.add("doubleSlash.txt");
 		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/"), excludeNames));
 		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/ConfigFile"), null));
+		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/ConfigFile/iniTestFileJSON.js"), null));
 		
 	}
 	

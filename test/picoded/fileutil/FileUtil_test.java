@@ -205,7 +205,6 @@ public class FileUtil_test {
 		symLinkPath.toFile().delete();
 		existingFilePath = Paths.get(testDirStr + "doubleSlash.txt");
 		symLinkPath = Paths.get(outputDirStr+ "doubleSlashLink.txt");
-		Files.createSymbolicLink(symLinkPath, existingFilePath);
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, true);
 		symLinkPath.toFile().delete();
 	}

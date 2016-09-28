@@ -197,17 +197,11 @@ public class FileUtil_test {
 	}
 	 
 	@Test
-	public void testCopyFileIfDifferentUseSymLink() throws IOException {
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), false, true);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), false, true);
-	}
-
-	@Test
 	public void testCopyFileIfDifferent() throws IOException {
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"));
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), true);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(testDirStr + "jsRegexLink.js"), false, false);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), true, true);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(testDirStr + "jsRegexLink.js"), false, true);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), false, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), true, false);
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), true, false);

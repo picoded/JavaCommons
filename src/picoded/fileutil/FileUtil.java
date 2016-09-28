@@ -208,21 +208,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToUseSymLink)
 		throws IOException {
-		// Checks if the output file is already a symbolic link
-		// And if its valid. And since both is pratically the same 
-		// final file when linked, the file is considered "not different"
-		//------------------------------------------------------------
-		if (outFile.exists() && Files.isSymbolicLink(outFile.toPath())) {
-			// Gets the symbolic link source file path, and checks if it points to source file.
-			// See: http://stackoverflow.com/questions/29368308/java-nio-how-is-path-issamefile-different-from-path-equals
-			// for why is `Files.isSameFile()` used
-			// If it points to the same file, the symbolic link is valid
-			// No copy operations is required.
-			return;
-		}
-		
+	
 		// Tries to build symlink if possible, hopefully
-		if (tryToUseSymLink) {
+		if (tryToUseSymLink && !outFile.exists()) {
 			// NOTE: You do not test source file for symbolic link
 			// Only the detination file should be a symbolic link.
 			//------------------------------------------------------------
@@ -238,6 +226,20 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			//------------------------------------------------------------
 			Files.createSymbolicLink(outFile.toPath(), inFile.toPath());
 		}
+		
+		// Checks if the output file is already a symbolic link
+		// And if its valid. And since both is pratically the same 
+		// final file when linked, the file is considered "not different"
+		//------------------------------------------------------------
+		if (Files.isSymbolicLink(outFile.toPath())) {
+			// Gets the symbolic link source file path, and checks if it points to source file.
+			// See: http://stackoverflow.com/questions/29368308/java-nio-how-is-path-issamefile-different-from-path-equals
+			// for why is `Files.isSameFile()` used
+			// If it points to the same file, the symbolic link is valid
+			// No copy operations is required.
+			return;
+		}
+		
 		// Silence the error 
 		// Uses fallback behaviour of copying the file if it occurs
 		

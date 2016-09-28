@@ -198,13 +198,15 @@ public class FileUtil_test {
 	 
 	@Test
 	public void testCopyFileIfDifferent() throws IOException {
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"));
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), true);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), true, true);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(testDirStr + "jsRegexLink.js"), false, true);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), false, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), true, false);
+		Path existingFilePath = Paths.get(testDirStr + "jsRegex.js");
+		Path symLinkPath = Paths.get(outputDirStr+ "jsRegexLink.js");
+		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
+		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), true);
+		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), true, true);
+		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, true);
+		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, false);
+		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), true, false);
+		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), true, false);
 	}
 	/// Test for Newest File Timestamp
 	@Test

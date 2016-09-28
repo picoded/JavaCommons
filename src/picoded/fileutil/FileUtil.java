@@ -244,7 +244,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		
 		// Checks if file has not been modified, and has same data length, for skipping?
 		//---------------------------------------------------------------------------------
-		if (inFile.lastModified() == outFile.lastModified() && inFile.length() == outFile.length()) {
+		if (inFile.lastModified() == outFile.lastModified()) {
 			// returns and skip for optimization
 			return;
 		}

@@ -3,11 +3,16 @@ package picoded.fileutil;
 import static org.junit.Assert.assertEquals;
 // Test Case include
 import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -183,19 +188,18 @@ public class FileUtil_test {
 	
 	/// Test for Copy Directory If Different
 	@Test
-	public void testCopyFileIfDifferent() throws IOException {
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"));
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(testDirStr + "jsRegex.js"), false, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), false, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegex.js"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "jsRegex.js"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
-	}
+	 public void testCopyFileIfDifferentCreateSymbolicLink() throws IOException {
+	  Path existingFilePath = Paths.get(testDirStr + "jsRegex.js");
+	  Path symLinkPath = Paths.get(outputDirStr+ "jsRegexLink.js");
+	  Files.createSymbolicLink(symLinkPath, existingFilePath);
+	  FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, false);
+	  symLinkPath.toFile().delete();
+	 }
+	 
+	 @Test
+	 public void testCopyFileIfDifferentUseSymLink() throws IOException {
+	  FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), false, true);
+	 }
 	/// Test for Newest File Timestamp
 	@Test
 	public void testNewestFileTimestamp() throws IOException {

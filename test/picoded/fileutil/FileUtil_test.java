@@ -205,16 +205,12 @@ public class FileUtil_test {
 	@Test
 	public void testCopyFileIfDifferent() throws IOException {
 		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"));
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegexLink.js"), new File(outputDirStr+ "jsRegexLink.js"), true);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegexLink.js"), new File(outputDirStr+ "jsRegexLink.js"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegexLink.js"), new File(testDirStr + "jsRegexLink.js"), false, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegexLink.js"), new File(outputDirStr+ "jsRegexLink.js"), false, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegexLink.js"), new File(outputDirStr+ "jsRegexLink.js"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "jsRegexLink.js"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
-		FileUtil.copyFile_ifDifferent(new File(testDirStr + "doubleSlash.txt"), new File(outputDirStr+ "doubleSlash.txt"), true, false);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), true);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), true, false);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(testDirStr + "jsRegexLink.js"), false, false);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), false, false);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), true, false);
+		FileUtil.copyFile_ifDifferent(new File(testDirStr + "jsRegex.js"), new File(outputDirStr+ "jsRegexLink.js"), true, false);
 	}
 	/// Test for Newest File Timestamp
 	@Test

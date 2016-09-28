@@ -212,7 +212,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		// And if its valid. And since both is pratically the same 
 		// final file when linked, the file is considered "not different"
 		//------------------------------------------------------------
-		if (Files.isSymbolicLink(outFile.toPath()) && outFile.exists()) {
+		if (outFile.exists() && Files.isSymbolicLink(outFile.toPath())) {
 			// Gets the symbolic link source file path, and checks if it points to source file.
 			// See: http://stackoverflow.com/questions/29368308/java-nio-how-is-path-issamefile-different-from-path-equals
 			// for why is `Files.isSameFile()` used

@@ -202,9 +202,12 @@ public class FileUtil_test {
 		Path symLinkPath = Paths.get(outputDirStr+ "jsRegexLink.js");
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), true);
+		symLinkPath.toFile().delete();
 		existingFilePath = Paths.get(testDirStr + "doubleSlash.txt");
 		symLinkPath = Paths.get(outputDirStr+ "doubleSlashLink.txt");
+		Files.createSymbolicLink(symLinkPath, existingFilePath);
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, true);
+		symLinkPath.toFile().delete();
 	}
 	/// Test for Newest File Timestamp
 	@Test

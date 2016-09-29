@@ -28,17 +28,20 @@ public class DeferredMapEntry<K extends Object, V extends Object> implements Map
 	// ----------------------------------------------
 
 	// / Returns the key corresponding to this entry.
+	@Override
 	public K getKey() {
 		return key;
 	}
 
 	// / Returns the value corresponding to this entry.
+	@Override
 	public V getValue() {
 		return sourceMap.get(key);
 	}
 
 	// / Compares the specified object with this entry for equality.
 	@SuppressWarnings("unchecked")
+	@Override
 	public boolean equals(Object o) {
 		if (o == this) {
 	      return true;
@@ -46,14 +49,14 @@ public class DeferredMapEntry<K extends Object, V extends Object> implements Map
 	    if (o == null) {
 	      return false;
 	    }
-		//if (o instanceof Map.Entry) {
+	    boolean flag = false;
 	    if (this.getClass() == o.getClass()) {
 			Map.Entry<K, V> e1 = this;
 			Map.Entry<K, V> e2 = (Map.Entry<K, V>) o;
 
-			return ((e1.getKey() == null ? e2.getKey() == null : e1.getKey().equals(e2.getKey())) && (e1.getValue() == null ? e2.getValue() == null : e1.getValue().equals(e2.getValue())));
+			flag =  (e1.getKey() == null ? e2.getKey() == null : e1.getKey().equals(e2.getKey())) && (e1.getValue() == null ? e2.getValue() == null : e1.getValue().equals(e2.getValue()));
 		}
-		return false;
+		return flag;
 	}
 
 	// / Returns the hash code value for this map entry.
@@ -61,12 +64,14 @@ public class DeferredMapEntry<K extends Object, V extends Object> implements Map
 	// / Note that you should not rely on hashCode =[
 	// / See:
 	// http://stackoverflow.com/questions/785091/consistency-of-hashcode-on-a-java-string
+	@Override
 	public int hashCode() {
 		return (getKey() == null ? 0 : getKey().hashCode()) ^ (getValue() == null ? 0 : getValue().hashCode());
 	}
 
 	// / Replaces the value corresponding to this entry with the specified value
 	// (optional operation).
+	@Override
 	public V setValue(V value) {
 		return sourceMap.put(key, value);
 	}

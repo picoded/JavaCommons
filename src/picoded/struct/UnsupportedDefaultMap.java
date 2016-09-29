@@ -10,7 +10,7 @@ import java.util.Set;
 ///
 /// Simple interface pattern, that implements the default map functions, which throws an UnsupportedOperationException
 ///
-/// @TODO Implment several default functions such as putAll using put / entrySet, using keySet, etc. Including the test case
+/// @TODO Implment several default functions such as putAll using put / entrySet, using keySet, etc. 
 ///
 /// ### Example Usage
 ///
@@ -25,38 +25,45 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 	// -------------------------------------------------------------------
 
 	// / throws an UnsupportedOperationException
-	public default V get(Object key) {
+	@Override
+	default V get(Object key) {
 		throw new UnsupportedOperationException("function not supported");
 	}
 
 	// / throws an UnsupportedOperationException
-	public default V put(K key, V value) {
+	@Override
+	default V put(K key, V value) {
 		throw new UnsupportedOperationException("function not supported");
 	}
 
 	// / throws an UnsupportedOperationException
-	public default V remove(Object key) {
+	@Override
+	default V remove(Object key) {
 		throw new UnsupportedOperationException("function not supported");
 	}
 
 	// / throws an UnsupportedOperationException
-	public default Set<K> keySet() {
+	@Override
+	default Set<K> keySet() {
 		throw new UnsupportedOperationException("function not supported");
 	}
 
-	public default void clear() {
+	@Override
+	default void clear() {
 		for (K key : keySet()) {
 			remove(key);
 		}
 	}
 
 	// / Does an unoptimized check, using keySet9)
-	public default boolean containsKey(Object key) {
+	@Override
+	default boolean containsKey(Object key) {
 		return keySet().contains(key);
 	}
 
 	// / Does an unoptimized check, using keySet9)
-	public default boolean containsValue(Object value) {
+	@Override
+	default boolean containsValue(Object value) {
 		for (Map.Entry<K, V> entry : entrySet()) {
 			V val = entry.getValue();
 			if (value == null) {
@@ -73,7 +80,8 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 	}
 
 	// / throws an UnsupportedOperationException
-	public default Set<Map.Entry<K, V>> entrySet() {
+	@Override
+	default Set<Map.Entry<K, V>> entrySet() {
 		Set<java.util.Map.Entry<K, V>> ret = new HashSet<Map.Entry<K, V>>();
 		for (Map.Entry<K, V> entry : entrySet()) {
 			ret.add(new DeferredMapEntry<K, V>(this, entry.getKey()));
@@ -82,24 +90,28 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 	}
 
 	// / throws an UnsupportedOperationException
-	public default boolean isEmpty() {
-		return (keySet().isEmpty());
+	@Override
+	default boolean isEmpty() {
+		return keySet().isEmpty();
 	}
 
 	// / throws an UnsupportedOperationException
-	public default void putAll(Map<? extends K, ? extends V> m) {
+	@Override
+	default void putAll(Map<? extends K, ? extends V> m) {
 		for (Map.Entry<? extends K, ? extends V> e : m.entrySet()) {
 			put(e.getKey(), e.getValue());
 		}
 	}
 
 	// / throws an UnsupportedOperationException
-	public default int size() {
+	@Override
+	default int size() {
 		return keySet().size();
 	}
 
 	// / throws an UnsupportedOperationException
-	public default Collection<V> values() {
+	@Override
+	default Collection<V> values() {
 		List<V> ret = new ArrayList<V>();
 		for (K key : keySet()) {
 			ret.add(get(key));

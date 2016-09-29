@@ -202,13 +202,14 @@ public class FileUtil_test {
 		Path symLinkPath = Paths.get(outputDirStr+ "jsRegexLink.js");
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), true);
-		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), true, false);
+		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), true, false);
 		symLinkPath.toFile().delete();
 		existingFilePath = Paths.get(testDirStr + "doubleSlash.txt");
 		symLinkPath = Paths.get(outputDirStr+ "doubleSlashLink.txt");
-		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, true);
+		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false, true);
 		symLinkPath.toFile().delete();
 	}
+
 	/// Test for Newest File Timestamp
 	@Test
 	public void testNewestFileTimestamp() throws IOException {

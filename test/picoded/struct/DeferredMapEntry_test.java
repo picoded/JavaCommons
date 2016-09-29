@@ -55,7 +55,12 @@ public class DeferredMapEntry_test {
 	}
 	
 	@Test 
-	public void equalsWithDifferentObject() {
+	public void equalsWithDifferentClassObjectTest() {
+		assertFalse(deferredMapEntry.equals(map));
+	}
+	
+	@Test 
+	public void equalsWithDifferentObjectTest() {
 		DeferredMapEntry<String, String> temp = new DeferredMapEntry<String, String>(map, key);
 		assertTrue(deferredMapEntry.equals(temp));
 	}

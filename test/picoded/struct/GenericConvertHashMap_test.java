@@ -5,6 +5,9 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,5 +38,17 @@ public class GenericConvertHashMap_test {
 	public void putTest() {
 		genericConvertHashMap.put("key", "value");
 		assertEquals(1, genericConvertHashMap.size());
+	}
+	
+	@Test
+	public void ConstructorTest() {
+		Map<String, String> map = new HashMap<>();
+		genericConvertHashMap = new GenericConvertHashMap<>(map);
+		assertNull(genericConvertHashMap.get("key"));
+	}
+	
+	@Test
+	public void toStringTest() {
+		assertNull(genericConvertHashMap.toString());
 	}
 }

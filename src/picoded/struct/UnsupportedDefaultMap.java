@@ -82,7 +82,7 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 	// / throws an UnsupportedOperationException
 	@Override
 	default Set<Map.Entry<K, V>> entrySet() {
-		Set<java.util.Map.Entry<K, V>> ret = new HashSet<Map.Entry<K, V>>();
+		Set<Map.Entry<K, V>> ret = new HashSet<Map.Entry<K, V>>();
 		for (Map.Entry<K, V> entry : entrySet()) {
 			ret.add(new DeferredMapEntry<K, V>(this, entry.getKey()));
 		}

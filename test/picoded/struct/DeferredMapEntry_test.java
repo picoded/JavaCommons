@@ -2,6 +2,7 @@ package picoded.struct;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +47,17 @@ public class DeferredMapEntry_test {
 	@Test 
 	public void equalsTest() {
 		assertTrue(deferredMapEntry.equals(deferredMapEntry));
+	}
+	
+	@Test 
+	public void equalsWithNullTest() {
+		assertFalse(deferredMapEntry.equals(null));
+	}
+	
+	@Test 
+	public void equalsWithDifferentObject() {
+		DeferredMapEntry<String, String> temp = new DeferredMapEntry<String, String>(map, key);
+		assertTrue(deferredMapEntry.equals(temp));
 	}
 	
 	@Test 

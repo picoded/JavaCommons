@@ -40,7 +40,14 @@ public class DeferredMapEntry<K extends Object, V extends Object> implements Map
 	// / Compares the specified object with this entry for equality.
 	@SuppressWarnings("unchecked")
 	public boolean equals(Object o) {
-		if (o instanceof Map.Entry) {
+		if (o == this) {
+	      return true;
+	    }
+	    if (o == null) {
+	      return false;
+	    }
+		//if (o instanceof Map.Entry) {
+	    if (this.getClass() == o.getClass()) {
 			Map.Entry<K, V> e1 = this;
 			Map.Entry<K, V> e2 = (Map.Entry<K, V>) o;
 

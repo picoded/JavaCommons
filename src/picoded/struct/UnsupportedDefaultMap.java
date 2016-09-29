@@ -57,9 +57,8 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 
 	// / Does an unoptimized check, using keySet9)
 	public default boolean containsValue(Object value) {
-		for (K key : keySet()) {
-			V val = get(key);
-
+		for (Map.Entry<K, V> entry : entrySet()) {
+			V val = entry.getValue();
 			if (value == null) {
 				if (val == null) {
 					return true;
@@ -76,15 +75,15 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 	// / throws an UnsupportedOperationException
 	public default Set<Map.Entry<K, V>> entrySet() {
 		Set<java.util.Map.Entry<K, V>> ret = new HashSet<Map.Entry<K, V>>();
-		for (K key : keySet()) {
-			ret.add(new DeferredMapEntry<K, V>(this, key));
+		for (Map.Entry<K, V> entry : entrySet()) {
+			ret.add(new DeferredMapEntry<K, V>(this, entry.getKey()));
 		}
 		return ret;
 	}
 
 	// / throws an UnsupportedOperationException
 	public default boolean isEmpty() {
-		return (keySet().size() == 0);
+		return (keySet().isEmpty());
 	}
 
 	// / throws an UnsupportedOperationException

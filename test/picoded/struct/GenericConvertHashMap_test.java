@@ -3,6 +3,7 @@ package picoded.struct;
 // Target test class
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.HashMap;
@@ -50,5 +51,11 @@ public class GenericConvertHashMap_test {
 	@Test
 	public void toStringTest() {
 		assertNull(genericConvertHashMap.toString());
+	}
+	
+	@Test
+	public void buildTest() {
+		Map<String, String> map = new HashMap<>();
+		assertNotNull(GenericConvertMap.build(map));
 	}
 }

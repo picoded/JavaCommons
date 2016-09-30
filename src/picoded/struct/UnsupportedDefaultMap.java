@@ -83,8 +83,8 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 	@Override
 	default Set<Map.Entry<K, V>> entrySet() {
 		Set<Map.Entry<K, V>> ret = new HashSet<Map.Entry<K, V>>();
-		for (Map.Entry<K, V> entry : entrySet()) {
-			ret.add(new DeferredMapEntry<K, V>(this, entry.getKey()));
+		for (K key : keySet()) {
+			ret.add(new DeferredMapEntry<K, V>(this, key));
 		}
 		return ret;
 	}

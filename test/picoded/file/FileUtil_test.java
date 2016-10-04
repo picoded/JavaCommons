@@ -1,8 +1,10 @@
-package picoded.fileutil;
+package picoded.file;
 
-import static org.junit.Assert.assertEquals;
 // Test Case include
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,9 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-
 ///
 /// Test Case for picoded.FileUtil.ConfigFileSet
 ///
@@ -23,9 +22,9 @@ public class FileUtil_test {
 	
 	// Test directories and setup
 	//----------------------------------------------------------------------------------------------------
-	public static String testDirStr = "./test-files/test-specific/fileutils/FileUtils/";
+	public static String testDirStr = "./test-files/test-specific/file/FileUtils/";
 	public File testDir = new File(testDirStr);
-	public String outputDirStr = "./test-files/tmp/fileutils/FileUtils/";
+	public String outputDirStr = "./test-files/tmp/file/FileUtils/";
 	public File outputDir = new File(outputDirStr);
 	
 	/// Invalid constructor test
@@ -146,7 +145,7 @@ public class FileUtil_test {
 	/// Test for list Dirs
 	@Test
 	public void testListDirs() throws IOException {
-		assertNotNull(FileUtil.listDirs(new File("./test-files/test-specific/fileutils/")));
+		assertNotNull(FileUtil.listDirs(new File("./test-files/test-specific/file/")));
 		assertNotNull(FileUtil.listDirs(testDir));
 		assertNotNull(FileUtil.listDirs(outputDir));
 		assertEquals(new ArrayList<File>(), FileUtil.listDirs(null));
@@ -156,32 +155,32 @@ public class FileUtil_test {
 	@Test
 	public void testCopyDirectoryIfDifferent() throws IOException {
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File("./test-files/tmp/"));
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File("./test-files/tmp/"));
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
 				new File("./test-files/tmp/"));
 		
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, true);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File(
 			"./test-files/tmp/"), true);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
 				new File("./test-files/tmp/"), true);
 	
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File(
 			"./test-files/tmp/"), false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
 				new File("./test-files/tmp/"), false);
 		
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, true, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File(
 			"./test-files/tmp/"), true, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
 				new File("./test-files/tmp/"), true, false);
 		
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, false, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/"), new File(
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File(
 			"./test-files/tmp/"), false, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
 				new File("./test-files/tmp/"), false, false);
 	}
 	
@@ -232,14 +231,14 @@ public class FileUtil_test {
 		assertEquals(0L, FileUtil.newestFileTimestamp(new File("")));
 		assertNotNull(FileUtil.newestFileTimestamp(new File(testDirStr + "jsRegex.js")));
 		assertNotNull(FileUtil.newestFileTimestamp(new File(testDirStr + "doubleSlash.txt")));
-		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/")));
+		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/file/")));
 		List<String> excludeNames = new ArrayList<String>();
 		excludeNames.add("jsRegex.js");
 		excludeNames.add("doubleSlash.txt");
 		assertEquals(0L, FileUtil.newestFileTimestamp(null, null));
 		assertEquals(0L, FileUtil.newestFileTimestamp(new File(""), new ArrayList<String>()));
-		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/"), excludeNames));
-		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/fileutils/ConfigFile"), null));
+		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/file/"), excludeNames));
+		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/file/ConfigFile"), null));
 		
 	}
 	
@@ -325,7 +324,7 @@ public class FileUtil_test {
 		assertEquals(filePathsList, FileUtil.getFilePaths(null));
 		assertEquals(filePathsList, FileUtil.getFilePaths(new File("")));
 		assertNotNull(FileUtil.getFilePaths(new File(testDirStr)));
-		assertNotNull(FileUtil.getFilePaths(new File("./test-files/test-specific/fileutils/")));
+		assertNotNull(FileUtil.getFilePaths(new File("./test-files/test-specific/file/")));
 		filePathsList.add("jsRegex");
 		assertEquals(filePathsList, FileUtil.getFilePaths(new File(testDirStr + "jsRegex.js")));
 		assertEquals(filePathsList, FileUtil.getFilePaths(new File(testDirStr + "jsRegex.js"), "/"));

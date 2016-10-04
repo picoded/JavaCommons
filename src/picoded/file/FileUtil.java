@@ -1,4 +1,4 @@
-package picoded.fileutil;
+package picoded.file;
 
 //java incldues
 import java.io.File;

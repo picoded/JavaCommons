@@ -36,7 +36,7 @@ public class FileUtil_test {
 		
 	@Before
 	public void setUp() throws IOException {
-		FileUtils.deleteDirectory(outputDir);
+		FileUtil.deleteDirectory(outputDir);
 		outputDir.mkdirs();
 		test_res = null;
 		fileCollection = new ArrayList<File>();

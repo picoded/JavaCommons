@@ -13,9 +13,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 ///
-/// Small extension of apache FileUtil, 
-// for some additional features that we needed.
-/// Additionally several FilenameUtils is made avaliable here
+/// Extension of apache FileUtils, for some additional features that we needed.
+/// Additionally several FilenameUtils is made avaliable here.
+///
+/// To clarify, this class inherits all the apache FileUtils functions, and serves as a somewhat 
+/// (different classname) drop in replacement
 ///
 /// @See https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtil.html
 ///
@@ -52,12 +54,27 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		return ret;
 	}
 	
-	/// Overwrites null encoding with US-ASCII
+	///
+	/// Reads a file content into a string
+	///
+	/// Encoding assumes US-ASCII by default
+	///
+	/// @param File to read
+	///
+	/// @return File string value (US-ASCII encoding)
+	///
 	public static String readFileToString(File inFile) throws IOException {
 		return picoded.fileutil.FileUtil.readFileToString(inFile, (String) null);
 	}
 	
-	/// Overwrites null encoding with US-ASCII
+	///
+	/// Reads a file content into a string, with encoding
+	///
+	/// @param File to read
+	/// @param Encoding string value to use - Null value assumes encoding with US-ASCII
+	///
+	/// @return File string value with given encoding
+	///
 	public static String readFileToString(File inFile, String encoding) throws IOException {
 		if (encoding == null || encoding.isEmpty()) {
 			encoding = "US-ASCII";
@@ -65,12 +82,25 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		return org.apache.commons.io.FileUtils.readFileToString(inFile, encoding);
 	}
 	
-	/// Overwrites null encoding with US-ASCII
+	///
+	/// Write a string content into a file
+	///
+	/// Encoding assumes US-ASCII by default
+	///
+	/// @param File to read
+	/// @param String data to write 
+	///
 	public static void writeStringToFile(File inFile, String data) throws IOException {
 		picoded.fileutil.FileUtil.writeStringToFile(inFile, data, (String) null);
 	}
 	
-	/// Overwrites null encoding with US-ASCII
+	///
+	/// Write a string content into a file
+	///
+	/// @param File to read
+	/// @param String data to write 
+	/// @param Encoding string value to use - Null value assumes encoding with US-ASCII
+	///
 	public static void writeStringToFile(File inFile, String data, String encoding) throws IOException {
 		if (encoding == null || encoding.isEmpty()) {
 			encoding = "US-ASCII";
@@ -109,11 +139,13 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			return fallback;
 		}
 		
-			return picoded.fileutil.FileUtil.readFileToString(inFile, encoding);
+		return picoded.fileutil.FileUtil.readFileToString(inFile, encoding);
 	}
 	
 	///
 	/// Write to file only if it differs
+	///
+	/// Encoding assumes US-ASCII by default
 	///
 	/// @param file to write
 	/// @param value to write
@@ -146,6 +178,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// Recursively copy all directories, and files only if the file content is different
 	///
 	/// @param folder to scan and copy from
+	/// @param folder to copy into
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir) throws IOException {
 		copyDirectory_ifDifferent(inDir, outDir, true);
@@ -155,6 +188,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// Recursively copy all directories, and files only if the file content is different
 	///
 	/// @param folder to scan and copy from
+	/// @param folder to copy into
+	/// @param Indicate if file timestamps should follow the original file, when the copy occurs
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate) throws IOException {
 		//default symlink is false : This is considered advance behaviour
@@ -165,19 +200,22 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// Recursively copy all directories, and files only if the file content is different
 	///
 	/// @param folder to scan and copy from
+	/// @param folder to copy into
+	/// @param Indicate if file timestamps should follow the original file, when the copy occurs
+	/// @param indicate if symbolic link should be used when possible for "copying" files
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate,
-		boolean tryToUseSymLink) throws IOException {
+		boolean tryToSymLinkFiles) throws IOException {
 		File[] dir_inDir = inDir.listFiles();
 		for (int i = 0; i < dir_inDir.length; i++) {
 			File infile = dir_inDir[i];
 			if (infile.isFile()) {
 				File outfile = new File(outDir, infile.getName());
-				copyFile_ifDifferent(infile, outfile, preserveFileDate, tryToUseSymLink);
+				copyFile_ifDifferent(infile, outfile, preserveFileDate, tryToSymLinkFiles);
 			} else {
 				File newOutDir = new File(outDir.getAbsolutePath() + File.separator + infile.getName());
 				newOutDir.mkdir();
-				copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToUseSymLink);
+				copyDirectory_ifDifferent(infile, newOutDir, preserveFileDate, tryToSymLinkFiles);
 			}
 		}
 	}
@@ -186,6 +224,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// Recursively copy all directories, and files only if the file content is different
 	///
 	/// @param file to scan and copy from
+	/// @param file to copy into
 	///
 	public static void copyFile_ifDifferent(File inFile, File outFile) throws IOException {
 		copyFile_ifDifferent(inFile, outFile, true);
@@ -195,6 +234,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// Recursively copy all directories, and files only if the file content is different
 	///
 	/// @param file to scan and copy from
+	/// @param file to copy into
+	/// @param Indicate if file timestamps should follow the original file, when the copy occurs
 	///
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate) throws IOException {
 		//default symlink is false :This is considered advance behaviour
@@ -205,8 +246,11 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// Recursively copy all directories, and files only if the file content is different
 	///
 	/// @param file to scan and copy from
+	/// @param file to copy into
+	/// @param Indicate if file timestamps should follow the original file, when the copy occurs
+	/// @param indicate if symbolic link should be used when possible for "copying" files
 	///
-	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToUseSymLink)
+	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToSymLinkFiles)
 		throws IOException {
 		// Checks if the output file is already a symbolic link
 		// And if its points to the same file. 
@@ -227,7 +271,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		}
 		
 		// Tries to build symlink if possible, hopefully
-		if (tryToUseSymLink) {
+		if (tryToSymLinkFiles) {
 			// NOTE: You do not test source file for symbolic link
 			// Only the detination file should be a symbolic link.
 			//------------------------------------------------------------

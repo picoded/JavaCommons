@@ -29,13 +29,14 @@ public class FileUtil_test {
 	public File outputDir = new File(outputDirStr);
 	
 	/// Invalid constructor test
-		@Test(expected = IllegalAccessError.class)
-		public void invalidConstructor() throws Exception {
-			new FileUtil();
+	@Test(expected = IllegalAccessError.class)
+	public void invalidConstructor() throws Exception {
+		new FileUtil();
 	}
 		
 	@Before
-	public void setUp() {
+	public void setUp() throws IOException {
+		FileUtils.deleteDirectory(outputDir);
 		outputDir.mkdirs();
 		test_res = null;
 		fileCollection = new ArrayList<File>();
@@ -193,7 +194,7 @@ public class FileUtil_test {
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, false);
 		symLinkPath.toFile().delete();
 	}
-	 
+	
 	@Test
 	public void testCopyFileIfDifferent() throws IOException {
 		Path existingFilePath = Paths.get(testDirStr + "jsRegex.js");
@@ -206,6 +207,22 @@ public class FileUtil_test {
 		symLinkPath = Paths.get(outputDirStr+ "doubleSlashLink.txt");
 		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false, true);
 		symLinkPath.toFile().delete();
+	}
+	
+	@Test
+	public void testCopyFileIfDifferent_invalidSymlinkExisting() throws IOException {
+		// Test paths
+		Path fileA = Paths.get(testDirStr + "jsRegex.js");
+		Path fileB = Paths.get(testDirStr + "jsRegex.js");
+		Path destFile = Paths.get(outputDirStr+ "jsRegexLink.js");
+		
+		// Creating original symlink
+		FileUtil.copyFile_ifDifferent(fileA.toFile(), destFile.toFile(), true, true);
+		FileUtil.copyFile_ifDifferent(fileA.toFile(), destFile.toFile(), true, true);
+		
+		// Overwrite symlink
+		FileUtil.copyFile_ifDifferent(fileB.toFile(), destFile.toFile(), true, true);
+		FileUtil.copyFile_ifDifferent(fileB.toFile(), destFile.toFile(), true, true);
 	}
 
 	/// Test for Newest File Timestamp

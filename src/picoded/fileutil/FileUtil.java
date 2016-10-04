@@ -243,12 +243,11 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath().toAbsolutePath());
 		}
 		
-		// Silence the error 
-		// Uses fallback behaviour of copying the file if it occurs
-		
 		// Checks if file has not been modified, and has same data length, for skipping?
 		//---------------------------------------------------------------------------------
-		if (inFile.lastModified() == outFile.lastModified()) {
+		if (inFile.lastModified() == outFile.lastModified() &&
+			inFile.length() == outFile.length()
+			) {
 			// returns and skip for optimization
 			return;
 		}

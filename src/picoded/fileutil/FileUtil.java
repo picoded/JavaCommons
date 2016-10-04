@@ -209,8 +209,10 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToUseSymLink)
 		throws IOException {
 		// Checks if the output file is already a symbolic link
-		// And if its valid. And since both is pratically the same 
-		// final file when linked, the file is considered "not different"
+		// And if its points to the same file. 
+		//
+		// If so, both is practically the same final file when 
+		// linked, hence the file is considered "not different"
 		//------------------------------------------------------------
 		if (Files.isSymbolicLink(outFile.toPath())
 			&& Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath())) {
@@ -227,18 +229,18 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			// NOTE: You do not test source file for symbolic link
 			// Only the detination file should be a symbolic link.
 			//------------------------------------------------------------
-			//if(!Files.isSymbolicLink(inFile.toPath())){
-			//	Files.createSymbolicLink(Paths.get(inFile.getAbsolutePath()), 
-			// Paths.get(outFile.getAbsolutePath()), new FileAttribute<?>[0]);
-			//}
+			
+			//
 			// Assumes output file is either NOT a symbolic link
 			// or has the wrong symbolic link reference.
 			//
 			// Creates a symbolic link of the outfile, 
 			// relative to the in file (if possible)
+			//
 			//------------------------------------------------------------
 			Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath().toAbsolutePath());
 		}
+		
 		// Silence the error 
 		// Uses fallback behaviour of copying the file if it occurs
 		

@@ -38,4 +38,21 @@ public class ProxyGenericConvertList_test {
 		proxyGenericConvertList = new ProxyGenericConvertList<>(list);
 		assertEquals(ConvertJSON.fromObject(list), proxyGenericConvertList.toString());
 	}
+	
+	@Test 
+	public void ensureTest() {
+		List<String> list = new ArrayList<String>();
+		list.add("me");
+		GenericConvertList<String> temp = ProxyGenericConvertList.ensure(list);
+		assertEquals(list.get(0), temp.get(0));
+	}
+	
+	@Test 
+	public void ensureIfConditionTest() {
+		List<String> list = new ArrayList<String>();
+		list.add("me");
+		proxyGenericConvertList = new ProxyGenericConvertList<>(list);
+		GenericConvertList<String> temp = ProxyGenericConvertList.ensure(proxyGenericConvertList);
+		assertEquals(list.get(0), temp.get(0));
+	}
 }

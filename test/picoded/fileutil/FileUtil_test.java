@@ -182,8 +182,6 @@ public class FileUtil_test {
 			"./test-files/tmp/"), false, false);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
 				new File("./test-files/tmp/"), false, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/fileutils/ConfigFile/"),
-				new File(""), false, false);
 	}
 	
 	/// Test for Copy Directory If Different

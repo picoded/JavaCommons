@@ -32,7 +32,7 @@ public class FileUtil_test {
 	public void invalidConstructor() throws Exception {
 		new FileUtil();
 	}
-		
+	
 	@Before
 	public void setUp() throws IOException {
 		FileUtil.deleteDirectory(outputDir);
@@ -93,7 +93,8 @@ public class FileUtil_test {
 		assertEquals("", FileUtil.readFileToString_withFallback(new File(""), "", ""));
 		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "jsRegex.js"), "", ""));
 		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "doubleSlash.txt"), "", ""));
-		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "doubleSlash.txt"), "", "US-ASCII"));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "doubleSlash.txt"), "",
+			"US-ASCII"));
 		assertEquals("test", FileUtil.readFileToString_withFallback(new File(""), "test", "US-ASCII"));
 		assertEquals("test", FileUtil.readFileToString_withFallback(new File(""), "test", "US-ASCII"));
 	}
@@ -112,7 +113,7 @@ public class FileUtil_test {
 		
 		String str = null;
 		assertEquals(null, FileUtil.readFileToString_withFallback(null, null, str));
-		str="";
+		str = "";
 		assertEquals("", FileUtil.readFileToString_withFallback(new File(""), "", str));
 		// encoding not empty
 		str = "US-ASCII";
@@ -120,11 +121,10 @@ public class FileUtil_test {
 		assertEquals(test_res, FileUtil.readFileToString_withFallback(outFile, "test", str));
 		assertEquals(test_res, FileUtil.readFileToString_withFallback(outFile, "", str));
 		
-		
 		assertEquals(test_jsRegex, test_res.trim());
 		str = null;
 		FileUtil.writeStringToFile(outFile, test_jsRegex, str);
-		str="";
+		str = "";
 		FileUtil.writeStringToFile(outFile, test_jsRegex, str);
 		// encoding not empty
 		str = "US-ASCII";
@@ -156,39 +156,39 @@ public class FileUtil_test {
 	public void testCopyDirectoryIfDifferent() throws IOException {
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir);
 		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File("./test-files/tmp/"));
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
-				new File("./test-files/tmp/"));
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"), new File(
+			"./test-files/tmp/"));
 		
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, true);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File(
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File("./test-files/tmp/"),
+			true);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"), new File(
 			"./test-files/tmp/"), true);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
-				new File("./test-files/tmp/"), true);
-	
+		
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File(
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File("./test-files/tmp/"),
+			false);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"), new File(
 			"./test-files/tmp/"), false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
-				new File("./test-files/tmp/"), false);
 		
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, true, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File(
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File("./test-files/tmp/"),
+			true, false);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"), new File(
 			"./test-files/tmp/"), true, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
-				new File("./test-files/tmp/"), true, false);
 		
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, false, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File(
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File("./test-files/tmp/"),
+			false, false);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"), new File(
 			"./test-files/tmp/"), false, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
-				new File("./test-files/tmp/"), false, false);
 	}
 	
 	/// Test for Copy Directory If Different
 	@Test
 	public void testCopyFileIfDifferentCreateSymbolicLink() throws IOException {
 		Path existingFilePath = Paths.get(testDirStr + "jsRegex.js");
-		Path symLinkPath = Paths.get(outputDirStr+ "jsRegexLink.js");
+		Path symLinkPath = Paths.get(outputDirStr + "jsRegexLink.js");
 		Files.createSymbolicLink(symLinkPath, existingFilePath);
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, false);
 		symLinkPath.toFile().delete();
@@ -197,13 +197,13 @@ public class FileUtil_test {
 	@Test
 	public void testCopyFileIfDifferent() throws IOException {
 		Path existingFilePath = Paths.get(testDirStr + "jsRegex.js");
-		Path symLinkPath = Paths.get(outputDirStr+ "jsRegexLink.js");
+		Path symLinkPath = Paths.get(outputDirStr + "jsRegexLink.js");
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), true);
 		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), true, false);
 		symLinkPath.toFile().delete();
 		existingFilePath = Paths.get(testDirStr + "doubleSlash.txt");
-		symLinkPath = Paths.get(outputDirStr+ "doubleSlashLink.txt");
+		symLinkPath = Paths.get(outputDirStr + "doubleSlashLink.txt");
 		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false, true);
 		symLinkPath.toFile().delete();
 	}
@@ -213,7 +213,7 @@ public class FileUtil_test {
 		// Test paths
 		Path fileA = Paths.get(testDirStr + "jsRegex.js");
 		Path fileB = Paths.get(testDirStr + "jsRegex.js");
-		Path destFile = Paths.get(outputDirStr+ "jsRegexLink.js");
+		Path destFile = Paths.get(outputDirStr + "jsRegexLink.js");
 		
 		// Creating original symlink
 		FileUtil.copyFile_ifDifferent(fileA.toFile(), destFile.toFile(), true, true);
@@ -223,7 +223,7 @@ public class FileUtil_test {
 		FileUtil.copyFile_ifDifferent(fileB.toFile(), destFile.toFile(), true, true);
 		FileUtil.copyFile_ifDifferent(fileB.toFile(), destFile.toFile(), true, true);
 	}
-
+	
 	/// Test for Newest File Timestamp
 	@Test
 	public void testNewestFileTimestamp() throws IOException {

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
 //apache includes
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,7 +26,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	protected FileUtil() {
 		throw new IllegalAccessError("Utility class");
 	}
-
+	
 	//------------------------------------------------------------------------------------------------------------------
 	//
 	// JavaCommons extensions
@@ -250,8 +249,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param Indicate if file timestamps should follow the original file, when the copy occurs
 	/// @param indicate if symbolic link should be used when possible for "copying" files
 	///
-	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate, boolean tryToSymLinkFiles)
-		throws IOException {
+	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate,
+		boolean tryToSymLinkFiles) throws IOException {
 		// Checks if the output file is already a symbolic link
 		// And if its points to the same file. 
 		//
@@ -289,9 +288,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		
 		// Checks if file has not been modified, and has same data length, for skipping?
 		//---------------------------------------------------------------------------------
-		if (inFile.lastModified() == outFile.lastModified() &&
-			inFile.length() == outFile.length()
-			) {
+		if (inFile.lastModified() == outFile.lastModified() && inFile.length() == outFile.length()) {
 			// returns and skip for optimization
 			return;
 		}

@@ -64,7 +64,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @return File string value (US-ASCII encoding)
 	///
 	public static String readFileToString(File inFile) throws IOException {
-		return picoded.fileutil.FileUtil.readFileToString(inFile, (String) null);
+		return picoded.file.FileUtil.readFileToString(inFile, (String) null);
 	}
 	
 	///
@@ -91,7 +91,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param String data to write 
 	///
 	public static void writeStringToFile(File inFile, String data) throws IOException {
-		picoded.fileutil.FileUtil.writeStringToFile(inFile, data, (String) null);
+		picoded.file.FileUtil.writeStringToFile(inFile, data, (String) null);
 	}
 	
 	///
@@ -120,7 +120,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @returns the file value if possible, else returns the fallback value
 	///
 	public static String readFileToString_withFallback(File inFile, String fallback) throws IOException {
-		return picoded.fileutil.FileUtil.readFileToString_withFallback(inFile, fallback, null);
+		return picoded.file.FileUtil.readFileToString_withFallback(inFile, fallback, null);
 	}
 	
 	///
@@ -139,7 +139,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			return fallback;
 		}
 		
-		return picoded.fileutil.FileUtil.readFileToString(inFile, encoding);
+		return picoded.file.FileUtil.readFileToString(inFile, encoding);
 	}
 	
 	///
@@ -171,7 +171,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @returns the boolean indicating true if file was written to
 	///
 	public static boolean writeStringToFile_ifDifferant(File inFile, String data) throws IOException {
-		return picoded.fileutil.FileUtil.writeStringToFile_ifDifferant(inFile, data, null);
+		return picoded.file.FileUtil.writeStringToFile_ifDifferant(inFile, data, null);
 	}
 	
 	///

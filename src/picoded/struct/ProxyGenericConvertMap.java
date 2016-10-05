@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.apache.commons.collections4.map.AbstractMapDecorator;
 
+import picoded.conv.GenericConvert;
+
 public class ProxyGenericConvertMap <K, V> extends AbstractMapDecorator<K, V> implements GenericConvertMap<K, V> {
 
 	// ------------------------------------------------------
@@ -17,13 +19,13 @@ public class ProxyGenericConvertMap <K, V> extends AbstractMapDecorator<K, V> im
 		super();
 	}
 
-	// / Consturctor
+	/// Consturctor
 	@SuppressWarnings("unchecked")
 	public ProxyGenericConvertMap(Map<? extends K, ? extends V> m) {
 		super((Map<K, V>) m);
 	}
 	
-	// / The static builder for the map
+	/// The static builder for the map
 	public static <A, B> GenericConvertMap<A, B> ensure(Map<A, B> inMap) {
 		if (inMap instanceof GenericConvertMap) { // <A,B>
 			return (GenericConvertMap<A, B>) inMap;
@@ -37,10 +39,9 @@ public class ProxyGenericConvertMap <K, V> extends AbstractMapDecorator<K, V> im
 	//
 	// ------------------------------------------------------
 
-	// / Implments a JSON to string conversion
+	/// Implments a JSON to string conversion
 	@Override
 	public String toString() {
-		//TODO return GenericConvert.toString((Object) this);
-		return null;
+		return GenericConvert.toString(this);
 	}
 }

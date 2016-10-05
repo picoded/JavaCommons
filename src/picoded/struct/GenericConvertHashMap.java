@@ -3,6 +3,8 @@ package picoded.struct;
 import java.util.HashMap;
 import java.util.Map;
 
+import picoded.conv.GenericConvert;
+
 ///
 /// HashMap implmentation of GenericConvertMap. 
 ///
@@ -28,8 +30,7 @@ public class GenericConvertHashMap<K, V> extends HashMap<K, V> implements Generi
 	// / Implments a JSON to string conversion
 	@Override
 	public String toString() {
-		//return GenericConvert.toString((Object) this);
-		return null; //TODO
+		return GenericConvert.toString(this);
 	}
 
 	// ------------------------------------------------------
@@ -44,8 +45,7 @@ public class GenericConvertHashMap<K, V> extends HashMap<K, V> implements Generi
 	}
 
 	// / Consturctor
-	@SuppressWarnings("unchecked")
 	public GenericConvertHashMap(Map<? extends K, ? extends V> m) {
-		super((Map<K, V>) m);
+		super(m);
 	}
 }

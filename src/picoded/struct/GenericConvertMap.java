@@ -277,7 +277,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// /
 	// / @default The converted value
 	public default List<Object> getObjectList(K key) {
-		return GenericConvert.toObjectList(key);
+		return GenericConvert.toObjectList(get(key));
 	}
 
 	// to map
@@ -377,7 +377,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// /
 	// / @returns The converted Object[], always possible unless null
 	public default Object[] getObjectArray(K key, Object fallbck) {
-		return GenericConvert.toObjectArray(key, fallbck);
+		return GenericConvert.toObjectArray(get(key), fallbck);
 	}
 
 	// / Default Null fallback, To Object[] conversion of generic object
@@ -386,7 +386,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// /
 	// / @default The converted value
 	public default Object[] getObjectArray(K key) {
-		return GenericConvert.toObjectArray(key);
+		return GenericConvert.toObjectArray(get(key));
 	}
 
 	// NESTED object fetch (related to fully qualified keys handling)

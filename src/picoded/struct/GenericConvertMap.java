@@ -418,7 +418,8 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// /
 	// / @returns The fetched object, always possible unless fallbck null
 	public default Object getNestedObject(String key) {
-		return getNestedObject(key, null);
+		//return getNestedObject(key, null);
+		return GenericConvert.fetchNestedObject(this, key);
 	}
 
 	// Does a simple typecast and put conversion

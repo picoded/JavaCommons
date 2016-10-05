@@ -424,7 +424,7 @@ public class GenericConvertMap_test {
 	
 	@Test 
 	public void getGUIDValidTest() {
-		Mockito.when(genericConvertMapForValid.getUUID("my_key")).thenCallRealMethod();
+		Mockito.when(genericConvertMapForValid.getGUID("my_key")).thenCallRealMethod();
 		when(genericConvertMapForValid.get("my_key")).thenReturn("1");
 		assertNull(genericConvertMapForValid.getGUID("my_key"));
 	}
@@ -584,7 +584,7 @@ public class GenericConvertMap_test {
 	@Test
 	public void getObjectArrayOverloadValidTest() {
 		Object[] strArr = new Object[]{"1", 2};
-		Mockito.when(genericConvertMapForValid.getObjectArray("my_key", strArr)).thenCallRealMethod();
+		when(genericConvertMapForValid.getObjectArray("my_key", strArr)).thenCallRealMethod();
 		when(genericConvertMapForValid.get("my_key")).thenReturn("1, 2");
 		assertArrayEquals(strArr, genericConvertMapForValid.getObjectArray("my_key", strArr));
 	}
@@ -592,6 +592,13 @@ public class GenericConvertMap_test {
 	@Test (expected = UnsupportedOperationException.class)
 	public void getNestedObjectTest() {
 		assertEquals("", genericConvertMap.getNestedObject("my_key"));
+	}
+	
+	@Test 
+	public void getNestedObjectValidTest() {
+		when(genericConvertMapForValid.getNestedObject("my_key")).thenCallRealMethod();
+		when(genericConvertMapForValid.get("my_key")).thenReturn("1");
+		assertEquals("1", genericConvertMapForValid.getNestedObject("my_key"));
 	}
 	
 	@Test (expected = UnsupportedOperationException.class)

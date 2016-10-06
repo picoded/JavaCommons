@@ -215,10 +215,12 @@ public class FileUtil_test {
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), existingFilePath.toFile(), false);
  		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), existingFilePath.toFile(), true);
  		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), existingFilePath.toFile(), false);
+ 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
 	 		
  		// file is already a symbolic link
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
  		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false);
+ 		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), existingFilePath.toFile(), false);
 	}
 	
 	@Test

@@ -135,11 +135,14 @@ public class FileUtil_test {
 	@Test
 	public void writeStringToFileIfDifferant() throws IOException {
 		File outFile = new File(outputDir, "jsRegex.js");
+		FileUtil.writeStringToFile_ifDifferant(outFile, "");
 		FileUtil.writeStringToFile_ifDifferant(outFile, test_jsRegex);
 		outFile = new File(outputDir, "doubleSlash.txt");
 		FileUtil.writeStringToFile_ifDifferant(outFile, test_jsRegex);
 		outFile = new File(outputDir, "test.js");
 		FileUtil.writeStringToFile_ifDifferant(outFile, test_jsRegex);
+		FileUtil.writeStringToFile_ifDifferant(outFile, test_jsRegex);
+		
 	}
 	
 	/// Test for list Dirs

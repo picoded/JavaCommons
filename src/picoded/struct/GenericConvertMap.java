@@ -14,7 +14,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 
 	// / Ensures the returned map is a GenericConvertMap, doing the conversion
 	// if needed.
-	public static <A, B> GenericConvertMap<A, B> build(Map<A, B> inMap) {
+	static <A, B> GenericConvertMap<A, B> build(Map<A, B> inMap) {
 		return ProxyGenericConvertMap.ensure(inMap);
 	}
 
@@ -27,7 +27,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable, aka null)
 	// /
 	// / @returns The converted string, always possible unless null
-	public default String getString(K key, String fallbck) {
+	default String getString(K key, String fallbck) {
 		return GenericConvert.toString(get(key), fallbck);
 	}
 
@@ -36,7 +36,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param key The input value key to convert
 	// /
 	// / @returns The converted string, always possible unless null
-	public default String getString(K key) {
+	default String getString(K key) {
 		return GenericConvert.toString(get(key));
 	}
 
@@ -49,7 +49,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted string, always possible unless null
-	public default boolean getBoolean(K key, boolean fallbck) {
+	default boolean getBoolean(K key, boolean fallbck) {
 		return GenericConvert.toBoolean(get(key), fallbck);
 	}
 
@@ -58,7 +58,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param key The input value key to convert
 	// /
 	// / @returns The converted string, always possible unless null
-	public default boolean getBoolean(K key) {
+	default boolean getBoolean(K key) {
 		return GenericConvert.toBoolean(get(key));
 	}
 
@@ -71,7 +71,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted string, always possible unless null
-	public default Number getNumber(K key, Number fallbck) {
+	default Number getNumber(K key, Number fallbck) {
 		return GenericConvert.toNumber(get(key), fallbck);
 	}
 
@@ -80,7 +80,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param key The input value key to convert
 	// /
 	// / @returns The converted string, always possible unless null
-	public default Number getNumber(K key) {
+	default Number getNumber(K key) {
 		return GenericConvert.toNumber(get(key));
 	}
 
@@ -93,7 +93,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted string, always possible unless null
-	public default int getInt(K key, int fallbck) {
+	default int getInt(K key, int fallbck) {
 		return GenericConvert.toInt(get(key), fallbck);
 	}
 
@@ -102,7 +102,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param key The input value key to convert
 	// /
 	// / @returns The converted string, always possible unless null
-	public default int getInt(K key) {
+	default int getInt(K key) {
 		return GenericConvert.toInt(get(key));
 	}
 
@@ -115,7 +115,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted string, always possible unless null
-	public default long getLong(K key, long fallbck) {
+	default long getLong(K key, long fallbck) {
 		return GenericConvert.toLong(get(key), fallbck);
 	}
 
@@ -124,7 +124,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param key The input value key to convert
 	// /
 	// / @returns The converted string, always possible unless null
-	public default long getLong(K key) {
+	default long getLong(K key) {
 		return GenericConvert.toLong(get(key));
 	}
 
@@ -137,7 +137,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted string, always possible unless null
-	public default float getFloat(K key, float fallbck) {
+	default float getFloat(K key, float fallbck) {
 		return GenericConvert.toFloat(get(key), fallbck);
 	}
 
@@ -146,7 +146,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param key The input value key to convert
 	// /
 	// / @returns The converted string, always possible unless null
-	public default float getFloat(K key) {
+	default float getFloat(K key) {
 		return GenericConvert.toFloat(get(key));
 	}
 
@@ -159,7 +159,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted string, always possible unless null
-	public default double getDouble(K key, double fallbck) {
+	default double getDouble(K key, double fallbck) {
 		return GenericConvert.toDouble(get(key), fallbck);
 	}
 
@@ -168,7 +168,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param key The input value key to convert
 	// /
 	// / @returns The converted string, always possible unless null
-	public default double getDouble(K key) {
+	default double getDouble(K key) {
 		return GenericConvert.toDouble(get(key));
 	}
 
@@ -181,7 +181,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted string, always possible unless null
-	public default byte getByte(K key, byte fallbck) {
+	default byte getByte(K key, byte fallbck) {
 		return GenericConvert.toByte(get(key), fallbck);
 	}
 
@@ -190,7 +190,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param key The input value key to convert
 	// /
 	// / @returns The converted string, always possible unless null
-	public default byte getByte(K key) {
+	default byte getByte(K key) {
 		return GenericConvert.toByte(get(key));
 	}
 
@@ -203,7 +203,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted string, always possible unless null
-	public default short getShort(K key, short fallbck) {
+	default short getShort(K key, short fallbck) {
 		return GenericConvert.toShort(get(key), fallbck);
 	}
 
@@ -212,7 +212,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param key The input value key to convert
 	// /
 	// / @returns The converted string, always possible unless null
-	public default short getShort(K key) {
+	default short getShort(K key) {
 		return GenericConvert.toShort(get(key));
 	}
 
@@ -225,7 +225,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted UUID, always possible unless null
-	public default UUID getUUID(K key, Object fallbck) {
+	default UUID getUUID(K key, Object fallbck) {
 		return GenericConvert.toUUID(get(key), fallbck);
 	}
 
@@ -234,7 +234,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param input The input value to convert
 	// /
 	// / @returns The converted value
-	public default UUID getUUID(K key) {
+	default UUID getUUID(K key) {
 		return GenericConvert.toUUID(get(key));
 	}
 
@@ -244,7 +244,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted UUID, always possible unless null
-	public default String getGUID(K key, Object fallbck) {
+	default String getGUID(K key, Object fallbck) {
 		return GenericConvert.toGUID(get(key), fallbck);
 	}
 
@@ -253,7 +253,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param input The input value to convert
 	// /
 	// / @returns The converted value
-	public default String getGUID(K key) {
+	default String getGUID(K key) {
 		return GenericConvert.toGUID(get(key));
 	}
 
@@ -267,7 +267,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted Object[], always possible unless null
-	public default List<Object> getObjectList(K key, Object fallbck) {
+	default List<Object> getObjectList(K key, Object fallbck) {
 		return GenericConvert.toObjectList(get(key), fallbck);
 	}
 
@@ -276,7 +276,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param input The input value to convert
 	// /
 	// / @default The converted value
-	public default List<Object> getObjectList(K key) {
+	default List<Object> getObjectList(K key) {
 		return GenericConvert.toObjectList(get(key));
 	}
 
@@ -288,7 +288,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted Map if possible, else null
-	public default <K extends String, V> Map<K, V> getStringMap(K key, Object fallbck) {
+	default <K extends String, V> Map<K, V> getStringMap(K key, Object fallbck) {
 		return GenericConvert.toStringMap(get(key), fallbck);
 	}
 
@@ -298,7 +298,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param key The input value key to convert
 	// /
 	// / @returns The converted Map if possible, else null
-	public default <K extends String, V> Map<K, V> getStringMap(K key) {
+	default <K extends String, V> Map<K, V> getStringMap(K key) {
 		return GenericConvert.toStringMap(get(key));
 	}
 
@@ -308,7 +308,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted Map if possible, else null
-	public default <K extends String, V> GenericConvertMap<K, V> getGenericConvertStringMap(K key, Object fallbck) {
+	default <K extends String, V> GenericConvertMap<K, V> getGenericConvertStringMap(K key, Object fallbck) {
 		return GenericConvert.toGenericConvertStringMap(get(key), fallbck);
 	}
 
@@ -318,7 +318,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param key The input value key to convert
 	// /
 	// / @returns The converted Map if possible, else null
-	public default <K extends String, V> GenericConvertMap<K, V> getGenericConvertStringMap(K key) {
+	default <K extends String, V> GenericConvertMap<K, V> getGenericConvertStringMap(K key) {
 		return GenericConvert.toGenericConvertStringMap(get(key));
 	}
 
@@ -331,7 +331,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted Map if possible, else null
-	public default GenericConvertList<V> getGenericConvertList(K key, Object fallbck) {
+	default GenericConvertList<V> getGenericConvertList(K key, Object fallbck) {
 		return GenericConvert.toGenericConvertList(get(key), fallbck);
 	}
 
@@ -341,7 +341,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param key The input value key to convert
 	// /
 	// / @returns The converted Map if possible, else null
-	public default GenericConvertList<V> getGenericConvertList(K key) {
+	default GenericConvertList<V> getGenericConvertList(K key) {
 		return GenericConvert.toGenericConvertList(get(key));
 	}
 
@@ -354,7 +354,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted String[], always possible unless null
-	public default String[] getStringArray(K key, Object fallbck) {
+	default String[] getStringArray(K key, Object fallbck) {
 		return GenericConvert.toStringArray(get(key), fallbck);
 	}
 
@@ -363,7 +363,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param input The input value to convert
 	// /
 	// / @returns The converted value
-	public default String[] getStringArray(K key) {
+	default String[] getStringArray(K key) {
 		return GenericConvert.toStringArray(get(key));
 	}
 
@@ -376,7 +376,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The converted Object[], always possible unless null
-	public default Object[] getObjectArray(K key, Object fallbck) {
+	default Object[] getObjectArray(K key, Object fallbck) {
 		return GenericConvert.toObjectArray(get(key), fallbck);
 	}
 
@@ -385,7 +385,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param input The input value to convert
 	// /
 	// / @default The converted value
-	public default Object[] getObjectArray(K key) {
+	default Object[] getObjectArray(K key) {
 		return GenericConvert.toObjectArray(get(key));
 	}
 
@@ -406,7 +406,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param fallbck The fallback default (if not convertable)
 	// /
 	// / @returns The fetched object, always possible unless fallbck null
-	public default Object getNestedObject(String key, Object fallbck) {
+	default Object getNestedObject(String key, Object fallbck) {
 		return GenericConvert.fetchNestedObject(this, key, fallbck);
 	}
 
@@ -417,7 +417,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// / @param key The input key to fetch, possibly nested
 	// /
 	// / @returns The fetched object, always possible unless fallbck null
-	public default Object getNestedObject(String key) {
+	default Object getNestedObject(String key) {
 		//return getNestedObject(key, null);
 		return GenericConvert.fetchNestedObject(this, key);
 	}
@@ -425,21 +425,21 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// Does a simple typecast and put conversion
 	// --------------------------------------------------------------------------------------------------
 	@SuppressWarnings("unchecked")
-	public default V typecastPut(K key, Object value) {
+	default V typecastPut(K key, Object value) {
 		return put(key, (V) value);
 	}
 
 	// Attempts to convert against known V value types, and insert into the map.
 	// If no conversion is required, please use typecastPut
 	// --------------------------------------------------------------------------------------------------
-	public default V convertPut(K key, Object value, Class<V> valueClass) {
+	default V convertPut(K key, Object value, Class<V> valueClass) {
 		@SuppressWarnings("unchecked")
 		BiFunction<Object, Object, V> bf = (BiFunction<Object, Object, V>) GenericConvert.getBiFunction_noisy(valueClass);
 		V val = bf.apply(key, value);
 		return put(key, val);
 	}
 
-	public default V convertPut(K key, Object value) {
+	default V convertPut(K key, Object value) {
 		throw new UnsupportedOperationException("Sadly convertPut without class parameter needs to be manually extended. Eg: 'return convertPut(key, value, V.class)', where V is not a generic");
 	}
 }

@@ -53,8 +53,8 @@ public class DeferredMapEntry<K extends Object, V extends Object> implements Map
 	    if (this.getClass() == o.getClass()) {
 			Map.Entry<K, V> e1 = this;
 			Map.Entry<K, V> e2 = (Map.Entry<K, V>) o;
-
-			flag =  (e1.getKey() == null ? (e2.getKey() == null) : e1.getKey().equals(e2.getKey())) && (e1.getValue() == null ? (e2.getValue() == null) : e1.getValue().equals(e2.getValue()));
+			flag =  e1.getKey() == null ? (e2.getKey() == null) : e1.getKey().equals(e2.getKey());
+			flag =  flag && (e1.getValue() == null ? (e2.getValue() == null) : e1.getValue().equals(e2.getValue()));
 		}
 		return flag;
 	}

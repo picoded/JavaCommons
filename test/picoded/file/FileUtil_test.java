@@ -198,21 +198,24 @@ public class FileUtil_test {
 	}
 	
 	@Test
-	public void testCopyFileIfDifferent() throws IOException {
+	public void testCopyFileIfDifferent() throws IOException { 		
 		Path existingFilePath = Paths.get(testDirStr + "jsRegex.js");
 		Path symLinkPath = Paths.get(outputDirStr + "jsRegexLink.js");
-		//create symbolic Link
+ 		
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
-		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
+		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), 
+				symLinkPath.toFile());
 		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile());
-		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
-		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
-		// same file return
-		FileUtil.copyFile_ifDifferent(Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), existingFilePath.toFile(), false);
-		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false);
-		// copy if files are different 
-		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), symLinkPath.toFile(), false);
-		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
+		
+		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), true);
+		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), 
+				symLinkPath.toFile(), false);
+		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false);
+		
+		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, false);
+		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
+				symLinkPath.toFile(), false, false);
+		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false, false);
 	}
 	
 	@Test

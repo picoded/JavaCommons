@@ -205,17 +205,15 @@ public class FileUtil_test {
 		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile());
 		
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), true);
-		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), 
-				symLinkPath.toFile(), false);
-		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), 
-				Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
-		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), 
-				Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
+		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), symLinkPath.toFile(), false);
+		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
+		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
+		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), true);
+		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), false);
 		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false);
 		
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, false);
-		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
-				symLinkPath.toFile(), false, false);
+		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),symLinkPath.toFile(), false, false);
 		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false, false);
 	}
 	

@@ -259,7 +259,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		// If so, both is practically the same final file when 
 		// linked, hence the file is considered "not different"
 		//------------------------------------------------------------
-		if (Files.isSymbolicLink(outFile.toPath())&& Files.readSymbolicLink(outFile.toPath())!= null 
+		if (Files.isSymbolicLink(outFile.toPath())&& Files.readSymbolicLink(outFile.toPath())!=null 
 				&& FileUtils.contentEquals(outFile, inFile)) {
 			// Gets the symbolic link source file path, and checks if it points to source file.
 			//

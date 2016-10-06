@@ -606,9 +606,31 @@ public class GenericConvertMap_test {
 		assertEquals("", genericConvertMap.getNestedObject("my_key", "ok"));
 	}
 	
+	@Test 
+	public void getNestedObjectOverloadValidTest() {
+		when(genericConvertMapForValid.getNestedObject("my_key", "ok")).thenCallRealMethod();
+		when(genericConvertMapForValid.get("my_key")).thenReturn("1");
+		assertEquals("1", genericConvertMapForValid.getNestedObject("my_key", "ok"));
+	}
+	
+	@Test 
+	public void getNestedObjectOverloadInvalidTest() {
+		when(genericConvertMapForValid.getNestedObject("my_key", "ok")).thenCallRealMethod();
+		when(genericConvertMapForValid.get("key")).thenReturn("1");
+		assertEquals("ok", genericConvertMapForValid.getNestedObject("my_key", "ok"));
+	}
+	
 	@Test (expected = UnsupportedOperationException.class)
 	public void typecastPutTest() {
 		assertEquals("", genericConvertMap.typecastPut("my_key", "my_value"));
+	}
+	
+	@Test 
+	public void typecastPutValidTest() {
+		when(genericConvertMapForValid.typecastPut("my_key", "my_value")).thenCallRealMethod();
+		when(genericConvertMapForValid.get("my_key")).thenReturn("1");
+		when(genericConvertMapForValid.put("my_key", "my_value")).thenReturn("my_value");
+		assertEquals("my_value", genericConvertMapForValid.typecastPut("my_key", "my_value"));
 	}
 	
 	@Test (expected = UnsupportedOperationException.class)
@@ -619,5 +641,13 @@ public class GenericConvertMap_test {
 	@Test (expected = UnsupportedOperationException.class)
 	public void convertPutOverloadTest() {
 		assertEquals("", genericConvertMap.convertPut("my_key", "my_value", String.class));
+	}
+	
+	@Test 
+	public void convertPutOverloadValidTest() {
+		when(genericConvertMapForValid.convertPut("my_key", "my_value", String.class)).thenCallRealMethod();
+		when(genericConvertMapForValid.get("my_key")).thenReturn("my_value");
+		when(genericConvertMapForValid.put("my_key", "my_key")).thenReturn("my_key");
+		assertEquals("my_key", genericConvertMapForValid.convertPut("my_key", "my_value", String.class));
 	}
 }

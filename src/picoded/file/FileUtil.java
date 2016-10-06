@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.List;
 
 
-import org.apache.commons.io.FileUtils;
 //apache includes
 import org.apache.commons.lang3.StringUtils;
 
@@ -259,8 +258,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		// If so, both is practically the same final file when 
 		// linked, hence the file is considered "not different"
 		//------------------------------------------------------------
-		if (Files.isSymbolicLink(outFile.toPath())&& Files.readSymbolicLink(outFile.toPath())!=null 
-				&& FileUtils.contentEquals(outFile, inFile)) {
+		if (Files.isSymbolicLink(outFile.toPath())&& Files.readSymbolicLink(outFile.toPath())!= null 
+				&& org.apache.commons.io.FileUtils.contentEquals(outFile, inFile)) {
 			// Gets the symbolic link source file path, and checks if it points to source file.
 			//
 			// See: http://stackoverflow.com/questions/29368308/java-nio-how-is-path-issamefile-different-from-path-equals

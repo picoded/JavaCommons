@@ -214,21 +214,16 @@ public class FileUtil_test {
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), existingFilePath.toFile(), false);
  		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), 
  				existingFilePath.toFile(), false);
- 		
- 		
+	 		
  		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(),  
  				Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
  		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), 
  				Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
  		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false);
- 		
- 		
+ 		 		
  		
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
  		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false);
- 		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), 
- 				symLinkPath.toFile(), false);
- 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, false);
 	}
 	
 	@Test

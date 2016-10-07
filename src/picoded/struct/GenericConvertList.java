@@ -323,7 +323,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @default         The converted value
 	default List<Object> getObjectList(int index) {
-		return GenericConvert.toObjectList(index);
+		return GenericConvert.toObjectList(getSilent(index));
 	}
 	
 	// to array

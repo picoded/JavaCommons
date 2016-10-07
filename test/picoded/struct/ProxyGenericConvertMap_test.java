@@ -44,6 +44,8 @@ public class ProxyGenericConvertMap_test {
 	
 	@Test
 	public void toStringTest() {
-		assertNull(proxyGenericConvertMap.toString());
+		Map<String, String> map = new HashMap<>();
+		proxyGenericConvertMap = new ProxyGenericConvertMap<>(map);
+		assertNotNull(proxyGenericConvertMap.toString());
 	}
 }

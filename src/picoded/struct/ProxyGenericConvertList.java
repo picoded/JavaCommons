@@ -1,6 +1,5 @@
 package picoded.struct;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.list.AbstractListDecorator;
@@ -26,17 +25,12 @@ public class ProxyGenericConvertList<V> extends AbstractListDecorator<V> impleme
 		super(inList);
 	}
 
-	// / Protected constructor
-	public ProxyGenericConvertList() {
-		super();
-	}
-
 	// / The static builder for the map
 	public static <V> GenericConvertList<V> ensure(List<V> inList) {
 		if (inList instanceof GenericConvertList) { // <V>
 			return (GenericConvertList<V>) inList;
 		}
-		return (new ProxyGenericConvertList<V>(inList));
+		return new ProxyGenericConvertList<V>(inList);
 	}
 
 	// / Implments a JSON to string conversion

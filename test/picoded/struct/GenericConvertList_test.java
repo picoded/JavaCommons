@@ -3,6 +3,8 @@ package picoded.struct;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
+
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -228,4 +230,53 @@ public class GenericConvertList_test {
 	public void getGenericConvertList2ParamTest() {
 		assertNull(genericConvertList.getGenericConvertList(1, "ok"));
 	}
+	
+	@Test 
+	public void getStringArrayTest() {
+		when(genericConvertList.size()).thenReturn(2);
+		when(genericConvertList.get(1)).thenReturn("me");
+		assertNull(genericConvertList.getStringArray(1));
+	}
+	
+	@Test 
+	public void getGUID2ParamTest() {
+		when(genericConvertList.size()).thenReturn(2);
+		when(genericConvertList.get(1)).thenReturn("ok");
+		assertEquals("123456789o123456789o12", genericConvertList.getGUID(1, "123456789o123456789o12"));
+	}
+	
+	@Test 
+	public void getFloat2ParamTest() {
+		when(genericConvertList.size()).thenReturn(1);
+		when(genericConvertList.get(1)).thenReturn("me");
+		assertEquals(-1.0, genericConvertList.getFloat(1, -1f), 0.01);
+	}
+	@Test 
+	public void getObjectList2ParamTest() {
+		when(genericConvertList.size()).thenReturn(2);
+		when(genericConvertList.get(1)).thenReturn("me");
+		assertArrayEquals(new Object[]{"1", 1}, genericConvertList.getObjectList(1, new Object[]{"1", 1}).toArray());
+	}
+	
+	@Test 
+	public void getNestedObjectTest() {
+		when(genericConvertList.size()).thenReturn(2);
+		when(genericConvertList.get(1)).thenReturn("me");
+		assertEquals("me", genericConvertList.getNestedObject("1"));
+	}
+	
+	@Test 
+	public void getLong2ParamTest() {
+		when(genericConvertList.size()).thenReturn(2);
+		when(genericConvertList.get(1)).thenReturn("1");
+		assertEquals(1, genericConvertList.getLong(1, -1l));
+	}
+	
+	@Test 
+	public void getLong2ParamAlternateTest() {
+		when(genericConvertList.size()).thenReturn(2);
+		when(genericConvertList.get(1)).thenReturn("me");
+		assertEquals(-5l, genericConvertList.getLong(1, -5l));
+	}
+	
 }

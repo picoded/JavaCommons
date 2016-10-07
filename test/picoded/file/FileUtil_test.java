@@ -211,7 +211,6 @@ public class FileUtil_test {
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
  		
  		//Checks if file has not been modified, and has same data length
- 		FileUtil.copyFile_ifDifferent(Paths.get("").toFile(), Paths.get("").toFile(), false);
  		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), existingFilePath.toFile(), false);
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), existingFilePath.toFile(), false);
  		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), existingFilePath.toFile(), true);

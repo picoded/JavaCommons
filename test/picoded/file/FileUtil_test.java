@@ -221,48 +221,6 @@ public class FileUtil_test {
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
  		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false);
  		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), existingFilePath.toFile(), false);
- 		
- 		
- 		
- 		existingFilePath = Paths.get(testDirStr + "jsRegex.js");
- 		Path doubleSlashPath = Paths.get(testDirStr + "doubleSlash.js");
- 		
- 		// create symbolic link
- 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), doubleSlashPath.toFile(), false);
- 		
- 		//Checks if file has not been modified, and has same data length
- 		FileUtil.copyFile_ifDifferent(doubleSlashPath.toFile(), existingFilePath.toFile(), false);
- 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), existingFilePath.toFile(), false);
- 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), doubleSlashPath.toFile(), false);
- 		FileUtil.copyFile_ifDifferent(doubleSlashPath.toFile(), doubleSlashPath.toFile(), false);
- 		
- 		
- 		existingFilePath = Paths.get(testDirStr + "jsRegex.js");
- 		symLinkPath = Paths.get(outputDirStr + "jsRegexLink.js");
- 		
- 		// create symbolic link
- 	 	FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
- 		// create symbolic link
- 	 	FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), existingFilePath.toFile());
- 		
- 		// file is already a symbolic link
- 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
- 		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), existingFilePath.toFile());
- 		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false);
- 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), existingFilePath.toFile(), false);
-	
- 		
- 		existingFilePath = Paths.get(testDirStr + "jsRegex.js");
- 		symLinkPath = Paths.get(outputDirStr + "jsRegexLink.js");
- 		
- 		// create symbolic link
- 	 	FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
- 		
- 	 	// copies file if content differs
- 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), existingFilePath.toFile(), false);
- 		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
- 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
- 		
 	}
 	
 	@Test

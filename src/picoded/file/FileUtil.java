@@ -261,7 +261,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		// linked, hence the file is considered "not different"
 		//------------------------------------------------------------
 		LOGGER.log(null, "isSymbolicLink******************"+Files.isSymbolicLink(outFile.toPath()));
-		LOGGER.log(null, "isSameFile******************"+Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath()));
+		LOGGER.log(null, "isSameFile******************"+
+		Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath()));
 		LOGGER.log(null, "readSymbolicLink******************"+Files.readSymbolicLink(outFile.toPath()));
 		if (Files.isSymbolicLink(outFile.toPath())
 			&& Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath())) {
@@ -303,7 +304,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			// returns and skip for optimization
 			return;
 		}
-		LOGGER.log(null, "contentEqualsIgnoreEOL******************"+FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null));
+		LOGGER.log(null, "contentEqualsIgnoreEOL******************"+
+		FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null));
 		// Final fallback behaviour, copies file if content differs.
 		//---------------------------------------------------------------------------------
 		if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null)) {

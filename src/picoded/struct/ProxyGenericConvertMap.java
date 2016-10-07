@@ -30,7 +30,7 @@ public class ProxyGenericConvertMap <K, V> extends AbstractMapDecorator<K, V> im
 		if (inMap instanceof GenericConvertMap) { // <A,B>
 			return (GenericConvertMap<A, B>) inMap;
 		}
-		return (new ProxyGenericConvertMap<A, B>(inMap));
+		return new ProxyGenericConvertMap<A, B>(inMap);
 	}
 
 	// ------------------------------------------------------

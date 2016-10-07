@@ -30,7 +30,7 @@ public class ProxyGenericConvertList<V> extends AbstractListDecorator<V> impleme
 		if (inList instanceof GenericConvertList) { // <V>
 			return (GenericConvertList<V>) inList;
 		}
-		return (new ProxyGenericConvertList<V>(inList));
+		return new ProxyGenericConvertList<V>(inList);
 	}
 
 	// / Implments a JSON to string conversion

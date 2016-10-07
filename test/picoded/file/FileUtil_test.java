@@ -228,7 +228,10 @@ public class FileUtil_test {
  		Path existingFilePath = Paths.get(testDirStr + "jsRegex.js");
  		Path symLinkPath = Paths.get(outputDirStr + "jsRegexLink.js");
  		
- 		// copies file if content differs
+ 		// create symbolic link
+ 	 	FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
+ 		
+ 	 	// copies file if content differs
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), existingFilePath.toFile(), false);
  		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
@@ -239,6 +242,9 @@ public class FileUtil_test {
 	public void testCopyFileIfDifferent2() throws IOException { 		
  		Path existingFilePath = Paths.get(testDirStr + "jsRegex.js");
  		Path symLinkPath = Paths.get(outputDirStr + "jsRegexLink.js");
+ 		
+ 		// create symbolic link
+ 	 	FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
  		
  		//Checks if file has not been modified, and has same data length
  		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), existingFilePath.toFile(), false);
@@ -257,6 +263,9 @@ public class FileUtil_test {
 	public void testCopyFileIfDifferent3() throws IOException { 		
  		Path existingFilePath = Paths.get(testDirStr + "jsRegex.js");
  		Path symLinkPath = Paths.get(outputDirStr + "jsRegexLink.js");
+ 		
+ 		// create symbolic link
+ 	 	FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
  		
  		// file is already a symbolic link
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());

@@ -8,8 +8,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import java.util.logging.Logger;
+
 //apache includes
 import org.apache.commons.lang3.StringUtils;
+
 
 ///
 /// Extension of apache FileUtils, for some additional features that we needed.
@@ -21,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 /// @See https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtil.html
 ///
 public class FileUtil extends org.apache.commons.io.FileUtils {
-	
+	private final static Logger LOGGER = Logger.getLogger(FileUtil.class.getName());
 	/// Invalid constructor (throws exception)
 	protected FileUtil() {
 		throw new IllegalAccessError("Utility class");
@@ -257,9 +260,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		// If so, both is practically the same final file when 
 		// linked, hence the file is considered "not different"
 		//------------------------------------------------------------
-		System.out.println("isSymbolicLink******************"+Files.isSymbolicLink(outFile.toPath()));
-		System.out.println("isSameFile******************"+Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath()));
-		System.out.println("readSymbolicLink******************"+Files.readSymbolicLink(outFile.toPath()));
+		LOGGER.log(null, "isSymbolicLink******************"+Files.isSymbolicLink(outFile.toPath()));
+		LOGGER.log(null, "isSameFile******************"+Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath()));
+		LOGGER.log(null, "readSymbolicLink******************"+Files.readSymbolicLink(outFile.toPath()));
 		if (Files.isSymbolicLink(outFile.toPath())
 			&& Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath())) {
 			// Gets the symbolic link source file path, and checks if it points to source file.
@@ -273,7 +276,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		}
 		
 		// Tries to build symlink if possible, hopefully
-		System.out.println("tryToSymLinkFiles******************"+tryToSymLinkFiles);
+		LOGGER.log(null, "tryToSymLinkFiles******************"+tryToSymLinkFiles);
 		if (tryToSymLinkFiles) {
 			// NOTE: You do not test source file for symbolic link
 			// Only the detination file should be a symbolic link.
@@ -292,15 +295,15 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		
 		// Checks if file has not been modified, and has same data length, for skipping?
 		//---------------------------------------------------------------------------------
-		System.out.println("inFile.lastModified()******************"+inFile.lastModified());
-		System.out.println("inFile.length()******************"+inFile.length());
-		System.out.println("outFile.lastModified()******************"+outFile.lastModified());
-		System.out.println("outFile.length()******************"+outFile.length());
+		LOGGER.log(null, "inFile.lastModified()******************"+inFile.lastModified());
+		LOGGER.log(null, "inFile.length()******************"+inFile.length());
+		LOGGER.log(null, "outFile.lastModified()******************"+outFile.lastModified());
+		LOGGER.log(null, "outFile.length()******************"+outFile.length());
 		if (inFile.lastModified() == outFile.lastModified() && inFile.length() == outFile.length()) {
 			// returns and skip for optimization
 			return;
 		}
-		System.out.println("contentEqualsIgnoreEOL******************"+FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null));
+		LOGGER.log(null, "contentEqualsIgnoreEOL******************"+FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null));
 		// Final fallback behaviour, copies file if content differs.
 		//---------------------------------------------------------------------------------
 		if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null)) {

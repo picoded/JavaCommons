@@ -24,32 +24,32 @@ aws-sdk/httpcomponents-client-4.3,httpcore-4.3.jar,Http Components Client,v 4.3,
 aws-sdk/spring-3.0,spring-beans-3.0.7.jar,Spring Beans,v 3.0.7,"APACHE LICENSE, VERSION 2.0",v 4.3.3,,http://grepcode.com/project/repo1.maven.org/maven2/org.springframework/spring-beans/,http://docs.spring.io/spring-framework/docs/current/javadoc-api/,http://www.apache.org/licenses/LICENSE-2.0
 aws-sdk/spring-3.0,spring-context-3.0.7.jar,Spring Context,v 3.0.7,"APACHE LICENSE, VERSION 2.0",v 4.3.3,,http://grepcode.com/project/repo1.maven.org/maven2/org.springframework/spring-context/,http://docs.spring.io/spring-framework/docs/current/javadoc-api/,http://www.apache.org/licenses/LICENSE-2.0
 aws-sdk/spring-3.0,spring-core-3.0.7.jar,Spring Core,v 3.0.7,"APACHE LICENSE, VERSION 2.0",v 4.3.3,,http://grepcode.com/project/repo1.maven.org/maven2/org.springframework/spring-core/,http://docs.spring.io/spring-framework/docs/current/javadoc-api/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-CUSTOM.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-anim.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-awt-util.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-bridge.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-codec.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-css.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-dom.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-ext.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-extension.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-gui-util.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-gvt.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-parser.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-rasterizer.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-script.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-slideshow.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-squiggle.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-svg-dom.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-svggen.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-svgpp.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-swing.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-transcoder.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-ttf2svg.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-util.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,batik-xml.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
-batik,xml-apis-ext.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",,, http://xml.apache.org/commons/components/external/,https://xerces.apache.org/xerces2-j/javadocs/api/,http://www.apache.org/licenses/LICENSE-2.0
-batik,xml-apis.jar,Apache Batik ,,"APACHE LICENSE, VERSION 2.0",,,http://xerces.apache.org/xml-commons/components/external/,https://xerces.apache.org/xerces2-j/javadocs/api/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-CUSTOM.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-anim.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-awt-util.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-bridge.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-codec.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-css.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-dom.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-ext.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-extension.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-gui-util.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-gvt.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-parser.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-rasterizer.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-script.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-slideshow.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-squiggle.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-svg-dom.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-svggen.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-svgpp.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-swing.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-transcoder.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-ttf2svg.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-util.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,batik-xml.jar,Apache Batik ,v 1.7+r608262,"APACHE LICENSE, VERSION 2.0",v 7.1,,https://xmlgraphics.apache.org/batik/,https://xmlgraphics.apache.org/batik/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
+batik,xml-apis-ext.jar,Apache Batik ,1.4.01,"APACHE LICENSE, VERSION 2.0",,, http://xml.apache.org/commons/components/external/,https://xerces.apache.org/xerces2-j/javadocs/api/,http://www.apache.org/licenses/LICENSE-2.0
+batik,xml-apis.jar,Apache Batik ,v 1.3,"APACHE LICENSE, VERSION 2.0",,,http://xerces.apache.org/xml-commons/components/external/,https://xerces.apache.org/xerces2-j/javadocs/api/,http://www.apache.org/licenses/LICENSE-2.0
 conv,jmte-3.1.jar,Java Minimal Template Engine,v 3.1,"APACHE LICENSE, VERSION 2.0",v  3.2.0,,https://code.google.com/archive/p/jmte/,,http://www.apache.org/licenses/LICENSE-2.0
 conv,jsoup-1.9.2.jar,Jsoup ,v 1.9.2,THE MIT LICENSE,,,https://jsoup.org/,https://jsoup.org/apidocs/,https://jsoup.org/license
 conv,lesscss-1.7.0.1.1.jar,Lesscss Compiler,v 1.7.0.1.1,"APACHE LICENSE, VERSION 2.0",,,http://github.com/marceloverdijk/lesscss-java,,http://www.apache.org/licenses/LICENSE-2.0
@@ -64,7 +64,7 @@ encrypt/bouncy-castle,bcpkix-jdk15on-1.47.jar,"Bouncy Castle PKIX, CMS, EAC, TSP
 encrypt/bouncy-castle,bcprov-jdk15on-151.jar,Bouncy Castle Provider,v 151,BOUNCY CASTLE LICENCE,v 1.55,,http://www.bouncycastle.org/java.html,http://www.bouncycastle.org/latest_releases.html,http://www.bouncycastle.org/licence.html
 fileUtils,ini4j-0.5.2.jar,Ini4j,v 0.5.2,"APACHE LICENSE, VERSION 2.0",v 0.5.4,,http://www.ini4j.org,http://ini4j.sourceforge.net/apidocs/,http://www.apache.org/licenses/LICENSE-2.0
 fileUtils/encrypt,winzipaes-1.0.1.jar,Winzipaes,v 1.0.1,"APACHE LICENSE, VERSION 2.0",,,http://code.google.com/p/winzipaes/,https://code.google.com/archive/p/winzipaes/,http://www.apache.org/licenses/LICENSE-2.0
-fileUtils/pdf,core-renderer.jar,XHTMLRenderer Core Renderer,,"GNU LESSER GENERAL PUBLIC LICENSE (LGPL), VERSION 2.1",v R8,,https://xhtmlrenderer.dev.java.net/,http://javadox.com/org.xhtmlrenderer,http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+fileUtils/pdf,core-renderer.jar,XHTMLRenderer Core Renderer,v 1.0.1,"GNU LESSER GENERAL PUBLIC LICENSE (LGPL), VERSION 2.1",v R8,,https://xhtmlrenderer.dev.java.net/,http://javadox.com/org.xhtmlrenderer,http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
 fileUtils/pdf,iText-2.0.8.jar,Itext,v 2.0.8,GNU AFFERO GENERAL PUBLIC LICENSE V3,v 4.2.2,,http://www.lowagie.com/iText/,http://itextsupport.com/apidocs/itext5/latest/, http://www.fsf.org/licensing/licenses/agpl-3.0.html
 google-guava,guava-19.0-rc2.jar,Guava,v 19.0-rc2,"APACHE LICENSE, VERSION 2.0",v 19.0,,https://github.com/google/guava/wiki,http://google.github.io/guava/releases/19.0/api/docs/,http://www.apache.org/licenses/LICENSE-2.0
 hazelcast/client,hazelcast-client-3.4.jar,Hazelcast Client,v 3.4,"APACHE LICENSE, VERSION 2.0",v 3.7.1,,https://hazelcast.org/clients/java/,http://docs.hazelcast.org/docs/3.4/javadoc/,http://www.apache.org/licenses/LICENSE-2.0
@@ -140,7 +140,7 @@ jCache/redisson,redisson-1.2.1-SNAPSHOT.jar,Redisson ,v 1.2.1-SNAPSHOT,"APACHE L
 jCache/redisson,slf4j-api-1.7.10.jar,SLF4J API Module ,v 1.7.10,MIT LICENSE,v 1.7.21,,http://www.slf4j.org,http://www.slf4j.org/api/,http://www.apache.org/licenses/LICENSE-2.0
 jSql,jtds-1.2.7.jar,JTDS,v 1.2.7,LGPL,v 1.3.1,,http://jtds.sourceforge.net,http://jtds.sourceforge.net/doc/,http://www.gnu.org/copyleft/lesser.html
 jSql,mysql-connector-java-5.1.15-bin.jar,MySQL Connector,v 5.1.15-bin,"THE GNU GENERAL PUBLIC LICENSE, VERSION 2",v 6.0.4,,http://dev.mysql.com,http://dev.mysql.com/doc/,http://www.gnu.org/licenses/gpl.txt
-jSql,ojdbc6.jar,OJdbc6,,ORACLE TECHNOLOGY NETWORK DEVELOPMENT AND DISTRIBUTION LICENSE TERMS,,,http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/index.html,http://docs.oracle.com/javase/7/docs/technotes/guides/jdbc/,http://www.oracle.com/technology/software/htdocs/distlic.html
+jSql,ojdbc6.jar,OJdbc6,v 5.1.15-bin,ORACLE TECHNOLOGY NETWORK DEVELOPMENT AND DISTRIBUTION LICENSE TERMS,,,http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/index.html,http://docs.oracle.com/javase/7/docs/technotes/guides/jdbc/,http://www.oracle.com/technology/software/htdocs/distlic.html
 jSql,sqlite-jdbc-3.7.2.jar,SQLite JDBC,v 3.7.2,"APACHE LICENSE, VERSION 2.0",v 3.14.2.1,,https://www.sqlite.org,https://www.sqlite.org/docs.html,http://www.apache.org/licenses/LICENSE-2.0
 jStore,leveldbjni-all-1.8.jar,Leveldbjni All,v 1.8,"APACHE LICENSE, VERSION 2.0
 THE BSD 3-CLAUSE LICENSE",,,https://github.com/fusesource/leveldbjni,https://github.com/fusesource/leveldbjni,"http://www.apache.org/licenses/LICENSE-2.0
@@ -150,7 +150,7 @@ javax,javax.mail-api-1.4.6.jar,JavaMail API (compat) ,v 1.4.6,"CDDL
 GPLV2+CE",v 1.5.0-b01,,http://docs.oracle.com/,http://docs.oracle.com/javaee/5/api/javax/mail/package-summary.html,"http://www.sun.com/cddl
 https://glassfish.java.net/public/CDDL+GPL_1_1.html"
 javax,servlet-api-3.0.jar,Java Servlet API,v 3.0,CDDL + GPLV2 WITH CLASSPATH EXCEPTION,v 4.0.0-b01,, http://servlet-spec.java.net,https://tomcat.apache.org/tomcat-7.0-doc/servletapi/index.html?overview-summary.html,https://glassfish.dev.java.net/nonav/public/CDDL+GPL.html
-ldap,unboundid-ldapsdk-se.jar,UnboundID LDAP SDK,,"GNU GENERAL PUBLIC LICENSE VERSION 2 
+ldap,unboundid-ldapsdk-se.jar,UnboundID LDAP SDK,v 2.3.8,"GNU GENERAL PUBLIC LICENSE VERSION 2 
 GNU LESSER GENERAL PUBLIC LICENSE VERSION 2.1 
 UNBOUNDID LDAP SDK FREE USE LICENSE",v 3.2.0,, http://www.unboundid.com/,https://docs.ldap.com/ldap-sdk/docs/javadoc/index.html,"http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
@@ -159,16 +159,16 @@ log4j/apache-log4j-1.2.17,log4j-1.2.17.jar,Apache Log4j,v 1.2.17,"APACHE LICENSE
 picodedTests-only/embedded-redis,embedded-redis-0.4.jar,Embedded Redis ,v 0.4,"APACHE LICENSE, VERSION 2.0",v 0.6,,https://github.com/gbrd/embedded-redis,https://github.com/kstyrc/embedded-redis,http://www.apache.org/licenses/LICENSE-2.0
 picodedTests-only/junit,ant-junit-1.9.2.jar,Apache Ant + JUnit,v 1.9.2,"APACHE LICENSE, VERSION 2.0",v 1.9.7,,http://ant.apache.org/,https://ant.apache.org/manual/Tasks/junit.html,http://www.apache.org/licenses/LICENSE-2.0
 picodedTests-only/junit,hamcrest-core-1.3.jar,Hamcrest Core,v 1.3,NEW BSD LICENSE ,v 1.4-atlassian-1 ,,http://hamcrest.org,http://hamcrest.org/JavaHamcrest/javadoc/1.3/,http://www.opensource.org/licenses/bsd-license.php
-picodedTests-only/junit,jacocoant.jar,JaCoCo Ant Tasks,,ECLIPSE PUBLIC LICENSE V1.0,v 0.7.7.201606060606,,http://www.eclemma.org,http://www.eclemma.org/jacoco/trunk/doc/ant.html,http://www.eclipse.org/legal/epl-v10.html
+picodedTests-only/junit,jacocoant.jar,JaCoCo Ant Tasks,v  0.7.6.201602180812,ECLIPSE PUBLIC LICENSE V1.0,v 0.7.7.201606060606,,http://www.eclemma.org,http://www.eclemma.org/jacoco/trunk/doc/ant.html,http://www.eclipse.org/legal/epl-v10.html
 picodedTests-only/junit,junit-4.11.jar,JUnit,v 4.11,COMMON PUBLIC LICENSE VERSION 1.0,v 4.12,,http://junit.org,http://junit.org/junit4/javadoc/latest/,http://www.opensource.org/licenses/cpl1.0.txt
 picodedTests-only/mockito,mockito-all-1.10.19.jar,Mockito,v 1.10.19,MIT LICENSE,v 2.0.2-beta,, http://www.mockito.org,http://site.mockito.org/mockito/docs/1.10.19/org/mockito/Mockito.html,http://github.com/mockito/mockito/blob/master/LICENSE
-security,jce.jar,Java Cryptography Extension,,"APACHE LICENSE, VERSION 2.0",,,http://docs.oracle.com/,http://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html,http://www.apache.org/licenses/LICENSE-2.0
-servletUtils,tomcat-embed-core.jar,Tomcat Embed Core,,"APACHE LICENSE, VERSION 2.0",,, http://tomcat.apache.org/,https://tomcat.apache.org/tomcat-7.0-doc/api/,http://www.apache.org/licenses/LICENSE-2.0
-servletUtils,tomcat-embed-jasper.jar,Tomcat Embed Jasper,,"APACHE LICENSE, VERSION 2.0",,,http://tomcat.apache.org/,https://tomcat.apache.org/tomcat-7.0-doc/api/,http://www.apache.org/licenses/LICENSE-2.0
-servletUtils,tomcat-embed-logging-juli.jar,Tomcat Embed Logging Juli,,"APACHE LICENSE, VERSION 2.0",,, http://tomcat.apache.org/,https://tomcat.apache.org/tomcat-7.0-doc/api/,http://www.apache.org/licenses/LICENSE-2.0
+security,jce.jar,Java Cryptography Extension,v 1.6,"APACHE LICENSE, VERSION 2.0",,,http://docs.oracle.com/,http://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html,http://www.apache.org/licenses/LICENSE-2.0
+servletUtils,tomcat-embed-core.jar,Tomcat Embed Core,v 7.0.62,"APACHE LICENSE, VERSION 2.0",,, http://tomcat.apache.org/,https://tomcat.apache.org/tomcat-7.0-doc/api/,http://www.apache.org/licenses/LICENSE-2.0
+servletUtils,tomcat-embed-jasper.jar,Tomcat Embed Jasper,v 7.0.62,"APACHE LICENSE, VERSION 2.0",,,http://tomcat.apache.org/,https://tomcat.apache.org/tomcat-7.0-doc/api/,http://www.apache.org/licenses/LICENSE-2.0
+servletUtils,tomcat-embed-logging-juli.jar,Tomcat Embed Logging Juli,v 7.0.62,"APACHE LICENSE, VERSION 2.0",,, http://tomcat.apache.org/,https://tomcat.apache.org/tomcat-7.0-doc/api/,http://www.apache.org/licenses/LICENSE-2.0
 webUtils,async-http-client-1.9.29.jar,Asynchronous Http Client,v 1.9.29,"APACHE LICENSE, VERSION 2.0",v 1.9.39,,http://github.com/AsyncHttpClient/async-http-client,http://www.javadoc.io/doc/com.ning/async-http-client/1.9.29,http://www.apache.org/licenses/LICENSE-2.0
 webUtils,javax.websocket-api-1.1.jar,WebSocket Server API,v 1.1,DUAL LICENSE CONSISTING OF THE CDDL V1.1 AND GPL V2,,, http://websocket-spec.java.net,https://docs.oracle.com/javaee/7/api/javax/websocket/package-summary.html,https://glassfish.java.net/public/CDDL+GPL_1_1.html
-webUtils,mail.jar,JavaMail API (compat),,"CDDL
+webUtils,mail.jar,JavaMail API (compat),v 1.4.7,"CDDL
 GPLv2+CE",,,https://javamail.java.net/,https://javamail.java.net/nonav/docs/api/,"http://www.sun.com/cddl
 https://glassfish.java.net/public/CDDL+GPL_1_1.html"
 webUtils,netty-3.10.4.Final.jar,Netty/All In One,v 3.10.4,"APACHE LICENSE, VERSION 2.0",v 4.0.0.Alpha8,, http://netty.io/,http://netty.io/3.10/api/org/jboss/netty/channel/ChannelStateEvent.html,http://www.apache.org/licenses/LICENSE-2.0

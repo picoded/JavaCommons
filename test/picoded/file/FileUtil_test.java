@@ -203,7 +203,9 @@ public class FileUtil_test {
  		Path symLinkPath = Paths.get(outputDirStr + "jsRegexLink.js");
  		
  		// create symbolic link
+ 		Files.createSymbolicLink(symLinkPath, existingFilePath);
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
+ 		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), existingFilePath.toFile());
  		
  		// copies file if content differs
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), existingFilePath.toFile(), false);

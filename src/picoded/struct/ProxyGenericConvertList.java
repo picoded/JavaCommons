@@ -17,14 +17,14 @@ import picoded.conv.GenericConvert;
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
 public class ProxyGenericConvertList<V> extends AbstractListDecorator<V> implements GenericConvertList<V> {
-
+	
 	private static final long serialVersionUID = 1L;
-
+	
 	// / Protected constructor
 	public ProxyGenericConvertList(List<V> inList) {
 		super(inList);
 	}
-
+	
 	// / The static builder for the map
 	public static <V> GenericConvertList<V> ensure(List<V> inList) {
 		if (inList instanceof GenericConvertList) { // <V>
@@ -32,7 +32,7 @@ public class ProxyGenericConvertList<V> extends AbstractListDecorator<V> impleme
 		}
 		return new ProxyGenericConvertList<V>(inList);
 	}
-
+	
 	// / Implments a JSON to string conversion
 	@Override
 	public String toString() {

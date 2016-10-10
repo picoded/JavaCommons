@@ -216,6 +216,9 @@ public class FileUtil_test {
  		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), existingFilePath.toFile(), true);
  		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), existingFilePath.toFile(), false);
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
+ 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(),Paths.get(testDirStr + "doubleSlash.txt").toFile());
+ 		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
+ 				Paths.get("./test-files/test-specific/file/ConfigFile" + "iniTestFileJSON.js").toFile());
  		
  		// create symbolic link
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, false);

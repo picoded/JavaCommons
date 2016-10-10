@@ -188,14 +188,14 @@ public class FileUtil_test {
 	}
 	
 	/// Test for Copy Directory If Different
-//	@Test
-//	public void testCopyFileIfDifferentCreateSymbolicLink() throws IOException {
-//		Path existingFilePath = Paths.get(testDirStr + "jsRegex.js");
-//		Path symLinkPath = Paths.get(outputDirStr + "jsRegexLink.js");
-//		Files.createSymbolicLink(symLinkPath, existingFilePath);
-//		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, false);
-//		symLinkPath.toFile().delete();
-//	}
+	@Test
+	public void testCopyFileIfDifferentCreateSymbolicLink() throws IOException {
+		Path existingFilePath = Paths.get(testDirStr + "jsRegex.js");
+		Path symLinkPath = Paths.get(outputDirStr + "jsRegexLink.js");
+		Files.createSymbolicLink(symLinkPath, existingFilePath);
+		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, false);
+		symLinkPath.toFile().delete();
+	}
 	
 	@Test
 	public void testCopyFileIfDifferent() throws IOException { 		
@@ -219,6 +219,10 @@ public class FileUtil_test {
  		
  		// create symbolic link
  		Files.createSymbolicLink(symLinkPath, existingFilePath);
+ 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
+ 		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), Paths.get(testDirStr + "doubleSlashLink.txt").toFile());
+ 		FileUtil.copyFile_ifDifferent(Paths.get("./test-files/test-specific/file/ConfigFile" + "iniTestFileJSON.js").toFile(), 
+ 				Paths.get(testDirStr + "doubleSlashLink.txt").toFile());
  		// file is already a symbolic link
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
  		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false);

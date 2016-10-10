@@ -201,7 +201,6 @@ public class FileUtil_test {
 	public void testCopyFileIfDifferent() throws IOException { 		
  		Path existingFilePath = Paths.get(testDirStr + "jsRegex.js");
  		Path symLinkPath = Paths.get(outputDirStr + "jsRegexLink.js");
- 		Files.createSymbolicLink(symLinkPath, existingFilePath);
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
  		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), existingFilePath.toFile());
  		

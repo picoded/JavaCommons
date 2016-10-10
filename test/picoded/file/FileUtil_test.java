@@ -218,11 +218,18 @@ public class FileUtil_test {
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
  		
  		// create symbolic link
- 		Files.createSymbolicLink(symLinkPath, existingFilePath);
- 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), true, true);
- 		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), true, true);
+ 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, true);
+ 		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), 
+ 				Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), false, true);
  		FileUtil.copyFile_ifDifferent(Paths.get("./test-files/test-specific/file/ConfigFile" + "iniTestFileJSON.js").toFile(), 
- 				Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), true, true);
+ 				Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), false, true);
+ 		
+ 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), true, false);
+ 		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
+ 				Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), true, false);
+ 		FileUtil.copyFile_ifDifferent(Paths.get("./test-files/test-specific/file/ConfigFile" + "iniTestFileJSON.js").toFile(), 
+ 				Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), true, false);
+
  		// file is already a symbolic link
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
  		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false);

@@ -230,18 +230,20 @@ public class FileUtil_test {
  		// Last Modified date and length are different
  	 	FileUtil.copyFile_ifDifferent(Paths.get("./test-files/test-specific/file/ConfigFile/"+ 
  		"iniTestFileJSON.js").toFile(), existingFilePath.toFile(), false, false);
+ 	 	
  		// create symbolic link
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, false);
  		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), 
  				Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), false, true);
  		FileUtil.copyFile_ifDifferent(Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(),
- 				Paths.get("./test-files/test-specific/file/ConfigFile/" + "iniTestFileJSON.js").toFile(), false, false);
+ 				Paths.get("./test-files/test-specific/file/ConfigFile/" + 
+ 		"iniTestFileJSON.js").toFile(), false, false);
  		
  		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
  		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
  				Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
- 		FileUtil.copyFile_ifDifferent(Paths.get("./test-files/test-specific/file/ConfigFile/" + "iniTestFileJSON.js").toFile(), 
- 				Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
+ 		FileUtil.copyFile_ifDifferent(Paths.get("./test-files/test-specific/file/ConfigFile/" 
+ 				+ "iniTestFileJSON.js").toFile(), Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
 
  		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), 
  				Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());

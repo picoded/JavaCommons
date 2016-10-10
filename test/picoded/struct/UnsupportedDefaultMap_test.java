@@ -202,9 +202,12 @@ public class UnsupportedDefaultMap_test {
 	
 	@Test 
 	public void valuesValidTest() {
-		Set<String> set = new HashSet<>();
-		set.add("my_entry");
-		when(unsupportedDefaultMap.keySet()).thenReturn(set);
+		Set<Map.Entry<String, String>> set = new HashSet<>();
+		Map<String, String> map = new HashMap<>();
+		map.put("key1", "value1");
+		map.put("key2", "value2");
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		when(unsupportedDefaultMap.values()).thenCallRealMethod();
 		assertEquals(set.size(), unsupportedDefaultMap.values().size());
 	}

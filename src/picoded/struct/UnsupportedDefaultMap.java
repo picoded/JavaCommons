@@ -113,7 +113,8 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 	@Override
 	default Collection<V> values() {
 		List<V> ret = new ArrayList<V>();
-		for (K key : keySet()) {
+		for (Map.Entry<K, V> entry : entrySet()) {
+			K key = entry.getKey();
 			ret.add(get(key));
 		}
 		return ret;

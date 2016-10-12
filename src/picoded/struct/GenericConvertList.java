@@ -303,10 +303,6 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 		return GenericConvert.toGUID(getSilent(index));
 	}
 	
-	// to list
-	// @TODO generic list conversion
-	//--------------------------------------------------------------------------------------------------
-	
 	/// To List<Object> conversion of generic object
 	///
 	/// @param index       The input value index to convert
@@ -325,10 +321,6 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	default List<Object> getObjectList(int index) {
 		return GenericConvert.toObjectList(getSilent(index));
 	}
-	
-	// to array
-	// @TODO generic array conversion
-	//--------------------------------------------------------------------------------------------------
 	
 	// to string array
 	//--------------------------------------------------------------------------------------------------

@@ -20,47 +20,47 @@ import java.util.Set;
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
 public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
-
+	
 	// Critical functions that need to over-ride, to support Map
 	// -------------------------------------------------------------------
-
+	
 	// / throws an UnsupportedOperationException
 	@Override
 	default V get(Object key) {
 		throw new UnsupportedOperationException("function not supported");
 	}
-
+	
 	// / throws an UnsupportedOperationException
 	@Override
 	default V put(K key, V value) {
 		throw new UnsupportedOperationException("function not supported");
 	}
-
+	
 	// / throws an UnsupportedOperationException
 	@Override
 	default V remove(Object key) {
 		throw new UnsupportedOperationException("function not supported");
 	}
-
+	
 	// / throws an UnsupportedOperationException
 	@Override
 	default Set<K> keySet() {
 		throw new UnsupportedOperationException("function not supported");
 	}
-
+	
 	@Override
 	default void clear() {
 		for (K key : keySet()) {
 			remove(key);
 		}
 	}
-
+	
 	// / Does an unoptimized check, using keySet9)
 	@Override
 	default boolean containsKey(Object key) {
 		return keySet().contains(key);
 	}
-
+	
 	// / Does an unoptimized check, using keySet9)
 	@Override
 	default boolean containsValue(Object value) {
@@ -78,7 +78,7 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 		}
 		return false;
 	}
-
+	
 	// / throws an UnsupportedOperationException
 	@Override
 	default Set<Map.Entry<K, V>> entrySet() {
@@ -88,13 +88,13 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 		}
 		return ret;
 	}
-
+	
 	// / throws an UnsupportedOperationException
 	@Override
 	default boolean isEmpty() {
 		return keySet().isEmpty();
 	}
-
+	
 	// / throws an UnsupportedOperationException
 	@Override
 	default void putAll(Map<? extends K, ? extends V> m) {
@@ -102,13 +102,13 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 			put(e.getKey(), e.getValue());
 		}
 	}
-
+	
 	// / throws an UnsupportedOperationException
 	@Override
 	default int size() {
 		return keySet().size();
 	}
-
+	
 	// / throws an UnsupportedOperationException
 	@Override
 	default Collection<V> values() {

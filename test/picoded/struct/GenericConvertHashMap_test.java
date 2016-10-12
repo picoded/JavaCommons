@@ -12,7 +12,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
 ///
 /// Test Case for picoded.struct.CaseInsensitiveHashMap
 ///
@@ -29,12 +28,12 @@ public class GenericConvertHashMap_test {
 		
 	}
 	
-	@Test 
+	@Test
 	public void getTest() {
 		assertNull(genericConvertHashMap.get("key"));
 	}
 	
-	@Test 
+	@Test
 	public void putTest() {
 		genericConvertHashMap.put("key", "value");
 		assertEquals(1, genericConvertHashMap.size());

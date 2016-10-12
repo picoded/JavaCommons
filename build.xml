@@ -92,13 +92,13 @@
 	<!-- Code Beautifier, used for pre-commit hook -->
 	<target name="src-beautify">
 		<!-- Scan and beautify the code : spaces only -->
-		<exec executable="java">
+		<!--<exec executable="java">
 			<arg value="-cp"/>
 			<arg value="./build-tools/java-formatter/java-formatter-with-dependencies.jar"/>
 			<arg value="Formatter"/>
 			<arg value="./build-config/code-format.opts"/>
 			<arg value="./src"/>
-		</exec>
+		</exec>-->
 		
 		<!-- Scan and beautify the code : spaces only -->
 		<exec executable="java">
@@ -106,7 +106,7 @@
 			<arg value="./build-tools/java-formatter/java-formatter-with-dependencies.jar"/>
 			<arg value="Formatter"/>
 			<arg value="./build-config/code-format.opts"/>
-			<arg value="./test"/>
+			<arg value="./test/picoded/servlet"/>
 		</exec>
 	</target>
 

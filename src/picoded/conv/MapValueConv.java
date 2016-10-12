@@ -1,12 +1,10 @@
 package picoded.conv;
 
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
-
-import picoded.struct.*;
+import java.util.Map;
 
 /// 
 /// Utility conversion class, that helps convert Map values from one type to another
@@ -62,9 +60,8 @@ public class MapValueConv {
 	
 	public static Map<String, Object> fromFullyQualifiedKeys(Map<String, Object> source) {
 		Map<String, Object> finalMap = new HashMap<String, Object>();
-		
-		for (String sourceKey : source.keySet()) {
-			recreateObject(finalMap, sourceKey, source.get(sourceKey));
+		for (Map.Entry<String,Object> sourceKey : source.entrySet()) {
+			recreateObject(finalMap, sourceKey.getKey(), sourceKey.getValue());
 		}
 		
 		return finalMap;
@@ -81,14 +78,13 @@ public class MapValueConv {
 		if (separator.isEmpty()) {
 			separator = ".";
 		}
-		
+		String parentName = "";
 		if (source instanceof List) {
 			List<Object> sourceList = (List<Object>) source;
 			
 			int counter = 0;
 			for (Object obj : sourceList) {
 				if (obj instanceof List) {
-					String parentName = "";
 					if (!rootName.isEmpty()) {
 						parentName = rootName + "[" + counter + "]";
 					}
@@ -97,31 +93,29 @@ public class MapValueConv {
 					
 				} else if (obj instanceof Map) {
 					Map<String, Object> objMap = (Map<String, Object>) obj;
-					;
-					for (String objMapKey : objMap.keySet()) {
-						String parentName = "";
+					for (Map.Entry<String,Object> objMapKey1 : objMap.entrySet()) {
+						parentName = "";
 						if (rootName.isEmpty()) {
-							parentName = objMapKey;
+							parentName = objMapKey1.getKey();
 						} else {
-							parentName = rootName + "[" + counter + "]" + separator + objMapKey;
+							parentName = rootName + "[" + counter + "]" + separator + objMapKey1.getKey();
 						}
-						
-						fullyQualifiedMap.putAll(toFullyQualifiedKeys(objMap.get(objMapKey), parentName, separator));
+						fullyQualifiedMap.putAll(toFullyQualifiedKeys(objMap.get(objMapKey1.getKey()), parentName, separator));
 					}
 					++counter;
 				}
 			}
 		} else if (source instanceof Map) {
 			Map<String, Object> sourceMap = (Map<String, Object>) source;
-			for (String sourceMapKey : sourceMap.keySet()) {
-				String parentName = "";
+			for (Map.Entry<String,Object> sourceMapKey : sourceMap.entrySet()) {
+				parentName = "";
 				if (rootName.isEmpty()) {
-					parentName = sourceMapKey;
+					parentName = sourceMapKey.getKey();
 				} else {
-					parentName = rootName + separator + sourceMapKey;
+					parentName = rootName + separator + sourceMapKey.getKey();
 				}
 				
-				fullyQualifiedMap.putAll(toFullyQualifiedKeys(sourceMap.get(sourceMapKey), parentName, separator));
+				fullyQualifiedMap.putAll(toFullyQualifiedKeys(sourceMapKey.getValue(), parentName, separator));
 			}
 		} else if (source instanceof Number) {
 			fullyQualifiedMap.put(rootName, source);
@@ -135,7 +129,7 @@ public class MapValueConv {
 	@SuppressWarnings("unchecked")
 	private static void recreateObject(Object source, String key, Object value) {
 		if (key.contains("]") && key.contains(".")) {
-			if (key.indexOf("]") < key.indexOf(".")) {
+			if (key.indexOf(']') < key.indexOf('.')) {
 				String[] bracketSplit = key.split("\\[|\\]|\\.");
 				bracketSplit = sanitiseArray(bracketSplit);
 				
@@ -161,7 +155,7 @@ public class MapValueConv {
 							sourceList.remove(index);
 							sourceList.add(index, newMap);
 							
-							key = key.substring(key.indexOf(".") + 1, key.length());
+							key = key.substring(key.indexOf('.') + 1, key.length());
 							recreateObject(newMap, key, value);
 						} else if (stringIsNumber(bracketSplit[1])) { //put list [1, 0, secondLayer0]
 							Object retrievedValue = sourceList.get(index);
@@ -174,7 +168,7 @@ public class MapValueConv {
 							sourceList.remove(index);
 							sourceList.add(index, newList);
 							
-							key = key.substring(key.indexOf("]") + 1, key.length());
+							key = key.substring(key.indexOf(']') + 1, key.length());
 							recreateObject(newList, key, value);
 						}
 					} else {

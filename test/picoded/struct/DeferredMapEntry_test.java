@@ -28,44 +28,54 @@ public class DeferredMapEntry_test {
 		
 	}
 	
-	@Test
+	@Test 
 	public void getKeyTest() {
 		assertEquals("key1", deferredMapEntry.getKey());
 	}
 	
-	@Test
+	@Test 
 	public void getValueTest() {
 		assertEquals("value_one", deferredMapEntry.getValue());
 	}
 	
-	@Test
+	@Test 
 	public void setValueTest() {
 		deferredMapEntry.setValue("value_new");
 		assertEquals("value_new", deferredMapEntry.getValue());
 	}
 	
-	@Test
+	@Test 
 	public void equalsTest() {
 		assertTrue(deferredMapEntry.equals(deferredMapEntry));
+		assertFalse(deferredMapEntry.equals((key = null)));
+		assertFalse(deferredMapEntry.equals((key = "")));
+		DeferredMapEntry<String, String> temp = new DeferredMapEntry<String, String>(map, key);
+		assertFalse(deferredMapEntry.equals(temp));
+		temp = new DeferredMapEntry<String, String>(null, key);
+		assertFalse(deferredMapEntry.equals(temp));
+		temp = new DeferredMapEntry<String, String>(map, null);
+		assertFalse(deferredMapEntry.equals(temp));
+		temp = new DeferredMapEntry<String, String>(new HashMap<String, String>(), new String());
+		assertFalse(deferredMapEntry.equals(temp));
 	}
 	
-	@Test
+	@Test 
 	public void equalsWithNullTest() {
 		assertFalse(deferredMapEntry.equals(null));
 	}
 	
-	@Test
+	@Test 
 	public void equalsWithDifferentClassObjectTest() {
 		assertFalse(deferredMapEntry.equals(map));
 	}
 	
-	@Test
+	@Test 
 	public void equalsWithDifferentObjectTest() {
 		DeferredMapEntry<String, String> temp = new DeferredMapEntry<String, String>(map, key);
 		assertTrue(deferredMapEntry.equals(temp));
 	}
 	
-	@Test
+	@Test 
 	public void hashCodeTest() {
 		deferredMapEntry.hashCode();
 	}

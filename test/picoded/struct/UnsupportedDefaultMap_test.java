@@ -105,9 +105,7 @@ public class UnsupportedDefaultMap_test {
 		assertFalse(unsupportedDefaultMap.containsValue("value"));
 		
 		set = new HashSet<>();
-		map = new HashMap<>();
-		map.put(null, null);
-		set.addAll(map.entrySet());
+		set.addAll(null);
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertFalse(unsupportedDefaultMap.containsValue(null));
 		
@@ -123,7 +121,14 @@ public class UnsupportedDefaultMap_test {
 		map.put("key", "value");
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMap.containsValue("value"));
+		assertTrue(unsupportedDefaultMap.containsValue("value"));
+		
+		set = new HashSet<>();
+		map = new HashMap<>();
+		map.put("key", null);
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertTrue(unsupportedDefaultMap.containsValue(null));
 
 	}
 	

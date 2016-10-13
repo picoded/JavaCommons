@@ -7,7 +7,6 @@ import javax.servlet.*;
 
 // Exceptions used
 import java.lang.RuntimeException;
-import java.lang.IllegalArgumentException;
 import java.io.IOException;
 
 // Objects used
@@ -18,14 +17,11 @@ import java.io.PrintWriter;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.net.URLDecoder;
 
 import picoded.conv.ConvertJSON;
 import picoded.file.FileUtil;
 import picoded.enums.HttpRequestType;
-import picoded.enums.EmptyArrays;
+import picoded.enums.EmptyArray;
 import picoded.struct.HashMapList;
 
 // Sub modules useds
@@ -87,6 +83,8 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	// Static type variables declaration
 	//-------------------------------------------
+	
+	private static final long serialVersionUID = 1L;
 	
 	/// RESTBuilder HttpRequestType enum access
 	public static class RequestTypeSet extends picoded.enums.HttpRequestType.HttpRequestTypeSet {
@@ -280,7 +278,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		String raw = requestWildcardUri();
 		
 		if (raw == null || raw.isEmpty()) {
-			return EmptyArrays.STRING;
+			return EmptyArray.STRING;
 		}
 		
 		if (raw.startsWith("/") || raw.startsWith("\\")) {

@@ -12,6 +12,7 @@ import org.junit.Test;
 
 public class ProxyGenericConvertMap_test {
 	private ProxyGenericConvertMap<String, String> proxyGenericConvertMap = null;
+	
 	@Before
 	public void setUp() {
 		proxyGenericConvertMap = new ProxyGenericConvertMap<>();
@@ -22,7 +23,7 @@ public class ProxyGenericConvertMap_test {
 		
 	}
 	
-	@Test 
+	@Test
 	public void getConstructorTest() {
 		Map<String, String> map = new HashMap<>();
 		proxyGenericConvertMap = new ProxyGenericConvertMap<>(map);

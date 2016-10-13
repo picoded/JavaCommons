@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 public class UnsupportedDefaultList_test {
-
+	
 	@SuppressWarnings("unchecked")
 	UnsupportedDefaultList<String> unsupportedDefaultList = mock(UnsupportedDefaultList.class, CALLS_REAL_METHODS);
 	
@@ -29,19 +29,19 @@ public class UnsupportedDefaultList_test {
 		
 	}
 	
-	@Test (expected = UnsupportedOperationException.class)
+	@Test(expected = UnsupportedOperationException.class)
 	public void getTest() {
 		when(unsupportedDefaultList.get("key")).thenCallRealMethod();
 		unsupportedDefaultList.get("key");
 	}
 	
-	@Test (expected = UnsupportedOperationException.class)
+	@Test(expected = UnsupportedOperationException.class)
 	public void addTest() {
 		doCallRealMethod().when(unsupportedDefaultList).add(1, "value");
 		unsupportedDefaultList.add(1, "value");
 	}
 	
-	@Test (expected = UnsupportedOperationException.class)
+	@Test(expected = UnsupportedOperationException.class)
 	public void removeTest() {
 		when(unsupportedDefaultList.remove("key")).thenCallRealMethod();
 		unsupportedDefaultList.remove("key");

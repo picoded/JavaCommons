@@ -14,6 +14,7 @@ import picoded.conv.ConvertJSON;
 public class ProxyGenericConvertList_test {
 	
 	private ProxyGenericConvertList<String> proxyGenericConvertList = null;
+	
 	@Before
 	public void setUp() {
 	}
@@ -23,7 +24,7 @@ public class ProxyGenericConvertList_test {
 		
 	}
 	
-	@Test 
+	@Test
 	public void getConstructorSecondTest() {
 		List<String> list = new ArrayList<String>();
 		list.add("me");
@@ -31,7 +32,7 @@ public class ProxyGenericConvertList_test {
 		assertEquals("me", proxyGenericConvertList.get(0));
 	}
 	
-	@Test 
+	@Test
 	public void toStringTest() {
 		List<String> list = new ArrayList<String>();
 		list.add("me");
@@ -39,7 +40,7 @@ public class ProxyGenericConvertList_test {
 		assertEquals(ConvertJSON.fromObject(list), proxyGenericConvertList.toString());
 	}
 	
-	@Test 
+	@Test
 	public void ensureTest() {
 		List<String> list = new ArrayList<String>();
 		list.add("me");
@@ -47,7 +48,7 @@ public class ProxyGenericConvertList_test {
 		assertEquals(list.get(0), temp.get(0));
 	}
 	
-	@Test 
+	@Test
 	public void ensureIfConditionTest() {
 		List<String> list = new ArrayList<String>();
 		list.add("me");

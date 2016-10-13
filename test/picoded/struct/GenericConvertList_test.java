@@ -36,6 +36,7 @@ public class GenericConvertList_test {
 	
 	@Test 
 	public void getSilentTest() {
+		assertNull(genericConvertList.getSilent(-1));
 		assertNull(genericConvertList.getSilent(0));
 		assertNull(genericConvertList.getSilent(1));
 		assertNull(genericConvertList.getSilent(2));

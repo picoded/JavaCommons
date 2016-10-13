@@ -58,6 +58,8 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	//--------------------------------------------------------------------------------------------------
 	
 	default E getSilent(int index) {
+		System.out.println("index>>>>>>>>>>>>>>>>"+index);
+		System.out.println("this.size()>>>>>>>>>>>>>>>>"+this.size());
 		if (index < this.size() && index >= 0) {
 			return get(index);
 		}

@@ -46,17 +46,64 @@ public class DeferredMapEntry_test {
 	
 	@Test 
 	public void equalsTest() {
+		
 		assertTrue(deferredMapEntry.equals(deferredMapEntry));
 		assertFalse(deferredMapEntry.equals((key = null)));
 		assertFalse(deferredMapEntry.equals((key = "")));
+		
 		DeferredMapEntry<String, String> temp = new DeferredMapEntry<String, String>(map, key);
 		assertFalse(deferredMapEntry.equals(temp));
 		temp = new DeferredMapEntry<String, String>(null, key);
+		
+		map.put(null, null);
+		temp = new DeferredMapEntry<String, String>(map, key);
 		assertFalse(deferredMapEntry.equals(temp));
-		temp = new DeferredMapEntry<String, String>(map, null);
+		
+		map.put(key, null);
+		temp = new DeferredMapEntry<String, String>(map, key);
 		assertFalse(deferredMapEntry.equals(temp));
-		temp = new DeferredMapEntry<String, String>(new HashMap<String, String>(), new String());
+		
+		
+		map.put(null, key);
+		temp = new DeferredMapEntry<String, String>(map, key);
 		assertFalse(deferredMapEntry.equals(temp));
+		
+		map.put("", "");
+		temp = new DeferredMapEntry<String, String>(map, key);
+		assertFalse(deferredMapEntry.equals(temp));
+		
+		map.put(key, "");
+		temp = new DeferredMapEntry<String, String>(map, key);
+		assertFalse(deferredMapEntry.equals(temp));
+		
+		map.put("", key);
+		temp = new DeferredMapEntry<String, String>(map, key);
+		assertFalse(deferredMapEntry.equals(temp));
+		
+		map.put(null, null);
+		temp = new DeferredMapEntry<String, String>(map, key);
+		assertFalse(temp.equals(deferredMapEntry));
+		
+		map.put(key, null);
+		temp = new DeferredMapEntry<String, String>(map, key);
+		assertFalse(temp.equals(deferredMapEntry));
+		
+		
+		map.put(null, key);
+		temp = new DeferredMapEntry<String, String>(map, key);
+		assertFalse(temp.equals(deferredMapEntry));
+		
+		map.put("", "");
+		temp = new DeferredMapEntry<String, String>(map, key);
+		assertFalse(temp.equals(deferredMapEntry));
+		
+		map.put(key, "");
+		temp = new DeferredMapEntry<String, String>(map, key);
+		assertFalse(temp.equals(deferredMapEntry));
+		
+		map.put("", key);
+		temp = new DeferredMapEntry<String, String>(map, key);
+		assertFalse(temp.equals(deferredMapEntry));
 	}
 	
 	@Test 

@@ -18,7 +18,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -39,7 +42,7 @@ import picoded.enums.HttpRequestType;
 public class CorePage_test {
 	
 	private CorePage corePage;
-	private CorePage corePageSpy = mock(CorePage.class);
+	private CorePage corePageMock = mock(CorePage.class);
 	
 	@Before
 	public void setUp() {
@@ -72,10 +75,39 @@ public class CorePage_test {
 	}
 	
 	@Test
+	public void requestHeaderMapValidTest() throws ServletException {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		List<String> headerList = new ArrayList<String>();
+		headerList.add("header_1");
+		headerList.add("header_2");
+		when(request.getHeaderNames()).thenReturn(Collections.enumeration(headerList));
+		CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
+		assertNotNull(corePageLocal.requestHeaderMap());
+	}
+	
+	@Test
+	public void requestHeaderMapAlternatePathTest() throws ServletException {
+		Map<String, String[]> map = new HashMap<>();
+		map.put("arg", new String[] { "a", "b" });
+		corePage._requestHeaderMap = map;
+		assertNotNull(corePage.requestHeaderMap());
+	}
+	
+	@Test
 	public void processChainTest() throws ServletException, IOException {
 		ServletOutputStream mockStream = mock(ServletOutputStream.class);
 		corePage.requestType = HttpRequestType.GET;
 		corePage.responseOutputStream = mockStream;
+		assertTrue(corePage.processChain());
+	}
+	
+	@Test
+	public void processChainJSONPathTest() throws ServletException, IOException {
+		ServletOutputStream mockStream = mock(ServletOutputStream.class);
+		corePage.requestType = HttpRequestType.GET;
+		corePage.responseOutputStream = mockStream;
+		corePage.setJsonRequestFlag("*");
 		assertTrue(corePage.processChain());
 	}
 	
@@ -118,32 +150,32 @@ public class CorePage_test {
 	
 	@Test
 	public void isGET() throws IOException, ServletException {
-		when(corePageSpy.isGET()).thenReturn(true);
-		assertTrue(corePageSpy.isGET());
+		when(corePageMock.isGET()).thenReturn(true);
+		assertTrue(corePageMock.isGET());
 	}
 	
 	@Test
 	public void isOPTIONTest() throws IOException, ServletException {
-		when(corePageSpy.isOPTION()).thenReturn(true);
-		assertTrue(corePageSpy.isOPTION());
+		when(corePageMock.isOPTION()).thenReturn(true);
+		assertTrue(corePageMock.isOPTION());
 	}
 	
 	@Test
 	public void isPOSTTest() throws IOException, ServletException {
-		when(corePageSpy.isPOST()).thenReturn(true);
-		assertTrue(corePageSpy.isPOST());
+		when(corePageMock.isPOST()).thenReturn(true);
+		assertTrue(corePageMock.isPOST());
 	}
 	
 	@Test
 	public void isPUTTest() throws IOException, ServletException {
-		when(corePageSpy.isPUT()).thenReturn(true);
-		assertTrue(corePageSpy.isPUT());
+		when(corePageMock.isPUT()).thenReturn(true);
+		assertTrue(corePageMock.isPUT());
 	}
 	
 	@Test
 	public void isDELETETest() throws IOException, ServletException {
-		when(corePageSpy.isDELETE()).thenReturn(true);
-		assertTrue(corePageSpy.isDELETE());
+		when(corePageMock.isDELETE()).thenReturn(true);
+		assertTrue(corePageMock.isDELETE());
 	}
 	
 	@Test
@@ -158,13 +190,20 @@ public class CorePage_test {
 	}
 	
 	@Test
-	public void getWriterTest() throws IOException {
+	public void getWriterTest() throws IOException, ServletException {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
-		when(corePageSpy.getOutputStream()).thenReturn(mockOutput);
-		//assertNotNull(testPage.getWriter());
-		//can not be NOT NULL due to Servlet where request and response is NULL
-		assertNull(corePageSpy.getWriter());
+		when(response.getOutputStream()).thenReturn(mockOutput);
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
+		assertNotNull(corePageLocal.getWriter());
+	}
+	
+	@Test
+	public void getWriterNullTest() throws IOException {
+		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
+		when(corePageMock.getOutputStream()).thenReturn(mockOutput);
+		assertNull(corePageMock.getWriter());
 	}
 	
 	@Test
@@ -173,15 +212,23 @@ public class CorePage_test {
 	}
 	
 	@Test
-	public void getOutputStreamTest() throws IOException, ServletException {
+	public void getOutputStreamValidTest() throws IOException, ServletException {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
 		when(response.getOutputStream()).thenReturn(mockOutput);
 		HttpServletRequest request = mock(HttpServletRequest.class);
-		corePageSpy.doGet(request, response);
-		//assertNotNull(testPage.getOutputStream());
-		//can not be NOT NULL due to Servlet where request and response is NULL
-		assertNull(corePageSpy.getOutputStream());
+		CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
+		assertNotNull(corePageLocal.getOutputStream());
+	}
+	
+	@Test
+	public void getOutputStreamNullTest() throws IOException, ServletException {
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
+		when(response.getOutputStream()).thenReturn(mockOutput);
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		corePageMock.doGet(request, response);
+		assertNull(corePageMock.getOutputStream());
 	}
 	
 	@Test
@@ -195,36 +242,47 @@ public class CorePage_test {
 	}
 	
 	@Test
-	public void getServletContextURITest() {
+	public void getServletContextURITest() throws ServletException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
-		when(corePageSpy.getHttpServletRequest()).thenReturn(request);
+		when(corePageMock.getHttpServletRequest()).thenReturn(request);
 		when(request.getServletPath()).thenReturn("/");
-		//can not be NOT NULL due to Servlet where request and response is NULL
-		assertNull(corePageSpy.getServletContextURI());
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
+		assertNotNull(corePageLocal.getServletContextURI());
 	}
 	
 	@Test
 	public void getServletContextURIInvalidTest() {
-		assertNull(corePageSpy.getServletContextURI());
+		assertNull(corePageMock.getServletContextURI());
 	}
 	
-	//@Test //can not be tested due to Servlet where request and response is NULL
+	@Test(expected = RuntimeException.class)
+	public void getServletContextURIExceptionTest() {
+		assertNull(corePage.getServletContextURI());
+	}
+	
 	public void getParameterTest() {
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		Map<String, String[]> map = new HashMap<String, String[]>();
 		map.put("user", new String[] { "me" });
 		when(httpRequest.getParameterMap()).thenReturn(map);
-		assertEquals("me", corePageSpy.getParameter("user"));
-	}
-	
-	//@Test //can not be tested due to Servlet where request and response is NULL
-	public void getParameterNULLTest() {
-		assertNull(corePage.getParameter(null));
+		assertEquals("me", corePageMock.getParameter("user"));
 	}
 	
 	@Test
-	public void sendRedirectTest() {
-		corePage.sendRedirect("/home");
+	public void getParameterNULLTest() {
+		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		Map<String, String[]> map = new HashMap<String, String[]>();
+		when(httpRequest.getParameterMap()).thenReturn(map);
+		assertNull(corePageMock.getParameter(""));
+	}
+	
+	@Test
+	public void sendRedirectTest() throws ServletException {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		CorePage corePageLocal = corePage.setupInstance(HttpRequestType.GET, request, response);
+		corePageLocal.sendRedirect("/home");
 	}
 	
 	@Test
@@ -373,7 +431,7 @@ public class CorePage_test {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
 		when(response.getOutputStream()).thenReturn(mockOutput);
-		corePageSpy.doGet(request, response);
+		corePageMock.doGet(request, response);
 	}
 	
 	@Test
@@ -382,7 +440,7 @@ public class CorePage_test {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
 		when(response.getOutputStream()).thenReturn(mockOutput);
-		corePageSpy.doPost(request, response);
+		corePageMock.doPost(request, response);
 	}
 	
 	@Test
@@ -391,7 +449,7 @@ public class CorePage_test {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
 		when(response.getOutputStream()).thenReturn(mockOutput);
-		corePageSpy.doPut(request, response);
+		corePageMock.doPut(request, response);
 	}
 	
 	@Test
@@ -400,7 +458,7 @@ public class CorePage_test {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
 		when(response.getOutputStream()).thenReturn(mockOutput);
-		corePageSpy.doDelete(request, response);
+		corePageMock.doDelete(request, response);
 	}
 	
 	@Test
@@ -409,18 +467,30 @@ public class CorePage_test {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
 		when(response.getOutputStream()).thenReturn(mockOutput);
-		corePageSpy.doOptions(request, response);
+		corePageMock.doOptions(request, response);
+	}
+	
+	@Test(expected = ServletException.class)
+	public void doOptionsExceptionTest() throws ServletException, IOException {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		corePageMock.doOptions(request, response);
 	}
 	
 	@Test
 	public void contextInitializedTest() {
 		ServletContextEvent servletContextEvent = new ServletContextEvent(mock(ServletContext.class));
-		corePageSpy.contextInitialized(servletContextEvent);
+		corePage.contextInitialized(servletContextEvent);
 	}
 	
 	@Test
 	public void contextDestroyedTest() {
 		ServletContextEvent servletContextEvent = new ServletContextEvent(mock(ServletContext.class));
 		corePage.contextDestroyed(servletContextEvent);
+	}
+	
+	@Test(expected = Exception.class)
+	public void doExceptionTest() throws Exception {
+		corePage.doException(new Exception("CorePage Exception"));
 	}
 }

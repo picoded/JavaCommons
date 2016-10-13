@@ -20,44 +20,32 @@ import java.util.Set;
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
 public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
-
+	
 	// Critical functions that need to over-ride, to support Map
 	// -------------------------------------------------------------------
 
 	/// throws an UnsupportedOperationException
 	@Override
 	default V get(Object key) {
-		for (Map.Entry<K, V> entry : entrySet()) {
-			V val = entry.getValue();
-			if (key == null) {
-				if (val == null) {
-					return val;
-				}
-			} else {
-				if (key.equals(val)) {
-					return val;
-				}
-			}
-		}
-		return null;
+		throw new UnsupportedOperationException("function not supported");
 	}
 
 	/// throws an UnsupportedOperationException
 	@Override
 	default V put(K key, V value) {
-		return put(key, value);
+		throw new UnsupportedOperationException("function not supported");
 	}
 
 	/// throws an UnsupportedOperationException
 	@Override
 	default V remove(Object key) {
-		return remove(key);
+		throw new UnsupportedOperationException("function not supported");
 	}
 
 	/// throws an UnsupportedOperationException
 	@Override
 	default Set<K> keySet() {
-		return keySet();
+		throw new UnsupportedOperationException("function not supported");
 	}
 
 	@Override

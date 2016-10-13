@@ -149,33 +149,33 @@ public class CorePage_test {
 	}
 	
 	@Test
-	public void isGET() throws IOException, ServletException {
-		when(corePageMock.isGET()).thenReturn(true);
-		assertTrue(corePageMock.isGET());
+	public void isGET() {
+		corePage.requestType = HttpRequestType.GET;
+		assertTrue(corePage.isGET());
 	}
 	
 	@Test
-	public void isOPTIONTest() throws IOException, ServletException {
-		when(corePageMock.isOPTION()).thenReturn(true);
-		assertTrue(corePageMock.isOPTION());
+	public void isOPTIONTest() {
+		corePage.requestType = HttpRequestType.OPTION;
+		assertTrue(corePage.isOPTION());
 	}
 	
 	@Test
-	public void isPOSTTest() throws IOException, ServletException {
-		when(corePageMock.isPOST()).thenReturn(true);
-		assertTrue(corePageMock.isPOST());
+	public void isPOSTTest() {
+		corePage.requestType = HttpRequestType.POST;
+		assertTrue(corePage.isPOST());
 	}
 	
 	@Test
-	public void isPUTTest() throws IOException, ServletException {
-		when(corePageMock.isPUT()).thenReturn(true);
-		assertTrue(corePageMock.isPUT());
+	public void isPUTTest() {
+		corePage.requestType = HttpRequestType.PUT;
+		assertTrue(corePage.isPUT());
 	}
 	
 	@Test
-	public void isDELETETest() throws IOException, ServletException {
-		when(corePageMock.isDELETE()).thenReturn(true);
-		assertTrue(corePageMock.isDELETE());
+	public void isDELETETest() {
+		corePage.requestType = HttpRequestType.DELETE;
+		assertTrue(corePage.isDELETE());
 	}
 	
 	@Test
@@ -233,6 +233,31 @@ public class CorePage_test {
 	
 	@Test
 	public void getContextPathTest() {
+		corePage._contextPath = "/root";
+		assertEquals("/root", corePage.getContextPath());
+	}
+	
+	@Test
+	public void getContextPathRequestObjectNotNullTest() {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getServletContext()).thenReturn(mock(ServletContext.class));
+		when(request.getServletContext().getRealPath("/")).thenReturn("/root");
+		corePage.httpRequest = request;
+		assertEquals("/root/", corePage.getContextPath());
+	}
+	
+	@Test
+	public void getContextPathThroughServletContextEventTest() {
+		ServletContextEvent servletContextEvent = mock(ServletContextEvent.class);
+		ServletContext servletContext = mock(ServletContext.class);
+		when(servletContextEvent.getServletContext()).thenReturn(servletContext);
+		when(servletContext.getRealPath("/")).thenReturn("/home");
+		corePage._servletContextEvent = servletContextEvent;
+		assertEquals("/home/", corePage.getContextPath());
+	}
+	
+	@Test
+	public void getContextPathExceptionTest() {
 		assertNotNull(corePage.getContextPath());
 	}
 	

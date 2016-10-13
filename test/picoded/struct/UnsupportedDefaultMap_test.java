@@ -110,7 +110,7 @@ public class UnsupportedDefaultMap_test {
 		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
 		unsupportedDefaultMap.put("key", "value");
 		when(unsupportedDefaultMap.containsValue("value")).thenCallRealMethod();
-		assertTrue(unsupportedDefaultMap.containsValue("value"));
+		assertFalse(unsupportedDefaultMap.containsValue("value"));
 		
 		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
 		unsupportedDefaultMap.put("key", "value");

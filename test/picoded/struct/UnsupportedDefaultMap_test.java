@@ -4,7 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
-
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
@@ -19,11 +18,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("unchecked")
 public class UnsupportedDefaultMap_test {
 	
-	@SuppressWarnings("unchecked")
-	UnsupportedDefaultMap<String, String> unsupportedDefaultMapForVoidMethod = mock(UnsupportedDefaultMap.class,
-		CALLS_REAL_METHODS);
+	UnsupportedDefaultMap<String, String> unsupportedDefaultMapForVoidMethod = mock(UnsupportedDefaultMap.class, CALLS_REAL_METHODS);
+	
 	UnsupportedDefaultMap<String, String> unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
 	
 	@Before
@@ -36,51 +35,51 @@ public class UnsupportedDefaultMap_test {
 		
 	}
 	
-	@Test(expected = UnsupportedOperationException.class)
+	@Test (expected = UnsupportedOperationException.class)
 	public void getTest() {
 		when(unsupportedDefaultMap.get("key")).thenCallRealMethod();
 		unsupportedDefaultMap.get("key");
 	}
 	
-	@Test(expected = UnsupportedOperationException.class)
+	@Test (expected = UnsupportedOperationException.class)
 	public void putTest() {
 		when(unsupportedDefaultMap.put("key", "value")).thenCallRealMethod();
 		unsupportedDefaultMap.put("key", "value");
 	}
 	
-	@Test(expected = UnsupportedOperationException.class)
+	@Test (expected = UnsupportedOperationException.class)
 	public void removeTest() {
 		when(unsupportedDefaultMap.remove("key")).thenCallRealMethod();
 		unsupportedDefaultMap.remove("key");
 	}
 	
-	@Test(expected = UnsupportedOperationException.class)
+	@Test (expected = UnsupportedOperationException.class)
 	public void keySetTest() {
 		when(unsupportedDefaultMap.keySet()).thenCallRealMethod();
 		unsupportedDefaultMap.keySet();
 	}
 	
-	@Test(expected = UnsupportedOperationException.class)
+	@Test (expected = UnsupportedOperationException.class)
 	public void clearTest() {
 		unsupportedDefaultMapForVoidMethod.clear();
 	}
 	
-	@Test
+	@Test 
 	public void clearValidTest() {
 		Set<String> set = new HashSet<>();
 		set.add("key1");
 		set.add("key2");
 		when(unsupportedDefaultMap.keySet()).thenReturn(set);
-		doCallRealMethod().when(unsupportedDefaultMap).clear();
+		doCallRealMethod().when(unsupportedDefaultMap).clear(); 
 		unsupportedDefaultMap.clear();
 	}
 	
-	@Test(expected = UnsupportedOperationException.class)
+	@Test (expected = UnsupportedOperationException.class)
 	public void containsKeyTest() {
 		unsupportedDefaultMapForVoidMethod.containsKey("key");
 	}
 	
-	@Test
+	@Test 
 	public void containsKeyValidTest() {
 		when(unsupportedDefaultMap.containsKey("key1")).thenCallRealMethod();
 		Set<String> set = new HashSet<>();
@@ -90,7 +89,7 @@ public class UnsupportedDefaultMap_test {
 		assertTrue(unsupportedDefaultMap.containsKey("key1"));
 	}
 	
-	@Test(expected = UnsupportedOperationException.class)
+	@Test (expected = UnsupportedOperationException.class)
 	public void containsValueExceptionTest() {
 		when(unsupportedDefaultMap.containsValue("value")).thenCallRealMethod();
 		when(unsupportedDefaultMap.entrySet()).thenCallRealMethod();
@@ -98,13 +97,37 @@ public class UnsupportedDefaultMap_test {
 		assertFalse(unsupportedDefaultMap.containsValue("value"));
 	}
 	
-	@Test
+	@Test 
 	public void containsValueTest() {
+		
+		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
+		unsupportedDefaultMap.put(null, null);
+		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
+		assertFalse(unsupportedDefaultMap.containsValue(null));
+		
+		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
+		unsupportedDefaultMap.put("", "");
 		when(unsupportedDefaultMap.containsValue("value")).thenCallRealMethod();
 		assertFalse(unsupportedDefaultMap.containsValue("value"));
+		
+		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
+		unsupportedDefaultMap.put("key", "value");
+		when(unsupportedDefaultMap.containsValue("value")).thenCallRealMethod();
+		assertTrue(unsupportedDefaultMap.containsValue("value"));
+		
+		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
+		unsupportedDefaultMap.put("key", "");
+		when(unsupportedDefaultMap.containsValue("")).thenCallRealMethod();
+		assertTrue(unsupportedDefaultMap.containsValue(""));
+		
+		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
+		unsupportedDefaultMap.put("key", "value1");
+		when(unsupportedDefaultMap.containsValue("value")).thenCallRealMethod();
+		assertTrue(unsupportedDefaultMap.containsValue("value"));
+
 	}
 	
-	@Test
+	@Test 
 	public void containsValueValidTest() {
 		when(unsupportedDefaultMap.containsValue("value1")).thenCallRealMethod();
 		Set<Map.Entry<String, String>> set = new HashSet<>();
@@ -116,7 +139,7 @@ public class UnsupportedDefaultMap_test {
 		assertTrue(unsupportedDefaultMap.containsValue("value1"));
 	}
 	
-	@Test
+	@Test 
 	public void containsValueValidForNullTest() {
 		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
 		Set<Map.Entry<String, String>> set = new HashSet<>();
@@ -128,14 +151,14 @@ public class UnsupportedDefaultMap_test {
 		assertTrue(unsupportedDefaultMap.containsValue(null));
 	}
 	
-	@Test(expected = UnsupportedOperationException.class)
+	@Test (expected = UnsupportedOperationException.class)
 	public void entrySetTest() {
 		when(unsupportedDefaultMap.entrySet()).thenCallRealMethod();
 		when(unsupportedDefaultMap.keySet()).thenCallRealMethod();
 		unsupportedDefaultMap.entrySet();
 	}
 	
-	@Test
+	@Test 
 	public void entrySetValidTest() {
 		when(unsupportedDefaultMap.entrySet()).thenCallRealMethod();
 		Set<String> set = new HashSet<>();
@@ -145,12 +168,12 @@ public class UnsupportedDefaultMap_test {
 		assertNotNull(unsupportedDefaultMap.entrySet());
 	}
 	
-	@Test(expected = UnsupportedOperationException.class)
+	@Test (expected = UnsupportedOperationException.class)
 	public void isEmptyTest() {
 		unsupportedDefaultMapForVoidMethod.isEmpty();
 	}
 	
-	@Test
+	@Test 
 	public void isEmptyTrueTest() {
 		when(unsupportedDefaultMap.isEmpty()).thenCallRealMethod();
 		Set<String> set = new HashSet<>();
@@ -158,7 +181,7 @@ public class UnsupportedDefaultMap_test {
 		assertTrue(unsupportedDefaultMap.isEmpty());
 	}
 	
-	@Test
+	@Test 
 	public void isEmptyFalseTest() {
 		when(unsupportedDefaultMap.isEmpty()).thenCallRealMethod();
 		Set<String> set = new HashSet<>();
@@ -167,14 +190,14 @@ public class UnsupportedDefaultMap_test {
 		assertFalse(unsupportedDefaultMap.isEmpty());
 	}
 	
-	@Test(expected = java.lang.UnsupportedOperationException.class)
+	@Test (expected = java.lang.UnsupportedOperationException.class)
 	public void putAllTest() {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("my_key", "my_value");
 		unsupportedDefaultMapForVoidMethod.putAll(map);
 	}
 	
-	@Test
+	@Test 
 	public void putAllValidTest() {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("my_key", "my_value");
@@ -182,12 +205,12 @@ public class UnsupportedDefaultMap_test {
 		unsupportedDefaultMap.putAll(map);
 	}
 	
-	@Test(expected = UnsupportedOperationException.class)
+	@Test (expected = UnsupportedOperationException.class)
 	public void sizeTest() {
 		unsupportedDefaultMapForVoidMethod.size();
 	}
 	
-	@Test
+	@Test 
 	public void sizeValidTest() {
 		when(unsupportedDefaultMap.size()).thenCallRealMethod();
 		Set<String> set = new HashSet<>();
@@ -196,12 +219,12 @@ public class UnsupportedDefaultMap_test {
 		assertEquals(1, unsupportedDefaultMap.size());
 	}
 	
-	@Test(expected = UnsupportedOperationException.class)
+	@Test (expected = UnsupportedOperationException.class)
 	public void valuesTest() {
 		unsupportedDefaultMapForVoidMethod.values();
 	}
 	
-	@Test
+	@Test 
 	public void valuesValidTest() {
 		Set<Map.Entry<String, String>> set = new HashSet<>();
 		Map<String, String> map = new HashMap<>();

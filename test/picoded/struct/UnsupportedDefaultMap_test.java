@@ -123,7 +123,7 @@ public class UnsupportedDefaultMap_test {
 		map.put("key", null);
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertTrue(unsupportedDefaultMap.containsValue(null));
+		assertFalse(unsupportedDefaultMap.containsValue(null));
 		
 		set = new HashSet<>();
 		map = new HashMap<>();

@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doReturn;
@@ -39,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import picoded.conv.ConvertJSON;
+import picoded.enums.EmptyArray;
 import picoded.enums.HttpRequestType;
 
 public class CorePage_test {
@@ -376,6 +377,15 @@ public class CorePage_test {
 		corePageLocal.sendRedirect("/home");
 	}
 	
+	@Test(expected = RuntimeException.class)
+	public void sendRedirectExceptionTest() throws ServletException, IOException {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		CorePage corePageLocal = corePage.setupInstance(HttpRequestType.GET, request, response);
+		doThrow(IOException.class).when(response).sendRedirect("/home");
+		corePageLocal.sendRedirect("/home");
+	}
+	
 	@Test
 	public void doAuthTest() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -696,5 +706,61 @@ public class CorePage_test {
 		corePage.httpRequest = request;
 		when(request.getPathInfo()).thenReturn("/home");
 		assertEquals("\\home", corePage.requestWildcardUri());
+	}
+	
+	@Test
+	public void requestWildcardUriExceptionTest() {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		corePage.httpRequest = request;
+		when(request.getPathInfo()).thenThrow(Exception.class);
+		assertNull(corePage.requestWildcardUri());
+	}
+	
+	@Test
+	public void requestWildcardUriArrayTest() {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		corePage.httpRequest = request;
+		assertArrayEquals(EmptyArray.STRING, corePage.requestWildcardUriArray());
+	}
+	
+	@Test
+	public void requestWildcardUriArrayNotEmptyTest() {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getPathInfo()).thenReturn("/");
+		corePage.httpRequest = request;
+		assertArrayEquals(new String[] { "" }, corePage.requestWildcardUriArray());
+	}
+	
+	@Test
+	public void requestWildcardUriArrayValidPathTest() {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getPathInfo()).thenReturn("/home/");
+		corePage.httpRequest = request;
+		assertArrayEquals(new String[] { "home" }, corePage.requestWildcardUriArray());
+	}
+	
+	@Test(expected = ServletException.class)
+	public void setupInstanceExceptionTest() throws ServletException, IOException {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		List<String> headerList = new ArrayList<String>();
+		headerList.add("header_1");
+		headerList.add("header_2");
+		when(request.getHeaderNames()).thenReturn(Collections.enumeration(headerList));
+		when(response.getOutputStream()).thenThrow(Exception.class);
+		corePage.setupInstance(HttpRequestType.GET, request, response);
+	}
+	
+	@Test
+	public void setupInstance2paramsTest() throws ServletException {
+		Map<String, String[]> reqParam = new HashMap<String, String[]>();
+		assertNotNull(corePage.setupInstance(HttpRequestType.GET, reqParam));
+	}
+	
+	@Test
+	public void setupInstance3paramsTest() throws ServletException {
+		Map<String, String[]> reqParam = new HashMap<String, String[]>();
+		Map<String, Cookie[]> reqCookieMap = new HashMap<String, Cookie[]>();
+		assertNotNull(corePage.setupInstance(HttpRequestType.GET, reqParam, reqCookieMap));
 	}
 }

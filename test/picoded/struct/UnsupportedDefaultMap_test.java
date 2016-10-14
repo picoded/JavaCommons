@@ -103,10 +103,27 @@ public class UnsupportedDefaultMap_test {
 		assertFalse(unsupportedDefaultMap.containsValue("value"));
 		
 		when(unsupportedDefaultMap.entrySet()).thenReturn(null);
+		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
+		unsupportedDefaultMap.putAll(null);
 		assertFalse(unsupportedDefaultMap.containsValue(null));
+		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
 		
 		when(unsupportedDefaultMap.entrySet()).thenReturn(new HashSet<>());
 		assertFalse(unsupportedDefaultMap.containsValue(""));
+		
+		set = new HashSet<>();
+		map = new HashMap<>();
+		map.put("key", "value");
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertFalse(unsupportedDefaultMap.containsValue(null));
+		
+		set = new HashSet<>();
+		map = new HashMap<>();
+		map.put("key", null);
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertTrue(unsupportedDefaultMap.containsValue(null));
 		
 		set = new HashSet<>();
 		map = new HashMap<>();
@@ -120,7 +137,7 @@ public class UnsupportedDefaultMap_test {
 		map.put("key", null);
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMap.containsValue(null));
+		assertFalse(unsupportedDefaultMap.containsValue("value"));
 		
 		set = new HashSet<>();
 		map = new HashMap<>();

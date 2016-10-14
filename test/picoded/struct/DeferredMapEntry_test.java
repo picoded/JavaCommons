@@ -141,5 +141,19 @@ public class DeferredMapEntry_test {
 	@Test 
 	public void hashCodeTest() {
 		deferredMapEntry.hashCode();
+		map = new HashMap<String, String>();
+		map.put(null, null);
+		DeferredMapEntry<String, String> temp = new DeferredMapEntry<String, String>(map, null);
+		temp.hashCode();
+		
+		map = new HashMap<String, String>();
+		map.put("", "");
+		temp = new DeferredMapEntry<String, String>(map, "");
+		temp.hashCode();
+		
+		map = new HashMap<String, String>();
+		map.put("key", "val");
+		temp = new DeferredMapEntry<String, String>(map, "key1");
+		temp.hashCode();
 	}
 }

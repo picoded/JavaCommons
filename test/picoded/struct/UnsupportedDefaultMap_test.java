@@ -99,52 +99,52 @@ public class UnsupportedDefaultMap_test {
 	public void containsValueTest() {
 		Set<Map.Entry<String, String>> set =null;
 		Map<String, String> map = null;
-		when(unsupportedDefaultMapForVoidMethod.containsValue("value")).thenCallRealMethod();
-		assertFalse(unsupportedDefaultMapForVoidMethod.containsValue("value"));
+		when(unsupportedDefaultMap.containsValue("value")).thenCallRealMethod();
+		assertFalse(unsupportedDefaultMap.containsValue("value"));
 		
-		when(unsupportedDefaultMapForVoidMethod.entrySet()).thenReturn(null);
-		unsupportedDefaultMapForVoidMethod = mock(UnsupportedDefaultMap.class, CALLS_REAL_METHODS);
-		unsupportedDefaultMapForVoidMethod.putAll(null);
-		assertFalse(unsupportedDefaultMapForVoidMethod.containsValue(null));
-		unsupportedDefaultMapForVoidMethod = mock(UnsupportedDefaultMap.class, CALLS_REAL_METHODS);
+		when(unsupportedDefaultMap.entrySet()).thenReturn(null);
+		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
+		unsupportedDefaultMap.putAll(null);
+		assertFalse(unsupportedDefaultMap.containsValue(null));
+		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
 		
-		when(unsupportedDefaultMapForVoidMethod.entrySet()).thenReturn(new HashSet<>());
-		assertFalse(unsupportedDefaultMapForVoidMethod.containsValue(""));
-		
-		set = new HashSet<>();
-		map = new HashMap<>();
-		map.put("key", "value");
-		set.addAll(map.entrySet());
-		when(unsupportedDefaultMapForVoidMethod.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMapForVoidMethod.containsValue(null));
-		
-		set = new HashSet<>();
-		map = new HashMap<>();
-		map.put("key", null);
-		set.addAll(map.entrySet());
-		when(unsupportedDefaultMapForVoidMethod.entrySet()).thenReturn(set);
-		assertTrue(unsupportedDefaultMapForVoidMethod.containsValue(null));
+		when(unsupportedDefaultMap.entrySet()).thenReturn(new HashSet<>());
+		assertFalse(unsupportedDefaultMap.containsValue(""));
 		
 		set = new HashSet<>();
 		map = new HashMap<>();
 		map.put("key", "value");
 		set.addAll(map.entrySet());
-		when(unsupportedDefaultMapForVoidMethod.entrySet()).thenReturn(set);
-		assertTrue(unsupportedDefaultMapForVoidMethod.containsValue("value"));
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertFalse(unsupportedDefaultMap.containsValue(null));
 		
 		set = new HashSet<>();
 		map = new HashMap<>();
 		map.put("key", null);
 		set.addAll(map.entrySet());
-		when(unsupportedDefaultMapForVoidMethod.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMapForVoidMethod.containsValue("value"));
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertTrue(unsupportedDefaultMap.containsValue(null));
+		
+		set = new HashSet<>();
+		map = new HashMap<>();
+		map.put("key", "value");
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertTrue(unsupportedDefaultMap.containsValue("value"));
+		
+		set = new HashSet<>();
+		map = new HashMap<>();
+		map.put("key", null);
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertFalse(unsupportedDefaultMap.containsValue("value"));
 		
 		set = new HashSet<>();
 		map = new HashMap<>();
 		map.put("key", "");
 		set.addAll(map.entrySet());
-		when(unsupportedDefaultMapForVoidMethod.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMapForVoidMethod.containsValue(""));
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertFalse(unsupportedDefaultMap.containsValue(""));
 
 	}
 	

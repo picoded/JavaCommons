@@ -1,12 +1,12 @@
 package picoded.struct;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
@@ -104,7 +104,6 @@ public class UnsupportedDefaultMap_test {
 		
 		when(unsupportedDefaultMap.entrySet()).thenReturn(null);
 		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
-		unsupportedDefaultMap.putAll(null);
 		assertFalse(unsupportedDefaultMap.containsValue(null));
 		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
 		
@@ -113,35 +112,35 @@ public class UnsupportedDefaultMap_test {
 		
 		set = new HashSet<>();
 		map = new HashMap<>();
-		map.put("key", "value");
+		map.put("K", "V");
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertFalse(unsupportedDefaultMap.containsValue(null));
 		
 		set = new HashSet<>();
 		map = new HashMap<>();
-		map.put("key", null);
+		map.put("K1", null);
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertFalse(unsupportedDefaultMap.containsValue(null));
 		
 		set = new HashSet<>();
 		map = new HashMap<>();
-		map.put("key", "value");
+		map.put("K2", "V2");
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMap.containsValue("value"));
+		assertFalse(unsupportedDefaultMap.containsValue("V2"));
 		
 		set = new HashSet<>();
 		map = new HashMap<>();
-		map.put("key", null);
+		map.put("K3", null);
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMap.containsValue("value"));
+		assertFalse(unsupportedDefaultMap.containsValue("V2"));
 		
 		set = new HashSet<>();
 		map = new HashMap<>();
-		map.put("key", "");
+		map.put("K4", "");
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertFalse(unsupportedDefaultMap.containsValue(""));

@@ -105,7 +105,9 @@ public class UnsupportedDefaultMap_test {
 		assertFalse(unsupportedDefaultMap.containsValue("value"));
 		
 		set = new HashSet<>();
-		set.addAll(null);
+		map = new HashMap<>();
+		map.put(null, null);
+		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertFalse(unsupportedDefaultMap.containsValue(null));
 		

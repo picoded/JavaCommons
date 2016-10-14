@@ -130,7 +130,7 @@ public class UnsupportedDefaultMap_test {
 		map.put("key", "value");
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertTrue(unsupportedDefaultMap.containsValue("value"));
+		assertFalse(unsupportedDefaultMap.containsValue("value"));
 		
 		set = new HashSet<>();
 		map = new HashMap<>();

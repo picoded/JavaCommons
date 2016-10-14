@@ -4,7 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
-
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
@@ -18,10 +17,9 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
+@SuppressWarnings("unchecked")
 public class UnsupportedDefaultMap_test {
 	
-	@SuppressWarnings("unchecked")
 	UnsupportedDefaultMap<String, String> unsupportedDefaultMapForVoidMethod = mock(UnsupportedDefaultMap.class, CALLS_REAL_METHODS);
 	UnsupportedDefaultMap<String, String> unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
 	
@@ -104,18 +102,10 @@ public class UnsupportedDefaultMap_test {
 		when(unsupportedDefaultMap.containsValue("value")).thenCallRealMethod();
 		assertFalse(unsupportedDefaultMap.containsValue("value"));
 		
-		set = new HashSet<>();
-		map = new HashMap<>();
-		map.put(null, null);
-		set.addAll(map.entrySet());
-		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		when(unsupportedDefaultMap.entrySet()).thenReturn(null);
 		assertFalse(unsupportedDefaultMap.containsValue(null));
 		
-		set = new HashSet<>();
-		map = new HashMap<>();
-		map.put("", "");
-		set.addAll(map.entrySet());
-		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		when(unsupportedDefaultMap.entrySet()).thenReturn(new HashSet<>());
 		assertFalse(unsupportedDefaultMap.containsValue(""));
 		
 		set = new HashSet<>();
@@ -131,6 +121,13 @@ public class UnsupportedDefaultMap_test {
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertFalse(unsupportedDefaultMap.containsValue(null));
+		
+		set = new HashSet<>();
+		map = new HashMap<>();
+		map.put("key", "");
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertFalse(unsupportedDefaultMap.containsValue(""));
 
 	}
 	

@@ -51,75 +51,22 @@ public class DeferredMapEntry_test {
 		assertFalse(deferredMapEntry.equals((key = null)));
 		assertFalse(deferredMapEntry.equals((key = "")));
 		
-		DeferredMapEntry<String, String> temp = new DeferredMapEntry<String, String>(map, key);
-		assertFalse(deferredMapEntry.equals(temp));
-		temp = new DeferredMapEntry<String, String>(null, key);
-		
 		map = new HashMap<String, String>();
 		map.put(null, null);
-		deferredMapEntry = new DeferredMapEntry<String, String>(map, key);
-		temp = new DeferredMapEntry<String, String>(map, key);
-		assertTrue(deferredMapEntry.equals(temp));
-		
-		map = new HashMap<String, String>();
-		map.put(key, "value_one");
-		deferredMapEntry = new DeferredMapEntry<String, String>(map, key);
-		map = new HashMap<String, String>();
-		map.put(null, null);
-		temp = new DeferredMapEntry<String, String>(map, key);
-		assertFalse(deferredMapEntry.equals(temp));
-		
-		map = new HashMap<String, String>();
-		map.put(null, null);
-		deferredMapEntry = new DeferredMapEntry<String, String>(map, key);
-		map = new HashMap<String, String>();
-		map.put(key, "value_one");
-		temp = new DeferredMapEntry<String, String>(map, key);
-		assertFalse(deferredMapEntry.equals(temp));
-		
-		map = new HashMap<String, String>();
-		map.put(key, "value_one");
-		deferredMapEntry = new DeferredMapEntry<String, String>(map, key);
-		temp = new DeferredMapEntry<String, String>(map, key);
-		assertTrue(deferredMapEntry.equals(temp));
-		
-		map = new HashMap<String, String>();
-		map.put("", "");
-		deferredMapEntry = new DeferredMapEntry<String, String>(map, key);
-		temp = new DeferredMapEntry<String, String>(map, key);
-		assertTrue(deferredMapEntry.equals(temp));
-		
-		map = new HashMap<String, String>();
-		map.put(key, "value_one");
-		deferredMapEntry = new DeferredMapEntry<String, String>(map, key);
-		map = new HashMap<String, String>();
-		map.put("", "");
-		temp = new DeferredMapEntry<String, String>(map, key);
+		DeferredMapEntry<String, String> temp = new DeferredMapEntry<String, String>(map, null);
 		assertFalse(deferredMapEntry.equals(temp));
 		
 		map = new HashMap<String, String>();
 		map.put("", "");
-		deferredMapEntry = new DeferredMapEntry<String, String>(map, key);
-		map = new HashMap<String, String>();
-		map.put(key, "value_one");
-		temp = new DeferredMapEntry<String, String>(map, key);
+		temp = new DeferredMapEntry<String, String>(map, "");
 		assertFalse(deferredMapEntry.equals(temp));
-
-		map = new HashMap<String, String>();
-		map.put(key, null);
-		deferredMapEntry = new DeferredMapEntry<String, String>(map, key);
-		map = new HashMap<String, String>();
-		map.put(null, "value_one");
-		temp = new DeferredMapEntry<String, String>(map, key);
-		assertTrue(deferredMapEntry.equals(temp));
 		
 		map = new HashMap<String, String>();
-		map.put(null, "value_one");
-		deferredMapEntry = new DeferredMapEntry<String, String>(map, key);
-		map = new HashMap<String, String>();
-		map.put(key, null);
-		temp = new DeferredMapEntry<String, String>(map, key);
-		assertTrue(deferredMapEntry.equals(temp));
+		map.put("key", "val");
+		temp = new DeferredMapEntry<String, String>(map, "key1");
+		assertFalse(deferredMapEntry.equals(temp));
+		
+		
 	}
 	
 	@Test 

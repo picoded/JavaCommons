@@ -19,6 +19,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,7 +48,7 @@ public class CorePage_test {
 	
 	private CorePage corePage;
 	private CorePage corePageMock; // = mock(CorePage.class);
-	
+
 	@Before
 	public void setUp() {
 		corePage = new CorePage();
@@ -63,12 +65,12 @@ public class CorePage_test {
 		assertNotNull(corePage);
 	}
 	
-	@Test
+	@Test 
 	public void requestTypeSetTest() {
 		assertNotNull(CorePage.RequestTypeSet.GET);
 	}
 	
-	@Test
+	@Test 
 	public void getHttpServletRequestTest() {
 		assertNull(corePage.getHttpServletRequest());
 	}
@@ -93,12 +95,12 @@ public class CorePage_test {
 	@Test
 	public void requestHeaderMapAlternatePathTest() {
 		Map<String, String[]> map = new HashMap<>();
-		map.put("arg", new String[] { "a", "b" });
+		map.put("arg", new String[]{"a", "b"});
 		corePage._requestHeaderMap = map;
 		assertNotNull(corePage.requestHeaderMap());
 	}
 	
-	@Test
+	@Test 
 	public void processChainTest() throws ServletException {
 		ServletOutputStream mockStream = mock(ServletOutputStream.class);
 		corePage.requestType = HttpRequestType.GET;
@@ -106,7 +108,7 @@ public class CorePage_test {
 		assertTrue(corePage.processChain());
 	}
 	
-	@Test
+	@Test 
 	public void processChainJSONPathTest() throws ServletException {
 		ServletOutputStream mockStream = mock(ServletOutputStream.class);
 		corePage.requestType = HttpRequestType.GET;
@@ -115,7 +117,7 @@ public class CorePage_test {
 		assertTrue(corePage.processChain());
 	}
 	
-	@Test
+	@Test 
 	public void processChainJSONPOSTTest() throws ServletException {
 		ServletOutputStream mockStream = mock(ServletOutputStream.class);
 		corePage.requestType = HttpRequestType.POST;
@@ -124,7 +126,34 @@ public class CorePage_test {
 		assertTrue(corePage.processChain());
 	}
 	
-	@Test
+	@Test 
+	public void processChainJSONPOSTDoAuthTest() throws Exception {
+		ServletOutputStream mockStream = mock(ServletOutputStream.class);
+		corePage.requestType = HttpRequestType.POST;
+		corePage.responseOutputStream = mockStream;
+		corePage.setJsonRequestFlag("*");
+		Map<String, Object> templateDataObj = new HashMap<String, Object>();
+		corePage.templateDataObj = templateDataObj;
+		CorePage corePageLocal = spy(corePage);
+		when(corePageLocal.doAuth(templateDataObj)).thenReturn(false);
+		assertFalse(corePageLocal.processChain());
+	}
+	
+	@Test 
+	public void processChainJSONPOSTDoJSONTest() throws Exception {
+		ServletOutputStream mockStream = mock(ServletOutputStream.class);
+		corePage.requestType = HttpRequestType.POST;
+		corePage.responseOutputStream = mockStream;
+		corePage.setJsonRequestFlag("*");
+		Map<String, Object> templateDataObj = new HashMap<String, Object>();
+		corePage.templateDataObj = templateDataObj;
+		corePage.jsonDataObj = templateDataObj;
+		CorePage corePageLocal = spy(corePage);
+		when(corePageLocal.doJSON(templateDataObj, templateDataObj)).thenReturn(false);
+		assertFalse(corePageLocal.processChain());
+	}
+	
+	@Test 
 	public void processChainJSONPUTTest() throws ServletException {
 		ServletOutputStream mockStream = mock(ServletOutputStream.class);
 		corePage.requestType = HttpRequestType.PUT;
@@ -133,7 +162,7 @@ public class CorePage_test {
 		assertTrue(corePage.processChain());
 	}
 	
-	@Test
+	@Test 
 	public void processChainJSONDELETETest() throws ServletException {
 		ServletOutputStream mockStream = mock(ServletOutputStream.class);
 		corePage.requestType = HttpRequestType.DELETE;
@@ -142,7 +171,7 @@ public class CorePage_test {
 		assertTrue(corePage.processChain());
 	}
 	
-	@Test(expected = ServletException.class)
+	@Test (expected = ServletException.class)
 	public void processChainExceptionTest() throws Exception {
 		assertFalse(corePage.processChain());
 	}
@@ -159,13 +188,28 @@ public class CorePage_test {
 		corePage.setJsonRequestFlag("in");
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		Map<String, String[]> map = new HashMap<String, String[]>();
-		map.put("in", new String[] { "json" });
+		map.put("in", new String[]{"json"});
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
 		when(response.getOutputStream()).thenReturn(mockOutput);
 		when(httpRequest.getParameterMap()).thenReturn(map);
 		corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, httpRequest, response));
 		assertTrue(corePageLocal.isJsonRequest());
+	}
+	
+	@Test
+	public void isJsonRequestAlternatePathEmptyStringTest() throws IOException, ServletException {
+		CorePage corePageLocal;
+		corePage.setJsonRequestFlag("in");
+		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		Map<String, String[]> map = new HashMap<String, String[]>();
+		map.put("in", new String[]{""});
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
+		when(response.getOutputStream()).thenReturn(mockOutput);
+		when(httpRequest.getParameterMap()).thenReturn(map);
+		corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, httpRequest, response));
+		assertFalse(corePageLocal.isJsonRequest());
 	}
 	
 	@Test
@@ -191,7 +235,7 @@ public class CorePage_test {
 	}
 	
 	@Test
-	public void isOPTIONTest() {
+	public void isOPTIONTest()  {
 		corePage.requestType = HttpRequestType.OPTION;
 		assertTrue(corePage.isOPTION());
 	}
@@ -203,7 +247,7 @@ public class CorePage_test {
 	}
 	
 	@Test
-	public void isPUTTest() {
+	public void isPUTTest()  {
 		corePage.requestType = HttpRequestType.PUT;
 		assertTrue(corePage.isPUT());
 	}
@@ -212,6 +256,36 @@ public class CorePage_test {
 	public void isDELETETest() {
 		corePage.requestType = HttpRequestType.DELETE;
 		assertTrue(corePage.isDELETE());
+	}
+	
+	@Test
+	public void isGETTest() {
+		corePage.requestType = HttpRequestType.PUT;
+		assertFalse(corePage.isGET());
+	}
+	
+	@Test
+	public void isOPTIONFalseTest()  {
+		corePage.requestType = HttpRequestType.PUT;
+		assertFalse(corePage.isOPTION());
+	}
+	
+	@Test
+	public void isPOSTFalseTest() {
+		corePage.requestType = HttpRequestType.PUT;
+		assertFalse(corePage.isPOST());
+	}
+	
+	@Test
+	public void isPUTFalseTest()  {
+		corePage.requestType = HttpRequestType.GET;
+		assertFalse(corePage.isPUT());
+	}
+	
+	@Test
+	public void isDELETEFalseTest() {
+		corePage.requestType = HttpRequestType.PUT;
+		assertFalse(corePage.isDELETE());
 	}
 	
 	@Test
@@ -225,7 +299,7 @@ public class CorePage_test {
 		corePage.initSetup(corePage, servletConfig);
 	}
 	
-	@Test
+	//@Test (expected = RuntimeException.class)
 	public void initSetupexceptionTest() throws ServletException {
 		ServletConfig servletConfig = mock(ServletConfig.class);
 		doThrow(Exception.class).when(corePageMock).init(servletConfig);
@@ -348,9 +422,15 @@ public class CorePage_test {
 		assertNull(corePageMock.getServletContextURI());
 	}
 	
-	@Test(expected = RuntimeException.class)
+	@Test (expected = RuntimeException.class)
 	public void getServletContextURIExceptionTest() {
 		assertNull(corePage.getServletContextURI());
+	}
+	
+	//@Test 
+	public void getContextURIExceptionTest() {
+		doThrow(UnsupportedEncodingException.class).when(mock(URLDecoder.class, "decode"));
+		assertEquals("../", corePage.getContextURI());
 	}
 	
 	public void getParameterTest() {
@@ -377,7 +457,7 @@ public class CorePage_test {
 		corePageLocal.sendRedirect("/home");
 	}
 	
-	@Test(expected = RuntimeException.class)
+	@Test (expected = RuntimeException.class)
 	public void sendRedirectExceptionTest() throws ServletException, IOException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
@@ -618,7 +698,7 @@ public class CorePage_test {
 		corePageMock.doOptions(request, response);
 	}
 	
-	@Test(expected = ServletException.class)
+	@Test (expected = ServletException.class)
 	public void doOptionsExceptionTest() throws ServletException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
@@ -637,12 +717,12 @@ public class CorePage_test {
 		corePage.contextDestroyed(servletContextEvent);
 	}
 	
-	@Test(expected = Exception.class)
+	@Test (expected = Exception.class)
 	public void doExceptionTest() throws Exception {
 		corePage.doException(new Exception("CorePage Exception"));
 	}
 	
-	@Test
+	@Test 
 	public void getHttpServletResponseTest() {
 		assertNull(corePage.getHttpServletResponse());
 	}
@@ -663,7 +743,7 @@ public class CorePage_test {
 	public void requestCookieMapHTTPRequestNotNullTest() {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		Cookie cookie = mock(Cookie.class);
-		when(request.getCookies()).thenReturn(new Cookie[] { cookie });
+		when(request.getCookies()).thenReturn(new Cookie[]{cookie});
 		corePage.httpRequest = request;
 		assertNotNull(corePage.requestCookieMap());
 	}
@@ -724,11 +804,27 @@ public class CorePage_test {
 	}
 	
 	@Test
+	public void requestWildcardUriArrayAlternateTest() {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getPathInfo()).thenReturn("");
+		corePage.httpRequest = request;
+		assertArrayEquals(EmptyArray.STRING, corePage.requestWildcardUriArray());
+	}
+	
+	@Test
 	public void requestWildcardUriArrayNotEmptyTest() {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(request.getPathInfo()).thenReturn("/");
 		corePage.httpRequest = request;
-		assertArrayEquals(new String[] { "" }, corePage.requestWildcardUriArray());
+		assertArrayEquals(new String[]{""}, corePage.requestWildcardUriArray());
+	}
+	
+	@Test
+	public void requestWildcardUriArrayNotEmptyAlternateTest() {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getPathInfo()).thenReturn("\\");
+		corePage.httpRequest = request;
+		assertArrayEquals(new String[]{""}, corePage.requestWildcardUriArray());
 	}
 	
 	@Test
@@ -736,10 +832,18 @@ public class CorePage_test {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(request.getPathInfo()).thenReturn("/home/");
 		corePage.httpRequest = request;
-		assertArrayEquals(new String[] { "home" }, corePage.requestWildcardUriArray());
+		assertArrayEquals(new String[]{"home"}, corePage.requestWildcardUriArray());
 	}
 	
-	@Test(expected = ServletException.class)
+	@Test
+	public void requestWildcardUriArrayValidAlternatePathTest() {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getPathInfo()).thenReturn("/home\\");
+		corePage.httpRequest = request;
+		assertArrayEquals(new String[]{"home"}, corePage.requestWildcardUriArray());
+	}
+	
+	@Test (expected = ServletException.class)
 	public void setupInstanceExceptionTest() throws ServletException, IOException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
@@ -751,13 +855,13 @@ public class CorePage_test {
 		corePage.setupInstance(HttpRequestType.GET, request, response);
 	}
 	
-	@Test
+	@Test 
 	public void setupInstance2paramsTest() throws ServletException {
 		Map<String, String[]> reqParam = new HashMap<String, String[]>();
 		assertNotNull(corePage.setupInstance(HttpRequestType.GET, reqParam));
 	}
 	
-	@Test
+	@Test 
 	public void setupInstance3paramsTest() throws ServletException {
 		Map<String, String[]> reqParam = new HashMap<String, String[]>();
 		Map<String, Cookie[]> reqCookieMap = new HashMap<String, Cookie[]>();

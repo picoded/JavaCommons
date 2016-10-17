@@ -376,6 +376,16 @@ public class CorePage_test {
 		assertEquals("/home/", corePage.getContextPath());
 	}
 	
+	//@Test //testing inside try block
+	public void getContextPathDefaultTest() throws ServletException {
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
+		when(corePageLocal.getServletContext()).thenReturn(request.getServletContext());
+		when(corePageLocal.getServletContext().getRealPath("/")).thenReturn("/home");
+		assertEquals("/home/", corePageLocal.getContextPath());
+	}
+	
 	@Test
 	public void getContextPathExceptionTest() {
 		assertNotNull(corePage.getContextPath());
@@ -449,7 +459,7 @@ public class CorePage_test {
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		Map<String, String[]> map = new HashMap<String, String[]>();
 		when(httpRequest.getParameterMap()).thenReturn(map);
-		assertNull(corePageMock.getParameter(""));
+		assertNull(corePage.getParameter(""));
 	}
 	
 	@Test

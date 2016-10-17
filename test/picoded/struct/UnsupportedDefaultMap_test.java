@@ -89,10 +89,10 @@ public class UnsupportedDefaultMap_test {
 	
 	@Test (expected = UnsupportedOperationException.class)
 	public void containsValueExceptionTest() {
-//		when(unsupportedDefaultMap.containsValue("value")).thenCallRealMethod();
+		when(unsupportedDefaultMap.containsValue("value")).thenCallRealMethod();
 		when(unsupportedDefaultMap.entrySet()).thenCallRealMethod();
 		when(unsupportedDefaultMap.keySet()).thenCallRealMethod();
-//		assertFalse(unsupportedDefaultMap.containsValue("value"));
+		assertFalse(unsupportedDefaultMap.containsValue("value"));
 	}
 	
 	@Test 
@@ -126,7 +126,7 @@ public class UnsupportedDefaultMap_test {
 		
 		set = new HashSet<>();
 		map = new HashMap<>();
-		map.put("K1", "");
+		map.put("K1", "V");
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertFalse(unsupportedDefaultMap.containsValue(null));
@@ -158,31 +158,36 @@ public class UnsupportedDefaultMap_test {
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertFalse(unsupportedDefaultMap.containsValue(""));
+		
+		
+		when(unsupportedDefaultMap.containsValue("value")).thenCallRealMethod();
+		when(unsupportedDefaultMap.containsValue("")).thenCallRealMethod();
+		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
 
 	}
 	
 	@Test 
 	public void containsValueValidTest() {
-//		when(unsupportedDefaultMap.containsValue("value1")).thenCallRealMethod();
+		when(unsupportedDefaultMap.containsValue("value1")).thenCallRealMethod();
 		Set<Map.Entry<String, String>> set = new HashSet<>();
 		Map<String, String> map = new HashMap<>();
 		map.put("key1", "value1");
 		map.put("key2", "value2");
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-//		assertTrue(unsupportedDefaultMap.containsValue("value1"));
+		assertTrue(unsupportedDefaultMap.containsValue("value1"));
 	}
 	
 	@Test 
 	public void containsValueValidForNullTest() {
-//		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
+		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
 		Set<Map.Entry<String, String>> set = new HashSet<>();
 		Map<String, String> map = new HashMap<>();
 		map.put("key1", "value1");
 		map.put("key2", null);
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-//		assertTrue(unsupportedDefaultMap.containsValue(null));
+		assertTrue(unsupportedDefaultMap.containsValue(null));
 	}
 	
 	@Test (expected = UnsupportedOperationException.class)

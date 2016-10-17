@@ -299,11 +299,14 @@ public class CorePage_test {
 		corePage.initSetup(corePage, servletConfig);
 	}
 	
-	//@Test (expected = RuntimeException.class)
+	@Test (expected = RuntimeException.class)
 	public void initSetupexceptionTest() throws ServletException {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
 		ServletConfig servletConfig = mock(ServletConfig.class);
-		doThrow(Exception.class).when(corePageMock).init(servletConfig);
-		corePageMock.initSetup(corePageMock, servletConfig);
+		CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
+		doThrow(Exception.class).when(corePageLocal).init(servletConfig);
+		corePageLocal.initSetup(corePageLocal, servletConfig);
 	}
 	
 	@Test
@@ -711,10 +714,30 @@ public class CorePage_test {
 		corePage.contextInitialized(servletContextEvent);
 	}
 	
+	@Test (expected = RuntimeException.class)
+	public void contextInitializedExceptionTest() throws Exception {
+		ServletContextEvent servletContextEvent = new ServletContextEvent(mock(ServletContext.class));
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
+		doThrow(Exception.class).when(corePageLocal).doSharedSetup();
+		corePageLocal.contextInitialized(servletContextEvent);
+	}
+	
 	@Test
 	public void contextDestroyedTest() {
 		ServletContextEvent servletContextEvent = new ServletContextEvent(mock(ServletContext.class));
 		corePage.contextDestroyed(servletContextEvent);
+	}
+	
+	@Test (expected = RuntimeException.class)
+	public void contextDestroyedExceptionTest() throws Exception {
+		ServletContextEvent servletContextEvent = new ServletContextEvent(mock(ServletContext.class));
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
+		doThrow(Exception.class).when(corePageLocal).destroyContext();
+		corePageLocal.contextDestroyed(servletContextEvent);
 	}
 	
 	@Test (expected = Exception.class)

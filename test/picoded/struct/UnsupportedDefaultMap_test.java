@@ -126,13 +126,6 @@ public class UnsupportedDefaultMap_test {
 		
 		set = new HashSet<>();
 		map = new HashMap<>();
-		map.put("K1", "V");
-		set.addAll(map.entrySet());
-		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMap.containsValue(null));
-		
-		set = new HashSet<>();
-		map = new HashMap<>();
 		map.put("K2", "V2");
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
@@ -147,22 +140,10 @@ public class UnsupportedDefaultMap_test {
 		
 		set = new HashSet<>();
 		map = new HashMap<>();
-		map.put("K3", "");
-		set.addAll(map.entrySet());
-		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMap.containsValue("V2"));
-	
-		set = new HashSet<>();
-		map = new HashMap<>();
 		map.put("K4", "");
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertFalse(unsupportedDefaultMap.containsValue(""));
-		
-		
-		when(unsupportedDefaultMap.containsValue("value")).thenCallRealMethod();
-		when(unsupportedDefaultMap.containsValue("")).thenCallRealMethod();
-		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
 
 	}
 	

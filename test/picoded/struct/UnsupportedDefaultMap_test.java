@@ -163,7 +163,7 @@ public class UnsupportedDefaultMap_test {
 	
 	@Test 
 	public void containsValueValidTest() {
-		when(unsupportedDefaultMap.containsValue("value1")).thenCallRealMethod();
+//		when(unsupportedDefaultMap.containsValue("value1")).thenCallRealMethod();
 		Set<Map.Entry<String, String>> set = new HashSet<>();
 		Map<String, String> map = new HashMap<>();
 		map.put("key1", "value1");
@@ -175,7 +175,7 @@ public class UnsupportedDefaultMap_test {
 	
 	@Test 
 	public void containsValueValidForNullTest() {
-		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
+//		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
 		Set<Map.Entry<String, String>> set = new HashSet<>();
 		Map<String, String> map = new HashMap<>();
 		map.put("key1", "value1");

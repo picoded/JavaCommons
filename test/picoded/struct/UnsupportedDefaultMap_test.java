@@ -109,14 +109,8 @@ public class UnsupportedDefaultMap_test {
 		
 		when(unsupportedDefaultMap.entrySet()).thenReturn(new HashSet<>());
 		assertFalse(unsupportedDefaultMap.containsValue(""));
-		
-		set = new HashSet<>();
-		map = new HashMap<>();
-		map.put("K", "V");
-		set.addAll(map.entrySet());
-		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMap.containsValue(null));
-		
+
+		// value==null and key-value==null
 		set = new HashSet<>();
 		map = new HashMap<>();
 		map.put("K1", null);
@@ -124,6 +118,15 @@ public class UnsupportedDefaultMap_test {
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertFalse(unsupportedDefaultMap.containsValue(null));
 		
+		// value==null and key-value!=null
+		set = new HashSet<>();
+		map = new HashMap<>();
+		map.put("K", "V");
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertFalse(unsupportedDefaultMap.containsValue(null));
+		
+		// value==V2 and key-value==V2
 		set = new HashSet<>();
 		map = new HashMap<>();
 		map.put("K2", "V2");
@@ -131,20 +134,21 @@ public class UnsupportedDefaultMap_test {
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertFalse(unsupportedDefaultMap.containsValue("V2"));
 		
+		// value==XYZ and key-value==ABC
 		set = new HashSet<>();
 		map = new HashMap<>();
-		map.put("K3", null);
+		map.put("K3", "ABC");
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMap.containsValue("V2"));
+		assertFalse(unsupportedDefaultMap.containsValue("XYZ"));
 		
+		// value==XYZ and key-value==ABC
 		set = new HashSet<>();
 		map = new HashMap<>();
-		map.put("K4", "");
+		map.put("K4", null);
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMap.containsValue(""));
-
+		assertFalse(unsupportedDefaultMap.containsValue("VV2"));
 	}
 	
 	@Test 

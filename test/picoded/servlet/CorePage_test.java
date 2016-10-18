@@ -8,16 +8,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.spy;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -118,6 +115,15 @@ public class CorePage_test {
 	}
 	
 	@Test 
+	public void processChainJSONPathRequestTypeOtherTest() throws ServletException {
+		ServletOutputStream mockStream = mock(ServletOutputStream.class);
+		corePage.requestType = HttpRequestType.HEAD;
+		corePage.responseOutputStream = mockStream;
+		corePage.setJsonRequestFlag("*");
+		assertTrue(corePage.processChain());
+	}
+	
+	@Test 
 	public void processChainJSONPOSTTest() throws ServletException {
 		ServletOutputStream mockStream = mock(ServletOutputStream.class);
 		corePage.requestType = HttpRequestType.POST;
@@ -171,9 +177,99 @@ public class CorePage_test {
 		assertTrue(corePage.processChain());
 	}
 	
+	@Test 
+	public void processChainJSONPOSTExceptionTest() throws Exception {
+		ServletOutputStream mockStream = mock(ServletOutputStream.class);
+		corePage.requestType = HttpRequestType.POST;
+		corePage.responseOutputStream = mockStream;
+		corePage.setJsonRequestFlag("*");
+		Map<String, Object> templateDataObj = new HashMap<String, Object>();
+		corePage.templateDataObj = templateDataObj;
+		corePage.jsonDataObj = templateDataObj;
+		CorePage corePageLocal = spy(corePage);
+		when(corePageLocal.doPostJSON(templateDataObj, templateDataObj)).thenThrow(Exception.class);
+		assertFalse(corePageLocal.processChain());
+	}
+
+	@Test 
+	public void processChainNormalPathTest() throws ServletException {
+		ServletOutputStream mockStream = mock(ServletOutputStream.class);
+		corePage.requestType = HttpRequestType.GET;
+		corePage.responseOutputStream = mockStream;
+		assertTrue(corePage.processChain());
+	}
+	
+	@Test 
+	public void processChainNormalPathRequestTypeOtherTest() throws ServletException {
+		ServletOutputStream mockStream = mock(ServletOutputStream.class);
+		corePage.requestType = HttpRequestType.HEAD;
+		corePage.responseOutputStream = mockStream;
+		assertTrue(corePage.processChain());
+	}
+	
+	@Test 
+	public void processChainNormalPOSTTest() throws ServletException {
+		ServletOutputStream mockStream = mock(ServletOutputStream.class);
+		corePage.requestType = HttpRequestType.POST;
+		corePage.responseOutputStream = mockStream;
+		assertTrue(corePage.processChain());
+	}
+	
+	@Test 
+	public void processChainNormalPOSTDoAuthTest() throws Exception {
+		ServletOutputStream mockStream = mock(ServletOutputStream.class);
+		corePage.requestType = HttpRequestType.POST;
+		corePage.responseOutputStream = mockStream;
+		Map<String, Object> templateDataObj = new HashMap<String, Object>();
+		corePage.templateDataObj = templateDataObj;
+		CorePage corePageLocal = spy(corePage);
+		when(corePageLocal.doAuth(templateDataObj)).thenReturn(false);
+		assertFalse(corePageLocal.processChain());
+	}
+	
+	@Test 
+	public void processChainNormalPOSTDoJSONTest() throws Exception {
+		ServletOutputStream mockStream = mock(ServletOutputStream.class);
+		corePage.requestType = HttpRequestType.POST;
+		corePage.responseOutputStream = mockStream;
+		Map<String, Object> templateDataObj = new HashMap<String, Object>();
+		corePage.templateDataObj = templateDataObj;
+		CorePage corePageLocal = spy(corePage);
+		when(corePageLocal.doRequest(templateDataObj)).thenReturn(false);
+		assertFalse(corePageLocal.processChain());
+	}
+	
+	@Test 
+	public void processChainNormalPUTTest() throws ServletException {
+		ServletOutputStream mockStream = mock(ServletOutputStream.class);
+		corePage.requestType = HttpRequestType.PUT;
+		corePage.responseOutputStream = mockStream;
+		assertTrue(corePage.processChain());
+	}
+	
+	@Test 
+	public void processChainNormalDELETETest() throws ServletException {
+		ServletOutputStream mockStream = mock(ServletOutputStream.class);
+		corePage.requestType = HttpRequestType.DELETE;
+		corePage.responseOutputStream = mockStream;
+		assertTrue(corePage.processChain());
+	}
+	
 	@Test (expected = ServletException.class)
 	public void processChainExceptionTest() throws Exception {
 		assertFalse(corePage.processChain());
+	}
+	
+	@Test (expected = ServletException.class)
+	public void processChainNormalPOSTExceptionTest() throws Exception {
+		ServletOutputStream mockStream = mock(ServletOutputStream.class);
+		corePage.requestType = HttpRequestType.POST;
+		corePage.responseOutputStream = mockStream;
+		Map<String, Object> templateDataObj = new HashMap<String, Object>();
+		corePage.templateDataObj = templateDataObj;
+		CorePage corePageLocal = spy(corePage);
+		when(corePageLocal.doPostRequest(templateDataObj)).thenThrow(Exception.class);
+		assertFalse(corePageLocal.processChain());
 	}
 	
 	@Test
@@ -459,6 +555,7 @@ public class CorePage_test {
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		Map<String, String[]> map = new HashMap<String, String[]>();
 		when(httpRequest.getParameterMap()).thenReturn(map);
+		corePage.httpRequest = httpRequest;
 		assertNull(corePage.getParameter(""));
 	}
 	

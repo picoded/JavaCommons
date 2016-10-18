@@ -64,6 +64,7 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 	/// Does an unoptimized check, using keySet9)
 	@Override
 	default boolean containsValue(Object value) {
+		System.out.println("entrySet()>>>>>>>>>>>>>>>>>>>>>>>"+entrySet().toString());
 		for (Map.Entry<K, V> entry : entrySet()) {
 			V val = entry.getValue();
 			if (value == null) {

@@ -169,7 +169,7 @@ public class UnsupportedDefaultMap_test {
 		map.put("key2", "value2");
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-//		assertTrue(unsupportedDefaultMap.containsValue("value1"));
+		assertTrue(unsupportedDefaultMap.containsValue("value1"));
 	}
 	
 	@Test 
@@ -181,7 +181,7 @@ public class UnsupportedDefaultMap_test {
 		map.put("key2", null);
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-//		assertTrue(unsupportedDefaultMap.containsValue(null));
+		assertTrue(unsupportedDefaultMap.containsValue(null));
 	}
 	
 	@Test (expected = UnsupportedOperationException.class)

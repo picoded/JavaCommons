@@ -175,7 +175,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 			mapList.append(name, httpRequest.getHeaders(name));
 		}
 		
-		return (_requestHeaderMap = mapList.toMapArray(new String[0]));
+		return _requestHeaderMap = mapList.toMapArray(new String[0]);
 	}
 	
 	/// The requested cookie map, either set at startup or extracted from httpRequest
@@ -313,22 +313,22 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// Returns if the request is GET
 	public boolean isGET() {
-		return (requestType == HttpRequestType.GET);
+		return requestType == HttpRequestType.GET;
 	}
 	
 	/// Returns if the request is POST
 	public boolean isPOST() {
-		return (requestType == HttpRequestType.POST);
+		return requestType == HttpRequestType.POST;
 	}
 	
 	/// Returns if the request is PUT
 	public boolean isPUT() {
-		return (requestType == HttpRequestType.PUT);
+		return requestType == HttpRequestType.PUT;
 	}
 	
 	/// Returns if the request is DELETE
 	public boolean isDELETE() {
-		return (requestType == HttpRequestType.DELETE);
+		return requestType == HttpRequestType.DELETE;
 	}
 	
 	/// Returns if the request is OPTION
@@ -447,7 +447,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 			// Note this may fail for contextInitialized
 			return (_contextPath = getServletContext().getRealPath("/") + "/");
 		} catch (Exception e) {
-			return (_contextPath = "./");
+			return _contextPath = "./";
 		}
 	}
 	

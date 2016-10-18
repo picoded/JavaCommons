@@ -200,7 +200,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		}
 		
 		// Cache and return
-		return (_requestCookieMap = mapList.toMapArray(new String[0]));
+		return _requestCookieMap = mapList.toMapArray(new String[0]);
 	}
 	
 	///////////////////////////////////////////////////////
@@ -333,7 +333,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	
 	/// Returns if the request is OPTION
 	public boolean isOPTION() {
-		return (requestType == HttpRequestType.OPTION);
+		return requestType == HttpRequestType.OPTION;
 	}
 	
 	///////////////////////////////////////////////////////
@@ -435,17 +435,17 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		}
 		
 		if (httpRequest != null) {
-			return (_contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/");
+			return _contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/";
 		}
 		
 		if (_servletContextEvent != null) {
 			ServletContext sc = _servletContextEvent.getServletContext();
-			return (_contextPath = sc.getRealPath("/")) + "/";
+			return _contextPath = sc.getRealPath("/") + "/";
 		}
 		
 		try {
 			// Note this may fail for contextInitialized
-			return (_contextPath = getServletContext().getRealPath("/") + "/");
+			return _contextPath = getServletContext().getRealPath("/") + "/";
 		} catch (Exception e) {
 			return _contextPath = "./";
 		}
@@ -466,7 +466,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 		
 		if (_servletContextEvent != null) {
 			ServletContext sc = _servletContextEvent.getServletContext();
-			return (_contextURI = sc.getContextPath()) + "/";
+			return _contextURI = sc.getContextPath() + "/";
 		}
 		
 		try {

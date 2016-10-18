@@ -110,6 +110,11 @@ public class UnsupportedDefaultMap_test {
 		when(unsupportedDefaultMap.entrySet()).thenReturn(new HashSet<>());
 		assertFalse(unsupportedDefaultMap.containsValue(""));
 
+		// set is blank
+		set = new HashSet<>();
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertFalse(unsupportedDefaultMap.containsValue("AQW"));
+		
 		// value==null and key-value==null
 		set = new HashSet<>();
 		map = new HashMap<>();
@@ -121,7 +126,8 @@ public class UnsupportedDefaultMap_test {
 		// value==null and key-value!=null
 		set = new HashSet<>();
 		map = new HashMap<>();
-		map.put("K", "V");
+		String keyValue = new String("V");
+		map.put("K", keyValue);
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertFalse(unsupportedDefaultMap.containsValue(null));
@@ -129,26 +135,29 @@ public class UnsupportedDefaultMap_test {
 		// value==V2 and key-value==V2
 		set = new HashSet<>();
 		map = new HashMap<>();
-		map.put("K2", "V2");
+		keyValue = new String("V2");
+		map.put("K2", keyValue);
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMap.containsValue("V2"));
+		assertTrue(unsupportedDefaultMap.containsValue(keyValue));
 		
 		// value==XYZ and key-value==ABC
 		set = new HashSet<>();
 		map = new HashMap<>();
-		map.put("K3", "ABC");
+		keyValue = new String("ABC");
+		map.put("K3", keyValue);
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMap.containsValue("XYZ"));
+		assertFalse(unsupportedDefaultMap.containsValue(new String("XYZ")));
 		
 		// value==XYZ and key-value==ABC
 		set = new HashSet<>();
 		map = new HashMap<>();
-		map.put("K4", null);
+		keyValue = null;
+		map.put("K4", keyValue);
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMap.containsValue("VV2"));
+		assertFalse(unsupportedDefaultMap.containsValue(new String("VV2")));
 	}
 	
 	@Test 

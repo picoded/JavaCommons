@@ -97,12 +97,33 @@ public class UnsupportedDefaultMap_test {
 	
 	@Test 
 	public void containsValueTest() {
-		Set<Map.Entry<String, String>> set =null;
-		Map<String, String> map = null;
-		// set is blank
-		set = new HashSet<>();
+		Map<String, String> map = new HashMap<>();
+		Set<Map.Entry<String, String>> set = new HashSet<>();
+		
+		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertFalse(unsupportedDefaultMap.containsValue("AQW"));
+		assertTrue(unsupportedDefaultMap.containsValue(null));
+		
+		map.put("key1", "abc");
+		map.put("key2", null);
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertTrue(unsupportedDefaultMap.containsValue(null));
+		
+		map = new HashMap<>();
+		set = new HashSet<>();
+		map.put("key1", "abc");
+		map.put("key2", "cds");
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertTrue(unsupportedDefaultMap.containsValue("cds"));
+		
+//		Set<Map.Entry<String, String>> set =null;
+//		Map<String, String> map = null;
+//		// set is blank
+//		set = new HashSet<>();
+//		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+//		assertFalse(unsupportedDefaultMap.containsValue("AQW"));
 //		
 //		// value==null and key-value==null
 //		set = new HashSet<>();

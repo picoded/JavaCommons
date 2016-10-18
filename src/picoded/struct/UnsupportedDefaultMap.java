@@ -65,10 +65,8 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 	@SuppressWarnings("unused")
 	@Override
 	default boolean containsValue(Object value) {
-		System.out.println("value>>>>>>>>>>>>>>>"+value.toString());
 		for (Map.Entry<K, V> entry : entrySet()) {
 			V val = entry.getValue();
-			System.out.println("val>>>>>>>>>>>>>>>"+val.toString());
 			if (value == null) {
 				if (val == null) {
 					return true;

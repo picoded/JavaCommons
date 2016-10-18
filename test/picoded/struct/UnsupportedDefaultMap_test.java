@@ -99,17 +99,6 @@ public class UnsupportedDefaultMap_test {
 	public void containsValueTest() {
 		Set<Map.Entry<String, String>> set =null;
 		Map<String, String> map = null;
-		when(unsupportedDefaultMap.containsValue("value")).thenCallRealMethod();
-		assertFalse(unsupportedDefaultMap.containsValue("value"));
-		
-		when(unsupportedDefaultMap.entrySet()).thenReturn(null);
-		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
-		assertFalse(unsupportedDefaultMap.containsValue(null));
-		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
-		
-		when(unsupportedDefaultMap.entrySet()).thenReturn(new HashSet<>());
-		assertFalse(unsupportedDefaultMap.containsValue(""));
-
 		// set is blank
 		set = new HashSet<>();
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
@@ -269,4 +258,3 @@ public class UnsupportedDefaultMap_test {
 		assertEquals(set.size(), unsupportedDefaultMap.values().size());
 	}
 }
-

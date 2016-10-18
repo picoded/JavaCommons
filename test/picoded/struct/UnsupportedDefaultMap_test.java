@@ -102,21 +102,16 @@ public class UnsupportedDefaultMap_test {
 		
 		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertTrue(unsupportedDefaultMap.containsValue(null));
+		assertFalse(unsupportedDefaultMap.containsValue(null));
 		
 		map.put("key1", "abc");
 		map.put("key2", null);
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertTrue(unsupportedDefaultMap.containsValue(null));
-		
-		map = new HashMap<>();
-		set = new HashSet<>();
-		map.put("key1", "abc");
-		map.put("key2", "cds");
-		set.addAll(map.entrySet());
-		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertTrue(unsupportedDefaultMap.containsValue("cds"));
+		assertFalse(unsupportedDefaultMap.containsValue(""));
+		assertTrue(unsupportedDefaultMap.containsValue("abc"));
+		assertFalse(unsupportedDefaultMap.containsValue("cds"));
 		
 //		Set<Map.Entry<String, String>> set =null;
 //		Map<String, String> map = null;

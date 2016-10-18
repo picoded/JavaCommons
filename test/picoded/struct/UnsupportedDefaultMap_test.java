@@ -110,7 +110,7 @@ public class UnsupportedDefaultMap_test {
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertTrue(unsupportedDefaultMap.containsValue(null));
 		assertFalse(unsupportedDefaultMap.containsValue(""));
-		assertTrue(unsupportedDefaultMap.containsValue("abc"));
+		assertFalse(unsupportedDefaultMap.containsValue("abc"));
 		assertFalse(unsupportedDefaultMap.containsValue("cds"));
 		
 //		Set<Map.Entry<String, String>> set =null;

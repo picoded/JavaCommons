@@ -6,7 +6,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.*;
 
 // Exceptions used
-import java.lang.RuntimeException;
 import java.io.IOException;
 
 // Objects used
@@ -44,7 +43,7 @@ import picoded.struct.HashMapList;
  * ##Process flow
  * <pre>
  * {@code
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * [CorePage request process flow]
  *
  * spawnInstance ----\
@@ -85,7 +84,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements javax.se
 	//-------------------------------------------
 	
 	private static final long serialVersionUID = 1L;
-	
+
 	/// RESTBuilder HttpRequestType enum access
 	public static class RequestTypeSet extends picoded.enums.HttpRequestType.HttpRequestTypeSet {
 	};

@@ -173,9 +173,6 @@ public class UnsupportedDefaultMap_test {
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertTrue(unsupportedDefaultMap.containsValue(null));
-		assertFalse(unsupportedDefaultMap.containsValue(""));
-		assertFalse(unsupportedDefaultMap.containsValue("value1"));
-		assertFalse(unsupportedDefaultMap.containsValue("cds"));
 	}
 	
 	@Test (expected = UnsupportedOperationException.class)

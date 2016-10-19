@@ -161,7 +161,7 @@ public class UnsupportedDefaultMap_test {
 		map.put("K2", keyValue);
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-		assertTrue(unsupportedDefaultMap.containsValue(null));
+		assertFalse(unsupportedDefaultMap.containsValue(null));
 		
 		// value==XYZ and key-value==ABC
 		set = new HashSet<>();

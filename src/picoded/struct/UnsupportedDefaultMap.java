@@ -68,7 +68,7 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 		System.out.println("value>>>>>>>>>>>>>>>>>>>>>>"+value.toString());
 		for (Map.Entry<K, V> entry : entrySet()) {
 			V val = entry.getValue();
-			System.out.println("v>>>>>>>>>>>>>>>>>>>>>>"+val.toString());
+			System.out.println("value>>>>>>>>>>>>>>>>>>>>>>"+val.toString());
 			if (value == null) {
 				if (val == null) {
 					return true;

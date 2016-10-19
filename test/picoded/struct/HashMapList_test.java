@@ -14,7 +14,7 @@ import org.junit.Test;
 import picoded.struct.HashMapList;
 
 ///
-/// Test Case for picoded.struct.CaseInsensitiveHashMap
+/// Test Case for picoded.struct.HashMapList
 ///
 public class HashMapList_test {
 	

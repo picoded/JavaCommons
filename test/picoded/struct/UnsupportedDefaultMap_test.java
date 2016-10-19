@@ -99,7 +99,7 @@ public class UnsupportedDefaultMap_test {
 	@Test 
 	public void containsValueForNullTest() {
 		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
-		when(unsupportedDefaultMap.entrySet()).thenReturn(null);
+		when(unsupportedDefaultMap.entrySet()).thenReturn(new HashSet<>());
 		assertFalse(unsupportedDefaultMap.containsValue(null));
 	}
 	

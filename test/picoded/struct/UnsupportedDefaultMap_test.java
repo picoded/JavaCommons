@@ -97,68 +97,35 @@ public class UnsupportedDefaultMap_test {
 	}
 	
 	@Test 
-	public void containsValueTest() {
-		Set<Map.Entry<String, String>> set =null;
-		Map<String, String> map = null;
-		when(unsupportedDefaultMap.containsValue("value")).thenCallRealMethod();
-		assertFalse(unsupportedDefaultMap.containsValue("value"));
+	public void containsValueForNullTest() {
+		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
+		when(unsupportedDefaultMap.entrySet()).thenReturn(new HashSet<>());
+		assertFalse(unsupportedDefaultMap.containsValue(null));
+	}
 	
-//		when(unsupportedDefaultMap.entrySet()).thenReturn(null);
-//		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
-//		assertFalse(unsupportedDefaultMap.containsValue(null));
-//		unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
-//		
-//		when(unsupportedDefaultMap.entrySet()).thenReturn(new HashSet<>());
-//		assertFalse(unsupportedDefaultMap.containsValue(""));
-//
-//		// set is blank
-//		set = new HashSet<>();
-//		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-//		assertFalse(unsupportedDefaultMap.containsValue("AQW"));
-//		
-//		// value==null and key-value==null
-//		set = new HashSet<>();
-//		map = new HashMap<>();
-//		map.put("K1", null);
-//		set.addAll(map.entrySet());
-//		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-//		assertFalse(unsupportedDefaultMap.containsValue(null));
-//		
-//		// value==null and key-value!=null
-//		set = new HashSet<>();
-//		map = new HashMap<>();
-//		String keyValue = new String("V");
-//		map.put("K", keyValue);
-//		set.addAll(map.entrySet());
-//		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-//		assertFalse(unsupportedDefaultMap.containsValue(null));
-//		
-//		// value==V2 and key-value==V2
-//		set = new HashSet<>();
-//		map = new HashMap<>();
-//		keyValue = new String("V2");
-//		map.put("K2", keyValue);
-//		set.addAll(map.entrySet());
-//		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-//		assertTrue(unsupportedDefaultMap.containsValue(keyValue));
-//		
-//		// value==XYZ and key-value==ABC
-//		set = new HashSet<>();
-//		map = new HashMap<>();
-//		keyValue = new String("ABC");
-//		map.put("K3", keyValue);
-//		set.addAll(map.entrySet());
-//		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-//		assertFalse(unsupportedDefaultMap.containsValue(new String("XYZ")));
-//		
-//		// value==XYZ and key-value==ABC
-//		set = new HashSet<>();
-//		map = new HashMap<>();
-//		keyValue = null;
-//		map.put("K4", keyValue);
-//		set.addAll(map.entrySet());
-//		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
-//		assertFalse(unsupportedDefaultMap.containsValue(new String("VV2")));
+	@Test 
+	public void containsValueForNullConditionTest() {
+		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
+		Set<Map.Entry<String, String>> set = new HashSet<>();
+		Map<String, String> map = new HashMap<>();
+		map.put("key4", "V1");
+		map.put("key5", null);
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertTrue(unsupportedDefaultMap.containsValue(null));
+	
+	}
+	
+	@Test 
+	public void containsValueTest() {
+		when(unsupportedDefaultMap.containsValue("V2")).thenCallRealMethod();
+		Set<Map.Entry<String, String>> set = new HashSet<>();
+		Map<String, String> map = new HashMap<>();
+		map.put("key4", "V1");
+		map.put("key5", "V2");
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertTrue(unsupportedDefaultMap.containsValue("V2"));
 	}
 	
 	@Test 

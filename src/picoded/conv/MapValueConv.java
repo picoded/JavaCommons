@@ -60,7 +60,7 @@ public class MapValueConv {
 	
 	public static Map<String, Object> fromFullyQualifiedKeys(Map<String, Object> source) {
 		Map<String, Object> finalMap = new HashMap<String, Object>();
-		for (Map.Entry<String,Object> sourceKey : source.entrySet()) {
+		for (Map.Entry<String, Object> sourceKey : source.entrySet()) {
 			recreateObject(finalMap, sourceKey.getKey(), sourceKey.getValue());
 		}
 		
@@ -93,21 +93,22 @@ public class MapValueConv {
 					
 				} else if (obj instanceof Map) {
 					Map<String, Object> objMap = (Map<String, Object>) obj;
-					for (Map.Entry<String,Object> objMapKey1 : objMap.entrySet()) {
+					for (Map.Entry<String, Object> objMapKey1 : objMap.entrySet()) {
 						parentName = "";
 						if (rootName.isEmpty()) {
 							parentName = objMapKey1.getKey();
 						} else {
 							parentName = rootName + "[" + counter + "]" + separator + objMapKey1.getKey();
 						}
-						fullyQualifiedMap.putAll(toFullyQualifiedKeys(objMap.get(objMapKey1.getKey()), parentName, separator));
+						fullyQualifiedMap
+							.putAll(toFullyQualifiedKeys(objMap.get(objMapKey1.getKey()), parentName, separator));
 					}
 					++counter;
 				}
 			}
 		} else if (source instanceof Map) {
 			Map<String, Object> sourceMap = (Map<String, Object>) source;
-			for (Map.Entry<String,Object> sourceMapKey : sourceMap.entrySet()) {
+			for (Map.Entry<String, Object> sourceMapKey : sourceMap.entrySet()) {
 				parentName = "";
 				if (rootName.isEmpty()) {
 					parentName = sourceMapKey.getKey();

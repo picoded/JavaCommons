@@ -150,10 +150,21 @@ public class UnsupportedDefaultMap_test {
 	
 	@Test 
 	public void containsValueForOuterNullConditionTest2() {
-		when(unsupportedDefaultMap.containsValue("V2")).thenCallRealMethod();
+		when(unsupportedDefaultMap.containsValue("ABC")).thenCallRealMethod();
 		Set<Map.Entry<String, String>> set = new HashSet<>();
 		Map<String, String> map = new HashMap<>();
 		map.put("key5", "V2");
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertFalse(unsupportedDefaultMap.containsValue("ABC"));
+	}
+	
+	@Test 
+	public void containsValueForOuterNullConditionTest3() {
+		when(unsupportedDefaultMap.containsValue("ABC")).thenCallRealMethod();
+		Set<Map.Entry<String, String>> set = new HashSet<>();
+		Map<String, String> map = new HashMap<>();
+		map.put("key5", null);
 		set.addAll(map.entrySet());
 		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		assertFalse(unsupportedDefaultMap.containsValue("ABC"));

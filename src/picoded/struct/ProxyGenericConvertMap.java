@@ -14,7 +14,7 @@ public class ProxyGenericConvertMap<K, V> extends AbstractMapDecorator<K, V> imp
 	//
 	// ------------------------------------------------------
 	
-	// / Consturctor
+	/// Consturctor
 	public ProxyGenericConvertMap() {
 		super();
 	}

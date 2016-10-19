@@ -40,12 +40,12 @@ public class GenericConvertHashMap<K, V> extends HashMap<K, V> implements Generi
 	//
 	// ------------------------------------------------------
 	
-	// / Consturctor
+	/// Consturctor
 	public GenericConvertHashMap() {
 		super();
 	}
 	
-	// / Consturctor
+	/// Consturctor
 	public GenericConvertHashMap(Map<? extends K, ? extends V> m) {
 		super(m);
 	}

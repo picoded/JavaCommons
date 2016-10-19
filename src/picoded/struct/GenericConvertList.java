@@ -5,45 +5,7 @@ import java.util.UUID;
 
 import picoded.conv.GenericConvert;
 
-/**
- * The <tt>List</tt> interface provides four methods for positional (indexed)
- * access to list elements. Lists (like Java arrays) are zero based. Note that
- * these operations may execute in time proportional to the index value for some
- * implementations (the <tt>LinkedList</tt> class, for example). Thus, iterating
- * over the elements in a list is typically preferable to indexing through it if
- * the caller does not know the implementation.
- * <p>
- *
- * The <tt>List</tt> interface provides a special iterator, called a
- * <tt>ListIterator</tt>, that allows element insertion and replacement, and
- * bidirectional access in addition to the normal operations that the
- * <tt>Iterator</tt> interface provides. A method is provided to obtain a list
- * iterator that starts at a specified position in the list.
- * <p>
- *
- * The <tt>List</tt> interface provides two methods to search for a specified
- * object. From a performance standpoint, these methods should be used with
- * caution. In many implementations they will perform costly linear searches.
- * <p>
- *
- * The <tt>List</tt> interface provides two methods to efficiently insert and
- * remove multiple elements at an arbitrary point in the list.
- * <p>
- *
- * Note: While it is permissible for lists to contain themselves as elements,
- * extreme caution is advised: the <tt>equals</tt> and <tt>hashCode</tt> methods
- * are no longer well defined on such a list.
- *
- * <p>
- * This interface is a member of the <a href="{@docRoot}
- * /../technotes/guides/collections/index.html"> Java Collections Framework</a>.
- *
- * @param <E>
- *            the type of elements in this list
- *
- * @see List
- */
-
+/// Common list class, used to implement all the generic convert convinence functions in a map interface
 public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	
 	// Static proxy build
@@ -303,10 +265,6 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 		return GenericConvert.toGUID(getSilent(index));
 	}
 	
-	// to list
-	// @TODO generic list conversion
-	//--------------------------------------------------------------------------------------------------
-	
 	/// To List<Object> conversion of generic object
 	///
 	/// @param index       The input value index to convert
@@ -325,10 +283,6 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	default List<Object> getObjectList(int index) {
 		return GenericConvert.toObjectList(getSilent(index));
 	}
-	
-	// to array
-	// @TODO generic array conversion
-	//--------------------------------------------------------------------------------------------------
 	
 	// to string array
 	//--------------------------------------------------------------------------------------------------

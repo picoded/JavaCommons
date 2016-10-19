@@ -20,8 +20,11 @@ import org.mockito.Mockito;
 
 public class GenericConvertMap_test {
 	
+	@SuppressWarnings("unchecked")
 	private GenericConvertMap<String, String> genericConvertMap = Mockito.mock(GenericConvertMap.class,
 		Mockito.CALLS_REAL_METHODS);
+	
+	@SuppressWarnings("unchecked")
 	private GenericConvertMap<String, String> genericConvertMapForValid = Mockito.mock(GenericConvertMap.class);
 	
 	@Before

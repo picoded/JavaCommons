@@ -8,9 +8,11 @@ import java.util.Map;
 import java.util.Set;
 
 ///
-/// Simple interface pattern, that implements the default map functions, which throws an UnsupportedOperationException
+/// Simple interface pattern, that implements the default map functions, 
+/// which throws an UnsupportedOperationException for core functions (get/put/remove/keyset)
 ///
-/// @TODO Implment several default functions such as putAll using put / entrySet, using keySet, etc. 
+/// While attempting to polyfill all other operations in possibly suboptimal usage patterns
+/// But atleast it works =)
 ///
 /// ### Example Usage
 ///
@@ -21,28 +23,31 @@ import java.util.Set;
 ///
 public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 	
+	//-------------------------------------------------------------------
+	//
 	// Critical functions that need to over-ride, to support Map
-	// -------------------------------------------------------------------
+	//
+	//-------------------------------------------------------------------
 	
-	// / throws an UnsupportedOperationException
+	/// throws an UnsupportedOperationException
 	@Override
 	default V get(Object key) {
 		throw new UnsupportedOperationException("function not supported");
 	}
 	
-	// / throws an UnsupportedOperationException
+	/// throws an UnsupportedOperationException
 	@Override
 	default V put(K key, V value) {
 		throw new UnsupportedOperationException("function not supported");
 	}
 	
-	// / throws an UnsupportedOperationException
+	/// throws an UnsupportedOperationException
 	@Override
 	default V remove(Object key) {
 		throw new UnsupportedOperationException("function not supported");
 	}
 	
-	// / throws an UnsupportedOperationException
+	/// throws an UnsupportedOperationException
 	@Override
 	default Set<K> keySet() {
 		throw new UnsupportedOperationException("function not supported");
@@ -55,13 +60,19 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 		}
 	}
 	
-	// / Does an unoptimized check, using keySet9)
+	//-------------------------------------------------------------------
+	//
+	// Map polyfill related functions
+	//
+	//-------------------------------------------------------------------
+	
+	/// Does an unoptimized check, using keySet9)
 	@Override
 	default boolean containsKey(Object key) {
 		return keySet().contains(key);
 	}
 	
-	// / Does an unoptimized check, using keySet9)
+	/// Does an unoptimized check, using keySet9)
 	@Override
 	default boolean containsValue(Object value) {
 		for (Map.Entry<K, V> entry : entrySet()) {
@@ -79,7 +90,7 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 		return false;
 	}
 	
-	// / throws an UnsupportedOperationException
+	/// throws an UnsupportedOperationException
 	@Override
 	default Set<Map.Entry<K, V>> entrySet() {
 		Set<Map.Entry<K, V>> ret = new HashSet<Map.Entry<K, V>>();
@@ -89,13 +100,13 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 		return ret;
 	}
 	
-	// / throws an UnsupportedOperationException
+	/// throws an UnsupportedOperationException
 	@Override
 	default boolean isEmpty() {
 		return keySet().isEmpty();
 	}
 	
-	// / throws an UnsupportedOperationException
+	/// throws an UnsupportedOperationException
 	@Override
 	default void putAll(Map<? extends K, ? extends V> m) {
 		for (Map.Entry<? extends K, ? extends V> e : m.entrySet()) {
@@ -103,13 +114,13 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 		}
 	}
 	
-	// / throws an UnsupportedOperationException
+	/// throws an UnsupportedOperationException
 	@Override
 	default int size() {
 		return keySet().size();
 	}
 	
-	// / throws an UnsupportedOperationException
+	/// throws an UnsupportedOperationException
 	@Override
 	default Collection<V> values() {
 		List<V> ret = new ArrayList<V>();

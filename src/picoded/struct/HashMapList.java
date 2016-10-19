@@ -9,7 +9,7 @@ import picoded.conv.MapValueConv;
 ///
 /// @TODO : Implement the GenericConvertMap interface, once that class is transfered to RC
 ///
-public class HashMapList<K, V> extends HashMap<K, List<V>> /* implements GenericConvertMap<K, List<V>> */{
+public class HashMapList<K, V> extends HashMap<K, List<V>> implements GenericConvertMap<K, List<V>> {
 	
 	/// "Serializable" classes should have a version id 
 	private static final long serialVersionUID = 1L;

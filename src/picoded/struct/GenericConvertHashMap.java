@@ -25,9 +25,10 @@ import picoded.conv.GenericConvert;
 ///
 public class GenericConvertHashMap<K, V> extends HashMap<K, V> implements GenericConvertMap<K, V> {
 	
+	/// Serial version UID
 	private static final long serialVersionUID = 1L;
 	
-	// / Implments a JSON to string conversion
+	/// Implments a JSON to string conversion
 	@Override
 	public String toString() {
 		return GenericConvert.toString(this);

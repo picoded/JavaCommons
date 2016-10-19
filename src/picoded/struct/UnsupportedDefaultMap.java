@@ -8,9 +8,11 @@ import java.util.Map;
 import java.util.Set;
 
 ///
-/// Simple interface pattern, that implements the default map functions, which throws an UnsupportedOperationException
+/// Simple interface pattern, that implements the default map functions, 
+/// which throws an UnsupportedOperationException for core functions (get/put/remove/keyset)
 ///
-/// @TODO Implment several default functions such as putAll using put / entrySet, using keySet, etc. 
+/// While attempting to polyfill all other operations in possibly suboptimal usage patterns
+/// But atleast it works =)
 ///
 /// ### Example Usage
 ///
@@ -21,8 +23,11 @@ import java.util.Set;
 ///
 public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 	
+	//-------------------------------------------------------------------
+	//
 	// Critical functions that need to over-ride, to support Map
-	// -------------------------------------------------------------------
+	//
+	//-------------------------------------------------------------------
 	
 	/// throws an UnsupportedOperationException
 	@Override
@@ -54,6 +59,12 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 			remove(key);
 		}
 	}
+	
+	//-------------------------------------------------------------------
+	//
+	// Map polyfill related functions
+	//
+	//-------------------------------------------------------------------
 	
 	/// Does an unoptimized check, using keySet9)
 	@Override

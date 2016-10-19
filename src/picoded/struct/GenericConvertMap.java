@@ -7,6 +7,7 @@ import java.util.function.BiFunction;
 
 import picoded.conv.GenericConvert;
 
+/// Common map class, used to implement all the generic convert convinence functions in a map interface
 public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	
 	// Static proxy build

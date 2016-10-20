@@ -89,11 +89,7 @@ public class MapValueConv {
 			
 			int counter = 0;
 			for (Object obj : sourceList) {
-				
-				if (!rootName.isEmpty()) {
-					parentName = rootName + "[" + counter + "]";
-				}
-				
+				parentName = getRootName(rootName, counter);
 				if (obj instanceof List) {
 					fullyQualifiedMap.putAll(toFullyQualifiedKeys(obj, parentName, separator));
 					++counter;
@@ -132,7 +128,13 @@ public class MapValueConv {
 		
 		return fullyQualifiedMap;
 	}
-	
+	private static String getRootName(String rootName, Integer counter){
+		String parentName="";
+		if (!rootName.isEmpty()) {
+			return parentName = rootName + "[" + counter + "]";
+		}
+		return parentName;
+	}
 	@SuppressWarnings("unchecked")
 	private static void recreateObject(Object source, String key, Object value) {
 		if (key.contains("]") && key.contains(".")) {

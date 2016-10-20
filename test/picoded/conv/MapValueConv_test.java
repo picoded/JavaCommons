@@ -161,6 +161,7 @@ public class MapValueConv_test {
 		Map<String, Object> map=new HashMap<String, Object>();
 		map.put("abc", "xyz");
 		assertNotNull(MapValueConv.toFullyQualifiedKeys(map, null, new String()));
+		assertNotNull(MapValueConv.toFullyQualifiedKeys(map, "abc", new String()));
 		List<Map<String, Object>> list=new ArrayList<Map<String, Object>>();
 		map=new HashMap<String, Object>();
 		map.put("abc", "test");
@@ -169,4 +170,3 @@ public class MapValueConv_test {
 		
 	}
 }
-

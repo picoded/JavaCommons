@@ -15,7 +15,7 @@ public class MapValueConv {
 	protected MapValueConv() {
 		throw new IllegalAccessError("Utility class");
 	}
-
+	
 	/// Converts a Map with List values, into array values
 	public static <A, B> Map<A, B[]> listToArray(Map<A, List<B>> source, Map<A, B[]> target, B[] arrayType) {
 		// Normalize array type to 0 length
@@ -138,55 +138,53 @@ public class MapValueConv {
 				String[] bracketSplit = key.split("\\[|\\]|\\.");
 				bracketSplit = sanitiseArray(bracketSplit);
 				
-				if (bracketSplit.length > 1) {
-					if (stringIsNumber(bracketSplit[0])) { //numbers only
-						int index = Integer.parseInt(bracketSplit[0]);
-						List<Object> sourceList = (List<Object>) source;
-						
-						if (index >= sourceList.size()) {
-							for (int i = sourceList.size(); i <= index; ++i) {
-								sourceList.add(new Object());
-							}
+				if (bracketSplit.length > 1 && stringIsNumber(bracketSplit[0])) { //numbers only
+					int index = Integer.parseInt(bracketSplit[0]);
+					List<Object> sourceList = (List<Object>) source;
+					
+					if (index >= sourceList.size()) {
+						for (int i = sourceList.size(); i <= index; ++i) {
+							sourceList.add(new Object());
 						}
-						
-						if (stringIsWord(bracketSplit[1])) { //put map
-							Object retrievedValue = sourceList.get(index);
-							Map<String, Object> newMap = new HashMap<String, Object>();
-							
-							if (retrievedValue instanceof Map) {
-								newMap = (Map<String, Object>) retrievedValue;
-							}
-							
-							sourceList.remove(index);
-							sourceList.add(index, newMap);
-							
-							key = key.substring(key.indexOf('.') + 1, key.length());
-							recreateObject(newMap, key, value);
-						} else if (stringIsNumber(bracketSplit[1])) { //put list [1, 0, secondLayer0]
-							Object retrievedValue = sourceList.get(index);
-							List<Object> newList = new ArrayList<Object>();
-							
-							if (retrievedValue instanceof List) {
-								newList = (List<Object>) retrievedValue;
-							}
-							
-							sourceList.remove(index);
-							sourceList.add(index, newList);
-							
-							key = key.substring(key.indexOf(']') + 1, key.length());
-							recreateObject(newList, key, value);
-						}
-					} else {
-						Map<String, Object> sourceMap = (Map<String, Object>) source;
-						List<Object> element = (List<Object>) sourceMap.get(bracketSplit[0]);
-						if (element == null) {
-							element = new ArrayList<Object>();
-							sourceMap.put(bracketSplit[0], element);
-						}
-						
-						key = key.substring(bracketSplit[0].length(), key.length());
-						recreateObject(element, key, value);
 					}
+					
+					if (stringIsWord(bracketSplit[1])) { //put map
+						Object retrievedValue = sourceList.get(index);
+						Map<String, Object> newMap = new HashMap<String, Object>();
+						
+						if (retrievedValue instanceof Map) {
+							newMap = (Map<String, Object>) retrievedValue;
+						}
+						
+						sourceList.remove(index);
+						sourceList.add(index, newMap);
+						
+						key = key.substring(key.indexOf('.') + 1, key.length());
+						recreateObject(newMap, key, value);
+					} else if (stringIsNumber(bracketSplit[1])) { //put list [1, 0, secondLayer0]
+						Object retrievedValue = sourceList.get(index);
+						List<Object> newList = new ArrayList<Object>();
+						
+						if (retrievedValue instanceof List) {
+							newList = (List<Object>) retrievedValue;
+						}
+						
+						sourceList.remove(index);
+						sourceList.add(index, newList);
+						
+						key = key.substring(key.indexOf(']') + 1, key.length());
+						recreateObject(newList, key, value);
+					}
+				} else {
+					Map<String, Object> sourceMap = (Map<String, Object>) source;
+					List<Object> element = (List<Object>) sourceMap.get(bracketSplit[0]);
+					if (element == null) {
+						element = new ArrayList<Object>();
+						sourceMap.put(bracketSplit[0], element);
+					}
+					
+					key = key.substring(bracketSplit[0].length(), key.length());
+					recreateObject(element, key, value);
 				}
 			}
 		} else {
@@ -215,18 +213,15 @@ public class MapValueConv {
 	private static boolean stringIsNumber(String source) {
 		if (source.matches("[0-9]+")) {
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 	
 	private static boolean stringIsWord(String source) {
-		
 		if (!source.startsWith("[") && !source.startsWith("]") && !source.startsWith(".")
 			&& !source.substring(0, 1).matches("[0-9]+")) {
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 }

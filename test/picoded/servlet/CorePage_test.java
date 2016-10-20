@@ -33,6 +33,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -502,7 +503,11 @@ public class CorePage_test {
 	
 	@Test
 	public void getContextURITest() {
-		assertEquals("/", corePage.getContextURI());
+		if (SystemUtils.IS_OS_WINDOWS) {
+			assertEquals("/", corePage.getContextURI());
+		} else {
+			assertEquals("\\", corePage.getContextURI());
+		}
 	}
 	
 	@Test
@@ -928,7 +933,11 @@ public class CorePage_test {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		corePage.httpRequest = request;
 		when(request.getPathInfo()).thenReturn("/home");
-		assertEquals("\\home", corePage.requestWildcardUri());
+		if (SystemUtils.IS_OS_WINDOWS) {
+			assertEquals("\\home", corePage.requestWildcardUri());
+		} else {
+			assertEquals("/home", corePage.requestWildcardUri());
+		}
 	}
 	
 	@Test

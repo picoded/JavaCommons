@@ -89,7 +89,7 @@ public class MapValueConv {
 			
 			int counter = 0;
 			for (Object obj : sourceList) {
-				parentName = getRootName(rootName, counter);
+				parentName = getRootName(rootName, counter, null, null);
 				if (obj instanceof List) {
 					fullyQualifiedMap.putAll(toFullyQualifiedKeys(obj, parentName, separator));
 					++counter;
@@ -98,11 +98,7 @@ public class MapValueConv {
 				if (obj instanceof Map) {
 					Map<String, Object> objMap = (Map<String, Object>) obj;
 					for (Map.Entry<String, Object> objMapKey1 : objMap.entrySet()) {
-						if (rootName.isEmpty()) {
-							parentName = objMapKey1.getKey();
-						} else {
-							parentName = rootName + "[" + counter + "]" + separator + objMapKey1.getKey();
-						}
+						parentName = getRootName(rootName, counter, separator, objMapKey1.getKey());
 						fullyQualifiedMap
 							.putAll(toFullyQualifiedKeys(objMap.get(objMapKey1.getKey()), parentName, separator));
 					}
@@ -128,12 +124,15 @@ public class MapValueConv {
 		
 		return fullyQualifiedMap;
 	}
-	private static String getRootName(String rootName, Integer counter){
-		String parentName="";
-		if (!rootName.isEmpty()) {
-			return parentName = rootName + "[" + counter + "]";
+	private static String getRootName(String rootName, Integer counter, String separator, String objMapKey){
+		if (!rootName.isEmpty() && counter != null) {
+			return rootName + "[" + counter + "]";
+		} else if(!rootName.isEmpty()&& objMapKey != null){
+			return rootName + "[" + counter + "]" + separator + objMapKey;
+		}else if(rootName.isEmpty() && objMapKey != null){
+			return objMapKey;
 		}
-		return parentName;
+		return "";
 	}
 	@SuppressWarnings("unchecked")
 	private static void recreateObject(Object source, String key, Object value) {

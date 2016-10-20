@@ -11,6 +11,11 @@ import java.util.Map;
 ///
 public class MapValueConv {
 	
+	/// Invalid constructor (throws exception)
+	protected MapValueConv() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	/// Converts a Map with List values, into array values
 	public static <A, B> Map<A, B[]> listToArray(Map<A, List<B>> source, Map<A, B[]> target, B[] arrayType) {
 		// Normalize array type to 0 length

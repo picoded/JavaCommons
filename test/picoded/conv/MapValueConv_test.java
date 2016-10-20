@@ -5,21 +5,46 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.lesscss.deps.org.apache.commons.io.FileUtils;
-
-import picoded.conv.ConvertJSON;
-import picoded.conv.MapValueConv;
 
 public class MapValueConv_test {
+	
+	//
+	// Temp vars - To setup
+	//
+	Map<String, Object> unqualifiedMap;
+
+	/// Setup the temp vars
+	@Before
+	public void setUp() {
+		unqualifiedMap = new HashMap<String, Object>();
+	}
+	
+	@After
+	public void tearDown() {
+		
+	}
+
+	//
+	// Expected exception testing
+	//
+	
+	/// Invalid constructor test
+	@Test(expected = IllegalAccessError.class)
+	public void invalidConstructor() throws Exception {
+		new MapValueConv();
+	}
+
 	@Test
 	public void testTo() {
-		Map<String, Object> unqualifiedMap = new HashMap<String, Object>();
-		
 		File unqualifiedMapFile = new File("./test-files/test-specific/conv/unqualifiedMap.js");
 		String jsonString = "";
 		try {
@@ -102,5 +127,30 @@ public class MapValueConv_test {
 		assertNotNull(unqualifiedChaosMap);
 		assertTrue(jsonMap.equals(unqualifiedChaosMap));
 		
+	}
+	
+	@Test
+	public void listToArrayTest() {
+		Map<Object, List<Object>> map = new HashMap<Object, List<Object>>();
+		Map<Object, Object[]>  mapArrayObj = null;
+		map.put("test", null);
+		mapArrayObj = MapValueConv.listToArray(map, null);
+		assertNotNull(mapArrayObj);
+		List<Object> list=new ArrayList<Object>();
+		list.add("abc");
+		map.put("test", list);
+		mapArrayObj = MapValueConv.listToArray(map, new String[]{"abc"});
+	}
+	
+	@Test
+	public void singleToArrayTest() {
+		Map<Object, Object> map = new HashMap<Object, Object>();
+		Map<Object, Object[]>  mapArrayObj = null;
+		map.put("test", null);
+		mapArrayObj = MapValueConv.singleToArray(map, new String[]{});
+		assertNotNull(mapArrayObj);
+		map.put("test", "abc");
+		mapArrayObj = MapValueConv.singleToArray(map, new String[]{"abc"});
+		assertNotNull(mapArrayObj);
 	}
 }

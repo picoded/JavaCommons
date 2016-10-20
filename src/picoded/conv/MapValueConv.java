@@ -15,7 +15,7 @@ public class MapValueConv {
 	protected MapValueConv() {
 		throw new IllegalAccessError("Utility class");
 	}
-
+	
 	/// Converts a Map with List values, into array values
 	public static <A, B> Map<A, B[]> listToArray(Map<A, List<B>> source, Map<A, B[]> target, B[] arrayType) {
 		// Normalize array type to 0 length
@@ -94,19 +94,11 @@ public class MapValueConv {
 					fullyQualifiedMap.putAll(toFullyQualifiedKeys(obj, parentName, separator));
 					++counter;
 					
-				} 
+				}
 				if (obj instanceof Map) {
 					Map<String, Object> objMap = (Map<String, Object>) obj;
-					for (Map.Entry<String, Object> objMapKey1 : objMap.entrySet()) {
-						if (rootName.isEmpty()) {
-							parentName = objMapKey1.getKey();
-						} else {
-							parentName = rootName + "[" + counter + "]" + separator + objMapKey1.getKey();
-						}
-						fullyQualifiedMap
-							.putAll(toFullyQualifiedKeys(objMap.get(objMapKey1.getKey()), parentName, separator));
-					}
-					++counter;
+					fullyQualifiedMap = getFullyQualifiedMap(fullyQualifiedMap, objMap, rootName, parentName, counter, separator);
+					counter = (int) fullyQualifiedMap.get("counter");
 				}
 			}
 		} else if (source instanceof Map) {
@@ -128,19 +120,36 @@ public class MapValueConv {
 		
 		return fullyQualifiedMap;
 	}
-	private static String getRootName(String rootName, Integer counter){
+	
+	private static String getRootName(String rootName, Integer counter) {
 		if (!rootName.isEmpty()) {
 			return rootName + "[" + counter + "]";
 		}
 		return "";
 	}
+	
+	private static Map<String, Object> getFullyQualifiedMap(Map<String, Object> fullyQualifiedMap, Map<String, Object> objMap, 
+			String rootName, String parentName, int counter, String separator) {
+		for (Map.Entry<String, Object> objMapKey1 : objMap.entrySet()) {
+			if (rootName.isEmpty()) {
+				parentName = objMapKey1.getKey();
+			} else {
+				parentName = rootName + "[" + counter + "]" + separator + objMapKey1.getKey();
+			}
+			fullyQualifiedMap.putAll(toFullyQualifiedKeys(objMap.get(objMapKey1.getKey()), parentName, separator));
+		}
+		++counter;
+		fullyQualifiedMap.put("counter", counter);
+		return fullyQualifiedMap;
+	}
+	
 	@SuppressWarnings("unchecked")
 	private static void recreateObject(Object source, String key, Object value) {
 		if (key.contains("]") && key.contains(".")) {
 			if (key.indexOf(']') < key.indexOf('.')) {
 				String[] bracketSplit = key.split("\\[|\\]|\\.");
 				bracketSplit = sanitiseArray(bracketSplit);
-			
+				
 				if (bracketSplit.length > 1 && stringIsNumber(bracketSplit[0])) { //numbers only
 					int index = Integer.parseInt(bracketSplit[0]);
 					List<Object> sourceList = (List<Object>) source;
@@ -154,24 +163,24 @@ public class MapValueConv {
 					if (stringIsWord(bracketSplit[1])) { //put map
 						Object retrievedValue = sourceList.get(index);
 						Map<String, Object> newMap = new HashMap<String, Object>();
-					
+						
 						if (retrievedValue instanceof Map) {
 							newMap = (Map<String, Object>) retrievedValue;
 						}
-					
+						
 						sourceList.remove(index);
 						sourceList.add(index, newMap);
-					
+						
 						key = key.substring(key.indexOf('.') + 1, key.length());
 						recreateObject(newMap, key, value);
 					} else if (stringIsNumber(bracketSplit[1])) { //put list [1, 0, secondLayer0]
 						Object retrievedValue = sourceList.get(index);
 						List<Object> newList = new ArrayList<Object>();
-					
-					if (retrievedValue instanceof List) {
-						newList = (List<Object>) retrievedValue;
-					}
-					
+						
+						if (retrievedValue instanceof List) {
+							newList = (List<Object>) retrievedValue;
+						}
+						
 						sourceList.remove(index);
 						sourceList.add(index, newList);
 						
@@ -185,7 +194,7 @@ public class MapValueConv {
 						element = new ArrayList<Object>();
 						sourceMap.put(bracketSplit[0], element);
 					}
-						
+					
 					key = key.substring(bracketSplit[0].length(), key.length());
 					recreateObject(element, key, value);
 				}
@@ -206,7 +215,7 @@ public class MapValueConv {
 	private static String[] sanitiseArray(String[] source) {
 		List<String> holder = new ArrayList<String>();
 		for (int i = 0; i < source.length; ++i) {
-			if (source[i] != null && !source[i].isEmpty()) {
+			if (!source[i].isEmpty()) {
 				holder.add(source[i]);
 			}
 		}
@@ -224,7 +233,7 @@ public class MapValueConv {
 		if (!source.startsWith("[") && !source.startsWith("]") && !source.startsWith(".")
 			&& !source.substring(0, 1).matches("[0-9]+")) {
 			return true;
-		} 
-	 return false;
+		}
+		return false;
 	}
 }

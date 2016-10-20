@@ -97,7 +97,8 @@ public class MapValueConv {
 				}
 				if (obj instanceof Map) {
 					Map<String, Object> objMap = (Map<String, Object>) obj;
-					fullyQualifiedMap = getFullyQualifiedMap(fullyQualifiedMap, objMap, rootName, parentName, counter, separator);
+					fullyQualifiedMap = getFullyQualifiedMap(fullyQualifiedMap, objMap, rootName, parentName, counter,
+						separator);
 					counter = (int) fullyQualifiedMap.get("counter");
 				}
 			}
@@ -128,8 +129,8 @@ public class MapValueConv {
 		return "";
 	}
 	
-	private static Map<String, Object> getFullyQualifiedMap(Map<String, Object> fullyQualifiedMap, Map<String, Object> objMap, 
-			String rootName, String parentName, int counter, String separator) {
+	private static Map<String, Object> getFullyQualifiedMap(Map<String, Object> fullyQualifiedMap,
+		Map<String, Object> objMap, String rootName, String parentName, int counter, String separator) {
 		for (Map.Entry<String, Object> objMapKey1 : objMap.entrySet()) {
 			if (rootName.isEmpty()) {
 				parentName = objMapKey1.getKey();

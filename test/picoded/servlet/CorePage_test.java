@@ -506,7 +506,7 @@ public class CorePage_test {
 		if (SystemUtils.IS_OS_WINDOWS) {
 			assertEquals("/", corePage.getContextURI());
 		} else {
-			assertEquals("\\", corePage.getContextURI());
+			assertEquals("../", corePage.getContextURI());
 		}
 	}
 	

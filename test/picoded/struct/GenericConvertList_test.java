@@ -4,7 +4,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
-
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -17,6 +16,8 @@ import org.mockito.Mockito;
 
 public class GenericConvertList_test {
 	
+	@SuppressWarnings("unchecked")
+	//	private GenericConvertList<String> genericConvertList = Mockito.mock(GenericConvertList.class, Mockito.CALLS_REAL_METHODS);
 	private GenericConvertList<String> genericConvertList = Mockito.mock(GenericConvertList.class,
 		Mockito.CALLS_REAL_METHODS);
 	
@@ -36,7 +37,10 @@ public class GenericConvertList_test {
 	
 	@Test
 	public void getSilentTest() {
+		assertNull(genericConvertList.getSilent(-1));
 		assertNull(genericConvertList.getSilent(0));
+		assertNull(genericConvertList.getSilent(1));
+		assertNull(genericConvertList.getSilent(2));
 	}
 	
 	@Test

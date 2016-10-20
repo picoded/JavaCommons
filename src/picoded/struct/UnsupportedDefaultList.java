@@ -13,18 +13,18 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	// Critical functions that need to over-ride, to support Map
 	// -------------------------------------------------------------------
 	
-	// / throws an UnsupportedOperationException
+	/// throws an UnsupportedOperationException
 	default E get(Object key) {
 		throw new UnsupportedOperationException("function not supported");
 	}
 	
-	// / throws an UnsupportedOperationException
+	/// throws an UnsupportedOperationException
 	@Override
 	default void add(int index, E value) {
 		throw new UnsupportedOperationException("function not supported");
 	}
 	
-	// / throws an UnsupportedOperationException
+	/// throws an UnsupportedOperationException
 	@Override
 	default boolean remove(Object key) {
 		throw new UnsupportedOperationException("function not supported");

@@ -1,13 +1,12 @@
 package picoded.struct;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
@@ -19,9 +18,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("unchecked")
 public class UnsupportedDefaultMap_test {
 	
-	@SuppressWarnings("unchecked")
 	UnsupportedDefaultMap<String, String> unsupportedDefaultMapForVoidMethod = mock(UnsupportedDefaultMap.class,
 		CALLS_REAL_METHODS);
 	UnsupportedDefaultMap<String, String> unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
@@ -99,9 +98,77 @@ public class UnsupportedDefaultMap_test {
 	}
 	
 	@Test
-	public void containsValueTest() {
-		when(unsupportedDefaultMap.containsValue("value")).thenCallRealMethod();
-		assertFalse(unsupportedDefaultMap.containsValue("value"));
+	public void containsValueForNullTest() {
+		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
+		when(unsupportedDefaultMap.entrySet()).thenReturn(new HashSet<>());
+		assertFalse(unsupportedDefaultMap.containsValue(null));
+	}
+	
+	@Test
+	public void containsValueForInnerNullConditionTest() {
+		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
+		Set<Map.Entry<String, String>> set = new HashSet<>();
+		Map<String, String> map = new HashMap<>();
+		map.put("key4", null);
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertTrue(unsupportedDefaultMap.containsValue(null));
+		
+	}
+	
+	@Test
+	public void containsValueForInnerNullConditionTest1() {
+		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
+		Set<Map.Entry<String, String>> set = new HashSet<>();
+		Map<String, String> map = new HashMap<>();
+		map.put("key5", "V2");
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertFalse(unsupportedDefaultMap.containsValue(null));
+	}
+	
+	@Test
+	public void containsValueForOuterNullConditionTest() {
+		when(unsupportedDefaultMap.containsValue(null)).thenCallRealMethod();
+		Set<Map.Entry<String, String>> set = new HashSet<>();
+		Map<String, String> map = new HashMap<>();
+		map.put("key5", null);
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertTrue(unsupportedDefaultMap.containsValue(null));
+	}
+	
+	@Test
+	public void containsValueForOuterNullConditionTest1() {
+		when(unsupportedDefaultMap.containsValue("V2")).thenCallRealMethod();
+		Set<Map.Entry<String, String>> set = new HashSet<>();
+		Map<String, String> map = new HashMap<>();
+		map.put("key5", "V2");
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertTrue(unsupportedDefaultMap.containsValue("V2"));
+	}
+	
+	@Test
+	public void containsValueForOuterNullConditionTest2() {
+		when(unsupportedDefaultMap.containsValue("ABC")).thenCallRealMethod();
+		Set<Map.Entry<String, String>> set = new HashSet<>();
+		Map<String, String> map = new HashMap<>();
+		map.put("key5", "V2");
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertFalse(unsupportedDefaultMap.containsValue("ABC"));
+	}
+	
+	@Test
+	public void containsValueForOuterNullConditionTest3() {
+		when(unsupportedDefaultMap.containsValue("ABC")).thenCallRealMethod();
+		Set<Map.Entry<String, String>> set = new HashSet<>();
+		Map<String, String> map = new HashMap<>();
+		map.put("key5", null);
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
+		assertFalse(unsupportedDefaultMap.containsValue("ABC"));
 	}
 	
 	@Test
@@ -203,9 +270,12 @@ public class UnsupportedDefaultMap_test {
 	
 	@Test
 	public void valuesValidTest() {
-		Set<String> set = new HashSet<>();
-		set.add("my_entry");
-		when(unsupportedDefaultMap.keySet()).thenReturn(set);
+		Set<Map.Entry<String, String>> set = new HashSet<>();
+		Map<String, String> map = new HashMap<>();
+		map.put("key1", "value1");
+		map.put("key2", "value2");
+		set.addAll(map.entrySet());
+		when(unsupportedDefaultMap.entrySet()).thenReturn(set);
 		when(unsupportedDefaultMap.values()).thenCallRealMethod();
 		assertEquals(set.size(), unsupportedDefaultMap.values().size());
 	}

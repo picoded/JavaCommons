@@ -89,17 +89,17 @@ public class MapValueConv {
 			
 			int counter = 0;
 			for (Object obj : sourceList) {
+				
+				if (!rootName.isEmpty()) {
+					parentName = rootName + "[" + counter + "]";
+				}
 				if (obj instanceof List) {
-					if (!rootName.isEmpty()) {
-						parentName = rootName + "[" + counter + "]";
-					}
 					fullyQualifiedMap.putAll(toFullyQualifiedKeys(obj, parentName, separator));
 					++counter;
 					
 				} else if (obj instanceof Map) {
 					Map<String, Object> objMap = (Map<String, Object>) obj;
 					for (Map.Entry<String, Object> objMapKey1 : objMap.entrySet()) {
-						parentName = "";
 						if (rootName.isEmpty()) {
 							parentName = objMapKey1.getKey();
 						} else {
@@ -114,7 +114,6 @@ public class MapValueConv {
 		} else if (source instanceof Map) {
 			Map<String, Object> sourceMap = (Map<String, Object>) source;
 			for (Map.Entry<String, Object> sourceMapKey : sourceMap.entrySet()) {
-				parentName = "";
 				if (rootName.isEmpty()) {
 					parentName = sourceMapKey.getKey();
 				} else {

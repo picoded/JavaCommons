@@ -169,4 +169,22 @@ public class MapValueConv_test {
 		assertNotNull(MapValueConv.toFullyQualifiedKeys(list, null, new String()));
 		
 	}
+	
+	@Test
+	public void recreateObjectTest() {
+		
+		Map<String, Object> unqualifiedMap = new HashMap<String, Object>();
+		assertNotNull(MapValueConv.fromFullyQualifiedKeys(unqualifiedMap));
+		
+		unqualifiedMap.put("","");
+		assertNotNull(MapValueConv.fromFullyQualifiedKeys(unqualifiedMap));
+		
+		unqualifiedMap = new HashMap<String, Object>();
+		unqualifiedMap.put("[]","");
+		assertNotNull(MapValueConv.fromFullyQualifiedKeys(unqualifiedMap));
+		
+		unqualifiedMap = new HashMap<String, Object>();
+		unqualifiedMap.put(".","");
+		assertNotNull(MapValueConv.fromFullyQualifiedKeys(unqualifiedMap));
+	}
 }

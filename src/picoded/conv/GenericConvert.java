@@ -87,7 +87,7 @@ public class GenericConvert {
 		}
 		
 		if (input instanceof Number) {
-			return (((Number) input).floatValue() > 0.0f);
+			return ((Number) input).floatValue() > 0.0f;
 		}
 		
 		if (input instanceof String && ((String) input).length() > 0) {
@@ -111,7 +111,7 @@ public class GenericConvert {
 				s = s.substring(0, 2);
 			}
 			try {
-				return (Integer.parseInt(s) > 0);
+				return Integer.parseInt(s) > 0;
 			} catch (Exception e) {
 				return fallbck;
 			}
@@ -157,8 +157,7 @@ public class GenericConvert {
 			//Numeric string conversion
 			
 			try {
-				BigDecimal bd = new BigDecimal(input.toString());
-				return bd;
+				return new BigDecimal(input.toString());
 			} catch (Exception e) {
 				return fallbck;
 			}

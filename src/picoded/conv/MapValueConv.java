@@ -200,7 +200,7 @@ public class MapValueConv {
 					recreateObject(element, key, value);
 				}
 			}
-		} else {
+		} else if (source instanceof Map) {
 			Map<String, Object> sourceMap = (Map<String, Object>) source;
 			sourceMap.put(key, value);
 		}

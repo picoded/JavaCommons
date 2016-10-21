@@ -87,7 +87,7 @@ public class GenericConvert {
 		}
 		
 		if (input instanceof Number) {
-			return ((Number) input).floatValue() > 0.0f;
+			return ((Number) input).floatValue() > 0.0F;
 		}
 		
 		if (input instanceof String && ((String) input).length() > 0) {
@@ -101,7 +101,7 @@ public class GenericConvert {
 				returnValue = "false";
 			}
 			if (!returnValue.isEmpty()) {
-				return Boolean.getBoolean(returnValue);
+				return Boolean.parseBoolean(returnValue);
 				
 			}
 			//Numeric string conversion

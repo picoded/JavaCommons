@@ -8,9 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
-
-
 //Target test class
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -19,21 +16,21 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
 public class GenericConvert_test {
-
+	
 	/// Setup the temp vars
 	@Before
 	public void setUp() {
 	}
-
+	
 	@After
 	public void tearDown() {
-
+		
 	}
-
+	
 	//
 	// Expected exception testing
 	//
-
+	
 	/// Invalid constructor test
 	@Test(expected = IllegalAccessError.class)
 	public void invalidConstructor() throws Exception {
@@ -47,34 +44,47 @@ public class GenericConvert_test {
 	
 	@Test
 	public void toBooleanTest() {
-		List<String> list=new ArrayList<String>();
+		List<String> list = new ArrayList<String>();
 		assertFalse(GenericConvert.toBoolean(list, false));
 		/// for boolean true false test case
-		Boolean boolean1=new Boolean(true);
-		assertTrue(GenericConvert.toBoolean(boolean1 , false));
-		boolean1=new Boolean(false);
-		assertFalse(GenericConvert.toBoolean(boolean1 , true));
+		Boolean boolean1 = new Boolean(true);
+		assertTrue(GenericConvert.toBoolean(boolean1, false));
+		boolean1 = new Boolean(false);
+		assertFalse(GenericConvert.toBoolean(boolean1, true));
 		/// for boolean number test case
-		assertTrue(GenericConvert.toBoolean(1 , true));
-		assertFalse(GenericConvert.toBoolean(0 , true));
+		assertTrue(GenericConvert.toBoolean(1, true));
+		assertFalse(GenericConvert.toBoolean(0, true));
 		/// for string test case
-		assertFalse(GenericConvert.toBoolean(null , false));
-		assertFalse(GenericConvert.toBoolean("" , false));
-		assertTrue(GenericConvert.toBoolean("123" , false));
-		assertTrue(GenericConvert.toBoolean("12" , false));
-		assertFalse(GenericConvert.toBoolean("-1" , false));
-		assertFalse(GenericConvert.toBoolean("$%" , false));
+		assertFalse(GenericConvert.toBoolean(null, false));
+		
+		assertFalse(GenericConvert.toBoolean("", false));
+		assertTrue(GenericConvert.toBoolean("+", false));
+		assertTrue(GenericConvert.toBoolean("t", false));
+		assertTrue(GenericConvert.toBoolean("T", false));
+		assertTrue(GenericConvert.toBoolean("y", false));
+		assertTrue(GenericConvert.toBoolean("Y", false));
+		
+		assertFalse(GenericConvert.toBoolean("-", false));
+		assertFalse(GenericConvert.toBoolean("f", false));
+		assertFalse(GenericConvert.toBoolean("F", false));
+		assertFalse(GenericConvert.toBoolean("n", false));
+		assertFalse(GenericConvert.toBoolean("N", false));
+		
+		assertTrue(GenericConvert.toBoolean("123", false));
+		assertTrue(GenericConvert.toBoolean("12", false));
+		assertFalse(GenericConvert.toBoolean("-1", false));
+		assertFalse(GenericConvert.toBoolean("$%", false));
 		
 	}
 	
 	@Test
 	public void toNumberTest() {
-		List<String> list=new ArrayList<String>();
+		List<String> list = new ArrayList<String>();
 		assertNotEquals(list, GenericConvert.toNumber(list, 0).intValue());
-		assertNotEquals("$%", GenericConvert.toNumber("$%" , 0).intValue());
-		assertEquals(10, GenericConvert.toNumber(10 , 0).intValue());
-		assertNotEquals("", GenericConvert.toNumber("" , 0).intValue());
-		assertEquals(new BigDecimal("01111111111111111"), GenericConvert.toNumber("01111111111111111" , 0));
+		assertNotEquals("$%", GenericConvert.toNumber("$%", 0).intValue());
+		assertEquals(10, GenericConvert.toNumber(10, 0).intValue());
+		assertNotEquals("", GenericConvert.toNumber("", 0).intValue());
+		assertEquals(new BigDecimal("01111111111111111"), GenericConvert.toNumber("01111111111111111", 0));
 		
 	}
 }

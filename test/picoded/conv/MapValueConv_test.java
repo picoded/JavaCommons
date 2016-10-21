@@ -92,7 +92,7 @@ public class MapValueConv_test {
 		
 		assertTrue(unqualifiedMap.get("clients") instanceof List);
 		List<Object> innerList = (List<Object>) unqualifiedMap.get("clients");
-		assertTrue(innerList.size() == 4);
+		assertTrue(innerList.size() == 3);
 		
 		Map<String, Object> innerMap = null;
 		innerMap = (Map<String, Object>) innerList.get(0);

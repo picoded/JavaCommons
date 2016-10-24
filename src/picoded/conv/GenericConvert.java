@@ -14,6 +14,12 @@ import picoded.struct.GenericConvertMap;
 import picoded.struct.ProxyGenericConvertMap;
 
 public class GenericConvert {
+	
+	/// Invalid constructor (throws exception)
+	protected GenericConvert() {
+		throw new IllegalAccessError("Utility class");
+	}
+	
 	// to string conversion
 	//--------------------------------------------------------------------------------------------------
 	
@@ -42,13 +48,7 @@ public class GenericConvert {
 			return input.toString();
 		}
 		
-		try {
-			return ConvertJSON.fromObject(input);
-		} catch (Exception e) {
-			// ignores
-		}
-		
-		return input.toString();
+		return ConvertJSON.fromObject(input);
 	}
 	
 	/// Default null fallback, To String conversion of generic object
@@ -87,30 +87,33 @@ public class GenericConvert {
 		}
 		
 		if (input instanceof Number) {
-			return (((Number) input).floatValue() > 0.0f);
+			return ((Number) input).floatValue() > 0.0F;
 		}
 		
 		if (input instanceof String && ((String) input).length() > 0) {
 			char tChar = ((String) input).charAt(0);
 			
 			//String conversion
+			String returnValue = "";
 			if (tChar == '+' || tChar == 't' || tChar == 'T' || tChar == 'y' || tChar == 'Y') {
-				return true;
+				returnValue = "true";
 			} else if (tChar == '-' || tChar == 'f' || tChar == 'F' || tChar == 'n' || tChar == 'N') {
-				return false;
+				returnValue = "false";
 			}
-			
+			if (!returnValue.isEmpty()) {
+				return Boolean.parseBoolean(returnValue);
+				
+			}
 			//Numeric string conversion
-			String s = ((String) input);
+			String s = (String) input;
 			
 			if (s.length() > 2) {
 				s = s.substring(0, 2);
 			}
 			try {
-				Integer i = Integer.valueOf(s);
-				return (i.intValue() > 0);
+				return Integer.parseInt(s) > 0;
 			} catch (Exception e) {
-				//does nothing
+				return fallbck;
 			}
 		}
 		
@@ -147,17 +150,16 @@ public class GenericConvert {
 		}
 		
 		if (input instanceof Number) {
-			return ((Number) input);
+			return (Number) input;
 		}
 		
 		if (input instanceof String && ((String) input).length() > 0) {
 			//Numeric string conversion
 			
 			try {
-				BigDecimal bd = new BigDecimal(((String) input));
-				return bd;
+				return new BigDecimal(input.toString());
 			} catch (Exception e) {
-				
+				return fallbck;
 			}
 		}
 		
@@ -484,7 +486,6 @@ public class GenericConvert {
 	/// @param fallbck   The fallback default (if not convertable)
 	///
 	/// @returns         The converted value
-	@SuppressWarnings("unchecked")
 	public static <K extends String, V> Map<K, V> toStringMap(Object input, Object fallbck) {
 		
 		// Null handling

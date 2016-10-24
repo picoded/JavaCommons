@@ -537,11 +537,11 @@ public class GenericConvert {
 	/// @param fallbck   The fallback default (if not convertable)
 	///
 	/// @returns         The converted value
-	@Deprecated
-	@SuppressWarnings("unchecked")
-	public static Map<String, Object> toStringObjectMap(Object input, Object fallbck) {
-		return toStringMap(input, fallbck);
-	}
+	//	@Deprecated
+	//	@SuppressWarnings("unchecked")
+	//	public static Map<String, Object> toStringObjectMap(Object input, Object fallbck) {
+	//		return toStringMap(input, fallbck);
+	//	}
 	
 	///
 	/// @Deprecated : Use {@link #toStringMap()} instead
@@ -551,10 +551,10 @@ public class GenericConvert {
 	/// @param input     The input value to convert
 	///
 	/// @returns         The converted value
-	@Deprecated
-	public static Map<String, Object> toStringObjectMap(Object input) {
-		return toStringObjectMap(input, null);
-	}
+	//	@Deprecated
+	//	public static Map<String, Object> toStringObjectMap(Object input) {
+	//		return toStringObjectMap(input, null);
+	//	}
 	
 	// Generic string map
 	//--------------------------------------------------------------------------------------------------

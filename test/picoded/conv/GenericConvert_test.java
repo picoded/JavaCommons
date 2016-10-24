@@ -2,13 +2,16 @@ package picoded.conv;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 //Target test class
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -85,6 +88,7 @@ public class GenericConvert_test {
 		assertFalse(GenericConvert.toBoolean("-1", false));
 		assertFalse(GenericConvert.toBoolean("$%", false));
 		
+		assertTrue(toBoolean(999, false));
 	}
 	
 	@Test
@@ -187,5 +191,100 @@ public class GenericConvert_test {
 		assertNotEquals("", GenericConvert.toNumber("", 0).intValue());
 		assertEquals(new BigDecimal("01111111111111111"), GenericConvert.toNumber("01111111111111111", 0));
 		
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Test
+	public void fetchObjectTest() {
+		assertNull(fetchObject(null, null, null));
+		assertEquals("default", fetchObject(null, null, "default"));
+		Map map = new HashMap();
+		assertNull(fetchObject(map, null, null));
+		map = new HashMap();
+		map.put("key", "value");
+		assertNull(fetchObject(map, null, null));
+		assertEquals("value", fetchObject(map, "key", null));
+		
+		List list = new ArrayList();
+		assertNull(fetchObject(list, null, null));
+		list = new ArrayList();
+		list.add("value");
+		assertNull(fetchObject(list, null, null));
+		assertNull("value", fetchObject(list, "key", null));
+		assertEquals("value", fetchObject(list, "0", null));
+		
+		assertEquals("default", fetchObject("value", "0", "default"));
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Test
+	public void fetchObjectWithTwoParametersTest() {
+		assertNull(fetchObject(null, null));
+		Map map = new HashMap();
+		assertNull(fetchObject(map, null));
+		map = new HashMap();
+		map.put("key", "value");
+		assertNull(fetchObject(map, null));
+		assertEquals("value", fetchObject(map, "key"));
+		
+		List list = new ArrayList();
+		assertNull(fetchObject(list, null));
+		list = new ArrayList();
+		list.add("value");
+		assertNull(fetchObject(list, null));
+		assertNull("value", fetchObject(list, "key"));
+		assertEquals("value", fetchObject(list, "0"));
+		
+		assertNull(fetchObject("value", "0"));
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Test
+	public void fetchNestedObjectTest() {
+		assertNull(fetchNestedObject(null, null));
+		
+		assertNull(fetchNestedObject(null, null, null));
+		assertEquals("default", fetchNestedObject(null, null, "default"));
+		assertEquals("default", fetchNestedObject("string", null, "default"));
+		Map map = new HashMap();
+		assertEquals("default", fetchNestedObject(map, null, "default"));
+		map.put("key", "value");
+		assertEquals("value", fetchNestedObject(map, "key", "default"));
+		assertEquals("value", fetchNestedObject(map, ".key", "default"));
+		map.put("key1", "value1");
+		assertEquals("value1", fetchNestedObject(map, "[key1]", "default"));
+		assertEquals("default", fetchNestedObject(map, "[key2]", "default"));
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Test(expected = RuntimeException.class)
+	public void fetchNestedObjectinvalidTest() {
+		Map map = new HashMap();
+		map.put("key", "value");
+		assertEquals("value1", fetchNestedObject(map, "[key1", "default"));
+	}
+	
+	@Test
+	public void toStringArrayTest() {
+		assertNull(toStringArray(null));
+		
+		assertNull(toStringArray(null, null));
+		
+		assertNull(toStringArray(null, "default"));
+		assertArrayEquals(new String[] { "key1", "key2" }, toStringArray(new String[] { "key1", "key2" }, "default"));
+		assertArrayEquals(new String[] { "1", "2.2" }, toStringArray(new Object[] { "1", "2.2" }, "default"));
+		assertArrayEquals(new String[] { "key1", "key2", "key3" },
+			toStringArray("[\"key1\",\"key2\",\"key3\"]", "default"));
+		List<String> list = new ArrayList<>();
+		list.add("key1");
+		list.add("key2");
+		assertArrayEquals(new String[] { "key1", "key2" }, toStringArray(list, "default"));
+	}
+	
+	@Test
+	public void toStringMapTest() {
+		assertNull(toStringMap(null));
+		
+		assertNull(toStringMap(null, null));
 	}
 }

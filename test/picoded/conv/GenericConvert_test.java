@@ -2,6 +2,7 @@ package picoded.conv;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -248,8 +249,10 @@ public class GenericConvert_test {
 		assertEquals("default", fetchNestedObject("string", null, "default"));
 		Map map = new HashMap();
 		assertEquals("default", fetchNestedObject(map, null, "default"));
+		assertEquals("default", fetchNestedObject(map, "", "default"));
 		map.put("key", "value");
 		assertEquals("value", fetchNestedObject(map, "key", "default"));
+		assertEquals("value", fetchNestedObject(map, " key ", "default"));
 		assertEquals("value", fetchNestedObject(map, ".key", "default"));
 		map.put("key1", "value1");
 		assertEquals("value1", fetchNestedObject(map, "[key1]", "default"));
@@ -258,7 +261,7 @@ public class GenericConvert_test {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test(expected = RuntimeException.class)
-	public void fetchNestedObjectinvalidTest() {
+	public void fetchNestedObjectInvalidTest() {
 		Map map = new HashMap();
 		map.put("key", "value");
 		assertEquals("value1", fetchNestedObject(map, "[key1", "default"));
@@ -272,13 +275,47 @@ public class GenericConvert_test {
 		
 		assertNull(toStringArray(null, "default"));
 		assertArrayEquals(new String[] { "key1", "key2" }, toStringArray(new String[] { "key1", "key2" }, "default"));
-		assertArrayEquals(new String[] { "1", "2.2" }, toStringArray(new Object[] { "1", "2.2" }, "default"));
+		assertArrayEquals(new String[] { "1", "2.2" }, toStringArray(new Object[] { "1", 2.2 }, "default"));
 		assertArrayEquals(new String[] { "key1", "key2", "key3" },
 			toStringArray("[\"key1\",\"key2\",\"key3\"]", "default"));
 		List<String> list = new ArrayList<>();
 		list.add("key1");
 		list.add("key2");
 		assertArrayEquals(new String[] { "key1", "key2" }, toStringArray(list, "default"));
+	}
+	
+	@Test
+	public void toObjectArrayTest() {
+		assertNull(toObjectArray(null));
+		
+		assertNull(toObjectArray(null, null));
+		assertNull(toObjectArray(null, "default"));
+		assertArrayEquals(new Object[] { "key1", "key2" }, toObjectArray(new String[] { "key1", "key2" }, "default"));
+		assertArrayEquals(new Object[] { "1", "2.2" }, toObjectArray(new String[] { "1", "2.2" }, "default"));
+		assertArrayEquals(new Object[] { "key1", "key2", "key3" },
+			toObjectArray("[\"key1\",\"key2\",\"key3\"]", "default"));
+		List<String> list = new ArrayList<>();
+		list.add("key1");
+		list.add("key2");
+		assertArrayEquals(new String[] { "key1", "key2" }, toObjectArray(list, "default"));
+	}
+	
+	@Test
+	public void toObjectListTest() {
+		assertNull(toObjectList(null));
+		
+		assertNull(toObjectList(null, null));
+		
+		assertNull(toObjectList(null, "default"));
+		assertEquals(Arrays.asList(new Object[] { "key1", "key2" }),
+			toObjectList(new String[] { "key1", "key2" }, "default"));
+		assertEquals(Arrays.asList(new Object[] { "1", "2.2" }), toObjectList(new String[] { "1", "2.2" }, "default"));
+		assertEquals(Arrays.asList(new Object[] { "key1", "key2", "key3" }),
+			toObjectList("[\"key1\",\"key2\",\"key3\"]", "default"));
+		List<String> list = new ArrayList<>();
+		list.add("key1");
+		list.add("key2");
+		assertEquals(Arrays.asList(new String[] { "key1", "key2" }), toObjectList(list, "default"));
 	}
 	
 	@Test

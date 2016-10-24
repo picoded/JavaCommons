@@ -5,8 +5,8 @@ import java.util.List;
 
 import picoded.conv.GenericConvert;
 
-public class GenericConvertArrayList<E> extends ArrayList<E> implements GenericConvertList<E>{
-
+public class GenericConvertArrayList<E> extends ArrayList<E> implements GenericConvertList<E> {
+	
 	/// Serial version UID
 	private static final long serialVersionUID = 1L;
 	
@@ -31,5 +31,5 @@ public class GenericConvertArrayList<E> extends ArrayList<E> implements GenericC
 	public GenericConvertArrayList(List<E> m) {
 		super(m);
 	}
-
+	
 }

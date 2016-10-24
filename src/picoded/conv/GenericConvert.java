@@ -398,7 +398,7 @@ public class GenericConvert {
 				try {
 					return GUID.fromBase58((String) input);
 				} catch (Exception e) {
-					
+					// Silence the exception
 				}
 			}
 		}
@@ -450,7 +450,7 @@ public class GenericConvert {
 						return (String) input;
 					}
 				} catch (Exception e) {
-					
+					// Silence the exception
 				}
 			}
 		}
@@ -971,13 +971,13 @@ public class GenericConvert {
 		
 		// Reuse vars?
 		Object ret = null;
-		int idxPos = 0;
+		//int idxPos = 0;
 		
 		// Full key fetch
 		if (baseMap != null) {
 			ret = baseMap.get(key);
 		} else { // if( baseList != null ) {
-			idxPos = toInt(key, -1);
+			int idxPos = toInt(key, -1);
 			if (idxPos >= 0 && idxPos < baseList.size()) {
 				ret = baseList.get(idxPos);
 			}

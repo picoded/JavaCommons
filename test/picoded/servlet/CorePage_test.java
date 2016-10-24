@@ -502,6 +502,7 @@ public class CorePage_test {
 	
 	@Test
 	public void getContextURITest() {
+		corePage._contextURI = "/";
 		assertEquals("/", corePage.getContextURI());
 	}
 	

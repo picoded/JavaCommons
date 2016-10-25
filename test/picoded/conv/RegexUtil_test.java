@@ -28,33 +28,38 @@ public class RegexUtil_test {
 	}
 	
 	@Test
-	public void removeAllWhiteSpace() {
+	public void removeAllWhiteSpaceTest() {
 		assertEquals("THereWILLBeNOWHITEISSPACE",
 			RegexUtil.removeAllWhiteSpace("T   H ere  WILL  Be N O W H I T E I S S PACE"));
 	}
 	
 	@Test
-	public void removeAllNonAlphaNumeric() {
+	public void removeAllNonAlphaNumericTest() {
 		assertEquals(RegexUtil.removeAllWhiteSpace("N NONALPHANUMERICS ARE ALLOWED hsdofhsd"),
 			RegexUtil.removeAllWhiteSpace(RegexUtil
 				.removeAllNonAlphaNumeric("N@ NON-ALPHANUMERICS ARE ALLOWED :- !#@!hsdofhsd")));
 	}
 	
 	@Test
-	public void removeAllNonAlphaNumeric_allowUnderscoreDashFullstop() {
+	public void removeAllNonAlphaNumericAllowUnderscoreDashFullstopTest() {
 		assertEquals("removesallnon-alphanumericsexcept_-.",
 			RegexUtil.removeAllNonAlphaNumeric_allowUnderscoreDashFullstop("removes all non-alphanumerics except _-."));
 	}
 	
 	@Test
-	public void removeAllNonAlphaNumeric_allowCommonSeparators() {
+	public void removeAllNonAlphaNumericAllowCommonSeparatorsTest() {
 		assertEquals("removesnon-alphanumericsexceptcommonseprators_",
 			RegexUtil
 				.removeAllNonAlphaNumeric_allowCommonSeparators("removes non-alphanumerics except common seprators /_,"));
 	}
 	
 	@Test
-	public void removeAllNonNumeric() {
+	public void removeAllNonNumericTest() {
 		assertEquals("12345", RegexUtil.removeAllNonNumeric("T 1  H 2er3e4  WILL 5 Be N O W H I T E I S S PACE"));
+	}
+	
+	@Test
+	public void sanitiseCommonEscapeCharactersIntoAsciiTest() {
+		assertEquals("&#92;&#60;test&#92;&#62;", RegexUtil.sanitiseCommonEscapeCharactersIntoAscii("\\<test\\>"));
 	}
 }

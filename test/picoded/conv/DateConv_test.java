@@ -26,6 +26,7 @@ public class DateConv_test {
 	public void tearDown() {
 		
 	}
+	
 	//
 	// Expected exception testing
 	//
@@ -36,7 +37,7 @@ public class DateConv_test {
 		new DateConv();
 		
 	}
-
+	
 	@Test
 	public void convMilliSecondsToISO() {
 		long millisecondsDate = Long.parseLong("1441756800000");
@@ -74,10 +75,12 @@ public class DateConv_test {
 		String isoDate_dmy = DateConv.toISOFormat(millisecondsDate, ISODateFormat.DDMMYYYY, "-");
 		
 		assertNull(DateConv.changeISODateFormat(null, null, null, null));
-		assertNull(DateConv.changeISODateFormat("", ISODateFormat.DDMMYYYY, ISODateFormat.YYYYMMDD,
-				null));
+		assertNull(DateConv.changeISODateFormat("", ISODateFormat.DDMMYYYY, ISODateFormat.YYYYMMDD, null));
 		
 		isoDate_dmy = DateConv.toISOFormat(millisecondsDate, ISODateFormat.DDMMYYYY, "-");
+		assertEquals("16-05-2015", isoDate_dmy);
+		
+		isoDate_dmy = DateConv.toISOFormat(millisecondsDate, ISODateFormat.DDMMYYYY, null);
 		assertEquals("16-05-2015", isoDate_dmy);
 		
 		String isoDate_ymd = DateConv.changeISODateFormat(isoDate_dmy, ISODateFormat.DDMMYYYY, ISODateFormat.YYYYMMDD,

@@ -17,7 +17,7 @@ public class DateConv {
 	protected DateConv() {
 		throw new IllegalAccessError("Utility class");
 	}
-
+	
 	public enum ISODateFormat {
 		DDMMYYYY, MMDDYYYY, YYYYMMDD, YYYYDDMM
 	}
@@ -48,7 +48,6 @@ public class DateConv {
 		} else {
 			//TODO sanitise separator string?
 		}
-		
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(inDate);

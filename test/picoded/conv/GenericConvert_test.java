@@ -260,6 +260,28 @@ public class GenericConvert_test {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Test
+	public void fetchNestedObjectRecursiveTest() {
+		Map map = new HashMap();
+		map.put("key", "value");
+		Map subMap = new HashMap();
+		subMap.put("sub_key", "sub_value");
+		map.put("key1", subMap);
+		assertEquals("sub_value", fetchNestedObject(map, "key1.sub_key", "default"));
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Test
+	public void fetchNestedObjectRecursiveArrayTest() {
+		Map map = new HashMap();
+		map.put("key", "value");
+		Map subMap = new HashMap();
+		subMap.put("sub_key", "sub_value");
+		map.put("key1", subMap);
+		assertEquals("sub_value", fetchNestedObject(map, "[key1][sub_key]", "default"));
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test(expected = RuntimeException.class)
 	public void fetchNestedObjectInvalidTest() {
 		Map map = new HashMap();
@@ -323,5 +345,80 @@ public class GenericConvert_test {
 		assertNull(toStringMap(null));
 		
 		assertNull(toStringMap(null, null));
+	}
+	
+	@Test
+	public void normalizeObjectPathTest() {
+		assertEquals("", normalizeObjectPath(null, null));
+		
+		assertEquals("", normalizeObjectPath(null, null, null).toString());
+		StringBuilder sb = new StringBuilder();
+		assertEquals("", normalizeObjectPath(null, null, sb).toString());
+		List<String> list = new ArrayList<String>();
+		assertEquals("", normalizeObjectPath(null, list, sb).toString());
+		list.add("key");
+		List<String> base = new ArrayList<String>();
+		assertEquals("", normalizeObjectPath(base, list, sb).toString());
+		base.add("my_path");
+		assertEquals("", normalizeObjectPath(base, list, sb).toString());
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key", "my_path");
+		assertEquals("key", normalizeObjectPath(map, list, sb).toString());
+		list = new ArrayList<String>();
+		list.add("0");
+		sb = new StringBuilder();
+		assertEquals("[0]", normalizeObjectPath(base, list, sb).toString());
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void normalizeObjectPathExceptionTest() {
+		StringBuilder sb = new StringBuilder();
+		List<String> list = new ArrayList<String>();
+		list.add("key");
+		assertEquals("", normalizeObjectPath(null, list, sb).toString());
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void normalizeObjectPathRecursiveExceptionTest() {
+		StringBuilder sb = new StringBuilder();
+		List<String> list = new ArrayList<String>();
+		list.add("0");
+		list.add("1");
+		List<String> base = new ArrayList<String>();
+		base.add("my_path");
+		base.add("my_second_path");
+		sb = new StringBuilder();
+		assertEquals("[0]", normalizeObjectPath(base, list, sb).toString());
+	}
+	
+	@Test
+	public void splitObjectPathTest() {
+		assertArrayEquals(new String[] {}, splitObjectPath(null));
+		
+		assertEquals(new ArrayList<String>(), splitObjectPath(null, null));
+		List<String> ret = new ArrayList<>();
+		assertEquals(new ArrayList<String>(), splitObjectPath(null, ret));
+		List<String> key = new ArrayList<String>();
+		key.add("my_key");
+		assertEquals(key, splitObjectPath(" my_key ", ret));
+		ret = new ArrayList<>();
+		assertEquals(key, splitObjectPath(".my_key", ret));
+		ret = new ArrayList<>();
+		key = new ArrayList<>();
+		key.add("key");
+		key.add("my_key");
+		assertEquals(key, splitObjectPath("key.my_key", ret));
+		ret = new ArrayList<>();
+		key = new ArrayList<>();
+		key.add("my_key");
+		assertEquals(key, splitObjectPath("[my_key]", ret));
+		
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void splitObjectPathExceptionTest() {
+		List<String> ret = new ArrayList<>();
+		List<String> key = new ArrayList<String>();
+		assertEquals(key, splitObjectPath("[my_key", ret));
 	}
 }

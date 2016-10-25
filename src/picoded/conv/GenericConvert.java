@@ -113,7 +113,8 @@ public class GenericConvert {
 			try {
 				return Integer.parseInt(s) > 0;
 			} catch (Exception e) {
-				return fallbck;
+				//return fallbck; //commented due to Code Smell
+				// Silence the exception
 			}
 		}
 		
@@ -393,14 +394,14 @@ public class GenericConvert {
 			return (UUID) input;
 		}
 		
-		if (input instanceof String) {
-			if (((String) input).length() == 22) {
-				try {
-					return GUID.fromBase58((String) input);
-				} catch (Exception e) {
-					// Silence the exception
-				}
+		if (input instanceof String && ((String) input).length() == 22) {
+			//if (((String) input).length() == 22) {
+			try {
+				return GUID.fromBase58((String) input);
+			} catch (Exception e) {
+				// Silence the exception
 			}
+			//}
 		}
 		
 		return toUUID(fallbck, null);
@@ -443,16 +444,16 @@ public class GenericConvert {
 			}
 		}
 		
-		if (input instanceof String) {
-			if (((String) input).length() >= 22) {
-				try {
-					if (GUID.fromBase58((String) input) != null) {
-						return (String) input;
-					}
-				} catch (Exception e) {
-					// Silence the exception
+		if (input instanceof String && ((String) input).length() >= 22) {
+			//if (((String) input).length() >= 22) {
+			try {
+				if (GUID.fromBase58((String) input) != null) {
+					return (String) input;
 				}
+			} catch (Exception e) {
+				// Silence the exception
 			}
+			//}
 		}
 		
 		return toGUID(fallbck, null);
@@ -706,18 +707,19 @@ public class GenericConvert {
 			}
 			return toStringArray(fallbck, null);
 		}
-		
+		String[] ret = null;
 		if (input instanceof String[]) {
-			return (String[]) input;
+			ret = (String[]) input;
 		} else if (input instanceof Object[]) {
 			Object[] inArr = (Object[]) input;
-			String[] ret = new String[inArr.length];
+			ret = new String[inArr.length];
 			for (int a = 0; a < inArr.length; ++a) {
 				ret[a] = toString(inArr[a]);
 			}
+		}
+		if (ret != null) {
 			return ret;
 		}
-		
 		// From list conversion (if needed)
 		List<?> list = null;
 		
@@ -755,7 +757,7 @@ public class GenericConvert {
 			}
 			
 			// Try value by value conversion
-			String[] ret = new String[list.size()];
+			ret = new String[list.size()];
 			for (int a = 0; a < ret.length; ++a) {
 				ret[a] = toString(list.get(a));
 			}
@@ -804,7 +806,7 @@ public class GenericConvert {
 		}
 		
 		if (input instanceof Object[]) {
-			return (Arrays.asList(((Object[]) input)));
+			return Arrays.asList(((Object[]) input));
 		}
 		
 		List<Object> ret = null;
@@ -943,24 +945,19 @@ public class GenericConvert {
 	///
 	/// @returns         The fetched object, always possible unless fallbck null
 	///
+	@SuppressWarnings("unchecked")
 	public static Object fetchObject(Object base, String key, Object fallback) {
 		
 		// Base to map / list conversion
 		Map<String, Object> baseMap = null;
 		List<Object> baseList = null;
 		
-		// Base to map / list conversion
-		if (base instanceof Map) {
-			baseMap = toStringMap(base);
-		} else if (base instanceof List) {
-			baseList = toObjectList(base);
-		}
-		
-		// Fail on getting base item : attempts conversion
-		if (baseMap == null && baseList == null) {
-			baseMap = toStringMap(base);
-			if (baseMap == null) {
-				baseList = toObjectList(base);
+		Object obj = resolvedListOrMap(base);
+		if (obj != null) {
+			if (obj instanceof Map) {
+				baseMap = (Map<String, Object>) obj;
+			} else {
+				baseList = (List<Object>) obj;
 			}
 		}
 		
@@ -1288,6 +1285,7 @@ public class GenericConvert {
 	///
 	/// @returns         The normalized key
 	///
+	@SuppressWarnings("unchecked")
 	protected static StringBuilder normalizeObjectPath(Object base, List<String> splitKeyPath, StringBuilder res) {
 		
 		//
@@ -1303,7 +1301,7 @@ public class GenericConvert {
 		//--------------------------------------------------------
 		
 		/// No additional parts, return existing path
-		if (splitKeyPath.size() <= 0) {
+		if (splitKeyPath == null || splitKeyPath.size() <= 0) {
 			return res;
 		}
 		
@@ -1315,18 +1313,12 @@ public class GenericConvert {
 		Map<String, Object> baseMap = null;
 		List<Object> baseList = null;
 		
-		// Base to map / list conversion
-		if (base instanceof Map) {
-			baseMap = toStringMap(base);
-		} else if (base instanceof List) {
-			baseList = toObjectList(base);
-		}
-		
-		// Fail on getting base item : attempts conversion
-		if (baseMap == null && baseList == null) {
-			baseMap = toStringMap(base);
-			if (baseMap == null) {
-				baseList = toObjectList(base);
+		Object obj = resolvedListOrMap(base);
+		if (obj != null) {
+			if (obj instanceof Map) {
+				baseMap = (Map<String, Object>) obj;
+			} else {
+				baseList = (List<Object>) obj;
 			}
 		}
 		
@@ -1459,5 +1451,28 @@ public class GenericConvert {
 			throw new RuntimeException("Unable to find specified class object: " + resultClassObj);
 		}
 		return ret;
+	}
+	
+	protected static Object resolvedListOrMap(Object base) {
+		Map<String, Object> baseMap = null;
+		List<Object> baseList = null;
+		// Base to map / list conversion
+		if (base instanceof Map) {
+			baseMap = toStringMap(base);
+		} else if (base instanceof List) {
+			baseList = toObjectList(base);
+		}
+		
+		// Fail on getting base item : attempts conversion
+		if (baseMap == null && baseList == null) {
+			baseMap = toStringMap(base);
+			if (baseMap == null) {
+				baseList = toObjectList(base);
+			}
+		}
+		if (baseMap == null) {
+			return baseList;
+		}
+		return baseMap;
 	}
 }

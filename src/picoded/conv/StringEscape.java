@@ -3,7 +3,8 @@ package picoded.conv;
 //import java.net.URLDecoder;
 
 /// Proxy to apache.commons.lang3.StringEscapeUtils. See its full documentation
-/// [here](http://commons.apache.org/proper/commons-lang/javadocs/api-3.1/org/apache/commons/lang3/StringEscapeUtils.html)
+/// [here](http://commons.apache.org/proper/commons-lang/javadocs/api-3.1/org/apache/
+/// +commons/lang3/StringEscapeUtils.html)
 ///
 /// ### Example
 /// ...................................................................javaS
@@ -28,6 +29,11 @@ package picoded.conv;
 ///
 public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 	
+	/// Invalid constructor (throws exception)
+	protected StringEscape() {
+		throw new IllegalAccessError("Utility class");
+	}
+	
 	/// Direct proxy to escapeHtml4
 	public static String escapeHtml(String input) {
 		return org.apache.commons.lang3.StringEscapeUtils.escapeHtml4(input);
@@ -47,24 +53,24 @@ public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 		if (c <= (char) 0xF) {
 			uri.append("%");
 			uri.append('0');
-			uri.append(hex[c]);
+			uri.append(HEX[c]);
 		} else if (c <= (char) 0xFF) {
 			uri.append("%");
-			uri.append(hex[c >> 4]);
-			uri.append(hex[c & 0xF]);
+			uri.append(HEX[c >> 4]);
+			uri.append(HEX[c & 0xF]);
 		} else {
 			/// unicode
 			uri.append('\\');
 			uri.append('u');
-			uri.append(hex[c >> 24]);
-			uri.append(hex[(c >> 16) & 0xF]);
-			uri.append(hex[(c >> 8) & 0xF]);
-			uri.append(hex[c & 0xF]);
+			uri.append(HEX[c >> 24]);
+			uri.append(HEX[(c >> 16) & 0xF]);
+			uri.append(HEX[(c >> 8) & 0xF]);
+			uri.append(HEX[c & 0xF]);
 		}
 	}
 	
-	private static final String mark = "-_.!~*'()\"";
-	private static final char[] hex = "0123456789ABCDEF".toCharArray();
+	private static final String MARK = "-_.!~*'()\"";
+	private static final char[] HEX = "0123456789ABCDEF".toCharArray();
 	
 	///
 	/// simple uri encoder, made from the spec at http://www.ietf.org/rfc/rfc2396.txt
@@ -79,7 +85,7 @@ public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 		char[] chars = argString.toCharArray();
 		for (int i = 0; i < chars.length; i++) {
 			char c = chars[i];
-			if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || mark.indexOf(c) != -1) {
+			if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || MARK.indexOf(c) != -1) {
 				uri.append(c);
 			} else {
 				appendEscaped(uri, c);
@@ -95,7 +101,7 @@ public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 		try {
 			return java.net.URLDecoder.decode(argString, "UTF-8");
 		} catch (java.io.UnsupportedEncodingException e) {
-			throw new java.lang.RuntimeException(e);
+			throw new AssertionError("UTF-8 not supported");
 		}
 	}
 	

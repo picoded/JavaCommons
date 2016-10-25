@@ -3,15 +3,41 @@ package picoded.conv;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.UnsupportedEncodingException;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /// The following test case covers the encode/decodeURI extension added to stringEscapeUtils
 public class StringEscape_test {
 	
+	@Before
+	public void setUp() {
+	}
+	
+	@After
+	public void tearDown() {
+		
+	}
+	
+	//
+	// Expected exception testing
+	//
+	
+	/// Invalid constructor test
+	@Test(expected = IllegalAccessError.class)
+	public void invalidConstructor() throws Exception {
+		new StringEscape();
+		
+	}
+	
 	@Test
-	public void encodeAndDecodeURI() {
+	public void encodeAndDecodeURI() throws UnsupportedEncodingException {
 		assertEquals("abc%2Bxyz", StringEscape.encodeURI("abc+xyz"));
+		assertNotNull("abc%2Bxyz", StringEscape.encodeURI("0918azbyAZBY"));
 		assertEquals("qwe abc+xyz", StringEscape.decodeURI("qwe+abc%2Bxyz"));
+		assertNotNull(StringEscape.decodeURI("I didn't  say \"you to run!\""));
 	}
 	
 	@Test

@@ -1,17 +1,40 @@
 package picoded.conv;
 
 // Target test class
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.util.Calendar;
 
-import picoded.conv.DateConv;
+import org.junit.After;
+// Test Case include
+import org.junit.Before;
+import org.junit.Test;
+
 import picoded.conv.DateConv.ISODateFormat;
 
-// Test Case include
-import org.junit.*;
-
-import static org.junit.Assert.*;
-
 public class DateConv_test {
+	
+	@Before
+	public void setUp() {
+	}
+	
+	@After
+	public void tearDown() {
+		
+	}
+	
+	//
+	// Expected exception testing
+	//
+	
+	/// Invalid constructor test
+	@Test(expected = IllegalAccessError.class)
+	public void invalidConstructor() throws Exception {
+		new DateConv();
+		
+	}
+	
 	@Test
 	public void convMilliSecondsToISO() {
 		long millisecondsDate = Long.parseLong("1441756800000");
@@ -40,9 +63,14 @@ public class DateConv_test {
 	
 	@Test
 	public void changeISOFormat() {
-		long millisecondsDate = Long.parseLong("1431756800000"); //16-5-2015
 		
+		long millisecondsDate = Long.parseLong("1431756800000"); //16-5-2015
 		String isoDate_dmy = DateConv.toISOFormat(millisecondsDate, ISODateFormat.DDMMYYYY, "-");
+		
+		assertNull(DateConv.changeISODateFormat(null, null, null, null));
+		assertNull(DateConv.changeISODateFormat("", ISODateFormat.DDMMYYYY, ISODateFormat.YYYYMMDD, null));
+		
+		isoDate_dmy = DateConv.toISOFormat(millisecondsDate, ISODateFormat.DDMMYYYY, "-");
 		assertEquals("16-05-2015", isoDate_dmy);
 		
 		String isoDate_ymd = DateConv.changeISODateFormat(isoDate_dmy, ISODateFormat.DDMMYYYY, ISODateFormat.YYYYMMDD,

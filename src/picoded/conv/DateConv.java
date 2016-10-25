@@ -13,6 +13,11 @@ import com.mysql.jdbc.StringUtils;
 ///
 public class DateConv {
 	
+	/// Invalid constructor (throws exception)
+	protected DateConv() {
+		throw new IllegalAccessError("Utility class");
+	}
+	
 	public enum ISODateFormat {
 		DDMMYYYY, MMDDYYYY, YYYYMMDD, YYYYDDMM
 	}

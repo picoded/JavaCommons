@@ -17,7 +17,7 @@ public class DateConv {
 	protected DateConv() {
 		throw new IllegalAccessError("Utility class");
 	}
-	
+
 	public enum ISODateFormat {
 		DDMMYYYY, MMDDYYYY, YYYYMMDD, YYYYDDMM
 	}
@@ -29,13 +29,13 @@ public class DateConv {
 		
 		String format_cleaned = RegexUtil.removeAllNonAlphaNumeric(format);
 		
-		if (format_cleaned.equalsIgnoreCase("ddmmyyyy")) {
+		if ("ddmmyyyy".equalsIgnoreCase(format_cleaned)) {
 			return ISODateFormat.DDMMYYYY;
-		} else if (format_cleaned.equalsIgnoreCase("mmddyyyy")) {
+		} else if ("mmddyyyy".equalsIgnoreCase(format_cleaned)) {
 			return ISODateFormat.MMDDYYYY;
-		} else if (format_cleaned.equalsIgnoreCase("yyyymmdd")) {
+		} else if ("yyyymmdd".equalsIgnoreCase(format_cleaned)) {
 			return ISODateFormat.YYYYMMDD;
-		} else if (format_cleaned.equalsIgnoreCase("yyyyddmm")) {
+		} else if ("yyyyddmm".equalsIgnoreCase(format_cleaned)) {
 			return ISODateFormat.YYYYDDMM;
 		} else {
 			return ISODateFormat.DDMMYYYY;
@@ -49,22 +49,21 @@ public class DateConv {
 			//TODO sanitise separator string?
 		}
 		
-		String isoDate = "";
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(inDate);
 		
-		String date = "" + cal.get(Calendar.DATE);
+		String date = String.valueOf(cal.get(Calendar.DATE));
 		if (date.length() == 1) {
 			date = "0" + date;
 		}
 		
-		String month = "" + (cal.get(Calendar.MONTH) + 1);
+		String month = String.valueOf(cal.get(Calendar.MONTH) + 1);
 		if (month.length() == 1) {
 			month = "0" + month;
 		}
 		
-		isoDate = "" + date + separator + month + separator + cal.get(Calendar.YEAR);
+		String isoDate = String.valueOf(date + separator + month + separator + cal.get(Calendar.YEAR));
 		isoDate = changeISODateFormat(isoDate, ISODateFormat.DDMMYYYY, dateFormat, separator);
 		
 		return isoDate;
@@ -79,16 +78,18 @@ public class DateConv {
 		}
 		
 		String newDate = changeISODateFormat(inDate, currentDateFormat, ISODateFormat.YYYYMMDD, separator);
-		String[] newDateSplit = newDate.split(separator);
-		
-		if (newDateSplit == null || newDateSplit.length != 3) {
+		String[] newDateSplit = null;
+		if (newDate != null) {
+			newDateSplit = newDate.split(separator);
+		}
+		if (newDateSplit == null) {
 			return null;
 		}
 		
 		Calendar cal = Calendar.getInstance();
 		cal.set(Integer.parseInt(newDateSplit[0]), (Integer.parseInt(newDateSplit[1]) - 1),
 			Integer.parseInt(newDateSplit[2]));
-		return "" + cal.getTimeInMillis();
+		return String.valueOf(cal.getTimeInMillis());
 		
 	}
 	
@@ -121,7 +122,7 @@ public class DateConv {
 		int month = cal.get(Calendar.MONTH) + 1;
 		int year = cal.get(Calendar.YEAR);
 		
-		String newDate = "" + date + separator + month + separator + year; //ddmmyyyy
+		String newDate = String.valueOf(date + separator + month + separator + year); //ddmmyyyy
 		newDate = changeISODateFormat(newDate, ISODateFormat.DDMMYYYY, dateFormat, separator);
 		
 		return newDate;

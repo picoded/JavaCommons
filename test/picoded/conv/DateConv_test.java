@@ -3,6 +3,9 @@ package picoded.conv;
 // Target test class
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Calendar;
 
@@ -23,7 +26,6 @@ public class DateConv_test {
 	public void tearDown() {
 		
 	}
-	
 	//
 	// Expected exception testing
 	//
@@ -34,7 +36,7 @@ public class DateConv_test {
 		new DateConv();
 		
 	}
-	
+
 	@Test
 	public void convMilliSecondsToISO() {
 		long millisecondsDate = Long.parseLong("1441756800000");
@@ -59,6 +61,10 @@ public class DateConv_test {
 		String isoDateReconstructed = DateConv.toISOFormat(Long.parseLong(millisecondsDate), ISODateFormat.YYYYMMDD, "-");
 		
 		assertEquals(isoDate, isoDateReconstructed);
+		isoDate = "2016-10-25";
+		millisecondsDate = DateConv.toMillisecondsFormat(isoDate, ISODateFormat.YYYYMMDD, "-");
+		isoDateReconstructed = DateConv.toISOFormat(Long.parseLong(millisecondsDate), ISODateFormat.YYYYMMDD, "-");
+		assertEquals(isoDate, isoDateReconstructed);
 	}
 	
 	@Test
@@ -68,7 +74,8 @@ public class DateConv_test {
 		String isoDate_dmy = DateConv.toISOFormat(millisecondsDate, ISODateFormat.DDMMYYYY, "-");
 		
 		assertNull(DateConv.changeISODateFormat(null, null, null, null));
-		assertNull(DateConv.changeISODateFormat("", ISODateFormat.DDMMYYYY, ISODateFormat.YYYYMMDD, null));
+		assertNull(DateConv.changeISODateFormat("", ISODateFormat.DDMMYYYY, ISODateFormat.YYYYMMDD,
+				null));
 		
 		isoDate_dmy = DateConv.toISOFormat(millisecondsDate, ISODateFormat.DDMMYYYY, "-");
 		assertEquals("16-05-2015", isoDate_dmy);
@@ -84,5 +91,48 @@ public class DateConv_test {
 		String isoDate_ydm = DateConv.changeISODateFormat(isoDate_mdy, ISODateFormat.MMDDYYYY, ISODateFormat.YYYYDDMM,
 			"-");
 		assertEquals("2015-16-05", isoDate_ydm);
+	}
+	
+	@Test
+	public void toISODateFormat() {
+		assertEquals(ISODateFormat.DDMMYYYY, DateConv.toISODateFormat(null));
+		assertEquals(ISODateFormat.DDMMYYYY, DateConv.toISODateFormat(""));
+		assertEquals(ISODateFormat.DDMMYYYY, DateConv.toISODateFormat("ddmmyyyy"));
+		assertEquals(ISODateFormat.MMDDYYYY, DateConv.toISODateFormat("mmddyyyy"));
+		assertEquals(ISODateFormat.YYYYMMDD, DateConv.toISODateFormat("yyyymmdd"));
+		assertEquals(ISODateFormat.YYYYDDMM, DateConv.toISODateFormat("yyyyddmm"));
+		assertEquals(ISODateFormat.DDMMYYYY, DateConv.toISODateFormat("abc"));
+	}
+	
+	@Test
+	public void toMillisecondsFormat() {
+		assertNull(DateConv.toMillisecondsFormat(null, null, null));
+		assertNull(DateConv.toMillisecondsFormat("", null, null));
+		assertNull(DateConv.toMillisecondsFormat("2016-10-25-12", null, "-"));
+		assertEquals(ISODateFormat.DDMMYYYY, DateConv.toISODateFormat(""));
+		assertEquals(ISODateFormat.DDMMYYYY, DateConv.toISODateFormat("ddmmyyyy"));
+		assertEquals(ISODateFormat.MMDDYYYY, DateConv.toISODateFormat("mmddyyyy"));
+		assertEquals(ISODateFormat.YYYYMMDD, DateConv.toISODateFormat("yyyymmdd"));
+		assertEquals(ISODateFormat.YYYYDDMM, DateConv.toISODateFormat("yyyyddmm"));
+		assertEquals(ISODateFormat.DDMMYYYY, DateConv.toISODateFormat("abc"));
+	}
+	
+	@Test
+	public void isInISOFormat() {
+		assertTrue(DateConv.isInISOFormat("-str-"));
+		assertFalse(DateConv.isInISOFormat("str"));
+	}
+	
+	@Test
+	public void isInMillisecondsFormat() {
+		assertTrue(DateConv.isInMillisecondsFormat("-str"));
+		assertFalse(DateConv.isInMillisecondsFormat("str-"));
+		assertTrue(DateConv.isInMillisecondsFormat("str"));
+	}
+	
+	@Test
+	public void getCurrentDateISO() {
+		assertNotNull(DateConv.getCurrentDateISO(ISODateFormat.DDMMYYYY, null));
+		assertNotNull(DateConv.getCurrentDateISO(ISODateFormat.DDMMYYYY, "-"));
 	}
 }

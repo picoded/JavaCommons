@@ -437,11 +437,11 @@ public class GenericConvert {
 		}
 		
 		if (input instanceof UUID) {
-			try {
-				return GUID.base58((UUID) input);
-			} catch (Exception e) {
-				
-			}
+			//try {
+			return GUID.base58((UUID) input);
+			//			} catch (Exception e) {
+			//				
+			//			}
 		}
 		
 		if (input instanceof String && ((String) input).length() >= 22) {
@@ -721,31 +721,7 @@ public class GenericConvert {
 			return ret;
 		}
 		// From list conversion (if needed)
-		List<?> list = null;
-		
-		// Conversion to List (if possible)
-		if (input instanceof String) {
-			try {
-				Object o = ConvertJSON.toList((String) input);
-				if (o instanceof List) {
-					list = (List<?>) o;
-				}
-			} catch (Exception e) {
-				// Silence the exception
-			}
-		} else if (input instanceof List) {
-			list = (List<?>) input;
-		} else { //Force the "toString", then to List conversion
-			try {
-				String inputStr = input.toString();
-				Object o = ConvertJSON.toList(inputStr);
-				if (o instanceof List) {
-					list = (List<?>) o;
-				}
-			} catch (Exception e) {
-				// Silence the exception
-			}
-		}
+		List<?> list = toArrayHelper(input);
 		
 		// List to string array conversion
 		if (list != null) {
@@ -879,31 +855,7 @@ public class GenericConvert {
 		}
 		
 		// From list conversion (if needed)
-		List<?> list = null;
-		
-		// Conversion to List (if possible)
-		if (input instanceof String) {
-			try {
-				Object o = ConvertJSON.toList((String) input);
-				if (o instanceof List) {
-					list = (List<?>) o;
-				}
-			} catch (Exception e) {
-				
-			}
-		} else if (input instanceof List) {
-			list = (List<?>) input;
-		} else { //Force the "toString", then to List conversion
-			try {
-				String inputStr = input.toString();
-				Object o = ConvertJSON.toList(inputStr);
-				if (o instanceof List) {
-					list = (List<?>) o;
-				}
-			} catch (Exception e) {
-				// Silence the exception
-			}
-		}
+		List<?> list = toArrayHelper(input);
 		
 		// List to string array conversion
 		if (list != null) {
@@ -1474,5 +1426,34 @@ public class GenericConvert {
 			return baseList;
 		}
 		return baseMap;
+	}
+	
+	protected static List<?> toArrayHelper(Object input) {
+		List<?> list = null;
+		
+		// Conversion to List (if possible)
+		if (input instanceof String) {
+			try {
+				Object o = ConvertJSON.toList((String) input);
+				if (o instanceof List) {
+					list = (List<?>) o;
+				}
+			} catch (Exception e) {
+				// Silence the exception
+			}
+		} else if (input instanceof List) {
+			list = (List<?>) input;
+		} else { //Force the "toString", then to List conversion
+			try {
+				String inputStr = input.toString();
+				Object o = ConvertJSON.toList(inputStr);
+				if (o instanceof List) {
+					list = (List<?>) o;
+				}
+			} catch (Exception e) {
+				// Silence the exception
+			}
+		}
+		return list;
 	}
 }

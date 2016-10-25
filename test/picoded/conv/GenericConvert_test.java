@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
@@ -191,6 +192,8 @@ public class GenericConvert_test {
 		assertEquals(10, GenericConvert.toNumber(10, 0).intValue());
 		assertNotEquals("", GenericConvert.toNumber("", 0).intValue());
 		assertEquals(new BigDecimal("01111111111111111"), GenericConvert.toNumber("01111111111111111", 0));
+		UUID uuid = UUID.randomUUID();
+		assertNotNull(toGUID(uuid, null));
 		
 	}
 	
@@ -304,6 +307,9 @@ public class GenericConvert_test {
 		list.add("key1");
 		list.add("key2");
 		assertArrayEquals(new String[] { "key1", "key2" }, toStringArray(list, "default"));
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("key", "value");
+		//assertArrayEquals(new String[]{"key1", "key2"}, toStringArray(2.2, "default"));
 	}
 	
 	@Test
@@ -345,6 +351,14 @@ public class GenericConvert_test {
 		assertNull(toStringMap(null));
 		
 		assertNull(toStringMap(null, null));
+		assertNull("default", toStringMap(null, "default"));
+		Map<String, String> map = new HashMap<>();
+		assertEquals(map, toStringMap(map, null));
+		map = new HashMap<String, String>();
+		map.put("Hello", "WORLD");
+		map.put("WORLD", "Hello");
+		String str = ConvertJSON.fromMap(map);
+		assertEquals(map, toStringMap(str, null));
 	}
 	
 	@Test

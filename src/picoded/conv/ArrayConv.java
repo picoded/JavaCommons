@@ -7,6 +7,11 @@ import org.apache.commons.lang3.ArrayUtils;
 ///
 public class ArrayConv extends ArrayUtils {
 	
+	/// Invalid constructor (throws exception)
+	protected ArrayConv() {
+		throw new IllegalAccessError("Utility class");
+	}
+	
 	//
 	// NOTE: All these were made obselete by apache.commons.ArrayUtils.subarray()
 	//

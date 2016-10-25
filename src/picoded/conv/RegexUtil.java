@@ -1,34 +1,40 @@
 package picoded.conv;
 
 public class RegexUtil {
-	private static String removeAllWhiteSpace_regexString = "\\s";
+	
+	/// Invalid constructor (throws exception)
+	protected RegexUtil() {
+		throw new IllegalAccessError("Utility class");
+	}
+	
+	private static String removeAllWhiteSpaceRegexString = "\\s";
 	
 	public static String removeAllWhiteSpace(String input) {
-		return input.replaceAll(removeAllWhiteSpace_regexString, "");
+		return input.replaceAll(removeAllWhiteSpaceRegexString, "");
 	}
 	
-	private static String removeAllNonNumeric_regexString = "[^\\d.]";
+	private static String removeAllNonNumericRegexString = "[^\\d.]";
 	
 	public static String removeAllNonNumeric(String input) {
-		return input.replaceAll(removeAllNonNumeric_regexString, "");
+		return input.replaceAll(removeAllNonNumericRegexString, "");
 	}
 	
-	private static String removeAllNonAlphaNumeric_regexString = "[^a-zA-Z0-9]";
+	private static String removeAllNonAlphaNumericRegexString = "[^a-zA-Z0-9]";
 	
 	public static String removeAllNonAlphaNumeric(String input) {
-		return input.replaceAll(removeAllNonAlphaNumeric_regexString, "");
+		return input.replaceAll(removeAllNonAlphaNumericRegexString, "");
 	}
 	
-	private static String removeAllNonAlphaNumeric_allowUnderscoreDashFullstop_regexString = "[^a-zA-Z0-9-_\\.]";
+	private static String removeAllNonAlphaNumericAllowUnderscoreDashFullstopRegexString = "[^a-zA-Z0-9-_\\.]";
 	
 	public static String removeAllNonAlphaNumeric_allowUnderscoreDashFullstop(String input) {
-		return input.replaceAll(removeAllNonAlphaNumeric_allowUnderscoreDashFullstop_regexString, "");
+		return input.replaceAll(removeAllNonAlphaNumericAllowUnderscoreDashFullstopRegexString, "");
 	}
 	
-	private static String removeAllNonAlphaNumeric_allowCommonSeparators_regexString = "[^a-zA-Z0-9-_\\.\\]\\[]";
+	private static String removeAllNonAlphaNumericAllowCommonSeparatorsRegexString = "[^a-zA-Z0-9-_\\.\\]\\[]";
 	
 	public static String removeAllNonAlphaNumeric_allowCommonSeparators(String input) {
-		return input.replaceAll(removeAllNonAlphaNumeric_allowCommonSeparators_regexString, "");
+		return input.replaceAll(removeAllNonAlphaNumericAllowCommonSeparatorsRegexString, "");
 	}
 	
 	public static String sanitiseCommonEscapeCharactersIntoAscii(String input) {

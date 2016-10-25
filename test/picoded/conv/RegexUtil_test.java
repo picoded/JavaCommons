@@ -2,16 +2,29 @@ package picoded.conv;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class RegexUtil_test {
-	/// Dummy constructor test
-	protected RegexUtil regexUtils = null;
 	
 	@Before
 	public void setUp() {
-		regexUtils = new RegexUtil();
+	}
+	
+	@After
+	public void tearDown() {
+		
+	}
+	
+	//
+	// Expected exception testing
+	//
+	
+	/// Invalid constructor test
+	@Test(expected = IllegalAccessError.class)
+	public void invalidConstructor() throws Exception {
+		new RegexUtil();
 	}
 	
 	@Test
@@ -40,4 +53,8 @@ public class RegexUtil_test {
 				.removeAllNonAlphaNumeric_allowCommonSeparators("removes non-alphanumerics except common seprators /_,"));
 	}
 	
+	@Test
+	public void removeAllNonNumeric() {
+		assertEquals("12345", RegexUtil.removeAllNonNumeric("T 1  H 2er3e4  WILL 5 Be N O W H I T E I S S PACE"));
+	}
 }

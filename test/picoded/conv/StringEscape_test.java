@@ -40,6 +40,7 @@ public class StringEscape_test {
 		assertEquals("qwe abc+xyz", StringEscape.decodeURI("qwe+abc%2Bxyz"));
 		assertNull(StringEscape.decodeURI("%xy"));
 		assertNotNull(StringEscape.encodeURI("@$^%#[]+=|{}:?∂\\u"));
+		assertNotNull(StringEscape.encodeURI("-_.!~*'()\""));
 	}
 	
 	@Test

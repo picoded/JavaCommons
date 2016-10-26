@@ -19,7 +19,7 @@ public class DateConv {
 	}
 	
 	public enum ISODateFormat {
-		DDMMYYYY, MMDDYYYY, YYYYMMDD, YYYYDDMM
+		DDMMYYYY, MMDDYYYY, YYYYMMDD, YYYYDDMM, DEFAULT
 	}
 	
 	public static ISODateFormat toISODateFormat(String format) {
@@ -148,7 +148,9 @@ public class DateConv {
 		}
 		
 		dateSplit = resortDateArray(dateSplit, currentDateFormat, newDateFormat);
-		
+		if (dateSplit == null) {
+			return null;
+		}
 		StringBuilder sb = new StringBuilder();
 		for (byte i = 0; i < dateSplit.length; ++i) {
 			sb.append(dateSplit[i]);
@@ -167,7 +169,9 @@ public class DateConv {
 		
 		byte[] currentDateSorting = getISODateSorting(currentDateFormat);
 		byte[] newDateSorting = getISODateSorting(newDateFormat);
-		
+		if (currentDateSorting == null || newDateSorting == null) {
+			return null;
+		}
 		for (byte i = 0; i < dateSplit.length; ++i) {
 			dateSplit[i] = inDateSplit[ArrayUtils.indexOf(currentDateSorting, newDateSorting[i])];
 		}

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiFunction;
 
 import org.junit.After;
 import org.junit.Before;
@@ -220,6 +221,14 @@ public class GenericConvert_test {
 		assertEquals("default", fetchObject("value", "0", "default"));
 	}
 	
+	@Test
+	public void biFunctionMapTest() {
+		assertNotNull(biFunctionMap());
+		Map<Class<?>, BiFunction<Object, Object, ?>> myBiFunctionMap = new HashMap<Class<?>, BiFunction<Object, Object, ?>>();
+		biFunctionMap = myBiFunctionMap;
+		assertEquals(myBiFunctionMap, biFunctionMap);
+	}
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test
 	public void fetchObjectWithTwoParametersTest() {
@@ -282,6 +291,7 @@ public class GenericConvert_test {
 		subMap.put("sub_key", "sub_value");
 		map.put("key1", subMap);
 		assertEquals("sub_value", fetchNestedObject(map, "[key1][sub_key]", "default"));
+		assertEquals("default", fetchNestedObject(map, "key[key1]", "default"));
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -378,6 +388,20 @@ public class GenericConvert_test {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("key", "my_path");
 		assertEquals("key", normalizeObjectPath(map, list, sb).toString());
+		// Attempt to correct the case insensitivty issue
+		list = new ArrayList<String>();
+		list.add("KEY");
+		sb = new StringBuilder();
+		map = new HashMap<String, Object>();
+		map.put("key", "my_path");
+		assertEquals("key", normalizeObjectPath(map, list, sb).toString());
+		// Attempt to correct the case insensitivty issue
+		list = new ArrayList<String>();
+		list.add("KEEY");
+		sb = new StringBuilder();
+		map = new HashMap<String, Object>();
+		map.put("key", "my_path");
+		assertEquals("", normalizeObjectPath(map, list, sb).toString());
 		list = new ArrayList<String>();
 		list.add("0");
 		sb = new StringBuilder();
@@ -412,6 +436,7 @@ public class GenericConvert_test {
 		assertEquals(new ArrayList<String>(), splitObjectPath(null, null));
 		List<String> ret = new ArrayList<>();
 		assertEquals(new ArrayList<String>(), splitObjectPath(null, ret));
+		assertEquals(new ArrayList<String>(), splitObjectPath("", ret));
 		List<String> key = new ArrayList<String>();
 		key.add("my_key");
 		assertEquals(key, splitObjectPath(" my_key ", ret));
@@ -426,7 +451,29 @@ public class GenericConvert_test {
 		key = new ArrayList<>();
 		key.add("my_key");
 		assertEquals(key, splitObjectPath("[my_key]", ret));
-		
+		ret = new ArrayList<>();
+		key = new ArrayList<>();
+		key.add("\\my_key");
+		List<String> expected = new ArrayList<>();
+		expected.add("my_key");
+		assertEquals(key, splitObjectPath("[\\my_key]", ret));
+		ret = new ArrayList<>();
+		key = new ArrayList<>();
+		key.add("\\my_key\\");
+		expected = new ArrayList<>();
+		expected.add("my_key");
+		assertEquals(expected, splitObjectPath("[\"" + "my_key" + "\"]", ret));
+		ret = new ArrayList<>();
+		key = new ArrayList<>();
+		key.add("\\my_key\\");
+		expected = new ArrayList<>();
+		expected.add("key");
+		expected.add("my_key");
+		assertEquals(expected, splitObjectPath("key[my_key]", ret));
+		ret = new ArrayList<>();
+		expected = new ArrayList<>();
+		expected.add("key");
+		assertEquals(expected, splitObjectPath("[ key ]", ret));
 	}
 	
 	@Test(expected = RuntimeException.class)
@@ -434,5 +481,26 @@ public class GenericConvert_test {
 		List<String> ret = new ArrayList<>();
 		List<String> key = new ArrayList<String>();
 		assertEquals(key, splitObjectPath("[my_key", ret));
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void getBiFunction_noisySelfTest() {
+		assertNotNull(getBiFunction_noisy(getClass()));
+	}
+	
+	public void getBiFunction_noisyTest() {
+		assertNotNull(getBiFunction_noisy(List.class));
+	}
+	
+	@Test
+	public void toArrayHelperTest() {
+		assertNull(toArrayHelper(null));
+		Map<String, String> map = new HashMap<String, String>();
+		//List<String> list = new ArrayList<String>();
+		//list.add("value1");
+		//list.add("value2");
+		map.put("key1", "value1");
+		map.put("key2", "value2");
+		//assertNull(toArrayHelper(map));
 	}
 }

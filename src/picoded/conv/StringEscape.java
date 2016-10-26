@@ -100,8 +100,8 @@ public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 	public static String decodeURI(String argString) {
 		try {
 			return java.net.URLDecoder.decode(argString, "UTF-8");
-		} catch (java.io.UnsupportedEncodingException e) {
-			throw new AssertionError("UTF-8 not supported");
+		} catch (Exception e) {
+			return null;
 		}
 	}
 	

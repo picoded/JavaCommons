@@ -2,6 +2,7 @@ package picoded.conv;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.UnsupportedEncodingException;
 
@@ -37,7 +38,8 @@ public class StringEscape_test {
 		assertEquals("abc%2Bxyz", StringEscape.encodeURI("abc+xyz"));
 		assertNotNull("abc%2Bxyz", StringEscape.encodeURI("0918azbyAZBY"));
 		assertEquals("qwe abc+xyz", StringEscape.decodeURI("qwe+abc%2Bxyz"));
-		assertNotNull(StringEscape.decodeURI("I didn't  say \"you to run!\""));
+		assertNull(StringEscape.decodeURI("%xy"));
+		assertNotNull(StringEscape.encodeURI("@$^%#[]+=|{}:?∂\\u"));
 	}
 	
 	@Test

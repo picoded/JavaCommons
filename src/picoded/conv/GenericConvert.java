@@ -991,12 +991,12 @@ public class GenericConvert {
 		}
 		
 		// Left and right string parts to recursively process
-		String leftPart = null;
-		String rightPart = null;
+		String leftPart;
+		String rightPart;
 		
 		// Fetches the next 2 index points (most probably seperator of token parts)
-		int dotIndex = key.indexOf(".");
-		int leftBracketIndex = key.indexOf("[");
+		int dotIndex = key.indexOf('.');
+		int leftBracketIndex = key.indexOf('[');
 		
 		// No match found, assume last key
 		if (dotIndex < 0 && leftBracketIndex < 0) {
@@ -1011,7 +1011,7 @@ public class GenericConvert {
 			// This is most likely an array fetching,
 			// but could also be a case of map fetching with string
 			//
-			int rightBracketIndex = key.indexOf("]", 1);
+			int rightBracketIndex = key.indexOf(']', 1);
 			if (rightBracketIndex <= 0) {
 				throw new RuntimeException("Missing closing ']' right bracket for key : " + key);
 			}
@@ -1108,10 +1108,10 @@ public class GenericConvert {
 		}
 		
 		// Reuse ret object
-		Object ret = null;
+		//Object ret;
 		
 		// Full key fetching found -> if found it is returned =)
-		ret = fetchObject(base, key, null);
+		Object ret = fetchObject(base, key, null);
 		if (ret != null) {
 			return ret;
 		}
@@ -1167,8 +1167,8 @@ public class GenericConvert {
 		}
 		
 		// Fetch one nested level =(
-		int dotIndex = key.indexOf(".");
-		int leftBracketIndex = key.indexOf("[");
+		int dotIndex = key.indexOf('.');
+		int leftBracketIndex = key.indexOf('[');
 		
 		if (dotIndex >= 0 && (leftBracketIndex < 0 || dotIndex <= leftBracketIndex)) {
 			// Dot Index exists, and is before left bracket index OR there is no left bracket index
@@ -1253,7 +1253,7 @@ public class GenericConvert {
 		//--------------------------------------------------------
 		
 		/// No additional parts, return existing path
-		if (splitKeyPath == null || splitKeyPath.size() <= 0) {
+		if (splitKeyPath == null || splitKeyPath.isEmpty()) {
 			return res;
 		}
 		
@@ -1333,7 +1333,7 @@ public class GenericConvert {
 		}
 		
 		// Terminate when done
-		if (nextKeyPathSet.size() <= 0) {
+		if (nextKeyPathSet.isEmpty()) {
 			return res;
 		}
 		
@@ -1371,8 +1371,8 @@ public class GenericConvert {
 	
 	// to BiFunction Map, used to automated put conversion handling
 	//--------------------------------------------------------------------------------------------------
-	public static BiFunction<Object, Object, String> toString_BiFunction = (i, f) -> GenericConvert.toString(i, f);
-	public static BiFunction<Object, Object, String[]> toStringArray_BiFunction = (i, f) -> GenericConvert
+	protected static BiFunction<Object, Object, String> toString_BiFunction = (i, f) -> GenericConvert.toString(i, f);
+	protected static BiFunction<Object, Object, String[]> toStringArray_BiFunction = (i, f) -> GenericConvert
 		.toStringArray(i, f);
 	
 	protected static Map<Class<?>, BiFunction<Object, Object, ?>> biFunctionMap = null;
@@ -1446,7 +1446,7 @@ public class GenericConvert {
 		} else { //Force the "toString", then to List conversion
 			try {
 				String inputStr = input.toString();
-				Object o = ConvertJSON.toList(inputStr);
+				Object o = ConvertJSON.toMap(inputStr);
 				if (o instanceof List) {
 					list = (List<?>) o;
 				}

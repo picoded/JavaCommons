@@ -13,6 +13,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import picoded.struct.GenericConvertList;
+import picoded.struct.GenericConvertMap;
+import picoded.struct.ProxyGenericConvertList;
+import picoded.struct.ProxyGenericConvertMap;
 //Target test class
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -92,6 +96,7 @@ public class GenericConvert_test {
 		assertFalse(GenericConvert.toBoolean("$%", false));
 		
 		assertTrue(toBoolean(999, false));
+		assertFalse(toBoolean("000", false));
 	}
 	
 	@Test
@@ -175,6 +180,8 @@ public class GenericConvert_test {
 		assertNull(GenericConvert.toUUID(null, null));
 		assertEquals(GUID.fromBase58("heijoworjdabcdefghijabc"),
 			GenericConvert.toUUID(GUID.fromBase58("heijoworjdabcdefghijabc"), "hello world"));
+		assertNull(GenericConvert.toUUID(1234567, "default"));
+		assertNull(GenericConvert.toUUID("123456789o123456789o12345", "default"));
 	}
 	
 	@Test
@@ -269,6 +276,8 @@ public class GenericConvert_test {
 		map.put("key1", "value1");
 		assertEquals("value1", fetchNestedObject(map, "[key1]", "default"));
 		assertEquals("default", fetchNestedObject(map, "[key2]", "default"));
+		assertEquals("default", fetchNestedObject(map, "key.[key2]", "default"));
+		
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -397,6 +406,13 @@ public class GenericConvert_test {
 		assertEquals("key", normalizeObjectPath(map, list, sb).toString());
 		// Attempt to correct the case insensitivty issue
 		list = new ArrayList<String>();
+		list.add("KEY");
+		sb = new StringBuilder();
+		map = new HashMap<String, Object>();
+		map.put("key", "my_path");
+		assertEquals("key", normalizeObjectPath(map, list, sb).toString());
+		// Attempt to correct the case insensitivty issue
+		list = new ArrayList<String>();
 		list.add("KEEY");
 		sb = new StringBuilder();
 		map = new HashMap<String, Object>();
@@ -406,6 +422,21 @@ public class GenericConvert_test {
 		list.add("0");
 		sb = new StringBuilder();
 		assertEquals("[0]", normalizeObjectPath(base, list, sb).toString());
+		// Attempt to correct the case insensitivty issue
+		list = new ArrayList<String>();
+		list.add("KEY");
+		sb = new StringBuilder();
+		map = new HashMap<String, Object>();
+		map.put("key", null);
+		assertEquals("", normalizeObjectPath(map, list, sb).toString());
+		// Attempt to correct the case insensitivty issue
+		list = new ArrayList<String>();
+		list.add("KEY");
+		//sb = new StringBuilder();
+		map = new HashMap<String, Object>();
+		map.put("key", "my_path");
+		sb.append("previous");
+		assertEquals("previous.key", normalizeObjectPath(map, list, sb).toString());
 	}
 	
 	@Test(expected = RuntimeException.class)
@@ -474,6 +505,12 @@ public class GenericConvert_test {
 		expected = new ArrayList<>();
 		expected.add("key");
 		assertEquals(expected, splitObjectPath("[ key ]", ret));
+		ret = new ArrayList<>();
+		key = new ArrayList<>();
+		key.add("\\my_key\\");
+		expected = new ArrayList<>();
+		expected.add("my_key");
+		assertEquals(expected, splitObjectPath("[\'" + "my_key" + "\']", ret));
 	}
 	
 	@Test(expected = RuntimeException.class)
@@ -502,5 +539,40 @@ public class GenericConvert_test {
 		map.put("key1", "value1");
 		map.put("key2", "value2");
 		//assertNull(toArrayHelper(map));
+	}
+	
+	@Test
+	public void toGenericConvertListTest() {
+		assertNull(toGenericConvertList(null));
+		
+		assertNull(toGenericConvertList(null, null));
+		
+		List<String> list = new ArrayList<String>();
+		GenericConvertList<String> gcList = new ProxyGenericConvertList<String>(list);
+		assertEquals(list, toGenericConvertList(gcList, null));
+		assertEquals(null, toGenericConvertList(list, null));
+		
+	}
+	
+	@Test
+	public void toGenericConvertStringMapTest() {
+		assertNull(toGenericConvertStringMap(null));
+		
+		assertNull(toGenericConvertStringMap(null, null));
+		assertNull(toGenericConvertStringMap(null, "default"));
+		
+		Map<String, String> defMap = new HashMap<String, String>();
+		defMap.put("key", "value");
+		assertEquals(defMap, toGenericConvertStringMap(null, defMap));
+		
+		GenericConvertMap<String, String> gcMap = new ProxyGenericConvertMap<String, String>(defMap);
+		assertEquals(defMap, toGenericConvertStringMap(gcMap, defMap));
+		
+		Map<String, String> empty = new ProxyGenericConvertMap<String, String>();
+		assertEquals(defMap, toGenericConvertStringMap(defMap, empty));
+		
+		assertEquals(defMap, toGenericConvertStringMap(ConvertJSON.fromMap(defMap), empty));
+		assertNotNull(toGenericConvertStringMap("{}", empty));
+		
 	}
 }

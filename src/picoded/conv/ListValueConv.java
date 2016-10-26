@@ -7,11 +7,16 @@ import java.util.*;
 ///
 public class ListValueConv {
 	
+	/// Invalid constructor (throws exception)
+	protected ListValueConv() {
+		throw new IllegalAccessError("Utility class");
+	}
+	
 	public static String[] objectListToStringArray(List<Object> listObj) {
 		String[] stringArr = new String[listObj.size()];
 		for (int a = 0; a < listObj.size(); ++a) {
 			Object obj = listObj.get(a);
-			stringArr[a] = (obj != null ? GenericConvert.toString(obj, null) : null);
+			stringArr[a] = obj != null ? GenericConvert.toString(obj, null) : null;
 		}
 		return stringArr;
 	}

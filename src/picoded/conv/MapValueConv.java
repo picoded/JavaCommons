@@ -157,20 +157,9 @@ public class MapValueConv {
 					
 					sourceList = getSourceList(sourceList, index);
 					
-					if (stringIsWord(bracketSplit[1])) { //put map
-						Object retrievedValue = sourceList.get(index);
-						Map<String, Object> newMap = new HashMap<String, Object>();
-						
-						if (retrievedValue instanceof Map) {
-							newMap = (Map<String, Object>) retrievedValue;
-						}
-						
-						sourceList.remove(index);
-						sourceList.add(index, newMap);
-						
-						key = key.substring(key.indexOf('.') + 1, key.length());
-						recreateObject(newMap, key, value);
-					} else if (stringIsNumber(bracketSplit[1])) { //put list [1, 0, secondLayer0]
+					sourceList = checkStringIsWords(sourceList, index, key, value, bracketSplit);
+					
+					if (stringIsNumber(bracketSplit[1])) { //put list [1, 0, secondLayer0]
 						Object retrievedValue = sourceList.get(index);
 						List<Object> newList = new ArrayList<Object>();
 						
@@ -191,7 +180,6 @@ public class MapValueConv {
 						element = new ArrayList<Object>();
 						sourceMap.put(bracketSplit[0], element);
 					}
-					
 					key = key.substring(bracketSplit[0].length(), key.length());
 					recreateObject(element, key, value);
 				}
@@ -200,6 +188,26 @@ public class MapValueConv {
 			Map<String, Object> sourceMap = (Map<String, Object>) source;
 			sourceMap.put(key, value);
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static List<Object> checkStringIsWords(List<Object> sourceList, int index, String key, Object value,
+		String[] bracketSplit) {
+		if (stringIsWord(bracketSplit[1])) { //put map
+			Object retrievedValue = sourceList.get(index);
+			Map<String, Object> newMap = new HashMap<String, Object>();
+			
+			if (retrievedValue instanceof Map) {
+				newMap = (Map<String, Object>) retrievedValue;
+			}
+			
+			sourceList.remove(index);
+			sourceList.add(index, newMap);
+			
+			key = key.substring(key.indexOf('.') + 1, key.length());
+			recreateObject(newMap, key, value);
+		}
+		return sourceList;
 	}
 	
 	private static List<Object> getSourceList(List<Object> sourceList, int index) {

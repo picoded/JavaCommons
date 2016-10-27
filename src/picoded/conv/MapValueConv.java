@@ -231,8 +231,7 @@ public class MapValueConv {
 	}
 	
 	private static boolean stringIsWord(String source) {
-		if (!source.startsWith("[") && !source.startsWith("]") && !source.startsWith(".")
-			&& !source.substring(0, 1).matches("[0-9]+")) {
+		if (!source.substring(0, 1).matches("[0-9]+")) {
 			return true;
 		}
 		return false;

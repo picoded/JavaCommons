@@ -84,7 +84,7 @@ public class DateConv {
 		}
 		
 		Calendar cal = Calendar.getInstance();
-		cal.set(Integer.parseInt(newDateSplit[0]), (Integer.parseInt(newDateSplit[1]) - 1),
+		cal.set(Integer.parseInt(newDateSplit[0]), Integer.parseInt(newDateSplit[1]) - 1,
 			Integer.parseInt(newDateSplit[2]));
 		return String.valueOf(cal.getTimeInMillis());
 		

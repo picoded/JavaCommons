@@ -29,9 +29,7 @@ public class DateConv {
 		
 		String format_cleaned = RegexUtil.removeAllNonAlphaNumeric(format);
 		
-		if ("ddmmyyyy".equalsIgnoreCase(format_cleaned)) {
-			return ISODateFormat.DDMMYYYY;
-		} else if ("mmddyyyy".equalsIgnoreCase(format_cleaned)) {
+		if ("mmddyyyy".equalsIgnoreCase(format_cleaned)) {
 			return ISODateFormat.MMDDYYYY;
 		} else if ("yyyymmdd".equalsIgnoreCase(format_cleaned)) {
 			return ISODateFormat.YYYYMMDD;
@@ -96,19 +94,17 @@ public class DateConv {
 	/// Util functions
 	///
 	public static boolean isInISOFormat(String inDateString) {
-		if (inDateString.indexOf("-") != inDateString.lastIndexOf("-")) {
+		if (inDateString.indexOf('-') != inDateString.lastIndexOf('-')) {
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 	
 	public static boolean isInMillisecondsFormat(String inDateString) {
 		if (inDateString.startsWith("-") || !inDateString.contains("-")) {
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 	
 	public static String getCurrentDateISO(ISODateFormat dateFormat, String separator) {
@@ -143,7 +139,7 @@ public class DateConv {
 		}
 		
 		String[] dateSplit = inDateISO.split(separator);
-		if (dateSplit == null || dateSplit.length != 3) {
+		if (dateSplit.length != 3) {
 			return null;
 		}
 		

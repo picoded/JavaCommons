@@ -155,11 +155,7 @@ public class MapValueConv {
 					int index = Integer.parseInt(bracketSplit[0]);
 					List<Object> sourceList = (List<Object>) source;
 					
-					if (index >= sourceList.size()) {
-						for (int i = sourceList.size(); i <= index; ++i) {
-							sourceList.add(new Object());
-						}
-					}
+					sourceList = getSourceList(sourceList, index);
 					
 					if (stringIsWord(bracketSplit[1])) { //put map
 						Object retrievedValue = sourceList.get(index);
@@ -204,6 +200,15 @@ public class MapValueConv {
 			Map<String, Object> sourceMap = (Map<String, Object>) source;
 			sourceMap.put(key, value);
 		}
+	}
+	
+	private static List<Object> getSourceList(List<Object> sourceList, int index) {
+		if (index >= sourceList.size()) {
+			for (int i = sourceList.size(); i <= index; ++i) {
+				sourceList.add(new Object());
+			}
+		}
+		return sourceList;
 	}
 	
 	protected static <B> B[] sanatizeArray(B[] in) {

@@ -187,12 +187,5 @@ public class MapValueConv_test {
 		unqualifiedMap.put(".", "");
 		assertNotNull(MapValueConv.fromFullyQualifiedKeys(unqualifiedMap));
 		
-		unqualifiedMap = new HashMap<String, Object>();
-		unqualifiedMap.put(".[]", "");
-		assertNotNull(MapValueConv.fromFullyQualifiedKeys(unqualifiedMap));
-		
-		unqualifiedMap.put("[].", "");
-		assertNotNull(MapValueConv.fromFullyQualifiedKeys(unqualifiedMap));
-		
 	}
 }

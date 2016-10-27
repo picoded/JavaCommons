@@ -150,8 +150,7 @@ public class MapValueConv {
 			if (key.indexOf(']') < key.indexOf('.')) {
 				String[] bracketSplit = key.split("\\[|\\]|\\.");
 				bracketSplit = sanitiseArray(bracketSplit);
-				if (bracketSplit.length == 0)
-					return;
+				
 				if (bracketSplit.length > 1 && stringIsNumber(bracketSplit[0])) { //numbers only
 					int index = Integer.parseInt(bracketSplit[0]);
 					List<Object> sourceList = (List<Object>) source;

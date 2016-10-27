@@ -1446,7 +1446,7 @@ public class GenericConvert {
 		} else { //Force the "toString", then to List conversion
 			try {
 				String inputStr = input.toString();
-				Object o = ConvertJSON.toMap(inputStr);
+				Object o = ConvertJSON.toList(inputStr);
 				if (o instanceof List) {
 					list = (List<?>) o;
 				}

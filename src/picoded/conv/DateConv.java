@@ -19,7 +19,7 @@ public class DateConv {
 	}
 	
 	public enum ISODateFormat {
-		DDMMYYYY, MMDDYYYY, YYYYMMDD, YYYYDDMM, DEFAULT
+		DDMMYYYY, MMDDYYYY, YYYYMMDD, YYYYDDMM
 	}
 	
 	public static ISODateFormat toISODateFormat(String format) {

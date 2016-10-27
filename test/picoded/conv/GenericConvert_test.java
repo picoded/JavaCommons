@@ -375,6 +375,8 @@ public class GenericConvert_test {
 		list.add("key1");
 		list.add("key2");
 		assertEquals(Arrays.asList(new String[] { "key1", "key2" }), toObjectList(list, "default"));
+		assertEquals(Arrays.asList(new Object[] { "key1", "key2", "key3" }),
+			toObjectList(new StringBuilder("[\"key1\",\"key2\",\"key3\"]"), "default"));
 	}
 	
 	@Test
@@ -452,7 +454,7 @@ public class GenericConvert_test {
 	}
 	
 	@Test(expected = RuntimeException.class)
-	public void normalizeObjectPathRecursiveTest() {
+	public void normalizeObjectPathRecursiveexceptionTest() {
 		// Else recursive fetch
 		List<String> list = new ArrayList<String>();
 		list.add("KEY");
@@ -461,6 +463,19 @@ public class GenericConvert_test {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("key", "my_path");
 		map.put("key1", "my_path1");
+		assertEquals("previous.key", normalizeObjectPath(map, list, sb).toString());
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void normalizeObjectPathRecursiveTest() {
+		// Else recursive fetch
+		List<String> list = new ArrayList<String>();
+		list.add("key1");
+		list.add("key2");
+		StringBuilder sb = new StringBuilder();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key1", "my_path1");
+		map.put("key2", "my_path2");
 		assertEquals("previous.key", normalizeObjectPath(map, list, sb).toString());
 	}
 	

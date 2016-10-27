@@ -790,10 +790,11 @@ public class GenericConvert {
 		// Conversion to List (if possible)
 		if (input instanceof String) {
 			try {
-				Object o = ConvertJSON.toList((String) input);
-				if (o instanceof List) {
-					ret = (List<Object>) o;
-				}
+				//Object o = ConvertJSON.toList((String) input);
+				ret = ConvertJSON.toList((String) input);
+				//if (o instanceof List) {
+				//ret = (List<Object>) o;
+				//}
 			} catch (Exception e) {
 				// Silence the exception
 			}

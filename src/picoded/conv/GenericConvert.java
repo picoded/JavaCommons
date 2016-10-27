@@ -782,7 +782,7 @@ public class GenericConvert {
 		}
 		
 		if (input instanceof Object[]) {
-			return Arrays.asList(((Object[]) input));
+			return Arrays.asList((Object[]) input);
 		}
 		
 		List<Object> ret = null;
@@ -972,9 +972,9 @@ public class GenericConvert {
 		// This is the actual termination point for the recursive function
 		//
 		if (key == null || key.length() <= 0) {
-			if (ret.size() < 0) {
-				ret.add("");
-			}
+			//if (ret.size() < 0) {
+			//ret.add("");
+			//}
 			return ret;
 		}
 		
@@ -990,10 +990,6 @@ public class GenericConvert {
 			return splitObjectPath(key.substring(1), ret);
 		}
 		
-		// Left and right string parts to recursively process
-		String leftPart;
-		String rightPart;
-		
 		// Fetches the next 2 index points (most probably seperator of token parts)
 		int dotIndex = key.indexOf('.');
 		int leftBracketIndex = key.indexOf('[');
@@ -1004,6 +1000,9 @@ public class GenericConvert {
 			return ret;
 		}
 		
+		// Left and right string parts to recursively process
+		String leftPart;
+		String rightPart;
 		// Begins left/right part splitting and processing
 		if (leftBracketIndex == 0) {
 			//
@@ -1144,7 +1143,6 @@ public class GenericConvert {
 			}
 			
 			String bracketKey = key.substring(1, rightBracketIndex).trim();
-			String rightKey = key.substring(rightBracketIndex + 1).trim();
 			
 			// Fetch [sub object]
 			Object subObject = fetchObject(base, bracketKey, null);
@@ -1157,6 +1155,7 @@ public class GenericConvert {
 				return fallback;
 			}
 			
+			String rightKey = key.substring(rightBracketIndex + 1).trim();
 			// subObject is THE object, as its the ending key
 			if (rightKey.length() <= 0) {
 				return subObject;
@@ -1434,10 +1433,11 @@ public class GenericConvert {
 		// Conversion to List (if possible)
 		if (input instanceof String) {
 			try {
-				Object o = ConvertJSON.toList((String) input);
-				if (o instanceof List) {
-					list = (List<?>) o;
-				}
+				//Object o = ConvertJSON.toList((String) input);
+				list = ConvertJSON.toList((String) input);
+				//if (o instanceof List) {
+				//list = (List<?>) o;
+				//}
 			} catch (Exception e) {
 				// Silence the exception
 			}

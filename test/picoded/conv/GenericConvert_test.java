@@ -331,6 +331,16 @@ public class GenericConvert_test {
 		//assertArrayEquals(new String[]{"key1", "key2"}, toStringArray(2.2, "default"));
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public void toStringArrayExceptionTest() {
+		List list = new ArrayList<>();
+		list.add(2.23);
+		list.add("3.4");
+		list.add("key1");
+		assertArrayEquals(new String[] { "2.23", "3.4", "key1" }, toStringArray(list, "default"));
+	}
+	
 	@Test
 	public void toObjectArrayTest() {
 		assertNull(toObjectArray(null));
@@ -518,6 +528,13 @@ public class GenericConvert_test {
 		List<String> ret = new ArrayList<>();
 		List<String> key = new ArrayList<String>();
 		assertEquals(key, splitObjectPath("[my_key", ret));
+	}
+	
+	//@Test (expected = RuntimeException.class)
+	public void splitObjectPathExceptionUnexpectedKeyTest() {
+		List<String> ret = new ArrayList<>();
+		List<String> key = new ArrayList<String>();
+		assertEquals(key, splitObjectPath("key.my_key]", ret));
 	}
 	
 	@Test(expected = RuntimeException.class)

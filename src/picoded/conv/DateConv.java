@@ -1,244 +1,185 @@
 package picoded.conv;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Calendar;
 
-/// 
-/// Utility conversion class, that helps convert Map values from one type to another
+import org.apache.commons.lang3.ArrayUtils;
+
+import com.mysql.jdbc.StringUtils;
+
 ///
-public class MapValueConv {
+/// Convenience class to convert between date types
+/// Month is 1-indexed
+/// Default dateformat is DD-MM-YYYY like the rest of the civilised world uses
+///
+public class DateConv {
 	
 	/// Invalid constructor (throws exception)
-	protected MapValueConv() {
+	protected DateConv() {
 		throw new IllegalAccessError("Utility class");
 	}
 	
-	/// Converts a Map with List values, into array values
-	public static <A, B> Map<A, B[]> listToArray(Map<A, List<B>> source, Map<A, B[]> target, B[] arrayType) {
-		// Normalize array type to 0 length
-		arrayType = sanatizeArray(arrayType);
-		
-		for (Map.Entry<A, List<B>> entry : source.entrySet()) {
-			List<B> value = entry.getValue();
-			if (value == null) {
-				target.put(entry.getKey(), null);
-			} else {
-				target.put(entry.getKey(), value.toArray(arrayType));
-			}
-		}
-		
-		return target;
+	public enum ISODateFormat {
+		DDMMYYYY, MMDDYYYY, YYYYMMDD, YYYYDDMM
 	}
 	
-	/// Converts a Map with List values, into array values. Target map is created using HashMap
-	public static <A, B> Map<A, B[]> listToArray(Map<A, List<B>> source, B[] arrayType) {
-		return listToArray(source, new HashMap<A, B[]>(), arrayType);
-	}
-	
-	/// Converts a single value map, to an array map
-	public static <A, B> Map<A, B[]> singleToArray(Map<A, B> source, Map<A, B[]> target, B[] arrayType) {
-		// Normalize array type to 0 length
-		arrayType = sanatizeArray(arrayType);
-		
-		// Convert values
-		for (Map.Entry<A, B> entry : source.entrySet()) {
-			List<B> aList = new ArrayList<B>();
-			aList.add(entry.getValue());
-			target.put(entry.getKey(), aList.toArray(arrayType));
-		}
-		return target;
-	}
-	
-	/// Converts a single value map, to an array map
-	public static <A, B> Map<A, B[]> singleToArray(Map<A, B> source, B[] arrayType) {
-		return singleToArray(source, new HashMap<A, B[]>(), arrayType);
-	}
-	
-	//--------------------------------------------------------------------------------------------------
-	//
-	//  Fully Qualified KEYS handling
-	//
-	//--------------------------------------------------------------------------------------------------
-	
-	public static Map<String, Object> fromFullyQualifiedKeys(Map<String, Object> source) {
-		Map<String, Object> finalMap = new HashMap<String, Object>();
-		for (Map.Entry<String, Object> sourceKey : source.entrySet()) {
-			recreateObject(finalMap, sourceKey.getKey(), sourceKey.getValue());
+	public static ISODateFormat toISODateFormat(String format) {
+		if (format == null || format.isEmpty()) {
+			return ISODateFormat.DDMMYYYY;
 		}
 		
-		return finalMap;
+		String format_cleaned = RegexUtil.removeAllNonAlphaNumeric(format);
+		
+		if ("mmddyyyy".equalsIgnoreCase(format_cleaned)) {
+			return ISODateFormat.MMDDYYYY;
+		} else if ("yyyymmdd".equalsIgnoreCase(format_cleaned)) {
+			return ISODateFormat.YYYYMMDD;
+		} else if ("yyyyddmm".equalsIgnoreCase(format_cleaned)) {
+			return ISODateFormat.YYYYDDMM;
+		} else {
+			return ISODateFormat.DDMMYYYY;
+		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static Map<String, Object> toFullyQualifiedKeys(Object source, String rootName, String separator) {
-		Map<String, Object> fullyQualifiedMap = new HashMap<String, Object>();
-		
-		if (rootName == null) {
-			rootName = "";
+	public static String toISOFormat(long inDate, ISODateFormat dateFormat, String separator) {
+		if (separator == null) {
+			separator = "-";
+		} else {
+			//TODO sanitise separator string?
 		}
 		
-		if (separator.isEmpty()) {
-			separator = ".";
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(inDate);
+		
+		String date = String.valueOf(cal.get(Calendar.DATE));
+		if (date.length() == 1) {
+			date = "0" + date;
 		}
-		String parentName;
-		if (source instanceof List) {
-			List<Object> sourceList = (List<Object>) source;
+		
+		String month = String.valueOf(cal.get(Calendar.MONTH) + 1);
+		if (month.length() == 1) {
+			month = "0" + month;
+		}
+		
+		String isoDate = String.valueOf(date + separator + month + separator + cal.get(Calendar.YEAR));
+		isoDate = changeISODateFormat(isoDate, ISODateFormat.DDMMYYYY, dateFormat, separator);
+		
+		return isoDate;
+	}
+	
+	///
+	/// I return string to that i can return null if an error happened during conversion
+	///
+	public static String toMillisecondsFormat(String inDate, ISODateFormat currentDateFormat, String separator) {
+		if (StringUtils.isNullOrEmpty(inDate)) {
+			return null;
+		}
+		
+		String newDate = changeISODateFormat(inDate, currentDateFormat, ISODateFormat.YYYYMMDD, separator);
+		String[] newDateSplit = null;
+		if (newDate != null) {
+			newDateSplit = newDate.split(separator);
+		}
+		if (newDateSplit == null) {
+			return null;
+		}
+		
+		Calendar cal = Calendar.getInstance();
+		cal.set(Integer.parseInt(newDateSplit[0]), Integer.parseInt(newDateSplit[1]) - 1,
+			Integer.parseInt(newDateSplit[2]));
+		return String.valueOf(cal.getTimeInMillis());
+		
+	}
+	
+	///
+	/// Util functions
+	///
+	public static boolean isInISOFormat(String inDateString) {
+		if (inDateString.indexOf('-') != inDateString.lastIndexOf('-')) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean isInMillisecondsFormat(String inDateString) {
+		if (inDateString.startsWith("-") || !inDateString.contains("-")) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static String getCurrentDateISO(ISODateFormat dateFormat, String separator) {
+		if (separator == null) {
+			separator = "-";
+		}
+		
+		Calendar cal = Calendar.getInstance();
+		int date = cal.get(Calendar.DATE);
+		int month = cal.get(Calendar.MONTH) + 1;
+		int year = cal.get(Calendar.YEAR);
+		
+		String newDate = String.valueOf(date + separator + month + separator + year); //ddmmyyyy
+		newDate = changeISODateFormat(newDate, ISODateFormat.DDMMYYYY, dateFormat, separator);
+		
+		return newDate;
+	}
+	
+	///
+	/// Convert from one ISO date format to another format
+	///
+	public static String changeISODateFormat(String inDateISO, ISODateFormat currentDateFormat,
+		ISODateFormat newDateFormat, String separator) {
+		if (inDateISO == null || (currentDateFormat == null && newDateFormat == null)) {
+			return null;
+		}
+		
+		if (separator == null) {
+			separator = "-";
+		} else {
+			//TODO sanitise separator string?
+		}
+		
+		String[] dateSplit = inDateISO.split(separator);
+		if (dateSplit.length != 3) {
+			return null;
+		}
+		
+		dateSplit = resortDateArray(dateSplit, currentDateFormat, newDateFormat);
+		StringBuilder sb = new StringBuilder();
+		for (byte i = 0; i < dateSplit.length; ++i) {
+			sb.append(dateSplit[i]);
 			
-			int counter = 0;
-			for (Object obj : sourceList) {
-				parentName = getRootName(rootName, counter);
-				if (obj instanceof List) {
-					fullyQualifiedMap.putAll(toFullyQualifiedKeys(obj, parentName, separator));
-					++counter;
-					
-				}
-				if (obj instanceof Map) {
-					Map<String, Object> objMap = (Map<String, Object>) obj;
-					fullyQualifiedMap = getFullyQualifiedMap(fullyQualifiedMap, objMap, rootName, parentName, counter,
-						separator);
-					counter = (int) fullyQualifiedMap.get("counter");
-				}
+			if (i < dateSplit.length - 1) {
+				sb.append(separator);
 			}
-		} else if (source instanceof Map) {
-			Map<String, Object> sourceMap = (Map<String, Object>) source;
-			for (Map.Entry<String, Object> sourceMapKey : sourceMap.entrySet()) {
-				if (rootName.isEmpty()) {
-					parentName = sourceMapKey.getKey();
-				} else {
-					parentName = rootName + separator + sourceMapKey.getKey();
-				}
-				
-				fullyQualifiedMap.putAll(toFullyQualifiedKeys(sourceMapKey.getValue(), parentName, separator));
-			}
-		} else if (source instanceof Number) {
-			fullyQualifiedMap.put(rootName, source);
-		} else {
-			fullyQualifiedMap.put(rootName, source.toString());
 		}
 		
-		return fullyQualifiedMap;
+		return sb.toString();
 	}
 	
-	private static String getRootName(String rootName, Integer counter) {
-		if (!rootName.isEmpty()) {
-			return rootName + "[" + counter + "]";
+	private static String[] resortDateArray(String[] inDateSplit, ISODateFormat currentDateFormat,
+		ISODateFormat newDateFormat) {
+		byte[] currentDateSorting = getISODateSorting(currentDateFormat);
+		byte[] newDateSorting = getISODateSorting(newDateFormat);
+		String[] dateSplit = new String[3];
+		for (byte i = 0; i < dateSplit.length; ++i) {
+			dateSplit[i] = inDateSplit[ArrayUtils.indexOf(currentDateSorting, newDateSorting[i])];
 		}
-		return "";
+		
+		return dateSplit;
 	}
 	
-	private static Map<String, Object> getFullyQualifiedMap(Map<String, Object> fullyQualifiedMap,
-		Map<String, Object> objMap, String rootName, String parentName, int counter, String separator) {
-		for (Map.Entry<String, Object> objMapKey1 : objMap.entrySet()) {
-			if (rootName.isEmpty()) {
-				parentName = objMapKey1.getKey();
-			} else {
-				parentName = rootName + "[" + counter + "]" + separator + objMapKey1.getKey();
-			}
-			fullyQualifiedMap.putAll(toFullyQualifiedKeys(objMap.get(objMapKey1.getKey()), parentName, separator));
+	private static byte[] getISODateSorting(ISODateFormat dateFormat) {
+		switch (dateFormat) {
+		case DDMMYYYY:
+			return new byte[] { 0, 1, 2 };
+		case MMDDYYYY:
+			return new byte[] { 1, 0, 2 };
+		case YYYYMMDD:
+			return new byte[] { 2, 1, 0 };
+		case YYYYDDMM:
+			return new byte[] { 2, 0, 1 };
+		default:
+			return null;
 		}
-		++counter;
-		fullyQualifiedMap.put("counter", counter);
-		return fullyQualifiedMap;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private static void recreateObject(Object source, String key, Object value) {
-		if (key.contains("]") && key.contains(".")) {
-			if (key.indexOf(']') < key.indexOf('.')) {
-				String[] bracketSplit = key.split("\\[|\\]|\\.");
-				bracketSplit = sanitiseArray(bracketSplit);
-				
-				if (bracketSplit.length > 1 && stringIsNumber(bracketSplit[0])) { //numbers only
-					int index = Integer.parseInt(bracketSplit[0]);
-					List<Object> sourceList = (List<Object>) source;
-					
-					sourceList = getSourceList(sourceList, index);
-					
-					if (stringIsWord(bracketSplit[1])) { //put map
-						Object retrievedValue = sourceList.get(index);
-						Map<String, Object> newMap = new HashMap<String, Object>();
-						
-						if (retrievedValue instanceof Map) {
-							newMap = (Map<String, Object>) retrievedValue;
-						}
-						
-						sourceList.remove(index);
-						sourceList.add(index, newMap);
-						
-						key = key.substring(key.indexOf('.') + 1, key.length());
-						recreateObject(newMap, key, value);
-					} else if (stringIsNumber(bracketSplit[1])) { //put list [1, 0, secondLayer0]
-						Object retrievedValue = sourceList.get(index);
-						List<Object> newList = new ArrayList<Object>();
-						
-						if (retrievedValue instanceof List) {
-							newList = (List<Object>) retrievedValue;
-						}
-						
-						sourceList.remove(index);
-						sourceList.add(index, newList);
-						
-						key = key.substring(key.indexOf(']') + 1, key.length());
-						recreateObject(newList, key, value);
-					}
-				} else if (source instanceof Map) {
-					Map<String, Object> sourceMap = (Map<String, Object>) source;
-					List<Object> element = (List<Object>) sourceMap.get(bracketSplit[0]);
-					if (element == null) {
-						element = new ArrayList<Object>();
-						sourceMap.put(bracketSplit[0], element);
-					}
-					
-					key = key.substring(bracketSplit[0].length(), key.length());
-					recreateObject(element, key, value);
-				}
-			}
-		} else {
-			Map<String, Object> sourceMap = (Map<String, Object>) source;
-			sourceMap.put(key, value);
-		}
-	}
-	
-	private static List<Object> getSourceList(List<Object> sourceList, int index) {
-		if (index >= sourceList.size()) {
-			for (int i = sourceList.size(); i <= index; ++i) {
-				sourceList.add(new Object());
-			}
-		}
-		return sourceList;
-	}
-	
-	protected static <B> B[] sanatizeArray(B[] in) {
-		if (in != null && in.length > 0) {
-			in = Arrays.copyOfRange(in, 0, 0);
-		}
-		return in;
-	}
-	
-	private static String[] sanitiseArray(String[] source) {
-		List<String> holder = new ArrayList<String>();
-		for (int i = 0; i < source.length; ++i) {
-			if (!source[i].isEmpty()) {
-				holder.add(source[i]);
-			}
-		}
-		return holder.toArray(new String[] {});
-	}
-	
-	private static boolean stringIsNumber(String source) {
-		if (source.matches("[0-9]+")) {
-			return true;
-		}
-		return false;
-	}
-	
-	private static boolean stringIsWord(String source) {
-		if (!source.substring(0, 1).matches("[0-9]+")) {
-			return true;
-		}
-		return false;
 	}
 }

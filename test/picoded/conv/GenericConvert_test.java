@@ -576,6 +576,7 @@ public class GenericConvert_test {
 	public void getBiFunction_noisyTest() {
 		biFunctionMap = null;
 		assertNotNull(getBiFunction_noisy(String.class));
+		assertNotNull(getBiFunction_noisy(String[].class));
 	}
 	
 	@Test

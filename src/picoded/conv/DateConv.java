@@ -29,7 +29,9 @@ public class DateConv {
 		
 		String format_cleaned = RegexUtil.removeAllNonAlphaNumeric(format);
 		
-		if ("mmddyyyy".equalsIgnoreCase(format_cleaned)) {
+		if ("ddmmyyyy".equalsIgnoreCase(format_cleaned)) {
+			return ISODateFormat.DDMMYYYY;
+		} else if ("mmddyyyy".equalsIgnoreCase(format_cleaned)) {
 			return ISODateFormat.MMDDYYYY;
 		} else if ("yyyymmdd".equalsIgnoreCase(format_cleaned)) {
 			return ISODateFormat.YYYYMMDD;
@@ -94,17 +96,19 @@ public class DateConv {
 	/// Util functions
 	///
 	public static boolean isInISOFormat(String inDateString) {
-		if (inDateString.indexOf('-') != inDateString.lastIndexOf('-')) {
+		if (inDateString.indexOf("-") != inDateString.lastIndexOf("-")) {
 			return true;
+		} else {
+			return false;
 		}
-		return false;
 	}
 	
 	public static boolean isInMillisecondsFormat(String inDateString) {
 		if (inDateString.startsWith("-") || !inDateString.contains("-")) {
 			return true;
+		} else {
+			return false;
 		}
-		return false;
 	}
 	
 	public static String getCurrentDateISO(ISODateFormat dateFormat, String separator) {
@@ -144,9 +148,6 @@ public class DateConv {
 		}
 		
 		dateSplit = resortDateArray(dateSplit, currentDateFormat, newDateFormat);
-		if (dateSplit == null) {
-			return null;
-		}
 		StringBuilder sb = new StringBuilder();
 		for (byte i = 0; i < dateSplit.length; ++i) {
 			sb.append(dateSplit[i]);
@@ -161,13 +162,8 @@ public class DateConv {
 	
 	private static String[] resortDateArray(String[] inDateSplit, ISODateFormat currentDateFormat,
 		ISODateFormat newDateFormat) {
-		
 		byte[] currentDateSorting = getISODateSorting(currentDateFormat);
 		byte[] newDateSorting = getISODateSorting(newDateFormat);
-		if (currentDateSorting == null || newDateSorting == null) {
-			return null;
-		}
-		
 		String[] dateSplit = new String[3];
 		for (byte i = 0; i < dateSplit.length; ++i) {
 			dateSplit[i] = inDateSplit[ArrayUtils.indexOf(currentDateSorting, newDateSorting[i])];

@@ -561,11 +561,11 @@ public class GenericConvert_test {
 		assertEquals(key, splitObjectPath("[my_key", ret));
 	}
 	
-	//@Test (expected = RuntimeException.class)
+	@Test(expected = RuntimeException.class)
 	public void splitObjectPathExceptionUnexpectedKeyTest() {
 		List<String> ret = new ArrayList<>();
 		List<String> key = new ArrayList<String>();
-		assertEquals(key, splitObjectPath("key.my_key]", ret));
+		assertEquals(key, splitObjectPath("]key..my_key][", ret));
 	}
 	
 	@Test(expected = RuntimeException.class)

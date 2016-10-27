@@ -159,7 +159,7 @@ public class MapValueConv {
 					// Check String is words and recursive call of recreateObject method
 					sourceList = checkStringIsWords(sourceList, index, key, value, bracketSplit);
 					// Check String is number and recursive call of recreateObject method
-					sourceList = checkStringIsNumber(sourceList, index, key, value, bracketSplit);
+					checkStringIsNumber(sourceList, index, key, value, bracketSplit);
 				} else if (source instanceof Map) {
 					Map<String, Object> sourceMap = (Map<String, Object>) source;
 					List<Object> element = (List<Object>) sourceMap.get(bracketSplit[0]);

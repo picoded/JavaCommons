@@ -188,7 +188,7 @@ public class MapValueConv {
 						key = key.substring(key.indexOf(']') + 1, key.length());
 						recreateObject(newList, key, value);
 					}
-				} else {
+				} else if (source instanceof Map) {
 					Map<String, Object> sourceMap = (Map<String, Object>) source;
 					List<Object> element = (List<Object>) sourceMap.get(bracketSplit[0]);
 					if (element == null) {

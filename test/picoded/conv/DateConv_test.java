@@ -78,6 +78,8 @@ public class DateConv_test {
 		assertNull(DateConv.changeISODateFormat("", ISODateFormat.DDMMYYYY, ISODateFormat.YYYYMMDD, null));
 		assertNull(DateConv.changeISODateFormat("16-05-2015", ISODateFormat.DEFAULT, ISODateFormat.YYYYMMDD, null));
 		assertNull(DateConv.changeISODateFormat("16-05-2015-12", ISODateFormat.DEFAULT, ISODateFormat.YYYYMMDD, null));
+		assertNull(DateConv.changeISODateFormat("16-05-2015-12", ISODateFormat.DEFAULT, ISODateFormat.DEFAULT, null));
+		assertNull(DateConv.changeISODateFormat("16-05-2015-12", ISODateFormat.DDMMYYYY, ISODateFormat.DEFAULT, null));
 		
 		isoDate_dmy = DateConv.toISOFormat(millisecondsDate, ISODateFormat.DDMMYYYY, "-");
 		assertEquals("16-05-2015", isoDate_dmy);

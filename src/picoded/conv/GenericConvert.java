@@ -790,10 +790,11 @@ public class GenericConvert {
 		// Conversion to List (if possible)
 		if (input instanceof String) {
 			try {
-				Object o = ConvertJSON.toList((String) input);
-				if (o instanceof List) {
-					ret = (List<Object>) o;
-				}
+				//Object o = ConvertJSON.toList((String) input);
+				ret = ConvertJSON.toList((String) input);
+				//if (o instanceof List) {
+				//ret = (List<Object>) o;
+				//}
 			} catch (Exception e) {
 				// Silence the exception
 			}
@@ -1446,7 +1447,7 @@ public class GenericConvert {
 		} else { //Force the "toString", then to List conversion
 			try {
 				String inputStr = input.toString();
-				Object o = ConvertJSON.toMap(inputStr);
+				Object o = ConvertJSON.toList(inputStr);
 				if (o instanceof List) {
 					list = (List<?>) o;
 				}

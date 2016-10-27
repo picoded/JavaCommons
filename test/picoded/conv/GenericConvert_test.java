@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
@@ -373,6 +375,8 @@ public class GenericConvert_test {
 		list.add("key1");
 		list.add("key2");
 		assertEquals(Arrays.asList(new String[] { "key1", "key2" }), toObjectList(list, "default"));
+		assertEquals(Arrays.asList(new Object[] { "key1", "key2", "key3" }),
+			toObjectList(new StringBuilder("[\"key1\",\"key2\",\"key3\"]"), "default"));
 	}
 	
 	@Test
@@ -446,6 +450,32 @@ public class GenericConvert_test {
 		map = new HashMap<String, Object>();
 		map.put("key", "my_path");
 		sb.append("previous");
+		assertEquals("previous.key", normalizeObjectPath(map, list, sb).toString());
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void normalizeObjectPathRecursiveexceptionTest() {
+		// Else recursive fetch
+		List<String> list = new ArrayList<String>();
+		list.add("KEY");
+		list.add("key1");
+		StringBuilder sb = new StringBuilder();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key", "my_path");
+		map.put("key1", "my_path1");
+		assertEquals("previous.key", normalizeObjectPath(map, list, sb).toString());
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void normalizeObjectPathRecursiveTest() {
+		// Else recursive fetch
+		List<String> list = new ArrayList<String>();
+		list.add("key1");
+		list.add("key2");
+		StringBuilder sb = new StringBuilder();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key1", "my_path1");
+		map.put("key2", "my_path2");
 		assertEquals("previous.key", normalizeObjectPath(map, list, sb).toString());
 	}
 	
@@ -542,20 +572,18 @@ public class GenericConvert_test {
 		assertNotNull(getBiFunction_noisy(getClass()));
 	}
 	
+	@Test
 	public void getBiFunction_noisyTest() {
-		assertNotNull(getBiFunction_noisy(List.class));
+		biFunctionMap = null;
+		assertNotNull(getBiFunction_noisy(String.class));
+		assertNotNull(getBiFunction_noisy(String[].class));
 	}
 	
 	@Test
-	public void toArrayHelperTest() {
+	public void toStringArrayForceToStringTest() {
 		assertNull(toArrayHelper(null));
-		Map<String, String> map = new HashMap<String, String>();
-		//List<String> list = new ArrayList<String>();
-		//list.add("value1");
-		//list.add("value2");
-		map.put("key1", "value1");
-		map.put("key2", "value2");
-		//assertNull(toArrayHelper(map));
+		StringBuilder sb = new StringBuilder("[\"key1\",\"key2\",\"key3\"]");
+		assertArrayEquals(new String[] { "key1", "key2", "key3" }, toStringArray(sb, null));
 	}
 	
 	@Test
@@ -577,6 +605,8 @@ public class GenericConvert_test {
 		
 		assertNull(toGenericConvertStringMap(null, null));
 		assertNull(toGenericConvertStringMap(null, "default"));
+		
+		assertNull(toGenericConvertStringMap("true", "default"));
 		
 		Map<String, String> defMap = new HashMap<String, String>();
 		defMap.put("key", "value");

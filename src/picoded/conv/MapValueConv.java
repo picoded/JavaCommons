@@ -154,32 +154,17 @@ public class MapValueConv {
 				if (bracketSplit.length > 1 && stringIsNumber(bracketSplit[0])) { //numbers only
 					int index = Integer.parseInt(bracketSplit[0]);
 					List<Object> sourceList = (List<Object>) source;
-					
+					// Get source list
 					sourceList = getSourceList(sourceList, index);
-					
+					// Check String is words and recursive call of recreateObject method
 					sourceList = checkStringIsWords(sourceList, index, key, value, bracketSplit);
-					
-					if (stringIsNumber(bracketSplit[1])) { //put list [1, 0, secondLayer0]
-						Object retrievedValue = sourceList.get(index);
-						List<Object> newList = new ArrayList<Object>();
-						
-						if (retrievedValue instanceof List) {
-							newList = (List<Object>) retrievedValue;
-						}
-						
-						sourceList.remove(index);
-						sourceList.add(index, newList);
-						
-						key = key.substring(key.indexOf(']') + 1, key.length());
-						recreateObject(newList, key, value);
-					}
+					// Check String is number and recursive call of recreateObject method
+					sourceList = checkStringIsNumber(sourceList, index, key, value, bracketSplit);
 				} else if (source instanceof Map) {
 					Map<String, Object> sourceMap = (Map<String, Object>) source;
 					List<Object> element = (List<Object>) sourceMap.get(bracketSplit[0]);
-					if (element == null) {
-						element = new ArrayList<Object>();
-						sourceMap.put(bracketSplit[0], element);
-					}
+					// Get element list
+					element = getElementList(sourceMap, element, bracketSplit);
 					key = key.substring(bracketSplit[0].length(), key.length());
 					recreateObject(element, key, value);
 				}
@@ -188,6 +173,34 @@ public class MapValueConv {
 			Map<String, Object> sourceMap = (Map<String, Object>) source;
 			sourceMap.put(key, value);
 		}
+	}
+	
+	private static List<Object> getElementList(Map<String, Object> sourceMap, List<Object> element, String[] bracketSplit) {
+		if (element == null) {
+			element = new ArrayList<Object>();
+			sourceMap.put(bracketSplit[0], element);
+		}
+		return element;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static List<Object> checkStringIsNumber(List<Object> sourceList, int index, String key, Object value,
+		String[] bracketSplit) {
+		if (stringIsNumber(bracketSplit[1])) { //put list [1, 0, secondLayer0]
+			Object retrievedValue = sourceList.get(index);
+			List<Object> newList = new ArrayList<Object>();
+			
+			if (retrievedValue instanceof List) {
+				newList = (List<Object>) retrievedValue;
+			}
+			
+			sourceList.remove(index);
+			sourceList.add(index, newList);
+			
+			key = key.substring(key.indexOf(']') + 1, key.length());
+			recreateObject(newList, key, value);
+		}
+		return sourceList;
 	}
 	
 	@SuppressWarnings("unchecked")

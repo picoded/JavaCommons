@@ -4,10 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
@@ -454,7 +452,7 @@ public class GenericConvert_test {
 	}
 	
 	@Test(expected = RuntimeException.class)
-	public void normalizeObjectPathRecursiveexceptionTest() {
+	public void normalizeObjectPathRecursiveExceptionTest() {
 		// Else recursive fetch
 		List<String> list = new ArrayList<String>();
 		list.add("KEY");
@@ -466,7 +464,7 @@ public class GenericConvert_test {
 		assertEquals("previous.key", normalizeObjectPath(map, list, sb).toString());
 	}
 	
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void normalizeObjectPathRecursiveTest() {
 		// Else recursive fetch
 		List<String> list = new ArrayList<String>();
@@ -474,9 +472,12 @@ public class GenericConvert_test {
 		list.add("key2");
 		StringBuilder sb = new StringBuilder();
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("key1", "my_path1");
+		Map<String, Object> subMap = new HashMap<String, Object>();
+		subMap.put("s_key1", "s_my_path1");
+		subMap.put("s_key2", "s_my_path2");
+		map.put("key1", subMap);
 		map.put("key2", "my_path2");
-		assertEquals("previous.key", normalizeObjectPath(map, list, sb).toString());
+		assertEquals("", normalizeObjectPath(map, list, sb).toString());
 	}
 	
 	@Test(expected = RuntimeException.class)
@@ -488,7 +489,7 @@ public class GenericConvert_test {
 	}
 	
 	@Test(expected = RuntimeException.class)
-	public void normalizeObjectPathRecursiveExceptionTest() {
+	public void normalizeObjectPathRecursiveException1Test() {
 		StringBuilder sb = new StringBuilder();
 		List<String> list = new ArrayList<String>();
 		list.add("0");

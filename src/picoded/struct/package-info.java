@@ -1,3 +1,3 @@
-/// Struct classes used to keep data in different format such as HashMapList
+/// Servlet classes used to extend and/or implement Servlet functionality
 package picoded.struct;
 

@@ -502,6 +502,7 @@ public class CorePage_test {
 	
 	@Test
 	public void getContextURITest() {
+		corePage._contextURI = "/";
 		assertEquals("/", corePage.getContextURI());
 	}
 	
@@ -928,7 +929,7 @@ public class CorePage_test {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		corePage.httpRequest = request;
 		when(request.getPathInfo()).thenReturn("/home");
-		assertEquals("\\home", corePage.requestWildcardUri());
+		assertEquals("/home", corePage.requestWildcardUri());
 	}
 	
 	@Test

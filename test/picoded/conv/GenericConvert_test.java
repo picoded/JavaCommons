@@ -645,6 +645,8 @@ public class GenericConvert_test {
 		
 		assertNotNull(toGenericConvertStringMap(123456, empty));
 		
+		defMap = null;
+		assertEquals(defMap, toGenericConvertStringMap(ConvertJSON.fromMap(defMap), "default"));
 	}
 	
 }

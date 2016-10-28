@@ -175,8 +175,7 @@ public class MapValueConv {
 		}
 	}
 	
-	private static List<Object> getElementList(Map<String, Object> sourceMap, List<Object> element, 
-		String[] bracketSplit) {
+	private static List<Object> getElementList(Map<String, Object> sourceMap, List<Object> element, String[] bracketSplit) {
 		if (element == null) {
 			element = new ArrayList<Object>();
 			sourceMap.put(bracketSplit[0], element);

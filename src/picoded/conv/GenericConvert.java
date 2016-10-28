@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
+import picoded.struct.GenericConvertArrayList;
 import picoded.struct.GenericConvertList;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.ProxyGenericConvertMap;
@@ -654,7 +655,7 @@ public class GenericConvert {
 		
 		// If List instance
 		if (input instanceof List) {
-			//TODO return new GenericConvertArrayList<V>((List<V>) input);
+			return new GenericConvertArrayList<V>((List<V>) input);
 			//return ProxyGenericConvertMap.ensure((Map<K, V>) input);
 		}
 		
@@ -663,7 +664,7 @@ public class GenericConvert {
 			try {
 				List<Object> jsonList = ConvertJSON.toList((String) input);
 				if (jsonList != null) {
-					//TODO return new GenericConvertArrayList<V>((List<V>) jsonList);
+					return new GenericConvertArrayList<V>((List<V>) jsonList);
 				}
 			} catch (Exception e) {
 				// Silence the exception

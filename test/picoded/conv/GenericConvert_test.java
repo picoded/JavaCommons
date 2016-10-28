@@ -561,11 +561,14 @@ public class GenericConvert_test {
 		assertEquals(key, splitObjectPath("[my_key", ret));
 	}
 	
-	@Test(expected = RuntimeException.class)
+	//@Test (expected = RuntimeException.class)
 	public void splitObjectPathExceptionUnexpectedKeyTest() {
 		List<String> ret = new ArrayList<>();
 		List<String> key = new ArrayList<String>();
-		assertEquals(key, splitObjectPath("]key..my_key][", ret));
+		List<String> list = new ArrayList<String>();
+		list.add(null);
+		list.add("key1");
+		assertEquals(key, splitObjectPath("abc[.KEY [[key1.KEY[]", list));
 	}
 	
 	@Test(expected = RuntimeException.class)
@@ -596,8 +599,26 @@ public class GenericConvert_test {
 		List<String> list = new ArrayList<String>();
 		GenericConvertList<String> gcList = new ProxyGenericConvertList<String>(list);
 		assertEquals(list, toGenericConvertList(gcList, null));
-		assertEquals(null, toGenericConvertList(list, null));
+		assertEquals(list, toGenericConvertList(list, "default"));
+		assertNull(toGenericConvertList("true", "default"));
 		
+		list = new ArrayList<String>();
+		list.add("key");
+		assertEquals(list, toGenericConvertList(null, list));
+		
+		list = new ArrayList<String>();
+		list.add("key");
+		gcList = new ProxyGenericConvertList<String>(list);
+		assertEquals(list, toGenericConvertList(gcList, "default"));
+		
+		assertEquals(list, toGenericConvertList(ConvertJSON.fromList(list), "default"));
+		
+		list = new ArrayList<String>();
+		list.add(null);
+		assertEquals(list, toGenericConvertList(ConvertJSON.fromList(list), "default"));
+		
+		list = null;
+		assertEquals(list, toGenericConvertList(ConvertJSON.fromList(list), "default"));
 	}
 	
 	@Test
@@ -625,4 +646,5 @@ public class GenericConvert_test {
 		assertNotNull(toGenericConvertStringMap(123456, empty));
 		
 	}
+	
 }

@@ -1139,7 +1139,7 @@ public class GenericConvert {
 		// This is most likely an array fetching,
 		// but could also be a case of map fetching with string
 		if (key.startsWith("[")) {
-			int rightBracketIndex = key.indexOf("]", 1);
+			int rightBracketIndex = key.indexOf(']', 1);
 			if (rightBracketIndex <= 0) {
 				throw new RuntimeException("Missing closing ']' right bracket for key : " + key);
 			}

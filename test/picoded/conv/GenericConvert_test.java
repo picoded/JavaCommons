@@ -228,13 +228,13 @@ public class GenericConvert_test {
 		assertEquals("default", fetchObject("value", "0", "default"));
 	}
 	
-	@Test
-	public void biFunctionMapTest() {
-		assertNotNull(biFunctionMap());
-		Map<Class<?>, BiFunction<Object, Object, ?>> myBiFunctionMap = new HashMap<Class<?>, BiFunction<Object, Object, ?>>();
-		biFunctionMap = myBiFunctionMap;
-		assertEquals(myBiFunctionMap, biFunctionMap);
-	}
+	// @Test
+	// public void biFunctionMapTest() {
+	// 	assertNotNull(biFunctionMap());
+	// 	Map<Class<?>, BiFunction<Object, Object, ?>> myBiFunctionMap = new HashMap<Class<?>, BiFunction<Object, Object, ?>>();
+	// 	biFunctionMap = myBiFunctionMap;
+	// 	assertEquals(myBiFunctionMap, biFunctionMap);
+	// }
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test
@@ -571,17 +571,17 @@ public class GenericConvert_test {
 		assertEquals(key, splitObjectPath("abc[.KEY [[key1.KEY[]", list));
 	}
 	
-	@Test(expected = RuntimeException.class)
-	public void getBiFunction_noisySelfTest() {
-		assertNotNull(getBiFunction_noisy(getClass()));
-	}
-	
-	@Test
-	public void getBiFunction_noisyTest() {
-		biFunctionMap = null;
-		assertNotNull(getBiFunction_noisy(String.class));
-		assertNotNull(getBiFunction_noisy(String[].class));
-	}
+	// @Test(expected = RuntimeException.class)
+	// public void getBiFunction_noisySelfTest() {
+	// 	assertNotNull(getBiFunction_noisy(getClass()));
+	// }
+	// 
+	// @Test
+	// public void getBiFunction_noisyTest() {
+	// 	biFunctionMap = null;
+	// 	assertNotNull(getBiFunction_noisy(String.class));
+	// 	assertNotNull(getBiFunction_noisy(String[].class));
+	// }
 	
 	@Test
 	public void toStringArrayForceToStringTest() {

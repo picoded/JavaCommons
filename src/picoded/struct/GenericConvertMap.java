@@ -419,26 +419,26 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 		return GenericConvert.fetchNestedObject(this, key);
 	}
 	
-	// Does a simple typecast and put conversion
-	// --------------------------------------------------------------------------------------------------
-	@SuppressWarnings("unchecked")
-	default V typecastPut(K key, Object value) {
-		return put(key, (V) value);
-	}
-	
-	// Attempts to convert against known V value types, and insert into the map.
-	// If no conversion is required, please use typecastPut
-	// --------------------------------------------------------------------------------------------------
-	default V convertPut(K key, Object value, Class<V> valueClass) {
-		@SuppressWarnings("unchecked")
-		BiFunction<Object, Object, V> bf = (BiFunction<Object, Object, V>) GenericConvert.getBiFunction_noisy(valueClass);
-		V val = bf.apply(key, value);
-		return put(key, val);
-	}
-	
-	default V convertPut(K key, Object value) {
-		throw new UnsupportedOperationException(
-			"Sadly convertPut without class parameter needs to be manually extended. "
-				+ "Eg: 'return convertPut(key, value, V.class)', where V is not a generic");
-	}
+	// // Does a simple typecast and put conversion
+	// // --------------------------------------------------------------------------------------------------
+	// @SuppressWarnings("unchecked")
+	// default V typecastPut(K key, Object value) {
+	// 	return put(key, (V) value);
+	// }
+	// 
+	// // Attempts to convert against known V value types, and insert into the map.
+	// // If no conversion is required, please use typecastPut
+	// // --------------------------------------------------------------------------------------------------
+	// default V convertPut(K key, Object value, Class<V> valueClass) {
+	// 	@SuppressWarnings("unchecked")
+	// 	BiFunction<Object, Object, V> bf = (BiFunction<Object, Object, V>) GenericConvert.getBiFunction_noisy(valueClass);
+	// 	V val = bf.apply(key, value);
+	// 	return put(key, val);
+	// }
+	// 
+	// default V convertPut(K key, Object value) {
+	// 	throw new UnsupportedOperationException(
+	// 		"Sadly convertPut without class parameter needs to be manually extended. "
+	// 			+ "Eg: 'return convertPut(key, value, V.class)', where V is not a generic");
+	// }
 }

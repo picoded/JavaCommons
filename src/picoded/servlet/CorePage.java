@@ -471,9 +471,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 		try {
 			return (URLDecoder.decode(this.getClass().getClassLoader().getResource("/").getPath(),
 				"UTF-8")).split("/WEB-INF/classes/")[0];
-		} catch (UnsupportedEncodingException e) {
-			return "../";
-		} catch (NullPointerException e) {
+		} catch (UnsupportedEncodingException | NullPointerException e) {
 			return "../";
 		}
 	}

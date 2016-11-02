@@ -420,6 +420,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// // Does a simple typecast and put conversion
+	// // NOTE: Removed due to lack of use
 	// // --------------------------------------------------------------------------------------------------
 	// @SuppressWarnings("unchecked")
 	// default V typecastPut(K key, Object value) {

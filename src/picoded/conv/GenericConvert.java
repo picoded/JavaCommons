@@ -274,6 +274,7 @@ public class GenericConvert extends GenericConvertStandard {
 	// //--------------------------------------------------------------------------------------------------
 	// //
 	// // to BiFunction Map, used to automated put conversion handling
+	// // NOTE: Removed due to lack of use
 	// //
 	// //--------------------------------------------------------------------------------------------------
 	// 

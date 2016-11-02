@@ -21,10 +21,10 @@ import picoded.struct.ProxyGenericConvertMap;
 ///
 /// + String
 /// + String[]
-/// + Number
-/// + Object[]
-/// + List<Object>
 /// + Map<String,?>
+/// + List<?>
+/// + Object[]
+/// + Number
 /// + UUID
 /// + base-58 GUID
 /// 
@@ -231,50 +231,75 @@ class GenericConvertStandard extends GenericConvertPrimitive {
 		return toStringMap(input, null);
 	}
 	
-	// to Number
+	// to object list
 	//--------------------------------------------------------------------------------------------------
 	
-	/// To Number conversion of generic object
+	/// To object list conversion of generic object
 	///
 	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
-	/// - Numeric string conversion
+	/// - Array to List
+	/// - String to List
 	/// - Fallback
 	///
 	/// @param input     The input value to convert
 	/// @param fallbck   The fallback default (if not convertable)
 	///
-	/// @returns         The converted string, always possible unless null
-	public static Number toNumber(Object input, Number fallbck) {
+	/// @returns         The converted value
+	@SuppressWarnings("unchecked")
+	public static <V> List<V> toList(Object input, Object fallbck) {
 		if (input == null) {
-			return fallbck;
+			if (fallbck == null) {
+				return null;
+			}
+			return toList(fallbck, null);
 		}
 		
-		if (input instanceof Number) {
-			return (Number) input;
+		if (input instanceof List) {
+			return (List<V>) input;
 		}
 		
-		if (input instanceof String && ((String) input).length() > 0) {
-			//Numeric string conversion
-			
+		if (input instanceof Object[]) {
+			return (List<V>)Arrays.asList((Object[]) input);
+		}
+		
+		List<V> ret = null;
+		
+		// Conversion to List (if possible)
+		if (input instanceof String) {
 			try {
-				return new BigDecimal(input.toString());
+				ret = (List<V>)ConvertJSON.toList((String) input);
 			} catch (Exception e) {
-				return fallbck;
+				// Silence the exception
+			}
+		} else { //Force the "toString", then to List conversion
+			try {
+				String inputStr = input.toString();
+				Object o = ConvertJSON.toList(inputStr);
+				if (o instanceof List) {
+					ret = (List<V>) o;
+				}
+			} catch (Exception e) {
+				// Silence the exception
 			}
 		}
 		
-		return fallbck;
+		// List to string array conversion
+		if (ret != null) {
+			return ret;
+		}
+		
+		return toList(fallbck, null);
 	}
 	
-	/// Default false fallback, To Number conversion of generic object
+	/// Default Null fallback, To object list conversion of generic object
 	///
 	/// @param input     The input value to convert
 	///
-	/// @returns         The converted boolean
-	public static Number toNumber(Object input) {
-		return toNumber(input, null);
+	/// @returns         The converted value
+	public static <V> List<V> toList(Object input) {
+		return toList(input, null);
 	}
 	
 	// to object array
@@ -330,79 +355,50 @@ class GenericConvertStandard extends GenericConvertPrimitive {
 		return toObjectArray(input, null);
 	}
 	
-	// to object list
+	// to Number
 	//--------------------------------------------------------------------------------------------------
 	
-	/// To object list conversion of generic object
+	/// To Number conversion of generic object
 	///
 	/// Performs the following strategies in the following order
 	///
 	/// - No conversion
-	/// - Array to List
-	/// - String to List
+	/// - Numeric string conversion
 	/// - Fallback
 	///
 	/// @param input     The input value to convert
 	/// @param fallbck   The fallback default (if not convertable)
 	///
-	/// @returns         The converted value
-	@SuppressWarnings("unchecked")
-	public static List<Object> toObjectList(Object input, Object fallbck) {
+	/// @returns         The converted string, always possible unless null
+	public static Number toNumber(Object input, Number fallbck) {
 		if (input == null) {
-			if (fallbck == null) {
-				return null;
-			}
-			return toObjectList(fallbck, null);
+			return fallbck;
 		}
 		
-		if (input instanceof List) {
-			return (List<Object>) input;
+		if (input instanceof Number) {
+			return (Number) input;
 		}
 		
-		if (input instanceof Object[]) {
-			return Arrays.asList((Object[]) input);
-		}
-		
-		List<Object> ret = null;
-		
-		// Conversion to List (if possible)
-		if (input instanceof String) {
+		if (input instanceof String && ((String) input).length() > 0) {
+			//Numeric string conversion
+			
 			try {
-				//Object o = ConvertJSON.toList((String) input);
-				ret = ConvertJSON.toList((String) input);
-				//if (o instanceof List) {
-				//ret = (List<Object>) o;
-				//}
+				return new BigDecimal(input.toString());
 			} catch (Exception e) {
-				// Silence the exception
-			}
-		} else { //Force the "toString", then to List conversion
-			try {
-				String inputStr = input.toString();
-				Object o = ConvertJSON.toList(inputStr);
-				if (o instanceof List) {
-					ret = (List<Object>) o;
-				}
-			} catch (Exception e) {
-				// Silence the exception
+				return fallbck;
 			}
 		}
 		
-		// List to string array conversion
-		if (ret != null) {
-			return ret;
-		}
-		
-		return toObjectList(fallbck, null);
+		return fallbck;
 	}
 	
-	/// Default Null fallback, To object list conversion of generic object
+	/// Default false fallback, To Number conversion of generic object
 	///
 	/// @param input     The input value to convert
 	///
-	/// @returns         The converted value
-	public static List<Object> toObjectList(Object input) {
-		return toObjectList(input, null);
+	/// @returns         The converted boolean
+	public static Number toNumber(Object input) {
+		return toNumber(input, null);
 	}
 	
 	// to UUID aka GUID

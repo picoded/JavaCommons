@@ -272,7 +272,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @returns         The converted Object[], always possible unless null
 	default List<Object> getObjectList(int index, Object fallbck) {
-		return GenericConvert.toObjectList(getSilent(index), fallbck);
+		return GenericConvert.toList(getSilent(index), fallbck);
 	}
 	
 	/// Default Null fallback, To List<Object> conversion of generic object
@@ -281,7 +281,7 @@ public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	///
 	/// @default         The converted value
 	default List<Object> getObjectList(int index) {
-		return GenericConvert.toObjectList(getSilent(index));
+		return GenericConvert.toList(getSilent(index));
 	}
 	
 	// to string array

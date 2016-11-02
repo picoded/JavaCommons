@@ -358,23 +358,23 @@ public class GenericConvert_test {
 	}
 	
 	@Test
-	public void toObjectListTest() {
-		assertNull(toObjectList(null));
+	public void toListTest() {
+		assertNull(toList(null));
 		
-		assertNull(toObjectList(null, null));
+		assertNull(toList(null, null));
 		
-		assertNull(toObjectList(null, "default"));
+		assertNull(toList(null, "default"));
 		assertEquals(Arrays.asList(new Object[] { "key1", "key2" }),
-			toObjectList(new String[] { "key1", "key2" }, "default"));
-		assertEquals(Arrays.asList(new Object[] { "1", "2.2" }), toObjectList(new String[] { "1", "2.2" }, "default"));
+			toList(new String[] { "key1", "key2" }, "default"));
+		assertEquals(Arrays.asList(new Object[] { "1", "2.2" }), toList(new String[] { "1", "2.2" }, "default"));
 		assertEquals(Arrays.asList(new Object[] { "key1", "key2", "key3" }),
-			toObjectList("[\"key1\",\"key2\",\"key3\"]", "default"));
+			toList("[\"key1\",\"key2\",\"key3\"]", "default"));
 		List<String> list = new ArrayList<>();
 		list.add("key1");
 		list.add("key2");
-		assertEquals(Arrays.asList(new String[] { "key1", "key2" }), toObjectList(list, "default"));
+		assertEquals(Arrays.asList(new String[] { "key1", "key2" }), toList(list, "default"));
 		assertEquals(Arrays.asList(new Object[] { "key1", "key2", "key3" }),
-			toObjectList(new StringBuilder("[\"key1\",\"key2\",\"key3\"]"), "default"));
+			toList(new StringBuilder("[\"key1\",\"key2\",\"key3\"]"), "default"));
 	}
 	
 	@Test

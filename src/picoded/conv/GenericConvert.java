@@ -35,58 +35,6 @@ public class GenericConvert extends GenericConvertStandard {
 		throw new IllegalAccessError("Utility class");
 	}
 	
-	// to string object map
-	//--------------------------------------------------------------------------------------------------
-	
-	/// To String map conversion of generic object
-	///
-	/// Performs the following strategies in the following order
-	///
-	/// - No conversion (if its a map)
-	/// - JSON String to Map
-	/// - Fallback
-	///
-	/// @param input     The input value to convert
-	/// @param fallbck   The fallback default (if not convertable)
-	///
-	/// @returns         The converted value
-	@SuppressWarnings("unchecked")
-	public static <K extends String, V> Map<K, V> toStringMap(Object input, Object fallbck) {
-		
-		// Null handling
-		if (input == null) {
-			if (fallbck == null) {
-				return null;
-			}
-			return toStringMap(fallbck, null);
-		}
-		
-		// If Map instance
-		if (input instanceof Map) {
-			return (Map<K, V>) input;
-		}
-		
-		// If String instance, attampt JSON conversion
-		if (input instanceof String) {
-			try {
-				return (Map<K, V>) ConvertJSON.toMap((String) input);
-			} catch (Exception e) {
-				// Silence the exception
-			}
-		}
-		
-		return toStringMap(fallbck, null);
-	}
-	
-	/// Default Null fallback, To String Object map conversion of generic object
-	///
-	/// @param input     The input value to convert
-	///
-	/// @returns         The converted value
-	public static <K extends String, V> Map<K, V> toStringMap(Object input) {
-		return toStringMap(input, null);
-	}
-	
 	// Generic string map
 	//--------------------------------------------------------------------------------------------------
 	
@@ -746,14 +694,14 @@ public class GenericConvert extends GenericConvertStandard {
 		if (base instanceof Map) {
 			baseMap = toStringMap(base);
 		} else if (base instanceof List) {
-			baseList = toObjectList(base);
+			baseList = toList(base);
 		}
 		
 		// Fail on getting base item : attempts conversion
 		if (baseMap == null && baseList == null) {
 			baseMap = toStringMap(base);
 			if (baseMap == null) {
-				baseList = toObjectList(base);
+				baseList = toList(base);
 			}
 		}
 		if (baseMap == null) {
@@ -762,33 +710,4 @@ public class GenericConvert extends GenericConvertStandard {
 		return baseMap;
 	}
 	
-	protected static List<?> toArrayHelper(Object input) {
-		List<?> list = null;
-		
-		// Conversion to List (if possible)
-		if (input instanceof String) {
-			try {
-				//Object o = ConvertJSON.toList((String) input);
-				list = ConvertJSON.toList((String) input);
-				//if (o instanceof List) {
-				//list = (List<?>) o;
-				//}
-			} catch (Exception e) {
-				// Silence the exception
-			}
-		} else if (input instanceof List) {
-			list = (List<?>) input;
-		} else { //Force the "toString", then to List conversion
-			try {
-				String inputStr = input.toString();
-				Object o = ConvertJSON.toList(inputStr);
-				if (o instanceof List) {
-					list = (List<?>) o;
-				}
-			} catch (Exception e) {
-				// Silence the exception
-			}
-		}
-		return list;
-	}
 }

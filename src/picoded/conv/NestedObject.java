@@ -515,7 +515,7 @@ public class NestedObject {
 			}
 			res.append(currentKey);
 			
-		} else if (baseList != null) {
+		} else { // if (baseList != null) { //baseList is never null here
 			//
 			// Base is a list
 			//

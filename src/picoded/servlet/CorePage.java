@@ -87,7 +87,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	/// RESTBuilder HttpRequestType enum access
 	public static class RequestTypeSet extends picoded.enums.HttpRequestType.HttpRequestTypeSet {
-	};
+	}
 	
 	///////////////////////////////////////////////////////
 	//
@@ -425,7 +425,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	}
 	
 	/// Cached context path
-	public String _contextPath = null;
+	protected String _contextPath = null;
 	
 	/// Gets and returns the context path / application folder path in absolute terms if possible
 	public String getContextPath() {

@@ -17,7 +17,17 @@ import picoded.struct.ProxyGenericConvertMap;
 ///
 /// Contains conversions to Java standard objects types
 ///
-/// Basically the various supported Objects under java.lang, java.math, java.util
+/// Basically the various supported Objects under java.lang, java.util
+///
+/// + String
+/// + String[]
+/// + Number
+/// + Object[]
+/// + List<Object>
+/// + Map<String,?>
+/// + UUID
+/// + base-58 GUID
+/// 
 ///
 /// @see GenericConvert 
 ///
@@ -26,6 +36,39 @@ class GenericConvertStandard extends GenericConvertPrimitive {
 	/// Invalid constructor (throws exception)
 	protected GenericConvertStandard() {
 		throw new IllegalAccessError("Utility class");
+	}
+	
+	// Internal utils function
+	//--------------------------------------------------------------------------------------------------
+	
+	protected static List<?> toArrayHelper(Object input) {
+		List<?> list = null;
+		
+		// Conversion to List (if possible)
+		if (input instanceof String) {
+			try {
+				//Object o = ConvertJSON.toList((String) input);
+				list = ConvertJSON.toList((String) input);
+				//if (o instanceof List) {
+				//list = (List<?>) o;
+				//}
+			} catch (Exception e) {
+				// Silence the exception
+			}
+		} else if (input instanceof List) {
+			list = (List<?>) input;
+		} else { //Force the "toString", then to List conversion
+			try {
+				String inputStr = input.toString();
+				Object o = ConvertJSON.toList(inputStr);
+				if (o instanceof List) {
+					list = (List<?>) o;
+				}
+			} catch (Exception e) {
+				// Silence the exception
+			}
+		}
+		return list;
 	}
 	
 	// to string conversion
@@ -66,6 +109,126 @@ class GenericConvertStandard extends GenericConvertPrimitive {
 	/// @returns         The converted string, always possible unless null
 	public static String toString(Object input) {
 		return toString(input, null);
+	}
+	
+	// to string array
+	//--------------------------------------------------------------------------------------------------
+	
+	/// To String array conversion of generic object
+	///
+	/// Performs the following strategies in the following order
+	///
+	/// - No conversion
+	/// - String to List
+	/// - List to array
+	/// - Fallback
+	///
+	/// @param input     The input value to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted value
+	public static String[] toStringArray(Object input, Object fallbck) {
+		if (input == null) {
+			if (fallbck == null) {
+				return null;
+			}
+			return toStringArray(fallbck, null);
+		}
+		String[] ret = null;
+		if (input instanceof String[]) {
+			ret = (String[]) input;
+		} else if (input instanceof Object[]) {
+			Object[] inArr = (Object[]) input;
+			ret = new String[inArr.length];
+			for (int a = 0; a < inArr.length; ++a) {
+				ret[a] = toString(inArr[a]);
+			}
+		}
+		if (ret != null) {
+			return ret;
+		}
+		// From list conversion (if needed)
+		List<?> list = toArrayHelper(input);
+		
+		// List to string array conversion
+		if (list != null) {
+			// Try direct conversion?
+			try {
+				return list.toArray(new String[list.size()]);
+			} catch (Exception e) {
+				
+			}
+			
+			// Try value by value conversion
+			ret = new String[list.size()];
+			for (int a = 0; a < ret.length; ++a) {
+				ret[a] = toString(list.get(a));
+			}
+			return ret;
+		}
+		
+		return toStringArray(fallbck, null);
+	}
+	
+	/// Default Null fallback, To String array conversion of generic object
+	///
+	/// @param input     The input value to convert
+	///
+	/// @returns         The converted value
+	public static String[] toStringArray(Object input) {
+		return toStringArray(input, null);
+	}
+	
+	// to string object map
+	//--------------------------------------------------------------------------------------------------
+	
+	/// To String map conversion of generic object
+	///
+	/// Performs the following strategies in the following order
+	///
+	/// - No conversion (if its a map)
+	/// - JSON String to Map
+	/// - Fallback
+	///
+	/// @param input     The input value to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted value
+	@SuppressWarnings("unchecked")
+	public static <K extends String, V> Map<K, V> toStringMap(Object input, Object fallbck) {
+		
+		// Null handling
+		if (input == null) {
+			if (fallbck == null) {
+				return null;
+			}
+			return toStringMap(fallbck, null);
+		}
+		
+		// If Map instance
+		if (input instanceof Map) {
+			return (Map<K, V>) input;
+		}
+		
+		// If String instance, attampt JSON conversion
+		if (input instanceof String) {
+			try {
+				return (Map<K, V>) ConvertJSON.toMap((String) input);
+			} catch (Exception e) {
+				// Silence the exception
+			}
+		}
+		
+		return toStringMap(fallbck, null);
+	}
+	
+	/// Default Null fallback, To String Object map conversion of generic object
+	///
+	/// @param input     The input value to convert
+	///
+	/// @returns         The converted value
+	public static <K extends String, V> Map<K, V> toStringMap(Object input) {
+		return toStringMap(input, null);
 	}
 	
 	// to Number
@@ -112,6 +275,134 @@ class GenericConvertStandard extends GenericConvertPrimitive {
 	/// @returns         The converted boolean
 	public static Number toNumber(Object input) {
 		return toNumber(input, null);
+	}
+	
+	// to object array
+	//--------------------------------------------------------------------------------------------------
+	
+	/// To object array conversion of generic object
+	///
+	/// Performs the following strategies in the following order
+	///
+	/// - No conversion
+	/// - String to List
+	/// - List to array
+	/// - Fallback
+	///
+	/// @param input     The input value to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted value
+	public static Object[] toObjectArray(Object input, Object fallbck) {
+		if (input == null) {
+			if (fallbck == null) {
+				return null;
+			}
+			return toObjectArray(fallbck, null);
+		}
+		
+		if (input instanceof Object[]) {
+			return (Object[]) input;
+		}
+		
+		// From list conversion (if needed)
+		List<?> list = toArrayHelper(input);
+		
+		// List to string array conversion
+		if (list != null) {
+			// Try direct conversion? (almost always works for object list)
+			try {
+				return list.toArray(new Object[list.size()]);
+			} catch (Exception e) {
+				
+			}
+		}
+		
+		return toObjectArray(fallbck, null);
+	}
+	
+	/// Default Null fallback, To object array conversion of generic object
+	///
+	/// @param input     The input value to convert
+	///
+	/// @returns         The converted value
+	public static Object[] toObjectArray(Object input) {
+		return toObjectArray(input, null);
+	}
+	
+	// to object list
+	//--------------------------------------------------------------------------------------------------
+	
+	/// To object list conversion of generic object
+	///
+	/// Performs the following strategies in the following order
+	///
+	/// - No conversion
+	/// - Array to List
+	/// - String to List
+	/// - Fallback
+	///
+	/// @param input     The input value to convert
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The converted value
+	@SuppressWarnings("unchecked")
+	public static List<Object> toObjectList(Object input, Object fallbck) {
+		if (input == null) {
+			if (fallbck == null) {
+				return null;
+			}
+			return toObjectList(fallbck, null);
+		}
+		
+		if (input instanceof List) {
+			return (List<Object>) input;
+		}
+		
+		if (input instanceof Object[]) {
+			return Arrays.asList((Object[]) input);
+		}
+		
+		List<Object> ret = null;
+		
+		// Conversion to List (if possible)
+		if (input instanceof String) {
+			try {
+				//Object o = ConvertJSON.toList((String) input);
+				ret = ConvertJSON.toList((String) input);
+				//if (o instanceof List) {
+				//ret = (List<Object>) o;
+				//}
+			} catch (Exception e) {
+				// Silence the exception
+			}
+		} else { //Force the "toString", then to List conversion
+			try {
+				String inputStr = input.toString();
+				Object o = ConvertJSON.toList(inputStr);
+				if (o instanceof List) {
+					ret = (List<Object>) o;
+				}
+			} catch (Exception e) {
+				// Silence the exception
+			}
+		}
+		
+		// List to string array conversion
+		if (ret != null) {
+			return ret;
+		}
+		
+		return toObjectList(fallbck, null);
+	}
+	
+	/// Default Null fallback, To object list conversion of generic object
+	///
+	/// @param input     The input value to convert
+	///
+	/// @returns         The converted value
+	public static List<Object> toObjectList(Object input) {
+		return toObjectList(input, null);
 	}
 	
 	// to UUID aka GUID

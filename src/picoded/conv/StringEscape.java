@@ -85,7 +85,8 @@ public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 		char[] chars = argString.toCharArray();
 		for (int i = 0; i < chars.length; i++) {
 			char c = chars[i];
-			if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || MARK.indexOf(c) != -1) {
+			if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+				|| MARK.indexOf(c) != -1) {
 				uri.append(c);
 			} else {
 				appendEscaped(uri, c);

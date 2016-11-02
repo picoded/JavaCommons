@@ -305,7 +305,8 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	/// @param fallbck The fallback default (if not convertable)
 	///
 	/// @returns The converted Map if possible, else null
-	default <K extends String, V> GenericConvertMap<K, V> getGenericConvertStringMap(K key, Object fallbck) {
+	default <K extends String, V> GenericConvertMap<K, V> getGenericConvertStringMap(K key,
+		Object fallbck) {
 		return GenericConvert.toGenericConvertStringMap(get(key), fallbck);
 	}
 	

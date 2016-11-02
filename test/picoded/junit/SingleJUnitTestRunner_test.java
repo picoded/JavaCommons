@@ -23,12 +23,15 @@ public class SingleJUnitTestRunner_test {
 	@Test
 	public void mainIsTrue() {
 		SingleJUnitTestRunner.main("picoded.junit.SingleJUnitTestRunner_test#isTrue");
-		assertEquals(1, SingleJUnitTestRunner.runTestMethod("picoded.junit.SingleJUnitTestRunner_test#isTrue"));
+		assertEquals(1,
+			SingleJUnitTestRunner.runTestMethod("picoded.junit.SingleJUnitTestRunner_test#isTrue"));
 	}
 	
 	@Test
 	public void checkFailure() {
-		assertEquals(-1, SingleJUnitTestRunner.runTestMethod("picoded.junit.SingleJUnitTestRunner#_thisThrowsException"));
+		assertEquals(-1,
+			SingleJUnitTestRunner
+				.runTestMethod("picoded.junit.SingleJUnitTestRunner#_thisThrowsException"));
 	}
 	
 	@Test(expected = IllegalArgumentException.class)

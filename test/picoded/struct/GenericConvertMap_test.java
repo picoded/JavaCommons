@@ -21,11 +21,12 @@ import org.mockito.Mockito;
 public class GenericConvertMap_test {
 	
 	@SuppressWarnings("unchecked")
-	private GenericConvertMap<String, String> genericConvertMap = Mockito.mock(GenericConvertMap.class,
-		Mockito.CALLS_REAL_METHODS);
+	private GenericConvertMap<String, String> genericConvertMap = Mockito.mock(
+		GenericConvertMap.class, Mockito.CALLS_REAL_METHODS);
 	
 	@SuppressWarnings("unchecked")
-	private GenericConvertMap<String, String> genericConvertMapForValid = Mockito.mock(GenericConvertMap.class);
+	private GenericConvertMap<String, String> genericConvertMapForValid = Mockito
+		.mock(GenericConvertMap.class);
 	
 	@Before
 	public void setUp() {
@@ -416,7 +417,8 @@ public class GenericConvertMap_test {
 	
 	@Test
 	public void getUUIDOverloadInvalidTest() {
-		Mockito.when(genericConvertMapForValid.getUUID("my_key", "o123456789o123456789ok")).thenCallRealMethod();
+		Mockito.when(genericConvertMapForValid.getUUID("my_key", "o123456789o123456789ok"))
+			.thenCallRealMethod();
 		when(genericConvertMapForValid.get("key")).thenReturn("1");
 		assertNotNull(genericConvertMapForValid.getUUID("my_key", "o123456789o123456789ok"));
 	}
@@ -502,7 +504,8 @@ public class GenericConvertMap_test {
 	
 	@Test
 	public void getGenericConvertStringMapValidTest() {
-		Mockito.when(genericConvertMapForValid.getGenericConvertStringMap("my_key")).thenCallRealMethod();
+		Mockito.when(genericConvertMapForValid.getGenericConvertStringMap("my_key"))
+			.thenCallRealMethod();
 		when(genericConvertMapForValid.get("my_key")).thenReturn("1");
 		assertNull(genericConvertMapForValid.getGenericConvertStringMap("my_key"));
 	}
@@ -514,7 +517,8 @@ public class GenericConvertMap_test {
 	
 	@Test
 	public void getGenericConvertStringMapOverloadValidTest() {
-		Mockito.when(genericConvertMapForValid.getGenericConvertStringMap("my_key", "ok")).thenCallRealMethod();
+		Mockito.when(genericConvertMapForValid.getGenericConvertStringMap("my_key", "ok"))
+			.thenCallRealMethod();
 		when(genericConvertMapForValid.get("my_key")).thenReturn("1");
 		assertNull(genericConvertMapForValid.getGenericConvertStringMap("my_key", "ok"));
 	}
@@ -538,7 +542,8 @@ public class GenericConvertMap_test {
 	
 	@Test
 	public void getGenericConvertListOverloadValidTest() {
-		Mockito.when(genericConvertMapForValid.getGenericConvertList("my_key", "ok")).thenCallRealMethod();
+		Mockito.when(genericConvertMapForValid.getGenericConvertList("my_key", "ok"))
+			.thenCallRealMethod();
 		when(genericConvertMapForValid.get("my_key")).thenReturn("1");
 		assertNull(genericConvertMapForValid.getGenericConvertList("my_key", "ok"));
 	}

@@ -100,7 +100,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param String data to write 
 	/// @param Encoding string value to use - Null value assumes encoding with US-ASCII
 	///
-	public static void writeStringToFile(File inFile, String data, String encoding) throws IOException {
+	public static void writeStringToFile(File inFile, String data, String encoding)
+		throws IOException {
 		if (encoding == null || encoding.isEmpty()) {
 			encoding = "US-ASCII";
 		}
@@ -118,7 +119,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @returns the file value if possible, else returns the fallback value
 	///
-	public static String readFileToString_withFallback(File inFile, String fallback) throws IOException {
+	public static String readFileToString_withFallback(File inFile, String fallback)
+		throws IOException {
 		return picoded.file.FileUtil.readFileToString_withFallback(inFile, fallback, null);
 	}
 	
@@ -133,7 +135,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @returns the file value if possible, else returns the fallback value
 	///
-	public static String readFileToString_withFallback(File inFile, String fallback, String encoding) throws IOException {
+	public static String readFileToString_withFallback(File inFile, String fallback, String encoding)
+		throws IOException {
 		if (inFile == null || !inFile.exists()) {
 			return fallback;
 		}
@@ -152,7 +155,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @returns the boolean indicating true if file was written to
 	///
-	public static boolean writeStringToFile_ifDifferant(File inFile, String data, String encoding) throws IOException {
+	public static boolean writeStringToFile_ifDifferant(File inFile, String data, String encoding)
+		throws IOException {
 		String original = readFileToString_withFallback(inFile, "", encoding);
 		if (original.equals(data)) {
 			return false;
@@ -190,7 +194,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param folder to copy into
 	/// @param Indicate if file timestamps should follow the original file, when the copy occurs
 	///
-	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate) throws IOException {
+	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate)
+		throws IOException {
 		//default symlink is false : This is considered advance behaviour
 		copyDirectory_ifDifferent(inDir, outDir, preserveFileDate, false);
 	}
@@ -236,7 +241,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param file to copy into
 	/// @param Indicate if file timestamps should follow the original file, when the copy occurs
 	///
-	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate) throws IOException {
+	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate)
+		throws IOException {
 		//default symlink is false :This is considered advance behaviour
 		copyFile_ifDifferent(inFile, outFile, preserveFileDate, false);
 	}
@@ -283,7 +289,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			// relative to the in file (if possible)
 			//
 			//------------------------------------------------------------
-			Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath().toAbsolutePath());
+			Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath()
+				.toAbsolutePath());
 		}
 		
 		// Checks if file has not been modified, and has same data length, for skipping?

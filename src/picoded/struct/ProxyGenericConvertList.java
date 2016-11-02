@@ -16,7 +16,8 @@ import picoded.conv.GenericConvert;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
-public class ProxyGenericConvertList<V> extends AbstractListDecorator<V> implements GenericConvertList<V> {
+public class ProxyGenericConvertList<V> extends AbstractListDecorator<V> implements
+	GenericConvertList<V> {
 	
 	private static final long serialVersionUID = 1L;
 	

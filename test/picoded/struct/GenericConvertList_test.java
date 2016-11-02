@@ -244,7 +244,8 @@ public class GenericConvertList_test {
 	public void getGUID2ParamTest() {
 		when(genericConvertList.size()).thenReturn(2);
 		when(genericConvertList.get(1)).thenReturn("ok");
-		assertEquals("123456789o123456789o12", genericConvertList.getGUID(1, "123456789o123456789o12"));
+		assertEquals("123456789o123456789o12",
+			genericConvertList.getGUID(1, "123456789o123456789o12"));
 	}
 	
 	@Test
@@ -258,7 +259,8 @@ public class GenericConvertList_test {
 	public void getObjectList2ParamTest() {
 		when(genericConvertList.size()).thenReturn(2);
 		when(genericConvertList.get(1)).thenReturn("me");
-		assertArrayEquals(new Object[] { "1", 1 }, genericConvertList.getObjectList(1, new Object[] { "1", 1 }).toArray());
+		assertArrayEquals(new Object[] { "1", 1 },
+			genericConvertList.getObjectList(1, new Object[] { "1", 1 }).toArray());
 	}
 	
 	@Test

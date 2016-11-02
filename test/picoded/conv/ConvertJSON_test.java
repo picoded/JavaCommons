@@ -105,7 +105,8 @@ public class ConvertJSON_test {
 	public void checkIfCommentsInJsonBreaksThings() {
 		tMap.put("Hello", "WORLD");
 		tMap.put("WORLD", "Hello");
-		assertEquals(tMap,
+		assertEquals(
+			tMap,
 			ConvertJSON
 				.toMap("{ /* Hello folks. comment here is to break things */ \"Hello\":\"WORLD\",\"WORLD\":\"Hello\"}"));
 		assertEquals("{\"Hello\":\"WORLD\",\"WORLD\":\"Hello\"}", (tStr = ConvertJSON.fromMap(tMap)));
@@ -207,7 +208,8 @@ public class ConvertJSON_test {
 		assertEquals("null", ConvertJSON.fromArray((String[]) null).toString());
 		assertEquals("[]", ConvertJSON.fromArray(new String[0]).toString());
 		assertEquals("[\"a\"]", ConvertJSON.fromArray(new String[] { "a" }).toString());
-		assertEquals("[\"a\",\"b\",\"c\"]", ConvertJSON.fromArray(new String[] { "a", "b", "c" }).toString());
+		assertEquals("[\"a\",\"b\",\"c\"]", ConvertJSON.fromArray(new String[] { "a", "b", "c" })
+			.toString());
 	}
 	
 	@Test
@@ -219,7 +221,8 @@ public class ConvertJSON_test {
 		assertEquals("null", ConvertJSON.fromArray((int[]) null).toString());
 		assertEquals("[]", ConvertJSON.fromArray(new int[0]).toString());
 		assertEquals("[12]", ConvertJSON.fromArray(new int[] { 12 }).toString());
-		assertEquals("[-7,22,86,-99]", ConvertJSON.fromArray(new int[] { -7, 22, 86, -99 }).toString());
+		assertEquals("[-7,22,86,-99]", ConvertJSON.fromArray(new int[] { -7, 22, 86, -99 })
+			.toString());
 	}
 	
 	@Test
@@ -231,7 +234,8 @@ public class ConvertJSON_test {
 		assertEquals("null", ConvertJSON.fromArray((long[]) null).toString());
 		assertEquals("[]", ConvertJSON.fromArray(new long[0]).toString());
 		assertEquals("[12]", ConvertJSON.fromArray(new long[] { 12 }).toString());
-		assertEquals("[-7,22,86,-99]", ConvertJSON.fromArray(new long[] { -7, 22, 86, -99 }).toString());
+		assertEquals("[-7,22,86,-99]", ConvertJSON.fromArray(new long[] { -7, 22, 86, -99 })
+			.toString());
 	}
 	
 	@Test
@@ -239,12 +243,13 @@ public class ConvertJSON_test {
 		assertEquals("null", ConvertJSON.fromArray((double[]) null));
 		assertEquals("[]", ConvertJSON.fromArray(new double[0]));
 		assertEquals("[12.8]", ConvertJSON.fromArray(new double[] { 12.8 }));
-		assertEquals("[-7.1,22.234,86.7,-99.02]", ConvertJSON.fromArray(new double[] { -7.1, 22.234, 86.7, -99.02 }));
+		assertEquals("[-7.1,22.234,86.7,-99.02]",
+			ConvertJSON.fromArray(new double[] { -7.1, 22.234, 86.7, -99.02 }));
 		assertEquals("null", ConvertJSON.fromArray((double[]) null).toString());
 		assertEquals("[]", ConvertJSON.fromArray(new double[0]).toString());
 		assertEquals("[12.8]", ConvertJSON.fromArray(new double[] { 12.8 }).toString());
-		assertEquals("[-7.1,22.234,86.7,-99.02]", ConvertJSON.fromArray(new double[] { -7.1, 22.234, 86.7, -99.02 })
-			.toString());
+		assertEquals("[-7.1,22.234,86.7,-99.02]",
+			ConvertJSON.fromArray(new double[] { -7.1, 22.234, 86.7, -99.02 }).toString());
 	}
 	
 	@Test
@@ -273,11 +278,13 @@ public class ConvertJSON_test {
 	
 	@Test
 	public void nullInStringArray() {
-		assertArrayEquals(new String[] { "one", null, "two" }, ConvertJSON.toStringArray("[\"one\",null,\"two\"]"));
+		assertArrayEquals(new String[] { "one", null, "two" },
+			ConvertJSON.toStringArray("[\"one\",null,\"two\"]"));
 	}
 	
 	@Test
 	public void nullInObjectArray() {
-		assertArrayEquals(new Object[] { "one", null, "two" }, ConvertJSON.toObjectArray("[\"one\",null,\"two\"]"));
+		assertArrayEquals(new Object[] { "one", null, "two" },
+			ConvertJSON.toObjectArray("[\"one\",null,\"two\"]"));
 	}
 }

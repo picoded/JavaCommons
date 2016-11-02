@@ -17,7 +17,8 @@ import org.mockito.Mockito;
 public class UnsupportedDefaultList_test {
 	
 	@SuppressWarnings("unchecked")
-	UnsupportedDefaultList<String> unsupportedDefaultList = mock(UnsupportedDefaultList.class, CALLS_REAL_METHODS);
+	UnsupportedDefaultList<String> unsupportedDefaultList = mock(UnsupportedDefaultList.class,
+		CALLS_REAL_METHODS);
 	
 	@Before
 	public void setUp() {

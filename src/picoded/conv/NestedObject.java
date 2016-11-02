@@ -113,7 +113,8 @@ public class NestedObject {
 	/// @param fallbck   The fallback default (if not convertable)
 	///
 	/// @returns         The fetched object, always possible unless fallbck null
-	protected static Object fetchNestedObject_key_startsWithLeftBracket(Object base, String key, Object fallback) {
+	protected static Object fetchNestedObject_key_startsWithLeftBracket(Object base, String key,
+		Object fallback) {
 		int rightBracketIndex = key.indexOf(']', 1);
 		if (rightBracketIndex <= 0) {
 			throw new RuntimeException("Missing closing ']' right bracket for key : " + key);
@@ -151,7 +152,8 @@ public class NestedObject {
 	/// @param dotIndex  dot index position in the key to process
 	///
 	/// @returns         The fetched object, always possible unless fallbck null
-	protected static Object fetchNestedObject_key_withDotIndex(Object base, String key, Object fallback, int dotIndex) {
+	protected static Object fetchNestedObject_key_withDotIndex(Object base, String key,
+		Object fallback, int dotIndex) {
 		// Gets the left.right key
 		String leftKey = key.substring(0, dotIndex); //left
 		String rightKey = key.substring(dotIndex + 1); //right
@@ -172,8 +174,8 @@ public class NestedObject {
 	/// @param leftBracketIndex   Left bracket index position in the key to process
 	///
 	/// @returns         The fetched object, always possible unless fallbck null
-	protected static Object fetchNestedObject_key_withLeftBracketIndex(Object base, String key, Object fallback,
-		int leftBracketIndex) {
+	protected static Object fetchNestedObject_key_withLeftBracketIndex(Object base, String key,
+		Object fallback, int leftBracketIndex) {
 		// Gets the left[right] key
 		String leftKey = key.substring(0, leftBracketIndex); //left
 		String rightKey = key.substring(leftBracketIndex); //[right]
@@ -354,8 +356,8 @@ public class NestedObject {
 			
 			// Sanatize the left path from quotation marks
 			if (leftPart.length() > 1
-				&& ((leftPart.startsWith("\"") && leftPart.endsWith("\"")) || (leftPart.startsWith("\'") && leftPart
-					.endsWith("\'")))) {
+				&& ((leftPart.startsWith("\"") && leftPart.endsWith("\"")) || (leftPart
+					.startsWith("\'") && leftPart.endsWith("\'")))) {
 				leftPart = leftPart.substring(1, leftPart.length() - 1);
 			}
 			
@@ -426,7 +428,8 @@ public class NestedObject {
 	/// @returns         The normalized key
 	///
 	@SuppressWarnings("unchecked")
-	public static StringBuilder normalizeObjectPath(Object base, List<String> splitKeyPath, StringBuilder res) {
+	public static StringBuilder normalizeObjectPath(Object base, List<String> splitKeyPath,
+		StringBuilder res) {
 		
 		//
 		// Result string builder setup
@@ -463,7 +466,8 @@ public class NestedObject {
 		}
 		
 		if (baseMap == null && baseList == null) {
-			throw new RuntimeException("Unexpected key path format : " + ConvertJSON.fromList(splitKeyPath));
+			throw new RuntimeException("Unexpected key path format : "
+				+ ConvertJSON.fromList(splitKeyPath));
 		}
 		
 		//

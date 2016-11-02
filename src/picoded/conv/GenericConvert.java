@@ -52,7 +52,8 @@ public class GenericConvert extends GenericConvertStandard {
 	///
 	/// @returns         The converted value
 	@SuppressWarnings("unchecked")
-	public static <K extends String, V> GenericConvertMap<K, V> toGenericConvertStringMap(Object input, Object fallbck) {
+	public static <K extends String, V> GenericConvertMap<K, V> toGenericConvertStringMap(
+		Object input, Object fallbck) {
 		
 		// Null handling
 		if (input == null) {
@@ -94,7 +95,8 @@ public class GenericConvert extends GenericConvertStandard {
 	/// @param input     The input value to convert
 	///
 	/// @returns         The converted value
-	public static <K extends String, V> GenericConvertMap<K, V> toGenericConvertStringMap(Object input) {
+	public static <K extends String, V> GenericConvertMap<K, V> toGenericConvertStringMap(
+		Object input) {
 		return toGenericConvertStringMap(input, null);
 	}
 	
@@ -267,7 +269,8 @@ public class GenericConvert extends GenericConvertStandard {
 	///
 	/// @returns         The normalized key
 	///
-	public static StringBuilder normalizeObjectPath(Object base, List<String> splitKeyPath, StringBuilder res) {
+	public static StringBuilder normalizeObjectPath(Object base, List<String> splitKeyPath,
+		StringBuilder res) {
 		return NestedObject.normalizeObjectPath(base, splitKeyPath, res);
 	}
 	

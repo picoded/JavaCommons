@@ -270,8 +270,8 @@ public class BaseX {
 		for (char character : encodedString.toCharArray()) {
 			indx = inCharset.indexOf(character);
 			if (indx < 0) {
-				throw new IllegalArgumentException("Invalid character `" + character + "` for encoded string:"
-					+ encodedString);
+				throw new IllegalArgumentException("Invalid character `" + character
+					+ "` for encoded string:" + encodedString);
 			}
 			
 			// Process each character into the BigInteger value
@@ -352,11 +352,12 @@ public class BaseX {
 	/// @param  The byte values positions to check up to (not including)
 	/// @param  Byte length targeted (for error throwing)
 	/// @param  Encoding string (for error throwing)
-	protected void checkForEncodingLoss(byte[] fullEncodedValue, int limit, int byteLength, String encodedString) {
+	protected void checkForEncodingLoss(byte[] fullEncodedValue, int limit, int byteLength,
+		String encodedString) {
 		for (int a = 0; a < limit; ++a) {
 			if (fullEncodedValue[a] != 0) {
-				throw new IllegalArgumentException("Encoded value loss for given byteLength(" + byteLength
-					+ ") for input encodedString: " + encodedString);
+				throw new IllegalArgumentException("Encoded value loss for given byteLength("
+					+ byteLength + ") for input encodedString: " + encodedString);
 			}
 		}
 	}

@@ -60,7 +60,8 @@ public class DateConv {
 			month = "0" + month;
 		}
 		
-		String isoDate = String.valueOf(date + separator + month + separator + cal.get(Calendar.YEAR));
+		String isoDate = String
+			.valueOf(date + separator + month + separator + cal.get(Calendar.YEAR));
 		isoDate = changeISODateFormat(isoDate, ISODateFormat.DDMMYYYY, dateFormat, separator);
 		
 		return isoDate;
@@ -69,12 +70,14 @@ public class DateConv {
 	///
 	/// I return string to that i can return null if an error happened during conversion
 	///
-	public static String toMillisecondsFormat(String inDate, ISODateFormat currentDateFormat, String separator) {
+	public static String toMillisecondsFormat(String inDate, ISODateFormat currentDateFormat,
+		String separator) {
 		if (StringUtils.isNullOrEmpty(inDate)) {
 			return null;
 		}
 		
-		String newDate = changeISODateFormat(inDate, currentDateFormat, ISODateFormat.YYYYMMDD, separator);
+		String newDate = changeISODateFormat(inDate, currentDateFormat, ISODateFormat.YYYYMMDD,
+			separator);
 		String[] newDateSplit = null;
 		if (newDate != null) {
 			newDateSplit = newDate.split(separator);

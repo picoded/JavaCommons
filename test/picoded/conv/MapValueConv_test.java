@@ -124,7 +124,8 @@ public class MapValueConv_test {
 		Map<String, Object> qualifiedChaosMap = MapValueConv.toFullyQualifiedKeys(jsonMap, "", ".");
 		assertNotNull(qualifiedChaosMap);
 		
-		Map<String, Object> unqualifiedChaosMap = MapValueConv.fromFullyQualifiedKeys(qualifiedChaosMap);
+		Map<String, Object> unqualifiedChaosMap = MapValueConv
+			.fromFullyQualifiedKeys(qualifiedChaosMap);
 		assertNotNull(unqualifiedChaosMap);
 		
 	}

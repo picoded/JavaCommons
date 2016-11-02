@@ -58,7 +58,8 @@ public class BaseXPlus_test extends BaseX_test {
 	@Test
 	public void base64_helloWorld() {
 		BaseX b = null;
-		assertNotNull(b = new BaseX("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"));
+		assertNotNull(b = new BaseX(
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"));
 		
 		// raw byteArray to encode
 		byte[] byteArr = ("Hello World!").getBytes();
@@ -77,7 +78,8 @@ public class BaseXPlus_test extends BaseX_test {
 	@Test
 	public void base64_encodeAndDecodeOnce() {
 		BaseX b = null;
-		assertNotNull(b = new BaseX("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"));
+		assertNotNull(b = new BaseX(
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"));
 		
 		assertEquals(27, b.bitToStringLength(160));
 		
@@ -110,7 +112,8 @@ public class BaseXPlus_test extends BaseX_test {
 	public void base64_edgeCases() {
 		BaseX b = null;
 		byte[] byteArr = null;
-		assertNotNull(b = new BaseX("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"));
+		assertNotNull(b = new BaseX(
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"));
 		
 		String[] edgeCases = new String[] { "AFvcGhtpwLHfjTWe" };
 		

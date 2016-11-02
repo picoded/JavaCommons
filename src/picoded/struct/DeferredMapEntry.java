@@ -54,7 +54,9 @@ public class DeferredMapEntry<K extends Object, V extends Object> implements Map
 			Map.Entry<K, V> e1 = this;
 			Map.Entry<K, V> e2 = (Map.Entry<K, V>) o;
 			flag = e1.getKey() == null ? (e2.getKey() == null) : e1.getKey().equals(e2.getKey());
-			flag = flag && (e1.getValue() == null ? (e2.getValue() == null) : e1.getValue().equals(e2.getValue()));
+			flag = flag
+				&& (e1.getValue() == null ? (e2.getValue() == null) : e1.getValue().equals(
+					e2.getValue()));
 		}
 		return flag;
 	}
@@ -66,7 +68,8 @@ public class DeferredMapEntry<K extends Object, V extends Object> implements Map
 	// http://stackoverflow.com/questions/785091/consistency-of-hashcode-on-a-java-string
 	@Override
 	public int hashCode() {
-		return (getKey() == null ? 0 : getKey().hashCode()) ^ (getValue() == null ? 0 : getValue().hashCode());
+		return (getKey() == null ? 0 : getKey().hashCode())
+			^ (getValue() == null ? 0 : getValue().hashCode());
 	}
 	
 	/// Replaces the value corresponding to this entry with the specified value

@@ -59,12 +59,14 @@ public class DateConv_test {
 		
 		String millisecondsDate = DateConv.toMillisecondsFormat(isoDate, ISODateFormat.YYYYMMDD, "-");
 		
-		String isoDateReconstructed = DateConv.toISOFormat(Long.parseLong(millisecondsDate), ISODateFormat.YYYYMMDD, "-");
+		String isoDateReconstructed = DateConv.toISOFormat(Long.parseLong(millisecondsDate),
+			ISODateFormat.YYYYMMDD, "-");
 		
 		assertEquals(isoDate, isoDateReconstructed);
 		isoDate = "2016-10-25";
 		millisecondsDate = DateConv.toMillisecondsFormat(isoDate, ISODateFormat.YYYYMMDD, "-");
-		isoDateReconstructed = DateConv.toISOFormat(Long.parseLong(millisecondsDate), ISODateFormat.YYYYMMDD, "-");
+		isoDateReconstructed = DateConv.toISOFormat(Long.parseLong(millisecondsDate),
+			ISODateFormat.YYYYMMDD, "-");
 		assertEquals(isoDate, isoDateReconstructed);
 	}
 	
@@ -75,7 +77,8 @@ public class DateConv_test {
 		String isoDate_dmy = DateConv.toISOFormat(millisecondsDate, ISODateFormat.DDMMYYYY, "-");
 		
 		assertNull(DateConv.changeISODateFormat(null, null, null, null));
-		assertNull(DateConv.changeISODateFormat("", ISODateFormat.DDMMYYYY, ISODateFormat.YYYYMMDD, null));
+		assertNull(DateConv.changeISODateFormat("", ISODateFormat.DDMMYYYY, ISODateFormat.YYYYMMDD,
+			null));
 		
 		isoDate_dmy = DateConv.toISOFormat(millisecondsDate, ISODateFormat.DDMMYYYY, "-");
 		assertEquals("16-05-2015", isoDate_dmy);
@@ -83,16 +86,16 @@ public class DateConv_test {
 		isoDate_dmy = DateConv.toISOFormat(millisecondsDate, ISODateFormat.DDMMYYYY, null);
 		assertEquals("16-05-2015", isoDate_dmy);
 		
-		String isoDate_ymd = DateConv.changeISODateFormat(isoDate_dmy, ISODateFormat.DDMMYYYY, ISODateFormat.YYYYMMDD,
-			"-");
+		String isoDate_ymd = DateConv.changeISODateFormat(isoDate_dmy, ISODateFormat.DDMMYYYY,
+			ISODateFormat.YYYYMMDD, "-");
 		assertEquals("2015-05-16", isoDate_ymd);
 		
-		String isoDate_mdy = DateConv.changeISODateFormat(isoDate_ymd, ISODateFormat.YYYYMMDD, ISODateFormat.MMDDYYYY,
-			"-");
+		String isoDate_mdy = DateConv.changeISODateFormat(isoDate_ymd, ISODateFormat.YYYYMMDD,
+			ISODateFormat.MMDDYYYY, "-");
 		assertEquals("05-16-2015", isoDate_mdy);
 		
-		String isoDate_ydm = DateConv.changeISODateFormat(isoDate_mdy, ISODateFormat.MMDDYYYY, ISODateFormat.YYYYDDMM,
-			"-");
+		String isoDate_ydm = DateConv.changeISODateFormat(isoDate_mdy, ISODateFormat.MMDDYYYY,
+			ISODateFormat.YYYYDDMM, "-");
 		assertEquals("2015-16-05", isoDate_ydm);
 		
 	}

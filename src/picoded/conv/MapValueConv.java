@@ -17,7 +17,8 @@ public class MapValueConv {
 	}
 	
 	/// Converts a Map with List values, into array values
-	public static <A, B> Map<A, B[]> listToArray(Map<A, List<B>> source, Map<A, B[]> target, B[] arrayType) {
+	public static <A, B> Map<A, B[]> listToArray(Map<A, List<B>> source, Map<A, B[]> target,
+		B[] arrayType) {
 		// Normalize array type to 0 length
 		arrayType = sanatizeArray(arrayType);
 		
@@ -39,7 +40,8 @@ public class MapValueConv {
 	}
 	
 	/// Converts a single value map, to an array map
-	public static <A, B> Map<A, B[]> singleToArray(Map<A, B> source, Map<A, B[]> target, B[] arrayType) {
+	public static <A, B> Map<A, B[]> singleToArray(Map<A, B> source, Map<A, B[]> target,
+		B[] arrayType) {
 		// Normalize array type to 0 length
 		arrayType = sanatizeArray(arrayType);
 		
@@ -73,7 +75,8 @@ public class MapValueConv {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static Map<String, Object> toFullyQualifiedKeys(Object source, String rootName, String separator) {
+	public static Map<String, Object> toFullyQualifiedKeys(Object source, String rootName,
+		String separator) {
 		Map<String, Object> fullyQualifiedMap = new HashMap<String, Object>();
 		
 		if (rootName == null) {
@@ -97,8 +100,8 @@ public class MapValueConv {
 				}
 				if (obj instanceof Map) {
 					Map<String, Object> objMap = (Map<String, Object>) obj;
-					fullyQualifiedMap = getFullyQualifiedMap(fullyQualifiedMap, objMap, rootName, parentName, counter,
-						separator);
+					fullyQualifiedMap = getFullyQualifiedMap(fullyQualifiedMap, objMap, rootName,
+						parentName, counter, separator);
 					counter = (int) fullyQualifiedMap.get("counter");
 				}
 			}
@@ -111,7 +114,8 @@ public class MapValueConv {
 					parentName = rootName + separator + sourceMapKey.getKey();
 				}
 				
-				fullyQualifiedMap.putAll(toFullyQualifiedKeys(sourceMapKey.getValue(), parentName, separator));
+				fullyQualifiedMap.putAll(toFullyQualifiedKeys(sourceMapKey.getValue(), parentName,
+					separator));
 			}
 		} else if (source instanceof Number) {
 			fullyQualifiedMap.put(rootName, source);
@@ -137,7 +141,8 @@ public class MapValueConv {
 			} else {
 				parentName = rootName + "[" + counter + "]" + separator + objMapKey1.getKey();
 			}
-			fullyQualifiedMap.putAll(toFullyQualifiedKeys(objMap.get(objMapKey1.getKey()), parentName, separator));
+			fullyQualifiedMap.putAll(toFullyQualifiedKeys(objMap.get(objMapKey1.getKey()), parentName,
+				separator));
 		}
 		++counter;
 		fullyQualifiedMap.put("counter", counter);
@@ -175,7 +180,8 @@ public class MapValueConv {
 		}
 	}
 	
-	private static List<Object> getElementList(Map<String, Object> sourceMap, List<Object> element, String[] bracketSplit) {
+	private static List<Object> getElementList(Map<String, Object> sourceMap, List<Object> element,
+		String[] bracketSplit) {
 		if (element == null) {
 			element = new ArrayList<Object>();
 			sourceMap.put(bracketSplit[0], element);
@@ -184,8 +190,8 @@ public class MapValueConv {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static List<Object> checkStringIsNumber(List<Object> sourceList, int index, String key, Object value,
-		String[] bracketSplit) {
+	private static List<Object> checkStringIsNumber(List<Object> sourceList, int index, String key,
+		Object value, String[] bracketSplit) {
 		if (stringIsNumber(bracketSplit[1])) { //put list [1, 0, secondLayer0]
 			Object retrievedValue = sourceList.get(index);
 			List<Object> newList = new ArrayList<Object>();
@@ -204,8 +210,8 @@ public class MapValueConv {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static List<Object> checkStringIsWords(List<Object> sourceList, int index, String key, Object value,
-		String[] bracketSplit) {
+	private static List<Object> checkStringIsWords(List<Object> sourceList, int index, String key,
+		Object value, String[] bracketSplit) {
 		if (stringIsWord(bracketSplit[1])) { //put map
 			Object retrievedValue = sourceList.get(index);
 			Map<String, Object> newMap = new HashMap<String, Object>();

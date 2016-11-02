@@ -21,8 +21,8 @@ import org.junit.Test;
 @SuppressWarnings("unchecked")
 public class UnsupportedDefaultMap_test {
 	
-	UnsupportedDefaultMap<String, String> unsupportedDefaultMapForVoidMethod = mock(UnsupportedDefaultMap.class,
-		CALLS_REAL_METHODS);
+	UnsupportedDefaultMap<String, String> unsupportedDefaultMapForVoidMethod = mock(
+		UnsupportedDefaultMap.class, CALLS_REAL_METHODS);
 	UnsupportedDefaultMap<String, String> unsupportedDefaultMap = mock(UnsupportedDefaultMap.class);
 	
 	@Before

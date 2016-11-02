@@ -18,12 +18,11 @@ indentation_size:int:3
 continuation_indentation:int:1
 continuation_indentation_for_array_initializer:int:1
 
-# Sets the page width to 120 characters
-page_width:int:120
+# Sets the page width to 100 characters
+page_width:int:100
 
 # Setup tabs as leading indentation only
 use_tabs_only_for_leading_indentations:boolean:false
 
 # Fills up empty lines with indent
 indent_empty_lines:boolean:true
-

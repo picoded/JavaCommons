@@ -15,7 +15,8 @@ import picoded.conv.ConvertJSON;
 ///
 /// @TODO: Optimize the class to do the conversion between String[] to String only ON DEMAND, and to cache the result
 ///
-public class RequestMap extends AbstractMapDecorator<String, String> implements GenericConvertMap<String, String> {
+public class RequestMap extends AbstractMapDecorator<String, String> implements
+	GenericConvertMap<String, String> {
 	
 	// Constructor
 	//------------------------------------------------------------------------------

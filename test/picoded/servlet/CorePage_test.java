@@ -736,15 +736,16 @@ public class CorePage_test {
 		map.put("user", new String[] { "me" });
 		File file = new File("me.txt");
 		PrintWriter printWriter = new PrintWriter(file);
-		assertFalse(corePage.outputJSONException(map, template, printWriter, new Exception("There is an error")));
+		assertFalse(corePage.outputJSONException(map, template, printWriter, new Exception(
+			"There is an error")));
 		printWriter.flush();
 		printWriter.close();
 		File rFile = new File("me.txt");
 		BufferedReader expected = new BufferedReader(new FileReader(rFile));
 		String line;
 		Map<String, String> ret = new HashMap<String, String>();
-		ret.put("error",
-			org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(new Exception("There is an error")));
+		ret.put("error", org.apache.commons.lang3.exception.ExceptionUtils
+			.getStackTrace(new Exception("There is an error")));
 		while ((line = expected.readLine()) != null) {
 			assertNotNull(line);
 		}
@@ -761,15 +762,16 @@ public class CorePage_test {
 		PrintWriter printWriter = new PrintWriter(file);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		corePage.httpResponse = response;
-		assertFalse(corePage.outputJSONException(map, template, printWriter, new Exception("There is an error")));
+		assertFalse(corePage.outputJSONException(map, template, printWriter, new Exception(
+			"There is an error")));
 		printWriter.flush();
 		printWriter.close();
 		File rFile = new File("me.txt");
 		BufferedReader expected = new BufferedReader(new FileReader(rFile));
 		String line;
 		Map<String, String> ret = new HashMap<String, String>();
-		ret.put("error",
-			org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(new Exception("There is an error")));
+		ret.put("error", org.apache.commons.lang3.exception.ExceptionUtils
+			.getStackTrace(new Exception("There is an error")));
 		while ((line = expected.readLine()) != null) {
 			assertNotNull(line);
 		}

@@ -58,7 +58,8 @@ public class FileUtil_test {
 	public void readDoubleSlash() throws IOException {
 		assertNotNull(test_res = FileUtil.readFileToString(new File(testDir, "doubleSlash.txt")));
 		assertEquals(test_doubleSlash, test_res.trim());
-		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "doubleSlash.txt"), null));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir,
+			"doubleSlash.txt"), null));
 		assertEquals(test_doubleSlash, test_res.trim());
 	}
 	
@@ -67,7 +68,8 @@ public class FileUtil_test {
 	public void readJSRegex() throws IOException {
 		assertNotNull(test_res = FileUtil.readFileToString(new File(testDir, "jsRegex.js")));
 		assertNotNull(test_jsRegex, test_res.trim());
-		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "jsRegex.js"), null));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir,
+			"jsRegex.js"), null));
 		assertNotNull(test_jsRegex, test_res.trim());
 		
 		// encoding null test
@@ -86,17 +88,20 @@ public class FileUtil_test {
 	@Test
 	public void readFileToStringWithFallback() throws IOException {
 		assertEquals(null, FileUtil.readFileToString_withFallback(null, null, null));
-		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "jsRegex.js"), null, null));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir,
+			"jsRegex.js"), null, null));
 		assertNotNull(test_res = FileUtil.readFileToString_withFallback(null, "test", "US-ASCII"));
 		assertEquals("test", FileUtil.readFileToString_withFallback(null, "test", "US-ASCII"));
 		assertEquals(null, FileUtil.readFileToString_withFallback(null, null, "US-ASCII"));
 		assertEquals("test", FileUtil.readFileToString_withFallback(null, "test", null));
 		assertEquals("", FileUtil.readFileToString_withFallback(new File(""), "", ""));
 		assertEquals("", FileUtil.readFileToString_withFallback(new File(""), "", ""));
-		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "jsRegex.js"), "", ""));
-		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "doubleSlash.txt"), "", ""));
-		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir, "doubleSlash.txt"), "",
-			"US-ASCII"));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir,
+			"jsRegex.js"), "", ""));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir,
+			"doubleSlash.txt"), "", ""));
+		assertNotNull(test_res = FileUtil.readFileToString_withFallback(new File(testDir,
+			"doubleSlash.txt"), "", "US-ASCII"));
 		assertEquals("test", FileUtil.readFileToString_withFallback(new File(""), "test", "US-ASCII"));
 		assertEquals("test", FileUtil.readFileToString_withFallback(new File(""), "test", "US-ASCII"));
 	}
@@ -160,33 +165,34 @@ public class FileUtil_test {
 	@Test
 	public void testCopyDirectoryIfDifferent() throws IOException {
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File("./test-files/tmp/"));
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"), new File(
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File(
 			"./test-files/tmp/"));
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
+			new File("./test-files/tmp/"));
 		
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, true);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File("./test-files/tmp/"),
-			true);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"), new File(
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File(
 			"./test-files/tmp/"), true);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
+			new File("./test-files/tmp/"), true);
 		
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File("./test-files/tmp/"),
-			false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"), new File(
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File(
 			"./test-files/tmp/"), false);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
+			new File("./test-files/tmp/"), false);
 		
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, true, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File("./test-files/tmp/"),
-			true, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"), new File(
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File(
 			"./test-files/tmp/"), true, false);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
+			new File("./test-files/tmp/"), true, false);
 		
 		FileUtil.copyDirectory_ifDifferent(testDir, outputDir, false, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File("./test-files/tmp/"),
-			false, false);
-		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"), new File(
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/"), new File(
 			"./test-files/tmp/"), false, false);
+		FileUtil.copyDirectory_ifDifferent(new File("./test-files/test-specific/file/ConfigFile/"),
+			new File("./test-files/tmp/"), false, false);
 	}
 	
 	/// Test for Copy Directory If Different
@@ -207,9 +213,10 @@ public class FileUtil_test {
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
 		
 		// copies file if content differs
-		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
-		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), Paths.get(testDirStr + "doubleSlash.txt").toFile(),
-			false);
+		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), Paths.get(testDirStr + "doubleSlash.txt")
+			.toFile(), false);
+		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(),
+			Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
 		
 		//Checks if file has not been modified, and has same data length
 		// all conditions are true
@@ -225,36 +232,41 @@ public class FileUtil_test {
 		
 		// Files length are different
 		Paths.get(testDirStr + "doubleSlash.txt").toFile().setLastModified(new Date().getTime() + 2);
-		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), existingFilePath.toFile(),
-			false, false);
+		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
+			existingFilePath.toFile(), false, false);
 		
 		// Last Modified date and length are different
-		FileUtil.copyFile_ifDifferent(Paths.get("./test-files/test-specific/file/ConfigFile/" + "iniTestFileJSON.js")
-			.toFile(), existingFilePath.toFile(), false, false);
+		FileUtil.copyFile_ifDifferent(Paths.get(
+			"./test-files/test-specific/file/ConfigFile/" + "iniTestFileJSON.js").toFile(),
+			existingFilePath.toFile(), false, false);
 		
 		// create symbolic link
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, false);
 		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
 			Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), false, true);
-		FileUtil.copyFile_ifDifferent(Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), Paths.get(
-			"./test-files/test-specific/file/ConfigFile/" + "iniTestFileJSON.js").toFile(), false, false);
+		FileUtil.copyFile_ifDifferent(Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), Paths
+			.get("./test-files/test-specific/file/ConfigFile/" + "iniTestFileJSON.js").toFile(),
+			false, false);
 		
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
 		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
 			Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
-		FileUtil.copyFile_ifDifferent(Paths.get("./test-files/test-specific/file/ConfigFile/" + "iniTestFileJSON.js")
-			.toFile(), Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
+		FileUtil.copyFile_ifDifferent(Paths.get(
+			"./test-files/test-specific/file/ConfigFile/" + "iniTestFileJSON.js").toFile(),
+			Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
 		
-		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
+		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(),
+			Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
 		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
 			Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
-		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
+		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(),
+			Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
 		
 		// file is already a symbolic link
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
 		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false);
-		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(), existingFilePath.toFile(),
-			false);
+		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
+			existingFilePath.toFile(), false);
 	}
 	
 	@Test
@@ -286,8 +298,10 @@ public class FileUtil_test {
 		excludeNames.add("doubleSlash.txt");
 		assertEquals(0L, FileUtil.newestFileTimestamp(null, null));
 		assertEquals(0L, FileUtil.newestFileTimestamp(new File(""), new ArrayList<String>()));
-		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/file/"), excludeNames));
-		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/file/ConfigFile"), null));
+		assertNotNull(FileUtil.newestFileTimestamp(new File("./test-files/test-specific/file/"),
+			excludeNames));
+		assertNotNull(FileUtil.newestFileTimestamp(new File(
+			"./test-files/test-specific/file/ConfigFile"), null));
 		
 	}
 	
@@ -379,7 +393,8 @@ public class FileUtil_test {
 		assertEquals(filePathsList, FileUtil.getFilePaths(new File(testDirStr + "jsRegex.js"), "/"));
 		filePathsList = new ArrayList<String>();
 		filePathsList.add("doubleSlash");
-		assertEquals(filePathsList, FileUtil.getFilePaths(new File(testDirStr + "doubleSlash.txt"), "/"));
+		assertEquals(filePathsList,
+			FileUtil.getFilePaths(new File(testDirStr + "doubleSlash.txt"), "/"));
 		assertEquals(filePathsList, FileUtil.getFilePaths(new File(testDirStr + "doubleSlash.txt")));
 	}
 }

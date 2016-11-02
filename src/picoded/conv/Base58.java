@@ -31,7 +31,8 @@ public class Base58 extends BaseX {
 	public Base58(String customCharset) {
 		super(customCharset);
 		if (customCharset.length() != 58) {
-			throw new IllegalArgumentException("Charset string length, must be 58. This is base58 after all my friend.");
+			throw new IllegalArgumentException(
+				"Charset string length, must be 58. This is base58 after all my friend.");
 		}
 	}
 	

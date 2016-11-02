@@ -364,8 +364,8 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	}
 	
 	/// Setup the instance, with http request & response
-	protected CorePage setupInstance(HttpRequestType inRequestType, HttpServletRequest req, HttpServletResponse res)
-		throws ServletException {
+	protected CorePage setupInstance(HttpRequestType inRequestType, HttpServletRequest req,
+		HttpServletResponse res) throws ServletException {
 		requestType = inRequestType;
 		httpRequest = req;
 		httpResponse = res;
@@ -469,8 +469,8 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 		}
 		
 		try {
-			return (URLDecoder.decode(this.getClass().getClassLoader().getResource("/").getPath(), "UTF-8"))
-				.split("/WEB-INF/classes/")[0];
+			return (URLDecoder.decode(this.getClass().getClassLoader().getResource("/").getPath(),
+				"UTF-8")).split("/WEB-INF/classes/")[0];
 		} catch (UnsupportedEncodingException e) {
 			return "../";
 		} catch (NullPointerException e) {
@@ -484,7 +484,8 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 			return httpRequest.getServletPath();
 		}
 		//return getServletPath();
-		throw new RuntimeException("Unable to process getServletContextURI, outside of servlet request");
+		throw new RuntimeException(
+			"Unable to process getServletContextURI, outside of servlet request");
 	}
 	
 	/// gets a parameter value, from the httpRequest.getParameter
@@ -726,7 +727,8 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the output processing, this is after do(Post/Get/Put/Delete)Request
-	public boolean outputRequest(Map<String, Object> templateData, PrintWriter output) throws Exception {
+	public boolean outputRequest(Map<String, Object> templateData, PrintWriter output)
+		throws Exception {
 		return true;
 	}
 	
@@ -734,8 +736,8 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	///
 	/// note that this should return false, or throw a ServletException, UNLESS the exception was gracefully handled.
 	/// which in most cases SHOULD NOT be handled here.
-	public boolean outputRequestException(Map<String, Object> templateData, PrintWriter output, Exception e)
-		throws Exception {
+	public boolean outputRequestException(Map<String, Object> templateData, PrintWriter output,
+		Exception e) throws Exception {
 		// Throws a runtime Exception, let the servlet manager handle the rest
 		throw e;
 		//return false;
@@ -746,38 +748,43 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doJSON(Map<String, Object> outputData, Map<String, Object> templateData) throws Exception {
+	public boolean doJSON(Map<String, Object> outputData, Map<String, Object> templateData)
+		throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doGetJSON(Map<String, Object> outputData, Map<String, Object> templateData) throws Exception {
+	public boolean doGetJSON(Map<String, Object> outputData, Map<String, Object> templateData)
+		throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doPostJSON(Map<String, Object> outputData, Map<String, Object> templateData) throws Exception {
+	public boolean doPostJSON(Map<String, Object> outputData, Map<String, Object> templateData)
+		throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doPutJSON(Map<String, Object> outputData, Map<String, Object> templateData) throws Exception {
+	public boolean doPutJSON(Map<String, Object> outputData, Map<String, Object> templateData)
+		throws Exception {
 		return true;
 	}
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the JSON request processing, and outputs a JSON object
-	public boolean doDeleteJSON(Map<String, Object> outputData, Map<String, Object> templateData) throws Exception {
+	public boolean doDeleteJSON(Map<String, Object> outputData, Map<String, Object> templateData)
+		throws Exception {
 		return true;
 	}
 	
 	/// [Avoid Extending, this handles all the various headers and JSONP / CORS]
 	/// Does the actual final json object to json string output, with contentType "application/javascript"
-	public boolean outputJSON(Map<String, Object> outputData, Map<String, Object> templateData, PrintWriter output)
-		throws Exception {
+	public boolean outputJSON(Map<String, Object> outputData, Map<String, Object> templateData,
+		PrintWriter output) throws Exception {
 		// Set content type to JSON
 		if (httpResponse != null) {
 			httpResponse.setContentType("application/javascript");
@@ -792,8 +799,8 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	///
 	/// note that this should return false, UNLESS the exception was gracefully handled.
 	/// which in most cases SHOULD NOT be handled here.
-	public boolean outputJSONException(Map<String, Object> outputData, Map<String, Object> templateData,
-		PrintWriter output, Exception e) throws Exception {
+	public boolean outputJSONException(Map<String, Object> outputData,
+		Map<String, Object> templateData, PrintWriter output, Exception e) throws Exception {
 		// Converts the stack trace to a string
 		String stackTrace = org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e);
 		
@@ -840,31 +847,36 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
 	@Override
-	public final void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+	public final void doGet(HttpServletRequest request, HttpServletResponse response)
+		throws ServletException {
 		spawnInstance().setupInstance(HttpRequestType.GET, request, response).processChain();
 	}
 	
 	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
 	@Override
-	public final void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+	public final void doPost(HttpServletRequest request, HttpServletResponse response)
+		throws ServletException {
 		spawnInstance().setupInstance(HttpRequestType.POST, request, response).processChain();
 	}
 	
 	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
 	@Override
-	public final void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+	public final void doPut(HttpServletRequest request, HttpServletResponse response)
+		throws ServletException {
 		spawnInstance().setupInstance(HttpRequestType.PUT, request, response).processChain();
 	}
 	
 	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
 	@Override
-	public final void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+	public final void doDelete(HttpServletRequest request, HttpServletResponse response)
+		throws ServletException {
 		spawnInstance().setupInstance(HttpRequestType.DELETE, request, response).processChain();
 	}
 	
 	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
 	@Override
-	public final void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+	public final void doOptions(HttpServletRequest request, HttpServletResponse response)
+		throws ServletException {
 		spawnInstance().setupInstance(HttpRequestType.OPTION, request, response).processChain();
 		try {
 			super.doOptions(request, response);

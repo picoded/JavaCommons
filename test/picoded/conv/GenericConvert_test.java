@@ -111,7 +111,8 @@ public class GenericConvert_test {
 		assertNotEquals("$%", GenericConvert.toNumber("$%", 0).intValue());
 		assertEquals(10, GenericConvert.toNumber(10, 0).intValue());
 		assertNotEquals("", GenericConvert.toNumber("", 0).intValue());
-		assertEquals(new BigDecimal("01111111111111111"), GenericConvert.toNumber("01111111111111111", 0));
+		assertEquals(new BigDecimal("01111111111111111"),
+			GenericConvert.toNumber("01111111111111111", 0));
 		assertEquals(new BigDecimal("2.1"), GenericConvert.toNumber("2.1", null));
 		assertEquals(new BigDecimal("2.2"), GenericConvert.toNumber("2.2"));
 	}
@@ -171,7 +172,8 @@ public class GenericConvert_test {
 		assertNull(GenericConvert.toUUID("hello-world"));
 		assertEquals(GUID.fromBase58("heijoworjdabcdefghijabc"),
 			GenericConvert.toUUID(GUID.fromBase58("heijoworjdabcdefghijabc")));
-		assertEquals(GUID.fromBase58("123456789o123456789o12"), GenericConvert.toUUID("123456789o123456789o12", null));
+		assertEquals(GUID.fromBase58("123456789o123456789o12"),
+			GenericConvert.toUUID("123456789o123456789o12", null));
 		assertNull(GenericConvert.toUUID("123456789o123456789o1o2", null));
 		assertEquals(GUID.fromBase58("heijoworjdabcdefghijabc"),
 			GenericConvert.toUUID(GUID.fromBase58("heijoworjdabcdefghijabc"), null));
@@ -187,19 +189,22 @@ public class GenericConvert_test {
 	@Test
 	public void toGUIDTest() {
 		assertNull(GenericConvert.toGUID("hello-world"));
-		assertEquals("ADAukG8u3ryYrm6pHFDB6o", GenericConvert.toGUID(GUID.fromBase58("heijoworjdabcdefghijabc")));
+		assertEquals("ADAukG8u3ryYrm6pHFDB6o",
+			GenericConvert.toGUID(GUID.fromBase58("heijoworjdabcdefghijabc")));
 		assertEquals("ADAukG8u3ryYrm6pHFDB6o", GenericConvert.toGUID("ADAukG8u3ryYrm6pHFDB6o"));
 		assertNull(GenericConvert.toGUID(100));
 		assertEquals("ADAukG8u3ryYrm6pHFDB6o", GenericConvert.toGUID(null, "ADAukG8u3ryYrm6pHFDB6o"));
 		assertEquals("ADAukG8u3ryYrm6pHFDB6o", GenericConvert.toGUID("ADAukG8u3ryYrm6pHFDB6o", null));
 		assertNull(GenericConvert.toGUID(null, null));
-		assertEquals("ADAukG8u3ryYrm6pHFDB6o", GenericConvert.toGUID("ADAukG8u3ryYrm6pHFDB6o", "hello world"));
+		assertEquals("ADAukG8u3ryYrm6pHFDB6o",
+			GenericConvert.toGUID("ADAukG8u3ryYrm6pHFDB6o", "hello world"));
 		List<String> list = new ArrayList<String>();
 		assertNotEquals(list, GenericConvert.toNumber(list, 0).intValue());
 		assertNotEquals("$%", GenericConvert.toNumber("$%", 0).intValue());
 		assertEquals(10, GenericConvert.toNumber(10, 0).intValue());
 		assertNotEquals("", GenericConvert.toNumber("", 0).intValue());
-		assertEquals(new BigDecimal("01111111111111111"), GenericConvert.toNumber("01111111111111111", 0));
+		assertEquals(new BigDecimal("01111111111111111"),
+			GenericConvert.toNumber("01111111111111111", 0));
 		UUID uuid = UUID.randomUUID();
 		assertNotNull(toGUID(uuid, null));
 		
@@ -318,8 +323,10 @@ public class GenericConvert_test {
 		assertNull(toStringArray(null, null));
 		
 		assertNull(toStringArray(null, "default"));
-		assertArrayEquals(new String[] { "key1", "key2" }, toStringArray(new String[] { "key1", "key2" }, "default"));
-		assertArrayEquals(new String[] { "1", "2.2" }, toStringArray(new Object[] { "1", 2.2 }, "default"));
+		assertArrayEquals(new String[] { "key1", "key2" },
+			toStringArray(new String[] { "key1", "key2" }, "default"));
+		assertArrayEquals(new String[] { "1", "2.2" },
+			toStringArray(new Object[] { "1", 2.2 }, "default"));
 		assertArrayEquals(new String[] { "key1", "key2", "key3" },
 			toStringArray("[\"key1\",\"key2\",\"key3\"]", "default"));
 		List<String> list = new ArrayList<>();
@@ -347,8 +354,10 @@ public class GenericConvert_test {
 		
 		assertNull(toObjectArray(null, null));
 		assertNull(toObjectArray(null, "default"));
-		assertArrayEquals(new Object[] { "key1", "key2" }, toObjectArray(new String[] { "key1", "key2" }, "default"));
-		assertArrayEquals(new Object[] { "1", "2.2" }, toObjectArray(new String[] { "1", "2.2" }, "default"));
+		assertArrayEquals(new Object[] { "key1", "key2" },
+			toObjectArray(new String[] { "key1", "key2" }, "default"));
+		assertArrayEquals(new Object[] { "1", "2.2" },
+			toObjectArray(new String[] { "1", "2.2" }, "default"));
 		assertArrayEquals(new Object[] { "key1", "key2", "key3" },
 			toObjectArray("[\"key1\",\"key2\",\"key3\"]", "default"));
 		List<String> list = new ArrayList<>();
@@ -364,8 +373,10 @@ public class GenericConvert_test {
 		assertNull(toList(null, null));
 		
 		assertNull(toList(null, "default"));
-		assertEquals(Arrays.asList(new Object[] { "key1", "key2" }), toList(new String[] { "key1", "key2" }, "default"));
-		assertEquals(Arrays.asList(new Object[] { "1", "2.2" }), toList(new String[] { "1", "2.2" }, "default"));
+		assertEquals(Arrays.asList(new Object[] { "key1", "key2" }),
+			toList(new String[] { "key1", "key2" }, "default"));
+		assertEquals(Arrays.asList(new Object[] { "1", "2.2" }),
+			toList(new String[] { "1", "2.2" }, "default"));
 		assertEquals(Arrays.asList(new Object[] { "key1", "key2", "key3" }),
 			toList("[\"key1\",\"key2\",\"key3\"]", "default"));
 		List<String> list = new ArrayList<>();

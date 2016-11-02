@@ -24,7 +24,8 @@ public class Base62 extends BaseX {
 	public Base62(String customCharset) {
 		super(customCharset);
 		if (customCharset.length() != 62) {
-			throw new IllegalArgumentException("Charset string length, must be 62. This is base62 after all my friend.");
+			throw new IllegalArgumentException(
+				"Charset string length, must be 62. This is base62 after all my friend.");
 		}
 	}
 	

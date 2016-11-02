@@ -6,7 +6,8 @@ import org.apache.commons.collections4.map.AbstractMapDecorator;
 
 import picoded.conv.GenericConvert;
 
-public class ProxyGenericConvertMap<K, V> extends AbstractMapDecorator<K, V> implements GenericConvertMap<K, V> {
+public class ProxyGenericConvertMap<K, V> extends AbstractMapDecorator<K, V> implements
+	GenericConvertMap<K, V> {
 	
 	// ------------------------------------------------------
 	//

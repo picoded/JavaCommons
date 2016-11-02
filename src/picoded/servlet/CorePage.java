@@ -64,7 +64,7 @@ import picoded.struct.HashMapList;
  *
  * contextDestroyed ----> doSharedTeardown --> destroyContext
  *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * }
  * </pre>
  * ---------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ import picoded.struct.HashMapList;
  * ##[TODO]
  * + Websocket support?
  */
-public class CorePage extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
+public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	///////////////////////////////////////////////////////
 	//

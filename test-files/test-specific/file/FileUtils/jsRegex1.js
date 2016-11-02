@@ -1,0 +1,1 @@
+pathname = pathname.replace(/\\/g, '/');

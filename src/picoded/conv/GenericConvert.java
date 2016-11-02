@@ -35,7 +35,7 @@ public class GenericConvert extends GenericConvertStandard {
 		throw new IllegalAccessError("Utility class");
 	}
 	
-	// Generic string map
+	// To GenericConvertMap
 	//--------------------------------------------------------------------------------------------------
 	
 	/// To GenericConvertMap conversion of generic object
@@ -98,7 +98,7 @@ public class GenericConvert extends GenericConvertStandard {
 		return toGenericConvertStringMap(input, null);
 	}
 	
-	// to array
+	// To GenericConvertList
 	//--------------------------------------------------------------------------------------------------
 	
 	/// To GenericConvertList conversion of generic object
@@ -180,48 +180,8 @@ public class GenericConvert extends GenericConvertStandard {
 	///
 	/// @returns         The fetched object, always possible unless fallbck null
 	///
-	@SuppressWarnings("unchecked")
 	public static Object fetchObject(Object base, String key, Object fallback) {
-		
-		// Base to map / list conversion
-		Map<String, Object> baseMap = null;
-		List<Object> baseList = null;
-		
-		Object obj = resolvedListOrMap(base);
-		if (obj != null) {
-			if (obj instanceof Map) {
-				baseMap = (Map<String, Object>) obj;
-			} else {
-				baseList = (List<Object>) obj;
-			}
-		}
-		
-		// Fail on getting base item
-		if (baseMap == null && baseList == null) {
-			return fallback;
-		}
-		
-		// Reuse vars?
-		Object ret = null;
-		//int idxPos = 0;
-		
-		// Full key fetch
-		if (baseMap != null) {
-			ret = baseMap.get(key);
-		} else { // if( baseList != null ) {
-			int idxPos = toInt(key, -1);
-			if (idxPos >= 0 && idxPos < baseList.size()) {
-				ret = baseList.get(idxPos);
-			}
-		}
-		
-		// Full key found
-		if (ret != null) {
-			return ret;
-		}
-		
-		// Fallback
-		return fallback;
+		return NestedObject.fetchObject(base, key, fallback);
 	}
 	
 	///
@@ -233,130 +193,7 @@ public class GenericConvert extends GenericConvertStandard {
 	/// @returns         The fetched object, always possible unless fallbck null
 	///
 	public static Object fetchObject(Object base, String key) {
-		return fetchObject(base, key, null);
-	}
-	
-	///
-	/// Split the key path into their respective component
-	///
-	/// @param key       The input key to fetch, possibly nested
-	///
-	/// @returns         The fetched object, possibly empty array if key is invalid?
-	///
-	protected static List<String> splitObjectPath(String key, List<String> ret) {
-		// Return array list of string
-		if (ret == null) {
-			ret = new ArrayList<String>();
-		}
-		
-		//
-		// No more key parts, terminates
-		//
-		// This is the actual termination point for the recursive function
-		//
-		if (key == null || key.length() <= 0) {
-			//if (ret.size() < 0) {
-			//ret.add("");
-			//}
-			return ret;
-		}
-		
-		// Trim off useless spaces, and try again (if applicable)
-		int keyLen = key.length();
-		key = key.trim();
-		if (key.length() != keyLen) {
-			return splitObjectPath(key, ret);
-		}
-		
-		// Trim off useless starting ".dots" and try again
-		if (key.startsWith(".")) {
-			return splitObjectPath(key.substring(1), ret);
-		}
-		
-		// Fetches the next 2 index points (most probably seperator of token parts)
-		int dotIndex = key.indexOf('.');
-		int leftBracketIndex = key.indexOf('[');
-		
-		// No match found, assume last key
-		if (dotIndex < 0 && leftBracketIndex < 0) {
-			ret.add(key);
-			return ret;
-		}
-		
-		// Left and right string parts to recursively process
-		String leftPart;
-		String rightPart;
-		// Begins left/right part splitting and processing
-		if (leftBracketIndex == 0) {
-			//
-			// Array bracket fetching start
-			// This is most likely an array fetching,
-			// but could also be a case of map fetching with string
-			//
-			int rightBracketIndex = key.indexOf(']', 1);
-			if (rightBracketIndex <= 0) {
-				throw new RuntimeException("Missing closing ']' right bracket for key : " + key);
-			}
-			
-			//
-			// Get the left part within the bracket, and the right part after it
-			// 
-			// Format: [leftPart]rightPart___
-			//
-			leftPart = key.substring(1, rightBracketIndex).trim();
-			rightPart = key.substring(rightBracketIndex + 1).trim();
-			
-			// Sanatize the left path from quotation marks
-			if (leftPart.length() > 1
-				&& ((leftPart.startsWith("\"") && leftPart.endsWith("\"")) || (leftPart.startsWith("\'") && leftPart
-					.endsWith("\'")))) {
-				leftPart = leftPart.substring(1, leftPart.length() - 1);
-			}
-			
-		} else if (dotIndex >= 0 && (leftBracketIndex < 0 || dotIndex <= leftBracketIndex)) {
-			//
-			// Dot Index exists, and is before left bracket index OR there is no left bracket index
-			//
-			// This is most likely a nested object fetch -> so recursion is done
-			//
-			
-			//
-			// Get the left part before the dot, and right part after it
-			//
-			// Format: leftPart.rightPart___
-			//
-			leftPart = key.substring(0, dotIndex); //left
-			rightPart = key.substring(dotIndex + 1); //right
-			
-		} else if (leftBracketIndex > 0) {
-			//
-			// Left bracket index exists, and there is no dot before it
-			//
-			// This is most likely a nested object fetch -> so recursion is done
-			//
-			
-			//
-			// Get the left part before the left bracket, and right part INCLUDING the left bracket it
-			//
-			// Format: leftPart[rightPart___
-			//
-			leftPart = key.substring(0, leftBracketIndex); //left
-			rightPart = key.substring(leftBracketIndex); //[right]
-			
-		} else {
-			throw new RuntimeException("Unexpected key format : " + key);
-		}
-		
-		// Add left key to return set
-		ret.add(leftPart);
-		
-		// There is no right key, ends and terminate at recusive termination point above
-		if (rightPart == null || rightPart.length() <= 0) {
-			return splitObjectPath(null, ret);
-		}
-		
-		// ELSE : recursively process the right keys
-		return splitObjectPath(rightPart, ret);
+		return NestedObject.fetchObject(base, key);
 	}
 	
 	///
@@ -367,7 +204,18 @@ public class GenericConvert extends GenericConvertStandard {
 	/// @returns         The fetched object, possibly empty array if key is invalid?
 	///
 	public static String[] splitObjectPath(String key) {
-		return toStringArray(splitObjectPath(key, null));
+		return NestedObject.splitObjectPath( key );
+	}
+	
+	///
+	/// Split the key path into their respective component
+	///
+	/// @param key       The input key to fetch, possibly nested
+	///
+	/// @returns         The fetched object, possibly empty array if key is invalid?
+	///
+	public static List<String> splitObjectPath(String key, List<String> ret) {
+		return NestedObject.splitObjectPath( key, ret );
 	}
 	
 	///
@@ -383,108 +231,7 @@ public class GenericConvert extends GenericConvertStandard {
 	///
 	/// @returns         The fetched object, always possible unless fallbck null
 	public static Object fetchNestedObject(Object base, String key, Object fallback) {
-		
-		// Invalid base -> null, or not ( map OR list ) -> fallback
-		if (base == null || !((base instanceof Map) || (base instanceof List))) {
-			return fallback;
-		}
-		
-		// Reuse ret object
-		//Object ret;
-		
-		// Full key fetching found -> if found it is returned =)
-		Object ret = fetchObject(base, key, null);
-		if (ret != null) {
-			return ret;
-		}
-		
-		// Fallsback if key is ALREADY EMPTY !
-		// cause nothing is found, and nothing else can be done
-		if (key == null || key.length() <= 0) {
-			return fallback;
-		}
-		
-		// Trim off useless spaces, and try again (if applicable)
-		int keyLen = key.length();
-		key = key.trim();
-		if (key.length() != keyLen) {
-			return fetchNestedObject(base, key, fallback);
-		}
-		
-		// Trim off useless starting ".dots" and try again
-		if (key.startsWith(".")) {
-			return fetchNestedObject(base, key.substring(1), fallback);
-		}
-		
-		// Array bracket fetching
-		// This is most likely an array fetching,
-		// but could also be a case of map fetching with string
-		if (key.startsWith("[")) {
-			int rightBracketIndex = key.indexOf(']', 1);
-			if (rightBracketIndex <= 0) {
-				throw new RuntimeException("Missing closing ']' right bracket for key : " + key);
-			}
-			
-			String bracketKey = key.substring(1, rightBracketIndex).trim();
-			
-			// Fetch [sub object]
-			Object subObject = fetchObject(base, bracketKey, null);
-			
-			// No sub object, cant go a step down, fallback
-			//
-			// Meaning this can neither be the final object (ending key)
-			// nor could it be a recusive fetch.
-			if (subObject == null) {
-				return fallback;
-			}
-			
-			String rightKey = key.substring(rightBracketIndex + 1).trim();
-			// subObject is THE object, as its the ending key
-			if (rightKey.length() <= 0) {
-				return subObject;
-			}
-			
-			// ELSE : Time to continue, recusively fetching
-			return fetchNestedObject(subObject, rightKey, fallback);
-		}
-		
-		// Fetch one nested level =(
-		int dotIndex = key.indexOf('.');
-		int leftBracketIndex = key.indexOf('[');
-		
-		if (dotIndex >= 0 && (leftBracketIndex < 0 || dotIndex <= leftBracketIndex)) {
-			// Dot Index exists, and is before left bracket index OR there is no left bracket index
-			//
-			// This is most likely a nested object fetch -> so recursion is done
-			
-			// Gets the left.right key
-			String leftKey = key.substring(0, dotIndex); //left
-			String rightKey = key.substring(dotIndex + 1); //right
-			
-			// Fetch left
-			Object left = fetchObject(base, leftKey, null);
-			
-			// Time to continue, recusively fetching
-			return fetchNestedObject(left, rightKey, fallback);
-			//
-		} else if (leftBracketIndex > 0) {
-			// Left bracket index exists, and there is no dot before it
-			//
-			// This is most likely a nested object fetch -> so recursion is done
-			
-			// Gets the left[right] key
-			String leftKey = key.substring(0, leftBracketIndex); //left
-			String rightKey = key.substring(leftBracketIndex); //[right]
-			
-			// Fetch left
-			Object left = fetchObject(base, leftKey, null);
-			
-			// Time to continue, recusively fetching [right]
-			return fetchNestedObject(left, rightKey, fallback);
-		}
-		
-		// All else failed, including full key fetch -> fallback
-		return fallback;
+		return NestedObject.fetchNestedObject(base, key, fallback);
 	}
 	
 	///
@@ -496,7 +243,7 @@ public class GenericConvert extends GenericConvertStandard {
 	/// @returns         The fetched object, always possible unless fallbck null
 	///
 	public static Object fetchNestedObject(Object base, String key) {
-		return fetchNestedObject(base, key, null);
+		return NestedObject.fetchNestedObject(base, key);
 	}
 	
 	///
@@ -508,150 +255,26 @@ public class GenericConvert extends GenericConvertStandard {
 	/// @returns         The normalized key
 	///
 	public static String normalizeObjectPath(Object base, String key) {
-		return normalizeObjectPath(base, splitObjectPath(key, null), null).toString();
+		return NestedObject.normalizeObjectPath(base, key);
 	}
 	
 	///
 	/// Takes a possibly case insensitive key, and normalize it to the actual key path (if found) for the selected object
 	///
-	/// @param base      Map / List to manipulate from
-	/// @param key       The input key to fetch, possibly nested
+	/// @param base           Map / List to manipulate from
+	/// @param splitKeyPath   Key path in a list format
+	/// @param res            StringBuilder results
 	///
 	/// @returns         The normalized key
 	///
-	@SuppressWarnings("unchecked")
-	protected static StringBuilder normalizeObjectPath(Object base, List<String> splitKeyPath, StringBuilder res) {
-		
-		//
-		// Result string builder setup
-		//--------------------------------------------------------
-		
-		if (res == null) {
-			res = new StringBuilder();
-		}
-		
-		//
-		// End of path recursion
-		//--------------------------------------------------------
-		
-		/// No additional parts, return existing path
-		if (splitKeyPath == null || splitKeyPath.isEmpty()) {
-			return res;
-		}
-		
-		//
-		// Get base respective array or map type
-		//--------------------------------------------------------
-		
-		// Base to map / list conversion
-		Map<String, Object> baseMap = null;
-		List<Object> baseList = null;
-		
-		Object obj = resolvedListOrMap(base);
-		if (obj != null) {
-			if (obj instanceof Map) {
-				baseMap = (Map<String, Object>) obj;
-			} else {
-				baseList = (List<Object>) obj;
-			}
-		}
-		
-		if (baseMap == null && baseList == null) {
-			throw new RuntimeException("Unexpected key path format : " + ConvertJSON.fromList(splitKeyPath));
-		}
-		
-		//
-		// Process if its map or list respectively
-		//--------------------------------------------------------
-		
-		String currentKey = splitKeyPath.get(0);
-		List<String> nextKeyPathSet = splitKeyPath.subList(1, splitKeyPath.size());
-		Object subObject = fetchObject(base, currentKey);
-		
-		// Failed fetch with currentKey
-		if (subObject == null) {
-			
-			// Fails if its an array : no such thing as case insensitive number
-			if (baseList != null) {
-				return new StringBuilder();
-			}
-			
-			//System.out.println("normalize search - "+currentKey); 
-			//System.out.println("normalize keySet - "+baseMap.keySet());
-			
-			// Attempt to correct the case insensitivty issue
-			for (String oneKey : baseMap.keySet()) {
-				if (oneKey.equalsIgnoreCase(currentKey)) {
-					currentKey = oneKey;
-					subObject = baseMap.get(currentKey);
-					if (subObject != null) {
-						break;
-					}
-				}
-			}
-			
-			// Still invalid after search
-			if (subObject == null) {
-				return new StringBuilder();
-			}
-		}
-		
-		if (baseMap != null) {
-			//
-			// Base is a map
-			//
-			if (res.length() > 0) {
-				res.append(".");
-			}
-			res.append(currentKey);
-			
-		} else if (baseList != null) {
-			//
-			// Base is a list
-			//
-			res.append("[");
-			res.append(currentKey);
-			res.append("]");
-		}
-		
-		// Terminate when done
-		if (nextKeyPathSet.isEmpty()) {
-			return res;
-		}
-		
-		// Else recursive fetch
-		return normalizeObjectPath(subObject, nextKeyPathSet, res);
+	public static StringBuilder normalizeObjectPath(Object base, List<String> splitKeyPath, StringBuilder res) {
+		return NestedObject.normalizeObjectPath(base, splitKeyPath, res);
 	}
 	
-	// to custom class
 	//--------------------------------------------------------------------------------------------------
-	/*
-	/// Converts an input object to the desired Class, note that this is on a "best effort" basis
-	///
-	/// @param input   The input value to convert
-	/// @param cClass  The target conversion class if possible
-	///
-	/// @returns       The converted value (if converted) null if failed
-	///
-	/// @SuppressWarnings("unchecked")
-	public static Object toCustomClass(Class<?> cClass, Object input, Object fallback) {
-		
-		/// Does not need conversion
-		if( cClass.isInstance(input) ) {
-			return input;
-		}
-		
-		//if( cClass.isPrimitive() ) {
-		//	if( cClass == String.class ) {
-		//		return (Object)toString(input, (String)fallback );
-		//	}
-		//}
-		
-		return null;
-	}
-	 */
-	
+	//
 	// to BiFunction Map, used to automated put conversion handling
+	//
 	//--------------------------------------------------------------------------------------------------
 	protected static BiFunction<Object, Object, String> toString_BiFunction = (i, f) -> GenericConvert.toString(i, f);
 	protected static BiFunction<Object, Object, String[]> toStringArray_BiFunction = (i, f) -> GenericConvert
@@ -685,29 +308,6 @@ public class GenericConvert extends GenericConvertStandard {
 			throw new RuntimeException("Unable to find specified class object: " + resultClassObj);
 		}
 		return ret;
-	}
-	
-	protected static Object resolvedListOrMap(Object base) {
-		Map<String, Object> baseMap = null;
-		List<Object> baseList = null;
-		// Base to map / list conversion
-		if (base instanceof Map) {
-			baseMap = toStringMap(base);
-		} else if (base instanceof List) {
-			baseList = toList(base);
-		}
-		
-		// Fail on getting base item : attempts conversion
-		if (baseMap == null && baseList == null) {
-			baseMap = toStringMap(base);
-			if (baseMap == null) {
-				baseList = toList(base);
-			}
-		}
-		if (baseMap == null) {
-			return baseList;
-		}
-		return baseMap;
 	}
 	
 }

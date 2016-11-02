@@ -28,7 +28,6 @@ import picoded.struct.ProxyGenericConvertMap;
 /// + UUID
 /// + base-58 GUID
 /// 
-///
 /// @see GenericConvert 
 ///
 class GenericConvertStandard extends GenericConvertPrimitive {
@@ -41,6 +40,9 @@ class GenericConvertStandard extends GenericConvertPrimitive {
 	// Internal utils function
 	//--------------------------------------------------------------------------------------------------
 	
+	/// Converts anything to a list if possible
+	///
+	/// @return List<?> or null
 	protected static List<?> toArrayHelper(Object input) {
 		List<?> list = null;
 		
@@ -69,6 +71,32 @@ class GenericConvertStandard extends GenericConvertPrimitive {
 			}
 		}
 		return list;
+	}
+	
+	/// Converts anything to a list or map
+	///
+	/// @return List<?> or Map<String,?> or null
+	protected static Object resolvedListOrMap(Object base) {
+		Map<String, Object> baseMap = null;
+		List<Object> baseList = null;
+		// Base to map / list conversion
+		if (base instanceof Map) {
+			baseMap = toStringMap(base);
+		} else if (base instanceof List) {
+			baseList = toList(base);
+		}
+		
+		// Fail on getting base item : attempts conversion
+		if (baseMap == null && baseList == null) {
+			baseMap = toStringMap(base);
+			if (baseMap == null) {
+				baseList = toList(base);
+			}
+		}
+		if (baseMap == null) {
+			return baseList;
+		}
+		return baseMap;
 	}
 	
 	// to string conversion

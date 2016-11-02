@@ -364,8 +364,7 @@ public class GenericConvert_test {
 		assertNull(toList(null, null));
 		
 		assertNull(toList(null, "default"));
-		assertEquals(Arrays.asList(new Object[] { "key1", "key2" }),
-			toList(new String[] { "key1", "key2" }, "default"));
+		assertEquals(Arrays.asList(new Object[] { "key1", "key2" }), toList(new String[] { "key1", "key2" }, "default"));
 		assertEquals(Arrays.asList(new Object[] { "1", "2.2" }), toList(new String[] { "1", "2.2" }, "default"));
 		assertEquals(Arrays.asList(new Object[] { "key1", "key2", "key3" }),
 			toList("[\"key1\",\"key2\",\"key3\"]", "default"));

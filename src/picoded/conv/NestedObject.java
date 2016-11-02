@@ -172,7 +172,8 @@ public class NestedObject {
 	/// @param leftBracketIndex   Left bracket index position in the key to process
 	///
 	/// @returns         The fetched object, always possible unless fallbck null
-	protected static Object fetchNestedObject_key_withLeftBracketIndex(Object base, String key, Object fallback, int leftBracketIndex) {
+	protected static Object fetchNestedObject_key_withLeftBracketIndex(Object base, String key, Object fallback,
+		int leftBracketIndex) {
 		// Gets the left[right] key
 		String leftKey = key.substring(0, leftBracketIndex); //left
 		String rightKey = key.substring(leftBracketIndex); //[right]

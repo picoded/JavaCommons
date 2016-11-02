@@ -289,7 +289,7 @@ class GenericConvertStandard extends GenericConvertPrimitive {
 		}
 		
 		if (input instanceof Object[]) {
-			return (List<V>)Arrays.asList((Object[]) input);
+			return (List<V>) Arrays.asList((Object[]) input);
 		}
 		
 		List<V> ret = null;
@@ -297,7 +297,7 @@ class GenericConvertStandard extends GenericConvertPrimitive {
 		// Conversion to List (if possible)
 		if (input instanceof String) {
 			try {
-				ret = (List<V>)ConvertJSON.toList((String) input);
+				ret = (List<V>) ConvertJSON.toList((String) input);
 			} catch (Exception e) {
 				// Silence the exception
 			}

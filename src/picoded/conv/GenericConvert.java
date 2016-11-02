@@ -204,7 +204,7 @@ public class GenericConvert extends GenericConvertStandard {
 	/// @returns         The fetched object, possibly empty array if key is invalid?
 	///
 	public static String[] splitObjectPath(String key) {
-		return NestedObject.splitObjectPath( key );
+		return NestedObject.splitObjectPath(key);
 	}
 	
 	///
@@ -215,7 +215,7 @@ public class GenericConvert extends GenericConvertStandard {
 	/// @returns         The fetched object, possibly empty array if key is invalid?
 	///
 	public static List<String> splitObjectPath(String key, List<String> ret) {
-		return NestedObject.splitObjectPath( key, ret );
+		return NestedObject.splitObjectPath(key, ret);
 	}
 	
 	///

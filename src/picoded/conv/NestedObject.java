@@ -82,32 +82,7 @@ public class NestedObject {
 		// This is most likely an array fetching,
 		// but could also be a case of map fetching with string
 		if (key.startsWith("[")) {
-			int rightBracketIndex = key.indexOf(']', 1);
-			if (rightBracketIndex <= 0) {
-				throw new RuntimeException("Missing closing ']' right bracket for key : " + key);
-			}
-			
-			String bracketKey = key.substring(1, rightBracketIndex).trim();
-			
-			// Fetch [sub object]
-			Object subObject = fetchObject(base, bracketKey, null);
-			
-			// No sub object, cant go a step down, fallback
-			//
-			// Meaning this can neither be the final object (ending key)
-			// nor could it be a recusive fetch.
-			if (subObject == null) {
-				return fallback;
-			}
-			
-			String rightKey = key.substring(rightBracketIndex + 1).trim();
-			// subObject is THE object, as its the ending key
-			if (rightKey.length() <= 0) {
-				return subObject;
-			}
-			
-			// ELSE : Time to continue, recusively fetching
-			return fetchNestedObject(subObject, rightKey, fallback);
+			return fetchNestedObject_key_startsWithLeftBracket(base, key, fallback);
 		}
 		
 		// Fetch one nested level =(
@@ -118,35 +93,95 @@ public class NestedObject {
 			// Dot Index exists, and is before left bracket index OR there is no left bracket index
 			//
 			// This is most likely a nested object fetch -> so recursion is done
-			
-			// Gets the left.right key
-			String leftKey = key.substring(0, dotIndex); //left
-			String rightKey = key.substring(dotIndex + 1); //right
-			
-			// Fetch left
-			Object left = fetchObject(base, leftKey, null);
-			
-			// Time to continue, recusively fetching
-			return fetchNestedObject(left, rightKey, fallback);
-			//
+			return fetchNestedObject_key_withDotIndex(base, key, fallback, dotIndex);
 		} else if (leftBracketIndex > 0) {
 			// Left bracket index exists, and there is no dot before it
 			//
 			// This is most likely a nested object fetch -> so recursion is done
-			
-			// Gets the left[right] key
-			String leftKey = key.substring(0, leftBracketIndex); //left
-			String rightKey = key.substring(leftBracketIndex); //[right]
-			
-			// Fetch left
-			Object left = fetchObject(base, leftKey, null);
-			
-			// Time to continue, recusively fetching [right]
-			return fetchNestedObject(left, rightKey, fallback);
+			return fetchNestedObject_key_withLeftBracketIndex(base, key, fallback, leftBracketIndex);
 		}
 		
 		// All else failed, including full key fetch -> fallback
 		return fallback;
+	}
+	
+	///
+	/// unchecked, fetch for fetchNestedObject, where the key starts wihth "["
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	/// @param fallbck   The fallback default (if not convertable)
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	protected static Object fetchNestedObject_key_startsWithLeftBracket(Object base, String key, Object fallback) {
+		int rightBracketIndex = key.indexOf(']', 1);
+		if (rightBracketIndex <= 0) {
+			throw new RuntimeException("Missing closing ']' right bracket for key : " + key);
+		}
+		
+		String bracketKey = key.substring(1, rightBracketIndex).trim();
+		
+		// Fetch [sub object]
+		Object subObject = fetchObject(base, bracketKey, null);
+		
+		// No sub object, cant go a step down, fallback
+		//
+		// Meaning this can neither be the final object (ending key)
+		// nor could it be a recusive fetch.
+		if (subObject == null) {
+			return fallback;
+		}
+		
+		String rightKey = key.substring(rightBracketIndex + 1).trim();
+		// subObject is THE object, as its the ending key
+		if (rightKey.length() <= 0) {
+			return subObject;
+		}
+		
+		// ELSE : Time to continue, recusively fetching
+		return fetchNestedObject(subObject, rightKey, fallback);
+	}
+	
+	///
+	/// unchecked, fetch for fetchNestedObject, where the key next split point is a "."
+	///
+	/// @param base      Map / List to manipulate from
+	/// @param key       The input key to fetch, possibly nested
+	/// @param fallbck   The fallback default (if not convertable)
+	/// @param dotIndex  dot index position in the key to process
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	protected static Object fetchNestedObject_key_withDotIndex(Object base, String key, Object fallback, int dotIndex) {
+		// Gets the left.right key
+		String leftKey = key.substring(0, dotIndex); //left
+		String rightKey = key.substring(dotIndex + 1); //right
+		
+		// Fetch left
+		Object left = fetchObject(base, leftKey, null);
+		
+		// Time to continue, recusively fetching
+		return fetchNestedObject(left, rightKey, fallback);
+	}
+	
+	///
+	/// unchecked, fetch for fetchNestedObject, where the key next split point is a "["
+	///
+	/// @param base               Map / List to manipulate from
+	/// @param key                The input key to fetch, possibly nested
+	/// @param fallbck            The fallback default (if not convertable)
+	/// @param leftBracketIndex   Left bracket index position in the key to process
+	///
+	/// @returns         The fetched object, always possible unless fallbck null
+	protected static Object fetchNestedObject_key_withLeftBracketIndex(Object base, String key, Object fallback, int leftBracketIndex) {
+		// Gets the left[right] key
+		String leftKey = key.substring(0, leftBracketIndex); //left
+		String rightKey = key.substring(leftBracketIndex); //[right]
+		
+		// Fetch left
+		Object left = fetchObject(base, leftKey, null);
+		
+		// Time to continue, recusively fetching [right]
+		return fetchNestedObject(left, rightKey, fallback);
 	}
 	
 	///

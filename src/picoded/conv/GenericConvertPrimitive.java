@@ -43,6 +43,20 @@ class GenericConvertPrimitive {
 	// to boolean conversion
 	//--------------------------------------------------------------------------------------------------
 	
+	/// Takes in a char, and convert it to true/false statements, if a match occurs
+	///
+	/// @param  tChar   The character to deduce true/false statements
+	///
+	/// @return  "true", "false", or ""
+	protected static Boolean charToBoolean(char tChar) {
+		if (tChar == '+' || tChar == 't' || tChar == 'T' || tChar == 'y' || tChar == 'Y') {
+			return Boolean.TRUE;
+		} else if (tChar == '-' || tChar == 'f' || tChar == 'F' || tChar == 'n' || tChar == 'N') {
+			return Boolean.FALSE;
+		}
+		return null;
+	}
+	
 	/// To boolean conversion of generic object
 	///
 	/// Performs the following strategies in the following order
@@ -53,8 +67,8 @@ class GenericConvertPrimitive {
 	/// - Numeric string conversion
 	/// - Fallback
 	///
-	/// @param input     The input value to convert
-	/// @param fallbck   The fallback default (if not convertable)
+	/// @param  input     The input value to convert
+	/// @param  fallbck   The fallback default (if not convertable)
 	///
 	/// @returns         The converted string, always possible unless null
 	public static boolean toBoolean(Object input, boolean fallbck) {
@@ -74,15 +88,10 @@ class GenericConvertPrimitive {
 			char tChar = ((String) input).charAt(0);
 			
 			//String conversion
-			String returnValue = "";
-			if (tChar == '+' || tChar == 't' || tChar == 'T' || tChar == 'y' || tChar == 'Y') {
-				returnValue = "true";
-			} else if (tChar == '-' || tChar == 'f' || tChar == 'F' || tChar == 'n' || tChar == 'N') {
-				returnValue = "false";
-			}
-			if (!returnValue.isEmpty()) {
-				return Boolean.parseBoolean(returnValue);
-				
+			Boolean returnValue = charToBoolean(tChar);
+			
+			if (returnValue != null) {
+				return returnValue.booleanValue();
 			}
 			//Numeric string conversion
 			String s = (String) input;

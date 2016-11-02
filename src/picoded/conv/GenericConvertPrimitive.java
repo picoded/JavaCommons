@@ -323,15 +323,15 @@ class GenericConvertPrimitive {
 			return fallbck;
 		}
 		
-		if(input instanceof Character) {
-			return ((Character)input).charValue();
+		if (input instanceof Character) {
+			return ((Character) input).charValue();
 		}
 		
-		if(input instanceof String) {
-			return ((String)input).charAt(0);
+		if (input instanceof String) {
+			return ((String) input).charAt(0);
 		}
 		
-		return (char)(GenericConvert.toNumber(input, (short)fallbck)).shortValue();
+		return (char) (GenericConvert.toNumber(input, (short) fallbck)).shortValue();
 	}
 	
 	/// Default 0 fallback, To char conversion of generic object

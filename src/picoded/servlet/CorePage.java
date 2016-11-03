@@ -230,7 +230,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	/// Note this is used internally by the process chain
 	public boolean isJsonRequest() {
 		if (jsonRequestFlag != null) {
-			if (jsonRequestFlag.equals("*")) {
+			if ("*".equals(jsonRequestFlag)) {
 				return true;
 			}
 			

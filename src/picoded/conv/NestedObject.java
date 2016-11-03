@@ -1,18 +1,8 @@
 package picoded.conv;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.function.BiFunction;
-
-import picoded.struct.GenericConvertArrayList;
-import picoded.struct.GenericConvertList;
-import picoded.struct.GenericConvertMap;
-import picoded.struct.ProxyGenericConvertMap;
 
 ///
 /// Handles the manipulation of nested objects, in a Map/List.

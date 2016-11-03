@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import picoded.struct.GenericConvertArrayList;
-import picoded.struct.GenericConvertList;
-
 ///
 /// Contains conversions to Java standard objects types
 ///

@@ -395,20 +395,33 @@
 				 -->
 
 				<batchtest haltonfailure="no" todir="${junit-reports}">
-
 					<fileset dir="test">
 						<include name="picoded/**/*_test.java"/>
 					</fileset>
-
 					<formatter type="plain"/>
 					<formatter type="xml"/>
-
 				</batchtest>
-
 			</junit>
 		</jacoco:coverage>
+		<antcall target="junit-xml-fix"/>
 	</target>
-
+	
+	<!-- Sanatize junit xml reports, and fix common issues -->
+	<target name="junit-xml-fix">
+		
+		<!-- 
+			Sanatize the junit XML report, for ending > error, which occurs randomly
+			but frequently enough to be a real annoyance on jenkins
+		-->
+		<replace dir="${junit-reports}">
+			<include name="**/*.xml"/>
+			<replacetoken><![CDATA[</testsuite>
+>]]></replacetoken>
+			<replacevalue><![CDATA[</testsuite>]]></replacevalue>
+		</replace>
+		
+	</target>
+	
 	<!--Sams own targets -->
 	<target name="b">
 		<antcall target="build-src"></antcall>

@@ -85,9 +85,9 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	
-	/// RESTBuilder HttpRequestType enum access
-	public static class RequestTypeSet extends picoded.enums.HttpRequestType.HttpRequestTypeSet {
-	}
+	// /// RESTBuilder HttpRequestType enum access
+	// public static class RequestTypeSet extends picoded.enums.HttpRequestType.HttpRequestTypeSet {
+	// }
 	
 	///////////////////////////////////////////////////////
 	//

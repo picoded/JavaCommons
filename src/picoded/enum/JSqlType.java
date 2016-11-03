@@ -49,7 +49,7 @@ public enum JSqlType {
 	}
 	
 	/// Byte to enum serialization
-	public static JSqlType byteToEnum(byte val) {
+	public static JSqlType toEnum(int val) {
 		switch (val) {
 		case 0:
 			return JSqlType.INVALID;
@@ -72,7 +72,7 @@ public enum JSqlType {
 	}
 	
 	/// Enum to byte serialization
-	public static byte enumToByte(JSqlType val) {
+	public static int toInt(JSqlType val) {
 		switch (val) {
 		case INVALID:
 			return 0;

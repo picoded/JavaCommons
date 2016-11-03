@@ -3,17 +3,22 @@ package picoded.enums;
 /// HttpRequestType enum, used in webUtils, servletUtils, servlet, and RESTBuidler
 public enum HttpRequestType {
 	
-	/// List of request types
-	GET, POST, PUT, DELETE, HEAD, OPTION;
+	/// List of request types (that is supported)
+	GET(1<<0), 
+	POST(1<<1), 
+	PUT(1<<2), 
+	DELETE(1<<3), 
+	HEAD(1<<4), 
+	OPTION(1<<5);
 	
-	/// TypeMap to be extended, and stored in their respective package usage
-	public static class HttpRequestTypeSet {
-		public static final HttpRequestType GET = HttpRequestType.GET;
-		public static final HttpRequestType POST = HttpRequestType.POST;
-		public static final HttpRequestType PUT = HttpRequestType.PUT;
-		public static final HttpRequestType DELETE = HttpRequestType.DELETE;
-		public static final HttpRequestType OPTION = HttpRequestType.OPTION;
-	}
+	// /// TypeMap to be extended, and stored in their respective package usage
+	// public static class HttpRequestTypeSet {
+	// 	public static final HttpRequestType GET = HttpRequestType.GET;
+	// 	public static final HttpRequestType POST = HttpRequestType.POST;
+	// 	public static final HttpRequestType PUT = HttpRequestType.PUT;
+	// 	public static final HttpRequestType DELETE = HttpRequestType.DELETE;
+	// 	public static final HttpRequestType OPTION = HttpRequestType.OPTION;
+	// }
 	
 	/// Get name and toString alias to name() varient
 	public String getName() {
@@ -26,7 +31,7 @@ public enum HttpRequestType {
 	}
 	
 	/// Byte to enum serialization
-	public static HttpRequestType byteToEnum(byte val) {
+	public static HttpRequestType toEnum(int val) {
 		switch (val) {
 		case 0:
 			return HttpRequestType.GET;
@@ -43,7 +48,7 @@ public enum HttpRequestType {
 	}
 	
 	/// Enum to byte serialization
-	public static byte enumToByte(HttpRequestType val) {
+	public static int toInt(HttpRequestType val) {
 		switch (val) {
 		case GET:
 			return 0;

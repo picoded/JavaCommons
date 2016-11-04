@@ -1,5 +1,7 @@
 package picoded.servlet.api;
 
+import java.util.*;
+
 ///
 /// ApiBuilder is a utility class, in which facilitates the building of modern JSON pure API's.
 /// This can be used in the project either via a public API, or even internally via a direct function call.
@@ -22,22 +24,34 @@ package picoded.servlet.api;
 ///
 public class ApiBuilder {
 	
-	/////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////
 	//
 	// Constructor
 	//
-	/////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////
 	
 	/// Blank constructor, to build a root end point
 	public ApiBuilder() {
 		// Blank constructor
 	}
 	
-	/////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////
+	//
+	// Common exceptions string
+	//
+	//////////////////////////////////////////////////////////////////
+	
+	/// Exception for methods not supported in root node
+	public static String UNSUPPORTED_IN_ROOT_NODE = "ApiBuilder root node : Does not support parent/version/path methods";
+	
+	/// Exception for methods ONLY supported in root node
+	public static String SUPPORTED_ONLY_IN_ROOT_NODE = "ApiBuilder sub node : Version initialization is supported only in root node";
+	
+	//////////////////////////////////////////////////////////////////
 	//
 	// Core structure vars
 	//
-	/////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////
 	
 	/// ApiBuilder absolute root
 	protected ApiBuilder absRoot = this;
@@ -45,8 +59,8 @@ public class ApiBuilder {
 	/// ApiBuilder version roots
 	protected ApiBuilder verRoot = null;
 	
-	/// Version, of the api (assuming ver root)
-	protected String ver = null;
+	/// ApiBuilder parent node
+	protected ApiBuilder parent = null;
 	
 	/// @return boolean true if this is the root node
 	public boolean isRoot() {
@@ -63,11 +77,21 @@ public class ApiBuilder {
 	/// Version root, of the API
 	/// 
 	/// @return  Version root API node.
-	public ApiBuilder verRoot() {
-		if( verRoot == null ) {
-			throw new RuntimeException("Root node, does not have a version root");
+	public ApiBuilder versionRoot() {
+		if( isRoot() ) {
+			throw new RuntimeException(UNSUPPORTED_IN_ROOT_NODE);
 		}
 		return verRoot;
+	}
+	
+	/// Parent node, of the API
+	///
+	/// @return  Parent node
+	public ApiBuilder parent() {
+		if( isRoot() ) {
+			throw new RuntimeException(UNSUPPORTED_IN_ROOT_NODE);
+		}
+		return parent;
 	}
 	
 	/// Current API version (taken for verRoot)
@@ -75,16 +99,16 @@ public class ApiBuilder {
 	/// @return  version string (not inlcluding the v prefix)
 	public String version() {
 		if( verRoot == null ) {
-			throw new RuntimeException("Root node, does not have a version root");
+			throw new RuntimeException(UNSUPPORTED_IN_ROOT_NODE);
 		}
 		return verRoot.version();
 	}
 	
-	/////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////
 	//
 	// Path namespace handling
 	//
-	/////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////
 	
 	/// Fixed URI api path step map
 	protected Map<String,ApiBuilder> fixedPath = new HashMap<String,ApiBuilder>();
@@ -97,17 +121,105 @@ public class ApiBuilder {
 	/// @param  The version string 
 	///
 	/// @return  version specific ApiBuilder node
-	public ApiBuidler version(String reqVer) {
+	public ApiBuilder version(String reqVer) {
 		if( isRoot() ) {
 			String fixedKey = "v"+reqVer;
-			ApiBuidler ret = fixedPath.get(fixedKey);
+			ApiBuilder ret = fixedPath.get(fixedKey);
 			if( ret == null ) {
 				ret = new ApiBuilderVersion(this, reqVer);
 				fixedPath.put(fixedKey, ret);
 			}
 			return ret;
 		} else {
-			throw new RuntimeException("Extending version, is only allowed in Root node");
+			throw new RuntimeException(SUPPORTED_ONLY_IN_ROOT_NODE);
 		}
 	}
+	
+	/// Path namespace handling, to actually build the API
+	///
+	/// @param  The path string
+	///
+	/// @return  The path aligned node
+	public ApiBuilder path(String path) {
+		if( isRoot() ) {
+			throw new RuntimeException(UNSUPPORTED_IN_ROOT_NODE);
+		}
+		
+		return singlePathStep(path);
+	}
+	
+	//////////////////////////////////////////////////////////////////
+	//
+	// Inner path utility management
+	// ONLY applicable for extended classes (not root layer)
+	//
+	//////////////////////////////////////////////////////////////////
+	
+	/// Does a single step to fetch
+	///
+	/// @param  The path string
+	///
+	/// @return  The path aligned node
+	protected ApiBuilder singlePathStep(String pathStep) {
+		// Minor santization step
+		pathStep = pathStep.trim();
+		
+		// Map pathing to fetch from
+		Map<String,ApiBuilder> pathMap = fixedPath;
+		
+		// Use the dynamic path, INSTEAD of fixed path
+		if( pathStep.startsWith("{") && pathStep.endsWith("}") ) {
+			pathMap = dynamicPath;
+		}
+		
+		// ApiBuilder path and fetching
+		ApiBuilder ret = pathMap.get(pathStep);
+		if( ret == null ) {
+			ret = new ApiBuilderNode(this);
+			pathMap.put(pathStep, ret);
+		}
+		return ret;
+	}
+	
+	//////////////////////////////////////////////////////////////////
+	//
+	// Path string manipulation
+	//
+	//////////////////////////////////////////////////////////////////
+	
+	/// Namespace filter, amends common namespace errors
+	///
+	/// @param  path to sanitize
+	///
+	/// @return Sanitize path return
+	protected String pathFilter(String inPath) {
+		// Basic sanitization
+		inPath = inPath.split("\\?")[0].replaceAll("\\.", "/");
+		
+		// Sanitized repeated "//"
+		while( inPath.indexOf("//") >= 0 ) {
+			inPath = inPath.replaceAll("//", "/");
+		}
+		
+		// Sanitize ending and starting "/"
+		while( inPath.startsWith("/") ) {
+			inPath = inPath.substring(1);
+		}
+		while( inPath.endsWith("/") ) {
+			inPath = inPath.substring(0, inPath.length() - 1);
+		}
+		
+		// Return the path
+		return inPath;
+	}
+	
+	/// Filters and get the storage namespace
+	///
+	/// @param  path to sanitize and split
+	///
+	/// @return Split sanitized path return
+	protected String[] pathArray(String inPath) {
+		return pathFilter(inPath).split("/");
+	}
+	
 }

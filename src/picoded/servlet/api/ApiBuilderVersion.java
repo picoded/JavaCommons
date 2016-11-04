@@ -1,5 +1,7 @@
 package picoded.servlet.api;
 
+import java.util.*;
+
 ///
 /// Version specific varient of ApiBuilder
 ///
@@ -11,6 +13,9 @@ class ApiBuilderVersion extends ApiBuilder {
 	//
 	/////////////////////////////////////////////
 	
+	/// Version, of the api
+	protected String ver = null;
+	
 	/// Version specific ApiBuilder
 	///
 	/// @param  Root node to use
@@ -18,7 +23,14 @@ class ApiBuilderVersion extends ApiBuilder {
 	ApiBuilderVersion(ApiBuilder root, String inVer) {
 		absRoot = root;
 		verRoot = this;
+		parent = root;
 		ver = inVer;
 	}
 	
+	/// Current API version
+	///
+	/// @return  version string (not inlcluding the v prefix)
+	public String version() {
+		return ver;
+	}
 }

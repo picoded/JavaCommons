@@ -23,4 +23,8 @@ public class ApiBuilder_test {
 		assertNotNull(root);
 	}
 	
+	@Test
+	public void versioning() {
+		assertNotNull(root.version("0"));
+	}
 }

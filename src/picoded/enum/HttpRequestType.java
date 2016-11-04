@@ -1,66 +1,124 @@
 package picoded.enums;
 
+import java.util.EnumSet;
+
 /// HttpRequestType enum, used in webUtils, servletUtils, servlet, and RESTBuidler
 public enum HttpRequestType {
 	
+	//--------------------------------------------------------
+	//
+	//  Constructor setup
+	//
+	//--------------------------------------------------------
+	
 	/// List of request types (that is supported)
-	GET(1<<0), 
-	POST(1<<1), 
-	PUT(1<<2), 
-	DELETE(1<<3), 
-	HEAD(1<<4), 
-	OPTION(1<<5);
+	GET(1<<1), 
+	POST(1<<2), 
+	PUT(1<<3), 
+	DELETE(1<<4), 
+	HEAD(1<<5), 
+	OPTION(1<<6);
 	
-	// /// TypeMap to be extended, and stored in their respective package usage
-	// public static class HttpRequestTypeSet {
-	// 	public static final HttpRequestType GET = HttpRequestType.GET;
-	// 	public static final HttpRequestType POST = HttpRequestType.POST;
-	// 	public static final HttpRequestType PUT = HttpRequestType.PUT;
-	// 	public static final HttpRequestType DELETE = HttpRequestType.DELETE;
-	// 	public static final HttpRequestType OPTION = HttpRequestType.OPTION;
-	// }
-	
-	/// Get name and toString alias to name() varient
-	public String getName() {
-		return super.name();
+	/// The internal value used by the Enum constructor
+	private final int value;
+
+	/// Constructor
+	///
+	/// @param  Value used as Enum Constructor
+	HttpRequestType(int inValue) {
+		value = inValue;
 	}
 	
+	/// Value fetching
+	///
+	/// @return  The value of the Enum object
+	public int value(){
+		return value;
+	}
+	
+	//--------------------------------------------------------
+	//
+	//  EnumSet handling
+	//
+	//--------------------------------------------------------
+	
+	/// EnumSet for iterating
+	public static EnumSet<HttpRequestType> set = EnumSet.allOf(HttpRequestType.class);
+	
+	//--------------------------------------------------------
+	//
+	//  Name conversion
+	//
+	//--------------------------------------------------------
+	
 	/// Get name and toString alias to name() varient
+	///
+	/// @return  Enum name string
 	public String toString() {
-		return super.name();
+		return super.name().toUpperCase();
 	}
+	
+	/// name to enum serialization
+	///
+	/// @param   String name to lookup
+	///
+	/// @return  the Enum object, if string match (not case sensitive)
+	public static HttpRequestType fromName(String val) {
+		for(HttpRequestType candidate : set) {
+			if( candidate.name().equalsIgnoreCase(val) ) {
+				return candidate;
+			}
+		}
+		return null;
+	}
+	
+	//--------------------------------------------------------
+	//
+	//  Numeric value conversion
+	//
+	//--------------------------------------------------------
 	
 	/// Byte to enum serialization
+	/// 
+	/// @param  Request type represented as an int
+	///
+	/// @return  The exact enum object, only if exact match found
 	public static HttpRequestType toEnum(int val) {
-		switch (val) {
-		case 0:
-			return HttpRequestType.GET;
-		case 1:
-			return HttpRequestType.POST;
-		case 2:
-			return HttpRequestType.PUT;
-		case 3:
-			return HttpRequestType.DELETE;
-		case 4:
-			return HttpRequestType.OPTION;
+		for(HttpRequestType candidate : set) {
+			if( candidate.value() == val ) {
+				return candidate;
+			}
 		}
 		return null;
 	}
 	
 	/// Enum to byte serialization
+	///
+	/// @param  Request type to convert to int
+	///
+	/// @return  int value, -1 if null
 	public static int toInt(HttpRequestType val) {
-		switch (val) {
-		case GET:
-			return 0;
-		case POST:
-			return 1;
-		case PUT:
-			return 2;
-		case DELETE:
-			return 3;
-		case OPTION:
-			return 4;
+		if( val != null ) {
+			return val.value();
 		}
 		return -1;
+	}
+	
+	//--------------------------------------------------------
+	//
+	//  Flag lookup
+	//
+	//--------------------------------------------------------
+	
+	/// Check if the given Enum, matches another flag
+	///
+	/// @param  Single or multiple flag values
+	///
+	/// @return  true if current Enum flag is found
+	public boolean hasFlag(int flagSet) {
+		if( flagSet != 0 && ((flagSet & value) == flagSet) ) {
+			return true;
+		}
+		return false;
 	}
 }

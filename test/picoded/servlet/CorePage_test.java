@@ -61,12 +61,7 @@ public class CorePage_test {
 	public void constructor() {
 		assertNotNull(corePage);
 	}
-	
-	@Test
-	public void requestTypeSetTest() {
-		assertNotNull(CorePage.RequestTypeSet.GET);
-	}
-	
+	 
 	@Test
 	public void getHttpServletRequestTest() {
 		assertNull(corePage.getHttpServletRequest());

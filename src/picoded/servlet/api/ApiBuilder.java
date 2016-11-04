@@ -17,8 +17,8 @@ package picoded.servlet.api;
 /// module code to be "callable" by a function a rather indirect and "inefficent" method of calling its 
 /// local page directly was used. Aka an encryption proxy. Due to the time constraints of the project.
 ///
-/// Simply put, if a standardised REST API builder was built and used, several page API features can be called directly
-/// instead of being usued via a proxy
+/// Simply put, if a standardised REST API builder was built and used, several page API features can be 
+/// called directly instead of being usued via a proxy
 ///
 public class ApiBuilder {
 	
@@ -48,6 +48,11 @@ public class ApiBuilder {
 	/// Version, of the api (assuming ver root)
 	protected String ver = null;
 	
+	/// @return boolean true if this is the root node
+	public boolean isRoot() {
+		return ( absRoot == this );
+	}
+	
 	/// Getting the absolute root, of the API
 	///
 	/// @return  The root API node. Used to gurantee the root node used
@@ -55,15 +60,54 @@ public class ApiBuilder {
 		return absRoot;
 	}
 	
+	/// Version root, of the API
+	/// 
+	/// @return  Version root API node.
+	public ApiBuilder verRoot() {
+		if( verRoot == null ) {
+			throw new RuntimeException("Root node, does not have a version root");
+		}
+		return verRoot;
+	}
+	
+	/// Current API version (taken for verRoot)
 	///
-	///
-	///
+	/// @return  version string (not inlcluding the v prefix)
+	public String version() {
+		if( verRoot == null ) {
+			throw new RuntimeException("Root node, does not have a version root");
+		}
+		return verRoot.version();
+	}
 	
 	/////////////////////////////////////////////
 	//
-	// Core structure vars
+	// Path namespace handling
 	//
 	/////////////////////////////////////////////
 	
+	/// Fixed URI api path step map
+	protected Map<String,ApiBuilder> fixedPath = new HashMap<String,ApiBuilder>();
 	
+	/// Dynamic named URI api path step map
+	protected Map<String,ApiBuilder> dynamicPath = new HashMap<String,ApiBuilder>();
+	
+	/// Getting the version node, to start building the API =)
+	///
+	/// @param  The version string 
+	///
+	/// @return  version specific ApiBuilder node
+	public ApiBuidler version(String reqVer) {
+		if( isRoot() ) {
+			String fixedKey = "v"+reqVer;
+			ApiBuidler ret = fixedPath.get(fixedKey);
+			if( ret == null ) {
+				ret = new ApiBuilderVersion(this, reqVer);
+				fixedPath.put(fixedKey, ret);
+			}
+			return ret;
+		} else {
+			throw new RuntimeException("Extending version, is only allowed in Root node");
+		}
+	}
 }

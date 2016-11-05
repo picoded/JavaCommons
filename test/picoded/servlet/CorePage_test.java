@@ -100,91 +100,91 @@ public class CorePage_test {
 		assertTrue(corePage.processChain());
 	}
 	
-	@Test
-	public void processChainJSONPathTest() throws ServletException {
-		ServletOutputStream mockStream = mock(ServletOutputStream.class);
-		corePage.requestType = HttpRequestType.GET;
-		corePage.responseOutputStream = mockStream;
-		corePage.setJsonRequestFlag("*");
-		assertTrue(corePage.processChain());
-	}
-	
-	@Test
-	public void processChainJSONPathRequestTypeOtherTest() throws ServletException {
-		ServletOutputStream mockStream = mock(ServletOutputStream.class);
-		corePage.requestType = HttpRequestType.HEAD;
-		corePage.responseOutputStream = mockStream;
-		corePage.setJsonRequestFlag("*");
-		assertTrue(corePage.processChain());
-	}
-	
-	@Test
-	public void processChainJSONPOSTTest() throws ServletException {
-		ServletOutputStream mockStream = mock(ServletOutputStream.class);
-		corePage.requestType = HttpRequestType.POST;
-		corePage.responseOutputStream = mockStream;
-		corePage.setJsonRequestFlag("*");
-		assertTrue(corePage.processChain());
-	}
-	
-	@Test
-	public void processChainJSONPOSTDoAuthTest() throws Exception {
-		ServletOutputStream mockStream = mock(ServletOutputStream.class);
-		corePage.requestType = HttpRequestType.POST;
-		corePage.responseOutputStream = mockStream;
-		corePage.setJsonRequestFlag("*");
-		Map<String, Object> templateDataObj = new HashMap<String, Object>();
-		corePage.templateDataObj = templateDataObj;
-		CorePage corePageLocal = spy(corePage);
-		when(corePageLocal.doAuth(templateDataObj)).thenReturn(false);
-		assertFalse(corePageLocal.processChain());
-	}
-	
-	@Test
-	public void processChainJSONPOSTDoJSONTest() throws Exception {
-		ServletOutputStream mockStream = mock(ServletOutputStream.class);
-		corePage.requestType = HttpRequestType.POST;
-		corePage.responseOutputStream = mockStream;
-		corePage.setJsonRequestFlag("*");
-		Map<String, Object> templateDataObj = new HashMap<String, Object>();
-		corePage.templateDataObj = templateDataObj;
-		corePage.jsonDataObj = templateDataObj;
-		CorePage corePageLocal = spy(corePage);
-		when(corePageLocal.doJSON(templateDataObj, templateDataObj)).thenReturn(false);
-		assertFalse(corePageLocal.processChain());
-	}
-	
-	@Test
-	public void processChainJSONPUTTest() throws ServletException {
-		ServletOutputStream mockStream = mock(ServletOutputStream.class);
-		corePage.requestType = HttpRequestType.PUT;
-		corePage.responseOutputStream = mockStream;
-		corePage.setJsonRequestFlag("*");
-		assertTrue(corePage.processChain());
-	}
-	
-	@Test
-	public void processChainJSONDELETETest() throws ServletException {
-		ServletOutputStream mockStream = mock(ServletOutputStream.class);
-		corePage.requestType = HttpRequestType.DELETE;
-		corePage.responseOutputStream = mockStream;
-		corePage.setJsonRequestFlag("*");
-		assertTrue(corePage.processChain());
-	}
-	
-	@Test
-	public void processChainJSONPOSTExceptionTest() throws Exception {
-		ServletOutputStream mockStream = mock(ServletOutputStream.class);
-		corePage.requestType = HttpRequestType.POST;
-		corePage.responseOutputStream = mockStream;
-		corePage.setJsonRequestFlag("*");
-		Map<String, Object> templateDataObj = new HashMap<String, Object>();
-		corePage.templateDataObj = templateDataObj;
-		corePage.jsonDataObj = templateDataObj;
-		CorePage corePageLocal = spy(corePage);
-		when(corePageLocal.doPostJSON(templateDataObj, templateDataObj)).thenThrow(Exception.class);
-		assertFalse(corePageLocal.processChain());
-	}
+	// @Test
+	// public void processChainJSONPathTest() throws ServletException {
+	// 	ServletOutputStream mockStream = mock(ServletOutputStream.class);
+	// 	corePage.requestType = HttpRequestType.GET;
+	// 	corePage.responseOutputStream = mockStream;
+	// 	corePage.setJsonRequestFlag("*");
+	// 	assertTrue(corePage.processChain());
+	// }
+	// 
+	// @Test
+	// public void processChainJSONPathRequestTypeOtherTest() throws ServletException {
+	// 	ServletOutputStream mockStream = mock(ServletOutputStream.class);
+	// 	corePage.requestType = HttpRequestType.HEAD;
+	// 	corePage.responseOutputStream = mockStream;
+	// 	corePage.setJsonRequestFlag("*");
+	// 	assertTrue(corePage.processChain());
+	// }
+	// 
+	// @Test
+	// public void processChainJSONPOSTTest() throws ServletException {
+	// 	ServletOutputStream mockStream = mock(ServletOutputStream.class);
+	// 	corePage.requestType = HttpRequestType.POST;
+	// 	corePage.responseOutputStream = mockStream;
+	// 	corePage.setJsonRequestFlag("*");
+	// 	assertTrue(corePage.processChain());
+	// }
+	// 
+	// @Test
+	// public void processChainJSONPOSTDoAuthTest() throws Exception {
+	// 	ServletOutputStream mockStream = mock(ServletOutputStream.class);
+	// 	corePage.requestType = HttpRequestType.POST;
+	// 	corePage.responseOutputStream = mockStream;
+	// 	corePage.setJsonRequestFlag("*");
+	// 	Map<String, Object> templateDataObj = new HashMap<String, Object>();
+	// 	corePage.templateDataObj = templateDataObj;
+	// 	CorePage corePageLocal = spy(corePage);
+	// 	when(corePageLocal.doAuth(templateDataObj)).thenReturn(false);
+	// 	assertFalse(corePageLocal.processChain());
+	// }
+	// 
+	// @Test
+	// public void processChainJSONPOSTDoJSONTest() throws Exception {
+	// 	ServletOutputStream mockStream = mock(ServletOutputStream.class);
+	// 	corePage.requestType = HttpRequestType.POST;
+	// 	corePage.responseOutputStream = mockStream;
+	// 	corePage.setJsonRequestFlag("*");
+	// 	Map<String, Object> templateDataObj = new HashMap<String, Object>();
+	// 	corePage.templateDataObj = templateDataObj;
+	// 	corePage.jsonDataObj = templateDataObj;
+	// 	CorePage corePageLocal = spy(corePage);
+	// 	when(corePageLocal.doJSON(templateDataObj, templateDataObj)).thenReturn(false);
+	// 	assertFalse(corePageLocal.processChain());
+	// }
+	// 
+	// @Test
+	// public void processChainJSONPUTTest() throws ServletException {
+	// 	ServletOutputStream mockStream = mock(ServletOutputStream.class);
+	// 	corePage.requestType = HttpRequestType.PUT;
+	// 	corePage.responseOutputStream = mockStream;
+	// 	corePage.setJsonRequestFlag("*");
+	// 	assertTrue(corePage.processChain());
+	// }
+	// 
+	// @Test
+	// public void processChainJSONDELETETest() throws ServletException {
+	// 	ServletOutputStream mockStream = mock(ServletOutputStream.class);
+	// 	corePage.requestType = HttpRequestType.DELETE;
+	// 	corePage.responseOutputStream = mockStream;
+	// 	corePage.setJsonRequestFlag("*");
+	// 	assertTrue(corePage.processChain());
+	// }
+	// 
+	// @Test
+	// public void processChainJSONPOSTExceptionTest() throws Exception {
+	// 	ServletOutputStream mockStream = mock(ServletOutputStream.class);
+	// 	corePage.requestType = HttpRequestType.POST;
+	// 	corePage.responseOutputStream = mockStream;
+	// 	corePage.setJsonRequestFlag("*");
+	// 	Map<String, Object> templateDataObj = new HashMap<String, Object>();
+	// 	corePage.templateDataObj = templateDataObj;
+	// 	corePage.jsonDataObj = templateDataObj;
+	// 	CorePage corePageLocal = spy(corePage);
+	// 	when(corePageLocal.doPostJSON(templateDataObj, templateDataObj)).thenThrow(Exception.class);
+	// 	assertFalse(corePageLocal.processChain());
+	// }
 	
 	@Test
 	public void processChainNormalPathTest() throws ServletException {
@@ -280,47 +280,47 @@ public class CorePage_test {
 		assertFalse(corePageLocal.processChain());
 	}
 	
-	@Test
-	public void isJsonRequestTest() {
-		assertNotNull(corePage.setJsonRequestFlag("*"));
-		assertTrue(corePage.isJsonRequest());
-	}
-	
-	@Test
-	public void isJsonRequestAlternatePathTest() throws IOException, ServletException {
-		CorePage corePageLocal;
-		corePage.setJsonRequestFlag("in");
-		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-		Map<String, String[]> map = new HashMap<String, String[]>();
-		map.put("in", new String[] { "json" });
-		HttpServletResponse response = mock(HttpServletResponse.class);
-		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
-		when(response.getOutputStream()).thenReturn(mockOutput);
-		when(httpRequest.getParameterMap()).thenReturn(map);
-		corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, httpRequest, response));
-		assertTrue(corePageLocal.isJsonRequest());
-	}
-	
-	@Test
-	public void isJsonRequestAlternatePathEmptyStringTest() throws IOException, ServletException {
-		CorePage corePageLocal;
-		corePage.setJsonRequestFlag("in");
-		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-		Map<String, String[]> map = new HashMap<String, String[]>();
-		map.put("in", new String[] { "" });
-		HttpServletResponse response = mock(HttpServletResponse.class);
-		ServletOutputStream mockOutput = mock(ServletOutputStream.class);
-		when(response.getOutputStream()).thenReturn(mockOutput);
-		when(httpRequest.getParameterMap()).thenReturn(map);
-		corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, httpRequest, response));
-		assertFalse(corePageLocal.isJsonRequest());
-	}
-	
-	@Test
-	public void getJsonRequestFlagTest() {
-		corePage.setJsonRequestFlag("in");
-		assertEquals("in", corePage.getJsonRequestFlag());
-	}
+	// @Test
+	// public void isJsonRequestTest() {
+	// 	assertNotNull(corePage.setJsonRequestFlag("*"));
+	// 	assertTrue(corePage.isJsonRequest());
+	// }
+	// 
+	// @Test
+	// public void isJsonRequestAlternatePathTest() throws IOException, ServletException {
+	// 	CorePage corePageLocal;
+	// 	corePage.setJsonRequestFlag("in");
+	// 	HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+	// 	Map<String, String[]> map = new HashMap<String, String[]>();
+	// 	map.put("in", new String[] { "json" });
+	// 	HttpServletResponse response = mock(HttpServletResponse.class);
+	// 	ServletOutputStream mockOutput = mock(ServletOutputStream.class);
+	// 	when(response.getOutputStream()).thenReturn(mockOutput);
+	// 	when(httpRequest.getParameterMap()).thenReturn(map);
+	// 	corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, httpRequest, response));
+	// 	assertTrue(corePageLocal.isJsonRequest());
+	// }
+	// 
+	// @Test
+	// public void isJsonRequestAlternatePathEmptyStringTest() throws IOException, ServletException {
+	// 	CorePage corePageLocal;
+	// 	corePage.setJsonRequestFlag("in");
+	// 	HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+	// 	Map<String, String[]> map = new HashMap<String, String[]>();
+	// 	map.put("in", new String[] { "" });
+	// 	HttpServletResponse response = mock(HttpServletResponse.class);
+	// 	ServletOutputStream mockOutput = mock(ServletOutputStream.class);
+	// 	when(response.getOutputStream()).thenReturn(mockOutput);
+	// 	when(httpRequest.getParameterMap()).thenReturn(map);
+	// 	corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, httpRequest, response));
+	// 	assertFalse(corePageLocal.isJsonRequest());
+	// }
+	// 
+	// @Test
+	// public void getJsonRequestFlagTest() {
+	// 	corePage.setJsonRequestFlag("in");
+	// 	assertEquals("in", corePage.getJsonRequestFlag());
+	// }
 	
 	@Test
 	public void requestHeaderMapTest() throws ServletException, IOException {

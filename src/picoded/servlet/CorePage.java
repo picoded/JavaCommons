@@ -211,34 +211,10 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	// JSON request config handling
 	//-------------------------------------------
 	
-	/// Sets the JSON detection flag
-	protected String jsonRequestFlag = null;
-	
-	/// Sets the JSON request flag, used to handle JSON requests.
-	/// Note that NULL, means disabled. While "*" means anything
-	public CorePage setJsonRequestFlag(String in) {
-		jsonRequestFlag = in;
-		return this;
-	}
-	
-	/// Gets the current JSON request flag
-	public String getJsonRequestFlag() {
-		return jsonRequestFlag;
-	}
-	
 	/// Returns true / false if current request qualifies as JSON
 	/// Note this is used internally by the process chain
 	public boolean isJsonRequest() {
-		if (jsonRequestFlag != null) {
-			if ("*".equals(jsonRequestFlag)) {
-				return true;
-			}
-			
-			String rStr = getParameter(jsonRequestFlag);
-			if (rStr != null && rStr.length() > 0) {
-				return true;
-			}
-		}
+		// Returns false, unless overwritten
 		return false;
 	}
 	

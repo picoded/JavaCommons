@@ -570,14 +570,6 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 			}
 			
 			//
-			// Check for the "api" keyword
-			//
-			if(fullURI.indexOf("/api/") >= 0 || fullURI.indexOf("/API/") >= 0) {
-				// Found it, assume its valid then
-				return true;
-			}
-			
-			//
 			// Get the query string to append (if needed)
 			//
 			String queryString = httpRequest.getQueryString();
@@ -608,14 +600,11 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 				doSharedSetup();
 				doSetup();
 				
-				// PathEnding enforcement
-				if( enforceProperRequestPathEnding() ) {
-					// is JSON request?
-					if (isJsonRequest()) {
-						ret = processChainJSON();
-					} else { // or as per normal
-						ret = processChainRequest();
-					}
+				// is JSON request?
+				if (isJsonRequest()) {
+					ret = processChainJSON();
+				} else { // or as per normal
+					ret = processChainRequest();
 				}
 				
 				// Flush any data if exists
@@ -639,6 +628,11 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	/// The process chain part specific to a normal request
 	private boolean processChainRequest() throws Exception {
 		try {
+			// PathEnding enforcement
+			if( !enforceProperRequestPathEnding() ) {
+				return false;
+			}
+			
 			// Does authentication check
 			if (!doAuth(templateDataObj)) {
 				return false;

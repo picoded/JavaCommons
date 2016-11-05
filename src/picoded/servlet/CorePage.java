@@ -17,6 +17,10 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 
+// Apache library used
+import org.apache.commons.io.FilenameUtils;
+
+// JavaCommons library used
 import picoded.conv.ConvertJSON;
 import picoded.file.FileUtil;
 import picoded.set.HttpRequestType;
@@ -494,6 +498,106 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	//
 	///////////////////////////////////////////////////////
 	
+	///
+	/// Checks and forces a redirection for closing slash on index page requests.
+	/// If needed (returns false, on validation failure)
+	///
+	/// For example : https://picoded.com/JavaCommons , will redirect to https://picoded.com/JavaCommons/
+	///
+	/// This is a rather complicated topic. Regarding the ambiguity of the HTML
+	/// redirection handling of. (T605 on phabricator)
+	///
+	/// But basically take the following as example. On how a redirect is handled
+	/// for a relative "./index.html" within a webpage.
+	///
+	/// | Current URL              | Redirects to             |
+	/// |--------------------------|--------------------------|
+	/// | host/subpath             | host/index.html          |
+	/// | host/subpath/            | host/subpath/index.html  |
+	/// | host/subpath/index.html  | host/subpath/index.html  |
+	/// 
+	/// As a result of the ambiguity in redirect for html index pages loaded
+	/// in "host/subpath". This function was created, so that when called.
+	/// will do any redirect if needed if the request was found to be.
+	///
+	/// The reason for standardising to "host/subpath/" is that this will be consistent
+	/// offline page loads (such as through cordova). Where the index.html will be loaded
+	/// in full file path instead.
+	///
+	/// 1) A request path withoug the "/" ending
+	///
+	/// 2) Not a file request, a file request is assumed if there was a "." in the last name
+	///    Example: host/subpath/file.js
+	///
+	/// 3) Not an API request with the "api" keyword. Example: host/subpath/api
+	///
+	/// This will also safely handle the forwarding of all GET request parameters.
+	/// For example: "host/subpath?abc=xyz" will be redirected to "host/subpath/?abc=xyz"
+	///
+	/// Note: THIS will silently pass as true, if a httpRequest is not found. This is to facilitate
+	///       possible function calls done on servlet setup. Without breaking them
+	///
+	/// Now that was ALOT of explaination for one simple function wasnt it >_>
+	/// Well its one of the lesser understood "gotchas" in the HTTP specifications.
+	/// Made more unknown by the JavaCommons user due to the common usage of ${PageRootURI}
+	/// which basically resolves this issue. Unless its in relative path mode. Required for app exports.
+	///
+	protected boolean enforceProperRequestPathEnding() throws IOException {
+		if( httpRequest != null ) {
+			String fullURI = httpRequest.getRequestURI();
+			
+			// This does not validate blank / root requests
+			//
+			// Should we? : To fix if this is required (as of now no)
+			if(fullURI == null || fullURI.equalsIgnoreCase("/")) {
+				return true;
+			}
+			
+			//
+			// Already ends with a "/" ? : If so its considered valid
+			//
+			if(fullURI.endsWith("/")) {
+				return true;
+			}
+			
+			//
+			// Checks if its a file request. Ends check if it is
+			//
+			String name = FilenameUtils.getName(fullURI);
+			if( FilenameUtils.getExtension(name).length() > 0 ) {
+				// There is a file extension. so we shall assume it is a file
+				return true; // And end it
+			}
+			
+			//
+			// Check for the "api" keyword
+			//
+			if(fullURI.indexOf("/api/") >= 0 || fullURI.indexOf("/API/") >= 0) {
+				// Found it, assume its valid then
+				return true;
+			}
+			
+			//
+			// Get the query string to append (if needed)
+			//
+			String queryString = httpRequest.getQueryString();
+			if(queryString == null) {
+				queryString = "";
+			} else if(!queryString.startsWith("?")){
+				queryString = "?"+queryString;
+			}
+			
+			//	
+			// Enforce proper URL handling
+			//
+			httpResponse.sendRedirect( fullURI+"/"+queryString );
+			return false;
+		}
+		
+		// Validation is valid.
+		return true;
+	}
+
 	/// Triggers the process chain with the current setup, and indicates failure / success
 	public boolean processChain() throws ServletException {
 		try {
@@ -504,11 +608,14 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 				doSharedSetup();
 				doSetup();
 				
-				// is JSON request?
-				if (isJsonRequest()) {
-					ret = processChainJSON();
-				} else { // or as per normal
-					ret = processChainRequest();
+				// PathEnding enforcement
+				if( enforceProperRequestPathEnding() ) {
+					// is JSON request?
+					if (isJsonRequest()) {
+						ret = processChainJSON();
+					} else { // or as per normal
+						ret = processChainRequest();
+					}
 				}
 				
 				// Flush any data if exists

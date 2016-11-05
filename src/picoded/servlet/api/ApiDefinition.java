@@ -2,7 +2,7 @@ package picoded.servlet.api;
 
 import java.util.*;
 
-import picoded.enum.HttpRequestType;
+import picoded.set.HttpRequestType;
 
 ///
 /// API Request map information
@@ -29,10 +29,13 @@ public class ApiDefinition {
 	
 	/////////////////////////////////////////////
 	//
-	// HTTP request namespace
+	// HTTP request path handling
 	//
 	/////////////////////////////////////////////
 	
-	protected int supportedHttpRequests = HttpRequestType.GET | HttpRequestType.POST;
+	/// HTTP Request types supported
+	/// The default supported is both GET & POST
+	protected EnumSet<HttpRequestType> supportedHttpRequests = EnumSet.of(HttpRequestType.GET, HttpRequestType.POST);
+	
 	
 }

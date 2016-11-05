@@ -1,4 +1,4 @@
-package picoded.enums;
+package picoded.set;
 
 ///
 /// Sometimes you just want objects which represents "something"

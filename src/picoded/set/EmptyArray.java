@@ -1,4 +1,4 @@
-package picoded.enums;
+package picoded.set;
 
 import org.apache.commons.lang3.ArrayUtils;
 

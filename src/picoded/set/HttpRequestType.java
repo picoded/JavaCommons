@@ -1,4 +1,4 @@
-package picoded.enums;
+package picoded.set;
 
 import java.util.EnumSet;
 
@@ -43,7 +43,7 @@ public enum HttpRequestType {
 	//--------------------------------------------------------
 	
 	/// EnumSet for iterating
-	public static EnumSet<HttpRequestType> set = EnumSet.allOf(HttpRequestType.class);
+	public static final EnumSet<HttpRequestType> set = EnumSet.allOf(HttpRequestType.class);
 	
 	//--------------------------------------------------------
 	//

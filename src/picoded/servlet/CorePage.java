@@ -19,8 +19,8 @@ import java.io.UnsupportedEncodingException;
 
 import picoded.conv.ConvertJSON;
 import picoded.file.FileUtil;
-import picoded.enums.HttpRequestType;
-import picoded.enums.EmptyArray;
+import picoded.set.HttpRequestType;
+import picoded.set.EmptyArray;
 import picoded.struct.HashMapList;
 
 // Sub modules useds
@@ -86,7 +86,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	// /// RESTBuilder HttpRequestType enum access
-	// public static class RequestTypeSet extends picoded.enums.HttpRequestType.HttpRequestTypeSet {
+	// public static class RequestTypeSet extends picoded.set.HttpRequestType.HttpRequestTypeSet {
 	// }
 	
 	///////////////////////////////////////////////////////

@@ -38,8 +38,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import picoded.conv.ConvertJSON;
-import picoded.enums.EmptyArray;
-import picoded.enums.HttpRequestType;
+import picoded.set.EmptyArray;
+import picoded.set.HttpRequestType;
 
 public class CorePage_test {
 	

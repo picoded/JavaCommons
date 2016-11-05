@@ -15,16 +15,22 @@ class ApiBuilderNode extends ApiBuilder {
 	//
 	/////////////////////////////////////////////
 	
+	/// Path step that represents itself
+	protected String pathStep = null;
+	
 	/// Version specific ApiBuilder
 	///
 	/// @param  in parent node
-	ApiBuilderNode(ApiBuilder inParent) {
+	ApiBuilderNode(ApiBuilder inParent, String inStep) {
 		// Parent node to setup
 		parent = inParent;
 		
 		// AbsRoot and VerRoot
 		absRoot = inParent.root();
 		verRoot = inParent.versionRoot();
+		
+		// PathStepping
+		pathStep = inStep;
 	}
 	
 	/////////////////////////////////////////////
@@ -75,5 +81,20 @@ class ApiBuilderNode extends ApiBuilder {
 		return definition;
 	}
 	
+	//////////////////////////////////////////////////////////////////
+	//
+	// Lamda Function direct invocation
+	//
+	//////////////////////////////////////////////////////////////////
 	
+	/// WIP
+	public ApiResponse execute() {
+		ApiRequest req = new ApiRequest();
+		ApiResponse res = new ApiResponse();
+		
+		ApiDefinition def = definition();
+		def.completeSetup();
+		
+		return def.functionLamda.apply(req, res);
+	}
 }

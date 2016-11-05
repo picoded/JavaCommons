@@ -3,6 +3,8 @@ package picoded.servlet.api;
 import static org.junit.Assert.*;
 import org.junit.*;
 
+import java.util.*;
+
 public class ApiBuilder_test {
 	
 	/// The root API builder to test
@@ -54,9 +56,13 @@ public class ApiBuilder_test {
 			},
 			// implmentation function
 			(req,res) -> {
-				
+				res.put("is", "round");
 				return res;
 			}
 		));
+		
+		Map<String,Object> res = null;
+		assertNotNull(res = p.execute());
+		assertEquals("round", res.get("is"));
 	}
 }

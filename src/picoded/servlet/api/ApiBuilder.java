@@ -199,7 +199,7 @@ public class ApiBuilder {
 		// ApiBuilder path and fetching
 		ApiBuilder ret = pathMap.get(pathStep);
 		if( ret == null ) {
-			ret = new ApiBuilderNode(this);
+			ret = new ApiBuilderNode(this, pathStep);
 			pathMap.put(pathStep, ret);
 		}
 		return ret;
@@ -322,4 +322,14 @@ public class ApiBuilder {
 		return this;
 	}
 	
+	//////////////////////////////////////////////////////////////////
+	//
+	// Lamda Function direct invocation
+	//
+	//////////////////////////////////////////////////////////////////
+	
+	/// WIP
+	public ApiResponse execute() {
+		throw new UnsupportedOperationException(UNSUPPORTED_IN_ROOT_NODE);
+	}
 }

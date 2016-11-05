@@ -113,5 +113,5 @@ public class ApiDefinition {
 	///
 	/// @TODO implmentation support
 	protected EnumSet<HttpRequestType> supportedHttpRequests = EnumSet.of(HttpRequestType.GET, HttpRequestType.POST);
-	 
+	
 }

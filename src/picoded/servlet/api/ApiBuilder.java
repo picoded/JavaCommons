@@ -1,6 +1,8 @@
 package picoded.servlet.api;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.BiFunction;
 
 ///
 /// ApiBuilder is a utility class, in which facilitates the building of modern JSON pure API's.
@@ -42,10 +44,15 @@ public class ApiBuilder {
 	//////////////////////////////////////////////////////////////////
 	
 	/// Exception for methods not supported in root node
-	public static String UNSUPPORTED_IN_ROOT_NODE = "ApiBuilder root node : Does not support parent/version/path methods";
+	public static String UNSUPPORTED_IN_ROOT_NODE = "ApiBuilder root node : Does not support parent/version/path/setup methods";
 	
 	/// Exception for methods ONLY supported in root node
 	public static String SUPPORTED_ONLY_IN_ROOT_NODE = "ApiBuilder sub node : Version initialization is supported only in root node";
+	
+	/// Excption for lambda setup function, for setup that previously exists
+	public static String DEFINE_SETUP_CALLED = "ApiBuilder node : 'blank' define lamda function has already been processed";
+	public static String DEFINE_SETUP_CONFLICT = "ApiBuilder node : Already has an existing define lamda function";
+	public static String FUNCTION_SETUP_CONFLICT = "ApiBuilder node : Already has an existing define/implmentation lamda function";
 	
 	//////////////////////////////////////////////////////////////////
 	//
@@ -79,7 +86,7 @@ public class ApiBuilder {
 	/// @return  Version root API node.
 	public ApiBuilder versionRoot() {
 		if( isRoot() ) {
-			throw new RuntimeException(UNSUPPORTED_IN_ROOT_NODE);
+			throw new UnsupportedOperationException(UNSUPPORTED_IN_ROOT_NODE);
 		}
 		return verRoot;
 	}
@@ -89,7 +96,7 @@ public class ApiBuilder {
 	/// @return  Parent node
 	public ApiBuilder parent() {
 		if( isRoot() ) {
-			throw new RuntimeException(UNSUPPORTED_IN_ROOT_NODE);
+			throw new UnsupportedOperationException(UNSUPPORTED_IN_ROOT_NODE);
 		}
 		return parent;
 	}
@@ -99,7 +106,7 @@ public class ApiBuilder {
 	/// @return  version string (not inlcluding the v prefix)
 	public String version() {
 		if( verRoot == null ) {
-			throw new RuntimeException(UNSUPPORTED_IN_ROOT_NODE);
+			throw new UnsupportedOperationException(UNSUPPORTED_IN_ROOT_NODE);
 		}
 		return verRoot.version();
 	}
@@ -131,7 +138,7 @@ public class ApiBuilder {
 			}
 			return ret;
 		} else {
-			throw new RuntimeException(SUPPORTED_ONLY_IN_ROOT_NODE);
+			throw new UnsupportedOperationException(SUPPORTED_ONLY_IN_ROOT_NODE);
 		}
 	}
 	
@@ -142,7 +149,7 @@ public class ApiBuilder {
 	/// @return  The path aligned node
 	public ApiBuilder path(String path) {
 		if( isRoot() ) {
-			throw new RuntimeException(UNSUPPORTED_IN_ROOT_NODE);
+			throw new UnsupportedOperationException(UNSUPPORTED_IN_ROOT_NODE);
 		}
 		return multiplePathSteps(pathArray(path));
 	}
@@ -164,7 +171,7 @@ public class ApiBuilder {
 		for(String step : steps) {
 			ret = this.singlePathStep(step);
 		}
-		return this;
+		return ret;
 	}
 	
 	/// Does a single step to fetch the target ApiBuilder
@@ -175,6 +182,11 @@ public class ApiBuilder {
 	protected ApiBuilder singlePathStep(String pathStep) {
 		// Minor santization step
 		pathStep = pathStep.trim();
+		
+		// Blank path step returns self
+		if( pathStep.isEmpty() ) {
+			return this;
+		}
 		
 		// Map pathing to fetch from
 		Map<String,ApiBuilder> pathMap = fixedPath;
@@ -236,8 +248,78 @@ public class ApiBuilder {
 	
 	//////////////////////////////////////////////////////////////////
 	//
-	// Function setup
+	// Lamda Function setup - core
 	//
 	//////////////////////////////////////////////////////////////////
+	
+	/// Does the setup with both the define lambda and function lambda,
+	/// All other setup functions, is simply a variation / extension.
+	///
+	/// Note the following 
+	/// + NULL values are ignored. 
+	/// + No exception is thrown if both is NULL
+	/// + Exception is thrown if existing value exists
+	/// + Exception is thrown for root and version nodes
+	///
+	/// @param  Definition lamda to use
+	/// @param  Function lamda to use
+	///
+	/// @return  Itself
+	public ApiBuilder setup(
+		Consumer<ApiDefinition> defineLamda,
+		BiFunction<ApiRequest, ApiResponse, ApiResponse> functionLamda 
+	) {
+		throw new UnsupportedOperationException(UNSUPPORTED_IN_ROOT_NODE);
+	}
+	
+	//////////////////////////////////////////////////////////////////
+	//
+	// Lamda Function setup - alias helpers
+	//
+	//////////////////////////////////////////////////////////////////
+	
+	/// Does the setup of the lamda 
+	///
+	/// @param  Definition lamda to use
+	///
+	/// @return  Itself
+	public ApiBuilder setup(
+		Consumer<ApiDefinition> defineLamda
+	) {
+		return this.setup(defineLamda, null);
+	}
+	
+	/// Does the setup of the lamda 
+	///
+	/// @param  Function lamda to use
+	///
+	/// @return  Itself
+	public ApiBuilder setup(
+		BiFunction<ApiRequest, ApiResponse, ApiResponse> functionLamda
+	) {
+		return this.setup(null, functionLamda);
+	}
+	
+	/// Does the setup with path, define, and lamda.
+	/// 
+	/// Returns its calling ApiBuilder, NOT the derived path ApiBuilder.
+	/// This is used to chain setup API in class set / templates
+	///
+	/// @param  Path to setup at
+	/// @param  Definition lamda to use
+	/// @param  Function lamda to use
+	///
+	/// @return  Itself
+	public ApiBuilder setup(
+		String inPath,
+		Consumer<ApiDefinition> defineLamda,
+		BiFunction<ApiRequest, ApiResponse, ApiResponse> functionLamda 
+	) {
+		// Setup call
+		this.path(inPath).setup(defineLamda, functionLamda);
+		
+		// Return of self
+		return this;
+	}
 	
 }

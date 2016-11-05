@@ -144,8 +144,7 @@ public class ApiBuilder {
 		if( isRoot() ) {
 			throw new RuntimeException(UNSUPPORTED_IN_ROOT_NODE);
 		}
-		
-		return singlePathStep(path);
+		return multiplePathSteps(pathArray(path));
 	}
 	
 	//////////////////////////////////////////////////////////////////
@@ -155,11 +154,24 @@ public class ApiBuilder {
 	//
 	//////////////////////////////////////////////////////////////////
 	
-	/// Does a single step to fetch
+	/// Does an array of single steps to fetch the relevent ApiBuilder
+	///
+	/// @param   The path string array
+	///
+	/// @return  The path aligned ApiBuilder
+	protected ApiBuilder multiplePathSteps(String[] steps) {
+		ApiBuilder ret = this;
+		for(String step : steps) {
+			ret = this.singlePathStep(step);
+		}
+		return this;
+	}
+	
+	/// Does a single step to fetch the target ApiBuilder
 	///
 	/// @param  The path string
 	///
-	/// @return  The path aligned node
+	/// @return  The path aligned ApiBuilder
 	protected ApiBuilder singlePathStep(String pathStep) {
 		// Minor santization step
 		pathStep = pathStep.trim();
@@ -221,5 +233,11 @@ public class ApiBuilder {
 	protected String[] pathArray(String inPath) {
 		return pathFilter(inPath).split("/");
 	}
+	
+	//////////////////////////////////////////////////////////////////
+	//
+	// Function setup
+	//
+	//////////////////////////////////////////////////////////////////
 	
 }

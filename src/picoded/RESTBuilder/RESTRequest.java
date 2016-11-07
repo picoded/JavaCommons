@@ -30,7 +30,8 @@ import org.apache.commons.collections4.map.AbstractMapDecorator;
 ///
 /// It represents the request object, and include utility functions 
 ///
-public class RESTRequest extends AbstractMapDecorator<String, Object> implements GenericConvertMap<String, Object> {
+public class RESTRequest extends AbstractMapDecorator<String, Object> implements
+	GenericConvertMap<String, Object> {
 	
 	//--------------------------------------------------------------------------------
 	// Protected vars
@@ -99,8 +100,8 @@ public class RESTRequest extends AbstractMapDecorator<String, Object> implements
 		if (registeredNamespace[registeredNamespace.length - 1].equals("*")
 			&& rawRequestNamespace.length > (registeredNamespace.length - 1)) {
 			
-			wildCardNamespace = Arrays.copyOfRange(rawRequestNamespace, registeredNamespace.length - 1,
-				rawRequestNamespace.length);
+			wildCardNamespace = Arrays.copyOfRange(rawRequestNamespace,
+				registeredNamespace.length - 1, rawRequestNamespace.length);
 		}
 		return wildCardNamespace;
 	}

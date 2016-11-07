@@ -71,7 +71,7 @@ public class ApiBuilder {
 	
 	/// @return boolean true if this is the root node
 	public boolean isRoot() {
-		return ( absRoot == this );
+		return (absRoot == this);
 	}
 	
 	/// Getting the absolute root, of the API
@@ -85,7 +85,7 @@ public class ApiBuilder {
 	/// 
 	/// @return  Version root API node.
 	public ApiBuilder versionRoot() {
-		if( isRoot() ) {
+		if (isRoot()) {
 			throw new UnsupportedOperationException(UNSUPPORTED_IN_ROOT_NODE);
 		}
 		return verRoot;
@@ -95,7 +95,7 @@ public class ApiBuilder {
 	///
 	/// @return  Parent node
 	public ApiBuilder parent() {
-		if( isRoot() ) {
+		if (isRoot()) {
 			throw new UnsupportedOperationException(UNSUPPORTED_IN_ROOT_NODE);
 		}
 		return parent;
@@ -105,7 +105,7 @@ public class ApiBuilder {
 	///
 	/// @return  version string (not inlcluding the v prefix)
 	public String version() {
-		if( verRoot == null ) {
+		if (verRoot == null) {
 			throw new UnsupportedOperationException(UNSUPPORTED_IN_ROOT_NODE);
 		}
 		return verRoot.version();
@@ -118,10 +118,10 @@ public class ApiBuilder {
 	//////////////////////////////////////////////////////////////////
 	
 	/// Fixed URI api path step map
-	protected Map<String,ApiBuilder> fixedPath = new HashMap<String,ApiBuilder>();
+	protected Map<String, ApiBuilder> fixedPath = new HashMap<String, ApiBuilder>();
 	
 	/// Dynamic named URI api path step map
-	protected Map<String,ApiBuilder> dynamicPath = new HashMap<String,ApiBuilder>();
+	protected Map<String, ApiBuilder> dynamicPath = new HashMap<String, ApiBuilder>();
 	
 	/// Getting the version node, to start building the API =)
 	///
@@ -129,10 +129,10 @@ public class ApiBuilder {
 	///
 	/// @return  version specific ApiBuilder node
 	public ApiBuilder version(String reqVer) {
-		if( isRoot() ) {
-			String fixedKey = "v"+reqVer;
+		if (isRoot()) {
+			String fixedKey = "v" + reqVer;
 			ApiBuilder ret = fixedPath.get(fixedKey);
-			if( ret == null ) {
+			if (ret == null) {
 				ret = new ApiBuilderVersion(this, reqVer);
 				fixedPath.put(fixedKey, ret);
 			}
@@ -148,7 +148,7 @@ public class ApiBuilder {
 	///
 	/// @return  The path aligned node
 	public ApiBuilder path(String path) {
-		if( isRoot() ) {
+		if (isRoot()) {
 			throw new UnsupportedOperationException(UNSUPPORTED_IN_ROOT_NODE);
 		}
 		return multiplePathSteps(pathArray(path));
@@ -168,7 +168,7 @@ public class ApiBuilder {
 	/// @return  The path aligned ApiBuilder
 	protected ApiBuilder multiplePathSteps(String[] steps) {
 		ApiBuilder ret = this;
-		for(String step : steps) {
+		for (String step : steps) {
 			ret = this.singlePathStep(step);
 		}
 		return ret;
@@ -184,21 +184,21 @@ public class ApiBuilder {
 		pathStep = pathStep.trim();
 		
 		// Blank path step returns self
-		if( pathStep.isEmpty() ) {
+		if (pathStep.isEmpty()) {
 			return this;
 		}
 		
 		// Map pathing to fetch from
-		Map<String,ApiBuilder> pathMap = fixedPath;
+		Map<String, ApiBuilder> pathMap = fixedPath;
 		
 		// Use the dynamic path, INSTEAD of fixed path
-		if( pathStep.startsWith("{") && pathStep.endsWith("}") ) {
+		if (pathStep.startsWith("{") && pathStep.endsWith("}")) {
 			pathMap = dynamicPath;
 		}
 		
 		// ApiBuilder path and fetching
 		ApiBuilder ret = pathMap.get(pathStep);
-		if( ret == null ) {
+		if (ret == null) {
 			ret = new ApiBuilderNode(this, pathStep);
 			pathMap.put(pathStep, ret);
 		}
@@ -221,15 +221,15 @@ public class ApiBuilder {
 		inPath = inPath.split("\\?")[0].replaceAll("\\.", "/");
 		
 		// Sanitized repeated "//"
-		while( inPath.indexOf("//") >= 0 ) {
+		while (inPath.indexOf("//") >= 0) {
 			inPath = inPath.replaceAll("//", "/");
 		}
 		
 		// Sanitize ending and starting "/"
-		while( inPath.startsWith("/") ) {
+		while (inPath.startsWith("/")) {
 			inPath = inPath.substring(1);
 		}
-		while( inPath.endsWith("/") ) {
+		while (inPath.endsWith("/")) {
 			inPath = inPath.substring(0, inPath.length() - 1);
 		}
 		
@@ -265,10 +265,8 @@ public class ApiBuilder {
 	/// @param  Function lamda to use
 	///
 	/// @return  Itself
-	public ApiBuilder setup(
-		Consumer<ApiDefinition> defineLamda,
-		BiFunction<ApiRequest, ApiResponse, ApiResponse> functionLamda 
-	) {
+	public ApiBuilder setup(Consumer<ApiDefinition> defineLamda,
+		BiFunction<ApiRequest, ApiResponse, ApiResponse> functionLamda) {
 		throw new UnsupportedOperationException(UNSUPPORTED_IN_ROOT_NODE);
 	}
 	
@@ -283,9 +281,7 @@ public class ApiBuilder {
 	/// @param  Definition lamda to use
 	///
 	/// @return  Itself
-	public ApiBuilder setup(
-		Consumer<ApiDefinition> defineLamda
-	) {
+	public ApiBuilder setup(Consumer<ApiDefinition> defineLamda) {
 		return this.setup(defineLamda, null);
 	}
 	
@@ -294,9 +290,7 @@ public class ApiBuilder {
 	/// @param  Function lamda to use
 	///
 	/// @return  Itself
-	public ApiBuilder setup(
-		BiFunction<ApiRequest, ApiResponse, ApiResponse> functionLamda
-	) {
+	public ApiBuilder setup(BiFunction<ApiRequest, ApiResponse, ApiResponse> functionLamda) {
 		return this.setup(null, functionLamda);
 	}
 	
@@ -310,11 +304,8 @@ public class ApiBuilder {
 	/// @param  Function lamda to use
 	///
 	/// @return  Itself
-	public ApiBuilder setup(
-		String inPath,
-		Consumer<ApiDefinition> defineLamda,
-		BiFunction<ApiRequest, ApiResponse, ApiResponse> functionLamda 
-	) {
+	public ApiBuilder setup(String inPath, Consumer<ApiDefinition> defineLamda,
+		BiFunction<ApiRequest, ApiResponse, ApiResponse> functionLamda) {
 		// Setup call
 		this.path(inPath).setup(defineLamda, functionLamda);
 		

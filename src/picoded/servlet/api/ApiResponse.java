@@ -9,6 +9,6 @@ import picoded.struct.*;
 /// API Request map information
 /// For the API function to process
 ///
-public class ApiResponse extends GenericConvertHashMap<String,Object> {
+public class ApiResponse extends GenericConvertHashMap<String, Object> {
 	
 }

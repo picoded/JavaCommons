@@ -35,9 +35,10 @@ public class ApiBuilder_test {
 		
 		assertNotEquals(root.version("0"), root.version("1"));
 	}
-	@Test(expected=UnsupportedOperationException.class)
+	
+	@Test(expected = UnsupportedOperationException.class)
 	public void rootSetupException() {
-		root.setup(null,null);
+		root.setup(null, null);
 	}
 	
 	@Test
@@ -50,18 +51,17 @@ public class ApiBuilder_test {
 		assertNotEquals(v, p);
 		
 		assertNotNull(p.setup(
-			// Definition function
+		// Definition function
 			(def) -> {
 				
 			},
 			// implmentation function
-			(req,res) -> {
+			(req, res) -> {
 				res.put("is", "round");
 				return res;
-			}
-		));
+			}));
 		
-		Map<String,Object> res = null;
+		Map<String, Object> res = null;
 		assertNotNull(res = p.execute());
 		assertEquals("round", res.get("is"));
 	}

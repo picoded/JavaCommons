@@ -61,7 +61,7 @@ public class CorePage_test {
 	public void constructor() {
 		assertNotNull(corePage);
 	}
-	 
+	
 	@Test
 	public void getHttpServletRequestTest() {
 		assertNull(corePage.getHttpServletRequest());

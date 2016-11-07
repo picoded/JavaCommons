@@ -47,12 +47,12 @@ public class ApiDefinition {
 	/// calls the lamda definition for setup if present
 	protected void completeSetup() {
 		// Skip if previously completed
-		if(completeSetupFlag) {
+		if (completeSetupFlag) {
 			return;
 		}
 		
 		// Execute lamda if it is given
-		if(defineLamda != null) {
+		if (defineLamda != null) {
 			defineLamda.accept(this);
 		}
 		
@@ -63,19 +63,19 @@ public class ApiDefinition {
 	/// @param  Setup the function lamda
 	protected void setup(Consumer<ApiDefinition> inDefine) {
 		// Ignore null calls
-		if(inDefine == null) {
+		if (inDefine == null) {
 			return;
 		}
 		
 		// Potential conflict, to check / resolve
-		if(defineLamda != inDefine) {
+		if (defineLamda != inDefine) {
 			// Existing setup already registered
-			if(defineLamda != null) {
-				throw new IllegalArgumentException( ApiBuilder.DEFINE_SETUP_CONFLICT );
+			if (defineLamda != null) {
+				throw new IllegalArgumentException(ApiBuilder.DEFINE_SETUP_CONFLICT);
 			}
 			// null setup was previously called
-			if(completeSetupFlag) {
-				throw new IllegalArgumentException( ApiBuilder.DEFINE_SETUP_CALLED );
+			if (completeSetupFlag) {
+				throw new IllegalArgumentException(ApiBuilder.DEFINE_SETUP_CALLED);
 			}
 		}
 		
@@ -86,15 +86,15 @@ public class ApiDefinition {
 	/// @param  Setup the definition lamda
 	protected void setup(BiFunction<ApiRequest, ApiResponse, ApiResponse> inFunction) {
 		// Ignore null calls
-		if(inFunction == null) {
+		if (inFunction == null) {
 			return;
 		}
 		
 		// Potential conflict, to check / resolve
-		if(functionLamda != inFunction) {
+		if (functionLamda != inFunction) {
 			// Existing setup already registered
-			if(functionLamda != null) {
-				throw new IllegalArgumentException( ApiBuilder.FUNCTION_SETUP_CONFLICT );
+			if (functionLamda != null) {
+				throw new IllegalArgumentException(ApiBuilder.FUNCTION_SETUP_CONFLICT);
 			}
 		}
 		
@@ -112,6 +112,7 @@ public class ApiDefinition {
 	/// The default supported is both GET & POST
 	///
 	/// @TODO implmentation support
-	protected EnumSet<HttpRequestType> supportedHttpRequests = EnumSet.of(HttpRequestType.GET, HttpRequestType.POST);
+	protected EnumSet<HttpRequestType> supportedHttpRequests = EnumSet.of(HttpRequestType.GET,
+		HttpRequestType.POST);
 	
 }

@@ -53,10 +53,8 @@ class ApiBuilderNode extends ApiBuilder {
 	///
 	/// @return  Itself
 	@Override
-	public ApiBuilder setup(
-		Consumer<ApiDefinition> defineLamda,
-		BiFunction<ApiRequest, ApiResponse, ApiResponse> functionLamda 
-	) {
+	public ApiBuilder setup(Consumer<ApiDefinition> defineLamda,
+		BiFunction<ApiRequest, ApiResponse, ApiResponse> functionLamda) {
 		ApiDefinition d = definition();
 		d.setup(defineLamda);
 		d.setup(functionLamda);
@@ -75,7 +73,7 @@ class ApiBuilderNode extends ApiBuilder {
 	
 	/// Definition fetch, setup if needed
 	protected ApiDefinition definition() {
-		if( definition == null ) {
+		if (definition == null) {
 			definition = new ApiDefinition(this);
 		}
 		return definition;

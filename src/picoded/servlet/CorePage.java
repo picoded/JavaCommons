@@ -543,20 +543,20 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	/// which basically resolves this issue. Unless its in relative path mode. Required for app exports.
 	///
 	protected boolean enforceProperRequestPathEnding() throws IOException {
-		if( httpRequest != null ) {
+		if (httpRequest != null) {
 			String fullURI = httpRequest.getRequestURI();
 			
 			// This does not validate blank / root requests
 			//
 			// Should we? : To fix if this is required (as of now no)
-			if(fullURI == null || fullURI.equalsIgnoreCase("/")) {
+			if (fullURI == null || fullURI.equalsIgnoreCase("/")) {
 				return true;
 			}
 			
 			//
 			// Already ends with a "/" ? : If so its considered valid
 			//
-			if(fullURI.endsWith("/")) {
+			if (fullURI.endsWith("/")) {
 				return true;
 			}
 			
@@ -564,7 +564,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 			// Checks if its a file request. Ends check if it is
 			//
 			String name = FilenameUtils.getName(fullURI);
-			if( FilenameUtils.getExtension(name).length() > 0 ) {
+			if (FilenameUtils.getExtension(name).length() > 0) {
 				// There is a file extension. so we shall assume it is a file
 				return true; // And end it
 			}
@@ -573,23 +573,23 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 			// Get the query string to append (if needed)
 			//
 			String queryString = httpRequest.getQueryString();
-			if(queryString == null) {
+			if (queryString == null) {
 				queryString = "";
-			} else if(!queryString.startsWith("?")){
-				queryString = "?"+queryString;
+			} else if (!queryString.startsWith("?")) {
+				queryString = "?" + queryString;
 			}
 			
 			//	
 			// Enforce proper URL handling
 			//
-			httpResponse.sendRedirect( fullURI+"/"+queryString );
+			httpResponse.sendRedirect(fullURI + "/" + queryString);
 			return false;
 		}
 		
 		// Validation is valid.
 		return true;
 	}
-
+	
 	/// Triggers the process chain with the current setup, and indicates failure / success
 	public boolean processChain() throws ServletException {
 		try {
@@ -629,7 +629,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	private boolean processChainRequest() throws Exception {
 		try {
 			// PathEnding enforcement
-			if( !enforceProperRequestPathEnding() ) {
+			if (!enforceProperRequestPathEnding()) {
 				return false;
 			}
 			

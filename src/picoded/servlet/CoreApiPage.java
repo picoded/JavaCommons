@@ -76,8 +76,8 @@ public class CoreApiPage extends CorePage {
 	
 	/// Does the actual final json object to json string output, with contentType "application/javascript"
 	@Override
-	public boolean outputJSON(Map<String, Object> outputData, Map<String, Object> templateData, PrintWriter output)
-		throws Exception {
+	public boolean outputJSON(Map<String, Object> outputData, Map<String, Object> templateData,
+		PrintWriter output) throws Exception {
 		// Gets the wildcard URI
 		String[] wildcardUri = requestWildcardUriArray();
 		

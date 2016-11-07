@@ -15,8 +15,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,18 +37,24 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.LifecycleException;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
 import picoded.conv.ConvertJSON;
 import picoded.enums.EmptyArray;
 import picoded.enums.HttpRequestType;
+import picoded.servlet.utils.EmbeddedServlet;
 
 public class CorePage_test {
 	
 	private CorePage corePage;
 	private CorePage corePageMock; // = mock(CorePage.class);
+	private static EmbeddedServlet tomcat = null;
 	
 	@Before
 	public void setUp() {
@@ -502,8 +512,11 @@ public class CorePage_test {
 	
 	@Test
 	public void getContextURITest() {
-		corePage._contextURI = "/";
-		assertEquals("/", corePage.getContextURI());
+		if (SystemUtils.IS_OS_WINDOWS) {
+			assertEquals("/", corePage.getContextURI());
+		} else {
+			assertEquals("../", corePage.getContextURI());
+		}
 	}
 	
 	@Test
@@ -931,7 +944,11 @@ public class CorePage_test {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		corePage.httpRequest = request;
 		when(request.getPathInfo()).thenReturn("/home");
-		assertEquals("/home", corePage.requestWildcardUri());
+		if (SystemUtils.IS_OS_WINDOWS) {
+			assertEquals("\\home", corePage.requestWildcardUri());
+		} else {
+			assertEquals("/home", corePage.requestWildcardUri());
+		}
 	}
 	
 	@Test
@@ -971,6 +988,15 @@ public class CorePage_test {
 		when(request.getPathInfo()).thenReturn("\\");
 		corePage.httpRequest = request;
 		assertArrayEquals(new String[] { "" }, corePage.requestWildcardUriArray());
+	}
+	
+	@Test
+	public void requestWildcardUriArrayNotEmptyAlternateTomcatTest() throws IOException,
+		LifecycleException {
+		initTomcat();
+		Map<String, String[]> paramsMap = new HashMap<String, String[]>();
+		String response = invokeServlet(paramsMap);
+		assertEquals("/app", response);
 	}
 	
 	@Test
@@ -1021,4 +1047,37 @@ public class CorePage_test {
 		Map<String, Cookie[]> reqCookieMap = new HashMap<String, Cookie[]>();
 		assertNotNull(corePage.setupInstance(HttpRequestType.GET, reqParam, reqCookieMap));
 	}
+	
+	private void initTomcat() throws LifecycleException {
+		File context = new File("./test-files/test-specific/embeddedTomcat");
+		tomcat = new EmbeddedServlet("/app", context).withPort(8050).withServlet("/corePage",
+			"corePageServlet", new CorePageExtended()); // {
+		tomcat.start();
+		//tomcat.awaitServer();
+	}
+	
+	@AfterClass
+	public static void serverTearDown() throws LifecycleException {
+		if (tomcat != null) {
+			tomcat.stop();
+		}
+		tomcat = null;
+	}
+	
+	private String invokeServlet(Map<String, String[]> parametersMap) throws IOException {
+		URL url = new URL("http://127.0.0.1:" + tomcat.getPort() + "/app/corePage");
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+		connection.setRequestProperty("Content-Type", "application/octet-stream");
+		connection.setRequestMethod("GET");
+		connection.setDoOutput(true);
+		connection.setDoInput(true);
+		ObjectOutputStream oos = new ObjectOutputStream(connection.getOutputStream());
+		oos.writeObject(parametersMap);
+		oos.flush();
+		oos.close();
+		InputStreamReader in = new InputStreamReader(connection.getInputStream());
+		String result = IOUtils.toString(in);
+		return result;
+	}
+	
 }

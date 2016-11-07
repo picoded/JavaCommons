@@ -26,6 +26,7 @@ import picoded.file.FileUtil;
 import picoded.set.HttpRequestType;
 import picoded.set.EmptyArray;
 import picoded.struct.HashMapList;
+import picoded.servlet.util.FileServlet;
 
 // Sub modules useds
 
@@ -408,6 +409,8 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	protected String _contextPath = null;
 	
 	/// Gets and returns the context path / application folder path in absolute terms if possible
+	///
+	/// This represents the FILE path in the native file system
 	public String getContextPath() {
 		if (_contextPath != null) {
 			return _contextPath;
@@ -434,6 +437,8 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	protected String _contextURI = null;
 	
 	/// Returns the servlet contextual path : needed for base URI for page redirects / etc
+	///
+	/// This represents the URL path used in HTTP
 	public String getContextURI() {
 		if (_contextURI != null) {
 			return _contextURI;
@@ -494,9 +499,20 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	///////////////////////////////////////////////////////
 	//
-	// Process Chain execution
+	// Native FileServlet and path handling
 	//
 	///////////////////////////////////////////////////////
+	
+	/// Cached FileServlet
+	protected FileServlet _outputFileServlet = null;
+	
+	/// Returns the File servlet
+	public FileServlet outputFileServlet() {
+		if (_outputFileServlet != null) {
+			return _outputFileServlet;
+		}
+		return (_outputFileServlet = new FileServlet(getContextPath()));
+	}
 	
 	///
 	/// Checks and forces a redirection for closing slash on index page requests.
@@ -589,6 +605,12 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 		// Validation is valid.
 		return true;
 	}
+	
+	///////////////////////////////////////////////////////
+	//
+	// Process Chain execution
+	//
+	///////////////////////////////////////////////////////
 	
 	/// Triggers the process chain with the current setup, and indicates failure / success
 	public boolean processChain() throws ServletException {
@@ -804,10 +826,14 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	/// Does the output processing, this is after do(Post/Get/Put/Delete)Request
 	public boolean outputRequest(Map<String, Object> templateData, PrintWriter output)
 		throws Exception {
-		
-		/// Println msg to force outputRequest ot be redefined.
-		output.println("<h1>Output Request is undefined</h1>");
-		
+		/// Does standard file output - if file exists
+		outputFileServlet().processRequest( //
+				page.getHttpServletRequest(), //
+				page.getHttpServletResponse(), //
+				page.requestType() == HttpRequestType.HEAD, //
+				requestWildcardUri());
+				
+		/// Completes and return
 		return true;
 	}
 	

@@ -804,6 +804,10 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	/// Does the output processing, this is after do(Post/Get/Put/Delete)Request
 	public boolean outputRequest(Map<String, Object> templateData, PrintWriter output)
 		throws Exception {
+		
+		/// Println msg to force outputRequest ot be redefined.
+		output.println("<h1>Output Request is undefined</h1>");
+		
 		return true;
 	}
 	

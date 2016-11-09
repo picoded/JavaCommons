@@ -1,40 +1,18 @@
 package picoded.JStruct;
 
 /// Java imports
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.*;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-/// Picoded imports
-import picoded.conv.GUID;
-import picoded.conv.GenericConvert;
 import picoded.conv.ConvertJSON;
-import picoded.JSql.*;
-import picoded.JCache.*;
-import picoded.JStruct.*;
-import picoded.JStruct.internal.*;
-import picoded.struct.CaseInsensitiveHashMap;
-import picoded.struct.UnsupportedDefaultMap;
-import picoded.struct.GenericConvertMap;
 import picoded.security.NxtCrypt;
-
+import picoded.struct.UnsupportedDefaultMap;
+/// Picoded imports
 /// hazelcast
-import com.hazelcast.core.*;
-import com.hazelcast.config.*;
-import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.HazelcastClient;
-import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.HazelcastClient;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
 
 ///
 /// The account class is considered a hybrid class of both the user, group management class.

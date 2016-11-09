@@ -1,23 +1,18 @@
 package picoded.JStruct;
 
 // Target test class
-import picoded.JStruct.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
 // Test Case include
-import org.junit.*;
-import static org.junit.Assert.*;
-
+import org.junit.Before;
+import org.junit.Test;
 // Test depends
-import java.nio.charset.Charset;
-import java.io.UnsupportedEncodingException;
-import java.util.*;
-
-import org.apache.commons.lang3.RandomUtils;
-
-import picoded.conv.*;
-import picoded.struct.*;
-
-import picodedTests.TestConfig;
 
 public class AccountTable_test {
 	

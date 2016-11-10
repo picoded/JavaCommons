@@ -215,30 +215,27 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	
 	/// Gets the account using the object ID array,
 	/// and returns the account object array
-	public AccountObject[] getFromIDArray(String[] _oidList) {
-		AccountObject[] mList = new AccountObject[_oidList.length];
-		for (int a = 0; a < _oidList.length; ++a) {
-			mList[a] = getFromID(_oidList[a]);
+	public AccountObject[] getFromIDArray(String[] oidList) {
+		AccountObject[] mList = new AccountObject[oidList.length];
+		for (int a = 0; a < oidList.length; ++a) {
+			mList[a] = getFromID(oidList[a]);
 		}
 		return mList;
 	}
 	
 	/// Gets the account using the nice name
 	public AccountObject getFromName(Object name) {
-		String _oid = nameToID(name.toString());
-		
-		if (_oid != null) {
-			return getFromID(_oid);
+		if (nameToID(name.toString()) != null) {
+			return getFromID(nameToID(name.toString()));
 		}
-		
 		return null;
 	}
 	
 	/// Generates a new account object
 	public AccountObject newObject() {
-		AccountObject ret = new AccountObject(this, null);
+		//AccountObject ret = new AccountObject(this, null);
 		//ret.saveAll(); //ensures the blank object is now in DB
-		return ret;
+		return new AccountObject(this, null);
 	}
 	
 	/// Generates a new account object with the given nice name

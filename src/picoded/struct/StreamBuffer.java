@@ -193,7 +193,8 @@ public class StreamBuffer implements Closeable {
 	public static boolean correctOffsetAndLengthToWrite(byte[] b, int off, int len) {
 		if (b == null) {
 			throw new NullPointerException();
-		} else if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0)) {
+		} else if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length)
+			|| ((off + len) < 0)) {
 			throw new IndexOutOfBoundsException();
 		} else if (len == 0) {
 			return false;
@@ -437,7 +438,8 @@ public class StreamBuffer implements Closeable {
 					// this element can be copied fully to the destination
 					if (missingBytes >= maximumBytesToCopy) {
 						// copy the complete byte[] to the destination
-						System.arraycopy(first, positionAtCurrentBufferEntry, b, copiedBytes + off, maximumBytesToCopy);
+						System.arraycopy(first, positionAtCurrentBufferEntry, b, copiedBytes + off,
+							maximumBytesToCopy);
 						copiedBytes += maximumBytesToCopy;
 						maximumAvailableBytes -= maximumBytesToCopy;
 						availableBytes -= maximumBytesToCopy;
@@ -448,7 +450,8 @@ public class StreamBuffer implements Closeable {
 						positionAtCurrentBufferEntry = 0;
 					} else {
 						// copy only a part of byte[] to the destination
-						System.arraycopy(first, positionAtCurrentBufferEntry, b, copiedBytes + off, missingBytes);
+						System.arraycopy(first, positionAtCurrentBufferEntry, b, copiedBytes + off,
+							missingBytes);
 						// add the offset
 						positionAtCurrentBufferEntry += missingBytes;
 						copiedBytes += missingBytes;

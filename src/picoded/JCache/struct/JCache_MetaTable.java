@@ -101,7 +101,8 @@ public class JCache_MetaTable extends JStruct_MetaTable {
 	
 	/// Updates the actual backend storage of MetaObject 
 	/// either partially (if supported / used), or completely
-	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap, Set<String> keys) {
+	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap,
+		Set<String> keys) {
 		// Ensure all object refence is lost
 		Map<String, Object> storeMap = new HashMap<String, Object>();
 		

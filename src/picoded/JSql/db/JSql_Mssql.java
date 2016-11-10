@@ -33,13 +33,15 @@ public class JSql_Mssql extends JSql {
 		
 		String connectionUrl = "jdbc:jtds:sqlserver://" + (String) connectionProps.get("dbUrl");
 		
-		if (connectionProps.get("dbName") != null && connectionProps.get("dbName").toString().trim().length() > 0) {
-			connectionUrl += ";DatabaseName=" + (String) connectionProps.get("dbName") + ";uselobs=false;"; //disable clobs
+		if (connectionProps.get("dbName") != null
+			&& connectionProps.get("dbName").toString().trim().length() > 0) {
+			connectionUrl += ";DatabaseName=" + (String) connectionProps.get("dbName")
+				+ ";uselobs=false;"; //disable clobs
 		}
 		try {
 			Class.forName("net.sourceforge.jtds.jdbcx.JtdsDataSource"); //connection pooling
-			sqlConn = java.sql.DriverManager.getConnection(connectionUrl, (String) connectionProps.get("dbUser"),
-				(String) connectionProps.get("dbPass"));
+			sqlConn = java.sql.DriverManager.getConnection(connectionUrl,
+				(String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load mssql connection: ", e);
 		}
@@ -57,8 +59,9 @@ public class JSql_Mssql extends JSql {
 	// Internal parser that converts some of the common sql statements to mssql
 	public String genericSqlParser(String inString) {
 		
-		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("`", "\"").replaceAll("'", "\"")
-			.replaceAll("\\s+", " ").replaceAll(" =", "=").replaceAll("= ", "=").trim();
+		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("`", "\"")
+			.replaceAll("'", "\"").replaceAll("\\s+", " ").replaceAll(" =", "=").replaceAll("= ", "=")
+			.trim();
 		
 		String upperCaseStr = fixedQuotes.toUpperCase();
 		String qString = fixedQuotes;
@@ -102,8 +105,9 @@ public class JSql_Mssql extends JSql {
 				if (upperCaseStr.startsWith(ifExists, prefixOffset)) { //IF EXISTS
 					prefixOffset += ifExists.length() + 1;
 					
-					qStringPrefix = "BEGIN TRY IF OBJECT_ID('" + fixedQuotes.substring(prefixOffset).toUpperCase()
-						+ "', 'U')" + " IS NOT NULL DROP TABLE " + fixedQuotes.substring(prefixOffset)
+					qStringPrefix = "BEGIN TRY IF OBJECT_ID('"
+						+ fixedQuotes.substring(prefixOffset).toUpperCase() + "', 'U')"
+						+ " IS NOT NULL DROP TABLE " + fixedQuotes.substring(prefixOffset)
 						+ " END TRY BEGIN CATCH END CATCH";
 				} else {
 					qStringPrefix = "DROP TABLE ";
@@ -117,8 +121,9 @@ public class JSql_Mssql extends JSql {
 				if (upperCaseStr.startsWith(ifExists, prefixOffset)) { //IF EXISTS
 					prefixOffset += ifExists.length() + 1;
 					
-					qStringPrefix = "BEGIN TRY IF OBJECT_ID('" + fixedQuotes.substring(prefixOffset).toUpperCase()
-						+ "', 'V')" + " IS NOT NULL DROP VIEW " + fixedQuotes.substring(prefixOffset)
+					qStringPrefix = "BEGIN TRY IF OBJECT_ID('"
+						+ fixedQuotes.substring(prefixOffset).toUpperCase() + "', 'V')"
+						+ " IS NOT NULL DROP VIEW " + fixedQuotes.substring(prefixOffset)
 						+ " END TRY BEGIN CATCH END CATCH";
 				} else {
 					qStringPrefix = "DROP VIEW ";
@@ -134,8 +139,13 @@ public class JSql_Mssql extends JSql {
 					prefixOffset += ifNotExists.length() + 1;
 					//get the table name from incoming query
 					String tableName = getTableName(fixedQuotes.substring(prefixOffset));
-					qStringPrefix = "BEGIN TRY IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'" + tableName
-						+ "')" + " AND OBJECTPROPERTY(id, N'" + tableName + "')" + " = 1) CREATE TABLE ";
+					qStringPrefix = "BEGIN TRY IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'"
+						+ tableName
+						+ "')"
+						+ " AND OBJECTPROPERTY(id, N'"
+						+ tableName
+						+ "')"
+						+ " = 1) CREATE TABLE ";
 					qStringSuffix = " END TRY BEGIN CATCH END CATCH";
 				} else {
 					qStringPrefix = "CREATE TABLE ";
@@ -172,8 +182,8 @@ public class JSql_Mssql extends JSql {
 						tmpIndx = tmpStr.indexOf(" ON ");
 						
 						if (tmpIndx > 0) {
-							qString = "BEGIN TRY CREATE " + ((indexType != null) ? indexType + " " : "") + "INDEX "
-								+ tmpStr.substring(0, tmpIndx) + " ON "
+							qString = "BEGIN TRY CREATE " + ((indexType != null) ? indexType + " " : "")
+								+ "INDEX " + tmpStr.substring(0, tmpIndx) + " ON "
 								+ _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx + 4))
 								+ " END TRY BEGIN CATCH END CATCH";
 						}
@@ -196,7 +206,8 @@ public class JSql_Mssql extends JSql {
 			if (tmpIndx > 0) {
 				qString = "SELECT " + tmpStr.substring(0, tmpIndx - 7)
 				//.replaceAll("\"", "'")
-					.replaceAll("`", "\"") + " FROM " + _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx - 1));
+					.replaceAll("`", "\"") + " FROM "
+					+ _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx - 1));
 			} else {
 				qString = _fixTableNameInMssqlSubQuery(fixedQuotes);
 			}
@@ -208,8 +219,8 @@ public class JSql_Mssql extends JSql {
 				
 				if (prefixOffset > 0) {
 					qString = qString.substring(0, tmpIndx)
-						+ qString.substring(tmpIndx, prefixOffset).replaceAll("`", "\"").replaceAll("'", "\"")
-						+ qString.substring(prefixOffset);
+						+ qString.substring(tmpIndx, prefixOffset).replaceAll("`", "\"")
+							.replaceAll("'", "\"") + qString.substring(prefixOffset);
 				} else {
 					break;
 				}
@@ -405,8 +416,10 @@ public class JSql_Mssql extends JSql {
 		}
 		
 		/// Checks that unique collumn and values length to be aligned
-		if (uniqueColumns == null || uniqueValues == null || uniqueColumns.length != uniqueValues.length) {
-			throw new JSqlException("Upsert query requires unique column and values to be equal length");
+		if (uniqueColumns == null || uniqueValues == null
+			|| uniqueColumns.length != uniqueValues.length) {
+			throw new JSqlException(
+				"Upsert query requires unique column and values to be equal length");
 		}
 		
 		/// Preparing inner default select, this will be used repeatingly for COALESCE, DEFAULT and MISC values
@@ -432,7 +445,8 @@ public class JSql_Mssql extends JSql {
 		String statementTerminator = ";";
 		
 		/// Building the query for INSERT OR REPLACE
-		StringBuilder queryBuilder = new StringBuilder("MERGE INTO `" + tableName + "` AS " + targetTableAlias);
+		StringBuilder queryBuilder = new StringBuilder("MERGE INTO `" + tableName + "` AS "
+			+ targetTableAlias);
 		
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		ArrayList<Object> insertQueryArgs = new ArrayList<Object>();
@@ -477,7 +491,8 @@ public class JSql_Mssql extends JSql {
 				updateColumnNames.append("?");
 				updateColumnNames.append(columnSeperator);
 				
-				updateQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				updateQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]
+					: null);
 				
 				// select dual
 				selectColumnNames.append("?");
@@ -485,7 +500,8 @@ public class JSql_Mssql extends JSql {
 				selectColumnNames.append(insertColumns[a]);
 				selectColumnNames.append(columnSeperator);
 				
-				selectQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				selectQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]
+					: null);
 				
 				// insert column
 				insertColumnNames.append(insertColumns[a]);
@@ -494,7 +510,8 @@ public class JSql_Mssql extends JSql {
 				insertColumnValues.append("?");
 				insertColumnValues.append(columnSeperator);
 				
-				insertQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				insertQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]
+					: null);
 			}
 		}
 		
@@ -515,7 +532,8 @@ public class JSql_Mssql extends JSql {
 				insertColumnValues.append(", ?)");
 				insertColumnValues.append(columnSeperator);
 				
-				insertQueryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+				insertQueryArgs
+					.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
 				
 				// update column
 				updateColumnNames.append(defaultColumns[a]);
@@ -529,7 +547,8 @@ public class JSql_Mssql extends JSql {
 				
 				updateColumnNames.append(", ?)");
 				updateColumnNames.append(columnSeperator);
-				updateQueryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+				updateQueryArgs
+					.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
 				
 				// select dual
 				// COALESCE((SELECT col3 from t where a=?), ?) as col3
@@ -542,7 +561,8 @@ public class JSql_Mssql extends JSql {
 				selectQueryArgs.addAll(innerSelectArgs);
 				
 				selectColumnNames.append(" AS " + defaultColumns[a] + columnSeperator);
-				selectQueryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+				selectQueryArgs
+					.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
 			}
 		}
 		
@@ -603,7 +623,8 @@ public class JSql_Mssql extends JSql {
 		/// Building the final query
 		
 		queryBuilder.append(" USING (SELECT ");
-		queryBuilder.append(selectColumnNames.substring(0, selectColumnNames.length() - columnSeperator.length()));
+		queryBuilder.append(selectColumnNames.substring(0, selectColumnNames.length()
+			- columnSeperator.length()));
 		queryBuilder.append(")");
 		queryBuilder.append(" AS ");
 		queryBuilder.append(sourceTableAlias);
@@ -612,12 +633,15 @@ public class JSql_Mssql extends JSql {
 		queryBuilder.append(" ) ");
 		queryBuilder.append(" WHEN MATCHED ");
 		queryBuilder.append(" THEN UPDATE SET ");
-		queryBuilder.append(updateColumnNames.substring(0, updateColumnNames.length() - columnSeperator.length()));
+		queryBuilder.append(updateColumnNames.substring(0, updateColumnNames.length()
+			- columnSeperator.length()));
 		queryBuilder.append(" WHEN NOT MATCHED ");
 		queryBuilder.append(" THEN INSERT (");
-		queryBuilder.append(insertColumnNames.substring(0, insertColumnNames.length() - columnSeperator.length()));
+		queryBuilder.append(insertColumnNames.substring(0, insertColumnNames.length()
+			- columnSeperator.length()));
 		queryBuilder.append(") VALUES (");
-		queryBuilder.append(insertColumnValues.substring(0, insertColumnValues.length() - columnSeperator.length()));
+		queryBuilder.append(insertColumnValues.substring(0, insertColumnValues.length()
+			- columnSeperator.length()));
 		queryBuilder.append(")");
 		queryBuilder.append(statementTerminator);
 		
@@ -638,7 +662,8 @@ public class JSql_Mssql extends JSql {
 		String[] insertColumns, // Columns names to update
 		Object[] insertValues // Values to update
 	) throws JSqlException {
-		return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues, null, null, null);
+		return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			null, null, null);
 	}
 	
 }

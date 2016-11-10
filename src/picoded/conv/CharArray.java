@@ -21,7 +21,8 @@ public class CharArray {
 	///
 	/// @return  The found position in the heystack AFTER the needle
 	/// 
-	public static boolean startsWith(String needle, final char[] heystack, int startOffset, int endOffset) {
+	public static boolean startsWith(String needle, final char[] heystack, int startOffset,
+		int endOffset) {
 		// Needle size and length check
 		int needleSize = needle.length();
 		
@@ -93,7 +94,8 @@ public class CharArray {
 	///
 	/// @return  The index of the needle found, else -1
 	/// 
-	public static int startsWith(String[] needleArray, final char[] heystack, int startOffset, int endOffset) {
+	public static int startsWith(String[] needleArray, final char[] heystack, int startOffset,
+		int endOffset) {
 		for (int i = 0; i < needleArray.length; ++i) {
 			if (startsWith(needleArray[i], heystack, startOffset, endOffset)) {
 				return i;
@@ -114,8 +116,8 @@ public class CharArray {
 	///
 	/// @return  The index of the needle found, else -1
 	/// 
-	public static int startsWith(String[][] needleSet, int nestedPos, final char[] heystack, int startOffset,
-		int endOffset) {
+	public static int startsWith(String[][] needleSet, int nestedPos, final char[] heystack,
+		int startOffset, int endOffset) {
 		for (int idx = 0; idx < needleSet.length; ++idx) {
 			String[] needleArray = needleSet[idx];
 			int found = -1;
@@ -144,8 +146,8 @@ public class CharArray {
 	///
 	/// @return  The found position in the heystack AFTER the needle
 	/// 
-	public static int indexOf_skipEscapedCharacters(String[] escapeStrings, String needle, final char[] heystack,
-		int startOffset, int endOffset) {
+	public static int indexOf_skipEscapedCharacters(String[] escapeStrings, String needle,
+		final char[] heystack, int startOffset, int endOffset) {
 		// Iterate till found
 		for (; startOffset < endOffset; ++startOffset) {
 			

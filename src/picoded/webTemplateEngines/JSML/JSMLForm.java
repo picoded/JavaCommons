@@ -36,6 +36,7 @@ import picoded.file.FileUtil;
 import picoded.file.PDFGenerator;
 import picoded.servlet.BasePage;
 import picoded.webTemplateEngines.FormGenerator.FormGenerator;
+
 // Sub modules useds
 
 public class JSMLForm {
@@ -358,7 +359,8 @@ public class JSMLForm {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected Map<String, Object> sanitiseMap(Map<String, Object> inMap, String inKey, boolean pdfMode) {
+	protected Map<String, Object> sanitiseMap(Map<String, Object> inMap, String inKey,
+		boolean pdfMode) {
 		if (inMap == null) {
 			return new HashMap<String, Object>();
 		}
@@ -406,7 +408,8 @@ public class JSMLForm {
 				tempList.add(i, sanitiseList((List<Object>) inList.get(i), keyWithIndex, pdfMode));
 			} else if (inList.get(i) instanceof Map) {
 				tempList.remove(i);
-				tempList.add(i, sanitiseMap((Map<String, Object>) inList.get(i), keyWithIndex, pdfMode));
+				tempList
+					.add(i, sanitiseMap((Map<String, Object>) inList.get(i), keyWithIndex, pdfMode));
 			}
 		}
 		
@@ -427,8 +430,10 @@ public class JSMLForm {
 			String pngFileName = "outSig_" + name + ".png";
 			
 			validateTempFolder();
-			String svgFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/" + svgFileName;
-			String pngFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/" + pngFileName;
+			String svgFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/"
+				+ svgFileName;
+			String pngFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/"
+				+ pngFileName;
 			
 			try {
 				FileOutputStream fos = new FileOutputStream(svgFilePath);
@@ -455,7 +460,8 @@ public class JSMLForm {
 		String tempString = inString;
 		if (tempString.contains(_contextIdentifier)) {
 			tempString = tempString.replace(_contextIdentifier, "file:///" + _formFolderPath + "/");
-			tempString = tempString.replace(_contextIdentifier + "/", "file:///" + _formFolderPath + "/");
+			tempString = tempString.replace(_contextIdentifier + "/", "file:///" + _formFolderPath
+				+ "/");
 		}
 		
 		return tempString;
@@ -510,7 +516,8 @@ public class JSMLForm {
 		return MapValueConv.fromFullyQualifiedKeys(inRequestParams);
 	}
 	
-	public StringBuilder generateHTML(Map<String, Object> data, boolean isDisplayMode) throws IOException {
+	public StringBuilder generateHTML(Map<String, Object> data, boolean isDisplayMode)
+		throws IOException {
 		StringBuilder ret = new StringBuilder();
 		
 		try {
@@ -547,15 +554,19 @@ public class JSMLForm {
 		return generatePDF(page, data, "file:///" + _formFolderPath + "/" + _tempFolderPath);
 	}
 	
-	public byte[] generatePDF(BasePage page, Map<String, Object> data, JMTE _jmteObj) throws IOException {
+	public byte[] generatePDF(BasePage page, Map<String, Object> data, JMTE _jmteObj)
+		throws IOException {
 		return generatePDF(page, data, "file:///" + _formFolderPath + "/" + _tempFolderPath, _jmteObj);
 	}
 	
-	public byte[] generatePDF(BasePage page, Map<String, Object> data, String pdfGeneratorContextFolder) throws IOException {
-		return generatePDF(page, data, pdfGeneratorContextFolder, new JMTE(page.getPageTemplatePath()));
+	public byte[] generatePDF(BasePage page, Map<String, Object> data,
+		String pdfGeneratorContextFolder) throws IOException {
+		return generatePDF(page, data, pdfGeneratorContextFolder,
+			new JMTE(page.getPageTemplatePath()));
 	}
 	
-	public byte[] generatePDF(BasePage page, Map<String, Object> data, String pdfGeneratorContextFolder, JMTE _jmteObj) throws IOException {
+	public byte[] generatePDF(BasePage page, Map<String, Object> data,
+		String pdfGeneratorContextFolder, JMTE _jmteObj) throws IOException {
 		StringBuilder ret = new StringBuilder();
 		
 		data = sanitiseMap(data, "", true);
@@ -567,11 +578,12 @@ public class JSMLForm {
 		}
 		
 		if (ret == null) {
-			throw new RuntimeException("generatePDF() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
+			throw new RuntimeException(
+				"generatePDF() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
 		}
 		
 		//jmte the result
-		HashMap<String,Object> actualData = new HashMap<String,Object>();
+		HashMap<String, Object> actualData = new HashMap<String, Object>();
 		actualData.putAll(data);
 		actualData.put("ContextPath", page.getContextURI());
 		actualData.put("ContextURI", "file:///" + page.getContextPath());
@@ -580,15 +592,16 @@ public class JSMLForm {
 		ret = new StringBuilder(_jmteObj.parseTemplate(ret.toString(), actualData));
 		
 		validateTempFolder();
-		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/generatedPDF.pdf";
+		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID
+			+ "/generatedPDF.pdf";
 		
 		String bodyPrefix = sanatizePrefixForPDF(readBodyPrefix("PrefixPDF"));
 		String bodySuffix = sanatizeSuffixForPDF(readBodySuffix("SuffixPDF"));
 		ret.insert(0, sanitiseStringForPDF(bodyPrefix, ""));
 		ret.append(bodySuffix);
 		
-		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), pdfGeneratorContextFolder + "/" + _generatedGUID
-			+ "/");
+		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), pdfGeneratorContextFolder
+			+ "/" + _generatedGUID + "/");
 		//		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), pdfGeneratorContextFolder +"/" );
 		
 		//read the pdf file now
@@ -607,9 +620,11 @@ public class JSMLForm {
 	// Whoever sees these 2 functions, Im so sorry. I wanted to sleep so badly.
 	// To be cleaned up once embedded images and filepath images can coexist peacefully
 	//
-	public byte[] generatePDF_embeddedImageSupport(BasePage page, Map<String, Object> data) throws IOException {
+	public byte[] generatePDF_embeddedImageSupport(BasePage page, Map<String, Object> data)
+		throws IOException {
 		validateTempFolder();
-		return generatePDF_embeddedImageSupport(page, data, "file:///" + _formFolderPath + "/" + _tempFolderPath);
+		return generatePDF_embeddedImageSupport(page, data, "file:///" + _formFolderPath + "/"
+			+ _tempFolderPath);
 	}
 	
 	public byte[] generatePDF_embeddedImageSupport(BasePage page, Map<String, Object> data,
@@ -625,7 +640,8 @@ public class JSMLForm {
 		}
 		
 		if (ret == null) {
-			throw new RuntimeException("generatePDF() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
+			throw new RuntimeException(
+				"generatePDF() -> pdfResult is empty, there was an error in generatePDFReadyHTML()");
 		}
 		
 		//jmte the result
@@ -641,15 +657,16 @@ public class JSMLForm {
 		ret = new StringBuilder(_jmteObj.parseTemplate(ret.toString()));
 		
 		validateTempFolder();
-		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/generatedPDF.pdf";
+		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID
+			+ "/generatedPDF.pdf";
 		
 		String bodyPrefix = sanatizePrefixForPDF(readBodyPrefix("PrefixPDF"));
 		String bodySuffix = sanatizeSuffixForPDF(readBodySuffix("SuffixPDF"));
 		ret.insert(0, sanitiseStringForPDF(bodyPrefix, ""));
 		ret.append(bodySuffix);
 		
-		PDFGenerator.generatePDFfromRawHTML_embeddedImageSupport(pdfFilePath, ret.toString(), pdfGeneratorContextFolder
-			+ "/" + _generatedGUID + "/");
+		PDFGenerator.generatePDFfromRawHTML_embeddedImageSupport(pdfFilePath, ret.toString(),
+			pdfGeneratorContextFolder + "/" + _generatedGUID + "/");
 		//		PDFGenerator.generatePDFfromRawHTML(pdfFilePath, ret.toString(), pdfGeneratorContextFolder +"/" );
 		
 		//read the pdf file now
@@ -706,9 +723,11 @@ public class JSMLForm {
 		
 		data = sanitiseMap(data, "", true);
 		validateTempFolder();
-		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID + "/generatedPDF.pdf";
+		String pdfFilePath = _formFolderPath + "/" + _tempFolderPath + "/" + _generatedGUID
+			+ "/generatedPDF.pdf";
 		
-		values[0] = "PDFGenerator context folder given is -> " + _formFolderPath + "/tmp/" + _generatedGUID + "/";
+		values[0] = "PDFGenerator context folder given is -> " + _formFolderPath + "/tmp/"
+			+ _generatedGUID + "/";
 		values[1] = "PDFFilePath given to output to is -> " + pdfFilePath;
 		
 		String finalSigA = (String) data.get("finalsig");
@@ -750,8 +769,8 @@ public class JSMLForm {
 		templateVars.put("PagesRootURI", context);
 		templateVars.put("ContextURI", context);
 		
-		return (new JMTE(formSetObj.basePage.getPageTemplatePath())).parseTemplate(generateHTML(null, displayOnly)
-			.toString(), templateVars);
+		return (new JMTE(formSetObj.basePage.getPageTemplatePath())).parseTemplate(
+			generateHTML(null, displayOnly).toString(), templateVars);
 	}
 	
 	/// JMTE fallback support

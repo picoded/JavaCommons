@@ -87,7 +87,8 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		rbObj.getNamespace("server.now").put(HttpRequestType.GET, ServerTime.now);
 		
 		// Preload RESBUilder stack
-		JStackUtils.setupRESTBuilderStruct(rbObj, JStackObj, JConfig().getStringMap("sys.JStack.struct", null));
+		JStackUtils.setupRESTBuilderStruct(rbObj, JStackObj,
+			JConfig().getStringMap("sys.JStack.struct", null));
 	}
 	
 	/////////////////////////////////////////////
@@ -107,7 +108,8 @@ public class BasePage extends JStackPage implements ServletContextListener {
 		AccountTable at = accountAuthTable();
 		
 		// Setup table
-		boolean skipAccountAuthTableSetup = JConfig().getBoolean("sys.JStack.skipAccountAuthTableSetup", false);
+		boolean skipAccountAuthTableSetup = JConfig().getBoolean(
+			"sys.JStack.skipAccountAuthTableSetup", false);
 		if (!skipAccountAuthTableSetup) {
 			at.systemSetup();
 		} else {
@@ -388,20 +390,20 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	/// which basically resolves this issue. Unless its in relative path mode. Required for app exports.
 	///
 	public boolean enforceProperRequestPathEnding() throws IOException {
-		if( httpRequest != null ) {
+		if (httpRequest != null) {
 			String fullURI = httpRequest.getRequestURI();
 			
 			// This does not validate blank / root requests
 			//
 			// Should we? : To fix if this is required (as of now no)
-			if(fullURI == null || fullURI.equalsIgnoreCase("/")) {
+			if (fullURI == null || fullURI.equalsIgnoreCase("/")) {
 				return true;
 			}
 			
 			//
 			// Already ends with a "/" ? : If so its considered valid
 			//
-			if(fullURI.endsWith("/")) {
+			if (fullURI.endsWith("/")) {
 				return true;
 			}
 			
@@ -409,7 +411,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 			// Checks if its a file request. Ends check if it is
 			//
 			String name = FilenameUtils.getName(fullURI);
-			if( FilenameUtils.getExtension(name).length() > 0 ) {
+			if (FilenameUtils.getExtension(name).length() > 0) {
 				// There is a file extension. so we shall assume it is a file
 				return true; // And end it
 			}
@@ -417,7 +419,7 @@ public class BasePage extends JStackPage implements ServletContextListener {
 			//
 			// Check for the "api" keyword
 			//
-			if(fullURI.indexOf("/api/") >= 0 || fullURI.indexOf("/API/") >= 0) {
+			if (fullURI.indexOf("/api/") >= 0 || fullURI.indexOf("/API/") >= 0) {
 				// Found it, assume its valid then
 				return true;
 			}
@@ -426,35 +428,35 @@ public class BasePage extends JStackPage implements ServletContextListener {
 			// Get the query string to append (if needed)
 			//
 			String queryString = httpRequest.getQueryString();
-			if(queryString == null) {
+			if (queryString == null) {
 				queryString = "";
-			} else if(!queryString.startsWith("?")){
-				queryString = "?"+queryString;
+			} else if (!queryString.startsWith("?")) {
+				queryString = "?" + queryString;
 			}
 			
 			//	
 			// Enforce proper URL handling
 			//
-			httpResponse.sendRedirect( fullURI+"/"+queryString );
+			httpResponse.sendRedirect(fullURI + "/" + queryString);
 			return false;
 		}
 		
 		// Validation is valid.
 		return true;
 	}
-
+	
 	/////////////////////////////////////////////
 	//
 	// Do Auth and Do output overrides
 	//
 	/////////////////////////////////////////////
-
+	
 	/// Enforces request path handling
 	@Override
 	public boolean doAuth(Map<String, Object> templateData) throws Exception {
 		return enforceProperRequestPathEnding() && super.doAuth(templateData);
 	}
-
+	
 	/// BasePage initializeContext to be extended / build on
 	@Override
 	public void initializeContext() throws Exception {

@@ -150,7 +150,8 @@ public class CompareUtils {
 	protected static Collator stringCompareCollator = RuleBasedCollator.getInstance(Locale.ENGLISH);
 	
 	/// Number instance for string to numeric
-	protected static NumberFormat stringToNumberParser = NumberFormat.getNumberInstance(Locale.ENGLISH);
+	protected static NumberFormat stringToNumberParser = NumberFormat
+		.getNumberInstance(Locale.ENGLISH);
 	
 	///
 	/// Conversion to numeric format, if possible. Else its null

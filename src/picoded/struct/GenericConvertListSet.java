@@ -176,7 +176,8 @@ public class GenericConvertListSet<V> implements Set<V>, GenericConvertList<V> {
 	}
 	
 	public boolean equals(Object other) {
-		return other instanceof GenericConvertListSet && this.list.equals(((GenericConvertListSet) other).list);
+		return other instanceof GenericConvertListSet
+			&& this.list.equals(((GenericConvertListSet) other).list);
 	}
 	
 	public int hashCode() {

@@ -18,7 +18,8 @@ public class AccountObject extends JStruct_MetaObject {
 	protected AccountTable mainTable = null;
 	
 	/// Constructor full setup
-	protected AccountObject(AccountTable accTable, JStruct_MetaTable inTable, String inOID, boolean isCompleteData) {
+	protected AccountObject(AccountTable accTable, JStruct_MetaTable inTable, String inOID,
+		boolean isCompleteData) {
 		super(inTable, inOID);
 		mainTable = accTable;
 	}
@@ -195,7 +196,8 @@ public class AccountObject extends JStruct_MetaObject {
 			return null;
 		}
 		
-		return mainTable.groupChildMeta.uncheckedGet(mainTable.getGroupChildMetaKey(this._oid(), memberOID));
+		return mainTable.groupChildMeta.uncheckedGet(mainTable.getGroupChildMetaKey(this._oid(),
+			memberOID));
 	}
 	
 	/// Gets and returns the member meta map, if it exists
@@ -260,7 +262,7 @@ public class AccountObject extends JStruct_MetaObject {
 		}
 		
 		String memberOID = memberObject._oid();
-//		String level = group_userToRoleMap().getString(memberOID);
+		//		String level = group_userToRoleMap().getString(memberOID);
 		
 		group_userToRoleMap().remove(memberOID);
 		group_userToRoleMap().saveAll();
@@ -330,7 +332,8 @@ public class AccountObject extends JStruct_MetaObject {
 	public void logLoginFailure(String userID) {
 		mainTable.loginThrottlingAttempt.putWithLifespan(userID, "1", 999999999);
 		int elapsedTime = ((int) (System.currentTimeMillis() / 1000)) + 2;
-		mainTable.loginThrottlingElapsed.putWithLifespan(userID, String.valueOf(elapsedTime), 999999999);
+		mainTable.loginThrottlingElapsed.putWithLifespan(userID, String.valueOf(elapsedTime),
+			999999999);
 	}
 	
 	/// This method returns time left before next permitted login attempt for the user based on User ID
@@ -362,9 +365,11 @@ public class AccountObject extends JStruct_MetaObject {
 			int attemptValue = Integer.parseInt(atteemptValueString);
 			int elapsedValue = (int) (System.currentTimeMillis() / 1000);
 			attemptValue++;
-			mainTable.loginThrottlingAttempt.putWithLifespan(userId, String.valueOf(attemptValue), 999999999);
+			mainTable.loginThrottlingAttempt.putWithLifespan(userId, String.valueOf(attemptValue),
+				999999999);
 			elapsedValue += attemptValue * 2;
-			mainTable.loginThrottlingElapsed.putWithLifespan(userId, String.valueOf(elapsedValue), 999999999);
+			mainTable.loginThrottlingElapsed.putWithLifespan(userId, String.valueOf(elapsedValue),
+				999999999);
 		}
 		
 	}

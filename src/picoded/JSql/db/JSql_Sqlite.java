@@ -33,7 +33,8 @@ public class JSql_Sqlite extends JSql {
 		
 		try {
 			Class.forName("org.sqlite.JDBC");
-			sqlConn = java.sql.DriverManager.getConnection("jdbc:sqlite:" + (String) connectionProps.get("dbUrl"));
+			sqlConn = java.sql.DriverManager.getConnection("jdbc:sqlite:"
+				+ (String) connectionProps.get("dbUrl"));
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load sqlite connection: ", e);
 		}

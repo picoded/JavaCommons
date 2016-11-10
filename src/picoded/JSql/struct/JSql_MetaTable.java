@@ -298,9 +298,11 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	
 	/// Updates the actual backend storage of MetaObject 
 	/// either partially (if supported / used), or completely
-	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap, Set<String> keys) {
+	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap,
+		Set<String> keys) {
 		try {
-			JSql_MetaTableUtils.JSqlObjectMapAppend(typeMap(), sqlObj, sqlTableName, _oid, fullMap, keys, true);
+			JSql_MetaTableUtils.JSqlObjectMapAppend(typeMap(), sqlObj, sqlTableName, _oid, fullMap,
+				keys, true);
 		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
@@ -331,9 +333,10 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The MetaObject[] array
-	public MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit) {
-		return JSql_MetaTableUtils.metaTableQuery(this, sqlObj, sqlTableName, whereClause, whereValues, orderByStr,
-			offset, limit);
+	public MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr,
+		int offset, int limit) {
+		return JSql_MetaTableUtils.metaTableQuery(this, sqlObj, sqlTableName, whereClause,
+			whereValues, orderByStr, offset, limit);
 		//return super.query( whereClause, whereValues, orderByStr, offset, limit );
 	}
 	
@@ -349,9 +352,10 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The String[] array
-	public String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit) {
-		return JSql_MetaTableUtils.metaTableQueryKey(this, sqlObj, sqlTableName, whereClause, whereValues, orderByStr,
-			offset, limit);
+	public String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr,
+		int offset, int limit) {
+		return JSql_MetaTableUtils.metaTableQueryKey(this, sqlObj, sqlTableName, whereClause,
+			whereValues, orderByStr, offset, limit);
 		//return super.query( whereClause, whereValues, orderByStr, offset, limit );
 	}
 	
@@ -362,7 +366,8 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	///
 	/// @returns  The total count for the query
 	public long queryCount(String whereClause, Object[] whereValues) {
-		return JSql_MetaTableUtils.metaTableCount(this, sqlObj, sqlTableName, whereClause, whereValues, null, -1, -1);
+		return JSql_MetaTableUtils.metaTableCount(this, sqlObj, sqlTableName, whereClause,
+			whereValues, null, -1, -1);
 	}
 	
 	/// 

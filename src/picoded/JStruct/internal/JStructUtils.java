@@ -25,8 +25,8 @@ public class JStructUtils {
 	///
 	/// @returns  The MetaObject[] array
 	///
-	public static MetaObject[] sortAndOffsetListToArray(List<MetaObject> retList, String orderByStr, int offset,
-		int limit) {
+	public static MetaObject[] sortAndOffsetListToArray(List<MetaObject> retList, String orderByStr,
+		int offset, int limit) {
 		
 		// Ensure the list is editable
 		if (!(retList instanceof ArrayList)) {

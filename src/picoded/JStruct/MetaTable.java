@@ -174,7 +174,8 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The MetaObject[] array
-	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit) {
+	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr,
+		int offset, int limit) {
 		
 		// The return list
 		List<MetaObject> retList = null;
@@ -201,7 +202,8 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The String[] array
-	public default String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit) {
+	public default String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr,
+		int offset, int limit) {
 		
 		// The return list
 		List<MetaObject> retList = null;
@@ -215,7 +217,8 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 		}
 		
 		// Sort, offset, convert to array, and return
-		MetaObject[] retArr = JStructUtils.sortAndOffsetListToArray(retList, orderByStr, offset, limit);
+		MetaObject[] retArr = JStructUtils.sortAndOffsetListToArray(retList, orderByStr, offset,
+			limit);
 		
 		// Prepare the return object
 		int retLength = retArr.length;
@@ -284,7 +287,8 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The MetaObject[] array
-	public default MetaObject[] getFromKeyName(String keyName, String orderByStr, int offset, int limit) {
+	public default MetaObject[] getFromKeyName(String keyName, String orderByStr, int offset,
+		int limit) {
 		
 		// The return list
 		List<MetaObject> retList = new ArrayList<MetaObject>();

@@ -47,7 +47,8 @@ public class CompileES6 {
 			
 			// To get the complete set of externs, the logic in
 			// CompilerRunner.getDefaultExterns() should be used here.
-			List<SourceFile> externList = CommandLineRunner.getBuiltinExterns(CompilerOptions.Environment.BROWSER);
+			List<SourceFile> externList = CommandLineRunner
+				.getBuiltinExterns(CompilerOptions.Environment.BROWSER);
 			
 			// The dummy input name "input.js" is used here so that any warnings or
 			// errors will cite line numbers in terms of input.js.

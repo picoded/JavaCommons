@@ -57,7 +57,8 @@ public class PDFGenerator {
 	public static boolean generatePDFfromHTMLfile(String pdfFile, String htmlFilePath) {
 		OutputStream outputStream = null;
 		try {
-			pdfFile = pdfFile.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System.getProperty("file.separator")));
+			pdfFile = pdfFile.replaceAll("[/\\\\]+",
+				Matcher.quoteReplacement(System.getProperty("file.separator")));
 			
 			createOutputFolder(pdfFile);
 			
@@ -91,7 +92,8 @@ public class PDFGenerator {
 	}
 	
 	private static void createOutputFolder(String outputFilePath) throws IOException {
-		String outputFolderpath = outputFilePath.substring(0, outputFilePath.lastIndexOf(File.separator));
+		String outputFolderpath = outputFilePath.substring(0,
+			outputFilePath.lastIndexOf(File.separator));
 		File outputFolder = new File(outputFolderpath);
 		
 		if (!outputFolder.exists()) {
@@ -99,10 +101,12 @@ public class PDFGenerator {
 		}
 	}
 	
-	public static boolean generatePDFfromHTMLfile(String pdfFile, String htmlFilePath, String contextRoot) {
+	public static boolean generatePDFfromHTMLfile(String pdfFile, String htmlFilePath,
+		String contextRoot) {
 		OutputStream outputStream = null;
 		try {
-			pdfFile = pdfFile.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System.getProperty("file.separator")));
+			pdfFile = pdfFile.replaceAll("[/\\\\]+",
+				Matcher.quoteReplacement(System.getProperty("file.separator")));
 			
 			createOutputFolder(pdfFile);
 			
@@ -188,7 +192,8 @@ public class PDFGenerator {
 	// /
 	/// @returns true if the HTML raw string is converted and saved in a pdf
 	// file.
-	public static boolean generatePDFfromRawHTML(String outputpdfpath, String rawHtml, String contextRoot) {
+	public static boolean generatePDFfromRawHTML(String outputpdfpath, String rawHtml,
+		String contextRoot) {
 		OutputStream outputStream = null;
 		try {
 			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+",
@@ -224,8 +229,8 @@ public class PDFGenerator {
 		return true;
 	}
 	
-	public static boolean generatePDFfromRawHTML_embeddedImageSupport(String outputpdfpath, String rawHtml,
-		String contextRoot) {
+	public static boolean generatePDFfromRawHTML_embeddedImageSupport(String outputpdfpath,
+		String rawHtml, String contextRoot) {
 		OutputStream outputStream = null;
 		try {
 			outputpdfpath = outputpdfpath.replaceAll("[/\\\\]+",

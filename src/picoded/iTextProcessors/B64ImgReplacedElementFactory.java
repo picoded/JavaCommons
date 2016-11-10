@@ -20,8 +20,8 @@ import java.util.Base64;
 
 public class B64ImgReplacedElementFactory implements ReplacedElementFactory {
 	
-	public ReplacedElement createReplacedElement(LayoutContext c, BlockBox box, UserAgentCallback uac, int cssWidth,
-		int cssHeight) {
+	public ReplacedElement createReplacedElement(LayoutContext c, BlockBox box,
+		UserAgentCallback uac, int cssWidth, int cssHeight) {
 		Element e = box.getElement();
 		if (e == null) {
 			return null;
@@ -48,10 +48,12 @@ public class B64ImgReplacedElementFactory implements ReplacedElementFactory {
 		return null;
 	}
 	
-	protected FSImage buildImage(String srcAttr, UserAgentCallback uac) throws IOException, BadElementException {
+	protected FSImage buildImage(String srcAttr, UserAgentCallback uac) throws IOException,
+		BadElementException {
 		FSImage fsImage;
 		if (srcAttr.startsWith("data:image/")) {
-			String b64encoded = srcAttr.substring(srcAttr.indexOf("base64,") + "base64,".length(), srcAttr.length());
+			String b64encoded = srcAttr.substring(srcAttr.indexOf("base64,") + "base64,".length(),
+				srcAttr.length());
 			// BASE64Decoder decoder = new BASE64Decoder();
 			// byte[] decodedBytes = decoder.decodeBuffer(b64encoded);
 			// byte[] decodedBytes = B64Decoder.decode(b64encoded);

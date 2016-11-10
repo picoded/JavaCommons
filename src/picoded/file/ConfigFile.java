@@ -70,7 +70,8 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 			if (fileName.endsWith(".js") || fileName.endsWith(".json")) {
 				jsonMode = true;
 				String jsString = FileUtils.readFileToString(inFile);
-				jsonMap = GenericConvert.toGenericConvertStringMap(jsString, new HashMap<String, Object>());
+				jsonMap = GenericConvert.toGenericConvertStringMap(jsString,
+					new HashMap<String, Object>());
 			} else {
 				iniMap = new Ini(inFile);
 			}
@@ -92,7 +93,8 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 			// read from ini
 			String[] splitKeyString = keyString.split("\\.");
 			
-			String section = StringUtils.join(ArrayUtils.subarray(splitKeyString, 0, splitKeyString.length - 1), "."); // name
+			String section = StringUtils.join(
+				ArrayUtils.subarray(splitKeyString, 0, splitKeyString.length - 1), "."); // name
 			// [keys] in brackets are considered a section
 			String sectionKey = splitKeyString[splitKeyString.length - 1];
 			

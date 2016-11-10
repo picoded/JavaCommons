@@ -366,11 +366,13 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	}
 	
 	/// Sets the session info with the given nonceSalt, IP, and browserAgent
-	protected String generateSession(String oid, int lifespan, String nonceSalt, String ipString, String browserAgent) {
+	protected String generateSession(String oid, int lifespan, String nonceSalt, String ipString,
+		String browserAgent) {
 		String nonce = NxtCrypt.randomString(nonceSize);
 		String key = oid + "-" + nonce;
 		accountSessions.putWithLifespan(key,
-			ConvertJSON.fromList(Arrays.asList(new String[] { nonceSalt, ipString, browserAgent })), lifespan);
+			ConvertJSON.fromList(Arrays.asList(new String[] { nonceSalt, ipString, browserAgent })),
+			lifespan);
 		return nonce;
 	}
 	
@@ -526,7 +528,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		} else {
 			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "0");
 		}
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Expi", String.valueOf(expireTime));
+		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Expi",
+			String.valueOf(expireTime));
 		
 		/// The cookie "Expi" store the other cookies (Rmbr, user, Nonc etc.) expiry life time in seconds.
 		/// This cookie value is used in JS (checkLogoutTime.js) for validating the login expiry time and show a message to user accordingly.
@@ -534,8 +537,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		for (int a = 0; a < noOfCookies; ++a) {
 			/// Path is required for cross AJAX / domain requests,
 			/// @TODO make this configurable?
-			String cookiePath = (request.getContextPath() == null || request.getContextPath().isEmpty()) ? "/" : request
-				.getContextPath();
+			String cookiePath = (request.getContextPath() == null || request.getContextPath()
+				.isEmpty()) ? "/" : request.getContextPath();
 			cookieJar[a].setPath(cookiePath);
 			
 			if (!rmberMe) { //set to clear on browser close
@@ -562,7 +565,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	
 	/// Login the user if valid
 	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request,
-		javax.servlet.http.HttpServletResponse response, AccountObject accountObj, String rawPassword, boolean rmberMe) {
+		javax.servlet.http.HttpServletResponse response, AccountObject accountObj,
+		String rawPassword, boolean rmberMe) {
 		if (accountObj != null && accountObj.validatePassword(rawPassword)) {
 			_setLogin(accountObj, request, response, rmberMe);
 			return accountObj;
@@ -573,7 +577,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	
 	/// Login the user if valid
 	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request,
-		javax.servlet.http.HttpServletResponse response, String nicename, String rawPassword, boolean rmberMe) {
+		javax.servlet.http.HttpServletResponse response, String nicename, String rawPassword,
+		boolean rmberMe) {
 		return loginAccount(request, response, getFromName(nicename), rawPassword, rmberMe);
 	}
 	
@@ -597,8 +602,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 			
 			/// Path is required for cross AJAX / domain requests,
 			/// @TODO make this configurable?
-			String cookiePath = (request.getContextPath() == null || request.getContextPath().isEmpty()) ? "/" : request
-				.getContextPath();
+			String cookiePath = (request.getContextPath() == null || request.getContextPath()
+				.isEmpty()) ? "/" : request.getContextPath();
 			cookieJar[a].setPath(cookiePath);
 			
 			if (a < 4 && isHttpOnly) {
@@ -621,8 +626,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	///
 	/// Group Membership roles managment
 	///--------------------------------------------------------------------------
-	protected List<String> membershipRoles = new ArrayList<String>(Arrays.asList(new String[] { "guest", "member",
-		"manager", "admin" }));
+	protected List<String> membershipRoles = new ArrayList<String>(Arrays.asList(new String[] {
+		"guest", "member", "manager", "admin" }));
 	
 	/// Returns the internal membership role list
 	public List<String> membershipRoles() {

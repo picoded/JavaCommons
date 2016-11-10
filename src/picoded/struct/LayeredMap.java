@@ -141,7 +141,8 @@ public class LayeredMap<K, V> implements GenericConvertMap<K, V> {
 	// /
 	/// @returns the first non-null value the function returned. else return
 	// null
-	public Object iterateLayersWithReturn(BiFunction<Map<K, V>, Object, Object> func, Object ret, boolean isReverse) {
+	public Object iterateLayersWithReturn(BiFunction<Map<K, V>, Object, Object> func, Object ret,
+		boolean isReverse) {
 		/// Iterate in normal order
 		if (!isReverse) {
 			return iterateLayersWithReturn(func, ret);

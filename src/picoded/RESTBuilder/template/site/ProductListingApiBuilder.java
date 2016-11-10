@@ -31,33 +31,34 @@ import com.google.common.io.BaseEncoding;
 /// Provides a product listings API
 /// All in a single API package.
 ///
-public class ProductListingApiBuilder {
 
+public class ProductListingApiBuilder {
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Class variables
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	public ProductListing core = null;
-
+	
 	public MetaTableApiBuilder listingsApi = null;
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Constructor options
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	/// Empty constructor
 	public ProductListingApiBuilder(ProductListing inCore) {
 		core = inCore;
 	}
-
+	
 	public ProductListingApiBuilder(JStruct inStruct, String prefix) {
 		core = new ProductListing(inStruct, prefix);
 	}
-
+	
 	///
 	/// # listings (GET/POST)
 	///
@@ -96,7 +97,7 @@ public class ProductListingApiBuilder {
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	///
 	public RESTFunction productListings_GET_and_POST = (req, res) -> {
-
+		
 		//
 		// _oid sanity check
 		//
@@ -106,63 +107,65 @@ public class ProductListingApiBuilder {
 			res.put("error", "Request object did not contain an oid");
 			return res;
 		}
-
+		
 		//
 		// Function reuse vars
 		//
 		List<MetaObject> prodList = null;
-
+		
 		//
 		// Get req params
 		//
-		String mode = req.getString("mode","update");
+		String mode = req.getString("mode", "update");
 		String listStr = req.getString("list", null);
-
+		
 		//
 		// Update / GET
 		//
-		if( listStr != null ) {
+		if (listStr != null) {
 			//
 			// Assumes an update
 			//
 			List<Object> updateList = ConvertJSON.toList(listStr);
-
+			
 			// Check for replacement mode
-			if( mode != null && mode.equalsIgnoreCase("replace") ) {
+			if (mode != null && mode.equalsIgnoreCase("replace")) {
 				throw new RuntimeException("mode=replace not supported");
 			} else {
-				prodList = core.updateList( oid, updateList );
+				prodList = core.updateList(oid, updateList);
 			}
 		} else {
 			//
 			// Simply get the list instead
 			//
-			prodList = core.getList( oid );
+			prodList = core.getList(oid);
 		}
 		res.put("list", prodList);
-
+		
 		return res;
 	};
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// RestBuilder template builder
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	///
 	/// Takes the restbuilder and implements its respective default API
 	///
 	public RESTBuilder setupRESTBuilder(RESTBuilder rb, String setPrefix) {
-		rb.getNamespace(setPrefix + "productList").put(HttpRequestType.GET, productListings_GET_and_POST);
-		rb.getNamespace(setPrefix + "productList").put(HttpRequestType.POST, productListings_GET_and_POST);
-
+		rb.getNamespace(setPrefix + "productList").put(HttpRequestType.GET,
+			productListings_GET_and_POST);
+		rb.getNamespace(setPrefix + "productList").put(HttpRequestType.POST,
+			productListings_GET_and_POST);
+		
 		listingsApi = new MetaTableApiBuilder(core.productItem);
-
+		
 		//ownerApi.setupRESTBuilder( rb, setPrefix + "owner" );
-		listingsApi.setupRESTBuilder( rb, setPrefix + "productList." );
-
+		listingsApi.setupRESTBuilder(rb, setPrefix + "productList.");
+		
 		return rb;
 	}
-
+	
 }

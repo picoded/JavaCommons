@@ -10,13 +10,13 @@ import picoded.conv.ConvertJSON;
 import picoded.enums.HttpRequestType;
 
 public class AtomicLongMapApiBuilder {
-
+	
 	private AtomicLongMap _atomicLongMap;
-
+	
 	public AtomicLongMapApiBuilder(AtomicLongMap inMap) {
 		_atomicLongMap = inMap;
 	}
-
+	
 	///
 	/// # getValue (GET)
 	///
@@ -44,20 +44,20 @@ public class AtomicLongMapApiBuilder {
 			res.put("error", "Atomic Long Map is null");
 			return res;
 		}
-
+		
 		//Get given key
 		String key = req.getString("key", "");
 		if (key.isEmpty()) {
 			res.put("error", "No key was supplied");
 			return res;
 		}
-
+		
 		//Add found value to map
 		res.put("value", _atomicLongMap.get(key));
-
+		
 		return res;
 	};
-
+	
 	///
 	/// # getValues (GET)
 	///
@@ -86,20 +86,20 @@ public class AtomicLongMapApiBuilder {
 			res.put("error", "Atomic Long Map is null");
 			return res;
 		}
-
+		
 		String[] keys = req.getStringArray("keys", null);
 		if (keys == null) {
 			res.put("error", "No key array was supplied");
 			return res;
 		}
-
+		
 		if (keys.length < 1) {
 			res.put("error", "Key array supplied was empty");
 			return res;
 		}
-
+		
 		Map<String, Long> valueMap = new HashMap<String, Long>();
-
+		
 		try {
 			for (String key : keys) {
 				valueMap.put(key, _atomicLongMap.get(key));
@@ -109,12 +109,12 @@ public class AtomicLongMapApiBuilder {
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
 		}
-
+		
 		res.put("values", valueMap);
-
+		
 		return res;
 	};
-
+	
 	///
 	/// # setValue (POST)
 	///
@@ -145,25 +145,25 @@ public class AtomicLongMapApiBuilder {
 			res.put("error", "Atomic Long Map is null");
 			return res;
 		}
-
+		
 		String key = req.getString("key", "");
 		if (key.isEmpty()) {
 			res.put("error", "No key was supplied");
 			return res;
 		}
-
+		
 		boolean allowEmptyValue = req.getBoolean("allowEmptyValue", false);
 		Long value = req.getLong("value");
 		if (value == null && !allowEmptyValue) {
 			res.put("error", "An empty value was supplied, and allowEmptyValue is false");
 			return res;
 		}
-
+		
 		res.put("map", _atomicLongMap.put(key, value));
-
+		
 		return res;
 	};
-
+	
 	///
 	/// # setValues (POST)
 	///
@@ -193,13 +193,13 @@ public class AtomicLongMapApiBuilder {
 			res.put("error", "Atomic Long Map is null");
 			return res;
 		}
-
+		
 		Object keyValues_raw = req.get("keyValues");
 		if (keyValues_raw == null) {
 			res.put("error", "No keyValues map was supplied");
 			return res;
 		}
-
+		
 		Map<String, Object> keyValues = null;
 		try {
 			if (keyValues_raw instanceof String) {
@@ -210,7 +210,7 @@ public class AtomicLongMapApiBuilder {
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
 		}
-
+		
 		boolean allowEmptyValue = req.getBoolean("allowEmptyValue", false);
 		try {
 			for (String key : keyValues.keySet()) {
@@ -228,12 +228,12 @@ public class AtomicLongMapApiBuilder {
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
 		}
-
+		
 		res.put("map", _atomicLongMap);
-
+		
 		return res;
 	};
-
+	
 	///
 	/// # deleteValue (POST)
 	///
@@ -262,13 +262,13 @@ public class AtomicLongMapApiBuilder {
 			res.put("error", "Atomic Long Map is null");
 			return res;
 		}
-
+		
 		String key = req.getString("key", "");
 		if (key.isEmpty()) {
 			res.put("error", "An empty key was supplied");
 			return res;
 		}
-
+		
 		try {
 			_atomicLongMap.remove(key);
 		} catch (Exception ex) {
@@ -276,12 +276,12 @@ public class AtomicLongMapApiBuilder {
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
 		}
-
+		
 		res.put("map", _atomicLongMap);
-
+		
 		return res;
 	};
-
+	
 	///
 	/// # deleteValues (POST)
 	///
@@ -310,18 +310,18 @@ public class AtomicLongMapApiBuilder {
 			res.put("error", "Atomic Long Map is null");
 			return res;
 		}
-
+		
 		String[] keys = req.getStringArray("keys", null);
 		if (keys == null) {
 			res.put("error", "No key array was supplied");
 			return res;
 		}
-
+		
 		if (keys.length < 1) {
 			res.put("error", "Key array supplied was empty");
 			return res;
 		}
-
+		
 		try {
 			for (String key : keys) {
 				if (_atomicLongMap.containsKey(key)) {
@@ -333,12 +333,12 @@ public class AtomicLongMapApiBuilder {
 			res.put("exceptionMsg", ex.getMessage());
 			return res;
 		}
-
+		
 		res.put("map", _atomicLongMap);
-
+		
 		return res;
 	};
-
+	
 	///
 	/// # getMap (GET)
 	///
@@ -364,152 +364,154 @@ public class AtomicLongMapApiBuilder {
 			res.put("error", "Atomic Long Map is null");
 			return res;
 		}
-
+		
 		res.put("map", _atomicLongMap);
-
+		
 		return res;
 	};
-
+	
 	public RESTFunction weakCompareAndSet = (req, res) -> {
 		if (_atomicLongMap == null) {
 			res.put("error", "Atomic Long Map is null");
 			return res;
 		}
-
+		
 		String key = req.getString("key", "");
 		if (key.isEmpty()) {
 			res.put("error", "No key was supplied");
 			return res;
 		}
-
+		
 		boolean allowEmptyValue = req.getBoolean("allowEmptyValue", false);
 		Long expect = req.getLong("expect");
 		if (expect == null && !allowEmptyValue) {
 			res.put("error", "An empty value was supplied, and allowEmptyValue is false");
 			return res;
 		}
-
+		
 		Long update = req.getLong("update");
-
+		
 		res.put("map", _atomicLongMap.weakCompareAndSet(key, expect, update));
-
+		
 		return res;
 	};
-
+	
 	public RESTFunction getAndAdd = (req, res) -> {
 		if (_atomicLongMap == null) {
 			res.put("error", "Atomic Long Map is null");
 			return res;
 		}
-
+		
 		//Get given key
 		String key = req.getString("key", "");
 		if (key.isEmpty()) {
 			res.put("error", "No key was supplied");
 			return res;
 		}
-
+		
 		boolean allowEmptyValue = req.getBoolean("allowEmptyValue", false);
 		Object delta = req.get("delta");
 		if (delta == null && !allowEmptyValue) {
 			res.put("error", "An empty value was supplied, and allowEmptyValue is false");
 			return res;
 		}
-
+		
 		res.put("value", _atomicLongMap.getAndAdd(key, delta));
-
+		
 		return res;
 	};
-
+	
 	public RESTFunction increment = (req, res) -> {
 		if (_atomicLongMap == null) {
 			res.put("error", "Atomic Long Map is null");
 			return res;
 		}
-
+		
 		//Get given key
 		String key = req.getString("key", "");
 		if (key.isEmpty()) {
 			res.put("error", "No key was supplied");
 			return res;
 		}
-
+		
 		// boolean allowEmptyValue = req.getBoolean("allowEmptyValue", false);
 		// Long value = req.getLong("value");
 		// if (value == null && !allowEmptyValue) {
 		// 	res.put("error", "An empty value was supplied, and allowEmptyValue is false");
 		// 	return res;
 		// }
-
+		
 		//Add found value to map
 		res.put("value", _atomicLongMap.incrementAndGet(key));
-
+		
 		return res;
 	};
-
+	
 	public RESTFunction increment_createIfNull = (req, res) -> {
 		if (_atomicLongMap == null) {
 			res.put("error", "Atomic Long Map is null");
 			return res;
 		}
-
+		
 		//Get given key
 		String key = req.getString("key", "");
 		if (key.isEmpty()) {
 			res.put("error", "No key was supplied");
 			return res;
 		}
-
+		
 		Long valueIfNull = req.getLong("valueIfNull", -1);
 		if (valueIfNull == -1) {
 			res.put("error", "No default value was supplied for valueIfNull");
 			return res;
 		}
-
+		
 		Long curValue = _atomicLongMap.get(key);
-		if(curValue == null){
-			System.out.println("No value found for key : " + key + ", creating new entry with value : " + valueIfNull);
+		if (curValue == null) {
+			System.out.println("No value found for key : " + key
+				+ ", creating new entry with value : " + valueIfNull);
 			_atomicLongMap.put(key, valueIfNull);
 			res.put("value", valueIfNull);
 		} else {
 			System.out.println("Value found, doing increment for key : " + key);
 			res.put("value", _atomicLongMap.incrementAndGet(key));
 		}
-
+		
 		return res;
 	};
-
+	
 	/////////////////////////////////////////////
 	//
 	// RestBuilder template builder
 	//
 	/////////////////////////////////////////////
-
+	
 	///
 	/// Takes the restbuilder and implements its respective default API
 	///
 	public RESTBuilder setupRESTBuilder(RESTBuilder rb, String setPrefix) {
-
+		
 		//Get entire mapping
 		rb.getNamespace(setPrefix + "map").put(HttpRequestType.GET, getMap);
-
+		
 		//Get values
 		rb.getNamespace(setPrefix + "value").put(HttpRequestType.GET, getValue);
 		rb.getNamespace(setPrefix + "values").put(HttpRequestType.GET, getValues);
-
+		
 		//Set values
 		rb.getNamespace(setPrefix + "value").put(HttpRequestType.POST, setValue);
 		rb.getNamespace(setPrefix + "values").put(HttpRequestType.POST, setValues);
-
+		
 		//Delete mappings
 		rb.getNamespace(setPrefix + "deleteValue").put(HttpRequestType.POST, deleteValue);
 		rb.getNamespace(setPrefix + "deleteValues").put(HttpRequestType.POST, deleteValues);
-
+		
 		rb.getNamespace(setPrefix + "weakCompareAndSet").put(HttpRequestType.POST, weakCompareAndSet);
 		rb.getNamespace(setPrefix + "getAndAdd").put(HttpRequestType.POST, getAndAdd);
 		rb.getNamespace(setPrefix + "increment").put(HttpRequestType.POST, increment);
-		rb.getNamespace(setPrefix + "increment_createIfNull").put(HttpRequestType.POST, increment_createIfNull);
-
+		rb.getNamespace(setPrefix + "increment_createIfNull").put(HttpRequestType.POST,
+			increment_createIfNull);
+		
 		return rb;
 	}
 }

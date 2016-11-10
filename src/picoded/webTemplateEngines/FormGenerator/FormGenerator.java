@@ -196,7 +196,8 @@ public class FormGenerator {
 	/// @params  {boolean}             displayOnly  - Display mode, html read only or form
 	///
 	/// @returns {StringBuilder} the full returning HTML
-	public StringBuilder build(Map<String, Object> format, Map<String, Object> data, boolean displayOnly) {
+	public StringBuilder build(Map<String, Object> format, Map<String, Object> data,
+		boolean displayOnly) {
 		FormNode rootNode = new FormNode(this, format, data);
 		rootNode.setFormSet(getFormSet());
 		
@@ -249,11 +250,13 @@ public class FormGenerator {
 	//
 	/////////////////////////////////////////////////////////////////////////
 	
-	public FormWrapperInterface addCustomFormWrapperTemplate(String key, FormWrapperInterface customWrapperTemplate) {
+	public FormWrapperInterface addCustomFormWrapperTemplate(String key,
+		FormWrapperInterface customWrapperTemplate) {
 		return customFormWrapperTemplates.put(key, customWrapperTemplate);
 	}
 	
-	public FormInputInterface addCustomFormInputTemplate(String key, FormInputInterface customInputTemplate) {
+	public FormInputInterface addCustomFormInputTemplate(String key,
+		FormInputInterface customInputTemplate) {
 		return customFormInputTemplates.put(key, customInputTemplate);
 	}
 	
@@ -263,7 +266,8 @@ public class FormGenerator {
 		return htmlString;
 	}
 	
-	public String generatePDFReadyHTML(Map<String, Object> jsonData, Map<String, Object> prefilledJSONData) {
+	public String generatePDFReadyHTML(Map<String, Object> jsonData,
+		Map<String, Object> prefilledJSONData) {
 		FormNode rootNode = new FormNode(this, jsonData, prefilledJSONData);
 		rootNode.setFormSet(getFormSet());
 		
@@ -301,7 +305,8 @@ public class FormGenerator {
 			innerData.append(generatePDFReadyHTML(node.children()));
 		}
 		
-		String finalNodeValue = formWrappers[0] + formTextData + innerData.toString() + formWrappers[1];
+		String finalNodeValue = formWrappers[0] + formTextData + innerData.toString()
+			+ formWrappers[1];
 		return finalNodeValue;
 	}
 	
@@ -349,7 +354,8 @@ public class FormGenerator {
 				innerData.append("</div>\n");
 			}
 			
-			String finalNodeValue = formWrappers[0] + inputOutputData + innerData.toString() + formWrappers[1];
+			String finalNodeValue = formWrappers[0] + inputOutputData + innerData.toString()
+				+ formWrappers[1];
 			return finalNodeValue;
 		}
 	}

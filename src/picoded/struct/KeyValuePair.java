@@ -42,8 +42,8 @@ public class KeyValuePair<K extends Object, V extends Object> implements Map.Ent
 			Map.Entry<K, V> e1 = this;
 			Map.Entry<K, V> e2 = (Map.Entry<K, V>) o;
 			
-			return ((e1.getKey() == null ? e2.getKey() == null : e1.getKey().equals(e2.getKey())) && (e1.getValue() == null ? e2
-				.getValue() == null : e1.getValue().equals(e2.getValue())));
+			return ((e1.getKey() == null ? e2.getKey() == null : e1.getKey().equals(e2.getKey())) && (e1
+				.getValue() == null ? e2.getValue() == null : e1.getValue().equals(e2.getValue())));
 		}
 		return false;
 	}
@@ -53,7 +53,8 @@ public class KeyValuePair<K extends Object, V extends Object> implements Map.Ent
 	/// Note that you should not rely on hashCode =[
 	/// See: http://stackoverflow.com/questions/785091/consistency-of-hashcode-on-a-java-string
 	public int hashCode() {
-		return (getKey() == null ? 0 : getKey().hashCode()) ^ (getValue() == null ? 0 : getValue().hashCode());
+		return (getKey() == null ? 0 : getKey().hashCode())
+			^ (getValue() == null ? 0 : getValue().hashCode());
 	}
 	
 	/// Replaces the value corresponding to this entry with the specified value (optional operation).

@@ -309,7 +309,8 @@ public class JMTE {
 		File tFile = new File(baseDirectory + fileName);
 		
 		if (!tFile.exists()) {
-			throw new java.io.IOException("Template file does not exists : " + baseDirectory + fileName);
+			throw new java.io.IOException("Template file does not exists : " + baseDirectory
+				+ fileName);
 		}
 		if (!tFile.canRead()) {
 			throw new java.io.IOException("Template file is unreadable : " + baseDirectory + fileName);
@@ -326,7 +327,8 @@ public class JMTE {
 	}
 	
 	/// Fetches and return the template output, with the data object
-	public String htmlTemplatePart(String fileName, Map<String, Object> dataObj) throws java.io.IOException {
+	public String htmlTemplatePart(String fileName, Map<String, Object> dataObj)
+		throws java.io.IOException {
 		String rawStr = rawHtmlPart(fileName);
 		return parseTemplate(rawStr, dataObj);
 	}

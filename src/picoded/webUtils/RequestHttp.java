@@ -31,7 +31,8 @@ public class RequestHttp {
 		Map<String, String[]> cookiesMap, // 
 		Map<String, String[]> headersMap // 
 	) { //
-		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap, headersMap, null);
+		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap,
+			headersMap, null);
 	}
 	
 	/// Performs GET request with parameters, cookies and headers
@@ -43,8 +44,8 @@ public class RequestHttp {
 		Map<String, String[]> headersMap, // 
 		InputStream requestStream //
 	) { //
-		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap, headersMap,
-			requestStream);
+		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap,
+			headersMap, requestStream);
 	}
 	
 	//--------------------------------------------------------

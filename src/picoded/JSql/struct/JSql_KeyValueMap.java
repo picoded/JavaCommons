@@ -175,7 +175,8 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	public long getExpiryRaw(String key) {
 		try {
 			// Search for the key
-			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "eTm", "kID=?", new Object[] { key }).query();
+			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "eTm", "kID=?", new Object[] { key })
+				.query();
 			return getExpiryRaw(r);
 		} catch (JSqlException e) {
 			throw new RuntimeException(e);
@@ -216,7 +217,8 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	public String getValueRaw(String key, long now) {
 		try {
 			// Search for the key
-			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key }).query();
+			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key })
+				.query();
 			long expiry = getExpiryRaw(r);
 			
 			if (expiry != 0 && expiry < now) {
@@ -269,7 +271,8 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 			long now = currentSystemTimeInSeconds();
 			JSqlResult r = null;
 			if (value == null) {
-				r = sqlObj.selectQuerySet(sqlTableName, "kID", "eTm <= ? OR eTm > ?", new Object[] { 0, now }).query();
+				r = sqlObj.selectQuerySet(sqlTableName, "kID", "eTm <= ? OR eTm > ?",
+					new Object[] { 0, now }).query();
 			} else {
 				r = sqlObj.selectQuerySet(sqlTableName, "kID", "kVl = ? AND (eTm <= ? OR eTm > ?)",
 					new Object[] { value, 0, now }).query();

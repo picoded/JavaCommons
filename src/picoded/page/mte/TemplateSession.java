@@ -33,7 +33,8 @@ public class TemplateSession {
 	/// @Param  Template string to use for the session
 	/// @Param  Session unique var map called - will be merged with parent map
 	///
-	public TemplateSession(MinimalTemplateEngine inParent, String inTemplate, Map<String, Object> inModelMap) {
+	public TemplateSession(MinimalTemplateEngine inParent, String inTemplate,
+		Map<String, Object> inModelMap) {
 		parent = inParent;
 		templateString = inTemplate;
 		templateChars = inTemplate.toCharArray();
@@ -163,8 +164,8 @@ public class TemplateSession {
 	/// Does the expression set scanning, execute it, push to return StringBuilder, 
 	/// and does automatic HTML escaping for variable substitution if found.
 	///
-	protected int evaluateIfExpressionSet(String[][] expressionSet, StringBuilder ret, int start, int end,
-		boolean autoEscape) {
+	protected int evaluateIfExpressionSet(String[][] expressionSet, StringBuilder ret, int start,
+		int end, boolean autoEscape) {
 		String[][] statementSet = fetchStatementSet(expressionSet, start, end);
 		if (statementSet == null) {
 			return -1;
@@ -185,9 +186,10 @@ public class TemplateSession {
 			int closingBlock = scanForClosingBlock("if", postExpressionOffset, end, false);
 			
 			if (closingBlock < 0) {
-				throw invalidTemplateFormatException(start, "Missing expected if closing block: " + statementSet[0][2]
-					+ "/if" + statementSet[0][3] + " OR " + statementSet[0][2] + "end" + statementSet[0][3] + " OR "
-					+ statementSet[0][2] + "else" + statementSet[0][3]);
+				throw invalidTemplateFormatException(start, "Missing expected if closing block: "
+					+ statementSet[0][2] + "/if" + statementSet[0][3] + " OR " + statementSet[0][2]
+					+ "end" + statementSet[0][3] + " OR " + statementSet[0][2] + "else"
+					+ statementSet[0][3]);
 			}
 			
 			int elseBlock = scanForClosingBlock("if", postExpressionOffset, end, true);

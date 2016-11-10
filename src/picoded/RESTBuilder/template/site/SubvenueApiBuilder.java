@@ -31,35 +31,36 @@ import com.google.common.io.BaseEncoding;
 /// Provides a product listings API
 /// All in a single API package.
 ///
-public class SubvenueApiBuilder {
 
+public class SubvenueApiBuilder {
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Class variables
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	public SubvenueBookings core = null;
-
+	
 	public MetaTableApiBuilder bookingsApi = null;
-
+	
 	public MetaTableApiBuilder subvenueBookingsApi = null;
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Constructor options
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	/// Empty constructor
 	public SubvenueApiBuilder(SubvenueBookings inCore) {
 		core = inCore;
 	}
-
+	
 	public SubvenueApiBuilder(JStruct inStruct, String prefix) {
 		core = new SubvenueBookings(inStruct, prefix);
 	}
-
+	
 	///
 	/// # listings (GET/POST)
 	///
@@ -98,7 +99,7 @@ public class SubvenueApiBuilder {
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	///
 	public RESTFunction subvenueDates_GET_and_POST = (req, res) -> {
-
+		
 		//
 		// _oid sanity check
 		//
@@ -108,17 +109,17 @@ public class SubvenueApiBuilder {
 			res.put("error", "Request object did not contain an oid");
 			return res;
 		}
-
+		
 		//
 		// Function reuse vars
 		//
 		List<MetaObject> bookingDatesList = null;
 		bookingDatesList = core.getSubvenueBookingDates_byBookingId(oid);
 		res.put("list", bookingDatesList);
-
+		
 		return res;
 	};
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Update status API
@@ -154,9 +155,9 @@ public class SubvenueApiBuilder {
 		//
 		// User safety check
 		//
-		MetaObject currentUser = ((BasePage)(req.requestPage())).currentAccount();
-		if(currentUser == null){
-			res.put("error","User is not login");
+		MetaObject currentUser = ((BasePage) (req.requestPage())).currentAccount();
+		if (currentUser == null) {
+			res.put("error", "User is not login");
 			return res;
 		}
 		//
@@ -165,28 +166,27 @@ public class SubvenueApiBuilder {
 		String oid = req.getString("_oid", "");
 		//"approved", "paid", "rejected", "failed"
 		String status = req.getString("status", "");
-		GenericConvertList<MetaObject>   bookingOrder;
-
-		if(oid.isEmpty()){
-			res.put("error","There needs to be a purchase order ID!");
+		GenericConvertList<MetaObject> bookingOrder;
+		
+		if (oid.isEmpty()) {
+			res.put("error", "There needs to be a purchase order ID!");
 			return res;
 		}
-
-		if(status == ""){
+		
+		if (status == "") {
 			//Fetches the status of the purchase order. User will need to sieve through to find the status
 			bookingOrder = core.getSubvenueBookings_bySubVenueId(oid);
-		}else{
+		} else {
 			//Updates the status of the purchase order
-			bookingOrder = core.updateSubvenueBookingStatus( oid, status);
+			bookingOrder = core.updateSubvenueBookingStatus(oid, status);
 		}
-
-		res.put("_oid",oid);
+		
+		res.put("_oid", oid);
 		res.put("data", bookingOrder);
-
+		
 		return res;
 	};
-
-
+	
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
@@ -199,12 +199,11 @@ public class SubvenueApiBuilder {
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
 	///
 	public RESTFunction subvenueBookings_POST = (req, res) -> {
-
-
-		String subvenueID = req.getString("subvenueID","");
-		String eventID = req.getString("eventID","");
-		String venueID = req.getString("venueID","");
-		Float paymentAmount = req.getFloat("paymentAmount",0);
+		
+		String subvenueID = req.getString("subvenueID", "");
+		String eventID = req.getString("eventID", "");
+		String venueID = req.getString("venueID", "");
+		Float paymentAmount = req.getFloat("paymentAmount", 0);
 		//
 		// sanity check
 		//
@@ -216,39 +215,39 @@ public class SubvenueApiBuilder {
 			res.put("error", "Request object did not contain an eventID");
 			return res;
 		}
-
+		
 		//
 		// Function reuse vars
 		//
-		GenericConvertMap<String,Object>  booking = null;
-		booking = core.createSubvenueBooking(subvenueID , eventID , venueID , paymentAmount);
-
+		GenericConvertMap<String, Object> booking = null;
+		booking = core.createSubvenueBooking(subvenueID, eventID, venueID, paymentAmount);
+		
 		// Creating the date items
 		@SuppressWarnings("unchecked")
 		// List<List<Object>> datesList = (List<List<Object>>)(Object)req.getObjectList("list", null);
 		Map<String, Object> datesList_obj_raw = req.getStringMap("list", null);
-
-		if(datesList_obj_raw == null){
+		
+		if (datesList_obj_raw == null) {
 			res.put("error", "datesList_obj_raw is null");
 			return res;
 		}
-
+		
 		// System.out.println("bookings "+ booking);
 		// System.out.println("datesList "+ datesList_obj_raw);
 		//With a subvenue booking,store the respective date and timeslots
-		GenericConvertMap<String,Object> bookingSlots = null;
-		try{
-			bookingSlots = core.createBookingSlots(booking.getString("_oid") , datesList_obj_raw);
-		}catch(Exception ex){
+		GenericConvertMap<String, Object> bookingSlots = null;
+		try {
+			bookingSlots = core.createBookingSlots(booking.getString("_oid"), datesList_obj_raw);
+		} catch (Exception ex) {
 			ex.printStackTrace();
 			res.put("error", ex.getMessage());
 			return res;
 		}
 		res.put("list", bookingSlots);
-
+		
 		return res;
 	};
-
+	
 	/// ## JSON Object Output Parameters
 	///
 	/// +-----------------+-------------------------+-----------------------------------------------------------------+
@@ -267,10 +266,10 @@ public class SubvenueApiBuilder {
 		//
 		String oid = req.getString("_oid", "");
 		res.put("_oid", oid);
-
-		String subvenueID = req.getString("_subvenueID","");
-		res.put("_subvenueID",subvenueID);
-
+		
+		String subvenueID = req.getString("_subvenueID", "");
+		res.put("_subvenueID", subvenueID);
+		
 		if (oid.isEmpty() && subvenueID.isEmpty()) {
 			res.put("error", "Request object did not contain a booking ID or subvenue ID");
 			return res;
@@ -279,17 +278,17 @@ public class SubvenueApiBuilder {
 		// Gets all booking keys for that specific subvenue
 		//
 		List<MetaObject> bookingsList = null;
-		if(oid.length() != 0){
+		if (oid.length() != 0) {
 			bookingsList = core.getSubvenueBookings_byBookingId(oid);
 		}
-		if(subvenueID.length() != 0){
+		if (subvenueID.length() != 0) {
 			bookingsList = core.getSubvenueBookings_bySubVenueId(subvenueID);
 		}
-		System.out.println("bookingsList "+bookingsList);
-		if(bookingsList.size() == 0){
-			res.put("isEmpty",true);
+		System.out.println("bookingsList " + bookingsList);
+		if (bookingsList.size() == 0) {
+			res.put("isEmpty", true);
 		}
-
+		
 		// List<List<MetaObject>> allbookingsForSubvenue = new ArrayList<List<MetaObject>>();
 		// //for each key, get all dates associated with the keys
 		// for(MetaObject meta : bookingsList){
@@ -301,38 +300,44 @@ public class SubvenueApiBuilder {
 		//
 		// 	allbookingsForSubvenue.add(bookingDatesList);
 		// }
-
+		
 		res.put("list", bookingsList);
-
+		
 		return res;
 	};
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// RestBuilder template builder
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	///
 	/// Takes the restbuilder and implements its respective default API
 	///
 	public RESTBuilder setupRESTBuilder(RESTBuilder rb, String setPrefix) {
-		rb.getNamespace(setPrefix + "subvenuebookingDates").put(HttpRequestType.GET, subvenueDates_GET_and_POST);
-		rb.getNamespace(setPrefix + "subvenuebookingDates").put(HttpRequestType.POST, subvenueDates_GET_and_POST);
-
-		rb.getNamespace(setPrefix + "subvenuebookings").put(HttpRequestType.GET, subvenueBookings_GET);
-		rb.getNamespace(setPrefix + "subvenuebookings").put(HttpRequestType.POST, subvenueBookings_POST);
-
-		rb.getNamespace(setPrefix + "subvenuebookings.status").put(HttpRequestType.GET, subvenueBookingStatus_GET_and_POST);
-		rb.getNamespace(setPrefix + "subvenuebookings.status").put(HttpRequestType.POST, subvenueBookingStatus_GET_and_POST);
-
+		rb.getNamespace(setPrefix + "subvenuebookingDates").put(HttpRequestType.GET,
+			subvenueDates_GET_and_POST);
+		rb.getNamespace(setPrefix + "subvenuebookingDates").put(HttpRequestType.POST,
+			subvenueDates_GET_and_POST);
+		
+		rb.getNamespace(setPrefix + "subvenuebookings")
+			.put(HttpRequestType.GET, subvenueBookings_GET);
+		rb.getNamespace(setPrefix + "subvenuebookings").put(HttpRequestType.POST,
+			subvenueBookings_POST);
+		
+		rb.getNamespace(setPrefix + "subvenuebookings.status").put(HttpRequestType.GET,
+			subvenueBookingStatus_GET_and_POST);
+		rb.getNamespace(setPrefix + "subvenuebookings.status").put(HttpRequestType.POST,
+			subvenueBookingStatus_GET_and_POST);
+		
 		bookingsApi = new MetaTableApiBuilder(core.subvenueBookingDates);
 		subvenueBookingsApi = new MetaTableApiBuilder(core.subvenueBookings);
 		//ownerApi.setupRESTBuilder( rb, setPrefix + "owner" );
-		bookingsApi.setupRESTBuilder( rb, setPrefix + "subvenuebookingDates." );
-		subvenueBookingsApi.setupRESTBuilder( rb, setPrefix + "subvenuebookings." );
-
+		bookingsApi.setupRESTBuilder(rb, setPrefix + "subvenuebookingDates.");
+		subvenueBookingsApi.setupRESTBuilder(rb, setPrefix + "subvenuebookings.");
+		
 		return rb;
 	}
-
+	
 }

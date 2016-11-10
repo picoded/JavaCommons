@@ -74,8 +74,9 @@ public class JSql_Mysql extends JSql {
 	/// Internal parser that converts some of the common sql statements to mysql
 	public String genericSqlParser(String inString) {
 		String qString = inString.toUpperCase();
-		qString = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("\\s+", " ").replaceAll("\"", "`")
-		//.replaceAll("\'", "`")
+		qString = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("\\s+", " ")
+			.replaceAll("\"", "`")
+			//.replaceAll("\'", "`")
 			.replaceAll("AUTOINCREMENT", "AUTO_INCREMENT").replace("VARCHAR(MAX)", "TEXT");
 		
 		return qString;
@@ -185,7 +186,8 @@ public class JSql_Mysql extends JSql {
 						// find the closing bracket index
 						int closeBracketIndex = tableAndColumnsName.lastIndexOf(")");
 						// extract the columns between the opening and closing brackets
-						String columns = tableAndColumnsName.substring(openBracketIndex + 1, closeBracketIndex);
+						String columns = tableAndColumnsName.substring(openBracketIndex + 1,
+							closeBracketIndex);
 						// fetch the table meta data info
 						JSqlResult JSql = executeQuery_metadata(tablename.trim());
 						Map<String, String> metadata = JSql.fetchMetaData();
@@ -194,7 +196,8 @@ public class JSql_Mysql extends JSql {
 							for (String column : columnsArr) {
 								column = column.trim();
 								// check if column type is BLOB or TEXT
-								if ("BLOB".equals(metadata.get(column)) || "TEXT".equals(metadata.get(column))) {
+								if ("BLOB".equals(metadata.get(column))
+									|| "TEXT".equals(metadata.get(column))) {
 									// repalce the column name in the origin sql statement with column name and suffic "(333)
 									qStringUpper = qStringUpper.replace(column, column + "(333)");
 								}
@@ -204,8 +207,11 @@ public class JSql_Mysql extends JSql {
 				}
 				return execute_raw(qStringUpper);
 			} catch (JSqlException e) {
-				if (e.getCause().toString()
-					.indexOf("com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Duplicate key name '") == -1) {
+				if (e
+					.getCause()
+					.toString()
+					.indexOf(
+						"com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Duplicate key name '") == -1) {
 					// throws as its not a duplicate key exception
 					throw e;
 				}
@@ -260,8 +266,10 @@ public class JSql_Mysql extends JSql {
 		}
 		
 		/// Checks that unique collumn and values length to be aligned
-		if (uniqueColumns == null || uniqueValues == null || uniqueColumns.length != uniqueValues.length) {
-			throw new JSqlException("Upsert query requires unique column and values to be equal length");
+		if (uniqueColumns == null || uniqueValues == null
+			|| uniqueColumns.length != uniqueValues.length) {
+			throw new JSqlException(
+				"Upsert query requires unique column and values to be equal length");
 		}
 		
 		/// Preparing inner default select, this will be used repeatingly for COALESCE, DEFAULT and MISC values
@@ -311,7 +319,8 @@ public class JSql_Mysql extends JSql {
 				columnValues.append("?");
 				columnValues.append(columnSeperator);
 				//
-				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]
+					: null);
 			}
 		}
 		
@@ -331,7 +340,8 @@ public class JSql_Mysql extends JSql {
 				columnValues.append(", ?)");
 				columnValues.append(columnSeperator);
 				//
-				queryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+				queryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a]
+					: null);
 			}
 		}
 		
@@ -351,9 +361,11 @@ public class JSql_Mysql extends JSql {
 		}
 		
 		/// Building the final query
-		queryBuilder.append(columnNames.substring(0, columnNames.length() - columnSeperator.length()));
+		queryBuilder
+			.append(columnNames.substring(0, columnNames.length() - columnSeperator.length()));
 		queryBuilder.append(") VALUES (");
-		queryBuilder.append(columnValues.substring(0, columnValues.length() - columnSeperator.length()));
+		queryBuilder.append(columnValues.substring(0,
+			columnValues.length() - columnSeperator.length()));
 		queryBuilder.append(")");
 		
 		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
@@ -369,6 +381,7 @@ public class JSql_Mysql extends JSql {
 		String[] insertColumns, // Columns names to update
 		Object[] insertValues // Values to update
 	) throws JSqlException {
-		return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues, null, null, null);
+		return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			null, null, null);
 	}
 }

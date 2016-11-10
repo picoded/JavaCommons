@@ -62,7 +62,8 @@ public class PageBuilder extends PageBuilderCore {
 		// Exists checks
 		//
 		if (!pageFolder.exists()) {
-			throw new RuntimeException("Page definition folder does not exists: " + pageFolder.getPath());
+			throw new RuntimeException("Page definition folder does not exists: "
+				+ pageFolder.getPath());
 		}
 		if (!outputFolder.exists()) {
 			throw new RuntimeException("Output folder does not exists: " + outputFolder.getPath());
@@ -72,10 +73,12 @@ public class PageBuilder extends PageBuilderCore {
 		// IsDir checks
 		//
 		if (!pageFolder.isDirectory()) {
-			throw new RuntimeException("Page definition folder path is not a 'directory': " + pageFolder.getPath());
+			throw new RuntimeException("Page definition folder path is not a 'directory': "
+				+ pageFolder.getPath());
 		}
 		if (!outputFolder.isDirectory()) {
-			throw new RuntimeException("Output folder path is not a 'directory': " + outputFolder.getPath());
+			throw new RuntimeException("Output folder path is not a 'directory': "
+				+ outputFolder.getPath());
 		}
 		
 		//
@@ -93,14 +96,14 @@ public class PageBuilder extends PageBuilderCore {
 	/// Build depenecy files, this should only be called after all the various standard page are built
 	protected void buildDependency() {
 		try {
-			FileUtil
-				.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.less"), dependencyLess(), null /*"UTF-8"*/);
-			FileUtil
-				.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.css"), dependencyCss(), null /*"UTF-8"*/);
-			FileUtil
-				.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.es6"), dependencyES6(), null /*"UTF-8"*/);
-			FileUtil
-				.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.js"), dependencyJS(), null /*"UTF-8"*/);
+			FileUtil.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.less"),
+				dependencyLess(), null /*"UTF-8"*/);
+			FileUtil.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.css"),
+				dependencyCss(), null /*"UTF-8"*/);
+			FileUtil.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.es6"),
+				dependencyES6(), null /*"UTF-8"*/);
+			FileUtil.writeStringToFile_ifDifferant(new File(outputFolder, "build/depend.js"),
+				dependencyJS(), null /*"UTF-8"*/);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -152,7 +155,8 @@ public class PageBuilder extends PageBuilderCore {
 	}
 	
 	/// reserved keynames for timestamp scan
-	protected final List<String> resevedTimestampScanNames = Arrays.asList(new String[]{"WEB-INF", ".git"});
+	protected final List<String> resevedTimestampScanNames = Arrays.asList(new String[] { "WEB-INF",
+		".git" });
 	
 	/// Process the full PageBuilder servlet request
 	public void processPageBuilderServlet(BasePage page, String[] requestWildcardUri) {
@@ -176,22 +180,25 @@ public class PageBuilder extends PageBuilderCore {
 				}
 			}
 			
-			boolean isDeveloperMode = (page.JConfig().getBoolean("developersMode.enabled", true) && page.JConfig()
-				.getBoolean("developersMode.PageBuilder", true));
+			boolean isDeveloperMode = (page.JConfig().getBoolean("developersMode.enabled", true) && page
+				.JConfig().getBoolean("developersMode.PageBuilder", true));
 			if (isDeveloperMode) {
 				
 				PageBuilder servletPageBuilder = page.PageBuilder();
 				
 				// Reloads only on index page request, instead of every http request
-				if (itemName.equals("index.html") && servletPageBuilder.hasPageFolder(basePageName + "/")) {
+				if (itemName.equals("index.html")
+					&& servletPageBuilder.hasPageFolder(basePageName + "/")) {
 					
 					// Newest timestamp in destination
-					long destTimestamp = FileUtil.newestFileTimestamp(outputFolder, resevedTimestampScanNames);
+					long destTimestamp = FileUtil.newestFileTimestamp(outputFolder,
+						resevedTimestampScanNames);
 					// Newest timestamp from source
-					long sourceTimestamp = FileUtil.newestFileTimestamp(pageFolder, resevedTimestampScanNames);
+					long sourceTimestamp = FileUtil.newestFileTimestamp(pageFolder,
+						resevedTimestampScanNames);
 					
 					// Source / Dest timestamp handling check
-					if( sourceTimestamp <= 0 || destTimestamp <= 0 || sourceTimestamp > destTimestamp ) {
+					if (sourceTimestamp <= 0 || destTimestamp <= 0 || sourceTimestamp > destTimestamp) {
 						// Changed to build everything, slower on page load but ensures component changes get propagated properly.
 						servletPageBuilder.buildAllPage();
 						
@@ -241,11 +248,11 @@ public class PageBuilder extends PageBuilderCore {
 			}
 			
 			// Fallsback into File Servlet
-//			outputFileServlet().processRequest( //
-//				page.getHttpServletRequest(), //
-//				page.getHttpServletResponse(), //
-//				page.requestType() == HttpRequestType.HEAD, //
-//				reqStr);
+			//			outputFileServlet().processRequest( //
+			//				page.getHttpServletRequest(), //
+			//				page.getHttpServletResponse(), //
+			//				page.requestType() == HttpRequestType.HEAD, //
+			//				reqStr);
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);

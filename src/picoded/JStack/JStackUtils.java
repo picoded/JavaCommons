@@ -17,15 +17,16 @@ import picoded.struct.GenericConvertMap;
 
 /// JStack utility to build up complex JStack structures from the JStack config file.
 public class JStackUtils {
-
-	public final static String[] structTypes = { "AccountTable", "KeyValueMap", "AtomicLongMap", "MetaTable" };
-
+	
+	public final static String[] structTypes = { "AccountTable", "KeyValueMap", "AtomicLongMap",
+		"MetaTable" };
+	
 	//--------------------------------------------------
 	//
 	// JStack MetaTable setups
 	//
 	//--------------------------------------------------
-
+	
 	///
 	/// Build the RESTBuilder to a single JStruct type object
 	///
@@ -35,22 +36,25 @@ public class JStackUtils {
 			return;
 		}
 		for (String name : nameMap.keySet()) {
-			String dotSpacedName = name.replaceAll("_",".");
-
+			String dotSpacedName = name.replaceAll("_", ".");
+			
 			if (type.equalsIgnoreCase("AccountTable")) {
 				AccountLogin.setupRESTBuilder(rbObj, struct.getAccountTable(name), dotSpacedName + ".");
 			} else if (type.equalsIgnoreCase("KeyValueMap")) {
-				(new KeyValueMapApiBuilder(struct.getKeyValueMap(name))).setupRESTBuilder(rbObj, dotSpacedName + ".");
+				(new KeyValueMapApiBuilder(struct.getKeyValueMap(name))).setupRESTBuilder(rbObj,
+					dotSpacedName + ".");
 			} else if (type.equalsIgnoreCase("AtomicLongMap")) {
-				(new AtomicLongMapApiBuilder(struct.getAtomicLongMap(name))).setupRESTBuilder(rbObj, dotSpacedName + ".");
+				(new AtomicLongMapApiBuilder(struct.getAtomicLongMap(name))).setupRESTBuilder(rbObj,
+					dotSpacedName + ".");
 			} else if (type.equalsIgnoreCase("MetaTable")) {
-				(new MetaTableApiBuilder(struct.getMetaTable(name))).setupRESTBuilder(rbObj, dotSpacedName + ".");
+				(new MetaTableApiBuilder(struct.getMetaTable(name))).setupRESTBuilder(rbObj,
+					dotSpacedName + ".");
 			} else {
 				throw new RuntimeException("Unknown struct type : " + type);
 			}
 		}
 	}
-
+	
 	///
 	/// Preload various table structures according to config. This would be the "sys.JStack.struct"
 	///
@@ -58,23 +62,24 @@ public class JStackUtils {
 	/// @param   The jstruct to build on
 	/// @param   The structure map containing { type : { name : configObj } }
 	///
-	public static void setupRESTBuilderStruct(RESTBuilder rbObj, JStruct struct, Map<String, Object> structMap) {
+	public static void setupRESTBuilderStruct(RESTBuilder rbObj, JStruct struct,
+		Map<String, Object> structMap) {
 		if (structMap == null) {
 			return;
 		}
-
+		
 		GenericConvertMap<String, Object> configMap = GenericConvertMap.build(structMap);
 		for (String s : structTypes) {
 			setupRESTBuilderType(rbObj, struct, s, configMap.getStringMap(s));
 		}
 	}
-
+	
 	//--------------------------------------------------
 	//
 	// JStack structure setups
 	//
 	//--------------------------------------------------
-
+	
 	///
 	/// Preload a single JStruct type object
 	///
@@ -86,7 +91,7 @@ public class JStackUtils {
 			struct.preloadJStructType(type, name);
 		}
 	}
-
+	
 	///
 	/// Preload various table structures according to config. This would be the "sys.JStack.struct"
 	///
@@ -97,45 +102,46 @@ public class JStackUtils {
 		if (structMap == null) {
 			return;
 		}
-
+		
 		GenericConvertMap<String, Object> configMap = GenericConvertMap.build(structMap);
 		String[] structTypes = { "AccountTable", "KeyValueMap", "AtomicLongMap", "MetaTable" };
 		for (String s : structTypes) {
 			preloadJStructType(struct, s, configMap.getStringMap(s));
 		}
 	}
-
+	
 	//--------------------------------------------------
 	//
 	// JStack layer handling
 	//
 	//--------------------------------------------------
-
+	
 	///
 	/// Generate a single JStack layer using a config map representing it
 	///
-	public static JStackLayer stackConfigToJStackLayer(Map<String, Object> inConfig, String fullWebInfPath) {
+	public static JStackLayer stackConfigToJStackLayer(Map<String, Object> inConfig,
+		String fullWebInfPath) {
 		if (inConfig == null) {
 			return null;
 		}
-
+		
 		GenericConvertMap<String, Object> configMap = GenericConvertMap.build(inConfig);
 		String type = configMap.getString("type");
 		JStackLayer ret = null;
-
+		
 		// Using the type, apply the relevent build logic
 		if (type.equalsIgnoreCase("jsql")) {
-
+			
 			// Gets the config vars
 			String engine = configMap.getString("engine", "");
 			String path = configMap.getString("path", "");
 			String username = configMap.getString("username", "");
 			String password = configMap.getString("password", "");
 			String database = configMap.getString("database", "");
-
+			
 			// SQLite implmentation
 			if (engine.equalsIgnoreCase("sqlite")) {
-
+				
 				//-------- Sample config --------//
 				// // [Sqlite] database implmentation
 				// // This is obviously not meant for production, but for testing,
@@ -143,33 +149,33 @@ public class JStackUtils {
 				// // Note that the database, username, password parameters are meaningless for sqlite
 				// "engine" : "sqlite",
 				// "path" : "./WEB-INF/storage/db.sqlite",
-
+				
 				if (path.length() <= 0) {
 					throw new RuntimeException("Unsupported " + "path: " + path);
 				}
-
+				
 				if (fullWebInfPath == null) {
 					fullWebInfPath = "./WEB-INF/";
 				}
-
+				
 				// Replaces WEB-INF path
 				path = path.replace("./WEB-INF/", fullWebInfPath);
 				path = path.replace("${WEB-INF}", fullWebInfPath);
-
+				
 				// Generates the sqlite connection with the path
 				return JSql.sqlite(path);
 			} else if (engine.equalsIgnoreCase("mssql")) {
-
+				
 				//-------- Sample config --------//
 				// // [MS-SQL] database implmentation
 				// // Note that uselobs=false should be used, this is known to resolve
 				// // Certain data competebility problems
 				// "engine" : "mssql",
 				// "path" : "54.169.34.78:1433;uselobs=false;",
-
+				
 				return JSql.mssql(path, database, username, password);
 			} else if (engine.equalsIgnoreCase("mysql")) {
-
+				
 				//-------- Sample config --------//
 				// // [MY-SQL] database implmentation
 				// "engine" : "mysql",
@@ -178,34 +184,34 @@ public class JStackUtils {
 				// "database" : "JAVACOMMONS",
 				// "username" : "JAVACOMMONS",
 				// "password" : "JAVACOMMONS"
-
+				
 				return JSql.mysql(path, database, username, password);
 			} else if (engine.equalsIgnoreCase("oracle")) {
-
+				
 				//-------- Sample config --------//
 				// // [Oracle] database implmentation
 				// // Note that as the database chosen is normally part of the pathing
 				// // The database attribute is ignored.
 				// "engine" : "oracle",
 				// "path" : "JAVACOMMONS@//54.169.34.78:1521/xe",
-
+				
 				JSql jsql_oracle = null;
-
+				
 				String jndiName = configMap.getString("jndi-name", "");
-				if(!jndiName.isEmpty()){
-
+				if (!jndiName.isEmpty()) {
+					
 					java.sql.Connection connectionObj = null;
-					try{
+					try {
 						connectionObj = getConnectionByJNDI(jndiName);
-					}catch(Exception ex){
+					} catch (Exception ex) {
 						throw new RuntimeException(ex);
 					}
-
+					
 					jsql_oracle = JSql.oracle(connectionObj);
-				}else{
+				} else {
 					jsql_oracle = JSql.oracle(path, username, password);
 				}
-
+				
 				return jsql_oracle;
 			} else {
 				throw new RuntimeException("Unexpected JStack.stack JSql engine: " + engine);
@@ -217,41 +223,44 @@ public class JStackUtils {
 		} else {
 			throw new RuntimeException("Unexpected JStack.stack type : " + type);
 		}
-
+		
 		return ret;
 	}
-
-	public static java.sql.Connection getConnectionByJNDI(String jndiName) throws Exception{
-		System.out.println("JStackUtils -> getConnectionByJNDI -> Using jndiname lookup for " +jndiName);
-
+	
+	public static java.sql.Connection getConnectionByJNDI(String jndiName) throws Exception {
+		System.out.println("JStackUtils -> getConnectionByJNDI -> Using jndiname lookup for "
+			+ jndiName);
+		
 		java.sql.Connection connectionObj = null;
-		try{
+		try {
 			javax.naming.InitialContext initialContext = new javax.naming.InitialContext();
 			javax.sql.DataSource dataSource = (javax.sql.DataSource) initialContext.lookup(jndiName);
 			connectionObj = dataSource.getConnection();
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
-
+		
 		return connectionObj;
 	}
-
+	
 	///
 	/// Generate JStack layers based on the configuration format of. This would be the "sys.JStack.stack" array
 	///
-	public static JStackLayer[] stackConfigLayersToJStackLayers(List<Object> inConfig, String fullWebInfPath) {
+	public static JStackLayer[] stackConfigLayersToJStackLayers(List<Object> inConfig,
+		String fullWebInfPath) {
 		if (inConfig == null) {
 			return null;
 		}
-
+		
 		List<JStackLayer> ret = new ArrayList<JStackLayer>();
 		for (Object config : inConfig) {
-			JStackLayer subLayer = stackConfigToJStackLayer(GenericConvert.toStringMap(config, null), fullWebInfPath);
+			JStackLayer subLayer = stackConfigToJStackLayer(GenericConvert.toStringMap(config, null),
+				fullWebInfPath);
 			if (subLayer != null) {
 				ret.add(subLayer);
 			}
 		}
-
+		
 		if (ret.size() > 0) {
 			return ret.toArray(new JStackLayer[0]);
 		}

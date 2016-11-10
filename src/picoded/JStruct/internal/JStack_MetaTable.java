@@ -167,7 +167,8 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	
 	/// Updates the actual backend storage of MetaObject 
 	/// either partially (if supported / used), or completely
-	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap, Set<String> keys) {
+	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap,
+		Set<String> keys) {
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
 			i.metaObjectRemoteDataMap_update(_oid, fullMap, keys);
 		}
@@ -190,7 +191,8 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The String[] array
-	public String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit) {
+	public String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr,
+		int offset, int limit) {
 		String[] ret = null;
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
 			if ((ret = i.queryKeys(whereClause, whereValues, orderByStr, offset, limit)) != null) {
@@ -209,7 +211,8 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The MetaObject[] array
-	public MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit) {
+	public MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr,
+		int offset, int limit) {
 		return getArrayFromID(queryKeys(whereClause, whereValues, orderByStr, offset, limit), true);
 	}
 	

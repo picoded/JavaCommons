@@ -110,7 +110,8 @@ public class EmbeddedServlet {
 		return this;
 	}
 	
-	public EmbeddedServlet withServlet(String servletURLName, String servletName, String servletClassName) {
+	public EmbeddedServlet withServlet(String servletURLName, String servletName,
+		String servletClassName) {
 		if (_tomcat != null && _context != null) {
 			if (!_cachedServletsAdded.contains(servletName)) {
 				_tomcat.addServlet(_context.getPath(), servletName, servletClassName);

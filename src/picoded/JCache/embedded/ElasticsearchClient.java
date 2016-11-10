@@ -60,10 +60,12 @@ public class ElasticsearchClient {
 			elasticsearchSettings.put("http.enabled", true);
 			
 			// Build client connection obj
-			TransportClient inClient = TransportClient.builder().settings(elasticsearchSettings.build()).build();
+			TransportClient inClient = TransportClient.builder()
+				.settings(elasticsearchSettings.build()).build();
 			
 			// Does the actual connection
-			inClient.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
+			inClient.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host),
+				port));
 			
 			return inClient;
 		} catch (UnknownHostException e) {
@@ -149,8 +151,8 @@ public class ElasticsearchClient {
 	/// @oaran  Shards count to use
 	/// @oaran  Replicas count to use
 	public void createIndex(String index, int shards, int replicas) {
-		Settings indexSettings = Settings.builder().put("number_of_shards", shards).put("number_of_replicas", replicas)
-			.build();
+		Settings indexSettings = Settings.builder().put("number_of_shards", shards)
+			.put("number_of_replicas", replicas).build();
 		CreateIndexRequest indexRequest = new CreateIndexRequest(index, indexSettings);
 		
 		client.admin().indices().create(indexRequest).actionGet();
@@ -201,19 +203,22 @@ public class ElasticsearchClient {
 		return QueryBuilders.wrapperQuery(ConvertJSON.fromMap(query));
 	}
 	
-	protected SearchRequestBuilder getSearchRequestBuilder(String index, String type, Map<String, Object> query) {
+	protected SearchRequestBuilder getSearchRequestBuilder(String index, String type,
+		Map<String, Object> query) {
 		SearchRequestBuilder req = client.prepareSearch(index).setTypes(type);
 		req.setQuery(queryBuilderFromMap(query));
 		return req;
 	}
 	
-	protected SearchRequestBuilder getSearchRequestBuilder(String index, String type, Map<String, Object> query,
-		int from, int size) {
+	protected SearchRequestBuilder getSearchRequestBuilder(String index, String type,
+		Map<String, Object> query, int from, int size) {
 		return getSearchRequestBuilder(index, type, query).setFrom(from).setSize(size);
 	}
 	
-	protected SearchResponse getSearchResponse(String index, String type, Map<String, Object> query, int from, int size) {
-		return client.search(getSearchRequestBuilder(index, type, query, from, size).request()).actionGet();
+	protected SearchResponse getSearchResponse(String index, String type, Map<String, Object> query,
+		int from, int size) {
+		return client.search(getSearchRequestBuilder(index, type, query, from, size).request())
+			.actionGet();
 	}
 	
 	protected SearchResponse getSearchResponse(String index, String type, Map<String, Object> query) {
@@ -270,8 +275,8 @@ public class ElasticsearchClient {
 	/// @param  Search size
 	///
 	/// @returns The record map list
-	public List<Map<String, Object>> getSearchMaps(String index, String type, Map<String, Object> query, int from,
-		int size) {
+	public List<Map<String, Object>> getSearchMaps(String index, String type,
+		Map<String, Object> query, int from, int size) {
 		return searchResponseToMaps(getSearchResponse(index, type, query, from, size));
 	}
 	
@@ -284,7 +289,8 @@ public class ElasticsearchClient {
 	/// @param  Search size
 	///
 	/// @returns The id list
-	public List<String> getSearchMapIds(String index, String type, Map<String, Object> query, int from, int size) {
+	public List<String> getSearchMapIds(String index, String type, Map<String, Object> query,
+		int from, int size) {
 		return searchResponseToIds(getSearchResponse(index, type, query, from, size));
 	}
 	

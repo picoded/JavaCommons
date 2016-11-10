@@ -58,7 +58,8 @@ public class DevToolsApiBuilder {
 		return setupRESTBuilder(rb, new DevToolsApiBuilder(rb), setPrefix);
 	}
 	
-	public static RESTBuilder setupRESTBuilder(RESTBuilder rb, DevToolsApiBuilder dev, String setPrefix) {
+	public static RESTBuilder setupRESTBuilder(RESTBuilder rb, DevToolsApiBuilder dev,
+		String setPrefix) {
 		// Get entire mapping
 		rb.getNamespace(setPrefix + "api/tree").put(HttpRequestType.GET, dev.api_tree_GET);
 		

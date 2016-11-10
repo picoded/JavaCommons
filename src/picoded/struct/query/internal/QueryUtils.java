@@ -33,7 +33,8 @@ public class QueryUtils {
 	///
 	public static String unwrapFieldName(String field) {
 		if ( //
-		(field.startsWith("\"") && field.endsWith("\"")) || (field.startsWith("'") && field.endsWith("'"))
+		(field.startsWith("\"") && field.endsWith("\""))
+			|| (field.startsWith("'") && field.endsWith("'"))
 			|| (field.startsWith("[") && field.endsWith("]"))) { //
 			field = field.substring(1, field.length() - 1);
 		}
@@ -66,7 +67,8 @@ public class QueryUtils {
 		if (source instanceof String) {
 			if (((String) source).matches("[0-9]+") || ((String) source).contains(".")) { //extremely rudimentary check for a number, needs to be improved
 				try {
-					Number sourceAsNumber = NumberFormat.getNumberInstance(Locale.ENGLISH).parse((String) source);
+					Number sourceAsNumber = NumberFormat.getNumberInstance(Locale.ENGLISH).parse(
+						(String) source);
 					Double sourceAsDouble = sourceAsNumber.doubleValue();
 					return sourceAsDouble;
 				} catch (Exception ex) {

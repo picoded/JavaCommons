@@ -141,10 +141,12 @@ public class DisqusIntegration {
 		return res;
 	};
 	
-	private static String sso_hmac_sha1(Map<String, String> message, String secretKey) throws Exception {
+	private static String sso_hmac_sha1(Map<String, String> message, String secretKey)
+		throws Exception {
 		//convert message object to json string, then base64 encode it
 		String jsonMessage = ConvertJSON.fromObject(message);
-		String base64EncodedStr = new String(Base64.getEncoder().encodeToString(jsonMessage.getBytes()));
+		String base64EncodedStr = new String(Base64.getEncoder().encodeToString(
+			jsonMessage.getBytes()));
 		
 		long timestamp = System.currentTimeMillis() / 1000;
 		

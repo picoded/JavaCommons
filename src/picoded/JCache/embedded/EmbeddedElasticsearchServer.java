@@ -24,7 +24,8 @@ public class EmbeddedElasticsearchServer {
 	/// @param  Persistent inHomeDir location, use NULL to use pure in-memory (not recommended)
 	/// @param  Restrict the server to local cluster mode, meaning no cluster networking
 	/// 
-	public EmbeddedElasticsearchServer(String clustername, String portRange, File inHomeDir, boolean localCluster) {
+	public EmbeddedElasticsearchServer(String clustername, String portRange, File inHomeDir,
+		boolean localCluster) {
 		Settings.Builder elasticsearchSettings = Settings.builder();
 		
 		//
@@ -123,7 +124,8 @@ public class EmbeddedElasticsearchServer {
 		try {
 			FileUtil.deleteDirectory(homeDirectory);
 		} catch (IOException e) {
-			throw new RuntimeException("Could not delete data directory of embedded elasticsearch server", e);
+			throw new RuntimeException(
+				"Could not delete data directory of embedded elasticsearch server", e);
 		}
 	}
 }

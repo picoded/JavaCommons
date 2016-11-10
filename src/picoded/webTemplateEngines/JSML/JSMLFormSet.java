@@ -83,18 +83,18 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 		}
 		
 		if (!formSetFolder.exists()) {
-			throw new RuntimeException("JSMLFormSet init param 'formSetFolder' (" + formSetFolder.toString()
-				+ ") does actually not exist in file system.");
+			throw new RuntimeException("JSMLFormSet init param 'formSetFolder' ("
+				+ formSetFolder.toString() + ") does actually not exist in file system.");
 		}
 		
 		if (!formSetFolder.isDirectory()) {
-			throw new RuntimeException("JSMLFormSet init param 'formSetFolder' value (" + formSetFolder.toString()
-				+ ") is actually not a directory in file system.");
+			throw new RuntimeException("JSMLFormSet init param 'formSetFolder' value ("
+				+ formSetFolder.toString() + ") is actually not a directory in file system.");
 		}
 		
 		if (!formSetFolder.canRead()) {
-			throw new RuntimeException("JSMLFormSet init param 'formSetFolder' value (" + formSetFolder.toString()
-				+ ") is actually not readable in file system.");
+			throw new RuntimeException("JSMLFormSet init param 'formSetFolder' value ("
+				+ formSetFolder.toString() + ") is actually not readable in file system.");
 		}
 		
 	}
@@ -171,7 +171,8 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 			return null;
 		}
 		String keyStr = key.toString();
-		JSMLForm newForm = new JSMLForm(new File(formSetFolder, keyStr), formSetURI + "/" + keyStr + "/", null);
+		JSMLForm newForm = new JSMLForm(new File(formSetFolder, keyStr), formSetURI + "/" + keyStr
+			+ "/", null);
 		newForm.setFormSet(this);
 		
 		newForm.getDefinition();
@@ -235,7 +236,8 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 		}
 		
 		// Convert parameter map to data map
-		Map<String, Object> processedRequestMap = form.requestParamsToParamsMap((Map<String, Object>) (Object) reqMap);
+		Map<String, Object> processedRequestMap = form
+			.requestParamsToParamsMap((Map<String, Object>) (Object) reqMap);
 		formDataMap.putAll(processedRequestMap);
 		
 		if (formDataMap == null) {

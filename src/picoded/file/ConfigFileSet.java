@@ -300,7 +300,8 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		// up
 		for (int splitPt = splitKeyString.length; splitPt > 0; --splitPt) {
 			String fileKey = StringUtils.join(ArrayUtils.subarray(splitKeyString, 0, splitPt), ".");
-			String headerKey = StringUtils.join(ArrayUtils.subarray(splitKeyString, splitPt, splitKeyString.length), ".");
+			String headerKey = StringUtils.join(
+				ArrayUtils.subarray(splitKeyString, splitPt, splitKeyString.length), ".");
 			
 			Object returnVal = getExact(fileKey, headerKey);
 			

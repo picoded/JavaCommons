@@ -222,7 +222,8 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 		
 		try {
 			// Search for the key
-			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key }).query();
+			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key })
+				.query();
 			if (r != null && r.rowCount() > 0) {
 				return Long.parseLong(r.get("kVl").get(0).toString());
 			}
@@ -245,7 +246,8 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 			Long oldVal = null;
 			while (tries < limit) {
 				
-				JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key }).query();
+				JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key })
+					.query();
 				
 				oldVal = Long.parseLong(r.get("kVl").get(0).toString());
 				Long newVal = oldVal + (Long) delta;
@@ -295,7 +297,8 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 		
 		try {
 			// Search for the key
-			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key }).query();
+			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key })
+				.query();
 			// long expiry = getExpiryRaw(r);
 			//
 			// if (expiry != 0 && expiry < now) {
@@ -329,7 +332,8 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	public Long incrementAndGet(Object key) {
 		try {
 			// Search for the key
-			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key }).query();
+			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key })
+				.query();
 			// long expiry = getExpiryRaw(r);
 			//
 			// if (expiry != 0 && expiry < now) {
@@ -369,22 +373,23 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 		
 		try {
 			// Search for the key
-			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=? AND kVl=?", new Object[] { key, expect })
-				.query();
+			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=? AND kVl=?",
+				new Object[] { key, expect }).query();
 			
 			Long oldVal = Long.parseLong(r.get("kVl").get(0).toString());
 			
 			//if no values inside
 			if (oldVal == null || r.rowCount() == 0) {
 				if (oldVal.equals(expect)) {
-					return sqlObj.execute("INSERT INTO " + sqlTableName + "(kID, kVl) VALUES (?,?)", key, update);
+					return sqlObj.execute("INSERT INTO " + sqlTableName + "(kID, kVl) VALUES (?,?)",
+						key, update);
 				} else {
 					return false;
 				}
 			} else {
 				if (oldVal.equals(expect)) {
-					return sqlObj.execute("UPDATE " + sqlTableName + " SET kVl= ? WHERE kID = ? AND kVl = ?", update, key,
-						expect);
+					return sqlObj.execute("UPDATE " + sqlTableName
+						+ " SET kVl= ? WHERE kID = ? AND kVl = ?", update, key, expect);
 				} else {
 					return false;
 				}

@@ -68,7 +68,8 @@ public class DeleteFilesByAge {
 	/// @param ageInSeconds The age in seconds, that the file must be to be
 	// deleted
 	static public void olderThenGivenAgeInSeconds(File fileObj, long ageInSeconds) {
-		DeleteFilesByAge.olderThenUnixTimestamp(fileObj, ((System.currentTimeMillis() / 1000L) - ageInSeconds));
+		DeleteFilesByAge.olderThenUnixTimestamp(fileObj,
+			((System.currentTimeMillis() / 1000L) - ageInSeconds));
 	}
 	
 	/// Delete files modified timestamp, older then given age

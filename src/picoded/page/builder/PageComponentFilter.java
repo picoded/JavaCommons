@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 // mmm... jsoup modules
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
@@ -78,8 +77,8 @@ public class PageComponentFilter {
 		core.addDependencyTracking(rawPageName);
 		
 		// Get the component html
-		String indexFileStr = FileUtil.readFileToString_withFallback(new File(core.pageFolder, rawPageName
-			+ "/component.html"), "");
+		String indexFileStr = FileUtil.readFileToString_withFallback(new File(core.pageFolder,
+			rawPageName + "/component.html"), "");
 		if ((indexFileStr = indexFileStr.trim()).length() == 0) {
 			return null;
 		}
@@ -121,7 +120,8 @@ public class PageComponentFilter {
 	}
 	
 	/// Create the element node, to inject
-	protected Element createElementComponent(String tagname, String innerHTML, Map<String, Object> tagArgs, String requestingRawPageName) throws IOException {
+	protected Element createElementComponent(String tagname, String innerHTML,
+		Map<String, Object> tagArgs, String requestingRawPageName) throws IOException {
 		if (tagname.startsWith("page-") || tagname.startsWith("PAGE-")) {
 			tagname = tagname.substring(5);
 		}
@@ -139,7 +139,8 @@ public class PageComponentFilter {
 		if (rawHtml == null) {
 			rawHtml = "";
 		}
-		GenericConvertMap<String, Object> genericJMTE = GenericConvertMap.build(core.pageJMTEvars(componentPath));
+		GenericConvertMap<String, Object> genericJMTE = GenericConvertMap.build(core
+			.pageJMTEvars(componentPath));
 		
 		//Add user defined html tags first
 		if (componentPath != null && componentPath.length() > 0) {
@@ -171,7 +172,8 @@ public class PageComponentFilter {
 		if (elementSet.size() == 1) {
 			return elementSet.get(0);
 		} else { //container wrapper
-			newDom = Jsoup.parse("<div PageComponent='" + tagname.replaceAll("\\.", "-") + "'>" + resolvedHtml + "</div>");
+			newDom = Jsoup.parse("<div PageComponent='" + tagname.replaceAll("\\.", "-") + "'>"
+				+ resolvedHtml + "</div>");
 			return newDom.children().get(0);
 		}
 	}

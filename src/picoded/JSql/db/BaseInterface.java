@@ -31,7 +31,8 @@ public abstract class BaseInterface implements JStackLayer {
 	public abstract boolean execute(String qString, Object... values) throws JSqlException;
 	
 	/// Raw variant of executeQuery, which DOES NOT perform any SQL to Implementation conversion
-	public abstract JSqlResult executeQuery_raw(String qString, Object... values) throws JSqlException;
+	public abstract JSqlResult executeQuery_raw(String qString, Object... values)
+		throws JSqlException;
 	
 	/// Raw varient of query, which DOES NOT perform any SQL to Implementation conversion
 	public abstract JSqlResult query_raw(String qString, Object... values) throws JSqlException;

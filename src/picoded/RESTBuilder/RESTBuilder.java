@@ -79,7 +79,8 @@ public class RESTBuilder {
 	
 	/// Namespace filter, amends common namespace errors
 	protected String namespaceFilter(String namespace) {
-		return namespace.replaceAll("\\.", "/").replaceAll("//", "/").replaceAll("//", "/").split("\\?")[0];
+		return namespace.replaceAll("\\.", "/").replaceAll("//", "/").replaceAll("//", "/")
+			.split("\\?")[0];
 	}
 	
 	/// Filters and get the storage namespace
@@ -127,8 +128,8 @@ public class RESTBuilder {
 	///----------------------------------------
 	
 	/// Does a search for the relevent api, and additional setup for RESTRequest, relvent to the found api. And perfroms the call
-	protected Map<String, Object> setupAndCall(String apiNamespace, HttpRequestType requestType, RESTRequest req,
-		Map<String, Object> res) {
+	protected Map<String, Object> setupAndCall(String apiNamespace, HttpRequestType requestType,
+		RESTRequest req, Map<String, Object> res) {
 		String[] raw_ns = namespaceArray(namespaceFilter(apiNamespace));
 		String[] ns = raw_ns;
 		
@@ -203,7 +204,8 @@ public class RESTBuilder {
 	public Map<String, Object> namespaceCall(String apiNamespace, HttpRequestType requestType,
 		picoded.servlet.CorePage page, Map<String, Object> resultMap) {
 		@SuppressWarnings("unchecked")
-		RESTRequest rRequest = new RESTRequest((Map<String, Object>) (Object) (page.requestParameters()));
+		RESTRequest rRequest = new RESTRequest(
+			(Map<String, Object>) (Object) (page.requestParameters()));
 		rRequest.requestPage = page;
 		
 		return setupAndCall(apiNamespace, requestType, rRequest, resultMap);
@@ -213,7 +215,8 @@ public class RESTBuilder {
 	/// and automatic handling of missing API error
 	///
 	/// This is mainly intended to be call within CorePage doJSON
-	public boolean servletCall(picoded.servlet.CorePage page, Map<String, Object> resultMap, String apiNamespace) {
+	public boolean servletCall(picoded.servlet.CorePage page, Map<String, Object> resultMap,
+		String apiNamespace) {
 		/// If null, the assumption is the request process flow is terminated. Hence default behaviour of JSON output is canceled
 		if (namespaceCall(apiNamespace, page.requestType(), page, resultMap) == null) {
 			return false;
@@ -227,7 +230,8 @@ public class RESTBuilder {
 	/// and automatic handling of missing API error
 	///
 	/// This is mainly intended to be call within CorePage doJSON
-	public boolean servletCall(String apiPrefix, picoded.servlet.CorePage page, Map<String, Object> resultMap) {
+	public boolean servletCall(String apiPrefix, picoded.servlet.CorePage page,
+		Map<String, Object> resultMap) {
 		String apiNamespace = (apiPrefix + page.requestWildcardUri()); //namespaceFilter?
 		return servletCall(page, resultMap, apiNamespace);
 	}
@@ -264,8 +268,9 @@ public class RESTBuilder {
 			String[] subnames = ArrayConv.subarray(names, 1, names.length);
 			
 			if ( //
-			item.equalsIgnoreCase("post") || item.equalsIgnoreCase("get") || item.equalsIgnoreCase("put")
-				|| item.equalsIgnoreCase("delete") || item.equalsIgnoreCase("update")) {
+			item.equalsIgnoreCase("post") || item.equalsIgnoreCase("get")
+				|| item.equalsIgnoreCase("put") || item.equalsIgnoreCase("delete")
+				|| item.equalsIgnoreCase("update")) {
 				throw new RuntimeException("Protected rest namespace key name used: " + item);
 			}
 			@SuppressWarnings("unchecked")
@@ -362,16 +367,19 @@ public class RESTBuilder {
 		String xHttpCall = "xHttpCall";
 		
 		return "\n" //
-			//----------------------------------------------------------------------------
-			// function xHttpCall(url,type,params,callbck) { .. }
-			//----------------------------------------------------------------------------
-			+ xmlHttpJS(xHttpCall) + "\n" //
+		//----------------------------------------------------------------------------
+		// function xHttpCall(url,type,params,callbck) { .. }
+		//----------------------------------------------------------------------------
+			+ xmlHttpJS(xHttpCall)
+			+ "\n" //
 			//----------------------------------------------------------------------------
 			// API base host name passing
 			//----------------------------------------------------------------------------
 			+ "function apiHost() {\n" //
 			+ "		if(PageComponent == null || PageComponent.apiRootURI == null) {\n" //
-			+ "			return '"+baseURL+"';\n" //
+			+ "			return '"
+			+ baseURL
+			+ "';\n" //
 			+ "		}\n" //
 			+ "		return PageComponent.apiRootURI;\n" //
 			+ "}\n" //

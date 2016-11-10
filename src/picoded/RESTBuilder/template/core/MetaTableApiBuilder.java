@@ -130,7 +130,8 @@ public class MetaTableApiBuilder {
 			if (orderByColumn <= -1) {
 				orderByStr = "\"oID\"";
 			} else {
-				boolean isColumnOrderable = req.getBoolean("columns[" + orderByColumn + "][orderable]", false);
+				boolean isColumnOrderable = req.getBoolean("columns[" + orderByColumn + "][orderable]",
+					false);
 				if (!isColumnOrderable || headers.length < orderByColumn) {
 					orderByStr = "\"oID\"";
 				} else {
@@ -173,9 +174,10 @@ public class MetaTableApiBuilder {
 				}
 			}
 			
-			query = "" + query + " AND " + generateQueryStringForSearchValue(searchParams, queryColumns, wildcardMode)
-				+ ""; //rebuilding query string
-			generateQueryStringArgsForSearchValue_andAddToList(searchParams, queryColumns, wildcardMode, queryArgsList);
+			query = "" + query + " AND "
+				+ generateQueryStringForSearchValue(searchParams, queryColumns, wildcardMode) + ""; //rebuilding query string
+			generateQueryStringArgsForSearchValue_andAddToList(searchParams, queryColumns,
+				wildcardMode, queryArgsList);
 			queryArgs = queryArgsList.toArray(new String[queryArgsList.size()]);
 			
 			dataTableSearchFilter = true;
@@ -207,7 +209,8 @@ public class MetaTableApiBuilder {
 		// Actual fetching of data
 		List<List<Object>> data = null;
 		try {
-			data = list_GET_and_POST_inner(draw, start, limit, headers, query, queryArgs, orderByStr, sanitiseOutput);
+			data = list_GET_and_POST_inner(draw, start, limit, headers, query, queryArgs, orderByStr,
+				sanitiseOutput);
 			res.put("data", data);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -216,8 +219,8 @@ public class MetaTableApiBuilder {
 		return res;
 	};
 	
-	private static List<String> generateQueryStringArgsForSearchValue_andAddToList(String inSearchString,
-		String[] queryColumns, String wildcardMode, List<String> ret) {
+	private static List<String> generateQueryStringArgsForSearchValue_andAddToList(
+		String inSearchString, String[] queryColumns, String wildcardMode, List<String> ret) {
 		if (inSearchString != null && queryColumns != null) {
 			String[] searchStringSplit = inSearchString.trim().split("\\s+");
 			StringBuilder querySB = new StringBuilder();
@@ -234,8 +237,8 @@ public class MetaTableApiBuilder {
 		return ret;
 	}
 	
-	private static String generateQueryStringForSearchValue(String inSearchString, String[] queryColumns,
-		String wildcardMode) {
+	private static String generateQueryStringForSearchValue(String inSearchString,
+		String[] queryColumns, String wildcardMode) {
 		if (inSearchString != null && queryColumns != null) {
 			String[] searchStringSplit = inSearchString.trim().split("\\s+");
 			StringBuilder querySB = new StringBuilder();
@@ -271,8 +274,9 @@ public class MetaTableApiBuilder {
 		}
 	}
 	
-	public List<List<Object>> list_GET_and_POST_inner(int draw, int start, int length, String[] headers, String query,
-		String[] queryArgs, String orderBy, boolean sanitiseOutput) throws RuntimeException {
+	public List<List<Object>> list_GET_and_POST_inner(int draw, int start, int length,
+		String[] headers, String query, String[] queryArgs, String orderBy, boolean sanitiseOutput)
+		throws RuntimeException {
 		if (_metaTableObj == null) {
 			return null;
 		}
@@ -313,8 +317,8 @@ public class MetaTableApiBuilder {
 		return ret;
 	}
 	
-	public List<String> csv_list(int draw, int start, int length, String[] headers, String query, String[] queryArgs,
-		String orderBy) throws RuntimeException {
+	public List<String> csv_list(int draw, int start, int length, String[] headers, String query,
+		String[] queryArgs, String orderBy) throws RuntimeException {
 		
 		List<String> ret = new ArrayList<String>();
 		
@@ -429,7 +433,8 @@ public class MetaTableApiBuilder {
 		CorePage page = req.requestPage();
 		PrintWriter pWriter = page.getWriter();
 		page.getHttpServletResponse().setContentType("text/csv");
-		page.getHttpServletResponse().setHeader("Content-Disposition", "attachment;filename=reports.csv");
+		page.getHttpServletResponse().setHeader("Content-Disposition",
+			"attachment;filename=reports.csv");
 		
 		try {
 			
@@ -499,8 +504,8 @@ public class MetaTableApiBuilder {
 	public RESTFunction meta_GET = (req, res) -> {
 		String oid = req.getString("_oid");
 		if (oid == null) {
-			oid = (req.rawRequestNamespace() != null) ? req.rawRequestNamespace()[req.rawRequestNamespace().length - 1]
-				: null;
+			oid = (req.rawRequestNamespace() != null) ? req.rawRequestNamespace()[req
+				.rawRequestNamespace().length - 1] : null;
 		}
 		
 		//put data back into response
@@ -531,7 +536,8 @@ public class MetaTableApiBuilder {
 		metaObjs = _metaTableObj.query("_oid=?", new String[] { oid });
 		
 		if (metaObjs.length > 1) {
-			throw new RuntimeException("meta_GET_inner() -> More than 1 meta object was returned for _oid : " + oid);
+			throw new RuntimeException(
+				"meta_GET_inner() -> More than 1 meta object was returned for _oid : " + oid);
 		} else if (metaObjs.length < 1) {
 			return null;
 		} else {
@@ -585,8 +591,8 @@ public class MetaTableApiBuilder {
 	public RESTFunction meta_POST = (req, res) -> {
 		String oid = req.getString("_oid");
 		if (oid == null) {
-			oid = (req.rawRequestNamespace() != null) ? req.rawRequestNamespace()[req.rawRequestNamespace().length - 1]
-				: null;
+			oid = (req.rawRequestNamespace() != null) ? req.rawRequestNamespace()[req
+				.rawRequestNamespace().length - 1] : null;
 		}
 		
 		//put data back into response
@@ -618,7 +624,8 @@ public class MetaTableApiBuilder {
 		return res;
 	};
 	
-	public MetaObject meta_POST_inner(String oid, Map<String, Object> mObj, String updateMode) throws RuntimeException {
+	public MetaObject meta_POST_inner(String oid, Map<String, Object> mObj, String updateMode)
+		throws RuntimeException {
 		boolean updateModeFull = false;
 		if (updateMode != null && updateMode.equalsIgnoreCase("full")) {
 			updateModeFull = true;
@@ -691,8 +698,8 @@ public class MetaTableApiBuilder {
 	public RESTFunction meta_DELETE = (req, res) -> {
 		String oid = req.getString("_oid");
 		if (oid == null) {
-			oid = (req.rawRequestNamespace() != null) ? req.rawRequestNamespace()[req.rawRequestNamespace().length - 1]
-				: null;
+			oid = (req.rawRequestNamespace() != null) ? req.rawRequestNamespace()[req
+				.rawRequestNamespace().length - 1] : null;
 		}
 		
 		if (oid == null || oid.isEmpty()) {

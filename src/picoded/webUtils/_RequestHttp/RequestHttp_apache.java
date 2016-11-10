@@ -30,7 +30,8 @@ public class RequestHttp_apache {
 	///////////////////////////////////////////////////////////////////////
 	
 	/// Returns the apache client HttpUriRequest, based on its type
-	protected static HttpRequestBase HttpUriRequest_fromRequestType(HttpRequestType reqType, String reqURL) {
+	protected static HttpRequestBase HttpUriRequest_fromRequestType(HttpRequestType reqType,
+		String reqURL) {
 		switch (reqType) {
 		case GET:
 			return new HttpGet(reqURL);
@@ -49,8 +50,8 @@ public class RequestHttp_apache {
 	}
 	
 	/// Adds the cookies parameters to cookieJar
-	protected static BasicCookieStore addCookiesIntoCookieJar(String domain, BasicCookieStore cookieJar,
-		Map<String, String[]> cookieMap) {
+	protected static BasicCookieStore addCookiesIntoCookieJar(String domain,
+		BasicCookieStore cookieJar, Map<String, String[]> cookieMap) {
 		if (cookieMap != null) {
 			for (Map.Entry<String, String[]> entry : cookieMap.entrySet()) {
 				String[] values = entry.getValue();
@@ -94,7 +95,8 @@ public class RequestHttp_apache {
 	}
 	
 	/// Adds the header parameters to request
-	protected static HttpRequestBase addHeadersIntoRequest(HttpRequestBase reqBase, Map<String, String[]> headersMap) {
+	protected static HttpRequestBase addHeadersIntoRequest(HttpRequestBase reqBase,
+		Map<String, String[]> headersMap) {
 		if (headersMap != null) {
 			for (Map.Entry<String, String[]> entry : headersMap.entrySet()) {
 				String[] values = entry.getValue();
@@ -169,8 +171,10 @@ public class RequestHttp_apache {
 			String host = new URL(reqURL).getHost();
 			
 			// Prepares the HTTPClient, with a cookieJar =D
-			BasicCookieStore cookieJar = addCookiesIntoCookieJar(host, new BasicCookieStore(), cookieMap);
-			HttpClient apacheClient = HttpClientBuilder.create().setDefaultCookieStore(cookieJar).build();
+			BasicCookieStore cookieJar = addCookiesIntoCookieJar(host, new BasicCookieStore(),
+				cookieMap);
+			HttpClient apacheClient = HttpClientBuilder.create().setDefaultCookieStore(cookieJar)
+				.build();
 			
 			// Executes request
 			HttpResponse apacheResponse = apacheClient.execute(httpRequest);
@@ -225,7 +229,8 @@ public class RequestHttp_apache {
 			try {
 				if (requestStream != null) {
 					// note that its sent as a raw stream (set headers manually please)
-					((HttpEntityEnclosingRequestBase) reqBase).setEntity(new InputStreamEntity(requestStream));
+					((HttpEntityEnclosingRequestBase) reqBase).setEntity(new InputStreamEntity(
+						requestStream));
 				} else if (parametersMap != null) {
 					// note that its sent as a form entity
 					((HttpEntityEnclosingRequestBase) reqBase).setEntity(new UrlEncodedFormEntity(

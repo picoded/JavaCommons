@@ -68,7 +68,8 @@ public class RESTNamespace extends HashMap<HttpRequestType, RESTFunction> {
 	protected Map<String, Object> call(HttpRequestType type, RESTRequest req, Map<String, Object> res) {
 		RESTFunction f = get(type);
 		if (f == null) {
-			throw new RuntimeException("Missing function for given namespace / type : " + namespace + " / " + type);
+			throw new RuntimeException("Missing function for given namespace / type : " + namespace
+				+ " / " + type);
 		}
 		return f.apply(req, res);
 	}

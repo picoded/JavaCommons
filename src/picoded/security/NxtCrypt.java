@@ -213,14 +213,14 @@ public class NxtCrypt {
 	}
 	
 	/// Default values varient of getSaltedHash
-	public static String getSaltedHash(String rawPassword, byte[] salt) throws IllegalArgumentException,
-		SecurityException {
+	public static String getSaltedHash(String rawPassword, byte[] salt)
+		throws IllegalArgumentException, SecurityException {
 		return getSaltedHash(rawPassword, salt, defaultIterations, defaultKeyLength);
 	}
 	
 	/// Default values, and string salt varient of getSaltedHash
-	public static String getSaltedHash(String rawPassword, String salt) throws IllegalArgumentException,
-		SecurityException {
+	public static String getSaltedHash(String rawPassword, String salt)
+		throws IllegalArgumentException, SecurityException {
 		return getSaltedHash(rawPassword, salt, defaultIterations, defaultKeyLength);
 	}
 	
@@ -289,12 +289,13 @@ public class NxtCrypt {
 		
 		byte[] salt = NxtCrypt.secureRand.generateSeed(saltLen);
 		
-		return Base64.encodeBase64String(salt) + seperator + "P" + iteration + "-" + keyLen + seperator
-			+ getSaltedHash(rawPassword, salt, iteration, keyLen);
+		return Base64.encodeBase64String(salt) + seperator + "P" + iteration + "-" + keyLen
+			+ seperator + getSaltedHash(rawPassword, salt, iteration, keyLen);
 	}
 	
 	/// Default values varient of getPassHash
-	public static String getPassHash(String rawPassword) throws IllegalArgumentException, SecurityException {
+	public static String getPassHash(String rawPassword) throws IllegalArgumentException,
+		SecurityException {
 		return getPassHash(rawPassword, 0, 0, 0);
 	}
 	
@@ -321,11 +322,13 @@ public class NxtCrypt {
 	}
 	
 	/// Validates the password hash against the raw password given
-	public static boolean validatePassHash(String passHash, String rawPassword) throws SecurityException {
+	public static boolean validatePassHash(String passHash, String rawPassword)
+		throws SecurityException {
 		String[] splitStr = passHash.split(seperator, 3);
 		
 		if (splitStr.length < 3) {
-			throw new SecurityException("Invalid salted hash of less then 3 component: " + Arrays.toString(splitStr));
+			throw new SecurityException("Invalid salted hash of less then 3 component: "
+				+ Arrays.toString(splitStr));
 		}
 		
 		String salt = splitStr[0];

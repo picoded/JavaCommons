@@ -70,7 +70,8 @@ public class QueryFilter {
 		
 		String resString = query;
 		while ((strPos = resString.indexOf("?")) >= 0) {
-			resString = (resString.substring(0, strPos) + ":" + queryCount + resString.substring(strPos + 1));
+			resString = (resString.substring(0, strPos) + ":" + queryCount + resString
+				.substring(strPos + 1));
 			++queryCount;
 		}
 		
@@ -83,7 +84,8 @@ public class QueryFilter {
 	/// @params  arguments array to convert from
 	///
 	/// @returns  the returned named map
-	public static Map<String, Object> argumentsArrayToMap(Map<String, Object> baseMap, Object[] argArr) {
+	public static Map<String, Object> argumentsArrayToMap(Map<String, Object> baseMap,
+		Object[] argArr) {
 		if (baseMap == null) {
 			baseMap = new HashMap<String, Object>();
 		}
@@ -261,12 +263,14 @@ public class QueryFilter {
 	/// @params  named argument used after the operator
 	///
 	/// @returns  built query
-	public static Query basicQueryFromTokens(Map<String, Object> paramsMap, String before, String operator, String after) {
+	public static Query basicQueryFromTokens(Map<String, Object> paramsMap, String before,
+		String operator, String after) {
 		String field = QueryUtils.unwrapFieldName(before);
 		String namedParam = after;
 		
 		if (namedParam == null || !namedParam.startsWith(":")) {
-			throw new RuntimeException("Unexpected named parameter set: " + before + " " + operator + " " + after);
+			throw new RuntimeException("Unexpected named parameter set: " + before + " " + operator
+				+ " " + after);
 		} else {
 			namedParam = namedParam.substring(1);
 		}
@@ -291,7 +295,8 @@ public class QueryFilter {
 			return new NotEquals(field, namedParam, paramsMap);
 		}
 		
-		throw new RuntimeException("Unknown operator set found: " + before + " " + operator + " " + after);
+		throw new RuntimeException("Unknown operator set found: " + before + " " + operator + " "
+			+ after);
 	}
 	
 	//
@@ -350,7 +355,8 @@ public class QueryFilter {
 	/// @params  default parameter map of query
 	///
 	/// @returns  The combined query
-	public static Query combinationQuery(String combinationType, List<Query> childQuery, Map<String, Object> paramsMap) {
+	public static Query combinationQuery(String combinationType, List<Query> childQuery,
+		Map<String, Object> paramsMap) {
 		if (combinationType.equals("AND")) {
 			return new And(childQuery, paramsMap);
 		} else if (combinationType.equals("OR")) {
@@ -359,7 +365,8 @@ public class QueryFilter {
 			return new Not(childQuery, paramsMap);
 		}
 		
-		throw new RuntimeException("Unknown combination set found: " + combinationType + " " + childQuery);
+		throw new RuntimeException("Unknown combination set found: " + combinationType + " "
+			+ childQuery);
 	}
 	
 	/// Builds a combined query given an isolated token set
@@ -368,7 +375,8 @@ public class QueryFilter {
 	/// @params  default parameter map of query
 	///
 	/// @returns  The combined query
-	public static Query collapseQueryTokensWithoutBrackets(List<Object> tokens, Map<String, Object> paramMap) {
+	public static Query collapseQueryTokensWithoutBrackets(List<Object> tokens,
+		Map<String, Object> paramMap) {
 		if (tokens.size() == 1) {
 			Object t = tokens.get(0);
 			if (t instanceof Query) {

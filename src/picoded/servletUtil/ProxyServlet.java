@@ -37,7 +37,8 @@ public class ProxyServlet extends CorePage {
 	protected static final String ORIGIN_HEADER_NAME = "Origin";
 	
 	/// The directory to use to temporarily store uploaded files
-	protected static final File UPLOAD_TEMP_DIRECTORY = new File(System.getProperty("java.io.tmpdir"));
+	protected static final File UPLOAD_TEMP_DIRECTORY = new File(
+		System.getProperty("java.io.tmpdir"));
 	
 	///////////////////////////////////////////////////////////
 	// Proxy host params
@@ -159,7 +160,8 @@ public class ProxyServlet extends CorePage {
 		
 		// Get the maximum file upload size if specified
 		String newMaxFileUploadSize = servletConfig.getInitParameter("maxFileUploadSize");
-		if (newMaxFileUploadSize != null && (newMaxFileUploadSize = newMaxFileUploadSize.trim()).length() > 0) {
+		if (newMaxFileUploadSize != null
+			&& (newMaxFileUploadSize = newMaxFileUploadSize.trim()).length() > 0) {
 			setMaxFileUploadSize(Integer.parseInt(newMaxFileUploadSize));
 		}
 	}
@@ -171,7 +173,8 @@ public class ProxyServlet extends CorePage {
 	/// Gets and returns the target proxy URL given the httpServletReqeust
 	protected String getProxyURL(HttpServletRequest httpServletRequest) {
 		// Set the protocol to HTTP
-		String scheme = (getProxyScheme() != null) ? getProxyScheme() : httpServletRequest.getScheme();
+		String scheme = (getProxyScheme() != null) ? getProxyScheme() : httpServletRequest
+			.getScheme();
 		
 		String stringProxyURL = scheme + "://" + getProxyHostAndPort();
 		// Check if we are proxying to a path other that the document root
@@ -211,8 +214,9 @@ public class ProxyServlet extends CorePage {
 	}
 	
 	/// Does the proxy request with the given headers, and servlet response
-	protected void proxyRequest(HttpRequestType reqType, String targetURL, Map<String, String[]> filteredHeaders,
-		InputStream requestStream, HttpServletRequest req, HttpServletResponse res) {
+	protected void proxyRequest(HttpRequestType reqType, String targetURL,
+		Map<String, String[]> filteredHeaders, InputStream requestStream, HttpServletRequest req,
+		HttpServletResponse res) {
 		try {
 			
 			// Performs the request
@@ -228,7 +232,8 @@ public class ProxyServlet extends CorePage {
 			ResponseHttp respHttpObj = null;
 			
 			// Handles post or put
-			if (requestStream != null && (reqType == HttpRequestType.POST || reqType == HttpRequestType.PUT)) {
+			if (requestStream != null
+				&& (reqType == HttpRequestType.POST || reqType == HttpRequestType.PUT)) {
 				// Pass input stream if required
 				if (reqLength != null && reqLength.equals("0")) {
 					// does standard request if 0
@@ -243,7 +248,8 @@ public class ProxyServlet extends CorePage {
 					filteredHeaders.remove(CONTENT_LENGTH_HEADER_NAME);
 					
 					// Passes input stream
-					respHttpObj = RequestHttp.byType(reqType, targetURL, null, null, filteredHeaders, requestStream);
+					respHttpObj = RequestHttp.byType(reqType, targetURL, null, null, filteredHeaders,
+						requestStream);
 				}
 			} else {
 				//Handles as get / etc request
@@ -277,8 +283,9 @@ public class ProxyServlet extends CorePage {
 				// Gets the string location, and check it
 				String stringLocation = headersMap.get(LOCATION_HEADER)[0];
 				if (stringLocation == null || stringLocation.length() <= 0) {
-					throw new RuntimeException("Recieved status code: " + Integer.toString(intProxyResponseCode)
-						+ " but no " + LOCATION_HEADER + " header was found in the response");
+					throw new RuntimeException("Recieved status code: "
+						+ Integer.toString(intProxyResponseCode) + " but no " + LOCATION_HEADER
+						+ " header was found in the response");
 				}
 				
 				// The proxy hostname and port
@@ -290,7 +297,8 @@ public class ProxyServlet extends CorePage {
 				
 				// Replace the target host path, with the proxy host path,
 				// and sends the redirect
-				res.sendRedirect(stringLocation.replace(getProxyHostAndPort() + getProxyPath(), stringMyHostName));
+				res.sendRedirect(stringLocation.replace(getProxyHostAndPort() + getProxyPath(),
+					stringMyHostName));
 				return;
 			} else if (intProxyResponseCode == HttpServletResponse.SC_NOT_MODIFIED) {
 				// 304 needs special handling.  See:
@@ -347,7 +355,8 @@ public class ProxyServlet extends CorePage {
 	
 	/// Performs an output request, with special handling of POST / PUT
 	@Override
-	public boolean outputRequest(Map<String, Object> templateData, PrintWriter output) throws Exception {
+	public boolean outputRequest(Map<String, Object> templateData, PrintWriter output)
+		throws Exception {
 		return proxyCorePageRequest(this);
 	}
 	

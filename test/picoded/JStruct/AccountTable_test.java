@@ -203,20 +203,36 @@ public class AccountTable_test {
 	
 	@Test
 	public void newObjectTest() {
+		String grpName = "hello-group";
+		AccountObject grpObj;
+		assertFalse(accTableObj.containsKey(grpName));
+		assertNull(accTableObj.get(grpName));
+		assertNotNull(grpObj = accTableObj.newObject(grpName));
 		assertNotNull(accTableObj.newObject("test"));
 		assertNull(accTableObj.newObject("test"));
-		assertNotNull(accTableObj.newObject("hello-group"));
-		assertNotNull(accTableObj.newObject("Test-1"));
+		assertNull(accTableObj.newObject("hello-group"));
+		assertNotNull(accTableObj.newObject(grpObj.get("_oid").toString()));
 	}
 	
 	@Test
 	public void removeFromNameTest() {
-		accTableObj.removeFromName("test");
-		accTableObj.removeFromName("hello");
-		accTableObj.removeFromName("hello-group");
-		accTableObj.removeFromName("Test-1");
-		accTableObj.removeFromName("guest");
 		accTableObj.removeFromName("_oid");
-		
+		String grpName = "hello-group";
+		@SuppressWarnings("unused")
+		AccountObject grpObj;
+		assertFalse(accTableObj.containsKey(grpName));
+		assertNull(accTableObj.get(grpName));
+		assertNotNull(grpObj = accTableObj.newObject(grpName));
+		accTableObj.removeFromName("hello-group");
+	}
+	
+	@Test
+	public void removeFromIDTest() {
+		String grpName = "hello-group";
+		AccountObject grpObj;
+		assertFalse(accTableObj.containsKey(grpName));
+		assertNull(accTableObj.get(grpName));
+		assertNotNull(grpObj = accTableObj.newObject(grpName));
+		accTableObj.removeFromID(grpObj.get("_oid").toString());
 	}
 }

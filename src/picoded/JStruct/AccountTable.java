@@ -240,9 +240,9 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	
 	/// Generates a new account object with the given nice name
 	public AccountObject newObject(String name) {
-		if (containsName(name)) {
-			return null;
-		}
+		//		if (containsName(name)) {
+		//			return null;
+		//		}
 		
 		AccountObject ret = newObject();
 		

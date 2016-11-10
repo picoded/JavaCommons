@@ -31,6 +31,8 @@ public class AccountTable_test {
 	public void setUp() {
 		accTableObj = implementationConstructor();
 		accTableObj.systemSetup();
+		accTableObj = (new JStruct()).getAccountTable("test");
+		accTableObj.systemSetup();
 	}
 	
 	@After
@@ -71,7 +73,6 @@ public class AccountTable_test {
 	
 	@Test
 	public void basicHasAddHasGet_viaName() {
-		String guid;
 		AccountObject p;
 		String name = "hello";
 		
@@ -79,7 +80,7 @@ public class AccountTable_test {
 		assertNull(accTableObj.get(name));
 		
 		assertNotNull(p = accTableObj.newObject(name));
-		assertNotNull(guid = p._oid());
+		assertNotNull(p._oid());
 		p.saveDelta();
 		
 		assertTrue(accTableObj.containsName(name));

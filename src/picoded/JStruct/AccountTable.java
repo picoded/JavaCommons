@@ -54,12 +54,12 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	///
 	/// Group[member] = role1,role2, ...
 	/// MetaTable<Group_guid, MetaObject<Member_guid, "String array of roles">
-	protected MetaTable group_childRole = null; //to delete from
+	protected MetaTable groupChildRole = null; //to delete from
 	
 	/// Handles the Group-member meta field mapping
 	///
 	/// MetaTable<GroupOID-MemberOID, MetaObject>
-	protected MetaTable groupChild_meta = null; //to delete from
+	protected MetaTable groupChildMeta = null; //to delete from
 	
 	///Handles the Login Throttling Attempt Key (User Id) Value (Attempt) field mapping
 	///
@@ -79,28 +79,28 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	protected String tableNamePrefix = null;
 	
 	/// The account self ID's
-	protected static String ACCOUNT_ID = "_ID";
+	protected static String ACCOUNTID = "_ID";
 	
 	/// The account self ID's
-	protected static String ACCOUNT_HASH = "_IH";
+	protected static String ACCOUNTHASH = "_IH";
 	
 	/// The login sessions used for authentication
-	protected static String ACCOUNT_SESSIONS = "_LS";
+	protected static String ACCOUNTSESSIONS = "_LS";
 	
 	/// The account self meta values
-	protected static String ACCOUNT_META = "_SM";
+	protected static String ACCOUNTMETA = "_SM";
 	
 	/// The child nodes mapping, from self
-	protected static String ACCOUNT_CHILD = "_SC";
+	protected static String ACCOUNTCHILD = "_SC";
 	
 	/// The child account meta values
-	protected static String ACCOUNT_CHILDMETA = "_CM";
+	protected static String ACCOUNTCHILDMETA = "_CM";
 	
 	/// The Login Throttling Attempt account values
-	protected static String ACCOUNT_LOGIN_THROTTLING_ATTEMPT = "_LA";
+	protected static String ACCOUNTLOGINTHROTTLINGATTEMPT = "_LA";
 	
 	/// The Login Throttling Elapsed account values
-	protected static String ACCOUNT_LOGIN_THROTTLING_ELAPSED = "_LE";
+	protected static String ACCOUNTLOGINTHROTTLINGELAPSED = "_LE";
 	
 	///
 	/// Constructor setup
@@ -110,14 +110,14 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	public AccountTable(JStruct jStructObj, String tableName) {
 		tableNamePrefix = tableName;
 		
-		accountID = jStructObj.getKeyValueMap(tableName + ACCOUNT_ID);
-		accountHash = jStructObj.getKeyValueMap(tableName + ACCOUNT_HASH);
-		accountSessions = jStructObj.getKeyValueMap(tableName + ACCOUNT_SESSIONS);
-		accountMeta = jStructObj.getMetaTable(tableName + ACCOUNT_META);
-		group_childRole = jStructObj.getMetaTable(tableName + ACCOUNT_CHILD);
-		groupChild_meta = jStructObj.getMetaTable(tableName + ACCOUNT_CHILDMETA);
-		loginThrottlingAttempt = jStructObj.getKeyValueMap(tableName + ACCOUNT_LOGIN_THROTTLING_ATTEMPT);
-		loginThrottlingElapsed = jStructObj.getKeyValueMap(tableName + ACCOUNT_LOGIN_THROTTLING_ELAPSED);
+		accountID = jStructObj.getKeyValueMap(tableName + ACCOUNTID);
+		accountHash = jStructObj.getKeyValueMap(tableName + ACCOUNTHASH);
+		accountSessions = jStructObj.getKeyValueMap(tableName + ACCOUNTSESSIONS);
+		accountMeta = jStructObj.getMetaTable(tableName + ACCOUNTMETA);
+		groupChildRole = jStructObj.getMetaTable(tableName + ACCOUNTCHILD);
+		groupChildMeta = jStructObj.getMetaTable(tableName + ACCOUNTCHILDMETA);
+		loginThrottlingAttempt = jStructObj.getKeyValueMap(tableName + ACCOUNTLOGINTHROTTLINGATTEMPT);
+		loginThrottlingElapsed = jStructObj.getKeyValueMap(tableName + ACCOUNTLOGINTHROTTLINGELAPSED);
 		accountSessions.setTempHint(true); //optimization
 	}
 	
@@ -131,8 +131,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		accountHash.systemSetup();
 		accountSessions.systemSetup();
 		accountMeta.systemSetup();
-		group_childRole.systemSetup();
-		groupChild_meta.systemSetup();
+		groupChildRole.systemSetup();
+		groupChildMeta.systemSetup();
 		loginThrottlingAttempt.systemSetup();
 		loginThrottlingElapsed.systemSetup();
 		if (superUserGroup() == null) {
@@ -146,8 +146,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		accountHash.systemTeardown();
 		accountSessions.systemTeardown();
 		accountMeta.systemTeardown();
-		group_childRole.systemTeardown();
-		groupChild_meta.systemTeardown();
+		groupChildRole.systemTeardown();
+		groupChildMeta.systemTeardown();
 		loginThrottlingAttempt.systemTeardown();
 		loginThrottlingElapsed.systemTeardown();
 	}
@@ -162,11 +162,11 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	}
 	
 	public MetaTable groupChildRole() {
-		return group_childRole;
+		return groupChildRole;
 	}
 	
 	public MetaTable groupChildMeta() {
-		return groupChild_meta;
+		return groupChildMeta;
 	}
 	
 	//
@@ -176,22 +176,26 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	//--------------------------------------------------------------------------
 	
 	/// Gets and return the accounts table from the account ID
+	@Override
 	public AccountObject get(Object oid) {
 		return getFromID(oid);
 	}
 	
 	/// Account exists, this is an alias of containsName
+	@Override
 	public boolean containsKey(Object oid) {
 		return containsID(oid.toString());
 	}
 	
 	/// Removes the object, returns null
+	@Override
 	public AccountObject remove(Object oid) {
 		removeFromID(oid.toString());
 		return null;
 	}
 	
 	// Returns all the account _oid in the system
+	@Override
 	public Set<String> keySet() {
 		return accountMeta.keySet();
 	}
@@ -202,10 +206,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	
 	/// Gets the account using the object ID
 	public AccountObject getFromID(Object oid) {
-		String _oid = oid.toString();
-		
-		if (containsID(_oid)) {
-			return new AccountObject(this, _oid);
+		if (containsID(oid.toString())) {
+			return new AccountObject(this, oid.toString());
 		}
 		
 		return null;
@@ -287,24 +289,24 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 			//group_childRole and groupChild_meta
 			if (ao != null) {
 				if (ao.isGroup()) {
-					MetaObject groupObj = group_childRole.get(oid);
-					group_childRole.remove(oid);
+					MetaObject groupObj = groupChildRole.get(oid);
+					groupChildRole.remove(oid);
 					
 					if (groupObj != null) {
 						for (String userID : groupObj.keySet()) {
 							String groupChildMetaKey = getGroupChildMetaKey(oid, userID);
-							groupChild_meta.remove(groupChildMetaKey);
+							groupChildMeta.remove(groupChildMetaKey);
 						}
 					}
 				} else {
 					String[] groupIDs = ao.getGroups_id();
 					if (groupIDs != null) {
 						for (String groupID : groupIDs) {
-							MetaObject groupObj = group_childRole.get(groupID);
+							MetaObject groupObj = groupChildRole.get(groupID);
 							groupObj.remove(oid);
 							
 							String groupChildMetaKey = getGroupChildMetaKey(groupID, oid);
-							groupChild_meta.remove(groupChildMetaKey);
+							groupChildMeta.remove(groupChildMetaKey);
 						}
 					}
 				}

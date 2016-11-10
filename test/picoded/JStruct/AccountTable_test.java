@@ -208,4 +208,15 @@ public class AccountTable_test {
 		assertNotNull(accTableObj.newObject("hello-group"));
 		assertNotNull(accTableObj.newObject("Test-1"));
 	}
+	
+	@Test
+	public void removeFromNameTest() {
+		accTableObj.removeFromName("test");
+		accTableObj.removeFromName("hello");
+		accTableObj.removeFromName("hello-group");
+		accTableObj.removeFromName("Test-1");
+		accTableObj.removeFromName("guest");
+		accTableObj.removeFromName("_oid");
+		
+	}
 }

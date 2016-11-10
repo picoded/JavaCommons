@@ -1,34 +1,16 @@
 package picoded.JStruct;
 
 /// Java imports
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.*;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
-/// Picoded imports
-import picoded.conv.GUID;
+import picoded.JStruct.internal.JStruct_MetaObject;
+import picoded.JStruct.internal.JStruct_MetaTable;
 import picoded.security.NxtCrypt;
-import picoded.JSql.*;
-import picoded.JCache.*;
-import picoded.JStruct.*;
-import picoded.JStruct.internal.*;
-import picoded.struct.*;
-
+/// Picoded imports
 /// hazelcast
-import com.hazelcast.core.*;
-import com.hazelcast.config.*;
-import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.HazelcastClient;
-import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.HazelcastClient;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
 
 public class AccountObject extends JStruct_MetaObject {
 	
@@ -164,7 +146,7 @@ public class AccountObject extends JStruct_MetaObject {
 			return _group_userToRoleMap;
 		}
 		
-		return (_group_userToRoleMap = mainTable.group_childRole.uncheckedGet(this._oid()));
+		return (_group_userToRoleMap = mainTable.groupChildRole.uncheckedGet(this._oid()));
 	}
 	
 	// Group status check
@@ -213,7 +195,7 @@ public class AccountObject extends JStruct_MetaObject {
 			return null;
 		}
 		
-		return mainTable.groupChild_meta.uncheckedGet(mainTable.getGroupChildMetaKey(this._oid(), memberOID));
+		return mainTable.groupChildMeta.uncheckedGet(mainTable.getGroupChildMetaKey(this._oid(), memberOID));
 	}
 	
 	/// Gets and returns the member meta map, if it exists
@@ -228,7 +210,7 @@ public class AccountObject extends JStruct_MetaObject {
 			return null;
 		}
 		
-		return mainTable.groupChild_meta.uncheckedGet(this._oid() + "-" + memberOID);
+		return mainTable.groupChildMeta.uncheckedGet(this._oid() + "-" + memberOID);
 	}
 	
 	/// Adds the member to the group with the given role, if it was not previously added
@@ -262,11 +244,11 @@ public class AccountObject extends JStruct_MetaObject {
 			group_userToRoleMap().put(memberOID, role);
 			group_userToRoleMap().saveDelta();
 			
-			childMeta = mainTable.groupChild_meta.uncheckedGet(this._oid() + "-" + memberOID);
+			childMeta = mainTable.groupChildMeta.uncheckedGet(this._oid() + "-" + memberOID);
 			childMeta.put("role", role);
 			childMeta.saveDelta();
 		} else {
-			childMeta = mainTable.groupChild_meta.uncheckedGet(this._oid() + "-" + memberOID);
+			childMeta = mainTable.groupChildMeta.uncheckedGet(this._oid() + "-" + memberOID);
 		}
 		
 		return childMeta;
@@ -278,12 +260,12 @@ public class AccountObject extends JStruct_MetaObject {
 		}
 		
 		String memberOID = memberObject._oid();
-		String level = group_userToRoleMap().getString(memberOID);
+//		String level = group_userToRoleMap().getString(memberOID);
 		
 		group_userToRoleMap().remove(memberOID);
 		group_userToRoleMap().saveAll();
 		
-		mainTable.groupChild_meta.remove(this._oid() + "-" + memberOID);
+		mainTable.groupChildMeta.remove(this._oid() + "-" + memberOID);
 		
 		System.out.println("Remove member called successfully");
 		
@@ -306,7 +288,7 @@ public class AccountObject extends JStruct_MetaObject {
 	/// Returns the list of members in the group
 	///
 	public String[] getGroups_id() {
-		return mainTable.group_childRole.getFromKeyName_id(_oid());
+		return mainTable.groupChildRole.getFromKeyName_id(_oid());
 	}
 	
 	/// Gets all the members object related to the group

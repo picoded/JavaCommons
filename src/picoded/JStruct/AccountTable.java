@@ -719,22 +719,23 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 				// To avoid null error in the array
 				if (userGroup != null && doGroupCheck
 					&& ArrayUtils.contains(insideGroupAny, userGroup._oid())) {
-					if (doRoleCheck && ArrayUtils.contains(hasRoleAny, userGroup.getMemberRole(ao))) {
-						ret.add(ao);
-					} else {
-						ret.add(ao);
-					}
+					getAccountObjectList(doRoleCheck, ret, hasRoleAny, userGroup, ao);
 				} else if (userGroup != null) {
-					if (doRoleCheck && ArrayUtils.contains(hasRoleAny, userGroup.getMemberRole(ao))) {
-						ret.add(ao);
-					} else {
-						ret.add(ao);
-					}
+					getAccountObjectList(doRoleCheck, ret, hasRoleAny, userGroup, ao);
 				}
 			}
 		}
-		
 		return ret.toArray(new AccountObject[ret.size()]);
 	}
 	
+	private List<AccountObject> getAccountObjectList(boolean doRoleCheck, List<AccountObject> ret,
+		String[] hasRoleAny, AccountObject userGroup, AccountObject ao) {
+		if (doRoleCheck && ArrayUtils.contains(hasRoleAny, userGroup.getMemberRole(ao))) {
+			ret.add(ao);
+		} else {
+			ret.add(ao);
+		}
+		return ret;
+		
+	}
 }

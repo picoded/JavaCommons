@@ -276,4 +276,23 @@ public class AccountTable_test {
 	public void setSuperUserGroupNameTest() {
 		assertNotNull(accTableObj.setSuperUserGroupName("userGroup"));
 	}
+	
+	@Test
+	public void getUsersByGroupAndRoleTest() {
+		assertNotNull(accTableObj.setSuperUserGroupName("hello-group"));
+		assertNotNull(accTableObj.setSuperUserGroupName("userGroup"));
+		assertNotNull(accTableObj.getUsersByGroupAndRole(null, null));
+		assertNotNull(accTableObj.getUsersByGroupAndRole(null, new String[] { "guest", "member",
+			"manager", "admin" }));
+		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] { "hello-group", "userGroup" },
+			null));
+		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] { "" }, new String[] { "" }));
+		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] { "" }, new String[] { "guest",
+			"member", "manager", "admin" }));
+		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] { "hello-group", "userGroup" },
+			new String[] { "" }));
+		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] { "hello-group", "userGroup" },
+			new String[] { "guest", "member", "manager", "admin" }));
+		
+	}
 }

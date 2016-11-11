@@ -32,6 +32,10 @@ public class AccountTable_test {
 	public void setUp() {
 		accTableObj = implementationConstructor();
 		accTableObj.systemSetup();
+		String grpName = "hello-group";
+		assertFalse(accTableObj.containsKey(grpName));
+		assertNull(accTableObj.get(grpName));
+		accTableObj.systemSetup();
 	}
 	
 	@After
@@ -234,5 +238,26 @@ public class AccountTable_test {
 		assertNull(accTableObj.get(grpName));
 		assertNotNull(grpObj = accTableObj.newObject(grpName));
 		accTableObj.removeFromID(grpObj.get("_oid").toString());
+	}
+	
+	@Test
+	public void getGroupChildMetaKeyTest() {
+		String grpName = "hello-group";
+		AccountObject grpObj;
+		assertFalse(accTableObj.containsKey(grpName));
+		assertNull(accTableObj.get(grpName));
+		assertNotNull(grpObj = accTableObj.newObject(grpName));
+		assertNotNull(accTableObj.getGroupChildMetaKey(grpObj.get("_oid").toString(), "hello"));
+	}
+	
+	@Test
+	public void getSessionInfoTest() {
+		String grpName = "hello-group";
+		AccountObject grpObj;
+		assertFalse(accTableObj.containsKey(grpName));
+		assertNull(accTableObj.get(grpName));
+		assertNotNull(grpObj = accTableObj.newObject(grpName));
+		assertNull(accTableObj.getSessionInfo(grpObj.get("_oid").toString(),
+			String.valueOf(accTableObj.nonceSize)));
 	}
 }

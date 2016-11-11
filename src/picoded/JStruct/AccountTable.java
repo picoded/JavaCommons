@@ -637,33 +637,27 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	/// Checks if membership role exists
 	public boolean hasMembershipRole(String role) {
 		// Sanatize the role
-		role = role.toLowerCase();
-		
 		// Returns if it exists
-		return membershipRoles.contains(role);
+		return membershipRoles.contains(role.toLowerCase());
 	}
 	
 	/// Add membership role if it does not exists
 	public void addMembershipRole(String role) {
 		// Sanatize the role
-		role = role.toLowerCase();
-		
 		// Already exists terminate
-		if (hasMembershipRole(role)) {
+		if (hasMembershipRole(role.toLowerCase())) {
 			return;
 		}
-		
 		// Add the role
-		membershipRoles.add(role);
+		membershipRoles.add(role.toLowerCase());
 	}
 	
 	/// Checks and validates the membership role, throws if invalid
 	protected String validateMembershipRole(String role) {
-		role = role.toLowerCase();
-		if (!hasMembershipRole(role)) {
-			throw new RuntimeException("Membership role does not exists: " + role);
+		if (!hasMembershipRole(role.toLowerCase())) {
+			throw new RuntimeException("Membership role does not exists: " + role.toLowerCase());
 		}
-		return role;
+		return role.toLowerCase();
 	}
 	
 	//

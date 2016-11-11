@@ -50,7 +50,6 @@ public class AccountTable_test {
 	public void constructorTest() {
 		// not null check
 		assertNotNull(accTableObj);
-		
 		// run maintaince, no exception?
 		// mtObj.maintenance();
 	}
@@ -259,5 +258,22 @@ public class AccountTable_test {
 		assertNotNull(grpObj = accTableObj.newObject(grpName));
 		assertNull(accTableObj.getSessionInfo(grpObj.get("_oid").toString(),
 			String.valueOf(accTableObj.nonceSize)));
+	}
+	
+	@Test
+	public void membershipRolesTest() {
+		assertNotNull(accTableObj.membershipRoles());
+		accTableObj.addMembershipRole("gust0");
+		accTableObj.addMembershipRole("gust0");
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void validateMembershipRoleTest() throws Exception {
+		accTableObj.validateMembershipRole("gust123");
+	}
+	
+	@Test
+	public void setSuperUserGroupNameTest() {
+		assertNotNull(accTableObj.setSuperUserGroupName("userGroup"));
 	}
 }

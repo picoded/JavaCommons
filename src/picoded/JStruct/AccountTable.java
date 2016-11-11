@@ -691,14 +691,15 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	public AccountObject[] getUsersByGroupAndRole(String[] insideGroupAny, String[] hasRoleAny) {
 		List<AccountObject> ret = new ArrayList<AccountObject>();
 		
-		MetaObject[] metaObjs = accountMetaTable().query(null, null, "oID", 0, 0); //initial query just to get everything out so i can filter
+		//initial query just to get everything out so i can filter
+		MetaObject[] metaObjs = accountMetaTable().query(null, null, "oID", 0, 0);
 		
 		if (metaObjs == null) {
 			return null;
 		}
 		
-		boolean doGroupCheck = (insideGroupAny != null && insideGroupAny.length > 0);
-		boolean doRoleCheck = (hasRoleAny != null && hasRoleAny.length > 0);
+		boolean doGroupCheck = insideGroupAny != null && insideGroupAny.length > 0;
+		boolean doRoleCheck = hasRoleAny != null && hasRoleAny.length > 0;
 		
 		for (MetaObject metaObj : metaObjs) {
 			AccountObject ao = getFromID(metaObj._oid());
@@ -715,29 +716,17 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 			}
 			
 			for (AccountObject userGroup : userGroups) {
-				
 				// To avoid null error in the array
-				if (userGroup == null) {
-					continue;
-				}
-				
-				if (doGroupCheck) {
-					if (ArrayUtils.contains(insideGroupAny, userGroup._oid())) {
-						if (doRoleCheck) {
-							String memberRole = userGroup.getMemberRole(ao);
-							if (ArrayUtils.contains(hasRoleAny, memberRole)) {
-								ret.add(ao);
-							}
-						} else {
-							ret.add(ao);
-						}
+				if (userGroup != null && doGroupCheck
+					&& ArrayUtils.contains(insideGroupAny, userGroup._oid())) {
+					if (doRoleCheck && ArrayUtils.contains(hasRoleAny, userGroup.getMemberRole(ao))) {
+						ret.add(ao);
+					} else {
+						ret.add(ao);
 					}
-				} else {
-					if (doRoleCheck) {
-						String memberRole = userGroup.getMemberRole(ao);
-						if (ArrayUtils.contains(hasRoleAny, memberRole)) {
-							ret.add(ao);
-						}
+				} else if (userGroup != null) {
+					if (doRoleCheck && ArrayUtils.contains(hasRoleAny, userGroup.getMemberRole(ao))) {
+						ret.add(ao);
 					} else {
 						ret.add(ao);
 					}

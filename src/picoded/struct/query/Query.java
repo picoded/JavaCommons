@@ -1,15 +1,18 @@
 package picoded.struct.query;
 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 import picoded.struct.ArrayListMap;
 import picoded.struct.query.internal.QueryFilter;
+
 
 ///
 /// Representas a query condition, that can be used as a java Predicate against a collection
@@ -162,9 +165,9 @@ public interface Query extends Predicate<Object> {
 			for (int i = 0; i < subListLen; ++i) {
 				Query node = subList.get(i);
 				
-				if (node == original) {
+				if (node.equals(original)) {
 					subList.set(i, replacement);
-				} else if (node == replacement) {
+				} else if (node.equals(replacement)) {
 					// ignroe replacement nodes
 				} else {
 					// recursive call
@@ -264,8 +267,9 @@ public interface Query extends Predicate<Object> {
 	/// Searches using the query, and returns the resulting set
 	default <K, V> List<V> search(Map<K, V> set) {
 		List<V> ret = new ArrayList<V>();
-		for (K key : set.keySet()) {
-			V val = set.get(key);
+		//for (K key : set.keySet()) {
+		for (Entry<K, V> entry : set.entrySet()) {
+			V val = entry.getValue();
 			if (test(val)) {
 				ret.add(val);
 			}

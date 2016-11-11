@@ -13,6 +13,9 @@ import java.util.regex.Pattern;
 /// Which can be used to create more complex Comperator, or used on its own
 public class CompareUtils {
 	
+	protected CompareUtils() {
+		throw new IllegalAccessError("Utility class");
+	}
 	//
 	// Static comparators in use
 	//-----------------------------------------------------------------
@@ -32,7 +35,7 @@ public class CompareUtils {
 			if (o2 == null) {
 				return 0;
 			} //else { //o2 has value, therefor o1 is smaller
-			return -1;
+				return -1;
 			//}
 		} else if (o2 == null) { //o1 has value, therefor o1 is larger
 			return 1;
@@ -56,7 +59,7 @@ public class CompareUtils {
 			if (o2 == null) {
 				return 0;
 			} //else { //o2 has value, therefor o1 is smaller
-			return -1;
+				return -1;
 			//}
 		} else if (o2 == null) { //o1 has value, therefor o1 is larger
 			return 1;
@@ -83,7 +86,7 @@ public class CompareUtils {
 			if (o2 == null) {
 				return 0;
 			} //else { //o2 has value, therefor o1 is smaller
-			return -1;
+				return -1;
 			//}
 		} else if (o2 == null) { //o1 has value, therefor o1 is larger
 			return 1;
@@ -150,8 +153,7 @@ public class CompareUtils {
 	protected static Collator stringCompareCollator = RuleBasedCollator.getInstance(Locale.ENGLISH);
 	
 	/// Number instance for string to numeric
-	protected static NumberFormat stringToNumberParser = NumberFormat
-		.getNumberInstance(Locale.ENGLISH);
+	protected static NumberFormat stringToNumberParser = NumberFormat.getNumberInstance(Locale.ENGLISH);
 	
 	///
 	/// Conversion to numeric format, if possible. Else its null
@@ -182,7 +184,7 @@ public class CompareUtils {
 			if (o2 == null) {
 				return 0;
 			} //else { //o2 has value, therefor o1 is smaller
-			return -1;
+				return -1;
 			//}
 		} else if (o2 == null) { //o1 has value, therefor o1 is larger
 			return 1;

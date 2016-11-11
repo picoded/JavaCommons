@@ -62,7 +62,7 @@ public enum QueryType {
 	//
 	// Public EnumSet
 	//--------------------------------------------------------------------
-	public static final EnumSet<QueryType> typeSet = EnumSet.allOf(QueryType.class);
+	protected static final EnumSet<QueryType> typeSet = EnumSet.allOf(QueryType.class);
 	
 	//
 	// Type mapping
@@ -87,9 +87,12 @@ public enum QueryType {
 				nameToTypeMap_wip.put(type.name(), type);
 				idToTypeMap_wip.put(type.getValue(), type);
 			}
-			
-			nameToTypeMap = nameToTypeMap_wip;
-			//idToTypeMap_wip = idToTypeMap_wip;
+			synchronized(nameToTypeMap) {
+				if (nameToTypeMap == null) {
+					nameToTypeMap = nameToTypeMap_wip;
+				}
+				//idToTypeMap_wip = idToTypeMap_wip;
+			}
 		}
 	}
 	

@@ -172,7 +172,7 @@ public class OrderBy<T> implements Comparator<T> {
 			if (comparePair.getRight() == OrderType.ASC) {
 				return diff;
 			} //else {
-			return -diff;
+				return -diff;
 			//}
 		}
 		

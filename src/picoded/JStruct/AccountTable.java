@@ -698,7 +698,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 			return null;
 		}
 		
-		boolean doGroupCheck = insideGroupAny != null && insideGroupAny.length > 0;
+		//		boolean doGroupCheck = insideGroupAny != null && insideGroupAny.length > 0;
 		boolean doRoleCheck = hasRoleAny != null && hasRoleAny.length > 0;
 		
 		for (MetaObject metaObj : metaObjs) {
@@ -717,10 +717,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 			
 			for (AccountObject userGroup : userGroups) {
 				// To avoid null error in the array
-				if (userGroup != null && doGroupCheck
-					&& ArrayUtils.contains(insideGroupAny, userGroup._oid())) {
-					getAccountObjectList(doRoleCheck, ret, hasRoleAny, userGroup, ao);
-				} else if (userGroup != null) {
+				if (userGroup != null) {
 					getAccountObjectList(doRoleCheck, ret, hasRoleAny, userGroup, ao);
 				}
 			}

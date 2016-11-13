@@ -172,7 +172,8 @@ public class FileServlet extends HttpServlet {
 		
 		// 404 error if accessing possible java servlet protected files
 		String requestPath_lowerCase = requestPath.toLowerCase();
-		if (requestPath_lowerCase.contains("/web-inf/") || requestPath_lowerCase.contains("/meta-inf/")) {
+		if (requestPath_lowerCase.contains("/web-inf/")
+			|| requestPath_lowerCase.contains("/meta-inf/")) {
 			servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
@@ -231,7 +232,8 @@ public class FileServlet extends HttpServlet {
 		// If-Modified-Since header should be greater than LastModified. If so, then return 304.
 		// This header is ignored if any If-None-Match header is specified.
 		long ifModifiedSince = servletRequest.getDateHeader("If-Modified-Since");
-		if (ifNoneMatch == null && ifModifiedSince != -1 && ifModifiedSince + cacheNetworkJitterTolerance > lastModified) {
+		if (ifNoneMatch == null && ifModifiedSince != -1
+			&& ifModifiedSince + cacheNetworkJitterTolerance > lastModified) {
 			servletResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
 			servletResponse.setHeader("ETag", eTag); // Required in 304.
 			if (expires > 0) {
@@ -345,7 +347,8 @@ public class FileServlet extends HttpServlet {
 			// the browser, then set to inline, else attachment which will pop a 'save as' dialogue.
 			//
 			String accept = servletRequest.getHeader("Accept");
-			disposition = accept != null && headerAccept(accept, contentType) ? "inline" : "attachment";
+			disposition = accept != null && headerAccept(accept, contentType) ? "inline"
+				: "attachment";
 		}
 		
 		// Return headers
@@ -354,7 +357,8 @@ public class FileServlet extends HttpServlet {
 		// Initialize servletResponse.
 		servletResponse.reset();
 		//servletResponse.setBufferSize(10240);
-		servletResponse.setHeader("Content-Disposition", disposition + ";filename=\"" + fileName + "\"");
+		servletResponse.setHeader("Content-Disposition", disposition + ";filename=\"" + fileName
+			+ "\"");
 		servletResponse.setHeader("Accept-Ranges", "bytes");
 		servletResponse.setHeader("ETag", eTag);
 		servletResponse.setDateHeader("Last-Modified", lastModified);
@@ -375,7 +379,8 @@ public class FileServlet extends HttpServlet {
 				// Return full file.
 				Range r = full;
 				servletResponse.setContentType(contentType);
-				servletResponse.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/" + r.total);
+				servletResponse.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/"
+					+ r.total);
 				
 				if (!headersOnly) {
 					if (acceptsGzip) {
@@ -394,7 +399,8 @@ public class FileServlet extends HttpServlet {
 				// Return single part of file.
 				Range r = ranges.get(0);
 				servletResponse.setContentType(contentType);
-				servletResponse.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/" + r.total);
+				servletResponse.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/"
+					+ r.total);
 				servletResponse.setHeader("Content-Length", String.valueOf(r.length));
 				servletResponse.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
 				
@@ -405,7 +411,8 @@ public class FileServlet extends HttpServlet {
 			} else {
 				
 				// Return multiple parts of file.
-				servletResponse.setContentType("multipart/byteranges; boundary=" + MULTIPART_BYTERANGES);
+				servletResponse
+					.setContentType("multipart/byteranges; boundary=" + MULTIPART_BYTERANGES);
 				servletResponse.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
 				
 				if (!headersOnly) {
@@ -457,13 +464,13 @@ public class FileServlet extends HttpServlet {
 		}
 		
 		if (!baseFolder.isDirectory()) {
-			throw new RuntimeException("FileServlet init param 'basePath' value (" + baseFolder.toString()
-				+ ") is actually not a directory in file system.");
+			throw new RuntimeException("FileServlet init param 'basePath' value ("
+				+ baseFolder.toString() + ") is actually not a directory in file system.");
 		}
 		
 		if (!baseFolder.canRead()) {
-			throw new RuntimeException("FileServlet init param 'basePath' value (" + baseFolder.toString()
-				+ ") is actually not readable in file system.");
+			throw new RuntimeException("FileServlet init param 'basePath' value ("
+				+ baseFolder.toString() + ") is actually not readable in file system.");
 		}
 		
 		// Use provided file, to extract filepath
@@ -513,7 +520,8 @@ public class FileServlet extends HttpServlet {
 		String[] headerValues = header.split("\\s*,\\s*");
 		Arrays.sort(headerValues);
 		
-		return Arrays.binarySearch(headerValues, toMatch) > -1 || Arrays.binarySearch(headerValues, "*") > -1;
+		return Arrays.binarySearch(headerValues, toMatch) > -1
+			|| Arrays.binarySearch(headerValues, "*") > -1;
 	}
 	
 	/// Inner class representing a byte range
@@ -557,7 +565,8 @@ public class FileServlet extends HttpServlet {
 	///
 	/// @throws IOException If something fails at I/O level.
 	///
-	private static void copy(RandomAccessFile input, OutputStream output, long start, long length) throws IOException {
+	private static void copy(RandomAccessFile input, OutputStream output, long start, long length)
+		throws IOException {
 		byte[] buffer = new byte[64]; //line cache size
 		int read;
 		
@@ -611,12 +620,14 @@ public class FileServlet extends HttpServlet {
 	}
 	
 	/// Process HEAD servletRequest. This returns the same headers as GET request, but without content.
-	protected void doHead(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doHead(HttpServletRequest request, HttpServletResponse response)
+		throws ServletException, IOException {
 		processRequest(request, response, true);
 	}
 	
 	/// Process GET request, with headers and content
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+		throws ServletException, IOException {
 		processRequest(request, response, false);
 	}
 	

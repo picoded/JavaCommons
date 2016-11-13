@@ -21,18 +21,18 @@ import org.apache.commons.lang3.StringUtils;
 /// @See https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtil.html
 ///
 public class FileUtil extends org.apache.commons.io.FileUtils {
-
+	
 	/// Invalid constructor (throws exception)
 	protected FileUtil() {
 		throw new IllegalAccessError("Utility class");
 	}
-
+	
 	//------------------------------------------------------------------------------------------------------------------
 	//
 	// File / folder search handling
 	//
 	//------------------------------------------------------------------------------------------------------------------
-
+	
 	///
 	/// List only the folders inside a folder
 	///
@@ -52,7 +52,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		}
 		return ret;
 	}
-
+	
 	///
 	/// List only the folders inside a folder
 	///
@@ -61,9 +61,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @return List of folder names
 	///
 	public static List<String> listDirNames(File directory) {
-		return fileCollectionToStringNames( listDirs(directory) );
+		return fileCollectionToStringNames(listDirs(directory));
 	}
-
+	
 	///
 	/// Finds files within a given directory (and optionally its subdirectories) which match an array of extensions.
 	///
@@ -74,9 +74,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @return  List of file names
 	///
 	public static List<String> listFileNames(File directory, String[] extensions, boolean recursive) {
-		return fileCollectionToStringNames( listFiles(directory, extensions, recursive) );
+		return fileCollectionToStringNames(listFiles(directory, extensions, recursive));
 	}
-
+	
 	///
 	/// Finds files within a given directory (and optionally its subdirectories) which match an array of extensions.
 	///
@@ -88,7 +88,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	public static List<String> listFileNames(File directory, String[] extensions) {
 		return listFileNames(directory, extensions, false);
 	}
-
+	
 	///
 	/// Takes in a file collection and converts them into string names
 	///
@@ -98,21 +98,21 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	public static List<String> fileCollectionToStringNames(Collection<File> fileCollection) {
 		ArrayList<String> ret = new ArrayList<String>();
-		if(fileCollection == null) {
+		if (fileCollection == null) {
 			return ret;
 		}
-		for(File item : fileCollection) {
-			ret.add( item.getName() );
+		for (File item : fileCollection) {
+			ret.add(item.getName());
 		}
 		return ret;
 	}
-
+	
 	//------------------------------------------------------------------------------------------------------------------
 	//
 	// File to string handling
 	//
 	//------------------------------------------------------------------------------------------------------------------
-
+	
 	///
 	/// Reads a file content into a string
 	///
@@ -125,7 +125,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	public static String readFileToString(File inFile) throws IOException {
 		return picoded.file.FileUtil.readFileToString(inFile, (String) null);
 	}
-
+	
 	///
 	/// Reads a file content into a string, with encoding
 	///
@@ -140,7 +140,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		}
 		return org.apache.commons.io.FileUtils.readFileToString(inFile, encoding);
 	}
-
+	
 	///
 	/// Write a string content into a file
 	///
@@ -152,7 +152,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	public static void writeStringToFile(File inFile, String data) throws IOException {
 		picoded.file.FileUtil.writeStringToFile(inFile, data, (String) null);
 	}
-
+	
 	///
 	/// Write a string content into a file
 	///
@@ -167,7 +167,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		}
 		org.apache.commons.io.FileUtils.writeStringToFile(inFile, data, encoding);
 	}
-
+	
 	///
 	/// Extends the readFileToString to include a "fallback" default value,
 	/// which is used if the file does not exists / is not readable / is not a
@@ -183,7 +183,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		throws IOException {
 		return picoded.file.FileUtil.readFileToString_withFallback(inFile, fallback, null);
 	}
-
+	
 	///
 	/// Extends the readFileToString to include a "fallback" default value,
 	/// which is used if the file does not exists / is not readable / is not a
@@ -200,10 +200,10 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		if (inFile == null || !inFile.exists()) {
 			return fallback;
 		}
-
+		
 		return picoded.file.FileUtil.readFileToString(inFile, encoding);
 	}
-
+	
 	///
 	/// Write to file only if it differs
 	///
@@ -224,7 +224,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		writeStringToFile(inFile, data, encoding);
 		return true;
 	}
-
+	
 	///
 	/// Write to file only if it differs
 	///
@@ -236,7 +236,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	public static boolean writeStringToFile_ifDifferant(File inFile, String data) throws IOException {
 		return picoded.file.FileUtil.writeStringToFile_ifDifferant(inFile, data, null);
 	}
-
+	
 	///
 	/// Recursively copy all directories, and files only if the file content is different
 	///
@@ -246,7 +246,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	public static void copyDirectory_ifDifferent(File inDir, File outDir) throws IOException {
 		copyDirectory_ifDifferent(inDir, outDir, true);
 	}
-
+	
 	///
 	/// Recursively copy all directories, and files only if the file content is different
 	///
@@ -259,7 +259,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		//default symlink is false : This is considered advance behaviour
 		copyDirectory_ifDifferent(inDir, outDir, preserveFileDate, false);
 	}
-
+	
 	///
 	/// Recursively copy all directories, and files only if the file content is different
 	///
@@ -283,7 +283,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			}
 		}
 	}
-
+	
 	///
 	/// Recursively copy all directories, and files only if the file content is different
 	///
@@ -293,7 +293,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	public static void copyFile_ifDifferent(File inFile, File outFile) throws IOException {
 		copyFile_ifDifferent(inFile, outFile, true);
 	}
-
+	
 	///
 	/// Recursively copy all directories, and files only if the file content is different
 	///
@@ -306,7 +306,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		//default symlink is false :This is considered advance behaviour
 		copyFile_ifDifferent(inFile, outFile, preserveFileDate, false);
 	}
-
+	
 	///
 	/// Recursively copy all directories, and files only if the file content is different
 	///
@@ -334,13 +334,13 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			// No copy operations is required.
 			return;
 		}
-
+		
 		// Tries to build symlink if possible, hopefully
 		if (tryToSymLinkFiles) {
 			// NOTE: You do not test source file for symbolic link
 			// Only the detination file should be a symbolic link.
 			//------------------------------------------------------------
-
+			
 			//
 			// Assumes output file is either NOT a symbolic link
 			// or has the wrong symbolic link reference.
@@ -352,27 +352,27 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath()
 				.toAbsolutePath());
 		}
-
+		
 		// Checks if file has not been modified, and has same data length, for skipping?
 		//---------------------------------------------------------------------------------
 		if (inFile.lastModified() == outFile.lastModified() && inFile.length() == outFile.length()) {
 			// returns and skip for optimization
 			return;
 		}
-
+		
 		// Final fallback behaviour, copies file if content differs.
 		//---------------------------------------------------------------------------------
 		if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null)) {
 			copyFile(inFile, outFile, preserveFileDate);
 		}
 	}
-
+	
 	//------------------------------------------------------------------------------------------------------------------
 	//
 	// JavaCommons time utility functions
 	//
 	//------------------------------------------------------------------------------------------------------------------
-
+	
 	///
 	/// Recursively scan for the newest file
 	///
@@ -406,7 +406,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 		}
 		return tmpTimestamp;
 	}
-
+	
 	///
 	/// Recursively scan for the newest file
 	///
@@ -418,75 +418,75 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	public static long newestFileTimestamp(File inFile) {
 		return newestFileTimestamp(inFile, null);
 	}
-
+	
 	//------------------------------------------------------------------------------------------------------------------
 	//
 	// FilenameUtils functions
 	//
 	//------------------------------------------------------------------------------------------------------------------
-
+	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getBaseName(java.lang.String)
 	/// @param raw file name/path
 	/// @return filename only without the the type extension
 	public static String getBaseName(String filename) {
 		return org.apache.commons.io.FilenameUtils.getBaseName(filename);
 	}
-
+	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getExtension(java.lang.String)
 	/// @param raw file name/path
 	/// @return filename type extension
 	public static String getExtension(String filename) {
 		return org.apache.commons.io.FilenameUtils.getExtension(filename);
 	}
-
+	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getFullPath(java.lang.String)
 	/// @param raw file name/path
 	/// @return full resolved path with ending / for directories
 	public static String getFullPath(String filename) {
 		return org.apache.commons.io.FilenameUtils.getFullPath(filename);
 	}
-
+	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getFullPathNoEndSeparator(java.lang.String)
 	/// @param raw file name/path
 	/// @return full resolved path without ending / for directories
 	public static String getFullPathNoEndSeparator(String filename) {
 		return org.apache.commons.io.FilenameUtils.getFullPathNoEndSeparator(filename);
 	}
-
+	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getName(java.lang.String)
 	/// @param raw file name/path
 	/// @return filename without the path
 	public static String getName(String filename) {
 		return org.apache.commons.io.FilenameUtils.getName(filename);
 	}
-
+	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getPath(java.lang.String)
 	/// @param raw file name/path
 	/// @return full resolved path with ending / for directories
 	public static String getPath(String filename) {
 		return org.apache.commons.io.FilenameUtils.getPath(filename);
 	}
-
+	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getPathNoEndSeparator(java.lang.String)
 	/// @param raw file name/path
 	/// @return full resolved path without ending / for directories
 	public static String getPathNoEndSeparator(String filename) {
 		return org.apache.commons.io.FilenameUtils.getPathNoEndSeparator(filename);
 	}
-
+	
 	/// @see https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#normalize(java.lang.String)
 	/// @param raw file name/path
 	/// @return full resolved path with ending / for directories
 	public static String normalize(String filename) {
 		return org.apache.commons.io.FilenameUtils.normalize(filename);
 	}
-
+	
 	//------------------------------------------------------------------------------------------------------------------
 	//
 	// Items below here, requires cleanup : not considered stable
 	//
 	//------------------------------------------------------------------------------------------------------------------
-
+	
 	///
 	/// Get List only the files path
 	///
@@ -498,7 +498,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	public static Collection<String> getFilePaths(File inFile) {
 		return getFilePaths(inFile, null, null);
 	}
-
+	
 	///
 	/// Get List only the files path
 	///
@@ -511,7 +511,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	public static Collection<String> getFilePaths(File inFile, String separator) {
 		return getFilePaths(inFile, separator, null);
 	}
-
+	
 	///
 	/// Get List only the files path
 	///

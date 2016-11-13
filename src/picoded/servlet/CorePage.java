@@ -828,11 +828,11 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 		throws Exception {
 		/// Does standard file output - if file exists
 		outputFileServlet().processRequest( //
-				getHttpServletRequest(), //
-				getHttpServletResponse(), //
-				requestType() == HttpRequestType.HEAD, //
-				requestWildcardUri());
-				
+			getHttpServletRequest(), //
+			getHttpServletResponse(), //
+			requestType() == HttpRequestType.HEAD, //
+			requestWildcardUri());
+		
 		/// Completes and return
 		return true;
 	}

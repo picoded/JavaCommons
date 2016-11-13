@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException; 
+import org.xml.sax.SAXParseException;
 import org.xml.sax.InputSource;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Document;
@@ -73,7 +73,7 @@ public class ConvertXML {
 			ret.getDocumentElement().normalize();
 			ret.normalizeDocument();
 			return ret;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new InvalidFormatXML(e);
 		}
 	}
@@ -95,11 +95,11 @@ public class ConvertXML {
 	/// @param  XML string to use
 	///
 	/// @return   Result map
-	protected static Map<String,Object> toMap(Element el) {
-		Map<String,Object> ret = new HashMap<String,Object>();
+	protected static Map<String, Object> toMap(Element el) {
+		Map<String, Object> ret = new HashMap<String, Object>();
 		
 		// Process element
-		if(el != null) {
+		if (el != null) {
 			//
 			// Process attributes
 			//
@@ -119,34 +119,34 @@ public class ConvertXML {
 			// Processs children nodes
 			//
 			NodeList childList = el.getChildNodes();
-			int childListLen = (childList != null)? childList.getLength() : 0;
-			if( len > 0 ) {
+			int childListLen = (childList != null) ? childList.getLength() : 0;
+			if (len > 0) {
 				ArrayList<Object> list = new ArrayList<Object>();
 				String nodeValue = "";
 				
 				// Every child item
-				for(int i=0; i< childListLen; ++i) {
+				for (int i = 0; i < childListLen; ++i) {
 					Object item = childList.item(i);
-					if( item instanceof Element ) {
-						Element itemEle = (Element)item;
-						list.add( toMap(itemEle) );
-					} else if( item instanceof Node ) {
+					if (item instanceof Element) {
+						Element itemEle = (Element) item;
+						list.add(toMap(itemEle));
+					} else if (item instanceof Node) {
 						// Text value
-						nodeValue = nodeValue + ((Node)item).getNodeValue();
+						nodeValue = nodeValue + ((Node) item).getNodeValue();
 					} else {
-						throw new InvalidFormatXML("Unexpected item type : "+item.toString());
+						throw new InvalidFormatXML("Unexpected item type : " + item.toString());
 					}
 				}
 				
-				if( list.size() > 0 ) {
+				if (list.size() > 0) {
 					ret.put("ChildNodes", list);
 				}
-				if( nodeValue.length() > 0 ) {
+				if (nodeValue.length() > 0) {
 					ret.put("NodeValue", nodeValue);
 				}
 			} else {
 				String nodeValue = el.getNodeValue();
-				if(nodeValue == null || nodeValue.length() <= 0) {
+				if (nodeValue == null || nodeValue.length() <= 0) {
 					nodeValue = el.getTextContent();
 				}
 				ret.put("NodeValue", nodeValue);
@@ -160,8 +160,8 @@ public class ConvertXML {
 	/// @param  XML string to use
 	///
 	/// @return   Result map
-	public static Map<String,Object> toMap(String xmlStr) {
-		return toMap( toElement(xmlStr) );
+	public static Map<String, Object> toMap(String xmlStr) {
+		return toMap(toElement(xmlStr));
 	}
 	
 	/// Inserts a child map, in accordence to its type
@@ -171,12 +171,13 @@ public class ConvertXML {
 	///
 	/// @return  The base map
 	@SuppressWarnings("unchecked")
-	protected static Map<String,Object> addChildNodeToBaseMap(Map<String,Object>baseMap, Map<String,Object>childMap) {
+	protected static Map<String, Object> addChildNodeToBaseMap(Map<String, Object> baseMap,
+		Map<String, Object> childMap) {
 		//
 		// Get the type key
 		//
-		String type = GenericConvert.toString( childMap.get("type"), null );
-		if( type == null || type.length() <= 0 ) {
+		String type = GenericConvert.toString(childMap.get("type"), null);
+		if (type == null || type.length() <= 0) {
 			type = "child";
 		}
 		
@@ -188,7 +189,7 @@ public class ConvertXML {
 		//
 		// Base map : if blank, assume first node
 		//
-		if( baseMapOri == null ) {
+		if (baseMapOri == null) {
 			baseMap.put(type, childMap);
 			return baseMap;
 		}
@@ -197,11 +198,11 @@ public class ConvertXML {
 		// List map to save child nodes to?
 		//
 		ArrayList<Object> listToSaveTo = null;
-		if( baseMapOri instanceof ArrayList ) {
-			listToSaveTo = (ArrayList<Object>)baseMapOri;
+		if (baseMapOri instanceof ArrayList) {
+			listToSaveTo = (ArrayList<Object>) baseMapOri;
 		} else {
 			listToSaveTo = new ArrayList<Object>();
-			listToSaveTo.add( baseMapOri );
+			listToSaveTo.add(baseMapOri);
 		}
 		
 		//
@@ -224,13 +225,13 @@ public class ConvertXML {
 	/// @param  The Map to collapse
 	///
 	/// @return  Result map
-	public static Map<String,Object> toCollapsedMap(Map<String,Object> inMap) {
+	public static Map<String, Object> toCollapsedMap(Map<String, Object> inMap) {
 		
 		//
 		// Normalize "NodeValue" as "value"
 		//
-		String nodeValue = GenericConvert.toString( inMap.get("NodeValue"), null );
-		if( nodeValue != null && nodeValue.length() > 0 ) {
+		String nodeValue = GenericConvert.toString(inMap.get("NodeValue"), null);
+		if (nodeValue != null && nodeValue.length() > 0) {
 			inMap.put("value", nodeValue);
 		}
 		inMap.remove("NodeValue");
@@ -238,8 +239,8 @@ public class ConvertXML {
 		//
 		// Normalize "TagName" as "type"
 		//
-		String tagName = GenericConvert.toString( inMap.get("TagName"), null );
-		if(tagName != null && tagName.length() > 0) {
+		String tagName = GenericConvert.toString(inMap.get("TagName"), null);
+		if (tagName != null && tagName.length() > 0) {
 			inMap.put("type", tagName);
 		}
 		inMap.remove("TagName");
@@ -247,12 +248,12 @@ public class ConvertXML {
 		//
 		// Normalize "ChildNodes"
 		//
-		List<Object> childList = GenericConvert.toList( inMap.get("ChildNodes"), null );
+		List<Object> childList = GenericConvert.toList(inMap.get("ChildNodes"), null);
 		inMap.remove("ChildNodes");
-		if( childList != null && childList.size() > 0 ) {
-			for(int i=0; i<childList.size(); ++i) {
+		if (childList != null && childList.size() > 0) {
+			for (int i = 0; i < childList.size(); ++i) {
 				// Child node to process
-				Map<String,Object> childNode = GenericConvert.toStringMap( childList.get(i) );
+				Map<String, Object> childNode = GenericConvert.toStringMap(childList.get(i));
 				
 				// Recusion filter
 				childNode = toCollapsedMap(childNode);
@@ -266,7 +267,6 @@ public class ConvertXML {
 		return inMap;
 	}
 	
-	
 	/// Collapse an XML map into a more JSON concise format.
 	/// Assuming no key and tag name conflict.
 	///
@@ -275,7 +275,7 @@ public class ConvertXML {
 	/// @param  The XML String to collapse
 	///
 	/// @return  Result map
-	public static Map<String,Object> toCollapsedMap(String xmlStr) {
-		return toCollapsedMap( toMap(xmlStr) );
+	public static Map<String, Object> toCollapsedMap(String xmlStr) {
+		return toCollapsedMap(toMap(xmlStr));
 	}
 }

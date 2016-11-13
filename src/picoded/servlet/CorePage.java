@@ -531,7 +531,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	/// | host/subpath             | host/index.html          |
 	/// | host/subpath/            | host/subpath/index.html  |
 	/// | host/subpath/index.html  | host/subpath/index.html  |
-	/// 
+	///
 	/// As a result of the ambiguity in redirect for html index pages loaded
 	/// in "host/subpath". This function was created, so that when called.
 	/// will do any redirect if needed if the request was found to be.
@@ -595,7 +595,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 				queryString = "?" + queryString;
 			}
 			
-			//	
+			//
 			// Enforce proper URL handling
 			//
 			httpResponse.sendRedirect(fullURI + "/" + queryString);
@@ -896,7 +896,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 		}
 		
 		// Output the data
-		output.println(ConvertJSON.fromObject(outputData));
+		output.println(ConvertJSON.fromObject(outputData, true));
 		return true;
 	}
 	

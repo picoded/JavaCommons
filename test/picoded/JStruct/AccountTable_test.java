@@ -240,15 +240,14 @@ public class AccountTable_test {
 		assertNull(accTableObj.get(grpName));
 		assertNotNull(grpObj = accTableObj.newObject(grpName));
 		accTableObj.removeFromID(grpObj.get("_oid").toString());
-
+		
 		assertNotNull(usrObj = accTableObj.newObject(usrName));
 		
 		assertArrayEquals(new String[] {}, grpObj.getMembers_id());
 		usrObj.saveDelta();
 		
 		assertNotNull(grpObj.addMember(usrObj, "guest"));
-		assertArrayEquals("addMember failed?", new String[] { usrObj._oid() },
-				grpObj.getMembers_id());
+		assertArrayEquals("addMember failed?", new String[] { usrObj._oid() }, grpObj.getMembers_id());
 		grpObj.saveDelta();
 		
 		AccountObject[] usrList = null;
@@ -281,6 +280,7 @@ public class AccountTable_test {
 		assertNull(accTableObj.getSessionInfo(grpObj.get("_oid").toString(),
 			String.valueOf(accTableObj.nonceSize)));
 	}
+	
 	@Test
 	public void generateSessionTest() {
 		String grpName = "hello-group";
@@ -288,8 +288,8 @@ public class AccountTable_test {
 		assertFalse(accTableObj.containsKey(grpName));
 		assertNull(accTableObj.get(grpName));
 		assertNotNull(grpObj = accTableObj.newObject(grpName));
-		assertNotNull(accTableObj.generateSession(grpObj.get("_oid").toString(), 1, 
-				"nonceSalt", "ipString", "browserAgent"));
+		assertNotNull(accTableObj.generateSession(grpObj.get("_oid").toString(), 1, "nonceSalt",
+			"ipString", "browserAgent"));
 	}
 	
 	@Test

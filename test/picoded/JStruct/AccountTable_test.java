@@ -8,6 +8,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+
 import org.junit.After;
 // Test Case include
 import org.junit.Before;
@@ -215,6 +217,7 @@ public class AccountTable_test {
 		assertNull(accTableObj.newObject("test"));
 		assertNull(accTableObj.newObject("hello-group"));
 		assertNotNull(accTableObj.newObject(grpObj.get("_oid").toString()));
+		
 	}
 	
 	@Test
@@ -258,6 +261,8 @@ public class AccountTable_test {
 		assertNotNull(usrList = grpObj.getMembersAccountObject());
 		assertEquals(1, usrList.length);
 		assertEquals(usrObj._oid(), usrList[0]._oid());
+		accTableObj.removeFromID("");
+		accTableObj.removeFromID("111wwww");
 	}
 	
 	@Test
@@ -326,5 +331,4 @@ public class AccountTable_test {
 		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] { "hello-group", "userGroup" },
 			new String[] { "guest", "member", "manager", "admin" }));
 	}
-	
 }

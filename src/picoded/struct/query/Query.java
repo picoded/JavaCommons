@@ -1,6 +1,5 @@
 package picoded.struct.query;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,7 +11,6 @@ import java.util.function.Predicate;
 
 import picoded.struct.ArrayListMap;
 import picoded.struct.query.internal.QueryFilter;
-
 
 ///
 /// Representas a query condition, that can be used as a java Predicate against a collection

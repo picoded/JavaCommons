@@ -72,12 +72,12 @@ public class CompareUtils_test {
 		
 	}
 	
-	@Test (expected = IllegalAccessError.class)
+	@Test(expected = IllegalAccessError.class)
 	public void compareUtilsTest() {
 		new CompareUtils();
 	}
 	
-	@Test 
+	@Test
 	public void stringMatchesTest() {
 		assertEquals(0, CompareUtils.stringMatches(null, null));
 		assertEquals(1, CompareUtils.stringMatches("b", null));

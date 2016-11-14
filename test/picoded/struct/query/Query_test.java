@@ -23,7 +23,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 
-
 ///
 /// Test Case for picoded.struct.query.condition.*
 ///
@@ -64,7 +63,8 @@ public class Query_test {
 	
 	@Test
 	public void multipleAnd() {
-		assertEquals("\"me\" = :good AND \"life\" = :awsome", Query.build("me = :good AND life = :awsome").toString());
+		assertEquals("\"me\" = :good AND \"life\" = :awsome",
+			Query.build("me = :good AND life = :awsome").toString());
 		assertEquals("\"me\" = :good AND \"life\" = :awsome AND \"new\" = :world",
 			Query.build("me = :good AND life = :awsome AND new = :world").toString());
 	}
@@ -80,8 +80,8 @@ public class Query_test {
 	//
 	@Test
 	public void likeQuery() {
-		assertEquals("(\"me\" LIKE :good AND \"life\" LIKE :awsome) OR \"every\" LIKE :one",
-			Query.build("(me LIKE :good AND life LIKE :awsome) OR every LIKE :one").toString());
+		assertEquals("(\"me\" LIKE :good AND \"life\" LIKE :awsome) OR \"every\" LIKE :one", Query
+			.build("(me LIKE :good AND life LIKE :awsome) OR every LIKE :one").toString());
 	}
 	
 	//
@@ -91,7 +91,8 @@ public class Query_test {
 	public void dualNestedQuery() {
 		Query queryObj = null;
 		Object[] paramArr = new Object[] { "adv", "sup", "prx", "a", "b" };
-		assertNotNull(queryObj = Query.build("( adv = ? OR sup = ? OR prx = ? ) AND ( a = ? OR b = ? )", paramArr));
+		assertNotNull(queryObj = Query.build(
+			"( adv = ? OR sup = ? OR prx = ? ) AND ( a = ? OR b = ? )", paramArr));
 	}
 	
 	//
@@ -254,7 +255,6 @@ public class Query_test {
 	public void searchTest() {
 		Map<String, String> set = new HashMap<String, String>();
 		assertNotNull(queryMock.search(set));
-		
 		
 	}
 }

@@ -233,10 +233,32 @@ public class AccountTable_test {
 	public void removeFromIDTest() {
 		String grpName = "hello-group";
 		AccountObject grpObj;
+		String usrName = "user1";
+		AccountObject usrObj;
+		
 		assertFalse(accTableObj.containsKey(grpName));
 		assertNull(accTableObj.get(grpName));
 		assertNotNull(grpObj = accTableObj.newObject(grpName));
 		accTableObj.removeFromID(grpObj.get("_oid").toString());
+
+		assertNotNull(usrObj = accTableObj.newObject(usrName));
+		
+		assertArrayEquals(new String[] {}, grpObj.getMembers_id());
+		usrObj.saveDelta();
+		
+		assertNotNull(grpObj.addMember(usrObj, "guest"));
+		assertArrayEquals("addMember failed?", new String[] { usrObj._oid() },
+				grpObj.getMembers_id());
+		grpObj.saveDelta();
+		
+		AccountObject[] usrList = null;
+		assertNotNull(usrList = grpObj.getMembersAccountObject());
+		assertEquals(1, usrList.length);
+		assertEquals(usrObj._oid(), usrList[0]._oid());
+		accTableObj.removeFromID(grpObj.get("_oid").toString());
+		assertNotNull(usrList = grpObj.getMembersAccountObject());
+		assertEquals(1, usrList.length);
+		assertEquals(usrObj._oid(), usrList[0]._oid());
 	}
 	
 	@Test
@@ -258,6 +280,16 @@ public class AccountTable_test {
 		assertNotNull(grpObj = accTableObj.newObject(grpName));
 		assertNull(accTableObj.getSessionInfo(grpObj.get("_oid").toString(),
 			String.valueOf(accTableObj.nonceSize)));
+	}
+	@Test
+	public void generateSessionTest() {
+		String grpName = "hello-group";
+		AccountObject grpObj;
+		assertFalse(accTableObj.containsKey(grpName));
+		assertNull(accTableObj.get(grpName));
+		assertNotNull(grpObj = accTableObj.newObject(grpName));
+		assertNotNull(accTableObj.generateSession(grpObj.get("_oid").toString(), 1, 
+				"nonceSalt", "ipString", "browserAgent"));
 	}
 	
 	@Test
@@ -293,6 +325,6 @@ public class AccountTable_test {
 			new String[] { "" }));
 		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] { "hello-group", "userGroup" },
 			new String[] { "guest", "member", "manager", "admin" }));
-		
 	}
+	
 }

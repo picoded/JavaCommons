@@ -692,13 +692,13 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		List<AccountObject> ret = new ArrayList<AccountObject>();
 		
 		//initial query just to get everything out so i can filter
-		MetaObject[] metaObjs = accountMetaTable().query(null, null, "oID", 0, 0);
+		MetaObject[] metaObjs = accountMetaTable().query(null, null, "oID", 0, 0); 
 		
 		if (metaObjs == null) {
 			return null;
 		}
 		
-		//		boolean doGroupCheck = insideGroupAny != null && insideGroupAny.length > 0;
+//		boolean doGroupCheck = insideGroupAny != null && insideGroupAny.length > 0;
 		boolean doRoleCheck = hasRoleAny != null && hasRoleAny.length > 0;
 		
 		for (MetaObject metaObj : metaObjs) {
@@ -717,7 +717,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 			
 			for (AccountObject userGroup : userGroups) {
 				// To avoid null error in the array
-				if (userGroup != null) {
+				if (userGroup != null){
 					getAccountObjectList(doRoleCheck, ret, hasRoleAny, userGroup, ao);
 				}
 			}
@@ -725,8 +725,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		return ret.toArray(new AccountObject[ret.size()]);
 	}
 	
-	private List<AccountObject> getAccountObjectList(boolean doRoleCheck, List<AccountObject> ret,
-		String[] hasRoleAny, AccountObject userGroup, AccountObject ao) {
+	private List<AccountObject> getAccountObjectList(boolean doRoleCheck, 
+			List<AccountObject> ret, String[] hasRoleAny, AccountObject userGroup, AccountObject ao){
 		if (doRoleCheck && ArrayUtils.contains(hasRoleAny, userGroup.getMemberRole(ao))) {
 			ret.add(ao);
 		} else {

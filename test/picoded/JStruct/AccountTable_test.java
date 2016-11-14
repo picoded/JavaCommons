@@ -8,20 +8,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
 // Test Case include
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import picoded.security.NxtCrypt;
 
 // Test depends
 
@@ -340,10 +333,8 @@ public class AccountTable_test extends Mockito {
 			new String[] { "guest", "member", "manager", "admin" }));
 	}
 	
-	@SuppressWarnings("unused")
 	@Test
 	public void getRequestUser() {
-		String cookiePrefix = "Account_";
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		assertNull(accTableObj.getRequestUser(request));
 		request

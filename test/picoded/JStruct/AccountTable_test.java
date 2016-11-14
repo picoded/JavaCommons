@@ -8,16 +8,24 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
 // Test Case include
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+
+import picoded.security.NxtCrypt;
 
 // Test depends
 
-public class AccountTable_test {
+public class AccountTable_test extends Mockito {
 	
 	// / Test object
 	public AccountTable accTableObj = null;
@@ -330,5 +338,16 @@ public class AccountTable_test {
 			new String[] { "" }));
 		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] { "hello-group", "userGroup" },
 			new String[] { "guest", "member", "manager", "admin" }));
+	}
+	
+	@SuppressWarnings("unused")
+	@Test
+	public void getRequestUser() {
+		String cookiePrefix = "Account_";
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		assertNull(accTableObj.getRequestUser(request));
+		request
+			.setAttribute("javax.servlet.include.path_info", "http://localhost:8080/App/logout=-1");
+		assertNull(accTableObj.getRequestUser(request));
 	}
 }

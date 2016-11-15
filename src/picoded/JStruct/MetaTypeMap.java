@@ -1,10 +1,19 @@
 package picoded.JStruct;
 
-import java.util.*;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /// MetaTypeMap, used to hold the various meta type configs
 public class MetaTypeMap extends ConcurrentHashMap<String, MetaType> {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	/// Invalid constructor (throws exception)
+	public MetaTypeMap() {
+	}
 	
 	/// String put alternative
 	///

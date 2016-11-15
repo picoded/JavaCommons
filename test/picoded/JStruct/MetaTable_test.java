@@ -343,15 +343,15 @@ public class MetaTable_test {
 		node.saveDelta();
 		
 		// Get the value, to check
-		assertEquals(123, mtObj.get(node._oid()).get("NotIndexedKey"));
+		assertEquals("123", mtObj.get(node._oid()).get("NotIndexedKey"));
 		
 		// Refetch node, and get data, and validate
 		assertNotNull(list = mtObj.getFromKeyName("num"));
 		assertEquals(1, list.length);
 		assertNotNull(list[0]);
 		assertEquals(node._oid(), list[0]._oid());
-		assertEquals(123, node.get("NotIndexedKey"));
-		assertEquals(123, list[0].get("NotIndexedKey"));
+		assertEquals("123", node.get("NotIndexedKey"));
+		assertEquals("123", list[0].get("NotIndexedKey"));
 	}
 	
 	@Test
@@ -376,8 +376,8 @@ public class MetaTable_test {
 		assertEquals(1, list.length);
 		assertNotNull(list[0]);
 		assertEquals(node._oid(), list[0]._oid());
-		assertEquals(123, node.get("NotIndexedKey"));
-		assertEquals(123, list[0].get("NotIndexedKey"));
+		assertEquals("123", node.get("NotIndexedKey"));
+		assertEquals("123", list[0].get("NotIndexedKey"));
 		
 		// Fetch non indexed key
 		assertNotNull(list = mtObj.getFromKeyName("NotIndexedKey"));
@@ -562,6 +562,7 @@ public class MetaTable_test {
 		
 		// Doing a query
 		MetaObject[] qRes = table.query("num > ? OR be = ?", new Object[] { 0, "happy" });
+		
 		// Each object has a base68 GUID
 		String guid = qRes[0]._oid();
 	}

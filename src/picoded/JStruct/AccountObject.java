@@ -1,16 +1,34 @@
 package picoded.JStruct;
 
 /// Java imports
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.*;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
 
-import picoded.JStruct.internal.JStruct_MetaObject;
-import picoded.JStruct.internal.JStruct_MetaTable;
-import picoded.security.NxtCrypt;
 /// Picoded imports
+import picoded.conv.GUID;
+import picoded.security.NxtCrypt;
+import picoded.JSql.*;
+import picoded.JCache.*;
+import picoded.JStruct.*;
+import picoded.JStruct.internal.*;
+import picoded.struct.*;
+
 /// hazelcast
+import com.hazelcast.core.*;
+import com.hazelcast.config.*;
+import com.hazelcast.client.config.ClientConfig;
+import com.hazelcast.client.HazelcastClient;
+import com.hazelcast.client.config.ClientConfig;
+import com.hazelcast.client.HazelcastClient;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 
 public class AccountObject extends JStruct_MetaObject {
 	
@@ -262,8 +280,6 @@ public class AccountObject extends JStruct_MetaObject {
 		}
 		
 		String memberOID = memberObject._oid();
-		//		String level = group_userToRoleMap().getString(memberOID);
-		
 		group_userToRoleMap().remove(memberOID);
 		group_userToRoleMap().saveAll();
 		

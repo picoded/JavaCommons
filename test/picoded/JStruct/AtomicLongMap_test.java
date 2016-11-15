@@ -7,6 +7,7 @@ import org.junit.After;
 // Test Case include
 import org.junit.Before;
 import org.junit.Test;
+
 // Test depends
 
 public class AtomicLongMap_test {
@@ -114,25 +115,25 @@ public class AtomicLongMap_test {
 	}
 	
 	@Test
-	public void getTempHintTest(){
+	public void getTempHintTest() {
 		assertEquals(false, almObj.getTempHint());
 		almObj.systemSetup();
 		almObj.systemTeardown();
 	}
 	
 	@Test
-	public void setTempHintTest(){
+	public void setTempHintTest() {
 		assertEquals(false, almObj.setTempHint(false));
 	}
 	
 	@Test
-	public void incrementalMaintenanceTest(){
+	public void incrementalMaintenanceTest() {
 		almObj.incrementalMaintenance();
 		almObj.maintenance();
 	}
 	
 	@Test
-	public void putTest(){
-		assertNull(almObj.put("test", (Number)123));
+	public void putTest() {
+		assertNull(almObj.put("test", (Number) 123));
 	}
 }

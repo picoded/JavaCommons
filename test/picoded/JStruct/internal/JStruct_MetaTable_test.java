@@ -15,21 +15,21 @@ import picoded.enums.ObjectTokens;
 
 public class JStruct_MetaTable_test {
 	JStruct_MetaTable jStruct_MetaTable = null;
-
+	
 	@Before
 	public void setUp() {
 		jStruct_MetaTable = new JStruct_MetaTable();
 	}
-
+	
 	@After
 	public void tearDown() {
 	}
-
+	
 	@Test
 	public void getTempHintTest() {
 		assertFalse(jStruct_MetaTable.getTempHint());
 	}
-
+	
 	@Test
 	public void setTempHintTest() {
 		assertFalse(jStruct_MetaTable.setTempHint(true));
@@ -37,19 +37,19 @@ public class JStruct_MetaTable_test {
 		jStruct_MetaTable.systemSetup();
 		jStruct_MetaTable.systemTeardown();
 	}
-
+	
 	@Test
 	public void getTest() {
 		assertNull(jStruct_MetaTable.get(null));
-
+		
 	}
-
+	
 	@Test
 	public void metaObjectRemoteDataMap_update() {
 		Map<String, Object> fullMap = new HashMap<String, Object>();
 		fullMap.put("test", ObjectTokens.NULL);
 		fullMap.put("test1", null);
-		Set<String> keys=new HashSet<String>();
+		Set<String> keys = new HashSet<String>();
 		keys.add("test");
 		keys.add("test1");
 		jStruct_MetaTable.metaObjectRemoteDataMap_update("str", fullMap, keys);

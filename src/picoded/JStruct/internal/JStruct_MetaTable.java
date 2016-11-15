@@ -177,7 +177,8 @@ public class JStruct_MetaTable implements MetaTable {
 	
 	/// Updates the actual backend storage of MetaObject
 	/// either partially (if supported / used), or completely
-	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap, Set<String> keys) {
+	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap,
+		Set<String> keys) {
 		try {
 			_accessLock.writeLock().lock();
 			
@@ -193,7 +194,7 @@ public class JStruct_MetaTable implements MetaTable {
 			for (String key : keys) {
 				Object val = fullMap.get(key);
 				
-				if (val == null || val ==ObjectTokens.NULL) {
+				if (val == null || val == ObjectTokens.NULL) {
 					storedValue.remove(key);
 				} else {
 					storedValue.put(key, val);

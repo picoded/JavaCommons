@@ -1,17 +1,9 @@
 package picoded.JStruct;
 
-import java.util.*;
-import java.util.logging.Logger;
+import java.util.Formatter;
+import java.util.Locale;
 import java.util.logging.Level;
-
-import org.apache.commons.lang3.StringUtils;
-
-import picoded.conv.Base58;
-import picoded.conv.GUID;
-import picoded.utils.systemInfo;
-
-import java.math.BigInteger;
-import java.security.MessageDigest;
+import java.util.logging.Logger;
 
 /// SerlvetLogging, is a utility class meant to facilitate the logging of server sideded application events, and errors
 ///
@@ -35,12 +27,12 @@ import java.security.MessageDigest;
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
 public interface EventLogger {
-	
 	/// Core logging function
 	public default void log(Level l, Exception e, String format, Object... args) {
 		
 		// Build the string and format
 		StringBuilder sb = new StringBuilder();
+		@SuppressWarnings("resource")
 		Formatter formatter = new Formatter(sb, Locale.US);
 		formatter.format(format, args);
 		

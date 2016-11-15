@@ -69,7 +69,7 @@ public class QueryFilter {
 		int strPos = 0;
 		
 		String resString = query;
-		while ((strPos = "?".indexOf(resString)) >= 0) {
+		while ((strPos = resString.indexOf("?")) >= 0) {
 			resString = (resString.substring(0, strPos) + ":" + queryCount + resString
 				.substring(strPos + 1));
 			++queryCount;

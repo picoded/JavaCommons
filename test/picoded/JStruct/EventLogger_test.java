@@ -5,11 +5,11 @@ import java.util.logging.Level;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
-public class EventLogger_test extends Mockito {
-	EventLogger eventLogger = new EventLogger() {
-	};
+import picoded.JStruct.internal.JStruct_EventLogger;
+
+public class EventLogger_test {
+	EventLogger eventLogger = new JStruct_EventLogger();
 	Exception exception = null;
 	
 	@Before

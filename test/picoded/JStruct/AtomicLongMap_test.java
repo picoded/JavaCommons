@@ -60,7 +60,7 @@ public class AtomicLongMap_test {
 	///------------------------------------------------------
 	
 	@Test
-	public void simpleHasPutHasGet() throws Exception {
+	public void simpleHasPutHasGetTest() throws Exception {
 		
 		// TEST CASE
 		//public Long put(String key, Number value)
@@ -111,8 +111,24 @@ public class AtomicLongMap_test {
 	}
 	
 	@Test
-	public void nullGet() throws Exception {
+	public void nullGetTest() throws Exception {
 		assertEquals(null, almObj.get("e"));
 	}
 	
+	@Test
+	public void getTempHintTest() {
+		assertEquals(false, almObj.getTempHint());
+		almObj.systemSetup();
+		almObj.systemTeardown();
+	}
+	
+	@Test
+	public void setTempHintTest() {
+		assertEquals(false, almObj.setTempHint(false));
+	}
+	
+	@Test
+	public void incrementalMaintenanceTest() {
+		almObj.incrementalMaintenance();
+	}
 }

@@ -261,6 +261,8 @@ public class AccountTable_test extends Mockito {
 		assertEquals(1, usrList.length);
 		assertEquals(usrObj._oid(), usrList[0]._oid());
 		accTableObj.removeFromID("111wwww");
+		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] {}, new String[] { "guest",
+			"member", "manager", "admin" }));
 	}
 	
 	@Test
@@ -317,17 +319,9 @@ public class AccountTable_test extends Mockito {
 		assertNotNull(accTableObj.setSuperUserGroupName("hello-group"));
 		assertNotNull(accTableObj.setSuperUserGroupName("userGroup"));
 		assertNotNull(accTableObj.getUsersByGroupAndRole(null, null));
-		assertNotNull(accTableObj.getUsersByGroupAndRole(null, new String[] { "guest", "member",
-			"manager", "admin" }));
-		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] { "hello-group", "userGroup" },
-			null));
-		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] { "" }, new String[] { "" }));
-		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] { "" }, new String[] { "guest",
+		assertNotNull(accTableObj.getUsersByGroupAndRole(null, new String[] {}));
+		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] {}, new String[] { "guest",
 			"member", "manager", "admin" }));
-		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] { "hello-group", "userGroup" },
-			new String[] { "" }));
-		assertNotNull(accTableObj.getUsersByGroupAndRole(new String[] { "hello-group", "userGroup" },
-			new String[] { "guest", "member", "manager", "admin" }));
 	}
 	
 	@Test

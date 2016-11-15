@@ -694,9 +694,9 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		//initial query just to get everything out so i can filter
 		MetaObject[] metaObjs = accountMetaTable().query(null, null, "oID", 0, 0);
 		
-		if (metaObjs == null) {
-			return null;
-		}
+		//		if (metaObjs == null) {
+		//			return null;
+		//		}
 		
 		//		boolean doGroupCheck = insideGroupAny != null && insideGroupAny.length > 0;
 		boolean doRoleCheck = hasRoleAny != null && hasRoleAny.length > 0;

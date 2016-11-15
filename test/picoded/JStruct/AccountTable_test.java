@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
 // Test Case include
@@ -239,21 +240,18 @@ public class AccountTable_test extends Mockito {
 		AccountObject grpObj;
 		String usrName = "user1";
 		AccountObject usrObj;
-		
+		accTableObj.removeFromID(null);
+		accTableObj.removeFromID("");
 		assertFalse(accTableObj.containsKey(grpName));
 		assertNull(accTableObj.get(grpName));
 		assertNotNull(grpObj = accTableObj.newObject(grpName));
 		accTableObj.removeFromID(grpObj.get("_oid").toString());
-		
 		assertNotNull(usrObj = accTableObj.newObject(usrName));
-		
 		assertArrayEquals(new String[] {}, grpObj.getMembers_id());
 		usrObj.saveDelta();
-		
 		assertNotNull(grpObj.addMember(usrObj, "guest"));
 		assertArrayEquals("addMember failed?", new String[] { usrObj._oid() }, grpObj.getMembers_id());
 		grpObj.saveDelta();
-		
 		AccountObject[] usrList = null;
 		assertNotNull(usrList = grpObj.getMembersAccountObject());
 		assertEquals(1, usrList.length);
@@ -262,7 +260,6 @@ public class AccountTable_test extends Mockito {
 		assertNotNull(usrList = grpObj.getMembersAccountObject());
 		assertEquals(1, usrList.length);
 		assertEquals(usrObj._oid(), usrList[0]._oid());
-		accTableObj.removeFromID("");
 		accTableObj.removeFromID("111wwww");
 	}
 	
@@ -334,11 +331,41 @@ public class AccountTable_test extends Mockito {
 	}
 	
 	@Test
-	public void getRequestUser() {
+	public void getRequestUserTest() {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		assertNull(accTableObj.getRequestUser(request));
 		request
 			.setAttribute("javax.servlet.include.path_info", "http://localhost:8080/App/logout=-1");
 		assertNull(accTableObj.getRequestUser(request));
+	}
+	
+	@Test
+	public void loginAccountTest() {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		String usrName = "gust";
+		AccountObject usrObj = null;
+		accTableObj.loginAccount(request, response, usrObj, null, true);
+		assertFalse(accTableObj.containsKey(usrName));
+		assertNull(accTableObj.get(usrName));
+		assertNotNull(usrObj = accTableObj.newObject(usrName));
+		usrObj.setName("test");
+		usrObj.setPassword("test123");
+		accTableObj.loginAccount(request, response, "test", usrObj.getPasswordHash(), true);
+	}
+	
+	@Test
+	public void logoutAccountTest() {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		String usrName = "gust";
+		AccountObject usrObj = null;
+		accTableObj.logoutAccount(null, null);
+		assertFalse(accTableObj.containsKey(usrName));
+		assertNull(accTableObj.get(usrName));
+		assertNotNull(usrObj = accTableObj.newObject(usrName));
+		usrObj.setName("test");
+		usrObj.setPassword("test123");
+		accTableObj.logoutAccount(request, response);
 	}
 }

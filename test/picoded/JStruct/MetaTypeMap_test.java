@@ -21,20 +21,19 @@ public class MetaTypeMap_test {
 	}
 	
 	/// Invalid constructor test
-	@Test
-	public void constructorTest() {
-		metaTypeMap = new MetaTypeMap();
-	}
-	
-	/// Invalid constructor test
 	@Test(expected = Exception.class)
 	public void putTest() throws Exception {
 		assertNotNull(metaTypeMap.put("key", "value"));
 		assertNotNull(metaTypeMap.put("key", (Object) MetaType.BINARY));
 	}
 	
+	@Test(expected = Exception.class)
+	public void putTest1() throws Exception {
+		assertNotNull(metaTypeMap.put(null, (Object) null));
+	}
+	
 	@Test
-	public void putTest1() {
+	public void putTest2() {
 		assertNull(metaTypeMap.put("key", (Object) MetaType.BINARY));
 		assertNotNull(metaTypeMap.put("key", (Object) "null"));
 	}

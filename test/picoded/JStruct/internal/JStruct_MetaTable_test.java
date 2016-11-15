@@ -47,11 +47,13 @@ public class JStruct_MetaTable_test {
 	@Test
 	public void metaObjectRemoteDataMap_update() {
 		Map<String, Object> fullMap = new HashMap<String, Object>();
+		jStruct_MetaTable.metaObjectRemoteDataMap_update("str", fullMap, null);
 		fullMap.put("test", ObjectTokens.NULL);
 		fullMap.put("test1", null);
 		Set<String> keys = new HashSet<String>();
 		keys.add("test");
 		keys.add("test1");
 		jStruct_MetaTable.metaObjectRemoteDataMap_update("str", fullMap, keys);
+		jStruct_MetaTable.metaObjectRemoteDataMap_update("str", fullMap, null);
 	}
 }

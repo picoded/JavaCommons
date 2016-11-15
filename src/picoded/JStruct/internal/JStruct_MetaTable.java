@@ -1,16 +1,18 @@
 package picoded.JStruct.internal;
 
 /// Java imports
-import java.util.logging.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import picoded.JStruct.MetaObject;
+import picoded.JStruct.MetaTable;
+import picoded.JStruct.MetaTypeMap;
 /// Picoded imports
-import picoded.conv.*;
-import picoded.struct.*;
-import picoded.enums.*;
-import picoded.JStruct.*;
+import picoded.conv.ConvertJSON;
+import picoded.enums.ObjectTokens;
 
 /// MetaTable, serves as the core flexible backend storage implmentation for the whole
 /// JStack setup. Its role can be viewed similarly to NoSql, or AWS SimpleDB
@@ -92,6 +94,7 @@ public class JStruct_MetaTable implements MetaTable {
 	//----------------------------------------------
 	
 	/// Gets the MetaObject, if it exists
+	@Override
 	public MetaObject get(Object _oid) {
 		if (_oid == null) {
 			return null;
@@ -112,11 +115,13 @@ public class JStruct_MetaTable implements MetaTable {
 	}
 	
 	/// Gets the full keySet
+	@Override
 	public Set<String> keySet() {
 		return _valueMap.keySet();
 	}
 	
 	/// Remove the node
+	@Override
 	public MetaObject remove(Object key) {
 		_valueMap.remove(key);
 		return null;
@@ -126,6 +131,7 @@ public class JStruct_MetaTable implements MetaTable {
 	//----------------------------------------------
 	
 	/// Does an unoptimized check, using keySet
+	@Override
 	public boolean containsKey(Object key) {
 		return (get(key) != null);
 	}
@@ -154,17 +160,15 @@ public class JStruct_MetaTable implements MetaTable {
 	public Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
 		try {
 			_accessLock.readLock().lock();
-			
 			Map<String, Object> ret = null;
 			Map<String, Object> storedValue = _valueMap.get(_oid);
-			
-			if (storedValue != null) {
-				ret = new HashMap<String, Object>();
-				for (String key : storedValue.keySet()) {
-					ret.put(key, detachValue(storedValue.get(key)));
-				}
+			if (storedValue == null) {
+				return ret;
 			}
-			
+			ret = new HashMap<String, Object>();
+			for (String key : storedValue.keySet()) {
+				ret.put(key, detachValue(storedValue.get(key)));
+			}
 			return ret;
 		} finally {
 			_accessLock.readLock().unlock();
@@ -173,8 +177,7 @@ public class JStruct_MetaTable implements MetaTable {
 	
 	/// Updates the actual backend storage of MetaObject
 	/// either partially (if supported / used), or completely
-	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap,
-		Set<String> keys) {
+	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap, Set<String> keys) {
 		try {
 			_accessLock.writeLock().lock();
 			
@@ -190,7 +193,7 @@ public class JStruct_MetaTable implements MetaTable {
 			for (String key : keys) {
 				Object val = fullMap.get(key);
 				
-				if (val == null || val == ObjectTokens.NULL) {
+				if (val == null || val ==ObjectTokens.NULL) {
 					storedValue.remove(key);
 				} else {
 					storedValue.put(key, val);
@@ -208,6 +211,7 @@ public class JStruct_MetaTable implements MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Gets and return the internal MetaTypeMap
+	@Override
 	public MetaTypeMap typeMap() {
 		return _typeMap;
 	}

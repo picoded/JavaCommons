@@ -1,13 +1,8 @@
 package picoded.JStruct;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import picoded.struct.*;
-import picoded.security.NxtCrypt;
-
 import org.apache.commons.lang3.RandomUtils;
+
+import picoded.struct.GenericConvertMap;
 
 /// Refence implementation of AtomicLongMap data structure
 ///

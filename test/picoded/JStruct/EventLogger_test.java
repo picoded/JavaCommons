@@ -7,12 +7,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class EventLogger_test extends Mockito {
-	EventLogger eventLogger = null;
+public class EventLogger_test extends Mockito implements EventLogger {
+	EventLogger eventLogger = mock(picoded.JStruct.EventLogger.class);
 	
 	@Before
 	public void setUp() {
-		eventLogger = mock(picoded.JStruct.EventLogger.class);
+		
 	}
 	
 	@After

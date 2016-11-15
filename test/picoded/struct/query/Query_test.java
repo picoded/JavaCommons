@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.CALLS_REAL_METHODS;
 public class Query_test {
 	
 	private Query queryMock = mock(Query.class, CALLS_REAL_METHODS);
+	private Query query = Query.build("my = ?");
 	
 	@Before
 	public void setUp() {
@@ -193,9 +195,31 @@ public class Query_test {
 		List<Query> subList = new ArrayList<Query>();
 		subList.add(Query.build("my = ?"));
 		when(queryMock.childrenQuery()).thenReturn(subList);
-		Query uery = Query.build("my = ?");
-		assertNotNull(queryMock.replaceQuery(uery, null));
+		Query query = Query.build("my = ?");
+		assertNotNull(queryMock.replaceQuery(query, null));
 		
+	}
+	
+	@Test
+	public void replaceQueryNodeEqualOriginalTest() {
+		assertNull(queryMock.replaceQuery(queryMock, null));
+		when(queryMock.isCombinationOperator()).thenReturn(true);
+		List<Query> subList = new ArrayList<Query>();
+		when(queryMock.childrenQuery()).thenReturn(subList);
+		Query query = Query.build("my = ?");
+		subList.add(query);
+		assertNotNull(queryMock.replaceQuery(query, null));
+	}
+	
+	@Test
+	public void replaceQueryNodeEqualReplacementTest() {
+		assertNull(queryMock.replaceQuery(queryMock, null));
+		when(queryMock.isCombinationOperator()).thenReturn(true);
+		List<Query> subList = new ArrayList<Query>();
+		when(queryMock.childrenQuery()).thenReturn(subList);
+		Query query = Query.build("my = ?");
+		subList.add(query);
+		assertNotNull(queryMock.replaceQuery(Query.build("me = ?"), query));
 	}
 	
 	@Test
@@ -215,6 +239,16 @@ public class Query_test {
 		when(queryMock.isBasicOperator()).thenReturn(true);
 		assertNotNull(queryMock.queryArgumentsList(ret));
 		
+		ArrayList<Query> list = new ArrayList<Query>();
+		list.add(Query.build("my = ?"));
+		when(queryMock.isCombinationOperator()).thenReturn(true);
+		when(queryMock.childrenQuery()).thenReturn(list);
+		assertNotNull(queryMock.queryArgumentsList(ret));
+	}
+	
+	@Test
+	public void queryArgumentsList3AlternateTest() {
+		List<Object> ret = new ArrayList<Object>();
 		ArrayList<Query> list = new ArrayList<Query>();
 		list.add(Query.build("my = ?"));
 		when(queryMock.isCombinationOperator()).thenReturn(true);
@@ -247,6 +281,16 @@ public class Query_test {
 	}
 	
 	@Test
+	public void queryArgumentsMap3AlternateTest() {
+		Map<String, Object> ret = new HashMap<String, Object>();
+		ArrayList<Query> list = new ArrayList<Query>();
+		list.add(Query.build("my = ?"));
+		when(queryMock.isCombinationOperator()).thenReturn(true);
+		when(queryMock.childrenQuery()).thenReturn(list);
+		assertNotNull(queryMock.queryArgumentsMap(ret));
+	}
+	
+	@Test
 	public void toSqlStringTest() {
 		assertNotNull(queryMock.toSqlString());
 	}
@@ -254,7 +298,44 @@ public class Query_test {
 	@Test
 	public void searchTest() {
 		Map<String, String> set = new HashMap<String, String>();
+		set.put("key", "value");
+		when(queryMock.test("value")).thenReturn(true);
 		assertNotNull(queryMock.search(set));
-		
+	}
+	
+	@Test
+	public void searchOrderByTest() {
+		Map<String, String> set = new HashMap<String, String>();
+		set.put("key", "value");
+		when(queryMock.test("value")).thenReturn(true);
+		assertNotNull(queryMock.search(set, "ASC"));
+	}
+	
+	@Test
+	public void searchComparatorTest() {
+		Map<String, String> set = new HashMap<String, String>();
+		set.put("key", "value");
+		when(queryMock.test("value")).thenReturn(true);
+		Comparator<String> abc = (String o1, String o2) -> o1.toLowerCase().compareTo(
+			o2.toLowerCase());
+		assertNotNull(queryMock.search(set, abc));
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void buildExceptionTest() {
+		Map<String, Object> paramMap = null;
+		assertNotNull(Query.build("myString", paramMap));
+	}
+	
+	@Test
+	public void buildTest() {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("key", "value");
+		assertNotNull(Query.build("my = ?", paramMap));
+	}
+	
+	@Test
+	public void keyValuesMapTest() {
+		assertNotNull(query.keyValuesMap());
 	}
 }

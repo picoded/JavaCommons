@@ -69,13 +69,13 @@ public class QueryFilter {
 		int strPos = 0;
 		
 		String resString = query;
-		while ((strPos = resString.indexOf("?")) >= 0) {
+		while ((strPos = "?".indexOf(resString)) >= 0) {
 			resString = (resString.substring(0, strPos) + ":" + queryCount + resString
 				.substring(strPos + 1));
 			++queryCount;
 		}
 		
-		return new MutablePair<String, Integer>(resString, new Integer(queryCount));
+		return new MutablePair<String, Integer>(resString, queryCount);
 	}
 	
 	/// Converts the argument array to its named map format
@@ -92,7 +92,7 @@ public class QueryFilter {
 		
 		if (argArr != null && argArr.length > 0) {
 			for (int a = 0; a < argArr.length; ++a) {
-				baseMap.put("" + a, argArr[a]);
+				baseMap.put(Integer.toString(a), argArr[a]);
 			}
 		}
 		
@@ -211,11 +211,11 @@ public class QueryFilter {
 	//
 	
 	/// Basic query operator tokens to search for
-	public static List<String> basicOperators = Arrays.asList(new String[] { //
+	protected static List<String> basicOperators = Arrays.asList(new String[] { //
 		"=", "<", ">", "<=", ">=", "LIKE", "!=" }); //
 	
 	/// Extended query tokens to search for
-	public static List<String> combinationOperators = Arrays.asList(new String[] { //
+	protected static List<String> combinationOperators = Arrays.asList(new String[] { //
 		"AND", "OR", "NOT" }); //
 	
 	/// Extract out the string, and build the basic query
@@ -275,23 +275,23 @@ public class QueryFilter {
 		namedParam = namedParam.substring(1);
 		//}
 		
-		if (operator.equals("=")) {
+		if ("=".equals(operator)) {
 			return new Equals(field, namedParam, paramsMap);
 			
-		} else if (operator.equals("<")) {
+		} else if ("<".equals(operator)) {
 			return new LessThan(field, namedParam, paramsMap);
 			
-		} else if (operator.equals("<=")) {
+		} else if ("<=".equals(operator)) {
 			return new LessThanOrEquals(field, namedParam, paramsMap);
 			
-		} else if (operator.equals(">")) {
+		} else if (">".equals(operator)) {
 			return new MoreThan(field, namedParam, paramsMap);
 			
-		} else if (operator.equals(">=")) {
+		} else if (">=".equals(operator)) {
 			return new MoreThanOrEquals(field, namedParam, paramsMap);
-		} else if (operator.equals("LIKE")) {
+		} else if ("LIKE".equals(operator)) {
 			return new Like(field, namedParam, paramsMap);
-		} else if (operator.equals("!=")) {
+		} else if ("!=".equals(operator)) {
 			return new NotEquals(field, namedParam, paramsMap);
 		}
 		

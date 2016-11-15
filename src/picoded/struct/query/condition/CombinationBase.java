@@ -160,7 +160,7 @@ public class CombinationBase implements Query {
 			++iteration;
 		}
 		
-		if (iteration == 1 && !(operatorSymbol().equals("AND"))) {
+		if (iteration == 1 && !("AND".equals(operatorSymbol()))) {
 			String retStr = ret.toString();
 			
 			if (retStr.startsWith("(")) {

@@ -107,4 +107,31 @@ public class AllCombinations_test {
 		assertFalse(cond.test(sample_a));
 	}
 	
+	@Test
+	public void notTest() {
+		List<Query> child = new ArrayList<Query>();
+		Query query = new NotEquals("key", "key_hello", arguments_a);
+		child.add(query);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key", "key_hello");
+		Query cond = new Not(child, map);
+		assertTrue(cond.test(sample_a));
+		assertTrue(cond.test(sample_b));
+		assertTrue(cond.test(sample_b, map));
+	}
+	
+	@Test
+	public void notAlternatePathTest() {
+		List<Query> child = new ArrayList<Query>();
+		Query query = new NotEquals("key", "key_hello", arguments_a);
+		child.add(query);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key", "key_hello");
+		map.put("key_hello", "key_hello");
+		Query cond = new Not(child, map);
+		assertFalse(cond.test(sample_a));
+		assertFalse(cond.test(sample_b));
+		assertFalse(cond.test(sample_b, map));
+	}
+	
 }

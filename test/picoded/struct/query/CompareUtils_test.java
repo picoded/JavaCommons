@@ -3,6 +3,7 @@ package picoded.struct.query;
 // Target test class
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.After;
 // Test Case include
@@ -81,8 +82,36 @@ public class CompareUtils_test {
 	public void stringMatchesTest() {
 		assertEquals(0, CompareUtils.stringMatches(null, null));
 		assertEquals(1, CompareUtils.stringMatches("b", null));
+		assertEquals(-1, CompareUtils.stringMatches(null, "b"));
 		assertEquals(0, CompareUtils.stringMatches("b", "b"));
 		assertEquals(-1, CompareUtils.stringMatches("b", "c"));
 	}
 	
+	@Test
+	public void stringLikeCompareTest() {
+		assertEquals(0, CompareUtils.stringLikeCompare(null, null));
+		assertEquals(-1, CompareUtils.stringLikeCompare(null, "a"));
+		assertEquals(1, CompareUtils.stringLikeCompare("A", null));
+		assertEquals(1, CompareUtils.stringLikeCompare("A", "a"));
+		assertEquals(0, CompareUtils.stringLikeCompare("A", "A"));
+	}
+	
+	@Test
+	public void objectToNumberIfPossibleTest() {
+		assertNull(CompareUtils.objectToNumberIfPossible("a"));
+		assertNull(CompareUtils.objectToNumberIfPossible(null));
+	}
+	
+	@Test
+	public void numericCompareTest() {
+		assertEquals(0, CompareUtils.numericCompare(null, null));
+		assertEquals(0, CompareUtils.numericCompare(2, 1));
+		assertEquals(0, CompareUtils.numericCompare(2.2, 1));
+	}
+	
+	@Test
+	public void dynamicCompareTest() {
+		assertEquals(0, CompareUtils.dynamicCompare(null, null));
+		assertEquals(0, CompareUtils.dynamicCompare("a", "a"));
+	}
 }

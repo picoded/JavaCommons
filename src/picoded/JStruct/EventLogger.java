@@ -28,11 +28,11 @@ import java.util.logging.Logger;
 ///
 public interface EventLogger {
 	/// Core logging function
+	@SuppressWarnings("resource")
 	public default void log(Level l, Exception e, String format, Object... args) {
 		
 		// Build the string and format
 		StringBuilder sb = new StringBuilder();
-		@SuppressWarnings("resource")
 		Formatter formatter = new Formatter(sb, Locale.US);
 		formatter.format(format, args);
 		

@@ -1,8 +1,7 @@
 package picoded.JStruct;
 
 // Target test class
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import org.junit.After;
 // Test Case include
@@ -130,5 +129,11 @@ public class AtomicLongMap_test {
 	@Test
 	public void incrementalMaintenanceTest() {
 		almObj.incrementalMaintenance();
+		almObj.maintenance();
+	}
+	
+	@Test
+	public void putTest() {
+		assertNull(almObj.put("test", 123));
 	}
 }

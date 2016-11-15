@@ -1,9 +1,8 @@
 package picoded.JStruct;
 
-import org.apache.commons.lang3.RandomUtils;
-
 import picoded.struct.GenericConvertMap;
 
+/*import org.apache.commons.lang3.RandomUtils;*/
 /// Refence implementation of AtomicLongMap data structure
 ///
 /// This is intended to be an optimized incremental long map data storage
@@ -50,9 +49,9 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long> {
 	public default void incrementalMaintenance() {
 		// 2 percent chance of trigering maintenance
 		// This is to lower to overall performance cost incrementalMaintenance per request
-		if (RandomUtils.nextInt(0, 100) <= 2) {
-			maintenance();
-		}
+		//		if (RandomUtils.nextInt(0, 100) <= 2) {
+		//			maintenance();
+		//		}
 	}
 	
 	/// Perform maintenance, mainly removing of expired data if applicable
@@ -101,6 +100,7 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long> {
 	/// @param key param find the meta key
 	///
 	/// @returns  value of the given key
+	@Override
 	public Long get(Object key);
 	
 	/// Returns the value, given the key

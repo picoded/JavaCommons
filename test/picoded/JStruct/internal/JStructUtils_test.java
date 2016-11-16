@@ -12,23 +12,23 @@ import org.mockito.Mockito;
 
 import picoded.JStruct.MetaObject;
 
-public class JStructUtils_test extends Mockito{
-
+public class JStructUtils_test extends Mockito {
+	
 	@Before
 	public void setUp() {
 	}
-
+	
 	@After
 	public void tearDown() {
 	}
-
+	
 	// / Invalid constructor test
 	@Test(expected = IllegalAccessError.class)
 	public void invalidConstructor() throws Exception {
 		new JStructUtils();
-
+		
 	}
-
+	
 	@Test
 	public void sortAndOffsetListToArray() {
 		List<MetaObject> retList = new ArrayList<MetaObject>();
@@ -41,5 +41,8 @@ public class JStructUtils_test extends Mockito{
 		retList.add(mock(picoded.JStruct.MetaObject.class));
 		retList.add(mock(picoded.JStruct.MetaObject.class));
 		assertNotNull(JStructUtils.sortAndOffsetListToArray(retList, null, 2, -1));
+		assertNotNull(JStructUtils.sortAndOffsetListToArray(retList, " ", 2, -1));
+		assertNotNull(JStructUtils.sortAndOffsetListToArray(retList, "", 2, -1));
+		assertNotNull(JStructUtils.sortAndOffsetListToArray(retList, "asc", 2, -1));
 	}
 }

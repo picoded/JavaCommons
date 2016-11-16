@@ -6,6 +6,7 @@ package picoded.struct.query.condition;
 import org.junit.*;
 
 import picoded.struct.query.Query;
+import picoded.struct.query.QueryType;
 import static org.junit.Assert.*;
 
 import java.util.*;
@@ -134,4 +135,43 @@ public class AllCombinations_test {
 		assertFalse(cond.test(sample_b, map));
 	}
 	
+	@Test
+	public void CombinationBaseTest() {
+		List<Query> childQuery = new ArrayList<Query>();
+		Map<String, Object> defaultArgMap = new HashMap<String, Object>();
+		CombinationBase combinationBase = new CombinationBase(childQuery, defaultArgMap);
+		assertNotNull(combinationBase);
+	}
+	
+	@Test
+	public void childrenQueryTest() {
+		List<Query> childQuery = new ArrayList<Query>();
+		Map<String, Object> defaultArgMap = new HashMap<String, Object>();
+		CombinationBase combinationBase = new CombinationBase(childQuery, defaultArgMap);
+		assertNotNull(combinationBase.childrenQuery());
+	}
+	
+	@Test
+	public void keyValuesMapTest() {
+		List<Query> childQuery = new ArrayList<Query>();
+		Map<String, Object> defaultArgMap = new HashMap<String, Object>();
+		CombinationBase combinationBase = new CombinationBase(childQuery, defaultArgMap);
+		assertNotNull(combinationBase.keyValuesMap());
+	}
+	
+	@Test
+	public void operatorSymbolTest() {
+		List<Query> childQuery = new ArrayList<Query>();
+		Map<String, Object> defaultArgMap = new HashMap<String, Object>();
+		CombinationBase combinationBase = new CombinationBase(childQuery, defaultArgMap);
+		assertEquals("AND", combinationBase.operatorSymbol());
+	}
+	
+	@Test
+	public void typeTest() {
+		List<Query> childQuery = new ArrayList<Query>();
+		Map<String, Object> defaultArgMap = new HashMap<String, Object>();
+		CombinationBase combinationBase = new CombinationBase(childQuery, defaultArgMap);
+		assertEquals(QueryType.AND, combinationBase.type());
+	}
 }

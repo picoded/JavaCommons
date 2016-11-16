@@ -20,6 +20,8 @@ import picoded.struct.query.internal.QueryFilter;
 ///
 public class QueryFilter_test {
 	
+	private QueryFilter queryFilter = new QueryFilter();
+	
 	//
 	// Test Setup
 	//--------------------------------------------------------------------
@@ -68,4 +70,23 @@ public class QueryFilter_test {
 			QueryFilter.enforceRequiredWhitespace("A<=:0  AND  B>=:1 AND C!=:2 AND (D<:3 AND E=:4)"));
 	}
 	
+	@Test
+	public void QueryFilterTest() {
+		assertNotNull(new QueryFilter());
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void basicQueryFromTokensInvalidTest() {
+		assertNotNull(QueryFilter.basicQueryFromTokens(null, "", "", ""));
+	}
+	
+	//@Test
+	public void basicQueryFromTokensTest() {
+		Map<String, Object> paramsMap = new HashMap<String, Object>();
+		String before;
+		String operator;
+		String after;
+		
+		assertNotNull(QueryFilter.basicQueryFromTokens(null, "", "", ""));
+	}
 }

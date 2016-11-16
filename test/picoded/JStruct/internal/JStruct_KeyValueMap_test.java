@@ -22,8 +22,8 @@ public class JStruct_KeyValueMap_test {
 	//
 	
 	// / Invalid constructor test
-	@Test(expected = IllegalAccessError.class)
-	public void invalidConstructor() throws Exception {
+	@Test
+	public void invalidConstructor() {
 		new JStruct_KeyValueMap();
 		
 	}

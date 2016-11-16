@@ -22,7 +22,6 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	
 	/// Invalid constructor (throws exception)
 	public JStruct_KeyValueMap() {
-		throw new IllegalAccessError("Utility class");
 	}
 	
 	///

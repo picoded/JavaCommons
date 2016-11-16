@@ -1,20 +1,20 @@
 package picoded.JStruct.internal;
 
 /// Java imports
-import java.util.logging.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.Collections;
+import java.util.List;
 
+import picoded.JStruct.MetaObject;
+import picoded.struct.query.OrderBy;
 /// Picoded imports
-import picoded.conv.*;
-import picoded.struct.*;
-import picoded.enums.*;
-import picoded.JStruct.*;
-import picoded.struct.query.*;
 
 public class JStructUtils {
 	
+	/// Invalid constructor (throws exception)
+	protected JStructUtils() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	///
 	/// Utility funciton, used to sort and limit the result of a query
 	///
@@ -25,13 +25,8 @@ public class JStructUtils {
 	///
 	/// @returns  The MetaObject[] array
 	///
-	public static MetaObject[] sortAndOffsetListToArray(List<MetaObject> retList, String orderByStr,
-		int offset, int limit) {
-		
-		// Ensure the list is editable
-		if (!(retList instanceof ArrayList)) {
-			retList = new ArrayList<MetaObject>(retList);
-		}
+	public static MetaObject[] sortAndOffsetListToArray(List<MetaObject> retList, String orderByStr, int offset,
+		int limit) {
 		
 		// Sorting the order, if needed
 		if (orderByStr != null && (orderByStr = orderByStr.trim()).length() > 0) {
@@ -60,10 +55,10 @@ public class JStructUtils {
 				end = size;
 			}
 			
-			// Out of range
-			if (end <= offset) {
-				return new MetaObject[0];
-			}
+//			// Out of range
+//			if (end <= offset) {
+//				return new MetaObject[0];
+//			}
 			
 			// Get sublist
 			retList = retList.subList(offset, end);

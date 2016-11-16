@@ -202,7 +202,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 			}
 			
 			// Set expire value
-			expireMap.put(key, new Long(time));
+			expireMap.put(key, time);
 		} finally {
 			accessLock.writeLock().unlock();
 		}

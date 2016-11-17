@@ -109,8 +109,8 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 			// Iterate and evict
 			for (String key : expireKeyArray) {
 				Long timeObj = expireMap.get(key);
-				long time = (timeObj != null) ? timeObj.longValue() : 0;
-				
+				//				long time = (timeObj != null) ? timeObj.longValue() : 0;
+				long time = timeObj.longValue();
 				// expired? kick it
 				if (time < now && time > 0) {
 					valueMap.remove(key);

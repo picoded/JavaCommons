@@ -98,10 +98,13 @@ public class JStruct_KeyValueMap_test {
 	public void getKeysTest() {
 		ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
 		valueMap.put("key", "0l");
+		valueMap.put("key1", "0l");
 		jStruct_KeyValueMap.valueMap = valueMap;
 		ConcurrentHashMap<String, Long> expireMap = new ConcurrentHashMap<String, Long>();
 		expireMap.put("key", 2l);
 		jStruct_KeyValueMap.expireMap = expireMap;
 		assertNotNull(jStruct_KeyValueMap.getKeys("key3"));
+		assertNotNull(jStruct_KeyValueMap.getKeys("0l"));
+		assertNotNull(jStruct_KeyValueMap.getKeys(null));
 	}
 }

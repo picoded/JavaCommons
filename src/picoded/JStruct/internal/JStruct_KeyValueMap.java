@@ -346,7 +346,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 			for (String key : valuekeySet) {
 				String rawValue = getValueRaw(key, now);
 				if (rawValue != null && (value == null || rawValue.equals(value))) {
-					ret.add(key);
+						ret.add(key);
 				}
 			}
 			

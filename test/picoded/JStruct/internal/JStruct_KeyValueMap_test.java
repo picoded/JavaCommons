@@ -10,32 +10,32 @@ import org.junit.Test;
 
 public class JStruct_KeyValueMap_test {
 	JStruct_KeyValueMap jStruct_KeyValueMap = null;
-
+	
 	@Before
 	public void setUp() {
 		jStruct_KeyValueMap = new JStruct_KeyValueMap();
 	}
-
+	
 	@After
 	public void tearDown() {
-
+		
 	}
-
+	
 	//
 	// Expected exception testing
 	//
-
+	
 	// / Invalid constructor test
 	@Test
 	public void invalidConstructor() {
 		new JStruct_KeyValueMap();
 	}
-
+	
 	@Test
 	public void getTempHintTest() {
 		assertFalse(jStruct_KeyValueMap.getTempHint());
 	}
-
+	
 	@Test
 	public void maintenanceTest() {
 		ConcurrentHashMap<String, Long> expireMap = new ConcurrentHashMap<String, Long>();
@@ -45,7 +45,7 @@ public class JStruct_KeyValueMap_test {
 		jStruct_KeyValueMap.expireMap = expireMap;
 		jStruct_KeyValueMap.incrementalMaintenance();
 	}
-
+	
 	@Test
 	public void setExpiryRawTest() {
 		ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
@@ -55,7 +55,7 @@ public class JStruct_KeyValueMap_test {
 		jStruct_KeyValueMap.setExpiryRaw("key5", 160l);
 		jStruct_KeyValueMap.setExpiryRaw("test", 1);
 	}
-
+	
 	@Test
 	public void setValueRawTest() {
 		ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<String, String>();

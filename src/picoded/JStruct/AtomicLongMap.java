@@ -71,10 +71,7 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long> {
 	/// @param value as Number
 	///
 	/// @returns long
-	public default Long put(String key, Number value) {
-		//update the valuemap
-		return put(key, value.longValue());
-	}
+	public Long put(String key, Number value);
 	
 	/// Stores (and overwrites if needed) key, value pair
 	///

@@ -43,15 +43,24 @@ public class JStruct_KeyValueMap_test {
 		expireMap.put("key5", 160l);
 		expireMap.put("key6", 169898998260l);
 		jStruct_KeyValueMap.expireMap = expireMap;
-		jStruct_KeyValueMap.maintenance();
+		jStruct_KeyValueMap.incrementalMaintenance();
 	}
 	
 	@Test
-	public void setExpiryRaw() {
+	public void setExpiryRawTest() {
 		ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
 		valueMap.put("key3", "0l");
 		valueMap.put("key5", "160l");
 		jStruct_KeyValueMap.valueMap = valueMap;
 		jStruct_KeyValueMap.setExpiryRaw("key5", 160l);
+	}
+	
+	@Test
+	public void setValueRawTest() {
+		ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
+		valueMap.put("key3", "0l");
+		valueMap.put("key5", "160l");
+		jStruct_KeyValueMap.valueMap = valueMap;
+		jStruct_KeyValueMap.setValueRaw("key3", null, 0);
 	}
 }

@@ -20,10 +20,6 @@ import picoded.security.NxtCrypt;
 ///
 public class JStruct_KeyValueMap implements KeyValueMap {
 	
-	/// Invalid constructor (throws exception)
-	public JStruct_KeyValueMap() {
-	}
-	
 	///
 	/// Constructor vars
 	///--------------------------------------------------------------------------
@@ -349,11 +345,8 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 			// Iterate and get
 			for (String key : valuekeySet) {
 				String rawValue = getValueRaw(key, now);
-				
-				if (rawValue != null) {
-					if (value == null || rawValue.equals(value)) {
-						ret.add(key);
-					}
+				if (rawValue != null && (value == null || rawValue.equals(value))) {
+					ret.add(key);
 				}
 			}
 			

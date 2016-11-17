@@ -6,6 +6,10 @@ import java.util.Map;
 
 public class QueryUtils {
 	
+	protected QueryUtils() {
+		throw new IllegalAccessError("Utility class");
+	}
+	
 	///
 	/// Gets the field value to test
 	///

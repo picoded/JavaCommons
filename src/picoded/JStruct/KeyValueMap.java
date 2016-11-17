@@ -1,13 +1,11 @@
 package picoded.JStruct;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import picoded.struct.*;
-import picoded.security.NxtCrypt;
+import java.util.Set;
 
 import org.apache.commons.lang3.RandomUtils;
+
+import picoded.security.NxtCrypt;
+import picoded.struct.GenericConvertMap;
 
 /// Refence implementation of KeyValueMap data structure
 ///
@@ -67,6 +65,7 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	///
 	/// Handles re-entrant lock where applicable
 	///
+	@Override
 	public void clear();
 	
 	//
@@ -118,6 +117,7 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	///
 	/// @param key as String
 	/// @returns boolean true or false if the key exists
+	@Override
 	public default boolean containsKey(Object key) {
 		return (getLifespan(key.toString()) >= 0);
 	}
@@ -126,12 +126,14 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @param key param find the thae meta key
 	///
 	/// @returns  value of the given key
+	@Override
 	public String get(Object key);
 	
 	/// Remove the value, given the key
 	/// @param key param find the thae meta key
 	///
 	/// @returns  null
+	@Override
 	public String remove(Object key);
 	
 	/// Stores (and overwrites if needed) key, value pair
@@ -147,6 +149,7 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// Returns all the valid keys
 	///
 	/// @returns  the full keyset
+	@Override
 	public default Set<String> keySet() {
 		return getKeys(null);
 	}
@@ -215,5 +218,4 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 		putWithLifespan(res, val, lifespan);
 		return res;
 	}
-	
 }

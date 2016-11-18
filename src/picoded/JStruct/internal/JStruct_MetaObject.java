@@ -137,7 +137,7 @@ public class JStruct_MetaObject implements MetaObject {
 		for (String key : deltaDataMap.keySet()) {
 			Object val = deltaDataMap.get(key);
 			
-			if (val == null || val == ObjectTokens.NULL) {
+			if (val == null || val.equals(ObjectTokens.NULL)) {
 				remoteDataMap.remove(key);
 			} else {
 				remoteDataMap.put(key, val);
@@ -210,6 +210,7 @@ public class JStruct_MetaObject implements MetaObject {
 	//----------------------------------------------
 	
 	/// Gets and return its current value
+	@Override
 	public Object get(Object key) {
 		
 		/// Get key operation
@@ -231,7 +232,7 @@ public class JStruct_MetaObject implements MetaObject {
 		}
 		
 		// Return null value
-		if (ret == ObjectTokens.NULL) {
+		if (ret != null && ret.equals(ObjectTokens.NULL)) {
 			return ret;
 		}
 		return ret;
@@ -243,7 +244,7 @@ public class JStruct_MetaObject implements MetaObject {
 		Object ret = get(key);
 		
 		// Object token null, cleared as null
-		if (ret == ObjectTokens.NULL) {
+		if (ret != null && ret.equals(ObjectTokens.NULL)) {
 			ret = null;
 		}
 		
@@ -251,17 +252,14 @@ public class JStruct_MetaObject implements MetaObject {
 		value = agressiveNumericConversion(value);
 		
 		// If no values are changed, ignore delta
-		if (value == ret) {
+		if (value != null && value.equals(ret)) {
 			return ret;
 		}
 		
 		// Value comparision check, ignore if no change
 		if (value != null && ret != null && value.getClass() == ret.getClass()) {
-			if (ret.toString().equals(value.toString())) {
-				return ret;
-			}
+			return ret;
 		}
-		
 		if (value == null) {
 			deltaDataMap.put(key, ObjectTokens.NULL);
 		} else {
@@ -288,7 +286,7 @@ public class JStruct_MetaObject implements MetaObject {
 				continue;
 			}
 			
-			if (get(key) != null && get(key) != ObjectTokens.NULL) {
+			if (get(key) != null && !get(key).equals(ObjectTokens.NULL)) {
 				retSet.add(key);
 			}
 		}

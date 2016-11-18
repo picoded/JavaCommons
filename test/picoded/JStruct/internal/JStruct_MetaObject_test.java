@@ -40,16 +40,37 @@ public class JStruct_MetaObject_test {
 		jStruct_MetaObject.deltaDataMap = deltaDataMap;
 		assertNull(jStruct_MetaObject.put("key4", ObjectTokens.NULL));
 		deltaDataMap = new HashMap<String, Object>();
-		object = new Object();
-		deltaDataMap.put("key5", object);
+		
+		deltaDataMap.put("key5", object = new Object());
 		jStruct_MetaObject.deltaDataMap = deltaDataMap;
 		assertNotNull(jStruct_MetaObject.put("key5", object));
 		
 		deltaDataMap = new HashMap<String, Object>();
-		object = null;
-		deltaDataMap.put("key5", object);
+		deltaDataMap.put("key5", "test");
+		jStruct_MetaObject.deltaDataMap = deltaDataMap;
+		assertNotNull(jStruct_MetaObject.put("key5", "test"));
+		
+		deltaDataMap = new HashMap<String, Object>();
+		deltaDataMap.put("key5", null);
+		jStruct_MetaObject.deltaDataMap = deltaDataMap;
+		assertNull(jStruct_MetaObject.put("key5", null));
+		
+		deltaDataMap = new HashMap<String, Object>();
+		deltaDataMap.put("key5", "abc");
 		jStruct_MetaObject.deltaDataMap = deltaDataMap;
 		assertNotNull(jStruct_MetaObject.put("key5", null));
+		
+		deltaDataMap = new HashMap<String, Object>();
+		deltaDataMap.put("key5", null);
+		jStruct_MetaObject.deltaDataMap = deltaDataMap;
+		assertNull(jStruct_MetaObject.put("key5", "abc"));
+		
+		deltaDataMap = new HashMap<String, Object>();
+		deltaDataMap.put("key5", new String("hello"));
+		jStruct_MetaObject.deltaDataMap = deltaDataMap;
+		assertNotNull(jStruct_MetaObject.put("key5", new String("test")));
+		jStruct_MetaObject.isCompleteRemoteDataMap = false;
+		assertNotNull(jStruct_MetaObject.get("key5"));
 	}
 	
 	@Test

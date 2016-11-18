@@ -49,6 +49,23 @@ public class Or_test {
 		assertEquals("OR", or.operatorSymbol());
 	}
 	
+	@Test
+	public void testTest() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Query> childQuery = new ArrayList<Query>();
+		CombinationBase combinationBase = new CombinationBase(childQuery, map);
+		Query leftQuery = new Or(childQuery, map);
+		Map<String, Object> sample_a = new HashMap<String, Object>();
+		sample_a.put("hello", "world");
+		sample_a.put("my", "perfect world");
+		Query rightQuery = new Like("hello", "world", sample_a);
+		Map<String, Object> defaultArgMap = new HashMap<>();
+		defaultArgMap.put("hello", "world");
+		or = new Or(leftQuery, rightQuery, defaultArgMap);
+		assertFalse(or.test("hello", defaultArgMap));
+		
+	}
+	
 	private Or construct() {
 		Map<String, Object> defaultArgMap = new HashMap<>();
 		return new Or(Arrays.asList(new Query[] { new Equals("hello", "hello", defaultArgMap),

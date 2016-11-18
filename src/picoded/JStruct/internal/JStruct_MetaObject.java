@@ -26,29 +26,29 @@ import picoded.enums.ObjectTokens;
 public class JStruct_MetaObject implements MetaObject {
 	
 	// Core variables
-	//----------------------------------------------
+	// ----------------------------------------------
 	
-	/// MetaTable used for the object
+	// / MetaTable used for the object
 	protected JStruct_MetaTable mainTable = null;
 	
-	/// GUID used for the object
+	// / GUID used for the object
 	protected String _oid = null;
 	
-	/// Written changes, note that picoded.enums.ObjectTokens.NULL is used
-	/// as a pesudo null value (remove)
+	// / Written changes, note that picoded.enums.ObjectTokens.NULL is used
+	// / as a pesudo null value (remove)
 	protected Map<String, Object> deltaDataMap = new HashMap<String, Object>();
 	
-	/// Used to indicate if the full remoteDataMap is given.
-	/// This is used when incomplete query data is given first
+	// / Used to indicate if the full remoteDataMap is given.
+	// / This is used when incomplete query data is given first
 	protected boolean isCompleteRemoteDataMap = false;
 	
-	/// Local data cache
+	// / Local data cache
 	protected Map<String, Object> remoteDataMap = null;
 	
 	// Constructor
-	//----------------------------------------------
+	// ----------------------------------------------
 	
-	/// Common setup function, across constructors
+	// / Common setup function, across constructors
 	protected void commonSetup(MetaTable inTable, String inOID, Map<String, Object> inRemoteData,
 		boolean isCompleteData) {
 		
@@ -96,30 +96,30 @@ public class JStruct_MetaObject implements MetaObject {
 		
 	}
 	
-	/// Constructor, with metaTable and GUID (auto generated if null)
+	// / Constructor, with metaTable and GUID (auto generated if null)
 	public JStruct_MetaObject(MetaTable inTable, String inOID) {
 		commonSetup(inTable, inOID, null, false);
 	}
 	
-	/// Constructor, with metaTable and GUID (auto generated if null)
+	// / Constructor, with metaTable and GUID (auto generated if null)
 	public JStruct_MetaObject(MetaTable inTable, String inOID, Map<String, Object> inRemoteData,
 		boolean isCompleteData) {
 		commonSetup(inTable, inOID, inRemoteData, isCompleteData);
 	}
 	
 	// MetaObject ID
-	//----------------------------------------------
+	// ----------------------------------------------
 	
-	/// The object ID
+	// / The object ID
 	@Override
 	public String _oid() {
 		return _oid;
 	}
 	
 	// Utiltiy functions
-	//----------------------------------------------
+	// ----------------------------------------------
 	
-	/// Ensures the complete remote data map is loaded
+	// / Ensures the complete remote data map is loaded
 	protected void ensureCompleteRemoteDataMap() {
 		if (remoteDataMap == null || !isCompleteRemoteDataMap) {
 			remoteDataMap = mainTable.metaObjectRemoteDataMap_get(_oid);
@@ -131,7 +131,7 @@ public class JStruct_MetaObject implements MetaObject {
 		}
 	}
 	
-	/// Collapse delta map to remote map
+	// / Collapse delta map to remote map
 	protected void collapseDeltaToRemoteMap() {
 		ensureCompleteRemoteDataMap();
 		for (Entry<String, Object> entry : deltaDataMap.entrySet()) {
@@ -145,7 +145,7 @@ public class JStruct_MetaObject implements MetaObject {
 		deltaDataMap = new HashMap<String, Object>();
 	}
 	
-	/// Raw keyset, that is unfiltered
+	// / Raw keyset, that is unfiltered
 	protected Set<String> unfilteredForNullKeySet() {
 		Set<String> unfilteredForNull = new HashSet<String>();
 		
@@ -156,11 +156,11 @@ public class JStruct_MetaObject implements MetaObject {
 		return unfilteredForNull;
 	}
 	
-	/// The aggressive type conversion to int / double types
-	///
-	/// @params  The input object to convert
-	///
-	/// @returns  The converted Integer or Double object, else its default value
+	// / The aggressive type conversion to int / double types
+	// /
+	// / @params The input object to convert
+	// /
+	// / @returns The converted Integer or Double object, else its default value
 	protected Object agressiveNumericConversion(Object value) {
 		if (value == null) {
 			return value;
@@ -177,7 +177,7 @@ public class JStruct_MetaObject implements MetaObject {
 			
 			ret = Integer.valueOf(strValue);
 		} catch (Exception e) {
-			//Silent ignore
+			// Silent ignore
 		}
 		
 		try {
@@ -185,7 +185,7 @@ public class JStruct_MetaObject implements MetaObject {
 				ret = Long.parseLong(strValue);
 			}
 		} catch (Exception e) {
-			//Silent ignore
+			// Silent ignore
 		}
 		
 		try {
@@ -194,7 +194,7 @@ public class JStruct_MetaObject implements MetaObject {
 				ret = Double.parseDouble(strValue);
 			}
 		} catch (Exception e) {
-			//Silent ignore
+			// Silent ignore
 		}
 		
 		if (ret != null && ret.toString().equals(strValue)) {
@@ -204,13 +204,13 @@ public class JStruct_MetaObject implements MetaObject {
 	}
 	
 	// Critical map functions
-	//----------------------------------------------
+	// ----------------------------------------------
 	
-	/// Gets and return its current value
+	// / Gets and return its current value
 	@Override
 	public Object get(Object key) {
 		
-		/// Get key operation
+		// / Get key operation
 		if (key.toString().equalsIgnoreCase("_oid")) {
 			return _oid;
 		}
@@ -235,7 +235,7 @@ public class JStruct_MetaObject implements MetaObject {
 		return ret;
 	}
 	
-	/// Put and set its delta value, set null is considered "remove"
+	// / Put and set its delta value, set null is considered "remove"
 	@Override
 	public Object put(String key, Object value) {
 		Object ret = get(key);
@@ -266,13 +266,13 @@ public class JStruct_MetaObject implements MetaObject {
 		return ret;
 	}
 	
-	/// Remove operation
+	// / Remove operation
 	@Override
 	public Object remove(Object key) {
 		return put(key.toString(), null);
 	}
 	
-	/// Gets and return valid keySet()
+	// / Gets and return valid keySet()
 	@Override
 	public Set<String> keySet() {
 		Set<String> unfilteredForNull = unfilteredForNullKeySet();
@@ -293,9 +293,9 @@ public class JStruct_MetaObject implements MetaObject {
 	}
 	
 	// MetaObject save operations
-	//----------------------------------------------
+	// ----------------------------------------------
 	
-	/// Save the delta changes to storage
+	// / Save the delta changes to storage
 	@Override
 	public void saveDelta() {
 		ensureCompleteRemoteDataMap();
@@ -303,7 +303,7 @@ public class JStruct_MetaObject implements MetaObject {
 		collapseDeltaToRemoteMap();
 	}
 	
-	/// Save all the configured data, ignore delta handling
+	// / Save all the configured data, ignore delta handling
 	@Override
 	public void saveAll() {
 		ensureCompleteRemoteDataMap();
@@ -317,7 +317,7 @@ public class JStruct_MetaObject implements MetaObject {
 	}
 	
 	// To string operation : aids debugging
-	//----------------------------------------------
+	// ----------------------------------------------
 	@Override
 	public String toString() {
 		return ConvertJSON.fromMap(this);

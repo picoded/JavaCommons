@@ -32,11 +32,11 @@ public class JStruct_MetaObject_test {
 		return (new JStruct()).getMetaTable("test");
 	}
 	
-	//	@Test(expected = Exception.class)
-	//	public void commonSetupTest()throws Exception  {
-	//		MetaTable metaTable =new JStruct_MetaTable();
-	//		jStruct_MetaObject.commonSetup(metaTable, null, null, false);
-	//	}
+	// @Test(expected = Exception.class)
+	// public void commonSetupTest()throws Exception {
+	// MetaTable metaTable =new JStruct_MetaTable();
+	// jStruct_MetaObject.commonSetup(metaTable, null, null, false);
+	// }
 	
 	@Test
 	public void putTest() {
@@ -75,6 +75,12 @@ public class JStruct_MetaObject_test {
 		deltaDataMap.put("key5", new String("hello"));
 		jStruct_MetaObject.deltaDataMap = deltaDataMap;
 		assertNotNull(jStruct_MetaObject.put("key5", new String("test")));
+		
+		deltaDataMap = new HashMap<String, Object>();
+		deltaDataMap.put("key5", new String("hello"));
+		jStruct_MetaObject.deltaDataMap = deltaDataMap;
+		assertNotNull(jStruct_MetaObject.put("key5", new Integer(123)));
+		
 		jStruct_MetaObject.isCompleteRemoteDataMap = false;
 		assertNotNull(jStruct_MetaObject.get("key5"));
 	}
@@ -111,5 +117,4 @@ public class JStruct_MetaObject_test {
 		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("9648512236521"));
 		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("96485.12236521"));
 	}
-	
 }

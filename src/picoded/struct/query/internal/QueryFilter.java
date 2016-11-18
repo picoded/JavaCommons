@@ -69,7 +69,7 @@ public class QueryFilter {
 		int strPos = 0;
 		
 		String resString = query;
-		while ((strPos = resString.indexOf("?")) >= 0) {
+		while ((strPos = resString.indexOf('?')) >= 0) {
 			resString = (resString.substring(0, strPos) + ":" + queryCount + resString
 				.substring(strPos + 1));
 			++queryCount;
@@ -326,9 +326,9 @@ public class QueryFilter {
 				continue;
 			}
 			
-			if (token.equals("(")) {
+			if ("(".equals(token)) {
 				start = a;
-			} else if (token.equals(")")) {
+			} else if (")".equals(token)) {
 				if (start == -1) {
 					throw new RuntimeException("Found closing bracket ')' without opening bracket");
 				} //else {
@@ -357,11 +357,11 @@ public class QueryFilter {
 	/// @returns  The combined query
 	public static Query combinationQuery(String combinationType, List<Query> childQuery,
 		Map<String, Object> paramsMap) {
-		if (combinationType.equals("AND")) {
+		if ("AND".equals(combinationType)) {
 			return new And(childQuery, paramsMap);
-		} else if (combinationType.equals("OR")) {
+		} else if ("OR".equals(combinationType)) {
 			return new Or(childQuery, paramsMap);
-		} else if (combinationType.equals("NOT")) {
+		} else if ("NOT".equals(combinationType)) {
 			return new Not(childQuery, paramsMap);
 		}
 		
@@ -434,8 +434,8 @@ public class QueryFilter {
 		if (combinationType == null) {
 			
 			// Empty token handling
-			if (tokens == null || tokens.size() == 0) {
-				if (childList == null || childList.size() == 0) {
+			if (tokens == null || tokens.isEmpty()) {
+				if (childList == null || childList.isEmpty()) {
 					throw new RuntimeException("Missing combination token: Empty tokens and child list");
 				}
 				

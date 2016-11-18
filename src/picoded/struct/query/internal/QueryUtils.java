@@ -22,7 +22,7 @@ public class QueryUtils {
 	///
 	@SuppressWarnings("rawtypes")
 	public static Object getFieldValue(Object t, String field) {
-		if (field == null || field.toString().equalsIgnoreCase("this")) {
+		if (field == null || "this".equalsIgnoreCase(field)) {
 			return t;
 		} else if (t instanceof Map) {
 			return ((Map) t).get(field);

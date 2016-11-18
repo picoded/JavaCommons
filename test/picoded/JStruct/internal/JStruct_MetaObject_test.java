@@ -108,6 +108,8 @@ public class JStruct_MetaObject_test {
 		assertNotNull(jStruct_MetaObject.toString());
 		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("test"));
 		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("10"));
+		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("9648512236521"));
+		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("96485.12236521"));
 	}
 	
 }

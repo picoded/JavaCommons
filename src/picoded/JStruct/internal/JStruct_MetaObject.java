@@ -134,13 +134,12 @@ public class JStruct_MetaObject implements MetaObject {
 	/// Collapse delta map to remote map
 	protected void collapseDeltaToRemoteMap() {
 		ensureCompleteRemoteDataMap();
-		for (String key : deltaDataMap.keySet()) {
-			Object val = deltaDataMap.get(key);
-			
+		for (Entry<String, Object> entry : deltaDataMap.entrySet()) {
+			Object val = deltaDataMap.get(entry.getKey());
 			if (val == null || val.equals(ObjectTokens.NULL)) {
-				remoteDataMap.remove(key);
+				remoteDataMap.remove(entry.getKey());
 			} else {
-				remoteDataMap.put(key, val);
+				remoteDataMap.put(entry.getKey(), val);
 			}
 		}
 		deltaDataMap = new HashMap<String, Object>();
@@ -182,17 +181,17 @@ public class JStruct_MetaObject implements MetaObject {
 		}
 		
 		try {
-			
 			if (ret == null) {
-				ret = Double.parseDouble(strValue);
+				ret = Long.parseLong(strValue);
 			}
 		} catch (Exception e) {
 			//Silent ignore
 		}
 		
 		try {
+			
 			if (ret == null) {
-				ret = Long.parseLong(strValue);
+				ret = Double.parseDouble(strValue);
 			}
 		} catch (Exception e) {
 			//Silent ignore

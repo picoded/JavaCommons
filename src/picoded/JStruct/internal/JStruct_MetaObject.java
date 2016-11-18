@@ -220,7 +220,7 @@ public class JStruct_MetaObject implements MetaObject {
 		Object ret = deltaDataMap.get(key);
 		
 		// Get from incomplete map
-		if (ret == null && !isCompleteRemoteDataMap && remoteDataMap != null) {
+		if (ret == null && isCompleteRemoteDataMap && remoteDataMap != null) {
 			ret = remoteDataMap.get(key);
 		}
 		
@@ -232,7 +232,7 @@ public class JStruct_MetaObject implements MetaObject {
 		
 		// Return null value
 		if (ret == ObjectTokens.NULL) {
-			return null;
+			return ret;
 		}
 		return ret;
 	}
@@ -288,7 +288,7 @@ public class JStruct_MetaObject implements MetaObject {
 				continue;
 			}
 			
-			if (get(key) != null) {
+			if (get(key) != null && get(key) != ObjectTokens.NULL) {
 				retSet.add(key);
 			}
 		}

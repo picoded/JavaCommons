@@ -109,6 +109,18 @@ public class QueryFilter_test {
 	}
 	
 	@Test(expected = RuntimeException.class)
+	public void basicQueryFromTokensInvalid4Test() {
+		Map<String, Object> paramsMap = new HashMap<String, Object>();
+		assertNotNull(QueryFilter.basicQueryFromTokens(paramsMap, "abc", "<", null));
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void basicQueryFromTokensInvalid5Test() {
+		Map<String, Object> paramsMap = new HashMap<String, Object>();
+		assertNotNull(QueryFilter.basicQueryFromTokens(paramsMap, "abc", "<", "abc"));
+	}
+	
+	@Test(expected = RuntimeException.class)
 	public void basicQueryFromTokensExceptionTest() {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		assertNotNull(QueryFilter.basicQueryFromTokens(paramsMap, "abc", "<<", ":abc"));
@@ -149,5 +161,19 @@ public class QueryFilter_test {
 		Map<String, Object> baseMap = new HashMap<>();
 		String[] argArr = new String[] { "a" };
 		assertNotNull(QueryFilter.refactorQuery(query, baseMap, argArr));
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void findCompleteEnclosureInvalidClosingBracketTest() {
+		List<Object> list = new ArrayList();
+		list.add(")");
+		assertNotNull(QueryFilter.findCompleteEnclosure(list));
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void findCompleteEnclosureInvalidStartBracketTest() {
+		List<Object> list = new ArrayList();
+		list.add("(");
+		assertNotNull(QueryFilter.findCompleteEnclosure(list));
 	}
 }

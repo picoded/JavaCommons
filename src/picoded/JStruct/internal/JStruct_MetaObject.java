@@ -1,13 +1,17 @@
 package picoded.JStruct.internal;
 
 /// Java imports
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
+import picoded.JStruct.MetaObject;
+import picoded.JStruct.MetaTable;
+import picoded.conv.ConvertJSON;
 /// Picoded imports
-import picoded.conv.*;
-import picoded.struct.*;
-import picoded.JStruct.*;
-import picoded.enums.*;
+import picoded.conv.GUID;
+import picoded.enums.ObjectTokens;
 
 /// Represents a single object node in the MetaTable collection.
 ///
@@ -107,6 +111,7 @@ public class JStruct_MetaObject implements MetaObject {
 	//----------------------------------------------
 	
 	/// The object ID
+	@Override
 	public String _oid() {
 		return _oid;
 	}
@@ -233,6 +238,7 @@ public class JStruct_MetaObject implements MetaObject {
 	}
 	
 	/// Put and set its delta value, set null is considered "remove"
+	@Override
 	public Object put(String key, Object value) {
 		Object ret = get(key);
 		
@@ -266,11 +272,13 @@ public class JStruct_MetaObject implements MetaObject {
 	}
 	
 	/// Remove operation
+	@Override
 	public Object remove(Object key) {
 		return put(key.toString(), null);
 	}
 	
 	/// Gets and return valid keySet()
+	@Override
 	public Set<String> keySet() {
 		Set<String> unfilteredForNull = unfilteredForNullKeySet();
 		Set<String> retSet = new HashSet<String>();
@@ -293,6 +301,7 @@ public class JStruct_MetaObject implements MetaObject {
 	//----------------------------------------------
 	
 	/// Save the delta changes to storage
+	@Override
 	public void saveDelta() {
 		ensureCompleteRemoteDataMap();
 		mainTable.metaObjectRemoteDataMap_update(_oid, this, deltaDataMap.keySet());
@@ -300,6 +309,7 @@ public class JStruct_MetaObject implements MetaObject {
 	}
 	
 	/// Save all the configured data, ignore delta handling
+	@Override
 	public void saveAll() {
 		ensureCompleteRemoteDataMap();
 		
@@ -313,6 +323,7 @@ public class JStruct_MetaObject implements MetaObject {
 	
 	// To string operation : aids debugging
 	//----------------------------------------------
+	@Override
 	public String toString() {
 		return ConvertJSON.fromMap(this);
 	}

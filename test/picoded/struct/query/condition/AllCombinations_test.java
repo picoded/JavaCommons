@@ -144,6 +144,16 @@ public class AllCombinations_test {
 	}
 	
 	@Test
+	public void CombinationBaseThreeParamsTest() {
+		CombinationBase combinationBase = new CombinationBase(null, null, null);
+		assertNotNull(combinationBase);
+		Query rightQuery = new NotEquals("key", "key_hello", arguments_a);
+		Query leftQuery = new NotEquals("key", "key_hello", arguments_a);
+		Map<String, Object> defaultArgMap = new HashMap<String, Object>();
+		combinationBase = new CombinationBase(leftQuery, rightQuery, defaultArgMap);
+	}
+	
+	@Test
 	public void childrenQueryTest() {
 		List<Query> childQuery = new ArrayList<Query>();
 		Map<String, Object> defaultArgMap = new HashMap<String, Object>();
@@ -154,6 +164,8 @@ public class AllCombinations_test {
 	@Test
 	public void keyValuesMapTest() {
 		List<Query> childQuery = new ArrayList<Query>();
+		Query query = new NotEquals("key", "key_hello", arguments_a);
+		childQuery.add(query);
 		Map<String, Object> defaultArgMap = new HashMap<String, Object>();
 		CombinationBase combinationBase = new CombinationBase(childQuery, defaultArgMap);
 		assertNotNull(combinationBase.keyValuesMap());
@@ -173,5 +185,31 @@ public class AllCombinations_test {
 		Map<String, Object> defaultArgMap = new HashMap<String, Object>();
 		CombinationBase combinationBase = new CombinationBase(childQuery, defaultArgMap);
 		assertEquals(QueryType.AND, combinationBase.type());
+	}
+	
+	@Test
+	public void testTest() {
+		List<Query> childQuery = new ArrayList<Query>();
+		Query query = new NotEquals("key", "key_hello", arguments_a);
+		Map<String, Object> map = new HashMap<String, Object>();
+		CombinationBase combinationBase = new CombinationBase(childQuery, map);
+		Query cond = new Not(childQuery, map);
+		assertFalse(combinationBase.test(cond, map));
+		childQuery.add(query);
+		map.put("key", "key_hello");
+		combinationBase = new CombinationBase(childQuery, map);
+		assertFalse(combinationBase.test(null, map));
+		//assertTrue(combinationBase.test("key", map));
+	}
+	
+	@Test
+	public void toStringTest() {
+		Query query = new Or(Arrays.asList(new Query[] { new Equals("hello", "hello", arguments_a),
+			new Equals("my", "my", arguments_a) }), arguments_a);
+		List<Query> childQuery = new ArrayList<Query>();
+		childQuery.add(query);
+		Map<String, Object> map = new HashMap<String, Object>();
+		CombinationBase combinationBase = new CombinationBase(childQuery, map);
+		assertEquals("(\"hello\" = :hello OR \"my\" = :my)", combinationBase.toString());
 	}
 }

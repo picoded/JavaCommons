@@ -105,8 +105,8 @@ public class CompareUtils_test {
 	@Test
 	public void numericCompareTest() {
 		assertEquals(0, CompareUtils.numericCompare(null, null));
-		assertEquals(0, CompareUtils.numericCompare(2, 1));
-		assertEquals(0, CompareUtils.numericCompare(2.2, 1));
+		assertEquals(1, CompareUtils.numericCompare(2, 1));
+		assertEquals(1, CompareUtils.numericCompare(2.2, 1));
 	}
 	
 	@Test

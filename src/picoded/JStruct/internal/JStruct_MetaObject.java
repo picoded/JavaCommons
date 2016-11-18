@@ -121,7 +121,7 @@ public class JStruct_MetaObject implements MetaObject {
 	
 	/// Ensures the complete remote data map is loaded
 	protected void ensureCompleteRemoteDataMap() {
-		if (remoteDataMap == null || isCompleteRemoteDataMap == false) {
+		if (remoteDataMap == null || !isCompleteRemoteDataMap) {
 			remoteDataMap = mainTable.metaObjectRemoteDataMap_get(_oid);
 			isCompleteRemoteDataMap = true;
 			
@@ -198,10 +198,8 @@ public class JStruct_MetaObject implements MetaObject {
 			//Silent ignore
 		}
 		
-		if (ret != null) {
-			if (ret.toString().equals(strValue)) {
-				return ret;
-			}
+		if (ret != null && ret.toString().equals(strValue)) {
+			return ret;
 		}
 		return value;
 	}

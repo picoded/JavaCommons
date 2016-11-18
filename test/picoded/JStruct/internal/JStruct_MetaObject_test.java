@@ -32,6 +32,12 @@ public class JStruct_MetaObject_test {
 		return (new JStruct()).getMetaTable("test");
 	}
 	
+	//	@Test(expected = Exception.class)
+	//	public void commonSetupTest()throws Exception  {
+	//		MetaTable metaTable =new JStruct_MetaTable();
+	//		jStruct_MetaObject.commonSetup(metaTable, null, null, false);
+	//	}
+	
 	@Test
 	public void putTest() {
 		Map<String, Object> deltaDataMap = new HashMap<String, Object>();
@@ -94,11 +100,14 @@ public class JStruct_MetaObject_test {
 		jStruct_MetaObject.deltaDataMap = deltaDataMap;
 		jStruct_MetaObject.remoteDataMap = remoteDataMap;
 		assertNotNull(jStruct_MetaObject.keySet());
+		jStruct_MetaObject.collapseDeltaToRemoteMap();
 	}
 	
 	@Test
 	public void toStringTest() {
 		assertNotNull(jStruct_MetaObject.toString());
+		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("test"));
+		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("10"));
 	}
 	
 }

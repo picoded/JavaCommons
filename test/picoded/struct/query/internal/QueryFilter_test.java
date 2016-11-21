@@ -77,11 +77,6 @@ public class QueryFilter_test {
 			QueryFilter.enforceRequiredWhitespace("A<=:0  AND  B>=:1 AND C!=:2 AND (D<:3 AND E=:4)"));
 	}
 	
-	@Test
-	public void QueryFilterTest() {
-		assertNotNull(new QueryFilter());
-	}
-	
 	@Test(expected = RuntimeException.class)
 	public void basicQueryFromTokensInvalidTest() {
 		assertNotNull(QueryFilter.basicQueryFromTokens(null, "", "", ""));
@@ -124,11 +119,6 @@ public class QueryFilter_test {
 	public void basicQueryFromTokensExceptionTest() {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		assertNotNull(QueryFilter.basicQueryFromTokens(paramsMap, "abc", "<<", ":abc"));
-	}
-	
-	@Test
-	public void collapseQueryTokensWithoutBracketsTest() {
-		
 	}
 	
 	@Test
@@ -176,4 +166,10 @@ public class QueryFilter_test {
 		list.add("(");
 		assertNotNull(QueryFilter.findCompleteEnclosure(list));
 	}
+	
+	@Test(expected = IllegalAccessError.class)
+	public void QueryFilterTest() {
+		assertNotNull(new QueryFilter());
+	}
+	
 }

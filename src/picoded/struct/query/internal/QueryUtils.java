@@ -58,7 +58,7 @@ public class QueryUtils {
 		if (number instanceof Integer) {
 			val = (Integer) number * 1.0;
 		} else if (number instanceof Float) {
-			val = ((Float) number * 1.0);
+			val = (Float) number * 1.0;
 		} else if (number instanceof Double) {
 			val = (Double) number;
 		}
@@ -73,8 +73,8 @@ public class QueryUtils {
 				try {
 					Number sourceAsNumber = NumberFormat.getNumberInstance(Locale.ENGLISH).parse(
 						(String) source);
-					Double sourceAsDouble = sourceAsNumber.doubleValue();
-					return sourceAsDouble;
+					return sourceAsNumber.doubleValue();
+					//return sourceAsDouble;
 				} catch (Exception ex) {
 					throw new RuntimeException("exception in normalizeObject-> " + ex.getMessage());
 				}

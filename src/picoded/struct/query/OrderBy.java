@@ -1,5 +1,6 @@
 package picoded.struct.query;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -11,7 +12,9 @@ import picoded.struct.query.internal.QueryUtils;
 
 /// Utility class that provides SQL styel OrderBy functionality
 /// to sort object collection lists
-public class OrderBy<T> implements Comparator<T> {
+public class OrderBy<T> implements Comparator<T>, Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	//
 	// Constructor setup

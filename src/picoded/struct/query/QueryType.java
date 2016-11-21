@@ -87,12 +87,12 @@ public enum QueryType {
 				nameToTypeMap_wip.put(type.name(), type);
 				idToTypeMap_wip.put(type.getValue(), type);
 			}
-			synchronized (idToTypeMap_wip) {
-				if (nameToTypeMap == null) {
-					nameToTypeMap = nameToTypeMap_wip;
-					idToTypeMap = idToTypeMap_wip;
-				}
+			//synchronized(idToTypeMap_wip) {
+			if (nameToTypeMap == null) {
+				nameToTypeMap = nameToTypeMap_wip;
+				idToTypeMap = idToTypeMap_wip;
 			}
+			//}
 		}
 	}
 	

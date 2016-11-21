@@ -43,7 +43,7 @@ public class And extends CombinationBase {
 	/// @param   the argument map, if applicable
 	///
 	/// @returns  boolean indicating true / false
-	@Override
+	/*@Override
 	public boolean test(Object t, Map<String, Object> argMap) {
 		boolean result = false; //blank combination is a failure
 		
@@ -56,7 +56,7 @@ public class And extends CombinationBase {
 		}
 		
 		return result;
-	}
+	}*/
 	
 	/// Gets the query type 
 	///

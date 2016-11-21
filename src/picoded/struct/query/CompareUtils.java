@@ -118,8 +118,8 @@ public class CompareUtils {
 		
 		// String type comparision
 		if ( // 
-		(o1 instanceof String) && (o2 instanceof String || o2 == null) || //
-			(o2 instanceof String) && o1 == null //
+		(o1 instanceof String) && ((o2 instanceof String || o2 == null) || //
+			(o2 instanceof String && o1 == null))//
 		) {
 			return stringCompare( //
 				(o1 != null) ? o1.toString() : null, //
@@ -134,7 +134,7 @@ public class CompareUtils {
 		// Tries to numeric compare
 		if ( //
 		(n1 != null && (n2 != null || o2 == null)) || //
-			n2 != null && o1 == null //
+			(n2 != null && o1 == null) //
 		) { //
 			return numericCompare(n1, n2);
 		}

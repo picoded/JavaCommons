@@ -49,6 +49,10 @@ import picoded.struct.query.condition.Or;
 ///
 public class QueryFilter {
 	
+	protected QueryFilter() {
+		throw new IllegalAccessError("Utility class");
+	}
+	
 	//---------------------------------
 	//
 	// String processors
@@ -70,8 +74,8 @@ public class QueryFilter {
 		
 		String resString = query;
 		while ((strPos = resString.indexOf('?')) >= 0) {
-			resString = (resString.substring(0, strPos) + ":" + queryCount + resString
-				.substring(strPos + 1));
+			resString = resString.substring(0, strPos) + ":" + queryCount
+				+ resString.substring(strPos + 1);
 			++queryCount;
 		}
 		
@@ -313,7 +317,7 @@ public class QueryFilter {
 		
 		// Gets the start and end
 		int start = -1;
-		int end = -1;
+		//int end = -1;
 		
 		//System.out.println(queryTokens.toString());
 		

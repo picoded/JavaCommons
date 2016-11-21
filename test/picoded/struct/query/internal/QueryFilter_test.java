@@ -172,4 +172,12 @@ public class QueryFilter_test {
 		assertNotNull(new QueryFilter());
 	}
 	
+	@Test(expected = RuntimeException.class)
+	public void collapseQueryTokensWithoutBracketsTest() {
+		List<Object> tokens = new ArrayList();
+		Map<String, Object> paramMap = new HashMap();
+		tokens.add(new StringBuilder("A = ? AND B = ?"));
+		assertNotNull(QueryFilter.collapseQueryTokensWithoutBrackets(tokens, paramMap));
+		
+	}
 }

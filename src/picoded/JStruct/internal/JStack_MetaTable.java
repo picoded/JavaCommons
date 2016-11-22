@@ -12,6 +12,10 @@ import picoded.JStruct.MetaObject;
 ///
 public class JStack_MetaTable extends JStruct_MetaTable {
 	
+	/// Invalid constructor (throws exception)
+	protected JStack_MetaTable() {
+	}
+	
 	///
 	/// Temporary logger used to make sure incomplete implmentation is noted
 	///--------------------------------------------------------------------------

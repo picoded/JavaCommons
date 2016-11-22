@@ -18,17 +18,17 @@ import org.junit.Test;
 
 public class KeyValueMap_test {
 	
-	/// Test object
+	// / Test object
 	public KeyValueMap kvmObj = null;
 	
-	/// To override for implementation
-	///------------------------------------------------------
+	// / To override for implementation
+	// /------------------------------------------------------
 	public KeyValueMap implementationConstructor() {
 		return (new JStruct()).getKeyValueMap("test");
 	}
 	
-	/// Setup and sanity test
-	///------------------------------------------------------
+	// / Setup and sanity test
+	// /------------------------------------------------------
 	@Before
 	public void setUp() {
 		kvmObj = implementationConstructor();
@@ -45,21 +45,21 @@ public class KeyValueMap_test {
 	
 	@Test
 	public void constructorTest() {
-		//not null check
+		// not null check
 		assertNotNull(kvmObj);
 		
-		//run maintaince, no exception?
+		// run maintaince, no exception?
 		kvmObj.maintenance();
 	}
 	
-	/// utility
-	///------------------------------------------------------
+	// / utility
+	// /------------------------------------------------------
 	public long currentSystemTimeInSeconds() {
 		return (System.currentTimeMillis() / 1000L);
 	}
 	
-	/// basic test
-	///------------------------------------------------------
+	// / basic test
+	// /------------------------------------------------------
 	
 	@Test
 	public void simpleHasPutHasGet() throws Exception {
@@ -106,17 +106,17 @@ public class KeyValueMap_test {
 	
 	@Test
 	public void testColumnExpiration() throws Exception {
-		//set column expiration time to current time + 30 secs.
+		// set column expiration time to current time + 30 secs.
 		long expirationTime = currentSystemTimeInSeconds() + 1;
 		kvmObj.putWithExpiry("yes", "no", expirationTime);
 		
-		//before the expiration time key will not be null.
+		// before the expiration time key will not be null.
 		assertNotNull(kvmObj.get("yes"));
 		
-		//sleep the execution for 31 secs so that key gets expired.
+		// sleep the execution for 31 secs so that key gets expired.
 		Thread.sleep(2000);
 		
-		//key should be null after expiration time.
+		// key should be null after expiration time.
 		assertEquals(null, kvmObj.get("yes"));
 	}
 	
@@ -138,14 +138,23 @@ public class KeyValueMap_test {
 			kvmObj.getKeys("world"));
 	}
 	
-	/// nonce test
-	///------------------------------------------------------
+	// / nonce test
+	// /------------------------------------------------------
 	
 	@Test
-	public void simpleNonce() {
+	public void generateNonceTest() {
 		String nonce;
-		assertNotNull(nonce = kvmObj.generateNonce("hello"));
+		assertNotNull(nonce = kvmObj.generateNonce("hello", 1, "hello".length()));
 		assertEquals("hello", kvmObj.get(nonce));
 	}
 	
+	@Test
+	public void keySetTest() {
+		assertNotNull(kvmObj.keySet());
+	}
+	
+	@Test
+	public void containsKeyTest() {
+		assertNotNull(kvmObj.containsKey("hello"));
+	}
 }

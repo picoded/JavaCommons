@@ -52,9 +52,9 @@ public class JStruct_MetaObject implements MetaObject {
 	protected void commonSetup(MetaTable inTable, String inOID, Map<String, Object> inRemoteData,
 		boolean isCompleteData) {
 		
-		if (!(inTable instanceof JStruct_MetaTable)) {
-			throw new RuntimeException("Requires MetaTable to be based off JStruct_MetaTable");
-		}
+		//		if (!(inTable instanceof JStruct_MetaTable)) {
+		//			throw new RuntimeException("Requires MetaTable to be based off JStruct_MetaTable");
+		//		}
 		
 		mainTable = (JStruct_MetaTable) inTable;
 		
@@ -98,13 +98,13 @@ public class JStruct_MetaObject implements MetaObject {
 	
 	// / Constructor, with metaTable and GUID (auto generated if null)
 	public JStruct_MetaObject(MetaTable inTable, String inOID) {
-		commonSetup(inTable, inOID, null, false);
+		this.commonSetup(inTable, inOID, null, false);
 	}
 	
 	// / Constructor, with metaTable and GUID (auto generated if null)
 	public JStruct_MetaObject(MetaTable inTable, String inOID, Map<String, Object> inRemoteData,
 		boolean isCompleteData) {
-		commonSetup(inTable, inOID, inRemoteData, isCompleteData);
+		this.commonSetup(inTable, inOID, inRemoteData, isCompleteData);
 	}
 	
 	// MetaObject ID
@@ -196,7 +196,6 @@ public class JStruct_MetaObject implements MetaObject {
 		} catch (Exception e) {
 			// Silent ignore
 		}
-		
 		if (ret != null && ret.toString().equals(strValue)) {
 			return ret;
 		}

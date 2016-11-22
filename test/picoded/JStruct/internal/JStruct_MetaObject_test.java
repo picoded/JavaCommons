@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import picoded.JStruct.JStruct;
 import picoded.JStruct.MetaTable;
+import picoded.conv.GUID;
 import picoded.enums.ObjectTokens;
 
 public class JStruct_MetaObject_test {
@@ -32,11 +33,14 @@ public class JStruct_MetaObject_test {
 		return (new JStruct()).getMetaTable("test");
 	}
 	
-	// @Test(expected = Exception.class)
-	// public void commonSetupTest()throws Exception {
-	// MetaTable metaTable =new JStruct_MetaTable();
-	// jStruct_MetaObject.commonSetup(metaTable, null, null, false);
-	// }
+	@Test
+	public void commonSetupTest() {
+		Map<String, Object> remoteDataMap = new HashMap<String, Object>();
+		remoteDataMap.put("key5", new String("hello"));
+		jStruct_MetaObject.remoteDataMap = remoteDataMap;
+		MetaTable metaTable = new JStruct_MetaTable();
+		jStruct_MetaObject.commonSetup(metaTable, "_oid", null, false);
+	}
 	
 	@Test
 	public void putTest() {
@@ -86,6 +90,26 @@ public class JStruct_MetaObject_test {
 	}
 	
 	@Test
+	public void getTest() {
+		Map<String, Object> deltaDataMap = new HashMap<String, Object>();
+		Map<String, Object> remoteDataMap = new HashMap<String, Object>();
+		remoteDataMap.put("key5", new String("hello"));
+		deltaDataMap.put("key5", new String("hello"));
+		jStruct_MetaObject.deltaDataMap = deltaDataMap;
+		jStruct_MetaObject.remoteDataMap = remoteDataMap;
+		jStruct_MetaObject.isCompleteRemoteDataMap = false;
+		assertNotNull(jStruct_MetaObject.get("key5"));
+		
+		jStruct_MetaObject.isCompleteRemoteDataMap = true;
+		assertNotNull(jStruct_MetaObject.get("key5"));
+		
+		jStruct_MetaObject.remoteDataMap = null;
+		jStruct_MetaObject.isCompleteRemoteDataMap = true;
+		assertNotNull(jStruct_MetaObject.get("key5"));
+		assertNull(jStruct_MetaObject.get("key6"));
+	}
+	
+	@Test
 	public void removeTest() {
 		Map<String, Object> deltaDataMap = new HashMap<String, Object>();
 		deltaDataMap.put("key", "value");
@@ -112,9 +136,26 @@ public class JStruct_MetaObject_test {
 	@Test
 	public void toStringTest() {
 		assertNotNull(jStruct_MetaObject.toString());
+		
+	}
+	
+	@Test
+	public void agressiveNumericConversionTest() {
 		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("test"));
 		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("10"));
 		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("9648512236521"));
 		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("96485.12236521"));
+	}
+	
+	@Test
+	public void ensureCompleteRemoteDataMapTest() {
+		Map<String, Object> remoteDataMap = new HashMap<String, Object>();
+		remoteDataMap.put("key", "value");
+		jStruct_MetaObject.remoteDataMap = remoteDataMap;
+		jStruct_MetaObject.isCompleteRemoteDataMap = true;
+		jStruct_MetaObject.ensureCompleteRemoteDataMap();
+		jStruct_MetaObject.remoteDataMap = null;
+		jStruct_MetaObject.isCompleteRemoteDataMap = false;
+		jStruct_MetaObject.ensureCompleteRemoteDataMap();
 	}
 }

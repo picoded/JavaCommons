@@ -16,12 +16,10 @@ public class JStack_MetaTable_test {
 	@Before
 	public void setUp() {
 		jStack_MetaTable = new JStack_MetaTable();
-		jStack_MetaTable.systemSetup();
 	}
 	
 	@After
 	public void tearDown() {
-		jStack_MetaTable.systemTeardown();
 	}
 	
 	@Test

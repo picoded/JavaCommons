@@ -1,9 +1,10 @@
 package picoded.JStruct;
 
 // Target test class
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -32,45 +33,48 @@ public class JStruct_test {
 	}
 	
 	@Test
-	public void getKeyValueMapTest1() {
+	public void getKeyValueMapTest() {
+		ConcurrentHashMap<String, KeyValueMap> keyValueMapCache = new ConcurrentHashMap<String, KeyValueMap>();
+		keyValueMap = jStructObj.getKeyValueMap("test");
+		keyValueMapCache.put("TEST", keyValueMap);
+		jStructObj.keyValueMapCache = keyValueMapCache;
 		keyValueMap = jStructObj.getKeyValueMap("test");
 		assertNotNull(keyValueMap);
 		assertTrue(keyValueMap.isEmpty());
 	}
 	
 	@Test
-	public void getKeyValueMapTest2() {
-		KeyValueMap keyValueMapLocal = jStructObj.getKeyValueMap("test");
-		assertNotNull(keyValueMapLocal);
-		assertEquals(keyValueMap, keyValueMapLocal);
-	}
-	
-	@Test
-	public void getMetaTableTest1() {
+	public void getMetaTableTest() {
+		ConcurrentHashMap<String, MetaTable> metaTableCache = new ConcurrentHashMap<String, MetaTable>();
+		metaTable = jStructObj.getMetaTable("test");
+		metaTableCache.put("TEST", metaTable);
+		jStructObj.metaTableCache = metaTableCache;
 		metaTable = jStructObj.getMetaTable("test");
 		assertNotNull(metaTable);
 		assertTrue(metaTable.isEmpty());
 	}
 	
 	@Test
-	public void getMetaTableTest2() {
-		MetaTable metaTableLocal = jStructObj.getMetaTable("test");
-		assertNotNull(metaTableLocal);
-		assertEquals(metaTable, metaTableLocal);
-	}
-	
-	@Test
-	public void getAccountTableTest1() {
+	public void getAccountTableTest() {
+		ConcurrentHashMap<String, AccountTable> accountTableCache = new ConcurrentHashMap<String, AccountTable>();
+		accountTable = jStructObj.getAccountTable("test");
+		accountTableCache.put("TEST", accountTable);
+		jStructObj.accountTableCache = accountTableCache;
 		accountTable = jStructObj.getAccountTable("test");
 		assertNotNull(accountTable);
 		assertTrue(accountTable.isEmpty());
 	}
 	
 	@Test
-	public void getAccountTableTest2() {
-		AccountTable accountTableLocal = jStructObj.getAccountTable("test");
-		assertNotNull(accountTableLocal);
-		assertEquals(accountTable, accountTableLocal);
+	public void preloadJStructTypeTest() {
+		jStructObj.preloadJStructType("AccountTable", "AccountTable");
+		jStructObj.preloadJStructType("MetaTable", "MetaTable");
+		jStructObj.preloadJStructType("KeyValueMap", "KeyValueMap");
+		jStructObj.preloadJStructType("AtomicLongMap", "AtomicLongMap");
 	}
 	
+	@Test(expected = Exception.class)
+	public void preloadJStructTypeTest1() throws Exception {
+		jStructObj.preloadJStructType("test", "test");
+	}
 }

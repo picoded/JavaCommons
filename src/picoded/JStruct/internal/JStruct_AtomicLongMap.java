@@ -1,12 +1,9 @@
 package picoded.JStruct.internal;
 
-import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import picoded.struct.*;
-import picoded.security.NxtCrypt;
-import picoded.JStruct.*;
+import picoded.JStruct.AtomicLongMap;
 
 /// Refence implementation of AtomicLongMap data structure
 ///
@@ -60,8 +57,8 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	/// @param value as Number
 	///
 	/// @returns null
+	@Override
 	public Long put(String key, Number value) {
-		
 		try {
 			accessLock.writeLock().lock();
 			
@@ -85,6 +82,7 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	/// @param value as long
 	///
 	/// @returns null
+	@Override
 	public Long put(String key, long value) {
 		
 		try {
@@ -93,7 +91,7 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 			//convert from long to Long
 			Long newVal = new Long(value);
 			
-			if (newVal == null) {
+			if (newVal.longValue() <= 0) {
 				valueMap.remove(key);
 			} else {
 				valueMap.put(key, newVal);
@@ -112,6 +110,7 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	/// @param value as Long
 	///
 	/// @returns null
+	@Override
 	public Long put(String key, Long value) {
 		
 		try {
@@ -132,6 +131,7 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	/// @param key param find the thae meta key
 	///
 	/// @returns  value of the given key
+	@Override
 	public Long get(Object key) {
 		
 		try {
@@ -154,6 +154,7 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	/// @param delta value to add
 	///
 	/// @returns  value of the given key
+	@Override
 	public Long getAndAdd(Object key, Object delta) {
 		
 		try {
@@ -179,6 +180,7 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	/// @param delta value to add
 	///
 	/// @returns  value of the given key
+	@Override
 	public Long getAndIncrement(Object key) {
 		
 		try {
@@ -203,6 +205,7 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	/// @param delta value to add
 	///
 	/// @returns  value of the given key after adding
+	@Override
 	public Long incrementAndGet(Object key) {
 		try {
 			accessLock.readLock().lock();
@@ -229,6 +232,7 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	/// @param value as long
 	///
 	/// @returns true if successful
+	@Override
 	public boolean weakCompareAndSet(String key, Long expect, Long update) {
 		
 		try {

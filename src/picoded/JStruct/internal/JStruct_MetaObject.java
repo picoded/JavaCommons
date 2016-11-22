@@ -98,13 +98,13 @@ public class JStruct_MetaObject implements MetaObject {
 	
 	// / Constructor, with metaTable and GUID (auto generated if null)
 	public JStruct_MetaObject(MetaTable inTable, String inOID) {
-		this.commonSetup(inTable, inOID, null, false);
+		commonSetup(inTable, inOID, null, false);
 	}
 	
 	// / Constructor, with metaTable and GUID (auto generated if null)
 	public JStruct_MetaObject(MetaTable inTable, String inOID, Map<String, Object> inRemoteData,
 		boolean isCompleteData) {
-		this.commonSetup(inTable, inOID, inRemoteData, isCompleteData);
+		commonSetup(inTable, inOID, inRemoteData, isCompleteData);
 	}
 	
 	// MetaObject ID

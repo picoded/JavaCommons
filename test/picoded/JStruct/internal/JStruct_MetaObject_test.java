@@ -1,6 +1,7 @@
 package picoded.JStruct.internal;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +12,6 @@ import org.junit.Test;
 
 import picoded.JStruct.JStruct;
 import picoded.JStruct.MetaTable;
-import picoded.conv.GUID;
 import picoded.enums.ObjectTokens;
 
 public class JStruct_MetaObject_test {
@@ -145,6 +145,7 @@ public class JStruct_MetaObject_test {
 		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("10"));
 		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("9648512236521"));
 		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("96485.12236521"));
+		assertNotNull(jStruct_MetaObject.agressiveNumericConversion("9999999999954775807"));
 	}
 	
 	@Test
@@ -153,6 +154,8 @@ public class JStruct_MetaObject_test {
 		remoteDataMap.put("key", "value");
 		jStruct_MetaObject.remoteDataMap = remoteDataMap;
 		jStruct_MetaObject.isCompleteRemoteDataMap = true;
+		jStruct_MetaObject.ensureCompleteRemoteDataMap();
+		jStruct_MetaObject.isCompleteRemoteDataMap = false;
 		jStruct_MetaObject.ensureCompleteRemoteDataMap();
 		jStruct_MetaObject.remoteDataMap = null;
 		jStruct_MetaObject.isCompleteRemoteDataMap = false;

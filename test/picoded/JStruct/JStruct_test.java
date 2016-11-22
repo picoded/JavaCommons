@@ -20,6 +20,7 @@ public class JStruct_test {
 	private static KeyValueMap keyValueMap;
 	private static MetaTable metaTable;
 	private static AccountTable accountTable;
+	private static AtomicLongMap atomicLongMap;
 	
 	@BeforeClass
 	public static void setUp() {
@@ -61,6 +62,17 @@ public class JStruct_test {
 		accountTableCache.put("TEST", accountTable);
 		jStructObj.accountTableCache = accountTableCache;
 		accountTable = jStructObj.getAccountTable("test");
+		assertNotNull(accountTable);
+		assertTrue(accountTable.isEmpty());
+	}
+	
+	@Test
+	public void getAtomicLongMapTest() {
+		ConcurrentHashMap<String, AtomicLongMap> atomicLongMapCache = new ConcurrentHashMap<String, AtomicLongMap>();
+		atomicLongMap = jStructObj.getAtomicLongMap("test");
+		atomicLongMapCache.put("TEST", atomicLongMap);
+		jStructObj.atomicLongMapCache = atomicLongMapCache;
+		atomicLongMap = jStructObj.getAtomicLongMap("test");
 		assertNotNull(accountTable);
 		assertTrue(accountTable.isEmpty());
 	}

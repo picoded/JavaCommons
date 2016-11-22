@@ -88,9 +88,9 @@ public class JStruct implements JStackLayer {
 		
 		// Tries to get 1 time, without locking
 		AtomicLongMap cacheCopy = atomicLongMapCache.get(name);
-		if (cacheCopy != null) {
-			return cacheCopy;
-		}
+		//		if (cacheCopy != null) {
+		//			return cacheCopy;
+		//		}
 		
 		// Tries to get again with lock, creates and put if not exists
 		try {

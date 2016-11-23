@@ -20,10 +20,10 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// The inner sql object
-	JStack stackObj = null;
+	private static JStack stackObj = null;
 	
 	/// The tablename for the key value pair map
-	String stackTablename = null;
+	private static String stackTablename = null;
 	
 	/// JStack setup
 	public JStack_KeyValueMap(JStack inStack, String tablename) {
@@ -37,18 +37,18 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// The cached structure implmentation layers
-	public JStruct_KeyValueMap[] implementationLayers = null;
+	public static JStruct_KeyValueMap[] implementationLayer = null;
 	
 	/// The cached structure implmentation layers reversed
-	public JStruct_KeyValueMap[] implementationLayersReversed = null;
+	public static JStruct_KeyValueMap[] implementationLayersReversed = null;
 	
 	///
 	/// Getting the implmentation layers
 	/// This is used internally to iterate the KeyValueMap layers
 	///
 	public JStruct_KeyValueMap[] implementationLayers() {
-		if (implementationLayers != null) {
-			return implementationLayers;
+		if (implementationLayer != null) {
+			return implementationLayer;
 		}
 		
 		// Get the structure layers
@@ -68,7 +68,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 			ret[a] = (JStruct_KeyValueMap) struct[a].getKeyValueMap(stackTablename);
 		}
 		
-		return implementationLayers = ret;
+		return implementationLayer = ret;
 	}
 	
 	///

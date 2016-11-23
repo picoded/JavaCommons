@@ -8,6 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("static-access")
 public class JStruct_AtomicLongMap_test {
 	
 	JStruct_AtomicLongMap jStruct_AtomicLongMap = null;

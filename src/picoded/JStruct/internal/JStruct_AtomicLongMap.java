@@ -1,6 +1,7 @@
 package picoded.JStruct.internal;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import picoded.JStruct.AtomicLongMap;
@@ -22,10 +23,10 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	///--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
-	public ConcurrentHashMap<String, Long> valueMap = new ConcurrentHashMap<String, Long>();
+	public static ConcurrentMap<String, Long> valueMap = new ConcurrentHashMap<String, Long>();
 	
 	/// Read write lock
-	public ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
+	public static ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
 	
 	///
 	/// Constructor setup
@@ -89,7 +90,7 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 			accessLock.writeLock().lock();
 			
 			//convert from long to Long
-			Long newVal = new Long(value);
+			Long newVal = Long.valueOf(value);
 			
 			if (newVal.longValue() <= 0) {
 				valueMap.remove(key);

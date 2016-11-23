@@ -8,6 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("static-access")
 public class JStruct_KeyValueMap_test {
 	JStruct_KeyValueMap jStruct_KeyValueMap = null;
 	

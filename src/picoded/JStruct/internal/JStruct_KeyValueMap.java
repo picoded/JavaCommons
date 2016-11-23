@@ -3,6 +3,7 @@ package picoded.JStruct.internal;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import picoded.JStruct.KeyValueMap;
@@ -25,13 +26,13 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
-	public ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
+	public static ConcurrentMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
 	
 	/// Stores the expire timestamp
-	public ConcurrentHashMap<String, Long> expireMap = new ConcurrentHashMap<String, Long>();
+	public static ConcurrentMap<String, Long> expireMap = new ConcurrentHashMap<String, Long>();
 	
 	/// Read write lock
-	public ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
+	public static final ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
 	
 	///
 	/// Constructor setup
@@ -44,7 +45,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Temp value flag, defaults to false
-	public boolean isTempHint = false;
+	public static boolean isTempHint = false;
 	
 	/// Gets if temp mode optimization hint is indicated
 	/// Note that this only serve as a hint, as does not indicate actual setting
@@ -395,7 +396,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	/// @returns boolean true or false if the key exists
 	@Override
 	public boolean containsKey(Object key) {
-		return (getLifespan(key.toString()) >= 0);
+		return getLifespan(key.toString()) >= 0;
 	}
 	
 	/// Returns the value, given the key
@@ -453,10 +454,10 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Default nonce lifetime (1 hour)
-	public int nonce_defaultLifetime = 3600;
+	public static int nonceDefaultLifetime = 3600;
 	
 	/// Default nonce string length (22 is chosen to be consistent with base58 GUID's)
-	public int nonce_defaultLength = 22;
+	public static int nonceDefaultLength = 22;
 	
 	/// Generates a random nonce hash, and saves the value to it
 	///
@@ -467,7 +468,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	/// @returns String value of the random key generated
 	@Override
 	public String generateNonce(String val) {
-		return generateNonce(val, nonce_defaultLifetime, nonce_defaultLength);
+		return generateNonce(val, nonceDefaultLifetime, nonceDefaultLength);
 	}
 	
 	/// Generates a random nonce hash, and saves the value to it
@@ -480,7 +481,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	/// @returns String value of the random key generated
 	@Override
 	public String generateNonce(String val, long lifespan) {
-		return generateNonce(val, lifespan, nonce_defaultLength);
+		return generateNonce(val, lifespan, nonceDefaultLength);
 	}
 	
 	/// Generates a random nonce hash, and saves the value to it

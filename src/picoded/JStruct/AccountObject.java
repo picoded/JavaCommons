@@ -29,7 +29,7 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// Simplified Constructor
 	protected AccountObject(AccountTable accTable, String inOID) {
-		super((JStruct_MetaTable) (accTable.accountMeta), inOID);
+		super((JStruct_MetaTable) (accTable.meatAccountTable), inOID);
 		accountTable = accTable;
 	}
 	
@@ -38,7 +38,7 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// Gets and returns the stored password hash
 	protected String getPasswordHash() {
-		return accountTable.accountHash.get(_oid);
+		return accountTable.keyValueMapAccountHash.get(_oid);
 	}
 	
 	// Password management
@@ -53,7 +53,7 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// Remove the account password
 	public void removePassword() {
-		accountTable.accountHash.remove(_oid);
+		accountTable.keyValueMapAccountHash.remove(_oid);
 	}
 	
 	/// Validate if the given password is valid
@@ -70,7 +70,7 @@ public class AccountObject extends JStruct_MetaObject {
 		if (pass == null) {
 			removePassword();
 		} else {
-			accountTable.accountHash.put(_oid, NxtCrypt.getPassHash(pass));
+			accountTable.keyValueMapAccountHash.put(_oid, NxtCrypt.getPassHash(pass));
 		}
 		return true;
 	}
@@ -89,7 +89,7 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// Gets and return the various "nice-name" (not UUID) for this account
 	public Set<String> getNames() {
-		return accountTable.accountID.getKeys(_oid);
+		return accountTable.keyValueMapAccountID.getKeys(_oid);
 	}
 	
 	/// Sets the name for the account, returns true or false if it succed.
@@ -105,14 +105,14 @@ public class AccountObject extends JStruct_MetaObject {
 		saveDelta(); //ensure itself is registered
 		
 		/// Technically a race condition =X
-		accountTable.accountID.put(name, _oid);
+		accountTable.keyValueMapAccountID.put(name, _oid);
 		return true;
 	}
 	
 	/// Removes the old name from the database
 	/// @TODO Add-in security measure to only removeName of this user, instead of ANY
 	public void removeName(String name) {
-		accountTable.accountID.remove(name);
+		accountTable.keyValueMapAccountID.remove(name);
 	}
 	
 	/// Sets the name as a unique value, delete all previous alias

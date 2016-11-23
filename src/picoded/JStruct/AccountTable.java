@@ -358,7 +358,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	private String cookieDomain = null;
 	
 	/// The nonce size
-	private int nonceSize = 22;
+	public int nonceSize = 22;
 	
 	/// Gets and returns the session info, [nonceSalt, loginIP, browserAgent]
 	protected String[] getSessionInfo(String oid, String nonce) {

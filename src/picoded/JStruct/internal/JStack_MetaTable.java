@@ -21,7 +21,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	protected static Logger logger = Logger.getLogger(JStack_MetaTable.class.getName());
+	protected final static Logger logger = Logger.getLogger(JStack_MetaTable.class.getName());
 	
 	///
 	/// Constructor setup
@@ -45,18 +45,18 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// The cached structure implmentation layers
-	public JStruct_MetaTable[] _implementationLayers = null;
+	public JStruct_MetaTable[] implementationLayer = null;
 	
 	/// The cached structure implmentation layers reversed
-	public JStruct_MetaTable[] _implementationLayers_reversed = null;
+	public JStruct_MetaTable[] implementationLayersReversed = null;
 	
 	///
 	/// Getting the implmentation layers
 	/// This is used internally to iterate the KeyValueMap layers
 	///
 	public JStruct_MetaTable[] implementationLayers() {
-		if (_implementationLayers != null) {
-			return _implementationLayers;
+		if (implementationLayer != null) {
+			return implementationLayer;
 		}
 		
 		// Get the structure layers
@@ -76,7 +76,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 			ret[a] = (JStruct_MetaTable) struct[a].getMetaTable(stackTablename);
 		}
 		
-		return (_implementationLayers = ret);
+		return implementationLayer = ret;
 	}
 	
 	///
@@ -84,8 +84,8 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	/// This is used internally to iterate the KeyValueMap layers reversed
 	///
 	public JStruct_MetaTable[] implementationLayers_reverse() {
-		if (_implementationLayers_reversed != null) {
-			return _implementationLayers_reversed;
+		if (implementationLayersReversed != null) {
+			return implementationLayersReversed;
 		}
 		
 		// Get and reverse
@@ -97,7 +97,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 		}
 		
 		// Return the reversed PDF
-		return _implementationLayers_reversed = ret;
+		return implementationLayersReversed = ret;
 	}
 	
 	///
@@ -105,6 +105,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Setsup the backend storage table, etc. If needed
+	@Override
 	public void systemSetup() {
 		for (JStruct_MetaTable i : implementationLayers()) {
 			i.systemSetup();
@@ -112,6 +113,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	}
 	
 	/// Teardown and delete the backend storage table, etc. If needed
+	@Override
 	public void systemTeardown() {
 		for (JStruct_MetaTable i : implementationLayers()) {
 			i.systemTeardown();
@@ -122,6 +124,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	//----------------------------------------------
 	
 	/// Gets the full keySet
+	@Override
 	public Set<String> keySet() {
 		Set<String> ret = null;
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
@@ -133,6 +136,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	}
 	
 	/// Remove the node
+	@Override
 	public MetaObject remove(Object key) {
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
 			i.remove(key);
@@ -146,6 +150,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	
 	/// Gets the complete remote data map, for MetaObject.
 	/// Returns null
+	@Override
 	public Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
 		// Layers to fetch from
 		JStruct_MetaTable[] layers = implementationLayers();
@@ -171,6 +176,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	
 	/// Updates the actual backend storage of MetaObject 
 	/// either partially (if supported / used), or completely
+	@Override
 	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap,
 		Set<String> keys) {
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
@@ -195,6 +201,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The String[] array
+	@Override
 	public String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr,
 		int offset, int limit) {
 		String[] ret = null;
@@ -215,6 +222,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The MetaObject[] array
+	@Override
 	public MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr,
 		int offset, int limit) {
 		return getArrayFromID(queryKeys(whereClause, whereValues, orderByStr, offset, limit), true);
@@ -226,6 +234,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	/// @param   where clause values array
 	///
 	/// @returns  The total count for the query
+	@Override
 	public long queryCount(String whereClause, Object[] whereValues) {
 		long ret = 0;
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {

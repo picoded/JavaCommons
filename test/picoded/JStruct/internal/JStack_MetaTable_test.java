@@ -39,7 +39,7 @@ public class JStack_MetaTable_test {
 		assertNotNull(jStack_MetaTable.implementationLayers());
 		JStack_MetaTable jStack_MetaTable = new JStack_MetaTable(jStructObj, "test");
 		JStruct_MetaTable[] _implementationLayers = { jStack_MetaTable };
-		jStack_MetaTable._implementationLayers = _implementationLayers;
+		jStack_MetaTable.implementationLayer = _implementationLayers;
 		assertNotNull(jStack_MetaTable.implementationLayers());
 	}
 }

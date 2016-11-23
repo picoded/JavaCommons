@@ -101,6 +101,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	/// The Login Throttling Elapsed account values
 	protected static String accountLoginThrottlingElapsed = "_LE";
 	
+	private static String user = "User";
+	
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
@@ -597,7 +599,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		
 		javax.servlet.http.Cookie[] cookieJar = new javax.servlet.http.Cookie[5];
 		
-		cookieJar[0] = new javax.servlet.http.Cookie(cookiePrefix + "User", "-");
+		cookieJar[0] = new javax.servlet.http.Cookie(cookiePrefix + user, "-");
 		cookieJar[1] = new javax.servlet.http.Cookie(cookiePrefix + "Nonc", "-");
 		cookieJar[2] = new javax.servlet.http.Cookie(cookiePrefix + "Hash", "-");
 		cookieJar[3] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "-");

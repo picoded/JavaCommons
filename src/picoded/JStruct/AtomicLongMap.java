@@ -1,7 +1,6 @@
 package picoded.JStruct;
 
 import picoded.struct.GenericConvertMap;
-
 /*import org.apache.commons.lang3.RandomUtils;*/
 /// Refence implementation of AtomicLongMap data structure
 ///
@@ -19,7 +18,7 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long> {
 	/// Note that this only serve as a hint, as does not indicate actual setting
 	///
 	/// @returns boolean  temp mode value
-	public default boolean getTempHint() {
+	default boolean getTempHint() {
 		return false;
 	};
 	
@@ -29,7 +28,7 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long> {
 	/// @param  mode  the new temp mode hint
 	///
 	/// @returns boolean  previous value if set
-	public default boolean setTempHint(boolean mode) {
+	default boolean setTempHint(boolean mode) {
 		return false;
 	};
 	
@@ -38,24 +37,24 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long> {
 	//--------------------------------------------------------------------------
 	
 	/// Setsup the backend storage table, etc. If needed
-	public default void systemSetup() {
+	default void systemSetup() {
 	};
 	
 	/// Teardown and delete the backend storage table, etc. If needed
-	public default void systemTeardown() {
+	default void systemTeardown() {
 	};
 	
 	/// perform increment maintenance, meant for minor changes between requests
-	public default void incrementalMaintenance() {
+	default void incrementalMaintenance() {
 		// 2 percent chance of trigering maintenance
 		// This is to lower to overall performance cost incrementalMaintenance per request
-		//		if (RandomUtils.nextInt(0, 100) <= 2) {
-		//			maintenance();
-		//		}
+//		if (RandomUtils.nextInt(0, 100) <= 2) {
+//			maintenance();
+//		}
 	}
 	
 	/// Perform maintenance, mainly removing of expired data if applicable
-	public default void maintenance() {
+	default void maintenance() {
 		// does nothing?
 	}
 	
@@ -71,7 +70,7 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long> {
 	/// @param value as Number
 	///
 	/// @returns long
-	public Long put(String key, Number value);
+	Long put(String key, Number value);
 	
 	/// Stores (and overwrites if needed) key, value pair
 	///
@@ -81,7 +80,7 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long> {
 	/// @param value as long
 	///
 	/// @returns long
-	public Long put(String key, long value);
+	Long put(String key, long value);
 	
 	/// Stores (and overwrites if needed) key, value pair
 	///
@@ -91,35 +90,35 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long> {
 	/// @param value as Long
 	///
 	/// @returns null
-	public Long put(String key, Long value);
+	Long put(String key, Long value);
 	
 	/// Returns the value, given the key
 	/// @param key param find the meta key
 	///
 	/// @returns  value of the given key
 	@Override
-	public Long get(Object key);
+	Long get(Object key);
 	
 	/// Returns the value, given the key
 	/// @param key param find the meta key
 	/// @param delta value to add
 	///
 	/// @returns  value of the given key before adding
-	public Long getAndAdd(Object key, Object delta);
+	Long getAndAdd(Object key, Object delta);
 	
 	/// Returns the value, given the key
 	/// @param key param find the meta key
 	/// @param delta value to add
 	///
 	/// @returns  value of the given key before adding
-	public Long getAndIncrement(Object key);
+	Long getAndIncrement(Object key);
 	
 	/// Returns the value, given the key
 	/// @param key param find the meta key
 	/// @param delta value to add
 	///
 	/// @returns  value of the given key after adding
-	public Long incrementAndGet(Object key);
+	Long incrementAndGet(Object key);
 	
 	/// Stores (and overwrites if needed) key, value pair
 	///
@@ -130,6 +129,6 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long> {
 	/// @param update as Long
 	///
 	/// @returns true if successful
-	public boolean weakCompareAndSet(String key, Long expect, Long update);
+	boolean weakCompareAndSet(String key, Long expect, Long update);
 	
 }

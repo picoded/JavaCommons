@@ -13,6 +13,7 @@ public interface MetaObject extends GenericConvertMap<String, Object> {
 	String _oid();
 	
 	/// Gets and return its current value
+	@Override
 	Object get(Object key);
 	
 	/// Put and set its delta value, set null is considered "remove"

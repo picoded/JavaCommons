@@ -1,17 +1,19 @@
 package picoded.JStruct;
 
 /// Java imports
-import java.util.*;
-
-/// Picoded imports
-import picoded.conv.GUID;
-import picoded.struct.CaseInsensitiveHashMap;
-import picoded.struct.UnsupportedDefaultMap;
-import picoded.JStruct.internal.*;
-import picoded.struct.query.*;
-import picoded.conv.ListValueConv;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.RandomUtils;
+
+import picoded.JStruct.internal.JStructUtils;
+import picoded.JStruct.internal.JStruct_MetaObject;
+import picoded.struct.UnsupportedDefaultMap;
+import picoded.struct.query.Query;
+/// Picoded imports
 
 /// MetaTable, serves as the core flexible backend storage implmentation for the whole
 /// JStack setup. Its role can be viewed similarly to NoSql, or AWS SimpleDB
@@ -34,7 +36,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// Note that this only serve as a hint, as does not indicate actual setting
 	///
 	/// @returns boolean  temp mode value
-	public boolean getTempHint();
+	boolean getTempHint();
 	
 	/// Sets temp mode optimization indicator hint
 	/// Note that this only serve as a hint, as does not indicate actual setting
@@ -42,20 +44,20 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param  mode  the new temp mode hint
 	///
 	/// @returns boolean  previous value if set
-	public boolean setTempHint(boolean mode);
+	boolean setTempHint(boolean mode);
 	
 	//
 	// Backend system setup / teardown
 	//--------------------------------------------------------------------------
 	
 	/// Setsup the backend storage table, etc. If needed
-	public void systemSetup();
+	void systemSetup();
 	
 	/// Teardown and delete the backend storage table, etc. If needed
-	public void systemTeardown();
+	void systemTeardown();
 	
 	/// perform increment maintenance, meant for minor changes between requests
-	public default void incrementalMaintenance() {
+	default void incrementalMaintenance() {
 		// 2 percent chance of trigering maintenance
 		// This is to lower to overall performance cost incrementalMaintenance per request
 		if (RandomUtils.nextInt(0, 100) <= 2) {
@@ -64,7 +66,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	}
 	
 	/// Perform maintenance, mainly removing of expired data if applicable
-	public default void maintenance() {
+	default void maintenance() {
 		// does nothing?
 	}
 	
@@ -75,11 +77,11 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// Generates a new blank object, with a GUID
 	///
 	/// @returns the MetaObject
-	public default MetaObject newObject() {
+	default MetaObject newObject() {
 		MetaObject ret = new JStruct_MetaObject(this, null, null, false);
 		
 		// Baking in _createTime stamp
-		ret.put("_createTime", (System.currentTimeMillis() / 1000L));
+		ret.put("_createTime", System.currentTimeMillis() / 1000L);
 		
 		return ret;
 	}
@@ -87,8 +89,8 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// Gets the MetaObject, regardless of its actual existance
 	///
 	/// @returns the MetaObject
-	public default MetaObject uncheckedGet(String _oid) {
-		return new JStruct_MetaObject(this, _oid, null, false);
+	default MetaObject uncheckedGet(String oid) {
+		return new JStruct_MetaObject(this, oid, null, false);
 	}
 	
 	/// PUT, returns the object ID (especially when its generated), note that this
@@ -96,17 +98,17 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// nulled or replaced are maintained
 	///
 	/// @returns the MetaObject
-	public default MetaObject append(String _oid, Map<String, Object> obj) {
+	default MetaObject append(String oid, Map<String, Object> obj) {
 		
 		/// Appending a MetaObject is equivalent of saveDelta
 		MetaObject r = null;
-		if (obj instanceof MetaObject && ((MetaObject) obj)._oid().equals(_oid)) {
+		if (obj instanceof MetaObject && ((MetaObject) obj)._oid().equals(oid)) {
 			(r = (MetaObject) obj).saveDelta();
 			return r;
 		}
 		
 		/// Unchecked get, put, and save
-		r = uncheckedGet(_oid);
+		r = uncheckedGet(oid);
 		r.putAll(obj);
 		r.saveDelta();
 		
@@ -119,11 +121,11 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param boolean indicator for unchecked get (skips existance checks)
 	///
 	/// @returns the MetaObject
-	public default MetaObject get(String _oid, boolean isUnchecked) {
+	default MetaObject get(String oid, boolean isUnchecked) {
 		if (isUnchecked) {
-			return uncheckedGet(_oid);
+			return uncheckedGet(oid);
 		} else {
-			return get(_oid);
+			return get(oid);
 		}
 	}
 	
@@ -132,7 +134,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	//--------------------------------------------------------------------------
 	
 	/// Get array of MetaObjects
-	public default MetaObject[] getArrayFromID(String[] idArray, boolean isUnchecked) {
+	default MetaObject[] getArrayFromID(String[] idArray, boolean isUnchecked) {
 		MetaObject[] retArr = new MetaObject[idArray.length];
 		for (int i = 0; i < idArray.length; ++i) {
 			retArr[i] = get(idArray[i], isUnchecked);
@@ -150,7 +152,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param   where clause values array
 	///
 	/// @returns  The MetaObject[] array
-	public default MetaObject[] query(String whereClause, Object[] whereValues) {
+	default MetaObject[] query(String whereClause, Object[] whereValues) {
 		return query(whereClause, whereValues, null, 0, 0);
 	}
 	
@@ -161,7 +163,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param   query string to sort the order by, use null to ignore
 	///
 	/// @returns  The MetaObject[] array
-	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr) {
+	default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr) {
 		return query(whereClause, whereValues, orderByStr, 0, 0);
 	}
 	
@@ -174,7 +176,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The MetaObject[] array
-	public default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr,
+	default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr,
 		int offset, int limit) {
 		
 		// The return list
@@ -202,7 +204,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The String[] array
-	public default String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr,
+	default String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr,
 		int offset, int limit) {
 		
 		// The return list
@@ -237,7 +239,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param   where clause values array
 	///
 	/// @returns  The total count for the query
-	public default long queryCount(String whereClause, Object[] whereValues) {
+	default long queryCount(String whereClause, Object[] whereValues) {
 		
 		// The return list
 		List<MetaObject> retList = null;
@@ -263,7 +265,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param   keyName to lookup for
 	///
 	/// @returns  The MetaObject[] array
-	public default MetaObject[] getFromKeyName(String keyName) {
+	default MetaObject[] getFromKeyName(String keyName) {
 		return getFromKeyName(keyName, null, -1, -1);
 	}
 	
@@ -273,7 +275,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param   query string to sort the order by, use null to ignore
 	///
 	/// @returns  The MetaObject[] array
-	public default MetaObject[] getFromKeyName(String keyName, String orderByStr) {
+	default MetaObject[] getFromKeyName(String keyName, String orderByStr) {
 		return getFromKeyName(keyName, orderByStr, -1, -1);
 	}
 	
@@ -287,8 +289,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The MetaObject[] array
-	public default MetaObject[] getFromKeyName(String keyName, String orderByStr, int offset,
-		int limit) {
+	default MetaObject[] getFromKeyName(String keyName, String orderByStr, int offset, int limit) {
 		
 		// The return list
 		List<MetaObject> retList = new ArrayList<MetaObject>();
@@ -311,7 +312,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param   keyName to lookup for
 	///
 	/// @returns  The MetaObject[] array
-	public default String[] getFromKeyName_id(String keyName) {
+	default String[] getFromKeyName_id(String keyName) {
 		// The return list
 		List<String> retList = new ArrayList<String>();
 		
@@ -344,7 +345,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	///
 	/// @returns  The various key names used in the objects
 	///
-	public default Set<String> getKeyNames(int seekDepth) {
+	default Set<String> getKeyNames(int seekDepth) {
 		Set<String> res = new HashSet<String>();
 		
 		// Iterate the list, get key names
@@ -367,7 +368,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	///
 	/// @returns  The various key names used in the objects
 	///
-	public default Set<String> getKeyNames() {
+	default Set<String> getKeyNames() {
 		return getKeyNames(10);
 	}
 	
@@ -376,20 +377,20 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	//--------------------------------------------------------------------------
 	
 	/// Gets and return the internal MetaTypeMap
-	public MetaTypeMap typeMap();
+	MetaTypeMap typeMap();
 	
 	/// Get convinent function
-	public default MetaType getType(String name) {
+	default MetaType getType(String name) {
 		return typeMap().get(name);
 	}
 	
 	/// Put convinent function
-	public default MetaType putType(String name, Object value) {
+	default MetaType putType(String name, Object value) {
 		return typeMap().put(name, value);
 	}
 	
 	/// Generic varient of put all
-	public default <K, V> void setMappingType(Map<K, V> m) {
+	default <K, V> void setMappingType(Map<K, V> m) {
 		typeMap().putAllGeneric(m);
 	}
 }

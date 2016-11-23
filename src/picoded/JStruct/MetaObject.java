@@ -10,24 +10,26 @@ import picoded.struct.*;
 public interface MetaObject extends GenericConvertMap<String, Object> {
 	
 	/// The object ID
-	public String _oid();
+	String _oid();
 	
 	/// Gets and return its current value
-	public Object get(Object key);
+	Object get(Object key);
 	
 	/// Put and set its delta value, set null is considered "remove"
-	public Object put(String key, Object value);
+	Object put(String key, Object value);
 	
 	/// Remove operation
-	public Object remove(Object key);
+	@Override
+	Object remove(Object key);
 	
 	/// Gets and return valid keySet()
-	public Set<String> keySet();
+	@Override
+	Set<String> keySet();
 	
 	/// Save the delta changes to storage
-	public void saveDelta();
+	void saveDelta();
 	
 	/// Save all the configured data, ignore delta handling
-	public void saveAll();
+	void saveAll();
 	
 }

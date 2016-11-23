@@ -17,6 +17,8 @@ public class AccountObject extends JStruct_MetaObject {
 	/// The original table
 	protected AccountTable accountTable = null;
 	
+	private static String groupName = "isGroup";
+	
 	/// Constructor full setup
 	protected AccountObject(AccountTable accTable, JStruct_MetaTable inTable, String inOID,
 		boolean isCompleteData) {
@@ -153,7 +155,7 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// Returns if set as group
 	public boolean isGroup() {
-		Object status = this.get("isGroup");
+		Object status = this.get(groupName);
 		if (status instanceof Number && //
 			((Number) status).intValue() >= 1) {
 			return true;
@@ -166,9 +168,9 @@ public class AccountObject extends JStruct_MetaObject {
 	/// Sets if the account is a group
 	public void setGroupStatus(boolean enabled) {
 		if (enabled) {
-			this.put("isGroup", Integer.valueOf(1));
+			this.put(groupName, Integer.valueOf(1));
 		} else {
-			this.put("isGroup", Integer.valueOf(0));
+			this.put(groupName, Integer.valueOf(0));
 			
 			// group_userToRoleMap().clear();
 			// group_userToRoleMap().saveDelta();
@@ -275,7 +277,7 @@ public class AccountObject extends JStruct_MetaObject {
 	public String[] getMembers_id() {
 		List<String> retList = new ArrayList<String>();
 		for (String key : group_userToRoleMap().keySet()) {
-			if (key.equals("_oid")) {
+			if ("_oid".equals(key)) {
 				continue;
 			}
 			retList.add(key);
@@ -326,10 +328,11 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// This method logs the details about login faailure for the user based on User ID
 	public void logLoginFailure(String userID) {
-		accountTable.loginThrottlingAttempt.putWithLifespan(userID, "1", 999999999);
+		accountTable.loginThrottlingAttempt.putWithLifespan(userID, "1", Long.getLong("999999999")
+			.longValue());
 		int elapsedTime = ((int) (System.currentTimeMillis() / 1000)) + 2;
-		accountTable.loginThrottlingElapsed.putWithLifespan(userID, String.valueOf(elapsedTime),
-			999999999);
+		accountTable.loginThrottlingElapsed.putWithLifespan(userID, String.valueOf(elapsedTime), Long
+			.getLong("999999999").longValue());
 	}
 	
 	/// This method returns time left before next permitted login attempt for the user based on User ID
@@ -348,8 +351,7 @@ public class AccountObject extends JStruct_MetaObject {
 		if (elapsedValueString == null || "".equals(elapsedValueString)) {
 			return (System.currentTimeMillis() / 1000) + 2;
 		}
-		long elapsedValue = Long.parseLong(elapsedValueString);
-		return elapsedValue;
+		return Long.parseLong(elapsedValueString);
 	}
 	
 	/// This method would be added the delay for the user based on User ID
@@ -362,10 +364,10 @@ public class AccountObject extends JStruct_MetaObject {
 			int elapsedValue = (int) (System.currentTimeMillis() / 1000);
 			attemptValue++;
 			accountTable.loginThrottlingAttempt.putWithLifespan(userId, String.valueOf(attemptValue),
-				999999999);
+				Long.valueOf("999999999").longValue());
 			elapsedValue += attemptValue * 2;
 			accountTable.loginThrottlingElapsed.putWithLifespan(userId, String.valueOf(elapsedValue),
-				999999999);
+				Long.valueOf("999999999").longValue());
 		}
 		
 	}

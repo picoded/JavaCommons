@@ -45,7 +45,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Temp value flag, defaults to false
-	public static boolean isTempHint = false;
+	public boolean isTempHint = false;
 	
 	/// Gets if temp mode optimization hint is indicated
 	/// Note that this only serve as a hint, as does not indicate actual setting

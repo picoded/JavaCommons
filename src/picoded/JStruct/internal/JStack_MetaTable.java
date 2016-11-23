@@ -2,7 +2,6 @@ package picoded.JStruct.internal;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import picoded.JStack.JStack;
 import picoded.JStruct.JStruct;
@@ -21,7 +20,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	protected final static Logger logger = Logger.getLogger(JStack_MetaTable.class.getName());
+	//	protected  Logger logger = Logger.getLogger(JStack_MetaTable.class.getName());
 	
 	///
 	/// Constructor setup

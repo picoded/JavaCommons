@@ -26,10 +26,10 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
-	public static ConcurrentMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
+	public ConcurrentMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
 	
 	/// Stores the expire timestamp
-	public static ConcurrentMap<String, Long> expireMap = new ConcurrentHashMap<String, Long>();
+	public ConcurrentMap<String, Long> expireMap = new ConcurrentHashMap<String, Long>();
 	
 	/// Read write lock
 	public static final ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();

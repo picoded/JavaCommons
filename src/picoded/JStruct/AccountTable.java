@@ -4,9 +4,8 @@ package picoded.JStruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
-
-import org.apache.commons.lang3.ArrayUtils;
 
 import picoded.conv.ConvertJSON;
 import picoded.security.NxtCrypt;
@@ -520,19 +519,26 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		javax.servlet.http.Cookie cookieJar[] = new javax.servlet.http.Cookie[noOfCookies];
 		
 		int index = 0;
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Puid", puid);
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Nonc", nonc);
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Hash", cookieHash);
+		cookieJar[index] = new javax.servlet.http.Cookie(cookiePrefix + "Puid", puid);
+		index++;
+		cookieJar[index] = new javax.servlet.http.Cookie(cookiePrefix + "Nonc", nonc);
+		index++;
+		cookieJar[index] = new javax.servlet.http.Cookie(cookiePrefix + "Hash", cookieHash);
+		index++;
 		if (rmberMe) {
-			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "1");
+			cookieJar[index] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "1");
+			index++;
 		} else {
-			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "0");
+			cookieJar[index] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "0");
+			index++;
 		}
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Expi",
+		cookieJar[index] = new javax.servlet.http.Cookie(cookiePrefix + "Expi",
 			String.valueOf(expireTime));
+		index++;
 		
 		/// The cookie "Expi" store the other cookies (Rmbr, user, Nonc etc.) expiry life time in seconds.
-		/// This cookie value is used in JS (checkLogoutTime.js) for validating the login expiry time and show a message to user accordingly.
+		/// This cookie value is used in JS (checkLogoutTime.js) -
+		/// - for validating the login expiry time and show a message to user accordingly.
 		
 		for (int a = 0; a < noOfCookies; ++a) {
 			/// Path is required for cross AJAX / domain requests,
@@ -638,26 +644,27 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	public boolean hasMembershipRole(String role) {
 		// Sanatize the role
 		// Returns if it exists
-		return membershipRoles.contains(role.toLowerCase());
+		return membershipRoles.contains(role.toLowerCase(Locale.ENGLISH));
 	}
 	
 	/// Add membership role if it does not exists
 	public void addMembershipRole(String role) {
 		// Sanatize the role
 		// Already exists terminate
-		if (hasMembershipRole(role.toLowerCase())) {
+		if (hasMembershipRole(role.toLowerCase(Locale.ENGLISH))) {
 			return;
 		}
 		// Add the role
-		membershipRoles.add(role.toLowerCase());
+		membershipRoles.add(role.toLowerCase(Locale.ENGLISH));
 	}
 	
 	/// Checks and validates the membership role, throws if invalid
 	protected String validateMembershipRole(String role) {
-		if (!hasMembershipRole(role.toLowerCase())) {
-			throw new RuntimeException("Membership role does not exists: " + role.toLowerCase());
+		if (!hasMembershipRole(role.toLowerCase(Locale.ENGLISH))) {
+			throw new RuntimeException("Membership role does not exists: "
+				+ role.toLowerCase(Locale.ENGLISH));
 		}
-		return role.toLowerCase();
+		return role.toLowerCase(Locale.ENGLISH);
 	}
 	
 	//
@@ -699,39 +706,30 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		//		}
 		
 		//		boolean doGroupCheck = insideGroupAny != null && insideGroupAny.length > 0;
-		boolean doRoleCheck = hasRoleAny != null && hasRoleAny.length > 0;
+		//		boolean doRoleCheck = hasRoleAny != null && hasRoleAny.length > 0;
 		
 		for (MetaObject metaObj : metaObjs) {
 			AccountObject ao = getFromID(metaObj._oid());
 			
-			if (ao == null) {
+			if (ao == null || ao.getGroups() == null) {
 				continue;
 			}
 			
 			// Possible Error found: returns null in one of the array
 			AccountObject[] userGroups = ao.getGroups();
 			
-			if (userGroups == null) {
-				continue;
-			}
-			
 			for (AccountObject userGroup : userGroups) {
 				// To avoid null error in the array
 				if (userGroup != null) {
-					getAccountObjectList(doRoleCheck, ret, hasRoleAny, userGroup, ao);
+					getAccountObjectList(ret, ao);
 				}
 			}
 		}
 		return ret.toArray(new AccountObject[ret.size()]);
 	}
 	
-	private List<AccountObject> getAccountObjectList(boolean doRoleCheck, List<AccountObject> ret,
-		String[] hasRoleAny, AccountObject userGroup, AccountObject ao) {
-		if (doRoleCheck && ArrayUtils.contains(hasRoleAny, userGroup.getMemberRole(ao))) {
-			ret.add(ao);
-		} else {
-			ret.add(ao);
-		}
+	private static List<AccountObject> getAccountObjectList(List<AccountObject> ret, AccountObject ao) {
+		ret.add(ao);
 		return ret;
 		
 	}

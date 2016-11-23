@@ -39,16 +39,16 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	///
 	/// "names" are unique, and are usually either group names or emails
 	/// GUID's are not unique, as a single GUID can have multiple "names"
-	protected KeyValueMap accountID = null; //to delete from
+	protected KeyValueMap keyValueMapAccountID = null; //to delete from
 	
 	/// Stores the account authentication hash, used for password based authentication
-	protected KeyValueMap accountHash = null; //to delete from
+	protected KeyValueMap keyValueMapAccountHash = null; //to delete from
 	
 	/// Stores the account session authentication no-once information
-	protected KeyValueMap accountSessions = null;
+	protected KeyValueMap keyValueMapAccountSessions = null;
 	
 	/// Holds the account object meta table values
-	protected MetaTable accountMeta = null; //to delete from
+	protected MetaTable meatAccountTable = null; //to delete from
 	
 	/// Handles the storage of the group mapping
 	///
@@ -79,28 +79,28 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	protected String tableNamePrefix = null;
 	
 	/// The account self ID's
-	protected static String ACCOUNTID = "_ID";
+	protected static String accountID = "_ID";
 	
 	/// The account self ID's
-	protected static String ACCOUNTHASH = "_IH";
+	protected static String accountHash = "_IH";
 	
 	/// The login sessions used for authentication
-	protected static String ACCOUNTSESSIONS = "_LS";
+	protected static String accountSessions = "_LS";
 	
 	/// The account self meta values
-	protected static String ACCOUNTMETA = "_SM";
+	protected static String accountMeta = "_SM";
 	
 	/// The child nodes mapping, from self
-	protected static String ACCOUNTCHILD = "_SC";
+	protected static String accountChild = "_SC";
 	
 	/// The child account meta values
-	protected static String ACCOUNTCHILDMETA = "_CM";
+	protected static String accountChildMeta = "_CM";
 	
 	/// The Login Throttling Attempt account values
-	protected static String ACCOUNTLOGINTHROTTLINGATTEMPT = "_LA";
+	protected static String accountLoginThrottlingAttempt = "_LA";
 	
 	/// The Login Throttling Elapsed account values
-	protected static String ACCOUNTLOGINTHROTTLINGELAPSED = "_LE";
+	protected static String accountLoginThrottlingElapsed = "_LE";
 	
 	///
 	/// Constructor setup
@@ -110,15 +110,15 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	public AccountTable(JStruct jStructObj, String tableName) {
 		tableNamePrefix = tableName;
 		
-		accountID = jStructObj.getKeyValueMap(tableName + ACCOUNTID);
-		accountHash = jStructObj.getKeyValueMap(tableName + ACCOUNTHASH);
-		accountSessions = jStructObj.getKeyValueMap(tableName + ACCOUNTSESSIONS);
-		accountMeta = jStructObj.getMetaTable(tableName + ACCOUNTMETA);
-		groupChildRole = jStructObj.getMetaTable(tableName + ACCOUNTCHILD);
-		groupChildMeta = jStructObj.getMetaTable(tableName + ACCOUNTCHILDMETA);
-		loginThrottlingAttempt = jStructObj.getKeyValueMap(tableName + ACCOUNTLOGINTHROTTLINGATTEMPT);
-		loginThrottlingElapsed = jStructObj.getKeyValueMap(tableName + ACCOUNTLOGINTHROTTLINGELAPSED);
-		accountSessions.setTempHint(true); //optimization
+		keyValueMapAccountID = jStructObj.getKeyValueMap(tableName + accountID);
+		keyValueMapAccountHash = jStructObj.getKeyValueMap(tableName + accountHash);
+		keyValueMapAccountSessions = jStructObj.getKeyValueMap(tableName + accountSessions);
+		meatAccountTable = jStructObj.getMetaTable(tableName + accountMeta);
+		groupChildRole = jStructObj.getMetaTable(tableName + accountChild);
+		groupChildMeta = jStructObj.getMetaTable(tableName + accountChildMeta);
+		loginThrottlingAttempt = jStructObj.getKeyValueMap(tableName + accountLoginThrottlingAttempt);
+		loginThrottlingElapsed = jStructObj.getKeyValueMap(tableName + accountLoginThrottlingElapsed);
+		keyValueMapAccountSessions.setTempHint(true); //optimization
 	}
 	
 	//
@@ -127,25 +127,25 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	
 	/// Performs the full stack setup for the data object
 	public void systemSetup() {
-		accountID.systemSetup();
-		accountHash.systemSetup();
-		accountSessions.systemSetup();
-		accountMeta.systemSetup();
+		keyValueMapAccountID.systemSetup();
+		keyValueMapAccountHash.systemSetup();
+		keyValueMapAccountSessions.systemSetup();
+		meatAccountTable.systemSetup();
 		groupChildRole.systemSetup();
 		groupChildMeta.systemSetup();
 		loginThrottlingAttempt.systemSetup();
 		loginThrottlingElapsed.systemSetup();
 		if (superUserGroup() == null) {
-			newObject(_superUserGroup).saveAll();
+			newObject(superUserGroup).saveAll();
 		}
 	}
 	
 	/// Performs the full stack teardown for the data object
 	public void systemTeardown() {
-		accountID.systemTeardown();
-		accountHash.systemTeardown();
-		accountSessions.systemTeardown();
-		accountMeta.systemTeardown();
+		keyValueMapAccountID.systemTeardown();
+		keyValueMapAccountHash.systemTeardown();
+		keyValueMapAccountSessions.systemTeardown();
+		meatAccountTable.systemTeardown();
 		groupChildRole.systemTeardown();
 		groupChildMeta.systemTeardown();
 		loginThrottlingAttempt.systemTeardown();
@@ -158,7 +158,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	//
 	
 	public MetaTable accountMetaTable() {
-		return accountMeta;
+		return meatAccountTable;
 	}
 	
 	public MetaTable groupChildRole() {
@@ -197,7 +197,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	// Returns all the account _oid in the system
 	@Override
 	public Set<String> keySet() {
-		return accountMeta.keySet();
+		return meatAccountTable.keySet();
 	}
 	
 	//
@@ -257,17 +257,17 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	
 	/// Gets the account UUID, using the configured name
 	public String nameToID(String name) {
-		return accountID.get(name);
+		return keyValueMapAccountID.get(name);
 	}
 	
 	/// Returns if the name exists
 	public boolean containsName(String name) {
-		return accountID.containsKey(name);
+		return keyValueMapAccountID.containsKey(name);
 	}
 	
 	/// Returns if the account object id exists
 	public boolean containsID(Object oid) {
-		return accountMeta.containsKey(oid);
+		return meatAccountTable.containsKey(oid);
 	}
 	
 	/// Removes the accountObject using the name
@@ -310,18 +310,18 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 			}
 			
 			//accountID
-			Set<String> accountIDNames = accountID.getKeys(oid);
+			Set<String> accountIDNames = keyValueMapAccountID.getKeys(oid);
 			if (accountIDNames != null) {
 				for (String name : accountIDNames) {
-					accountID.remove(name, oid);
+					keyValueMapAccountID.remove(name, oid);
 				}
 			}
 			
 			//accountHash
-			accountHash.remove(oid);
+			keyValueMapAccountHash.remove(oid);
 			
 			//accountMeta
-			accountMeta.remove(oid);
+			meatAccountTable.remove(oid);
 		}
 	}
 	
@@ -334,35 +334,35 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	///--------------------------------------------------------------------------
 	
 	/// defined login lifetime, default as 3600 seconds (aka 1 hr)
-	public int loginLifetime = 3600; // 1 hr = 60 (mins) * 60 (seconds) = 3600 seconds
+	private int loginLifetime = 3600; // 1 hr = 60 (mins) * 60 (seconds) = 3600 seconds
 	
 	/// lifetime for http login token required for renewal, 1800 seconds (or half an hour)
-	public int loginRenewal = loginLifetime / 2; //
+	private int loginRenewal = loginLifetime / 2; //
 	
 	/// Remember me lifetime, default as 2592000 seconds (aka 30 days)
-	public int rmberMeLifetime = 2592000; // 1 mth ~= 30 (days) * 24 (hrs) * 3600 (seconds in an hr)
+	private int rmberMeLifetime = 2592000; // 1 mth ~= 30 (days) * 24 (hrs) * 3600 (seconds in an hr)
 	
 	/// Remember me lifetime, default as 15 days
-	public int rmberMeRenewal = rmberMeLifetime / 2; // 15 days
+	private int rmberMeRenewal = rmberMeLifetime / 2; // 15 days
 	
 	/// Sets the cookie to be limited to http only
-	public boolean isHttpOnly = false;
+	private boolean isHttpOnly = false;
 	
 	/// Sets the cookie to be via https only
-	public boolean isSecureOnly = false;
+	private boolean isSecureOnly = false;
 	
 	/// Sets the cookie namespace prefix
-	public String cookiePrefix = "Account_";
+	private String cookiePrefix = "Account_";
 	
 	/// Sets teh cookie domain, defaults is null
-	public String cookieDomain = null;
+	private String cookieDomain = null;
 	
 	/// The nonce size
-	public int nonceSize = 22;
+	private int nonceSize = 22;
 	
 	/// Gets and returns the session info, [nonceSalt, loginIP, browserAgent]
 	protected String[] getSessionInfo(String oid, String nonce) {
-		return accountSessions.getStringArray(oid + "-" + nonce);
+		return keyValueMapAccountSessions.getStringArray(oid + "-" + nonce);
 	}
 	
 	/// Sets the session info with the given nonceSalt, IP, and browserAgent
@@ -370,7 +370,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		String browserAgent) {
 		String nonce = NxtCrypt.randomString(nonceSize);
 		String key = oid + "-" + nonce;
-		accountSessions.putWithLifespan(key,
+		keyValueMapAccountSessions.putWithLifespan(key,
 			ConvertJSON.fromList(Arrays.asList(new String[] { nonceSalt, ipString, browserAgent })),
 			lifespan);
 		return nonce;
@@ -469,13 +469,13 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		//---------------------------------------------------------------------------------------------------
 		
 		if (response != null) { //assume renewal process check
-			if (rmbr != null && rmbr.equals("1")) {
-				if (accountSessions.getLifespan(nonc) < rmberMeRenewal) { //needs renewal (perform it!)
-					_setLogin(ret, request, response, true);
+			if (rmbr != null && "1".equals(rmbr)) {
+				if (keyValueMapAccountSessions.getLifespan(nonc) < rmberMeRenewal) { //needs renewal (perform it!)
+					setLogin(ret, request, response, true);
 				}
 			} else {
-				if (accountSessions.getLifespan(nonc) < loginRenewal) { //needs renewal (perform it!)
-					_setLogin(ret, request, response, false);
+				if (keyValueMapAccountSessions.getLifespan(nonc) < loginRenewal) { //needs renewal (perform it!)
+					setLogin(ret, request, response, false);
 				}
 			}
 		}
@@ -484,7 +484,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	}
 	
 	/// Internally sets the login to a user (handles the respective nonce) and set the cookies for the response
-	private boolean _setLogin(AccountObject po, javax.servlet.http.HttpServletRequest request,
+	private boolean setLogin(AccountObject po, javax.servlet.http.HttpServletRequest request,
 		javax.servlet.http.HttpServletResponse response, boolean rmberMe) {
 		
 		// Prepare the vars
@@ -568,7 +568,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		javax.servlet.http.HttpServletResponse response, AccountObject accountObj,
 		String rawPassword, boolean rmberMe) {
 		if (accountObj != null && accountObj.validatePassword(rawPassword)) {
-			_setLogin(accountObj, request, response, rmberMe);
+			setLogin(accountObj, request, response, rmberMe);
 			return accountObj;
 		}
 		
@@ -665,17 +665,17 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	//--------------------------------------------------------------------------
 	
 	/// Default super user group
-	protected String _superUserGroup = "SuperUsers";
+	protected String superUserGroup = "SuperUsers";
 	
 	/// Gets the super user group
 	public String getSuperUserGroupName() {
-		return _superUserGroup;
+		return superUserGroup;
 	}
 	
 	/// Change the super user group
 	public String setSuperUserGroupName(String userGroup) {
-		String old = _superUserGroup;
-		_superUserGroup = userGroup;
+		String old = superUserGroup;
+		superUserGroup = userGroup;
 		return old;
 	}
 	

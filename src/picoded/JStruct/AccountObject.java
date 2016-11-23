@@ -1,51 +1,33 @@
 package picoded.JStruct;
 
 /// Java imports
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.*;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
-/// Picoded imports
-import picoded.conv.GUID;
+import picoded.JStruct.internal.JStruct_MetaObject;
+import picoded.JStruct.internal.JStruct_MetaTable;
 import picoded.security.NxtCrypt;
-import picoded.JSql.*;
-import picoded.JCache.*;
-import picoded.JStruct.*;
-import picoded.JStruct.internal.*;
-import picoded.struct.*;
-
+/// Picoded imports
 /// hazelcast
-import com.hazelcast.core.*;
-import com.hazelcast.config.*;
-import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.HazelcastClient;
-import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.HazelcastClient;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
 
 public class AccountObject extends JStruct_MetaObject {
 	
 	/// The original table
-	protected AccountTable mainTable = null;
+	protected AccountTable accountTable = null;
 	
 	/// Constructor full setup
 	protected AccountObject(AccountTable accTable, JStruct_MetaTable inTable, String inOID,
 		boolean isCompleteData) {
 		super(inTable, inOID);
-		mainTable = accTable;
+		accountTable = accTable;
 	}
 	
 	/// Simplified Constructor
 	protected AccountObject(AccountTable accTable, String inOID) {
 		super((JStruct_MetaTable) (accTable.accountMeta), inOID);
-		mainTable = accTable;
+		accountTable = accTable;
 	}
 	
 	// Internal utility functions
@@ -53,7 +35,7 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// Gets and returns the stored password hash
 	protected String getPasswordHash() {
-		return mainTable.accountHash.get(_oid);
+		return accountTable.accountHash.get(_oid);
 	}
 	
 	// Password management
@@ -63,12 +45,12 @@ public class AccountObject extends JStruct_MetaObject {
 	/// if it functions as a group. Or is passwordless login
 	public boolean hasPassword() {
 		String h = getPasswordHash();
-		return (h != null && h.length() > 0);
+		return h != null && h.length() > 0;
 	}
 	
 	/// Remove the account password
 	public void removePassword() {
-		mainTable.accountHash.remove(_oid);
+		accountTable.accountHash.remove(_oid);
 	}
 	
 	/// Validate if the given password is valid
@@ -85,7 +67,7 @@ public class AccountObject extends JStruct_MetaObject {
 		if (pass == null) {
 			removePassword();
 		} else {
-			mainTable.accountHash.put(_oid, NxtCrypt.getPassHash(pass));
+			accountTable.accountHash.put(_oid, NxtCrypt.getPassHash(pass));
 		}
 		return true;
 	}
@@ -104,7 +86,7 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// Gets and return the various "nice-name" (not UUID) for this account
 	public Set<String> getNames() {
-		return mainTable.accountID.getKeys(_oid);
+		return accountTable.accountID.getKeys(_oid);
 	}
 	
 	/// Sets the name for the account, returns true or false if it succed.
@@ -113,21 +95,21 @@ public class AccountObject extends JStruct_MetaObject {
 			throw new RuntimeException("AccountObject nice name cannot be blank");
 		}
 		
-		if (mainTable.containsName(name)) {
+		if (accountTable.containsName(name)) {
 			return false;
 		}
 		
 		saveDelta(); //ensure itself is registered
 		
 		/// Technically a race condition =X
-		mainTable.accountID.put(name, _oid);
+		accountTable.accountID.put(name, _oid);
 		return true;
 	}
 	
 	/// Removes the old name from the database
 	/// @TODO Add-in security measure to only removeName of this user, instead of ANY
 	public void removeName(String name) {
-		mainTable.accountID.remove(name);
+		accountTable.accountID.remove(name);
 	}
 	
 	/// Sets the name as a unique value, delete all previous alias
@@ -135,10 +117,8 @@ public class AccountObject extends JStruct_MetaObject {
 		
 		// The old name list, to check if new name already is set
 		Set<String> oldNamesList = getNames();
-		if (!(Arrays.asList(oldNamesList).contains(name))) {
-			if (!setName(name)) { //does not own the name, but fail to set =(
-				return false;
-			}
+		if (!(Arrays.asList(oldNamesList).contains(name)) && !setName(name)) {
+			return false;
 		}
 		
 		// Iterate the names, delete uneeded ones
@@ -165,7 +145,7 @@ public class AccountObject extends JStruct_MetaObject {
 			return _group_userToRoleMap;
 		}
 		
-		return (_group_userToRoleMap = mainTable.groupChildRole.uncheckedGet(this._oid()));
+		return (_group_userToRoleMap = accountTable.groupChildRole.uncheckedGet(this._oid()));
 	}
 	
 	// Group status check
@@ -186,9 +166,9 @@ public class AccountObject extends JStruct_MetaObject {
 	/// Sets if the account is a group
 	public void setGroupStatus(boolean enabled) {
 		if (enabled) {
-			this.put("isGroup", new Integer(1));
+			this.put("isGroup", Integer.valueOf(1));
 		} else {
-			this.put("isGroup", new Integer(0));
+			this.put("isGroup", Integer.valueOf(0));
 			
 			// group_userToRoleMap().clear();
 			// group_userToRoleMap().saveDelta();
@@ -214,14 +194,14 @@ public class AccountObject extends JStruct_MetaObject {
 			return null;
 		}
 		
-		return mainTable.groupChildMeta.uncheckedGet(mainTable.getGroupChildMetaKey(this._oid(),
-			memberOID));
+		return accountTable.groupChildMeta.uncheckedGet(accountTable.getGroupChildMetaKey(
+			this._oid(), memberOID));
 	}
 	
 	/// Gets and returns the member meta map, if it exists
 	/// Only returns if member exists and matches role, else null
 	public MetaObject getMember(AccountObject memberObject, String role) {
-		role = mainTable.validateMembershipRole(role);
+		role = accountTable.validateMembershipRole(role);
 		
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
@@ -230,7 +210,7 @@ public class AccountObject extends JStruct_MetaObject {
 			return null;
 		}
 		
-		return mainTable.groupChildMeta.uncheckedGet(this._oid() + "-" + memberOID);
+		return accountTable.groupChildMeta.uncheckedGet(this._oid() + "-" + memberOID);
 	}
 	
 	/// Adds the member to the group with the given role, if it was not previously added
@@ -250,7 +230,7 @@ public class AccountObject extends JStruct_MetaObject {
 	///
 	/// Returns the group-member unique meta object
 	public MetaObject setMember(AccountObject memberObject, String role) {
-		role = mainTable.validateMembershipRole(role);
+		role = accountTable.validateMembershipRole(role);
 		
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
@@ -264,11 +244,11 @@ public class AccountObject extends JStruct_MetaObject {
 			group_userToRoleMap().put(memberOID, role);
 			group_userToRoleMap().saveDelta();
 			
-			childMeta = mainTable.groupChildMeta.uncheckedGet(this._oid() + "-" + memberOID);
+			childMeta = accountTable.groupChildMeta.uncheckedGet(this._oid() + "-" + memberOID);
 			childMeta.put("role", role);
 			childMeta.saveDelta();
 		} else {
-			childMeta = mainTable.groupChildMeta.uncheckedGet(this._oid() + "-" + memberOID);
+			childMeta = accountTable.groupChildMeta.uncheckedGet(this._oid() + "-" + memberOID);
 		}
 		
 		return childMeta;
@@ -283,9 +263,9 @@ public class AccountObject extends JStruct_MetaObject {
 		group_userToRoleMap().remove(memberOID);
 		group_userToRoleMap().saveAll();
 		
-		mainTable.groupChildMeta.remove(this._oid() + "-" + memberOID);
+		accountTable.groupChildMeta.remove(this._oid() + "-" + memberOID);
 		
-		System.out.println("Remove member called successfully");
+		//		System.out.println("Remove member called successfully");
 		
 		return true;
 	}
@@ -306,7 +286,7 @@ public class AccountObject extends JStruct_MetaObject {
 	/// Returns the list of members in the group
 	///
 	public String[] getGroups_id() {
-		return mainTable.groupChildRole.getFromKeyName_id(_oid());
+		return accountTable.groupChildRole.getFromKeyName_id(_oid());
 	}
 	
 	/// Gets all the members object related to the group
@@ -315,7 +295,7 @@ public class AccountObject extends JStruct_MetaObject {
 		String[] idList = getMembers_id();
 		AccountObject[] objList = new AccountObject[idList.length];
 		for (int a = 0; a < idList.length; ++a) {
-			objList[a] = mainTable.getFromID(idList[a]);
+			objList[a] = accountTable.getFromID(idList[a]);
 		}
 		return objList;
 	}
@@ -326,7 +306,7 @@ public class AccountObject extends JStruct_MetaObject {
 	/// Gets all the groups the user is in
 	///
 	public AccountObject[] getGroups() {
-		return mainTable.getFromIDArray(getGroups_id());
+		return accountTable.getFromIDArray(getGroups_id());
 	}
 	
 	// Is super user group handling
@@ -335,26 +315,26 @@ public class AccountObject extends JStruct_MetaObject {
 	/// Returns if its a super user
 	///
 	public boolean isSuperUser() {
-		AccountObject superUserGrp = mainTable.superUserGroup();
+		AccountObject superUserGrp = accountTable.superUserGroup();
 		if (superUserGrp == null) {
 			return false;
 		}
 		
 		String superUserGroupRole = superUserGrp.getMemberRole(this);
-		return (superUserGroupRole != null && superUserGroupRole.equalsIgnoreCase("admin"));
+		return superUserGroupRole != null && "admin".equalsIgnoreCase(superUserGroupRole);
 	}
 	
 	/// This method logs the details about login faailure for the user based on User ID
 	public void logLoginFailure(String userID) {
-		mainTable.loginThrottlingAttempt.putWithLifespan(userID, "1", 999999999);
+		accountTable.loginThrottlingAttempt.putWithLifespan(userID, "1", 999999999);
 		int elapsedTime = ((int) (System.currentTimeMillis() / 1000)) + 2;
-		mainTable.loginThrottlingElapsed.putWithLifespan(userID, String.valueOf(elapsedTime),
+		accountTable.loginThrottlingElapsed.putWithLifespan(userID, String.valueOf(elapsedTime),
 			999999999);
 	}
 	
 	/// This method returns time left before next permitted login attempt for the user based on User ID
 	public int getNextLoginTimeAllowed(String userID) {
-		String val = mainTable.loginThrottlingElapsed.get(userID);
+		String val = accountTable.loginThrottlingElapsed.get(userID);
 		if (val == null || "".equals(val)) {
 			return 0;
 		}
@@ -364,7 +344,7 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// This method would be added in on next login failure for the user based on User ID
 	public long getTimeElapsedNextLogin(String userId) {
-		String elapsedValueString = mainTable.loginThrottlingElapsed.get(userId);
+		String elapsedValueString = accountTable.loginThrottlingElapsed.get(userId);
 		if (elapsedValueString == null || "".equals(elapsedValueString)) {
 			return (System.currentTimeMillis() / 1000) + 2;
 		}
@@ -374,17 +354,17 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// This method would be added the delay for the user based on User ID
 	public void addDelay(String userId) {
-		String atteemptValueString = mainTable.loginThrottlingAttempt.get(userId);
+		String atteemptValueString = accountTable.loginThrottlingAttempt.get(userId);
 		if (atteemptValueString == null || "".equals(atteemptValueString)) {
 			logLoginFailure(userId);
 		} else {
 			int attemptValue = Integer.parseInt(atteemptValueString);
 			int elapsedValue = (int) (System.currentTimeMillis() / 1000);
 			attemptValue++;
-			mainTable.loginThrottlingAttempt.putWithLifespan(userId, String.valueOf(attemptValue),
+			accountTable.loginThrottlingAttempt.putWithLifespan(userId, String.valueOf(attemptValue),
 				999999999);
 			elapsedValue += attemptValue * 2;
-			mainTable.loginThrottlingElapsed.putWithLifespan(userId, String.valueOf(elapsedValue),
+			accountTable.loginThrottlingElapsed.putWithLifespan(userId, String.valueOf(elapsedValue),
 				999999999);
 		}
 		
@@ -392,7 +372,7 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// This method remove the entries for the user (should call after successful login)
 	public void resetLoginThrottle(String userId) {
-		mainTable.loginThrottlingAttempt.remove(userId);
-		mainTable.loginThrottlingElapsed.remove(userId);
+		accountTable.loginThrottlingAttempt.remove(userId);
+		accountTable.loginThrottlingElapsed.remove(userId);
 	}
 }

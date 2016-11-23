@@ -1,26 +1,9 @@
 package picoded.JStruct.internal;
 
-import java.util.*;
-import java.util.logging.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.Set;
 
-import picoded.struct.*;
-import picoded.security.NxtCrypt;
-import picoded.JStruct.KeyValueMap;
-
-import picoded.struct.*;
-import picoded.JStack.*;
-import picoded.JCache.*;
-import picoded.JSql.*;
-import picoded.JCache.struct.*;
-import picoded.JSql.struct.*;
-import picoded.conv.*;
-import picoded.JStruct.*;
-import picoded.JStruct.internal.*;
-import picoded.security.NxtCrypt;
-
-import org.apache.commons.lang3.RandomUtils;
+import picoded.JStack.JStack;
+import picoded.JStruct.JStruct;
 
 public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	
@@ -29,17 +12,18 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	public static Logger logger = Logger.getLogger(JStack_KeyValueMap.class.getName());
+	//public static final Logger logger = 
+	//Logger.getLogger(JStack_KeyValueMap.class.getName());
 	
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
 	
 	/// The inner sql object
-	public JStack stackObj = null;
+	JStack stackObj = null;
 	
 	/// The tablename for the key value pair map
-	public String stackTablename = null;
+	String stackTablename = null;
 	
 	/// JStack setup
 	public JStack_KeyValueMap(JStack inStack, String tablename) {
@@ -53,18 +37,18 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// The cached structure implmentation layers
-	public JStruct_KeyValueMap[] _implementationLayers = null;
+	public JStruct_KeyValueMap[] implementationLayers = null;
 	
 	/// The cached structure implmentation layers reversed
-	public JStruct_KeyValueMap[] _implementationLayers_reversed = null;
+	public JStruct_KeyValueMap[] implementationLayersReversed = null;
 	
 	///
 	/// Getting the implmentation layers
 	/// This is used internally to iterate the KeyValueMap layers
 	///
 	public JStruct_KeyValueMap[] implementationLayers() {
-		if (_implementationLayers != null) {
-			return _implementationLayers;
+		if (implementationLayers != null) {
+			return implementationLayers;
 		}
 		
 		// Get the structure layers
@@ -84,7 +68,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 			ret[a] = (JStruct_KeyValueMap) struct[a].getKeyValueMap(stackTablename);
 		}
 		
-		return (_implementationLayers = ret);
+		return implementationLayers = ret;
 	}
 	
 	///
@@ -92,8 +76,8 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	/// This is used internally to iterate the KeyValueMap layers reversed
 	///
 	public JStruct_KeyValueMap[] implementationLayers_reverse() {
-		if (_implementationLayers_reversed != null) {
-			return _implementationLayers_reversed;
+		if (implementationLayersReversed != null) {
+			return implementationLayersReversed;
 		}
 		
 		// Get and reverse
@@ -105,7 +89,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 		}
 		
 		// Return the reversed PDF
-		return _implementationLayers_reversed = ret;
+		return implementationLayersReversed = ret;
 	}
 	
 	///
@@ -113,6 +97,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Setsup the backend storage table, etc. If needed
+	@Override
 	public void systemSetup() {
 		for (JStruct_KeyValueMap i : implementationLayers()) {
 			i.systemSetup();
@@ -120,6 +105,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	}
 	
 	/// Teardown and delete the backend storage table, etc. If needed
+	@Override
 	public void systemTeardown() {
 		for (JStruct_KeyValueMap i : implementationLayers()) {
 			i.systemTeardown();
@@ -127,6 +113,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	}
 	
 	/// Perform maintenance, mainly removing of expired data if applicable
+	@Override
 	public void maintenance() {
 		for (JStruct_KeyValueMap i : implementationLayers()) {
 			i.maintenance();
@@ -134,6 +121,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	}
 	
 	/// Perform maintenance, mainly removing of expired data if applicable
+	@Override
 	public void incrementalMaintenance() {
 		for (JStruct_KeyValueMap i : implementationLayers()) {
 			i.incrementalMaintenance();
@@ -141,6 +129,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	}
 	
 	/// Perform maintenance, mainly removing of expired data if applicable
+	@Override
 	public void clear() {
 		for (JStruct_KeyValueMap i : implementationLayers()) {
 			i.clear();
@@ -159,6 +148,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	/// @param key as String
 	///
 	/// @returns long
+	@Override
 	public long getExpiryRaw(String key) {
 		long ret = -1;
 		for (JStruct_KeyValueMap i : implementationLayers()) {
@@ -178,6 +168,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	/// @param expire timestamp in seconds, 0 means NO expire
 	///
 	/// @returns long
+	@Override
 	public void setExpiryRaw(String key, long time) {
 		for (JStruct_KeyValueMap i : implementationLayers_reverse()) {
 			i.setExpiryRaw(key, time);
@@ -197,6 +188,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	/// @param now timestamp
 	///
 	/// @returns String value
+	@Override
 	public String getValueRaw(String key, long now) {
 		String val = null;
 		for (JStruct_KeyValueMap i : implementationLayers()) {
@@ -218,6 +210,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	/// @param expire timestamp, 0 means not timestamp
 	///
 	/// @returns null
+	@Override
 	public String setValueRaw(String key, String value, long expire) {
 		for (JStruct_KeyValueMap i : implementationLayers_reverse()) {
 			i.setValueRaw(key, value, expire);
@@ -232,6 +225,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	/// @param key, note that null matches ALL
 	///
 	/// @returns array of keys
+	@Override
 	public Set<String> getKeys(String value) {
 		Set<String> ret = null;
 		for (JStruct_KeyValueMap i : implementationLayers_reverse()) {
@@ -249,6 +243,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	/// @param key, note that null matches ALL
 	///
 	/// @returns array of keys
+	@Override
 	public String remove(Object key) {
 		for (JStruct_KeyValueMap i : implementationLayers_reverse()) {
 			i.remove(key);

@@ -97,15 +97,15 @@ public enum MetaType {
 	//
 	// Constructor setup
 	//--------------------------------------------------------------------
-	private final int ID;
+	private final int iD;
 	
-	private MetaType(final int inID) {
-		ID = inID;
+	MetaType(final int inID) {
+		iD = inID;
 	}
 	
 	/// Return the numeric value representing the enum
 	public int getValue() {
-		return ID;
+		return iD;
 	}
 	
 	/// Get name and toString alias to name() varient
@@ -113,6 +113,7 @@ public enum MetaType {
 		return super.name();
 	}
 	
+	@Override
 	public String toString() {
 		return super.name();
 	}
@@ -120,7 +121,7 @@ public enum MetaType {
 	//
 	// Public EnumSet
 	//--------------------------------------------------------------------
-	public static final EnumSet<MetaType> typeSet = EnumSet.allOf(MetaType.class);
+	protected static final EnumSet<MetaType> typeSet = EnumSet.allOf(MetaType.class);
 	
 	//
 	// Type mapping
@@ -145,9 +146,7 @@ public enum MetaType {
 				nameToTypeMap_wip.put(type.name(), type);
 				idToTypeMap_wip.put(type.getValue(), type);
 			}
-			
 			nameToTypeMap = nameToTypeMap_wip;
-			idToTypeMap_wip = idToTypeMap_wip;
 		}
 	}
 	
@@ -160,7 +159,7 @@ public enum MetaType {
 	/// Get from the respective string name values
 	public static MetaType fromName(String name) {
 		initializeTypeMaps();
-		name = name.toUpperCase();
+		name = name.toUpperCase(Locale.ENGLISH);
 		return nameToTypeMap.get(name);
 	}
 	

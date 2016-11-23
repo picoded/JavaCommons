@@ -8,7 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-@SuppressWarnings("static-access")
 public class JStruct_AtomicLongMap_test {
 	
 	JStruct_AtomicLongMap jStruct_AtomicLongMap = null;
@@ -32,14 +31,14 @@ public class JStruct_AtomicLongMap_test {
 	public void putTest() {
 		ConcurrentHashMap<String, Long> valueMap = new ConcurrentHashMap<String, Long>();
 		valueMap.put("key", 90l);
-		jStruct_AtomicLongMap.valueMap = valueMap;
+		JStruct_AtomicLongMap.valueMap = valueMap;
 		Number number = null;
 		assertNull(jStruct_AtomicLongMap.put("key", number));
 		valueMap.put("key", 90l);
-		jStruct_AtomicLongMap.valueMap = valueMap;
+		JStruct_AtomicLongMap.valueMap = valueMap;
 		assertNull(jStruct_AtomicLongMap.put("key", 0));
 		valueMap.put("key", 90l);
-		jStruct_AtomicLongMap.valueMap = valueMap;
+		JStruct_AtomicLongMap.valueMap = valueMap;
 		assertNull(jStruct_AtomicLongMap.put("key", (Long) null));
 	}
 	
@@ -47,7 +46,7 @@ public class JStruct_AtomicLongMap_test {
 	public void getAndAddTest() {
 		ConcurrentHashMap<String, Long> valueMap = new ConcurrentHashMap<String, Long>();
 		valueMap.put("key", 90l);
-		jStruct_AtomicLongMap.valueMap = valueMap;
+		JStruct_AtomicLongMap.valueMap = valueMap;
 		assertNotNull(jStruct_AtomicLongMap.getAndAdd("key", (Long) 90l));
 		assertNull(jStruct_AtomicLongMap.getAndAdd("key1", (Long) 90l));
 	}
@@ -56,7 +55,7 @@ public class JStruct_AtomicLongMap_test {
 	public void getAndIncrementTest() {
 		ConcurrentHashMap<String, Long> valueMap = new ConcurrentHashMap<String, Long>();
 		valueMap.put("key", 90l);
-		jStruct_AtomicLongMap.valueMap = valueMap;
+		JStruct_AtomicLongMap.valueMap = valueMap;
 		assertNull(jStruct_AtomicLongMap.getAndIncrement("key1"));
 	}
 	
@@ -64,7 +63,7 @@ public class JStruct_AtomicLongMap_test {
 	public void incrementAndGetTest() {
 		ConcurrentHashMap<String, Long> valueMap = new ConcurrentHashMap<String, Long>();
 		valueMap.put("key", 90l);
-		jStruct_AtomicLongMap.valueMap = valueMap;
+		JStruct_AtomicLongMap.valueMap = valueMap;
 		assertNull(jStruct_AtomicLongMap.incrementAndGet("key1"));
 	}
 	
@@ -72,7 +71,7 @@ public class JStruct_AtomicLongMap_test {
 	public void weakCompareAndSetTest() {
 		ConcurrentHashMap<String, Long> valueMap = new ConcurrentHashMap<String, Long>();
 		valueMap.put("key", 90l);
-		jStruct_AtomicLongMap.valueMap = valueMap;
+		JStruct_AtomicLongMap.valueMap = valueMap;
 		assertFalse(jStruct_AtomicLongMap.weakCompareAndSet("key", (Long) 80l, (Long) 80l));
 	}
 }

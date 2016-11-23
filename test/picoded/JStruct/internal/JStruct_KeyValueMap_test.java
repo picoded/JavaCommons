@@ -8,7 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-@SuppressWarnings("static-access")
 public class JStruct_KeyValueMap_test {
 	JStruct_KeyValueMap jStruct_KeyValueMap = null;
 	
@@ -43,7 +42,7 @@ public class JStruct_KeyValueMap_test {
 		expireMap.put("key3", 0l);
 		expireMap.put("key5", 160l);
 		expireMap.put("key6", 169898998260l);
-		jStruct_KeyValueMap.expireMap = expireMap;
+		JStruct_KeyValueMap.expireMap = expireMap;
 		jStruct_KeyValueMap.incrementalMaintenance();
 	}
 	
@@ -52,7 +51,7 @@ public class JStruct_KeyValueMap_test {
 		ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
 		valueMap.put("key3", "0l");
 		valueMap.put("key5", "160l");
-		jStruct_KeyValueMap.valueMap = valueMap;
+		JStruct_KeyValueMap.valueMap = valueMap;
 		jStruct_KeyValueMap.setExpiryRaw("key5", 160l);
 		jStruct_KeyValueMap.setExpiryRaw("test", 1);
 	}
@@ -62,7 +61,7 @@ public class JStruct_KeyValueMap_test {
 		ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
 		valueMap.put("key3", "0l");
 		valueMap.put("key5", "160l");
-		jStruct_KeyValueMap.valueMap = valueMap;
+		JStruct_KeyValueMap.valueMap = valueMap;
 		assertNull(jStruct_KeyValueMap.setValueRaw("key3", null, 0));
 	}
 	
@@ -70,10 +69,10 @@ public class JStruct_KeyValueMap_test {
 	public void getExpiryTest() {
 		ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
 		valueMap.put("key3", "0l");
-		jStruct_KeyValueMap.valueMap = valueMap;
+		JStruct_KeyValueMap.valueMap = valueMap;
 		ConcurrentHashMap<String, Long> expireMap = new ConcurrentHashMap<String, Long>();
 		expireMap.put("key3", 1l);
-		jStruct_KeyValueMap.expireMap = expireMap;
+		JStruct_KeyValueMap.expireMap = expireMap;
 		assertNotNull(jStruct_KeyValueMap.getExpiry("key"));
 		assertNotNull(jStruct_KeyValueMap.getExpiry("key3"));
 	}
@@ -82,10 +81,10 @@ public class JStruct_KeyValueMap_test {
 	public void getLifespanTest() {
 		ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
 		valueMap.put("key3", "0l");
-		jStruct_KeyValueMap.valueMap = valueMap;
+		JStruct_KeyValueMap.valueMap = valueMap;
 		ConcurrentHashMap<String, Long> expireMap = new ConcurrentHashMap<String, Long>();
 		expireMap.put("key3", 1l);
-		jStruct_KeyValueMap.expireMap = expireMap;
+		JStruct_KeyValueMap.expireMap = expireMap;
 		assertNotNull(jStruct_KeyValueMap.getLifespan("key"));
 		assertNotNull(jStruct_KeyValueMap.getLifespan("key3"));
 	}
@@ -100,10 +99,10 @@ public class JStruct_KeyValueMap_test {
 		ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
 		valueMap.put("key", "0l");
 		valueMap.put("key1", "0l");
-		jStruct_KeyValueMap.valueMap = valueMap;
+		JStruct_KeyValueMap.valueMap = valueMap;
 		ConcurrentHashMap<String, Long> expireMap = new ConcurrentHashMap<String, Long>();
 		expireMap.put("key", 2l);
-		jStruct_KeyValueMap.expireMap = expireMap;
+		JStruct_KeyValueMap.expireMap = expireMap;
 		assertNotNull(jStruct_KeyValueMap.getKeys("key3"));
 		assertNotNull(jStruct_KeyValueMap.getKeys("0l"));
 		assertNotNull(jStruct_KeyValueMap.getKeys(null));

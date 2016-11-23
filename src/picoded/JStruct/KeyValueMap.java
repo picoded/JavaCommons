@@ -29,7 +29,7 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// Note that this only serve as a hint, as does not indicate actual setting
 	///
 	/// @returns boolean  temp mode value
-	public boolean getTempHint();
+	boolean getTempHint();
 	
 	/// Sets temp mode optimization indicator hint
 	/// Note that this only serve as a hint, as does not indicate actual setting
@@ -37,23 +37,23 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @param  mode  the new temp mode hint
 	///
 	/// @returns boolean  previous value if set
-	public boolean setTempHint(boolean mode);
+	boolean setTempHint(boolean mode);
 	
 	//
 	// Backend system setup / teardown
 	//--------------------------------------------------------------------------
 	
 	/// Setsup the backend storage table, etc. If needed
-	public void systemSetup();
+	void systemSetup();
 	
 	/// Teardown and delete the backend storage table, etc. If needed
-	public void systemTeardown();
+	void systemTeardown();
 	
 	/// Perform maintenance, mainly removing of expired data if applicable
-	public void maintenance();
+	void maintenance();
 	
 	/// perform increment maintenance, meant for minor changes between requests
-	public default void incrementalMaintenance() {
+	default void incrementalMaintenance() {
 		// 2 percent chance of trigering maintenance
 		// This is to lower to overall performance cost incrementalMaintenance per request
 		if (RandomUtils.nextInt(0, 100) <= 2) {
@@ -66,7 +66,7 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// Handles re-entrant lock where applicable
 	///
 	@Override
-	public void clear();
+	void clear();
 	
 	//
 	// Expiration and lifespan handling (public access)
@@ -77,26 +77,26 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @param key as String
 	///
 	/// @returns long, 0 means no expirary, -1 no data / expire
-	public long getExpiry(String key);
+	long getExpiry(String key);
 	
 	/// Returns the lifespan time stamp value
 	///
 	/// @param key as String
 	///
 	/// @returns long, 0 means no expirary, -1 no data / expire
-	public long getLifespan(String key);
+	long getLifespan(String key);
 	
 	/// Sets the expire time stamp value, if still valid
 	///
 	/// @param key 
 	/// @param time 
-	public void setExpiry(String key, long time);
+	void setExpiry(String key, long time);
 	
 	/// Sets the expire time stamp value, if still valid
 	///
 	/// @param key 
 	/// @param lifespan 
-	public void setLifeSpan(String key, long lifespan);
+	void setLifeSpan(String key, long lifespan);
 	
 	/// Search using the value, all the relevent key mappings
 	///
@@ -105,7 +105,7 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @param key, note that null matches ALL
 	///
 	/// @returns array of keys
-	public Set<String> getKeys(String value);
+	Set<String> getKeys(String value);
 	
 	//
 	// put, get, etc (public)
@@ -118,8 +118,8 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @param key as String
 	/// @returns boolean true or false if the key exists
 	@Override
-	public default boolean containsKey(Object key) {
-		return (getLifespan(key.toString()) >= 0);
+	default boolean containsKey(Object key) {
+		return getLifespan(key.toString()) >= 0;
 	}
 	
 	/// Returns the value, given the key
@@ -127,14 +127,14 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	///
 	/// @returns  value of the given key
 	@Override
-	public String get(Object key);
+	String get(Object key);
 	
 	/// Remove the value, given the key
 	/// @param key param find the thae meta key
 	///
 	/// @returns  null
 	@Override
-	public String remove(Object key);
+	String remove(Object key);
 	
 	/// Stores (and overwrites if needed) key, value pair
 	///
@@ -144,13 +144,13 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @param value as String
 	///
 	/// @returns null
-	public String put(String key, String value);
+	String put(String key, String value);
 	
 	/// Returns all the valid keys
 	///
 	/// @returns  the full keyset
 	@Override
-	public default Set<String> keySet() {
+	default Set<String> keySet() {
 		return getKeys(null);
 	}
 	
@@ -167,7 +167,7 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @param lifespan time to expire in seconds
 	///
 	/// @returns null
-	public String putWithLifespan(String key, String value, long lifespan);
+	String putWithLifespan(String key, String value, long lifespan);
 	
 	/// Stores (and overwrites if needed) key, value pair
 	///
@@ -178,7 +178,7 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @param expireTime expire time stamp value
 	///
 	/// @returns String
-	public String putWithExpiry(String key, String value, long expireTime);
+	String putWithExpiry(String key, String value, long expireTime);
 	
 	//
 	// Nonce operations suppport (public)
@@ -191,7 +191,7 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @param value to store as string
 	///
 	/// @returns String value of the random key generated
-	public String generateNonce(String val);
+	String generateNonce(String val);
 	
 	/// Generates a random nonce hash, and saves the value to it
 	///
@@ -201,7 +201,7 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @param lifespan time to expire in seconds
 	///
 	/// @returns String value of the random key generated
-	public String generateNonce(String val, long lifespan);
+	String generateNonce(String val, long lifespan);
 	
 	/// Generates a random nonce hash, and saves the value to it
 	///
@@ -213,7 +213,7 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @param lifespan time to expire in seconds
 	///
 	/// @returns String value of the random key generated
-	public default String generateNonce(String val, long lifespan, int keyLength) {
+	default String generateNonce(String val, long lifespan, int keyLength) {
 		String res = NxtCrypt.randomString(keyLength);
 		putWithLifespan(res, val, lifespan);
 		return res;

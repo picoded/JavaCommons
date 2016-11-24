@@ -1,14 +1,16 @@
 package picoded.JStruct.module.site;
 
 /// Java imports
-import java.util.*;
+import java.util.List;
 
+import picoded.JStruct.JStruct;
+import picoded.JStruct.MetaObject;
+import picoded.JStruct.MetaTable;
+import picoded.struct.GenericConvertArrayList;
+import picoded.struct.GenericConvertHashMap;
+import picoded.struct.GenericConvertList;
+import picoded.struct.GenericConvertMap;
 /// Picoded imports
-import picoded.conv.*;
-import picoded.struct.*;
-import picoded.servlet.*;
-import picoded.JStruct.*;
-import picoded.struct.query.*;
 
 ///
 /// A product listing system, which is built ontop of MetaTable, and AtomicLongMap
@@ -23,6 +25,7 @@ public class ProductListing {
 	
 	/// Product list max size
 	public int product_max = 250;
+	private static String ownerID = "_ownerID";
 	
 	/// Empty constructor
 	public ProductListing() {
@@ -91,7 +94,7 @@ public class ProductListing {
 		GenericConvertList<MetaObject> ret = new GenericConvertArrayList<MetaObject>();
 		
 		// Fetch and populate
-		MetaObject[] queryRet = productItem.query("_ownerID=?", new String[] { ownerID },
+		MetaObject[] queryRet = productItem.query(ownerID + "=?", new String[] { ownerID },
 			"_createdTime", 0, product_max);
 		if (queryRet != null && queryRet.length > 0) {
 			for (int i = 0; i < queryRet.length; ++i) {
@@ -153,7 +156,7 @@ public class ProductListing {
 			
 			// Product _oid
 			String update_oid = updateProduct.getString("_oid", null);
-			if (update_oid != null && update_oid.equalsIgnoreCase("new")) {
+			if (update_oid != null && "new".equalsIgnoreCase(update_oid)) {
 				update_oid = null;
 			}
 			
@@ -169,14 +172,14 @@ public class ProductListing {
 				updateMetaObject = productItem.get(update_oid);
 				
 				// Security validation of owner ID
-				if (!ownerID.equals(updateMetaObject.get("_ownerID"))) {
+				if (!ownerID.equals(updateMetaObject.get(ownerID))) {
 					throw new SecurityException("Unauthorized update call to object " + update_oid
 						+ " with invalid ownerID " + ownerID);
 				}
 			} else {
 				// New meta object
 				updateMetaObject = productItem.newObject();
-				updateMetaObject.put("_ownerID", ownerID);
+				updateMetaObject.put(ownerID, ownerID);
 				updateMetaObject.saveDelta();
 				
 				prodList.add(updateMetaObject);
@@ -216,7 +219,7 @@ public class ProductListing {
 		inMap.remove("_orderID");
 		inMap.remove("_sellerID");
 		
-		inMap.remove("_ownerID");
+		inMap.remove(ownerID);
 		inMap.remove("_ownerMeta");
 		
 		inMap.remove("_productID");

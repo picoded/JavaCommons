@@ -128,8 +128,8 @@ public enum MetaType {
 	//--------------------------------------------------------------------
 	
 	/// The type mapping cache
-	private static Map<String, MetaType> nameToTypeMap = null;
-	private static Map<Integer, MetaType> idToTypeMap = null;
+	protected volatile static Map<String, MetaType> nameToTypeMap = null;
+	protected static  Map<Integer, MetaType> idToTypeMap = null;
 	
 	/// Setting up the type mapping
 	///

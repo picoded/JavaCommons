@@ -518,7 +518,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		// Store the cookies
 		//-----------------------------------------------------
 		int noOfCookies = 5;
-		javax.servlet.http.Cookie cookieJar[] = new javax.servlet.http.Cookie[noOfCookies];
+		javax.servlet.http.Cookie[] cookieJar = new javax.servlet.http.Cookie[noOfCookies];
 		
 		int index = 0;
 		cookieJar[index] = new javax.servlet.http.Cookie(cookiePrefix + "Puid", puid);

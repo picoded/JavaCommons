@@ -60,6 +60,7 @@ public class JStruct_MetaTable implements MetaTable {
 	/// Note that this only serve as a hint, as does not indicate actual setting
 	///
 	/// @returns boolean  temp mode value
+	@Override
 	public boolean getTempHint() {
 		return isTempHint;
 	}
@@ -70,6 +71,7 @@ public class JStruct_MetaTable implements MetaTable {
 	/// @param  mode  the new temp mode hint
 	///
 	/// @returns boolean  previous value if set
+	@Override
 	public boolean setTempHint(boolean mode) {
 		boolean ret = isTempHint;
 		isTempHint = mode;
@@ -81,11 +83,13 @@ public class JStruct_MetaTable implements MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Setsup the backend storage table, etc. If needed
+	@Override
 	public void systemSetup() {
 		// does nothing
 	}
 	
 	/// Teardown and delete the backend storage table, etc. If needed
+	@Override
 	public void systemTeardown() {
 		_valueMap.clear();
 	}
@@ -95,20 +99,19 @@ public class JStruct_MetaTable implements MetaTable {
 	
 	/// Gets the MetaObject, if it exists
 	@Override
-	public MetaObject get(Object _oid) {
-		if (_oid == null) {
+	public MetaObject get(Object oid) {
+		if (oid == null) {
 			return null;
 		}
 		try {
 			_accessLock.readLock().lock();
 			
-			String oid = _oid.toString();
-			Map<String, Object> fullMap = metaObjectRemoteDataMap_get(oid);
+			Map<String, Object> fullMap = metaObjectRemoteDataMap_get(oid.toString());
 			
 			if (fullMap == null) {
 				return null;
 			}
-			return new JStruct_MetaObject(this, oid, fullMap, true);
+			return new JStruct_MetaObject(this, oid.toString(), fullMap, true);
 		} finally {
 			_accessLock.readLock().unlock();
 		}
@@ -133,7 +136,7 @@ public class JStruct_MetaTable implements MetaTable {
 	/// Does an unoptimized check, using keySet
 	@Override
 	public boolean containsKey(Object key) {
-		return (get(key) != null);
+		return get(key) != null;
 	}
 	
 	///
@@ -157,17 +160,17 @@ public class JStruct_MetaTable implements MetaTable {
 	
 	/// Gets the complete remote data map, for MetaObject.
 	/// Returns null
-	public Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
+	public Map<String, Object> metaObjectRemoteDataMap_get(String oid) {
 		try {
 			_accessLock.readLock().lock();
 			Map<String, Object> ret = null;
-			Map<String, Object> storedValue = _valueMap.get(_oid);
+			Map<String, Object> storedValue = _valueMap.get(oid);
 			if (storedValue == null) {
 				return ret;
 			}
 			ret = new HashMap<String, Object>();
-			for (String key : storedValue.keySet()) {
-				ret.put(key, detachValue(storedValue.get(key)));
+			for (Entry<String, Object> entry : storedValue.entrySet()) {
+				ret.put(entry.getKey(), detachValue(storedValue.get(entry.getKey())));
 			}
 			return ret;
 		} finally {
@@ -177,7 +180,7 @@ public class JStruct_MetaTable implements MetaTable {
 	
 	/// Updates the actual backend storage of MetaObject
 	/// either partially (if supported / used), or completely
-	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap,
+	public void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
 		Set<String> keys) {
 		try {
 			_accessLock.writeLock().lock();
@@ -186,7 +189,7 @@ public class JStruct_MetaTable implements MetaTable {
 				keys = fullMap.keySet();
 			}
 			
-			Map<String, Object> storedValue = _valueMap.get(_oid);
+			Map<String, Object> storedValue = _valueMap.get(oid);
 			if (storedValue == null) {
 				storedValue = new ConcurrentHashMap<String, Object>();
 			}
@@ -194,14 +197,14 @@ public class JStruct_MetaTable implements MetaTable {
 			for (String key : keys) {
 				Object val = fullMap.get(key);
 				
-				if (val == null || val == ObjectTokens.NULL) {
+				if (val == null || val.equals(ObjectTokens.NULL)) {
 					storedValue.remove(key);
 				} else {
 					storedValue.put(key, val);
 				}
 			}
 			
-			_valueMap.put(_oid, storedValue);
+			_valueMap.put(oid, storedValue);
 		} finally {
 			_accessLock.writeLock().unlock();
 		}

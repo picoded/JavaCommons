@@ -1,6 +1,5 @@
 package picoded;
 
-
 import java.util.Properties;
 import org.apache.commons.lang3.RandomStringUtils;
 

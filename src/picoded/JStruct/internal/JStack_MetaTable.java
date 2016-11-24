@@ -27,10 +27,10 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// The inner sql object
-	public JStack stackObj = null;
+	protected JStack stackObj = null;
 	
 	/// The tablename for the key value pair map
-	public String stackTablename = null;
+	protected String stackTablename = null;
 	
 	/// JStack setup
 	public JStack_MetaTable(JStack inStack, String tablename) {
@@ -44,10 +44,10 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// The cached structure implmentation layers
-	public JStruct_MetaTable[] implementationLayer = null;
+	protected JStruct_MetaTable[] implementationLayer = null;
 	
 	/// The cached structure implmentation layers reversed
-	public JStruct_MetaTable[] implementationLayersReversed = null;
+	protected JStruct_MetaTable[] implementationLayersReversed = null;
 	
 	///
 	/// Getting the implmentation layers

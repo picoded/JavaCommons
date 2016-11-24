@@ -30,13 +30,13 @@ public class JStruct_MetaTable implements MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
-	public Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
+	protected Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
 	
 	/// Read write lock
-	public ReentrantReadWriteLock _accessLock = new ReentrantReadWriteLock();
+	protected ReentrantReadWriteLock _accessLock = new ReentrantReadWriteLock();
 	
 	/// Internal MetaTypeMap
-	public MetaTypeMap _typeMap = new MetaTypeMap();
+	protected MetaTypeMap _typeMap = new MetaTypeMap();
 	
 	///
 	/// Constructor setup
@@ -54,7 +54,7 @@ public class JStruct_MetaTable implements MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Temp value flag, defaults to false
-	public boolean isTempHint = false;
+	protected boolean isTempHint = false;
 	
 	/// Gets if temp mode optimization hint is indicated
 	/// Note that this only serve as a hint, as does not indicate actual setting

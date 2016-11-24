@@ -20,10 +20,10 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// The inner sql object
-	private static JStack stackObj = null;
+	protected static volatile JStack stackObj = null;
 	
 	/// The tablename for the key value pair map
-	private static String stackTablename = null;
+	protected static volatile String stackTablename = null;
 	
 	/// JStack setup
 	public JStack_KeyValueMap(JStack inStack, String tablename) {

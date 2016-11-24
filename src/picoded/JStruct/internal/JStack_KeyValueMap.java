@@ -37,7 +37,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// The cached structure implmentation layers
-	public JStruct_KeyValueMap[] implementationLayer = null;
+	protected JStruct_KeyValueMap[] implementationLayer = null;
 	
 	/// The cached structure implmentation layers reversed
 	public JStruct_KeyValueMap[] implementationLayersReversed = null;

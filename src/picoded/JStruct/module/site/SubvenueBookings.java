@@ -1,14 +1,19 @@
 package picoded.JStruct.module.site;
 
 /// Java imports
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import picoded.JStruct.JStruct;
+import picoded.JStruct.MetaObject;
+import picoded.JStruct.MetaTable;
+import picoded.struct.GenericConvertArrayList;
+import picoded.struct.GenericConvertHashMap;
+import picoded.struct.GenericConvertList;
+import picoded.struct.GenericConvertMap;
 /// Picoded imports
-import picoded.conv.*;
-import picoded.struct.*;
-import picoded.servlet.*;
-import picoded.JStruct.*;
-import picoded.struct.query.*;
 
 ///
 /// A product listing system, which is built ontop of MetaTable, and AtomicLongMap
@@ -16,12 +21,16 @@ import picoded.struct.query.*;
 public class SubvenueBookings {
 	
 	/// Subvenue Bookings metatable
-	public MetaTable subvenueBookings = null;
+	public MetaTable subvenueBooking = null;
 	
 	///Subvenue Booking Dates metatable
 	public MetaTable subvenueBookingDates = null;
 	
-	private int bookings_max = 50;
+	private int bookingsMax = 50;
+	
+	private static String errorMsg = "Missing in_subvenueId";
+	
+	private static String createdTime = "_createdTime";
 	
 	/// Empty constructor
 	public SubvenueBookings() {
@@ -44,10 +53,10 @@ public class SubvenueBookings {
 	///
 	public void setupStandardTables(JStruct inStruct, String prefix, String listing) {
 		if (listing == null || listing.length() < 4) {
-			subvenueBookings = inStruct.getMetaTable(prefix + "_subvenueBooking");
+			subvenueBooking = inStruct.getMetaTable(prefix + "_subvenueBooking");
 			subvenueBookingDates = inStruct.getMetaTable(prefix + "_subvenueBookingDates");
 		} else {
-			subvenueBookings = inStruct.getMetaTable(prefix + "_" + listing);
+			subvenueBooking = inStruct.getMetaTable(prefix + "_" + listing);
 			subvenueBookingDates = inStruct.getMetaTable(prefix + "_" + listing);
 		}
 	}
@@ -56,7 +65,7 @@ public class SubvenueBookings {
 	/// Calls the systemSetup for the underlying MetaTable / AtomicLongMap
 	///
 	public void systemSetup() {
-		subvenueBookings.systemSetup();
+		subvenueBooking.systemSetup();
 		subvenueBookingDates.systemSetup();
 	}
 	
@@ -64,7 +73,7 @@ public class SubvenueBookings {
 	/// Calls the systemSetup for the underlying MetaTable / AtomicLongMap
 	///
 	public void systemTeardown() {
-		subvenueBookings.systemTeardown();
+		subvenueBooking.systemTeardown();
 		subvenueBookingDates.systemTeardown();
 	}
 	
@@ -84,15 +93,15 @@ public class SubvenueBookings {
 	public GenericConvertList<MetaObject> getSubvenueBookings_bySubVenueId(String in_subvenueId) {
 		// Sanity check
 		if (in_subvenueId == null || in_subvenueId.isEmpty()) {
-			throw new RuntimeException("Missing in_subvenueId");
+			throw new RuntimeException(errorMsg);
 		}
 		
 		// Return object
 		GenericConvertList<MetaObject> ret = new GenericConvertArrayList<MetaObject>();
 		
 		// Fetch and populate
-		MetaObject[] queryRet = subvenueBookings.query("_subvenueID=? AND (_status=? OR _status=?)",
-			new String[] { in_subvenueId, "Paid", "Approved" }, "_createdTime", 0, bookings_max);
+		MetaObject[] queryRet = subvenueBooking.query("_subvenueID=? AND (_status=? OR _status=?)",
+			new String[] { in_subvenueId, "Paid", "Approved" }, createdTime, 0, bookingsMax);
 		if (queryRet != null && queryRet.length > 0) {
 			for (int i = 0; i < queryRet.length; ++i) {
 				ret.add(queryRet[i]);
@@ -113,8 +122,8 @@ public class SubvenueBookings {
 		GenericConvertList<MetaObject> ret = new GenericConvertArrayList<MetaObject>();
 		
 		// Fetch and populate
-		MetaObject[] queryRet = subvenueBookings.query("_oid=?", new String[] { in_bookingID },
-			"_createdTime", 0, bookings_max);
+		MetaObject[] queryRet = subvenueBooking.query("_oid=?", new String[] { in_bookingID },
+			createdTime, 0, bookingsMax);
 		if (queryRet != null && queryRet.length > 0) {
 			for (int i = 0; i < queryRet.length; ++i) {
 				ret.add(queryRet[i]);
@@ -128,7 +137,7 @@ public class SubvenueBookings {
 	public GenericConvertList<MetaObject> getSubvenueBookingDates_byBookingId(String in_subvenueId) {
 		// Sanity check
 		if (in_subvenueId == null || in_subvenueId.isEmpty()) {
-			throw new RuntimeException("Missing in_subvenueId");
+			throw new RuntimeException(errorMsg);
 		}
 		
 		// Return object
@@ -136,7 +145,7 @@ public class SubvenueBookings {
 		
 		// Fetch and populate
 		MetaObject[] queryRet = subvenueBookingDates.query("_bookingID=?",
-			new String[] { in_subvenueId }, "_createdTime", 0, bookings_max);
+			new String[] { in_subvenueId }, createdTime, 0, bookingsMax);
 		if (queryRet != null && queryRet.length > 0) {
 			for (int i = 0; i < queryRet.length; ++i) {
 				ret.add(queryRet[i]);
@@ -164,7 +173,7 @@ public class SubvenueBookings {
 		// The meta object to create / update
 		MetaObject updateMetaObject = null;
 		// New meta object in subvenue bookings table
-		updateMetaObject = subvenueBookings.newObject();
+		updateMetaObject = subvenueBooking.newObject();
 		
 		updateMetaObject.put("_subvenueID", subvenueID);
 		updateMetaObject.put("_eventID", eventID);
@@ -199,11 +208,11 @@ public class SubvenueBookings {
 		
 		// Sanity check
 		if (in_subvenueId == null || in_subvenueId.isEmpty()) {
-			throw new RuntimeException("Missing in_subvenueId");
+			throw new RuntimeException(errorMsg);
 		}
 		
 		// Sales object
-		MetaObject bookingObject = subvenueBookings.get(in_subvenueId);
+		MetaObject bookingObject = subvenueBooking.get(in_subvenueId);
 		
 		// Update sales object status
 		bookingObject.put("_status", newStatus);
@@ -232,8 +241,8 @@ public class SubvenueBookings {
 		ArrayList<MetaObject> itemList = new ArrayList<MetaObject>();
 		
 		// Assuming datesList is a Map<String, Object> which actually is a Map<String, List<Object>>
-		for (String dateKey : datesList.keySet()) {
-			Object timeslot_list_raw = datesList.get(dateKey);
+		for (Entry<String, Object> entry : datesList.entrySet()) {
+			Object timeslot_list_raw = datesList.get(entry.getKey());
 			if (timeslot_list_raw instanceof List) {
 				// list = [0500-0600, 0600-0700]
 				List<Object> timeslot_list = (List<Object>) timeslot_list_raw;
@@ -247,7 +256,7 @@ public class SubvenueBookings {
 				
 				// Link it all up
 				dateItem.put("_bookingID", bookingID);
-				dateItem.put("_date", dateKey);
+				dateItem.put("_date", entry.getKey());
 				dateItem.put("_timeSlots", timeslot_list);
 				
 				dateItem.saveDelta();

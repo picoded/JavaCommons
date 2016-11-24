@@ -1,14 +1,25 @@
 package picoded.JStruct.module.site;
 
 /// Java imports
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import picoded.JStruct.AtomicLongMap;
+import picoded.JStruct.JStruct;
+import picoded.JStruct.MetaObject;
+import picoded.JStruct.MetaTable;
+import picoded.conv.ConvertJSON;
 /// Picoded imports
-import picoded.conv.*;
-import picoded.struct.*;
-import picoded.servlet.*;
-import picoded.JStruct.*;
-import picoded.struct.query.*;
+import picoded.conv.GenericConvert;
+import picoded.servlet.CorePage;
+import picoded.struct.GenericConvertArrayList;
+import picoded.struct.GenericConvertHashMap;
+import picoded.struct.GenericConvertList;
+import picoded.struct.GenericConvertMap;
 
 ///
 /// A simple shopping cart system, which is built ontop of MetaTable, and AtomicLongMap
@@ -40,15 +51,18 @@ public class SimpleShoppingCart {
 	public String shoppingCartCookieName = "shopping-cart";
 	
 	/// Cart maximum size
-	public int cart_max = 50;
+	public int cartMax = 50;
 	
 	/// Product list max size
-	public int product_max = 250;
+	public int productMax = 250;
 	
 	/// Transaction percentage fee
-	public double transaction_percentage = 2.9;
-	public double transaction_fixed = 0.99;
-	public String transaction_productPriceKey = "display_price";
+	public double transactionPercentage = 2.9;
+	public double transactionFixed = 0.99;
+	public String transactionProductPriceKey = "display_price";
+	
+	private static String ownerID = "_ownerID";
+	private static String orderStatus = "_orderStatus";
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -156,6 +170,7 @@ public class SimpleShoppingCart {
 		if (!updateJson.equals(ori)) {
 			javax.servlet.http.Cookie theOneCookie = new javax.servlet.http.Cookie(
 				shoppingCartCookieName, updateJson);
+			theOneCookie.setSecure(true);
 			requestPage.getHttpServletResponse().addCookie(theOneCookie);
 		}
 	}
@@ -460,8 +475,8 @@ public class SimpleShoppingCart {
 		}
 		
 		// Max cart size handling
-		if (cart.size() > cart_max) {
-			throw new RuntimeException("Cart maximum size exceeded : " + cart.size() + "/" + cart_max);
+		if (cart.size() > cartMax) {
+			throw new RuntimeException("Cart maximum size exceeded : " + cart.size() + "/" + cartMax);
 		}
 		
 		// Update the JSON cookie with cart
@@ -526,8 +541,8 @@ public class SimpleShoppingCart {
 		GenericConvertList<MetaObject> ret = new GenericConvertArrayList<MetaObject>();
 		
 		// Fetch and populate
-		MetaObject[] queryRet = productItem.query("_ownerID=?", new String[] { ownerID },
-			"_createdTime", 0, product_max);
+		MetaObject[] queryRet = productItem.query(ownerID + "=?", new String[] { ownerID },
+			"_createdTime", 0, productMax);
 		if (queryRet != null && queryRet.length > 0) {
 			for (int i = 0; i < queryRet.length; ++i) {
 				ret.add(queryRet[i]);
@@ -588,7 +603,7 @@ public class SimpleShoppingCart {
 			
 			// Product _oid
 			String update_oid = updateProduct.getString("_oid", null);
-			if (update_oid != null && update_oid.equalsIgnoreCase("new")) {
+			if (update_oid != null && "new".equalsIgnoreCase(update_oid)) {
 				update_oid = null;
 			}
 			
@@ -608,14 +623,14 @@ public class SimpleShoppingCart {
 				}
 				
 				// Security validation of owner ID
-				if (!ownerID.equals(updateMetaObject.get("_ownerID"))) {
+				if (!ownerID.equals(updateMetaObject.get(ownerID))) {
 					throw new SecurityException("Unauthorized update call to object " + update_oid
 						+ " with invalid ownerID " + ownerID);
 				}
 			} else {
 				// New meta object
 				updateMetaObject = productItem.newObject();
-				updateMetaObject.put("_ownerID", ownerID);
+				updateMetaObject.put(ownerID, ownerID);
 				updateMetaObject.saveDelta();
 				
 				prodList.add(updateMetaObject);
@@ -649,9 +664,9 @@ public class SimpleShoppingCart {
 	///
 	/// @return The metaobject found (if found)
 	///
-	protected MetaObject findMetaObjectInList(List<MetaObject> list, String _oid) {
+	protected MetaObject findMetaObjectInList(List<MetaObject> list, String oid) {
 		for (MetaObject o : list) {
-			if (o._oid().equalsIgnoreCase(_oid)) {
+			if (o._oid().equalsIgnoreCase(oid)) {
 				return o;
 			}
 		}
@@ -692,8 +707,8 @@ public class SimpleShoppingCart {
 		}
 		// Building the orderObj, with _ownerID, and _orderStatus link
 		orderObj.putAll(orderMeta);
-		orderObj.put("_ownerID", purchaseOwnerID);
-		orderObj.put("_orderStatus", status);
+		orderObj.put(ownerID, purchaseOwnerID);
+		orderObj.put(orderStatus, status);
 		orderObj.saveDelta();
 		
 		// Get the order ID
@@ -731,7 +746,7 @@ public class SimpleShoppingCart {
 			
 			// Owner meta mapping
 			GenericConvertMap<String, Object> ownerMetaObj = new GenericConvertHashMap<String, Object>(
-				productOwner.get(rawItemObj.get("_ownerID")));
+				productOwner.get(rawItemObj.get(ownerID)));
 			
 			// Item meta mapping
 			GenericConvertMap<String, Object> itemMetaObj = new GenericConvertHashMap<String, Object>(
@@ -740,11 +755,11 @@ public class SimpleShoppingCart {
 			// Link it all up
 			orderItem.put("_count", itemCount);
 			orderItem.put("_totalCost", totalCost);
-			orderItem.put("_ownerID", purchaseOwnerID);
+			orderItem.put(ownerID, purchaseOwnerID);
 			orderItem.put("_orderID", orderID);
-			orderItem.put("_sellerID", rawItemObj.get("_ownerID"));
+			orderItem.put("_sellerID", rawItemObj.get(ownerID));
 			orderItem.put("_productID", rawItemObj.get("_oid"));
-			orderItem.put("_orderStatus", status);
+			orderItem.put(orderStatus, status);
 			
 			// Product meta information
 			orderItem.put("_productMeta", itemMetaObj);
@@ -789,13 +804,13 @@ public class SimpleShoppingCart {
 		MetaObject salesObject = salesOrder.get(orderID);
 		
 		// Update sales object status
-		salesObject.put("_orderStatus", newStatus);
+		salesObject.put(orderStatus, newStatus);
 		salesObject.saveDelta();
 		
 		// Item list
 		List<MetaObject> prodList = fetchSalesItemList(orderID);
 		for (MetaObject item : prodList) {
-			item.put("_orderStatus", newStatus);
+			item.put(orderStatus, newStatus);
 			item.saveDelta();
 		}
 		
@@ -864,13 +879,13 @@ public class SimpleShoppingCart {
 		inMap.remove("_orderID");
 		inMap.remove("_sellerID");
 		
-		inMap.remove("_ownerID");
+		inMap.remove(ownerID);
 		inMap.remove("_ownerMeta");
 		
 		inMap.remove("_productID");
 		inMap.remove("_productMeta");
 		
-		inMap.remove("_orderStatus");
+		inMap.remove(orderStatus);
 		
 		// Other systems reserved vars
 		inMap.remove("_createTime");

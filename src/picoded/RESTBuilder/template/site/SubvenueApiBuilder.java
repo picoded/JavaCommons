@@ -1,32 +1,20 @@
 package picoded.RESTBuilder.template.site;
 
+import java.util.List;
+import java.util.Map;
+
+import picoded.JStruct.JStruct;
+import picoded.JStruct.MetaObject;
+import picoded.JStruct.module.site.SubvenueBookings;
 import picoded.RESTBuilder.RESTBuilder;
 import picoded.RESTBuilder.RESTFunction;
-import picoded.RESTBuilder.template.core.*;
+import picoded.RESTBuilder.template.core.MetaTableApiBuilder;
 import picoded.enums.HttpRequestType;
-import picoded.JStruct.*;
-import picoded.JStruct.module.site.*;
-import picoded.servlet.*;
-import picoded.struct.*;
-import picoded.conv.*;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-
+import picoded.servlet.BasePage;
+import picoded.struct.GenericConvertList;
+import picoded.struct.GenericConvertMap;
 //For HMAC key generation
-import java.nio.charset.Charset;
-import java.security.SignatureException;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 // import java.lang.System.*;
-import com.google.common.io.BaseEncoding;
 ///
 /// Provides a product listings API
 /// All in a single API package.
@@ -223,7 +211,6 @@ public class SubvenueApiBuilder {
 		booking = core.createSubvenueBooking(subvenueID, eventID, venueID, paymentAmount);
 		
 		// Creating the date items
-		@SuppressWarnings("unchecked")
 		// List<List<Object>> datesList = (List<List<Object>>)(Object)req.getObjectList("list", null);
 		Map<String, Object> datesList_obj_raw = req.getStringMap("list", null);
 		
@@ -332,7 +319,7 @@ public class SubvenueApiBuilder {
 			subvenueBookingStatus_GET_and_POST);
 		
 		bookingsApi = new MetaTableApiBuilder(core.subvenueBookingDates);
-		subvenueBookingsApi = new MetaTableApiBuilder(core.subvenueBookings);
+		subvenueBookingsApi = new MetaTableApiBuilder(core.subvenueBooking);
 		//ownerApi.setupRESTBuilder( rb, setPrefix + "owner" );
 		bookingsApi.setupRESTBuilder(rb, setPrefix + "subvenuebookingDates.");
 		subvenueBookingsApi.setupRESTBuilder(rb, setPrefix + "subvenuebookings.");

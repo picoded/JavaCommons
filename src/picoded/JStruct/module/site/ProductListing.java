@@ -18,13 +18,14 @@ import picoded.struct.GenericConvertMap;
 public class ProductListing {
 	
 	/// Inventory owner metatable
-	public MetaTable productOwner = null;
+	protected MetaTable productOwner = null;
 	
 	/// Inventory listing
 	public MetaTable productItem = null;
 	
 	/// Product list max size
-	public int product_max = 250;
+	protected int productMax = 250;
+	
 	private static String ownerID = "_ownerID";
 	
 	/// Empty constructor
@@ -95,7 +96,7 @@ public class ProductListing {
 		
 		// Fetch and populate
 		MetaObject[] queryRet = productItem.query(ownerID + "=?", new String[] { ownerID },
-			"_createdTime", 0, product_max);
+			"_createdTime", 0, productMax);
 		if (queryRet != null && queryRet.length > 0) {
 			for (int i = 0; i < queryRet.length; ++i) {
 				ret.add(queryRet[i]);

@@ -39,7 +39,7 @@ public class SimpleShoppingCart {
 	public MetaTable productItem = null;
 	
 	/// Atomic product counting
-	public AtomicLongMap productCount = null;
+	protected AtomicLongMap productCount = null;
 	
 	/// Sales order
 	public MetaTable salesOrder = null;
@@ -48,21 +48,21 @@ public class SimpleShoppingCart {
 	public MetaTable salesItem = null;
 	
 	/// Shopping cart cookie name
-	public String shoppingCartCookieName = "shopping-cart";
+	protected String shoppingCartCookieName = "shopping-cart";
 	
 	/// Cart maximum size
-	public int cartMax = 50;
+	protected int cartMax = 50;
 	
 	/// Product list max size
-	public int productMax = 250;
+	protected int productMax = 250;
 	
 	/// Transaction percentage fee
-	public double transactionPercentage = 2.9;
-	public double transactionFixed = 0.99;
-	public String transactionProductPriceKey = "display_price";
+	protected double transactionPercentage = 2.9;
+	protected double transactionFixed = 0.99;
+	protected String transactionProductPriceKey = "display_price";
 	
-	private static String ownerID = "_ownerID";
-	private static String orderStatus = "_orderStatus";
+	protected String ownerID = "_ownerID";
+	protected String orderStatus = "_orderStatus";
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//

@@ -32,7 +32,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	public ConcurrentMap<String, Long> expireMap = new ConcurrentHashMap<String, Long>();
 	
 	/// Read write lock
-	public static final ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
+	protected ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
 	
 	///
 	/// Constructor setup
@@ -45,7 +45,7 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Temp value flag, defaults to false
-	public boolean isTempHint = false;
+	protected boolean isTempHint = false;
 	
 	/// Gets if temp mode optimization hint is indicated
 	/// Note that this only serve as a hint, as does not indicate actual setting
@@ -454,10 +454,10 @@ public class JStruct_KeyValueMap implements KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Default nonce lifetime (1 hour)
-	public static int nonceDefaultLifetime = 3600;
+	protected int nonceDefaultLifetime = 3600;
 	
 	/// Default nonce string length (22 is chosen to be consistent with base58 GUID's)
-	public static int nonceDefaultLength = 22;
+	protected int nonceDefaultLength = 22;
 	
 	/// Generates a random nonce hash, and saves the value to it
 	///

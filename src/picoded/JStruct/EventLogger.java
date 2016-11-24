@@ -27,16 +27,14 @@ import java.util.logging.Logger;
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
 public interface EventLogger {
+	
 	/// Core logging function
-	@SuppressWarnings("resource")
 	default void log(Level l, Exception e, String format, Object... args) {
-		
 		// Build the string and format
 		StringBuilder sb = new StringBuilder();
 		Formatter formatter = new Formatter(sb, Locale.US);
-		formatter.format(format, args);
-		
 		// Logs it in standrad log
+		formatter.close();
 		if (e != null) {
 			Logger.getLogger(EventLogger.class.getName()).log(l, sb.toString(), e);
 		} else {

@@ -152,11 +152,9 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	public long getExpiryRaw(String key) {
 		long ret = -1;
 		for (JStruct_KeyValueMap i : implementationLayers()) {
-			if ((ret = i.getExpiryRaw(key)) >= 0) {
-				return ret;
-			}
+			ret = i.getExpiryRaw(key);
 		}
-		return -1;
+		return ret;
 	}
 	
 	/// [Internal use, to be extended in future implementation]
@@ -192,11 +190,9 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	public String getValueRaw(String key, long now) {
 		String val = null;
 		for (JStruct_KeyValueMap i : implementationLayers()) {
-			if ((val = i.getValueRaw(key, now)) != null) {
-				return val;
-			}
+			val = i.getValueRaw(key, now);
 		}
-		return null;
+		return val;
 	}
 	
 	///
@@ -229,11 +225,9 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	public Set<String> getKeys(String value) {
 		Set<String> ret = null;
 		for (JStruct_KeyValueMap i : implementationLayers_reverse()) {
-			if ((ret = i.getKeys(value)) != null) {
-				return ret;
-			}
+			ret = i.getKeys(value);
 		}
-		return null;
+		return ret;
 	}
 	
 	/// Search using the value, all the relevent key mappings

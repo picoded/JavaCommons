@@ -1,5 +1,7 @@
 package picoded.JStruct.internal;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,8 +44,71 @@ public class JStack_KeyValueMap_test {
 		return new JStackLayer[] { new JStruct(), JSql.sqlite() };
 	}
 	
+	private JStackLayer[] stackLayersNull() {
+		return new JStackLayer[] { null };
+	}
+	
 	@Test
-	public void name() {
-		
+	public void implementationLayersTest() {
+		JStruct_KeyValueMap[] implementationLayer = {};
+		assertNotNull(implementationLayer = jStack_KeyValueMap.implementationLayers());
+		assertNotNull(new JStack_KeyValueMap(new JStack(stackLayersNull()), "hello123")
+			.implementationLayers());
+		jStack_KeyValueMap.implementationLayer = implementationLayer;
+		assertNotNull(jStack_KeyValueMap.implementationLayers());
+	}
+	
+	@Test
+	public void implementationLayersReverseTest() {
+		JStruct_KeyValueMap[] implementationLayersReversed = {};
+		assertNotNull(implementationLayersReversed = jStack_KeyValueMap
+			.implementationLayers_reverse());
+		jStack_KeyValueMap.implementationLayersReversed = implementationLayersReversed;
+		assertNotNull(jStack_KeyValueMap.implementationLayers_reverse());
+	}
+	
+	@Test(expected = Exception.class)
+	public void maintenanceTest() throws Exception {
+		jStack_KeyValueMap.maintenance();
+	}
+	
+	@Test(expected = Exception.class)
+	public void incrementalMaintenanceTest() throws Exception {
+		jStack_KeyValueMap.incrementalMaintenance();
+	}
+	
+	@Test
+	public void clearTest() {
+		jStack_KeyValueMap.clear();
+	}
+	
+	@Test(expected = Exception.class)
+	public void getExpiryRawTest() throws Exception {
+		assertNotNull(jStack_KeyValueMap.getExpiryRaw("value"));
+	}
+	
+	@Test(expected = Exception.class)
+	public void setExpiryRawTest() throws Exception {
+		jStack_KeyValueMap.setExpiryRaw("value", 123l);
+	}
+	
+	@Test(expected = Exception.class)
+	public void getValueRawTest() throws Exception {
+		assertNotNull(jStack_KeyValueMap.getValueRaw("value", 0l));
+	}
+	
+	@Test(expected = Exception.class)
+	public void setValueRawTest() throws Exception {
+		jStack_KeyValueMap.setValueRaw("value", "123l", 1);
+	}
+	
+	@Test(expected = Exception.class)
+	public void getKeysTest() throws Exception {
+		assertNotNull(jStack_KeyValueMap.getKeys("value"));
+	}
+	
+	@Test(expected = Exception.class)
+	public void removeTest() throws Exception {
+		jStack_KeyValueMap.remove("value", 123l);
 	}
 }

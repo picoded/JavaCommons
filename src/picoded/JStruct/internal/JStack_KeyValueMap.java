@@ -1,6 +1,8 @@
 package picoded.JStruct.internal;
 
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import picoded.JStack.JStack;
 import picoded.JStruct.JStruct;
@@ -12,8 +14,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	//public static final Logger logger = 
-	//Logger.getLogger(JStack_KeyValueMap.class.getName());
+	public static final Logger logger = Logger.getLogger(JStack_KeyValueMap.class.getName());
 	
 	///
 	/// Constructor setup
@@ -116,7 +117,11 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	@Override
 	public void maintenance() {
 		for (JStruct_KeyValueMap i : implementationLayers()) {
-			i.maintenance();
+			try {
+				i.maintenance();
+			} catch (Exception e) {
+				logger.log(Level.WARNING, e.getMessage());
+			}
 		}
 	}
 	
@@ -124,7 +129,11 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	@Override
 	public void incrementalMaintenance() {
 		for (JStruct_KeyValueMap i : implementationLayers()) {
-			i.incrementalMaintenance();
+			try {
+				i.incrementalMaintenance();
+			} catch (Exception e) {
+				logger.log(Level.WARNING, e.getMessage());
+			}
 		}
 	}
 	
@@ -132,7 +141,12 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	@Override
 	public void clear() {
 		for (JStruct_KeyValueMap i : implementationLayers()) {
-			i.clear();
+			try {
+				i.clear();
+			} catch (Exception e) {
+				logger.log(Level.WARNING, e.getMessage());
+			}
+			
 		}
 	}
 	
@@ -152,7 +166,11 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	public long getExpiryRaw(String key) {
 		long ret = -1;
 		for (JStruct_KeyValueMap i : implementationLayers()) {
-			ret = i.getExpiryRaw(key);
+			try {
+				ret = i.getExpiryRaw(key);
+			} catch (Exception e) {
+				logger.log(Level.WARNING, e.getMessage());
+			}
 		}
 		return ret;
 	}
@@ -169,7 +187,11 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	@Override
 	public void setExpiryRaw(String key, long time) {
 		for (JStruct_KeyValueMap i : implementationLayers_reverse()) {
-			i.setExpiryRaw(key, time);
+			try {
+				i.setExpiryRaw(key, time);
+			} catch (Exception e) {
+				logger.log(Level.WARNING, e.getMessage());
+			}
 		}
 	}
 	
@@ -190,7 +212,12 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	public String getValueRaw(String key, long now) {
 		String val = null;
 		for (JStruct_KeyValueMap i : implementationLayers()) {
-			val = i.getValueRaw(key, now);
+			try {
+				val = i.getValueRaw(key, now);
+			} catch (Exception e) {
+				logger.log(Level.WARNING, e.getMessage());
+			}
+			
 		}
 		return val;
 	}
@@ -209,7 +236,12 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	@Override
 	public String setValueRaw(String key, String value, long expire) {
 		for (JStruct_KeyValueMap i : implementationLayers_reverse()) {
-			i.setValueRaw(key, value, expire);
+			try {
+				i.setValueRaw(key, value, expire);
+			} catch (Exception e) {
+				logger.log(Level.WARNING, e.getMessage());
+			}
+			
 		}
 		return null;
 	}
@@ -225,7 +257,12 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	public Set<String> getKeys(String value) {
 		Set<String> ret = null;
 		for (JStruct_KeyValueMap i : implementationLayers_reverse()) {
-			ret = i.getKeys(value);
+			try {
+				ret = i.getKeys(value);
+			} catch (Exception e) {
+				logger.log(Level.WARNING, e.getMessage());
+			}
+			
 		}
 		return ret;
 	}
@@ -240,7 +277,11 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	@Override
 	public String remove(Object key) {
 		for (JStruct_KeyValueMap i : implementationLayers_reverse()) {
-			i.remove(key);
+			try {
+				i.remove(key);
+			} catch (Exception e) {
+				logger.log(Level.WARNING, e.getMessage());
+			}
 		}
 		return null;
 	}

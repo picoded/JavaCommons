@@ -1,6 +1,6 @@
 package picoded.JStruct.internal;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -67,13 +67,13 @@ public class JStack_KeyValueMap_test {
 		assertNotNull(jStack_KeyValueMap.implementationLayers_reverse());
 	}
 	
-	@Test(expected = Exception.class)
-	public void maintenanceTest() throws Exception {
+	@Test
+	public void maintenanceTest() {
 		jStack_KeyValueMap.maintenance();
 	}
 	
-	@Test(expected = Exception.class)
-	public void incrementalMaintenanceTest() throws Exception {
+	@Test
+	public void incrementalMaintenanceTest() {
 		jStack_KeyValueMap.incrementalMaintenance();
 	}
 	
@@ -82,34 +82,34 @@ public class JStack_KeyValueMap_test {
 		jStack_KeyValueMap.clear();
 	}
 	
-	@Test(expected = Exception.class)
-	public void getExpiryRawTest() throws Exception {
+	@Test
+	public void getExpiryRawTest() {
 		assertNotNull(jStack_KeyValueMap.getExpiryRaw("value"));
 	}
 	
-	@Test(expected = Exception.class)
-	public void setExpiryRawTest() throws Exception {
+	@Test
+	public void setExpiryRawTest() {
 		jStack_KeyValueMap.setExpiryRaw("value", 123l);
 	}
 	
-	@Test(expected = Exception.class)
-	public void getValueRawTest() throws Exception {
-		assertNotNull(jStack_KeyValueMap.getValueRaw("value", 0l));
+	@Test
+	public void getValueRawTest() {
+		assertNull(jStack_KeyValueMap.getValueRaw("value", 0l));
 	}
 	
-	@Test(expected = Exception.class)
-	public void setValueRawTest() throws Exception {
+	@Test
+	public void setValueRawTest() {
 		jStack_KeyValueMap.setValueRaw("value", "123l", 1);
 	}
 	
-	@Test(expected = Exception.class)
-	public void getKeysTest() throws Exception {
+	@Test
+	public void getKeysTest() {
 		assertNotNull(jStack_KeyValueMap.getKeys("value"));
 	}
 	
-	@Test(expected = Exception.class)
-	public void removeTest() throws Exception {
-		assertNotNull(jStack_KeyValueMap.remove("value"));
+	@Test
+	public void removeTest() {
+		assertNull(jStack_KeyValueMap.remove("value"));
 	}
 	
 	@Test

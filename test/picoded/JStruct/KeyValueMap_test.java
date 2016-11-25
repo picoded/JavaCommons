@@ -161,10 +161,8 @@ public class KeyValueMap_test {
 	
 	@Test
 	public void generateNonceTest() {
-		String nonce;
-		assertNotNull(nonce = kvmObj.generateNonce("hello"));
-		assertNotNull(nonce = kvmObj.generateNonce("hello", 1, "hello".length()));
-		assertEquals("hello", kvmObj.get(nonce));
+		acessInterface = new CommonDefaultAcessInterface();
+		assertNotNull(acessInterface.generateNonce("hello", 1, "hello".length()));
 	}
 	
 }

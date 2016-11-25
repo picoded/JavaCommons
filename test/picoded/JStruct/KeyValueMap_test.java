@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.After;
 // Test Case include
 import org.junit.Before;
@@ -144,7 +145,10 @@ public class KeyValueMap_test {
 	@Test
 	public void incrementalMaintenanceTest() {
 		acessInterface = new CommonDefaultAcessInterface();
-		acessInterface.incrementalMaintenance();
+		for (int i = 0; i < 100; i++) {
+			acessInterface.incrementalMaintenance();
+		}
+		
 	}
 	
 	@Test

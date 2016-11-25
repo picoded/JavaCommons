@@ -56,7 +56,8 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	default void incrementalMaintenance() {
 		// 2 percent chance of trigering maintenance
 		// This is to lower to overall performance cost incrementalMaintenance per request
-		if (RandomUtils.nextInt(0, 100) <= 2) {
+		int num = RandomUtils.nextInt(0, 100);
+		if (num <= 2) {
 			maintenance();
 		}
 	}

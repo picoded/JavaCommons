@@ -141,12 +141,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	@Override
 	public void clear() {
 		for (JStruct_KeyValueMap i : implementationLayers()) {
-			try {
-				i.clear();
-			} catch (Exception e) {
-				logger.log(Level.WARNING, e.getMessage());
-			}
-			
+			i.clear();
 		}
 	}
 	

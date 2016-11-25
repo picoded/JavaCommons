@@ -112,8 +112,8 @@ public class JStack_KeyValueMap_test {
 		assertNotNull(jStack_KeyValueMap.remove("value"));
 	}
 	
-	@Test(expected = Exception.class)
-	public void systemSetupTest() throws Exception {
+	@Test
+	public void systemSetupTest() {
 		jStack_KeyValueMap.systemSetup();
 		jStack_KeyValueMap.systemTeardown();
 	}

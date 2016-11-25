@@ -1,12 +1,15 @@
 package picoded.JStruct;
 
 // Target test class
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.apache.commons.lang3.RandomUtils;
 import org.junit.After;
 // Test Case include
 import org.junit.Before;
@@ -155,6 +158,7 @@ public class KeyValueMap_test {
 	public void containsKeyTest() {
 		acessInterface = new CommonDefaultAcessInterface();
 		assertNotNull(acessInterface.containsKey("hello"));
+		assertNotNull(acessInterface.containsKey("_oid"));
 	}
 	
 	@Test

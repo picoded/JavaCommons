@@ -26,11 +26,11 @@ public class SubvenueBookings {
 	///Subvenue Booking Dates metatable
 	public MetaTable subvenueBookingDates = null;
 	
-	private int bookingsMax = 50;
+	protected int bookingsMax = 50;
 	
-	private static String errorMsg = "Missing in_subvenueId";
+	protected String errorMsg = "Missing in_subvenueId";
 	
-	private static String createdTime = "_createdTime";
+	protected String createdTime = "_createdTime";
 	
 	/// Empty constructor
 	public SubvenueBookings() {

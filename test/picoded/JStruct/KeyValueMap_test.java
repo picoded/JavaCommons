@@ -1,10 +1,7 @@
 package picoded.JStruct;
 
 // Target test class
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,12 +11,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import picoded.CommonDefaultAcessInterface;
+
 // Test depends
 
 public class KeyValueMap_test {
 	
 	// / Test object
 	public KeyValueMap kvmObj = null;
+	CommonDefaultAcessInterface acessInterface = null;
 	
 	// / To override for implementation
 	// /------------------------------------------------------
@@ -142,6 +142,24 @@ public class KeyValueMap_test {
 	// /------------------------------------------------------
 	
 	@Test
+	public void incrementalMaintenanceTest() {
+		acessInterface = new CommonDefaultAcessInterface();
+		acessInterface.incrementalMaintenance();
+	}
+	
+	@Test
+	public void containsKeyTest() {
+		acessInterface = new CommonDefaultAcessInterface();
+		assertNotNull(acessInterface.containsKey("hello"));
+	}
+	
+	@Test
+	public void keySetTest() {
+		acessInterface = new CommonDefaultAcessInterface();
+		assertNull(acessInterface.keySet());
+	}
+	
+	@Test
 	public void generateNonceTest() {
 		String nonce;
 		assertNotNull(nonce = kvmObj.generateNonce("hello"));
@@ -149,13 +167,4 @@ public class KeyValueMap_test {
 		assertEquals("hello", kvmObj.get(nonce));
 	}
 	
-	@Test
-	public void keySetTest() {
-		assertNotNull(kvmObj.keySet());
-	}
-	
-	@Test
-	public void containsKeyTest() {
-		assertNotNull(kvmObj.containsKey("hello"));
-	}
 }

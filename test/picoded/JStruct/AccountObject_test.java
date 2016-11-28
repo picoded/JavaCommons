@@ -104,6 +104,6 @@ public class AccountObject_test {
 	
 	@Test
 	public void isSuperUserTest() {
-		assertTrue(accountObject.isSuperUser());
+		assertFalse(accountObject.isSuperUser());
 	}
 }

@@ -16,12 +16,12 @@ public class AccountObject extends JStruct_MetaObject {
 	/// The original table
 	protected AccountTable accountTable = null;
 	
-	private static String groupName="isGroup";
+	private static String groupName = "isGroup";
 	private static Long longValue = Long.valueOf("999999999");
 	
 	/// Constructor full setup
-	protected AccountObject(AccountTable accTable, JStruct_MetaTable inTable, 
-			String inOID, boolean isCompleteData) {
+	protected AccountObject(AccountTable accTable, JStruct_MetaTable inTable, String inOID,
+		boolean isCompleteData) {
 		super(inTable, inOID);
 		accountTable = accTable;
 	}
@@ -125,10 +125,10 @@ public class AccountObject extends JStruct_MetaObject {
 		
 		// Iterate the names, delete uneeded ones
 		for (String oldName : oldNamesList) {
-//			// Skip new name
-//			if (oldName.equals(name)) {
-//				continue;
-//			}
+			//			// Skip new name
+			//			if (oldName.equals(name)) {
+			//				continue;
+			//			}
 			removeName(oldName);
 		}
 		
@@ -159,7 +159,7 @@ public class AccountObject extends JStruct_MetaObject {
 		if (status instanceof Number && //
 			((Number) status).intValue() >= 1) {
 			return true;
-		} 
+		}
 		return false;
 		//return ( group_userToRoleMap().size() > 1 );
 	}
@@ -195,8 +195,8 @@ public class AccountObject extends JStruct_MetaObject {
 			return null;
 		}
 		
-		return accountTable.groupChildMeta.uncheckedGet(
-				accountTable.getGroupChildMetaKey(this._oid(), memberOID));
+		return accountTable.groupChildMeta.uncheckedGet(accountTable.getGroupChildMetaKey(
+			this._oid(), memberOID));
 	}
 	
 	/// Gets and returns the member meta map, if it exists
@@ -266,7 +266,7 @@ public class AccountObject extends JStruct_MetaObject {
 		
 		accountTable.groupChildMeta.remove(this._oid() + "-" + memberOID);
 		
-//		System.out.println("Remove member called successfully");
+		//		System.out.println("Remove member called successfully");
 		
 		return true;
 	}
@@ -327,11 +327,10 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// This method logs the details about login faailure for the user based on User ID
 	public void logLoginFailure(String userID) {
-		accountTable.loginThrottlingAttempt.putWithLifespan(userID, "1", 
-				longValue.longValue());
+		accountTable.loginThrottlingAttempt.putWithLifespan(userID, "1", longValue.longValue());
 		int elapsedTime = ((int) (System.currentTimeMillis() / 1000)) + 2;
-		accountTable.loginThrottlingElapsed.putWithLifespan(userID, 
-				String.valueOf(elapsedTime), longValue.longValue());
+		accountTable.loginThrottlingElapsed.putWithLifespan(userID, String.valueOf(elapsedTime),
+			longValue.longValue());
 	}
 	
 	/// This method returns time left before next permitted login attempt for the user based on User ID
@@ -362,11 +361,11 @@ public class AccountObject extends JStruct_MetaObject {
 			int attemptValue = Integer.parseInt(atteemptValueString);
 			int elapsedValue = (int) (System.currentTimeMillis() / 1000);
 			attemptValue++;
-			accountTable.loginThrottlingAttempt.putWithLifespan(userId, 
-					String.valueOf(attemptValue), longValue.longValue());
+			accountTable.loginThrottlingAttempt.putWithLifespan(userId, String.valueOf(attemptValue),
+				longValue.longValue());
 			elapsedValue += attemptValue * 2;
-			accountTable.loginThrottlingElapsed.putWithLifespan(userId, 
-					String.valueOf(elapsedValue), longValue.longValue());
+			accountTable.loginThrottlingElapsed.putWithLifespan(userId, String.valueOf(elapsedValue),
+				longValue.longValue());
 		}
 		
 	}

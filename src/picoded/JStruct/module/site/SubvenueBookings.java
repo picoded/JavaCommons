@@ -21,10 +21,10 @@ import picoded.struct.GenericConvertMap;
 public class SubvenueBookings {
 
 	/// Subvenue Bookings metatable
-	protected MetaTable subvenueBooking = null;
+	public MetaTable subvenueBooking = null;
 
 	///Subvenue Booking Dates metatable
-	protected MetaTable subvenueBookingDates = null;
+	public MetaTable subvenueBookingDates = null;
 
 	protected int bookingsMax = 50;
 	

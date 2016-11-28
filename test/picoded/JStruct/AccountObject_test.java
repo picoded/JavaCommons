@@ -70,17 +70,41 @@ public class AccountObject_test {
 	@Test(expected = Exception.class)
 	public void setNamesTest() throws Exception {
 		assertNotNull(accountObject.setName(null));
+	}
+
+	@Test(expected = Exception.class)
+	public void setNamesTest1() throws Exception {
 		assertNotNull(accountObject.setName(""));
 	}
 
 	@Test
-	public void getNames() {
+	public void getNamesTest() {
 		assertNotNull(accountObject.setName("user1"));
 		assertNotNull(accountObject.setName("user2"));
 		assertNotNull(accountObject.setName("user3"));
 		assertNotNull(accountObject.getNames());
 		accountObject.removeName("user3");
 		assertFalse(accountObject.setUniqueName("user1"));
-		assertTrue(accountObject.setUniqueName("AdminUser"));
+		assertTrue(accountObject.setUniqueName("JavaAdminUser"));
+	}
+
+	@Test
+	public void setGroupStatusTest() {
+		accountObject.setGroupStatus(false);
+		assertFalse(accountObject.isGroup());
+		accountObject.setGroupStatus(true);
+		assertFalse(accountObject.isGroup());
+	}
+
+	@Test
+	public void addMemberTest() {
+		assertNotNull(accountObject.setMember(accountObject, "admin"));
+		assertNull(accountObject.addMember(accountObject, "admin"));
+		assertTrue(accountObject.removeMember(accountObject));
+	}
+	
+	@Test
+	public void isSuperUserTest(){
+		assertTrue(accountObject.isSuperUser());
 	}
 }

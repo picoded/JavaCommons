@@ -2,7 +2,6 @@ package picoded.JStruct;
 
 /// Java imports
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -120,16 +119,16 @@ public class AccountObject extends JStruct_MetaObject {
 		
 		// The old name list, to check if new name already is set
 		Set<String> oldNamesList = getNames();
-		if (!(Arrays.asList(oldNamesList).contains(name)) && !setName(name)) {
+		if (oldNamesList.contains(name) && !setName(name)) {
 			return false;
 		}
 		
 		// Iterate the names, delete uneeded ones
 		for (String oldName : oldNamesList) {
-			// Skip new name
-			if (oldName.equals(name)) {
-				continue;
-			}
+//			// Skip new name
+//			if (oldName.equals(name)) {
+//				continue;
+//			}
 			removeName(oldName);
 		}
 		

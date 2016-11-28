@@ -50,34 +50,32 @@ public class SubvenueBookings_test {
 	
 	@Test(expected = Exception.class)
 	public void getSubvenueBookings_bySubVenueIdTest() throws Exception {
+		assertNotNull(subvenueBookings.getSubvenueBookings_bySubVenueId("_subvenueID"));
 		assertNotNull(subvenueBookings.getSubvenueBookings_bySubVenueId(null));
 		assertNotNull(subvenueBookings.getSubvenueBookings_bySubVenueId(""));
-		assertNotNull(subvenueBookings.getSubvenueBookings_bySubVenueId("_subvenueID"));
-		
 	}
 	
 	@Test(expected = Exception.class)
 	public void getSubvenueBookings_byBookingIdTest() throws Exception {
+		assertNotNull(subvenueBookings.getSubvenueBookings_byBookingId("_bookingID"));
 		assertNotNull(subvenueBookings.getSubvenueBookings_byBookingId(null));
 		assertNotNull(subvenueBookings.getSubvenueBookings_byBookingId(""));
-		assertNotNull(subvenueBookings.getSubvenueBookings_byBookingId("_bookingID"));
 		
 	}
 	
 	@Test(expected = Exception.class)
 	public void getSubvenueBookingDates_byBookingIdTest() throws Exception {
+		assertNotNull(subvenueBookings.getSubvenueBookingDates_byBookingId("_subvenueID"));
 		assertNotNull(subvenueBookings.getSubvenueBookingDates_byBookingId(null));
 		assertNotNull(subvenueBookings.getSubvenueBookingDates_byBookingId(""));
-		assertNotNull(subvenueBookings.getSubvenueBookingDates_byBookingId("_subvenueID"));
 		
 	}
 	
 	@Test(expected = Exception.class)
 	public void updateSubvenueBookingStatusTest() throws Exception {
+		assertNotNull(subvenueBookings.updateSubvenueBookingStatus("_subvenueID", "newStatus"));
 		assertNotNull(subvenueBookings.updateSubvenueBookingStatus(null, null));
 		assertNotNull(subvenueBookings.updateSubvenueBookingStatus("", ""));
-		assertNotNull(subvenueBookings.updateSubvenueBookingStatus("_subvenueID", "newStatus"));
-		
 	}
 	
 	@Test(expected = Exception.class)

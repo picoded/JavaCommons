@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.After;
 import org.junit.Before;
@@ -12,6 +13,7 @@ import org.junit.Test;
 
 import picoded.JStruct.JStruct;
 import picoded.JStruct.MetaTable;
+import picoded.conv.GUID;
 import picoded.enums.ObjectTokens;
 
 public class JStruct_MetaObject_test {
@@ -33,13 +35,33 @@ public class JStruct_MetaObject_test {
 		return (new JStruct()).getMetaTable("test");
 	}
 	
-	@Test
-	public void commonSetupTest() {
+	@Test(expected = Exception.class)
+	public void commonSetupTest() throws Exception {
+		JStruct_MetaTable jStruct_MetaTable = new JStruct_MetaTable();
+		Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
+		
+		String _oid = GUID.base58();
 		Map<String, Object> remoteDataMap = new HashMap<String, Object>();
 		remoteDataMap.put("key5", new String("hello"));
 		jStruct_MetaObject.remoteDataMap = remoteDataMap;
-		MetaTable metaTable = new JStruct_MetaTable();
-		jStruct_MetaObject.commonSetup(metaTable, "_oid", null, false);
+		jStruct_MetaObject.commonSetup(jStruct_MetaTable, _oid, remoteDataMap, true);
+		
+		remoteDataMap = new HashMap<String, Object>();
+		remoteDataMap.put("_oid", _oid);
+		_valueMap.put(_oid, remoteDataMap);
+		jStruct_MetaTable._valueMap = _valueMap;
+		jStruct_MetaObject.commonSetup(jStruct_MetaTable, "_oid", null, false);
+		
+		_valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
+		remoteDataMap = new HashMap<String, Object>();
+		remoteDataMap.put("key5", new String("hello"));
+		remoteDataMap.put("_oid", _oid);
+		jStruct_MetaObject.remoteDataMap = remoteDataMap;
+		jStruct_MetaTable = new JStruct_MetaTable();
+		_valueMap.put(_oid, remoteDataMap);
+		jStruct_MetaTable._valueMap = _valueMap;
+		jStruct_MetaObject.commonSetup(jStruct_MetaTable, "_oid", null, false);
+		
 	}
 	
 	@Test

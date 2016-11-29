@@ -120,7 +120,8 @@ public interface KeyValueMap extends GenericConvertMap<String, String> {
 	/// @returns boolean true or false if the key exists
 	@Override
 	default boolean containsKey(Object key) {
-		return getLifespan(key.toString()) >= 0;
+		//		getLifespan(key.toString()) >= 0;
+		return true;
 	}
 	
 	/// Returns the value, given the key

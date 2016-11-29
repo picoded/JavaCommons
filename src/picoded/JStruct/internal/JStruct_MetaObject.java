@@ -61,7 +61,9 @@ public class JStruct_MetaObject implements MetaObject {
 		// Generates a GUID if not given
 		if (inOID == null || inOID.length() < 22) {
 			// Issue a GUID
-			_oid = GUID.base58();
+			if (_oid == null) {
+				_oid = GUID.base58();
+			}
 			
 			// D= GUID collision check for LOLZ
 			remoteDataMap = mainTable.metaObjectRemoteDataMap_get(_oid);

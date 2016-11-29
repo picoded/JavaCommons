@@ -113,6 +113,7 @@ public class AccountObject_test {
 		assertNull(accountObject.getMember(accountObject, "member"));
 		assertNotNull(accountObject.setMember(accountObject, "admin"));
 		assertNotNull(accountObject.setMember(accountObject, "guest"));
+		assertNotNull(accountObject.setMember(accountObject, "admin"));
 		assertNull(accountObject.addMember(accountObject, "admin"));
 		assertNull(accountObject.addMember(accountObject, "user"));
 		assertNotNull(accountObject.getMember(accountObject));

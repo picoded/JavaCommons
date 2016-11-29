@@ -117,6 +117,8 @@ public class AccountObject_test {
 		assertNotNull(accountObject.getMember(accountObject));
 		assertNotNull(accountObject.getMember(accountObject, "admin"));
 		assertNull(accountObject.getMember(accountObject, "guest"));
+		assertNotNull(accountObject.removeMember(accountObject));
+		accountObject.resetLoginThrottle("member");
 	}
 	
 	@Test

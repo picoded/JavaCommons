@@ -22,6 +22,10 @@ public class AccountObject_test {
 		return (new JStruct()).getAccountTable("test");
 	}
 	
+	public KeyValueMap implementationConstructor1() {
+		return (new JStruct()).getKeyValueMap("test");
+	}
+	
 	// / Setup and sanity test
 	// /------------------------------------------------------
 	@Before
@@ -53,6 +57,9 @@ public class AccountObject_test {
 		assertTrue(accountObject.setPassword("test@1234", "test@123"));
 		assertFalse(accountObject.setPassword("test", "test"));
 		assertTrue(accountObject.hasPassword());
+		accountObject.accountTable.keyValueMapAccountHash.put("test", "");
+		accountObject.setOID("test");
+		assertFalse(accountObject.hasPassword());
 	}
 	
 	@Test
@@ -84,8 +91,9 @@ public class AccountObject_test {
 		assertNotNull(accountObject.setName("user3"));
 		assertNotNull(accountObject.getNames());
 		accountObject.removeName("user3");
-		assertFalse(accountObject.setUniqueName("user1"));
 		assertTrue(accountObject.setUniqueName("JavaAdminUser"));
+		assertNotNull(accountObject.setName("JavaAdminUser"));
+		assertFalse(accountObject.setUniqueName("JavaAdminUser"));
 	}
 	
 	@Test

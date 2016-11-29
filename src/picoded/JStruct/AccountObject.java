@@ -120,7 +120,7 @@ public class AccountObject extends JStruct_MetaObject {
 	
 	/// Sets the name as a unique value, delete all previous alias
 	public boolean setUniqueName(String name) {
-		boolean returnValue = false;
+		boolean returnValue = true;
 		// The old name list, to check if new name already is set
 		Set<String> oldNamesList = getNames();
 		if (oldNamesList.contains(name)) {

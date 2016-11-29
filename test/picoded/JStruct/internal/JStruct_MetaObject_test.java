@@ -61,7 +61,20 @@ public class JStruct_MetaObject_test {
 		_valueMap.put(_oid, remoteDataMap);
 		jStruct_MetaTable._valueMap = _valueMap;
 		jStruct_MetaObject.commonSetup(jStruct_MetaTable, "_oid", null, false);
-		
+	}
+	
+	@Test(expected = Exception.class)
+	public void commonSetupTest1() throws Exception {
+		JStruct_MetaTable jStruct_MetaTable = new JStruct_MetaTable();
+		Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
+		String _oid = GUID.base58();
+		Map<String, Object> remoteDataMap = new HashMap<String, Object>();
+		remoteDataMap.put("key5", new String("hello"));
+		jStruct_MetaObject.remoteDataMap = remoteDataMap;
+		_valueMap.put(_oid, remoteDataMap);
+		jStruct_MetaTable._valueMap = _valueMap;
+		jStruct_MetaObject.commonSetup(jStruct_MetaTable, _oid, remoteDataMap, true);
+		jStruct_MetaObject.commonSetup(jStruct_MetaTable, "_oid", null, false);
 	}
 	
 	@Test

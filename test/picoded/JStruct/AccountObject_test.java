@@ -114,12 +114,10 @@ public class AccountObject_test {
 		assertNotNull(accountObject.setMember(accountObject, "admin"));
 		assertNotNull(accountObject.setMember(accountObject, "guest"));
 		assertNull(accountObject.addMember(accountObject, "admin"));
-		assertNotNull(accountObject.isSuperUser());
 		assertNull(accountObject.addMember(accountObject, "user"));
 		assertNotNull(accountObject.getMember(accountObject));
 		assertNotNull(accountObject.getMember(accountObject, "admin"));
 		assertNull(accountObject.getMember(accountObject, "guest"));
-		assertNotNull(accountObject.isSuperUser());
 		assertNotNull(accountObject.getNextLoginTimeAllowed("member"));
 		assertNotNull(accountObject.getTimeElapsedNextLogin("member"));
 		accountObject.addDelay("member");
@@ -129,15 +127,19 @@ public class AccountObject_test {
 		assertNotNull(accountObject.getNextLoginTimeAllowed("guest"));
 		assertNotNull(accountObject.getTimeElapsedNextLogin("admin"));
 		
+		accountObject.accountTable.setSuperUserGroupName("SuperUsers");
+		assertNotNull(accountObject.isSuperUser());
+		assertNotNull(accountObject.isSuperUser());
+		
 		accountObject.addDelay("admin");
 		assertNotNull(accountObject.isSuperUser());
 		assertNotNull(accountObject.removeMember(accountObject));
 		accountObject.resetLoginThrottle("member");
-		
 	}
 	
 	@Test
 	public void isSuperUserTest() {
+		accountObject.accountTable.setSuperUserGroupName("admin");
 		assertFalse(accountObject.isSuperUser());
 	}
 }

@@ -91,6 +91,7 @@ public class JStruct_KeyValueMap_test {
 	
 	@Test
 	public void generateNonceTest() {
+		assertNotNull(jStruct_KeyValueMap.generateNonce("key3"));
 		assertNotNull(jStruct_KeyValueMap.generateNonce("key3", 1l));
 	}
 	

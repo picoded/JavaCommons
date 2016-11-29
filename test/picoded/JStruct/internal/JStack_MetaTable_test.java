@@ -37,9 +37,21 @@ public class JStack_MetaTable_test {
 		JStack jStructObj = new JStack(jStackLayer);
 		jStack_MetaTable.stackObj = jStructObj;
 		assertNotNull(jStack_MetaTable.implementationLayers());
-		JStack_MetaTable jStack_MetaTable = new JStack_MetaTable(jStructObj, "test");
+		jStack_MetaTable = new JStack_MetaTable(jStructObj, "test");
+		jStack_MetaTable.stackObj = jStructObj;
+		assertNotNull(jStack_MetaTable.implementationLayers());
 		JStruct_MetaTable[] _implementationLayers = { jStack_MetaTable };
 		jStack_MetaTable.implementationLayer = _implementationLayers;
 		assertNotNull(jStack_MetaTable.implementationLayers());
+		assertNotNull(jStack_MetaTable.implementationLayersReversed = jStack_MetaTable
+			.implementationLayers_reverse());
+		assertNotNull(jStack_MetaTable.implementationLayers_reverse());
+	}
+	
+	@Test(expected = Exception.class)
+	public void systemTest() throws Exception {
+		jStack_MetaTable.systemSetup();
+		jStack_MetaTable.systemTeardown();
+		
 	}
 }

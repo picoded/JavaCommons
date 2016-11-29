@@ -197,7 +197,7 @@ public class AccountObject extends JStruct_MetaObject {
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
 		
-		if (level == null || level.length() <= 0) {
+		if (level == null) {
 			return null;
 		}
 		
@@ -342,7 +342,7 @@ public class AccountObject extends JStruct_MetaObject {
 	/// This method returns time left before next permitted login attempt for the user based on User ID
 	public int getNextLoginTimeAllowed(String userID) {
 		String val = accountTable.loginThrottlingElapsed.get(userID);
-		if (val == null || "".equals(val)) {
+		if (val == null) {
 			return 0;
 		}
 		int allowedTime = Integer.parseInt(val) - (int) (System.currentTimeMillis() / 1000);
@@ -352,7 +352,7 @@ public class AccountObject extends JStruct_MetaObject {
 	/// This method would be added in on next login failure for the user based on User ID
 	public long getTimeElapsedNextLogin(String userId) {
 		String elapsedValueString = accountTable.loginThrottlingElapsed.get(userId);
-		if (elapsedValueString == null || "".equals(elapsedValueString)) {
+		if (elapsedValueString == null) {
 			return (System.currentTimeMillis() / 1000) + 2;
 		}
 		return Long.parseLong(elapsedValueString);
@@ -361,7 +361,7 @@ public class AccountObject extends JStruct_MetaObject {
 	/// This method would be added the delay for the user based on User ID
 	public void addDelay(String userId) {
 		String atteemptValueString = accountTable.loginThrottlingAttempt.get(userId);
-		if (atteemptValueString == null || "".equals(atteemptValueString)) {
+		if (atteemptValueString == null) {
 			logLoginFailure(userId);
 		} else {
 			int attemptValue = Integer.parseInt(atteemptValueString);

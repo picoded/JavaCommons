@@ -104,13 +104,19 @@ public class AccountObject_test {
 		assertFalse(accountObject.isGroup());
 	}
 	
+	//	"", "member", "manager", "admin" 
+	
 	@Test
 	public void addMemberTest() {
-		assertNotNull(accountObject.setMember(accountObject, "admin"));
-		assertNull(accountObject.addMember(accountObject, "admin"));
-		assertTrue(accountObject.removeMember(accountObject));
 		assertNull(accountObject.getMember(accountObject));
-		assertNull(accountObject.getMember(accountObject, "admin"));
+		assertNull(accountObject.getMember(accountObject, "member"));
+		assertNotNull(accountObject.setMember(accountObject, "admin"));
+		assertNotNull(accountObject.setMember(accountObject, "guest"));
+		assertNull(accountObject.addMember(accountObject, "admin"));
+		assertNull(accountObject.addMember(accountObject, "user"));
+		assertNotNull(accountObject.getMember(accountObject));
+		assertNotNull(accountObject.getMember(accountObject, "admin"));
+		assertNull(accountObject.getMember(accountObject, "guest"));
 	}
 	
 	@Test

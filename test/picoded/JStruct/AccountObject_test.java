@@ -108,6 +108,7 @@ public class AccountObject_test {
 	
 	@Test
 	public void addMemberTest() {
+		assertNotNull(accountObject.removeMember(accountObject));
 		assertNull(accountObject.getMember(accountObject));
 		assertNull(accountObject.getMember(accountObject, "member"));
 		assertNotNull(accountObject.setMember(accountObject, "admin"));
@@ -122,9 +123,12 @@ public class AccountObject_test {
 		assertNotNull(accountObject.getNextLoginTimeAllowed("member"));
 		assertNotNull(accountObject.getTimeElapsedNextLogin("member"));
 		accountObject.addDelay("member");
-		
+		accountObject.addDelay("guest");
 		assertNotNull(accountObject.getNextLoginTimeAllowed("admin"));
+		assertNotNull(accountObject.getNextLoginTimeAllowed("member"));
+		assertNotNull(accountObject.getNextLoginTimeAllowed("guest"));
 		assertNotNull(accountObject.getTimeElapsedNextLogin("admin"));
+		
 		accountObject.addDelay("admin");
 		assertNotNull(accountObject.isSuperUser());
 		assertNotNull(accountObject.removeMember(accountObject));

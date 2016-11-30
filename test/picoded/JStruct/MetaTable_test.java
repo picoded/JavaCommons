@@ -565,11 +565,17 @@ public class MetaTable_test {
 		mObj.saveDelta();
 		
 		// Doing a query
-		//		MetaObject[] qRes = null;
-		assertNotNull(/*qRes = */table.query("num > ? OR be = ?", new Object[] { 0, "happy" }));
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = table.query("num > ? OR be = ?", new Object[] { 0, "happy" }));
 		// Each object has a base68 GUID
-		//		String guid = qRes[0]._oid();
+		String guid = qRes[0]._oid();
 		assertNotNull(table.queryKeys("num > ? OR be = ?", new Object[] { 0, "happy" }, null, 0, 0));
+		assertNotNull(table.get(guid, false));
+		assertNotNull(table.getFromKeyName("happy", null));
+		Map<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
+		objMap.put("hello", qRes);
+		assertNotNull(table.append(guid, objMap));
+		
 	}
 	
 	@Test

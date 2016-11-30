@@ -2,6 +2,8 @@ package picoded.JStruct.internal;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import picoded.JStack.JStack;
 import picoded.JStruct.JStruct;
@@ -20,7 +22,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	//	protected  Logger logger = Logger.getLogger(JStack_MetaTable.class.getName());
+	protected Logger logger = Logger.getLogger(JStack_MetaTable.class.getName());
 	
 	///
 	/// Constructor setup
@@ -106,17 +108,29 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	/// Setsup the backend storage table, etc. If needed
 	@Override
 	public void systemSetup() {
-		for (JStruct_MetaTable i : implementationLayers()) {
-			i.systemSetup();
+		try {
+			for (JStruct_MetaTable i : implementationLayers()) {
+				i.systemSetup();
+			}
+		} catch (Exception e) {
+			logger.log(Level.WARNING, e.getMessage());
+			
 		}
+		
 	}
 	
 	/// Teardown and delete the backend storage table, etc. If needed
 	@Override
 	public void systemTeardown() {
-		for (JStruct_MetaTable i : implementationLayers()) {
-			i.systemTeardown();
+		try {
+			for (JStruct_MetaTable i : implementationLayers()) {
+				i.systemTeardown();
+			}
+		} catch (Exception e) {
+			logger.log(Level.WARNING, e.getMessage());
+			
 		}
+		
 	}
 	
 	// MetaObject MAP operations
@@ -127,11 +141,11 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	public Set<String> keySet() {
 		Set<String> ret = null;
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
-			if ((ret = i.keySet()) != null) {
-				return ret;
+			if (i.keySet() != null) {
+				ret = i.keySet();
 			}
 		}
-		return null;
+		return ret;
 	}
 	
 	/// Remove the node
@@ -181,7 +195,6 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
 			i.metaObjectRemoteDataMap_update(_oid, fullMap, keys);
 		}
-		return;
 	}
 	
 	/// 
@@ -205,11 +218,11 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 		int offset, int limit) {
 		String[] ret = null;
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
-			if ((ret = i.queryKeys(whereClause, whereValues, orderByStr, offset, limit)) != null) {
-				return ret;
+			if (i.queryKeys(whereClause, whereValues, orderByStr, offset, limit) != null) {
+				ret = i.queryKeys(whereClause, whereValues, orderByStr, offset, limit);
 			}
 		}
-		return null;
+		return ret;
 	}
 	
 	/// Performs a search query, and returns the respective MetaObjects
@@ -237,11 +250,11 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	public long queryCount(String whereClause, Object[] whereValues) {
 		long ret = 0;
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
-			if ((ret = i.queryCount(whereClause, whereValues)) >= 0) {
-				return ret;
+			if (i.queryCount(whereClause, whereValues) >= 0) {
+				ret = i.queryCount(whereClause, whereValues);
 			}
 		}
-		return 0;
+		return ret;
 	}
 	
 }

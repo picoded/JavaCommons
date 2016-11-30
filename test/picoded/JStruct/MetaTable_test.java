@@ -575,6 +575,7 @@ public class MetaTable_test {
 		Map<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("hello", qRes);
 		assertNotNull(table.append(guid, qRes[0]));
+		assertNotNull(table.append("test", qRes[0]));
 		assertNotNull(table.getKeyNames(0));
 		assertNotNull(table.getKeyNames(-1));
 		assertNotNull(table.getFromKeyName_id("happy"));

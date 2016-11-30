@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import picoded.TestConfig;
 import picoded.JStruct.JStruct;
+import picoded.JStruct.MetaObject;
 import picoded.JStruct.MetaTable;
 import picoded.struct.GenericConvertHashMap;
 
@@ -45,8 +46,9 @@ public class SubvenueBookings_test {
 		return (new JStruct()).getMetaTable(tableName);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
-	public void createSubvenueBookingTest() {
+	public void createSubvenueBookingTest() throws Exception {
 		assertNotNull(resMap = (GenericConvertHashMap<String, Object>) subvenueBookings
 			.createSubvenueBooking("subvenueID", "eventID", "venueID", 10.0f));
 		assertNotNull(subvenueBookings.subvenueBookingDates.append("subvenueID", resMap));
@@ -54,6 +56,19 @@ public class SubvenueBookings_test {
 		assertNotNull(subvenueBookings.getSubvenueBookingDates_byBookingId(resMap.get("_subvenueID")
 			.toString()));
 		assertNotNull(subvenueBookings.getSubvenueBookingDates_byBookingId("_bookingID"));
+		assertNotNull(subvenueBookings.getSubvenueBookings_byBookingId(resMap.get("_oid").toString()));
+		Map<String, Object> datesList = new HashMap<String, Object>();
+		assertNotNull(subvenueBookings.createBookingSlots(null, datesList));
+		List<Object> list = new ArrayList<Object>();
+		list.add("2016-11-28");
+		list.add("2016-11-28");
+		datesList.put("date", list);
+		assertNotNull(resMap = (GenericConvertHashMap<String, Object>) subvenueBookings
+			.createBookingSlots(resMap.get("_oid").toString(), datesList));
+		ArrayList<MetaObject> itemList = (ArrayList<MetaObject>) resMap.get("_booking");
+		MetaObject dateItem = (MetaObject) itemList.get(0);
+		assertNotNull(subvenueBookings.getSubvenueBookingDates_byBookingId(dateItem.get("_bookingID")
+			.toString()));
 	}
 	
 	@Test
@@ -88,10 +103,20 @@ public class SubvenueBookings_test {
 	
 	@Test(expected = Exception.class)
 	public void updateSubvenueBookingStatusTest() throws Exception {
-		subvenueBookings.subvenueBooking = implementationConstructor();
-		assertNotNull(subvenueBookings.updateSubvenueBookingStatus(null, null));
-		assertNotNull(subvenueBookings.updateSubvenueBookingStatus("_subvenueID", ""));
-		assertNotNull(subvenueBookings.updateSubvenueBookingStatus("_subvenueID", "newStatus"));
+		assertNotNull(resMap = (GenericConvertHashMap<String, Object>) subvenueBookings
+			.createSubvenueBooking("subvenueID", "eventID", "venueID", 10.0f));
+		assertNotNull(subvenueBookings.subvenueBookingDates.append("subvenueID", resMap));
+		assertNotNull(subvenueBookings.subvenueBookingDates.append("_bookingID", resMap));
+		
+		assertNotNull(subvenueBookings.updateSubvenueBookingStatus(resMap.get("_oid").toString(),
+			"Approved"));
+		assertNotNull(subvenueBookings.updateSubvenueBookingStatus(null, ""));
+		
+	}
+	
+	@Test(expected = Exception.class)
+	public void updateSubvenueBookingStatusTest1() throws Exception {
+		assertNotNull(subvenueBookings.updateSubvenueBookingStatus("", ""));
 	}
 	
 	@Test(expected = Exception.class)

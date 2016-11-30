@@ -21,18 +21,18 @@ import picoded.JStruct.MetaTable;
 import picoded.conv.GUID;
 
 public class JStack_MetaTable_test {
-
+	
 	JStack_MetaTable jStack_MetaTable = null;
-
+	
 	@Before
 	public void setUp() {
 		jStack_MetaTable = new JStack_MetaTable();
 	}
-
+	
 	@After
 	public void tearDown() {
 	}
-
+	
 	@Test
 	public void jStack_MetaTable() {
 		JStackLayer jStackLayer = new JStackLayer() {
@@ -40,13 +40,13 @@ public class JStack_MetaTable_test {
 		JStack jStructObj = new JStack(jStackLayer);
 		new JStack_MetaTable(jStructObj, "_oid");
 	}
-
+	
 	// / To override for implementation
 	// /------------------------------------------------------
 	public MetaTable implementationConstructor() {
 		return (new JStruct()).getMetaTable("test");
 	}
-
+	
 	@Test
 	public void implementationLayersTest() {
 		JStackLayer jStackLayer = new JStackLayer() {
@@ -61,15 +61,15 @@ public class JStack_MetaTable_test {
 		jStack_MetaTable.implementationLayer = _implementationLayers;
 		assertNotNull(jStack_MetaTable.implementationLayers());
 		assertNotNull(jStack_MetaTable.implementationLayersReversed = jStack_MetaTable
-				.implementationLayers_reverse());
+			.implementationLayers_reverse());
 		assertNotNull(jStack_MetaTable.implementationLayers_reverse());
-		jStack_MetaTable.implementationLayer =null;
+		jStack_MetaTable.implementationLayer = null;
 		JStack jStack = new JStack(stackLayers());
 		jStack_MetaTable.stackObj = jStack;
 		assertNotNull(jStack_MetaTable.implementationLayers());
-
+		
 	}
-
+	
 	@Test
 	public void keySetTest() {
 		Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
@@ -82,7 +82,7 @@ public class JStack_MetaTable_test {
 		jStack_MetaTable.implementationLayersReversed = implementationLayersReversed;
 		assertNotNull(jStack_MetaTable.keySet());
 	}
-
+	
 	@Test
 	public void removeTest() {
 		Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
@@ -95,7 +95,7 @@ public class JStack_MetaTable_test {
 		jStack_MetaTable.implementationLayersReversed = implementationLayersReversed;
 		assertNull(jStack_MetaTable.remove("test1"));
 	}
-
+	
 	@Test
 	public void metaObjectRemoteDataMap_updateTest() {
 		Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
@@ -120,21 +120,24 @@ public class JStack_MetaTable_test {
 		jStack_MetaTable.implementationLayer = null;
 		assertNull(jStack_MetaTable.metaObjectRemoteDataMap_get("test"));
 	}
-
+	
 	private JStackLayer[] stackLayers() {
 		return new JStackLayer[] { new JStruct(), JSql.sqlite() };
 	}
-
+	
 	@Test
 	public void queryKeysTest() {
 		JStruct_MetaTable jStruct_MetaTable = new JStruct_MetaTable();
 		JStruct_MetaTable[] implementationLayersReversed = { jStruct_MetaTable };
 		jStack_MetaTable.implementationLayersReversed = implementationLayersReversed;
-		assertNotNull(jStack_MetaTable.queryKeys("num > ? AND num < ?", new Object[] {2, 5 }, "num ASC", 2, 2));
-		assertNotNull(jStack_MetaTable.queryKeys(null, new Object[] {2, 5 }, "num ASC", 2, 2));
-		assertNotNull(jStack_MetaTable.query("num > ? AND num < ?", new Object[] {2, 5 }, "num ASC", 2, 2));
-		assertNotNull(jStack_MetaTable.queryCount("num > ? AND num < ?", new Object[] {2, 5 })); 
+		assertNotNull(jStack_MetaTable.queryKeys("num > ? AND num < ?", new Object[] { 2, 5 },
+			"num ASC", 2, 2));
+		assertNotNull(jStack_MetaTable.queryKeys(null, new Object[] { 2, 5 }, "num ASC", 2, 2));
+		assertNotNull(jStack_MetaTable.query("num > ? AND num < ?", new Object[] { 2, 5 }, "num ASC",
+			2, 2));
+		assertNotNull(jStack_MetaTable.queryCount("num > ? AND num < ?", new Object[] { 2, 5 }));
 	}
+	
 	@Test
 	public void systemSetupTest() {
 		Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
@@ -146,9 +149,9 @@ public class JStack_MetaTable_test {
 		JStruct_MetaTable[] implementationLayer = { jStruct_MetaTable };
 		jStack_MetaTable.implementationLayer = implementationLayer;
 		jStack_MetaTable.systemSetup();
-
+		
 	}
-
+	
 	@Test
 	public void systemTeardownTest() {
 		Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
@@ -160,6 +163,6 @@ public class JStack_MetaTable_test {
 		JStruct_MetaTable[] implementationLayer = { jStruct_MetaTable };
 		jStack_MetaTable.implementationLayer = implementationLayer;
 		jStack_MetaTable.systemTeardown();
-
+		
 	}
 }

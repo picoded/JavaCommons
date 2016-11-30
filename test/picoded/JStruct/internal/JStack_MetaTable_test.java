@@ -1,6 +1,7 @@
 package picoded.JStruct.internal;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,8 +13,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import picoded.JSql.JSql;
 import picoded.JStack.JStack;
 import picoded.JStack.JStackLayer;
+import picoded.JStruct.JStruct;
+import picoded.JStruct.MetaTable;
 import picoded.conv.GUID;
 
 public class JStack_MetaTable_test {
@@ -35,6 +39,12 @@ public class JStack_MetaTable_test {
 		};
 		JStack jStructObj = new JStack(jStackLayer);
 		new JStack_MetaTable(jStructObj, "_oid");
+	}
+	
+	// / To override for implementation
+	// /------------------------------------------------------
+	public MetaTable implementationConstructor() {
+		return (new JStruct()).getMetaTable("test");
 	}
 	
 	@Test
@@ -102,9 +112,28 @@ public class JStack_MetaTable_test {
 		jStack_MetaTable.implementationLayer = implementationLayersReversed;
 		assertNotNull(jStack_MetaTable.metaObjectRemoteDataMap_get(_oid));
 		assertNull(jStack_MetaTable.metaObjectRemoteDataMap_get("test"));
-		
 		jStack_MetaTable.implementationLayer = null;
 		assertNull(jStack_MetaTable.metaObjectRemoteDataMap_get("test"));
+		JStack jStack = new JStack(stackLayers());
+		jStack_MetaTable.stackObj = jStack;
+		assertNotNull(jStack_MetaTable.implementationLayers());
+		
+	}
+	
+	private JStackLayer[] stackLayers() {
+		return new JStackLayer[] { new JStruct(), JSql.sqlite() };
+	}
+	
+	@Test
+	public void queryKeysTest() {
+		JStruct_MetaTable jStruct_MetaTable = new JStruct_MetaTable();
+		JStruct_MetaTable[] implementationLayersReversed = { jStruct_MetaTable };
+		jStack_MetaTable.implementationLayersReversed = implementationLayersReversed;
+		assertNotNull(jStack_MetaTable.queryKeys("num > ? AND num < ?", new Object[] { 2, 5 },
+			"num ASC", 2, 2));
+		assertNotNull(jStack_MetaTable.query("num > ? AND num < ?", new Object[] { 2, 5 }, "num ASC",
+			2, 2));
+		assertNotNull(jStack_MetaTable.queryCount("num > ? AND num < ?", new Object[] { 2, 5 }));
 	}
 	
 	@Test

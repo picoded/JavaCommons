@@ -49,6 +49,11 @@ public class SubvenueBookings_test {
 	public void createSubvenueBookingTest() {
 		assertNotNull(resMap = (GenericConvertHashMap<String, Object>) subvenueBookings
 			.createSubvenueBooking("subvenueID", "eventID", "venueID", 10.0f));
+		assertNotNull(subvenueBookings.subvenueBookingDates.append("subvenueID", resMap));
+		assertNotNull(subvenueBookings.subvenueBookingDates.append("_bookingID", resMap));
+		assertNotNull(subvenueBookings.getSubvenueBookingDates_byBookingId(resMap.get("_subvenueID")
+			.toString()));
+		assertNotNull(subvenueBookings.getSubvenueBookingDates_byBookingId("_bookingID"));
 	}
 	
 	@Test

@@ -174,7 +174,6 @@ public class SubvenueBookings {
 		MetaObject updateMetaObject = null;
 		// New meta object in subvenue bookings table
 		updateMetaObject = subvenueBooking.newObject();
-		
 		updateMetaObject.put("_subvenueID", subvenueID);
 		updateMetaObject.put("_eventID", eventID);
 		updateMetaObject.put("_status", "Pending");

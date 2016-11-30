@@ -60,7 +60,8 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	default void incrementalMaintenance() {
 		// 2 percent chance of trigering maintenance
 		// This is to lower to overall performance cost incrementalMaintenance per request
-		if (RandomUtils.nextInt(0, 100) <= 2) {
+		int randomNum = RandomUtils.nextInt(0, 100);
+		if (randomNum <= 2) {
 			maintenance();
 		}
 	}

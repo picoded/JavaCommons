@@ -29,17 +29,17 @@ import picoded.struct.CaseInsensitiveHashMap;
 // MetaTable base test class
 public class MetaTable_test {
 	
-	/// Test object
+	// / Test object
 	public MetaTable mtObj = null;
 	
-	/// To override for implementation
-	///------------------------------------------------------
+	// / To override for implementation
+	// /------------------------------------------------------
 	public MetaTable implementationConstructor() {
 		return (new JStruct()).getMetaTable("test");
 	}
 	
-	/// Setup and sanity test
-	///------------------------------------------------------
+	// / Setup and sanity test
+	// /------------------------------------------------------
 	@Before
 	public void setUp() {
 		mtObj = implementationConstructor();
@@ -56,15 +56,15 @@ public class MetaTable_test {
 	
 	@Test
 	public void constructorTest() {
-		//not null check
+		// not null check
 		assertNotNull(mtObj);
 		
-		//run maintaince, no exception?
+		// run maintaince, no exception?
 		// mtObj.maintenance();
 	}
 	
 	// Test cases
-	//-----------------------------------------------
+	// -----------------------------------------------
 	
 	// Test utility used to generate random maps
 	protected HashMap<String, Object> randomObjMap() {
@@ -81,16 +81,18 @@ public class MetaTable_test {
 	}
 	
 	// @Test
-	// public void invalidSetup() { //Numeric as table prefix tend to cuase problems
-	// 	MetaTable m;
+	// public void invalidSetup() { //Numeric as table prefix tend to cuase
+	// problems
+	// MetaTable m;
 	//
-	// 	try {
-	// 		m = new MetaTable(JStackObj, "1" + TestConfig.randomTablePrefix());
-	// 		fail(); // if we got here, no exception was thrown, which is bad
-	// 	} catch (Exception e) {
-	// 		final String expected = "Invalid table name (cannot start with numbers)";
-	// 		assertTrue("Missing Exception - " + expected, e.getMessage().indexOf(expected) >= 0);
-	// 	}
+	// try {
+	// m = new MetaTable(JStackObj, "1" + TestConfig.randomTablePrefix());
+	// fail(); // if we got here, no exception was thrown, which is bad
+	// } catch (Exception e) {
+	// final String expected = "Invalid table name (cannot start with numbers)";
+	// assertTrue("Missing Exception - " + expected,
+	// e.getMessage().indexOf(expected) >= 0);
+	// }
 	// }
 	
 	@Test
@@ -125,7 +127,7 @@ public class MetaTable_test {
 		assertEquals(objMap, mtObj.get(guid));
 	}
 	
-	/// Checks if a blank object gets saved
+	// / Checks if a blank object gets saved
 	@Test
 	public void blankObjectSave() {
 		String guid = null;
@@ -187,9 +189,9 @@ public class MetaTable_test {
 		assertEquals(5, mtObj.queryCount("num > ?", new Object[] { 2 }));
 	}
 	
-	///
-	/// An exception occurs, if a query fetch occurs with an empty table
-	///
+	// /
+	// / An exception occurs, if a query fetch occurs with an empty table
+	// /
 	@Test
 	public void issue47_exceptionWhenTableIsEmpty() {
 		MetaObject[] qRes = null;
@@ -197,11 +199,11 @@ public class MetaTable_test {
 		assertEquals(0, qRes.length);
 	}
 	
-	///
-	/// Bad view index due to inner join instead of left join. Testing.
-	///
-	/// AKA: Incomplete object does not appear in view index
-	///
+	// /
+	// / Bad view index due to inner join instead of left join. Testing.
+	// /
+	// / AKA: Incomplete object does not appear in view index
+	// /
 	@Test
 	public void innerJoinFlaw() {
 		mtObj.append(null, genNumStrObj(1, "hello world"));
@@ -229,9 +231,9 @@ public class MetaTable_test {
 		
 	}
 	
-	///
-	/// Handle right outer closign bracket in metatable meta names
-	///
+	// /
+	// / Handle right outer closign bracket in metatable meta names
+	// /
 	@Test
 	public void mssqlOuterBrackerInMetaNameFlaw() {
 		HashMap<String, Object> objMap = null;
@@ -389,7 +391,7 @@ public class MetaTable_test {
 	}
 	
 	// Array values tests
-	//-----------------------------------------------
+	// -----------------------------------------------
 	@Test
 	public void jsonStorageTest() {
 		Map<String, Object> data = new HashMap<String, Object>();
@@ -430,8 +432,8 @@ public class MetaTable_test {
 		assertArrayEquals((byte[]) (data.get("bin")), (byte[]) (to.get("bin")));
 	}
 	
-	// Orderby sorting 
-	//-----------------------------------------------
+	// Orderby sorting
+	// -----------------------------------------------
 	
 	@Test
 	public void T50_orderByTest() {
@@ -445,7 +447,8 @@ public class MetaTable_test {
 		mtObj.append(null, genNumStrObj(6, "in", 6));
 		mtObj.append(null, genNumStrObj(7, "this", 7));
 		
-		// Replicated a bug, where u CANNOT use orderby on a collumn your not doing a where search
+		// Replicated a bug, where u CANNOT use orderby on a collumn your not
+		// doing a where search
 		MetaObject[] qRes = mtObj.query("str_val = ?", new String[] { "this" }, "num ASC");
 		assertEquals(qRes.length, 2);
 		
@@ -484,16 +487,16 @@ public class MetaTable_test {
 	
 	// @Test
 	// public void orderByTestLoop() {
-	// 	for(int i=0; i<25; ++i) {
-	// 		orderByTest();
-	// 		
-	// 		tearDown();
-	// 		setUp();
-	// 	}
+	// for(int i=0; i<25; ++i) {
+	// orderByTest();
+	//
+	// tearDown();
+	// setUp();
+	// }
 	// }
 	
 	// KeyName fetching test
-	//-----------------------------------------------
+	// -----------------------------------------------
 	@Test
 	public void getKeyNamesTest() {
 		
@@ -509,7 +512,7 @@ public class MetaTable_test {
 	}
 	
 	// Mapping tests
-	//-----------------------------------------------
+	// -----------------------------------------------
 	
 	@Test
 	public void testSingleMappingSystem() {
@@ -549,7 +552,8 @@ public class MetaTable_test {
 	}
 	
 	// Demo code : kept here for reference
-	//-----------------------------------------------
+	// -----------------------------------------------
+	@Test
 	public void demoCode() {
 		// Initiate a meta table
 		MetaTable table = (new JStruct()).getMetaTable("demo");
@@ -561,10 +565,18 @@ public class MetaTable_test {
 		mObj.saveDelta();
 		
 		// Doing a query
-		MetaObject[] qRes = table.query("num > ? OR be = ?", new Object[] { 0, "happy" });
-		
+		//		MetaObject[] qRes = null;
+		assertNotNull(/*qRes = */table.query("num > ? OR be = ?", new Object[] { 0, "happy" }));
 		// Each object has a base68 GUID
-		String guid = qRes[0]._oid();
+		//		String guid = qRes[0]._oid();
+		assertNotNull(table.queryKeys("num > ? OR be = ?", new Object[] { 0, "happy" }, null, 0, 0));
 	}
 	
+	@Test
+	public void incrementalMaintenanceTest() {
+		for (int i = 0; i < 99; i++) {
+			mtObj.incrementalMaintenance();
+		}
+		mtObj.maintenance();
+	}
 }

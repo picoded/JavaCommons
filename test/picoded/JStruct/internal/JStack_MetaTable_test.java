@@ -17,6 +17,7 @@ import picoded.JSql.JSql;
 import picoded.JStack.JStack;
 import picoded.JStack.JStackLayer;
 import picoded.JStruct.JStruct;
+import picoded.JStruct.MetaObject;
 import picoded.JStruct.MetaTable;
 import picoded.conv.GUID;
 
@@ -127,15 +128,34 @@ public class JStack_MetaTable_test {
 	
 	@Test
 	public void queryKeysTest() {
+		// Initiate a meta table
+		MetaTable table = (new JStruct()).getMetaTable("demo");
+		
+		// Adding new object?
+		MetaObject mObj = table.newObject();
+		mObj.put("be", "happy");
+		mObj.put("num", new Integer(1));
+		mObj.saveDelta();
+		
 		JStruct_MetaTable jStruct_MetaTable = new JStruct_MetaTable();
-		JStruct_MetaTable[] implementationLayersReversed = { jStruct_MetaTable };
+		JStruct_MetaTable[] implementationLayersReversed = { jStruct_MetaTable,
+			(JStruct_MetaTable) table };
 		jStack_MetaTable.implementationLayersReversed = implementationLayersReversed;
+		
+		assertNotNull(jStack_MetaTable.queryKeys("num > ? OR be = ?", new Object[] { 0, "happy" },
+			null, 0, 0));
 		assertNotNull(jStack_MetaTable.queryKeys("num > ? AND num < ?", new Object[] { 2, 5 },
 			"num ASC", 2, 2));
 		assertNotNull(jStack_MetaTable.queryKeys(null, new Object[] { 2, 5 }, "num ASC", 2, 2));
+		assertNotNull(jStack_MetaTable.queryKeys(null, new Object[] { 2, 5 }, "num ASC", 2, 2));
+		
 		assertNotNull(jStack_MetaTable.query("num > ? AND num < ?", new Object[] { 2, 5 }, "num ASC",
 			2, 2));
+		assertNotNull(jStack_MetaTable.query("num > ? OR be = ?", new Object[] { 0, "happy" }, null,
+			0, 0));
+		
 		assertNotNull(jStack_MetaTable.queryCount("num > ? AND num < ?", new Object[] { 2, 5 }));
+		assertNotNull(jStack_MetaTable.queryCount("num > ? OR be = ?", new Object[] { 0, "happy" }));
 	}
 	
 	@Test

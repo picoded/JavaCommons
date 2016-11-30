@@ -165,7 +165,7 @@ public class SubvenueBookings {
 	/// @return a booking MetaObject
 	///
 	public GenericConvertMap<String, Object> createSubvenueBooking(String subvenueID,
-		String eventID, String venueID, Float paymentAmount) {
+		String eventID, String venueID, Float paymentAmount, String status) {
 		
 		// Prepare the actual return object
 		GenericConvertHashMap<String, Object> resMap = new GenericConvertHashMap<String, Object>();
@@ -176,7 +176,7 @@ public class SubvenueBookings {
 		updateMetaObject = subvenueBooking.newObject();
 		updateMetaObject.put("_subvenueID", subvenueID);
 		updateMetaObject.put("_eventID", eventID);
-		updateMetaObject.put("_status", "Pending");
+		updateMetaObject.put("_status", status);//Pending
 		updateMetaObject.put("_venueID", venueID);
 		updateMetaObject.put("_paymentAmount", paymentAmount);
 		updateMetaObject.saveDelta();

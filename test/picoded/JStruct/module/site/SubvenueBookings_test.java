@@ -50,7 +50,7 @@ public class SubvenueBookings_test {
 	@Test
 	public void createSubvenueBookingTest() throws Exception {
 		assertNotNull(resMap = (GenericConvertHashMap<String, Object>) subvenueBookings
-			.createSubvenueBooking("subvenueID", "eventID", "venueID", 10.0f));
+			.createSubvenueBooking("subvenueID", "eventID", "venueID", 10.0f, "Approved"));
 		assertNotNull(subvenueBookings.subvenueBookingDates.append("subvenueID", resMap));
 		assertNotNull(subvenueBookings.subvenueBookingDates.append("_bookingID", resMap));
 		assertNotNull(subvenueBookings.getSubvenueBookingDates_byBookingId(resMap.get("_subvenueID")
@@ -63,6 +63,8 @@ public class SubvenueBookings_test {
 		list.add("2016-11-28");
 		list.add("2016-11-28");
 		datesList.put("date", list);
+		assertNotNull(subvenueBookings.getSubvenueBookings_bySubVenueId(resMap.get("_subvenueID")
+			.toString()));
 		assertNotNull(resMap = (GenericConvertHashMap<String, Object>) subvenueBookings
 			.createBookingSlots(resMap.get("_oid").toString(), datesList));
 		ArrayList<MetaObject> itemList = (ArrayList<MetaObject>) resMap.get("_booking");
@@ -82,6 +84,10 @@ public class SubvenueBookings_test {
 	public void getSubvenueBookings_bySubVenueIdTest() throws Exception {
 		assertNotNull(subvenueBookings.getSubvenueBookings_bySubVenueId("_subvenueID"));
 		assertNotNull(subvenueBookings.getSubvenueBookings_bySubVenueId(null));
+	}
+	
+	@Test(expected = Exception.class)
+	public void getSubvenueBookings_bySubVenueIdTest1() throws Exception {
 		assertNotNull(subvenueBookings.getSubvenueBookings_bySubVenueId(""));
 	}
 	
@@ -89,6 +95,10 @@ public class SubvenueBookings_test {
 	public void getSubvenueBookings_byBookingIdTest() throws Exception {
 		assertNotNull(subvenueBookings.getSubvenueBookings_byBookingId("_bookingID"));
 		assertNotNull(subvenueBookings.getSubvenueBookings_byBookingId(null));
+	}
+	
+	@Test(expected = Exception.class)
+	public void getSubvenueBookings_byBookingIdTest1() throws Exception {
 		assertNotNull(subvenueBookings.getSubvenueBookings_byBookingId(""));
 		
 	}
@@ -97,6 +107,10 @@ public class SubvenueBookings_test {
 	public void getSubvenueBookingDates_byBookingIdTest() throws Exception {
 		assertNotNull(subvenueBookings.getSubvenueBookingDates_byBookingId("_subvenueID"));
 		assertNotNull(subvenueBookings.getSubvenueBookingDates_byBookingId(null));
+	}
+	
+	@Test(expected = Exception.class)
+	public void getSubvenueBookingDates_byBookingIdTest1() throws Exception {
 		assertNotNull(subvenueBookings.getSubvenueBookingDates_byBookingId(""));
 		
 	}
@@ -104,12 +118,12 @@ public class SubvenueBookings_test {
 	@Test(expected = Exception.class)
 	public void updateSubvenueBookingStatusTest() throws Exception {
 		assertNotNull(resMap = (GenericConvertHashMap<String, Object>) subvenueBookings
-			.createSubvenueBooking("subvenueID", "eventID", "venueID", 10.0f));
+			.createSubvenueBooking("subvenueID", "eventID", "venueID", 10.0f, "Approved"));
 		assertNotNull(subvenueBookings.subvenueBookingDates.append("subvenueID", resMap));
 		assertNotNull(subvenueBookings.subvenueBookingDates.append("_bookingID", resMap));
 		
 		assertNotNull(subvenueBookings.updateSubvenueBookingStatus(resMap.get("_oid").toString(),
-			"Approved"));
+			"Paid"));
 		assertNotNull(subvenueBookings.updateSubvenueBookingStatus(null, ""));
 		
 	}

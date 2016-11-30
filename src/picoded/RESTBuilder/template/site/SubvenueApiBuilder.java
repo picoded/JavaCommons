@@ -208,7 +208,7 @@ public class SubvenueApiBuilder {
 		// Function reuse vars
 		//
 		GenericConvertMap<String, Object> booking = null;
-		booking = core.createSubvenueBooking(subvenueID, eventID, venueID, paymentAmount);
+		booking = core.createSubvenueBooking(subvenueID, eventID, venueID, paymentAmount, "Pending");
 		
 		// Creating the date items
 		// List<List<Object>> datesList = (List<List<Object>>)(Object)req.getObjectList("list", null);

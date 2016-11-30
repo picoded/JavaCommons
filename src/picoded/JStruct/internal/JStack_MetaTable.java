@@ -141,9 +141,9 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	public Set<String> keySet() {
 		Set<String> ret = null;
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
-			if (i.keySet() != null) {
-				ret = i.keySet();
-			}
+			//			if (i.keySet() != null) {
+			ret = i.keySet();
+			//			}
 		}
 		return ret;
 	}
@@ -164,7 +164,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	/// Gets the complete remote data map, for MetaObject.
 	/// Returns null
 	@Override
-	public Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
+	public Map<String, Object> metaObjectRemoteDataMap_get(String oid) {
 		// Layers to fetch from
 		JStruct_MetaTable[] layers = implementationLayers();
 		
@@ -172,12 +172,12 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 		Map<String, Object> ret = null;
 		for (int i = 0; i < layers.length; ++i) {
 			// Found a valid layer
-			if ((ret = layers[i].metaObjectRemoteDataMap_get(_oid)) != null) {
+			if ((ret = layers[i].metaObjectRemoteDataMap_get(oid)) != null) {
 				// Iterate back upwards and populate the upper layers
 				// And cache the layers inbetween =)
 				i = i - 1; // Start immediately at previous layer
 				for (; i >= 0; --i) {
-					layers[i].metaObjectRemoteDataMap_update(_oid, ret, null);
+					layers[i].metaObjectRemoteDataMap_update(oid, ret, null);
 				}
 				return ret;
 			}
@@ -190,10 +190,10 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	/// Updates the actual backend storage of MetaObject 
 	/// either partially (if supported / used), or completely
 	@Override
-	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap,
+	public void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
 		Set<String> keys) {
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
-			i.metaObjectRemoteDataMap_update(_oid, fullMap, keys);
+			i.metaObjectRemoteDataMap_update(oid, fullMap, keys);
 		}
 	}
 	

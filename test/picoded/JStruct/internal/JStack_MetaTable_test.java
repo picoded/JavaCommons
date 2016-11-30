@@ -3,7 +3,9 @@ package picoded.JStruct.internal;
 import static org.junit.Assert.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.After;
@@ -12,6 +14,7 @@ import org.junit.Test;
 
 import picoded.JStack.JStack;
 import picoded.JStack.JStackLayer;
+import picoded.conv.GUID;
 
 public class JStack_MetaTable_test {
 	
@@ -31,7 +34,7 @@ public class JStack_MetaTable_test {
 		JStackLayer jStackLayer = new JStackLayer() {
 		};
 		JStack jStructObj = new JStack(jStackLayer);
-		new JStack_MetaTable(jStructObj, "test");
+		new JStack_MetaTable(jStructObj, "_oid");
 	}
 	
 	@Test
@@ -57,8 +60,6 @@ public class JStack_MetaTable_test {
 		Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("key", "value");
-		map.put("key1", "value");
-		map.put("key2", "value");
 		_valueMap.put("test", map);
 		JStruct_MetaTable jStruct_MetaTable = new JStruct_MetaTable();
 		jStruct_MetaTable._valueMap = _valueMap;
@@ -68,13 +69,38 @@ public class JStack_MetaTable_test {
 	}
 	
 	@Test
-	public void keySetTest1() {
-		
+	public void removeTest() {
+		Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key", "value");
+		_valueMap.put("test1", map);
+		JStruct_MetaTable jStruct_MetaTable = new JStruct_MetaTable();
+		jStruct_MetaTable._valueMap = _valueMap;
+		JStruct_MetaTable[] implementationLayersReversed = { jStruct_MetaTable };
+		jStack_MetaTable.implementationLayersReversed = implementationLayersReversed;
+		assertNull(jStack_MetaTable.remove("test1"));
 	}
 	
 	@Test
-	public void keySetTest2() {
-		
+	public void metaObjectRemoteDataMap_updateTest() {
+		Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key", "value");
+		_valueMap.put("test1", map);
+		JStruct_MetaTable jStruct_MetaTable = new JStruct_MetaTable();
+		jStruct_MetaTable._valueMap = _valueMap;
+		JStruct_MetaTable[] implementationLayersReversed = { jStruct_MetaTable };
+		jStack_MetaTable.implementationLayersReversed = implementationLayersReversed;
+		String _oid = GUID.base58();
+		Map<String, Object> fullMap = new HashMap<String, Object>();
+		fullMap.put("key", "value");
+		fullMap.put("key1", "value");
+		fullMap.put("key2", "value");
+		Set<String> keys = new HashSet<String>();
+		keys.add(_oid);
+		jStack_MetaTable.metaObjectRemoteDataMap_update(_oid, fullMap, keys);
+		jStack_MetaTable.implementationLayer = implementationLayersReversed;
+		assertNotNull(fullMap = jStack_MetaTable.metaObjectRemoteDataMap_get(_oid));
 	}
 	
 	@Test

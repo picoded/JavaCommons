@@ -100,25 +100,37 @@ public class JStack_MetaTable_test {
 		keys.add(_oid);
 		jStack_MetaTable.metaObjectRemoteDataMap_update(_oid, fullMap, keys);
 		jStack_MetaTable.implementationLayer = implementationLayersReversed;
-		assertNotNull(fullMap = jStack_MetaTable.metaObjectRemoteDataMap_get(_oid));
+		assertNotNull(jStack_MetaTable.metaObjectRemoteDataMap_get(_oid));
+		assertNull(jStack_MetaTable.metaObjectRemoteDataMap_get("test"));
+		
+		jStack_MetaTable.implementationLayer = null;
+		assertNull(jStack_MetaTable.metaObjectRemoteDataMap_get("test"));
 	}
 	
 	@Test
 	public void systemSetupTest() {
-		JStackLayer jStackLayer = new JStackLayer() {
-		};
-		JStack jStructObj = new JStack(jStackLayer);
-		jStack_MetaTable.stackObj = jStructObj;
+		Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key", "value");
+		_valueMap.put("test", map);
+		JStruct_MetaTable jStruct_MetaTable = new JStruct_MetaTable();
+		jStruct_MetaTable._valueMap = _valueMap;
+		JStruct_MetaTable[] implementationLayer = { jStruct_MetaTable };
+		jStack_MetaTable.implementationLayer = implementationLayer;
 		jStack_MetaTable.systemSetup();
 		
 	}
 	
 	@Test
 	public void systemTeardownTest() {
-		JStackLayer jStackLayer = new JStackLayer() {
-		};
-		JStack jStructObj = new JStack(jStackLayer);
-		jStack_MetaTable.stackObj = jStructObj;
+		Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key", "value");
+		_valueMap.put("test", map);
+		JStruct_MetaTable jStruct_MetaTable = new JStruct_MetaTable();
+		jStruct_MetaTable._valueMap = _valueMap;
+		JStruct_MetaTable[] implementationLayer = { jStruct_MetaTable };
+		jStack_MetaTable.implementationLayer = implementationLayer;
 		jStack_MetaTable.systemTeardown();
 		
 	}

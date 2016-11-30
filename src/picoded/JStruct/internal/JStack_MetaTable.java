@@ -56,28 +56,34 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	/// This is used internally to iterate the KeyValueMap layers
 	///
 	public JStruct_MetaTable[] implementationLayers() {
-		if (implementationLayer != null) {
-			return implementationLayer;
-		}
-		
-		// Get the structure layers
-		JStruct[] struct = stackObj.structLayers();
-		JStruct_MetaTable[] ret = new JStruct_MetaTable[struct.length];
-		
-		// Fetch their respective key value map
-		for (int a = 0; a < struct.length; ++a) {
-			
-			// Safety check
-			if (struct[a] == null) {
-				ret[a] = null;
-				continue;
+		JStruct_MetaTable[] ret = new JStruct_MetaTable[0];
+		try {
+			if (implementationLayer != null) {
+				return implementationLayer;
 			}
 			
-			// Fetch the implementation
-			ret[a] = (JStruct_MetaTable) struct[a].getMetaTable(stackTablename);
+			// Get the structure layers
+			JStruct[] struct = stackObj.structLayers();
+			ret = new JStruct_MetaTable[struct.length];
+			
+			// Fetch their respective key value map
+			for (int a = 0; a < struct.length; ++a) {
+				
+				// Safety check
+				if (struct[a] == null) {
+					ret[a] = null;
+					continue;
+				}
+				
+				// Fetch the implementation
+				ret[a] = (JStruct_MetaTable) struct[a].getMetaTable(stackTablename);
+			}
+			
+			return implementationLayer = ret;
+		} catch (Exception e) {
+			logger.log(Level.WARNING, e.getMessage());
 		}
-		
-		return implementationLayer = ret;
+		return ret;
 	}
 	
 	///
@@ -108,13 +114,8 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	/// Setsup the backend storage table, etc. If needed
 	@Override
 	public void systemSetup() {
-		try {
-			for (JStruct_MetaTable i : implementationLayers()) {
-				i.systemSetup();
-			}
-		} catch (Exception e) {
-			logger.log(Level.WARNING, e.getMessage());
-			
+		for (JStruct_MetaTable i : implementationLayers()) {
+			i.systemSetup();
 		}
 		
 	}
@@ -122,13 +123,8 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	/// Teardown and delete the backend storage table, etc. If needed
 	@Override
 	public void systemTeardown() {
-		try {
-			for (JStruct_MetaTable i : implementationLayers()) {
-				i.systemTeardown();
-			}
-		} catch (Exception e) {
-			logger.log(Level.WARNING, e.getMessage());
-			
+		for (JStruct_MetaTable i : implementationLayers()) {
+			i.systemTeardown();
 		}
 		
 	}
@@ -175,7 +171,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 			if ((ret = layers[i].metaObjectRemoteDataMap_get(oid)) != null) {
 				// Iterate back upwards and populate the upper layers
 				// And cache the layers inbetween =)
-				i = i - 1; // Start immediately at previous layer
+				//				i = i - 1; // Start immediately at previous layer
 				for (; i >= 0; --i) {
 					layers[i].metaObjectRemoteDataMap_update(oid, ret, null);
 				}

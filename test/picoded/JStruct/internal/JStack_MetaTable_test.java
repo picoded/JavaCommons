@@ -63,6 +63,11 @@ public class JStack_MetaTable_test {
 		assertNotNull(jStack_MetaTable.implementationLayersReversed = jStack_MetaTable
 			.implementationLayers_reverse());
 		assertNotNull(jStack_MetaTable.implementationLayers_reverse());
+		jStack_MetaTable.implementationLayer = null;
+		JStack jStack = new JStack(stackLayers());
+		jStack_MetaTable.stackObj = jStack;
+		assertNotNull(jStack_MetaTable.implementationLayers());
+		
 	}
 	
 	@Test
@@ -114,10 +119,6 @@ public class JStack_MetaTable_test {
 		assertNull(jStack_MetaTable.metaObjectRemoteDataMap_get("test"));
 		jStack_MetaTable.implementationLayer = null;
 		assertNull(jStack_MetaTable.metaObjectRemoteDataMap_get("test"));
-		JStack jStack = new JStack(stackLayers());
-		jStack_MetaTable.stackObj = jStack;
-		assertNotNull(jStack_MetaTable.implementationLayers());
-		
 	}
 	
 	private JStackLayer[] stackLayers() {

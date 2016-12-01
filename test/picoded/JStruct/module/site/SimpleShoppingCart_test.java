@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import picoded.JStruct.JStruct;
 import picoded.JStruct.MetaObject;
+import picoded.JStruct.MetaTable;
 import picoded.conv.ConvertJSON;
 import picoded.conv.GenericConvert;
 import picoded.enums.HttpRequestType;
@@ -50,6 +51,10 @@ public class SimpleShoppingCart_test {
 	
 	public SimpleShoppingCart implementationConstructor() {
 		return new SimpleShoppingCart(jstructConstructor(), "cart");
+	}
+	
+	public MetaTable implementationConstructor1() {
+		return (new JStruct()).getMetaTable("test");
 	}
 	
 	/// Setup and sanity test
@@ -129,7 +134,7 @@ public class SimpleShoppingCart_test {
 		GenericConvertList<List<Object>> testCart = GenericConvert.toGenericConvertList(testJSON,
 			new ArrayList<Object>());
 		assertNotNull(simpleShoppingCart.updateCartList(corePageLocal, testCart, true));
-		assertNotNull(simpleShoppingCart.updateCartList(corePageLocal, testCart, false));
+		assertNotNull(simpleShoppingCart.updateCartList(corePageLocal, null, false));
 		
 	}
 	
@@ -149,9 +154,18 @@ public class SimpleShoppingCart_test {
 			.cartCookieJSONToList(validJSON)));
 		testCart = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
 		assertNotNull(simpleShoppingCart.cartListQuantityCount(testCart));
+		MetaTable productItem = implementationConstructor1();
+		productOwnerObject = simpleShoppingCart.productOwner.newObject();
+		productOwnerObject.put("id-1", "Scrooge Mcduck");
+		productOwnerObject.saveDelta();
+		productItem.append("id-1", productOwnerObject);
+		simpleShoppingCart.productItem = productItem;
+		testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"], [\""
+			+ productItem.getFromKeyName("_oid")[0]._oid() + "\", 0] ]";
+		testCart = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
 		assertNotNull(simpleShoppingCart.fetchAndValidateCartList(testCart));
+		testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
+		testCart = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
 		assertNotNull(simpleShoppingCart.mergeCartList(testCart, testCart1, true));
-		assertNotNull(simpleShoppingCart.mergeCartList(testCart, testCart1, false));
 	}
-	
 }

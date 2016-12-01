@@ -84,7 +84,6 @@ public class SimpleShoppingCart_test {
 	
 	// Test cases
 	//-----------------------------------------------
-	
 	@Test
 	public void productSetup() {
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
@@ -139,7 +138,7 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test
-	public void cartListToCookieJSON() {
+	public void cartListToCookieJSONTest() {
 		String testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
 		
 		String testJSON1 = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
@@ -165,11 +164,41 @@ public class SimpleShoppingCart_test {
 		testCart = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
 		assertNotNull(simpleShoppingCart.fetchAndValidateCartList(testCart));
 		
-		testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5, 3],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
-		testJSON1 = "[[\"id-1\",11],[\"id-4\",-1, null],[\"id-3\",-6, 4],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
+		testJSON = "[[\"id-1\",10, null],[\"id-2\",0],[\"id-3\",-5, 3],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
+		testJSON1 = "[[\"id-1\",null, 11],[\"id-4\",-1, null],[\"id-3\",-6, 4],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
 		testCart = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
 		testCart1 = GenericConvert.toGenericConvertList(testJSON1, new ArrayList<Object>());
 		
 		assertNotNull(simpleShoppingCart.mergeCartList(testCart, testCart1, true));
+		assertNotNull(simpleShoppingCart.mergeCartList(testCart, testCart1, false));
+	}
+	
+	@Test(expected = Exception.class)
+	public void replaceCartListTest() throws Exception {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		List<String> headerList = new ArrayList<String>();
+		headerList.add("header_1");
+		headerList.add("header_2");
+		when(request.getHeaderNames()).thenReturn(Collections.enumeration(headerList));
+		CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
+		
+		String testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
+		GenericConvertList<List<Object>> cartList = GenericConvert.toGenericConvertList(testJSON,
+			new ArrayList<Object>());
+		for (int i = 0; i < 52; i++) {
+			cartList.add(GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>()));
+		}
+		assertNotNull(simpleShoppingCart.replaceCartList(corePageLocal, cartList, true));
+	}
+	
+	@Test(expected = Exception.class)
+	public void getProductList() {
+		assertNotNull(simpleShoppingCart.getProductList(null));
+	}
+	
+	@Test(expected = Exception.class)
+	public void getProductList1() {
+		assertNotNull(simpleShoppingCart.getProductList(""));
 	}
 }

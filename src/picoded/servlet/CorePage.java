@@ -1,898 +1,911 @@
-package picoded.JStruct.module.site;
+package picoded.servlet;
 
-/// Java imports
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Cookie;
+import javax.servlet.*;
+
+// Exceptions used
+import java.io.IOException;
+
+// Objects used
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Enumeration;
+import java.io.PrintWriter;
+import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.io.UnsupportedEncodingException;
 
-import picoded.JStruct.AtomicLongMap;
-import picoded.JStruct.JStruct;
-import picoded.JStruct.MetaObject;
-import picoded.JStruct.MetaTable;
 import picoded.conv.ConvertJSON;
-/// Picoded imports
-import picoded.conv.GenericConvert;
-import picoded.servlet.CorePage;
-import picoded.struct.GenericConvertArrayList;
-import picoded.struct.GenericConvertHashMap;
-import picoded.struct.GenericConvertList;
-import picoded.struct.GenericConvertMap;
+import picoded.file.FileUtil;
+import picoded.enums.HttpRequestType;
+import picoded.enums.EmptyArray;
+import picoded.struct.HashMapList;
 
-///
-/// A simple shopping cart system, which is built ontop of MetaTable, and AtomicLongMap
-///
-public class SimpleShoppingCart {
+// Sub modules useds
+
+/**
+ * JavaCommons.servlet page core system, in which all additional page are extended from.
+ * In addition, this is intentionally structured to be "usable" even without the understanding / importing of
+ * the various HttpServlet functionalities. Though doing so is still highly recommended.
+ *
+ * corePage, and its sub page is designed to facilitate rapid servlet page creation, and extension across
+ * 3 distinct processing layers/roles : Authentication, Data, and output.
+ *
+ * in addition, it has built in mechanism to facilitate the handling of JSON data request
+ *
+ * Note that internally, doPost, doGet creates a new class instance for each call/request it recieves.
+ * As such, all subclass built can consider all servlet instances are fresh instances on process request.
+ *
+ * ---------------------------------------------------------------------------------------------------------
+ *
+ * ##Process flow
+ * <pre>
+ * {@code
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * [CorePage request process flow]
+ *
+ * spawnInstance ----\
+ *                   |
+ * doOption ---------+
+ *                   |
+ * doPost -----------+--> processChain --> doAuth -+-> doRequest --> do_X_Request --> outputRequest
+ *                   |         |                   |
+ * doGet ------------+         V                   \-> doJson -----> do_X_Json -----> outputJSON
+ *                   |     doSharedSetup
+ * doDelete ---------+         |
+ *                   |         V
+ * doPut ------------/     doSharedTeardown
+ *
+ * [CorePage lifecycle process flow]
+ *
+ * contextInitialized --> doSharedSetup -----> initializeContext
+ *
+ * contextDestroyed ----> doSharedTeardown --> destroyContext
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * }
+ * </pre>
+ * ---------------------------------------------------------------------------------------------------------
+ *
+ * ##[TODO]
+ * + Websocket support?
+ */
+public class CorePage extends javax.servlet.http.HttpServlet {
 	
-	/////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
 	//
-	// Class variables
+	// Static variables
 	//
-	/////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
 	
-	/// Inventory owner metatable
-	public MetaTable productOwner = null;
+	// Static type variables declaration
+	//-------------------------------------------
 	
-	/// Inventory listing
-	public MetaTable productItem = null;
+	private static final long serialVersionUID = 1L;
 	
-	/// Atomic product counting
-	protected AtomicLongMap productCount = null;
-	
-	/// Sales order
-	public MetaTable salesOrder = null;
-	
-	/// Sales items
-	public MetaTable salesItem = null;
-	
-	/// Shopping cart cookie name
-	protected String shoppingCartCookieName = "shopping-cart";
-	
-	/// Cart maximum size
-	protected int cartMax = 50;
-	
-	/// Product list max size
-	protected int productMax = 250;
-	
-	/// Transaction percentage fee
-	protected double transactionPercentage = 2.9;
-	protected double transactionFixed = 0.99;
-	protected String transactionProductPriceKey = "display_price";
-	
-	protected String ownerID = "_ownerID";
-	protected String orderStatus = "_orderStatus";
-	
-	/////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Constructor options
-	//
-	/////////////////////////////////////////////////////////////////////////////////////////
-	
-	/// Empty constructor
-	public SimpleShoppingCart() {
-		//Does nothing : manual setup
+	/// RESTBuilder HttpRequestType enum access
+	public static class RequestTypeSet extends picoded.enums.HttpRequestType.HttpRequestTypeSet {
 	}
 	
-	public SimpleShoppingCart(JStruct inStruct, String prefix) {
-		setupStandardTables(inStruct, prefix);
-	}
-	
-	///
-	/// Setup the standard tables, with the given JStruct
-	///
-	/// @param   The JStruct object to build ontop of
-	/// @param   The table name prefix to generate the various meta table
-	///
-	public void setupStandardTables(JStruct inStruct, String prefix) {
-		productOwner = inStruct.getMetaTable(prefix);
-		productItem = inStruct.getMetaTable(prefix + "_product");
-		productCount = inStruct.getAtomicLongMap(prefix + "_sale_count");
-		
-		salesOrder = inStruct.getMetaTable(prefix + "_sale_order");
-		salesItem = inStruct.getMetaTable(prefix + "_sale_item");
-	}
-	
-	///
-	/// Calls the systemSetup for the underlying MetaTable / AtomicLongMap
-	///
-	public void systemSetup() {
-		productOwner.systemSetup();
-		productItem.systemSetup();
-		productCount.systemSetup();
-		salesOrder.systemSetup();
-		salesItem.systemSetup();
-	}
-	
-	///
-	/// Calls the systemSetup for the underlying MetaTable / AtomicLongMap
-	///
-	public void systemTeardown() {
-		productOwner.systemTeardown();
-		productItem.systemTeardown();
-		productCount.systemTeardown();
-		salesOrder.systemTeardown();
-		salesItem.systemTeardown();
-	}
-	
-	/////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
 	//
-	// Shopping cart functions (Low level)
+	// Instance variables
 	//
-	/////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
 	
-	///
-	/// Gets the current shopping cart, from the current CorePage request cookie
-	/// This fetches the JSON stored in the cart, as defined by "shoppingCartCookieName"
-	///
-	/// @param  Request page used, this is used to get the cookie value
-	///
-	/// @return Returns the cart cookie JSON string
-	///
-	public String getCartCookieJSON(CorePage requestPage) {
-		//
-		// Safety checks
-		//
-		if (requestPage == null) {
-			throw new RuntimeException("Missing requestPage parameter");
+	// Instance variables
+	//-------------------------------------------
+	
+	/// Request type indicator
+	//protected byte requestType = 0;
+	protected HttpRequestType requestType = null;
+	
+	/// The actual output stream used
+	protected OutputStream responseOutputStream = null;
+	
+	/// parameter map, either initialized from httpRequest, or directly
+	protected RequestMap requestParameters = null;
+	
+	/// The template data object wich is being passed around in each process stage
+	protected Map<String, Object> templateDataObj = new HashMap<String, Object>();
+	
+	/// The JSON output data object, if used in JSON processing mode
+	protected Map<String, Object> jsonDataObj = new HashMap<String, Object>();
+	
+	// Servlet specific variables
+	//-------------------------------------------
+	
+	/// httpRequest used [modification of this value, is highly discouraged]
+	protected HttpServletRequest httpRequest = null;
+	
+	/// httpResponse used [modification of this value, is highly discouraged]
+	protected HttpServletResponse httpResponse = null;
+	
+	public HttpServletRequest getHttpServletRequest() {
+		return httpRequest;
+	}
+	
+	public HttpServletResponse getHttpServletResponse() {
+		return httpResponse;
+	}
+	
+	// Independent instance variables
+	//-------------------------------------------
+	
+	// /// The header map, this is ignored when httpResponse parameter is already set
+	// protected Map<String,String> responseHeaderMap = null;
+	//
+	// /// The cookie map, this is ignored when httpResponse parameter is already set
+	// protected Map<String,Cookie> responseCookieMap = null;
+	//
+	// /// local output stream, used for internal execution / testing
+	// protected ByteArrayOutputStream cachedResponseOutputStream = null;
+	
+	/// The requested headers map, either set at startup or extracted from httpRequest
+	protected Map<String, String[]> _requestHeaderMap = null;
+	
+	/// Gets and returns the requestHeaderMap
+	public Map<String, String[]> requestHeaderMap() {
+		// gets the constructor set cookies / cached cookies
+		if (_requestHeaderMap != null) {
+			return _requestHeaderMap;
 		}
 		
-		//
-		// Get existing cookie values
-		//
-		String cartJsonStr = null;
-		Map<String, String[]> cookieMap = requestPage.requestCookieMap();
-		String[] cookieSet = null;
-		if (cookieMap != null) {
-			cookieSet = cookieMap.get(shoppingCartCookieName);
+		// if the cached copy not previously set, and request is null, nothing can be done
+		if (httpRequest == null) {
+			return null;
 		}
 		
-		if (cookieSet != null && cookieSet.length > 0) {
-			cartJsonStr = cookieSet[0];
-		} else {
-			cartJsonStr = "";
-		}
-		return cartJsonStr;
-	}
-	
-	///
-	/// Updates the current CorePage request cookie as defined by "shoppingCartCookieName"
-	///
-	/// @param  Request page used, this is used to get the cookie value
-	/// @param  The cookie cart JSON string
-	///
-	public void setCartCookieJSON(CorePage requestPage, String updateJson) {
-		// Original cookie
-		String ori = getCartCookieJSON(requestPage);
+		// Creates the _requestHeaderMap from httpRequest
+		HashMapList<String, String> mapList = new HashMapList<String, String>();
 		
-		// Update the cookie value only if needed
-		if (!updateJson.equals(ori)) {
-			javax.servlet.http.Cookie theOneCookie = new javax.servlet.http.Cookie(
-				shoppingCartCookieName, updateJson);
-			theOneCookie.setSecure(true);
-			requestPage.getHttpServletResponse().addCookie(theOneCookie);
+		// Get an Enumeration of all of the header names sent by the client
+		Enumeration<String> headerNames = httpRequest.getHeaderNames();
+		while (headerNames.hasMoreElements()) {
+			String name = headerNames.nextElement();
+			
+			// As per the Java Servlet API 2.5 documentation:
+			//        Some headers, such as Accept-Language can be sent by clients
+			//        as several headers each with a different value rather than
+			//        sending the header as a comma separated list.
+			// Thus, we get an Enumeration of the header values sent by the client
+			mapList.append(name, httpRequest.getHeaders(name));
 		}
-	}
-	
-	///
-	/// Converts the cart cookie json string, to the cart listing object
-	///
-	/// @param  Cart cookie string
-	///
-	/// @return Returns the cart cookie string
-	///
-	public GenericConvertList<List<Object>> cartCookieJSONToList(String cartJsonStr) {
-		return GenericConvert.toGenericConvertList(cartJsonStr, new ArrayList<Object>());
-	}
-	
-	///
-	/// Converts the cart listing object to JSON string
-	///
-	/// @param  Cart list
-	///
-	/// @return Returns the cart cookie string
-	///
-	public String cartListToCookieJSON(List<List<Object>> inList) {
-		GenericConvertList<List<Object>> cartList = GenericConvert.toGenericConvertList(inList,
-			new ArrayList<Object>());
 		
-		// Iterate and ensure valid cart size
-		for (int i = 0; i < cartList.size(); i++) {
-			List<Object> cartLine = cartList.getGenericConvertList(i);
-			if (cartLine == null) {
-				continue;
+		return _requestHeaderMap = mapList.toMapArray(new String[0]);
+	}
+	
+	/// The requested cookie map, either set at startup or extracted from httpRequest
+	public Map<String, String[]> _requestCookieMap = null;
+	
+	/// Gets and returns the requestCookieMap
+	public Map<String, String[]> requestCookieMap() {
+		// gets the constructor set cookies / cached cookies
+		if (_requestCookieMap != null) {
+			return _requestCookieMap;
+		}
+		
+		// if the cached copy not previously set, and request is null, nothing can be done
+		if (httpRequest == null || httpRequest.getCookies() == null) {
+			return null;
+		}
+		
+		// Creates the _requestCookieMap from httpRequest
+		HashMapList<String, String> mapList = new HashMapList<String, String>();
+		for (Cookie oneCookie : httpRequest.getCookies()) {
+			mapList.append(oneCookie.getName(), oneCookie.getValue());
+		}
+		
+		// Cache and return
+		return _requestCookieMap = mapList.toMapArray(new String[0]);
+	}
+	
+	///////////////////////////////////////////////////////
+	//
+	// Instance config
+	//
+	///////////////////////////////////////////////////////
+	
+	// JSON request config handling
+	//-------------------------------------------
+	
+	/// Sets the JSON detection flag
+	protected String jsonRequestFlag = null;
+	
+	/// Sets the JSON request flag, used to handle JSON requests.
+	/// Note that NULL, means disabled. While "*" means anything
+	public CorePage setJsonRequestFlag(String in) {
+		jsonRequestFlag = in;
+		return this;
+	}
+	
+	/// Gets the current JSON request flag
+	public String getJsonRequestFlag() {
+		return jsonRequestFlag;
+	}
+	
+	/// Returns true / false if current request qualifies as JSON
+	/// Note this is used internally by the process chain
+	public boolean isJsonRequest() {
+		if (jsonRequestFlag != null) {
+			if ("*".equals(jsonRequestFlag)) {
+				return true;
 			}
 			
-			int lineSize = cartLine.size();
-			if (lineSize <= 1) {
-				// Not enough info
-				cartList.set(i, null);
-			} else if (lineSize > 2) {
-				// Too much info, trim it
-				cartLine = cartLine.subList(0, 2);
-				cartList.set(i, cartLine);
+			String rStr = getParameter(jsonRequestFlag);
+			if (rStr != null && rStr.length() > 0) {
+				return true;
 			}
 		}
-		
-		// Null out items less then zero
-		cartList = nullOutZeroCount(cartList);
-		
-		// Remove null from list
-		cartList.removeAll(Collections.singleton(null));
-		
-		return ConvertJSON.fromList(cartList);
+		return false;
 	}
 	
-	///
-	/// Counts the total quantity inside a cart
-	///
-	/// @param  Cart list
-	///
-	/// @return Returns the cart quantity count
-	///
-	public int cartListQuantityCount(List<List<Object>> inList) {
-		GenericConvertList<List<Object>> cartList = GenericConvert.toGenericConvertList(inList,
-			new ArrayList<Object>());
-		int ret = 0;
-		// Iterate and ensure valid cart size
-		for (int i = 0; i < cartList.size(); i++) {
-			GenericConvertList<Object> cartLine = cartList.getGenericConvertList(i);
-			if (cartLine == null) {
-				continue;
+	// CORS config handling
+	// @TODO CORS OPTION implementation
+	//-------------------------------------------
+	
+	// HTTP Servlet convinence functions
+	//-------------------------------------------
+	
+	/// Gets the server requestURI
+	public String requestURI() {
+		return httpRequest.getRequestURI();
+	}
+	
+	/// Gets the request servlet path
+	public String requestServletPath() {
+		return httpRequest.getServletPath();
+	}
+	
+	/// Gets the serer wildcard segment of the URI
+	/// Note this does any URL decoding if needed, use httpRequest.getPathInfo() for the raw wild card path
+	public String requestWildcardUri() {
+		try {
+			String path = httpRequest.getPathInfo(); //no query values
+			if (path == null || path.isEmpty()) {
+				return null;
 			}
-			if (cartLine.size() >= 2) {
-				// Get item count
-				int count = cartLine.getInt(1, 0);
-				if (count > 0) {
-					ret += count;
-				}
-			}
+			return FileUtil.normalize(URLDecoder.decode(path, "UTF-8").trim());
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public String[] requestWildcardUriArray() {
+		String raw = requestWildcardUri();
+		
+		if (raw == null || raw.isEmpty()) {
+			return EmptyArray.STRING;
 		}
 		
-		// Return
-		return ret;
+		if (raw.startsWith("/") || raw.startsWith("\\")) {
+			raw = raw.substring(1);
+		}
+		
+		if (raw.endsWith("/") || raw.endsWith("\\")) {
+			raw = raw.substring(0, raw.length() - 1);
+		}
+		
+		return raw.split("[\\\\/]");
 	}
 	
-	/////////////////////////////////////////////////////////////////////////////////////////
+	// Request type config getters
+	//-------------------------------------------
+	
+	/// Returns the request type
+	public HttpRequestType requestType() {
+		return requestType;
+	}
+	
+	/// Returns the request parameters
+	public RequestMap requestParameters() {
+		if (requestParameters != null) {
+			return requestParameters;
+		}
+		
+		requestParameters = RequestMap.fromStringArrayValueMap(httpRequest.getParameterMap());
+		
+		return requestParameters;
+	}
+	
+	/// Returns if the request is GET
+	public boolean isGET() {
+		return requestType == HttpRequestType.GET;
+	}
+	
+	/// Returns if the request is POST
+	public boolean isPOST() {
+		return requestType == HttpRequestType.POST;
+	}
+	
+	/// Returns if the request is PUT
+	public boolean isPUT() {
+		return requestType == HttpRequestType.PUT;
+	}
+	
+	/// Returns if the request is DELETE
+	public boolean isDELETE() {
+		return requestType == HttpRequestType.DELETE;
+	}
+	
+	/// Returns if the request is OPTION
+	public boolean isOPTION() {
+		return requestType == HttpRequestType.OPTION;
+	}
+	
+	///////////////////////////////////////////////////////
 	//
-	// Shopping cart functions (Higher level)
+	// Constructor, setup and instance spawn
 	//
-	/////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
 	
-	///
-	/// Gets the current shopping cart, from the current CorePage request cookie
-	/// This fetches the JSON stored in the cart, as defined by "shoppingCartCookieName"
-	///
-	/// @param  Request page used, this is used to get the cookie value
-	/// @param  Simple mode indicator, if its false, it runs the validation step for more information
-	///
-	/// @return Returns a list as `[[ID,count], ... ]` in simple mode, else returns `[[ID,count,meta], ... ]`
-	///
-	public GenericConvertList<List<Object>> getCartList(CorePage requestPage, boolean simple) {
-		//
-		// Return var
-		//
-		GenericConvertList<List<Object>> ret = cartCookieJSONToList(getCartCookieJSON(requestPage));
-		if (!simple) {
-			return fetchAndValidateCartList(ret);
-		}
-		return ret;
+	/// Blank constructor, used for template building, unit testing, etc
+	public CorePage() {
+		super();
 	}
 	
-	///
-	/// Takes in a `[[ID,count], ... ]` cart listing, fetch its meta object and validates it.
-	/// Converting it into a `[[ID,count,meta], ... ]` in the process.
-	///
-	/// Removes items with count 0 or less, will be removed from list
-	///
-	/// @TODO The actual validation, beyond just fetching the meta object
-	///
-	/// @param  The `[[ID,count], ... ]` list to filter
-	///
-	/// @return The processed and validated `[[ID,count,meta], ... ]`
-	///
-	public GenericConvertList<List<Object>> fetchAndValidateCartList(List<List<Object>> inList) {
+	/// Setup the instance, with the request parameter, and
+	protected CorePage setupInstance(HttpRequestType inRequestType, Map<String, String[]> reqParam)
+		throws ServletException {
+		requestType = inRequestType;
+		//requestParameters = new RequestMap( reqParam );
+		return this;
+	}
+	
+	/// Setup the instance, with the request parameter, and cookie map
+	protected CorePage setupInstance(HttpRequestType inRequestType, Map<String, String[]> reqParam,
+		Map<String, Cookie[]> reqCookieMap) throws ServletException {
+		requestType = inRequestType;
+		//requestParameters = new RequestMap( reqParam );
+		//requestCookieMap = reqCookieMap;
+		return this;
+	}
+	
+	/// Setup the instance, with http request & response
+	public CorePage setupInstance(HttpRequestType inRequestType, HttpServletRequest req,
+		HttpServletResponse res) throws ServletException {
+		requestType = inRequestType;
+		httpRequest = req;
+		httpResponse = res;
 		
-		// Ensure valid input list
-		GenericConvertList<List<Object>> cartList = GenericConvertList.build(inList);
+		// @TODO: To use IOUtils.buffer for inputstream of httpRequest / parameterMap
+		// THIS IS CRITICAL, for the POST request in proxyServlet to work
+		//requestParameters = RequestMap.fromStringArrayValueMap( httpRequest.getParameterMap() );
 		
-		// Iterate and get meta objects
-		for (int i = 0; i < cartList.size(); i++) {
-			GenericConvertList<Object> cartLine = cartList.getGenericConvertList(i);
-			if (cartLine == null) {
-				continue;
-			}
-			String itemID = cartLine.getString(0);
-			Map<String, Object> itemMeta = productItem.get(itemID);
+		try {
+			responseOutputStream = httpResponse.getOutputStream();
+		} catch (Exception e) {
+			throw new ServletException(e);
+		}
+		
+		return this;
+	}
+	
+	/// Spawn and instance of the current class
+	public final CorePage spawnInstance() throws ServletException { //, OutputStream outStream
+		try {
+			Class<? extends CorePage> pageClass = this.getClass();
+			CorePage ret = pageClass.newInstance();
+			pageClass.cast(ret).initSetup(this, this.getServletConfig());
 			
-			// missing item safety
-			if (itemMeta == null) {
-				cartList.set(i, null);
-				continue;
+			return ret;
+		} catch (Exception e) {
+			throw new ServletException(e);
+		}
+	}
+	
+	/// To be over-ridden
+	public void initSetup(CorePage original, ServletConfig servletConfig) {
+		try {
+			if (servletConfig != null) {
+				init(servletConfig);
 			}
-			
-			// Add the item meta
-			cartLine.add(2, itemMeta);
-			cartList.set(i, cartLine);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		
-		// Null out zero counts
-		cartList = nullOutZeroCount(cartList);
-		
-		// Remove null from list
-		cartList.removeAll(Collections.singleton(null));
-		
-		// Return final list
-		return cartList;
 	}
 	
-	///
-	/// Merges in two `[[ID,count], ... ]` cart listing into a single listing
-	///
-	/// @param  The `[[ID,count], ... ]` list to use as base
-	/// @param  The `[[ID,count], ... ]` list to add
-	/// @param  Indicator if items 0 or less, will be removed from list
-	///
-	/// @return The processed and validated `[[ID,count,meta], ... ]`
-	///
-	public GenericConvertList<List<Object>> mergeCartList(List<List<Object>> inBaseList,
-		List<List<Object>> addList, boolean removeZeroCount) {
-		
-		// Ensure valid input list
-		GenericConvertList<List<Object>> baseList = GenericConvertList.build(inBaseList);
-		GenericConvertList<List<Object>> updateList = GenericConvertList.build(addList);
-		
-		// Iterate the add list
-		if (updateList != null) {
-			int iLen = updateList.size();
-			for (int i = 0; i < iLen; ++i) {
-				// Line record of an update
-				GenericConvertList<Object> updateLine = updateList.getGenericConvertList(i, null);
-				
-				// Skip blank / invalid lines
-				if (updateLine == null || updateLine.size() < 2) {
-					continue;
-				}
-				
-				// ID and count
-				String id = updateLine.getString(0);
-				int count = updateLine.getInt(1);
-				// Note this maybe null
-				Object meta = null;
-				if (updateLine.size() > 2) {
-					meta = updateLine.get(2);
-				}
-				//
-				// Find the ID in existing cartList, update count
-				//
-				boolean found = false;
-				for (int j = 0; j < baseList.size(); j++) {
-					// Iterate, and ignore blank lines
-					GenericConvertList<Object> baseLine = baseList.getGenericConvertList(j);
-					if (baseLine == null) {
-						continue;
-					}
-					// ID is valid
-					if (baseLine.getString(0).equals(id)) {
-						
-						// Base count
-						int baseCount = baseLine.getInt(1);
-						
-						// Sum up the count
-						baseLine.set(1, baseCount + count);
-						
-						// Check if meta object needs to be transfered over
-						if (meta != null) {
-							// Check for base meta object, this takes priority in merge
-							Object baseMeta = baseLine.get(2);
-							// Merge if baseMeta is null
-							if (baseMeta == null) {
-								baseLine.set(2, meta);
-							}
-						}
-						
-						// Replace and update
-						baseList.set(j, baseLine);
-						
-						// Indicate item was found, validate
-						found = true;
-						break;
-					}
-				}
-				
-				//
-				// No ID found, append to cartList
-				//
-				if (!found) {
-					List<Object> newList = new ArrayList<Object>();
-					newList.add(id);
-					newList.add(count);
-					
-					if (meta != null) {
-						newList.add(meta);
-					}
-					
-					baseList.add(newList);
-				}
-			}
-		}
-		
-		// Remove zero count or less rows
-		if (removeZeroCount) {
-			// Null out  zero count
-			baseList = nullOutZeroCount(baseList);
-		}
-		
-		// Remove null from list
-		baseList.removeAll(Collections.singleton(null));
-		
-		// Return final list
-		return baseList;
-	}
-	
-	///
-	/// Update and add in the additional  `[[ID,count], ... ]` cart listing into a existing cart
-	///
-	/// @param  Request page used, this is used to get the cookie value
-	/// @param  The `[[ID,count], ... ]` list to add
-	/// @param  Simple mode indicator, if its false, it runs the validation step for more information
-	///
-	/// @return Returns a list as `[[ID,count], ... ]` in simple mode, else returns `[[ID,count,meta], ... ]`
-	///
-	public GenericConvertList<List<Object>> updateCartList(CorePage requestPage,
-		List<List<Object>> addList, boolean simple) {
-		// Get existing cart
-		GenericConvertList<List<Object>> cart = getCartList(requestPage, false);
-		
-		// Merge in addList
-		if (addList != null) {
-			cart = mergeCartList(cart, addList, true);
-		}
-		
-		// Update, validate, return the cart
-		return replaceCartList(requestPage, cart, simple);
-	}
-	
-	///
-	/// Full replacement varient of updateCartList
-	///
-	/// @param  Request page used, this is used to get the cookie value
-	/// @param  The `[[ID,count], ... ]` list to add
-	/// @param  Simple mode indicator, if its false, it runs the validation step for more information
-	///
-	/// @return Returns a list as `[[ID,count], ... ]` in simple mode, else returns `[[ID,count,meta], ... ]`
-	///
-	public GenericConvertList<List<Object>> replaceCartList(CorePage requestPage,
-		List<List<Object>> cartList, boolean simple) {
-		// Get existing cart
-		GenericConvertList<List<Object>> cart = GenericConvert.toGenericConvertList(cartList,
-			new ArrayList<Object>());
-		
-		// Validate
-		if (!simple) {
-			cart = fetchAndValidateCartList(cart);
-		}
-		
-		// Max cart size handling
-		if (cart.size() > cartMax) {
-			throw new RuntimeException("Cart maximum size exceeded : " + cart.size() + "/" + cartMax);
-		}
-		
-		// Update the JSON cookie with cart
-		setCartCookieJSON(requestPage, cartListToCookieJSON(cart));
-		
-		// Return the cart
-		return cart;
-	}
-	
-	/////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
 	//
-	// shopping cart [util functions]
+	// Convinence functions
 	//
-	/////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
 	
-	///
-	/// Nulls items with count of 0 or less
-	///
-	/// @param  The `[[ID,count], ... ]` list to use
-	///
-	/// @return The processed and validated `[[ID,count], ... ]`
-	///
-	protected GenericConvertList<List<Object>> nullOutZeroCount(
-		GenericConvertList<List<Object>> cartList) {
-		// Iterate and get meta objects
-		for (int i = 0; i < cartList.size(); i++) {
-			GenericConvertList<Object> cartLine = cartList.getGenericConvertList(i);
-			// Ignore blank lines
-			if (cartLine == null) {
-				continue;
-			}
-			// Invalid count check
-			int count = cartLine.getInt(1, 0);
-			if (count <= 0) {
-				// Removing invalid count
-				cartList.set(i, null);
-			}
-		}
-		return cartList;
+	/// gets the PrintWriter, from the getOutputStream() object and returns it
+	public PrintWriter getWriter() {
+		return new PrintWriter(getOutputStream(), true);
 	}
 	
-	/////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Product listing
-	//
-	/////////////////////////////////////////////////////////////////////////////////////////
-	
-	///
-	/// Gets a list of products assigned under an ownerID
-	///
-	/// @param  The ownerID assigned
-	///
-	/// @return List of meta objects representing the owner
-	///
-	public GenericConvertList<MetaObject> getProductList(String ownerID) {
-		// Sanity check
-		if (ownerID == null || ownerID.isEmpty()) {
-			throw new RuntimeException("Missing ownerID");
-		}
-		
-		// Return object
-		GenericConvertList<MetaObject> ret = new GenericConvertArrayList<MetaObject>();
-		
-		// Fetch and populate
-		MetaObject[] queryRet = productItem.query(ownerID + "=?", new String[] { ownerID },
-			"_createdTime", 0, productMax);
-		if (queryRet != null && queryRet.length > 0) {
-			for (int i = 0; i < queryRet.length; ++i) {
-				ret.add(queryRet[i]);
-			}
-		}
-		
-		// Return
-		return ret;
+	/// gets the OutputStream, from the httpResponse.getOutputStream() object and returns it
+	/// also surpresses IOException, as RuntimeException
+	public OutputStream getOutputStream() {
+		return responseOutputStream;
 	}
 	
-	///
-	/// Updates the product listing under an ownerID
-	///
-	/// @param  The ownerID assigned
-	/// @param  List of product objects to insert / update
-	///
-	/// @return List of meta objects representing the owner
-	///
-	public List<MetaObject> updateProductList(String ownerID, List<Object> inUpdateList) {
-		//
-		// Sanity check
-		//
-		if (ownerID == null || ownerID.isEmpty()) {
-			throw new RuntimeException("Missing ownerID");
+	/// Cached context path
+	protected String _contextPath = null;
+	
+	/// Gets and returns the context path / application folder path in absolute terms if possible
+	public String getContextPath() {
+		if (_contextPath != null) {
+			return _contextPath;
 		}
 		
-		MetaObject ownerObj = productOwner.get(ownerID);
-		if (ownerObj == null) {
-			throw new RuntimeException("Missing product owner object for : " + ownerID);
+		if (httpRequest != null) {
+			return _contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/";
 		}
 		
-		if (inUpdateList == null) {
-			throw new RuntimeException("Missing update list");
+		if (_servletContextEvent != null) {
+			ServletContext sc = _servletContextEvent.getServletContext();
+			return _contextPath = sc.getRealPath("/") + "/";
 		}
 		
-		// Existing product list from ownerID
-		GenericConvertList<MetaObject> prodList = getProductList(ownerID);
-		
-		// Update list to use
-		GenericConvertList<Object> updateList = GenericConvertList.build(inUpdateList);
-		
-		//
-		// Iterate the update list, updating if need be. La, la la
-		//
-		int iLen = updateList.size();
-		for (int i = 0; i < iLen; ++i) {
-			// Ensure it is a new object, avoid meta object changes bugs
-			GenericConvertMap<String, Object> updateProduct = updateList.getGenericConvertStringMap(i,
-				null);
-			
-			// Skip null rows
-			if (updateProduct == null) {
-				continue;
-			}
-			
-			// Make new object, clone the values
-			updateProduct = new GenericConvertHashMap<String, Object>(updateProduct);
-			
-			// Product _oid
-			String update_oid = updateProduct.getString("_oid", null);
-			if (update_oid != null && "new".equalsIgnoreCase(update_oid)) {
-				update_oid = null;
-			}
-			
-			// Sanitize updateProduct
-			updateProduct = sanatizePurchaseData(updateProduct);
-			
-			// The meta object to create / update
-			MetaObject updateMetaObject = null;
-			
-			// Get the meta object to "update"
-			if (update_oid != null) {
-				// Old meta object
-				updateMetaObject = productItem.get(update_oid);
-				
-				if (updateMetaObject == null) {
-					throw new RuntimeException("Unable to fetch product with id : " + update_oid);
-				}
-				
-				// Security validation of owner ID
-				if (!ownerID.equals(updateMetaObject.get(ownerID))) {
-					throw new SecurityException("Unauthorized update call to object " + update_oid
-						+ " with invalid ownerID " + ownerID);
-				}
-			} else {
-				// New meta object
-				updateMetaObject = productItem.newObject();
-				updateMetaObject.put(ownerID, ownerID);
-				updateMetaObject.saveDelta();
-				
-				prodList.add(updateMetaObject);
-			}
-			
-			// Update the meta values
-			updateMetaObject.putAll(updateProduct);
-			
-			//
-			// @TODO : inventory quantity management
-			//
-			
-			// Save
-			updateMetaObject.saveDelta();
+		try {
+			// Note this may fail for contextInitialized
+			return _contextPath = getServletContext().getRealPath("/") + "/";
+		} catch (Exception e) {
+			return _contextPath = "./";
 		}
-		
-		return prodList;
 	}
 	
-	/////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// products [util functions]
-	//
-	/////////////////////////////////////////////////////////////////////////////////////////
+	/// Cached context path
+	protected String _contextURI = null;
 	
-	///
-	/// Converts the cart listing object to JSON string
-	///
-	/// @param  List of metaobject to find
-	/// @param  _oid to find for
-	///
-	/// @return The metaobject found (if found)
-	///
-	protected MetaObject findMetaObjectInList(List<MetaObject> list, String oid) {
-		for (MetaObject o : list) {
-			if (o._oid().equalsIgnoreCase(oid)) {
-				return o;
-			}
+	/// Returns the servlet contextual path : needed for base URI for page redirects / etc
+	public String getContextURI() {
+		if (_contextURI != null) {
+			return _contextURI;
+		}
+		
+		if (httpRequest != null) {
+			return _contextURI = httpRequest.getContextPath();
+		}
+		
+		if (_servletContextEvent != null) {
+			ServletContext sc = _servletContextEvent.getServletContext();
+			return _contextURI = sc.getContextPath() + "/";
+		}
+		
+		try {
+			return (URLDecoder.decode(this.getClass().getClassLoader().getResource("/").getPath(),
+				"UTF-8")).split("/WEB-INF/classes/")[0];
+		} catch (UnsupportedEncodingException | NullPointerException e) {
+			return "../";
+		}
+	}
+	
+	/// Returns the servlet contextual path : needed for base URI for page redirects / etc
+	public String getServletContextURI() {
+		if (httpRequest != null) {
+			return httpRequest.getServletPath();
+		}
+		//return getServletPath();
+		throw new RuntimeException(
+			"Unable to process getServletContextURI, outside of servlet request");
+	}
+	
+	/// gets a parameter value, from the httpRequest.getParameter
+	public String getParameter(String paramName) {
+		if (requestParameters() != null) {
+			return requestParameters().get(paramName);
 		}
 		return null;
 	}
 	
-	/////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Sales purchase order
-	//
-	/////////////////////////////////////////////////////////////////////////////////////////
+	/// Proxies to httpResponse.sendRedirect,
+	/// Fallsback to responseHeaderMap.location, if httpResponse is null
+	public void sendRedirect(String uri) {
+		if (httpResponse != null) {
+			try {
+				httpResponse.sendRedirect(uri);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			return;
+		}
+		
+		// if( responseHeaderMap == null ) {
+		// 	responseHeaderMap = new HashMap<String, String>();
+		// }
+		// responseHeaderMap.put("location", uri);
+	}
 	
-	///
-	/// Creates a purchase order using a cart listing.
-	/// This creates a snapshot of all the products. And store it
-	///
-	/// @param  Owner ID - used to identify the purchase owner
-	/// @param  Shopping cart list to create the purchase order
-	/// @param  Meta data to add to the purchase order
-	/// @param  Meta data to add to the purchase order items
-	/// @param  Purchase status "request", "approved", "paid", "rejected", "failed"
-	///
-	public GenericConvertMap<String, Object> createPurchaseOrder(String purchaseOwnerID,
-		List<List<Object>> cart, Map<String, Object> orderMeta, Map<String, Object> itemMeta,
-		String status) {
-		// The order object to use
-		MetaObject orderObj = salesOrder.newObject();
-		
-		// Make sure the meta object, is a cloned, and sanatized
-		if (orderMeta == null) {
-			orderMeta = new GenericConvertHashMap<String, Object>();
-		} else {
-			orderMeta = sanatizePurchaseData(new GenericConvertHashMap<String, Object>(orderMeta));
+	///////////////////////////////////////////////////////
+	//
+	// Process Chain execution
+	//
+	///////////////////////////////////////////////////////
+	
+	/// Triggers the process chain with the current setup, and indicates failure / success
+	public boolean processChain() throws ServletException {
+		try {
+			try {
+				boolean ret = true;
+				
+				// Does setup
+				doSharedSetup();
+				doSetup();
+				
+				// is JSON request?
+				if (isJsonRequest()) {
+					ret = processChainJSON();
+				} else { // or as per normal
+					ret = processChainRequest();
+				}
+				
+				// Flush any data if exists
+				getWriter().flush();
+				
+				// Does teardwon
+				doSharedTeardown();
+				doTeardown();
+				
+				// Returns success or failure
+				return ret;
+			} catch (Exception e) {
+				doException(e);
+				return false;
+			}
+		} catch (Exception e) {
+			throw new ServletException(e);
 		}
-		
-		if (itemMeta == null) {
-			itemMeta = new GenericConvertHashMap<String, Object>();
-		}
-		// Building the orderObj, with _ownerID, and _orderStatus link
-		orderObj.putAll(orderMeta);
-		orderObj.put(ownerID, purchaseOwnerID);
-		orderObj.put(orderStatus, status);
-		orderObj.saveDelta();
-		
-		// Get the order ID
-		String orderID = orderObj._oid();
-		
-		// Creating the cart items
-		GenericConvertList<List<Object>> cartlist = fetchAndValidateCartList(cart);
-		
-		// The item order list
-		ArrayList<MetaObject> itemList = new ArrayList<MetaObject>();
-		
-		// Build the order items
-		for (List<Object> cartRawRow : cartlist) {
-			// Generic list
-			GenericConvertList<Object> cartRow = GenericConvertList.build(cartRawRow);
+	}
+	
+	/// The process chain part specific to a normal request
+	@SuppressWarnings("incomplete-switch")
+	private boolean processChainRequest() throws Exception {
+		try {
+			// Does authentication check
+			if (!doAuth(templateDataObj)) {
+				return false;
+			}
 			
-			// Cart item object
-			MetaObject orderItem = salesItem.newObject();
+			// Does for all requests
+			if (!doRequest(templateDataObj)) {
+				return false;
+			}
+			boolean ret = true;
 			
-			// Get the item info, merge it with item meta
-			int itemCount = cartRow.getInt(1);
-			
-			// Item object mapping
-			GenericConvertMap<String, Object> rawItemObj = cartRow.getGenericConvertStringMap(2);
-			GenericConvertMap<String, Object> itemObj = new GenericConvertHashMap<String, Object>(
-				rawItemObj);
-			
-			// Merge it into the actual item object
-			orderItem.putAll(sanatizePurchaseData(itemObj));
-			orderItem.putAll(sanatizePurchaseData(new GenericConvertHashMap<String, Object>(
-				new HashMap<String, Object>(itemMeta))));
-			
-			//Get the total cost of the item, merge with item meta
-			float totalCost = cartRow.getFloat(3);
-			
-			// Owner meta mapping
-			GenericConvertMap<String, Object> ownerMetaObj = new GenericConvertHashMap<String, Object>(
-				productOwner.get(rawItemObj.get(ownerID)));
-			
-			// Item meta mapping
-			GenericConvertMap<String, Object> itemMetaObj = new GenericConvertHashMap<String, Object>(
-				productItem.get(rawItemObj.get("_oid")));
-			
-			// Link it all up
-			orderItem.put("_count", itemCount);
-			orderItem.put("_totalCost", totalCost);
-			orderItem.put(ownerID, purchaseOwnerID);
-			orderItem.put("_orderID", orderID);
-			orderItem.put("_sellerID", rawItemObj.get(ownerID));
-			orderItem.put("_productID", rawItemObj.get("_oid"));
-			orderItem.put(orderStatus, status);
-			
-			// Product meta information
-			orderItem.put("_productMeta", itemMetaObj);
-			orderItem.put("_ownerMeta", ownerMetaObj);
-			
-			// Save it
-			orderItem.saveDelta();
-			
+			// Switch is used over if,else for slight compiler optimization
+			// http://stackoverflow.com/questions/6705955/why-switch-is-faster-than-if
 			//
-			// @TODO : inventory quantity management
-			//
+			// HttpRequestType reqTypeAsEnum = HttpRequestType(requestType);
+			switch (requestType) {
+			case GET:
+				ret = doGetRequest(templateDataObj);
+				break;
+			case POST:
+				ret = doPostRequest(templateDataObj);
+				break;
+			case PUT:
+				ret = doPutRequest(templateDataObj);
+				break;
+			case DELETE:
+				ret = doDeleteRequest(templateDataObj);
+				break;
+			}
 			
-			// Put into final item list
-			itemList.add(orderItem);
+			if (ret) {
+				outputRequest(templateDataObj, getWriter());
+			}
+			
+			return ret;
+		} catch (Exception e) {
+			return outputRequestException(templateDataObj, getWriter(), e);
+		}
+	}
+	
+	/// The process chain part specific to JSON request
+	@SuppressWarnings("incomplete-switch")
+	private boolean processChainJSON() throws Exception {
+		try {
+			// Does authentication check
+			if (!doAuth(templateDataObj)) {
+				return false;
+			}
+			
+			// Does for all JSON
+			if (!doJSON(jsonDataObj, templateDataObj)) {
+				return false;
+			}
+			
+			boolean ret = true;
+			
+			// Switch is used over if,else for slight compiler optimization
+			// http://stackoverflow.com/questions/6705955/why-switch-is-faster-than-if
+			//
+			switch (requestType) {
+			case GET:
+				ret = doGetJSON(jsonDataObj, templateDataObj);
+				break;
+			case POST:
+				ret = doPostJSON(jsonDataObj, templateDataObj);
+				break;
+			case PUT:
+				ret = doPutJSON(jsonDataObj, templateDataObj);
+				break;
+			case DELETE:
+				ret = doDeleteJSON(jsonDataObj, templateDataObj);
+				break;
+			}
+			
+			if (ret) {
+				outputJSON(jsonDataObj, templateDataObj, getWriter());
+			}
+			
+			return ret;
+		} catch (Exception e) {
+			return outputJSONException(jsonDataObj, templateDataObj, getWriter(), e);
+		}
+	}
+	
+	///////////////////////////////////////////////////////
+	//
+	// Process chains overwrites
+	//
+	///////////////////////////////////////////////////////
+	
+	/// [To be extended by sub class, if needed]
+	/// Called once when initialized per request, and by the initializeContext thread.
+	///
+	/// The distinction is important, as certain parameters (such as requesrt details),
+	/// cannot be assumed to be avaliable in initializeContext, but is present for most requests
+	public void doSharedSetup() throws Exception {
+		// Does nothing (to override)
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Called once when completed per request, regardless of request status, and by the destroyContext thread
+	///
+	/// PS: This is rarely needed, just rely on java GC =)
+	///
+	/// The distinction is important, as certain parameters (such as requesrt details),
+	/// cannot be assumed to be avaliable in initializeContext, but is present for most requests
+	public void doSharedTeardown() throws Exception {
+		// Does nothing (to override)
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Called once when initialized per request
+	public void doSetup() throws Exception {
+		// Does nothing (to override)
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Called once when completed per request, regardless of request status
+	/// PS: This is rarely needed, just rely on java GC =)
+	public void doTeardown() throws Exception {
+		// Does nothing (to override)
+	}
+	
+	/// Handles setup and teardown exception
+	public void doException(Exception e) throws Exception {
+		throw e;
+	}
+	
+	// HTTP request handling
+	//-------------------------------------------
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the needed page request authentication, page redirects (if needed), and so forth. Should not do any actual,
+	/// output processing. Returns true to continue process chian (default) or false to terminate the process chain.
+	public boolean doAuth(Map<String, Object> templateData) throws Exception {
+		return true;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the required page request processing, this is used if both post / get behaviour is consistent
+	public boolean doRequest(Map<String, Object> templateData) throws Exception {
+		return true;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the required page GET processing, AFTER doRequest
+	public boolean doGetRequest(Map<String, Object> templateData) throws Exception {
+		return true;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the required page POST processing, AFTER doRequest
+	public boolean doPostRequest(Map<String, Object> templateData) throws Exception {
+		return true;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the required page PUT processing, AFTER doRequest
+	public boolean doPutRequest(Map<String, Object> templateData) throws Exception {
+		return true;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the required page DELETE processing, AFTER doRequest
+	public boolean doDeleteRequest(Map<String, Object> templateData) throws Exception {
+		return true;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the output processing, this is after do(Post/Get/Put/Delete)Request
+	public boolean outputRequest(Map<String, Object> templateData, PrintWriter output)
+		throws Exception {
+		return true;
+	}
+	
+	/// Exception handler for the request stack
+	///
+	/// note that this should return false, or throw a ServletException, UNLESS the exception was gracefully handled.
+	/// which in most cases SHOULD NOT be handled here.
+	public boolean outputRequestException(Map<String, Object> templateData, PrintWriter output,
+		Exception e) throws Exception {
+		// Throws a runtime Exception, let the servlet manager handle the rest
+		throw e;
+		//return false;
+	}
+	
+	// JSON request handling
+	//-------------------------------------------
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the JSON request processing, and outputs a JSON object
+	public boolean doJSON(Map<String, Object> outputData, Map<String, Object> templateData)
+		throws Exception {
+		return true;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the JSON request processing, and outputs a JSON object
+	public boolean doGetJSON(Map<String, Object> outputData, Map<String, Object> templateData)
+		throws Exception {
+		return true;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the JSON request processing, and outputs a JSON object
+	public boolean doPostJSON(Map<String, Object> outputData, Map<String, Object> templateData)
+		throws Exception {
+		return true;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the JSON request processing, and outputs a JSON object
+	public boolean doPutJSON(Map<String, Object> outputData, Map<String, Object> templateData)
+		throws Exception {
+		return true;
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Does the JSON request processing, and outputs a JSON object
+	public boolean doDeleteJSON(Map<String, Object> outputData, Map<String, Object> templateData)
+		throws Exception {
+		return true;
+	}
+	
+	/// [Avoid Extending, this handles all the various headers and JSONP / CORS]
+	/// Does the actual final json object to json string output, with contentType "application/javascript"
+	public boolean outputJSON(Map<String, Object> outputData, Map<String, Object> templateData,
+		PrintWriter output) throws Exception {
+		// Set content type to JSON
+		if (httpResponse != null) {
+			httpResponse.setContentType("application/javascript");
 		}
 		
-		// Store the list representation
-		orderObj.put("_productList", itemList);
-		orderObj.saveDelta();
-		
-		// Prepare the actual return object
-		GenericConvertHashMap<String, Object> resMap = new GenericConvertHashMap<String, Object>();
-		
-		// Populate
-		resMap.putAll(orderObj);
-		resMap.put("productList", itemList);
-		
-		return resMap;
+		// Output the data
+		output.println(ConvertJSON.fromObject(outputData));
+		return true;
 	}
 	
+	/// Exception handler for the request stack
 	///
-	/// Gets a single purchase order, and all its relevent data
-	///
-	/// @param  OrderID - the "createPurchaseOrder" _oid
-	///
-	public GenericConvertMap<String, Object> updatePurchaseOrderStatus(String orderID,
-		String newStatus) {
-		// Prepare the actual return object
-		GenericConvertHashMap<String, Object> resMap = new GenericConvertHashMap<String, Object>();
+	/// note that this should return false, UNLESS the exception was gracefully handled.
+	/// which in most cases SHOULD NOT be handled here.
+	public boolean outputJSONException(Map<String, Object> outputData,
+		Map<String, Object> templateData, PrintWriter output, Exception e) throws Exception {
+		// Converts the stack trace to a string
+		String stackTrace = org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e);
 		
-		// Sales object
-		MetaObject salesObject = salesOrder.get(orderID);
+		// Performs a stack trace, and returns it in a JSON object
+		Map<String, String> ret = new HashMap<String, String>();
+		ret.put("error", stackTrace);
 		
-		// Update sales object status
-		salesObject.put(orderStatus, newStatus);
-		salesObject.saveDelta();
-		
-		// Item list
-		List<MetaObject> prodList = fetchSalesItemList(orderID);
-		for (MetaObject item : prodList) {
-			item.put(orderStatus, newStatus);
-			item.saveDelta();
+		// Set content type to JSON
+		if (httpResponse != null) {
+			httpResponse.setContentType("application/javascript");
 		}
 		
-		// Populate
-		resMap.putAll(salesObject);
-		resMap.put("productList", prodList);
-		
-		// Return
-		return resMap;
+		// Output the data
+		output.println(ConvertJSON.fromObject(ret));
+		return false;
 	}
 	
-	///
-	/// Gets a single purchase order, and all its relevent data
-	///
-	/// @param  OrderID - the "createPurchaseOrder" _oid
-	///
-	public GenericConvertMap<String, Object> fetchPurchaseOrder(String orderID) {
-		// Prepare the actual return object
-		GenericConvertHashMap<String, Object> resMap = new GenericConvertHashMap<String, Object>();
-		
-		// Sales object
-		MetaObject salesObject = salesOrder.get(orderID);
-		if (salesObject == null) {
-			throw new RuntimeException("Invalid OID");
+	///////////////////////////////////////////////////////
+	//
+	// Servlet Context handling
+	//
+	///////////////////////////////////////////////////////
+	
+	/// Cached servlet context event
+	protected ServletContextEvent _servletContextEvent = null;
+	
+	/// [To be extended by sub class, if needed]
+	/// Initialize context setup process
+	public void initializeContext() throws Exception {
+		// does nothing
+	}
+	
+	/// [To be extended by sub class, if needed]
+	/// Initialize context destroy process
+	public void destroyContext() throws Exception {
+		// does nothing
+	}
+	
+	///////////////////////////////////////////////////////
+	//
+	// Native Servlet do overwrites [Avoid overwriting]
+	//
+	///////////////////////////////////////////////////////
+	
+	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
+	@Override
+	public final void doGet(HttpServletRequest request, HttpServletResponse response)
+		throws ServletException {
+		spawnInstance().setupInstance(HttpRequestType.GET, request, response).processChain();
+	}
+	
+	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
+	@Override
+	public final void doPost(HttpServletRequest request, HttpServletResponse response)
+		throws ServletException {
+		spawnInstance().setupInstance(HttpRequestType.POST, request, response).processChain();
+	}
+	
+	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
+	@Override
+	public final void doPut(HttpServletRequest request, HttpServletResponse response)
+		throws ServletException {
+		spawnInstance().setupInstance(HttpRequestType.PUT, request, response).processChain();
+	}
+	
+	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
+	@Override
+	public final void doDelete(HttpServletRequest request, HttpServletResponse response)
+		throws ServletException {
+		spawnInstance().setupInstance(HttpRequestType.DELETE, request, response).processChain();
+	}
+	
+	/// [Do not extend] Diverts the native doX to spawnInstance().setupInstance(TYPE,Req,Res).processChain()
+	@Override
+	public final void doOptions(HttpServletRequest request, HttpServletResponse response)
+		throws ServletException {
+		spawnInstance().setupInstance(HttpRequestType.OPTION, request, response).processChain();
+		try {
+			super.doOptions(request, response);
+		} catch (Exception e) {
+			throw new ServletException(e);
 		}
-		// Populate
-		resMap.putAll(salesObject);
-		resMap.put("productList", fetchSalesItemList(orderID));
-		
-		// Return
-		return resMap;
 	}
 	
-	/////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Sales purchase order [protected]
-	//
-	/////////////////////////////////////////////////////////////////////////////////////////
-	
-	///
-	/// Gets a single purchase order list of items
-	///
-	/// @param  OrderID - the "createPurchaseOrder" _oid
-	///
-	protected List<MetaObject> fetchSalesItemList(String orderID) {
-		return Arrays.asList(salesItem.query("_orderID = ?", new Object[] { orderID }));
+	/// [Do not extend] Servlet context initializer handling.
+	public void contextInitialized(ServletContextEvent sce) {
+		_servletContextEvent = sce;
+		try {
+			doSharedSetup();
+			initializeContext();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
-	/////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Sales purchase order [utils]
-	//
-	/////////////////////////////////////////////////////////////////////////////////////////
-	
-	///
-	/// Sanatizes a map data from protected purchase order data
-	///
-	/// @param Map to sanatize and return
-	///
-	/// @return The parameter
-	///
-	protected GenericConvertMap<String, Object> sanatizePurchaseData(
-		GenericConvertMap<String, Object> inMap) {
-		// Sanatize the item info
-		inMap.remove("_oid");
-		inMap.remove("_orderID");
-		inMap.remove("_sellerID");
-		
-		inMap.remove(ownerID);
-		inMap.remove("_ownerMeta");
-		
-		inMap.remove("_productID");
-		inMap.remove("_productMeta");
-		
-		inMap.remove(orderStatus);
-		
-		// Other systems reserved vars
-		inMap.remove("_createTime");
-		inMap.remove("_updateTime");
-		
-		// Reserved and not in use?
-		inMap.remove("_purchaserID");
-		return inMap;
+	/// [Do not extend] Servlet context destroyed handling
+	public void contextDestroyed(ServletContextEvent sce) {
+		_servletContextEvent = sce;
+		try {
+			doSharedTeardown();
+			destroyContext();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
+	
+	/// @TODO : HEAD SUPPORT, for integration with FileServlet
 }

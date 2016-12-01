@@ -1,8 +1,7 @@
 package picoded.JStruct.module.site;
 
 // Target test class
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -31,6 +30,7 @@ import picoded.enums.HttpRequestType;
 import picoded.servlet.CorePage;
 import picoded.struct.GenericConvertList;
 // Test depends
+import picoded.struct.GenericConvertMap;
 
 // MetaTable base test class
 public class SimpleShoppingCart_test {
@@ -162,6 +162,12 @@ public class SimpleShoppingCart_test {
 		testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"], [\""
 			+ productItem.getFromKeyName("_oid")[0]._oid() + "\", 0] ]";
 		testCart = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
+		List<MetaObject> list = new ArrayList<MetaObject>();
+		list.add(productOwnerObject);
+		assertNotNull(simpleShoppingCart.findMetaObjectInList(list, productOwnerObject.get("_oid")
+			.toString()));
+		assertNull(simpleShoppingCart.findMetaObjectInList(list, "_oid"));
+		assertNull(simpleShoppingCart.findMetaObjectInList(new ArrayList<MetaObject>(), "_oid"));
 		assertNotNull(simpleShoppingCart.fetchAndValidateCartList(testCart));
 		
 		testJSON = "[[\"id-1\",10, null],[\"id-2\",0],[\"id-3\",-5, 3],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
@@ -233,5 +239,25 @@ public class SimpleShoppingCart_test {
 		assertNotNull(simpleShoppingCart.updateProductList(
 			productOwner.getFromKeyName("_oid")[0]._oid(), testCart.get(0)));
 		
+	}
+	
+	@Test
+	public void createPurchaseOrder() {
+		String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
+		GenericConvertList<List<Object>> testCart = GenericConvert.toGenericConvertList(testJSON,
+			new ArrayList<Object>());
+		Map<String, Object> itemMeta = new HashMap<String, Object>();
+		itemMeta.put("id-1", 11);
+		itemMeta.put("id-4", -1);
+		itemMeta.put("id-3", -6);
+		itemMeta.put("id-5", 11);
+		GenericConvertMap<String, Object> genericConvertMap = null;
+		assertNotNull(genericConvertMap = simpleShoppingCart.createPurchaseOrder("shopping-cart",
+			testCart, itemMeta, itemMeta, "Approved"));
+		assertNotNull(genericConvertMap = simpleShoppingCart.createPurchaseOrder("shopping-cart",
+			testCart, null, null, "Approved"));
+		assertNotNull(simpleShoppingCart.fetchSalesItemList(genericConvertMap.get("_oid").toString()));
+		assertNotNull(simpleShoppingCart.updatePurchaseOrderStatus(genericConvertMap.get("_oid")
+			.toString(), "Paid"));
 	}
 }

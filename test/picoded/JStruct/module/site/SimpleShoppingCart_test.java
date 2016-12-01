@@ -164,8 +164,12 @@ public class SimpleShoppingCart_test {
 			+ productItem.getFromKeyName("_oid")[0]._oid() + "\", 0] ]";
 		testCart = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
 		assertNotNull(simpleShoppingCart.fetchAndValidateCartList(testCart));
-		testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
+		
+		testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5, 3],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
+		testJSON1 = "[[\"id-1\",11],[\"id-4\",-1, null],[\"id-3\",-6, 4],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
 		testCart = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
+		testCart1 = GenericConvert.toGenericConvertList(testJSON1, new ArrayList<Object>());
+		
 		assertNotNull(simpleShoppingCart.mergeCartList(testCart, testCart1, true));
 	}
 }

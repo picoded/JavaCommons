@@ -83,6 +83,7 @@ public class SubvenueBookings_test {
 	@Test(expected = Exception.class)
 	public void getSubvenueBookings_bySubVenueIdTest() throws Exception {
 		assertNotNull(subvenueBookings.getSubvenueBookings_bySubVenueId("_subvenueID"));
+		assertNotNull(subvenueBookings.getSubvenueBookings_bySubVenueId("test"));
 		assertNotNull(subvenueBookings.getSubvenueBookings_bySubVenueId(null));
 	}
 	

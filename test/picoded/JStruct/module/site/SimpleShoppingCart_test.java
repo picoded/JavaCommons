@@ -193,12 +193,45 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
-	public void getProductList() {
-		assertNotNull(simpleShoppingCart.getProductList(null));
+	public void updateProductListTest() {
+		assertNotNull(simpleShoppingCart.updateProductList(null, null));
 	}
 	
 	@Test(expected = Exception.class)
 	public void getProductList1() {
-		assertNotNull(simpleShoppingCart.getProductList(""));
+		assertNotNull(simpleShoppingCart.updateProductList("", null));
+	}
+	
+	@Test(expected = Exception.class)
+	public void getProductLis2() {
+		assertNotNull(simpleShoppingCart.updateProductList("test", null));
+	}
+	
+	@Test(expected = Exception.class)
+	public void getProductList3() {
+		MetaTable productOwner = implementationConstructor1();
+		productOwnerObject = simpleShoppingCart.productOwner.newObject();
+		productOwnerObject.put("test", "Scrooge Mcduck");
+		productOwnerObject.saveDelta();
+		productOwner.append("test", productOwnerObject);
+		simpleShoppingCart.productOwner = productOwner;
+		assertNotNull(simpleShoppingCart.updateProductList(
+			productOwner.getFromKeyName("_oid")[0]._oid(), null));
+	}
+	
+	@Test
+	public void getProductList4() {
+		MetaTable productOwner = implementationConstructor1();
+		productOwnerObject = simpleShoppingCart.productOwner.newObject();
+		productOwnerObject.put("id-1", "Scrooge Mcduck");
+		productOwnerObject.saveDelta();
+		productOwner.append("id-1", productOwnerObject);
+		simpleShoppingCart.productOwner = productOwner;
+		String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
+		GenericConvertList<List<Object>> testCart = GenericConvert.toGenericConvertList(testJSON,
+			new ArrayList<Object>());
+		assertNotNull(simpleShoppingCart.updateProductList(
+			productOwner.getFromKeyName("_oid")[0]._oid(), testCart.get(0)));
+		
 	}
 }

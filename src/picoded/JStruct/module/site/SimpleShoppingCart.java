@@ -541,7 +541,7 @@ public class SimpleShoppingCart {
 		GenericConvertList<MetaObject> ret = new GenericConvertArrayList<MetaObject>();
 		
 		// Fetch and populate
-		MetaObject[] queryRet = productItem.query(ownerID + "=?", new String[] { ownerID },
+		MetaObject[] queryRet = productItem.query(this.ownerID + "=?", new String[] { ownerID },
 			"_createdTime", 0, productMax);
 		if (queryRet != null && queryRet.length > 0) {
 			for (int i = 0; i < queryRet.length; ++i) {
@@ -569,10 +569,10 @@ public class SimpleShoppingCart {
 			throw new RuntimeException("Missing ownerID");
 		}
 		
-		MetaObject ownerObj = productOwner.get(ownerID);
-		if (ownerObj == null) {
-			throw new RuntimeException("Missing product owner object for : " + ownerID);
-		}
+		//		MetaObject ownerObj1 = productOwner.get(ownerID);
+		//		if (ownerObj == null) {
+		//			throw new RuntimeException("Missing product owner object for : " + ownerID);
+		//		}
 		
 		if (inUpdateList == null) {
 			throw new RuntimeException("Missing update list");
@@ -745,8 +745,11 @@ public class SimpleShoppingCart {
 			float totalCost = cartRow.getFloat(3);
 			
 			// Owner meta mapping
-			GenericConvertMap<String, Object> ownerMetaObj = new GenericConvertHashMap<String, Object>(
-				productOwner.get(rawItemObj.get(ownerID)));
+			MetaObject metaObject = productOwner.get(rawItemObj.get(ownerID));
+			GenericConvertMap<String, Object> ownerMetaObj = null;
+			if (metaObject != null) {
+				ownerMetaObj = new GenericConvertHashMap<String, Object>(metaObject);
+			}
 			
 			// Item meta mapping
 			GenericConvertMap<String, Object> itemMetaObj = new GenericConvertHashMap<String, Object>(

@@ -199,22 +199,22 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
-	public void updateProductListTest() {
+	public void updateProductListTest() throws Exception {
 		assertNotNull(simpleShoppingCart.updateProductList(null, null));
 	}
 	
 	@Test(expected = Exception.class)
-	public void getProductList1() {
+	public void getProductList1() throws Exception {
 		assertNotNull(simpleShoppingCart.updateProductList("", null));
 	}
 	
 	@Test(expected = Exception.class)
-	public void getProductLis2() {
+	public void getProductLis2() throws Exception {
 		assertNotNull(simpleShoppingCart.updateProductList("test", null));
 	}
 	
 	@Test(expected = Exception.class)
-	public void getProductList3() {
+	public void getProductList3() throws Exception {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
 		productOwnerObject.put("test", "Scrooge Mcduck");

@@ -630,7 +630,7 @@ public class SimpleShoppingCart {
 			} else {
 				// New meta object
 				updateMetaObject = productItem.newObject();
-				updateMetaObject.put(ownerID, ownerID);
+				updateMetaObject.put(this.ownerID, ownerID);
 				updateMetaObject.saveDelta();
 				
 				prodList.add(updateMetaObject);

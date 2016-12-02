@@ -274,21 +274,29 @@ public class SimpleShoppingCart_test {
 		productOwner.append("id-1", productOwnerObject);
 		simpleShoppingCart.productOwner = productOwner;
 		String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
+		List<Object> inUpdateList = new ArrayList<Object>();
+		
+		inUpdateList.add(GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>()));
+		assertNotNull(simpleShoppingCart.updateProductList(
+			productOwner.getFromKeyName("_oid")[0]._oid(), inUpdateList));
+		
+		inUpdateList = new ArrayList<Object>();
 		GenericConvertMap<String, Object> itemObj = new GenericConvertHashMap<String, Object>();
 		itemObj.put("product_01", ConvertJSON.toList("[{\"name\":\"product_01\"}]"));
 		itemObj.put("testCart",
 			GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>()));
 		itemObj.put("_oid", "new");
-		List<Object> inUpdateList = new ArrayList<Object>();
 		inUpdateList.add(itemObj);
 		assertNotNull(simpleShoppingCart.updateProductList(
 			productOwner.getFromKeyName("_oid")[0]._oid(), inUpdateList));
+		
 		inUpdateList = new ArrayList<Object>();
 		itemObj.put("_oid", simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
 		inUpdateList.add(itemObj);
 		simpleShoppingCart.productOwner = simpleShoppingCart.productItem;
+		itemObj.put("_oid", simpleShoppingCart.productItem.getFromKeyName("_ownerID")[0]._oid());
 		assertNotNull(simpleShoppingCart.updateProductList(
-			simpleShoppingCart.productItem.getFromKeyName("_ownerID")[0]._oid(), inUpdateList));
+			simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid(), inUpdateList));
 	}
 	
 	@Test

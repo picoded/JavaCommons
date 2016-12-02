@@ -623,7 +623,7 @@ public class SimpleShoppingCart {
 				}
 				
 				// Security validation of owner ID
-				if (!ownerID.equals(updateMetaObject.get(ownerID))) {
+				if (!ownerID.equals(updateMetaObject.get(this.ownerID))) {
 					throw new SecurityException("Unauthorized update call to object " + update_oid
 						+ " with invalid ownerID " + ownerID);
 				}

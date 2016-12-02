@@ -569,8 +569,8 @@ public class SimpleShoppingCart {
 			throw new RuntimeException("Missing ownerID");
 		}
 		
-		//		MetaObject ownerObj1 = productOwner.get(ownerID);
-		//		if (ownerObj == null) {
+		//		MetaObject ownerObj = productOwner.get(ownerID);
+		//		if ( ownerObj == null) {
 		//			throw new RuntimeException("Missing product owner object for : " + ownerID);
 		//		}
 		

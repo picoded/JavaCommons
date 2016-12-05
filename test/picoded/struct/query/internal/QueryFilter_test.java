@@ -16,12 +16,7 @@ import org.junit.Test;
 
 import picoded.struct.MutablePair;
 import picoded.struct.query.Query;
-import picoded.struct.query.condition.LessThan;
-import picoded.struct.query.condition.LessThanOrEquals;
-import picoded.struct.query.condition.Like;
-import picoded.struct.query.condition.MoreThan;
-import picoded.struct.query.condition.MoreThanOrEquals;
-import picoded.struct.query.condition.NotEquals;
+import picoded.struct.query.condition.Equals;
 import picoded.struct.query.internal.QueryFilter;
 
 ///
@@ -173,11 +168,23 @@ public class QueryFilter_test {
 	}
 	
 	@Test(expected = RuntimeException.class)
-	public void collapseQueryTokensWithoutBracketsTest() {
+	public void collapseQueryTokensWithoutBracketsInvalidTest() {
 		List<Object> tokens = new ArrayList();
 		Map<String, Object> paramMap = new HashMap();
 		tokens.add(new StringBuilder("A = ? AND B = ?"));
 		assertNotNull(QueryFilter.collapseQueryTokensWithoutBrackets(tokens, paramMap));
 		
+	}
+	
+	@Test
+	public void collapseQueryTokensWithoutBracketsTest() {
+		List<Object> tokens = new ArrayList();
+		Map<String, Object> paramMap = new HashMap();
+		tokens.add(new Equals("key", "key_hello", paramMap));
+		tokens.add("AND");
+		tokens.add(new Equals("key1", "key1_hello", paramMap));
+		tokens.add("OR");
+		tokens.add(new Equals("key2", "key2_hello", paramMap));
+		assertNotNull(QueryFilter.collapseQueryTokensWithoutBrackets(tokens, paramMap));
 	}
 }

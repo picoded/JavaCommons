@@ -436,21 +436,22 @@ public class QueryFilter {
 		}
 		
 		if (combinationType == null) {
-			
-			// Empty token handling
-			if (tokens == null || tokens.isEmpty()) {
-				if (childList == null || childList.isEmpty()) {
-					throw new RuntimeException("Missing combination token: Empty tokens and child list");
-				}
-				
-				// Single nested child, promote it
-				if (childList.size() == 1) {
-					return childList.get(0);
-				} //else {
-				return combinationQuery("AND", childList, paramMap);
-				//}
-			}
-			throw new RuntimeException("Missing combination token: " + tokens);
+			return processCombinationType(tokens, paramMap, childList);
+			//			
+			//			// Empty token handling
+			//			if (tokens == null || tokens.isEmpty()) {
+			//				if (childList == null || childList.isEmpty()) {
+			//					throw new RuntimeException("Missing combination token: Empty tokens and child list");
+			//				}
+			//				
+			//				// Single nested child, promote it
+			//				if (childList.size() == 1) {
+			//					return childList.get(0);
+			//				} //else {
+			//					return combinationQuery("AND", childList, paramMap);
+			//				//}
+			//			}
+			//			throw new RuntimeException("Missing combination token: " + tokens);
 		}
 		
 		return combinationQuery(combinationType, childList, paramMap);
@@ -523,5 +524,23 @@ public class QueryFilter {
 		String[] querySplit = splitRefactoredQuery(refac.getLeft());
 		List<Object> tokenArr = buildBasicQuery(querySplit, refac.getRight());
 		return collapseQueryTokens(tokenArr, refac.getRight());
+	}
+	
+	protected static Query processCombinationType(List<Object> tokens, Map<String, Object> paramMap,
+		List<Query> childList) {
+		// Empty token handling
+		if (tokens == null || tokens.isEmpty()) {
+			if (childList == null || childList.isEmpty()) {
+				throw new RuntimeException("Missing combination token: Empty tokens and child list");
+			}
+			
+			// Single nested child, promote it
+			if (childList.size() == 1) {
+				return childList.get(0);
+			} //else {
+			return combinationQuery("AND", childList, paramMap);
+			//}
+		}
+		throw new RuntimeException("Missing combination token: " + tokens);
 	}
 }

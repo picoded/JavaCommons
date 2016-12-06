@@ -187,4 +187,30 @@ public class QueryFilter_test {
 		tokens.add(new Equals("key2", "key2_hello", paramMap));
 		assertNotNull(QueryFilter.collapseQueryTokensWithoutBrackets(tokens, paramMap));
 	}
+	
+	@Test(expected = RuntimeException.class)
+	public void collapseQueryTokensWithoutBracketsInvalidOperationTest() {
+		List<Object> tokens = new ArrayList();
+		Map<String, Object> paramMap = new HashMap();
+		tokens.add("AND");
+		tokens.add("OR");
+		assertNotNull(QueryFilter.collapseQueryTokensWithoutBrackets(tokens, paramMap));
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void collapseQueryTokensWithoutBracketsNullCombinationTypeOperationTest() {
+		List<Object> tokens = new ArrayList();
+		Map<String, Object> paramMap = new HashMap();
+		assertNotNull(QueryFilter.collapseQueryTokensWithoutBrackets(tokens, paramMap));
+	}
+	
+	@Test
+	public void collapseQueryTokensWithoutBracketsWrongOperationTest() {
+		List<Object> tokens = new ArrayList();
+		Map<String, Object> paramMap = new HashMap();
+		tokens.add(new Equals("key", "key_hello", paramMap));
+		tokens.add("ANDA");
+		tokens.add(new Equals("key1", "key1_hello", paramMap));
+		assertNotNull(QueryFilter.collapseQueryTokensWithoutBrackets(tokens, paramMap));
+	}
 }

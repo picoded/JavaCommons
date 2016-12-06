@@ -316,6 +316,18 @@ public class SimpleShoppingCart_test {
 		assertNotNull(simpleShoppingCart.createPurchaseOrder(
 			simpleShoppingCart.productOwner.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
 			cartList, itemObj, itemObj, "Paid"));
+		
+		productOwnerObject = simpleShoppingCart.productOwner.newObject();
+		productOwnerObject.put("id-1", "Scrooge Mcduck");
+		productOwnerObject.put("_ownerID",
+			simpleShoppingCart.productOwner.getFromKeyName("_ownerID")[0].get("_ownerID").toString());
+		productOwnerObject.saveDelta();
+		productOwner.append("id-1", productOwnerObject);
+		simpleShoppingCart.productOwner = productOwner;
+		assertNotNull(simpleShoppingCart.createPurchaseOrder(
+			simpleShoppingCart.productOwner.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
+			cartList, itemObj, itemObj, "Paid"));
+		
 		assertNotNull(simpleShoppingCart.updatePurchaseOrderStatus(
 			simpleShoppingCart.productOwner.getFromKeyName("_productList")[0]._oid(), "test"));
 		itemObj.put("testCart", cartList);

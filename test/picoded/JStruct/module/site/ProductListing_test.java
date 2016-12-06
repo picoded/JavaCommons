@@ -153,43 +153,9 @@ public class ProductListing_test {
 		productOwner.append("id-1", productOwnerObject);
 		productListing.productOwner = productOwner;
 		productListing.productItem = productListing.productOwner;
-		assertEquals(0, productListing.getList(productOwner.getFromKeyName("_oid")[0]._oid()));
+		assertEquals(0, productListing.getList(productOwner.getFromKeyName("_oid")[0]._oid()).size());
 		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
 			inUpdateList));
 		
-	}
-	
-	@Test(expected = Exception.class)
-	public void updateProductList7() throws Exception {
-		MetaTable productOwner = implementationConstructor1();
-		productOwnerObject = productListing.productOwner.newObject();
-		productOwnerObject.put("id-1", "Scrooge Mcduck");
-		productOwnerObject.put("_oid", "new");
-		productOwnerObject.saveDelta();
-		productOwner.append("id-1", productOwnerObject);
-		productListing.productOwner = productOwner;
-		String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"testCart\"] ]";
-		List<Object> inUpdateList = new ArrayList<Object>();
-		
-		inUpdateList.add(GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>()));
-		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
-			inUpdateList));
-		
-		inUpdateList = new ArrayList<Object>();
-		GenericConvertList<List<Object>> cartList = GenericConvert.toGenericConvertList(testJSON,
-			new ArrayList<Object>());
-		GenericConvertMap<String, Object> itemObj = new GenericConvertHashMap<String, Object>();
-		itemObj.put("product_01", ConvertJSON.toList("[{\"name\":\"product_01\"}]"));
-		itemObj.put("testCart", cartList);
-		itemObj.put("_oid", "new");
-		inUpdateList.add(itemObj);
-		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
-			inUpdateList));
-		
-		itemObj.put("_oid", productListing.productItem.getFromKeyName("_ownerID")[0].get("_ownerID")
-			.toString());
-		inUpdateList.add(itemObj);
-		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
-			inUpdateList));
 	}
 }

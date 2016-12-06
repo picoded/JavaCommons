@@ -95,7 +95,8 @@ public class ProductListing {
 		GenericConvertList<MetaObject> ret = new GenericConvertArrayList<MetaObject>();
 		
 		// Fetch and populate
-		MetaObject[] queryRet = productItem.query(ownerID + "=?", new String[] { ownerID },
+		@SuppressWarnings("static-access")
+		MetaObject[] queryRet = productItem.query(this.ownerID + "=?", new String[] { ownerID },
 			"_createdTime", 0, productMax);
 		if (queryRet != null && queryRet.length > 0) {
 			for (int i = 0; i < queryRet.length; ++i) {
@@ -115,6 +116,7 @@ public class ProductListing {
 	///
 	/// @return List of meta objects representing the owner
 	///
+	@SuppressWarnings("static-access")
 	public List<MetaObject> updateList(String ownerID, List<Object> inUpdateList) {
 		//
 		// Sanity check
@@ -173,7 +175,7 @@ public class ProductListing {
 				updateMetaObject = productItem.get(update_oid);
 				
 				// Security validation of owner ID
-				if (!ownerID.equals(updateMetaObject.get(ownerID))) {
+				if (!ownerID.equals(updateMetaObject.get(this.ownerID))) {
 					throw new SecurityException("Unauthorized update call to object " + update_oid
 						+ " with invalid ownerID " + ownerID);
 				}

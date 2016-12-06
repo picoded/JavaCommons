@@ -115,8 +115,8 @@ public class ProductListing_test {
 			productListing.productOwner.getFromKeyName("_oid")[0]._oid(), null));
 	}
 	
-	@Test
-	public void updateList3() {
+	@Test(expected = Exception.class)
+	public void updateList3() throws Exception {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = productListing.productOwner.newObject();
 		productOwnerObject.put("id-1", "Scrooge Mcduck");
@@ -130,12 +130,18 @@ public class ProductListing_test {
 		inUpdateList.add(GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>()));
 		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
 			inUpdateList));
+		testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"], [\""
+			+ productOwner.getFromKeyName("_oid")[0]._oid() + "\", 0] ]";
 		GenericConvertList<List<Object>> cartList = GenericConvert.toGenericConvertList(testJSON,
 			new ArrayList<Object>());
 		GenericConvertMap<String, Object> itemObj = new GenericConvertHashMap<String, Object>();
 		itemObj.put("product_01", ConvertJSON.toList("[{\"name\":\"product_01\"}]"));
 		itemObj.put("testCart", cartList);
 		itemObj.put("_oid", "new");
+		inUpdateList.add(itemObj);
+		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
+			inUpdateList));
+		itemObj.put("_oid", productOwner.getFromKeyName("_oid")[0]._oid());
 		inUpdateList.add(itemObj);
 		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
 			inUpdateList));

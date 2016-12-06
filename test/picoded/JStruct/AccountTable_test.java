@@ -347,6 +347,7 @@ public class AccountTable_test extends Mockito {
 		usrObj.setPassword("test123");
 		assertNotNull(usrObj = accTableObj.loginAccount(request, response, usrObj, "test123", true));
 		assertNotNull(usrObj = accTableObj.loginAccount(request, response, usrObj, "test123", false));
+		assertNull(accTableObj.loginAccount(request, response, "test123", "test", false));
 		
 	}
 	

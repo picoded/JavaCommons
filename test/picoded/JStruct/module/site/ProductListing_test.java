@@ -62,6 +62,7 @@ public class ProductListing_test {
 	public void constructorTest() {
 		//not null check
 		new ProductListing(jstructConstructor(), "shopping", "cart");
+		new ProductListing(jstructConstructor(), "shopping", "car");
 		assertNotNull(productListing);
 		new ProductListing();
 	}
@@ -84,26 +85,31 @@ public class ProductListing_test {
 	
 	@Test(expected = Exception.class)
 	public void getListTest() throws Exception {
-		assertNotNull(productListing.getList(""));
+		assertNotNull(productListing.getList(null));
 	}
 	
 	@Test(expected = Exception.class)
 	public void getListTest1() throws Exception {
+		assertNotNull(productListing.getList(""));
+	}
+	
+	@Test(expected = Exception.class)
+	public void updateListTest() throws Exception {
 		assertNotNull(productListing.updateList(null, null));
 	}
 	
 	@Test(expected = Exception.class)
-	public void updateList() throws Exception {
+	public void updateList1() throws Exception {
 		assertNotNull(productListing.updateList("", null));
 	}
 	
 	@Test(expected = Exception.class)
-	public void updateList1() throws Exception {
+	public void updateList2() throws Exception {
 		assertNotNull(productListing.updateList("test", null));
 	}
 	
 	@Test(expected = Exception.class)
-	public void updateList2() throws Exception {
+	public void updateList3() throws Exception {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = productListing.productOwner.newObject();
 		productOwnerObject.put("id-1", "Scrooge Mcduck");
@@ -116,7 +122,7 @@ public class ProductListing_test {
 	}
 	
 	@Test(expected = Exception.class)
-	public void updateList3() throws Exception {
+	public void updateList4() throws Exception {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = productListing.productOwner.newObject();
 		productOwnerObject.put("id-1", "Scrooge Mcduck");
@@ -142,7 +148,12 @@ public class ProductListing_test {
 		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
 			inUpdateList));
 		itemObj.put("_oid", productOwner.getFromKeyName("_oid")[0]._oid());
-		inUpdateList.add(itemObj);
+		productOwnerObject.put("_ownerID", productOwner.getFromKeyName("_oid")[0]._oid());
+		productOwnerObject.saveDelta();
+		productOwner.append("id-1", productOwnerObject);
+		productListing.productOwner = productOwner;
+		productListing.productItem = productListing.productOwner;
+		assertEquals(0, productListing.getList(productOwner.getFromKeyName("_oid")[0]._oid()));
 		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
 			inUpdateList));
 		

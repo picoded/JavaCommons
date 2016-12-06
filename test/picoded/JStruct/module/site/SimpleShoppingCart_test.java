@@ -316,7 +316,70 @@ public class SimpleShoppingCart_test {
 		assertNotNull(simpleShoppingCart.createPurchaseOrder(
 			simpleShoppingCart.productOwner.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
 			cartList, itemObj, itemObj, "Paid"));
+		assertNotNull(simpleShoppingCart.updatePurchaseOrderStatus(
+			simpleShoppingCart.productOwner.getFromKeyName("_productList")[0]._oid(), "test"));
+		itemObj.put("testCart", cartList);
+		inUpdateList.add(itemObj);
+		assertNotNull(simpleShoppingCart.updateProductList(
+			simpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
+			inUpdateList));
+	}
+	
+	@Test
+	public void updateProductList8() {
+		MetaTable productOwner = implementationConstructor1();
+		productOwnerObject = simpleShoppingCart.productOwner.newObject();
+		productOwnerObject.put("id-1", "Scrooge Mcduck");
+		productOwnerObject.put("_oid", "new");
+		productOwnerObject.saveDelta();
+		productOwner.append("id-1", productOwnerObject);
+		simpleShoppingCart.productOwner = productOwner;
+		String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"testCart\"] ]";
+		List<Object> inUpdateList = new ArrayList<Object>();
 		
+		inUpdateList.add(GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>()));
+		assertNotNull(simpleShoppingCart.updateProductList(
+			productOwner.getFromKeyName("_oid")[0]._oid(), inUpdateList));
+		
+		inUpdateList = new ArrayList<Object>();
+		GenericConvertList<List<Object>> cartList = GenericConvert.toGenericConvertList(testJSON,
+			new ArrayList<Object>());
+		GenericConvertMap<String, Object> itemObj = new GenericConvertHashMap<String, Object>();
+		itemObj.put("product_01", ConvertJSON.toList("[{\"name\":\"product_01\"}]"));
+		itemObj.put("testCart", cartList);
+		itemObj.put("_oid", "new");
+		inUpdateList.add(itemObj);
+		assertNotNull(simpleShoppingCart.updateProductList(
+			productOwner.getFromKeyName("_oid")[0]._oid(), inUpdateList));
+		
+		inUpdateList = new ArrayList<Object>();
+		itemObj.put("_oid", simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
+		inUpdateList.add(itemObj);
+		simpleShoppingCart.productOwner = simpleShoppingCart.productItem;
+		simpleShoppingCart.salesOrder = simpleShoppingCart.productItem;
+		assertNotNull(simpleShoppingCart.fetchPurchaseOrder(simpleShoppingCart.productItem
+			.getFromKeyName("_oid")[0]._oid()));
+		assertNotNull(simpleShoppingCart.updatePurchaseOrderStatus(
+			simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid(), "Paid"));
+		itemObj = new GenericConvertHashMap<String, Object>();
+		assertNotNull(simpleShoppingCart.getProductList(simpleShoppingCart.productOwner
+			.getFromKeyName("_ownerID")[0].get("_ownerID").toString()));
+		testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"_ownerID\", \""
+			+ simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid()
+			+ "\"], [\""
+			+ simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid() + "\", 9] ]";
+		cartList = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
+		itemObj.put("_oid",
+			simpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString());
+		assertNotNull(simpleShoppingCart.createPurchaseOrder(
+			simpleShoppingCart.productOwner.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
+			cartList, itemObj, itemObj, "Paid"));
+		assertNotNull(simpleShoppingCart.createPurchaseOrder(
+			simpleShoppingCart.productOwner.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
+			cartList, itemObj, itemObj, "Paid"));
+		
+		assertNotNull(simpleShoppingCart.updatePurchaseOrderStatus(
+			simpleShoppingCart.productOwner.getFromKeyName("_productList")[0]._oid(), "test"));
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
 		productOwnerObject.put("id-1", "Scrooge Mcduck");
 		productOwnerObject.put("_ownerID",
@@ -327,14 +390,6 @@ public class SimpleShoppingCart_test {
 		assertNotNull(simpleShoppingCart.createPurchaseOrder(
 			simpleShoppingCart.productOwner.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
 			cartList, itemObj, itemObj, "Paid"));
-		
-		assertNotNull(simpleShoppingCart.updatePurchaseOrderStatus(
-			simpleShoppingCart.productOwner.getFromKeyName("_productList")[0]._oid(), "test"));
-		itemObj.put("testCart", cartList);
-		inUpdateList.add(itemObj);
-		assertNotNull(simpleShoppingCart.updateProductList(
-			simpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
-			inUpdateList));
 	}
 	
 	@Test(expected = Exception.class)

@@ -349,7 +349,7 @@ public class AccountTable_test extends Mockito {
 		assertNotNull(accTableObj.loginAccount(request, response, usrObj, "test123", false));
 		assertNull(accTableObj.loginAccount(request, response, "test123", "test", false));
 		accTableObj.meatAccountTable.append(usrObj._oid(), usrObj);
-		assertNull(accTableObj.getUsersByGroupAndRole(null, null));
+		assertNotNull(accTableObj.getUsersByGroupAndRole(null, null));
 		
 	}
 	

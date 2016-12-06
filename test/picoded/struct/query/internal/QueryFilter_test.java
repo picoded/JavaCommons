@@ -213,4 +213,53 @@ public class QueryFilter_test {
 		tokens.add(new Equals("key1", "key1_hello", paramMap));
 		assertNotNull(QueryFilter.collapseQueryTokensWithoutBrackets(tokens, paramMap));
 	}
+	
+	@Test(expected = RuntimeException.class)
+	public void processCombinationTypeInvalidTest() {
+		assertNotNull(QueryFilter.processCombinationType(null, null, null));
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void processCombinationTypeInvalid1Test() {
+		List<Object> tokens = new ArrayList();
+		assertNotNull(QueryFilter.processCombinationType(tokens, null, null));
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void processCombinationTypeInvalid2Test() {
+		List<Object> tokens = new ArrayList();
+		List<Query> child = new ArrayList();
+		assertNotNull(QueryFilter.processCombinationType(tokens, null, child));
+	}
+	
+	@Test(expected = RuntimeException.class)
+	//"Missing combination token: "
+	public void processCombinationTypeInvalid3Test() {
+		List<Object> tokens = new ArrayList();
+		Map<String, Object> paramMap = new HashMap();
+		tokens.add(new Equals("key", "key_hello", paramMap));
+		List<Query> child = new ArrayList();
+		assertNotNull(QueryFilter.processCombinationType(tokens, null, child));
+	}
+	
+	@Test
+	public void processCombinationTypeSingleChildTest() {
+		List<Object> tokens = new ArrayList();
+		List<Query> child = new ArrayList();
+		Map<String, Object> paramMap = new HashMap();
+		Query query = new Equals("key1", "key1_hello", paramMap);
+		child.add(query);
+		assertEquals(query, QueryFilter.processCombinationType(tokens, null, child));
+	}
+	
+	@Test
+	public void processCombinationTypeChildrenTest() {
+		List<Object> tokens = new ArrayList();
+		List<Query> child = new ArrayList();
+		Map<String, Object> paramMap = new HashMap();
+		Query query = new Equals("key1", "key1_hello", paramMap);
+		child.add(new Equals("key1", "key1_hello", paramMap));
+		child.add(query);
+		assertNotNull(QueryFilter.processCombinationType(tokens, null, child));
+	}
 }

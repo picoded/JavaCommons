@@ -204,7 +204,7 @@ public class QueryFilter_test {
 		assertNotNull(QueryFilter.collapseQueryTokensWithoutBrackets(tokens, paramMap));
 	}
 	
-	@Test
+	@Test(expected = RuntimeException.class)
 	public void collapseQueryTokensWithoutBracketsWrongOperationTest() {
 		List<Object> tokens = new ArrayList();
 		Map<String, Object> paramMap = new HashMap();

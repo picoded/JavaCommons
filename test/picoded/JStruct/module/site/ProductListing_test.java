@@ -153,7 +153,7 @@ public class ProductListing_test {
 		productOwner.append("id-1", productOwnerObject);
 		productListing.productOwner = productOwner;
 		productListing.productItem = productListing.productOwner;
-		assertEquals(0, productListing.getList(productOwner.getFromKeyName("_oid")[0]._oid()).size());
+		assertNotNull(productListing.getList(productOwner.getFromKeyName("_oid")[0]._oid()));
 		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
 			inUpdateList));
 		

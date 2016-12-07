@@ -464,14 +464,7 @@ public class AccountTable_test extends Mockito {
 		assertNotNull(usrObj = accTableObj.getRequestUser(request, response));
 		usrObj.getMemberRole(usrObj);
 		usrObj.saveDelta();
-		
-		MetaTable productItem = implementationConstructor1();
-		usrObj.put("id-1", "Scrooge Mcduck");
-		usrObj.saveDelta();
-		productItem.append("id-1", usrObj);
-		
-		accTableObj.groupChildRole = productItem;
-		accTableObj.removeFromID("SuperUsers");
+		accTableObj.removeFromID(usrObj._oid());
 	}
 	
 	public MetaTable implementationConstructor1() {

@@ -463,11 +463,7 @@ public class AccountTable_test extends Mockito {
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
 		assertNotNull(usrObj = accTableObj.getRequestUser(request, response));
 		usrObj.getMemberRole(usrObj);
-		usrObj.saveDelta();
 		accTableObj.removeFromID(usrObj._oid());
 	}
 	
-	public MetaTable implementationConstructor1() {
-		return (new JStruct()).getMetaTable("test");
-	}
 }

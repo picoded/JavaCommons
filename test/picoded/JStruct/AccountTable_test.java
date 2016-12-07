@@ -452,16 +452,29 @@ public class AccountTable_test extends Mockito {
 		cookieJar[4] = new javax.servlet.http.Cookie("Account_Puid", usrObj._oid());
 		request.setCookies(cookieJar);
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
-		assertNotNull(accTableObj.getRequestUser(request, response));
+		assertNotNull(usrObj = accTableObj.getRequestUser(request, response));
 		
 		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", null);
 		request.setCookies(cookieJar);
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
-		assertNotNull(accTableObj.getRequestUser(request, response));
-		
+		assertNotNull(usrObj = accTableObj.getRequestUser(request, response));
 		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", "Rmbr");
 		request.setCookies(cookieJar);
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
-		assertNotNull(accTableObj.getRequestUser(request, response));
+		assertNotNull(usrObj = accTableObj.getRequestUser(request, response));
+		usrObj.getMemberRole(usrObj);
+		usrObj.saveDelta();
+		
+		MetaTable productItem = implementationConstructor1();
+		usrObj.put("id-1", "Scrooge Mcduck");
+		usrObj.saveDelta();
+		productItem.append("id-1", usrObj);
+		
+		accTableObj.groupChildRole = productItem;
+		accTableObj.removeFromID("SuperUsers");
+	}
+	
+	public MetaTable implementationConstructor1() {
+		return (new JStruct()).getMetaTable("test");
 	}
 }

@@ -421,9 +421,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		for (javax.servlet.http.Cookie crumbs : cookieJar) {
 			crumbsFlavour = crumbs.getName();
 			
-			if (crumbsFlavour == null) {
-				continue;
-			} else if (crumbsFlavour.equals(cookiePrefix + "Puid")) {
+			if (crumbsFlavour.equals(cookiePrefix + "Puid")) {
 				puid = crumbs.getValue();
 			} else if (crumbsFlavour.equals(cookiePrefix + "Nonc")) {
 				nonc = crumbs.getValue();

@@ -347,16 +347,16 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	private int rmberMeRenewal = rmberMeLifetime / 2; // 15 days
 	
 	/// Sets the cookie to be limited to http only
-	private boolean isHttpOnly = false;
+	protected boolean isHttpOnly = false;
 	
 	/// Sets the cookie to be via https only
-	private boolean isSecureOnly = false;
+	protected boolean isSecureOnly = false;
 	
 	/// Sets the cookie namespace prefix
 	private String cookiePrefix = "Account_";
 	
 	/// Sets teh cookie domain, defaults is null
-	private String cookieDomain = null;
+	protected String cookieDomain = null;
 	
 	/// The nonce size
 	protected int nonceSize = 22;

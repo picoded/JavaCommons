@@ -26,7 +26,7 @@ public class ProductListing {
 	/// Product list max size
 	protected int productMax = 250;
 	
-	private static String ownerID = "_ownerID";
+	protected String ownerID = "_ownerID";
 	
 	/// Empty constructor
 	public ProductListing() {
@@ -95,7 +95,6 @@ public class ProductListing {
 		GenericConvertList<MetaObject> ret = new GenericConvertArrayList<MetaObject>();
 		
 		// Fetch and populate
-		@SuppressWarnings("static-access")
 		MetaObject[] queryRet = productItem.query(this.ownerID + "=?", new String[] { ownerID },
 			"_createdTime", 0, productMax);
 		if (queryRet != null && queryRet.length > 0) {
@@ -116,7 +115,6 @@ public class ProductListing {
 	///
 	/// @return List of meta objects representing the owner
 	///
-	@SuppressWarnings("static-access")
 	public List<MetaObject> updateList(String ownerID, List<Object> inUpdateList) {
 		//
 		// Sanity check

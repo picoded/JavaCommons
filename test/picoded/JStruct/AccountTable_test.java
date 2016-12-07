@@ -463,6 +463,6 @@ public class AccountTable_test extends Mockito {
 		request.setCookies(cookieJar);
 		String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
-		assertNull(accTableObj.getRequestUser(request, response));
+		assertNotNull(accTableObj.getRequestUser(request, response));
 	}
 }

@@ -16,6 +16,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 // Test depends
 
@@ -352,8 +354,8 @@ public class AccountTable_test extends Mockito {
 	
 	@Test
 	public void logoutAccountTest() {
-		HttpServletRequest request = mock(HttpServletRequest.class);
-		HttpServletResponse response = mock(HttpServletResponse.class);
+		MockHttpServletRequest request = new MockHttpServletRequest("GET", "/requestURI");
+		MockHttpServletResponse response = new MockHttpServletResponse();
 		String usrName = "gust";
 		AccountObject usrObj = null;
 		accTableObj.logoutAccount(null, null);
@@ -362,6 +364,21 @@ public class AccountTable_test extends Mockito {
 		assertNotNull(usrObj = accTableObj.newObject(usrName));
 		usrObj.setName("test");
 		usrObj.setPassword("test123");
-		accTableObj.logoutAccount(request, response);
+		
+		assertFalse(accTableObj.logoutAccount(request, null));
+		request.setContextPath(null);
+		assertTrue(accTableObj.logoutAccount(request, response));
+		request.setContextPath("");
+		assertTrue(accTableObj.logoutAccount(request, response));
+		request.setContextPath("/");
+		accTableObj.isHttpOnly = true;
+		accTableObj.isSecureOnly = true;
+		accTableObj.cookieDomain = null;
+		assertTrue(accTableObj.logoutAccount(request, response));
+		accTableObj.cookieDomain = "";
+		assertTrue(accTableObj.logoutAccount(request, response));
+		accTableObj.cookieDomain = "test.com";
+		assertTrue(accTableObj.logoutAccount(request, response));
+		
 	}
 }

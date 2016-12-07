@@ -396,8 +396,6 @@ public class AccountTable_test extends Mockito {
 		request.setCookies(cookieJar);
 		assertNull(accTableObj.getRequestUser(request, response));
 		
-		cookieJar = new javax.servlet.http.Cookie[5];
-		cookieJar[0] = new javax.servlet.http.Cookie("Account_User", "User");
 		cookieJar[1] = new javax.servlet.http.Cookie("Account_Nonc", null);
 		cookieJar[2] = new javax.servlet.http.Cookie("Account_Hash", "Hash");
 		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", "Rmbr");
@@ -405,8 +403,6 @@ public class AccountTable_test extends Mockito {
 		request.setCookies(cookieJar);
 		assertNull(accTableObj.getRequestUser(request, response));
 		
-		cookieJar = new javax.servlet.http.Cookie[5];
-		cookieJar[0] = new javax.servlet.http.Cookie("Account_User", "User");
 		cookieJar[1] = new javax.servlet.http.Cookie("Account_Nonc", "Nonc");
 		cookieJar[2] = new javax.servlet.http.Cookie("Account_Hash", null);
 		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", "Rmbr");
@@ -414,8 +410,6 @@ public class AccountTable_test extends Mockito {
 		request.setCookies(cookieJar);
 		assertNull(accTableObj.getRequestUser(request, response));
 		
-		cookieJar = new javax.servlet.http.Cookie[5];
-		cookieJar[0] = new javax.servlet.http.Cookie("Account_User", "User");
 		cookieJar[1] = new javax.servlet.http.Cookie("Account_Nonc", "Nonc");
 		cookieJar[2] = new javax.servlet.http.Cookie("Account_Hash", "Hash");
 		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", null);
@@ -423,45 +417,50 @@ public class AccountTable_test extends Mockito {
 		request.setCookies(cookieJar);
 		assertNull(accTableObj.getRequestUser(request, response));
 		
-		cookieJar = new javax.servlet.http.Cookie[5];
-		cookieJar[0] = new javax.servlet.http.Cookie("Account_User", "User");
-		cookieJar[1] = new javax.servlet.http.Cookie("Account_Nonc", "Nonc");
-		cookieJar[2] = new javax.servlet.http.Cookie("Account_Hash", "Hash");
 		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", "1");
 		cookieJar[4] = new javax.servlet.http.Cookie("Account_Puid", "PuidPuidPuidPuidPuidPuid");
 		request.setCookies(cookieJar);
 		assertNull(accTableObj.getRequestUser(request, response));
 		
-		cookieJar = new javax.servlet.http.Cookie[5];
-		cookieJar[0] = new javax.servlet.http.Cookie("Account_User", "User");
-		cookieJar[1] = new javax.servlet.http.Cookie("Account_Nonc", "Nonc");
-		cookieJar[2] = new javax.servlet.http.Cookie("Account_Hash", "Hash");
-		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", "1");
 		cookieJar[4] = new javax.servlet.http.Cookie("Account_Puid", "PuidPuidPuidPui");
 		request.setCookies(cookieJar);
 		assertNull(accTableObj.getRequestUser(request, response));
 		
-		cookieJar = new javax.servlet.http.Cookie[5];
-		cookieJar[0] = new javax.servlet.http.Cookie("Account_User", "User");
-		cookieJar[1] = new javax.servlet.http.Cookie("Account_Nonc", "Nonc");
-		cookieJar[2] = new javax.servlet.http.Cookie("Account_Hash", "Hash");
-		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", "1");
 		cookieJar[4] = new javax.servlet.http.Cookie("Account_Puid", usrObj._oid());
 		request.setCookies(cookieJar);
 		assertNull(accTableObj.getRequestUser(request, response));
 		
-		cookieJar = new javax.servlet.http.Cookie[5];
-		cookieJar[0] = new javax.servlet.http.Cookie("Account_User", "User");
-		cookieJar[1] = new javax.servlet.http.Cookie("Account_Nonc", "Nonc");
+		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", "[]");
+		assertNull(accTableObj.getRequestUser(request, response));
+		
+		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", "[null]");
+		assertNull(accTableObj.getRequestUser(request, response));
+		
+		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", "[test]");
+		assertNull(accTableObj.getRequestUser(request, response));
+		
+		cookieJar[4] = new javax.servlet.http.Cookie("Account_Puid", usrObj._oid());
+		request.setCookies(cookieJar);
+		String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
+		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
+		assertNull(accTableObj.getRequestUser(request, response));
 		
 		String passHash = usrObj.getPasswordHash();
 		String computedCookieHash = NxtCrypt.getSaltedHash(passHash, "[\"id-1\",11]");
 		computedCookieHash = computedCookieHash.replaceAll("\\W", "");
 		cookieJar[2] = new javax.servlet.http.Cookie("Account_Hash", computedCookieHash);
-		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", "1");
 		cookieJar[4] = new javax.servlet.http.Cookie("Account_Puid", usrObj._oid());
 		request.setCookies(cookieJar);
-		String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
+		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
+		assertNotNull(accTableObj.getRequestUser(request, response));
+		
+		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", null);
+		request.setCookies(cookieJar);
+		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
+		assertNotNull(accTableObj.getRequestUser(request, response));
+		
+		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", "Rmbr");
+		request.setCookies(cookieJar);
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
 		assertNotNull(accTableObj.getRequestUser(request, response));
 	}

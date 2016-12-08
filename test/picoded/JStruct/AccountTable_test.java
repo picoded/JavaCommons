@@ -9,7 +9,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
 // Test Case include
@@ -339,19 +338,28 @@ public class AccountTable_test extends Mockito {
 	
 	@Test
 	public void loginAccountTest() {
-		HttpServletRequest request = mock(HttpServletRequest.class);
-		HttpServletResponse response = mock(HttpServletResponse.class);
+		MockHttpServletRequest request = new MockHttpServletRequest("GET", "/requestURI");
+		MockHttpServletResponse response = new MockHttpServletResponse();
 		String usrName = "gust";
 		AccountObject usrObj = null;
-		accTableObj.loginAccount(request, response, usrObj, null, true);
+		assertNull(accTableObj.loginAccount(request, response, usrObj, null, true));
 		assertFalse(accTableObj.containsKey(usrName));
 		assertNull(accTableObj.get(usrName));
 		assertNotNull(usrObj = accTableObj.newObject(usrName));
 		usrObj.setName("test");
+		assertFalse(accTableObj.setLogin(usrObj, request, response, true));
 		usrObj.setPassword("test123");
 		assertNotNull(accTableObj.loginAccount(request, response, usrObj, "test123", true));
 		assertNotNull(accTableObj.loginAccount(request, response, usrObj, "test123", false));
 		assertNull(accTableObj.loginAccount(request, response, "test123", "test", false));
+		
+		assertNotNull(accTableObj.loginAccount(request, response, usrObj, "test123", true));
+		request.setContextPath(null);
+		assertNotNull(accTableObj.loginAccount(request, response, usrObj, "test123", true));
+		request.setContextPath("");
+		assertNotNull(accTableObj.loginAccount(request, response, usrObj, "test123", true));
+		request.setContextPath("/");
+		assertNotNull(accTableObj.loginAccount(request, response, usrObj, "test123", true));
 	}
 	
 	@Test
@@ -453,7 +461,9 @@ public class AccountTable_test extends Mockito {
 		request.setCookies(cookieJar);
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
 		assertNotNull(usrObj = accTableObj.getRequestUser(request, response));
-		
+		assertNotNull(accTableObj.getRequestUser(request, null));
+		accTableObj.rmberMeRenewal = -2;
+		assertNotNull(accTableObj.getRequestUser(request, response));
 		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", null);
 		request.setCookies(cookieJar);
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
@@ -461,6 +471,7 @@ public class AccountTable_test extends Mockito {
 		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", "Rmbr");
 		request.setCookies(cookieJar);
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
+		accTableObj.loginRenewal = -2;
 		assertNotNull(usrObj = accTableObj.getRequestUser(request, response));
 	}
 }

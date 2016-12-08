@@ -338,13 +338,13 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	private int loginLifetime = 3600; // 1 hr = 60 (mins) * 60 (seconds) = 3600 seconds
 	
 	/// lifetime for http login token required for renewal, 1800 seconds (or half an hour)
-	private int loginRenewal = loginLifetime / 2; //
+	protected int loginRenewal = loginLifetime / 2; //
 	
 	/// Remember me lifetime, default as 2592000 seconds (aka 30 days)
 	private int rmberMeLifetime = 2592000; // 1 mth ~= 30 (days) * 24 (hrs) * 3600 (seconds in an hr)
 	
 	/// Remember me lifetime, default as 15 days
-	private int rmberMeRenewal = rmberMeLifetime / 2; // 15 days
+	protected int rmberMeRenewal = rmberMeLifetime / 2; // 15 days
 	
 	/// Sets the cookie to be limited to http only
 	protected boolean isHttpOnly = false;
@@ -483,7 +483,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	}
 	
 	/// Internally sets the login to a user (handles the respective nonce) and set the cookies for the response
-	private boolean setLogin(AccountObject po, javax.servlet.http.HttpServletRequest request,
+	protected boolean setLogin(AccountObject po, javax.servlet.http.HttpServletRequest request,
 		javax.servlet.http.HttpServletResponse response, boolean rmberMe) {
 		
 		// Prepare the vars

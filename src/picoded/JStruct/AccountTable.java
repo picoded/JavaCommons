@@ -728,7 +728,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		return ret.toArray(new AccountObject[ret.size()]);
 	}
 	
-	private static List<AccountObject> getAccountObjectList(List<AccountObject> ret, AccountObject ao) {
+	protected static List<AccountObject> getAccountObjectList(List<AccountObject> ret,
+		AccountObject ao) {
 		ret.add(ao);
 		return ret;
 		

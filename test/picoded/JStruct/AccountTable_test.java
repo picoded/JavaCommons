@@ -8,9 +8,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.After;
@@ -365,10 +362,9 @@ public class AccountTable_test extends Mockito {
 		assertNotNull(accTableObj.loginAccount(request, response, usrObj, "test123", true));
 	}
 	
-	@SuppressWarnings("static-access")
 	@Test
 	public void logoutAccountTest() {
-		List<AccountObject> accountObjectList = new ArrayList<AccountObject>();
+		
 		MockHttpServletRequest request = new MockHttpServletRequest("GET", "/requestURI");
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		String usrName = "gust";
@@ -380,7 +376,6 @@ public class AccountTable_test extends Mockito {
 		usrObj.setName("test");
 		usrObj.setPassword("test123");
 		usrObj.saveDelta();
-		accountObjectList.add(usrObj);
 		assertFalse(accTableObj.logoutAccount(request, null));
 		request.setContextPath(null);
 		assertTrue(accTableObj.logoutAccount(request, response));
@@ -466,24 +461,17 @@ public class AccountTable_test extends Mockito {
 		request.setCookies(cookieJar);
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
 		assertNotNull(usrObj = accTableObj.getRequestUser(request, response));
-		accountObjectList.add(usrObj);
-		assertNotNull(usrObj = accTableObj.getRequestUser(request, null));
-		accountObjectList.add(usrObj);
+		assertNotNull(accTableObj.getRequestUser(request, null));
 		accTableObj.rmberMeRenewal = -2;
-		assertNotNull(usrObj = accTableObj.getRequestUser(request, response));
-		accountObjectList.add(usrObj);
+		assertNotNull(accTableObj.getRequestUser(request, response));
 		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", null);
 		request.setCookies(cookieJar);
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
 		assertNotNull(usrObj = accTableObj.getRequestUser(request, response));
-		accountObjectList.add(usrObj);
 		cookieJar[3] = new javax.servlet.http.Cookie("Account_Rmbr", "Rmbr");
 		request.setCookies(cookieJar);
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
 		accTableObj.loginRenewal = -2;
 		assertNotNull(usrObj = accTableObj.getRequestUser(request, response));
-		accountObjectList.add(usrObj);
-		assertNotNull(accountObjectList = accTableObj.getAccountObjectList(
-			new ArrayList<AccountObject>(), usrObj));
 	}
 }

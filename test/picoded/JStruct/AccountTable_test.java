@@ -462,30 +462,5 @@ public class AccountTable_test extends Mockito {
 		request.setCookies(cookieJar);
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
 		assertNotNull(usrObj = accTableObj.getRequestUser(request, response));
-		usrObj.getMemberRole(usrObj);
-		assertNull(usrObj.getMember(usrObj, "member"));
-		assertNotNull(usrObj.setMember(usrObj, "admin"));
-		assertNotNull(usrObj.setMember(usrObj, "guest"));
-		assertNotNull(usrObj.setMember(usrObj, "admin"));
-		assertNull(usrObj.addMember(usrObj, "admin"));
-		assertNull(usrObj.addMember(usrObj, "user"));
-		assertNotNull(usrObj.getMember(usrObj));
-		assertNotNull(usrObj.getMember(usrObj, "admin"));
-		assertNull(usrObj.getMember(usrObj, "guest"));
-		assertNotNull(usrObj.getNextLoginTimeAllowed("member"));
-		assertNotNull(usrObj.getTimeElapsedNextLogin("member"));
-		usrObj.addDelay("member");
-		usrObj.addDelay("guest");
-		assertNotNull(usrObj.getNextLoginTimeAllowed("admin"));
-		assertNotNull(usrObj.getNextLoginTimeAllowed("member"));
-		assertNotNull(usrObj.getNextLoginTimeAllowed("guest"));
-		assertNotNull(usrObj.getTimeElapsedNextLogin("admin"));
-		assertNotNull(usrObj.isSuperUser());
-		usrObj.addDelay("admin");
-		assertNotNull(usrObj.isSuperUser());
-		assertNotNull(usrObj.removeMember(usrObj));
-		accTableObj.removeFromID(usrObj._oid());
-		accTableObj.removeFromID(usrObj._oid());
 	}
-	
 }

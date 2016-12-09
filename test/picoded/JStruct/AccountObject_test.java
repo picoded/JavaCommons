@@ -131,9 +131,6 @@ public class AccountObject_test {
 		assertNotNull(accountObject.getTimeElapsedNextLogin("admin"));
 		assertNotNull(accountObject.isSuperUser());
 		accountObject.addDelay("admin");
-		accountTable.keyValueMapAccountID.put("admin", "admin");
-		accountObject.groupUserToRoleMap = accountTable.groupChildRole.uncheckedGet(accountObject
-			._oid());
 		assertNotNull(accountObject.isSuperUser());
 		assertNotNull(accountObject.removeMember(accountObject));
 		accountObject.resetLoginThrottle("member");

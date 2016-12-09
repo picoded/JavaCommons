@@ -124,11 +124,16 @@ public class AccountObject_test {
 		accountObject.addDelay("member");
 		accountObject.addDelay("guest");
 		assertNotNull(accountObject.getNextLoginTimeAllowed("admin"));
-		assertNotNull(accountObject.getNextLoginTimeAllowed("member"));
+		accountTable.loginThrottlingElapsed.put("test",
+			String.valueOf((System.currentTimeMillis() / 1000) + 25));
+		assertNotNull(accountObject.getNextLoginTimeAllowed("test"));
 		assertNotNull(accountObject.getNextLoginTimeAllowed("guest"));
 		assertNotNull(accountObject.getTimeElapsedNextLogin("admin"));
 		assertNotNull(accountObject.isSuperUser());
 		accountObject.addDelay("admin");
+		accountTable.keyValueMapAccountID.put("admin", "admin");
+		accountObject.groupUserToRoleMap = accountTable.groupChildRole.uncheckedGet(accountObject
+			._oid());
 		assertNotNull(accountObject.isSuperUser());
 		assertNotNull(accountObject.removeMember(accountObject));
 		accountObject.resetLoginThrottle("member");

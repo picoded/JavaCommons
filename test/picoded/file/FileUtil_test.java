@@ -15,7 +15,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+
+import picoded.conv.GUID;
 
 ///
 /// Test Case for picoded.FileUtil.ConfigFileSet
@@ -24,10 +27,15 @@ public class FileUtil_test {
 	
 	// Test directories and setup
 	//----------------------------------------------------------------------------------------------------
-	public static String testDirStr = "./test-files/test-specific/file/FileUtils/";
-	public File testDir = new File(testDirStr);
-	public String outputDirStr = "./test-files/tmp/file/FileUtils/";
-	public File outputDir = new File(outputDirStr);
+	public static String testDirStr = "./test-files/test-specific/file/FileUtil/";
+	public static File testDir = new File(testDirStr);
+	
+	public static String baseOutputDirStr = "./test-files/tmp/file/FileUtil/";
+	public static File baseOutputDir = new File(baseOutputDirStr);
+	
+	// Setup as a randomised sub folder in setUp();
+	public String outputDirStr = null;
+	public File outputDir = null;
 	
 	/// Invalid constructor test
 	@Test(expected = IllegalAccessError.class)
@@ -35,10 +43,18 @@ public class FileUtil_test {
 		new FileUtil();
 	}
 	
+	@BeforeClass
+	public static void baseSetup() throws IOException {
+		FileUtil.deleteDirectory(baseOutputDir);
+		baseOutputDir.mkdirs();
+	}
+	
 	@Before
-	public void setUp() throws IOException {
-		FileUtil.deleteDirectory(outputDir);
+	public void setUp() {
+		outputDirStr = baseOutputDirStr+GUID.base58()+"/";
+		outputDir = new File(outputDirStr);
 		outputDir.mkdirs();
+		
 		test_res = null;
 		fileCollection = new ArrayList<File>();
 	}
@@ -208,65 +224,57 @@ public class FileUtil_test {
 	@Test
 	public void testCopyFileIfDifferent() throws IOException {
 		Path existingFilePath = Paths.get(testDirStr + "jsRegex.js");
+		Path outFilePath = Paths.get(outputDirStr + "jsRegex.js");
 		Path symLinkPath = Paths.get(outputDirStr + "jsRegexLink.js");
+		
+		Path existingDoubleSlash = Paths.get(testDirStr + "doubleSlash.txt");
+		Path outputDoubleSlash = Paths.get(outputDirStr + "doubleSlash.txt");
 		
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
 		
 		// copies file if content differs
-		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), Paths.get(testDirStr + "doubleSlash.txt")
-			.toFile(), false);
-		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(),
-			Paths.get(testDirStr + "doubleSlash.txt").toFile(), false);
+		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), outputDoubleSlash.toFile(), false);
+		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), outputDoubleSlash.toFile(), false);
 		
 		//Checks if file has not been modified, and has same data length
 		// all conditions are true
-		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), existingFilePath.toFile(), false, false);
+		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), outFilePath.toFile(), false, false);
 		
 		// symLink Path Last Modified date different
 		symLinkPath.toFile().setLastModified(new Date().getTime() + 1);
-		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), existingFilePath.toFile(), false, false);
+		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), outFilePath.toFile(), false, false);
 		
 		// File Path Last Modified date different	
-		existingFilePath.toFile().setLastModified(new Date().getTime() + 2);
-		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), existingFilePath.toFile(), false, false);
+		outFilePath.toFile().setLastModified(new Date().getTime() + 2);
+		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), outFilePath.toFile(), false, false);
 		
 		// Files length are different
-		Paths.get(testDirStr + "doubleSlash.txt").toFile().setLastModified(new Date().getTime() + 2);
-		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
-			existingFilePath.toFile(), false, false);
+		existingDoubleSlash.toFile().setLastModified(new Date().getTime() + 2);
+		FileUtil.copyFile_ifDifferent(outputDoubleSlash.toFile(),
+			outFilePath.toFile(), false, false);
 		
 		// Last Modified date and length are different
 		FileUtil.copyFile_ifDifferent(Paths.get(
 			"./test-files/test-specific/file/ConfigFile/" + "iniTestFileJSON.js").toFile(),
-			existingFilePath.toFile(), false, false);
+			outFilePath.toFile(), false, false);
 		
 		// create symbolic link
 		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile(), false, false);
 		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
 			Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), false, true);
-		FileUtil.copyFile_ifDifferent(Paths.get(outputDirStr + "doubleSlashLink.txt").toFile(), Paths
-			.get("./test-files/test-specific/file/ConfigFile/" + "iniTestFileJSON.js").toFile(),
-			false, false);
 		
-		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
-		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
-			Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
-		FileUtil.copyFile_ifDifferent(Paths.get(
-			"./test-files/test-specific/file/ConfigFile/" + "iniTestFileJSON.js").toFile(),
-			Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
-		
-		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(),
-			Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
-		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
-			Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
-		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(),
-			Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
-		
-		// file is already a symbolic link
-		FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
-		FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false);
-		FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
-			existingFilePath.toFile(), false);
+		// FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
+		// FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
+		// 	Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
+		// FileUtil.copyFile_ifDifferent(Paths.get(
+		// 	"./test-files/test-specific/file/ConfigFile/" + "iniTestFileJSON.js").toFile(),
+		// 	Paths.get(outputDirStr + "doubleSlashLink.txt").toFile());
+		// 
+		// // file is already a symbolic link
+		// FileUtil.copyFile_ifDifferent(existingFilePath.toFile(), symLinkPath.toFile());
+		// FileUtil.copyFile_ifDifferent(symLinkPath.toFile(), symLinkPath.toFile(), false);
+		// FileUtil.copyFile_ifDifferent(Paths.get(testDirStr + "doubleSlash.txt").toFile(),
+		// 	outFilePath.toFile(), false);
 	}
 	
 	@Test

@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Locale;
 
 import picoded.struct.MutablePair;
 import picoded.struct.query.internal.QueryUtils;
@@ -55,7 +56,7 @@ public class OrderBy<T> implements Comparator<T>, Serializable {
 			
 			// Check for DESC / ASC suffix
 			if (orderSet.length() > 4) {
-				String lowerCaseOrderSet = orderSet.toLowerCase();
+				String lowerCaseOrderSet = orderSet.toLowerCase(Locale.ENGLISH);
 				if (lowerCaseOrderSet.endsWith(" desc")) {
 					ot = OrderBy.OrderType.DESC;
 					orderSet = orderSet.substring(0, orderSet.length() - 5).trim();

@@ -3,6 +3,7 @@ package picoded.struct.query;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Locale;
 
 /// Represents the variosu query types used
 ///
@@ -14,13 +15,14 @@ public enum QueryType {
 	// Combination types
 	//--------------------------------------------------------------------
 	
-	AND(0), OR(1), NOT(2), NOT_EQUALS(3), //Is actually and inverse of AND
+	AND(0), OR(1), NOT(2), //Is actually and inverse of AND
 	
 	//
 	// Comparision types
 	//--------------------------------------------------------------------
 	
 	EQUALS(10),
+	NOT_EQUALS(11), 
 	
 	LESS_THAN(20), LESS_THAN_OR_EQUALS(21),
 	
@@ -33,7 +35,7 @@ public enum QueryType {
 	// The following is cookie cutter code,
 	//
 	// This can be replaced when there is a way to default implement
-	// static function and variabels, etc, etc.
+	// static function and variables, etc, etc.
 	// 
 	// Or the unthinkable, java allow typed macros / type annotations
 	// (the closest the language now has to macros)
@@ -69,13 +71,13 @@ public enum QueryType {
 	//--------------------------------------------------------------------
 	
 	/// The type mapping cache
-	private static Map<String, QueryType> nameToTypeMap = null;
-	private static Map<Integer, QueryType> idToTypeMap = null;
+	private static volatile Map<String, QueryType> nameToTypeMap = null;
+	private static volatile Map<Integer, QueryType> idToTypeMap = null;
 	
 	/// Setting up the type mapping
 	///
 	/// Note that the redundent temp variable, is to ensure the final map is only set
-	/// in an "atomic" fashion. In event of multiple threads triggerint the initializeTypeMaps
+	/// in an "atomic" fashion. In event of multiple threads triggering the initializeTypeMaps
 	/// setup process.
 	///
 	protected static void initializeTypeMaps() {
@@ -105,7 +107,7 @@ public enum QueryType {
 	/// Get from the respective string name values
 	public static QueryType fromName(String name) {
 		initializeTypeMaps();
-		name = name.toUpperCase();
+		name = name.toUpperCase(Locale.ENGLISH);
 		return nameToTypeMap.get(name);
 	}
 	

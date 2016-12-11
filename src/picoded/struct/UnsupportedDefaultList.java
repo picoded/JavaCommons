@@ -19,13 +19,16 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	}
 	
 	/// throws an UnsupportedOperationException
-	@Override
 	default void add(int index, E value) {
 		throw new UnsupportedOperationException("function not supported");
 	}
 	
 	/// throws an UnsupportedOperationException
-	@Override
+	default E remove(int index) {
+		throw new UnsupportedOperationException("function not supported");
+	}
+	
+	/// throws an UnsupportedOperationException
 	default boolean remove(Object key) {
 		throw new UnsupportedOperationException("function not supported");
 	}

@@ -56,11 +56,14 @@ public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePai
 	///
 	/// @return  Object value for either left/right pair
 	@SuppressWarnings("unchecked")
-	public void add(int index, Object value) {
+	public Object set(int index, Object value) {
+		Object oldVal = get(index);
 		if (index == 0) {
 			setLeft((L) value);
+			return oldVal;
 		} else if (index == 1) {
 			setRight((R) value);
+			return oldVal;
 		}
 		throw new IllegalArgumentException(InvalidKeyMsg + index);
 	}
@@ -71,10 +74,10 @@ public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePai
 	///
 	/// @return  true if a non-null value was previously present
 	public Object remove(int index) {
-		Object val = get(index);
-		if (val != null) {
+		Object oldVal = get(index);
+		if (oldVal != null) {
 			add(index, null);
-			return val;
+			return oldVal;
 		}
 		return null;
 	}

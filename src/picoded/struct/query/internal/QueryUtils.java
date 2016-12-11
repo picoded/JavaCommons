@@ -65,11 +65,16 @@ public class QueryUtils {
 		return val;
 	}
 	
-	//returns String only, and ONLY if it should be compared as a string
-	//if its a number, will return as a double
+	///
+	/// returns String only, and ONLY if it should be compared as a string
+	/// if its a number, will return as a double
+	///
+	/// @returns String / Double object 
+	///
 	public static Object normalizeObject(Object source) {
 		if (source instanceof String) {
-			if (((String) source).matches("[0-9]+") || ((String) source).contains(".")) { //extremely rudimentary check for a number, needs to be improved
+			// extremely rudimentary check for a number, needs to be improved
+			if (((String) source).matches("[0-9]+") || ((String) source).contains(".")) { 
 				try {
 					Number sourceAsNumber = NumberFormat.getNumberInstance(Locale.ENGLISH).parse(
 						(String) source);

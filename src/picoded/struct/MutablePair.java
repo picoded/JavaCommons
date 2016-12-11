@@ -31,7 +31,7 @@ public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePai
 	// void setRight(R);
 	
 	/// Invalid key error message 
-	static String invalidKeyMsg = "Invalid get key, use eiher 0 or 1, for left and right pair respectively - ";
+	public final static String invalidKeyMsg = "Invalid get key, use eiher 0 or 1, for left and right pair respectively - ";
 	
 	/// Get the left / right value using index positioning
 	///

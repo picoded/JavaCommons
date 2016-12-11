@@ -50,15 +50,15 @@ public enum QueryType {
 	//
 	// Constructor setup
 	//--------------------------------------------------------------------
-	private final int ID;
+	private final int id;
 	
-	private QueryType(final int inID) {
-		ID = inID;
+	QueryType(final int inID) {
+		id = inID;
 	}
 	
 	/// Return the numeric value representing the enum
 	public int getValue() {
-		return ID;
+		return id;
 	}
 	
 	//
@@ -98,7 +98,7 @@ public enum QueryType {
 		}
 	}
 	
-	/// Get from the respective ID values
+	/// Get from the respective id values
 	public static QueryType fromID(int id) {
 		initializeTypeMaps();
 		return idToTypeMap.get(id);

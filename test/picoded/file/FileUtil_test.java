@@ -51,7 +51,7 @@ public class FileUtil_test {
 	
 	@Before
 	public void setUp() {
-		outputDirStr = baseOutputDirStr+GUID.base58()+"/";
+		outputDirStr = baseOutputDirStr + GUID.base58() + "/";
 		outputDir = new File(outputDirStr);
 		outputDir.mkdirs();
 		

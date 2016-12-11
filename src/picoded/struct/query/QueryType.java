@@ -21,8 +21,7 @@ public enum QueryType {
 	// Comparision types
 	//--------------------------------------------------------------------
 	
-	EQUALS(10),
-	NOT_EQUALS(11), 
+	EQUALS(10), NOT_EQUALS(11),
 	
 	LESS_THAN(20), LESS_THAN_OR_EQUALS(21),
 	

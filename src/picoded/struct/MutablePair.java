@@ -13,7 +13,8 @@ import picoded.conv.GenericConvert;
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
 @SuppressWarnings("serial")
-public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePair<L, R> /*implements List<Object> */{
+public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePair<L, R> implements
+	GenericConvertList<Object> {
 	
 	public MutablePair() {
 		super();
@@ -31,7 +32,8 @@ public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePai
 	// void setRight(R);
 	
 	/// Invalid key error message 
-	public final static String invalidKeyMsg = "Invalid get key, use eiher 0 or 1, for left and right pair respectively - ";
+	public static final String InvalidKeyMsg = "Invalid get key, use eiher 0 or 1, "
+		+ "for left and right pair respectively - ";
 	
 	/// Get the left / right value using index positioning
 	///
@@ -40,12 +42,12 @@ public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePai
 	/// @return  Object value for either left/right pair
 	public Object get(Object key) {
 		int index = GenericConvert.toInt(key, -1);
-		if( index == 0 ) {
+		if (index == 0) {
 			return getLeft();
-		} else if( index == 1 ) {
+		} else if (index == 1) {
 			return getRight();
 		}
-		throw new IllegalArgumentException(invalidKeyMsg+key);
+		throw new IllegalArgumentException(InvalidKeyMsg + key);
 	}
 	
 	/// Set the left / right value using index positioning
@@ -55,12 +57,12 @@ public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePai
 	/// @return  Object value for either left/right pair
 	@SuppressWarnings("unchecked")
 	public void add(int index, Object value) {
-		if( index == 0 ) {
-			setLeft( (L)value );
-		} else if( index == 1 ) {
-			setRight( (R)value );
+		if (index == 0) {
+			setLeft((L) value);
+		} else if (index == 1) {
+			setRight((R) value);
 		}
-		throw new IllegalArgumentException(invalidKeyMsg+index);
+		throw new IllegalArgumentException(InvalidKeyMsg + index);
 	}
 	
 	/// Remove the left / right value using index positioning
@@ -70,7 +72,7 @@ public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePai
 	/// @return  true if a non-null value was previously present
 	public Object remove(int index) {
 		Object val = get(index);
-		if( val != null ) {
+		if (val != null) {
 			add(index, null);
 			return val;
 		}

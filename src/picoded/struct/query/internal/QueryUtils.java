@@ -79,7 +79,7 @@ public class QueryUtils {
 	public static Object normalizeObject(Object source) {
 		if (source instanceof String) {
 			// extremely rudimentary check for a number, needs to be improved
-			if (((String) source).matches("[0-9]+") || ((String) source).contains(".")) { 
+			if (((String) source).matches("[0-9]+") || ((String) source).contains(".")) {
 				try {
 					Number sourceAsNumber = NumberFormat.getNumberInstance(Locale.ENGLISH).parse(
 						(String) source);
@@ -87,10 +87,10 @@ public class QueryUtils {
 				} catch (Exception ex) {
 					throw new RuntimeException("exception in normalizeObject-> " + ex.getMessage());
 				}
-			} 
+			}
 			// Return as string
 			return source;
-		} 
+		}
 		return normalizeNumber(source);
 	}
 }

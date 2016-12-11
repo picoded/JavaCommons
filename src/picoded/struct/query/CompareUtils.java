@@ -107,7 +107,7 @@ public class CompareUtils {
 		
 		// String type comparision
 		if ( // 
-			(o1 instanceof String && o2 instanceof String) || //
+		(o1 instanceof String && o2 instanceof String) || //
 			(o1 instanceof String && o2 == null) || //
 			(o2 instanceof String && o1 == null) //
 		) {
@@ -122,7 +122,7 @@ public class CompareUtils {
 		Number n2 = objectToNumberIfPossible(o2);
 		
 		// Tries to numeric compare
-		if ( !(n1 == null && n2 == null) ) { //
+		if (!(n1 == null && n2 == null)) { //
 			return numericCompare(n1, n2);
 		}
 		

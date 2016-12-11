@@ -150,14 +150,14 @@ public class QueryFilter_test {
 	
 	@Test(expected = RuntimeException.class)
 	public void findCompleteEnclosureInvalidClosingBracketTest() {
-		List<Object> list = new ArrayList();
+		List<Object> list = new ArrayList<Object>();
 		list.add(")");
 		assertNotNull(QueryFilter.findCompleteEnclosure(list));
 	}
 	
 	@Test(expected = RuntimeException.class)
 	public void findCompleteEnclosureInvalidStartBracketTest() {
-		List<Object> list = new ArrayList();
+		List<Object> list = new ArrayList<Object>();
 		list.add("(");
 		assertNotNull(QueryFilter.findCompleteEnclosure(list));
 	}
@@ -169,8 +169,8 @@ public class QueryFilter_test {
 	
 	@Test(expected = RuntimeException.class)
 	public void collapseQueryTokensWithoutBracketsInvalidTest() {
-		List<Object> tokens = new ArrayList();
-		Map<String, Object> paramMap = new HashMap();
+		List<Object> tokens = new ArrayList<Object>();
+		Map<String, Object> paramMap = new HashMap<String, Object>();
 		tokens.add(new StringBuilder("A = ? AND B = ?"));
 		assertNotNull(QueryFilter.collapseQueryTokensWithoutBrackets(tokens, paramMap));
 		
@@ -178,8 +178,8 @@ public class QueryFilter_test {
 	
 	@Test
 	public void collapseQueryTokensWithoutBracketsTest() {
-		List<Object> tokens = new ArrayList();
-		Map<String, Object> paramMap = new HashMap();
+		List<Object> tokens = new ArrayList<Object>();
+		Map<String, Object> paramMap = new HashMap<String, Object>();
 		tokens.add(new Equals("key", "key_hello", paramMap));
 		tokens.add("AND");
 		tokens.add(new Equals("key1", "key1_hello", paramMap));
@@ -190,8 +190,8 @@ public class QueryFilter_test {
 	
 	@Test(expected = RuntimeException.class)
 	public void collapseQueryTokensWithoutBracketsInvalidOperationTest() {
-		List<Object> tokens = new ArrayList();
-		Map<String, Object> paramMap = new HashMap();
+		List<Object> tokens = new ArrayList<Object>();
+		Map<String, Object> paramMap = new HashMap<String, Object>();
 		tokens.add("AND");
 		tokens.add("OR");
 		assertNotNull(QueryFilter.collapseQueryTokensWithoutBrackets(tokens, paramMap));
@@ -199,15 +199,15 @@ public class QueryFilter_test {
 	
 	@Test(expected = RuntimeException.class)
 	public void collapseQueryTokensWithoutBracketsNullCombinationTypeOperationTest() {
-		List<Object> tokens = new ArrayList();
-		Map<String, Object> paramMap = new HashMap();
+		List<Object> tokens = new ArrayList<Object>();
+		Map<String, Object> paramMap = new HashMap<String, Object>();
 		assertNotNull(QueryFilter.collapseQueryTokensWithoutBrackets(tokens, paramMap));
 	}
 	
 	@Test(expected = RuntimeException.class)
 	public void collapseQueryTokensWithoutBracketsWrongOperationTest() {
-		List<Object> tokens = new ArrayList();
-		Map<String, Object> paramMap = new HashMap();
+		List<Object> tokens = new ArrayList<Object>();
+		Map<String, Object> paramMap = new HashMap<String, Object>();
 		tokens.add(new Equals("key", "key_hello", paramMap));
 		tokens.add("ANDA");
 		tokens.add(new Equals("key1", "key1_hello", paramMap));
@@ -221,32 +221,32 @@ public class QueryFilter_test {
 	
 	@Test(expected = RuntimeException.class)
 	public void processCombinationTypeInvalid1Test() {
-		List<Object> tokens = new ArrayList();
+		List<Object> tokens = new ArrayList<Object>();
 		assertNotNull(QueryFilter.processCombinationType(tokens, null, null));
 	}
 	
 	@Test(expected = RuntimeException.class)
 	public void processCombinationTypeInvalid2Test() {
-		List<Object> tokens = new ArrayList();
-		List<Query> child = new ArrayList();
+		List<Object> tokens = new ArrayList<Object>();
+		List<Query> child = new ArrayList<Query>();
 		assertNotNull(QueryFilter.processCombinationType(tokens, null, child));
 	}
 	
 	@Test(expected = RuntimeException.class)
 	//"Missing combination token: "
 	public void processCombinationTypeInvalid3Test() {
-		List<Object> tokens = new ArrayList();
-		Map<String, Object> paramMap = new HashMap();
+		List<Object> tokens = new ArrayList<Object>();
+		Map<String, Object> paramMap = new HashMap<String, Object>();
 		tokens.add(new Equals("key", "key_hello", paramMap));
-		List<Query> child = new ArrayList();
+		List<Query> child = new ArrayList<Query>();
 		assertNotNull(QueryFilter.processCombinationType(tokens, null, child));
 	}
 	
 	@Test
 	public void processCombinationTypeSingleChildTest() {
-		List<Object> tokens = new ArrayList();
-		List<Query> child = new ArrayList();
-		Map<String, Object> paramMap = new HashMap();
+		List<Object> tokens = new ArrayList<Object>();
+		List<Query> child = new ArrayList<Query>();
+		Map<String, Object> paramMap = new HashMap<String, Object>();
 		Query query = new Equals("key1", "key1_hello", paramMap);
 		child.add(query);
 		assertEquals(query, QueryFilter.processCombinationType(tokens, null, child));
@@ -254,9 +254,9 @@ public class QueryFilter_test {
 	
 	@Test
 	public void processCombinationTypeChildrenTest() {
-		List<Object> tokens = new ArrayList();
-		List<Query> child = new ArrayList();
-		Map<String, Object> paramMap = new HashMap();
+		List<Object> tokens = new ArrayList<Object>();
+		List<Query> child = new ArrayList<Query>();
+		Map<String, Object> paramMap = new HashMap<String, Object>();
 		Query query = new Equals("key1", "key1_hello", paramMap);
 		child.add(new Equals("key1", "key1_hello", paramMap));
 		child.add(query);

@@ -20,7 +20,7 @@ import picoded.struct.query.OrderBy.OrderType;
 
 public class OrderBy_test {
 	
-	private OrderBy orderBy = new OrderBy<>("ASC");
+	private OrderBy<Object> orderBy = new OrderBy<Object>("ASC");
 	
 	@Before
 	public void setUp() {

@@ -53,6 +53,11 @@ public class QueryUtils {
 	// 
 	//--------------------------------------------------------------------
 	
+	///
+	/// Normalizes a Number object as a double
+	///
+	/// @returns Double object 
+	///
 	public static Double normalizeNumber(Object number) {
 		Double val = null;
 		if (number instanceof Integer) {
@@ -79,15 +84,13 @@ public class QueryUtils {
 					Number sourceAsNumber = NumberFormat.getNumberInstance(Locale.ENGLISH).parse(
 						(String) source);
 					return sourceAsNumber.doubleValue();
-					//return sourceAsDouble;
 				} catch (Exception ex) {
 					throw new RuntimeException("exception in normalizeObject-> " + ex.getMessage());
 				}
-			} //else {
+			} 
+			// Return as string
 			return source;
-			//}
-		} //else {
+		} 
 		return normalizeNumber(source);
-		//}
 	}
 }

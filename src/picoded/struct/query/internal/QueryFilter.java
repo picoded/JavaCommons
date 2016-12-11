@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 
 import picoded.struct.MutablePair;
 import picoded.struct.query.Query;
@@ -396,7 +397,7 @@ public class QueryFilter {
 			if (singleToken instanceof Query) {
 				childList.add((Query) singleToken);
 			} else if (singleToken instanceof String) {
-				String op = singleToken.toString().toUpperCase();
+				String op = singleToken.toString().toUpperCase(Locale.ENGLISH);
 				
 				if (!(combinationOperators.contains(op))) {
 					throw new RuntimeException("Unable to process combination token: " + op);
@@ -417,7 +418,7 @@ public class QueryFilter {
 				List<Object> subList = new ArrayList<Object>();
 				
 				// Check child list
-				if (childList.size() <= 0) {
+				if (childList.isEmpty()) {
 					throw new RuntimeException("Unexpected blank child list: " + childList);
 				}
 				

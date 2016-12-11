@@ -64,8 +64,7 @@ public class DeferredMapEntry<K extends Object, V extends Object> implements Map
 	/// Returns the hash code value for this map entry.
 	///
 	/// Note that you should not rely on hashCode =[
-	/// See:
-	// http://stackoverflow.com/questions/785091/consistency-of-hashcode-on-a-java-string
+	/// See: http://stackoverflow.com/questions/785091/consistency-of-hashcode-on-a-java-string
 	@Override
 	public int hashCode() {
 		return (getKey() == null ? 0 : getKey().hashCode())
@@ -73,7 +72,6 @@ public class DeferredMapEntry<K extends Object, V extends Object> implements Map
 	}
 	
 	/// Replaces the value corresponding to this entry with the specified value
-	// (optional operation).
 	@Override
 	public V setValue(V value) {
 		return sourceMap.put(key, value);

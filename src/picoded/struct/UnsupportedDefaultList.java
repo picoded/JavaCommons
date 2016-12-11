@@ -13,18 +13,18 @@ import picoded.conv.GenericConvert;
 ///
 /// These core functions are as followed
 /// + get
-/// + put
+/// + set
 /// + remove
-/// + keyset
+/// + size
 ///
 /// All other functions are then built ontop of these core function, 
-/// with suboptimal usage patterns. For example .isEmpty(), calls up the keyset(),
-/// and check its length. When there are probably much more efficent implmentation.
+/// with suboptimal usage patterns. For example .set(), calls up the get(),
+/// and put(), to mimick its usage. When there are probably much more efficent implmentation.
 ///
 /// However more importantly is, it works =)
 ///
 /// The idea is that this interface allows a programmer, to rapidly implement
-/// a Map object from any class, with just 4 function, instead of 24
+/// a Map object from any class, with just 4 function, instead of 24++ (with iterators)
 ///
 /// ### Example Usage
 ///
@@ -41,78 +41,156 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	//
 	//-------------------------------------------------------------------
 	
-	/// throws an UnsupportedOperationException
+	/// [Needs to be overriden, currently throws UnsupportedOperationException]
+	/// 
+	/// Returns the element at the specified position in this list.
+	///
+	/// @param   index of the element to return
+	///
+	/// @returns  the element at the specified position in this list
 	default E get(int key) {
 		throw new UnsupportedOperationException("function not supported");
 	}
 	
-	/// throws an UnsupportedOperationException
-	default E set(int index, E value) {
+	/// [Needs to be overriden, currently throws UnsupportedOperationException]
+	/// 
+	/// Inserts the specified element at the specified position in this list.
+	/// Shifts the element currently at that position (if any) and any subsequent elements 
+	/// to the right (adds one to their indices).
+	///
+	/// @param   index of the element to be inserted
+	/// @param   element to be stored at the specified position
+	///
+	/// @returns  the element at the specified position in this list
+	default void add(int index, E value) {
 		throw new UnsupportedOperationException("function not supported");
 	}
 	
-	/// throws an UnsupportedOperationException
+	/// [Needs to be overriden, currently throws UnsupportedOperationException]
+	/// 
+	/// Removes the element at the specified position in this list. 
+	/// Shifts any subsequent elements to the left (subtracts one from their indices). 
+	/// Returns the element that was removed from the list.
+	///
+	/// @param   index of the element to be removed
+	///
+	/// @returns  the element at the specified position in this list
 	default E remove(int index) {
 		throw new UnsupportedOperationException("function not supported");
 	}
 	
-	/// throws an UnsupportedOperationException
+	/// [Needs to be overriden, currently throws UnsupportedOperationException]
+	/// 
+	/// Returns the number of elements in this list. If this list contains more than
+	/// Integer.MAX_VALUE elements, erms, rewrite the polyfills. They WILL break.
+	///
+	/// @returns  the number of elements in this list
 	default int size() {
 		throw new UnsupportedOperationException("function not supported");
 	}
 	
 	//-------------------------------------------------------------------
 	//
-	// Polyfilled critical functions, you probably should still over-ride
-	// For performance issue fixes
+	// Default list utility class
 	//
 	//-------------------------------------------------------------------
 	
-	/// throws an UnsupportedOperationException
-	default void add(int index, E value) {
-		// Get the old size
-		int oldSize = size();
+	/// Class of utility functions for List implmentation 
+	/// This is used by the polyfills
+	static class defaultListUtils {
 		
-		// Out of bound check
-		if(index < 0 || index > oldSize) {
-			throw new IndexOutOfBoundsException("Index: "+index+", Size: "+oldSize);
+		///
+		/// Checks if the given index, is within 0 to last index (size - 1).
+		/// Throws the respective IndexOutOfBoundsException if it fails
+		///
+		/// @param  index position to check
+		/// @param  list size to assume in check
+		///
+		static void checkIndexRange(int index, int size) {
+			// Out of bound check
+			if(index < 0 || index >= size) {
+				throw new IndexOutOfBoundsException("Index: "+index+", Size: "+size);
+			}
 		}
 		
-		// Get the previous value, while inserting the new value
-		E prVal = set(index, value);
-		
-		// Push all the index upwards by one
-		for( int i = oldSize-1; i > index; ++i ) {
-			// For example, at size 5 the following occurs first
-			//
-			// i = 4 : (5-1)
-			// set(5, get(4))
-			//
-			// 5, is the new index position
-			// 4, is the last index
-			//
-			// This operation will repeat until its the item, above the added index
-			set( i + 1, get(i) );
+		///
+		/// Checks if the given index, is within 0 to size. Used for insertions.
+		/// Throws the respective IndexOutOfBoundsException if it fails
+		///
+		/// @param  index position to check
+		/// @param  list size to assume in check
+		///
+		static void checkInsertRange(int index, int size) {
+			// Out of bound check
+			if(index < 0 || index > size) {
+				throw new IndexOutOfBoundsException("Index: "+index+", Size: "+size);
+			}
 		}
-		
-		// After all the above items been "pushed" by 1 index, insert the old value
-		set(index+1, prVal);
 	}
 	
 	//-------------------------------------------------------------------
 	//
-	// Simple immediate polyfill's (one/two liners)
+	// Simple immediate polyfill's (few liners)
 	//
 	//-------------------------------------------------------------------
 	
-	/// throws an UnsupportedOperationException
-	default E get(Object key) {
-		return get( GenericConvert.toInt(key) );
+	/// Appends the specified element to the end of this list
+	///
+	/// @param   element to be stored 
+	/// 
+	/// @return  true, if added successfully (always, unless exception)
+	default boolean add(E value) {
+		add( size(), value );
+		return true;
 	}
 	
-	/// throws an UnsupportedOperationException
+	/// Replaces the element at the specified position in this list with the specified element
+	///
+	/// @param   index of the element to store
+	/// @param   element to be stored at the specified position
+	///
+	/// @return  Previous element that was stored
+	default E set(int index, E value) {
+		defaultListUtils.checkIndexRange(index, size());
+		E oldVal = remove(index);
+		add(index, value);
+		return oldVal;
+	}
+	
+	/// Returns true if this list contains no elements.
+	///
+	/// @return  true, if size is not 0
 	default boolean isEmpty() {
 		return (size() <= 0);
+	}
+	
+	/// Inserts all of the elements in the specified collection into this list at the 
+	/// end of the list. Shifts elements similar to how the add operation works.
+	///
+	/// The behavior of this operation is undefined if the specified collection 
+	/// is modified while the operation is in progress. 
+	///
+	/// @param   element collection to be stored
+	///
+	/// @return  true, if any insertion occurs
+	default boolean addAll(Collection<? extends E> c) {
+		return addAll( size(), c );
+	}
+	
+	/// Removes all of the elements from this collection. 
+	/// The collection will be empty after this method returns.
+	default void clear() {
+		// Iterate all items from top, and remove if
+		for(int i=size() - 1; i>=0; --i) {
+			remove(i);
+		}
+	}
+	
+	/// Returns true if this collection contains the specified element. 
+	///
+	/// @return  true, if element is found
+	default boolean contains(Object o) {
+		return indexOf(o) >= 0;
 	}
 	
 	//-------------------------------------------------------------------
@@ -121,7 +199,34 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	//
 	//-------------------------------------------------------------------
 	
-	/// throws an UnsupportedOperationException
+	/// Inserts all of the elements in the specified collection into this list at the 
+	/// specified position. Shifts elements similar to how the add operation works.
+	///
+	/// The behavior of this operation is undefined if the specified collection 
+	/// is modified while the operation is in progress. 
+	///
+	/// @param   index of the element to store
+	/// @param   element collection to be stored
+	///
+	/// @return  true, if any insertion occurs
+	default boolean addAll(int index, Collection<? extends E> c) {
+		defaultListUtils.checkInsertRange(index, size());
+		// Iterate collection, and add items
+		int idx = index;
+		for (E item : c) {
+			add(idx, item);
+			++idx;
+		}
+		// Returns true, if iteration has occured
+		return index != idx;
+	}
+	
+	/// Returns the index of the first occurrence of the specified element in this list, 
+	/// or -1 if this list does not contain the element
+	///
+	/// @param   element to find
+	///
+	/// @return  Index of the found item, else -1
 	default int indexOf(Object o) {
 		// Get the size
 		int len = size();
@@ -145,7 +250,12 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 		return -1;
 	}
 	
-	/// throws an UnsupportedOperationException
+	/// Returns the index of the last occurrence of the specified element in this list, 
+	/// or -1 if this list does not contain the element
+	///
+	/// @param   element to find
+	///
+	/// @return  Index of the found item, else -1
 	default int lastIndexOf(Object o) {
 		// Iterate to find
 		for(int i=size() - 1; i>=0; --i) {
@@ -172,33 +282,129 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	//
 	//-------------------------------------------------------------------
 	
-	/// throws an UnsupportedOperationException
-	default boolean add(E value) {
-		add( size(), value );
-		return true;
-	}
-	
-	/// throws an UnsupportedOperationException
+	/// Removes the first occurrence of the specified element 
+	/// from this list, if it is present
+	///
+	/// @param  element to be removed from this list, if present
+	///
+	/// @return  true, if element is found and removed
 	default boolean remove(Object o) {
 		int idx = indexOf(o);
 		if( idx >= 0 ) {
 			remove(idx);
+			return true;
 		}
 		return false;
 	}
 	
-	/// throws an UnsupportedOperationException
-	default void clear() {
-		// Iterate all items from top, and remove if
-		for(int i=size() - 1; i>=0; --i) {
-			remove(i);
+	/// Returns true if this collection contains all of the elements in the specified collection.
+	///
+	/// @param   element collection to scan
+	///
+	/// @return  true, if all items is found
+	default boolean containsAll(Collection<?> c) {
+		// Iterate collection
+		for (Object item : c) {
+			// Terminates checks the moment one lookup fails
+			if(!contains(item)) {
+				return false;
+			}
 		}
+		// Assumes checks completed, return success
+		return true;
 	}
 	
-	/// throws an UnsupportedOperationException
-	default boolean contains(Object o) {
-		return indexOf(o) >= 0;
+	/// Removed all items found in a collection.
+	///
+	/// @param   element collection to scan
+	///
+	/// @return  true, if any item was removed
+	default boolean removeAll(Collection<?> c) {
+		boolean ret = false;
+		// Iterate collection
+		for (Object item : c) {
+			// Remove, and cache any success
+			ret = remove(item) || ret;
+		}
+		return ret;
 	}
+	
+	/// Retains only the elements in this collection that are contained 
+	/// in the specified collection
+	///
+	/// @param   element collection to scan
+	/// 
+	/// @return  true, if any item was removed
+	default boolean retainAll(Collection<?> c) {
+		int oldSize = size();
+		
+		// Iterate entire array from the top
+		for(int idx = oldSize - 1; idx >= 0; ++idx) {
+			// If item at index is not found, remove it
+			// And move to next index
+			if(!c.contains( get(idx) )) {
+				remove(idx);
+			}
+		}
+		
+		// Returns true, if size changed
+		return (size() != oldSize);
+	}
+	
+	//-------------------------------------------------------------------
+	//
+	// Complex toArray polyfills
+	//
+	//-------------------------------------------------------------------
+	
+	/// Returns an array containing all of the elements in this collection.
+	///
+	/// @return  Array containing all of the elements in this collection
+	default Object[] toArray() {
+		int size = size();
+		Object[] ret = new Object[size];
+		for(int i=0; i<size; ++i) {
+			ret[i] = get(i);
+		}
+		return ret;
+	}
+	
+	/// Returns an array containing all of the elements in this collection; 
+	/// the runtime type of the returned array is that of the specified array. 
+	/// 
+	/// If the collection fits in the specified array, it is returned therein. 
+	/// Otherwise, a new array is allocated with the runtime type of the specified array 
+	/// and the size of this collection.
+	///
+	/// @param   the array into to store the results, if it is big enough;
+	///
+	/// @return  Array containing all of the elements in this collection
+	@SuppressWarnings("unchecked")
+	default <T> T[] toArray(T[] a) {
+		int size = size();
+		
+		// Write into input array, if it can fit
+		if(a.length >= size) {
+			// Iterate and write
+			for(int i=0; i<size; ++i) {
+				a[i] = (T)get(i);
+			}
+			
+			// Null terminator, if applicable
+			if(a.length > size) {
+				a[size] = null;
+			}
+		}
+		
+		// Create a new array, and returns it
+		return (T[])toArray();
+	}
+	
+	//-------------------------------------------------------------------
+	//
+	// Complex Polyfills that you should be glad you are not doing
+	//
+	//-------------------------------------------------------------------
 	
 	/// throws an UnsupportedOperationException
 	default ListIterator<E> listIterator() {
@@ -217,41 +423,6 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	
 	/// throws an UnsupportedOperationException
 	default List<E> subList(int fromIndex, int toIndex) {
-		throw new UnsupportedOperationException("function not supported");
-	}
-	
-	/// throws an UnsupportedOperationException
-	default boolean retainAll(Collection<?> c) {
-		throw new UnsupportedOperationException("function not supported");
-	}
-	
-	/// throws an UnsupportedOperationException
-	default boolean removeAll(Collection<?> c) {
-		throw new UnsupportedOperationException("function not supported");
-	}
-	
-	/// throws an UnsupportedOperationException
-	default boolean addAll(Collection<? extends E> c) {
-		throw new UnsupportedOperationException("function not supported");
-	}
-	
-	/// throws an UnsupportedOperationException
-	default boolean addAll(int index, Collection<? extends E> c) {
-		throw new UnsupportedOperationException("function not supported");
-	}
-	
-	/// throws an UnsupportedOperationException
-	default boolean containsAll(Collection<?> c) {
-		throw new UnsupportedOperationException("function not supported");
-	}
-	
-	/// throws an UnsupportedOperationException
-	default Object[] toArray() {
-		throw new UnsupportedOperationException("function not supported");
-	}
-	
-	/// throws an UnsupportedOperationException
-	default <T> T[] toArray(T[] a) {
 		throw new UnsupportedOperationException("function not supported");
 	}
 	

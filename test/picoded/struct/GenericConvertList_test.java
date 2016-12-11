@@ -17,13 +17,13 @@ import org.mockito.Mockito;
 public class GenericConvertList_test {
 	
 	@SuppressWarnings("unchecked")
-	//	private GenericConvertList<String> genericConvertList = Mockito.mock(GenericConvertList.class, Mockito.CALLS_REAL_METHODS);
-	private GenericConvertList<String> genericConvertList = null;
+	private GenericConvertList<String> genericConvertList = Mockito.mock(GenericConvertList.class, Mockito.CALLS_REAL_METHODS);
+	//private GenericConvertList<String> genericConvertList = null;
 	
 	@Before @SuppressWarnings("unchecked")
 	public void setUp() {
-		genericConvertList = Mockito.mock(GenericConvertArrayList.class,
-			Mockito.CALLS_REAL_METHODS);
+		// genericConvertList = Mockito.mock(GenericConvertList.class,
+		// 	Mockito.CALLS_REAL_METHODS);
 	}
 	
 	@After
@@ -36,14 +36,15 @@ public class GenericConvertList_test {
 		assertNotNull(GenericConvertList.build(new ArrayList<String>()));
 	}
 	
-	@Test
-	public void getSubtleTest() {
-		assertNull(genericConvertList.getSubtle(-1));
-		assertNull(genericConvertList.getSubtle(0));
-		assertNull(genericConvertList.getSubtle(1));
-		assertNull(genericConvertList.getSubtle(2));
-	}
-	
+	// @Test
+	// public void getSubtleTest() {
+	// 	when(genericConvertList.size()).thenReturn(0,0,0,0);
+	// 	assertNull(genericConvertList.getSubtle(-1));
+	// 	assertNull(genericConvertList.getSubtle(0));
+	// 	assertNull(genericConvertList.getSubtle(1));
+	// 	assertNull(genericConvertList.getSubtle(2));
+	// }
+	// 
 	// @Test
 	// public void getSubtleNonZeroTest() {
 	// 	when(genericConvertList.size()).thenReturn(2);

@@ -95,45 +95,6 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	
 	//-------------------------------------------------------------------
 	//
-	// Default list utility class
-	//
-	//-------------------------------------------------------------------
-	
-	/// Class of utility functions for List implmentation 
-	/// This is used by the polyfills
-	static class UnsupportedDefaultListUtils {
-		
-		///
-		/// Checks if the given index, is within 0 to last index (size - 1).
-		/// Throws the respective IndexOutOfBoundsException if it fails
-		///
-		/// @param  index position to check
-		/// @param  list size to assume in check
-		///
-		static void checkIndexRange(int index, int size) {
-			// Out of bound check
-			if(index < 0 || index >= size) {
-				throw new IndexOutOfBoundsException("Index: "+index+", Size: "+size);
-			}
-		}
-		
-		///
-		/// Checks if the given index, is within 0 to size. Used for insertions.
-		/// Throws the respective IndexOutOfBoundsException if it fails
-		///
-		/// @param  index position to check
-		/// @param  list size to assume in check
-		///
-		static void checkInsertRange(int index, int size) {
-			// Out of bound check
-			if(index < 0 || index > size) {
-				throw new IndexOutOfBoundsException("Index: "+index+", Size: "+size);
-			}
-		}
-	}
-	
-	//-------------------------------------------------------------------
-	//
 	// Simple immediate polyfill's (few liners)
 	//
 	//-------------------------------------------------------------------
@@ -155,7 +116,7 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	///
 	/// @return  Previous element that was stored
 	default E set(int index, E value) {
-		UnsupportedDefaultListUtils.checkIndexRange(index, size());
+		UnsupportedDefaultUtils.checkIndexRange(index, size());
 		E oldVal = remove(index);
 		add(index, value);
 		return oldVal;
@@ -214,7 +175,7 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	///
 	/// @return  true, if any insertion occurs
 	default boolean addAll(int index, Collection<? extends E> c) {
-		UnsupportedDefaultListUtils.checkInsertRange(index, size());
+		UnsupportedDefaultUtils.checkInsertRange(index, size());
 		// Iterate collection, and add items
 		int idx = index;
 		for (E item : c) {
@@ -411,244 +372,6 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	//
 	//-------------------------------------------------------------------
 	
-	///
-	/// Captures the List size. And performs ConcurrentModificationException checks.
-	///
-	/// This considers a size change as "change" in array, on a "change" detection
-	/// the status is locked. And throws ConcurrentModificationException subsequently
-	///
-	static class UnsupportedDefaultListSizeCapture<E> {
-		
-		//
-		// Internal tracking variables
-		//-------------------------------------------------------------------
-		
-		protected List<E> base; // List used to build this 
-		protected int initialSize; // Initial list size
-		protected boolean detectedChange; // Change has already been detected
-		
-		//
-		// Constructor and utils
-		//-------------------------------------------------------------------
-		
-		/// Constructor setting up the base list, and index point
-		///
-		/// @param  List to use as base, for get/size operations
-		/// @param  index position to iterate from
-		public UnsupportedDefaultListSizeCapture(List<E> inBase) {
-			base = inBase;
-			initialSize = base.size();
-			detectedChange = false;
-		}
-		
-		/// Check if any change has occured since previous iteration call
-		/// Throws a ConcurrentModificationException if so
-		protected void checkForChange() {
-			if( detectedChange ) {
-				throw new ConcurrentModificationException();
-			}
-			
-			if( base.size() != initialSize ) {
-				throwChangeException();
-			}
-		}
-		
-		/// Declare a change has occured
-		/// Throws a ConcurrentModificationException
-		protected void throwChangeException() {
-			detectedChange = true;
-			throw new ConcurrentModificationException();
-		}
-		
-		/// Reset the size capture
-		protected void resetSizeState() {
-			if( detectedChange ) {
-				throw new ConcurrentModificationException();
-			}
-			initialSize = base.size();
-		}
-	}
-	
-	///
-	/// Dummy Iterator implmentation, as mentioned this is far from perfect,
-	/// relying on the list respective get function calls, but its good enough.
-	///
-	static class UnsupportedDefaultListIterator<E> extends UnsupportedDefaultListSizeCapture<E> 
-		implements Iterator<E>, ListIterator<E> {
-		
-		//
-		// Internal tracking variables
-		//-------------------------------------------------------------------
-		
-		private int idxPt; // Index of next element
-		private int lastPt = -1; // Index for remove call to use
-		
-		//
-		// Constructor and utils
-		//-------------------------------------------------------------------
-		
-		/// Constructor setting up the base list, and index point
-		///
-		/// @param  List to use as base, for get/size operations
-		/// @param  index position to iterate from
-		public UnsupportedDefaultListIterator(List<E> inBase, int inIdx) {
-			super(inBase);
-			idxPt = inIdx;
-		}
-		
-		//
-		// Iterator implmentation
-		//-------------------------------------------------------------------
-		
-		/// Indicates if there is a next iteration
-		/// 
-		/// @return  true if there is another element to iterate
-		public boolean hasNext() {
-			return base.size() > idxPt;
-		}
-		
-		/// Gets the next element
-		/// Moves iterator position
-		///
-		/// @return  Respective iterator element
-		@SuppressWarnings("unchecked")
-		public E next() {
-			checkForChange();
-			
-			// End of iteration reached
-			if (idxPt >= initialSize) {
-				throw new NoSuchElementException();
-			}
-			
-			try {
-				// Get the item, while tracking the index
-				E ret = base.get(lastPt = idxPt); 
-				++idxPt; // Shift index point
-				return ret; // returns 
-			} catch (IndexOutOfBoundsException ex) {
-				throwChangeException();
-			}
-			return null;
-		}
-		
-		/// Removes from the underlying collection the last element returned by this iterator
-		/// This method can be called only once per call to next(). 
-		/// 
-		/// The behavior of an iterator is unspecified if the underlying collection 
-		/// is modified while the iteration is in progress in any way other than by 
-		/// calling this method.
-		public void remove() {
-			if (lastPt < 0) {
-				throw new IllegalStateException();
-			}
-			checkForChange();
-
-			try {
-				base.remove(lastPt);
-				idxPt = lastPt;
-				lastPt = -1;
-				resetSizeState();
-			} catch (IndexOutOfBoundsException ex) {
-				throwChangeException();
-			}
-		}
-		
-		//
-		// ListIterator implmentation
-		//-------------------------------------------------------------------
-		
-		/// returns true if the iterator can step backwards
-		///
-		/// @returns true if the iterator can step backwards
-		public boolean hasPrevious() {
-			return idxPt > 0;
-		}
-		
-		/// Returns the index of the element that would be returned by a 
-		/// subsequent call to next(). 
-		/// 
-		/// (Returns list size if the list iterator is at the end of the list.)
-		///
-		/// @return  Iterator index position
-		public int nextIndex() {
-			return idxPt;
-		}
-		
-		/// Returns the index of the element that would be returned by a subsequent 
-		/// call to previous(). 
-		/// 
-		/// (Returns -1 if the list iterator is at the beginning of the list.)
-		///
-		/// @return  Iterator previous index position, or -1
-		public int previousIndex() {
-			return idxPt - 1;
-		}
-		
-		/// Returns the previous element in the list and moves the cursor position backwards. 
-		/// This method may be called repeatedly to iterate through the list backwards, 
-		/// or intermixed with calls to next() to go back and forth. 
-		/// 
-		/// (Note that alternating calls to next and previous will return the same element repeatedly.)
-		///
-		/// @return  Respective iterator element
-		@SuppressWarnings("unchecked")
-		public E previous() {
-			checkForChange();
-			int i = idxPt - 1;
-			
-			// End of iteration reached
-			if (i < 0) {
-				throw new NoSuchElementException();
-			}
-			
-			try {
-				// Get the item, while tracking the index
-				E ret = base.get(lastPt = i); 
-				idxPt = i; // Shift index point
-				return ret; // returns 
-			} catch (IndexOutOfBoundsException ex) {
-				throwChangeException();
-			}
-			return null;
-		}
-		
-		/// Replaces the last element returned by next() or previous() with the specified element
-		///
-		/// @param  The element to set
-		public void set(E e) {
-			if (lastPt < 0) {
-				throw new IllegalStateException();
-			}
-			checkForChange();
-
-			try {
-				base.set(lastPt, e);
-			} catch (IndexOutOfBoundsException ex) {
-				throwChangeException();
-			}
-		}
-		
-		/// Inserts the specified element into the list. The element is inserted 
-		/// immediately before the element that would be returned by next()
-		///
-		/// @param  The element to add
-		public void add(E e) {
-			if (lastPt < 0) {
-				throw new IllegalStateException();
-			}
-			checkForChange();
-
-			try {
-				base.add(idxPt, e);
-				idxPt = idxPt + 1;
-				lastPt = -1;
-				resetSizeState();
-			} catch (IndexOutOfBoundsException ex) {
-				throwChangeException();
-			}
-		}
-	}
-	
 	/// Returns a list iterator over the elements in this list (in proper sequence).
 	/// 
 	/// @return  list iterator over the elements in this list (in proper sequence)
@@ -660,14 +383,14 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	/// 
 	/// @return  list iterator over the elements in this list (in proper sequence)
 	default ListIterator<E> listIterator(int index) {
-		return new UnsupportedDefaultListIterator<E>(this, index);
+		return new ArbitaryListIterator<E>(this, index);
 	}
 	
 	/// Returns a iterator over the elements in this list (in proper sequence).
 	/// 
 	/// @return  iterator over the elements in this list (in proper sequence)
 	default Iterator<E> iterator() {
-		return new UnsupportedDefaultListIterator<E>(this, 0);
+		return new ArbitaryListIterator<E>(this, 0);
 	}
 	
 	//-------------------------------------------------------------------
@@ -677,97 +400,9 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	//
 	//-------------------------------------------------------------------
 	
-	///
-	/// Dummy subList implmentation, as mentioned this is far from perfect,
-	/// relying on the list respective function calls, but its good enough.
-	///
-	static class UnsupportedDefaultSubList<E> extends UnsupportedDefaultListSizeCapture<E> 
-		implements UnsupportedDefaultList<E> {
-			
-		//
-		// Internal tracking variables
-		//-------------------------------------------------------------------
-		
-		private int offset; // Index of next element
-		private int size; // Index for remove call to use
-		
-		//
-		// Constructor and utils
-		//-------------------------------------------------------------------
-		
-		/// Constructor setting up the base list, and index point
-		///
-		/// @param  List to use as base, for get/size operations
-		/// @param  index position to iterate from
-		public UnsupportedDefaultSubList(List<E> inBase, int frmIdx, int toIdx) {
-			// State capture
-			super(inBase);
-			
-			// Index range checks
-			if (frmIdx < 0) {
-				throw new IndexOutOfBoundsException("fromIndex = " + frmIdx);
-			} else if (toIdx > base.size()) {
-				throw new IndexOutOfBoundsException("toIndex = " + toIdx);
-			} else if (frmIdx > toIdx) {
-				throw new IllegalArgumentException(
-					"fromIndex(" + frmIdx +
-					") > toIndex(" + toIdx + ")"
-				);
-			}
-			
-			// Index captures
-			offset = frmIdx;
-			size = toIdx - frmIdx;
-		}
-		
-		/// Size operation proxy
-		/// See: [UnsupportedDefaultList.size]
-		public int size() {
-			checkForChange();
-			return size;
-		}
-	
-		/// Set operation proxy
-		/// See: [UnsupportedDefaultList.set]
-		public E set(int index, E element) {
-			checkForChange();
-			UnsupportedDefaultListUtils.checkIndexRange(index, size);
-			return base.set(index+offset, element);
-		}
-		
-		/// Get operation proxy
-		/// See: [UnsupportedDefaultList.get]
-		public E get(int index) {
-			UnsupportedDefaultListUtils.checkIndexRange(index, size);
-			checkForChange();
-			return base.get(index+offset);
-		}
-		
-		/// Add operation proxy
-		/// See: [UnsupportedDefaultList.add]
-		public void add(int index, E element) {
-			UnsupportedDefaultListUtils.checkInsertRange(index, size);
-			checkForChange();
-			base.add(index+offset, element);
-			resetSizeState();
-			size++;
-		}
-		
-		/// Remove operation proxy
-		/// See: [UnsupportedDefaultList.remove]
-		public E remove(int index) {
-			UnsupportedDefaultListUtils.checkIndexRange(index, size());
-			checkForChange();
-			E result = base.remove(index+offset);
-			resetSizeState();
-			size--;
-			return result;
-		}
-	}
-	
 	/// throws an UnsupportedOperationException
 	default List<E> subList(int frmIdx, int toIdx) {
-		return new UnsupportedDefaultSubList<E>(this, frmIdx, toIdx);
+		return new ArbitaryListSubList<E>(this, frmIdx, toIdx);
 	}
 	
 }

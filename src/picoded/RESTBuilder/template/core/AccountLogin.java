@@ -30,6 +30,10 @@ public class AccountLogin extends BasePage {
 	//
 	/////////////////////////////////////////////
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final String MISSING_REQUEST_PAGE = "Unexpected Exception: Missing requestPage()";
 	public static final String MISSING_LOGIN_SESSION = "Authentication Error: Missing login session";
 	public static final String MISSING_PERMISSION = "Permission Error: Missing permission for request (generic)";
@@ -662,7 +666,6 @@ public class AccountLogin extends BasePage {
 			commonInfo.put("isSuperUser", account.isSuperUser());
 			commonInfo.put("isGroup", account.isGroup());
 			
-			Map<String, List<Map<String, Object>>> groupMap = new HashMap<String, List<Map<String, Object>>>();
 			AccountObject[] groups = account.getGroups();
 			if (groups != null) {
 				List<Map<String, Object>> groupList = new ArrayList<Map<String, Object>>();
@@ -967,8 +970,6 @@ public class AccountLogin extends BasePage {
 			req,
 			res,
 			(reqObj, resMap, basePageObj, accountTableObj, currentUser, groupObj, accObj_b) -> {
-				Map<String, Object> metaMap = mtApi.meta_GET.apply(req, res);
-				
 				AccountObject account = null;
 				if (currentUser != null) {
 					String id = "";
@@ -1246,7 +1247,6 @@ return resMap;
 	/// | error           | String (Optional)     | Errors encounted if any                                                    |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
-	@SuppressWarnings("unchecked")
 	public static RESTFunction members_list_POST = (req, res) -> {
 		// Only runs function if logged in, and valid group object, with admin rights
 		return fetchGroupObject_fromFirstWildcard_orCurrentUser(req, res, true,
@@ -1262,16 +1262,12 @@ return resMap;
 					return resMap;
 				}
 				
-				boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
-				
 				try {
 					//do deletes first
-			List<String> successfulDeletes = null;
 			List<Object> delMember = null;
 			Object delMemberRaw = req.get("delMembers");
 			if (delMemberRaw != null) {
 				delMember = ConvertJSON.toList((String) delMemberRaw);
-				successfulDeletes = new ArrayList<String>();
 			}
 			
 			if (delMember != null) {
@@ -1463,7 +1459,6 @@ return resMap;
 	/// | error           | String (Optional)     | Errors encounted if any                                                    |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
-	@SuppressWarnings("unchecked")
 	public static RESTFunction members_meta_POST = (req, res) -> {
 		// Only runs function if logged in, and valid group object
 		return fetchGroupObject_fromFirstWildcard_orCurrentUser(req, res, false, (reqObj, resMap,
@@ -1575,8 +1570,6 @@ return resMap;
 			currentUser, groupObj, accObj_b) -> {
 			
 			boolean isGroup = req.getBoolean("isGroup", false);
-			boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
-			
 			String userName = req.getString("username");
 			if (userName == null || userName.isEmpty()) {
 				res.put("error", "No username was supplied");
@@ -1714,7 +1707,7 @@ return resMap;
 	public static RESTFunction csv_GET = (req, res) -> {
 		return prepareAuthenticatedREST(req, res, (reqObj, resMap, basePageObj, accountTableObj,
 			currentUser, groupObj, accObj_b) -> {
-			Map<String, Object> metaMap = mtApi.csv_export.apply(req, res);
+			mtApi.csv_export.apply(req, res);
 			// res.put("AccountLogin", "csv_GET");
 			return res;
 		});

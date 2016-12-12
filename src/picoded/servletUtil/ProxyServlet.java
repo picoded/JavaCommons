@@ -317,7 +317,6 @@ public class ProxyServlet extends CorePage {
 			InputStream inputStreamProxyResponse = respHttpObj.inputStream();
 			BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStreamProxyResponse);
 			int outputNextByte;
-			int bytesToRead = 0;
 			
 			while ((outputNextByte = bufferedInputStream.read()) != -1) {
 				outputStreamClientResponse.write(outputNextByte);

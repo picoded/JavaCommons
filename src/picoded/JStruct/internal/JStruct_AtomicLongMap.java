@@ -23,7 +23,7 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	///--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
-	protected static ConcurrentMap<String, Long> valueMap = new ConcurrentHashMap<String, Long>();
+	protected ConcurrentMap<String, Long> valueMap = new ConcurrentHashMap<String, Long>();
 	
 	/// Read write lock
 	public static final ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();

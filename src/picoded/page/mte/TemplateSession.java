@@ -191,9 +191,6 @@ public class TemplateSession {
 					+ "end" + statementSet[0][3] + " OR " + statementSet[0][2] + "else"
 					+ statementSet[0][3]);
 			}
-			
-			int elseBlock = scanForClosingBlock("if", postExpressionOffset, end, true);
-			
 		}
 		
 		// Checks for functional expression

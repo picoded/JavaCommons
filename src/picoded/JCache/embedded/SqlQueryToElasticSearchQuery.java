@@ -1,8 +1,5 @@
 package picoded.JCache.embedded;
 
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-
 ///
 /// SQL query like syntax, for elastic search
 ///

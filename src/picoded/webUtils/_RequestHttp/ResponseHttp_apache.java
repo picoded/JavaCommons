@@ -1,16 +1,11 @@
 package picoded.webUtils._RequestHttp;
 
-import java.io.InputStream;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
 
-import org.apache.http.StatusLine;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
 
 import picoded.struct.HashMapList;
 

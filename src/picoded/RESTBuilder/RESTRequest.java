@@ -1,28 +1,16 @@
 package picoded.RESTBuilder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-
-// Exceptions used
-import java.lang.RuntimeException;
-import java.lang.IllegalArgumentException;
-import java.util.*;
-import java.lang.reflect.*;
-
-// Objects used
+import java.util.Arrays;
 import java.util.HashMap;
-import java.io.PrintWriter;
-import java.io.OutputStream;
-import java.net.URLDecoder;
-import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
-import picoded.struct.GenericConvertMap;
-import picoded.enums.HttpRequestType;
-
-// Ext lib used
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.collections4.map.AbstractMapDecorator;
+
+import picoded.enums.HttpRequestType;
+import picoded.struct.GenericConvertMap;
+// Exceptions used
+// Objects used
+// Ext lib used
 
 ///
 /// RESTRequest object handler, this is usually the first argument for all

@@ -30,6 +30,7 @@ public class RequestHttp_apache {
 	///////////////////////////////////////////////////////////////////////
 	
 	/// Returns the apache client HttpUriRequest, based on its type
+	@SuppressWarnings("incomplete-switch")
 	protected static HttpRequestBase HttpUriRequest_fromRequestType(HttpRequestType reqType,
 		String reqURL) {
 		switch (reqType) {

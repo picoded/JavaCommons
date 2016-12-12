@@ -1,12 +1,11 @@
 package picoded.JSql.struct;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import picoded.JSql.*;
-import picoded.JStruct.*;
-import picoded.struct.*;
+import picoded.JSql.JSql;
+import picoded.JStruct.AccountTable;
+import picoded.JStruct.AtomicLongMap;
+import picoded.JStruct.JStruct;
+import picoded.JStruct.KeyValueMap;
+import picoded.JStruct.MetaTable;
 
 public class JSqlStruct extends JStruct {
 	

@@ -11,10 +11,6 @@ public class MetaTypeMap extends ConcurrentHashMap<String, MetaType> {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	/// Invalid constructor (throws exception)
-	public MetaTypeMap() {
-	}
-	
 	/// String put alternative
 	///
 	/// @param  Key, used to represent collumn name

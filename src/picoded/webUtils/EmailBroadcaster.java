@@ -1,10 +1,10 @@
 package picoded.webUtils;
 
-import java.util.Properties;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -13,9 +13,6 @@ import javax.mail.Message.RecipientType;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
-import javax.mail.Store;
-import javax.mail.Folder;
-import javax.mail.Flags.Flag;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
@@ -24,7 +21,6 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 
 import picoded.struct.GenericConvertMap;
-import picoded.struct.GenericConvertHashMap;
 import picoded.struct.ProxyGenericConvertMap;
 
 ///

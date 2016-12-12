@@ -1,24 +1,29 @@
 package picoded.JSql.struct.internal;
 
 /// Java imports
-import java.util.*;
-import java.util.logging.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import picoded.JSql.JSql;
+import picoded.JSql.JSqlException;
+import picoded.JSql.JSqlResult;
+import picoded.JStruct.MetaObject;
+import picoded.JStruct.MetaTable;
+import picoded.JStruct.MetaType;
+import picoded.JStruct.MetaTypeMap;
 /// Picoded imports
-import picoded.conv.*;
-import picoded.enums.JSqlType;
+import picoded.conv.ConvertJSON;
+import picoded.conv.ListValueConv;
 import picoded.enums.ObjectTokens;
-import picoded.JSql.*;
-import picoded.JStruct.*;
-import picoded.struct.*;
-import picoded.struct.query.*;
-import picoded.struct.query.condition.*;
-import picoded.struct.query.internal.*;
+import picoded.struct.query.OrderBy;
+import picoded.struct.query.Query;
+import picoded.struct.query.internal.QueryFilter;
 
 ///
 /// Protected class, used to orgainze the various JSql based logic
@@ -221,7 +226,6 @@ public class JSql_MetaTableUtils {
 	/// @param {Set<String>} keyList       - keylist to limit append load
 	/// @param {boolean} optimizeAppend    - Used to indicate if append batch should be optimized (not used)
 	///
-	@SuppressWarnings("unchecked")
 	public static void JSqlObjectMapAppend( //
 		MetaTypeMap mtm, //
 		JSql sql, String tName, String _oid, //
@@ -332,7 +336,7 @@ public class JSql_MetaTableUtils {
 		List<Object> oID_list = r.get("oID");
 		List<Object> kID_list = r.get("kID");
 		List<Object> idx_list = r.get("idx");
-		List<Object> val_list = r.get("tVl");
+		//		List<Object> val_list = r.get("tVl");
 		
 		if (kID_list == null) {
 			return ret;
@@ -666,7 +670,7 @@ public class JSql_MetaTableUtils {
 							queryTypeMap.put(keyName, MetaType.STRING);
 						}
 						
-						MetaType type = queryTypeMap.get(keyName);
+						//						MetaType type = queryTypeMap.get(keyName);
 						
 						// Force lowercase string sorting for string orderby
 						if (queryTypeMap.get(keyName) == MetaType.STRING) {

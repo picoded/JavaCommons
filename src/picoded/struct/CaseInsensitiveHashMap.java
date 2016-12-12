@@ -1,6 +1,7 @@
 package picoded.struct;
 
 import java.util.Map;
+
 import picoded.conv.ConvertJSON;
 
 /// Case Insensitive HashMap, useful for various things.
@@ -22,6 +23,7 @@ import picoded.conv.ConvertJSON;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
+@SuppressWarnings("all")
 public class CaseInsensitiveHashMap<K extends String, V> extends GenericConvertHashMap<K, V> {
 	
 	/// Java serialversion uid: http://stackoverflow.com/questions/285793/what-is-a-serialversionuid-and-why-should-i-use-it

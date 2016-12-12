@@ -70,7 +70,6 @@ public class JStruct_MetaObject implements MetaObject {
 			if (remoteDataMap == null) {
 				remoteDataMap = new HashMap<String, Object>();
 			}
-			
 			if (remoteDataMap.size() > 0) {
 				if (remoteDataMap.size() == 1 && remoteDataMap.get("_oid") != null) {
 					// ignore if its just _oid

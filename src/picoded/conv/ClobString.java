@@ -1,12 +1,10 @@
 package picoded.conv;
 
-import java.lang.StringBuilder;
-import java.lang.Character;
-import oracle.sql.CLOB;
-
-import java.sql.SQLException;
-import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.sql.SQLException;
+
+import oracle.sql.CLOB;
 
 /// Utility function that converst from oracle.sql.CLOB to string (and back!)
 ///

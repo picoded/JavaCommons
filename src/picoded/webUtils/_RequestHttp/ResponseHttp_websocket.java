@@ -1,16 +1,16 @@
 package picoded.webUtils._RequestHttp;
 
 import java.net.URI;
-import java.io.InputStream;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.function.Consumer;
 
-import javax.websocket.*;
+import javax.websocket.CloseReason;
+import javax.websocket.ContainerProvider;
+import javax.websocket.OnClose;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
 
-import picoded.struct.HashMapList;
 import picoded.webUtils.ResponseHttp;
 
 /// Extends the basic implmentation to support websocket

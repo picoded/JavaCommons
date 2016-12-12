@@ -1,44 +1,35 @@
 package picoded.servlet;
 
 // Java Serlvet requirments
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletContextListener;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContext;
-
-// Net, io, NIO
-import java.net.URL;
-import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-//import java.nio.charset.StandardCharsets;
-
-// Exceptions used
-import javax.servlet.ServletException;
-import java.io.IOException;
-
 // Objects used
-import java.util.*;
-import java.io.PrintWriter;
+import java.util.Locale;
+import java.util.Map;
 
-// JMTE inner functions add-on
-import com.floreysoft.jmte.*;
+import javax.servlet.ServletContextListener;
 
 // Apache library used
 import org.apache.commons.io.FilenameUtils;
 
+import picoded.JStack.JConfig;
+import picoded.JStack.JStackException;
+import picoded.JStack.JStackUtils;
+import picoded.JStruct.AccountObject;
+import picoded.JStruct.AccountTable;
+import picoded.RESTBuilder.RESTBuilder;
+import picoded.RESTBuilder.template.server.ServerTime;
 // Sub modules useds
 import picoded.conv.JMTE;
-import picoded.enums.*;
-import picoded.JStack.*;
-import picoded.JStruct.*;
-import picoded.RESTBuilder.*;
-import picoded.RESTBuilder.template.core.*;
-import picoded.RESTBuilder.template.server.*;
-import picoded.webTemplateEngines.JSML.*;
-import picoded.page.builder.*;
+import picoded.enums.HttpRequestType;
+import picoded.page.builder.PageBuilder;
+import picoded.webTemplateEngines.JSML.JSMLFormSet;
+
+// JMTE inner functions add-on
+import com.floreysoft.jmte.NamedRenderer;
+import com.floreysoft.jmte.RenderFormatInfo;
+// Net, io, NIO
+//import java.nio.charset.StandardCharsets;
+// Exceptions used
 
 /**
  * Extends the corePage/jSqlPage functionality, and implements basic UI templating, lifecycle handling,
@@ -65,6 +56,10 @@ public class BasePage extends JStackPage implements ServletContextListener {
 	//
 	/////////////////////////////////////////////
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/// Cached restbuilder object
 	protected RESTBuilder _restBuilderObj = null;
 	

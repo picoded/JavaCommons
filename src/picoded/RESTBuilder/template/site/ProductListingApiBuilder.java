@@ -1,32 +1,16 @@
 package picoded.RESTBuilder.template.site;
 
+import java.util.List;
+
+import picoded.JStruct.JStruct;
+import picoded.JStruct.MetaObject;
+import picoded.JStruct.module.site.ProductListing;
 import picoded.RESTBuilder.RESTBuilder;
 import picoded.RESTBuilder.RESTFunction;
-import picoded.RESTBuilder.template.core.*;
+import picoded.RESTBuilder.template.core.MetaTableApiBuilder;
+import picoded.conv.ConvertJSON;
 import picoded.enums.HttpRequestType;
-import picoded.JStruct.*;
-import picoded.JStruct.module.site.*;
-import picoded.servlet.*;
-import picoded.struct.*;
-import picoded.conv.*;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-
 //For HMAC key generation
-import java.nio.charset.Charset;
-import java.security.SignatureException;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import com.google.common.io.BaseEncoding;
 ///
 /// Provides a product listings API
 /// All in a single API package.

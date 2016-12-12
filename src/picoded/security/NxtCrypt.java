@@ -5,6 +5,7 @@ import org.apache.commons.codec.binary.Base64;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -103,6 +104,7 @@ public class NxtCrypt {
 	 * @param   hex         the hex string
 	 * @return              the hex string decoded into a byte array
 	 */
+	@SuppressWarnings("unused")
 	private static byte[] fromHex(String hex) {
 		byte[] binary = new byte[hex.length() / 2];
 		for (int i = 0; i < binary.length; i++) {
@@ -117,6 +119,7 @@ public class NxtCrypt {
 	 * @param   array       the byte array to convert
 	 * @return              a length*2 character string encoding the byte array
 	 */
+	@SuppressWarnings("unused")
 	private static String toHex(byte[] array) {
 		BigInteger bi = new BigInteger(1, array);
 		String hex = bi.toString(16);

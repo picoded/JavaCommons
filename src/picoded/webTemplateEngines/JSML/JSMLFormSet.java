@@ -215,7 +215,7 @@ public class JSMLFormSet implements UnsupportedDefaultMap<String, JSMLForm> {
 	}
 	
 	/// Derive form data from request 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "unused" })
 	public Map<String, Object> formDataFromRequest(BasePage page, JSMLForm form) {
 		
 		RequestMap reqMap = page.requestParameters();

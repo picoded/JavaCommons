@@ -1,13 +1,9 @@
 package picoded.JCache;
 
-import java.lang.String;
-
-import picoded.JCache.*;
-import picoded.JCache.dataStore.BaseInterface;
-
-import java.util.concurrent.ConcurrentMap;
+import java.util.Queue;
 import java.util.concurrent.locks.Lock;
-import java.util.*;
+
+import picoded.JCache.dataStore.BaseInterface;
 
 /// Database intreface base class.
 public class JCache extends BaseInterface {

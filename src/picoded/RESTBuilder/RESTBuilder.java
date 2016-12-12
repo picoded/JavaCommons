@@ -1,27 +1,18 @@
 package picoded.RESTBuilder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-
-// Exceptions used
-import java.lang.RuntimeException;
-import java.lang.IllegalArgumentException;
-import java.util.*;
-import java.lang.reflect.*;
-
-// Objects used
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.io.PrintWriter;
-import java.io.OutputStream;
-import java.net.URLDecoder;
-import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import picoded.conv.*;
-import picoded.enums.HttpRequestType;
+import picoded.conv.ArrayConv;
 import picoded.conv.CompileES6;
+import picoded.enums.HttpRequestType;
+
+// Objects used
 
 /**
  * picoded.servlet.RESTBuilder is a servlet utility class, in which facilitates the building of "RESTful API's"

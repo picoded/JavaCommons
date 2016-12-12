@@ -1,19 +1,16 @@
 package picoded.JCache.dataStore;
 
-import picoded.JCache.*;
-import picoded.JCache.dataStore.BaseInterface;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Queue;
 import java.util.concurrent.locks.Lock;
-import java.util.*;
 
-import com.hazelcast.core.*;
-import com.hazelcast.config.*;
-import com.hazelcast.client.config.ClientConfig;
+import picoded.JCache.JCache;
+import picoded.JCache.JCacheException;
+import picoded.JCache.JCacheMap;
+import picoded.JCache.JCacheType;
+
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
 
 /// Implements the JCache interface for hazelcast. Note that this uses hazelcast library
 /// internally to handle the actual implementations.

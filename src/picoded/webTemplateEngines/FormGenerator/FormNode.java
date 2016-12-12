@@ -31,6 +31,11 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements
 	//
 	//------------------------------------------------------------------------
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	/// @returns {String} prefix for the label auto class
 	public String prefix_label() {
 		return "pfl_";
@@ -323,7 +328,6 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements
 	public static StringBuilder[] htmlNodeGenerator(String nodeType,
 		Map<String, String> parameterMap, String rawParameterString) {
 		StringBuilder domNode = new StringBuilder("<" + nodeType);
-		String innerHtml = null;
 		
 		if (parameterMap != null) {
 			for (Map.Entry<String, String> entry : parameterMap.entrySet()) {
@@ -643,7 +647,6 @@ public class FormNode extends CaseInsensitiveHashMap<String, Object> implements
 	/// Generate NEW children form nodes, using the given datamap.
 	///
 	/// @returns {List<FormNode>}  the list of formnodes
-	@SuppressWarnings("unchecked")
 	public List<FormNode> children(Map<String, Object> inputValue) {
 		List<FormNode> ret = new ArrayList<FormNode>();
 		for (Map<String, Object> childDefine : childrenDefinition()) {

@@ -151,7 +151,6 @@ public class JSqlResult extends
 	}
 	
 	/// Read a fetched row in a single hashmap
-	@SuppressWarnings("unchecked")
 	public HashMap<String, Object> readRow(int pt) {
 		if (pt >= rowCount) {
 			return null;
@@ -227,7 +226,6 @@ public class JSqlResult extends
 	}
 	
 	/// Fetch table Meta Data info
-	@SuppressWarnings("unchecked")
 	public Map<String, String> fetchMetaData() throws JSqlException {
 		Map<String, String> ret = null;
 		if (sqlRes != null) {

@@ -140,6 +140,7 @@ public class FormInputTemplates {
 	//show decimal places if there are
 	//do not show the decimal places if there are not decimal places
 	//returns a new DecimalFormat object
+	@SuppressWarnings("unused")
 	private static DecimalFormat showRemoveDecimal() {
 		
 		//if the value has a decimal(.##), then the format will new Decimal Form("#,###.00");
@@ -223,7 +224,6 @@ public class FormInputTemplates {
 	};
 	
 	protected static StringBuilder input_textarea(FormNode node, boolean displayMode) {
-		CaseInsensitiveHashMap<String, String> paramMap = new CaseInsensitiveHashMap<String, String>();
 		String fieldValue = node.getStringValue();
 		
 		StringBuilder[] sbArr = new StringBuilder[2];
@@ -333,8 +333,6 @@ public class FormInputTemplates {
 			
 			Object dropDownObject = node.get(JsonKeys.OPTIONS);
 			List<String> keyList = dropdownKeyList(dropDownObject);
-			List<String> nameList = dropdownNameList(dropDownObject);
-			
 			if (!keyList.contains(valLowercased)) {
 				ret.append("Others: " + val);
 			} else {
@@ -346,7 +344,6 @@ public class FormInputTemplates {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	protected static FormInputInterface checkbox = (node) -> {
 		return createCheckbox(node, false, "pf_div pf_checkboxSet");
 	};
@@ -529,7 +526,6 @@ public class FormInputTemplates {
 		
 		//data
 		List<Map<String, String>> childData = getTableChildrenData(node);
-		CaseInsensitiveHashMap<String, Object> nodeValues = node._inputValue;
 		List<CaseInsensitiveHashMap<String, Object>> clientsValues = (List<CaseInsensitiveHashMap<String, Object>>) node._inputValue
 			.get(node.getFieldName());
 		
@@ -595,7 +591,6 @@ public class FormInputTemplates {
 		
 		//data
 		List<Map<String, String>> childData = getTableChildrenData(node);
-		CaseInsensitiveHashMap<String, Object> nodeValues = node._inputValue;
 		List<CaseInsensitiveHashMap<String, Object>> clientsValues = (List<CaseInsensitiveHashMap<String, Object>>) node._inputValue
 			.get(node.getFieldName());
 		
@@ -979,7 +974,7 @@ public class FormInputTemplates {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "unused" })
 	private static List<String> getTableFields(List<Object> children) {
 		List<String> ret = new ArrayList<String>();
 		for (Object childRaw : children) {

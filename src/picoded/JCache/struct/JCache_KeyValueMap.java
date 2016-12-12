@@ -1,18 +1,12 @@
 package picoded.JCache.struct;
 
-import java.util.*;
-import java.util.logging.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Logger;
 
-import picoded.struct.*;
-import picoded.JCache.*;
-import picoded.conv.*;
-import picoded.JStruct.*;
-import picoded.JStruct.internal.*;
-import picoded.security.NxtCrypt;
-
-import org.apache.commons.lang3.RandomUtils;
+import picoded.JCache.JCache;
+import picoded.JCache.JCacheMap;
+import picoded.JStruct.internal.JStruct_KeyValueMap;
 
 /// JSql implmentation of KeyValueMap
 public class JCache_KeyValueMap extends JStruct_KeyValueMap {
@@ -158,23 +152,18 @@ public class JCache_KeyValueMap extends JStruct_KeyValueMap {
 	///
 	/// @returns array of keys
 	public Set<String> getKeys(String value) {
-		long now = currentSystemTimeInSeconds();
 		Set<String> ret = new HashSet<String>();
-		
 		// The keyset to check against
 		Set<String> valuekeySet = coreCacheMap().keySet();
-		
 		// Iterate and get
 		for (String key : valuekeySet) {
 			String rawValue = _coreCacheMap.get(key);
-			
 			if (rawValue != null) {
 				if (value == null || rawValue.equals(value)) {
 					ret.add(key);
 				}
 			}
 		}
-		
 		return ret;
 	}
 	

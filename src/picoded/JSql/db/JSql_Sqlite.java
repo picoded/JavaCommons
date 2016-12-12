@@ -12,6 +12,7 @@ import picoded.enums.JSqlType;
 public class JSql_Sqlite extends JSql {
 	
 	/// Internal self used logger
+	@SuppressWarnings("unused")
 	private static Logger logger = Logger.getLogger(JSql_Sqlite.class.getName());
 	
 	/// Runs with in memory SQLite

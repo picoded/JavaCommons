@@ -19,6 +19,7 @@ public class JSql_Oracle extends JSql {
 	private static Logger logger = Logger.getLogger(JSql_Oracle.class.getName());
 	
 	///
+	@SuppressWarnings("unused")
 	private String oracleTablespace = null;
 	
 	/// Runs JSql with the JDBC ORACLE SQL engine

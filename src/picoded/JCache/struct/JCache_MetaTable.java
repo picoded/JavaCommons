@@ -1,18 +1,14 @@
 package picoded.JCache.struct;
 
-import java.util.*;
-import java.util.logging.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
-import picoded.struct.*;
-import picoded.JCache.*;
-import picoded.conv.*;
-import picoded.JStruct.*;
-import picoded.JStruct.internal.*;
-import picoded.security.NxtCrypt;
-
-import org.apache.commons.lang3.RandomUtils;
+import picoded.JCache.JCache;
+import picoded.JCache.JCacheMap;
+import picoded.JStruct.MetaObject;
+import picoded.JStruct.internal.JStruct_MetaTable;
 
 /// JSql implmentation of KeyValueMap
 public class JCache_MetaTable extends JStruct_MetaTable {

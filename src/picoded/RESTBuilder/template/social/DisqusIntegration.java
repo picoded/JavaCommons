@@ -1,23 +1,22 @@
 package picoded.RESTBuilder.template.social;
 
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+import picoded.JStruct.AccountObject;
+import picoded.JStruct.AccountTable;
 import picoded.RESTBuilder.RESTBuilder;
 import picoded.RESTBuilder.RESTFunction;
-import picoded.enums.HttpRequestType;
-import picoded.servlet.CommonsPage;
-import picoded.servlet.BasePage;
 import picoded.conv.ConvertJSON;
-import picoded.JStruct.AccountTable;
-import picoded.JStruct.AccountObject;
-
-import java.util.Base64;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Formatter;
-import java.util.List;
-import java.util.ArrayList;
-
-import javax.crypto.spec.SecretKeySpec;
-import javax.crypto.Mac;
+import picoded.enums.HttpRequestType;
+import picoded.servlet.BasePage;
 
 public class DisqusIntegration {
 	
@@ -156,6 +155,7 @@ public class DisqusIntegration {
 	}
 	
 	private static String toHexString(byte[] bytes) {
+		@SuppressWarnings("resource")
 		Formatter formatter = new Formatter();
 		for (byte b : bytes) {
 			formatter.format("%02x", b);

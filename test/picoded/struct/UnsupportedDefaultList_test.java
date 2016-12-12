@@ -1,18 +1,13 @@
 package picoded.struct;
 
-import static org.mockito.Mockito.withSettings;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
-
-import java.util.List;
-import java.util.Observer;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class UnsupportedDefaultList_test {
 	

@@ -1,9 +1,7 @@
 package picoded.conv;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 import picoded.struct.GenericConvertArrayList;
 import picoded.struct.GenericConvertList;
@@ -24,6 +22,7 @@ import picoded.struct.ProxyGenericConvertMap;
 ///
 /// This split is mainly done to simplify code maintenance of this Giant package.
 ///
+@SuppressWarnings({ "unchecked", "all" })
 public class GenericConvert extends GenericConvertStandard {
 	
 	/// Invalid constructor (throws exception)
@@ -47,7 +46,6 @@ public class GenericConvert extends GenericConvertStandard {
 	/// @param fallbck   The fallback default (if not convertable)
 	///
 	/// @returns         The converted value
-	@SuppressWarnings("unchecked")
 	public static <K extends String, V> GenericConvertMap<K, V> toGenericConvertStringMap(
 		Object input, Object fallbck) {
 		

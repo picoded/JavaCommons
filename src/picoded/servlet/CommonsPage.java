@@ -30,6 +30,11 @@ import picoded.webUtils.EmailBroadcaster;
 ///
 public class CommonsPage extends BasePage {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	/// Authenticate the user, or redirects to login page if needed, this is not applied to API page
 	@Override
 	public boolean doAuth(Map<String, Object> templateData) throws Exception {
@@ -60,7 +65,6 @@ public class CommonsPage extends BasePage {
 		boolean annoymousApiAccess = JConfigObj.getBoolean("sys.CommonsPage.annoymousApiAccess",
 			false);
 		boolean publicSiteMode = JConfigObj.getBoolean("sys.CommonsPage.publicSiteMode", false);
-		boolean squashErrorMsg = JConfigObj.getBoolean("sys.CommonsPage.squashErrorMsg", false);
 		
 		//
 		// WEB-INF security
@@ -71,7 +75,6 @@ public class CommonsPage extends BasePage {
 			// File name and extension extraction for future processing
 			//
 			String fileName = wildcardUri[wildcardUri.length - 1].toLowerCase();
-			String fileExt = FileUtil.getExtension(fileName);
 			
 			//
 			// Always deny WEB-INF path, and potential invisibles (safety)

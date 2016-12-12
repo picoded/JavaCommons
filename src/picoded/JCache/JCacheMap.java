@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import picoded.struct.*;
+
 import com.hazelcast.core.*;
 import com.hazelcast.query.*;
 
@@ -135,6 +136,7 @@ public class JCacheMap<K, V> extends ProxyGenericConvertMap<K, V> {
 			}
 			
 			//isNotNull() 
+			@SuppressWarnings("unused")
 			PredicateBuilder pb = new PredicateBuilder();
 			EntryObject eo = new PredicateBuilder().getEntryObject();
 			Predicate<K, V> byValue = eo.isNotNull().and(eo.equal((Comparable<V>) value));

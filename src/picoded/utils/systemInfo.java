@@ -1,11 +1,8 @@
 package picoded.utils;
 
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-
-import java.util.UUID;
 
 import picoded.conv.Base58;
 
@@ -39,12 +36,12 @@ public class systemInfo {
 	/// localMACAddress, for retrived local mac address (local mac address : xx-xx-EA-BB-xA-xE)..
 	/// @returns  string local mac address 
 	///
+	@SuppressWarnings("unused")
 	public static String localMACAddress() throws UnknownHostException, SocketException {
 		StringBuilder sb = new StringBuilder();
 		sb.append("00-16-EA-BB-7A-4E"); //@TODO: REMOVE WHEN network.getHardwareAddress() ISSUE FIXED
 		
 		InetAddress ip = InetAddress.getLocalHost();
-		NetworkInterface network = NetworkInterface.getByInetAddress(ip);
 		byte[] mac = null;
 		mac = null; //network.getHardwareAddress(); //@TODO: TO FIX, this caused build failure
 		

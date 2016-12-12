@@ -145,8 +145,10 @@ public class JSql extends BaseInterface {
 	/// fetching the result data from the database. This is raw execution.
 	///
 	/// **Note:** Only queries starting with 'SELECT' will produce a JSqlResult object that has fetchable results
+	@SuppressWarnings("unused")
 	public JSqlResult executeQuery_raw(String qString, Object... values) throws JSqlException {
 		JSqlResult res = null;
+		
 		final String query = qString;
 		final Object parts[] = values;
 		try {

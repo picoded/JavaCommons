@@ -120,7 +120,7 @@ public class CharArray {
 		int startOffset, int endOffset) {
 		for (int idx = 0; idx < needleSet.length; ++idx) {
 			String[] needleArray = needleSet[idx];
-			int found = -1;
+			//			int found = -1;
 			
 			if (nestedPos >= 0) {
 				if (startsWith(needleArray[nestedPos], heystack, startOffset, endOffset)) {

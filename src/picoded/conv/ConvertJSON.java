@@ -29,6 +29,7 @@ public class ConvertJSON {
 	/// Illegal JSON format type. Used to handle all format exceptions in this class
 	///
 	/// Can be treated as a RuntimeException, and IllegalArgumentException
+	@SuppressWarnings("serial")
 	public static class InvalidFormatJSON extends IllegalArgumentException {
 		/// Common message
 		public InvalidFormatJSON(Throwable cause) {

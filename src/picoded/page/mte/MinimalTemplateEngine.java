@@ -1,10 +1,7 @@
 package picoded.page.mte;
 
-import java.util.*;
-
+import java.util.Map;
 //import picoded.page.mte.internal.*;
-import picoded.struct.*;
-import picoded.conv.*;
 
 ///
 /// A (somewhat) minimilistic, highly extensible markup engine package.

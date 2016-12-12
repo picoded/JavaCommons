@@ -1,14 +1,12 @@
 package picoded.webTemplateEngines.FormGenerator;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import picoded.conv.ConvertJSON;
-import picoded.webTemplateEngines.JSML.*;
-
-import com.amazonaws.util.StringUtils;
+import picoded.webTemplateEngines.JSML.JSMLFormSet;
 ///
 /// Web templating engine that helps define and convert a JSON styled template, into the actual web form
 ///
@@ -292,8 +290,6 @@ public class FormGenerator {
 		String nodeType = node.getString(JsonKeys.TYPE, HtmlTag.DIV);
 		String[] formWrappers = new String[] { "", "" };
 		
-		String wrapperType = node.getString(JsonKeys.WRAPPER, HtmlTag.DIV);
-		
 		//formWrappers = customPDFWrapperTemplates.get(wrapperType).apply(node);
 		
 		/// This is input data output
@@ -330,8 +326,6 @@ public class FormGenerator {
 	protected String applyTemplating(FormNode node) {
 		String nodeType = node.getString(JsonKeys.TYPE, HtmlTag.DIV);
 		String[] formWrappers = new String[] { "", "" };
-		
-		String wrapperType = node.getString(JsonKeys.WRAPPER, HtmlTag.DIV);
 		
 		//formWrappers = customFormWrapperTemplates.get(wrapperType).apply(node);
 		if (node.containsKey(JsonKeys.HTML_INJECTION)) {

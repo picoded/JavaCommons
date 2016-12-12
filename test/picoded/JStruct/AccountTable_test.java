@@ -8,6 +8,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.After;
@@ -473,5 +478,18 @@ public class AccountTable_test extends Mockito {
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
 		accTableObj.loginRenewal = -2;
 		assertNotNull(usrObj = accTableObj.getRequestUser(request, response));
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Test
+	public void getAccountObjectListTest() throws NoSuchMethodException, SecurityException,
+		IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		List<AccountObject> ret = new ArrayList();
+		AccountObject ao = new AccountObject(accTableObj, "inOID");
+		Method method = AccountTable.class.getDeclaredMethod("getAccountObjectList", List.class,
+			AccountObject.class);
+		method.setAccessible(true);
+		method.invoke(accTableObj, ret, ao);
+		assertEquals(1, ret.size());
 	}
 }

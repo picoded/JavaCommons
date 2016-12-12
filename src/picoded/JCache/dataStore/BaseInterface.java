@@ -1,12 +1,8 @@
 package picoded.JCache.dataStore;
 
+import java.util.Map;
+
 import picoded.JCache.JCacheException;
-
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.SynchronousQueue;
-import java.util.*;
-
 import picoded.JStack.JStackLayer;
 
 /// Standardised JCache interface for JCache functionalities.

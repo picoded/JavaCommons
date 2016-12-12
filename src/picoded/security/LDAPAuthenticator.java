@@ -151,6 +151,7 @@ public class LDAPAuthenticator {
 	///
 	/// @returns  The expected error message, if any. Else simply null for success
 	///
+	@SuppressWarnings("unused")
 	public String login(String username, String password) {
 		
 		//

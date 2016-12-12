@@ -8,6 +8,7 @@ import java.util.Map;
 ///
 /// This is at the upper most layer, hence conversion to query strings
 /// or reading through the query structure may provide much more insights
+@SuppressWarnings("all")
 public enum QueryType {
 	
 	//

@@ -1,13 +1,10 @@
 package picoded.JCache.struct;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import picoded.JSql.*;
-import picoded.JCache.*;
-import picoded.JStruct.*;
-import picoded.struct.*;
+import picoded.JCache.JCache;
+import picoded.JStruct.AccountTable;
+import picoded.JStruct.JStruct;
+import picoded.JStruct.KeyValueMap;
+import picoded.JStruct.MetaTable;
 
 public class JCacheStruct extends JStruct {
 	

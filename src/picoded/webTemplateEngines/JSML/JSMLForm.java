@@ -101,10 +101,13 @@ public class JSMLForm {
 	private String _svgPrefix = "data:image/svg+xml;base64,";
 	
 	//file name suffixes
+	@SuppressWarnings("unused")
 	private String _bodyPrefix = "prefix";
 	
+	@SuppressWarnings("unused")
 	private String _bodySuffix = "suffix";
 	
+	@SuppressWarnings("unused")
 	private String _styleSheetSuffix = "style";
 	
 	private Map<String, Object> _formDefinitionMap = null;

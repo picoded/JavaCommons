@@ -1,28 +1,31 @@
 package picoded.JCache.embedded;
 
-import picoded.conv.*;
-
-import org.elasticsearch.client.*;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.action.get.*;
-import org.elasticsearch.action.update.*;
-import org.elasticsearch.action.index.*;
-import org.elasticsearch.action.*;
-import org.elasticsearch.action.admin.indices.exists.indices.*;
-import org.elasticsearch.action.admin.indices.create.*;
-import org.elasticsearch.index.*;
-import org.elasticsearch.index.query.*;
-import org.elasticsearch.indices.*;
-import org.elasticsearch.action.search.*;
-import org.elasticsearch.search.*;
-import org.elasticsearch.client.transport.*;
-import org.elasticsearch.common.transport.*;
-
-import java.util.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
+import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.AdminClient;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.index.IndexNotFoundException;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.indices.IndexAlreadyExistsException;
+import org.elasticsearch.search.SearchHit;
+
+import picoded.conv.ConvertJSON;
 
 ///
 /// Elasticsearch : Serously what were you guys thinking when making the java API

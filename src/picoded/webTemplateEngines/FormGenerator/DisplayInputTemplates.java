@@ -21,22 +21,18 @@ public class DisplayInputTemplates {
 		return FormInputTemplates.displayDiv(node, "pfi_header pfi_display");
 	};
 	
-	@SuppressWarnings("unchecked")
 	protected static FormInputInterface select = (node) -> {
 		return FormInputTemplates.displayDiv(node, "pfi_select pfi_display");
 	};
 	
-	@SuppressWarnings("unchecked")
 	protected static FormInputInterface input_text = (node) -> {
 		return FormInputTemplates.displayDiv(node, "pfi_inputText pfi_display");
 	};
 	
-	@SuppressWarnings("unchecked")
 	protected static FormInputInterface input_number = (node) -> {
 		return FormInputTemplates.displayDiv(node, "pfi_inputNumber pfi_display");
 	};
 	
-	@SuppressWarnings("unchecked")
 	protected static FormInputInterface input_textarea = (node) -> {
 		return FormInputTemplates.input_textarea(node, true);
 		//return FormInputTemplates.displayDiv(node, "pfi_inputTextBox pfi_display");

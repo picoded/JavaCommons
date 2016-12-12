@@ -1,12 +1,14 @@
 package picoded.conv;
 
 // Junit includes
-import static org.junit.Assert.*;
-import org.junit.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-// Apache reference
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.RandomUtils;
+import org.junit.Before;
+import org.junit.Test;
+// Apache reference
 
 ///
 /// Test Case for picoded.struct.CaseInsensitiveHashMap

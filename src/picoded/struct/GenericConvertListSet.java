@@ -6,7 +6,7 @@ import java.util.*;
 /// A combination of ArrayList and HashSet!
 /// Only add to this array if not inside the list previously
 ///
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class GenericConvertListSet<V> implements Set<V>, GenericConvertList<V> {
 	
 	///

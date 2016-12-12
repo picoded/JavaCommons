@@ -1,21 +1,18 @@
 package picoded.JSql.struct;
 
-import java.util.*;
-import java.util.logging.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import picoded.struct.*;
-import picoded.JSql.*;
-import picoded.JSql.struct.internal.*;
-import picoded.conv.*;
-import picoded.struct.*;
-import picoded.enums.*;
-import picoded.JStruct.*;
-import picoded.JStruct.internal.*;
-import picoded.security.NxtCrypt;
-
-import org.apache.commons.lang3.RandomUtils;
+import picoded.JSql.JSql;
+import picoded.JSql.JSqlException;
+import picoded.JSql.JSqlResult;
+import picoded.JSql.struct.internal.JSql_MetaTableUtils;
+import picoded.JStruct.MetaObject;
+import picoded.JStruct.internal.JStruct_MetaTable;
+import picoded.conv.ListValueConv;
 
 /// JSql implmentation of MetaTable
 ///

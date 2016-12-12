@@ -211,7 +211,6 @@ public class PageBuilderCore {
 	/// 3) The root folder
 	///
 	protected Map<String, Object> getTemplateJson(String rawPageName) throws IOException {
-		String resStr = null;
 		String fileName = "page.json";
 		List<Map<String, Object>> templateList = new ArrayList<Map<String, Object>>();
 		

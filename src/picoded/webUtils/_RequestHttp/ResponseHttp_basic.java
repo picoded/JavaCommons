@@ -1,14 +1,11 @@
 package picoded.webUtils._RequestHttp;
 
 import java.io.InputStream;
-import java.util.Map;
-
-import picoded.webUtils.ResponseHttp;
-import picoded.conv.ConvertJSON;
-import picoded.struct.GenericConvertMap;
-import picoded.struct.ProxyGenericConvertMap;
 
 import org.apache.commons.io.IOUtils;
+
+import picoded.struct.GenericConvertMap;
+import picoded.webUtils.ResponseHttp;
 
 /// Provides the most basic implementation of ResponseHttp
 /// Which is to have all the results already loaded (not async)

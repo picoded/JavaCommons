@@ -479,6 +479,23 @@ public class AccountTable_test extends Mockito {
 		accTableObj.keyValueMapAccountSessions.put(usrObj._oid() + "-Nonc", testJSON);
 		accTableObj.loginRenewal = -2;
 		assertNotNull(usrObj = accTableObj.getRequestUser(request, response));
+		assertNull(usrObj.getMember(usrObj));
+		assertNull(usrObj.getMember(usrObj, "member"));
+		assertNotNull(usrObj.setMember(usrObj, "admin"));
+		assertNotNull(usrObj.setMember(usrObj, "guest"));
+		assertNotNull(usrObj.setMember(usrObj, "admin"));
+		assertNull(usrObj.addMember(usrObj, "admin"));
+		assertNull(usrObj.addMember(usrObj, "user"));
+		assertNotNull(usrObj.getMember(usrObj));
+		assertNotNull(usrObj.getMember(usrObj, "admin"));
+		assertNull(usrObj.getMember(usrObj, "guest"));
+		assertNotNull(usrObj.isSuperUser());
+		assertNotNull(usrObj.isSuperUser());
+		usrObj.remove("isGroup");
+		usrObj.saveDelta();
+		usrObj.groupUserToRoleMap = usrObj.getMember(usrObj);
+		accTableObj.removeFromID(usrObj._oid());
+		
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })

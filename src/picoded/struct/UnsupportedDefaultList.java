@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 
-import picoded.conv.GenericConvert;
-
 ///
 /// Interface pattern, that implements most of the default list functions, 
 /// This builds ontop of core functions, in which implmentors of this interface will need to support. 
@@ -345,7 +343,7 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 		int oldSize = size();
 		
 		// Iterate entire array from the top
-		for(int idx = oldSize - 1; idx >= 0; ++idx) {
+		for(int idx = oldSize - 1; idx >= 0; --idx) {
 			// If item at index is not found, remove it
 			// And move to next index
 			if(!c.contains( get(idx) )) {

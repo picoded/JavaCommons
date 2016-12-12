@@ -138,6 +138,7 @@ public class AccountTable_test extends Mockito {
 		assertNotNull(grpList = usrObj.getGroups());
 		assertEquals(1, grpList.length);
 		assertEquals(grpObj._oid(), grpList[0]._oid());
+		accTableObj.getUsersByGroupAndRole(null, null);
 	}
 	
 	@Test

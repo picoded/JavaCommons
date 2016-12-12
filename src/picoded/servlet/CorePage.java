@@ -16,6 +16,10 @@ import java.io.PrintWriter;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.URLDecoder;
 
 // Apache library used
 import org.apache.commons.io.FilenameUtils;
@@ -396,7 +400,11 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	/// gets the PrintWriter, from the getOutputStream() object and returns it
 	public PrintWriter getWriter() {
-		return new PrintWriter(getOutputStream(), true);
+		try {
+			return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
+		} catch(UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/// gets the OutputStream, from the httpResponse.getOutputStream() object and returns it

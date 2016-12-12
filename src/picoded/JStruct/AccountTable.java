@@ -298,7 +298,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 					}
 				} else {
 					String[] groupIDs = ao.getGroups_id();
-					if (groupIDs != null) {
+					if (groupIDs.length > 0) {
 						for (String groupID : groupIDs) {
 							MetaObject groupObj = groupChildRole.get(groupID);
 							groupObj.remove(oid);

@@ -32,7 +32,7 @@ public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePai
 	// void setRight(R);
 	
 	/// Invalid key error message 
-	public static final String InvalidKeyMsg = "Invalid get key, use eiher 0 or 1, "
+	public static final String INVALID_KEY_MSG = "Invalid get key, use eiher 0 or 1, "
 		+ "for left and right pair respectively - ";
 	
 	/// Get the left / right value using index positioning
@@ -47,7 +47,7 @@ public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePai
 		} else if (index == 1) {
 			return getRight();
 		}
-		throw new IllegalArgumentException(InvalidKeyMsg + key);
+		throw new IllegalArgumentException(INVALID_KEY_MSG + key);
 	}
 	
 	/// Set the left / right value using index positioning
@@ -65,7 +65,7 @@ public class MutablePair<L, R> extends org.apache.commons.lang3.tuple.MutablePai
 			setRight((R) value);
 			return oldVal;
 		}
-		throw new IllegalArgumentException(InvalidKeyMsg + index);
+		throw new IllegalArgumentException(INVALID_KEY_MSG + index);
 	}
 	
 	/// Remove the left / right value using index positioning

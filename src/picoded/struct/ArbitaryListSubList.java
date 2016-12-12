@@ -18,9 +18,9 @@ import java.util.NoSuchElementException;
 /// @TODO : To provide more List functionality to be supported by the main list directly.
 ///         Instead of through the lower performant 4 core functions.
 ///
-class ArbitaryListSubList<E> extends ArbitraryListAccessorWithConcurrentModificationException<E> 
+class ArbitaryListSubList<E> extends ArbitraryListAccessorWithConcurrentModificationException<E>
 	implements UnsupportedDefaultList<E> {
-		
+	
 	//
 	// Internal tracking variables
 	//-------------------------------------------------------------------
@@ -46,10 +46,7 @@ class ArbitaryListSubList<E> extends ArbitraryListAccessorWithConcurrentModifica
 		} else if (toIdx > base.size()) {
 			throw new IndexOutOfBoundsException("toIndex = " + toIdx);
 		} else if (frmIdx > toIdx) {
-			throw new IllegalArgumentException(
-				"fromIndex(" + frmIdx +
-				") > toIndex(" + toIdx + ")"
-			);
+			throw new IllegalArgumentException("fromIndex(" + frmIdx + ") > toIndex(" + toIdx + ")");
 		}
 		
 		// Index captures
@@ -63,13 +60,13 @@ class ArbitaryListSubList<E> extends ArbitraryListAccessorWithConcurrentModifica
 		checkForChange();
 		return size;
 	}
-
+	
 	/// Set operation proxy
 	/// See: [UnsupportedDefaultList.set]
 	public E set(int index, E element) {
 		checkForChange();
 		UnsupportedDefaultUtils.checkIndexRange(index, size);
-		return base.set(index+offset, element);
+		return base.set(index + offset, element);
 	}
 	
 	/// Get operation proxy
@@ -77,7 +74,7 @@ class ArbitaryListSubList<E> extends ArbitraryListAccessorWithConcurrentModifica
 	public E get(int index) {
 		UnsupportedDefaultUtils.checkIndexRange(index, size);
 		checkForChange();
-		return base.get(index+offset);
+		return base.get(index + offset);
 	}
 	
 	/// Add operation proxy
@@ -85,7 +82,7 @@ class ArbitaryListSubList<E> extends ArbitraryListAccessorWithConcurrentModifica
 	public void add(int index, E element) {
 		UnsupportedDefaultUtils.checkInsertRange(index, size);
 		checkForChange();
-		base.add(index+offset, element);
+		base.add(index + offset, element);
 		resetSizeState();
 		size++;
 	}
@@ -95,7 +92,7 @@ class ArbitaryListSubList<E> extends ArbitraryListAccessorWithConcurrentModifica
 	public E remove(int index) {
 		UnsupportedDefaultUtils.checkIndexRange(index, size());
 		checkForChange();
-		E result = base.remove(index+offset);
+		E result = base.remove(index + offset);
 		resetSizeState();
 		size--;
 		return result;

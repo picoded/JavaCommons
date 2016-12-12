@@ -17,10 +17,13 @@ import org.mockito.Mockito;
 public class GenericConvertList_test {
 	
 	@SuppressWarnings("unchecked")
-	private GenericConvertList<String> genericConvertList = Mockito.mock(GenericConvertList.class, Mockito.CALLS_REAL_METHODS);
+	private GenericConvertList<String> genericConvertList = Mockito.mock(GenericConvertList.class,
+		Mockito.CALLS_REAL_METHODS);
+	
 	//private GenericConvertList<String> genericConvertList = null;
 	
-	@Before @SuppressWarnings("unchecked")
+	@Before
+	@SuppressWarnings("unchecked")
 	public void setUp() {
 		// genericConvertList = Mockito.mock(GenericConvertList.class,
 		// 	Mockito.CALLS_REAL_METHODS);

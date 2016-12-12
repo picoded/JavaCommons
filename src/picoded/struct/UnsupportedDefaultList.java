@@ -105,7 +105,7 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	/// 
 	/// @return  true, if added successfully (always, unless exception)
 	default boolean add(E value) {
-		add( size(), value );
+		add(size(), value);
 		return true;
 	}
 	
@@ -139,14 +139,14 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	///
 	/// @return  true, if any insertion occurs
 	default boolean addAll(Collection<? extends E> c) {
-		return addAll( size(), c );
+		return addAll(size(), c);
 	}
 	
 	/// Removes all of the elements from this collection. 
 	/// The collection will be empty after this method returns.
 	default void clear() {
 		// Iterate all items from top, and remove if
-		for(int i=size() - 1; i>=0; --i) {
+		for (int i = size() - 1; i >= 0; --i) {
 			remove(i);
 		}
 	}
@@ -197,16 +197,16 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 		int len = size();
 		
 		// Iterate to find
-		for(int i=0; i<len; ++i) {
+		for (int i = 0; i < len; ++i) {
 			E val = get(i);
 			
 			// Null find
-			if(o == null && val == null) {
+			if (o == null && val == null) {
 				return i;
 			}
 			
 			// Not a null find
-			if( val != null && val.equals(o) ) {
+			if (val != null && val.equals(o)) {
 				return i;
 			}
 		}
@@ -223,16 +223,16 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	/// @return  Index of the found item, else -1
 	default int lastIndexOf(Object o) {
 		// Iterate to find
-		for(int i=size() - 1; i>=0; --i) {
+		for (int i = size() - 1; i >= 0; --i) {
 			E val = get(i);
 			
 			// Null find
-			if(o == null && val == null) {
+			if (o == null && val == null) {
 				return i;
 			}
 			
 			// Not a null find
-			if( val != null && val.equals(o) ) {
+			if (val != null && val.equals(o)) {
 				return i;
 			}
 		}
@@ -255,7 +255,7 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	/// @return  true, if element is found and removed
 	default boolean remove(Object o) {
 		int idx = indexOf(o);
-		if( idx >= 0 ) {
+		if (idx >= 0) {
 			remove(idx);
 			return true;
 		}
@@ -271,7 +271,7 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 		// Iterate collection
 		for (Object item : c) {
 			// Terminates checks the moment one lookup fails
-			if(!contains(item)) {
+			if (!contains(item)) {
 				return false;
 			}
 		}
@@ -304,10 +304,10 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 		int oldSize = size();
 		
 		// Iterate entire array from the top
-		for(int idx = oldSize - 1; idx >= 0; --idx) {
+		for (int idx = oldSize - 1; idx >= 0; --idx) {
 			// If item at index is not found, remove it
 			// And move to next index
-			if(!c.contains( get(idx) )) {
+			if (!c.contains(get(idx))) {
 				remove(idx);
 			}
 		}
@@ -328,7 +328,7 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 	default Object[] toArray() {
 		int size = size();
 		Object[] ret = new Object[size];
-		for(int i=0; i<size; ++i) {
+		for (int i = 0; i < size; ++i) {
 			ret[i] = get(i);
 		}
 		return ret;
@@ -349,20 +349,20 @@ public interface UnsupportedDefaultList<E> extends List<E> {
 		int size = size();
 		
 		// Write into input array, if it can fit
-		if(a.length >= size) {
+		if (a.length >= size) {
 			// Iterate and write
-			for(int i=0; i<size; ++i) {
-				a[i] = (T)get(i);
+			for (int i = 0; i < size; ++i) {
+				a[i] = (T) get(i);
 			}
 			
 			// Null terminator, if applicable
-			if(a.length > size) {
+			if (a.length > size) {
 				a[size] = null;
 			}
 		}
 		
 		// Create a new array, and returns it
-		return (T[])toArray();
+		return (T[]) toArray();
 	}
 	
 	//-------------------------------------------------------------------

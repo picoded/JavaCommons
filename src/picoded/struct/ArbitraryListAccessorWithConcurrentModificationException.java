@@ -45,11 +45,11 @@ class ArbitraryListAccessorWithConcurrentModificationException<E> {
 	/// Check if any change has occured since previous iteration call
 	/// Throws a ConcurrentModificationException if so
 	protected void checkForChange() {
-		if( detectedChange ) {
+		if (detectedChange) {
 			throw new ConcurrentModificationException();
 		}
 		
-		if( base.size() != initialSize ) {
+		if (base.size() != initialSize) {
 			throwChangeException();
 		}
 	}
@@ -63,7 +63,7 @@ class ArbitraryListAccessorWithConcurrentModificationException<E> {
 	
 	/// Reset the size capture
 	protected void resetSizeState() {
-		if( detectedChange ) {
+		if (detectedChange) {
 			throw new ConcurrentModificationException();
 		}
 		initialSize = base.size();

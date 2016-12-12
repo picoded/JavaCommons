@@ -15,8 +15,9 @@ import java.util.NoSuchElementException;
 ///
 /// This can be used either as Iterator, or ListIterator
 ///
-public class ArbitaryListIterator<E> extends ArbitraryListAccessorWithConcurrentModificationException<E> 
-	implements Iterator<E>, ListIterator<E> {
+public class ArbitaryListIterator<E> extends
+	ArbitraryListAccessorWithConcurrentModificationException<E> implements Iterator<E>,
+	ListIterator<E> {
 	
 	//
 	// Internal tracking variables
@@ -64,7 +65,7 @@ public class ArbitaryListIterator<E> extends ArbitraryListAccessorWithConcurrent
 		
 		try {
 			// Get the item, while tracking the index
-			E ret = base.get(lastPt = idxPt); 
+			E ret = base.get(lastPt = idxPt);
 			++idxPt; // Shift index point
 			return ret; // returns 
 		} catch (IndexOutOfBoundsException ex) {
@@ -84,7 +85,7 @@ public class ArbitaryListIterator<E> extends ArbitraryListAccessorWithConcurrent
 			throw new IllegalStateException();
 		}
 		checkForChange();
-
+		
 		try {
 			base.remove(lastPt);
 			idxPt = lastPt;
@@ -145,7 +146,7 @@ public class ArbitaryListIterator<E> extends ArbitraryListAccessorWithConcurrent
 		
 		try {
 			// Get the item, while tracking the index
-			E ret = base.get(lastPt = i); 
+			E ret = base.get(lastPt = i);
 			idxPt = i; // Shift index point
 			return ret; // returns 
 		} catch (IndexOutOfBoundsException ex) {
@@ -162,7 +163,7 @@ public class ArbitaryListIterator<E> extends ArbitraryListAccessorWithConcurrent
 			throw new IllegalStateException();
 		}
 		checkForChange();
-
+		
 		try {
 			base.set(lastPt, e);
 		} catch (IndexOutOfBoundsException ex) {
@@ -179,7 +180,7 @@ public class ArbitaryListIterator<E> extends ArbitraryListAccessorWithConcurrent
 			throw new IllegalStateException();
 		}
 		checkForChange();
-
+		
 		try {
 			base.add(idxPt, e);
 			idxPt = idxPt + 1;

@@ -18,10 +18,11 @@ public class UnsupportedDefaultList_test extends StandardArrayList_test {
 	//
 	
 	/// Blank implmentation of UnsupportedDefaultList
-	class UnsupportedTest<E> implements UnsupportedDefaultList<E> { }
+	class UnsupportedTest<E> implements UnsupportedDefaultList<E> {
+	}
 	
 	/// Implementation of core default list functions, to an arraylist
-	class ProxyTest<E> implements UnsupportedDefaultList<E> { 
+	class ProxyTest<E> implements UnsupportedDefaultList<E> {
 		// Base list to implement
 		ArrayList<E> base = new ArrayList<E>();
 		

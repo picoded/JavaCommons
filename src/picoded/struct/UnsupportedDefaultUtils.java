@@ -22,8 +22,8 @@ class UnsupportedDefaultUtils {
 	///
 	static void checkIndexRange(int index, int size) {
 		// Out of bound check
-		if(index < 0 || index >= size) {
-			throw new IndexOutOfBoundsException("Index: "+index+", Size: "+size);
+		if (index < 0 || index >= size) {
+			throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
 		}
 	}
 	
@@ -36,8 +36,8 @@ class UnsupportedDefaultUtils {
 	///
 	static void checkInsertRange(int index, int size) {
 		// Out of bound check
-		if(index < 0 || index > size) {
-			throw new IndexOutOfBoundsException("Index: "+index+", Size: "+size);
+		if (index < 0 || index > size) {
+			throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
 		}
 	}
 }

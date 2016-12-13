@@ -378,9 +378,12 @@ public class AccountTable_test extends Mockito {
 		assertFalse(accTableObj.logoutAccount(request, null));
 		request.setContextPath(null);
 		assertTrue(accTableObj.logoutAccount(request, response));
+		assertTrue(accTableObj.setLogin(usrObj, request, response, true));
 		request.setContextPath("");
 		assertTrue(accTableObj.logoutAccount(request, response));
+		assertTrue(accTableObj.setLogin(usrObj, request, response, true));
 		request.setContextPath("/");
+		assertTrue(accTableObj.setLogin(usrObj, request, response, true));
 		accTableObj.isHttpOnly = true;
 		accTableObj.isSecureOnly = true;
 		accTableObj.cookieDomain = null;

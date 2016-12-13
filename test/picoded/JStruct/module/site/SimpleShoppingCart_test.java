@@ -180,6 +180,10 @@ public class SimpleShoppingCart_test {
 		
 		assertNotNull(simpleShoppingCart.mergeCartList(testCart, testCart1, true));
 		assertNotNull(simpleShoppingCart.mergeCartList(testCart, testCart1, false));
+		
+		testCart = GenericConvert.toGenericConvertList("testJSON", new ArrayList<Object>());
+		testCart1 = GenericConvert.toGenericConvertList("aaaaaaaaaa", new ArrayList<Object>());
+		assertNotNull(simpleShoppingCart.mergeCartList(testCart, testCart1, false));
 	}
 	
 	@Test(expected = Exception.class)
@@ -437,6 +441,8 @@ public class SimpleShoppingCart_test {
 		assertNotNull(simpleShoppingCart.createPurchaseOrder(
 			simpleShoppingCart.productOwner.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
 			cartList, itemObj, itemObj, "Paid"));
+		assertNotNull(simpleShoppingCart.getProductList(simpleShoppingCart.productOwner
+			.getFromKeyName("_ownerID")[0].get("_ownerID").toString()));
 		itemObj.put("testCart", cartList);
 		inUpdateList.add(itemObj);
 		assertNotNull(simpleShoppingCart.updateProductList(

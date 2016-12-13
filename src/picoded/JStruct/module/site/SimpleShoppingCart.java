@@ -344,7 +344,7 @@ public class SimpleShoppingCart {
 		GenericConvertList<List<Object>> updateList = GenericConvertList.build(addList);
 		
 		// Iterate the add list
-		if (updateList != null) {
+		if (updateList.size() > 0) {
 			int iLen = updateList.size();
 			for (int i = 0; i < iLen; ++i) {
 				// Line record of an update
@@ -543,7 +543,7 @@ public class SimpleShoppingCart {
 		// Fetch and populate
 		MetaObject[] queryRet = productItem.query(this.ownerID + "=?", new String[] { ownerID },
 			"_createdTime", 0, productMax);
-		if (queryRet != null && queryRet.length > 0) {
+		if (queryRet.length > 0) {
 			for (int i = 0; i < queryRet.length; ++i) {
 				ret.add(queryRet[i]);
 			}

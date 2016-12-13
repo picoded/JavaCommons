@@ -127,13 +127,25 @@ public class AccountObject_test {
 		accountTable.loginThrottlingElapsed.put("test",
 			String.valueOf((System.currentTimeMillis() / 1000) + 25));
 		assertNotNull(accountObject.getNextLoginTimeAllowed("test"));
-		assertNotNull(accountObject.getNextLoginTimeAllowed("guest"));
+		accountTable.loginThrottlingElapsed.put("test", String.valueOf("0"));
+		assertNotNull(accountObject.getNextLoginTimeAllowed("test"));
 		assertNotNull(accountObject.getTimeElapsedNextLogin("admin"));
+		accountObject.saveDelta();
+		
 		assertNotNull(accountObject.isSuperUser());
+		accountTable = accountObject.accountTable;
+		accountObject = accountTable.superUserGroup();
+		accountTable.keyValueMapAccountID.put("admin", accountObject._oid());
+		accountTable.setSuperUserGroupName("admin");
+		accountTable.superUserGroup = "admin";
+		accountObject.accountTable = accountTable;
+		assertNotNull(accountObject.isSuperUser());
+		
 		accountObject.addDelay("admin");
 		assertNotNull(accountObject.isSuperUser());
 		assertNotNull(accountObject.removeMember(accountObject));
 		accountObject.resetLoginThrottle("member");
+		
 	}
 	
 	@Test

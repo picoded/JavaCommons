@@ -675,7 +675,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	/// Default super user group
 	protected String superUserGroup = "SuperUsers";
 	
-	public AccountTable accountTable;
+	protected AccountTable accountTable;
 	
 	/// Gets the super user group
 	public String getSuperUserGroupName() {

@@ -159,8 +159,8 @@ public class ProductListing_test {
 		
 	}
 	
-	@Test(expected = Exception.class)
-	public void updateProductList7() throws Exception {
+	@Test
+	public void updateProductList7() {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = productListing.productOwner.newObject();
 		productOwnerObject.put("id-1", "Scrooge Mcduck");
@@ -186,8 +186,6 @@ public class ProductListing_test {
 		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
 			inUpdateList));
 		
-		itemObj.put("_oid", productListing.productItem.getFromKeyName("_ownerID")[0].get("_ownerID")
-			.toString());
 		inUpdateList.add(itemObj);
 		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
 			inUpdateList));

@@ -131,7 +131,8 @@ public class AccountObject_test {
 		assertNotNull(accountObject.getNextLoginTimeAllowed("test"));
 		assertNotNull(accountObject.getTimeElapsedNextLogin("admin"));
 		accountObject.saveDelta();
-		
+		assertNotNull(accountObject.removeMember(accountObject));
+		accountObject.resetLoginThrottle("member");
 		assertNotNull(accountObject.isSuperUser());
 		accountTable = accountObject.accountTable;
 		accountObject = accountTable.superUserGroup();
@@ -143,9 +144,6 @@ public class AccountObject_test {
 		
 		accountObject.addDelay("admin");
 		assertNotNull(accountObject.isSuperUser());
-		assertNotNull(accountObject.removeMember(accountObject));
-		accountObject.resetLoginThrottle("member");
-		
 	}
 	
 	@Test

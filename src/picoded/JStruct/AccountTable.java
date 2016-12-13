@@ -290,7 +290,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 					MetaObject groupObj = groupChildRole.get(oid);
 					groupChildRole.remove(oid);
 					
-					if (groupObj != null) {
+					if (!groupObj.isEmpty()) {
 						for (String userID : groupObj.keySet()) {
 							String groupChildMetaKey = getGroupChildMetaKey(oid, userID);
 							groupChildMeta.remove(groupChildMetaKey);
@@ -312,7 +312,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 			
 			//accountID
 			Set<String> accountIDNames = keyValueMapAccountID.getKeys(oid);
-			if (accountIDNames != null) {
+			if (!accountIDNames.isEmpty()) {
 				for (String name : accountIDNames) {
 					keyValueMapAccountID.remove(name, oid);
 				}
@@ -500,7 +500,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		long expireTime = (System.currentTimeMillis()) / 1000L + noncLifetime;
 		
 		String passHash = po.getPasswordHash();
-		if (passHash == null || passHash.length() <= 1) {
+		//		if (passHash == null || passHash.length() <= 1) {
+		if (passHash == null) {
 			return false;
 		}
 		String nonceSalt = NxtCrypt.randomString(nonceSize);
@@ -674,6 +675,8 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	/// Default super user group
 	protected String superUserGroup = "SuperUsers";
 	
+	public AccountTable accountTable;
+	
 	/// Gets the super user group
 	public String getSuperUserGroupName() {
 		return superUserGroup;
@@ -701,19 +704,15 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 		//initial query just to get everything out so i can filter
 		MetaObject[] metaObjs = accountMetaTable().query(null, null, "oID", 0, 0);
 		
-		//		if (metaObjs == null) {
-		//			return null;
-		//		}
-		
 		//		boolean doGroupCheck = insideGroupAny != null && insideGroupAny.length > 0;
 		//		boolean doRoleCheck = hasRoleAny != null && hasRoleAny.length > 0;
 		
 		for (MetaObject metaObj : metaObjs) {
 			AccountObject ao = getFromID(metaObj._oid());
 			
-			if (ao == null || ao.getGroups() == null) {
-				continue;
-			}
+			//			if (ao == null || ao.getGroups() == null) {
+			//				continue;
+			//			}
 			
 			// Possible Error found: returns null in one of the array
 			AccountObject[] userGroups = ao.getGroups();

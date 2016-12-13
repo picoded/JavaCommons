@@ -265,6 +265,7 @@ public class AccountTable_test extends Mockito {
 		assertNotNull(usrList = grpObj.getMembersAccountObject());
 		assertEquals(1, usrList.length);
 		assertEquals(usrObj._oid(), usrList[0]._oid());
+		assertNotNull(usrObj.isSuperUser());
 		accTableObj.removeFromID(grpObj.get("_oid").toString());
 		assertNotNull(usrList = grpObj.getMembersAccountObject());
 		assertEquals(1, usrList.length);
@@ -356,16 +357,7 @@ public class AccountTable_test extends Mockito {
 		assertFalse(accTableObj.setLogin(usrObj, request, response, true));
 		usrObj.setPassword("test123");
 		assertNotNull(accTableObj.loginAccount(request, response, usrObj, "test123", true));
-		assertNotNull(accTableObj.loginAccount(request, response, usrObj, "test123", false));
-		assertNull(accTableObj.loginAccount(request, response, "test123", "test", false));
-		
-		assertNotNull(accTableObj.loginAccount(request, response, usrObj, "test123", true));
-		request.setContextPath(null);
-		assertNotNull(accTableObj.loginAccount(request, response, usrObj, "test123", true));
-		request.setContextPath("");
-		assertNotNull(accTableObj.loginAccount(request, response, usrObj, "test123", true));
-		request.setContextPath("/");
-		assertNotNull(accTableObj.loginAccount(request, response, usrObj, "test123", true));
+		assertNull(accTableObj.loginAccount(request, response, usrObj, "test", false));
 	}
 	
 	@Test
@@ -392,10 +384,13 @@ public class AccountTable_test extends Mockito {
 		accTableObj.isSecureOnly = true;
 		accTableObj.cookieDomain = null;
 		assertTrue(accTableObj.logoutAccount(request, response));
+		assertTrue(accTableObj.setLogin(usrObj, request, response, true));
 		accTableObj.cookieDomain = "";
 		assertTrue(accTableObj.logoutAccount(request, response));
+		assertTrue(accTableObj.setLogin(usrObj, request, response, true));
 		accTableObj.cookieDomain = "test.com";
 		assertTrue(accTableObj.logoutAccount(request, response));
+		assertTrue(accTableObj.setLogin(usrObj, request, response, true));
 		request.setPathInfo(null);
 		assertNull(accTableObj.getRequestUser(request, response));
 		request.setPathInfo("logout");

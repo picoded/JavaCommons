@@ -148,12 +148,19 @@ public class ProductListing_test {
 		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
 			inUpdateList));
 		itemObj.put("_oid", productOwner.getFromKeyName("_oid")[0]._oid());
-		productOwnerObject.put("_ownerID", productOwner.getFromKeyName("_oid")[0]._oid());
+		productOwner = implementationConstructor1();
+		productOwnerObject.put("_ownerID",
+			productListing.productItem.getFromKeyName("_oid")[0]._oid());
 		productOwnerObject.saveDelta();
 		productOwner.append("id-1", productOwnerObject);
 		productListing.productOwner = productOwner;
 		productListing.productItem = productListing.productOwner;
 		assertNotNull(productListing.getList(productOwner.getFromKeyName("_oid")[0]._oid()));
+		String _ownerID = (String) productOwner.getFromKeyName("_ownerID")[0].get("_ownerID");
+		itemObj.put("_oid", productOwner.getFromKeyName("_oid")[0]._oid());
+		itemObj.put("_ownerID", _ownerID);
+		inUpdateList.add(itemObj);
+		assertNotNull(productListing.updateList(_ownerID, inUpdateList));
 		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
 			inUpdateList));
 		

@@ -344,7 +344,7 @@ public class SimpleShoppingCart {
 		GenericConvertList<List<Object>> updateList = GenericConvertList.build(addList);
 		
 		// Iterate the add list
-		if (updateList.size() > 0) {
+		if (!updateList.isEmpty()) {
 			int iLen = updateList.size();
 			for (int i = 0; i < iLen; ++i) {
 				// Line record of an update

@@ -494,7 +494,9 @@ public class AccountTable_test extends Mockito {
 		usrObj.remove("isGroup");
 		usrObj.saveDelta();
 		usrObj.groupUserToRoleMap = usrObj.getMember(usrObj);
+		accTableObj.groupChildRole.append(usrObj._oid(), usrObj);
 		accTableObj.removeFromID(usrObj._oid());
+		accTableObj.removeFromID("test");
 		
 	}
 	
@@ -504,10 +506,13 @@ public class AccountTable_test extends Mockito {
 		IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		List<AccountObject> ret = new ArrayList();
 		AccountObject ao = new AccountObject(accTableObj, "inOID");
+		accTableObj.getUsersByGroupAndRole(null, null);
+		ao = new AccountObject(accTableObj, "inOID");
 		Method method = AccountTable.class.getDeclaredMethod("getAccountObjectList", List.class,
 			AccountObject.class);
 		method.setAccessible(true);
 		method.invoke(accTableObj, ret, ao);
 		assertEquals(1, ret.size());
 	}
+	
 }

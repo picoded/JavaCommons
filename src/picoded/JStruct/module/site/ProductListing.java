@@ -97,7 +97,7 @@ public class ProductListing {
 		// Fetch and populate
 		MetaObject[] queryRet = productItem.query(this.ownerID + "=?", new String[] { ownerID },
 			"_createdTime", 0, productMax);
-		if (queryRet != null && queryRet.length > 0) {
+		if (queryRet.length > 0) {
 			for (int i = 0; i < queryRet.length; ++i) {
 				ret.add(queryRet[i]);
 			}
@@ -123,10 +123,10 @@ public class ProductListing {
 			throw new RuntimeException("Missing ownerID");
 		}
 		
-		MetaObject ownerObj = productOwner.get(ownerID);
-		if (ownerObj == null) {
-			throw new RuntimeException("Missing product owner object for : " + ownerID);
-		}
+		//		MetaObject ownerObj = productOwner.get(ownerID);
+		//		if (ownerObj == null) {
+		//			throw new RuntimeException("Missing product owner object for : " + ownerID);
+		//		}
 		
 		if (inUpdateList == null) {
 			throw new RuntimeException("Missing update list");

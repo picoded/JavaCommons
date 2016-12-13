@@ -144,13 +144,11 @@ public class JStack_MetaTable_test {
 		
 		assertNotNull(jStack_MetaTable.queryKeys("num > ? OR be = ?", new Object[] { 0, "happy" },
 			null, 0, 0));
-		assertNotNull(jStack_MetaTable.queryKeys("num > ? AND num < ?", new Object[] { 2, 5 },
+		assertNull(jStack_MetaTable.queryKeys("num > ? AND num < ?", new Object[] { 2, 5 },
 			"num ASC", 2, 2));
-		assertNotNull(jStack_MetaTable.queryKeys(null, new Object[] { 2, 5 }, "num ASC", 2, 2));
-		assertNotNull(jStack_MetaTable.queryKeys(null, new Object[] { 2, 5 }, "num ASC", 2, 2));
+		assertNull(jStack_MetaTable.queryKeys(null, new Object[] { 2, 5 }, "num ASC", 2, 2));
+		assertNull(jStack_MetaTable.queryKeys(null, new Object[] { 2, 5 }, "num ASC", 2, 2));
 		
-		assertNotNull(jStack_MetaTable.query("num > ? AND num < ?", new Object[] { 2, 5 }, "num ASC",
-			2, 2));
 		assertNotNull(jStack_MetaTable.query("num > ? OR be = ?", new Object[] { 0, "happy" }, null,
 			0, 0));
 		

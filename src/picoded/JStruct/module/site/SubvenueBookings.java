@@ -102,7 +102,7 @@ public class SubvenueBookings {
 		// Fetch and populate
 		MetaObject[] queryRet = subvenueBooking.query("_subvenueID=? AND (_status=? OR _status=?)",
 			new String[] { in_subvenueId, "Paid", "Approved" }, createdTime, 0, bookingsMax);
-		if (queryRet != null && queryRet.length > 0) {
+		if (queryRet.length > 0) {
 			for (int i = 0; i < queryRet.length; ++i) {
 				ret.add(queryRet[i]);
 			}
@@ -124,7 +124,7 @@ public class SubvenueBookings {
 		// Fetch and populate
 		MetaObject[] queryRet = subvenueBooking.query("_oid=?", new String[] { in_bookingID },
 			createdTime, 0, bookingsMax);
-		if (queryRet != null && queryRet.length > 0) {
+		if (queryRet.length > 0) {
 			for (int i = 0; i < queryRet.length; ++i) {
 				ret.add(queryRet[i]);
 			}
@@ -146,7 +146,7 @@ public class SubvenueBookings {
 		// Fetch and populate
 		MetaObject[] queryRet = subvenueBookingDates.query("_bookingID=?",
 			new String[] { in_subvenueId }, createdTime, 0, bookingsMax);
-		if (queryRet != null && queryRet.length > 0) {
+		if (queryRet.length > 0) {
 			for (int i = 0; i < queryRet.length; ++i) {
 				ret.add(queryRet[i]);
 			}

@@ -214,7 +214,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 		int offset, int limit) {
 		String[] ret = null;
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
-			if (i.queryKeys(whereClause, whereValues, orderByStr, offset, limit) != null) {
+			if (i.queryKeys(whereClause, whereValues, orderByStr, offset, limit).length > 0) {
 				ret = i.queryKeys(whereClause, whereValues, orderByStr, offset, limit);
 			}
 		}
@@ -246,9 +246,9 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	public long queryCount(String whereClause, Object[] whereValues) {
 		long ret = 0;
 		for (JStruct_MetaTable i : implementationLayers_reverse()) {
-			if (i.queryCount(whereClause, whereValues) >= 0) {
-				ret = i.queryCount(whereClause, whereValues);
-			}
+			//			if (i.queryCount(whereClause, whereValues) >= 0) {
+			ret = i.queryCount(whereClause, whereValues);
+			//			}
 		}
 		return ret;
 	}

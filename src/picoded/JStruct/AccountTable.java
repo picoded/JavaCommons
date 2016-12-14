@@ -341,7 +341,7 @@ public class AccountTable implements UnsupportedDefaultMap<String, AccountObject
 	protected int loginRenewal = loginLifetime / 2; //
 	
 	/// Remember me lifetime, default as 2592000 seconds (aka 30 days)
-	private int rmberMeLifetime = 2592000; // 1 mth ~= 30 (days) * 24 (hrs) * 3600 (seconds in an hr)
+	private int rmberMeLifetime = 25_920_00; // 1 mth ~= 30 (days) * 24 (hrs) * 3600 (seconds in an hr)
 	
 	/// Remember me lifetime, default as 15 days
 	protected int rmberMeRenewal = rmberMeLifetime / 2; // 15 days

@@ -14,7 +14,7 @@ public class JStack_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	public static final Logger logger = Logger.getLogger(JStack_KeyValueMap.class.getName());
+	private static final Logger logger = Logger.getLogger(JStack_KeyValueMap.class.getName());
 	
 	///
 	/// Constructor setup

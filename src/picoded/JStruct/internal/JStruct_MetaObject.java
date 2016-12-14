@@ -211,7 +211,7 @@ public class JStruct_MetaObject implements MetaObject {
 	public Object get(Object key) {
 		
 		// / Get key operation
-		if (key.toString().equalsIgnoreCase("_oid")) {
+		if ("_oid".equalsIgnoreCase(key.toString())) {
 			return _oid;
 		}
 		
@@ -279,7 +279,7 @@ public class JStruct_MetaObject implements MetaObject {
 		Set<String> retSet = new HashSet<String>();
 		
 		for (String key : unfilteredForNull) {
-			if (key.equalsIgnoreCase("_oid")) {
+			if ("_oid".equalsIgnoreCase(key)) {
 				continue;
 			}
 			

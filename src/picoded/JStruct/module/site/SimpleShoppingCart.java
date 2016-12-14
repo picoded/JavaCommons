@@ -64,6 +64,8 @@ public class SimpleShoppingCart {
 	protected String ownerID = "_ownerID";
 	protected String orderStatus = "_orderStatus";
 	
+	protected String productList = "productList";
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Constructor options
@@ -788,7 +790,7 @@ public class SimpleShoppingCart {
 		
 		// Populate
 		resMap.putAll(orderObj);
-		resMap.put("productList", itemList);
+		resMap.put(this.productList, itemList);
 		
 		return resMap;
 	}
@@ -819,7 +821,7 @@ public class SimpleShoppingCart {
 		
 		// Populate
 		resMap.putAll(salesObject);
-		resMap.put("productList", prodList);
+		resMap.put(this.productList, prodList);
 		
 		// Return
 		return resMap;
@@ -841,7 +843,7 @@ public class SimpleShoppingCart {
 		}
 		// Populate
 		resMap.putAll(salesObject);
-		resMap.put("productList", fetchSalesItemList(orderID));
+		resMap.put(this.productList, fetchSalesItemList(orderID));
 		
 		// Return
 		return resMap;

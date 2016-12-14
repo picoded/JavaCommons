@@ -22,7 +22,7 @@ public class JStack_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	protected Logger logger = Logger.getLogger(JStack_MetaTable.class.getName());
+	private static final Logger logger = Logger.getLogger(JStack_MetaTable.class.getName());
 	
 	///
 	/// Constructor setup

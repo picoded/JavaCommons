@@ -69,12 +69,6 @@ public class ArbitaryListIterator_test {
 		assertEquals("hello", listIterator.next());
 	}
 	
-	@Test(expected = NoSuchElementException.class)
-	public void nextException3Test() {
-		listIterator.next();
-		listIterator.next();
-	}
-	
 	@Test
 	public void removeTest() {
 		listIterator.next();

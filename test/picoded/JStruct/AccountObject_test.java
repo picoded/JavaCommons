@@ -40,6 +40,7 @@ public class AccountObject_test {
 		JStruct_MetaTable jStruct_MetaTable = (JStruct_MetaTable) (new JStruct())
 			.getMetaTable("test");
 		accountObject = new AccountObject(accountTable, jStruct_MetaTable, accountObject._oid(), true);
+		
 	}
 	
 	@After
@@ -195,5 +196,8 @@ public class AccountObject_test {
 		accountTable.systemSetup();
 		accountObject.accountTable = accountTable;
 		assertNotNull(accountObject.isSuperUser());
+		accountTable.superUserGroup = "test";
+		assertNotNull(accountObject.isSuperUser());
+		
 	}
 }

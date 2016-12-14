@@ -136,19 +136,64 @@ public class AccountObject_test {
 		assertNotNull(accountObject.isSuperUser());
 		accountTable = accountObject.accountTable;
 		accountObject = accountTable.superUserGroup();
+		
 		accountTable.keyValueMapAccountID.put("admin", accountObject._oid());
 		accountTable.setSuperUserGroupName("admin");
 		accountTable.superUserGroup = "admin";
+		accountObject.setMember(accountObject, "admin");
+		accountTable.systemSetup();
+		accountObject.accountTable = accountTable;
+		assertNotNull(accountObject.isSuperUser());
+		accountObject.addDelay("SuperUsers");
+		assertNotNull(accountObject.isSuperUser());
+		
+		accountTable.keyValueMapAccountID.put("guest", accountObject._oid());
+		accountTable.setSuperUserGroupName("guest");
+		accountTable.superUserGroup = "guest";
+		accountObject.setMember(accountObject, "guest");
+		accountTable.systemSetup();
 		accountObject.accountTable = accountTable;
 		assertNotNull(accountObject.isSuperUser());
 		
-		accountObject.addDelay("admin");
-		assertNotNull(accountObject.isSuperUser());
 	}
 	
 	@Test
 	public void isSuperUserTest() {
-		accountObject.accountTable.setSuperUserGroupName("admin");
-		assertFalse(accountObject.isSuperUser());
+		assertNotNull(accountObject.removeMember(accountObject));
+		assertNull(accountObject.getMember(accountObject));
+		assertNull(accountObject.getMember(accountObject, "member"));
+		assertNotNull(accountObject.setMember(accountObject, "admin"));
+		assertNotNull(accountObject.setMember(accountObject, "guest"));
+		assertNotNull(accountObject.setMember(accountObject, "admin"));
+		assertNull(accountObject.addMember(accountObject, "admin"));
+		assertNull(accountObject.addMember(accountObject, "user"));
+		assertNotNull(accountObject.getMember(accountObject));
+		assertNotNull(accountObject.getMember(accountObject, "admin"));
+		assertNull(accountObject.getMember(accountObject, "guest"));
+		assertNotNull(accountObject.getNextLoginTimeAllowed("member"));
+		assertNotNull(accountObject.getTimeElapsedNextLogin("member"));
+		accountObject.addDelay("member");
+		accountObject.addDelay("guest");
+		assertNotNull(accountObject.getNextLoginTimeAllowed("admin"));
+		accountTable.loginThrottlingElapsed.put("test",
+			String.valueOf((System.currentTimeMillis() / 1000) + 25));
+		assertNotNull(accountObject.getNextLoginTimeAllowed("test"));
+		accountTable.loginThrottlingElapsed.put("test", String.valueOf("0"));
+		assertNotNull(accountObject.getNextLoginTimeAllowed("test"));
+		assertNotNull(accountObject.getTimeElapsedNextLogin("admin"));
+		accountObject.saveDelta();
+		assertNotNull(accountObject.removeMember(accountObject));
+		accountObject.resetLoginThrottle("member");
+		assertNotNull(accountObject.isSuperUser());
+		accountTable = accountObject.accountTable;
+		accountObject = accountTable.superUserGroup();
+		
+		accountTable.keyValueMapAccountID.put("guest", accountObject._oid());
+		accountTable.setSuperUserGroupName("guest");
+		accountTable.superUserGroup = "guest";
+		accountObject.setMember(accountObject, "guest");
+		accountTable.systemSetup();
+		accountObject.accountTable = accountTable;
+		assertNotNull(accountObject.isSuperUser());
 	}
 }

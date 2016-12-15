@@ -73,18 +73,21 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 	
 	@Override
 	default void clear() {
-		for (K key : keySet()) {
+		// This is a intentional converted to a new HashSet, to avoid
+		// ConcurrentModificationException
+		Set<K> clearSet = new HashSet<K>(keySet());
+		for (K key : clearSet) {
 			remove(key);
 		}
 	}
 	
-	/// Does an unoptimized check, using keySet9)
+	/// Does an unoptimized check, using keySet
 	@Override
 	default boolean containsKey(Object key) {
 		return keySet().contains(key);
 	}
 	
-	/// Does an unoptimized check, using keySet9)
+	/// Does an unoptimized check, using keySet
 	@Override
 	default boolean containsValue(Object value) {
 		for (Map.Entry<K, V> entry : entrySet()) {

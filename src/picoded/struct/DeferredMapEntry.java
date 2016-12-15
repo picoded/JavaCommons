@@ -76,4 +76,9 @@ public class DeferredMapEntry<K extends Object, V extends Object> implements Map
 	public V setValue(V value) {
 		return sourceMap.put(key, value);
 	}
+	
+	@Override
+	public String toString() {
+		return getKey()+"="+getValue();
+	}
 }

@@ -417,6 +417,8 @@
 			<include name="**/*.xml"/>
 			<replacetoken><![CDATA[</testsuite>
 >]]></replacetoken>
+			<replacetoken><![CDATA[</testsuite>
+te>]]></replacetoken>
 			<replacevalue><![CDATA[</testsuite>]]></replacevalue>
 		</replace>
 		

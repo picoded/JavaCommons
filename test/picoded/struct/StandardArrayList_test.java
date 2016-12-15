@@ -93,6 +93,7 @@ public class StandardArrayList_test {
 		assertEquals("zero", list.get(0));
 		assertEquals("one", list.get(1));
 		assertTrue(list.contains("two"));
+		assertFalse(list.contains("2"));
 		list.clear();
 		assertEquals(0, list.size());
 	}
@@ -108,6 +109,16 @@ public class StandardArrayList_test {
 	}
 	
 	@Test
+	public void containsAllFalseTest() {
+		Set<String> set = new HashSet<>();
+		set.add("zero");
+		set.add("one");
+		set.add("two");
+		list.add("ZERO");
+		assertFalse(list.containsAll(set));
+	}
+	
+	@Test
 	public void indexOfTest() {
 		Set<String> set = new HashSet<>();
 		set.add("zero");
@@ -115,6 +126,20 @@ public class StandardArrayList_test {
 		set.add("two");
 		list.addAll(set);
 		assertEquals(1, list.indexOf("one"));
+		assertEquals(-1, list.indexOf("1"));
+		assertEquals(-1, list.indexOf(null));
+	}
+	
+	@Test
+	public void lastIndexOfTest() {
+		Set<String> set = new HashSet<>();
+		set.add("zero");
+		set.add("one");
+		set.add("two");
+		list.addAll(set);
+		assertEquals(1, list.lastIndexOf("one"));
+		assertEquals(-1, list.lastIndexOf("1"));
+		assertEquals(-1, list.lastIndexOf(null));
 	}
 	
 	@Test
@@ -150,9 +175,10 @@ public class StandardArrayList_test {
 		list.add("two");
 		list.remove("one");
 		assertEquals("two", list.get(1));
-		list.remove(1);
+		int i = 1;
+		list.remove(i);
 		assertEquals(1, list.size());
-		
+		assertFalse(list.remove("TEN"));
 	}
 	
 	@Test
@@ -168,6 +194,15 @@ public class StandardArrayList_test {
 	}
 	
 	@Test
+	public void removeAllFalseTest() {
+		Set<String> set = new HashSet<>();
+		list.add("ZERO");
+		set.add("one");
+		set.add("two");
+		assertFalse(list.removeAll(set));
+	}
+	
+	@Test
 	public void retainAllTest() {
 		Set<String> set = new HashSet<>();
 		list.add("ZERO");
@@ -177,6 +212,7 @@ public class StandardArrayList_test {
 		assertEquals(3, list.size());
 		list.retainAll(set);
 		assertEquals(2, list.size());
+		assertFalse(list.retainAll(set));
 	}
 	
 	@Test
@@ -190,6 +226,39 @@ public class StandardArrayList_test {
 		assertEquals("TEN", list.get(0));
 		assertEquals("TEN", list.get(1));
 		assertEquals("TEN", list.get(2));
+	}
+	
+	@Test
+	public void setTest() {
+		list.add("zero");
+		list.add("one");
+		list.add("two");
+		list.set(1, "ONE");
+		assertEquals("zero", list.get(0));
+		assertEquals("ONE", list.get(1));
+		assertEquals("two", list.get(2));
+	}
+	
+	@Test
+	public void subListTest() {
+		list.add("zero");
+		list.add("one");
+		list.add("two");
+		
+		List<Object> subList = list.subList(1, 2);
+		
+		assertEquals("one", subList.get(0));
+	}
+	
+	@Test
+	public void toArrayTest() {
+		list.add("zero");
+		list.add("one");
+		list.add("two");
+		
+		Object[] arr = list.toArray();
+		
+		assertEquals("zero", arr[0]);
 	}
 	
 	private class MyOperator<T> implements UnaryOperator<T> {

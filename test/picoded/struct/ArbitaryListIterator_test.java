@@ -17,7 +17,7 @@ import org.junit.Test;
 public class ArbitaryListIterator_test {
 	
 	// Test list
-	private ArbitaryListIterator listIterator = null;
+	private ArbitaryListIterator<Object> listIterator = null;
 	private List<Object> list = null;
 	private int inIdx = 0;
 	

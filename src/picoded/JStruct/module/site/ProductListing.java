@@ -6,8 +6,6 @@ import java.util.List;
 import picoded.JStruct.JStruct;
 import picoded.JStruct.MetaObject;
 import picoded.JStruct.MetaTable;
-import picoded.struct.GenericConvertArrayList;
-import picoded.struct.GenericConvertHashMap;
 import picoded.struct.GenericConvertList;
 import picoded.struct.GenericConvertMap;
 /// Picoded imports
@@ -86,25 +84,7 @@ public class ProductListing {
 	/// @return List of meta objects representing the owner
 	///
 	public GenericConvertList<MetaObject> getList(String ownerID) {
-		// Sanity check
-		if (ownerID == null || ownerID.isEmpty()) {
-			throw new RuntimeException("Missing ownerID");
-		}
-		
-		// Return object
-		GenericConvertList<MetaObject> ret = new GenericConvertArrayList<MetaObject>();
-		
-		// Fetch and populate
-		MetaObject[] queryRet = productItem.query(this.ownerID + "=?", new String[] { ownerID },
-			"_createdTime", 0, productMax);
-		if (queryRet.length > 0) {
-			for (int i = 0; i < queryRet.length; ++i) {
-				ret.add(queryRet[i]);
-			}
-		}
-		
-		// Return
-		return ret;
+		return new SimpleShoppingCart().getProductList(ownerID);
 	}
 	
 	///
@@ -116,88 +96,7 @@ public class ProductListing {
 	/// @return List of meta objects representing the owner
 	///
 	public List<MetaObject> updateList(String ownerID, List<Object> inUpdateList) {
-		//
-		// Sanity check
-		//
-		if (ownerID == null || ownerID.isEmpty()) {
-			throw new RuntimeException("Missing ownerID");
-		}
-		
-		//		MetaObject ownerObj = productOwner.get(ownerID);
-		//		if (ownerObj == null) {
-		//			throw new RuntimeException("Missing product owner object for : " + ownerID);
-		//		}
-		
-		if (inUpdateList == null) {
-			throw new RuntimeException("Missing update list");
-		}
-		
-		// Existing product list from ownerID
-		GenericConvertList<MetaObject> prodList = getList(ownerID);
-		
-		// Update list to use
-		GenericConvertList<Object> updateList = GenericConvertList.build(inUpdateList);
-		
-		//
-		// Iterate the update list, updating if need be. La, la la
-		//
-		int iLen = updateList.size();
-		for (int i = 0; i < iLen; ++i) {
-			// Ensure it is a new object, avoid meta object changes bugs
-			GenericConvertMap<String, Object> updateProduct = updateList.getGenericConvertStringMap(i,
-				null);
-			
-			// Skip null rows
-			if (updateProduct == null) {
-				continue;
-			}
-			
-			// Make new object, clone the values
-			updateProduct = new GenericConvertHashMap<String, Object>(updateProduct);
-			
-			// Product _oid
-			String update_oid = updateProduct.getString("_oid", null);
-			if (update_oid != null && "new".equalsIgnoreCase(update_oid)) {
-				update_oid = null;
-			}
-			
-			// Sanitize updateProduct
-			updateProduct = sanatizePurchaseData(updateProduct);
-			
-			// The meta object to create / update
-			MetaObject updateMetaObject = null;
-			
-			// Get the meta object to "update"
-			if (update_oid != null) {
-				// Old meta object
-				updateMetaObject = productItem.get(update_oid);
-				
-				// Security validation of owner ID
-				if (!ownerID.equals(updateMetaObject.get(this.ownerID))) {
-					throw new SecurityException("Unauthorized update call to object " + update_oid
-						+ " with invalid ownerID " + ownerID);
-				}
-			} else {
-				// New meta object
-				updateMetaObject = productItem.newObject();
-				updateMetaObject.put(ownerID, ownerID);
-				updateMetaObject.saveDelta();
-				
-				prodList.add(updateMetaObject);
-			}
-			
-			// Update the meta values
-			updateMetaObject.putAll(updateProduct);
-			
-			//
-			// @TODO : inventory quantity management
-			//
-			
-			// Save
-			updateMetaObject.saveDelta();
-		}
-		
-		return prodList;
+		return new SimpleShoppingCart().updateProductList(ownerID, inUpdateList);
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////

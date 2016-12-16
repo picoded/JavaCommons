@@ -23,11 +23,11 @@ import static org.junit.Assert.*;
 public class StandardHashMap_test {
 	
 	// Test list 
-	Map<String,Object> map = null;
+	Map<String, Object> map = null;
 	
 	@Before
 	public void setUp() {
-		map = new HashMap<String,Object>();
+		map = new HashMap<String, Object>();
 	}
 	
 	@After
@@ -83,9 +83,9 @@ public class StandardHashMap_test {
 	}
 	
 	public void isEmptyTest() {
-		assertTrue( map.isEmpty() );
+		assertTrue(map.isEmpty());
 		map.put("key5", "V2");
-		assertFalse( map.isEmpty() );
+		assertFalse(map.isEmpty());
 	}
 	
 	@Test

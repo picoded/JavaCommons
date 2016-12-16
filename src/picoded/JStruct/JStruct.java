@@ -11,7 +11,7 @@ import picoded.JStruct.internal.*;
 /// Base object, where the respective data structure
 /// implmentation is loaded from.
 ///
-public class JStruct /*implements JStackLayer*/ {
+public class JStruct /*implements JStackLayer*/{
 	
 	// KeyValueMap handling
 	//----------------------------------------------

@@ -25,8 +25,6 @@ public class ProductListing {
 	
 	protected String ownerID = "_ownerID";
 	
-	public SimpleShoppingCart shoppingCart = null;
-	
 	/// Empty constructor
 	public ProductListing() {
 		//Does nothing : manual setup

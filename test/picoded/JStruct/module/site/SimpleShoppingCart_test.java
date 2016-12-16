@@ -21,8 +21,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.After;
 // Test Case include
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
+import picoded.RunInThread;
+import picoded.RunInThreadRule;
 import picoded.JStruct.JStruct;
 import picoded.JStruct.MetaObject;
 import picoded.JStruct.MetaTable;
@@ -37,6 +40,9 @@ import picoded.struct.GenericConvertMap;
 
 // MetaTable base test class
 public class SimpleShoppingCart_test {
+	
+	@Rule
+	public RunInThreadRule runInThread = new RunInThreadRule();
 	
 	/// Test object
 	public SimpleShoppingCart simpleShoppingCart = null;
@@ -63,6 +69,7 @@ public class SimpleShoppingCart_test {
 	/// Setup and sanity test
 	///------------------------------------------------------
 	@Before
+	@RunInThread
 	public void setUp() {
 		simpleShoppingCart = implementationConstructor();
 		simpleShoppingCart.systemSetup();
@@ -70,6 +77,7 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@After
+	@RunInThread
 	public void tearDown() {
 		if (simpleShoppingCart != null) {
 			simpleShoppingCart.systemTeardown();
@@ -79,6 +87,7 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test
+	@RunInThread
 	public void constructorTest() {
 		//not null check
 		assertNotNull(simpleShoppingCart);
@@ -88,6 +97,7 @@ public class SimpleShoppingCart_test {
 	// Test cases
 	//-----------------------------------------------
 	@Test
+	@RunInThread
 	public void productSetup() {
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
 		productOwnerObject.put("name", "Scrooge Mcduck");
@@ -104,42 +114,46 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
+	@RunInThread
 	public void getCartCookieJSONTest() throws Exception {
 		assertNotNull(simpleShoppingCart.getCartCookieJSON(null));
 	}
 	
-	// @Test
-	// public void getCartCookieJSONTest1() throws ServletException {
-	// 	HttpServletRequest request = mock(HttpServletRequest.class);
-	// 	HttpServletResponse response = mock(HttpServletResponse.class);
-	// 	List<String> headerList = new ArrayList<String>();
-	// 	headerList.add("header_1");
-	// 	headerList.add("header_2");
-	// 	when(request.getHeaderNames()).thenReturn(Collections.enumeration(headerList));
-	// 	CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
-	// 	assertNotNull(simpleShoppingCart.getCartCookieJSON(corePageLocal));
-	// 	String[] cookiesArr = new String[] {};
-	// 	Map<String, String[]> _requestCookieMap = new HashMap<String, String[]>();
-	// 	_requestCookieMap.put("shopping-cart", cookiesArr);
-	// 	corePageLocal._requestCookieMap = _requestCookieMap;
-	// 	assertNotNull(simpleShoppingCart.getCartCookieJSON(corePageLocal));
-	// 	cookiesArr = new String[] { "item1", "item2", "item2", "item4" };
-	// 	_requestCookieMap.put("shopping-cart", cookiesArr);
-	// 	corePageLocal._requestCookieMap = _requestCookieMap;
-	// 	String updateJson = null;
-	// 	assertNotNull(updateJson = simpleShoppingCart.getCartCookieJSON(corePageLocal));
-	// 	simpleShoppingCart.setCartCookieJSON(corePageLocal, updateJson);
-	// 	simpleShoppingCart.setCartCookieJSON(corePageLocal, "item5");
-	// 	assertNotNull(simpleShoppingCart.getCartList(corePageLocal, true));
-	// 	assertNotNull(simpleShoppingCart.getCartList(corePageLocal, false));
-	// 	String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
-	// 	GenericConvertList<List<Object>> testCart = GenericConvert.toGenericConvertList(testJSON,
-	// 		new ArrayList<Object>());
-	// 	assertNotNull(simpleShoppingCart.updateCartList(corePageLocal, testCart, true));
-	// 	assertNotNull(simpleShoppingCart.updateCartList(corePageLocal, null, false));
-	// }
+	@Test
+	@RunInThread
+	public void getCartCookieJSONTest1() throws ServletException {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		List<String> headerList = new ArrayList<String>();
+		headerList.add("header_1");
+		headerList.add("header_2");
+		when(request.getHeaderNames()).thenReturn(Collections.enumeration(headerList));
+		CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
+		assertNotNull(simpleShoppingCart.getCartCookieJSON(corePageLocal));
+		String[] cookiesArr = new String[] {};
+		Map<String, String[]> _requestCookieMap = new HashMap<String, String[]>();
+		_requestCookieMap.put("shopping-cart", cookiesArr);
+		corePageLocal._requestCookieMap = _requestCookieMap;
+		assertNotNull(simpleShoppingCart.getCartCookieJSON(corePageLocal));
+		cookiesArr = new String[] { "item1", "item2", "item2", "item4" };
+		_requestCookieMap.put("shopping-cart", cookiesArr);
+		corePageLocal._requestCookieMap = _requestCookieMap;
+		String updateJson = null;
+		assertNotNull(updateJson = simpleShoppingCart.getCartCookieJSON(corePageLocal));
+		simpleShoppingCart.setCartCookieJSON(corePageLocal, updateJson);
+		simpleShoppingCart.setCartCookieJSON(corePageLocal, "item5");
+		assertNotNull(simpleShoppingCart.getCartList(corePageLocal, true));
+		assertNotNull(simpleShoppingCart.getCartList(corePageLocal, false));
+		String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
+		GenericConvertList<List<Object>> testCart = GenericConvert.toGenericConvertList(testJSON,
+			new ArrayList<Object>());
+		assertNotNull(simpleShoppingCart.updateCartList(corePageLocal, testCart, true));
+		assertNotNull(simpleShoppingCart.updateCartList(corePageLocal, null, false));
+		
+	}
 	
 	@Test
+	@RunInThread
 	public void cartListToCookieJSONTest() {
 		String testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
 		
@@ -160,7 +174,7 @@ public class SimpleShoppingCart_test {
 		productOwnerObject.put("id-1", "Scrooge Mcduck");
 		productOwnerObject.saveDelta();
 		productItem.append("id-1", productOwnerObject);
-		simpleShoppingCart.productItem = productItem;
+		SimpleShoppingCart.productItem = productItem;
 		testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"], [\""
 			+ productItem.getFromKeyName("_oid")[0]._oid() + "\", 0] ]";
 		testCart = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
@@ -185,51 +199,58 @@ public class SimpleShoppingCart_test {
 		assertNotNull(simpleShoppingCart.mergeCartList(testCart, testCart1, false));
 	}
 	
-	// @Test(expected = Exception.class)
-	// public void replaceCartListTest() throws Exception {
-	// 	HttpServletRequest request = mock(HttpServletRequest.class);
-	// 	HttpServletResponse response = mock(HttpServletResponse.class);
-	// 	List<String> headerList = new ArrayList<String>();
-	// 	headerList.add("header_1");
-	// 	headerList.add("header_2");
-	// 	when(request.getHeaderNames()).thenReturn(Collections.enumeration(headerList));
-	// 	CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
-	// 	
-	// 	String testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
-	// 	GenericConvertList<List<Object>> cartList = GenericConvert.toGenericConvertList(testJSON,
-	// 		new ArrayList<Object>());
-	// 	for (int i = 0; i < 52; i++) {
-	// 		cartList.add(GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>()));
-	// 	}
-	// 	assertNotNull(simpleShoppingCart.replaceCartList(corePageLocal, cartList, true));
-	// }
+	@Test(expected = Exception.class)
+	@RunInThread
+	public void replaceCartListTest() throws Exception {
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		List<String> headerList = new ArrayList<String>();
+		headerList.add("header_1");
+		headerList.add("header_2");
+		when(request.getHeaderNames()).thenReturn(Collections.enumeration(headerList));
+		CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
+		
+		String testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
+		GenericConvertList<List<Object>> cartList = GenericConvert.toGenericConvertList(testJSON,
+			new ArrayList<Object>());
+		for (int i = 0; i < 52; i++) {
+			cartList.add(GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>()));
+		}
+		assertNotNull(simpleShoppingCart.replaceCartList(corePageLocal, cartList, true));
+	}
 	
 	@Test(expected = Exception.class)
+	@RunInThread
 	public void updateProductListTest() throws Exception {
 		assertNotNull(simpleShoppingCart.updateProductList(null, null));
 	}
 	
 	@Test(expected = Exception.class)
+	@RunInThread
 	public void updateProductListTest1() throws Exception {
 		assertNotNull(simpleShoppingCart.updateProductList("", null));
 	}
 	
 	@Test(expected = Exception.class)
+	@RunInThread
 	public void updateProductListTest2() throws Exception {
 		assertNotNull(simpleShoppingCart.updateProductList("test", null));
 	}
 	
 	@Test(expected = Exception.class)
+	@RunInThread
 	public void getProductList() throws Exception {
 		assertNotNull(simpleShoppingCart.getProductList(null));
 	}
 	
 	@Test(expected = Exception.class)
+	@RunInThread
 	public void getProductList1() throws Exception {
 		assertNotNull(simpleShoppingCart.getProductList(""));
 	}
 	
 	@Test(expected = Exception.class)
+	@RunInThread
 	public void updateProductList3() throws Exception {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
@@ -242,6 +263,7 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
+	@RunInThread
 	public void updateProductList4() throws Exception {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
@@ -268,6 +290,7 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
+	@RunInThread
 	public void updateProductList5() throws Exception {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
@@ -295,24 +318,24 @@ public class SimpleShoppingCart_test {
 			productOwner.getFromKeyName("_oid")[0]._oid(), inUpdateList));
 		
 		inUpdateList = new ArrayList<Object>();
-		itemObj.put("_oid", simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
+		itemObj.put("_oid", SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
 		inUpdateList.add(itemObj);
-		simpleShoppingCart.productOwner = simpleShoppingCart.productItem;
-		simpleShoppingCart.salesOrder = simpleShoppingCart.productItem;
-		assertNotNull(simpleShoppingCart.fetchPurchaseOrder(simpleShoppingCart.productItem
+		simpleShoppingCart.productOwner = SimpleShoppingCart.productItem;
+		simpleShoppingCart.salesOrder = SimpleShoppingCart.productItem;
+		assertNotNull(simpleShoppingCart.fetchPurchaseOrder(SimpleShoppingCart.productItem
 			.getFromKeyName("_oid")[0]._oid()));
 		assertNotNull(simpleShoppingCart.updatePurchaseOrderStatus(
-			simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid(), "Paid"));
+			SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid(), "Paid"));
 		itemObj = new GenericConvertHashMap<String, Object>();
 		assertNotNull(simpleShoppingCart.getProductList(simpleShoppingCart.productOwner
 			.getFromKeyName("_ownerID")[0].get("_ownerID").toString()));
 		testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"_ownerID\", \""
-			+ simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid()
+			+ SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid()
 			+ "\"], [\""
-			+ simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid() + "\", 9] ]";
+			+ SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid() + "\", 9] ]";
 		cartList = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
 		itemObj.put("_oid",
-			simpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString());
+			SimpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString());
 		assertNotNull(simpleShoppingCart.createPurchaseOrder(
 			simpleShoppingCart.productOwner.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
 			cartList, itemObj, itemObj, "Paid"));
@@ -324,11 +347,12 @@ public class SimpleShoppingCart_test {
 		itemObj.put("testCart", cartList);
 		inUpdateList.add(itemObj);
 		assertNotNull(simpleShoppingCart.updateProductList(
-			simpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
+			SimpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
 			inUpdateList));
 	}
 	
 	@Test
+	@RunInThread
 	public void updateProductList8() {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
@@ -356,24 +380,24 @@ public class SimpleShoppingCart_test {
 			productOwner.getFromKeyName("_oid")[0]._oid(), inUpdateList));
 		
 		inUpdateList = new ArrayList<Object>();
-		itemObj.put("_oid", simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
+		itemObj.put("_oid", SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
 		inUpdateList.add(itemObj);
-		simpleShoppingCart.productOwner = simpleShoppingCart.productItem;
-		simpleShoppingCart.salesOrder = simpleShoppingCart.productItem;
-		assertNotNull(simpleShoppingCart.fetchPurchaseOrder(simpleShoppingCart.productItem
+		simpleShoppingCart.productOwner = SimpleShoppingCart.productItem;
+		simpleShoppingCart.salesOrder = SimpleShoppingCart.productItem;
+		assertNotNull(simpleShoppingCart.fetchPurchaseOrder(SimpleShoppingCart.productItem
 			.getFromKeyName("_oid")[0]._oid()));
 		assertNotNull(simpleShoppingCart.updatePurchaseOrderStatus(
-			simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid(), "Paid"));
+			SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid(), "Paid"));
 		itemObj = new GenericConvertHashMap<String, Object>();
 		assertNotNull(simpleShoppingCart.getProductList(simpleShoppingCart.productOwner
 			.getFromKeyName("_ownerID")[0].get("_ownerID").toString()));
 		testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"_ownerID\", \""
-			+ simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid()
+			+ SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid()
 			+ "\"], [\""
-			+ simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid() + "\", 9] ]";
+			+ SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid() + "\", 9] ]";
 		cartList = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
 		itemObj.put("_oid",
-			simpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString());
+			SimpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString());
 		assertNotNull(simpleShoppingCart.createPurchaseOrder(
 			simpleShoppingCart.productOwner.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
 			cartList, itemObj, itemObj, "Paid"));
@@ -396,6 +420,7 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
+	@RunInThread
 	public void updateProductList6() throws Exception {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
@@ -423,20 +448,20 @@ public class SimpleShoppingCart_test {
 			productOwner.getFromKeyName("_oid")[0]._oid(), inUpdateList));
 		
 		inUpdateList = new ArrayList<Object>();
-		itemObj.put("_oid", simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
+		itemObj.put("_oid", SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
 		inUpdateList.add(itemObj);
-		simpleShoppingCart.productOwner = simpleShoppingCart.productItem;
-		simpleShoppingCart.salesOrder = simpleShoppingCart.productItem;
+		simpleShoppingCart.productOwner = SimpleShoppingCart.productItem;
+		simpleShoppingCart.salesOrder = SimpleShoppingCart.productItem;
 		
 		itemObj = new GenericConvertHashMap<String, Object>();
 		assertNotNull(simpleShoppingCart.getProductList(simpleShoppingCart.productOwner
 			.getFromKeyName("_ownerID")[0].get("_ownerID").toString()));
 		testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"_ownerID\", \""
-			+ simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid()
+			+ SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid()
 			+ "\"], [\""
-			+ simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid() + "\", 9] ]";
+			+ SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid() + "\", 9] ]";
 		cartList = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
-		itemObj.put("_oid", simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
+		itemObj.put("_oid", SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
 		assertNotNull(simpleShoppingCart.createPurchaseOrder(
 			simpleShoppingCart.productOwner.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
 			cartList, itemObj, itemObj, "Paid"));
@@ -445,10 +470,11 @@ public class SimpleShoppingCart_test {
 		itemObj.put("testCart", cartList);
 		inUpdateList.add(itemObj);
 		assertNotNull(simpleShoppingCart.updateProductList(
-			simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid(), inUpdateList));
+			SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid(), inUpdateList));
 	}
 	
 	@Test(expected = Exception.class)
+	@RunInThread
 	public void updateProductList7() throws Exception {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
@@ -476,13 +502,14 @@ public class SimpleShoppingCart_test {
 			productOwner.getFromKeyName("_oid")[0]._oid(), inUpdateList));
 		
 		itemObj.put("_oid",
-			simpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString());
+			SimpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString());
 		inUpdateList.add(itemObj);
 		assertNotNull(simpleShoppingCart.updateProductList(
 			productOwner.getFromKeyName("_oid")[0]._oid(), inUpdateList));
 	}
 	
 	@Test
+	@RunInThread
 	public void createPurchaseOrder() {
 		String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
 		GenericConvertList<List<Object>> testCart = GenericConvert.toGenericConvertList(testJSON,
@@ -503,6 +530,7 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
+	@RunInThread
 	public void fetchPurchaseOrder() throws Exception {
 		assertNotNull(simpleShoppingCart.fetchPurchaseOrder("test"));
 	}

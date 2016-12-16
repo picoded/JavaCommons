@@ -21,11 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.After;
 // Test Case include
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
-import picoded.RunInThread;
-import picoded.RunInThreadRule;
 import picoded.JStruct.JStruct;
 import picoded.JStruct.MetaObject;
 import picoded.JStruct.MetaTable;
@@ -40,9 +37,6 @@ import picoded.struct.GenericConvertMap;
 
 // MetaTable base test class
 public class SimpleShoppingCart_test {
-	
-	@Rule
-	public RunInThreadRule runInThread = new RunInThreadRule();
 	
 	/// Test object
 	public SimpleShoppingCart simpleShoppingCart = null;
@@ -69,7 +63,6 @@ public class SimpleShoppingCart_test {
 	/// Setup and sanity test
 	///------------------------------------------------------
 	@Before
-	@RunInThread
 	public void setUp() {
 		simpleShoppingCart = implementationConstructor();
 		simpleShoppingCart.systemSetup();
@@ -77,7 +70,6 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@After
-	@RunInThread
 	public void tearDown() {
 		if (simpleShoppingCart != null) {
 			simpleShoppingCart.systemTeardown();
@@ -87,7 +79,6 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void constructorTest() {
 		//not null check
 		assertNotNull(simpleShoppingCart);
@@ -97,7 +88,6 @@ public class SimpleShoppingCart_test {
 	// Test cases
 	//-----------------------------------------------
 	@Test
-	@RunInThread
 	public void productSetup() {
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
 		productOwnerObject.put("name", "Scrooge Mcduck");
@@ -114,13 +104,11 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
-	@RunInThread
 	public void getCartCookieJSONTest() throws Exception {
 		assertNotNull(simpleShoppingCart.getCartCookieJSON(null));
 	}
 	
 	@Test
-	@RunInThread
 	public void getCartCookieJSONTest1() throws ServletException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
@@ -153,7 +141,6 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void cartListToCookieJSONTest() {
 		String testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
 		
@@ -200,7 +187,6 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
-	@RunInThread
 	public void replaceCartListTest() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
@@ -220,37 +206,31 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
-	@RunInThread
 	public void updateProductListTest() throws Exception {
 		assertNotNull(simpleShoppingCart.updateProductList(null, null));
 	}
 	
 	@Test(expected = Exception.class)
-	@RunInThread
 	public void updateProductListTest1() throws Exception {
 		assertNotNull(simpleShoppingCart.updateProductList("", null));
 	}
 	
 	@Test(expected = Exception.class)
-	@RunInThread
 	public void updateProductListTest2() throws Exception {
 		assertNotNull(simpleShoppingCart.updateProductList("test", null));
 	}
 	
 	@Test(expected = Exception.class)
-	@RunInThread
 	public void getProductList() throws Exception {
 		assertNotNull(simpleShoppingCart.getProductList(null));
 	}
 	
 	@Test(expected = Exception.class)
-	@RunInThread
 	public void getProductList1() throws Exception {
 		assertNotNull(simpleShoppingCart.getProductList(""));
 	}
 	
 	@Test(expected = Exception.class)
-	@RunInThread
 	public void updateProductList3() throws Exception {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
@@ -263,7 +243,6 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
-	@RunInThread
 	public void updateProductList4() throws Exception {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
@@ -290,7 +269,6 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
-	@RunInThread
 	public void updateProductList5() throws Exception {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
@@ -352,7 +330,6 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void updateProductList8() {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
@@ -420,7 +397,6 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
-	@RunInThread
 	public void updateProductList6() throws Exception {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
@@ -474,7 +450,6 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
-	@RunInThread
 	public void updateProductList7() throws Exception {
 		MetaTable productOwner = implementationConstructor1();
 		productOwnerObject = simpleShoppingCart.productOwner.newObject();
@@ -509,7 +484,6 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void createPurchaseOrder() {
 		String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
 		GenericConvertList<List<Object>> testCart = GenericConvert.toGenericConvertList(testJSON,
@@ -530,7 +504,6 @@ public class SimpleShoppingCart_test {
 	}
 	
 	@Test(expected = Exception.class)
-	@RunInThread
 	public void fetchPurchaseOrder() throws Exception {
 		assertNotNull(simpleShoppingCart.fetchPurchaseOrder("test"));
 	}

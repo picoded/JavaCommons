@@ -68,7 +68,7 @@ public class SubvenueBookings_test {
 			.createBookingSlots(resMap.get("_oid").toString(), datesList));
 		@SuppressWarnings("unchecked")
 		ArrayList<MetaObject> itemList = (ArrayList<MetaObject>) resMap.get("_booking");
-		MetaObject dateItem = (MetaObject) itemList.get(0);
+		MetaObject dateItem = itemList.get(0);
 		assertNotNull(subvenueBookings.getSubvenueBookingDates_byBookingId(dateItem.get("_bookingID")
 			.toString()));
 	}

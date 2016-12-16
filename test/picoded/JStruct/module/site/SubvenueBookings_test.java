@@ -40,8 +40,8 @@ public class SubvenueBookings_test {
 		subvenueBookings.systemTeardown();
 	}
 	
-	// / To override for implementation
-	// /------------------------------------------------------
+	/// To override for implementation
+	/// -----------------------------------------------------
 	public MetaTable implementationConstructor() {
 		return (new JStruct()).getMetaTable(tableName);
 	}

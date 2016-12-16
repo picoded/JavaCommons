@@ -20,7 +20,7 @@ import picoded.struct.GenericConvertMap;
 ///
 public class SubvenueBookings {
 	
-	// / Subvenue Bookings metatable
+	/// Subvenue Bookings metatable
 	public MetaTable subvenueBooking = null;
 	
 	// /Subvenue Booking Dates metatable
@@ -32,7 +32,7 @@ public class SubvenueBookings {
 	
 	protected String createdTime = "_createdTime";
 	
-	// / Empty constructor
+	/// Empty constructor
 	public SubvenueBookings() {
 		// Does nothing : manual setup
 	}
@@ -46,10 +46,10 @@ public class SubvenueBookings {
 	}
 	
 	// /
-	// / Setup the standard tables, with the given JStruct
+	/// Setup the standard tables, with the given JStruct
 	// /
-	// / @param The JStruct object to build ontop of
-	// / @param The table name prefix to generate the various meta table
+	/// @param The JStruct object to build ontop of
+	/// @param The table name prefix to generate the various meta table
 	// /
 	public void setupStandardTables(JStruct inStruct, String prefix, String listing) {
 		if (listing == null || listing.length() < 4) {
@@ -62,7 +62,7 @@ public class SubvenueBookings {
 	}
 	
 	// /
-	// / Calls the systemSetup for the underlying MetaTable / AtomicLongMap
+	/// Calls the systemSetup for the underlying MetaTable / AtomicLongMap
 	// /
 	public void systemSetup() {
 		subvenueBooking.systemSetup();
@@ -70,7 +70,7 @@ public class SubvenueBookings {
 	}
 	
 	// /
-	// / Calls the systemSetup for the underlying MetaTable / AtomicLongMap
+	/// Calls the systemSetup for the underlying MetaTable / AtomicLongMap
 	// /
 	public void systemTeardown() {
 		subvenueBooking.systemTeardown();
@@ -84,11 +84,11 @@ public class SubvenueBookings {
 	// ///////////////////////////////////////////////////////////////////////////////////////
 	
 	// /
-	// / Gets a list of products assigned under an id
+	/// Gets a list of products assigned under an id
 	// /
-	// / @param The ownerID/eventID/ID assigned
+	/// @param The ownerID/eventID/ID assigned
 	// /
-	// / @return List of meta objects representing the owner
+	/// @return List of meta objects representing the owner
 	// /
 	public GenericConvertList<MetaObject> getSubvenueBookings_bySubVenueId(String in_subvenueId) {
 		// Sanity check
@@ -157,12 +157,12 @@ public class SubvenueBookings {
 	}
 	
 	// /
-	// / Creates a new subvenue booking
+	/// Creates a new subvenue booking
 	// /
-	// / @param The subvenueID assigned
-	// / @param List of product objects to insert / update
+	/// @param The subvenueID assigned
+	/// @param List of product objects to insert / update
 	// /
-	// / @return a booking MetaObject
+	/// @return a booking MetaObject
 	// /
 	public GenericConvertMap<String, Object> createSubvenueBooking(String subvenueID,
 		String eventID, String venueID, Float paymentAmount, String status) {
@@ -193,11 +193,11 @@ public class SubvenueBookings {
 	// ///////////////////////////////////////////////////////////////////////////////////////
 	
 	// /
-	// / Gets a list of products assigned under an id
+	/// Gets a list of products assigned under an id
 	// /
-	// / @param The ownerID/eventID/ID assigned
+	/// @param The ownerID/eventID/ID assigned
 	// /
-	// / @return List of meta objects representing the owner
+	/// @return List of meta objects representing the owner
 	// /
 	public GenericConvertList<MetaObject> updateSubvenueBookingStatus(String in_subvenueId,
 		String newStatus) {
@@ -223,12 +223,12 @@ public class SubvenueBookings {
 	}
 	
 	// /
-	// / Creates booking slots for a given booking
+	/// Creates booking slots for a given booking
 	// /
-	// / @param The bookingID assigned
-	// / @param List of product objects to insert / update
+	/// @param The bookingID assigned
+	/// @param List of product objects to insert / update
 	// /
-	// / @return List of meta objects representing the owner
+	/// @return List of meta objects representing the owner
 	// /
 	@SuppressWarnings("unchecked")
 	public GenericConvertMap<String, Object> createBookingSlots(String bookingID,

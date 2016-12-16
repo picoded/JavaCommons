@@ -12,12 +12,12 @@ import org.junit.Test;
 import picoded.JStruct.internal.JStruct_MetaTable;
 
 public class AccountObject_test {
-	// / Test object
+	/// Test object
 	public AccountTable accountTable = null;
 	public AccountObject accountObject = null;
 	
-	// / To override for implementation
-	// /------------------------------------------------------
+	/// To override for implementation
+	/// -----------------------------------------------------
 	public AccountTable implementationConstructor() {
 		return (new JStruct()).getAccountTable("test");
 	}
@@ -26,8 +26,8 @@ public class AccountObject_test {
 		return (new JStruct()).getKeyValueMap("test");
 	}
 	
-	// / Setup and sanity test
-	// /------------------------------------------------------
+	/// Setup and sanity test
+	/// -----------------------------------------------------
 	@Before
 	public void setUp() {
 		accountTable = implementationConstructor();

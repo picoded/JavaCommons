@@ -29,17 +29,17 @@ import picoded.security.NxtCrypt;
 
 public class AccountTable_test extends Mockito {
 	
-	// / Test object
+	/// Test object
 	public AccountTable accTableObj = null;
 	
-	// / To override for implementation
-	// /------------------------------------------------------
+	/// To override for implementation
+	/// -----------------------------------------------------
 	public AccountTable implementationConstructor() {
 		return (new JStruct()).getAccountTable("test");
 	}
 	
-	// / Setup and sanity test
-	// /------------------------------------------------------
+	/// Setup and sanity test
+	/// -----------------------------------------------------
 	@Before
 	public void setUp() {
 		accTableObj = implementationConstructor();

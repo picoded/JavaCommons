@@ -25,7 +25,7 @@ public class JStruct_KeyValueMap_test {
 	// Expected exception testing
 	//
 	
-	// / Invalid constructor test
+	/// Invalid constructor test
 	@Test
 	public void invalidConstructor() {
 		new JStruct_KeyValueMap();

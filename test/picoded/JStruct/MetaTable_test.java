@@ -29,17 +29,17 @@ import picoded.struct.CaseInsensitiveHashMap;
 // MetaTable base test class
 public class MetaTable_test {
 	
-	// / Test object
+	/// Test object
 	public MetaTable mtObj = null;
 	
-	// / To override for implementation
-	// /------------------------------------------------------
+	/// To override for implementation
+	/// -----------------------------------------------------
 	public MetaTable implementationConstructor() {
 		return (new JStruct()).getMetaTable("test");
 	}
 	
-	// / Setup and sanity test
-	// /------------------------------------------------------
+	/// Setup and sanity test
+	/// -----------------------------------------------------
 	@Before
 	public void setUp() {
 		mtObj = implementationConstructor();
@@ -127,7 +127,7 @@ public class MetaTable_test {
 		assertEquals(objMap, mtObj.get(guid));
 	}
 	
-	// / Checks if a blank object gets saved
+	/// Checks if a blank object gets saved
 	@Test
 	public void blankObjectSave() {
 		String guid = null;
@@ -190,7 +190,7 @@ public class MetaTable_test {
 	}
 	
 	// /
-	// / An exception occurs, if a query fetch occurs with an empty table
+	/// An exception occurs, if a query fetch occurs with an empty table
 	// /
 	@Test
 	public void issue47_exceptionWhenTableIsEmpty() {
@@ -200,9 +200,9 @@ public class MetaTable_test {
 	}
 	
 	// /
-	// / Bad view index due to inner join instead of left join. Testing.
+	/// Bad view index due to inner join instead of left join. Testing.
 	// /
-	// / AKA: Incomplete object does not appear in view index
+	/// AKA: Incomplete object does not appear in view index
 	// /
 	@Test
 	public void innerJoinFlaw() {
@@ -232,7 +232,7 @@ public class MetaTable_test {
 	}
 	
 	// /
-	// / Handle right outer closign bracket in metatable meta names
+	/// Handle right outer closign bracket in metatable meta names
 	// /
 	@Test
 	public void mssqlOuterBrackerInMetaNameFlaw() {

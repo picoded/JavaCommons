@@ -22,7 +22,7 @@ public class JStructUtils_test extends Mockito {
 	public void tearDown() {
 	}
 	
-	// / Invalid constructor test
+	/// Invalid constructor test
 	@Test(expected = IllegalAccessError.class)
 	public void invalidConstructor() throws Exception {
 		new JStructUtils();

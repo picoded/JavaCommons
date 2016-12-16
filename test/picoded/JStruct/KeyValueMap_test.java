@@ -15,24 +15,21 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.CommonDefaultAcessInterface;
-
 // Test depends
 
 public class KeyValueMap_test {
 	
-	// / Test object
+	/// Test object
 	public KeyValueMap kvmObj = null;
-	CommonDefaultAcessInterface acessInterface = null;
 	
-	// / To override for implementation
-	// /------------------------------------------------------
+	/// To override for implementation
+	/// -----------------------------------------------------
 	public KeyValueMap implementationConstructor() {
 		return (new JStruct()).getKeyValueMap("test");
 	}
 	
-	// / Setup and sanity test
-	// /------------------------------------------------------
+	/// Setup and sanity test
+	/// -----------------------------------------------------
 	@Before
 	public void setUp() {
 		kvmObj = implementationConstructor();
@@ -56,14 +53,14 @@ public class KeyValueMap_test {
 		kvmObj.maintenance();
 	}
 	
-	// / utility
-	// /------------------------------------------------------
+	/// utility
+	/// -----------------------------------------------------
 	public long currentSystemTimeInSeconds() {
 		return (System.currentTimeMillis() / 1000L);
 	}
 	
-	// / basic test
-	// /------------------------------------------------------
+	/// basic test
+	/// -----------------------------------------------------
 	
 	@Test
 	public void simpleHasPutHasGet() throws Exception {
@@ -140,37 +137,6 @@ public class KeyValueMap_test {
 		
 		assertEquals(new HashSet<String>(Arrays.asList(new String[] { "hello", "this" })),
 			kvmObj.getKeys("world"));
-	}
-	
-	// / nonce test
-	// /------------------------------------------------------
-	
-	@Test
-	public void incrementalMaintenanceTest() {
-		acessInterface = new CommonDefaultAcessInterface();
-		for (int i = 0; i < 100; i++) {
-			acessInterface.incrementalMaintenance();
-		}
-		
-	}
-	
-	@Test
-	public void containsKeyTest() {
-		acessInterface = new CommonDefaultAcessInterface();
-		assertNotNull(acessInterface.containsKey("hello"));
-		assertNotNull(acessInterface.containsKey("_oid"));
-	}
-	
-	@Test
-	public void keySetTest() {
-		acessInterface = new CommonDefaultAcessInterface();
-		assertNull(acessInterface.keySet());
-	}
-	
-	@Test
-	public void generateNonceTest() {
-		acessInterface = new CommonDefaultAcessInterface();
-		assertNotNull(acessInterface.generateNonce("hello", 1, "hello".length()));
 	}
 	
 }

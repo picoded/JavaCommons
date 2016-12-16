@@ -108,37 +108,36 @@ public class SimpleShoppingCart_test {
 		assertNotNull(simpleShoppingCart.getCartCookieJSON(null));
 	}
 	
-	@Test
-	public void getCartCookieJSONTest1() throws ServletException {
-		HttpServletRequest request = mock(HttpServletRequest.class);
-		HttpServletResponse response = mock(HttpServletResponse.class);
-		List<String> headerList = new ArrayList<String>();
-		headerList.add("header_1");
-		headerList.add("header_2");
-		when(request.getHeaderNames()).thenReturn(Collections.enumeration(headerList));
-		CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
-		assertNotNull(simpleShoppingCart.getCartCookieJSON(corePageLocal));
-		String[] cookiesArr = new String[] {};
-		Map<String, String[]> _requestCookieMap = new HashMap<String, String[]>();
-		_requestCookieMap.put("shopping-cart", cookiesArr);
-		corePageLocal._requestCookieMap = _requestCookieMap;
-		assertNotNull(simpleShoppingCart.getCartCookieJSON(corePageLocal));
-		cookiesArr = new String[] { "item1", "item2", "item2", "item4" };
-		_requestCookieMap.put("shopping-cart", cookiesArr);
-		corePageLocal._requestCookieMap = _requestCookieMap;
-		String updateJson = null;
-		assertNotNull(updateJson = simpleShoppingCart.getCartCookieJSON(corePageLocal));
-		simpleShoppingCart.setCartCookieJSON(corePageLocal, updateJson);
-		simpleShoppingCart.setCartCookieJSON(corePageLocal, "item5");
-		assertNotNull(simpleShoppingCart.getCartList(corePageLocal, true));
-		assertNotNull(simpleShoppingCart.getCartList(corePageLocal, false));
-		String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
-		GenericConvertList<List<Object>> testCart = GenericConvert.toGenericConvertList(testJSON,
-			new ArrayList<Object>());
-		assertNotNull(simpleShoppingCart.updateCartList(corePageLocal, testCart, true));
-		assertNotNull(simpleShoppingCart.updateCartList(corePageLocal, null, false));
-		
-	}
+	// @Test
+	// public void getCartCookieJSONTest1() throws ServletException {
+	// 	HttpServletRequest request = mock(HttpServletRequest.class);
+	// 	HttpServletResponse response = mock(HttpServletResponse.class);
+	// 	List<String> headerList = new ArrayList<String>();
+	// 	headerList.add("header_1");
+	// 	headerList.add("header_2");
+	// 	when(request.getHeaderNames()).thenReturn(Collections.enumeration(headerList));
+	// 	CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
+	// 	assertNotNull(simpleShoppingCart.getCartCookieJSON(corePageLocal));
+	// 	String[] cookiesArr = new String[] {};
+	// 	Map<String, String[]> _requestCookieMap = new HashMap<String, String[]>();
+	// 	_requestCookieMap.put("shopping-cart", cookiesArr);
+	// 	corePageLocal._requestCookieMap = _requestCookieMap;
+	// 	assertNotNull(simpleShoppingCart.getCartCookieJSON(corePageLocal));
+	// 	cookiesArr = new String[] { "item1", "item2", "item2", "item4" };
+	// 	_requestCookieMap.put("shopping-cart", cookiesArr);
+	// 	corePageLocal._requestCookieMap = _requestCookieMap;
+	// 	String updateJson = null;
+	// 	assertNotNull(updateJson = simpleShoppingCart.getCartCookieJSON(corePageLocal));
+	// 	simpleShoppingCart.setCartCookieJSON(corePageLocal, updateJson);
+	// 	simpleShoppingCart.setCartCookieJSON(corePageLocal, "item5");
+	// 	assertNotNull(simpleShoppingCart.getCartList(corePageLocal, true));
+	// 	assertNotNull(simpleShoppingCart.getCartList(corePageLocal, false));
+	// 	String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
+	// 	GenericConvertList<List<Object>> testCart = GenericConvert.toGenericConvertList(testJSON,
+	// 		new ArrayList<Object>());
+	// 	assertNotNull(simpleShoppingCart.updateCartList(corePageLocal, testCart, true));
+	// 	assertNotNull(simpleShoppingCart.updateCartList(corePageLocal, null, false));
+	// }
 	
 	@Test
 	public void cartListToCookieJSONTest() {
@@ -186,24 +185,24 @@ public class SimpleShoppingCart_test {
 		assertNotNull(simpleShoppingCart.mergeCartList(testCart, testCart1, false));
 	}
 	
-	@Test(expected = Exception.class)
-	public void replaceCartListTest() throws Exception {
-		HttpServletRequest request = mock(HttpServletRequest.class);
-		HttpServletResponse response = mock(HttpServletResponse.class);
-		List<String> headerList = new ArrayList<String>();
-		headerList.add("header_1");
-		headerList.add("header_2");
-		when(request.getHeaderNames()).thenReturn(Collections.enumeration(headerList));
-		CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
-		
-		String testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
-		GenericConvertList<List<Object>> cartList = GenericConvert.toGenericConvertList(testJSON,
-			new ArrayList<Object>());
-		for (int i = 0; i < 52; i++) {
-			cartList.add(GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>()));
-		}
-		assertNotNull(simpleShoppingCart.replaceCartList(corePageLocal, cartList, true));
-	}
+	// @Test(expected = Exception.class)
+	// public void replaceCartListTest() throws Exception {
+	// 	HttpServletRequest request = mock(HttpServletRequest.class);
+	// 	HttpServletResponse response = mock(HttpServletResponse.class);
+	// 	List<String> headerList = new ArrayList<String>();
+	// 	headerList.add("header_1");
+	// 	headerList.add("header_2");
+	// 	when(request.getHeaderNames()).thenReturn(Collections.enumeration(headerList));
+	// 	CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
+	// 	
+	// 	String testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
+	// 	GenericConvertList<List<Object>> cartList = GenericConvert.toGenericConvertList(testJSON,
+	// 		new ArrayList<Object>());
+	// 	for (int i = 0; i < 52; i++) {
+	// 		cartList.add(GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>()));
+	// 	}
+	// 	assertNotNull(simpleShoppingCart.replaceCartList(corePageLocal, cartList, true));
+	// }
 	
 	@Test(expected = Exception.class)
 	public void updateProductListTest() throws Exception {

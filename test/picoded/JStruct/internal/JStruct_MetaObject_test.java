@@ -29,8 +29,8 @@ public class JStruct_MetaObject_test {
 		
 	}
 	
-	// / To override for implementation
-	// /------------------------------------------------------
+	/// To override for implementation
+	/// -----------------------------------------------------
 	public MetaTable implementationConstructor() {
 		return (new JStruct()).getMetaTable("test");
 	}

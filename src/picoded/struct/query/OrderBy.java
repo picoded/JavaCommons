@@ -1,17 +1,21 @@
 package picoded.struct.query;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Locale;
 
 import picoded.struct.MutablePair;
 import picoded.struct.query.internal.QueryUtils;
 
 /// Utility class that provides SQL styel OrderBy functionality
 /// to sort object collection lists
-public class OrderBy<T> implements Comparator<T> {
+public class OrderBy<T> implements Comparator<T>, Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	//
 	// Constructor setup
@@ -52,7 +56,7 @@ public class OrderBy<T> implements Comparator<T> {
 			
 			// Check for DESC / ASC suffix
 			if (orderSet.length() > 4) {
-				String lowerCaseOrderSet = orderSet.toLowerCase();
+				String lowerCaseOrderSet = orderSet.toLowerCase(Locale.ENGLISH);
 				if (lowerCaseOrderSet.endsWith(" desc")) {
 					ot = OrderBy.OrderType.DESC;
 					orderSet = orderSet.substring(0, orderSet.length() - 5).trim();
@@ -81,6 +85,7 @@ public class OrderBy<T> implements Comparator<T> {
 	///
 	/// @returns    the SQL orderby query string
 	///
+	@Override
 	public String toString() {
 		StringBuilder ret = new StringBuilder();
 		
@@ -152,6 +157,7 @@ public class OrderBy<T> implements Comparator<T> {
 	///
 	/// @returns -1, 0, or 1 as the first argument is less than, equal to, or greater than the second.
 	///
+	@Override
 	public int compare(T o1, T o2) {
 		
 		/// Scan and compare, and return the differences
@@ -169,9 +175,9 @@ public class OrderBy<T> implements Comparator<T> {
 			// Return its value / flipped value
 			if (comparePair.getRight() == OrderType.ASC) {
 				return diff;
-			} else {
-				return -diff;
-			}
+			} //else {
+			return -diff;
+			//}
 		}
 		
 		return CompareUtils.dynamicCompare(o1, o2); //fallback

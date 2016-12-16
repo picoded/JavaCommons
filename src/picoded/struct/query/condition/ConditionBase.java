@@ -103,7 +103,7 @@ public class ConditionBase implements Query {
 		
 		// Allow operation across all key / val mappings, wildcard search
 		if (t instanceof Map) {
-			if (_fieldName.equalsIgnoreCase("key")) {
+			if ("key".equalsIgnoreCase(_fieldName)) {
 				
 				// Test against all the key values
 				for (Map.Entry<Object, Object> e : ((Map<Object, Object>) t).entrySet()) {
@@ -114,7 +114,7 @@ public class ConditionBase implements Query {
 				
 				// Failed to find any key
 				return false;
-			} else if (_fieldName.equalsIgnoreCase("val")) {
+			} else if ("val".equalsIgnoreCase(_fieldName)) {
 				
 				// Test against all the stored values
 				for (Map.Entry<Object, Object> e : ((Map<Object, Object>) t).entrySet()) {
@@ -142,6 +142,7 @@ public class ConditionBase implements Query {
 	/// @param   the object to test against
 	///
 	/// @returns  boolean indicating true / false
+	@Override
 	public boolean test(Object t) {
 		return getAndTestFieldValue(t, _argMap);
 	}
@@ -155,6 +156,7 @@ public class ConditionBase implements Query {
 	/// @param   the argument map, if applicable
 	///
 	/// @returns  boolean indicating true / false
+	@Override
 	public boolean test(Object t, Map<String, Object> argMap) {
 		return getAndTestFieldValue(t, argMap);
 	}
@@ -164,6 +166,7 @@ public class ConditionBase implements Query {
 	//--------------------------------------------------------------------
 	
 	/// Indicates if its a basic operator
+	@Override
 	public boolean isBasicOperator() {
 		return true;
 	}
@@ -171,21 +174,25 @@ public class ConditionBase implements Query {
 	/// Gets the query type
 	///
 	/// [to override on extension]
+	@Override
 	public QueryType type() {
 		return QueryType.EQUALS;
 	}
 	
 	/// Gets the field name
+	@Override
 	public String fieldName() {
 		return _fieldName;
 	}
 	
 	/// Gets the argument name
+	@Override
 	public String argumentName() {
 		return _argName;
 	}
 	
 	/// Gets the default argument map
+	@Override
 	public Map<String, Object> defaultArgumentMap() {
 		return _argMap;
 	}
@@ -197,11 +204,13 @@ public class ConditionBase implements Query {
 	/// The operator symbol support
 	///
 	/// [to override on extension]
+	@Override
 	public String operatorSymbol() {
 		return "=";
 	}
 	
 	/// The query string
+	@Override
 	public String toString() {
 		return "\"" + fieldName() + "\" " + operatorSymbol() + " " + ":" + argumentName();
 	}
@@ -211,6 +220,7 @@ public class ConditionBase implements Query {
 	//--------------------------------------------------------------------
 	
 	/// Extract out the respective query keys, and values
+	@Override
 	public Map<String, List<Object>> keyValuesMap(Map<String, List<Object>> mapToReturn) {
 		String key = _fieldName;
 		Object val = (_argMap != null) ? _argMap.get(_argName) : null;

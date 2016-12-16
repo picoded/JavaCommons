@@ -36,17 +36,19 @@ public class LessThanOrEquals extends ConditionBase {
 	///
 	/// @returns  boolean indicating success or failure
 	///
+	@Override
 	protected boolean testValues(Object fieldValue, Object argValue) {
 		if (argValue == null || fieldValue == null) {
 			return false;
-		} else {
-			return CompareUtils.dynamicCompare(fieldValue, argValue) <= 0;
-		}
+		} //else {
+		return CompareUtils.dynamicCompare(fieldValue, argValue) <= 0;
+		//}
 	}
 	
 	/// The operator symbol support
 	///
 	/// [to override on extension]
+	@Override
 	public String operatorSymbol() {
 		return "<=";
 	}
@@ -54,6 +56,7 @@ public class LessThanOrEquals extends ConditionBase {
 	/// Gets the query type 
 	///
 	/// [to override on extension]
+	@Override
 	public QueryType type() {
 		return QueryType.LESS_THAN_OR_EQUALS;
 	}

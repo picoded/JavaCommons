@@ -43,14 +43,15 @@ public class Or extends CombinationBase {
 	/// @param   the argument map, if applicable
 	///
 	/// @returns  boolean indicating true / false
+	@Override
 	public boolean test(Object t, Map<String, Object> argMap) {
 		
 		for (Query child : _children) {
 			if (child.test(t, argMap)) {
 				return true; //succeds on first success
-			} else {
-				// wait till success
-			}
+			} //else {
+			  // wait till success
+			  //}
 		}
 		
 		return false;
@@ -59,6 +60,7 @@ public class Or extends CombinationBase {
 	/// Gets the query type 
 	///
 	/// [to override on extension]
+	@Override
 	public QueryType type() {
 		return QueryType.OR;
 	}
@@ -66,6 +68,7 @@ public class Or extends CombinationBase {
 	/// The operator symbol support
 	///
 	/// [to override on extension]
+	@Override
 	public String operatorSymbol() {
 		return "OR";
 	}

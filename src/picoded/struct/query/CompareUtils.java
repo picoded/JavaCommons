@@ -13,6 +13,10 @@ import java.util.regex.Pattern;
 /// Which can be used to create more complex Comperator, or used on its own
 public class CompareUtils {
 	
+	protected CompareUtils() {
+		throw new IllegalAccessError("Utility class");
+	}
+	
 	//
 	// Static comparators in use
 	//-----------------------------------------------------------------
@@ -31,9 +35,9 @@ public class CompareUtils {
 			// Both equals
 			if (o2 == null) {
 				return 0;
-			} else { //o2 has value, therefor o1 is smaller
-				return -1;
-			}
+			} //else { //o2 has value, therefor o1 is smaller
+			return -1;
+			//}
 		} else if (o2 == null) { //o1 has value, therefor o1 is larger
 			return 1;
 		}
@@ -55,9 +59,9 @@ public class CompareUtils {
 			// Both equals
 			if (o2 == null) {
 				return 0;
-			} else { //o2 has value, therefor o1 is smaller
-				return -1;
-			}
+			} //else { //o2 has value, therefor o1 is smaller
+			return -1;
+			//}
 		} else if (o2 == null) { //o1 has value, therefor o1 is larger
 			return 1;
 		}
@@ -82,25 +86,14 @@ public class CompareUtils {
 			// Both equals
 			if (o2 == null) {
 				return 0;
-			} else { //o2 has value, therefor o1 is smaller
-				return -1;
-			}
+			} //else { //o2 has value, therefor o1 is smaller
+			return -1;
+			//}
 		} else if (o2 == null) { //o1 has value, therefor o1 is larger
 			return 1;
 		}
 		
-		double d1 = o1.doubleValue();
-		double d2 = o2.doubleValue();
-		
-		if (d1 == d2) {
-			return 0;
-		} else if (d1 < d2) {
-			return -1;
-		} else if (d1 > d2) {
-			return 1;
-		}
-		
-		throw new RuntimeException("Unexpected numericCompare termination");
+		return Double.compare(o1.doubleValue(), o2.doubleValue());
 	}
 	
 	///
@@ -114,8 +107,9 @@ public class CompareUtils {
 		
 		// String type comparision
 		if ( // 
-		(o1 instanceof String) && (o2 instanceof String || o2 == null) || //
-			(o2 instanceof String) && o1 == null //
+		(o1 instanceof String && o2 instanceof String) || //
+			(o1 instanceof String && o2 == null) || //
+			(o2 instanceof String && o1 == null) //
 		) {
 			return stringCompare( //
 				(o1 != null) ? o1.toString() : null, //
@@ -128,10 +122,7 @@ public class CompareUtils {
 		Number n2 = objectToNumberIfPossible(o2);
 		
 		// Tries to numeric compare
-		if ( //
-		(n1 != null && (n2 != null || o2 == null)) || //
-			n2 != null && o1 == null //
-		) { //
+		if (!(n1 == null && n2 == null)) { //
 			return numericCompare(n1, n2);
 		}
 		
@@ -181,9 +172,9 @@ public class CompareUtils {
 			// Both equals
 			if (o2 == null) {
 				return 0;
-			} else { //o2 has value, therefor o1 is smaller
-				return -1;
-			}
+			} //else { //o2 has value, therefor o1 is smaller
+			return -1;
+			//}
 		} else if (o2 == null) { //o1 has value, therefor o1 is larger
 			return 1;
 		}

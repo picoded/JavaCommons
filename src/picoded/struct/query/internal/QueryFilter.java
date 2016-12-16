@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 
 import picoded.struct.MutablePair;
 import picoded.struct.query.Query;
@@ -49,6 +50,10 @@ import picoded.struct.query.condition.Or;
 ///
 public class QueryFilter {
 	
+	protected QueryFilter() {
+		throw new IllegalAccessError("Utility class");
+	}
+	
 	//---------------------------------
 	//
 	// String processors
@@ -69,13 +74,13 @@ public class QueryFilter {
 		int strPos = 0;
 		
 		String resString = query;
-		while ((strPos = resString.indexOf("?")) >= 0) {
-			resString = (resString.substring(0, strPos) + ":" + queryCount + resString
-				.substring(strPos + 1));
+		while ((strPos = resString.indexOf('?')) >= 0) {
+			resString = resString.substring(0, strPos) + ":" + queryCount
+				+ resString.substring(strPos + 1);
 			++queryCount;
 		}
 		
-		return new MutablePair<String, Integer>(resString, new Integer(queryCount));
+		return new MutablePair<String, Integer>(resString, queryCount);
 	}
 	
 	/// Converts the argument array to its named map format
@@ -92,7 +97,7 @@ public class QueryFilter {
 		
 		if (argArr != null && argArr.length > 0) {
 			for (int a = 0; a < argArr.length; ++a) {
-				baseMap.put("" + a, argArr[a]);
+				baseMap.put(Integer.toString(a), argArr[a]);
 			}
 		}
 		
@@ -211,11 +216,11 @@ public class QueryFilter {
 	//
 	
 	/// Basic query operator tokens to search for
-	public static List<String> basicOperators = Arrays.asList(new String[] { //
+	protected static List<String> basicOperators = Arrays.asList(new String[] { //
 		"=", "<", ">", "<=", ">=", "LIKE", "!=" }); //
 	
 	/// Extended query tokens to search for
-	public static List<String> combinationOperators = Arrays.asList(new String[] { //
+	protected static List<String> combinationOperators = Arrays.asList(new String[] { //
 		"AND", "OR", "NOT" }); //
 	
 	/// Extract out the string, and build the basic query
@@ -271,27 +276,27 @@ public class QueryFilter {
 		if (namedParam == null || !namedParam.startsWith(":")) {
 			throw new RuntimeException("Unexpected named parameter set: " + before + " " + operator
 				+ " " + after);
-		} else {
-			namedParam = namedParam.substring(1);
-		}
+		} //else {
+		namedParam = namedParam.substring(1);
+		//}
 		
-		if (operator.equals("=")) {
+		if ("=".equals(operator)) {
 			return new Equals(field, namedParam, paramsMap);
 			
-		} else if (operator.equals("<")) {
+		} else if ("<".equals(operator)) {
 			return new LessThan(field, namedParam, paramsMap);
 			
-		} else if (operator.equals("<=")) {
+		} else if ("<=".equals(operator)) {
 			return new LessThanOrEquals(field, namedParam, paramsMap);
 			
-		} else if (operator.equals(">")) {
+		} else if (">".equals(operator)) {
 			return new MoreThan(field, namedParam, paramsMap);
 			
-		} else if (operator.equals(">=")) {
+		} else if (">=".equals(operator)) {
 			return new MoreThanOrEquals(field, namedParam, paramsMap);
-		} else if (operator.equals("LIKE")) {
+		} else if ("LIKE".equals(operator)) {
 			return new Like(field, namedParam, paramsMap);
-		} else if (operator.equals("!=")) {
+		} else if ("!=".equals(operator)) {
 			return new NotEquals(field, namedParam, paramsMap);
 		}
 		
@@ -313,7 +318,7 @@ public class QueryFilter {
 		
 		// Gets the start and end
 		int start = -1;
-		int end = -1;
+		//int end = -1;
 		
 		//System.out.println(queryTokens.toString());
 		
@@ -326,14 +331,14 @@ public class QueryFilter {
 				continue;
 			}
 			
-			if (token.equals("(")) {
+			if ("(".equals(token)) {
 				start = a;
-			} else if (token.equals(")")) {
+			} else if (")".equals(token)) {
 				if (start == -1) {
 					throw new RuntimeException("Found closing bracket ')' without opening bracket");
-				} else {
-					return new int[] { start, a };
-				}
+				} //else {
+				return new int[] { start, a };
+				//}
 			}
 		}
 		
@@ -357,11 +362,11 @@ public class QueryFilter {
 	/// @returns  The combined query
 	public static Query combinationQuery(String combinationType, List<Query> childQuery,
 		Map<String, Object> paramsMap) {
-		if (combinationType.equals("AND")) {
+		if ("AND".equals(combinationType)) {
 			return new And(childQuery, paramsMap);
-		} else if (combinationType.equals("OR")) {
+		} else if ("OR".equals(combinationType)) {
 			return new Or(childQuery, paramsMap);
-		} else if (combinationType.equals("NOT")) {
+		} else if ("NOT".equals(combinationType)) {
 			return new Not(childQuery, paramsMap);
 		}
 		
@@ -392,7 +397,7 @@ public class QueryFilter {
 			if (singleToken instanceof Query) {
 				childList.add((Query) singleToken);
 			} else if (singleToken instanceof String) {
-				String op = singleToken.toString().toUpperCase();
+				String op = singleToken.toString().toUpperCase(Locale.ENGLISH);
 				
 				if (!(combinationOperators.contains(op))) {
 					throw new RuntimeException("Unable to process combination token: " + op);
@@ -413,7 +418,7 @@ public class QueryFilter {
 				List<Object> subList = new ArrayList<Object>();
 				
 				// Check child list
-				if (childList.size() <= 0) {
+				if (childList.isEmpty()) {
 					throw new RuntimeException("Unexpected blank child list: " + childList);
 				}
 				
@@ -432,21 +437,22 @@ public class QueryFilter {
 		}
 		
 		if (combinationType == null) {
-			
-			// Empty token handling
-			if (tokens == null || tokens.size() == 0) {
-				if (childList == null || childList.size() == 0) {
-					throw new RuntimeException("Missing combination token: Empty tokens and child list");
-				}
-				
-				// Single nested child, promote it
-				if (childList.size() == 1) {
-					return childList.get(0);
-				} else {
-					return combinationQuery("AND", childList, paramMap);
-				}
-			}
-			throw new RuntimeException("Missing combination token: " + tokens);
+			return processCombinationType(tokens, paramMap, childList);
+			//			
+			//			// Empty token handling
+			//			if (tokens == null || tokens.isEmpty()) {
+			//				if (childList == null || childList.isEmpty()) {
+			//					throw new RuntimeException("Missing combination token: Empty tokens and child list");
+			//				}
+			//				
+			//				// Single nested child, promote it
+			//				if (childList.size() == 1) {
+			//					return childList.get(0);
+			//				} //else {
+			//					return combinationQuery("AND", childList, paramMap);
+			//				//}
+			//			}
+			//			throw new RuntimeException("Missing combination token: " + tokens);
 		}
 		
 		return combinationQuery(combinationType, childList, paramMap);
@@ -519,5 +525,23 @@ public class QueryFilter {
 		String[] querySplit = splitRefactoredQuery(refac.getLeft());
 		List<Object> tokenArr = buildBasicQuery(querySplit, refac.getRight());
 		return collapseQueryTokens(tokenArr, refac.getRight());
+	}
+	
+	protected static Query processCombinationType(List<Object> tokens, Map<String, Object> paramMap,
+		List<Query> childList) {
+		// Empty token handling
+		if (tokens == null || tokens.isEmpty()) {
+			if (childList == null || childList.isEmpty()) {
+				throw new RuntimeException("Missing combination token: Empty tokens and child list");
+			}
+			
+			// Single nested child, promote it
+			if (childList.size() == 1) {
+				return childList.get(0);
+			} //else {
+			return combinationQuery("AND", childList, paramMap);
+			//}
+		}
+		throw new RuntimeException("Missing combination token: " + tokens);
 	}
 }

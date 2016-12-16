@@ -67,6 +67,7 @@ public class CombinationBase implements Query {
 	/// @param   the object to test against
 	///
 	/// @returns  boolean indicating true / false
+	@Override
 	public boolean test(Object t) {
 		return test(t, _argMap);
 	}
@@ -82,6 +83,7 @@ public class CombinationBase implements Query {
 	/// @param   the argument map, if applicable
 	///
 	/// @returns  boolean indicating true / false
+	@Override
 	public boolean test(Object t, Map<String, Object> argMap) {
 		boolean result = false; //blank combination is a failure
 		
@@ -101,6 +103,7 @@ public class CombinationBase implements Query {
 	//--------------------------------------------------------------------
 	
 	/// Indicates if its a basic operator 
+	@Override
 	public boolean isCombinationOperator() {
 		return true;
 	}
@@ -108,11 +111,13 @@ public class CombinationBase implements Query {
 	/// Gets the query type 
 	///
 	/// [to override on extension]
+	@Override
 	public QueryType type() {
 		return QueryType.AND;
 	}
 	
 	/// Gets the children conditions
+	@Override
 	public List<Query> childrenQuery() {
 		return _children;
 	}
@@ -122,11 +127,13 @@ public class CombinationBase implements Query {
 	//--------------------------------------------------------------------
 	
 	/// The operator symbol support
+	@Override
 	public String operatorSymbol() {
 		return "AND";
 	}
 	
 	/// The query string
+	@Override
 	public String toString() {
 		StringBuilder ret = new StringBuilder();
 		
@@ -153,7 +160,7 @@ public class CombinationBase implements Query {
 			++iteration;
 		}
 		
-		if (iteration == 1 && !(operatorSymbol().equals("AND"))) {
+		if (iteration == 1 && !("AND".equals(operatorSymbol()))) {
 			String retStr = ret.toString();
 			
 			if (retStr.startsWith("(")) {
@@ -170,6 +177,7 @@ public class CombinationBase implements Query {
 	//--------------------------------------------------------------------
 	
 	/// Extract out the respective query keys, and values
+	@Override
 	public Map<String, List<Object>> keyValuesMap(Map<String, List<Object>> mapToReturn) {
 		for (Query child : childrenQuery()) {
 			mapToReturn = child.keyValuesMap(mapToReturn);

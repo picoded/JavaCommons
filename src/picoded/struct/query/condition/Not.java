@@ -33,15 +33,16 @@ public class Not extends CombinationBase {
 	/// @param   the argument map, if applicable
 	///
 	/// @returns  boolean indicating true / false
+	@Override
 	public boolean test(Object t, Map<String, Object> argMap) {
 		boolean result = false; //blank combination is a failure
 		
 		for (Query child : _children) {
 			if (child.test(t, argMap)) {
 				return false; //breaks and return false on first failure
-			} else {
-				result = true;
-			}
+			} //else {
+			result = true;
+			//}
 		}
 		
 		return result;
@@ -50,6 +51,7 @@ public class Not extends CombinationBase {
 	/// Gets the query type 
 	///
 	/// [to override on extension]
+	@Override
 	public QueryType type() {
 		return QueryType.NOT;
 	}
@@ -57,6 +59,7 @@ public class Not extends CombinationBase {
 	/// The operator symbol support
 	///
 	/// [to override on extension]
+	@Override
 	public String operatorSymbol() {
 		return "NOT";
 	}

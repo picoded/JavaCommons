@@ -6,6 +6,10 @@ import java.util.Map;
 
 public class QueryUtils {
 	
+	protected QueryUtils() {
+		throw new IllegalAccessError("Utility class");
+	}
+	
 	///
 	/// Gets the field value to test
 	///
@@ -18,7 +22,7 @@ public class QueryUtils {
 	///
 	@SuppressWarnings("rawtypes")
 	public static Object getFieldValue(Object t, String field) {
-		if (field == null || field.toString().equalsIgnoreCase("this")) {
+		if (field == null || "this".equalsIgnoreCase(field)) {
 			return t;
 		} else if (t instanceof Map) {
 			return ((Map) t).get(field);
@@ -49,36 +53,44 @@ public class QueryUtils {
 	// 
 	//--------------------------------------------------------------------
 	
+	///
+	/// Normalizes a Number object as a double
+	///
+	/// @returns Double object 
+	///
 	public static Double normalizeNumber(Object number) {
 		Double val = null;
 		if (number instanceof Integer) {
-			val = (Double) ((Integer) number * 1.0);
+			val = (Integer) number * 1.0;
 		} else if (number instanceof Float) {
-			val = (Double) ((Float) number * 1.0);
+			val = (Float) number * 1.0;
 		} else if (number instanceof Double) {
 			val = (Double) number;
 		}
 		return val;
 	}
 	
-	//returns String only, and ONLY if it should be compared as a string
-	//if its a number, will return as a double
+	///
+	/// returns String only, and ONLY if it should be compared as a string
+	/// if its a number, will return as a double
+	///
+	/// @returns String / Double object 
+	///
 	public static Object normalizeObject(Object source) {
 		if (source instanceof String) {
-			if (((String) source).matches("[0-9]+") || ((String) source).contains(".")) { //extremely rudimentary check for a number, needs to be improved
+			// extremely rudimentary check for a number, needs to be improved
+			if (((String) source).matches("[0-9]+") || ((String) source).contains(".")) {
 				try {
 					Number sourceAsNumber = NumberFormat.getNumberInstance(Locale.ENGLISH).parse(
 						(String) source);
-					Double sourceAsDouble = sourceAsNumber.doubleValue();
-					return sourceAsDouble;
+					return sourceAsNumber.doubleValue();
 				} catch (Exception ex) {
 					throw new RuntimeException("exception in normalizeObject-> " + ex.getMessage());
 				}
-			} else {
-				return (String) source;
 			}
-		} else {
-			return normalizeNumber(source);
+			// Return as string
+			return source;
 		}
+		return normalizeNumber(source);
 	}
 }

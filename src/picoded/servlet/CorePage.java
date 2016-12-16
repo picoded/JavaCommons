@@ -178,7 +178,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	}
 	
 	/// The requested cookie map, either set at startup or extracted from httpRequest
-	public Map<String, String[]> _requestCookieMap = null;
+	protected Map<String, String[]> _requestCookieMap = null;
 	
 	/// Gets and returns the requestCookieMap
 	public Map<String, String[]> requestCookieMap() {
@@ -364,7 +364,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	}
 	
 	/// Setup the instance, with http request & response
-	public CorePage setupInstance(HttpRequestType inRequestType, HttpServletRequest req,
+	protected CorePage setupInstance(HttpRequestType inRequestType, HttpServletRequest req,
 		HttpServletResponse res) throws ServletException {
 		requestType = inRequestType;
 		httpRequest = req;
@@ -554,7 +554,6 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	}
 	
 	/// The process chain part specific to a normal request
-	@SuppressWarnings("incomplete-switch")
 	private boolean processChainRequest() throws Exception {
 		try {
 			// Does authentication check
@@ -598,7 +597,6 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	}
 	
 	/// The process chain part specific to JSON request
-	@SuppressWarnings("incomplete-switch")
 	private boolean processChainJSON() throws Exception {
 		try {
 			// Does authentication check

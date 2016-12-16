@@ -11,7 +11,7 @@ import picoded.JStruct.MetaTable;
 import picoded.conv.ConvertJSON;
 /// Picoded imports
 import picoded.conv.GUID;
-import picoded.enums.ObjectTokens;
+import picoded.enums.ObjectToken;
 
 /// Represents a single object node in the MetaTable collection.
 ///
@@ -34,7 +34,7 @@ public class JStruct_MetaObject implements MetaObject {
 	// / GUID used for the object
 	protected String _oid = null;
 	
-	// / Written changes, note that picoded.enums.ObjectTokens.NULL is used
+	// / Written changes, note that picoded.enums.ObjectToken.NULL is used
 	// / as a pesudo null value (remove)
 	protected Map<String, Object> deltaDataMap = new HashMap<String, Object>();
 	
@@ -137,7 +137,7 @@ public class JStruct_MetaObject implements MetaObject {
 		ensureCompleteRemoteDataMap();
 		for (Entry<String, Object> entry : deltaDataMap.entrySet()) {
 			Object val = deltaDataMap.get(entry.getKey());
-			if (val == null || val.equals(ObjectTokens.NULL)) {
+			if (val == null || val.equals(ObjectToken.NULL)) {
 				remoteDataMap.remove(entry.getKey());
 			} else {
 				remoteDataMap.put(entry.getKey(), val);
@@ -229,7 +229,7 @@ public class JStruct_MetaObject implements MetaObject {
 		}
 		
 		// Return null value
-		if (ret != null && ret.equals(ObjectTokens.NULL)) {
+		if (ret != null && ret.equals(ObjectToken.NULL)) {
 			return ret;
 		}
 		return ret;
@@ -241,7 +241,7 @@ public class JStruct_MetaObject implements MetaObject {
 		Object ret = get(key);
 		
 		// Object token null, cleared as null
-		if (ret != null && ret.equals(ObjectTokens.NULL)) {
+		if (ret != null && ret.equals(ObjectToken.NULL)) {
 			ret = null;
 		}
 		
@@ -258,7 +258,7 @@ public class JStruct_MetaObject implements MetaObject {
 			return ret;
 		}
 		if (value == null) {
-			deltaDataMap.put(key, ObjectTokens.NULL);
+			deltaDataMap.put(key, ObjectToken.NULL);
 		} else {
 			deltaDataMap.put(key, value);
 		}
@@ -283,7 +283,7 @@ public class JStruct_MetaObject implements MetaObject {
 				continue;
 			}
 			
-			if (get(key) != null && !get(key).equals(ObjectTokens.NULL)) {
+			if (get(key) != null && !get(key).equals(ObjectToken.NULL)) {
 				retSet.add(key);
 			}
 		}

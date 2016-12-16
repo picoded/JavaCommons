@@ -22,7 +22,6 @@ import java.util.UUID;
 /// 
 /// @see GenericConvert 
 ///
-@SuppressWarnings("all")
 class GenericConvertStandard extends GenericConvertPrimitive {
 	
 	/// Invalid constructor (throws exception)

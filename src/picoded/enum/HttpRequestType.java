@@ -43,7 +43,6 @@ public enum HttpRequestType {
 	}
 	
 	/// Enum to byte serialization
-	@SuppressWarnings("incomplete-switch")
 	public static byte enumToByte(HttpRequestType val) {
 		switch (val) {
 		case GET:

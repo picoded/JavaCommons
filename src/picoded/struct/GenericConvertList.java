@@ -6,7 +6,6 @@ import java.util.UUID;
 import picoded.conv.GenericConvert;
 
 /// Common list class, used to implement all the generic convert convinence functions in a map interface
-@SuppressWarnings("all")
 public interface GenericConvertList<E> extends UnsupportedDefaultList<E> {
 	
 	// Static proxy build

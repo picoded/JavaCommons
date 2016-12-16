@@ -11,7 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.enums.ObjectTokens;
+import picoded.enums.ObjectToken;
 
 public class JStruct_MetaTable_test {
 	JStruct_MetaTable jStruct_MetaTable = null;
@@ -48,7 +48,7 @@ public class JStruct_MetaTable_test {
 	public void metaObjectRemoteDataMap_update() {
 		Map<String, Object> fullMap = new HashMap<String, Object>();
 		jStruct_MetaTable.metaObjectRemoteDataMap_update("str", fullMap, null);
-		fullMap.put("test", ObjectTokens.NULL);
+		fullMap.put("test", ObjectToken.NULL);
 		fullMap.put("test1", null);
 		Set<String> keys = new HashSet<String>();
 		keys.add("test");

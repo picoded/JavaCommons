@@ -14,7 +14,7 @@ import org.junit.Test;
 import picoded.JStruct.JStruct;
 import picoded.JStruct.MetaTable;
 import picoded.conv.GUID;
-import picoded.enums.ObjectTokens;
+import picoded.enums.ObjectToken;
 
 public class JStruct_MetaObject_test {
 	JStruct_MetaObject jStruct_MetaObject = null;
@@ -81,9 +81,9 @@ public class JStruct_MetaObject_test {
 	public void putTest() {
 		Map<String, Object> deltaDataMap = new HashMap<String, Object>();
 		Object object = null;
-		deltaDataMap.put("key4", ObjectTokens.NULL);
+		deltaDataMap.put("key4", ObjectToken.NULL);
 		jStruct_MetaObject.deltaDataMap = deltaDataMap;
-		assertNull(jStruct_MetaObject.put("key4", ObjectTokens.NULL));
+		assertNull(jStruct_MetaObject.put("key4", ObjectToken.NULL));
 		deltaDataMap = new HashMap<String, Object>();
 		
 		deltaDataMap.put("key5", object = new Object());
@@ -158,10 +158,10 @@ public class JStruct_MetaObject_test {
 		Map<String, Object> remoteDataMap = new HashMap<String, Object>();
 		deltaDataMap.put("key", "value");
 		deltaDataMap.put("key1", null);
-		deltaDataMap.put("key2", ObjectTokens.NULL);
+		deltaDataMap.put("key2", ObjectToken.NULL);
 		remoteDataMap.put("key", "value");
 		remoteDataMap.put("key1", null);
-		remoteDataMap.put("key2", ObjectTokens.NULL);
+		remoteDataMap.put("key2", ObjectToken.NULL);
 		jStruct_MetaObject.deltaDataMap = deltaDataMap;
 		jStruct_MetaObject.remoteDataMap = remoteDataMap;
 		assertNotNull(jStruct_MetaObject.keySet());

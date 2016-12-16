@@ -7,7 +7,6 @@ import picoded.JStruct.JStruct;
 import picoded.JStruct.MetaObject;
 import picoded.JStruct.MetaTable;
 import picoded.struct.GenericConvertList;
-import picoded.struct.GenericConvertMap;
 /// Picoded imports
 
 ///
@@ -25,6 +24,8 @@ public class ProductListing {
 	protected int productMax = 250;
 	
 	protected String ownerID = "_ownerID";
+	
+	public SimpleShoppingCart shoppingCart = null;
 	
 	/// Empty constructor
 	public ProductListing() {
@@ -99,40 +100,39 @@ public class ProductListing {
 		return new SimpleShoppingCart().updateProductList(ownerID, inUpdateList);
 	}
 	
-	/////////////////////////////////////////////////////////////////////////////////////////
+	//	/////////////////////////////////////////////////////////////////////////////////////////
+	//	//
+	//	// Sales purchase order [utils]
+	//	//
+	//	/////////////////////////////////////////////////////////////////////////////////////////
 	//
-	// Sales purchase order [utils]
+	//	///
+	//	/// Sanatizes a map data from protected purchase order data
+	//	///
+	//	/// @param Map to sanatize and return
+	//	///
+	//	/// @return The parameter
+	//	///
+	//	protected GenericConvertMap<String, Object> sanatizePurchaseData(GenericConvertMap<String, Object> inMap) {
+	//		// Sanatize the item info
+	//		inMap.remove("_oid");
+	//		inMap.remove("_orderID");
+	//		inMap.remove("_sellerID");
 	//
-	/////////////////////////////////////////////////////////////////////////////////////////
-	
-	///
-	/// Sanatizes a map data from protected purchase order data
-	///
-	/// @param Map to sanatize and return
-	///
-	/// @return The parameter
-	///
-	protected GenericConvertMap<String, Object> sanatizePurchaseData(
-		GenericConvertMap<String, Object> inMap) {
-		// Sanatize the item info
-		inMap.remove("_oid");
-		inMap.remove("_orderID");
-		inMap.remove("_sellerID");
-		
-		inMap.remove(ownerID);
-		inMap.remove("_ownerMeta");
-		
-		inMap.remove("_productID");
-		inMap.remove("_productMeta");
-		
-		inMap.remove("_orderStatus");
-		
-		// Other systems reserved vars
-		inMap.remove("_createTime");
-		inMap.remove("_updateTime");
-		
-		// Reserved and not in use?
-		inMap.remove("_purchaserID");
-		return inMap;
-	}
+	//		inMap.remove(ownerID);
+	//		inMap.remove("_ownerMeta");
+	//
+	//		inMap.remove("_productID");
+	//		inMap.remove("_productMeta");
+	//
+	//		inMap.remove("_orderStatus");
+	//
+	//		// Other systems reserved vars
+	//		inMap.remove("_createTime");
+	//		inMap.remove("_updateTime");
+	//
+	//		// Reserved and not in use?
+	//		inMap.remove("_purchaserID");
+	//		return inMap;
+	//	}
 }

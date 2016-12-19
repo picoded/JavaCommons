@@ -12,7 +12,7 @@ import picoded.JStruct.MetaTable;
 import picoded.JStruct.MetaTypeMap;
 /// Picoded imports
 import picoded.conv.ConvertJSON;
-import picoded.enums.ObjectTokens;
+import picoded.enums.ObjectToken;
 
 /// MetaTable, serves as the core flexible backend storage implmentation for the whole
 /// JStack setup. Its role can be viewed similarly to NoSql, or AWS SimpleDB
@@ -78,19 +78,7 @@ public class JStruct_MetaTable implements MetaTable {
 		return ret;
 	}
 	
-	///
-	/// Backend system setup / teardown
-	///--------------------------------------------------------------------------
-	
-	/// Setsup the backend storage table, etc. If needed
-	@Override
-	public void systemSetup() {
-		// does nothing
-	}
-	
-	/// Teardown and delete the backend storage table, etc. If needed
-	@Override
-	public void systemTeardown() {
+	public void clear() {
 		_valueMap.clear();
 	}
 	
@@ -197,7 +185,7 @@ public class JStruct_MetaTable implements MetaTable {
 			for (String key : keys) {
 				Object val = fullMap.get(key);
 				
-				if (val == null || val.equals(ObjectTokens.NULL)) {
+				if (val == null || val.equals(ObjectToken.NULL)) {
 					storedValue.remove(key);
 				} else {
 					storedValue.put(key, val);

@@ -35,7 +35,6 @@ public class SimpleShoppingCart_test {
 	/// The product owner to currently use for testing
 	public MetaObject productOwnerObject = null;
 	
-	@SuppressWarnings("unused")
 	private CorePage corePage;
 	
 	/// To override for implementation
@@ -97,39 +96,34 @@ public class SimpleShoppingCart_test {
 	
 	@Test(expected = Exception.class)
 	public void getCartCookieJSONTest() throws Exception {
+		assertNotNull(simpleShoppingCart.getCartCookieJSON(corePage));
+		String[] arr = { "shopping-cart", "shopping-cart", "shopping-cart" };
+		Map<String, String[]> requestCookieMap = new HashMap<String, String[]>();
+		corePage._requestCookieMap = requestCookieMap;
+		assertNotNull(simpleShoppingCart.getCartCookieJSON(corePage));
+		
+		requestCookieMap.put("shopping-cart", new String[] {});
+		corePage._requestCookieMap = requestCookieMap;
+		assertNotNull(simpleShoppingCart.getCartCookieJSON(corePage));
+		
+		requestCookieMap.put("shopping-cart", arr);
+		corePage._requestCookieMap = requestCookieMap;
+		assertNotNull(simpleShoppingCart.getCartCookieJSON(corePage));
+		
 		assertNotNull(simpleShoppingCart.getCartCookieJSON(null));
 	}
 	
-	// @Test
-	// public void getCartCookieJSONTest1() throws ServletException {
-	// 	HttpServletRequest request = mock(HttpServletRequest.class);
-	// 	HttpServletResponse response = mock(HttpServletResponse.class);
-	// 	List<String> headerList = new ArrayList<String>();
-	// 	headerList.add("header_1");
-	// 	headerList.add("header_2");
-	// 	when(request.getHeaderNames()).thenReturn(Collections.enumeration(headerList));
-	// 	CorePage corePageLocal = spy(corePage.setupInstance(HttpRequestType.GET, request, response));
-	// 	assertNotNull(simpleShoppingCart.getCartCookieJSON(corePageLocal));
-	// 	String[] cookiesArr = new String[] {};
-	// 	Map<String, String[]> _requestCookieMap = new HashMap<String, String[]>();
-	// 	_requestCookieMap.put("shopping-cart", cookiesArr);
-	// 	corePageLocal._requestCookieMap = _requestCookieMap;
-	// 	assertNotNull(simpleShoppingCart.getCartCookieJSON(corePageLocal));
-	// 	cookiesArr = new String[] { "item1", "item2", "item2", "item4" };
-	// 	_requestCookieMap.put("shopping-cart", cookiesArr);
-	// 	corePageLocal._requestCookieMap = _requestCookieMap;
-	// 	String updateJson = null;
-	// 	assertNotNull(updateJson = simpleShoppingCart.getCartCookieJSON(corePageLocal));
-	// 	simpleShoppingCart.setCartCookieJSON(corePageLocal, updateJson);
-	// 	simpleShoppingCart.setCartCookieJSON(corePageLocal, "item5");
-	// 	assertNotNull(simpleShoppingCart.getCartList(corePageLocal, true));
-	// 	assertNotNull(simpleShoppingCart.getCartList(corePageLocal, false));
-	// 	String testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"id-9\"] ]";
-	// 	GenericConvertList<List<Object>> testCart = GenericConvert.toGenericConvertList(testJSON,
-	// 		new ArrayList<Object>());
-	// 	assertNotNull(simpleShoppingCart.updateCartList(corePageLocal, testCart, true));
-	// 	assertNotNull(simpleShoppingCart.updateCartList(corePageLocal, null, false));
-	// }
+	//	 @Test (expected = Exception.class)
+	//	 public void setCartCookieJSONTest() throws Exception {
+	//	 	assertNotNull(simpleShoppingCart.getCartCookieJSON(corePage));
+	//	 	String[] arr={"shopping-cart", "shopping-cart", "shopping-cart"};
+	//	 	Map<String, String[]> requestCookieMap=new HashMap<String, String[]>();
+	//	 	requestCookieMap.put("shopping-cart", arr);
+	//	 	corePage._requestCookieMap=requestCookieMap;
+	//	 	String testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"] ]";
+	//	 	assertNotNull(simpleShoppingCart.getCartCookieJSON(corePage));
+	//	 	simpleShoppingCart.setCartCookieJSON(corePage, testJSON);
+	//	 }
 	
 	@Test
 	public void cartListToCookieJSONTest() {

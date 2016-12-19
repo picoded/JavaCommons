@@ -52,7 +52,6 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	
 	/// Setsup the backend storage table, etc. If needed
 	default void systemSetup() {
-		clear();
 	}
 	
 	/// Teardown and delete the backend storage table, etc. If needed

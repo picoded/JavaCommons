@@ -12,7 +12,7 @@ import picoded.JStruct.MetaTable;
 import picoded.JStruct.MetaTypeMap;
 /// Picoded imports
 import picoded.conv.ConvertJSON;
-import picoded.enums.ObjectToken;
+import picoded.enums.ObjectTokens;
 
 /// MetaTable, serves as the core flexible backend storage implmentation for the whole
 /// JStack setup. Its role can be viewed similarly to NoSql, or AWS SimpleDB
@@ -54,15 +54,15 @@ public class JStruct_MetaTable implements MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Temp value flag, defaults to false
-	protected boolean isTempHint = false;
+	protected boolean isTempHintVal = false;
 	
 	/// Gets if temp mode optimization hint is indicated
 	/// Note that this only serve as a hint, as does not indicate actual setting
 	///
 	/// @returns boolean  temp mode value
 	@Override
-	public boolean getTempHint() {
-		return isTempHint;
+	public boolean getTempHintVal() {
+		return isTempHintVal;
 	}
 	
 	/// Sets temp mode optimization indicator hint
@@ -72,9 +72,9 @@ public class JStruct_MetaTable implements MetaTable {
 	///
 	/// @returns boolean  previous value if set
 	@Override
-	public boolean setTempHint(boolean mode) {
-		boolean ret = isTempHint;
-		isTempHint = mode;
+	public boolean setTempHintVal(boolean mode) {
+		boolean ret = isTempHintVal;
+		isTempHintVal = mode;
 		return ret;
 	}
 	
@@ -197,7 +197,7 @@ public class JStruct_MetaTable implements MetaTable {
 			for (String key : keys) {
 				Object val = fullMap.get(key);
 				
-				if (val == null || val.equals(ObjectToken.NULL)) {
+				if (val == null || val.equals(ObjectTokens.NULL)) {
 					storedValue.remove(key);
 				} else {
 					storedValue.put(key, val);

@@ -36,7 +36,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// Note that this only serve as a hint, as does not indicate actual setting
 	///
 	/// @returns boolean  temp mode value
-	boolean getTempHint();
+	boolean getTempHintVal();
 	
 	/// Sets temp mode optimization indicator hint
 	/// Note that this only serve as a hint, as does not indicate actual setting
@@ -44,17 +44,21 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject> {
 	/// @param  mode  the new temp mode hint
 	///
 	/// @returns boolean  previous value if set
-	boolean setTempHint(boolean mode);
+	boolean setTempHintVal(boolean mode);
 	
 	//
 	// Backend system setup / teardown
 	//--------------------------------------------------------------------------
 	
 	/// Setsup the backend storage table, etc. If needed
-	void systemSetup();
+	default void systemSetup() {
+		clear();
+	}
 	
 	/// Teardown and delete the backend storage table, etc. If needed
-	void systemTeardown();
+	default void systemTeardown() {
+		clear();
+	}
 	
 	/// perform increment maintenance, meant for minor changes between requests
 	default void incrementalMaintenance() {

@@ -137,15 +137,6 @@ public class KeyValueMap_test {
 		assertEquals(new HashSet<String>(Arrays.asList(new String[] { "hello", "this" })),
 			kvmObj.getKeys("world"));
 		
-		assertNotNull(kvmObj.generateNonce("world", 0l, "world".length()));
-		assertNotNull(kvmObj.keySet());
-		assertNotNull(kvmObj.containsKey("world"));
 	}
 	
-	@Test
-	public void incrementalMaintenanceTest() {
-		for (int i = 0; i < 99; i++) {
-			kvmObj.incrementalMaintenance();
-		}
-	}
 }

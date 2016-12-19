@@ -1,7 +1,10 @@
 package picoded.JStruct;
 
 // Target test class
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -11,15 +14,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.CommonDefaultAcessInterface;
-
 // Test depends
 
 public class KeyValueMap_test {
 	
 	/// Test object
 	public KeyValueMap kvmObj = null;
-	private CommonDefaultAcessInterface acessInterface = null;
 	
 	/// To override for implementation
 	/// -----------------------------------------------------
@@ -33,7 +33,6 @@ public class KeyValueMap_test {
 	public void setUp() {
 		kvmObj = implementationConstructor();
 		kvmObj.systemSetup();
-		acessInterface = new CommonDefaultAcessInterface();
 	}
 	
 	@After
@@ -137,12 +136,7 @@ public class KeyValueMap_test {
 		
 		assertEquals(new HashSet<String>(Arrays.asList(new String[] { "hello", "this" })),
 			kvmObj.getKeys("world"));
-		assertNotNull(acessInterface.generateNonce("world", 0, "world".length()));
-		assertNull(acessInterface.keySet());
-		assertNotNull(acessInterface.containsKey(null));
-		for (int i = 0; i < 99; i++) {
-			acessInterface.incrementalMaintenance();
-		}
+		
 	}
 	
 }

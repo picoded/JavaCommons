@@ -128,6 +128,8 @@ public class StandardArrayList_test {
 		assertEquals(1, list.indexOf("one"));
 		assertEquals(-1, list.indexOf("1"));
 		assertEquals(-1, list.indexOf(null));
+		list.add(null);
+		assertEquals(3, list.indexOf(null));
 	}
 	
 	@Test
@@ -140,6 +142,8 @@ public class StandardArrayList_test {
 		assertEquals(1, list.lastIndexOf("one"));
 		assertEquals(-1, list.lastIndexOf("1"));
 		assertEquals(-1, list.lastIndexOf(null));
+		list.add(null);
+		assertEquals(3, list.lastIndexOf(null));
 	}
 	
 	@Test

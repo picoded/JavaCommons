@@ -1,16 +1,6 @@
 package picoded.struct;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -98,12 +88,6 @@ public class UnsupportedDefaultMap_test extends StandardHashMap_test {
 	@Test(expected = UnsupportedOperationException.class)
 	public void clearTest() {
 		unsupported.clear();
-	}
-	
-	@Override
-	@Test(expected = UnsupportedOperationException.class)
-	public void containsKeyTest() {
-		unsupported.containsKey("key");
 	}
 	
 }

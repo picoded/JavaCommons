@@ -261,6 +261,18 @@ public class StandardArrayList_test {
 		assertEquals("zero", arr[0]);
 	}
 	
+	@Test
+	public void toArrayObjTest() {
+		list.add("zero");
+		list.add("one");
+		list.add("two");
+		Object[] arrParam = new Object[4];
+		Object[] arr = list.toArray(arrParam);
+		
+		assertEquals("zero", arrParam[0]);
+		assertEquals("zero", arr[0]);
+	}
+	
 	private class MyOperator<T> implements UnaryOperator<T> {
 		T arg1;
 		

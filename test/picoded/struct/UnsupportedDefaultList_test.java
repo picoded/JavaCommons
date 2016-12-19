@@ -2,12 +2,10 @@ package picoded.struct;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Observer;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 /// Test the UnsupportedDefaultList,
 /// Most of the test coverage is actually provided by StandardArrayList test
@@ -27,21 +25,25 @@ public class UnsupportedDefaultList_test extends StandardArrayList_test {
 		ArrayList<E> base = new ArrayList<E>();
 		
 		// Implementation to actual base list
+		@Override
 		public E get(int key) {
 			return base.get(key);
 		}
 		
 		// Implementation to actual base list
+		@Override
 		public void add(int index, E value) {
 			base.add(index, value);
 		}
 		
 		// Implementation to actual base list
+		@Override
 		public E remove(int index) {
 			return base.remove(index);
 		}
 		
 		// Implementation to actual base list
+		@Override
 		public int size() {
 			return base.size();
 		}
@@ -57,12 +59,14 @@ public class UnsupportedDefaultList_test extends StandardArrayList_test {
 	// Test list 
 	// List<Object> list = null;
 	
+	@Override
 	@Before
 	public void setUp() {
 		unsupported = new UnsupportedTest<Object>();
 		list = new ProxyTest<Object>();
 	}
 	
+	@Override
 	@After
 	public void tearDown() {
 		unsupported = null;
@@ -86,6 +90,11 @@ public class UnsupportedDefaultList_test extends StandardArrayList_test {
 	@Test(expected = UnsupportedOperationException.class)
 	public void removeUnsupportedTest() {
 		unsupported.remove("key");
+	}
+	
+	@Test(expected = UnsupportedOperationException.class)
+	public void removeWithParamIntUnsupportedTest() {
+		unsupported.remove(1);
 	}
 	
 	@Test(expected = UnsupportedOperationException.class)

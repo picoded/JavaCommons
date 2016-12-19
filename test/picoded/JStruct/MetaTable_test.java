@@ -20,11 +20,8 @@ import org.apache.commons.lang3.RandomUtils;
 import org.junit.After;
 // Test Case include
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
-import picoded.RunInThread;
-import picoded.RunInThreadRule;
 import picoded.conv.GUID;
 import picoded.struct.CaseInsensitiveHashMap;
 // Test depends
@@ -32,29 +29,24 @@ import picoded.struct.CaseInsensitiveHashMap;
 // MetaTable base test class
 public class MetaTable_test {
 	
-	@Rule
-	public RunInThreadRule runInThread = new RunInThreadRule();
-	
-	// / Test object
+	/// Test object
 	public MetaTable mtObj = null;
 	
-	// / To override for implementation
-	// /------------------------------------------------------
+	/// To override for implementation
+	/// -----------------------------------------------------
 	public MetaTable implementationConstructor() {
 		return (new JStruct()).getMetaTable("test");
 	}
 	
-	// / Setup and sanity test
-	// /------------------------------------------------------
+	/// Setup and sanity test
+	/// -----------------------------------------------------
 	@Before
-	@RunInThread
 	public void setUp() {
 		mtObj = implementationConstructor();
 		mtObj.systemSetup();
 	}
 	
 	@After
-	@RunInThread
 	public void tearDown() {
 		if (mtObj != null) {
 			mtObj.systemTeardown();
@@ -63,7 +55,6 @@ public class MetaTable_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void constructorTest() {
 		// not null check
 		assertNotNull(mtObj);
@@ -105,7 +96,6 @@ public class MetaTable_test {
 	// }
 	
 	@Test
-	@RunInThread
 	public void newObjectTest() {
 		MetaObject moObj = null;
 		
@@ -121,7 +111,6 @@ public class MetaTable_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void basicTest() {
 		String guid = GUID.base58();
 		assertNull(mtObj.get(guid));
@@ -138,9 +127,8 @@ public class MetaTable_test {
 		assertEquals(objMap, mtObj.get(guid));
 	}
 	
-	// / Checks if a blank object gets saved
+	/// Checks if a blank object gets saved
 	@Test
-	@RunInThread
 	public void blankObjectSave() {
 		String guid = null;
 		MetaObject p = null;
@@ -168,7 +156,6 @@ public class MetaTable_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void indexBasedTest() {
 		
 		mtObj.append(null, genNumStrObj(1, "this"));
@@ -203,10 +190,9 @@ public class MetaTable_test {
 	}
 	
 	// /
-	// / An exception occurs, if a query fetch occurs with an empty table
+	/// An exception occurs, if a query fetch occurs with an empty table
 	// /
 	@Test
-	@RunInThread
 	public void issue47_exceptionWhenTableIsEmpty() {
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
@@ -214,12 +200,11 @@ public class MetaTable_test {
 	}
 	
 	// /
-	// / Bad view index due to inner join instead of left join. Testing.
+	/// Bad view index due to inner join instead of left join. Testing.
 	// /
-	// / AKA: Incomplete object does not appear in view index
+	/// AKA: Incomplete object does not appear in view index
 	// /
 	@Test
-	@RunInThread
 	public void innerJoinFlaw() {
 		mtObj.append(null, genNumStrObj(1, "hello world"));
 		
@@ -247,10 +232,9 @@ public class MetaTable_test {
 	}
 	
 	// /
-	// / Handle right outer closign bracket in metatable meta names
+	/// Handle right outer closign bracket in metatable meta names
 	// /
 	@Test
-	@RunInThread
 	public void mssqlOuterBrackerInMetaNameFlaw() {
 		HashMap<String, Object> objMap = null;
 		MetaObject[] qRes = null;
@@ -287,7 +271,6 @@ public class MetaTable_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void missingStrError() {
 		HashMap<String, Object> objMap = new HashMap<String, Object>();
 		objMap.put("num", 123);
@@ -305,7 +288,6 @@ public class MetaTable_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void missingNumWithSomeoneElse() {
 		mtObj.append(null, genNumStrObj(1, "hello world"));
 		
@@ -327,7 +309,6 @@ public class MetaTable_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void getFromKeyName_basic() {
 		
 		mtObj.append(null, genNumStrObj(1, "one"));
@@ -347,7 +328,6 @@ public class MetaTable_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void nonIndexedKeySaveCheck() {
 		
 		// Generates single node
@@ -377,7 +357,6 @@ public class MetaTable_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void getFromKeyName_customKeys() {
 		
 		// Generates single node
@@ -414,7 +393,6 @@ public class MetaTable_test {
 	// Array values tests
 	// -----------------------------------------------
 	@Test
-	@RunInThread
 	public void jsonStorageTest() {
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("name", "Hello");
@@ -436,7 +414,6 @@ public class MetaTable_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void binaryStorageTest() {
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("name", "Hello");
@@ -459,7 +436,6 @@ public class MetaTable_test {
 	// -----------------------------------------------
 	
 	@Test
-	@RunInThread
 	public void T50_orderByTest() {
 		
 		// Lets just rescycle old test for the names
@@ -509,10 +485,19 @@ public class MetaTable_test {
 		
 	}
 	
+	// @Test
+	// public void orderByTestLoop() {
+	// for(int i=0; i<25; ++i) {
+	// orderByTest();
+	//
+	// tearDown();
+	// setUp();
+	// }
+	// }
+	
 	// KeyName fetching test
 	// -----------------------------------------------
 	@Test
-	@RunInThread
 	public void getKeyNamesTest() {
 		
 		// Lets just rescycle old test for the names
@@ -530,7 +515,6 @@ public class MetaTable_test {
 	// -----------------------------------------------
 	
 	@Test
-	@RunInThread
 	public void testSingleMappingSystem() {
 		mtObj.typeMap().clear();
 		
@@ -546,7 +530,6 @@ public class MetaTable_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void testMapMappingSystem() {
 		mtObj.typeMap().clear();
 		
@@ -571,7 +554,6 @@ public class MetaTable_test {
 	// Demo code : kept here for reference
 	// -----------------------------------------------
 	@Test
-	@RunInThread
 	public void demoCode() {
 		// Initiate a meta table
 		MetaTable table = (new JStruct()).getMetaTable("demo");
@@ -600,7 +582,6 @@ public class MetaTable_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void incrementalMaintenanceTest() {
 		for (int i = 0; i < 99; i++) {
 			mtObj.incrementalMaintenance();
@@ -609,7 +590,6 @@ public class MetaTable_test {
 	}
 	
 	@Test
-	@RunInThread
 	public void systemSetupTest() {
 		mtObj.systemSetup();
 		mtObj.systemTeardown();

@@ -139,7 +139,7 @@ public class KeyValueMap_test {
 		
 		assertNotNull(kvmObj.generateNonce("world", 0l, "world".length()));
 		assertNotNull(kvmObj.keySet());
-		assertNotNull(kvmObj.containsKey(null));
+		assertNotNull(kvmObj.containsKey("world"));
 	}
 	
 	@Test

@@ -108,7 +108,7 @@ public class NxtCrypt_test {
 		assertNotNull("GetSaltedHash rd2", saltedHashB);
 		
 		assertEquals("GetSaltedHash equals", saltedHashA, saltedHashB);
-		NxtCrypt.getPassHash(rawPass, 32, 1500, 256);
+		NxtCrypt.getPassHash(rawPass, 1, 1, 1);
 	}
 	
 	@Test

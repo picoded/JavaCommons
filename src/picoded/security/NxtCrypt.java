@@ -67,16 +67,16 @@ public class NxtCrypt {
 	private static String seperator = "@";
 	
 	/// Definable default salt length
-	public static int defaultSaltLength = 32; //bytes
+	protected static int defaultSaltLength = 32; //bytes
 	/// Definable default salt iterations
-	public static int defaultIterations = 1500;
+	protected static int defaultIterations = 1500;
 	/// Definable default salt keylength
-	public static int defaultKeyLength = 256;
+	protected static int defaultKeyLength = 256;
 	
 	/// Setup the default setting for SecureRandom
-	public static boolean isStrongSecureRandom = false;
+	protected static boolean isStrongSecureRandom = false;
 	
-	protected static String SecurityKey = "PBKDF2WithHmacSHA1";
+	protected static String securityKey = "PBKDF2WithHmacSHA1";
 	
 	/**
 	 * Compares two byte arrays in length-constant time. This comparison method
@@ -140,7 +140,7 @@ public class NxtCrypt {
 	/// Setup static reuse object / default hash objects
 	protected static void setupReuseObjects() throws NoSuchAlgorithmException {
 		if (NxtCrypt.pbk == null) {
-			NxtCrypt.pbk = SecretKeyFactory.getInstance(SecurityKey);
+			NxtCrypt.pbk = SecretKeyFactory.getInstance(securityKey);
 		}
 		if (NxtCrypt.secureRand == null) {
 			if (NxtCrypt.isStrongSecureRandom == false) {

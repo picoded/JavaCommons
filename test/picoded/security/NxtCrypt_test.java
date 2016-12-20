@@ -34,7 +34,7 @@ public class NxtCrypt_test {
 		assertFalse("slowEquals test for byteArray",
 			NxtCrypt.slowEquals("".getBytes(), bStr.getBytes()));
 		
-		NxtCrypt.SecurityKey = "";
+		NxtCrypt.securityKey = "";
 		NxtCrypt.pbk = null;
 		NxtCrypt.setupReuseObjects_generic();
 	}

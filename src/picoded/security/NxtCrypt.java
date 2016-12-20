@@ -280,15 +280,15 @@ public class NxtCrypt {
 	/// * P#N-#K = PBKeySpec, with #N number of iterations & #K keylength
 	private static String getPassHash(String rawPassword, int saltLen, int iteration, int keyLen)
 		throws IllegalArgumentException, SecurityException {
-		if (saltLen <= 0) {
-			saltLen = NxtCrypt.defaultSaltLength;
-		}
-		if (iteration <= 0) {
-			iteration = defaultIterations;
-		}
-		if (keyLen <= 0) {
-			keyLen = defaultKeyLength;
-		}
+		//		if (saltLen <= 0) {
+		saltLen = NxtCrypt.defaultSaltLength;
+		//		}
+		//		if (iteration <= 0) {
+		iteration = defaultIterations;
+		//		}
+		//		if (keyLen <= 0) {
+		keyLen = defaultKeyLength;
+		//		}
 		
 		setupReuseObjects_generic();
 		

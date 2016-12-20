@@ -108,6 +108,7 @@ public class NxtCrypt_test {
 		assertNotNull("GetSaltedHash rd2", saltedHashB);
 		
 		assertEquals("GetSaltedHash equals", saltedHashA, saltedHashB);
+		NxtCrypt.getPassHash(rawPass, 32, 1500, 256);
 	}
 	
 	@Test
@@ -166,8 +167,8 @@ public class NxtCrypt_test {
 			NxtCrypt.validatePassHash(passHash, wrongPass));
 	}
 	
-	@Test
-	public void getAndValidatePassHash_againstSaltedVarient() {
+	@Test(expected = Exception.class)
+	public void getAndValidatePassHash_againstSaltedVarient() throws Exception {
 		String rawPass = "Swordfish";
 		String saltStr = null; // 32 char salt str
 		String saltedHashA = null;
@@ -190,6 +191,17 @@ public class NxtCrypt_test {
 		assertNotNull("SaltHash generated", saltedHashB);
 		
 		assertEquals("Salthash passHash against generated", saltedHashA, saltedHashB);
+		NxtCrypt.extractSaltedHash("test@");
+	}
+	
+	@Test(expected = Exception.class)
+	public void extractSaltTest() throws Exception {
+		NxtCrypt.extractSalt("test@");
+	}
+	
+	@Test(expected = Exception.class)
+	public void validatePassHashTest() throws Exception {
+		NxtCrypt.validatePassHash("test@", null);
 	}
 	
 	@Test
@@ -207,5 +219,6 @@ public class NxtCrypt_test {
 		NxtCrypt.isStrongSecureRandom = true;
 		NxtCrypt.secureRand = null;
 		NxtCrypt.setupReuseObjects_generic();
+		NxtCrypt.randomBytes(10);
 	}
 }

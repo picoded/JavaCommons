@@ -3,11 +3,11 @@ package picoded.struct;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 
 public class GenericConvertArrayList_test extends StandardArrayList_test {
 	
@@ -42,13 +42,15 @@ public class GenericConvertArrayList_test extends StandardArrayList_test {
 		}
 	}
 	
-	List<Object> unsupported = null;
+	GenericConvertList<Object> unsupported = null;
+	ProxyTest proxyList = null;
 	
 	@Override
 	@Before
 	public void setUp() {
 		unsupported = new GenericConvertTest<>();
 		list = new ProxyTest<Object>();
+		proxyList = new ProxyTest<Object>();
 	}
 	
 	@Override
@@ -56,12 +58,15 @@ public class GenericConvertArrayList_test extends StandardArrayList_test {
 	public void tearDown() {
 		unsupported = null;
 		list = null;
+		proxyList = null;
 	}
+	
 	
 	@Test
 	public void notNullTest() {
 		assertNotNull(unsupported);
 		assertNotNull(list);
+		assertNotNull(proxyList);
 	}
 	
 	//
@@ -91,5 +96,11 @@ public class GenericConvertArrayList_test extends StandardArrayList_test {
 	@Test(expected = UnsupportedOperationException.class)
 	public void sizeUnsupportedTest() {
 		unsupported.remove("key");
+	}
+	
+	@Test
+	public void getBooleanTest() {
+		proxyList.add(0, "value");
+		proxyList.getBoolean(0);
 	}
 }

@@ -18,11 +18,10 @@ public class NxtCrypt_test {
 	
 	@After
 	public void tearDown() {
-		
 	}
 	
-	@Test
-	public void slowEquals() {
+	@Test(expected = Exception.class)
+	public void slowEquals() throws Exception {
 		String aStr = "Hello World";
 		String bStr = "Hello World";
 		
@@ -34,6 +33,10 @@ public class NxtCrypt_test {
 			NxtCrypt.slowEquals(aStr.getBytes(), "".getBytes()));
 		assertFalse("slowEquals test for byteArray",
 			NxtCrypt.slowEquals("".getBytes(), bStr.getBytes()));
+		
+		NxtCrypt.SecurityKey = "";
+		NxtCrypt.pbk = null;
+		NxtCrypt.setupReuseObjects_generic();
 	}
 	
 	// / default constructor test

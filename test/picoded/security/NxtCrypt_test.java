@@ -29,6 +29,7 @@ public class NxtCrypt_test {
 		assertTrue("slowEquals test for string", NxtCrypt.slowEquals(aStr, bStr));
 		assertTrue("slowEquals test for byteArray",
 			NxtCrypt.slowEquals(aStr.getBytes(), bStr.getBytes()));
+		assertTrue("slowEquals test for byteArray", NxtCrypt.slowEquals("".getBytes(), "".getBytes()));
 	}
 	
 	@Test

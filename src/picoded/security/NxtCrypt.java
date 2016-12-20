@@ -104,8 +104,7 @@ public class NxtCrypt {
 	 * @param   hex         the hex string
 	 * @return              the hex string decoded into a byte array
 	 */
-	@SuppressWarnings("unused")
-	private static byte[] fromHex(String hex) {
+	protected static byte[] fromHex(String hex) {
 		byte[] binary = new byte[hex.length() / 2];
 		for (int i = 0; i < binary.length; i++) {
 			binary[i] = (byte) Integer.parseInt(hex.substring(2 * i, 2 * i + 2), 16);
@@ -119,8 +118,7 @@ public class NxtCrypt {
 	 * @param   array       the byte array to convert
 	 * @return              a length*2 character string encoding the byte array
 	 */
-	@SuppressWarnings("unused")
-	private static String toHex(byte[] array) {
+	protected static String toHex(byte[] array) {
 		BigInteger bi = new BigInteger(1, array);
 		String hex = bi.toString(16);
 		int paddingLength = (array.length * 2) - hex.length();
@@ -144,7 +142,7 @@ public class NxtCrypt {
 				// Cause its over 9000x easier to do social engineering attacks,
 				// then a side channel timing attack. 
 				//
-				// Unless of course your opponent is NSA. ¯\_(ツ)_/¯
+				// Unless of course your opponent is NSA. Â¯\_(ãƒ„)_/Â¯
 				//
 				// Or more frankly, one of their admins setting their password as "I-am-@wsome-123"
 				//

@@ -9,7 +9,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public class GenericConvertArrayList_test extends StandardArrayList_test {
 	
 	class GenericConvertTest<E> implements GenericConvertList<E> {
@@ -59,10 +58,38 @@ public class GenericConvertArrayList_test extends StandardArrayList_test {
 		list = null;
 	}
 	
-	
 	@Test
 	public void notNullTest() {
 		assertNotNull(unsupported);
 		assertNotNull(list);
+	}
+	
+	//
+	// Unsupported Operation Exception
+	//
+	
+	@Test(expected = UnsupportedOperationException.class)
+	public void getUnsupportedTest() {
+		unsupported.get(0);
+	}
+	
+	@Test(expected = UnsupportedOperationException.class)
+	public void addUnsupportedTest() {
+		unsupported.add(1, "value");
+	}
+	
+	@Test(expected = UnsupportedOperationException.class)
+	public void removeUnsupportedTest() {
+		unsupported.remove("key");
+	}
+	
+	@Test(expected = UnsupportedOperationException.class)
+	public void removeWithParamIntUnsupportedTest() {
+		unsupported.remove(1);
+	}
+	
+	@Test(expected = UnsupportedOperationException.class)
+	public void sizeUnsupportedTest() {
+		unsupported.remove("key");
 	}
 }

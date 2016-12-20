@@ -344,7 +344,7 @@ public class NxtCrypt {
 			if ((splitStr[1]).substring(0, 1).equals("P")) {
 				String[] splitProtocol = (splitStr[1]).substring(1).split("-", 2);
 				
-				if (splitProtocol != null && splitProtocol.length >= 2) {
+				if (splitProtocol.length >= 2) {
 					iteration = Integer.parseInt(splitProtocol[0]);
 					keyLen = Integer.parseInt(splitProtocol[1]);
 				} else {

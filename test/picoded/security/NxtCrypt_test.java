@@ -124,7 +124,16 @@ public class NxtCrypt_test {
 		int iterations = 1500;
 		int keyLength = 256;
 		byte[] arr = null;
-		NxtCrypt.getSaltedHash(null, arr, iterations, keyLength);
+		NxtCrypt.getSaltedHash("", arr, iterations, keyLength);
+	}
+	
+	@Test(expected = Exception.class)
+	public void getSaltedHash_byteArr11() throws Exception {
+		String rawPass = "Swordfish";
+		int iterations = 1500;
+		int keyLength = 256;
+		byte[] arr = null;
+		NxtCrypt.getSaltedHash(rawPass, arr, iterations, keyLength);
 	}
 	
 	@Test(expected = Exception.class)
@@ -166,18 +175,23 @@ public class NxtCrypt_test {
 		assertEquals("GetSaltedHash equals", saltedHashA, saltedHashB);
 	}
 	
-	@Test
-	public void getAndValidatePassHash() {
+	@Test(expected = Exception.class)
+	public void getAndValidatePassHash() throws Exception {
 		String rawPass = "Swordfish";
-		// String saltStr = null; //32 char salt str
-		// int iterations = 1500;
-		// int keyLength = 256;
-		
 		String passHash = NxtCrypt.getPassHash(rawPass);
-		
 		assertNotNull("Password hash generated", passHash);
 		assertTrue("Validated password hash as equal", NxtCrypt.validatePassHash(passHash, rawPass));
 		passHash = "1500@@256";
+		NxtCrypt.validatePassHash(passHash, rawPass);
+		
+		passHash = "1500@P@256";
+		NxtCrypt.validatePassHash(passHash, rawPass);
+	}
+	
+	@Test(expected = Exception.class)
+	public void getAndValidatePassHash1() throws Exception {
+		String rawPass = "Swordfish";
+		String passHash = "1500@a@256";
 		NxtCrypt.validatePassHash(passHash, rawPass);
 	}
 	
@@ -185,12 +199,7 @@ public class NxtCrypt_test {
 	public void getAndValidatePassHash_fail() {
 		String rawPass = "Swordfish";
 		String wrongPass = "NOOOOO";
-		// String saltStr = null; //32 char salt str
-		// int iterations = 1500;
-		// int keyLength = 256;
-		
 		String passHash = NxtCrypt.getPassHash(rawPass);
-		
 		assertNotNull("Password hash generated", passHash);
 		assertFalse("Validated password hash as equal",
 			NxtCrypt.validatePassHash(passHash, wrongPass));

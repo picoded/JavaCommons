@@ -48,16 +48,18 @@ import java.util.Arrays;
 /// * hashInfo : User text friendly version of current password encryption scheme
 /// * needsRehash : Indicate true, on legacy hashes
 /// * in document example usage.
-/// * configurable class default values, with class functions, in addition of static global defaults. Should fallback to global default if not set.
+/// * configurable class default values, with class functions, in addition of static global defaults. 
+/// * Should fallback to global default if not set.
 public class NxtCrypt {
 	
 	/// Reusable crypt objects
-	private static SecretKeyFactory pbk = null;
+	protected static SecretKeyFactory pbk = null;
 	
 	/// Reusable Random objects objects
-	private static SecureRandom secureRand = null;
+	protected static SecureRandom secureRand = null;
 	
-	/// Hash storage seperator, @ is intentionally used as opposed to $, as to make the stored passHash obviously not "php password_hash" format.
+	/// Hash storage seperator, @ is intentionally used as opposed to $, as to make the stored 
+	/// passHash obviously not "php password_hash" format.
 	private static String seperator = "@";
 	
 	/// Definable default salt length
@@ -69,6 +71,8 @@ public class NxtCrypt {
 	
 	/// Setup the default setting for SecureRandom
 	public static boolean isStrongSecureRandom = false;
+	
+	protected static String key = "PBKDF2WithHmacSHA1";
 	
 	/**
 	 * Compares two byte arrays in length-constant time. This comparison method
@@ -130,9 +134,9 @@ public class NxtCrypt {
 	}
 	
 	/// Setup static reuse object / default hash objects
-	private static void setupReuseObjects() throws NoSuchAlgorithmException {
+	protected static void setupReuseObjects() throws NoSuchAlgorithmException {
 		if (NxtCrypt.pbk == null) {
-			NxtCrypt.pbk = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+			NxtCrypt.pbk = SecretKeyFactory.getInstance(key);
 		}
 		if (NxtCrypt.secureRand == null) {
 			if (NxtCrypt.isStrongSecureRandom == false) {
@@ -164,7 +168,7 @@ public class NxtCrypt {
 	}
 	
 	/// Generic SecurityException varient for setupReuseObjects
-	private static void setupReuseObjects_generic() throws SecurityException {
+	protected static void setupReuseObjects_generic() throws SecurityException {
 		try {
 			NxtCrypt.setupReuseObjects();
 		} catch (NoSuchAlgorithmException e) {
@@ -174,7 +178,7 @@ public class NxtCrypt {
 	
 	/// Gets the salted hash of the raw password only (not the entire passHash)
 	public static String getSaltedHash(String rawPassword, byte[] salt, int iteration, int keyLen)
-		throws IllegalArgumentException, SecurityException {
+		throws Throwable {
 		if (rawPassword == null || rawPassword.length() == 0) {
 			throw new IllegalArgumentException("Empty/NULL passwords are not supported.");
 		}
@@ -205,7 +209,7 @@ public class NxtCrypt {
 	
 	/// String salt varient of getSaltedHash (instead of byte[])
 	public static String getSaltedHash(String rawPassword, String salt, int iteration, int keyLen)
-		throws IllegalArgumentException, SecurityException {
+		throws Throwable {
 		if (salt == null || salt.length() == 0) {
 			throw new IllegalArgumentException("Empty/NULL salts are not supported.");
 		}
@@ -214,14 +218,12 @@ public class NxtCrypt {
 	}
 	
 	/// Default values varient of getSaltedHash
-	public static String getSaltedHash(String rawPassword, byte[] salt)
-		throws IllegalArgumentException, SecurityException {
+	public static String getSaltedHash(String rawPassword, byte[] salt) throws Throwable {
 		return getSaltedHash(rawPassword, salt, defaultIterations, defaultKeyLength);
 	}
 	
 	/// Default values, and string salt varient of getSaltedHash
-	public static String getSaltedHash(String rawPassword, String salt)
-		throws IllegalArgumentException, SecurityException {
+	public static String getSaltedHash(String rawPassword, String salt) throws Throwable {
 		return getSaltedHash(rawPassword, salt, defaultIterations, defaultKeyLength);
 	}
 	
@@ -275,7 +277,7 @@ public class NxtCrypt {
 	/// Notes on protocall format
 	/// * P#N-#K = PBKeySpec, with #N number of iterations & #K keylength
 	private static String getPassHash(String rawPassword, int saltLen, int iteration, int keyLen)
-		throws IllegalArgumentException, SecurityException {
+		throws Throwable {
 		if (saltLen <= 0) {
 			saltLen = NxtCrypt.defaultSaltLength;
 		}
@@ -295,8 +297,7 @@ public class NxtCrypt {
 	}
 	
 	/// Default values varient of getPassHash
-	public static String getPassHash(String rawPassword) throws IllegalArgumentException,
-		SecurityException {
+	public static String getPassHash(String rawPassword) throws Throwable {
 		return getPassHash(rawPassword, 0, 0, 0);
 	}
 	
@@ -323,8 +324,7 @@ public class NxtCrypt {
 	}
 	
 	/// Validates the password hash against the raw password given
-	public static boolean validatePassHash(String passHash, String rawPassword)
-		throws SecurityException {
+	public static boolean validatePassHash(String passHash, String rawPassword) throws Throwable {
 		String[] splitStr = passHash.split(seperator, 3);
 		
 		if (splitStr.length < 3) {

@@ -178,7 +178,7 @@ public class NxtCrypt {
 	
 	/// Gets the salted hash of the raw password only (not the entire passHash)
 	public static String getSaltedHash(String rawPassword, byte[] salt, int iteration, int keyLen)
-		throws Throwable {
+		throws IllegalArgumentException, SecurityException {
 		if (rawPassword == null || rawPassword.length() == 0) {
 			throw new IllegalArgumentException("Empty/NULL passwords are not supported.");
 		}
@@ -209,7 +209,7 @@ public class NxtCrypt {
 	
 	/// String salt varient of getSaltedHash (instead of byte[])
 	public static String getSaltedHash(String rawPassword, String salt, int iteration, int keyLen)
-		throws Throwable {
+		throws IllegalArgumentException, SecurityException {
 		if (salt == null || salt.length() == 0) {
 			throw new IllegalArgumentException("Empty/NULL salts are not supported.");
 		}
@@ -218,12 +218,14 @@ public class NxtCrypt {
 	}
 	
 	/// Default values varient of getSaltedHash
-	public static String getSaltedHash(String rawPassword, byte[] salt) throws Throwable {
+	public static String getSaltedHash(String rawPassword, byte[] salt)
+		throws IllegalArgumentException, SecurityException {
 		return getSaltedHash(rawPassword, salt, defaultIterations, defaultKeyLength);
 	}
 	
 	/// Default values, and string salt varient of getSaltedHash
-	public static String getSaltedHash(String rawPassword, String salt) throws Throwable {
+	public static String getSaltedHash(String rawPassword, String salt)
+		throws IllegalArgumentException, SecurityException {
 		return getSaltedHash(rawPassword, salt, defaultIterations, defaultKeyLength);
 	}
 	
@@ -277,7 +279,7 @@ public class NxtCrypt {
 	/// Notes on protocall format
 	/// * P#N-#K = PBKeySpec, with #N number of iterations & #K keylength
 	private static String getPassHash(String rawPassword, int saltLen, int iteration, int keyLen)
-		throws Throwable {
+		throws IllegalArgumentException, SecurityException {
 		if (saltLen <= 0) {
 			saltLen = NxtCrypt.defaultSaltLength;
 		}
@@ -297,7 +299,8 @@ public class NxtCrypt {
 	}
 	
 	/// Default values varient of getPassHash
-	public static String getPassHash(String rawPassword) throws Throwable {
+	public static String getPassHash(String rawPassword) throws IllegalArgumentException,
+		SecurityException {
 		return getPassHash(rawPassword, 0, 0, 0);
 	}
 	
@@ -324,7 +327,8 @@ public class NxtCrypt {
 	}
 	
 	/// Validates the password hash against the raw password given
-	public static boolean validatePassHash(String passHash, String rawPassword) throws Throwable {
+	public static boolean validatePassHash(String passHash, String rawPassword)
+		throws SecurityException {
 		String[] splitStr = passHash.split(seperator, 3);
 		
 		if (splitStr.length < 3) {

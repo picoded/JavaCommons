@@ -64,8 +64,8 @@ public class NxtCrypt_test {
 		}
 	}
 	
-	@Test(expected = Throwable.class)
-	public void getSaltedHash() throws Throwable {
+	@Test(expected = Exception.class)
+	public void getSaltedHash() throws Exception {
 		String rawPass = "Swordfish";
 		String saltStr = "12345678901234567890123456789012"; // 32 char salt str
 		int iterations = 1500;
@@ -82,17 +82,18 @@ public class NxtCrypt_test {
 		NxtCrypt.getSaltedHash(rawPass, saltStr = null, iterations, keyLength);
 	}
 	
-	@Test(expected = Throwable.class)
-	public void getSaltedHash1() throws Throwable {
+	@Test(expected = Exception.class)
+	public void getSaltedHash1() throws Exception {
 		String rawPass = "Swordfish";
 		String saltStr = ""; // 32 char salt str
 		int iterations = 1500;
 		int keyLength = 256;
+		
 		NxtCrypt.getSaltedHash(rawPass, saltStr, iterations, keyLength);
 	}
 	
 	@Test
-	public void getSaltedHash_byteArr() throws Throwable {
+	public void getSaltedHash_byteArr() {
 		String rawPass = "Swordfish";
 		String saltStr = "12345678901234567890123456789012"; // 32 char salt str
 		int iterations = 1500;
@@ -110,7 +111,7 @@ public class NxtCrypt_test {
 	}
 	
 	@Test
-	public void getSaltedHash_default() throws Throwable {
+	public void getSaltedHash_default() {
 		String rawPass = "Swordfish";
 		String saltStr = "12345678901234567890123456789012"; // 32 char salt str
 		
@@ -124,7 +125,7 @@ public class NxtCrypt_test {
 	}
 	
 	@Test
-	public void getSaltedHash_byteArr_default() throws Throwable {
+	public void getSaltedHash_byteArr_default() {
 		String rawPass = "Swordfish";
 		String saltStr = "12345678901234567890123456789012"; // 32 char salt str
 		
@@ -138,7 +139,7 @@ public class NxtCrypt_test {
 	}
 	
 	@Test
-	public void getAndValidatePassHash() throws Throwable {
+	public void getAndValidatePassHash() {
 		String rawPass = "Swordfish";
 		// String saltStr = null; //32 char salt str
 		// int iterations = 1500;
@@ -151,7 +152,7 @@ public class NxtCrypt_test {
 	}
 	
 	@Test
-	public void getAndValidatePassHash_fail() throws Throwable {
+	public void getAndValidatePassHash_fail() {
 		String rawPass = "Swordfish";
 		String wrongPass = "NOOOOO";
 		// String saltStr = null; //32 char salt str
@@ -166,7 +167,7 @@ public class NxtCrypt_test {
 	}
 	
 	@Test
-	public void getAndValidatePassHash_againstSaltedVarient() throws Throwable {
+	public void getAndValidatePassHash_againstSaltedVarient() {
 		String rawPass = "Swordfish";
 		String saltStr = null; // 32 char salt str
 		String saltedHashA = null;

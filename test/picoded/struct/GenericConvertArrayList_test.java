@@ -3,12 +3,14 @@ package picoded.struct;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GenericConvertArrayList_test extends UnsupportedDefaultList_test {
+
+public class GenericConvertArrayList_test extends StandardArrayList_test {
 	
 	class GenericConvertTest<E> implements GenericConvertList<E> {
 		
@@ -41,6 +43,8 @@ public class GenericConvertArrayList_test extends UnsupportedDefaultList_test {
 		}
 	}
 	
+	List<Object> unsupported = null;
+	
 	@Override
 	@Before
 	public void setUp() {
@@ -54,6 +58,7 @@ public class GenericConvertArrayList_test extends UnsupportedDefaultList_test {
 		unsupported = null;
 		list = null;
 	}
+	
 	
 	@Test
 	public void notNullTest() {

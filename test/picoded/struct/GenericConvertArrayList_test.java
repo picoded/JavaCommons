@@ -3,56 +3,61 @@ package picoded.struct;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GenericConvertArrayList_test {
+public class GenericConvertArrayList_test extends UnsupportedDefaultList_test {
 	
-	GenericConvertArrayList<String> genericConvertArrayList = null;
-	String strValue = null;
-	
-	@Before
-	public void setUp() {
-		genericConvertArrayList = new GenericConvertArrayList<>();
-		genericConvertArrayList.add("value");
-	}
-	
-	@After
-	public void tearDown() {
+	class GenericConvertTest<E> implements GenericConvertList<E> {
 		
 	}
 	
-	@Test
-	public void getTest() {
-		assertNotNull(genericConvertArrayList.get(0));
+	class ProxyTest<E> implements GenericConvertList<E> {
+		ArrayList<E> base = new ArrayList<E>();
+		
+		@Override
+		public int size() {
+			return base.size();
+		}
+		
+		// Implementation to actual base list
+		@Override
+		public void add(int index, E value) {
+			base.add(index, value);
+		}
+		
+		// Implementation to actual base list
+		@Override
+		public E remove(int index) {
+			return base.remove(index);
+		}
+		
+		// Implementation to actual base list
+		@Override
+		public E get(int key) {
+			return base.get(key);
+		}
+	}
+	
+	@Override
+	@Before
+	public void setUp() {
+		unsupported = new GenericConvertTest<>();
+		list = new ProxyTest<Object>();
+	}
+	
+	@Override
+	@After
+	public void tearDown() {
+		unsupported = null;
+		list = null;
 	}
 	
 	@Test
-	public void putTest() {
-		genericConvertArrayList.add("value");
-		assertEquals(2, genericConvertArrayList.size());
+	public void notNullTest() {
+		assertNotNull(unsupported);
+		assertNotNull(list);
 	}
-	
-	@Test
-	public void ConstructorTest() {
-		List<String> list = new ArrayList<>();
-		genericConvertArrayList = new GenericConvertArrayList<>(list);
-		genericConvertArrayList.add("value");
-		assertNotNull(genericConvertArrayList.get(0));
-	}
-	
-	@Test
-	public void toStringTest() {
-		assertNotNull(genericConvertArrayList.toString());
-	}
-	
-	@Test
-	public void buildTest() {
-		List<String> list = new ArrayList<>();
-		assertNotNull(GenericConvertList.build(list));
-	}
-	
 }

@@ -36,6 +36,13 @@ public class NxtCrypt_test {
 			NxtCrypt.slowEquals("".getBytes(), bStr.getBytes()));
 	}
 	
+	// / default constructor test
+	@Test
+	public void invalidConstructor() {
+		new NxtCrypt();
+		
+	}
+	
 	@Test
 	public void slowEquals_falseTest() {
 		String aStr = "Hello World??";
@@ -92,8 +99,8 @@ public class NxtCrypt_test {
 		NxtCrypt.getSaltedHash(rawPass, saltStr, iterations, keyLength);
 	}
 	
-	@Test
-	public void getSaltedHash_byteArr() {
+	@Test(expected = Exception.class)
+	public void getSaltedHash_byteArr() throws Exception {
 		String rawPass = "Swordfish";
 		String saltStr = "12345678901234567890123456789012"; // 32 char salt str
 		int iterations = 1500;
@@ -108,6 +115,27 @@ public class NxtCrypt_test {
 		assertNotNull("GetSaltedHash rd2", saltedHashB);
 		
 		assertEquals("GetSaltedHash equals", saltedHashA, saltedHashB);
+		NxtCrypt.getSaltedHash(rawPass, saltStr.getBytes(), 0, 0);
+		NxtCrypt.getSaltedHash(null, saltStr.getBytes(), iterations, keyLength);
+	}
+	
+	@Test(expected = Exception.class)
+	public void getSaltedHash_byteArr1() throws Exception {
+		int iterations = 1500;
+		int keyLength = 256;
+		byte[] arr = null;
+		NxtCrypt.getSaltedHash(null, arr, iterations, keyLength);
+	}
+	
+	@Test(expected = Exception.class)
+	public void getSaltedHash_byteArr2() throws Exception {
+		NxtCrypt.pbk = null;
+		String rawPass = "@#$";
+		String saltStr = ""; // 32 char salt str
+		int iterations = 12;
+		int keyLength = 34;
+		NxtCrypt.getSaltedHash(rawPass, saltStr.getBytes(), iterations, keyLength);
+		
 	}
 	
 	@Test
@@ -149,6 +177,8 @@ public class NxtCrypt_test {
 		
 		assertNotNull("Password hash generated", passHash);
 		assertTrue("Validated password hash as equal", NxtCrypt.validatePassHash(passHash, rawPass));
+		passHash = "1500@@256";
+		NxtCrypt.validatePassHash(passHash, rawPass);
 	}
 	
 	@Test

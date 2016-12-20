@@ -52,6 +52,10 @@ import java.util.Arrays;
 /// * Should fallback to global default if not set.
 public class NxtCrypt {
 	
+	/// default constructor 
+	protected NxtCrypt() {
+	}
+	
 	/// Reusable crypt objects
 	protected static SecretKeyFactory pbk = null;
 	
@@ -72,7 +76,7 @@ public class NxtCrypt {
 	/// Setup the default setting for SecureRandom
 	public static boolean isStrongSecureRandom = false;
 	
-	protected static String key = "PBKDF2WithHmacSHA1";
+	protected static String SecurityKey = "PBKDF2WithHmacSHA1";
 	
 	/**
 	 * Compares two byte arrays in length-constant time. This comparison method
@@ -136,7 +140,7 @@ public class NxtCrypt {
 	/// Setup static reuse object / default hash objects
 	protected static void setupReuseObjects() throws NoSuchAlgorithmException {
 		if (NxtCrypt.pbk == null) {
-			NxtCrypt.pbk = SecretKeyFactory.getInstance(key);
+			NxtCrypt.pbk = SecretKeyFactory.getInstance(SecurityKey);
 		}
 		if (NxtCrypt.secureRand == null) {
 			if (NxtCrypt.isStrongSecureRandom == false) {
@@ -280,16 +284,9 @@ public class NxtCrypt {
 	/// * P#N-#K = PBKeySpec, with #N number of iterations & #K keylength
 	private static String getPassHash(String rawPassword, int saltLen, int iteration, int keyLen)
 		throws IllegalArgumentException, SecurityException {
-		//		if (saltLen <= 0) {
 		saltLen = NxtCrypt.defaultSaltLength;
-		//		}
-		//		if (iteration <= 0) {
 		iteration = defaultIterations;
-		//		}
-		//		if (keyLen <= 0) {
 		keyLen = defaultKeyLength;
-		//		}
-		
 		setupReuseObjects_generic();
 		
 		byte[] salt = NxtCrypt.secureRand.generateSeed(saltLen);

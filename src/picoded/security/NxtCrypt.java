@@ -235,7 +235,7 @@ public class NxtCrypt {
 	}
 	
 	/// Valid random string characters
-	private static char[] _randomstring_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456879"
+	private static char[] randomstringChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456879"
 		.toCharArray();
 	
 	/// Generate a random byte array of strings at indicated length
@@ -250,7 +250,7 @@ public class NxtCrypt {
 		setupReuseObjects_generic();
 		
 		// Entropy resuffling
-		Random rand = new Random();
+		Random rand = new Random(System.currentTimeMillis());
 		char[] buff = new char[len];
 		
 		// For each character extract it
@@ -259,7 +259,7 @@ public class NxtCrypt {
 			if ((i % 10) == 0) {
 				rand.setSeed(secureRand.nextLong()); // 64 bits of random!
 			}
-			buff[i] = _randomstring_chars[rand.nextInt(_randomstring_chars.length)];
+			buff[i] = randomstringChars[rand.nextInt(randomstringChars.length)];
 		}
 		return new String(buff);
 	}

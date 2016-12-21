@@ -170,7 +170,7 @@ public class LDAPAuthenticator {
 		//
 		String usedUsername = username; //username actually used
 		String domainName = defaultDomain; //domain name actually used
-		if (usedUsername.indexOf('@') > 0) {
+		if (usedUsername.indexOf('@') >= 1) {
 			String[] splitNames = usedUsername.split("@");
 			
 			if (splitNames.length != 2) {
@@ -238,14 +238,13 @@ public class LDAPAuthenticator {
 		/// Try and catch the errors
 		try {
 			loginContext = new InitialLdapContext(props, null);
+			if (loginContext == null) {
+				return "Failed to acquire login context: " + username;
+			}
 		} catch (javax.naming.CommunicationException e) {
 			return "Failed to connect to server, possible network error";
 		} catch (NamingException e) {
 			return "Failed to authenticate: " + username;
-		}
-		
-		if (loginContext == null) {
-			return "Failed to acquire login context: " + username;
 		}
 		
 		cachedDomain = domainName;
@@ -322,5 +321,4 @@ public class LDAPAuthenticator {
 		throw new RuntimeException("Failed to fetch userInfo (" + usedUsername + ")");
 		//return null; // Failed to get
 	}
-	
 }

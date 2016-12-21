@@ -143,7 +143,7 @@ public class NxtCrypt {
 			NxtCrypt.pbk = SecretKeyFactory.getInstance(securityKey);
 		}
 		if (NxtCrypt.secureRand == null) {
-			if (NxtCrypt.isStrongSecureRandom == false) {
+			if (!NxtCrypt.isStrongSecureRandom) {
 				//
 				// Using just plain old SecureRandom by default now.
 				// Frankly speaking I personally feel this is "secure enough",
@@ -172,7 +172,7 @@ public class NxtCrypt {
 	}
 	
 	/// Generic SecurityException varient for setupReuseObjects
-	protected static void setupReuseObjects_generic() throws SecurityException {
+	protected static void setupReuseObjects_generic() {
 		try {
 			NxtCrypt.setupReuseObjects();
 		} catch (NoSuchAlgorithmException e) {
@@ -181,8 +181,7 @@ public class NxtCrypt {
 	}
 	
 	/// Gets the salted hash of the raw password only (not the entire passHash)
-	public static String getSaltedHash(String rawPassword, byte[] salt, int iteration, int keyLen)
-		throws IllegalArgumentException, SecurityException {
+	public static String getSaltedHash(String rawPassword, byte[] salt, int iteration, int keyLen) {
 		if (rawPassword == null || rawPassword.length() == 0) {
 			throw new IllegalArgumentException("Empty/NULL passwords are not supported.");
 		}
@@ -212,8 +211,7 @@ public class NxtCrypt {
 	}
 	
 	/// String salt varient of getSaltedHash (instead of byte[])
-	public static String getSaltedHash(String rawPassword, String salt, int iteration, int keyLen)
-		throws IllegalArgumentException, SecurityException {
+	public static String getSaltedHash(String rawPassword, String salt, int iteration, int keyLen) {
 		if (salt == null || salt.length() == 0) {
 			throw new IllegalArgumentException("Empty/NULL salts are not supported.");
 		}
@@ -222,14 +220,12 @@ public class NxtCrypt {
 	}
 	
 	/// Default values varient of getSaltedHash
-	public static String getSaltedHash(String rawPassword, byte[] salt)
-		throws IllegalArgumentException, SecurityException {
+	public static String getSaltedHash(String rawPassword, byte[] salt) {
 		return getSaltedHash(rawPassword, salt, defaultIterations, defaultKeyLength);
 	}
 	
 	/// Default values, and string salt varient of getSaltedHash
-	public static String getSaltedHash(String rawPassword, String salt)
-		throws IllegalArgumentException, SecurityException {
+	public static String getSaltedHash(String rawPassword, String salt) {
 		return getSaltedHash(rawPassword, salt, defaultIterations, defaultKeyLength);
 	}
 	
@@ -282,8 +278,7 @@ public class NxtCrypt {
 	///
 	/// Notes on protocall format
 	/// * P#N-#K = PBKeySpec, with #N number of iterations & #K keylength
-	private static String getPassHash(String rawPassword, int saltLen, int iteration, int keyLen)
-		throws IllegalArgumentException, SecurityException {
+	private static String getPassHash(String rawPassword, int saltLen, int iteration, int keyLen) {
 		saltLen = NxtCrypt.defaultSaltLength;
 		iteration = defaultIterations;
 		keyLen = defaultKeyLength;
@@ -296,8 +291,7 @@ public class NxtCrypt {
 	}
 	
 	/// Default values varient of getPassHash
-	public static String getPassHash(String rawPassword) throws IllegalArgumentException,
-		SecurityException {
+	public static String getPassHash(String rawPassword) {
 		return getPassHash(rawPassword, 0, 0, 0);
 	}
 	
@@ -313,7 +307,7 @@ public class NxtCrypt {
 	}
 	
 	/// Extract out the salt from the full passHash. see getPassHash
-	public static String extractSalt(String passHash) throws SecurityException {
+	public static String extractSalt(String passHash) {
 		String[] splitStr = passHash.split(seperator, 3);
 		
 		if (splitStr.length < 3) {
@@ -324,8 +318,7 @@ public class NxtCrypt {
 	}
 	
 	/// Validates the password hash against the raw password given
-	public static boolean validatePassHash(String passHash, String rawPassword)
-		throws SecurityException {
+	public static boolean validatePassHash(String passHash, String rawPassword) {
 		String[] splitStr = passHash.split(seperator, 3);
 		
 		if (splitStr.length < 3) {

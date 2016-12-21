@@ -1,16 +1,15 @@
 package picoded.security;
 
-import org.apache.commons.codec.binary.Base64;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Arrays;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.util.Random;
-import java.security.SecureRandom;
-import java.util.Arrays;
+import org.apache.commons.codec.binary.Base64;
 
 /// Password hashing and crypt function : This uses PBEKeySpec (which will be upgraded in the future).
 /// This is conceptually similar to [PHP password_hash] (http://sg2.php.net/manual/en/function.password-hash.php),
@@ -250,7 +249,7 @@ public class NxtCrypt {
 		setupReuseObjects_generic();
 		
 		// Entropy resuffling
-		Random rand = new Random(System.currentTimeMillis());
+		SecureRandom rand = new SecureRandom();
 		char[] buff = new char[len];
 		
 		// For each character extract it

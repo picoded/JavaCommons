@@ -3,104 +3,56 @@ package picoded.struct;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
-public class GenericConvertArrayList_test extends StandardArrayList_test {
+public class GenericConvertArrayList_test {
 	
-	class GenericConvertTest<E> implements GenericConvertList<E> {
-		
-	}
+	GenericConvertArrayList<String> genericConvertArrayList = null;
+	String strValue = null;
 	
-	class ProxyTest<E> implements GenericConvertList<E> {
-		ArrayList<E> base = new ArrayList<E>();
-		
-		@Override
-		public int size() {
-			return base.size();
-		}
-		
-		// Implementation to actual base list
-		@Override
-		public void add(int index, E value) {
-			base.add(index, value);
-		}
-		
-		// Implementation to actual base list
-		@Override
-		public E remove(int index) {
-			return base.remove(index);
-		}
-		
-		// Implementation to actual base list
-		@Override
-		public E get(int key) {
-			return base.get(key);
-		}
-	}
-	
-	GenericConvertList<Object> unsupported = null;
-	ProxyTest proxyList = null;
-	
-	@Override
 	@Before
 	public void setUp() {
-		unsupported = new GenericConvertTest<>();
-		list = new ProxyTest<Object>();
-		proxyList = new ProxyTest<Object>();
+		genericConvertArrayList = new GenericConvertArrayList<>();
+		genericConvertArrayList.add("value");
 	}
 	
-	@Override
 	@After
 	public void tearDown() {
-		unsupported = null;
-		list = null;
-		proxyList = null;
-	}
-	
-	
-	@Test
-	public void notNullTest() {
-		assertNotNull(unsupported);
-		assertNotNull(list);
-		assertNotNull(proxyList);
-	}
-	
-	//
-	// Unsupported Operation Exception
-	//
-	
-	@Test(expected = UnsupportedOperationException.class)
-	public void getUnsupportedTest() {
-		unsupported.get(0);
-	}
-	
-	@Test(expected = UnsupportedOperationException.class)
-	public void addUnsupportedTest() {
-		unsupported.add(1, "value");
-	}
-	
-	@Test(expected = UnsupportedOperationException.class)
-	public void removeUnsupportedTest() {
-		unsupported.remove("key");
-	}
-	
-	@Test(expected = UnsupportedOperationException.class)
-	public void removeWithParamIntUnsupportedTest() {
-		unsupported.remove(1);
-	}
-	
-	@Test(expected = UnsupportedOperationException.class)
-	public void sizeUnsupportedTest() {
-		unsupported.remove("key");
+		
 	}
 	
 	@Test
-	public void getBooleanTest() {
-		proxyList.add(0, "value");
-		proxyList.getBoolean(0);
+	public void getTest() {
+		assertNotNull(genericConvertArrayList.get(0));
 	}
+	
+	@Test
+	public void putTest() {
+		genericConvertArrayList.add("value");
+		assertEquals(2, genericConvertArrayList.size());
+	}
+	
+	@Test
+	public void ConstructorTest() {
+		List<String> list = new ArrayList<>();
+		genericConvertArrayList = new GenericConvertArrayList<>(list);
+		genericConvertArrayList.add("value");
+		assertNotNull(genericConvertArrayList.get(0));
+	}
+	
+	@Test
+	public void toStringTest() {
+		assertNotNull(genericConvertArrayList.toString());
+	}
+	
+	@Test
+	public void buildTest() {
+		List<String> list = new ArrayList<>();
+		assertNotNull(GenericConvertList.build(list));
+	}
+	
 }

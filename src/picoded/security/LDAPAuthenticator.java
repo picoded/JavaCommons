@@ -90,7 +90,7 @@ public class LDAPAuthenticator {
 	}
 	
 	/// Closes the current cached context if any
-	public void close() {
+	public void close() throws NamingException {
 		cachedUser = null;
 		cachedDomain = null;
 		
@@ -109,13 +109,13 @@ public class LDAPAuthenticator {
 	///
 	/// @param LdapContext to close
 	///
-	protected void closeContext(LdapContext context) {
+	protected void closeContext(LdapContext context) throws NamingException {
 		if (context != null) {
-			try {
-				context.close();
-			} catch (Exception e) {
-				// do nothing
-			}
+			//			try {
+			context.close();
+			//			} catch (Exception e) {
+			// do nothing
+			//			}
 		}
 	}
 	
@@ -170,7 +170,7 @@ public class LDAPAuthenticator {
 		//
 		String usedUsername = username; //username actually used
 		String domainName = defaultDomain; //domain name actually used
-		if (usedUsername.indexOf("@") > 0) {
+		if (usedUsername.indexOf('@') > 0) {
 			String[] splitNames = usedUsername.split("@");
 			
 			if (splitNames.length != 2) {
@@ -195,7 +195,7 @@ public class LDAPAuthenticator {
 			try {
 				String fqdn = java.net.InetAddress.getLocalHost().getCanonicalHostName();
 				if (fqdn.split("\\.").length > 1) {
-					domainName = fqdn.substring(fqdn.indexOf(".") + 1);
+					domainName = fqdn.substring(fqdn.indexOf('.') + 1);
 				}
 			} catch (java.net.UnknownHostException e) {
 				// Does nothing

@@ -233,23 +233,20 @@ public class LDAPAuthenticator {
 		props.put(Context.PROVIDER_URL, ldapURL);
 		
 		/// The login context
-		LdapContext loginContext = null;
-		
 		/// Try and catch the errors
 		try {
-			loginContext = new InitialLdapContext(props, null);
+			LdapContext loginContext = new InitialLdapContext(props, null);
 			if (loginContext == null) {
 				return "Failed to acquire login context: " + username;
 			}
+			cachedDomain = domainName;
+			cachedUser = usedUsername;
+			cachedContext = loginContext;
 		} catch (javax.naming.CommunicationException e) {
 			return "Failed to connect to server, possible network error";
 		} catch (NamingException e) {
 			return "Failed to authenticate: " + username;
 		}
-		
-		cachedDomain = domainName;
-		cachedUser = usedUsername;
-		cachedContext = loginContext;
 		return null;
 	}
 	

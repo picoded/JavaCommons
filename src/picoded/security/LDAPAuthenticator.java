@@ -151,7 +151,6 @@ public class LDAPAuthenticator {
 	///
 	/// @returns  The expected error message, if any. Else simply null for success
 	///
-	@SuppressWarnings("unused")
 	public String login(String username, String password) {
 		
 		//
@@ -233,20 +232,23 @@ public class LDAPAuthenticator {
 		props.put(Context.PROVIDER_URL, ldapURL);
 		
 		/// The login context
+		LdapContext loginContext = null;
+		
 		/// Try and catch the errors
 		try {
-			LdapContext loginContext = new InitialLdapContext(props, null);
-			if (loginContext == null) {
-				return "Failed to acquire login context: " + username;
-			}
-			cachedDomain = domainName;
-			cachedUser = usedUsername;
-			cachedContext = loginContext;
+			loginContext = new InitialLdapContext(props, null);
 		} catch (javax.naming.CommunicationException e) {
 			return "Failed to connect to server, possible network error";
 		} catch (NamingException e) {
 			return "Failed to authenticate: " + username;
 		}
+		//		if (loginContext == null) {
+		//			return "Failed to acquire login context: " + username;
+		//		}
+		cachedDomain = domainName;
+		cachedUser = usedUsername;
+		cachedContext = loginContext;
+		
 		return null;
 	}
 	

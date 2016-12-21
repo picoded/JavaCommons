@@ -210,10 +210,8 @@ public class LDAPAuthenticator {
 		//
 		// password length 0, is considered null (no password
 		//
-		if (password != null) {
-			if ((password = password.trim()).length() == 0) {
-				password = null;
-			}
+		if (password != null && (password = password.trim()).length() == 0) {
+			password = null;
 		}
 		
 		//

@@ -296,7 +296,7 @@ public class NxtCrypt {
 	}
 	
 	/// Extract out the salted hash from the full passHash. see getPassHash
-	public static String extractSaltedHash(String passHash) throws SecurityException {
+	public static String extractSaltedHash(String passHash) {
 		String[] splitStr = passHash.split(seperator, 3);
 		
 		if (splitStr.length < 3) {

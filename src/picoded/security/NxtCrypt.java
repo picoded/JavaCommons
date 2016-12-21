@@ -131,7 +131,8 @@ public class NxtCrypt {
 		String hex = bi.toString(16);
 		int paddingLength = (array.length * 2) - hex.length();
 		if (paddingLength > 0) {
-			return String.format("%0" + paddingLength + "d", 0) + hex;
+			String str = "%0" + paddingLength + "d";
+			return String.format(str, 0) + hex;
 		} else {
 			return hex;
 		}
@@ -341,7 +342,7 @@ public class NxtCrypt {
 		int keyLen = 0;
 		
 		if (splitStr[1].length() >= 1) {
-			if ((splitStr[1]).substring(0, 1).equals("P")) {
+			if ("P".equals((splitStr[1]).substring(0, 1))) {
 				String[] splitProtocol = (splitStr[1]).substring(1).split("-", 2);
 				
 				if (splitProtocol.length >= 2) {

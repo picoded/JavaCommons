@@ -57,7 +57,7 @@ public class NxtCrypt_test {
 	}
 	
 	@Test
-	public void randomString() {
+	public void randomString() throws Exception {
 		String aStr = NxtCrypt.randomString(10);
 		
 		assertNotNull("Random string created", aStr);
@@ -65,7 +65,7 @@ public class NxtCrypt_test {
 	}
 	
 	@Test
-	public void randomString_multipleLengths() {
+	public void randomString_multipleLengths() throws Exception {
 		for (int a = 1; a < 25; ++a) {
 			String aStr = NxtCrypt.randomString(a);
 			
@@ -151,7 +151,7 @@ public class NxtCrypt_test {
 	}
 	
 	@Test
-	public void getSaltedHash_default() {
+	public void getSaltedHash_default() throws Exception {
 		String rawPass = "Swordfish";
 		String saltStr = "12345678901234567890123456789012"; // 32 char salt str
 		
@@ -165,7 +165,7 @@ public class NxtCrypt_test {
 	}
 	
 	@Test
-	public void getSaltedHash_byteArr_default() {
+	public void getSaltedHash_byteArr_default() throws Exception {
 		String rawPass = "Swordfish";
 		String saltStr = "12345678901234567890123456789012"; // 32 char salt str
 		
@@ -199,7 +199,7 @@ public class NxtCrypt_test {
 	}
 	
 	@Test
-	public void getAndValidatePassHash_fail() {
+	public void getAndValidatePassHash_fail() throws Exception {
 		String rawPass = "Swordfish";
 		String wrongPass = "NOOOOO";
 		String passHash = NxtCrypt.getPassHash(rawPass);
@@ -256,7 +256,7 @@ public class NxtCrypt_test {
 	}
 	
 	@Test
-	public void setupReuseObjectsTest() {
+	public void setupReuseObjectsTest() throws Exception {
 		NxtCrypt.isStrongSecureRandom = true;
 		NxtCrypt.secureRand = null;
 		NxtCrypt.setupReuseObjects_generic();

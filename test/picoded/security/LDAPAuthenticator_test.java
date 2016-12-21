@@ -65,9 +65,11 @@ public class LDAPAuthenticator_test {
 		assertNull(authObj.login("dummyuser", "P@ssw0rd!"));
 	}
 	
-	@Test
-	public void basicLoginInfo() {
+	@Test(expected = Exception.class)
+	public void basicLoginInfo() throws Exception {
 		assertNull(authObj.login("dummyuser", "P@ssw0rd!"));
+		assertNotNull(authObj.userInfo());
+		authObj.close();
 		assertNotNull(authObj.userInfo());
 	}
 	

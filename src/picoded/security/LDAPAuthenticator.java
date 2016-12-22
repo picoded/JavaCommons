@@ -79,7 +79,7 @@ public class LDAPAuthenticator {
 	//////////////////////////////////////////
 	
 	/// Blank constructor (will rely on user, and server info for domain, etc)
-	public LDAPAuthenticator() {
+	protected LDAPAuthenticator() {
 	}
 	
 	/// Constructor which setsup the various base config
@@ -228,7 +228,8 @@ public class LDAPAuthenticator {
 		}
 		
 		// LDAP Server connection
-		String ldapURL = "ldap://" + ((serverName == null) ? domainName : serverName + ":" + port);
+		String serverNameWithPort = serverName + ":" + port;
+		String ldapURL = "ldap://" + ((serverName == null) ? domainName : serverNameWithPort);
 		props.put(Context.PROVIDER_URL, ldapURL);
 		
 		/// The login context
@@ -285,9 +286,11 @@ public class LDAPAuthenticator {
 			SearchControls controls = new SearchControls();
 			controls.setSearchScope(SUBTREE_SCOPE);
 			controls.setReturningAttributes(userInfoAttributes);
+			
+			String userPrincipalName = "(& (userPrincipalName=" + principalName
+				+ ")(objectClass=user))";
 			NamingEnumeration<SearchResult> answer = usedContext.search(
-				domainNameToLdapDC(usedDomain), "(& (userPrincipalName=" + principalName
-					+ ")(objectClass=user))", controls);
+				domainNameToLdapDC(usedDomain), userPrincipalName, controls);
 			
 			if (answer.hasMore()) {
 				Attributes attr = answer.next().getAttributes();

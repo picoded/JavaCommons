@@ -20,6 +20,7 @@ import picoded.TestConfig;
 public class LDAPAuthenticator_test {
 	
 	protected LDAPAuthenticator authObj = null;
+	private static LdapContext cachedContext = null;
 	
 	@Before
 	public void setUp() {
@@ -68,8 +69,27 @@ public class LDAPAuthenticator_test {
 	@Test(expected = Exception.class)
 	public void basicLoginInfo() throws Exception {
 		assertNull(authObj.login("dummyuser", "P@ssw0rd!"));
+		cachedContext = authObj.cachedContext;
+		assertNotNull(authObj.userInfo());
+		authObj = new LDAPAuthenticator(null, TestConfig.LDAP_PORT(), "com.demo\\.");
+		authObj.cachedContext = cachedContext;
 		assertNotNull(authObj.userInfo());
 		authObj.close();
+		assertNotNull(authObj.userInfo());
+	}
+	
+	@Test(expected = Exception.class)
+	public void basicLoginInfo1() throws Exception {
+		authObj.cachedContext = cachedContext;
+		authObj.cachedDomain = "com.demo. ";
+		assertNotNull(authObj.userInfo());
+	}
+	
+	@Test(expected = Exception.class)
+	public void basicLoginInfo2() throws Exception {
+		authObj.cachedContext = cachedContext;
+		authObj.cachedDomain = "com.test";
+		authObj.cachedUser = "dummyuser";
 		assertNotNull(authObj.userInfo());
 	}
 	

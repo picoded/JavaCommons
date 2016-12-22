@@ -64,13 +64,13 @@ public class LDAPAuthenticator {
 	//
 	
 	/// The cached context
-	private LdapContext cachedContext = null;
+	protected LdapContext cachedContext = null;
 	
 	/// The cached username in context
-	private String cachedUser = null;
+	protected String cachedUser = null;
 	
 	/// The cached domain in context
-	private String cachedDomain = null;
+	protected String cachedDomain = null;
 	
 	//////////////////////////////////////////
 	//
@@ -129,7 +129,7 @@ public class LDAPAuthenticator {
 	private static String domainNameToLdapDC(String domainName) {
 		StringBuilder buf = new StringBuilder();
 		for (String token : domainName.split("\\.")) {
-			if (token.length() == 0) {
+			if (token.trim().length() == 0) {
 				continue; // defensive check
 			}
 			if (buf.length() > 0) {
@@ -316,8 +316,8 @@ public class LDAPAuthenticator {
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to fetch userInfo (" + usedUsername + ")", e);
 		}
-		
-		throw new RuntimeException("Failed to fetch userInfo (" + usedUsername + ")");
+		return ret;
+		//		throw new RuntimeException("Failed to fetch userInfo (" + usedUsername + ")");
 		//return null; // Failed to get
 	}
 }

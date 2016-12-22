@@ -69,7 +69,6 @@ public class LDAPAuthenticator_test {
 	@Test(expected = Exception.class)
 	public void basicLoginInfo() throws Exception {
 		assertNull(authObj.login("dummyuser", "P@ssw0rd!"));
-		assertNull(authObj.login("dummyuser", ""));
 		cachedContext = authObj.cachedContext;
 		assertNotNull(authObj.userInfo());
 		authObj.close();

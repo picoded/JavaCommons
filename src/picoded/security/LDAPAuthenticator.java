@@ -286,12 +286,9 @@ public class LDAPAuthenticator {
 			SearchControls controls = new SearchControls();
 			controls.setSearchScope(SUBTREE_SCOPE);
 			controls.setReturningAttributes(userInfoAttributes);
-			
-			String userPrincipalName = "(& (userPrincipalName=" + principalName
-				+ ")(objectClass=user))";
-			userPrincipalName = new String(userPrincipalName.getBytes("UTF-8"), userPrincipalName);
 			NamingEnumeration<SearchResult> answer = usedContext.search(
-				domainNameToLdapDC(usedDomain), userPrincipalName, controls);
+				domainNameToLdapDC(usedDomain), "(& (userPrincipalName=" + principalName
+					+ ")(objectClass=user))", controls);
 			
 			if (answer.hasMore()) {
 				Attributes attr = answer.next().getAttributes();

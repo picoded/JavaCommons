@@ -71,9 +71,6 @@ public class LDAPAuthenticator_test {
 		assertNull(authObj.login("dummyuser", "P@ssw0rd!"));
 		cachedContext = authObj.cachedContext;
 		assertNotNull(authObj.userInfo());
-		authObj = new LDAPAuthenticator(null, TestConfig.LDAP_PORT(), "com.demo\\.");
-		authObj.cachedContext = cachedContext;
-		assertNotNull(authObj.userInfo());
 		authObj.close();
 		assertNotNull(authObj.userInfo());
 	}

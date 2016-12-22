@@ -310,7 +310,6 @@ public class LDAPAuthenticator {
 					//
 					// And returns
 					//
-					return ret;
 				}
 			}
 		} catch (Exception e) {

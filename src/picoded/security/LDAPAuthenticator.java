@@ -156,6 +156,7 @@ public class LDAPAuthenticator {
 		//
 		// Sanity checks
 		//
+		System.out.println("password>>>" + password);
 		if (username == null) {
 			return "Invalid blank username (null)";
 		}

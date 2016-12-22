@@ -1,7 +1,5 @@
 package picoded.struct;
 
-import java.util.ArrayList;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,24 +13,14 @@ public class MutablePair_test {
 	class MutablePairProxy<L, R> extends MutablePair<L, R> {
 		
 		private static final long serialVersionUID = 1L;
-		ArrayList<L> base = new ArrayList<L>();
-		
-		public MutablePairProxy() {
-			super();
-		}
 		
 		public MutablePairProxy(L left, R right) {
 			super(left, right);
 		}
 		
 		@Override
-		public int size() {
-			return base.size();
-		}
-		
-		@Override
 		public void add(int index, Object value) {
-			super.set(index, (L) value);
+			super.set(index, value);
 		}
 		
 		@Override
@@ -85,7 +73,6 @@ public class MutablePair_test {
 	
 	@Test
 	public void removeTest() {
-		assertEquals(false, mutablePair.remove("0"));
 		assertEquals("right", mutablePair.remove(1));
 		assertEquals(null, mutablePair.remove(1));
 	}

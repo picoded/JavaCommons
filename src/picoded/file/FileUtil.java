@@ -483,6 +483,49 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	
 	//------------------------------------------------------------------------------------------------------------------
 	//
+	// Recursive permission nuke
+	//
+	//------------------------------------------------------------------------------------------------------------------
+	
+	///
+	/// Recursively reset the permission
+	///
+	/// @param file / folder to set permission
+	/// @param Set read permissions  (0:ignore, 1:unset, 2:set, -1:unset-owner-only, -2:set-owner-only)
+	/// @param Set write permissions (0:ignore, 1:unset, 2:set, -1:unset-owner-only, -2:set-owner-only)
+	/// @param Set exec permissions  (0:ignore, 1:unset, 2:set, -1:unset-owner-only, -2:set-owner-only)
+	/// @param recursion settings
+	///
+	public static void setFilePermission(File inFile, int read, int write, int exec, boolean recursive) {
+		try {
+			//
+			// Apply the permission setting
+			//
+			if( read != 0 ) {
+				inFile.setReadable( (read>=2 || read<-2), (read<0) );
+			}
+			if( write != 0 ) {
+				inFile.setWritable( (write>=2 || write<-2), (write<0) );
+			}
+			if( exec != 0 ) {
+				inFile.setExecutable( (exec>=2 || exec<-2), (exec<0) );
+			}
+			
+			//
+			// Recurssion
+			//
+			if( recursive && inFile.isDirectory() ) {
+				for (File f : inFile.listFiles()) {
+					setFilePermission(f, read, write, exec, recursive);
+				}
+			}
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	//------------------------------------------------------------------------------------------------------------------
+	//
 	// Items below here, requires cleanup : not considered stable
 	//
 	//------------------------------------------------------------------------------------------------------------------

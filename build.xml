@@ -374,7 +374,7 @@
 	<target name="junit-all" depends="compile-tests">
 		<mkdir dir="${junit-reports}"/>
 		<jacoco:coverage destfile="${junit-reports}/junit-all.exec">
-			<junit printsummary="yes" haltonfailure="yes" fork="true" forkmode="once">
+			<junit printsummary="yes" haltonfailure="yes" fork="true" forkmode="perTest" threads="16">
 				<classpath>
 					<pathelement path="${build-classes}"/>
 					<!--<pathelement path="${build-libOnly}"/>-->

@@ -419,6 +419,12 @@
 >]]></replacetoken>
 			<replacevalue><![CDATA[</testsuite>]]></replacevalue>
 		</replace>
+		<replace dir="${junit-reports}">
+			<include name="**/*.xml"/>
+			<replacetoken><![CDATA[</testsuite>
+te>]]></replacetoken>
+			<replacevalue><![CDATA[</testsuite>]]></replacevalue>
+		</replace>
 		
 	</target>
 	

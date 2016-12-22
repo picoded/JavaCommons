@@ -904,7 +904,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 		}
 		
 		// Output the data
-		output.println(ConvertJSON.fromObject(outputData, true));
+		output.println(ConvertJSON.fromObject(outputData));
 		return true;
 	}
 	

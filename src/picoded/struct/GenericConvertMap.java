@@ -349,7 +349,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	/// To String[] conversion of generic object
 	///
 	/// @param key The input value key to convert
-	/// @param The fallback default (if not convertable)
+	/// @param fallbck The fallback default (if not convertable)
 	///
 	/// @returns The converted String[], always possible unless null
 	default String[] getStringArray(K key, Object fallbck) {

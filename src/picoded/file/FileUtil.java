@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 /// Extension of apache FileUtils, for some additional features that we needed.
 /// Additionally several FilenameUtils is made avaliable here.
 ///
-/// To clarify, this class inherits all the apache FileUtils functions, and serves as a somewhat
+/// To clarify, this class inherits all the apache FileUtils functions, and serves as a somewhat 
 /// (different classname) drop in replacement
 ///
 /// @See https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtil.html
@@ -147,7 +147,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// Encoding assumes US-ASCII by default
 	///
 	/// @param File to read
-	/// @param String data to write
+	/// @param String data to write 
 	///
 	public static void writeStringToFile(File inFile, String data) throws IOException {
 		picoded.file.FileUtil.writeStringToFile(inFile, data, (String) null);
@@ -157,7 +157,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// Write a string content into a file
 	///
 	/// @param File to read
-	/// @param String data to write
+	/// @param String data to write 
 	/// @param Encoding string value to use - Null value assumes encoding with US-ASCII
 	///
 	public static void writeStringToFile(File inFile, String data, String encoding)
@@ -318,9 +318,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate,
 		boolean tryToSymLinkFiles) throws IOException {
 		// Checks if the output file is already a symbolic link
-		// And if its points to the same file.
+		// And if its points to the same file. 
 		//
-		// If so, both is practically the same final file when
+		// If so, both is practically the same final file when 
 		// linked, hence the file is considered "not different"
 		//------------------------------------------------------------
 		if (Files.isSymbolicLink(outFile.toPath())
@@ -345,7 +345,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			// Assumes output file is either NOT a symbolic link
 			// or has the wrong symbolic link reference.
 			//
-			// Creates a symbolic link of the outfile,
+			// Creates a symbolic link of the outfile, 
 			// relative to the in file (if possible)
 			//
 			//------------------------------------------------------------

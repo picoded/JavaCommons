@@ -1,15 +1,18 @@
 package picoded.conv;
 
 // Junit includes
-import static org.junit.Assert.*;
-import org.junit.*;
-
-// Apache reference
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.RandomUtils;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 // Java reference
 import java.lang.reflect.InvocationTargetException;
+
+import org.apache.commons.lang3.RandomUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+// Apache reference
 
 /// The actual test suite
 public class BaseX_test {

@@ -8,11 +8,23 @@ import java.util.Map;
 import java.util.Set;
 
 ///
-/// Simple interface pattern, that implements the default map functions, 
-/// which throws an UnsupportedOperationException for core functions (get/put/remove/keyset)
+/// Interface pattern, that implements most of the default map functions, 
+/// This builds ontop of core functions, in which implmentors of this interface will need to support. 
 ///
-/// While attempting to polyfill all other operations in possibly suboptimal usage patterns
-/// But atleast it works =)
+/// These core functions are as followed
+/// + get
+/// + put
+/// + remove
+/// + keyset
+///
+/// All other functions are then built ontop of these core function, 
+/// with suboptimal usage patterns. For example .isEmpty(), calls up the keyset(),
+/// and check its length. When there are probably much more efficent implmentation.
+///
+/// However more importantly is, it works =)
+///
+/// The idea is that this interface allows a programmer, to rapidly implement
+/// a Map object from any class, with just 4 function, instead of 12
 ///
 /// ### Example Usage
 ///
@@ -53,26 +65,29 @@ public interface UnsupportedDefaultMap<K, V> extends Map<K, V> {
 		throw new UnsupportedOperationException("function not supported");
 	}
 	
-	@Override
-	default void clear() {
-		for (K key : keySet()) {
-			remove(key);
-		}
-	}
-	
 	//-------------------------------------------------------------------
 	//
 	// Map polyfill related functions
 	//
 	//-------------------------------------------------------------------
 	
-	/// Does an unoptimized check, using keySet9)
+	@Override
+	default void clear() {
+		// This is a intentional converted to a new HashSet, to avoid
+		// ConcurrentModificationException
+		Set<K> clearSet = new HashSet<K>(keySet());
+		for (K key : clearSet) {
+			remove(key);
+		}
+	}
+	
+	/// Does an unoptimized check, using keySet
 	@Override
 	default boolean containsKey(Object key) {
 		return keySet().contains(key);
 	}
 	
-	/// Does an unoptimized check, using keySet9)
+	/// Does an unoptimized check, using keySet
 	@Override
 	default boolean containsValue(Object value) {
 		for (Map.Entry<K, V> entry : entrySet()) {

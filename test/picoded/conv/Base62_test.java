@@ -1,12 +1,12 @@
 package picoded.conv;
 
 // Junit includes
-import static org.junit.Assert.*;
-import org.junit.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
+import org.junit.Before;
+import org.junit.Test;
 // Apache reference
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.RandomUtils;
 
 /// The actual test suite
 public class Base62_test extends BaseX_test {

@@ -60,7 +60,7 @@ public class HashMapList_test {
 	///
 	/// Testing against multiple append
 	///
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	public void multiArrayAppendTest() {
 		

@@ -96,15 +96,4 @@ public class LDAPAuthenticator_test {
 		context.addToEnvironment(null, null);
 		authObj.closeContext(context);
 	}
-	
-	public static void main(String[] args) {
-		try {
-			for (int i = 0; i < 99; i++) {
-				System.out
-					.println(">>>>>" + java.net.InetAddress.getLocalHost().getCanonicalHostName());
-			}
-		} catch (java.net.UnknownHostException e) {
-			// Does nothing
-		}
-	}
 }

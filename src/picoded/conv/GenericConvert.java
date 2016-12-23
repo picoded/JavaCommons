@@ -22,7 +22,6 @@ import picoded.struct.ProxyGenericConvertMap;
 ///
 /// This split is mainly done to simplify code maintenance of this Giant package.
 ///
-@SuppressWarnings("all")
 public class GenericConvert extends GenericConvertStandard {
 	
 	/// Invalid constructor (throws exception)
@@ -46,6 +45,7 @@ public class GenericConvert extends GenericConvertStandard {
 	/// @param fallbck   The fallback default (if not convertable)
 	///
 	/// @returns         The converted value
+	@SuppressWarnings({ "unchecked", "all" })
 	public static <K extends String, V> GenericConvertMap<K, V> toGenericConvertStringMap(
 		Object input, Object fallbck) {
 		
@@ -89,6 +89,7 @@ public class GenericConvert extends GenericConvertStandard {
 	/// @param input     The input value to convert
 	///
 	/// @returns         The converted value
+	@SuppressWarnings("all")
 	public static <K extends String, V> GenericConvertMap<K, V> toGenericConvertStringMap(
 		Object input) {
 		return toGenericConvertStringMap(input, null);

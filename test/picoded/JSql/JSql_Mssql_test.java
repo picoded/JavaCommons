@@ -1,4 +1,4 @@
-package picodedTests.JSql;
+package picoded.JSql;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -11,7 +11,7 @@ import picoded.JSql.JSql;
 import picoded.JSql.JSqlException;
 import picoded.JSql.JSqlQuerySet;
 import picoded.JSql.JSqlResult;
-import picodedTests.TestConfig;
+import picoded.TestConfig;
 
 public class JSql_Mssql_test extends JSql_Sqlite_test {
 	

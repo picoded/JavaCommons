@@ -1,4 +1,4 @@
-package picodedTests.JSql;
+package picoded.JSql;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -16,11 +16,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import picoded.JSql.JSql;
-import picoded.JSql.JSqlException;
-import picoded.JSql.JSqlQuerySet;
-import picoded.JSql.JSqlResult;
-import picodedTests.TestConfig;
+import picoded.TestConfig;
 
 public class JSql_Sqlite_test {
 	
@@ -494,7 +490,7 @@ public class JSql_Sqlite_test {
 	public void selectRangeSet() throws JSqlException {
 		try {
 			row1to7setup();
-			JSqlResult r = null;
+			//			JSqlResult r = null;
 			JSqlQuerySet qSet = null;
 			
 			//Select range query
@@ -699,8 +695,9 @@ public class JSql_Sqlite_test {
 		JSqlObj.query(
 			"CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 TEXT )")
 			.dispose();
-		boolean b = JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)",
-			404, "has nothing");
+		//		boolean b = 
+		JSqlObj.execute("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404,
+			"has nothing");
 		JSqlResult r = JSqlObj.query("SELECT * FROM " + testTableName + " where col1 = ? ", 404);
 		assertNotNull("SQL result returns as expected", r);
 		r.fetchAllRows();

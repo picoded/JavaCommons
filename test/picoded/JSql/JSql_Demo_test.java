@@ -1,4 +1,4 @@
-package picodedTests.JSql;
+package picoded.JSql;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import picoded.JSql.JSql;
 import picoded.JSql.JSqlException;
-import picodedTests.TestConfig;
+import picoded.TestConfig;
 
 public class JSql_Demo_test {
 	

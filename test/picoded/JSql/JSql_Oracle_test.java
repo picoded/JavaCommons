@@ -1,4 +1,4 @@
-package picodedTests.JSql;
+package picoded.JSql;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -20,7 +20,7 @@ import picoded.JSql.JSql;
 import picoded.JSql.JSqlException;
 import picoded.JSql.JSqlQuerySet;
 import picoded.JSql.JSqlResult;
-import picodedTests.TestConfig;
+import picoded.TestConfig;
 
 public class JSql_Oracle_test {
 	
@@ -477,7 +477,7 @@ public class JSql_Oracle_test {
 	public void selectRangeSet() throws JSqlException {
 		try {
 			row1to7setup();
-			JSqlResult r = null;
+			//			JSqlResult r = null;
 			JSqlQuerySet qSet = null;
 			
 			//Select range query

@@ -1,17 +1,9 @@
-package picodedTests.JSql;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+package picoded.JSql;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.JSql.JSql;
-import picoded.JSql.JSqlException;
-import picoded.JSql.JSqlQuerySet;
-import picoded.JSql.JSqlResult;
-import picodedTests.TestConfig;
+import picoded.TestConfig;
 
 public class JSql_Mysql_test extends JSql_Sqlite_test {
 	
@@ -24,8 +16,8 @@ public class JSql_Mysql_test extends JSql_Sqlite_test {
 	@Test
 	public void upsertQuerySetWithDefault() throws JSqlException {
 		row1to7setup();
-		JSqlResult r = null;
-		JSqlQuerySet qSet = null;
+		//		JSqlResult r = null;
+		//		JSqlQuerySet qSet = null;
 		
 		JSqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "_1`").dispose(); //cleanup (just incase)
 		
@@ -60,9 +52,9 @@ public class JSql_Mysql_test extends JSql_Sqlite_test {
 	@Test
 	public void upsertQuerySetDefault() throws JSqlException {
 		row1to7setup();
-		JSqlResult r = null;
-		JSqlQuerySet qSet = null;
-		
+		//		JSqlResult r = null;
+		//		JSqlQuerySet qSet = null;
+		//		
 		JSqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "_1`").dispose(); //cleanup (just incase)
 		
 		JSqlObj.executeQuery(

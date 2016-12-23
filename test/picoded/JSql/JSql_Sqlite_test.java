@@ -657,7 +657,7 @@ public class JSql_Sqlite_test {
 	@Test
 	public void genericSqlParserTest() throws JSqlException {
 		String s = JSqlObj.genericSqlParser("SELECT * FROM " + testTableName + " WHERE COL1 = ?");
-		assertEquals("SELECT * FROM " + testTableName + " WHERE COL1=?", s);
+		assertEquals("SELECT * FROM " + testTableName + " WHERE COL1 = ?", s);
 	}
 	
 	@SuppressWarnings("deprecation")

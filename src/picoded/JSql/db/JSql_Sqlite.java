@@ -1,6 +1,6 @@
 package picoded.JSql.db;
 
-import java.util.logging.Logger;
+import java.util.Locale;
 
 import picoded.JSql.JSql;
 import picoded.JSql.JSqlException;
@@ -12,8 +12,9 @@ import picoded.enums.JSqlType;
 public class JSql_Sqlite extends JSql {
 	
 	/// Internal self used logger
-	@SuppressWarnings("unused")
-	private static Logger logger = Logger.getLogger(JSql_Sqlite.class.getName());
+	//	private static Logger LOGGER = Logger.getLogger(JSql_Sqlite.class.getName());
+	
+	public String className = "org.sqlite.JDBC";
 	
 	/// Runs with in memory SQLite
 	public JSql_Sqlite() {
@@ -33,7 +34,7 @@ public class JSql_Sqlite extends JSql {
 		sqlType = JSqlType.SQLITE;
 		
 		try {
-			Class.forName("org.sqlite.JDBC");
+			Class.forName(className);
 			sqlConn = java.sql.DriverManager.getConnection("jdbc:sqlite:"
 				+ (String) connectionProps.get("dbUrl"));
 		} catch (Exception e) {
@@ -55,7 +56,7 @@ public class JSql_Sqlite extends JSql {
 		final String truncateTable = "TRUNCATE TABLE";
 		final String deleteFrom = "DELETE FROM";
 		
-		inString = inString.toUpperCase();
+		inString = inString.toUpperCase(Locale.ENGLISH);
 		inString = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("\\s+", " ")
 			.replaceAll("(?i)VARCHAR\\(MAX\\)", "VARCHAR").replaceAll("(?i)BIGINT", "INTEGER");
 		//System.out.println( inString );

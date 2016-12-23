@@ -17,6 +17,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import picoded.TestConfig;
+import picoded.JSql.db.JSql_Sqlite;
 
 public class JSql_Sqlite_test {
 	
@@ -687,8 +688,8 @@ public class JSql_Sqlite_test {
 		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col1")).intValue());
 	}
 	
-	@Test
-	public void recreateTest() throws JSqlException {
+	@Test(expected = Exception.class)
+	public void recreateTest() throws Exception, JSqlException {
 		JSqlObj.recreate(true);
 		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
@@ -705,6 +706,8 @@ public class JSql_Sqlite_test {
 		assertEquals("via readRow", 404, ((Number) row.get("col1")).intValue());
 		assertEquals("via readCol", "has nothing", r.readCol("col2")[0]);
 		assertEquals("via readCol", "has nothing", r.readCol_StringArr("col2")[0]);
+		JSql_Sqlite jSql_Sqlite = new JSql_Sqlite();
+		jSql_Sqlite.className = null;
+		jSql_Sqlite.recreate(false);
 	}
-	
 }

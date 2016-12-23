@@ -554,6 +554,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	}
 	
 	/// The process chain part specific to a normal request
+	@SuppressWarnings("incomplete-switch")
 	private boolean processChainRequest() throws Exception {
 		try {
 			// Does authentication check
@@ -597,6 +598,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	}
 	
 	/// The process chain part specific to JSON request
+	@SuppressWarnings("incomplete-switch")
 	private boolean processChainJSON() throws Exception {
 		try {
 			// Does authentication check

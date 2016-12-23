@@ -1,12 +1,5 @@
 package picoded.struct;
 
-import java.util.List;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.NoSuchElementException;
-
 /// Class of utility functions used by UnsupportedDefaultList / UnssuportedDefaultMap
 /// This is used by the polyfills, for features such as constant error message format, etc
 ///

@@ -1,10 +1,8 @@
 package picoded.struct;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 
 ///
@@ -54,7 +52,6 @@ public class ArbitaryListIterator<E> extends
 	/// Moves iterator position
 	///
 	/// @return  Respective iterator element
-	@SuppressWarnings("unchecked")
 	public E next() {
 		checkForChange();
 		
@@ -134,7 +131,6 @@ public class ArbitaryListIterator<E> extends
 	/// (Note that alternating calls to next and previous will return the same element repeatedly.)
 	///
 	/// @return  Respective iterator element
-	@SuppressWarnings("unchecked")
 	public E previous() {
 		checkForChange();
 		int i = idxPt - 1;

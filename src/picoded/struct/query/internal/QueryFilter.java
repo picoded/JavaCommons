@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Locale;
+import java.util.Map;
 
 import picoded.struct.MutablePair;
 import picoded.struct.query.Query;
@@ -313,7 +313,6 @@ public class QueryFilter {
 	/// @params  Current list of Query and string tokens
 	///
 	/// @returns  {int[2]}  an array consisting of the left and right position. -1 if not found
-	@SuppressWarnings("unused")
 	public static int[] findCompleteEnclosure(List<Object> queryTokens) {
 		
 		// Gets the start and end

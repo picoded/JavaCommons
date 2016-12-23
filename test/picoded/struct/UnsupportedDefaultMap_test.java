@@ -55,7 +55,7 @@ public class UnsupportedDefaultMap_test extends StandardHashMap_test {
 		}
 	}
 	
-	Map<String,Object> unsupported = null;
+	Map<String, Object> unsupported = null;
 	
 	@Before
 	public void setUp() {

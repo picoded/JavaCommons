@@ -3,11 +3,11 @@ package picoded.struct;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiFunction;
 
 import picoded.conv.GenericConvert;
 
 /// Common map class, used to implement all the generic convert convinence functions in a map interface
+@SuppressWarnings("all")
 public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	
 	// Static proxy build

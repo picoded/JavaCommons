@@ -1,11 +1,9 @@
 package picoded.struct;
 
-import java.util.List;
-import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.NoSuchElementException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 ///
 /// Interface pattern, that implements most of the default list functions, 

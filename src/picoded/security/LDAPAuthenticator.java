@@ -185,7 +185,8 @@ public class LDAPAuthenticator {
 		//
 		
 		// Possibly invalid domain name
-		if ((domainName = domainName.trim()).length() <= 0) {
+		domainName = domainName.trim();
+		if (domainName.length() <= 0) {
 			domainName = null;
 		}
 		
@@ -194,7 +195,7 @@ public class LDAPAuthenticator {
 			try {
 				String fqdn = java.net.InetAddress.getLocalHost().getCanonicalHostName();
 				if (fqdn.split("\\.").length > 1) {
-					domainName = fqdn.substring(fqdn.indexOf('.') + 1);
+					domainName = fqdn.substring(fqdn.indexOf('.') + 1).trim();
 				}
 			} catch (java.net.UnknownHostException e) {
 				// Does nothing
@@ -202,14 +203,15 @@ public class LDAPAuthenticator {
 		}
 		
 		// Missing domain name check
-		if (domainName == null || (domainName = domainName.trim()).length() <= 0) {
+		if (domainName == null || domainName.length() <= 0) {
 			return "Missing domain name parameter for user (" + usedUsername + ")";
 		}
 		
 		//
 		// password length 0, is considered null (no password
 		//
-		if (password != null && (password = password.trim()).length() == 0) {
+		password = password.trim();
+		if (password != null && password.length() == 0) {
 			password = null;
 		}
 		

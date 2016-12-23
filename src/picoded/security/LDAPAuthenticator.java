@@ -168,7 +168,7 @@ public class LDAPAuthenticator {
 		// Domain names overwrite
 		//
 		String usedUsername = username; //username actually used
-		String domainName = defaultDomain; //domain name actually used
+		String domainName = defaultDomain.trim(); //domain name actually used
 		if (usedUsername.indexOf('@') >= 1) {
 			String[] splitNames = usedUsername.split("@");
 			
@@ -177,7 +177,7 @@ public class LDAPAuthenticator {
 			}
 			
 			usedUsername = splitNames[0];
-			domainName = splitNames[1];
+			domainName = splitNames[1].trim();
 		}
 		
 		//
@@ -185,7 +185,6 @@ public class LDAPAuthenticator {
 		//
 		
 		// Possibly invalid domain name
-		domainName = domainName.trim();
 		if (domainName.length() <= 0) {
 			domainName = null;
 		}
@@ -210,8 +209,7 @@ public class LDAPAuthenticator {
 		//
 		// password length 0, is considered null (no password
 		//
-		password = password.trim();
-		if (password != null && password.length() == 0) {
+		if (password != null && (password = password.trim()).length() == 0) {
 			password = null;
 		}
 		

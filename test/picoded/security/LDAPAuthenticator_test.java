@@ -95,6 +95,7 @@ public class LDAPAuthenticator_test {
 		LdapContext context = Mockito.mock(LdapContext.class);
 		context.addToEnvironment(null, null);
 		authObj.closeContext(context);
+		assertNull(authObj.login("test@123", null));
 		assertNull(authObj.login("test@123", ""));
 	}
 }

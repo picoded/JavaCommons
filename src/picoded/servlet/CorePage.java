@@ -401,8 +401,9 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	/// gets the PrintWriter, from the getOutputStream() object and returns it
 	public PrintWriter getWriter() {
 		try {
-			return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
-		} catch(UnsupportedEncodingException e) {
+			return new PrintWriter(getOutputStream());
+			//return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
+		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

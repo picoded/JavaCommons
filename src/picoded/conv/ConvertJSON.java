@@ -119,6 +119,32 @@ public class ConvertJSON {
 		}
 	}
 	
+	/// Converts input object into a json string
+	///
+	/// Note: This refers to java object types, not arrays
+	///
+	/// Note: that this is the core "to JSON string" function that all
+	/// other type strict varient is built ontop of.
+	///
+	/// @param  Input object to convert
+	/// @param  Boolean true, if output as pretty print
+	///
+	/// @return The json string
+	public static String fromObject(Object input, boolean prettyPrint) {
+		// No pretty print
+		if (prettyPrint != true) {
+			return fromObject(input);
+		}
+		
+		// With pretty print
+		try {
+			return cachedMapper().writerWithDefaultPrettyPrinter().writeValueAsString(input);
+		} catch (IOException e) {
+			// Any exception is recasted as InvalidFormatJSON
+			throw new InvalidFormatJSON(e);
+		}
+	}
+	
 	/////////////////////////////////////////////////
 	//
 	// From array conversion to JSON string conversion

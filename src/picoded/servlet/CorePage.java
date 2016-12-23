@@ -16,21 +16,14 @@ import java.io.PrintWriter;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.URLDecoder;
-
 // Apache library used
 import org.apache.commons.io.FilenameUtils;
 
-// JavaCommons library used
 import picoded.conv.ConvertJSON;
 import picoded.file.FileUtil;
 import picoded.set.HttpRequestType;
 import picoded.set.EmptyArray;
 import picoded.struct.HashMapList;
-import picoded.servlet.util.FileServlet;
 
 // Sub modules useds
 
@@ -400,12 +393,13 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	/// gets the PrintWriter, from the getOutputStream() object and returns it
 	public PrintWriter getWriter() {
-		try {
-			return new PrintWriter(getOutputStream());
-			//return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
-		} catch(Exception e) {
-			throw new RuntimeException(e);
-		}
+		// try {
+		// 	return new PrintWriter(getOutputStream());
+		// 	//return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
+		// } catch(Exception e) {
+		// 	throw new RuntimeException(e);
+		// }
+		return new PrintWriter(getOutputStream(), true);
 	}
 	
 	/// gets the OutputStream, from the httpResponse.getOutputStream() object and returns it
@@ -511,17 +505,6 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	// Native FileServlet and path handling
 	//
 	///////////////////////////////////////////////////////
-	
-	/// Cached FileServlet
-	protected FileServlet _outputFileServlet = null;
-	
-	/// Returns the File servlet
-	public FileServlet outputFileServlet() {
-		if (_outputFileServlet != null) {
-			return _outputFileServlet;
-		}
-		return (_outputFileServlet = new FileServlet(getContextPath()));
-	}
 	
 	///
 	/// Checks and forces a redirection for closing slash on index page requests.
@@ -835,14 +818,6 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	/// Does the output processing, this is after do(Post/Get/Put/Delete)Request
 	public boolean outputRequest(Map<String, Object> templateData, PrintWriter output)
 		throws Exception {
-		/// Does standard file output - if file exists
-		outputFileServlet().processRequest( //
-			getHttpServletRequest(), //
-			getHttpServletResponse(), //
-			requestType() == HttpRequestType.HEAD, //
-			requestWildcardUri());
-		
-		/// Completes and return
 		return true;
 	}
 	

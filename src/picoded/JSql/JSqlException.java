@@ -1,8 +1,5 @@
 package picoded.JSql;
 
-import java.lang.String;
-import java.lang.Exception;
-
 //import java.io.IOException;
 
 /// JSql base exception class : This is used for BOTH sqlite and mysql

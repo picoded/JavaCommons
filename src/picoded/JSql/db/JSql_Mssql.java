@@ -1,6 +1,7 @@
 package picoded.JSql.db;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -18,6 +19,8 @@ public class JSql_Mssql extends JSql {
 	/// Internal self used logger
 	private static Logger logger = Logger.getLogger(JSql_Mssql.class.getName());
 	
+	protected String dbName = "dbName";
+	
 	/// Runs JSql with the JDBC sqlite engine
 	public JSql_Mssql(String dbUrl, String dbName, String dbUser, String dbPass) {
 		// store database connection properties
@@ -33,9 +36,9 @@ public class JSql_Mssql extends JSql {
 		
 		String connectionUrl = "jdbc:jtds:sqlserver://" + (String) connectionProps.get("dbUrl");
 		
-		if (connectionProps.get("dbName") != null
-			&& connectionProps.get("dbName").toString().trim().length() > 0) {
-			connectionUrl += ";DatabaseName=" + (String) connectionProps.get("dbName")
+		if (connectionProps.get(this.dbName) != null
+			&& connectionProps.get(this.dbName).toString().trim().length() > 0) {
+			connectionUrl += ";DatabaseName=" + (String) connectionProps.get(this.dbName)
 				+ ";uselobs=false;"; //disable clobs
 		}
 		try {
@@ -63,7 +66,7 @@ public class JSql_Mssql extends JSql {
 			.replaceAll("'", "\"").replaceAll("\\s+", " ").replaceAll(" =", "=").replaceAll("= ", "=")
 			.trim();
 		
-		String upperCaseStr = fixedQuotes.toUpperCase();
+		String upperCaseStr = fixedQuotes.toUpperCase(Locale.ENGLISH);
 		String qString = fixedQuotes;
 		
 		String qStringPrefix = "";
@@ -106,7 +109,7 @@ public class JSql_Mssql extends JSql {
 					prefixOffset += ifExists.length() + 1;
 					
 					qStringPrefix = "BEGIN TRY IF OBJECT_ID('"
-						+ fixedQuotes.substring(prefixOffset).toUpperCase() + "', 'U')"
+						+ fixedQuotes.substring(prefixOffset).toUpperCase(Locale.ENGLISH) + "', 'U')"
 						+ " IS NOT NULL DROP TABLE " + fixedQuotes.substring(prefixOffset)
 						+ " END TRY BEGIN CATCH END CATCH";
 				} else {
@@ -122,7 +125,7 @@ public class JSql_Mssql extends JSql {
 					prefixOffset += ifExists.length() + 1;
 					
 					qStringPrefix = "BEGIN TRY IF OBJECT_ID('"
-						+ fixedQuotes.substring(prefixOffset).toUpperCase() + "', 'V')"
+						+ fixedQuotes.substring(prefixOffset).toUpperCase(Locale.ENGLISH) + "', 'V')"
 						+ " IS NOT NULL DROP VIEW " + fixedQuotes.substring(prefixOffset)
 						+ " END TRY BEGIN CATCH END CATCH";
 				} else {
@@ -201,7 +204,7 @@ public class JSql_Mssql extends JSql {
 			prefixOffset = select.length() + 1;
 			
 			tmpStr = qString.substring(prefixOffset);
-			tmpIndx = qString.toUpperCase().indexOf(" FROM ");
+			tmpIndx = qString.toUpperCase(Locale.ENGLISH).indexOf(" FROM ");
 			
 			if (tmpIndx > 0) {
 				qString = "SELECT " + tmpStr.substring(0, tmpIndx - 7)
@@ -317,14 +320,14 @@ public class JSql_Mssql extends JSql {
 	private static String getTableName(String qString) {
 		qString = qString.trim();
 		int indxPt = ((indxPt = qString.indexOf(' ')) <= -1) ? qString.length() : indxPt;
-		String tableStr = qString.substring(0, indxPt).toUpperCase();
+		String tableStr = qString.substring(0, indxPt).toUpperCase(Locale.ENGLISH);
 		return tableStr; //retrun the table name
 	}
 	
 	private static String _fixTableNameInMssqlSubQuery(String qString) {
 		qString = qString.trim();
 		int indxPt = ((indxPt = qString.indexOf(' ')) <= -1) ? qString.length() : indxPt;
-		String tableStr = qString.substring(0, indxPt).toUpperCase();
+		String tableStr = qString.substring(0, indxPt).toUpperCase(Locale.ENGLISH);
 		
 		qString = tableStr + qString.substring(indxPt);
 		

@@ -1,6 +1,7 @@
 package picoded.JSql.db;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -73,7 +74,7 @@ public class JSql_Mysql extends JSql {
 	
 	/// Internal parser that converts some of the common sql statements to mysql
 	public String genericSqlParser(String inString) {
-		String qString = inString.toUpperCase();
+		String qString = inString.toUpperCase(Locale.ENGLISH);
 		qString = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("\\s+", " ")
 			.replaceAll("\"", "`")
 			//.replaceAll("\'", "`")
@@ -103,7 +104,7 @@ public class JSql_Mysql extends JSql {
 	/// Returns false if no result is given by the execution call, else true on success
 	public boolean execute(String qString, Object... values) throws JSqlException {
 		qString = genericSqlParser(qString);
-		String qStringUpper = qString.toUpperCase();
+		String qStringUpper = qString.toUpperCase(Locale.ENGLISH);
 		/// MySQL does not support the inner query in create view
 		/// Check if create view query has an inner query.
 		/// If yes, create a view from the inner query and replace the inner query with created view.

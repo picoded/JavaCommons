@@ -1,6 +1,7 @@
 package picoded.JSql.db;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -128,7 +129,7 @@ public class JSql_Oracle extends JSql {
 	private static String _fixTableNameInOracleSubQuery(String qString) {
 		qString = qString.trim();
 		int indxPt = ((indxPt = qString.indexOf(' ')) <= -1) ? qString.length() : indxPt;
-		String tableStr = qString.substring(0, indxPt).toUpperCase();
+		String tableStr = qString.substring(0, indxPt).toUpperCase(Locale.ENGLISH);
 		
 		/*
 		if( !tableStr.substring(0,1).equals("\"") ) {
@@ -173,7 +174,7 @@ public class JSql_Oracle extends JSql {
 		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("\\s+", " ")
 			.replaceAll("'", "\"").replaceAll("`", "\""); //.replaceAll("\"", "'");
 		
-		String upperCaseStr = fixedQuotes.toUpperCase();
+		String upperCaseStr = fixedQuotes.toUpperCase(Locale.ENGLISH);
 		String qString = fixedQuotes;
 		String qStringPrefix = "";
 		String qStringSuffix = "";
@@ -292,7 +293,7 @@ public class JSql_Oracle extends JSql {
 						if (metadata != null && !metadata.isEmpty()) {
 							for (Map.Entry<String, String> entry : metadata.entrySet()) {
 								if (entry.getValue() != null
-									&& entry.getValue().trim().toUpperCase().contains("LOB")) {
+									&& entry.getValue().trim().toUpperCase(Locale.ENGLISH).contains("LOB")) {
 									throw new JSqlException(
 										"Cannot create index on expression with datatype LOB for field '"
 											+ entry.getKey() + "'.");
@@ -328,7 +329,7 @@ public class JSql_Oracle extends JSql {
 			prefixOffset = select.length() + 1;
 			
 			tmpStr = qString.substring(prefixOffset);
-			tmpIndx = qString.toUpperCase().indexOf(" FROM ");
+			tmpIndx = qString.toUpperCase(Locale.ENGLISH).indexOf(" FROM ");
 			
 			if (tmpIndx > 0) {
 				qString = "SELECT " + tmpStr.substring(0, tmpIndx - 7)

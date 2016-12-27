@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 /// Extension of apache FileUtils, for some additional features that we needed.
 /// Additionally several FilenameUtils is made avaliable here.
 ///
-/// To clarify, this class inherits all the apache FileUtils functions, and serves as a somewhat 
+/// To clarify, this class inherits all the apache FileUtils functions, and serves as a somewhat
 /// (different classname) drop in replacement
 ///
 /// @See https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtil.html
@@ -29,7 +29,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	
 	//------------------------------------------------------------------------------------------------------------------
 	//
-	// JavaCommons extensions
+	// File / folder search handling
 	//
 	//------------------------------------------------------------------------------------------------------------------
 	
@@ -40,18 +40,78 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @return Collection of folders within the current folder
 	///
-	public static Collection<File> listDirs(File inFile) {
+	public static List<File> listDirs(File directory) {
 		List<File> ret = new ArrayList<File>();
-		if (inFile == null) {
+		if (directory == null) {
 			return ret;
 		}
-		for (File f : inFile.listFiles()) {
+		for (File f : directory.listFiles()) {
 			if (f.isDirectory()) {
 				ret.add(f);
 			}
 		}
 		return ret;
 	}
+	
+	///
+	/// List only the folders inside a folder
+	///
+	/// @param folder to scan
+	///
+	/// @return List of folder names
+	///
+	public static List<String> listDirNames(File directory) {
+		return fileCollectionToStringNames(listDirs(directory));
+	}
+	
+	///
+	/// Finds files within a given directory (and optionally its subdirectories) which match an array of extensions.
+	///
+	/// @param  Folder to scan
+	/// @param  an array of extensions, ex. {"java","xml"}. If this parameter is null, all files are returned.
+	/// @param  if true all subdirectories are searched as well
+	///
+	/// @return  List of file names
+	///
+	public static List<String> listFileNames(File directory, String[] extensions, boolean recursive) {
+		return fileCollectionToStringNames(listFiles(directory, extensions, recursive));
+	}
+	
+	///
+	/// Finds files within a given directory (and optionally its subdirectories) which match an array of extensions.
+	///
+	/// @param  Folder to scan
+	/// @param  an array of extensions, ex. {"java","xml"}. If this parameter is null, all files are returned.
+	///
+	/// @return  List of file names
+	///
+	public static List<String> listFileNames(File directory, String[] extensions) {
+		return listFileNames(directory, extensions, false);
+	}
+	
+	///
+	/// Takes in a file collection and converts them into string names
+	///
+	/// @param  File collection to do the result conversion
+	///
+	/// @return  Array list of file/folder names given
+	///
+	public static List<String> fileCollectionToStringNames(Collection<File> fileCollection) {
+		ArrayList<String> ret = new ArrayList<String>();
+		if (fileCollection == null) {
+			return ret;
+		}
+		for (File item : fileCollection) {
+			ret.add(item.getName());
+		}
+		return ret;
+	}
+	
+	//------------------------------------------------------------------------------------------------------------------
+	//
+	// File to string handling
+	//
+	//------------------------------------------------------------------------------------------------------------------
 	
 	///
 	/// Reads a file content into a string
@@ -87,7 +147,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// Encoding assumes US-ASCII by default
 	///
 	/// @param File to read
-	/// @param String data to write 
+	/// @param String data to write
 	///
 	public static void writeStringToFile(File inFile, String data) throws IOException {
 		picoded.file.FileUtil.writeStringToFile(inFile, data, (String) null);
@@ -97,7 +157,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// Write a string content into a file
 	///
 	/// @param File to read
-	/// @param String data to write 
+	/// @param String data to write
 	/// @param Encoding string value to use - Null value assumes encoding with US-ASCII
 	///
 	public static void writeStringToFile(File inFile, String data, String encoding)
@@ -258,9 +318,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate,
 		boolean tryToSymLinkFiles) throws IOException {
 		// Checks if the output file is already a symbolic link
-		// And if its points to the same file. 
+		// And if its points to the same file.
 		//
-		// If so, both is practically the same final file when 
+		// If so, both is practically the same final file when
 		// linked, hence the file is considered "not different"
 		//------------------------------------------------------------
 		if (Files.isSymbolicLink(outFile.toPath())
@@ -285,7 +345,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			// Assumes output file is either NOT a symbolic link
 			// or has the wrong symbolic link reference.
 			//
-			// Creates a symbolic link of the outfile, 
+			// Creates a symbolic link of the outfile,
 			// relative to the in file (if possible)
 			//
 			//------------------------------------------------------------

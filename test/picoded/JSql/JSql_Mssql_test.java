@@ -4,13 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.JSql.JSql;
-import picoded.JSql.JSqlException;
-import picoded.JSql.JSqlQuerySet;
-import picoded.JSql.JSqlResult;
 import picoded.TestConfig;
 
 public class JSql_Mssql_test extends JSql_Sqlite_test {
@@ -89,5 +88,21 @@ public class JSql_Mssql_test extends JSql_Sqlite_test {
 	@Test
 	public void JSqlExceptionTest() throws Exception {
 		new JSqlException(new Throwable());
+	}
+	
+	@Test(expected = Exception.class)
+	public void setupConnectionTest() throws Exception {
+		Map<String, Object> connectionProps = new HashMap<String, Object>();
+		connectionProps.put("dbName", null);
+		JSqlObj.connectionProps = connectionProps;
+		JSqlObj.recreate(false);
+	}
+	
+	@Test(expected = Exception.class)
+	public void setupConnectionTest1() throws Exception {
+		Map<String, Object> connectionProps = new HashMap<String, Object>();
+		connectionProps.put("dbName", "");
+		JSqlObj.connectionProps = connectionProps;
+		JSqlObj.recreate(false);
 	}
 }

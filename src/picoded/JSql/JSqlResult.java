@@ -1,24 +1,27 @@
 package picoded.JSql;
 
-import java.math.BigDecimal;
-import java.sql.Blob;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
+import java.lang.Exception;
+import java.sql.PreparedStatement;
+
+import picoded.struct.CaseInsensitiveHashMap;
+import picoded.JSql.JSqlException;
+
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.sql.Blob;
+import java.io.IOException;
 
 // OracleSQL types
 import oracle.sql.CLOB;
 import picoded.conv.ClobString;
-import picoded.struct.CaseInsensitiveHashMap;
 
 /// JSql result set, data is either prefetched, or fetch on row request. For example usage, refer to JSql
 ///
@@ -45,12 +48,11 @@ import picoded.struct.CaseInsensitiveHashMap;
 ///   - readRow / readRowCol : To support unfetched rows -> ie, automatically fetchs to the desired row count
 ///   - isFetchedAll / isFetchedRow
 ///
-public class JSqlResult extends
-	CaseInsensitiveHashMap<String /*fieldName*/, List<Object> /*rowNumber array */> {
+public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, List<Object> /*rowNumber array */> {
 	protected static final long serialVersionUID = 1L;
 	
 	/// Internal self used logger
-	private static final Logger LOGGER = Logger.getLogger(JSqlResult.class.getName());
+	private static Logger logger = Logger.getLogger(JSqlResult.class.getName());
 	
 	/// Total row count for query
 	private int rowCount = 0;
@@ -93,8 +95,7 @@ public class JSqlResult extends
 							if (colName.charAt(0) == '\'' || colName.charAt(0) == '"') {
 								colName = colName.substring(1);
 							}
-							if (colName.charAt(colName.length() - 1) == '\''
-								|| colName.charAt(colName.length() - 1) == '"') {
+							if (colName.charAt(colName.length() - 1) == '\'' || colName.charAt(colName.length() - 1) == '"') {
 								colName = colName.substring(0, colName.length() - 1);
 							}
 						}
@@ -110,18 +111,20 @@ public class JSqlResult extends
 						//Expected format for mysql (basic data structs)
 						tmpObj = sqlRes.getObject(pt + 1);
 						if (BigDecimal.class.isInstance(tmpObj)) {
-							tmpObj = ((BigDecimal) tmpObj).doubleValue();
+							tmpObj = new Double(((BigDecimal) tmpObj).doubleValue());
 						} else if (CLOB.class.isInstance(tmpObj)) {
 							try {
 								tmpObj = ClobString.toStringNoisy((CLOB) tmpObj);
 							} catch (SQLException e) {
 								throw new JSqlException("CLOB Processing Error", e);
+							} catch (IOException e) {
+								throw new JSqlException("CLOB Processing Error", e);
 							}
 						} else if (Blob.class.isInstance(tmpObj)) {
-							Blob bob = (Blob) tmpObj;
-							tmpObj = bob.getBytes(1, (int) bob.length());
+							Blob bob = (Blob)tmpObj;
+							tmpObj = bob.getBytes(1, (int)bob.length());
 							bob.free();
-						}
+						} 
 						
 						colArr.add(rowCount, tmpObj);
 					}
@@ -146,11 +149,11 @@ public class JSqlResult extends
 	}
 	
 	/// Read a fetched row in a single hashmap
-	public Map<String, Object> readRow(int pt) {
+	public HashMap<String, Object> readRow(int pt) {
 		if (pt >= rowCount) {
 			return null;
 		}
-		Map<String, Object> ret = new HashMap<String, Object>();
+		HashMap<String, Object> ret = new HashMap<String, Object>();
 		Iterator<Map.Entry<String, List<Object>>> it = this.entrySet().iterator();
 		Map.Entry<String, List<Object>> pairs;
 		String colName;
@@ -206,7 +209,7 @@ public class JSqlResult extends
 			}
 		} catch (Exception e) {
 			//Logg the exception as warning
-			LOGGER.log(Level.WARNING, "JSqlResult.dispose result exception", e);
+			logger.log(Level.WARNING, "JSqlResult.dispose result exception", e);
 		}
 		
 		try {
@@ -216,7 +219,7 @@ public class JSqlResult extends
 			}
 		} catch (Exception e) {
 			//Logg the exception as warning
-			LOGGER.log(Level.WARNING, "JSqlResult.dispose statement exception", e);
+			logger.log(Level.WARNING, "JSqlResult.dispose statement exception", e);
 		}
 	}
 	
@@ -227,8 +230,7 @@ public class JSqlResult extends
 			ret = new HashMap<String, String>();
 			try {
 				while (sqlRes.next()) {
-					ret.put(sqlRes.getString("COLUMN_NAME").toUpperCase(Locale.ENGLISH), sqlRes
-						.getString("TYPE_NAME").toUpperCase(Locale.ENGLISH));
+					ret.put(sqlRes.getString("COLUMN_NAME").toUpperCase(), sqlRes.getString("TYPE_NAME").toUpperCase());
 				}
 			} catch (Exception e) {
 				throw new JSqlException("Error fetching sql meta data", e);

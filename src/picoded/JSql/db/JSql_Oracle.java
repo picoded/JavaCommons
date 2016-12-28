@@ -22,6 +22,7 @@ public class JSql_Oracle extends JSql {
 	private static String number = "NUMBER";
 	private static String queryStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;";
 	private static String from = "FROM";
+	private static String className = "oracle.jdbc.OracleDriver";
 	
 	///
 	//	private String oracleTablespace = null;
@@ -58,7 +59,7 @@ public class JSql_Oracle extends JSql {
 		
 		String connectionUrl = "jdbc:oracle:thin:" + oraclePath;
 		try {
-			Class.forName("oracle.jdbc.OracleDriver").newInstance(); //ensure oracle driver is loaded
+			Class.forName(className).newInstance(); //ensure oracle driver is loaded
 			sqlConn = java.sql.DriverManager.getConnection(connectionUrl,
 				(String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
 			
@@ -151,21 +152,21 @@ public class JSql_Oracle extends JSql {
 		return qString;
 	}
 	
-	static final String IFEXISTS = "IF EXISTS";
-	static final String IFNOTEXISTS = "IF NOT EXISTS";
+	public static final String IFEXISTS = "IF EXISTS";
+	public static final String IFNOTEXISTS = "IF NOT EXISTS";
 	
-	static final String CREATE = "CREATE";
-	static final String DROP = "DROP";
-	static final String VIEW = "VIEW";
-	static final String TABLE = "TABLE";
-	static final String SELECT = "SELECT";
-	static final String UPDATE = "UPDATE";
+	public static final String CREATE = "CREATE";
+	public static final String DROP = "DROP";
+	public static final String VIEW = "VIEW";
+	public static final String TABLE = "TABLE";
+	public static final String SELECT = "SELECT";
+	public static final String UPDATE = "UPDATE";
 	
-	static final String INSERTINTO = "INSERT INTO";
-	static final String DELETEFROM = "DELETE FROM";
+	public static final String INSERTINTO = "INSERT INTO";
+	public static final String DELETEFROM = "DELETE FROM";
 	
-	static final String[] INDEXTYPEARR = { "UNIQUE", "FULLTEXT", "SPATIAL" };
-	static final String INDEX = "INDEX";
+	public static final String[] INDEXTYPEARR = { "UNIQUE", "FULLTEXT", "SPATIAL" };
+	public static final String INDEX = "INDEX";
 	
 	/// Internal parser that converts some of the common sql statements to sqlite
 	public String genericSqlParser(String inString) throws JSqlException {

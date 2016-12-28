@@ -23,16 +23,12 @@ public class JSql_Oracle extends JSql {
 	private static String queryStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;";
 	private static String from = "FROM";
 	
-	///
-	//	private String oracleTablespace = null;
-	
 	/// Runs JSql with the JDBC ORACLE SQL engine
 	///
 	/// **Note:** urlString, is just IP:PORT. For example, "127.0.0.1:3306"
 	public JSql_Oracle(String oraclePath, String dbUser, String dbPass) {
 		// store database connection properties
 		setConnectionProperties(oraclePath, null, dbUser, dbPass, null);
-		
 		// call internal method to create the connection
 		setupConnection();
 	}
@@ -49,35 +45,17 @@ public class JSql_Oracle extends JSql {
 		
 		// Get the assumed oracle table space
 		String oraclePath = (String) connectionProps.get("dbUrl");
-		//		int tPoint = oraclePath.indexOf('@');
-		//		if (tPoint > 0) {
-		//			oracleTablespace = oraclePath.substring(0, tPoint);
-		//		} else {
-		//			oracleTablespace = null;
-		//		}
-		
 		String connectionUrl = "jdbc:oracle:thin:" + oraclePath;
 		try {
 			Class.forName("oracle.jdbc.OracleDriver").newInstance(); //ensure oracle driver is loaded
 			sqlConn = java.sql.DriverManager.getConnection(connectionUrl,
 				(String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
-			
 			// Try to alter & ensure the current session roles
 			try {
 				execute("SET ROLE ALL");
 			} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, "Failed to alter current session roles", e);
 			}
-			
-			// Try to alter & ensure the current session schema to the right tablespace
-			//try {
-			//	if( oracleTablespace != null && !dbUser.equals(oracleTablespace) ) {
-			//		execute("ALTER SESSION SET current_schema = ?", oracleTablespace);
-			//	}
-			//} catch (Exception e) {
-			//	logAndFormatError("Failed to alter sesion to target table space", e);
-			//}
-			
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load SQL connection: ", e);
 		}
@@ -94,38 +72,18 @@ public class JSql_Oracle extends JSql {
 	
 	/// Collumn type correction from mysql to oracle sql
 	private static String simpleMysqlToOracleCollumnSubstitude(String qString) {
-		return qString
-			.replaceAll("(?i)BIT", "RAW")
-			.replaceAll("(?i)TINYBLOB", "RAW")
-			//, RAW
-			//.replaceAll("(?i)CHAR","CHAR")
-			.replaceAll("(?i)DECIMAL", number)
-			.replaceAll("(?i)DOUBLE", "FLOAT(24)")
-			.replaceAll("(?i)DOUBLE PRECISION", "FLOAT(24)")
-			.replaceAll("(?i)REAL", "FLOAT (24)")
-			//.replaceAll("(?i)FLOAT","FLOAT")
-			.replaceAll("(?i)INTEGER", "INT")
-			//.replaceAll("(?i)INT", number+"(10,0)")
-			.replaceAll("(?i)BIGINT", number + "(19, 0)")
+		return qString.replaceAll("(?i)BIT", "RAW").replaceAll("(?i)TINYBLOB", "RAW")
+			.replaceAll("(?i)DECIMAL", number).replaceAll("(?i)DOUBLE", "FLOAT(24)")
+			.replaceAll("(?i)DOUBLE PRECISION", "FLOAT(24)").replaceAll("(?i)REAL", "FLOAT (24)")
+			.replaceAll("(?i)INTEGER", "INT").replaceAll("(?i)BIGINT", number + "(19, 0)")
 			.replaceAll("(?i)MEDIUMINT", number + "(7,0)")
 			.replaceAll("(?i)SMALLINT", number + "(5,0)").replaceAll("(?i)TINYINT", number + "(3,0)")
 			.replaceAll("(?i)YEAR", number).replaceAll("(?i)" + number, number)
 			.replaceAll("(?i)BLOB", "BLOB").replaceAll("(?i)LONGBLOB", "BLOB")
 			.replaceAll("(?i)MEDIUMBLOB", "BLOB").replaceAll("(?i)LONGTEXT", "CLOB")
-			.replaceAll("(?i)MEDIUMTEXT", "CLOB")
-			.replaceAll("(?i)TEXT", "CLOB")
-			//.replaceAll("(?i)DATE","DATE")
+			.replaceAll("(?i)MEDIUMTEXT", "CLOB").replaceAll("(?i)TEXT", "CLOB")
 			.replaceAll("(?i)TIME", "DATE").replaceAll("(?i)TIMESTAMP", "DATE")
-			.replaceAll("(?i)DATETIME", "DATE")
-			/*
-			.replaceAll("(?i)ENUM(?=\\()","VARCHAR2")
-			.replaceAll("(?i)ENUM(?!\\()","VARCHAR2(n)")
-			.replaceAll("(?i)SET(?=\\()","VARCHAR2")
-			.replaceAll("(?i)SET(?!\\()","VARCHAR2(n)")
-			.replaceAll("(?i)TINYTEXT(?=\\()","VARCHAR2")
-			.replaceAll("(?i)TINYTEXT(?!\\()","VARCHAR2(n)")
-			 */
-			.replaceAll("(?i)VARCHAR(?!\\()", "VARCHAR2(4000)")
+			.replaceAll("(?i)DATETIME", "DATE").replaceAll("(?i)VARCHAR(?!\\()", "VARCHAR2(4000)")
 			.replaceAll("(?i)VARCHAR\\(", "VARCHAR2(").replaceAll("MAX", "4000");
 	}
 	
@@ -134,17 +92,7 @@ public class JSql_Oracle extends JSql {
 		qString = qString.trim();
 		int indxPt = ((indxPt = qString.indexOf(' ')) <= -1) ? qString.length() : indxPt;
 		String tableStr = qString.substring(0, indxPt).toUpperCase(Locale.ENGLISH);
-		
-		/*
-		if( !tableStr.substring(0,1).equals("\"") ) {
-			tableStr = "\"" + tableStr;
-			if( !tableStr.substring(tableStr.length()-1).equals("\"") ) {
-				tableStr = tableStr+"\"";
-			}
-		}
-		 */
 		qString = tableStr + qString.substring(indxPt);
-		
 		while (qString.endsWith(";")) { //Remove uneeded trailing ";" semi collons
 			qString = qString.substring(0, qString.length() - 1);
 		}
@@ -153,18 +101,15 @@ public class JSql_Oracle extends JSql {
 	
 	public static final String IFEXISTS = "IF EXISTS";
 	public static final String IFNOTEXISTS = "IF NOT EXISTS";
-	
 	public static final String CREATE = "CREATE";
 	public static final String DROP = "DROP";
 	public static final String VIEW = "VIEW";
 	public static final String TABLE = "TABLE";
 	public static final String SELECT = "SELECT";
 	public static final String UPDATE = "UPDATE";
-	
 	public static final String INSERTINTO = "INSERT INTO";
 	public static final String DELETEFROM = "DELETE FROM";
-	
-	public static final String[] INDEXTYPEARR = { "UNIQUE", "FULLTEXT", "SPATIAL" };
+	protected static final String[] INDEXTYPEARR = { "UNIQUE", "FULLTEXT", "SPATIAL" };
 	public static final String INDEX = "INDEX";
 	
 	/// Internal parser that converts some of the common sql statements to sqlite
@@ -174,26 +119,20 @@ public class JSql_Oracle extends JSql {
 		if (inString.startsWith(oracleImmediateExecute)) {
 			return inString;
 		}
-		
 		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("\\s+", " ")
 			.replaceAll("'", "\"").replaceAll("`", "\""); //.replaceAll("\"", "'");
-		
 		String upperCaseStr = fixedQuotes.toUpperCase(Locale.ENGLISH);
 		String qString = fixedQuotes;
 		String qStringPrefix = "";
 		String qStringSuffix = "";
-		
 		String indexType;
 		String tmpStr;
 		int tmpIndx;
-		
 		Pattern createIndexType = Pattern.compile("((UNIQUE|FULLTEXT|SPATIAL) ){0,1}INDEX.*");
-		
 		int prefixOffset = 0;
 		if (upperCaseStr.startsWith(DROP)) { //DROP
 			upperCaseStr = upperCaseStr.replaceAll(IFNOTEXISTS, IFEXISTS);
 			fixedQuotes = fixedQuotes.replaceAll(IFNOTEXISTS, IFEXISTS);
-			
 			prefixOffset = DROP.length() + 1;
 			if (upperCaseStr.startsWith(TABLE, prefixOffset)) { //TABLE
 				prefixOffset += TABLE.length() + 1;
@@ -216,10 +155,8 @@ public class JSql_Oracle extends JSql {
 				}
 				qString = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 			}
-			
 		} else if (upperCaseStr.startsWith(CREATE)) { //CREATE
 			prefixOffset = CREATE.length() + 1;
-			
 			if (upperCaseStr.startsWith(TABLE, prefixOffset)) { //TABLE
 				prefixOffset += TABLE.length() + 1;
 				if (upperCaseStr.startsWith(IFNOTEXISTS, prefixOffset)) { //IF NOT EXISTS
@@ -242,7 +179,6 @@ public class JSql_Oracle extends JSql {
 				}
 				qString = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 				qString = simpleMysqlToOracleCollumnSubstitude(qString);
-				
 				int fromKeywordIndex = qString.indexOf(from) + from.length();
 				String qStringBeforeFromKeyword = qString.substring(0, fromKeywordIndex);
 				// remove 'AS' keywords after table name
@@ -250,14 +186,11 @@ public class JSql_Oracle extends JSql {
 					.replaceAll("AS", "");
 				// replace double quotes (") with single quotes
 				qStringAfterFromKeyword = qStringAfterFromKeyword.replace("\"", "'");
-				
 				qString = qStringBeforeFromKeyword + qStringAfterFromKeyword;
-				
 			} else {
 				LOGGER.finer("Trying to matched INDEX : " + upperCaseStr.substring(prefixOffset));
 				if (createIndexType.matcher(upperCaseStr.substring(prefixOffset)).matches()) { //UNIQUE|FULLTEXT|SPATIAL|_ INDEX
 					LOGGER.finer("Matched INDEX : " + inString);
-					
 					//Find the index type
 					indexType = null;
 					for (int a = 0; a < INDEXTYPEARR.length; ++a) {
@@ -267,21 +200,17 @@ public class JSql_Oracle extends JSql {
 							break;
 						}
 					}
-					
 					//only bother if it matches (shd be right?)
 					if (upperCaseStr.startsWith(INDEX, prefixOffset)) {
 						prefixOffset += INDEX.length() + 1;
-						
 						//If not exists wrapper
 						if (upperCaseStr.startsWith(IFNOTEXISTS, prefixOffset)) {
 							prefixOffset += IFNOTEXISTS.length() + 1;
 							qStringPrefix = "BEGIN EXECUTE IMMEDIATE '";
 							qStringSuffix = queryStringSuffix;
 						}
-						
 						tmpStr = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 						tmpIndx = tmpStr.indexOf(" ON ");
-						
 						String tableAndColumns = tmpStr.substring(tmpIndx + " ON ".length());
 						// check column's type
 						String metaDataQuery = "SELECT "
@@ -304,37 +233,23 @@ public class JSql_Oracle extends JSql {
 								}
 							}
 						}
-						
 						if (tmpIndx > 0) {
 							qString = "CREATE " + ((indexType != null) ? (indexType + " ") : "")
 								+ "INDEX " + tmpStr.substring(0, tmpIndx) + " ON "
 								+ fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx + 4));
 						}
 						// check if column type is blob
-						
 					}
 				}
 			}
 		} else if (upperCaseStr.startsWith(INSERTINTO)) { //INSERT INTO
 			prefixOffset = INSERTINTO.length() + 1;
-			
 			tmpStr = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
-			
-			//-- Not fully supported
-			//tmpIndx = tmpStr.indexOf(" ON DUPLICATE KEY UPDATE ");
-			//if(tmpIndx > 0) {
-			//	qStringPrefix = "BEGIN EXECUTE IMMEDIATE '";
-			//	qString = tmpStr.substring(0, tmpIndx);
-			//	qStringSuffix = QueryStringSuffix;
-			//}
-			
 			qString = "INSERT INTO " + tmpStr;
 		} else if (upperCaseStr.startsWith(SELECT)) { //SELECT
 			prefixOffset = SELECT.length() + 1;
-			
 			tmpStr = qString.substring(prefixOffset);
 			tmpIndx = qString.toUpperCase(Locale.ENGLISH).indexOf(" " + from + " ");
-			
 			if (tmpIndx > 0) {
 				qString = "SELECT " + tmpStr.substring(0, tmpIndx - 7)
 				//.replaceAll("\"", "'")
@@ -358,40 +273,10 @@ public class JSql_Oracle extends JSql {
 			// Remove 'AS' from table alias
 			qString = removeAsAfterTablename(qString);
 			qString = removeAsAfterOpeningBracket(qString);
-			
-			// Fix the pagination query as per the Oracle 12C
-			// The Oracle 12C supports the pagination query with the OFFSET/FETCH keywords
-			/*
-			String prefixQuery = null;
-			int offsetIndex = qString.indexOf("OFFSET");
-			String offsetQuery = "";
-			if (offsetIndex != -1) {
-			   prefixQuery = qString.substring(0, offsetIndex);
-			   offsetQuery = qString.substring(offsetIndex);
-			   offsetQuery += " ROWS ";
-			}
-			int limitIndex = qString.indexOf("LIMIT");
-			String limitQuery = "";
-			if (limitIndex != -1) {
-			   prefixQuery = qString.substring(0, limitIndex);
-			   if (offsetIndex != -1) {
-			      limitQuery = qString.substring(limitIndex, offsetIndex);
-			   } else {
-			      limitQuery = qString.substring(limitIndex);
-			   }
-			   limitQuery = limitQuery.replace("LIMIT", "FETCH NEXT");
-			   limitQuery += " ROWS ONLY ";
-			}
-			if (prefixQuery != null) {
-			   qString = prefixQuery + offsetQuery + limitQuery;
-			}
-			 */
-			
 			// Fix the pagination using the ROWNUM which is supported by versions below than Oracle 12C
 			String prefixQuery = null;
 			int startRowNum = -1;
 			int endRowNum = -1;
-			
 			int limitIndex = qString.indexOf("LIMIT");
 			if (limitIndex != -1) {
 				prefixQuery = qString.substring(0, limitIndex);
@@ -411,36 +296,22 @@ public class JSql_Oracle extends JSql {
 				qString = "SELECT * FROM (SELECT a.*, rownum AS rnum FROM (" + prefixQuery
 					+ ") a WHERE rownum <= " + endRowNum + ") WHERE rnum > " + startRowNum;
 			}
-			
 		} else if (upperCaseStr.startsWith(DELETEFROM)) {
 			prefixOffset = DELETEFROM.length() + 1;
-			
 			tmpStr = fixTableNameInOracleSubQuery(qString.substring(prefixOffset));
 			qString = DELETEFROM + " " + tmpStr;
-			
 		} else if (upperCaseStr.startsWith(UPDATE)) { //UPDATE
 			prefixOffset = UPDATE.length() + 1;
-			
 			tmpStr = fixTableNameInOracleSubQuery(qString.substring(prefixOffset));
 			qString = UPDATE + " " + tmpStr;
 		}
-		
 		qString = qStringPrefix + qString + qStringSuffix;
-		
-		//logger.finer("Converting MySQL query to oracleSQL query");
-		//logger.finer("MySql -> "+inString);
-		//logger.finer("OracleSql -> "+qString);
-		
-		//logger.warning("MySql -> "+inString);
-		//logger.warning("OracleSql -> "+qString);
-		
 		return qString; //no change of data
 	}
 	
 	private static String removeAsAfterTablename(String qString) {
 		int prefixOffset = 0;
 		String tmpStr = null;
-		
 		// parse table name
 		String searchString = from;
 		String tablename = "";
@@ -456,10 +327,8 @@ public class JSql_Oracle extends JSql {
 					tablename += tmpStr.charAt(i);
 				}
 				tablename = tablename.replaceAll("\"", "").trim();
-				
 			}
 		}
-		
 		// Fix the "AS" quotation
 		searchString = " " + tablename + " ";
 		while ((prefixOffset = qString.indexOf(searchString, prefixOffset)) > 0) {
@@ -470,7 +339,6 @@ public class JSql_Oracle extends JSql {
 					+ qString.substring(prefixOffset + "AS".length() + 1, qString.length()).trim();
 			}
 		}
-		
 		return qString;
 	}
 	
@@ -520,14 +388,7 @@ public class JSql_Oracle extends JSql {
 	///
 	/// **Note:** Only queries starting with 'SELECT' will produce a JSqlResult object that has fetchable results
 	public JSqlResult executeQuery(String qString, Object... values) throws JSqlException {
-		//try {
 		return executeQuery_raw(genericSqlParser(qString), values);
-		//} catch(JSqlException e) {
-		//	logger.log( Level.SEVERE, "ExecuteQuery Exception" ); //, e
-		//	logger.log( Level.SEVERE, "-> Original query : " + qString );
-		//	logger.log( Level.SEVERE, "-> Parsed query   : " + genericSqlParser(qString) );
-		//	throw e;
-		//}
 	}
 	
 	/// Executes the argumented query, and immediately fetches the result from
@@ -535,14 +396,7 @@ public class JSql_Oracle extends JSql {
 	///
 	/// **Note:** Only queries starting with 'SELECT' will produce a JSqlResult object that has fetchable results
 	public JSqlResult query(String qString, Object... values) throws JSqlException {
-		//try {
 		return query_raw(genericSqlParser(qString), values);
-		//} catch(JSqlException e) {
-		//	logger.log( Level.SEVERE, "Query Exception" ); //, e
-		//	logger.log( Level.SEVERE, "-> Original query : " + qString );
-		//	logger.log( Level.SEVERE, "-> Parsed query   : " + genericSqlParser(qString) );
-		//	throw e;
-		//}
 	}
 	
 	/// Executes and dispose the sqliteResult object.
@@ -631,12 +485,6 @@ public class JSql_Oracle extends JSql {
 		}
 		
 		return retvalue;
-		//} catch(JSqlException e) {
-		//	logger.log( Level.SEVERE, "Execute Exception" ); //, e
-		//	logger.log( Level.SEVERE, "-> Original query : " + qString );
-		//	logger.log( Level.SEVERE, "-> Parsed query   : " + genericSqlParser(qString) );
-		//	throw e;
-		//}
 	}
 	
 	///

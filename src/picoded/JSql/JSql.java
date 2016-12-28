@@ -334,15 +334,6 @@ public class JSql extends BaseInterface {
 		}
 	}
 	
-	// Performs a roll back, this is currently useless without setting checkpoints
-	//public void rollback() throws JSqlException {
-	//	try {
-	//		sqlConn.rollback();
-	//	} catch (Exception e) {
-	//		throw new JSqlException(e);
-	//	}
-	//}
-	
 	//--------------------------------------------------------------------------
 	// Utility helper functions used to prepare common complex SQL quries
 	//--------------------------------------------------------------------------
@@ -528,21 +519,18 @@ public class JSql extends BaseInterface {
 				defaultColumns, defaultValues, miscColumns, innerSelectArgs, innerSelectSB,
 				innerSelectPrefix, innerSelectSuffix);
 		}
-		
 		/// Building the query for INSERT OR REPLACE
 		StringBuilder queryBuilder = new StringBuilder("INSERT OR REPLACE INTO `" + tableName + "` (");
 		if (sqlType.equals(JSqlType.MYSQL)) {
 			/// Building the query for REPLACE
 			queryBuilder = new StringBuilder("REPLACE INTO `" + tableName + "` (");
 		}
-		
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		/// Building the query for both sides of '(...columns...) VALUE (...vars...)' clauses in upsert
 		/// Note that the final trailing ", " seperator will be removed prior to final query conversion
 		StringBuilder columnNames = new StringBuilder();
 		StringBuilder columnValues = new StringBuilder();
 		String columnSeperator = ", ";
-		
 		/// Setting up unique values
 		for (int a = 0; a < uniqueColumns.length; ++a) {
 			columnNames.append(uniqueColumns[a]);
@@ -553,7 +541,6 @@ public class JSql extends BaseInterface {
 			//
 			queryArgs.add(uniqueValues[a]);
 		}
-		
 		/// Inserting updated values
 		if (insertColumns != null) {
 			for (int a = 0; a < insertColumns.length; ++a) {
@@ -567,43 +554,34 @@ public class JSql extends BaseInterface {
 					: null);
 			}
 		}
-		
 		/// Handling default values
 		if (defaultColumns != null) {
 			for (int a = 0; a < defaultColumns.length; ++a) {
 				columnNames.append(defaultColumns[a]);
 				columnNames.append(columnSeperator);
-				//
 				columnValues.append(COALESCE);
-				//-
 				columnValues.append(innerSelectPrefix);
 				columnValues.append(defaultColumns[a]);
 				columnValues.append(innerSelectSuffix);
 				queryArgs.addAll(innerSelectArgs);
-				//-
 				columnValues.append(", ?)");
 				columnValues.append(columnSeperator);
-				//
 				queryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a]
 					: null);
 			}
 		}
-		
 		/// Handling Misc values
 		if (miscColumns != null) {
 			for (int a = 0; a < miscColumns.length; ++a) {
 				columnNames.append(miscColumns[a]);
 				columnNames.append(columnSeperator);
-				//-
 				columnValues.append(innerSelectPrefix);
 				columnValues.append(miscColumns[a]);
 				columnValues.append(innerSelectSuffix);
 				queryArgs.addAll(innerSelectArgs);
-				//-
 				columnValues.append(columnSeperator);
 			}
 		}
-		
 		/// Building the final query
 		queryBuilder
 			.append(columnNames.substring(0, columnNames.length() - columnSeperator.length()));
@@ -611,7 +589,6 @@ public class JSql extends BaseInterface {
 		queryBuilder.append(columnValues.substring(0,
 			columnValues.length() - columnSeperator.length()));
 		queryBuilder.append(")");
-		
 		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	

@@ -17,11 +17,14 @@ import picoded.enums.JSqlType;
 public class JSql_Oracle extends JSql {
 	
 	/// Internal self used logger
-	private static Logger logger = Logger.getLogger(JSql_Oracle.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(JSql_Oracle.class.getName());
+	
+	private static String NUMBER = "NUMBER";
+	private static String QUERYSTRINGSUFFIX = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;";
+	private static String FROM = "FROM";
 	
 	///
-	@SuppressWarnings("unused")
-	private String oracleTablespace = null;
+	//	private String oracleTablespace = null;
 	
 	/// Runs JSql with the JDBC ORACLE SQL engine
 	///
@@ -46,12 +49,12 @@ public class JSql_Oracle extends JSql {
 		
 		// Get the assumed oracle table space
 		String oraclePath = (String) connectionProps.get("dbUrl");
-		int tPoint = oraclePath.indexOf('@');
-		if (tPoint > 0) {
-			oracleTablespace = oraclePath.substring(0, tPoint);
-		} else {
-			oracleTablespace = null;
-		}
+		//		int tPoint = oraclePath.indexOf('@');
+		//		if (tPoint > 0) {
+		//			oracleTablespace = oraclePath.substring(0, tPoint);
+		//		} else {
+		//			oracleTablespace = null;
+		//		}
 		
 		String connectionUrl = "jdbc:oracle:thin:" + oraclePath;
 		try {
@@ -63,7 +66,7 @@ public class JSql_Oracle extends JSql {
 			try {
 				execute("SET ROLE ALL");
 			} catch (Exception e) {
-				logger.log(Level.SEVERE, "Failed to alter current session roles", e);
+				LOGGER.log(Level.SEVERE, "Failed to alter current session roles", e);
 			}
 			
 			// Try to alter & ensure the current session schema to the right tablespace
@@ -90,22 +93,23 @@ public class JSql_Oracle extends JSql {
 	}
 	
 	/// Collumn type correction from mysql to oracle sql
-	private static String _simpleMysqlToOracle_collumnSubstitude(String qString) {
+	private static String simpleMysqlToOracleCollumnSubstitude(String qString) {
 		return qString
 			.replaceAll("(?i)BIT", "RAW")
 			.replaceAll("(?i)TINYBLOB", "RAW")
 			//, RAW
 			//.replaceAll("(?i)CHAR","CHAR")
-			.replaceAll("(?i)DECIMAL", "NUMBER")
+			.replaceAll("(?i)DECIMAL", NUMBER)
 			.replaceAll("(?i)DOUBLE", "FLOAT(24)")
 			.replaceAll("(?i)DOUBLE PRECISION", "FLOAT(24)")
 			.replaceAll("(?i)REAL", "FLOAT (24)")
 			//.replaceAll("(?i)FLOAT","FLOAT")
 			.replaceAll("(?i)INTEGER", "INT")
-			//.replaceAll("(?i)INT","NUMBER(10,0)")
-			.replaceAll("(?i)BIGINT", "NUMBER(19, 0)").replaceAll("(?i)MEDIUMINT", "NUMBER(7,0)")
-			.replaceAll("(?i)SMALLINT", "NUMBER(5,0)").replaceAll("(?i)TINYINT", "NUMBER(3,0)")
-			.replaceAll("(?i)YEAR", "NUMBER").replaceAll("(?i)NUMERIC", "NUMBER")
+			//.replaceAll("(?i)INT", number+"(10,0)")
+			.replaceAll("(?i)BIGINT", NUMBER + "(19, 0)")
+			.replaceAll("(?i)MEDIUMINT", NUMBER + "(7,0)")
+			.replaceAll("(?i)SMALLINT", NUMBER + "(5,0)").replaceAll("(?i)TINYINT", NUMBER + "(3,0)")
+			.replaceAll("(?i)YEAR", NUMBER).replaceAll("(?i)" + NUMBER, NUMBER)
 			.replaceAll("(?i)BLOB", "BLOB").replaceAll("(?i)LONGBLOB", "BLOB")
 			.replaceAll("(?i)MEDIUMBLOB", "BLOB").replaceAll("(?i)LONGTEXT", "CLOB")
 			.replaceAll("(?i)MEDIUMTEXT", "CLOB")
@@ -126,7 +130,7 @@ public class JSql_Oracle extends JSql {
 	}
 	
 	/// Fixes the table name, and removes any trailing ";" if needed
-	private static String _fixTableNameInOracleSubQuery(String qString) {
+	private static String fixTableNameInOracleSubQuery(String qString) {
 		qString = qString.trim();
 		int indxPt = ((indxPt = qString.indexOf(' ')) <= -1) ? qString.length() : indxPt;
 		String tableStr = qString.substring(0, indxPt).toUpperCase(Locale.ENGLISH);
@@ -147,21 +151,21 @@ public class JSql_Oracle extends JSql {
 		return qString;
 	}
 	
-	final String ifExists = "IF EXISTS";
-	final String ifNotExists = "IF NOT EXISTS";
+	static final String ifExists = "IF EXISTS";
+	static final String ifNotExists = "IF NOT EXISTS";
 	
-	final String create = "CREATE";
-	final String drop = "DROP";
-	final String view = "VIEW";
-	final String table = "TABLE";
-	final String select = "SELECT";
-	final String update = "UPDATE";
+	static final String create = "CREATE";
+	static final String drop = "DROP";
+	static final String view = "VIEW";
+	static final String table = "TABLE";
+	static final String select = "SELECT";
+	static final String update = "UPDATE";
 	
-	final String insertInto = "INSERT INTO";
-	final String deleteFrom = "DELETE FROM";
+	static final String insertInto = "INSERT INTO";
+	static final String deleteFrom = "DELETE FROM";
 	
-	final String[] indexTypeArr = { "UNIQUE", "FULLTEXT", "SPATIAL" };
-	final String index = "INDEX";
+	static final String[] indexTypeArr = { "UNIQUE", "FULLTEXT", "SPATIAL" };
+	static final String index = "INDEX";
 	
 	/// Internal parser that converts some of the common sql statements to sqlite
 	public String genericSqlParser(String inString) throws JSqlException {
@@ -200,7 +204,7 @@ public class JSql_Oracle extends JSql {
 				} else {
 					qStringPrefix = "DROP TABLE ";
 				}
-				qString = _fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
+				qString = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 			} else if (upperCaseStr.startsWith(view, prefixOffset)) { //VIEW
 				prefixOffset += view.length() + 1;
 				if (upperCaseStr.startsWith(ifExists, prefixOffset)) { //IF EXISTS
@@ -210,7 +214,7 @@ public class JSql_Oracle extends JSql {
 				} else {
 					qStringPrefix = "DROP VIEW ";
 				}
-				qString = _fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
+				qString = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 			}
 			
 		} else if (upperCaseStr.startsWith(create)) { //CREATE
@@ -221,25 +225,25 @@ public class JSql_Oracle extends JSql {
 				if (upperCaseStr.startsWith(ifNotExists, prefixOffset)) { //IF NOT EXISTS
 					prefixOffset += ifNotExists.length() + 1;
 					qStringPrefix = "BEGIN EXECUTE IMMEDIATE 'CREATE TABLE ";
-					qStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;";
+					qStringSuffix = QUERYSTRINGSUFFIX;
 				} else {
 					qStringPrefix = "CREATE TABLE ";
 				}
-				qString = _fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
-				qString = _simpleMysqlToOracle_collumnSubstitude(qString);
+				qString = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
+				qString = simpleMysqlToOracleCollumnSubstitude(qString);
 			} else if (upperCaseStr.startsWith(view, prefixOffset)) { //VIEW
 				prefixOffset += view.length() + 1;
 				if (upperCaseStr.startsWith(ifNotExists, prefixOffset)) { //IF NOT EXISTS
 					prefixOffset += ifNotExists.length() + 1;
 					qStringPrefix = "BEGIN EXECUTE IMMEDIATE 'CREATE VIEW ";
-					qStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;";
+					qStringSuffix = QUERYSTRINGSUFFIX;
 				} else {
 					qStringPrefix = "CREATE VIEW ";
 				}
-				qString = _fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
-				qString = _simpleMysqlToOracle_collumnSubstitude(qString);
+				qString = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
+				qString = simpleMysqlToOracleCollumnSubstitude(qString);
 				
-				int fromKeywordIndex = qString.indexOf("FROM") + "FROM".length();
+				int fromKeywordIndex = qString.indexOf(FROM) + FROM.length();
 				String qStringBeforeFromKeyword = qString.substring(0, fromKeywordIndex);
 				// remove 'AS' keywords after table name
 				String qStringAfterFromKeyword = qString.substring(fromKeywordIndex, qString.length())
@@ -250,9 +254,9 @@ public class JSql_Oracle extends JSql {
 				qString = qStringBeforeFromKeyword + qStringAfterFromKeyword;
 				
 			} else {
-				logger.finer("Trying to matched INDEX : " + upperCaseStr.substring(prefixOffset));
+				LOGGER.finer("Trying to matched INDEX : " + upperCaseStr.substring(prefixOffset));
 				if (createIndexType.matcher(upperCaseStr.substring(prefixOffset)).matches()) { //UNIQUE|FULLTEXT|SPATIAL|_ INDEX
-					logger.finer("Matched INDEX : " + inString);
+					LOGGER.finer("Matched INDEX : " + inString);
 					
 					//Find the index type
 					indexType = null;
@@ -272,10 +276,10 @@ public class JSql_Oracle extends JSql {
 						if (upperCaseStr.startsWith(ifNotExists, prefixOffset)) {
 							prefixOffset += ifNotExists.length() + 1;
 							qStringPrefix = "BEGIN EXECUTE IMMEDIATE '";
-							qStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;";
+							qStringSuffix = QUERYSTRINGSUFFIX;
 						}
 						
-						tmpStr = _fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
+						tmpStr = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 						tmpIndx = tmpStr.indexOf(" ON ");
 						
 						String tableAndColumns = tmpStr.substring(tmpIndx + " ON ".length());
@@ -302,9 +306,9 @@ public class JSql_Oracle extends JSql {
 						}
 						
 						if (tmpIndx > 0) {
-							qString = "CREATE " + ((indexType != null) ? indexType + " " : "") + "INDEX "
-								+ tmpStr.substring(0, tmpIndx) + " ON "
-								+ _fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx + 4));
+							qString = "CREATE " + ((indexType != null) ? (indexType + " ") : "")
+								+ "INDEX " + tmpStr.substring(0, tmpIndx) + " ON "
+								+ fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx + 4));
 						}
 						// check if column type is blob
 						
@@ -314,14 +318,14 @@ public class JSql_Oracle extends JSql {
 		} else if (upperCaseStr.startsWith(insertInto)) { //INSERT INTO
 			prefixOffset = insertInto.length() + 1;
 			
-			tmpStr = _fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
+			tmpStr = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 			
 			//-- Not fully supported
 			//tmpIndx = tmpStr.indexOf(" ON DUPLICATE KEY UPDATE ");
 			//if(tmpIndx > 0) {
 			//	qStringPrefix = "BEGIN EXECUTE IMMEDIATE '";
 			//	qString = tmpStr.substring(0, tmpIndx);
-			//	qStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;";
+			//	qStringSuffix = QueryStringSuffix;
 			//}
 			
 			qString = "INSERT INTO " + tmpStr;
@@ -335,9 +339,9 @@ public class JSql_Oracle extends JSql {
 				qString = "SELECT " + tmpStr.substring(0, tmpIndx - 7)
 				//.replaceAll("\"", "'")
 					.replaceAll("`", "\"") + " FROM "
-					+ _fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx - 1));
+					+ fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx - 1));
 			} else {
-				qString = _fixTableNameInOracleSubQuery(fixedQuotes);
+				qString = fixTableNameInOracleSubQuery(fixedQuotes);
 			}
 			prefixOffset = 0;
 			//Fix the "AS" quotation
@@ -411,13 +415,13 @@ public class JSql_Oracle extends JSql {
 		} else if (upperCaseStr.startsWith(deleteFrom)) {
 			prefixOffset = deleteFrom.length() + 1;
 			
-			tmpStr = _fixTableNameInOracleSubQuery(qString.substring(prefixOffset));
+			tmpStr = fixTableNameInOracleSubQuery(qString.substring(prefixOffset));
 			qString = deleteFrom + " " + tmpStr;
 			
 		} else if (upperCaseStr.startsWith(update)) { //UPDATE
 			prefixOffset = update.length() + 1;
 			
-			tmpStr = _fixTableNameInOracleSubQuery(qString.substring(prefixOffset));
+			tmpStr = fixTableNameInOracleSubQuery(qString.substring(prefixOffset));
 			qString = update + " " + tmpStr;
 		}
 		
@@ -438,7 +442,7 @@ public class JSql_Oracle extends JSql {
 		String tmpStr = null;
 		
 		// parse table name
-		String searchString = "FROM";
+		String searchString = FROM;
 		String tablename = "";
 		while ((prefixOffset = qString.indexOf(searchString, prefixOffset)) > 0) {
 			prefixOffset += searchString.length();
@@ -677,7 +681,8 @@ public class JSql_Oracle extends JSql {
 		Object[] insertValues, // Values to update
 		//
 		String[] defaultColumns, // Columns names to apply default value, if not exists
-		Object[] defaultValues, // Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+		Object[] defaultValues, // Values to insert, that is not updated. 
+		// Note that this is ignored if pre-existing values exists
 		//
 		// Various column names where its existing value needs to be maintained (if any),
 		// this is important as some SQL implementation will fallback to default table values, if not properly handled
@@ -686,7 +691,7 @@ public class JSql_Oracle extends JSql {
 	) throws JSqlException {
 		
 		if (tableName.length() > 30) {
-			logger.warning(JSqlException.oracleNameSpaceWarning + tableName);
+			LOGGER.warning(JSqlException.oracleNameSpaceWarning + tableName);
 		}
 		
 		/// Checks that unique collumn and values length to be aligned

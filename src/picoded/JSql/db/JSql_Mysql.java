@@ -135,11 +135,11 @@ public class JSql_Mysql extends JSql {
 			String createViewQuery = null;
 			if (indexOpeningBracket != -1) {
 				tmpViewName = viewName;
-				if (viewName.indexOf("_") != -1) {
+				if (viewName.indexOf('_') != -1) {
 					tmpViewName = viewName.split("_")[0];
 				}
 				tmpViewName += "_inner_view";
-				indexClosingIndex = qStringUpper.indexOf(")", indexOpeningBracket);
+				indexClosingIndex = qStringUpper.indexOf(')', indexOpeningBracket);
 				
 				String innerQuery = qStringUpper.substring(indexOpeningBracket + 1, indexClosingIndex);
 				createViewQuery = "CREATE VIEW " + tmpViewName + " AS " + innerQuery;
@@ -180,12 +180,12 @@ public class JSql_Mysql extends JSql {
 					// Find the index of opening bracket index.
 					// The column names will be enclosed between the opening and closing bracket
 					// And table name will be before the opening bracket
-					int openBracketIndex = tableAndColumnsName.indexOf("(");
+					int openBracketIndex = tableAndColumnsName.indexOf('(');
 					if (openBracketIndex != -1) {
 						// extract the table name which is till the opening bracket
 						String tablename = tableAndColumnsName.substring(0, openBracketIndex);
 						// find the closing bracket index
-						int closeBracketIndex = tableAndColumnsName.lastIndexOf(")");
+						int closeBracketIndex = tableAndColumnsName.lastIndexOf(')');
 						// extract the columns between the opening and closing brackets
 						String columns = tableAndColumnsName.substring(openBracketIndex + 1,
 							closeBracketIndex);

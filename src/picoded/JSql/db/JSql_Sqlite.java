@@ -89,5 +89,4 @@ public class JSql_Sqlite extends JSql {
 	public boolean execute(String qString, Object... values) throws JSqlException {
 		return execute_raw(genericSqlParser(qString), values);
 	}
-	
 }

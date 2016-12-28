@@ -19,9 +19,9 @@ public class JSql_Oracle extends JSql {
 	/// Internal self used logger
 	private static final Logger LOGGER = Logger.getLogger(JSql_Oracle.class.getName());
 	
-	private static String NUMBER = "NUMBER";
-	private static String QUERYSTRINGSUFFIX = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;";
-	private static String FROM = "FROM";
+	private static String number = "NUMBER";
+	private static String queryStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;";
+	private static String from = "FROM";
 	
 	///
 	//	private String oracleTablespace = null;
@@ -99,17 +99,17 @@ public class JSql_Oracle extends JSql {
 			.replaceAll("(?i)TINYBLOB", "RAW")
 			//, RAW
 			//.replaceAll("(?i)CHAR","CHAR")
-			.replaceAll("(?i)DECIMAL", NUMBER)
+			.replaceAll("(?i)DECIMAL", number)
 			.replaceAll("(?i)DOUBLE", "FLOAT(24)")
 			.replaceAll("(?i)DOUBLE PRECISION", "FLOAT(24)")
 			.replaceAll("(?i)REAL", "FLOAT (24)")
 			//.replaceAll("(?i)FLOAT","FLOAT")
 			.replaceAll("(?i)INTEGER", "INT")
 			//.replaceAll("(?i)INT", number+"(10,0)")
-			.replaceAll("(?i)BIGINT", NUMBER + "(19, 0)")
-			.replaceAll("(?i)MEDIUMINT", NUMBER + "(7,0)")
-			.replaceAll("(?i)SMALLINT", NUMBER + "(5,0)").replaceAll("(?i)TINYINT", NUMBER + "(3,0)")
-			.replaceAll("(?i)YEAR", NUMBER).replaceAll("(?i)" + NUMBER, NUMBER)
+			.replaceAll("(?i)BIGINT", number + "(19, 0)")
+			.replaceAll("(?i)MEDIUMINT", number + "(7,0)")
+			.replaceAll("(?i)SMALLINT", number + "(5,0)").replaceAll("(?i)TINYINT", number + "(3,0)")
+			.replaceAll("(?i)YEAR", number).replaceAll("(?i)" + number, number)
 			.replaceAll("(?i)BLOB", "BLOB").replaceAll("(?i)LONGBLOB", "BLOB")
 			.replaceAll("(?i)MEDIUMBLOB", "BLOB").replaceAll("(?i)LONGTEXT", "CLOB")
 			.replaceAll("(?i)MEDIUMTEXT", "CLOB")
@@ -151,21 +151,21 @@ public class JSql_Oracle extends JSql {
 		return qString;
 	}
 	
-	static final String ifExists = "IF EXISTS";
-	static final String ifNotExists = "IF NOT EXISTS";
+	static final String IFEXISTS = "IF EXISTS";
+	static final String IFNOTEXISTS = "IF NOT EXISTS";
 	
-	static final String create = "CREATE";
-	static final String drop = "DROP";
-	static final String view = "VIEW";
-	static final String table = "TABLE";
-	static final String select = "SELECT";
-	static final String update = "UPDATE";
+	static final String CREATE = "CREATE";
+	static final String DROP = "DROP";
+	static final String VIEW = "VIEW";
+	static final String TABLE = "TABLE";
+	static final String SELECT = "SELECT";
+	static final String UPDATE = "UPDATE";
 	
-	static final String insertInto = "INSERT INTO";
-	static final String deleteFrom = "DELETE FROM";
+	static final String INSERTINTO = "INSERT INTO";
+	static final String DELETEFROM = "DELETE FROM";
 	
-	static final String[] indexTypeArr = { "UNIQUE", "FULLTEXT", "SPATIAL" };
-	static final String index = "INDEX";
+	static final String[] INDEXTYPEARR = { "UNIQUE", "FULLTEXT", "SPATIAL" };
+	static final String INDEX = "INDEX";
 	
 	/// Internal parser that converts some of the common sql statements to sqlite
 	public String genericSqlParser(String inString) throws JSqlException {
@@ -190,25 +190,25 @@ public class JSql_Oracle extends JSql {
 		Pattern createIndexType = Pattern.compile("((UNIQUE|FULLTEXT|SPATIAL) ){0,1}INDEX.*");
 		
 		int prefixOffset = 0;
-		if (upperCaseStr.startsWith(drop)) { //DROP
-			upperCaseStr = upperCaseStr.replaceAll(ifNotExists, ifExists);
-			fixedQuotes = fixedQuotes.replaceAll(ifNotExists, ifExists);
+		if (upperCaseStr.startsWith(DROP)) { //DROP
+			upperCaseStr = upperCaseStr.replaceAll(IFNOTEXISTS, IFEXISTS);
+			fixedQuotes = fixedQuotes.replaceAll(IFNOTEXISTS, IFEXISTS);
 			
-			prefixOffset = drop.length() + 1;
-			if (upperCaseStr.startsWith(table, prefixOffset)) { //TABLE
-				prefixOffset += table.length() + 1;
-				if (upperCaseStr.startsWith(ifExists, prefixOffset)) { //IF EXISTS
-					prefixOffset += ifExists.length() + 1;
+			prefixOffset = DROP.length() + 1;
+			if (upperCaseStr.startsWith(TABLE, prefixOffset)) { //TABLE
+				prefixOffset += TABLE.length() + 1;
+				if (upperCaseStr.startsWith(IFEXISTS, prefixOffset)) { //IF EXISTS
+					prefixOffset += IFEXISTS.length() + 1;
 					qStringPrefix = "BEGIN EXECUTE IMMEDIATE 'DROP TABLE ";
 					qStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;";
 				} else {
 					qStringPrefix = "DROP TABLE ";
 				}
 				qString = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
-			} else if (upperCaseStr.startsWith(view, prefixOffset)) { //VIEW
-				prefixOffset += view.length() + 1;
-				if (upperCaseStr.startsWith(ifExists, prefixOffset)) { //IF EXISTS
-					prefixOffset += ifExists.length() + 1;
+			} else if (upperCaseStr.startsWith(VIEW, prefixOffset)) { //VIEW
+				prefixOffset += VIEW.length() + 1;
+				if (upperCaseStr.startsWith(IFEXISTS, prefixOffset)) { //IF EXISTS
+					prefixOffset += IFEXISTS.length() + 1;
 					qStringPrefix = "BEGIN EXECUTE IMMEDIATE 'DROP VIEW ";
 					qStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;";
 				} else {
@@ -217,33 +217,33 @@ public class JSql_Oracle extends JSql {
 				qString = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 			}
 			
-		} else if (upperCaseStr.startsWith(create)) { //CREATE
-			prefixOffset = create.length() + 1;
+		} else if (upperCaseStr.startsWith(CREATE)) { //CREATE
+			prefixOffset = CREATE.length() + 1;
 			
-			if (upperCaseStr.startsWith(table, prefixOffset)) { //TABLE
-				prefixOffset += table.length() + 1;
-				if (upperCaseStr.startsWith(ifNotExists, prefixOffset)) { //IF NOT EXISTS
-					prefixOffset += ifNotExists.length() + 1;
+			if (upperCaseStr.startsWith(TABLE, prefixOffset)) { //TABLE
+				prefixOffset += TABLE.length() + 1;
+				if (upperCaseStr.startsWith(IFNOTEXISTS, prefixOffset)) { //IF NOT EXISTS
+					prefixOffset += IFNOTEXISTS.length() + 1;
 					qStringPrefix = "BEGIN EXECUTE IMMEDIATE 'CREATE TABLE ";
-					qStringSuffix = QUERYSTRINGSUFFIX;
+					qStringSuffix = queryStringSuffix;
 				} else {
 					qStringPrefix = "CREATE TABLE ";
 				}
 				qString = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 				qString = simpleMysqlToOracleCollumnSubstitude(qString);
-			} else if (upperCaseStr.startsWith(view, prefixOffset)) { //VIEW
-				prefixOffset += view.length() + 1;
-				if (upperCaseStr.startsWith(ifNotExists, prefixOffset)) { //IF NOT EXISTS
-					prefixOffset += ifNotExists.length() + 1;
+			} else if (upperCaseStr.startsWith(VIEW, prefixOffset)) { //VIEW
+				prefixOffset += VIEW.length() + 1;
+				if (upperCaseStr.startsWith(IFNOTEXISTS, prefixOffset)) { //IF NOT EXISTS
+					prefixOffset += IFNOTEXISTS.length() + 1;
 					qStringPrefix = "BEGIN EXECUTE IMMEDIATE 'CREATE VIEW ";
-					qStringSuffix = QUERYSTRINGSUFFIX;
+					qStringSuffix = queryStringSuffix;
 				} else {
 					qStringPrefix = "CREATE VIEW ";
 				}
 				qString = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 				qString = simpleMysqlToOracleCollumnSubstitude(qString);
 				
-				int fromKeywordIndex = qString.indexOf(FROM) + FROM.length();
+				int fromKeywordIndex = qString.indexOf(from) + from.length();
 				String qStringBeforeFromKeyword = qString.substring(0, fromKeywordIndex);
 				// remove 'AS' keywords after table name
 				String qStringAfterFromKeyword = qString.substring(fromKeywordIndex, qString.length())
@@ -260,23 +260,23 @@ public class JSql_Oracle extends JSql {
 					
 					//Find the index type
 					indexType = null;
-					for (int a = 0; a < indexTypeArr.length; ++a) {
-						if (upperCaseStr.startsWith(indexTypeArr[a], prefixOffset)) {
-							prefixOffset += indexTypeArr[a].length() + 1;
-							indexType = indexTypeArr[a];
+					for (int a = 0; a < INDEXTYPEARR.length; ++a) {
+						if (upperCaseStr.startsWith(INDEXTYPEARR[a], prefixOffset)) {
+							prefixOffset += INDEXTYPEARR[a].length() + 1;
+							indexType = INDEXTYPEARR[a];
 							break;
 						}
 					}
 					
 					//only bother if it matches (shd be right?)
-					if (upperCaseStr.startsWith(index, prefixOffset)) {
-						prefixOffset += index.length() + 1;
+					if (upperCaseStr.startsWith(INDEX, prefixOffset)) {
+						prefixOffset += INDEX.length() + 1;
 						
 						//If not exists wrapper
-						if (upperCaseStr.startsWith(ifNotExists, prefixOffset)) {
-							prefixOffset += ifNotExists.length() + 1;
+						if (upperCaseStr.startsWith(IFNOTEXISTS, prefixOffset)) {
+							prefixOffset += IFNOTEXISTS.length() + 1;
 							qStringPrefix = "BEGIN EXECUTE IMMEDIATE '";
-							qStringSuffix = QUERYSTRINGSUFFIX;
+							qStringSuffix = queryStringSuffix;
 						}
 						
 						tmpStr = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
@@ -315,8 +315,8 @@ public class JSql_Oracle extends JSql {
 					}
 				}
 			}
-		} else if (upperCaseStr.startsWith(insertInto)) { //INSERT INTO
-			prefixOffset = insertInto.length() + 1;
+		} else if (upperCaseStr.startsWith(INSERTINTO)) { //INSERT INTO
+			prefixOffset = INSERTINTO.length() + 1;
 			
 			tmpStr = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
 			
@@ -329,16 +329,16 @@ public class JSql_Oracle extends JSql {
 			//}
 			
 			qString = "INSERT INTO " + tmpStr;
-		} else if (upperCaseStr.startsWith(select)) { //SELECT
-			prefixOffset = select.length() + 1;
+		} else if (upperCaseStr.startsWith(SELECT)) { //SELECT
+			prefixOffset = SELECT.length() + 1;
 			
 			tmpStr = qString.substring(prefixOffset);
-			tmpIndx = qString.toUpperCase(Locale.ENGLISH).indexOf(" FROM ");
+			tmpIndx = qString.toUpperCase(Locale.ENGLISH).indexOf(" " + from + " ");
 			
 			if (tmpIndx > 0) {
 				qString = "SELECT " + tmpStr.substring(0, tmpIndx - 7)
 				//.replaceAll("\"", "'")
-					.replaceAll("`", "\"") + " FROM "
+					.replaceAll("`", "\"") + " " + from + " "
 					+ fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx - 1));
 			} else {
 				qString = fixTableNameInOracleSubQuery(fixedQuotes);
@@ -412,17 +412,17 @@ public class JSql_Oracle extends JSql {
 					+ ") a WHERE rownum <= " + endRowNum + ") WHERE rnum > " + startRowNum;
 			}
 			
-		} else if (upperCaseStr.startsWith(deleteFrom)) {
-			prefixOffset = deleteFrom.length() + 1;
+		} else if (upperCaseStr.startsWith(DELETEFROM)) {
+			prefixOffset = DELETEFROM.length() + 1;
 			
 			tmpStr = fixTableNameInOracleSubQuery(qString.substring(prefixOffset));
-			qString = deleteFrom + " " + tmpStr;
+			qString = DELETEFROM + " " + tmpStr;
 			
-		} else if (upperCaseStr.startsWith(update)) { //UPDATE
-			prefixOffset = update.length() + 1;
+		} else if (upperCaseStr.startsWith(UPDATE)) { //UPDATE
+			prefixOffset = UPDATE.length() + 1;
 			
 			tmpStr = fixTableNameInOracleSubQuery(qString.substring(prefixOffset));
-			qString = update + " " + tmpStr;
+			qString = UPDATE + " " + tmpStr;
 		}
 		
 		qString = qStringPrefix + qString + qStringSuffix;
@@ -442,7 +442,7 @@ public class JSql_Oracle extends JSql {
 		String tmpStr = null;
 		
 		// parse table name
-		String searchString = FROM;
+		String searchString = from;
 		String tablename = "";
 		while ((prefixOffset = qString.indexOf(searchString, prefixOffset)) > 0) {
 			prefixOffset += searchString.length();
@@ -558,20 +558,20 @@ public class JSql_Oracle extends JSql {
 		if (qString.indexOf("AUTOINCREMENT") != -1 || qString.indexOf("AUTO_INCREMENT") != -1) {
 			
 			// Create sequence and trigger if it is CREATE TABLE query and has the AUTO INCREMENT column
-			int prefixOffset = qString.indexOf(create);
+			int prefixOffset = qString.indexOf(CREATE);
 			// check if create statement
 			if (prefixOffset != -1) { //CREATE
 			
-				prefixOffset += create.length() + 1;
+				prefixOffset += CREATE.length() + 1;
 				
 				// check if create table statement
-				if (qString.startsWith(table, prefixOffset)) { //TABLE
+				if (qString.startsWith(TABLE, prefixOffset)) { //TABLE
 				
-					prefixOffset += table.length() + 1;
+					prefixOffset += TABLE.length() + 1;
 					
 					// check if 'IF NOT EXISTS' exists in query
-					if (qString.startsWith(ifNotExists, prefixOffset)) {
-						prefixOffset += ifNotExists.length() + 1;
+					if (qString.startsWith(IFNOTEXISTS, prefixOffset)) {
+						prefixOffset += IFNOTEXISTS.length() + 1;
 					}
 					
 					// parse table name

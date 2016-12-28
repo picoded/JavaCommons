@@ -29,7 +29,7 @@ public class JSql extends BaseInterface {
 	
 	/// Internal refrence of the current sqlType the system is running as
 	/// @TODO: make a getter function, so this will be read-only?
-	public JSqlType sqlType = JSqlType.INVALID;
+	public static JSqlType sqlType = JSqlType.INVALID;
 	
 	/// Internal self used logger
 	private static final Logger LOGGER = Logger.getLogger(JSql.class.getName());

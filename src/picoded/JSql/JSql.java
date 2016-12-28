@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -31,7 +32,7 @@ public class JSql extends BaseInterface {
 	public JSqlType sqlType = JSqlType.INVALID;
 	
 	/// Internal self used logger
-	private static Logger logger = Logger.getLogger(JSql.class.getName());
+	private static Logger LOGGER = Logger.getLogger(JSql.class.getName());
 	
 	// Database connection caching (used for recreate
 	//-------------------------------------------------------------------------
@@ -156,7 +157,7 @@ public class JSql extends BaseInterface {
 			//Try and finally : prevent memory leaks
 			try {
 				//is a select statment
-				if (qString.trim().toUpperCase().substring(0, 6).equals("SELECT")) {
+				if (qString.trim().toUpperCase(Locale.ENGLISH).substring(0, 6).equals("SELECT")) {
 					rs = ps.executeQuery();
 					res = new JSqlResult(ps, rs);
 					
@@ -205,7 +206,7 @@ public class JSql extends BaseInterface {
 			ResultSet rs = null;
 			try {
 				//is a select statment
-				if (qString.trim().toUpperCase().substring(0, 6).equals("SELECT")) {
+				if (qString.trim().toUpperCase(Locale.ENGLISH).substring(0, 6).equals("SELECT")) {
 					rs = ps.executeQuery();
 					if (rs != null) {
 						return true;
@@ -407,7 +408,7 @@ public class JSql extends BaseInterface {
 	) {
 		
 		if (tableName.length() > 30) {
-			logger.warning(JSqlException.oracleNameSpaceWarning + tableName);
+			LOGGER.warning(JSqlException.oracleNameSpaceWarning + tableName);
 		}
 		
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
@@ -497,7 +498,7 @@ public class JSql extends BaseInterface {
 	) throws JSqlException {
 		
 		if (tableName.length() > 30) {
-			logger.warning(JSqlException.oracleNameSpaceWarning + tableName);
+			LOGGER.warning(JSqlException.oracleNameSpaceWarning + tableName);
 		}
 		
 		/// Checks that unique collumn and values length to be aligned
@@ -643,7 +644,7 @@ public class JSql extends BaseInterface {
 	) {
 		
 		if (tableName.length() > 30) {
-			logger.warning(JSqlException.oracleNameSpaceWarning + tableName);
+			LOGGER.warning(JSqlException.oracleNameSpaceWarning + tableName);
 		}
 		
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
@@ -731,7 +732,7 @@ public class JSql extends BaseInterface {
 	) {
 		
 		if (tableName.length() > 30) {
-			logger.warning(JSqlException.oracleNameSpaceWarning + tableName);
+			LOGGER.warning(JSqlException.oracleNameSpaceWarning + tableName);
 		}
 		
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
@@ -746,11 +747,11 @@ public class JSql extends BaseInterface {
 		
 		// Creates a suffix, based on the collumn names
 		if (indexSuffix == null || indexSuffix.length() <= 0) {
-			indexSuffix = columnNames.replaceAll("/[^A-Za-z0-9]/", ""); //.toUpperCase()?
+			indexSuffix = columnNames.replaceAll("/[^A-Za-z0-9]/", ""); //.toUpperCase(Locale.ENGLISH)?
 		}
 		
 		if ((tableName.length() + 1 + indexSuffix.length()) > 30) {
-			logger.warning(JSqlException.oracleNameSpaceWarning + tableName + "_" + indexSuffix);
+			LOGGER.warning(JSqlException.oracleNameSpaceWarning + tableName + "_" + indexSuffix);
 		}
 		
 		queryBuilder.append("`");

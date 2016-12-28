@@ -32,7 +32,7 @@ public class JSql extends BaseInterface {
 	public JSqlType sqlType = JSqlType.INVALID;
 	
 	/// Internal self used logger
-	private static Logger LOGGER = Logger.getLogger(JSql.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(JSql.class.getName());
 	
 	// Database connection caching (used for recreate
 	//-------------------------------------------------------------------------
@@ -146,11 +146,8 @@ public class JSql extends BaseInterface {
 	/// fetching the result data from the database. This is raw execution.
 	///
 	/// **Note:** Only queries starting with 'SELECT' will produce a JSqlResult object that has fetchable results
-	@SuppressWarnings("unused")
 	public JSqlResult executeQuery_raw(String qString, Object... values) throws JSqlException {
 		JSqlResult res = null;
-		final String query = qString;
-		final Object parts[] = values;
 		try {
 			PreparedStatement ps = prepareSqlStatment(qString, values);
 			ResultSet rs = null;
@@ -529,10 +526,15 @@ public class JSql extends BaseInterface {
 				defaultColumns, defaultValues, miscColumns, innerSelectArgs, innerSelectSB,
 				innerSelectPrefix, innerSelectSuffix);
 		}
+		
 		/// Building the query for INSERT OR REPLACE
 		StringBuilder queryBuilder = new StringBuilder("INSERT OR REPLACE INTO `" + tableName + "` (");
-		ArrayList<Object> queryArgs = new ArrayList<Object>();
+		if (sqlType.equals(JSqlType.MYSQL)) {
+			/// Building the query for REPLACE
+			queryBuilder = new StringBuilder("REPLACE INTO `" + tableName + "` (");
+		}
 		
+		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		/// Building the query for both sides of '(...columns...) VALUE (...vars...)' clauses in upsert
 		/// Note that the final trailing ", " seperator will be removed prior to final query conversion
 		StringBuilder columnNames = new StringBuilder();
@@ -620,7 +622,6 @@ public class JSql extends BaseInterface {
 		String targetTableAlias = "target";
 		String sourceTableAlias = "source";
 		String statementTerminator = ";";
-		
 		/// Building the query for INSERT OR REPLACE
 		StringBuilder queryBuilder = new StringBuilder("MERGE INTO `" + tableName + "` AS "
 			+ targetTableAlias);

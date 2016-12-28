@@ -46,7 +46,7 @@ public class JSql_Oracle extends JSql {
 		
 		// Get the assumed oracle table space
 		String oraclePath = (String) connectionProps.get("dbUrl");
-		int tPoint = oraclePath.indexOf("@");
+		int tPoint = oraclePath.indexOf('@');
 		if (tPoint > 0) {
 			oracleTablespace = oraclePath.substring(0, tPoint);
 		} else {
@@ -281,9 +281,9 @@ public class JSql_Oracle extends JSql {
 						String tableAndColumns = tmpStr.substring(tmpIndx + " ON ".length());
 						// check column's type
 						String metaDataQuery = "SELECT "
-							+ tableAndColumns.substring(tableAndColumns.indexOf("(") + 1,
-								tableAndColumns.indexOf(")")) + " FROM "
-							+ tableAndColumns.substring(0, tableAndColumns.indexOf("("));
+							+ tableAndColumns.substring(tableAndColumns.indexOf('(') + 1,
+								tableAndColumns.indexOf(')')) + " FROM "
+							+ tableAndColumns.substring(0, tableAndColumns.indexOf('('));
 						Map<String, String> metadata = null;
 						try {
 							metadata = getMetaData(metaDataQuery);
@@ -342,7 +342,7 @@ public class JSql_Oracle extends JSql {
 			prefixOffset = 0;
 			//Fix the "AS" quotation
 			while ((tmpIndx = qString.indexOf(" AS ", prefixOffset)) > 0) {
-				prefixOffset = qString.indexOf(" ", tmpIndx + 4);
+				prefixOffset = qString.indexOf(' ', tmpIndx + 4);
 				if (prefixOffset > 0) {
 					qString = qString.substring(0, tmpIndx)
 						+ qString.substring(tmpIndx, prefixOffset).replaceAll("`", "\"")
@@ -572,7 +572,7 @@ public class JSql_Oracle extends JSql {
 					
 					// parse table name
 					String tableName = qString.substring(prefixOffset,
-						qString.indexOf("(", prefixOffset));
+						qString.indexOf('(', prefixOffset));
 					tableName = tableName.replaceAll("\"", "").trim();
 					
 					prefixOffset += tableName.length();
@@ -585,10 +585,10 @@ public class JSql_Oracle extends JSql {
 						.trim();
 					
 					if (tmpStr.charAt(tmpStr.length() - 1) == ')') {
-						tmpStr = tmpStr.substring(0, tmpStr.lastIndexOf("(")).trim();
+						tmpStr = tmpStr.substring(0, tmpStr.lastIndexOf('(')).trim();
 					}
 					// find last space
-					tmpStr = tmpStr.substring(0, tmpStr.lastIndexOf(" ")).trim();
+					tmpStr = tmpStr.substring(0, tmpStr.lastIndexOf(' ')).trim();
 					
 					for (int i = tmpStr.length() - 1; i >= 0; i--) {
 						// find space, comma or opening bracket

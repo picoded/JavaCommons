@@ -31,6 +31,8 @@ public class JSql extends BaseInterface {
 	/// @TODO: make a getter function, so this will be read-only?
 	public JSqlType sqlType = JSqlType.INVALID;
 	
+	private static final String COALESCE = "COALESCE(";
+	
 	/// Internal self used logger
 	private static final Logger LOGGER = Logger.getLogger(JSql.class.getName());
 	
@@ -572,7 +574,7 @@ public class JSql extends BaseInterface {
 				columnNames.append(defaultColumns[a]);
 				columnNames.append(columnSeperator);
 				//
-				columnValues.append("COALESCE(");
+				columnValues.append(COALESCE);
 				//-
 				columnValues.append(innerSelectPrefix);
 				columnValues.append(defaultColumns[a]);
@@ -618,6 +620,7 @@ public class JSql extends BaseInterface {
 		String[] defaultColumns, Object[] defaultValues, String[] miscColumns,
 		ArrayList<Object> innerSelectArgs, StringBuilder innerSelectSB, String innerSelectPrefix,
 		String innerSelectSuffix) {
+		
 		String equalSign = "=";
 		String targetTableAlias = "target";
 		String sourceTableAlias = "source";
@@ -668,26 +671,20 @@ public class JSql extends BaseInterface {
 				updateColumnNames.append(equalSign);
 				updateColumnNames.append("?");
 				updateColumnNames.append(columnSeperator);
-				
 				updateQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]
 					: null);
-				
 				// select dual
 				selectColumnNames.append("?");
 				selectColumnNames.append(" AS ");
 				selectColumnNames.append(insertColumns[a]);
 				selectColumnNames.append(columnSeperator);
-				
 				selectQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]
 					: null);
-				
 				// insert column
 				insertColumnNames.append(insertColumns[a]);
 				insertColumnNames.append(columnSeperator);
-				
 				insertColumnValues.append("?");
 				insertColumnValues.append(columnSeperator);
-				
 				insertQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]
 					: null);
 			}
@@ -699,30 +696,23 @@ public class JSql extends BaseInterface {
 				// insert column
 				insertColumnNames.append(defaultColumns[a]);
 				insertColumnNames.append(columnSeperator);
-				
-				insertColumnValues.append("COALESCE(");
+				insertColumnValues.append(COALESCE);
 				insertColumnValues.append(innerSelectPrefix);
 				insertColumnValues.append(defaultColumns[a]);
 				insertColumnValues.append(innerSelectSuffix);
-				
 				insertQueryArgs.addAll(innerSelectArgs);
-				
 				insertColumnValues.append(", ?)");
 				insertColumnValues.append(columnSeperator);
-				
 				insertQueryArgs
 					.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
-				
 				// update column
 				updateColumnNames.append(defaultColumns[a]);
 				updateColumnNames.append(equalSign);
-				updateColumnNames.append("COALESCE(");
+				updateColumnNames.append(COALESCE);
 				updateColumnNames.append(innerSelectPrefix);
 				updateColumnNames.append(defaultColumns[a]);
 				updateColumnNames.append(innerSelectSuffix);
-				
 				updateQueryArgs.addAll(innerSelectArgs);
-				
 				updateColumnNames.append(", ?)");
 				updateColumnNames.append(columnSeperator);
 				updateQueryArgs
@@ -730,7 +720,7 @@ public class JSql extends BaseInterface {
 				
 				// select dual
 				// COALESCE((SELECT col3 from t where a=?), ?) as col3
-				selectColumnNames.append("COALESCE(");
+				selectColumnNames.append(COALESCE);
 				selectColumnNames.append(innerSelectPrefix);
 				selectColumnNames.append(defaultColumns[a]);
 				selectColumnNames.append(innerSelectSuffix);

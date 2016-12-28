@@ -20,6 +20,8 @@ public class JSql_Mssql extends JSql {
 	
 	protected String dbName = "dbName";
 	
+	private String exceptionMsg = " END TRY BEGIN CATCH END CATCH";
+	
 	/// Runs JSql with the JDBC sqlite engine
 	public JSql_Mssql(String dbUrl, String dbName, String dbUser, String dbPass) {
 		// store database connection properties
@@ -109,8 +111,7 @@ public class JSql_Mssql extends JSql {
 					
 					qStringPrefix = "BEGIN TRY IF OBJECT_ID('"
 						+ fixedQuotes.substring(prefixOffset).toUpperCase(Locale.ENGLISH) + "', 'U')"
-						+ " IS NOT NULL DROP TABLE " + fixedQuotes.substring(prefixOffset)
-						+ " END TRY BEGIN CATCH END CATCH";
+						+ " IS NOT NULL DROP TABLE " + fixedQuotes.substring(prefixOffset) + exceptionMsg;
 				} else {
 					qStringPrefix = "DROP TABLE ";
 				}
@@ -125,8 +126,7 @@ public class JSql_Mssql extends JSql {
 					
 					qStringPrefix = "BEGIN TRY IF OBJECT_ID('"
 						+ fixedQuotes.substring(prefixOffset).toUpperCase(Locale.ENGLISH) + "', 'V')"
-						+ " IS NOT NULL DROP VIEW " + fixedQuotes.substring(prefixOffset)
-						+ " END TRY BEGIN CATCH END CATCH";
+						+ " IS NOT NULL DROP VIEW " + fixedQuotes.substring(prefixOffset) + exceptionMsg;
 				} else {
 					qStringPrefix = "DROP VIEW ";
 				}
@@ -148,7 +148,7 @@ public class JSql_Mssql extends JSql {
 						+ tableName
 						+ "')"
 						+ " = 1) CREATE TABLE ";
-					qStringSuffix = " END TRY BEGIN CATCH END CATCH";
+					qStringSuffix = exceptionMsg;
 				} else {
 					qStringPrefix = "CREATE TABLE ";
 				}
@@ -186,8 +186,7 @@ public class JSql_Mssql extends JSql {
 						if (tmpIndx > 0) {
 							qString = "BEGIN TRY CREATE " + ((indexType != null) ? indexType + " " : "")
 								+ "INDEX " + tmpStr.substring(0, tmpIndx) + " ON "
-								+ fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx + 4))
-								+ " END TRY BEGIN CATCH END CATCH";
+								+ fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx + 4)) + exceptionMsg;
 						}
 						
 					}
@@ -217,7 +216,7 @@ public class JSql_Mssql extends JSql {
 			prefixOffset = 0;
 			//Fix the "AS" quotation
 			while ((tmpIndx = qString.indexOf(" AS ", prefixOffset)) > 0) {
-				prefixOffset = qString.indexOf(" ", tmpIndx + 4);
+				prefixOffset = qString.indexOf(' ', tmpIndx + 4);
 				
 				if (prefixOffset > 0) {
 					qString = qString.substring(0, tmpIndx)

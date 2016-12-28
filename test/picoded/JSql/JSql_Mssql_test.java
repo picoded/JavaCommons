@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import picoded.TestConfig;
+import picoded.JSql.db.JSql_Mssql;
 
 public class JSql_Mssql_test extends JSql_Sqlite_test {
 	
@@ -104,5 +105,13 @@ public class JSql_Mssql_test extends JSql_Sqlite_test {
 		connectionProps.put("dbName", "");
 		JSqlObj.connectionProps = connectionProps;
 		JSqlObj.recreate(false);
+	}
+	
+	@Test
+	public void getQStringTest() {
+		JSql_Mssql mssql = new JSql_Mssql(TestConfig.MSSQL_CONN(), TestConfig.MSSQL_NAME(),
+			TestConfig.MSSQL_USER(), TestConfig.MSSQL_PASS());
+		String qString = "CREATE TABLE AUTOINCREMENT NUMBER ON DELETE =\"  \" ";
+		mssql.getQString(qString);
 	}
 }

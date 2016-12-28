@@ -17,7 +17,7 @@ import picoded.enums.JSqlType;
 public class JSql_Mssql extends JSql {
 	
 	/// Internal self used logger
-	private static Logger logger = Logger.getLogger(JSql_Mssql.class.getName());
+	private static Logger LOGGER = Logger.getLogger(JSql_Mssql.class.getName());
 	
 	protected String dbName = "dbName";
 	
@@ -156,9 +156,9 @@ public class JSql_Mssql extends JSql {
 				qString = _fixTableNameInMssqlSubQuery(fixedQuotes.substring(prefixOffset));
 				//qString = _simpleMysqlToOracle_collumnSubstitude(qString);
 			} else {
-				logger.finer("Trying to matched INDEX : " + upperCaseStr.substring(prefixOffset));
+				LOGGER.finer("Trying to matched INDEX : " + upperCaseStr.substring(prefixOffset));
 				if (createIndexType.matcher(upperCaseStr.substring(prefixOffset)).matches()) { //UNIQUE|FULLTEXT|SPATIAL|_ INDEX
-					logger.finer("Matched INDEX : " + inString);
+					LOGGER.finer("Matched INDEX : " + inString);
 					
 					//Find the index type
 					indexType = null;
@@ -277,6 +277,10 @@ public class JSql_Mssql extends JSql {
 			qString = qStringPrefix + qString + qStringSuffix;
 		}
 		
+		return getQString(qString);
+	}
+	
+	public String getQString(String qString) {
 		if (qString.contains("CREATE TABLE")) {
 			// Replace PRIMARY KEY AUTOINCREMENT with IDENTITY
 			if (qString.contains("AUTOINCREMENT")) {
@@ -296,7 +300,7 @@ public class JSql_Mssql extends JSql {
 		
 		// Replace double quote (") with single quote (') for assignment values 
 		StringBuilder sb = new StringBuilder(qString);
-		int endIndex = qString.indexOf("=");
+		int endIndex = qString.indexOf('=');
 		int beginIndex = 0;
 		while (endIndex != -1) {
 			endIndex++;
@@ -312,8 +316,7 @@ public class JSql_Mssql extends JSql {
 			}
 			endIndex = sb.indexOf("=", beginIndex);
 		}
-		qString = sb.toString();
-		return qString;
+		return qString = sb.toString();
 	}
 	
 	//Method to return table name from incoming query string
@@ -407,7 +410,8 @@ public class JSql_Mssql extends JSql {
 		Object[] insertValues, // Values to update
 		//
 		String[] defaultColumns, // Columns names to apply default value, if not exists
-		Object[] defaultValues, // Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+		Object[] defaultValues, // Values to insert, that is not updated. 
+		//Note that this is ignored if pre-existing values exists
 		//
 		// Various column names where its existing value needs to be maintained (if any),
 		// this is important as some SQL implementation will fallback to default table values, if not properly handled
@@ -415,7 +419,7 @@ public class JSql_Mssql extends JSql {
 	) throws JSqlException {
 		
 		if (tableName.length() > 30) {
-			logger.warning(JSqlException.oracleNameSpaceWarning + tableName);
+			LOGGER.warning(JSqlException.oracleNameSpaceWarning + tableName);
 		}
 		
 		/// Checks that unique collumn and values length to be aligned

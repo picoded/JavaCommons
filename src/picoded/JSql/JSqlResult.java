@@ -48,7 +48,8 @@ import picoded.conv.ClobString;
 ///   - readRow / readRowCol : To support unfetched rows -> ie, automatically fetchs to the desired row count
 ///   - isFetchedAll / isFetchedRow
 ///
-public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, List<Object> /*rowNumber array */> {
+public class JSqlResult extends
+	CaseInsensitiveHashMap<String /*fieldName*/, List<Object> /*rowNumber array */> {
 	protected static final long serialVersionUID = 1L;
 	
 	/// Internal self used logger
@@ -95,7 +96,8 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Lis
 							if (colName.charAt(0) == '\'' || colName.charAt(0) == '"') {
 								colName = colName.substring(1);
 							}
-							if (colName.charAt(colName.length() - 1) == '\'' || colName.charAt(colName.length() - 1) == '"') {
+							if (colName.charAt(colName.length() - 1) == '\''
+								|| colName.charAt(colName.length() - 1) == '"') {
 								colName = colName.substring(0, colName.length() - 1);
 							}
 						}
@@ -121,10 +123,10 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Lis
 								throw new JSqlException("CLOB Processing Error", e);
 							}
 						} else if (Blob.class.isInstance(tmpObj)) {
-							Blob bob = (Blob)tmpObj;
-							tmpObj = bob.getBytes(1, (int)bob.length());
+							Blob bob = (Blob) tmpObj;
+							tmpObj = bob.getBytes(1, (int) bob.length());
 							bob.free();
-						} 
+						}
 						
 						colArr.add(rowCount, tmpObj);
 					}
@@ -230,7 +232,8 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /*fieldName*/, Lis
 			ret = new HashMap<String, String>();
 			try {
 				while (sqlRes.next()) {
-					ret.put(sqlRes.getString("COLUMN_NAME").toUpperCase(), sqlRes.getString("TYPE_NAME").toUpperCase());
+					ret.put(sqlRes.getString("COLUMN_NAME").toUpperCase(), sqlRes.getString("TYPE_NAME")
+						.toUpperCase());
 				}
 			} catch (Exception e) {
 				throw new JSqlException("Error fetching sql meta data", e);

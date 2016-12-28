@@ -85,4 +85,9 @@ public class JSql_Mssql_test extends JSql_Sqlite_test {
 		s = JSqlObj.genericSqlParser("ALTER TABLE my_table ADD COLUMN col3 varchar(10)");
 		assertEquals("ALTER TABLE my_table ADD COLUMN col3 varchar(10)", s);
 	}
+	
+	@Test
+	public void JSqlExceptionTest() throws Exception {
+		new JSqlException(new Throwable());
+	}
 }

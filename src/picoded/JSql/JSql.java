@@ -628,7 +628,6 @@ public class JSql extends BaseInterface {
 		/// Building the query for INSERT OR REPLACE
 		StringBuilder queryBuilder = new StringBuilder("MERGE INTO `" + tableName + "` AS "
 			+ targetTableAlias);
-		
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		ArrayList<Object> insertQueryArgs = new ArrayList<Object>();
 		ArrayList<Object> updateQueryArgs = new ArrayList<Object>();
@@ -642,7 +641,6 @@ public class JSql extends BaseInterface {
 		StringBuilder insertColumnValues = new StringBuilder();
 		StringBuilder condition = new StringBuilder();
 		String columnSeperator = ", ";
-		
 		/// Setting up unique values
 		for (int a = 0; a < uniqueColumns.length; ++a) {
 			// dual select
@@ -650,16 +648,13 @@ public class JSql extends BaseInterface {
 			selectColumnNames.append(" AS ");
 			selectColumnNames.append(uniqueColumns[a]);
 			selectColumnNames.append(columnSeperator);
-			
 			selectQueryArgs.add(uniqueValues[a]);
-			
 			// insert column list
 			insertColumnNames.append(uniqueColumns[a]);
 			insertColumnNames.append(columnSeperator);
 			// insert column value list
 			insertColumnValues.append("?");
 			insertColumnValues.append(columnSeperator);
-			//
 			insertQueryArgs.add(uniqueValues[a]);
 		}
 		
@@ -717,7 +712,6 @@ public class JSql extends BaseInterface {
 				updateColumnNames.append(columnSeperator);
 				updateQueryArgs
 					.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
-				
 				// select dual
 				// COALESCE((SELECT col3 from t where a=?), ?) as col3
 				selectColumnNames.append(COALESCE);
@@ -725,9 +719,7 @@ public class JSql extends BaseInterface {
 				selectColumnNames.append(defaultColumns[a]);
 				selectColumnNames.append(innerSelectSuffix);
 				selectColumnNames.append(", ?)");
-				
 				selectQueryArgs.addAll(innerSelectArgs);
-				
 				selectColumnNames.append(" AS " + defaultColumns[a] + columnSeperator);
 				selectQueryArgs
 					.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
@@ -740,15 +732,11 @@ public class JSql extends BaseInterface {
 				// insert column
 				insertColumnNames.append(miscColumns[a]);
 				insertColumnNames.append(columnSeperator);
-				
 				insertColumnValues.append(innerSelectPrefix);
 				insertColumnValues.append(miscColumns[a]);
 				insertColumnValues.append(innerSelectSuffix);
-				
 				insertQueryArgs.addAll(innerSelectArgs);
-				
 				insertColumnValues.append(columnSeperator);
-				
 				// updtae column
 				updateColumnNames.append(miscColumns[a]);
 				updateColumnNames.append(equalSign);
@@ -756,20 +744,15 @@ public class JSql extends BaseInterface {
 				updateColumnNames.append(miscColumns[a]);
 				updateColumnNames.append(innerSelectSuffix);
 				updateColumnNames.append(columnSeperator);
-				
 				updateQueryArgs.addAll(innerSelectArgs);
-				
 				// select dual
 				selectColumnNames.append(innerSelectPrefix);
 				selectColumnNames.append(miscColumns[a]);
 				selectColumnNames.append(innerSelectSuffix);
-				
 				selectColumnNames.append(" AS ");
 				selectColumnNames.append(miscColumns[a]);
 				selectColumnNames.append(columnSeperator);
-				
 				selectQueryArgs.addAll(innerSelectArgs);
-				
 			}
 		}
 		
@@ -784,12 +767,10 @@ public class JSql extends BaseInterface {
 			condition.append(equalSign);
 			condition.append(sourceTableAlias);
 			condition.append(".");
-			
 			condition.append(uniqueColumns[a]);
 		}
 		
 		/// Building the final query
-		
 		queryBuilder.append(" USING (SELECT ");
 		queryBuilder.append(selectColumnNames.substring(0, selectColumnNames.length()
 			- columnSeperator.length()));

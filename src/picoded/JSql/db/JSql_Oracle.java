@@ -22,7 +22,6 @@ public class JSql_Oracle extends JSql {
 	private static String number = "NUMBER";
 	private static String queryStringSuffix = "'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;";
 	private static String from = "FROM";
-	private static String className = "oracle.jdbc.OracleDriver";
 	
 	///
 	//	private String oracleTablespace = null;
@@ -59,7 +58,7 @@ public class JSql_Oracle extends JSql {
 		
 		String connectionUrl = "jdbc:oracle:thin:" + oraclePath;
 		try {
-			Class.forName(className).newInstance(); //ensure oracle driver is loaded
+			Class.forName("oracle.jdbc.OracleDriver").newInstance(); //ensure oracle driver is loaded
 			sqlConn = java.sql.DriverManager.getConnection(connectionUrl,
 				(String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
 			
@@ -705,15 +704,12 @@ public class JSql_Oracle extends JSql {
 		/// Table aliasing names
 		String targetTableAlias = "destTable";
 		String sourceTableAlias = "srcTable";
-		
 		/// Final actual query set
 		StringBuilder queryBuilder = new StringBuilder();
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
-		
 		/// The actual query building
 		queryBuilder
 			.append("MERGE INTO `" + tableName + "` " + targetTableAlias + " USING ( SELECT ");
-		
 		/// The fields to select to search for unique
 		for (int a = 0; a < uniqueColumns.length; ++a) {
 			if (a > 0) {
@@ -726,7 +722,6 @@ public class JSql_Oracle extends JSql {
 		
 		/// From dual
 		queryBuilder.append(" FROM DUAL ) " + sourceTableAlias);
-		
 		/// On unique keys
 		queryBuilder.append(" ON ( ");
 		for (int a = 0; a < uniqueColumns.length; ++a) {
@@ -759,14 +754,12 @@ public class JSql_Oracle extends JSql {
 				queryBuilder.append(".");
 				queryBuilder.append(insertColumns[a]);
 				queryBuilder.append(" = ? ");
-				
 				queryArgs.add(insertValues[a]);
 			}
 		}
 		
 		// Found it, do an insert
 		queryBuilder.append(" WHEN NOT MATCHED THEN INSERT ( ");
-		
 		// Insert query building
 		StringBuilder insertNameString = new StringBuilder();
 		StringBuilder insertValuesString = new StringBuilder();
@@ -787,7 +780,6 @@ public class JSql_Oracle extends JSql {
 			for (int a = 0; a < insertColumns.length; ++a) {
 				insertNameString.append(", ");
 				insertValuesString.append(", ");
-				
 				insertNameString.append(insertColumns[a]);
 				insertValuesString.append("?");
 				queryArgs.add(insertValues[a]);
@@ -799,7 +791,6 @@ public class JSql_Oracle extends JSql {
 			for (int a = 0; a < defaultColumns.length; ++a) {
 				insertNameString.append(", ");
 				insertValuesString.append(", ");
-				
 				insertNameString.append(defaultColumns[a]);
 				insertValuesString.append("?");
 				queryArgs.add(defaultValues[a]);
@@ -811,7 +802,6 @@ public class JSql_Oracle extends JSql {
 		queryBuilder.append(" ) VALUES ( ");
 		queryBuilder.append(insertValuesString);
 		queryBuilder.append(" )");
-		
 		// The actual query
 		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
 	}

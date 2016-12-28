@@ -113,5 +113,6 @@ public class JSql_Mssql_test extends JSql_Sqlite_test {
 			TestConfig.MSSQL_USER(), TestConfig.MSSQL_PASS());
 		String qString = "CREATE TABLE AUTOINCREMENT NUMBER ON DELETE =\"  \" ";
 		mssql.getQString(qString);
+		JSql_Mssql.fixTableNameInMssqlSubQuery("CREATE TABLE AUTOINCREMENT NUMBER ON DELETE;");
 	}
 }

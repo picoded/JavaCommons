@@ -17,7 +17,7 @@ import picoded.enums.JSqlType;
 public class JSql_Mssql extends JSql {
 	
 	/// Internal self used logger
-	private static Logger LOGGER = Logger.getLogger(JSql_Mssql.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(JSql_Mssql.class.getName());
 	
 	protected String dbName = "dbName";
 	
@@ -153,7 +153,7 @@ public class JSql_Mssql extends JSql {
 				} else {
 					qStringPrefix = "CREATE TABLE ";
 				}
-				qString = _fixTableNameInMssqlSubQuery(fixedQuotes.substring(prefixOffset));
+				qString = fixTableNameInMssqlSubQuery(fixedQuotes.substring(prefixOffset));
 				//qString = _simpleMysqlToOracle_collumnSubstitude(qString);
 			} else {
 				LOGGER.finer("Trying to matched INDEX : " + upperCaseStr.substring(prefixOffset));
@@ -181,13 +181,13 @@ public class JSql_Mssql extends JSql {
 							qStringSuffix = "";
 						}
 						
-						tmpStr = _fixTableNameInMssqlSubQuery(fixedQuotes.substring(prefixOffset));
+						tmpStr = fixTableNameInMssqlSubQuery(fixedQuotes.substring(prefixOffset));
 						tmpIndx = tmpStr.indexOf(" ON ");
 						
 						if (tmpIndx > 0) {
 							qString = "BEGIN TRY CREATE " + ((indexType != null) ? indexType + " " : "")
 								+ "INDEX " + tmpStr.substring(0, tmpIndx) + " ON "
-								+ _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx + 4))
+								+ fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx + 4))
 								+ " END TRY BEGIN CATCH END CATCH";
 						}
 						
@@ -197,7 +197,7 @@ public class JSql_Mssql extends JSql {
 		} else if (upperCaseStr.startsWith(insertInto)) { //INSERT INTO
 			prefixOffset = insertInto.length() + 1;
 			
-			tmpStr = _fixTableNameInMssqlSubQuery(fixedQuotes.substring(prefixOffset));
+			tmpStr = fixTableNameInMssqlSubQuery(fixedQuotes.substring(prefixOffset));
 			
 			qString = "INSERT INTO " + tmpStr;
 		} else if (upperCaseStr.startsWith(select)) { //SELECT
@@ -210,9 +210,9 @@ public class JSql_Mssql extends JSql {
 				qString = "SELECT " + tmpStr.substring(0, tmpIndx - 7)
 				//.replaceAll("\"", "'")
 					.replaceAll("`", "\"") + " FROM "
-					+ _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx - 1));
+					+ fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx - 1));
 			} else {
-				qString = _fixTableNameInMssqlSubQuery(fixedQuotes);
+				qString = fixTableNameInMssqlSubQuery(fixedQuotes);
 			}
 			
 			prefixOffset = 0;
@@ -261,13 +261,13 @@ public class JSql_Mssql extends JSql {
 		} else if (upperCaseStr.startsWith(deleteFrom)) {
 			prefixOffset = deleteFrom.length() + 1;
 			
-			tmpStr = _fixTableNameInMssqlSubQuery(qString.substring(prefixOffset));
+			tmpStr = fixTableNameInMssqlSubQuery(qString.substring(prefixOffset));
 			qString = deleteFrom + " " + tmpStr;
 			
 		} else if (upperCaseStr.startsWith(update)) { //UPDATE
 			prefixOffset = update.length() + 1;
 			
-			tmpStr = _fixTableNameInMssqlSubQuery(qString.substring(prefixOffset));
+			tmpStr = fixTableNameInMssqlSubQuery(qString.substring(prefixOffset));
 			qString = update + " " + tmpStr;
 		}
 		//Drop table query modication
@@ -323,17 +323,14 @@ public class JSql_Mssql extends JSql {
 	private static String getTableName(String qString) {
 		qString = qString.trim();
 		int indxPt = ((indxPt = qString.indexOf(' ')) <= -1) ? qString.length() : indxPt;
-		String tableStr = qString.substring(0, indxPt).toUpperCase(Locale.ENGLISH);
-		return tableStr; //retrun the table name
+		return qString.substring(0, indxPt).toUpperCase(Locale.ENGLISH); //retrun the table name
 	}
 	
-	private static String _fixTableNameInMssqlSubQuery(String qString) {
+	public static String fixTableNameInMssqlSubQuery(String qString) {
 		qString = qString.trim();
 		int indxPt = ((indxPt = qString.indexOf(' ')) <= -1) ? qString.length() : indxPt;
-		String tableStr = qString.substring(0, indxPt).toUpperCase(Locale.ENGLISH);
-		
-		qString = tableStr + qString.substring(indxPt);
-		
+		qString = qString.substring(0, indxPt).toUpperCase(Locale.ENGLISH)
+			+ qString.substring(indxPt);
 		while (qString.endsWith(";")) { //Remove uneeded trailing ";" semi collons
 			qString = qString.substring(0, qString.length() - 1);
 		}

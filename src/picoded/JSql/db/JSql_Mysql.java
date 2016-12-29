@@ -168,7 +168,8 @@ public class JSql_Mysql extends JSql {
 				
 				// It is must to define the The length of the BLOB and TEXT column type
 				// Append the maximum length "333" to BLOB and TEXT columns
-				// Extract the table name and the columns from the sql statement i.e. "CREATE UNIQUE INDEX `JSQLTEST_UNIQUE` ON `JSQLTEST` ( COL1, COL2, COL3 )"
+				// Extract the table name and the columns from the sql statement i.e. 
+				// "CREATE UNIQUE INDEX `JSQLTEST_UNIQUE` ON `JSQLTEST` ( COL1, COL2, COL3 )"
 				// Find the "ON" word index
 				int onIndex = qStringUpper.indexOf("ON");
 				// if index == -1 then it is not a valid sql statement

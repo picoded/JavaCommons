@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import picoded.TestConfig;
+import picoded.JSql.db.JSql_Mysql;
 
 public class JSql_Mysql_test extends JSql_Sqlite_test {
 	
@@ -16,70 +17,25 @@ public class JSql_Mysql_test extends JSql_Sqlite_test {
 	@Test
 	public void upsertQuerySetWithDefault() throws JSqlException {
 		row1to7setup();
-		//		JSqlResult r = null;
-		//		JSqlQuerySet qSet = null;
-		
 		JSqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "_1`").dispose(); //cleanup (just incase)
-		
-		JSqlObj
-			.executeQuery(
-				"CREATE TABLE IF NOT EXISTS "
-					+ testTableName
-					+ "_1 ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(50) default '1')")
-			.dispose(); //valid table creation : no exception
-		
-		//TODO Not working Upsert for MySQL
-		
-		//Upsert query
-		//		assertNotNull(qSet = JSqlObj.upsertQuerySet( //
-		//			testTableName + "_1", //
-		//			new String[] { "col1" }, new Object[] { 404 }, //
-		//			//new String[] { "col2", "col3" }, new Object[] { "not found", "not found" },  //
-		//			new String[] { "col2" }, new Object[] { "not found" },  //
-		//			//new String[] { "col4", "col5" }, new Object[] { "not found", "not found" },
-		//			new String[] { "col3" }, new Object[] { "3 not found" },
-		//			new String[] { "col4" } //
-		//			));
-		//		assertTrue("SQL result should return true", qSet.execute());
-		//		
-		//		assertNotNull("query should return a JSql result",
-		//			r = JSqlObj.query("SELECT * FROM " + testTableName + "_1 ORDER BY col1 ASC"));
-		//		assertEquals("Upsert value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
-		//		assertEquals("Upsert value check failed", "not found", r.readRowCol(0, "col2"));
-		//		assertEquals("Upsert value check failed",  null, r.readRowCol(0, "col4")); 
+		JSqlObj.executeQuery(
+			"CREATE TABLE IF NOT EXISTS " + testTableName + "_1 ( "
+				+ "col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(50) default '1')")
+			.dispose();
+		JSqlObj.recreate(false);
 	}
 	
 	@Test
 	public void upsertQuerySetDefault() throws JSqlException {
 		row1to7setup();
-		//		JSqlResult r = null;
-		//		JSqlQuerySet qSet = null;
-		//		
 		JSqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "_1`").dispose(); //cleanup (just incase)
-		
 		JSqlObj.executeQuery(
-			"CREATE TABLE IF NOT EXISTS " + testTableName
-				+ "_1 ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(100) )")
-			.dispose(); //valid table creation : no exception
-		
-		//TODO Not working Upsert for MySQL
-		
-		//		//Upsert query
-		//		assertNotNull(qSet = JSqlObj.upsertQuerySet( //
-		//			testTableName + "_1", //
-		//			new String[] { "col1" }, new Object[] { 404 }, //
-		//			//new String[] { "col2", "col3" }, new Object[] { "not found", "not found" },  //
-		//			new String[] { "col2" }, new Object[] { "not found" },  //
-		//			//new String[] { "col4", "col5" }, new Object[] { "not found", "not found" },
-		//			new String[] { "col3" }, new Object[] { "3 not found" },
-		//			new String[] { "col4" } //
-		//			));
-		//		assertTrue("SQL result should return true", qSet.execute());
-		//		
-		//		assertNotNull("query should return a JSql result",
-		//			r = JSqlObj.query("SELECT * FROM " + testTableName + "_1 ORDER BY col1 ASC"));
-		//		assertEquals("Upsert value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
-		//		assertEquals("Upsert value check failed", "not found", r.readRowCol(0, "col2"));
-		//		assertEquals("Upsert value check failed", null, r.readRowCol(0, "col4"));
+			"CREATE TABLE IF NOT EXISTS " + testTableName + "_1 ( "
+				+ "col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(100) )").dispose();
+	}
+	
+	@Test(expected = Exception.class)
+	public void ConnectionTest() throws Exception {
+		JSqlObj = new JSql_Mysql("test-mysql.test", "test", "root", "admin");
 	}
 }

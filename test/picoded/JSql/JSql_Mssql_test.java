@@ -88,8 +88,10 @@ public class JSql_Mssql_test extends JSql_Sqlite_test {
 		s = JSqlObj.genericSqlParser("DROP");
 		assertEquals("", s);
 		JSqlObj.genericSqlParser("DROP VIEW");
+		JSqlObj.genericSqlParser("DROP INDEX");
 		JSqlObj.genericSqlParser("CREATE INDEX UNIQUE");
 		JSqlObj.genericSqlParser("SELECT * AS ");
+		JSqlObj.genericSqlParser("SELECT AS test");
 		JSqlObj.genericSqlParser("CREATE TABLE IF NOT EXISTS MYTABLE");
 	}
 	

@@ -1,27 +1,24 @@
 package picoded.JSql;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.sql.Blob;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.logging.*;
-import java.lang.Exception;
-import java.sql.PreparedStatement;
-
-import picoded.struct.CaseInsensitiveHashMap;
-import picoded.JSql.JSqlException;
-
-import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.sql.Blob;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // OracleSQL types
 import oracle.sql.CLOB;
 import picoded.conv.ClobString;
+import picoded.struct.CaseInsensitiveHashMap;
 
 /// JSql result set, data is either prefetched, or fetch on row request. For example usage, refer to JSql
 ///
@@ -113,7 +110,7 @@ public class JSqlResult extends
 						//Expected format for mysql (basic data structs)
 						tmpObj = sqlRes.getObject(pt + 1);
 						if (BigDecimal.class.isInstance(tmpObj)) {
-							tmpObj = new Double(((BigDecimal) tmpObj).doubleValue());
+							tmpObj = ((BigDecimal) tmpObj).doubleValue();
 						} else if (CLOB.class.isInstance(tmpObj)) {
 							try {
 								tmpObj = ClobString.toStringNoisy((CLOB) tmpObj);

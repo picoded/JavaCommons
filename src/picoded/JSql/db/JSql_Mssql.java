@@ -170,26 +170,26 @@ public class JSql_Mssql extends JSql {
 					}
 					
 					//only bother if it matches (shd be right?)
-					if (upperCaseStr.startsWith(index, prefixOffset)) {
-						prefixOffset += index.length() + 1;
-						
-						//If not exists wrapper
-						if (upperCaseStr.startsWith(ifNotExists, prefixOffset)) {
-							prefixOffset += ifNotExists.length() + 1;
-							qStringPrefix = "";
-							qStringSuffix = "";
-						}
-						
-						tmpStr = fixTableNameInMssqlSubQuery(fixedQuotes.substring(prefixOffset));
-						tmpIndx = tmpStr.indexOf(" ON ");
-						
-						if (tmpIndx > 0) {
-							qString = "BEGIN TRY CREATE " + ((indexType != null) ? (indexType + " ") : "")
-								+ "INDEX " + tmpStr.substring(0, tmpIndx) + " ON "
-								+ fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx + 4)) + exceptionMsg;
-						}
-						
+					//					if (upperCaseStr.startsWith(index, prefixOffset)) {
+					prefixOffset += index.length() + 1;
+					
+					//If not exists wrapper
+					if (upperCaseStr.startsWith(ifNotExists, prefixOffset)) {
+						prefixOffset += ifNotExists.length() + 1;
+						qStringPrefix = "";
+						qStringSuffix = "";
 					}
+					
+					tmpStr = fixTableNameInMssqlSubQuery(fixedQuotes.substring(prefixOffset));
+					tmpIndx = tmpStr.indexOf(" ON ");
+					
+					if (tmpIndx > 0) {
+						qString = "BEGIN TRY CREATE " + (indexType + " ") + "INDEX "
+							+ tmpStr.substring(0, tmpIndx) + " ON "
+							+ fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx + 4)) + exceptionMsg;
+					}
+					
+					//					}
 				}
 			}
 		} else if (upperCaseStr.startsWith(insertInto)) { //INSERT INTO

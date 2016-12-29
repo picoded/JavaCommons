@@ -50,7 +50,7 @@ public class JSql_Mssql_test extends JSql_Sqlite_test {
 			r = JSqlObj.query("SELECT * FROM " + testTableName + "_1 ORDER BY col1 ASC"));
 		assertEquals("Upsert value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
 		assertEquals("Upsert value check failed", "not found", r.readRowCol(0, "col2"));
-		assertEquals("Upsert value check failed", null, r.readRowCol(0, "col4")); //TODO
+		assertEquals("Upsert value check failed", null, r.readRowCol(0, "col4"));
 	}
 	
 	@Test
@@ -84,6 +84,13 @@ public class JSql_Mssql_test extends JSql_Sqlite_test {
 		
 		s = JSqlObj.genericSqlParser("ALTER TABLE my_table ADD COLUMN col3 varchar(10)");
 		assertEquals("ALTER TABLE my_table ADD COLUMN col3 varchar(10)", s);
+		
+		s = JSqlObj.genericSqlParser("DROP");
+		assertEquals("", s);
+		JSqlObj.genericSqlParser("DROP VIEW");
+		// CREATE UNIQUE INDEX IF NOT EXISTS "JSQLTEST_WCIFTYIL_UNIQUE"
+		JSqlObj.genericSqlParser("CREATE INDEX UNIQUE");
+		JSqlObj.genericSqlParser("SELECT * AS ");
 	}
 	
 	@Test

@@ -184,7 +184,7 @@ public class JSql_Mssql extends JSql {
 						tmpIndx = tmpStr.indexOf(" ON ");
 						
 						if (tmpIndx > 0) {
-							qString = "BEGIN TRY CREATE " + ((indexType != null) ? indexType + " " : "")
+							qString = "BEGIN TRY CREATE " + ((indexType != null) ? (indexType + " ") : "")
 								+ "INDEX " + tmpStr.substring(0, tmpIndx) + " ON "
 								+ fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx + 4)) + exceptionMsg;
 						}
@@ -371,5 +371,4 @@ public class JSql_Mssql extends JSql {
 		return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
 			null, null, null);
 	}
-	
 }

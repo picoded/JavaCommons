@@ -28,13 +28,15 @@ public class JSql_Mysql_test extends JSql_Sqlite_test {
 		JSqlObj.recreate(false);
 	}
 	
-	@Test
+	@Test(expected = Exception.class)
 	public void upsertQuerySetDefault() throws JSqlException {
 		row1to7setup();
 		JSqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "_1`").dispose(); //cleanup (just incase)
 		JSqlObj.executeQuery(
 			"CREATE TABLE IF NOT EXISTS " + testTableName + "_1 ( "
 				+ "col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(100) )").dispose();
+		String qString = "CREATE VIEW TEST AS  SELECT * FROM (";
+		JSqlObj.execute(qString, "test");
 	}
 	
 	@Test(expected = Exception.class)
@@ -63,8 +65,11 @@ public class JSql_Mysql_test extends JSql_Sqlite_test {
 		jsqlMysql.getQStringUpper(null, null, null);
 		Map<String, String> metadata = new HashMap<String, String>();
 		metadata.put("test", "test");
-		String columns = "test, test";
-		jsqlMysql.getQStringUpper(metadata, null, columns);
+		metadata.put("TEXT", "TEXT");
+		metadata.put("BLOB", "BLOB");
+		String columns = "test, TEXT, BLOB";
+		String qStringUpper = "test";
+		jsqlMysql.getQStringUpper(metadata, qStringUpper, columns);
 		JSqlObj.execute("INDEX IF NOT EXISTS", "test");
 	}
 	

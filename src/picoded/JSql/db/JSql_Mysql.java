@@ -191,18 +191,7 @@ public class JSql_Mysql extends JSql {
 						// fetch the table meta data info
 						JSqlResult jsql = executeQuery_metadata(tablename.trim());
 						Map<String, String> metadata = jsql.fetchMetaData();
-						if (metadata != null) {
-							String[] columnsArr = columns.split(",");
-							for (String column : columnsArr) {
-								column = column.trim();
-								// check if column type is BLOB or TEXT
-								if ("BLOB".equals(metadata.get(column))
-									|| "TEXT".equals(metadata.get(column))) {
-									// repalce the column name in the origin sql statement with column name and suffic "(333)
-									qStringUpper = qStringUpper.replace(column, column + "(333)");
-								}
-							}
-						}
+						qStringUpper = getQStringUpper(metadata, qStringUpper, columns);
 					}
 				}
 				return execute_raw(qStringUpper);
@@ -219,6 +208,21 @@ public class JSql_Mysql extends JSql {
 			}
 		}
 		return execute_raw(qStringUpper, values);
+	}
+	
+	public String getQStringUpper(Map<String, String> metadata, String qStringUpper, String columns) {
+		if (metadata != null) {
+			String[] columnsArr = columns.split(",");
+			for (String column : columnsArr) {
+				column = column.trim();
+				// check if column type is BLOB or TEXT
+				if ("BLOB".equals(metadata.get(column)) || "TEXT".equals(metadata.get(column))) {
+					// repalce the column name in the origin sql statement with column name and suffic "(333)
+					qStringUpper = qStringUpper.replace(column, column + "(333)");
+				}
+			}
+		}
+		return qStringUpper;
 	}
 	
 	// Helper varient, without default or misc fields

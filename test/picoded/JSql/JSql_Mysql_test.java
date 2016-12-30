@@ -1,5 +1,8 @@
 package picoded.JSql;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,5 +49,27 @@ public class JSql_Mysql_test extends JSql_Sqlite_test {
 		String qString = "CREATE VIEW " + testTableName + "_View AS  SELECT * FROM (" + testTableName
 			+ "_1 NATURAL FULL OUTER JOIN " + testTableName + "_View )";
 		JSqlObj.execute(qString, "test");
+	}
+	
+	@Test(expected = JSqlException.class)
+	public void executeTest1() throws JSqlException {
+		JSqlObj.execute("CREATE VIEW FROM", "test");
+	}
+	
+	@Test(expected = JSqlException.class)
+	public void getQStringUpperTest() throws JSqlException {
+		JSql_Mysql jsqlMysql = new JSql_Mysql(TestConfig.MYSQL_CONN(), TestConfig.MYSQL_DATA(),
+			TestConfig.MYSQL_USER(), TestConfig.MYSQL_PASS());
+		jsqlMysql.getQStringUpper(null, null, null);
+		Map<String, String> metadata = new HashMap<String, String>();
+		metadata.put("test", "test");
+		String columns = "test, test";
+		jsqlMysql.getQStringUpper(metadata, null, columns);
+		JSqlObj.execute("INDEX IF NOT EXISTS", "test");
+	}
+	
+	@Test(expected = JSqlException.class)
+	public void getQStringUpperTest1() throws JSqlException {
+		JSqlObj.execute("INDEX IF NOT EXISTS ON", "test");
 	}
 }

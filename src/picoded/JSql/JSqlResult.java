@@ -50,7 +50,7 @@ public class JSqlResult extends
 	protected static final long serialVersionUID = 1L;
 	
 	/// Internal self used logger
-	private static Logger logger = Logger.getLogger(JSqlResult.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(JSqlResult.class.getName());
 	
 	/// Total row count for query
 	private int rowCount = 0;
@@ -208,7 +208,7 @@ public class JSqlResult extends
 			}
 		} catch (Exception e) {
 			//Logg the exception as warning
-			logger.log(Level.WARNING, "JSqlResult.dispose result exception", e);
+			LOGGER.log(Level.WARNING, "JSqlResult.dispose result exception", e);
 		}
 		
 		try {
@@ -218,7 +218,7 @@ public class JSqlResult extends
 			}
 		} catch (Exception e) {
 			//Logg the exception as warning
-			logger.log(Level.WARNING, "JSqlResult.dispose statement exception", e);
+			LOGGER.log(Level.WARNING, "JSqlResult.dispose statement exception", e);
 		}
 	}
 	

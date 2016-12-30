@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -148,11 +149,11 @@ public class JSqlResult extends
 	}
 	
 	/// Read a fetched row in a single hashmap
-	public HashMap<String, Object> readRow(int pt) {
+	public Map<String, Object> readRow(int pt) {
 		if (pt >= rowCount) {
 			return null;
 		}
-		HashMap<String, Object> ret = new HashMap<String, Object>();
+		Map<String, Object> ret = new HashMap<String, Object>();
 		Iterator<Map.Entry<String, List<Object>>> it = this.entrySet().iterator();
 		Map.Entry<String, List<Object>> pairs;
 		String colName;
@@ -223,17 +224,13 @@ public class JSqlResult extends
 	}
 	
 	/// Fetch table Meta Data info
-	public Map<String, String> fetchMetaData() throws JSqlException {
+	public Map<String, String> fetchMetaData() throws SQLException {
 		Map<String, String> ret = null;
 		if (sqlRes != null) {
 			ret = new HashMap<String, String>();
-			try {
-				while (sqlRes.next()) {
-					ret.put(sqlRes.getString("COLUMN_NAME").toUpperCase(), sqlRes.getString("TYPE_NAME")
-						.toUpperCase());
-				}
-			} catch (Exception e) {
-				throw new JSqlException("Error fetching sql meta data", e);
+			while (sqlRes.next()) {
+				ret.put(sqlRes.getString("COLUMN_NAME").toUpperCase(Locale.ENGLISH),
+					sqlRes.getString("TYPE_NAME").toUpperCase(Locale.ENGLISH));
 			}
 		}
 		return ret;

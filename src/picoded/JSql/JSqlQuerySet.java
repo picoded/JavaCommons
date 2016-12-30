@@ -1,5 +1,7 @@
 package picoded.JSql;
 
+import java.sql.SQLException;
+
 /// JSql type options enum, see JSql.sqlType for its usage
 public class JSqlQuerySet {
 	
@@ -55,7 +57,7 @@ public class JSqlQuerySet {
 	
 	/// Executes and dispose the sqliteResult object. Similar to executeQuery
 	/// Returns false if no result object is given by the execution call. This is raw execution.
-	public boolean execute() throws JSqlException {
+	public boolean execute() throws JSqlException, SQLException {
 		return JSqlObj.execute(sqlQuery, sqlArgs);
 	}
 }

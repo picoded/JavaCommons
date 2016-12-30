@@ -8,7 +8,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.HashMap;
+import java.sql.SQLException;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -57,7 +58,7 @@ public class JSql_Sqlite_test {
 	
 	/// Create table if not exists test
 	@Test
-	public void createTableQueryBuilder() throws JSqlException {
+	public void createTableQueryBuilder() throws JSqlException, SQLException {
 		JSqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "`").dispose(); //cleanup (just incase)
 		
 		JSqlObj.createTableQuerySet(testTableName, new String[] { "col1", "col2" },
@@ -139,7 +140,7 @@ public class JSql_Sqlite_test {
 	
 	/// Modified duplicate of executeQuery set
 	@Test
-	public void execute() throws JSqlException {
+	public void execute() throws JSqlException, SQLException {
 		assertTrue(JSqlObj.execute("DROP TABLE IF EXISTS " + testTableName + "")); //cleanup (just incase)
 		
 		//valid table creation : no exception
@@ -157,7 +158,7 @@ public class JSql_Sqlite_test {
 	}
 	
 	@Test
-	public void execute_expectedExceptions() throws JSqlException {
+	public void execute_expectedExceptions() throws JSqlException, SQLException {
 		execute(); //runs the no exception varient. to pre populate the tables for exceptions
 		
 		java.util.logging.Logger.getLogger("com.almworks.sqlite4java").setLevel(
@@ -287,7 +288,7 @@ public class JSql_Sqlite_test {
 	
 	/// Test if the "INDEX IF NOT EXISTS" clause is being handled correctly
 	@Test
-	public void uniqueIndexIfNotExists() throws JSqlException {
+	public void uniqueIndexIfNotExists() throws JSqlException, SQLException {
 		executeQuery();
 		
 		assertTrue(
@@ -312,7 +313,7 @@ public class JSql_Sqlite_test {
 		assertArrayEquals((new String[] { "world", "one" }), qSet.getArguments());
 	}
 	
-	public void row1to7setup() throws JSqlException {
+	public void row1to7setup() throws JSqlException, SQLException {
 		executeQuery();
 		
 		// added more data to test
@@ -324,7 +325,7 @@ public class JSql_Sqlite_test {
 	}
 	
 	@Test
-	public void selectQuerySet() throws JSqlException {
+	public void selectQuerySet() throws JSqlException, SQLException {
 		row1to7setup();
 		
 		JSqlResult r = null;
@@ -392,7 +393,7 @@ public class JSql_Sqlite_test {
 	
 	/// @TODO extend test coverage to include default, and misc columns
 	@Test
-	public void upsertQuerySet() throws JSqlException {
+	public void upsertQuerySet() throws JSqlException, SQLException {
 		row1to7setup();
 		JSqlResult r = null;
 		JSqlQuerySet qSet = null;
@@ -417,7 +418,7 @@ public class JSql_Sqlite_test {
 	}
 	
 	@Test
-	public void upsertQuerySetDefault() throws JSqlException {
+	public void upsertQuerySetDefault() throws JSqlException, SQLException {
 		row1to7setup();
 		JSqlResult r = null;
 		JSqlQuerySet qSet = null;
@@ -448,7 +449,7 @@ public class JSql_Sqlite_test {
 	}
 	
 	@Test
-	public void upsertQuerySetWithDefault() throws JSqlException {
+	public void upsertQuerySetWithDefault() throws JSqlException, SQLException {
 		row1to7setup();
 		JSqlResult r = null;
 		JSqlQuerySet qSet = null;
@@ -524,7 +525,7 @@ public class JSql_Sqlite_test {
 	
 	//*/
 	@Test
-	public void recreate() throws JSqlException {
+	public void recreate() throws JSqlException, SQLException {
 		// close connection
 		JSqlObj.dispose();
 		
@@ -622,7 +623,7 @@ public class JSql_Sqlite_test {
 	}
 	
 	@Test
-	public void executeTest() throws JSqlException {
+	public void executeTest() throws JSqlException, SQLException {
 		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
 		JSqlObj.query(
@@ -638,7 +639,7 @@ public class JSql_Sqlite_test {
 	}
 	
 	@Test
-	public void executeQueryTest() throws JSqlException {
+	public void executeQueryTest() throws JSqlException, SQLException {
 		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
 		JSqlObj.query(
@@ -672,7 +673,7 @@ public class JSql_Sqlite_test {
 	}
 	
 	@Test
-	public void queryTest() throws JSqlException {
+	public void queryTest() throws JSqlException, SQLException {
 		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
 		JSqlObj.query(
@@ -689,7 +690,7 @@ public class JSql_Sqlite_test {
 	}
 	
 	@Test(expected = Exception.class)
-	public void recreateTest() throws Exception, JSqlException {
+	public void recreateTest() throws Exception, JSqlException, SQLException {
 		JSqlObj.recreate(true);
 		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
@@ -702,7 +703,7 @@ public class JSql_Sqlite_test {
 		JSqlResult r = JSqlObj.query("SELECT * FROM " + testTableName + " where col1 = ? ", 404);
 		assertNotNull("SQL result returns as expected", r);
 		r.fetchAllRows();
-		HashMap<String, Object> row = r.readRow(0);
+		Map<String, Object> row = r.readRow(0);
 		assertEquals("via readRow", 404, ((Number) row.get("col1")).intValue());
 		assertEquals("via readCol", "has nothing", r.readCol("col2")[0]);
 		assertEquals("via readCol", "has nothing", r.readCol_StringArr("col2")[0]);

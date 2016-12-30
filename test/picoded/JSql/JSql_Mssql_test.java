@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +24,7 @@ public class JSql_Mssql_test extends JSql_Sqlite_test {
 	}
 	
 	@Test
-	public void upsertQuerySetWithDefault() throws JSqlException {
+	public void upsertQuerySetWithDefault() throws JSqlException, SQLException {
 		row1to7setup();
 		JSqlResult r = null;
 		JSqlQuerySet qSet = null;

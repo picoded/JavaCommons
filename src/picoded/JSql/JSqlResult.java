@@ -1,6 +1,5 @@
 package picoded.JSql;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
@@ -116,8 +115,6 @@ public class JSqlResult extends
 							try {
 								tmpObj = ClobString.toStringNoisy((CLOB) tmpObj);
 							} catch (SQLException e) {
-								throw new JSqlException("CLOB Processing Error", e);
-							} catch (IOException e) {
 								throw new JSqlException("CLOB Processing Error", e);
 							}
 						} else if (Blob.class.isInstance(tmpObj)) {

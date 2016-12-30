@@ -8,19 +8,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Date;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.sql.SQLException;
-import java.util.Date;
-
-import picoded.JSql.JSql;
-import picoded.JSql.JSqlException;
-import picoded.JSql.JSqlQuerySet;
-import picoded.JSql.JSqlResult;
 import picoded.TestConfig;
 
 public class JSql_Oracle_test {
@@ -64,7 +59,7 @@ public class JSql_Oracle_test {
 	
 	/// Test if the "INDEX IF NOT EXISTS" clause is being handled correctly
 	@Test
-	public void uniqueIndexIfNotExists() throws JSqlException, SQLException {
+	public void uniqueIndexIfNotExists() throws JSqlException {
 		executeQuery();
 		
 		JSqlException caughtException = null;
@@ -104,7 +99,7 @@ public class JSql_Oracle_test {
 	
 	/// Create table if not exists test
 	@Test
-	public void createTableQueryBuilder() throws JSqlException, SQLException {
+	public void createTableQueryBuilder() throws JSqlException {
 		JSqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "`").dispose(); //cleanup (just incase)
 		
 		JSqlObj.createTableQuerySet(testTableName, new String[] { "col1", "col2" },
@@ -186,7 +181,7 @@ public class JSql_Oracle_test {
 	
 	/// Modified duplicate of executeQuery set
 	@Test
-	public void execute() throws JSqlException, SQLException {
+	public void execute() throws JSqlException {
 		assertTrue(JSqlObj.execute("DROP TABLE IF EXISTS " + testTableName + "")); //cleanup (just incase)
 		
 		//valid table creation : no exception
@@ -204,7 +199,7 @@ public class JSql_Oracle_test {
 	}
 	
 	@Test
-	public void execute_expectedExceptions() throws JSqlException, SQLException {
+	public void execute_expectedExceptions() throws JSqlException {
 		execute(); //runs the no exception varient. to pre populate the tables for exceptions
 		
 		java.util.logging.Logger.getLogger("com.almworks.sqlite4java").setLevel(
@@ -343,7 +338,7 @@ public class JSql_Oracle_test {
 		assertArrayEquals((new String[] { "world", "one" }), qSet.getArguments());
 	}
 	
-	public void row1to7setup() throws JSqlException, SQLException {
+	public void row1to7setup() throws JSqlException {
 		executeQuery();
 		
 		// added more data to test
@@ -355,7 +350,7 @@ public class JSql_Oracle_test {
 	}
 	
 	@Test
-	public void selectQuerySet() throws JSqlException, SQLException {
+	public void selectQuerySet() throws JSqlException {
 		row1to7setup();
 		
 		JSqlResult r = null;
@@ -423,7 +418,7 @@ public class JSql_Oracle_test {
 	
 	/// @TODO extend test coverage to include default, and misc columns
 	@Test
-	public void upsertQuerySet() throws JSqlException, SQLException {
+	public void upsertQuerySet() throws JSqlException {
 		row1to7setup();
 		JSqlResult r = null;
 		JSqlQuerySet qSet = null;
@@ -448,7 +443,7 @@ public class JSql_Oracle_test {
 	}
 	
 	@Test
-	public void upsertQuerySetWithDefault() throws JSqlException, SQLException {
+	public void upsertQuerySetWithDefault() throws JSqlException {
 		row1to7setup();
 		JSqlResult r = null;
 		JSqlQuerySet qSet = null;
@@ -514,7 +509,7 @@ public class JSql_Oracle_test {
 	
 	//*/
 	@Test
-	public void recreate() throws JSqlException, SQLException {
+	public void recreate() throws JSqlException {
 		// close connection
 		JSqlObj.dispose();
 		
@@ -622,7 +617,7 @@ public class JSql_Oracle_test {
 	}
 	
 	@Test
-	public void upsertWithMisc() throws JSqlException, SQLException {
+	public void upsertWithMisc() throws JSqlException {
 		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
 		JSqlObj
@@ -637,7 +632,7 @@ public class JSql_Oracle_test {
 	}
 	
 	@Test
-	public void upsertWithDate() throws JSqlException, SQLException {
+	public void upsertWithDate() throws JSqlException {
 		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
 		JSqlObj

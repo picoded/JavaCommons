@@ -1,7 +1,5 @@
 package picoded.JSql.db;
 
-import java.sql.SQLException;
-
 import picoded.JSql.JSqlException;
 import picoded.JSql.JSqlResult;
 import picoded.JStack.JStackLayer;
@@ -30,8 +28,7 @@ public abstract class BaseInterface implements JStackLayer {
 	/// Executes and dispose the sqliteResult object.
 	///
 	/// Returns false if no result is given by the execution call, else true on success
-	public abstract boolean execute(String qString, Object... values) throws JSqlException,
-		SQLException;
+	public abstract boolean execute(String qString, Object... values) throws JSqlException;
 	
 	/// Raw variant of executeQuery, which DOES NOT perform any SQL to Implementation conversion
 	public abstract JSqlResult executeQuery_raw(String qString, Object... values)

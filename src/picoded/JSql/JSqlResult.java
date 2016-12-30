@@ -224,13 +224,17 @@ public class JSqlResult extends
 	}
 	
 	/// Fetch table Meta Data info
-	public Map<String, String> fetchMetaData() throws SQLException {
+	public Map<String, String> fetchMetaData() throws JSqlException {
 		Map<String, String> ret = null;
 		if (sqlRes != null) {
 			ret = new HashMap<String, String>();
-			while (sqlRes.next()) {
-				ret.put(sqlRes.getString("COLUMN_NAME").toUpperCase(Locale.ENGLISH),
-					sqlRes.getString("TYPE_NAME").toUpperCase(Locale.ENGLISH));
+			try {
+				while (sqlRes.next()) {
+					ret.put(sqlRes.getString("COLUMN_NAME").toUpperCase(Locale.ENGLISH), sqlRes
+						.getString("TYPE_NAME").toUpperCase(Locale.ENGLISH));
+				}
+			} catch (Exception e) {
+				throw new JSqlException("Error fetching sql meta data", e);
 			}
 		}
 		return ret;

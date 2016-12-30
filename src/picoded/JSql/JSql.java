@@ -266,7 +266,7 @@ public class JSql extends BaseInterface {
 	}
 	
 	/// Throws an exception, as this functionality isnt supported in the base class
-	public boolean execute(String qString, Object... values) throws JSqlException, SQLException {
+	public boolean execute(String qString, Object... values) throws JSqlException {
 		throw new JSqlException(JSqlException.invalidDatabaseImplementationException);
 	}
 	

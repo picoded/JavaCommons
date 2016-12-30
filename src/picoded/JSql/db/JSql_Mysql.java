@@ -1,6 +1,5 @@
 package picoded.JSql.db;
 
-import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -101,7 +100,7 @@ public class JSql_Mysql extends JSql {
 	/// Executes and dispose the sqliteResult object.
 	///
 	/// Returns false if no result is given by the execution call, else true on success
-	public boolean execute(String qString, Object... values) throws JSqlException, SQLException {
+	public boolean execute(String qString, Object... values) throws JSqlException {
 		qString = genericSqlParser(qString);
 		String qStringUpper = qString.toUpperCase(Locale.ENGLISH);
 		/// MySQL does not support the inner query in create view

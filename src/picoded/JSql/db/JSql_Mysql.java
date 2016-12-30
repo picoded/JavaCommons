@@ -143,7 +143,7 @@ public class JSql_Mysql extends JSql {
 				createViewQuery = "CREATE VIEW " + tmpViewName + " AS " + innerQuery;
 			}
 			
-			if (createViewQuery != null && createViewQuery.trim().length() != 0) {
+			if (createViewQuery != null) {
 				// execute query to drop the view if exist
 				String dropViewQuery = "DROP VIEW IF EXISTS " + tmpViewName;
 				
@@ -189,8 +189,8 @@ public class JSql_Mysql extends JSql {
 						String columns = tableAndColumnsName.substring(openBracketIndex + 1,
 							closeBracketIndex);
 						// fetch the table meta data info
-						JSqlResult JSql = executeQuery_metadata(tablename.trim());
-						Map<String, String> metadata = JSql.fetchMetaData();
+						JSqlResult jsql = executeQuery_metadata(tablename.trim());
+						Map<String, String> metadata = jsql.fetchMetaData();
 						if (metadata != null) {
 							String[] columnsArr = columns.split(",");
 							for (String column : columnsArr) {

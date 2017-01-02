@@ -18,7 +18,7 @@ import org.junit.Test;
 
 import picoded.TestConfig;
 
-public class JSql_Oracle_test {
+public class JSql_Oracle_test extends JSql_Mysql_test {
 	
 	protected JSql JSqlObj;
 	protected static String testTableName = "JSqlTest_default";
@@ -644,5 +644,15 @@ public class JSql_Oracle_test {
 		JSqlObj.upsertQuerySet(testTableName, new String[] { "PTK" }, new Object[] { "TEST_KEY" },
 			new String[] { "CDATE", "RNO", "ACODE" }, new Object[] { new Date(), "12345", "CODE" },
 			null, null, new String[] { "CBY", "LDATE" }).execute();
+	}
+	
+	@SuppressWarnings("static-access")
+	@Test(expected = Exception.class)
+	public void JSql_OracleTest() throws Exception {
+		JSqlObj.oracle(JSqlObj.sqlConn);
+		JSqlObj.oracle(null);
+		JSqlObj.recreate(false);
+		assertEquals("BEGIN EXECUTE IMMEDIATE", JSqlObj.genericSqlParser("BEGIN EXECUTE IMMEDIATE"));
+		JSqlObj = JSql.oracle("test", "test", "test");
 	}
 }

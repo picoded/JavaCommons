@@ -46,20 +46,20 @@ public class JSql_Mysql_test extends JSql_Sqlite_test {
 		JSqlObj = new JSql_Mysql("test-mysql.test", "test", "root", "admin");
 	}
 	
-	@Test(expected = JSqlException.class)
-	public void executeTest() throws JSqlException {
+	@Test(expected = Exception.class)
+	public void executeTest() throws JSqlException, Exception {
 		String qString = "CREATE VIEW " + testTableName + "_View AS  SELECT * FROM (" + testTableName
 			+ "_1 NATURAL FULL OUTER JOIN " + testTableName + "_View )";
 		JSqlObj.execute(qString, "test");
 	}
 	
-	@Test(expected = JSqlException.class)
-	public void executeTest1() throws JSqlException {
+	@Test(expected = Exception.class)
+	public void executeTest1() throws JSqlException, Exception {
 		JSqlObj.execute("CREATE VIEW FROM", "test");
 	}
 	
-	@Test(expected = JSqlException.class)
-	public void getQStringUpperTest() throws JSqlException {
+	@Test(expected = Exception.class)
+	public void getQStringUpperTest() throws JSqlException, Exception {
 		JSql_Mysql jsqlMysql = new JSql_Mysql(TestConfig.MYSQL_CONN(), TestConfig.MYSQL_DATA(),
 			TestConfig.MYSQL_USER(), TestConfig.MYSQL_PASS());
 		jsqlMysql.getQStringUpper(null, null, null);
@@ -73,13 +73,13 @@ public class JSql_Mysql_test extends JSql_Sqlite_test {
 		JSqlObj.execute("INDEX IF NOT EXISTS", "test");
 	}
 	
-	@Test(expected = JSqlException.class)
-	public void getQStringUpperTest1() throws JSqlException {
+	@Test(expected = Exception.class)
+	public void getQStringUpperTest1() throws JSqlException, Exception {
 		JSqlObj.execute("INDEX IF NOT EXISTS ON", "test");
 	}
 	
-	@Test(expected = JSqlException.class)
-	public void getQStringExecuteTest() throws JSqlException {
+	@Test(expected = Exception.class)
+	public void getQStringExecuteTest() throws JSqlException, Exception {
 		String qString = "CREATE TABLE " + testTableName
 			+ "(id int, first_name VARCHAR(15), last_name VARCHAR(15), "
 			+ "start_date DATE, end_date DATE, salary FLOAT(8,2), city VARCHAR(10))";

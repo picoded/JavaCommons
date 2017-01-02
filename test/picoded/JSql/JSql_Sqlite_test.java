@@ -50,11 +50,6 @@ public class JSql_Sqlite_test {
 		}
 	}
 	
-	@Test
-	public void sqliteInMemoryConstructor() {
-		assertNotNull("JSql constructed object must not be null", JSqlObj);
-	}
-	
 	/// Create table if not exists test
 	@Test
 	public void createTableQueryBuilder() throws JSqlException {
@@ -622,7 +617,7 @@ public class JSql_Sqlite_test {
 	}
 	
 	@Test
-	public void executeTest() throws JSqlException {
+	public void executeTest() throws JSqlException, Exception {
 		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
 		JSqlObj.query(
@@ -637,8 +632,8 @@ public class JSql_Sqlite_test {
 		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col1")).intValue());
 	}
 	
-	@Test
-	public void executeQueryTest() throws JSqlException {
+	@Test(expected = Exception.class)
+	public void executeQueryTest() throws JSqlException, Exception {
 		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
 		JSqlObj.query(
@@ -653,6 +648,10 @@ public class JSql_Sqlite_test {
 		assertNotNull("SQL result returns as expected", r);
 		r.fetchAllRows();
 		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col1")).intValue());
+		JSql_Sqlite jSql_Sqlite = new JSql_Sqlite();
+		jSql_Sqlite.className = null;
+		jSql_Sqlite.recreate(false);
+		
 	}
 	
 	@Test
@@ -671,8 +670,8 @@ public class JSql_Sqlite_test {
 		assertEquals(array, rArray);
 	}
 	
-	@Test
-	public void queryTest() throws JSqlException {
+	@Test(expected = Exception.class)
+	public void queryTest() throws JSqlException, Exception {
 		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
 		
 		JSqlObj.query(
@@ -686,6 +685,10 @@ public class JSql_Sqlite_test {
 		assertNotNull("SQL result returns as expected", r);
 		r.fetchAllRows();
 		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col1")).intValue());
+		JSql_Sqlite jSql_Sqlite = new JSql_Sqlite();
+		jSql_Sqlite.className = null;
+		jSql_Sqlite.recreate(false);
+		
 	}
 	
 	@Test(expected = Exception.class)

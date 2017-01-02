@@ -3,7 +3,6 @@ package picoded.JSql.db;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -51,11 +50,7 @@ public class JSql_Oracle extends JSql {
 			sqlConn = java.sql.DriverManager.getConnection(connectionUrl,
 				(String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
 			// Try to alter & ensure the current session roles
-			try {
-				execute("SET ROLE ALL");
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, "Failed to alter current session roles", e);
-			}
+			execute("SET ROLE ALL");
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load SQL connection: ", e);
 		}

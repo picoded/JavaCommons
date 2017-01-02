@@ -77,4 +77,76 @@ public class JSql_Mysql_test extends JSql_Sqlite_test {
 	public void getQStringUpperTest1() throws JSqlException {
 		JSqlObj.execute("INDEX IF NOT EXISTS ON", "test");
 	}
+	
+	@Test(expected = JSqlException.class)
+	public void getQStringExecuteTest() throws JSqlException {
+		String qString = "CREATE TABLE " + testTableName
+			+ "(id int, first_name VARCHAR(15), last_name VARCHAR(15), "
+			+ "start_date DATE, end_date DATE, salary FLOAT(8,2), city VARCHAR(10))";
+		JSqlObj.execute(qString);
+		qString = "DROP TABLE IF EXISTS Job";
+		JSqlObj.execute(qString);
+		qString = "CREATE TABLE Job (id int, title VARCHAR(20))";
+		JSqlObj.execute(qString);
+		qString = "insert into "
+			+ testTableName
+			+ "(id,first_name, last_name, "
+			+ "start_date, end_Date, salary, City) values (1,'Jason', 'Martin', '19960725', '20060725', 1234.56, 'Toronto')";
+		JSqlObj.execute(qString);
+		qString = "insert into "
+			+ testTableName
+			+ "(id,first_name, last_name, "
+			+ "start_date, end_Date, salary, City) values(2, 'Alison', 'Mathews', '19760321', '19860221', 6661.78, 'Vancouver')";
+		JSqlObj.execute(qString);
+		qString = "insert into "
+			+ testTableName
+			+ "(id,first_name, last_name, "
+			+ "start_date, end_Date, salary, City) values(3, 'James', 'Smith', '19781212', '19900315', 6544.78, 'Vancouver')";
+		JSqlObj.execute(qString);
+		qString = "insert into "
+			+ testTableName
+			+ "(id,first_name, last_name, "
+			+ "start_date, end_Date, salary, City) values(4, 'Celia', 'Rice', '19821024', '19990421', 2344.78, 'Vancouver')";
+		JSqlObj.execute(qString);
+		qString = "insert into "
+			+ testTableName
+			+ "(id,first_name, last_name, "
+			+ "start_date, end_Date, salary, City) values(5, 'Robert', 'Black', '19840115', '19980808', 2334.78, 'Vancouver')";
+		JSqlObj.execute(qString);
+		qString = "insert into "
+			+ testTableName
+			+ "(id,first_name, last_name, "
+			+ "start_date, end_Date, salary, City) values(6, 'Linda', 'Green', '19870730', '19960104', 4322.78, 'New York')";
+		JSqlObj.execute(qString);
+		qString = "insert into "
+			+ testTableName
+			+ "(id,first_name, last_name, "
+			+ "start_date, end_Date, salary, City) values(7, 'David', 'Larry', '19901231', '19980212', 7897.78, 'New York')";
+		JSqlObj.execute(qString);
+		qString = "insert into "
+			+ testTableName
+			+ "(id,first_name, last_name, "
+			+ "start_date, end_Date, salary, City) values(8, 'James', 'Cat', '19960917', '20020415', 1232.78, 'Vancouver')";
+		JSqlObj.execute(qString);
+		qString = "insert into job (id, title) values (1,'Tester')";
+		JSqlObj.execute(qString);
+		qString = "insert into job (id, title) values (2,'Accountant')";
+		JSqlObj.execute(qString);
+		qString = "insert into job (id, title) values (3,'Developer')";
+		JSqlObj.execute(qString);
+		qString = "insert into job (id, title) values (4,'Coder')";
+		JSqlObj.execute(qString);
+		qString = "insert into job (id, title) values (5,'Director')";
+		JSqlObj.execute(qString);
+		qString = "insert into job (id, title) values (6,'Mediator')";
+		JSqlObj.execute(qString);
+		qString = "insert into job (id, title) values (7,'Proffessor')";
+		JSqlObj.execute(qString);
+		qString = "insert into job (id, title) values (8,'Programmer')";
+		JSqlObj.execute(qString);
+		qString = "CREATE VIEW " + testTableName + "_View AS SELECT testTableName.first_name, "
+			+ "job.title FROM (SELECT " + testTableName + ".first_name, job.title FROM "
+			+ testTableName + " join job))";
+		JSqlObj.execute(qString);
+	}
 }

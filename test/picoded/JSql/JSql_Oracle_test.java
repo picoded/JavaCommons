@@ -469,7 +469,7 @@ public class JSql_Oracle_test extends JSql_Mysql_test {
 			r = JSqlObj.query("SELECT * FROM " + testTableName + "_1 ORDER BY col1 ASC"));
 		assertEquals("Upsert value check failed", 404, ((Number) r.readRowCol(0, "col1")).intValue());
 		assertEquals("Upsert value check failed", "not found", r.readRowCol(0, "col2"));
-		assertEquals("Upsert value check failed", null, r.readRowCol(0, "col4")); //TODO
+		assertEquals("Upsert value check failed", null, r.readRowCol(0, "col4"));
 	}
 	
 	@Test
@@ -671,6 +671,37 @@ public class JSql_Oracle_test extends JSql_Mysql_test {
 		JSqlObj.genericSqlParser("CREATE " + testTableName);
 		JSqlObj.genericSqlParser("SELECT * FROM AS ");
 		JSqlObj.genericSqlParser("SELECT * FROM AS " + testTableName);
+		
 		JSqlObj.genericSqlParser("CREATE UNIQUE INDEX " + testTableName);
+	}
+	
+	@Test(expected = Exception.class)
+	public void upsertQuerySet1() throws JSqlException {
+		String tableName = "test";
+		String[] uniqueColumns = new String[] {};
+		Object[] uniqueValues = new Object[] {};
+		String[] insertColumns = new String[] {};
+		Object[] insertValues = new Object[] {};
+		String[] defaultColumns = new String[] {};
+		Object[] defaultValues = new Object[] {};
+		String[] miscColumns = new String[] {};
+		JSqlObj.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns);
+		
+		tableName = "Upsert query requires unique column and values to be equal length";
+		uniqueColumns = new String[] {};
+		uniqueValues = new Object[] {};
+		insertColumns = null;
+		insertValues = null;
+		defaultColumns = null;
+		defaultValues = null;
+		miscColumns = null;
+		JSqlObj.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns);
+		uniqueColumns = new String[] {};
+		uniqueValues = new Object[] {};
+		uniqueColumns = null;
+		JSqlObj.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns);
 	}
 }

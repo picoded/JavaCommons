@@ -655,4 +655,22 @@ public class JSql_Oracle_test extends JSql_Mysql_test {
 		assertEquals("BEGIN EXECUTE IMMEDIATE", JSqlObj.genericSqlParser("BEGIN EXECUTE IMMEDIATE"));
 		JSqlObj = JSql.oracle("test", "test", "test");
 	}
+	
+	@Test(expected = Exception.class)
+	public void genericSqlParser1Test() throws JSqlException {
+		JSqlObj.genericSqlParser("DROP TABLE " + testTableName);
+		JSqlObj.genericSqlParser("DROP TABLE IF EXISTS " + testTableName);
+		
+		JSqlObj.genericSqlParser("DROP VIEW " + testTableName);
+		JSqlObj.genericSqlParser("DROP VIEW IF EXISTS " + testTableName);
+		
+		JSqlObj.genericSqlParser("CREATE TABLE " + testTableName);
+		JSqlObj.genericSqlParser("CREATE IF NOT EXISTS " + testTableName);
+		JSqlObj.genericSqlParser("CREATE VIEW " + testTableName);
+		JSqlObj.genericSqlParser("CREATE VIEW IF NOT EXISTS " + testTableName);
+		JSqlObj.genericSqlParser("CREATE " + testTableName);
+		JSqlObj.genericSqlParser("SELECT * FROM AS ");
+		JSqlObj.genericSqlParser("SELECT * FROM AS " + testTableName);
+		JSqlObj.genericSqlParser("CREATE UNIQUE INDEX " + testTableName);
+	}
 }

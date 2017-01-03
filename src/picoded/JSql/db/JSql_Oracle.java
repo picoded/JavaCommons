@@ -308,13 +308,15 @@ public class JSql_Oracle extends JSql {
 	
 	public Map<String, String> getPrefixOffsetAndIndexType(String upperCaseStr,
 		String[] indextypearr, int prefixOffset, String indexType) {
+		String prefixOff = "prefixOffset";
+		String indexTy = "indexType";
 		Map<String, String> map = new HashMap<String, String>();
-		map.put("prefixOffset", String.valueOf(prefixOffset));
-		map.put("indexType", indexType);
+		map.put(prefixOff, String.valueOf(prefixOffset));
+		map.put(indexTy, indexType);
 		for (int a = 0; a < indextypearr.length; ++a) {
 			if (upperCaseStr.startsWith(indextypearr[a], prefixOffset)) {
-				map.put("prefixOffset", String.valueOf((prefixOffset += indextypearr[a].length() + 1)));
-				map.put("indexType", indextypearr[a]);
+				map.put(prefixOff, String.valueOf((prefixOffset += indextypearr[a].length() + 1)));
+				map.put(indexTy, indextypearr[a]);
 				break;
 			}
 		}
@@ -679,4 +681,5 @@ public class JSql_Oracle extends JSql {
 		return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
 			null, null, null);
 	}
+	
 }

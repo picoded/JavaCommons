@@ -679,5 +679,4 @@ public class JSql_Oracle extends JSql {
 		return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
 			null, null, null);
 	}
-	
 }

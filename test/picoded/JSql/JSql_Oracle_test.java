@@ -676,7 +676,7 @@ public class JSql_Oracle_test extends JSql_Mysql_test {
 		JSqlObj.genericSqlParser("SELECT * FROM");
 		JSqlObj.genericSqlParser("SELECT * FROM AS ");
 		JSqlObj.genericSqlParser("SELECT * FROM AS " + testTableName);
-		JSqlObj.genericSqlParser("SELECT * FROM " + testTableName + " AS  t where t.id=123 OFFSET");
+		JSqlObj.genericSqlParser("SELECT * FROM " + testTableName + " AS  t where t.id=123");
 		JSqlObj.genericSqlParser("CREATE UNIQUE INDEX IF NOT EXISTS " + testTableName + " ()");
 		JSqlObj.genericSqlParser("CREATE UNIQUE INDEX " + testTableName);
 	}
@@ -723,5 +723,10 @@ public class JSql_Oracle_test extends JSql_Mysql_test {
 		jSqlOracle.checkMetadata(metadata);
 		metadata.put("test", null);
 		jSqlOracle.checkMetadata(metadata);
+		JSqlObj.genericSqlParser("SELECT * FROM ( " + testTableName + " AS  "
+			+ "t where t.id=123 ( FROM (" + testTableName + " AS  t where t.id=123)))");
+		String qString = "CREATE TABLE Persons(ID int NOT NULL AUTO_INCREMENT, "
+			+ "LastName varchar(255) NOT NULL, FirstName varchar(255), Address varchar(255), City varchar(255), PRIMARY KEY (ID))";
+		JSqlObj.execute(qString);
 	}
 }

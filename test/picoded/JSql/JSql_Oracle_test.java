@@ -688,6 +688,11 @@ public class JSql_Oracle_test {
 	}
 	
 	@Test(expected = Exception.class)
+	public void genericSqlParser1Test2() throws JSqlException {
+		JSqlObj.genericSqlParser("SELECT * FROM (");
+	}
+	
+	@Test(expected = Exception.class)
 	public void upsertQuerySet1() throws JSqlException {
 		String tableName = "test";
 		String[] uniqueColumns = new String[] {};
@@ -826,5 +831,19 @@ public class JSql_Oracle_test {
 	@Test(expected = Exception.class)
 	public void JSqlOracleTest2() throws JSqlException {
 		JSqlObj.execute("CREATE AUTOINCREMENT");
+	}
+	
+	@Test(expected = Exception.class)
+	public void JSqlOracleTest3() throws JSqlException {
+		String qString = "CREATE TABLE " + testTableName
+			+ " (, ID int NOT NULL AUTOINCREMENT PRIMARY KEY)) ";
+		JSqlObj.execute(qString);
+	}
+	
+	@Test(expected = Exception.class)
+	public void JSqlOracleTest4() throws JSqlException {
+		String qString = "CREATE TABLE " + testTableName
+			+ " (, ID int NOT , AUTOINCREMENT PRIMARY KEY)) ";
+		JSqlObj.execute(qString);
 	}
 }

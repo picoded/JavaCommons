@@ -21,7 +21,7 @@ import org.junit.Test;
 import picoded.TestConfig;
 import picoded.JSql.db.JSql_Oracle;
 
-public class JSql_Oracle_test /*extends JSql_Mysql_test*/{
+public class JSql_Oracle_test {
 	
 	protected JSql JSqlObj;
 	protected static String testTableName = "JSqlTest_default";
@@ -676,8 +676,11 @@ public class JSql_Oracle_test /*extends JSql_Mysql_test*/{
 		JSqlObj.genericSqlParser("SELECT * FROM");
 		JSqlObj.genericSqlParser("SELECT * FROM AS ");
 		JSqlObj.genericSqlParser("SELECT * FROM AS " + testTableName);
-		JSqlObj.genericSqlParser("SELECT * FROM " + testTableName + " AS  t where t.id=123");
 		JSqlObj.genericSqlParser("CREATE UNIQUE INDEX IF NOT EXISTS " + testTableName + " ()");
+		JSqlObj.genericSqlParser("SELECT * FROM ( " + testTableName
+			+ " AS ) AS where (SELECT * FROM ( " + testTableName + " AS  t where t.id=123)))");
+		JSqlObj
+			.genericSqlParser("SELECT * FROM JSQLTEST)EOPUNMKX AS t where t.id=123 ( FROM (JSQLTEST_EOPUNMKX AS t where t.id=123)))");
 		JSqlObj.genericSqlParser("CREATE UNIQUE INDEX " + testTableName);
 	}
 	
@@ -709,40 +712,6 @@ public class JSql_Oracle_test /*extends JSql_Mysql_test*/{
 		uniqueColumns = null;
 		JSqlObj.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
 			defaultColumns, defaultValues, miscColumns);
-	}
-	
-	@Test(expected = Exception.class)
-	public void JSqlOracleTest() throws JSqlException {
-		JSql_Oracle jSqlOracle = new JSql_Oracle(JSqlObj.sqlConn);
-		jSqlOracle.getPrefixOffsetAndIndexType("", new String[] {}, 0, "");
-		jSqlOracle.getPrefixOffsetAndIndexType("test", new String[] { "abc" }, 0, "");
-		
-		Map<String, String> metadata = null;
-		jSqlOracle.checkMetadata(metadata);
-		metadata = new HashMap<String, String>();
-		jSqlOracle.checkMetadata(metadata);
-		metadata.put("test", null);
-		jSqlOracle.checkMetadata(metadata);
-		JSqlObj.genericSqlParser("SELECT * FROM ( " + testTableName
-			+ " AS  t where t.id=123 ( FROM (" + testTableName + " AS  t where t.id=123)))");
-		String qString = "CREATE TABLE "
-			+ testTableName
-			+ "(ID int NOT NULL AUTO_INCREMENT,LastName varchar(255) NOT NULL, FirstName varchar(255),Address varchar(255),City varchar(255),PRIMARY KEY (ID))";
-		JSqlObj.execute(qString);
-		JSqlObj.execute("AUTOINCREMENT");
-	}
-	
-	@Test(expected = Exception.class)
-	public void JSqlOracleTest1() throws JSqlException {
-		String qString = "IF NOT EXISTS ,CREATE TABLE IF NOT EXISTS "
-			+ testTableName
-			+ "( ID int NOT NULL() AUTOINCREMENT ( ID int NOT NULL AUTOINCREMENT ) ) PRIMARY KEY (ID) )";
-		JSqlObj.execute(qString);
-	}
-	
-	@Test(expected = Exception.class)
-	public void JSqlOracleTest2() throws JSqlException {
-		JSqlObj.execute("CREATE AUTOINCREMENT");
 	}
 	
 	@Test(expected = Exception.class)
@@ -802,5 +771,57 @@ public class JSql_Oracle_test /*extends JSql_Mysql_test*/{
 		
 		JSqlObj.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
 			defaultColumns, defaultValues, miscColumns);
+	}
+	
+	@Test(expected = Exception.class)
+	public void upsertQuerySet5() throws JSqlException {
+		String tableName = "test";
+		String[] uniqueColumns = new String[] { "col1", "col2" };
+		Object[] uniqueValues = null;
+		
+		String[] insertColumns = new String[] {};
+		Object[] insertValues = new Object[] {};
+		
+		String[] defaultColumns = new String[] {};
+		Object[] defaultValues = new Object[] {};
+		
+		String[] miscColumns = new String[] {};
+		
+		JSqlObj.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns);
+	}
+	
+	@Test(expected = Exception.class)
+	public void JSqlOracleTest() throws JSqlException {
+		JSql_Oracle jSqlOracle = new JSql_Oracle(JSqlObj.sqlConn);
+		jSqlOracle.getPrefixOffsetAndIndexType("", new String[] {}, 0, "");
+		jSqlOracle.getPrefixOffsetAndIndexType("test", new String[] { "abc" }, 0, "");
+		
+		Map<String, String> metadata = null;
+		jSqlOracle.checkMetadata(metadata);
+		metadata = new HashMap<String, String>();
+		jSqlOracle.checkMetadata(metadata);
+		metadata.put("test", null);
+		jSqlOracle.checkMetadata(metadata);
+		JSqlObj.genericSqlParser("SELECT * FROM ( " + testTableName
+			+ " AS  t where t.id=123 ( FROM (" + testTableName + " AS  t where t.id=123)))");
+		String qString = "CREATE TABLE "
+			+ testTableName
+			+ "(ID int NOT NULL AUTO_INCREMENT,LastName varchar(255) NOT NULL, FirstName varchar(255),Address varchar(255),City varchar(255),PRIMARY KEY (ID))";
+		JSqlObj.execute(qString);
+		JSqlObj.execute("AUTOINCREMENT");
+	}
+	
+	@Test(expected = Exception.class)
+	public void JSqlOracleTest1() throws JSqlException {
+		String qString = "IF NOT EXISTS ,CREATE TABLE IF NOT EXISTS "
+			+ testTableName
+			+ "( ID int NOT NULL() AUTOINCREMENT ( ID int NOT NULL AUTOINCREMENT ) ) PRIMARY KEY (ID) )";
+		JSqlObj.execute(qString);
+	}
+	
+	@Test(expected = Exception.class)
+	public void JSqlOracleTest2() throws JSqlException {
+		JSqlObj.execute("CREATE AUTOINCREMENT");
 	}
 }

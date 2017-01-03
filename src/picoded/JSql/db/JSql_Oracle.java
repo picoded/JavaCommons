@@ -1,6 +1,7 @@
 package picoded.JSql.db;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -188,53 +189,41 @@ public class JSql_Oracle extends JSql {
 					LOGGER.finer("Matched INDEX : " + inString);
 					//Find the index type
 					indexType = null;
-					for (int a = 0; a < INDEXTYPEARR.length; ++a) {
-						if (upperCaseStr.startsWith(INDEXTYPEARR[a], prefixOffset)) {
-							prefixOffset += INDEXTYPEARR[a].length() + 1;
-							indexType = INDEXTYPEARR[a];
-							break;
-						}
-					}
+					Map<String, String> map = getPrefixOffsetAndIndexType(upperCaseStr, INDEXTYPEARR,
+						prefixOffset, indexType);
+					prefixOffset = Integer.parseInt(map.get("prefixOffset"));
+					indexType = map.get("indexType");
+					
 					//only bother if it matches (shd be right?)
-					if (upperCaseStr.startsWith(INDEX, prefixOffset)) {
-						prefixOffset += INDEX.length() + 1;
-						//If not exists wrapper
-						if (upperCaseStr.startsWith(IFNOTEXISTS, prefixOffset)) {
-							prefixOffset += IFNOTEXISTS.length() + 1;
-							qStringPrefix = "BEGIN EXECUTE IMMEDIATE '";
-							qStringSuffix = queryStringSuffix;
-						}
-						tmpStr = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
-						tmpIndx = tmpStr.indexOf(" ON ");
-						String tableAndColumns = tmpStr.substring(tmpIndx + " ON ".length());
-						// check column's type
-						String metaDataQuery = "SELECT "
-							+ tableAndColumns.substring(tableAndColumns.indexOf('(') + 1,
-								tableAndColumns.indexOf(')')) + " FROM "
-							+ tableAndColumns.substring(0, tableAndColumns.indexOf('('));
-						Map<String, String> metadata = null;
-						try {
-							metadata = getMetaData(metaDataQuery);
-						} catch (JSqlException e) {
-							//throw e;
-						}
-						if (metadata != null && !metadata.isEmpty()) {
-							for (Map.Entry<String, String> entry : metadata.entrySet()) {
-								if (entry.getValue() != null
-									&& entry.getValue().trim().toUpperCase(Locale.ENGLISH).contains("LOB")) {
-									throw new JSqlException(
-										"Cannot create index on expression with datatype LOB for field '"
-											+ entry.getKey() + "'.");
-								}
-							}
-						}
-						if (tmpIndx > 0) {
-							qString = "CREATE " + ((indexType != null) ? (indexType + " ") : "")
-								+ "INDEX " + tmpStr.substring(0, tmpIndx) + " ON "
-								+ fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx + 4));
-						}
-						// check if column type is blob
+					//					if (upperCaseStr.startsWith(INDEX, prefixOffset)) {
+					prefixOffset += INDEX.length() + 1;
+					//If not exists wrapper
+					if (upperCaseStr.startsWith(IFNOTEXISTS, prefixOffset)) {
+						prefixOffset += IFNOTEXISTS.length() + 1;
+						qStringPrefix = "BEGIN EXECUTE IMMEDIATE '";
+						qStringSuffix = queryStringSuffix;
 					}
+					tmpStr = fixTableNameInOracleSubQuery(fixedQuotes.substring(prefixOffset));
+					tmpIndx = tmpStr.indexOf(" ON ");
+					String tableAndColumns = tmpStr.substring(tmpIndx + " ON ".length());
+					// check column's type
+					String metaDataQuery = "SELECT "
+						+ tableAndColumns.substring(tableAndColumns.indexOf('(') + 1,
+							tableAndColumns.indexOf(')')) + " FROM "
+						+ tableAndColumns.substring(0, tableAndColumns.indexOf('('));
+					Map<String, String> metadata = null;
+					try {
+						metadata = getMetaData(metaDataQuery);
+					} catch (JSqlException e) {
+						//throw e;
+					}
+					checkMetadata(metadata);
+					if (tmpIndx > 0) {
+						qString = "CREATE " + (indexType + " ") + "INDEX " + tmpStr.substring(0, tmpIndx)
+							+ " ON " + fixTableNameInOracleSubQuery(tmpStr.substring(tmpIndx + 4));
+					}
+					// check if column type is blob
+					//					}
 				}
 			}
 		} else if (upperCaseStr.startsWith(INSERTINTO)) { //INSERT INTO
@@ -302,6 +291,34 @@ public class JSql_Oracle extends JSql {
 		}
 		qString = qStringPrefix + qString + qStringSuffix;
 		return qString; //no change of data
+	}
+	
+	public void checkMetadata(Map<String, String> metadata) throws JSqlException {
+		if (metadata != null && !metadata.isEmpty()) {
+			for (Map.Entry<String, String> entry : metadata.entrySet()) {
+				if (entry.getValue() != null
+					&& entry.getValue().trim().toUpperCase(Locale.ENGLISH).contains("LOB")) {
+					throw new JSqlException(
+						"Cannot create index on expression with datatype LOB for field '"
+							+ entry.getKey() + "'.");
+				}
+			}
+		}
+	}
+	
+	public Map<String, String> getPrefixOffsetAndIndexType(String upperCaseStr,
+		String[] indextypearr, int prefixOffset, String indexType) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("prefixOffset", String.valueOf(prefixOffset));
+		map.put("indexType", indexType);
+		for (int a = 0; a < indextypearr.length; ++a) {
+			if (upperCaseStr.startsWith(indextypearr[a], prefixOffset)) {
+				map.put("prefixOffset", String.valueOf((prefixOffset += indextypearr[a].length() + 1)));
+				map.put("indexType", indextypearr[a]);
+				break;
+			}
+		}
+		return map;
 	}
 	
 	private static String removeAsAfterTablename(String qString) {

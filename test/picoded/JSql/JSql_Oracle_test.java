@@ -9,6 +9,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -17,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import picoded.TestConfig;
+import picoded.JSql.db.JSql_Oracle;
 
 public class JSql_Oracle_test extends JSql_Mysql_test {
 	
@@ -663,15 +666,18 @@ public class JSql_Oracle_test extends JSql_Mysql_test {
 		
 		JSqlObj.genericSqlParser("DROP VIEW " + testTableName);
 		JSqlObj.genericSqlParser("DROP VIEW IF EXISTS " + testTableName);
+		JSqlObj.genericSqlParser("DROP");
 		
 		JSqlObj.genericSqlParser("CREATE TABLE " + testTableName);
 		JSqlObj.genericSqlParser("CREATE IF NOT EXISTS " + testTableName);
 		JSqlObj.genericSqlParser("CREATE VIEW " + testTableName);
 		JSqlObj.genericSqlParser("CREATE VIEW IF NOT EXISTS " + testTableName);
 		JSqlObj.genericSqlParser("CREATE " + testTableName);
+		JSqlObj.genericSqlParser("SELECT * FROM");
 		JSqlObj.genericSqlParser("SELECT * FROM AS ");
 		JSqlObj.genericSqlParser("SELECT * FROM AS " + testTableName);
-		
+		JSqlObj.genericSqlParser("SELECT * FROM " + testTableName + " AS  t where t.id=123 OFFSET");
+		JSqlObj.genericSqlParser("CREATE UNIQUE INDEX IF NOT EXISTS " + testTableName + " ()");
 		JSqlObj.genericSqlParser("CREATE UNIQUE INDEX " + testTableName);
 	}
 	
@@ -703,5 +709,19 @@ public class JSql_Oracle_test extends JSql_Mysql_test {
 		uniqueColumns = null;
 		JSqlObj.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
 			defaultColumns, defaultValues, miscColumns);
+	}
+	
+	@Test
+	public void JSqlOracleTest() throws JSqlException {
+		JSql_Oracle jSqlOracle = new JSql_Oracle(JSqlObj.sqlConn);
+		jSqlOracle.getPrefixOffsetAndIndexType("", new String[] {}, 0, "");
+		jSqlOracle.getPrefixOffsetAndIndexType("test", new String[] { "abc" }, 0, "");
+		
+		Map<String, String> metadata = null;
+		jSqlOracle.checkMetadata(metadata);
+		metadata = new HashMap<String, String>();
+		jSqlOracle.checkMetadata(metadata);
+		metadata.put("test", null);
+		jSqlOracle.checkMetadata(metadata);
 	}
 }

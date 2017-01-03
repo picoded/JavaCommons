@@ -315,7 +315,7 @@ public class JSql_Oracle extends JSql {
 		map.put(indexTy, indexType);
 		for (int a = 0; a < indextypearr.length; ++a) {
 			if (upperCaseStr.startsWith(indextypearr[a], prefixOffset)) {
-				map.put(prefixOff, String.valueOf((prefixOffset += indextypearr[a].length() + 1)));
+				map.put(prefixOff, String.valueOf(prefixOffset += indextypearr[a].length() + 1));
 				map.put(indexTy, indextypearr[a]);
 				break;
 			}

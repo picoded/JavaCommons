@@ -681,6 +681,9 @@ public class JSql_Oracle_test {
 			+ " AS ) AS where (SELECT * FROM ( " + testTableName + " AS  t where t.id=123)))");
 		JSqlObj
 			.genericSqlParser("SELECT * FROM JSQLTEST)EOPUNMKX AS t where t.id=123 ( FROM (JSQLTEST_EOPUNMKX AS t where t.id=123)))");
+		JSqlObj.genericSqlParser("SELECT * FROM JSQLTEST_EOPUNMKX AS t where t.id=123");
+		JSqlObj
+			.genericSqlParser("SELECT * FROM JSQLTEST_EOPUNMKX AS t where t.id=123 LIMIT -6 OFFSET 5");
 		JSqlObj.genericSqlParser("CREATE UNIQUE INDEX " + testTableName);
 	}
 	

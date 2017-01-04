@@ -18,5 +18,7 @@ public class CommonJSql_test {
 		jSqlResult.readRowCol(1, "name");
 		jSqlResult.readCol("name");
 		jSqlResult.fetchMetaData();
+		jSqlResult.equals(null);
+		jSqlResult.hashCode();
 	}
 }

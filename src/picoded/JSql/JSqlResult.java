@@ -67,6 +67,17 @@ public class JSqlResult extends CaseInsensitiveHashMap<String /* fieldName */, L
 		sqlRes = rs;
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		return false;
+		
+	};
+	
+	@Override
+	public int hashCode() {
+		return rowCount;
+	};
+	
 	// / Empty constructor, used as place holder
 	public JSqlResult() { // empty
 	

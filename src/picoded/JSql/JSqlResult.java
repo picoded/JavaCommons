@@ -45,35 +45,44 @@ import picoded.struct.CaseInsensitiveHashMap;
 ///   - readRow / readRowCol : To support unfetched rows -> ie, automatically fetchs to the desired row count
 ///   - isFetchedAll / isFetchedRow
 ///
-public class JSqlResult extends
-	CaseInsensitiveHashMap<String /*fieldName*/, List<Object> /*rowNumber array */> {
+public class JSqlResult extends CaseInsensitiveHashMap<String /* fieldName */, List<Object> /*
+ * rowNumber
+ * array
+ */> {
 	protected static final long serialVersionUID = 1L;
 	
-	/// Internal self used logger
+	// / Internal self used logger
 	private static final Logger LOGGER = Logger.getLogger(JSqlResult.class.getName());
 	
-	/// Total row count for query
+	// / Total row count for query
 	private int rowCount = 0;
 	
 	private PreparedStatement sqlStmt = null;
 	private ResultSet sqlRes = null;
 	
-	/// Constructor with SQL resultSet
-	/// (Used internally by JSql : not to be used directly)
+	// / Constructor with SQL resultSet
+	// / (Used internally by JSql : not to be used directly)
 	public JSqlResult(PreparedStatement ps, ResultSet rs) {
 		sqlStmt = ps;
 		sqlRes = rs;
 	}
 	
-	/// Empty constructor, used as place holder
-	public JSqlResult() { //empty
+	@Override
+	public boolean equals(Object o) {
+		return false;
+	};
+	
+	// / Empty constructor, used as place holder
+	public JSqlResult() { // empty
 	
 	}
 	
-	/// Fetches all the row data, and store it into the local hashmap & respective array list
-	/// Returns the rowCount on success.
-	///
-	/// Important note: This step is redundent for sqlite, as data is prefetch on all executions
+	// / Fetches all the row data, and store it into the local hashmap &
+	// respective array list
+	// / Returns the rowCount on success.
+	// /
+	// / Important note: This step is redundent for sqlite, as data is prefetch
+	// on all executions
 	public int fetchAllRows() throws JSqlException {
 		int pt;
 		int colCount;
@@ -88,7 +97,8 @@ public class JSqlResult extends
 				while (sqlRes.next()) {
 					for (pt = 0; pt < colCount; pt++) {
 						colName = rsmd.getColumnName(pt + 1);
-						// remove single quote if it is first and last character.
+						// remove single quote if it is first and last
+						// character.
 						if (colName != null && colName.trim().length() > 0) {
 							if (colName.charAt(0) == '\'' || colName.charAt(0) == '"') {
 								colName = colName.substring(1);
@@ -106,8 +116,8 @@ public class JSqlResult extends
 							this.put(colName, colArr);
 						}
 						
-						//Auto conversion from Oracle type variables, to a more
-						//Expected format for mysql (basic data structs)
+						// Auto conversion from Oracle type variables, to a more
+						// Expected format for mysql (basic data structs)
 						tmpObj = sqlRes.getObject(pt + 1);
 						if (BigDecimal.class.isInstance(tmpObj)) {
 							tmpObj = ((BigDecimal) tmpObj).doubleValue();
@@ -136,16 +146,16 @@ public class JSqlResult extends
 			
 		}
 		
-		//throw new JSqlException("SQL format is not yet implemented");
+		// throw new JSqlException("SQL format is not yet implemented");
 		return rowCount;
 	}
 	
-	/// Return current row count
+	// / Return current row count
 	public int rowCount() {
 		return rowCount;
 	}
 	
-	/// Read a fetched row in a single hashmap
+	// / Read a fetched row in a single hashmap
 	public Map<String, Object> readRow(int pt) {
 		if (pt >= rowCount) {
 			return null;
@@ -164,7 +174,7 @@ public class JSqlResult extends
 		return ret;
 	}
 	
-	/// Read a fetched row column value and returns it (if row/value exists)
+	// / Read a fetched row column value and returns it (if row/value exists)
 	public Object readRowCol(int pt, String name) {
 		List<Object> colArr = this.get(name);
 		if (colArr != null) {
@@ -173,13 +183,13 @@ public class JSqlResult extends
 		return null;
 	}
 	
-	/// JSql result set to an object array, from a single collumn field
+	// / JSql result set to an object array, from a single collumn field
 	public Object[] readCol(String field) {
 		List<Object> resList = get(field);
 		return (resList != null) ? resList.toArray(new Object[resList.size()]) : null;
 	}
 	
-	/// JSql result set to an string array, from a single collumn field
+	// / JSql result set to an string array, from a single collumn field
 	public String[] readCol_StringArr(String field) {
 		List<Object> resList = get(field);
 		int len = resList.size();
@@ -188,16 +198,12 @@ public class JSqlResult extends
 		String[] res = new String[len];
 		for (Object data : resList) {
 			res[pt] = (String) data;
-			
 			pt++;
-			if (pt > len) {
-				break;
-			}
 		}
 		return res;
 	}
 	
-	/// Dispose and closes the result connection
+	// / Dispose and closes the result connection
 	public void dispose() {
 		try {
 			if (sqlRes != null) {
@@ -205,7 +211,7 @@ public class JSqlResult extends
 				sqlRes = null;
 			}
 		} catch (Exception e) {
-			//Logg the exception as warning
+			// Logg the exception as warning
 			LOGGER.log(Level.WARNING, "JSqlResult.dispose result exception", e);
 		}
 		
@@ -215,12 +221,12 @@ public class JSqlResult extends
 				sqlStmt = null;
 			}
 		} catch (Exception e) {
-			//Logg the exception as warning
+			// Logg the exception as warning
 			LOGGER.log(Level.WARNING, "JSqlResult.dispose statement exception", e);
 		}
 	}
 	
-	/// Fetch table Meta Data info
+	// / Fetch table Meta Data info
 	public Map<String, String> fetchMetaData() throws JSqlException {
 		Map<String, String> ret = null;
 		if (sqlRes != null) {

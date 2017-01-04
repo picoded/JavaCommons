@@ -1,20 +1,14 @@
 package picoded.JSql;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
 import org.junit.Before;
 import org.junit.Test;
 
 public class CommonJSql_test {
 	JSqlResult jSqlResult = null;
-	ResultSet rs;
-	PreparedStatement ps;
 	
 	@Before
 	public void setUp() {
 		jSqlResult = new JSqlResult();
-		
 	}
 	
 	@Test
@@ -25,5 +19,4 @@ public class CommonJSql_test {
 		jSqlResult.readCol("name");
 		jSqlResult.fetchMetaData();
 	}
-	
 }

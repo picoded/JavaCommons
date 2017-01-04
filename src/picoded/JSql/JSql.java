@@ -480,7 +480,9 @@ public class JSql extends BaseInterface {
 		Object[] insertValues, // Values to update
 		//
 		String[] defaultColumns, // Columns names to apply default value, if not exists
-		Object[] defaultValues, // Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+		
+		// Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+		Object[] defaultValues,
 		//
 		// Various column names where its existing value needs to be maintained (if any),
 		// this is important as some SQL implementation will fallback to default table values, if not properly handled

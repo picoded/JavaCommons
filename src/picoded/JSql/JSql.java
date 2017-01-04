@@ -156,21 +156,16 @@ public class JSql extends BaseInterface {
 			//Try and finally : prevent memory leaks
 			try {
 				//is a select statment
-				if (qString.trim().toUpperCase(Locale.ENGLISH).substring(0, 6).equals("SELECT")) {
+				if ("SELECT".equals(qString.trim().toUpperCase(Locale.ENGLISH).substring(0, 6))) {
 					rs = ps.executeQuery();
 					res = new JSqlResult(ps, rs);
-					
-					//let JSqlResult "close" it
-					ps = null;
-					rs = null;
 					return res;
 				} else {
 					int r = ps.executeUpdate();
-					if (r != -1) {
-						return new JSqlResult(); //returns a blank JSqlResult, for consistency
-					} else {
-						return null;
+					if (r >= 0) {
+						res = new JSqlResult(); //returns a blank JSqlResult, for consistency
 					}
+					return res;
 				}
 			} finally {
 				if (rs != null) {
@@ -201,21 +196,23 @@ public class JSql extends BaseInterface {
 	/// Returns false if no result object is given by the execution call. This is raw execution.
 	public boolean execute_raw(String qString, Object... values) throws JSqlException {
 		try {
+			boolean isexecuteRaw = false;
 			PreparedStatement ps = prepareSqlStatment(qString, values);
 			ResultSet rs = null;
 			try {
 				//is a select statment
-				if (qString.trim().toUpperCase(Locale.ENGLISH).substring(0, 6).equals("SELECT")) {
+				if ("SELECT".equals(qString.trim().toUpperCase(Locale.ENGLISH).substring(0, 6))) {
 					rs = ps.executeQuery();
 					if (rs != null) {
-						return true;
+						isexecuteRaw = true;
 					}
 				} else {
 					int r = ps.executeUpdate();
-					if (r != -1) {
-						return true;
+					if (r >= 0) {
+						isexecuteRaw = true;
 					}
 				}
+				return isexecuteRaw;
 			} finally {
 				if (rs != null) {
 					rs.close();
@@ -227,19 +224,19 @@ public class JSql extends BaseInterface {
 		} catch (Exception e) {
 			throw new JSqlException("execute_raw exception : " + qString, e);
 		}
-		return false;
 	}
 	
 	/// Executes and dispose the sqliteResult object. Similar to executeQuery but uses the Statement class
 	/// Returns false if no result object is given by the execution call. This is raw execution.
 	public boolean execute_query(String qString) throws JSqlException {
 		try {
+			boolean isexecuteRaw = false;
 			Statement ps = sqlConn.createStatement();
 			ResultSet rs = null;
 			try {
 				rs = ps.executeQuery(qString);
 				if (rs != null) {
-					return true;
+					isexecuteRaw = true;
 				}
 			} finally {
 				if (rs != null) {
@@ -249,10 +246,10 @@ public class JSql extends BaseInterface {
 					ps.close();
 				}
 			}
+			return isexecuteRaw;
 		} catch (Exception e) {
 			throw new JSqlException("execute_query exception : " + qString, e);
 		}
-		return false;
 	}
 	
 	/// Throws an exception, as this functionality isnt supported in the base class

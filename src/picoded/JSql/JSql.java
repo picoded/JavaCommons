@@ -32,6 +32,7 @@ public class JSql extends BaseInterface {
 	public JSqlType sqlType = JSqlType.INVALID;
 	
 	private static final String COALESCE = "COALESCE(";
+	private static final String WHERE = " WHERE ";
 	
 	/// Internal self used logger
 	private static final Logger LOGGER = Logger.getLogger(JSql.class.getName());
@@ -156,7 +157,7 @@ public class JSql extends BaseInterface {
 			//Try and finally : prevent memory leaks
 			try {
 				//is a select statment
-				if (qString.trim().toUpperCase(Locale.ENGLISH).substring(0, 6).equals("SELECT")) {
+				if ("SELECT".equals(qString.trim().toUpperCase(Locale.ENGLISH).substring(0, 6))) {
 					rs = ps.executeQuery();
 					res = new JSqlResult(ps, rs);
 					
@@ -205,7 +206,7 @@ public class JSql extends BaseInterface {
 			ResultSet rs = null;
 			try {
 				//is a select statment
-				if (qString.trim().toUpperCase(Locale.ENGLISH).substring(0, 6).equals("SELECT")) {
+				if ("SELECT".equals(qString.trim().toUpperCase(Locale.ENGLISH).substring(0, 6))) {
 					rs = ps.executeQuery();
 					if (rs != null) {
 						return true;
@@ -272,7 +273,7 @@ public class JSql extends BaseInterface {
 	
 	/// Returns true, if dispose() function was called prior
 	public boolean isDisposed() {
-		return (sqlConn == null);
+		return sqlConn == null;
 	}
 	
 	/// Dispose of the respective SQL driver / connection
@@ -417,7 +418,7 @@ public class JSql extends BaseInterface {
 		// Where clauses
 		if (whereStatement != null && (whereStatement = whereStatement.trim()).length() >= 3) {
 			
-			queryBuilder.append(" WHERE ");
+			queryBuilder.append(WHERE);
 			queryBuilder.append(whereStatement);
 			
 			if (whereValues != null) {
@@ -504,7 +505,7 @@ public class JSql extends BaseInterface {
 		ArrayList<Object> innerSelectArgs = new ArrayList<Object>();
 		StringBuilder innerSelectSB = new StringBuilder(" FROM ");
 		innerSelectSB.append("`" + tableName + "`");
-		innerSelectSB.append(" WHERE ");
+		innerSelectSB.append(WHERE);
 		for (int a = 0; a < uniqueColumns.length; ++a) {
 			if (a > 0) {
 				innerSelectSB.append(" AND ");
@@ -828,7 +829,7 @@ public class JSql extends BaseInterface {
 		
 		// Where clauses
 		if (whereStatement != null && (whereStatement = whereStatement.trim()).length() >= 3) {
-			queryBuilder.append(" WHERE ");
+			queryBuilder.append(WHERE);
 			queryBuilder.append(whereStatement);
 			
 			if (whereValues != null) {

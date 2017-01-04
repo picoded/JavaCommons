@@ -159,6 +159,10 @@ public class JSql extends BaseInterface {
 				if ("SELECT".equals(qString.trim().toUpperCase(Locale.ENGLISH).substring(0, 6))) {
 					rs = ps.executeQuery();
 					res = new JSqlResult(ps, rs);
+					
+					//let JSqlResult "close" it
+					//					
+					//					
 					return res;
 				} else {
 					int r = ps.executeUpdate();
@@ -170,9 +174,11 @@ public class JSql extends BaseInterface {
 			} finally {
 				if (rs != null) {
 					rs.close();
+					rs = null;
 				}
 				if (ps != null) {
 					ps.close();
+					ps = null;
 				}
 			}
 		} catch (Exception e) {
@@ -196,7 +202,6 @@ public class JSql extends BaseInterface {
 	/// Returns false if no result object is given by the execution call. This is raw execution.
 	public boolean execute_raw(String qString, Object... values) throws JSqlException {
 		try {
-			boolean isexecuteRaw = false;
 			PreparedStatement ps = prepareSqlStatment(qString, values);
 			ResultSet rs = null;
 			try {
@@ -204,15 +209,14 @@ public class JSql extends BaseInterface {
 				if ("SELECT".equals(qString.trim().toUpperCase(Locale.ENGLISH).substring(0, 6))) {
 					rs = ps.executeQuery();
 					if (rs != null) {
-						isexecuteRaw = true;
+						return true;
 					}
 				} else {
 					int r = ps.executeUpdate();
-					if (r >= 0) {
-						isexecuteRaw = true;
+					if (r != -1) {
+						return true;
 					}
 				}
-				return isexecuteRaw;
 			} finally {
 				if (rs != null) {
 					rs.close();
@@ -224,19 +228,19 @@ public class JSql extends BaseInterface {
 		} catch (Exception e) {
 			throw new JSqlException("execute_raw exception : " + qString, e);
 		}
+		return false;
 	}
 	
 	/// Executes and dispose the sqliteResult object. Similar to executeQuery but uses the Statement class
 	/// Returns false if no result object is given by the execution call. This is raw execution.
 	public boolean execute_query(String qString) throws JSqlException {
 		try {
-			boolean isexecuteRaw = false;
 			Statement ps = sqlConn.createStatement();
 			ResultSet rs = null;
 			try {
 				rs = ps.executeQuery(qString);
 				if (rs != null) {
-					isexecuteRaw = true;
+					return true;
 				}
 			} finally {
 				if (rs != null) {
@@ -246,10 +250,10 @@ public class JSql extends BaseInterface {
 					ps.close();
 				}
 			}
-			return isexecuteRaw;
 		} catch (Exception e) {
 			throw new JSqlException("execute_query exception : " + qString, e);
 		}
+		return false;
 	}
 	
 	/// Throws an exception, as this functionality isnt supported in the base class

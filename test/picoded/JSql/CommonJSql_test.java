@@ -1,8 +1,8 @@
 package picoded.JSql;
 
+import java.sql.Blob;
 import java.sql.SQLException;
 
-import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialException;
 
 import org.junit.Before;
@@ -54,12 +54,23 @@ public class CommonJSql_test {
 	@Test(expected = Exception.class)
 	public void commitTest() throws JSqlException {
 		jSql.selectQuerySet(testTableName, "name");
+		jSql.genericSqlParser(null);
 		jSql.commit();
+	}
+	
+	@Test(expected = Exception.class)
+	public void createBlobTest() throws Exception {
+		jSql.createBlob();
+	}
+	
+	@Test(expected = Exception.class)
+	public void executeQuery_metadataTest() throws Exception {
+		jSql.executeQuery_metadata(null);
 	}
 	
 	@SuppressWarnings("static-access")
 	@Test(expected = Exception.class)
-	public void jSqlTest() throws JSqlException, SerialException, SQLException {
+	public void jSqlTest() throws Exception {
 		jSql.setConnectionProperties(null, null, null, null, null);
 		jSql.sqlite(null);
 		jSql.mysql(TestConfig.MYSQL_CONN(), TestConfig.MYSQL_DATA(), TestConfig.MYSQL_USER(),
@@ -74,8 +85,8 @@ public class CommonJSql_test {
 			"Vancouver");
 		jSql_Mysql.execute_raw("Select * From " + testTableName + " where id=?", 4);
 		jSql_Mysql.execute_query("Select * From " + testTableName + " where id=4");
-		jSql_Mysql.prepareSqlStatment(query, null, 1l, 1d, 1.0f, new SerialBlob("test".getBytes()),
-			new Object());
+		Blob blob = jSql_Mysql.createBlob();
+		jSql_Mysql.prepareSqlStatment(query, null, 1l, 1d, 1.0f, blob, new Object());
 	}
 	
 	@Test(expected = Exception.class)

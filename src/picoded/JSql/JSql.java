@@ -235,12 +235,14 @@ public class JSql extends BaseInterface {
 	/// Returns false if no result object is given by the execution call. This is raw execution.
 	public boolean execute_query(String qString) throws JSqlException {
 		try {
-			Statement ps = sqlConn.createStatement();
+			Statement ps = null;
 			ResultSet rs = null;
+			boolean isResultSetNotNull = false;
 			try {
+				ps = sqlConn.createStatement();
 				rs = ps.executeQuery(qString);
 				if (rs != null) {
-					return true;
+					isResultSetNotNull = true;
 				}
 			} finally {
 				if (rs != null) {
@@ -250,10 +252,10 @@ public class JSql extends BaseInterface {
 					ps.close();
 				}
 			}
+			return isResultSetNotNull;
 		} catch (Exception e) {
 			throw new JSqlException("execute_query exception : " + qString, e);
 		}
-		return false;
 	}
 	
 	/// Throws an exception, as this functionality isnt supported in the base class

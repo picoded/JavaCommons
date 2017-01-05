@@ -33,7 +33,7 @@ public class CommonJSql_test {
 		testTableName = testTableName.toUpperCase();
 	}
 	
-	@Test
+	@Test(expected = Exception.class)
 	public void rowCountTest() throws JSqlException {
 		jSqlResult.rowCount();
 		jSqlResult.readRow(10);
@@ -42,6 +42,19 @@ public class CommonJSql_test {
 		jSqlResult.fetchMetaData();
 		jSqlResult.equals(null);
 		jSqlResult.hashCode();
+		jSql.isDisposed();
+		jSql.setAutoCommit(false);
+	}
+	
+	@Test(expected = Exception.class)
+	public void getAutoCommitTest() throws JSqlException {
+		jSql.getAutoCommit();
+	}
+	
+	@Test(expected = Exception.class)
+	public void commitTest() throws JSqlException {
+		jSql.selectQuerySet(testTableName, "name");
+		jSql.commit();
 	}
 	
 	@SuppressWarnings("static-access")

@@ -162,8 +162,6 @@ public class JSql extends BaseInterface {
 					res = new JSqlResult(ps, rs);
 					
 					//let JSqlResult "close" it
-					ps = null;
-					rs = null;
 				} else {
 					int r = ps.executeUpdate();
 					if (r >= 0) {
@@ -175,9 +173,11 @@ public class JSql extends BaseInterface {
 				if (rs != null) {
 					rs.close();
 				}
+				rs = null;
 				if (ps != null) {
 					ps.close();
 				}
+				ps = null;
 			}
 		} catch (Exception e) {
 			throw new JSqlException("executeQuery_raw exception: " + qString, e);

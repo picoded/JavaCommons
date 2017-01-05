@@ -2,6 +2,7 @@ package picoded.JSql;
 
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.sql.rowset.serial.SerialException;
 
@@ -153,7 +154,7 @@ public class CommonJSql_test {
 	public void upsertQuerySet1() throws JSqlException {
 		String tableName = "Select * From testTableName where id=";
 		String[] uniqueColumns = new String[] {};
-		Object[] uniqueValues = new Object[] {};
+		Object[] uniqueValues = new Object[] { "tets" };
 		String[] insertColumns = new String[] {};
 		Object[] insertValues = new Object[] {};
 		String[] defaultColumns = new String[] {};
@@ -161,11 +162,50 @@ public class CommonJSql_test {
 		String[] miscColumns = new String[] {};
 		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
 			defaultColumns, defaultValues, miscColumns);
-		uniqueValues = new Object[] { "tets" };
-		
-		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
-			defaultColumns, defaultValues, miscColumns);
 		
 	}
 	
+	@Test(expected = Exception.class)
+	public void upsertQuerySet2() throws JSqlException {
+		String tableName = testTableName;
+		String[] uniqueColumns = new String[] {};
+		Object[] uniqueValues = null;
+		String[] insertColumns = null;
+		Object[] insertValues = null;
+		String[] defaultColumns = null;
+		Object[] defaultValues = null;
+		String[] miscColumns = null;
+		ArrayList<Object> innerSelectArgs = null;
+		StringBuilder innerSelectSB = null;
+		String innerSelectPrefix = null;
+		String innerSelectSuffix = null;
+		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns, innerSelectArgs, innerSelectSB,
+			innerSelectPrefix, innerSelectSuffix);
+	}
+	
+	@Test
+	public void upsertQuerySet3() throws JSqlException {
+		String tableName = testTableName;
+		String[] uniqueColumns = new String[] { "test", "test", "test" };
+		Object[] uniqueValues = new Object[] { "test", null, "test", null };
+		;
+		String[] insertColumns = new String[] { "test", null, "test", null };
+		Object[] insertValues = null;
+		String[] defaultColumns = new String[] { "test", null, "test", null };
+		Object[] defaultValues = null;
+		String[] miscColumns = null;
+		ArrayList<Object> innerSelectArgs = new ArrayList<Object>();
+		StringBuilder innerSelectSB = null;
+		String innerSelectPrefix = null;
+		String innerSelectSuffix = null;
+		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns, innerSelectArgs, innerSelectSB,
+			innerSelectPrefix, innerSelectSuffix);
+		insertValues = new Object[] { "test", null };
+		defaultValues = new Object[] { "test", null };
+		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns, innerSelectArgs, innerSelectSB,
+			innerSelectPrefix, innerSelectSuffix);
+	}
 }

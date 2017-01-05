@@ -596,7 +596,7 @@ public class JSql extends BaseInterface {
 		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	
-	private JSqlQuerySet upsertQuerySet(String tableName, String[] uniqueColumns,
+	protected JSqlQuerySet upsertQuerySet(String tableName, String[] uniqueColumns,
 		Object[] uniqueValues, String[] insertColumns, Object[] insertValues,
 		String[] defaultColumns, Object[] defaultValues, String[] miscColumns,
 		ArrayList<Object> innerSelectArgs, StringBuilder innerSelectSB, String innerSelectPrefix,

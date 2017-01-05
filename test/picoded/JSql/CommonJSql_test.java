@@ -51,8 +51,18 @@ public class CommonJSql_test {
 	}
 	
 	@Test(expected = Exception.class)
+	public void getMetaDataTest() throws JSqlException {
+		jSql.getMetaData(null);
+	}
+	
+	@Test(expected = Exception.class)
 	public void getAutoCommitTest() throws JSqlException {
 		jSql.getAutoCommit();
+	}
+	
+	@Test(expected = Exception.class)
+	public void executeQueryMetadataTest() throws JSqlException {
+		jSql.executeQuery_metadata(null);
 	}
 	
 	@Test(expected = Exception.class)
@@ -284,5 +294,27 @@ public class CommonJSql_test {
 		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
 			defaultColumns, defaultValues, miscColumns);
 		;
+	}
+	
+	@Test(expected = Exception.class)
+	public void deleteQuerySetTest() throws JSqlException {
+		jSql.deleteQuerySet(testTableName, null, null);
+		jSql.deleteQuerySet(testTableName, "", null);
+		jSql.deleteQuerySet(testTableName, "test", null);
+		String[] uniqueColumns = new String[] {};
+		Object[] uniqueValues = new Object[] {};
+		;
+		String[] insertColumns = new String[] { "test", null, "test", null };
+		Object[] insertValues = null;
+		String[] defaultColumns = new String[] { "test", null, "test", null };
+		Object[] defaultValues = null;
+		String[] miscColumns = null;
+		jSql.upsertQuerySet(testTableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns);
+		insertValues = new Object[] { "test", null };
+		defaultValues = new Object[] { "test", null };
+		jSql.upsertQuerySet(testTableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns);
+		jSql.execute_query(null);
 	}
 }

@@ -83,7 +83,7 @@ public class CommonJSql_test {
 		
 		jSql.selectQuerySet("this is the table nname " + testTableName, "", "", new Object[] { "" },
 			"ab", 0, 0);
-		
+		jSql.selectQuerySet("this is the table nname " + testTableName, "", "abca", null, "ab", 0, 0);
 		jSql.deleteQuerySet("this is the table nname " + testTableName, null, null);
 		jSql.deleteQuerySet("this is the table nname " + testTableName, "abc", new Object[] {});
 		
@@ -153,8 +153,27 @@ public class CommonJSql_test {
 	@Test(expected = Exception.class)
 	public void upsertQuerySet1() throws JSqlException {
 		String tableName = "Select * From testTableName where id=";
-		String[] uniqueColumns = new String[] {};
-		Object[] uniqueValues = new Object[] { "tets" };
+		String[] uniqueColumns = new String[] { "test", "test", "test" };
+		Object[] uniqueValues = new Object[] { "test", "test", "test" };
+		String[] insertColumns = new String[] {};
+		Object[] insertValues = new Object[] {};
+		String[] defaultColumns = new String[] {};
+		Object[] defaultValues = new Object[] {};
+		String[] miscColumns = new String[] {};
+		
+		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns);
+		uniqueValues = new Object[] {};
+		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns);
+		
+	}
+	
+	@Test(expected = Exception.class)
+	public void upsertQuerySet2() throws JSqlException {
+		String tableName = "Select * From testTableName where id=";
+		String[] uniqueColumns = null;
+		Object[] uniqueValues = new Object[] { "test", "test", "test" };
 		String[] insertColumns = new String[] {};
 		Object[] insertValues = new Object[] {};
 		String[] defaultColumns = new String[] {};
@@ -166,7 +185,22 @@ public class CommonJSql_test {
 	}
 	
 	@Test(expected = Exception.class)
-	public void upsertQuerySet2() throws JSqlException {
+	public void upsertQuerySet3() throws JSqlException {
+		String tableName = "Select * From testTableName where id=";
+		String[] uniqueColumns = new String[] { "test", "test", "test" };
+		Object[] uniqueValues = null;
+		String[] insertColumns = new String[] {};
+		Object[] insertValues = new Object[] {};
+		String[] defaultColumns = new String[] {};
+		Object[] defaultValues = new Object[] {};
+		String[] miscColumns = new String[] {};
+		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns);
+		
+	}
+	
+	@Test(expected = Exception.class)
+	public void upsertQuerySet4() throws JSqlException {
 		String tableName = testTableName;
 		String[] uniqueColumns = new String[] {};
 		Object[] uniqueValues = null;
@@ -185,7 +219,32 @@ public class CommonJSql_test {
 	}
 	
 	@Test
-	public void upsertQuerySet3() throws JSqlException {
+	public void upsertQuerySet5() throws JSqlException {
+		String tableName = testTableName;
+		String[] uniqueColumns = new String[] { "test", "test", "test" };
+		Object[] uniqueValues = new Object[] { "test", null, "test", null };
+		;
+		String[] insertColumns = new String[] { "test", null, "test", null };
+		Object[] insertValues = null;
+		String[] defaultColumns = new String[] { "test", null, "test", null };
+		Object[] defaultValues = null;
+		String[] miscColumns = null;
+		ArrayList<Object> innerSelectArgs = new ArrayList<Object>();
+		StringBuilder innerSelectSB = null;
+		String innerSelectPrefix = null;
+		String innerSelectSuffix = null;
+		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns, innerSelectArgs, innerSelectSB,
+			innerSelectPrefix, innerSelectSuffix);
+		insertValues = new Object[] { "test", null };
+		defaultValues = new Object[] { "test", null };
+		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns, innerSelectArgs, innerSelectSB,
+			innerSelectPrefix, innerSelectSuffix);
+	}
+	
+	@Test
+	public void upsertQuerySet6() throws JSqlException {
 		String tableName = testTableName;
 		String[] uniqueColumns = new String[] { "test", "test", "test" };
 		Object[] uniqueValues = new Object[] { "test", null, "test", null };

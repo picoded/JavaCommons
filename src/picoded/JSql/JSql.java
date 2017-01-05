@@ -107,7 +107,7 @@ public class JSql extends BaseInterface {
 	protected PreparedStatement prepareSqlStatment(String qString, Object... values)
 		throws JSqlException {
 		int pt = 0;
-		final Object parts[] = (values != null) ? values : (new Object[] {});
+		final Object[] parts = (values != null) ? values : (new Object[] {});
 		
 		Object argObj;
 		PreparedStatement ps;

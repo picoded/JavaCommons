@@ -526,8 +526,8 @@ public class JSql extends BaseInterface {
 		objectArrayMap.put("defaultColumns", defaultColumns);
 		objectArrayMap.put("defaultValues", defaultValues);
 		objectArrayMap.put("miscColumns", miscColumns);
-		
 		if (sqlType.equals(JSqlType.MSSQL)) {
+			
 			return upsertQuerySet(tableName, objectArrayMap, innerSelectArgs, innerSelectSB,
 				innerSelectPrefix, innerSelectSuffix);
 		}
@@ -637,11 +637,12 @@ public class JSql extends BaseInterface {
 		StringBuilder condition = new StringBuilder();
 		String columnSeperator = ", ";
 		/// Setting up unique values
-		
 		for (int a = 0; a < uniqueColumns.length; ++a) {
 			// dual select
-			selectColumnNames = getSelectColumnNames(selectColumnNames, a, uniqueColumns,
-				columnSeperator);
+			selectColumnNames.append("?");
+			selectColumnNames.append(" AS ");
+			selectColumnNames.append(uniqueColumns[a]);
+			selectColumnNames.append(columnSeperator);
 			selectQueryArgs.add(uniqueValues[a]);
 			// insert column list
 			insertColumnNames.append(uniqueColumns[a]);
@@ -663,8 +664,10 @@ public class JSql extends BaseInterface {
 				updateQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]
 					: null);
 				// select dual
-				selectColumnNames = getSelectColumnNames(selectColumnNames, a, insertColumns,
-					columnSeperator);
+				selectColumnNames.append("?");
+				selectColumnNames.append(" AS ");
+				selectColumnNames.append(insertColumns[a]);
+				selectColumnNames.append(columnSeperator);
 				selectQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]
 					: null);
 				// insert column
@@ -711,7 +714,6 @@ public class JSql extends BaseInterface {
 				selectColumnNames.append(defaultColumns[a]);
 				selectColumnNames.append(innerSelectSuffix);
 				selectColumnNames.append(", ?)");
-				
 				selectQueryArgs.addAll(innerSelectArgs);
 				selectColumnNames.append(" AS " + defaultColumns[a] + columnSeperator);
 				selectQueryArgs
@@ -742,8 +744,9 @@ public class JSql extends BaseInterface {
 				selectColumnNames.append(innerSelectPrefix);
 				selectColumnNames.append(miscColumns[a]);
 				selectColumnNames.append(innerSelectSuffix);
-				selectColumnNames = getSelectColumnNames(selectColumnNames, a, miscColumns,
-					columnSeperator);
+				selectColumnNames.append(" AS ");
+				selectColumnNames.append(miscColumns[a]);
+				selectColumnNames.append(columnSeperator);
 				selectQueryArgs.addAll(innerSelectArgs);
 			}
 		}
@@ -791,15 +794,6 @@ public class JSql extends BaseInterface {
 		queryArgs.addAll(insertQueryArgs);
 		
 		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
-	}
-	
-	private StringBuilder getSelectColumnNames(StringBuilder selectColumnNames, int a,
-		String[] uniqueColumns, String columnSeperator) {
-		selectColumnNames.append("?");
-		selectColumnNames.append(" AS ");
-		selectColumnNames.append(uniqueColumns[a]);
-		selectColumnNames.append(columnSeperator);
-		return selectColumnNames;
 	}
 	
 	// Helper varient, without default or misc fields

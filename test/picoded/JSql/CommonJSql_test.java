@@ -74,10 +74,21 @@ public class CommonJSql_test {
 	@Test(expected = Exception.class)
 	public void createTableIndexQuerySet() throws Exception {
 		jSql.createTableIndexQuerySet("this is the table nname " + testTableName, "test", null, null);
+		
+		jSql.selectQuerySet("this is the table nname " + testTableName, null, null, null, null, 0, 0);
+		
 		jSql.createTableIndexQuerySet("this is the table nname " + testTableName, "test", "", "");
 		jSql.deleteQuerySet(testTableName, "name", new Object[] { 4 });
+		
+		jSql.selectQuerySet("this is the table nname " + testTableName, "", "", new Object[] { "" },
+			"ab", 0, 0);
+		
 		jSql.deleteQuerySet("this is the table nname " + testTableName, null, null);
 		jSql.deleteQuerySet("this is the table nname " + testTableName, "abc", new Object[] {});
+		
+		jSql.selectQuerySet("this is the table nname " + testTableName, "abca", "abca",
+			new Object[] { "abca" }, "abca", 0, 0);
+		
 		jSql.createTableQuerySet("tableName", new String[] { "test" }, new String[] {});
 	}
 	

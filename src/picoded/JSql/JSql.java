@@ -164,15 +164,13 @@ public class JSql extends BaseInterface {
 					//let JSqlResult "close" it
 					ps = null;
 					rs = null;
-					return res;
 				} else {
 					int r = ps.executeUpdate();
-					if (r != -1) {
-						return new JSqlResult(); //returns a blank JSqlResult, for consistency
-					} else {
-						return null;
+					if (r >= 0) {
+						res = new JSqlResult(); //returns a blank JSqlResult, for consistency
 					}
 				}
+				return res;
 			} finally {
 				if (rs != null) {
 					rs.close();
@@ -993,7 +991,6 @@ public class JSql extends BaseInterface {
 		try {
 			try {
 				Statement st = sqlConn.createStatement();
-				st = sqlConn.createStatement();
 				rs = st.executeQuery(sql);
 				ResultSetMetaData rsMetaData = rs.getMetaData();
 				int numberOfColumns = rsMetaData.getColumnCount();

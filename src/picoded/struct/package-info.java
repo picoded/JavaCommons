@@ -1,3 +1,3 @@
-/// Servlet classes used to extend and/or implement Servlet functionality
+/// General Java object and structures,
+/// Including manipulation of such object / structures
 package picoded.struct;
-

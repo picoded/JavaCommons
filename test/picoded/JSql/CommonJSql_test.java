@@ -68,6 +68,16 @@ public class CommonJSql_test {
 		jSql.executeQuery_metadata(null);
 	}
 	
+	@Test(expected = Exception.class)
+	public void createTableIndexQuerySet() {
+		jSql.createTableIndexQuerySet("this is the table nname " + testTableName, "test", null, null);
+		jSql.createTableIndexQuerySet("this is the table nname " + testTableName, "test", "", "");
+		jSql.deleteQuerySet(testTableName, "nname", new Object[] { 4 });
+		jSql.deleteQuerySet("this is the table nname " + testTableName, "ab", null);
+		jSql.deleteQuerySet("this is the table nname " + testTableName, "abc", new Object[] {});
+		jSql.createTableQuerySet("tableName", new String[] { "test" }, new String[] {});
+	}
+	
 	@SuppressWarnings("static-access")
 	@Test(expected = Exception.class)
 	public void jSqlTest() throws Exception {

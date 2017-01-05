@@ -973,12 +973,12 @@ public class JSql extends BaseInterface {
 				res = new JSqlResult(null, rs);
 				
 				//let JSqlResult "close" it
-				rs = null;
 				return res;
 			} finally {
 				if (rs != null) {
 					rs.close();
 				}
+				rs = null;
 			}
 		} catch (Exception e) {
 			throw new JSqlException("executeQuery_metadata exception", e);
@@ -991,28 +991,26 @@ public class JSql extends BaseInterface {
 		ResultSet rs = null;
 		//Try and finally : prevent memory leaks
 		try {
-			Statement st = sqlConn.createStatement();
-			st = sqlConn.createStatement();
-			rs = st.executeQuery(sql);
-			ResultSetMetaData rsMetaData = rs.getMetaData();
-			int numberOfColumns = rsMetaData.getColumnCount();
-			for (int i = 1; i <= numberOfColumns; i++) {
-				if (metaData == null) {
-					metaData = new HashMap<String, String>();
+			try {
+				Statement st = sqlConn.createStatement();
+				st = sqlConn.createStatement();
+				rs = st.executeQuery(sql);
+				ResultSetMetaData rsMetaData = rs.getMetaData();
+				int numberOfColumns = rsMetaData.getColumnCount();
+				for (int i = 1; i <= numberOfColumns; i++) {
+					if (metaData == null) {
+						metaData = new HashMap<String, String>();
+					}
+					metaData.put(rsMetaData.getColumnName(i), rsMetaData.getColumnTypeName(i));
 				}
-				metaData.put(rsMetaData.getColumnName(i), rsMetaData.getColumnTypeName(i));
-			}
-		} catch (Exception e) {
-			throw new JSqlException("executeQuery_metadata exception", e);
-		} finally {
-			if (rs != null) {
-				try {
+			} finally {
+				if (rs != null) {
 					rs.close();
-				} catch (Exception e) {
-					//donothing
 				}
 				rs = null;
 			}
+		} catch (Exception e) {
+			throw new JSqlException("executeQuery_metadata exception", e);
 		}
 		return metaData;
 	}

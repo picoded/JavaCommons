@@ -518,17 +518,9 @@ public class JSql extends BaseInterface {
 		
 		String innerSelectPrefix = "(SELECT ";
 		String innerSelectSuffix = innerSelectSB.toString();
-		Map<String, Object[]> objectArrayMap = new HashMap<String, Object[]>();
-		objectArrayMap.put("uniqueColumns", uniqueColumns);
-		objectArrayMap.put("uniqueValues", uniqueValues);
-		objectArrayMap.put("insertColumns", insertColumns);
-		objectArrayMap.put("insertValues", insertValues);
-		objectArrayMap.put("defaultColumns", defaultColumns);
-		objectArrayMap.put("defaultValues", defaultValues);
-		objectArrayMap.put("miscColumns", miscColumns);
 		if (sqlType.equals(JSqlType.MSSQL)) {
-			
-			return upsertQuerySet(tableName, objectArrayMap, innerSelectArgs, innerSelectSB,
+			return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+				defaultColumns, defaultValues, miscColumns, innerSelectArgs, innerSelectSB,
 				innerSelectPrefix, innerSelectSuffix);
 		}
 		/// Building the query for INSERT OR REPLACE
@@ -604,17 +596,11 @@ public class JSql extends BaseInterface {
 		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	
-	protected JSqlQuerySet upsertQuerySet(String tableName, Map<String, Object[]> objectArrayMap,
+	protected JSqlQuerySet upsertQuerySet(String tableName, String[] uniqueColumns,
+		Object[] uniqueValues, String[] insertColumns, Object[] insertValues,
+		String[] defaultColumns, Object[] defaultValues, String[] miscColumns,
 		ArrayList<Object> innerSelectArgs, StringBuilder innerSelectSB, String innerSelectPrefix,
 		String innerSelectSuffix) {
-		
-		String[] uniqueColumns = (String[]) objectArrayMap.get("uniqueColumns");
-		Object[] uniqueValues = objectArrayMap.get("uniqueColumns");
-		String[] insertColumns = (String[]) objectArrayMap.get("insertColumns");
-		Object[] insertValues = objectArrayMap.get("insertValues");
-		String[] defaultColumns = (String[]) objectArrayMap.get("defaultColumns");
-		Object[] defaultValues = objectArrayMap.get("defaultValues");
-		String[] miscColumns = (String[]) objectArrayMap.get("defaultColumns");
 		
 		String equalSign = "=";
 		String targetTableAlias = "target";

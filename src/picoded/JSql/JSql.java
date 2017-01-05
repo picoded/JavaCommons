@@ -973,12 +973,12 @@ public class JSql extends BaseInterface {
 				res = new JSqlResult(null, rs);
 				
 				//let JSqlResult "close" it
+				rs = null;
 				return res;
 			} finally {
 				if (rs != null) {
 					rs.close();
 				}
-				rs = null;
 			}
 		} catch (Exception e) {
 			throw new JSqlException("executeQuery_metadata exception", e);

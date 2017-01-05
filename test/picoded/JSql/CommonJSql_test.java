@@ -11,13 +11,11 @@ import org.junit.Test;
 
 import picoded.TestConfig;
 import picoded.JSql.db.JSql_Mysql;
-import picoded.JSql.db.JSql_Sqlite;
 
 public class CommonJSql_test {
 	JSqlResult jSqlResult = null;
 	JSql jSql = null;
 	JSql_Mysql jSql_Mysql;
-	JSql_Sqlite jSql_Sqlite = null;
 	protected static String testTableName = "JSqlTest_default";
 	
 	@Before
@@ -26,7 +24,6 @@ public class CommonJSql_test {
 		jSql_Mysql = new JSql_Mysql(TestConfig.MYSQL_CONN(), TestConfig.MYSQL_DATA(),
 			TestConfig.MYSQL_USER(), TestConfig.MYSQL_PASS());
 		jSql = new JSql();
-		jSql_Sqlite = new JSql_Sqlite();
 	}
 	
 	@BeforeClass
@@ -134,13 +131,13 @@ public class CommonJSql_test {
 	}
 	
 	@Test(expected = Exception.class)
-	public void execute_queryTest() throws JSqlException, SerialException, SQLException {
-		jSql_Mysql.execute_query("Select * From testTableName where id=");
+	public void execute_queryTest() throws JSqlException {
+		jSql.execute_query("Select * From testTableName where id=");
 	}
 	
 	@Test(expected = Exception.class)
 	public void upsertQuerySet1() throws JSqlException {
-		String tableName = "test";
+		String tableName = "Select * From testTableName where id=";
 		String[] uniqueColumns = new String[] {};
 		Object[] uniqueValues = new Object[] {};
 		String[] insertColumns = new String[] {};
@@ -148,107 +145,14 @@ public class CommonJSql_test {
 		String[] defaultColumns = new String[] {};
 		Object[] defaultValues = new Object[] {};
 		String[] miscColumns = new String[] {};
-		jSql_Mysql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns,
-			insertValues, defaultColumns, defaultValues, miscColumns);
+		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns);
 		
-		tableName = "Upsert query requires unique column and values to be equal length";
-		uniqueColumns = new String[] {};
-		uniqueValues = new Object[] {};
-		insertColumns = null;
-		insertValues = null;
-		defaultColumns = null;
-		defaultValues = null;
-		miscColumns = null;
-		jSql_Mysql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns,
-			insertValues, defaultColumns, defaultValues, miscColumns);
+		uniqueValues = new Object[] { "test" };
 		
-		jSql_Sqlite.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns,
-			insertValues, defaultColumns, defaultValues, miscColumns);
+		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			defaultColumns, defaultValues, miscColumns);
 		
-		uniqueColumns = new String[] {};
-		uniqueValues = new Object[] {};
-		uniqueColumns = null;
-		jSql_Mysql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns,
-			insertValues, defaultColumns, defaultValues, miscColumns);
 	}
 	
-	@Test
-	public void upsertQuerySet2() throws JSqlException {
-		String tableName = "test";
-		String[] uniqueColumns = new String[] { "col1", "col2" };
-		Object[] uniqueValues = new Object[] { "col1", "col2" };
-		
-		String[] insertColumns = new String[] {};
-		Object[] insertValues = new Object[] {};
-		
-		String[] defaultColumns = new String[] {};
-		Object[] defaultValues = new Object[] {};
-		
-		String[] miscColumns = new String[] {};
-		
-		jSql_Mysql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns,
-			insertValues, defaultColumns, defaultValues, miscColumns);
-		
-		jSql_Sqlite.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns,
-			insertValues, defaultColumns, defaultValues, miscColumns);
-		
-		insertColumns = new String[] { "col1", "col2" };
-		
-		jSql_Mysql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns,
-			insertValues, defaultColumns, defaultValues, miscColumns);
-	}
-	
-	@Test(expected = Exception.class)
-	public void upsertQuerySet3() throws JSqlException {
-		String tableName = "test";
-		String[] uniqueColumns = new String[] {};
-		Object[] uniqueValues = new Object[] { "col1", "col2" };
-		
-		String[] insertColumns = new String[] {};
-		Object[] insertValues = new Object[] {};
-		
-		String[] defaultColumns = new String[] {};
-		Object[] defaultValues = new Object[] {};
-		
-		String[] miscColumns = new String[] {};
-		
-		jSql_Mysql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns,
-			insertValues, defaultColumns, defaultValues, miscColumns);
-	}
-	
-	@Test(expected = Exception.class)
-	public void upsertQuerySet4() throws JSqlException {
-		String tableName = "test";
-		String[] uniqueColumns = new String[] { "col1", "col2" };
-		Object[] uniqueValues = new Object[] {};
-		
-		String[] insertColumns = new String[] {};
-		Object[] insertValues = new Object[] {};
-		
-		String[] defaultColumns = new String[] {};
-		Object[] defaultValues = new Object[] {};
-		
-		String[] miscColumns = new String[] {};
-		
-		jSql_Mysql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns,
-			insertValues, defaultColumns, defaultValues, miscColumns);
-	}
-	
-	@Test(expected = Exception.class)
-	public void upsertQuerySet5() throws JSqlException {
-		String tableName = "test";
-		String[] uniqueColumns = new String[] { "col1", "col2" };
-		Object[] uniqueValues = null;
-		
-		String[] insertColumns = new String[] {};
-		Object[] insertValues = new Object[] {};
-		
-		String[] defaultColumns = new String[] {};
-		Object[] defaultValues = new Object[] {};
-		
-		String[] miscColumns = new String[] {};
-		
-		jSql_Mysql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns,
-			insertValues, defaultColumns, defaultValues, miscColumns);
-	}
 }

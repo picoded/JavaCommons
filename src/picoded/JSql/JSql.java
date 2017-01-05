@@ -202,19 +202,21 @@ public class JSql extends BaseInterface {
 		try {
 			PreparedStatement ps = prepareSqlStatment(qString, values);
 			ResultSet rs = null;
+			boolean isResultSetNotNull = false;
 			try {
 				//is a select statment
 				if ("SELECT".equals(qString.trim().toUpperCase(Locale.ENGLISH).substring(0, 6))) {
 					rs = ps.executeQuery();
 					if (rs != null) {
-						return true;
+						isResultSetNotNull = true;
 					}
 				} else {
 					int r = ps.executeUpdate();
 					if (r != -1) {
-						return true;
+						isResultSetNotNull = true;
 					}
 				}
+				return isResultSetNotNull;
 			} finally {
 				if (rs != null) {
 					rs.close();
@@ -226,7 +228,6 @@ public class JSql extends BaseInterface {
 		} catch (Exception e) {
 			throw new JSqlException("execute_raw exception : " + qString, e);
 		}
-		return false;
 	}
 	
 	/// Executes and dispose the sqliteResult object. Similar to executeQuery but uses the Statement class

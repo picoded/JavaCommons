@@ -134,25 +134,4 @@ public class CommonJSql_test {
 	public void execute_queryTest() throws JSqlException {
 		jSql.execute_query("Select * From testTableName where id=");
 	}
-	
-	@Test(expected = Exception.class)
-	public void upsertQuerySet1() throws JSqlException {
-		String tableName = "Select * From testTableName where id=";
-		String[] uniqueColumns = new String[] {};
-		Object[] uniqueValues = new Object[] {};
-		String[] insertColumns = new String[] {};
-		Object[] insertValues = new Object[] {};
-		String[] defaultColumns = new String[] {};
-		Object[] defaultValues = new Object[] {};
-		String[] miscColumns = new String[] {};
-		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
-			defaultColumns, defaultValues, miscColumns);
-		
-		uniqueValues = new Object[] { "test" };
-		
-		jSql.upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
-			defaultColumns, defaultValues, miscColumns);
-		
-	}
-	
 }

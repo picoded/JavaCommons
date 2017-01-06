@@ -846,4 +846,10 @@ public class JSql_Oracle_test {
 			+ " (, ID int NOT , AUTOINCREMENT PRIMARY KEY)) ";
 		JSqlObj.execute(qString);
 	}
+	
+	@Test(expected = Exception.class)
+	public void JSqlOracleTest5() throws JSqlException {
+		String qString = "CREATE TABLE " + testTableName + " t AUTOINCREMENT () PRIMARY KEY)) ";
+		JSqlObj.execute(qString);
+	}
 }

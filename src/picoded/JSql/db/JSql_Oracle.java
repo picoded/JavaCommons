@@ -338,7 +338,7 @@ public class JSql_Oracle extends JSql {
 					if (tmpStr.charAt(i) == ' ' || tmpStr.charAt(i) == ')') {
 						break;
 					}
-					tablename += tmpStr.charAt(i);
+					tablename += Character.toString(tmpStr.charAt(i));
 				}
 				tablename = tablename.replaceAll("\"", "").trim();
 			}
@@ -460,7 +460,9 @@ public class JSql_Oracle extends JSql {
 						tmpStr = tmpStr.substring(0, tmpStr.lastIndexOf('(')).trim();
 					}
 					// find last space
-					tmpStr = tmpStr.substring(0, tmpStr.lastIndexOf(' ')).trim();
+					if (tmpStr.lastIndexOf(' ') != -1) {
+						tmpStr = tmpStr.substring(0, tmpStr.lastIndexOf(' ')).trim();
+					}
 					
 					for (int i = tmpStr.length() - 1; i >= 0; i--) {
 						// find space, comma or opening bracket

@@ -16,8 +16,6 @@
 
 	<property name="src-path" value="src/picoded" />
 	<property name="src-test" value="test/picoded" />
-	<property name="src-test-old" value="src/picodedTests" />
-	<property name="src-experimental" value="src/picodedX" />
 
 	<property name="lib-organized-dir" value="lib-organized" />
 
@@ -317,7 +315,6 @@
 		
 		<mkdir dir="${build-classes}"/>
 		<mkdir dir="${src-test}"/>
-		<mkdir dir="${src-test-old}"/>
 		
 		<javac destdir="${build-classes}" classpathref="lib.test.ref" debug="true" debuglevel="lines,source"
 				 includeantruntime="false">
@@ -326,7 +323,6 @@
  			<compilerarg value="-Xlint:-path"/>
 			<src path="${src-path}"/>
 			<src path="${src-test}"/>
-			<src path="${src-test-old}"/>
 			<exclude name="**/package-info.java"/>
 		</javac>
 	</target>

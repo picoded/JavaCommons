@@ -14,7 +14,7 @@ import org.junit.Test;
 import picoded.JStruct.JStruct;
 import picoded.JStruct.MetaTable;
 import picoded.conv.GUID;
-import picoded.enums.ObjectToken;
+import picoded.set.ObjectToken;
 
 public class JStruct_MetaObject_test {
 	JStruct_MetaObject jStruct_MetaObject = null;

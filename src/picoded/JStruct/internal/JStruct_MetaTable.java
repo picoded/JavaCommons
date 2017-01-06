@@ -12,7 +12,7 @@ import picoded.JStruct.MetaTable;
 import picoded.JStruct.MetaTypeMap;
 /// Picoded imports
 import picoded.conv.ConvertJSON;
-import picoded.enums.ObjectToken;
+import picoded.set.ObjectToken;
 
 /// MetaTable, serves as the core flexible backend storage implmentation for the whole
 /// JStack setup. Its role can be viewed similarly to NoSql, or AWS SimpleDB

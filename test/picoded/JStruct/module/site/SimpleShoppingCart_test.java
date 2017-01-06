@@ -28,7 +28,7 @@ import picoded.JStruct.MetaObject;
 import picoded.JStruct.MetaTable;
 import picoded.conv.ConvertJSON;
 import picoded.conv.GenericConvert;
-import picoded.enums.HttpRequestType;
+import picoded.set.HttpRequestType;
 import picoded.servlet.CorePage;
 import picoded.struct.GenericConvertHashMap;
 import picoded.struct.GenericConvertList;

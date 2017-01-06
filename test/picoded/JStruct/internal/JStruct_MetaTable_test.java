@@ -11,7 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.enums.ObjectToken;
+import picoded.set.ObjectToken;
 
 public class JStruct_MetaTable_test {
 	JStruct_MetaTable jStruct_MetaTable = null;

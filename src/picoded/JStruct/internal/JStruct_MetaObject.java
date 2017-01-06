@@ -11,7 +11,7 @@ import picoded.JStruct.MetaTable;
 import picoded.conv.ConvertJSON;
 /// Picoded imports
 import picoded.conv.GUID;
-import picoded.enums.ObjectToken;
+import picoded.set.ObjectToken;
 
 /// Represents a single object node in the MetaTable collection.
 ///
@@ -34,7 +34,7 @@ public class JStruct_MetaObject implements MetaObject {
 	/// GUID used for the object
 	protected String _oid = null;
 	
-	/// Written changes, note that picoded.enums.ObjectToken.NULL is used
+	/// Written changes, note that picoded.set.ObjectToken.NULL is used
 	/// as a pesudo null value (remove)
 	protected Map<String, Object> deltaDataMap = new HashMap<String, Object>();
 	

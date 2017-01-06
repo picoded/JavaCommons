@@ -55,17 +55,17 @@ import picoded.servlet.util.FileServlet;
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * [CorePage request process flow]
  *
- * spawnInstance ----\
- *                   |
- * doOption ---------+
- *                   |
- * doPost -----------+--> processChain --> doAuth -+-> doRequest --> do_X_Request --> outputRequest
+ * spawnInstance ----+--> processChain
+ *                   |         |
+ * doOption ---------+    doSharedSetup && doSetup
+ *                   |         |
+ * doPost -----------+       doAuth ---------------+-> doRequest --> do_X_Request --> outputRequest
  *                   |         |                   |
- * doGet ------------+         V                   \-> doJson -----> do_X_Json -----> outputJSON
- *                   |     doSharedSetup
- * doDelete ---------+         |
- *                   |         V
- * doPut ------------/     doSharedTeardown
+ * doGet ------------+         V               isJsonRequest == true
+ *                   |     doSharedTeardown        |
+ * doDelete ---------+      && doTeardown          \-> doJson -----> do_X_Json -----> outputJSON
+ *                   |
+ * doPut ------------/
  *
  * [CorePage lifecycle process flow]
  *
@@ -93,10 +93,6 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	//-------------------------------------------
 	
 	private static final long serialVersionUID = 1L;
-	
-	// /// RESTBuilder HttpRequestType enum access
-	// public static class RequestTypeSet extends picoded.set.HttpRequestType.HttpRequestTypeSet {
-	// }
 	
 	///////////////////////////////////////////////////////
 	//
@@ -143,6 +139,10 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	// Independent instance variables
 	//-------------------------------------------
 	
+	//
+	// Note that local testing copy is not to be used
+	// as testing should be facilitated by standalone runs
+	//
 	// /// The header map, this is ignored when httpResponse parameter is already set
 	// protected Map<String,String> responseHeaderMap = null;
 	//
@@ -400,11 +400,12 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	/// gets the PrintWriter, from the getOutputStream() object and returns it
 	public PrintWriter getWriter() {
-		try {
-			return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
-		} catch(UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
+		return new PrintWriter(getOutputStream());
+		// try {
+		// 	return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
+		// } catch(UnsupportedEncodingException e) {
+		// 	throw new RuntimeException(e);
+		// }
 	}
 	
 	/// gets the OutputStream, from the httpResponse.getOutputStream() object and returns it
@@ -424,7 +425,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 			return _contextPath;
 		}
 		
-		if (httpRequest != null) {
+		if (httpRequest != null && httpRequest.getServletContext() != null) {
 			return _contextPath = (httpRequest.getServletContext()).getRealPath("/") + "/";
 		}
 		

@@ -41,7 +41,7 @@ import picoded.conv.ConvertJSON;
 import picoded.set.EmptyArray;
 import picoded.set.HttpRequestType;
 
-public class CorePage_test {
+public class BrokenCorePage_test {
 	
 	private CorePage corePage;
 	private CorePage corePageMock; // = mock(CorePage.class);
@@ -627,26 +627,8 @@ public class CorePage_test {
 		assertTrue(corePage.doDeleteRequest(map));
 	}
 	
-	// @Test
-	// public void outputRequestTest() throws Exception {
-	// 	Map<String, Object> map = new HashMap<String, Object>();
-	// 	map.put("user", new String[] { "me" });
-	// 	File file = new File("test-files/tmp/servlet/me.txt");
-	// 	PrintWriter printWriter = new PrintWriter(file);
-	// 	assertTrue(corePage.outputRequest(map, printWriter));
-	// 	printWriter.close();
-	// }
-	// 
-	// @Test(expected = Exception.class)
-	// public void outputRequestExceptionTest() throws Exception {
-	// 	Map<String, Object> map = new HashMap<String, Object>();
-	// 	map.put("user", new String[] { "me" });
-	// 	File file = new File("test-files/tmp/servlet/me.txt");
-	// 	PrintWriter printWriter = new PrintWriter(file);
-	// 	assertTrue(corePage.outputRequestException(map, printWriter, new Exception()));
-	// 	printWriter.close();
-	// }
-	// 
+	
+	
 	@Test
 	public void doJSONTest() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();

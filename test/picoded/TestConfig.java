@@ -1,6 +1,8 @@
 package picoded;
 
+import java.net.ServerSocket;
 import java.util.Properties;
+import java.util.concurrent.ThreadLocalRandom;
 import org.apache.commons.lang3.RandomStringUtils;
 
 ///
@@ -14,6 +16,50 @@ public class TestConfig {
 	///
 	static public String randomTablePrefix() {
 		return RandomStringUtils.randomAlphanumeric(8).toUpperCase();
+	}
+	
+	//
+	// Unique port numbers to be issues, and used for test paralizing
+	//
+	static private int portCounter = -1;
+	
+	//
+	// Issue a somewhat unique port number for use in test cases
+	//
+	public synchronized static int issuePortNumber(){
+		// Check if its initial count
+		if( portCounter <= 0 ) {
+			// Start with a random port between 10k to 50k
+			portCounter = ThreadLocalRandom.current().nextInt(10000, 50000);
+		} else {
+			// Increment the port
+			++portCounter;
+		}
+		
+		// Increment if a conflict is found
+		while( isLocalPortInUse(portCounter) ) {
+			++portCounter;
+		}
+		
+		// Returns the port counter
+		return portCounter;
+	}
+	
+	/// Utility function used to test if a localhost port is in use, if so skip its "issue process"
+	/// 
+	/// @param   Port number to test
+	///
+	/// @return  true if its in use
+	private static boolean isLocalPortInUse(int port) {
+		try {
+			// ServerSocket try to open a LOCAL port
+			new ServerSocket(port).close();
+			// local port can be opened, it's available
+			return false;
+		} catch(Exception e) {
+			// local port cannot be opened, it's in use
+			return true;
+		}
 	}
 	
 	//-------------------------------//

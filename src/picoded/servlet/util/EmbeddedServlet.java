@@ -26,6 +26,10 @@ import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.startup.ContextConfig;
+import org.apache.tomcat.util.scan.StandardJarScanner;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleListener;
 
 import picoded.conv.GUID;
 
@@ -53,7 +57,7 @@ public class EmbeddedServlet implements Closeable {
 	String contextName = "ROOT";
 	
 	/// The context path used, derived from context name
-	String contextPath = "/";
+	String contextPath = "";
 	
 	///////////////////////////////////////////////////////
 	//
@@ -63,46 +67,22 @@ public class EmbeddedServlet implements Closeable {
 	
 	///
 	/// The simplest consturctor, just point to the web application folder
-	/// and run it as "ROOT" on port 8080
+	/// and run it as "ROOT" on a specified port
 	///
-	/// @param   File representing the 
+	/// @param   Port to run the embedded servlet on, -1 defaults to 8080
+	/// @param   File representing either the folder, or the war file to deploy 
 	///
-	public EmbeddedServlet(File webappPath) {
-		// initTomcatInstance();
-		// addWebapp("ROOT", webappPath);
-		// startup();
-		
-		String mWorkingDir = System.getProperty("java.io.tmpdir");
-		tomcat = new Tomcat();
-		tomcat.setPort(8080);
-		tomcat.setBaseDir(mWorkingDir);
-		tomcat.getHost().setAppBase(mWorkingDir);
-		tomcat.getHost().setAutoDeploy(true);
-		tomcat.getHost().setDeployOnStartup(true);
-		
-		tomcat.setHostname("localhost");
-		tomcat.enableNaming();
-		
-		// // Alternatively, you can specify a WAR file as last parameter in the following call e.g. "C:\\Users\\admin\\Desktop\\app.war"
-		Context appContext = tomcat.addWebapp(tomcat.getHost(), "/", webappPath.getAbsolutePath());
-		// LOGGER.info("Deployed " + appContext.getBaseName() + " as " + appContext.getBaseName());
-		// 
-		// tomcat.getServer().await();
-		
-		try {
-			tomcat.start();
-		} catch (LifecycleException e) {
-			//LOGGER.severe("Tomcat could not be started.");
-			e.printStackTrace();
-		}
-		//LOGGER.info("Tomcat started on " + tomcat.getHost());
-		
+	public EmbeddedServlet(int port, File webappPath) {
+		initTomcatInstance("", port);
+		addWebapp("ROOT", webappPath);
+		startup();
 	}
 	
 	/// Destroy the tomcat instance and removes it, if it exists
 	public void close() {
 		try {
 			if( tomcat != null ) {
+				tomcat.stop();
 				tomcat.destroy();
 				tomcat = null;
 			}
@@ -138,11 +118,7 @@ public class EmbeddedServlet implements Closeable {
 	
 	/// Does the basic default tomcat instance setup
 	protected void initTomcatInstance() {
-		try {
-			initTomcatInstance( Files.createTempDirectory( GUID.base58() ).toAbsolutePath().toString(), 8080);
-		} catch(Exception e) {
-			throw new RuntimeException(e);
-		}
+		initTomcatInstance("", -1);
 	}
 	
 	/// Does the basic default tomcat instance setup
@@ -158,22 +134,58 @@ public class EmbeddedServlet implements Closeable {
 	/// @param  Temp base directory to use
 	/// @param  Port number to use
 	protected void initTomcatInstance(String tempPath, int port) {
-		// Setup tomcat instance
-		tomcat = new Tomcat();
-		
-		// Default port is 8080
-		tomcat.setPort(port);
-		
-		// Get default base dir to current executing directory "java_tmp/random-guid"
-		//
-		// It is important to note that in the Tomcat API documentation this is considered 
-		// a security risk. Mainly due to cross application attacks
-		tomcat.setBaseDir( tempPath );
-		
-		// Add AprLifecycleListener
-		StandardServer server = (StandardServer)tomcat.getServer();
-		AprLifecycleListener listener = new AprLifecycleListener();
-		server.addLifecycleListener(listener);
+		try {
+			// Setup tomcat instance
+			tomcat = new Tomcat();
+			
+			// Port setup
+			tomcat.setPort(port > 0? port : 8080);
+			
+			// Get default base dir to current executing directory "java_tmp/random-guid"
+			// If needed of course
+			//
+			// It is important to note that in the Tomcat API documentation this is considered 
+			// a security risk. Mainly due to cross application attacks
+			//
+			// Files.createTempDirectory - is used in place of java.io.tmpdir
+			// String mWorkingDir = System.getProperty("java.io.tmpdir");
+			if( tempPath == null || tempPath.isEmpty() ) {
+				tempPath = Files.createTempDirectory( GUID.base58() ).toAbsolutePath().toString();
+			}
+			tomcat.setBaseDir(tempPath);
+			
+			// Possible things that may change in the future
+			//--------------------------------------------------------------------------
+			//tomcat.getHost().setAppBase(mWorkingDir);
+			//tomcat.getHost().setAutoDeploy(true);
+			//tomcat.getHost().setDeployOnStartup(true);
+			//tomcat.setHostname("localhost");
+			//tomcat.enableNaming();
+			
+			// Do not add ContextConfig at the server level, but at the webapp level
+			// This somehow fails despite it being in accordance to some documentation
+			//--------------------------------------------------------------------------
+			// ContextConfig contextConfig = new ContextConfig() {
+			// 	private boolean invoked = false;
+			// 	@Override
+			// 	public void lifecycleEvent(LifecycleEvent event) {
+			// 		if (!invoked) {
+			// 			StandardJarScanner scanner = new StandardJarScanner();
+			// 			scanner.setScanBootstrapClassPath(true);
+			// 			scanner.setScanClassPath(false);
+			// 			scanner.setScanManifest(true);
+			// 			((Context) event.getLifecycle()).setJarScanner(scanner);
+			// 			invoked = true;
+			// 		}
+			// 		super.lifecycleEvent(event);
+			// 	}
+			// };
+			// 
+			// StandardServer server = (StandardServer)tomcat.getServer();
+			// server.addLifecycleListener(contextConfig);
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/// Add a webapplication
@@ -190,157 +202,56 @@ public class EmbeddedServlet implements Closeable {
 	/// @param  Webapplication File path to use
 	protected void addWebapp(String inContextName, String webappPath) {
 		try {
+			//
 			// Load context name and path
+			//
 			contextName = inContextName;
 			if( contextName == null || contextName.isEmpty() || contextName.equalsIgnoreCase("ROOT") ) {
-				contextPath = "/";
+				contextPath = "";
 			} else {
-				contextPath = "/"+contextName+"/";
+				contextPath = "/"+contextName;
 			}
 			
-			// Load context
-			context = tomcat.addWebapp(contextPath, webappPath);
+			//
+			// This helps disable the default parent class path scanning
+			// And help reduce the classpathing warning errors.
+			//
+			// In the context JavaCommons webappllication, each deployment
+			// will have more then enough Jars to provide on their own 
+			//
+			ContextConfig contextConfig = new ContextConfig() {
+				private boolean invoked = false;
+				@Override
+				public void lifecycleEvent(LifecycleEvent event) {
+					if (!invoked) {
+						StandardJarScanner scanner = new StandardJarScanner();
+						scanner.setScanBootstrapClassPath(true);
+						scanner.setScanClassPath(false);
+						scanner.setScanManifest(true);
+						((Context) event.getLifecycle()).setJarScanner(scanner);
+						invoked = true;
+					}
+					super.lifecycleEvent(event);
+				}
+			};
 			
-			// Normalize context resources
-			WebResourceRoot resources = new StandardRoot(context);
-			context.setResources(resources);
-			
-			// Wrapper defaultServlet = context.createWrapper();
-			// defaultServlet.setName("default");
-			// defaultServlet.setServletClass("org.apache.catalina.servlets.DefaultServlet");
-			// defaultServlet.addInitParameter("debug", "0");
-			// defaultServlet.addInitParameter("listings", "false");
-			// defaultServlet.setLoadOnStartup(1);
-			// 
-			// context.addChild(defaultServlet);
-			// context.addServletMapping("/","default");
+			//
+			// Loads the application with the custom contextConfig
+			//
+			context = tomcat.addWebapp(tomcat.getHost(), contextPath, webappPath, (LifecycleListener)contextConfig );
 			
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	/// Startup the tomcat instance 
+	/// Startup the tomcat instance, does any final initialization prior to startup if needed
 	protected void startup() {
 		try {
-			tomcat.init();
+			//tomcat.init();
 			tomcat.start();
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	///////////////////////////////////////////////////////
-	//
-	// Old stuff
-	//
-	///////////////////////////////////////////////////////
-	
-	// private Context _context = null;
-	// private 
-	// private List<String> _cachedServletsAdded = null;
-	// 
-	// //Users are forced to provide a context root folder
-	// public EmbeddedServlet(String contextRootName, File contextRootFolder) {
-	// 	_cachedServletsAdded = new ArrayList<String>();
-	// 	
-	// 	initTomcatInstance();
-	// 	withContextRoot(contextRootName, contextRootFolder);
-	// 	initDefaultServlet();
-	// }
-	// 
-	// 
-	// //Create a default servlet to handle serving static files
-	// private void initDefaultServlet() {
-	// 	Wrapper defaultServlet = _context.createWrapper();
-	// 	defaultServlet.setName("default");
-	// 	defaultServlet.setServletClass("org.apache.catalina.servlets.DefaultServlet");
-	// 	defaultServlet.addInitParameter("debug", "0");
-	// 	defaultServlet.addInitParameter("listings", "false");
-	// 	defaultServlet.setLoadOnStartup(1);
-	// 	
-	// 	_context.addChild(defaultServlet);
-	// 	_context.addServletMapping("/", "default");
-	// 	_cachedServletsAdded.add("default");
-	// }
-	// 
-	// //Should this be in its own thread?
-	// public void awaitServer() {
-	// 	if (_tomcat != null) {
-	// 		_tomcat.getServer().await();
-	// 	} else {
-	// 		System.out.println("Tomcat instance is null");
-	// 	}
-	// }
-	// 
-	// public void stop() throws LifecycleException {
-	// 	if (_tomcat != null) {
-	// 		_tomcat.stop();
-	// 	} else {
-	// 		System.out.println("Tomcat instance is null");
-	// 	}
-	// }
-	// 
-	// public EmbeddedServlet withPort(int portNum) {
-	// 	if (_tomcat != null) {
-	// 		_tomcat.setPort(portNum);
-	// 		_port = portNum;
-	// 	} else {
-	// 		System.out.println("Tomcat instance is null");
-	// 	}
-	// 	
-	// 	return this;
-	// }
-	// 
-	// public int getPort() {
-	// 	return _port;
-	// }
-	// 
-	// public EmbeddedServlet withContextRoot(String contextRootName, File contextRootFolder) {
-	// 	if (_tomcat != null) {
-	// 		_context = _tomcat.addContext(contextRootName, contextRootFolder.getAbsolutePath());
-	// 	} else {
-	// 		System.out.println("Tomcat instance is null");
-	// 	}
-	// 	
-	// 	return this;
-	// }
-	// 
-	// public EmbeddedServlet withBaseDirectory(File baseDir) {
-	// 	if (baseDir != null) {
-	// 		_tomcat.setBaseDir(baseDir.getAbsolutePath());
-	// 	} else {
-	// 		System.out.println("Paramater baseDir is null");
-	// 	}
-	// 	
-	// 	return this;
-	// }
-	// 
-	// public EmbeddedServlet withServlet(String servletURLName, String servletName, String servletClassName) {
-	// 	if (_tomcat != null && _context != null) {
-	// 		if (!_cachedServletsAdded.contains(servletName)) {
-	// 			_tomcat.addServlet(_context.getPath(), servletName, servletClassName);
-	// 			_cachedServletsAdded.add(servletName);
-	// 		}
-	// 		_context.addServletMapping(servletURLName, servletName);
-	// 	} else {
-	// 		System.out.println("Tomcat instance is null");
-	// 	}
-	// 	
-	// 	return this;
-	// }
-	// 
-	// public EmbeddedServlet withServlet(String servletURLName, String servletName, Servlet servlet) {
-	// 	if (_tomcat != null) {
-	// 		if (!_cachedServletsAdded.contains(servletName)) {
-	// 			_tomcat.addServlet(_context.getPath(), servletName, servlet);
-	// 			_cachedServletsAdded.add(servletName);
-	// 		}
-	// 		_context.addServletMapping(servletURLName, servletName);
-	// 	} else {
-	// 		System.out.println("Tomcat instance is null");
-	// 	}
-	// 	
-	// 	return this;
-	// }
 }

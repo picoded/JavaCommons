@@ -12,6 +12,7 @@ import javax.servlet.http.*;
 
 import org.junit.*;
 
+import picoded.TestConfig;
 import picoded.conv.*;
 import picoded.set.*;
 import picoded.web.*;
@@ -28,27 +29,36 @@ public class EmbeddedServlet_test {
 	File helloWorldDir = new File(testCollection, "HelloWorld");
 	
 	//
-	// The test servlet
+	// The test vars to use
 	//
-	EmbeddedServlet testServlet = null;
+	int testPort = 0; //Test port to use
+	EmbeddedServlet testServlet = null; //Test servlet to use
 	
+	//
+	// Standard setup and teardown
+	//
 	@Before
 	public void setUp() {
-		
+		testPort = TestConfig.issuePortNumber();
 	}
 	
 	@After
 	public void tearDown() {
-		testServlet = null;
+		if(testServlet != null) {
+			testServlet.close();
+			testServlet = null;
+		}
 	}
+	
+	//
+	// Test them all !
+	//
 	
 	@Test
 	public void helloWorld() {
 		assertTrue( helloWorldDir.isDirectory() );
-		assertNotNull(testServlet = new EmbeddedServlet(helloWorldDir));
-		//testServlet.await();
-		
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:8080/index.html").toString().trim() );
+		assertNotNull(testServlet = new EmbeddedServlet(testPort, helloWorldDir));
+		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/index.html").toString().trim() );
 	}
 	
 }

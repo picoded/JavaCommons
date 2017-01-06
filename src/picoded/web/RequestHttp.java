@@ -21,6 +21,7 @@ import picoded.web._RequestHttp.ResponseHttp_websocket;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.java}
 ///
+/// // You can use your relevent URL string that you want
 /// String requestURL = "http://localhost:8080"
 ///
 /// // Get request in its simplest form

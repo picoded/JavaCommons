@@ -38,7 +38,7 @@
 
 	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
 		<classpath refid="junit-path"/>
-    </taskdef>
+	</taskdef>
 
 	<!-- One-JAR -->
 	<taskdef name="one-jar" classname="com.simontuffs.onejar.ant.OneJarTask"
@@ -318,9 +318,9 @@
 		
 		<javac destdir="${build-classes}" classpathref="lib.test.ref" debug="true" debuglevel="lines,source"
 				 includeantruntime="false">
- 			<compilerarg value="-Xlint:all"/>
- 			<compilerarg value="-Xlint:-serial"/>
- 			<compilerarg value="-Xlint:-path"/>
+			<compilerarg value="-Xlint:all"/>
+			<compilerarg value="-Xlint:-serial"/>
+			<compilerarg value="-Xlint:-path"/>
 			<src path="${src-path}"/>
 			<src path="${src-test}"/>
 			<exclude name="**/package-info.java"/>

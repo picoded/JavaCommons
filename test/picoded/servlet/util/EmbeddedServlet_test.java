@@ -12,9 +12,9 @@ import javax.servlet.http.*;
 
 import org.junit.*;
 
-import picoded.conv.ConvertJSON;
-import picoded.set.EmptyArray;
-import picoded.set.HttpRequestType;
+import picoded.conv.*;
+import picoded.set.*;
+import picoded.web.*;
 
 ///
 /// Test the EmbeddedServlet implmentation
@@ -47,6 +47,8 @@ public class EmbeddedServlet_test {
 		assertTrue( helloWorldDir.isDirectory() );
 		assertNotNull(testServlet = new EmbeddedServlet(helloWorldDir));
 		//testServlet.await();
+		
+		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:8080/index.html").toString().trim() );
 	}
 	
 }

@@ -21,8 +21,39 @@ import picoded.web._RequestHttp.ResponseHttp_websocket;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.java}
 ///
+/// String requestURL = "http://localhost:8080"
+///
 /// // Get request in its simplest form
-/// String getResult = RequestHttp.get("http://localhost:8080").toString()
+/// String getResult = RequestHttp.get( requestURL ).toString()
+///
+/// // Or with parameters
+/// Map<String,Object> requestParams = new HashMap<String,Object>();
+/// requestParams.put("test","one");
+/// 
+/// // Get request with parameters
+/// getResult = RequestHttp.get( requestURL, requestParams ).toString();
+///
+/// // That can also be made as a POST request 
+/// getResult = RequestHttp.post( requestURL, requestParams ).toString();
+///
+/// // Or other less commonly used types
+/// getResult = RequestHttp.put( requestURL, requestParams ).toString();
+/// getResult = RequestHttp.delete( requestURL, requestParams ).toString();
+/// 
+/// //
+/// // You may also want to get additional possible values
+/// // 
+/// HttpResponse response = RequestHttp.get( requestURL ); 
+///
+/// // Such as HTTP Code
+/// response.statusCode();
+///
+/// // Its headers and cookies map
+/// response.headersMap();
+/// response.cookiesMap();
+///
+/// // Oh similarly you can use that in your request too, with Map<String, String[]>
+/// RequestHttp.get( requestURL, requestParams, cookies, headers );
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
@@ -33,16 +64,47 @@ public class RequestHttp {
 	//--------------------------------------------------------
 	
 	/// Performs GET request : in the most basic form
+	///
+	/// @param   Request URL to call
+	///
+	/// @return  The ResponseHttp object, use it to get more info
 	public static ResponseHttp get(String requestURL) {
 		return byType(HttpRequestType.GET, requestURL, null, null, null);
 	}
 	
-	/// Performs GET request : with parameters
+	/// Performs GET request : with parameters, appended to the requestURL
+	///
+	/// @param   Request URL to call
+	/// @param   [Optional] Parameters to add to the request
+	///
+	/// @return  The ResponseHttp object
 	public static ResponseHttp get(String requestURL, Map<String, String[]> parametersMap) {
 		return byType(HttpRequestType.GET, requestURL, parametersMap, null, null);
 	}
 	
-	/// Performs GET request with parameters, cookies and headers
+	/// Performs GET request : with parameters, appended to the requestURL
+	///
+	/// @param   Request URL to call
+	/// @param   [Optional] Parameters to add to the request
+	/// @param   [Optional] Cookie map to send values
+	///
+	/// @return  The ResponseHttp object
+	public static ResponseHttp get( //
+		String requestURL, //
+		Map<String, String[]> parametersMap, // 
+		Map<String, String[]> cookiesMap
+	) { //
+		return byType(HttpRequestType.GET, requestURL, parametersMap, cookiesMap, null);
+	}
+	
+	/// Performs GET request : with parameters, appended to the requestURL
+	///
+	/// @param   Request URL to call
+	/// @param   [Optional] Parameters to add to the request
+	/// @param   [Optional] Cookie map to send values
+	/// @param   [Optional] Headers map to send values
+	///
+	/// @return  The ResponseHttp object
 	public static ResponseHttp get( //
 		String requestURL, //
 		Map<String, String[]> parametersMap, // 

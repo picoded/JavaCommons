@@ -22,40 +22,11 @@ import picoded.web._RequestHttp.ResponseHttp_websocket;
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.java}
 ///
 /// // Get request in its simplest form
-/// String getResult = RequestHttp.get("https://localhost:8080").toString()
-///
+/// String getResult = RequestHttp.get("http://localhost:8080").toString()
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
 public class RequestHttp {
-	
-	//--------------------------------------------------------
-	// X request operations
-	//--------------------------------------------------------
-	
-	/// Performs GET request with parameters, cookies and headers
-	public static ResponseHttp byType( //
-		HttpRequestType requestType, //
-		String requestURL, //
-		Map<String, String[]> parametersMap, // 
-		Map<String, String[]> cookiesMap, // 
-		Map<String, String[]> headersMap // 
-	) { //
-		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap, headersMap, null);
-	}
-	
-	/// Performs GET request with parameters, cookies and headers
-	public static ResponseHttp byType( //
-		HttpRequestType requestType, //
-		String requestURL, //
-		Map<String, String[]> parametersMap, // 
-		Map<String, String[]> cookiesMap, // 
-		Map<String, String[]> headersMap, // 
-		InputStream requestStream //
-	) { //
-		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap, headersMap,
-			requestStream);
-	}
 	
 	//--------------------------------------------------------
 	// GET request operations
@@ -143,6 +114,34 @@ public class RequestHttp {
 		Map<String, String[]> headersMap // 
 	) { //
 		return byType(HttpRequestType.DELETE, requestURL, parametersMap, cookiesMap, headersMap);
+	}
+	
+	//--------------------------------------------------------
+	// X request operations
+	//--------------------------------------------------------
+	
+	/// Performs GET request with parameters, cookies and headers
+	public static ResponseHttp byType( //
+		HttpRequestType requestType, //
+		String requestURL, //
+		Map<String, String[]> parametersMap, // 
+		Map<String, String[]> cookiesMap, // 
+		Map<String, String[]> headersMap // 
+	) { //
+		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap, headersMap, null);
+	}
+	
+	/// Performs GET request with parameters, cookies and headers
+	public static ResponseHttp byType( //
+		HttpRequestType requestType, //
+		String requestURL, //
+		Map<String, String[]> parametersMap, // 
+		Map<String, String[]> cookiesMap, // 
+		Map<String, String[]> headersMap, // 
+		InputStream requestStream //
+	) { //
+		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap, headersMap,
+			requestStream);
 	}
 	
 	//--------------------------------------------------------

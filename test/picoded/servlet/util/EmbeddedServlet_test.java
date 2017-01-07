@@ -54,9 +54,8 @@ public class EmbeddedServlet_test {
 	}
 	
 	//
-	// Sanity testing other modes?
+	// Testing various servlet packages deployment
 	//
-	
 	@Test
 	public void helloWorldHtml() {
 		assertTrue( helloWorldHtml.isDirectory() );
@@ -82,4 +81,53 @@ public class EmbeddedServlet_test {
 		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/test-jsp.jsp").toString().trim() );
 	}
 	
+	@Test
+	public void helloWorldJWar_contextName() {
+		assertTrue( helloWorldJWar.isFile() );
+		assertNotNull(testServlet = new EmbeddedServlet(testPort, "ctest", helloWorldJWar));
+		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/ctest/test-html.html").toString().trim() );
+		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/ctest/test-java").toString().trim() );
+		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/ctest/test-jsp.jsp").toString().trim() );
+	}
+	
+	//
+	// Testing deployment using a single servlet class
+	// This is useful for Junit testing
+	//
+	
+	// The hello world class to test
+	public class HelloWorld extends HttpServlet {
+		private String message;
+		public void init() throws ServletException {
+			// Do required initialization
+			message = "Hello World";
+		}
+
+		public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+			// Set response content type
+			response.setContentType("text/html");
+
+			// Actual logic goes here.
+			PrintWriter out = response.getWriter();
+			out.println("<h1>" + message + "</h1>");
+		}
+	}
+	
+	@Test
+	public void helloWorldServlet() {
+		assertNotNull(testServlet = new EmbeddedServlet(testPort, new HelloWorld()));
+		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/test").toString().trim() );
+	}
+	
+	@Test
+	public void helloWorldServlet_fixedPath() {
+		assertNotNull(testServlet = new EmbeddedServlet(testPort, new HelloWorld(), "/fixed"));
+		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/fixed").toString().trim() );
+		assertNotEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/rand").toString().trim() );
+	}
+	@Test
+	public void helloWorldServlet_contextName() {
+		assertNotNull(testServlet = new EmbeddedServlet(testPort, "ctest", new HelloWorld(), null));
+		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/ctest/test").toString().trim() );
+	}
 }

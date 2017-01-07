@@ -36,9 +36,10 @@ import picoded.file.FileUtil;
 
 ///
 /// EmbeddedServlet class, provides a means of self executing any of the JavaCommons packages
-/// Without having the need to use of a parent tomcat : YAYS!
+/// Without having the need of a parent tomcat : YAYS!
 ///
 /// On the flip side, this assumes only 1 context per deployment.
+/// For more complex deployments, seriously use tomcat (or its many siblings)
 ///
 public class EmbeddedServlet implements Closeable {
 	
@@ -61,11 +62,12 @@ public class EmbeddedServlet implements Closeable {
 	String contextPath = "";
 	
 	/// Temp path used, delete on close, if exists
+	Path tempBaseDir = null;
 	Path tempContextDir = null;
 	
 	///////////////////////////////////////////////////////
 	//
-	// Constructor, and basic server start/stop
+	// Constructor, and basic server setup+start
 	//
 	///////////////////////////////////////////////////////
 	
@@ -77,10 +79,68 @@ public class EmbeddedServlet implements Closeable {
 	/// @param   File representing either the folder, or the war file to deploy 
 	///
 	public EmbeddedServlet(int port, File webappPath) {
+		this(port, "ROOT", webappPath);
+	}
+	
+	///
+	/// Sometimes the app just will not work for "ROOT", so you may want to define 
+	/// a fixed contextName path instead.
+	///
+	/// @param   Port to run the embedded servlet on, -1 defaults to 8080
+	/// @param   String representing the context name and path, without "/", like "ROOT"
+	/// @param   File representing either the folder, or the war file to deploy 
+	///
+	public EmbeddedServlet(int port, String contextName, File webappPath) {
 		initTomcatInstance("", port);
-		addWebapp("ROOT", webappPath);
+		addWebapp(contextName, webappPath);
 		startup();
 	}
+	
+	///
+	/// Implement just one class as a servlet for the whole context,
+	/// mainly for a single role port services, or for unit testing.
+	/// 
+	/// This defaults to a servlet path of "/*"
+	///
+	/// @param   Port to run the embedded servlet on, -1 defaults to 8080
+	/// @param   Servlet class to use
+	///
+	public EmbeddedServlet(int port, Servlet servletClass) {
+		this(port, "ROOT", servletClass, null);
+	}
+	
+	///
+	/// Implement just one class as a servlet for the whole context,
+	/// mainly for a single role port services, or for unit testing.
+	/// 
+	/// @param   Port to run the embedded servlet on, -1 defaults to 8080
+	/// @param   Servlet class to use
+	/// @param   Servlet path to assign class to, null defaults to "/*"
+	///
+	public EmbeddedServlet(int port, Servlet servletClass, String servletPath) {
+		this(port, "ROOT", servletClass, servletPath);
+	}
+	
+	///
+	/// Implement just one class as a servlet for the whole context,
+	/// mainly for a single role port services, or for unit testing.
+	/// 
+	/// @param   Port to run the embedded servlet on, -1 defaults to 8080
+	/// @param   String representing the context name and path, without "/", like "ROOT"
+	/// @param   Servlet class to use
+	/// @param   Servlet path to assign class to, null defaults to "/*"
+	///
+	public EmbeddedServlet(int port, String contextName, Servlet servletClass, String servletPath) {
+		initTomcatInstance("", port);
+		addServlet(contextName, servletClass, servletPath);
+		startup();
+	}
+	
+	///////////////////////////////////////////////////////
+	//
+	// Server closure and destruction
+	//
+	///////////////////////////////////////////////////////
 	
 	/// Destroy the tomcat instance and removes it, if it exists
 	public synchronized void close() {
@@ -93,6 +153,10 @@ public class EmbeddedServlet implements Closeable {
 			}
 			
 			// Temp file clenup
+			if( tempBaseDir != null ) {
+				FileUtil.deleteDirectory(tempBaseDir.toFile());
+				tempBaseDir = null;
+			}
 			if( tempContextDir != null ) {
 				FileUtil.deleteDirectory(tempContextDir.toFile());
 				tempContextDir = null;
@@ -126,11 +190,6 @@ public class EmbeddedServlet implements Closeable {
 	// Initializing and starting, internal functions
 	//
 	///////////////////////////////////////////////////////
-	
-	/// Does the basic default tomcat instance setup
-	protected void initTomcatInstance() {
-		initTomcatInstance("", -1);
-	}
 	
 	/// Does the basic default tomcat instance setup
 	///
@@ -170,7 +229,7 @@ public class EmbeddedServlet implements Closeable {
 				assert Files.isWritable(webappPath);
 				
 				// Temp path directory
-				tempContextDir = tPath;
+				tempBaseDir = tPath;
 				tempPath = tPath.toString();
 			}
 			tomcat.setBaseDir(tempPath);
@@ -209,9 +268,28 @@ public class EmbeddedServlet implements Closeable {
 		}
 	}
 	
+	/// Normalize the context name, and provides its actual context path
+	///
+	/// @param In context name to use (will be converted to path)
+	///
+	/// @return  Context path to use
+	protected String normalizeContextNameToPath(String inContextName) {
+		//
+		// Load context name and path
+		//
+		contextName = inContextName;
+		if( contextName == null || contextName.isEmpty() || contextName.equalsIgnoreCase("ROOT") ) {
+			contextName = "ROOT";
+			contextPath = "";
+		} else {
+			contextPath = "/"+contextName;
+		}
+		return contextPath;
+	}
+	
 	/// Add a webapplication
 	///
-	/// @param  ContextPath to use
+	/// @param  In context name to use (will be converted to path)
 	/// @param  Webapplication File path to use
 	protected void addWebapp(String inContextName, File webappPath) {
 		addWebapp(inContextName, webappPath.getAbsolutePath() );
@@ -219,19 +297,12 @@ public class EmbeddedServlet implements Closeable {
 	
 	/// Add a webapplication
 	///
-	/// @param  ContextPath to use
+	/// @param  In context name to use (will be converted to path)
 	/// @param  Webapplication File path to use
 	protected void addWebapp(String inContextName, String webappPath) {
 		try {
-			//
-			// Load context name and path
-			//
-			contextName = inContextName;
-			if( contextName == null || contextName.isEmpty() || contextName.equalsIgnoreCase("ROOT") ) {
-				contextPath = "";
-			} else {
-				contextPath = "/"+contextName;
-			}
+			// Normalize and store the context path
+			normalizeContextNameToPath(inContextName);
 			
 			//
 			// This helps disable the default parent class path scanning
@@ -260,6 +331,40 @@ public class EmbeddedServlet implements Closeable {
 			// Loads the application with the custom contextConfig
 			//
 			context = tomcat.addWebapp(tomcat.getHost(), contextPath, webappPath, contextConfig );
+			
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/// Adds a single servlet, and load it with a context.
+	/// This is mainly useful for single use ports, or unit testing.
+	///
+	/// @param  In context name to use (will be converted to path)
+	/// @param  Servlet class to use
+	/// @param  Servlet path to use (defaults to "/*")
+	protected void addServlet(String inContextName, Servlet serverClass, String serverPath) {
+		try {
+			// Normalize and store the context path
+			normalizeContextNameToPath(inContextName);
+			
+			// Temp directory for context
+			tempContextDir = Files.createTempDirectory( GUID.base58() ).toAbsolutePath();
+			
+			// Setup context
+			context = tomcat.addContext(contextPath, tempContextDir.toString());
+			
+			// Setup servlet class
+			Tomcat.addServlet(context, "ServletApp", serverClass);
+			
+			// And link the path
+			if( serverPath == null ) {
+				// http://stackoverflow.com/questions/4140448/difference-between-and-in-servlet-mapping-url-pattern
+				serverPath = "/*";
+			}
+			
+			// Add the servlet 
+			context.addServletMappingDecoded(serverPath, "ServletApp");
 			
 		} catch(Exception e) {
 			throw new RuntimeException(e);

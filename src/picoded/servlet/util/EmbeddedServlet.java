@@ -32,6 +32,7 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 
 import picoded.conv.GUID;
+import picoded.file.FileUtil;
 
 ///
 /// EmbeddedServlet class, provides a means of self executing any of the JavaCommons packages
@@ -59,6 +60,9 @@ public class EmbeddedServlet implements Closeable {
 	/// The context path used, derived from context name
 	String contextPath = "";
 	
+	/// Temp path used, delete on close, if exists
+	Path tempContextDir = null;
+	
 	///////////////////////////////////////////////////////
 	//
 	// Constructor, and basic server start/stop
@@ -79,12 +83,19 @@ public class EmbeddedServlet implements Closeable {
 	}
 	
 	/// Destroy the tomcat instance and removes it, if it exists
-	public void close() {
+	public synchronized void close() {
 		try {
+			// Tomcat teardown / destruction
 			if( tomcat != null ) {
 				tomcat.stop();
 				tomcat.destroy();
 				tomcat = null;
+			}
+			
+			// Temp file clenup
+			if( tempContextDir != null ) {
+				FileUtil.deleteDirectory(tempContextDir.toFile());
+				tempContextDir = null;
 			}
 		} catch(Exception e) {
 			throw new RuntimeException(e);
@@ -150,7 +161,17 @@ public class EmbeddedServlet implements Closeable {
 			// Files.createTempDirectory - is used in place of java.io.tmpdir
 			// String mWorkingDir = System.getProperty("java.io.tmpdir");
 			if( tempPath == null || tempPath.isEmpty() ) {
-				tempPath = Files.createTempDirectory( GUID.base58() ).toAbsolutePath().toString();
+				// Temp directory for context
+				Path tPath = Files.createTempDirectory( GUID.base58() ).toAbsolutePath();
+				
+				// Minor error prevention
+				Path webappPath = tPath.resolve("webapps");
+				Files.createDirectories(webappPath);
+				assert Files.isWritable(webappPath);
+				
+				// Temp path directory
+				tempContextDir = tPath;
+				tempPath = tPath.toString();
 			}
 			tomcat.setBaseDir(tempPath);
 			
@@ -219,7 +240,7 @@ public class EmbeddedServlet implements Closeable {
 			// In the context JavaCommons webappllication, each deployment
 			// will have more then enough Jars to provide on their own 
 			//
-			ContextConfig contextConfig = new ContextConfig() {
+			LifecycleListener contextConfig = new ContextConfig() { 
 				private boolean invoked = false;
 				@Override
 				public void lifecycleEvent(LifecycleEvent event) {
@@ -238,7 +259,7 @@ public class EmbeddedServlet implements Closeable {
 			//
 			// Loads the application with the custom contextConfig
 			//
-			context = tomcat.addWebapp(tomcat.getHost(), contextPath, webappPath, (LifecycleListener)contextConfig );
+			context = tomcat.addWebapp(tomcat.getHost(), contextPath, webappPath, contextConfig );
 			
 		} catch(Exception e) {
 			throw new RuntimeException(e);

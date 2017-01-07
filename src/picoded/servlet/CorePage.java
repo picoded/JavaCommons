@@ -49,7 +49,7 @@ import picoded.servlet.util.FileServlet;
  *
  * ---------------------------------------------------------------------------------------------------------
  *
- * ##Process flow
+ * ## Process flow
  * <pre>
  * {@code
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,15 +57,17 @@ import picoded.servlet.util.FileServlet;
  *
  * spawnInstance ----+--> processChain
  *                   |         |
- * doOption ---------+    doSharedSetup && doSetup
- *                   |         |
- * doPost -----------+       doAuth ---------------+-> doRequest --> do_X_Request --> outputRequest
- *                   |         |                   |
- * doGet ------------+         V               isJsonRequest == true
- *                   |     doSharedTeardown        |
- * doDelete ---------+      && doTeardown          \-> doJson -----> do_X_Json -----> outputJSON
+ * doOption ---------+    doSharedSetup 
+ *                   |     && doSetup
+ * doPost -----------+         |                       (excludes Head/Option)
+ *                   |       doAuth ---------------+-> doRequest --> do_X_Request --> outputRequest
+ * doGet ------------+         |                   |
+ *                   |         V               isJsonRequest == true
+ * doDelete ---------+     doSharedTeardown        |
+ *                   |     && doTeardown           \-> doJson -----> do_X_Json -----> outputJSON
+ * doPut ------------+                                 (excludes Head/Option)
  *                   |
- * doPut ------------/
+ * doHead -----------/
  *
  * [CorePage lifecycle process flow]
  *
@@ -78,7 +80,7 @@ import picoded.servlet.util.FileServlet;
  * </pre>
  * ---------------------------------------------------------------------------------------------------------
  *
- * ##[TODO]
+ * ## [TODO]
  * + Websocket support?
  */
 public class CorePage extends javax.servlet.http.HttpServlet {
@@ -128,10 +130,12 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	/// httpResponse used [modification of this value, is highly discouraged]
 	protected HttpServletResponse httpResponse = null;
 	
+	/// Get the native http servlet request
 	public HttpServletRequest getHttpServletRequest() {
 		return httpRequest;
 	}
 	
+	/// Get the native http servlet response
 	public HttpServletResponse getHttpServletResponse() {
 		return httpResponse;
 	}
@@ -151,6 +155,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	//
 	// /// local output stream, used for internal execution / testing
 	// protected ByteArrayOutputStream cachedResponseOutputStream = null;
+	//
 	
 	/// The requested headers map, either set at startup or extracted from httpRequest
 	protected Map<String, String[]> _requestHeaderMap = null;
@@ -355,11 +360,14 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 		httpRequest = req;
 		httpResponse = res;
 		
-		// @TODO: To use IOUtils.buffer for inputstream of httpRequest / parameterMap
-		// THIS IS CRITICAL, for the POST request in proxyServlet to work
-		//requestParameters = RequestMap.fromStringArrayValueMap( httpRequest.getParameterMap() );
-		
 		try {
+			// UTF-8 enforcement
+			httpRequest.setCharacterEncoding("UTF-8");
+			
+			// @TODO: To use IOUtils.buffer for inputstream of httpRequest / parameterMap
+			// THIS IS CRITICAL, for the POST request in proxyServlet to work
+			//requestParameters = RequestMap.fromStringArrayValueMap( httpRequest.getParameterMap() );
+			
 			responseOutputStream = httpResponse.getOutputStream();
 		} catch (Exception e) {
 			throw new ServletException(e);
@@ -372,9 +380,18 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	public final CorePage spawnInstance() throws ServletException { //, OutputStream outStream
 		try {
 			Class<? extends CorePage> pageClass = this.getClass();
-			CorePage ret = pageClass.newInstance();
-			pageClass.cast(ret).initSetup(this, this.getServletConfig());
+			CorePage ret = null; 
 			
+			// Tries and create a new instance
+			try {
+				// This works for 
+				ret = pageClass.newInstance();
+			} catch(InstantiationException ie) {
+				// Tries again, with a possibly annoymous class consturctor
+				ret = pageClass.getDeclaredConstructor(CorePage.class).newInstance();
+			}
+			
+			pageClass.cast(ret).initSetup(this, this.getServletConfig());
 			return ret;
 		} catch (Exception e) {
 			throw new ServletException(e);
@@ -400,12 +417,12 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	/// gets the PrintWriter, from the getOutputStream() object and returns it
 	public PrintWriter getWriter() {
-		return new PrintWriter(getOutputStream());
-		// try {
-		// 	return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
-		// } catch(UnsupportedEncodingException e) {
-		// 	throw new RuntimeException(e);
-		// }
+		// return new PrintWriter(getOutputStream());
+		try {
+			return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
+		} catch(UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/// gets the OutputStream, from the httpResponse.getOutputStream() object and returns it
@@ -530,7 +547,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	/// For example : https://picoded.com/JavaCommons , will redirect to https://picoded.com/JavaCommons/
 	///
 	/// This is a rather complicated topic. Regarding the ambiguity of the HTML
-	/// redirection handling of. (T605 on phabricator)
+	/// redirection handling (T605 on phabricator)
 	///
 	/// But basically take the following as example. On how a redirect is handled
 	/// for a relative "./index.html" within a webpage.
@@ -835,6 +852,14 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	/// Does the output processing, this is after do(Post/Get/Put/Delete)Request
 	public boolean outputRequest(Map<String, Object> templateData, PrintWriter output)
 		throws Exception {
+		
+		/// Does string output if parameter is set
+		Object outputString = templateData.get("OutputString");
+		if( outputString != null ) {
+			output.print(outputString);
+			return true;
+		}
+		
 		/// Does standard file output - if file exists
 		outputFileServlet().processRequest( //
 			getHttpServletRequest(), //

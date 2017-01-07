@@ -67,7 +67,7 @@ public class AnonymousClass_test {
 	}
 	
 	/// This works fine and all.... until someone tries to use it as an anonymous class!
-	@Test
+	@Test(expected=Exception.class)
 	public void nextGenerationTest() {
 		HiveMind nextGeneration = new HiveMind() {
 			// New generation new mind set.
@@ -77,6 +77,9 @@ public class AnonymousClass_test {
 		};
 		assertEquals("enslave humans", nextGeneration.status);
 		
+		//
+		// Sadly this fails =(
+		//
 		HiveMind newOverlord = nextGeneration.spawnInstance();
 		assertEquals("enslave humans", newOverlord.status);
 	}

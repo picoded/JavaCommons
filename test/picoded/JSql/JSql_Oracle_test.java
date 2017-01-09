@@ -8,6 +8,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -851,5 +853,63 @@ public class JSql_Oracle_test {
 	public void JSqlOracleTest5() throws JSqlException {
 		String qString = "CREATE TABLE " + testTableName + " t AUTOINCREMENT () PRIMARY KEY)) ";
 		JSqlObj.execute(qString);
+	}
+	
+	@Test
+	//remove single quote if it is first and last is not executing because column name fetching without quotes
+	public void fetchAllRowsTest() throws JSqlException {
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); //cleanup (just incase)
+		
+		JSqlObj.query(
+			"CREATE TABLE IF NOT EXISTS " + testTableName
+				+ " ( `col[1].pk` INT PRIMARY KEY, \"col2\" TEXT )").dispose();
+		JSqlObj.setAutoCommit(false);
+		assertFalse(JSqlObj.getAutoCommit());
+		JSqlObj.query("INSERT INTO " + testTableName + " ( `col[1].pk`, \"col2\" ) VALUES (?,?)",
+			404, "has nothing").dispose();
+		JSqlObj.commit();
+		JSqlResult r = JSqlObj
+			.executeQuery("SELECT `col[1].pk`, \"col2\" FROM " + testTableName + "");
+		assertNotNull("SQL result returns as expected", r);
+		r.fetchAllRows();
+		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col[1].pk")).intValue());
+	}
+	
+	@Test
+	public void fetchAllRowsForBLOBTest() throws JSqlException, SQLException {
+		JSqlObj.query(
+			"CREATE TABLE IF NOT EXISTS " + testTableName + " ( col1 INT PRIMARY KEY, col2 BLOB )")
+			.dispose();
+		
+		java.sql.Blob blob = JSqlObj.sqlConn.createBlob();
+		byte[] bytes = "has nothing".getBytes();
+		blob.setBytes(bytes.length, bytes);
+		String sql = "INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)";
+		PreparedStatement psmt = JSqlObj.prepareSqlStatment(sql, 404, blob);
+		psmt.execute();
+		JSqlObj.commit();
+		JSqlResult r = JSqlObj.executeQuery("SELECT col1, col2 FROM " + testTableName + "");
+		assertNotNull("SQL result returns as expected", r);
+		r.fetchAllRows();
+		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col1")).intValue());
+	}
+	
+	@Test
+	public void fetchAllRowsForExceptionTest() throws JSqlException, SQLException {
+		JSqlObj
+			.query(
+				"CREATE TABLE IF NOT EXISTS " + testTableName
+					+ " ( col1 INT PRIMARY KEY, \"col2\" BLOB )").dispose();
+		
+		java.sql.Blob blob = JSqlObj.sqlConn.createBlob();
+		blob.setBytes(2, null);
+		String sql = "INSERT INTO " + testTableName + " ( col1, \"col2\" ) VALUES (?,?)";
+		PreparedStatement psmt = JSqlObj.prepareSqlStatment(sql, 404, blob);
+		psmt.execute();
+		JSqlObj.commit();
+		JSqlResult r = JSqlObj.executeQuery("SELECT col1, \"col2' FROM " + testTableName + "");
+		assertNotNull("SQL result returns as expected", r);
+		r.fetchAllRows();
+		assertEquals("via readRowCol", 404, ((Number) r.readRowCol(0, "col1")).intValue());
 	}
 }

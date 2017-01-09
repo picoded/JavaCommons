@@ -60,7 +60,7 @@ public class CorePage_test {
 		public boolean outputRequest(Map<String, Object> templateData, PrintWriter output)
 			throws Exception {
 				
-			output.println("hello");
+			output.println("<h1>Hello World</h1>");
 			
 			// /// Does string output if parameter is set
 			// Object outputString = templateData.get("OutputString");

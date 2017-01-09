@@ -407,12 +407,15 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	/// gets the PrintWriter, from the getOutputStream() object and returns it
 	public PrintWriter getWriter() {
-		return new PrintWriter(getOutputStream());
 		// try {
 		// 	return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
 		// } catch(UnsupportedEncodingException e) {
 		// 	throw new RuntimeException(e);
 		// }
+		
+		// Important note: You will need to use "true" for auto flush.
+		// "PrintWriter(Writer out, boolean autoFlush)", or it will NOT work.
+		return new PrintWriter(getOutputStream(), true);
 	}
 	
 	/// gets the OutputStream, from the httpResponse.getOutputStream() object and returns it
@@ -496,7 +499,6 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	}
 	
 	/// Proxies to httpResponse.sendRedirect,
-	/// Fallsback to responseHeaderMap.location, if httpResponse is null
 	public void sendRedirect(String uri) {
 		if (httpResponse != null) {
 			try {
@@ -507,8 +509,10 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 			return;
 		}
 		
+		// Fallsback to responseHeaderMap.location, if httpResponse is null
+		//
 		// if( responseHeaderMap == null ) {
-		// 	responseHeaderMap = new HashMap<String, String>();
+		//	responseHeaderMap = new HashMap<String, String>();
 		// }
 		// responseHeaderMap.put("location", uri);
 	}
@@ -1037,4 +1041,4 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	}
 	
 	/// @TODO : HEAD SUPPORT, for integration with FileServlet
-}
+ }

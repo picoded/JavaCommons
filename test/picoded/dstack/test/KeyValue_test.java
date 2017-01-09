@@ -115,15 +115,15 @@ public class KeyValue_test {
 	
 	@Test
 	public void testColumnExpiration() throws Exception {
-		// set column expiration time to current time + 30 secs.
-		long expirationTime = currentSystemTimeInSeconds() + 1;
+		// set column expiration time to current time + 2 secs.
+		long expirationTime = currentSystemTimeInSeconds() + 2;
 		testObj.putWithExpiry("yes", "no", expirationTime);
 		
 		// before the expiration time key will not be null.
 		assertNotNull(testObj.get("yes"));
 		
-		// sleep the execution for 31 secs so that key gets expired.
-		Thread.sleep(2000);
+		// sleep the execution for 4 secs so that key gets expired.
+		Thread.sleep(4000);
 		
 		// key should be null after expiration time.
 		assertEquals(null, testObj.get("yes"));

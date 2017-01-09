@@ -21,30 +21,6 @@ import picoded.struct.GenericConvertMap;
 public interface KeyValueMap extends GenericConvertMap<String, String> {
 	
 	//
-	// Temp mode optimization, used to indicate pure session like data,
-	// that does not require persistance (or even SQL)
-	//
-	//--------------------------------------------------------------------------
-	
-	/// Gets if temp mode optimization hint is indicated, AND enforced
-	/// Note that this only serve as a hint, as does not indicate actual setting
-	///
-	/// @returns boolean  temp mode value
-	default boolean getTempHint() {
-		return true;
-	}
-	
-	/// Sets temp mode optimization indicator hint
-	/// Note that this only serve as a hint, as does not indicate actual setting
-	///
-	/// @param  mode  the new temp mode hint
-	///
-	/// @returns boolean  previous value if set
-	default void setTempHint(boolean mode) {
-		// Does nothing by default
-	}
-	
-	//
 	// Backend system setup / teardown
 	//--------------------------------------------------------------------------
 	

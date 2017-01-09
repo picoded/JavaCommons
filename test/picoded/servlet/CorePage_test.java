@@ -54,36 +54,47 @@ public class CorePage_test {
 			templateData.put("OutputString", "<h1>Hello World</h1>");
 			return true;
 		}
-		
-		/// Does the output processing, this is after do(Post/Get/Put/Delete)Request
-		@Override
-		public boolean outputRequest(Map<String, Object> templateData, PrintWriter output)
-			throws Exception {
-				
-			output.println("<h1>Hello World</h1>");
-			
-			// /// Does string output if parameter is set
-			// Object outputString = templateData.get("OutputString");
-			// output.print(outputString);
-			return true;
-		}
 	}
 	
-	// Setup for resuse
-	public void helloWorldAssert(String testUrl) {
-		assertNotNull(testServlet);
-		//testServlet.await();
+	//
+	// Assertion test case for multiple reuse
+	//
+	public void helloWorldAssert(String testUrl, String testString) {
+		if(testString == null) {
+			testString = "<h1>Hello World</h1>";
+		}
 		
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get(testUrl, null).toString().trim() );
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.post(testUrl, null).toString().trim() );
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.put(testUrl, null).toString().trim() );
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.delete(testUrl, null).toString().trim() );
+		assertEquals( testString, RequestHttp.get(testUrl, null).toString().trim() );
+		assertEquals( testString, RequestHttp.post(testUrl, null).toString().trim() );
+		assertEquals( testString, RequestHttp.put(testUrl, null).toString().trim() );
+		assertEquals( testString, RequestHttp.delete(testUrl, null).toString().trim() );
 	}
 	
 	@Test
 	public void simpleHelloWorldTest() {
 		assertNotNull( testServlet = new EmbeddedServlet(testPort, new SimpleHelloWorld()) );
-		helloWorldAssert( "http://localhost:"+testPort+"/test/" );
+		helloWorldAssert( "http://localhost:"+testPort+"/test/", null );
+	}
+	
+	//
+	// Testing and fixing the PrintWriter.print bug not outputing final result
+	//
+	public static class SpecialSymbolsTesting extends CorePage {
+		// Message to put
+		@Override
+		public boolean outputRequest(Map<String, Object> templateData, PrintWriter output) throws Exception {
+			//
+			// intentionally using output.print, instead of println - to test
+			//
+			output.println("Test *» This");
+			return true;
+		}
+	}
+	
+	@Test
+	public void outputPrintBugFixing() {
+		assertNotNull( testServlet = new EmbeddedServlet(testPort, new SpecialSymbolsTesting()) );
+		helloWorldAssert( "http://localhost:"+testPort+"/test/", "Test *» This" );
 	}
 	
 }

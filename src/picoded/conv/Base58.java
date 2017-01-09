@@ -6,8 +6,8 @@ package picoded.conv;
 ///
 /// Default charset: 123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz
 ///
-/// The default base58 charset is based on bitcoin base58 charset. A
-/// ccording to wikipedia: http://en.wikipedia.org/wiki/Base58
+/// The default base58 charset is based on bitcoin base58 charset. 
+/// According to wikipedia: http://en.wikipedia.org/wiki/Base58
 ///
 /// Main advantage of using a base 58 charset, is that for a GUID its length space 
 /// is the same compared to Base64, while avoiding common typos

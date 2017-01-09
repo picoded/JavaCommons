@@ -362,7 +362,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 		
 		try {
 			// UTF-8 enforcement
-			// httpRequest.setCharacterEncoding("UTF-8");
+			httpRequest.setCharacterEncoding("UTF-8");
 			
 			// @TODO: To use IOUtils.buffer for inputstream of httpRequest / parameterMap
 			// THIS IS CRITICAL, for the POST request in proxyServlet to work
@@ -407,15 +407,15 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	/// gets the PrintWriter, from the getOutputStream() object and returns it
 	public PrintWriter getWriter() {
-		// try {
-		// 	return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
-		// } catch(UnsupportedEncodingException e) {
-		// 	throw new RuntimeException(e);
-		// }
+		try {
+			return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
+		} catch(UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 		
 		// Important note: You will need to use "true" for auto flush.
 		// "PrintWriter(Writer out, boolean autoFlush)", or it will NOT work.
-		return new PrintWriter(getOutputStream(), true);
+		// return new PrintWriter(getOutputStream(), true);
 	}
 	
 	/// gets the OutputStream, from the httpResponse.getOutputStream() object and returns it
@@ -709,6 +709,10 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 				outputRequest(templateDataObj, getWriter());
 			}
 			
+			// // Flush the output stream
+			// getWriter().flush();
+			// getOutputStream().flush();
+			
 			return ret;
 		} catch (Exception e) {
 			return outputRequestException(templateDataObj, getWriter(), e);
@@ -844,13 +848,19 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	/// [To be extended by sub class, if needed]
 	/// Does the output processing, this is after do(Post/Get/Put/Delete)Request
+	///
+	/// Important note: when output testual data like HTML/JS/etc. and not raw data, 
+	/// somehow the protocol requires an ending new line for the output to work.
+	/// If you are using print() extensively, you may simply do a final println()
+	/// at the end to terminate the output correctly.
+	///
 	public boolean outputRequest(Map<String, Object> templateData, PrintWriter output)
 		throws Exception {
 		
 		/// Does string output if parameter is set
 		Object outputString = templateData.get("OutputString");
 		if( outputString != null ) {
-			output.print(outputString);
+			output.println(outputString.toString());
 			return true;
 		}
 		

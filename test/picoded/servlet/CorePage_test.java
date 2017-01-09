@@ -47,17 +47,33 @@ public class CorePage_test {
 	//
 	// Simple get test
 	//
-	public CorePage simpleHelloWorld = new CorePage() {
+	public static class SimpleHelloWorld extends CorePage {
 		// Message to put
+		@Override
 		public boolean doRequest(Map<String, Object> templateData) throws Exception {
 			templateData.put("OutputString", "<h1>Hello World</h1>");
 			return true;
 		}
-	};
+		
+		/// Does the output processing, this is after do(Post/Get/Put/Delete)Request
+		@Override
+		public boolean outputRequest(Map<String, Object> templateData, PrintWriter output)
+			throws Exception {
+				
+			output.println("hello");
+			
+			// /// Does string output if parameter is set
+			// Object outputString = templateData.get("OutputString");
+			// output.print(outputString);
+			return true;
+		}
+	}
 	
 	// Setup for resuse
 	public void helloWorldAssert(String testUrl) {
 		assertNotNull(testServlet);
+		//testServlet.await();
+		
 		assertEquals( "<h1>Hello World</h1>", RequestHttp.get(testUrl, null).toString().trim() );
 		assertEquals( "<h1>Hello World</h1>", RequestHttp.post(testUrl, null).toString().trim() );
 		assertEquals( "<h1>Hello World</h1>", RequestHttp.put(testUrl, null).toString().trim() );
@@ -66,8 +82,8 @@ public class CorePage_test {
 	
 	@Test
 	public void simpleHelloWorldTest() {
-		assertNotNull(testServlet = new EmbeddedServlet(testPort, simpleHelloWorld));
-		helloWorldAssert( "http://localhost:"+testPort+"/test" );
+		assertNotNull( testServlet = new EmbeddedServlet(testPort, new SimpleHelloWorld()) );
+		helloWorldAssert( "http://localhost:"+testPort+"/test/" );
 	}
 	
 }

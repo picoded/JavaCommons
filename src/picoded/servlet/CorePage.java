@@ -362,7 +362,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 		
 		try {
 			// UTF-8 enforcement
-			httpRequest.setCharacterEncoding("UTF-8");
+			// httpRequest.setCharacterEncoding("UTF-8");
 			
 			// @TODO: To use IOUtils.buffer for inputstream of httpRequest / parameterMap
 			// THIS IS CRITICAL, for the POST request in proxyServlet to work
@@ -380,17 +380,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	public final CorePage spawnInstance() throws ServletException { //, OutputStream outStream
 		try {
 			Class<? extends CorePage> pageClass = this.getClass();
-			CorePage ret = null; 
-			
-			// Tries and create a new instance
-			try {
-				// This works for 
-				ret = pageClass.newInstance();
-			} catch(InstantiationException ie) {
-				// Tries again, with a possibly annoymous class consturctor
-				ret = pageClass.getDeclaredConstructor(CorePage.class).newInstance();
-			}
-			
+			CorePage ret = pageClass.newInstance();
 			pageClass.cast(ret).initSetup(this, this.getServletConfig());
 			return ret;
 		} catch (Exception e) {
@@ -417,12 +407,12 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	/// gets the PrintWriter, from the getOutputStream() object and returns it
 	public PrintWriter getWriter() {
-		// return new PrintWriter(getOutputStream());
-		try {
-			return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
-		} catch(UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
+		return new PrintWriter(getOutputStream());
+		// try {
+		// 	return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
+		// } catch(UnsupportedEncodingException e) {
+		// 	throw new RuntimeException(e);
+		// }
 	}
 	
 	/// gets the OutputStream, from the httpResponse.getOutputStream() object and returns it

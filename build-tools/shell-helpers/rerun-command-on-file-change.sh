@@ -46,7 +46,7 @@ echo "";
 echo "Waiting for file change event inside : $scan_dir ";
 
 while true; do
-	fswatch -r -1 "$scan_dir";
+	fswatch -r -1 -i "\\.java$" "$scan_dir";
 	echo "";
 	echo "-------------------------------------------------------------------";
 	echo "";

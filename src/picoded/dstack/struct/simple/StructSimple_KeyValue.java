@@ -11,7 +11,8 @@ import picoded.security.NxtCrypt;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 
-/// Refence implementation of KeyValue data structure
+///
+/// Refrence implementation of KeyValue data structure
 ///
 /// This is intended to be an optimized key value map data storage
 /// Used mainly in caching or performance critical scenerios.

@@ -8,6 +8,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import picoded.dstack.KeyValue;
 import picoded.security.NxtCrypt;
+import picoded.struct.GenericConvertMap;
+import picoded.struct.GenericConvertHashMap;
 
 /// Refence implementation of KeyValue data structure
 ///
@@ -21,9 +23,11 @@ import picoded.security.NxtCrypt;
 ///
 public class StructSimple_KeyValue implements KeyValue {
 	
-	///
-	/// Constructor vars
-	///--------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	//
+	// Constructor vars
+	//
+	//--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
 	protected ConcurrentMap<String, String> valueMap = new ConcurrentHashMap<String, String>();
@@ -34,145 +38,104 @@ public class StructSimple_KeyValue implements KeyValue {
 	/// Read write lock
 	protected ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
 	
-	///
-	/// Backend system setup / teardown
-	///--------------------------------------------------------------------------
+	/// Configuration map to use
+	protected GenericConvertMap<String,Object> configMap = new GenericConvertHashMap<String,Object>();
 	
-	/// Setsup the backend storage table, etc. If needed
-	@Override
-	public void systemSetup() {
-		//clear();
-	}
-	
-	/// Teardown and delete the backend storage table, etc. If needed
-	@Override
-	public void systemDestroy() {
-		clear();
-	}
-	
-	/// perform increment maintenance, meant for minor changes between requests
-	@Override
-	public void incrementalMaintenance() {
-		// For JStruct, both is same
-		maintenance();
-	}
-	
-	/// Perform maintenance, mainly removing of expired data if applicable
-	@Override
-	public void maintenance() {
-		try {
-			accessLock.writeLock().lock();
-			
-			// The time to check against
-			long now = currentSystemTimeInSeconds();
-			
-			// not iterated directly due to remove()
-			Set<String> expireKeySet = expireMap.keySet();
-			
-			// The keyset to check against
-			String[] expireKeyArray = expireKeySet.toArray(new String[expireKeySet.size()]);
-			
-			// Iterate and evict
-			for (String key : expireKeyArray) {
-				Long timeObj = expireMap.get(key);
-				//				long time = (timeObj != null) ? timeObj.longValue() : 0;
-				long time = timeObj.longValue();
-				// expired? kick it
-				if (time < now && time > 0) {
-					valueMap.remove(key);
-					expireMap.remove(key);
-				}
-			}
-		} finally {
-			accessLock.writeLock().unlock();
-		}
-	}
-	
-	/// Removes all data, without tearing down setup
-	///
-	/// Handles re-entrant lock where applicable
-	///
-	@Override
-	public void clear() {
-		try {
-			accessLock.writeLock().lock();
-			valueMap.clear();
-			expireMap.clear();
-		} finally {
-			accessLock.writeLock().unlock();
-		}
-	}
-	
-	///
-	/// Utility functions used internally
-	///--------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	//
+	// Utility functions used internally
+	//
+	//--------------------------------------------------------------------------
 	
 	/// Gets the current system time in seconds
 	public long currentSystemTimeInSeconds() {
 		return (System.currentTimeMillis()) / 1000L;
 	}
 	
-	///
-	/// Expiration and lifespan handling (to override)
-	///--------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	//
+	// Basic put / get / remove operations
+	//
+	//--------------------------------------------------------------------------
 	
-	/// [Internal use, to be extended in future implementation]
-	/// Returns the expire time stamp value, raw without validation
+	/// Returns the value, given the key
+	/// @param key param find the thae meta key
 	///
-	/// Handles re-entrant lock where applicable
-	///
-	/// @param key as String
-	///
-	/// @returns long
-	public long getExpiryRaw(String key) {
-		try {
-			accessLock.readLock().lock();
-			
-			// no value fails
-			if (valueMap.get(key) == null) {
-				return -1;
-			}
-			
-			// Expire value?
-			Long expireObj = expireMap.get(key);
-			if (expireObj == null) {
-				return 0;
-			}
-			return expireObj.longValue();
-		} finally {
-			accessLock.readLock().unlock();
-		}
+	/// returns  value of the given key
+	@Override
+	public String get(Object key) {
+		return getValueRaw(key.toString(), currentSystemTimeInSeconds());
 	}
 	
-	/// [Internal use, to be extended in future implementation]
-	/// Sets the expire time stamp value, raw without validation
+	/// Stores (and overwrites if needed) key, value pair
 	///
-	/// Handles re-entrant lock where applicable
+	/// Important note: It does not return the previously stored value
 	///
 	/// @param key as String
-	/// @param expire timestamp in seconds, 0 means NO expire
+	/// @param value as String
 	///
-	/// @returns long
-	public void setExpiryRaw(String key, long time) {
+	/// @returns null
+	@Override
+	public String put(String key, String value) {
+		return setValueRaw(key, value, 0);
+	}
+	
+	/// Remove the value, given the key
+	///
+	/// @param key param find the thae meta key
+	///
+	/// @returns  null
+	@Override
+	public String remove(Object key) {
 		try {
 			accessLock.writeLock().lock();
 			
-			// Does nothing if empty
-			if (time <= 0 || valueMap.get(key) == null) {
-				expireMap.remove(key);
-				return;
-			}
+			valueMap.remove(key);
+			expireMap.remove(key);
 			
-			// Set expire value
-			expireMap.put(key, time);
+			return null;
 		} finally {
 			accessLock.writeLock().unlock();
 		}
 	}
 	
+	/// Search using the value, all the relevent key mappings
 	///
-	/// Expiration and lifespan handling (public access)
-	///--------------------------------------------------------------------------
+	/// Handles re-entrant lock where applicable
+	///
+	/// @param key, note that null matches ALL
+	///
+	/// @returns array of keys
+	@Override
+	public Set<String> keySet(String value) {
+		try {
+			accessLock.readLock().lock();
+			
+			long now = currentSystemTimeInSeconds();
+			Set<String> ret = new HashSet<String>();
+			
+			// The keyset to check against
+			Set<String> valuekeySet = valueMap.keySet();
+			
+			// Iterate and get
+			for (String key : valuekeySet) {
+				String rawValue = getValueRaw(key, now);
+				if (rawValue != null && (value == null || rawValue.equals(value))) {
+					ret.add(key);
+				}
+			}
+			
+			return ret;
+		} finally {
+			accessLock.readLock().unlock();
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	//
+	// Expiration and lifespan handling 
+	//
+	//--------------------------------------------------------------------------
 	
 	/// Returns the expire time stamp value, if still valid
 	///
@@ -229,9 +192,39 @@ public class StructSimple_KeyValue implements KeyValue {
 		setExpiryRaw(key, lifespan + currentSystemTimeInSeconds());
 	}
 	
+	/// Stores (and overwrites if needed) key, value pair
 	///
-	/// put, get, remove, etc (to override)
-	///--------------------------------------------------------------------------
+	/// Important note: It does not return the previously stored value
+	///
+	/// @param key as String
+	/// @param value as String
+	/// @param lifespan time to expire in seconds
+	///
+	/// @returns null
+	@Override
+	public String putWithLifespan(String key, String value, long lifespan) {
+		return setValueRaw(key, value, (lifespan <= 0)? -1 : currentSystemTimeInSeconds() + lifespan);
+	}
+	
+	/// Stores (and overwrites if needed) key, value pair
+	///
+	/// Important note: It does not return the previously stored value
+	///
+	/// @param key as String
+	/// @param value as String
+	/// @param expireTime expire time stamp value
+	///
+	/// @returns String
+	@Override
+	public String putWithExpiry(String key, String value, long expireTime) {
+		return setValueRaw(key, value, expireTime);
+	}
+	
+	//--------------------------------------------------------------------------
+	//
+	// put, get, remove, etc (core)
+	//
+	//--------------------------------------------------------------------------
 	
 	/// [Internal use, to be extended in future implementation]
 	/// Returns the value, with validation
@@ -242,7 +235,7 @@ public class StructSimple_KeyValue implements KeyValue {
 	/// @param now timestamp
 	///
 	/// @returns String value
-	public String getValueRaw(String key, long now) {
+	protected String getValueRaw(String key, long now) {
 		try {
 			accessLock.readLock().lock();
 			
@@ -273,10 +266,9 @@ public class StructSimple_KeyValue implements KeyValue {
 	/// @param expire timestamp, 0 means not timestamp
 	///
 	/// @returns null
-	public String setValueRaw(String key, String value, long expire) {
+	protected String setValueRaw(String key, String value, long expire) {
 		try {
 			accessLock.writeLock().lock();
-			
 			if (value == null) {
 				valueMap.remove(key);
 				expireMap.remove(key);
@@ -290,180 +282,150 @@ public class StructSimple_KeyValue implements KeyValue {
 		}
 	}
 	
-	/// Search using the value, all the relevent key mappings
+	//--------------------------------------------------------------------------
+	//
+	// Expiration and lifespan handling (core)
+	//
+	//--------------------------------------------------------------------------
+	
+	/// [Internal use, to be extended in future implementation]
+	/// Returns the expire time stamp value, raw without validation
 	///
 	/// Handles re-entrant lock where applicable
 	///
-	/// @param key, note that null matches ALL
+	/// @param key as String
 	///
-	/// @returns array of keys
-	@Override
-	public Set<String> keySet(String value) {
+	/// @returns long
+	protected long getExpiryRaw(String key) {
 		try {
 			accessLock.readLock().lock();
 			
-			long now = currentSystemTimeInSeconds();
-			Set<String> ret = new HashSet<String>();
-			
-			// The keyset to check against
-			Set<String> valuekeySet = valueMap.keySet();
-			
-			// Iterate and get
-			for (String key : valuekeySet) {
-				String rawValue = getValueRaw(key, now);
-				if (rawValue != null && (value == null || rawValue.equals(value))) {
-					ret.add(key);
-				}
+			// no value fails
+			if (valueMap.get(key) == null) {
+				return -1;
 			}
 			
-			return ret;
+			// Expire value?
+			Long expireObj = expireMap.get(key);
+			if (expireObj == null) {
+				return 0;
+			}
+			return expireObj.longValue();
 		} finally {
 			accessLock.readLock().unlock();
 		}
 	}
 	
-	/// Remove the value, given the key
+	/// [Internal use, to be extended in future implementation]
+	/// Sets the expire time stamp value, raw without validation
 	///
-	/// @param key param find the thae meta key
+	/// Handles re-entrant lock where applicable
 	///
-	/// @returns  null
-	@Override
-	public String remove(Object key) {
+	/// @param key as String
+	/// @param expire timestamp in seconds, 0 means NO expire
+	///
+	/// @returns long
+	public void setExpiryRaw(String key, long time) {
 		try {
 			accessLock.writeLock().lock();
 			
-			valueMap.remove(key);
-			expireMap.remove(key);
+			// Does nothing if empty
+			if (time <= 0 || valueMap.get(key) == null) {
+				expireMap.remove(key);
+				return;
+			}
 			
-			return null;
+			// Set expire value
+			expireMap.put(key, time);
+		} finally {
+			accessLock.writeLock().unlock();
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	//
+	// Backend system setup / teardown / maintenance (DataStructureSetup)
+	//
+	//--------------------------------------------------------------------------
+	
+	///
+	/// Sets up the backend storage. If needed.
+	/// The SQL equivalent would be "CREATE TABLE {TABLENAME} IF NOT EXISTS"
+	///
+	@Override
+	public void systemSetup() {
+		//clear();
+	}
+	
+	///
+	/// Destroy, Teardown and delete the backend storage. If needed
+	/// The SQL equivalent would be "DROP TABLE {TABLENAME}"
+	///
+	@Override
+	public void systemDestroy() {
+		clear();
+	}
+	
+	///
+	/// Perform maintenance, mainly removing of expired data if applicable
+	///
+	/// Handles re-entrant lock where applicable
+	///
+	@Override
+	public void maintenance() {
+		try {
+			accessLock.writeLock().lock();
+			
+			// The time to check against
+			long now = currentSystemTimeInSeconds();
+			
+			// not iterated directly due to remove()
+			Set<String> expireKeySet = expireMap.keySet();
+			
+			// The keyset to check against
+			String[] expireKeyArray = expireKeySet.toArray(new String[expireKeySet.size()]);
+			
+			// Iterate and evict
+			for (String key : expireKeyArray) {
+				Long timeObj = expireMap.get(key);
+				//				long time = (timeObj != null) ? timeObj.longValue() : 0;
+				long time = timeObj.longValue();
+				// expired? kick it
+				if (time < now && time > 0) {
+					valueMap.remove(key);
+					expireMap.remove(key);
+				}
+			}
 		} finally {
 			accessLock.writeLock().unlock();
 		}
 	}
 	
 	///
-	/// put, get, etc (public)
-	///--------------------------------------------------------------------------
-	
-	/// Returns all the valid keys
+	/// Removes all data, without tearing down setup
 	///
-	/// @returns  the full keyset
+	/// Handles re-entrant lock where applicable
+	///
 	@Override
-	public Set<String> keySet() {
-		return getKeys(null);
-	}
-	
-	/// Contains key operation.
-	///
-	/// note that boolean false can either mean no value or expired value
-	///
-	/// @param key as String
-	/// @returns boolean true or false if the key exists
-	@Override
-	public boolean containsKey(Object key) {
-		return getLifespan(key.toString()) >= 0;
-	}
-	
-	/// Returns the value, given the key
-	/// @param key param find the thae meta key
-	///
-	/// returns  value of the given key
-	@Override
-	public String get(Object key) {
-		return getValueRaw(key.toString(), currentSystemTimeInSeconds());
-	}
-	
-	/// Stores (and overwrites if needed) key, value pair
-	///
-	/// Important note: It does not return the previously stored value
-	///
-	/// @param key as String
-	/// @param value as String
-	///
-	/// @returns null
-	@Override
-	public String put(String key, String value) {
-		return setValueRaw(key, value, 0);
-	}
-	
-	/// Stores (and overwrites if needed) key, value pair
-	///
-	/// Important note: It does not return the previously stored value
-	///
-	/// @param key as String
-	/// @param value as String
-	/// @param lifespan time to expire in seconds
-	///
-	/// @returns null
-	@Override
-	public String putWithLifespan(String key, String value, long lifespan) {
-		return setValueRaw(key, value, currentSystemTimeInSeconds() + lifespan);
-	}
-	
-	/// Stores (and overwrites if needed) key, value pair
-	///
-	/// Important note: It does not return the previously stored value
-	///
-	/// @param key as String
-	/// @param value as String
-	/// @param expireTime expire time stamp value
-	///
-	/// @returns String
-	@Override
-	public String putWithExpiry(String key, String value, long expireTime) {
-		return setValueRaw(key, value, expireTime);
+	public void clear() {
+		try {
+			accessLock.writeLock().lock();
+			valueMap.clear();
+			expireMap.clear();
+		} finally {
+			accessLock.writeLock().unlock();
+		}
 	}
 	
 	///
-	/// Nonce operations suppport (public)
-	///--------------------------------------------------------------------------
-	
-	/// Default nonce lifetime (1 hour)
-	protected int nonceDefaultLifetime = 3600;
-	
-	/// Default nonce string length (22 is chosen to be consistent with base58 GUID's)
-	protected int nonceDefaultLength = 22;
-	
-	/// Generates a random nonce hash, and saves the value to it
+	/// Persistent config mapping implmentation. 
+	/// 
+	/// Currently these values are in use.
+	/// + NonceLifespan
+	/// + NonceKeyLength
 	///
-	/// Relies on both nonce_defaultLength & nonce_defaultLifetime for default parameters
-	///
-	/// @param value to store as string
-	///
-	/// @returns String value of the random key generated
 	@Override
-	public String generateNonce(String val) {
-		return generateNonce(val, nonceDefaultLifetime, nonceDefaultLength);
+	public GenericConvertMap<String,Object> configMap() {
+		return configMap;
 	}
-	
-	/// Generates a random nonce hash, and saves the value to it
-	///
-	/// Relies on nonce_defaultLength for default parameters
-	///
-	/// @param value to store as string
-	/// @param lifespan time to expire in seconds
-	///
-	/// @returns String value of the random key generated
-	@Override
-	public String generateNonce(String val, long lifespan) {
-		return generateNonce(val, lifespan, nonceDefaultLength);
-	}
-	
-	/// Generates a random nonce hash, and saves the value to it
-	///
-	/// Note that the random nonce value returned, is based on picoded.security.NxtCrypt.randomString.
-	/// Note that this relies on true random to avoid collisions, and if it occurs. Values are over-written
-	///
-	/// @param keyLength random key length size
-	/// @param value to store as string
-	/// @param lifespan time to expire in seconds
-	///
-	/// @returns String value of the random key generated
-	@Override
-	public String generateNonce(String val, long lifespan, int keyLength) {
-		String res = NxtCrypt.randomString(keyLength);
-		putWithLifespan(res, val, lifespan);
-		return res;
-	}
-	
 }

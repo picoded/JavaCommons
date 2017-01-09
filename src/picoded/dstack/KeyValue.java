@@ -94,8 +94,10 @@ public interface KeyValue extends GenericConvertMap<String, String>, DataStructu
 		throw new UnsupportedOperationException("function not supported");
 	}
 	
+	//--------------------------------------------------------------------------
 	//
-	// Expiration and lifespan handling (public access)
+	// Expiration and lifespan handling 
+	//
 	//--------------------------------------------------------------------------
 	
 	/// Returns the expire time stamp value, if still valid
@@ -124,8 +126,10 @@ public interface KeyValue extends GenericConvertMap<String, String>, DataStructu
 	/// @param lifespan 
 	void setLifeSpan(String key, long lifespan);
 	
+	//--------------------------------------------------------------------------
 	//
 	// Extended map operations
+	//
 	//--------------------------------------------------------------------------
 	
 	/// Stores (and overwrites if needed) key, value pair 
@@ -152,8 +156,10 @@ public interface KeyValue extends GenericConvertMap<String, String>, DataStructu
 	/// @returns String
 	String putWithExpiry(String key, String value, long expireTime);
 	
+	//--------------------------------------------------------------------------
 	//
 	// Nonce operations suppport (public)
+	//
 	//--------------------------------------------------------------------------
 	
 	/// Generates a random nonce hash, and saves the value into it

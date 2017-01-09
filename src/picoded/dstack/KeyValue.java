@@ -87,12 +87,10 @@ public interface KeyValue extends GenericConvertMap<String, String>, DataStructu
 	/// systems are NOT designed for this operation. And will do so
 	/// the hard way (searching every data value)
 	///
-	/// @param value to search, note that null matches ALL
+	/// @param value to search, note that null matches ALL. This is used by keySet()
 	///
 	/// @returns array of keys
-	default Set<String> keySet(String value) {
-		throw new UnsupportedOperationException("function not supported");
-	}
+	Set<String> keySet(String value);
 	
 	//--------------------------------------------------------------------------
 	//

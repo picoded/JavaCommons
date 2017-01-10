@@ -261,7 +261,6 @@ public interface MetaTable extends DataStructureSetup<String, MetaObject> {
 	///         objects for the key names, use -1 to search all
 	///
 	/// @returns  The various key names used in the objects
-	///
 	default Set<String> getKeyNames(int seekDepth) {
 		Set<String> res = new HashSet<String>();
 		
@@ -281,12 +280,11 @@ public interface MetaTable extends DataStructureSetup<String, MetaObject> {
 		return res;
 	}
 	
-	/// getKeyNames varient with seekDepth defaulted to 10
+	/// getKeyNames varient with seekDepth defaulted to 25
 	///
 	/// @returns  The various key names used in the objects
-	///
 	default Set<String> getKeyNames() {
-		return getKeyNames(10);
+		return getKeyNames(25);
 	}
 	
 }

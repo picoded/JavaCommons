@@ -34,4 +34,15 @@ public abstract class Core_DataStructure<K,V> implements DataStructureSetup<K,V>
 		return configMap;
 	}
 	
+	//--------------------------------------------------------------------------
+	//
+	// Utility functions used internally
+	//
+	//--------------------------------------------------------------------------
+	
+	/// Gets the current system time in seconds
+	protected long currentSystemTimeInSeconds() {
+		return (System.currentTimeMillis()) / 1000L;
+	}
+	
 }

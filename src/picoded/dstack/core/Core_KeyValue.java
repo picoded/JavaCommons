@@ -9,7 +9,7 @@ import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 
 ///
-/// Common utility class of KeyValue.
+/// Common base utility class of KeyValue.
 ///
 /// Does not actually implement its required feature,
 /// but helps provide a common base line for all the various implementation.
@@ -18,22 +18,13 @@ public abstract class Core_KeyValue extends Core_DataStructure<String,String> im
 	
 	//--------------------------------------------------------------------------
 	//
-	// Utility functions used internally
-	//
-	//--------------------------------------------------------------------------
-	
-	/// Gets the current system time in seconds
-	protected long currentSystemTimeInSeconds() {
-		return (System.currentTimeMillis()) / 1000L;
-	}
-	
-	//--------------------------------------------------------------------------
-	//
 	// raw put & get, meant to be actually implemented.
+	// [Internal use, to be extended in future implementation]
 	//
 	//--------------------------------------------------------------------------
 	
 	/// [Internal use, to be extended in future implementation]
+	///
 	/// Returns the value, with validation
 	///
 	/// Handles re-entrant lock where applicable
@@ -45,6 +36,7 @@ public abstract class Core_KeyValue extends Core_DataStructure<String,String> im
 	abstract protected String getValueRaw(String key, long now);
 	
 	/// [Internal use, to be extended in future implementation]
+	///
 	/// Sets the value, with validation
 	///
 	/// Handles re-entrant lock where applicable
@@ -57,6 +49,7 @@ public abstract class Core_KeyValue extends Core_DataStructure<String,String> im
 	abstract protected String setValueRaw(String key, String value, long expire);
 	
 	/// [Internal use, to be extended in future implementation]
+	///
 	/// Returns the expire time stamp value, raw without validation
 	///
 	/// Handles re-entrant lock where applicable
@@ -67,6 +60,7 @@ public abstract class Core_KeyValue extends Core_DataStructure<String,String> im
 	abstract protected long getExpiryRaw(String key);
 	
 	/// [Internal use, to be extended in future implementation]
+	///
 	/// Sets the expire time stamp value, raw without validation
 	///
 	/// Handles re-entrant lock where applicable

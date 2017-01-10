@@ -22,9 +22,6 @@ import picoded.dstack.*;
 /// of a JCache layer for non-complex lookup cached reads. Which will in most cases be the main
 /// read request load.
 ///
-/// Note that this class was intentionly designed to serve as the foundation for other dstack implementation.
-/// With 
-///
 public class StructSimple_MetaTable /*implements MetaTable*/ {
 	
 	// ///

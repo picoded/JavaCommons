@@ -6,6 +6,7 @@ import java.util.Map;
 // Library imports
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
+import picoded.struct.UnsupportedDefaultMap;
 
 // Third party imports
 import org.apache.commons.lang3.RandomUtils;
@@ -21,7 +22,7 @@ import org.apache.commons.lang3.RandomUtils;
 ///
 /// Be it a map of key-to-values, a map of map, or a map of maps of maps ...
 ///
-public interface DataStructureSetup<K, V> extends Map<K, V> {
+public interface DataStructureSetup<K, V> extends UnsupportedDefaultMap<K, V> {
 	
 	//--------------------------------------------------------------------------
 	//

@@ -52,7 +52,7 @@ public interface MetaTable extends DataStructureSetup<String, MetaObject> {
 	/// Generates a new blank object, with a GUID.
 	/// And append all the relevent data to it.
 	///
-	/// Note that save does not trigger, unless its called.
+	/// Note that this does trigger a save all
 	///
 	/// @param  data to save
 	///
@@ -60,6 +60,7 @@ public interface MetaTable extends DataStructureSetup<String, MetaObject> {
 	default MetaObject newObject(Map<String,Object> data) {
 		MetaObject ret = newObject();
 		ret.putAll(data);
+		ret.saveAll();
 		return ret;
 	}
 	
@@ -70,7 +71,7 @@ public interface MetaTable extends DataStructureSetup<String, MetaObject> {
 	/// @param  object GUID to fetch
 	///
 	/// @returns the MetaObject, null if not exists
-	MetaObject get(String oid);
+	MetaObject get(Object oid);
 	
 	/// Get a MetaObject, and returns it. Skips existance checks if required
 	///
@@ -252,7 +253,7 @@ public interface MetaTable extends DataStructureSetup<String, MetaObject> {
 	/// This is used mainly in adminstration interface, etc.
 	///
 	/// Note however, that in non-JSql mode, this function is not
-	/// optimize, and does an iterative search for the various object keys.
+	/// optimized, and does an iterative search for the various object keys.
 	/// which is ridiculously expensive. So avoid calling this unless needed.
 	///
 	/// The seekDepth parameter is ignored in JSql mode, as its optimized.

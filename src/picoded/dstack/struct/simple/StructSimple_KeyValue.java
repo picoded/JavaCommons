@@ -18,7 +18,7 @@ import picoded.struct.GenericConvertHashMap;
 ///
 /// Built ontop of the Core_KeyValue implementation.
 ///
-public class StructSimple_KeyValue extends Core_KeyValue implements KeyValue {
+public class StructSimple_KeyValue extends Core_KeyValue {
 	
 	//--------------------------------------------------------------------------
 	//

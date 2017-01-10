@@ -240,12 +240,14 @@ abstract public class Core_MetaTable extends Core_DataStructure<String,MetaObjec
 	/// Existance checks is performed for such requests
 	///
 	/// @param  object GUID to fetch
-	/// @param  boolean used to indicate if an existance check is done for the request
 	///
 	/// @returns the MetaObject, null if not exists
-	public MetaObject get(String oid) {
+	public MetaObject get(Object oid) {
+		// String oid
+		String soid = (oid != null)? oid.toString() : null;
+		
 		// Get remote data map
-		Map<String,Object> fullRemote = metaObjectRemoteDataMap_get(oid);
+		Map<String,Object> fullRemote = metaObjectRemoteDataMap_get(soid);
 		
 		// Return null, if there is no data
 		if( fullRemote == null ) {
@@ -253,7 +255,23 @@ abstract public class Core_MetaTable extends Core_DataStructure<String,MetaObjec
 		}
 		
 		// Return a Metaobject
-		return new Core_MetaObject(this, oid, fullRemote, true);
+		return new Core_MetaObject(this, soid, fullRemote, true);
 	}
 	
+	//--------------------------------------------------------------------------
+	// 
+	// Constructor and maintenance
+	//
+	//--------------------------------------------------------------------------
+	
+	///
+	/// Maintenance step call, however due to the nature of most implementation not 
+	/// having any form of time "expirary", this call does nothing in most implementation.
+	/// 
+	/// As such im making that the default =)
+	///
+	@Override
+	public void maintenance() {
+		// Does nothing
+	}
 }

@@ -1,0 +1,37 @@
+package picoded.dstack.core;
+
+import picoded.dstack.DataStructureSetup;
+import picoded.security.NxtCrypt;
+import picoded.struct.GenericConvertMap;
+import picoded.struct.GenericConvertHashMap;
+
+///
+/// Common utility class of DataStructureSetup.
+///
+/// Does not actually implement its required feature,
+/// but helps provide a common base line for the configuration system.
+///
+public abstract class Core_DataStructure<K,V> implements DataStructureSetup<K,V> {
+	
+	//--------------------------------------------------------------------------
+	//
+	// Configuration system used commonly
+	//
+	//--------------------------------------------------------------------------
+	
+	/// Configuration map to use
+	protected GenericConvertMap<String,Object> configMap = new GenericConvertHashMap<String,Object>();
+	
+	///
+	/// Persistent config mapping implmentation. 
+	/// 
+	/// Currently these values are in use.
+	/// + NonceLifespan
+	/// + NonceKeyLength
+	///
+	@Override
+	public GenericConvertMap<String,Object> configMap() {
+		return configMap;
+	}
+	
+}

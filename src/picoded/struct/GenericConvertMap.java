@@ -11,7 +11,7 @@ import picoded.conv.GenericConvert;
 public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	
 	// Static proxy build
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	/// Ensures the returned map is a GenericConvertMap, doing the conversion
 	// if needed.
@@ -20,7 +20,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to string conversion
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	/// To String conversion of generic object
 	///
@@ -42,7 +42,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to boolean conversion
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	/// To boolean conversion of generic object
 	///
@@ -64,7 +64,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to Number conversion
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	/// To Number conversion of generic object
 	///
@@ -86,7 +86,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to int conversion
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	/// To int conversion of generic object
 	///
@@ -108,7 +108,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to long conversion
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	/// To long conversion of generic object
 	///
@@ -130,7 +130,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to float conversion
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	/// To float conversion of generic object
 	///
@@ -152,7 +152,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to double conversion
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	/// To double conversion of generic object
 	///
@@ -174,7 +174,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to byte conversion
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	/// To byte conversion of generic object
 	///
@@ -196,7 +196,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to short conversion
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	/// To short conversion of generic object
 	///
@@ -218,7 +218,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to UUID / GUID
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	/// To UUID conversion of generic object
 	///
@@ -278,7 +278,8 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to map
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
+	
 	/// To String Map conversion of generic object
 	///
 	/// @param key The input value key to convert
@@ -321,7 +322,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to array
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	/// To String Map conversion of generic object
 	///
@@ -344,7 +345,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to string array
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	/// To String[] conversion of generic object
 	///
@@ -366,7 +367,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// to object array
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	/// To Object[] conversion of generic object
 	///
@@ -388,7 +389,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	}
 	
 	// NESTED object fetch (related to fully qualified keys handling)
-	// --------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 	
 	///
 	/// Gets an object from the map,
@@ -422,7 +423,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	
 	// // Does a simple typecast and put conversion
 	// // NOTE: Removed due to lack of use
-	// // --------------------------------------------------------------------------------------------------
+	// //---------------------------------------------------------------------------------------------------
 	// @SuppressWarnings("unchecked")
 	// default V typecastPut(K key, Object value) {
 	// 	return put(key, (V) value);
@@ -430,7 +431,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	// 
 	// // Attempts to convert against known V value types, and insert into the map.
 	// // If no conversion is required, please use typecastPut
-	// // --------------------------------------------------------------------------------------------------
+	// //---------------------------------------------------------------------------------------------------
 	// default V convertPut(K key, Object value, Class<V> valueClass) {
 	// 	@SuppressWarnings("unchecked")
 	// 	BiFunction<Object, Object, V> bf = (BiFunction<Object, Object, V>) GenericConvert.getBiFunction_noisy(valueClass);

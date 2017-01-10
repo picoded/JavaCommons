@@ -56,10 +56,10 @@ public class JStructUtils {
 				end = size;
 			}
 			
-			//			// Out of range
-			//			if (end <= offset) {
-			//				return new MetaObject[0];
-			//			}
+			// // Out of range
+			// if (end <= offset) {
+			// 	return new MetaObject[0];
+			// }
 			
 			// Get sublist
 			retList = retList.subList(offset, end);

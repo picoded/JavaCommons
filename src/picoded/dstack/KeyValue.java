@@ -15,6 +15,10 @@ import picoded.struct.GenericConvertMap;
 ///
 /// As such its sacrifices much utility for performance
 ///
+/// Its value type is also intentionally a String, to ensure compatibility
+/// with a large number of String based caching systems. Additionally,
+/// NULL is considered a delete value. 
+///
 /// Note that expire timestamps are measured in seconds, 
 /// this is intentional design as anything smaller then a second 
 /// is pointless over a network.

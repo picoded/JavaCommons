@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 /// Extension of apache FileUtils, for some additional features that we needed.
 /// Additionally several FilenameUtils is made avaliable here.
 ///
-/// To clarify, this class inherits all the apache FileUtils functions, and serves as a somewhat
+/// To clarify, this class inherits all the apache FileUtils functions, and serves as a somewhat 
 /// (different classname) drop in replacement
 ///
 /// @See https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtil.html
@@ -147,7 +147,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// Encoding assumes US-ASCII by default
 	///
 	/// @param File to read
-	/// @param String data to write
+	/// @param String data to write 
 	///
 	public static void writeStringToFile(File inFile, String data) throws IOException {
 		picoded.file.FileUtil.writeStringToFile(inFile, data, (String) null);
@@ -157,7 +157,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// Write a string content into a file
 	///
 	/// @param File to read
-	/// @param String data to write
+	/// @param String data to write 
 	/// @param Encoding string value to use - Null value assumes encoding with US-ASCII
 	///
 	public static void writeStringToFile(File inFile, String data, String encoding)
@@ -318,9 +318,9 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate,
 		boolean tryToSymLinkFiles) throws IOException {
 		// Checks if the output file is already a symbolic link
-		// And if its points to the same file.
+		// And if its points to the same file. 
 		//
-		// If so, both is practically the same final file when
+		// If so, both is practically the same final file when 
 		// linked, hence the file is considered "not different"
 		//------------------------------------------------------------
 		if (Files.isSymbolicLink(outFile.toPath())
@@ -345,7 +345,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 			// Assumes output file is either NOT a symbolic link
 			// or has the wrong symbolic link reference.
 			//
-			// Creates a symbolic link of the outfile,
+			// Creates a symbolic link of the outfile, 
 			// relative to the in file (if possible)
 			//
 			//------------------------------------------------------------
@@ -479,6 +479,49 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @return full resolved path with ending / for directories
 	public static String normalize(String filename) {
 		return org.apache.commons.io.FilenameUtils.normalize(filename);
+	}
+	
+	//------------------------------------------------------------------------------------------------------------------
+	//
+	// Recursive permission nuke
+	//
+	//------------------------------------------------------------------------------------------------------------------
+	
+	///
+	/// Recursively reset the permission
+	///
+	/// @param file / folder to set permission
+	/// @param Set read permissions  (0:ignore, 1:unset, 2:set, -1:unset-owner-only, -2:set-owner-only)
+	/// @param Set write permissions (0:ignore, 1:unset, 2:set, -1:unset-owner-only, -2:set-owner-only)
+	/// @param Set exec permissions  (0:ignore, 1:unset, 2:set, -1:unset-owner-only, -2:set-owner-only)
+	/// @param recursion settings
+	///
+	public static void setFilePermission(File inFile, int read, int write, int exec, boolean recursive) {
+		try {
+			//
+			// Apply the permission setting
+			//
+			if( read != 0 ) {
+				inFile.setReadable( (read>=2 || read<-2), (read<0) );
+			}
+			if( write != 0 ) {
+				inFile.setWritable( (write>=2 || write<-2), (write<0) );
+			}
+			if( exec != 0 ) {
+				inFile.setExecutable( (exec>=2 || exec<-2), (exec<0) );
+			}
+			
+			//
+			// Recurssion
+			//
+			if( recursive && inFile.isDirectory() ) {
+				for (File f : inFile.listFiles()) {
+					setFilePermission(f, read, write, exec, recursive);
+				}
+			}
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	//------------------------------------------------------------------------------------------------------------------

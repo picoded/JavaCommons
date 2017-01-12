@@ -14,17 +14,17 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	public static Logger logger = Logger.getLogger(JSql_AtomicLongMap.class.getName());
+	public static final Logger logger = Logger.getLogger(JSql_AtomicLongMap.class.getName());
 	
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
 	
 	/// The inner sql object
-	public JSql sqlObj = null;
+	protected JSql sqlObj = null;
 	
 	/// The tablename for the key value pair map
-	public String sqlTableName = null;
+	protected String sqlTableName = null;
 	
 	/// JSql setup
 	public JSql_AtomicLongMap(JSql inJSql, String tablename) {
@@ -38,16 +38,16 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	///--------------------------------------------------------------------------
 	
 	/// Primary key type
-	public String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
+	protected String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
 	
 	/// Timestamp field type
-	public String tStampColumnType = "BIGINT";
+	protected String tStampColumnType = "BIGINT";
 	
 	/// Key name field type
-	public String keyColumnType = "VARCHAR(64)";
+	protected String keyColumnType = "VARCHAR(64)";
 	
 	/// Value field type
-	public String valueColumnType = "VARCHAR(MAX)";
+	protected String valueColumnType = "VARCHAR(MAX)";
 	
 	///
 	/// Backend system setup / teardown
@@ -388,7 +388,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 			
 			//if no values inside
 			if (oldVal == null || r.rowCount() == 0) {
-				if (oldVal.equals(expect)) {
+				if (oldVal != null && oldVal.equals(expect)) {
 					return sqlObj.execute("INSERT INTO " + sqlTableName + "(kID, kVl) VALUES (?,?)",
 						key, update);
 				} else {

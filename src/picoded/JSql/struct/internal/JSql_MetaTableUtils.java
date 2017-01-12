@@ -2,6 +2,7 @@ package picoded.JSql.struct.internal;
 
 /// Java imports
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Base64;
 import java.util.logging.Level;
@@ -56,7 +57,7 @@ public class JSql_MetaTableUtils {
 				continue;
 			}
 			
-			if (key != null && !key.equals(((kID_list.get(i))))) {
+			if (key != null && !key.equals(kID_list.get(i))) {
 				continue;
 			}
 			
@@ -122,23 +123,23 @@ public class JSql_MetaTableUtils {
 	///
 	public static Object[] valueToOptionSet(MetaTypeMap mtm, String key, Object value) {
 		if (value instanceof Integer) {
-			return new Object[] { new Integer(MetaType.INTEGER.getValue()), value,
+			return new Object[] { Integer.valueOf(MetaType.INTEGER.getValue()), value,
 				shortenStringValue(value), value.toString() }; //Typ, N,S,I,T
 		} else if (value instanceof Float) {
-			return new Object[] { new Integer(MetaType.FLOAT.getValue()), value,
+			return new Object[] { Integer.valueOf(MetaType.FLOAT.getValue()), value,
 				shortenStringValue(value), value.toString() }; //Typ, N,S,I,T
 		} else if (value instanceof Double) {
-			return new Object[] { new Integer(MetaType.DOUBLE.getValue()), value,
+			return new Object[] { Integer.valueOf(MetaType.DOUBLE.getValue()), value,
 				shortenStringValue(value), value.toString() }; //Typ, N,S,I,T
 		} else if (value instanceof String) {
-			return new Object[] { new Integer(MetaType.STRING.getValue()), 0,
+			return new Object[] { Integer.valueOf(MetaType.STRING.getValue()), 0,
 				shortenStringValue(value), value.toString() }; //Typ, N,S,I,T
 		} else if (value instanceof byte[]) {
-			return new Object[] { new Integer(MetaType.BINARY.getValue()), 0, null,
-				(Base64.getEncoder().encodeToString((byte[]) value)) }; //Typ, N,S,I,T
+			return new Object[] { Integer.valueOf(MetaType.BINARY.getValue()), 0, null,
+				Base64.getEncoder().encodeToString((byte[]) value) }; //Typ, N,S,I,T
 		} else {
 			String jsonString = ConvertJSON.fromObject(value);
-			return new Object[] { new Integer(MetaType.JSON.getValue()), 0, null, jsonString };
+			return new Object[] { Integer.valueOf(MetaType.JSON.getValue()), 0, null, jsonString };
 		}
 		
 		//throw new RuntimeException("Object type not yet supported: "+key+" = "+ value);
@@ -159,17 +160,17 @@ public class JSql_MetaTableUtils {
 		
 		// Int, Long, Double, Float
 		if (baseType == MetaType.INTEGER.getValue()) {
-			return new Integer(((Number) (r.get("nVl").get(pos))).intValue());
+			return Integer.valueOf(((Number) (r.get("nVl").get(pos))).intValue());
 		} else if (baseType == MetaType.FLOAT.getValue()) {
-			return new Float(((Number) (r.get("nVl").get(pos))).floatValue());
+			return Float.valueOf(((Number) (r.get("nVl").get(pos))).floatValue());
 		} else if (baseType == MetaType.DOUBLE.getValue()) {
-			return new Double(((Number) (r.get("nVl").get(pos))).doubleValue());
-		} else if (baseType == MetaType.STRING.getValue()) { // String
+			return Double.valueOf(((Number) (r.get("nVl").get(pos))).doubleValue());
+		} else if (baseType == MetaType.STRING.getValue() || baseType == MetaType.TEXT.getValue()) { // String OR Text
 			return r.get("tVl").get(pos);
-		} else if (baseType == MetaType.TEXT.getValue()) { // Text
-			return r.get("tVl").get(pos);
+			//		} else if (baseType == MetaType.TEXT.getValue()) { // Text
+			//			return r.get("tVl").get(pos);
 		} else if (baseType == MetaType.BINARY.getValue()) {
-			return (Base64.getDecoder().decode((String) (r.get("tVl").get(pos))));
+			return Base64.getDecoder().decode((String) (r.get("tVl").get(pos)));
 		} else if (baseType == MetaType.JSON.getValue()) { // JSON
 			return ConvertJSON.toObject((String) (r.get("tVl").get(pos)));
 		}
@@ -236,7 +237,7 @@ public class JSql_MetaTableUtils {
 			for (String k : keyList) {
 				
 				// Skip reserved key, otm is allowed to be saved (to ensure blank object is saved)
-				if (k.equalsIgnoreCase("_otm")) { //reserved
+				if ("_otm".equalsIgnoreCase(k)) { //reserved
 					continue;
 				}
 				
@@ -255,7 +256,7 @@ public class JSql_MetaTableUtils {
 				
 				if (v == ObjectToken.NULL || v == null) {
 					// Skip reserved key, oid key is allowed to be removed directly
-					if (k.equalsIgnoreCase("oid") || k.equalsIgnoreCase("_oid")) {
+					if ("oid".equalsIgnoreCase(k) || "_oid".equalsIgnoreCase(k)) {
 						continue;
 					}
 					sql.deleteQuerySet(tName, "oID=? AND kID=?", new Object[] { _oid, k }).execute();
@@ -566,8 +567,8 @@ public class JSql_MetaTableUtils {
 			&& orderByStr == null
 			&& offset <= 0
 			&& limit <= 0
-			&& (selectedCols.equals("COUNT(DISTINCT \"oID\") AS rcount") || selectedCols
-				.equals("DISTINCT \"oID\""))) {
+			&& ("COUNT(DISTINCT \"oID\") AS rcount".equals(selectedCols) || "DISTINCT \"oID\""
+				.equals(selectedCols))) {
 			// Blank search, quick and easy
 			queryBuilder.append("SELECT " + selectedCols.replaceAll("\\\"", "") + " FROM " + tablename
 				+ "");
@@ -589,15 +590,15 @@ public class JSql_MetaTableUtils {
 				queryObj = Query.build(whereClause, whereValues);
 				// Build the query type map
 				Map<String, List<Object>> queryMap = queryObj.keyValuesMap();
-				for (String key : queryMap.keySet()) {
-					
+				//for (String key : queryMap.keySet()) {
+				for (Entry<String, List<Object>> entry : queryMap.entrySet()) {
 					//if( key.endsWith(lowerCaseSuffix) ) {
 					//
 					//}
 					
-					MetaType subType = valueToMetaType(queryMap.get(key).get(0));
+					MetaType subType = valueToMetaType(entry.getValue().get(0));
 					if (subType != null) {
-						queryTypeMap.put(key, subType);
+						queryTypeMap.put(entry.getKey(), subType);
 					}
 				}
 				
@@ -633,7 +634,7 @@ public class JSql_MetaTableUtils {
 								argLowerCase = argLowerCase.toString().toLowerCase();
 							}
 							
-							queryArgMap.put("" + newQueryArgsPos, argLowerCase);
+							queryArgMap.put(Integer.toString(newQueryArgsPos), argLowerCase);
 							Query replacement = QueryFilter.basicQueryFromTokens(queryArgMap,
 								toReplace.fieldName() + lowerCaseSuffix, toReplace.operatorSymbol(), ":"
 									+ newQueryArgsPos);
@@ -656,7 +657,7 @@ public class JSql_MetaTableUtils {
 			// Order by handling for metatype map
 			if (orderByObj != null) {
 				for (String keyName : orderByObj.getKeyNames()) {
-					if (!keyName.equalsIgnoreCase("oID")) {
+					if (!"oID".equalsIgnoreCase(keyName)) {
 						if (!queryTypeMap.containsKey(keyName)) {
 							queryTypeMap.put(keyName, MetaType.STRING);
 						}

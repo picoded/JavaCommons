@@ -18,17 +18,17 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	public static Logger logger = Logger.getLogger(JSql_MetaTable.class.getName());
+	public static final Logger logger = Logger.getLogger(JSql_MetaTable.class.getName());
 	
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
 	
 	/// The inner sql object
-	public JSql sqlObj = null;
+	protected JSql sqlObj = null;
 	
 	/// The tablename for the key value pair map
-	public String sqlTableName = null;
+	protected String sqlTableName = null;
 	
 	/// JSql setup 
 	public JSql_MetaTable(JSql inJSql, String tablename) {
@@ -42,35 +42,35 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Object ID field type
-	public String objColumnType = "VARCHAR(64)";
+	protected String objColumnType = "VARCHAR(64)";
 	
 	/// Key name field type
-	public String keyColumnType = "VARCHAR(64)";
+	protected String keyColumnType = "VARCHAR(64)";
 	
 	/// Type collumn type
-	public String typeColumnType = "TINYINT";
+	protected String typeColumnType = "TINYINT";
 	
 	/// Index collumn type
-	public String indexColumnType = "TINYINT";
+	protected String indexColumnType = "TINYINT";
 	
 	/// String value field type
 	/// @TODO: Investigate performance issues for this approach
-	public String numColumnType = "DECIMAL(36,12)";
+	protected String numColumnType = "DECIMAL(36,12)";
 	
 	/// String value field type
-	public String strColumnType = "VARCHAR(64)";
+	protected String strColumnType = "VARCHAR(64)";
 	
 	/// Full text value field type
-	public String fullTextColumnType = "VARCHAR(MAX)";
+	protected String fullTextColumnType = "VARCHAR(MAX)";
 	
 	/// Timestamp field type
-	public String tStampColumnType = "BIGINT";
+	protected String tStampColumnType = "BIGINT";
 	
 	/// Primary key type
-	public String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
+	protected String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
 	
 	/// Indexed view prefix, this is used to handle index conflicts between "versions" if needed
-	public String viewSuffix = "";
+	protected String viewSuffix = "";
 	
 	///
 	/// Backend system setup / teardown

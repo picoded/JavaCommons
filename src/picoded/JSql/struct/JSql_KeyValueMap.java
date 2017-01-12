@@ -16,17 +16,17 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	public static Logger logger = Logger.getLogger(JSql_KeyValueMap.class.getName());
+	public static final Logger logger = Logger.getLogger(JSql_KeyValueMap.class.getName());
 	
 	///
 	/// Constructor setup
 	///--------------------------------------------------------------------------
 	
 	/// The inner sql object
-	public JSql sqlObj = null;
+	protected JSql sqlObj = null;
 	
 	/// The tablename for the key value pair map
-	public String sqlTableName = null;
+	protected String sqlTableName = null;
 	
 	/// JSql setup 
 	public JSql_KeyValueMap(JSql inJSql, String tablename) {
@@ -40,16 +40,16 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Primary key type
-	public String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
+	protected String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
 	
 	/// Timestamp field type
-	public String tStampColumnType = "BIGINT";
+	protected String tStampColumnType = "BIGINT";
 	
 	/// Key name field type
-	public String keyColumnType = "VARCHAR(64)";
+	protected String keyColumnType = "VARCHAR(64)";
 	
 	/// Value field type
-	public String valueColumnType = "VARCHAR(MAX)";
+	protected String valueColumnType = "VARCHAR(MAX)";
 	
 	///
 	/// Backend system setup / teardown
@@ -152,7 +152,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 			if (rawTime instanceof Number) {
 				ret = ((Number) rawTime).longValue();
 			} else {
-				ret = (Long.parseLong(rawTime.toString()));
+				ret = Long.parseLong(rawTime.toString());
 			}
 		}
 		

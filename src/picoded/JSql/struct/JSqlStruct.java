@@ -1,17 +1,14 @@
 package picoded.JSql.struct;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import picoded.JSql.*;
 import picoded.JStruct.*;
-import picoded.struct.*;
 
 public class JSqlStruct extends JStruct {
 	
 	/// The sql object implmentation
 	protected JSql sqlObj = null;
+	
+	private final String EXCEPTION_MESSAGE = "Missing required SQL Object";
 	
 	/// Setup with nothing
 	/// TEMP: for JStack
@@ -32,7 +29,7 @@ public class JSqlStruct extends JStruct {
 	@Override
 	protected KeyValueMap setupKeyValueMap(String name) {
 		if (sqlObj == null) {
-			throw new RuntimeException("Missing required SQL Object");
+			throw new RuntimeException(EXCEPTION_MESSAGE);
 		}
 		
 		return new JSql_KeyValueMap(sqlObj, name);
@@ -46,7 +43,7 @@ public class JSqlStruct extends JStruct {
 	@Override
 	protected AtomicLongMap setupAtomicLongMap(String name) {
 		if (sqlObj == null) {
-			throw new RuntimeException("Missing required SQL Object");
+			throw new RuntimeException(EXCEPTION_MESSAGE);
 		}
 		
 		return new JSql_AtomicLongMap(sqlObj, name);
@@ -60,7 +57,7 @@ public class JSqlStruct extends JStruct {
 	@Override
 	protected MetaTable setupMetaTable(String name) {
 		if (sqlObj == null) {
-			throw new RuntimeException("Missing required SQL Object");
+			throw new RuntimeException(EXCEPTION_MESSAGE);
 		}
 		
 		return new JSql_MetaTable(sqlObj, name);
@@ -74,7 +71,7 @@ public class JSqlStruct extends JStruct {
 	@Override
 	protected AccountTable setupAccountTable(String name) {
 		if (sqlObj == null) {
-			throw new RuntimeException("Missing required SQL Object");
+			throw new RuntimeException(EXCEPTION_MESSAGE);
 		}
 		
 		return new AccountTable(this, name);

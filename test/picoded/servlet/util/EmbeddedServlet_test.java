@@ -41,11 +41,10 @@ public class EmbeddedServlet_test {
 	//
 	@Before
 	public void setUp() {
-		
 		// Ensure a new file handle is issued
 		testCollection = new File("./test-files/test-specific/servlet/util/EmbeddedServlet/");
-		helloWorldHtml = new File(testCollection, "helloWorldHtml");
-		helloWorldJava = new File(testCollection, "helloWorldJava");
+		helloWorldHtml = new File(testCollection, "helloWorldHtml/");
+		helloWorldJava = new File(testCollection, "helloWorldJava/");
 		helloWorldJWar = new File(testCollection, "helloWorldJWar/test.war");
 		
 		// Issue a possible port to use
@@ -61,19 +60,27 @@ public class EmbeddedServlet_test {
 		}
 	}
 	
+	// Sanity check
+	@Test
+	public void fileChecks() {
+		assertTrue(testCollection.isDirectory());
+		assertTrue(helloWorldHtml.isDirectory());
+		assertTrue(helloWorldJava.isDirectory());
+		assertTrue(helloWorldJWar.isFile());
+		
+	}
+	
 	//
 	// Testing various servlet packages deployment
 	//
 	@Test
 	public void helloWorldHtml() {
-		assertTrue( helloWorldHtml.isDirectory() );
 		assertNotNull(testServlet = new EmbeddedServlet(testPort, helloWorldHtml));
 		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/index.html").toString().trim() );
 	}
 	
 	@Test
 	public void helloWorldJava() {
-		assertTrue( helloWorldJava.isDirectory() );
 		assertNotNull(testServlet = new EmbeddedServlet(testPort, helloWorldJava));
 		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/test-html.html").toString().trim() );
 		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/test-java").toString().trim() );
@@ -82,7 +89,6 @@ public class EmbeddedServlet_test {
 	
 	@Test
 	public void helloWorldJWar() {
-		assertTrue( helloWorldJWar.isFile() );
 		assertNotNull(testServlet = new EmbeddedServlet(testPort, helloWorldJWar));
 		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/test-html.html").toString().trim() );
 		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/test-java").toString().trim() );
@@ -91,7 +97,6 @@ public class EmbeddedServlet_test {
 	
 	@Test
 	public void helloWorldJWar_contextName() {
-		assertTrue( helloWorldJWar.isFile() );
 		assertNotNull(testServlet = new EmbeddedServlet(testPort, "ctest", helloWorldJWar));
 		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/ctest/test-html.html").toString().trim() );
 		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/ctest/test-java").toString().trim() );

@@ -395,6 +395,7 @@
 				<batchtest haltonfailure="no" todir="${junit-reports}">
 					<fileset dir="test">
 						<include name="picoded/**/*_test.java"/>
+						<exclude name="picoded/**-old/*_test.java"/>
 					</fileset>
 					<formatter type="plain"/>
 					<formatter type="xml"/>

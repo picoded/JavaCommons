@@ -19,26 +19,21 @@ public class TestConfig {
 	}
 	
 	//
-	// Unique port numbers to be issues, and used for test paralizing
-	//
-	static private int portCounter = -1;
-	
-	//
 	// Issue a somewhat unique port number for use in test cases
 	//
 	public synchronized static int issuePortNumber(){
-		// Check if its initial count
-		if( portCounter <= 0 ) {
-			// Start with a random port between 10k to 50k
-			portCounter = ThreadLocalRandom.current().nextInt(10000, 50000);
-		} else {
-			// Increment the port
-			++portCounter;
-		}
+		// Start with a random port between 10k to 50k
+		int portCounter = ThreadLocalRandom.current().nextInt(10000, 50000);
 		
 		// Increment if a conflict is found
+		int checkTries = 0;
 		while( isLocalPortInUse(portCounter) ) {
-			++portCounter;
+			portCounter = ThreadLocalRandom.current().nextInt(10000, 50000);
+			
+			++checkTries;
+			if( checkTries > 1000 ) {
+				throw new RuntimeException("Attempted over "+checkTries+" to get a local port =( sad");
+			}
 		}
 		
 		// Returns the port counter

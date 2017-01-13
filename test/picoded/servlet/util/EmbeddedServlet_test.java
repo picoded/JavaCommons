@@ -26,9 +26,9 @@ public class EmbeddedServlet_test {
 	// The test folders to use
 	//
 	File testCollection = new File("./test-files/test-specific/servlet/util/EmbeddedServlet/");
-	File helloWorldHtml = new File(testCollection, "helloWorldHtml");
-	File helloWorldJava = new File(testCollection, "helloWorldJava");
-	File helloWorldJWar = new File(testCollection, "helloWorldJWar/test.war");
+	File helloWorldHtml = new File(testCollection, "HelloWorldHtml");
+	File helloWorldJava = new File(testCollection, "HelloWorldJava");
+	File helloWorldJWar = new File(testCollection, "HelloWorldJWar/test.war");
 	
 	//
 	// The test vars to use

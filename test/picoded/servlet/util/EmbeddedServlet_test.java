@@ -41,6 +41,14 @@ public class EmbeddedServlet_test {
 	//
 	@Before
 	public void setUp() {
+		
+		// Ensure a new file handle is issued
+		testCollection = new File("./test-files/test-specific/servlet/util/EmbeddedServlet/");
+		helloWorldHtml = new File(testCollection, "helloWorldHtml");
+		helloWorldJava = new File(testCollection, "helloWorldJava");
+		helloWorldJWar = new File(testCollection, "helloWorldJWar/test.war");
+		
+		// Issue a possible port to use
 		testPort = TestConfig.issuePortNumber();
 		testServlet = null;
 	}

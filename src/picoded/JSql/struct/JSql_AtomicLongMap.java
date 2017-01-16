@@ -143,35 +143,16 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	/// @returns null
 	@Override
 	public Long put(String key, Number value) {
-		put(key, (Object) value);
-		return null;
-	}
-	
-	public Long put(String key, Object value) {
 		
 		try {
-			Number number = null;
-			Long longVal = null;
-			long longVal1 = 0l;
-			Object[] objectArray = null;
 			long now = currentSystemTimeInSeconds();
-			if (value instanceof Number) {
-				number = (Number) value;
-				objectArray = new Object[] { now, number };
-			} else if (value instanceof Long) {
-				longVal = (Long) value;
-				objectArray = new Object[] { now, longVal };
-			} else if (long.class.equals(value)) {
-				longVal1 = (long) value;
-				objectArray = new Object[] { now, longVal1 };
-			}
 			sqlObj.upsertQuerySet( //
 				sqlTableName, //
 				new String[] { "kID" }, //unique cols
 				new Object[] { key }, //unique value
 				//
 				new String[] { "cTm", "kVl" }, //insert cols
-				objectArray //insert values
+				new Object[] { now, value } //insert values
 				).execute();
 			
 		} catch (JSqlException e) {
@@ -190,7 +171,21 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	/// @returns null
 	@Override
 	public Long put(String key, long value) {
-		put(key, (Object) value);
+		
+		try {
+			long now = currentSystemTimeInSeconds();
+			sqlObj.upsertQuerySet( //
+				sqlTableName, //
+				new String[] { "kID" }, //unique cols
+				new Object[] { key }, //unique value
+				//
+				new String[] { "cTm", "kVl" }, //insert cols
+				new Object[] { now, value } //insert values
+				).execute();
+			
+		} catch (JSqlException e) {
+			throw new RuntimeException(e);
+		}
 		return null;
 	}
 	
@@ -204,7 +199,21 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	/// @returns null
 	@Override
 	public Long put(String key, Long value) {
-		put(key, (Object) value);
+		
+		try {
+			long now = currentSystemTimeInSeconds();
+			sqlObj.upsertQuerySet( //
+				sqlTableName, //
+				new String[] { "kID" }, //unique cols
+				new Object[] { key }, //unique value
+				//
+				new String[] { "cTm", "kVl" }, //insert cols
+				new Object[] { now, value } //insert values
+				).execute();
+			
+		} catch (JSqlException e) {
+			throw new RuntimeException(e);
+		}
 		return null;
 	}
 	

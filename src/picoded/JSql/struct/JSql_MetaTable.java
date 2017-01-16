@@ -188,7 +188,7 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 			//sqlObj.createTableIndexQuerySet( //
 			//	tName, "cTm", null, "cTm" //
 			//).execute();
-		} catch (JSqlException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

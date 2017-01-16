@@ -1,20 +1,31 @@
 package picoded.JSql.struct.internal;
 
 /// Java imports
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import picoded.JSql.JSql;
+import picoded.JSql.JSqlException;
+import picoded.JSql.JSqlResult;
+import picoded.JStruct.MetaObject;
+import picoded.JStruct.MetaTable;
+import picoded.JStruct.MetaType;
+import picoded.JStruct.MetaTypeMap;
 /// Picoded imports
-import picoded.conv.*;
+import picoded.conv.ConvertJSON;
+import picoded.conv.ListValueConv;
 import picoded.enums.ObjectToken;
-import picoded.JSql.*;
-import picoded.JStruct.*;
-import picoded.struct.query.*;
-import picoded.struct.query.internal.*;
+import picoded.struct.query.OrderBy;
+import picoded.struct.query.Query;
+import picoded.struct.query.internal.QueryFilter;
 
 ///
 /// Protected class, used to orgainze the various JSql based logic
@@ -103,7 +114,7 @@ public class JSql_MetaTableUtils {
 	/// @returns the shorten return value
 	///
 	protected static String shortenStringValue(Object value) {
-		String shortenValue = value.toString().toLowerCase();
+		String shortenValue = value.toString().toLowerCase(Locale.ENGLISH);
 		if (shortenValue.length() > 64) {
 			shortenValue = shortenValue.substring(0, 64);
 		}
@@ -217,7 +228,6 @@ public class JSql_MetaTableUtils {
 	/// @param {Set<String>} keyList       - keylist to limit append load
 	/// @param {boolean} optimizeAppend    - Used to indicate if append batch should be optimized (not used)
 	///
-	@SuppressWarnings("unchecked")
 	public static void JSqlObjectMapAppend( //
 		MetaTypeMap mtm, //
 		JSql sql, String tName, String _oid, //
@@ -328,7 +338,7 @@ public class JSql_MetaTableUtils {
 		List<Object> oID_list = r.get("oID");
 		List<Object> kID_list = r.get("kID");
 		List<Object> idx_list = r.get("idx");
-		List<Object> val_list = r.get("tVl");
+		//		List<Object> val_list = r.get("tVl");
 		
 		if (kID_list == null) {
 			return ret;
@@ -576,7 +586,7 @@ public class JSql_MetaTableUtils {
 			
 			// Order by object handling
 			if (orderByStr != null) {
-				orderByStr.replaceAll("_oid", "oID");
+				orderByStr = orderByStr.replaceAll("_oid", "oID");
 				orderByObj = getOrderByObject(orderByStr);
 			}
 			
@@ -611,17 +621,17 @@ public class JSql_MetaTableUtils {
 				// Parses the where clause with query type map,
 				// to enforce lower case search for string based nodes
 				//
-				for (String key : queryTypeMap.keySet()) {
+				for (Entry<String, MetaType> entry : queryTypeMap.entrySet()) {
 					
 					// For each string based search, enforce lowercase search
-					MetaType subType = queryTypeMap.get(key);
+					MetaType subType = queryTypeMap.get(entry.getKey());
 					if (subType == MetaType.STRING) {
 						
 						// The query list to do lower case replacement
-						List<Query> toReplaceQueries = fieldQueryMap.get(key);
+						List<Query> toReplaceQueries = fieldQueryMap.get(entry.getKey());
 						
 						// Skip if blank
-						if (toReplaceQueries == null || toReplaceQueries.size() <= 0) {
+						if (toReplaceQueries == null || toReplaceQueries.isEmpty()) {
 							continue;
 						}
 						
@@ -631,7 +641,7 @@ public class JSql_MetaTableUtils {
 							String argName = toReplace.argumentName();
 							Object argLowerCase = queryArgMap.get(argName);
 							if (argLowerCase != null) {
-								argLowerCase = argLowerCase.toString().toLowerCase();
+								argLowerCase = argLowerCase.toString().toLowerCase(Locale.ENGLISH);
 							}
 							
 							queryArgMap.put(Integer.toString(newQueryArgsPos), argLowerCase);
@@ -662,7 +672,7 @@ public class JSql_MetaTableUtils {
 							queryTypeMap.put(keyName, MetaType.STRING);
 						}
 						
-						MetaType type = queryTypeMap.get(keyName);
+						//						MetaType type = queryTypeMap.get(keyName);
 						
 						// Force lowercase string sorting for string orderby
 						if (queryTypeMap.get(keyName) == MetaType.STRING) {

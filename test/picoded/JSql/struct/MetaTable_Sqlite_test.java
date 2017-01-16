@@ -46,7 +46,7 @@ public class MetaTable_Sqlite_test extends MetaTable_test {
 	@Test
 	public void systemSetupExceptionTest() {
 		JSql_MetaTable jsObj = new JSql_MetaTable(sqlImplmentation(), "");
-		jsObj.sqlTableName = "";
+		jsObj.sqlTableName = tableName;
 		jsObj.systemSetup();
 	}
 	

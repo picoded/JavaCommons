@@ -173,6 +173,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	}
 	
 	protected Long put(String key, Object value) {
+		
 		try {
 			long now = currentSystemTimeInSeconds();
 			sqlObj.upsertQuerySet( //
@@ -273,8 +274,31 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	/// @returns  value of the given key
 	@Override
 	public Long getAndIncrement(Object key) {
+		
 		try {
-			return getJSqlResultObject(key);
+			// Search for the key
+			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key })
+				.query();
+			// long expiry = getExpiryRaw(r);
+			//
+			// if (expiry != 0 && expiry < now) {
+			// 	return null;
+			// }
+			
+			Long oldVal = Long.parseLong(r.get("kVl").get(0).toString());
+			Long newVal = oldVal + 1;
+			
+			long now = currentSystemTimeInSeconds();
+			sqlObj.upsertQuerySet( //
+				sqlTableName, //
+				new String[] { "kID" }, //unique cols
+				new Object[] { key }, //unique value
+				//
+				new String[] { "cTm", "kVl" }, //insert cols
+				new Object[] { now, newVal } //insert values
+				).execute();
+			
+			return oldVal;
 		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
@@ -289,32 +313,33 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	public Long incrementAndGet(Object key) {
 		try {
 			// Search for the key
-			return getJSqlResultObject(key);
+			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key })
+				.query();
+			// long expiry = getExpiryRaw(r);
+			//
+			// if (expiry != 0 && expiry < now) {
+			// 	return null;
+			// }
+			
+			Long oldVal = Long.parseLong(r.get("kVl").get(0).toString());
+			Long newVal = oldVal + 1;
+			
+			long now = currentSystemTimeInSeconds();
+			sqlObj.upsertQuerySet( //
+				sqlTableName, //
+				new String[] { "kID" }, //unique cols
+				new Object[] { key }, //unique value
+				//
+				new String[] { "cTm", "kVl" }, //insert cols
+				new Object[] { now, newVal } //insert values
+				).execute();
+			
+			r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key }).query();
+			
+			return Long.parseLong(r.get("kVl").get(0).toString());
 		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
-	}
-	
-	protected Long getJSqlResultObject(Object key) throws JSqlException {
-		// Search for the key
-		JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key })
-			.query();
-		
-		Long oldVal = Long.parseLong(r.get("kVl").get(0).toString());
-		Long newVal = oldVal + 1;
-		
-		long now = currentSystemTimeInSeconds();
-		sqlObj.upsertQuerySet( //
-			sqlTableName, //
-			new String[] { "kID" }, //unique cols
-			new Object[] { key }, //unique value
-			//
-			new String[] { "cTm", "kVl" }, //insert cols
-			new Object[] { now, newVal } //insert values
-			).execute();
-		
-		r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key }).query();
-		return Long.parseLong(r.get("kVl").get(0).toString());
 	}
 	
 	/// Stores (and overwrites if needed) key, value pair

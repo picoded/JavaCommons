@@ -100,6 +100,12 @@ public class MetaTable_Sqlite_test extends MetaTable_test {
 		Set<String> expected = new HashSet<String>(Arrays.asList(new String[] {}));
 		assertNotNull(keyNames);
 		assertEquals(keyNames, expected);
-		
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void systemSetupTest() {
+		JSql_MetaTable jsObj = new JSql_MetaTable(sqlImplmentation(), "");
+		jsObj.sqlObj = null;
+		jsObj.systemSetup();
 	}
 }

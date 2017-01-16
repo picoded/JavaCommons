@@ -18,7 +18,7 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	public static final Logger logger = Logger.getLogger(JSql_MetaTable.class.getName());
+	public static final Logger LOGGER = Logger.getLogger(JSql_MetaTable.class.getName());
 	
 	///
 	/// Constructor setup
@@ -41,11 +41,13 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	/// Internal config vars
 	///--------------------------------------------------------------------------
 	
+	private String varchar = "VARCHAR(64)";
+	
 	/// Object ID field type
-	protected String objColumnType = "VARCHAR(64)";
+	protected String objColumnType = varchar;
 	
 	/// Key name field type
-	protected String keyColumnType = "VARCHAR(64)";
+	protected String keyColumnType = varchar;
 	
 	/// Type collumn type
 	protected String typeColumnType = "TINYINT";
@@ -58,7 +60,7 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	protected String numColumnType = "DECIMAL(36,12)";
 	
 	/// String value field type
-	protected String strColumnType = "VARCHAR(64)";
+	protected String strColumnType = varchar;
 	
 	/// Full text value field type
 	protected String fullTextColumnType = "VARCHAR(MAX)";
@@ -197,7 +199,7 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 		try {
 			sqlObj.execute("DROP TABLE IF EXISTS " + sqlTableName); //IF EXISTS
 		} catch (JSqlException e) {
-			logger.log(Level.SEVERE, "systemTeardown JSqlException (@TODO properly handle this): ", e);
+			LOGGER.log(Level.SEVERE, "systemTeardown JSqlException (@TODO properly handle this): ", e);
 		}
 	}
 	

@@ -316,7 +316,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	public Long incrementAndGet(Object key) {
 		try {
 			// Search for the key
-			return getJSqlResultObject(key);
+			return getJSqlResultObject(key) + 1;
 		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}

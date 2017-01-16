@@ -1,12 +1,14 @@
 package picoded.JSql.struct;
 
-import java.util.*;
-import java.util.logging.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Logger;
 
-import picoded.enums.JSqlType;
-import picoded.JSql.*;
-import picoded.conv.*;
-import picoded.JStruct.internal.*;
+import picoded.JSql.JSql;
+import picoded.JSql.JSqlException;
+import picoded.JSql.JSqlResult;
+import picoded.JStruct.internal.JStruct_KeyValueMap;
+import picoded.conv.ListValueConv;
 
 /// JSql implmentation of KeyValueMap
 public class JSql_KeyValueMap extends JStruct_KeyValueMap {
@@ -17,6 +19,8 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	
 	/// Standard java logger
 	public static final Logger logger = Logger.getLogger(JSql_KeyValueMap.class.getName());
+	
+	JSql_AtomicLongMap atomicLongMap = null;
 	
 	///
 	/// Constructor setup
@@ -31,25 +35,26 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	/// JSql setup 
 	public JSql_KeyValueMap(JSql inJSql, String tablename) {
 		super();
-		sqlObj = inJSql;
 		sqlTableName = tablename;
+		sqlObj = inJSql;
+		atomicLongMap = new JSql_AtomicLongMap(inJSql, tablename);
 	}
 	
-	///
-	/// Internal config vars
-	///--------------------------------------------------------------------------
-	
-	/// Primary key type
-	protected String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
-	
-	/// Timestamp field type
-	protected String tStampColumnType = "BIGINT";
-	
-	/// Key name field type
-	protected String keyColumnType = "VARCHAR(64)";
-	
-	/// Value field type
-	protected String valueColumnType = "VARCHAR(MAX)";
+	//	///
+	//	/// Internal config vars
+	//	///--------------------------------------------------------------------------
+	//	
+	//	/// Primary key type
+	//	protected String pKeyColumnType = atomicLongMap.pKeyColumnType; //"BIGINT PRIMARY KEY AUTOINCREMENT";
+	//	
+	//	/// Timestamp field type
+	//	protected String tStampColumnType = atomicLongMap.tStampColumnType; //"BIGINT";
+	//	
+	//	/// Key name field type
+	//	protected String keyColumnType = atomicLongMap.keyColumnType; // "VARCHAR(64)";
+	//	
+	//	/// Value field type
+	//	protected String valueColumnType = atomicLongMap.valueColumnType; // "VARCHAR(MAX)";
 	
 	///
 	/// Backend system setup / teardown
@@ -58,54 +63,9 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	/// Setsup the backend storage table, etc. If needed
 	@Override
 	public void systemSetup() {
-		try {
-			// Table constructor
-			//-------------------
-			sqlObj.createTableQuerySet( //
-				sqlTableName, //
-				new String[] { //
-				// Primary key, as classic int, this is used to lower SQL
-				// fragmentation level, and index memory usage. And is not accessible.
-				// Sharding and uniqueness of system is still maintained by meta keys
-					"pKy", //
-					// Time stamps
-					"cTm", //value created time
-					"eTm", //value expire time
-					// Storage keys
-					"kID", //
-					// Value storage
-					"kVl" //
-				}, //
-				new String[] { //
-				pKeyColumnType, //Primary key
-					// Time stamps
-					tStampColumnType, tStampColumnType,
-					// Storage keys
-					keyColumnType, //
-					// Value storage
-					valueColumnType } //
-				).execute();
-			
-			// Unique index
-			//------------------------------------------------
-			sqlObj.createTableIndexQuerySet( //
-				sqlTableName, "kID", "UNIQUE", "unq" //
-			).execute();
-			
-			// Value search index
-			//------------------------------------------------
-			if (sqlObj.sqlType == JSqlType.MYSQL) {
-				sqlObj.createTableIndexQuerySet( //
-					sqlTableName, "kVl(255)", null, "valMap" //
-				).execute();
-			} else {
-				sqlObj.createTableIndexQuerySet( //
-					sqlTableName, "kVl", null, "valMap" //
-				).execute();
-			}
-		} catch (JSqlException e) {
-			throw new RuntimeException(e);
-		}
+		atomicLongMap.sqlObj = sqlObj;
+		atomicLongMap.sqlTableName = sqlTableName;
+		atomicLongMap.systemSetup();
 	}
 	
 	/// Teardown and delete the backend storage table, etc. If needed
@@ -113,22 +73,17 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	/// @TODO properly handle this: Especially adding (and testing) the IF EXISTS clause
 	@Override
 	public void systemTeardown() {
-		try {
-			sqlObj.execute("DROP TABLE IF EXISTS " + sqlTableName); //IF EXISTS
-		} catch (JSqlException e) {
-			logger.log(Level.SEVERE, "systemTeardown JSqlException (@TODO properly handle this): ", e);
-		}
+		atomicLongMap.sqlObj = sqlObj;
+		atomicLongMap.sqlTableName = sqlTableName;
+		atomicLongMap.systemTeardown();
 	}
 	
 	/// Perform maintenance, mainly removing of expired data if applicable
 	@Override
 	public void maintenance() {
-		try {
-			long now = currentSystemTimeInSeconds();
-			sqlObj.execute("DELETE FROM `" + sqlTableName + "` WHERE eTm <= ? AND eTm > ?", now, 0);
-		} catch (JSqlException e) {
-			throw new RuntimeException(e);
-		}
+		atomicLongMap.sqlObj = sqlObj;
+		atomicLongMap.sqlTableName = sqlTableName;
+		atomicLongMap.maintenance();
 	}
 	
 	///

@@ -143,6 +143,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	/// @returns null
 	@Override
 	public Long put(String key, Number value) {
+		
 		try {
 			long now = currentSystemTimeInSeconds();
 			sqlObj.upsertQuerySet( //
@@ -170,6 +171,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	/// @returns null
 	@Override
 	public Long put(String key, long value) {
+		
 		try {
 			long now = currentSystemTimeInSeconds();
 			sqlObj.upsertQuerySet( //
@@ -197,26 +199,8 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	/// @returns null
 	@Override
 	public Long put(String key, Long value) {
+		
 		try {
-			long now = currentSystemTimeInSeconds();
-			sqlObj.upsertQuerySet( //
-				sqlTableName, //
-				new String[] { "kID" }, //unique cols
-				new Object[] { key }, //unique value
-				//
-				new String[] { "cTm", "kVl" }, //insert cols
-				new Object[] { now, value } //insert values
-				).execute();
-			
-		} catch (JSqlException e) {
-			throw new RuntimeException(e);
-		}
-		return null;
-	}
-	
-	protected Long put(String key, Object value) {
-		try {
-			
 			long now = currentSystemTimeInSeconds();
 			sqlObj.upsertQuerySet( //
 				sqlTableName, //

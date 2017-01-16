@@ -18,9 +18,9 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	public static final Logger logger = Logger.getLogger(JSql_KeyValueMap.class.getName());
+	public static final Logger LOGGER = Logger.getLogger(JSql_KeyValueMap.class.getName());
 	
-	JSql_AtomicLongMap atomicLongMap = null;
+	private JSql_AtomicLongMap atomicLongMap = null;
 	
 	///
 	/// Constructor setup

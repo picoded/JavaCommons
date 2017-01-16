@@ -58,6 +58,20 @@ public class AtomicLongMap_Sqlite_test extends AtomicLongMap_test {
 	}
 	
 	@Test(expected = RuntimeException.class)
+	public void putWithNumberParamExceptionTest() {
+		JSql_AtomicLongMap jsObj = new JSql_AtomicLongMap(sqlImplmentation(), "");
+		Number n = Integer.valueOf(1);
+		jsObj.put("key", n);
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void putWithLongParamExceptionTest() {
+		JSql_AtomicLongMap jsObj = new JSql_AtomicLongMap(sqlImplmentation(), "");
+		Long l = Long.valueOf(1);
+		jsObj.put("key", l);
+	}
+	
+	@Test(expected = RuntimeException.class)
 	public void putLongParamExceptionTest() {
 		JSql_AtomicLongMap jsObj = new JSql_AtomicLongMap(sqlImplmentation(), "");
 		jsObj.put("key", 1l);

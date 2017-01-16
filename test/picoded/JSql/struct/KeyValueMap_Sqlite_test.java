@@ -43,9 +43,30 @@ public class KeyValueMap_Sqlite_test extends KeyValueMap_test {
 	}
 	
 	@Test(expected = RuntimeException.class)
-	public void getExpiryRawTest() {
+	public void getExpiryRawExceptionTest() {
 		JSql_KeyValueMap jsObj = new JSql_KeyValueMap(sqlImplmentation(), "");
 		jsObj.getExpiryRaw("");
+	}
+	
+	@Test
+	public void getExpiryRawTest() throws JSqlException {
+		JSql_KeyValueMap jsObj = (JSql_KeyValueMap) implementationConstructor();
+		jsObj.systemSetup();
+		long expireTime = currentSystemTimeInSeconds() * 2;
+		jsObj.putWithExpiry("yes", "no", expireTime);
+		//jsObj.put("yes", "no");
+		JSqlResult r = jsObj.sqlObj.selectQuerySet(jsObj.sqlTableName, "eTm", "kID=?",
+			new Object[] { "yes1" }).query();
+		assertEquals(-1, jsObj.getExpiryRaw(r));
+		r = jsObj.sqlObj.selectQuerySet(jsObj.sqlTableName, "eTm", "kID=?", new Object[] { "yes" })
+			.query();
+		assertEquals(expireTime, jsObj.getExpiryRaw(r));
+		jsObj.sqlObj.execute("UPDATE " + jsObj.sqlTableName + " SET eTm=? WHERE kID = ?",
+			"123456789", "yes");
+		r = jsObj.sqlObj.selectQuerySet(jsObj.sqlTableName, "eTm", "kID=?", new Object[] { "yes" })
+			.query();
+		assertEquals(123456789, jsObj.getExpiryRaw(r));
+		
 	}
 	
 	@Test(expected = RuntimeException.class)

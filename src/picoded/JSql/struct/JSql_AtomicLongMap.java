@@ -143,7 +143,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	/// @returns null
 	@Override
 	public Long put(String key, Number value) {
-		put(key, value);
+		put(key, (Object) value);
 		return null;
 	}
 	
@@ -190,7 +190,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	/// @returns null
 	@Override
 	public Long put(String key, long value) {
-		put(key, value);
+		put(key, (Object) value);
 		return null;
 	}
 	
@@ -204,7 +204,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	/// @returns null
 	@Override
 	public Long put(String key, Long value) {
-		put(key, value);
+		put(key, (Object) value);
 		return null;
 	}
 	

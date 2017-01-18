@@ -36,7 +36,11 @@ import picoded.struct.query.internal.QueryFilter;
 public class JSql_MetaTableUtils {
 	
 	/// Static local logger
-	protected static Logger logger = Logger.getLogger(JSql_MetaTableUtils.class.getName());
+	private static Logger logger = Logger.getLogger(JSql_MetaTableUtils.class.getName());
+	
+	protected JSql_MetaTableUtils() {
+		throw new IllegalAccessError("Utility class");
+	}
 	
 	//
 	// JSqlResult search

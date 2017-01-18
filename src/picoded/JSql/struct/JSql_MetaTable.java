@@ -18,7 +18,7 @@ public class JSql_MetaTable extends JStruct_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	public static final Logger LOGGER = Logger.getLogger(JSql_MetaTable.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(JSql_MetaTable.class.getName());
 	
 	///
 	/// Constructor setup

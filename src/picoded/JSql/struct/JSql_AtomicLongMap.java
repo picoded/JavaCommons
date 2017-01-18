@@ -14,7 +14,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	public static final Logger LOGGER = Logger.getLogger(JSql_AtomicLongMap.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(JSql_AtomicLongMap.class.getName());
 	
 	///
 	/// Constructor setup
@@ -143,22 +143,22 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	/// @returns null
 	@Override
 	public Long put(String key, Number value) {
-		
-		try {
-			long now = currentSystemTimeInSeconds();
-			sqlObj.upsertQuerySet( //
-				sqlTableName, //
-				new String[] { "kID" }, //unique cols
-				new Object[] { key }, //unique value
-				//
-				new String[] { "cTm", "kVl" }, //insert cols
-				new Object[] { now, value } //insert values
-				).execute();
-			
-		} catch (JSqlException e) {
-			throw new RuntimeException(e);
-		}
-		return null;
+		return put(key, value.longValue());
+		//		try {
+		//			long now = currentSystemTimeInSeconds();
+		//			sqlObj.upsertQuerySet( //
+		//				sqlTableName, //
+		//				new String[] { "kID" }, //unique cols
+		//				new Object[] { key }, //unique value
+		//				//
+		//				new String[] { "cTm", "kVl" }, //insert cols
+		//				new Object[] { now, value } //insert values
+		//				).execute();
+		//			
+		//		} catch (JSqlException e) {
+		//			throw new RuntimeException(e);
+		//		}
+		//		return null;
 	}
 	
 	/// Stores (and overwrites if needed) key, value pair
@@ -171,22 +171,22 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	/// @returns null
 	@Override
 	public Long put(String key, long value) {
-		
-		try {
-			long now = currentSystemTimeInSeconds();
-			sqlObj.upsertQuerySet( //
-				sqlTableName, //
-				new String[] { "kID" }, //unique cols
-				new Object[] { key }, //unique value
-				//
-				new String[] { "cTm", "kVl" }, //insert cols
-				new Object[] { now, value } //insert values
-				).execute();
-			
-		} catch (JSqlException e) {
-			throw new RuntimeException(e);
-		}
-		return null;
+		return put(key, Long.valueOf(value));
+		//		try {
+		//			long now = currentSystemTimeInSeconds();
+		//			sqlObj.upsertQuerySet( //
+		//				sqlTableName, //
+		//				new String[] { "kID" }, //unique cols
+		//				new Object[] { key }, //unique value
+		//				//
+		//				new String[] { "cTm", "kVl" }, //insert cols
+		//				new Object[] { now, value } //insert values
+		//				).execute();
+		//			
+		//		} catch (JSqlException e) {
+		//			throw new RuntimeException(e);
+		//		}
+		//		return null;
 	}
 	
 	/// Stores (and overwrites if needed) key, value pair
@@ -201,15 +201,16 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	public Long put(String key, Long value) {
 		
 		try {
-			long now = currentSystemTimeInSeconds();
-			sqlObj.upsertQuerySet( //
-				sqlTableName, //
-				new String[] { "kID" }, //unique cols
-				new Object[] { key }, //unique value
-				//
-				new String[] { "cTm", "kVl" }, //insert cols
-				new Object[] { now, value } //insert values
-				).execute();
+			//			long now = currentSystemTimeInSeconds();
+			//			sqlObj.upsertQuerySet( //
+			//				sqlTableName, //
+			//				new String[] { "kID" }, //unique cols
+			//				new Object[] { key }, //unique value
+			//				//
+			//				new String[] { "cTm", "kVl" }, //insert cols
+			//				new Object[] { now, value } //insert values
+			//				).execute();
+			upsertQuerySet(key, value);
 			
 		} catch (JSqlException e) {
 			throw new RuntimeException(e);
@@ -314,15 +315,16 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 			Long oldVal = Long.parseLong(r.get("kVl").get(0).toString());
 			Long newVal = oldVal + 1;
 			
-			long now = currentSystemTimeInSeconds();
-			sqlObj.upsertQuerySet( //
-				sqlTableName, //
-				new String[] { "kID" }, //unique cols
-				new Object[] { key }, //unique value
-				//
-				new String[] { "cTm", "kVl" }, //insert cols
-				new Object[] { now, newVal } //insert values
-				).execute();
+			//			long now = currentSystemTimeInSeconds();
+			//			sqlObj.upsertQuerySet( //
+			//				sqlTableName, //
+			//				new String[] { "kID" }, //unique cols
+			//				new Object[] { key }, //unique value
+			//				//
+			//				new String[] { "cTm", "kVl" }, //insert cols
+			//				new Object[] { now, newVal } //insert values
+			//				).execute();
+			upsertQuerySet(key, newVal);
 			
 			return oldVal;
 		} catch (JSqlException e) {
@@ -350,15 +352,16 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 			Long oldVal = Long.parseLong(r.get("kVl").get(0).toString());
 			Long newVal = oldVal + 1;
 			
-			long now = currentSystemTimeInSeconds();
-			sqlObj.upsertQuerySet( //
-				sqlTableName, //
-				new String[] { "kID" }, //unique cols
-				new Object[] { key }, //unique value
-				//
-				new String[] { "cTm", "kVl" }, //insert cols
-				new Object[] { now, newVal } //insert values
-				).execute();
+			//			long now = currentSystemTimeInSeconds();
+			//			sqlObj.upsertQuerySet( //
+			//				sqlTableName, //
+			//				new String[] { "kID" }, //unique cols
+			//				new Object[] { key }, //unique value
+			//				//
+			//				new String[] { "cTm", "kVl" }, //insert cols
+			//				new Object[] { now, newVal } //insert values
+			//				).execute();
+			upsertQuerySet(key, newVal);
 			
 			r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key }).query();
 			
@@ -366,6 +369,18 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	protected void upsertQuerySet(Object key, Object newVal) throws JSqlException {
+		long now = currentSystemTimeInSeconds();
+		sqlObj.upsertQuerySet( //
+			sqlTableName, //
+			new String[] { "kID" }, //unique cols
+			new Object[] { key }, //unique value
+			//
+			new String[] { "cTm", "kVl" }, //insert cols
+			new Object[] { now, newVal } //insert values
+			).execute();
 	}
 	
 	/// Stores (and overwrites if needed) key, value pair

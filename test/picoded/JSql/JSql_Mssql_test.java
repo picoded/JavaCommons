@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.BeforeClass;
 
 import picoded.TestConfig;
 import picoded.JSql.db.JSql_Mssql;

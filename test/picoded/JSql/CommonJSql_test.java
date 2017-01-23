@@ -19,7 +19,13 @@ public class CommonJSql_test {
 	JSql jSql = null;
 	JSql_Mysql jSql_Mysql;
 	JSql_Sqlite jSql_Sqlite = null;
-	protected static String testTableName = "JSqlTest_default" + TestConfig.randomTablePrefix();
+	protected static String testTableName = "CommonTest_default" + TestConfig.randomTablePrefix();
+	
+	@BeforeClass
+	public static void oneTimeSetUp() {
+		// one-time initialization code
+		testTableName = testTableName.toUpperCase();
+	}
 	
 	@Before
 	public void setUp() {

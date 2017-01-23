@@ -26,7 +26,7 @@ import picoded.JSql.db.JSql_Oracle;
 public class JSql_Oracle_test {
 	
 	protected JSql JSqlObj;
-	protected static String testTableName = "JSqlTest_Oracle_" + TestConfig.randomTablePrefix();
+	protected static String testTableName = "JSqlTest_" + TestConfig.randomTablePrefix();
 	
 	@BeforeClass
 	public static void oneTimeSetUp() {

@@ -9,23 +9,15 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.BeforeClass;
 
 import picoded.TestConfig;
 import picoded.JSql.db.JSql_Mssql;
 
 public class JSql_Mssql_test extends JSql_Sqlite_test {
 	
-	protected static String testTableName = "JSqlTest_Mssql_" + TestConfig.randomTablePrefix();
-	
-	@BeforeClass
-	public static void oneTimeSetUp() {
-		// one-time initialization code
-		testTableName = testTableName.toUpperCase();
-	}
-	
 	@Before
 	public void setUp() {
+		testTableName = "MSSQL"+testTableName
 		//create connection
 		JSqlObj = JSql.mssql(TestConfig.MSSQL_CONN(), TestConfig.MSSQL_NAME(),
 			TestConfig.MSSQL_USER(), TestConfig.MSSQL_PASS());

@@ -22,12 +22,11 @@ import picoded.JSql.db.JSql_Sqlite;
 public class JSql_Sqlite_test {
 	
 	protected JSql JSqlObj;
-	protected static String testTableName = "JSqlTest_default";
+	protected static String testTableName = "JSqlTest_" + TestConfig.randomTablePrefix();
 	
 	@BeforeClass
 	public static void oneTimeSetUp() {
 		// one-time initialization code
-		testTableName = "JSqlTest_" + TestConfig.randomTablePrefix();
 		testTableName = testTableName.toUpperCase();
 	}
 	

@@ -22,12 +22,12 @@ public class KeyValueMap_Sqlite_test extends KeyValueMap_test {
 		return JSql.sqlite();
 	}
 	
-	public String tableName = TestConfig.randomTablePrefix();
+	public String tableName = "KVM_" + TestConfig.randomTablePrefix();
 	
 	@Override
 	public KeyValueMap implementationConstructor() {
 		JSqlStruct jsObj = new JSqlStruct(sqlImplmentation());
-		return jsObj.getKeyValueMap("KVM_" + tableName);
+		return jsObj.getKeyValueMap(tableName);
 	}
 	
 	@Test

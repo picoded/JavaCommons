@@ -20,42 +20,42 @@ public class AccountTable_Sqlite_test extends AccountTable_test {
 		return JSql.sqlite();
 	}
 	
-	public String tableName = TestConfig.randomTablePrefix();
+	public String tableName = "AT_" + TestConfig.randomTablePrefix();
 	
 	@Override
 	public AccountTable implementationConstructor() {
 		JSqlStruct jsObj = new JSqlStruct(sqlImplmentation());
-		return jsObj.getAccountTable("AT_" + tableName);
+		return jsObj.getAccountTable(tableName);
 	}
 	
 	@Test
 	public void implementationDefaultConstructor() {
 		JSqlStruct jsObj = new JSqlStruct();
 		jsObj.sqlObj = sqlImplmentation();
-		jsObj.getAccountTable("AT_" + tableName);
+		jsObj.getAccountTable(tableName);
 	}
 	
 	@Test(expected = RuntimeException.class)
 	public void setupAccountTableTest() {
 		JSqlStruct jsObj = new JSqlStruct();
-		jsObj.setupAccountTable("AT_" + tableName);
+		jsObj.setupAccountTable(tableName);
 	}
 	
 	@Test(expected = RuntimeException.class)
 	public void setupKeyValueMapTest() {
 		JSqlStruct jsObj = new JSqlStruct();
-		jsObj.setupKeyValueMap("AT_" + tableName);
+		jsObj.setupKeyValueMap(tableName);
 	}
 	
 	@Test(expected = RuntimeException.class)
 	public void setupAtomicLongMapTest() {
 		JSqlStruct jsObj = new JSqlStruct();
-		jsObj.setupAtomicLongMap("AT_" + tableName);
+		jsObj.setupAtomicLongMap(tableName);
 	}
 	
 	@Test(expected = RuntimeException.class)
 	public void setupMetaTableTest() {
 		JSqlStruct jsObj = new JSqlStruct();
-		jsObj.setupMetaTable("AT_" + tableName);
+		jsObj.setupMetaTable(tableName);
 	}
 }

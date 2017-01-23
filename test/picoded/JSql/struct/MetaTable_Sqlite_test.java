@@ -24,12 +24,12 @@ public class MetaTable_Sqlite_test extends MetaTable_test {
 		return JSql.sqlite();
 	}
 	
-	public String tableName = TestConfig.randomTablePrefix();
+	public String tableName = "MT_" + TestConfig.randomTablePrefix();
 	
 	@Override
 	public MetaTable implementationConstructor() {
 		JSqlStruct jsObj = new JSqlStruct(sqlImplmentation());
-		return jsObj.getMetaTable("MT_" + tableName);
+		return jsObj.getMetaTable(tableName);
 	}
 	
 	// @Test

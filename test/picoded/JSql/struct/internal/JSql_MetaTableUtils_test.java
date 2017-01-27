@@ -31,7 +31,7 @@ public class JSql_MetaTableUtils_test {
 		JSql_MetaTableUtils temp = new JSql_MetaTableUtils();
 	}
 	
-	@Test (expected = Exception.class)
+	@Test(expected = Exception.class)
 	public void fetchResultPositionTest() throws Exception {
 		TempClass temp = new TempClass();
 		assertEquals(1, JSql_MetaTableUtils.fetchResultPosition(temp.getResultSet(), "key", "key", 1));

@@ -138,8 +138,8 @@ public class JSql_Oracle_test {
 		JSqlObj.executeQuery("DROP VIEW IF EXISTS `" + testTableName + "_View`").dispose();
 		
 		JSqlObj.executeQuery(
-			"CREATE VIEW IF NOT EXISTS " + testTableName + "_View AS  SELECT * FROM " + testTableName)
-			.dispose();
+			"CREATE VIEW IF NOT EXISTS `" + testTableName + "_View' AS  SELECT * FROM "
+				+ testTableName).dispose();
 		
 		JSqlObj.executeQuery("DROP VIEW IF EXISTS `" + testTableName + "_View`").dispose();
 		

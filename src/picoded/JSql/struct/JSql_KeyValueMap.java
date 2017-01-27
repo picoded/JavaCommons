@@ -2,7 +2,6 @@ package picoded.JSql.struct;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import picoded.JSql.JSql;
 import picoded.JSql.JSqlException;
@@ -18,7 +17,7 @@ public class JSql_KeyValueMap extends JStruct_KeyValueMap {
 	///--------------------------------------------------------------------------
 	
 	/// Standard java logger
-	private static final Logger LOGGER = Logger.getLogger(JSql_KeyValueMap.class.getName());
+	//	private static final Logger LOGGER = Logger.getLogger(JSql_KeyValueMap.class.getName());
 	
 	private JSql_AtomicLongMap atomicLongMap = null;
 	

@@ -32,13 +32,14 @@ public class JSql_MetaTableUtils_test {
 	
 	@Test(expected = IllegalAccessError.class)
 	public void constructorTest() throws JSqlException {
-		 new JSql_MetaTableUtils();
+		new JSql_MetaTableUtils();
 	}
 	
 	@Test
 	public void fetchResultPositionTest() throws Exception {
 		TempClass temp = new TempClass();
-		assertEquals(-1, JSql_MetaTableUtils.fetchResultPosition(temp.getResultSet(), "key", "key", 1));
+		assertEquals(-1,
+			JSql_MetaTableUtils.fetchResultPosition(temp.getResultSet(), "key", "key", 1));
 	}
 	
 	//@Test
@@ -116,30 +117,57 @@ public class JSql_MetaTableUtils_test {
 	public void fetchResultPositionTest1() throws Exception, JSqlException {
 		JSqlObj.recreate(true);
 		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
-		JSqlObj.query(
-			"CREATE TABLE IF NOT EXISTS " + testTableName + " ( oID INT PRIMARY KEY, kID INT , idx INT, typ varchar(255))")
+		JSqlObj
+			.query(
+				"CREATE TABLE IF NOT EXISTS "
+					+ testTableName
+					+ " ( oID INT PRIMARY KEY, kID INT , idx INT, typ varchar(255), nVl varchar(255), tVl varchar(255))")
 			.dispose();
 		JSqlResult jSqlResult = JSqlObj.query("SELECT * FROM " + testTableName);
 		JSql_MetaTableUtils.fetchResultPosition(jSqlResult, "kID", 401);
 		JSql_MetaTableUtils.extractKeyValue(jSqlResult, "kID");
-		JSqlObj.execute("INSERT INTO " + testTableName + " ( oID, kID, idx, typ ) VALUES (?,?,?,?)", 401, 401, 401, "11");
-		JSqlObj.execute("INSERT INTO " + testTableName + " ( oID, kID, idx, typ  ) VALUES (?,?,?,?)", 402, 402, 402, "11.0f");
-		JSqlObj.execute("INSERT INTO " + testTableName + " ( oID, kID, idx, typ  ) VALUES (?,?,?,?)", 403, 403, 403, "11.0d");
-		JSqlObj.execute("INSERT INTO " + testTableName + " ( oID, kID, idx, typ  ) VALUES (?,?,?,?)", 404, 404, 404, "11l");
-		JSqlObj.execute("INSERT INTO " + testTableName + " ( oID, kID, idx, typ  ) VALUES (?,?,?,?)", 405, 405, 405, "11");
-		JSqlObj.execute("INSERT INTO " + testTableName + " ( oID, kID, idx, typ ) VALUES (?,?,?,?)", 406, 406, 406, "11");
-		JSqlObj.execute("INSERT INTO " + testTableName + " ( oID, kID, idx, typ  ) VALUES (?,?,?,?)", 0, 0, 0, "11");
+		JSqlObj.execute("INSERT INTO " + testTableName
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 401, 401, 401, "21", "21",
+			"21");
+		JSqlObj.execute("INSERT INTO " + testTableName
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 402, 402, 402, "24", "24",
+			"24");
+		JSqlObj.execute("INSERT INTO " + testTableName
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 403, 403, 403, "23", "23",
+			"23");
+		JSqlObj.execute("INSERT INTO " + testTableName
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 405, 405, 405, "25", "25",
+			"25");
+		JSqlObj.execute("INSERT INTO " + testTableName
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 406, 406, 406, "32", "32",
+			"32");
+		JSqlObj.execute("INSERT INTO " + testTableName
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 0, 0, 0, "33", "33", "33");
+		JSqlObj.execute("INSERT INTO " + testTableName
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 1, 1, 1, "31", "31", "31");
+		JSqlObj.execute("INSERT INTO " + testTableName
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 404, 404, 404, "22", "22",
+			"22");
 		jSqlResult = JSqlObj.query("SELECT * FROM " + testTableName);
 		JSql_MetaTableUtils.fetchResultPosition(jSqlResult, "kID", 401);
 		JSql_MetaTableUtils.fetchResultPosition(jSqlResult, "401", "401", 401);
 		JSql_MetaTableUtils.fetchResultPosition(jSqlResult, "kID", "kID", 123);
+		JSql_MetaTableUtils.fetchResultPosition(jSqlResult, "401", "401", 123);
 		JSql_MetaTableUtils.fetchResultPosition(jSqlResult, "401", 401);
-		JSql_MetaTableUtils.extractKeyValue(jSqlResult, "0");
-		JSql_MetaTableUtils.JSqlObjectMapFetch( null, null, null, null, null );
+		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 0);
+		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 1);
+		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 2);
+		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 3);
+		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 4);
+		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 5);
+		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 6);
+		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 7);
 	}
 	
 	@Test(expected = Exception.class)
 	public void JSqlObjectMapFetchTest() throws Exception, JSqlException {
-		JSql_MetaTableUtils.JSqlObjectMapFetch( null, JSqlObj, "test123", "test", new HashMap<String, Object>() );
+		
+		JSql_MetaTableUtils.JSqlObjectMapFetch(null, JSqlObj, "test123", "test",
+			new HashMap<String, Object>());
 	}
 }

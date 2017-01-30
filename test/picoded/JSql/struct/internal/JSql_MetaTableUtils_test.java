@@ -166,6 +166,9 @@ public class JSql_MetaTableUtils_test {
 		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 5);
 		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 6);
 		JSql_MetaTableUtils.extractKeyValue(jSqlResult, "0");
+		JSql_MetaTableUtils.extractObjectMapFromJSqlResult(null, null, null, null);
+		JSql_MetaTableUtils.extractObjectMapFromJSqlResult(null, jSqlResult, "401", null);
+		JSql_MetaTableUtils.extractObjectMapFromJSqlResult(null, jSqlResult, "406", null);
 		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 7);
 	}
 	

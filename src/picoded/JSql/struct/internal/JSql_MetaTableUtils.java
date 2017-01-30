@@ -40,6 +40,7 @@ public class JSql_MetaTableUtils {
 	 * 
 	 */
 	private static Logger LOGGER = Logger.getLogger(JSql_MetaTableUtils.class.getName());
+	private static String FROM = " FROM ";
 	
 	protected JSql_MetaTableUtils() {
 		throw new IllegalAccessError("Utility class");
@@ -63,7 +64,7 @@ public class JSql_MetaTableUtils {
 	///
 	/// @returns   row of the JSqlResult, -1 if failed to find
 	///
-	protected static int fetchResultPosition(JSqlResult r, String _oid, String key, int idx) {
+	protected static int fetchResultPosition(JSqlResult r, String oid, String key, int idx) {
 		List<Object> oID_list = r.get("oID");
 		List<Object> kID_list = r.get("kID");
 		List<Object> idx_list = r.get("idx");
@@ -73,15 +74,18 @@ public class JSql_MetaTableUtils {
 		}
 		for (int i = 0; i < lim; ++i) {
 			
-			if (_oid != null && !_oid.equals(String.valueOf(oID_list.get(i)))) {
+			if ((oid != null && oID_list.get(i) != null)
+				&& !oid.equals(String.valueOf(oID_list.get(i)))) {
 				continue;
 			}
 			
-			if (key != null && !key.equals(String.valueOf(kID_list.get(i)))) {
+			if ((key != null && kID_list.get(i) != null)
+				&& !key.equals(String.valueOf(kID_list.get(i)))) {
 				continue;
 			}
 			
-			if (idx > -9 && idx != ((Number) (idx_list.get(i))).intValue()) {
+			if ((idx > -9 && idx_list.get(i) != null)
+				&& idx != ((Number) (idx_list.get(i))).intValue()) {
 				continue;
 			}
 			
@@ -176,7 +180,7 @@ public class JSql_MetaTableUtils {
 	protected static Object extractNonArrayValueFromPos(JSqlResult r, int pos) {
 		
 		List<Object> typList = r.get("typ");
-		int baseType = Integer.valueOf(typList.get(pos).toString());
+		int baseType = Integer.parseInt(typList.get(pos).toString());
 		
 		// Int, Long, Double, Float
 		if (baseType == MetaType.INTEGER.getValue()) {
@@ -355,7 +359,7 @@ public class JSql_MetaTableUtils {
 		
 		int lim = kID_list.size();
 		for (int i = 0; i < lim; ++i) {
-			if (_oid != null && !_oid.equals(oID_list.get(i))) {
+			if (_oid != null && !_oid.equals(oID_list.get(i).toString())) {
 				continue;
 			}
 			
@@ -419,7 +423,7 @@ public class JSql_MetaTableUtils {
 		StringBuilder select = new StringBuilder("SELECT B.oID AS ");
 		select.append(lBracket + "oID" + rBracket);
 		
-		StringBuilder from = new StringBuilder(" FROM ");
+		StringBuilder from = new StringBuilder(FROM);
 		from.append("(SELECT DISTINCT oID");
 		
 		//
@@ -437,7 +441,7 @@ public class JSql_MetaTableUtils {
 		//
 		//-----------------------------------------
 		
-		from.append(" FROM " + tableName + ")");
+		from.append(FROM + tableName + ")");
 		//from.append( tableName );
 		from.append(" AS B");
 		
@@ -589,7 +593,7 @@ public class JSql_MetaTableUtils {
 			&& ("COUNT(DISTINCT \"oID\") AS rcount".equals(selectedCols) || "DISTINCT \"oID\""
 				.equals(selectedCols))) {
 			// Blank search, quick and easy
-			queryBuilder.append("SELECT " + selectedCols.replaceAll("\\\"", "") + " FROM " + tablename
+			queryBuilder.append("SELECT " + selectedCols.replaceAll("\\\"", "") + FROM + tablename
 				+ "");
 		} else {
 			

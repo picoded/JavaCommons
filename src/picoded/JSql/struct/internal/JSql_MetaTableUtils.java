@@ -36,7 +36,10 @@ import picoded.struct.query.internal.QueryFilter;
 public class JSql_MetaTableUtils {
 	
 	/// Static local logger
-	private static Logger logger = Logger.getLogger(JSql_MetaTableUtils.class.getName());
+	/**
+	 * 
+	 */
+	private static Logger LOGGER = Logger.getLogger(JSql_MetaTableUtils.class.getName());
 	
 	protected JSql_MetaTableUtils() {
 		throw new IllegalAccessError("Utility class");
@@ -64,15 +67,17 @@ public class JSql_MetaTableUtils {
 		List<Object> oID_list = r.get("oID");
 		List<Object> kID_list = r.get("kID");
 		List<Object> idx_list = r.get("idx");
-		
-		int lim = kID_list.size();
+		int lim = 0;
+		if(kID_list!=null){
+			lim = kID_list.size();
+		}
 		for (int i = 0; i < lim; ++i) {
 			
-			if (_oid != null && !_oid.equals(oID_list.get(i))) {
+			if (_oid != null && !_oid.equals(String.valueOf(oID_list.get(i)))) {
 				continue;
 			}
 			
-			if (key != null && !key.equals(kID_list.get(i))) {
+			if (key != null && !key.equals(String.valueOf(kID_list.get(i)))) {
 				continue;
 			}
 			
@@ -171,7 +176,7 @@ public class JSql_MetaTableUtils {
 	protected static Object extractNonArrayValueFromPos(JSqlResult r, int pos) {
 		
 		List<Object> typList = r.get("typ");
-		int baseType = ((Number) (typList.get(pos))).intValue();
+		int baseType = Integer.parseInt(typList.get(pos).toString());
 		
 		// Int, Long, Double, Float
 		if (baseType == MetaType.INTEGER.getValue()) {
@@ -506,7 +511,7 @@ public class JSql_MetaTableUtils {
 				
 			} else {
 				// Unknown MetaType ignored
-				logger.log(Level.WARNING, "sqlComplexLeftJoinQueryBuilder -> Unknown MetaType (" + type
+				LOGGER.log(Level.WARNING, "sqlComplexLeftJoinQueryBuilder -> Unknown MetaType (" + type
 					+ ") - for meta key : " + key);
 			}
 			

@@ -1,40 +1,44 @@
 package picoded.JSql.struct.internal;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import picoded.TestConfig;
 import picoded.JSql.JSql;
 import picoded.JSql.JSqlException;
 import picoded.JSql.JSqlResult;
-import picoded.JSql.struct.JSqlStruct;
-import picoded.JSql.struct.JSql_KeyValueMap;
 import picoded.JSql.struct.JSql_MetaTable;
-import picoded.JStruct.AccountObject;
 import picoded.JStruct.JStruct;
-import picoded.JStruct.MetaObject;
 import picoded.JStruct.MetaType;
 import picoded.JStruct.MetaTypeMap;
 import picoded.JStruct.internal.JStruct_MetaObject;
 
 public class JSql_MetaTableUtils_test {
 	
-	@Test(expected = IllegalAccessError.class)
-	public void constructorTest() throws JSqlException {
-		JSql_MetaTableUtils temp = new JSql_MetaTableUtils();
+	protected static String testTableName = "JSql_MetaTableUtils_" + TestConfig.randomTablePrefix();
+	protected JSql JSqlObj;
+	
+	@Before
+	public void setUp() {
+		JSqlObj = JSql.sqlite();
 	}
 	
-	@Test(expected = Exception.class)
+	@Test(expected = IllegalAccessError.class)
+	public void constructorTest() throws JSqlException {
+		 new JSql_MetaTableUtils();
+	}
+	
+	@Test
 	public void fetchResultPositionTest() throws Exception {
 		TempClass temp = new TempClass();
-		assertEquals(1, JSql_MetaTableUtils.fetchResultPosition(temp.getResultSet(), "key", "key", 1));
+		assertEquals(-1, JSql_MetaTableUtils.fetchResultPosition(temp.getResultSet(), "key", "key", 1));
 	}
 	
 	//@Test
@@ -106,5 +110,36 @@ public class JSql_MetaTableUtils_test {
 			jStruct_MetaObject.put("key5", object);
 			return sqlObj.selectQuerySet(sqlTableName, "DISTINCT kID").query();
 		}
+	}
+	
+	@Test(expected = Exception.class)
+	public void fetchResultPositionTest1() throws Exception, JSqlException {
+		JSqlObj.recreate(true);
+		JSqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose();
+		JSqlObj.query(
+			"CREATE TABLE IF NOT EXISTS " + testTableName + " ( oID INT PRIMARY KEY, kID INT , idx INT, typ varchar(255))")
+			.dispose();
+		JSqlResult jSqlResult = JSqlObj.query("SELECT * FROM " + testTableName);
+		JSql_MetaTableUtils.fetchResultPosition(jSqlResult, "kID", 401);
+		JSql_MetaTableUtils.extractKeyValue(jSqlResult, "kID");
+		JSqlObj.execute("INSERT INTO " + testTableName + " ( oID, kID, idx, typ ) VALUES (?,?,?,?)", 401, 401, 401, "11");
+		JSqlObj.execute("INSERT INTO " + testTableName + " ( oID, kID, idx, typ  ) VALUES (?,?,?,?)", 402, 402, 402, "11.0f");
+		JSqlObj.execute("INSERT INTO " + testTableName + " ( oID, kID, idx, typ  ) VALUES (?,?,?,?)", 403, 403, 403, "11.0d");
+		JSqlObj.execute("INSERT INTO " + testTableName + " ( oID, kID, idx, typ  ) VALUES (?,?,?,?)", 404, 404, 404, "11l");
+		JSqlObj.execute("INSERT INTO " + testTableName + " ( oID, kID, idx, typ  ) VALUES (?,?,?,?)", 405, 405, 405, "11");
+		JSqlObj.execute("INSERT INTO " + testTableName + " ( oID, kID, idx, typ ) VALUES (?,?,?,?)", 406, 406, 406, "11");
+		JSqlObj.execute("INSERT INTO " + testTableName + " ( oID, kID, idx, typ  ) VALUES (?,?,?,?)", 0, 0, 0, "11");
+		jSqlResult = JSqlObj.query("SELECT * FROM " + testTableName);
+		JSql_MetaTableUtils.fetchResultPosition(jSqlResult, "kID", 401);
+		JSql_MetaTableUtils.fetchResultPosition(jSqlResult, "401", "401", 401);
+		JSql_MetaTableUtils.fetchResultPosition(jSqlResult, "kID", "kID", 123);
+		JSql_MetaTableUtils.fetchResultPosition(jSqlResult, "401", 401);
+		JSql_MetaTableUtils.extractKeyValue(jSqlResult, "0");
+		JSql_MetaTableUtils.JSqlObjectMapFetch( null, null, null, null, null );
+	}
+	
+	@Test(expected = Exception.class)
+	public void JSqlObjectMapFetchTest() throws Exception, JSqlException {
+		JSql_MetaTableUtils.JSqlObjectMapFetch( null, JSqlObj, "test123", "test", new HashMap<String, Object>() );
 	}
 }

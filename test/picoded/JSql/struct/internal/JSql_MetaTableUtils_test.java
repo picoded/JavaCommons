@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -169,6 +170,12 @@ public class JSql_MetaTableUtils_test {
 		JSql_MetaTableUtils.extractObjectMapFromJSqlResult(null, null, null, null);
 		JSql_MetaTableUtils.extractObjectMapFromJSqlResult(null, jSqlResult, "401", null);
 		JSql_MetaTableUtils.extractObjectMapFromJSqlResult(null, jSqlResult, "406", null);
+		MetaTypeMap mtm = new MetaTypeMap();
+		mtm.put("text", MetaType.TEXT);
+		mtm.put("json", MetaType.JSON);
+		List<Object> queryArgs = new ArrayList<Object>();
+		queryArgs.add("test");
+		JSql_MetaTableUtils.sqlComplexLeftJoinQueryBuilder(JSqlObj, testTableName, mtm, queryArgs);
 		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 7);
 	}
 	

@@ -40,7 +40,10 @@ public class JSql_MetaTableUtils {
 	 * 
 	 */
 	private static Logger LOGGER = Logger.getLogger(JSql_MetaTableUtils.class.getName());
-	private static String FROM = " FROM ";
+	private static final String FROM = " FROM ";
+	private static final String JOIN = " JOIN ";
+	private static final String KID = ".kID = ?";
+	private static final String ANDS = " AND S";
 	
 	protected JSql_MetaTableUtils() {
 		throw new IllegalAccessError("Utility class");
@@ -243,7 +246,7 @@ public class JSql_MetaTableUtils {
 	///
 	public static void JSqlObjectMapAppend( //
 		MetaTypeMap mtm, //
-		JSql sql, String tName, String _oid, //
+		JSql sql, String tName, String oid, //
 		Map<String, Object> objMap, Set<String> keyList, //
 		boolean optimizeAppend //
 	) throws JSqlException {
@@ -266,7 +269,7 @@ public class JSql_MetaTableUtils {
 				
 				if (k.length() > 64) {
 					throw new RuntimeException(
-						"Attempted to insert a key value larger then 64 for (_oid = " + _oid + "): " + k);
+						"Attempted to insert a key value larger then 64 for (_oid = " + oid + "): " + k);
 				}
 				
 				// Checks if keyList given, if so skip if not on keyList
@@ -282,7 +285,7 @@ public class JSql_MetaTableUtils {
 					if ("oid".equalsIgnoreCase(k) || "_oid".equalsIgnoreCase(k)) {
 						continue;
 					}
-					sql.deleteQuerySet(tName, "oID=? AND kID=?", new Object[] { _oid, k }).execute();
+					sql.deleteQuerySet(tName, "oID=? AND kID=?", new Object[] { oid, k }).execute();
 				} else {
 					// Converts it into a type set, and store it
 					typSet = valueToOptionSet(mtm, k, v);
@@ -291,7 +294,7 @@ public class JSql_MetaTableUtils {
 					sql.upsertQuerySet( //
 						tName, //
 						new String[] { "oID", "kID", "idx" }, //
-						new Object[] { _oid, k, 0 }, //
+						new Object[] { oid, k, 0 }, //
 						//
 						new String[] { "typ", "nVl", "sVl", "tVl" }, //
 						new Object[] { typSet[0], typSet[1], typSet[2], typSet[3] }, //
@@ -320,13 +323,13 @@ public class JSql_MetaTableUtils {
 	///
 	public static Map<String, Object> JSqlObjectMapFetch( //
 		MetaTypeMap mtm, JSql sql, //
-		String sqlTableName, String _oid, //
+		String sqlTableName, String oid, //
 		Map<String, Object> ret //
 	) {
 		try {
-			JSqlResult r = sql.selectQuerySet(sqlTableName, "*", "oID=?", new Object[] { _oid })
+			JSqlResult r = sql.selectQuerySet(sqlTableName, "*", "oID=?", new Object[] { oid })
 				.query();
-			return extractObjectMapFromJSqlResult(mtm, r, _oid, ret);
+			return extractObjectMapFromJSqlResult(mtm, r, oid, ret);
 		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
@@ -342,7 +345,7 @@ public class JSql_MetaTableUtils {
 	///
 	public static Map<String, Object> extractObjectMapFromJSqlResult(//
 		MetaTypeMap mtm, JSqlResult r, //
-		String _oid, Map<String, Object> ret //
+		String oid, Map<String, Object> ret //
 	) {
 		if (r == null) {
 			return ret;
@@ -359,7 +362,7 @@ public class JSql_MetaTableUtils {
 		
 		int lim = kID_list.size();
 		for (int i = 0; i < lim; ++i) {
-			if (_oid != null && !_oid.equals(oID_list.get(i).toString())) {
+			if (oid != null && !oid.equals(oID_list.get(i).toString())) {
 				continue;
 			}
 			
@@ -387,14 +390,16 @@ public class JSql_MetaTableUtils {
 	///
 	/// The complex left inner join StringBuilder used for view / query requests
 	///
-	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
+	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". 
+	/// This can end up badly for SAAS build
 	///
 	/// @params  sql connection used, this is used to detect vendor specific logic =(
 	/// @params  meta table name, used to pull the actual data the view is based on
 	/// @params  type mapping to build the complex view from
 	/// @params  additional arguments needed to build the query
 	///
-	/// @returns StringBuilder for the view building statement, this can be used for creating permenant view / queries
+	/// @returns StringBuilder for the view building statement, 
+	/// this can be used for creating permenant view / queries
 	///
 	protected static StringBuilder sqlComplexLeftJoinQueryBuilder(JSql sql, String tableName,
 		MetaTypeMap mtm, List<Object> queryArgs) {
@@ -469,9 +474,9 @@ public class JSql_MetaTableUtils {
 				select.append(", N" + joinCount + ".nVl AS ");
 				select.append(lBracket + key + rBracket);
 				
-				from.append(" " + joinType + " JOIN " + tableName + " AS N" + joinCount);
+				from.append(" " + joinType + JOIN + tableName + " AS N" + joinCount);
 				from.append(" ON B.oID = N" + joinCount + ".oID");
-				from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = ?");
+				from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + KID);
 				
 				queryArgs.add(key);
 				
@@ -483,18 +488,18 @@ public class JSql_MetaTableUtils {
 				select.append(", S" + joinCount + ".sVl AS ");
 				select.append(lBracket + key + lowerCaseSuffix + rBracket);
 				
-				from.append(" " + joinType + " JOIN " + tableName + " AS S" + joinCount);
+				from.append(" " + joinType + JOIN + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
 				
 				// Key based seperation
-				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = ?");
+				from.append(ANDS + joinCount + ".idx = 0 AND S" + joinCount + KID);
 				queryArgs.add(key);
 				
 				//
 				// Numeric value = 0, index optimization (to reimplment in future)
 				// Disabled, as it PREVENTS sorting of numeric value via the string index (to be optimized later)
 				//
-				// from.append(" AND S" + joinCount + ".nVl = ? ");
+				// from.append(ANDS + joinCount + ".nVl = ? ");
 				// queryArgs.add(0.0);
 				
 			} else if (type == MetaType.TEXT) {
@@ -502,15 +507,15 @@ public class JSql_MetaTableUtils {
 				select.append(", S" + joinCount + ".tVl AS ");
 				select.append(lBracket + key + rBracket);
 				
-				from.append(" " + joinType + " JOIN " + tableName + " AS S" + joinCount);
+				from.append(" " + joinType + JOIN + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
 				
 				// Key based seperation
-				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = ?");
+				from.append(ANDS + joinCount + ".idx = 0 AND S" + joinCount + KID);
 				queryArgs.add(key);
 				
 				// Numeric value = 0, index optimization
-				from.append(" AND S" + joinCount + ".nVl = ? ");
+				from.append(ANDS + joinCount + ".nVl = ? ");
 				queryArgs.add(0.0);
 				
 			} else {

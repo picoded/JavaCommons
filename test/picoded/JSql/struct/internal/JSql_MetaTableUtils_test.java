@@ -5,7 +5,9 @@ import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -163,12 +165,23 @@ public class JSql_MetaTableUtils_test {
 		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 4);
 		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 5);
 		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 6);
+		JSql_MetaTableUtils.extractKeyValue(jSqlResult, "0");
 		JSql_MetaTableUtils.extractNonArrayValueFromPos(jSqlResult, 7);
 	}
 	
 	@Test(expected = Exception.class)
 	public void JSqlObjectMapFetchTest() throws Exception, JSqlException {
-		
+		Set<String> keyList = new HashSet<String>();
+		keyList.add("_otm");
+		keyList.add("oid");
+		keyList.add("_oid");
+		keyList.add("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+		Map<String, Object> objMap = new HashMap<String, Object>();
+		JSql_MetaTableUtils.JSqlObjectMapAppend(null, null, null, null, objMap, keyList, false);
+	}
+	
+	@Test(expected = Exception.class)
+	public void JSqlObjectMapFetchTest1() throws Exception, JSqlException {
 		JSql_MetaTableUtils.JSqlObjectMapFetch(null, JSqlObj, "test123", "test",
 			new HashMap<String, Object>());
 	}

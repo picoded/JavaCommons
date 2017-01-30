@@ -68,7 +68,7 @@ public class JSql_MetaTableUtils {
 		List<Object> kID_list = r.get("kID");
 		List<Object> idx_list = r.get("idx");
 		int lim = 0;
-		if ((kID_list != null && kID_list != null) && idx_list != null) {
+		if ((oID_list != null && kID_list != null) && idx_list != null) {
 			lim = kID_list.size();
 		}
 		for (int i = 0; i < lim; ++i) {
@@ -266,9 +266,9 @@ public class JSql_MetaTableUtils {
 				}
 				
 				// Checks if keyList given, if so skip if not on keyList
-				if (keyList != null && !keyList.contains(k)) {
+				/*if (keyList != null && !keyList.contains(k)) {
 					continue;
-				}
+				}*/
 				
 				// Get the value to insert
 				v = objMap.get(k);

@@ -121,33 +121,35 @@ public class JSql_MetaTableUtils_test {
 			.query(
 				"CREATE TABLE IF NOT EXISTS "
 					+ testTableName
-					+ " ( oID INT PRIMARY KEY, kID INT , idx INT, typ varchar(255), nVl varchar(255), tVl varchar(255))")
+					+ " ( oID INT PRIMARY KEY, kID INT , idx INT, typ varchar(255), nVl integer, tVl varchar(255))")
 			.dispose();
 		JSqlResult jSqlResult = JSqlObj.query("SELECT * FROM " + testTableName);
 		JSql_MetaTableUtils.fetchResultPosition(jSqlResult, "kID", 401);
 		JSql_MetaTableUtils.extractKeyValue(jSqlResult, "kID");
 		JSqlObj.execute("INSERT INTO " + testTableName
-			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 401, 401, 401, "21", "21",
-			"21");
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 401, 401, 401, "21", 21,
+			"2112312312312312");
 		JSqlObj.execute("INSERT INTO " + testTableName
-			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 402, 402, 402, "24", "24",
-			"24");
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 402, 402, 402, "24", 24,
+			"2423123123123133");
 		JSqlObj.execute("INSERT INTO " + testTableName
-			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 403, 403, 403, "23", "23",
-			"23");
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 403, 403, 403, "23", 23,
+			"2123123123112333");
 		JSqlObj.execute("INSERT INTO " + testTableName
-			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 405, 405, 405, "25", "25",
-			"25");
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 405, 405, 405, "25", 25,
+			"2123123123123125");
 		JSqlObj.execute("INSERT INTO " + testTableName
-			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 406, 406, 406, "32", "32",
-			"32");
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 406, 406, 406, "32", 32,
+			"1231231231231231");
 		JSqlObj.execute("INSERT INTO " + testTableName
-			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 0, 0, 0, "33", "33", "33");
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 0, 0, 0, "33", 33,
+			"1231231231231231");
 		JSqlObj.execute("INSERT INTO " + testTableName
-			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 1, 1, 1, "31", "31", "31");
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 1, 1, 1, "31", 31,
+			"1231231231231231");
 		JSqlObj.execute("INSERT INTO " + testTableName
-			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 404, 404, 404, "22", "22",
-			"22");
+			+ " ( oID, kID, idx, typ, nVl, tVl ) VALUES (?,?,?,?,?,?)", 404, 404, 404, 22, 22,
+			"1231231231231231");
 		jSqlResult = JSqlObj.query("SELECT * FROM " + testTableName);
 		JSql_MetaTableUtils.fetchResultPosition(jSqlResult, "kID", 401);
 		JSql_MetaTableUtils.fetchResultPosition(jSqlResult, "401", "401", 401);

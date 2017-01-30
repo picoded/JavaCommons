@@ -68,7 +68,7 @@ public class JSql_MetaTableUtils {
 		List<Object> kID_list = r.get("kID");
 		List<Object> idx_list = r.get("idx");
 		int lim = 0;
-		if (kID_list != null && kID_list != null && idx_list != null) {
+		if ((kID_list != null && kID_list != null) && idx_list != null) {
 			lim = kID_list.size();
 		}
 		for (int i = 0; i < lim; ++i) {
@@ -176,15 +176,15 @@ public class JSql_MetaTableUtils {
 	protected static Object extractNonArrayValueFromPos(JSqlResult r, int pos) {
 		
 		List<Object> typList = r.get("typ");
-		int baseType = Integer.parseInt(typList.get(pos).toString());
+		int baseType = Integer.valueOf(typList.get(pos).toString());
 		
 		// Int, Long, Double, Float
 		if (baseType == MetaType.INTEGER.getValue()) {
-			return Integer.valueOf(r.get("nVl").get(pos).toString());
+			return Integer.valueOf(((Number) (r.get("nVl").get(pos))).intValue());
 		} else if (baseType == MetaType.FLOAT.getValue()) {
-			return Float.valueOf(r.get("nVl").get(pos).toString());
+			return Float.valueOf(((Number) (r.get("nVl").get(pos))).floatValue());
 		} else if (baseType == MetaType.DOUBLE.getValue()) {
-			return Double.valueOf(r.get("nVl").get(pos).toString());
+			return Double.valueOf(((Number) (r.get("nVl").get(pos))).doubleValue());
 		} else if (baseType == MetaType.STRING.getValue() || baseType == MetaType.TEXT.getValue()) { // String OR Text
 			return r.get("tVl").get(pos);
 			//		} else if (baseType == MetaType.TEXT.getValue()) { // Text

@@ -117,9 +117,9 @@ public class AtomicLongMap_Sqlite_test extends AtomicLongMap_test {
 	}
 	
 	@Test(expected = Exception.class)
-	public void systemSetupTest()throws Exception{
+	public void systemSetupTest() throws Exception {
 		JSql_AtomicLongMap jsObj = new JSql_AtomicLongMap(sqlImplmentation(), "");
-		jsObj.sqlObj=null;
+		jsObj.sqlObj = null;
 		jsObj.systemSetup();
 	}
 }

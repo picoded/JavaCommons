@@ -19,18 +19,18 @@ public class AtomicLongMap_Sqlite_test extends AtomicLongMap_test {
 		return JSql.sqlite();
 	}
 	
-	public String tableName = "ALM_" + TestConfig.randomTablePrefix();
+	public String tableName = TestConfig.randomTablePrefix();
 	
 	@Override
 	public AtomicLongMap implementationConstructor() {
 		JSqlStruct jsObj = new JSqlStruct(sqlImplmentation());
-		return jsObj.getAtomicLongMap(tableName);
+		return jsObj.getAtomicLongMap("ALM_" + tableName);
 	}
 	
 	@Test(expected = RuntimeException.class)
 	public void getExceptionTest() {
 		JSql_AtomicLongMap jsObj = new JSql_AtomicLongMap(sqlImplmentation(), "");
-		jsObj.get(tableName);
+		jsObj.get("ALM_" + tableName);
 	}
 	
 	@Test(expected = RuntimeException.class)
@@ -109,10 +109,17 @@ public class AtomicLongMap_Sqlite_test extends AtomicLongMap_test {
 	
 	@Test
 	public void getAndAddTest() {
-		//JSql_AtomicLongMap jsObj = new JSql_AtomicLongMap(sqlImplmentation(), tableName);
+		//JSql_AtomicLongMap jsObj = new JSql_AtomicLongMap(sqlImplmentation(), "ALM_" + tableName);
 		almObj.put("hello", 1);
 		almObj.systemSetup();
 		assertEquals(Long.valueOf(1), almObj.getAndAdd("hello", Long.valueOf(2)));
 		assertEquals(Long.valueOf(3), almObj.get("hello"));
+	}
+	
+	@Test(expected = Exception.class)
+	public void systemSetupTest()throws Exception{
+		JSql_AtomicLongMap jsObj = new JSql_AtomicLongMap(sqlImplmentation(), "");
+		jsObj.sqlObj=null;
+		jsObj.systemSetup();
 	}
 }

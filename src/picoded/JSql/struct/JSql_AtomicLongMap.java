@@ -49,6 +49,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	/// Value field type
 	protected String valueColumnType = "VARCHAR(MAX)";
 	
+	protected String kID = "kID=?";
 	///
 	/// Backend system setup / teardown
 	///--------------------------------------------------------------------------
@@ -101,7 +102,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 					sqlTableName, "kVl", null, "valMap" //
 				).execute();
 			}
-		} catch (JSqlException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -227,7 +228,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 		
 		try {
 			// Search for the key
-			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key })
+			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", kID, new Object[] { key })
 				.query();
 			if (r != null && r.rowCount() > 0) {
 				return Long.parseLong(r.get("kVl").get(0).toString());
@@ -252,7 +253,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 			Long oldVal = null;
 			while (tries < limit) {
 				
-				JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key })
+				JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", kID, new Object[] { key })
 					.query();
 				
 				oldVal = Long.parseLong(r.get("kVl").get(0).toString());
@@ -268,7 +269,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 			throw new RuntimeException("Max tries reached.");
 			// return oldVal;
 			// Search for the key
-			// JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key }).query();
+			// JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", kID, new Object[] { key }).query();
 			// long expiry = getExpiryRaw(r);
 			//
 			// if (expiry != 0 && expiry < now) {
@@ -304,7 +305,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 		
 		try {
 			// Search for the key
-			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key })
+			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", kID, new Object[] { key })
 				.query();
 			// long expiry = getExpiryRaw(r);
 			//
@@ -341,7 +342,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	public Long incrementAndGet(Object key) {
 		try {
 			// Search for the key
-			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key })
+			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "*", kID, new Object[] { key })
 				.query();
 			// long expiry = getExpiryRaw(r);
 			//
@@ -363,7 +364,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 			//				).execute();
 			upsertQuerySet(key, newVal);
 			
-			r = sqlObj.selectQuerySet(sqlTableName, "*", "kID=?", new Object[] { key }).query();
+			r = sqlObj.selectQuerySet(sqlTableName, "*", kID, new Object[] { key }).query();
 			
 			return Long.parseLong(r.get("kVl").get(0).toString());
 		} catch (JSqlException e) {

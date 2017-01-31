@@ -113,11 +113,7 @@ public class JSql_AtomicLongMap extends JStruct_AtomicLongMap {
 	/// @TODO properly handle this: Especially adding (and testing) the IF EXISTS clause
 	@Override
 	public void systemTeardown() {
-		try {
-			sqlObj.execute("DROP TABLE IF EXISTS " + sqlTableName); //IF EXISTS
-		} catch (JSqlException e) {
-			LOGGER.log(Level.SEVERE, "systemTeardown JSqlException (@TODO properly handle this): ", e);
-		}
+		new JSql_MetaTable(sqlObj, sqlTableName).systemTeardown();
 	}
 	
 	/// Perform maintenance, mainly removing of expired data if applicable

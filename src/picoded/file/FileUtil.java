@@ -122,8 +122,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @return File string value (US-ASCII encoding)
 	///
-	public static String readFileToString(File inFile) throws IOException {
-		return picoded.file.FileUtil.readFileToString(inFile, (String) null);
+	public static String readFileToString(File inFile) {
+		return FileUtil.readFileToString(inFile, (String) null);
 	}
 	
 	///
@@ -134,11 +134,15 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @return File string value with given encoding
 	///
-	public static String readFileToString(File inFile, String encoding) throws IOException {
-		if (encoding == null || encoding.isEmpty()) {
-			encoding = "US-ASCII";
+	public static String readFileToString(File inFile, String encoding) {
+		try {
+			if (encoding == null || encoding.isEmpty()) {
+				encoding = "US-ASCII";
+			}
+			return org.apache.commons.io.FileUtils.readFileToString(inFile, encoding);
+		} catch(IOException e) {
+			throw new RuntimeException(e);
 		}
-		return org.apache.commons.io.FileUtils.readFileToString(inFile, encoding);
 	}
 	
 	///
@@ -149,8 +153,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param File to read
 	/// @param String data to write 
 	///
-	public static void writeStringToFile(File inFile, String data) throws IOException {
-		picoded.file.FileUtil.writeStringToFile(inFile, data, (String) null);
+	public static void writeStringToFile(File inFile, String data) {
+		FileUtil.writeStringToFile(inFile, data, (String) null);
 	}
 	
 	///
@@ -160,12 +164,15 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param String data to write 
 	/// @param Encoding string value to use - Null value assumes encoding with US-ASCII
 	///
-	public static void writeStringToFile(File inFile, String data, String encoding)
-		throws IOException {
-		if (encoding == null || encoding.isEmpty()) {
-			encoding = "US-ASCII";
+	public static void writeStringToFile(File inFile, String data, String encoding) {
+		try {
+			if (encoding == null || encoding.isEmpty()) {
+				encoding = "US-ASCII";
+			}
+			org.apache.commons.io.FileUtils.writeStringToFile(inFile, data, encoding);
+		} catch(IOException e) {
+			throw new RuntimeException(e);
 		}
-		org.apache.commons.io.FileUtils.writeStringToFile(inFile, data, encoding);
 	}
 	
 	///
@@ -179,9 +186,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @returns the file value if possible, else returns the fallback value
 	///
-	public static String readFileToString_withFallback(File inFile, String fallback)
-		throws IOException {
-		return picoded.file.FileUtil.readFileToString_withFallback(inFile, fallback, null);
+	public static String readFileToString_withFallback(File inFile, String fallback) {
+		return FileUtil.readFileToString_withFallback(inFile, fallback, null);
 	}
 	
 	///
@@ -195,13 +201,12 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @returns the file value if possible, else returns the fallback value
 	///
-	public static String readFileToString_withFallback(File inFile, String fallback, String encoding)
-		throws IOException {
+	public static String readFileToString_withFallback(File inFile, String fallback, String encoding) {
 		if (inFile == null || !inFile.exists()) {
 			return fallback;
 		}
 		
-		return picoded.file.FileUtil.readFileToString(inFile, encoding);
+		return FileUtil.readFileToString(inFile, encoding);
 	}
 	
 	///
@@ -215,8 +220,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @returns the boolean indicating true if file was written to
 	///
-	public static boolean writeStringToFile_ifDifferant(File inFile, String data, String encoding)
-		throws IOException {
+	public static boolean writeStringToFile_ifDifferant(File inFile, String data, String encoding) {
 		String original = readFileToString_withFallback(inFile, "", encoding);
 		if (original.equals(data)) {
 			return false;
@@ -233,8 +237,8 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	///
 	/// @returns the boolean indicating true if file was written to
 	///
-	public static boolean writeStringToFile_ifDifferant(File inFile, String data) throws IOException {
-		return picoded.file.FileUtil.writeStringToFile_ifDifferant(inFile, data, null);
+	public static boolean writeStringToFile_ifDifferant(File inFile, String data) {
+		return FileUtil.writeStringToFile_ifDifferant(inFile, data, null);
 	}
 	
 	///
@@ -243,7 +247,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param folder to scan and copy from
 	/// @param folder to copy into
 	///
-	public static void copyDirectory_ifDifferent(File inDir, File outDir) throws IOException {
+	public static void copyDirectory_ifDifferent(File inDir, File outDir) {
 		copyDirectory_ifDifferent(inDir, outDir, true);
 	}
 	
@@ -254,8 +258,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param folder to copy into
 	/// @param Indicate if file timestamps should follow the original file, when the copy occurs
 	///
-	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate)
-		throws IOException {
+	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate) {
 		//default symlink is false : This is considered advance behaviour
 		copyDirectory_ifDifferent(inDir, outDir, preserveFileDate, false);
 	}
@@ -269,7 +272,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param indicate if symbolic link should be used when possible for "copying" files
 	///
 	public static void copyDirectory_ifDifferent(File inDir, File outDir, boolean preserveFileDate,
-		boolean tryToSymLinkFiles) throws IOException {
+		boolean tryToSymLinkFiles) {
 		File[] dir_inDir = inDir.listFiles();
 		for (int i = 0; i < dir_inDir.length; i++) {
 			File infile = dir_inDir[i];
@@ -290,7 +293,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param file to scan and copy from
 	/// @param file to copy into
 	///
-	public static void copyFile_ifDifferent(File inFile, File outFile) throws IOException {
+	public static void copyFile_ifDifferent(File inFile, File outFile) {
 		copyFile_ifDifferent(inFile, outFile, true);
 	}
 	
@@ -301,8 +304,7 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param file to copy into
 	/// @param Indicate if file timestamps should follow the original file, when the copy occurs
 	///
-	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate)
-		throws IOException {
+	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate) {
 		//default symlink is false :This is considered advance behaviour
 		copyFile_ifDifferent(inFile, outFile, preserveFileDate, false);
 	}
@@ -316,54 +318,58 @@ public class FileUtil extends org.apache.commons.io.FileUtils {
 	/// @param indicate if symbolic link should be used when possible for "copying" files
 	///
 	public static void copyFile_ifDifferent(File inFile, File outFile, boolean preserveFileDate,
-		boolean tryToSymLinkFiles) throws IOException {
-		// Checks if the output file is already a symbolic link
-		// And if its points to the same file. 
-		//
-		// If so, both is practically the same final file when 
-		// linked, hence the file is considered "not different"
-		//------------------------------------------------------------
-		if (Files.isSymbolicLink(outFile.toPath())
-			&& Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath())) {
-			// Gets the symbolic link source file path, and checks if it points to source file.
+		boolean tryToSymLinkFiles) {
+		try {
+			// Checks if the output file is already a symbolic link
+			// And if its points to the same file. 
 			//
-			// See: http://stackoverflow.com/questions/29368308/java-nio-how-is-path-issamefile-different-from-path-equals
-			// for why is `Files.isSameFile()` used
-			//
-			// If it points to the same file, the symbolic link is valid
-			// No copy operations is required.
-			return;
-		}
-		
-		// Tries to build symlink if possible, hopefully
-		if (tryToSymLinkFiles) {
-			// NOTE: You do not test source file for symbolic link
-			// Only the detination file should be a symbolic link.
+			// If so, both is practically the same final file when 
+			// linked, hence the file is considered "not different"
 			//------------------------------------------------------------
+			if (Files.isSymbolicLink(outFile.toPath())
+				&& Files.isSameFile(Files.readSymbolicLink(outFile.toPath()), inFile.toPath())) {
+				// Gets the symbolic link source file path, and checks if it points to source file.
+				//
+				// See: http://stackoverflow.com/questions/29368308/java-nio-how-is-path-issamefile-different-from-path-equals
+				// for why is `Files.isSameFile()` used
+				//
+				// If it points to the same file, the symbolic link is valid
+				// No copy operations is required.
+				return;
+			}
 			
-			//
-			// Assumes output file is either NOT a symbolic link
-			// or has the wrong symbolic link reference.
-			//
-			// Creates a symbolic link of the outfile, 
-			// relative to the in file (if possible)
-			//
-			//------------------------------------------------------------
-			Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath()
-				.toAbsolutePath());
-		}
-		
-		// Checks if file has not been modified, and has same data length, for skipping?
-		//---------------------------------------------------------------------------------
-		if (inFile.lastModified() == outFile.lastModified() && inFile.length() == outFile.length()) {
-			// returns and skip for optimization
-			return;
-		}
-		
-		// Final fallback behaviour, copies file if content differs.
-		//---------------------------------------------------------------------------------
-		if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null)) {
-			copyFile(inFile, outFile, preserveFileDate);
+			// Tries to build symlink if possible, hopefully
+			if (tryToSymLinkFiles) {
+				// NOTE: You do not test source file for symbolic link
+				// Only the detination file should be a symbolic link.
+				//------------------------------------------------------------
+				
+				//
+				// Assumes output file is either NOT a symbolic link
+				// or has the wrong symbolic link reference.
+				//
+				// Creates a symbolic link of the outfile, 
+				// relative to the in file (if possible)
+				//
+				//------------------------------------------------------------
+				Files.createSymbolicLink(outFile.toPath().toAbsolutePath(), inFile.toPath()
+					.toAbsolutePath());
+			}
+			
+			// Checks if file has not been modified, and has same data length, for skipping?
+			//---------------------------------------------------------------------------------
+			if (inFile.lastModified() == outFile.lastModified() && inFile.length() == outFile.length()) {
+				// returns and skip for optimization
+				return;
+			}
+			
+			// Final fallback behaviour, copies file if content differs.
+			//---------------------------------------------------------------------------------
+			if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null)) {
+				copyFile(inFile, outFile, preserveFileDate);
+			}
+		} catch(IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 	

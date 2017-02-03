@@ -17,7 +17,9 @@ import picoded.web._RequestHttp.ResponseHttp_websocket;
 ///
 /// Aka: KISS (for) the user programmer (using) this class (api)
 ///
-/// KISS: Keep It Simple Stupid
+/// KISS: Keep It Simple Stupid.
+///
+/// @TODO : A Map<String,String>, String[] String[], Map<String,Object> request version
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.java}
 ///

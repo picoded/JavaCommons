@@ -23,10 +23,11 @@ import org.apache.commons.io.output.NullOutputStream;
 
 ///
 /// Direct 1-to-1 replacement to apache FileUtils. With one major "catch",
-/// There are no IOExceptions, they are all reduced to RuntimeException.
 ///
 /// All documentations here is copied from apache commons, trimmed down where necessary.
 /// All deprecated functions are removed, to break things.
+///
+/// And: There are no IOExceptions, they are all reduced to RuntimeException.
 ///
 /// Blasphamy!
 ///

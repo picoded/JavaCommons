@@ -12,15 +12,19 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 ///
-/// Extension of apache FileUtils, for some additional features that we needed.
+/// Extension of FileUtilBase, for some additional non-apache, features that we needed.
 /// Additionally several FilenameUtils is made avaliable here.
 ///
 /// To clarify, this class inherits all the apache FileUtils functions, and serves as a somewhat 
 /// (different classname) drop in replacement
 ///
+/// But: There are no IOExceptions, they are all reduced to RuntimeException.
+///
+/// Blasphamy!
+///
 /// @See https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtil.html
 ///
-public class FileUtil extends org.apache.commons.io.FileUtils {
+public class FileUtil extends FileUtilBase {
 	
 	/// Invalid constructor (throws exception)
 	protected FileUtil() {

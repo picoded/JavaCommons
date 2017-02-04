@@ -580,7 +580,7 @@ public class FileUtil extends FileUtilBase {
 		if (inFile == null || !inFile.exists()) {
 			return keyList;
 		}
-		//check folder Prefix is not empt
+		//check folder Prefix is not empty
 		if (StringUtils.isEmpty(folderPrefix)) {
 			folderPrefix = "";
 		}

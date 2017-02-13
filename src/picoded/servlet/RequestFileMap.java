@@ -17,12 +17,14 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 
 import picoded.struct.GenericConvertMap;
+import picoded.struct.GenericConvertHashMap;
+import picoded.struct.UnsupportedDefaultMap;
 import picoded.conv.ConvertJSON;
 
 ///
 /// Class map, that handles file uploads in RequestMap
 ///
-public class RequestFileMap extends HashMap<String, InputStream>  {
+public class RequestFileMap extends GenericConvertHashMap<String, String>  {
 	
 	/// Inner DiskFileItem mapping
 	protected Map<String,DiskFileItem> diskItemMap = new HashMap<String,DiskFileItem>();
@@ -45,12 +47,54 @@ public class RequestFileMap extends HashMap<String, InputStream>  {
 		diskItemMap.put(filepath, diskItem);
 		
 		// Get the output stream
-		put(filepath, diskItem.getInputStream());
+		put(filepath, "");
 	}
 	
 	/// Mirrors to diskItemMap
-	public void writeToFile(String filePath, File file) throws Exception {
-		diskItemMap.get(filePath).write(file);
+	public void writeToFile(String filePath, File file) {
+		try {
+			if( diskItemMap.get(filePath) != null ) {
+				diskItemMap.get(filePath).write(file);
+			}
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
+	/// Converts stream to byyte array
+	public InputStream getInputStream(String filePath) {
+		try {
+			if( diskItemMap.get(filePath) != null ) {
+				return diskItemMap.get(filePath).getInputStream();
+			}
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+		return null;
+	}
+	
+	/// Converts stream to byyte array
+	public byte[] getByteArray(String filePath) {
+		if( diskItemMap.get(filePath) != null ) {
+			return diskItemMap.get(filePath).get();
+		}
+		return null;
+	}
+	
+	/// Converts to string object
+	public String getString(String filePath) {
+		try {
+			if( diskItemMap.get(filePath) != null ) {
+				return diskItemMap.get(filePath).getString("UTF-8");
+			}
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+		return null;
+	}
+	
+	/// Fetch the string object
+	public String get(Object key) {
+		return getString(key.toString());
+	}
 }

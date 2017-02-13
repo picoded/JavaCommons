@@ -22,6 +22,11 @@ import picoded.RESTBuilder.*;
 public class CoreApiPage_test {
 	
 	//
+	// The test folders to use
+	//
+	File testFolder = new File("./test-files/test-specific/servlet/CoreApiPage/");
+	
+	//
 	// The test vars to use
 	//
 	int testPort = 0; //Test port to use
@@ -66,7 +71,6 @@ public class CoreApiPage_test {
 	//
 	// Assertion
 	//
-	
 	@Test
 	public void simpleHelloWorldTest() {
 		assertNotNull( testServlet = new EmbeddedServlet(testPort, new SimpleEcho()) );
@@ -86,6 +90,55 @@ public class CoreApiPage_test {
 		
 		Map<String,File[]> blankFileMap = new HashMap<String,File[]>();
 		assertEquals( testString, RequestHttp.post(testUrl, args, blankFileMap).toString().trim() );
+	}
+	
+	//
+	// File upload assertion
+	//
+	public static class SimpleFile extends CoreApiPage {
+		
+		// Result fetching
+		public static RESTFunction testEcho = (req, res) -> {
+			assertEquals( "hello", req.getString("msg") );
+			
+			Object fileObj = null;
+			assertNotNull( fileObj = req.get("file") );
+			
+			assertTrue( fileObj instanceof RequestFileMap );
+			RequestFileMap fileMap = (RequestFileMap)fileObj;
+			
+			assertEquals( 1, fileMap.size() );
+			for(String key : fileMap.keySet()) {
+				assertEquals("hello.txt", key);
+				assertEquals( "hello world", fileMap.get(key).trim() );
+				//assertEquals("hello world")
+			}
+			return res;
+		};
+		
+		// Message to put
+		@Override
+		public void restBuilderSetup(RESTBuilder rbObj) {
+			rbObj.getNamespace("test").put(HttpRequestType.POST, testEcho);
+		}
+	}
+	
+	//
+	// Assertion
+	//
+	@Test
+	public void simpleFileTest() {
+		assertNotNull( testServlet = new EmbeddedServlet(testPort, new SimpleFile()) );
+		String testUrl = "http://localhost:"+testPort+"/api/test/";
+		
+		Map<String,String[]> args = new HashMap<String,String[]>();
+		args.put("msg", new String[] { "hello" });
+		
+		Map<String,File[]> fileMap = new HashMap<String,File[]>();
+		fileMap.put("file", new File[] { new File(testFolder,"hello.txt") });
+		
+		// Check that is no error
+		assertEquals( "{ }", RequestHttp.post(testUrl, args, fileMap).toString().trim() );
 	}
 	
 }

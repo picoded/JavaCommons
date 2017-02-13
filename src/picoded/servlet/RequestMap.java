@@ -135,11 +135,11 @@ public class RequestMap extends AbstractMapDecorator<String, String> implements
 						// Get the filemap cache
 						//
 						Object cache = get(fieldname);
-						RequestFile fileMap = null;
-						if( cache == null || !(cache instanceof RequestFile)) {
-							fileMap = new RequestFile();
+						RequestFileMap fileMap = null;
+						if( cache == null || !(cache instanceof RequestFileMap)) {
+							fileMap = new RequestFileMap();
 						} else {
-							fileMap = (RequestFile)cache;
+							fileMap = (RequestFileMap)cache;
 						}
 						
 						//

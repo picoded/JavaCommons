@@ -22,7 +22,7 @@ import picoded.conv.ConvertJSON;
 ///
 /// Class map, that handles file uploads in RequestMap
 ///
-public class RequestFile extends HashMap<String, InputStream>  {
+public class RequestFileMap extends HashMap<String, InputStream>  {
 	
 	/// Inner DiskFileItem mapping
 	protected Map<String,DiskFileItem> diskItemMap = new Map<String,DiskFileItem>();
@@ -50,7 +50,7 @@ public class RequestFile extends HashMap<String, InputStream>  {
 	
 	/// Mirrors to diskItemMap
 	public void writeToFile(String filePath, File file) {
-		
+		diskItemMap.get(filePath).write(file);
 	}
 	
 }

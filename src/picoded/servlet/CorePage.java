@@ -295,7 +295,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 			return requestParameters;
 		}
 		
-		requestParameters = RequestMap.fromStringArrayValueMap(httpRequest.getParameterMap());
+		requestParameters = new RequestMap(httpRequest);
 		
 		return requestParameters;
 	}
@@ -493,7 +493,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	/// gets a parameter value, from the httpRequest.getParameter
 	public String getParameter(String paramName) {
 		if (requestParameters() != null) {
-			return requestParameters().get(paramName);
+			return requestParameters().getString(paramName);
 		}
 		return null;
 	}

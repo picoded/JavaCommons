@@ -25,8 +25,8 @@ import picoded.conv.ConvertJSON;
 ///
 /// @TODO: Optimize the class to do the conversion between String[] to String only ON DEMAND, and to cache the result
 ///
-public class RequestMap extends AbstractMapDecorator<String, String> implements
-	GenericConvertMap<String, String> {
+public class RequestMap extends AbstractMapDecorator<String, Object> implements
+	GenericConvertMap<String, Object> {
 		
 	// Upload settings (for now)
 	//------------------------------------------------------------------------------
@@ -43,12 +43,12 @@ public class RequestMap extends AbstractMapDecorator<String, String> implements
 	
 	/// blank constructor
 	public RequestMap() {
-		super(new HashMap<String, String>());
+		super(new HashMap<String, Object>());
 	}
 	
 	/// basic proxy constructor
-	public RequestMap(Map<String, String> proxy) {
-		super((proxy != null) ? proxy : new HashMap<String, String>());
+	public RequestMap(Map<String, Object> proxy) {
+		super((proxy != null) ? proxy : new HashMap<String, Object>());
 	}
 	
 	/// basic proxy constructor
@@ -80,8 +80,8 @@ public class RequestMap extends AbstractMapDecorator<String, String> implements
 	}
 	
 	/// Does the conversion of a Map<String,String[]> to a Map<String,String>
-	private static Map<String, String> mapConvert(Map<String, String[]> in) {
-		HashMap<String, String> ret = new HashMap<String, String>();
+	private static Map<String, Object> mapConvert(Map<String, String[]> in) {
+		HashMap<String, Object> ret = new HashMap<String, Object>();
 		
 		for (Map.Entry<String, String[]> entry : in.entrySet()) {
 			ret.put(entry.getKey(), stringFromArray(entry.getValue()));

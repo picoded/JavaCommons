@@ -25,10 +25,10 @@ import picoded.conv.ConvertJSON;
 public class RequestFileMap extends HashMap<String, InputStream>  {
 	
 	/// Inner DiskFileItem mapping
-	protected Map<String,DiskFileItem> diskItemMap = new Map<String,DiskFileItem>();
+	protected Map<String,DiskFileItem> diskItemMap = new HashMap<String,DiskFileItem>();
 	
 	/// Adds a FileItem part
-	public void importFileItem(FileItem item) {
+	public void importFileItem(FileItem item) throws IOException{
 		
 		// In case apache breaks a future version
 		if( !(item instanceof DiskFileItem)) {
@@ -49,7 +49,7 @@ public class RequestFileMap extends HashMap<String, InputStream>  {
 	}
 	
 	/// Mirrors to diskItemMap
-	public void writeToFile(String filePath, File file) {
+	public void writeToFile(String filePath, File file) throws Exception {
 		diskItemMap.get(filePath).write(file);
 	}
 	

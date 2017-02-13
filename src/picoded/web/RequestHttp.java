@@ -3,6 +3,7 @@ package picoded.web;
 import java.util.Map;
 
 import java.io.InputStream;
+import java.io.File;
 import java.util.function.Consumer;
 
 import picoded.set.HttpRequestType;
@@ -136,6 +137,22 @@ public class RequestHttp {
 		return byType(HttpRequestType.POST, requestURL, parametersMap, cookiesMap, headersMap);
 	}
 	
+	/// Performs (form) POST request : with parameters and files
+	public static ResponseHttp post(String requestURL, Map<String, String[]> parametersMap, Map<String,File[]> filesMap) {
+		return byType(HttpRequestType.POST, requestURL, parametersMap, null, null, filesMap, null);
+	}
+	
+	/// Performs (form) POST request with parameters, files, cookies and headers
+	public static ResponseHttp post( //
+		String requestURL, //
+		Map<String, String[]> parametersMap, // 
+		Map<String, File[]> filesMap, //
+		Map<String, String[]> cookiesMap, // 
+		Map<String, String[]> headersMap // 
+	) { //
+		return byType(HttpRequestType.POST, requestURL, parametersMap, cookiesMap, headersMap, filesMap, null);
+	}
+	
 	//--------------------------------------------------------
 	// PUT request operations
 	//--------------------------------------------------------
@@ -153,6 +170,22 @@ public class RequestHttp {
 		Map<String, String[]> headersMap // 
 	) { //
 		return byType(HttpRequestType.PUT, requestURL, parametersMap, cookiesMap, headersMap);
+	}
+	
+	/// Performs (form) PUT request : with parameters and files
+	public static ResponseHttp put(String requestURL, Map<String, String[]> parametersMap, Map<String,File[]> filesMap) {
+		return byType(HttpRequestType.PUT, requestURL, parametersMap, null, null, filesMap, null);
+	}
+	
+	/// Performs (form) PUT request with parameters, files, cookies and headers
+	public static ResponseHttp put( //
+		String requestURL, //
+		Map<String, String[]> parametersMap, // 
+		Map<String, File[]> filesMap, //
+		Map<String, String[]> cookiesMap, // 
+		Map<String, String[]> headersMap // 
+	) { //
+		return byType(HttpRequestType.PUT, requestURL, parametersMap, cookiesMap, headersMap, filesMap, null);
 	}
 	
 	//--------------------------------------------------------
@@ -185,7 +218,7 @@ public class RequestHttp {
 	// X request operations
 	//--------------------------------------------------------
 	
-	/// Performs GET request with parameters, cookies and headers
+	/// Performs X request with parameters, cookies and headers
 	public static ResponseHttp byType( //
 		HttpRequestType requestType, //
 		String requestURL, //
@@ -196,7 +229,7 @@ public class RequestHttp {
 		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap, headersMap, null);
 	}
 	
-	/// Performs GET request with parameters, cookies and headers
+	/// Performs X request with parameters, cookies and headers
 	public static ResponseHttp byType( //
 		HttpRequestType requestType, //
 		String requestURL, //
@@ -207,6 +240,20 @@ public class RequestHttp {
 	) { //
 		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap, headersMap,
 			requestStream);
+	}
+	
+	/// Performs X request with parameters, cookies and headers
+	public static ResponseHttp byType( //
+		HttpRequestType requestType, //
+		String requestURL, //
+		Map<String, String[]> parametersMap, // 
+		Map<String, String[]> cookiesMap, // 
+		Map<String, String[]> headersMap, // 
+		Map<String, File[]> filesMap, //
+		InputStream requestStream //
+	) { //
+		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap, headersMap,
+			filesMap, requestStream);
 	}
 	
 	//--------------------------------------------------------

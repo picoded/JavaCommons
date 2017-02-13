@@ -5,12 +5,15 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.net.URL;
+import java.io.File;
+import java.io.FileInputStream;
 
 import picoded.conv.StringEscape;
 import picoded.set.HttpRequestType;
 import picoded.web.ResponseHttp;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.*;
 import org.apache.http.NameValuePair;
@@ -19,7 +22,9 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 
 /// Support the RequestHTTP api via apache
 /// Note that apache requests are synchrnous, and not async
@@ -211,6 +216,21 @@ public class RequestHttp_apache {
 		Map<String, String[]> headersMap, //
 		InputStream requestStream //
 	) {
+		return callRequest(reqType, reqURL, parametersMap, cookiesMap, headersMap, null, requestStream);
+	}
+	
+	/// Executes the request, given the type and parmeters
+	/// Note that post/put request parameters are sent using
+	/// the input stream if given, else it uses the parameter map
+	public static ResponseHttp callRequest( //
+		HttpRequestType reqType, //
+		String reqURL, //
+		Map<String, String[]> parametersMap, //
+		Map<String, String[]> cookiesMap, //
+		Map<String, String[]> headersMap, //
+		Map<String, File[]> filesMap, //
+		InputStream requestStream //
+	) {
 		// append get parameters if needed
 		if (reqType == HttpRequestType.GET || reqType == HttpRequestType.DELETE) {
 			reqURL = appendGetParameters(reqURL, parametersMap);
@@ -226,6 +246,35 @@ public class RequestHttp_apache {
 				if (requestStream != null) {
 					// note that its sent as a raw stream (set headers manually please)
 					((HttpEntityEnclosingRequestBase) reqBase).setEntity(new InputStreamEntity(requestStream));
+				} else if (filesMap != null) {
+					// does a multipart encoding request
+					MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+					
+					// Process the file map, not using lambda as it does not auto rethrow the IOException
+					for(Map.Entry<String, File[]>part : filesMap.entrySet()) {
+						String filePath = part.getKey();
+						for(File fileObj : part.getValue()) {
+							builder.addBinaryBody(
+								filePath,
+								new FileInputStream(fileObj),
+								ContentType.APPLICATION_OCTET_STREAM,
+								fileObj.getName()
+							);
+						}
+					};
+					
+					// Process the text map
+					if(parametersMap != null) {
+						parametersMap.forEach((key,valArr) -> {
+							for(String val : valArr) {
+								builder.addTextBody(key,val, ContentType.TEXT_PLAIN);
+							}
+						});
+					}
+					
+					// And submit it
+					HttpEntity multipart = builder.build();
+					((HttpEntityEnclosingRequestBase) reqBase).setEntity(multipart);
 				} else if (parametersMap != null) {
 					// note that its sent as a form entity
 					((HttpEntityEnclosingRequestBase) reqBase).setEntity(new UrlEncodedFormEntity(

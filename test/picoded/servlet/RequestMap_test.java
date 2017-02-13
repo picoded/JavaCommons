@@ -38,7 +38,7 @@ public class RequestMap_test {
 	
 	@Test
 	public void constructorParametrized() {
-		Map<String, String> proxy = new HashMap<String, String>();
+		Map<String, Object> proxy = new HashMap<String, Object>();
 		proxy.put("my_key", "val1");
 		requestMap = new RequestMap(proxy);
 		assertNotNull(requestMap);
@@ -47,7 +47,7 @@ public class RequestMap_test {
 	
 	@Test
 	public void constructorParametrizedNullParameter() {
-		requestMap = new RequestMap(null);
+		requestMap = new RequestMap((Map<String,Object>)null);
 		assertNotNull(requestMap);
 		assertEquals(0, requestMap.size());
 	}

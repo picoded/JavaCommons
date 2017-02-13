@@ -83,6 +83,9 @@ public class CoreApiPage_test {
 		
 		assertEquals( testString, RequestHttp.get(testUrl, args).toString().trim() );
 		assertEquals( testString, RequestHttp.post(testUrl, args).toString().trim() );
+		
+		Map<String,File[]> blankFileMap = new HashMap<String,File[]>();
+		assertEquals( testString, RequestHttp.post(testUrl, args, blankFileMap).toString().trim() );
 	}
 	
 }

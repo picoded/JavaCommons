@@ -1,10 +1,20 @@
 package picoded.servlet;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Collection;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.commons.collections4.map.AbstractMapDecorator;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import picoded.struct.GenericConvertMap;
 import picoded.conv.ConvertJSON;
@@ -17,7 +27,17 @@ import picoded.conv.ConvertJSON;
 ///
 public class RequestMap extends AbstractMapDecorator<String, String> implements
 	GenericConvertMap<String, String> {
+		
+	// Upload settings (for now)
+	//------------------------------------------------------------------------------
+	private static final int MEMORY_THRESHOLD = 1024 * 1024 * 24;  // 24MB
 	
+	//
+	// The following is ignored, as MAX request size should be configured by server not application
+	//
+	// private static final int MAX_FILE_SIZE = 1024 * 1024 * 40; // 40MB
+	// private static final int MAX_REQUEST_SIZE = 1024 * 1024 * 50; // 50MB
+
 	// Constructor
 	//------------------------------------------------------------------------------
 	
@@ -29,6 +49,12 @@ public class RequestMap extends AbstractMapDecorator<String, String> implements
 	/// basic proxy constructor
 	public RequestMap(Map<String, String> proxy) {
 		super((proxy != null) ? proxy : new HashMap<String, String>());
+	}
+	
+	/// basic proxy constructor
+	public RequestMap(HttpServletRequest req) {
+		super(mapConvert(req.getParameterMap()));
+		multipartProcessing(req);
 	}
 	
 	/// http map proxy builder
@@ -61,6 +87,79 @@ public class RequestMap extends AbstractMapDecorator<String, String> implements
 			ret.put(entry.getKey(), stringFromArray(entry.getValue()));
 		}
 		return ret;
+	}
+	
+	/// Processes the multipart object
+	private boolean multipartProcessing(HttpServletRequest request) {
+		
+		// Only work when there is multi part
+		if( !ServletFileUpload.isMultipartContent(request) ) {
+			return false;
+		}
+		
+		// configures upload settings
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		// sets memory threshold - beyond which files are stored in disk
+		factory.setSizeThreshold(MEMORY_THRESHOLD);
+		// sets temporary location to store files
+		factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
+		// Get the servlet file uploader handler class
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		
+		//
+		// The following is ignored, as MAX request size should be configured by server not application
+		//
+		// // sets maximum size of upload file
+		// upload.setFileSizeMax(MAX_FILE_SIZE);
+		// // sets maximum size of request (include file + form data)
+		// upload.setSizeMax(MAX_REQUEST_SIZE);
+		//
+		
+		try {
+			@SuppressWarnings("unchecked")
+			List<FileItem> formItems = upload.parseRequest(request);
+			
+			if (formItems != null && formItems.size() > 0) {
+				for (FileItem item : formItems) {
+					// processes only fields that are not form fields
+					if (item.isFormField()) {
+						String fieldname = item.getFieldName();
+						String fieldvalue = item.getString();
+						
+						put(fieldname, fieldvalue);
+					} else {
+						// Field name to handle
+						String fieldname = item.getFieldName();
+						
+						//
+						// Get the filemap cache
+						//
+						Object cache = get(fieldname);
+						RequestFile fileMap = null;
+						if( cache == null || !(cache instanceof RequestFile)) {
+							fileMap = new RequestFile();
+						} else {
+							fileMap = (RequestFile)cache;
+						}
+						
+						//
+						// Import the item in
+						//
+						fileMap.importFileItem(item);
+						
+						//
+						// Save the file map
+						//
+						put(fieldname, fileMap);
+					}
+				}
+			}
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+		
+		// Finish processing
+		return true;
 	}
 	
 }

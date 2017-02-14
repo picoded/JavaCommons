@@ -30,7 +30,7 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 		
 	// Upload settings (for now)
 	//------------------------------------------------------------------------------
-	private static final int MEMORY_THRESHOLD = 1024 * 1024 * 24;  // 24MB
+	private static final int MEMORY_THRESHOLD = 1024 * 1024 * 4;  // 4MB
 	
 	//
 	// The following is ignored, as MAX request size should be configured by server not application
@@ -101,8 +101,10 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		// sets memory threshold - beyond which files are stored in disk
 		factory.setSizeThreshold(MEMORY_THRESHOLD);
-		// sets temporary location to store files
-		factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
+		
+		// sets temporary location to store files (Already done by default)
+		// factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
+		
 		// Get the servlet file uploader handler class
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		

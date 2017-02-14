@@ -18,6 +18,7 @@ import picoded.conv.*;
 import picoded.set.*;
 import picoded.web.*;
 import picoded.RESTBuilder.*;
+import picoded.RESTBuilder.template.*;
 
 public class CoreApiPage_test {
 	
@@ -139,6 +140,43 @@ public class CoreApiPage_test {
 		
 		// Check that is no error
 		assertEquals( "{ }", RequestHttp.post(testUrl, args, fileMap).toString().trim() );
+	}
+	
+	//
+	// Echo testing
+	//
+	public static class EchoTest extends CoreApiPage {
+		@Override
+		public void restBuilderSetup(RESTBuilder rbObj) {
+			rbObj.getNamespace("test").put(HttpRequestType.GET, RESTEcho.echoFunction);
+			rbObj.getNamespace("test").put(HttpRequestType.POST, RESTEcho.echoFunction);
+		}
+	}
+	
+	//
+	// Assertion
+	//
+	@Test
+	public void simpleEchoTest() {
+		// Server
+		assertNotNull( testServlet = new EmbeddedServlet(testPort, new EchoTest()) );
+		String testUrl = "http://localhost:"+testPort+"/api/test/";
+		
+		// Arguments
+		Map<String,String[]> args = new HashMap<String,String[]>();
+		args.put("msg", new String[] { "hello" });
+		Map<String,File[]> fileMap = new HashMap<String,File[]>();
+		fileMap.put("file", new File[] { new File(testFolder,"hello.txt") });
+		
+		// Expected
+		Map<String,Object> expected = new HashMap<String,Object>();
+		expected.put("msg", "hello");
+		Map<String,String> expectedFile = new HashMap<String,String>();
+		expectedFile.put("hello.txt","hello world\n");
+		expected.put("file", expectedFile);
+		
+		// Check that is no error
+		assertEquals( expected, ConvertJSON.toMap(RequestHttp.post(testUrl, args, fileMap).toString().trim()) );
 	}
 	
 }

@@ -380,4 +380,14 @@ public class EmbeddedServlet implements Closeable {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	///////////////////////////////////////////////////////
+	//
+	// CLI Utility runner
+	//
+	///////////////////////////////////////////////////////
+	
+	public static void main(String[] args) {
+		
+	}
 }

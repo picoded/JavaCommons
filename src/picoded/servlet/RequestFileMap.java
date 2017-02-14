@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Arrays;
 import java.util.Collection;
 import java.io.File;
@@ -84,17 +85,45 @@ public class RequestFileMap extends GenericConvertHashMap<String, String>  {
 	/// Converts to string object
 	public String getString(String filePath) {
 		try {
-			if( diskItemMap.get(filePath) != null ) {
-				return diskItemMap.get(filePath).getString("UTF-8");
+			// Result was previously stored
+			String cachedResult = super.get(filePath);
+			if(cachedResult != null && cachedResult.length() > 0) {
+				return cachedResult;
 			}
+			
+			// Get and cache result
+			if( diskItemMap.get(filePath) != null ) {
+				cachedResult = diskItemMap.get(filePath).getString("UTF-8");
+			}
+			put(filePath, cachedResult);
+			return cachedResult;
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
-		return null;
 	}
 	
 	/// Fetch the string object
 	public String get(Object key) {
 		return getString(key.toString());
 	}
+	
+	/// Load all the values into a string format
+	private void loadAll() {
+		for(String key : diskItemMap.keySet()) {
+			getString(key);
+		}
+	}
+	
+	/// Loads all before doing the respective call
+	public Set<Map.Entry<String, String>> entrySet() {
+		loadAll();
+		return super.entrySet();
+	}
+	
+	/// Loads all before doing the respective call
+	public Collection<String> values() {
+		loadAll();
+		return super.values();
+	}
+	
 }

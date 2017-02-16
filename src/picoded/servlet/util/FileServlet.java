@@ -201,8 +201,8 @@ public class FileServlet extends HttpServlet {
 		// Validate the file
 		//-------------------------------------------
 		
-		// Check if file exists
-		if (!file.exists()) {
+		// Check if file exists, or is a directory
+		if (!file.exists() || file.isDirectory()) {
 			// 404 error if file not found
 			servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;

@@ -32,6 +32,7 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 
 import picoded.conv.GUID;
+import picoded.conv.GenericConvert;
 import picoded.file.FileUtil;
 
 ///
@@ -387,7 +388,37 @@ public class EmbeddedServlet implements Closeable {
 	//
 	///////////////////////////////////////////////////////
 	
+	/// Takes in the following parameters
+	///
+	/// args[0] - servlet static (parent of WEB-INF) folder. Default ".."
+	/// args[1] - context name. Default "ROOT"
+	/// args[2] - port number. Default "8080"
 	public static void main(String[] args) {
 		
+		// Config settings to pass
+		String servletFolder = "..";
+		String contextName = "ROOT";
+		String portNumber = "8080";
+		
+		// Arguments passing
+		if( args.length > 0 ) {
+			servletFolder = args[0];
+		}
+		if( args.length > 1 ) {
+			contextName = args[1];
+		}
+		if( args.length > 2 ) {
+			portNumber = args[2];
+		}
+		
+		// Run the servlet
+		EmbeddedServlet servlet = new EmbeddedServlet( 
+			GenericConvert.toInt(portNumber),  
+			contextName,
+			new File(servletFolder)
+		);
+		
+		// Wait and continue
+		servlet.await();
 	}
 }

@@ -105,15 +105,12 @@ public class CoreApiPage_test {
 			Object fileObj = null;
 			assertNotNull( fileObj = req.get("file") );
 			
-			assertTrue( fileObj instanceof RequestFileMap );
-			RequestFileMap fileMap = (RequestFileMap)fileObj;
+			assertTrue( fileObj instanceof RequestFileArray );
+			RequestFileArray fileArr = (RequestFileArray)fileObj;
 			
-			assertEquals( 1, fileMap.size() );
-			for(String key : fileMap.keySet()) {
-				assertEquals("hello.txt", key);
-				assertEquals( "hello world", fileMap.get(key).trim() );
-				//assertEquals("hello world")
-			}
+			assertEquals( 1, fileArr.size() );
+			assertEquals( "hello world", fileArr.get(0).trim() );
+				
 			return res;
 		};
 		
@@ -171,8 +168,8 @@ public class CoreApiPage_test {
 		// Expected
 		Map<String,Object> expected = new HashMap<String,Object>();
 		expected.put("msg", "hello");
-		Map<String,String> expectedFile = new HashMap<String,String>();
-		expectedFile.put("hello.txt","hello world\n");
+		List<String> expectedFile = new ArrayList<String>();
+		expectedFile.add("hello world\n");
 		expected.put("file", expectedFile);
 		
 		// Check that is no error

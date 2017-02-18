@@ -5,6 +5,7 @@ import javax.servlet.http.Part;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Collection;
 import java.io.File;
@@ -123,36 +124,60 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 			
 			if (formItems != null && formItems.size() > 0) {
 				for (FileItem item : formItems) {
+					// Field name to handle
+					String fieldname = item.getFieldName();
+					
 					// processes only fields that are not form fields
 					if (item.isFormField()) {
-						String fieldname = item.getFieldName();
+						
+						// Field value to populate OR append
 						String fieldvalue = item.getString();
 						
-						put(fieldname, fieldvalue);
+						// Get the cache
+						Object cache = get(fieldname);
+						
+						// Insert the cache if null
+						if( cache == null ) {
+							// Puts in directly
+							put(fieldname, fieldvalue);
+						} else {
+							// Puts in as array?
+							List<Object> listCache = getObjectList(fieldname, null);
+							
+							// Get the list representation instead
+							if( listCache == null ) {
+								listCache = new ArrayList<Object>();
+								listCache.add(cache); // Add the previous value as first in list
+							}
+							
+							// List append the new value
+							listCache.add(fieldvalue);
+							
+							// Put the modified the list
+							put(fieldname, listCache);
+						}
 					} else {
-						// Field name to handle
-						String fieldname = item.getFieldName();
 						
 						//
-						// Get the filemap cache
+						// Get the fileArray cache
 						//
 						Object cache = get(fieldname);
-						RequestFileMap fileMap = null;
-						if( cache == null || !(cache instanceof RequestFileMap)) {
-							fileMap = new RequestFileMap();
+						RequestFileArray fileArray = null;
+						if( cache == null || !(cache instanceof RequestFileArray)) {
+							fileArray = new RequestFileArray();
 						} else {
-							fileMap = (RequestFileMap)cache;
+							fileArray = (RequestFileArray)cache;
 						}
 						
 						//
 						// Import the item in
 						//
-						fileMap.importFileItem(item);
+						fileArray.importFileItem(item);
 						
 						//
 						// Save the file map
 						//
-						put(fieldname, fileMap);
+						put(fieldname, fileArray);
 					}
 				}
 			}

@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiFunction;
+import java.util.Set;
+import java.util.HashSet;
 
 import picoded.conv.GenericConvert;
+import picoded.conv.NestedObject;
 
 /// Common map class, used to implement all the generic convert convinence functions in a map interface
 public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
@@ -388,17 +391,48 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 		return GenericConvert.toObjectArray(get(key));
 	}
 	
+	// Fully Qualified Name unpacking
+	//------------------------------------------------------------------------------
+	
+	///
+	/// This Unpacks all keynames, and rewriting any underlying map/list implementation
+	/// if needed. Note that while this helps normalizes input parameters against a
+	/// large collection of format interpration. Its implications are rarely well 
+	/// understood when things does not work as intended.
+	///
+	/// So for example 
+	/// `{ "a[0].b" : "hello" }` 
+	/// 
+	/// Will unpack to
+	/// ```
+	///	{
+	///		"a" : [
+	///			{
+	///				"b" : "hello"
+	///			}
+	///		]
+	///	}
+	/// ```
+	///
+	/// But because there is so so many ways this could go wrong, not that it is a bug.
+	/// But someone somewhere misunderstanding how it should work. So do test when using this.
+	///
+	/// So err.... Good luck =S
+	///
+	default void unpackFullyQualifiedNameKeys() {
+		NestedObject.unpackFullyQualifiedNameKeys(this);
+	}
+	
 	// NESTED object fetch (related to fully qualified keys handling)
 	//---------------------------------------------------------------------------------------------------
 	
 	///
 	/// Gets an object from the map,
 	/// That could very well be, a map inside a list, inside a map, inside a
-	// .....
+	/// .....
 	///
 	/// Note that at each iteration step, it attempts to do a FULL key match
-	// first,
-	/// before the next iteration depth
+	/// first, before the next iteration depth
 	///
 	/// @param base Map / List to manipulate from
 	/// @param key The input key to fetch, possibly nested

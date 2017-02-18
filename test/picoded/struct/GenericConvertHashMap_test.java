@@ -5,8 +5,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
+import picoded.conv.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -55,5 +56,17 @@ public class GenericConvertHashMap_test {
 	public void buildTest() {
 		Map<String, String> map = new HashMap<>();
 		assertNotNull(GenericConvertMap.build(map));
+	}
+	
+	@Test
+	public void unpackFullyQualifiedNameKeys() {
+		GenericConvertHashMap<String,Object> base = new GenericConvertHashMap<String,Object>();
+		base.put("a[0].b", "hello");
+		
+		// Unpack the map
+		base.unpackFullyQualifiedNameKeys();
+		
+		Map<String,Object> expected = GenericConvert.toStringMap("{ \"a\":[{ \"b\":\"hello\" }] }");
+		assertEquals(expected, base);
 	}
 }

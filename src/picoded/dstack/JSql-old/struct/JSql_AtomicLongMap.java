@@ -2,7 +2,7 @@ package picoded.JSql.struct;
 
 import java.util.logging.*;
 
-import picoded.enums.JSqlType;
+import picoded.set.JSqlType;
 import picoded.JSql.*;
 import picoded.JStruct.internal.*;
 

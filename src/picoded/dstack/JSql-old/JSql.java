@@ -16,7 +16,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import picoded.JSql.db.BaseInterface;
-import picoded.enums.JSqlType;
+import picoded.set.JSqlType;
 
 /// Database intreface base class.
 public class JSql extends BaseInterface {

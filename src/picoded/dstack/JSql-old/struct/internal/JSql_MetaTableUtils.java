@@ -22,7 +22,7 @@ import picoded.JStruct.MetaTypeMap;
 /// Picoded imports
 import picoded.conv.ConvertJSON;
 import picoded.conv.ListValueConv;
-import picoded.enums.ObjectToken;
+import picoded.set.ObjectToken;
 import picoded.struct.query.OrderBy;
 import picoded.struct.query.Query;
 import picoded.struct.query.internal.QueryFilter;

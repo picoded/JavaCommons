@@ -8,7 +8,7 @@ import picoded.JSql.JSql;
 import picoded.JSql.JSqlException;
 import picoded.JSql.JSqlQuerySet;
 import picoded.JSql.JSqlResult;
-import picoded.enums.JSqlType;
+import picoded.set.JSqlType;
 
 /// Pure SQL Server 2012 implentation of JSql
 /// Support only for SQL Server 2012 and above version for the pagination query, the OFFSET / FETCH keywords

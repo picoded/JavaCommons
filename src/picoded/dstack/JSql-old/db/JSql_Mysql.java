@@ -8,7 +8,7 @@ import picoded.JSql.JSql;
 import picoded.JSql.JSqlException;
 import picoded.JSql.JSqlQuerySet;
 import picoded.JSql.JSqlResult;
-import picoded.enums.JSqlType;
+import picoded.set.JSqlType;
 
 /// Pure MySQL implentation of JSql
 public class JSql_Mysql extends JSql {

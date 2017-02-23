@@ -1,6 +1,6 @@
 package picoded.JStack;
 
-import picoded.fileUtils.ConfigFileSet;
+import picoded.file.ConfigFileSet;
 
 ///
 /// Important note:

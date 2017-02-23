@@ -1,4 +1,4 @@
-package picoded.fileUtils;
+package picoded.file;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	
 	/// Overwrites null encoding with US-ASCII
 	public static String readFileToString(File inFile) throws IOException {
-		return picoded.fileUtils.FileUtils.readFileToString(inFile, (String) null);
+		return picoded.file.FileUtils.readFileToString(inFile, (String) null);
 	}
 	
 	/// Overwrites null encoding with US-ASCII
@@ -58,7 +58,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	
 	/// Overwrites null encoding with US-ASCII
 	public static void writeStringToFile(File inFile, String data) throws IOException {
-		picoded.fileUtils.FileUtils.writeStringToFile(inFile, data, (String) null);
+		picoded.file.FileUtils.writeStringToFile(inFile, data, (String) null);
 	}
 	
 	/// Overwrites null encoding with US-ASCII
@@ -82,7 +82,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/// @returns the file value if possible, else returns the fallback value
 	///
 	public static String readFileToString_withFallback(File inFile, String fallback) {
-		return picoded.fileUtils.FileUtils.readFileToString_withFallback(inFile, fallback, null);
+		return picoded.file.FileUtils.readFileToString_withFallback(inFile, fallback, null);
 	}
 	
 	///
@@ -102,7 +102,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 		}
 		
 		try {
-			return picoded.fileUtils.FileUtils.readFileToString(inFile, encoding);
+			return picoded.file.FileUtils.readFileToString(inFile, encoding);
 		} catch (IOException e) {
 			return fallback;
 		}
@@ -137,7 +137,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/// @returns the boolean indicating true if file was written to
 	///
 	public static boolean writeStringToFile_ifDifferant(File inFile, String data) throws IOException {
-		return picoded.fileUtils.FileUtils.writeStringToFile_ifDifferant(inFile, data, null);
+		return picoded.file.FileUtils.writeStringToFile_ifDifferant(inFile, data, null);
 	}
 	
 	///

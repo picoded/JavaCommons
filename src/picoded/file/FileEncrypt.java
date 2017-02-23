@@ -1,4 +1,4 @@
-package picoded.fileUtils;
+package picoded.file;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

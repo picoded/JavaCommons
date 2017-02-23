@@ -5,10 +5,10 @@ import java.util.Map;
 
 import javax.servlet.ServletException;
 
-public class CorePageExtended extends CorePage{
-
+public class CorePageExtended extends CorePage {
+	
 	private static final long serialVersionUID = 1L;
-
+	
 	@Override
 	public boolean doPostRequest(Map<String, Object> templateData) throws Exception {
 		try {

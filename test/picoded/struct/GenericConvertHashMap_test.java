@@ -60,13 +60,13 @@ public class GenericConvertHashMap_test {
 	
 	@Test
 	public void unpackFullyQualifiedNameKeys() {
-		GenericConvertHashMap<String,Object> base = new GenericConvertHashMap<String,Object>();
+		GenericConvertHashMap<String, Object> base = new GenericConvertHashMap<String, Object>();
 		base.put("a[0].b", "hello");
 		
 		// Unpack the map
 		base.unpackFullyQualifiedNameKeys();
 		
-		Map<String,Object> expected = GenericConvert.toStringMap("{ \"a\":[{ \"b\":\"hello\" }] }");
+		Map<String, Object> expected = GenericConvert.toStringMap("{ \"a\":[{ \"b\":\"hello\" }] }");
 		assertEquals(expected, base);
 	}
 }

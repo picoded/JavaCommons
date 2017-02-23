@@ -18,7 +18,6 @@ import picoded.conv.*;
 import picoded.set.*;
 import picoded.web.*;
 
-
 public class CorePage_test {
 	
 	//
@@ -38,7 +37,7 @@ public class CorePage_test {
 	
 	@After
 	public void tearDown() throws Exception {
-		if(testServlet != null) {
+		if (testServlet != null) {
 			testServlet.close();
 			testServlet = null;
 		}
@@ -60,20 +59,20 @@ public class CorePage_test {
 	// Assertion test case for multiple reuse
 	//
 	public void helloWorldAssert(String testUrl, String testString) {
-		if(testString == null) {
+		if (testString == null) {
 			testString = "<h1>Hello World</h1>";
 		}
 		
-		assertEquals( testString, RequestHttp.get(testUrl, null).toString().trim() );
-		assertEquals( testString, RequestHttp.post(testUrl, null).toString().trim() );
-		assertEquals( testString, RequestHttp.put(testUrl, null).toString().trim() );
-		assertEquals( testString, RequestHttp.delete(testUrl, null).toString().trim() );
+		assertEquals(testString, RequestHttp.get(testUrl, null).toString().trim());
+		assertEquals(testString, RequestHttp.post(testUrl, null).toString().trim());
+		assertEquals(testString, RequestHttp.put(testUrl, null).toString().trim());
+		assertEquals(testString, RequestHttp.delete(testUrl, null).toString().trim());
 	}
 	
 	@Test
 	public void simpleHelloWorldTest() {
-		assertNotNull( testServlet = new EmbeddedServlet(testPort, new SimpleHelloWorld()) );
-		helloWorldAssert( "http://localhost:"+testPort+"/test/", null );
+		assertNotNull(testServlet = new EmbeddedServlet(testPort, new SimpleHelloWorld()));
+		helloWorldAssert("http://localhost:" + testPort + "/test/", null);
 	}
 	
 	//
@@ -82,7 +81,8 @@ public class CorePage_test {
 	public static class SpecialSymbolsTesting extends CorePage {
 		// Message to put
 		@Override
-		public boolean outputRequest(Map<String, Object> templateData, PrintWriter output) throws Exception {
+		public boolean outputRequest(Map<String, Object> templateData, PrintWriter output)
+			throws Exception {
 			//
 			// intentionally using output.print, instead of println - to test
 			//
@@ -93,8 +93,8 @@ public class CorePage_test {
 	
 	@Test
 	public void outputPrintBugFixing() {
-		assertNotNull( testServlet = new EmbeddedServlet(testPort, new SpecialSymbolsTesting()) );
-		helloWorldAssert( "http://localhost:"+testPort+"/test/", "Test *» This" );
+		assertNotNull(testServlet = new EmbeddedServlet(testPort, new SpecialSymbolsTesting()));
+		helloWorldAssert("http://localhost:" + testPort + "/test/", "Test *» This");
 	}
 	
 }

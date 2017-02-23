@@ -23,7 +23,8 @@ import picoded.struct.GenericConvertMap;
 /// this is intentional design as anything smaller then a second 
 /// is pointless over a network.
 ///
-public interface KeyValue extends GenericConvertMap<String, String>, DataStructureSetup<String,String> {
+public interface KeyValue extends GenericConvertMap<String, String>,
+	DataStructureSetup<String, String> {
 	
 	//--------------------------------------------------------------------------
 	//
@@ -228,6 +229,6 @@ public interface KeyValue extends GenericConvertMap<String, String>, DataStructu
 	/// Note: that this is here to help resolve the interface conflict
 	///
 	default void clear() {
-		((GenericConvertMap<String,String>)this).clear();
+		((GenericConvertMap<String, String>) this).clear();
 	}
 }

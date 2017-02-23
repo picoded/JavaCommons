@@ -21,18 +21,19 @@ public class TestConfig {
 	//
 	// Issue a somewhat unique port number for use in test cases
 	//
-	public synchronized static int issuePortNumber(){
+	public synchronized static int issuePortNumber() {
 		// Start with a random port between 10k to 50k
 		int portCounter = ThreadLocalRandom.current().nextInt(10000, 50000);
 		
 		// Increment if a conflict is found
 		int checkTries = 0;
-		while( isLocalPortInUse(portCounter) ) {
+		while (isLocalPortInUse(portCounter)) {
 			portCounter = ThreadLocalRandom.current().nextInt(10000, 50000);
 			
 			++checkTries;
-			if( checkTries > 1000 ) {
-				throw new RuntimeException("Attempted over "+checkTries+" to get a local port =( sad");
+			if (checkTries > 1000) {
+				throw new RuntimeException("Attempted over " + checkTries
+					+ " to get a local port =( sad");
 			}
 		}
 		
@@ -51,7 +52,7 @@ public class TestConfig {
 			new ServerSocket(port).close();
 			// local port can be opened, it's available
 			return false;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			// local port cannot be opened, it's in use
 			return true;
 		}

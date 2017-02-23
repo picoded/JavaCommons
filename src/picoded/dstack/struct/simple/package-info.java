@@ -8,3 +8,4 @@
 /// implmentation that repeatedly calls for a DB value in multiple classes.
 ///
 package picoded.dstack.struct.simple;
+

@@ -62,9 +62,9 @@ public class MetaTable_test {
 	/// Utility function, to ensure the expected values exists in map
 	/// while allowing future test cases not to break when additional values
 	/// like create timestamp is added.
-	public void assetSubset(Map<String,Object> expected, Map<String,Object> result) {
+	public void assetSubset(Map<String, Object> expected, Map<String, Object> result) {
 		for (Map.Entry<String, Object> entry : expected.entrySet()) {
-			assertEquals( entry.getValue(), result.get( entry.getKey()) );
+			assertEquals(entry.getValue(), result.get(entry.getKey()));
 		}
 	}
 	
@@ -170,13 +170,13 @@ public class MetaTable_test {
 	@Test
 	public void indexBasedTest() {
 		
-		mtObj.newObject( genNumStrObj(1, "this"));
-		mtObj.newObject( genNumStrObj(2, "is"));
-		mtObj.newObject( genNumStrObj(3, "hello"));
-		mtObj.newObject( genNumStrObj(4, "world"));
-		mtObj.newObject( genNumStrObj(5, "program"));
-		mtObj.newObject( genNumStrObj(6, "in"));
-		mtObj.newObject( genNumStrObj(7, "this"));
+		mtObj.newObject(genNumStrObj(1, "this"));
+		mtObj.newObject(genNumStrObj(2, "is"));
+		mtObj.newObject(genNumStrObj(3, "hello"));
+		mtObj.newObject(genNumStrObj(4, "world"));
+		mtObj.newObject(genNumStrObj(5, "program"));
+		mtObj.newObject(genNumStrObj(6, "in"));
+		mtObj.newObject(genNumStrObj(7, "this"));
 		
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
@@ -218,15 +218,15 @@ public class MetaTable_test {
 	// /
 	@Test
 	public void innerJoinFlaw() {
-		mtObj.newObject( genNumStrObj(1, "hello world"));
+		mtObj.newObject(genNumStrObj(1, "hello world"));
 		
 		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("num", new Integer(2));
-		mtObj.newObject( objMap).saveDelta();
+		mtObj.newObject(objMap).saveDelta();
 		
 		objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("str_val", "nope");
-		mtObj.newObject( objMap);
+		mtObj.newObject(objMap);
 		
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
@@ -256,17 +256,17 @@ public class MetaTable_test {
 		//
 		objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("num[0].val", new Integer(2));
-		mtObj.newObject( objMap).saveDelta();
+		mtObj.newObject(objMap).saveDelta();
 		
 		objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("str[0].val", "nope");
 		objMap.put("str[1].val", "rawr");
-		mtObj.newObject( objMap);
+		mtObj.newObject(objMap);
 		
 		objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("num[0].val", new Integer(2));
 		objMap.put("str[0].val", "nope");
-		mtObj.newObject( objMap);
+		mtObj.newObject(objMap);
 		
 		//
 		// Query to run
@@ -301,7 +301,7 @@ public class MetaTable_test {
 	
 	@Test
 	public void missingNumWithSomeoneElse() {
-		mtObj.newObject( genNumStrObj(1, "hello world"));
+		mtObj.newObject(genNumStrObj(1, "hello world"));
 		
 		HashMap<String, Object> objMap = new HashMap<String, Object>();
 		objMap.put("str_val", "^_^");
@@ -323,8 +323,8 @@ public class MetaTable_test {
 	@Test
 	public void getFromKeyName_basic() {
 		
-		mtObj.newObject( genNumStrObj(1, "one"));
-		mtObj.newObject( genNumStrObj(2, "two"));
+		mtObj.newObject(genNumStrObj(1, "one"));
+		mtObj.newObject(genNumStrObj(2, "two"));
 		
 		MetaObject[] list = null;
 		assertNotNull(list = mtObj.getFromKeyName("num"));
@@ -343,7 +343,7 @@ public class MetaTable_test {
 	public void nonIndexedKeySaveCheck() {
 		
 		// Generates single node
-		mtObj.newObject( genNumStrObj(1, "hello world"));
+		mtObj.newObject(genNumStrObj(1, "hello world"));
 		MetaObject[] list = null;
 		MetaObject node = null;
 		
@@ -372,7 +372,7 @@ public class MetaTable_test {
 	public void getFromKeyName_customKeys() {
 		
 		// Generates single node
-		mtObj.newObject( genNumStrObj(1, "hello world"));
+		mtObj.newObject(genNumStrObj(1, "hello world"));
 		MetaObject[] list = null;
 		MetaObject node = null;
 		
@@ -413,7 +413,7 @@ public class MetaTable_test {
 		data.put("arrs", new ArrayList<String>(ohnoArray));
 		
 		MetaObject mo = null;
-		assertNotNull(mo = mtObj.newObject( data));
+		assertNotNull(mo = mtObj.newObject(data));
 		mo.saveDelta();
 		
 		MetaObject to = null;
@@ -432,7 +432,7 @@ public class MetaTable_test {
 		data.put("bin", new byte[] { 1, 2, 3, 4, 5 });
 		
 		MetaObject mo = null;
-		assertNotNull(mo = mtObj.newObject( data));
+		assertNotNull(mo = mtObj.newObject(data));
 		mo.saveDelta();
 		
 		MetaObject to = null;
@@ -451,13 +451,13 @@ public class MetaTable_test {
 	public void T50_orderByTest() {
 		
 		// Lets just rescycle old test for the names
-		mtObj.newObject( genNumStrObj(1, "this", 5));
-		mtObj.newObject( genNumStrObj(2, "is", 4));
-		mtObj.newObject( genNumStrObj(3, "hello", 3));
-		mtObj.newObject( genNumStrObj(4, "world", 2));
-		mtObj.newObject( genNumStrObj(5, "program", 1));
-		mtObj.newObject( genNumStrObj(6, "in", 6));
-		mtObj.newObject( genNumStrObj(7, "this", 7));
+		mtObj.newObject(genNumStrObj(1, "this", 5));
+		mtObj.newObject(genNumStrObj(2, "is", 4));
+		mtObj.newObject(genNumStrObj(3, "hello", 3));
+		mtObj.newObject(genNumStrObj(4, "world", 2));
+		mtObj.newObject(genNumStrObj(5, "program", 1));
+		mtObj.newObject(genNumStrObj(6, "in", 6));
+		mtObj.newObject(genNumStrObj(7, "this", 7));
 		
 		// Replicated a bug, where u CANNOT use orderby on a collumn your not
 		// doing a where search

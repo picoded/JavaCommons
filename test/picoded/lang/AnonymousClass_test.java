@@ -28,7 +28,7 @@ public class AnonymousClass_test {
 		
 		/// Status string, to assert
 		public String status = "relaxed";
-
+		
 		/// Spawn and instance of the current class
 		public final HiveMind spawnInstance() throws RuntimeException {
 			try {
@@ -67,7 +67,7 @@ public class AnonymousClass_test {
 	}
 	
 	/// This works fine and all.... until someone tries to use it as an anonymous class!
-	@Test(expected=Exception.class)
+	@Test(expected = Exception.class)
 	public void nextGenerationTest() {
 		HiveMind nextGeneration = new HiveMind() {
 			// New generation new mind set.

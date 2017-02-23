@@ -144,7 +144,7 @@ public class FileUtil extends FileUtilBase {
 				encoding = "US-ASCII";
 			}
 			return org.apache.commons.io.FileUtils.readFileToString(inFile, encoding);
-		} catch(IOException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -174,7 +174,7 @@ public class FileUtil extends FileUtilBase {
 				encoding = "US-ASCII";
 			}
 			org.apache.commons.io.FileUtils.writeStringToFile(inFile, data, encoding);
-		} catch(IOException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -372,7 +372,7 @@ public class FileUtil extends FileUtilBase {
 			if (!FileUtil.contentEqualsIgnoreEOL(inFile, outFile, null)) {
 				copyFile(inFile, outFile, preserveFileDate);
 			}
-		} catch(IOException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -506,30 +506,31 @@ public class FileUtil extends FileUtilBase {
 	/// @param Set exec permissions  (0:ignore, 1:unset, 2:set, -1:unset-owner-only, -2:set-owner-only)
 	/// @param recursion settings
 	///
-	public static void setFilePermission(File inFile, int read, int write, int exec, boolean recursive) {
+	public static void setFilePermission(File inFile, int read, int write, int exec,
+		boolean recursive) {
 		try {
 			//
 			// Apply the permission setting
 			//
-			if( read != 0 ) {
-				inFile.setReadable( (read>=2 || read<-2), (read<0) );
+			if (read != 0) {
+				inFile.setReadable((read >= 2 || read < -2), (read < 0));
 			}
-			if( write != 0 ) {
-				inFile.setWritable( (write>=2 || write<-2), (write<0) );
+			if (write != 0) {
+				inFile.setWritable((write >= 2 || write < -2), (write < 0));
 			}
-			if( exec != 0 ) {
-				inFile.setExecutable( (exec>=2 || exec<-2), (exec<0) );
+			if (exec != 0) {
+				inFile.setExecutable((exec >= 2 || exec < -2), (exec < 0));
 			}
 			
 			//
 			// Recurssion
 			//
-			if( recursive && inFile.isDirectory() ) {
+			if (recursive && inFile.isDirectory()) {
 				for (File f : inFile.listFiles()) {
 					setFilePermission(f, read, write, exec, recursive);
 				}
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

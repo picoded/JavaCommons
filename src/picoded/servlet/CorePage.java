@@ -408,8 +408,9 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	/// gets the PrintWriter, from the getOutputStream() object and returns it
 	public PrintWriter getWriter() {
 		try {
-			return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest().getCharacterEncoding()), true);
-		} catch(UnsupportedEncodingException e) {
+			return new PrintWriter(new OutputStreamWriter(getOutputStream(), getHttpServletRequest()
+				.getCharacterEncoding()), true);
+		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
 		
@@ -861,7 +862,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 		
 		/// Does string output if parameter is set
 		Object outputString = templateData.get("OutputString");
-		if( outputString != null ) {
+		if (outputString != null) {
 			output.println(outputString.toString());
 			return true;
 		}
@@ -1054,4 +1055,4 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 	
 	/// @TODO : HEAD SUPPORT, for integration with FileServlet
 	
- }
+}

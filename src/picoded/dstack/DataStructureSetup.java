@@ -91,8 +91,8 @@ public interface DataStructureSetup<K, V> extends UnsupportedDefaultMap<K, V> {
 	///
 	/// @return  The configuration map, to update / change settings.
 	///
-	default GenericConvertMap<String,Object> configMap() {
-		return new GenericConvertHashMap<String,Object>();
+	default GenericConvertMap<String, Object> configMap() {
+		return new GenericConvertHashMap<String, Object>();
 	}
 	
 }

@@ -47,7 +47,7 @@ public class RequestMap_test {
 	
 	@Test
 	public void constructorParametrizedNullParameter() {
-		requestMap = new RequestMap((Map<String,Object>)null);
+		requestMap = new RequestMap((Map<String, Object>) null);
 		assertNotNull(requestMap);
 		assertEquals(0, requestMap.size());
 	}

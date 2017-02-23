@@ -147,22 +147,22 @@ public class EmbeddedServlet implements Closeable {
 	public synchronized void close() {
 		try {
 			// Tomcat teardown / destruction
-			if( tomcat != null ) {
+			if (tomcat != null) {
 				tomcat.stop();
 				tomcat.destroy();
 				tomcat = null;
 			}
 			
 			// Temp file clenup
-			if( tempBaseDir != null ) {
+			if (tempBaseDir != null) {
 				FileUtil.deleteDirectory(tempBaseDir.toFile());
 				tempBaseDir = null;
 			}
-			if( tempContextDir != null ) {
+			if (tempContextDir != null) {
 				FileUtil.deleteDirectory(tempContextDir.toFile());
 				tempContextDir = null;
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -197,7 +197,7 @@ public class EmbeddedServlet implements Closeable {
 	/// @param  Temp base directory to use
 	/// @param  Port number to use
 	protected void initTomcatInstance(File tempPath, int port) {
-		initTomcatInstance( tempPath.getAbsolutePath(), port );
+		initTomcatInstance(tempPath.getAbsolutePath(), port);
 	}
 	
 	/// Does the basic default tomcat instance setup
@@ -210,7 +210,7 @@ public class EmbeddedServlet implements Closeable {
 			tomcat = new Tomcat();
 			
 			// Port setup
-			tomcat.setPort(port > 0? port : 8080);
+			tomcat.setPort(port > 0 ? port : 8080);
 			
 			// Get default base dir to current executing directory "java_tmp/random-guid"
 			// If needed of course
@@ -220,9 +220,9 @@ public class EmbeddedServlet implements Closeable {
 			//
 			// Files.createTempDirectory - is used in place of java.io.tmpdir
 			// String mWorkingDir = System.getProperty("java.io.tmpdir");
-			if( tempPath == null || tempPath.isEmpty() ) {
+			if (tempPath == null || tempPath.isEmpty()) {
 				// Temp directory for context
-				Path tPath = Files.createTempDirectory( GUID.base58() ).toAbsolutePath();
+				Path tPath = Files.createTempDirectory(GUID.base58()).toAbsolutePath();
 				
 				// Minor error prevention
 				Path webappPath = tPath.resolve("webapps");
@@ -264,7 +264,7 @@ public class EmbeddedServlet implements Closeable {
 			// 
 			// StandardServer server = (StandardServer)tomcat.getServer();
 			// server.addLifecycleListener(contextConfig);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -279,11 +279,11 @@ public class EmbeddedServlet implements Closeable {
 		// Load context name and path
 		//
 		contextName = inContextName;
-		if( contextName == null || contextName.isEmpty() || contextName.equalsIgnoreCase("ROOT") ) {
+		if (contextName == null || contextName.isEmpty() || contextName.equalsIgnoreCase("ROOT")) {
 			contextName = "ROOT";
 			contextPath = "";
 		} else {
-			contextPath = "/"+contextName;
+			contextPath = "/" + contextName;
 		}
 		return contextPath;
 	}
@@ -293,7 +293,7 @@ public class EmbeddedServlet implements Closeable {
 	/// @param  In context name to use (will be converted to path)
 	/// @param  Webapplication File path to use
 	protected void addWebapp(String inContextName, File webappPath) {
-		addWebapp(inContextName, webappPath.getAbsolutePath() );
+		addWebapp(inContextName, webappPath.getAbsolutePath());
 	}
 	
 	/// Add a webapplication
@@ -312,8 +312,9 @@ public class EmbeddedServlet implements Closeable {
 			// In the context JavaCommons webappllication, each deployment
 			// will have more then enough Jars to provide on their own 
 			//
-			LifecycleListener contextConfig = new ContextConfig() { 
+			LifecycleListener contextConfig = new ContextConfig() {
 				private boolean invoked = false;
+				
 				@Override
 				public void lifecycleEvent(LifecycleEvent event) {
 					if (!invoked) {
@@ -331,9 +332,9 @@ public class EmbeddedServlet implements Closeable {
 			//
 			// Loads the application with the custom contextConfig
 			//
-			context = tomcat.addWebapp(tomcat.getHost(), contextPath, webappPath, contextConfig );
+			context = tomcat.addWebapp(tomcat.getHost(), contextPath, webappPath, contextConfig);
 			
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -350,7 +351,7 @@ public class EmbeddedServlet implements Closeable {
 			normalizeContextNameToPath(inContextName);
 			
 			// Temp directory for context
-			tempContextDir = Files.createTempDirectory( GUID.base58() ).toAbsolutePath();
+			tempContextDir = Files.createTempDirectory(GUID.base58()).toAbsolutePath();
 			
 			// Setup context
 			context = tomcat.addContext(contextPath, tempContextDir.toString());
@@ -359,7 +360,7 @@ public class EmbeddedServlet implements Closeable {
 			Tomcat.addServlet(context, "ServletApp", serverClass);
 			
 			// And link the path
-			if( serverPath == null ) {
+			if (serverPath == null) {
 				// http://stackoverflow.com/questions/4140448/difference-between-and-in-servlet-mapping-url-pattern
 				serverPath = "/*";
 			}
@@ -367,7 +368,7 @@ public class EmbeddedServlet implements Closeable {
 			// Add the servlet 
 			context.addServletMappingDecoded(serverPath, "ServletApp");
 			
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -377,7 +378,7 @@ public class EmbeddedServlet implements Closeable {
 		try {
 			//tomcat.init();
 			tomcat.start();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -401,22 +402,19 @@ public class EmbeddedServlet implements Closeable {
 		String portNumber = "8080";
 		
 		// Arguments passing
-		if( args.length > 0 ) {
+		if (args.length > 0) {
 			servletFolder = args[0];
 		}
-		if( args.length > 1 ) {
+		if (args.length > 1) {
 			contextName = args[1];
 		}
-		if( args.length > 2 ) {
+		if (args.length > 2) {
 			portNumber = args[2];
 		}
 		
 		// Run the servlet
-		EmbeddedServlet servlet = new EmbeddedServlet( 
-			GenericConvert.toInt(portNumber),  
-			contextName,
-			new File(servletFolder)
-		);
+		EmbeddedServlet servlet = new EmbeddedServlet(GenericConvert.toInt(portNumber), contextName,
+			new File(servletFolder));
 		
 		// Wait and continue
 		servlet.await();

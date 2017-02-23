@@ -48,7 +48,7 @@ public class EmbeddedServlet_test {
 	
 	@After
 	public void tearDown() throws Exception {
-		if(testServlet != null) {
+		if (testServlet != null) {
 			testServlet.close();
 			testServlet = null;
 		}
@@ -70,31 +70,42 @@ public class EmbeddedServlet_test {
 	@Test
 	public void helloWorldHtml() {
 		assertNotNull(testServlet = new EmbeddedServlet(testPort, helloWorldHtml));
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/index.html").toString().trim() );
+		assertEquals("<h1>Hello World</h1>",
+			RequestHttp.get("http://localhost:" + testPort + "/index.html").toString().trim());
 	}
 	
 	@Test
 	public void helloWorldJava() {
 		assertNotNull(testServlet = new EmbeddedServlet(testPort, helloWorldJava));
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/test-html.html").toString().trim() );
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/test-java").toString().trim() );
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/test-jsp.jsp").toString().trim() );
+		assertEquals("<h1>Hello World</h1>",
+			RequestHttp.get("http://localhost:" + testPort + "/test-html.html").toString().trim());
+		assertEquals("<h1>Hello World</h1>",
+			RequestHttp.get("http://localhost:" + testPort + "/test-java").toString().trim());
+		assertEquals("<h1>Hello World</h1>",
+			RequestHttp.get("http://localhost:" + testPort + "/test-jsp.jsp").toString().trim());
 	}
 	
 	@Test
 	public void helloWorldJWar() {
 		assertNotNull(testServlet = new EmbeddedServlet(testPort, helloWorldJWar));
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/test-html.html").toString().trim() );
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/test-java").toString().trim() );
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/test-jsp.jsp").toString().trim() );
+		assertEquals("<h1>Hello World</h1>",
+			RequestHttp.get("http://localhost:" + testPort + "/test-html.html").toString().trim());
+		assertEquals("<h1>Hello World</h1>",
+			RequestHttp.get("http://localhost:" + testPort + "/test-java").toString().trim());
+		assertEquals("<h1>Hello World</h1>",
+			RequestHttp.get("http://localhost:" + testPort + "/test-jsp.jsp").toString().trim());
 	}
 	
 	@Test
 	public void helloWorldJWar_contextName() {
 		assertNotNull(testServlet = new EmbeddedServlet(testPort, "ctest", helloWorldJWar));
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/ctest/test-html.html").toString().trim() );
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/ctest/test-java").toString().trim() );
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/ctest/test-jsp.jsp").toString().trim() );
+		assertEquals("<h1>Hello World</h1>",
+			RequestHttp.get("http://localhost:" + testPort + "/ctest/test-html.html").toString()
+				.trim());
+		assertEquals("<h1>Hello World</h1>",
+			RequestHttp.get("http://localhost:" + testPort + "/ctest/test-java").toString().trim());
+		assertEquals("<h1>Hello World</h1>",
+			RequestHttp.get("http://localhost:" + testPort + "/ctest/test-jsp.jsp").toString().trim());
 	}
 	
 	//
@@ -105,15 +116,17 @@ public class EmbeddedServlet_test {
 	// The hello world class to test
 	public class HelloWorld extends HttpServlet {
 		private String message;
+		
 		public void init() throws ServletException {
 			// Do required initialization
 			message = "Hello World";
 		}
-
-		public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 			// Set response content type
 			response.setContentType("text/html");
-
+			
 			// Actual logic goes here.
 			PrintWriter out = response.getWriter();
 			out.println("<h1>" + message + "</h1>");
@@ -123,18 +136,23 @@ public class EmbeddedServlet_test {
 	@Test
 	public void helloWorldServlet() {
 		assertNotNull(testServlet = new EmbeddedServlet(testPort, new HelloWorld()));
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/test").toString().trim() );
+		assertEquals("<h1>Hello World</h1>", RequestHttp
+			.get("http://localhost:" + testPort + "/test").toString().trim());
 	}
 	
 	@Test
 	public void helloWorldServlet_fixedPath() {
 		assertNotNull(testServlet = new EmbeddedServlet(testPort, new HelloWorld(), "/fixed"));
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/fixed").toString().trim() );
-		assertNotEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/rand").toString().trim() );
+		assertEquals("<h1>Hello World</h1>",
+			RequestHttp.get("http://localhost:" + testPort + "/fixed").toString().trim());
+		assertNotEquals("<h1>Hello World</h1>",
+			RequestHttp.get("http://localhost:" + testPort + "/rand").toString().trim());
 	}
+	
 	@Test
 	public void helloWorldServlet_contextName() {
 		assertNotNull(testServlet = new EmbeddedServlet(testPort, "ctest", new HelloWorld(), null));
-		assertEquals( "<h1>Hello World</h1>", RequestHttp.get("http://localhost:"+testPort+"/ctest/test").toString().trim() );
+		assertEquals("<h1>Hello World</h1>",
+			RequestHttp.get("http://localhost:" + testPort + "/ctest/test").toString().trim());
 	}
 }

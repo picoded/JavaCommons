@@ -6,7 +6,8 @@ import picoded.struct.GenericConvertMap;
 /// This is intended to be an optimized incremental long data storage
 /// Because in "most" cases this would be good enough to handle any transactional data that is required.
 ///
-public interface AtomicLong extends GenericConvertMap<String, Long>, DataStructureSetup<String, Long> {
+public interface AtomicLong extends GenericConvertMap<String, Long>,
+	DataStructureSetup<String, Long> {
 	
 	// put, get, etc (public)
 	//--------------------------------------------------------------------------

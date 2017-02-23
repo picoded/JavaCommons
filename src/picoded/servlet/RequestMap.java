@@ -28,17 +28,17 @@ import picoded.conv.ConvertJSON;
 ///
 public class RequestMap extends AbstractMapDecorator<String, Object> implements
 	GenericConvertMap<String, Object> {
-		
+	
 	// Upload settings (for now)
 	//------------------------------------------------------------------------------
-	private static final int MEMORY_THRESHOLD = 1024 * 1024 * 4;  // 4MB
+	private static final int MEMORY_THRESHOLD = 1024 * 1024 * 4; // 4MB
 	
 	//
 	// The following is ignored, as MAX request size should be configured by server not application
 	//
 	// private static final int MAX_FILE_SIZE = 1024 * 1024 * 40; // 40MB
 	// private static final int MAX_REQUEST_SIZE = 1024 * 1024 * 50; // 50MB
-
+	
 	// Constructor
 	//------------------------------------------------------------------------------
 	
@@ -94,7 +94,7 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 	private boolean multipartProcessing(HttpServletRequest request) {
 		
 		// Only work when there is multi part
-		if( !ServletFileUpload.isMultipartContent(request) ) {
+		if (!ServletFileUpload.isMultipartContent(request)) {
 			return false;
 		}
 		
@@ -137,7 +137,7 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 						Object cache = get(fieldname);
 						
 						// Insert the cache if null
-						if( cache == null ) {
+						if (cache == null) {
 							// Puts in directly
 							put(fieldname, fieldvalue);
 						} else {
@@ -145,7 +145,7 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 							List<Object> listCache = getObjectList(fieldname, null);
 							
 							// Get the list representation instead
-							if( listCache == null ) {
+							if (listCache == null) {
 								listCache = new ArrayList<Object>();
 								listCache.add(cache); // Add the previous value as first in list
 							}
@@ -163,10 +163,10 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 						//
 						Object cache = get(fieldname);
 						RequestFileArray fileArray = null;
-						if( cache == null || !(cache instanceof RequestFileArray)) {
+						if (cache == null || !(cache instanceof RequestFileArray)) {
 							fileArray = new RequestFileArray();
 						} else {
-							fileArray = (RequestFileArray)cache;
+							fileArray = (RequestFileArray) cache;
 						}
 						
 						//

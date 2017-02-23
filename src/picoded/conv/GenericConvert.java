@@ -1,9 +1,7 @@
 package picoded.conv;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 import picoded.struct.GenericConvertArrayList;
 import picoded.struct.GenericConvertList;
@@ -47,7 +45,7 @@ public class GenericConvert extends GenericConvertStandard {
 	/// @param fallbck   The fallback default (if not convertable)
 	///
 	/// @returns         The converted value
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "all" })
 	public static <K extends String, V> GenericConvertMap<K, V> toGenericConvertStringMap(
 		Object input, Object fallbck) {
 		
@@ -91,6 +89,7 @@ public class GenericConvert extends GenericConvertStandard {
 	/// @param input     The input value to convert
 	///
 	/// @returns         The converted value
+	@SuppressWarnings("all")
 	public static <K extends String, V> GenericConvertMap<K, V> toGenericConvertStringMap(
 		Object input) {
 		return toGenericConvertStringMap(input, null);

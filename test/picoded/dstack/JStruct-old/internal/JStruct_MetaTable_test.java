@@ -27,13 +27,13 @@ public class JStruct_MetaTable_test {
 	
 	@Test
 	public void getTempHintTest() {
-		assertFalse(jStruct_MetaTable.getTempHint());
+		assertFalse(jStruct_MetaTable.getTempHintVal());
 	}
 	
 	@Test
 	public void setTempHintTest() {
-		assertFalse(jStruct_MetaTable.setTempHint(true));
-		assertTrue(jStruct_MetaTable.getTempHint());
+		assertFalse(jStruct_MetaTable.setTempHintVal(true));
+		assertTrue(jStruct_MetaTable.getTempHintVal());
 		jStruct_MetaTable.systemSetup();
 		jStruct_MetaTable.systemTeardown();
 	}

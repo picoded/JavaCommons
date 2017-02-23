@@ -4,19 +4,11 @@ package picoded.JStruct.module.site;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
 // Test Case include
@@ -28,7 +20,6 @@ import picoded.JStruct.MetaObject;
 import picoded.JStruct.MetaTable;
 import picoded.conv.ConvertJSON;
 import picoded.conv.GenericConvert;
-import picoded.set.HttpRequestType;
 import picoded.servlet.CorePage;
 import picoded.struct.GenericConvertHashMap;
 import picoded.struct.GenericConvertList;
@@ -44,6 +35,7 @@ public class SimpleShoppingCart_test {
 	/// The product owner to currently use for testing
 	public MetaObject productOwnerObject = null;
 	
+	@SuppressWarnings("unused")
 	private CorePage corePage;
 	
 	/// To override for implementation
@@ -160,7 +152,7 @@ public class SimpleShoppingCart_test {
 		productOwnerObject.put("id-1", "Scrooge Mcduck");
 		productOwnerObject.saveDelta();
 		productItem.append("id-1", productOwnerObject);
-		simpleShoppingCart.productItem = productItem;
+		SimpleShoppingCart.productItem = productItem;
 		testJSON = "[[\"id-1\",10],[\"id-2\",0],[\"id-3\",-5],[\"id-4\",10,{\"someMeta\":100}], null, [\"id-7\"], [\""
 			+ productItem.getFromKeyName("_oid")[0]._oid() + "\", 0] ]";
 		testCart = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
@@ -295,24 +287,24 @@ public class SimpleShoppingCart_test {
 			productOwner.getFromKeyName("_oid")[0]._oid(), inUpdateList));
 		
 		inUpdateList = new ArrayList<Object>();
-		itemObj.put("_oid", simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
+		itemObj.put("_oid", SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
 		inUpdateList.add(itemObj);
-		simpleShoppingCart.productOwner = simpleShoppingCart.productItem;
-		simpleShoppingCart.salesOrder = simpleShoppingCart.productItem;
-		assertNotNull(simpleShoppingCart.fetchPurchaseOrder(simpleShoppingCart.productItem
+		simpleShoppingCart.productOwner = SimpleShoppingCart.productItem;
+		simpleShoppingCart.salesOrder = SimpleShoppingCart.productItem;
+		assertNotNull(simpleShoppingCart.fetchPurchaseOrder(SimpleShoppingCart.productItem
 			.getFromKeyName("_oid")[0]._oid()));
 		assertNotNull(simpleShoppingCart.updatePurchaseOrderStatus(
-			simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid(), "Paid"));
+			SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid(), "Paid"));
 		itemObj = new GenericConvertHashMap<String, Object>();
 		assertNotNull(simpleShoppingCart.getProductList(simpleShoppingCart.productOwner
 			.getFromKeyName("_ownerID")[0].get("_ownerID").toString()));
 		testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"_ownerID\", \""
-			+ simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid()
+			+ SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid()
 			+ "\"], [\""
-			+ simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid() + "\", 9] ]";
+			+ SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid() + "\", 9] ]";
 		cartList = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
 		itemObj.put("_oid",
-			simpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString());
+			SimpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString());
 		assertNotNull(simpleShoppingCart.createPurchaseOrder(
 			simpleShoppingCart.productOwner.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
 			cartList, itemObj, itemObj, "Paid"));
@@ -324,7 +316,7 @@ public class SimpleShoppingCart_test {
 		itemObj.put("testCart", cartList);
 		inUpdateList.add(itemObj);
 		assertNotNull(simpleShoppingCart.updateProductList(
-			simpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
+			SimpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
 			inUpdateList));
 	}
 	
@@ -356,24 +348,24 @@ public class SimpleShoppingCart_test {
 			productOwner.getFromKeyName("_oid")[0]._oid(), inUpdateList));
 		
 		inUpdateList = new ArrayList<Object>();
-		itemObj.put("_oid", simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
+		itemObj.put("_oid", SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
 		inUpdateList.add(itemObj);
-		simpleShoppingCart.productOwner = simpleShoppingCart.productItem;
-		simpleShoppingCart.salesOrder = simpleShoppingCart.productItem;
-		assertNotNull(simpleShoppingCart.fetchPurchaseOrder(simpleShoppingCart.productItem
+		simpleShoppingCart.productOwner = SimpleShoppingCart.productItem;
+		simpleShoppingCart.salesOrder = SimpleShoppingCart.productItem;
+		assertNotNull(simpleShoppingCart.fetchPurchaseOrder(SimpleShoppingCart.productItem
 			.getFromKeyName("_oid")[0]._oid()));
 		assertNotNull(simpleShoppingCart.updatePurchaseOrderStatus(
-			simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid(), "Paid"));
+			SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid(), "Paid"));
 		itemObj = new GenericConvertHashMap<String, Object>();
 		assertNotNull(simpleShoppingCart.getProductList(simpleShoppingCart.productOwner
 			.getFromKeyName("_ownerID")[0].get("_ownerID").toString()));
 		testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"_ownerID\", \""
-			+ simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid()
+			+ SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid()
 			+ "\"], [\""
-			+ simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid() + "\", 9] ]";
+			+ SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid() + "\", 9] ]";
 		cartList = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
 		itemObj.put("_oid",
-			simpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString());
+			SimpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString());
 		assertNotNull(simpleShoppingCart.createPurchaseOrder(
 			simpleShoppingCart.productOwner.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
 			cartList, itemObj, itemObj, "Paid"));
@@ -423,20 +415,20 @@ public class SimpleShoppingCart_test {
 			productOwner.getFromKeyName("_oid")[0]._oid(), inUpdateList));
 		
 		inUpdateList = new ArrayList<Object>();
-		itemObj.put("_oid", simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
+		itemObj.put("_oid", SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
 		inUpdateList.add(itemObj);
-		simpleShoppingCart.productOwner = simpleShoppingCart.productItem;
-		simpleShoppingCart.salesOrder = simpleShoppingCart.productItem;
+		simpleShoppingCart.productOwner = SimpleShoppingCart.productItem;
+		simpleShoppingCart.salesOrder = SimpleShoppingCart.productItem;
 		
 		itemObj = new GenericConvertHashMap<String, Object>();
 		assertNotNull(simpleShoppingCart.getProductList(simpleShoppingCart.productOwner
 			.getFromKeyName("_ownerID")[0].get("_ownerID").toString()));
 		testJSON = "[[\"id-1\",11],[\"id-4\",-1],[\"id-3\",-6],[\"id-5\",11,{\"someMeta\":130}], null, [\"_ownerID\", \""
-			+ simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid()
+			+ SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid()
 			+ "\"], [\""
-			+ simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid() + "\", 9] ]";
+			+ SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid() + "\", 9] ]";
 		cartList = GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>());
-		itemObj.put("_oid", simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
+		itemObj.put("_oid", SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid());
 		assertNotNull(simpleShoppingCart.createPurchaseOrder(
 			simpleShoppingCart.productOwner.getFromKeyName("_ownerID")[0].get("_ownerID").toString(),
 			cartList, itemObj, itemObj, "Paid"));
@@ -445,7 +437,7 @@ public class SimpleShoppingCart_test {
 		itemObj.put("testCart", cartList);
 		inUpdateList.add(itemObj);
 		assertNotNull(simpleShoppingCart.updateProductList(
-			simpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid(), inUpdateList));
+			SimpleShoppingCart.productItem.getFromKeyName("_oid")[0]._oid(), inUpdateList));
 	}
 	
 	@Test(expected = Exception.class)
@@ -476,7 +468,7 @@ public class SimpleShoppingCart_test {
 			productOwner.getFromKeyName("_oid")[0]._oid(), inUpdateList));
 		
 		itemObj.put("_oid",
-			simpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString());
+			SimpleShoppingCart.productItem.getFromKeyName("_ownerID")[0].get("_ownerID").toString());
 		inUpdateList.add(itemObj);
 		assertNotNull(simpleShoppingCart.updateProductList(
 			productOwner.getFromKeyName("_oid")[0]._oid(), inUpdateList));

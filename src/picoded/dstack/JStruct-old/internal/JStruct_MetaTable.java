@@ -54,15 +54,15 @@ public class JStruct_MetaTable implements MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Temp value flag, defaults to false
-	protected boolean isTempHint = false;
+	protected boolean isTempHintVal = false;
 	
 	/// Gets if temp mode optimization hint is indicated
 	/// Note that this only serve as a hint, as does not indicate actual setting
 	///
 	/// @returns boolean  temp mode value
 	@Override
-	public boolean getTempHint() {
-		return isTempHint;
+	public boolean getTempHintVal() {
+		return isTempHintVal;
 	}
 	
 	/// Sets temp mode optimization indicator hint
@@ -72,25 +72,13 @@ public class JStruct_MetaTable implements MetaTable {
 	///
 	/// @returns boolean  previous value if set
 	@Override
-	public boolean setTempHint(boolean mode) {
-		boolean ret = isTempHint;
-		isTempHint = mode;
+	public boolean setTempHintVal(boolean mode) {
+		boolean ret = isTempHintVal;
+		isTempHintVal = mode;
 		return ret;
 	}
 	
-	///
-	/// Backend system setup / teardown
-	///--------------------------------------------------------------------------
-	
-	/// Setsup the backend storage table, etc. If needed
-	@Override
-	public void systemSetup() {
-		// does nothing
-	}
-	
-	/// Teardown and delete the backend storage table, etc. If needed
-	@Override
-	public void systemTeardown() {
+	public void clear() {
 		_valueMap.clear();
 	}
 	

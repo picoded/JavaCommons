@@ -179,6 +179,7 @@ public class ProductListing_test {
 		List<Object> inUpdateList = new ArrayList<Object>();
 		
 		inUpdateList.add(GenericConvert.toGenericConvertList(testJSON, new ArrayList<Object>()));
+		SimpleShoppingCart.productItem = productOwner;
 		assertNotNull(productListing.updateList(productOwner.getFromKeyName("_oid")[0]._oid(),
 			inUpdateList));
 		

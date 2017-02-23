@@ -80,21 +80,6 @@ public class MetaTable_test {
 		return objMap;
 	}
 	
-	// @Test
-	// public void invalidSetup() { //Numeric as table prefix tend to cuase
-	// problems
-	// MetaTable m;
-	//
-	// try {
-	// m = new MetaTable(JStackObj, "1" + TestConfig.randomTablePrefix());
-	// fail(); // if we got here, no exception was thrown, which is bad
-	// } catch (Exception e) {
-	// final String expected = "Invalid table name (cannot start with numbers)";
-	// assertTrue("Missing Exception - " + expected,
-	// e.getMessage().indexOf(expected) >= 0);
-	// }
-	// }
-	
 	@Test
 	public void newObjectTest() {
 		MetaObject moObj = null;
@@ -485,16 +470,6 @@ public class MetaTable_test {
 		
 	}
 	
-	// @Test
-	// public void orderByTestLoop() {
-	// for(int i=0; i<25; ++i) {
-	// orderByTest();
-	//
-	// tearDown();
-	// setUp();
-	// }
-	// }
-	
 	// KeyName fetching test
 	// -----------------------------------------------
 	@Test
@@ -569,8 +544,14 @@ public class MetaTable_test {
 		assertNotNull(qRes = table.query("num > ? OR be = ?", new Object[] { 0, "happy" }));
 		// Each object has a base68 GUID
 		String guid = qRes[0]._oid();
+		assertNotNull(table.queryKeys(null, new Object[] { 0, "happy" }, null, 0, 0));
 		assertNotNull(table.queryKeys("num > ? OR be = ?", new Object[] { 0, "happy" }, null, 0, 0));
 		assertNotNull(table.get(guid, false));
+		assertNotNull(table.get(guid, true));
+		String[] idArray = new String[] {};
+		assertNotNull(table.getArrayFromID(idArray, false));
+		idArray = new String[] { "happy", guid };
+		assertNotNull(table.getArrayFromID(idArray, false));
 		assertNotNull(table.getFromKeyName("happy", null));
 		Map<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("hello", qRes);
@@ -587,5 +568,11 @@ public class MetaTable_test {
 			mtObj.incrementalMaintenance();
 		}
 		mtObj.maintenance();
+	}
+	
+	@Test
+	public void systemSetupTest() {
+		mtObj.systemSetup();
+		mtObj.systemTeardown();
 	}
 }

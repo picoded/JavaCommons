@@ -36,7 +36,7 @@ public class SimpleShoppingCart {
 	public MetaTable productOwner = null;
 	
 	/// Inventory listing
-	public MetaTable productItem = null;
+	public static MetaTable productItem = null;
 	
 	/// Atomic product counting
 	protected AtomicLongMap productCount = null;

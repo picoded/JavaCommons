@@ -6,6 +6,11 @@ package picoded.struct;
 /// This is not a public class
 class UnsupportedDefaultUtils {
 	
+	/// Invalid constructor (throws exception)
+	protected UnsupportedDefaultUtils() {
+		throw new IllegalAccessError("Utility class");
+	}
+	
 	///
 	/// Checks if the given index, is within 0 to last index (size - 1).
 	/// Throws the respective IndexOutOfBoundsException if it fails

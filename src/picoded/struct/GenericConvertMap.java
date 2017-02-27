@@ -366,7 +366,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	///
 	/// @returns The converted value
 	default String[] getStringArray(K key) {
-		return GenericConvert.toStringArray(get(key));
+		return getStringArray(key, null);
 	}
 	
 	// to object array

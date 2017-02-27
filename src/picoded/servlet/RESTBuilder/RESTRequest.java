@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 
+import picoded.conv.GenericConvert;
 import picoded.struct.GenericConvertMap;
 import picoded.set.HttpRequestType;
 
@@ -120,4 +121,29 @@ public class RESTRequest extends AbstractMapDecorator<String, Object> implements
 	public picoded.servlet.CorePage requestPage() {
 		return requestPage;
 	}
+
+	//------------------------------------------------------------------------------
+	// Overridden Array functions
+	//------------------------------------------------------------------------------
+
+    /// To String[] conversion of generic object
+    ///
+    /// @param key The input value key to convert
+    /// @param The fallback default (if not convertable)
+    ///
+    /// @returns The converted String[], always possible unless null
+    public String[] getStringArray(String key, Object fallbck) {
+		Object val = get(key);
+		if(val == null){
+			return GenericConvert.toStringArray(fallbck);
+		}
+		String[] arr = GenericConvert.toStringArray(val);
+		if(arr == null){
+			// maybe it is not an array, try get string and then coerce it into an array
+			String s = GenericConvert.toString(val);
+			arr = new String[]{s};
+		}
+		return arr;
+	}
+
 }

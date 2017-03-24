@@ -1,17 +1,17 @@
 package picoded.dstack.core;
 
-import picoded.dstack.DataStructureSetup;
+import picoded.dstack.DStackCommon;
 import picoded.security.NxtCrypt;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 
 ///
-/// Common utility class of DataStructureSetup.
+/// Common utility class of DStackCommon.
 ///
 /// Does not actually implement its required feature,
 /// but helps provide a common base line for the configuration system.
 ///
-public abstract class Core_DataStructure<K,V> implements DataStructureSetup<K,V> {
+public abstract class Core_DataStructure<K,V> implements DStackCommon<K,V> {
 	
 	//--------------------------------------------------------------------------
 	//

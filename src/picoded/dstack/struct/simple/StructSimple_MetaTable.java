@@ -26,10 +26,10 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	///--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
-	protected Map<String, Map<String, Object>> _valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
+	protected Map<String, Map<String, Object>> valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
 	
 	/// Read write lock
-	protected ReentrantReadWriteLock _accessLock = new ReentrantReadWriteLock();
+	protected ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
 	
 	///
 	/// Backend system setup / teardown
@@ -44,15 +44,24 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	/// Teardown and delete the backend storage table, etc. If needed
 	@Override
 	public void systemDestroy() {
-		_valueMap.clear();
+		clear();
 	}
 	
-	/// Removes all data
+	///
+	/// Removes all data, without tearing down setup
+	///
+	/// Handles re-entrant lock where applicable
+	///
 	@Override
 	public void clear() {
-		_valueMap.clear();
+		try {
+			accessLock.writeLock().lock();
+			valueMap.clear();
+		} finally {
+			accessLock.writeLock().unlock();
+		}
 	}
-	
+
 	///
 	/// Internal functions, used by MetaObject
 	///--------------------------------------------------------------------------
@@ -61,8 +70,8 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	/// Returns null
 	public Map<String, Object> metaObjectRemoteDataMap_get(String oid) {
 		try {
-			_accessLock.readLock().lock();
-			Map<String, Object> storedValue = _valueMap.get(oid);
+			accessLock.readLock().lock();
+			Map<String, Object> storedValue = valueMap.get(oid);
 			if (storedValue == null) {
 				return null;
 			}
@@ -72,7 +81,7 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 			}
 			return ret;
 		} finally {
-			_accessLock.readLock().unlock();
+			accessLock.readLock().unlock();
 		}
 	}
 	
@@ -81,7 +90,7 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	public void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
 		Set<String> keys) {
 		try {
-			_accessLock.writeLock().lock();
+			accessLock.writeLock().lock();
 			
 			// Get keys to store, null = all
 			if (keys == null) {
@@ -89,7 +98,7 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 			}
 			
 			// Makes a new map if needed
-			Map<String, Object> storedValue = _valueMap.get(oid);
+			Map<String, Object> storedValue = valueMap.get(oid);
 			if (storedValue == null) {
 				storedValue = new ConcurrentHashMap<String, Object>();
 			}
@@ -105,9 +114,9 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 			}
 			
 			// Ensure the value map is stored
-			_valueMap.put(oid, storedValue);
+			valueMap.put(oid, storedValue);
 		} finally {
-			_accessLock.writeLock().unlock();
+			accessLock.writeLock().unlock();
 		}
 	}
 	
@@ -123,10 +132,10 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	@Override
 	public Set<String> keySet() {
 		try {
-			_accessLock.readLock().lock();
-			return _valueMap.keySet();
+			accessLock.readLock().lock();
+			return valueMap.keySet();
 		} finally {
-			_accessLock.readLock().unlock();
+			accessLock.readLock().unlock();
 		}
 	}
 	

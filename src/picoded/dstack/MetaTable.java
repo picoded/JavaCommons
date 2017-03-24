@@ -25,7 +25,7 @@ import picoded.dstack.core.Core_MetaObject;
 /// of a JCache layer for non-complex lookup cached reads. Which will in most cases be the main
 /// read request load.
 /// 
-public interface MetaTable extends DataStructureSetup<String, MetaObject> {
+public interface MetaTable extends DStackCommon<String, MetaObject> {
 	
 	// MetaObject optimizations
 	//----------------------------------------------

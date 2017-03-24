@@ -23,7 +23,7 @@ import picoded.struct.GenericConvertMap;
 /// this is intentional design as anything smaller then a second 
 /// is pointless over a network.
 ///
-public interface KeyValue extends GenericConvertMap<String, String>, DataStructureSetup<String,String> {
+public interface KeyValue extends GenericConvertMap<String, String>, DStackCommon<String,String> {
 	
 	//--------------------------------------------------------------------------
 	//
@@ -216,7 +216,7 @@ public interface KeyValue extends GenericConvertMap<String, String>, DataStructu
 	//
 	// Backend system setup / teardown / maintenance
 	//
-	// @see `DataStructureSetup` for the rest of the interface requirments
+	// @see `DStackCommon` for the rest of the interface requirments
 	//
 	//--------------------------------------------------------------------------
 	

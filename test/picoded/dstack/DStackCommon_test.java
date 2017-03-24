@@ -19,10 +19,10 @@ import org.junit.Test;
 import picoded.dstack.*;
 import picoded.dstack.struct.simple.*;
 
-public class DataStructureSetup_test {
+public class DStackCommon_test {
 	
 	// Test object for reuse
-	public DataStructureSetup<String,String> testObj = null;
+	public DStackCommon<String,String> testObj = null;
 	
 	// To override for implementation
 	//-----------------------------------------------------
@@ -30,7 +30,7 @@ public class DataStructureSetup_test {
 	/// Note that this implementation constructor
 	/// is to be overriden for the various backend
 	/// specific test cases
-	public DataStructureSetup<String,String> implementationConstructor() {
+	public DStackCommon<String,String> implementationConstructor() {
 		return new StructSimple_KeyValue();
 	}
 	

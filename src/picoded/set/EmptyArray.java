@@ -5,6 +5,8 @@ import org.apache.commons.lang3.ArrayUtils;
 ///
 /// Provides a standardised access to empty arrays
 ///
+/// This proxies the object found in ArrayUtils (from apache)
+///
 public class EmptyArray {
 	
 	/// An empty immutable string array

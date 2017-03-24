@@ -5,6 +5,9 @@ import org.apache.commons.lang3.ArrayUtils;
 ///
 /// Utility class to help slice out arrays out of arrays without cloning them in memory =)
 ///
+/// This class extends `org.apache.commons.lang3.ArrayUtils`
+/// https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/ArrayUtils.html
+///
 public class ArrayConv extends ArrayUtils {
 	
 	/// Invalid constructor (throws exception)

@@ -1,4 +1,4 @@
-package picoded.dstack.test;
+package picoded.dstack.struct.simple;
 
 // Target test class
 import static org.junit.Assert.assertEquals;
@@ -10,8 +10,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.junit.After;
 // Test Case include
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,7 +19,7 @@ import org.junit.Test;
 import picoded.dstack.*;
 import picoded.dstack.struct.simple.*;
 
-public class KeyValue_test {
+public class StructSimple_KeyValue_test {
 	
 	// Test object for reuse
 	public KeyValue testObj = null;
@@ -141,7 +141,7 @@ public class KeyValue_test {
 		// before the expiration time key will not be null.
 		assertNotNull(testObj.get("yes"));
 		
-		// sleep the execution for 4 secs so that key gets expired.
+		// sleep the execution for 4 secs so the inserted key gets expired.
 		Thread.sleep(4000);
 		
 		// key should be null after expiration time.

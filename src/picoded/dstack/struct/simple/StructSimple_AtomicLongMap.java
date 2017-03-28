@@ -7,13 +7,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import picoded.dstack.*;
 import picoded.dstack.core.*;
 
-/// Refence implementation of AtomicKeyLong data structure
+/// Refence implementation of AtomicLongMap data structure
 ///
 /// This is intended to be an optimized key value map data storage
 /// Used mainly in caching or performance critical scenerios.
 ///
 /// As such its sacrifices much utility for performance
-public class StructSimple_AtomicKeyLong extends Core_AtomicKeyLong {
+public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	
 	///
 	/// Constructor vars
@@ -30,7 +30,7 @@ public class StructSimple_AtomicKeyLong extends Core_AtomicKeyLong {
 	///--------------------------------------------------------------------------
 	
 	/// Constructor
-	public StructSimple_AtomicKeyLong() {
+	public StructSimple_AtomicLongMap() {
 		// does nothing =X
 	}
 	

@@ -28,7 +28,7 @@
 /// |------------------|----------------------------------------------------------------------|
 /// | KeyValue         | Key to string value mapping. Used for temporary values storage       |
 /// | MetaTable        | Key to object map storage, used primarily for "table" like data      |
-/// | AtomicKeyLong    | Key to long values where atomic consistency is required              |
+/// | AtomicLongMap    | [@TODO] Key to long values where atomic consistency is required      |
 /// | EventLogger      | [@TODO] Event logging and management system                          |
 /// |------------------|----------------------------------------------------------------------|
 ///

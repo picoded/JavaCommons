@@ -3,10 +3,16 @@ package picoded.dstack;
 import picoded.struct.GenericConvertMap;
 
 ///
-/// This is intended to be an optimized incremental long data storage
-/// Because in "most" cases this would be good enough to handle any transactional data that is required.
+/// [DO NOT USE : THIS IS CURRENTLY FLAGGED OUT TO BE REFACTORED]
+/// 
+/// @TODO : EUGENE, consider if this should be rewritten to Map<String,AtomicLong> 
+///         instead to be more standard compliant
 ///
-public interface AtomicKeyLong extends GenericConvertMap<String, Long>, DStackCommon<String, Long> {
+/// This is intended to be an optimized incremental long data storage
+/// Because in "most" cases this would be good enough to handle 
+/// any transactional data that is required.
+///
+public interface AtomicLongMap extends GenericConvertMap<String, Long>, DStackCommon<String, Long> {
 	
 	// Core put / get
 	//--------------------------------------------------------------------------

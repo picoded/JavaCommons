@@ -1,11 +1,6 @@
 package picoded.struct;
 
-import java.util.*;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -23,11 +18,11 @@ import static org.junit.Assert.*;
 public class StandardHashMap_test {
 	
 	// Test list 
-	Map<String,Object> map = null;
+	Map<String, Object> map = null;
 	
 	@Before
 	public void setUp() {
-		map = new HashMap<String,Object>();
+		map = new HashMap<String, Object>();
 	}
 	
 	@After
@@ -83,9 +78,9 @@ public class StandardHashMap_test {
 	}
 	
 	public void isEmptyTest() {
-		assertTrue( map.isEmpty() );
+		assertTrue(map.isEmpty());
 		map.put("key5", "V2");
-		assertFalse( map.isEmpty() );
+		assertFalse(map.isEmpty());
 	}
 	
 	@Test
@@ -104,6 +99,8 @@ public class StandardHashMap_test {
 		Map<String, String> submap = new HashMap<>();
 		submap.put("key1", "1");
 		set.addAll(submap.entrySet());
+		Collection<Object> col = map.values();
+		assertNotNull(col);
 		
 		// We do a toString conversion with 1 entry,
 		// As UnsupportedDefaultMap uses the DeferredMapEntry, which 

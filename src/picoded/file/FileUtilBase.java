@@ -41,7 +41,7 @@ public class FileUtilBase {
 	
 	/// The number of bytes in a kilobyte.
 	public static final long ONE_KB = FileUtils.ONE_KB;
-
+	
 	/// The number of bytes in a kilobyte.
 	public static final BigInteger ONE_KB_BI = FileUtils.ONE_KB_BI;
 	
@@ -62,10 +62,10 @@ public class FileUtilBase {
 	
 	/// The number of bytes in a terabyte.
 	public static final BigInteger ONE_TB_BI = FileUtils.ONE_TB_BI;
-
+	
 	/// The number of bytes in a petabyte.
 	public static final long ONE_PB = FileUtils.ONE_PB;
-
+	
 	/// The number of bytes in a petabyte.
 	public static final BigInteger ONE_PB_BI = FileUtils.ONE_PB_BI;
 	
@@ -122,7 +122,7 @@ public class FileUtilBase {
 	public static File getUserDirectory() {
 		return FileUtils.getUserDirectory();
 	}
-
+	
 	/// Opens a {@link FileInputStream} for the specified file, providing better
 	/// error messages than simply calling <code>new FileInputStream(file)</code>.
 	///
@@ -138,7 +138,7 @@ public class FileUtilBase {
 	public static FileInputStream openInputStream(final File file) {
 		try {
 			return FileUtils.openInputStream(file);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -160,7 +160,7 @@ public class FileUtilBase {
 	public static FileOutputStream openOutputStream(final File file) {
 		try {
 			return FileUtils.openOutputStream(file);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -184,7 +184,7 @@ public class FileUtilBase {
 	public static FileOutputStream openOutputStream(final File file, final boolean append) {
 		try {
 			return FileUtils.openOutputStream(file, append);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -202,7 +202,7 @@ public class FileUtilBase {
 	public static String byteCountToDisplaySize(final BigInteger size) {
 		try {
 			return FileUtils.byteCountToDisplaySize(size);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -219,7 +219,7 @@ public class FileUtilBase {
 	public static String byteCountToDisplaySize(final long size) {
 		try {
 			return FileUtils.byteCountToDisplaySize(size);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -236,11 +236,10 @@ public class FileUtilBase {
 	public static void touch(final File file) {
 		try {
 			FileUtils.touch(file);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
 	
 	/// Converts a Collection containing java.io.File instanced into array
 	/// representation. This is to account for the difference between
@@ -251,7 +250,7 @@ public class FileUtilBase {
 	public static File[] convertFileCollectionToFileArray(final Collection<File> files) {
 		try {
 			return FileUtils.convertFileCollectionToFileArray(files);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -277,12 +276,11 @@ public class FileUtilBase {
 	///                   If this parameter is {@code null}, subdirectories will not be included in the
 	///                   search. Use TrueFileFilter.INSTANCE to match all directories.
 	/// @return an collection of java.io.File with the matching files
-	public static Collection<File> listFiles(
-		final File directory, final IOFileFilter fileFilter, final IOFileFilter dirFilter
-	) {
+	public static Collection<File> listFiles(final File directory, final IOFileFilter fileFilter,
+		final IOFileFilter dirFilter) {
 		try {
 			return FileUtils.listFiles(directory, fileFilter, dirFilter);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -299,9 +297,8 @@ public class FileUtilBase {
 	///                   If this parameter is {@code null}, subdirectories will not be included in the
 	///                   search. Use TrueFileFilter.INSTANCE to match all directories.
 	/// @return an collection of java.io.File with the matching files
-	public static Collection<File> listFilesAndDirs(
-		final File directory, final IOFileFilter fileFilter, final IOFileFilter dirFilter
-	) {
+	public static Collection<File> listFilesAndDirs(final File directory,
+		final IOFileFilter fileFilter, final IOFileFilter dirFilter) {
 		return FileUtils.listFilesAndDirs(directory, fileFilter, dirFilter);
 	}
 	
@@ -318,9 +315,8 @@ public class FileUtilBase {
 	///                   If this parameter is {@code null}, subdirectories will not be included in the
 	///                   search. Use TrueFileFilter.INSTANCE to match all directories.
 	/// @return an iterator of java.io.File for the matching files
-	public static Iterator<File> iterateFiles(
-		final File directory, final IOFileFilter fileFilter, final IOFileFilter dirFilter
-	) {
+	public static Iterator<File> iterateFiles(final File directory, final IOFileFilter fileFilter,
+		final IOFileFilter dirFilter) {
 		return FileUtils.iterateFiles(directory, fileFilter, dirFilter);
 	}
 	
@@ -339,9 +335,8 @@ public class FileUtilBase {
 	///                   If this parameter is {@code null}, subdirectories will not be included in the
 	///                   search. Use TrueFileFilter.INSTANCE to match all directories.
 	/// @return an iterator of java.io.File for the matching files
-	public static Iterator<File> iterateFilesAndDirs(
-		final File directory, final IOFileFilter fileFilter, final IOFileFilter dirFilter
-	) {
+	public static Iterator<File> iterateFilesAndDirs(final File directory,
+		final IOFileFilter fileFilter, final IOFileFilter dirFilter) {
 		return FileUtils.iterateFilesAndDirs(directory, fileFilter, dirFilter);
 	}
 	
@@ -353,9 +348,8 @@ public class FileUtilBase {
 	///                   parameter is {@code null}, all files are returned.
 	/// @param recursive  if true all subdirectories are searched as well
 	/// @return an collection of java.io.File with the matching files
-	public static Collection<File> listFiles(
-		final File directory, final String[] extensions, final boolean recursive
-	) {
+	public static Collection<File> listFiles(final File directory, final String[] extensions,
+		final boolean recursive) {
 		return FileUtils.listFiles(directory, extensions, recursive);
 	}
 	
@@ -370,9 +364,8 @@ public class FileUtilBase {
 	/// @param recursive  if true all subdirectories are searched as well
 	/// @return an iterator of java.io.File with the matching files
 	/// @since 1.2
-	public static Iterator<File> iterateFiles(
-		final File directory, final String[] extensions, final boolean recursive
-	) {
+	public static Iterator<File> iterateFiles(final File directory, final String[] extensions,
+		final boolean recursive) {
 		return FileUtils.iterateFiles(directory, extensions, recursive);
 	}
 	
@@ -391,7 +384,7 @@ public class FileUtilBase {
 	public static boolean contentEquals(final File file1, final File file2) {
 		try {
 			return FileUtils.contentEquals(file1, file2);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -408,10 +401,11 @@ public class FileUtilBase {
 	///                    May be null, in which case the platform default is used
 	/// @return true if the content of the files are equal or neither exists,
 	/// false otherwise
-	public static boolean contentEqualsIgnoreEOL(final File file1, final File file2, final String charsetName) {
+	public static boolean contentEqualsIgnoreEOL(final File file1, final File file2,
+		final String charsetName) {
 		try {
 			return FileUtils.contentEqualsIgnoreEOL(file1, file2, charsetName);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -459,7 +453,7 @@ public class FileUtilBase {
 	public static URL[] toURLs(final File[] files) {
 		try {
 			return FileUtils.toURLs(files);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -481,7 +475,7 @@ public class FileUtilBase {
 	public static void copyFileToDirectory(final File srcFile, final File destDir) {
 		try {
 			FileUtils.copyFileToDirectory(srcFile, destDir);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -503,10 +497,11 @@ public class FileUtilBase {
 	/// @param destDir          the directory to place the copy in, must not be {@code null}
 	/// @param preserveFileDate true if the file date of the copy
 	///                         should be the same as the original
-	public static void copyFileToDirectory(final File srcFile, final File destDir, final boolean preserveFileDate) {
+	public static void copyFileToDirectory(final File srcFile, final File destDir,
+		final boolean preserveFileDate) {
 		try {
 			FileUtils.copyFileToDirectory(srcFile, destDir, preserveFileDate);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -530,7 +525,7 @@ public class FileUtilBase {
 	public static void copyFile(final File srcFile, final File destFile) {
 		try {
 			FileUtils.copyFile(srcFile, destFile);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -552,10 +547,11 @@ public class FileUtilBase {
 	/// @param destFile         the new file, must not be {@code null}
 	/// @param preserveFileDate true if the file date of the copy
 	///                         should be the same as the original
-	public static void copyFile( final File srcFile, final File destFile, final boolean preserveFileDate) {
+	public static void copyFile(final File srcFile, final File destFile,
+		final boolean preserveFileDate) {
 		try {
 			FileUtils.copyFile(srcFile, destFile, preserveFileDate);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -570,11 +566,10 @@ public class FileUtilBase {
 	public static long copyFile(final File input, final OutputStream output) {
 		try {
 			return FileUtils.copyFile(input, output);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
 	
 	/// Copies a directory to within another directory preserving the file dates.
 	/// 
@@ -595,7 +590,7 @@ public class FileUtilBase {
 	public static void copyDirectoryToDirectory(final File srcDir, final File destDir) {
 		try {
 			FileUtils.copyDirectoryToDirectory(srcDir, destDir);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -620,7 +615,7 @@ public class FileUtilBase {
 	public static void copyDirectory(final File srcDir, final File destDir) {
 		try {
 			FileUtils.copyDirectory(srcDir, destDir);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -644,12 +639,11 @@ public class FileUtilBase {
 	/// @param destDir          the new directory, must not be {@code null}
 	/// @param preserveFileDate true if the file date of the copy
 	///                         should be the same as the original
-	public static void copyDirectory(
-		final File srcDir, final File destDir, final boolean preserveFileDate
-	) {
+	public static void copyDirectory(final File srcDir, final File destDir,
+		final boolean preserveFileDate) {
 		try {
 			FileUtils.copyDirectory(srcDir, destDir, preserveFileDate);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -691,12 +685,10 @@ public class FileUtilBase {
 	/// @param destDir the new directory, must not be {@code null}
 	/// @param filter  the filter to apply, null means copy all directories and files
 	///                should be the same as the original
-	public static void copyDirectory(
-		final File srcDir, final File destDir, final FileFilter filter
-	) {
+	public static void copyDirectory(final File srcDir, final File destDir, final FileFilter filter) {
 		try {
 			FileUtils.copyDirectory(srcDir, destDir, filter);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -740,12 +732,11 @@ public class FileUtilBase {
 	/// @param filter           the filter to apply, null means copy all directories and files
 	/// @param preserveFileDate true if the file date of the copy
 	///                         should be the same as the original
-	public static void copyDirectory(
-		final File srcDir, final File destDir, final FileFilter filter, final boolean preserveFileDate
-	) {
+	public static void copyDirectory(final File srcDir, final File destDir, final FileFilter filter,
+		final boolean preserveFileDate) {
 		try {
 			FileUtils.copyDirectory(srcDir, destDir, filter, preserveFileDate);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -765,7 +756,7 @@ public class FileUtilBase {
 	public static void copyURLToFile(final URL source, final File destination) {
 		try {
 			FileUtils.copyURLToFile(source, destination);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -782,12 +773,11 @@ public class FileUtilBase {
 	///                          will timeout if no connection could be established to the <code>source</code>
 	/// @param readTimeout       the number of milliseconds until this method will
 	///                          timeout if no data could be read from the <code>source</code>
-	public static void copyURLToFile(
-		final URL source, final File destination, final int connectionTimeout, final int readTimeout
-	) {
+	public static void copyURLToFile(final URL source, final File destination,
+		final int connectionTimeout, final int readTimeout) {
 		try {
 			FileUtils.copyURLToFile(source, destination, connectionTimeout, readTimeout);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -804,7 +794,7 @@ public class FileUtilBase {
 	public static void copyInputStreamToFile(final InputStream source, final File destination) {
 		try {
 			FileUtils.copyInputStreamToFile(source, destination);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -815,7 +805,7 @@ public class FileUtilBase {
 	public static void deleteDirectory(final File directory) {
 		try {
 			FileUtils.deleteDirectory(directory);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -852,7 +842,7 @@ public class FileUtilBase {
 	public static boolean directoryContains(final File directory, final File child) {
 		try {
 			return FileUtils.directoryContains(directory, child);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -869,7 +859,6 @@ public class FileUtilBase {
 		return FileUtils.waitFor(file, seconds);
 	}
 	
-	
 	/// Reads the contents of a file into a String.
 	/// The file is always closed.
 	/// 
@@ -879,7 +868,7 @@ public class FileUtilBase {
 	public static String readFileToString(final File file, final Charset encoding) {
 		try {
 			return FileUtils.readFileToString(file, encoding);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -892,7 +881,7 @@ public class FileUtilBase {
 	public static String readFileToString(final File file, final String encoding) {
 		try {
 			return FileUtils.readFileToString(file, encoding);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -905,7 +894,7 @@ public class FileUtilBase {
 	public static byte[] readFileToByteArray(final File file) {
 		try {
 			return FileUtils.readFileToByteArray(file);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -919,7 +908,7 @@ public class FileUtilBase {
 	public static List<String> readLines(final File file, final Charset encoding) {
 		try {
 			return FileUtils.readLines(file, encoding);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -932,7 +921,7 @@ public class FileUtilBase {
 	public static List<String> readLines(final File file, final String encoding) {
 		try {
 			return FileUtils.readLines(file, encoding);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -967,7 +956,7 @@ public class FileUtilBase {
 	public static LineIterator lineIterator(final File file, final String encoding) {
 		try {
 			return FileUtils.lineIterator(file, encoding);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -980,7 +969,7 @@ public class FileUtilBase {
 	public static LineIterator lineIterator(final File file) {
 		try {
 			return FileUtils.lineIterator(file);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -996,7 +985,7 @@ public class FileUtilBase {
 	public static void writeStringToFile(final File file, final String data, final Charset encoding) {
 		try {
 			FileUtils.writeStringToFile(file, data, encoding);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1012,7 +1001,7 @@ public class FileUtilBase {
 	public static void writeStringToFile(final File file, final String data, final String encoding) {
 		try {
 			FileUtils.writeStringToFile(file, data, encoding);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1024,12 +1013,11 @@ public class FileUtilBase {
 	/// @param encoding the encoding to use, {@code null} means platform default
 	/// @param append   if {@code true}, then the String will be added to the
 	///                 end of the file rather than overwriting
-	public static void writeStringToFile(
-		final File file, final String data, final Charset encoding, final boolean append
-	) {
+	public static void writeStringToFile(final File file, final String data, final Charset encoding,
+		final boolean append) {
 		try {
 			FileUtils.writeStringToFile(file, data, encoding, append);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1043,12 +1031,11 @@ public class FileUtilBase {
 	///                 end of the file rather than overwriting
 	///
 	/// 
-	public static void writeStringToFile(
-		final File file, final String data, final String encoding, final boolean append
-	) {
+	public static void writeStringToFile(final File file, final String data, final String encoding,
+		final boolean append) {
 		try {
 			FileUtils.writeStringToFile(file, data, encoding, append);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1061,7 +1048,7 @@ public class FileUtilBase {
 	public static void write(final File file, final CharSequence data, final Charset encoding) {
 		try {
 			FileUtils.write(file, data, encoding);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1074,7 +1061,7 @@ public class FileUtilBase {
 	public static void write(final File file, final CharSequence data, final String encoding) {
 		try {
 			FileUtils.write(file, data, encoding);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1086,10 +1073,11 @@ public class FileUtilBase {
 	/// @param encoding the encoding to use, {@code null} means platform default
 	/// @param append   if {@code true}, then the data will be added to the
 	///                 end of the file rather than overwriting
-	public static void write(final File file, final CharSequence data, final Charset encoding, final boolean append) {
+	public static void write(final File file, final CharSequence data, final Charset encoding,
+		final boolean append) {
 		try {
 			FileUtils.write(file, data, encoding, append);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1101,10 +1089,11 @@ public class FileUtilBase {
 	/// @param encoding the encoding to use, {@code null} means platform default
 	/// @param append   if {@code true}, then the data will be added to the
 	///                 end of the file rather than overwriting
-	public static void write(final File file, final CharSequence data, final String encoding, final boolean append) {
+	public static void write(final File file, final CharSequence data, final String encoding,
+		final boolean append) {
 		try {
 			FileUtils.write(file, data, encoding, append);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1119,7 +1108,7 @@ public class FileUtilBase {
 	public static void writeByteArrayToFile(final File file, final byte[] data) {
 		try {
 			FileUtils.writeByteArrayToFile(file, data);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1133,7 +1122,7 @@ public class FileUtilBase {
 	public static void writeByteArrayToFile(final File file, final byte[] data, final boolean append) {
 		try {
 			FileUtils.writeByteArrayToFile(file, data, append);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1151,7 +1140,7 @@ public class FileUtilBase {
 	public static void writeLines(final File file, final String encoding, final Collection<?> lines) {
 		try {
 			FileUtils.writeLines(file, encoding, lines);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1165,12 +1154,11 @@ public class FileUtilBase {
 	/// @param lines    the lines to write, {@code null} entries produce blank lines
 	/// @param append   if {@code true}, then the lines will be added to the
 	///                 end of the file rather than overwriting
-	public static void writeLines(
-		final File file, final String encoding, final Collection<?> lines, final boolean append
-	) {
+	public static void writeLines(final File file, final String encoding, final Collection<?> lines,
+		final boolean append) {
 		try {
 			FileUtils.writeLines(file, encoding, lines, append);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1184,7 +1172,7 @@ public class FileUtilBase {
 	public static void writeLines(final File file, final Collection<?> lines) {
 		try {
 			FileUtils.writeLines(file, lines);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1200,7 +1188,7 @@ public class FileUtilBase {
 	public static void writeLines(final File file, final Collection<?> lines, final boolean append) {
 		try {
 			FileUtils.writeLines(file, lines, append);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1216,12 +1204,11 @@ public class FileUtilBase {
 	/// @param encoding   the encoding to use, {@code null} means platform default
 	/// @param lines      the lines to write, {@code null} entries produce blank lines
 	/// @param lineEnding the line separator to use, {@code null} is system default
-	public static void writeLines(
-		final File file, final String encoding, final Collection<?> lines, final String lineEnding
-	) {
+	public static void writeLines(final File file, final String encoding, final Collection<?> lines,
+		final String lineEnding) {
 		try {
 			FileUtils.writeLines(file, encoding, lines, lineEnding);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1236,12 +1223,11 @@ public class FileUtilBase {
 	/// @param lineEnding the line separator to use, {@code null} is system default
 	/// @param append     if {@code true}, then the lines will be added to the
 	///                   end of the file rather than overwriting
-	public static void writeLines(
-		final File file, final String encoding, final Collection<?> lines, final String lineEnding, final boolean append
-	) {
+	public static void writeLines(final File file, final String encoding, final Collection<?> lines,
+		final String lineEnding, final boolean append) {
 		try {
 			FileUtils.writeLines(file, encoding, lines, lineEnding, append);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1256,7 +1242,7 @@ public class FileUtilBase {
 	public static void writeLines(final File file, final Collection<?> lines, final String lineEnding) {
 		try {
 			FileUtils.writeLines(file, lines, lineEnding);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1270,12 +1256,11 @@ public class FileUtilBase {
 	/// @param lineEnding the line separator to use, {@code null} is system default
 	/// @param append     if {@code true}, then the lines will be added to the
 	///                   end of the file rather than overwriting
-	public static void writeLines(
-		final File file, final Collection<?> lines, final String lineEnding, final boolean append
-	) {
+	public static void writeLines(final File file, final Collection<?> lines,
+		final String lineEnding, final boolean append) {
 		try {
 			FileUtils.writeLines(file, lines, lineEnding, append);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1293,7 +1278,7 @@ public class FileUtilBase {
 	public static void forceDelete(final File file) {
 		try {
 			FileUtils.forceDelete(file);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1305,7 +1290,7 @@ public class FileUtilBase {
 	public static void forceDeleteOnExit(final File file) {
 		try {
 			FileUtils.forceDeleteOnExit(file);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1320,7 +1305,7 @@ public class FileUtilBase {
 	public static void forceMkdir(final File directory) {
 		try {
 			FileUtils.forceMkdir(directory);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1379,7 +1364,7 @@ public class FileUtilBase {
 	public static boolean isFileNewer(final File file, final File reference) {
 		try {
 			return FileUtils.isFileNewer(file, reference);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1395,7 +1380,7 @@ public class FileUtilBase {
 	public static boolean isFileNewer(final File file, final Date date) {
 		try {
 			return FileUtils.isFileNewer(file, date);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1459,7 +1444,7 @@ public class FileUtilBase {
 	public static long checksumCRC32(final File file) {
 		try {
 			return FileUtils.checksumCRC32(file);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1478,7 +1463,7 @@ public class FileUtilBase {
 	public static Checksum checksum(final File file, final Checksum checksum) {
 		try {
 			return FileUtils.checksum(file, checksum);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1492,7 +1477,7 @@ public class FileUtilBase {
 	public static void moveDirectory(final File srcDir, final File destDir) {
 		try {
 			FileUtils.moveDirectory(srcDir, destDir);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1503,10 +1488,11 @@ public class FileUtilBase {
 	/// @param destDir       the destination file
 	/// @param createDestDir If {@code true} create the destination directory,
 	///                      otherwise if {@code false} throw an IOException
-	public static void moveDirectoryToDirectory(final File src, final File destDir, final boolean createDestDir) {
+	public static void moveDirectoryToDirectory(final File src, final File destDir,
+		final boolean createDestDir) {
 		try {
 			FileUtils.moveDirectoryToDirectory(src, destDir, createDestDir);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1520,7 +1506,7 @@ public class FileUtilBase {
 	public static void moveFile(final File srcFile, final File destFile) {
 		try {
 			FileUtils.moveFile(srcFile, destFile);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1531,10 +1517,11 @@ public class FileUtilBase {
 	/// @param destDir       the destination file
 	/// @param createDestDir If {@code true} create the destination directory,
 	///                      otherwise if {@code false} throw an IOException
-	public static void moveFileToDirectory(final File srcFile, final File destDir, final boolean createDestDir) {
+	public static void moveFileToDirectory(final File srcFile, final File destDir,
+		final boolean createDestDir) {
 		try {
 			FileUtils.moveFileToDirectory(srcFile, destDir, createDestDir);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1547,10 +1534,11 @@ public class FileUtilBase {
 	/// @param destDir       the destination directory
 	/// @param createDestDir If {@code true} create the destination directory,
 	///                      otherwise if {@code false} throw an IOException
-	public static void moveToDirectory(final File src, final File destDir, final boolean createDestDir) {
+	public static void moveToDirectory(final File src, final File destDir,
+		final boolean createDestDir) {
 		try {
 			FileUtils.moveToDirectory(src, destDir, createDestDir);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -1573,7 +1561,7 @@ public class FileUtilBase {
 	public static boolean isSymlink(final File file) {
 		try {
 			return FileUtils.isSymlink(file);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

@@ -1,16 +1,6 @@
 package picoded.struct;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,34 +25,40 @@ public class UnsupportedDefaultMap_test extends StandardHashMap_test {
 		HashMap<K, V> base = new HashMap<K, V>();
 		
 		// Implementation to actual base list
+		@Override
 		public V get(Object key) {
 			return base.get(key);
 		}
 		
 		// Implementation to actual base list
+		@Override
 		public V put(K key, V value) {
 			return base.put(key, value);
 		}
 		
 		// Implementation to actual base list
+		@Override
 		public V remove(Object key) {
 			return base.remove(key);
 		}
 		
 		// Implementation to actual base list
+		@Override
 		public Set<K> keySet() {
 			return base.keySet();
 		}
 	}
 	
-	Map<String,Object> unsupported = null;
+	Map<String, Object> unsupported = null;
 	
+	@Override
 	@Before
 	public void setUp() {
 		unsupported = new UnsupportedTest<>();
 		map = new ProxyTest<>();
 	}
 	
+	@Override
 	@After
 	public void tearDown() {
 		unsupported = null;
@@ -92,11 +88,6 @@ public class UnsupportedDefaultMap_test extends StandardHashMap_test {
 	@Test(expected = UnsupportedOperationException.class)
 	public void clearTest() {
 		unsupported.clear();
-	}
-	
-	@Test(expected = UnsupportedOperationException.class)
-	public void containsKeyTest() {
-		unsupported.containsKey("key");
 	}
 	
 }

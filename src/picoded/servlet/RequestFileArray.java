@@ -21,7 +21,7 @@ import picoded.conv.ConvertJSON;
 ///
 /// Class map, that handles file uploads in a RequestList
 ///
-public class RequestFileArray extends GenericConvertArrayList<String>  {
+public class RequestFileArray extends GenericConvertArrayList<String> {
 	
 	/// Inner DiskFileItem mapping
 	protected List<DiskFileItem> diskItemList = new ArrayList<DiskFileItem>();
@@ -29,15 +29,15 @@ public class RequestFileArray extends GenericConvertArrayList<String>  {
 	/// Adds a FileItem part to the end of the array
 	///
 	/// @param  FileItem to add
-	protected void importFileItem(FileItem item) throws IOException{
+	protected void importFileItem(FileItem item) throws IOException {
 		
 		// In case apache breaks a future version
-		if( !(item instanceof DiskFileItem)) {
+		if (!(item instanceof DiskFileItem)) {
 			throw new RuntimeException("Currently only DiskFileItem is supported");
 		}
 		
 		// Get the disk item
-		DiskFileItem diskItem = (DiskFileItem)item;
+		DiskFileItem diskItem = (DiskFileItem) item;
 		
 		// Transfer to local diskItemList storage
 		diskItemList.add(diskItem);
@@ -61,10 +61,10 @@ public class RequestFileArray extends GenericConvertArrayList<String>  {
 	/// @param  File to write into
 	public void writeToFile(int idx, File file) {
 		try {
-			if( diskItemList.get(idx) != null ) {
+			if (diskItemList.get(idx) != null) {
 				diskItemList.get(idx).write(file);
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -76,10 +76,10 @@ public class RequestFileArray extends GenericConvertArrayList<String>  {
 	/// @return  String representing the declared file name (maybe null)
 	public String getName(int idx) {
 		try {
-			if( diskItemList.get(idx) != null ) {
+			if (diskItemList.get(idx) != null) {
 				return diskItemList.get(idx).getName();
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		return null;
@@ -92,10 +92,10 @@ public class RequestFileArray extends GenericConvertArrayList<String>  {
 	/// @return Input Stream representing the file
 	public InputStream getInputStream(int idx) {
 		try {
-			if( diskItemList.get(idx) != null ) {
+			if (diskItemList.get(idx) != null) {
 				return diskItemList.get(idx).getInputStream();
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		return null;
@@ -110,7 +110,7 @@ public class RequestFileArray extends GenericConvertArrayList<String>  {
 	///
 	/// @return Byte Arra representing the file
 	public byte[] getByteArray(int idx) {
-		if( diskItemList.get(idx) != null ) {
+		if (diskItemList.get(idx) != null) {
 			return diskItemList.get(idx).get();
 		}
 		return null;
@@ -128,17 +128,17 @@ public class RequestFileArray extends GenericConvertArrayList<String>  {
 		try {
 			// Result was previously stored
 			String cachedResult = super.get(idx);
-			if(cachedResult != null && cachedResult.length() > 0) {
+			if (cachedResult != null && cachedResult.length() > 0) {
 				return cachedResult;
 			}
 			
 			// Get and cache result
-			if( diskItemList.get(idx) != null ) {
+			if (diskItemList.get(idx) != null) {
 				cachedResult = diskItemList.get(idx).getString("UTF-8");
 			}
 			set(idx, cachedResult);
 			return cachedResult;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -146,7 +146,7 @@ public class RequestFileArray extends GenericConvertArrayList<String>  {
 	/// Load all the values into a string format
 	/// This is required for entrySet / values iteration
 	private void loadAll() {
-		for(int i=0; i<diskItemList.size(); ++i) {
+		for (int i = 0; i < diskItemList.size(); ++i) {
 			getString(i);
 		}
 	}

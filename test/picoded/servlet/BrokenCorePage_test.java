@@ -627,8 +627,6 @@ public class BrokenCorePage_test {
 		assertTrue(corePage.doDeleteRequest(map));
 	}
 	
-	
-	
 	@Test
 	public void doJSONTest() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();

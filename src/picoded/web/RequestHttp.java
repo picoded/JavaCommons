@@ -96,8 +96,7 @@ public class RequestHttp {
 	public static ResponseHttp get( //
 		String requestURL, //
 		Map<String, String[]> parametersMap, // 
-		Map<String, String[]> cookiesMap
-	) { //
+		Map<String, String[]> cookiesMap) { //
 		return byType(HttpRequestType.GET, requestURL, parametersMap, cookiesMap, null);
 	}
 	
@@ -138,7 +137,8 @@ public class RequestHttp {
 	}
 	
 	/// Performs (form) POST request : with parameters and files
-	public static ResponseHttp post(String requestURL, Map<String, String[]> parametersMap, Map<String,File[]> filesMap) {
+	public static ResponseHttp post(String requestURL, Map<String, String[]> parametersMap,
+		Map<String, File[]> filesMap) {
 		return byType(HttpRequestType.POST, requestURL, parametersMap, null, null, filesMap, null);
 	}
 	
@@ -150,7 +150,8 @@ public class RequestHttp {
 		Map<String, String[]> cookiesMap, // 
 		Map<String, String[]> headersMap // 
 	) { //
-		return byType(HttpRequestType.POST, requestURL, parametersMap, cookiesMap, headersMap, filesMap, null);
+		return byType(HttpRequestType.POST, requestURL, parametersMap, cookiesMap, headersMap,
+			filesMap, null);
 	}
 	
 	//--------------------------------------------------------
@@ -173,7 +174,8 @@ public class RequestHttp {
 	}
 	
 	/// Performs (form) PUT request : with parameters and files
-	public static ResponseHttp put(String requestURL, Map<String, String[]> parametersMap, Map<String,File[]> filesMap) {
+	public static ResponseHttp put(String requestURL, Map<String, String[]> parametersMap,
+		Map<String, File[]> filesMap) {
 		return byType(HttpRequestType.PUT, requestURL, parametersMap, null, null, filesMap, null);
 	}
 	
@@ -185,7 +187,8 @@ public class RequestHttp {
 		Map<String, String[]> cookiesMap, // 
 		Map<String, String[]> headersMap // 
 	) { //
-		return byType(HttpRequestType.PUT, requestURL, parametersMap, cookiesMap, headersMap, filesMap, null);
+		return byType(HttpRequestType.PUT, requestURL, parametersMap, cookiesMap, headersMap,
+			filesMap, null);
 	}
 	
 	//--------------------------------------------------------
@@ -226,7 +229,8 @@ public class RequestHttp {
 		Map<String, String[]> cookiesMap, // 
 		Map<String, String[]> headersMap // 
 	) { //
-		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap, headersMap, null);
+		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap,
+			headersMap, null);
 	}
 	
 	/// Performs X request with parameters, cookies and headers
@@ -238,8 +242,8 @@ public class RequestHttp {
 		Map<String, String[]> headersMap, // 
 		InputStream requestStream //
 	) { //
-		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap, headersMap,
-			requestStream);
+		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap,
+			headersMap, requestStream);
 	}
 	
 	/// Performs X request with parameters, cookies and headers
@@ -252,8 +256,8 @@ public class RequestHttp {
 		Map<String, File[]> filesMap, //
 		InputStream requestStream //
 	) { //
-		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap, headersMap,
-			filesMap, requestStream);
+		return RequestHttp_apache.callRequest(requestType, requestURL, parametersMap, cookiesMap,
+			headersMap, filesMap, requestStream);
 	}
 	
 	//--------------------------------------------------------

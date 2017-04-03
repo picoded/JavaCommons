@@ -86,7 +86,8 @@ public interface ResponseHttp {
 	
 	/// Closes the websocket, if it is not closed yet
 	public default void websocketClose() {
-		throw new UnsupportedOperationException("Use RequestHttp.websocket to support websocket operations");
+		throw new UnsupportedOperationException(
+			"Use RequestHttp.websocket to support websocket operations");
 	}
 	
 	/// Sets the message handler lisenter. This will cause an exception, 
@@ -98,7 +99,8 @@ public interface ResponseHttp {
 	/// @Returns   the previous handler if set, if replace is enabled
 	public default void setMessageHandler(Consumer<String> handler) {
 		if (replaceMessageHandler(handler) != null) {
-			throw new RuntimeException("Previous handler exists, if this is intended use replaceMessageHandler");
+			throw new RuntimeException(
+				"Previous handler exists, if this is intended use replaceMessageHandler");
 		}
 	}
 	
@@ -109,17 +111,20 @@ public interface ResponseHttp {
 	///
 	/// @Returns   the previous handler if set, if replace is enabled
 	public default Consumer<String> replaceMessageHandler(Consumer<String> handler) {
-		throw new UnsupportedOperationException("Use RequestHttp.websocket to support websocket operations");
+		throw new UnsupportedOperationException(
+			"Use RequestHttp.websocket to support websocket operations");
 	};
 	
 	/// Gets the currently set message handler
 	public default Consumer<String> getMessageHandler() {
-		throw new UnsupportedOperationException("Use RequestHttp.websocket to support websocket operations");
+		throw new UnsupportedOperationException(
+			"Use RequestHttp.websocket to support websocket operations");
 	}
 	
 	/// sends a message via websocket
 	public default void sendMessage(String message) {
-		throw new UnsupportedOperationException("Use RequestHttp.websocket to support websocket operations");
+		throw new UnsupportedOperationException(
+			"Use RequestHttp.websocket to support websocket operations");
 	}
 	
 	/// Sends a message, and intercepts the next immediate response.
@@ -128,7 +133,8 @@ public interface ResponseHttp {
 	/// Do note that if multiple "processes" are using a single websocket
 	/// be warry of race conditions that may occur.
 	public default String sendAndWait(String message) {
-		throw new UnsupportedOperationException("Use RequestHttp.websocket to support websocket operations");
+		throw new UnsupportedOperationException(
+			"Use RequestHttp.websocket to support websocket operations");
 	}
 	
 }

@@ -44,7 +44,7 @@ public class CoreApiPage_test {
 	
 	@After
 	public void tearDown() throws Exception {
-		if(testServlet != null) {
+		if (testServlet != null) {
 			testServlet.close();
 			testServlet = null;
 		}
@@ -74,23 +74,23 @@ public class CoreApiPage_test {
 	//
 	@Test
 	public void simpleHelloWorldTest() {
-		assertNotNull( testServlet = new EmbeddedServlet(testPort, new SimpleEcho()) );
-		String testUrl = "http://localhost:"+testPort+"/api/test/";
+		assertNotNull(testServlet = new EmbeddedServlet(testPort, new SimpleEcho()));
+		String testUrl = "http://localhost:" + testPort + "/api/test/";
 		
 		String msg = "hello";
 		
-		Map<String,Object> expected = new HashMap<String,Object>();
+		Map<String, Object> expected = new HashMap<String, Object>();
 		expected.put("echo", "hello");
 		String testString = ConvertJSON.fromObject(expected, true).trim();
 		
-		Map<String,String[]> args = new HashMap<String,String[]>();
+		Map<String, String[]> args = new HashMap<String, String[]>();
 		args.put("echo", new String[] { msg });
 		
-		assertEquals( testString, RequestHttp.get(testUrl, args).toString().trim() );
-		assertEquals( testString, RequestHttp.post(testUrl, args).toString().trim() );
+		assertEquals(testString, RequestHttp.get(testUrl, args).toString().trim());
+		assertEquals(testString, RequestHttp.post(testUrl, args).toString().trim());
 		
-		Map<String,File[]> blankFileMap = new HashMap<String,File[]>();
-		assertEquals( testString, RequestHttp.post(testUrl, args, blankFileMap).toString().trim() );
+		Map<String, File[]> blankFileMap = new HashMap<String, File[]>();
+		assertEquals(testString, RequestHttp.post(testUrl, args, blankFileMap).toString().trim());
 	}
 	
 	//
@@ -100,17 +100,17 @@ public class CoreApiPage_test {
 		
 		// Result fetching
 		public static RESTFunction testEcho = (req, res) -> {
-			assertEquals( "hello", req.getString("msg") );
+			assertEquals("hello", req.getString("msg"));
 			
 			Object fileObj = null;
-			assertNotNull( fileObj = req.get("file") );
+			assertNotNull(fileObj = req.get("file"));
 			
-			assertTrue( fileObj instanceof RequestFileArray );
-			RequestFileArray fileArr = (RequestFileArray)fileObj;
+			assertTrue(fileObj instanceof RequestFileArray);
+			RequestFileArray fileArr = (RequestFileArray) fileObj;
 			
-			assertEquals( 1, fileArr.size() );
-			assertEquals( "hello world", fileArr.get(0).trim() );
-				
+			assertEquals(1, fileArr.size());
+			assertEquals("hello world", fileArr.get(0).trim());
+			
 			return res;
 		};
 		
@@ -126,17 +126,17 @@ public class CoreApiPage_test {
 	//
 	@Test
 	public void simpleFileTest() {
-		assertNotNull( testServlet = new EmbeddedServlet(testPort, new SimpleFile()) );
-		String testUrl = "http://localhost:"+testPort+"/api/test/";
+		assertNotNull(testServlet = new EmbeddedServlet(testPort, new SimpleFile()));
+		String testUrl = "http://localhost:" + testPort + "/api/test/";
 		
-		Map<String,String[]> args = new HashMap<String,String[]>();
+		Map<String, String[]> args = new HashMap<String, String[]>();
 		args.put("msg", new String[] { "hello" });
 		
-		Map<String,File[]> fileMap = new HashMap<String,File[]>();
-		fileMap.put("file", new File[] { new File(testFolder,"hello.txt") });
+		Map<String, File[]> fileMap = new HashMap<String, File[]>();
+		fileMap.put("file", new File[] { new File(testFolder, "hello.txt") });
 		
 		// Check that is no error
-		assertEquals( "{ }", RequestHttp.post(testUrl, args, fileMap).toString().trim() );
+		assertEquals("{ }", RequestHttp.post(testUrl, args, fileMap).toString().trim());
 	}
 	
 	//
@@ -156,24 +156,25 @@ public class CoreApiPage_test {
 	@Test
 	public void simpleEchoTest() {
 		// Server
-		assertNotNull( testServlet = new EmbeddedServlet(testPort, new EchoTest()) );
-		String testUrl = "http://localhost:"+testPort+"/api/test/";
+		assertNotNull(testServlet = new EmbeddedServlet(testPort, new EchoTest()));
+		String testUrl = "http://localhost:" + testPort + "/api/test/";
 		
 		// Arguments
-		Map<String,String[]> args = new HashMap<String,String[]>();
+		Map<String, String[]> args = new HashMap<String, String[]>();
 		args.put("msg", new String[] { "hello" });
-		Map<String,File[]> fileMap = new HashMap<String,File[]>();
-		fileMap.put("file", new File[] { new File(testFolder,"hello.txt") });
+		Map<String, File[]> fileMap = new HashMap<String, File[]>();
+		fileMap.put("file", new File[] { new File(testFolder, "hello.txt") });
 		
 		// Expected
-		Map<String,Object> expected = new HashMap<String,Object>();
+		Map<String, Object> expected = new HashMap<String, Object>();
 		expected.put("msg", "hello");
 		List<String> expectedFile = new ArrayList<String>();
 		expectedFile.add("hello world\n");
 		expected.put("file", expectedFile);
 		
 		// Check that is no error
-		assertEquals( expected, ConvertJSON.toMap(RequestHttp.post(testUrl, args, fileMap).toString().trim()) );
+		assertEquals(expected,
+			ConvertJSON.toMap(RequestHttp.post(testUrl, args, fileMap).toString().trim()));
 	}
 	
 }

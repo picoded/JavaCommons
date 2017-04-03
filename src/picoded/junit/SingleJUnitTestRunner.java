@@ -1,9 +1,10 @@
 package picoded.junit;
 
 // Junit includes
-import static org.junit.Assert.*;
-import org.junit.*;
-import org.junit.runner.*;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Request;
+import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
 ///

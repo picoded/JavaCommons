@@ -35,7 +35,8 @@ public class RequestHttp_apache {
 	///////////////////////////////////////////////////////////////////////
 	
 	/// Returns the apache client HttpUriRequest, based on its type
-	protected static HttpRequestBase HttpUriRequest_fromRequestType(HttpRequestType reqType, String reqURL) {
+	protected static HttpRequestBase HttpUriRequest_fromRequestType(HttpRequestType reqType,
+		String reqURL) {
 		switch (reqType) {
 		case GET:
 			return new HttpGet(reqURL);
@@ -54,8 +55,8 @@ public class RequestHttp_apache {
 	}
 	
 	/// Adds the cookies parameters to cookieJar
-	protected static BasicCookieStore addCookiesIntoCookieJar(String domain, BasicCookieStore cookieJar,
-		Map<String, String[]> cookieMap) {
+	protected static BasicCookieStore addCookiesIntoCookieJar(String domain,
+		BasicCookieStore cookieJar, Map<String, String[]> cookieMap) {
 		if (cookieMap != null) {
 			for (Map.Entry<String, String[]> entry : cookieMap.entrySet()) {
 				String[] values = entry.getValue();
@@ -99,7 +100,8 @@ public class RequestHttp_apache {
 	}
 	
 	/// Adds the header parameters to request
-	protected static HttpRequestBase addHeadersIntoRequest(HttpRequestBase reqBase, Map<String, String[]> headersMap) {
+	protected static HttpRequestBase addHeadersIntoRequest(HttpRequestBase reqBase,
+		Map<String, String[]> headersMap) {
 		if (headersMap != null) {
 			for (Map.Entry<String, String[]> entry : headersMap.entrySet()) {
 				String[] values = entry.getValue();
@@ -174,8 +176,10 @@ public class RequestHttp_apache {
 			String host = new URL(reqURL).getHost();
 			
 			// Prepares the HTTPClient, with a cookieJar =D
-			BasicCookieStore cookieJar = addCookiesIntoCookieJar(host, new BasicCookieStore(), cookieMap);
-			HttpClient apacheClient = HttpClientBuilder.create().setDefaultCookieStore(cookieJar).build();
+			BasicCookieStore cookieJar = addCookiesIntoCookieJar(host, new BasicCookieStore(),
+				cookieMap);
+			HttpClient apacheClient = HttpClientBuilder.create().setDefaultCookieStore(cookieJar)
+				.build();
 			
 			// Executes request
 			HttpResponse apacheResponse = apacheClient.execute(httpRequest);
@@ -216,7 +220,8 @@ public class RequestHttp_apache {
 		Map<String, String[]> headersMap, //
 		InputStream requestStream //
 	) {
-		return callRequest(reqType, reqURL, parametersMap, cookiesMap, headersMap, null, requestStream);
+		return callRequest(reqType, reqURL, parametersMap, cookiesMap, headersMap, null,
+			requestStream);
 	}
 	
 	/// Executes the request, given the type and parmeters
@@ -245,29 +250,27 @@ public class RequestHttp_apache {
 			try {
 				if (requestStream != null) {
 					// note that its sent as a raw stream (set headers manually please)
-					((HttpEntityEnclosingRequestBase) reqBase).setEntity(new InputStreamEntity(requestStream));
+					((HttpEntityEnclosingRequestBase) reqBase).setEntity(new InputStreamEntity(
+						requestStream));
 				} else if (filesMap != null) {
 					// does a multipart encoding request
 					MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 					
 					// Process the file map, not using lambda as it does not auto rethrow the IOException
-					for(Map.Entry<String, File[]>part : filesMap.entrySet()) {
+					for (Map.Entry<String, File[]> part : filesMap.entrySet()) {
 						String filePath = part.getKey();
-						for(File fileObj : part.getValue()) {
-							builder.addBinaryBody(
-								filePath,
-								new FileInputStream(fileObj),
-								ContentType.APPLICATION_OCTET_STREAM,
-								fileObj.getName()
-							);
+						for (File fileObj : part.getValue()) {
+							builder.addBinaryBody(filePath, new FileInputStream(fileObj),
+								ContentType.APPLICATION_OCTET_STREAM, fileObj.getName());
 						}
-					};
+					}
+					;
 					
 					// Process the text map
-					if(parametersMap != null) {
-						parametersMap.forEach((key,valArr) -> {
-							for(String val : valArr) {
-								builder.addTextBody(key,val, ContentType.TEXT_PLAIN);
+					if (parametersMap != null) {
+						parametersMap.forEach((key, valArr) -> {
+							for (String val : valArr) {
+								builder.addTextBody(key, val, ContentType.TEXT_PLAIN);
 							}
 						});
 					}

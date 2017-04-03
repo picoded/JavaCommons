@@ -128,6 +128,8 @@ public class StandardArrayList_test {
 		assertEquals(1, list.indexOf("one"));
 		assertEquals(-1, list.indexOf("1"));
 		assertEquals(-1, list.indexOf(null));
+		list.add(null);
+		assertEquals(3, list.indexOf(null));
 	}
 	
 	@Test
@@ -140,6 +142,8 @@ public class StandardArrayList_test {
 		assertEquals(1, list.lastIndexOf("one"));
 		assertEquals(-1, list.lastIndexOf("1"));
 		assertEquals(-1, list.lastIndexOf(null));
+		list.add(null);
+		assertEquals(3, list.lastIndexOf(null));
 	}
 	
 	@Test
@@ -258,6 +262,18 @@ public class StandardArrayList_test {
 		
 		Object[] arr = list.toArray();
 		
+		assertEquals("zero", arr[0]);
+	}
+	
+	@Test
+	public void toArrayObjTest() {
+		list.add("zero");
+		list.add("one");
+		list.add("two");
+		Object[] arrParam = new Object[4];
+		Object[] arr = list.toArray(arrParam);
+		
+		assertEquals("zero", arrParam[0]);
 		assertEquals("zero", arr[0]);
 	}
 	

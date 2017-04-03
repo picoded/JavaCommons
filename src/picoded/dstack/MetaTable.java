@@ -25,7 +25,7 @@ import picoded.dstack.core.Core_MetaObject;
 /// of a JCache layer for non-complex lookup cached reads. Which will in most cases be the main
 /// read request load.
 /// 
-public interface MetaTable extends DataStructureSetup<String, MetaObject> {
+public interface MetaTable extends DStackCommon<String, MetaObject> {
 	
 	// MetaObject optimizations
 	//----------------------------------------------
@@ -57,7 +57,7 @@ public interface MetaTable extends DataStructureSetup<String, MetaObject> {
 	/// @param  data to save
 	///
 	/// @returns the MetaObject
-	default MetaObject newObject(Map<String, Object> data) {
+	default MetaObject newObject(Map<String,Object> data) {
 		MetaObject ret = newObject();
 		ret.putAll(data);
 		ret.saveAll();
@@ -80,6 +80,7 @@ public interface MetaTable extends DataStructureSetup<String, MetaObject> {
 	///
 	/// @returns the MetaObject
 	MetaObject get(String oid, boolean isUnchecked);
+	
 	
 	// MetaObject utility operations
 	//--------------------------------------------------------------------------
@@ -126,8 +127,7 @@ public interface MetaTable extends DataStructureSetup<String, MetaObject> {
 	/// @param   number of objects to return max, use -1 to ignore
 	///
 	/// @returns  The MetaObject[] array
-	default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr,
-		int offset, int limit) {
+	default MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit) {
 		return getArrayFromID(query_id(whereClause, whereValues, orderByStr, offset, limit), true);
 	}
 	
@@ -155,8 +155,7 @@ public interface MetaTable extends DataStructureSetup<String, MetaObject> {
 	/// @param   number of objects to return max, use -1 to ignore
 	///
 	/// @returns  The String[] array
-	String[] query_id(String whereClause, Object[] whereValues, String orderByStr, int offset,
-		int limit);
+	String[] query_id(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit);
 	
 	/// Performs a search query, and returns the respective MetaObjects
 	///

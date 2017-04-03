@@ -23,7 +23,6 @@ public class ArrayConv_test {
 	@Test(expected = IllegalAccessError.class)
 	public void invalidConstructor() throws Exception {
 		new ArrayConv();
-		
 	}
 	
 }

@@ -23,12 +23,20 @@
 ///
 /// ----------------------------------------------------------------------------------------------------
 ///
-/// ## So what are the core data structures?
+/// ## So what are the core data structures / file?
 ///
 /// |------------------|----------------------------------------------------------------------|
 /// | KeyValue         | Key to string value mapping. Used for temporary values storage       |
 /// | MetaTable        | Key to object map storage, used primarily for "table" like data      |
-/// | AtomicLongTable  | Used for handling long values where atomic consistency is required   |
+/// | AtomicLongMap    | [@TODO] Key to long values where atomic consistency is required      |
+/// | EventLogger      | [@TODO] Event logging and management system                          |
+/// |------------------|----------------------------------------------------------------------|
+///
+/// ## Related files
+///
+/// |------------------|----------------------------------------------------------------------|
+/// | DStackCommon     | Common functionality that persist across all data structures         |
+/// | DStack           | The actual final DStack                                              |
 /// |------------------|----------------------------------------------------------------------|
 ///
 /// ## Are there any other data structures in consideration?
@@ -37,11 +45,29 @@
 /// | ByteStream       | Meant to be a drop in replacement for file input/output streams.     |
 /// |                  | For large streams that can reach 100's of MB, or even GB's.          |
 /// |                  | Or simply just files. Functions similarly to KeyValue                |
+/// |                  | Alternatively you can think it as a reduced interface to S3          |
 /// |------------------|----------------------------------------------------------------------|
 ///
 /// ----------------------------------------------------------------------------------------------------
 /// 
-/// # The many layers of "Data Stack Level"
+/// ## The project folder summary
+///
+/// |-------------------|----------------------------------------------------------------------|
+/// | foundation        | Containing foundation protected implementations used commonly        |
+/// |                   | across different structure. Not to be used directly.                 |
+/// |-------------------|----------------------------------------------------------------------|
+/// | struct            | Pure java data structure implementations                             |
+/// |    simple         | L0 : Simple reference implmentation, not optimised for anything.     |
+/// |    cache          | L1 : Shared local caching optimised implementation.                  |
+/// | JFile             | L2 : Local file cache                                                |
+/// | JCache            | L3 : Shared network caching                                          |
+/// | JSql              | L3+ : Persistent storage                                             |
+/// | aws               | L3+ : AWS specific implmentations, such as S3 persistent storage     |
+/// |-------------------|----------------------------------------------------------------------|
+///
+/// ----------------------------------------------------------------------------------------------------
+/// 
+/// # One more thing : The many layers of "Data Stack Level"
 ///
 /// Throughout the documentation you will find multiple implmentation of the dstack interfaces starting
 /// with a mention on its target "Data Stack level". This is meant to show what level a particular,
@@ -106,4 +132,3 @@
 /// Another way to view this, is an authoriative L4, in which all other L4 clusters read from.
 ///
 package picoded.dstack;
-

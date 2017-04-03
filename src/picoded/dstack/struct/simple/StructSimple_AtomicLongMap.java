@@ -1,10 +1,11 @@
-package picoded.JStruct.internal;
+package picoded.dstack.struct.simple;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import picoded.JStruct.AtomicLongMap;
+import picoded.dstack.*;
+import picoded.dstack.core.*;
 
 /// Refence implementation of AtomicLongMap data structure
 ///
@@ -12,11 +13,7 @@ import picoded.JStruct.AtomicLongMap;
 /// Used mainly in caching or performance critical scenerios.
 ///
 /// As such its sacrifices much utility for performance
-///
-/// Note that expire timestamps are measured in seconds,
-/// anything smaller then that is pointless over a network
-///
-public class JStruct_AtomicLongMap implements AtomicLongMap {
+public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	
 	///
 	/// Constructor vars
@@ -33,75 +30,44 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	///--------------------------------------------------------------------------
 	
 	/// Constructor
-	public JStruct_AtomicLongMap() {
+	public StructSimple_AtomicLongMap() {
 		// does nothing =X
 	}
 	
 	///
-	/// Utility functions used internally
+	/// Backend system setup / maintenance teardown
 	///--------------------------------------------------------------------------
 	
-	/// Gets the current system time in seconds
-	public long currentSystemTimeInSeconds() {
-		return (System.currentTimeMillis()) / 1000L;
+	/// Setsup the backend storage table, etc. If needed
+	@Override
+	public void systemSetup() {
+		// does nothing
+	}
+	
+	/// Teardown and delete the backend storage table, etc. If needed
+	@Override
+	public void systemDestroy() {
+		valueMap.clear();
+	}
+
+	///
+	/// Removes all data, without tearing down setup
+	///
+	/// Handles re-entrant lock where applicable
+	///
+	@Override
+	public void clear() {
+		try {
+			accessLock.writeLock().lock();
+			valueMap.clear();
+		} finally {
+			accessLock.writeLock().unlock();
+		}
 	}
 	
 	//
-	// put, get, etc (public)
+	// Core put / get
 	//--------------------------------------------------------------------------
-	
-	/// Stores (and overwrites if needed) key, value pair
-	///
-	/// Important note: It does not return the previously stored value
-	///
-	/// @param key as String
-	/// @param value as Number
-	///
-	/// @returns null
-	@Override
-	public Long put(String key, Number value) {
-		try {
-			accessLock.writeLock().lock();
-			
-			if (value == null) {
-				valueMap.remove(key);
-			} else {
-				valueMap.put(key, value.longValue());
-			}
-			
-			return null;
-		} finally {
-			accessLock.writeLock().unlock();
-		}
-	}
-	
-	/// Stores (and overwrites if needed) key, value pair
-	///
-	/// Important note: It does not return the previously stored value
-	///
-	/// @param key as String
-	/// @param value as long
-	///
-	/// @returns null
-	@Override
-	public Long put(String key, long value) {
-		
-		try {
-			accessLock.writeLock().lock();
-			
-			//convert from long to Long
-			Long newVal = Long.valueOf(value);
-			
-			if (newVal.longValue() <= 0) {
-				valueMap.remove(key);
-			} else {
-				valueMap.put(key, newVal);
-			}
-			return null;
-		} finally {
-			accessLock.writeLock().unlock();
-		}
-	}
 	
 	/// Stores (and overwrites if needed) key, value pair
 	///
@@ -112,15 +78,14 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	///
 	/// @returns null
 	@Override
-	public Long put(String key, Long value) {
-		
+	public Long put(Object key, Long value) {
 		try {
 			accessLock.writeLock().lock();
 			
 			if (value == null) {
 				valueMap.remove(key);
 			} else {
-				valueMap.put(key, value);
+				valueMap.put(key.toString(), value);
 			}
 			return null;
 		} finally {
@@ -134,7 +99,6 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 	/// @returns  value of the given key
 	@Override
 	public Long get(Object key) {
-		
 		try {
 			accessLock.readLock().lock();
 			
@@ -146,18 +110,16 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 		} finally {
 			accessLock.readLock().unlock();
 		}
-		
-		// return valueMap.get(key);
 	}
 	
 	/// Returns the value, given the key
+	///
 	/// @param key param find the meta key
 	/// @param delta value to add
 	///
 	/// @returns  value of the given key
 	@Override
 	public Long getAndAdd(Object key, Object delta) {
-		
 		try {
 			accessLock.readLock().lock();
 			
@@ -171,55 +133,6 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 			valueMap.put(key.toString(), newVal);
 			
 			return oldVal;
-		} finally {
-			accessLock.readLock().unlock();
-		}
-	}
-	
-	/// Returns the value, given the key
-	/// @param key param find the meta key
-	/// @param delta value to add
-	///
-	/// @returns  value of the given key
-	@Override
-	public Long getAndIncrement(Object key) {
-		
-		try {
-			accessLock.readLock().lock();
-			
-			Long oldVal = valueMap.get(key);
-			if (oldVal == null) {
-				return null;
-			}
-			
-			Long newVal = oldVal + 1;
-			valueMap.put(key.toString(), newVal);
-			
-			return oldVal;
-		} finally {
-			accessLock.readLock().unlock();
-		}
-	}
-	
-	/// Returns the value, given the key
-	/// @param key param find the meta key
-	/// @param delta value to add
-	///
-	/// @returns  value of the given key after adding
-	@Override
-	public Long incrementAndGet(Object key) {
-		try {
-			accessLock.readLock().lock();
-			
-			Long oldVal = valueMap.get(key);
-			if (oldVal == null) {
-				return null;
-			}
-			
-			Long newVal = oldVal + 1;
-			valueMap.put(key.toString(), newVal);
-			
-			return valueMap.get(key);
 		} finally {
 			accessLock.readLock().unlock();
 		}
@@ -240,7 +153,7 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 			accessLock.writeLock().lock();
 			
 			Long curVal = valueMap.get(key);
-			// System.out.println("CurVal:" + curVal + " ExpectVal:" + expect);
+			
 			//if current value is equal to expected value, set to new value
 			if (curVal.equals(expect)) {
 				valueMap.put(key, update);
@@ -253,4 +166,5 @@ public class JStruct_AtomicLongMap implements AtomicLongMap {
 			accessLock.writeLock().unlock();
 		}
 	}
+	
 }

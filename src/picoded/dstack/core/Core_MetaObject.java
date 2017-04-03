@@ -63,8 +63,7 @@ public class Core_MetaObject implements MetaObject {
 	/// @param  GUID to use, can be null
 	/// @param  Remote mapping data used (this should be modifiable)
 	/// @param  is complete remote map, use false if incomplete data
-	public Core_MetaObject(MetaTable inTable, String inOID, Map<String, Object> inRemoteData,
-		boolean isCompleteData) {
+	public Core_MetaObject(MetaTable inTable, String inOID, Map<String, Object> inRemoteData, boolean isCompleteData) {
 		// Main table to use
 		mainTable = (Core_MetaTable) inTable;
 		
@@ -85,7 +84,7 @@ public class Core_MetaObject implements MetaObject {
 			deltaDataMap.put("_oid", _oid);
 			
 			// Create remote data map (blank)
-			remoteDataMap = new HashMap<String, Object>();
+			remoteDataMap = new HashMap<String,Object>();
 			
 			// Indicated that the provided map is "complete"
 			isCompleteRemoteDataMap = true;
@@ -261,7 +260,7 @@ public class Core_MetaObject implements MetaObject {
 		Object ret = deltaDataMap.get(key);
 		
 		// Get from incomplete map, exists
-		if (ret == null && remoteDataMap != null && !isCompleteRemoteDataMap) {
+		if (ret == null && remoteDataMap != null && !isCompleteRemoteDataMap ) {
 			ret = remoteDataMap.get(key);
 		}
 		
@@ -302,7 +301,7 @@ public class Core_MetaObject implements MetaObject {
 		value = agressiveNumericConversion(value);
 		
 		// If value and ret is both null, return
-		if (value == null && ret == null) {
+		if(value == null && ret == null) {
 			return null;
 		}
 		

@@ -1,4 +1,4 @@
-package picoded.dstack.test;
+package picoded.dstack.struct.simple;
 
 // Test system include
 import static org.junit.Assert.*;
@@ -17,7 +17,7 @@ import picoded.dstack.*;
 import picoded.dstack.struct.simple.*;
 
 // MetaTable base test class
-public class MetaTable_test {
+public class StructSimple_MetaTable_test {
 	
 	/// Test object
 	public MetaTable mtObj = null;

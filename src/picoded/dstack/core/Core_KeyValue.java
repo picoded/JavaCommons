@@ -14,7 +14,7 @@ import picoded.struct.GenericConvertHashMap;
 /// Does not actually implement its required feature,
 /// but helps provide a common base line for all the various implementation.
 ///
-public abstract class Core_KeyValue extends Core_DataStructure<String, String> implements KeyValue {
+public abstract class Core_KeyValue extends Core_DataStructure<String,String> implements KeyValue {
 	
 	//--------------------------------------------------------------------------
 	//
@@ -186,7 +186,7 @@ public abstract class Core_KeyValue extends Core_DataStructure<String, String> i
 	/// @returns null
 	@Override
 	public String putWithLifespan(String key, String value, long lifespan) {
-		return setValueRaw(key, value, (lifespan <= 0) ? -1 : currentSystemTimeInSeconds() + lifespan);
+		return setValueRaw(key, value, (lifespan <= 0)? -1 : currentSystemTimeInSeconds() + lifespan);
 	}
 	
 	/// Stores (and overwrites if needed) key, value pair

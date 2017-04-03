@@ -197,7 +197,7 @@ public class StructSimple_KeyValue extends Core_KeyValue {
 	
 	//--------------------------------------------------------------------------
 	//
-	// Backend system setup / teardown / maintenance (DataStructureSetup)
+	// Backend system setup / teardown / maintenance (DStackCommon)
 	//
 	//--------------------------------------------------------------------------
 	

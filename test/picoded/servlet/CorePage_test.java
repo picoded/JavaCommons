@@ -86,7 +86,7 @@ public class CorePage_test {
 			//
 			// intentionally using output.print, instead of println - to test
 			//
-			output.println("Test *» This");
+			output.println("Test *>> This");
 			return true;
 		}
 	}
@@ -94,7 +94,7 @@ public class CorePage_test {
 	@Test
 	public void outputPrintBugFixing() {
 		assertNotNull(testServlet = new EmbeddedServlet(testPort, new SpecialSymbolsTesting()));
-		helloWorldAssert("http://localhost:" + testPort + "/test/", "Test *» This");
+		helloWorldAssert("http://localhost:" + testPort + "/test/", "Test *>> This");
 	}
 	
 }

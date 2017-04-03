@@ -150,7 +150,7 @@ public class NxtCrypt {
 				// Cause its over 9000x easier to do social engineering attacks,
 				// then a side channel timing attack. 
 				//
-				// Unless of course your opponent is NSA. Â¯\_(ãƒ„)_/Â¯
+				// Unless of course your opponent is NSA. =/
 				//
 				// Or more frankly, one of their admins setting their password as "I-am-@wsome-123"
 				//

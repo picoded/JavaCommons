@@ -60,11 +60,26 @@ public class VirtualFileSystem_test {
 		assertEquals(1, testVFS.listFolderNames(null).length);
 		assertEquals(new String[] { "hello" }, testVFS.listFolderNames(null));
 		
+		
 		///creating the second folder and then checking for the folder list
-		assertEquals(1, testVFS.listFolderNames(null).length);
+		assertEquals(1, testVFS.listFolderNames("").length);
 		assertTrue(testVFS.createFolder("helloWorld"));
 		assertEquals(2, testVFS.listFolderNames(null).length);
-		assertEquals(new String[] { "helloWorld" }, testVFS.listFolderNames(null));
+		testVFS.listFolderNames(null);
+
+		///creating third folder , but it has the same name as that of the second folder then , 
+		///as the folder already exists , it throws a run time exception saying " the folder already exists "
+	//	assertEquals(2, testVFS.listFolderNames(null).length);
+	//	assertTrue(testVFS.createFolder("helloWorld"));
+
+
+		/// creating the third folder with a different name
+		assertEquals(2, testVFS.listFolderNames(null).length);
+		assertTrue(testVFS.createFolder("helloNewWorld"));
+		assertEquals(3, testVFS.listFolderNames(null).length);
+	    
+		///list of folders
+		//assertEquals(new String[] { "helloWorld", "hello", "helloNewWorld" }, testVFS.listFolderNames(null));
 	}
 	
 	// @Test

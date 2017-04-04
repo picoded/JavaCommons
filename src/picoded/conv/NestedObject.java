@@ -47,12 +47,12 @@ public class NestedObject {
 	///
 	/// @param  Input map to unpack
 	@SuppressWarnings("unchecked")
-	public static <K,V> void unpackFullyQualifiedNameKeys(Map<K,V> inMap) {
+	public static <K, V> void unpackFullyQualifiedNameKeys(Map<K, V> inMap) {
 		
 		// Normalize keyset, as modifications will occur
 		// We do not want a modification access exception
 		Set<K> keys = new HashSet<K>(inMap.keySet());
-		for(K key : keys) {
+		for (K key : keys) {
 			
 			// Get and process the key path
 			String keyStr = GenericConvert.toString(key, "");
@@ -60,7 +60,7 @@ public class NestedObject {
 			
 			// Key path is considered "complex" and needs "unpacking"
 			int keyLength = keyPath.length;
-			if( keyLength > 1 ) {
+			if (keyLength > 1) {
 				
 				// Final value to actually store without unpacking
 				Object value = inMap.get(keyStr);
@@ -72,13 +72,13 @@ public class NestedObject {
 				Object base = inMap;
 				
 				// Start the key diving
-				for(int i=0; i<keyLength; ++i) {
+				for (int i = 0; i < keyLength; ++i) {
 					
 					// Gets the next step of the path
 					String keyItem = keyPath[i];
 					
 					// If last index. Time to finalize the object
-					if( lastIndex == i ) {
+					if (lastIndex == i) {
 						setMapOrList(base, keyItem, value);
 						break; // End key diving loop
 					}
@@ -87,18 +87,18 @@ public class NestedObject {
 					Object newBase = fetchObject(base, keyItem, null);
 					
 					// If base is null, generate it
-					if( newBase == null ) {
+					if (newBase == null) {
 						// Grab next key to decide object type
-						String nextKey = keyPath[i+1];
+						String nextKey = keyPath[i + 1];
 						
 						// Check if next key is numeric
 						int nextKeyInt = GenericConvert.toInt(nextKey, -1);
-						if( nextKeyInt >= 0 ) {
+						if (nextKeyInt >= 0) {
 							// Numeric key : assume array
 							newBase = new ArrayList<Object>();
 						} else {
 							// Non numeric key : assume map
-							newBase = new HashMap<String,Object>();
+							newBase = new HashMap<String, Object>();
 						}
 						
 						setMapOrList(base, keyItem, newBase);
@@ -128,45 +128,45 @@ public class NestedObject {
 		//------------------------------------------------
 		
 		// Try converting to a map
-		if( inObj instanceof Map ) {
+		if (inObj instanceof Map) {
 			// Map found, converting and inserting
-			Map<String,Object> inMap = (Map<String,Object>)inObj;
+			Map<String, Object> inMap = (Map<String, Object>) inObj;
 			inMap.put(key, value);
 			return inMap;
 		}
 		
 		// Try converting to a list
-		if( inObj instanceof List ) {
+		if (inObj instanceof List) {
 			// List found, converting and inserting
-			List<Object> inList = (List<Object>)inObj;
+			List<Object> inList = (List<Object>) inObj;
 			
 			// Convert key
 			int idx = GenericConvert.toInt(key, -1);
 			
 			// Invalid key exception
-			if( idx < 0 ) {
-				throw new RuntimeException("Unexpected key to insert to List : "+key);
+			if (idx < 0) {
+				throw new RuntimeException("Unexpected key to insert to List : " + key);
 			}
 			
-			if( idx >= inList.size() ) {
+			if (idx >= inList.size()) {
 				inList.add(value);
 			} else {
-				inList.set(idx,value);
+				inList.set(idx, value);
 			}
 			return inList;
-		} 
+		}
 		
 		// Ok sadly, the optimistic methods failed =(
 		//------------------------------------------------
 		
 		// Time to go agressive, and try again as a map
-		Map<String,Object> tryMap = GenericConvert.toStringMap(inObj, null);
-		if( tryMap != null ) {
+		Map<String, Object> tryMap = GenericConvert.toStringMap(inObj, null);
+		if (tryMap != null) {
 			return setMapOrList(tryMap, key, value);
 		}
 		
 		List<Object> tryList = GenericConvert.toList(inObj, null);
-		if( tryList != null ) {
+		if (tryList != null) {
 			return setMapOrList(tryList, key, value);
 		}
 		
@@ -174,7 +174,6 @@ public class NestedObject {
 		//------------------------------------------------
 		throw new RuntimeException("Unexpected object to set value to (neither map, nor list)");
 	}
-	
 	
 	//--------------------------------------------------------------------------------------------------
 	//

@@ -9,7 +9,6 @@ import java.util.*;
 
 // External lib includes
 import org.apache.commons.lang3.RandomUtils;
-import org.apache.commons.lang3.ArrayUtils;
 
 // Test depends
 import picoded.conv.GUID;
@@ -508,24 +507,6 @@ public class StructSimple_MetaTable_test {
 	// }
 	// }
 	
-	// ByteArray test
-	//-----------------------------------------------
-	@Test
-	public void byteArray() {
-		byte[] bArray = "hello bytes".getBytes();
-
-		MetaObject mObj = null;
-		assertNotNull(mObj = mtObj.newObject());
-		mObj.put("test", bArray);
-		mObj.saveDelta();
-		
-		String guid = null;
-		assertNotNull(guid = mObj._oid());
-		
-		assertNotNull(mObj = mtObj.get(guid));
-		assertTrue( ArrayUtils.isEquals(bArray, mObj.get("test")) );
-	}
-
 	// KeyName fetching test
 	//-----------------------------------------------
 	@Test

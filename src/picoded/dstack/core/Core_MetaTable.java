@@ -21,7 +21,8 @@ import picoded.dstack.*;
 /// Does not actually implement its required feature,
 /// but helps provide a common base line for all the various implementation.
 ///
-abstract public class Core_MetaTable extends Core_DataStructure<String,MetaObject> implements MetaTable {
+abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObject> implements
+	MetaTable {
 	
 	//--------------------------------------------------------------------------
 	//
@@ -128,7 +129,8 @@ abstract public class Core_MetaTable extends Core_DataStructure<String,MetaObjec
 	/// @param   Object ID to get
 	/// @param   The full map of data. This is required as not all backend implementations allow partial update
 	/// @param   Keys to update, this is used to optimize certain backends
-	abstract public void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap, Set<String> keys);
+	abstract public void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
+		Set<String> keys);
 	
 	//--------------------------------------------------------------------------
 	//
@@ -148,13 +150,14 @@ abstract public class Core_MetaTable extends Core_DataStructure<String,MetaObjec
 	/// @param   number of objects to return max, use -1 to ignore
 	///
 	/// @returns  The String[] array
-	public String[] query_id(String whereClause, Object[] whereValues, String orderByStr, int offset, int limit) {
+	public String[] query_id(String whereClause, Object[] whereValues, String orderByStr,
+		int offset, int limit) {
 		
 		// The return list of MetaObjects
 		List<MetaObject> retList = null;
 		
 		// Setup the query, if needed
-		if (whereClause == null) { 
+		if (whereClause == null) {
 			// Null gets all
 			retList = new ArrayList<MetaObject>(this.values());
 		} else {
@@ -215,7 +218,7 @@ abstract public class Core_MetaTable extends Core_DataStructure<String,MetaObjec
 		MetaObject ret = new Core_MetaObject(this, null, null, false);
 		
 		// Baking in _createTime stamp
-		ret.put("_createTime", currentSystemTimeInSeconds() );
+		ret.put("_createTime", currentSystemTimeInSeconds());
 		
 		// Actual return
 		return ret;
@@ -244,13 +247,13 @@ abstract public class Core_MetaTable extends Core_DataStructure<String,MetaObjec
 	/// @returns the MetaObject, null if not exists
 	public MetaObject get(Object oid) {
 		// String oid
-		String soid = (oid != null)? oid.toString() : null;
+		String soid = (oid != null) ? oid.toString() : null;
 		
 		// Get remote data map
-		Map<String,Object> fullRemote = metaObjectRemoteDataMap_get(soid);
+		Map<String, Object> fullRemote = metaObjectRemoteDataMap_get(soid);
 		
 		// Return null, if there is no data
-		if( fullRemote == null ) {
+		if (fullRemote == null) {
 			return null;
 		}
 		

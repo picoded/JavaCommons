@@ -43,14 +43,14 @@ public class GenericConvertMap_test extends StandardHashMap_test {
 	}
 	
 	GenericConvertMap<String, Object> unsupported = null;
-	ProxyTest<String,Object> proxyMap = null;
+	ProxyTest<String, Object> proxyMap = null;
 	
 	@Override
 	@Before
 	public void setUp() {
 		unsupported = new GenericConvertTest<>();
 		map = new ProxyTest<String, Object>();
-		proxyMap = new ProxyTest<String,Object>();
+		proxyMap = new ProxyTest<String, Object>();
 	}
 	
 	@Override

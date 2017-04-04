@@ -22,7 +22,7 @@ import picoded.dstack.struct.simple.*;
 public class DStackCommon_test {
 	
 	// Test object for reuse
-	public DStackCommon<String,String> testObj = null;
+	public DStackCommon<String, String> testObj = null;
 	
 	// To override for implementation
 	//-----------------------------------------------------
@@ -30,7 +30,7 @@ public class DStackCommon_test {
 	/// Note that this implementation constructor
 	/// is to be overriden for the various backend
 	/// specific test cases
-	public DStackCommon<String,String> implementationConstructor() {
+	public DStackCommon<String, String> implementationConstructor() {
 		return new StructSimple_KeyValue();
 	}
 	
@@ -70,7 +70,7 @@ public class DStackCommon_test {
 	///
 	@Test
 	public void incrementalMaintenance() {
-		for(int i=0; i<10000000; ++i) {
+		for (int i = 0; i < 10000000; ++i) {
 			testObj.incrementalMaintenance();
 		}
 	}

@@ -49,7 +49,7 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	public void systemDestroy() {
 		valueMap.clear();
 	}
-
+	
 	///
 	/// Removes all data, without tearing down setup
 	///

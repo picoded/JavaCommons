@@ -43,14 +43,14 @@ public class GenericConvertMap_test extends StandardHashMap_test {
 	}
 	
 	GenericConvertMap<String, Object> unsupported = null;
-	ProxyTest proxyMap = null;
+	ProxyTest<String,Object> proxyMap = null;
 	
 	@Override
 	@Before
 	public void setUp() {
 		unsupported = new GenericConvertTest<>();
 		map = new ProxyTest<String, Object>();
-		proxyMap = new ProxyTest<>();
+		proxyMap = new ProxyTest<String,Object>();
 	}
 	
 	@Override
@@ -446,7 +446,7 @@ public class GenericConvertMap_test extends StandardHashMap_test {
 	
 	@Test
 	public void getObjectListOverloadValidTest() {
-		List<String> list = new ArrayList();
+		List<String> list = new ArrayList<String>();
 		list.add("me");
 		proxyMap.put("my_key", "1");
 		assertEquals(list, proxyMap.getObjectList("my_key", list));

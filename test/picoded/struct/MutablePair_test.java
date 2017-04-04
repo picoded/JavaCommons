@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 
 public class MutablePair_test {
 	
-	private MutablePair mutablePair = null;
+	private MutablePair<String,String> mutablePair = null;
 	
 	class MutablePairProxy<L, R> extends MutablePair<L, R> {
 		
@@ -36,7 +36,7 @@ public class MutablePair_test {
 	
 	@Before
 	public void setUp() {
-		mutablePair = new MutablePairProxy<>("left", "right");
+		mutablePair = new MutablePairProxy<String,String>("left", "right");
 	}
 	
 	@After

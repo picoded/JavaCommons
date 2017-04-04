@@ -8,11 +8,11 @@ import org.junit.Test;
 
 public class ArrayListMap_test {
 	
-	private ArrayListMap arrayListMap = null;
+	private ArrayListMap<String,String> arrayListMap = null;
 	
 	@Before
 	public void setUp() {
-		arrayListMap = new ArrayListMap();
+		arrayListMap = new ArrayListMap<String,String>();
 	}
 	
 	@After

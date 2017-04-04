@@ -46,7 +46,7 @@ public class GenericConvertList_test extends StandardArrayList_test {
 	}
 	
 	GenericConvertList<Object> unsupported = null;
-	ProxyTest proxyList = null;
+	ProxyTest<Object> proxyList = null;
 	
 	@Override
 	@Before

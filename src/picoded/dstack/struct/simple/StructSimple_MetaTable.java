@@ -61,7 +61,7 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 			accessLock.writeLock().unlock();
 		}
 	}
-
+	
 	///
 	/// Internal functions, used by MetaObject
 	///--------------------------------------------------------------------------

@@ -11,7 +11,7 @@ import picoded.struct.GenericConvertHashMap;
 /// Does not actually implement its required feature,
 /// but helps provide a common base line for the configuration system.
 ///
-public abstract class Core_DataStructure<K,V> implements DStackCommon<K,V> {
+public abstract class Core_DataStructure<K, V> implements DStackCommon<K, V> {
 	
 	//--------------------------------------------------------------------------
 	//
@@ -20,7 +20,7 @@ public abstract class Core_DataStructure<K,V> implements DStackCommon<K,V> {
 	//--------------------------------------------------------------------------
 	
 	/// Configuration map to use
-	protected GenericConvertMap<String,Object> configMap = new GenericConvertHashMap<String,Object>();
+	protected GenericConvertMap<String, Object> configMap = new GenericConvertHashMap<String, Object>();
 	
 	///
 	/// Persistent config mapping implmentation. 
@@ -30,7 +30,7 @@ public abstract class Core_DataStructure<K,V> implements DStackCommon<K,V> {
 	/// + NonceKeyLength
 	///
 	@Override
-	public GenericConvertMap<String,Object> configMap() {
+	public GenericConvertMap<String, Object> configMap() {
 		return configMap;
 	}
 	

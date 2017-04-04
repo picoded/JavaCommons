@@ -87,11 +87,11 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long>, DStackCo
 	///
 	/// @returns  value of the given key after adding
 	default Long addAndGet(Object key, Object delta) {
-		Long res = getAndAdd(key,delta);
-		if( res == null ) {
+		Long res = getAndAdd(key, delta);
+		if (res == null) {
 			return null;
 		}
-		return res.longValue() + ((Long)delta).longValue();
+		return res.longValue() + ((Long) delta).longValue();
 	}
 	
 	/// Returns the value, given the key, and increment it

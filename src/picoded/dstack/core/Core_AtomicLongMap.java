@@ -21,8 +21,9 @@ import picoded.dstack.*;
 /// Does not actually implement its required feature,
 /// but helps provide a common base line for all the various implementation.
 ///
-abstract public class Core_AtomicLongMap extends Core_DataStructure<String,Long> implements AtomicLongMap {
-
+abstract public class Core_AtomicLongMap extends Core_DataStructure<String, Long> implements
+	AtomicLongMap {
+	
 	//--------------------------------------------------------------------------
 	// 
 	// Constructor and maintenance
@@ -39,5 +40,5 @@ abstract public class Core_AtomicLongMap extends Core_DataStructure<String,Long>
 	public void maintenance() {
 		// Does nothing
 	}
-
+	
 }

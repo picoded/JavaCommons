@@ -264,6 +264,18 @@ public abstract class JSql {
 	public boolean update(String qString, Object... values) throws JSqlException {
 		throw new UnsupportedOperationException(JSqlException.invalidDatabaseImplementationException);
 	}
+
+	/// Prepare an SQL statement, for execution subsequently later
+	///
+	/// Custom SQL specific parsing occurs here
+	///
+	/// @param  Query strings including substituable variable "?"
+	/// @param  Array of arguments to do the variable subtitution
+	///
+	/// @return  Prepared statement
+	public JSqlPreparedStatement prepareStatement(String qString, Object... values) {
+		return new JSqlPreparedStatement(qString, values, this);
+	}
 	
 	//-------------------------------------------------------------------------
 	//
@@ -349,36 +361,165 @@ public abstract class JSql {
 	
 	//-------------------------------------------------------------------------
 	//
-	// Custom Query builder 
+	// SELECT Query builder 
 	//
 	//-------------------------------------------------------------------------
 	
-	// ///
-	// /// Helps generate an SQL SELECT request. This function was created to acommedate the various
-	// /// syntax differances of SELECT across the various SQL vendors (if any).
-	// ///
-	// public JSqlQuerySet selectQuerySet( //
-	// 	String tableName, // Table name to select from
-	// 	String selectStatement // The Columns to select, null means all
-	// ) {
-	// 	return selectQuerySet(tableName, selectStatement, null, null, null, 0, 0);
-	// }
-	
-	// ///
-	// /// Helps generate an SQL SELECT request. This function was created to acommedate the various
-	// /// syntax differances of SELECT across the various SQL vendors (if any).
-	// ///
-	// public JSqlQuerySet selectQuerySet( //
-	// 	String tableName, // Table name to select from
-	// 	String selectStatement, // The Columns to select, null means all
-		
-	// 	String whereStatement, // The Columns to apply where clause, this must be sql neutral
-	// 	Object[] whereValues // Values that corresponds to the where statement
-	// ) {
-	// 	return selectQuerySet(tableName, selectStatement, whereStatement, whereValues, null, 0, 0);
-	// }
-	
+	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
+	/// syntax differances of SELECT across the various SQL vendors (if any).
+	///
+	/// @param  Table name to query        (eg: tableName)
+	/// @param  Columns to select          (eg: col1, col2)
+	///
+	/// @return  A prepared select statement
+	public JSqlResult select( //
+		String tableName, // Table name to select from
+		String selectStatement // The Columns to select, null means all
+	) {
+		return selectStatement(tableName, selectStatement).query();
+	}
 
+	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
+	/// syntax differances of SELECT across the various SQL vendors (if any).
+	///
+	/// @param  Table name to query        (eg: tableName)
+	/// @param  Columns to select          (eg: col1, col2)
+	/// @param  Where statement to filter  (eg: col1=?)
+	/// @param  Where arguments value      (eg: [value/s])
+	///
+	/// @return  A prepared select statement
+	public JSqlResult select( //
+		String tableName, // Table name to select from
+		String selectStatement, // The Columns to select, null means all
+		String whereStatement, // The Columns to apply where clause, this must be sql neutral
+		Object[] whereValues // Values that corresponds to the where statement
+	) {
+		return selectStatement(tableName, selectStatement, whereStatement, whereValues).query();
+	}
+
+	///
+	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
+	/// syntax differances of SELECT across the various SQL vendors (if any).
+	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
+	/// The syntax below, is an example of such an SELECT statement for SQLITE.
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	/// SELECT
+	///	col1, col2   //select collumn
+	/// FROM tableName //table name to select from
+	/// WHERE
+	///	col1=?       //where clause
+	/// ORDER BY
+	///	col2 DESC    //order by clause
+	/// LIMIT 2        //limit clause
+	/// OFFSET 3       //offset clause
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	///
+	/// @param  Table name to query        (eg: tableName)
+	/// @param  Columns to select          (eg: col1, col2)
+	/// @param  Where statement to filter  (eg: col1=?)
+	/// @param  Where arguments value      (eg: [value/s])
+	/// @param  Order by statement         (eg: col2 DESC)
+	/// @param  Row count limit            (eg: 2)
+	/// @param  Row offset                 (eg: 3)
+	///
+	/// @return  A prepared select statement
+	///
+	public JSqlResult select( //
+		String tableName, // Table name to select from
+		//
+		String selectStatement, // The Columns to select, null means all
+		//
+		String whereStatement, // The Columns to apply where clause, this must be sql neutral
+		Object[] whereValues, // Values that corresponds to the where statement
+		//
+		String orderStatement, // Order by statements, must be either ASC / DESC
+		//
+		long limit, // Limit row count to, use 0 to ignore / disable
+		long offset // Offset limit by?
+	) {
+		return selectStatement(tableName, selectStatement, whereStatement, whereValues, orderStatement, limit, offset).query();
+	}
+
+	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
+	/// syntax differances of SELECT across the various SQL vendors (if any).
+	///
+	/// @param  Table name to query        (eg: tableName)
+	/// @param  Columns to select          (eg: col1, col2)
+	///
+	/// @return  A prepared select statement
+	public JSqlPreparedStatement selectStatement( //
+		String tableName, // Table name to select from
+		String selectStatement // The Columns to select, null means all
+	) {
+		return selectStatement(tableName, selectStatement, null, null, null, 0, 0);
+	}
+	
+	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
+	/// syntax differances of SELECT across the various SQL vendors (if any).
+	///
+	/// @param  Table name to query        (eg: tableName)
+	/// @param  Columns to select          (eg: col1, col2)
+	/// @param  Where statement to filter  (eg: col1=?)
+	/// @param  Where arguments value      (eg: [value/s])
+	///
+	/// @return  A prepared select statement
+	public JSqlPreparedStatement selectStatement( //
+		String tableName, // Table name to select from
+		String selectStatement, // The Columns to select, null means all
+		String whereStatement, // The Columns to apply where clause, this must be sql neutral
+		Object[] whereValues // Values that corresponds to the where statement
+	) {
+		return selectStatement(tableName, selectStatement, whereStatement, whereValues, null, 0, 0);
+	}
+	
+	///
+	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
+	/// syntax differances of SELECT across the various SQL vendors (if any).
+	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
+	/// The syntax below, is an example of such an SELECT statement for SQLITE.
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	/// SELECT
+	///	col1, col2   //select collumn
+	/// FROM tableName //table name to select from
+	/// WHERE
+	///	col1=?       //where clause
+	/// ORDER BY
+	///	col2 DESC    //order by clause
+	/// LIMIT 2        //limit clause
+	/// OFFSET 3       //offset clause
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	///
+	/// @param  Table name to query        (eg: tableName)
+	/// @param  Columns to select          (eg: col1, col2)
+	/// @param  Where statement to filter  (eg: col1=?)
+	/// @param  Where arguments value      (eg: [value/s])
+	/// @param  Order by statement         (eg: col2 DESC)
+	/// @param  Row count limit            (eg: 2)
+	/// @param  Row offset                 (eg: 3)
+	///
+	/// @return  A prepared select statement
+	///
+	public JSqlPreparedStatement selectStatement( //
+		String tableName, // Table name to select from
+		//
+		String selectStatement, // The Columns to select, null means all
+		//
+		String whereStatement, // The Columns to apply where clause, this must be sql neutral
+		Object[] whereValues, // Values that corresponds to the where statement
+		//
+		String orderStatement, // Order by statements, must be either ASC / DESC
+		//
+		long limit, // Limit row count to, use 0 to ignore / disable
+		long offset // Offset limit by?
+	) {
+		throw new UnsupportedOperationException(JSqlException.invalidDatabaseImplementationException);
+	}
 
 
 	/*

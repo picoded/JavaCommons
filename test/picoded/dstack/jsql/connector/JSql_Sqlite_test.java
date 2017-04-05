@@ -66,6 +66,27 @@ public class JSql_Sqlite_test {
 		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );
 	}
 
+	/// rawSimpleQueryFlow, with built select statement instead
+	@Test
+	public void selectSimpleQueryFlow() {
+		// Creating and inserting the result
+		assertTrue( jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
+		assertTrue( jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
+
+		// Query and validating data
+		JSqlResult res = null;
+		assertNotNull( res = jsqlObj.select(testTableName, "*") );
+
+		// Note that expected is in lower case, 
+		// as results is stored in case insensitive hashmap
+		Map<String,Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
+		assertEquals( ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res) );
+		res.dispose();
+
+		// Table cleanup
+		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );
+	}
+
 	// /// Create table if not exists test
 	// @Test
 	// public void createTableQueryBuilder() throws JSqlException {

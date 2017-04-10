@@ -47,7 +47,7 @@ public class JSql_Sqlite_test {
 	/// Simple raw query of creating, writing, reading, and deleting test
 	/// This is considered the simplest minimal test flow
 	@Test
-	public void rawSimpleQueryFlow() {
+	public void simpleQueryFlow_raw() {
 		// Creating and inserting the result
 		assertTrue( jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
 		assertTrue( jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
@@ -66,9 +66,31 @@ public class JSql_Sqlite_test {
 		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );
 	}
 
-	/// rawSimpleQueryFlow, with built select statement instead
+	/// simpleQueryFlow, with built create table statement instead
 	@Test
-	public void selectSimpleQueryFlow() {
+	public void simpleQueryFlow_createTable() {
+		// Creating and inserting the result
+		assertTrue( jsqlObj.createTable(testTableName, new String[] { "COL1" }, new String[] { "INTEGER" }) );
+		assertTrue( jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
+
+		// Query and validating data
+		JSqlResult res = null;
+		assertNotNull( res = jsqlObj.query_raw("SELECT * FROM "+testTableName+"") );
+
+		// Note that expected is in lower case, 
+		// as results is stored in case insensitive hashmap
+		Map<String,Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
+		assertEquals( ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res) );
+		res.dispose();
+
+		// Table cleanup
+		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );
+	}
+
+
+	/// simpleQueryFlow, with built select statement instead
+	@Test
+	public void simpleQueryFlow_select() {
 		// Creating and inserting the result
 		assertTrue( jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
 		assertTrue( jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
@@ -86,6 +108,28 @@ public class JSql_Sqlite_test {
 		// Table cleanup
 		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );
 	}
+
+	/// simpleQueryFlow, with built create table statement instead
+	@Test
+	public void simpleQueryFlow_insert() {
+		// Creating and inserting the result
+		assertTrue( jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
+		assertTrue( jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
+
+		// Query and validating data
+		JSqlResult res = null;
+		assertNotNull( res = jsqlObj.query_raw("SELECT * FROM "+testTableName+"") );
+
+		// Note that expected is in lower case, 
+		// as results is stored in case insensitive hashmap
+		Map<String,Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
+		assertEquals( ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res) );
+		res.dispose();
+
+		// Table cleanup
+		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );
+	}
+
 
 	// /// Create table if not exists test
 	// @Test

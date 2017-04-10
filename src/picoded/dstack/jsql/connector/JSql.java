@@ -361,6 +361,62 @@ public abstract class JSql {
 	
 	//-------------------------------------------------------------------------
 	//
+	// CREATE TABLE Query builder 
+	//
+	//-------------------------------------------------------------------------
+	
+	///
+	/// Helps generate an SQL CREATE TABLE IF NOT EXISTS request. This function was created to acommedate the various
+	/// syntax differances of CREATE TABLE IF NOT EXISTS across the various SQL vendors (if any).
+	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
+	/// The syntax below, is an example of such an CREATE TABLE IF NOT EXISTS statement for SQLITE.
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	/// CREATE TABLE IF NOT EXISTS TABLENAME ( COLLUMNS_NAME TYPE, ... )
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	///
+	/// @param  Table name to query        (eg: tableName)
+	/// @param  Columns to create          (eg: col1, col2)
+	/// @param  Columns types              (eg: int, text)
+	///
+	/// @return  A prepared create table statement
+	public boolean createTable( //
+		String tableName, // Table name to create
+		String[] columnName, // The column names
+		String[] columnTypes // The column types
+	) {
+		return createTableStatement(tableName, columnName, columnTypes).update();
+	}
+	
+	///
+	/// Helps generate an SQL CREATE TABLE IF NOT EXISTS request. This function was created to acommedate the various
+	/// syntax differances of CREATE TABLE IF NOT EXISTS across the various SQL vendors (if any).
+	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
+	/// The syntax below, is an example of such an CREATE TABLE IF NOT EXISTS statement for SQLITE.
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	/// CREATE TABLE IF NOT EXISTS TABLENAME ( COLLUMNS_NAME TYPE, ... )
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	///
+	/// @param  Table name to query        (eg: tableName)
+	/// @param  Columns to create          (eg: col1, col2)
+	/// @param  Columns types              (eg: int, text)
+	///
+	/// @return  A prepared create table statement
+	public JSqlPreparedStatement createTableStatement( //
+		String tableName, // Table name to create
+		String[] columnName, // The column names
+		String[] columnTypes // The column types
+	) {
+		throw new UnsupportedOperationException(JSqlException.invalidDatabaseImplementationException);
+	}
+	
+	//-------------------------------------------------------------------------
+	//
 	// SELECT Query builder 
 	//
 	//-------------------------------------------------------------------------
@@ -368,10 +424,12 @@ public abstract class JSql {
 	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
 	/// syntax differances of SELECT across the various SQL vendors (if any).
 	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
 	/// @param  Table name to query        (eg: tableName)
 	/// @param  Columns to select          (eg: col1, col2)
 	///
-	/// @return  A prepared select statement
+	/// @return  The JSqlResult
 	public JSqlResult select( //
 		String tableName, // Table name to select from
 		String selectStatement // The Columns to select, null means all
@@ -382,12 +440,14 @@ public abstract class JSql {
 	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
 	/// syntax differances of SELECT across the various SQL vendors (if any).
 	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
 	/// @param  Table name to query        (eg: tableName)
 	/// @param  Columns to select          (eg: col1, col2)
 	/// @param  Where statement to filter  (eg: col1=?)
 	/// @param  Where arguments value      (eg: [value/s])
 	///
-	/// @return  A prepared select statement
+	/// @return  The JSqlResult
 	public JSqlResult select( //
 		String tableName, // Table name to select from
 		String selectStatement, // The Columns to select, null means all
@@ -397,7 +457,6 @@ public abstract class JSql {
 		return selectStatement(tableName, selectStatement, whereStatement, whereValues).query();
 	}
 
-	///
 	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
 	/// syntax differances of SELECT across the various SQL vendors (if any).
 	///
@@ -425,8 +484,7 @@ public abstract class JSql {
 	/// @param  Row count limit            (eg: 2)
 	/// @param  Row offset                 (eg: 3)
 	///
-	/// @return  A prepared select statement
-	///
+	/// @return  The JSqlResult
 	public JSqlResult select( //
 		String tableName, // Table name to select from
 		//
@@ -446,6 +504,8 @@ public abstract class JSql {
 	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
 	/// syntax differances of SELECT across the various SQL vendors (if any).
 	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
 	/// @param  Table name to query        (eg: tableName)
 	/// @param  Columns to select          (eg: col1, col2)
 	///
@@ -459,6 +519,8 @@ public abstract class JSql {
 	
 	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
 	/// syntax differances of SELECT across the various SQL vendors (if any).
+	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
 	///
 	/// @param  Table name to query        (eg: tableName)
 	/// @param  Columns to select          (eg: col1, col2)
@@ -504,7 +566,6 @@ public abstract class JSql {
 	/// @param  Row offset                 (eg: 3)
 	///
 	/// @return  A prepared select statement
-	///
 	public JSqlPreparedStatement selectStatement( //
 		String tableName, // Table name to select from
 		//
@@ -521,6 +582,12 @@ public abstract class JSql {
 		throw new UnsupportedOperationException(JSqlException.invalidDatabaseImplementationException);
 	}
 
+	//-------------------------------------------------------------------------
+	//
+	// INSERT query builder 
+	//
+	//-------------------------------------------------------------------------
+	
 
 	/*
 
@@ -548,7 +615,7 @@ public abstract class JSql {
 	/// OFFSET 3       //offset clause
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
-	public JSqlQuerySet selectQuerySet( //
+	public JSqlPreparedStatement selectQuerySet( //
 		String tableName, // Table name to select from
 		//
 		String selectStatement, // The Columns to select, null means all
@@ -608,7 +675,7 @@ public abstract class JSql {
 		}
 		
 		// Create the query set
-		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
+		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	
 	///
@@ -635,7 +702,7 @@ public abstract class JSql {
 	/// );
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
-	public JSqlQuerySet upsertQuerySet( //
+	public JSqlPreparedStatement upsertQuerySet( //
 		String tableName, // Table name to upsert on
 		//
 		String[] uniqueColumns, // The unique column names
@@ -756,10 +823,10 @@ public abstract class JSql {
 		queryBuilder.append(columnValues.substring(0,
 			columnValues.length() - columnSeperator.length()));
 		queryBuilder.append(")");
-		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
+		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	
-	protected JSqlQuerySet upsertQuerySet(String tableName, String[] uniqueColumns,
+	protected JSqlPreparedStatement upsertQuerySet(String tableName, String[] uniqueColumns,
 		Object[] uniqueValues, String[] insertColumns, Object[] insertValues,
 		String[] defaultColumns, Object[] defaultValues, String[] miscColumns,
 		ArrayList<Object> innerSelectArgs, StringBuilder innerSelectSB, String innerSelectPrefix,
@@ -942,11 +1009,11 @@ public abstract class JSql {
 		queryArgs.addAll(updateQueryArgs);
 		queryArgs.addAll(insertQueryArgs);
 		
-		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
+		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	
 	// Helper varient, without default or misc fields
-	public JSqlQuerySet upsertQuerySet( //
+	public JSqlPreparedStatement upsertQuerySet( //
 		String tableName, // Table name to upsert on
 		//
 		String[] uniqueColumns, // The unique column names
@@ -974,7 +1041,7 @@ public abstract class JSql {
 	///	col1=?       //where clause
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
-	public JSqlQuerySet deleteQuerySet( //
+	public JSqlPreparedStatement deleteQuerySet( //
 		String tableName, // Table name to select from
 		//
 		String whereStatement, // The Columns to apply where clause, this must be sql neutral
@@ -1004,7 +1071,7 @@ public abstract class JSql {
 		}
 		
 		// Create the query set
-		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
+		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	
 	///
@@ -1019,14 +1086,14 @@ public abstract class JSql {
 	/// CREATE TABLE IF NOT EXISTS TABLENAME ( COLLUMNS_NAME TYPE, ... )
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
-	public JSqlQuerySet createTableQuerySet(String tableName, // Table name to create
+	public JSqlPreparedStatement createTableQuerySet(String tableName, // Table name to create
 		//
 		String[] columnName, // The column names
-		String[] columnDefine // The column types
+		String[] columnTypes // The column types
 	) {
-		if (columnName == null || columnDefine == null || columnDefine.length != columnName.length) {
+		if (columnName == null || columnTypes == null || columnTypes.length != columnName.length) {
 			throw new IllegalArgumentException("Invalid columnName/Type provided: " + columnName
-				+ " : " + columnDefine);
+				+ " : " + columnTypes);
 		}
 		
 		StringBuilder queryBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS `");
@@ -1039,12 +1106,12 @@ public abstract class JSql {
 			}
 			queryBuilder.append(columnName[a]);
 			queryBuilder.append(" ");
-			queryBuilder.append(columnDefine[a]);
+			queryBuilder.append(columnTypes[a]);
 		}
 		queryBuilder.append(" )");
 		
 		// Create the query set
-		return new JSqlQuerySet(queryBuilder.toString(), null, this);
+		return new JSqlPreparedStatement(queryBuilder.toString(), null, this);
 	}
 	
 	///
@@ -1059,7 +1126,7 @@ public abstract class JSql {
 	/// CREATE (UNIQUE|FULLTEXT) INDEX IF NOT EXISTS TABLENAME_SUFFIX ON TABLENAME ( COLLUMNS )
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
-	public JSqlQuerySet createTableIndexQuerySet( //
+	public JSqlPreparedStatement createTableIndexQuerySet( //
 		String tableName, // Table name to select from
 		//
 		String columnNames, // The column name to create the index on
@@ -1103,11 +1170,11 @@ public abstract class JSql {
 		queryBuilder.append(")");
 		
 		// Create the query set
-		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
+		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	
 	/// Helper varient, where indexSuffix is defaulted to auto generate (null)
-	public JSqlQuerySet createTableIndexQuerySet( //
+	public JSqlPreparedStatement createTableIndexQuerySet( //
 		String tableName, // Table name to select from
 		String columnNames, // The column name to create the index on
 		String indexType // The index type if given, can be null
@@ -1116,7 +1183,7 @@ public abstract class JSql {
 	}
 	
 	/// Helper varient, where idnexType and indexSuffix is defaulted(null)
-	public JSqlQuerySet createTableIndexQuerySet( //
+	public JSqlPreparedStatement createTableIndexQuerySet( //
 		String tableName, // Table name to select from
 		String columnNames // The column name to create the index on
 	) {

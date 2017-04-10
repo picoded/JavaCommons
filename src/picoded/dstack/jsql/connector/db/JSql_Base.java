@@ -252,10 +252,7 @@ public class JSql_Base extends JSql {
 		long limit, // Limit row count to, use 0 to ignore / disable
 		long offset // Offset limit by?
 	) {
-		if (tableName.length() > 30) {
-			LOGGER.warning(JSqlException.oracleNameSpaceWarning + tableName);
-		}
-		
+
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		StringBuilder queryBuilder = new StringBuilder("SELECT ");
 		
@@ -301,49 +298,231 @@ public class JSql_Base extends JSql {
 		return prepareStatement(queryBuilder.toString(), queryArgs.toArray());
 	}
 
+	//-------------------------------------------------------------------------
+	//
+	// CREATE TABLE Query builder 
+	//
+	//-------------------------------------------------------------------------
+	
+	///
+	/// Helps generate an SQL CREATE TABLE IF NOT EXISTS request. This function was created to acommedate the various
+	/// syntax differances of CREATE TABLE IF NOT EXISTS across the various SQL vendors (if any).
+	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
+	/// The syntax below, is an example of such an CREATE TABLE IF NOT EXISTS statement for SQLITE.
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	/// CREATE TABLE IF NOT EXISTS TABLENAME ( COLLUMNS_NAME TYPE, ... )
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	///
+	/// @param  Table name to query        (eg: tableName)
+	/// @param  Columns to create          (eg: col1, col2)
+	/// @param  Columns types              (eg: int, text)
+	public JSqlPreparedStatement createTableStatement( //
+		String tableName, // Table name to create
+		String[] columnName, // The column names
+		String[] columnTypes // The column types
+	) {
+
+		// Tablename length warning
+		if (tableName.length() > 30) {
+			LOGGER.warning(JSqlException.oracleNameSpaceWarning + tableName);
+		}
+		
+		// Column names checks
+		if (columnName == null || columnTypes == null || columnTypes.length != columnName.length) {
+			throw new IllegalArgumentException("Invalid columnName/Type provided: " + columnName
+				+ " : " + columnTypes);
+		}
+		
+		StringBuilder queryBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS `");
+		queryBuilder.append(tableName);
+		queryBuilder.append("` ( ");
+		
+		for (int a = 0; a < columnName.length; ++a) {
+			if (a > 0) {
+				queryBuilder.append(", ");
+			}
+			queryBuilder.append(columnName[a]);
+			queryBuilder.append(" ");
+			queryBuilder.append(columnTypes[a]);
+		}
+		queryBuilder.append(" )");
+		
+		// Create the query set
+		return prepareStatement(queryBuilder.toString());
+	}
+
+	//-------------------------------------------------------------------------
+	//
+	// UPSERT Query Builder
+	//
+	//-------------------------------------------------------------------------
+	
+	///
+	/// Helps generate an SQL UPSERT request. This function was created to acommedate the various
+	/// syntax differances of UPSERT across the various SQL vendors.
+	///
+	/// Note that misc column, while "annoying" to fill up is required to ensure cross DB
+	/// competibility as in certain cases this is required!
+	///
+	/// This query alone is one of the largest reason this whole library exists,
+	/// (the other being create table if not exists) due to its high usage,
+	/// and extremely non consistent SQL implmentations across systems.
+	///
+	/// Note that care should be taken to prevent SQL injection via the given statment strings.
+	///
+	/// The syntax below, is an example of such an UPSERT statement for SQLITE.
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	/// INSERT OR REPLACE INTO Employee (
+	///	id,      // Unique Columns to check for upsert
+	///	fname,   // Insert Columns to update
+	///	lname,   // Insert Columns to update
+	///	role,    // Default Columns, that has default fallback value
+	///   note,    // Misc Columns, which existing values are preserved (if exists)
+	/// ) VALUES (
+	///	1,       // Unique value
+	/// 	'Tom',   // Insert value
+	/// 	'Hanks', // Update value
+	///	COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'), // Values with default
+	///	(SELECT note FROM Employee WHERE id = 1) // Misc values to preserve
+	/// );
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	///
+	/// @param  Table name to query        (eg: tableName)
+	/// @param  Unique column names        (eg: id)
+	/// @param  Unique column values       (eg: 1)
+	/// @param  Upsert column names        (eg: fname,lname)
+	/// @param  Upsert column values       (eg: 'Tom','Hanks')
+	/// @param  Default column to use existing values if exists   (eg: 'role')
+	/// @param  Default column values to use if not exists        (eg: 'Benchwarmer')
+	/// @param  All other column names to maintain existing value (eg: 'note')
+	///
+	/// @return  A prepared upsert statement
+	///
+	public JSqlPreparedStatement upsertStatement( //
+		String tableName, // Table name to upsert on
+		//
+		String[] uniqueColumns, // The unique column names
+		Object[] uniqueValues, // The row unique identifier values
+		//
+		String[] insertColumns, // Columns names to update
+		Object[] insertValues, // Values to update
+		//
+		String[] defaultColumns, //
+		// Columns names to apply default value, if not exists
+		// Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+		Object[] defaultValues, //
+		// Various column names where its existing value needs to be maintained (if any),
+		// this is important as some SQL implementation will fallback to default table values, if not properly handled
+		String[] miscColumns //
+	) {
+		
+		/// Checks that unique collumn and values length to be aligned
+		if (uniqueColumns == null || uniqueValues == null
+			|| uniqueColumns.length != uniqueValues.length) {
+			throw new JSqlException(
+				"Upsert query requires unique column and values to be equal length");
+		}
+		
+		/// Preparing inner default select, this will be used repeatingly for COALESCE, DEFAULT and MISC values
+		ArrayList<Object> innerSelectArgs = new ArrayList<Object>();
+		StringBuilder innerSelectSB = new StringBuilder(" FROM ");
+		innerSelectSB.append("`" + tableName + "`");
+		innerSelectSB.append(WHERE);
+		for (int a = 0; a < uniqueColumns.length; ++a) {
+			if (a > 0) {
+				innerSelectSB.append(" AND ");
+			}
+			innerSelectSB.append(uniqueColumns[a] + " = ?");
+			innerSelectArgs.add(uniqueValues[a]);
+		}
+		innerSelectSB.append(")");
+		
+		String innerSelectPrefix = "(SELECT ";
+		String innerSelectSuffix = innerSelectSB.toString();
+		if (sqlType.equals(JSqlType.MSSQL)) {
+			return upsertQuerySet(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+				defaultColumns, defaultValues, miscColumns, innerSelectArgs, innerSelectSB,
+				innerSelectPrefix, innerSelectSuffix);
+		}
+		/// Building the query for INSERT OR REPLACE
+		StringBuilder queryBuilder = new StringBuilder("INSERT OR REPLACE INTO `" + tableName + "` (");
+		if (sqlType.equals(JSqlType.MYSQL)) {
+			/// Building the query for REPLACE
+			queryBuilder = new StringBuilder("REPLACE INTO `" + tableName + "` (");
+		}
+		ArrayList<Object> queryArgs = new ArrayList<Object>();
+		/// Building the query for both sides of '(...columns...) VALUE (...vars...)' clauses in upsert
+		/// Note that the final trailing ", " seperator will be removed prior to final query conversion
+		StringBuilder columnNames = new StringBuilder();
+		StringBuilder columnValues = new StringBuilder();
+		String columnSeperator = ", ";
+		/// Setting up unique values
+		for (int a = 0; a < uniqueColumns.length; ++a) {
+			columnNames.append(uniqueColumns[a]);
+			columnNames.append(columnSeperator);
+			//
+			columnValues.append("?");
+			columnValues.append(columnSeperator);
+			//
+			queryArgs.add(uniqueValues[a]);
+		}
+		/// Inserting updated values
+		if (insertColumns != null) {
+			for (int a = 0; a < insertColumns.length; ++a) {
+				columnNames.append(insertColumns[a]);
+				columnNames.append(columnSeperator);
+				//
+				columnValues.append("?");
+				columnValues.append(columnSeperator);
+				//
+				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]
+					: null);
+			}
+		}
+		/// Handling default values
+		if (defaultColumns != null) {
+			for (int a = 0; a < defaultColumns.length; ++a) {
+				columnNames.append(defaultColumns[a]);
+				columnNames.append(columnSeperator);
+				columnValues.append(COALESCE);
+				columnValues.append(innerSelectPrefix);
+				columnValues.append(defaultColumns[a]);
+				columnValues.append(innerSelectSuffix);
+				queryArgs.addAll(innerSelectArgs);
+				columnValues.append(", ?)");
+				columnValues.append(columnSeperator);
+				queryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a]
+					: null);
+			}
+		}
+		/// Handling Misc values
+		if (miscColumns != null) {
+			for (int a = 0; a < miscColumns.length; ++a) {
+				columnNames.append(miscColumns[a]);
+				columnNames.append(columnSeperator);
+				columnValues.append(innerSelectPrefix);
+				columnValues.append(miscColumns[a]);
+				columnValues.append(innerSelectSuffix);
+				queryArgs.addAll(innerSelectArgs);
+				columnValues.append(columnSeperator);
+			}
+		}
+		/// Building the final query
+		queryBuilder
+			.append(columnNames.substring(0, columnNames.length() - columnSeperator.length()));
+		queryBuilder.append(") VALUES (");
+		queryBuilder.append(columnValues.substring(0,
+			columnValues.length() - columnSeperator.length()));
+		queryBuilder.append(")");
+		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
+	}
+		
 	/*
 	
-	/// Executes and dispose the sqliteResult object. Similar to executeQuery but uses the Statement class
-	/// Returns false if no result object is given by the execution call. This is raw execution.
-	public boolean execute_query(String qString) throws JSqlException {
-		try {
-			Statement ps = null;
-			ResultSet rs = null;
-			boolean isResultSetNotNull = false;
-			try {
-				ps = sqlConn.createStatement();
-				rs = ps.executeQuery(qString);
-				if (rs != null) {
-					isResultSetNotNull = true;
-				}
-			} finally {
-				if (rs != null) {
-					rs.close();
-				}
-				if (ps != null) {
-					ps.close();
-				}
-			}
-			return isResultSetNotNull;
-		} catch (Exception e) {
-			throw new JSqlException("execute_query exception : " + qString, e);
-		}
-	}
-	
-	/// Throws an exception, as this functionality isnt supported in the base class
-	public JSqlResult executeQuery(String qString, Object... values) throws JSqlException {
-		throw new JSqlException(JSqlException.invalidDatabaseImplementationException);
-	}
-	
-	/// Throws an exception, as this functionality isnt supported in the base class
-	public JSqlResult query(String qString, Object... values) throws JSqlException {
-		throw new JSqlException(JSqlException.invalidDatabaseImplementationException);
-	}
-	
-	/// Throws an exception, as this functionality isnt supported in the base class
-	public boolean execute(String qString, Object... values) throws JSqlException {
-		throw new JSqlException(JSqlException.invalidDatabaseImplementationException);
-	}
 	
 	//--------------------------------------------------------------------------
 	// Utility helper functions used to prepare common complex SQL quries
@@ -386,114 +565,6 @@ public class JSql_Base extends JSql {
 	//--------------------------------------------------------------------------
 	
 	///
-	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
-	/// syntax differances of SELECT across the various SQL vendors (if any).
-	///
-	public JSqlQuerySet selectQuerySet( //
-		String tableName, // Table name to select from
-		String selectStatement // The Columns to select, null means all
-	) {
-		return selectQuerySet(tableName, selectStatement, null, null, null, 0, 0);
-	}
-	
-	///
-	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
-	/// syntax differances of SELECT across the various SQL vendors (if any).
-	///
-	public JSqlQuerySet selectQuerySet( //
-		String tableName, // Table name to select from
-		String selectStatement, // The Columns to select, null means all
-		
-		String whereStatement, // The Columns to apply where clause, this must be sql neutral
-		Object[] whereValues // Values that corresponds to the where statement
-	) {
-		return selectQuerySet(tableName, selectStatement, whereStatement, whereValues, null, 0, 0);
-	}
-	
-	///
-	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
-	/// syntax differances of SELECT across the various SQL vendors (if any).
-	///
-	/// Note that care should be taken to prevent SQL injection via the given statment strings.
-	///
-	/// The syntax below, is an example of such an SELECT statement for SQLITE.
-	///
-	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
-	/// SELECT
-	///	col1, col2   //select collumn
-	/// FROM tableName //table name to select from
-	/// WHERE
-	///	col1=?       //where clause
-	/// ORDER BY
-	///	col2 DESC    //order by clause
-	/// LIMIT 2        //limit clause
-	/// OFFSET 3       //offset clause
-	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	///
-	public JSqlQuerySet selectQuerySet( //
-		String tableName, // Table name to select from
-		//
-		String selectStatement, // The Columns to select, null means all
-		//
-		String whereStatement, // The Columns to apply where clause, this must be sql neutral
-		Object[] whereValues, // Values that corresponds to the where statement
-		//
-		String orderStatement, // Order by statements, must be either ASC / DESC
-		//
-		long limit, // Limit row count to, use 0 to ignore / disable
-		long offset // Offset limit by?
-	) {
-		
-		if (tableName.length() > 30) {
-			LOGGER.warning(JSqlException.oracleNameSpaceWarning + tableName);
-		}
-		
-		ArrayList<Object> queryArgs = new ArrayList<Object>();
-		StringBuilder queryBuilder = new StringBuilder("SELECT ");
-		
-		// Select collumns
-		if (selectStatement == null || (selectStatement = selectStatement.trim()).length() <= 0) {
-			queryBuilder.append("*");
-		} else {
-			queryBuilder.append(selectStatement);
-		}
-		
-		// From table names
-		queryBuilder.append(" FROM `" + tableName + "`");
-		
-		// Where clauses
-		if (whereStatement != null && (whereStatement = whereStatement.trim()).length() >= 3) {
-			
-			queryBuilder.append(WHERE);
-			queryBuilder.append(whereStatement);
-			
-			if (whereValues != null) {
-				for (int b = 0; b < whereValues.length; ++b) {
-					queryArgs.add(whereValues[b]);
-				}
-			}
-		}
-		
-		// Order By clause
-		if (orderStatement != null && (orderStatement = orderStatement.trim()).length() > 3) {
-			queryBuilder.append(" ORDER BY ");
-			queryBuilder.append(orderStatement);
-		}
-		
-		// Limit and offset clause
-		if (limit > 0) {
-			queryBuilder.append(" LIMIT " + limit);
-			
-			if (offset > 0) {
-				queryBuilder.append(" OFFSET " + offset);
-			}
-		}
-		
-		// Create the query set
-		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
-	}
-	
-	///
 	/// Helps generate an SQL UPSERT request. This function was created to acommedate the various
 	/// syntax differances of UPSERT across the various SQL vendors.
 	///
@@ -517,7 +588,7 @@ public class JSql_Base extends JSql {
 	/// );
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
-	public JSqlQuerySet upsertQuerySet( //
+	public JSqlPreparedStatement upsertQuerySet( //
 		String tableName, // Table name to upsert on
 		//
 		String[] uniqueColumns, // The unique column names
@@ -638,10 +709,10 @@ public class JSql_Base extends JSql {
 		queryBuilder.append(columnValues.substring(0,
 			columnValues.length() - columnSeperator.length()));
 		queryBuilder.append(")");
-		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
+		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	
-	protected JSqlQuerySet upsertQuerySet(String tableName, String[] uniqueColumns,
+	protected JSqlPreparedStatement upsertQuerySet(String tableName, String[] uniqueColumns,
 		Object[] uniqueValues, String[] insertColumns, Object[] insertValues,
 		String[] defaultColumns, Object[] defaultValues, String[] miscColumns,
 		ArrayList<Object> innerSelectArgs, StringBuilder innerSelectSB, String innerSelectPrefix,
@@ -824,11 +895,11 @@ public class JSql_Base extends JSql {
 		queryArgs.addAll(updateQueryArgs);
 		queryArgs.addAll(insertQueryArgs);
 		
-		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
+		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	
 	// Helper varient, without default or misc fields
-	public JSqlQuerySet upsertQuerySet( //
+	public JSqlPreparedStatement upsertQuerySet( //
 		String tableName, // Table name to upsert on
 		//
 		String[] uniqueColumns, // The unique column names
@@ -856,7 +927,7 @@ public class JSql_Base extends JSql {
 	///	col1=?       //where clause
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
-	public JSqlQuerySet deleteQuerySet( //
+	public JSqlPreparedStatement deleteQuerySet( //
 		String tableName, // Table name to select from
 		//
 		String whereStatement, // The Columns to apply where clause, this must be sql neutral
@@ -886,7 +957,7 @@ public class JSql_Base extends JSql {
 		}
 		
 		// Create the query set
-		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
+		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	
 	///
@@ -901,7 +972,7 @@ public class JSql_Base extends JSql {
 	/// CREATE TABLE IF NOT EXISTS TABLENAME ( COLLUMNS_NAME TYPE, ... )
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
-	public JSqlQuerySet createTableQuerySet(String tableName, // Table name to create
+	public JSqlPreparedStatement createTableQuerySet(String tableName, // Table name to create
 		//
 		String[] columnName, // The column names
 		String[] columnDefine // The column types
@@ -926,7 +997,7 @@ public class JSql_Base extends JSql {
 		queryBuilder.append(" )");
 		
 		// Create the query set
-		return new JSqlQuerySet(queryBuilder.toString(), null, this);
+		return new JSqlPreparedStatement(queryBuilder.toString(), null, this);
 	}
 	
 	///
@@ -941,7 +1012,7 @@ public class JSql_Base extends JSql {
 	/// CREATE (UNIQUE|FULLTEXT) INDEX IF NOT EXISTS TABLENAME_SUFFIX ON TABLENAME ( COLLUMNS )
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
-	public JSqlQuerySet createTableIndexQuerySet( //
+	public JSqlPreparedStatement createTableIndexQuerySet( //
 		String tableName, // Table name to select from
 		//
 		String columnNames, // The column name to create the index on
@@ -985,11 +1056,11 @@ public class JSql_Base extends JSql {
 		queryBuilder.append(")");
 		
 		// Create the query set
-		return new JSqlQuerySet(queryBuilder.toString(), queryArgs.toArray(), this);
+		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	
 	/// Helper varient, where indexSuffix is defaulted to auto generate (null)
-	public JSqlQuerySet createTableIndexQuerySet( //
+	public JSqlPreparedStatement createTableIndexQuerySet( //
 		String tableName, // Table name to select from
 		String columnNames, // The column name to create the index on
 		String indexType // The index type if given, can be null
@@ -998,7 +1069,7 @@ public class JSql_Base extends JSql {
 	}
 	
 	/// Helper varient, where idnexType and indexSuffix is defaulted(null)
-	public JSqlQuerySet createTableIndexQuerySet( //
+	public JSqlPreparedStatement createTableIndexQuerySet( //
 		String tableName, // Table name to select from
 		String columnNames // The column name to create the index on
 	) {

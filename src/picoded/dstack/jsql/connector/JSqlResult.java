@@ -273,15 +273,14 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 	/// @param  row number to fetch
 	///
 	/// @return Map of row data
-	public Map<String, Object> readRow(int pt) {
-
+	public CaseInsensitiveHashMap<String, Object> readRow(int pt) {
 		// Return null for segments above row count
 		if (pt >= rowCount) {
 			return null;
 		}
 
 		// Return result, to populate
-		Map<String, Object> ret = new HashMap<String, Object>();
+		CaseInsensitiveHashMap<String, Object> ret = new CaseInsensitiveHashMap<String, Object>();
 
 		// Iterating the local data set, process the result, and return
 		for (Map.Entry<String, Object[]> entry : this.entrySet()) {

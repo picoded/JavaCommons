@@ -948,24 +948,6 @@ public abstract class JSql {
 	}
 	
 	/*
-
-	/// Helper varient, where indexSuffix is defaulted to auto generate (null)
-	public JSqlPreparedStatement createTableIndexQuerySet( //
-		String tableName, // Table name to select from
-		String columnNames, // The column name to create the index on
-		String indexType // The index type if given, can be null
-	) {
-		return createTableIndexQuerySet(tableName, columnNames, indexType, null);
-	}
-	
-	/// Helper varient, where idnexType and indexSuffix is defaulted(null)
-	public JSqlPreparedStatement createTableIndexQuerySet( //
-		String tableName, // Table name to select from
-		String columnNames // The column name to create the index on
-	) {
-		return createTableIndexQuerySet(tableName, columnNames, null, null);
-	}
-	
 	/// Executes the table meta data query, and returns the result object
 	public JSqlResult executeQuery_metadata(String table) throws JSqlException {
 		JSqlResult res = null;
@@ -1018,6 +1000,5 @@ public abstract class JSql {
 		}
 		return metaData;
 	}
-	
 	*/
 }

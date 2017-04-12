@@ -32,9 +32,8 @@ public class JSql_Sqlite_test {
 	@After
 	public void tearDown() throws JSqlException {
 		if (jsqlObj != null) {
-			// jsqlObj.executeQuery("DROP TABLE IF EXISTS `" + testTableName + "`").dispose();
-			// jsqlObj.dispose();
-			// jsqlObj = null;
+			jsqlObj.update("DROP TABLE IF EXISTS `" + testTableName + "`");
+			jsqlObj = null;
 		}
 	}
 	
@@ -66,7 +65,7 @@ public class JSql_Sqlite_test {
 		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );
 	}
 
-	/// simpleQueryFlow, with built create table statement instead
+	/// simpleQueryFlow, with built CREATE TABLE statement instead
 	@Test
 	public void simpleQueryFlow_createTable() {
 		// Creating and inserting the result
@@ -88,7 +87,7 @@ public class JSql_Sqlite_test {
 	}
 
 
-	/// simpleQueryFlow, with built select statement instead
+	/// simpleQueryFlow, with built SELECT statement instead
 	@Test
 	public void simpleQueryFlow_select() {
 		// Creating and inserting the result
@@ -109,12 +108,14 @@ public class JSql_Sqlite_test {
 		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );
 	}
 
-	/// simpleQueryFlow, with built create table statement instead
+	/// simpleQueryFlow, with built UPSERT statement instead, modified with primary key
 	@Test
-	public void simpleQueryFlow_insert() {
+	public void simpleQueryFlow_upsert() {
 		// Creating and inserting the result
-		assertTrue( jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
-		assertTrue( jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
+		assertTrue( jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER PRIMARY KEY )") );
+
+		// Upserting only the primary key, rest is to be facilitated in other tests
+		assertTrue( jsqlObj.upsert(testTableName, new String[] { "COL1" }, new Object[] { 1 }, null, null, null, null, null) );
 
 		// Query and validating data
 		JSqlResult res = null;
@@ -125,6 +126,46 @@ public class JSql_Sqlite_test {
 		Map<String,Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
 		assertEquals( ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res) );
 		res.dispose();
+
+		// Table cleanup
+		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );
+	}
+
+	/// Simple raw query of creating, writing, reading, and deleting test
+	/// This is considered the simplest minimal test flow
+	@Test
+	public void simpleQueryFlow_delete() {
+		// Creating and inserting the result
+		assertTrue( jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
+		assertTrue( jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
+
+		// Query and validating data
+		JSqlResult res = null;
+		assertNotNull( res = jsqlObj.query_raw("SELECT * FROM "+testTableName+"") );
+		assertEquals( 1, res.rowCount() );
+
+		// Note that expected is in lower case, 
+		// as results is stored in case insensitive hashmap
+		Map<String,Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
+		assertEquals( ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res) );
+
+		// Delete from the table
+		assertTrue( jsqlObj.delete(testTableName) );
+
+		// Check for no data
+		assertNotNull( res = jsqlObj.query_raw("SELECT * FROM "+testTableName+"") );
+		assertEquals( 0, res.rowCount() );
+
+		// Reinsert a different data
+		assertTrue( jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (2)") );
+
+		// Requery for new data strictly
+		assertNotNull( res = jsqlObj.query_raw("SELECT * FROM "+testTableName+"") );
+		assertEquals( 1, res.rowCount() );
+
+		// Validate the result
+		expected = ConvertJSON.toMap("{ \"col1\" : [ 2 ] }");
+		assertEquals( ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res) );
 
 		// Table cleanup
 		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );

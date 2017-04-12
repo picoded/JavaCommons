@@ -52,55 +52,69 @@ public class VirtualFileSystem_test {
 		// testObj.incrementalMaintenance();
 	}
 	
+	///FOLDER TESTS
+	// @Test
+	// public void simpleFolderCreation() {
+	// 	//creating a simple folder with parent ID being null .i.e. parentID = ROOT
+	// 	assertTrue(testVFS.createFolder("helloWorld"));
+	
+	// 	//checking if the folder is created or not
+	// 	assertTrue(testVFS.hasFolder("helloWorld"));
+	// }
+	
+	// @Test
+	// public void simpleNestedFolderCreation() {
+	
+	// 	//creating a folder with in another folder .i.e. parentID != ROOT
+	// 	assertTrue(testVFS.createFolder("parent/child"));
+	
+	// 	//checking if the folder is created or not
+	// 	assertTrue(testVFS.hasFolder("parent/child"));
+	
+	// 	//creating another folder inside the child folder
+	// 	assertTrue(testVFS.createFolder("parent/child/child2"));
+	
+	// 	//checking if the above folder is created 
+	// 	assertTrue(testVFS.hasFolder("parent/child/child2"));
+	
+	// 	//creating a folder with the parentID = ROOT
+	// 	assertTrue(testVFS.createFolder("java"));
+	
+	// 	//creating another folder taking the above folder created as a parent folder
+	// 	//here it should check if the java folder exists and then create javaScript under the java folder
+	// 	assertTrue(testVFS.createFolder("java/javaScript"));
+	
+	// 	//check for folder javaScript
+	// 	//it should throw an error as its root folder is not null
+	// 	assertFalse(testVFS.hasFolder("javaScript"));
+	// 	assertTrue(testVFS.hasFolder("java/javaScript"));
+	
+	// 	//check for the parent folder 
+	// 	//assertTrue(testVFS.hasFolder("parent"));
+	//     assertTrue(testVFS.hasFolder("java"));
+	
+	// }
+	
+	///FILE TESTS
 	@Test
-	public void folderCreation() {
-		///creating the first folder and then checking for the length of the folder list
-		assertEquals(0, testVFS.listFolderNames(null).length);
-		assertTrue(testVFS.createFolder("hello"));
-		assertEquals(1, testVFS.listFolderNames(null).length);
-		assertEquals(new String[] { "hello" }, testVFS.listFolderNames(null));
+	//	public void simpleFileCreation() {
+	/// creating a simple file in the root
+	//		assertTrue(testVFS.createFile("firstFile"));
+	///checking of the file has been created
+	//		assertTrue(testVFS.hasFile("ROOT", "firstFile"));
+	//	}
+	//	public void simpleAddFileContent() {
+	///adding content to the file which ia already created 
+	//	assertTrue(testVFS.createFileContent("ROOT" , "firstFile" , "firstFileContent"));
+	///adding content to the file that does not exists
+	//assertTrue(testVFS.createFileContent("ROOT", "secondFile", "secondFileContent"));
+	///cheking for the content added
+	//	assertTrue(testVFS.hasFileContent("ROOT", "firstFile", "firstFileContent"));
+	//}
+	public void simpleFileContent() {
+		byte[] helloWorldBytes = "Hello World".getBytes();
 		
-		
-		///creating the second folder and then checking for the folder list
-		assertEquals(1, testVFS.listFolderNames("").length);
-		assertTrue(testVFS.createFolder("helloWorld"));
-		assertEquals(2, testVFS.listFolderNames(null).length);
-		testVFS.listFolderNames(null);
-
-		///creating third folder , but it has the same name as that of the second folder then , 
-		///as the folder already exists , it throws a run time exception saying " the folder already exists "
-	//	assertEquals(2, testVFS.listFolderNames(null).length);
-	//	assertTrue(testVFS.createFolder("helloWorld"));
-
-
-		/// creating the third folder with a different name
-		assertEquals(2, testVFS.listFolderNames(null).length);
-		assertTrue(testVFS.createFolder("helloNewWorld"));
-		assertEquals(3, testVFS.listFolderNames(null).length);
-	    
-		///list of folders
-		//assertEquals(new String[] { "helloWorld", "hello", "helloNewWorld" }, testVFS.listFolderNames(null));
+		assertTrue(testVFS.saveFile("firstFile", helloWorldBytes));
+		assertEquals(helloWorldBytes, testVFS.getFile("firstFile"));
 	}
-	
-	// @Test
-	// public void getingFolderByName() {
-	//     assertTrue(testVFS.getFolderByName("hello"));
-	// }
-	
-	// @Test
-	// public void renamingFolder() {
-	//     assertEquals(new String() , testVFS.renameFolder("hello1"));
-	//     assertTrue(testVFS.getFolderByName("hello1"));
-	// }
-	
-	// @Test
-	// public void movingFolder() {
-	//     assertTrue(testVFS.moveFolder(path));
-	//     assertEquals(2, testVFS.listFolderNames((null).lengthg));
-	// }
-	
-	// @Test 
-	// public void deletingFolder() {
-	//     assertTrue(testVFS.deleteFolders("hello"));
-	// }
 }

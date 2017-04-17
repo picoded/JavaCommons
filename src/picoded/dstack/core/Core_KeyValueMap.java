@@ -3,18 +3,18 @@ package picoded.dstack.core;
 import java.util.HashSet;
 import java.util.Set;
 
-import picoded.dstack.KeyValue;
+import picoded.dstack.KeyValueMap;
 import picoded.security.NxtCrypt;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 
 ///
-/// Common base utility class of KeyValue.
+/// Common base utility class of KeyValueMap.
 ///
 /// Does not actually implement its required feature,
 /// but helps provide a common base line for all the various implementation.
 ///
-public abstract class Core_KeyValue extends Core_DataStructure<String, String> implements KeyValue {
+public abstract class Core_KeyValueMap extends Core_DataStructure<String, String> implements KeyValueMap {
 	
 	//--------------------------------------------------------------------------
 	//

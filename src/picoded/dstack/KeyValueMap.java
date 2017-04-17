@@ -8,7 +8,7 @@ import picoded.security.NxtCrypt;
 import picoded.struct.GenericConvertMap;
 
 ///
-/// Refence interface of KeyValue Map data structure
+/// Refence interface of KeyValueMap Map data structure
 ///
 /// This is intended to be an optimized key value map data storage
 /// Used mainly in caching or performance critical scenerios.
@@ -23,7 +23,7 @@ import picoded.struct.GenericConvertMap;
 /// this is intentional design as anything smaller then a second 
 /// is pointless over a network.
 ///
-public interface KeyValue extends GenericConvertMap<String, String>, DStackCommon<String, String> {
+public interface KeyValueMap extends GenericConvertMap<String, String>, DStackCommon<String, String> {
 	
 	//--------------------------------------------------------------------------
 	//

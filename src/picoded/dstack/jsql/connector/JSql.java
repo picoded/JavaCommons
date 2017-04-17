@@ -845,8 +845,6 @@ public abstract class JSql {
 	///
 	/// @param  Table name to query            (eg: tableName)
 	/// @param  Column names to build an index (eg: col1,col2)
-	/// @param  Index type to build            (eg: UNIQUE)
-	/// @param  Index suffix to use            (eg: SpecialIndex)
 	///
 	/// @return  A prepared CREATE INDEX statement
 	///
@@ -856,6 +854,28 @@ public abstract class JSql {
 		String columnNames // The column name to create the index on
 	) {
 		return createIndexStatement(tableName, columnNames, null, null).update();
+	}
+
+	///
+	/// Helps generate an SQL CREATE INDEX request. This function was created to acommedate the various
+	/// syntax differances of CREATE INDEX across the various SQL vendors (if any).
+	///
+	/// See : createIndexStatement for full docs
+	///
+	/// @param  Table name to query            (eg: tableName)
+	/// @param  Column names to build an index (eg: col1,col2)
+	/// @param  Index type to build            (eg: UNIQUE)
+	///
+	/// @return  A prepared CREATE INDEX statement
+	///
+	public boolean createIndex( //
+		String tableName, // Table name to select from
+		//
+		String columnNames, // The column name to create the index on
+		//
+		String indexType // The index type if given, can be null
+	) {
+		return createIndexStatement(tableName, columnNames, indexType, null).update();
 	}
 
 	///

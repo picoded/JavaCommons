@@ -138,8 +138,8 @@ public class VirtualFileObject {
 		}
 
 		//checking if the Directory already exists
-		MetaObject[] directoryList = vfs.directories.query("parentID = ? AND name = ?", new String[] { parentID,
-			directoryName });
+		MetaObject[] directoryList = vfs.directories.query("parentID = ? AND name = ?",
+		new String[] { parentID,directoryName });
 
 		// Gets the Directory meta object
 		if (directoryList.length > 0) {
@@ -224,7 +224,8 @@ public class VirtualFileObject {
 	/// Throws an exception if its not a folder
 	///
 	/// @return  List of files
-	public String[] listFolderNames() {
+
+	public String[] listDirectoryNames() {
 		return extractMetaObjectNames(
 			vfs.directories.query("parentID = ?", new String[] { getDirectoryID() })
 		);
@@ -274,6 +275,15 @@ public class VirtualFileObject {
 
 		// Get an exisitng file object
 		newMetaObject = getFileMetaObject( parentID, splitPath[0] );
+		if(newMetaObject != null) {
+			throw new RuntimeException("There already is a file with this name");
+		}
+
+		// Get an exisisting folder object
+		newMetaObject = getDirectoryMetaObject( parentID , splitPath[0]);
+		if(newMetaObject != null) {
+			throw new RuntimeException("There already is a folder with this name");
+		}
 
 		// Else create a new file
 		if(newMetaObject == null) {
@@ -327,6 +337,32 @@ public class VirtualFileObject {
 		return new VirtualFileObject(vfs, newMetaObject, "FILE");
 	}
 
+
+	///Delete a file
+	///
+	///@param The full path name to delete
+	///
+	public boolean deleteFile(String pathName) {
+		///
+		assertIsDirectory();
+
+		//Path parts normalised
+		String[] splitPath = normalizeToSplitPath_withBlankCheck(pathName);
+		if( splitPath.length > 1) {
+			throw new RuntimeException("Function does not support nested directories(yet)");
+		}
+		//the parentID to use
+		String parentID = getDirectoryID();
+
+		//Get the exisiting directory
+	 	MetaObject fileToDelete = getFileMetaObject(parentID , splitPath[0]);
+
+		if(fileToDelete != null) {
+			vfs.files.remove( fileToDelete._oid() );
+		}
+		return false;
+	}
+
 	//--------------------------------------------------------------------------
 	//
 	// Folder manipulation
@@ -345,10 +381,10 @@ public class VirtualFileObject {
 		// Path parts normalized
 		String[] splitPath = normalizeToSplitPath_withBlankCheck(pathName);
 		if( splitPath.length > 1 ) {
-			throw new RuntimeException("Function does not support nested directories (yet)");
+			throw new RuntimeException("Function does not support nested directories(yet)");
 		}
 
-		// Get the file MetaObject, or generates a new one if needed.
+		// Get the folder MetaObject, or generates a new one if needed.
 		MetaObject newMetaObject = null;
 
 		// The parentID to use
@@ -356,10 +392,19 @@ public class VirtualFileObject {
 
 		// Get an exisitng directory object
 		newMetaObject = getDirectoryMetaObject( parentID, splitPath[0] );
+		if(newMetaObject != null) {
+			throw new RuntimeException("The folder name already exixts");
+		}
+
+		// Get an exisisting file object
+		newMetaObject = getFileMetaObject( parentID , splitPath[0]);
+		if(newMetaObject != null) {
+			throw new RuntimeException("This name already exists for a file");
+		}
 
 		// Else create a new directory
 		if(newMetaObject == null) {
-			newMetaObject = vfs.files.newObject();
+			newMetaObject = vfs.directories.newObject();
 		}
 
 		// Save required information
@@ -374,7 +419,7 @@ public class VirtualFileObject {
 		return ret;
 	}
 
-	/// Create a file and return the VirtualFileObject
+	/// Create a folder and return the VirtualFileObject
 	///
 	/// @param   The full path name to create at
 	///
@@ -404,4 +449,28 @@ public class VirtualFileObject {
 		return new VirtualFileObject(vfs, newMetaObject, "DIRECTORY");
 	}
 
+	///Delete a folder
+	///
+	///@param The full path name to delete
+	///
+	public boolean deleteFolder(String pathName) {
+		///
+		assertIsDirectory();
+
+		//Path parts normalised
+		String[] splitPath = normalizeToSplitPath_withBlankCheck(pathName);
+		if( splitPath.length > 1) {
+			throw new RuntimeException("Function does not support nested directories(yet)");
+		}
+		//the parentID to use
+		String parentID = getDirectoryID();
+
+		//Get the exisiting directory
+	 	MetaObject folderToDelete = getDirectoryMetaObject(parentID , splitPath[0]);
+
+		if(folderToDelete != null) {
+			vfs.directories.remove( folderToDelete._oid() );
+		}
+		return false;
+	}
 }

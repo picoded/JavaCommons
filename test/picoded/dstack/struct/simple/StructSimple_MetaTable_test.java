@@ -593,4 +593,47 @@ public class StructSimple_MetaTable_test {
 	// 	assertNotNull(table.getKeyNames(-1));
 	// 	assertNotNull(table.getFromKeyName_id("happy"));
 	// }
+	
+	// remove meta object support
+	//-----------------------------------------------
+	@Test
+	public void removeViaMetaObject() {
+		
+		// Lets just rescycle old test for some dummy data
+		basicTest();
+		
+		// Lets get MetaObject list
+		MetaObject[] oRes = null;
+		assertNotNull(oRes = mtObj.query(null, null));
+		assertTrue(oRes.length > 0);
+
+		// Lets remove one object
+		mtObj.remove(oRes[0]);
+
+		// Lets query to make sure its removed
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.query(null, null));
+		assertEquals(oRes.length - 1, qRes.length);
+	}
+	
+	@Test
+	public void removeViaMetaOID() {
+		
+		// Lets just rescycle old test for some dummy data
+		basicTest();
+		
+		// Lets get MetaObject list
+		MetaObject[] oRes = null;
+		assertNotNull(oRes = mtObj.query(null, null));
+		assertTrue(oRes.length > 0);
+
+		// Lets remove one object
+		mtObj.remove(oRes[0]._oid());
+
+		// Lets query to make sure its removed
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.query(null, null));
+		assertEquals(oRes.length - 1, qRes.length);
+	}
+	
 }

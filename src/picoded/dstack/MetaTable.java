@@ -81,6 +81,13 @@ public interface MetaTable extends DStackCommon<String, MetaObject> {
 	/// @returns the MetaObject
 	MetaObject get(String oid, boolean isUnchecked);
 	
+	/// Removes a metaobject if it exists, from the DB
+	///
+	/// @param  object GUID to fetch
+	///
+	/// @returns NULL
+	MetaObject remove(Object key);
+	
 	// MetaObject utility operations
 	//--------------------------------------------------------------------------
 	

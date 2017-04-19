@@ -21,9 +21,9 @@ import picoded.dstack.core.*;
 ///
 public class StructSimple_MetaTable extends Core_MetaTable {
 	
-	///
-	/// Constructor vars
-	///--------------------------------------------------------------------------
+	//
+	// Constructor vars
+	//--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
 	protected Map<String, Map<String, Object>> valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
@@ -31,9 +31,9 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	/// Read write lock
 	protected ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
 	
-	///
-	/// Backend system setup / teardown
-	///--------------------------------------------------------------------------
+	//
+	// Backend system setup / teardown
+	//--------------------------------------------------------------------------
 	
 	/// Setsup the backend storage table, etc. If needed
 	@Override
@@ -62,9 +62,27 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 		}
 	}
 	
+	//
+	// Internal functions, used by MetaObject
+	//--------------------------------------------------------------------------
+	
+	/// [Internal use, to be extended in future implementation]
 	///
-	/// Internal functions, used by MetaObject
-	///--------------------------------------------------------------------------
+	/// Removes the complete remote data map, for MetaObject.
+	/// This is used to nuke an entire object
+	///
+	/// @param  Object ID to remove
+	///
+	/// @return  nothing
+	public void metaObjectRemoteDataMap_remove(String oid) {
+		try {
+			accessLock.writeLock().lock();
+			valueMap.remove(oid);
+		} finally {
+			accessLock.writeLock().unlock();
+		}
+
+	}
 	
 	/// Gets the complete remote data map, for MetaObject.
 	/// Returns null
@@ -120,10 +138,10 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 		}
 	}
 	
-	///
-	/// KeySet support
-	///--------------------------------------------------------------------------
-	
+	//
+	// KeySet support
+	//--------------------------------------------------------------------------
+
 	/// Get and returns all the GUID's, note that due to its 
 	/// potential of returning a large data set, production use
 	/// should be avoided.

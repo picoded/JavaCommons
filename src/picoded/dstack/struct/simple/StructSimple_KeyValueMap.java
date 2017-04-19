@@ -6,19 +6,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import picoded.dstack.KeyValue;
-import picoded.dstack.core.Core_KeyValue;
+import picoded.dstack.KeyValueMap;
+import picoded.dstack.core.Core_KeyValueMap;
 import picoded.security.NxtCrypt;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 
 ///
-/// Reference implementation of KeyValue data structure.
+/// Reference implementation of KeyValueMap data structure.
 /// This is done via a minimal implementation via internal data structures.
 ///
-/// Built ontop of the Core_KeyValue implementation.
+/// Built ontop of the Core_KeyValueMap implementation.
 ///
-public class StructSimple_KeyValue extends Core_KeyValue {
+public class StructSimple_KeyValueMap extends Core_KeyValueMap {
 	
 	//--------------------------------------------------------------------------
 	//

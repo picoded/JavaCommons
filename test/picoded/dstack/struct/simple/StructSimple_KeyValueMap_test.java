@@ -19,10 +19,10 @@ import org.junit.Test;
 import picoded.dstack.*;
 import picoded.dstack.struct.simple.*;
 
-public class StructSimple_KeyValue_test {
+public class StructSimple_KeyValueMap_test {
 	
 	// Test object for reuse
-	public KeyValue testObj = null;
+	public KeyValueMap testObj = null;
 	
 	// To override for implementation
 	//-----------------------------------------------------
@@ -30,8 +30,8 @@ public class StructSimple_KeyValue_test {
 	/// Note that this implementation constructor
 	/// is to be overriden for the various backend
 	/// specific test cases
-	public KeyValue implementationConstructor() {
-		return new StructSimple_KeyValue();
+	public KeyValueMap implementationConstructor() {
+		return new StructSimple_KeyValueMap();
 	}
 	
 	// Setup and sanity test

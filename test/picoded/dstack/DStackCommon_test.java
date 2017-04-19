@@ -31,7 +31,7 @@ public class DStackCommon_test {
 	/// is to be overriden for the various backend
 	/// specific test cases
 	public DStackCommon<String, String> implementationConstructor() {
-		return new StructSimple_KeyValue();
+		return new StructSimple_KeyValueMap();
 	}
 	
 	// Setup and sanity test

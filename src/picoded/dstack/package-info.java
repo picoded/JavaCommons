@@ -26,7 +26,7 @@
 /// ## So what are the core data structures / file?
 ///
 /// |------------------|----------------------------------------------------------------------|
-/// | KeyValue         | Key to string value mapping. Used for temporary values storage       |
+/// | KeyValueMap      | Key to string value mapping. Used for temporary values storage       |
 /// | MetaTable        | Key to object map storage, used primarily for "table" like data      |
 /// | AtomicLongMap    | [@TODO] Key to long values where atomic consistency is required      |
 /// | EventLogger      | [@TODO] Event logging and management system                          |
@@ -44,7 +44,7 @@
 /// |------------------|----------------------------------------------------------------------|
 /// | ByteStream       | Meant to be a drop in replacement for file input/output streams.     |
 /// |                  | For large streams that can reach 100's of MB, or even GB's.          |
-/// |                  | Or simply just files. Functions similarly to KeyValue                |
+/// |                  | Or simply just files. Functions similarly to KeyValueMap             |
 /// |                  | Alternatively you can think it as a reduced interface to S3          |
 /// |------------------|----------------------------------------------------------------------|
 ///

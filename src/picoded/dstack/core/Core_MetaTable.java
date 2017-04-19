@@ -106,6 +106,38 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	
 	//--------------------------------------------------------------------------
 	//
+	// MetaObject removal
+	//
+	//--------------------------------------------------------------------------
+	
+	/// Removes a metaobject if it exists, from the DB
+	///
+	/// @param  object GUID to fetch, OR the MetaObject itself
+	///
+	/// @returns NULL
+	public MetaObject remove(Object key) {
+			if( key instanceof MetaObject ) {
+				// Removal via MetaObject itself
+				metaObjectRemoteDataMap_remove( ((MetaObject)key)._oid() );
+			} else {
+				// Remove using the ID
+				metaObjectRemoteDataMap_remove(key.toString());
+			}
+			return null;
+	}
+	
+	/// [Internal use, to be extended in future implementation]
+	///
+	/// Removes the complete remote data map, for MetaObject.
+	/// This is used to nuke an entire object
+	///
+	/// @param  Object ID to remove
+	///
+	/// @return  nothing
+	abstract public void metaObjectRemoteDataMap_remove(String oid);
+	
+	//--------------------------------------------------------------------------
+	//
 	// Functions, used by MetaObject
 	// [Internal use, to be extended in future implementation]
 	//

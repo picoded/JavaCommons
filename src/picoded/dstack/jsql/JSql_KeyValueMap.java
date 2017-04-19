@@ -1,5 +1,6 @@
 package picoded.dstack.jsql;
 
+import java.util.logging.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,6 +22,13 @@ import picoded.set.JSqlType;
 /// Built ontop of the Core_KeyValueMap implementation.
 ///
 public class JSql_KeyValueMap extends Core_KeyValueMap {
+	
+	///
+	/// Temporary logger used to make sure incomplete implmentation is noted
+	///--------------------------------------------------------------------------
+	
+	/// Standard java logger
+	public static Logger logger = Logger.getLogger(JSql_KeyValueMap.class.getName());
 	
 	//--------------------------------------------------------------------------
 	//

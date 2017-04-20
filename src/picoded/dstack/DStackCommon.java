@@ -52,7 +52,7 @@ public interface DStackCommon<K, V> extends UnsupportedDefaultMap<K, V> {
 	///
 	/// Perform increment maintenance, meant for minor changes between requests.
 	///
-	/// By default this randomly triggers a maintenance call with 1% probability.
+	/// By default this randomly triggers a maintenance call with 2% probability.
 	/// The main reason for doing so, is that for many implmentations there may not be
 	/// a concept of incremental maintenance, and in many cases its implementor may forget 
 	/// to actually call a maintenance call. For years.

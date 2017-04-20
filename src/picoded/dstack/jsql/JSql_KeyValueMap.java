@@ -24,13 +24,6 @@ import picoded.conv.ListValueConv;
 ///
 public class JSql_KeyValueMap extends Core_KeyValueMap {
 	
-	///
-	/// Temporary logger used to make sure incomplete implmentation is noted
-	///--------------------------------------------------------------------------
-	
-	/// Standard java logger
-	public static Logger logger = Logger.getLogger(JSql_KeyValueMap.class.getName());
-	
 	//--------------------------------------------------------------------------
 	//
 	// Constructor vars
@@ -238,26 +231,19 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 	
 	/// Perform maintenance, mainly removing of expired data if applicable
 	public void maintenance() {
-		try {
-			long now = currentSystemTimeInSeconds();
-			sqlObj.update("DELETE FROM `" + sqlTableName + "` WHERE eTm <= ? AND eTm > ?", now, 0);
-		} catch (JSqlException e) {
-			throw new RuntimeException(e);
-		}
+		sqlObj.delete( //
+			sqlTableName, //
+			"eTm <= ? AND eTm > ?", //
+			new Object[] { currentSystemTimeInSeconds(), 0 }
+		);
 	}
 	
 	///
 	/// Removes all data, without tearing down setup
 	///
-	/// Handles re-entrant lock where applicable
-	///
 	@Override
 	public void clear() {
-		try {
-			sqlObj.update("DELETE FROM `" + sqlTableName + "`");
-		} catch (JSqlException e) {
-			throw new RuntimeException(e);
-		}
+		sqlObj.delete(sqlTableName);
 	}
 	
 	//--------------------------------------------------------------------------

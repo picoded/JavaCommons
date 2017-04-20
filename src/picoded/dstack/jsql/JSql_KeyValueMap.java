@@ -14,6 +14,7 @@ import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 import picoded.dstack.jsql.connector.*;
 import picoded.set.JSqlType;
+import picoded.conv.ListValueConv;
 
 ///
 /// Reference implementation of KeyValueMap data structure.
@@ -51,24 +52,6 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 	
 	//--------------------------------------------------------------------------
 	//
-	// KeySet support implementation
-	//
-	//--------------------------------------------------------------------------
-	
-	/// Search using the value, all the relevent key mappings
-	///
-	/// Handles re-entrant lock where applicable
-	///
-	/// @param key, note that null matches ALL
-	///
-	/// @returns array of keys
-	@Override
-	public Set<String> keySet(String value) {
-		return null;
-	}
-	
-	//--------------------------------------------------------------------------
-	//
 	// Fundemental set/get value (core)
 	//
 	//--------------------------------------------------------------------------
@@ -83,7 +66,15 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 	///
 	/// @returns String value
 	protected String getValueRaw(String key, long now) {
-		return null;
+		// Search for the key
+		JSqlResult r = sqlObj.select(sqlTableName, "*", "kID=?", new Object[] { key });
+		long expiry = getExpiryRaw(r);
+		
+		if (expiry != 0 && expiry < now) {
+			return null;
+		}
+		
+		return r.get("kVl")[0].toString();
 	}
 	
 	/// [Internal use, to be extended in future implementation]
@@ -97,6 +88,15 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 	///
 	/// @returns null
 	protected String setValueRaw(String key, String value, long expire) {
+		long now = currentSystemTimeInSeconds();
+		sqlObj.upsert( //
+			sqlTableName, //
+			new String[] { "kID" }, //unique cols
+			new Object[] { key }, //unique value
+			//
+			new String[] { "cTm", "eTm", "kVl" }, //insert cols
+			new Object[] { now, expire, value } //insert values
+		);
 		return null;
 	}
 	
@@ -107,6 +107,36 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 	//--------------------------------------------------------------------------
 	
 	/// [Internal use, to be extended in future implementation]
+	/// Gets the expire time from the JSqlResult
+	protected long getExpiryRaw(JSqlResult r) throws JSqlException {
+		// Search for the key
+		Object rawTime = null;
+		
+		// Has value
+		if (r != null && r.rowCount() > 0) {
+			rawTime = r.get("eTm")[0];
+		} else {
+			return -1; //No value (-1)
+		}
+		
+		// 0 represents expired value
+		long ret = 0;
+		if (rawTime != null) {
+			if (rawTime instanceof Number) {
+				ret = ((Number) rawTime).longValue();
+			} else {
+				ret = Long.parseLong(rawTime.toString());
+			}
+		}
+		
+		if (ret <= 0) {
+			return 0;
+		} else {
+			return ret;
+		}
+	}
+	
+	/// [Internal use, to be extended in future implementation]
 	/// Returns the expire time stamp value, raw without validation
 	///
 	/// Handles re-entrant lock where applicable
@@ -115,7 +145,10 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 	///
 	/// @returns long
 	protected long getExpiryRaw(String key) {
-		return 0;
+		// Search for the key, get expire timestamp, and process it
+		return getExpiryRaw( //
+			sqlObj.select(sqlTableName, "eTm", "kID=?", new Object[] { key })
+		);
 	}
 	
 	/// [Internal use, to be extended in future implementation]
@@ -128,7 +161,7 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 	///
 	/// @returns long
 	public void setExpiryRaw(String key, long time) {
-		
+		sqlObj.update("UPDATE " + sqlTableName + " SET eTm=? WHERE kID=?", time, key);
 	}
 	
 	//--------------------------------------------------------------------------
@@ -199,14 +232,8 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 	}
 	
 	/// Teardown and delete the backend storage table, etc. If needed
-	///
-	/// @TODO properly handle this: Especially adding (and testing) the IF EXISTS clause
 	public void systemDestroy() {
-		try {
-			sqlObj.update("DROP TABLE IF EXISTS " + sqlTableName); //IF EXISTS
-		} catch (JSqlException e) {
-			logger.log(Level.SEVERE, "systemTeardown JSqlException (@TODO properly handle this): ", e);
-		}
+		sqlObj.dropTable(sqlTableName);
 	}
 	
 	/// Perform maintenance, mainly removing of expired data if applicable
@@ -231,6 +258,50 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 		} catch (JSqlException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	//--------------------------------------------------------------------------
+	//
+	// SQL specific KeySet / remove optimization
+	//
+	//--------------------------------------------------------------------------
+	
+	/// Search using the value, all the relevent key mappings
+	///
+	/// Handles re-entrant lock where applicable
+	///
+	/// @param key, note that null matches ALL
+	///
+	/// @returns array of keys
+	@Override
+	public Set<String> keySet(String value) {
+		long now = currentSystemTimeInSeconds();
+		JSqlResult r = null;
+		if (value == null) {
+			r = sqlObj.select(sqlTableName, "kID", "eTm <= ? OR eTm > ?",
+				new Object[] { 0, now });
+		} else {
+			r = sqlObj.select(sqlTableName, "kID", "kVl = ? AND (eTm <= ? OR eTm > ?)",
+				new Object[] { value, 0, now });
+		}
+		
+		if (r == null || r.get("kID") == null) {
+			return new HashSet<String>();
+		}
+		
+		// Gets the various key names as a set
+		return ListValueConv.toStringSet(r.getObjectList("kID", "[]"));
+	}
+	
+	/// Remove the value, given the key
+	///
+	/// @param key param find the thae meta key
+	///
+	/// @returns  null
+	@Override
+	public String remove(Object key) {
+		sqlObj.update("DELETE FROM `" + sqlTableName + "` WHERE kID = ?", key.toString());
+		return null;
 	}
 	
 }

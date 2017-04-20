@@ -831,6 +831,36 @@ public abstract class JSql {
 	//
 	//-------------------------------------------------------------------------
 	
+	///
+	/// Helps generate an SQL DROP TABLE IF EXISTS request. This function was created to acommedate the various
+	/// syntax differances of DROP TABLE IF EXISTS across the various SQL vendors (if any).
+	///
+	/// The syntax below, is an example of such an DROP TABLE IF EXISTS statement for SQLITE.
+	///
+	/// Note : That due to its "try catch" nature currently, there is no statment varient for this command.
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	/// DROP TABLE IF NOT EXISTS TABLENAME
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	///
+	/// @param  Table name to drop        (eg: tableName)
+	///
+	/// @return  true, if DROP TABLE execution is succesful
+	///
+	public boolean dropTable(
+		String tablename //Table name to drop
+	) {
+		try {
+			return update("DROP TABLE IF EXISTS " + tablename); //IF EXISTS
+		} catch (JSqlException e) {
+			String stackTrace = org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e);
+			if( stackTrace.indexOf("missing database") > 0 ) {
+				return true;
+			}
+			throw e;
+		}
+	}
+
 	//-------------------------------------------------------------------------
 	//
 	// CREATE INDEX statement builder 

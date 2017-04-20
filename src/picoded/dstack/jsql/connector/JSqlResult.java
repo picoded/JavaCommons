@@ -267,7 +267,7 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 			throw new JSqlException(e);
 		}
 	}
-	
+
 	/// Read a fetched row in a single hashmap
 	///
 	/// @param  row number to fetch

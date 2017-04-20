@@ -21,8 +21,10 @@ import picoded.dstack.core.*;
 ///
 public class StructSimple_MetaTable extends Core_MetaTable {
 	
+	//--------------------------------------------------------------------------
 	//
 	// Constructor vars
+	//
 	//--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
@@ -31,8 +33,10 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	/// Read write lock
 	protected ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
 	
+	//--------------------------------------------------------------------------
 	//
-	// Backend system setup / teardown
+	// Backend system setup / teardown / maintenance (DStackCommon)
+	//
 	//--------------------------------------------------------------------------
 	
 	/// Setsup the backend storage table, etc. If needed
@@ -50,8 +54,6 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	///
 	/// Removes all data, without tearing down setup
 	///
-	/// Handles re-entrant lock where applicable
-	///
 	@Override
 	public void clear() {
 		try {
@@ -61,9 +63,11 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 			accessLock.writeLock().unlock();
 		}
 	}
-	
+
+	//--------------------------------------------------------------------------
 	//
 	// Internal functions, used by MetaObject
+	//
 	//--------------------------------------------------------------------------
 	
 	/// [Internal use, to be extended in future implementation]
@@ -74,7 +78,7 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	/// @param  Object ID to remove
 	///
 	/// @return  nothing
-	public void metaObjectRemoteDataMap_remove(String oid) {
+	protected void metaObjectRemoteDataMap_remove(String oid) {
 		try {
 			accessLock.writeLock().lock();
 			valueMap.remove(oid);
@@ -85,8 +89,8 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	}
 	
 	/// Gets the complete remote data map, for MetaObject.
-	/// Returns null
-	public Map<String, Object> metaObjectRemoteDataMap_get(String oid) {
+	/// Returns null if not exists
+	protected Map<String, Object> metaObjectRemoteDataMap_get(String oid) {
 		try {
 			accessLock.readLock().lock();
 			Map<String, Object> storedValue = valueMap.get(oid);
@@ -105,7 +109,7 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	
 	/// Updates the actual backend storage of MetaObject
 	/// either partially (if supported / used), or completely
-	public void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
+	protected void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
 		Set<String> keys) {
 		try {
 			accessLock.writeLock().lock();
@@ -137,9 +141,11 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 			accessLock.writeLock().unlock();
 		}
 	}
-	
+
+	//--------------------------------------------------------------------------
 	//
 	// KeySet support
+	//
 	//--------------------------------------------------------------------------
 
 	/// Get and returns all the GUID's, note that due to its 

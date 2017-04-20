@@ -134,7 +134,7 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	/// @param  Object ID to remove
 	///
 	/// @return  nothing
-	abstract public void metaObjectRemoteDataMap_remove(String oid);
+	abstract protected void metaObjectRemoteDataMap_remove(String oid);
 	
 	//--------------------------------------------------------------------------
 	//
@@ -151,7 +151,7 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	/// @param  Object ID to get
 	///
 	/// @return  The raw Map object to build the MetaObject, null if does not exists
-	abstract public Map<String, Object> metaObjectRemoteDataMap_get(String oid);
+	abstract protected Map<String, Object> metaObjectRemoteDataMap_get(String oid);
 	
 	/// [Internal use, to be extended in future implementation]
 	///
@@ -161,7 +161,7 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	/// @param   Object ID to get
 	/// @param   The full map of data. This is required as not all backend implementations allow partial update
 	/// @param   Keys to update, this is used to optimize certain backends
-	abstract public void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
+	abstract protected void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
 		Set<String> keys);
 	
 	//--------------------------------------------------------------------------

@@ -354,13 +354,42 @@ public class VirtualFileObject {
 		//the parentID to use
 		String parentID = getDirectoryID();
 
-		//Get the exisiting directory
+		//Get the exisiting file
 	 	MetaObject fileToDelete = getFileMetaObject(parentID , splitPath[0]);
 
 		if(fileToDelete != null) {
 			vfs.files.remove( fileToDelete._oid() );
 		}
 		return false;
+	}
+
+	///Move a file
+	///
+	public VirtualFileObject moveFile(String pathName , String newPathName) {
+
+		///
+		assertIsDirectory();
+
+		//Path parts normalised
+		String[] splitPath = normalizeToSplitPath_withBlankCheck(pathName);
+		if( splitPath.length > 1) {
+			throw new RuntimeException("Function does not support nested directories(yet)");
+		}
+		//the parentID to use
+		String parentID = getDirectoryID();
+
+		//Get the exisiting file
+      MetaObject fileToMove = getFileMetaObject(parentID , splitPath[0]);
+
+		if(fileToMove != null) {
+			fileToMove.put("name" , newPathName);
+			fileToMove.saveDelta();
+		}
+		// Generate the return object
+		VirtualFileObject ret = new VirtualFileObject(vfs, fileToMove, "FILE");
+
+		// Return the VirtualFileObject
+		return ret;
 	}
 
 	//--------------------------------------------------------------------------
@@ -433,7 +462,6 @@ public class VirtualFileObject {
 		if( splitPath.length > 1 ) {
 			throw new RuntimeException("Function does not support nested directories (yet)");
 		}
-
 		// The parentID to use
 		String parentID = getDirectoryID();
 
@@ -449,28 +477,81 @@ public class VirtualFileObject {
 		return new VirtualFileObject(vfs, newMetaObject, "DIRECTORY");
 	}
 
-	///Delete a folder
-	///
-	///@param The full path name to delete
-	///
-	public boolean deleteFolder(String pathName) {
-		///
+	/// Delete all files and folder in the current directory
+	public void emptyDirectory() {
+		// Delete call can only be done inside a directory
 		assertIsDirectory();
 
-		//Path parts normalised
+		// Get the list of folders in this directory to delete
+		String[] dirNames = listDirectoryNames();
+		for(int pt=0; pt<dirNames.length; ++pt) {
+			deleteDirectory(dirNames[pt]);
+		}
+
+		// Get the list of files in this directory to delete
+		String[] fileNames = listFileNames();
+		for(int pt=0; pt<fileNames.length; ++pt) {
+			deleteFile(fileNames[pt]);
+		}
+	}
+
+	/// Delete a folder
+	///
+	/// @param The full path name to delete
+	///
+	public boolean deleteDirectory(String pathName) {
+		// Delete call can only be done inside a directory
+		assertIsDirectory();
+
+		// Path parts normalised
 		String[] splitPath = normalizeToSplitPath_withBlankCheck(pathName);
 		if( splitPath.length > 1) {
 			throw new RuntimeException("Function does not support nested directories(yet)");
 		}
-		//the parentID to use
-		String parentID = getDirectoryID();
 
-		//Get the exisiting directory
-	 	MetaObject folderToDelete = getDirectoryMetaObject(parentID , splitPath[0]);
+		// Get the directory to delete
+		VirtualFileObject directoryToDelete = getDirectory(splitPath[0]);
 
-		if(folderToDelete != null) {
-			vfs.directories.remove( folderToDelete._oid() );
+		// Directory (to delete) does not exist, terminate
+		if(directoryToDelete == null) {
+			return false;
 		}
-		return false;
+
+		// Empties the directory
+		directoryToDelete.emptyDirectory();
+
+		// Now actually delete the directory
+		vfs.directories.remove( directoryToDelete.mObj._oid() );
+
+		return true;
 	}
+
+///Move a file
+///
+public VirtualFileObject moveDirectory(String pathName , String newPathName) {
+
+	///
+	assertIsDirectory();
+
+	//Path parts normalised
+	String[] splitPath = normalizeToSplitPath_withBlankCheck(pathName);
+	if( splitPath.length > 1) {
+		throw new RuntimeException("Function does not support nested directories(yet)");
+	}
+	//the parentID to use
+	String parentID = getDirectoryID();
+
+	//Get the exisiting file
+	MetaObject directoryToMove = getDirectoryMetaObject(parentID , splitPath[0]);
+
+	if(directoryToMove != null) {
+		directoryToMove.put("name" , newPathName);
+		directoryToMove.saveDelta();
+	}
+	// Generate the return object
+	VirtualFileObject ret = new VirtualFileObject(vfs, directoryToMove, "DIRECTORY");
+
+	// Return the VirtualFileObject
+	return ret;
+}
 }

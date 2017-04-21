@@ -151,29 +151,35 @@ public class VirtualFileSystem_test {
 		assertEquals(2, testVFS.listDirectoryNames().length);
 	}
 
-	// @Test
-	// //thid test throws an error as the file cant be created under another file
-	// //it has to be a folder
-	// public void fileInFileTest() {
-	//
-	// 	//test data
-	// 	byte[] data7 = "Software".getBytes();
-	// 	byte[] data8 = "engineer".getBytes();
-	//
-	// 	//creating a file in the root
-	// 	VirtualFileObject file = testVFS.saveFile("fileSoftware", data7);
-	// 	//assertNotNull(testVFS.getFile("fileSoftware"));
-	//
-	// 	//creating and returning a file under the other file
-	// 	assertNotNull(file.saveFile("fileEngineer", data8));
-	// 	//assertNotNull(file)
-	//
-	// 	//list the files under the root
-	// 	assertEquals(1, testVFS.listFileNames().length);
-	//
-	// 	// list the file under thr other file
-	// 	assertEquals(1, file.listFileNames().length);
-	// }
+	@Test
+	//this test throws an error as the file cant be created under another file
+	//it has to be a folder
+	public void fileInFileTest() {
+
+		//test data
+		byte[] data7 = "Software".getBytes();
+		byte[] data8 = "engineer".getBytes();
+
+		Exception caughtError = null;
+
+		try{
+			//creating a file in the root
+			VirtualFileObject file = testVFS.saveFile("fileSoftware", data7);
+			//assertNotNull(testVFS.getFile("fileSoftware"));
+
+			//creating and returning a file under the other file
+			assertNotNull(file.saveFile("fileEngineer", data8));
+			//assertNotNull(file)
+
+			//list the files under the root
+			assertEquals(1, testVFS.listFileNames().length);
+
+			// list the file under the other file
+			assertEquals(1, file.listFileNames().length);
+		}catch(Exception e) {
+			caughtError = e;
+		}
+	}
 
 	@Test
 	public void folderInFolder() {
@@ -310,12 +316,13 @@ public class VirtualFileSystem_test {
 
 		//create a new folder
 
-		VirtualFileObject deleteFolder = testVFS.makeDirectory("temporaryFolder");
+		assertNotNull(testVFS.makeDirectory("firstFolder"));
+		assertNotNull(testVFS.getDirectory("firstFolder"));
 
-		assertEquals(1, testVFS.listDirectoryNames().length);
+		 assertEquals(1, testVFS.listDirectoryNames().length);
 
 		//delete the folder which we created above
-		assertNotNull(testVFS.deleteDirectory("temporarayFolder"));
+		assertNotNull(testVFS.deleteDirectory("firstFolder"));
 
 		//check if the folder still exists
 		assertEquals(0, testVFS.listDirectoryNames().length);
@@ -345,4 +352,131 @@ public class VirtualFileSystem_test {
 		//files.remove(obj._oid());
 	}
 
+	@Test
+	public void deleteFileUnderFolder() {
+
+		//test data
+		byte [] data21 = "deletefile".getBytes();
+
+		//create a new folder under the root
+		VirtualFileObject rootFolder = testVFS.makeDirectory("rootFolder");
+
+		//geting the length od folders in the root
+		assertEquals(1, testVFS.listDirectoryNames().length);
+
+		//create file under the folder
+		VirtualFileObject fileUndeerFolder = rootFolder.saveFile("fileUnderFolder" , data21);
+
+		//geting the length of the files inside the folder
+		assertEquals(1, rootFolder.listFileNames().length);
+
+		//delete the folder and the files created under the folder
+		assertNotNull(testVFS.deleteDirectory("rootFolder"));
+
+		//reconfirming that the folder and the files inside the folder are deleted
+		assertNull(testVFS.getDirectory("rootFolder"));
+		assertNull(rootFolder.getFile("fileUnderFolder"));
+
+	}
+
+	@Test
+	public void deleteFileAndFolderUnderFolder() {
+
+		//test data
+		byte [] data22 = "deleteFile1".getBytes();
+		byte [] data23 = "deleteFile2".getBytes();
+
+		//create a new folder in the root
+		VirtualFileObject rootFolderMain = testVFS.makeDirectory("MainFolder");
+
+		//create a second folder in the root
+		VirtualFileObject secondRootFolder = testVFS.makeDirectory("SecondMainFolder");
+
+		//create a file under the root folder
+		VirtualFileObject fileUnderMainFolder = rootFolderMain.saveFile("firstFileUnderTheFolder" , data22);
+
+		//create a folder under the root folder
+		VirtualFileObject folderUnderMainFolder = rootFolderMain.makeDirectory("firstFolderUnderTheMain");
+
+		//create a file under the folder created under teh root folder
+		VirtualFileObject secondFileUnderSecondFolder = folderUnderMainFolder.saveFile("secondFileUnderSecondFolder", data23);
+
+		//get the length of the folders in the root
+		assertEquals(2, testVFS.listDirectoryNames().length);
+
+		//get the length of files in the root folder
+		assertEquals(1, rootFolderMain.listFileNames().length);
+
+		//get the length of the folders in the root folder
+		assertEquals(1, rootFolderMain.listDirectoryNames().length);
+
+		//get the length of the files inside the folder under the root folder
+		assertEquals(1 , folderUnderMainFolder.listFileNames().length);
+
+		//delete the root folder
+		assertNotNull(testVFS.deleteDirectory("MainFolder"));
+
+		//get the list of the folders in the root
+		assertEquals(1, testVFS.listDirectoryNames().length);
+
+		//get the length of files in the root folder
+		assertEquals(0, rootFolderMain.listFileNames().length);
+
+		//get the length of the folders in the root folder
+		assertEquals(0, rootFolderMain.listDirectoryNames().length);
+
+		//get the length of the files inside the folder under the root folder
+		assertEquals(0, folderUnderMainFolder.listFileNames().length);
+
+	}
+
+	@Test
+	public void fileToMove() {
+
+		byte [] data24 = "movefile".getBytes();
+
+		//create a file in the root
+		VirtualFileObject beforeFileMove = testVFS.saveFile("firstFile" , data24);
+
+		//move the file
+		VirtualFileObject afterMoveFile = testVFS.moveFile("firstFile" , "secondFile");
+
+		//get the new moved file
+		assertNotNull(testVFS.getFile("secondFile"));
+	}
+
+	@Test
+	public void folderToMove() {
+
+		//create a folder in the root
+		VirtualFileObject beforeFolderMove = testVFS.makeDirectory("firstFolder");
+
+		//move the folder
+		VirtualFileObject afterMoveFile = testVFS.moveDirectory("firstFolder" , "secondFolder");
+
+		//get the moved folder
+		assertNotNull(testVFS.getDirectory("secondFolder"));
+	}
+
+	@Test
+	public void moveFilesUnderFolder() {
+
+		//test data
+		byte [] data25 = "movefilesunderfolder".getBytes();
+
+		//create a folder in the root
+		VirtualFileObject mainFolder = testVFS.makeDirectory("MainFolder");
+
+		//create the file inside the folder
+		VirtualFileObject file = mainFolder.saveFile("firstFile" , data25);
+
+		//get the length of the files inside the folder
+		assertEquals(1, mainFolder.listFileNames().length);
+
+		//move the folder in the root
+		VirtualFileObject movedFolder = testVFS.moveDirectory("MainFolder" , "Folder");
+
+		//get the length of the files inside the moved folder
+		assertEquals(1, movedFolder.listFileNames().length);
+	}
 }

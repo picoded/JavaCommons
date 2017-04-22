@@ -115,38 +115,68 @@ public class JSql_MetaTableUtils {
 		return shortenValue;
 	}
 
+	/// An option set, represents the following storage collumn
+	///
+	/// "typ", //type collumn
+	/// "nVl", //numeric value (if applicable)
+	/// "sVl", //case insensitive string value (if applicable), or case sensitive hash
+	/// "tVl", //Textual storage, placed last for row storage optimization
+	/// "rVl", //Raw binary storage, placed last for row storage optimization
+	///
+	/// In the format of an Object[] array, this is built using the following function
+	///
+	/// @param  Value type
+	/// @param  Numeric value to store (if any)
+	/// @param  Shorten string value
+	/// @param  Full string value
+	/// @param  raw binary data 
+	///
+	/// @return  valueTypeSet set
+	protected static Object[] valueTypeSet(int type, Number value, String shortStr, String fullStr, byte[] rawVal) {
+		return new Object[] { new Integer(type), value, shortStr, fullStr, rawVal };
+	}
+
 	/// Values to option set conversion used by JSql
 	/// Note collumn strong typing is now DEPRECATED (for now)
 	///
-	/// @TODO: Support the various numeric value
-	/// @TODO: Support string / text
 	/// @TODO: Support array sets
 	/// @TODO: Support GUID hash
 	/// @TODO: Support MetaTable/Object
 	/// @TODO: Check against configured type
 	/// @TODO: Convert to configured type if possible (like numeric)
-	/// @TODO: Support proper timestamp handling (not implemented)
 	///
-	public static Object[] valueToOptionSet(String key, Object value) {
-		if (value instanceof Integer) {
-			return new Object[] { new Integer(MetaType.INTEGER.getValue()), value, shortenStringValue(value),
-				value.toString() }; //Typ, N,S,I,T
-		} else if (value instanceof Float) {
-			return new Object[] { new Integer(MetaType.FLOAT.getValue()), value, shortenStringValue(value),
-				value.toString() }; //Typ, N,S,I,T
-		} else if (value instanceof Double) {
-			return new Object[] { new Integer(MetaType.DOUBLE.getValue()), value, shortenStringValue(value),
-				value.toString() }; //Typ, N,S,I,T
-		} else if (value instanceof String) {
-			return new Object[] { new Integer(MetaType.STRING.getValue()), 0, shortenStringValue(value), value.toString() }; //Typ, N,S,I,T
-		} else if (value instanceof byte[]) {
-			return new Object[] { new Integer(MetaType.BINARY.getValue()), 0, null,
-				(Base64.getEncoder().encodeToString((byte[]) value)) }; //Typ, N,S,I,T
-		} else {
-			String jsonString = ConvertJSON.fromObject(value);
-			return new Object[] { new Integer(MetaType.JSON.getValue()), 0, null, jsonString };
+	/// @param  Value to store
+	///
+	/// @return  valueTypeSet
+	public static Object[] valueToValueTypeSet(Object value) {
+		// Type flag to use
+		int type = 0;
+
+		// Numeric type support
+		if (value instanceof Number) {
+			if (value instanceof Integer) {
+				type = MetaType.INTEGER.getValue();
+			} else if (value instanceof Float) {
+				type = MetaType.FLOAT.getValue();
+			} else if (value instanceof Double) {
+				type = MetaType.DOUBLE.getValue();
+			} 
+			return valueTypeSet(type, (Number)value, shortenStringValue(value), value.toString(), null);
 		}
-		//throw new RuntimeException("Object type not yet supported: "+key+" = "+ value);
+		
+		// String type support
+		if (value instanceof String) {
+			return valueTypeSet(MetaType.STRING.getValue(), 0, shortenStringValue(value), value.toString(), null);
+		} 
+		
+		// Binary type support
+		if (value instanceof byte[]) {
+			return valueTypeSet(MetaType.BINARY.getValue(), 0, null, null, (byte[])value);
+		} 
+		
+		// Fallback JSON support
+		String jsonString = ConvertJSON.fromObject(value);
+		return valueTypeSet(MetaType.JSON.getValue(), 0, null, jsonString.toString(), null);
 	}
 
 	/// Takes in the JSqlResult from a MetaTable internal table query
@@ -232,10 +262,10 @@ public class JSql_MetaTableUtils {
 	/// @param  The jsql result set from a select call
 	/// @param  Row position to fetch values from result
 	///
-	/// @return  The object[] array representing [ oID, kID, and value ]
-	protected static Object[] extractKeyValueNonArrayValueFromPos(JSqlResult r, int pos) {
+	/// @return  The object[] array representing [ kID, and value ]
+	protected static Object[] extractKeyValueFromPos_nonArray(JSqlResult r, int pos) {
 		Object value = extractNonArrayValueFromPos(r, pos);
-		return new Object[] { r.get("oID")[pos], r.get("kID")[pos], value };
+		return new Object[] { r.get("kID")[pos], value };
 	}
 
 	/// Extract the key value
@@ -254,34 +284,35 @@ public class JSql_MetaTableUtils {
 		return extractNonArrayValueFromPos(r, pos);
 	}
 
-	/*
-
 	//------------------------------------------------------------------------------------------
 	//
 	// Append and get
 	//
 	//------------------------------------------------------------------------------------------
 
+	/// Get the current timestamp in seconds
+	public static long getCurrentTimestamp() {
+		return (System.currentTimeMillis() / 1000L);
+	}
+
 	///
 	/// Iterates the relevent keyList, and appends its value from the objMap, into the sql colTypes database
 	///
-	/// @param {MetaTypeMap} mtm           - main MetaTypeMap, to check collumn configuration
-	/// @param {JSql} sql                  - sql connection to setup the table
+	/// @param {JSql} sql                  - sql connection to write into the table
 	/// @param {String} tName              - table name to setup, this holds the actual meta table data
 	/// @param {String} _oid               - object id to store the key value pairs into
 	/// @param {Map<String,Object>} objMap - map to extract values to store from
 	/// @param {Set<String>} keyList       - keylist to limit append load
-	/// @param {boolean} optimizeAppend    - Used to indicate if append batch should be optimized (not used)
+	/// @param {boolean} optimizeAppend    - Used to indicate if batch mode should be used as optimization (not used)
 	///
 	@SuppressWarnings("unchecked")
 	public static void JSqlObjectMapAppend( //
-		MetaTypeMap mtm, //
 		JSql sql, String tName, String _oid, //
 		Map<String, Object> objMap, Set<String> keyList, //
-		boolean optimizeAppend //
+		boolean batchMode //
 	) throws JSqlException {
 
-		// boolean sqlMode = handleQuery ? sql.getAutoCommit() : false;
+		// boolean sqlMode = batchMode ? sql.getAutoCommit() : false;
 		// if (sqlMode) {
 		// 	sql.setAutoCommit(false);
 		// }
@@ -290,46 +321,55 @@ public class JSql_MetaTableUtils {
 			Object[] typSet;
 			Object v;
 
+			//
+			// Iterate and store ONLY values inside the keyList
+			// This helps optimize writes to only changed data
+			//
 			for (String k : keyList) {
 
-				// Skip reserved key, otm is allowed to be saved (to ensure blank object is saved)
+				// Skip reserved key, otm is not allowed to be saved 
+				// (to ensure blank object is saved)
 				if (k.equalsIgnoreCase("_otm")) { //reserved
 					continue;
 				}
 
+				// Key length size protection
 				if (k.length() > 64) {
 					throw new RuntimeException("Attempted to insert a key value larger then 64 for (_oid = " + _oid + "): "
 						+ k);
 				}
 
-				// Checks if keyList given, if so skip if not on keyList
-				if (keyList != null && !keyList.contains(k)) {
-					continue;
-				}
-
 				// Get the value to insert
 				v = objMap.get(k);
 
-				if (v == ObjectTokens.NULL || v == null) {
+				// Delete support
+				if (v == ObjectToken.NULL || v == null) {
 					// Skip reserved key, oid key is allowed to be removed directly
 					if (k.equalsIgnoreCase("oid") || k.equalsIgnoreCase("_oid")) {
 						continue;
 					}
-					sql.deleteQuerySet(tName, "oID=? AND kID=?", new Object[] { _oid, k }).execute();
+					sql.delete(tName, "oID=? AND kID=?", new Object[] { _oid, k });
 				} else {
 					// Converts it into a type set, and store it
-					typSet = valueToOptionSet(mtm, k, v);
+					typSet = valueToValueTypeSet(v);
+
+					// Curent timestamp
+					long now = getCurrentTimestamp();
 
 					// This is currently only for NON array mode
-					sql.upsertQuerySet( //
-						tName, //
-						new String[] { "oID", "kID", "idx" }, //
-						new Object[] { _oid, k, 0 }, //
-						//
-						new String[] { "typ", "nVl", "sVl", "tVl" }, //
-						new Object[] { typSet[0], typSet[1], typSet[2], typSet[3] }, //
-						null, null, null //
-					).execute();
+					sql.upsert( //
+						tName, // Table name to upsert on
+						// "pKy" is auto generated by SQL db
+						new String[] { "oID", "kID", "idx" }, // The unique column names
+						new Object[] { _oid, k, 0 }, // The row unique identifier values
+						// Value / Text / Raw storage + Updated / Expire time stamp
+						new String[] { "typ", "nVl", "sVl", "tVl", "rVl", "uTm", "eTm" }, //
+						new Object[] { typSet[0], typSet[1], typSet[2], typSet[3], typSet[4], now, 0 }, //
+						// Created timestamp setup
+						new String[] { "cTm" }, //
+						new Object[] { now }, //
+						null // The only misc col, is pKy, which is being handled by DB
+					);
 				}
 			}
 			//sql.commit();
@@ -345,73 +385,78 @@ public class JSql_MetaTableUtils {
 	///
 	/// Extracts and build the map stored under an _oid
 	///
-	/// @param {MetaTypeMap} mtm           - main MetaTypeMap, to check collumn configuration
 	/// @param {JSql} sql                  - sql connection to setup the table
 	/// @param {String} sqlTableName       - table name to setup, this holds the actual meta table data
 	/// @param {String} _oid               - object id to store the key value pairs into
 	/// @param {Map<String,Object>} ret    - map to populate, and return, created if null if there is data
 	///
 	public static Map<String, Object> JSqlObjectMapFetch( //
-		MetaTypeMap mtm, JSql sql, //
+		JSql sql, //
 		String sqlTableName, String _oid, //
 		Map<String, Object> ret //
 	) {
-		try {
-			JSqlResult r = sql.selectQuerySet(sqlTableName, "*", "oID=?", new Object[] { _oid }).query();
-			return extractObjectMapFromJSqlResult(mtm, r, _oid, ret);
-		} catch (JSqlException e) {
-			throw new RuntimeException(e);
-		}
+		JSqlResult r = sql.select(sqlTableName, "*", "oID=?", new Object[] { _oid });
+		return extractObjectMapFromJSqlResult(r, _oid, ret);
 	}
 
 	///
 	/// Extracts and build the map stored under an _oid, from the JSqlResult
 	///
-	/// @param {MetaTypeMap} mtm           - main MetaTypeMap, to check collumn configuration
 	/// @param {JSqlResult} r              - sql result
 	/// @param {String} _oid               - object id to store the key value pairs into
-	/// @param {Map<String,Object>} ret    - map to populate, and return, created if null if there is data
+	/// @param {Map<String,Object>} ret    - map to populate, and return, created if null and there is data
 	///
 	public static Map<String, Object> extractObjectMapFromJSqlResult(//
-		MetaTypeMap mtm, JSqlResult r, //
-		String _oid, Map<String, Object> ret //
+		JSqlResult r, String _oid, Map<String, Object> ret //
 	) {
+		// No result means no data to extract
 		if (r == null) {
 			return ret;
 		}
 
+		// Get thee value lists
 		Object[] oID_list = r.get("oID");
 		Object[] kID_list = r.get("kID");
 		Object[] idx_list = r.get("idx");
-		Object[] val_list = r.get("tVl");
 
-		if (kID_list == null) {
+		// This is a query call, hence no data to extract
+		if (kID_list == null || kID_list.length <= 0) {
 			return ret;
 		}
 
-		int lim = kID_list.size();
+		// Iterate the keys
+		int lim = kID_list.length;
 		for (int i = 0; i < lim; ++i) {
+
+			// oid provided, and does not match, terminated
 			if (_oid != null && !_oid.equals(oID_list[i])) {
 				continue;
 			}
 
+			// Ignore non 0-indexed value (array support not added yet)
 			if (((Number) (idx_list[i])).intValue() != 0) {
 				continue; //Now only accepts first value (not an array)
 			}
 
-			Object[] rowData = extractKeyValueNonArrayValueFromPos(r, i);
+			// Extract out key value pair
+			Object[] rowData = extractKeyValueFromPos_nonArray(r, i);
 
-			/// Only check for ret, at this point,
-			/// so returning null when no data occurs
+			// Only check for ret, at this point,
+			// so returning null when no data occurs
 			if (ret == null) {
-				ret = new ConcurrentHashMap<String, Object>();
+				ret = new HashMap<String, Object>();
 			}
 
-			ret.put(rowData[1].toString(), rowData[2]);
+			// Add in vallue
+			ret.put(rowData[0].toString(), rowData[1]);
 		}
 
 		return ret;
 	}
+
+
+	/*
+
 
 	/// Lowercase suffix string
 	protected static String lowerCaseSuffix = "#lc";

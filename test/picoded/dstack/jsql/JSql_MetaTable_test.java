@@ -22,7 +22,7 @@ import picoded.dstack.jsql.*;
 import picoded.dstack.jsql.connector.*;
 import picoded.dstack.struct.simple.*;
 
-public class JSql_KeyValueMap_test extends StructSimple_KeyValueMap_test {
+public class JSql_MetaTable_test extends StructSimple_MetaTable_test {
 
 	// To override for implementation
 	//-----------------------------------------------------
@@ -35,8 +35,8 @@ public class JSql_KeyValueMap_test extends StructSimple_KeyValueMap_test {
 	}
 
 	/// Impomentation constructor for SQL
-	public KeyValueMap implementationConstructor() {
-		return new JSql_KeyValueMap( jsqlConnection(), TestConfig.randomTablePrefix() );
+	public MetaTable implementationConstructor() {
+		return new JSql_MetaTable( jsqlConnection(), TestConfig.randomTablePrefix() );
 	}
 	
 }

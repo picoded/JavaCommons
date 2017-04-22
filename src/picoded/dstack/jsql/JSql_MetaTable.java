@@ -136,7 +136,12 @@ public class JSql_MetaTable extends Core_MetaTable {
 			
 		// Unique index
 		//
-		// This also optimizes query by object keys
+		// This also optimizes query by object keys, 
+		// with the following combinations
+		//
+		// + oID
+		// + oID, kID
+		// + oID, kID, idx
 		//------------------------------------------------
 		sqlObj.createIndex( //
 			sqlTableName, "oID, kID, idx", "UNIQUE", "unq" //
@@ -150,6 +155,9 @@ public class JSql_MetaTable extends Core_MetaTable {
 		// its IMPORTANT that nVl = 0 is passed
 		// For string based search
 		//
+		// + kID
+		// + kID, nVl
+		// + kID, nVl=0, sVl
 		sqlObj.createIndex( //
 			sqlTableName, "kID, nVl, sVl", null, "valMap" //
 		); //
@@ -240,16 +248,14 @@ public class JSql_MetaTable extends Core_MetaTable {
 	/// Gets the complete remote data map, for MetaObject.
 	/// Returns null if not exists
 	protected Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
-		//return JSql_MetaTableUtils.JSqlObjectMapFetch(typeMap(), sqlObj, sqlTableName, _oid, null);
-		return null;
+		return JSql_MetaTableUtils.JSqlObjectMapFetch(sqlObj, sqlTableName, _oid, null);
 	}
 	
 	/// Updates the actual backend storage of MetaObject
 	/// either partially (if supported / used), or completely
-	protected void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
+	protected void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap,
 		Set<String> keys) {
-		// JSql_MetaTableUtils.JSqlObjectMapAppend(typeMap(), sqlObj, sqlTableName, _oid, fullMap,
-		// 	keys, true);
+		JSql_MetaTableUtils.JSqlObjectMapAppend(sqlObj, sqlTableName, _oid, fullMap, keys, true);
 	}
 
 	//--------------------------------------------------------------------------
@@ -265,92 +271,20 @@ public class JSql_MetaTable extends Core_MetaTable {
 	/// @returns set of keys
 	@Override
 	public Set<String> keySet() {
-		return null;
+		JSqlResult r = sqlObj.select(sqlTableName, "DISTINCT oID");
+		if (r == null || r.get("oID") == null) {
+			return new HashSet<String>();
+		}
+		return ListValueConv.toStringSet(r.getObjectList("oID"));
 	}
 
 	/*
-	
-	
-	// MetaObject MAP operations
-	//----------------------------------------------
-	
-	/// Gets the full keySet
-	@Override
-	public Set<String> keySet() {
-		try {
-			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "oID").query();
-			if (r == null || r.get("oID") == null) {
-				return new HashSet<String>();
-			}
-			
-			return ListValueConv.toStringSet(r.get("oID"));
-		} catch (JSqlException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	/// Remove the node
-	@Override
-	public MetaObject remove(Object key) {
-		try {
-			String keyID = key.toString();
-			sqlObj.execute("DELETE FROM `" + sqlTableName + "` WHERE oID = ?", keyID);
-		} catch (JSqlException e) {
-			throw new RuntimeException(e);
-		}
-		return null;
-	}
-	
-	// MetaObject operations
-	//----------------------------------------------
-	
-	// /// Generates a new blank object, with a GUID
-	// public MetaObject newObject() {
-	// 	MetaObject ret = new JStruct_MetaObject(this, null, null, false);
-	// 	return ret;
-	// }
-	
-	// /// Gets the MetaObject, regardless of its actual existance
-	// public MetaObject uncheckedGet(String _oid) {
-	// 	return new JStruct_MetaObject(this, _oid, null, false);
-	// }
-	
-	// /// PUT, returns the object ID (especially when its generated), note that this
-	// /// adds the value in a merger style. Meaning for example, existing values not explicitely
-	// /// nulled or replaced are maintained
-	// public MetaObject append(String _oid, Map<String, Object> obj) {
-	// 	
-	// 	/// Appending a MetaObject is equivalent of saveDelta
-	// 	MetaObject r = null;
-	// 	if (obj instanceof MetaObject && ((MetaObject) obj)._oid().equals(_oid)) {
-	// 		(r = (MetaObject) obj).saveDelta();
-	// 		return r;
-	// 	}
-	// 	
-	// 	/// Unchecked get, put, and save
-	// 	r = uncheckedGet(_oid);
-	// 	r.putAll(obj);
-	// 	r.saveDelta();
-	// 	
-	// 	return r;
-	// }
-	
-	//
-	// Internal functions, used by MetaObject
+
 	//--------------------------------------------------------------------------
-	
-	/// 
-	/// MetaType handling, does type checking and conversion
-	///--------------------------------------------------------------------------
-	
-	// /// Gets and return the internal MetaTypeMap
-	// public MetaTypeMap typeMap() {
-	// 	return _typeMap;
-	// }
-	
-	/// 
-	/// Query based optimization
-	///--------------------------------------------------------------------------
+	// 
+	// Query based optimization
+	//
+	//--------------------------------------------------------------------------
 	
 	/// Performs a search query, and returns the respective MetaObjects
 	///
@@ -404,9 +338,13 @@ public class JSql_MetaTable extends Core_MetaTable {
 			whereValues, null, -1, -1);
 	}
 	
-	/// 
-	/// Get key names handling
-	///--------------------------------------------------------------------------
+	*/
+
+	//--------------------------------------------------------------------------
+	// 
+	// Get key names handling
+	//
+	//--------------------------------------------------------------------------
 	
 	/// Scans the object and get the various keynames used. 
 	/// This is used mainly in adminstration interface, etc.
@@ -420,16 +358,11 @@ public class JSql_MetaTable extends Core_MetaTable {
 	///
 	@Override
 	public Set<String> getKeyNames(int seekDepth) {
-		try {
-			JSqlResult r = sqlObj.selectQuerySet(sqlTableName, "DISTINCT kID").query();
-			if (r == null || r.get("kID") == null) {
-				return new HashSet<String>();
-			}
-			
-			return ListValueConv.toStringSet(r.get("kID"));
-		} catch (JSqlException e) {
-			throw new RuntimeException(e);
+		JSqlResult r = sqlObj.select(sqlTableName, "DISTINCT kID");
+		if (r == null || r.get("kID") == null) {
+			return new HashSet<String>();
 		}
+		
+		return ListValueConv.toStringSet(r.getObjectList("kID"));
 	}
-	*/
 }

@@ -440,6 +440,20 @@ public abstract class JSql {
 	/// See : selectStatement for full docs
 	///
 	/// @param  Table name to query        (eg: tableName)
+	///
+	/// @return  The JSqlResult
+	public JSqlResult select( //
+		String tableName // Table name to select from
+	) {
+		return selectStatement(tableName, "*", null, null, null, 0, 0).query();
+	}
+
+	/// Helps generate an SQL SELECT request. This function was created to acommedate the various
+	/// syntax differances of SELECT across the various SQL vendors (if any).
+	///
+	/// See : selectStatement for full docs
+	///
+	/// @param  Table name to query        (eg: tableName)
 	/// @param  Columns to select          (eg: col1, col2)
 	///
 	/// @return  The JSqlResult

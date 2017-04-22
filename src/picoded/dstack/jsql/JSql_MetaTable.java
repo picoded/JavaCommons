@@ -95,7 +95,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 		sqlObj.createTable( //
 			sqlTableName, //
 			new String[] { //
-			// Primary key, as classic int, htis is used to lower SQL
+			// Primary key, as classic int, this is used to lower SQL
 			// fragmentation level, and index memory usage. And is not accessible.
 			// Sharding and uniqueness of system is still maintained by GUID's
 				"pKy", //
@@ -112,8 +112,8 @@ public class JSql_MetaTable extends Core_MetaTable {
 				"nVl", //numeric value (if applicable)
 				"sVl", //case insensitive string value (if applicable), or case sensitive hash
 				// Text value storage
-				"tVl", //Textual storage, placed last for storage optimization
-				"rVl"
+				"tVl", //Textual storage, placed last for row storage optimization
+				"rVl" //Raw binary storage, placed last for row storage optimization
 			}, //
 			new String[] { //
 			pKeyColumnType, //Primary key
@@ -248,6 +248,8 @@ public class JSql_MetaTable extends Core_MetaTable {
 	/// either partially (if supported / used), or completely
 	protected void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
 		Set<String> keys) {
+		// JSql_MetaTableUtils.JSqlObjectMapAppend(typeMap(), sqlObj, sqlTableName, _oid, fullMap,
+		// 	keys, true);
 	}
 
 	//--------------------------------------------------------------------------
@@ -336,26 +338,6 @@ public class JSql_MetaTable extends Core_MetaTable {
 	//
 	// Internal functions, used by MetaObject
 	//--------------------------------------------------------------------------
-	
-	/// Gets the complete remote data map, for MetaObject.
-	/// Returns null if not exists
-	@Override
-	public Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
-		return JSql_MetaTableUtils.JSqlObjectMapFetch(typeMap(), sqlObj, sqlTableName, _oid, null);
-	}
-	
-	/// Updates the actual backend storage of MetaObject 
-	/// either partially (if supported / used), or completely
-	@Override
-	public void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap,
-		Set<String> keys) {
-		try {
-			JSql_MetaTableUtils.JSqlObjectMapAppend(typeMap(), sqlObj, sqlTableName, _oid, fullMap,
-				keys, true);
-		} catch (JSqlException e) {
-			throw new RuntimeException(e);
-		}
-	}
 	
 	/// 
 	/// MetaType handling, does type checking and conversion

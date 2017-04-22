@@ -8,6 +8,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.sql.SQLException;
 
 /// Picoded imports
 import picoded.conv.*;
@@ -31,8 +32,10 @@ public class JSql_MetaTableUtils {
 	/// Static local logger
 	protected static Logger LOGGER = Logger.getLogger(JSql_MetaTableUtils.class.getName());
 
+	//--------------------------------------------------------------------------
 	//
 	// JSqlResult search
+	//
 	//--------------------------------------------------------------------------
 
 	/// Fetches the result array position using the filters
@@ -48,7 +51,6 @@ public class JSql_MetaTableUtils {
 	/// @params  the idx to check against, ignored if -10 or below
 	///
 	/// @returns   row of the JSqlResult, -1 if failed to find
-	///
 	protected static int fetchResultPosition(JSqlResult r, String _oid, String key, int idx) {
 		Object[] oID_array = r.get("oID");
 		Object[] kID_array = r.get("kID");
@@ -87,11 +89,11 @@ public class JSql_MetaTableUtils {
 	/// @params  the idx to check against, ignored if -10 or below
 	///
 	/// @returns   row of the JSqlResult, -1 if failed to find
-	///
 	protected static int fetchResultPosition(JSqlResult r, String key, int idx) {
 		return fetchResultPosition(r, null, key, idx);
 	}
 	
+	//--------------------------------------------------------------------------
 	//
 	// MetaType and SQL handling
 	//
@@ -105,7 +107,6 @@ public class JSql_MetaTableUtils {
 	/// @params  The input object value
 	///
 	/// @returns the shorten return value
-	///
 	protected static String shortenStringValue(Object value) {
 		String shortenValue = value.toString().toLowerCase();
 		if (shortenValue.length() > 64) {
@@ -114,67 +115,109 @@ public class JSql_MetaTableUtils {
 		return shortenValue;
 	}
 
-	// /// Values to option set conversion used by JSql
-	// /// Note collumn strong typing is now DEPRECATED (for now)
-	// ///
-	// /// @TODO: Support the various numeric value
-	// /// @TODO: Support string / text
-	// /// @TODO: Support array sets
-	// /// @TODO: Support GUID hash
-	// /// @TODO: Support MetaTable/Object
-	// /// @TODO: Check against configured type
-	// /// @TODO: Convert to configured type if possible (like numeric)
-	// /// @TODO: Support proper timestamp handling (not implemented)
-	// ///
-	// public static Object[] valueToOptionSet(MetaTypeMap mtm, String key, Object value) {
-	// 	if (value instanceof Integer) {
-	// 		return new Object[] { new Integer(MetaType.INTEGER.getValue()), value, shortenStringValue(value),
-	// 			value.toString() }; //Typ, N,S,I,T
-	// 	} else if (value instanceof Float) {
-	// 		return new Object[] { new Integer(MetaType.FLOAT.getValue()), value, shortenStringValue(value),
-	// 			value.toString() }; //Typ, N,S,I,T
-	// 	} else if (value instanceof Double) {
-	// 		return new Object[] { new Integer(MetaType.DOUBLE.getValue()), value, shortenStringValue(value),
-	// 			value.toString() }; //Typ, N,S,I,T
-	// 	} else if (value instanceof String) {
-	// 		return new Object[] { new Integer(MetaType.STRING.getValue()), 0, shortenStringValue(value), value.toString() }; //Typ, N,S,I,T
-	// 	} else if (value instanceof byte[]) {
-	// 		return new Object[] { new Integer(MetaType.BINARY.getValue()), 0, null,
-	// 			(Base64.getEncoder().encodeToString((byte[]) value)) }; //Typ, N,S,I,T
-	// 	} else {
-	// 		String jsonString = ConvertJSON.fromObject(value);
-	// 		return new Object[] { new Integer(MetaType.JSON.getValue()), 0, null, jsonString };
-	// 	}
-	// 	//throw new RuntimeException("Object type not yet supported: "+key+" = "+ value);
-	// }
-
-	/// Takes in the JSqlResult from a MetaTable internal table query
-	/// And extract out the respective 
+	/// Values to option set conversion used by JSql
+	/// Note collumn strong typing is now DEPRECATED (for now)
 	///
 	/// @TODO: Support the various numeric value
 	/// @TODO: Support string / text
+	/// @TODO: Support array sets
+	/// @TODO: Support GUID hash
+	/// @TODO: Support MetaTable/Object
+	/// @TODO: Check against configured type
+	/// @TODO: Convert to configured type if possible (like numeric)
+	/// @TODO: Support proper timestamp handling (not implemented)
+	///
+	public static Object[] valueToOptionSet(String key, Object value) {
+		if (value instanceof Integer) {
+			return new Object[] { new Integer(MetaType.INTEGER.getValue()), value, shortenStringValue(value),
+				value.toString() }; //Typ, N,S,I,T
+		} else if (value instanceof Float) {
+			return new Object[] { new Integer(MetaType.FLOAT.getValue()), value, shortenStringValue(value),
+				value.toString() }; //Typ, N,S,I,T
+		} else if (value instanceof Double) {
+			return new Object[] { new Integer(MetaType.DOUBLE.getValue()), value, shortenStringValue(value),
+				value.toString() }; //Typ, N,S,I,T
+		} else if (value instanceof String) {
+			return new Object[] { new Integer(MetaType.STRING.getValue()), 0, shortenStringValue(value), value.toString() }; //Typ, N,S,I,T
+		} else if (value instanceof byte[]) {
+			return new Object[] { new Integer(MetaType.BINARY.getValue()), 0, null,
+				(Base64.getEncoder().encodeToString((byte[]) value)) }; //Typ, N,S,I,T
+		} else {
+			String jsonString = ConvertJSON.fromObject(value);
+			return new Object[] { new Integer(MetaType.JSON.getValue()), 0, null, jsonString };
+		}
+		//throw new RuntimeException("Object type not yet supported: "+key+" = "+ value);
+	}
+
+	/// Takes in the JSqlResult from a MetaTable internal table query
+	/// And extract out the respective result value
+	///
 	/// @TODO: Support GUID hash
 	/// @TODO: Support MetaTable
 	///
-	/// @see extractKeyValue
+	/// @param  The jsql result set from a select call
+	/// @param  Row position to fetch values from result
+	///
+	/// @return  The object value
 	protected static Object extractNonArrayValueFromPos(JSqlResult r, int pos) {
-		Object[] typList = r.get("typ");
-		int baseType = ((Number) (typList[pos])).intValue();
+		//
+		// Get the storage type setting
+		//
+		int baseType = ((Number) (r.get("typ")[pos])).intValue();
 	
+		//
 		// Int, Long, Double, Float
+		//
 		if (baseType == MetaType.INTEGER.getValue()) {
 			return new Integer(((Number) (r.get("nVl")[pos])).intValue());
+		} else if (baseType == MetaType.LONG.getValue()) {
+			return new Long(((Number) (r.get("nVl")[pos])).longValue());
 		} else if (baseType == MetaType.FLOAT.getValue()) {
 			return new Float(((Number) (r.get("nVl")[pos])).floatValue());
 		} else if (baseType == MetaType.DOUBLE.getValue()) {
 			return new Double(((Number) (r.get("nVl")[pos])).doubleValue());
-		} else if (baseType == MetaType.STRING.getValue()) { // String
+		}  
+		
+		//
+		// String / Text value support
+		//
+		if (baseType == MetaType.STRING.getValue()) { // String
 			return (String) (r.get("tVl")[pos]);
 		} else if (baseType == MetaType.TEXT.getValue()) { // Text
 			return (String) (r.get("tVl")[pos]);
-		} else if (baseType == MetaType.BINARY.getValue()) {
-			return (Base64.getDecoder().decode((String) (r.get("tVl")[pos])));
-		} else if (baseType == MetaType.JSON.getValue()) { // JSON
+		} 
+		
+		//
+		// Binary value
+		//
+		if (baseType == MetaType.BINARY.getValue()) {
+			// Older base64 stroage format
+			// return (Base64.getDecoder().decode((String) (r.get("tVl")[pos])));
+			
+			Object rawValue = r.get("rVl")[pos];
+			if( rawValue instanceof java.sql.Blob ) {
+				java.sql.Blob blobData = (java.sql.Blob)rawValue;
+				try {
+					// GetBytes is 1 indexed??
+					// See: https://docs.oracle.com/javase/7/docs/api/java/sql/Blob.html#length()
+					return blobData.getBytes(1, (int)(blobData.length()));
+				} catch(SQLException e) {
+					throw new JSqlException(e);
+				} finally {
+					try {
+						blobData.free();
+					} catch (SQLException e) {
+						throw new JSqlException(e);
+					}
+				}
+			} 
+			return (byte[])rawValue;
+		} 
+		
+		//
+		// JSON value support
+		//
+		if (baseType == MetaType.JSON.getValue()) { // JSON
 			return ConvertJSON.toObject((String) (r.get("tVl")[pos]));
 		}
 	
@@ -184,9 +227,12 @@ public class JSql_MetaTableUtils {
 		//throw new RuntimeException("Object type not yet supported: Pos = "+pos+", BaseType = "+ baseType);
 	}
 
-	/*
-
 	/// Same as extractNonArrayValueFromPos, however returns oid, and row key names as well
+	///
+	/// @param  The jsql result set from a select call
+	/// @param  Row position to fetch values from result
+	///
+	/// @return  The object[] array representing [ oID, kID, and value ]
 	protected static Object[] extractKeyValueNonArrayValueFromPos(JSqlResult r, int pos) {
 		Object value = extractNonArrayValueFromPos(r, pos);
 		return new Object[] { r.get("oID")[pos], r.get("kID")[pos], value };
@@ -196,16 +242,21 @@ public class JSql_MetaTableUtils {
 	///
 	/// @TODO: Support array sets
 	///
+	/// @param  The jsql result set from a select call
+	/// @param  Keyname to use for extraction
+	///
+	/// @return  The object value
 	protected static Object extractKeyValue(JSqlResult r, String key) throws JSqlException {
 		int pos = fetchResultPosition(r, key, 0); //get the 0 pos value
-
 		if (pos <= -1) {
 			return null;
 		}
-
 		return extractNonArrayValueFromPos(r, pos);
 	}
 
+	/*
+
+	//------------------------------------------------------------------------------------------
 	//
 	// Append and get
 	//

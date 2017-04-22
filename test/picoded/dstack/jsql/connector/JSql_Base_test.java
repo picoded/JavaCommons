@@ -33,7 +33,7 @@ public class JSql_Base_test {
 	}
 	
 	@After
-	public void tearDown() throws JSqlException {
+	public void tearDown() {
 		if (jsqlObj != null) {
 			jsqlObj.update("DROP TABLE IF EXISTS `" + testTableName + "`");
 			jsqlObj = null;
@@ -177,7 +177,7 @@ public class JSql_Base_test {
 
 	/// Create table if not exists test
 	@Test
-	public void createTableStatementBuilder() throws JSqlException {
+	public void createTableStatementBuilder() {
 		// cleanup (just incase)
 		assertTrue( jsqlObj.update("DROP TABLE IF EXISTS `" + testTableName + "`") ); 
 		
@@ -199,7 +199,7 @@ public class JSql_Base_test {
 	
 	/// This is the base execute sql test example, in which other examples are built on
 	@Test
-	public void updateStatements() throws JSqlException {
+	public void updateStatements() {
 		// cleanup (just incase)
 		assertTrue( jsqlObj.update("DROP TABLE IF EXISTS `" + testTableName + "`") ); 
 		
@@ -231,7 +231,7 @@ public class JSql_Base_test {
 	
 	
 	@Test
-	public void update_expectedExceptions() throws JSqlException {
+	public void update_expectedExceptions() {
 		// runs the no exception varient. to pre populate the tables for exceptions
 		updateStatements(); 
 		
@@ -276,7 +276,7 @@ public class JSql_Base_test {
 	}
 	
 	@Test
-	public void JSqlResultFetch() throws JSqlException {
+	public void JSqlResultFetch() {
 		updateStatements();
 		
 		// added more data to test
@@ -306,7 +306,7 @@ public class JSql_Base_test {
 	
 	/// Test if the "INDEX IF NOT EXISTS" clause is being handled correctly
 	@Test
-	public void uniqueIndexIfNotExists() throws JSqlException {
+	public void uniqueIndexIfNotExists() {
 		updateStatements();
 		
 		assertTrue(
@@ -320,7 +320,7 @@ public class JSql_Base_test {
 				+ testTableName + "` ( col3 )"));
 	}
 	
-	public void row1to7setup() throws JSqlException {
+	public void row1to7setup() {
 		updateStatements();
 		
 		// added more data to test
@@ -332,7 +332,7 @@ public class JSql_Base_test {
 	}
 	
 	@Test
-	public void selectStatement() throws JSqlException {
+	public void selectStatement() {
 		row1to7setup();
 		
 		JSqlResult r = null;
@@ -388,7 +388,7 @@ public class JSql_Base_test {
 	
 	/// @TODO extend test coverage to include default, and misc columns
 	@Test
-	public void upsertStatement() throws JSqlException {
+	public void upsertStatement() {
 		row1to7setup();
 		JSqlResult r = null;
 		
@@ -411,7 +411,7 @@ public class JSql_Base_test {
 	}
 	
 	@Test
-	public void upsertStatementDefault() throws JSqlException {
+	public void upsertStatementDefault() {
 		row1to7setup();
 		JSqlResult r = null;
 		JSqlPreparedStatement preparedStatment = null;
@@ -440,7 +440,7 @@ public class JSql_Base_test {
 	}
 	
 	@Test
-	public void upsertStatementWithDefault() throws JSqlException {
+	public void upsertStatementWithDefault() {
 		row1to7setup();
 		JSqlResult r = null;
 		
@@ -507,7 +507,7 @@ public class JSql_Base_test {
 	}
 	
 	@Test
-	public void recreate() throws JSqlException {
+	public void recreate() {
 
 		// Create setup
 		simpleQueryFlow_raw();
@@ -533,7 +533,7 @@ public class JSql_Base_test {
 	
 	/// JSQL table collumn with ending bracket ], which may breaks MS-SQL
 	@Test
-	public void mssqlClosingBracketInCollumnName() throws JSqlException {
+	public void mssqlClosingBracketInCollumnName() {
 		jsqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); //cleanup (just incase)
 		
 		jsqlObj.query(
@@ -562,7 +562,7 @@ public class JSql_Base_test {
 	}
 	
 	@Test
-	public void commitTest() throws JSqlException {
+	public void commitTest() {
 		jsqlObj.update("DROP TABLE IF EXISTS " + testTableName + ""); //cleanup (just incase)
 		
 		jsqlObj.update(
@@ -580,7 +580,7 @@ public class JSql_Base_test {
 	}
 	
 	@Test
-	public void createTableIndexStatementTest() throws JSqlException {
+	public void createTableIndexStatementTest() {
 		jsqlObj.update("DROP TABLE IF EXISTS " + testTableName + "");
 		
 		jsqlObj.update("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col1` INT PRIMARY KEY, col2 TEXT )");
@@ -588,7 +588,7 @@ public class JSql_Base_test {
 	}
 	
 	@Test
-	public void createTableIndexStatementTestThreeParam() throws JSqlException {
+	public void createTableIndexStatementTestThreeParam() {
 		jsqlObj.update("DROP TABLE IF EXISTS " + testTableName + "");
 		
 		jsqlObj.update(
@@ -598,7 +598,7 @@ public class JSql_Base_test {
 	}
 	
 	@Test
-	public void createTableIndexStatementTestFourParam() throws JSqlException {
+	public void createTableIndexStatementTestFourParam() {
 		jsqlObj.update("DROP TABLE IF EXISTS " + testTableName + "");
 		
 		jsqlObj.update(
@@ -608,14 +608,14 @@ public class JSql_Base_test {
 	}
 	
 	@Test
-	public void genericSqlParserTest() throws JSqlException {
+	public void genericSqlParserTest() {
 		String s = jsqlObj.genericSqlParser("SELECT * FROM " + testTableName + " WHERE COL1 = ?");
 		assertEquals("SELECT * FROM " + testTableName + " WHERE COL1 = ?", s);
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Test
-	public void joinArgumentsTest() throws JSqlException {
+	public void joinArgumentsTest() {
 		Object[] array1 = new Object[] { 1, 2, 3 };
 		Object[] array2 = new Object[] { 4, 5, 6 };
 		Object[] array = new Object[] { 1, 2, 3, 4, 5, 6 };
@@ -623,4 +623,33 @@ public class JSql_Base_test {
 		assertEquals(array, rArray);
 	}
 	
+	@Test 
+	public void byteArrayStorage() {
+		// Table with BLOB type
+		assertTrue( jsqlObj.createTable(
+			testTableName,
+			new String[] { "pKy", "rVl" },
+			new String[] { "VARCHAR(64) PRIMARY KEY", "BLOB" }
+		) );
+
+		// Byte array to store
+		byte[] dataArr = "big-data : data that cannot fit inside excel spreadsheet".getBytes();
+
+		// Inserting the byte array
+		assertTrue( jsqlObj.upsert(
+			testTableName,
+			new String[] { "pKy" },
+			new Object[] { "small-data" },
+			new String[] { "rVl" },
+			new Object[] { dataArr }
+		));
+
+		// Fetch the data
+		JSqlResult res = jsqlObj.select(testTableName);
+		assertNotNull( res );
+
+		// Validate data
+		assertEquals( "small-data", res.get("pKy")[0] );
+		assertArrayEquals( dataArr, (byte[])res.get("rVl")[0] );
+	}
 }

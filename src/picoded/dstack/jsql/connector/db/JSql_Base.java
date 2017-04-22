@@ -74,6 +74,8 @@ public class JSql_Base extends JSql {
 				} else if (Date.class.isInstance(argObj)) {
 					java.sql.Date sqlDate = new java.sql.Date(((Date) argObj).getTime());
 					ps.setDate(pt + 1, sqlDate);
+				} else if(argObj instanceof byte[]) {
+					ps.setBytes(pt + 1, (byte[]) argObj);
 				} else if (java.sql.Blob.class.isInstance(argObj)) {
 					ps.setBlob(pt + 1, (java.sql.Blob) argObj);
 				} else {

@@ -135,14 +135,13 @@ public class JSql_MetaTable extends Core_MetaTable {
 		);
 			
 		// Unique index
-		//
-		// This also optimizes query by object keys, 
+		//------------------------------------------------
+
+		// This optimizes query by object keys, 
 		// with the following combinations
-		//
 		// + oID
 		// + oID, kID
 		// + oID, kID, idx
-		//------------------------------------------------
 		sqlObj.createIndex( //
 			sqlTableName, "oID, kID, idx", "UNIQUE", "unq" //
 		); //
@@ -150,16 +149,18 @@ public class JSql_MetaTable extends Core_MetaTable {
 		// Key Values search index
 		//------------------------------------------------
 		
-		//
-		// Note as this checks nVl also, 
-		// its IMPORTANT that nVl = 0 is passed
-		// For string based search
-		//
+		// This optimizes for numeric values
 		// + kID
 		// + kID, nVl
-		// + kID, nVl=0, sVl
 		sqlObj.createIndex( //
-			sqlTableName, "kID, nVl, sVl", null, "valMap" //
+			sqlTableName, "kID, nVl", null, "knIdx" //
+		); //
+		
+		// This optimizes for string values
+		// + kID
+		// + kID, sVl
+		sqlObj.createIndex( //
+			sqlTableName, "kID, sVl", null, "ksIdx" //
 		); //
 		
 		// Full text index, for textual data

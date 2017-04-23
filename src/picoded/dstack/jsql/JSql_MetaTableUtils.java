@@ -166,17 +166,17 @@ public class JSql_MetaTableUtils {
 		
 		// String type support
 		if (value instanceof String) {
-			return valueTypeSet(MetaType.STRING.getValue(), 0, shortenStringValue(value), value.toString(), null);
+			return valueTypeSet(MetaType.STRING.getValue(), null, shortenStringValue(value), value.toString(), null);
 		} 
 		
 		// Binary type support
 		if (value instanceof byte[]) {
-			return valueTypeSet(MetaType.BINARY.getValue(), 0, null, null, (byte[])value);
+			return valueTypeSet(MetaType.BINARY.getValue(), null, null, null, (byte[])value);
 		} 
 		
 		// Fallback JSON support
 		String jsonString = ConvertJSON.fromObject(value);
-		return valueTypeSet(MetaType.JSON.getValue(), 0, null, jsonString.toString(), null);
+		return valueTypeSet(MetaType.JSON.getValue(), null, null, jsonString.toString(), null);
 	}
 
 	/// Takes in the JSqlResult from a MetaTable internal table query
@@ -454,9 +454,87 @@ public class JSql_MetaTableUtils {
 		return ret;
 	}
 
+	//========================================================================================
+	//
+	// Super complicated complex inner join query builder here
+	//
+	// DO-NOT attempt to make changes here without ATLEAST an indepth
+	// understanding of meta-table structure, and how inner join queries work
+	//
+	// The complexity of this query generator SHOULD NOT be underextimated
+	//
+	//========================================================================================
 
-	/*
+	// Complex query static vars
+	//-----------------------------------------------------------------------------
 
+	/// Select column statements for DISTINCT oID
+	protected static String oid_distinct = "DISTINCT oID";
+
+	/// Select column statements for counting DISTINCT oID
+	protected static String oid_distinctCount = "COUNT(DISTINCT oID) AS rcount";
+
+	// Complex query utilities
+	//-----------------------------------------------------------------------------
+
+	/// Does the value to MetaType conversion used in query search
+	///
+	/// @param   Value used
+	///
+	/// @return  MetaType value
+	public static MetaType searchValueToMetaType(Object value) {
+		if (value instanceof Integer) {
+			return MetaType.INTEGER;
+		} else if (value instanceof Float) {
+			return MetaType.FLOAT;
+		} else if (value instanceof Double) {
+			return MetaType.DOUBLE;
+		} else if (value instanceof Long) {
+			return MetaType.LONG;
+		} else if (value instanceof String) {
+			return MetaType.STRING;
+		}
+		// else if (value instanceof byte[]) {
+		// 	return MetaType.BINARY;
+		// } else {
+		//	return MetaType.JSON;
+		//}
+		return null;
+	}
+
+	/// Sanatizes a query key, for a somewhat SQL safer varient
+	///
+	/// @param  Key to sanatize
+	///
+	/// @return  sanatized key to return
+	public static String escapeQueryKey(String key) {
+		return key.replaceAll("[\u0000-\u001f]", "") // replaces invisible characters
+			.replaceAll("\\\\", "\\\\") // Replaces the "\" character
+			.replaceAll("\\\"", "\\\"") // Replaces the "double quotes"
+			.replaceAll("\\'", "\\'") // Replaces the 'single quotes'
+			.replaceAll("\\`", "\\`") // Replaces the `oracle quotes`
+			.replaceAll("\\[", "\\[") // Replaces the [ms-sql opening brackets]
+			.replaceAll("\\]", "\\]") // Replaces the [ms-sql closing brackets]
+			.replaceAll("\\#", "\\#"); // Replaces the reserved # key
+	}
+
+	/// Sanatize the order by string, and places the field name as query arguments
+	///
+	/// @param  Raw order by string
+	///
+	/// @return  Order by function obj
+	public static OrderBy<MetaObject> getOrderByObject(String rawString) {
+		// Clear out excess whtiespace
+		rawString = rawString.trim().replaceAll("\\s+", " ");
+		if (rawString.length() <= 0) {
+			throw new RuntimeException("Unexpected blank found in OrderBy query : " + rawString);
+		}
+
+		return new OrderBy<MetaObject>(rawString);
+	}
+
+	// Complex query actual implementation
+	//-----------------------------------------------------------------------------
 
 	/// Lowercase suffix string
 	protected static String lowerCaseSuffix = "#lc";
@@ -464,19 +542,23 @@ public class JSql_MetaTableUtils {
 	///
 	/// The complex left inner join StringBuilder used for view / query requests
 	///
-	/// @TODO: Protect index names from SQL injections. Since index columns may end up "configurable". This can end up badly for SAAS build
+	/// This helps build a complex temporary table view, for use in a query.
+	///
+	/// This somewhat represents the actual table,
+	/// you would have quried against in traditional fixed SQL view
 	///
 	/// @params  sql connection used, this is used to detect vendor specific logic =(
 	/// @params  meta table name, used to pull the actual data the view is based on
 	/// @params  type mapping to build the complex view from
-	/// @params  additional arguments needed to build the query
+	/// @params  additional arguments needed to build the query, 
+	///          this serves as an additional return value and is hence required
 	///
 	/// @returns StringBuilder for the view building statement, this can be used for creating permenant view / queries
 	///
-	protected static StringBuilder sqlComplexLeftJoinQueryBuilder(JSql sql, String tableName, MetaTypeMap mtm,
+	protected static StringBuilder complexQueryView(JSql sql, String tableName, Map<String, MetaType> mtm,
 		List<Object> queryArgs) {
 		//
-		// Vendor specific custimization
+		// Vendor specific customization
 		//-----------------------------------------
 
 		String joinType = "LEFT";
@@ -485,10 +567,10 @@ public class JSql_MetaTableUtils {
 		String rBracket = "\"";
 
 		// Reserved to overwrite, and to do more complex quotes
-		// if (sql.sqlType == JSqlType.mssql) {
-		// 	lBracket = "[";
-		// 	rBracket = "]";
-		// }
+		if (sql.sqlType() == JSqlType.MSSQL) {
+			lBracket = "[";
+			rBracket = "]";
+		}
 
 		//
 		// Select / From StringBuilder setup
@@ -497,24 +579,19 @@ public class JSql_MetaTableUtils {
 		//
 		//-----------------------------------------
 
+		// This statement section, represents the final view "columns" to use
 		StringBuilder select = new StringBuilder("SELECT B.oID AS ");
 		select.append(lBracket + "oID" + rBracket);
 
+		// This statement section, reprsents the underlying actual "columns" to fetch from
 		StringBuilder from = new StringBuilder(" FROM ");
 		from.append("(SELECT DISTINCT oID");
 
 		//
-		// Optional object created time support
-		// (Commented out)
-		//
-		//-----------------------------------------
-
-		//select.append(", B.oTm AS ");
-		//select.append(lBracket + "_otm" + rBracket);
-		//from.append(", oTm");
-
-		//
 		// Distinct table reference
+		//
+		// This is used to reduce the result set
+		// to a single row per oID
 		//
 		//-----------------------------------------
 
@@ -523,79 +600,70 @@ public class JSql_MetaTableUtils {
 		from.append(" AS B");
 
 		//
-		// Distinct table reference
+		// Select / From query building base on MetaType
 		//
-		//-----------------------------------------
+		//--------------------------------------------------
 
-		String key;
-		MetaType type;
-
-		// ArrayList<Object> argList = new ArrayList<Object>();
+		// Join count, is required to ensure table labeling does not colide
 		int joinCount = 0;
-		for (Map.Entry<String, MetaType> e : mtm.entrySet()) {
-			key = e.getKey();
-			type = e.getValue();
 
-			// SQL safety the key
-			key = key.replaceAll("\\\\", "\\\\").replaceAll("\\\"", "\\\"").replaceAll("\\'", "\\'");
+		//
+		// Iterate every MetaType, and build their respective column SELECT/FROM statement
+		//
+		for (Map.Entry<String, MetaType> e : mtm.entrySet()) {
+
+			// Get key, safekey, and type
+			String rawKey = e.getKey();
+			String safeKey = escapeQueryKey(rawKey);
+			MetaType type = e.getValue();
+
 			if ( //
 			type == MetaType.INTEGER || //
 				type == MetaType.FLOAT || //
 				type == MetaType.DOUBLE ||
 				type == MetaType.LONG
 			) { //
+				//---------------------------
+				// Numeric column processing
+				//---------------------------
 
+				// Get numeric column
 				select.append(", N" + joinCount + ".nVl AS ");
-				select.append(lBracket + key + rBracket);
+				select.append(lBracket + safeKey + rBracket);
+				// Get string column, and shorten lowercase
+				select.append(", N" + joinCount + ".sVl AS ");
+				select.append(lBracket + safeKey + lowerCaseSuffix + rBracket);
 
+				// Joined from, with unique OID
 				from.append(" " + joinType + " JOIN " + tableName + " AS N" + joinCount);
 				from.append(" ON B.oID = N" + joinCount + ".oID");
+				// and is not an array, while matching raw key
 				from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = ?");
-
-				queryArgs.add(key);
+				queryArgs.add(rawKey);
 
 			} else if (type == MetaType.STRING) {
+				//---------------------------
+				// String column processing
+				//---------------------------
 
+				// Get string column, in full representation, 
 				select.append(", S" + joinCount + ".tVl AS ");
-				select.append(lBracket + key + rBracket);
-
+				select.append(lBracket + safeKey + rBracket);
+				// Get string column, and shorten lowercase
 				select.append(", S" + joinCount + ".sVl AS ");
-				select.append(lBracket + key + lowerCaseSuffix + rBracket);
+				select.append(lBracket + safeKey + lowerCaseSuffix + rBracket);
 
+				// Joined from, with unique OID
 				from.append(" " + joinType + " JOIN " + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
-
-				// Key based seperation
+				// and is not an array, while matching raw key
 				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = ?");
-				queryArgs.add(key);
-
-				//
-				// Numeric value = 0, index optimization (to reimplment in future)
-				// Disabled, as it PREVENTS sorting of numeric value via the string index (to be optimized later)
-				//
-				// from.append(" AND S" + joinCount + ".nVl = ? ");
-				// queryArgs.add(0.0);
-
-			} else if (type == MetaType.TEXT) {
-
-				select.append(", S" + joinCount + ".tVl AS ");
-				select.append(lBracket + key + rBracket);
-
-				from.append(" " + joinType + " JOIN " + tableName + " AS S" + joinCount);
-				from.append(" ON B.oID = S" + joinCount + ".oID");
-
-				// Key based seperation
-				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = ?");
-				queryArgs.add(key);
-
-				// Numeric value = 0, index optimization
-				from.append(" AND S" + joinCount + ".nVl = ? ");
-				queryArgs.add(0.0);
+				queryArgs.add(rawKey);
 
 			} else {
 				// Unknown MetaType ignored
-				logger.log(Level.WARNING, "sqlComplexLeftJoinQueryBuilder -> Unknown MetaType (" + type
-					+ ") - for meta key : " + key);
+				LOGGER.log(Level.WARNING, "complexQueryView -> Unsupported MetaType (" + type
+					+ ") - for meta key : " + rawKey);
 			}
 
 			++joinCount;
@@ -610,197 +678,234 @@ public class JSql_MetaTableUtils {
 		return ret;
 	}
 
-	/// Does the value to MetaType conversion
-	public static MetaType valueToMetaType(Object value) {
-		if (value instanceof Integer) {
-			return MetaType.INTEGER;
-		} else if (value instanceof Float) {
-			return MetaType.FLOAT;
-		} else if (value instanceof Double) {
-			return MetaType.DOUBLE;
-		} else if (value instanceof String) {
-			return MetaType.STRING;
-		} else if (value instanceof byte[]) {
-			return MetaType.BINARY;
-		} else if (value instanceof Long) {
-			return MetaType.LONG;
-		} //else {
-		  //	return MetaType.JSON;
-		  //}
-		return null;
-	}
-
-	/// Sanatize the order by string, and places the field name as query arguments
-	public static OrderBy<MetaObject> getOrderByObject(String rawString) {
-		// Clear out excess whtiespace
-		rawString = rawString.trim().replaceAll("\\s+", " ");
-		if (rawString.length() <= 0) {
-			throw new RuntimeException("Unexpected blank found in OrderBy query : " + rawString);
-		}
-
-		return new OrderBy<MetaObject>(rawString);
-	}
-
-	/// Performs a search query, and returns the respective MetaObjects
+	/// Performs a search query, and returns the respective MetaObjects information
+	/// This works by taking the query and its args, building its complex inner view, then querying that view.
 	///
 	/// CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
 	/// @TODO: Performs the search pattern using the respective type map
 	///
+	/// @param   MetaTable object to refrence from
+	/// @param   JSql connection to use
+	/// @param   JSql table name to use
+	/// @param   The selected columns to query
 	/// @param   where query statement
 	/// @param   where clause values array
 	/// @param   query string to sort the order by, use null to ignore
 	/// @param   offset of the result to display, use -1 to ignore
 	/// @param   number of objects to return max
 	///
-	/// @returns  The MetaObject[] array
-	public static JSqlResult metaTableSelectQueryBuilder( //
+	/// @returns  The JSql query result
+	public static JSqlResult runComplexQuery( //
 		MetaTable metaTableObj, JSql sql, String tablename, String selectedCols, //
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
 
-		/// Query string, for either a newly constructed view, or cached view
+		//----------------------------------------------------------------------
+		// Quick optimal lookup : Does not do any complext building
+		// Runs the query and exit immediately
+		//----------------------------------------------------------------------
+		if (whereClause == null && orderByStr == null && offset <= 0 && limit <= 0
+			&& (selectedCols.equals(oid_distinctCount) || selectedCols.equals(oid_distinct))) {
+			// Blank search, quick and easy
+			return sql.select(tablename, selectedCols);
+		} 
+
+		//----------------------------------------------------------------------
+		// Sadly looks like things must be done the hardway, initialize the vars
+		//----------------------------------------------------------------------
+
+		// Query string, for either a newly constructed view, or cached view
 		StringBuilder queryBuilder = new StringBuilder();
+
+		// The actual args to use
 		List<Object> complexQueryArgs = new ArrayList<Object>();
 		Object[] queryArgs = null;
+
+		// Result ordering by 
 		OrderBy<MetaObject> orderByObj = null;
 
-		/// Quick optimal lookup
-		if (whereClause == null && orderByStr == null && offset <= 0 && limit <= 0
-			&& (selectedCols.equals("COUNT(DISTINCT \"oID\") AS rcount") || selectedCols.equals("DISTINCT \"oID\""))) {
-			// Blank search, quick and easy
-			queryBuilder.append("SELECT " + selectedCols.replaceAll("\\\"", "") + " FROM " + tablename + "");
-		} else {
+		// Building the MetaTypeMap from where request
+		Map<String,MetaType> queryTypeMap = new HashMap<String,MetaType>();
 
-			// Order by object handling
-			if (orderByStr != null) {
-				orderByStr.replaceAll("_oid", "oID");
-				orderByObj = getOrderByObject(orderByStr);
-			}
+		// The where clause query object, that is built, and actually used
+		Query queryObj = null;
 
-			// Building the MetaTypeMap from where request
-			MetaTypeMap queryTypeMap = new MetaTypeMap();
+		//----------------------------------------------------------------------
+		// Validating the Where clause and using it to build the MetaTypeMap
+		// AND rebuild the query to the required formatting (lowercase)
+		//----------------------------------------------------------------------
 
-			// Validating the Where clause and using it to build the MetaTypeMap
-			Query queryObj = null;
-			if (whereClause != null && whereClause.length() >= 0) {
-				// Conversion to query object, round 1 of sanatizing
-				queryObj = Query.build(whereClause, whereValues);
-				// Build the query type map
-				Map<String, List<Object>> queryMap = queryObj.keyValuesMap();
-				for (String key : queryMap.keySet()) {
+		// Where clause exists, build it!
+		if (whereClause != null && whereClause.length() >= 0) {
 
-					//if( key.endsWith(lowerCaseSuffix) ) {
-					//
-					//}
+			// Conversion to raw query object, round 1 of sanatizing
+			//
+			// To avoid confusion, the original query is called "RAW QUERY",
+			// While the converted actual JSql query is called "PROCESSED QUERY"
+			//---------------------------------------------------------------------
+			queryObj = Query.build(whereClause, whereValues);
 
-					MetaType subType = valueToMetaType(queryMap.get(key).get(0));
-					if (subType != null) {
-						queryTypeMap.put(key, subType);
-					}
-				}
-
-				// Gets the original field query map, to do subtitution
-				Map<String, List<Query>> fieldQueryMap = queryObj.fieldQueryMap();
-				Map<String, Object> queryArgMap = queryObj.queryArgumentsMap();
-				int newQueryArgsPos = queryArgMap.size() + 1;
-
-				//
-				// Parses the where clause with query type map,
-				// to enforce lower case search for string based nodes
-				//
-				for (String key : queryTypeMap.keySet()) {
-
-					// For each string based search, enforce lowercase search
-					MetaType subType = queryTypeMap.get(key);
-					if (subType == MetaType.STRING) {
-
-						// The query list to do lower case replacement
-						List<Query> toReplaceQueries = fieldQueryMap.get(key);
-
-						// Skip if blank
-						if (toReplaceQueries == null || toReplaceQueries.size() <= 0) {
-							continue;
-						}
-
-						// Iterate the queries to replace them
-						for (Query toReplace : toReplaceQueries) {
-
-							String argName = toReplace.argumentName();
-							Object argLowerCase = queryArgMap.get(argName);
-							if (argLowerCase != null) {
-								argLowerCase = argLowerCase.toString().toLowerCase();
-							}
-
-							queryArgMap.put("" + newQueryArgsPos, argLowerCase);
-							Query replacement = QueryFilter.basicQueryFromTokens(queryArgMap, toReplace.fieldName()
-								+ lowerCaseSuffix, toReplace.operatorSymbol(), ":" + newQueryArgsPos);
-
-							// Case sensitive varient
-							// replacement = new And(
-							// 	replacement,
-							// 	toReplace,
-							// 	queryArgMap
-							// );
-
-							queryObj = queryObj.replaceQuery(toReplace, replacement);
-
-							++newQueryArgsPos;
-						}
-					}
+			// Build the query type map from the "raw query"
+			//---------------------------------------------------------------------
+			Map<String, List<Object>> queryMap = queryObj.keyValuesMap();
+			for (String key : queryMap.keySet()) {
+				MetaType subType = searchValueToMetaType(queryMap.get(key).get(0));
+				if (subType != null) {
+					queryTypeMap.put(key, subType);
 				}
 			}
 
-			// Order by handling for metatype map
-			if (orderByObj != null) {
-				for (String keyName : orderByObj.getKeyNames()) {
-					if (!keyName.equalsIgnoreCase("oID")) {
-						if (!queryTypeMap.containsKey(keyName)) {
-							queryTypeMap.put(keyName, MetaType.STRING);
+			// Gets the original field to "raw query" maps
+			// of keys, to do subtitution on, 
+			// and their respective argument map.
+			Map<String, List<Query>> fieldQueryMap = queryObj.fieldQueryMap();
+			Map<String, Object> queryArgMap = queryObj.queryArgumentsMap();
+
+			// Gets the new index position to add new arguments if needed
+			int newQueryArgsPos = queryArgMap.size() + 1;
+
+			// Iterate the queryTypeMap, and doing the 
+			// required query expension / substitution 
+			//
+			// Parses the where clause with query type map
+			for (String key : queryTypeMap.keySet()) {
+
+				// Get the "raw query" type that may require processing
+				MetaType subType = queryTypeMap.get(key);
+
+				// The query list to do processing on
+				List<Query> toReplaceQueries = fieldQueryMap.get(key);
+
+				// Skip if no query was found needed processing
+				if (toReplaceQueries == null || toReplaceQueries.size() <= 0) {
+					continue;
+				}
+
+				// For each string based search, 
+				// enforce and additional lowercase matching
+				// for increased indexing perfromance.
+				if (subType == MetaType.STRING) {
+
+					// Iterate the queries to replace them
+					//-------------------------------------------
+					for (Query toReplace : toReplaceQueries) {
+
+						// Get the argument name/idx used in the query
+						String argName = toReplace.argumentName();
+
+						// Get the lower case representation of query arguments
+						String argLowerCase = queryArgMap.get(argName).toString();
+						if (argLowerCase != null) {
+							argLowerCase = argLowerCase.toString().toLowerCase();
 						}
 
-						MetaType type = queryTypeMap.get(keyName);
+						// Store the lower case varient of the query
+						queryArgMap.put("" + newQueryArgsPos, argLowerCase);
+						++newQueryArgsPos;
 
-						// Force lowercase string sorting for string orderby
-						if (queryTypeMap.get(keyName) == MetaType.STRING) {
-							orderByObj.replaceKeyName(keyName, keyName + "#lc");
-						}
+						// Add the new query with the lower case argument
+						Query replacement = QueryFilter.basicQueryFromTokens(queryArgMap, toReplace.fieldName()
+							+ lowerCaseSuffix, toReplace.operatorSymbol(), ":" + newQueryArgsPos);
+
+						// Case sensitive varient, to consider support with #cs ?
+						// Or perhaps a meta table configuration?
+						//
+						// replacement = new And(
+						// 	replacement,
+						// 	toReplace,
+						// 	queryArgMap
+						// );
+
+						// Replaces old query with new query
+						queryObj = queryObj.replaceQuery(toReplace, replacement);
 					}
+					// End of query iteration replacement
+					//-------------------------------------------
 				}
 			}
-
-			// Building the Inner join query
-			StringBuilder innerJoinQuery = sqlComplexLeftJoinQueryBuilder(sql, tablename, queryTypeMap, complexQueryArgs);
-
-			//queryBuilder.append( innerJoinQuery );
-			// Building the complex inner join query
-			queryBuilder.append("SELECT " + selectedCols.replaceAll("DISTINCT", "") + " FROM (");
-			queryBuilder.append(innerJoinQuery);
-			queryBuilder.append(") AS R");
-
-			// WHERE query is built from queryObj, this acts as a form of sql sanitization
-			if (queryObj != null) {
-				queryBuilder.append(" WHERE ");
-				queryBuilder.append(queryObj.toSqlString());
-				complexQueryArgs.addAll(queryObj.queryArgumentsList());
-			}
-
-			// Order by string mapping
-			if (orderByObj != null) {
-				queryBuilder.append(" ORDER BY ");
-				queryBuilder.append(orderByObj.toString());
-			}
-
-			//logger.log( Level.WARNING, queryBuilder.toString() );
-			//logger.log( Level.WARNING, Arrays.asList(queryArgs).toString() );
 		}
 
+		//----------------------------------------------------------------------
+		// Order by clause handling
+		//----------------------------------------------------------------------
+
+		// Order by object handling, of oid keys
+		// Replaces reserved "_oid" key with actual key
+		if (orderByStr != null) {
+			orderByStr.replaceAll("_oid", "oID");
+			orderByObj = getOrderByObject(orderByStr);
+		}
+
+		// Order by handling for metatype map
+		if (orderByObj != null) {
+			// Iterate each order by key name, and normalize them
+			Set<String> orderByKeys = orderByObj.getKeyNames();
+			for (String keyName : orderByKeys) {
+
+				// Ignores oID keynames
+				if (!keyName.equalsIgnoreCase("oID")) {
+					continue;
+				}
+
+				// Check if keyname is found within metamap
+				// adds it if it wasnt previously added
+				if (!queryTypeMap.containsKey(keyName)) {
+					queryTypeMap.put(keyName, MetaType.STRING);
+				}
+
+				// Get the query type
+				MetaType type = queryTypeMap.get(keyName);
+
+				// Force lowercase string sorting for string orderby
+				//
+				// Case sensitive varient, to consider support with #cs ?
+				// Or perhaps a meta table configuration?
+				if (type == MetaType.STRING) {
+					orderByObj.replaceKeyName(keyName, keyName + "#lc");
+				}
+			}
+		}
+
+		//----------------------------------------------------------------------
+		// Finally putting all the query pieces together
+		//----------------------------------------------------------------------
+
+		// Building the Inner join query, via a complex query view
+		// to actually query thee data against. This somewhat represents the actual table,
+		// you would have quried against in traditional fixed SQL view
+		StringBuilder innerJoinQuery = complexQueryView(sql, tablename, queryTypeMap, complexQueryArgs);
+
+		// Building the complex inner join query
+		//
+		// Filters out DISTINCT support as it will probably be there only for OID
+		// In which it would already be handled by the inner-join, creates buggy 
+		// result otherwise (to confirm?)
+		queryBuilder.append("SELECT " + selectedCols.replaceAll("DISTINCT", "") + " FROM (");
+		queryBuilder.append(innerJoinQuery);
+		queryBuilder.append(") AS R");
+
+		// WHERE query is built from queryObj, this acts as a form of sql sanitization
+		if (queryObj != null) {
+			queryBuilder.append(" WHERE ");
+			queryBuilder.append(queryObj.toSqlString());
+			complexQueryArgs.addAll(queryObj.queryArgumentsList());
+		}
+
+		// Order by string mapping
+		if (orderByObj != null) {
+			queryBuilder.append(" ORDER BY ");
+			queryBuilder.append(orderByObj.toString());
+		}
+
+		//logger.log( Level.WARNING, queryBuilder.toString() );
+		//logger.log( Level.WARNING, Arrays.asList(queryArgs).toString() );
+		
 		// Finalize query args
 		queryArgs = complexQueryArgs.toArray(new Object[0]);
 
-		// Limit and offset clause
+		// Limit and offset clause handling
 		if (limit > 0) {
 			queryBuilder.append(" LIMIT " + limit);
-
 			if (offset > 0) {
 				queryBuilder.append(" OFFSET " + offset);
 			}
@@ -809,14 +914,12 @@ public class JSql_MetaTableUtils {
 		// In case you want to debug the query =(
 		// System.out.println(">>> "+queryBuilder.toString());
 
-		try {
-			// Execute and get the result
-			return sql.query(queryBuilder.toString(), queryArgs);
-		} catch (JSqlException e) {
-			throw new RuntimeException(e);
-		}
+		// Execute and get the result
+		return sql.query(queryBuilder.toString(), queryArgs);
 	}
 
+
+	/* 
 	/// Performs a search query, and returns the respective MetaObjects GUID keys
 	///
 	/// CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
@@ -835,7 +938,7 @@ public class JSql_MetaTableUtils {
 		//
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
-		JSqlResult r = metaTableSelectQueryBuilder( //
+		JSqlResult r = runComplexQuery( //
 			metaTableObj, sql, tablename, "DISTINCT \"oID\"", whereClause, whereValues, orderByStr, offset, limit);
 		//logger.log( Level.WARNING, r.toString() );
 		List<Object> oID_list = r.get("oID");
@@ -887,7 +990,7 @@ public class JSql_MetaTableUtils {
 		//
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
-		JSqlResult r = metaTableSelectQueryBuilder(metaTableObj, sql, tablename, "COUNT(DISTINCT \"oID\") AS rcount",
+		JSqlResult r = runComplexQuery(metaTableObj, sql, tablename, "COUNT(DISTINCT \"oID\") AS rcount",
 			whereClause, whereValues, orderByStr, offset, limit);
 
 		List<Object> rcountArr = r.get("rcount");

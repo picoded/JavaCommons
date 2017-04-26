@@ -168,8 +168,7 @@ public class StructSimple_MetaTable_test {
 	}
 	
 	@Test
-	public void indexBasedTest() {
-		
+	public void indexBasedTestSetup() {
 		mtObj.newObject(genNumStrObj(1, "this"));
 		mtObj.newObject(genNumStrObj(2, "is"));
 		mtObj.newObject(genNumStrObj(3, "hello"));
@@ -177,6 +176,12 @@ public class StructSimple_MetaTable_test {
 		mtObj.newObject(genNumStrObj(5, "program"));
 		mtObj.newObject(genNumStrObj(6, "in"));
 		mtObj.newObject(genNumStrObj(7, "this"));
+	}
+
+	/// Numeric based query test
+	@Test
+	public void indexBasedTest_num() {
+		indexBasedTestSetup();
 		
 		MetaObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
@@ -189,10 +194,6 @@ public class StructSimple_MetaTable_test {
 		assertEquals("world", qRes[1].get("str_val"));
 		assertEquals(2, mtObj.queryCount("num > ? AND num < ?", new Object[] { 2, 5 }));
 		
-		assertNotNull(qRes = mtObj.query("str_val = ?", new Object[] { "this" }));
-		assertEquals(2, qRes.length);
-		assertEquals(2, mtObj.queryCount("str_val = ?", new Object[] { "this" }));
-		
 		assertNotNull(qRes = mtObj.query("num > ?", new Object[] { 2 }, "num ASC", 2, 2));
 		assertEquals(2, qRes.length);
 		assertEquals("program", qRes[0].get("str_val"));
@@ -201,9 +202,20 @@ public class StructSimple_MetaTable_test {
 		assertEquals(5, mtObj.queryCount("num > ?", new Object[] { 2 }));
 	}
 	
-	// /
+	/// String based query test
+	@Test
+	public void indexBasedTest_string() {
+		indexBasedTestSetup();
+
+		MetaObject[] qRes = null;
+		assertNotNull(qRes = mtObj.query("str_val = ?", new Object[] { "this" }));
+		assertEquals(2, qRes.length);
+		assertEquals(2, mtObj.queryCount("str_val = ?", new Object[] { "this" }));
+	}
+
+	///
 	/// An exception occurs, if a query fetch occurs with an empty table
-	// /
+	///
 	@Test
 	public void issue47_exceptionWhenTableIsEmpty() {
 		MetaObject[] qRes = null;
@@ -211,11 +223,11 @@ public class StructSimple_MetaTable_test {
 		assertEquals(0, qRes.length);
 	}
 	
-	// /
+	///
 	/// Bad view index due to inner join instead of left join. Testing.
-	// /
+	///
 	/// AKA: Incomplete object does not appear in view index
-	// /
+	///
 	@Test
 	public void innerJoinFlaw() {
 		mtObj.newObject(genNumStrObj(1, "hello world"));
@@ -243,9 +255,9 @@ public class StructSimple_MetaTable_test {
 		
 	}
 	
-	// /
+	///
 	/// Handle right outer closign bracket in metatable meta names
-	// /
+	///
 	@Test
 	public void mssqlOuterBrackerInMetaNameFlaw() {
 		HashMap<String, Object> objMap = null;
@@ -513,7 +525,7 @@ public class StructSimple_MetaTable_test {
 	public void getKeyNamesTest() {
 		
 		// Lets just rescycle old test for the names
-		indexBasedTest();
+		indexBasedTestSetup();
 		
 		Set<String> keyNames = mtObj.getKeyNames();
 		Set<String> expected = new HashSet<String>(Arrays.asList(new String[] { "_oid", "num",
@@ -523,9 +535,9 @@ public class StructSimple_MetaTable_test {
 		
 	}
 	
-	// // Mapping tests
-	// // [FEATURE DROPPED]
-	// //-----------------------------------------------
+	//// Mapping tests
+	//// [FEATURE DROPPED]
+	////-----------------------------------------------
 	// 
 	// @Test
 	// public void testSingleMappingSystem() {
@@ -564,8 +576,8 @@ public class StructSimple_MetaTable_test {
 	// 	assertEquals(mtObj.getType("uuid-array"), MetaType.UUID_ARRAY);
 	// }
 	
-	// // Demo code : kept here for reference
-	// //-----------------------------------------------
+	//// Demo code : kept here for reference
+	////-----------------------------------------------
 	// @Test
 	// public void demoCode() {
 	// 	// Initiate a meta table

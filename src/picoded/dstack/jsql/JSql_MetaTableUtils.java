@@ -695,7 +695,7 @@ public class JSql_MetaTableUtils {
 	/// @param   number of objects to return max
 	///
 	/// @returns  The JSql query result
-	public static JSqlResult runComplexQuery( //
+	protected static JSqlResult runComplexQuery( //
 		MetaTable metaTableObj, JSql sql, String tablename, String selectedCols, //
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
@@ -801,7 +801,6 @@ public class JSql_MetaTableUtils {
 
 						// Store the lower case varient of the query
 						queryArgMap.put("" + newQueryArgsPos, argLowerCase);
-						++newQueryArgsPos;
 
 						// Add the new query with the lower case argument
 						Query replacement = QueryFilter.basicQueryFromTokens(queryArgMap, toReplace.fieldName()
@@ -818,6 +817,9 @@ public class JSql_MetaTableUtils {
 
 						// Replaces old query with new query
 						queryObj = queryObj.replaceQuery(toReplace, replacement);
+
+						// Increment the argument count
+						++newQueryArgsPos;
 					}
 					// End of query iteration replacement
 					//-------------------------------------------
@@ -843,12 +845,12 @@ public class JSql_MetaTableUtils {
 			for (String keyName : orderByKeys) {
 
 				// Ignores oID keynames
-				if (!keyName.equalsIgnoreCase("oID")) {
+				if (keyName.equalsIgnoreCase("oID")) {
 					continue;
 				}
 
 				// Check if keyname is found within metamap
-				// adds it if it wasnt previously added
+				// adds it if it wasnt previously added, assumes a string
 				if (!queryTypeMap.containsKey(keyName)) {
 					queryTypeMap.put(keyName, MetaType.STRING);
 				}
@@ -911,20 +913,26 @@ public class JSql_MetaTableUtils {
 			}
 		}
 
-		// In case you want to debug the query =(
+		// // In case you want to debug the query =(
 		// System.out.println(">>> "+queryBuilder.toString());
+		// System.out.println(">>> "+ConvertJSON.fromList(complexQueryArgs));
+
+		// // Dump and debug the table
+		// System.out.println(">>> TABLE DUMP");
+		// System.out.println( ConvertJSON.fromMap( sql.select(tablename).readRow(0) ) );
 
 		// Execute and get the result
 		return sql.query(queryBuilder.toString(), queryArgs);
 	}
 
-
-	/* 
 	/// Performs a search query, and returns the respective MetaObjects GUID keys
 	///
 	/// CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
 	/// @TODO: Performs the search pattern using the respective type map
 	///
+	/// @param   MetaTable object to refrence from
+	/// @param   JSql connection to use
+	/// @param   JSql table name to use
 	/// @param   where query statement
 	/// @param   where clause values array
 	/// @param   query string to sort the order by, use null to ignore
@@ -933,15 +941,14 @@ public class JSql_MetaTableUtils {
 	///
 	/// @returns  The String[] array
 	public static String[] metaTableQueryKey( //
-		//
+		// The meta table / sql configs
 		MetaTable metaTableObj, JSql sql, String tablename, //
-		//
+		// The actual query
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
 		JSqlResult r = runComplexQuery( //
 			metaTableObj, sql, tablename, "DISTINCT \"oID\"", whereClause, whereValues, orderByStr, offset, limit);
-		//logger.log( Level.WARNING, r.toString() );
-		List<Object> oID_list = r.get("oID");
+		List<Object> oID_list = r.getObjectList("oID");
 		// Generate the object list
 		if (oID_list != null) {
 			return ListValueConv.objectListToStringArray(oID_list);
@@ -955,6 +962,9 @@ public class JSql_MetaTableUtils {
 	/// CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
 	/// @TODO: Performs the search pattern using the respective type map
 	///
+	/// @param   MetaTable object to refrence from
+	/// @param   JSql connection to use
+	/// @param   JSql table name to use
 	/// @param   where query statement
 	/// @param   where clause values array
 	/// @param   query string to sort the order by, use null to ignore
@@ -963,9 +973,9 @@ public class JSql_MetaTableUtils {
 	///
 	/// @returns  The MetaObject[] array
 	public static MetaObject[] metaTableQuery( //
-		//
+		// The meta table / sql configs
 		MetaTable metaTableObj, JSql sql, String tablename, //
-		//
+		// The actual query
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
 		return metaTableObj.getArrayFromID(
@@ -977,6 +987,9 @@ public class JSql_MetaTableUtils {
 	/// CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
 	/// @TODO: Performs the search pattern using the respective type map
 	///
+	/// @param   MetaTable object to refrence from
+	/// @param   JSql connection to use
+	/// @param   JSql table name to use
 	/// @param   where query statement
 	/// @param   where clause values array
 	/// @param   query string to sort the order by, use null to ignore
@@ -993,13 +1006,13 @@ public class JSql_MetaTableUtils {
 		JSqlResult r = runComplexQuery(metaTableObj, sql, tablename, "COUNT(DISTINCT \"oID\") AS rcount",
 			whereClause, whereValues, orderByStr, offset, limit);
 
-		List<Object> rcountArr = r.get("rcount");
+		Object[] rcountArr = r.get("rcount");
 		// Generate the object list
-		if (rcountArr != null) {
-			return ((Number) rcountArr.get(0)).longValue();
+		if (rcountArr != null && rcountArr.length > 0) {
+			return ((Number) rcountArr[0]).longValue();
 		}
 		// Blank as fallback
 		return 0;
 	}
-	*/
+	
 }

@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import picoded.dstack.MetaTable;
+import picoded.dstack.MetaObject;
 import picoded.dstack.core.Core_MetaTable;
 import picoded.security.NxtCrypt;
 import picoded.struct.GenericConvertMap;
@@ -279,8 +280,6 @@ public class JSql_MetaTable extends Core_MetaTable {
 		return ListValueConv.toStringSet(r.getObjectList("oID"));
 	}
 
-	/*
-
 	//--------------------------------------------------------------------------
 	// 
 	// Query based optimization
@@ -307,6 +306,8 @@ public class JSql_MetaTable extends Core_MetaTable {
 		//return super.query( whereClause, whereValues, orderByStr, offset, limit );
 	}
 	
+	/*
+
 	/// Performs a search query, and returns the respective MetaObjects keys
 	///
 	/// CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria

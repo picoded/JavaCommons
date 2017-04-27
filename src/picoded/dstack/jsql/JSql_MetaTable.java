@@ -28,13 +28,16 @@ public class JSql_MetaTable extends Core_MetaTable {
 	//
 	//--------------------------------------------------------------------------
 	
-	// The inner sql object
+	/// The inner sql object
 	protected JSql sqlObj = null;
 	
-	// The tablename for the key value pair map
+	/// The tablename for the key value pair map
 	protected String sqlTableName = null;
 	
-	// JSql setup 
+	/// JSql setup 
+	///
+	/// @param   JSQL connection
+	/// @param   Table name to use 
 	public JSql_MetaTable(JSql inJSql, String tablename) {
 		super();
 		sqlObj = inJSql;
@@ -217,9 +220,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 		sqlObj.dropTable(sqlTableName);
 	}
 	
-	///
 	/// Removes all data, without tearing down setup
-	///
 	@Override
 	public void clear() {
 		sqlObj.delete(sqlTableName);

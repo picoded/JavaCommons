@@ -33,7 +33,7 @@ public class JSql_Base extends JSql {
 	protected static final String WHERE = " WHERE ";
 
 	/// Blank JSQL result set, initialized once and reused
-	protected static final JSqlResult BLANK_JSQLRESULT = new JSqlResult();
+	// protected static final JSqlResult BLANK_JSQLRESULT = new JSqlResult();
 
 	//-------------------------------------------------------------------------
 	//
@@ -124,7 +124,7 @@ public class JSql_Base extends JSql {
 				} else {
 					int r = ps.executeUpdate();
 					if (r >= 0) {
-						res = BLANK_JSQLRESULT;
+						res = new JSqlResult(ps, rs, r);
 					}
 				}
 				return res;

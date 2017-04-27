@@ -1,6 +1,7 @@
 package picoded.dstack;
 
 import picoded.struct.GenericConvertMap;
+import picoded.conv.GenericConvert;
 
 ///
 /// [DO NOT USE : THIS IS CURRENTLY FLAGGED OUT TO BE REFACTORED]
@@ -34,12 +35,12 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long>, DStackCo
 	/// @returns  value of the given key
 	Long get(Object key);
 	
-	/// Returns the value, given the key
+	/// Returns the value, given the key. Then apply the delta change
 	///
 	/// @param key param find the meta key
 	/// @param delta value to add
 	///
-	/// @returns  value of the given key before adding
+	/// @returns  value of the given key, note that it returns 0 if there wasnt a previous value set
 	Long getAndAdd(Object key, Object delta);
 	
 	/// Stores (and overwrites if needed) key, value pair
@@ -55,6 +56,18 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long>, DStackCo
 	
 	// put, get varients
 	//--------------------------------------------------------------------------
+	
+	/// Stores (and overwrites if needed) key, value pair
+	///
+	/// Important note: It does not return the previously stored value
+	///
+	/// @param key as String
+	/// @param value as Number
+	///
+	/// @returns long
+	default Long put(String key, Long value) {
+		return put((Object)key, value);
+	}
 	
 	/// Stores (and overwrites if needed) key, value pair
 	///
@@ -87,11 +100,12 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long>, DStackCo
 	///
 	/// @returns  value of the given key after adding
 	default Long addAndGet(Object key, Object delta) {
-		Long res = getAndAdd(key, delta);
+		long deltaLn = GenericConvert.toLong(delta, 0);
+		Long res = getAndAdd(key, deltaLn);
 		if (res == null) {
 			return null;
 		}
-		return res.longValue() + ((Long) delta).longValue();
+		return res.longValue() + deltaLn;
 	}
 	
 	/// Returns the value, given the key, and increment it

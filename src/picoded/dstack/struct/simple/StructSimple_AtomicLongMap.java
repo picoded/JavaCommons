@@ -6,6 +6,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import picoded.dstack.*;
 import picoded.dstack.core.*;
+import picoded.conv.GenericConvert;
 
 /// Refence implementation of AtomicLongMap data structure
 ///
@@ -15,9 +16,11 @@ import picoded.dstack.core.*;
 /// As such its sacrifices much utility for performance
 public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	
-	///
-	/// Constructor vars
-	///--------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	//
+	// Constructor vars
+	//
+	//--------------------------------------------------------------------------
 	
 	/// Stores the key to value map
 	protected ConcurrentMap<String, Long> valueMap = new ConcurrentHashMap<String, Long>();
@@ -25,18 +28,22 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	/// Read write lock
 	public static final ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
 	
-	///
-	/// Constructor setup
-	///--------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	//
+	// Constructor setup
+	//
+	//--------------------------------------------------------------------------
 	
 	/// Constructor
 	public StructSimple_AtomicLongMap() {
 		// does nothing =X
 	}
 	
-	///
-	/// Backend system setup / maintenance teardown
-	///--------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	//
+	// Backend system setup / maintenance teardown
+	//
+	//--------------------------------------------------------------------------
 	
 	/// Setsup the backend storage table, etc. If needed
 	@Override
@@ -65,8 +72,10 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 		}
 	}
 	
+	//--------------------------------------------------------------------------
 	//
 	// Core put / get
+	//
 	//--------------------------------------------------------------------------
 	
 	/// Stores (and overwrites if needed) key, value pair
@@ -104,7 +113,7 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 			
 			Long val = valueMap.get(key);
 			if (val == null) {
-				return null;
+				return 0l;
 			}
 			return val;
 		} finally {
@@ -112,12 +121,12 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 		}
 	}
 	
-	/// Returns the value, given the key
+	/// Returns the value, given the key. Then apply the delta change
 	///
 	/// @param key param find the meta key
 	/// @param delta value to add
 	///
-	/// @returns  value of the given key
+	/// @returns  value of the given key, note that it returns 0 if there wasnt a previous value set
 	@Override
 	public Long getAndAdd(Object key, Object delta) {
 		try {
@@ -125,11 +134,12 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 			
 			Long oldVal = valueMap.get(key);
 			
+			// Assume 0, if old value does not exists
 			if (oldVal == null) {
-				return null;
+				oldVal = (Long)0l;
 			}
 			
-			Long newVal = oldVal + (Long) delta;
+			Long newVal = oldVal.longValue() + GenericConvert.toNumber(delta).longValue();
 			valueMap.put(key.toString(), newVal);
 			
 			return oldVal;

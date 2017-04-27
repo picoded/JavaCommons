@@ -64,6 +64,9 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 	
 	/// Total row count for query
 	private int rowCount = -1;
+
+	/// Total rows affected, this applies for update statements
+	private int affectedRows = 0;
 	
 	/// The prepared statment used for this result
 	private PreparedStatement sqlStmt = null;
@@ -82,6 +85,14 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 	public JSqlResult(PreparedStatement ps, ResultSet rs) {
 		sqlStmt = ps;
 		sqlRes = rs;
+	}
+	
+	/// Constructor with SQL resultSet
+	/// (Used internally by JSql : not to be used directly)
+	public JSqlResult(PreparedStatement ps, ResultSet rs, int inAffectedRows) {
+		sqlStmt = ps;
+		sqlRes = rs;
+		affectedRows = inAffectedRows;
 	}
 	
 	//-------------------------------------------------------------------------
@@ -206,6 +217,11 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 		return rowCount;
 	}
 	
+	/// Returns the amount of affected rows, applies only for non-select statements
+	public int affectedRows() {
+		return affectedRows;
+	}
+
 	/// Fetches all the row data, and store it into the local hashmap & array
 	///
 	/// @return rowCount on success, -1 indicate there was no SQLResult to process

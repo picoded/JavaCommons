@@ -1,6 +1,16 @@
 package picoded.dstack.jsql.connector.db;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Locale;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Properties;
 import java.util.ArrayList;
 
 import picoded.dstack.jsql.connector.*;
@@ -8,6 +18,12 @@ import picoded.set.JSqlType;
 
 /// Pure "MY"SQL implentation of JSql
 public class JSql_Mysql extends JSql_Base {
+	
+	//-------------------------------------------------------------------------
+	//
+	// Database connection handling
+	//
+	//-------------------------------------------------------------------------
 	
 	/// Runs JSql with the JDBC "MY"SQL engine
 	///
@@ -69,6 +85,170 @@ public class JSql_Mysql extends JSql_Base {
 		setupConnection();
 	}
 	
+	//-------------------------------------------------------------------------
+	//
+	// Table MetaData handling, limited use cases, 
+	// avoid use : may or may not be standardised
+	//
+	//-------------------------------------------------------------------------
+	
+	/// Executes and fetch a table column information as a map
+	///
+	/// @param  Table name
+	/// 
+	/// @return  Collumn meta information
+	public Map<String,String> getTableColumnsInformation(String tablename) {
+		// Prepare return information
+		Map<String,String> ret = new HashMap<String,String>();
+
+		try {
+			//Try and finally : prevent memory leaks
+			ResultSet sqlRes = null;
+			try {
+				// Get the collumn meta data
+				DatabaseMetaData meta = sqlConn.getMetaData();
+				sqlRes = meta.getColumns(null, null, tablename, null);
+				
+				// Process the result, and get the collumn information
+				while (sqlRes.next()) {
+					ret.put(sqlRes.getString("COLUMN_NAME").toUpperCase(Locale.ENGLISH), sqlRes
+						.getString("TYPE_NAME").toUpperCase(Locale.ENGLISH));
+				}
+
+				// Return the result
+				return ret;
+			} finally {
+				if (sqlRes != null) {
+					sqlRes.close();
+				}
+			}
+		} catch (Exception e) {
+			throw new JSqlException("getTableMetaData exception : "+tablename, e);
+		}
+	}
+
+	/// Enforces column index limits for BLOB and TEXT type
+	///
+	/// @param  Collumn infromation from `getTableColumnsInformation`
+	/// @param  Query string to sanatize
+	/// @param  Columns to scan and replace
+	/// 
+	/// @return  Sanatized query
+	public String enforceColumnIndexLimit(Map<String,String> metadata, String qStringUpper, String columns) {
+		if (metadata != null) {
+			// Get the relevent column names
+			String[] columnsArr = columns.split(",");
+
+			// For each, does a search and replace if its a BLOB or TEXT type
+			// Note that if the column ALREADY has the (size) format, it will fail the search
+			for (String column : columnsArr) {
+				column = column.trim();
+				// check if column type is BLOB or TEXT
+				if ("BLOB".equals(metadata.get(column)) || "TEXT".equals(metadata.get(column))) {
+					// repalce the column name in the origin sql statement with column name and suffic "(333)
+					qStringUpper = qStringUpper.replace(column, column + "(333)");
+				}
+			}
+		}
+		return qStringUpper;
+	}
+	/*
+
+	public String getQStringUpper(Map<String, String> metadata, String qStringUpper, String columns) {
+		if (metadata != null) {
+			String[] columnsArr = columns.split(",");
+			for (String column : columnsArr) {
+				column = column.trim();
+				// check if column type is BLOB or TEXT
+				if ("BLOB".equals(metadata.get(column)) || "TEXT".equals(metadata.get(column))) {
+					// repalce the column name in the origin sql statement with column name and suffic "(333)
+					qStringUpper = qStringUpper.replace(column, column + "(333)");
+				}
+			}
+		}
+		return qStringUpper;
+	}
+	
+
+	/// Executes the table meta data query, and returns the result object
+	public JSqlResult executeQuery_metadata(String table) {
+		JSqlResult res = null;
+		try {
+			ResultSet rs = null;
+			//Try and finally : prevent memory leaks
+			try {
+				DatabaseMetaData meta = sqlConn.getMetaData();
+				rs = meta.getColumns(null, null, table, null);
+				res = new JSqlResult(null, rs);
+				
+				//let JSqlResult "close" it
+				rs = null;
+				return res;
+			} finally {
+				if (rs != null) {
+					rs.close();
+				}
+			}
+		} catch (Exception e) {
+			throw new JSqlException("executeQuery_metadata exception", e);
+		}
+	}
+	
+	/// Fetch table Meta Data info
+	public Map<String, String> fetchMetaData() throws JSqlException {
+		Map<String, String> ret = null;
+		//ResultSet
+		if (sqlRes != null) {
+			ret = new HashMap<String, String>();
+			try {
+				while (sqlRes.next()) {
+					ret.put(sqlRes.getString("COLUMN_NAME").toUpperCase(Locale.ENGLISH), sqlRes
+						.getString("TYPE_NAME").toUpperCase(Locale.ENGLISH));
+				}
+			} catch (Exception e) {
+				throw new JSqlException("Error fetching sql meta data", e);
+			}
+		}
+		return ret;
+	}
+
+	/// Executes the table meta data query, and returns the result object
+	public Map<String, String> getMetaData(String sql) {
+		Map<String, String> metaData = null;
+		ResultSet rs = null;
+		//Try and finally : prevent memory leaks
+		try {
+			try {
+				Statement st = sqlConn.createStatement();
+				rs = st.executeQuery(sql);
+				ResultSetMetaData rsMetaData = rs.getMetaData();
+				int numberOfColumns = rsMetaData.getColumnCount();
+				for (int i = 1; i <= numberOfColumns; i++) {
+					if (metaData == null) {
+						metaData = new HashMap<String, String>();
+					}
+					metaData.put(rsMetaData.getColumnName(i), rsMetaData.getColumnTypeName(i));
+				}
+			} finally {
+				if (rs != null) {
+					rs.close();
+				}
+				rs = null;
+			}
+		} catch (Exception e) {
+			throw new JSqlException("executeQuery_metadata exception", e);
+		}
+		return metaData;
+	}
+	*/
+
+
+	//-------------------------------------------------------------------------
+	//
+	// Generic SQL conversion and query
+	//
+	//-------------------------------------------------------------------------
+	
 	/// Internal parser that converts some of the common sql statements to sqlite
 	/// This converts one SQL convention to another as needed
 	///
@@ -76,13 +256,141 @@ public class JSql_Mysql extends JSql_Base {
 	///
 	/// @return  SQL query that was converted
 	public String genericSqlParser(String inString) {
+
+		// Normalize all syntax to upper case
 		String qString = inString.toUpperCase(Locale.ENGLISH);
 		qString = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("\\s+", " ")
 			.replaceAll("\"", "`")
 			//.replaceAll("\'", "`")
 			.replaceAll("AUTOINCREMENT", "AUTO_INCREMENT").replace("VARCHAR(MAX)", "TEXT");
 		
+		// MySQL does not support the inner query in create view
+		//
+		// Check if create view query has an inner query.
+		// If yes, create a view from the inner query and replace the inner query with created view.
+		if (qString.contains("CREATE VIEW")) {
+			// get view name
+			int indexAs = qString.indexOf("AS");
+			String viewName = "";
+			if (indexAs != -1) {
+				viewName = qString.substring("CREATE VIEW".length(), indexAs);
+			}
+			// check if any inner query
+			int indexOpeningBracket = -1;
+			int indexFrom = qString.indexOf("FROM") + "FROM".length();
+			// find if next char is bracket
+			for (int i = indexFrom; i < qString.length(); i++) {
+				if (qString.charAt(i) == ' ') {
+					continue;
+				}
+				if (qString.charAt(i) == '(') {
+					indexOpeningBracket = i;
+				} else {
+					break;
+				}
+			}
+			
+			int indexClosingIndex = -1;
+			String tmpViewName = null;
+			String createViewQuery = null;
+			if (indexOpeningBracket != -1) {
+				tmpViewName = viewName;
+				if (viewName.indexOf('_') != -1) {
+					tmpViewName = viewName.split("_")[0];
+				}
+				tmpViewName += "_inner_view";
+				indexClosingIndex = qString.indexOf(')', indexOpeningBracket);
+				
+				String innerQuery = qString.substring(indexOpeningBracket + 1, indexClosingIndex);
+				createViewQuery = "CREATE VIEW " + tmpViewName + " AS " + innerQuery;
+			}
+			
+			if (createViewQuery != null) {
+				// execute query to drop the view if exist
+				String dropViewQuery = "DROP VIEW IF EXISTS " + tmpViewName;
+				
+				// Drop the view 'temporarily' if previously exists
+				update_raw(genericSqlParser(dropViewQuery));
+				
+				// execute the query to create view 'temporarily'
+				update_raw(genericSqlParser(createViewQuery));
+				
+				// replace the inner query with created view name
+				qString = qString.substring(0, indexFrom) + tmpViewName
+					+ qString.substring(indexClosingIndex + 1);
+			}
+		}
+
+		// Possible "INDEX IF NOT EXISTS" call for mysql, suppress duplicate index error if needed
+		//
+		// This is a work around for MYSQL not supporting the "CREATE X INDEX IF NOT EXISTS" syntax
+		//
+		if (qString.indexOf("INDEX IF NOT EXISTS") != -1) {
+			// index conflict try catch
+			qString = qString.replaceAll("INDEX IF NOT EXISTS", "INDEX");
+			
+			// It is must to define the The length of the BLOB and TEXT column type
+			//
+			// This is how to enforce it
+			// sample script : "CREATE UNIQUE INDEX `JSQLTEST_UNIQUE` ON `JSQLTEST` ( COL1, COL2, COL3 )"
+			//
+			// Find the "ON" word index
+			int onIndex = qString.indexOf("ON");
+			// if index == -1 then it is not a valid sql statement
+			if (onIndex != -1) {
+				// subtract the table name and columns from the sql statement string
+				String tableAndColumnsName = qString.substring(onIndex + "ON".length());
+				// Find the index of opening bracket index.
+				// The column names will be enclosed between the opening and closing bracket
+				// And table name will be before the opening bracket
+				int openBracketIndex = tableAndColumnsName.indexOf('(');
+				if (openBracketIndex != -1) {
+					// extract the table name which is till the opening bracket
+					String tablename = tableAndColumnsName.substring(0, openBracketIndex);
+					// find the closing bracket index
+					int closeBracketIndex = tableAndColumnsName.lastIndexOf(')');
+					// extract the columns between the opening and closing brackets
+					String columns = tableAndColumnsName.substring(openBracketIndex + 1,
+						closeBracketIndex);
+					// fetch the table meta data info
+					Map<String, String> metadata = getTableColumnsInformation(tablename);
+					// Enforce the column index limits
+					// It is must to define the The length of the BLOB and TEXT column type
+					// Append the maximum length "333" to BLOB and TEXT columns
+					qString = enforceColumnIndexLimit(metadata, qString, columns);
+				}
+			}
+		}
+
 		return qString;
+	}
+
+	/// Internal exception catching, used for cases which its not possible to 
+	/// easily handle with pure SQL query. Or cases where the performance cost in the
+	/// the query does not justify its usage (edge cases)
+	///
+	/// This is the actual implmentation to overwrite
+	///
+	/// This acts as a filter for query, noFetchQuery, and update respectively
+	///
+	/// @param  SQL query to "normalize"
+	/// @param  The "normalized" sql query
+	/// @param  The exception caught, as a stack trace string
+	///
+	/// @return  TRUE, if the exception can be safely ignored
+	protected boolean sanatizeErrors(String originalQuery, String normalizedQuery, String stackTrace) {
+		if( super.sanatizeErrors(originalQuery, normalizedQuery, stackTrace) ) {
+			return true;
+		}
+
+		// Possible "INDEX IF NOT EXISTS" call for mysql, suppress duplicate index error if needed
+		if( originalQuery.indexOf("INDEX IF NOT EXISTS") >= 0) {
+			if(stackTrace.indexOf("com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Duplicate key name '") > 0) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	//-------------------------------------------------------------------------
@@ -92,22 +400,24 @@ public class JSql_Mysql extends JSql_Base {
 	//-------------------------------------------------------------------------
 	
 	///
-	/// SQLite specific UPSERT support
+	/// MYSQL specific UPSERT support
+	///
+	/// The following is an example syntax
 	///
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
-	/// INSERT OR REPLACE INTO Employee (
-	///	id,      // Unique Columns to check for upsert
-	///	fname,   // Insert Columns to update
-	///	lname,   // Insert Columns to update
-	///	role,    // Default Columns, that has default fallback value
-	///   note,    // Misc Columns, which existing values are preserved (if exists)
+	/// INSERT INTO Employee (
+	/// 	id,      // Unique Columns to check for upsert
+	/// 	fname,   // Insert Columns to update
+	/// 	lname,   // Insert Columns to update
+	/// 	role     // Default Columns, that has default fallback value
 	/// ) VALUES (
-	///	1,       // Unique value
+	/// 	1,       // Unique value
 	/// 	'Tom',   // Insert value
-	/// 	'Hanks', // Update value
-	///	COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'), // Values with default
-	///	(SELECT note FROM Employee WHERE id = 1) // Misc values to preserve
-	/// );
+	/// 	'Hanks', // Insert value
+	/// 	'Benchwarmer' // Default fallback value
+	/// ) ON DUPLICATE KEY UPDATE
+	/// 	fname = 'Tom'   //Only update upsert values
+	/// 	lname = 'Hanks' // Only update upsert values
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	///
 	/// @param  Table name to query        (eg: tableName)
@@ -129,105 +439,91 @@ public class JSql_Mysql extends JSql_Base {
 		//
 		String[] insertColumns, // Columns names to update
 		Object[] insertValues, // Values to update
-		//
-		String[] defaultColumns, //
 		// Columns names to apply default value, if not exists
 		// Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+		String[] defaultColumns, //
 		Object[] defaultValues, //
 		// Various column names where its existing value needs to be maintained (if any),
 		// this is important as some SQL implementation will fallback to default table values, if not properly handled
-		String[] miscColumns //
+		String[] miscColumns // This is ignored in mysql
 	) {
 		
-		/// Checks that unique collumn and values length to be aligned
+		// Checks that unique collumn and values length to be aligned
 		if (uniqueColumns == null || uniqueValues == null
 			|| uniqueColumns.length != uniqueValues.length) {
-			throw new JSqlException(
-				"Upsert query requires unique column and values to be equal length");
+			throw new JSqlException("Upsert query requires unique column and values to be equal length");
 		}
 		
-		/// Preparing inner default select, this will be used repeatingly for COALESCE, DEFAULT and MISC values
-		ArrayList<Object> innerSelectArgs = new ArrayList<Object>();
-		StringBuilder innerSelectSB = new StringBuilder(" FROM ");
-		innerSelectSB.append("`" + tableName + "`");
-		innerSelectSB.append(WHERE);
-		for (int a = 0; a < uniqueColumns.length; ++a) {
-			if (a > 0) {
-				innerSelectSB.append(" AND ");
-			}
-			innerSelectSB.append(uniqueColumns[a] + " = ?");
-			innerSelectArgs.add(uniqueValues[a]);
-		}
-		innerSelectSB.append(")");
-		
-		String innerSelectPrefix = "(SELECT ";
-		String innerSelectSuffix = innerSelectSB.toString();
-		/// Building the query for INSERT OR REPLACE
-		StringBuilder queryBuilder = new StringBuilder("INSERT OR REPLACE INTO `" + tableName + "` (");
+		// Build the final, actual query args
+		StringBuilder queryBuilder = new StringBuilder();
+		StringBuilder valuesSegment = new StringBuilder();
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
-		/// Building the query for both sides of '(...columns...) VALUE (...vars...)' clauses in upsert
-		/// Note that the final trailing ", " seperator will be removed prior to final query conversion
-		StringBuilder columnNames = new StringBuilder();
-		StringBuilder columnValues = new StringBuilder();
-		String columnSeperator = ", ";
-		/// Setting up unique values
-		for (int a = 0; a < uniqueColumns.length; ++a) {
-			columnNames.append(uniqueColumns[a]);
-			columnNames.append(columnSeperator);
-			//
-			columnValues.append("?");
-			columnValues.append(columnSeperator);
-			//
-			queryArgs.add(uniqueValues[a]);
+
+		// Prepare the prefix
+		queryBuilder.append("INSERT INTO ");
+		queryBuilder.append("`" + tableName + "`");
+		queryBuilder.append(" ( ");
+		valuesSegment.append("VALUES ( ");
+
+		// Lets start with unique names / values
+		for( int i = 0; i < uniqueColumns.length; ++i ) {
+			if( i > 0 ) {
+				queryBuilder.append(", ");
+				valuesSegment.append(", ");
+			}
+
+			// Actual name and values tokens
+			queryBuilder.append(uniqueColumns[i]);
+			valuesSegment.append("?");
+			queryArgs.add(uniqueValues[i]);
 		}
-		/// Inserting updated values
-		if (insertColumns != null) {
-			for (int a = 0; a < insertColumns.length; ++a) {
-				columnNames.append(insertColumns[a]);
-				columnNames.append(columnSeperator);
-				//
-				columnValues.append("?");
-				columnValues.append(columnSeperator);
-				//
-				queryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]
-					: null);
+
+		// And the insert columns names / values
+		if( insertColumns != null ) {
+			for( int i = 0; i < insertColumns.length; ++i ) {
+				// Since this is post unique value, always valid
+				queryBuilder.append(", ");
+				valuesSegment.append(", ");
+				
+				// Actual name and value tokens
+				queryBuilder.append(insertColumns[i]);
+				valuesSegment.append("?");
+				queryArgs.add(insertValues[i]);
 			}
 		}
-		/// Handling default values
-		if (defaultColumns != null) {
-			for (int a = 0; a < defaultColumns.length; ++a) {
-				columnNames.append(defaultColumns[a]);
-				columnNames.append(columnSeperator);
-				columnValues.append(COALESCE);
-				columnValues.append(innerSelectPrefix);
-				columnValues.append(defaultColumns[a]);
-				columnValues.append(innerSelectSuffix);
-				queryArgs.addAll(innerSelectArgs);
-				columnValues.append(", ?)");
-				columnValues.append(columnSeperator);
-				queryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a]
-					: null);
+
+		// And the default columns names / values
+		if( defaultColumns != null ) {
+			for( int i = 0; i < defaultColumns.length; ++i ) {
+				// Since this is post unique value, always valid
+				queryBuilder.append(", ");
+				valuesSegment.append(", ");
+				
+				// Actual name and value tokens
+				queryBuilder.append(defaultColumns[i]);
+				valuesSegment.append("?");
+				queryArgs.add(defaultValues[i]);
 			}
 		}
-		/// Handling Misc values
-		if (miscColumns != null) {
-			for (int a = 0; a < miscColumns.length; ++a) {
-				columnNames.append(miscColumns[a]);
-				columnNames.append(columnSeperator);
-				columnValues.append(innerSelectPrefix);
-				columnValues.append(miscColumns[a]);
-				columnValues.append(innerSelectSuffix);
-				queryArgs.addAll(innerSelectArgs);
-				columnValues.append(columnSeperator);
+
+		// Condensing the information
+		valuesSegment.append(" ) ");
+		queryBuilder.append(" ) ");
+		queryBuilder.append(valuesSegment);
+		queryBuilder.append("ON DUPLICATE KEY UPDATE ");
+
+		// Handling the insert values on key conflict, see
+		// https://dev.mysql.com/doc/refman/5.7/en/insert-on-duplicate.html
+		if( insertColumns != null ) {
+			for( int i = 0; i < insertColumns.length; ++i ) {
+				if( i > 0 ) {
+					queryBuilder.append(", ");
+				}
+				queryBuilder.append(insertColumns[i]+" = VALUES("+insertColumns[i]+")");
 			}
 		}
-		/// Building the final query
-		queryBuilder
-			.append(columnNames.substring(0, columnNames.length() - columnSeperator.length()));
-		queryBuilder.append(") VALUES (");
-		queryBuilder.append(columnValues.substring(0,
-			columnValues.length() - columnSeperator.length()));
-		queryBuilder.append(")");
+		
+		// Builde the actual statement, to run!
 		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 	

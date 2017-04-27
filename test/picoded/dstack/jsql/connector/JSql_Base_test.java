@@ -51,8 +51,8 @@ public class JSql_Base_test {
 	@Test
 	public void simpleQueryFlow_raw() {
 		// Creating and inserting the result
-		assertTrue( jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
-		assertTrue( jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
+		assertEquals(0, jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
+		assertEquals(1, jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
 
 		// Query and validating data
 		JSqlResult res = null;
@@ -65,7 +65,7 @@ public class JSql_Base_test {
 		res.dispose();
 
 		// Table cleanup
-		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );
+		jsqlObj.update_raw("DROP TABLE "+testTableName+"");
 	}
 
 	/// simpleQueryFlow, with built CREATE TABLE statement instead
@@ -73,7 +73,7 @@ public class JSql_Base_test {
 	public void simpleQueryFlow_createTable() {
 		// Creating and inserting the result
 		assertTrue( jsqlObj.createTable(testTableName, new String[] { "COL1" }, new String[] { "INTEGER" }) );
-		assertTrue( jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
+		assertEquals(1, jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
 
 		// Query and validating data
 		JSqlResult res = null;
@@ -86,7 +86,7 @@ public class JSql_Base_test {
 		res.dispose();
 
 		// Table cleanup
-		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );
+		jsqlObj.update_raw("DROP TABLE "+testTableName+"");
 	}
 
 
@@ -94,8 +94,8 @@ public class JSql_Base_test {
 	@Test
 	public void simpleQueryFlow_select() {
 		// Creating and inserting the result
-		assertTrue( jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
-		assertTrue( jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
+		assertEquals(0, jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
+		assertEquals(1, jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
 
 		// Query and validating data
 		JSqlResult res = null;
@@ -108,14 +108,14 @@ public class JSql_Base_test {
 		res.dispose();
 
 		// Table cleanup
-		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );
+		jsqlObj.update_raw("DROP TABLE "+testTableName+"");
 	}
 
 	/// simpleQueryFlow, with built UPSERT statement instead, modified with primary key
 	@Test
 	public void simpleQueryFlow_upsert() {
 		// Creating and inserting the result
-		assertTrue( jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER PRIMARY KEY )") );
+		assertEquals(0, jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER PRIMARY KEY )") );
 
 		// Upserting only the primary key, rest is to be facilitated in other tests
 		assertTrue( jsqlObj.upsert(testTableName, new String[] { "COL1" }, new Object[] { 1 }, null, null, null, null, null) );
@@ -131,7 +131,7 @@ public class JSql_Base_test {
 		res.dispose();
 
 		// Table cleanup
-		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );
+		jsqlObj.update_raw("DROP TABLE "+testTableName+"");
 	}
 
 	/// Simple raw query of creating, writing, reading, and deleting test
@@ -139,8 +139,8 @@ public class JSql_Base_test {
 	@Test
 	public void simpleQueryFlow_delete() {
 		// Creating and inserting the result
-		assertTrue( jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
-		assertTrue( jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
+		assertEquals(0, jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
+		assertEquals(1, jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
 
 		// Query and validating data
 		JSqlResult res = null;
@@ -153,14 +153,14 @@ public class JSql_Base_test {
 		assertEquals( ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res) );
 
 		// Delete from the table
-		assertTrue( jsqlObj.delete(testTableName) );
+		assertEquals(1, jsqlObj.delete(testTableName) );
 
 		// Check for no data
 		assertNotNull( res = jsqlObj.query_raw("SELECT * FROM "+testTableName+"") );
 		assertEquals( 0, res.rowCount() );
 
 		// Reinsert a different data
-		assertTrue( jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (2)") );
+		assertEquals(1, jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (2)") );
 
 		// Requery for new data strictly
 		assertNotNull( res = jsqlObj.query_raw("SELECT * FROM "+testTableName+"") );
@@ -171,7 +171,7 @@ public class JSql_Base_test {
 		assertEquals( ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res) );
 
 		// Table cleanup
-		assertTrue( jsqlObj.update_raw("DROP TABLE "+testTableName+"") );
+		jsqlObj.update_raw("DROP TABLE "+testTableName+"");
 	}
 
 
@@ -179,7 +179,7 @@ public class JSql_Base_test {
 	@Test
 	public void createTableStatementBuilder() {
 		// cleanup (just incase)
-		assertTrue( jsqlObj.update("DROP TABLE IF EXISTS `" + testTableName + "`") ); 
+		assertEquals(0, jsqlObj.update("DROP TABLE IF EXISTS `" + testTableName + "`") ); 
 		
 		// valid table creation : no exception
 		assertTrue( jsqlObj.createTable(testTableName, new String[] { "col1", "col2" },
@@ -190,10 +190,10 @@ public class JSql_Base_test {
 			new String[] { "INT PRIMARY KEY", "TEXT" }) ); 
 		
 		// Truncate call, (ensure no prior data)
-		assertTrue(  jsqlObj.update("TRUNCATE TABLE " + testTableName + "") ); 
+		assertEquals(0, jsqlObj.update("TRUNCATE TABLE " + testTableName + "") ); 
 		
 		// Data insertion
-		assertTrue( jsqlObj.update("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404,
+		assertEquals(1, jsqlObj.update("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404,
 			"has nothing") );
 	}
 	
@@ -201,17 +201,17 @@ public class JSql_Base_test {
 	@Test
 	public void updateStatements() {
 		// cleanup (just incase)
-		assertTrue( jsqlObj.update("DROP TABLE IF EXISTS `" + testTableName + "`") ); 
+		assertEquals(0, jsqlObj.update("DROP TABLE IF EXISTS `" + testTableName + "`") ); 
 		
-		assertTrue(jsqlObj.update(
+		assertEquals(0, jsqlObj.update(
 			"CREATE TABLE IF NOT EXISTS " + testTableName
 				+ " ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50) )")); //valid table creation : no exception
-		assertTrue(jsqlObj.update(
+		assertEquals(0, jsqlObj.update(
 			"CREATE TABLE IF NOT EXISTS " + testTableName
 				+ " ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50) )")); //run twice to ensure "IF NOT EXISTS" works
 		
 		// Truncate call, (ensure no prior data)
-		assertTrue(  jsqlObj.update("TRUNCATE TABLE " + testTableName + "") ); 
+		assertEquals(0, jsqlObj.update("TRUNCATE TABLE " + testTableName + "") ); 
 		
 		// Data insertion
 		jsqlObj.update("INSERT INTO " + testTableName + " ( col1, col2, col3 ) VALUES (?,?,?)",
@@ -309,15 +309,13 @@ public class JSql_Base_test {
 	public void uniqueIndexIfNotExists() {
 		updateStatements();
 		
-		assertTrue(
-			"1st uniq index",
-			jsqlObj.update("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName + "_uni1` ON `"
-				+ testTableName + "` ( col1, col2 )"));
+		/// 1st unique index
+		jsqlObj.update("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName + "_uni1` ON `"
+			+ testTableName + "` ( col1, col2 )");
 		
-		assertTrue(
-			"2nd uniq index",
-			jsqlObj.update("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName + "_uni2` ON `"
-				+ testTableName + "` ( col3 )"));
+		/// 2nd unique index
+		jsqlObj.update("CREATE UNIQUE INDEX IF NOT EXISTS `" + testTableName + "_uni2` ON `"
+			+ testTableName + "` ( col3 )");
 	}
 	
 	public void row1to7setup() {

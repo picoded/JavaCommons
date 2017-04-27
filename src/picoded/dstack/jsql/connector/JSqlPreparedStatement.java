@@ -52,7 +52,7 @@ public class JSqlPreparedStatement {
 	/// result into a memory leak.
 	///
 	/// **Note:** Only queries starting with 'SELECT' will produce a JSqlResult object that has fetchable results
-	public JSqlResult noFetchQuery() throws JSqlException {
+	public JSqlResult noFetchQuery() {
 		return jsqlObj.noFetchQuery(sqlQuery, sqlArgs);
 	}
 	
@@ -62,7 +62,7 @@ public class JSqlPreparedStatement {
 	/// Custom SQL specific parsing occurs here
 	///
 	/// **Note:** Only queries starting with 'SELECT' will produce a JSqlResult object that has fetchable results
-	public JSqlResult query() throws JSqlException {
+	public JSqlResult query() {
 		return jsqlObj.query(sqlQuery, sqlArgs);
 	}
 	
@@ -71,7 +71,7 @@ public class JSqlPreparedStatement {
 	/// Returns false if no result object is given by the execution call. 
 	///
 	/// Custom SQL specific parsing occurs here
-	public boolean update() throws JSqlException {
+	public int update() {
 		return jsqlObj.update(sqlQuery, sqlArgs);
 	}
 }

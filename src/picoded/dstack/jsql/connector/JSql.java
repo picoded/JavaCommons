@@ -176,7 +176,7 @@ public abstract class JSql {
 	/// @param  Array of arguments to do the variable subtitution
 	///
 	/// @return  JSQL result set
-	public JSqlResult query_raw(String qString, Object... values) throws JSqlException {
+	public JSqlResult query_raw(String qString, Object... values) {
 		JSqlResult result = noFetchQuery_raw(qString, values);
 		if (result != null) {
 			result.fetchAllRows();
@@ -195,7 +195,7 @@ public abstract class JSql {
 	/// @param  Array of arguments to do the variable subtitution
 	///
 	/// @return  JSQL result set
-	public JSqlResult noFetchQuery_raw(String qString, Object... values) throws JSqlException {
+	public JSqlResult noFetchQuery_raw(String qString, Object... values) {
 		throw new UnsupportedOperationException(JSqlException.invalidDatabaseImplementationException);
 	}
 
@@ -208,14 +208,19 @@ public abstract class JSql {
 	/// @param  Query strings including substituable variable "?"
 	/// @param  Array of arguments to do the variable subtitution
 	///
-	/// @return  true if operation is succesful
-	public boolean update_raw(String qString, Object... values) throws JSqlException {
-		return query_raw(qString, values) != null;
+	/// @return  -1 if failed, 0 and above for affected rows
+	public int update_raw(String qString, Object... values) {
+		JSqlResult r = query_raw(qString, values);
+		if( r == null ) {
+			return -1;
+		} else {
+			return r.affectedRows();
+		}
 	}
 
 	//-------------------------------------------------------------------------
 	//
-	// SQL parser
+	// Generic SQL conversion and query
 	//
 	//-------------------------------------------------------------------------
 	
@@ -224,16 +229,52 @@ public abstract class JSql {
 	/// by query / update. Doing common regex substitutions if needed.
 	///
 	/// Long term plan is to convert this to a much more proprely structed AST engine.
-	public String genericSqlParser(String inString) throws JSqlException {
-		return inString;
+	///
+	/// @param  SQL query to "normalize"
+	///
+	/// @return  SQL query that was converted
+	public String genericSqlParser(String qString) {
+		return qString;
 	}
-	
-	//-------------------------------------------------------------------------
-	//
-	// Normalized, and parsed query/execute command sets
-	//
-	//-------------------------------------------------------------------------
-	
+
+	/// Internal exception catching, used for cases which its not possible to 
+	/// easily handle with pure SQL query. Or cases where the performance cost in the
+	/// the query does not justify its usage (edge cases)
+	///
+	/// This acts as a filter for query, noFetchQuery, and update respectively
+	///
+	/// @param  SQL query to "normalize"
+	/// @param  The "normalized" sql query
+	/// @param  The exception caught
+	///
+	/// @return  TRUE, if the exception can be safely ignored
+	protected boolean sanatizeErrors(String originalQuery, String normalizedQuery, JSqlException e) {
+		String stackTrace = org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e);
+		return sanatizeErrors( originalQuery.toUpperCase(), normalizedQuery.toUpperCase(), stackTrace );
+	}
+
+	/// Internal exception catching, used for cases which its not possible to 
+	/// easily handle with pure SQL query. Or cases where the performance cost in the
+	/// the query does not justify its usage (edge cases)
+	///
+	/// This is the actual implmentation to overwrite
+	///
+	/// This acts as a filter for query, noFetchQuery, and update respectively
+	///
+	/// @param  SQL query to "normalize"
+	/// @param  The "normalized" sql query
+	/// @param  The exception caught, as a stack trace string
+	///
+	/// @return  TRUE, if the exception can be safely ignored
+	protected boolean sanatizeErrors(String originalQuery, String normalizedQuery, String stackTrace) {
+		if( originalQuery.indexOf("DROP TABLE IF EXISTS ") >= 0) {
+			if( stackTrace.indexOf("missing database") > 0 ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/// Executes the argumented SQL query, and immediately fetches the result from
 	/// the database into the result set. 
 	///
@@ -245,12 +286,19 @@ public abstract class JSql {
 	/// @param  Array of arguments to do the variable subtitution
 	///
 	/// @return  JSQL result set
-	public JSqlResult query(String qString, Object... values) throws JSqlException {
-		JSqlResult result = noFetchQuery(qString, values);
-		if (result != null) {
-			result.fetchAllRows();
+	public JSqlResult query(String qString, Object... values) {
+		String parsedQuery = genericSqlParser(qString);
+		try {
+			return query_raw(parsedQuery, values);
+		} catch( JSqlException e ) {
+			if( sanatizeErrors(qString, parsedQuery, e) ) {
+				// Sanatization passed, return a token JSqlResult 
+				return new JSqlResult(null,null,0);
+			} else {
+				// If sanatization fails, rethrows error
+				throw e;
+			}
 		}
-		return result;
 	}
 	
 	/// Executes the argumented SQL query, and returns the result object *without*
@@ -264,8 +312,19 @@ public abstract class JSql {
 	/// @param  Array of arguments to do the variable subtitution
 	///
 	/// @return  JSQL result set
-	public JSqlResult noFetchQuery(String qString, Object... values) throws JSqlException {
-		throw new UnsupportedOperationException(JSqlException.invalidDatabaseImplementationException);
+	public JSqlResult noFetchQuery(String qString, Object... values) {
+		String parsedQuery = genericSqlParser(qString);
+		try {
+			return noFetchQuery_raw(parsedQuery, values );
+		} catch( JSqlException e ) {
+			if( sanatizeErrors(qString, parsedQuery, e) ) {
+				// Sanatization passed, return a token JSqlResult 
+				return new JSqlResult(null,null,0);
+			} else {
+				// If sanatization fails, rethrows error
+				throw e;
+			}
+		}
 	}
 
 	/// Executes the argumented SQL update.
@@ -277,9 +336,20 @@ public abstract class JSql {
 	/// @param  Query strings including substituable variable "?"
 	/// @param  Array of arguments to do the variable subtitution
 	///
-	/// @return  JSQL result set
-	public boolean update(String qString, Object... values) throws JSqlException {
-		throw new UnsupportedOperationException(JSqlException.invalidDatabaseImplementationException);
+	/// @return  -1 if failed, 0 and above for affected rows
+	public int update(String qString, Object... values) {
+		String parsedQuery = genericSqlParser(qString);
+		try {
+			return update_raw(parsedQuery, values );
+		} catch( JSqlException e ) {
+			if( sanatizeErrors(qString, parsedQuery, e) ) {
+				// Sanatization passed, return a token JSqlResult 
+				return 0;
+			} else {
+				// If sanatization fails, rethrows error
+				throw e;
+			}
+		}
 	}
 
 	/// Prepare an SQL statement, for execution subsequently later
@@ -291,7 +361,7 @@ public abstract class JSql {
 	///
 	/// @return  Prepared statement
 	public JSqlPreparedStatement prepareStatement(String qString, Object... values) {
-		return new JSqlPreparedStatement(qString, values, this);
+		return new JSqlPreparedStatement( qString, values, this );
 	}
 	
 	//-------------------------------------------------------------------------
@@ -348,7 +418,7 @@ public abstract class JSql {
 	/// Sets the auto commit level
 	///
 	/// @param  The auto commit level flag to set
-	public void setAutoCommit(boolean autoCommit) throws JSqlException {
+	public void setAutoCommit(boolean autoCommit) {
 		try {
 			sqlConn.setAutoCommit(autoCommit);
 		} catch (Exception e) {
@@ -359,7 +429,7 @@ public abstract class JSql {
 	/// Gets the current auto commit setting
 	///
 	/// @return true if auto commit is enabled
-	public boolean getAutoCommit() throws JSqlException {
+	public boolean getAutoCommit() {
 		try {
 			return sqlConn.getAutoCommit();
 		} catch (Exception e) {
@@ -368,7 +438,7 @@ public abstract class JSql {
 	}
 	
 	/// Runs the commit (use only if setAutoCommit is false)
-	public void commit() throws JSqlException {
+	public void commit() {
 		try {
 			sqlConn.commit();
 		} catch (Exception e) {
@@ -402,7 +472,7 @@ public abstract class JSql {
 		String[] columnName, // The column names
 		String[] columnTypes // The column types
 	) {
-		return createTableStatement(tableName, columnName, columnTypes).update();
+		return createTableStatement(tableName, columnName, columnTypes).update() >= 0;
 	}
 	
 	///
@@ -611,7 +681,7 @@ public abstract class JSql {
 			insertColumns, insertValues, //
 			null, null, //
 			null //
-		).update();
+		).update() >= 1;
 	}
 
 	///
@@ -653,7 +723,7 @@ public abstract class JSql {
 			insertColumns, insertValues, //
 			defaultColumns, defaultValues, //
 			miscColumns //
-		).update();
+		).update() >= 1;
 	}
 	
 	///
@@ -756,8 +826,8 @@ public abstract class JSql {
 	///
 	/// @param  Table name to query        (eg: tableName)
 	///
-	/// @return  true, if DELETE statement executed succesfuly
-	public boolean delete( //
+	/// @return  the number of rows affected
+	public int delete( //
 		String tableName // Table name to select from
 	) {
 		return deleteStatement(tableName, null, null).update();
@@ -773,8 +843,8 @@ public abstract class JSql {
 	/// @param  Where statement to filter  (eg: col1=?)
 	/// @param  Where arguments value      (eg: [value/s])
 	///
-	/// @return  true, if DELETE statement executed succesfuly
-	public boolean delete( //
+	/// @return  the number of rows affected
+	public int delete( //
 		String tableName, // Table name to select from
 		//
 		String whereStatement, // The Columns to apply where clause, this must be sql neutral
@@ -851,8 +921,6 @@ public abstract class JSql {
 	///
 	/// The syntax below, is an example of such an DROP TABLE IF EXISTS statement for SQLITE.
 	///
-	/// Note : That due to its "try catch" nature currently, there is no statment varient for this command.
-	///
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
 	/// DROP TABLE IF NOT EXISTS TABLENAME
 	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -864,15 +932,27 @@ public abstract class JSql {
 	public boolean dropTable(
 		String tablename //Table name to drop
 	) {
-		try {
-			return update("DROP TABLE IF EXISTS " + tablename); //IF EXISTS
-		} catch (JSqlException e) {
-			String stackTrace = org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e);
-			if( stackTrace.indexOf("missing database") > 0 ) {
-				return true;
-			}
-			throw e;
-		}
+		return (dropTableStatement(tablename).update() >= 0);
+	}
+
+	///
+	/// Helps generate an SQL DROP TABLE IF EXISTS request. This function was created to acommedate the various
+	/// syntax differances of DROP TABLE IF EXISTS across the various SQL vendors (if any).
+	///
+	/// The syntax below, is an example of such an DROP TABLE IF EXISTS statement for SQLITE.
+	///
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	/// DROP TABLE IF NOT EXISTS TABLENAME
+	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	///
+	/// @param  Table name to drop        (eg: tableName)
+	///
+	/// @return  true, if DROP TABLE execution is succesful
+	///
+	public JSqlPreparedStatement dropTableStatement(
+		String tablename //Table name to drop
+	) {
+		return prepareStatement("DROP TABLE IF EXISTS " + tablename);
 	}
 
 	//-------------------------------------------------------------------------
@@ -897,7 +977,7 @@ public abstract class JSql {
 		//
 		String columnNames // The column name to create the index on
 	) {
-		return createIndexStatement(tableName, columnNames, null, null).update();
+		return createIndexStatement(tableName, columnNames, null, null).update() >= 0;
 	}
 
 	///
@@ -919,7 +999,7 @@ public abstract class JSql {
 		//
 		String indexType // The index type if given, can be null
 	) {
-		return createIndexStatement(tableName, columnNames, indexType, null).update();
+		return createIndexStatement(tableName, columnNames, indexType, null).update() >= 0;
 	}
 
 	///
@@ -944,7 +1024,7 @@ public abstract class JSql {
 		//
 		String indexSuffix // The index name suffix, its auto generated if null
 	) {
-		return createIndexStatement(tableName, columnNames, indexType, indexSuffix).update();
+		return createIndexStatement(tableName, columnNames, indexType, indexSuffix).update() >= 0;
 	}
 
 	///
@@ -1013,7 +1093,7 @@ public abstract class JSql {
 	
 	/*
 	/// Executes the table meta data query, and returns the result object
-	public JSqlResult executeQuery_metadata(String table) throws JSqlException {
+	public JSqlResult executeQuery_metadata(String table) {
 		JSqlResult res = null;
 		try {
 			ResultSet rs = null;
@@ -1037,7 +1117,7 @@ public abstract class JSql {
 	}
 	
 	/// Executes the table meta data query, and returns the result object
-	public Map<String, String> getMetaData(String sql) throws JSqlException {
+	public Map<String, String> getMetaData(String sql) {
 		Map<String, String> metaData = null;
 		ResultSet rs = null;
 		//Try and finally : prevent memory leaks

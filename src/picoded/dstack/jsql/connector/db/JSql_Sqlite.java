@@ -89,7 +89,7 @@ public class JSql_Sqlite extends JSql_Base {
 	/// ) VALUES (
 	///	1,       // Unique value
 	/// 	'Tom',   // Insert value
-	/// 	'Hanks', // Update value
+	/// 	'Hanks', // Insert value
 	///	COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'), // Values with default
 	///	(SELECT note FROM Employee WHERE id = 1) // Misc values to preserve
 	/// );
@@ -114,10 +114,9 @@ public class JSql_Sqlite extends JSql_Base {
 		//
 		String[] insertColumns, // Columns names to update
 		Object[] insertValues, // Values to update
-		//
-		String[] defaultColumns, //
 		// Columns names to apply default value, if not exists
 		// Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+		String[] defaultColumns, //
 		Object[] defaultValues, //
 		// Various column names where its existing value needs to be maintained (if any),
 		// this is important as some SQL implementation will fallback to default table values, if not properly handled

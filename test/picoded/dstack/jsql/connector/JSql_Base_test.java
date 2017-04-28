@@ -13,6 +13,13 @@ import picoded.TestConfig;
 ///
 public class JSql_Base_test {
 	
+	///
+	/// SQL implmentation to actually overwrite
+	///
+	public JSql sqlImplementation() {
+		return JSql.sqlite();
+	}
+
 	protected JSql jsqlObj;
 	protected static String testTableName = "JSqlTest_" + TestConfig.randomTablePrefix().toUpperCase();
 	
@@ -29,7 +36,7 @@ public class JSql_Base_test {
 	
 	@Before
 	public void setUp() {
-		jsqlObj = JSql.sqlite();
+		jsqlObj = sqlImplementation();
 	}
 	
 	@After

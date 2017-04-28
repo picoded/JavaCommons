@@ -61,8 +61,6 @@ public abstract class JSql {
 		return new picoded.dstack.jsql.connector.db.JSql_Sqlite(sqliteLoc);
 	}
 
-	/*
-	
 	/// MySql static constructor, returns picoded.JSql.JSql_Mysql
 	public static JSql mysql(String dbServerAddress, String dbName, String dbUser, String dbPass) {
 		return new picoded.dstack.jsql.connector.db.JSql_Mysql(dbServerAddress, dbName, dbUser, dbPass);
@@ -72,6 +70,8 @@ public abstract class JSql {
 	public static JSql mysql(String connectionUrl, Properties connectionProps) {
 		return new picoded.dstack.jsql.connector.db.JSql_Mysql(connectionUrl, connectionProps);
 	}
+	
+	/*
 	
 	/// Mssql static constructor, returns picoded.JSql.JSql_Mssql
 	public static JSql mssql(String dbUrl, String dbName, String dbUser, String dbPass) {

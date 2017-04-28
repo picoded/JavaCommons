@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import picoded.dstack.jsql.connector.*;
 import picoded.set.JSqlType;
+import picoded.conv.ConvertJSON;
 
 /// Pure "MY"SQL implentation of JSql
 public class JSql_Mysql extends JSql_Base {
@@ -100,31 +101,26 @@ public class JSql_Mysql extends JSql_Base {
 	public Map<String,String> getTableColumnsInformation(String tablename) {
 		// Prepare return information
 		Map<String,String> ret = new HashMap<String,String>();
+		
+		// Remove quotations in table name, and trim out excess whitespace
+		tablename = tablename.replaceAll("`", "").replaceAll("'","").replaceAll("\"","").trim();
+		//System.out.println(tablename);
 
-		try {
-			//Try and finally : prevent memory leaks
-			ResultSet sqlRes = null;
-			try {
-				// Get the collumn meta data
-				DatabaseMetaData meta = sqlConn.getMetaData();
-				sqlRes = meta.getColumns(null, null, tablename, null);
-				
-				// Process the result, and get the collumn information
-				while (sqlRes.next()) {
-					ret.put(sqlRes.getString("COLUMN_NAME").toUpperCase(Locale.ENGLISH), sqlRes
-						.getString("TYPE_NAME").toUpperCase(Locale.ENGLISH));
-				}
+		// Get the column information
+		JSqlResult tableInfo = query_raw("SELECT column_name, column_type FROM information_schema.columns WHERE table_name=?", new Object[] { tablename });
+		//System.out.println( ConvertJSON.fromMap(tableInfo) );
+		
+		// Parse it into a map format
+		Object[] column_name = tableInfo.get("column_name");
+		Object[] column_type = tableInfo.get("column_type");
 
-				// Return the result
-				return ret;
-			} finally {
-				if (sqlRes != null) {
-					sqlRes.close();
-				}
-			}
-		} catch (Exception e) {
-			throw new JSqlException("getTableMetaData exception : "+tablename, e);
+		// Iterate name/type, and get the info
+		for(int i=0; i<column_name.length; ++i) {
+			ret.put( column_name[i].toString(), column_type[i].toString().toUpperCase() );
 		}
+
+		// Return the meta map
+		return ret;
 	}
 
 	/// Enforces column index limits for BLOB and TEXT type
@@ -144,7 +140,7 @@ public class JSql_Mysql extends JSql_Base {
 			for (String column : columnsArr) {
 				column = column.trim();
 				// check if column type is BLOB or TEXT
-				if ("BLOB".equals(metadata.get(column)) || "TEXT".equals(metadata.get(column))) {
+				if ("BLOB".equalsIgnoreCase(metadata.get(column)) || "TEXT".equalsIgnoreCase(metadata.get(column))) {
 					// repalce the column name in the origin sql statement with column name and suffic "(333)
 					qStringUpper = qStringUpper.replace(column, column + "(333)");
 				}
@@ -358,6 +354,10 @@ public class JSql_Mysql extends JSql_Base {
 					// It is must to define the The length of the BLOB and TEXT column type
 					// Append the maximum length "333" to BLOB and TEXT columns
 					qString = enforceColumnIndexLimit(metadata, qString, columns);
+
+					//System.out.println(">>>  "+ConvertJSON.fromMap(metadata));
+					//System.out.println(">>>  "+qString);
+
 				}
 			}
 		}
@@ -510,11 +510,14 @@ public class JSql_Mysql extends JSql_Base {
 		valuesSegment.append(" ) ");
 		queryBuilder.append(" ) ");
 		queryBuilder.append(valuesSegment);
-		queryBuilder.append("ON DUPLICATE KEY UPDATE ");
 
 		// Handling the insert values on key conflict, see
 		// https://dev.mysql.com/doc/refman/5.7/en/insert-on-duplicate.html
 		if( insertColumns != null ) {
+
+			// If there is no non unique keys, its not needed to handle duplicate keys udpdate
+			queryBuilder.append("ON DUPLICATE KEY UPDATE ");
+
 			for( int i = 0; i < insertColumns.length; ++i ) {
 				if( i > 0 ) {
 					queryBuilder.append(", ");

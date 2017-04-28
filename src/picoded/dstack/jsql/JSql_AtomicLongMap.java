@@ -187,7 +187,7 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 		// Search for the key
 		JSqlResult r = sqlObj.select(sqlTableName, "*", "kID = ?", new Object[] { key });
 		if (r != null && r.rowCount() > 0) {
-			return Long.parseLong(r.get("kVl")[0].toString());
+			return new Long(GenericConvert.toLong(r.get("kVl")[0]));
 		}
 		return null;
 	}

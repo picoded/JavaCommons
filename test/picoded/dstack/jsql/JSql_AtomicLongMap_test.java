@@ -31,7 +31,7 @@ public class JSql_AtomicLongMap_test extends StructSimple_AtomicLongMap_test {
 	/// is to be overriden for the various backend
 	/// specific test cases
 	public JSql jsqlConnection() {
-		return JSql.sqlite();
+		return JSqlTest.sqlite();
 	}
 
 	/// Impomentation constructor for SQL

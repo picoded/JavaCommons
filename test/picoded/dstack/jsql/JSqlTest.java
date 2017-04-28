@@ -22,21 +22,21 @@ import picoded.dstack.jsql.*;
 import picoded.dstack.jsql.connector.*;
 import picoded.dstack.struct.simple.*;
 
-public class JSql_MetaTable_test extends StructSimple_MetaTable_test {
+/// Utility test class to get the respective JSQL connection used in TESTING
+public class JSqlTest {
 
-	// To override for implementation
-	//-----------------------------------------------------
-	
-	/// Note that this SQL connector constructor
-	/// is to be overriden for the various backend
-	/// specific test cases
-	public JSql jsqlConnection() {
-		return JSqlTest.sqlite();
+	/// SQLite connection
+	public static JSql sqlite() {
+		return JSql.sqlite();
 	}
 
-	/// Impomentation constructor for SQL
-	public MetaTable implementationConstructor() {
-		return new JSql_MetaTable( jsqlConnection(), TestConfig.randomTablePrefix() );
+	/// MYSQL connection
+	public static JSql mysql() {
+		return JSql.mysql( 
+			TestConfig.MYSQL_CONN(),
+			TestConfig.MYSQL_DATA(),
+			TestConfig.MYSQL_USER(),
+			TestConfig.MYSQL_PASS()
+		);
 	}
-	
 }

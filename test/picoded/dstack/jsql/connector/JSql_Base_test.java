@@ -7,6 +7,7 @@ import java.util.Map;
 
 import picoded.conv.ConvertJSON;
 import picoded.TestConfig;
+import picoded.dstack.jsql.*;
 
 ///
 /// Common base JSql Test case which is applied to various implmentation
@@ -17,7 +18,7 @@ public class JSql_Base_test {
 	/// SQL implmentation to actually overwrite
 	///
 	public JSql sqlImplementation() {
-		return JSql.sqlite();
+		return JSqlTest.sqlite();
 	}
 
 	protected JSql jsqlObj;

@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -812,6 +813,68 @@ public abstract class JSql {
 		throw new UnsupportedOperationException(JSqlException.invalidDatabaseImplementationException);
 	}
 
+	//-------------------------------------------------------------------------
+	//
+	// Multiple UPSERT
+	//
+	//-------------------------------------------------------------------------
+	
+	///
+	/// Does multiple UPSERT continously. Use this command when doing,
+	/// a large number of UPSERT's to the same table with the same format.
+	///
+	/// In certain SQL deployments, this larger multi-UPSERT would be optimized as a 
+	/// single transaction call. However this behaviour is not guranteed across all platforms.
+	///
+	/// This is incredibily useful for large meta-table object updates.
+	///
+	/// @param  Table name to query
+	/// @param  Unique column names
+	/// @param  Unique column values, as a list. Each item in a list represents the respecitve row record
+	/// @param  Upsert column names 
+	/// @param  Upsert column values, as a list. Each item in a list represents the respecitve row record
+	/// @param  Default column to use existing values if exists 
+	/// @param  Default column values to use if not exists, as a list. Each item in a list represents the respecitve row record
+	/// @param  All other column names to maintain existing value 
+	///
+	/// @return  true, if UPSERT statement executed succesfuly
+	public boolean multiUpsert(  //
+		String tableName, // Table name to upsert on
+		//
+		String[] uniqueColumns, // The unique column names
+		List<Object[]> uniqueValuesList, // The row unique identifier values
+		//
+		String[] insertColumns, // Columns names to update
+		List<Object[]> insertValuesList, // Values to update
+		// Columns names to apply default value, if not exists
+		// Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+		String[] defaultColumns, //
+		List<Object[]> defaultValuesList, //
+		// Various column names where its existing value needs to be maintained (if any),
+		// this is important as some SQL implementation will fallback to default table values, if not properly handled
+		String[] miscColumns //
+	) {
+		int rows = uniqueValuesList.size();
+		boolean res = true;
+
+		// For each record, do the respective upsert
+		for( int i=0; i<rows; ++i ) {
+			Object[] uniqueValues = (uniqueValuesList != null && uniqueValuesList.size() > i)? uniqueValuesList.get(i) : null;
+			Object[] insertValues = (insertValuesList != null && insertValuesList.size() > i)? insertValuesList.get(i) : null;
+			Object[] defaultValues = (defaultValuesList != null && defaultValuesList.size() > i)? defaultValuesList.get(i) : null;
+
+			res = res && upsert( //
+				tableName, //
+				uniqueColumns, uniqueValues, //
+				insertColumns, insertValues, //
+				defaultColumns, defaultValues, //
+				miscColumns
+			);
+		}
+		
+		return res;
+	}
+	
 	//-------------------------------------------------------------------------
 	//
 	// DELETE statement builder 

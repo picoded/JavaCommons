@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Locale;
 import java.util.Map;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.ArrayList;
@@ -148,96 +149,6 @@ public class JSql_Mysql extends JSql_Base {
 		}
 		return qStringUpper;
 	}
-	/*
-
-	public String getQStringUpper(Map<String, String> metadata, String qStringUpper, String columns) {
-		if (metadata != null) {
-			String[] columnsArr = columns.split(",");
-			for (String column : columnsArr) {
-				column = column.trim();
-				// check if column type is BLOB or TEXT
-				if ("BLOB".equals(metadata.get(column)) || "TEXT".equals(metadata.get(column))) {
-					// repalce the column name in the origin sql statement with column name and suffic "(333)
-					qStringUpper = qStringUpper.replace(column, column + "(333)");
-				}
-			}
-		}
-		return qStringUpper;
-	}
-	
-
-	/// Executes the table meta data query, and returns the result object
-	public JSqlResult executeQuery_metadata(String table) {
-		JSqlResult res = null;
-		try {
-			ResultSet rs = null;
-			//Try and finally : prevent memory leaks
-			try {
-				DatabaseMetaData meta = sqlConn.getMetaData();
-				rs = meta.getColumns(null, null, table, null);
-				res = new JSqlResult(null, rs);
-				
-				//let JSqlResult "close" it
-				rs = null;
-				return res;
-			} finally {
-				if (rs != null) {
-					rs.close();
-				}
-			}
-		} catch (Exception e) {
-			throw new JSqlException("executeQuery_metadata exception", e);
-		}
-	}
-	
-	/// Fetch table Meta Data info
-	public Map<String, String> fetchMetaData() throws JSqlException {
-		Map<String, String> ret = null;
-		//ResultSet
-		if (sqlRes != null) {
-			ret = new HashMap<String, String>();
-			try {
-				while (sqlRes.next()) {
-					ret.put(sqlRes.getString("COLUMN_NAME").toUpperCase(Locale.ENGLISH), sqlRes
-						.getString("TYPE_NAME").toUpperCase(Locale.ENGLISH));
-				}
-			} catch (Exception e) {
-				throw new JSqlException("Error fetching sql meta data", e);
-			}
-		}
-		return ret;
-	}
-
-	/// Executes the table meta data query, and returns the result object
-	public Map<String, String> getMetaData(String sql) {
-		Map<String, String> metaData = null;
-		ResultSet rs = null;
-		//Try and finally : prevent memory leaks
-		try {
-			try {
-				Statement st = sqlConn.createStatement();
-				rs = st.executeQuery(sql);
-				ResultSetMetaData rsMetaData = rs.getMetaData();
-				int numberOfColumns = rsMetaData.getColumnCount();
-				for (int i = 1; i <= numberOfColumns; i++) {
-					if (metaData == null) {
-						metaData = new HashMap<String, String>();
-					}
-					metaData.put(rsMetaData.getColumnName(i), rsMetaData.getColumnTypeName(i));
-				}
-			} finally {
-				if (rs != null) {
-					rs.close();
-				}
-				rs = null;
-			}
-		} catch (Exception e) {
-			throw new JSqlException("executeQuery_metadata exception", e);
-		}
-		return metaData;
-	}
-	*/
-
 
 	//-------------------------------------------------------------------------
 	//
@@ -528,6 +439,188 @@ public class JSql_Mysql extends JSql_Base {
 		
 		// Builde the actual statement, to run!
 		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
+	}
+	
+	///
+	/// Does multiple UPSERT continously. Use this command when doing,
+	/// a large number of UPSERT's to the same table with the same format.
+	///
+	/// In certain SQL deployments, this larger multi-UPSERT would be optimized as a 
+	/// single transaction call. However this behaviour is not guranteed across all platforms.
+	///
+	/// This is incredibily useful for large meta-table object updates.
+	///
+	/// @param  Table name to query
+	/// @param  Unique column names
+	/// @param  Unique column values, as a list. Each item in a list represents the respecitve row record
+	/// @param  Upsert column names 
+	/// @param  Upsert column values, as a list. Each item in a list represents the respecitve row record
+	/// @param  Default column to use existing values if exists 
+	/// @param  Default column values to use if not exists, as a list. Each item in a list represents the respecitve row record
+	/// @param  All other column names to maintain existing value 
+	///
+	/// @return  true, if UPSERT statement executed succesfuly
+	public boolean multiUpsert(  //
+		String tableName, // Table name to upsert on
+		//
+		String[] uniqueColumns, // The unique column names
+		List<Object[]> uniqueValuesList, // The row unique identifier values
+		//
+		String[] insertColumns, // Columns names to update
+		List<Object[]> insertValuesList, // Values to update
+		// Columns names to apply default value, if not exists
+		// Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+		String[] defaultColumns, //
+		List<Object[]> defaultValuesList, //
+		// Various column names where its existing value needs to be maintained (if any),
+		// this is important as some SQL implementation will fallback to default table values, if not properly handled
+		String[] miscColumns //
+	) {
+		
+		// Checks that unique collumn and values 
+		if (uniqueColumns == null || uniqueValuesList == null) {
+			throw new JSqlException("Upsert query requires unique column and values");
+		}
+		
+		// Build the final, actual query args
+		StringBuilder queryBuilder = new StringBuilder();
+		ArrayList<Object> queryArgs = new ArrayList<Object>();
+
+		// Prepare the prefix
+		queryBuilder.append("INSERT INTO ");
+		queryBuilder.append("`" + tableName + "`");
+		
+
+		// Column definition
+		//-----------------------------------------------------
+
+		// Column definition opening
+		queryBuilder.append(" ( ");
+
+		// Lets start with unique names
+		for( int i = 0; i < uniqueColumns.length; ++i ) {
+			if( i > 0 ) {
+				queryBuilder.append(", ");
+			}
+			queryBuilder.append(uniqueColumns[i]);
+		}
+
+		// And the insert columns names
+		if( insertColumns != null ) {
+			for( int i = 0; i < insertColumns.length; ++i ) {
+				// Since this is post unique value, always valid to append ", "
+				queryBuilder.append(", ");
+				queryBuilder.append(insertColumns[i]);
+			}
+		}
+
+		// And the default columns names
+		if( defaultColumns != null ) {
+			for( int i = 0; i < defaultColumns.length; ++i ) {
+				// Since this is post unique value, always valid to append ", "
+				queryBuilder.append(", ");
+				queryBuilder.append(defaultColumns[i]);
+			}
+		}
+
+		// Column definition closing
+		queryBuilder.append(" ) ");
+
+		// Values definition
+		//-----------------------------------------------------
+
+		// Values definition opening
+		queryBuilder.append("VALUES ");
+
+		// Iterate every row record to upsert
+		for( int r=0; r<uniqueValuesList.size(); ++r ) {
+			if( r > 0 ) { // Multiple row record, requires comma seperator
+				queryBuilder.append(", ");
+			}
+
+			// Open the row
+			queryBuilder.append("( ");
+
+			// Unique values always assumed
+			Object[] uniqueValues = uniqueValuesList.get(r);
+			// Lets start with unique values processing
+			for( int i = 0; i < uniqueColumns.length; ++i ) {
+				if( i > 0 ) {
+					queryBuilder.append(", ");
+				}
+				queryBuilder.append("?");
+				queryArgs.add(uniqueValues[i]);
+			}
+
+			// Lets move on to insert, and default values
+			Object[] insertValues = null;
+			Object[] defaultValues = null;
+
+			// Insert, and default values may or may not occur
+			if( insertValuesList != null && insertValuesList.size() < r ) {
+				insertValues = insertValuesList.get(r);
+			}
+			if( defaultValuesList != null && defaultValuesList.size() < r ) {
+				defaultValues = defaultValuesList.get(r);
+			}
+
+			// Regardless if the list produced values handle based on names
+			// And the insert columns names / values
+			if( insertColumns != null ) {
+				for( int i = 0; i < insertColumns.length; ++i ) {
+					// Since this is post unique value, always valid to append ", "
+					queryBuilder.append(", ");
+					queryBuilder.append("?");
+
+					// Process the value
+					if( insertValues != null && insertValues.length > i ) {
+						queryArgs.add(insertValues[i]);
+					} else {
+						queryArgs.add(null);
+					}
+				}
+			}
+			// And the insert columns names / values
+			if( defaultColumns != null ) {
+				for( int i = 0; i < defaultColumns.length; ++i ) {
+					// Since this is post unique value, always valid to append ", "
+					queryBuilder.append(", ");
+					queryBuilder.append("?");
+
+					// Process the value
+					if( defaultValues != null && defaultValues.length > i ) {
+						queryArgs.add(defaultValues[i]);
+					} else {
+						queryArgs.add(null);
+					}
+				}
+			}
+
+			// Close the row
+			queryBuilder.append(") ");
+		}
+
+		// Handling the insert values on key conflict ruling, see
+		// https://dev.mysql.com/doc/refman/5.7/en/insert-on-duplicate.html
+		if( insertColumns != null ) {
+
+			// If there is no non unique keys, its not needed to handle duplicate keys udpdate
+			queryBuilder.append("ON DUPLICATE KEY UPDATE ");
+
+			// Set the rule for insert columns replacement
+			for( int i = 0; i < insertColumns.length; ++i ) {
+				if( i > 0 ) {
+					queryBuilder.append(", ");
+				}
+				queryBuilder.append(insertColumns[i]+" = VALUES("+insertColumns[i]+")");
+			}
+		}
+		
+		// Builde the actual statement, to run!
+		JSqlPreparedStatement statement =  new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
+
+		// Run it
+		return statement.update() >= 1;
 	}
 	
 }

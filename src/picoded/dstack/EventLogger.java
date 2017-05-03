@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
-public interface EventLogger extends DStackCommon<String, String> {
+public interface EventLogger extends CommonStructure {
 	
 	/// Core logWithLevel function
 	default void logWithLevel(Level l, Exception e, String format, Object... args) {

@@ -13,7 +13,7 @@ import picoded.conv.GenericConvert;
 /// Because in "most" cases this would be good enough to handle 
 /// any transactional data that is required.
 ///
-public interface AtomicLongMap extends GenericConvertMap<String, Long>, DStackCommon<String, Long> {
+public interface AtomicLongMap extends GenericConvertMap<String, Long>, CommonStructure {
 	
 	// Core put / get
 	//--------------------------------------------------------------------------
@@ -145,5 +145,15 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long>, DStackCo
 	default Long decrementAndGet(Object key) {
 		return addAndGet(key, -1);
 	}
+	
+	// Resolving class inheritence conflict
+	//--------------------------------------------------------------------------
+	
+	///
+	/// Removes all data, without tearing down setup
+	///
+	/// This is equivalent of "TRUNCATE TABLE {TABLENAME}"
+	///
+	void clear();
 	
 }

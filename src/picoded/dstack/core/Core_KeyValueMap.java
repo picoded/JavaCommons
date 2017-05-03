@@ -14,7 +14,7 @@ import picoded.struct.GenericConvertHashMap;
 /// Does not actually implement its required feature,
 /// but helps provide a common base line for all the various implementation.
 ///
-public abstract class Core_KeyValueMap extends Core_DataStructure<String, String> implements KeyValueMap {
+public abstract class Core_KeyValueMap extends Core_DataStructure<String,String> implements KeyValueMap {
 	
 	//--------------------------------------------------------------------------
 	//

@@ -22,7 +22,7 @@ import org.apache.commons.lang3.RandomUtils;
 ///
 /// Be it a map of key-to-values, a map of map, or a map of maps of maps ...
 ///
-public interface DStackCommon<K, V> extends UnsupportedDefaultMap<K, V> {
+public interface CommonStructure {
 	
 	//--------------------------------------------------------------------------
 	//

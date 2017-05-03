@@ -14,6 +14,7 @@ import org.apache.commons.lang3.RandomUtils;
 import picoded.struct.UnsupportedDefaultMap;
 import picoded.struct.query.Query;
 import picoded.dstack.core.Core_MetaObject;
+import picoded.struct.GenericConvertMap;
 
 ///
 /// MetaTable, serves as the core flexible backend storage implmentation for the whole
@@ -25,7 +26,7 @@ import picoded.dstack.core.Core_MetaObject;
 /// of a JCache layer for non-complex lookup cached reads. Which will in most cases be the main
 /// read request load.
 /// 
-public interface MetaTable extends DStackCommon<String, MetaObject> {
+public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject>, CommonStructure {
 	
 	// MetaObject optimizations
 	//----------------------------------------------
@@ -295,5 +296,15 @@ public interface MetaTable extends DStackCommon<String, MetaObject> {
 	default Set<String> getKeyNames() {
 		return getKeyNames(25);
 	}
+	
+	// Resolving class inheritence conflict
+	//--------------------------------------------------------------------------
+	
+	///
+	/// Removes all data, without tearing down setup
+	///
+	/// This is equivalent of "TRUNCATE TABLE {TABLENAME}"
+	///
+	void clear();
 	
 }

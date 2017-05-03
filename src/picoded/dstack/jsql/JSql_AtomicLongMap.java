@@ -41,7 +41,7 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 	public JSql_AtomicLongMap(JSql inJSql, String tablename) {
 		super();
 		sqlObj = inJSql;
-		sqlTableName = tablename;
+		sqlTableName = "AL_"+tablename;
 	}
 	
 	//--------------------------------------------------------------------------

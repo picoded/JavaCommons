@@ -39,7 +39,7 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 	/// [internal use] JSql setup with a SQL connection and tablename
 	public JSql_KeyValueMap(JSql inJSql, String tablename) {
 		super();
-		sqlTableName = tablename;
+		sqlTableName = "KV_"+tablename;
 		sqlObj = inJSql;
 	}
 	

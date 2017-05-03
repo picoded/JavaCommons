@@ -41,7 +41,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 	public JSql_MetaTable(JSql inJSql, String tablename) {
 		super();
 		sqlObj = inJSql;
-		sqlTableName = tablename;
+		sqlTableName = "MT_"+tablename;
 	}
 	
 	//--------------------------------------------------------------------------

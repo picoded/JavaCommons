@@ -17,11 +17,6 @@ import org.apache.commons.lang3.RandomUtils;
 ///
 /// However this is needed to ensure a consistent setup / teardown process.
 ///
-/// Additionally it extends from Map, because almost all persistent
-/// backend storage, can be represented as an extension of a map interface.
-///
-/// Be it a map of key-to-values, a map of map, or a map of maps of maps ...
-///
 public interface CommonStructure {
 	
 	//--------------------------------------------------------------------------

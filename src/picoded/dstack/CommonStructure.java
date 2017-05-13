@@ -13,9 +13,9 @@ import org.apache.commons.lang3.RandomUtils;
 
 ///
 /// Minimal interface for all of picoded.datastack implmentation structures.
-/// This is used mainly internally via DStack, or JStruct, etc.
+/// That handles consistent setup / teardown process.
 ///
-/// However this is needed to ensure a consistent setup / teardown process.
+/// This is used mainly internally via DStack, or JStruct, etc.
 ///
 public interface CommonStructure {
 	

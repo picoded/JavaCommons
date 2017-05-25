@@ -29,7 +29,7 @@ public class JSqlStack extends Core_CommonStack {
 	/// @param   Name used to initialize the structure
 	///
 	/// @return  The CommonStructure that was initialized
-	protected CommonStructure setupStructure(String type, String name) {
+	public CommonStructure initializeStructure(String type, String name) {
 		if ("MetaTable".equalsIgnoreCase(type)) {
 			return new JSql_MetaTable(sqlConn, name);
 		} else if ("KeyValueMap".equalsIgnoreCase(type)) {

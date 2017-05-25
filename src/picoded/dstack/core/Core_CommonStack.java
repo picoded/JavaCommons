@@ -39,7 +39,7 @@ public abstract class Core_CommonStack implements CommonStack {
 	/// @param   Name used to initialize the structure
 	///
 	/// @return  The CommonStructure that was initialized
-	protected abstract CommonStructure setupStructure(String type, String name);
+	public abstract CommonStructure initializeStructure(String type, String name);
 
 	///
 	/// Validate the CommonStructure, to its respective type
@@ -117,7 +117,7 @@ public abstract class Core_CommonStack implements CommonStack {
 
 			// Setup and store the newly created
 			// structure into the local object cache
-			cacheCopy = setupStructure(type, name);
+			cacheCopy = initializeStructure(type, name);
 			if( cacheCopy == null ) {
 				throw new RuntimeException("Failed to generate structure for name / type : "+name+" / "+type);
 			}

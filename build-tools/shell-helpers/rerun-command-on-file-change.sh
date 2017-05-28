@@ -43,19 +43,35 @@ echo "";
 echo "PS: Sam, you may want to port this to windows yourself =x";
 echo "-------------------------------------------------------------------";
 echo "";
-echo "Waiting for file change event inside : $scan_dir ";
+echo "> Waiting for file change event inside, stand by  =| : $scan_dir ";
+echo "";
+echo "-------------------------------------------------------------------";
+echo "";
+echo "> Waiting ... ";
 
 while true; do
-	fswatch -r -1 -i "\\.java$" "$scan_dir";
+	fswatch -r -1 -i "\\.java$" -e "\\.git.*" "$scan_dir";
+	printf "\e[1A";
+	printf "\e[1A";
+	printf "\e[1A";
+	printf "\e[1A";
+	printf "\e[1A";
+	printf "\e[1A";
+	printf "\e[1A";
+	printf "\e[1A";
+	printf "\e[1A";
 	echo "";
 	echo "-------------------------------------------------------------------";
 	echo "";
-	echo "(Possible file changed detected, running command)";
+	echo "> Possible file changed detected, running command XD";
 	echo "";
 	echo "-------------------------------------------------------------------";
-	echo "";
 	"$scriptDir/clear-screen-and-output-full-command.sh" "$cmd_to_run" "$workingDir";
 	echo "";
-	echo "Waiting for file change event inside : $scan_dir ";
+	echo "> Waiting for file change event inside, stand by  =| : $scan_dir ";
+	echo "";
+	echo "-------------------------------------------------------------------";
+	echo "";
+	echo "> Waiting ... ";
 	sleep 1; # Delay induction
 done

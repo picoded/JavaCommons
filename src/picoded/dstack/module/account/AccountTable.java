@@ -50,10 +50,14 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 	/// Stores the account session key,
 	/// account linkage, and activity
+	///
+	/// KeyValueMap<sessionID, info-including-accountID>
 	protected KeyValueMap sessionInfoMap = null;
 
 	/// Stores the account token key,
 	/// to login information / meta data map
+	///
+	/// KeyValueMap<tokenID, sessionID>
 	protected KeyValueMap sessionTokenMap = null;
 
 	//
@@ -64,6 +68,8 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/// Account meta information
 	/// Used to pretty much store all individual information
 	/// directly associated with the account
+	///
+	/// Note: Consider this the "PRIMARY TABLE"
 	///
 	/// MetaTable<AccountOID, MetaObject>
 	protected MetaTable accountMetaTable = null;
@@ -111,10 +117,10 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	protected AtomicLongMap loginThrottlingExpiryMap = null;
 	
 	///////////////////////////////////////////////////////////////////////////
-	///
-	/// Table suffixes for the variosu sub tables
-	/// (Ignore this, as its generally not as important as knowing the above)
-	///
+	//
+	// Table suffixes for the variosu sub tables
+	// (Ignore this, as its generally not as important as knowing the above)
+	//
 	///////////////////////////////////////////////////////////////////////////
 
 	/// The account self ID's
@@ -151,15 +157,16 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	protected static String ACCOUNT_LOGIN_THROTTLING_EXPIRY = "_TE";
 
 	///////////////////////////////////////////////////////////////////////////
-	///
-	/// Constructor setup : Setup the actual tables, with the various names
-	///
+	//
+	// Constructor setup : Setup the actual tables, with the various names
+	//
 	///////////////////////////////////////////////////////////////////////////
 
 	/// Load the provided stack object
 	/// with the variosu meta table / key valuemap / etc
 	public AccountTable(CommonStack inStack, String inName) {
 		super(inStack, inName);
+		internalStructureList = setupInternalStructureList();
 	}
 
 	/// Get the list of local CommonStructure's
@@ -199,47 +206,204 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		);
 	}
 	
-	/*
-	// Map compliant implementation,
-	// Keys here refer to object ID
+	///////////////////////////////////////////////////////////////////////////
 	//
-	//--------------------------------------------------------------------------
+	// Basic account object existance checks, setup, and destruction
+	//
+	///////////////////////////////////////////////////////////////////////////
 
-	/// Gets and return the accounts table from the account ID
-	public AccountObject get(Object oid) {
-		return getFromID(oid);
+	/// Returns if the name exists
+	/// 
+	/// @param  Login ID to use, normally this is an email, or nice username
+	///
+	/// @return TRUE if login ID exists
+	public boolean hasLoginID(String inLoginID) {
+		return accountLoginIdMap.containsKey(inLoginID);
 	}
 
-	/// Account exists, this is an alias of containsName
+	/// Returns if the account object id exists
+	///
+	/// @param  Account OID to use
+	///
+	/// @return  TRUE of account ID exists
 	public boolean containsKey(Object oid) {
-		return containsID(oid.toString());
+		return accountMetaTable.containsKey(oid);
 	}
 
-	/// Removes the object, returns null
-	public AccountObject remove(Object oid) {
-		removeFromID(oid.toString());
-		return null;
+	/// Generates a new account object.
+	///
+	/// Note without setting a name, or any additional values. 
+	/// This call in some sense is quite, err useless.
+	public AccountObject newObject() {
+		AccountObject ret = new AccountObject(this, null);
+		// ret.saveAll(); //ensures the blank object is now in DB
+		return ret;
 	}
 
-	// Returns all the account _oid in the system
-	public Set<String> keySet() {
-		return accountMeta.keySet();
-	}
+	/// Generates a new account object with the given nice name
+	///
+	/// @param  Unique Login ID to use, normally this is an email, or nice username
+	///
+	/// @return AccountObject if succesfully created
+	public AccountObject newObject(String name) {
+		// Quick fail check
+		if (hasLoginID(name)) {
+			return null;
+		}
 
-	//
-	// Additional functionality add on
-	//--------------------------------------------------------------------------
-
-	/// Gets the account using the object ID
-	public AccountObject getFromID(Object oid) {
-		String _oid = oid.toString();
-
-		if (containsID(_oid)) {
-			return new AccountObject(this, _oid);
+		// Creating account object, setting the name if valid
+		AccountObject ret = newObject();
+		if (ret.setLoginID(name)) {
+			return ret;
+		} else {
+			// Removal step is required on failure,
+			// as it helps prevent "orphaned" account objects
+			// in new account race conditions
+			remove(ret._oid());
 		}
 
 		return null;
 	}
+
+	/// Removes the accountObject using the ID
+	///
+	/// @param  Account OID to use, or alternatively its object
+	///
+	/// @return NULL
+	public AccountObject remove(Object inOid) {
+		if (inOid != null) {
+
+			// Alternatively, instead of string use MetaObject
+			if( inOid instanceof MetaObject ) {
+				inOid = ((MetaObject)inOid)._oid();
+			}
+
+			// Get oid as a string, and fetch the account object
+			String oid = inOid.toString();
+			AccountObject ao = this.get(oid);
+			
+			// Remove account meta information
+			accountLoginIdMap.remove(oid);
+			accountPrivateMetaTable.remove(oid);
+			
+			// @TODO - handle removal of group data
+			// memberRolesTable
+			// memberMetaTable
+			// memberPrivateMetaTable
+			//-----------------------------------------
+			// //group_childRole and groupChild_meta
+			// if (ao != null) {
+			// 	if (ao.isGroup()) {
+			// 		MetaObject groupObj = group_childRole.get(oid);
+			// 		group_childRole.remove(oid);
+			// 		if (groupObj != null) {
+			// 			for (String userID : groupObj.keySet()) {
+			// 				String groupChildMetaKey = getGroupChildMetaKey(oid, userID);
+			// 				groupChild_meta.remove(groupChildMetaKey);
+			// 			}
+			// 		}
+			// 	} else {
+			// 		String[] groupIDs = ao.getGroups_id();
+			// 		if (groupIDs != null) {
+			// 			for (String groupID : groupIDs) {
+			// 				MetaObject groupObj = group_childRole.get(groupID);
+			// 				groupObj.remove(oid);
+			// 				String groupChildMetaKey = getGroupChildMetaKey(groupID, oid);
+			// 				groupChild_meta.remove(groupChildMetaKey);
+			// 			}
+			// 		}
+			// 	}
+			// }
+			//-----------------------------------------
+
+			// Remove login ID's AKA nice names
+			Set<String> loginIdMapNames = accountLoginIdMap.keySet(oid);
+			if (loginIdMapNames != null) {
+				for (String name : loginIdMapNames) {
+					accountLoginIdMap.remove(name, oid);
+				}
+			}
+
+			// Remove login authentication details
+			accountAuthMap.remove(oid);
+
+			// Remove thorttling information
+			loginThrottlingAttemptMap.remove(oid);
+			loginThrottlingExpiryMap.remove(oid);
+
+		}
+
+		return null;
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Account object getters
+	//
+	///////////////////////////////////////////////////////////////////////////
+
+	/// Gets and return the accounts object using the account ID
+	///
+	/// @param  Account ID to use
+	///
+	/// @return  AccountObject representing the account ID if found
+	public AccountObject get(Object oid) {
+		// Possibly a valid OID?
+		if( oid != null ) {
+			String _oid = oid.toString();
+			if (containsKey(_oid)) {
+				return new AccountObject(this, _oid);
+			}
+		}
+		// Account object invalid here
+		return null;
+	}
+
+	/// Gets the account UUID, using the configured name
+	///
+	/// @param  The login ID (nice-name/email)
+	///
+	/// @return  Account ID associated, if any
+	public String loginToAccountID(String name) {
+		return accountLoginIdMap.get(name);
+	}
+
+	/// Gets the account using the nice name
+	///
+	/// @param  The login ID (nice-name/email)
+	///
+	/// @return  AccountObject representing the account ID if found
+	public AccountObject getFromLoginID(Object name) {
+		String _oid = loginToAccountID(name.toString());
+		if (_oid != null) {
+			return get(_oid);
+		}
+		return null;
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Map compliance
+	//
+	///////////////////////////////////////////////////////////////////////////
+
+	/// Returns all the account _oid in the system
+	///
+	/// @return  Set of account oid's
+	public Set<String> keySet() {
+		return accountMetaTable.keySet();
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Additional functionality add on
+	//
+	///////////////////////////////////////////////////////////////////////////
+
+	/*
+	//
+	// Additional functionality add on
+	//--------------------------------------------------------------------------
 
 	/// Gets the account using the object ID array,
 	/// and returns the account object array
@@ -251,108 +415,11 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		return mList;
 	}
 
-	/// Gets the account using the nice name
-	public AccountObject getFromName(Object name) {
-		String _oid = nameToID(name.toString());
-
-		if (_oid != null) {
-			return getFromID(_oid);
-		}
-
-		return null;
-	}
-
-	/// Generates a new account object
-	public AccountObject newObject() {
-		AccountObject ret = new AccountObject(this, null);
-		//ret.saveAll(); //ensures the blank object is now in DB
-		return ret;
-	}
-
-	/// Generates a new account object with the given nice name
-	public AccountObject newObject(String name) {
-		if (containsName(name)) {
-			return null;
-		}
-
-		AccountObject ret = newObject();
-
-		if (ret.setName(name)) {
-			return ret;
-		} else {
-			removeFromID(ret._oid());
-		}
-
-		return null;
-	}
-
-	/// Gets the account UUID, using the configured name
-	public String nameToID(String name) {
-		return loginIdMap.get(name);
-	}
-
-	/// Returns if the name exists
-	public boolean containsName(String name) {
-		return loginIdMap.containsKey(name);
-	}
-
-	/// Returns if the account object id exists
-	public boolean containsID(Object oid) {
-		return accountMeta.containsKey(oid);
-	}
-
 	/// Removes the accountObject using the name
 	public void removeFromName(String name) {
 		AccountObject ao = this.getFromName(name);
 		if (ao != null) {
 			removeFromID(ao._oid());
-		}
-	}
-
-	/// Removes the accountObject using the ID
-	public void removeFromID(String oid) {
-		if (oid != null && !oid.isEmpty()) {
-			AccountObject ao = this.getFromID(oid);
-
-			//group_childRole and groupChild_meta
-			if (ao != null) {
-				if (ao.isGroup()) {
-					MetaObject groupObj = group_childRole.get(oid);
-					group_childRole.remove(oid);
-
-					if (groupObj != null) {
-						for (String userID : groupObj.keySet()) {
-							String groupChildMetaKey = getGroupChildMetaKey(oid, userID);
-							groupChild_meta.remove(groupChildMetaKey);
-						}
-					}
-				} else {
-					String[] groupIDs = ao.getGroups_id();
-					if (groupIDs != null) {
-						for (String groupID : groupIDs) {
-							MetaObject groupObj = group_childRole.get(groupID);
-							groupObj.remove(oid);
-
-							String groupChildMetaKey = getGroupChildMetaKey(groupID, oid);
-							groupChild_meta.remove(groupChildMetaKey);
-						}
-					}
-				}
-			}
-
-			//loginIdMap
-			Set<String> loginIdMapNames = loginIdMap.getKeys(oid);
-			if (loginIdMapNames != null) {
-				for (String name : loginIdMapNames) {
-					loginIdMap.remove(name, oid);
-				}
-			}
-
-			//accountAuthMap
-			accountAuthMap.remove(oid);
-
-			//accountMeta
-			accountMeta.remove(oid);
 		}
 	}
 

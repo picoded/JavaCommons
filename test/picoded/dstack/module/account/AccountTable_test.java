@@ -59,7 +59,25 @@ public class AccountTable_test {
 	}
 
 	@Test
-	public void rootFileTest() {
-		
+	public void blankHelloWorld() {
+		assertFalse(testAT.containsKey("hello-world"));
+		assertNull(testAT.get("hello-world"));
+	}
+
+	@Test
+	public void createCycleTest() {
+		AccountObject testAO = null;
+		assertNotNull( testAO = testAT.newObject("hello-world") );
+		assertTrue( testAT.hasLoginID("hello-world") );
+
+		// Validating seperately collected accountObjects
+		assertNotNull( testAO._oid() );
+		assertNotNull(testAT.get(testAO._oid()));
+		assertEquals( testAO._oid(), testAT.get( testAO._oid() )._oid() );
+		assertEquals( testAO._oid(), testAT.getFromLoginID( "hello-world" )._oid() );
+
+		// Removal test
+		testAO.remove( testAO );
+		blankHelloWorld();
 	}
 }

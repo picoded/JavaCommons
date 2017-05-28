@@ -12,6 +12,12 @@ import picoded.struct.*;
 ///
 public class AccountObject extends Core_MetaObject {
 
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Constructor and setup
+	//
+	///////////////////////////////////////////////////////////////////////////
+
 	/// The original account table
 	protected AccountTable mainTable = null;
 
@@ -22,6 +28,54 @@ public class AccountObject extends Core_MetaObject {
 	protected AccountObject(AccountTable accTable, String inOID) {
 		super((Core_MetaTable) (accTable.accountMetaTable), inOID);
 		mainTable = accTable;
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Getting and setting login ID's
+	//
+	///////////////////////////////////////////////////////////////////////////
+
+	/// Checks if the current account has the provided loginID
+	///
+	/// @param  LoginID to use
+	///
+	/// @return TRUE if login ID belongs to this account
+	public boolean hasLoginID(String name) {
+		return _oid.equals(mainTable.accountLoginIdMap.get(name));
+	}
+
+	/// Gets and return the various login "nice-name" (not UUID) for this account
+	///
+	/// @return  Set of loginID's used by this account
+	public Set<String> getLoginIDSet() {
+		return mainTable.accountLoginIdMap.keySet(_oid);
+	}
+
+	/// Sets the name for the account, returns true or false if it succed.
+	///
+	/// @param  LoginID to setup for this account
+	///
+	/// @return TRUE if login ID is configured to this account
+	public boolean setLoginID(String name) {
+		if (name == null || name.length() <= 0) {
+			throw new RuntimeException("AccountObject loding ID cannot be blank");
+		}
+
+		if (mainTable.hasLoginID(name)) {
+			return false;
+		}
+
+		// ensure its own OID is registered
+		saveDelta(); 
+
+		// Technically a race condition =X
+		//
+		// But name collision, if its an email collision should be a very rare event.
+		mainTable.accountLoginIdMap.put(name, _oid);
+
+		// Success of failure
+		return hasLoginID(name);
 	}
 
 	/*
@@ -78,28 +132,6 @@ public class AccountObject extends Core_MetaObject {
 
 	// Display name management
 	//-------------------------------------------------------------------------
-
-	/// Gets and return the various "nice-name" (not UUID) for this account
-	public Set<String> getNames() {
-		return mainTable.loginIdMap.getKeys(_oid);
-	}
-
-	/// Sets the name for the account, returns true or false if it succed.
-	public boolean setName(String name) {
-		if (name == null || name.length() <= 0) {
-			throw new RuntimeException("AccountObject nice name cannot be blank");
-		}
-
-		if (mainTable.containsName(name)) {
-			return false;
-		}
-
-		saveDelta(); //ensure itself is registered
-
-		/// Technically a race condition =X
-		mainTable.loginIdMap.put(name, _oid);
-		return true;
-	}
 
 	/// Removes the old name from the database
 	/// @TODO Add-in security measure to only removeName of this user, instead of ANY
@@ -372,7 +404,7 @@ public class AccountObject extends Core_MetaObject {
 	}
 
 	/// Gets value of key from the Account Meta table
-	public Object getMetaValue(String oid, String key){
+	public Object getMetaValue(String oid, String key) {
 		return mainTable.accountMeta.get(oid).get(key);
 	}
 

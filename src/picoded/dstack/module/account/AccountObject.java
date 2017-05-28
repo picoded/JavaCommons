@@ -3,30 +3,28 @@ package picoded.dstack.module.account;
 import java.util.*;
 
 import picoded.dstack.*;
+import picoded.dstack.core.*;
 import picoded.conv.*;
 import picoded.struct.*;
 
 ///
 /// Represents a single group / user account.
 ///
-public class AccountObject /*extends JStruct_MetaObject*/ {
+public class AccountObject extends Core_MetaObject {
 
-	/*
-	/// The original table
+	/// The original account table
 	protected AccountTable mainTable = null;
 
-	/// Constructor full setup
-	protected AccountObject(AccountTable accTable, JStruct_MetaTable inTable, String inOID, boolean isCompleteData) {
-		super(inTable, inOID);
-		mainTable = accTable;
-	}
-
-	/// Simplified Constructor
+	/// [INTERNAL USE ONLY]
+	///
+	/// Cosntructor setup, using an account table,
+	/// and the account GUID
 	protected AccountObject(AccountTable accTable, String inOID) {
-		super((JStruct_MetaTable) (accTable.accountMeta), inOID);
+		super((Core_MetaTable) (accTable.accountMetaTable), inOID);
 		mainTable = accTable;
 	}
 
+	/*
 	// Internal utility functions
 	//-------------------------------------------------------------------------
 

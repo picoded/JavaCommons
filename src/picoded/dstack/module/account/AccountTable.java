@@ -48,10 +48,14 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	//
 	//--------------------------------------------------------------------------
 
-	/// Stores the account session key,
-	/// account linkage, and activity
+	/// Stores the account session key, to accountID link
 	///
-	/// KeyValueMap<sessionID, info-including-accountID>
+	/// KeyValueMap<sessionID, accountID>
+	protected KeyValueMap sessionLinkMap = null;
+
+	/// Stores the account meta information
+	///
+	/// KeyValueMap<sessionID, info-about-access>
 	protected KeyValueMap sessionInfoMap = null;
 
 	/// Stores the account token key,
@@ -133,6 +137,9 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	protected static String SUFFIX_LOGIN_SESSION = "_LS";
 
 	/// The login sessions used for authentication
+	protected static String SUFFIX_LOGIN_SESSION_INFO = "_LI";
+
+	/// The login sessions used for authentication
 	protected static String SUFFIX_LOGIN_TOKEN = "_LT";
 
 	/// The account self meta values
@@ -178,7 +185,8 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		accountAuthMap = stack.getKeyValueMap(name + SUFFIX_ACCOUNT_HASH);
 		
 		// Login session infromation
-		sessionInfoMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_SESSION);
+		sessionLinkMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_SESSION);
+		sessionInfoMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_SESSION_INFO);
 		sessionTokenMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_TOKEN);
 		
 		// Account meta information
@@ -381,6 +389,19 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		return null;
 	}
 
+	/// Gets the account using the Session ID
+	///
+	/// @param  The Session ID
+	///
+	/// @return  AccountObject representing the account ID if found
+	public AccountObject getFromSessionID(String sessionID) {
+		String _oid = sessionLinkMap.get( sessionID );
+		if( _oid != null ) {
+			return get(_oid);
+		}
+		return null;
+	}
+
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Map compliance
@@ -400,36 +421,51 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	//
 	///////////////////////////////////////////////////////////////////////////
 
-	/*
-	//
-	// Additional functionality add on
-	//--------------------------------------------------------------------------
-
 	/// Gets the account using the object ID array,
-	/// and returns the account object array
-	public AccountObject[] getFromIDArray(String[] _oidList) {
+	/// and returns an account object array
+	///
+	/// @param   Account object ID array
+	/// 
+	/// @return  Array of corresponding account objects
+	public AccountObject[] getFromArray(String[] _oidList) {
 		AccountObject[] mList = new AccountObject[_oidList.length];
 		for (int a = 0; a < _oidList.length; ++a) {
-			mList[a] = getFromID(_oidList[a]);
+			mList[a] = get(_oidList[a]);
 		}
 		return mList;
 	}
 
-	/// Removes the accountObject using the name
-	public void removeFromName(String name) {
-		AccountObject ao = this.getFromName(name);
-		if (ao != null) {
-			removeFromID(ao._oid());
-		}
-	}
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Utility functions
+	//
+	///////////////////////////////////////////////////////////////////////////
 
-	protected String getGroupChildMetaKey(String groupOID, String AccountOID) {
+	/// @return  Internally used groupID and accountID pair string fromat
+	protected static String getGroupChildMetaKey(String groupOID, String AccountOID) {
 		return groupOID + "-" + AccountOID;
 	}
 
-	///
-	/// login configuration and utiltities
-	///--------------------------------------------------------------------------
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Static login settings, 
+	//
+	// highly doubt any of these needs to be changed.
+	// but who knows in the future
+	//
+	///////////////////////////////////////////////////////////////////////////
+
+	/// New session lifespan without token
+	public static int SESSION_NEW_LIFESPAN = 30;
+
+	/// Race condition buffer for tokens
+	public static int SESSION_RACE_BUFFER = 10;
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Login configuration and utilities
+	//
+	///////////////////////////////////////////////////////////////////////////
 
 	/// defined login lifetime, default as 3600 seconds (aka 1 hr)
 	public int loginLifetime = 3600; // 1 hr = 60 (mins) * 60 (seconds) = 3600 seconds
@@ -438,10 +474,10 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	public int loginRenewal = loginLifetime / 2; //
 
 	/// Remember me lifetime, default as 2592000 seconds (aka 30 days)
-	public int rmberMeLifetime = 2592000; // 1 mth ~= 30 (days) * 24 (hrs) * 3600 (seconds in an hr)
+	public int rememberMeLifetime = 2592000; // 1 mth ~= 30 (days) * 24 (hrs) * 3600 (seconds in an hr)
 
-	/// Remember me lifetime, default as 15 days
-	public int rmberMeRenewal = rmberMeLifetime / 2; // 15 days
+	/// Remember me lifetime, default the same as loginRenewal
+	public int rememberMeRenewal = loginRenewal;
 
 	/// Sets the cookie to be limited to http only
 	public boolean isHttpOnly = false;
@@ -457,6 +493,106 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 	/// The nonce size
 	public int nonceSize = 22;
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Actual login handling
+	//
+	///////////////////////////////////////////////////////////////////////////
+
+	/// Internally sets the login to a user (handles the respective nonce) and set the cookies for the response
+	/// 
+	/// @param  Account object used
+	/// @param  The http request to read
+	/// @param  The http response to write into
+	/// @param  Indicator for "remember me" functionality
+	/// @param  Session information map to use, useful to set custom flags, can be null
+	///
+	/// @return  Login success or failure
+	private boolean bypassSecurityChecksAndPerformNewAccountLogin(AccountObject ao, javax.servlet.http.HttpServletRequest request,
+		javax.servlet.http.HttpServletResponse response, boolean rememberMe, Map<String,Object> sessionInfo) {
+		
+		// Prepare the vars
+		//-----------------------------------------------------
+		String aoid = ao._oid();
+
+		
+		/*
+		// Detirmine the login lifetime
+		int noncLifetime;
+		if (rememberMe) {
+			noncLifetime = rememberMeLifetime;
+		} else {
+			noncLifetime = loginLifetime;
+		}
+		long expireTime = (System.currentTimeMillis()) / 1000L + noncLifetime;
+
+		String passHash = ao.getPasswordHash();
+		if (passHash == null || passHash.length() <= 1) {
+			return false;
+		}
+		String nonceSalt = NxtCrypt.randomString(nonceSize);
+
+		// @TODO: include session details, such as login IP and BrowserAgent
+		String nonc = generateSession(aoid, noncLifetime, nonceSalt, null, null);
+
+		String cookieHash = NxtCrypt.getSaltedHash(passHash, nonceSalt);
+		// Remove the special characters from the hash value
+		// Cookie with special characters failed to save at browser, specially with + and = signs
+		cookieHash = cookieHash.replaceAll("\\W", "");
+
+		// Store the cookies
+		//-----------------------------------------------------
+		int noOfCookies = 5;
+		javax.servlet.http.Cookie cookieJar[] = new javax.servlet.http.Cookie[noOfCookies];
+
+		int index = 0;
+		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Aoid", aoid);
+		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Nonc", nonc);
+		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Hash", cookieHash);
+		if (rememberMe) {
+			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "1");
+		} else {
+			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "0");
+		}
+		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Expi", String.valueOf(expireTime));
+
+		/// The cookie "Expi" store the other cookies (Rmbr, user, Nonc etc.) expiry life time in seconds.
+		/// This cookie value is used in JS (checkLogoutTime.js) for validating the login expiry time and show a message to user accordingly.
+
+		for (int a = 0; a < noOfCookies; ++a) {
+			/// Path is required for cross AJAX / domain requests,
+			/// @TODO make this configurable?
+			String cookiePath = (request.getContextPath() == null || request.getContextPath().isEmpty()) ? "/" : request
+				.getContextPath();
+			cookieJar[a].setPath(cookiePath);
+
+			if (!rememberMe) { //set to clear on browser close
+				cookieJar[a].setMaxAge(noncLifetime);
+			}
+
+			if (a < 4 && isHttpOnly) {
+				cookieJar[a].setHttpOnly(isHttpOnly);
+			}
+			if (isSecureOnly) {
+				cookieJar[a].setSecure(isSecureOnly);
+			}
+
+			if (cookieDomain != null && cookieDomain.length() > 0) {
+				cookieJar[a].setDomain(cookieDomain);
+			}
+
+			//Actually inserts the cookie
+			response.addCookie(cookieJar[a]);
+		}
+		*/
+		return true;
+	}
+
+	/*
+	///
+	/// login configuration and utiltities
+	///--------------------------------------------------------------------------
 
 	/// Gets and returns the session info, [nonceSalt, loginIP, browserAgent]
 	protected String[] getSessionInfo(String oid, String nonce) {
@@ -507,7 +643,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		// Gets the existing cookie settings
 		//----------------------------------------------------------
 
-		String puid = null;
+		String aoid = null;
 		String nonc = null;
 		String hash = null;
 		String rmbr = null;
@@ -518,8 +654,8 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 			if (crumbsFlavour == null) {
 				continue;
-			} else if (crumbsFlavour.equals(cookiePrefix + "Puid")) {
-				puid = crumbs.getValue();
+			} else if (crumbsFlavour.equals(cookiePrefix + "aoid")) {
+				aoid = crumbs.getValue();
 			} else if (crumbsFlavour.equals(cookiePrefix + "Nonc")) {
 				nonc = crumbs.getValue();
 			} else if (crumbsFlavour.equals(cookiePrefix + "Hash")) {
@@ -530,19 +666,19 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		}
 
 		// Check if all values are present, and if user ID is valid
-		if (puid == null || nonc == null || hash == null) {
+		if (aoid == null || nonc == null || hash == null) {
 			return null;
 		}
 
-		if (puid.length() < 22 || !containsID(puid)) {
+		if (aoid.length() < 22 || !containsID(aoid)) {
 			logoutAccount(request, response);
 			return null;
 		}
 
 		AccountObject ret = null;
-		String[] sessionInfo = getSessionInfo(puid, nonc);
+		String[] sessionInfo = getSessionInfo(aoid, nonc);
 		if (sessionInfo == null || sessionInfo.length <= 0 || //
-			sessionInfo[0] == null || (ret = getFromID(puid)) == null //
+			sessionInfo[0] == null || (ret = getFromID(aoid)) == null //
 		) {
 			logoutAccount(request, response);
 			return null;
@@ -566,11 +702,11 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 		if (response != null) { //assume renewal process check
 			if (rmbr != null && rmbr.equals("1")) {
-				if (accountSessions.getLifespan(puid + "-" + nonc) < rmberMeRenewal) { //needs renewal (perform it!)
+				if (accountSessions.getLifespan(aoid + "-" + nonc) < rememberMeRenewal) { //needs renewal (perform it!)
 					_setLogin(ret, request, response, true);
 				}
 			} else {
-				if (accountSessions.getLifespan(puid + "-" + nonc) < loginRenewal) { //needs renewal (perform it!)
+				if (accountSessions.getLifespan(aoid + "-" + nonc) < loginRenewal) { //needs renewal (perform it!)
 					_setLogin(ret, request, response, false);
 				}
 			}
@@ -584,90 +720,11 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		loginRenewal = loginLifetime / 2;
 	}
 
-	/// Internally sets the login to a user (handles the respective nonce) and set the cookies for the response
-	private boolean _setLogin(AccountObject po, javax.servlet.http.HttpServletRequest request,
-		javax.servlet.http.HttpServletResponse response, boolean rmberMe) {
-
-		// Prepare the vars
-		//-----------------------------------------------------
-		String puid = po._oid();
-
-		// Detirmine the login lifetime
-		int noncLifetime;
-		if (rmberMe) {
-			noncLifetime = rmberMeLifetime;
-		} else {
-			noncLifetime = loginLifetime;
-		}
-		long expireTime = (System.currentTimeMillis()) / 1000L + noncLifetime;
-
-		String passHash = po.getPasswordHash();
-		if (passHash == null || passHash.length() <= 1) {
-			return false;
-		}
-		String nonceSalt = NxtCrypt.randomString(nonceSize);
-
-		// @TODO: include session details, such as login IP and BrowserAgent
-		String nonc = generateSession(puid, noncLifetime, nonceSalt, null, null);
-
-		String cookieHash = NxtCrypt.getSaltedHash(passHash, nonceSalt);
-		// Remove the special characters from the hash value
-		// Cookie with special characters failed to save at browser, specially with + and = signs
-		cookieHash = cookieHash.replaceAll("\\W", "");
-
-		// Store the cookies
-		//-----------------------------------------------------
-		int noOfCookies = 5;
-		javax.servlet.http.Cookie cookieJar[] = new javax.servlet.http.Cookie[noOfCookies];
-
-		int index = 0;
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Puid", puid);
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Nonc", nonc);
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Hash", cookieHash);
-		if (rmberMe) {
-			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "1");
-		} else {
-			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "0");
-		}
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Expi", String.valueOf(expireTime));
-
-		/// The cookie "Expi" store the other cookies (Rmbr, user, Nonc etc.) expiry life time in seconds.
-		/// This cookie value is used in JS (checkLogoutTime.js) for validating the login expiry time and show a message to user accordingly.
-
-		for (int a = 0; a < noOfCookies; ++a) {
-			/// Path is required for cross AJAX / domain requests,
-			/// @TODO make this configurable?
-			String cookiePath = (request.getContextPath() == null || request.getContextPath().isEmpty()) ? "/" : request
-				.getContextPath();
-			cookieJar[a].setPath(cookiePath);
-
-			if (!rmberMe) { //set to clear on browser close
-				cookieJar[a].setMaxAge(noncLifetime);
-			}
-
-			if (a < 4 && isHttpOnly) {
-				cookieJar[a].setHttpOnly(isHttpOnly);
-			}
-			if (isSecureOnly) {
-				cookieJar[a].setSecure(isSecureOnly);
-			}
-
-			if (cookieDomain != null && cookieDomain.length() > 0) {
-				cookieJar[a].setDomain(cookieDomain);
-			}
-
-			//Actually inserts the cookie
-			response.addCookie(cookieJar[a]);
-		}
-
-		return true;
-	}
-
 	/// Login the user if valid
 	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request,
-		javax.servlet.http.HttpServletResponse response, AccountObject accountObj, String rawPassword, boolean rmberMe) {
+		javax.servlet.http.HttpServletResponse response, AccountObject accountObj, String rawPassword, boolean rememberMe) {
 		if (accountObj != null && accountObj.validatePassword(rawPassword)) {
-			_setLogin(accountObj, request, response, rmberMe);
+			_setLogin(accountObj, request, response, rememberMe);
 			return accountObj;
 		}
 
@@ -676,15 +733,15 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 	/// Login the user if valid
 	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request,
-		javax.servlet.http.HttpServletResponse response, String nicename, String rawPassword, boolean rmberMe) {
-		return loginAccount(request, response, getFromName(nicename), rawPassword, rmberMe);
+		javax.servlet.http.HttpServletResponse response, String nicename, String rawPassword, boolean rememberMe) {
+		return loginAccount(request, response, getFromName(nicename), rawPassword, rememberMe);
 	}
 
 	/// Facebook Login user
 	public AccountObject loginAccountViaFacebook(javax.servlet.http.HttpServletRequest request,
-		javax.servlet.http.HttpServletResponse response, AccountObject accountObj, String rawPassword, boolean rmberMe) {
+		javax.servlet.http.HttpServletResponse response, AccountObject accountObj, String rawPassword, boolean rememberMe) {
 		if (accountObj != null) {
-			_setLogin(accountObj, request, response, rmberMe);
+			_setLogin(accountObj, request, response, rememberMe);
 			return accountObj;
 		}
 

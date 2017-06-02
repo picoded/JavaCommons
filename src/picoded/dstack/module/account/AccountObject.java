@@ -6,6 +6,7 @@ import picoded.dstack.*;
 import picoded.dstack.core.*;
 import picoded.conv.*;
 import picoded.struct.*;
+import picoded.security.*;
 
 ///
 /// Represents a single group / user account.
@@ -78,31 +79,84 @@ public class AccountObject extends Core_MetaObject {
 		return hasLoginID(name);
 	}
 
-	/*
-	// Internal utility functions
-	//-------------------------------------------------------------------------
+	/// Removes the old name from the database
+	///
+	/// @param  LoginID to setup for this account
+	public void removeLoginID(String name) {
+		if(hasLoginID(name)) {
+			mainTable.accountLoginIdMap.remove(name);
+		}
+	}
 
-	/// Gets and returns the stored password hash
+	/// Sets the name as a unique value, delete all previous alias
+	///
+	/// @param  LoginID to setup for this account
+	///
+	/// @return TRUE if login ID is configured to this account
+	public boolean setUniqueLoginID(String name) {
+
+		// The old name list, to check if new name already is set
+		Set<String> oldNamesList = getLoginIDSet();
+
+		// Check if name exist in list
+		if (Arrays.asList(oldNamesList).contains(name)) {
+			// Already exists in the list, does nothing
+		} else {
+			// Name does not exist, attempt to set the name
+			if (!setLoginID(name)) { 
+				// Failed to setup the name, terminate
+				return false;
+			}
+		}
+
+		// Iterate the names, delete uneeded ones
+		for (String oldName : oldNamesList) {
+			// Skip the unique name, 
+			// prevent it from being deleted
+			if (oldName.equals(name)) {
+				continue;
+			}
+			// Remove the login ID
+			mainTable.accountLoginIdMap.remove(oldName);
+		}
+
+		return true;
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Password management
+	//
+	///////////////////////////////////////////////////////////////////////////
+
+	/// Gets and returns the stored password hash,
+	/// Intentionally made protected to avoid accidental use externally
+	///
+	/// @return  Password salted hash, as per NxtCrypt usage
 	protected String getPasswordHash() {
 		return mainTable.accountAuthMap.get(_oid);
 	}
 
-	// Password management
-	//-------------------------------------------------------------------------
-
 	/// Indicates if the current account has a configured password, it is possible there is no password
 	/// if it functions as a group. Or is passwordless login
+	///
+	/// @return  True if password was configured
 	public boolean hasPassword() {
 		String h = getPasswordHash();
 		return (h != null && h.length() > 0);
 	}
 
 	/// Remove the account password
+	/// This should only be used for group type account objects
 	public void removePassword() {
 		mainTable.accountAuthMap.remove(_oid);
 	}
 
 	/// Validate if the given password is valid
+	///
+	/// @param  raw Password string to validate
+	///
+	/// @return  True if password is valid
 	public boolean validatePassword(String pass) {
 		String hash = getPasswordHash();
 		if (hash != null) {
@@ -112,16 +166,26 @@ public class AccountObject extends Core_MetaObject {
 	}
 
 	/// Set the account password
-	public boolean setPassword(String pass) {
+	///
+	/// @param  raw Password string to setup
+	public void setPassword(String pass) {
+		// ensure its own OID is registered
+		saveDelta(); 
+
+		// Setup the password
 		if (pass == null) {
 			removePassword();
 		} else {
 			mainTable.accountAuthMap.put(_oid, NxtCrypt.getPassHash(pass));
 		}
-		return true;
 	}
 
 	/// Set the account password, after checking old password
+	///
+	/// @param  raw Password string to setup
+	/// @param  old Password to validate
+	///
+	/// @return  True if password change was valid
 	public boolean setPassword(String pass, String oldPass) {
 		if (validatePassword(oldPass)) {
 			setPassword(pass);
@@ -130,40 +194,178 @@ public class AccountObject extends Core_MetaObject {
 		return false;
 	}
 
-	// Display name management
-	//-------------------------------------------------------------------------
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Session management
+	//
+	///////////////////////////////////////////////////////////////////////////
 
-	/// Removes the old name from the database
-	/// @TODO Add-in security measure to only removeName of this user, instead of ANY
-	public void removeName(String name) {
-		mainTable.loginIdMap.remove(name);
+	/// Checks if the current session is associated with the account
+	///
+	/// @param  Session ID to validate
+	///
+	/// @return TRUE if login ID belongs to this account
+	public boolean hasSession(String sessionID) {
+		return sessionID != null && _oid.equals(mainTable.sessionLinkMap.get(sessionID));
 	}
 
-	/// Sets the name as a unique value, delete all previous alias
-	public boolean setUniqueName(String name) {
-
-		// The old name list, to check if new name already is set
-		Set<String> oldNamesList = getNames();
-		if (!(Arrays.asList(oldNamesList).contains(name))) {
-			if (!setName(name)) { //does not own the name, but fail to set =(
-				return false;
-			}
-		}
-
-		// Iterate the names, delete uneeded ones
-		for (String oldName : oldNamesList) {
-			// Skip new name
-			if (oldName.equals(name)) {
-				continue;
-			}
-			removeName(oldName);
-		}
-
-		return true;
+	/// List the various session ID's involved with this account
+	///
+	/// @return  Set of login session ID's
+	public Set<String> getSessionSet() {
+		return mainTable.sessionLinkMap.keySet(_oid);
 	}
 
-	// Group management utility function
-	//-------------------------------------------------------------------------
+	/// Get and return the session information meta
+	///
+	/// @param  Session ID to get
+	///
+	/// @return  Information meta if session is valid
+	public Map<String,Object> getSessionInfo(String sessionID) {
+		// Validate that session is legit
+		if(!hasSession(sessionID)) {
+			return null;
+		}
+
+		// Return the session information
+		return mainTable.sessionInfoMap.getStringMap(sessionID, null);
+	}
+
+	/// Generate a new session with the provided meta information
+	///
+	/// Additionally if no tokens are generated and issued in the next
+	/// 30 seconds, the session will expire. 
+	/// 
+	/// Subseqently session expirary will be tag to 
+	/// the most recently generated token.
+	///
+	/// Additionally info object is INTENTIONALLY NOT stored as a
+	/// MetaObject, for performance reasons.
+	///
+	/// @param  Meta information map associated with the session, 
+	///         a blank map is assumed if not provided.
+	///
+	/// @return  The session ID used
+	public String newSession(Map<String,Object> info) {
+
+		// Normalize the info object map
+		if( info == null ) {
+			info = new HashMap<String,Object>();
+		}
+
+		// Set the session expirary time : 30 seconds (before tokens)
+		long expireTime = (System.currentTimeMillis()) / 1000L + AccountTable.SESSION_NEW_LIFESPAN;
+
+		// Generate a base58 guid for session key
+		String sessionID = GUID.base58();
+
+		// As unlikely as it is, on GUID collision, 
+		// we do not want any session swarp EVER
+		if( mainTable.sessionLinkMap.get( sessionID ) != null ) {
+			throw new RuntimeException("GUID collision for sessionID : "+sessionID);
+		}
+
+		// Time to set it all up, with expire timestamp
+		mainTable.sessionLinkMap.putWithExpiry( sessionID, _oid, expireTime );
+		mainTable.sessionInfoMap.putWithExpiry( sessionID, ConvertJSON.fromMap(info), expireTime + AccountTable.SESSION_RACE_BUFFER );
+
+		// Return the session key
+		return sessionID;
+	}
+
+	/// Revoke a session, associated to this account.
+	///
+	/// This will also revoke all tokens associated to this session
+	///
+	/// @param  SessionID to revoke
+	public void revokeSession(String sessionID) {
+		// Validate the session belongs to this account !
+		if( hasSession(sessionID) ) {
+			// Session ownership validated, time to revoke!
+
+			// @TODO : Revoke all tokens associated to this session
+
+			// Revoke the session info
+			mainTable.sessionLinkMap.remove(sessionID);
+			mainTable.sessionInfoMap.remove(sessionID);
+		}
+	}
+
+	/// Revoke all sessions, associated to this account
+	public void revokeAllSession() {
+		Set<String> sessions = getSessionSet();
+		for(String oneSession : sessions) {
+			revokeSession(oneSession);
+		}
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Session token management
+	//
+	///////////////////////////////////////////////////////////////////////////
+
+	/// Checks if the current session token is associated with the account
+	///
+	/// @param  Session ID to validate
+	/// @param  Token ID to validate
+	///
+	/// @return TRUE if login ID belongs to this account
+	public boolean hasToken(String sessionID, String tokenID) {
+		return hasSession(sessionID) && sessionID.equals(mainTable.sessionTokenMap.get(tokenID));
+	}
+
+	/// Get the token set associated with the session and account
+	/// 
+	/// @param   Session ID to fetch from
+	///
+	/// @return  The list of token ID's currently associated to this session
+	///          null, if session is not valid.
+	public Set<String> getTokenSet(String sessionID) {
+		if( hasSession(sessionID) ) {
+			return mainTable.sessionTokenMap.keySet(sessionID);
+		}
+		return null;
+	}
+
+	/// Generate a new token, with a timeout
+	///
+	/// Note that this token will update the session timeout, 
+	/// even if there was a longer session previously set.
+	///
+	/// @param  Session ID to generate token from
+	/// @param  The expire timestamp of the token
+	///
+	/// @return  The tokenID generated, null on invalid session
+	public String newToken(String sessionID, long expireTime) {
+
+		// Terminate if session is invalid
+		if( !hasSession(sessionID) ) {
+			return null;
+		}
+
+		// Generate a base58 guid for session key
+		String tokenID = GUID.base58();
+
+		// Renew every session!
+		mainTable.sessionLinkMap.setExpiry(sessionID, expireTime + AccountTable.SESSION_RACE_BUFFER );
+		mainTable.sessionInfoMap.setExpiry(sessionID, expireTime + AccountTable.SESSION_RACE_BUFFER * 2 );
+
+		// Register the token
+		mainTable.sessionTokenMap.putWithExpiry(tokenID, sessionID, expireTime);
+		
+		// Return the token
+		return tokenID;
+	}
+
+
+	/*
+	
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Group management
+	//
+	///////////////////////////////////////////////////////////////////////////
 
 	/// Gets the cached child map
 	protected MetaObject _group_userToRoleMap = null;

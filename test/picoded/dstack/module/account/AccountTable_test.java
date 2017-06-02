@@ -6,6 +6,7 @@ import org.junit.*;
 
 // Test depends
 import java.util.*;
+import picoded.conv.*;
 import picoded.dstack.*;
 import picoded.dstack.struct.simple.*;
 import picoded.TestConfig;
@@ -79,5 +80,58 @@ public class AccountTable_test {
 		// Removal test
 		testAO.remove( testAO );
 		blankHelloWorld();
+	}
+
+	@Test
+	public void passwordTest() {
+		AccountObject testAO = testAT.newObject("hello-world");
+
+		assertFalse( testAO.hasPassword() );
+		assertFalse( testAO.validatePassword("bad-pass") );
+
+		testAO.setPassword("P@ssw0rd!");
+		assertTrue( testAO.hasPassword() );
+		assertTrue( testAO.validatePassword("P@ssw0rd!") );
+		assertFalse( testAO.validatePassword("bad-pass") );
+	}
+
+	@Test
+	public void sessionAndTokenManagement() {
+		AccountObject testAO = testAT.newObject("hello-world");
+		testAO.setPassword("P@ssw0rd!");
+
+		// The existing session ID sets
+		assertFalse( testAO.hasSession("bad-session") );
+		assertEquals(0, testAO.getSessionSet().size());
+
+		// Session info map
+		Map<String,Object> helloInfo = new HashMap<String,Object>();
+		helloInfo.put("hello", "motto");
+
+		// Time to generate the ession
+		String sessionID = null;
+		assertNotNull( sessionID = testAO.newSession(helloInfo) );
+		
+		// And validate it
+		assertTrue( testAO.hasSession(sessionID) );
+		assertEquals( 1, testAO.getSessionSet().size() );
+		assertEquals( sessionID, testAO.getSessionSet().toArray()[0] );
+		assertEquals( ConvertJSON.fromMap( helloInfo ), ConvertJSON.fromMap( testAO.getSessionInfo(sessionID) ) );
+
+		// TOKEN managment time
+		//---------------------------
+
+		// The existing token checks
+		assertFalse( testAO.hasToken(sessionID, "bad-bad-token") );
+		assertEquals(0, testAO.getTokenSet(sessionID).size());
+
+		// Generate a token
+		String tokenID = null;
+		assertNotNull( tokenID = testAO.newToken(sessionID, (System.currentTimeMillis()) / 1000L + 10 ) );
+
+		// And validate it
+		assertTrue( testAO.hasToken(sessionID, tokenID) );
+		assertEquals( 1, testAO.getTokenSet(sessionID).size() );
+		assertEquals( tokenID, testAO.getTokenSet(sessionID).toArray()[0] );
 	}
 }

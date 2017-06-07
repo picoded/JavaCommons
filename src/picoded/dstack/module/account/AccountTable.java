@@ -381,7 +381,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/// @param  The login ID (nice-name/email)
 	///
 	/// @return  Account ID associated, if any
-	public String loginToAccountID(String name) {
+	public String loginIDToAccountID(String name) {
 		return accountLoginIdMap.get(name);
 	}
 
@@ -391,7 +391,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	///
 	/// @return  AccountObject representing the account ID if found
 	public AccountObject getFromLoginID(Object name) {
-		String _oid = loginToAccountID(name.toString());
+		String _oid = loginIDToAccountID(name.toString());
 		if (_oid != null) {
 			return get(_oid);
 		}
@@ -503,13 +503,127 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/// The nonce size
 	public int nonceSize = 22;
 
+	/// Cookie path settings to overwrite, use NULL to use contextPath (as detected)
+	public String cookiePath = null;
+
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Actual login handling
 	//
+	// These features depends on the following packages
+	//
+	// import javax.servlet.ServletException;
+	// import javax.servlet.http.HttpServletRequest;
+	// import javax.servlet.http.HttpServletResponse;
+	// import javax.servlet.http.Cookie;
+	//
 	///////////////////////////////////////////////////////////////////////////
 
-	/// Internally sets the login to a user (handles the respective session tokens) and set the cookies for the response
+	/// Internal call to store the actual cookie and the respective values
+	///
+	/// @param   HTTP request to read server settings from
+	/// @param   HTTP Response to write into
+	/// @param   Session ID to store
+	/// @param   Token ID to store
+	/// @param   Remember me settings
+	/// @param   The cookie lifetime, 0 deletes the cookie, else its ignore if remember me is false
+	/// @param   The cookie expire timestamp
+	protected boolean storeCookiesInsideTheCookieJar(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response,
+		String sessionID, String tokenID, boolean rememberMe, int lifeTime, long expireTime) {
+
+		// instant failure without response object
+		if( response == null ) {
+			return false;
+		}
+		
+		// Setup the cookie jar
+		int noOfCookies = 4;
+		javax.servlet.http.Cookie cookieJar[] = new javax.servlet.http.Cookie[noOfCookies];
+
+		// Store session and token cookies
+		cookieJar[0] = new javax.servlet.http.Cookie(cookiePrefix + "ses", sessionID);
+		cookieJar[1] = new javax.servlet.http.Cookie(cookiePrefix + "tok", tokenID);
+
+		// Remember me configuration
+		// Should this be handled usign server side storage data?
+		// If its not a valid security threat, this should be ok right?
+		if (rememberMe) {
+			cookieJar[2] = new javax.servlet.http.Cookie(cookiePrefix + "rmb", "1");
+		} else {
+			cookieJar[2] = new javax.servlet.http.Cookie(cookiePrefix + "rmb", "0");
+		}
+
+		// The cookie "exp"-iry store the other cookies (Rmbr, user, Nonc etc.) expiry life time in seconds.
+		// This cookie value is used in JS (checkLogoutTime.js) for validating the login expiry time 
+		// and show a message to user accordingly.
+		//
+		// Note that this cookie IGNORES isHttpOnly setting
+		cookieJar[3] = new javax.servlet.http.Cookie(cookiePrefix + "exp", String.valueOf(expireTime));
+
+		// Storing the cookie jar with the browser
+		for (int a = 0; a < noOfCookies; ++a) {
+
+			/// Cookie Path is required for cross AJAX / domain requests,
+			/// This is taken from the request settings, if not defined
+			String cPath = cookiePath;
+			if( cPath == null ) {
+				if(request.getContextPath() == null || request.getContextPath().isEmpty()) {
+					cPath = "/";
+				} else {
+					cPath = request.getContextPath();
+				}
+			}
+			cookieJar[a].setPath(cPath);
+
+			// If remember me is configured
+			if(rememberMe || lifeTime == 0) {
+				cookieJar[a].setMaxAge(lifeTime);
+			} else {
+				cookieJar[a].setMaxAge(-1);
+			}
+			
+			// Set isHttpOnly flag, to prevent JS based session attacks
+			// this is ignored for the expire timestamp field (index = 3)
+			if (isHttpOnly && a != 3) {
+				cookieJar[a].setHttpOnly(isHttpOnly);
+			}
+
+			// Set it to be https strict if relevent
+			if (isSecureOnly) {
+				cookieJar[a].setSecure(isSecureOnly);
+			}
+
+			// Set a strict cookie domain
+			if (cookieDomain != null && cookieDomain.length() > 0) {
+				cookieJar[a].setDomain(cookieDomain);
+			}
+
+			// Actually inserts the cookie
+			response.addCookie(cookieJar[a]);
+		}
+
+		// Valid
+		return true;
+	}
+
+	/// Utility function to get the configured cookie lifetime, with the relevent settings
+	///
+	/// @param  remember configuration boolean
+	///
+	/// @return configured lifetime (not expire time)
+	protected int getLifeTime(boolean rememberMe) {
+		if (rememberMe) {
+			return rememberMeLifetime;
+		} else {
+			return loginLifetime;
+		}
+	}
+
+	/// Performs the login to a user (handles the respective session tokens) and set the cookies for the response.
+	///
+	/// As this does the login without the actual password authentication steps.
+	/// Unless you are creating a custom login intergration. DO NOT USE this, and use loginUser instead, with the
+	/// relevent username and password.
 	///
 	/// The cookie is configured to store the following information under the "cookiePrefix" (default Account_)
 	/// + Session ID
@@ -524,7 +638,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/// @param  Session information map to use, useful to set custom flags, can be null
 	///
 	/// @return  Login success or failure
-	private boolean bypassSecurityChecksAndPerformNewAccountLogin(AccountObject ao, javax.servlet.http.HttpServletRequest request,
+	public boolean bypassSecurityChecksAndPerformNewAccountLogin(AccountObject ao, javax.servlet.http.HttpServletRequest request,
 		javax.servlet.http.HttpServletResponse response, boolean rememberMe, Map<String,Object> sessionInfo) {
 		
 		// Prepare the vars
@@ -532,15 +646,10 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		String aoid = ao._oid();
 
 		// Detirmine the login lifetime
-		int noncLifetime;
-		if (rememberMe) {
-			noncLifetime = rememberMeLifetime;
-		} else {
-			noncLifetime = loginLifetime;
-		}
-		long expireTime = (System.currentTimeMillis()) / 1000L + noncLifetime;
+		int lifeTime = getLifeTime(rememberMe);
+		long expireTime = (System.currentTimeMillis()) / 1000L + lifeTime;
 
-		// Session info handling
+		// Session info handling 
 		//-----------------------------------------------------
 
 		// Prepare the session info
@@ -551,264 +660,186 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		// Lets do some USER_AGENT sniffing
 		sessionInfo.put( "USER_AGENT", request.getHeader("USER_AGENT") );
 
+		// @TODO : Conisder sniffing additional info such as IP address
+
 		// Generate the session and tokens
 		//-----------------------------------------------------
 		
 		String sessionID = ao.newSession(sessionInfo);
 		String tokenID = ao.newToken(sessionID, expireTime);
 
-		// Store the cookies
+		// Store the cookies, and end
 		//-----------------------------------------------------
-		int noOfCookies = 4;
-		javax.servlet.http.Cookie cookieJar[] = new javax.servlet.http.Cookie[noOfCookies];
-
-		int index = 0;
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "ses", sessionID);
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "tok", tokenID);
-
-		// Remember me configuration
-		// Should this be handled usign server side storage data?
-		// If its not a valid security threat, this should be ok right?
-		if (rememberMe) {
-			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "rmb", "1");
-		} else {
-			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "rmb", "0");
-		}
-
-		// The cookie "exp"-iry store the other cookies (Rmbr, user, Nonc etc.) expiry life time in seconds.
-		// This cookie value is used in JS (checkLogoutTime.js) for validating the login expiry time 
-		// and show a message to user accordingly.
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "exp", String.valueOf(expireTime));
-
-		// Storing the cookie jar with the browser
-		for (int a = 0; a < noOfCookies; ++a) {
-			/// Path is required for cross AJAX / domain requests,
-			/// @TODO make this configurable?
-			String cookiePath = (request.getContextPath() == null || request.getContextPath().isEmpty()) ? "/" : request
-				.getContextPath();
-			cookieJar[a].setPath(cookiePath);
-
-			if (!rememberMe) { //set to clear on browser close
-				cookieJar[a].setMaxAge(noncLifetime);
-			}
-
-			if (a < 4 && isHttpOnly) {
-				cookieJar[a].setHttpOnly(isHttpOnly);
-			}
-			if (isSecureOnly) {
-				cookieJar[a].setSecure(isSecureOnly);
-			}
-
-			if (cookieDomain != null && cookieDomain.length() > 0) {
-				cookieJar[a].setDomain(cookieDomain);
-			}
-
-			//Actually inserts the cookie
-			response.addCookie(cookieJar[a]);
-		}
-		
-		return true;
-	}
-
-	/*
-	///
-	/// login configuration and utiltities
-	///--------------------------------------------------------------------------
-
-	/// Gets and returns the session info, [nonceSalt, loginIP, browserAgent]
-	protected String[] getSessionInfo(String oid, String nonce) {
-		return accountSessions.getStringArray(oid + "-" + nonce);
-	}
-
-	/// Sets the session info with the given nonceSalt, IP, and browserAgent
-	protected String generateSession(String oid, int lifespan, String nonceSalt, String ipString, String browserAgent) {
-		String nonce = NxtCrypt.randomString(nonceSize);
-		String key = oid + "-" + nonce;
-		accountSessions.putWithLifespan(key,
-			ConvertJSON.fromList(Arrays.asList(new String[] { nonceSalt, ipString, browserAgent })), lifespan);
-		return nonce;
-	}
-
-	///
-	/// httpServlet authentication utility
-	///
-	/// These features depends on the following packages
-	///
-	/// import javax.servlet.ServletException;
-	/// import javax.servlet.http.HttpServletRequest;
-	/// import javax.servlet.http.HttpServletResponse;
-	/// import javax.servlet.http.Cookie;
-	///
-	///--------------------------------------------------------------------------
-
-	/// Validates the user retur true/false, without updating the response cookie
-	public AccountObject getRequestUser(javax.servlet.http.HttpServletRequest request) {
-		return getRequestUser(request, null);
-	}
-
-	/// Validates the user retur true/false, with an update response cookie / token if needed
-	public AccountObject getRequestUser(javax.servlet.http.HttpServletRequest request,
-		javax.servlet.http.HttpServletResponse response) {
-
-		// don't set cookies if it is logout request
-		if (request.getPathInfo() != null && request.getPathInfo().indexOf("logout") != -1) {
-			return null;
-		}
-
-		javax.servlet.http.Cookie[] cookieJar = request.getCookies();
-
-		if (cookieJar == null) {
-			return null;
-		}
-
-		// Gets the existing cookie settings
-		//----------------------------------------------------------
-
-		String aoid = null;
-		String nonc = null;
-		String hash = null;
-		String rmbr = null;
-		String crumbsFlavour = null;
-
-		for (javax.servlet.http.Cookie crumbs : cookieJar) {
-			crumbsFlavour = crumbs.getName();
-
-			if (crumbsFlavour == null) {
-				continue;
-			} else if (crumbsFlavour.equals(cookiePrefix + "aoid")) {
-				aoid = crumbs.getValue();
-			} else if (crumbsFlavour.equals(cookiePrefix + "Nonc")) {
-				nonc = crumbs.getValue();
-			} else if (crumbsFlavour.equals(cookiePrefix + "Hash")) {
-				hash = crumbs.getValue();
-			} else if (crumbsFlavour.equals(cookiePrefix + "Rmbr")) {
-				rmbr = crumbs.getValue();
-			}
-		}
-
-		// Check if all values are present, and if user ID is valid
-		if (aoid == null || nonc == null || hash == null) {
-			return null;
-		}
-
-		if (aoid.length() < 22 || !containsID(aoid)) {
-			logoutAccount(request, response);
-			return null;
-		}
-
-		AccountObject ret = null;
-		String[] sessionInfo = getSessionInfo(aoid, nonc);
-		if (sessionInfo == null || sessionInfo.length <= 0 || //
-			sessionInfo[0] == null || (ret = getFromID(aoid)) == null //
-		) {
-			logoutAccount(request, response);
-			return null;
-		}
-
-		String passHash = ret.getPasswordHash();
-
-		String computedCookieHash = NxtCrypt.getSaltedHash(passHash, sessionInfo[0]);
-		// Remove the special characters from the hash value
-		// Cookie with special characters failed to save at browser, specially with + and = signs
-		computedCookieHash = computedCookieHash.replaceAll("\\W", "");
-
-		// Invalid cookie hash, exits
-		if (!NxtCrypt.slowEquals(hash, computedCookieHash)) {
-			logoutAccount(request, response);
-			return null;
-		}
-
-		// From this point onwards, the session is valid. Now it performs checks for the renewal process
-		//---------------------------------------------------------------------------------------------------
-
-		if (response != null) { //assume renewal process check
-			if (rmbr != null && rmbr.equals("1")) {
-				if (accountSessions.getLifespan(aoid + "-" + nonc) < rememberMeRenewal) { //needs renewal (perform it!)
-					_setLogin(ret, request, response, true);
-				}
-			} else {
-				if (accountSessions.getLifespan(aoid + "-" + nonc) < loginRenewal) { //needs renewal (perform it!)
-					_setLogin(ret, request, response, false);
-				}
-			}
-		}
-
-		return ret;
-	}
-
-	public void setLoginLifetimeValue(int inLoginLifetime){
-		loginLifetime = inLoginLifetime;
-		loginRenewal = loginLifetime / 2;
-	}
-
-	/// Login the user if valid
-	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request,
-		javax.servlet.http.HttpServletResponse response, AccountObject accountObj, String rawPassword, boolean rememberMe) {
-		if (accountObj != null && accountObj.validatePassword(rawPassword)) {
-			_setLogin(accountObj, request, response, rememberMe);
-			return accountObj;
-		}
-
-		return null;
-	}
-
-	/// Login the user if valid
-	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request,
-		javax.servlet.http.HttpServletResponse response, String nicename, String rawPassword, boolean rememberMe) {
-		return loginAccount(request, response, getFromName(nicename), rawPassword, rememberMe);
-	}
-
-	/// Facebook Login user
-	public AccountObject loginAccountViaFacebook(javax.servlet.http.HttpServletRequest request,
-		javax.servlet.http.HttpServletResponse response, AccountObject accountObj, String rawPassword, boolean rememberMe) {
-		if (accountObj != null) {
-			_setLogin(accountObj, request, response, rememberMe);
-			return accountObj;
-		}
-
-		return null;
+		return storeCookiesInsideTheCookieJar(request, response, sessionID, tokenID, rememberMe, lifeTime, expireTime);
 	}
 
 	/// Logout any existing users
+	///
+	/// @param  The http request to read
+	/// @param  The http response to write into
+	///
+	/// @return  Logout success or failure
 	public boolean logoutAccount(javax.servlet.http.HttpServletRequest request,
 		javax.servlet.http.HttpServletResponse response) {
 		if (response == null) {
 			return false;
 		}
 
-		javax.servlet.http.Cookie cookieJar[] = new javax.servlet.http.Cookie[5];
-
-		cookieJar[0] = new javax.servlet.http.Cookie(cookiePrefix + "User", "-");
-		cookieJar[1] = new javax.servlet.http.Cookie(cookiePrefix + "Nonc", "-");
-		cookieJar[2] = new javax.servlet.http.Cookie(cookiePrefix + "Hash", "-");
-		cookieJar[3] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "-");
-		cookieJar[4] = new javax.servlet.http.Cookie(cookiePrefix + "Expi", "-");
-
-		for (int a = 0; a < 5; ++a) {
-			cookieJar[a].setMaxAge(1);
-
-			/// Path is required for cross AJAX / domain requests,
-			/// @TODO make this configurable?
-			String cookiePath = (request.getContextPath() == null || request.getContextPath().isEmpty()) ? "/" : request
-				.getContextPath();
-			cookieJar[a].setPath(cookiePath);
-
-			if (a < 4 && isHttpOnly) {
-				cookieJar[a].setHttpOnly(isHttpOnly);
-			}
-			if (isSecureOnly) {
-				cookieJar[a].setSecure(isSecureOnly);
-			}
-
-			if (cookieDomain != null && cookieDomain.length() > 0) {
-				cookieJar[a].setDomain(cookieDomain);
-			}
-
-			//Actually inserts the cookie
-			response.addCookie(cookieJar[a]);
-		}
-		return true;
+		return storeCookiesInsideTheCookieJar(request, response, "-", "-", false, 0, 0);
 	}
+
+	/// Validates the user retur true/false, with an update response cookie / token if needed
+	///
+	/// NOTE: login session renewal will not be performed on request url containing the keyword "logout"
+	///
+	/// @param   http servlet request
+	/// @param   http servlet response
+	///
+	/// @return  Valid logged in account object
+	public AccountObject getRequestUser(javax.servlet.http.HttpServletRequest request,
+		javax.servlet.http.HttpServletResponse response) {
+
+		// Do not set cookies if it is logout request
+		// This is to prevent session renewal and revoking from happening simultainously
+		// creating unexpected behaviour
+		//
+		// @TODO : Consider a more fixed pattern?
+		if (request.getPathInfo() != null && request.getPathInfo().indexOf("logout") != -1) {
+			return null;
+		}
+
+		javax.servlet.http.Cookie[] cookieJar = request.getCookies();
+		if (cookieJar == null) {
+			return null;
+		}
+
+		// Gets the existing cookie settings
+		//----------------------------------------------------------
+		String sessionID = null;
+		String tokenID = null;
+		boolean rememberMe = false;
+
+		for (javax.servlet.http.Cookie crumbs : cookieJar) {
+			String crumbsFlavour = crumbs.getName();
+
+			if (crumbsFlavour == null) {
+				continue;
+			} else if (crumbsFlavour.equals(cookiePrefix + "ses")) {
+				sessionID = crumbs.getValue();
+			} else if (crumbsFlavour.equals(cookiePrefix + "tok")) {
+				tokenID = crumbs.getValue();
+			} else if (crumbsFlavour.equals(cookiePrefix + "rmb")) {
+				rememberMe = "1".equals(crumbs.getValue());
+			}
+		}
+
+		// Time to validate the cookie settings
+		//----------------------------------------------------------
+
+		// Check if a session id and token id was provided
+		// in a valid format
+		if (sessionID == null || tokenID == null || sessionID.length() < 22 || tokenID.length() < 22) {
+			return null;
+		}
+
+		// If an invalid session / token ID is provided, assume logout
+		AccountObject ret = getFromSessionID( sessionID );
+
+		// Session ID fails to fetch an account object
+		if( ret == null ) {
+			logoutAccount(request,response);
+			return null;
+		}
+
+		// Get the token lifespan, not that this also
+		// check for invalid session and token
+		long tokenLifespan = ret.getTokenLifespan(sessionID, tokenID);
+		if( tokenLifespan <= 0 ) {
+			// Does logout on invalid token
+			logoutAccount(request,response);
+			return null;
+		}
+
+		// From this point onwards, the session is valid. Now it performs checks for the renewal process
+		//---------------------------------------------------------------------------------------------------
+		if (response != null) { 
+			
+			// Renewal checking
+			boolean needRenewal = false;
+			if( rememberMe ) {
+				if( tokenLifespan < rememberMeRenewal ) { // needs renewal (perform it!)
+					needRenewal = true;
+				}
+			} else {
+				if( tokenLifespan < loginRenewal ) { // needs renewal (perform it!)
+					needRenewal = true;
+				}
+			}
+
+			// Actual renewal process
+			if( needRenewal ) {
+				// Detirmine the renewed login lifetime and expirary to set (if new issued token)
+				long expireTime = (System.currentTimeMillis()) / 1000L + getLifeTime(rememberMe);
+
+				// Issue the next token
+				String nextTokenID = ret.issueNextToken(sessionID, tokenID, expireTime);
+
+				// Get the actual expiry of the next token (if it was previously issued)
+				expireTime = ret.getTokenExpiry(sessionID, nextTokenID);
+
+				// If nextTokenID and expireTime fails, assume login failure
+				if( nextTokenID == null || expireTime < 0 ) {
+					logoutAccount(request,response);
+					return null;
+				}
+
+				// Get lifespan
+				long lifespan = expireTime - (System.currentTimeMillis()) / 1000L;
+
+				// Setup the next token
+				storeCookiesInsideTheCookieJar(request, response, sessionID, nextTokenID, rememberMe, (int)lifespan, expireTime);
+			}
+		}
+		
+		// Return the validated account object
+		//---------------------------------------------------------------------------------------------------
+		return ret;
+	}
+
+	/// Login the user if the given values are valid, and return its account object
+	///
+	/// @param   http servlet request
+	/// @param   http servlet response
+	/// @param   Account object to perform login
+	/// @param   Raw password to validate
+	/// @param   Remember me boolean (if set)
+	///
+	/// @return  The logged in account object
+	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request,
+		javax.servlet.http.HttpServletResponse response, AccountObject accountObj, String rawPassword, boolean rememberMe) {
+		if (accountObj != null && accountObj.validatePassword(rawPassword)) {
+			bypassSecurityChecksAndPerformNewAccountLogin(accountObj, request, response, rememberMe, null);
+			return accountObj;
+		}
+		return null;
+	}
+
+	/// Login the user if the given values are valid, and return its account object
+	///
+	/// @param   http servlet request
+	/// @param   http servlet response
+	/// @param   Account nice login ID (normally email)
+	/// @param   Raw password to validate
+	/// @param   Remember me boolean (if set)
+	///
+	/// @return  The logged in account object
+	public AccountObject loginAccount(javax.servlet.http.HttpServletRequest request,
+		javax.servlet.http.HttpServletResponse response, String nicename, String rawPassword, boolean rememberMe) {
+		return loginAccount(request, response, getFromLoginID(nicename), rawPassword, rememberMe);
+	}
+
+
+	/*
 
 	///
 	/// Group Membership roles managment

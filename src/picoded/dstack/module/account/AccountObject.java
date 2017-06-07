@@ -430,6 +430,28 @@ public class AccountObject extends Core_MetaObject {
 		return -1;
 	}
 
+	/// Get token remaining lifespan
+	///
+	/// @param  Session ID to validate
+	/// @param  Token ID to check
+	///
+	/// @return  The token remaining timespan, -1 means invalid token
+	public long getTokenLifespan(String sessionID, String tokenID) {
+		// Get expiry timestamp
+		long expiry = getTokenExpiry( sessionID, tokenID );
+		
+		// Invalid tokens are -1
+		if(expiry <= -1) {
+			return -1;
+		}
+
+		long lifespan = expiry - (System.currentTimeMillis()) / 1000L;
+		if(lifespan < -1) {
+			return -1;
+		}
+		return lifespan;
+	}
+
 	/// Internal function, used to get the next token given a session and current token.
 	/// DOES NOT : Validate the next token if it exists
 	///
@@ -469,6 +491,11 @@ public class AccountObject extends Core_MetaObject {
 	public String issueNextToken(String sessionID, String tokenID, long expireTime) {
 		// Get NextToken, and returns (if previously issued)
 		String nextToken = getUncheckedNextToken(sessionID, tokenID);
+		// Terminate if nextToken is invalid
+		if( nextToken == null ) {
+			return null;
+		}
+
 		// Issue next token
 		registerToken(sessionID, nextToken, GUID.base58(), expireTime);
 		// Return the next token, after its been issued

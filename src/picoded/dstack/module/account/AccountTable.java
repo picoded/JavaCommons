@@ -58,11 +58,16 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/// KeyValueMap<sessionID, info-about-access>
 	protected KeyValueMap sessionInfoMap = null;
 
-	/// Stores the account token key,
-	/// to login information / meta data map
+	/// Stores the account token key, to session key
 	///
 	/// KeyValueMap<tokenID, sessionID>
 	protected KeyValueMap sessionTokenMap = null;
+
+	/// Stores the next token ID to reissue
+	/// This limits race conditions where multiple tokens are issued
+	///
+	/// KeyValueMap<tokenID, next-tokenID>
+	protected KeyValueMap sessionNextTokenMap = null;
 
 	//
 	// Account meta information
@@ -136,11 +141,14 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/// The login sessions used for authentication
 	protected static String SUFFIX_LOGIN_SESSION = "_LS";
 
-	/// The login sessions used for authentication
+	/// The login sessions info, used for authentication
 	protected static String SUFFIX_LOGIN_SESSION_INFO = "_LI";
 
-	/// The login sessions used for authentication
+	/// The login token used for authentication
 	protected static String SUFFIX_LOGIN_TOKEN = "_LT";
+
+	/// The next login token used for authentication
+	protected static String SUFFIX_LOGIN_NEXT_TOKEN = "_LN";
 
 	/// The account self meta values
 	protected static String SUFFIX_ACCOUNT_META = "_AM";
@@ -188,6 +196,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		sessionLinkMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_SESSION);
 		sessionInfoMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_SESSION_INFO);
 		sessionTokenMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_TOKEN);
+		sessionNextTokenMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_NEXT_TOKEN);
 		
 		// Account meta information
 		accountMetaTable = stack.getMetaTable(name + SUFFIX_ACCOUNT_META);
@@ -207,7 +216,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		// Return it as a list
 		return Arrays.asList(
 			accountLoginIdMap, accountAuthMap,
-			sessionInfoMap, sessionTokenMap,
+			sessionInfoMap, sessionTokenMap, sessionNextTokenMap,
 			accountMetaTable, accountPrivateMetaTable,
 			memberRolesTable, memberMetaTable, memberPrivateMetaTable,
 			loginThrottlingAttemptMap, loginThrottlingExpiryMap
@@ -486,7 +495,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	public boolean isSecureOnly = false;
 
 	/// Sets the cookie namespace prefix
-	public String cookiePrefix = "Account_";
+	public String cookiePrefix = "account_";
 
 	/// Sets teh cookie domain, defaults is null
 	public String cookieDomain = null;
@@ -500,7 +509,13 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	//
 	///////////////////////////////////////////////////////////////////////////
 
-	/// Internally sets the login to a user (handles the respective nonce) and set the cookies for the response
+	/// Internally sets the login to a user (handles the respective session tokens) and set the cookies for the response
+	///
+	/// The cookie is configured to store the following information under the "cookiePrefix" (default Account_)
+	/// + Session ID
+	/// + Token ID
+	/// + Expiriry Timestamp (for JS to read)
+	/// + Remember Me flag
 	/// 
 	/// @param  Account object used
 	/// @param  The http request to read
@@ -516,8 +531,6 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		//-----------------------------------------------------
 		String aoid = ao._oid();
 
-		
-		/*
 		// Detirmine the login lifetime
 		int noncLifetime;
 		if (rememberMe) {
@@ -527,39 +540,47 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		}
 		long expireTime = (System.currentTimeMillis()) / 1000L + noncLifetime;
 
-		String passHash = ao.getPasswordHash();
-		if (passHash == null || passHash.length() <= 1) {
-			return false;
+		// Session info handling
+		//-----------------------------------------------------
+
+		// Prepare the session info
+		if( sessionInfo == null ) {
+			sessionInfo = new HashMap<String,Object>();
 		}
-		String nonceSalt = NxtCrypt.randomString(nonceSize);
 
-		// @TODO: include session details, such as login IP and BrowserAgent
-		String nonc = generateSession(aoid, noncLifetime, nonceSalt, null, null);
+		// Lets do some USER_AGENT sniffing
+		sessionInfo.put( "USER_AGENT", request.getHeader("USER_AGENT") );
 
-		String cookieHash = NxtCrypt.getSaltedHash(passHash, nonceSalt);
-		// Remove the special characters from the hash value
-		// Cookie with special characters failed to save at browser, specially with + and = signs
-		cookieHash = cookieHash.replaceAll("\\W", "");
+		// Generate the session and tokens
+		//-----------------------------------------------------
+		
+		String sessionID = ao.newSession(sessionInfo);
+		String tokenID = ao.newToken(sessionID, expireTime);
 
 		// Store the cookies
 		//-----------------------------------------------------
-		int noOfCookies = 5;
+		int noOfCookies = 4;
 		javax.servlet.http.Cookie cookieJar[] = new javax.servlet.http.Cookie[noOfCookies];
 
 		int index = 0;
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Aoid", aoid);
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Nonc", nonc);
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Hash", cookieHash);
+		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "ses", sessionID);
+		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "tok", tokenID);
+
+		// Remember me configuration
+		// Should this be handled usign server side storage data?
+		// If its not a valid security threat, this should be ok right?
 		if (rememberMe) {
-			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "1");
+			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "rmb", "1");
 		} else {
-			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Rmbr", "0");
+			cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "rmb", "0");
 		}
-		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "Expi", String.valueOf(expireTime));
 
-		/// The cookie "Expi" store the other cookies (Rmbr, user, Nonc etc.) expiry life time in seconds.
-		/// This cookie value is used in JS (checkLogoutTime.js) for validating the login expiry time and show a message to user accordingly.
+		// The cookie "exp"-iry store the other cookies (Rmbr, user, Nonc etc.) expiry life time in seconds.
+		// This cookie value is used in JS (checkLogoutTime.js) for validating the login expiry time 
+		// and show a message to user accordingly.
+		cookieJar[index++] = new javax.servlet.http.Cookie(cookiePrefix + "exp", String.valueOf(expireTime));
 
+		// Storing the cookie jar with the browser
 		for (int a = 0; a < noOfCookies; ++a) {
 			/// Path is required for cross AJAX / domain requests,
 			/// @TODO make this configurable?
@@ -585,7 +606,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 			//Actually inserts the cookie
 			response.addCookie(cookieJar[a]);
 		}
-		*/
+		
 		return true;
 	}
 

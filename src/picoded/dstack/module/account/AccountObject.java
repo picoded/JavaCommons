@@ -283,7 +283,8 @@ public class AccountObject extends Core_MetaObject {
 		if( hasSession(sessionID) ) {
 			// Session ownership validated, time to revoke!
 
-			// @TODO : Revoke all tokens associated to this session
+			// Revoke all tokens associated to this session
+			revokeAllToken(sessionID);
 
 			// Revoke the session info
 			mainTable.sessionLinkMap.remove(sessionID);
@@ -325,7 +326,7 @@ public class AccountObject extends Core_MetaObject {
 		if( hasSession(sessionID) ) {
 			return mainTable.sessionTokenMap.keySet(sessionID);
 		}
-		return null;
+		return new HashSet<String>();
 	}
 
 	/// Generate a new token, with a timeout
@@ -347,18 +348,132 @@ public class AccountObject extends Core_MetaObject {
 		// Generate a base58 guid for session key
 		String tokenID = GUID.base58();
 
+		// Issue the token
+		registerToken(sessionID, tokenID, GUID.base58(), expireTime);
+
+		// Return the token
+		return tokenID;
+	}
+
+	/// Internal function, used to issue a token ID to the session
+	/// with the next token ID predefined
+	///
+	/// @param  Session ID to generate token from
+	/// @param  Token ID to setup
+	/// @param  Next token ID 
+	/// @param  The expire timestamp of the token
+	///
+	/// @return  The tokenID generated, null on invalid session
+	protected void registerToken(String sessionID, String tokenID, String nextTokenID, long expireTime) {
+		// Current token check, does nothing if invalid
+		if( hasToken(sessionID, tokenID) ) {
+			return;
+		}
+
+		// Check if token has already been registered
+		String existingTokenSession = mainTable.sessionTokenMap.getString(tokenID, null);
+		if( existingTokenSession != null ) {
+			// Check if token has valid session
+			if( sessionID.equals(existingTokenSession) ) {
+				// Assume setup was already done, terminating
+				return;
+			} else {
+				// Invalid next token, was issued to another session
+				// EITHER a GUID collision occured, OR spoofing is being attempted
+				throw new RuntimeException("FATAL : Unable to register token previously registered to another session ID");
+			}
+		}
+
 		// Renew every session!
 		mainTable.sessionLinkMap.setExpiry(sessionID, expireTime + AccountTable.SESSION_RACE_BUFFER );
 		mainTable.sessionInfoMap.setExpiry(sessionID, expireTime + AccountTable.SESSION_RACE_BUFFER * 2 );
 
 		// Register the token
-		mainTable.sessionTokenMap.putWithExpiry(tokenID, sessionID, expireTime);
-		
-		// Return the token
-		return tokenID;
+		mainTable.sessionTokenMap.putWithExpiry(tokenID, sessionID, expireTime );
+		mainTable.sessionNextTokenMap.putWithExpiry(tokenID, nextTokenID , expireTime );
 	}
 
+	/// Checks if the current session token is associated with the account
+	///
+	/// @param  Session ID to validate
+	/// @param  Token ID to revoke
+	///
+	/// @return TRUE if login ID belongs to this account
+	public boolean revokeToken(String sessionID, String tokenID) {
+		if( hasToken(sessionID, tokenID) ) {
+			mainTable.sessionTokenMap.remove(tokenID);
+			return true;
+		}
+		return false;
+	}
 
+	/// Revokes all tokens associated to a session
+	///
+	/// @param  Session ID to revoke
+	public void revokeAllToken(String sessionID) {
+		Set<String> tokens = getTokenSet(sessionID);
+		for(String oneToken : tokens) {
+			revokeToken(sessionID, oneToken);
+		}
+	}
+
+	/// Get token expiriry
+	///
+	/// @param  Session ID to validate
+	/// @param  Token ID to check
+	///
+	/// @return  The token expiry timestamp 
+	public long getTokenExpiry(String sessionID, String tokenID) {
+		if( hasToken(sessionID, tokenID) ) {
+			return mainTable.sessionTokenMap.getExpiry(tokenID);
+		}
+		return -1;
+	}
+
+	/// Internal function, used to get the next token given a session and current token.
+	/// DOES NOT : Validate the next token if it exists
+	///
+	/// @param  Session ID to validate
+	/// @param  Token ID to check
+	///
+	/// @return The next token
+	protected String getUncheckedNextToken(String sessionID, String tokenID) {
+		if( hasToken(sessionID, tokenID) ) {
+			return mainTable.sessionNextTokenMap.get(tokenID);
+		}
+		return null;
+	}
+
+	/// Get the next token AFTER validating if it is issued
+	///
+	/// @param  Session ID to validate
+	/// @param  Token ID to check
+	///
+	/// @return The next token ID
+	public String getNextToken(String sessionID, String tokenID) {
+		String nextToken = getUncheckedNextToken(sessionID, tokenID);
+		if( mainTable.sessionTokenMap.containsKey(nextToken) ) {
+			return nextToken;
+		}
+		return null;
+	}
+
+	/// Generate next token in line, with expiry
+	/// Note that expiry is NOT set, if token was previously issued
+	///
+	/// @param  Session ID to validate
+	/// @param  Token ID to check
+	/// @param  The expire timestamp of the token
+	///
+	/// @return The next token ID
+	public String issueNextToken(String sessionID, String tokenID, long expireTime) {
+		// Get NextToken, and returns (if previously issued)
+		String nextToken = getUncheckedNextToken(sessionID, tokenID);
+		// Issue next token
+		registerToken(sessionID, nextToken, GUID.base58(), expireTime);
+		// Return the next token, after its been issued
+		return nextToken;
+	}
 	/*
 	
 	///////////////////////////////////////////////////////////////////////////

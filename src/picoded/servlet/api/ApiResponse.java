@@ -14,4 +14,27 @@ import picoded.struct.GenericConvertHashMap;
 ///
 public class ApiResponse extends GenericConvertHashMap<String, Object> {
 	
+	
+	//-----------------------------------------------------------------
+	//
+	//  Constructor vars
+	//
+	//-----------------------------------------------------------------
+
+	/// The base API builder
+	protected ApiBuilder builder = null;
+
+	//-----------------------------------------------------------------
+	//
+	//  Constructor
+	//
+	//-----------------------------------------------------------------
+
+	/// Initialize the class
+	///
+	/// @param   Parent ApiBuilder
+	ApiResponse( ApiBuilder parent ) {
+		// Setup parent API builder object
+		builder = parent;
+	}
 }

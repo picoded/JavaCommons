@@ -23,6 +23,18 @@ public class ApiRequest /*implements GenericConvertMap<String, Object>*/ {
 	/// The context object to use
 	protected GenericConvertMap<String,Object> contextObj = new GenericConvertHashMap<String,Object> ();
 
+	/// The base API builder
+	protected ApiBuilder builder = null;
+
+	//-----------------------------------------------------------------
+	//
+	//  Overwrites vars (that would have taken from builder instead)
+	//
+	//-----------------------------------------------------------------
+
+	/// Overwrite the request type, to be a certain type, such as "JAVA"
+	protected String requestMethod = null;
+
 	//-----------------------------------------------------------------
 	//
 	//  Constructor
@@ -31,15 +43,27 @@ public class ApiRequest /*implements GenericConvertMap<String, Object>*/ {
 
 	/// Initialize the class with query and context object
 	///
+	/// @param   Parent ApiBuilder
 	/// @param   Query map to assume
 	/// @param   Context map to assume
-	ApiRequest( Map<String,Object> query, Map<String,Object> context ) {
+	ApiRequest( ApiBuilder parent, Map<String,Object> query, Map<String,Object> context ) {
+		// Setup parent API builder object
+		builder = parent;
+		// Query and context setup
 		if( query != null ) {
 			queryObj.putAll(query);
 		}
 		if( context != null ) {
 			contextObj.putAll(context);
 		}
+	}
+
+	/// Initialize the class
+	///
+	/// @param   Parent ApiBuilder
+	ApiRequest( ApiBuilder parent ) {
+		// Setup parent API builder object
+		builder = parent;
 	}
 
 	//-----------------------------------------------------------------

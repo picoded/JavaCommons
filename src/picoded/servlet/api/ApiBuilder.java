@@ -8,6 +8,8 @@ import picoded.struct.UnsupportedDefaultMap;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 
+import picoded.servlet.*;
+
 ///
 /// ApiBuilder is a utility class, in which facilitates the building of modern JSON pure API's.
 /// This can be used in the project either via a public API, or even internally via a direct function call.
@@ -29,6 +31,7 @@ import picoded.struct.GenericConvertHashMap;
 /// [ ] Add in JS API script generation
 /// [ ] Patch up endpoint removal, and keyset to take into seperate account filters
 /// [ ] Possibly seperate out filters?
+/// [ ] Formally define how ambiguity of API endpoints is resolved
 ///
 /// # Description rents
 ///
@@ -277,6 +280,35 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 
 	//-------------------------------------------------------------------
 	//
+	// ApiRequest setup process
+	//
+	//-------------------------------------------------------------------
+	
+	/// The ApiRequest method setup handling, assumes an internal java call in this case
+	///
+	/// @param   request query parameter to pass forward. 
+	/// @param   context data parameter to pass forward
+	///
+	/// @return  new ApiRequest, configured to the current ApiBuilder, and any of its default settings (if relevent)
+	protected ApiRequest setupApiRequest( Map<String,Object> queryParams, Map<String,Object>contextParams ) {
+		ApiRequest ret = new ApiRequest(this, queryParams, contextParams);
+		ret.requestMethod = "java";
+		return ret;
+	}
+
+	/// The ApiRequest method setup handling, loading the request query paremeters from the servlet
+	///
+	/// @param   The HTTP CorePage to extract data from
+	///
+	/// @return  new ApiRequest, configured to the current ApiBuilder, and any of its default settings (if relevent)
+	protected ApiRequest setupApiRequest( CorePage core ) {
+		ApiRequest ret = new ApiRequest(this);
+		ret.queryObj = core.requestParameters();
+		return ret;
+	}
+
+	//-------------------------------------------------------------------
+	//
 	// API put / remove handling
 	//
 	//-------------------------------------------------------------------
@@ -315,12 +347,12 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	/// @param   major version to use
 	/// @param   minor version to use
 	/// @param   path name to use
-	/// @param   request query parameter to pass forward. Must be JSON compatible (meaning no custom objects)
+	/// @param   request query parameter to pass forward. 
 	/// @param   context data parameter to pass forward,
 	///
 	/// @return  The result parameters
 	public ApiResponse execute(int inMajor, int inMinor, String path, Map<String,Object> queryParams, Map<String,Object>contextParams ) {
-		return execute(inMajor, inMinor, path, new ApiRequest(queryParams, contextParams), null);
+		return execute(inMajor, inMinor, path, setupApiRequest(queryParams, contextParams), null);
 	}
 
 	/// Execute a request
@@ -328,7 +360,7 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	/// @param   major version to use
 	/// @param   minor version to use
 	/// @param   path name to use
-	/// @param   request query parameter to pass forward. Must be JSON compatible (meaning no custom objects)
+	/// @param   request query parameter to pass forward. 
 	/// @param   context data parameter to pass forward,
 	///
 	/// @return  The result parameters
@@ -336,7 +368,7 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 
 		// Normalize response object
 		if(resObj == null) {
-			resObj = new ApiResponse();
+			resObj = new ApiResponse(this);
 		}
 
 		// Gets the collapsed version set
@@ -361,12 +393,33 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	/// Execute a request
 	///
 	/// @param   path name to use
-	/// @param   request query parameter to pass forward. Must be JSON compatible (meaning no custom objects)
+	/// @param   request query parameter to pass forward. 
 	/// @param   context data parameter to pass forward,
 	///
 	/// @return  The result parameters
 	public ApiResponse execute(String path, Map<String,Object> queryParams, Map<String,Object>contextParams ) {
 		return execute(majorVersion, minorVersion, path, queryParams, contextParams);
+	}
+
+	/// Execute a request
+	///
+	/// @param   path name to use
+	/// @param   request query parameter to pass forward. 
+	/// @param   context data parameter to pass forward,
+	///
+	/// @return  The result parameters
+	public ApiResponse execute(String path, ApiRequest reqObj, ApiResponse resObj ) {
+		return execute(majorVersion, minorVersion, path, reqObj, resObj);
+	}
+
+	/// Execute a request
+	///
+	/// @param   path name to use
+	/// @param   request query parameter to pass forward. 
+	///
+	/// @return  The result parameters
+	public ApiResponse execute(String path, Map<String,Object> queryParams) {
+		return execute(majorVersion, minorVersion, path, queryParams, (Map<String,Object>)null);
 	}
 
 	//-------------------------------------------------------------------
@@ -393,5 +446,24 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 		return null;
 	}
 	
+	//-------------------------------------------------------------------
+	//
+	// Servlet processing
+	//
+	//-------------------------------------------------------------------
 	
+	/// The intenal base CorePage to refrence any needed servlet setup data
+	protected CorePage corePageServlet = null;
+	
+	/// Setup the servlet linkage, and does the respective API call
+	///
+	/// @param  CorePage to based other request from
+	/// @param  Path name to use
+	public ApiResponse servletExecute(CorePage inCore, String path) {
+		corePageServlet = inCore;
+		ApiRequest req = setupApiRequest(inCore);
+		ApiResponse res = new ApiResponse(this);
+		return execute(path, req, res);
+	}
+
 }

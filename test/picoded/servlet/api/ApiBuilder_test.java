@@ -53,6 +53,24 @@ public class ApiBuilder_test {
 		assertNotNull(builder = new ApiBuilder());
 	}
 	
+	//
+	// Test the minimal implmentation of setting up an API, and executing directly
+	//
+	@Test
+	public void simpleHelloWorld() {
+		baseSetup();
+
+		// Blank Key set checking
+		Set<String> set = new HashSet<String>();
+		assertEquals(set, builder.keySet());
+
+		// Register the script
+		builder.put("hello", (req,res) -> { res.put("hello","world"); return res; });
+		
+		// Validate result format
+		assertEquals( "{\"hello\":\"world\"}", ConvertJSON.fromMap(builder.execute("hello", null)) );
+	}
+
 	@Test
 	public void baseHelloWorld() {
 		baseSetup();
@@ -70,12 +88,15 @@ public class ApiBuilder_test {
 		assertNotNull(builder.get("hello"));
 
 		// Assert result not null
-		assertNotNull( builder.execute("hello", null, null) );
+		assertNotNull( builder.execute("hello", null) );
 
 		// Validate result format
-		assertEquals( "{\"hello\":\"world\"}", ConvertJSON.fromMap(builder.execute("hello", null, null)) );
+		assertEquals( "{\"hello\":\"world\"}", ConvertJSON.fromMap(builder.execute("hello", null)) );
 	}
 
+	//
+	// An example of versioning in action
+	//
 	@Test
 	public void helloWorldVersioning() {
 		baseSetup();
@@ -89,7 +110,7 @@ public class ApiBuilder_test {
 		
 		// Bad world
 		builder.put("hello", (req,res) -> { res.put("hello","bad-world"); return res; });
-		assertEquals( "bad-world", builder.execute("hello", null, null).get("hello") );
+		assertEquals( "bad-world", builder.execute("hello", null).get("hello") );
 
 		// Version incrementing
 		assertNotNull( builder.setVersion(0,1) );
@@ -97,7 +118,6 @@ public class ApiBuilder_test {
 
 		// Good world
 		builder.put("hello", (req,res) -> { res.put("hello","good-world"); return res; });
-		assertEquals( "good-world", builder.execute("hello", null, null).get("hello") );
-		
+		assertEquals( "good-world", builder.execute("hello", null).get("hello") );
 	}
 }

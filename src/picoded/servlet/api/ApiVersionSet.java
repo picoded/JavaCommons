@@ -17,8 +17,6 @@ public class ApiVersionSet {
 
 	/// The filter map for
 
-
-
 	/// Takes in another endpoint map, and overwrite it onto itself!
 	/// This is used internally by "collapsedVersionSet" functions
 	///

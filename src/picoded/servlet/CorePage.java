@@ -366,7 +366,7 @@ public class CorePage extends javax.servlet.http.HttpServlet {
 			
 			// @TODO: To use IOUtils.buffer for inputstream of httpRequest / parameterMap
 			// THIS IS CRITICAL, for the POST request in proxyServlet to work
-			//requestParameters = RequestMap.fromStringArrayValueMap( httpRequest.getParameterMap() );
+			// requestParameters = RequestMap.fromStringArrayValueMap( httpRequest.getParameterMap() );
 			
 			responseOutputStream = httpResponse.getOutputStream();
 		} catch (Exception e) {

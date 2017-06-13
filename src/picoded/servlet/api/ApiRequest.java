@@ -9,7 +9,55 @@ import picoded.struct.GenericConvertHashMap;
 /// API Request map information
 /// For the API function to process
 ///
-public class ApiRequest extends GenericConvertHashMap<String, Object> {
+public class ApiRequest /*implements GenericConvertMap<String, Object>*/ {
+
+	//-----------------------------------------------------------------
+	//
+	//  Constructor vars
+	//
+	//-----------------------------------------------------------------
+
+	/// The query and context object 
+	protected GenericConvertMap<String,Object> queryObj = new GenericConvertHashMap<String,Object> ();
+
+	/// The context object to use
+	protected GenericConvertMap<String,Object> contextObj = new GenericConvertHashMap<String,Object> ();
+
+	//-----------------------------------------------------------------
+	//
+	//  Constructor
+	//
+	//-----------------------------------------------------------------
+
+	/// Initialize the class with query and context object
+	///
+	/// @param   Query map to assume
+	/// @param   Context map to assume
+	ApiRequest( Map<String,Object> query, Map<String,Object> context ) {
+		if( query != null ) {
+			queryObj.putAll(query);
+		}
+		if( context != null ) {
+			contextObj.putAll(context);
+		}
+	}
+
+	//-----------------------------------------------------------------
+	//
+	//  Parameter getters
+	//
+	//-----------------------------------------------------------------
+
+	/// @return  query parameters map
+	public GenericConvertMap<String,Object> query() {
+		return queryObj;
+	}
+
+	/// @return  context aprameter map
+	public GenericConvertMap<String,Object> context() {
+		return contextObj;
+	}
+
 	/*
 	Request
 	Request information and functionality is provided by the request parameter:
@@ -43,7 +91,6 @@ public class ApiRequest extends GenericConvertHashMap<String, Object> {
 	request.session();                // session management
 	request.splat();                  // splat (*) parameters
 	request.uri();                    // the uri, e.g. "http://example.com/foo"
-	request.url();                    // the url. e.g. "http://example.com/foo"
 	request.userAgent();              // user agentCopy
 	Response
 	Response information and functionality is provided by the response parameter:

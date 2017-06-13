@@ -14,4 +14,16 @@ public class ApiVersionSet {
 
 	/// The endpoint map, for this api version
 	Map<String, ApiEndpoint> endpointMap = new HashMap<String, ApiEndpoint>();
+
+	/// The filter map for
+
+
+
+	/// Takes in another endpoint map, and overwrite it onto itself!
+	/// This is used internally by "collapsedVersionSet" functions
+	///
+	/// @param  External version set to import 
+	protected void importVersionSet(ApiVersionSet importSet) {
+		endpointMap.putAll( importSet.endpointMap );
+	}
 }

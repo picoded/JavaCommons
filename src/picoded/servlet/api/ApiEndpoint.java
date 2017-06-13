@@ -21,26 +21,40 @@ public class ApiEndpoint {
 	//
 	/////////////////////////////////////////////
 	
+	/// The internal raw path name
+	protected String apiPath = null;
+
 	/// actual function call lamda 
-	protected BiFunction<ApiRequest, ApiResponse, ApiResponse> functionLamda = null;
-	
+	protected BiFunction<ApiRequest, ApiResponse, ApiResponse> functionLambda = null;
+
 	/// Null Endpoint builder, does nothing
 	ApiEndpoint() {
 	}
 	
 	/// Setup an ApiEndpoint with a lamdba function
 	///
+	/// @param  The defined api path
 	/// @param  Root ApiBuilder node
-	ApiEndpoint(BiFunction<ApiRequest, ApiResponse, ApiResponse> inFunc) {
+	ApiEndpoint(String inPath, BiFunction<ApiRequest, ApiResponse, ApiResponse> inFunc) {
+		// The api path to use
+		apiPath = inPath;
 		// Parent node to setup
-		functionLamda = inFunc;
+		functionLambda = inFunc;
 	}
 	
 	/////////////////////////////////////////////
 	//
-	// Lamda registration, and setup
+	// Execution !
 	//
 	/////////////////////////////////////////////
 	
-
+	/// Execute a request
+	///
+	/// @param   request object to do execution on
+	/// @param   response object to "respond to"
+	///
+	/// @return  The result parameters
+	public ApiResponse execute( ApiRequest req, ApiResponse res ) {
+		return functionLambda.apply(req, res);
+	}
 }

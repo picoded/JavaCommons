@@ -1,7 +1,6 @@
 package picoded.servlet.api;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.BiFunction;
 
 import picoded.struct.UnsupportedDefaultMap;

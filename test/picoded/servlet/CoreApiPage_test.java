@@ -1,11 +1,11 @@
 package picoded.servlet;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.function.BiFunction;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -17,8 +17,9 @@ import picoded.TestConfig;
 import picoded.conv.*;
 import picoded.set.*;
 import picoded.web.*;
-import picoded.RESTBuilder.*;
-import picoded.RESTBuilder.template.*;
+
+import picoded.servlet.api.*;
+import picoded.servlet.api.template.*;
 
 public class CoreApiPage_test {
 	
@@ -51,44 +52,39 @@ public class CoreApiPage_test {
 	}
 	
 	//
-	// Simple get test
+	// Simple hello world servlet
 	//
 	public static class SimpleEcho extends CoreApiPage {
 		
-		// Result fetching
-		public static RESTFunction testEcho = (req, res) -> {
-			res.put("echo", req.get("echo"));
-			return res;
-		};
-		
 		// Message to put
 		@Override
-		public void restBuilderSetup(RESTBuilder rbObj) {
-			rbObj.getNamespace("test").put(HttpRequestType.GET, testEcho);
-			rbObj.getNamespace("test").put(HttpRequestType.POST, testEcho);
+		public void apiBuilderSetup(ApiBuilder api) {
+			api.put("echo", EchoApi.SimpleEcho);
 		}
 	}
 	
 	//
-	// Assertion
+	// Hello world echo assertion assertion !
 	//
 	@Test
 	public void simpleHelloWorldTest() {
 		assertNotNull(testServlet = new EmbeddedServlet(testPort, new SimpleEcho()));
-		String testUrl = "http://localhost:" + testPort + "/api/test/";
+		String testUrl = "http://localhost:" + testPort + "/api/echo/";
 		
-		String msg = "hello";
+		String msg = "hello world"; // The test message
 		
+		// The expected result
 		Map<String, Object> expected = new HashMap<String, Object>();
-		expected.put("echo", "hello");
+		expected.put("echo", msg); 
 		String testString = ConvertJSON.fromObject(expected, true).trim();
 		
+		// Request parmeters
 		Map<String, String[]> args = new HashMap<String, String[]>();
 		args.put("echo", new String[] { msg });
 		
+		// Actual API calls
 		assertEquals(testString, RequestHttp.get(testUrl, args).toString().trim());
 		assertEquals(testString, RequestHttp.post(testUrl, args).toString().trim());
-		
 		Map<String, File[]> blankFileMap = new HashMap<String, File[]>();
 		assertEquals(testString, RequestHttp.post(testUrl, args, blankFileMap).toString().trim());
 	}
@@ -99,7 +95,7 @@ public class CoreApiPage_test {
 	public static class SimpleFile extends CoreApiPage {
 		
 		// Result fetching
-		public static RESTFunction testEcho = (req, res) -> {
+		public static BiFunction<ApiRequest, ApiResponse, ApiResponse> testFileEcho = (req, res) -> {
 			assertEquals("hello", req.getString("msg"));
 			
 			Object fileObj = null;
@@ -116,18 +112,18 @@ public class CoreApiPage_test {
 		
 		// Message to put
 		@Override
-		public void restBuilderSetup(RESTBuilder rbObj) {
-			rbObj.getNamespace("test").put(HttpRequestType.POST, testEcho);
+		public void apiBuilderSetup(ApiBuilder api) {
+			api.put("file", testFileEcho);
 		}
 	}
 	
 	//
-	// Assertion
+	// File upload, with server side assertion
 	//
 	@Test
 	public void simpleFileTest() {
 		assertNotNull(testServlet = new EmbeddedServlet(testPort, new SimpleFile()));
-		String testUrl = "http://localhost:" + testPort + "/api/test/";
+		String testUrl = "http://localhost:" + testPort + "/api/file/";
 		
 		Map<String, String[]> args = new HashMap<String, String[]>();
 		args.put("msg", new String[] { "hello" });
@@ -140,24 +136,13 @@ public class CoreApiPage_test {
 	}
 	
 	//
-	// Echo testing
-	//
-	public static class EchoTest extends CoreApiPage {
-		@Override
-		public void restBuilderSetup(RESTBuilder rbObj) {
-			rbObj.getNamespace("test").put(HttpRequestType.GET, RESTEcho.echoFunction);
-			rbObj.getNamespace("test").put(HttpRequestType.POST, RESTEcho.echoFunction);
-		}
-	}
-	
-	//
-	// Assertion
+	// File upload with content client side assertion
 	//
 	@Test
 	public void simpleEchoTest() {
 		// Server
-		assertNotNull(testServlet = new EmbeddedServlet(testPort, new EchoTest()));
-		String testUrl = "http://localhost:" + testPort + "/api/test/";
+		assertNotNull(testServlet = new EmbeddedServlet(testPort, new SimpleEcho()));
+		String testUrl = "http://localhost:" + testPort + "/api/echo/";
 		
 		// Arguments
 		Map<String, String[]> args = new HashMap<String, String[]>();

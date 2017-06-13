@@ -19,7 +19,7 @@ import java.util.*;
 import java.io.PrintWriter;
 
 // javacommons stuff
-import picoded.RESTBuilder.*;
+import picoded.servlet.api.*;
 import picoded.file.ConfigFileSet;
 
 /**
@@ -102,28 +102,33 @@ public class CoreApiPage extends CorePage {
 	
 	/////////////////////////////////////////////
 	//
-	// RESTBuilder related convinence
+	// ApiBuilder handling
 	//
 	/////////////////////////////////////////////
 	
 	/// Cached restbuilder object
-	protected RESTBuilder _restBuilderObj = null;
+	protected ApiBuilder _apiBuilderObj = null;
 	
 	/// REST API builder
-	public RESTBuilder restBuilder() {
-		if (_restBuilderObj != null) {
-			return _restBuilderObj;
+	public ApiBuilder apiBuilder() {
+		// Return the cached result (do not recreate)
+		if (_apiBuilderObj != null) {
+			return _apiBuilderObj;
 		}
 		
-		_restBuilderObj = new RESTBuilder();
-		restBuilderSetup(_restBuilderObj);
+		// Create a new object, and set it up
+		_apiBuilderObj = new ApiBuilder();
+		apiBuilderSetup(_apiBuilderObj);
 		
-		return _restBuilderObj;
+		// Return the result
+		return _apiBuilderObj;
 	}
 	
 	/// !To Override
-	/// to configure the restBuilderSetup steps
-	public void restBuilderSetup(RESTBuilder rbObj) {
+	/// to configure the ApiBuilder steps
+	///
+	/// @param  The APIBuilder object used for setup
+	public void apiBuilderSetup(ApiBuilder api) {
 		
 	}
 	
@@ -157,13 +162,26 @@ public class CoreApiPage extends CorePage {
 		
 		// Does the API call
 		if (wildcardUri.length >= 1 && (wildcardUri[0].equalsIgnoreCase("api"))) {
-			if (restBuilder().servletCall(this, outputData,
-				String.join(".", Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length)))) {
+			
+			// Prepare data
+			String apiPath = String.join(".", Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length));
+
+			// @TODO : Consider integrating template data (CorePage) with context data (ApiBuilder)
+
+			// Does actual execution
+			ApiResponse ret = apiBuilder().servletExecute(this, apiPath);
+
+			// There is valid return data
+			if( ret != null ) {
+				outputData.putAll(ret);
 				return super.outputJSON(outputData, templateData, output);
-			} else {
-				return false;
 			}
+
+			// Fails the return
+			return false;
 		}
+
+		// Fails the return
 		return false;
 	}
 	

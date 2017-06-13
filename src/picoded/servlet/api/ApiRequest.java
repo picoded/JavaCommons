@@ -9,7 +9,7 @@ import picoded.struct.GenericConvertHashMap;
 /// API Request map information
 /// For the API function to process
 ///
-public class ApiRequest /*implements GenericConvertMap<String, Object>*/ {
+public class ApiRequest implements GenericConvertMap<String, Object> {
 
 	//-----------------------------------------------------------------
 	//
@@ -81,6 +81,39 @@ public class ApiRequest /*implements GenericConvertMap<String, Object>*/ {
 	public GenericConvertMap<String,Object> context() {
 		return contextObj;
 	}
+
+	//-------------------------------------------------------------------
+	//
+	// Critical functions that need to over-ride, to support Map
+	// Right now this proxies the request onto queryObj, but maybe changed in future
+	//
+	//-------------------------------------------------------------------
+	
+	/// throws an UnsupportedOperationException
+	@Override
+	public Object get(Object key) {
+		return queryObj.get(key);
+	}
+	
+	/// throws an UnsupportedOperationException
+	@Override
+	public Object put(String key, Object value) {
+		return queryObj.put(key, value);
+	}
+	
+	/// throws an UnsupportedOperationException
+	@Override
+	public Object remove(Object key) {
+		return queryObj.remove(key);
+	}
+	
+	/// throws an UnsupportedOperationException
+	@Override
+	public Set<String> keySet() {
+		return queryObj.keySet();
+	}
+	
+
 
 	/*
 	Request

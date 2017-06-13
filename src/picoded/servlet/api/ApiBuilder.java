@@ -17,9 +17,22 @@ import picoded.struct.GenericConvertHashMap;
 /// + Packaging the entire web project core functionalities
 /// + JS Api script generation
 /// + Swagger compliant API documentation generation
+/// + RAML compliant API documentation generation
 /// + Internal function calls
 ///
-/// # This favours JSON like API, which may or may not be REST strict
+/// # @TODO Items
+///
+/// [ ] Add in documentation / definition support API
+/// [ ] Add in filter lambda API
+/// [ ] Add in parametarised paths support
+/// [ ] Add in actual servlet support (See RESTBuilder)
+/// [ ] Add in JS API script generation
+/// [ ] Patch up endpoint removal, and keyset to take into seperate account filters
+/// [ ] Possibly seperate out filters?
+///
+/// # Description rents
+///
+/// ## This favours JSON like API, which may or may not be REST strict
 ///
 /// > While this is somewhat a programming 'religious' topic. And I respect your oppinion.
 /// > Picoded as a company does deal with quite a number of enterprise companies who for "security reasons"
@@ -31,14 +44,16 @@ import picoded.struct.GenericConvertHashMap;
 ///
 /// More rents on why REST on API's is problematic here : https://mmikowski.github.io/the_lie/
 ///
-/// # Major, Minor sementic versioning support
+/// ## Major, Minor sementic versioning support
 ///
 /// See: http://semver.org/
 ///
 /// Major and Minor versioning handling is supported. Patch is intentionally not supported, 
 /// as it adds way too much development overhead, for what should by definition, be non breaking changes.
 ///
-/// # Historic notes from JavaCommons.RESTBuilder
+/// # Really misc notes, I should probably delete
+///
+/// ## Historic notes from JavaCommons.RESTBuilder
 ///
 /// While, it replaces the original servlet framework role of creating JSON API's. The framework is 
 /// also meant to facilitate intra project function calls. One of the examples learnt from the LMS project, 
@@ -247,6 +262,16 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 				break;
 			}
 		}
+
+		// Time to remove the "null" endpoints
+		HashSet<String> keySet = new HashSet<String>();
+		keySet.addAll( ret.endpointMap.keySet() );
+		for(String key : keySet) {
+			if( ret.endpointMap.get(key) == NULLENDPOINT ) {
+				ret.endpointMap.remove(key);
+			}
+		}
+
 		return ret;
 	}
 

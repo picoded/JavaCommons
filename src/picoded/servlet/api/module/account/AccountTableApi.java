@@ -20,5 +20,17 @@ public class AccountTableApi implements ApiModule {
 		table = inTable;
 	}
 
-	
+	public ApiFunction status = (req,res) -> {
+
+		return res;
+	};
+
+	/// Does the actual setup for the API
+	/// Given the API Builder, and the namespace prefix
+	///
+	/// @param  API builder to add the required functions
+	/// @param  Path to assume
+	public void setupApiBuilder(ApiBuilder builder, String subpath) {
+
+	}
 }

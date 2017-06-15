@@ -693,7 +693,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/// NOTE: login session renewal will not be performed on request url containing the keyword "logout"
 	///
 	/// @param   http servlet request
-	/// @param   http servlet response
+	/// @param   http servlet response (optional)
 	///
 	/// @return  Valid logged in account object
 	public AccountObject getRequestUser(javax.servlet.http.HttpServletRequest request,
@@ -761,6 +761,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		}
 
 		// From this point onwards, the session is valid. Now it performs checks for the renewal process
+		// Does nothing if response object is not given
 		//---------------------------------------------------------------------------------------------------
 		if (response != null) { 
 			

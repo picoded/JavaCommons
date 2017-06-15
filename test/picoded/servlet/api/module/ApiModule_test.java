@@ -14,27 +14,125 @@ import org.junit.*;
 
 import picoded.servlet.util.EmbeddedServlet;
 import picoded.TestConfig;
+import picoded.servlet.*;
 import picoded.servlet.api.*;
-import picoded.conv.*;
+import picoded.servlet.api.module.*;
 import picoded.set.*;
 import picoded.web.*;
+import picoded.conv.*;
+import picoded.dstack.*;
+import picoded.dstack.struct.simple.*;
 
+///
+/// Basic template to build and extend all ApiModule test cases
+///
 public class ApiModule_test {
 	
+	//-------------------------------------------------------------------------
 	//
-	// The test vars to use
+	// Internal vars
+	//
+	//-------------------------------------------------------------------------
+
+	//
+	// The servlet test vars to use
 	//
 	int testPort = 0; //Test port to use
+	CorePage testPage = null;
 	EmbeddedServlet testServlet = null; //Test servlet to use
-	ApiBuilder builder = null; //API builder to use
+	
+	/// The base URL to test from, used this in the respective calls
+	String testBaseUrl = null;
+
+	/// The testing cookie jar, to keep between request (in a single test)
+	Map<String,String[]> cookieJar = new HashMap<String,String[]>();
+
+	//
+	// The test folders to use
+	//
+	// File testFolder = new File("./test-files/test-specific/servlet/api/module/ApiModule/");
+	//
+	
+	//-------------------------------------------------------------------------
+	//
+	// Testing servlet
+	//
+	//-------------------------------------------------------------------------
+
+	/// The testing API Module servlet template
+	public static class ApiModuleTestServlet extends CoreApiPage {
+		
+		/// The CommonStack implementation 
+		public CommonStack testStack = null;
+
+		/// The api builder test vars
+		public ApiModule testModule = null;
+
+		/// To overwrite when replacing the default Stack implementation from struct
+		///
+		/// @param   Base static CorePage used
+		///
+		/// @return  The DStack.CommonStack implementation, used for module setup
+		public CommonStack stackSetup() {
+			return new StructSimpleStack();
+		}
+
+		/// The overwrite with the respective ApiModule
+		///
+		/// @param   Base static CorePage used
+		/// @param   API builder to setup on
+		///
+		/// @return  An ApiModule, to load (can be null)
+		public ApiModule moduleSetup(CommonStack stack) {
+			return null;
+		}
+
+		/// Called once when initialized per request, and by the initializeContext thread.
+		///
+		/// The distinction is important, as certain parameters (such as requesrt details),
+		/// cannot be assumed to be avaliable in initializeContext, but is present for most requests
+		@Override
+		public void doSharedSetup() throws Exception {
+			// Setup the CommonStack implementation	
+			testStack = stackSetup();
+			// Setup the testModule
+			testModule = moduleSetup(testStack);
+		}
+
+		/// !To Override
+		/// to configure the ApiBuilder steps
+		///
+		/// @param  The APIBuilder object used for setup
+		@Override
+		public void apiBuilderSetup(ApiBuilder api) {
+			// Setup the module API (if built)
+			if( testModule != null ) {
+				testModule.setupApiBuilder(api);
+			}
+		}
+	}
+
+	/// Testing servlet to provide, for test extension
+	public CorePage setupServlet() {
+		return new ApiModuleTestServlet();
+	}
+
+	//-------------------------------------------------------------------------
+	//
+	// JUnit setup and teardown
+	//
+	//-------------------------------------------------------------------------
 
 	//
 	// Standard setup and teardown
 	//
 	@Before
 	public void setUp() {
+		// Setup the servlet, this will call the required builder setup
 		testPort = TestConfig.issuePortNumber();
-		testServlet = null;
+		testPage = setupServlet();
+		testServlet = new EmbeddedServlet(testPort, testPage);
+		testBaseUrl = "http://localhost:" + testPort + "/api/";
 	}
 	
 	@After
@@ -43,88 +141,45 @@ public class ApiModule_test {
 			testServlet.close();
 			testServlet = null;
 		}
-		builder = null;
+		testPage = null;
+		cookieJar = null;
 	}
 
+	//-------------------------------------------------------------------------
 	//
-	// Non servlet test
+	// Convinence function calls
 	//
+	//-------------------------------------------------------------------------
+
+	/// Utility function to do a simple JSON POST request on the server URI
+	///
+	/// @param   Server subpath URI
+	/// @param   Parameters to pass over (can be null)
+	public Map<String,Object> requestJSON(String uri, Map<String,Object> params) {
+
+		// Make a request with cookies
+		ResponseHttp res = RequestHttp.post(testBaseUrl+uri, RequestHttp.simpleParameterConversion(params), null, cookieJar);
+		
+		// Store the cookie result
+		cookieJar.putAll( res.cookiesMap() );
+
+		// Process the result, to JSON map
+		String rawResult = res.toString().trim();
+		return ConvertJSON.toMap(rawResult);
+	}
+
+	//-------------------------------------------------------------------------
+	//
+	// Sanity test
+	//
+	//-------------------------------------------------------------------------
+
+	/// Minimal passing test, where intentionally the wrong URI is called
+	/// to get a JSON API response error
 	@Test
-	public void baseSetup() {
-		assertNotNull(builder = new ApiBuilder());
+	public void constructorTest() {
+		assertNotNull( testServlet );
+		assertNotNull( requestJSON("wrong/URI",null).get("ERROR") );
 	}
 	
-	//
-	// Test the minimal implmentation of setting up an API, and executing directly
-	//
-	@Test
-	public void simpleHelloWorld() {
-		baseSetup();
-
-		// Blank Key set checking
-		Set<String> set = new HashSet<String>();
-		assertEquals(set, builder.keySet());
-
-		// Register the script
-		builder.put("hello", (req,res) -> { 
-			assertNotNull(req);
-			assertNotNull(res);
-			res.put("hello","world"); 
-			return res; 
-		});
-		
-		// Validate result format
-		assertEquals( "{\"hello\":\"world\"}", ConvertJSON.fromMap(builder.execute("hello", null)) );
-	}
-
-	@Test
-	public void baseHelloWorld() {
-		baseSetup();
-
-		// Blank Key set checking
-		Set<String> set = new HashSet<String>();
-		assertEquals(set, builder.keySet());
-
-		// Register the script
-		builder.put("hello", (req,res) -> { res.put("hello","world"); return res; });
-		
-		// Registerd key set testing
-		set.add("hello");
-		assertEquals(set, builder.keySet());
-		assertNotNull(builder.get("hello"));
-
-		// Assert result not null
-		assertNotNull( builder.execute("hello", null) );
-
-		// Validate result format
-		assertEquals( "{\"hello\":\"world\"}", ConvertJSON.fromMap(builder.execute("hello", null)) );
-	}
-
-	//
-	// An example of versioning in action
-	//
-	@Test
-	public void helloWorldVersioning() {
-		baseSetup();
-
-		// base versioning
-		assertEquals( "v0.0", builder.versionStr() );
-
-		// Pointless version setup
-		assertNotNull( builder.setVersion(0,0) );
-		assertEquals( "v0.0", builder.versionStr() );
-		
-		// Bad world
-		builder.put("hello", (req,res) -> { res.put("hello","bad-world"); return res; });
-		assertEquals( "bad-world", builder.execute("hello", null).get("hello") );
-
-		// Version incrementing
-		assertNotNull( builder.setVersion(0,1) );
-		assertEquals( "v0.1", builder.versionStr() );
-
-		// Good world
-		builder.put("hello", (req,res) -> { res.put("hello","good-world"); return res; });
-		assertEquals( "good-world", builder.execute("hello", null).get("hello") );
-	}
-
 }

@@ -1,6 +1,9 @@
 package picoded.web;
 
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 
 import java.io.InputStream;
 import java.io.File;
@@ -8,6 +11,7 @@ import java.util.function.Consumer;
 
 import picoded.set.HttpRequestType;
 import picoded.set.EmptyArray;
+import picoded.conv.GenericConvert;
 import picoded.web._RequestHttp.RequestHttp_apache;
 import picoded.web._RequestHttp.ResponseHttp_websocket;
 
@@ -63,6 +67,89 @@ import picoded.web._RequestHttp.ResponseHttp_websocket;
 ///
 public class RequestHttp {
 	
+	//--------------------------------------------------------
+	// Utility function
+	//--------------------------------------------------------
+	
+	/// Takes a standard Map<String,Object> to Map<String,String[]> format
+	///
+	/// Note this does a "dumb" conversion of stringifying every object provided
+	/// and placing it as a single element in a String[]
+	///
+	/// @param  Simplified request parameters
+	///
+	/// @return Simplified as Map<String,Object>
+	public static Map<String,String[]> simpleParameterConversion(Map<String,Object> inMap) {
+		// Null check
+		if( inMap == null ) {
+			return null;
+		}
+
+		// Setup and duplicate over
+		Map<String,String[]> ret = new HashMap<String,String[]>();
+		Set<String> keySet = inMap.keySet();
+
+		// Enforce conversion to string, and store each value
+		for(String key : keySet) {
+			ret.put(key, new String[] { GenericConvert.toString(inMap.get(key)) });
+		}
+
+		// Return the converted params
+		return ret;
+	}
+
+	//--------------------------------------------------------
+	// simple GET / POST / PUT / DELETE
+	//--------------------------------------------------------
+	
+	/// Performs GET request : with parameters, appended to the requestURL
+	///
+	/// Parameters here are in a strict 1 to 1 pair, and is parsed to string as such
+	///
+	/// @param   Request URL to call
+	/// @param   [Optional] Parameters to add to the request
+	///
+	/// @return  The ResponseHttp object
+	public static ResponseHttp simpleGet(String requestURL, Map<String,Object> parametersMap) {
+		return get(requestURL, simpleParameterConversion(parametersMap));
+	}
+
+	/// Performs POST request : with parameters
+	///
+	/// Parameters here are in a strict 1 to 1 pair, and is parsed to string as such
+	///
+	/// @param   Request URL to call
+	/// @param   [Optional] Parameters to add to the request
+	///
+	/// @return  The ResponseHttp object
+	public static ResponseHttp simplePost(String requestURL, Map<String,Object> parametersMap) {
+		return post(requestURL, simpleParameterConversion(parametersMap));
+	}
+	
+	/// Performs PUT request : with parameters
+	///
+	/// Parameters here are in a strict 1 to 1 pair, and is parsed to string as such
+	///
+	/// @param   Request URL to call
+	/// @param   [Optional] Parameters to add to the request
+	///
+	/// @return  The ResponseHttp object
+	public static ResponseHttp simplePut(String requestURL, Map<String,Object> parametersMap) {
+		return put(requestURL, simpleParameterConversion(parametersMap));
+	}
+	
+	/// Performs DELETE request : with parameters
+	///
+	/// Parameters here are in a strict 1 to 1 pair, and is parsed to string as such
+	///
+	/// @param   Request URL to call
+	/// @param   [Optional] Parameters to add to the request
+	///
+	/// @return  The ResponseHttp object
+	public static ResponseHttp simpleDelete(String requestURL, Map<String,Object> parametersMap) {
+		return delete(requestURL, simpleParameterConversion(parametersMap));
+	}
+
 	//--------------------------------------------------------
 	// GET request operations
 	//--------------------------------------------------------

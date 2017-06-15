@@ -4,6 +4,7 @@ import java.util.*;
 
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
+import picoded.servlet.CorePage;
 
 ///
 /// API Request map information
@@ -34,6 +35,9 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 
 	/// Overwrite the request type, to be a certain type, such as "JAVA"
 	protected String requestMethod = null;
+
+	/// CorePage overwrite
+	protected CorePage corePage = null;
 
 	//-----------------------------------------------------------------
 	//
@@ -113,7 +117,38 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 		return queryObj.keySet();
 	}
 	
+	//---------------------------------------------------------------------------------
+	//
+	// CorePage, and HTTPRequestServlet support
+	//
+	//---------------------------------------------------------------------------------
+	
+	/// Gets and return the CorePage (if used)
+	/// Note: Currently this is protected until substential use case for public is found
+	///
+	/// @return CorePage (if used)
+	protected CorePage getCorePage() {
+		if( corePage != null ) {
+			return corePage;
+		}
 
+		if( builder != null && builder.corePageServlet != null ) {
+			return builder.corePageServlet;
+		}
+
+		return null;
+	}
+
+	/// Gets and return the java HttpServletRequest (if used)
+	///
+	/// @return  HttpServletRequest (if used)
+	public javax.servlet.http.HttpServletRequest getHttpServletRequest() {
+		CorePage core = getCorePage();
+		if( core != null ) {
+			return core.getHttpServletRequest();
+		}
+		return null;
+	}
 
 	/*
 	Request

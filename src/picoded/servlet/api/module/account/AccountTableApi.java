@@ -20,8 +20,14 @@ public class AccountTableApi implements ApiModule {
 		table = inTable;
 	}
 
-	public ApiFunction status = (req,res) -> {
-
+	/// Does a simple true / false isLogin check
+	/// This can be used for simple checks
+	protected ApiFunction isLogin = (req,res) -> {
+		// Get the account object (if any)
+		AccountObject ao = table.getRequestUser(req.getHttpServletRequest(), null);
+		// Return if a valid login object was found
+		res.put("return", ao != null);
+		// Return result
 		return res;
 	};
 
@@ -30,7 +36,7 @@ public class AccountTableApi implements ApiModule {
 	///
 	/// @param  API builder to add the required functions
 	/// @param  Path to assume
-	public void setupApiBuilder(ApiBuilder builder, String subpath) {
-
+	public void setupApiBuilder(ApiBuilder builder, String path) {
+		builder.put(path+"isLogin", isLogin);
 	}
 }

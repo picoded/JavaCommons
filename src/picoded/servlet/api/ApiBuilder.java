@@ -515,7 +515,11 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 		// Setup
 		ApiRequest req = setupApiRequest(inCore);
 		ApiResponse res = new ApiResponse(this);
-		corePageServlet = inCore;
+
+		// Setup the ApiBuidler corePageServlet : for reuse if needed
+		if( corePageServlet == null ) {
+			corePageServlet = inCore;
+		}
 
 		// Invalid API error
 		if( !isValidPath(path) ) {

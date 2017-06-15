@@ -162,4 +162,17 @@ public class CoreApiPage_test {
 			ConvertJSON.toMap(RequestHttp.post(testUrl, args, fileMap).toString().trim()));
 	}
 	
+	//
+	// Invalid endpoint testing
+	//
+	@Test
+	public void envalidEndpointTest() {
+		// Server
+		assertNotNull(testServlet = new EmbeddedServlet(testPort, new SimpleEcho()));
+		String testUrl = "http://localhost:" + testPort + "/api/this-does-not-exist/";
+		
+		// Check that there IS an error
+		assertNotNull(	ConvertJSON.toMap(RequestHttp.get(testUrl).toString().trim()).get("ERROR") );
+	}
+	
 }

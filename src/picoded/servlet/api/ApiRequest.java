@@ -66,11 +66,11 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 		builder = parent;
 	}
 
-	//-----------------------------------------------------------------
+	//-------------------------------------------------------------------------------
 	//
 	//  Parameter getters
 	//
-	//-----------------------------------------------------------------
+	//-------------------------------------------------------------------------------
 
 	/// @return  query parameters map
 	public GenericConvertMap<String,Object> query() {
@@ -82,12 +82,12 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 		return contextObj;
 	}
 
-	//-------------------------------------------------------------------
+	//---------------------------------------------------------------------------------
 	//
 	// Critical functions that need to over-ride, to support Map
 	// Right now this proxies the request onto queryObj, but maybe changed in future
 	//
-	//-------------------------------------------------------------------
+	//---------------------------------------------------------------------------------
 	
 	/// throws an UnsupportedOperationException
 	@Override

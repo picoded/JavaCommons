@@ -308,6 +308,36 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 
 	//-------------------------------------------------------------------
 	//
+	// Fetch and get the relevent API Execution endpoints for the path
+	//
+	//-------------------------------------------------------------------
+	
+	/// Fetch the relevant endpoint for the API request
+	///
+	/// @param   major version to use
+	/// @param   minor version to use
+	/// @param   path name to use
+	///
+	/// @return  The result ApiEndpoint (if found)
+	protected ApiEndpoint fetchApiEndpoint(int inMajor, int inMinor, String path) {
+		// Gets the collapsed version set
+		ApiVersionSet workingSet = collapsedVersionSet(inMajor, inMinor);
+
+		// Find the exact match
+		ApiEndpoint endpoint = workingSet.endpointMap.get(path);
+		if( endpoint != null ) {
+			// Exact match found
+			return endpoint;
+		}
+		
+		// @TODO : ITERATE FOR DYNAMIC MATCH
+		
+		// Fetch failure
+		return null;
+	}
+
+	//-------------------------------------------------------------------
+	//
 	// API put / remove handling
 	//
 	//-------------------------------------------------------------------
@@ -354,6 +384,32 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 		return execute(inMajor, inMinor, path, setupApiRequest(queryParams, contextParams), null);
 	}
 
+	//-------------------------------------------------------------------
+	//
+	// API Execution handling
+	//
+	//-------------------------------------------------------------------
+	
+	/// Checks for valid path, returns success or failure
+	///
+	/// @param   major version to use
+	/// @param   minor version to use
+	/// @param   path name to use
+	///
+	/// @return  true if path is valid
+	public boolean isValidPath(int inMajor, int inMinor, String path) {
+		return fetchApiEndpoint(inMajor, inMinor, path) != null;
+	}
+
+	/// Checks for valid path, returns success or failure
+	///
+	/// @param   path name to use
+	///
+	/// @return  true if path is valid
+	public boolean isValidPath(String path) {
+		return fetchApiEndpoint(majorVersion, minorVersion, path) != null;
+	}
+
 	/// Execute a request
 	///
 	/// @param   major version to use
@@ -365,28 +421,18 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	/// @return  The result parameters
 	public ApiResponse execute(int inMajor, int inMinor, String path, ApiRequest reqObj, ApiResponse resObj ) {
 
-		// Normalize response object
-		if(resObj == null) {
-			resObj = new ApiResponse(this);
-		}
+		// Fetch the endpoint
+		ApiEndpoint endpoint = fetchApiEndpoint(inMajor, inMinor, path);
 
-		// Gets the collapsed version set
-		ApiVersionSet workingSet = collapsedVersionSet(inMajor, inMinor);
+		// @TODO Filter handling
 
-		// @TODO : ITERATE FILTERS
-
-		// Find the exact match
-		ApiEndpoint endpoint = workingSet.endpointMap.get(path);
+		// Found the endpoint execute and return
 		if( endpoint != null ) {
-			// Exact match found
-			resObj = endpoint.execute(reqObj, resObj);
-		} else {
-			// @TODO : ITERATE FOR DYNAMIC MATCH
+			return endpoint.execute(reqObj, resObj);
 		}
 
-
-		// Return result
-		return resObj;
+		// Return failure
+		return null;
 	}
 
 	/// Execute a request
@@ -458,10 +504,23 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	///
 	/// @param  CorePage to based other request from
 	/// @param  Path name to use
+	///
+	/// @return ApiResponse, to propagate to the actual user
 	public ApiResponse servletExecute(CorePage inCore, String path) {
-		corePageServlet = inCore;
+		// Setup
 		ApiRequest req = setupApiRequest(inCore);
 		ApiResponse res = new ApiResponse(this);
+		corePageServlet = inCore;
+
+		// Invalid API error
+		if( !isValidPath(path) ) {
+			//Invalid path, terminate
+			res.put("ERROR", "Unknown API request endpoint");
+			res.put("INFO", "Requested path : "+path);
+			return res;
+		}
+
+		// The actual execution
 		return execute(path, req, res);
 	}
 

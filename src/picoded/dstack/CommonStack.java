@@ -74,4 +74,10 @@ public interface CommonStack extends CommonStructure {
 	/// This does the teardown called on all the preloaded DStack structures, created via preload/get calls
 	public void systemDestroy();
 	
+	//----------------------------------------------------------------
+	//
+	//  @TODO Adding module support
+	//
+	//----------------------------------------------------------------
+	
 }

@@ -71,6 +71,9 @@ public class ApiBuilder_test {
 		assertEquals( "{\"hello\":\"world\"}", ConvertJSON.fromMap(builder.execute("hello", null)) );
 	}
 
+	//
+	// More comprehensive test of the hello world example
+	//
 	@Test
 	public void baseHelloWorld() {
 		baseSetup();
@@ -80,7 +83,12 @@ public class ApiBuilder_test {
 		assertEquals(set, builder.keySet());
 
 		// Register the script
-		builder.put("hello", (req,res) -> { res.put("hello","world"); return res; });
+		builder.put("hello", (req,res) -> { 
+			assertNotNull(req);
+			assertNotNull(res);
+			res.put("hello","world"); 
+			return res; 
+		});
 		
 		// Registerd key set testing
 		set.add("hello");

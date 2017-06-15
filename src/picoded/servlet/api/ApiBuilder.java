@@ -424,6 +424,11 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 		// Fetch the endpoint
 		ApiEndpoint endpoint = fetchApiEndpoint(inMajor, inMinor, path);
 
+		// ApiResponse setup (if null)
+		if( resObj == null ) {
+			resObj = new ApiResponse(this);
+		}
+
 		// @TODO Filter handling
 
 		// Found the endpoint execute and return

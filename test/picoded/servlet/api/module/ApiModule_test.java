@@ -109,6 +109,9 @@ public class ApiModule_test {
 			if( testModule != null ) {
 				testModule.setupApiBuilder(api);
 			}
+
+			// Setup an intentional exception endpoint (for some sanity test)
+			api.put("IntentionalError", (req,res) -> { throw new RuntimeException("IntentionalError"); });
 		}
 	}
 

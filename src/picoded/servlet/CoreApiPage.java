@@ -177,8 +177,10 @@ public class CoreApiPage extends CorePage {
 				return super.outputJSON(outputData, templateData, output);
 			}
 
+			// If the statement hits here, an unexpected error occur where there is no response from apiBuilder
 			// Fails the return
-			return false;
+			outputData.put("ERROR", "Fatal unexpected missing output from apiBuilder");
+			return super.outputJSON(outputData, templateData, output);
 		}
 
 		// Fails the return

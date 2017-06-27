@@ -165,7 +165,16 @@ public class ApiModule_test {
 
 		// Process the result, to JSON map
 		String rawResult = res.toString().trim();
-		return ConvertJSON.toMap(rawResult);
+
+		try {
+			Map<String,Object> ret = ConvertJSON.toMap(rawResult);
+			if( ret == null ) {
+				throw new RuntimeException("Empty JSON response : "+rawResult);
+			}
+			return ret;
+		} catch (Exception e) {
+			throw new RuntimeException("Unexpected requestJSON formatting : \n"+rawResult);
+		}
 	}
 
 	//-------------------------------------------------------------------------
@@ -182,4 +191,10 @@ public class ApiModule_test {
 		assertNotNull( requestJSON("wrong/URI",null).get("ERROR") );
 	}
 	
+	/// Making sure IntentionalError, does actually give an error
+	@Test
+	public void intentionalErrorTest() {
+		assertEquals("IntentionalError", requestJSON("IntentionalError",null).get("ERROR") );
+		assertNotNull(requestJSON("IntentionalError",null).get("INFO"));
+	}
 }

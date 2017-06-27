@@ -640,6 +640,10 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/// @return  Login success or failure
 	public boolean bypassSecurityChecksAndPerformNewAccountLogin(AccountObject ao, javax.servlet.http.HttpServletRequest request,
 		javax.servlet.http.HttpServletResponse response, boolean rememberMe, Map<String,Object> sessionInfo) {
+		// Null check
+		if( request == null ) {
+			return false;
+		}
 		
 		// Prepare the vars
 		//-----------------------------------------------------
@@ -698,6 +702,10 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/// @return  Valid logged in account object
 	public AccountObject getRequestUser(javax.servlet.http.HttpServletRequest request,
 		javax.servlet.http.HttpServletResponse response) {
+		// Null check
+		if( request == null ) {
+			return null;
+		}
 
 		// Do not set cookies if it is logout request
 		// This is to prevent session renewal and revoking from happening simultainously

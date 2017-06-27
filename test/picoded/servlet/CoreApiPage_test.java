@@ -19,7 +19,7 @@ import picoded.set.*;
 import picoded.web.*;
 
 import picoded.servlet.api.*;
-import picoded.servlet.api.template.*;
+import picoded.servlet.api.module.util.EchoApi;
 
 public class CoreApiPage_test {
 	

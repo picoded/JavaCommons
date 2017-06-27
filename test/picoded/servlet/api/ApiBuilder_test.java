@@ -128,5 +128,51 @@ public class ApiBuilder_test {
 		builder.put("hello", (req,res) -> { res.put("hello","good-world"); return res; });
 		assertEquals( "good-world", builder.execute("hello", null).get("hello") );
 	}
+	//
+	// Testing exception handling
+	//
+	@Test
+	public void missingPathException() {
+		baseSetup();
 
+		// registering error endpoint
+		builder.put("error", (req,res) -> { throw new RuntimeException("test-exception"); });
+
+		// Exception to validate
+		Exception testException = null;
+
+		// Try to cause an exception
+		try {
+			builder.execute("does/not/exist", null);
+		} catch(Exception e) {
+			testException = e;
+		}
+
+		// Validate that an exception occur
+		assertNotNull(testException);
+	}
+
+	//
+	// Testing exception handling
+	//
+	@Test
+	public void validException() {
+		baseSetup();
+
+		// registering error endpoint
+		builder.put("error", (req,res) -> { throw new RuntimeException("test-exception"); });
+
+		// Exception to validate
+		Exception testException = null;
+
+		// Try to cause an exception
+		try {
+			builder.execute("test-exception", null);
+		} catch(Exception e) {
+			testException = e;
+		}
+
+		// Validate that an exception occur
+		assertNotNull(testException);
+	}
 }

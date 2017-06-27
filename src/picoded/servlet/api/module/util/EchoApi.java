@@ -1,4 +1,4 @@
-package picoded.servlet.api.module;
+package picoded.servlet.api.module.util;
 
 import java.util.*;
 import java.util.function.BiFunction;

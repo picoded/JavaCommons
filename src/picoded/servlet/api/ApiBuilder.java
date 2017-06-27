@@ -424,6 +424,11 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 		// Fetch the endpoint
 		ApiEndpoint endpoint = fetchApiEndpoint(inMajor, inMinor, path);
 
+		// Endpoitn does not exists
+		if( endpoint == null ) {
+			throw new UnsupportedOperationException("Missing requested path : "+path);
+		}
+
 		// ApiResponse setup (if null)
 		if( resObj == null ) {
 			resObj = new ApiResponse(this);
@@ -528,9 +533,16 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 			res.put("INFO", "Requested path : "+path);
 			return res;
 		}
-
-		// The actual execution
-		return execute(path, req, res);
+		
+		try {
+			// The actual execution
+			return execute(path, req, res);
+		} catch(Exception e) {
+			// Suppress and print out the error info
+			res.put("ERROR", e.getMessage());
+			res.put("INFO", org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e));
+		}
+		return res;
 	}
 
 }

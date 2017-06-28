@@ -68,7 +68,7 @@ public class AccountObject extends Core_MetaObject {
 		}
 
 		// ensure its own OID is registered
-		saveDelta(); 
+		saveDelta();
 
 		// Technically a race condition =X
 		//
@@ -103,7 +103,7 @@ public class AccountObject extends Core_MetaObject {
 			// Already exists in the list, does nothing
 		} else {
 			// Name does not exist, attempt to set the name
-			if (!setLoginID(name)) { 
+			if (!setLoginID(name)) {
 				// Failed to setup the name, terminate
 				return false;
 			}
@@ -111,7 +111,7 @@ public class AccountObject extends Core_MetaObject {
 
 		// Iterate the names, delete uneeded ones
 		for (String oldName : oldNamesList) {
-			// Skip the unique name, 
+			// Skip the unique name,
 			// prevent it from being deleted
 			if (oldName.equals(name)) {
 				continue;
@@ -170,7 +170,7 @@ public class AccountObject extends Core_MetaObject {
 	/// @param  raw Password string to setup
 	public void setPassword(String pass) {
 		// ensure its own OID is registered
-		saveDelta(); 
+		saveDelta();
 
 		// Setup the password
 		if (pass == null) {
@@ -234,15 +234,15 @@ public class AccountObject extends Core_MetaObject {
 	/// Generate a new session with the provided meta information
 	///
 	/// Additionally if no tokens are generated and issued in the next
-	/// 30 seconds, the session will expire. 
-	/// 
-	/// Subseqently session expirary will be tag to 
+	/// 30 seconds, the session will expire.
+	///
+	/// Subseqently session expirary will be tag to
 	/// the most recently generated token.
 	///
 	/// Additionally info object is INTENTIONALLY NOT stored as a
 	/// MetaObject, for performance reasons.
 	///
-	/// @param  Meta information map associated with the session, 
+	/// @param  Meta information map associated with the session,
 	///         a blank map is assumed if not provided.
 	///
 	/// @return  The session ID used
@@ -259,7 +259,7 @@ public class AccountObject extends Core_MetaObject {
 		// Generate a base58 guid for session key
 		String sessionID = GUID.base58();
 
-		// As unlikely as it is, on GUID collision, 
+		// As unlikely as it is, on GUID collision,
 		// we do not want any session swarp EVER
 		if( mainTable.sessionLinkMap.get( sessionID ) != null ) {
 			throw new RuntimeException("GUID collision for sessionID : "+sessionID);
@@ -317,7 +317,7 @@ public class AccountObject extends Core_MetaObject {
 	}
 
 	/// Get the token set associated with the session and account
-	/// 
+	///
 	/// @param   Session ID to fetch from
 	///
 	/// @return  The list of token ID's currently associated to this session
@@ -331,7 +331,7 @@ public class AccountObject extends Core_MetaObject {
 
 	/// Generate a new token, with a timeout
 	///
-	/// Note that this token will update the session timeout, 
+	/// Note that this token will update the session timeout,
 	/// even if there was a longer session previously set.
 	///
 	/// @param  Session ID to generate token from
@@ -360,7 +360,7 @@ public class AccountObject extends Core_MetaObject {
 	///
 	/// @param  Session ID to generate token from
 	/// @param  Token ID to setup
-	/// @param  Next token ID 
+	/// @param  Next token ID
 	/// @param  The expire timestamp of the token
 	///
 	/// @return  The tokenID generated, null on invalid session
@@ -422,7 +422,7 @@ public class AccountObject extends Core_MetaObject {
 	/// @param  Session ID to validate
 	/// @param  Token ID to check
 	///
-	/// @return  The token expiry timestamp 
+	/// @return  The token expiry timestamp
 	public long getTokenExpiry(String sessionID, String tokenID) {
 		if( hasToken(sessionID, tokenID) ) {
 			return mainTable.sessionTokenMap.getExpiry(tokenID);
@@ -439,7 +439,7 @@ public class AccountObject extends Core_MetaObject {
 	public long getTokenLifespan(String sessionID, String tokenID) {
 		// Get expiry timestamp
 		long expiry = getTokenExpiry( sessionID, tokenID );
-		
+
 		// Invalid tokens are -1
 		if(expiry <= -1) {
 			return -1;
@@ -502,7 +502,7 @@ public class AccountObject extends Core_MetaObject {
 		return nextToken;
 	}
 	/*
-	
+
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Group management
@@ -697,60 +697,67 @@ public class AccountObject extends Core_MetaObject {
 		String superUserGroupRole = superUserGrp.getMemberRole(this);
 		return (superUserGroupRole != null && superUserGroupRole.equalsIgnoreCase("admin"));
 	}
+	*/
 
 	/// This method logs the details about login faailure for the user based on User ID
 	public void logLoginFailure(String userID) {
-		mainTable.loginThrottlingAttempt.putWithLifespan(userID, "1", 999999999);
+		mainTable.loginThrottlingAttemptMap.put(userID, 1);
 		int elapsedTime = ((int) (System.currentTimeMillis() / 1000)) + 2;
-		mainTable.loginThrottlingElapsed.putWithLifespan(userID, String.valueOf(elapsedTime), 999999999);
+		mainTable.loginThrottlingExpiryMap.put(userID, elapsedTime);
 	}
 
 	/// This method returns time left before next permitted login attempt for the user based on User ID
-	public int getNextLoginTimeAllowed(String userID) {
-		String val = mainTable.loginThrottlingElapsed.get(userID);
-		if (val == null || "".equals(val)) {
+	public int getNextLoginTimeAllowed(String userId) {
+		long val = getExpiryTime(userId);
+		if (val == -1) {
 			return 0;
 		}
-		int allowedTime = Integer.parseInt(val) - (int) (System.currentTimeMillis() / 1000);
+		int allowedTime = (int) val - (int) (System.currentTimeMillis() / 1000);
 		return allowedTime > 0 ? allowedTime : 0;
 	}
 
 	/// This method would be added in on next login failure for the user based on User ID
 	public long getTimeElapsedNextLogin(String userId) {
-		String elapsedValueString = mainTable.loginThrottlingElapsed.get(userId);
-		if (elapsedValueString == null || "".equals(elapsedValueString)) {
+		long elapsedValue = getExpiryTime(userId);
+		if (elapsedValue == -1) {
 			return (System.currentTimeMillis() / 1000) + 2;
 		}
-		long elapsedValue = Long.parseLong(elapsedValueString);
 		return elapsedValue;
 	}
 
 	/// This method would be added the delay for the user based on User ID
-	public void addDelay(String userId) {
-		String atteemptValueString = mainTable.loginThrottlingAttempt.get(userId);
-		if (atteemptValueString == null || "".equals(atteemptValueString)) {
+	public void addDelay(AccountObject ao) {
+		String userId = ao._oid();
+		long attemptValue = getAttempts(userId);
+		if (attemptValue == -1) {
 			logLoginFailure(userId);
 		} else {
-			int attemptValue = Integer.parseInt(atteemptValueString);
-			int elapsedValue = (int) (System.currentTimeMillis() / 1000);
 			attemptValue++;
-			mainTable.loginThrottlingAttempt.putWithLifespan(userId, String.valueOf(attemptValue), 999999999);
-			elapsedValue += attemptValue * 2;
-			mainTable.loginThrottlingElapsed.putWithLifespan(userId, String.valueOf(elapsedValue), 999999999);
+			int elapsedValue = (int) (System.currentTimeMillis() / 1000);
+			elapsedValue += mainTable.calculateDelay.apply(ao, attemptValue);
+			mainTable.loginThrottlingAttemptMap.put(userId, attemptValue);
+			mainTable.loginThrottlingExpiryMap.put(userId, elapsedValue);
 		}
+	}
 
+	public long getAttempts(String userID) {
+		return (mainTable.loginThrottlingAttemptMap.get(userID)!=null) ? mainTable.loginThrottlingAttemptMap.get(userID) : -1;
+	}
+
+	public long getExpiryTime(String userID) {
+		return (mainTable.loginThrottlingExpiryMap.get(userID)!=null) ? mainTable.loginThrottlingExpiryMap.get(userID) : -1;
 	}
 
 	/// This method remove the entries for the user (should call after successful login)
 	public void resetLoginThrottle(String userId) {
-		mainTable.loginThrottlingAttempt.remove(userId);
-		mainTable.loginThrottlingElapsed.remove(userId);
+		mainTable.loginThrottlingAttemptMap.put(userId, null);
+		mainTable.loginThrottlingExpiryMap.put(userId, null);
 	}
 
-	/// Gets value of key from the Account Meta table
-	public Object getMetaValue(String oid, String key) {
-		return mainTable.accountMeta.get(oid).get(key);
-	}
+	// /// Gets value of key from the Account Meta table
+	// public Object getMetaValue(String oid, String key) {
+	// 	return mainTable.accountMetaTable.get(oid).get(key);
+	// }
 
-	*/
+
 }

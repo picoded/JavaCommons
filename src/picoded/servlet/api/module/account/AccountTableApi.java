@@ -6,6 +6,7 @@ import picoded.servlet.api.*;
 import picoded.servlet.api.module.ApiModule;
 import picoded.dstack.module.account.*;
 import picoded.dstack.*;
+import picoded.conv.ConvertJSON;
 
 ///
 /// Account table API builder
@@ -94,7 +95,7 @@ public class AccountTableApi implements ApiModule {
 		res.put("loginIDList", null);
 		res.put("isLogin", false);
 		res.put("rememberMe", false);
-		
+
 		// Get the login parameters
 		String accountID = req.getString("accountID", null);
 		String loginID = req.getString("loginID", null);
@@ -119,11 +120,21 @@ public class AccountTableApi implements ApiModule {
 			ao = table.getFromLoginID(loginID);
 		}
 
-		// Continue only with an account object
+		// Check if account has been locked out
+		if( ao != null ){
+			int timeAllowed = ao.getNextLoginTimeAllowed(ao._oid());
+			if(timeAllowed != 0){
+				res.put("ERROR", "Unable to login, user locked out for "+timeAllowed+" seconds.");
+				return res;
+			}
+		}
+
+		// Continue only with an account object and does not have a lockout timing
 		if( ao != null && ao.validatePassword(loginPass) ) {
 			// Validate and login, with password
 			ao = table.loginAccount( req.getHttpServletRequest(), res.getHttpServletResponse(), ao, loginPass, rememberMe);
-
+			// Reset any failed login attempts
+			ao.resetLoginThrottle(loginID);
 			// If ao is not null, it assumes a valid login
 			res.put("isLogin", true);
 			res.put("rememberMe", rememberMe);
@@ -135,10 +146,34 @@ public class AccountTableApi implements ApiModule {
 
 			// Return the loginIDList
 			res.put("loginIDList", loginIDList);
+			ao = table.getRequestUser(req.getHttpServletRequest(), null);
 		} else {
+			// Legitimate user but wrong password
+			if( ao != null ){
+				ao.addDelay(ao);
+			}
 			res.put("ERROR", "Failed login (wrong password or invalid user?)");
 		}
 
+		return res;
+	};
+
+	protected ApiFunction membershipRoles = (req,res) -> {
+		List<String> membershipRoles = table.membershipRoles();
+		res.put("list", ConvertJSON.fromList(membershipRoles));
+		// Return result
+		return res;
+	};
+
+	protected ApiFunction lockTime = (req, res) -> {
+		String accountName = req.getString("accountName", null);
+		if(accountName != null){
+			AccountObject ao = table.getFromLoginID(accountName);
+			if(ao != null){
+				long attempts = ao.getAttempts(ao._oid());
+				res.put("lockTime", table.calculateDelay.apply(ao, attempts));
+			}
+		}
 		return res;
 	};
 
@@ -150,5 +185,9 @@ public class AccountTableApi implements ApiModule {
 	public void setupApiBuilder(ApiBuilder builder, String path) {
 		builder.put(path+"isLogin", isLogin);
 		builder.put(path+"login", login);
+		builder.put(path+"lockTime", lockTime);
+
+		//Group functionalities
+		builder.put(path+"membershipRoles", membershipRoles);
 	}
 }

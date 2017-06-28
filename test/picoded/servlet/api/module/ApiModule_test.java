@@ -27,7 +27,7 @@ import picoded.dstack.struct.simple.*;
 /// Basic template to build and extend all ApiModule test cases
 ///
 public class ApiModule_test {
-	
+
 	//-------------------------------------------------------------------------
 	//
 	// Internal vars
@@ -40,7 +40,7 @@ public class ApiModule_test {
 	int testPort = 0; //Test port to use
 	CorePage testPage = null;
 	EmbeddedServlet testServlet = null; //Test servlet to use
-	
+
 	/// The base URL to test from, used this in the respective calls
 	String testBaseUrl = null;
 
@@ -52,7 +52,10 @@ public class ApiModule_test {
 	//
 	// File testFolder = new File("./test-files/test-specific/servlet/api/module/ApiModule/");
 	//
-	
+
+	// Statically sared common stack for reuse
+	public static CommonStack sharedCommonStack = null;
+
 	//-------------------------------------------------------------------------
 	//
 	// Testing servlet
@@ -61,8 +64,8 @@ public class ApiModule_test {
 
 	/// The testing API Module servlet template
 	public static class ApiModuleTestServlet extends CoreApiPage {
-		
-		/// The CommonStack implementation 
+
+		/// The CommonStack implementation
 		public CommonStack testStack = null;
 
 		/// The api builder test vars
@@ -74,7 +77,10 @@ public class ApiModule_test {
 		///
 		/// @return  The DStack.CommonStack implementation, used for module setup
 		public CommonStack stackSetup() {
-			return new StructSimpleStack();
+			if( sharedCommonStack == null ) {
+				sharedCommonStack = new StructSimpleStack();
+			}
+			return sharedCommonStack;
 		}
 
 		/// The overwrite with the respective ApiModule
@@ -93,7 +99,7 @@ public class ApiModule_test {
 		/// cannot be assumed to be avaliable in initializeContext, but is present for most requests
 		@Override
 		public void doSharedSetup() throws Exception {
-			// Setup the CommonStack implementation	
+			// Setup the CommonStack implementation
 			testStack = stackSetup();
 			// Setup the testModule
 			testModule = moduleSetup(testStack);
@@ -137,7 +143,7 @@ public class ApiModule_test {
 		testServlet = new EmbeddedServlet(testPort, testPage);
 		testBaseUrl = "http://localhost:" + testPort + "/api/";
 	}
-	
+
 	@After
 	public void tearDown() throws Exception {
 		if (testServlet != null) {
@@ -161,8 +167,7 @@ public class ApiModule_test {
 	public Map<String,Object> requestJSON(String uri, Map<String,Object> params) {
 
 		// Make a request with cookies
-		ResponseHttp res = RequestHttp.post(testBaseUrl+uri, RequestHttp.simpleParameterConversion(params), null, cookieJar);
-		
+		ResponseHttp res = RequestHttp.post(testBaseUrl+uri, RequestHttp.simpleParameterConversion(params), cookieJar, null);
 		// Store the cookie result
 		cookieJar.putAll( res.cookiesMap() );
 
@@ -193,7 +198,7 @@ public class ApiModule_test {
 		assertNotNull( testServlet );
 		assertNotNull( requestJSON("wrong/URI",null).get("ERROR") );
 	}
-	
+
 	/// Making sure IntentionalError, does actually give an error
 	@Test
 	public void intentionalErrorTest() {

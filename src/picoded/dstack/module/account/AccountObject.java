@@ -520,7 +520,7 @@ public class AccountObject extends Core_MetaObject {
 
 		return (_group_userToRoleMap = mainTable.group_childRole.uncheckedGet(this._oid()));
 	}
-
+	*/
 	// Group status check
 	//-------------------------------------------------------------------------
 
@@ -548,7 +548,7 @@ public class AccountObject extends Core_MetaObject {
 		}
 		this.saveDelta();
 	}
-
+	/*
 	// Group management of users
 	//-------------------------------------------------------------------------
 

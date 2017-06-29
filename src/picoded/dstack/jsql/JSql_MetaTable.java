@@ -192,7 +192,8 @@ public class JSql_MetaTable extends Core_MetaTable {
 			sqlObj.update_raw( //
 				"ALTER TABLE "+dataTableName+ //
 				"ADD CONSTRAINT "+dataTableName+"_fk"+ //
-				"FOREIGN KEY (oID) REFERENCES "+baseTableName+"(oID)"
+				"FOREIGN KEY (oID) REFERENCES "+baseTableName+"(oID)" + //
+				"ON DELETE CASCADE" // NOTE : This slows performance down
 			);
 		} catch(Exception e) {
 			// Silence exception
@@ -267,12 +268,14 @@ public class JSql_MetaTable extends Core_MetaTable {
 	/// Teardown and delete the backend storage table, etc. If needed
 	public void systemDestroy() {
 		sqlObj.dropTable(dataTableName);
+		sqlObj.dropTable(baseTableName);
 	}
 	
 	/// Removes all data, without tearing down setup
 	@Override
 	public void clear() {
 		sqlObj.delete(dataTableName);
+		sqlObj.delete(baseTableName);
 	}
 	
 	//--------------------------------------------------------------------------

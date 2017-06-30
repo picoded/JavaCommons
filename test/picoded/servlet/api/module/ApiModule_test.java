@@ -17,6 +17,7 @@ import picoded.TestConfig;
 import picoded.servlet.*;
 import picoded.servlet.api.*;
 import picoded.servlet.api.module.*;
+import picoded.struct.GenericConvertMap;
 import picoded.set.*;
 import picoded.web.*;
 import picoded.conv.*;
@@ -164,7 +165,7 @@ public class ApiModule_test {
 	///
 	/// @param   Server subpath URI
 	/// @param   Parameters to pass over (can be null)
-	public Map<String,Object> requestJSON(String uri, Map<String,Object> params) {
+	public GenericConvertMap<String,Object> requestJSON(String uri, Map<String,Object> params) {
 
 		// Make a request with cookies
 		ResponseHttp res = RequestHttp.post(testBaseUrl+uri, RequestHttp.simpleParameterConversion(params), cookieJar, null);
@@ -179,7 +180,7 @@ public class ApiModule_test {
 			if( ret == null ) {
 				throw new RuntimeException("Empty JSON response : "+rawResult);
 			}
-			return ret;
+			return GenericConvertMap.build(ret);
 		} catch (Exception e) {
 			throw new RuntimeException("Unexpected requestJSON formatting : \n"+rawResult);
 		}

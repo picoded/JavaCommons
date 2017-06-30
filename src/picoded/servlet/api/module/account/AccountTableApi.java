@@ -48,14 +48,14 @@ public class AccountTableApi implements ApiModule {
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | return         | boolean            | TRUE if a login session is valid, else FALSE                                  |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | error          | String (Optional)  | Errors encounted if any                                                       |
+	/// | error          | String (Optional)  | Errors encountered if any                                                     |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	///
-	protected ApiFunction isLogin = (req,res) -> {
+	protected ApiFunction isLogin = (req, res) -> {
 		// Get the account object (if any)
 		AccountObject ao = table.getRequestUser(req.getHttpServletRequest(), null);
 		// Return if a valid login object was found
-		res.put(Naming_Strings.RES_RETURN, ao != null);
+		res.put(Account_Strings.RES_RETURN, ao != null);
 		// Return result
 		return res;
 	};
@@ -89,74 +89,74 @@ public class AccountTableApi implements ApiModule {
 	/// | loginIDList    | String[]           | array of account names representing the session                               |
 	/// | rememberMe     | boolean            | indicator if the session is persistent (remember me)                          |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | error          | String (Optional)  | Errors encounted if any                                                       |
+	/// | error          | String (Optional)  | Errors encountered if any                                                     |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	///
-	protected ApiFunction login = (req,res) -> {
+	protected ApiFunction login = (req, res) -> {
 
 		// Setup default (failed) login
-		res.put(Naming_Strings.RES_ACCOUNT_ID, null);
-		res.put(Naming_Strings.RES_LOGIN_ID_LIST, null);
-		res.put(Naming_Strings.RES_IS_LOGIN, false);
-		res.put(Naming_Strings.RES_REMEMBER_ME, false);
+		res.put(Account_Strings.RES_ACCOUNT_ID, null);
+		res.put(Account_Strings.RES_LOGIN_ID_LIST, null);
+		res.put(Account_Strings.RES_IS_LOGIN, false);
+		res.put(Account_Strings.RES_REMEMBER_ME, false);
 
 		// Get the login parameters
-		String accountID = req.getString(Naming_Strings.REQ_ACCOUNT_ID, null);
-		String loginID = req.getString(Naming_Strings.REQ_USERNAME, null);
-		String loginPass = req.getString(Naming_Strings.REQ_PASSWORD, null);
-		boolean rememberMe = req.getBoolean(Naming_Strings.REQ_REMEMBER_ME, false);
+		String accountID = req.getString(Account_Strings.REQ_ACCOUNT_ID, null);
+		String loginID = req.getString(Account_Strings.REQ_USERNAME, null);
+		String loginPass = req.getString(Account_Strings.REQ_PASSWORD, null);
+		boolean rememberMe = req.getBoolean(Account_Strings.REQ_REMEMBER_ME, false);
 
 		// Missing paremeter error checks
-		if( loginPass == null ) {
-			res.put(Naming_Strings.RES_ERROR, "Missing login password");
+		if ( loginPass == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_LOGIN_PASSWORD);
 			return res;
 		}
-		if( accountID == null && loginID == null ) {
-			res.put(Naming_Strings.RES_ERROR, "Missing login ID");
+		if ( accountID == null && loginID == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_LOGIN_ID);
 			return res;
 		}
 
 		// Fetch the respective account object
 		AccountObject ao = null;
-		if( accountID != null ) {
+		if ( accountID != null ) {
 			ao = table.get(accountID);
-		} else if( loginID != null ) {
+		} else if ( loginID != null ) {
 			ao = table.getFromLoginID(loginID);
 		}
 
 		// Check if account has been locked out
-		if( ao != null ){
+		if ( ao != null ){
 			int timeAllowed = ao.getNextLoginTimeAllowed(ao._oid());
-			if(timeAllowed != 0){
-				res.put(Naming_Strings.RES_ERROR, "Unable to login, user locked out for "+timeAllowed+" seconds.");
+			if (timeAllowed != 0){
+				res.put(Account_Strings.RES_ERROR, "Unable to login, user locked out for "+timeAllowed+" seconds.");
 				return res;
 			}
 		}
 
 		// Continue only with an account object and does not have a lockout timing
-		if( ao != null && ao.validatePassword(loginPass) ) {
+		if ( ao != null && ao.validatePassword(loginPass) ) {
 			// Validate and login, with password
 			ao = table.loginAccount( req.getHttpServletRequest(), res.getHttpServletResponse(), ao, loginPass, rememberMe);
 			// Reset any failed login attempts
 			ao.resetLoginThrottle(loginID);
 			// If ao is not null, it assumes a valid login
-			res.put(Naming_Strings.RES_IS_LOGIN, true);
-			res.put(Naming_Strings.RES_REMEMBER_ME, rememberMe);
-			res.put(Naming_Strings.RES_ACCOUNT_ID, ao._oid());
+			res.put(Account_Strings.RES_IS_LOGIN, true);
+			res.put(Account_Strings.RES_REMEMBER_ME, rememberMe);
+			res.put(Account_Strings.RES_ACCOUNT_ID, ao._oid());
 
 			// loginID, as a list - as set does not gurantee sorting, a sort is done for the list for alphanumeric
 			List<String> loginIDList = new ArrayList<String>(ao.getLoginIDSet());
 			Collections.sort(loginIDList);
 
 			// Return the loginIDList
-			res.put(Naming_Strings.RES_LOGIN_ID_LIST, loginIDList);
+			res.put(Account_Strings.RES_LOGIN_ID_LIST, loginIDList);
 			ao = table.getRequestUser(req.getHttpServletRequest(), null);
 		} else {
 			// Legitimate user but wrong password
-			if( ao != null ){
+			if ( ao != null ){
 				ao.addDelay(ao);
 			}
-			res.put(Naming_Strings.RES_ERROR, "Failed login (wrong password or invalid user?)");
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_FAIL_LOGIN);
 		}
 
 		return res;
@@ -182,16 +182,16 @@ public class AccountTableApi implements ApiModule {
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | return         | boolean            | indicator if logout is successful or not                                      |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | error          | String (Optional)  | Errors encounted if any                                                       |
+	/// | error          | String (Optional)  | Errors encountered if any                                                     |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	protected ApiFunction logout = (req, res) -> {
-		res.put(Naming_Strings.RES_RETURN, false);
+		res.put(Account_Strings.RES_RETURN, false);
 
 		if (req.getHttpServletRequest() != null) {
-			res.put(Naming_Strings.RES_RETURN, table.logoutAccount(req.getHttpServletRequest(), res.getHttpServletResponse()));
+			res.put(Account_Strings.RES_RETURN, table.logoutAccount(req.getHttpServletRequest(), res.getHttpServletResponse()));
 		} else {
-			res.put(Naming_Strings.RES_ERROR, MISSING_REQUEST_PAGE);
+			res.put(Account_Strings.RES_ERROR, MISSING_REQUEST_PAGE);
 		}
 		return res;
 	};
@@ -226,25 +226,25 @@ public class AccountTableApi implements ApiModule {
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// | metaObject      | {Object}              | MetaObject representing this account                                       |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | error           | String (Optional)     | Errors encounted if any                                                    |
+	/// | error           | String (Optional)     | Errors encountered if any                                                  |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
 	public ApiFunction new_account = (req, res) -> {
 		// Only runs function if logged in, and valid group object
-		boolean isGroup = req.getBoolean(Naming_Strings.REQ_IS_GROUP, false);
+		boolean isGroup = req.getBoolean(Account_Strings.REQ_IS_GROUP, false);
 
-		String userName = req.getString(Naming_Strings.REQ_USERNAME);
+		String userName = req.getString(Account_Strings.REQ_USERNAME);
 		if (userName == null || userName.isEmpty()) {
-			res.put(Naming_Strings.RES_ERROR, "No username was supplied");
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USERNAME);
 			return res;
 		}
-		String password = req.getString(Naming_Strings.REQ_PASSWORD);
+		String password = req.getString(Account_Strings.REQ_PASSWORD);
 		if (!isGroup && (password == null || password.isEmpty())) {
-			res.put(Naming_Strings.RES_ERROR, "No password was supplied");
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PASSWORD);
 			return res;
 		}
 
-		Object metaObjRaw = req.get(Naming_Strings.REQ_META);
+		Object metaObjRaw = req.get(Account_Strings.REQ_META);
 		Map<String, Object> givenMetaObj = new HashMap<String, Object>();
 		if (metaObjRaw instanceof String) {
 			String jsonMetaString = (String) metaObjRaw;
@@ -254,33 +254,262 @@ public class AccountTableApi implements ApiModule {
 		}
 
 		AccountObject newAccount = table.newObject(userName);
-		if (newAccount != null) {
-			if (isGroup) {
+		if ( newAccount != null ) {
+			if ( isGroup ) {
 				newAccount.setGroupStatus(true);
+				boolean defaultRoles = req.getBoolean(Account_Strings.REQ_DEFAULT_ROLES, true);
+				List<String> list = req.getList(Account_Strings.REQ_ROLE, null);
+				if ( defaultRoles || list == null ) {
+					newAccount.setMembershipRoles(table.defaultMembershipRoles());
+				} else {
+					newAccount.setMembershipRoles(list);
+				}
 			}
-			givenMetaObj.put(Naming_Strings.RES_EMAIL, userName);
+			givenMetaObj.put(Account_Strings.PROPERTIES_EMAIL, userName);
 			newAccount.setPassword(password);
 			newAccount.putAll(givenMetaObj);
 			newAccount.saveAll();
-			res.put(Naming_Strings.RES_META, newAccount);
-			res.put(Naming_Strings.RES_ACCOUNT_ID, newAccount._oid());
+
+			res.put(Account_Strings.RES_META, newAccount);
+			res.put(Account_Strings.RES_ACCOUNT_ID, newAccount._oid());
 		} else {
 			AccountObject existingAccount = table.getFromLoginID(userName);
 			if (existingAccount != null) {
-				res.put(Naming_Strings.RES_ACCOUNT_ID, existingAccount._oid());
+				res.put(Account_Strings.RES_ACCOUNT_ID, existingAccount._oid());
 			} else {
-				res.put(Naming_Strings.RES_ACCOUNT_ID, null);
+				res.put(Account_Strings.RES_ACCOUNT_ID, null);
 			}
-			res.put(Naming_Strings.RES_ERROR, "Object already exists in account Table");
+			res.put(Account_Strings.RES_ERROR, "Object already exists in account Table");
 		}
 		return res;
 	};
 
-
-	protected ApiFunction membershipRoles = (req,res) -> {
-		List<String> membershipRoles = table.membershipRoles();
-		res.put(Naming_Strings.RES_LIST, ConvertJSON.fromList(membershipRoles));
+	/// # groupRoles
+	///
+	/// Retrieves the existing roles available from an existing group
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	      | Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | groupname				| String								| name of the group to retrieve
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | list						| List		              | List of roles																															 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	protected ApiFunction groupRoles = (req, res) -> {
+		String groupName = req.getString(Account_Strings.REQ_GROUPNAME);
+		if ( groupName == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUPNAME);
+			return res;
+		}
+		AccountObject group = table.getFromLoginID(groupName);
+		if ( group == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			return res;
+		}
+		List<String> membershipRoles = group.group_membershipRoles().getList(Account_Strings.PROPERTIES_ROLE, "[]");
+		res.put(Account_Strings.RES_LIST, membershipRoles);
 		// Return result
+		return res;
+	};
+
+	/// # addMemberToGroup
+	///
+	/// Add an existing user to an existing group
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | username				| String								| name of the user to add																										 |
+	/// | groupname				| String								| name of the group to add to																								 |
+	/// | role						| String								| name of the role assigned for the user																		 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | meta						| {Object}              | Information of the newly added user																				 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	protected ApiFunction addMemberToGroup = (req, res) -> {
+		// Checks all input are given before proceeding
+		Map<String, String> result = validateGroupParameters(req);
+		if ( result.get(Account_Strings.RES_ERROR) != null ) {
+			res.put(Account_Strings.RES_ERROR, result.get(Account_Strings.RES_ERROR));
+			return res;
+		}
+		String role = req.getString(Account_Strings.REQ_ROLE);
+		if ( role == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_ROLE);
+			return res;
+		}
+		AccountObject group = table.getFromLoginID(result.get(Account_Strings.REQ_GROUPNAME));
+		if ( group == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			return res;
+		}
+		AccountObject userToAdd = table.getFromLoginID(result.get(Account_Strings.REQ_USERNAME));
+		if ( userToAdd == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		MetaObject groupResult = group.addMember(userToAdd, role);
+		if ( groupResult == null ) {
+			res.put(Account_Strings.RES_ERROR, "User is already in group or role is not found.");
+		}else{
+			res.put(Account_Strings.RES_META, groupResult);
+		}
+		return res;
+	};
+
+	protected ApiFunction removeMemberFromGroup = (req, res) -> {
+		Map<String, String> result = validateGroupParameters(req);
+		if ( result.get(Account_Strings.RES_ERROR) != null ) {
+			res.put(Account_Strings.RES_ERROR, result.get(Account_Strings.RES_ERROR));
+			return res;
+		}
+		AccountObject group = table.getFromLoginID(result.get(Account_Strings.REQ_GROUPNAME));
+		if ( group == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			return res;
+		}
+		AccountObject userToRemove = table.getFromLoginID(result.get(Account_Strings.REQ_USERNAME));
+		if ( userToRemove == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		MetaObject groupResult = group.removeMember(userToRemove);
+		if ( groupResult == null ) {
+			res.put(Account_Strings.RES_ERROR, "User is not in group.");
+		} else if ( groupResult._oid() == group._oid() ) {
+			res.put(Account_Strings.RES_ERROR, "This is not a group.");
+		} else {
+			res.put(Account_Strings.RES_META, groupResult);
+		}
+		return res;
+	};
+
+	/// # getMemberMetaFromGroup
+	///
+	/// Retrieve the meta information of an existing user from an existing group
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | username				| String								| name of the user to retrieve																							 |
+	/// | groupname				| String								| name of the group to retrieve from																				 |
+	/// | role						| String (Optional)			| name of the role assigned to the user																			 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | meta						| {Object}              | Meta information of the user																							 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	protected ApiFunction getMemberMetaFromGroup = (req, res) -> {
+		// Checks all input are given before proceeding
+		Map<String, String> result = validateGroupParameters(req);
+		if ( result.get(Account_Strings.RES_ERROR) != null ) {
+			res.put(Account_Strings.RES_ERROR, result.get(Account_Strings.RES_ERROR));
+			return res;
+		}
+		String role = req.getString(Account_Strings.REQ_ROLE);
+		AccountObject group = table.getFromLoginID(result.get(Account_Strings.REQ_GROUPNAME));
+		if ( group == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			return res;
+		}
+		AccountObject userToAdd = table.getFromLoginID(result.get(Account_Strings.REQ_USERNAME));
+		if ( userToAdd == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		MetaObject groupResult = (role != null) ? group.getMember(userToAdd, role) : group.getMember(userToAdd);
+		if ( groupResult == null ) {
+			res.put(Account_Strings.RES_ERROR, "User is not in group or not in specified role.");
+		}else{
+			res.put(Account_Strings.RES_META, groupResult);
+		}
+		return res;
+	};
+
+	/// # getMemberRoleFromGroup
+	///
+	/// Retrieve the role of an existing user from an existing group
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | username				| String								| name of the user to retrieve																							 |
+	/// | groupname				| String								| name of the group to retrieve from																				 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | single					| String	              | Role of the user																													 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	protected ApiFunction getMemberRoleFromGroup = (req, res) -> {
+		// Checks all input are given before proceeding
+		Map<String, String> result = validateGroupParameters(req);
+		if ( result.get(Account_Strings.RES_ERROR) != null ) {
+			res.put(Account_Strings.RES_ERROR, result.get(Account_Strings.RES_ERROR));
+			return res;
+		}
+		AccountObject group = table.getFromLoginID(result.get(Account_Strings.REQ_GROUPNAME));
+		if ( group == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			return res;
+		}
+		AccountObject userToAdd = table.getFromLoginID(result.get(Account_Strings.REQ_USERNAME));
+		if ( userToAdd == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		String role = group.getMemberRole(userToAdd);
+		if ( role == null ) {
+			res.put(Account_Strings.RES_ERROR, "No role for user is found.");
+		} else {
+			res.put(Account_Strings.RES_SINGLE_RETURN_VALUE, role);
+		}
+		return res;
+	};
+
+	protected ApiFunction addNewMembershipRole = (req, res) -> {
+		return res;
+	};
+
+	protected ApiFunction removeMembershipRoleFromGroup = (req, res) -> {
 		return res;
 	};
 
@@ -294,7 +523,7 @@ public class AccountTableApi implements ApiModule {
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	/// | Parameter Name | Variable Type      | Description                                                                   |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | accountName    | String             | Errors encounted if any                                                       |
+	/// | accountName    | String             | Errors encountered if any                                                       |
 	/// +----------------+--------------------+-------------------------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
@@ -307,10 +536,10 @@ public class AccountTableApi implements ApiModule {
 	///
 
 	protected ApiFunction lockTime = (req, res) -> {
-		String accountName = req.getString(Naming_Strings.REQ_ACCOUNT_NAME, null);
-		if(accountName != null){
+		String accountName = req.getString(Account_Strings.REQ_ACCOUNT_NAME, null);
+		if (accountName != null){
 			AccountObject ao = table.getFromLoginID(accountName);
-			if(ao != null){
+			if (ao != null){
 				long attempts = ao.getAttempts(ao._oid());
 				res.put("lockTime", table.calculateDelay.apply(ao, attempts));
 			}
@@ -324,14 +553,39 @@ public class AccountTableApi implements ApiModule {
 	/// @param  API builder to add the required functions
 	/// @param  Path to assume
 	public void setupApiBuilder(ApiBuilder builder, String path) {
-		builder.put(path+Naming_Strings.RES_IS_LOGIN, isLogin);
-		builder.put(path+"login", login);
-		builder.put(path+"lockTime", lockTime);
-		builder.put(path+"logout", logout);
-		builder.put(path+"new", new_account);
+		builder.put(path+"isLogin", isLogin); // Tested
+		builder.put(path+"login", login); // Tested
+		builder.put(path+"lockTime", lockTime); // Tested
+		builder.put(path+"logout", logout); // Tested
+		builder.put(path+"new", new_account); // Tested
 
 		//Group functionalities
-		builder.put(path+"membershipRoles", membershipRoles);
-		// builder.put(path+"hasMe");
+		builder.put(path+"groupRoles", groupRoles);
+		builder.put(path+"addMember", addMemberToGroup); // Tested
+		builder.put(path+"removeMember", removeMemberFromGroup);
+		builder.put(path+"getMemberMeta", getMemberMetaFromGroup); // Tested
+		builder.put(path+"getMemberRole", getMemberRoleFromGroup); // Tested
+
+		builder.put(path+"addMembershipRole", addNewMembershipRole);
+		builder.put(path+"removeMembershipRole", removeMembershipRoleFromGroup);
+	}
+
+
+	/// Private Methods
+	private Map<String, String> validateGroupParameters(ApiRequest req) {
+		Map<String, String> res = new HashMap<String, String>();
+		String userNameToAdd = req.getString(Account_Strings.REQ_USERNAME);
+		if ( userNameToAdd == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USERNAME);
+			return res;
+		}
+		String groupName = req.getString(Account_Strings.REQ_GROUPNAME);
+		if ( groupName == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUPNAME);
+			return res;
+		}
+		res.put(Account_Strings.REQ_USERNAME, userNameToAdd);
+		res.put(Account_Strings.REQ_GROUPNAME, groupName);
+		return res;
 	}
 }

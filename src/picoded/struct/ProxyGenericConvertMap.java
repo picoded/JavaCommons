@@ -8,39 +8,47 @@ import picoded.conv.GenericConvert;
 
 public class ProxyGenericConvertMap<K, V> extends AbstractMapDecorator<K, V> implements
 	GenericConvertMap<K, V> {
-	
+
 	// ------------------------------------------------------
 	//
 	// Constructors
 	//
 	// ------------------------------------------------------
-	
-	/// Consturctor
+
+	/**
+	* Constructor
+	**/
 	public ProxyGenericConvertMap() {
 		super();
 	}
-	
-	/// Consturctor
+
+	/**
+	* Constructor
+	**/
 	@SuppressWarnings("unchecked")
 	public ProxyGenericConvertMap(Map<? extends K, ? extends V> m) {
 		super((Map<K, V>) m);
 	}
-	
-	/// The static builder for the map
+
+	/**
+	* The static builder for the map
+	**/
 	public static <A, B> GenericConvertMap<A, B> ensure(Map<A, B> inMap) {
 		if (inMap instanceof GenericConvertMap) { // <A,B>
 			return (GenericConvertMap<A, B>) inMap;
 		}
 		return new ProxyGenericConvertMap<A, B>(inMap);
 	}
-	
+
 	// ------------------------------------------------------
 	//
 	// Overwrites
 	//
 	// ------------------------------------------------------
-	
-	/// Implments a JSON to string conversion
+
+	/**
+	* Implments a JSON to string conversion
+	**/
 	@Override
 	public String toString() {
 		return GenericConvert.toString(this);

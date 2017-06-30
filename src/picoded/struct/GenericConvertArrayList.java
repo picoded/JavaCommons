@@ -6,30 +6,38 @@ import java.util.List;
 import picoded.conv.GenericConvert;
 
 public class GenericConvertArrayList<E> extends ArrayList<E> implements GenericConvertList<E> {
-	
-	/// Serial version UID
+
+	/**
+	* Serial version UID
+	**/
 	private static final long serialVersionUID = 1L;
-	
-	/// Implments a JSON to string conversion
+
+	/**
+	* Implments a JSON to string conversion
+	**/
 	@Override
 	public String toString() {
 		return GenericConvert.toString(this);
 	}
-	
+
 	// ------------------------------------------------------
 	//
 	// Constructors
 	//
 	// ------------------------------------------------------
-	
-	/// Consturctor
+
+	/**
+	* Consturctor
+	**/
 	public GenericConvertArrayList() {
 		super();
 	}
-	
-	/// Consturctor
+
+	/**
+	* Consturctor
+	**/
 	public GenericConvertArrayList(List<E> m) {
 		super(m);
 	}
-	
+
 }

@@ -8,6 +8,8 @@ import picoded.dstack.module.*;
 import picoded.conv.*;
 import picoded.struct.*;
 
+import picoded.servlet.api.module.account.Account_Strings;
+
 ///
 /// The account class is considered a hybrid class of both the user, group management class.
 /// Where both users, and groups are considered the "same". Hence their distinction is normally detirmined
@@ -211,6 +213,8 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		// Login throttling information
 		loginThrottlingAttemptMap = stack.getAtomicLongMap(name + ACCOUNT_LOGIN_THROTTLING_ATTEMPT);
 		loginThrottlingExpiryMap = stack.getAtomicLongMap(name + ACCOUNT_LOGIN_THROTTLING_EXPIRY);
+
+		// Side note: For new table, edit here and add into the return List
 
 		// @TODO - Consider adding support for temporary tabls typehints
 
@@ -875,45 +879,50 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	}
 
 
+	///////////////////////////////////////////////////////////////////////////
 	///
 	/// Group Membership roles managment
-	///--------------------------------------------------------------------------
-	protected List<String> membershipRoles = new ArrayList<String>(Arrays.asList(new String[] { "guest", "member",
-		"manager", "admin" }));
+	///
+	///////////////////////////////////////////////////////////////////////////
+	protected List<String> defaultMembershipRoles = new ArrayList<String>(Arrays.asList(new String[] { "member",
+		"admin" }));
 
-	/// Returns the internal membership role list
-	public List<String> membershipRoles() {
-		return membershipRoles;
+	/// Returns the internal default membership role list
+	public List<String> defaultMembershipRoles() {
+		return defaultMembershipRoles;
 	}
 
 	/// Checks if membership role exists
-	public boolean hasMembershipRole(String role) {
+	protected boolean hasMembershipRole(String group_oid, String role) {
 		// Sanatize the role
 		role = role.toLowerCase();
 
 		// Returns if it exists
-		return membershipRoles.contains(role);
+		MetaObject groupObject = accountPrivateMetaTable.get(group_oid);
+		List<String> groupRoles = groupObject.getList(Account_Strings.PROPERTIES_ROLE, "[]");
+		return groupRoles.contains(role);
 	}
 
-	/// Add membership role if it does not exists
-	public void addMembershipRole(String role) {
-		// Sanatize the role
-		role = role.toLowerCase();
-
-		// Already exists terminate
-		if (hasMembershipRole(role)) {
-			return;
-		}
-
-		// Add the role
-		membershipRoles.add(role);
-	}
+	// /// Add membership role if it does not exists
+	// public void addMembershipRole(String role) {
+	// 	// Sanatize the role
+	// 	role = role.toLowerCase();
+	//
+	// 	// Already exists terminate
+	// 	if (hasMembershipRole(role)) {
+	// 		return;
+	// 	}
+	//
+	// 	// Add the role
+	// 	membershipRoles.add(role);
+	// }
 
 	/// Checks and validates the membership role, throws if invalid
-	protected String validateMembershipRole(String role) {
+	protected String validateMembershipRole(String group_oid, String role) {
 		role = role.toLowerCase();
-		if (!hasMembershipRole(role)) {
-			throw new RuntimeException("Membership role does not exists: " + role);
+		if (!hasMembershipRole(group_oid, role)) {
+			// throw new RuntimeException("Membership role does not exists: " + role);
+			return null;
 		}
 		return role;
 	}

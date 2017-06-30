@@ -8,6 +8,9 @@ import picoded.conv.*;
 import picoded.struct.*;
 import picoded.security.*;
 
+
+import picoded.servlet.api.module.account.Account_Strings;
+
 ///
 /// Represents a single group / user account.
 ///
@@ -83,7 +86,7 @@ public class AccountObject extends Core_MetaObject {
 	///
 	/// @param  LoginID to setup for this account
 	public void removeLoginID(String name) {
-		if(hasLoginID(name)) {
+		if (hasLoginID(name)) {
 			mainTable.accountLoginIdMap.remove(name);
 		}
 	}
@@ -223,7 +226,7 @@ public class AccountObject extends Core_MetaObject {
 	/// @return  Information meta if session is valid
 	public Map<String,Object> getSessionInfo(String sessionID) {
 		// Validate that session is legit
-		if(!hasSession(sessionID)) {
+		if (!hasSession(sessionID)) {
 			return null;
 		}
 
@@ -249,7 +252,7 @@ public class AccountObject extends Core_MetaObject {
 	public String newSession(Map<String,Object> info) {
 
 		// Normalize the info object map
-		if( info == null ) {
+		if ( info == null ) {
 			info = new HashMap<String,Object>();
 		}
 
@@ -261,7 +264,7 @@ public class AccountObject extends Core_MetaObject {
 
 		// As unlikely as it is, on GUID collision,
 		// we do not want any session swarp EVER
-		if( mainTable.sessionLinkMap.get( sessionID ) != null ) {
+		if ( mainTable.sessionLinkMap.get( sessionID ) != null ) {
 			throw new RuntimeException("GUID collision for sessionID : "+sessionID);
 		}
 
@@ -280,7 +283,7 @@ public class AccountObject extends Core_MetaObject {
 	/// @param  SessionID to revoke
 	public void revokeSession(String sessionID) {
 		// Validate the session belongs to this account !
-		if( hasSession(sessionID) ) {
+		if ( hasSession(sessionID) ) {
 			// Session ownership validated, time to revoke!
 
 			// Revoke all tokens associated to this session
@@ -323,7 +326,7 @@ public class AccountObject extends Core_MetaObject {
 	/// @return  The list of token ID's currently associated to this session
 	///          null, if session is not valid.
 	public Set<String> getTokenSet(String sessionID) {
-		if( hasSession(sessionID) ) {
+		if ( hasSession(sessionID) ) {
 			return mainTable.sessionTokenMap.keySet(sessionID);
 		}
 		return new HashSet<String>();
@@ -341,7 +344,7 @@ public class AccountObject extends Core_MetaObject {
 	public String newToken(String sessionID, long expireTime) {
 
 		// Terminate if session is invalid
-		if( !hasSession(sessionID) ) {
+		if ( !hasSession(sessionID) ) {
 			return null;
 		}
 
@@ -366,15 +369,15 @@ public class AccountObject extends Core_MetaObject {
 	/// @return  The tokenID generated, null on invalid session
 	protected void registerToken(String sessionID, String tokenID, String nextTokenID, long expireTime) {
 		// Current token check, does nothing if invalid
-		if( hasToken(sessionID, tokenID) ) {
+		if ( hasToken(sessionID, tokenID) ) {
 			return;
 		}
 
 		// Check if token has already been registered
 		String existingTokenSession = mainTable.sessionTokenMap.getString(tokenID, null);
-		if( existingTokenSession != null ) {
+		if ( existingTokenSession != null ) {
 			// Check if token has valid session
-			if( sessionID.equals(existingTokenSession) ) {
+			if ( sessionID.equals(existingTokenSession) ) {
 				// Assume setup was already done, terminating
 				return;
 			} else {
@@ -400,7 +403,7 @@ public class AccountObject extends Core_MetaObject {
 	///
 	/// @return TRUE if login ID belongs to this account
 	public boolean revokeToken(String sessionID, String tokenID) {
-		if( hasToken(sessionID, tokenID) ) {
+		if ( hasToken(sessionID, tokenID) ) {
 			mainTable.sessionTokenMap.remove(tokenID);
 			return true;
 		}
@@ -424,7 +427,7 @@ public class AccountObject extends Core_MetaObject {
 	///
 	/// @return  The token expiry timestamp
 	public long getTokenExpiry(String sessionID, String tokenID) {
-		if( hasToken(sessionID, tokenID) ) {
+		if ( hasToken(sessionID, tokenID) ) {
 			return mainTable.sessionTokenMap.getExpiry(tokenID);
 		}
 		return -1;
@@ -441,12 +444,12 @@ public class AccountObject extends Core_MetaObject {
 		long expiry = getTokenExpiry( sessionID, tokenID );
 
 		// Invalid tokens are -1
-		if(expiry <= -1) {
+		if (expiry <= -1) {
 			return -1;
 		}
 
 		long lifespan = expiry - (System.currentTimeMillis()) / 1000L;
-		if(lifespan < -1) {
+		if (lifespan < -1) {
 			return -1;
 		}
 		return lifespan;
@@ -460,7 +463,7 @@ public class AccountObject extends Core_MetaObject {
 	///
 	/// @return The next token
 	protected String getUncheckedNextToken(String sessionID, String tokenID) {
-		if( hasToken(sessionID, tokenID) ) {
+		if ( hasToken(sessionID, tokenID) ) {
 			return mainTable.sessionNextTokenMap.get(tokenID);
 		}
 		return null;
@@ -474,7 +477,7 @@ public class AccountObject extends Core_MetaObject {
 	/// @return The next token ID
 	public String getNextToken(String sessionID, String tokenID) {
 		String nextToken = getUncheckedNextToken(sessionID, tokenID);
-		if( mainTable.sessionTokenMap.containsKey(nextToken) ) {
+		if ( mainTable.sessionTokenMap.containsKey(nextToken) ) {
 			return nextToken;
 		}
 		return null;
@@ -492,7 +495,7 @@ public class AccountObject extends Core_MetaObject {
 		// Get NextToken, and returns (if previously issued)
 		String nextToken = getUncheckedNextToken(sessionID, tokenID);
 		// Terminate if nextToken is invalid
-		if( nextToken == null ) {
+		if ( nextToken == null ) {
 			return null;
 		}
 
@@ -501,13 +504,18 @@ public class AccountObject extends Core_MetaObject {
 		// Return the next token, after its been issued
 		return nextToken;
 	}
-	/*
 
 	///////////////////////////////////////////////////////////////////////////
 	//
-	// Group management
+	// Group Configuration and Management
 	//
 	///////////////////////////////////////////////////////////////////////////
+
+	// Group Status and Management
+	// -------------------------------------------------------------------------
+
+	// Group Management of Users
+	//-------------------------------------------------------------------------
 
 	/// Gets the cached child map
 	protected MetaObject _group_userToRoleMap = null;
@@ -517,40 +525,9 @@ public class AccountObject extends Core_MetaObject {
 		if (_group_userToRoleMap != null) {
 			return _group_userToRoleMap;
 		}
-
-		return (_group_userToRoleMap = mainTable.group_childRole.uncheckedGet(this._oid()));
+		// true = uncheckedGet
+		return (_group_userToRoleMap = mainTable.memberRolesTable.get(this._oid(), true));
 	}
-	*/
-	// Group status check
-	//-------------------------------------------------------------------------
-
-	/// Returns if set as group
-	public boolean isGroup() {
-		Object status = this.get("isGroup");
-		if (status instanceof Number && //
-			((Number) status).intValue() >= 1) {
-			return true;
-		} else {
-			return false;
-		}
-		//return ( group_userToRoleMap().size() > 1 );
-	}
-
-	/// Sets if the account is a group
-	public void setGroupStatus(boolean enabled) {
-		if (enabled) {
-			this.put("isGroup", new Integer(1));
-		} else {
-			this.put("isGroup", new Integer(0));
-
-			// group_userToRoleMap().clear();
-			// group_userToRoleMap().saveDelta();
-		}
-		this.saveDelta();
-	}
-	/*
-	// Group management of users
-	//-------------------------------------------------------------------------
 
 	/// Gets and returns the member role, if it exists
 	public String getMemberRole(AccountObject memberObject) {
@@ -566,14 +543,14 @@ public class AccountObject extends Core_MetaObject {
 		if (level == null || level.length() <= 0) {
 			return null;
 		}
-
-		return mainTable.groupChild_meta.uncheckedGet(mainTable.getGroupChildMetaKey(this._oid(), memberOID));
+		// true = uncheckedGet
+		return mainTable.memberMetaTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
 	}
 
 	/// Gets and returns the member meta map, if it exists
 	/// Only returns if member exists and matches role, else null
 	public MetaObject getMember(AccountObject memberObject, String role) {
-		role = mainTable.validateMembershipRole(role);
+		role = mainTable.validateMembershipRole(this._oid(), role);
 
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
@@ -581,8 +558,8 @@ public class AccountObject extends Core_MetaObject {
 		if (level == null || !level.equals(role)) {
 			return null;
 		}
-
-		return mainTable.groupChild_meta.uncheckedGet(this._oid() + "-" + memberOID);
+		// true = uncheckedGet
+		return mainTable.memberMetaTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
 	}
 
 	/// Adds the member to the group with the given role, if it was not previously added
@@ -602,8 +579,10 @@ public class AccountObject extends Core_MetaObject {
 	///
 	/// Returns the group-member unique meta object
 	public MetaObject setMember(AccountObject memberObject, String role) {
-		role = mainTable.validateMembershipRole(role);
-
+		role = mainTable.validateMembershipRole(this._oid(), role);
+		if ( role == null ) {
+			return null;
+		}
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
 		MetaObject childMeta = null;
@@ -616,34 +595,101 @@ public class AccountObject extends Core_MetaObject {
 			group_userToRoleMap().put(memberOID, role);
 			group_userToRoleMap().saveDelta();
 
-			childMeta = mainTable.groupChild_meta.uncheckedGet(this._oid() + "-" + memberOID);
-			childMeta.put("role", role);
+			// true = uncheckedGet
+			childMeta = mainTable.memberMetaTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
+			childMeta.put(Account_Strings.PROPERTIES_ROLE, role);
 			childMeta.saveDelta();
 		} else {
-			childMeta = mainTable.groupChild_meta.uncheckedGet(this._oid() + "-" + memberOID);
+			// true = uncheckedGet
+			childMeta = mainTable.memberMetaTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
 		}
 
 		return childMeta;
 	}
 
-	public boolean removeMember(AccountObject memberObject) {
+
+	public MetaObject removeMember(AccountObject memberObject) {
 		if (!this.isGroup()) {
-			return false;
+			return this;
 		}
 
 		String memberOID = memberObject._oid();
-		String level = group_userToRoleMap().getString(memberOID);
-
+		String userRoleInGroup = group_userToRoleMap().getString(memberOID);
+		if ( userRoleInGroup == null ) {
+			return null;
+		}
 		group_userToRoleMap().remove(memberOID);
 		group_userToRoleMap().saveAll();
 
-		mainTable.groupChild_meta.remove(this._oid() + "-" + memberOID);
-
+		mainTable.memberMetaTable.remove(AccountTable.getGroupChildMetaKey(this._oid(), memberOID));
 		System.out.println("Remove member called successfully");
 
-		return true;
+		return memberObject;
 	}
 
+	// Group Status Check
+	//-------------------------------------------------------------------------
+
+	/// Returns if set as group
+	public boolean isGroup() {
+		Object status = this.get("isGroup");
+		if (status instanceof Number && //
+			((Number) status).intValue() >= 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/// Sets if the account is a group
+	public void setGroupStatus(boolean enabled) {
+		if (enabled) {
+			this.put("isGroup", new Integer(1));
+		} else {
+			this.put("isGroup", new Integer(0));
+		}
+		this.saveDelta();
+	}
+
+
+	// Group Configuration
+	// -------------------------------------------------------------------------
+	protected MetaObject _group_membershipRoles = null;
+
+	public MetaObject group_membershipRoles(){
+		if (_group_membershipRoles != null ) {
+			return _group_membershipRoles;
+		}
+		return (_group_membershipRoles = mainTable.accountPrivateMetaTable.get(this._oid(), true));
+	}
+
+	public MetaObject addNewMembershipRole(String role) {
+		List<String> currentRoles = group_membershipRoles().getList(Account_Strings.PROPERTIES_ROLE, "[]");
+		if ( currentRoles.contains(role) ){
+			return group_membershipRoles();
+		}
+		currentRoles.add(role);
+		return setMembershipRoles(currentRoles);
+	}
+
+	public MetaObject setMembershipRoles(List<String> roles) {
+		group_membershipRoles().put(Account_Strings.PROPERTIES_ROLE, roles);
+		group_membershipRoles().saveDelta();
+		return group_membershipRoles();
+	}
+
+	public MetaObject removeMembershipRole(String role) {
+		List<String> currentRoles = group_membershipRoles().getList(Account_Strings.PROPERTIES_ROLE, "[]");
+		if (!currentRoles.contains(role)){
+			return group_membershipRoles();
+		}
+		currentRoles.remove(role);
+		return setMembershipRoles(currentRoles);
+	}
+
+
+
+	/*
 	/// Returns the list of groups the member is in
 	///
 	public String[] getMembers_id() {

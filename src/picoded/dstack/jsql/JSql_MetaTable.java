@@ -351,7 +351,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 	/// @returns set of keys
 	@Override
 	public Set<String> keySet() {
-		JSqlResult r = sqlObj.select(dataTableName, "DISTINCT oID");
+		JSqlResult r = sqlObj.select(baseTableName, "oID");
 		if (r == null || r.get("oID") == null) {
 			return new HashSet<String>();
 		}
@@ -445,4 +445,5 @@ public class JSql_MetaTable extends Core_MetaTable {
 		
 		return ListValueConv.toStringSet(r.getObjectList("kID"));
 	}
+
 }

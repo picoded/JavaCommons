@@ -654,9 +654,9 @@ public class StructSimple_MetaTable_test {
 	@Test
 	public void randomObjectTest() {
 		assertNull( mtObj.randomObject() );
-		assertNull( mtObj.pseudoIterateObject(null) );
+		assertNull( mtObj.looselyIterateObject(null) );
 		basicTest();
 		assertNotNull( mtObj.randomObject() );
-		assertNotNull( mtObj.pseudoIterateObject(null) );
+		assertNotNull( mtObj.looselyIterateObject(null) );
 	}
 }

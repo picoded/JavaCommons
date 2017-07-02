@@ -369,7 +369,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject>, Co
 	/// repeated rounds on subsequent calls.
 	///
 	/// Due to its roughly random nature in production (with concurrent objects generated)
-	/// and its iterative nature as an eventuality. The phrase pseudoIterate was chosen,
+	/// and its iterative nature as an eventuality. The phrase looselyIterate was chosen,
 	/// to properly reflect its nature.
 	///
 	/// Another way to phrase it, in worse case scenerio, its completely random, eventually iterating all objects
@@ -379,7 +379,7 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject>, Co
 	///
 	/// @return  Next object ID, if found
 	///
-	default String pseudoIterateObjectID(String currentID) {
+	default String looselyIterateObjectID(String currentID) {
 		// By default this is an inefficent implementation
 		// of sorting the keyset, and returning in the respective order
 		ArrayList<String> idList = new ArrayList<String>(keySet());
@@ -423,9 +423,9 @@ public interface MetaTable extends UnsupportedDefaultMap<String, MetaObject>, Co
 	/// @param   MetaObject to iterate next from, can be null
 	///
 	/// @return  Random MetaObject
-	default MetaObject pseudoIterateObject(MetaObject currentObj) {
+	default MetaObject looselyIterateObject(MetaObject currentObj) {
 		String currentID = (currentObj != null)? currentObj._oid() : null;
-		String retID = pseudoIterateObjectID(currentID);
+		String retID = looselyIterateObjectID(currentID);
 		return (retID != null)? get(retID) : null;
 	}
 	

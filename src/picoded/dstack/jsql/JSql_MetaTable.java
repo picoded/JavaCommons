@@ -489,7 +489,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 	/// repeated rounds on subsequent calls.
 	///
 	/// Due to its roughly random nature in production (with concurrent objects generated)
-	/// and its iterative nature as an eventuality. The phrase pseudoIterate was chosen,
+	/// and its iterative nature as an eventuality. The phrase looselyIterate was chosen,
 	/// to properly reflect its nature.
 	///
 	/// Another way to phrase it, in worse case scenerio, its completely random, eventually iterating all objects
@@ -499,7 +499,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 	///
 	/// @return  Next object ID, if found
 	///
-	public String pseudoIterateObjectID(String currentID) {
+	public String looselyIterateObjectID(String currentID) {
 		// Result set to fetch next ID
 		JSqlResult r = null;
 		if( currentID == null ) {

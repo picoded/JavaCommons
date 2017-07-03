@@ -10,45 +10,50 @@ import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-///
-/// Common utility class of CommonStructure.
-///
-/// Does not actually implement its required feature,
-/// but helps provide a common base line for the configuration system.
-///
+/**
+* Common utility class of CommonStructure.
+*
+* Does not actually implement its required feature,
+* but helps provide a common base line for the configuration system.
+**/
 public abstract class Core_CommonStack implements CommonStack {
-	
+
 	//----------------------------------------------------------------
 	//
 	//  Get the various DStack structure
 	//
 	//----------------------------------------------------------------
-	
-	/// Holds the cache collection of KeyValueMaps currently initiated
+
+	/**
+	* Holds the cache collection of KeyValueMaps currently initiated
+	**/
 	protected ConcurrentHashMap<String, CommonStructure> structureCache = new ConcurrentHashMap<String, CommonStructure>();
 
-	/// Holds the lock for (possible) write access to the keyValueMap cache
+	/**
+	* Holds the lock for (possible) write access to the keyValueMap cache
+	**/
 	protected ReentrantReadWriteLock structureCacheLock = new ReentrantReadWriteLock();
-	
-	/// [TO OVERWRITE]
-	///
-	/// Common structure initialization interface, to be overwritten by actual implementation.
-	/// Note that if a specified structure type is not yet supported, return null;
-	///
-	/// @param   Type of structure to setup
-	/// @param   Name used to initialize the structure
-	///
-	/// @return  The CommonStructure that was initialized
+
+	// [TO OVERWRITE]
+	/**
+	* Common structure initialization interface, to be overwritten by actual implementation.
+	* Note that if a specified structure type is not yet supported, return null;
+	*
+	* @param   Type of structure to setup
+	* @param   Name used to initialize the structure
+	*
+	* @return  The CommonStructure that was initialized
+	**/
 	public abstract CommonStructure initializeStructure(String type, String name);
 
-	///
-	/// Validate the CommonStructure, to its respective type
-	///
-	/// @param   Type of structure to validate
-	/// @oaram   CommonStructure to validate
-	///
-	/// @return  True if the type is valid
-	///
+	/**
+	* Validate the CommonStructure, to its respective type
+	*
+	* @param   Type of structure to validate
+	* @param   CommonStructure to validate
+	*
+	* @return  True if the type is valid
+	**/
 	protected boolean validateStructureType(String type, CommonStructure inObj) {
 		if ("MetaTable".equalsIgnoreCase(type)) {
 			return (inObj instanceof MetaTable);
@@ -60,16 +65,16 @@ public abstract class Core_CommonStack implements CommonStack {
 		throw new RuntimeException("Unknown struct type : " + type);
 	}
 
-	///
-	/// Validate the CommonStructure, to its respective type.
-	/// Throws an exception if invalid
-	///
-	/// @param   Type of structure to validate
-	/// @param   Structure name to use in exception
-	/// @oaram   CommonStructure to validate
-	///
-	/// @return  True if the type is valid
-	///
+	/**
+	* Validate the CommonStructure, to its respective type.
+	* Throws an exception if invalid
+	*
+	* @param   Type of structure to validate
+	* @param   Structure name to use in exception
+	* @param   CommonStructure to validate
+	*
+	* @return  True if the type is valid
+	**/
 	protected boolean enforceStructureType(String type, String structName, CommonStructure inObj) {
 		if(!validateStructureType(type, inObj)) {
 			throw new RuntimeException("Invalid structure type found for "+structName+" - expected "+type);
@@ -77,31 +82,31 @@ public abstract class Core_CommonStack implements CommonStack {
 		return true;
 	}
 
-	///
-	/// Get the respective structure required, 
-	/// If its missing the respective structure, a setup call is performed.
-	/// If a conflicting structure of a different type was made, an exception occurs
-	///
-	/// @param   Type of structure to setup
-	/// @param   Name used to initialize the structur
-	///
-	/// @return  The respective structure requested
-	///
+	/**
+	* Get the respective structure required,
+	* If its missing the respective structure, a setup call is performed.
+	* If a conflicting structure of a different type was made, an exception occurs
+	*
+	* @param   Type of structure to setup
+	* @param   Name used to initialize the structur
+	*
+	* @return  The respective structure requested
+	**/
 	public CommonStructure getStructure(String type, String name) {
 
 		// Structure backend name is case insensitive
 		name = name.toUpperCase(Locale.ENGLISH);
 
 		// Tries to get 1 time, without locking
-		// If NULL, assume that a setup call maybe 
+		// If NULL, assume that a setup call maybe
 		// be required (or is occuring concurrently)
 		CommonStructure cacheCopy = structureCache.get(name);
 		if (cacheCopy != null) {
 			enforceStructureType(type, name, cacheCopy);
 			return cacheCopy;
 		}
-		
-		// Tries to get again with lock, 
+
+		// Tries to get again with lock,
 		// creates and put if not exists
 		try {
 			// Acquire write lock, to prevent concurrent initializations
@@ -140,8 +145,10 @@ public abstract class Core_CommonStack implements CommonStack {
 	//  or the respective maintenance/incrementalMaintenance call
 	//
 	//----------------------------------------------------------------
-	
-	/// This does the setup called on all the preloaded DStack structures, created via preload/get calls
+
+	/**
+	* This does the setup called on all the preloaded DStack structures, created via preload/get calls
+	**/
 	public void systemSetup() {
 		try {
 			// Acquire write lock, to prevent concurrent initializations
@@ -155,8 +162,10 @@ public abstract class Core_CommonStack implements CommonStack {
 		}
 	}
 
-	/// This does the system destruction (no undo) 
-	/// called on all the preloaded DStack structures, created via preload/get calls
+	/**
+	* This does the system destruction (no undo)
+	* called on all the preloaded DStack structures, created via preload/get calls
+	**/
 	public void systemDestroy() {
 		try {
 			// Acquire write lock, to prevent concurrent initializations
@@ -170,8 +179,10 @@ public abstract class Core_CommonStack implements CommonStack {
 		}
 	}
 
-	/// This clears out the data (no undo) 
-	/// called on all the preloaded DStack structures, created via preload/get calls
+	/**
+	* This clears out the data (no undo)
+	* called on all the preloaded DStack structures, created via preload/get calls
+	**/
 	public void clear() {
 		try {
 			// Acquire write lock, to prevent concurrent initializations
@@ -185,8 +196,10 @@ public abstract class Core_CommonStack implements CommonStack {
 		}
 	}
 
-	/// This does a maintenance across all DStack structures 
-	/// called on all the preloaded DStack structures, created via preload/get calls
+	/**
+	* This does a maintenance across all DStack structures
+	* called on all the preloaded DStack structures, created via preload/get calls
+	**/
 	public void maintenance() {
 		try {
 			// Acquire write lock, to prevent concurrent initializations
@@ -199,9 +212,11 @@ public abstract class Core_CommonStack implements CommonStack {
 			structureCacheLock.writeLock().unlock();
 		}
 	}
-
-	/// This does an incrementalMaintenance across all DStack structures 
-	/// called on all the preloaded DStack structures, created via preload/get calls
+	
+	/**
+	* This does an incrementalMaintenance across all DStack structures
+	* called on all the preloaded DStack structures, created via preload/get calls
+	**/
 	public void incrementalMaintenance() {
 		try {
 			// Acquire write lock, to prevent concurrent initializations
@@ -214,5 +229,5 @@ public abstract class Core_CommonStack implements CommonStack {
 			structureCacheLock.writeLock().unlock();
 		}
 	}
-	
+
 }

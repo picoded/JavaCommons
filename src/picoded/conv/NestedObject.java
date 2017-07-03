@@ -604,7 +604,9 @@ public class NestedObject {
 		// End of path recursion
 		//--------------------------------------------------------
 
-		/// No additional parts, return existing path
+		/**
+		* No additional parts, return existing path
+		**/
 		if (splitKeyPath == null || splitKeyPath.isEmpty()) {
 			return res;
 		}

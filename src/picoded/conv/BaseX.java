@@ -419,15 +419,17 @@ public class BaseX {
 		return retValue;
 	}
 
-	/// Does an encoding loss check if acceptEncodingLoss is set to false.
-	///
-	/// Check the first few additional bytes, if its "zero", and hence suffer from no encoding lost.
-	/// If a non zero value is found. Assume values will be lost to encoding, hence throw an error.
-	///
-	/// @param  The byte array to check
-	/// @param  The byte values positions to check up to (not including)
-	/// @param  Byte length targeted (for error throwing)
-	/// @param  Encoding string (for error throwing)
+	/**
+	* Does an encoding loss check if acceptEncodingLoss is set to false.
+	*
+	* Check the first few additional bytes, if its "zero", and hence suffer from no encoding lost.
+	* If a non zero value is found. Assume values will be lost to encoding, hence throw an error.
+	*
+	* @param  The byte array to check
+	* @param  The byte values positions to check up to (not including)
+	* @param  Byte length targeted (for error throwing)
+	* @param  Encoding string (for error throwing)
+	**/
 	protected void checkForEncodingLoss(byte[] fullEncodedValue, int limit, int byteLength,
 		String encodedString) {
 		for (int a = 0; a < limit; ++a) {
@@ -442,56 +444,63 @@ public class BaseX {
 	// MD5, SHA1 hashing support utility functions
 	//-----------------------------------------------
 
-	/// Hashes the input byte array, into the baseX format
-	///
-	/// @param  The byte array to do md5 hash
-	///
-	/// @return  Hash result in the encoded base format
+	/**
+	* Hashes the input byte array, into the baseX format
+	*
+	* @param  The byte array to do md5 hash
+	*
+	* @return  Hash result in the encoded base format
+	**/
 	public String md5hash(byte[] byteArr) {
 		return encode(DigestUtils.md5(byteArr));
 	}
-
-	/// Hashes the input byte array, into the baseX format
-	///
-	/// @param  The byte array to do md5 hash
-	///
-	/// @return  Hash result in the encoded base format
+	/**
+	* Hashes the input byte array, into the baseX format
+	*
+	* @param  The byte array to do md5 hash
+	*
+	* @return  Hash result in the encoded base format
+	**/
 	public String md5hash(String str) {
 		return encode(DigestUtils.md5(str));
 	}
-
-	/// Hashes the input byte array, into the baseX format
-	///
-	/// @param  The byte array to do sha1 hash
-	///
-	/// @return  Hash result in the encoded base format
+	/**
+	* Hashes the input byte array, into the baseX format
+	*
+	* @param  The byte array to do sha1 hash
+	*
+	* @return  Hash result in the encoded base format
+	**/
 	public String sha1hash(byte[] byteArr) {
 		return encode(DigestUtils.sha1(byteArr));
 	}
-
-	/// Hashes the input byte array, into the baseX format
-	///
-	/// @param  The byte array to do sha1 hash
-	///
-	/// @return  Hash result in the encoded base format
+	/**
+	* Hashes the input byte array, into the baseX format
+	*
+	* @param  The byte array to do sha1 hash
+	*
+	* @return  Hash result in the encoded base format
+	**/
 	public String sha1hash(String str) {
 		return encode(DigestUtils.sha1(str));
 	}
-
-	/// Hashes the input byte array, into the baseX format
-	///
-	/// @param  The byte array to do sha256 hash
-	///
-	/// @return  Hash result in the encoded base format
+	/**
+	* Hashes the input byte array, into the baseX format
+	*
+	* @param  The byte array to do sha256 hash
+	*
+	* @return  Hash result in the encoded base format
+	**/
 	public String sha256hash(byte[] byteArr) {
 		return encode(DigestUtils.sha256(byteArr));
 	}
-
-	/// Hashes the input byte array, into the baseX format
-	///
-	/// @param  The byte array to do sha256 hash
-	///
-	/// @return  Hash result in the encoded base format
+	/**
+	* Hashes the input byte array, into the baseX format
+	*
+	* @param  The byte array to do sha256 hash
+	*
+	* @return  Hash result in the encoded base format
+	**/
 	public String sha256hash(String str) {
 		return encode(DigestUtils.sha256(str));
 	}

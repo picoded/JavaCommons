@@ -528,6 +528,29 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
+	/// # addNewMembershipRole
+	///
+	/// Retrieve the role of an existing user from an existing group
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | role						| String								| name of the role to add																										 |
+	/// | groupname				| String								| name of the group to add to																								 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | meta						| {Object}	            | Object containing the list of roles of the group													 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
 	protected ApiFunction addNewMembershipRole = (req, res) -> {
 		String groupName = req.getString(Account_Strings.REQ_GROUPNAME);
 		if ( groupName == null ) {
@@ -552,6 +575,30 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
+
+	/// # removeMembershipRoleFromGroup
+	///
+	/// Retrieve the role of an existing user from an existing group
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | role						| String								| name of the role to remove																								 |
+	/// | groupname				| String								| name of the group to remove from																					 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | meta						| {Object}	            | Object containing the list of roles of the group													 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
 	protected ApiFunction removeMembershipRoleFromGroup = (req, res) -> {
 		String groupName = req.getString(Account_Strings.REQ_GROUPNAME);
 		if ( groupName == null ) {

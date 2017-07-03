@@ -506,10 +506,55 @@ public class AccountTableApi implements ApiModule {
 	};
 
 	protected ApiFunction addNewMembershipRole = (req, res) -> {
+		String groupName = req.getString(Account_Strings.REQ_GROUPNAME);
+		if ( groupName == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUPNAME);
+			return res;
+		}
+
+		String role = req.getString(Account_Strings.REQ_ROLE);
+		if ( role == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_ROLE);
+			return res;
+		}
+
+		AccountObject group = table.getFromLoginID(groupName);
+		if ( group == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			return res;
+		}
+
+		MetaObject groupResult = group.addNewMembershipRole(role);
+		res.put(Account_Strings.RES_META, groupResult);
 		return res;
 	};
 
 	protected ApiFunction removeMembershipRoleFromGroup = (req, res) -> {
+		String groupName = req.getString(Account_Strings.REQ_GROUPNAME);
+		if ( groupName == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUPNAME);
+			return res;
+		}
+
+		String role = req.getString(Account_Strings.REQ_ROLE);
+		if ( role == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_ROLE);
+			return res;
+		}
+
+		AccountObject group = table.getFromLoginID(groupName);
+		if ( group == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			return res;
+		}
+
+		MetaObject groupResult = group.removeMembershipRole(role);
+		if ( groupResult == null ) {
+			res.put(Account_Strings.RES_ERROR, "No such role is found.");
+		}else{
+			res.put(Account_Strings.RES_META, groupResult);
+		}
+
 		return res;
 	};
 
@@ -560,14 +605,14 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"new", new_account); // Tested
 
 		//Group functionalities
-		builder.put(path+"groupRoles", groupRoles);
+		builder.put(path+"groupRoles", groupRoles); // Tested
 		builder.put(path+"addMember", addMemberToGroup); // Tested
-		builder.put(path+"removeMember", removeMemberFromGroup);
+		builder.put(path+"removeMember", removeMemberFromGroup); // Tested
 		builder.put(path+"getMemberMeta", getMemberMetaFromGroup); // Tested
 		builder.put(path+"getMemberRole", getMemberRoleFromGroup); // Tested
 
-		builder.put(path+"addMembershipRole", addNewMembershipRole);
-		builder.put(path+"removeMembershipRole", removeMembershipRoleFromGroup);
+		builder.put(path+"addMembershipRole", addNewMembershipRole); // Tested
+		builder.put(path+"removeMembershipRole", removeMembershipRoleFromGroup); // Tested
 	}
 
 

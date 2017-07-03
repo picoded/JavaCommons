@@ -304,6 +304,11 @@ public class AccountTableApi_test extends ApiModule_test {
 		res = requestJSON("addMember", params);
 		assertEquals("User is already in group or role is not found.", res.get(Account_Strings.RES_ERROR));
 
+		// Adding members to a member account
+		params.put(Account_Strings.REQ_USERNAME, "newGroup");
+		params.put(Account_Strings.REQ_GROUPNAME, "memberToAdd");
+		res = requestJSON("addMember", params);
+		assertNotNull(Account_Strings.RES_ERROR);
 	}
 
 	@Test

@@ -378,6 +378,29 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
+	/// # removeMemberFromGroup
+	///
+	/// Add an existing user to an existing group
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | username				| String								| name of the user to remove																								 |
+	/// | groupname				| String								| name of the group to add to																								 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | meta						| {Object}              | Information of the remove user																						 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
 	protected ApiFunction removeMemberFromGroup = (req, res) -> {
 		Map<String, String> result = validateGroupParameters(req);
 		if ( result.get(Account_Strings.RES_ERROR) != null ) {
@@ -395,13 +418,13 @@ public class AccountTableApi implements ApiModule {
 			return res;
 		}
 		MetaObject groupResult = group.removeMember(userToRemove);
-		if ( groupResult == null ) {
-			res.put(Account_Strings.RES_ERROR, "User is not in group.");
-		} else if ( groupResult._oid() == group._oid() ) {
-			res.put(Account_Strings.RES_ERROR, "This is not a group.");
-		} else {
-			res.put(Account_Strings.RES_META, groupResult);
-		}
+	  if ( groupResult == null ) {
+	    res.put(Account_Strings.RES_ERROR, "User is not in group.");
+	  } else if ( groupResult.getInt(Account_Strings.PROPERTIES_IS_GROUP) == 0 && groupResult._oid() == group._oid()){
+	    res.put(Account_Strings.RES_ERROR, "This is not a group.");
+	  } else {
+	    res.put(Account_Strings.RES_META, groupResult);
+	  }
 		return res;
 	};
 

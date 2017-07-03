@@ -632,7 +632,7 @@ public class AccountObject extends Core_MetaObject {
 
 	/// Returns if set as group
 	public boolean isGroup() {
-		Object status = this.get("isGroup");
+		Object status = this.get(Account_Strings.PROPERTIES_IS_GROUP);
 		if (status instanceof Number && //
 			((Number) status).intValue() >= 1) {
 			return true;
@@ -644,9 +644,9 @@ public class AccountObject extends Core_MetaObject {
 	/// Sets if the account is a group
 	public void setGroupStatus(boolean enabled) {
 		if (enabled) {
-			this.put("isGroup", new Integer(1));
+			this.put(Account_Strings.PROPERTIES_IS_GROUP, new Integer(1));
 		} else {
-			this.put("isGroup", new Integer(0));
+			this.put(Account_Strings.PROPERTIES_IS_GROUP, new Integer(0));
 		}
 		this.saveDelta();
 	}
@@ -681,7 +681,7 @@ public class AccountObject extends Core_MetaObject {
 	public MetaObject removeMembershipRole(String role) {
 		List<String> currentRoles = group_membershipRoles().getList(Account_Strings.PROPERTIES_ROLE, "[]");
 		if (!currentRoles.contains(role)){
-			return group_membershipRoles();
+			return null;
 		}
 		currentRoles.remove(role);
 		return setMembershipRoles(currentRoles);

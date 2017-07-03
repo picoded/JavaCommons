@@ -29,6 +29,7 @@ public class Account_Strings{
     /// Static PROPERTIES VARS
     public static final String PROPERTIES_ROLE = "membershipRoles";
     public static final String PROPERTIES_EMAIL = "email";
+    public static final String PROPERTIES_IS_GROUP = "isGroup";
 
     /// ERROR MESSAGES
     public static final String ERROR_NO_GROUP = "No group is found.";

@@ -946,11 +946,13 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		return old;
 	}
 
-	/*
+
 	/// Returns the super user group
 	public AccountObject superUserGroup() {
-		return getFromName(getSuperUserGroupName());
+		return getFromLoginID(getSuperUserGroupName());
 	}
+
+	/*
 	//
 	// Getting users based on filters
 	// TODO: To optimise because Sam is dumb

@@ -389,25 +389,25 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(Account_Strings.REQ_USERNAME, "memberrole");
 		params.put(Account_Strings.REQ_PASSWORD, "password");
 		res = requestJSON("new", params);
-		assertNull("MemberMetaTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+		assertNull("getMemberRole: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
 
 		params.put(Account_Strings.REQ_USERNAME, "memberNotInGroup");
 		params.put(Account_Strings.REQ_PASSWORD, "password");
 		res = requestJSON("new", params);
-		assertNull("MemberMetaTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+		assertNull("getMemberRole: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
 		// Ensure that there is an existing group
 		params.clear();
 		params.put(Account_Strings.REQ_USERNAME, "memberRoleGroup");
 		params.put(Account_Strings.REQ_IS_GROUP, true);
 		res = requestJSON("new", params);
-		assertNull("MemberMetaTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
+		assertNull("getMemberRole: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
 		// Ensure that the user is added to the group
 		params.clear();
 		params.put(Account_Strings.REQ_USERNAME, "memberrole");
 		params.put(Account_Strings.REQ_GROUPNAME, "memberRoleGroup");
 		params.put(Account_Strings.REQ_ROLE, "member");
 		res = requestJSON("addMember", params);
-		assertNull("MemberMetaTest: Something wrong in adding member to group.", res.get(Account_Strings.RES_ERROR));
+		assertNull("getMemberRole: Something wrong in adding member to group.", res.get(Account_Strings.RES_ERROR));
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
@@ -453,25 +453,25 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(Account_Strings.REQ_USERNAME, "removemember");
 		params.put(Account_Strings.REQ_PASSWORD, "password");
 		res = requestJSON("new", params);
-		assertNull("MemberMetaTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+		assertNull("RemoveMemberTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
 
 		params.put(Account_Strings.REQ_USERNAME, "wrongmemberNotInGroup");
 		params.put(Account_Strings.REQ_PASSWORD, "password");
 		res = requestJSON("new", params);
-		assertNull("MemberMetaTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+		assertNull("RemoveMemberTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
 		// Ensure that there is an existing group
 		params.clear();
 		params.put(Account_Strings.REQ_USERNAME, "memberRemoveGroup");
 		params.put(Account_Strings.REQ_IS_GROUP, true);
 		res = requestJSON("new", params);
-		assertNull("MemberMetaTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
+		assertNull("RemoveMemberTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
 		// Ensure that the user is added to the group
 		params.clear();
 		params.put(Account_Strings.REQ_USERNAME, "removemember");
 		params.put(Account_Strings.REQ_GROUPNAME, "memberRemoveGroup");
 		params.put(Account_Strings.REQ_ROLE, "member");
 		res = requestJSON("addMember", params);
-		assertNull("MemberMetaTest: Something wrong in adding member to group.", res.get(Account_Strings.RES_ERROR));
+		assertNull("RemoveMemberTest: Something wrong in adding member to group.", res.get(Account_Strings.RES_ERROR));
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
@@ -530,7 +530,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		initialRole.add("lion");
 		params.put(Account_Strings.REQ_ROLE, initialRole);
 		res = requestJSON("new", params);
-		assertNull("MemberMetaTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
+		assertNull("AddMemberShipTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
@@ -571,7 +571,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		initialRole.add("lion");
 		params.put(Account_Strings.REQ_ROLE, initialRole);
 		res = requestJSON("new", params);
-		assertNull("MemberMetaTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
+		assertNull("removeMembershipTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
@@ -617,21 +617,21 @@ public class AccountTableApi_test extends ApiModule_test {
 		initialRole.add("lion");
 		params.put(Account_Strings.REQ_ROLE, initialRole);
 		res = requestJSON("new", params);
-		assertNull("MemberMetaTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
+		assertNull("MultiLevelGroupTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
 
 		// Ensure that there is an existing user
 		params.clear();
 		params.put(Account_Strings.REQ_USERNAME, "user1");
 		params.put(Account_Strings.REQ_PASSWORD, "thisismypassword");
 		res = requestJSON("new", params);
-		assertNull("MemberMetaTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+		assertNull("MultiLevelGroupTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
 
 		// Ensure that there is another user
 		params.clear();
 		params.put(Account_Strings.REQ_USERNAME, "user2");
 		params.put(Account_Strings.REQ_PASSWORD, "thisismypassword");
 		res = requestJSON("new", params);
-		assertNull("MemberMetaTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+		assertNull("MultiLevelGroupTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
@@ -665,5 +665,131 @@ public class AccountTableApi_test extends ApiModule_test {
 		// Reaffirm the result
 		res = requestJSON("getMemberRole", params);
 		assertEquals("knight", res.get(Account_Strings.RES_SINGLE_RETURN_VALUE));
+	}
+
+			// builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember);
+			// builder.put(path+"getListOfMemberIDInGroup", getListOfMemberIDInGroup);
+	@Test
+	public void getListOfGroupIDOfMember(){
+		GenericConvertMap<String,Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		// Ensure that there is an existing user
+		Map<String,Object> params = new HashMap<String,Object>();
+		// Ensure that there is an existing group
+		params.put(Account_Strings.REQ_USERNAME, "group number 1");
+		params.put(Account_Strings.REQ_IS_GROUP, true);
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
+		// Ensure that there is an existing group
+		params.put(Account_Strings.REQ_USERNAME, "group number 2");
+		params.put(Account_Strings.REQ_IS_GROUP, true);
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
+
+		// Ensure that there is an existing user
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "userToRetrieve");
+		params.put(Account_Strings.REQ_PASSWORD, "thisismypassword");
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+
+		params.put(Account_Strings.REQ_USERNAME, "userWithNoGroup");
+		params.put(Account_Strings.REQ_PASSWORD, "thisismypassword");
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+
+		// Ensure that user is in both group
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "userToRetrieve");
+		params.put(Account_Strings.REQ_GROUPNAME, "group number 1");
+		params.put(Account_Strings.REQ_ROLE, "member");
+		res = requestJSON("addMember", params);
+		assertNull("ListGroupTest: Something wrong in adding user to group", res.get(Account_Strings.RES_ERROR));
+
+		params.put(Account_Strings.REQ_GROUPNAME, "group number 2");
+		res = requestJSON("addMember", params);
+		assertNull("ListGroupTest: Something wrong in adding user to group", res.get(Account_Strings.RES_ERROR));
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+		res = requestJSON("getListOfGroupIDOfMember", null);
+		assertEquals("No oid and username found.", res.get(Account_Strings.RES_ERROR));
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "anyhowuser");
+		res = requestJSON("getListOfGroupIDOfMember", params);
+		assertEquals(Account_Strings.ERROR_NO_USER, res.get(Account_Strings.RES_ERROR));
+
+		params.put(Account_Strings.REQ_USERNAME, "userToRetrieve");
+		res = requestJSON("getListOfGroupIDOfMember", params);
+		assertTrue(res.getList(Account_Strings.RES_LIST).size() == 2);
+
+		params.put(Account_Strings.REQ_USERNAME, "userWithNoGroup");
+		res = requestJSON("getListOfGroupIDOfMember", params);
+		assertTrue(res.getList(Account_Strings.RES_LIST).size() == 0);
+
+	}
+
+	@Test
+	public void getListOfMemberIDInGroup(){
+		GenericConvertMap<String,Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		// Ensure that there is an existing user
+		Map<String,Object> params = new HashMap<String,Object>();
+		// Ensure that there is an existing group
+		params.put(Account_Strings.REQ_USERNAME, "groupToRetrieve");
+		params.put(Account_Strings.REQ_IS_GROUP, true);
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
+		// Ensure that there is an existing group
+		params.put(Account_Strings.REQ_USERNAME, "groupWithNoMember");
+		params.put(Account_Strings.REQ_IS_GROUP, true);
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
+
+		// Ensure that there is an existing user
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "user number 1");
+		params.put(Account_Strings.REQ_PASSWORD, "thisismypassword");
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+
+		params.put(Account_Strings.REQ_USERNAME, "user number 2");
+		params.put(Account_Strings.REQ_PASSWORD, "thisismypassword");
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+
+		// Ensure that group has both member
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "user number 1");
+		params.put(Account_Strings.REQ_GROUPNAME, "groupToRetrieve");
+		params.put(Account_Strings.REQ_ROLE, "member");
+		res = requestJSON("addMember", params);
+		assertNull("ListGroupTest: Something wrong in adding user to group", res.get(Account_Strings.RES_ERROR));
+
+		params.put(Account_Strings.REQ_USERNAME, "user number 2");
+		res = requestJSON("addMember", params);
+		assertNull("ListGroupTest: Something wrong in adding user to group", res.get(Account_Strings.RES_ERROR));
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+
+		res = requestJSON("getListOfMemberIDInGroup", null);
+		assertEquals(Account_Strings.ERROR_NO_GROUPNAME, res.get(Account_Strings.RES_ERROR));
+		params.clear();
+		params.put(Account_Strings.REQ_GROUPNAME, "anyhowgroup");
+		res = requestJSON("getListOfMemberIDInGroup", params);
+		assertEquals(Account_Strings.ERROR_NO_GROUP, res.get(Account_Strings.RES_ERROR));
+
+		params.put(Account_Strings.REQ_GROUPNAME, "groupToRetrieve");
+		res = requestJSON("getListOfMemberIDInGroup", params);
+		assertTrue(res.getList(Account_Strings.RES_LIST).size() == 2);
+
+		params.put(Account_Strings.REQ_GROUPNAME, "groupWithNoMember");
+		res = requestJSON("getListOfMemberIDInGroup", params);
+		assertTrue(res.getList(Account_Strings.RES_LIST).size() == 0);
 	}
 }

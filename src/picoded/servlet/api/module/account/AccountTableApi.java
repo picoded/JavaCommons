@@ -196,11 +196,6 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	//-------------------------------------------------------------------------------------------------------------------------
-	//
-	// Work in progress (not final) start
-	//
-	//-------------------------------------------------------------------------------------------------------------------------
 	///
 	/// # new [POST]
 	///
@@ -380,7 +375,7 @@ public class AccountTableApi implements ApiModule {
 
 	/// # removeMemberFromGroup
 	///
-	/// Add an existing user to an existing group
+	/// Remove an existing user to an existing group
 	///
 	/// ## HTTP Request Parameters
 	///
@@ -530,7 +525,7 @@ public class AccountTableApi implements ApiModule {
 
 	/// # addNewMembershipRole
 	///
-	/// Retrieve the role of an existing user from an existing group
+	/// Adding a new role to an existing group
 	///
 	/// ## HTTP Request Parameters
 	///
@@ -578,7 +573,7 @@ public class AccountTableApi implements ApiModule {
 
 	/// # removeMembershipRoleFromGroup
 	///
-	/// Retrieve the role of an existing user from an existing group
+	/// Remove an existing role from an existing group
 	///
 	/// ## HTTP Request Parameters
 	///
@@ -625,6 +620,85 @@ public class AccountTableApi implements ApiModule {
 			res.put(Account_Strings.RES_META, groupResult);
 		}
 
+		return res;
+	};
+
+	/// # getListOfMemberIDInGroup
+	///
+	/// Retrieve the list of members' ID from an existing group
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | groupname				| String								| name of the group to retrieve from																				 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | list						| List<String>          | List containing the members' ID of the group															 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	protected ApiFunction getListOfMemberIDInGroup = (req, res) -> {
+		String groupName = req.getString(Account_Strings.REQ_GROUPNAME);
+		if ( groupName == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUPNAME);
+			return res;
+		}
+
+		AccountObject group = table.getFromLoginID(groupName);
+		if ( group == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			return res;
+		}
+		String[] memberList = group.getMembers_id();
+		res.put(Account_Strings.RES_LIST, memberList);
+		return res;
+	};
+
+	/// # getListOfGroupIDOfMember
+	///
+	/// Retrieve a list of groups from an existing member
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | username				| String	(Either or)		| name of the user to retrieve from																					 |
+	/// | oid							| String								| oid of the user to retrieve from																					 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | list						| List<String>          | List containing the groups' ID of the member															 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	protected ApiFunction getListOfGroupIDOfMember = (req, res) -> {
+		String _oid = req.getString(Account_Strings.REQ_OID, null);
+		String username = req.getString(Account_Strings.REQ_USERNAME, null);
+		if ( _oid == null && username == null ){
+			res.put(Account_Strings.RES_ERROR, "No oid and username found.");
+			return res;
+		}
+		AccountObject ao = ( _oid != null ) ? table.get(_oid) : table.getFromLoginID(username);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		String[] listOfGroups = ao.getGroups_id();
+		res.put(Account_Strings.RES_LIST, listOfGroups);
 		return res;
 	};
 
@@ -678,11 +752,15 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"groupRoles", groupRoles); // Tested
 		builder.put(path+"addMember", addMemberToGroup); // Tested
 		builder.put(path+"removeMember", removeMemberFromGroup); // Tested
+
 		builder.put(path+"getMemberMeta", getMemberMetaFromGroup); // Tested
 		builder.put(path+"getMemberRole", getMemberRoleFromGroup); // Tested
 
 		builder.put(path+"addMembershipRole", addNewMembershipRole); // Tested
 		builder.put(path+"removeMembershipRole", removeMembershipRoleFromGroup); // Tested
+
+		builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember);
+		builder.put(path+"getListOfMemberIDInGroup", getListOfMemberIDInGroup);
 	}
 
 

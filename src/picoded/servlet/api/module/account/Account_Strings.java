@@ -4,6 +4,7 @@ public class Account_Strings{
 
   	/// Static REQUEST VARS
   	public static final String REQ_ACCOUNT_ID = "accountID";
+    public static final String REQ_OID = "_oid";
   	public static final String REQ_ACCOUNT_NAME = "accountName";
   	public static final String REQ_PASSWORD = "password";
   	public static final String REQ_USERNAME = "username";

@@ -689,8 +689,8 @@ public class AccountObject extends Core_MetaObject {
 
 
 
-	/*
-	/// Returns the list of groups the member is in
+
+	/// Returns the list of members in the group
 	///
 	public String[] getMembers_id() {
 		List<String> retList = new ArrayList<String>();
@@ -703,10 +703,10 @@ public class AccountObject extends Core_MetaObject {
 		return retList.toArray(new String[retList.size()]);
 	}
 
-	/// Returns the list of members in the group
+	/// Returns the list of groups the member is in
 	///
 	public String[] getGroups_id() {
-		return mainTable.group_childRole.getFromKeyName_id(_oid());
+		return mainTable.memberRolesTable.getFromKeyName_id(_oid());
 	}
 
 	/// Gets all the members object related to the group
@@ -715,10 +715,11 @@ public class AccountObject extends Core_MetaObject {
 		String[] idList = getMembers_id();
 		AccountObject[] objList = new AccountObject[idList.length];
 		for (int a = 0; a < idList.length; ++a) {
-			objList[a] = mainTable.getFromID(idList[a]);
+			objList[a] = mainTable.get(idList[a]);
 		}
 		return objList;
 	}
+
 
 	// Group management of users
 	//-------------------------------------------------------------------------
@@ -726,7 +727,7 @@ public class AccountObject extends Core_MetaObject {
 	/// Gets all the groups the user is in
 	///
 	public AccountObject[] getGroups() {
-		return mainTable.getFromIDArray(getGroups_id());
+		return mainTable.getFromArray(getGroups_id());
 	}
 
 	// Is super user group handling
@@ -743,7 +744,6 @@ public class AccountObject extends Core_MetaObject {
 		String superUserGroupRole = superUserGrp.getMemberRole(this);
 		return (superUserGroupRole != null && superUserGroupRole.equalsIgnoreCase("admin"));
 	}
-	*/
 
 	/// This method logs the details about login faailure for the user based on User ID
 	public void logLoginFailure(String userID) {

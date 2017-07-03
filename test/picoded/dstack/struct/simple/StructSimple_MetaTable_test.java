@@ -648,4 +648,15 @@ public class StructSimple_MetaTable_test {
 		assertEquals(oRes.length - 1, qRes.length);
 	}
 	
+	// Random object, and iteration support
+	//-----------------------------------------------
+
+	@Test
+	public void randomObjectTest() {
+		assertNull( mtObj.randomObject() );
+		assertNull( mtObj.looselyIterateObject(null) );
+		basicTest();
+		assertNotNull( mtObj.randomObject() );
+		assertNotNull( mtObj.looselyIterateObject(null) );
+	}
 }

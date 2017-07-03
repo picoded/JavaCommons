@@ -169,7 +169,8 @@ public class JSql_Mysql extends JSql_Base {
 		qString = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("\\s+", " ")
 			.replaceAll("\"", "`")
 			//.replaceAll("\'", "`")
-			.replaceAll("AUTOINCREMENT", "AUTO_INCREMENT").replace("VARCHAR(MAX)", "TEXT");
+			.replaceAll("AUTOINCREMENT", "AUTO_INCREMENT").replace("VARCHAR(MAX)", "TEXT")
+			.replaceAll("RANDOM\\(\\)", "RAND()");
 		
 		// MySQL does not support the inner query in create view
 		//

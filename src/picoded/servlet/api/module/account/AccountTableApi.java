@@ -662,9 +662,48 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
+	/// # getListOfMemberObjectOfGroup
+	///
+	/// Retrieve the list of members' OBJECT from an existing group
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | groupname				| String								| name of the group to retrieve from																				 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | list						| List<String>          | List containing the members' OBJECT of the group													 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	protected ApiFunction getListOfMemberObjectOfGroup = (req, res) -> {
+		String groupName = req.getString(Account_Strings.REQ_GROUPNAME);
+		if ( groupName == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUPNAME);
+			return res;
+		}
+
+		AccountObject group = table.getFromLoginID(groupName);
+		if ( group == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			return res;
+		}
+		AccountObject[] memberobjList = group.getGroups();
+		res.put(Account_Strings.RES_LIST, memberobjList);
+		return res;
+	};
+
 	/// # getListOfGroupIDOfMember
 	///
-	/// Retrieve a list of groups from an existing member
+	/// Retrieve a list of groups ID from an existing member
 	///
 	/// ## HTTP Request Parameters
 	///
@@ -699,6 +738,46 @@ public class AccountTableApi implements ApiModule {
 		}
 		String[] listOfGroups = ao.getGroups_id();
 		res.put(Account_Strings.RES_LIST, listOfGroups);
+		return res;
+	};
+
+	/// # getListOfGroupObjectOfMember
+	///
+	/// Retrieve a list of groups OBJECT from an existing member
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | username				| String	(Either or)		| name of the user to retrieve from																					 |
+	/// | oid							| String								| oid of the user to retrieve from																					 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | list						| List<String>          | List containing the groups' OBJECT of the member													 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	protected ApiFunction getListOfGroupObjectOfMember = (req, res) -> {
+		String _oid = req.getString(Account_Strings.REQ_OID, null);
+		String username = req.getString(Account_Strings.REQ_USERNAME, null);
+		if ( _oid == null && username == null ){
+			res.put(Account_Strings.RES_ERROR, "No oid and username found.");
+			return res;
+		}
+		AccountObject ao = ( _oid != null ) ? table.get(_oid) : table.getFromLoginID(username);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		AccountObject[] listOfGroupsObj = ao.getGroups();
+		res.put(Account_Strings.RES_LIST, listOfGroupsObj);
 		return res;
 	};
 
@@ -759,8 +838,11 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"addMembershipRole", addNewMembershipRole); // Tested
 		builder.put(path+"removeMembershipRole", removeMembershipRoleFromGroup); // Tested
 
-		builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember);
-		builder.put(path+"getListOfMemberIDInGroup", getListOfMemberIDInGroup);
+		builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember); // Tested
+		builder.put(path+"getListOfMemberIDInGroup", getListOfMemberIDInGroup); // Tested
+
+		builder.put(path+"getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
+		builder.put(path+"getListOfMemberObjectOfGroup", getListOfMemberObjectOfGroup); // Tested
 	}
 
 

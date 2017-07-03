@@ -687,9 +687,6 @@ public class AccountObject extends Core_MetaObject {
 		return setMembershipRoles(currentRoles);
 	}
 
-
-
-
 	/// Returns the list of members in the group
 	///
 	public String[] getMembers_id() {
@@ -720,15 +717,16 @@ public class AccountObject extends Core_MetaObject {
 		return objList;
 	}
 
-
-	// Group management of users
-	//-------------------------------------------------------------------------
-
-	/// Gets all the groups the user is in
+	/// Gets all the groups object the user is in
 	///
 	public AccountObject[] getGroups() {
 		return mainTable.getFromArray(getGroups_id());
 	}
+
+
+	// Group management of users
+	//-------------------------------------------------------------------------
+
 
 	// Is super user group handling
 	//-------------------------------------------------------------------------

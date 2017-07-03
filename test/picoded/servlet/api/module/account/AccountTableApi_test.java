@@ -792,4 +792,127 @@ public class AccountTableApi_test extends ApiModule_test {
 		res = requestJSON("getListOfMemberIDInGroup", params);
 		assertTrue(res.getList(Account_Strings.RES_LIST).size() == 0);
 	}
+
+	@Test
+	public void getListOfGroupObjectOfMember(){
+		GenericConvertMap<String,Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		// Ensure that there is an existing user
+		Map<String,Object> params = new HashMap<String,Object>();
+		// Ensure that there is an existing group
+		params.put(Account_Strings.REQ_USERNAME, "group test 1");
+		params.put(Account_Strings.REQ_IS_GROUP, true);
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
+		// Ensure that there is an existing group
+		params.put(Account_Strings.REQ_USERNAME, "group test 2");
+		params.put(Account_Strings.REQ_IS_GROUP, true);
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
+
+		// Ensure that there is an existing user
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "userObjToRetrieve");
+		params.put(Account_Strings.REQ_PASSWORD, "thisismypassword");
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+
+		params.put(Account_Strings.REQ_USERNAME, "userObjWithNoGroup");
+		params.put(Account_Strings.REQ_PASSWORD, "thisismypassword");
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+
+		// Ensure that user is in both group
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "userObjToRetrieve");
+		params.put(Account_Strings.REQ_GROUPNAME, "group test 1");
+		params.put(Account_Strings.REQ_ROLE, "member");
+		res = requestJSON("addMember", params);
+		assertNull("ListGroupTest: Something wrong in adding user to group", res.get(Account_Strings.RES_ERROR));
+
+		params.put(Account_Strings.REQ_GROUPNAME, "group test 2");
+		res = requestJSON("addMember", params);
+		assertNull("ListGroupTest: Something wrong in adding user to group", res.get(Account_Strings.RES_ERROR));
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+		res = requestJSON("getListOfGroupIDOfMember", null);
+		assertEquals("No oid and username found.", res.get(Account_Strings.RES_ERROR));
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "anyhowuser");
+		res = requestJSON("getListOfGroupIDOfMember", params);
+		assertEquals(Account_Strings.ERROR_NO_USER, res.get(Account_Strings.RES_ERROR));
+
+		params.put(Account_Strings.REQ_USERNAME, "userObjToRetrieve");
+		res = requestJSON("getListOfGroupIDOfMember", params);
+		assertTrue(res.getList(Account_Strings.RES_LIST).size() == 2);
+
+		params.put(Account_Strings.REQ_USERNAME, "userObjWithNoGroup");
+		res = requestJSON("getListOfGroupIDOfMember", params);
+		assertTrue(res.getList(Account_Strings.RES_LIST).size() == 0);
+	}
+
+	@Test
+	public void getListOfMemberObjectOfGroup(){
+		GenericConvertMap<String,Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		// Ensure that there is an existing user
+		Map<String,Object> params = new HashMap<String,Object>();
+		// Ensure that there is an existing group
+		params.put(Account_Strings.REQ_USERNAME, "groupObjToRetrieve");
+		params.put(Account_Strings.REQ_IS_GROUP, true);
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
+		// Ensure that there is an existing group
+		params.put(Account_Strings.REQ_USERNAME, "groupObjWithNoMember");
+		params.put(Account_Strings.REQ_IS_GROUP, true);
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
+
+		// Ensure that there is an existing user
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "user test 1");
+		params.put(Account_Strings.REQ_PASSWORD, "thisismypassword");
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+
+		params.put(Account_Strings.REQ_USERNAME, "user test 2");
+		params.put(Account_Strings.REQ_PASSWORD, "thisismypassword");
+		res = requestJSON("new", params);
+		assertNull("ListGroupTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+
+		// Ensure that group has both member
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "user test 1");
+		params.put(Account_Strings.REQ_GROUPNAME, "groupObjToRetrieve");
+		params.put(Account_Strings.REQ_ROLE, "member");
+		res = requestJSON("addMember", params);
+		assertNull("ListGroupTest: Something wrong in adding user to group", res.get(Account_Strings.RES_ERROR));
+
+		params.put(Account_Strings.REQ_USERNAME, "user test 2");
+		res = requestJSON("addMember", params);
+		assertNull("ListGroupTest: Something wrong in adding user to group", res.get(Account_Strings.RES_ERROR));
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+
+		res = requestJSON("getListOfMemberIDInGroup", null);
+		assertEquals(Account_Strings.ERROR_NO_GROUPNAME, res.get(Account_Strings.RES_ERROR));
+		params.clear();
+		params.put(Account_Strings.REQ_GROUPNAME, "anyhowgroup");
+		res = requestJSON("getListOfMemberIDInGroup", params);
+		assertEquals(Account_Strings.ERROR_NO_GROUP, res.get(Account_Strings.RES_ERROR));
+
+		params.put(Account_Strings.REQ_GROUPNAME, "groupObjToRetrieve");
+		res = requestJSON("getListOfMemberIDInGroup", params);
+		assertTrue(res.getList(Account_Strings.RES_LIST).size() == 2);
+
+		params.put(Account_Strings.REQ_GROUPNAME, "groupObjWithNoMember");
+		res = requestJSON("getListOfMemberIDInGroup", params);
+		assertTrue(res.getList(Account_Strings.RES_LIST).size() == 0);
+	}
 }

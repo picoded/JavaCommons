@@ -1,11 +1,14 @@
 package picoded.dstack.module.account;
 
 import java.util.*;
+import java.util.function.BiFunction;
 
 import picoded.dstack.*;
 import picoded.dstack.module.*;
 import picoded.conv.*;
 import picoded.struct.*;
+
+import picoded.servlet.api.module.account.Account_Strings;
 
 ///
 /// The account class is considered a hybrid class of both the user, group management class.
@@ -40,7 +43,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 	/// Stores the account authentication hash, used for password based authentication
 	///
-	/// KeyValueMap<uniqueLoginID,passwordHash>
+	/// KeyValueMap<AccountID,passwordHash>
 	protected KeyValueMap accountAuthMap = null; //to delete from
 
 	//
@@ -88,7 +91,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/// used more for internal variables
 	///
 	/// MetaTable<AccountOID, MetaObject>
-	protected MetaTable accountPrivateMetaTable = null;	
+	protected MetaTable accountPrivateMetaTable = null;
 
 	//
 	// Group hirachy, and membership information
@@ -98,17 +101,17 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/// Handles the storage of the group role mapping
 	///
 	/// MetaTable<Group_guid, MetaObject<Member_guid, "[role1, role2, ...]">
-	protected MetaTable memberRolesTable = null; 
+	protected MetaTable memberRolesTable = null;
 
 	/// Handles the storage of the group child meta information
 	///
 	/// MetaTable<GroupOID-AccountOID, MetaObject>
-	protected MetaTable memberMetaTable = null; 
-	
+	protected MetaTable memberMetaTable = null;
+
 	/// Handles the storage of the group child private meta information
 	///
 	/// MetaTable<GroupOID-AccountOID, MetaObject>
-	protected MetaTable memberPrivateMetaTable = null; 
+	protected MetaTable memberPrivateMetaTable = null;
 
 	//
 	// Login throttling information
@@ -119,12 +122,12 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	///
 	/// AtomicLongMap<UserOID, attempts>
 	protected AtomicLongMap loginThrottlingAttemptMap = null;
-	
+
 	/// Handles the Login Throttling Attempt Key (AccountID) Value (Timeout) field mapping
 	///
 	/// AtomicLongMap<UserOID, expireTimestamp>
 	protected AtomicLongMap loginThrottlingExpiryMap = null;
-	
+
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Table suffixes for the variosu sub tables
@@ -191,17 +194,17 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		// Login auth information
 		accountLoginIdMap = stack.getKeyValueMap(name + SUFFIX_ACCOUNT_LOGIN_ID);
 		accountAuthMap = stack.getKeyValueMap(name + SUFFIX_ACCOUNT_HASH);
-		
+
 		// Login session infromation
 		sessionLinkMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_SESSION);
 		sessionInfoMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_SESSION_INFO);
 		sessionTokenMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_TOKEN);
 		sessionNextTokenMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_NEXT_TOKEN);
-		
+
 		// Account meta information
 		accountMetaTable = stack.getMetaTable(name + SUFFIX_ACCOUNT_META);
 		accountPrivateMetaTable = stack.getMetaTable(name + SUFFIX_MEMBER_PRIVATE_META);
-		
+
 		// Group hirachy, and membership information
 		memberRolesTable = stack.getMetaTable(name + SUFFIX_MEMBER_ROLE);
 		memberMetaTable = stack.getMetaTable(name + SUFFIX_MEMBER_META);
@@ -210,6 +213,8 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		// Login throttling information
 		loginThrottlingAttemptMap = stack.getAtomicLongMap(name + ACCOUNT_LOGIN_THROTTLING_ATTEMPT);
 		loginThrottlingExpiryMap = stack.getAtomicLongMap(name + ACCOUNT_LOGIN_THROTTLING_EXPIRY);
+
+		// Side note: For new table, edit here and add into the return List
 
 		// @TODO - Consider adding support for temporary tabls typehints
 
@@ -222,7 +227,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 			loginThrottlingAttemptMap, loginThrottlingExpiryMap
 		);
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Basic account object existance checks, setup, and destruction
@@ -230,7 +235,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	///////////////////////////////////////////////////////////////////////////
 
 	/// Returns if the name exists
-	/// 
+	///
 	/// @param  Login ID to use, normally this is an email, or nice username
 	///
 	/// @return TRUE if login ID exists
@@ -249,7 +254,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 	/// Generates a new account object.
 	///
-	/// Note without setting a name, or any additional values. 
+	/// Note without setting a name, or any additional values.
 	/// This call in some sense is quite, err useless.
 	public AccountObject newObject() {
 		AccountObject ret = new AccountObject(this, null);
@@ -298,11 +303,11 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 			// Get oid as a string, and fetch the account object
 			String oid = inOid.toString();
 			AccountObject ao = this.get(oid);
-			
+
 			// Remove account meta information
 			accountLoginIdMap.remove(oid);
 			accountPrivateMetaTable.remove(oid);
-			
+
 			// @TODO - handle removal of group data
 			// memberRolesTable
 			// memberMetaTable
@@ -413,6 +418,32 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 	///////////////////////////////////////////////////////////////////////////
 	//
+	// Login throttling configuration
+	//
+	///////////////////////////////////////////////////////////////////////////
+
+	///
+	/// Login throttling lambda function, which can be overwritten for
+	/// custom login throttling requirements
+	///
+	/// @param   Account object in which login failed
+	/// @param   Login attempts failed
+	///
+	/// @return  Number of seconds to lock the account,
+	///          0 means an account is not locked
+	///          -1 means an account is locked permenantly
+	public BiFunction<AccountObject, Long, Long> calculateDelay = (inAO, attempts) -> {
+		// Tries - Seconds locked
+		// 1     - 0
+		// 2     - 1
+		// 3     - 3
+		// 4     - 7
+		// 5     - 15
+		return (long) (Math.pow(2,(attempts-1))-1);
+	};
+
+	///////////////////////////////////////////////////////////////////////////
+	//
 	// Map compliance
 	//
 	///////////////////////////////////////////////////////////////////////////
@@ -434,7 +465,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/// and returns an account object array
 	///
 	/// @param   Account object ID array
-	/// 
+	///
 	/// @return  Array of corresponding account objects
 	public AccountObject[] getFromArray(String[] _oidList) {
 		AccountObject[] mList = new AccountObject[_oidList.length];
@@ -457,7 +488,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 	///////////////////////////////////////////////////////////////////////////
 	//
-	// Static login settings, 
+	// Static login settings,
 	//
 	// highly doubt any of these needs to be changed.
 	// but who knows in the future
@@ -535,7 +566,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		if( response == null ) {
 			return false;
 		}
-		
+
 		// Setup the cookie jar
 		int noOfCookies = 4;
 		javax.servlet.http.Cookie cookieJar[] = new javax.servlet.http.Cookie[noOfCookies];
@@ -554,7 +585,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		}
 
 		// The cookie "exp"-iry store the other cookies (Rmbr, user, Nonc etc.) expiry life time in seconds.
-		// This cookie value is used in JS (checkLogoutTime.js) for validating the login expiry time 
+		// This cookie value is used in JS (checkLogoutTime.js) for validating the login expiry time
 		// and show a message to user accordingly.
 		//
 		// Note that this cookie IGNORES isHttpOnly setting
@@ -581,7 +612,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 			} else {
 				cookieJar[a].setMaxAge(-1);
 			}
-			
+
 			// Set isHttpOnly flag, to prevent JS based session attacks
 			// this is ignored for the expire timestamp field (index = 3)
 			if (isHttpOnly && a != 3) {
@@ -630,7 +661,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/// + Token ID
 	/// + Expiriry Timestamp (for JS to read)
 	/// + Remember Me flag
-	/// 
+	///
 	/// @param  Account object used
 	/// @param  The http request to read
 	/// @param  The http response to write into
@@ -644,7 +675,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		if( request == null ) {
 			return false;
 		}
-		
+
 		// Prepare the vars
 		//-----------------------------------------------------
 		String aoid = ao._oid();
@@ -653,7 +684,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		int lifeTime = getLifeTime(rememberMe);
 		long expireTime = (System.currentTimeMillis()) / 1000L + lifeTime;
 
-		// Session info handling 
+		// Session info handling
 		//-----------------------------------------------------
 
 		// Prepare the session info
@@ -668,7 +699,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 		// Generate the session and tokens
 		//-----------------------------------------------------
-		
+
 		String sessionID = ao.newSession(sessionInfo);
 		String tokenID = ao.newToken(sessionID, expireTime);
 
@@ -771,8 +802,8 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		// From this point onwards, the session is valid. Now it performs checks for the renewal process
 		// Does nothing if response object is not given
 		//---------------------------------------------------------------------------------------------------
-		if (response != null) { 
-			
+		if (response != null) {
+
 			// Renewal checking
 			boolean needRenewal = false;
 			if( rememberMe ) {
@@ -809,7 +840,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 				storeCookiesInsideTheCookieJar(request, response, sessionID, nextTokenID, rememberMe, (int)lifespan, expireTime);
 			}
 		}
-		
+
 		// Return the validated account object
 		//---------------------------------------------------------------------------------------------------
 		return ret;
@@ -848,47 +879,50 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	}
 
 
-	/*
-
+	///////////////////////////////////////////////////////////////////////////
 	///
 	/// Group Membership roles managment
-	///--------------------------------------------------------------------------
-	protected List<String> membershipRoles = new ArrayList<String>(Arrays.asList(new String[] { "guest", "member",
-		"manager", "admin" }));
+	///
+	///////////////////////////////////////////////////////////////////////////
+	protected List<String> defaultMembershipRoles = new ArrayList<String>(Arrays.asList(new String[] { "member",
+		"admin" }));
 
-	/// Returns the internal membership role list
-	public List<String> membershipRoles() {
-		return membershipRoles;
+	/// Returns the internal default membership role list
+	public List<String> defaultMembershipRoles() {
+		return defaultMembershipRoles;
 	}
 
 	/// Checks if membership role exists
-	public boolean hasMembershipRole(String role) {
+	protected boolean hasMembershipRole(String group_oid, String role) {
 		// Sanatize the role
 		role = role.toLowerCase();
 
 		// Returns if it exists
-		return membershipRoles.contains(role);
+		MetaObject groupObject = accountPrivateMetaTable.get(group_oid);
+		List<String> groupRoles = groupObject.getList(Account_Strings.PROPERTIES_ROLE, "[]");
+		return groupRoles.contains(role);
 	}
 
-	/// Add membership role if it does not exists
-	public void addMembershipRole(String role) {
-		// Sanatize the role
-		role = role.toLowerCase();
-
-		// Already exists terminate
-		if (hasMembershipRole(role)) {
-			return;
-		}
-
-		// Add the role
-		membershipRoles.add(role);
-	}
+	// /// Add membership role if it does not exists
+	// public void addMembershipRole(String role) {
+	// 	// Sanatize the role
+	// 	role = role.toLowerCase();
+	//
+	// 	// Already exists terminate
+	// 	if (hasMembershipRole(role)) {
+	// 		return;
+	// 	}
+	//
+	// 	// Add the role
+	// 	membershipRoles.add(role);
+	// }
 
 	/// Checks and validates the membership role, throws if invalid
-	protected String validateMembershipRole(String role) {
+	protected String validateMembershipRole(String group_oid, String role) {
 		role = role.toLowerCase();
-		if (!hasMembershipRole(role)) {
-			throw new RuntimeException("Membership role does not exists: " + role);
+		if (!hasMembershipRole(group_oid, role)) {
+			// throw new RuntimeException("Membership role does not exists: " + role);
+			return null;
 		}
 		return role;
 	}
@@ -912,11 +946,11 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		return old;
 	}
 
+	/*
 	/// Returns the super user group
 	public AccountObject superUserGroup() {
 		return getFromName(getSuperUserGroupName());
 	}
-
 	//
 	// Getting users based on filters
 	// TODO: To optimise because Sam is dumb

@@ -1023,7 +1023,10 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 		// Returns if it exists
 		MetaObject groupObject = accountPrivateMetaTable.get(group_oid);
-		List<String> groupRoles = groupObject.getList(Account_Strings.PROPERTIES_ROLE, "[]");
+		if ( groupObject == null ) {
+			return false;
+		}
+		List<String> groupRoles = groupObject.getList(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE, "[]");
 		return groupRoles.contains(role);
 	}
 
@@ -1078,19 +1081,24 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		return old;
 	}
 
-	/*
+
 	/// Returns the super user group
 	public AccountObject superUserGroup() {
-		return getFromName(getSuperUserGroupName());
+		return getFromLoginID(getSuperUserGroupName());
 	}
+	/*
 	//
 	// Getting users based on filters
 	// TODO: To optimise because Sam is dumb
 	// --------------------------------------------------------------------------
 	public AccountObject[] getUsersByGroupAndRole(String[] insideGroupAny, String[] hasRoleAny) {
 		List<AccountObject> ret = new ArrayList<AccountObject>();
-
-		MetaObject[] metaObjs = accountMetaTable().query(null, null, "oID", 0, 0); //initial query just to get everything out so i can filter
+		String query = "";
+		String[] objectIDs = new String[insideGroupAny.length+hasRoleAny.length];
+		for(int idx = 0; idx < insideGroupAny.length; idx++) {
+			query = "";
+		}
+		MetaObject[] metaObjs = accountMetaTable.query(null, null, "oID", 0, 0); //initial query just to get everything out so i can filter
 
 		if (metaObjs == null) {
 			return null;
@@ -1146,6 +1154,5 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 		return ret.toArray(new AccountObject[ret.size()]);
 	}
-
 	*/
 }

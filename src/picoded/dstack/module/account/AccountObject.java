@@ -621,7 +621,6 @@ public class AccountObject extends Core_MetaObject {
 	**/
 	public MetaObject getMember(AccountObject memberObject, String role) {
 		role = mainTable.validateMembershipRole(this._oid(), role);
-
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
 
@@ -642,7 +641,6 @@ public class AccountObject extends Core_MetaObject {
 		if (getMember(memberObject) != null) {
 			return null;
 		}
-
 		// Set and return a new member object
 		return setMember(memberObject, role);
 	}
@@ -708,7 +706,7 @@ public class AccountObject extends Core_MetaObject {
 	* Returns if set as group
 	**/
 	public boolean isGroup() {
-		Object status = this.get("isGroup");
+		Object status = this.get(Account_Strings.PROPERTIES_IS_GROUP);
 		if (status instanceof Number && //
 			((Number) status).intValue() >= 1) {
 			return true;
@@ -722,9 +720,9 @@ public class AccountObject extends Core_MetaObject {
 	**/
 	public void setGroupStatus(boolean enabled) {
 		if (enabled) {
-			this.put("isGroup", new Integer(1));
+			this.put(Account_Strings.PROPERTIES_IS_GROUP, new Integer(1));
 		} else {
-			this.put("isGroup", new Integer(0));
+			this.put(Account_Strings.PROPERTIES_IS_GROUP, new Integer(0));
 		}
 		this.saveDelta();
 	}
@@ -742,7 +740,7 @@ public class AccountObject extends Core_MetaObject {
 	}
 
 	public MetaObject addNewMembershipRole(String role) {
-		List<String> currentRoles = group_membershipRoles().getList(Account_Strings.PROPERTIES_ROLE, "[]");
+		List<String> currentRoles = group_membershipRoles().getList(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE, "[]");
 		if ( currentRoles.contains(role) ){
 			return group_membershipRoles();
 		}
@@ -751,24 +749,22 @@ public class AccountObject extends Core_MetaObject {
 	}
 
 	public MetaObject setMembershipRoles(List<String> roles) {
-		group_membershipRoles().put(Account_Strings.PROPERTIES_ROLE, roles);
+		this.setGroupStatus(true);
+		group_membershipRoles().put(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE, roles);
 		group_membershipRoles().saveDelta();
 		return group_membershipRoles();
 	}
 
 	public MetaObject removeMembershipRole(String role) {
-		List<String> currentRoles = group_membershipRoles().getList(Account_Strings.PROPERTIES_ROLE, "[]");
+		List<String> currentRoles = group_membershipRoles().getList(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE, "[]");
 		if (!currentRoles.contains(role)){
-			return group_membershipRoles();
+			return null;
 		}
 		currentRoles.remove(role);
 		return setMembershipRoles(currentRoles);
 	}
 
-
-
-	/*
-	/// Returns the list of groups the member is in
+	/// Returns the list of members in the group
 	///
 	public String[] getMembers_id() {
 		List<String> retList = new ArrayList<String>();
@@ -781,10 +777,10 @@ public class AccountObject extends Core_MetaObject {
 		return retList.toArray(new String[retList.size()]);
 	}
 
-	/// Returns the list of members in the group
+	/// Returns the list of groups the member is in
 	///
 	public String[] getGroups_id() {
-		return mainTable.group_childRole.getFromKeyName_id(_oid());
+		return mainTable.memberRolesTable.getFromKeyName_id(_oid());
 	}
 
 	/// Gets all the members object related to the group
@@ -793,19 +789,21 @@ public class AccountObject extends Core_MetaObject {
 		String[] idList = getMembers_id();
 		AccountObject[] objList = new AccountObject[idList.length];
 		for (int a = 0; a < idList.length; ++a) {
-			objList[a] = mainTable.getFromID(idList[a]);
+			objList[a] = mainTable.get(idList[a]);
 		}
 		return objList;
 	}
 
+	/// Gets all the groups object the user is in
+	///
+	public AccountObject[] getGroups() {
+		return mainTable.getFromArray(getGroups_id());
+	}
+
+
 	// Group management of users
 	//-------------------------------------------------------------------------
 
-	/// Gets all the groups the user is in
-	///
-	public AccountObject[] getGroups() {
-		return mainTable.getFromIDArray(getGroups_id());
-	}
 
 	// Is super user group handling
 	//-------------------------------------------------------------------------
@@ -821,7 +819,6 @@ public class AccountObject extends Core_MetaObject {
 		String superUserGroupRole = superUserGrp.getMemberRole(this);
 		return (superUserGroupRole != null && superUserGroupRole.equalsIgnoreCase("admin"));
 	}
-	*/
 
 	/**
 	* This method logs the details about login faailure for the user based on User ID
@@ -887,11 +884,4 @@ public class AccountObject extends Core_MetaObject {
 		mainTable.loginThrottlingAttemptMap.put(userId, null);
 		mainTable.loginThrottlingExpiryMap.put(userId, null);
 	}
-
-	// /// Gets value of key from the Account Meta table
-	// public Object getMetaValue(String oid, String key) {
-	// 	return mainTable.accountMetaTable.get(oid).get(key);
-	// }
-
-
 }

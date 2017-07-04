@@ -19,6 +19,7 @@ public class Account_Strings{
     public static final String REQ_HEADERS = "headers";
     public static final String REQ_META = "meta";
     public static final String REQ_ROLE = "role";
+    public static final String REQ_USER_ID = "userID";
 
     /// Static RESPONSE VARS
     // Single Value/Object Variables
@@ -60,7 +61,9 @@ public class Account_Strings{
     public static final String ERROR_FAIL_LOGIN = "Failed login (wrong password or invalid user?).";
     public static final String ERROR_NO_ROLE = "No role is found.";
     public static final String ERROR_NO_USER = "No user is found.";
+    public static final String ERROR_NO_USER_ID = "No userID is found.";
     public static final String ERROR_DEFAULT = "There is an error";
+
 
     /// ADDITIONAL Variables
     public static final String SPACE = " ";

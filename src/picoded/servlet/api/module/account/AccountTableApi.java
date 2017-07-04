@@ -321,55 +321,65 @@ public class AccountTableApi implements ApiModule {
 		// Return result
 		return res;
 	};
-	//
-	// /// # getMemberRoleFromGroup
-	// ///
-	// /// Retrieve the role of an existing user from an existing group
-	// ///
-	// /// ## HTTP Request Parameters
-	// ///
-	// /// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// /// | Parameter Name  | Variable Type					| Description                                                                |
-	// /// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// /// | username				| String								| name of the user to retrieve																							 |
-	// /// | groupname				| String								| name of the group to retrieve from																				 |
-	// /// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// ///
-	// /// ## JSON Object Output Parameters
-	// ///
-	// /// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// /// | Parameter Name  | Variable Type					| Description                                                                |
-	// /// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// /// | single					| String	              | Role of the user																													 |
-	// /// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// /// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	// /// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// ///
-	// protected ApiFunction getMemberRoleFromGroup = (req, res) -> {
-	// 	// Checks all input are given before proceeding
-	// 	Map<String, String> result = validateGroupParameters(req);
-	// 	if ( result.get(Account_Strings.RES_ERROR) != null ) {
-	// 		res.put(Account_Strings.RES_ERROR, result.get(Account_Strings.RES_ERROR));
-	// 		return res;
-	// 	}
-	// 	AccountObject group = table.getFromLoginID(result.get(Account_Strings.REQ_GROUPNAME));
-	// 	if ( group == null ) {
-	// 		res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
-	// 		return res;
-	// 	}
-	// 	AccountObject userToAdd = table.getFromLoginID(result.get(Account_Strings.REQ_USERNAME));
-	// 	if ( userToAdd == null ) {
-	// 		res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
-	// 		return res;
-	// 	}
-	// 	String role = group.getMemberRole(userToAdd);
-	// 	if ( role == null ) {
-	// 		res.put(Account_Strings.RES_ERROR, "No role for user is found.");
-	// 	} else {
-	// 		res.put(Account_Strings.RES_SINGLE_RETURN_VALUE, role);
-	// 	}
-	// 	return res;
-	// };
+
+	/// # getMemberRoleFromGroup
+	///
+	/// Retrieve the role of an existing user from an existing group
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | userID					| String								| ID of the user to retrieve																								 |
+	/// | groupID					| String								| ID of the group to retrieve from																					 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | single					| String	              | Role of the user																													 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	protected ApiFunction getMemberRoleFromGroup = (req, res) -> {
+		// Checks all input are given before proceeding
+		// // Map<String, String> result = validateGroupParameters(req);
+		// if ( result.get(Account_Strings.RES_ERROR) != null ) {
+		// 	res.put(Account_Strings.RES_ERROR, result.get(Account_Strings.RES_ERROR));
+		// 	return res;
+		// }
+		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
+		if ( groupID == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
+			return res;
+		}
+		String userID = req.getString(Account_Strings.REQ_USER_ID);
+		if ( userID == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER_ID);
+			return res;
+		}
+		AccountObject group = table.get(groupID);
+		if ( group == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			return res;
+		}
+		AccountObject userToAdd = table.get(userID);
+		if ( userToAdd == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		String role = group.getMemberRole(userToAdd);
+		if ( role == null ) {
+			res.put(Account_Strings.RES_ERROR, "No role for user is found.");
+		} else {
+			res.put(Account_Strings.RES_SINGLE_RETURN_VALUE, role);
+		}
+		return res;
+	};
 
 	/// # add_new_membership_role
 	///
@@ -858,18 +868,18 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"groupRoles", groupRoles); // Tested
 		// builder.put(path+"addMember", addMemberToGroup); // Tested
 		// builder.put(path+"removeMember", removeMemberFromGroup); // Tested
-		//
+
 		// builder.put(path+"getMemberMeta", getMemberMetaFromGroup); // Tested
-		// builder.put(path+"getMemberRole", getMemberRoleFromGroup); // Tested
-		//
+		builder.put(path+"getMemberRole", getMemberRoleFromGroup); // Tested
+
 		builder.put(path+"addMembershipRole", add_new_membership_role); // Tested
 		builder.put(path+"removeMembershipRole", remove_membership_role); // Tested
-		//
+
 		// builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember); // Tested
 		builder.put(path+"get_member_list_info", get_member_list_info); // Tested
 		builder.put(path+"add_remove_member", add_remove_member);
 		builder.put(path+"get_single_member_meta", get_single_member_meta);
-		//
+
 		// builder.put(path+"getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
 		// builder.put(path+"getListOfMemberObjectOfGroup", getListOfMemberObjectOfGroup); // Tested
 	}

@@ -7,10 +7,10 @@ import java.util.*;
 
 import picoded.conv.*;
 
-///
-/// VirtualFileSystem using MetaTable implmentation
-/// This replicates most of the file system requirements of Uilicious workspace
-///
+/**
+* VirtualFileSystem using MetaTable implmentation
+* This replicates most of the file system requirements of Uilicious workspace
+**/
 public class VirtualFileSystem extends VirtualFileObject {
 
 	//--------------------------------------------------------------------------
@@ -19,16 +19,22 @@ public class VirtualFileSystem extends VirtualFileObject {
 	//
 	//--------------------------------------------------------------------------
 
-	/// Directory structure and meta data
+	/**
+	* Directory structure and meta data
+	**/
 	protected MetaTable directories = null;
 
-	/// Actual data files
+	/**
+	* Actual data files
+	**/
 	protected MetaTable files = null;
 
-	/// Constructor with Directory, and file table
-	///
-	/// @param Directory table
-	/// @param File table
+	/**
+	* Constructor with Directory, and file table
+	*
+	* @param Directory table
+	* @param File table
+	**/
 	public VirtualFileSystem(MetaTable inDirectory, MetaTable inFile) {
 		super();
 
@@ -40,12 +46,13 @@ public class VirtualFileSystem extends VirtualFileObject {
 		type = "ROOT";
 		vfs = this;
 	}
-
-	// /// Gets and return the VirtualFileObject if either Directory / file
-	// /// With the respective name inside the parent ID exists.
-	// ///
-	// /// @param   The parent Directory ID (can be NULL / ROOT)
-	// /// @param   The sub path name to fetch
+	//	/**
+	// * Gets and return the VirtualFileObject if either Directory / file
+	// * With the respective name inside the parent ID exists.
+	// *
+	// * @param   The parent Directory ID (can be NULL / ROOT)
+	// * @param   The sub path name to fetch
+	// **/
 	// protected VirtualFileObject getVirtualFileObject(String parentID, String pathName) {
 	// 	// Normalize the parent ID
 	// 	if (parentID == null) {
@@ -74,13 +81,14 @@ public class VirtualFileSystem extends VirtualFileObject {
 	// // VirtualFileObject internal commands
 	// //
 	// //--------------------------------------------------------------------------
-	//
-	// /// Get and return the VirtualFileObject if it exists
-	// ///
-	// /// @param   The full path name to fetch
-	// ///
-	// /// @return  The VirtualFileObject representing either a file / Directory if found
-	// ///          Otherwise it will return null
+	//	/**
+	// * Get and return the VirtualFileObject if it exists
+	// *
+	// * @param   The full path name to fetch
+	// *
+	// * @return  The VirtualFileObject representing either a file / Directory if found
+	// *          Otherwise it will return null
+	// **/
 	// public VirtualFileObject getVirtualFileObject(String pathName) {
 	// 	// Path parts normalized
 	// 	String[] splitPath = normalizeToSplitPath_withBlankCheck(pathName);

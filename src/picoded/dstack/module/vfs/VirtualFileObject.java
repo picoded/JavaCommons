@@ -7,12 +7,12 @@ import picoded.file.FileUtil;
 
 import picoded.conv.*;
 
-///
-/// VirtualFileObject using MetaTable implmentation
-/// This replicates most of the file system requirements of Uilicious workspace
-///
-/// This represents a single file / folder
-///
+/**
+* VirtualFileObject using MetaTable implmentation
+* This replicates most of the file system requirements of Uilicious workspace
+*
+* This represents a single file / folder
+**/
 public class VirtualFileObject {
 
 	//--------------------------------------------------------------------------
@@ -21,27 +21,37 @@ public class VirtualFileObject {
 	//
 	//--------------------------------------------------------------------------
 
-	/// The parent VirtualFileSystem
+	/**
+	* The parent VirtualFileSystem
+	**/
 	protected VirtualFileSystem vfs = null;
 
-	/// The file / folder meta object
+	/**
+	* The file / folder meta object
+	**/
 	protected MetaObject mObj = null;
 
-	/// File object mode
+	/**
+	* File object mode
+	**/
 	protected String type = null;
 
-	/// [Internal] blank constructor
+	/**
+	* [Internal] blank constructor
+	**/
 	protected VirtualFileObject() {
 		// does nothing
 	}
 
-	/// [Internal] Constructor for the VirtualFileObject
-	/// This should only be constructed by VirtualFileSystem
-	/// Avoid direct constructor use.
-	///
-	/// @param   Original file system
-	/// @param   MetaObject representing either a file or folder
-	/// @param   MetaObject type, being either a "FILE" or "FOLDER"
+	/**
+	* [Internal] Constructor for the VirtualFileObject
+	* This should only be constructed by VirtualFileSystem
+	* Avoid direct constructor use.
+	*
+	* @param   Original file system
+	* @param   MetaObject representing either a file or folder
+	* @param   MetaObject type, being either a "FILE" or "FOLDER"
+	**/
 	protected VirtualFileObject(VirtualFileSystem inVFS, MetaObject inMObj, String inType) {
 		vfs = inVFS;
 		mObj = inMObj;
@@ -54,12 +64,14 @@ public class VirtualFileObject {
 	//
 	//--------------------------------------------------------------------------
 
-	/// Normalize a path string (reduce amount of edge cases error)
-	/// and return its split path array format
-	///
-	/// @param  String of file path to normalize and split
-	///
-	/// @return The splitted string path to iterate later
+	/**
+	* Normalize a path string (reduce amount of edge cases error)
+	* and return its split path array format
+	*
+	* @param  String of file path to normalize and split
+	*
+	* @return The splitted string path to iterate later
+	**/
 	protected String[] normalizeToSplitPath(String path) {
 		// Null means blank string path
 		if (path == null) {
@@ -89,7 +101,9 @@ public class VirtualFileObject {
 		return splitPath;
 	}
 
-	/// @return the current folder ID, used internally
+	/**
+	* @return the current folder ID, used internally
+	**/
 	protected String getDirectoryID() {
 		assertIsDirectory();
 
@@ -99,11 +113,13 @@ public class VirtualFileObject {
 		return mObj._oid();
 	}
 
-	/// Extract various names from an array of MetaObject
-	///
-	/// @param   array of meta objects
-	///
-	/// @return   String array of names, or null (if array is null)
+	/**
+	* Extract various names from an array of MetaObject
+	*
+	* @param   array of meta objects
+	*
+	* @return   String array of names, or null (if array is null)
+	**/
 	protected String[] extractMetaObjectNames(MetaObject[] inObjs) {
 		// Null safety check
 		if(inObjs == null) {
@@ -124,13 +140,15 @@ public class VirtualFileObject {
 	//
 	//--------------------------------------------------------------------------
 
-	/// Fetch the metaobject given the directoryName and parent object
-	/// if it exists, else return null
-	///
-	/// @param   The parent GUID, null defaults to ROOT
-	/// @param   The Directory name as a path step
-	///
-	/// @return  The Directory meta object, if it exsits
+	/**
+	* Fetch the metaobject given the directoryName and parent object
+	* if it exists, else return null
+	*
+	* @param   The parent GUID, null defaults to ROOT
+	* @param   The Directory name as a path step
+	*
+	* @return  The Directory meta object, if it exsits
+	**/
 	protected MetaObject getDirectoryMetaObject(String parentID, String directoryName) {
 		// Normalize the parent ID
 		if (parentID == null) {
@@ -148,13 +166,15 @@ public class VirtualFileObject {
 		return null;
 	}
 
-	/// Fetch the metaobject given the directoryName and parent object
-	/// if it exists, else return null
-	///
-	/// @param   The parent GUID, null defaults to ROOT
-	/// @param   The file name as a path step
-	///
-	/// @return  The file meta object, if it exists
+	/**
+	* Fetch the metaobject given the directoryName and parent object
+	* if it exists, else return null
+	*
+	* @param   The parent GUID, null defaults to ROOT
+	* @param   The file name as a path step
+	*
+	* @return  The file meta object, if it exists
+	**/
 	protected MetaObject getFileMetaObject(String parentID, String fileName) {
 		// Normalize the parent ID
 		if (parentID == null) {
@@ -180,24 +200,32 @@ public class VirtualFileObject {
 	//
 	//--------------------------------------------------------------------------
 
-	/// @return  true if its a file object
+	/**
+	* @return  true if its a file object
+	**/
 	public boolean isFile() {
 		return type.equals("FILE");
 	}
 
-	/// @return  true if its a file object
+	/**
+	* @return  true if its a file object
+	**/
 	public boolean isDirectory() {
 		return type.equals("DIRECTORY") || type.equals("ROOT");
 	}
 
-	/// Throws an exception if not a file
+	/**
+	* Throws an exception if not a file
+	**/
 	protected void assertIsFile() {
 		if( !isFile() ) {
 			throw new RuntimeException("VirtualFileObject is not a FILE");
 		}
 	}
 
-	/// Throws an exception if not a directory
+	/**
+	* Throws an exception if not a directory
+	**/
 	protected void assertIsDirectory() {
 		if( !isDirectory() ) {
 			throw new RuntimeException("VirtualFileObject is not a DIRECTORY");
@@ -210,26 +238,30 @@ public class VirtualFileObject {
 	//
 	//--------------------------------------------------------------------------
 
-	/// List the files found inside this folder
-	/// Throws an exception if its not a folder
-	///
-	/// @return  List of files
+	/**
+	* List the files found inside this folder
+	* Throws an exception if its not a folder
+	*
+	* @return  List of files
+	**/
 	public String[] listFileNames() {
 		return extractMetaObjectNames(
 			vfs.files.query("parentID = ?", new String[] { getDirectoryID() })
 		);
-	}
+	};
 
-	/// List the files found inside this folder
-	/// Throws an exception if its not a folder
-	///
-	/// @return  List of files
+	/**
+	* List the files found inside this folder
+	* Throws an exception if its not a folder
+	*
+	* @return  List of files
+	**/
 
 	public String[] listDirectoryNames() {
 		return extractMetaObjectNames(
 			vfs.directories.query("parentID = ?", new String[] { getDirectoryID() })
 		);
-	}
+	};
 
 	//--------------------------------------------------------------------------
 	//
@@ -237,7 +269,9 @@ public class VirtualFileObject {
 	//
 	//--------------------------------------------------------------------------
 
-	/// Save the byte[]
+	/**
+	* Save the byte[]
+	**/
 	public void saveData(byte[] data) {
 		assertIsFile();
 
@@ -245,18 +279,22 @@ public class VirtualFileObject {
 		mObj.saveDelta();
 	}
 
-	/// Get the byte[]
+	/**
+	* Get the byte[]
+	**/
 	public byte[] getData() {
 		assertIsFile();
 		return (byte[])mObj.get("data");
 	}
 
-	/// Create a file and return the VirtualFileObject
-	///
-	/// @param   The full path name to create at
-	/// @param   The byte array to store the data (if given, ignored if null)
-	///
-	/// @return  The VirtualFileObject representing a file
+	/**
+	* Create a file and return the VirtualFileObject
+	*
+	* @param   The full path name to create at
+	* @param   The byte array to store the data (if given, ignored if null)
+	*
+	* @return  The VirtualFileObject representing a file
+	**/
 	public VirtualFileObject saveFile(String pathName, byte[] data) {
 		// You cant save a file inside a file
 		assertIsDirectory();
@@ -307,11 +345,13 @@ public class VirtualFileObject {
 		return ret;
 	}
 
-	/// Create a file and return the VirtualFileObject
-	///
-	/// @param   The full path name to create at
-	///
-	/// @return  The VirtualFileObject representing a file
+	/**
+	* Create a file and return the VirtualFileObject
+	*
+	* @param   The full path name to create at
+	*
+	* @return  The VirtualFileObject representing a file
+	**/
 	public VirtualFileObject getFile(String pathName) {
 		// You cant save a file inside a file
 		assertIsDirectory();
@@ -337,13 +377,13 @@ public class VirtualFileObject {
 		return new VirtualFileObject(vfs, newMetaObject, "FILE");
 	}
 
-
-	///Delete a file
-	///
-	///@param The full path name to delete
-	///
+	/**
+	*Delete a file
+	*
+	*@param The full path name to delete
+	**/
 	public boolean deleteFile(String pathName) {
-		///
+		//
 		assertIsDirectory();
 
 		//Path parts normalised
@@ -363,11 +403,12 @@ public class VirtualFileObject {
 		return false;
 	}
 
-	///Move a file
-	///
+	/**
+	*Move a file
+	**/
 	public VirtualFileObject moveFile(String pathName , String newPathName) {
 
-		///
+		//
 		assertIsDirectory();
 
 		//Path parts normalised
@@ -398,11 +439,13 @@ public class VirtualFileObject {
 	//
 	//--------------------------------------------------------------------------
 
-	/// Create a folder and return the VirtualFileObject
-	///
-	/// @param   The full path name to create at
-	///
-	/// @return  The VirtualFileObject representing a file
+	/**
+	* Create a folder and return the VirtualFileObject
+	*
+	* @param   The full path name to create at
+	*
+	* @return  The VirtualFileObject representing a file
+	**/
 	public VirtualFileObject makeDirectory(String pathName) {
 		// You cant save a file inside a file
 		assertIsDirectory();
@@ -448,11 +491,13 @@ public class VirtualFileObject {
 		return ret;
 	}
 
-	/// Create a folder and return the VirtualFileObject
-	///
-	/// @param   The full path name to create at
-	///
-	/// @return  The VirtualFileObject representing a directory
+	/**
+	* Create a folder and return the VirtualFileObject
+	*
+	* @param   The full path name to create at
+	*
+	* @return  The VirtualFileObject representing a directory
+	**/
 	public VirtualFileObject getDirectory(String pathName) {
 		// You cant save a file inside a file
 		assertIsDirectory();
@@ -477,7 +522,9 @@ public class VirtualFileObject {
 		return new VirtualFileObject(vfs, newMetaObject, "DIRECTORY");
 	}
 
-	/// Delete all files and folder in the current directory
+	/**
+	* Delete all files and folder in the current directory
+	**/
 	public void emptyDirectory() {
 		// Delete call can only be done inside a directory
 		assertIsDirectory();
@@ -495,10 +542,11 @@ public class VirtualFileObject {
 		}
 	}
 
-	/// Delete a folder
-	///
-	/// @param The full path name to delete
-	///
+	/**
+	* Delete a folder
+	*
+	* @param The full path name to delete
+	**/
 	public boolean deleteDirectory(String pathName) {
 		// Delete call can only be done inside a directory
 		assertIsDirectory();
@@ -526,11 +574,12 @@ public class VirtualFileObject {
 		return true;
 	}
 
-///Move a file
-///
+/**
+*Move a file
+**/
 public VirtualFileObject moveDirectory(String pathName , String newPathName) {
 
-	///
+	//
 	assertIsDirectory();
 
 	//Path parts normalised

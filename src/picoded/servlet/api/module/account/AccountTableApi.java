@@ -8,49 +8,55 @@ import picoded.dstack.module.account.*;
 import picoded.dstack.*;
 import picoded.conv.ConvertJSON;
 
-///
-/// Account table API builder
-///
+/**
+* Account table API builder
+**/
 public class AccountTableApi implements ApiModule {
 
-	/// The AccountTable reference
+	/**
+	* The AccountTable reference
+	**/
 	protected AccountTable table = null;
 
-	/// Static ERROR MESSAGES
+	/**
+	* Static ERROR MESSAGES
+	**/
 	public static final String MISSING_REQUEST_PAGE = "Unexpected Exception: Missing requestPage()";
 
 
-	/// Setup the account table api class
-	///
-	/// @param  The input AccountTable to use
+	/**
+	* Setup the account table api class
+	*
+	* @param  The input AccountTable to use
+	**/
 	public AccountTableApi(AccountTable inTable) {
 		table = inTable;
 	}
 
-	///
-	/// # $prefix/isLogin
-	///
-	/// Does a simple true / false isLogin check
-	/// This can be used for simple checks
-	///
-	/// ## Request Parameters
-	///
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name | Variable Type	   | Description                                                                   |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | -              | -                  | -                                                                             |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	///
-	/// ## JSON Object Output Parameters
-	///
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name | Variable Type      | Description                                                                   |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | return         | boolean            | TRUE if a login session is valid, else FALSE                                  |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | error          | String (Optional)  | Errors encountered if any                                                     |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	///
+	/**
+	* # $prefix/isLogin
+	*
+	* Does a simple true / false isLogin check
+	* This can be used for simple checks
+	*
+	* ## Request Parameters
+	*
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | Parameter Name | Variable Type	   | Description                                                                   |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | -              | -                  | -                                                                             |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | Parameter Name | Variable Type      | Description                                                                   |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | return         | boolean            | TRUE if a login session is valid, else FALSE                                  |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | error          | String (Optional)  | Errors encountered if any                                                     |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	**/
 	protected ApiFunction isLogin = (req, res) -> {
 		// Get the account object (if any)
 		AccountObject ao = table.getRequestUser(req.getHttpServletRequest(), null);
@@ -60,38 +66,38 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	///
-	/// # $prefix/login
-	///
-	/// Login a user
-	///
-	/// ## Request Parameters
-	///
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name | Variable Type	   | Description                                                                   |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | accountID      | String (Optional)  | Either the loginID or the accountID is needed                                 |
-	/// | loginID        | String (Optional)  | Either the loginID or the accountID is needed                                 |
-	/// | loginPass      | String             | The account password used for login                                           |
-	/// | rememberMe     | boolean            | indicator if the session is persistent (remember me)                          |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
-	/// |                |                    | are returned as well.                                                         |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	///
-	/// ## JSON Object Output Parameters
-	///
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name | Variable Type      | Description                                                                   |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | isLogin        | boolean            | indicator if the session is logged in or not                                  |
-	/// | accountID      | String             | account id of the session                                                     |
-	/// | loginIDList    | String[]           | array of account names representing the session                               |
-	/// | rememberMe     | boolean            | indicator if the session is persistent (remember me)                          |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | error          | String (Optional)  | Errors encountered if any                                                     |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	///
+	/**
+	* # $prefix/login
+	*
+	* Login a user
+	*
+	* ## Request Parameters
+	*
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | Parameter Name | Variable Type	   | Description                                                                   |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | accountID      | String (Optional)  | Either the loginID or the accountID is needed                                 |
+	* | loginID        | String (Optional)  | Either the loginID or the accountID is needed                                 |
+	* | loginPass      | String             | The account password used for login                                           |
+	* | rememberMe     | boolean            | indicator if the session is persistent (remember me)                          |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	* |                |                    | are returned as well.                                                         |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | Parameter Name | Variable Type      | Description                                                                   |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | isLogin        | boolean            | indicator if the session is logged in or not                                  |
+	* | accountID      | String             | account id of the session                                                     |
+	* | loginIDList    | String[]           | array of account names representing the session                               |
+	* | rememberMe     | boolean            | indicator if the session is persistent (remember me)                          |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | error          | String (Optional)  | Errors encountered if any                                                     |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	**/
 	protected ApiFunction login = (req, res) -> {
 
 		// Setup default (failed) login
@@ -162,29 +168,29 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	///
-	/// # logout (GET)
-	///
-	/// The logout GET function, used to logout the current browser session
-	///
-	/// ## HTTP Request Parameters
-	///
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name | Variable Type      | Description                                                                   |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | No parameters options                                                                                               |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	///
-	/// ## JSON Object Output Parameters
-	///
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name | Variable Type      | Description                                                                   |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | return         | boolean            | indicator if logout is successful or not                                      |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | error          | String (Optional)  | Errors encountered if any                                                     |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	///
+	/**
+	* # logout (GET)
+	*
+	* The logout GET function, used to logout the current browser session
+	*
+	* ## HTTP Request Parameters
+	*
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | Parameter Name | Variable Type      | Description                                                                   |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | No parameters options                                                                                               |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | Parameter Name | Variable Type      | Description                                                                   |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | return         | boolean            | indicator if logout is successful or not                                      |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | error          | String (Optional)  | Errors encountered if any                                                     |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	**/
 	protected ApiFunction logout = (req, res) -> {
 		res.put(Account_Strings.RES_RETURN, false);
 
@@ -201,34 +207,35 @@ public class AccountTableApi implements ApiModule {
 	// Work in progress (not final) start
 	//
 	//-------------------------------------------------------------------------------------------------------------------------
-	///
-	/// # new [POST]
-	///
-	/// Creates a new account in the table
-	///
-	/// ## HTTP Request Parameters
-	///
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	      | Description                                                                |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | meta            | {Object} Map<S, O>    | Meta object that represents this account                                   |
-	/// | password        | String      	      | Password of new account                                                    |
-	/// | username        | String                | Username of new account                                                    |
-	/// | isGroup         | boolean (optional)    | whether this is a group object (defaults to false)                         |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	///
-	/// ## JSON Object Output Parameters
-	///
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	      | Description                                                                |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | accountID       | String                | account ID used                                                            |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | metaObject      | {Object}              | MetaObject representing this account                                       |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | error           | String (Optional)     | Errors encountered if any                                                  |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	///
+
+	/**
+	* # new [POST]
+	*
+	* Creates a new account in the table
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type	      | Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | meta            | {Object} Map<S, O>    | Meta object that represents this account                                   |
+	* | password        | String      	      | Password of new account                                                    |
+	* | username        | String                | Username of new account                                                    |
+	* | isGroup         | boolean (optional)    | whether this is a group object (defaults to false)                         |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type	      | Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | accountID       | String                | account ID used                                                            |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | metaObject      | {Object}              | MetaObject representing this account                                       |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | error           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
 	public ApiFunction new_account = (req, res) -> {
 		// Only runs function if logged in, and valid group object
 		boolean isGroup = req.getBoolean(Account_Strings.REQ_IS_GROUP, false);
@@ -284,28 +291,29 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	/// # groupRoles
-	///
-	/// Retrieves the existing roles available from an existing group
-	///
-	/// ## HTTP Request Parameters
-	///
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type	      | Description                                                                |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | groupname				| String								| name of the group to retrieve
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	///
-	/// ## JSON Object Output Parameters
-	///
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type					| Description                                                                |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | list						| List		              | List of roles																															 |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	///
+	/**
+	* # groupRoles
+	*
+	* Retrieves the existing roles available from an existing group
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type	      | Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | groupname				| String								| name of the group to retrieve
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | list						| List		              | List of roles																															 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
 	protected ApiFunction groupRoles = (req, res) -> {
 		String groupName = req.getString(Account_Strings.REQ_GROUPNAME);
 		if ( groupName == null ) {
@@ -323,30 +331,31 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	/// # addMemberToGroup
-	///
-	/// Add an existing user to an existing group
-	///
-	/// ## HTTP Request Parameters
-	///
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type					| Description                                                                |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | username				| String								| name of the user to add																										 |
-	/// | groupname				| String								| name of the group to add to																								 |
-	/// | role						| String								| name of the role assigned for the user																		 |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	///
-	/// ## JSON Object Output Parameters
-	///
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type					| Description                                                                |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | meta						| {Object}              | Information of the newly added user																				 |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	///
+	/**
+	* # addMemberToGroup
+	*
+	* Add an existing user to an existing group
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | username				| String								| name of the user to add																										 |
+	* | groupname				| String								| name of the group to add to																								 |
+	* | role						| String								| name of the role assigned for the user																		 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | meta						| {Object}              | Information of the newly added user																				 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
 	protected ApiFunction addMemberToGroup = (req, res) -> {
 		// Checks all input are given before proceeding
 		Map<String, String> result = validateGroupParameters(req);
@@ -405,30 +414,31 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	/// # getMemberMetaFromGroup
-	///
-	/// Retrieve the meta information of an existing user from an existing group
-	///
-	/// ## HTTP Request Parameters
-	///
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type					| Description                                                                |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | username				| String								| name of the user to retrieve																							 |
-	/// | groupname				| String								| name of the group to retrieve from																				 |
-	/// | role						| String (Optional)			| name of the role assigned to the user																			 |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	///
-	/// ## JSON Object Output Parameters
-	///
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type					| Description                                                                |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | meta						| {Object}              | Meta information of the user																							 |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	///
+	/**
+	* # getMemberMetaFromGroup
+	*
+	* Retrieve the meta information of an existing user from an existing group
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | username				| String								| name of the user to retrieve																							 |
+	* | groupname				| String								| name of the group to retrieve from																				 |
+	* | role						| String (Optional)			| name of the role assigned to the user																			 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | meta						| {Object}              | Meta information of the user																							 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
 	protected ApiFunction getMemberMetaFromGroup = (req, res) -> {
 		// Checks all input are given before proceeding
 		Map<String, String> result = validateGroupParameters(req);
@@ -456,29 +466,30 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	/// # getMemberRoleFromGroup
-	///
-	/// Retrieve the role of an existing user from an existing group
-	///
-	/// ## HTTP Request Parameters
-	///
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type					| Description                                                                |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | username				| String								| name of the user to retrieve																							 |
-	/// | groupname				| String								| name of the group to retrieve from																				 |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	///
-	/// ## JSON Object Output Parameters
-	///
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type					| Description                                                                |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | single					| String	              | Role of the user																													 |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	///
+	/**
+	* # getMemberRoleFromGroup
+	*
+	* Retrieve the role of an existing user from an existing group
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | username				| String								| name of the user to retrieve																							 |
+	* | groupname				| String								| name of the group to retrieve from																				 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | single					| String	              | Role of the user																													 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
 	protected ApiFunction getMemberRoleFromGroup = (req, res) -> {
 		// Checks all input are given before proceeding
 		Map<String, String> result = validateGroupParameters(req);
@@ -513,27 +524,27 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	///
-	/// # lock time
-	///
-	/// This function is used to retrieve the locked out timing for the accountName
-	///
-	/// ## HTTP Request Parameters
-	///
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name | Variable Type      | Description                                                                   |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | accountName    | String             | Errors encountered if any                                                       |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	///
-	/// ## JSON Object Output Parameters
-	///
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | Parameter Name | Variable Type      | Description                                                                   |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	/// | lockTime       | long               | If the number is whole number, it will be int                                 |
-	/// +----------------+--------------------+-------------------------------------------------------------------------------+
-	///
+	/**
+	* # lock time
+	*
+	* This function is used to retrieve the locked out timing for the accountName
+	*
+	* ## HTTP Request Parameters
+	*
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | Parameter Name | Variable Type      | Description                                                                   |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | accountName    | String             | Errors encountered if any                                                       |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | Parameter Name | Variable Type      | Description                                                                   |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | lockTime       | long               | If the number is whole number, it will be int                                 |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	**/
 
 	protected ApiFunction lockTime = (req, res) -> {
 		String accountName = req.getString(Account_Strings.REQ_ACCOUNT_NAME, null);
@@ -547,11 +558,13 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	/// Does the actual setup for the API
-	/// Given the API Builder, and the namespace prefix
-	///
-	/// @param  API builder to add the required functions
-	/// @param  Path to assume
+	/**
+	* Does the actual setup for the API
+	* Given the API Builder, and the namespace prefix
+	*
+	* @param  API builder to add the required functions
+	* @param  Path to assume
+	**/
 	public void setupApiBuilder(ApiBuilder builder, String path) {
 		builder.put(path+"isLogin", isLogin); // Tested
 		builder.put(path+"login", login); // Tested
@@ -570,8 +583,9 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"removeMembershipRole", removeMembershipRoleFromGroup);
 	}
 
-
-	/// Private Methods
+	/**
+	* Private Methods
+	**/
 	private Map<String, String> validateGroupParameters(ApiRequest req) {
 		Map<String, String> res = new HashMap<String, String>();
 		String userNameToAdd = req.getString(Account_Strings.REQ_USERNAME);

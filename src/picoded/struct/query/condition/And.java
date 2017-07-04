@@ -5,7 +5,7 @@ import picoded.struct.query.*;
 
 public class And extends CombinationBase {
 
-	//
+	//--------------------------------------------------------------------
 	// Constructor Setup
 	//--------------------------------------------------------------------
 

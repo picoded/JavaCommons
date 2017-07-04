@@ -6,10 +6,10 @@ import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 import picoded.servlet.CorePage;
 
-///
-/// API Request map information
-/// For the API function to process
-///
+/**
+* API Request map information
+* For the API function to process
+**/
 public class ApiRequest implements GenericConvertMap<String, Object> {
 
 	//-----------------------------------------------------------------
@@ -18,13 +18,19 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	//
 	//-----------------------------------------------------------------
 
-	/// The query and context object 
+	/**
+	* The query and context object
+	**/
 	protected GenericConvertMap<String,Object> queryObj = new GenericConvertHashMap<String,Object> ();
 
-	/// The context object to use
+	/**
+	* The context object to use
+	**/
 	protected GenericConvertMap<String,Object> contextObj = new GenericConvertHashMap<String,Object> ();
 
-	/// The base API builder
+	/**
+	* The base API builder
+	**/
 	protected ApiBuilder builder = null;
 
 	//-----------------------------------------------------------------
@@ -33,10 +39,14 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	//
 	//-----------------------------------------------------------------
 
-	/// Overwrite the request type, to be a certain type, such as "JAVA"
+	/**
+	* Overwrite the request type, to be a certain type, such as "JAVA"
+	**/
 	protected String requestMethod = null;
 
-	/// CorePage overwrite
+	/**
+	* CorePage overwrite
+	**/
 	protected CorePage corePage = null;
 
 	//-----------------------------------------------------------------
@@ -45,11 +55,13 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	//
 	//-----------------------------------------------------------------
 
-	/// Initialize the class with query and context object
-	///
-	/// @param   Parent ApiBuilder
-	/// @param   Query map to assume
-	/// @param   Context map to assume
+	/**
+	* Initialize the class with query and context object
+	*
+	* @param   Parent ApiBuilder
+	* @param   Query map to assume
+	* @param   Context map to assume
+	**/
 	ApiRequest( ApiBuilder parent, Map<String,Object> query, Map<String,Object> context ) {
 		// Setup parent API builder object
 		builder = parent;
@@ -62,9 +74,11 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 		}
 	}
 
-	/// Initialize the class
-	///
-	/// @param   Parent ApiBuilder
+	/**
+	* Initialize the class
+	*
+	* @param   Parent ApiBuilder
+	**/
 	ApiRequest( ApiBuilder parent ) {
 		// Setup parent API builder object
 		builder = parent;
@@ -76,12 +90,16 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	//
 	//-------------------------------------------------------------------------------
 
-	/// @return  query parameters map
+	/**
+	* @return  query parameters map
+	**/
 	public GenericConvertMap<String,Object> query() {
 		return queryObj;
 	}
 
-	/// @return  context aprameter map
+	/**
+	* @return  context aprameter map
+	**/
 	public GenericConvertMap<String,Object> context() {
 		return contextObj;
 	}
@@ -92,41 +110,51 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	// Right now this proxies the request onto queryObj, but maybe changed in future
 	//
 	//---------------------------------------------------------------------------------
-	
-	/// throws an UnsupportedOperationException
+
+	/**
+	* throws an UnsupportedOperationException
+	**/
 	@Override
 	public Object get(Object key) {
 		return queryObj.get(key);
 	}
-	
-	/// throws an UnsupportedOperationException
+
+	/**
+	* throws an UnsupportedOperationException
+	**/
 	@Override
 	public Object put(String key, Object value) {
 		return queryObj.put(key, value);
 	}
-	
-	/// throws an UnsupportedOperationException
+
+	/**
+	* throws an UnsupportedOperationException
+	**/
 	@Override
 	public Object remove(Object key) {
 		return queryObj.remove(key);
 	}
-	
-	/// throws an UnsupportedOperationException
+
+	/**
+	* throws an UnsupportedOperationException
+	**/
 	@Override
 	public Set<String> keySet() {
 		return queryObj.keySet();
 	}
-	
+
 	//---------------------------------------------------------------------------------
 	//
 	// CorePage, and HTTPRequestServlet support
 	//
 	//---------------------------------------------------------------------------------
-	
-	/// Gets and return the CorePage (if used)
-	/// Note: Currently this is protected until substential use case for public is found
-	///
-	/// @return CorePage (if used)
+
+	/**
+	* Gets and return the CorePage (if used)
+	* Note: Currently this is protected until substential use case for public is found
+	*
+	* @return CorePage (if used)
+	**/
 	protected CorePage getCorePage() {
 		if( corePage != null ) {
 			return corePage;
@@ -139,9 +167,11 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 		return null;
 	}
 
-	/// Gets and return the java HttpServletRequest (if used)
-	///
-	/// @return  HttpServletRequest (if used)
+	/**
+	* Gets and return the java HttpServletRequest (if used)
+	*
+	* @return  HttpServletRequest (if used)
+	**/
 	public javax.servlet.http.HttpServletRequest getHttpServletRequest() {
 		CorePage core = getCorePage();
 		if( core != null ) {

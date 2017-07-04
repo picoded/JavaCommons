@@ -9,20 +9,22 @@ import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 import picoded.servlet.CorePage;
 
-///
-/// API Request map information
-/// For the API function to process
-///
+/**
+* API Request map information
+* For the API function to process
+**/
 public class ApiResponse extends GenericConvertHashMap<String, Object> {
-	
-	
+
+
 	//-----------------------------------------------------------------
 	//
 	//  Constructor vars
 	//
 	//-----------------------------------------------------------------
 
-	/// The base API builder
+	/**
+	* The base API builder
+	**/
 	protected ApiBuilder builder = null;
 
 	//-----------------------------------------------------------------
@@ -31,7 +33,9 @@ public class ApiResponse extends GenericConvertHashMap<String, Object> {
 	//
 	//-----------------------------------------------------------------
 
-	/// CorePage overwrite
+	/**
+	* CorePage overwrite
+	**/
 	protected CorePage corePage = null;
 
 	//-----------------------------------------------------------------
@@ -40,9 +44,11 @@ public class ApiResponse extends GenericConvertHashMap<String, Object> {
 	//
 	//-----------------------------------------------------------------
 
-	/// Initialize the class
-	///
-	/// @param   Parent ApiBuilder
+	/**
+	* Initialize the class
+	*
+	* @param   Parent ApiBuilder
+	**/
 	ApiResponse( ApiBuilder parent ) {
 		// Setup parent API builder object
 		builder = parent;
@@ -53,11 +59,13 @@ public class ApiResponse extends GenericConvertHashMap<String, Object> {
 	// CorePage, and HttpServletResponse support
 	//
 	//---------------------------------------------------------------------------------
-	
-	/// Gets and return the CorePage (if used)
-	/// Note: Currently this is protected until substential use case for public is found
-	///
-	/// @return CorePage (if used)
+
+	/**
+	* Gets and return the CorePage (if used)
+	* Note: Currently this is protected until substential use case for public is found
+	*
+	* @return CorePage (if used)
+	**/
 	protected CorePage getCorePage() {
 		if( corePage != null ) {
 			return corePage;
@@ -70,9 +78,11 @@ public class ApiResponse extends GenericConvertHashMap<String, Object> {
 		return null;
 	}
 
-	/// Gets and return the java HttpServletRequest (if used)
-	///
-	/// @return  HttpServletRequest (if used)
+	/**
+	* Gets and return the java HttpServletRequest (if used)
+	*
+	* @return  HttpServletRequest (if used)
+	**/
 	public javax.servlet.http.HttpServletResponse getHttpServletResponse() {
 		CorePage core = getCorePage();
 		if( core != null ) {

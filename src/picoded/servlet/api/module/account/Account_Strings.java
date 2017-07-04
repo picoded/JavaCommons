@@ -1,8 +1,9 @@
 package picoded.servlet.api.module.account;
 
 public class Account_Strings{
-
-  	/// Static REQUEST VARS
+	/**
+  	* Static REQUEST VARS
+	**/
   	public static final String REQ_ACCOUNT_ID = "accountID";
   	public static final String REQ_ACCOUNT_NAME = "accountName";
   	public static final String REQ_PASSWORD = "password";
@@ -15,7 +16,9 @@ public class Account_Strings{
     public static final String REQ_GROUPNAME = "groupname";
     public static final String REQ_DEFAULT_ROLES = "defaultRoles";
 
-    /// Static RESPONSE VARS
+	 /**
+    * Static RESPONSE VARS
+	 **/
   	public static final String RES_RETURN = "return";
   	public static final String RES_ERROR = "ERROR";
     public static final String RES_ACCOUNT_ID = "accountID";
@@ -26,11 +29,15 @@ public class Account_Strings{
     public static final String RES_LIST = "list";
     public static final String RES_SINGLE_RETURN_VALUE = "single";
 
-    /// Static PROPERTIES VARS
+	 /**
+    * Static PROPERTIES VARS
+	 **/
     public static final String PROPERTIES_ROLE = "membershipRoles";
     public static final String PROPERTIES_EMAIL = "email";
 
-    /// ERROR MESSAGES
+	 /**
+    * ERROR MESSAGES
+	 **/
     public static final String ERROR_NO_GROUP = "No group is found.";
     public static final String ERROR_NO_USERNAME = "No username is supplied.";
     public static final String ERROR_NO_PASSWORD = "No password is supplied.";

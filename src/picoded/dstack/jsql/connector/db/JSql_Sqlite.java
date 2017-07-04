@@ -6,29 +6,37 @@ import java.util.ArrayList;
 import picoded.dstack.jsql.connector.*;
 import picoded.set.JSqlType;
 
-/// Pure SQLite implentation of JSql
+/**
+* Pure SQLite implentation of JSql
+**/
 public class JSql_Sqlite extends JSql_Base {
 
-	/// Setup database as pure SQLite mode
+	/**
+	* Setup database as pure SQLite mode
+	**/
 	public JSql_Sqlite() {
 		this(":memory:");
 	}
-	
-	/// Runs JSql with the JDBC sqlite engine
-	///
-	/// @param  File path for the sqlite file
+
+	/**
+	* Runs JSql with the JDBC sqlite engine
+	*
+	* @param  File path for the sqlite file
+	**/
 	public JSql_Sqlite(String sqliteLoc) {
 		// store database connection properties
 		setConnectionProperties(sqliteLoc, null, null, null, null);
 		// call internal method to create the connection
 		setupConnection();
 	}
-	
-	/// Internal common reuse constructor
-	/// Setsup the internal connection settings and driver
+
+	/**
+	* Internal common reuse constructor
+	* Setsup the internal connection settings and driver
+	**/
 	private void setupConnection() {
 		sqlType = JSqlType.SQLITE;
-		
+
 		try {
 			// This is only imported on demand, avoid preloading until needed
 			Class.forName("org.sqlite.JDBC");
@@ -40,8 +48,10 @@ public class JSql_Sqlite extends JSql_Base {
 			throw new RuntimeException("Failed to load sqlite connection: ", e);
 		}
 	}
-	
-	/// As this is the base class varient, this funciton isnt suported
+
+	/**
+	* As this is the base class varient, this funciton isnt suported
+	**/
 	public void recreate(boolean force) {
 		if (force) {
 			dispose();
@@ -49,21 +59,23 @@ public class JSql_Sqlite extends JSql_Base {
 		// call internal method to create the connection
 		setupConnection();
 	}
-	
-	/// Internal parser that converts some of the common sql statements to sqlite
-	/// This converts one SQL convention to another as needed
-	///
-	/// @param  SQL query to "normalize"
-	///
-	/// @return  SQL query that was converted
+
+	/**
+	* Internal parser that converts some of the common sql statements to sqlite
+	* This converts one SQL convention to another as needed
+	*
+	* @param  SQL query to "normalize"
+	*
+	* @return  SQL query that was converted
+	**/
 	public String genericSqlParser(String inString) {
 		final String truncateTable = "TRUNCATE TABLE";
 		final String deleteFrom = "DELETE FROM";
-		
+
 		inString = inString.toUpperCase(Locale.ENGLISH);
 		inString = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("\\s+", " ")
 			.replaceAll("(?i)VARCHAR\\(MAX\\)", "VARCHAR").replaceAll("(?i)BIGINT", "INTEGER");
-		
+
 		if (inString.startsWith(truncateTable)) {
 			inString = inString.replaceAll(truncateTable, deleteFrom);
 		}
@@ -75,37 +87,37 @@ public class JSql_Sqlite extends JSql_Base {
 	// UPSERT Query Builder
 	//
 	//-------------------------------------------------------------------------
-	
-	///
-	/// SQLite specific UPSERT support
-	///
-	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
-	/// INSERT OR REPLACE INTO Employee (
-	///	id,      // Unique Columns to check for upsert
-	///	fname,   // Insert Columns to update
-	///	lname,   // Insert Columns to update
-	///	role,    // Default Columns, that has default fallback value
-	///   note,    // Misc Columns, which existing values are preserved (if exists)
-	/// ) VALUES (
-	///	1,       // Unique value
-	/// 	'Tom',   // Insert value
-	/// 	'Hanks', // Insert value
-	///	COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'), // Values with default
-	///	(SELECT note FROM Employee WHERE id = 1) // Misc values to preserve
-	/// );
-	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	///
-	/// @param  Table name to query        (eg: tableName)
-	/// @param  Unique column names        (eg: id)
-	/// @param  Unique column values       (eg: 1)
-	/// @param  Upsert column names        (eg: fname,lname)
-	/// @param  Upsert column values       (eg: 'Tom','Hanks')
-	/// @param  Default column to use existing values if exists   (eg: 'role')
-	/// @param  Default column values to use if not exists        (eg: 'Benchwarmer')
-	/// @param  All other column names to maintain existing value (eg: 'note')
-	///
-	/// @return  A prepared upsert statement
-	///
+
+	/**
+	* SQLite specific UPSERT support
+	*
+	* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	* INSERT OR REPLACE INTO Employee (
+	*	id,      // Unique Columns to check for upsert
+	*	fname,   // Insert Columns to update
+	*	lname,   // Insert Columns to update
+	*	role,    // Default Columns, that has default fallback value
+	*   note,    // Misc Columns, which existing values are preserved (if exists)
+	* ) VALUES (
+	*	1,       // Unique value
+	* 	'Tom',   // Insert value
+	* 	'Hanks', // Insert value
+	*	COALESCE((SELECT role FROM Employee WHERE id = 1), 'Benchwarmer'), // Values with default
+	*	(SELECT note FROM Employee WHERE id = 1) // Misc values to preserve
+	* );
+	* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	*
+	* @param  Table name to query        (eg: tableName)
+	* @param  Unique column names        (eg: id)
+	* @param  Unique column values       (eg: 1)
+	* @param  Upsert column names        (eg: fname,lname)
+	* @param  Upsert column values       (eg: 'Tom','Hanks')
+	* @param  Default column to use existing values if exists   (eg: 'role')
+	* @param  Default column values to use if not exists        (eg: 'Benchwarmer')
+	* @param  All other column names to maintain existing value (eg: 'note')
+	*
+	* @return  A prepared upsert statement
+	**/
 	public JSqlPreparedStatement upsertStatement( //
 		String tableName, // Table name to upsert on
 		//
@@ -122,15 +134,19 @@ public class JSql_Sqlite extends JSql_Base {
 		// this is important as some SQL implementation will fallback to default table values, if not properly handled
 		String[] miscColumns //
 	) {
-		
-		/// Checks that unique collumn and values length to be aligned
+
+		/**
+		* Checks that unique collumn and values length to be aligned
+		**/
 		if (uniqueColumns == null || uniqueValues == null
 			|| uniqueColumns.length != uniqueValues.length) {
 			throw new JSqlException(
 				"Upsert query requires unique column and values to be equal length");
 		}
-		
-		/// Preparing inner default select, this will be used repeatingly for COALESCE, DEFAULT and MISC values
+
+		/**
+		* Preparing inner default select, this will be used repeatingly for COALESCE, DEFAULT and MISC values
+		**/
 		ArrayList<Object> innerSelectArgs = new ArrayList<Object>();
 		StringBuilder innerSelectSB = new StringBuilder(" FROM ");
 		innerSelectSB.append("`" + tableName + "`");
@@ -143,18 +159,27 @@ public class JSql_Sqlite extends JSql_Base {
 			innerSelectArgs.add(uniqueValues[a]);
 		}
 		innerSelectSB.append(")");
-		
+
 		String innerSelectPrefix = "(SELECT ";
 		String innerSelectSuffix = innerSelectSB.toString();
-		/// Building the query for INSERT OR REPLACE
+
+		/**
+		* Building the query for INSERT OR REPLACE
+		**/
 		StringBuilder queryBuilder = new StringBuilder("INSERT OR REPLACE INTO `" + tableName + "` (");
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
-		/// Building the query for both sides of '(...columns...) VALUE (...vars...)' clauses in upsert
-		/// Note that the final trailing ", " seperator will be removed prior to final query conversion
+
+		/**
+		* Building the query for both sides of '(...columns...) VALUE (...vars...)' clauses in upsert
+		* Note that the final trailing ", " seperator will be removed prior to final query conversion
+		**/
 		StringBuilder columnNames = new StringBuilder();
 		StringBuilder columnValues = new StringBuilder();
 		String columnSeperator = ", ";
-		/// Setting up unique values
+
+		/**
+		* Setting up unique values
+		**/
 		for (int a = 0; a < uniqueColumns.length; ++a) {
 			columnNames.append(uniqueColumns[a]);
 			columnNames.append(columnSeperator);
@@ -164,7 +189,10 @@ public class JSql_Sqlite extends JSql_Base {
 			//
 			queryArgs.add(uniqueValues[a]);
 		}
-		/// Inserting updated values
+
+		/**
+		* Inserting updated values
+		**/
 		if (insertColumns != null) {
 			for (int a = 0; a < insertColumns.length; ++a) {
 				columnNames.append(insertColumns[a]);
@@ -177,7 +205,10 @@ public class JSql_Sqlite extends JSql_Base {
 					: null);
 			}
 		}
-		/// Handling default values
+
+		/**
+		* Handling default values
+		**/
 		if (defaultColumns != null) {
 			for (int a = 0; a < defaultColumns.length; ++a) {
 				columnNames.append(defaultColumns[a]);
@@ -193,7 +224,10 @@ public class JSql_Sqlite extends JSql_Base {
 					: null);
 			}
 		}
-		/// Handling Misc values
+
+		/**
+		* Handling Misc values
+		**/
 		if (miscColumns != null) {
 			for (int a = 0; a < miscColumns.length; ++a) {
 				columnNames.append(miscColumns[a]);
@@ -205,7 +239,10 @@ public class JSql_Sqlite extends JSql_Base {
 				columnValues.append(columnSeperator);
 			}
 		}
-		/// Building the final query
+
+		/**
+		* Building the final query
+		**/
 		queryBuilder
 			.append(columnNames.substring(0, columnNames.length() - columnSeperator.length()));
 		queryBuilder.append(") VALUES (");
@@ -214,5 +251,5 @@ public class JSql_Sqlite extends JSql_Base {
 		queryBuilder.append(")");
 		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
-	
+
 }

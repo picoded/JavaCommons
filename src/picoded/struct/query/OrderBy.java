@@ -19,7 +19,7 @@ public class OrderBy<T> implements Comparator<T>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	//
+	//-----------------------------------------------------------------
 	// Constructor setup
 	//-----------------------------------------------------------------
 
@@ -84,7 +84,7 @@ public class OrderBy<T> implements Comparator<T>, Serializable {
 		// Done
 	}
 
-	//
+	//--------------------------------------------------------------------
 	// String manipulations
 	//--------------------------------------------------------------------
 
@@ -139,7 +139,7 @@ public class OrderBy<T> implements Comparator<T>, Serializable {
 		return res;
 	}
 
-	//
+	//--------------------------------------------------------------------
 	// To OrderBy implmentation
 	//--------------------------------------------------------------------
 
@@ -154,7 +154,7 @@ public class OrderBy<T> implements Comparator<T>, Serializable {
 		return resSet;
 	}
 
-	//
+	//--------------------------------------------------------------------
 	// Comparator implmentation
 	//--------------------------------------------------------------------
 

@@ -11,9 +11,9 @@ import picoded.security.*;
 
 import picoded.servlet.api.module.account.Account_Strings;
 
-///
-/// Represents a single group / user account.
-///
+/**
+* Represents a single group / user account.
+**/
 public class AccountObject extends Core_MetaObject {
 
 	///////////////////////////////////////////////////////////////////////////
@@ -22,13 +22,17 @@ public class AccountObject extends Core_MetaObject {
 	//
 	///////////////////////////////////////////////////////////////////////////
 
-	/// The original account table
+	/**
+	* The original account table
+	**/
 	protected AccountTable mainTable = null;
 
-	/// [INTERNAL USE ONLY]
-	///
-	/// Cosntructor setup, using an account table,
-	/// and the account GUID
+	/**
+	* [INTERNAL USE ONLY]
+	*
+	* Cosntructor setup, using an account table,
+	* and the account GUID
+	**/
 	protected AccountObject(AccountTable accTable, String inOID) {
 		super((Core_MetaTable) (accTable.accountMetaTable), inOID);
 		mainTable = accTable;
@@ -40,27 +44,33 @@ public class AccountObject extends Core_MetaObject {
 	//
 	///////////////////////////////////////////////////////////////////////////
 
-	/// Checks if the current account has the provided loginID
-	///
-	/// @param  LoginID to use
-	///
-	/// @return TRUE if login ID belongs to this account
+	/**
+	* Checks if the current account has the provided loginID
+	*
+	* @param  LoginID to use
+	*
+	* @return TRUE if login ID belongs to this account
+	**/
 	public boolean hasLoginID(String name) {
 		return _oid.equals(mainTable.accountLoginIdMap.get(name));
 	}
 
-	/// Gets and return the various login "nice-name" (not UUID) for this account
-	///
-	/// @return  Set of loginID's used by this account
+	/**
+	* Gets and return the various login "nice-name" (not UUID) for this account
+	*
+	* @return  Set of loginID's used by this account
+	**/
 	public Set<String> getLoginIDSet() {
 		return mainTable.accountLoginIdMap.keySet(_oid);
 	}
 
-	/// Sets the name for the account, returns true or false if it succed.
-	///
-	/// @param  LoginID to setup for this account
-	///
-	/// @return TRUE if login ID is configured to this account
+	/**
+	* Sets the name for the account, returns true or false if it succed.
+	*
+	* @param  LoginID to setup for this account
+	*
+	* @return TRUE if login ID is configured to this account
+	**/
 	public boolean setLoginID(String name) {
 		if (name == null || name.length() <= 0) {
 			throw new RuntimeException("AccountObject loding ID cannot be blank");
@@ -82,20 +92,24 @@ public class AccountObject extends Core_MetaObject {
 		return hasLoginID(name);
 	}
 
-	/// Removes the old name from the database
-	///
-	/// @param  LoginID to setup for this account
+	/**
+	* Removes the old name from the database
+	*
+	* @param  LoginID to setup for this account
+	**/
 	public void removeLoginID(String name) {
 		if (hasLoginID(name)) {
 			mainTable.accountLoginIdMap.remove(name);
 		}
 	}
 
-	/// Sets the name as a unique value, delete all previous alias
-	///
-	/// @param  LoginID to setup for this account
-	///
-	/// @return TRUE if login ID is configured to this account
+	/**
+	* Sets the name as a unique value, delete all previous alias
+	*
+	* @param  LoginID to setup for this account
+	*
+	* @return TRUE if login ID is configured to this account
+	**/
 	public boolean setUniqueLoginID(String name) {
 
 		// The old name list, to check if new name already is set
@@ -132,34 +146,42 @@ public class AccountObject extends Core_MetaObject {
 	//
 	///////////////////////////////////////////////////////////////////////////
 
-	/// Gets and returns the stored password hash,
-	/// Intentionally made protected to avoid accidental use externally
-	///
-	/// @return  Password salted hash, as per NxtCrypt usage
+	/**
+	* Gets and returns the stored password hash,
+	* Intentionally made protected to avoid accidental use externally
+	*
+	* @return  Password salted hash, as per NxtCrypt usage
+	**/
 	protected String getPasswordHash() {
 		return mainTable.accountAuthMap.get(_oid);
 	}
 
-	/// Indicates if the current account has a configured password, it is possible there is no password
-	/// if it functions as a group. Or is passwordless login
-	///
-	/// @return  True if password was configured
+	/**
+	* Indicates if the current account has a configured password, it is possible there is no password
+	* if it functions as a group. Or is passwordless login
+	*
+	* @return  True if password was configured
+	**/
 	public boolean hasPassword() {
 		String h = getPasswordHash();
 		return (h != null && h.length() > 0);
 	}
 
-	/// Remove the account password
-	/// This should only be used for group type account objects
+	/**
+	* Remove the account password
+	* This should only be used for group type account objects
+	**/
 	public void removePassword() {
 		mainTable.accountAuthMap.remove(_oid);
 	}
 
-	/// Validate if the given password is valid
-	///
-	/// @param  raw Password string to validate
-	///
-	/// @return  True if password is valid
+	/**
+	* Validate if the given password is valid
+	*
+	* @param  raw Password string to validate
+	*
+	* @return  True if password is valid
+	**/
 	public boolean validatePassword(String pass) {
 		String hash = getPasswordHash();
 		if (hash != null) {
@@ -168,9 +190,11 @@ public class AccountObject extends Core_MetaObject {
 		return false;
 	}
 
-	/// Set the account password
-	///
-	/// @param  raw Password string to setup
+	/**
+	* Set the account password
+	*
+	* @param  raw Password string to setup
+	**/
 	public void setPassword(String pass) {
 		// ensure its own OID is registered
 		saveDelta();
@@ -183,12 +207,14 @@ public class AccountObject extends Core_MetaObject {
 		}
 	}
 
-	/// Set the account password, after checking old password
-	///
-	/// @param  raw Password string to setup
-	/// @param  old Password to validate
-	///
-	/// @return  True if password change was valid
+	/**
+	* Set the account password, after checking old password
+	*
+	* @param  raw Password string to setup
+	* @param  old Password to validate
+	*
+	* @return  True if password change was valid
+	**/
 	public boolean setPassword(String pass, String oldPass) {
 		if (validatePassword(oldPass)) {
 			setPassword(pass);
@@ -203,27 +229,33 @@ public class AccountObject extends Core_MetaObject {
 	//
 	///////////////////////////////////////////////////////////////////////////
 
-	/// Checks if the current session is associated with the account
-	///
-	/// @param  Session ID to validate
-	///
-	/// @return TRUE if login ID belongs to this account
+	/**
+	* Checks if the current session is associated with the account
+	*
+	* @param  Session ID to validate
+	*
+	* @return TRUE if login ID belongs to this account
+	**/
 	public boolean hasSession(String sessionID) {
 		return sessionID != null && _oid.equals(mainTable.sessionLinkMap.get(sessionID));
 	}
 
-	/// List the various session ID's involved with this account
-	///
-	/// @return  Set of login session ID's
+	/**
+	* List the various session ID's involved with this account
+	*
+	* @return  Set of login session ID's
+	**/
 	public Set<String> getSessionSet() {
 		return mainTable.sessionLinkMap.keySet(_oid);
 	}
 
-	/// Get and return the session information meta
-	///
-	/// @param  Session ID to get
-	///
-	/// @return  Information meta if session is valid
+	/**
+	* Get and return the session information meta
+	*
+	* @param  Session ID to get
+	*
+	* @return  Information meta if session is valid
+	**/
 	public Map<String,Object> getSessionInfo(String sessionID) {
 		// Validate that session is legit
 		if (!hasSession(sessionID)) {
@@ -234,21 +266,23 @@ public class AccountObject extends Core_MetaObject {
 		return mainTable.sessionInfoMap.getStringMap(sessionID, null);
 	}
 
-	/// Generate a new session with the provided meta information
-	///
-	/// Additionally if no tokens are generated and issued in the next
-	/// 30 seconds, the session will expire.
-	///
-	/// Subseqently session expirary will be tag to
-	/// the most recently generated token.
-	///
-	/// Additionally info object is INTENTIONALLY NOT stored as a
-	/// MetaObject, for performance reasons.
-	///
-	/// @param  Meta information map associated with the session,
-	///         a blank map is assumed if not provided.
-	///
-	/// @return  The session ID used
+	/**
+	* Generate a new session with the provided meta information
+	*
+	* Additionally if no tokens are generated and issued in the next
+	* 30 seconds, the session will expire.
+	*
+	* Subseqently session expirary will be tag to
+	* the most recently generated token.
+	*
+	* Additionally info object is INTENTIONALLY NOT stored as a
+	* MetaObject, for performance reasons.
+	*
+	* @param  Meta information map associated with the session,
+	*         a blank map is assumed if not provided.
+	*
+	* @return  The session ID used
+	**/
 	public String newSession(Map<String,Object> info) {
 
 		// Normalize the info object map
@@ -276,11 +310,13 @@ public class AccountObject extends Core_MetaObject {
 		return sessionID;
 	}
 
-	/// Revoke a session, associated to this account.
-	///
-	/// This will also revoke all tokens associated to this session
-	///
-	/// @param  SessionID to revoke
+	/**
+	* Revoke a session, associated to this account.
+	*
+	* This will also revoke all tokens associated to this session
+	*
+	* @param  SessionID to revoke
+	**/
 	public void revokeSession(String sessionID) {
 		// Validate the session belongs to this account !
 		if ( hasSession(sessionID) ) {
@@ -295,7 +331,9 @@ public class AccountObject extends Core_MetaObject {
 		}
 	}
 
-	/// Revoke all sessions, associated to this account
+	/**
+	* Revoke all sessions, associated to this account
+	**/
 	public void revokeAllSession() {
 		Set<String> sessions = getSessionSet();
 		for(String oneSession : sessions) {
@@ -309,22 +347,26 @@ public class AccountObject extends Core_MetaObject {
 	//
 	///////////////////////////////////////////////////////////////////////////
 
-	/// Checks if the current session token is associated with the account
-	///
-	/// @param  Session ID to validate
-	/// @param  Token ID to validate
-	///
-	/// @return TRUE if login ID belongs to this account
+	/**
+	* Checks if the current session token is associated with the account
+	*
+	* @param  Session ID to validate
+	* @param  Token ID to validate
+	*
+	* @return TRUE if login ID belongs to this account
+	**/
 	public boolean hasToken(String sessionID, String tokenID) {
 		return hasSession(sessionID) && sessionID.equals(mainTable.sessionTokenMap.get(tokenID));
 	}
 
-	/// Get the token set associated with the session and account
-	///
-	/// @param   Session ID to fetch from
-	///
-	/// @return  The list of token ID's currently associated to this session
-	///          null, if session is not valid.
+	/**
+	* Get the token set associated with the session and account
+	*
+	* @param   Session ID to fetch from
+	*
+	* @return  The list of token ID's currently associated to this session
+	*          null, if session is not valid.
+	**/
 	public Set<String> getTokenSet(String sessionID) {
 		if ( hasSession(sessionID) ) {
 			return mainTable.sessionTokenMap.keySet(sessionID);
@@ -332,15 +374,17 @@ public class AccountObject extends Core_MetaObject {
 		return new HashSet<String>();
 	}
 
-	/// Generate a new token, with a timeout
-	///
-	/// Note that this token will update the session timeout,
-	/// even if there was a longer session previously set.
-	///
-	/// @param  Session ID to generate token from
-	/// @param  The expire timestamp of the token
-	///
-	/// @return  The tokenID generated, null on invalid session
+	/**
+	* Generate a new token, with a timeout
+	*
+	* Note that this token will update the session timeout,
+	* even if there was a longer session previously set.
+	*
+	* @param  Session ID to generate token from
+	* @param  The expire timestamp of the token
+	*
+	* @return  The tokenID generated, null on invalid session
+	**/
 	public String newToken(String sessionID, long expireTime) {
 
 		// Terminate if session is invalid
@@ -358,15 +402,17 @@ public class AccountObject extends Core_MetaObject {
 		return tokenID;
 	}
 
-	/// Internal function, used to issue a token ID to the session
-	/// with the next token ID predefined
-	///
-	/// @param  Session ID to generate token from
-	/// @param  Token ID to setup
-	/// @param  Next token ID
-	/// @param  The expire timestamp of the token
-	///
-	/// @return  The tokenID generated, null on invalid session
+	/**
+	* Internal function, used to issue a token ID to the session
+	* with the next token ID predefined
+	*
+	* @param  Session ID to generate token from
+	* @param  Token ID to setup
+	* @param  Next token ID
+	* @param  The expire timestamp of the token
+	*
+	* @return  The tokenID generated, null on invalid session
+	**/
 	protected void registerToken(String sessionID, String tokenID, String nextTokenID, long expireTime) {
 		// Current token check, does nothing if invalid
 		if ( hasToken(sessionID, tokenID) ) {
@@ -396,12 +442,14 @@ public class AccountObject extends Core_MetaObject {
 		mainTable.sessionNextTokenMap.putWithExpiry(tokenID, nextTokenID , expireTime );
 	}
 
-	/// Checks if the current session token is associated with the account
-	///
-	/// @param  Session ID to validate
-	/// @param  Token ID to revoke
-	///
-	/// @return TRUE if login ID belongs to this account
+	/**
+	* Checks if the current session token is associated with the account
+	*
+	* @param  Session ID to validate
+	* @param  Token ID to revoke
+	*
+	* @return TRUE if login ID belongs to this account
+	**/
 	public boolean revokeToken(String sessionID, String tokenID) {
 		if ( hasToken(sessionID, tokenID) ) {
 			mainTable.sessionTokenMap.remove(tokenID);
@@ -410,9 +458,11 @@ public class AccountObject extends Core_MetaObject {
 		return false;
 	}
 
-	/// Revokes all tokens associated to a session
-	///
-	/// @param  Session ID to revoke
+	/**
+	* Revokes all tokens associated to a session
+	*
+	* @param  Session ID to revoke
+	**/
 	public void revokeAllToken(String sessionID) {
 		Set<String> tokens = getTokenSet(sessionID);
 		for(String oneToken : tokens) {
@@ -420,12 +470,14 @@ public class AccountObject extends Core_MetaObject {
 		}
 	}
 
-	/// Get token expiriry
-	///
-	/// @param  Session ID to validate
-	/// @param  Token ID to check
-	///
-	/// @return  The token expiry timestamp
+	/**
+	* Get token expiriry
+	*
+	* @param  Session ID to validate
+	* @param  Token ID to check
+	*
+	* @return  The token expiry timestamp
+	**/
 	public long getTokenExpiry(String sessionID, String tokenID) {
 		if ( hasToken(sessionID, tokenID) ) {
 			return mainTable.sessionTokenMap.getExpiry(tokenID);
@@ -433,12 +485,14 @@ public class AccountObject extends Core_MetaObject {
 		return -1;
 	}
 
-	/// Get token remaining lifespan
-	///
-	/// @param  Session ID to validate
-	/// @param  Token ID to check
-	///
-	/// @return  The token remaining timespan, -1 means invalid token
+	/**
+	* Get token remaining lifespan
+	*
+	* @param  Session ID to validate
+	* @param  Token ID to check
+	*
+	* @return  The token remaining timespan, -1 means invalid token
+	**/
 	public long getTokenLifespan(String sessionID, String tokenID) {
 		// Get expiry timestamp
 		long expiry = getTokenExpiry( sessionID, tokenID );
@@ -455,13 +509,15 @@ public class AccountObject extends Core_MetaObject {
 		return lifespan;
 	}
 
-	/// Internal function, used to get the next token given a session and current token.
-	/// DOES NOT : Validate the next token if it exists
-	///
-	/// @param  Session ID to validate
-	/// @param  Token ID to check
-	///
-	/// @return The next token
+	/**
+	* Internal function, used to get the next token given a session and current token.
+	* DOES NOT : Validate the next token if it exists
+	*
+	* @param  Session ID to validate
+	* @param  Token ID to check
+	*
+	* @return The next token
+	**/
 	protected String getUncheckedNextToken(String sessionID, String tokenID) {
 		if ( hasToken(sessionID, tokenID) ) {
 			return mainTable.sessionNextTokenMap.get(tokenID);
@@ -469,12 +525,14 @@ public class AccountObject extends Core_MetaObject {
 		return null;
 	}
 
-	/// Get the next token AFTER validating if it is issued
-	///
-	/// @param  Session ID to validate
-	/// @param  Token ID to check
-	///
-	/// @return The next token ID
+	/**
+	* Get the next token AFTER validating if it is issued
+	*
+	* @param  Session ID to validate
+	* @param  Token ID to check
+	*
+	* @return The next token ID
+	**/
 	public String getNextToken(String sessionID, String tokenID) {
 		String nextToken = getUncheckedNextToken(sessionID, tokenID);
 		if ( mainTable.sessionTokenMap.containsKey(nextToken) ) {
@@ -483,14 +541,16 @@ public class AccountObject extends Core_MetaObject {
 		return null;
 	}
 
-	/// Generate next token in line, with expiry
-	/// Note that expiry is NOT set, if token was previously issued
-	///
-	/// @param  Session ID to validate
-	/// @param  Token ID to check
-	/// @param  The expire timestamp of the token
-	///
-	/// @return The next token ID
+	/**
+	* Generate next token in line, with expiry
+	* Note that expiry is NOT set, if token was previously issued
+	*
+	* @param  Session ID to validate
+	* @param  Token ID to check
+	* @param  The expire timestamp of the token
+	*
+	* @return The next token ID
+	**/
 	public String issueNextToken(String sessionID, String tokenID, long expireTime) {
 		// Get NextToken, and returns (if previously issued)
 		String nextToken = getUncheckedNextToken(sessionID, tokenID);
@@ -517,10 +577,14 @@ public class AccountObject extends Core_MetaObject {
 	// Group Management of Users
 	//-------------------------------------------------------------------------
 
-	/// Gets the cached child map
+	/**
+	* Gets the cached child map
+	**/
 	protected MetaObject _group_userToRoleMap = null;
 
-	/// Gets the child map (cached?)
+	/**
+	* Gets the child map (cached?)
+	**/
 	protected MetaObject group_userToRoleMap() {
 		if (_group_userToRoleMap != null) {
 			return _group_userToRoleMap;
@@ -529,13 +593,17 @@ public class AccountObject extends Core_MetaObject {
 		return (_group_userToRoleMap = mainTable.memberRolesTable.get(this._oid(), true));
 	}
 
-	/// Gets and returns the member role, if it exists
+	/**
+	* Gets and returns the member role, if it exists
+	**/
 	public String getMemberRole(AccountObject memberObject) {
 		return group_userToRoleMap().getString(memberObject._oid());
 	}
 
-	/// Gets and returns the member meta map, if it exists
-	/// Only returns if member exists, else null
+	/**
+	* Gets and returns the member meta map, if it exists
+	* Only returns if member exists, else null
+	**/
 	public MetaObject getMember(AccountObject memberObject) {
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
@@ -547,8 +615,10 @@ public class AccountObject extends Core_MetaObject {
 		return mainTable.memberMetaTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
 	}
 
-	/// Gets and returns the member meta map, if it exists
-	/// Only returns if member exists and matches role, else null
+	/**
+	* Gets and returns the member meta map, if it exists
+	* Only returns if member exists and matches role, else null
+	**/
 	public MetaObject getMember(AccountObject memberObject, String role) {
 		role = mainTable.validateMembershipRole(this._oid(), role);
 
@@ -562,9 +632,11 @@ public class AccountObject extends Core_MetaObject {
 		return mainTable.memberMetaTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
 	}
 
-	/// Adds the member to the group with the given role, if it was not previously added
-	///
-	/// Returns the group-member unique meta object, null if previously exists
+	/**
+	* Adds the member to the group with the given role, if it was not previously added
+	*
+	* Returns the group-member unique meta object, null if previously exists
+	**/
 	public MetaObject addMember(AccountObject memberObject, String role) {
 		// Gets the existing object, if exists terminates
 		if (getMember(memberObject) != null) {
@@ -575,9 +647,11 @@ public class AccountObject extends Core_MetaObject {
 		return setMember(memberObject, role);
 	}
 
-	/// Adds the member to the group with the given role, or update the role if already added
-	///
-	/// Returns the group-member unique meta object
+	/**
+	* Adds the member to the group with the given role, or update the role if already added
+	*
+	* Returns the group-member unique meta object
+	**/
 	public MetaObject setMember(AccountObject memberObject, String role) {
 		role = mainTable.validateMembershipRole(this._oid(), role);
 		if ( role == null ) {
@@ -630,7 +704,9 @@ public class AccountObject extends Core_MetaObject {
 	// Group Status Check
 	//-------------------------------------------------------------------------
 
-	/// Returns if set as group
+	/**
+	* Returns if set as group
+	**/
 	public boolean isGroup() {
 		Object status = this.get("isGroup");
 		if (status instanceof Number && //
@@ -641,7 +717,9 @@ public class AccountObject extends Core_MetaObject {
 		}
 	}
 
-	/// Sets if the account is a group
+	/**
+	* Sets if the account is a group
+	**/
 	public void setGroupStatus(boolean enabled) {
 		if (enabled) {
 			this.put("isGroup", new Integer(1));
@@ -745,14 +823,18 @@ public class AccountObject extends Core_MetaObject {
 	}
 	*/
 
-	/// This method logs the details about login faailure for the user based on User ID
+	/**
+	* This method logs the details about login faailure for the user based on User ID
+	**/
 	public void logLoginFailure(String userID) {
 		mainTable.loginThrottlingAttemptMap.put(userID, 1);
 		int elapsedTime = ((int) (System.currentTimeMillis() / 1000)) + 2;
 		mainTable.loginThrottlingExpiryMap.put(userID, elapsedTime);
 	}
 
-	/// This method returns time left before next permitted login attempt for the user based on User ID
+	/**
+	* This method returns time left before next permitted login attempt for the user based on User ID
+	**/
 	public int getNextLoginTimeAllowed(String userId) {
 		long val = getExpiryTime(userId);
 		if (val == -1) {
@@ -762,7 +844,9 @@ public class AccountObject extends Core_MetaObject {
 		return allowedTime > 0 ? allowedTime : 0;
 	}
 
-	/// This method would be added in on next login failure for the user based on User ID
+	/**
+	* This method would be added in on next login failure for the user based on User ID
+	**/
 	public long getTimeElapsedNextLogin(String userId) {
 		long elapsedValue = getExpiryTime(userId);
 		if (elapsedValue == -1) {
@@ -771,7 +855,9 @@ public class AccountObject extends Core_MetaObject {
 		return elapsedValue;
 	}
 
-	/// This method would be added the delay for the user based on User ID
+	/**
+	* This method would be added the delay for the user based on User ID
+	**/
 	public void addDelay(AccountObject ao) {
 		String userId = ao._oid();
 		long attemptValue = getAttempts(userId);
@@ -794,7 +880,9 @@ public class AccountObject extends Core_MetaObject {
 		return (mainTable.loginThrottlingExpiryMap.get(userID)!=null) ? mainTable.loginThrottlingExpiryMap.get(userID) : -1;
 	}
 
-	/// This method remove the entries for the user (should call after successful login)
+	/**
+	* This method remove the entries for the user (should call after successful login)
+	**/
 	public void resetLoginThrottle(String userId) {
 		mainTable.loginThrottlingAttemptMap.put(userId, null);
 		mainTable.loginThrottlingExpiryMap.put(userId, null);

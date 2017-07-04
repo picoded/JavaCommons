@@ -18,7 +18,7 @@ import picoded.struct.query.internal.QueryFilter;
 **/
 public interface Query extends Predicate<Object> {
 
-	//
+	//--------------------------------------------------------------------
 	// Static builder
 	//--------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ public interface Query extends Predicate<Object> {
 		return QueryFilter.buildQuery(queryString, paramMap, null);
 	}
 
-	//
+	//--------------------------------------------------------------------
 	// Public test functions
 	//--------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ public interface Query extends Predicate<Object> {
 	**/
 	boolean test(Object t, Map<String, Object> argMap);
 
-	//
+	//--------------------------------------------------------------------
 	// Public accessors
 	//--------------------------------------------------------------------
 
@@ -78,7 +78,7 @@ public interface Query extends Predicate<Object> {
 	**/
 	QueryType type();
 
-	//
+	//--------------------------------------------------------------------
 	// Condition only accessors
 	//--------------------------------------------------------------------
 	/**
@@ -115,7 +115,7 @@ public interface Query extends Predicate<Object> {
 		return false;
 	}
 
-	//
+	//--------------------------------------------------------------------
 	// Combination only accessors
 	//--------------------------------------------------------------------
 	/**
@@ -131,7 +131,7 @@ public interface Query extends Predicate<Object> {
 		return null;
 	}
 
-	//
+	//--------------------------------------------------------------------
 	// Query mapping search, modification, and arguments output
 	//--------------------------------------------------------------------
 	/**
@@ -267,7 +267,7 @@ public interface Query extends Predicate<Object> {
 		return ret;
 	}
 
-	//
+	//--------------------------------------------------------------------
 	// To string conversion
 	//--------------------------------------------------------------------
 	/**
@@ -288,7 +288,7 @@ public interface Query extends Predicate<Object> {
 		return toString().replaceAll(":[0-9]+", "?");
 	}
 
-	//
+	//--------------------------------------------------------------------
 	// Map based search
 	//--------------------------------------------------------------------
 	/**
@@ -320,7 +320,7 @@ public interface Query extends Predicate<Object> {
 		return search(set, new OrderBy<V>(orderBy));
 	}
 
-	//
+	//--------------------------------------------------------------------
 	// Name value pair extraction from query
 	//--------------------------------------------------------------------
 	/**

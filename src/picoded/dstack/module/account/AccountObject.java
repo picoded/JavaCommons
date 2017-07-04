@@ -551,7 +551,6 @@ public class AccountObject extends Core_MetaObject {
 	/// Only returns if member exists and matches role, else null
 	public MetaObject getMember(AccountObject memberObject, String role) {
 		role = mainTable.validateMembershipRole(this._oid(), role);
-
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
 
@@ -570,7 +569,6 @@ public class AccountObject extends Core_MetaObject {
 		if (getMember(memberObject) != null) {
 			return null;
 		}
-
 		// Set and return a new member object
 		return setMember(memberObject, role);
 	}
@@ -664,7 +662,7 @@ public class AccountObject extends Core_MetaObject {
 	}
 
 	public MetaObject addNewMembershipRole(String role) {
-		List<String> currentRoles = group_membershipRoles().getList(Account_Strings.PROPERTIES_ROLE, "[]");
+		List<String> currentRoles = group_membershipRoles().getList(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE, "[]");
 		if ( currentRoles.contains(role) ){
 			return group_membershipRoles();
 		}
@@ -673,13 +671,14 @@ public class AccountObject extends Core_MetaObject {
 	}
 
 	public MetaObject setMembershipRoles(List<String> roles) {
-		group_membershipRoles().put(Account_Strings.PROPERTIES_ROLE, roles);
+		this.setGroupStatus(true);
+		group_membershipRoles().put(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE, roles);
 		group_membershipRoles().saveDelta();
 		return group_membershipRoles();
 	}
 
 	public MetaObject removeMembershipRole(String role) {
-		List<String> currentRoles = group_membershipRoles().getList(Account_Strings.PROPERTIES_ROLE, "[]");
+		List<String> currentRoles = group_membershipRoles().getList(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE, "[]");
 		if (!currentRoles.contains(role)){
 			return null;
 		}
@@ -797,11 +796,4 @@ public class AccountObject extends Core_MetaObject {
 		mainTable.loginThrottlingAttemptMap.put(userId, null);
 		mainTable.loginThrottlingExpiryMap.put(userId, null);
 	}
-
-	// /// Gets value of key from the Account Meta table
-	// public Object getMetaValue(String oid, String key) {
-	// 	return mainTable.accountMetaTable.get(oid).get(key);
-	// }
-
-
 }

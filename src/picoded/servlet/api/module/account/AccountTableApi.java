@@ -880,7 +880,7 @@ public class AccountTableApi implements ApiModule {
 		// builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember); // Tested
 		builder.put(path+"get_member_list_info", get_member_list_info); // Tested
 		builder.put(path+"add_remove_member", add_remove_member); // Tested
-		builder.put(path+"get_single_member_meta", get_single_member_meta);
+		builder.put(path+"get_single_member_meta", get_single_member_meta); // Tested
 
 		// builder.put(path+"getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
 		// builder.put(path+"getListOfMemberObjectOfGroup", getListOfMemberObjectOfGroup); // Tested

@@ -553,7 +553,6 @@ public class AccountObject extends Core_MetaObject {
 		role = mainTable.validateMembershipRole(this._oid(), role);
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
-
 		if (level == null || !level.equals(role)) {
 			return null;
 		}
@@ -601,7 +600,6 @@ public class AccountObject extends Core_MetaObject {
 			// true = uncheckedGet
 			childMeta = mainTable.memberMetaTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
 		}
-
 		return childMeta;
 	}
 
@@ -672,6 +670,7 @@ public class AccountObject extends Core_MetaObject {
 
 	public MetaObject setMembershipRoles(List<String> roles) {
 		this.setGroupStatus(true);
+		_group_membershipRoles = null;
 		group_membershipRoles().put(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE, roles);
 		group_membershipRoles().saveDelta();
 		return group_membershipRoles();

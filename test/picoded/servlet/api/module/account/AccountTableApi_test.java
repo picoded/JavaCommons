@@ -576,7 +576,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		res = requestJSON("addMembershipRole", params);
 		assertNull(res.get(Account_Strings.RES_ERROR));
 		initialRole.add("roleToAdd");
-		assertEquals(initialRole, res.getStringMap(Account_Strings.RES_META).get("membershipRoles"));
+		assertEquals(initialRole, res.getStringMap(Account_Strings.RES_META).get(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE));
 	}
 
 	@Test
@@ -720,6 +720,7 @@ public class AccountTableApi_test extends ApiModule_test {
 			groupID.add(res.getString(Account_Strings.RES_ACCOUNT_ID));
 		}
 		for( int idx = 1; idx <= 5; idx ++ ) {
+			params.clear();
 			params.put(Account_Strings.REQ_USERNAME, "member" + idx);
 			params.put(Account_Strings.REQ_PASSWORD, "password");
 			res = requestJSON("new", params);
@@ -743,6 +744,23 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(Account_Strings.REQ_ROLE, "member");
 		params.put(Account_Strings.REQ_ADD_LIST, addUserList2);
 		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(1));
+		res = requestJSON("add_remove_member", params);
+		assertNull(res.get(Account_Strings.RES_ERROR));
+		assertEquals(expectedFailResult, res.get(Account_Strings.RES_FAIL_ADD));
+
+		// Make member 5 a group account
+		params.clear();
+		params.put(Account_Strings.REQ_ROLE, "little-boy");
+		params.put(Account_Strings.REQ_GROUP_ID, userID.get(4));
+		res = requestJSON("addMembershipRole", params);
+		assertNull(res.get(Account_Strings.RES_ERROR));
+
+		res = requestJSON("groupRoles", params);
+		// Add some members into member 5
+		params.clear();
+		params.put(Account_Strings.REQ_ROLE, "little-boy");
+		params.put(Account_Strings.REQ_ADD_LIST, addUserList2);
+		params.put(Account_Strings.REQ_GROUP_ID, userID.get(4));
 		res = requestJSON("add_remove_member", params);
 		assertNull(res.get(Account_Strings.RES_ERROR));
 		assertEquals(expectedFailResult, res.get(Account_Strings.RES_FAIL_ADD));
@@ -805,6 +823,155 @@ public class AccountTableApi_test extends ApiModule_test {
 		assertTrue(res.getInt(Account_Strings.RES_RECORDS_TOTAL) == 2);
 		assertTrue(res.getInt(Account_Strings.RES_RECORDS_FILTERED) == 2);
 		assertThat("Something is wrong with the lists", res.getList(Account_Strings.RES_DATA), containsInAnyOrder(expectedResult.toArray()));
+
+		// 7th Test: No groupID, user who is not a group is logged in
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "member2");
+		params.put(Account_Strings.REQ_PASSWORD, "password");
+		res = requestJSON("login", params);
+		assertNull(res.get(Account_Strings.RES_ERROR));
+
+		params.clear();
+		params.put(Account_Strings.REQ_HEADERS, "['" + Account_Strings.PROPERTIES_ROLE + "', 'group__oid', 'account_email', 'randomHeader']");
+		res = requestJSON("get_member_list_info", params);
+		assertEquals(Account_Strings.ERROR_NO_GROUP, res.get(Account_Strings.RES_ERROR));
+		res = requestJSON("logout", null);
+		assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
+
+		// 8th Test: No groupID, user is group and is logged in
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "member5");
+		params.put(Account_Strings.REQ_PASSWORD, "password");
+		res = requestJSON("login", params);
+		assertNull(res.get(Account_Strings.RES_ERROR));
+
+		params.clear();
+		params.put(Account_Strings.REQ_HEADERS, "['" + Account_Strings.PROPERTIES_ROLE + "', 'group__oid', 'account_email', 'randomHeader']");
+		res = requestJSON("get_member_list_info", params);
+		expectedResult.clear();
+		expectedResult.add(new ArrayList<>(Arrays.asList("little-boy", userID.get(4), "member1", "")));
+		expectedResult.add(new ArrayList<>(Arrays.asList("little-boy", userID.get(4), "member3", "")));
+		expectedResult.add(new ArrayList<>(Arrays.asList("little-boy", userID.get(4), "member5", "")));
+		assertTrue(res.getInt(Account_Strings.RES_RECORDS_TOTAL) == 3);
+		assertTrue(res.getInt(Account_Strings.RES_RECORDS_FILTERED) == 3);
+		assertThat("Something is wrong with the lists", res.getList(Account_Strings.RES_DATA), containsInAnyOrder(expectedResult.toArray()));
+		res = requestJSON("logout", null);
+		assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
+
+	}
+
+	@Test
+	public void singleMemberMeta(){
+		GenericConvertMap<String,Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		// Ensure that there is an existing user
+		Map<String,Object> params = new HashMap<String,Object>();
+		List<String> userID = new ArrayList<String>(), groupID = new ArrayList<String>();
+		List<String> addUserList = new ArrayList<String>();
+		List<String> expectedFailResult = new ArrayList<String>();
+		// Ensure that there is an existing group
+		params.put(Account_Strings.REQ_USERNAME, "exampleGrp");
+		params.put(Account_Strings.REQ_IS_GROUP, true);
+		res = requestJSON("new", params);
+		assertNull("getMemberListInfoTest: Something wrong in creating group.", res.get(Account_Strings.RES_ERROR));
+		groupID.add(res.getString(Account_Strings.RES_ACCOUNT_ID));
+		for( int idx = 1; idx <= 3; idx ++ ) {
+			params.clear();
+			params.put(Account_Strings.REQ_USERNAME, "single" + idx);
+			params.put(Account_Strings.REQ_PASSWORD, "password");
+			res = requestJSON("new", params);
+			assertNull("getMemberListInfoTest: Something wrong in adding user " + idx + ".", res.get(Account_Strings.RES_ERROR));
+			userID.add(res.getString(Account_Strings.RES_ACCOUNT_ID));
+			if ( idx % 2 == 1 ) {
+				addUserList.add(res.getString(Account_Strings.RES_ACCOUNT_ID));
+			}
+		}
+		params.clear();
+		params.put(Account_Strings.REQ_ROLE, "member");
+		params.put(Account_Strings.REQ_ADD_LIST, addUserList);
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		res = requestJSON("add_remove_member", params);
+		assertNull(res.get(Account_Strings.RES_ERROR));
+		assertEquals(expectedFailResult, res.get(Account_Strings.RES_FAIL_ADD));
+		List<List<String>> expectedResult = new ArrayList<List<String>>();
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+
+		// 1st Test: Empty Submission
+		res = requestJSON("get_single_member_meta", null);
+		assertEquals(Account_Strings.ERROR_NO_USER, res.get(Account_Strings.RES_ERROR));
+		// 2nd Test: Invalid accountID
+		params.clear();
+		params.put(Account_Strings.REQ_ACCOUNT_ID, "randomID");
+		res = requestJSON("get_single_member_meta", params);
+		assertEquals(Account_Strings.ERROR_NO_USER, res.get(Account_Strings.RES_ERROR));
+		// 3rd Test: Valid accountID, account not in group ( single 2 )
+		params.clear();
+		params.put(Account_Strings.REQ_ACCOUNT_ID, userID.get(1));
+		res = requestJSON("get_single_member_meta", params);
+		assertEquals(Account_Strings.ERROR_NO_GROUP_ID, res.get(Account_Strings.RES_ERROR));
+		// 4th Test: Valid accountID, account not in group, invalid groupID, no roles ( single 2 )
+		params.clear();
+		params.put(Account_Strings.REQ_ACCOUNT_ID, userID.get(1));
+		params.put(Account_Strings.REQ_GROUP_ID, "anyhowGroupID");
+		res = requestJSON("get_single_member_meta", params);
+		assertEquals(Account_Strings.ERROR_NO_GROUP, res.get(Account_Strings.RES_ERROR));
+		// 5th Test: Valid accountID, account not in group, Valid group, no roles ( single 2, exampleGrp )
+		params.clear();
+		params.put(Account_Strings.REQ_ACCOUNT_ID, userID.get(1));
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		res = requestJSON("get_single_member_meta", params);
+		assertEquals("User is not in group or not in specified role.", res.get(Account_Strings.RES_ERROR));
+		// 6th Test: Valid accountID, account in group, Valid group, no roles ( single 1, exampleGrp )
+		params.clear();
+		params.put(Account_Strings.REQ_ACCOUNT_ID, userID.get(0));
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		res = requestJSON("get_single_member_meta", params);
+		assertNull(res.get(Account_Strings.RES_ERROR));
+		assertEquals("member", res.getStringMap(Account_Strings.RES_META).get(Account_Strings.PROPERTIES_ROLE));
+		// 7th Test: Valid accountID, account in group, Valid group, with roles ( single 1, exampleGrp )
+		params.clear();
+		params.put(Account_Strings.REQ_ACCOUNT_ID, userID.get(0));
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		params.put(Account_Strings.REQ_ROLE, "member");
+		res = requestJSON("get_single_member_meta", params);
+		assertNull(res.get(Account_Strings.RES_ERROR));
+		assertEquals("member", res.getStringMap(Account_Strings.RES_META).get(Account_Strings.PROPERTIES_ROLE));
+		// 8th Test: Valid accountID, account in group, Valid group, with wrong roles ( single 1, exampleGrp )
+		params.clear();
+		params.put(Account_Strings.REQ_ACCOUNT_ID, userID.get(0));
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		params.put(Account_Strings.REQ_ROLE, "wrongRole");
+		res = requestJSON("get_single_member_meta", params);
+		assertEquals("User is not in group or not in specified role.", res.get(Account_Strings.RES_ERROR));
+		// 9th Test: No accountID, user logged in, user not group ( single2, exampleGrp )
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "single2");
+		params.put(Account_Strings.REQ_PASSWORD, "password");
+		res = requestJSON("login", params);
+		assertNull(res.get(Account_Strings.RES_ERROR));
+		params.clear();
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		res = requestJSON("get_single_member_meta", params);
+		assertEquals("User is not in group or not in specified role.", res.get(Account_Strings.RES_ERROR));
+		res = requestJSON("logout", null);
+		assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
+		// 10th Test:  No accountID, user logged in, user in group ( single1, exampleGrp )
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "single3");
+		params.put(Account_Strings.REQ_PASSWORD, "password");
+		res = requestJSON("login", params);
+		assertNull(res.get(Account_Strings.RES_ERROR));
+		params.clear();
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		res = requestJSON("get_single_member_meta", params);
+		assertEquals("member", res.getStringMap(Account_Strings.RES_META).get(Account_Strings.PROPERTIES_ROLE));
+		res = requestJSON("logout", null);
+		assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
+
 
 	}
 	//

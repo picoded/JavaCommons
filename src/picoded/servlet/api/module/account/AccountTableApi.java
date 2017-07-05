@@ -710,16 +710,57 @@ public class AccountTableApi implements ApiModule {
 
 		MetaObject groupResult = (role != null) ? group.getMember(ao, role) : group.getMember(ao);
 		if ( groupResult == null ) {
-			res.put(Account_Strings.RES_ERROR, "User is not in group or not in specified role.");
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NOT_IN_GROUP_OR_ROLE);
 		}else{
 			res.put(Account_Strings.RES_META, groupResult);
 		}
 		return res;
 	};
 
-	// protected ApiFunction update_member_meta_info = (req, res) -> {
-	//
-	// };
+	protected ApiFunction update_member_meta_info = (req, res) -> {
+		res.put(Account_Strings.RES_SUCCESS, false);
+		String memberIDToUpdate = req.getString(Account_Strings.REQ_USER_ID, null);
+		AccountObject ao = (memberIDToUpdate != null ) ? table.get(memberIDToUpdate) : table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		String groupID = req.getString(Account_Strings.REQ_GROUP_ID, null);
+		if ( groupID == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
+			return res;
+		}
+		Object metaObjRaw = req.get(Account_Strings.REQ_META);
+		if ( metaObjRaw == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_META);
+			return res;
+		}
+		AccountObject group = table.get(groupID);
+		if ( group == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			return res;
+		}
+		MetaObject currentMemberMeta = group.getMember(ao);
+		if ( currentMemberMeta == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NOT_IN_GROUP_OR_ROLE);
+			return res;
+		}
+		String updateMode = req.getString(Account_Strings.REQ_UPDATE_MODE, "delta");
+		Map<String, Object> metaObj = ConvertJSON.toMap((String) metaObjRaw);
+		updateMode = ( !updateMode.equalsIgnoreCase("full") ) ? "delta" : updateMode;
+		currentMemberMeta.putAll(metaObj);
+		if ( updateMode.equalsIgnoreCase("full") ) {
+			currentMemberMeta.saveAll();
+		} else {
+			currentMemberMeta.saveDelta();
+		}
+		res.put(Account_Strings.RES_ACCOUNT_ID, memberIDToUpdate);
+		res.put(Account_Strings.RES_META, metaObj);
+		res.put(Account_Strings.RES_UPDATE_MODE, updateMode);
+		res.put(Account_Strings.RES_SUCCESS, true);
+
+		return res;
+	};
 	//
 	// protected ApiFunction do_password_reset = (req, res) -> {
 	//
@@ -893,7 +934,7 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"get_member_list_info", get_member_list_info); // Tested
 		builder.put(path+"add_remove_member", add_remove_member); // Tested
 		builder.put(path+"get_single_member_meta", get_single_member_meta); // Tested
-
+		builder.put(path+"update_member_meta_info", update_member_meta_info);
 		// builder.put(path+"getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
 		// builder.put(path+"getListOfMemberObjectOfGroup", getListOfMemberObjectOfGroup); // Tested
 	}

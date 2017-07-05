@@ -20,6 +20,7 @@ public class Account_Strings{
     public static final String REQ_META = "meta";
     public static final String REQ_ROLE = "role";
     public static final String REQ_USER_ID = "userID";
+    public static final String REQ_UPDATE_MODE = "updateMode";
 
     /// Static RESPONSE VARS
     // Single Value/Object Variables
@@ -34,6 +35,8 @@ public class Account_Strings{
     public static final String RES_DRAW = "draw";
     public static final String RES_RECORDS_TOTAL = "recordsTotal";
     public static final String RES_RECORDS_FILTERED = "recordsFiltered";
+    public static final String RES_UPDATE_MODE = "updateMode";
+    public static final String RES_SUCCESS = "success";
     // Data List Return Variables
     public static final String RES_HEADERS= "headers";
     public static final String RES_DATA = "data";
@@ -65,7 +68,10 @@ public class Account_Strings{
     public static final String ERROR_NO_ROLE = "No role is found.";
     public static final String ERROR_NO_USER = "No user is found.";
     public static final String ERROR_NO_USER_ID = "No userID is found.";
-    public static final String ERROR_DEFAULT = "There is an error";
+    public static final String ERROR_DEFAULT = " is found.";
+    public static final String ERROR_NO_META = "No meta is found.";
+    public static final String ERROR_NOT_IN_GROUP_OR_ROLE = "User is not in group or not in specified role.";
+    public static final String ERROR_INVALID_FORMAT_JSON = "Invalid Format JSON";
 
 
     /// ADDITIONAL Variables

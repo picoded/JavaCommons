@@ -554,7 +554,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		initialRole.add("lion");
 		params.put(Account_Strings.REQ_ROLE, initialRole);
 		res = requestJSON("new", params);
-		String accountID = res.getString(Account_Strings.REQ_ACCOUNT_ID);
+		String accountID = res.getString(Account_Strings.RES_ACCOUNT_ID);
 		assertNull("AddMemberShipTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
@@ -905,36 +905,36 @@ public class AccountTableApi_test extends ApiModule_test {
 		assertEquals(Account_Strings.ERROR_NO_USER, res.get(Account_Strings.RES_ERROR));
 		// 2nd Test: Invalid accountID
 		params.clear();
-		params.put(Account_Strings.REQ_ACCOUNT_ID, "randomID");
+		params.put(Account_Strings.REQ_USER_ID, "randomID");
 		res = requestJSON("get_single_member_meta", params);
 		assertEquals(Account_Strings.ERROR_NO_USER, res.get(Account_Strings.RES_ERROR));
 		// 3rd Test: Valid accountID, account not in group ( single 2 )
 		params.clear();
-		params.put(Account_Strings.REQ_ACCOUNT_ID, userID.get(1));
+		params.put(Account_Strings.REQ_USER_ID, userID.get(1));
 		res = requestJSON("get_single_member_meta", params);
 		assertEquals(Account_Strings.ERROR_NO_GROUP_ID, res.get(Account_Strings.RES_ERROR));
 		// 4th Test: Valid accountID, account not in group, invalid groupID, no roles ( single 2 )
 		params.clear();
-		params.put(Account_Strings.REQ_ACCOUNT_ID, userID.get(1));
+		params.put(Account_Strings.REQ_USER_ID, userID.get(1));
 		params.put(Account_Strings.REQ_GROUP_ID, "anyhowGroupID");
 		res = requestJSON("get_single_member_meta", params);
 		assertEquals(Account_Strings.ERROR_NO_GROUP, res.get(Account_Strings.RES_ERROR));
 		// 5th Test: Valid accountID, account not in group, Valid group, no roles ( single 2, exampleGrp )
 		params.clear();
-		params.put(Account_Strings.REQ_ACCOUNT_ID, userID.get(1));
+		params.put(Account_Strings.REQ_USER_ID, userID.get(1));
 		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
 		res = requestJSON("get_single_member_meta", params);
 		assertEquals("User is not in group or not in specified role.", res.get(Account_Strings.RES_ERROR));
 		// 6th Test: Valid accountID, account in group, Valid group, no roles ( single 1, exampleGrp )
 		params.clear();
-		params.put(Account_Strings.REQ_ACCOUNT_ID, userID.get(0));
+		params.put(Account_Strings.REQ_USER_ID, userID.get(0));
 		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
 		res = requestJSON("get_single_member_meta", params);
 		assertNull(res.get(Account_Strings.RES_ERROR));
 		assertEquals("member", res.getStringMap(Account_Strings.RES_META).get(Account_Strings.PROPERTIES_ROLE));
 		// 7th Test: Valid accountID, account in group, Valid group, with roles ( single 1, exampleGrp )
 		params.clear();
-		params.put(Account_Strings.REQ_ACCOUNT_ID, userID.get(0));
+		params.put(Account_Strings.REQ_USER_ID, userID.get(0));
 		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
 		params.put(Account_Strings.REQ_ROLE, "member");
 		res = requestJSON("get_single_member_meta", params);
@@ -942,7 +942,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		assertEquals("member", res.getStringMap(Account_Strings.RES_META).get(Account_Strings.PROPERTIES_ROLE));
 		// 8th Test: Valid accountID, account in group, Valid group, with wrong roles ( single 1, exampleGrp )
 		params.clear();
-		params.put(Account_Strings.REQ_ACCOUNT_ID, userID.get(0));
+		params.put(Account_Strings.REQ_USER_ID, userID.get(0));
 		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
 		params.put(Account_Strings.REQ_ROLE, "wrongRole");
 		res = requestJSON("get_single_member_meta", params);

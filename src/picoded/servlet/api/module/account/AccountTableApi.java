@@ -568,6 +568,15 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
+	/**
+	* Description: This function performs add/remove members from existing groups
+	*
+	*
+	*	@param actionObject - GenericConvertMap<String, Object> Contains the action and groupID to be performed by the function
+	* @param userIDList - String[] Contains the list of user ID to be processed
+	*
+	*	@return returnResult - GenericConvertMap<String, Object> Returns the failedList and successList back to caller
+	*/
 	private BiFunction<GenericConvertMap<String, Object>, String[], GenericConvertHashMap<String, Object>> addOrRemove = (actionObject, userIDList) -> {
 		List<String> failedList = new ArrayList<String>(), successList = new ArrayList<String>();
 		AccountObject group = (AccountObject) actionObject.get(Account_Strings.GROUP),  currentUser = null;
@@ -681,7 +690,7 @@ public class AccountTableApi implements ApiModule {
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
 	protected ApiFunction get_single_member_meta = (req, res) -> {
-		String accountID = req.getString(Account_Strings.REQ_ACCOUNT_ID, null);
+		String accountID = req.getString(Account_Strings.REQ_USER_ID, null);
 		AccountObject ao = ( accountID != null ) ? table.get(accountID) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if( ao == null ) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
@@ -708,7 +717,7 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	// protected ApiFunction update_member_info = (req, res) -> {
+	// protected ApiFunction update_member_meta_info = (req, res) -> {
 	//
 	// };
 	//
@@ -739,6 +748,13 @@ public class AccountTableApi implements ApiModule {
 	// protected ApiFunction get_group_list_info = (req, res) -> {
 	//
 	// };
+	// protected ApiFunction account_info_by_ID = (req, res) -> {
+	//
+	// };
+	// protected ApiFunction account_info_by_Name = (req, res) -> {
+	//
+	// };
+
 
 	// /// # getListOfGroupIDOfMember
 	// ///
@@ -868,10 +884,6 @@ public class AccountTableApi implements ApiModule {
 
 		//Group functionalities
 		builder.put(path+"groupRoles", groupRoles); // Tested
-		// builder.put(path+"addMember", addMemberToGroup); // Tested
-		// builder.put(path+"removeMember", removeMemberFromGroup); // Tested
-
-		// builder.put(path+"getMemberMeta", getMemberMetaFromGroup); // Tested
 		builder.put(path+"getMemberRole", getMemberRoleFromGroup); // Tested
 
 		builder.put(path+"addMembershipRole", add_new_membership_role); // Tested

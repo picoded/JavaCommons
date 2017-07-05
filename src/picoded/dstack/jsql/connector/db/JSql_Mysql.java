@@ -18,21 +18,25 @@ import picoded.dstack.jsql.connector.*;
 import picoded.set.JSqlType;
 import picoded.conv.ConvertJSON;
 
-/// Pure "MY"SQL implentation of JSql
+/**
+* Pure "MY"SQL implentation of JSql
+**/
 public class JSql_Mysql extends JSql_Base {
-	
+
 	//-------------------------------------------------------------------------
 	//
 	// Database connection handling
 	//
 	//-------------------------------------------------------------------------
-	
-	/// Runs JSql with the JDBC "MY"SQL engine
-	///
-	/// @param   dbServerAddress, is just IP:PORT. For example, "127.0.0.1:3306"
-	/// @param   database name to connect to
-	/// @param   database user to connect to
-	/// @param   database password to use
+
+	/**
+	* Runs JSql with the JDBC "MY"SQL engine
+	*
+	* @param   dbServerAddress, is just IP:PORT. For example, "127.0.0.1:3306"
+	* @param   database name to connect to
+	* @param   database user to connect to
+	* @param   database password to use
+	**/
 	public JSql_Mysql(String dbServerAddress, String dbName, String dbUser, String dbPass) {
 		// set connection properties
 		Properties connectionProps = new Properties();
@@ -41,34 +45,38 @@ public class JSql_Mysql extends JSql_Base {
 		connectionProps.put("autoReconnect", "true");
 		connectionProps.put("failOverReadOnly", "false");
 		connectionProps.put("maxReconnects", "5");
-		
+
 		String connectionUrl = "jdbc:mysql://" + dbServerAddress + "/" + dbName;
-		
+
 		// store database connection properties
 		setConnectionProperties(connectionUrl, null, null, null, connectionProps);
-		
+
 		// call internal method to create the connection
 		setupConnection();
 	}
-	
-	/// Runs JSql with the JDBC "MY"SQL engine
-	/// Avoid direct usage, use `JSql_Mysql(dbServerAdress, dbName, dbUser, dbPass)` instead
-	///
-	/// @param   JDBC connectionUrl, for example, "jdbc:mysql://127.0.0.1:3306/JAVACOMMONS"
-	/// @param   Connection properties
+
+	/**
+	* Runs JSql with the JDBC "MY"SQL engine
+	* Avoid direct usage, use `JSql_Mysql(dbServerAdress, dbName, dbUser, dbPass)` instead
+	*
+	* @param   JDBC connectionUrl, for example, "jdbc:mysql://127.0.0.1:3306/JAVACOMMONS"
+	* @param   Connection properties
+	**/
 	public JSql_Mysql(String connectionUrl, Properties connectionProps) {
 		// store database connection properties
 		setConnectionProperties(connectionUrl, null, null, null, connectionProps);
-		
+
 		// call internal method to create the connection
 		setupConnection();
 	}
-	
-	/// Internal common reuse constructor
-	/// Setsup the internal connection settings and driver
+
+	/**
+	* Internal common reuse constructor
+	* Setsup the internal connection settings and driver
+	**/
 	private void setupConnection() {
 		sqlType = JSqlType.MYSQL;
-		
+
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance(); //ensure jdbc driver is loaded
 			sqlConn = java.sql.DriverManager.getConnection((String) connectionProps.get("dbUrl"),
@@ -77,8 +85,10 @@ public class JSql_Mysql extends JSql_Base {
 			throw new RuntimeException("Failed to load sql connection: ", e);
 		}
 	}
-	
-	/// As this is the base class varient, this funciton isnt suported
+
+	/**
+	* As this is the base class varient, this funciton isnt suported
+	**/
 	public void recreate(boolean force) {
 		if (force) {
 			dispose();
@@ -86,23 +96,25 @@ public class JSql_Mysql extends JSql_Base {
 		// call internal method to create the connection
 		setupConnection();
 	}
-	
+
 	//-------------------------------------------------------------------------
 	//
-	// Table MetaData handling, limited use cases, 
+	// Table MetaData handling, limited use cases,
 	// avoid use : may or may not be standardised
 	//
 	//-------------------------------------------------------------------------
-	
-	/// Executes and fetch a table column information as a map
-	///
-	/// @param  Table name
-	/// 
-	/// @return  Collumn meta information
+
+	/**
+	* Executes and fetch a table column information as a map
+	*
+	* @param  Table name
+	*
+	* @return  Collumn meta information
+	**/
 	public Map<String,String> getTableColumnsInformation(String tablename) {
 		// Prepare return information
 		Map<String,String> ret = new HashMap<String,String>();
-		
+
 		// Remove quotations in table name, and trim out excess whitespace
 		tablename = tablename.replaceAll("`", "").replaceAll("'","").replaceAll("\"","").trim();
 		//System.out.println(tablename);
@@ -110,7 +122,7 @@ public class JSql_Mysql extends JSql_Base {
 		// Get the column information
 		JSqlResult tableInfo = query_raw("SELECT column_name, column_type FROM information_schema.columns WHERE table_name=?", new Object[] { tablename });
 		//System.out.println( ConvertJSON.fromMap(tableInfo) );
-		
+
 		// Parse it into a map format
 		Object[] column_name = tableInfo.get("column_name");
 		Object[] column_type = tableInfo.get("column_type");
@@ -124,13 +136,15 @@ public class JSql_Mysql extends JSql_Base {
 		return ret;
 	}
 
-	/// Enforces column index limits for BLOB and TEXT type
-	///
-	/// @param  Collumn infromation from `getTableColumnsInformation`
-	/// @param  Query string to sanatize
-	/// @param  Columns to scan and replace
-	/// 
-	/// @return  Sanatized query
+	/**
+	* Enforces column index limits for BLOB and TEXT type
+	*
+	* @param  Collumn infromation from `getTableColumnsInformation`
+	* @param  Query string to sanatize
+	* @param  Columns to scan and replace
+	*
+	* @return  Sanatized query
+	**/
 	public String enforceColumnIndexLimit(Map<String,String> metadata, String qStringUpper, String columns) {
 		if (metadata != null) {
 			// Get the relevent column names
@@ -155,13 +169,15 @@ public class JSql_Mysql extends JSql_Base {
 	// Generic SQL conversion and query
 	//
 	//-------------------------------------------------------------------------
-	
-	/// Internal parser that converts some of the common sql statements to sqlite
-	/// This converts one SQL convention to another as needed
-	///
-	/// @param  SQL query to "normalize"
-	///
-	/// @return  SQL query that was converted
+
+	/**
+	* Internal parser that converts some of the common sql statements to sqlite
+	* This converts one SQL convention to another as needed
+	*
+	* @param  SQL query to "normalize"
+	*
+	* @return  SQL query that was converted
+	**/
 	public String genericSqlParser(String inString) {
 
 		// Normalize all syntax to upper case
@@ -171,7 +187,7 @@ public class JSql_Mysql extends JSql_Base {
 			//.replaceAll("\'", "`")
 			.replaceAll("AUTOINCREMENT", "AUTO_INCREMENT").replace("VARCHAR(MAX)", "TEXT")
 			.replaceAll("RANDOM\\(\\)", "RAND()");
-		
+
 		// MySQL does not support the inner query in create view
 		//
 		// Check if create view query has an inner query.
@@ -197,7 +213,7 @@ public class JSql_Mysql extends JSql_Base {
 					break;
 				}
 			}
-			
+
 			int indexClosingIndex = -1;
 			String tmpViewName = null;
 			String createViewQuery = null;
@@ -208,21 +224,21 @@ public class JSql_Mysql extends JSql_Base {
 				}
 				tmpViewName += "_inner_view";
 				indexClosingIndex = qString.indexOf(')', indexOpeningBracket);
-				
+
 				String innerQuery = qString.substring(indexOpeningBracket + 1, indexClosingIndex);
 				createViewQuery = "CREATE VIEW " + tmpViewName + " AS " + innerQuery;
 			}
-			
+
 			if (createViewQuery != null) {
 				// execute query to drop the view if exist
 				String dropViewQuery = "DROP VIEW IF EXISTS " + tmpViewName;
-				
+
 				// Drop the view 'temporarily' if previously exists
 				update_raw(genericSqlParser(dropViewQuery));
-				
+
 				// execute the query to create view 'temporarily'
 				update_raw(genericSqlParser(createViewQuery));
-				
+
 				// replace the inner query with created view name
 				qString = qString.substring(0, indexFrom) + tmpViewName
 					+ qString.substring(indexClosingIndex + 1);
@@ -236,7 +252,7 @@ public class JSql_Mysql extends JSql_Base {
 		if (qString.indexOf("INDEX IF NOT EXISTS") != -1) {
 			// index conflict try catch
 			qString = qString.replaceAll("INDEX IF NOT EXISTS", "INDEX");
-			
+
 			// It is must to define the The length of the BLOB and TEXT column type
 			//
 			// This is how to enforce it
@@ -277,19 +293,21 @@ public class JSql_Mysql extends JSql_Base {
 		return qString;
 	}
 
-	/// Internal exception catching, used for cases which its not possible to 
-	/// easily handle with pure SQL query. Or cases where the performance cost in the
-	/// the query does not justify its usage (edge cases)
-	///
-	/// This is the actual implmentation to overwrite
-	///
-	/// This acts as a filter for query, noFetchQuery, and update respectively
-	///
-	/// @param  SQL query to "normalize"
-	/// @param  The "normalized" sql query
-	/// @param  The exception caught, as a stack trace string
-	///
-	/// @return  TRUE, if the exception can be safely ignored
+	/**
+	* Internal exception catching, used for cases which its not possible to
+	* easily handle with pure SQL query. Or cases where the performance cost in the
+	* the query does not justify its usage (edge cases)
+	*
+	* This is the actual implmentation to overwrite
+	*
+	* This acts as a filter for query, noFetchQuery, and update respectively
+	*
+	* @param  SQL query to "normalize"
+	* @param  The "normalized" sql query
+	* @param  The exception caught, as a stack trace string
+	*
+	* @return  TRUE, if the exception can be safely ignored
+	**/
 	protected boolean sanatizeErrors(String originalQuery, String normalizedQuery, String stackTrace) {
 		if( super.sanatizeErrors(originalQuery, normalizedQuery, stackTrace) ) {
 			return true;
@@ -310,39 +328,39 @@ public class JSql_Mysql extends JSql_Base {
 	// UPSERT Query Builder
 	//
 	//-------------------------------------------------------------------------
-	
-	///
-	/// MYSQL specific UPSERT support
-	///
-	/// The following is an example syntax
-	///
-	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
-	/// INSERT INTO Employee (
-	/// 	id,      // Unique Columns to check for upsert
-	/// 	fname,   // Insert Columns to update
-	/// 	lname,   // Insert Columns to update
-	/// 	role     // Default Columns, that has default fallback value
-	/// ) VALUES (
-	/// 	1,       // Unique value
-	/// 	'Tom',   // Insert value
-	/// 	'Hanks', // Insert value
-	/// 	'Benchwarmer' // Default fallback value
-	/// ) ON DUPLICATE KEY UPDATE
-	/// 	fname = 'Tom'   //Only update upsert values
-	/// 	lname = 'Hanks' // Only update upsert values
-	/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	///
-	/// @param  Table name to query        (eg: tableName)
-	/// @param  Unique column names        (eg: id)
-	/// @param  Unique column values       (eg: 1)
-	/// @param  Upsert column names        (eg: fname,lname)
-	/// @param  Upsert column values       (eg: 'Tom','Hanks')
-	/// @param  Default column to use existing values if exists   (eg: 'role')
-	/// @param  Default column values to use if not exists        (eg: 'Benchwarmer')
-	/// @param  All other column names to maintain existing value (eg: 'note')
-	///
-	/// @return  A prepared upsert statement
-	///
+
+	/**
+	* MYSQL specific UPSERT support
+	*
+	* The following is an example syntax
+	*
+	* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.SQL}
+	* INSERT INTO Employee (
+	* 	id,      // Unique Columns to check for upsert
+	* 	fname,   // Insert Columns to update
+	* 	lname,   // Insert Columns to update
+	* 	role     // Default Columns, that has default fallback value
+	* ) VALUES (
+	* 	1,       // Unique value
+	* 	'Tom',   // Insert value
+	* 	'Hanks', // Insert value
+	* 	'Benchwarmer' // Default fallback value
+	* ) ON DUPLICATE KEY UPDATE
+	* 	fname = 'Tom'   //Only update upsert values
+	* 	lname = 'Hanks' // Only update upsert values
+	* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	*
+	* @param  Table name to query        (eg: tableName)
+	* @param  Unique column names        (eg: id)
+	* @param  Unique column values       (eg: 1)
+	* @param  Upsert column names        (eg: fname,lname)
+	* @param  Upsert column values       (eg: 'Tom','Hanks')
+	* @param  Default column to use existing values if exists   (eg: 'role')
+	* @param  Default column values to use if not exists        (eg: 'Benchwarmer')
+	* @param  All other column names to maintain existing value (eg: 'note')
+	*
+	* @return  A prepared upsert statement
+	**/
 	public JSqlPreparedStatement upsertStatement( //
 		String tableName, // Table name to upsert on
 		//
@@ -359,13 +377,13 @@ public class JSql_Mysql extends JSql_Base {
 		// this is important as some SQL implementation will fallback to default table values, if not properly handled
 		String[] miscColumns // This is ignored in mysql
 	) {
-		
+
 		// Checks that unique collumn and values length to be aligned
 		if (uniqueColumns == null || uniqueValues == null
 			|| uniqueColumns.length != uniqueValues.length) {
 			throw new JSqlException("Upsert query requires unique column and values to be equal length");
 		}
-		
+
 		// Build the final, actual query args
 		StringBuilder queryBuilder = new StringBuilder();
 		StringBuilder valuesSegment = new StringBuilder();
@@ -396,7 +414,7 @@ public class JSql_Mysql extends JSql_Base {
 				// Since this is post unique value, always valid
 				queryBuilder.append(", ");
 				valuesSegment.append(", ");
-				
+
 				// Actual name and value tokens
 				queryBuilder.append(insertColumns[i]);
 				valuesSegment.append("?");
@@ -410,7 +428,7 @@ public class JSql_Mysql extends JSql_Base {
 				// Since this is post unique value, always valid
 				queryBuilder.append(", ");
 				valuesSegment.append(", ");
-				
+
 				// Actual name and value tokens
 				queryBuilder.append(defaultColumns[i]);
 				valuesSegment.append("?");
@@ -437,30 +455,31 @@ public class JSql_Mysql extends JSql_Base {
 				queryBuilder.append(insertColumns[i]+" = VALUES("+insertColumns[i]+")");
 			}
 		}
-		
+
 		// Builde the actual statement, to run!
 		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
-	
-	///
-	/// Does multiple UPSERT continously. Use this command when doing,
-	/// a large number of UPSERT's to the same table with the same format.
-	///
-	/// In certain SQL deployments, this larger multi-UPSERT would be optimized as a 
-	/// single transaction call. However this behaviour is not guranteed across all platforms.
-	///
-	/// This is incredibily useful for large meta-table object updates.
-	///
-	/// @param  Table name to query
-	/// @param  Unique column names
-	/// @param  Unique column values, as a list. Each item in a list represents the respecitve row record
-	/// @param  Upsert column names 
-	/// @param  Upsert column values, as a list. Each item in a list represents the respecitve row record
-	/// @param  Default column to use existing values if exists 
-	/// @param  Default column values to use if not exists, as a list. Each item in a list represents the respecitve row record
-	/// @param  All other column names to maintain existing value 
-	///
-	/// @return  true, if UPSERT statement executed succesfuly
+
+	/**
+	* Does multiple UPSERT continously. Use this command when doing,
+	* a large number of UPSERT's to the same table with the same format.
+	*
+	* In certain SQL deployments, this larger multi-UPSERT would be optimized as a
+	* single transaction call. However this behaviour is not guranteed across all platforms.
+	*
+	* This is incredibily useful for large meta-table object updates.
+	*
+	* @param  Table name to query
+	* @param  Unique column names
+	* @param  Unique column values, as a list. Each item in a list represents the respecitve row record
+	* @param  Upsert column names
+	* @param  Upsert column values, as a list. Each item in a list represents the respecitve row record
+	* @param  Default column to use existing values if exists
+	* @param  Default column values to use if not exists, as a list. Each item in a list represents the respecitve row record
+	* @param  All other column names to maintain existing value
+	*
+	* @return  true, if UPSERT statement executed succesfuly
+	**/
 	public boolean multiUpsert(  //
 		String tableName, // Table name to upsert on
 		//
@@ -477,12 +496,12 @@ public class JSql_Mysql extends JSql_Base {
 		// this is important as some SQL implementation will fallback to default table values, if not properly handled
 		String[] miscColumns //
 	) {
-		
-		// Checks that unique collumn and values 
+
+		// Checks that unique collumn and values
 		if (uniqueColumns == null || uniqueValuesList == null) {
 			throw new JSqlException("Upsert query requires unique column and values");
 		}
-		
+
 		// Build the final, actual query args
 		StringBuilder queryBuilder = new StringBuilder();
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
@@ -490,7 +509,7 @@ public class JSql_Mysql extends JSql_Base {
 		// Prepare the prefix
 		queryBuilder.append("INSERT INTO ");
 		queryBuilder.append("`" + tableName + "`");
-		
+
 
 		// Column definition
 		//-----------------------------------------------------
@@ -616,12 +635,12 @@ public class JSql_Mysql extends JSql_Base {
 				queryBuilder.append(insertColumns[i]+" = VALUES("+insertColumns[i]+")");
 			}
 		}
-		
+
 		// Builde the actual statement, to run!
 		JSqlPreparedStatement statement =  new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 
 		// Run it
 		return statement.update() >= 1;
 	}
-	
+
 }

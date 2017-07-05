@@ -13,126 +13,146 @@ import picoded.conv.ConvertJSON;
 import picoded.conv.GUID;
 import picoded.set.ObjectToken;
 
-/// Represents a single object node in the MetaTable collection.
-///
-/// This is intended, to handle local, delta, and remote data seperately.
-/// Where its data layers can be visualized in the following order
-///
-/// + deltaDataMap                 - keeping track of local changes and removals
-/// + remoteDataMap (incomplete)   - partial data map, used when only query data is needed
-/// + remoteDataMap (complete)     - full data map, used when the incomplete map is insufficent
-///
-/// NOTE: This class should not be initialized directly, but through MetaTable class
+/**
+* Represents a single object node in the MetaTable collection.
+*
+* This is intended, to handle local, delta, and remote data seperately.
+* Where its data layers can be visualized in the following order
+*
+* + deltaDataMap                 - keeping track of local changes and removals
+* + remoteDataMap (incomplete)   - partial data map, used when only query data is needed
+* + remoteDataMap (complete)     - full data map, used when the incomplete map is insufficent
+*
+* NOTE: This class should not be initialized directly, but through MetaTable class
+**/
 public class Core_MetaObject implements MetaObject {
-	
+
 	// Core variables
 	//----------------------------------------------
-	
-	/// Core_MetaTable used for the object
-	/// Used to provide the underlying backend implementation
+
+	/**
+	* Core_MetaTable used for the object
+	* Used to provide the underlying backend implementation
+	**/
 	protected Core_MetaTable mainTable = null;
-	
-	/// GUID used for the object
+
+	/**
+	* GUID used for the object
+	**/
 	protected String _oid = null;
-	
-	/// Written changes, note that picoded.set.ObjectToken.NULL is used
-	/// as a pesudo null value (remove operation)
+
+	/**
+	* Written changes, note that picoded.set.ObjectToken.NULL is used
+	* as a pesudo null value (remove operation)
+	**/
 	protected Map<String, Object> deltaDataMap = new HashMap<String, Object>();
-	
-	/// Boolean Flag : Used to indicate if the full remoteDataMap is given.
-	/// This is used when incomplete query data is given first
+
+	/**
+	* Boolean Flag : Used to indicate if the full remoteDataMap is given.
+	* This is used when incomplete query data is given first
+	**/
 	protected boolean isCompleteRemoteDataMap = false;
-	
-	/// Local data cache of what exists on the server.
-	/// Is set to null if no remote data is loaded
+
+	/**
+	* Local data cache of what exists on the server.
+	* Is set to null if no remote data is loaded
+	**/
 	protected Map<String, Object> remoteDataMap = null;
-	
+
 	// Constructor
 	//----------------------------------------------
-	
-	/// Setup a MetaObject against a MetaTable backend.
-	///
-	/// This allow the setup in the following modes
-	///
-	/// + No (or invalid) GUID : Assume a new MetaObject is made with NO DATA. Issues a new GUID for the object
-	/// + GUID without remote data, will pull the required data when required
-	/// + GUID with complete remote data
-	/// + GUID with incomplete remote data, will pull the required data when required
-	///
-	/// @param  Meta table to use
-	/// @param  GUID to use, can be null
-	/// @param  Remote mapping data used (this should be modifiable)
-	/// @param  is complete remote map, use false if incomplete data
+
+	/**
+	* Setup a MetaObject against a MetaTable backend.
+	*
+	* This allow the setup in the following modes
+	*
+	* + No (or invalid) GUID : Assume a new MetaObject is made with NO DATA. Issues a new GUID for the object
+	* + GUID without remote data, will pull the required data when required
+	* + GUID with complete remote data
+	* + GUID with incomplete remote data, will pull the required data when required
+	*
+	* @param  Meta table to use
+	* @param  GUID to use, can be null
+	* @param  Remote mapping data used (this should be modifiable)
+	* @param  is complete remote map, use false if incomplete data
+	**/
 	public Core_MetaObject(MetaTable inTable, String inOID, Map<String, Object> inRemoteData,
 		boolean isCompleteData) {
 		// Main table to use
 		mainTable = (Core_MetaTable) inTable;
-		
+
 		// Generates a GUID if not given
 		if (inOID == null || inOID.length() < 22) {
 			// Issue a GUID
 			if (_oid == null) {
 				_oid = GUID.base58();
 			}
-			
+
 			// // D= GUID collision check for LOLZ
 			// remoteDataMap = mainTable.metaObjectRemoteDataMap_get(_oid);
 			// if (remoteDataMap.size() > 0) {
 			// 	throw new SecurityException("GUID Collision =.= DO YOU HAVE REAL ENTROPY? : " + _oid);
 			// }
-			
+
 			// Ensure oid is savable, needed to save blank objects
 			deltaDataMap.put("_oid", _oid);
-			
+
 			// Create remote data map (blank)
 			remoteDataMap = new HashMap<String, Object>();
-			
+
 			// Indicated that the provided map is "complete"
 			isCompleteRemoteDataMap = true;
-			
+
 		} else {
 			// _oid setup
 			_oid = inOID;
-			
+
 			// Loading remote data map, only valid if _oid is given
 			remoteDataMap = inRemoteData;
-			
+
 			// Indicates that isComplete is flagged if given
 			if (remoteDataMap != null) {
 				isCompleteRemoteDataMap = isCompleteData;
 			}
 		}
 	}
-	
-	/// Constructor, with metaTable and GUID (auto generated if null)
-	/// This is the shorten version of the larger constructor
-	///
-	/// @param  Meta table to use
-	/// @param  GUID to use, can be null
+
+	/**
+	* Constructor, with metaTable and GUID (auto generated if null)
+	* This is the shorten version of the larger constructor
+	*
+	* @param  Meta table to use
+	* @param  GUID to use, can be null
+	**/
 	public Core_MetaObject(MetaTable inTable, String inOID) {
 		this(inTable, inOID, null, false);
 	}
-	
+
 	// MetaObject ID
 	//----------------------------------------------
-	
-	/// The object ID
+
+	/**
+	* The object ID
+	**/
 	@Override
 	public String _oid() {
 		return _oid;
 	}
-	
+
 	// Utiltiy functions
 	//----------------------------------------------
-	
-	/// Ensures the complete remote data map is loaded.
-	///
-	/// This triggers if either the remote data is not flagged 
-	/// as complete, or is null, and calls from the main MetaTable
-	/// via "metaObjectRemoteDataMap_get"
-	///
-	/// This is mainly used when a get fails opportunistially with delta
-	/// or incomplete data, and requires the actual "true" data.
+
+	/**
+	* Ensures the complete remote data map is loaded.
+	*
+	* This triggers if either the remote data is not flagged
+	* as complete, or is null, and calls from the main MetaTable
+	* via "metaObjectRemoteDataMap_get"
+	*
+	* This is mainly used when a get fails opportunistially with delta
+	* or incomplete data, and requires the actual "true" data.
+	**/
 	protected void ensureCompleteRemoteDataMap() {
 		if (remoteDataMap == null || !isCompleteRemoteDataMap) {
 			remoteDataMap = mainTable.metaObjectRemoteDataMap_get(_oid);
@@ -142,35 +162,37 @@ public class Core_MetaObject implements MetaObject {
 			isCompleteRemoteDataMap = true;
 		}
 	}
-	
-	/// The aggressive type conversion to int / double types, if possible
-	///
-	/// This is done to help ensure numeric strings are converted into number
-	/// values in which they perform better via lookups
-	///
-	/// @params The input object to convert
-	///
-	/// @returns The converted Integer or Double object, else its original value
+
+	/**
+	* The aggressive type conversion to int / double types, if possible
+	*
+	* This is done to help ensure numeric strings are converted into number
+	* values in which they perform better via lookups
+	*
+	* @param The input object to convert
+	*
+	* @return The converted Integer or Double object, else its original value
+	**/
 	protected Object agressiveNumericConversion(Object value) {
 		if (value == null) {
 			return value;
 		}
-		
+
 		// Ignore byte[] array type conversion
 		if (value instanceof byte[]) {
 			return value;
 		}
-		
+
 		Object ret = null;
 		String strValue = value.toString();
-		
+
 		// Tries to convert to INT if possible
 		try {
 			ret = Integer.valueOf(strValue);
 		} catch (Exception e) {
 			// Silent ignore
 		}
-		
+
 		// Tries to convert to LONG if possible
 		try {
 			if (ret == null) {
@@ -179,7 +201,7 @@ public class Core_MetaObject implements MetaObject {
 		} catch (Exception e) {
 			// Silent ignore
 		}
-		
+
 		// Tries to convert to double if possible
 		try {
 			if (ret == null) {
@@ -188,22 +210,24 @@ public class Core_MetaObject implements MetaObject {
 		} catch (Exception e) {
 			// Silent ignore
 		}
-		
+
 		// Drop if accuracy or content is lost in the conversion process
 		if (ret != null && ret.toString().equals(strValue)) {
 			return ret;
 		}
 		return value;
 	}
-	
+
 	// MetaObject save operations
 	//----------------------------------------------
-	
-	/// Collapse delta map to remote map, but DOES NOT actually update
-	/// the remote data map inside the storage backend, this is done by the
-	/// save delta / save all functionality.
-	///
-	/// Seriously do not use this except in those cases
+
+	/**
+	* Collapse delta map to remote map, but DOES NOT actually update
+	* the remote data map inside the storage backend, this is done by the
+	* save delta / save all functionality.
+	*
+	* Seriously do not use this except in those cases
+	**/
 	protected void collapseDeltaToRemoteMap() {
 		ensureCompleteRemoteDataMap();
 		for (Entry<String, Object> entry : deltaDataMap.entrySet()) {
@@ -216,101 +240,109 @@ public class Core_MetaObject implements MetaObject {
 		}
 		deltaDataMap = new HashMap<String, Object>();
 	}
-	
-	/// Save the delta changes to storage. This only push the changes made to the server
-	/// as such on heavy usage, it may create write sequence errors
+
+	/**
+	* Save the delta changes to storage. This only push the changes made to the server
+	* as such on heavy usage, it may create write sequence errors
+	**/
 	@Override
 	public void saveDelta() {
 		ensureCompleteRemoteDataMap();
 		mainTable.metaObjectRemoteDataMap_update(_oid, this, deltaDataMap.keySet());
 		collapseDeltaToRemoteMap();
 	}
-	
-	/// Save all the configured data, ignore delta handling. This helps ensure all data
-	/// is written in a single session for consistency. 
-	/// 
-	/// In some implementation, this maybe the only way.
+
+	/**
+	* Save all the configured data, ignore delta handling. This helps ensure all data
+	* is written in a single session for consistency.
+	*
+	* In some implementation, this maybe the only way.
+	**/
 	@Override
 	public void saveAll() {
 		ensureCompleteRemoteDataMap();
-		
+
 		Set<String> keySet = new HashSet<String>(deltaDataMap.keySet());
 		keySet.addAll(remoteDataMap.keySet());
 		mainTable.metaObjectRemoteDataMap_update(_oid, this, keySet);
-		
+
 		collapseDeltaToRemoteMap();
 	}
-	
+
 	// Critical map functions
 	//----------------------------------------------
-	
-	/// Gets and return the requested current value
-	///
-	/// @param   key to use
-	///
-	/// @return  Value if present, NULL if fail
+
+	/**
+	* Gets and return the requested current value
+	*
+	* @param   key to use
+	*
+	* @return  Value if present, NULL if fail
+	**/
 	@Override
 	public Object get(Object key) {
-		
+
 		// Get key operation : Special case
 		if ("_oid".equalsIgnoreCase(key.toString())) {
 			return _oid;
 		}
-		
+
 		// Get from delta changes, if exists
 		Object ret = deltaDataMap.get(key);
-		
+
 		// Get from incomplete map, exists
 		if (ret == null && remoteDataMap != null && !isCompleteRemoteDataMap) {
 			ret = remoteDataMap.get(key);
 		}
-		
+
 		// Ensure the remote map is completed and fetch its result
 		if (ret == null) {
 			ensureCompleteRemoteDataMap();
 			ret = remoteDataMap.get(key);
 		}
-		
+
 		// Return null value
 		if (ret == null || ret.equals(ObjectToken.NULL)) {
 			return null;
 		}
-		
+
 		// Returns valid value
 		return ret;
 	}
-	
-	/// Put and set its delta value, set null is considered "remove"
-	///
-	/// @param  key to use
-	/// @param  Value to store, does conversion to numeric if possible
-	///
-	/// @return The previous value
+
+	/**
+	* Put and set its delta value, set null is considered "remove"
+	*
+	* @param  key to use
+	* @param  Value to store, does conversion to numeric if possible
+	*
+	* @return The previous value
+	**/
 	@Override
 	public Object put(String key, Object value) {
-		
+
 		// _oid overwriting handling
 		if ("_oid".equalsIgnoreCase(key.toString())) {
 			// Silently ignore changes, and return existing value
 			return _oid;
 		}
-		
+
 		// Get the previous value
 		Object ret = get(key);
-		
+
 		// Aggressive numeric conversion
 		value = agressiveNumericConversion(value);
-		
+
 		// If value and ret is both null, return
 		if (value == null && ret == null) {
 			return null;
 		}
-		
+
 		// If no values are changed, ignore and return
 		if (value != null && value.equals(ret)) {
 			return ret;
 		}
-		
+
 		// Check for change
 		if (value == null) {
 			// Put a NULL ObjectToken, if its a "delete"
@@ -319,22 +351,26 @@ public class Core_MetaObject implements MetaObject {
 			// Put the new value
 			deltaDataMap.put(key, value);
 		}
-		
+
 		return ret;
 	}
-	
-	/// Remove operation
-	///
-	/// @return  The old value if it exists
+
+	/**
+	* Remove operation
+	*
+	* @return  The old value if it exists
+	**/
 	@Override
 	public Object remove(Object key) {
 		return put(key.toString(), null);
 	}
-	
-	/// Raw keyset, that is unfiltered
-	/// Filtering is needed to ensure, no null values are used
-	///
-	/// @return  Unfiltered set of key names
+
+	/**
+	* Raw keyset, that is unfiltered
+	* Filtering is needed to ensure, no null values are used
+	*
+	* @return  Unfiltered set of key names
+	**/
 	protected Set<String> unfilteredForNullKeySet() {
 		Set<String> unfilteredForNull = new HashSet<String>();
 		ensureCompleteRemoteDataMap();
@@ -342,40 +378,42 @@ public class Core_MetaObject implements MetaObject {
 		unfilteredForNull.addAll(remoteDataMap.keySet());
 		return unfilteredForNull;
 	}
-	
-	/// Gets and return valid keySet()
+
+	/**
+	* Gets and return valid keySet()
+	**/
 	@Override
 	public Set<String> keySet() {
 		// Get unfilttered key
 		Set<String> unfilteredForNull = unfilteredForNullKeySet();
 		// Prepare result
 		Set<String> retSet = new HashSet<String>();
-		
+
 		// Iterate the set
 		for (String key : unfilteredForNull) {
 			if ("_oid".equalsIgnoreCase(key)) {
 				continue;
 			}
-			
+
 			// List final set ONLY, if it has value
 			if (get(key) != null) {
 				retSet.add(key);
 			}
 		}
-		
+
 		// Add _oid a special field
 		retSet.add("_oid");
-		
+
 		// Return the value.
 		return retSet;
 	}
-	
+
 	// To string operation : aids debugging
 	//----------------------------------------------
-	
-	///
-	/// Converts the map into a string, via JSON format. Which is to aid debugging.
-	///
+
+	/**
+	* Converts the map into a string, via JSON format. Which is to aid debugging.
+	**/
 	@Override
 	public String toString() {
 		return ConvertJSON.fromMap(this);

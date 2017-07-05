@@ -17,8 +17,10 @@ package picoded.conv;
 * Alternate character sets can be specified when constructing the object.
 **/
 public class Base58 extends BaseX {
-
-	/// Default charset value
+	
+	/**
+	* Default charset value
+	**/
 	public static final String DEFAULT_CHARSET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 

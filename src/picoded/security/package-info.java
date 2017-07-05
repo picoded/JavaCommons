@@ -1,3 +1,4 @@
-/// Security utility functions
+/**
+* Security utility functions
+**/
 package picoded.security;
-

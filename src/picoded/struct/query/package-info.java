@@ -1,6 +1,6 @@
-/// Java object / structures, search and query functionality
-///
-/// Think of it as emulating the SQL WHERE clauses, 
-/// because that is what it does
+/**
+* Java object / structures, search and query functionality
+*
+* Emulating the SQL WHERE clauses
+**/
 package picoded.struct.query;
-

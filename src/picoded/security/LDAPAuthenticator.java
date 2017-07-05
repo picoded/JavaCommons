@@ -18,97 +18,117 @@ import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 // LDAP dependencies
 
-///
-/// Simple LDAP Authenticator utility.
-///
-/// One thing to note strongly, is that it caches the valid login context,
-/// for the usage of more "complex" features. As such, try to limit a single
-/// login session to an object.
-///
+/**
+* Simple LDAP Authenticator utility.
+*
+* One thing to note strongly, is that it caches the valid login context,
+* for the usage of more "complex" features. As such, try to limit a single
+* login session to an object.
+**/
 public class LDAPAuthenticator {
-	
+
 	//////////////////////////////////////////
 	//
 	//  Static vars
 	//
 	//////////////////////////////////////////
-	
-	/// User Info attributes inside LDAP
+
+	/**
+	* User Info attributes inside LDAP
+	**/
 	private static String[] userInfoAttributes = { //
 	"distinguishedName", "cn", "name", //
 		"uid", "sn", "givenname", "memberOf", //
 		"samaccountname", "userPrincipalName" //
 	}; //
-	
+
 	//////////////////////////////////////////
 	//
 	//  Internal vars
 	//
 	//////////////////////////////////////////
-	
+
 	//
 	// Server config
 	//
-	
-	/// Default domain name
+
+	/**
+	* Default domain name
+	**/
 	private String defaultDomain = null;
-	
-	/// Server name to connect to
+
+	/**
+	* Server name to connect to
+	**/
 	private String serverName = null;
-	
-	/// Server port number to connect to
+
+	/**
+	* Server port number to connect to
+	**/
 	private int port = 389; //default non secure port
-	
+
 	//
 	// Cached context
 	//
-	
-	/// The cached context
+
+	/**
+	* The cached context
+	**/
 	protected LdapContext cachedContext = null;
-	
-	/// The cached username in context
+
+	/**
+	* The cached username in context
+	**/
 	protected String cachedUser = null;
-	
-	/// The cached domain in context
+
+	/**
+	* The cached domain in context
+	**/
 	protected String cachedDomain = null;
-	
+
 	//////////////////////////////////////////
 	//
 	//  Constructor
 	//
 	//////////////////////////////////////////
-	
-	/// Blank constructor (will rely on user, and server info for domain, etc)
+
+	/**
+	* Blank constructor (will rely on user, and server info for domain, etc)
+	**/
 	protected LDAPAuthenticator() {
 	}
-	
-	/// Constructor which setsup the various base config
+
+	/**
+	* Constructor which setsup the various base config
+	**/
 	public LDAPAuthenticator(String serverName, int port, String domainName) {
 		this.serverName = serverName;
 		this.port = port;
 		this.defaultDomain = domainName;
 	}
-	
-	/// Closes the current cached context if any
+
+	/**
+	* Closes the current cached context if any
+	**/
 	public void close() throws NamingException {
 		cachedUser = null;
 		cachedDomain = null;
-		
+
 		closeContext(cachedContext);
 		cachedContext = null;
 	}
-	
+
 	//////////////////////////////////////////
 	//
 	//  Utility function
 	//
 	//////////////////////////////////////////
-	
-	///
-	/// Closes the ldap context silently
-	///
-	/// @param LdapContext to close
-	///
+
+	/**
+	* Closes the ldap context silently
+	*
+	* @param LdapContext to close
+	**/
 	protected void closeContext(LdapContext context) throws NamingException {
 		if (context != null) {
 			//			try {
@@ -118,14 +138,14 @@ public class LDAPAuthenticator {
 			//			}
 		}
 	}
-	
-	///
-	/// Converts the domain name, to the LDAP DC format
-	///
-	/// @param domainname used
-	///
-	/// @returns LDAP DC
-	///
+
+	/**
+	* Converts the domain name, to the LDAP DC format
+	*
+	* @param domainname used
+	*
+	* @return LDAP DC
+	**/
 	private static String domainNameToLdapDC(String domainName) {
 		StringBuilder buf = new StringBuilder();
 		for (String token : domainName.split("\\.")) {
@@ -139,57 +159,61 @@ public class LDAPAuthenticator {
 		}
 		return buf.toString();
 	}
-	
+
 	//////////////////////////////////////////
 	//
 	//  Authentication function
 	//
 	//////////////////////////////////////////
-	
-	///
-	/// Used to authenticate a user given a username/password and domain name.
-	///
-	/// @returns  The expected error message, if any. Else simply null for success
-	///
+
+	/**
+	* Used to authenticate a user given a username/password and domain name.
+	*
+	* @return  The expected error message, if any. Else simply null for success
+	**/
 	public String login(String username, String password) {
-		
-		//
-		// Sanity checks
-		//
+
+		/**
+		* Sanity checks
+		**/
 		if (username == null) {
 			return "Invalid blank username (null)";
 		}
-		
+
 		if ((username = username.trim()).length() <= 0) {
 			return "Invalid blank username (length=0)";
 		}
-		
-		//
-		// Domain names overwrite
-		//
+
+		/**
+		* Domain names overwrite
+		**/
 		String usedUsername = username; //username actually used
 		String domainName = defaultDomain.trim(); //domain name actually used
 		if (usedUsername.indexOf('@') >= 1) {
 			String[] splitNames = usedUsername.split("@");
-			
+
 			if (splitNames.length != 2) {
 				return "Unexpected username with improper domain (" + usedUsername + ")";
 			}
-			
+
 			usedUsername = splitNames[0];
 			domainName = splitNames[1].trim();
 		}
-		
-		//
-		// Domain names validation check
-		//
-		
-		// Possibly invalid domain name
+
+		/**
+		* Domain names validation check
+		**/
+
+		/**
+		* Possibly invalid domain name
+		**/
 		if (domainName.length() <= 0) {
 			domainName = null;
 		}
-		
-		// Fallback to server domain
+
+		/**
+		* Fallback to server domain
+		**/
 		if (domainName == null) {
 			try {
 				String fqdn = java.net.InetAddress.getLocalHost().getCanonicalHostName();
@@ -200,42 +224,54 @@ public class LDAPAuthenticator {
 				// Does nothing
 			}
 		}
-		
-		// Missing domain name check
+
+		/**
+		* Missing domain name check
+		**/
 		if (domainName == null || domainName.length() <= 0) {
 			return "Missing domain name parameter for user (" + usedUsername + ")";
 		}
-		
-		//
-		// password length 0, is considered null (no password
-		//
+
+		/**
+		* password length 0, is considered null (no password
+		**/
 		if (password != null && (password = password.trim()).length() == 0) {
 			password = null;
 		}
-		
-		//
-		// Create property for context
-		//
+
+		/**
+		* Create property for context
+		**/
 		Hashtable<String, String> props = new Hashtable<String, String>();
-		
-		// Context builder
+
+		/**
+		* Context builder
+		**/
 		props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		
-		// User, domain and pass
+
+		/**
+		* User, domain and pass
+		**/
 		props.put(Context.SECURITY_PRINCIPAL, usedUsername + "@" + domainName);
 		if (password != null) {
 			props.put(Context.SECURITY_CREDENTIALS, password);
 		}
-		
-		// LDAP Server connection
+
+		/**
+		* LDAP Server connection
+		**/
 		String serverNameWithPort = serverName + ":" + port;
 		String ldapURL = "ldap://" + ((serverName == null) ? domainName : serverNameWithPort);
 		props.put(Context.PROVIDER_URL, ldapURL);
-		
-		/// The login context
+
+		/**
+		* The login context
+		**/
 		LdapContext loginContext = null;
-		
-		/// Try and catch the errors
+
+		/**
+		* Try and catch the errors
+		**/
 		try {
 			loginContext = new InitialLdapContext(props, null);
 		} catch (javax.naming.CommunicationException e) {
@@ -249,39 +285,39 @@ public class LDAPAuthenticator {
 		cachedDomain = domainName;
 		cachedUser = usedUsername;
 		cachedContext = loginContext;
-		
+
 		return null;
 	}
-	
-	///
-	/// Get some basic user information. Containing the following (userInfoAttributes)
-	///
-	/// Requires a previously valid authentication()
-	///
-	/// "distinguishedName", "cn", "name",
-	/// "uid", "sn", "givenname", "memberOf",
-	/// "samaccountname", "userPrincipalName"
-	///
-	/// @returns Map<String,String> of the user info mentioned above.
-	///
+
+	/**
+	* Get some basic user information. Containing the following (userInfoAttributes)
+	*
+	* Requires a previously valid authentication()
+	*
+	* "distinguishedName", "cn", "name",
+	* "uid", "sn", "givenname", "memberOf",
+	* "samaccountname", "userPrincipalName"
+	*
+	* @return Map<String,String> of the user info mentioned above.
+	**/
 	public Map<String, String> userInfo() {
-		
-		//
-		// Basic setup and checks
-		//
+
+		/**
+		* Basic setup and checks
+		**/
 		Map<String, String> ret = new HashMap<String, String>();
 		String usedDomain = cachedDomain;
 		String usedUsername = cachedUser;
 		String principalName = usedUsername + "@" + usedDomain;
 		LdapContext usedContext = cachedContext;
-		
+
 		if (usedContext == null) {
 			throw new RuntimeException("Missing user context, call authenticate() first");
 		}
-		
-		//
-		// Try to search user
-		//
+
+		/**
+		* Try to search user
+		**/
 		try {
 			SearchControls controls = new SearchControls();
 			controls.setSearchScope(SUBTREE_SCOPE);
@@ -289,7 +325,7 @@ public class LDAPAuthenticator {
 			NamingEnumeration<SearchResult> answer = usedContext.search(
 				domainNameToLdapDC(usedDomain), "(& (userPrincipalName=" + principalName
 					+ ")(objectClass=user))", controls);
-			
+
 			if (answer.hasMore()) {
 				Attributes attr = answer.next().getAttributes();
 				if (attr != null && attr.get("userPrincipalName") != null) {
@@ -301,7 +337,7 @@ public class LDAPAuthenticator {
 						if (attr.get(info) != null) {
 							val = attr.get(info).get();
 						}
-						
+
 						if (val != null) {
 							ret.put(info, val.toString());
 						} else {

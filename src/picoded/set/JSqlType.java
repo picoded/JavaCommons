@@ -1,54 +1,69 @@
 package picoded.set;
 
-/// JSql type options enum, see JSql.sqlType for its usage
+/**
+* JSql type options enum, see JSql.sqlType for its usage
+**/
 public enum JSqlType {
-	
-	/// invalid type (reserved for base class)
+
+	/**
+	* invalid type (reserved for base class)
+	**/
 	INVALID,
-	
-	/// Others
+	/**
+	* Others
+	**/
 	OTHERS,
-	
-	/// sqlite jdbc or file access
+	/**
+	* sqlite jdbc or file access
+	**/
 	SQLITE,
-	
-	/// mysql connection mode
+	/**
+	* mysql connection mode
+	**/
 	MYSQL,
-	
-	/// oracle connection mode
+	/**
+	* oracle connection mode
+	**/
 	ORACLE,
-	
-	/// MS-Sql connection mode
+	/**
+	* MS-Sql connection mode
+	**/
 	MSSQL,
-	
-	/// Postgres connection mode
+	/**
+	* Postgres connection mode
+	**/
 	POSTGRESQL,
-	
-	/// DB2 connection mode
+	/**
+	* DB2 connection mode
+	**/
 	DB2;
-	
-	/// Get name and toString alias to name() varient
+	/**
+	* Get name and toString alias to name() varient
+	**/
 	public String getName() {
 		return super.name();
 	}
-	
-	/// Get name and toString alias to name() varient
+	/**
+	* Get name and toString alias to name() varient
+	**/
 	public String toString() {
 		return super.name();
 	}
-	
-	/// TypeMap to be extended, and stored in their respective package usage
+	/**
+	* TypeMap to be extended, and stored in their respective package usage
+	**/
 	public static class JSqlTypeSet {
 		public static final JSqlType INVALID = JSqlType.INVALID;
 		public static final JSqlType OTHERS = JSqlType.OTHERS;
-		
+
 		public static final JSqlType SQLITE = JSqlType.SQLITE;
 		public static final JSqlType MYSQL = JSqlType.MYSQL;
 		public static final JSqlType ORACLE = JSqlType.ORACLE;
 		public static final JSqlType MSSQL = JSqlType.MSSQL;
 	}
-	
-	/// Byte to enum serialization
+	/**
+	* Byte to enum serialization
+	**/
 	public static JSqlType toEnum(int val) {
 		switch (val) {
 		case 0:
@@ -70,8 +85,9 @@ public enum JSqlType {
 		}
 		return null;
 	}
-	
-	/// Enum to byte serialization
+	/**
+	* Enum to byte serialization
+	**/
 	public static int toInt(JSqlType val) {
 		switch (val) {
 		case INVALID:

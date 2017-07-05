@@ -31,7 +31,7 @@ import picoded.conv.ArrayConv;
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.java}
 * // Below is the inner data structure format of JSqlResult,
 * // Where its respective fieldname/row can be accessed natively.
-* HashMap<String /*fieldName*/, Object[] /*rowResults array*/ > JSqlResultFormat;
+* HashMap<String, Object[]> JSqlResultFormat;
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *
 * *******************************************************************************

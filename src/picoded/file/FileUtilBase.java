@@ -1182,11 +1182,13 @@ public class FileUtilBase {
 		}
 	}
 
+	/**
 	* Writes a CharSequence to a file creating the file if it does not exist.
 	*
 	* @param file     the file to write
 	* @param data     the content to write to the file
 	* @param encoding the encoding to use, {@code null} means platform default
+	**/
 	public static void write(final File file, final CharSequence data, final String encoding) {
 		try {
 			FileUtils.write(file, data, encoding);

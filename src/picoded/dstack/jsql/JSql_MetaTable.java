@@ -20,6 +20,8 @@ import picoded.conv.ListValueConv;
 
 /// JSql implmentation of MetaTable
 ///
+/// Due to how complex this class is, it has been split apart into multiple sub classes
+///
 public class JSql_MetaTable extends Core_MetaTable {
 	
 	//--------------------------------------------------------------------------
@@ -32,7 +34,10 @@ public class JSql_MetaTable extends Core_MetaTable {
 	protected JSql sqlObj = null;
 	
 	/// The tablename for the key value pair map
-	protected String sqlTableName = null;
+	protected String dataTableName = null;
+	
+	/// The tablename the parent key
+	protected String baseTableName = null;
 	
 	/// JSql setup 
 	///
@@ -41,7 +46,8 @@ public class JSql_MetaTable extends Core_MetaTable {
 	public JSql_MetaTable(JSql inJSql, String tablename) {
 		super();
 		sqlObj = inJSql;
-		sqlTableName = "MT_"+tablename;
+		baseTableName = "MB_"+tablename;
+		dataTableName = "MD_"+tablename;
 	}
 	
 	//--------------------------------------------------------------------------
@@ -81,9 +87,6 @@ public class JSql_MetaTable extends Core_MetaTable {
 	/// Raw datastorage type
 	protected String rawDataColumnType = "BLOB";
 	
-	/// Indexed view prefix, this is used to handle index conflicts between "versions" if needed
-	protected String viewSuffix = "";
-	
 	//--------------------------------------------------------------------------
 	//
 	// Backend system setup / teardown / maintenance (DStackCommon)
@@ -94,10 +97,37 @@ public class JSql_MetaTable extends Core_MetaTable {
 	@Override
 	public void systemSetup() {
 		
-		// Table constructor
-		//-------------------
+		// BASE Table constructor
+		//----------------------------
 		sqlObj.createTable( //
-			sqlTableName, //
+			baseTableName, //
+			new String[] { //
+			// Primary key, as classic int, this is used to lower SQL
+			// fragmentation level, and index memory usage. And is not accessible.
+			// Sharding and uniqueness of system is still maintained by GUID's
+				"pKy", //
+				// Time stamps
+				"cTm", //object created time
+				"uTm", //object updated time
+				"eTm", //object expire time (for future use)
+				// Object keys
+				"oID" //_oid
+			}, //
+			new String[] { //
+				pKeyColumnType, //Primary key
+				// Time stamps
+				tStampColumnType, //
+				tStampColumnType, //
+				tStampColumnType, //
+				// Object keys
+				objColumnType //
+			} //
+		);
+		
+		// DATA Table constructor
+		//----------------------------
+		sqlObj.createTable( //
+			dataTableName, //
 			new String[] { //
 			// Primary key, as classic int, this is used to lower SQL
 			// fragmentation level, and index memory usage. And is not accessible.
@@ -137,19 +167,39 @@ public class JSql_MetaTable extends Core_MetaTable {
 				rawDataColumnType
 			} //
 		);
-			
+		
 		// Unique index
 		//------------------------------------------------
 
+		// This optimizes query by object keys
+		// + oID
+		sqlObj.createIndex( //
+			baseTableName, "oID", "UNIQUE", "unq" //
+		); //
+		
 		// This optimizes query by object keys, 
 		// with the following combinations
 		// + oID
 		// + oID, kID
 		// + oID, kID, idx
 		sqlObj.createIndex( //
-			sqlTableName, "oID, kID, idx", "UNIQUE", "unq" //
+			dataTableName, "oID, kID, idx", "UNIQUE", "unq" //
 		); //
-			
+		
+		// Foreign key constraint,
+		// to migrate functionality over to JSQL class itself
+		try {
+			sqlObj.update_raw( //
+				"ALTER TABLE "+dataTableName+ //
+				"ADD CONSTRAINT "+dataTableName+"_fk"+ //
+				"FOREIGN KEY (oID) REFERENCES "+baseTableName+"(oID)" + //
+				"ON DELETE CASCADE" // NOTE : This slows performance down
+			);
+		} catch(Exception e) {
+			// Silence exception
+			// @TODO : properly handle conflicts only
+		}
+
 		// Key Values search index
 		//------------------------------------------------
 		
@@ -157,14 +207,14 @@ public class JSql_MetaTable extends Core_MetaTable {
 		// + kID
 		// + kID, nVl
 		sqlObj.createIndex( //
-			sqlTableName, "kID, nVl", null, "knIdx" //
+			dataTableName, "kID, nVl", null, "knIdx" //
 		); //
 		
 		// This optimizes for string values
 		// + kID
 		// + kID, sVl
 		sqlObj.createIndex( //
-			sqlTableName, "kID, sVl", null, "ksIdx" //
+			dataTableName, "kID, sVl", null, "ksIdx" //
 		); //
 		
 		// Full text index, for textual data
@@ -176,7 +226,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 		//	);
 		//} else {
 		// sqlObj.createIndex( //
-		// 	sqlTableName, "tVl", null, "tVlI" // Sqlite uses normal index
+		// 	dataTableName, "tVl", null, "tVlI" // Sqlite uses normal index
 		// ); //
 		//}
 			
@@ -198,12 +248,12 @@ public class JSql_MetaTable extends Core_MetaTable {
 		
 		// // By created time
 		// sqlObj.createIndex( //
-		// 	sqlTableName, "cTm, kID, nVl, sVl", null, "cTm_valMap" //
+		// 	dataTableName, "cTm, kID, nVl, sVl", null, "cTm_valMap" //
 		// ); //
 
 		// // By updated time
 		// sqlObj.createIndex( //
-		// 	sqlTableName, "uTm, kID, nVl, sVl", null, "uTm_valMap" //
+		// 	dataTableName, "uTm, kID, nVl, sVl", null, "uTm_valMap" //
 		// ); //
 			
 		//sqlObj.createIndex( //
@@ -217,13 +267,15 @@ public class JSql_MetaTable extends Core_MetaTable {
 	
 	/// Teardown and delete the backend storage table, etc. If needed
 	public void systemDestroy() {
-		sqlObj.dropTable(sqlTableName);
+		sqlObj.dropTable(dataTableName);
+		sqlObj.dropTable(baseTableName);
 	}
 	
 	/// Removes all data, without tearing down setup
 	@Override
 	public void clear() {
-		sqlObj.delete(sqlTableName);
+		sqlObj.delete(dataTableName);
+		sqlObj.delete(baseTableName);
 	}
 	
 	//--------------------------------------------------------------------------
@@ -241,8 +293,16 @@ public class JSql_MetaTable extends Core_MetaTable {
 	///
 	/// @return  nothing
 	protected void metaObjectRemoteDataMap_remove(String oid) {
+		// Delete the data
 		sqlObj.delete(
-			sqlTableName,
+			dataTableName,
+			"oID = ?",
+			new Object[] { oid }
+		);
+
+		// Delete the parent key
+		sqlObj.delete(
+			baseTableName,
 			"oID = ?",
 			new Object[] { oid }
 		);
@@ -251,14 +311,31 @@ public class JSql_MetaTable extends Core_MetaTable {
 	/// Gets the complete remote data map, for MetaObject.
 	/// Returns null if not exists
 	protected Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
-		return JSql_MetaTableUtils.JSqlObjectMapFetch(sqlObj, sqlTableName, _oid, null);
+		return JSql_MetaTableUtils.JSqlObjectMapFetch(sqlObj, dataTableName, _oid, null);
 	}
 	
 	/// Updates the actual backend storage of MetaObject
 	/// either partially (if supported / used), or completely
 	protected void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap,
 		Set<String> keys) {
-		JSql_MetaTableUtils.JSqlObjectMapAppend(sqlObj, sqlTableName, _oid, fullMap, keys, true);
+
+		// Curent timestamp
+		long now = JSql_MetaTableUtils.getCurrentTimestamp();
+		
+		// Ensure GUID is registered
+		sqlObj.upsert( //
+			baseTableName, //
+			new String[] { "oID" }, //
+			new Object[] { _oid }, // 
+			new String[] { "uTm" }, //
+			new Object[] { now }, //
+			new String[] { "cTm", "eTm" }, //
+			new Object[] { now, 0 }, // 
+			null // The only misc col, is pKy, which is being handled by DB
+		);
+		
+		// Does the data append
+		JSql_MetaTableUtils.JSqlObjectMapAppend(sqlObj, dataTableName, _oid, fullMap, keys, true);
 	}
 
 	//--------------------------------------------------------------------------
@@ -274,7 +351,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 	/// @returns set of keys
 	@Override
 	public Set<String> keySet() {
-		JSqlResult r = sqlObj.select(sqlTableName, "DISTINCT oID");
+		JSqlResult r = sqlObj.select(baseTableName, "oID");
 		if (r == null || r.get("oID") == null) {
 			return new HashSet<String>();
 		}
@@ -302,7 +379,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 	@Override
 	public MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr,
 		int offset, int limit) {
-		return JSql_MetaTableUtils.metaTableQuery(this, sqlObj, sqlTableName, whereClause,
+		return JSql_MetaTableUtils.metaTableQuery(this, sqlObj, dataTableName, whereClause,
 			whereValues, orderByStr, offset, limit);
 		//return super.query( whereClause, whereValues, orderByStr, offset, limit );
 	}
@@ -324,7 +401,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 	@Override
 	public String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr,
 		int offset, int limit) {
-		return JSql_MetaTableUtils.metaTableQueryKey(this, sqlObj, sqlTableName, whereClause,
+		return JSql_MetaTableUtils.metaTableQueryKey(this, sqlObj, dataTableName, whereClause,
 			whereValues, orderByStr, offset, limit);
 		//return super.query( whereClause, whereValues, orderByStr, offset, limit );
 	}
@@ -337,7 +414,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 	/// @returns  The total count for the query
 	@Override
 	public long queryCount(String whereClause, Object[] whereValues) {
-		return JSql_MetaTableUtils.metaTableCount(this, sqlObj, sqlTableName, whereClause,
+		return JSql_MetaTableUtils.metaTableCount(this, sqlObj, dataTableName, whereClause,
 			whereValues, null, -1, -1);
 	}
 	
@@ -361,11 +438,83 @@ public class JSql_MetaTable extends Core_MetaTable {
 	///
 	@Override
 	public Set<String> getKeyNames(int seekDepth) {
-		JSqlResult r = sqlObj.select(sqlTableName, "DISTINCT kID");
+		JSqlResult r = sqlObj.select(dataTableName, "DISTINCT kID");
 		if (r == null || r.get("kID") == null) {
 			return new HashSet<String>();
 		}
 		
 		return ListValueConv.toStringSet(r.getObjectList("kID"));
 	}
+
+	//--------------------------------------------------------------------------
+	//
+	// Special iteration support
+	//
+	//--------------------------------------------------------------------------
+
+	/// Gets and return a random object ID
+	///
+	/// @return  Random object ID
+	public String randomObjectID() {
+		// Get a random ID
+		JSqlResult r = sqlObj.randomSelect(baseTableName, "oID", null, null, 1);
+
+		// No result : NULL
+		if (r == null || r.get("oID") == null || r.rowCount() <= 0) {
+			return null;
+		}
+
+		// Return the result
+		return r.getStringArray("oID")[0];
+	}
+
+	///
+	/// Gets and return the next object ID key for iteration given the current ID, 
+	/// null gets the first object in iteration.
+	///
+	/// It is important to note actual iteration sequence is implementation dependent.
+	/// And does not gurantee that newly added objects, after the iteration started,
+	/// will be part of the chain of results.
+	///
+	/// Similarly if the currentID was removed midway during iteration, the return 
+	/// result is not properly defined, and can either be null, or the closest object matched
+	/// or even a random object.
+	///
+	/// It is however guranteed, if no changes / writes occurs. A complete iteration
+	/// will iterate all existing objects.
+	///
+	/// The larger intention of this function, is to allow a background thread to slowly
+	/// iterate across all objects, eventually. With an acceptable margin of loss on,
+	/// recently created/edited object. As these objects will eventually be iterated in
+	/// repeated rounds on subsequent calls.
+	///
+	/// Due to its roughly random nature in production (with concurrent objects generated)
+	/// and its iterative nature as an eventuality. The phrase looselyIterate was chosen,
+	/// to properly reflect its nature.
+	///
+	/// Another way to phrase it, in worse case scenerio, its completely random, eventually iterating all objects
+	/// In best case scenerio, it does proper iteration as per normal.
+	///
+	/// @param   Current object ID, can be NULL
+	///
+	/// @return  Next object ID, if found
+	///
+	public String looselyIterateObjectID(String currentID) {
+		// Result set to fetch next ID
+		JSqlResult r = null;
+		if( currentID == null ) {
+			r = sqlObj.select(baseTableName, "oID", null, null, "oID ASC", 1, 0);
+		} else {
+			r = sqlObj.select(baseTableName, "oID", "oID > ?", new Object[] { currentID }, "oID ASC", 1, 0);
+		}
+
+		// No result : NULL
+		if (r == null || r.get("oID") == null || r.rowCount() <= 0) {
+			return null;
+		}
+
+		// Return the result
+		return r.getStringArray("oID")[0];
+	}
+
 }

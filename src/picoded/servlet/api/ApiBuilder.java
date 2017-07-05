@@ -75,6 +75,7 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	//-------------------------------------------------------------------
 	
 	/// Object token representing a "removed" endpoint
+	protected static ApiFunction NULLAPIFUNCTION = (req,res) -> { return res; };
 	protected static ApiEndpoint NULLENDPOINT = new ApiEndpoint();
 
 	/// ROOT Api connection, refenced by sub-class implementation

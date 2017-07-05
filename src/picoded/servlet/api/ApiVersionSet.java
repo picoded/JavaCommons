@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import java.util.function.BiFunction;
 
 import picoded.set.HttpRequestType;
+import picoded.struct.HashMapList;
 
 ///
 /// Represents the various different function / filter maps
@@ -16,6 +17,7 @@ public class ApiVersionSet {
 	Map<String, ApiEndpoint> endpointMap = new HashMap<String, ApiEndpoint>();
 
 	/// The filter map for
+	HashMapList<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> filterMap = null;
 
 	/// Takes in another endpoint map, and overwrite it onto itself!
 	/// This is used internally by "collapsedVersionSet" functions
@@ -24,4 +26,6 @@ public class ApiVersionSet {
 	protected void importVersionSet(ApiVersionSet importSet) {
 		endpointMap.putAll( importSet.endpointMap );
 	}
+
+	
 }

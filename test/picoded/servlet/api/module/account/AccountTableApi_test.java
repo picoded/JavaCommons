@@ -3,6 +3,7 @@ package picoded.servlet.api.module.account;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import org.junit.*;
 
 import java.util.*;
@@ -535,78 +536,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		assertNull(res.get(Account_Strings.RES_ERROR));
 		assertNotNull(res.get(Account_Strings.RES_SINGLE_RETURN_VALUE));
 	}
-	//
-	// @Test
-	// public void removeMemberFromGroup() {
-	// 	Map<String,Object> res = null;
-	// 	/// -----------------------------------------
-	// 	/// Preparation before commencement of Test
-	// 	/// -----------------------------------------
-	// 	// Ensure that there is an existing user
-	// 	Map<String,Object> params = new HashMap<String,Object>();
-	// 	params.put(Account_Strings.REQ_USERNAME, "removemember");
-	// 	params.put(Account_Strings.REQ_PASSWORD, "password");
-	// 	res = requestJSON("new", params);
-	// 	assertNull("RemoveMemberTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
-	//
-	// 	params.put(Account_Strings.REQ_USERNAME, "wrongmemberNotInGroup");
-	// 	params.put(Account_Strings.REQ_PASSWORD, "password");
-	// 	res = requestJSON("new", params);
-	// 	assertNull("RemoveMemberTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
-	// 	// Ensure that there is an existing group
-	// 	params.clear();
-	// 	params.put(Account_Strings.REQ_USERNAME, "memberRemoveGroup");
-	// 	params.put(Account_Strings.REQ_IS_GROUP, true);
-	// 	res = requestJSON("new", params);
-	// 	assertNull("RemoveMemberTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
-	// 	// Ensure that the user is added to the group
-	// 	params.clear();
-	// 	params.put(Account_Strings.REQ_USERNAME, "removemember");
-	// 	params.put(Account_Strings.REQ_GROUPNAME, "memberRemoveGroup");
-	// 	params.put(Account_Strings.REQ_ROLE, "member");
-	// 	res = requestJSON("addMember", params);
-	// 	assertNull("RemoveMemberTest: Something wrong in adding member to group.", res.get(Account_Strings.RES_ERROR));
-	// 	/// -----------------------------------------
-	// 	/// End of Preparation before commencement of Test
-	// 	/// -----------------------------------------
-	//
-	// 	// Invalid user, group and role
-	// 	res = requestJSON("removeMember", null);
-	// 	assertEquals(Account_Strings.ERROR_NO_USERNAME, res.get(Account_Strings.RES_ERROR));
-	//
-	// 	params.clear();
-	// 	params.put(Account_Strings.REQ_USERNAME, "wrong member");
-	// 	res = requestJSON("removeMember", params);
-	// 	assertEquals(Account_Strings.ERROR_NO_GROUPNAME, res.get(Account_Strings.RES_ERROR));
-	//
-	// 	params.put(Account_Strings.REQ_GROUPNAME, "wrong group");
-	// 	res = requestJSON("removeMember", params);
-	// 	assertEquals(Account_Strings.ERROR_NO_GROUP, res.get(Account_Strings.RES_ERROR));
-	//
-	// 	// Valid group
-	// 	params.put(Account_Strings.REQ_GROUPNAME, "memberRemoveGroup");
-	// 	res = requestJSON("removeMember", params);
-	// 	assertEquals(Account_Strings.ERROR_NO_USER, res.get(Account_Strings.RES_ERROR));
-	//
-	// 	// Invalid user
-	// 	params.put(Account_Strings.REQ_USERNAME, "wrongmemberNotInGroup");
-	// 	res = requestJSON("removeMember", params);
-	// 	assertEquals("User is not in group.", res.get(Account_Strings.RES_ERROR));
-	//
-	// 	// Legit Account but not Group Account
-	// 	params.put(Account_Strings.REQ_GROUPNAME, "removemember");
-	// 	res = requestJSON("removeMember", params);
-	// 	assertEquals("This is not a group.", res.get(Account_Strings.RES_ERROR));
-	//
-	// 	// Valid User and Group
-	// 	params.clear();
-	// 	params.put(Account_Strings.REQ_USERNAME, "removemember");
-	// 	params.put(Account_Strings.REQ_GROUPNAME, "memberRemoveGroup");
-	// 	res = requestJSON("removeMember", params);
-	// 	assertNull(res.get(Account_Strings.RES_ERROR));
-	// 	assertNotNull(res.get(Account_Strings.RES_META));
-	// }
-	//
+
 	@Test
 	public void addNewMembershipRole() {
 		GenericConvertMap<String,Object> res = null;
@@ -768,6 +698,114 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(Account_Strings.REQ_USER_ID, userID.get(1));
 		res = requestJSON("getMemberRole", params);
 		assertEquals("knight", res.get(Account_Strings.RES_SINGLE_RETURN_VALUE));
+	}
+
+	@Test
+	public void getMemberListInfo(){
+		GenericConvertMap<String,Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		// Ensure that there is an existing user
+		Map<String,Object> params = new HashMap<String,Object>();
+		List<String> userID = new ArrayList<String>(), groupID = new ArrayList<String>();
+		List<String> addUserList1 = new ArrayList<String>(), addUserList2 = new ArrayList<String>();
+		List<String> expectedFailResult = new ArrayList<String>();
+		// Ensure that there is an existing group
+		for( int idx = 1; idx <= 2; idx ++ ) {
+			params.put(Account_Strings.REQ_USERNAME, "exampleGrp"+idx);
+			params.put(Account_Strings.REQ_IS_GROUP, true);
+			res = requestJSON("new", params);
+			assertNull("getMemberListInfoTest: Something wrong in creating group " + idx + ".", res.get(Account_Strings.RES_ERROR));
+			groupID.add(res.getString(Account_Strings.RES_ACCOUNT_ID));
+		}
+		for( int idx = 1; idx <= 5; idx ++ ) {
+			params.put(Account_Strings.REQ_USERNAME, "member" + idx);
+			params.put(Account_Strings.REQ_PASSWORD, "password");
+			res = requestJSON("new", params);
+			assertNull("getMemberListInfoTest: Something wrong in adding user " + idx + ".", res.get(Account_Strings.RES_ERROR));
+			userID.add(res.getString(Account_Strings.RES_ACCOUNT_ID));
+			if ( idx % 2 == 0 ) {
+				addUserList1.add(res.getString(Account_Strings.RES_ACCOUNT_ID));
+			} else {
+				addUserList2.add(res.getString(Account_Strings.RES_ACCOUNT_ID));
+			}
+		}
+		params.clear();
+		params.put(Account_Strings.REQ_ROLE, "member");
+		params.put(Account_Strings.REQ_ADD_LIST, addUserList1);
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		res = requestJSON("add_remove_member", params);
+		assertNull(res.get(Account_Strings.RES_ERROR));
+		assertEquals(expectedFailResult, res.get(Account_Strings.RES_FAIL_ADD));
+
+		params.clear();
+		params.put(Account_Strings.REQ_ROLE, "member");
+		params.put(Account_Strings.REQ_ADD_LIST, addUserList2);
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(1));
+		res = requestJSON("add_remove_member", params);
+		assertNull(res.get(Account_Strings.RES_ERROR));
+		assertEquals(expectedFailResult, res.get(Account_Strings.RES_FAIL_ADD));
+
+		List<List<String>> expectedResult = new ArrayList<List<String>>();
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+
+		// 1st Test: Empty Submission
+		res = requestJSON("get_member_list_info", null);
+		assertEquals(Account_Strings.ERROR_NO_GROUP, res.get(Account_Strings.RES_ERROR));
+
+		// 2nd Test: Invalid Group ID
+		params.clear();
+		params.put(Account_Strings.REQ_GROUP_ID, "smlj group ID");
+		res = requestJSON("get_member_list_info", params);
+		assertEquals(Account_Strings.ERROR_NO_GROUP, res.get(Account_Strings.RES_ERROR));
+
+		// 3rd Test: Valid Group ID unknown headers ( group 1 )
+		params.clear();
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		params.put(Account_Strings.REQ_HEADERS, "['first', 'second', 'third']");
+		res = requestJSON("get_member_list_info", params);
+		expectedResult.clear();
+		expectedResult.add(new ArrayList<>(Arrays.asList("", "", "")));
+		expectedResult.add(new ArrayList<>(Arrays.asList("", "", "")));
+		assertEquals(expectedResult, res.get(Account_Strings.RES_DATA));
+		assertTrue(res.getInt(Account_Strings.RES_RECORDS_TOTAL) == 2);
+		assertTrue(res.getInt(Account_Strings.RES_RECORDS_FILTERED) == 2);
+
+		// 4th Test: Valid Group ID invalid headers ( group 1 )
+		params.clear();
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		params.put(Account_Strings.REQ_HEADERS, " this is an invalid header");
+		res = requestJSON("get_member_list_info", params);
+		expectedResult.clear();
+		expectedResult.add(new ArrayList<>(Arrays.asList(userID.get(1), "member")));
+		expectedResult.add(new ArrayList<>(Arrays.asList(userID.get(3), "member")));
+		assertThat("Something is wrong with the lists", res.getList(Account_Strings.RES_DATA), containsInAnyOrder(expectedResult.toArray()));
+		assertTrue(res.getInt(Account_Strings.RES_RECORDS_TOTAL) == 2);
+		assertTrue(res.getInt(Account_Strings.RES_RECORDS_FILTERED) == 2);
+
+		// 5th Test: Valid Group ID default headers ( group 1 )
+		params.clear();
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		res = requestJSON("get_member_list_info", params);
+		assertThat("Something is wrong with the lists", res.getList(Account_Strings.RES_DATA), containsInAnyOrder(expectedResult.toArray()));
+		assertTrue(res.getInt(Account_Strings.RES_RECORDS_TOTAL) == 2);
+		assertTrue(res.getInt(Account_Strings.RES_RECORDS_FILTERED) == 2);
+
+		// 6th Test: Valid Group ID custom headers ( group 1 )
+		params.clear();
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		params.put(Account_Strings.REQ_HEADERS, "['" + Account_Strings.PROPERTIES_ROLE + "', 'group__oid', 'account_email', 'randomHeader']");
+		res = requestJSON("get_member_list_info", params);
+		expectedResult.clear();
+		expectedResult.add(new ArrayList<>(Arrays.asList("member", groupID.get(0), "member2", "")));
+		expectedResult.add(new ArrayList<>(Arrays.asList("member", groupID.get(0), "member4", "")));
+		assertTrue(res.getInt(Account_Strings.RES_RECORDS_TOTAL) == 2);
+		assertTrue(res.getInt(Account_Strings.RES_RECORDS_FILTERED) == 2);
+		assertThat("Something is wrong with the lists", res.getList(Account_Strings.RES_DATA), containsInAnyOrder(expectedResult.toArray()));
+
 	}
 	//
 	// 		// builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember);

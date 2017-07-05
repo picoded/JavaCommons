@@ -501,7 +501,7 @@ public class AccountTableApi implements ApiModule {
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type					| Description                                                                |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | data						| array				          | Rows containing the members' OBJECT of the group													 |
+	/// | data						| array				          | Rows containing the members' OBJECT per row of the group									 |
 	/// | draw            | int (optional)     		| Draw counter echoed back, and used by the datatables.js server-side API       | not returned
 	/// | recordsTotal    | int                		| Total amount of records. Before any search filter (But after base filters)    | not returned
 	/// | recordsFilterd  | int                		| Total amount of records. After all search filter                              | not returned
@@ -520,16 +520,18 @@ public class AccountTableApi implements ApiModule {
 		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
 
 		AccountObject group = ( groupID != null ) ? table.get(groupID) : table.getRequestUser(req.getHttpServletRequest(), null);
-		if ( group == null || group.isGroup()) {
+		if ( group == null || !group.isGroup()) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
 			return res;
 		}
+
 		String[] headers = req.getStringArray(Account_Strings.REQ_HEADERS, "['" + Account_Strings.PROPERTIES_OID + "', '" + Account_Strings.PROPERTIES_ROLE +"']");
-		AccountObject[] memberobjList = group.getGroups();
+		AccountObject[] memberobjList = group.getMembersAccountObject();
 		List<List<Object>> returnList = new ArrayList<List<Object>>();
 		int listCounter = 0;
 		for ( AccountObject ao : memberobjList ) {
 			MetaObject currentGrpAOMeta = group.getMember(ao);
+			returnList.add(new ArrayList<Object>());
 			for ( String column : headers ) {
 				if ( column.equalsIgnoreCase(Account_Strings.PROPERTIES_OID) ) {
 					returnList.get(listCounter).add(ao._oid());
@@ -558,10 +560,10 @@ public class AccountTableApi implements ApiModule {
 			listCounter++;
 		}
 		res.put(Account_Strings.RES_GROUP_ID, group._oid());
-		res.put(Account_Strings.RES_LIST, returnList);
+		res.put(Account_Strings.RES_DATA, returnList);
 		res.put(Account_Strings.RES_DRAW, req.getInt("draw"));
-		res.put("recordsTotal", returnList.size());
-		res.put("recordsFiltered", returnList.size());
+		res.put(Account_Strings.RES_RECORDS_TOTAL, returnList.size());
+		res.put(Account_Strings.RES_RECORDS_FILTERED, returnList.size());
 		res.put(Account_Strings.RES_HEADERS, headers);
 		return res;
 	};
@@ -582,7 +584,7 @@ public class AccountTableApi implements ApiModule {
 				failedList.add("ID: " + userID + ", Error: " + actionErrorMsg);
 				continue;
 			} else if ( action.equalsIgnoreCase("remove") && result.getInt(Account_Strings.PROPERTIES_IS_GROUP) == 0 && result._oid() == group._oid()) {
-				failedList.add("ID: " + group._oid() + ", Error: This is not a group.");
+				failedList.add("ID: " + group._oid() + ", Error: " + Account_Strings.ERROR_NOT_GROUP);
 				break;
 			}
 			successList.add(userID);
@@ -877,7 +879,7 @@ public class AccountTableApi implements ApiModule {
 
 		// builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember); // Tested
 		builder.put(path+"get_member_list_info", get_member_list_info); // Tested
-		builder.put(path+"add_remove_member", add_remove_member);
+		builder.put(path+"add_remove_member", add_remove_member); // Tested
 		builder.put(path+"get_single_member_meta", get_single_member_meta);
 
 		// builder.put(path+"getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested

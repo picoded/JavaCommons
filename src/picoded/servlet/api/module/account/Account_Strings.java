@@ -32,6 +32,8 @@ public class Account_Strings{
     public static final String RES_REMEMBER_ME = "rememberMe";
     public static final String RES_META = "meta";
     public static final String RES_DRAW = "draw";
+    public static final String RES_RECORDS_TOTAL = "recordsTotal";
+    public static final String RES_RECORDS_FILTERED = "recordsFiltered";
     // Data List Return Variables
     public static final String RES_HEADERS= "headers";
     public static final String RES_DATA = "data";
@@ -53,9 +55,10 @@ public class Account_Strings{
     /// ERROR MESSAGES
     public static final String ERROR_NO_GROUP = "No group is found.";
     public static final String ERROR_NO_GROUP_ID = "No groupID is found.";
+    public static final String ERROR_NO_GROUPNAME = "No groupname is found.";
+    public static final String ERROR_NOT_GROUP = "This is not a group.";
     public static final String ERROR_NO_USERNAME = "No username is supplied.";
     public static final String ERROR_NO_PASSWORD = "No password is supplied.";
-    public static final String ERROR_NO_GROUPNAME = "No groupname is found.";
     public static final String ERROR_NO_LOGIN_PASSWORD = "Missing login password.";
     public static final String ERROR_NO_LOGIN_ID = "Missing login ID.";
     public static final String ERROR_FAIL_LOGIN = "Failed login (wrong password or invalid user?).";

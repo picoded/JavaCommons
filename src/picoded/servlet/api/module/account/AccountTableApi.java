@@ -690,8 +690,8 @@ public class AccountTableApi implements ApiModule {
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
 	protected ApiFunction get_single_member_meta = (req, res) -> {
-		String accountID = req.getString(Account_Strings.REQ_USER_ID, null);
-		AccountObject ao = ( accountID != null ) ? table.get(accountID) : table.getRequestUser(req.getHttpServletRequest(), null);
+		String userID = req.getString(Account_Strings.REQ_USER_ID, null);
+		AccountObject ao = ( userID != null ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if( ao == null ) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
 			return res;
@@ -754,17 +754,50 @@ public class AccountTableApi implements ApiModule {
 		} else {
 			currentMemberMeta.saveDelta();
 		}
-		res.put(Account_Strings.RES_ACCOUNT_ID, memberIDToUpdate);
+		res.put(Account_Strings.RES_ACCOUNT_ID, ao._oid());
 		res.put(Account_Strings.RES_META, metaObj);
 		res.put(Account_Strings.RES_UPDATE_MODE, updateMode);
 		res.put(Account_Strings.RES_SUCCESS, true);
 
 		return res;
 	};
-	//
-	// protected ApiFunction do_password_reset = (req, res) -> {
-	//
-	// };
+
+	protected ApiFunction do_password_reset = (req, res) -> {
+		res.put(Account_Strings.RES_SUCCESS, false);
+		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		String oldPassword = req.getString(Account_Strings.REQ_OLD_PASSWORD, "");
+		if ( oldPassword.isEmpty() ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PASSWORD);
+			return res;
+		}
+		String newPassword = req.getString(Account_Strings.REQ_NEW_PASSWORD, "");
+		if ( newPassword.isEmpty() ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_NEW_PASSWORD);
+			return res;
+		}
+		String repeatPassword = req.getString(Account_Strings.REQ_REPEAT_PASSWORD, "");
+		if ( repeatPassword.isEmpty() ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_NEW_REPEAT_PASSWORD);
+			return res;
+		}
+		if ( !newPassword.equals(repeatPassword) ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_PASS_NOT_EQUAL);
+			return res;
+		}
+		if ( !ao.setPassword(newPassword, oldPassword) ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_PASS_INCORRECT);
+			return res;
+		}
+		res.put(Account_Strings.RES_SUCCESS, true);
+		res.put(Account_Strings.RES_ACCOUNT_ID, ao._oid());
+
+		return res;
+	};
 	//
 	// protected ApiFunction get_basic_user_info = (req, res) -> {
 	//
@@ -922,6 +955,7 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"lockTime", lockTime); // Tested
 		builder.put(path+"logout", logout); // Tested
 		builder.put(path+"new", new_account); // Tested
+		builder.put(path+"do_password_reset", do_password_reset);
 
 		//Group functionalities
 		builder.put(path+"groupRoles", groupRoles); // Tested
@@ -934,7 +968,7 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"get_member_list_info", get_member_list_info); // Tested
 		builder.put(path+"add_remove_member", add_remove_member); // Tested
 		builder.put(path+"get_single_member_meta", get_single_member_meta); // Tested
-		builder.put(path+"update_member_meta_info", update_member_meta_info);
+		builder.put(path+"update_member_meta_info", update_member_meta_info); // Tested
 		// builder.put(path+"getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
 		// builder.put(path+"getListOfMemberObjectOfGroup", getListOfMemberObjectOfGroup); // Tested
 	}

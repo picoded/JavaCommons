@@ -37,7 +37,7 @@ public class AccountTableApi_test extends ApiModule_test {
 			AccountTable table = new AccountTable(stack, "account");
 			AccountTableApi ret = new AccountTableApi(table);
 			// table.loginThrottle = (inAo, failures) -> {
-			// 	System.out.println("this was not ran");
+				// System.out.println("this was not ran <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 			// 	return (long) 2;
 			// };
 			if( !table.hasLoginID("laughing-man") ) {
@@ -1128,6 +1128,129 @@ public class AccountTableApi_test extends ApiModule_test {
 		assertEquals("delta", res.get(Account_Strings.RES_UPDATE_MODE));
 		res = requestJSON("logout", null);
 		assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
+	}
+
+	@Test
+	public void passwordReset(){
+		GenericConvertMap<String,Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		Map<String,Object> params = new HashMap<String,Object>();
+		List<String> userID = new ArrayList<String>();
+		// Ensure that there is an existing user
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "reset");
+		params.put(Account_Strings.REQ_PASSWORD, "password");
+		res = requestJSON("new", params);
+		assertNull("getMemberListInfoTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+		userID.add(res.getString(Account_Strings.RES_ACCOUNT_ID));
+
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+		// 1st Test: Empty Submission
+		TestSet ts = new TestSet(null, "do_password_reset", Account_Strings.ERROR_NO_USER, Account_Strings.RES_ERROR);
+		ts.executeGenericTestCase();
+		// 2nd Test: Invalid userID
+		params.clear();
+		params.put(Account_Strings.REQ_USER_ID, "randomID");
+		ts.setAndExecuteGTC(params, Account_Strings.ERROR_NO_USER, Account_Strings.RES_ERROR);
+		// 3rd Test: Valid userID, No old password
+		params.clear();
+		params.put(Account_Strings.REQ_USER_ID, userID.get(0));
+		ts.setAndExecuteGTC(params, Account_Strings.ERROR_NO_PASSWORD, Account_Strings.RES_ERROR);
+		// 4th Test: Valid userID, old password, no new password
+		params.clear();
+		params.put(Account_Strings.REQ_USER_ID, userID.get(0));
+		params.put(Account_Strings.REQ_OLD_PASSWORD, "password");
+		ts.setAndExecuteGTC(params, Account_Strings.ERROR_NO_NEW_PASSWORD, Account_Strings.RES_ERROR);
+		// 5th Test: Valid userID, old password, new password, no repeatPass
+		params.clear();
+		params.put(Account_Strings.REQ_USER_ID, userID.get(0));
+		params.put(Account_Strings.REQ_OLD_PASSWORD, "password");
+		params.put(Account_Strings.REQ_NEW_PASSWORD, "password");
+		ts.setAndExecuteGTC(params, Account_Strings.ERROR_NO_NEW_REPEAT_PASSWORD, Account_Strings.RES_ERROR);
+		// 6th Test: Valid userID, old password, new password, incorrect repeatPass
+		params.clear();
+		params.put(Account_Strings.REQ_USER_ID, userID.get(0));
+		params.put(Account_Strings.REQ_OLD_PASSWORD, "password");
+		params.put(Account_Strings.REQ_NEW_PASSWORD, "passwordnew");
+		params.put(Account_Strings.REQ_REPEAT_PASSWORD, "passwordHAHAHHA");
+		ts.setAndExecuteGTC(params, Account_Strings.ERROR_PASS_NOT_EQUAL, Account_Strings.RES_ERROR);
+		// 7th Test: Valid userID, incorrect old password, new password, correct repeatPass
+		params.clear();
+		params.put(Account_Strings.REQ_USER_ID, userID.get(0));
+		params.put(Account_Strings.REQ_OLD_PASSWORD, "wrongOldPasswr");
+		params.put(Account_Strings.REQ_NEW_PASSWORD, "passwordnew");
+		params.put(Account_Strings.REQ_REPEAT_PASSWORD, "passwordnew");
+		ts.setAndExecuteGTC(params, Account_Strings.ERROR_PASS_INCORRECT, Account_Strings.RES_ERROR);
+		// 8th Test: Valid userID, correct old password, new password, correct repeatPass
+		params.clear();
+		params.put(Account_Strings.REQ_USER_ID, userID.get(0));
+		params.put(Account_Strings.REQ_OLD_PASSWORD, "password");
+		params.put(Account_Strings.REQ_NEW_PASSWORD, "passwordnew");
+		params.put(Account_Strings.REQ_REPEAT_PASSWORD, "passwordnew");
+		ts.setAndExecuteGTC(params, true, Account_Strings.RES_SUCCESS);
+		// 9th Test: no userID, user not logged in, correct old password, new password, correct repeatPass
+		params.clear();
+		params.put(Account_Strings.REQ_OLD_PASSWORD, "password");
+		params.put(Account_Strings.REQ_NEW_PASSWORD, "passwordnewlol");
+		params.put(Account_Strings.REQ_REPEAT_PASSWORD, "passwordnewlol");
+		ts.setAndExecuteGTC(params, Account_Strings.ERROR_NO_USER, Account_Strings.RES_ERROR);
+		// 10th Test: no userID, user logged in, correct old password, new password, correct repeatPass
+		ts.loginUser("reset", "passwordnew");
+		params.clear();
+		params.put(Account_Strings.REQ_OLD_PASSWORD, "passwordnew");
+		params.put(Account_Strings.REQ_NEW_PASSWORD, "passwordnewnew");
+		params.put(Account_Strings.REQ_REPEAT_PASSWORD, "passwordnewnew");
+		ts.setAndExecuteGTC(params, userID.get(0), Account_Strings.RES_ACCOUNT_ID);
+	}
+
+	class TestSet{
+		private Map<String, Object> params = null;
+		private String url = "";
+		private Object expectedResult = "";
+		private String resultToGetFrom = "";
+
+		public TestSet(Map<String, Object> params, String url, Object expectedResult, String resultToGetFrom){
+			this.params = params;
+			this.url = url;
+			this.expectedResult = expectedResult;
+			this.resultToGetFrom = resultToGetFrom;
+		}
+
+		public Map<String, Object> getParams() {
+			return params;
+		}
+
+		public String getURL() {
+			return url;
+		}
+		public Object getExpectedResult() {
+			return expectedResult;
+		}
+		public String getResultToGetFrom() {
+			return resultToGetFrom;
+		}
+
+		public void executeGenericTestCase() {
+			GenericConvertMap<String,Object> res = null;
+			res = requestJSON(url, params);
+			assertEquals(expectedResult, res.get(resultToGetFrom));
+		}
+		public void setAndExecuteGTC(Map<String, Object> params, Object expectedResult, String resultToGetFrom) {
+			this.params = params;
+			this.expectedResult = expectedResult;
+			this.resultToGetFrom = resultToGetFrom;
+			executeGenericTestCase();
+		}
+		public void loginUser(String name, String pass) {
+			Map<String,Object> params = new HashMap<String,Object>();
+			params.put(Account_Strings.REQ_USERNAME, name);
+			params.put(Account_Strings.REQ_PASSWORD, pass);
+			assertNull(requestJSON("login", params).get(Account_Strings.RES_ERROR));
+		}
 	}
 
 	//

@@ -21,6 +21,9 @@ public class Account_Strings{
     public static final String REQ_ROLE = "role";
     public static final String REQ_USER_ID = "userID";
     public static final String REQ_UPDATE_MODE = "updateMode";
+    public static final String REQ_OLD_PASSWORD = "oldPass";
+    public static final String REQ_REPEAT_PASSWORD = "repeatPass";
+    public static final String REQ_NEW_PASSWORD = "newPass";
 
     /// Static RESPONSE VARS
     // Single Value/Object Variables
@@ -72,8 +75,11 @@ public class Account_Strings{
     public static final String ERROR_NO_META = "No meta is found.";
     public static final String ERROR_NOT_IN_GROUP_OR_ROLE = "User is not in group or not in specified role.";
     public static final String ERROR_INVALID_FORMAT_JSON = "Invalid Format JSON";
-
-
+    public static final String ERROR_PASS_NOT_EQUAL = "The passwords are not equal.";
+    public static final String ERROR_NO_NEW_PASSWORD = "No new password found.";
+    public static final String ERROR_NO_NEW_REPEAT_PASSWORD = "No new repeat password found.";
+    public static final String ERROR_PASS_INCORRECT = "Old password is wrong.";
+    
     /// ADDITIONAL Variables
     public static final String SPACE = " ";
     public static final String GROUP = "group";

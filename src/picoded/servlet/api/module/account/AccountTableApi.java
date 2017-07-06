@@ -8,9 +8,11 @@ import picoded.dstack.module.account.*;
 import picoded.dstack.*;
 import picoded.conv.ConvertJSON;
 import picoded.conv.RegexUtil;
+import picoded.conv.GenericConvert;
 import java.util.function.BiFunction;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
+
 
 ///
 /// Account table API builder
@@ -798,83 +800,79 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	// protected ApiFunction get_user_or_group_list = (req, res) -> {
-	// 	String[] insideGroupAny = req.getStringArray("insideGroup_any");
-	// 	String[] hasGroupRole_any = req.getStringArray("hasGroupRole_any");
-	// 	String groupStatus = req.getString("groupStatus");
-	//
-	// 	String orderByStr = req.getString("orderBy");
-	// 	if (orderByStr == null || orderByStr.isEmpty()) {
-	// 		orderByStr = "oID";
-	// 	}
-	//
-	// 	String[] headers = req.getStringArray("headers");
-	//
-	// 	if (headers == null || headers.length < 1) {
-	// 		headers = new String[] { "_oid", "names" };
-	// 	}
-	//
-	// 	String query = req.getString("query");
-	// 	String[] queryArgs = req.getStringArray("queryArgs");
-	//
-	// 	// Data tables search refinement
-	// 	String[] queryColumns = req.getStringArray("queryColumns", headers);
-	// 	String wildcardMode = req.getString("wildcardMode", "suffix");
-	//
-	// 	String searchParams = req.getString("searchValue", "").trim(); //datatables specific key
-	//
-	// 	if (searchParams.isEmpty()) {
-	// 		searchParams = req.getString("search[value]", "").trim();
-	// 	}
-	// 	if (searchParams.length() >= 2 && searchParams.charAt(0) == '"'
-	// 		&& searchParams.charAt(searchParams.length() - 1) == '"') {
-	// 		searchParams = searchParams.substring(1, searchParams.length() - 1);
-	// 	}
-	//
-	// 	if (!searchParams.isEmpty() && queryColumns != null && queryColumns.length > 0) {
-	// 		List<String> queryArgsList = new ArrayList<String>(); //rebuild query arguments
-	// 		if (queryArgs != null) {
-	// 			for (String queryArg : queryArgs) {
-	// 				queryArgsList.add(queryArg);
-	// 			}
-	// 		}
-	//
-	// 		if(query == null){
-	// 			query = generateQueryStringForSearchValue(searchParams, queryColumns, wildcardMode);
-	// 		}else{
-	// 			query = query + " AND " + generateQueryStringForSearchValue(searchParams, queryColumns, wildcardMode);
-	// 		}
-	//
-	// 		generateQueryStringArgsForSearchValue_andAddToList(searchParams, queryColumns, wildcardMode, queryArgsList);
-	// 		queryArgs = queryArgsList.toArray(new String[queryArgsList.size()]);
-	// 	}
-	//
-	// 	MetaTable mtObj = accountTableObj.accountMetaTable();
-	//
-	// 	//put back into response
-	// 	res.put("draw", draw);
-	// 	res.put("headers", headers);
-	//
-	// 	res.put("recordsTotal", accountTableObj.size());
-	// 	if (query != null && !query.isEmpty() && queryArgs != null && queryArgs.length > 0) {
-	// 		res.put("recordsFiltered", mtObj.queryCount(query, queryArgs));
-	// 	} else {
-	// 		res.put("recordsFiltered", mtObj.queryCount(null, null));
-	// 	}
-	//
-	// 	boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
-	//
-	// 	List<List<Object>> data = new ArrayList<List<Object>>();
-	// 	try {
-	// 		data = list_GET_and_POST_inner(accountTableObj, draw, start, limit, headers, query, queryArgs,
-	// 			orderByStr, insideGroupAny, hasGroupRole_any, groupStatus, sanitiseOutput);
-	// 		res.put("data", data);
-	// 	} catch (Exception e) {
-	// 		res.put("error", e.getMessage());
-	// 	}
-	//
-	// 	return res;
-	// };
+	protected ApiFunction get_user_or_group_list = (req, res) -> {
+		int draw = req.getInt("draw");
+		int start = req.getInt("start");
+		int limit = req.getInt("length");
+		String[] insideGroupAny = req.getStringArray("insideGroup_any");
+		String[] hasGroupRole_any = req.getStringArray("hasGroupRole_any");
+		String groupStatus = req.getString("groupStatus");
+
+		String orderByStr = req.getString("orderBy", "oID");
+
+		String[] headers = req.getStringArray("headers", "['" + Account_Strings.PROPERTIES_OID + "', '" + Account_Strings.PROPERTIES_NAMES + "']");
+
+		String query = req.getString("query");
+		String[] queryArgs = req.getStringArray("queryArgs");
+
+		// Data tables search refinement
+		String[] queryColumns = req.getStringArray("queryColumns", headers);
+		String wildcardMode = req.getString("wildcardMode", "suffix");
+
+		String searchParams = req.getString("searchValue", "").trim(); //datatables specific key
+
+		if (searchParams.isEmpty()) {
+			searchParams = req.getString("search[value]", "").trim();
+		}
+		if (searchParams.length() >= 2 && searchParams.charAt(0) == '"'
+			&& searchParams.charAt(searchParams.length() - 1) == '"') {
+			searchParams = searchParams.substring(1, searchParams.length() - 1);
+		}
+
+		if (!searchParams.isEmpty() && queryColumns != null && queryColumns.length > 0) {
+			List<String> queryArgsList = new ArrayList<String>(); //rebuild query arguments
+			if (queryArgs != null) {
+				for (String queryArg : queryArgs) {
+					queryArgsList.add(queryArg);
+				}
+			}
+
+			if(query == null){
+				query = generateQueryStringForSearchValue(searchParams, queryColumns);
+			}else{
+				query = query + " AND " + generateQueryStringForSearchValue(searchParams, queryColumns);
+			}
+
+			generateQueryStringArgsForSearchValue_andAddToList(searchParams, queryColumns, wildcardMode, queryArgsList);
+			queryArgs = queryArgsList.toArray(new String[queryArgsList.size()]);
+		}
+
+		MetaTable mtObj = table.accountMetaTable();
+
+		//put back into response
+		res.put(Account_Strings.RES_DRAW, draw);
+		res.put(Account_Strings.RES_HEADERS, headers);
+		res.put(Account_Strings.RES_RECORDS_TOTAL, table.size());
+		if (query != null && !query.isEmpty() && queryArgs != null && queryArgs.length > 0) {
+			res.put(Account_Strings.RES_RECORDS_FILTERED, mtObj.queryCount(query, queryArgs));
+		} else {
+			res.put(Account_Strings.RES_RECORDS_FILTERED, mtObj.queryCount(null, null));
+		}
+
+		boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
+
+		List<List<Object>> data = new ArrayList<List<Object>>();
+		try {
+			data = list_GET_and_POST_inner(table, draw, start, limit, headers, query, queryArgs,
+				orderByStr, insideGroupAny, hasGroupRole_any, groupStatus, sanitiseOutput);
+				// System.out.println(ConvertJSON.fromObject(data)+" <<<<<<<<<<<<<<<<< data");
+			res.put(Account_Strings.RES_DATA, data);
+		} catch (Exception e) {
+			res.put("error", e.getMessage());
+		}
+
+		return res;
+	};
 
 	protected ApiFunction update_current_user_info = (req, res) -> {
 		res.put(Account_Strings.RES_SUCCESS, false);
@@ -1002,15 +1000,14 @@ public class AccountTableApi implements ApiModule {
 
 	/// # getListOfGroupObjectOfMember
 	///
-	/// Retrieve a list of groups OBJECT from an existing member
+	/// Retrieve a list of groups OBJECT from an existing member/current user
 	///
 	/// ## HTTP Request Parameters
 	///
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// | Parameter Name  | Variable Type					| Description                                                                |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | username				| String	(Either or)		| name of the user to retrieve from																					 |
-	/// | oid							| String								| oid of the user to retrieve from																					 |
+	/// | userID					| String	(Either or)		| ID of the user to retrieve from																						 |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
@@ -1090,7 +1087,8 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"do_password_reset", do_password_reset); // Tested
 		builder.put(path+"account_info_by_Name", account_info_by_Name); // Tested
 		builder.put(path+"account_info_by_ID", account_info_by_ID); // Tested
-		builder.put(path+"remove", delete_user_account);
+		builder.put(path+"remove", delete_user_account); // Tested
+		builder.put(path+"get_user_or_group_list", get_user_or_group_list);
 
 		//Group functionalities
 		builder.put(path+"groupRoles", groupRoles); // Tested
@@ -1190,4 +1188,163 @@ public class AccountTableApi implements ApiModule {
 		}
 		return commonInfo;
 	}
+
+	private static String generateQueryStringForSearchValue(String inSearchString, String[] queryColumns) {
+		if (inSearchString != null && queryColumns != null) {
+			String[] searchStringSplit = inSearchString.trim().split("\\s+");
+			StringBuilder querySB = new StringBuilder();
+
+			for (int i = 0; i < searchStringSplit.length; ++i) {
+				querySB.append("(");
+				for (int queryCol = 0; queryCol < queryColumns.length; ++queryCol) {
+					querySB.append(queryColumns[queryCol] + " LIKE ?");
+
+					if (queryCol < queryColumns.length - 1) {
+						querySB.append(" OR ");
+					}
+				}
+				querySB.append(")");
+
+				if (i < searchStringSplit.length - 1) {
+					querySB.append(" AND ");
+				}
+			}
+			return querySB.toString();
+		}
+
+		return "";
+	}
+	private static List<String> generateQueryStringArgsForSearchValue_andAddToList(String inSearchString,
+		String[] queryColumns, String wildcardMode, List<String> ret) {
+		if (inSearchString != null && queryColumns != null) {
+			String[] searchStringSplit = inSearchString.trim().split("\\s+");
+			StringBuilder querySB = new StringBuilder();
+
+			String wildMode = wildcardMode;
+			for (String searchString : searchStringSplit) {
+				for (String queryColumn : queryColumns) {
+					ret.add(getStringWithWildcardMode(searchString, wildMode));
+				}
+				wildMode = "both"; //Second string onwards is both side wildcard
+			}
+		}
+
+		return ret;
+	}
+
+	private static List<List<Object>> list_GET_and_POST_inner(AccountTable _metaTableObj, int draw, int start,
+	int length, String[] headers, String query, String[] queryArgs, String orderBy, String[] insideGroup_any,
+	String[] hasGroupRole_any, String groupStatus, boolean sanitiseOutput) throws RuntimeException {
+
+	List<List<Object>> ret = new ArrayList<List<Object>>();
+
+	if (_metaTableObj == null) {
+		return ret;
+	}
+
+	try {
+		if (headers != null && headers.length > 0) {
+			MetaObject[] metaObjs = null;
+			AccountObject[] fullUserArray = null;
+
+			if ((insideGroup_any == null || insideGroup_any.length == 0)
+				&& (hasGroupRole_any == null || hasGroupRole_any.length == 0)) {
+				//do normal query
+				MetaTable accountMetaTable = _metaTableObj.accountMetaTable();
+
+				if (accountMetaTable == null) {
+					return ret;
+				}
+
+				if (query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0) {
+					metaObjs = accountMetaTable.query(null, null, orderBy, start, length);
+				} else {
+					metaObjs = accountMetaTable.query(query, queryArgs, orderBy, start, length);
+				}
+
+				List<AccountObject> retUsers = new ArrayList<AccountObject>();
+				for (MetaObject metaObj : metaObjs) {
+					AccountObject ao = _metaTableObj.get(metaObj._oid()); //a single account
+					// System.out.println(ao._oid()+" ahwejakwekawej<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+					retUsers.add(ao);
+				}
+
+				fullUserArray = retUsers.toArray(new AccountObject[retUsers.size()]);
+			} else {
+				//do filtered query
+				fullUserArray = _metaTableObj.getUsersByGroupAndRole(insideGroup_any, hasGroupRole_any);
+			}
+
+			if (fullUserArray == null || fullUserArray.length == 0) {
+				return ret;
+			}
+
+			//group status filtering
+			if (groupStatus != null) {
+				List<AccountObject> filteredUsers = new ArrayList<AccountObject>();
+				for (AccountObject ao : fullUserArray) {
+					if (groupStatus.equalsIgnoreCase("group")) {
+						if (ao.isGroup()) {
+							filteredUsers.add(ao);
+						}
+					} else if (groupStatus.equalsIgnoreCase("user")) {
+						if (!ao.isGroup()) {
+							filteredUsers.add(ao);
+						}
+					}
+				}
+
+				fullUserArray = filteredUsers.toArray(new AccountObject[filteredUsers.size()]);
+			}
+
+			for (AccountObject ao : fullUserArray) {
+				List<Object> row = new ArrayList<Object>();
+				for (String header : headers) {
+					if (header.equalsIgnoreCase("names")) {
+						if (ao != null) {
+							Set<String> aoNames = ao.getLoginIDSet();
+
+							if (sanitiseOutput) {
+								aoNames.clear();
+								for (String name : ao.getLoginIDSet()) {
+									aoNames.add(RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(name));
+								}
+							}
+
+							if (aoNames != null) {
+								List<String> aoNameList = new ArrayList<String>(aoNames);
+								row.add(aoNameList);
+							}
+						}
+					} else {
+						Object rawVal = ao.get(header); //this used to be metaObj.get
+
+						if (sanitiseOutput && rawVal instanceof String) {
+							String stringVal = GenericConvert.toString(rawVal);
+							row.add(stringVal);
+						} else {
+							row.add(rawVal);
+						}
+
+					}
+				}
+				ret.add(row);
+			}
+		}
+	} catch (Exception e) {
+		throw new RuntimeException("list_GET_and_POST_inner() ", e);
+	}
+
+	return ret;
+}
+
+private static String getStringWithWildcardMode(String searchString, String wildcardMode) {
+	if (wildcardMode.equalsIgnoreCase("prefix")) {
+		return "%" + searchString;
+	} else if (wildcardMode.equalsIgnoreCase("suffix")) {
+		return searchString + "%";
+	} else {
+		return "%" + searchString + "%";
+	}
+}
 }

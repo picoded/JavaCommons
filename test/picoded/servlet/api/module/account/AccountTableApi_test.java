@@ -1505,6 +1505,60 @@ public class AccountTableApi_test extends ApiModule_test {
 		ts.setAndExecuteGTC(params, Account_Strings.ERROR_FAIL_LOGIN, Account_Strings.RES_ERROR);
 	}
 
+	@Test
+	public void getUserOrGroupList(){
+		GenericConvertMap<String,Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		Map<String,Object> params = new HashMap<String,Object>();
+		List<String> userID = new ArrayList<String>(), groupID = new ArrayList<String>(), addUserList = new ArrayList<String>();
+		List<String> expectedResult = new ArrayList<String>();
+		// Ensure that there is an existing group
+		for( int idx = 1; idx <= 2; idx ++ ) {
+			params.put(Account_Strings.REQ_USERNAME, "getTestGrp"+idx);
+			params.put(Account_Strings.REQ_IS_GROUP, true);
+			res = requestJSON("new", params);
+			assertNull("getUserOrGroupListTest: Something wrong in creating group " + idx + ".", res.get(Account_Strings.RES_ERROR));
+			groupID.add(res.getString(Account_Strings.RES_ACCOUNT_ID));
+			// System.out.println(groupID.get(idx-1)+" <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+		}
+		// Ensure that there is an existing user
+		for( int idx = 1; idx <= 2; idx ++ ) {
+			params.clear();
+			params.put(Account_Strings.REQ_USERNAME, "getTestMemb" + idx);
+			params.put(Account_Strings.REQ_PASSWORD, "password");
+			res = requestJSON("new", params);
+			assertNull("getUserOrGroupListTest: Something wrong in adding user " + idx + ".", res.get(Account_Strings.RES_ERROR));
+			userID.add(res.getString(Account_Strings.RES_ACCOUNT_ID));
+			if ( idx % 2 == 1 ) {
+				addUserList.add(res.getString(Account_Strings.RES_ACCOUNT_ID));
+			}
+			// System.out.println(userID.get(idx-1)+"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+			expectedResult.add(userID.get(idx-1));
+		}
+		// Ensure that user is in both group
+		params.clear();
+		params.put(Account_Strings.REQ_ADD_LIST, addUserList);
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		params.put(Account_Strings.REQ_ROLE, "member");
+		res = requestJSON("add_remove_member", params);
+		assertNull("getUserOrGroupListTest: Something wrong in adding user to group", res.get(Account_Strings.RES_ERROR));
+
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(1));
+		res = requestJSON("add_remove_member", params);
+		assertNull("getUserOrGroupListTest: Something wrong in adding user to group", res.get(Account_Strings.RES_ERROR));
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+		// 1st Test: Empty Submission
+		TestSet ts = new TestSet(null, "get_user_or_group_list", expectedResult, Account_Strings.RES_DATA);
+		ts.executeTrueTestCase();
+		// 2nd Test: Invalid userID
+		// params.clear();
+		// ts.setAndExecuteLTC(params, expectedResult, Account_Strings.RES_DATA, "The list has some problems");
+	}
+
 	class TestSet{
 		private Map<String, Object> params = null;
 		private String url = "";
@@ -1545,6 +1599,13 @@ public class AccountTableApi_test extends ApiModule_test {
 			List<Object> result = ConvertJSON.toList(ConvertJSON.fromObject(expectedResult));
 			assertThat( errorMsg, res.getList(resultToGetFrom), containsInAnyOrder(result.toArray()));
 		}
+		public void executeTrueTestCase() {
+			GenericConvertMap<String,Object> res = null;
+			res = requestJSON(url, params);
+			List<Object> result = ConvertJSON.toList(ConvertJSON.fromObject(res.get(Account_Strings.RES_DATA)));
+			assertTrue( result.size() > 0);
+		}
+
 		public void setAndExecuteGTC(Map<String, Object> params, Object expectedResult, String resultToGetFrom) {
 			this.params = params;
 			this.expectedResult = expectedResult;

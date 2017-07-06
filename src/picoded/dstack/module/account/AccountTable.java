@@ -7,6 +7,7 @@ import picoded.dstack.*;
 import picoded.dstack.module.*;
 import picoded.conv.*;
 import picoded.struct.*;
+import org.apache.commons.lang3.ArrayUtils;
 
 import picoded.servlet.api.module.account.Account_Strings;
 
@@ -448,6 +449,13 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/// @return  Set of account oid's
 	public Set<String> keySet() {
 		return accountMetaTable.keySet();
+	}
+
+	/// Returns the accountMetaTable
+	///
+	/// @return accountMetaTable
+	public MetaTable accountMetaTable(){
+		return accountMetaTable;
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -949,7 +957,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	public AccountObject superUserGroup() {
 		return getFromLoginID(getSuperUserGroupName());
 	}
-	/*
+
 	//
 	// Getting users based on filters
 	// TODO: To optimise because Sam is dumb
@@ -971,7 +979,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		boolean doRoleCheck = (hasRoleAny != null && hasRoleAny.length > 0);
 
 		for (MetaObject metaObj : metaObjs) {
-			AccountObject ao = getFromID(metaObj._oid());
+			AccountObject ao = get(metaObj._oid());
 
 			if (ao == null) {
 				continue;
@@ -1017,5 +1025,4 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 		return ret.toArray(new AccountObject[ret.size()]);
 	}
-	*/
 }

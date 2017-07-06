@@ -348,12 +348,6 @@ public class AccountTableApi implements ApiModule {
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
 	protected ApiFunction getMemberRoleFromGroup = (req, res) -> {
-		// Checks all input are given before proceeding
-		// // Map<String, String> result = validateGroupParameters(req);
-		// if ( result.get(Account_Strings.RES_ERROR) != null ) {
-		// 	res.put(Account_Strings.RES_ERROR, result.get(Account_Strings.RES_ERROR));
-		// 	return res;
-		// }
 		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
 		if ( groupID == null ) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
@@ -718,6 +712,34 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
+	/// # update_member_meta_info
+	///
+	/// Update the member meta information of an existing/current user from an existing group
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	/// | groupID					| String								| ID of the group to retrieve from																					 |
+	/// | updateMode			| String	              | Mode of the update used, full or delta (default: delta)										 |
+	/// | meta						| {Object}							| name of the role assigned to the user																			 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | meta						| {Object}              | Meta information of the user																							 |
+	/// | accountID				| String	              | ID of the user																														 |
+	/// | updateMode			| String	              | Mode of the update used																										 |
+	/// | success					| boolean	              | false for failed update and true for success															 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
 	protected ApiFunction update_member_meta_info = (req, res) -> {
 		res.put(Account_Strings.RES_SUCCESS, false);
 		String memberIDToUpdate = req.getString(Account_Strings.REQ_USER_ID, null);
@@ -763,6 +785,32 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
+	/// # do_password_reset
+	///
+	/// Resets the password of the user/current member
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	/// | oldPassword			| String								| Old password of the user																									 |
+	/// | newPassword			| String								| New password of the user																									 |
+	/// | repeatPassword	| String								| Repeat new password of the user																						 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | accountID				| String	              | ID of the user																														 |
+	/// | success					| boolean	              | false for failed change and true for success															 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
 	protected ApiFunction do_password_reset = (req, res) -> {
 		res.put(Account_Strings.RES_SUCCESS, false);
 		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
@@ -800,6 +848,51 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
+	///
+	/// # get_user_or_group_list
+	///
+	/// Lists the users according to the search criteria
+	///
+	/// This JSON api is compatible with the datatables.js server side API.
+	/// See: https://web.archive.org/web/20140627100023/http://datatables.net/manual/server-side
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
+	/// | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
+	/// | length          | int (optional)     | Default 50: The number of records to return                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | insideGroup_any | String[](optional) | Default null, else filters for only accounts inside the listed groups ID      |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
+	/// | query           | String (optional)  | Requested Query filter                                                        |
+	/// | queryArgs       | String[] (optional)| Requested Query filter arguments                                              |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | groupStatus     | String (optional)  | Default "both", either "user" or "group". Used to lmit the result set         |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	/// |                |                    | are returned as well.                                                         |
+	/// +----------------+--------------------+-------------------------------------------------------------------------------+s
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type	    | Description                                                                   |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
+	/// | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    |
+	/// | recordsFilterd  | int                | Total amount of records. After all search filter                              |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | data            | array              | Array of row records                                                          |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | error           | String (Optional)  | Errors encounted if any                                                       |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	///
 	protected ApiFunction get_user_or_group_list = (req, res) -> {
 		int draw = req.getInt("draw");
 		int start = req.getInt("start");
@@ -874,17 +967,37 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
+	/// # update_current_user_info
+	///
+	/// Update the account meta of existing/current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	/// | updateMode			| String	              | Mode of the update used, full or delta (default: delta)										 |
+	/// | meta						| {Object}							| name of the role assigned to the user																			 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | accountID				| String	              | ID of the user																														 |
+	/// | success					| boolean	              | false for failed change and true for success															 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
 	protected ApiFunction update_current_user_info = (req, res) -> {
 		res.put(Account_Strings.RES_SUCCESS, false);
-		String memberIDToUpdate = req.getString(Account_Strings.REQ_USER_ID, null);
-		AccountObject ao = (memberIDToUpdate != null ) ? table.get(memberIDToUpdate) : table.getRequestUser(req.getHttpServletRequest(), null);
+		String userID = req.getString(Account_Strings.REQ_USER_ID, null);
+		AccountObject ao = (userID != null ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( ao == null ) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
-			return res;
-		}
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID, null);
-		if ( groupID == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
 			return res;
 		}
 		Object metaObjRaw = req.get(Account_Strings.REQ_META);
@@ -892,24 +1005,15 @@ public class AccountTableApi implements ApiModule {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_META);
 			return res;
 		}
-		AccountObject group = table.get(groupID);
-		if ( group == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
-			return res;
-		}
-		MetaObject currentMemberMeta = group.getMember(ao);
-		if ( currentMemberMeta == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NOT_IN_GROUP_OR_ROLE);
-			return res;
-		}
+
 		String updateMode = req.getString(Account_Strings.REQ_UPDATE_MODE, "delta");
 		Map<String, Object> metaObj = ConvertJSON.toMap((String) metaObjRaw);
 		updateMode = ( !updateMode.equalsIgnoreCase("full") ) ? "delta" : updateMode;
-		currentMemberMeta.putAll(metaObj);
+		ao.putAll(metaObj);
 		if ( updateMode.equalsIgnoreCase("full") ) {
-			currentMemberMeta.saveAll();
+			ao.saveAll();
 		} else {
-			currentMemberMeta.saveDelta();
+			ao.saveDelta();
 		}
 		res.put(Account_Strings.RES_ACCOUNT_ID, ao._oid());
 		res.put(Account_Strings.RES_META, metaObj);
@@ -919,6 +1023,28 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
+	/// # delete_user_account
+	///
+	/// Delete an existing/current user
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | success					| boolean	              | false for failed change and true for success															 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
 	protected ApiFunction delete_user_account = (req, res) -> {
 		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
 		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
@@ -934,8 +1060,36 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	/// Gets and return the account info for the given accountID
-	/// Note: if ${accountName} is blank, it assumes the current user
+	/// # account_info_by_ID
+	///
+	/// Retrieve the account information of existing/current user using ID
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | accountID       | String             | account ID used                                                               |
+	/// | accountNames    | String[]           | array of account names representing the account                               | sanitise
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | isSuperUser     | boolean            | indicates if the account is considered a superUser                            |
+	/// | isAnyGroupAdmin | boolean            | indicates if the account is considered a superUser                            |
+	/// | isGroup         | boolean            | indicates if the account is considered a group                                |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | groups          | object(Map)        | Groups object as a Map<String, List<Map<String, Object>>>                     | sanitise
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
 	protected ApiFunction account_info_by_ID = (req, res) -> {
 		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
 		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
@@ -948,8 +1102,36 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	/// Gets and return the account info for the given accountName
-	/// Note: if ${accountName} is blank, it assumes the current user
+	/// # account_info_by_Name
+	///
+	/// Retrieve the account information of existing/current user using username
+	///
+	/// ## HTTP Request Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
+	/// ## JSON Object Output Parameters
+	///
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | Parameter Name  | Variable Type					| Description                                                                |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | accountID       | String             | account ID used                                                               |
+	/// | accountNames    | String[]           | array of account names representing the account                               | sanitise
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | isSuperUser     | boolean            | indicates if the account is considered a superUser                            |
+	/// | isAnyGroupAdmin | boolean            | indicates if the account is considered a superUser                            |
+	/// | isGroup         | boolean            | indicates if the account is considered a group                                |
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// | groups          | object(Map)        | Groups object as a Map<String, List<Map<String, Object>>>                     | sanitise
+	/// +-----------------+--------------------+-------------------------------------------------------------------------------+
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
+	///
 	protected ApiFunction account_info_by_Name = (req, res) -> {
 		String userName = req.getString(Account_Strings.REQ_USERNAME, "");
 		AccountObject ao = ( !userName.isEmpty() ) ? table.getFromLoginID(userName) : table.getRequestUser(req.getHttpServletRequest(), null);
@@ -1088,7 +1270,8 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"account_info_by_Name", account_info_by_Name); // Tested
 		builder.put(path+"account_info_by_ID", account_info_by_ID); // Tested
 		builder.put(path+"remove", delete_user_account); // Tested
-		builder.put(path+"get_user_or_group_list", get_user_or_group_list);
+		builder.put(path+"get_user_or_group_list", get_user_or_group_list); // Tested
+		builder.put(path+"update_current_user_info", update_current_user_info);
 
 		//Group functionalities
 		builder.put(path+"groupRoles", groupRoles); // Tested

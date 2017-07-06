@@ -1207,6 +1207,41 @@ public class AccountTableApi_test extends ApiModule_test {
 		ts.setAndExecuteGTC(params, userID.get(0), Account_Strings.RES_ACCOUNT_ID);
 	}
 
+	@Test
+	public void getInfoByName(){
+		GenericConvertMap<String,Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		Map<String,Object> params = new HashMap<String,Object>();
+		List<String> userID = new ArrayList<String>();
+		// Ensure that there is an existing user
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "infoName");
+		params.put(Account_Strings.REQ_PASSWORD, "password");
+		res = requestJSON("new", params);
+		assertNull("getMemberListInfoTest: Something wrong in adding user.", res.get(Account_Strings.RES_ERROR));
+		userID.add(res.getString(Account_Strings.RES_ACCOUNT_ID));
+
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+		// 1st Test: Empty Submission
+		TestSet ts = new TestSet(null, "account_info_by_Name", Account_Strings.ERROR_NO_USER, Account_Strings.RES_ERROR);
+		ts.executeGenericTestCase();
+		// 2nd Test: Invalid username
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "randomName");
+		ts.setAndExecuteGTC(params, Account_Strings.ERROR_NO_USER, Account_Strings.RES_ERROR);
+		// 3rd Test: Valid ID
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "infoName");
+		ts.setAndExecuteGTC(params, userID.get(0), Account_Strings.RES_ACCOUNT_ID);
+		// 4th Test: No user ID, user logged in
+		ts.loginUser("infoName", "password");
+		ts.setAndExecuteGTC(params, userID.get(0), Account_Strings.RES_ACCOUNT_ID);
+	}
+
 	class TestSet{
 		private Map<String, Object> params = null;
 		private String url = "";

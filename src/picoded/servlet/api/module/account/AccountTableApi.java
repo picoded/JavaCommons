@@ -798,11 +798,11 @@ public class AccountTableApi implements ApiModule {
 
 		return res;
 	};
-	//
+
 	// protected ApiFunction get_basic_user_info = (req, res) -> {
 	//
 	// };
-	//
+
 	// protected ApiFunction get_user_list = (req, res) -> {
 	//
 	// };
@@ -825,9 +825,20 @@ public class AccountTableApi implements ApiModule {
 	// protected ApiFunction account_info_by_ID = (req, res) -> {
 	//
 	// };
-	// protected ApiFunction account_info_by_Name = (req, res) -> {
-	//
-	// };
+
+	/// Gets and return the accountID for the given accountName
+	/// Note: if ${accountName} is blank, it assumes the current user
+	protected ApiFunction account_info_by_Name = (req, res) -> {
+		String userName = req.getString(Account_Strings.REQ_USERNAME, "");
+		AccountObject ao = ( !userName.isEmpty() ) ? table.getFromLoginID(userName) : table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
+		res.putAll(commonInfo);
+		return res;
+	};
 
 
 	// /// # getListOfGroupIDOfMember
@@ -955,7 +966,8 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"lockTime", lockTime); // Tested
 		builder.put(path+"logout", logout); // Tested
 		builder.put(path+"new", new_account); // Tested
-		builder.put(path+"do_password_reset", do_password_reset);
+		builder.put(path+"do_password_reset", do_password_reset); // Tested
+		builder.put(path+"account_info_by_Name", account_info_by_Name);
 
 		//Group functionalities
 		builder.put(path+"groupRoles", groupRoles); // Tested
@@ -990,5 +1002,73 @@ public class AccountTableApi implements ApiModule {
 		res.put(Account_Strings.REQ_USERNAME, userNameToAdd);
 		res.put(Account_Strings.REQ_GROUPNAME, groupName);
 		return res;
+	}
+
+	private static Map<String, Object> extractCommonInfoFromAccountObject(AccountObject account, boolean sanitiseOutput) {
+	//sanitise accountNames, groupNames,
+	System.out.println(" alwkejalkweawkwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
+		Map<String, Object> commonInfo = new HashMap<String, Object>();
+		sanitiseOutput = true; // let it always sanitise the output
+		commonInfo.put(Account_Strings.RES_ACCOUNT_ID, null);
+		commonInfo.put("accountNames", null);
+		commonInfo.put("isSuperUser", null);
+		commonInfo.put("isGroup", null);
+		commonInfo.put("groups", null);
+		commonInfo.put("isAnyGroupAdmin", false);
+
+		if (account != null) {
+			System.out.println(" aalkwjejewjlwjaljejkejwkjeakwjkaewjkekjaewjkjaekwjkeawjkaewjkeawkjawejkawjekjkwea");
+			commonInfo.put(Account_Strings.RES_ACCOUNT_ID, account._oid());
+			Set<String> accNameSet = account.getLoginIDSet();
+			if (accNameSet != null) {
+				String[] accNames = new String[accNameSet.size()];
+				accNameSet.toArray(accNames);
+				if (sanitiseOutput && accNames != null) {
+					for (int i = 0; i < accNames.length; ++i) {
+						accNames[i] = RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(accNames[i]);
+					}
+				}
+				commonInfo.put("accountNames", accNames);
+			}
+			commonInfo.put("isSuperUser", account.isSuperUser());
+			commonInfo.put("isGroup", account.isGroup());
+			Map<String, List<Map<String, Object>>> groupMap = new HashMap<String, List<Map<String, Object>>>();
+			AccountObject[] groups = account.getGroups();
+			if (groups != null) {
+				List<Map<String, Object>> groupList = new ArrayList<Map<String, Object>>();
+				for (AccountObject group : groups) {
+					Map<String, Object> newGroup = new HashMap<String, Object>();
+					newGroup.put("groupID", group._oid());
+					//extracting group names and sanitising if needed
+					Set<String> groupNames = group.getLoginIDSet();
+					if (sanitiseOutput) {
+						groupNames.clear();
+						for (String groupName : group.getLoginIDSet()) {
+							groupNames.add(RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(groupName));
+						}
+					}
+					newGroup.put("names", groupNames);
+					//extracting member roles and sanitising if needed
+					String role = group.getMemberRole(account);
+					if (sanitiseOutput) {
+						role = RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(role);
+					}
+					newGroup.put("role", role); //sanitise role just in case
+					role = ( role == null ) ? "" : role;
+					boolean isAdmin = role.equalsIgnoreCase("admin") || role.equalsIgnoreCase("superuser");
+					newGroup.put("isAdmin", isAdmin);
+					if (isAdmin) {
+						commonInfo.replace("isAnyGroupAdmin", true);
+					}
+					groupList.add(newGroup);
+				}
+				commonInfo.put("groups", groupList);
+			}
+		}else{
+			System.out.println(" aalkwjejewjlwjaljejkejwkjeakwjkaewjkekjaewjkjaekwjkeawjkaewjkeawkjawejkawjekjkweaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+			System.out.println("AccountLogin -> extractCommonInfoFromAccountObject -> AccountObject is null!");
+		}
+		System.out.println(" aalkwjejewjlwjaljejkejwkjeakwjkaewjkekjaewjkjaekwjkeawjkaewjkeawkjawejkawjekjkweaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+		return commonInfo;
 	}
 }

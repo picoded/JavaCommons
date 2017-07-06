@@ -516,7 +516,6 @@ public class AccountTableApi implements ApiModule {
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
 	protected ApiFunction get_member_list_info = (req, res) -> {
-
 		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
 
 		AccountObject group = ( groupID != null ) ? table.get(groupID) : table.getRequestUser(req.getHttpServletRequest(), null);
@@ -799,10 +798,10 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	// protected ApiFunction get_user_list = (req, res) -> {
+	// protected ApiFunction get_user_or_group_list = (req, res) -> {
 	//
 	// };
-	//
+
 
 	protected ApiFunction update_current_user_info = (req, res) -> {
 		res.put(Account_Strings.RES_SUCCESS, false);
@@ -853,9 +852,6 @@ public class AccountTableApi implements ApiModule {
 	//
 	// };
 	//
-	// protected ApiFunction get_group_list_info = (req, res) -> {
-	//
-	// };
 	/// Gets and return the account info for the given accountID
 	/// Note: if ${accountName} is blank, it assumes the current user
 	protected ApiFunction account_info_by_ID = (req, res) -> {
@@ -944,19 +940,21 @@ public class AccountTableApi implements ApiModule {
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
 	protected ApiFunction getListOfGroupObjectOfMember = (req, res) -> {
-		String _oid = req.getString(Account_Strings.REQ_OID, null);
-		String username = req.getString(Account_Strings.REQ_USERNAME, null);
-		if ( _oid == null && username == null ){
-			res.put(Account_Strings.RES_ERROR, "No oid and username found.");
-			return res;
-		}
-		AccountObject ao = ( _oid != null ) ? table.get(_oid) : table.getFromLoginID(username);
+		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( ao == null ) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
 			return res;
 		}
 		AccountObject[] listOfGroupsObj = ao.getGroups();
-		res.put(Account_Strings.RES_LIST, listOfGroupsObj);
+		List<Map<String, Object>> groupList = new ArrayList<Map<String,Object>>();
+		int listCounter = 0;
+		for ( AccountObject groupObj : listOfGroupsObj ) {
+			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(groupObj, true);
+			groupList.add(commonInfo);
+			listCounter++;
+		}
+		res.put(Account_Strings.RES_LIST, groupList);
 		return res;
 	};
 
@@ -1021,7 +1019,7 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"add_remove_member", add_remove_member); // Tested
 		builder.put(path+"get_single_member_meta", get_single_member_meta); // Tested
 		builder.put(path+"update_member_meta_info", update_member_meta_info); // Tested
-		// builder.put(path+"getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
+		builder.put(path+"getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
 		// builder.put(path+"getListOfMemberObjectOfGroup", getListOfMemberObjectOfGroup); // Tested
 	}
 

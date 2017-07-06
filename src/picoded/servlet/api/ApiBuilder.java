@@ -75,14 +75,9 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	//-------------------------------------------------------------------
 
 	/**
-	* Object token representing a "removed" endpoint
+	* Object token representing a "removed" endpoint / filter
 	**/
 	protected static final ApiFunction NULLAPIFUNCTION = (req,res) -> { return res; };
-
-	/**
-	* Object token representing a "removed" endpoint
-	**/
-	protected static ApiEndpoint NULLENDPOINT = new ApiEndpoint();
 
 	/**
 	* ROOT Api connection, refenced by sub-class implementation
@@ -306,7 +301,7 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 		HashSet<String> keySet = new HashSet<String>();
 		keySet.addAll( ret.endpointMap.keySet() );
 		for(String key : keySet) {
-			if( ret.endpointMap.get(key) == NULLENDPOINT ) {
+			if( ret.endpointMap.get(key) == NULLAPIFUNCTION ) {
 				ret.endpointMap.remove(key);
 			}
 		}
@@ -349,73 +344,56 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 
 	//-------------------------------------------------------------------
 	//
-	// Fetch and get the relevent API Execution endpoints for the path
+	// API put / remove map handling
 	//
 	//-------------------------------------------------------------------
 
 	/**
-	* Fetch the relevant endpoint for the API request
+	* Registers an API function to a single endpoint.
 	*
-	* @param   major version to use
-	* @param   minor version to use
-	* @param   path name to use
-	*
-	* @return  The result ApiEndpoint (if found)
-	**/
-	protected ApiEndpoint fetchApiEndpoint(int inMajor, int inMinor, String path) {
-		// Gets the collapsed version set
-		ApiVersionSet workingSet = collapsedVersionSet(inMajor, inMinor);
-
-		// Find the exact match
-		ApiEndpoint endpoint = workingSet.endpointMap.get(path);
-		if( endpoint != null ) {
-			// Exact match found
-			return endpoint;
-		}
-
-		// @TODO : ITERATE FOR DYNAMIC MATCH
-
-		// Fetch failure
-		return null;
-	}
-
-	//-------------------------------------------------------------------
-	//
-	// API put / remove handling
-	//
-	//-------------------------------------------------------------------
-
-	/**
-	* Registers an API function to a single endpoint
+	* Note that due to the way ApiBuilder is designed to export the respective API libraries
+	* wildcard based endpoints will not be supported.
 	*
 	* @param  Endpoint paths
-	* @param  Executor function
+	* @param  Executor function, use null to remove an existing function
 	*
 	* @return  returns null
 	**/
-	public BiFunction<ApiRequest, ApiResponse, ApiResponse> put(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
+	public void endpoint(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
+
+		if( path.indexOf("/*") >= 0 ) {
+			throw new RuntimeException("Wildcard endpoints are not supported");
+		}
+
 		// Clears the collapsed version set cache
 		cachedCollapsedVersionSet.clear();
 
 		// Get the current version, and write the respective endpoint to it
 		if( value == null ) {
-			getVersionSet().endpointMap.put(path, NULLENDPOINT);
+			getVersionSet().endpointMap.put(path, NULLAPIFUNCTION);
 		} else {
-			getVersionSet().endpointMap.put(path, new ApiEndpoint(path, value));
+			getVersionSet().endpointMap.put(path, value);
 		}
-		return null;
 	}
 
 	/**
-	* Removes an endpoint for the current version
-	* This intentionally remove if from the specified version onwards
+	* Registers an API filter function to a single endpoint.
 	*
 	* @param  Endpoint paths
+	* @param  Executor function, use null to remove an existing function
 	*
 	* @return  returns null
 	**/
-	public BiFunction<ApiRequest, ApiResponse, ApiResponse> remove(String path) {
-		return put(path, null);
+	public void filter(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
+		// Clears the collapsed version set cache
+		cachedCollapsedVersionSet.clear();
+
+		// Get the current version, and write the respective endpoint to it
+		if( value == null ) {
+			getVersionSet().filterMap.put(path, NULLAPIFUNCTION);
+		} else {
+			getVersionSet().filterMap.put(path, value);
+		}
 	}
 
 	/**
@@ -431,6 +409,38 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	**/
 	public ApiResponse execute(int inMajor, int inMinor, String path, Map<String,Object> queryParams, Map<String,Object>contextParams ) {
 		return execute(inMajor, inMinor, path, setupApiRequest(queryParams, contextParams), null);
+	}
+
+	//-------------------------------------------------------------------
+	//
+	// Fetch and get the relevent API Execution endpoints for the path
+	//
+	//-------------------------------------------------------------------
+
+	/**
+	* Fetch the relevant endpoint for the API request
+	*
+	* @param   major version to use
+	* @param   minor version to use
+	* @param   path name to use
+	*
+	* @return  The result ApiEndpoint (if found)
+	**/
+	protected BiFunction<ApiRequest, ApiResponse, ApiResponse> fetchApiEndpoint(int inMajor, int inMinor, String path) {
+		// Gets the collapsed version set
+		ApiVersionSet workingSet = collapsedVersionSet(inMajor, inMinor);
+
+		// Find the exact match
+		BiFunction<ApiRequest, ApiResponse, ApiResponse> endpoint = workingSet.endpointMap.get(path);
+		if( endpoint != null ) {
+			// Exact match found
+			return endpoint;
+		}
+
+		// @TODO : ITERATE FOR DYNAMIC MATCH
+
+		// Fetch failure
+		return null;
 	}
 
 	//-------------------------------------------------------------------
@@ -477,7 +487,7 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	public ApiResponse execute(int inMajor, int inMinor, String path, ApiRequest reqObj, ApiResponse resObj ) {
 
 		// Fetch the endpoint
-		ApiEndpoint endpoint = fetchApiEndpoint(inMajor, inMinor, path);
+		BiFunction<ApiRequest, ApiResponse, ApiResponse> endpoint = fetchApiEndpoint(inMajor, inMinor, path);
 
 		// Endpoitn does not exists
 		if( endpoint == null ) {
@@ -493,7 +503,7 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 
 		// Found the endpoint execute and return
 		if( endpoint != null ) {
-			return endpoint.execute(reqObj, resObj);
+			return endpoint.apply(reqObj, resObj);
 		}
 
 		// Return failure
@@ -540,7 +550,7 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 
 	//-------------------------------------------------------------------
 	//
-	// Useful API's for debugging, via map functions
+	// API map compliance
 	//
 	//-------------------------------------------------------------------
 
@@ -559,11 +569,32 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	* @return  The registed function for the given key
 	**/
 	public BiFunction<ApiRequest, ApiResponse, ApiResponse> get(Object key) {
-		ApiEndpoint endpoint = collapsedVersionSet().endpointMap.get(key);
-		if( endpoint != null ) {
-			return endpoint.functionLambda;
-		}
+		return collapsedVersionSet().endpointMap.get(key);
+	}
+
+	/**
+	* Registers an API function to a single endpoint
+	*
+	* @param  Endpoint paths
+	* @param  Executor function
+	*
+	* @return  returns null
+	**/
+	public BiFunction<ApiRequest, ApiResponse, ApiResponse> put(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
+		endpoint(path, value);
 		return null;
+	}
+
+	/**
+	* Removes an endpoint for the current version
+	* This intentionally remove if from the specified version onwards
+	*
+	* @param  Endpoint paths
+	*
+	* @return  returns null
+	**/
+	public BiFunction<ApiRequest, ApiResponse, ApiResponse> remove(String path) {
+		return put(path, null);
 	}
 
 	//-------------------------------------------------------------------

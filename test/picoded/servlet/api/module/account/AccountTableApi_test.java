@@ -1335,11 +1335,14 @@ public class AccountTableApi_test extends ApiModule_test {
 		// 3rd Test: Valid User with group ( memberList1 )
 		params.put(Account_Strings.REQ_USER_ID, userID.get(0));
 		ts.setAndExecuteLTC(params, expectedResult, Account_Strings.RES_LIST, "The list has some issues");
-		// 4th Test: Valid user with no group ( memberList2 )
+		// 4th Test: No userID, user is logged
+		ts.loginUser("memberList1", "password");
+		ts.setAndExecuteLTC(params, expectedResult, Account_Strings.RES_LIST, "The list has some issues");
+		ts.logout();
+		// 5th Test: Valid user with no group ( memberList2 )
 		params.put(Account_Strings.REQ_USER_ID, userID.get(1));
 		expectedResult.clear();
 		ts.setAndExecuteLTC(params, expectedResult, Account_Strings.RES_LIST, "The list has some issues");
-		// need to test with logged
 	}
 
 	@Test
@@ -1400,11 +1403,14 @@ public class AccountTableApi_test extends ApiModule_test {
 		// 3rd Test: Valid User with group ( memLi1 )
 		params.put(Account_Strings.REQ_USER_ID, userID.get(0));
 		ts.setAndExecuteLTC(params, expectedResult, Account_Strings.RES_LIST, "The list has some issues");
-		// 4th Test: Valid user with no group ( memLi2 )
+		// 4th Test: No userID, user is logged
+		ts.loginUser("memLi1", "password");
+		ts.setAndExecuteLTC(params, expectedResult, Account_Strings.RES_LIST, "The list has some issues");
+		ts.logout();
+		// 5th Test: Valid user with no group ( memLi2 )
 		params.put(Account_Strings.REQ_USER_ID, userID.get(1));
 		expectedResult.clear();
 		ts.setAndExecuteLTC(params, expectedResult, Account_Strings.RES_LIST, "The list has some issues");
-		// need to test with logged
 	}
 
 	@Test

@@ -822,11 +822,21 @@ public class AccountTableApi implements ApiModule {
 	// protected ApiFunction get_group_list_info = (req, res) -> {
 	//
 	// };
-	// protected ApiFunction account_info_by_ID = (req, res) -> {
-	//
-	// };
+	/// Gets and return the account info for the given accountID
+	/// Note: if ${accountName} is blank, it assumes the current user
+	protected ApiFunction account_info_by_ID = (req, res) -> {
+		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
+		res.putAll(commonInfo);
+		return res;
+	};
 
-	/// Gets and return the accountID for the given accountName
+	/// Gets and return the account info for the given accountName
 	/// Note: if ${accountName} is blank, it assumes the current user
 	protected ApiFunction account_info_by_Name = (req, res) -> {
 		String userName = req.getString(Account_Strings.REQ_USERNAME, "");
@@ -967,7 +977,8 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"logout", logout); // Tested
 		builder.put(path+"new", new_account); // Tested
 		builder.put(path+"do_password_reset", do_password_reset); // Tested
-		builder.put(path+"account_info_by_Name", account_info_by_Name);
+		builder.put(path+"account_info_by_Name", account_info_by_Name); // Tested
+		builder.put(path+"account_info_by_ID", account_info_by_ID); // Tested
 
 		//Group functionalities
 		builder.put(path+"groupRoles", groupRoles); // Tested
@@ -1006,7 +1017,6 @@ public class AccountTableApi implements ApiModule {
 
 	private static Map<String, Object> extractCommonInfoFromAccountObject(AccountObject account, boolean sanitiseOutput) {
 	//sanitise accountNames, groupNames,
-	System.out.println(" alwkejalkweawkwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
 		Map<String, Object> commonInfo = new HashMap<String, Object>();
 		sanitiseOutput = true; // let it always sanitise the output
 		commonInfo.put(Account_Strings.RES_ACCOUNT_ID, null);
@@ -1017,7 +1027,6 @@ public class AccountTableApi implements ApiModule {
 		commonInfo.put("isAnyGroupAdmin", false);
 
 		if (account != null) {
-			System.out.println(" aalkwjejewjlwjaljejkejwkjeakwjkaewjkekjaewjkjaekwjkeawjkaewjkeawkjawejkawjekjkwea");
 			commonInfo.put(Account_Strings.RES_ACCOUNT_ID, account._oid());
 			Set<String> accNameSet = account.getLoginIDSet();
 			if (accNameSet != null) {
@@ -1065,10 +1074,8 @@ public class AccountTableApi implements ApiModule {
 				commonInfo.put("groups", groupList);
 			}
 		}else{
-			System.out.println(" aalkwjejewjlwjaljejkejwkjeakwjkaewjkekjaewjkjaekwjkeawjkaewjkeawkjawejkawjekjkweaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 			System.out.println("AccountLogin -> extractCommonInfoFromAccountObject -> AccountObject is null!");
 		}
-		System.out.println(" aalkwjejewjlwjaljejkejwkjeakwjkaewjkekjaewjkjaekwjkeawjkaewjkeawkjawejkawjekjkweaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 		return commonInfo;
 	}
 }

@@ -25,29 +25,30 @@ import oracle.sql.CLOB;
 import picoded.struct.CaseInsensitiveHashMap;
 import picoded.conv.ArrayConv;
 
-/// JSql result set, data is either prefetched, or fetch on row request. For example usage, refer to JSql
-///
-/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.java}
-/// // Below is the inner data structure format of JSqlResult,
-/// // Where its respective fieldname/row can be accessed natively.
-/// HashMap<String /*fieldName*/, Object[] /*rowResults array*/ > JSqlResultFormat;
-/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-///
-/// *******************************************************************************
-///
-/// [LOW PRIROTY TODO LIST]
-/// * readRow() : Without the unchecked suppression flag
-/// * rowAffected() : used to get the amount of rows affected for an update statment
-/// * Exception for readRow / readRowCol on out-of-bound row number
-/// * Non silent (exception), and silent varient (returns null) for readRow / readRowCol
-/// * isDisposed: boolean function for the fetch checking.
-///
-/// IGNORED feature list (not fully supported, and dropped to ensure consistancy in sqlite/sql mode)
-/// - SingleRow fetch and related features was seen to be buggy in sqlite.
-///   - fetchRowData varient of fetchAllRows : Fetching 1 row from the database at a timeon both ends
-///   - readRow / readRowCol : To support unfetched rows -> ie, automatically fetchs to the desired row count
-///   - isFetchedAll / isFetchedRow
-///
+/**
+* JSql result set, data is either prefetched, or fetch on row request. For example usage, refer to JSql
+*
+* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.java}
+* // Below is the inner data structure format of JSqlResult,
+* // Where its respective fieldname/row can be accessed natively.
+* HashMap<String, Object[]> JSqlResultFormat;
+* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*
+* *******************************************************************************
+*
+* [LOW PRIROTY TODO LIST]
+* * readRow() : Without the unchecked suppression flag
+* * rowAffected() : used to get the amount of rows affected for an update statment
+* * Exception for readRow / readRowCol on out-of-bound row number
+* * Non silent (exception), and silent varient (returns null) for readRow / readRowCol
+* * isDisposed: boolean function for the fetch checking.
+*
+* IGNORED feature list (not fully supported, and dropped to ensure consistancy in sqlite/sql mode)
+* - SingleRow fetch and related features was seen to be buggy in sqlite.
+*   - fetchRowData varient of fetchAllRows : Fetching 1 row from the database at a timeon both ends
+*   - readRow / readRowCol : To support unfetched rows -> ie, automatically fetchs to the desired row count
+*   - isFetchedAll / isFetchedRow
+**/
 public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 
 	//-------------------------------------------------------------------------
@@ -55,56 +56,76 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 	// Internal variables and constructor
 	//
 	//-------------------------------------------------------------------------
-	
-	/// Serializable version number (to remove some java nagging warnings)
+
+	/**
+	* Serializable version number (to remove some java nagging warnings)
+	**/
 	protected static final long serialVersionUID = 1L;
-	
-	/// Internal self used logger
+
+	/**
+	* Internal self used logger
+	**/
 	private static final Logger LOGGER = Logger.getLogger(JSqlResult.class.getName());
-	
-	/// Total row count for query
+
+	/**
+	* Total row count for query
+	**/
 	private int rowCount = -1;
 
-	/// Total rows affected, this applies for update statements
+	/**
+	* Total rows affected, this applies for update statements
+	**/
 	private int affectedRows = 0;
-	
-	/// The prepared statment used for this result
+
+	/**
+	* The prepared statment used for this result
+	**/
 	private PreparedStatement sqlStmt = null;
 
-	/// The actual SQL result before parsing
+	/**
+	* The actual SQL result before parsing
+	**/
 	private ResultSet sqlRes = null;
-	
-	/// Empty constructor, used as place holder
-	/// (Used internally by JSql : not to be used directly)
-	public JSqlResult() { 
+
+	/**
+	* Empty constructor, used as place holder
+	* (Used internally by JSql : not to be used directly)
+	**/
+	public JSqlResult() {
 		// empty
 	}
 
-	/// Constructor with SQL resultSet
-	/// (Used internally by JSql : not to be used directly)
+	/**
+	* Constructor with SQL resultSet
+	* (Used internally by JSql : not to be used directly)
+	**/
 	public JSqlResult(PreparedStatement ps, ResultSet rs) {
 		sqlStmt = ps;
 		sqlRes = rs;
 	}
-	
-	/// Constructor with SQL resultSet
-	/// (Used internally by JSql : not to be used directly)
+
+	/**
+	* Constructor with SQL resultSet
+	* (Used internally by JSql : not to be used directly)
+	**/
 	public JSqlResult(PreparedStatement ps, ResultSet rs, int inAffectedRows) {
 		sqlStmt = ps;
 		sqlRes = rs;
 		affectedRows = inAffectedRows;
 	}
-	
+
 	//-------------------------------------------------------------------------
 	//
 	// Helper utility functions
 	//
 	//-------------------------------------------------------------------------
-	
-	/// Extracts out the string data from orcale CLOB. 
-	/// Without any exception, returning null instead when it occurs
-	///
-	/// @return  String representing the CLOB
+
+	/**
+	* Extracts out the string data from orcale CLOB.
+	* Without any exception, returning null instead when it occurs
+	*
+	* @return  String representing the CLOB
+	**/
 	static protected String CLOBtoString(CLOB inData) {
 		try {
 			return CLOBtoStringNoisy(inData);
@@ -114,10 +135,12 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 			return null;
 		}
 	}
-	
-	/// Extracts out the string data from oracale CLOB. 
-	///
-	/// @return  String representing the CLOB
+
+	/**
+	* Extracts out the string data from oracale CLOB.
+	*
+	* @return  String representing the CLOB
+	**/
 	static protected String CLOBtoStringNoisy(CLOB inData) throws SQLException, IOException {
 		final StringBuilder sb = new StringBuilder();
 		final BufferedReader br = new BufferedReader(inData.getCharacterStream());
@@ -133,17 +156,19 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 		return sb.toString();
 	}
 
-	/// Extract out the collumn names from an SQL result set
-	///
-	/// @param  SQL result set
-	///
-	/// @return  String array of filtered out column names
+	/**
+	* Extract out the collumn names from an SQL result set
+	*
+	* @param  SQL result set
+	*
+	* @return  String array of filtered out column names
+	**/
 	static protected String[] extractColumnNames(ResultSet sqlResultSet) throws SQLException {
 		// The SQL result meta data, column count, and return result
 		ResultSetMetaData rsmd = sqlResultSet.getMetaData();
 		int colCount = rsmd.getColumnCount();
 		String[] res = new String[colCount];
-		
+
 		// Getting the column names
 		for(int i=0; i<colCount; ++i) {
 			// the rsmd, column name function is 1 index-ed
@@ -168,17 +193,19 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 		return res;
 	}
 
-	/// Filters the result object, normalizing to their respective java format.
-	///
-	/// @param  The data result
-	///
-	/// @return The normalized data result
+	/**
+	* Filters the result object, normalizing to their respective java format.
+	*
+	* @param  The data result
+	*
+	* @return The normalized data result
+	**/
 	static protected Object filterDataObject(Object tmpObj) throws JSqlException {
 		// Normalize BigDecimal as Double
 		if (BigDecimal.class.isInstance(tmpObj)) {
 			return ((BigDecimal) tmpObj).doubleValue();
-		} 
-		
+		}
+
 		// Normalize CLOB as string
 		if (CLOB.class.isInstance(tmpObj)) {
 			try {
@@ -211,20 +238,26 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 	// Row fetching
 	//
 	//-------------------------------------------------------------------------
-	
-	/// Return the row count, previously set by `fetchAllRows`
+
+	/**
+	* Return the row count, previously set by `fetchAllRows`
+	**/
 	public int rowCount() {
 		return rowCount;
 	}
-	
-	/// Returns the amount of affected rows, applies only for non-select statements
+
+	/**
+	* Returns the amount of affected rows, applies only for non-select statements
+	**/
 	public int affectedRows() {
 		return affectedRows;
 	}
 
-	/// Fetches all the row data, and store it into the local hashmap & array
-	///
-	/// @return rowCount on success, -1 indicate there was no SQLResult to process
+	/**
+	* Fetches all the row data, and store it into the local hashmap & array
+	*
+	* @return rowCount on success, -1 indicate there was no SQLResult to process
+	**/
 	public int fetchAllRows() throws JSqlException {
 		// If SQL Result is null, it means data been already "fetched"
 		// or this class was not initialized properly
@@ -269,9 +302,9 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 			// Change format from List to Object array
 			for( int i=0; i<colCount; ++i ) {
 				// Populate the actual final result
-				this.put( 
+				this.put(
 					// Column name
-					colNames[i], 
+					colNames[i],
 					// Actual row result as an object array
 					rowResults.get(i).toArray(new Object[rowCount])
 				);
@@ -284,11 +317,13 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 		}
 	}
 
-	/// Read a fetched row in a single hashmap
-	///
-	/// @param  row number to fetch
-	///
-	/// @return Map of row data
+	/**
+	* Read a fetched row in a single hashmap
+	*
+	* @param  row number to fetch
+	*
+	* @return Map of row data
+	**/
 	public CaseInsensitiveHashMap<String, Object> readRow(int pt) {
 		// Return null for segments above row count
 		if (pt >= rowCount) {
@@ -304,15 +339,17 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 		}
 		return ret;
 	}
-	
-	/// [Internal use, avoid direct use] 
-	///
-	/// Returns SQL Table Meta Data info
-	///
-	/// this is specifically for an isolated use case of querying SQL information
-	/// as a single map result. This can only be called once.
-	///
-	/// @return  Map of table meta information
+
+	/**
+	* [Internal use, avoid direct use]
+	*
+	* Returns SQL Table Meta Data info
+	*
+	* this is specifically for an isolated use case of querying SQL information
+	* as a single map result. This can only be called once.
+	*
+	* @return  Map of table meta information
+	**/
 	public Map<String, String> fetchMetaData() throws JSqlException {
 		Map<String, String> ret = null;
 		if (sqlRes != null) {
@@ -334,10 +371,12 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 	// Cleanup handling
 	//
 	//-------------------------------------------------------------------------
-	
-	/// Dispose and closes the result connection
-	///
-	/// Note if you call this prior to fetchAllRows, data loss may occur.
+
+	/**
+	* Dispose and closes the result connection
+	*
+	* Note if you call this prior to fetchAllRows, data loss may occur.
+	**/
 	public void dispose() {
 		try {
 			if (sqlRes != null) {
@@ -345,35 +384,35 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 				sqlRes = null;
 			}
 		} catch (Exception e) {
-			// Logg the exception as warning
+			// Log the exception as warning
 			LOGGER.log(Level.WARNING, "JSqlResult.dispose result exception", e);
 		}
-		
+
 		try {
 			if (sqlStmt != null) {
 				sqlStmt.close();
 				sqlStmt = null;
 			}
 		} catch (Exception e) {
-			// Logg the exception as warning
+			// Log the exception as warning
 			LOGGER.log(Level.WARNING, "JSqlResult.dispose statement exception", e);
 		}
 	}
-	
+
 	//-------------------------------------------------------------------------
 	//
 	// Fine tuning equality checks
 	//
 	//-------------------------------------------------------------------------
-	
+
 	@Override
 	public boolean equals(Object o) {
 		return this == o;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return rowCount;
 	}
-	
+
 }

@@ -19,7 +19,9 @@ import picoded.set.JSqlType;
 import picoded.conv.ListValueConv;
 import picoded.conv.GenericConvert;
 
-/// JSql implmentation of AtomicLongMap
+/**
+* JSql implmentation of AtomicLongMap
+**/
 public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 
 	//--------------------------------------------------------------------------
@@ -28,16 +30,22 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 	//
 	//--------------------------------------------------------------------------
 
-	/// The inner sql object
+	/**
+	* The inner sql object
+	**/
 	protected JSql sqlObj = null;
 
-	/// The tablename for the key value pair map
+	/**
+	* The tablename for the key value pair map
+	**/
 	protected String sqlTableName = null;
 
-	/// JSql setup
-	///
-	/// @param   JSQL connection
-	/// @param   Table name to use
+	/**
+	* JSql setup
+	*
+	* @param   JSQL connection
+	* @param   Table name to use
+	**/
 	public JSql_AtomicLongMap(JSql inJSql, String tablename) {
 		super();
 		sqlObj = inJSql;
@@ -50,16 +58,24 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 	//
 	//--------------------------------------------------------------------------
 
-	/// Primary key type
+	/**
+	* Primary key type
+	**/
 	protected String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
 
-	/// Timestamp field type
+	/**
+	* Timestamp field type
+	**/
 	protected String tStampColumnType = "BIGINT";
 
-	/// Key name field type
+	/**
+	* Key name field type
+	**/
 	protected String keyColumnType = "VARCHAR(64)";
 
-	/// Value field type
+	/**
+	* Value field type
+	**/
 	protected String valueColumnType = "DECIMAL(36,12)";
 
 	//--------------------------------------------------------------------------
@@ -68,7 +84,9 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 	//
 	//--------------------------------------------------------------------------
 
-	/// Setsup the backend storage table, etc. If needed
+	/**
+	* Setsup the backend storage table, etc. If needed
+	**/
 	@Override
 	public void systemSetup() {
 		try {
@@ -119,13 +137,17 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 		}
 	}
 
-	/// Teardown and delete the backend storage table, etc. If needed
+	/**
+	* Teardown and delete the backend storage table, etc. If needed
+	**/
 	@Override
 	public void systemDestroy() {
 		sqlObj.dropTable( sqlTableName );
 	}
 
-	/// Removes all data, without tearing down setup
+	/**
+	* Removes all data, without tearing down setup
+	**/
 	@Override
 	public void clear() {
 		sqlObj.delete( sqlTableName );
@@ -137,10 +159,12 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 	//
 	//--------------------------------------------------------------------------
 
-	/// Simplified upsert, used throughout this package
-	///
-	/// @param  Key to use
-	/// @param  Value to store
+	/**
+	* Simplified upsert, used throughout this package
+	*
+	* @param  Key to use
+	* @param  Value to store
+	**/
 	protected void simplifiedUpsert(Object key, Object newVal) throws JSqlException {
 		long now = currentSystemTimeInSeconds();
 		sqlObj.upsert( //
@@ -159,14 +183,16 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 	//
 	//--------------------------------------------------------------------------
 
-	/// Stores (and overwrites if needed) key, value pair
-	///
-	/// Important note: It does not return the previously stored value
-	///
-	/// @param key as String
-	/// @param value as Long
-	///
-	/// @returns null
+	/**
+	* Stores (and overwrites if needed) key, value pair
+	*
+	* Important note: It does not return the previously stored value
+	*
+	* @param key as String
+	* @param value as Long
+	*
+	* @return null
+	**/
 	@Override
 	public Long put(Object key, Long value) {
 		try {
@@ -177,11 +203,13 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 		return null;
 	}
 
-	/// Returns the value, given the key
-	///
-	/// @param key param find the thae meta key
-	///
-	/// @returns  value of the given key
+	/**
+	* Returns the value, given the key
+	*
+	* @param key param find the thae meta key
+	*
+	* @return  value of the given key
+	**/
 	@Override
 	public Long get(Object key) {
 		// Search for the key
@@ -192,12 +220,14 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 		return null;
 	}
 
-	/// Returns the value, given the key
-	///
-	/// @param key param find the meta key
-	/// @param delta value to add
-	///
-	/// @returns  value of the given key
+	/**
+	* Returns the value, given the key
+	*
+	* @param key param find the meta key
+	* @param delta value to add
+	*
+	* @return  value of the given key
+	**/
 	@Override
 	public Long getAndAdd(Object key, Object delta) {
 		// Tries limits
@@ -230,12 +260,14 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 		throw new RuntimeException("Max tries reached : "+tries);
 	}
 
-	/// Returns the number of records deleted, given the key
-	///
-	/// Important note: If the key is not unique, all of its records will be deleted
-	///
-	/// @param key param find the meta key
-	/// @return number of records deleted
+	/**
+	* Returns the number of records deleted, given the key
+	*
+	* Important note: If the key is not unique, all of its records will be deleted
+	*
+	* @param key param find the meta key
+	* @return number of records deleted
+	**/
 	@Override
 	public Long remove(Object key) {
 		Integer resultDeleted = new Integer(sqlObj.delete(
@@ -246,14 +278,17 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 		return resultDeleted.longValue();
 	}
 
-	/// Stores (and overwrites if needed) key, value pair
-	///
-	/// Important note: It does not return the previously stored value
-	///
-	/// @param key as String
-	/// @param value as long
-	///
-	/// @returns true if successful
+
+	/**
+	* Stores (and overwrites if needed) key, value pair
+	*
+	* Important note: It does not return the previously stored value
+	*
+	* @param key as String
+	* @param value as long
+	*
+	* @return true if successful
+	**/
 	@Override
 	public boolean weakCompareAndSet(String key, Long expect, Long update) {
 		// Potentially a new upsert, ensure there is something to "delete" atleast

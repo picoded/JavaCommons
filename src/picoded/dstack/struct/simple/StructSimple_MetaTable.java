@@ -13,47 +13,55 @@ import picoded.set.ObjectToken;
 import picoded.dstack.*;
 import picoded.dstack.core.*;
 
-///
-/// Reference implementation of MetaTable data structure.
-/// This is done via a minimal implementation via internal data structures.
-///
-/// Built ontop of the Core_MetaTable implementation.
-///
+/**
+* Reference implementation of MetaTable data structure.
+* This is done via a minimal implementation via internal data structures.
+*
+* Built ontop of the Core_MetaTable implementation.
+**/
 public class StructSimple_MetaTable extends Core_MetaTable {
-	
+
 	//--------------------------------------------------------------------------
 	//
 	// Constructor vars
 	//
 	//--------------------------------------------------------------------------
-	
-	/// Stores the key to value map
+
+	/**
+	* Stores the key to value map
+	**/
 	protected Map<String, Map<String, Object>> valueMap = new ConcurrentHashMap<String, Map<String, Object>>();
-	
-	/// Read write lock
+
+	/**
+	* Read write lock
+	**/
 	protected ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
-	
+
 	//--------------------------------------------------------------------------
 	//
 	// Backend system setup / teardown / maintenance (DStackCommon)
 	//
 	//--------------------------------------------------------------------------
-	
-	/// Setsup the backend storage table, etc. If needed
+
+	/**
+	* Setsup the backend storage table, etc. If needed
+	**/
 	@Override
 	public void systemSetup() {
 		// does nothing
 	}
-	
-	/// Teardown and delete the backend storage table, etc. If needed
+
+	/**
+	* Teardown and delete the backend storage table, etc. If needed
+	**/
 	@Override
 	public void systemDestroy() {
 		clear();
 	}
-	
-	///
-	/// Removes all data, without tearing down setup
-	///
+
+	/**
+	* Removes all data, without tearing down setup
+	**/
 	@Override
 	public void clear() {
 		try {
@@ -69,15 +77,17 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	// Internal functions, used by MetaObject
 	//
 	//--------------------------------------------------------------------------
-	
-	/// [Internal use, to be extended in future implementation]
-	///
-	/// Removes the complete remote data map, for MetaObject.
-	/// This is used to nuke an entire object
-	///
-	/// @param  Object ID to remove
-	///
-	/// @return  nothing
+
+	/**
+	* [Internal use, to be extended in future implementation]
+	*
+	* Removes the complete remote data map, for MetaObject.
+	* This is used to nuke an entire object
+	*
+	* @param  Object ID to remove
+	*
+	* @return  nothing
+	**/
 	protected void metaObjectRemoteDataMap_remove(String oid) {
 		try {
 			accessLock.writeLock().lock();
@@ -87,9 +97,11 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 		}
 
 	}
-	
-	/// Gets the complete remote data map, for MetaObject.
-	/// Returns null if not exists
+
+	/**
+	* Gets the complete remote data map, for MetaObject.
+	* Returns null if not exists
+	**/
 	protected Map<String, Object> metaObjectRemoteDataMap_get(String oid) {
 		try {
 			accessLock.readLock().lock();
@@ -106,25 +118,27 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 			accessLock.readLock().unlock();
 		}
 	}
-	
-	/// Updates the actual backend storage of MetaObject
-	/// either partially (if supported / used), or completely
+
+	/**
+	* Updates the actual backend storage of MetaObject
+	* either partially (if supported / used), or completely
+	**/
 	protected void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
 		Set<String> keys) {
 		try {
 			accessLock.writeLock().lock();
-			
+
 			// Get keys to store, null = all
 			if (keys == null) {
 				keys = fullMap.keySet();
 			}
-			
+
 			// Makes a new map if needed
 			Map<String, Object> storedValue = valueMap.get(oid);
 			if (storedValue == null) {
 				storedValue = new ConcurrentHashMap<String, Object>();
 			}
-			
+
 			// Get and store the required values
 			for (String key : keys) {
 				Object val = fullMap.get(key);
@@ -134,7 +148,7 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 					storedValue.put(key, val);
 				}
 			}
-			
+
 			// Ensure the value map is stored
 			valueMap.put(oid, storedValue);
 		} finally {
@@ -148,11 +162,13 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	//
 	//--------------------------------------------------------------------------
 
-	/// Get and returns all the GUID's, note that due to its 
-	/// potential of returning a large data set, production use
-	/// should be avoided.
-	///
-	/// @returns set of keys
+	/**
+	* Get and returns all the GUID's, note that due to its
+	* potential of returning a large data set, production use
+	* should be avoided.
+	*
+	* @return set of keys
+	**/
 	@Override
 	public Set<String> keySet() {
 		try {
@@ -162,5 +178,5 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 			accessLock.readLock().unlock();
 		}
 	}
-	
+
 }

@@ -13,20 +13,22 @@ import picoded.set.ObjectToken;
 import picoded.dstack.*;
 import picoded.dstack.core.*;
 
-///
-/// Reference implementation of CommonStack
-/// This is done via a minimal implementation via internal data structures.
-///
-/// Built ontop of the Core_CommonStack implementation.
-///
+/**
+* Reference implementation of CommonStack
+* This is done via a minimal implementation via internal data structures.
+*
+* Built ontop of the Core_CommonStack implementation.
+**/
 public class StructSimpleStack extends Core_CommonStack {
 
-	/// Common structure initialization interface, to be overwritten by actual implementation
-	///
-	/// @param   Type of structure to setup
-	/// @param   Name used to initialize the structure
-	///
-	/// @return  The CommonStructure that was initialized
+	/**
+	* Common structure initialization interface, to be overwritten by actual implementation
+	*
+	* @param   Type of structure to setup
+	* @param   Name used to initialize the structure
+	*
+	* @return  The CommonStructure that was initialized
+	**/
 	public CommonStructure initializeStructure(String type, String name) {
 		if ("MetaTable".equalsIgnoreCase(type)) {
 			return new StructSimple_MetaTable();
@@ -37,5 +39,5 @@ public class StructSimpleStack extends Core_CommonStack {
 		}
 		return null;
 	}
-	
+
 }

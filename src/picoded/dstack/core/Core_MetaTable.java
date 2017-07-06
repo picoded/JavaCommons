@@ -15,12 +15,12 @@ import picoded.set.ObjectToken;
 import picoded.struct.query.*;
 import picoded.dstack.*;
 
-///
-/// Common base utility class of MetaTable
-///
-/// Does not actually implement its required feature,
-/// but helps provide a common base line for all the various implementation.
-///
+/**
+* Common base utility class of MetaTable
+*
+* Does not actually implement its required feature,
+* but helps provide a common base line for all the various implementation.
+**/
 abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObject> implements
 	MetaTable {
 
@@ -30,9 +30,11 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	//
 	//--------------------------------------------------------------------------
 
-	/// Ensures the returned value is not refrencing the input value, cloning if needed
-	///
-	/// @return  The cloned value, with no risk of modifying the original.
+	/**
+	* Ensures the returned value is not refrencing the input value, cloning if needed
+	*
+	* @return  The cloned value, with no risk of modifying the original.
+	**/
 	public Object detachValue(Object in) {
 		if (in instanceof byte[]) { //bytearray support
 			byte[] ori = (byte[]) in;
@@ -51,16 +53,16 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	//
 	//--------------------------------------------------------------------------
 
-	///
-	/// Utility funciton, used to sort and limit the result of a query
-	///
-	/// @param   list of MetaObject to sort and return
-	/// @param   query string to sort the order by, use null to ignore
-	/// @param   offset of the result to display, use -1 to ignore
-	/// @param   number of objects to return max
-	///
-	/// @returns  The MetaObject list to return
-	///
+	/**
+	* Utility funciton, used to sort and limit the result of a query
+	*
+	* @param   list of MetaObject to sort and return
+	* @param   query string to sort the order by, use null to ignore
+	* @param   offset of the result to display, use -1 to ignore
+	* @param   number of objects to return max
+	*
+	* @return  The MetaObject list to return
+	**/
 	public static List<MetaObject> sortAndOffsetList(List<MetaObject> retList, String orderByStr,
 		int offset, int limit) {
 
@@ -110,11 +112,13 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	//
 	//--------------------------------------------------------------------------
 
-	/// Removes a metaobject if it exists, from the DB
-	///
-	/// @param  object GUID to fetch, OR the MetaObject itself
-	///
-	/// @returns NULL
+	/**
+	* Removes a metaobject if it exists, from the DB
+	*
+	* @param  object GUID to fetch, OR the MetaObject itself
+	*
+	* @return NULL
+	**/
 	public MetaObject remove(Object key) {
 			if( key instanceof MetaObject ) {
 				// Removal via MetaObject itself
@@ -126,14 +130,16 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 			return null;
 	}
 
-	/// [Internal use, to be extended in future implementation]
-	///
-	/// Removes the complete remote data map, for MetaObject.
-	/// This is used to nuke an entire object
-	///
-	/// @param  Object ID to remove
-	///
-	/// @return  nothing
+	/**
+	* [Internal use, to be extended in future implementation]
+	*
+	* Removes the complete remote data map, for MetaObject.
+	* This is used to nuke an entire object
+	*
+	* @param Object ID to remove
+	*
+	* @return nothing
+	**/
 	abstract protected void metaObjectRemoteDataMap_remove(String oid);
 
 	//--------------------------------------------------------------------------
@@ -143,24 +149,28 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	//
 	//--------------------------------------------------------------------------
 
-	/// [Internal use, to be extended in future implementation]
-	///
-	/// Gets the complete remote data map, for MetaObject.
-	/// This is used to get the raw map data from the backend.
-	///
-	/// @param  Object ID to get
-	///
-	/// @return  The raw Map object to build the MetaObject, null if does not exists
+	/**
+	* [Internal use, to be extended in future implementation]
+	*
+	* Gets the complete remote data map, for MetaObject.
+	* This is used to get the raw map data from the backend.
+	*
+	* @param  Object ID to get
+	*
+	* @return  The raw Map object to build the MetaObject, null if does not exists
+	**/
 	abstract protected Map<String, Object> metaObjectRemoteDataMap_get(String oid);
 
-	/// [Internal use, to be extended in future implementation]
-	///
-	/// Updates the actual backend storage of MetaObject
-	/// either partially (if supported / used), or completely
-	///
-	/// @param   Object ID to get
-	/// @param   The full map of data. This is required as not all backend implementations allow partial update
-	/// @param   Keys to update, this is used to optimize certain backends
+	/**
+	* [Internal use, to be extended in future implementation]
+	*
+	* Updates the actual backend storage of MetaObject
+	* either partially (if supported / used), or completely
+	*
+	* @param   Object ID to get
+	* @param   The full map of data. This is required as not all backend implementations allow partial update
+	* @param   Keys to update, this is used to optimize certain backends
+	**/
 	abstract protected void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
 		Set<String> keys);
 
@@ -171,17 +181,19 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	//
 	//--------------------------------------------------------------------------
 
-	/// Performs a search query, and returns the respective MetaObject keys.
-	///
-	/// This is the GUID key varient of query, this is critical for stack lookup
-	///
-	/// @param   where query statement
-	/// @param   where clause values array
-	/// @param   query string to sort the order by, use null to ignore
-	/// @param   offset of the result to display, use -1 to ignore
-	/// @param   number of objects to return max, use -1 to ignore
-	///
-	/// @returns  The String[] array
+	/**
+	* Performs a search query, and returns the respective MetaObject keys.
+	*
+	* This is the GUID key varient of query, this is critical for stack lookup
+	*
+	* @param   where query statement
+	* @param   where clause values array
+	* @param   query string to sort the order by, use null to ignore
+	* @param   offset of the result to display, use -1 to ignore
+	* @param   number of objects to return max, use -1 to ignore
+	*
+	* @return  The String[] array
+	**/
 	public String[] query_id(String whereClause, Object[] whereValues, String orderByStr,
 		int offset, int limit) {
 
@@ -212,14 +224,16 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 		return ret;
 	}
 
-	/// Performs a custom search by configured keyname
-	///
-	/// @param   keyName to lookup for
-	/// @param   query string to sort the order by, use null to ignore
-	/// @param   offset of the result to display, use -1 to ignore
-	/// @param   number of objects to return max
-	///
-	/// @returns  The MetaObject[] array
+	/**
+	* Performs a custom search by configured keyname
+	*
+	* @param   keyName to lookup for
+	* @param   query string to sort the order by, use null to ignore
+	* @param   offset of the result to display, use -1 to ignore
+	* @param   number of objects to return max
+	*
+	* @return  The MetaObject[] array
+	**/
 	public MetaObject[] getFromKeyName(String keyName, String orderByStr, int offset, int limit) {
 
 		// The return list
@@ -242,9 +256,11 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	//
 	//--------------------------------------------------------------------------
 
-	/// Generates a new blank object, with a GUID
-	///
-	/// @returns the MetaObject
+	/**
+	* Generates a new blank object, with a GUID
+	*
+	* @return the MetaObject
+	**/
 	public MetaObject newObject() {
 		// Generating a new object
 		MetaObject ret = new Core_MetaObject(this, null, null, false);
@@ -256,12 +272,14 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 		return ret;
 	}
 
-	/// Get a MetaObject, and returns it. Skips existance checks if required
-	///
-	/// @param  object GUID to fetch
-	/// @param  boolean used to indicate if an existance check is done for the request
-	///
-	/// @returns the MetaObject
+	/**
+	* Get a MetaObject, and returns it. Skips existance checks if required
+	*
+	* @param  object GUID to fetch
+	* @param  boolean used to indicate if an existance check is done for the request
+	*
+	* @return the MetaObject
+	**/
 	public MetaObject get(String oid, boolean isUnchecked) {
 		if (isUnchecked) {
 			return new Core_MetaObject(this, oid, null, false);
@@ -270,13 +288,15 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 		}
 	}
 
-	/// Get a MetaObject, and returns it.
-	///
-	/// Existance checks is performed for such requests
-	///
-	/// @param  object GUID to fetch
-	///
-	/// @returns the MetaObject, null if not exists
+	/**
+	* Get a MetaObject, and returns it.
+	*
+	* Existance checks is performed for such requests
+	*
+	* @param  object GUID to fetch
+	*
+	* @return the MetaObject, null if not exists
+	**/
 	public MetaObject get(Object oid) {
 		// String oid
 		String soid = (oid != null) ? oid.toString() : null;
@@ -299,12 +319,12 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	//
 	//--------------------------------------------------------------------------
 
-	///
-	/// Maintenance step call, however due to the nature of most implementation not
-	/// having any form of time "expirary", this call does nothing in most implementation.
-	///
-	/// As such im making that the default =)
-	///
+	/**
+	* Maintenance step call, however due to the nature of most implementation not
+	* having any form of time "expirary", this call does nothing in most implementation.
+	*
+	* As such im making that the default =)
+	**/
 	@Override
 	public void maintenance() {
 		// Does nothing

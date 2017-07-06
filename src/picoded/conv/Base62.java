@@ -12,7 +12,9 @@ package picoded.conv;
 **/
 public class Base62 extends BaseX {
 
-	/// Default charset value
+	/**
+	* Default charset value
+	**/
 	public static final String DEFAULT_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 	// ---------------------------------

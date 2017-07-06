@@ -8,12 +8,14 @@ import picoded.dstack.*;
 import picoded.dstack.core.*;
 import picoded.conv.GenericConvert;
 
-/// Refence implementation of AtomicLongMap data structure
-///
-/// This is intended to be an optimized key value map data storage
-/// Used mainly in caching or performance critical scenerios.
-///
-/// As such its sacrifices much utility for performance
+/**
+* Refence implementation of AtomicLongMap data structure
+*
+* This is intended to be an optimized key value map data storage
+* Used mainly in caching or performance critical scenerios.
+*
+* As such its sacrifices much utility for performance
+**/
 public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 
 	//--------------------------------------------------------------------------
@@ -22,10 +24,14 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	//
 	//--------------------------------------------------------------------------
 
-	/// Stores the key to value map
+	/**
+	* Stores the key to value map
+	**/
 	protected ConcurrentMap<String, Long> valueMap = new ConcurrentHashMap<String, Long>();
 
-	/// Read write lock
+	/**
+	* Read write lock
+	**/
 	public static final ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
 
 	//--------------------------------------------------------------------------
@@ -34,7 +40,9 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	//
 	//--------------------------------------------------------------------------
 
-	/// Constructor
+	/**
+	* Constructor
+	**/
 	public StructSimple_AtomicLongMap() {
 		// does nothing =X
 	}
@@ -45,23 +53,28 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	//
 	//--------------------------------------------------------------------------
 
-	/// Setsup the backend storage table, etc. If needed
+	/**
+	* Setsup the backend storage table, etc. If needed
+	**/
 	@Override
 	public void systemSetup() {
 		// does nothing
 	}
 
-	/// Teardown and delete the backend storage table, etc. If needed
+	/**
+	* Teardown and delete the backend storage table, etc. If needed
+	**/
 	@Override
 	public void systemDestroy() {
 		valueMap.clear();
 	}
 
-	///
-	/// Removes all data, without tearing down setup
-	///
-	/// Handles re-entrant lock where applicable
-	///
+	/**
+	*
+	* Removes all data, without tearing down setup
+	*
+	* Handles re-entrant lock where applicable
+	**/
 	@Override
 	public void clear() {
 		try {
@@ -78,14 +91,16 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	//
 	//--------------------------------------------------------------------------
 
-	/// Stores (and overwrites if needed) key, value pair
-	///
-	/// Important note: It does not return the previously stored value
-	///
-	/// @param key as String
-	/// @param value as Long
-	///
-	/// @returns null
+	/**
+	* Stores (and overwrites if needed) key, value pair
+	*
+	* Important note: It does not return the previously stored value
+	*
+	* @param key as String
+	* @param value as Long
+	*
+	* @return null
+	**/
 	@Override
 	public Long put(Object key, Long value) {
 		try {
@@ -102,10 +117,12 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 		}
 	}
 
-	/// Returns the value, given the key
-	/// @param key param find the thae meta key
-	///
-	/// @returns  value of the given key
+	/**
+	* Returns the value, given the key
+	* @param key param find the thae meta key
+	*
+	* @return  value of the given key
+	**/
 	@Override
 	public Long get(Object key) {
 		try {
@@ -121,12 +138,14 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 		}
 	}
 
-	/// Returns the value, given the key. Then apply the delta change
-	///
-	/// @param key param find the meta key
-	/// @param delta value to add
-	///
-	/// @returns  value of the given key, note that it returns 0 if there wasnt a previous value set
+	/**
+	* Returns the value, given the key. Then apply the delta change
+	*
+	* @param key param find the meta key
+	* @param delta value to add
+	*
+	* @return  value of the given key, note that it returns 0 if there wasnt a previous value set
+	**/
 	@Override
 	public Long getAndAdd(Object key, Object delta) {
 		try {
@@ -148,11 +167,13 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 		}
 	}
 
-	/// Returns 1 if deleted, given the key.
-	///
-	/// @param key param find the meta key
-	///
-	/// @returns  the result of deletion, it returns 0 if nothing is deleted.
+	/**
+	* Returns 1 if deleted, given the key.
+	*
+	* @param key param find the meta key
+	*
+	* @returns  the result of deletion, it returns 0 if nothing is deleted.
+	**/
 	@Override
 	public Long remove(Object key) {
 		try {
@@ -167,14 +188,16 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 		}
 	}
 
-	/// Stores (and overwrites if needed) key, value pair
-	///
-	/// Important note: It does not return the previously stored value
-	///
-	/// @param key as String
-	/// @param value as long
-	///
-	/// @returns true if successful
+	/**
+	* Stores (and overwrites if needed) key, value pair
+	*
+	* Important note: It does not return the previously stored value
+	*
+	* @param key as String
+	* @param value as long
+	*
+	* @return true if successful
+	**/
 	@Override
 	public boolean weakCompareAndSet(String key, Long expect, Long update) {
 

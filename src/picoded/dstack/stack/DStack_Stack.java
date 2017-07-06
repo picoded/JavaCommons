@@ -15,14 +15,14 @@ import picoded.struct.UnsupportedDefaultMap;
 // Third party imports
 import org.apache.commons.lang3.RandomUtils;
 
-///
-/// The DStack, for handling all the data stuff
-///
-/// provides various common data storage format, that utalizes a combination of
-/// JCache, and JSql instances implementation.
-///
-/// The design principle is based on the prototyping experience for mmObjDB, and the original servlet-commons implementation of metaTables.
-///
+/**
+* The DStack, for handling all the data stuff
+*
+* provides various common data storage format, that utalizes a combination of
+* JCache, and JSql instances implementation.
+*
+* The design principle is based on the prototyping experience for mmObjDB, and the original servlet-commons implementation of metaTables.
+**/
 public class DStack_Stack extends Core_CommonStack {
 
 	//-----------------------------------------------------------
@@ -31,17 +31,23 @@ public class DStack_Stack extends Core_CommonStack {
 	//
 	//-----------------------------------------------------------
 
-	/// The stack of backend supported
-	protected List<CommonStack> _stackLayers = new ArrayList<CommonStack>(); 
+	/**
+	* The stack of backend supported
+	**/
+	protected List<CommonStack> _stackLayers = new ArrayList<CommonStack>();
 
-	/// Blank constructor
+	/**
+	* Blank constructor
+	**/
 	public DStack_Stack() {
 		//
 	}
 
-	/// DStack setup with a single stack node
-	///
-	/// @param  A single stack implementation
+	/**
+	* DStack setup with a single stack node
+	*
+	* @param  A single stack implementation
+	**/
 	public DStack_Stack(CommonStack single) {
 		_stackLayers.add(single);
 	}
@@ -59,14 +65,16 @@ public class DStack_Stack extends Core_CommonStack {
 	//
 	//-----------------------------------------------------------
 
-	/// Common structure initialization interface, to be overwritten by actual implementation
-	///
-	/// @param   Type of structure to setup
-	/// @param   Name used to initialize the structure
-	///
-	/// @return  The CommonStructure that was initialized
+	/**
+	* Common structure initialization interface, to be overwritten by actual implementation
+	*
+	* @param   Type of structure to setup
+	* @param   Name used to initialize the structure
+	*
+	* @return  The CommonStructure that was initialized
+	**/
 	public CommonStructure initializeStructure(String type, String name) {
-		
+
 		// Empty DStack error
 		if( _stackLayers.size() == 0 ) {
 			throw new RuntimeException("Empty DStack, add desired underlying implementation (like JSQL)");
@@ -85,5 +93,5 @@ public class DStack_Stack extends Core_CommonStack {
 		// Actual DStack setup
 		throw new RuntimeException("Multiple Dstack layers is not supported yet =(");
 	}
-	
+
 }

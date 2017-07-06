@@ -12,8 +12,9 @@ import picoded.conv.*;
 **/
 @SuppressWarnings("serial")
 public class ArrayListMap<K, V> extends HashMap<K, ArrayList<V>> {
-
-	/// Blank constructor
+	/**
+	* Blank constructor
+	**/
 	public ArrayListMap() {
 		super();
 	}

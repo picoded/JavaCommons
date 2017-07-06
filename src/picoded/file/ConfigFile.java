@@ -1,6 +1,5 @@
 package picoded.file;
 
-///
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,54 +15,62 @@ import picoded.struct.GenericConvertMap;
 
 //import com.hazelcast.com.eclipsesource.json.JsonObject;
 
-///
-/// Config file loader
-///
-/// Takes in an INI file, gives out a map. 
-///
-/// @TO-DO
-/// + Unit test, extended functions
-///
-/// + Variable subsitution (use key values as key names)
-///   eg: sys.${sys.selectedStack; default}.database
-/// + Array support
-///   eg: sys.dbStack[0].database
-/// + Nested substitution
-///   eg: sys.${sys.selectedStack; sys.default}.database
-///
-/// + JSON files delayed load
-/// + Spliting INI, and JSON load into its own seperate class, 
-///   use ConfigFileSet to switch between classes on setup
-///
-/// @TO-CONSIDER
-/// + Case insensitive key names?
-/// + File write????
-///
+/**
+* Config file loader
+*
+* Takes in an INI file, gives out a map.
+*
+* @TO-DO
+* + Unit test, extended functions
+*
+* + Variable subsitution (use key values as key names)
+*   eg: sys.${sys.selectedStack; default}.database
+* + Array support
+*   eg: sys.dbStack[0].database
+* + Nested substitution
+*   eg: sys.${sys.selectedStack; sys.default}.database
+*
+* + JSON files delayed load
+* + Spliting INI, and JSON load into its own seperate class,
+*   use ConfigFileSet to switch between classes on setup
+*
+* @TO-CONSIDER
+* + Case insensitive key names?
+* + File write????
+**/
 public class ConfigFile implements GenericConvertMap<String, Object> {
-	
-	/// The actual inner map storage
+
+	/**
+	* The actual inner map storage
+	**/
 	Ini iniMap = null;
 	GenericConvertMap<String, Object> jsonMap = null;
-	
+
 	boolean jsonMode = false;
-	
+
 	String fileName = "";
-	
-	/// Blank constructor
+
+	/**
+	* Blank constructor
+	**/
 	protected ConfigFile() {
-		
+
 	}
-	
-	/// Constructor, which takes in an INI file object and stores it
+
+	/**
+	* Constructor, which takes in an INI file object and stores it
+	**/
 	public ConfigFile(File fileObj) {
 		innerConstructor(fileObj);
 	}
-	
-	/// Constructor, which takes in an INI file path and stores it
+
+	/**
+	* Constructor, which takes in an INI file path and stores it
+	**/
 	public ConfigFile(String filePath) {
 		innerConstructor(new File(filePath));
 	}
-	
+
 	private void innerConstructor(File inFile) {
 		try {
 			fileName = inFile.getName();
@@ -79,12 +86,14 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public String fileName() {
 		return fileName;
 	}
-	
-	/// Gets the config value string, from the file
+
+	/**
+	* Gets the config value string, from the file
+	**/
 	public Object get(Object key) {
 		String keyString = key.toString();
 		if (jsonMode) {
@@ -92,21 +101,21 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 		} else {
 			// read from ini
 			String[] splitKeyString = keyString.split("\\.");
-			
+
 			String section = StringUtils.join(
 				ArrayUtils.subarray(splitKeyString, 0, splitKeyString.length - 1), "."); // name
 			// [keys] in brackets are considered a section
 			String sectionKey = splitKeyString[splitKeyString.length - 1];
-			
+
 			Ini.Section iniSection = iniMap.get(section);
-			
+
 			return (iniSection == null) ? null : iniSection.get(sectionKey);
 		}
 	}
-	
-	///
-	/// Top layer keySet fetching
-	///
+
+	/**
+	* Top layer keySet fetching
+	**/
 	public Set<String> keySet() {
 		if (jsonMode) {
 			return jsonMap.keySet();

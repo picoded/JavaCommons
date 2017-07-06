@@ -345,7 +345,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 			accountAuthMap.remove(oid);
 
 			// Remove thorttling information
-			if ( loginThrottlingAttemptMap.get(oid) != null ) loginThrottlingAttemptMap.remove(oid);
+			loginThrottlingAttemptMap.remove(oid);
 			loginThrottlingExpiryMap.remove(oid);
 			System.out.println("Account Object: " + oid + " has been successfully removed.");
 		}

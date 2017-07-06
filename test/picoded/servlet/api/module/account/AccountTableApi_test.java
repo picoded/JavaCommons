@@ -1277,6 +1277,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		ts.loginUser("infoID", "password");
 		params.clear();
 		ts.setAndExecuteGTC(params, userID.get(0), Account_Strings.RES_ACCOUNT_ID);
+		ts.logout();
 	}
 
 	// builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember);
@@ -1338,6 +1339,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(Account_Strings.REQ_USER_ID, userID.get(1));
 		expectedResult.clear();
 		ts.setAndExecuteLTC(params, expectedResult, Account_Strings.RES_LIST, "The list has some issues");
+		// need to test with logged
 	}
 
 	@Test
@@ -1402,6 +1404,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(Account_Strings.REQ_USER_ID, userID.get(1));
 		expectedResult.clear();
 		ts.setAndExecuteLTC(params, expectedResult, Account_Strings.RES_LIST, "The list has some issues");
+		// need to test with logged
 	}
 
 	@Test
@@ -1465,7 +1468,6 @@ public class AccountTableApi_test extends ApiModule_test {
 		// 3rd Test: Valid User ID
 		params.clear();
 		params.put(Account_Strings.REQ_USER_ID, userID.get(0));
-		System.out.println(userID.get(0)+" userID her iseoirois <<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 		ts.setAndExecuteGTC(params, true, Account_Strings.RES_SUCCESS);
 		// Affirmation of Result - No account Found
 		params.clear();
@@ -1482,7 +1484,19 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.clear();
 		params.put(Account_Strings.REQ_USER_ID, userID.get(1));
 		ts.setURL("getListOfGroupIDOfMember");
-		ts.setAndExecuteLTC(params, null, Account_Strings.RES_LIST, "The list has some issues");
+		ts.setAndExecuteLTC(params, expectedResult, Account_Strings.RES_LIST, "The list has some issues");
+		// 4th Test: No userID, user is logged in
+		ts.loginUser("remove2", "password");
+		ts.setURL("remove");
+		ts.setAndExecuteGTC(null, true, Account_Strings.RES_SUCCESS);
+		// Affirmation of Result - No logged in session
+		ts.setURL("isLogin");
+		ts.setAndExecuteGTC(null, false, Account_Strings.RES_RETURN);
+		// Affirmation of Result - Log in to deleted user
+		ts.setURL("login");
+		params.put(Account_Strings.REQ_USERNAME, "remove2");
+		params.put(Account_Strings.REQ_PASSWORD, "password");
+		ts.setAndExecuteGTC(params, Account_Strings.ERROR_FAIL_LOGIN, Account_Strings.RES_ERROR);
 	}
 
 	class TestSet{
@@ -1542,6 +1556,9 @@ public class AccountTableApi_test extends ApiModule_test {
 			params.put(Account_Strings.REQ_USERNAME, name);
 			params.put(Account_Strings.REQ_PASSWORD, pass);
 			assertNull(requestJSON("login", params).get(Account_Strings.RES_ERROR));
+		}
+		public void logout(){
+			assertEquals( Boolean.TRUE, requestJSON("logout", null).get(Account_Strings.RES_RETURN) );
 		}
 	}
 	//

@@ -799,7 +799,81 @@ public class AccountTableApi implements ApiModule {
 	};
 
 	// protected ApiFunction get_user_or_group_list = (req, res) -> {
+	// 	String[] insideGroupAny = req.getStringArray("insideGroup_any");
+	// 	String[] hasGroupRole_any = req.getStringArray("hasGroupRole_any");
+	// 	String groupStatus = req.getString("groupStatus");
 	//
+	// 	String orderByStr = req.getString("orderBy");
+	// 	if (orderByStr == null || orderByStr.isEmpty()) {
+	// 		orderByStr = "oID";
+	// 	}
+	//
+	// 	String[] headers = req.getStringArray("headers");
+	//
+	// 	if (headers == null || headers.length < 1) {
+	// 		headers = new String[] { "_oid", "names" };
+	// 	}
+	//
+	// 	String query = req.getString("query");
+	// 	String[] queryArgs = req.getStringArray("queryArgs");
+	//
+	// 	// Data tables search refinement
+	// 	String[] queryColumns = req.getStringArray("queryColumns", headers);
+	// 	String wildcardMode = req.getString("wildcardMode", "suffix");
+	//
+	// 	String searchParams = req.getString("searchValue", "").trim(); //datatables specific key
+	//
+	// 	if (searchParams.isEmpty()) {
+	// 		searchParams = req.getString("search[value]", "").trim();
+	// 	}
+	// 	if (searchParams.length() >= 2 && searchParams.charAt(0) == '"'
+	// 		&& searchParams.charAt(searchParams.length() - 1) == '"') {
+	// 		searchParams = searchParams.substring(1, searchParams.length() - 1);
+	// 	}
+	//
+	// 	if (!searchParams.isEmpty() && queryColumns != null && queryColumns.length > 0) {
+	// 		List<String> queryArgsList = new ArrayList<String>(); //rebuild query arguments
+	// 		if (queryArgs != null) {
+	// 			for (String queryArg : queryArgs) {
+	// 				queryArgsList.add(queryArg);
+	// 			}
+	// 		}
+	//
+	// 		if(query == null){
+	// 			query = generateQueryStringForSearchValue(searchParams, queryColumns, wildcardMode);
+	// 		}else{
+	// 			query = query + " AND " + generateQueryStringForSearchValue(searchParams, queryColumns, wildcardMode);
+	// 		}
+	//
+	// 		generateQueryStringArgsForSearchValue_andAddToList(searchParams, queryColumns, wildcardMode, queryArgsList);
+	// 		queryArgs = queryArgsList.toArray(new String[queryArgsList.size()]);
+	// 	}
+	//
+	// 	MetaTable mtObj = accountTableObj.accountMetaTable();
+	//
+	// 	//put back into response
+	// 	res.put("draw", draw);
+	// 	res.put("headers", headers);
+	//
+	// 	res.put("recordsTotal", accountTableObj.size());
+	// 	if (query != null && !query.isEmpty() && queryArgs != null && queryArgs.length > 0) {
+	// 		res.put("recordsFiltered", mtObj.queryCount(query, queryArgs));
+	// 	} else {
+	// 		res.put("recordsFiltered", mtObj.queryCount(null, null));
+	// 	}
+	//
+	// 	boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
+	//
+	// 	List<List<Object>> data = new ArrayList<List<Object>>();
+	// 	try {
+	// 		data = list_GET_and_POST_inner(accountTableObj, draw, start, limit, headers, query, queryArgs,
+	// 			orderByStr, insideGroupAny, hasGroupRole_any, groupStatus, sanitiseOutput);
+	// 		res.put("data", data);
+	// 	} catch (Exception e) {
+	// 		res.put("error", e.getMessage());
+	// 	}
+	//
+	// 	return res;
 	// };
 
 	protected ApiFunction update_current_user_info = (req, res) -> {
@@ -854,9 +928,10 @@ public class AccountTableApi implements ApiModule {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
 			return res;
 		}
-		System.out.println(userID+" <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+		if ( userID.isEmpty() ) { // logout any current session if it is the current user
+			this.logout.apply(req, res);
+		}
 		table.remove(ao);
-		System.out.println(true+" <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 		res.put(Account_Strings.RES_SUCCESS, true);
 		return res;
 	};

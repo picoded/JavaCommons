@@ -1071,9 +1071,9 @@ public class AccountTableApi_test extends ApiModule_test {
 		res = requestJSON("update_member_meta_info", params);
 		assertTrue(res.getBoolean(Account_Strings.RES_SUCCESS));
 		assertEquals("delta", res.get(Account_Strings.RES_UPDATE_MODE));
-		// 9th Test: No userID, user logged in, not in group, valid groupID, valid metaObj ( single2, exampleUpdateGrp )
+		// 9th Test: No userID, user logged in, not in group, valid groupID, valid metaObj ( update2, exampleUpdateGrp )
 		params.clear();
-		params.put(Account_Strings.REQ_USERNAME, "single2");
+		params.put(Account_Strings.REQ_USERNAME, "update2");
 		params.put(Account_Strings.REQ_PASSWORD, "password");
 		res = requestJSON("login", params);
 		assertNull(res.get(Account_Strings.RES_ERROR));
@@ -1084,36 +1084,50 @@ public class AccountTableApi_test extends ApiModule_test {
 		assertEquals(Account_Strings.ERROR_NOT_IN_GROUP_OR_ROLE, res.get(Account_Strings.RES_ERROR));
 		res = requestJSON("logout", null);
 		assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
-		// // 10th Test: No userID, user logged in, in group, valid groupID, valid metaObj ( single3, exampleUpdateGrp )
-		// params.clear();
-		// params.put(Account_Strings.REQ_USERNAME, "single3");
-		// params.put(Account_Strings.REQ_PASSWORD, "password");
-		// res = requestJSON("login", params);
-		// assertNull(res.get(Account_Strings.RES_ERROR));
-		// params.clear();
-		// params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
-		// params.put(Account_Strings.REQ_META, metaObj);
-		// res = requestJSON("update_member_meta_info", params);
-		// assertTrue(res.getBoolean(Account_Strings.RES_SUCCESS));
-		// assertEquals("delta", res.get(Account_Strings.RES_UPDATE_MODE));
-		// res = requestJSON("logout", null);
-		// assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
-		// // 11th Test: No userID, user logged in, in group, valid groupID, valid metaObj, full ( single3, exampleUpdateGrp )
-		// params.clear();
-		// params.put(Account_Strings.REQ_USERNAME, "single3");
-		// params.put(Account_Strings.REQ_PASSWORD, "password");
-		// res = requestJSON("login", params);
-		// assertNull(res.get(Account_Strings.RES_ERROR));
-		// params.clear();
-		// params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
-		// params.put(Account_Strings.REQ_META, metaObj);
-		// params.put(Account_Strings.REQ_UPDATE_MODE, "full");
-		// res = requestJSON("update_member_meta_info", params);
-		// assertTrue(res.getBoolean(Account_Strings.RES_SUCCESS));
-		// assertEquals("delta", res.get(Account_Strings.RES_UPDATE_MODE));
-		// res = requestJSON("logout", null);
-		// assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
-
+		// 10th Test: No userID, user logged in, in group, valid groupID, valid metaObj ( update1, exampleUpdateGrp )
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "update1");
+		params.put(Account_Strings.REQ_PASSWORD, "password");
+		res = requestJSON("login", params);
+		assertNull(res.get(Account_Strings.RES_ERROR));
+		params.clear();
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		params.put(Account_Strings.REQ_META, metaObj);
+		res = requestJSON("update_member_meta_info", params);
+		assertTrue(res.getBoolean(Account_Strings.RES_SUCCESS));
+		assertEquals("delta", res.get(Account_Strings.RES_UPDATE_MODE));
+		res = requestJSON("logout", null);
+		assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
+		// 11th Test: No userID, user logged in, in group, valid groupID, valid metaObj, full ( update3, exampleUpdateGrp )
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "update3");
+		params.put(Account_Strings.REQ_PASSWORD, "password");
+		res = requestJSON("login", params);
+		assertNull(res.get(Account_Strings.RES_ERROR));
+		params.clear();
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		params.put(Account_Strings.REQ_META, metaObj);
+		params.put(Account_Strings.REQ_UPDATE_MODE, "full");
+		res = requestJSON("update_member_meta_info", params);
+		assertTrue(res.getBoolean(Account_Strings.RES_SUCCESS));
+		assertEquals("full", res.get(Account_Strings.RES_UPDATE_MODE));
+		res = requestJSON("logout", null);
+		assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
+		// 12th Test: No userID, user logged in, in group, valid groupID, valid metaObj, random update ( update3, exampleUpdateGrp )
+		params.clear();
+		params.put(Account_Strings.REQ_USERNAME, "update3");
+		params.put(Account_Strings.REQ_PASSWORD, "password");
+		res = requestJSON("login", params);
+		assertNull(res.get(Account_Strings.RES_ERROR));
+		params.clear();
+		params.put(Account_Strings.REQ_GROUP_ID, groupID.get(0));
+		params.put(Account_Strings.REQ_META, metaObj);
+		params.put(Account_Strings.REQ_UPDATE_MODE, "waerawer");
+		res = requestJSON("update_member_meta_info", params);
+		assertTrue(res.getBoolean(Account_Strings.RES_SUCCESS));
+		assertEquals("delta", res.get(Account_Strings.RES_UPDATE_MODE));
+		res = requestJSON("logout", null);
+		assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
 	}
 
 	//

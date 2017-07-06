@@ -618,6 +618,7 @@ public class AccountObject extends Core_MetaObject {
 		group_userToRoleMap().saveAll();
 
 		mainTable.memberMetaTable.remove(AccountTable.getGroupChildMetaKey(this._oid(), memberOID));
+		mainTable.memberPrivateMetaTable.remove(AccountTable.getGroupChildMetaKey(this._oid(), memberOID));
 		System.out.println("Remove member called successfully");
 
 		return memberObject;

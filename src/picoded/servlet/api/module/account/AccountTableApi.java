@@ -802,7 +802,6 @@ public class AccountTableApi implements ApiModule {
 	//
 	// };
 
-
 	protected ApiFunction update_current_user_info = (req, res) -> {
 		res.put(Account_Strings.RES_SUCCESS, false);
 		String memberIDToUpdate = req.getString(Account_Strings.REQ_USER_ID, null);
@@ -848,10 +847,20 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	// protected ApiFunction delete_user_account = (req, res) -> {
-	//
-	// };
-	//
+	protected ApiFunction delete_user_account = (req, res) -> {
+		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		System.out.println(userID+" <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+		table.remove(ao);
+		System.out.println(true+" <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+		res.put(Account_Strings.RES_SUCCESS, true);
+		return res;
+	};
+
 	/// Gets and return the account info for the given accountID
 	/// Note: if ${accountName} is blank, it assumes the current user
 	protected ApiFunction account_info_by_ID = (req, res) -> {
@@ -1006,6 +1015,7 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"do_password_reset", do_password_reset); // Tested
 		builder.put(path+"account_info_by_Name", account_info_by_Name); // Tested
 		builder.put(path+"account_info_by_ID", account_info_by_ID); // Tested
+		builder.put(path+"remove", delete_user_account);
 
 		//Group functionalities
 		builder.put(path+"groupRoles", groupRoles); // Tested
@@ -1014,11 +1024,11 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"addMembershipRole", add_new_membership_role); // Tested
 		builder.put(path+"removeMembershipRole", remove_membership_role); // Tested
 
-		builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember); // Tested
 		builder.put(path+"get_member_list_info", get_member_list_info); // Tested
 		builder.put(path+"add_remove_member", add_remove_member); // Tested
 		builder.put(path+"get_single_member_meta", get_single_member_meta); // Tested
 		builder.put(path+"update_member_meta_info", update_member_meta_info); // Tested
+		builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember); // Tested
 		builder.put(path+"getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
 		// builder.put(path+"getListOfMemberObjectOfGroup", getListOfMemberObjectOfGroup); // Tested
 	}

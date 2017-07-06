@@ -304,40 +304,30 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 			String oid = inOid.toString();
 			AccountObject ao = this.get(oid);
 
-			// Remove account meta information
-			accountLoginIdMap.remove(oid);
-			accountPrivateMetaTable.remove(oid);
-
-			// @TODO - handle removal of group data
-			// memberRolesTable
-			// memberMetaTable
-			// memberPrivateMetaTable
-			//-----------------------------------------
-			// //group_childRole and groupChild_meta
-			// if (ao != null) {
-			// 	if (ao.isGroup()) {
-			// 		MetaObject groupObj = group_childRole.get(oid);
-			// 		group_childRole.remove(oid);
-			// 		if (groupObj != null) {
-			// 			for (String userID : groupObj.keySet()) {
-			// 				String groupChildMetaKey = getGroupChildMetaKey(oid, userID);
-			// 				groupChild_meta.remove(groupChildMetaKey);
-			// 			}
-			// 		}
-			// 	} else {
-			// 		String[] groupIDs = ao.getGroups_id();
-			// 		if (groupIDs != null) {
-			// 			for (String groupID : groupIDs) {
-			// 				MetaObject groupObj = group_childRole.get(groupID);
-			// 				groupObj.remove(oid);
-			// 				String groupChildMetaKey = getGroupChildMetaKey(groupID, oid);
-			// 				groupChild_meta.remove(groupChildMetaKey);
-			// 			}
-			// 		}
-			// 	}
-			// }
-			//-----------------------------------------
-
+			// Remove account member's information
+			if ( ao != null ) {
+				if ( ao.isGroup() ) {
+					// Remove all members from the group
+					// Eradicate the member - role maps
+					String[] memberIDs = ao.getMembers_id();
+					for ( String memberID : memberIDs ) {
+						AccountObject member = this.get(memberID);
+						if ( member != null ) {
+							ao.removeMember(member);
+						}
+					}
+					memberRolesTable.remove(ao._oid()); // Destroy the group's user to role map
+				}
+				// Remove itself from all the group it has associated
+				String[] groupIDs = ao.getGroups_id();
+				for ( String groupID : groupIDs ) {
+					AccountObject parentGroup = this.get(groupID);
+					if ( parentGroup != null ) {
+						parentGroup.removeMember(ao);
+					}
+				}
+				// @TODO - remove existence of itself to other tables if necessary
+			}
 			// Remove login ID's AKA nice names
 			Set<String> loginIdMapNames = accountLoginIdMap.keySet(oid);
 			if (loginIdMapNames != null) {
@@ -345,14 +335,19 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 					accountLoginIdMap.remove(name, oid);
 				}
 			}
+			// Remove account meta information
+			accountLoginIdMap.remove(oid);
+			accountPrivateMetaTable.remove(oid);
+			accountMetaTable.remove(oid);
+
 
 			// Remove login authentication details
 			accountAuthMap.remove(oid);
 
 			// Remove thorttling information
-			loginThrottlingAttemptMap.remove(oid);
+			if ( loginThrottlingAttemptMap.get(oid) != null ) loginThrottlingAttemptMap.remove(oid);
 			loginThrottlingExpiryMap.remove(oid);
-
+			System.out.println("Account Object: " + oid + " has been successfully removed.");
 		}
 
 		return null;

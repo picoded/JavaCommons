@@ -8,6 +8,7 @@ import picoded.dstack.module.account.*;
 import picoded.dstack.*;
 import picoded.conv.ConvertJSON;
 import picoded.conv.RegexUtil;
+import picoded.conv.GenericConvert;
 import java.util.function.BiFunction;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
@@ -329,55 +330,60 @@ public class AccountTableApi implements ApiModule {
 		// Return result
 		return res;
 	};
-	//	/**
-	// * # getMemberRoleFromGroup
-	// *
-	// * Retrieve the role of an existing user from an existing group
-	// *
-	// * ## HTTP Request Parameters
-	// *
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | Parameter Name  | Variable Type					| Description                                                                |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | username				| String								| name of the user to retrieve																							 |
-	// * | groupname				| String								| name of the group to retrieve from																				 |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// *
-	// * ## JSON Object Output Parameters
-	// *
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | Parameter Name  | Variable Type					| Description                                                                |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | single					| String	              | Role of the user																													 |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// **/
-	// protected ApiFunction getMemberRoleFromGroup = (req, res) -> {
-	// 	// Checks all input are given before proceeding
-	// 	Map<String, String> result = validateGroupParameters(req);
-	// 	if ( result.get(Account_Strings.RES_ERROR) != null ) {
-	// 		res.put(Account_Strings.RES_ERROR, result.get(Account_Strings.RES_ERROR));
-	// 		return res;
-	// 	}
-	// 	AccountObject group = table.getFromLoginID(result.get(Account_Strings.REQ_GROUPNAME));
-	// 	if ( group == null ) {
-	// 		res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
-	// 		return res;
-	// 	}
-	// 	AccountObject userToAdd = table.getFromLoginID(result.get(Account_Strings.REQ_USERNAME));
-	// 	if ( userToAdd == null ) {
-	// 		res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
-	// 		return res;
-	// 	}
-	// 	String role = group.getMemberRole(userToAdd);
-	// 	if ( role == null ) {
-	// 		res.put(Account_Strings.RES_ERROR, "No role for user is found.");
-	// 	} else {
-	// 		res.put(Account_Strings.RES_SINGLE_RETURN_VALUE, role);
-	// 	}
-	// 	return res;
-	// };
+
+	/**
+	* # getMemberRoleFromGroup
+	*
+	* Retrieve the role of an existing user from an existing group
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | userID					| String								| ID of the user to retrieve																								 |
+	* | groupID					| String								| ID of the group to retrieve from																					 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | single					| String	              | Role of the user																													 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
+	protected ApiFunction getMemberRoleFromGroup = (req, res) -> {
+		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
+		if ( groupID == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
+			return res;
+		}
+		String userID = req.getString(Account_Strings.REQ_USER_ID);
+		if ( userID == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER_ID);
+			return res;
+		}
+		AccountObject group = table.get(groupID);
+		if ( group == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			return res;
+		}
+		AccountObject userToAdd = table.get(userID);
+		if ( userToAdd == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		String role = group.getMemberRole(userToAdd);
+		if ( role == null ) {
+			res.put(Account_Strings.RES_ERROR, "No role for user is found.");
+		} else {
+			res.put(Account_Strings.RES_SINGLE_RETURN_VALUE, role);
+		}
+		return res;
+	};
 
 	/**
 	* # add_new_membership_role
@@ -517,20 +523,21 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction get_member_list_info = (req, res) -> {
-
 		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
 
 		AccountObject group = ( groupID != null ) ? table.get(groupID) : table.getRequestUser(req.getHttpServletRequest(), null);
-		if ( group == null || group.isGroup()) {
+		if ( group == null || !group.isGroup()) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
 			return res;
 		}
+
 		String[] headers = req.getStringArray(Account_Strings.REQ_HEADERS, "['" + Account_Strings.PROPERTIES_OID + "', '" + Account_Strings.PROPERTIES_ROLE +"']");
-		AccountObject[] memberobjList = group.getGroups();
+		AccountObject[] memberobjList = group.getMembersAccountObject();
 		List<List<Object>> returnList = new ArrayList<List<Object>>();
 		int listCounter = 0;
 		for ( AccountObject ao : memberobjList ) {
 			MetaObject currentGrpAOMeta = group.getMember(ao);
+			returnList.add(new ArrayList<Object>());
 			for ( String column : headers ) {
 				if ( column.equalsIgnoreCase(Account_Strings.PROPERTIES_OID) ) {
 					returnList.get(listCounter).add(ao._oid());
@@ -559,14 +566,23 @@ public class AccountTableApi implements ApiModule {
 			listCounter++;
 		}
 		res.put(Account_Strings.RES_GROUP_ID, group._oid());
-		res.put(Account_Strings.RES_LIST, returnList);
+		res.put(Account_Strings.RES_DATA, returnList);
 		res.put(Account_Strings.RES_DRAW, req.getInt("draw"));
-		res.put("recordsTotal", returnList.size());
-		res.put("recordsFiltered", returnList.size());
+		res.put(Account_Strings.RES_RECORDS_TOTAL, returnList.size());
+		res.put(Account_Strings.RES_RECORDS_FILTERED, returnList.size());
 		res.put(Account_Strings.RES_HEADERS, headers);
 		return res;
 	};
 
+	/**
+	* Description: This function performs add/remove members from existing groups
+	*
+	*
+	*	@param actionObject - GenericConvertMap<String, Object> Contains the action and groupID to be performed by the function
+	* @param userIDList - String[] Contains the list of user ID to be processed
+	*
+	*	@return returnResult - GenericConvertMap<String, Object> Returns the failedList and successList back to caller
+	*/
 	private BiFunction<GenericConvertMap<String, Object>, String[], GenericConvertHashMap<String, Object>> addOrRemove = (actionObject, userIDList) -> {
 		List<String> failedList = new ArrayList<String>(), successList = new ArrayList<String>();
 		AccountObject group = (AccountObject) actionObject.get(Account_Strings.GROUP),  currentUser = null;
@@ -583,7 +599,7 @@ public class AccountTableApi implements ApiModule {
 				failedList.add("ID: " + userID + ", Error: " + actionErrorMsg);
 				continue;
 			} else if ( action.equalsIgnoreCase("remove") && result.getInt(Account_Strings.PROPERTIES_IS_GROUP) == 0 && result._oid() == group._oid()) {
-				failedList.add("ID: " + group._oid() + ", Error: This is not a group.");
+				failedList.add("ID: " + group._oid() + ", Error: " + Account_Strings.ERROR_NOT_GROUP);
 				break;
 			}
 			successList.add(userID);
@@ -594,31 +610,32 @@ public class AccountTableApi implements ApiModule {
 		return returnResult;
 	};
 
-	/// # add_remove_member
-	///
-	/// Add/Remove an existing user (with role) to/from an existing group
-	///
-	/// ## HTTP Request Parameters
-	///
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type					| Description                                                                |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | addList					| String []							| List of ID of the users to add																						 |
-	/// | removeList			| String []							| List of ID of the users to remove																					 |
-	/// | groupID					| String []							| ID of the group to add/remove to/from																			 |
-	/// | role						| String								| name of the role assigned for the user																		 |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	///
-	/// ## JSON Object Output Parameters
-	///
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | Parameter Name  | Variable Type					| Description                                                                |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | meta						| {Object}              | Information of the newly added user																				 |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	/// | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
-	///
+	/**
+	* # add_remove_member
+	*
+	* Add/Remove an existing user (with role) to/from an existing group
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | addList					| String []							| List of ID of the users to add																						 |
+	* | removeList			| String []							| List of ID of the users to remove																					 |
+	* | groupID					| String []							| ID of the group to add/remove to/from																			 |
+	* | role						| String								| name of the role assigned for the user																		 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | meta						| {Object}              | Information of the newly added user																				 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
 	protected ApiFunction add_remove_member = (req, res) -> {
 		// Checks all input are given before proceeding
 		String [] addList = req.getStringArray(Account_Strings.REQ_ADD_LIST, "[]");
@@ -681,8 +698,8 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction get_single_member_meta = (req, res) -> {
-		String accountID = req.getString(Account_Strings.REQ_ACCOUNT_ID, null);
-		AccountObject ao = ( accountID != null ) ? table.get(accountID) : table.getRequestUser(req.getHttpServletRequest(), null);
+		String userID = req.getString(Account_Strings.REQ_USER_ID, null);
+		AccountObject ao = ( userID != null ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if( ao == null ) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
 			return res;
@@ -701,126 +718,528 @@ public class AccountTableApi implements ApiModule {
 
 		MetaObject groupResult = (role != null) ? group.getMember(ao, role) : group.getMember(ao);
 		if ( groupResult == null ) {
-			res.put(Account_Strings.RES_ERROR, "User is not in group or not in specified role.");
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NOT_IN_GROUP_OR_ROLE);
 		}else{
 			res.put(Account_Strings.RES_META, groupResult);
 		}
 		return res;
 	};
 
-	// protected ApiFunction update_member_info = (req, res) -> {
-	//
-	// };
-	//
-	// protected ApiFunction do_password_reset = (req, res) -> {
-	//
-	// };
-	//
-	// protected ApiFunction get_basic_user_info = (req, res) -> {
-	//
-	// };
-	//
-	// protected ApiFunction get_user_list = (req, res) -> {
-	//
-	// };
-	//
-	// protected ApiFunction get_current_user_info = (req, res) -> {
-	//
-	// };
-	//
-	// protected ApiFunction update_current_user_info = (req, res) -> {
-	//
-	// };
-	//
-	// protected ApiFunction delete_user_account = (req, res) -> {
-	//
-	// };
-	//
-	// protected ApiFunction get_group_list_info = (req, res) -> {
-	//
-	// };
+	/**
+	* # update_member_meta_info
+	*
+	* Update the member meta information of an existing/current user from an existing group
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	* | groupID					| String								| ID of the group to retrieve from																					 |
+	* | updateMode			| String	              | Mode of the update used, full or delta (default: delta)										 |
+	* | meta						| {Object}							| name of the role assigned to the user																			 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | meta						| {Object}              | Meta information of the user																							 |
+	* | accountID				| String	              | ID of the user																														 |
+	* | updateMode			| String	              | Mode of the update used																										 |
+	* | success					| boolean	              | false for failed update and true for success															 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
+	protected ApiFunction update_member_meta_info = (req, res) -> {
+		res.put(Account_Strings.RES_SUCCESS, false);
+		String memberIDToUpdate = req.getString(Account_Strings.REQ_USER_ID, null);
+		AccountObject ao = (memberIDToUpdate != null ) ? table.get(memberIDToUpdate) : table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		String groupID = req.getString(Account_Strings.REQ_GROUP_ID, null);
+		if ( groupID == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
+			return res;
+		}
+		Object metaObjRaw = req.get(Account_Strings.REQ_META);
+		if ( metaObjRaw == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_META);
+			return res;
+		}
+		AccountObject group = table.get(groupID);
+		if ( group == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			return res;
+		}
+		MetaObject currentMemberMeta = group.getMember(ao);
+		if ( currentMemberMeta == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NOT_IN_GROUP_OR_ROLE);
+			return res;
+		}
+		String updateMode = req.getString(Account_Strings.REQ_UPDATE_MODE, "delta");
+		Map<String, Object> metaObj = ConvertJSON.toMap((String) metaObjRaw);
+		updateMode = ( !updateMode.equalsIgnoreCase("full") ) ? "delta" : updateMode;
+		currentMemberMeta.putAll(metaObj);
+		if ( updateMode.equalsIgnoreCase("full") ) {
+			currentMemberMeta.saveAll();
+		} else {
+			currentMemberMeta.saveDelta();
+		}
+		res.put(Account_Strings.RES_ACCOUNT_ID, ao._oid());
+		res.put(Account_Strings.RES_META, metaObj);
+		res.put(Account_Strings.RES_UPDATE_MODE, updateMode);
+		res.put(Account_Strings.RES_SUCCESS, true);
 
-	//	/**
-	// * # getListOfGroupIDOfMember
-	// *
-	// * Retrieve a list of groups ID from an existing member
-	// *
-	// * ## HTTP Request Parameters
-	// *
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | Parameter Name  | Variable Type					| Description                                                                |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | username				| String	(Either or)		| name of the user to retrieve from																					 |
-	// * | oid							| String								| oid of the user to retrieve from																					 |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// *
-	// * ## JSON Object Output Parameters
-	// *
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | Parameter Name  | Variable Type					| Description                                                                |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | list						| List<String>          | List containing the groups' ID of the member															 |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// **/
-	// protected ApiFunction getListOfGroupIDOfMember = (req, res) -> {
-	// 	String _oid = req.getString(Account_Strings.REQ_OID, null);
-	// 	String username = req.getString(Account_Strings.REQ_USERNAME, null);
-	// 	if ( _oid == null && username == null ){
-	// 		res.put(Account_Strings.RES_ERROR, "No oid and username found.");
-	// 		return res;
-	// 	}
-	// 	AccountObject ao = ( _oid != null ) ? table.get(_oid) : table.getFromLoginID(username);
-	// 	if ( ao == null ) {
-	// 		res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
-	// 		return res;
-	// 	}
-	// 	String[] listOfGroups = ao.getGroups_id();
-	// 	res.put(Account_Strings.RES_LIST, listOfGroups);
-	// 	return res;
-	// };
-	//
-	//	/**
-	// * # getListOfGroupObjectOfMember
-	// *
-	// * Retrieve a list of groups OBJECT from an existing member
-	// *
-	// * ## HTTP Request Parameters
-	// *
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | Parameter Name  | Variable Type					| Description                                                                |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | username				| String	(Either or)		| name of the user to retrieve from																					 |
-	// * | oid							| String								| oid of the user to retrieve from																					 |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// *
-	// * ## JSON Object Output Parameters
-	// *
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | Parameter Name  | Variable Type					| Description                                                                |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | list						| List<String>          | List containing the groups' OBJECT of the member													 |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	// * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	// **/
-	// protected ApiFunction getListOfGroupObjectOfMember = (req, res) -> {
-	// 	String _oid = req.getString(Account_Strings.REQ_OID, null);
-	// 	String username = req.getString(Account_Strings.REQ_USERNAME, null);
-	// 	if ( _oid == null && username == null ){
-	// 		res.put(Account_Strings.RES_ERROR, "No oid and username found.");
-	// 		return res;
-	// 	}
-	// 	AccountObject ao = ( _oid != null ) ? table.get(_oid) : table.getFromLoginID(username);
-	// 	if ( ao == null ) {
-	// 		res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
-	// 		return res;
-	// 	}
-	// 	AccountObject[] listOfGroupsObj = ao.getGroups();
-	// 	res.put(Account_Strings.RES_LIST, listOfGroupsObj);
-	// 	return res;
-	// };
+		return res;
+	};
+
+	/**
+	* # do_password_reset
+	*
+	* Resets the password of the user/current member
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	* | oldPassword			| String								| Old password of the user																									 |
+	* | newPassword			| String								| New password of the user																									 |
+	* | repeatPassword	| String								| Repeat new password of the user																						 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | accountID				| String	              | ID of the user																														 |
+	* | success					| boolean	              | false for failed change and true for success															 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
+	protected ApiFunction do_password_reset = (req, res) -> {
+		res.put(Account_Strings.RES_SUCCESS, false);
+		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		String oldPassword = req.getString(Account_Strings.REQ_OLD_PASSWORD, "");
+		if ( oldPassword.isEmpty() ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PASSWORD);
+			return res;
+		}
+		String newPassword = req.getString(Account_Strings.REQ_NEW_PASSWORD, "");
+		if ( newPassword.isEmpty() ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_NEW_PASSWORD);
+			return res;
+		}
+		String repeatPassword = req.getString(Account_Strings.REQ_REPEAT_PASSWORD, "");
+		if ( repeatPassword.isEmpty() ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_NEW_REPEAT_PASSWORD);
+			return res;
+		}
+		if ( !newPassword.equals(repeatPassword) ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_PASS_NOT_EQUAL);
+			return res;
+		}
+		if ( !ao.setPassword(newPassword, oldPassword) ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_PASS_INCORRECT);
+			return res;
+		}
+		res.put(Account_Strings.RES_SUCCESS, true);
+		res.put(Account_Strings.RES_ACCOUNT_ID, ao._oid());
+
+		return res;
+	};
+
+	/**
+	* # get_user_or_group_list
+	*
+	* Lists the users according to the search criteria
+	*
+	* This JSON api is compatible with the datatables.js server side API.
+	* See: https://web.archive.org/web/20140627100023/http://datatables.net/manual/server-side
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type	    | Description                                                                   |
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
+	* | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
+	* | length          | int (optional)     | Default 50: The number of records to return                                   |
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | insideGroup_any | String[](optional) | Default null, else filters for only accounts inside the listed groups ID      |
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
+	* | query           | String (optional)  | Requested Query filter                                                        |
+	* | queryArgs       | String[] (optional)| Requested Query filter arguments                                              |
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | groupStatus     | String (optional)  | Default "both", either "user" or "group". Used to lmit the result set         |
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
+	* |                |                    | are returned as well.                                                         |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+s
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type	    | Description                                                                   |
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
+	* | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    |
+	* | recordsFilterd  | int                | Total amount of records. After all search filter                              |
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | data            | array              | Array of row records                                                          |
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | error           | String (Optional)  | Errors encounted if any                                                       |
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	**/
+	protected ApiFunction get_user_or_group_list = (req, res) -> {
+		int draw = req.getInt("draw");
+		int start = req.getInt("start");
+		int limit = req.getInt("length");
+		String[] insideGroupAny = req.getStringArray("insideGroup_any");
+		String[] hasGroupRole_any = req.getStringArray("hasGroupRole_any");
+		String groupStatus = req.getString("groupStatus");
+
+		String orderByStr = req.getString("orderBy", "oID");
+
+		String[] headers = req.getStringArray("headers", "['" + Account_Strings.PROPERTIES_OID + "', '" + Account_Strings.PROPERTIES_NAMES + "']");
+
+		String query = req.getString("query");
+		String[] queryArgs = req.getStringArray("queryArgs");
+
+		// Data tables search refinement
+		String[] queryColumns = req.getStringArray("queryColumns", headers);
+		String wildcardMode = req.getString("wildcardMode", "suffix");
+
+		String searchParams = req.getString("searchValue", "").trim(); //datatables specific key
+
+		if (searchParams.isEmpty()) {
+			searchParams = req.getString("search[value]", "").trim();
+		}
+		if (searchParams.length() >= 2 && searchParams.charAt(0) == '"'
+			&& searchParams.charAt(searchParams.length() - 1) == '"') {
+			searchParams = searchParams.substring(1, searchParams.length() - 1);
+		}
+
+		if (!searchParams.isEmpty() && queryColumns != null && queryColumns.length > 0) {
+			List<String> queryArgsList = new ArrayList<String>(); //rebuild query arguments
+			if (queryArgs != null) {
+				for (String queryArg : queryArgs) {
+					queryArgsList.add(queryArg);
+				}
+			}
+
+			if(query == null){
+				query = generateQueryStringForSearchValue(searchParams, queryColumns);
+			}else{
+				query = query + " AND " + generateQueryStringForSearchValue(searchParams, queryColumns);
+			}
+
+			generateQueryStringArgsForSearchValue_andAddToList(searchParams, queryColumns, wildcardMode, queryArgsList);
+			queryArgs = queryArgsList.toArray(new String[queryArgsList.size()]);
+		}
+
+		MetaTable mtObj = table.accountMetaTable();
+
+		//put back into response
+		res.put(Account_Strings.RES_DRAW, draw);
+		res.put(Account_Strings.RES_HEADERS, headers);
+		res.put(Account_Strings.RES_RECORDS_TOTAL, table.size());
+		if (query != null && !query.isEmpty() && queryArgs != null && queryArgs.length > 0) {
+			res.put(Account_Strings.RES_RECORDS_FILTERED, mtObj.queryCount(query, queryArgs));
+		} else {
+			res.put(Account_Strings.RES_RECORDS_FILTERED, mtObj.queryCount(null, null));
+		}
+
+		boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
+
+		List<List<Object>> data = new ArrayList<List<Object>>();
+		try {
+			data = list_GET_and_POST_inner(table, draw, start, limit, headers, query, queryArgs,
+				orderByStr, insideGroupAny, hasGroupRole_any, groupStatus, sanitiseOutput);
+				// System.out.println(ConvertJSON.fromObject(data)+" <<<<<<<<<<<<<<<<< data");
+			res.put(Account_Strings.RES_DATA, data);
+		} catch (Exception e) {
+			res.put("error", e.getMessage());
+		}
+
+		return res;
+	};
+
+	/**
+	* # update_current_user_info
+	*
+	* Update the account meta of existing/current user
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	* | updateMode			| String	              | Mode of the update used, full or delta (default: delta)										 |
+	* | meta						| {Object}							| name of the role assigned to the user																			 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | accountID				| String	              | ID of the user																														 |
+	* | success					| boolean	              | false for failed change and true for success															 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
+	protected ApiFunction update_current_user_info = (req, res) -> {
+		res.put(Account_Strings.RES_SUCCESS, false);
+		String userID = req.getString(Account_Strings.REQ_USER_ID, null);
+		AccountObject ao = (userID != null ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		Object metaObjRaw = req.get(Account_Strings.REQ_META);
+		if ( metaObjRaw == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_META);
+			return res;
+		}
+
+		String updateMode = req.getString(Account_Strings.REQ_UPDATE_MODE, "delta");
+		Map<String, Object> metaObj = ConvertJSON.toMap((String) metaObjRaw);
+		updateMode = ( !updateMode.equalsIgnoreCase("full") ) ? "delta" : updateMode;
+		ao.putAll(metaObj);
+		if ( updateMode.equalsIgnoreCase("full") ) {
+			ao.saveAll();
+		} else {
+			ao.saveDelta();
+		}
+		res.put(Account_Strings.RES_ACCOUNT_ID, ao._oid());
+		res.put(Account_Strings.RES_META, metaObj);
+		res.put(Account_Strings.RES_UPDATE_MODE, updateMode);
+		res.put(Account_Strings.RES_SUCCESS, true);
+
+		return res;
+	};
+
+	/**
+	* # delete_user_account
+	*
+	* Delete an existing/current user
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | success					| boolean	              | false for failed change and true for success															 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
+	protected ApiFunction delete_user_account = (req, res) -> {
+		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		if ( userID.isEmpty() ) { // logout any current session if it is the current user
+			this.logout.apply(req, res);
+		}
+		table.remove(ao);
+		res.put(Account_Strings.RES_SUCCESS, true);
+		return res;
+	};
+
+	/**
+	* # account_info_by_ID
+	*
+	* Retrieve the account information of existing/current user using ID
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | accountID       | String             | account ID used                                                               |
+	* | accountNames    | String[]           | array of account names representing the account                               | sanitise
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | isSuperUser     | boolean            | indicates if the account is considered a superUser                            |
+	* | isAnyGroupAdmin | boolean            | indicates if the account is considered a superUser                            |
+	* | isGroup         | boolean            | indicates if the account is considered a group                                |
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | groups          | object(Map)        | Groups object as a Map<String, List<Map<String, Object>>>                     | sanitise
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
+	protected ApiFunction account_info_by_ID = (req, res) -> {
+		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
+		res.putAll(commonInfo);
+		return res;
+	};
+
+	/**
+	* # account_info_by_Name
+	*
+	* Retrieve the account information of existing/current user using username
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | accountID       | String             | account ID used                                                               |
+	* | accountNames    | String[]           | array of account names representing the account                               | sanitise
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | isSuperUser     | boolean            | indicates if the account is considered a superUser                            |
+	* | isAnyGroupAdmin | boolean            | indicates if the account is considered a superUser                            |
+	* | isGroup         | boolean            | indicates if the account is considered a group                                |
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* | groups          | object(Map)        | Groups object as a Map<String, List<Map<String, Object>>>                     | sanitise
+	* +-----------------+--------------------+-------------------------------------------------------------------------------+
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
+	protected ApiFunction account_info_by_Name = (req, res) -> {
+		String userName = req.getString(Account_Strings.REQ_USERNAME, "");
+		AccountObject ao = ( !userName.isEmpty() ) ? table.getFromLoginID(userName) : table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
+		res.putAll(commonInfo);
+		return res;
+	};
+
+	/**
+	* # getListOfGroupIDOfMember
+	*
+	* Retrieve a list of groups ID from an existing member/current user
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | username				| String	(Either or)		| name of the user to retrieve from																					 |
+	* | oid							| String								| oid of the user to retrieve from																					 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | list						| List<String>          | List containing the groups' ID of the member															 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
+	protected ApiFunction getListOfGroupIDOfMember = (req, res) -> {
+		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		String[] listOfGroups = ao.getGroups_id();
+		res.put(Account_Strings.RES_LIST, listOfGroups);
+		return res;
+	};
+
+	/**
+	* # getListOfGroupObjectOfMember
+	*
+	* Retrieve a list of groups OBJECT from an existing member/current user
+	*
+	* ## HTTP Request Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | userID					| String	(Either or)		| ID of the user to retrieve from																						 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | Parameter Name  | Variable Type					| Description                                                                |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | list						| List<String>          | List containing the groups' OBJECT of the member													 |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	**/
+	protected ApiFunction getListOfGroupObjectOfMember = (req, res) -> {
+		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		AccountObject[] listOfGroupsObj = ao.getGroups();
+		List<Map<String, Object>> groupList = new ArrayList<Map<String,Object>>();
+		int listCounter = 0;
+		for ( AccountObject groupObj : listOfGroupsObj ) {
+			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(groupObj, true);
+			groupList.add(commonInfo);
+			listCounter++;
+		}
+		res.put(Account_Strings.RES_LIST, groupList);
+		return res;
+	};
 
 	/**
 	* # lock time
@@ -869,24 +1288,26 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"lockTime", lockTime); // Tested
 		builder.put(path+"logout", logout); // Tested
 		builder.put(path+"new", new_account); // Tested
+		builder.put(path+"do_password_reset", do_password_reset); // Tested
+		builder.put(path+"account_info_by_Name", account_info_by_Name); // Tested
+		builder.put(path+"account_info_by_ID", account_info_by_ID); // Tested
+		builder.put(path+"remove", delete_user_account); // Tested
+		builder.put(path+"get_user_or_group_list", get_user_or_group_list); // Tested
+		builder.put(path+"update_current_user_info", update_current_user_info);
 
 		//Group functionalities
 		builder.put(path+"groupRoles", groupRoles); // Tested
-		// builder.put(path+"addMember", addMemberToGroup); // Tested
-		// builder.put(path+"removeMember", removeMemberFromGroup); // Tested
-		//
-		// builder.put(path+"getMemberMeta", getMemberMetaFromGroup); // Tested
-		// builder.put(path+"getMemberRole", getMemberRoleFromGroup); // Tested
-		//
+		builder.put(path+"getMemberRole", getMemberRoleFromGroup); // Tested
+
 		builder.put(path+"addMembershipRole", add_new_membership_role); // Tested
 		builder.put(path+"removeMembershipRole", remove_membership_role); // Tested
-		//
-		// builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember); // Tested
+
 		builder.put(path+"get_member_list_info", get_member_list_info); // Tested
-		builder.put(path+"add_remove_member", add_remove_member);
-		builder.put(path+"get_single_member_meta", get_single_member_meta);
-		//
-		// builder.put(path+"getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
+		builder.put(path+"add_remove_member", add_remove_member); // Tested
+		builder.put(path+"get_single_member_meta", get_single_member_meta); // Tested
+		builder.put(path+"update_member_meta_info", update_member_meta_info); // Tested
+		builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember); // Tested
+		builder.put(path+"getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
 		// builder.put(path+"getListOfMemberObjectOfGroup", getListOfMemberObjectOfGroup); // Tested
 	}
 
@@ -909,4 +1330,227 @@ public class AccountTableApi implements ApiModule {
 		res.put(Account_Strings.REQ_GROUPNAME, groupName);
 		return res;
 	}
+
+	private static Map<String, Object> extractCommonInfoFromAccountObject(AccountObject account, boolean sanitiseOutput) {
+	//sanitise accountNames, groupNames,
+		Map<String, Object> commonInfo = new HashMap<String, Object>();
+		sanitiseOutput = true; // let it always sanitise the output
+		commonInfo.put(Account_Strings.RES_ACCOUNT_ID, null);
+		commonInfo.put("accountNames", null);
+		commonInfo.put("isSuperUser", null);
+		commonInfo.put("isGroup", null);
+		commonInfo.put("groups", null);
+		commonInfo.put("isAnyGroupAdmin", false);
+
+		if (account != null) {
+			commonInfo.put(Account_Strings.RES_ACCOUNT_ID, account._oid());
+			Set<String> accNameSet = account.getLoginIDSet();
+			if (accNameSet != null) {
+				String[] accNames = new String[accNameSet.size()];
+				accNameSet.toArray(accNames);
+				if (sanitiseOutput && accNames != null) {
+					for (int i = 0; i < accNames.length; ++i) {
+						accNames[i] = RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(accNames[i]);
+					}
+				}
+				commonInfo.put("accountNames", accNames);
+			}
+			commonInfo.put("isSuperUser", account.isSuperUser());
+			commonInfo.put("isGroup", account.isGroup());
+			Map<String, List<Map<String, Object>>> groupMap = new HashMap<String, List<Map<String, Object>>>();
+			AccountObject[] groups = account.getGroups();
+			if (groups != null) {
+				List<Map<String, Object>> groupList = new ArrayList<Map<String, Object>>();
+				for (AccountObject group : groups) {
+					Map<String, Object> newGroup = new HashMap<String, Object>();
+					newGroup.put("groupID", group._oid());
+					//extracting group names and sanitising if needed
+					Set<String> groupNames = group.getLoginIDSet();
+					if (sanitiseOutput) {
+						groupNames.clear();
+						for (String groupName : group.getLoginIDSet()) {
+							groupNames.add(RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(groupName));
+						}
+					}
+					newGroup.put("names", groupNames);
+					//extracting member roles and sanitising if needed
+					String role = group.getMemberRole(account);
+					if (sanitiseOutput) {
+						role = RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(role);
+					}
+					newGroup.put("role", role); //sanitise role just in case
+					role = ( role == null ) ? "" : role;
+					boolean isAdmin = role.equalsIgnoreCase("admin") || role.equalsIgnoreCase("superuser");
+					newGroup.put("isAdmin", isAdmin);
+					if (isAdmin) {
+						commonInfo.replace("isAnyGroupAdmin", true);
+					}
+					groupList.add(newGroup);
+				}
+				commonInfo.put("groups", groupList);
+			}
+		}else{
+			System.out.println("AccountLogin -> extractCommonInfoFromAccountObject -> AccountObject is null!");
+		}
+		return commonInfo;
+	}
+
+	private static String generateQueryStringForSearchValue(String inSearchString, String[] queryColumns) {
+		if (inSearchString != null && queryColumns != null) {
+			String[] searchStringSplit = inSearchString.trim().split("\\s+");
+			StringBuilder querySB = new StringBuilder();
+
+			for (int i = 0; i < searchStringSplit.length; ++i) {
+				querySB.append("(");
+				for (int queryCol = 0; queryCol < queryColumns.length; ++queryCol) {
+					querySB.append(queryColumns[queryCol] + " LIKE ?");
+
+					if (queryCol < queryColumns.length - 1) {
+						querySB.append(" OR ");
+					}
+				}
+				querySB.append(")");
+
+				if (i < searchStringSplit.length - 1) {
+					querySB.append(" AND ");
+				}
+			}
+			return querySB.toString();
+		}
+
+		return "";
+	}
+	private static List<String> generateQueryStringArgsForSearchValue_andAddToList(String inSearchString,
+		String[] queryColumns, String wildcardMode, List<String> ret) {
+		if (inSearchString != null && queryColumns != null) {
+			String[] searchStringSplit = inSearchString.trim().split("\\s+");
+			StringBuilder querySB = new StringBuilder();
+
+			String wildMode = wildcardMode;
+			for (String searchString : searchStringSplit) {
+				for (String queryColumn : queryColumns) {
+					ret.add(getStringWithWildcardMode(searchString, wildMode));
+				}
+				wildMode = "both"; //Second string onwards is both side wildcard
+			}
+		}
+
+		return ret;
+	}
+
+	private static List<List<Object>> list_GET_and_POST_inner(AccountTable _metaTableObj, int draw, int start,
+	int length, String[] headers, String query, String[] queryArgs, String orderBy, String[] insideGroup_any,
+	String[] hasGroupRole_any, String groupStatus, boolean sanitiseOutput) throws RuntimeException {
+
+	List<List<Object>> ret = new ArrayList<List<Object>>();
+
+	if (_metaTableObj == null) {
+		return ret;
+	}
+
+	try {
+		if (headers != null && headers.length > 0) {
+			MetaObject[] metaObjs = null;
+			AccountObject[] fullUserArray = null;
+
+			if ((insideGroup_any == null || insideGroup_any.length == 0)
+				&& (hasGroupRole_any == null || hasGroupRole_any.length == 0)) {
+				//do normal query
+				MetaTable accountMetaTable = _metaTableObj.accountMetaTable();
+
+				if (accountMetaTable == null) {
+					return ret;
+				}
+
+				if (query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0) {
+					metaObjs = accountMetaTable.query(null, null, orderBy, start, length);
+				} else {
+					metaObjs = accountMetaTable.query(query, queryArgs, orderBy, start, length);
+				}
+
+				List<AccountObject> retUsers = new ArrayList<AccountObject>();
+				for (MetaObject metaObj : metaObjs) {
+					AccountObject ao = _metaTableObj.get(metaObj._oid()); //a single account
+					// System.out.println(ao._oid()+" ahwejakwekawej<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+					retUsers.add(ao);
+				}
+
+				fullUserArray = retUsers.toArray(new AccountObject[retUsers.size()]);
+			} else {
+				//do filtered query
+				fullUserArray = _metaTableObj.getUsersByGroupAndRole(insideGroup_any, hasGroupRole_any);
+			}
+
+			if (fullUserArray == null || fullUserArray.length == 0) {
+				return ret;
+			}
+
+			//group status filtering
+			if (groupStatus != null) {
+				List<AccountObject> filteredUsers = new ArrayList<AccountObject>();
+				for (AccountObject ao : fullUserArray) {
+					if (groupStatus.equalsIgnoreCase("group")) {
+						if (ao.isGroup()) {
+							filteredUsers.add(ao);
+						}
+					} else if (groupStatus.equalsIgnoreCase("user")) {
+						if (!ao.isGroup()) {
+							filteredUsers.add(ao);
+						}
+					}
+				}
+
+				fullUserArray = filteredUsers.toArray(new AccountObject[filteredUsers.size()]);
+			}
+
+			for (AccountObject ao : fullUserArray) {
+				List<Object> row = new ArrayList<Object>();
+				for (String header : headers) {
+					if (header.equalsIgnoreCase("names")) {
+						if (ao != null) {
+							Set<String> aoNames = ao.getLoginIDSet();
+
+							if (sanitiseOutput) {
+								aoNames.clear();
+								for (String name : ao.getLoginIDSet()) {
+									aoNames.add(RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(name));
+								}
+							}
+
+							if (aoNames != null) {
+								List<String> aoNameList = new ArrayList<String>(aoNames);
+								row.add(aoNameList);
+							}
+						}
+					} else {
+						Object rawVal = ao.get(header); //this used to be metaObj.get
+
+						if (sanitiseOutput && rawVal instanceof String) {
+							String stringVal = GenericConvert.toString(rawVal);
+							row.add(stringVal);
+						} else {
+							row.add(rawVal);
+						}
+
+					}
+				}
+				ret.add(row);
+			}
+		}
+	} catch (Exception e) {
+		throw new RuntimeException("list_GET_and_POST_inner() ", e);
+	}
+
+	return ret;
+}
+
+private static String getStringWithWildcardMode(String searchString, String wildcardMode) {
+	if (wildcardMode.equalsIgnoreCase("prefix")) {
+		return "%" + searchString;
+	} else if (wildcardMode.equalsIgnoreCase("suffix")) {
+		return searchString + "%";
+	} else {
+		return "%" + searchString + "%";
+	}
+}
 }

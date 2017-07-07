@@ -54,7 +54,7 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	//--------------------------------------------------------------------------
 
 	/**
-	* Setsup the backend storage table, etc. If needed
+	* Sets up the backend storage table, etc. If needed
 	**/
 	@Override
 	public void systemSetup() {

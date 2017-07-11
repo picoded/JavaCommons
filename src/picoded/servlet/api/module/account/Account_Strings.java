@@ -1,25 +1,6 @@
 package picoded.servlet.api.module.account;
 
 public class Account_Strings{
-	/**
-	* Static REQUEST VARS
-	**/
-	public static final String REQ_OID = "_oid";
-	public static final String REQ_ACCOUNT_ID = "accountID";
-	public static final String REQ_ACCOUNT_NAME = "accountName";
-	public static final String REQ_ADD_LIST = "addList";
-	public static final String REQ_REMOVE_LIST = "removeList";
-	public static final String REQ_PASSWORD = "password";
-	public static final String REQ_USERNAME = "username";
-	public static final String REQ_REMEMBER_ME = "rememberMe";
-	public static final String REQ_SANITISE_OUTPUT = "sanitiseOutput";
-	public static final String REQ_DEFAULT_ROLES = "defaultRoles";
-	public static final String REQ_GROUPNAME = "groupname";
-	public static final String REQ_GROUP_ID = "groupID";
-	public static final String REQ_IS_GROUP = "isGroup";
-	public static final String REQ_HEADERS = "headers";
-	public static final String REQ_META = "meta";
-	public static final String REQ_ROLE = "role";
 
 	/**
   	* Static REQUEST VARS
@@ -73,34 +54,39 @@ public class Account_Strings{
     public static final String RES_FAIL_ADD = "failToAdd";
     public static final String RES_SUCCESS_ADD = "succeedAdd";
 
-	/**
-	* ERROR MESSAGES
-	**/
-	public static final String ERROR_NO_GROUP = "No group is found.";
-	public static final String ERROR_NO_GROUP_ID = "No groupID is found.";
-	public static final String ERROR_NO_GROUPNAME = "No groupname is found.";
-	public static final String ERROR_NOT_GROUP = "This is not a group.";
-	public static final String ERROR_NO_USERNAME = "No username is supplied.";
-	public static final String ERROR_NO_PASSWORD = "No password is supplied.";
-	public static final String ERROR_NO_LOGIN_PASSWORD = "Missing login password.";
-	public static final String ERROR_NO_LOGIN_ID = "Missing login ID.";
-	public static final String ERROR_FAIL_LOGIN = "Failed login (wrong password or invalid user?).";
-	public static final String ERROR_NO_ROLE = "No role is found.";
-	public static final String ERROR_NO_USER = "No user is found.";
-	public static final String ERROR_NO_USER_ID = "No userID is found.";
-	public static final String ERROR_DEFAULT = " is found.";
-	public static final String ERROR_NO_META = "No meta is found.";
-	public static final String ERROR_NOT_IN_GROUP_OR_ROLE = "User is not in group or not in specified role.";
-	public static final String ERROR_INVALID_FORMAT_JSON = "Invalid Format JSON";
-	public static final String ERROR_PASS_NOT_EQUAL = "The passwords are not equal.";
-	public static final String ERROR_NO_NEW_PASSWORD = "No new password found.";
-	public static final String ERROR_NO_NEW_REPEAT_PASSWORD = "No new repeat password found.";
-	public static final String ERROR_PASS_INCORRECT = "Old password is wrong.";
+    // Static PROPERTIES VARS
+    public static final String PROPERTIES_ROLE = "role";
+    public static final String PROPERTIES_MEMBERSHIP_ROLE = "membershipRoles";
+    public static final String PROPERTIES_EMAIL = "email";
+    public static final String PROPERTIES_IS_GROUP = "isGroup";
+    public static final String PROPERTIES_OID = "_oid";
+    public static final String PROPERTIES_NAMES = "name";
 
-	/**
-	* ADDITIONAL Variables
-	**/
-	public static final String SPACE = " ";
-	public static final String GROUP = "group";
+    // ERROR MESSAGES
+    public static final String ERROR_NO_GROUP = "No group is found.";
+    public static final String ERROR_NO_GROUP_ID = "No groupID is found.";
+    public static final String ERROR_NO_GROUPNAME = "No groupname is found.";
+    public static final String ERROR_NOT_GROUP = "This is not a group.";
+    public static final String ERROR_NO_USERNAME = "No username is supplied.";
+    public static final String ERROR_NO_PASSWORD = "No password is supplied.";
+    public static final String ERROR_NO_LOGIN_PASSWORD = "Missing login password.";
+    public static final String ERROR_NO_LOGIN_ID = "Missing login ID.";
+    public static final String ERROR_FAIL_LOGIN = "Failed login (wrong password or invalid user?).";
+    public static final String ERROR_NO_ROLE = "No role is found.";
+    public static final String ERROR_NO_USER = "No user is found.";
+    public static final String ERROR_NO_USER_ID = "No userID is found.";
+    public static final String ERROR_DEFAULT = " is found.";
+    public static final String ERROR_NO_META = "No meta is found.";
+    public static final String ERROR_NOT_IN_GROUP_OR_ROLE = "User is not in group or not in specified role.";
+    public static final String ERROR_INVALID_FORMAT_JSON = "Invalid Format JSON";
+    public static final String ERROR_PASS_NOT_EQUAL = "The passwords are not equal.";
+    public static final String ERROR_NO_NEW_PASSWORD = "No new password found.";
+    public static final String ERROR_NO_NEW_REPEAT_PASSWORD = "No new repeat password found.";
+    public static final String ERROR_PASS_INCORRECT = "Old password is wrong.";
+    public static final String ERROR_NO_PRIVILEGES = "User does not have privilege.";
+
+    // ADDITIONAL Variables
+    public static final String SPACE = " ";
+    public static final String GROUP = "group";
 
 }

@@ -132,14 +132,14 @@ public class FileUtil extends FileUtilBase {
 		return FileUtil.readFileToString(inFile, (String) null);
 	}
 
-	*
+	/**
 	* Reads a file content into a string, with encoding
 	*
 	* @param File to read
 	* @param Encoding string value to use - Null value assumes encoding with US-ASCII
 	*
 	* @return File string value with given encoding
-	*
+	**/
 	public static String readFileToString(File inFile, String encoding) {
 		try {
 			if (encoding == null || encoding.isEmpty()) {

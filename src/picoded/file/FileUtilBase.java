@@ -412,11 +412,13 @@ public class FileUtilBase {
 	*                   parameter is {@code null}, all files are returned.
 	* @param recursive  if true all subdirectories are searched as well
 	* @return an collection of java.io.File with the matching files
+	**/
 	public static Collection<File> listFiles(final File directory, final String[] extensions,
 		final boolean recursive) {
 		return FileUtils.listFiles(directory, extensions, recursive);
 	}
 
+	/**
 	* Allows iteration over the files in a given directory (and optionally
 	* its subdirectories) which match an array of extensions. This method
 	* is based on {@link #listFiles(File, String[], boolean)},
@@ -1182,11 +1184,13 @@ public class FileUtilBase {
 		}
 	}
 
+	/**
 	* Writes a CharSequence to a file creating the file if it does not exist.
 	*
 	* @param file     the file to write
 	* @param data     the content to write to the file
 	* @param encoding the encoding to use, {@code null} means platform default
+	**/
 	public static void write(final File file, final CharSequence data, final String encoding) {
 		try {
 			FileUtils.write(file, data, encoding);

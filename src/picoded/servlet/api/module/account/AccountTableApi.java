@@ -28,7 +28,6 @@ public class AccountTableApi implements ApiModule {
 	**/
 	public static final String MISSING_REQUEST_PAGE = "Unexpected Exception: Missing requestPage()";
 
-
 	/**
 	* Setup the account table api class
 	*
@@ -208,7 +207,6 @@ public class AccountTableApi implements ApiModule {
 	};
 
 	/**
-	*
 	* # new [POST]
 	*
 	* Creates a new account in the table
@@ -299,9 +297,9 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type	      | Description                                                                |
+	* | Parameter Name  | Variable Type	    	  | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | groupname				| String								| name of the group to retrieve
+	* | groupID					| String								| ID of the group to retrieve																								 |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
@@ -1310,6 +1308,7 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+"getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
 		// builder.put(path+"getListOfMemberObjectOfGroup", getListOfMemberObjectOfGroup); // Tested
 	}
+
 
 	/**
 	* Private Methods

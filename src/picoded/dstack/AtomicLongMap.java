@@ -17,7 +17,6 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long>, CommonSt
 
 	// Core put / get
 	//--------------------------------------------------------------------------
-
 	/**
 	* Stores (and overwrites if needed) key, value pair
 	*
@@ -48,6 +47,16 @@ public interface AtomicLongMap extends GenericConvertMap<String, Long>, CommonSt
 	* @return  value of the given key, note that it returns 0 if there wasnt a previous value set
 	**/
 	Long getAndAdd(Object key, Object delta);
+
+	/** Returns the value, given the key. Then apply the delta change
+	*
+	* Important note: If the key is not unique, all of its records will be deleted
+	*
+	* @param key param find the meta key
+	*
+	* @returns  value of the given key, note that it returns 0 if it fails
+	**/
+	Long remove(Object key);
 
 	/**
 	* Stores (and overwrites if needed) key, value pair

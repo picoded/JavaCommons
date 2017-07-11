@@ -261,6 +261,25 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 	}
 
 	/**
+	* Returns the number of records deleted, given the key
+	*
+	* Important note: If the key is not unique, all of its records will be deleted
+	*
+	* @param key param find the meta key
+	* @return number of records deleted
+	**/
+	@Override
+	public Long remove(Object key) {
+		Integer resultDeleted = new Integer(sqlObj.delete(
+			sqlTableName,
+			"kID = ?",
+			new Object[] { key }
+		));
+		return resultDeleted.longValue();
+	}
+
+
+	/**
 	* Stores (and overwrites if needed) key, value pair
 	*
 	* Important note: It does not return the previously stored value

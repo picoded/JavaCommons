@@ -168,6 +168,27 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	}
 
 	/**
+	* Returns 1 if deleted, given the key.
+	*
+	* @param key param find the meta key
+	*
+	* @returns  the result of deletion, it returns 0 if nothing is deleted.
+	**/
+	@Override
+	public Long remove(Object key) {
+		try {
+			accessLock.readLock().lock();
+			if ( valueMap.get(key) != null ) {
+				valueMap.remove(key);
+				return (Long) 1l;
+			}
+			return (Long) 0l;
+		} finally {
+			accessLock.readLock().unlock();
+		}
+	}
+
+	/**
 	* Stores (and overwrites if needed) key, value pair
 	*
 	* Important note: It does not return the previously stored value

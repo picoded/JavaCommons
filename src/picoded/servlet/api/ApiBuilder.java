@@ -2,10 +2,14 @@ package picoded.servlet.api;
 
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
+import picoded.servlet.api.exceptions.HaltException;
 import picoded.struct.UnsupportedDefaultMap;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
+import picoded.conv.ConvertJSON;
 
 import picoded.servlet.*;
 
@@ -361,12 +365,15 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	**/
 	public void endpoint(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
 
-		if( path.indexOf("/*") >= 0 ) {
-			throw new RuntimeException("Wildcard endpoints are not supported");
-		}
+		// if( path.indexOf("/*") >= 0 ) {
+		// 	throw new RuntimeException("Wildcard endpoints are not supported");
+		// }
 
 		// Clears the collapsed version set cache
 		cachedCollapsedVersionSet.clear();
+
+		// Change / into .
+		path = path.replaceAll("/", ".");
 
 		// Get the current version, and write the respective endpoint to it
 		if( value == null ) {
@@ -387,6 +394,9 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	public void filter(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
 		// Clears the collapsed version set cache
 		cachedCollapsedVersionSet.clear();
+
+		// Change / into .
+		path = path.replaceAll("/", ".");
 
 		// Get the current version, and write the respective endpoint to it
 		if( value == null ) {
@@ -429,7 +439,6 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	protected BiFunction<ApiRequest, ApiResponse, ApiResponse> fetchApiEndpoint(int inMajor, int inMinor, String path) {
 		// Gets the collapsed version set
 		ApiVersionSet workingSet = collapsedVersionSet(inMajor, inMinor);
-
 		// Find the exact match
 		BiFunction<ApiRequest, ApiResponse, ApiResponse> endpoint = workingSet.endpointMap.get(path);
 		if( endpoint != null ) {
@@ -441,6 +450,47 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 
 		// Fetch failure
 		return null;
+	}
+
+	//-------------------------------------------------------------------
+	//
+	// Fetch and get the relevent API Execution FILTER endpoints for the path
+	//
+	//-------------------------------------------------------------------
+
+	/**
+	* Fetch the relevant list of filters for the API request
+	*
+	* @param   major version to use
+	* @param   minor version to use
+	* @param   path name to use
+	*
+	* @return  The result list of FILTERS ApiEndpoint (if found)
+	**/
+	protected List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> fetchApiFilterEndpoints(int inMajor, int inMinor, String path) {
+		// Gets the collapsed version set
+		ApiVersionSet workingSet = collapsedVersionSet(inMajor, inMinor);
+		List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> filteredLegitPath = new ArrayList<BiFunction<ApiRequest, ApiResponse, ApiResponse>>();
+		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> filterMap = workingSet.filterMap;
+		Pattern pattern = Pattern.compile("");
+		Matcher match = null;
+		for ( String filterPath : filterMap.keySet() ) {
+			String currentPath = filterPath;
+			filterPath = filterPath.replaceAll("\\.", "\\\\."); // Regex: escape all .
+			filterPath = filterPath.replaceAll("\\*",".*"); // Regex: change * into .*
+			filterPath = filterPath.replaceAll("\\\\.\\.\\*$","(\\\\..*)?"); // Regex: change last \..* into optional (\..*)?
+			pattern = Pattern.compile(filterPath);
+			match = pattern.matcher(path);
+			if ( match.matches() ) { // Find the exact match
+				filteredLegitPath.add(filterMap.get(currentPath));
+			}
+		}
+		if ( filteredLegitPath.size() == 0 ) {
+			return null;
+		}
+
+		// @TODO : ITERATE FOR DYNAMIC MATCH
+		return filteredLegitPath;
 	}
 
 	//-------------------------------------------------------------------
@@ -485,10 +535,10 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	* @return  The result parameters
 	**/
 	public ApiResponse execute(int inMajor, int inMinor, String path, ApiRequest reqObj, ApiResponse resObj ) {
-
+		// Fetch the list of filters
+		List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> filterEndpoints = fetchApiFilterEndpoints(inMajor, inMinor, path);
 		// Fetch the endpoint
 		BiFunction<ApiRequest, ApiResponse, ApiResponse> endpoint = fetchApiEndpoint(inMajor, inMinor, path);
-
 		// Endpoitn does not exists
 		if( endpoint == null ) {
 			throw new UnsupportedOperationException("Missing requested path : "+path);
@@ -500,9 +550,19 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 		}
 
 		// @TODO Filter handling
-
+		if ( filterEndpoints != null ) {
+			ApiResponse filterResponse = null;
+			for ( BiFunction<ApiRequest, ApiResponse, ApiResponse> filterPoint : filterEndpoints ) {
+				System.out.println("filterPoint applying + <<<<<<<<<<<<<<<<<");
+				try {
+					filterResponse = filterPoint.andThen(getVersionSet().filterMap.get("test")).apply( reqObj, resObj );
+				} catch ( Exception he ) {
+					System.out.println(he);
+				}
+			}
+		}
 		// Found the endpoint execute and return
-		if( endpoint != null ) {
+		if ( endpoint != null ) {
 			return endpoint.apply(reqObj, resObj);
 		}
 

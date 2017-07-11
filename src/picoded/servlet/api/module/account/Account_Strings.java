@@ -79,7 +79,8 @@ public class Account_Strings{
     public static final String ERROR_NO_NEW_PASSWORD = "No new password found.";
     public static final String ERROR_NO_NEW_REPEAT_PASSWORD = "No new repeat password found.";
     public static final String ERROR_PASS_INCORRECT = "Old password is wrong.";
-    
+    public static final String ERROR_NO_PRIVILEGES = "User does not have privilege.";
+
     /// ADDITIONAL Variables
     public static final String SPACE = " ";
     public static final String GROUP = "group";

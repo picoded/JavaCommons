@@ -5,11 +5,12 @@ import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-import picoded.servlet.api.exceptions.HaltException;
+import picoded.servlet.api.exception.HaltException;
 import picoded.struct.UnsupportedDefaultMap;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 import picoded.conv.ConvertJSON;
+import picoded.servlet.api.module.account.Account_Strings;
 
 import picoded.servlet.*;
 
@@ -549,21 +550,30 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 			resObj = new ApiResponse(this);
 		}
 
-		// @TODO Filter handling
-		if ( filterEndpoints != null ) {
-			ApiResponse filterResponse = null;
-			for ( BiFunction<ApiRequest, ApiResponse, ApiResponse> filterPoint : filterEndpoints ) {
-				System.out.println("filterPoint applying + <<<<<<<<<<<<<<<<<");
-				try {
-					filterResponse = filterPoint.andThen(getVersionSet().filterMap.get("test")).apply( reqObj, resObj );
-				} catch ( Exception he ) {
-					System.out.println(he);
+		try {
+			// @TODO Filter handling
+			if ( filterEndpoints != null ) {
+				ApiResponse filterResponse = null;
+				for ( BiFunction<ApiRequest, ApiResponse, ApiResponse> filterPoint : filterEndpoints ) {
+					System.out.println("filterPoint applying + <<<<<<<<<<<<<<<<<");
+					filterResponse = filterPoint.apply( reqObj, resObj );
+					resObj = filterResponse;
+					if ( filterResponse.get(Account_Strings.RES_ERROR) != null ) {
+						resObj.halt();
+					}
 				}
 			}
+			// Found the endpoint execute and return
+			if ( endpoint != null ) {
+				return endpoint.apply(reqObj, resObj);
+			}
+		} catch(HaltException h) {
+		if ( resObj.get(Account_Strings.RES_ERROR) != null ) {
+			System.out.println(resObj.get(Account_Strings.RES_ERROR));
 		}
-		// Found the endpoint execute and return
-		if ( endpoint != null ) {
-			return endpoint.apply(reqObj, resObj);
+			return resObj;
+		} catch(Exception e) {
+			throw e;
 		}
 
 		// Return failure

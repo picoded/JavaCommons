@@ -36,10 +36,6 @@ public class AccountFilterApi_test extends ApiModule_test {
 		public ApiModule moduleSetup(CommonStack stack) {
 			AccountTable table = new AccountTable(stack, "account");
 			AccountFilterApi ret = new AccountFilterApi(table);
-			// table.loginThrottle = (inAo, failures) -> {
-				// System.out.println("this was not ran <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-			// 	return (long) 2;
-			// };
 			if( !table.hasLoginID("laughing-man") ) {
 				AccountObject ao = table.newObject("laughing-man");
 				ao.setPassword("The Catcher in the Rye");
@@ -58,6 +54,12 @@ public class AccountFilterApi_test extends ApiModule_test {
 	//  Test running
 	//
 	//----------------------------------------------------------------------------------------
+
+	@Test
+	public void checkSuperUser() {
+		GenericConvertMap<String,Object> res = null;
+		res = requestJSON("account/login", null);
+	}
 
 	// @Test
 	// public void isLoginFailure() {

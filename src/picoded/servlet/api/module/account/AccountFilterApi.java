@@ -1,10 +1,13 @@
 package picoded.servlet.api.module.account;
 
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import javax.mail.internet.*;
 
 import picoded.servlet.api.*;
 import picoded.servlet.api.module.ApiModule;
-import picoded.servlet.api.exceptions.HaltException;
+import picoded.servlet.api.exception.HaltException;
 
 import picoded.dstack.module.account.*;
 import picoded.dstack.*;
@@ -37,38 +40,112 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 		table = super.table;
 	}
 
-  protected ApiFunction test = (req, res) -> {
-    if ( res.get(Account_Strings.RES_ERROR) != null )
-      throw new HaltException(Account_Strings.ERROR_NO_USER);
-    else
-      return res;
-  };
-
-	protected ApiFunction check_is_super_user = (req, res) -> {
-		AccountObject ao = table.getRequestUser(req.getHttpServletRequest(), null);
-    if ( ao == null ) {
-      res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
-      return res;
-    }
-    if ( !ao.isSuperUser() ) {
-      // throw new HaltException(Account_Strings.ERROR_NO_USER);
-      res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
-      return res;
-    }
-
-		// Return result
-		return res;
+	////////////////////////////////////////////////////////////////////////////
+	/// Account Admin Filtering
+	////////////////////////////////////////////////////////////////////////////
+	// Pack all checks into one ApiFunction for ease of usage as well as set up
+	protected ApiFunction admin_bundle_check = (req, res) -> {
+		res = this.isLoggedIn.apply(req, res);
+		if ( res != null )
+			return res;
+		res = this.check_admin.apply(req, res);
+		if ( res != null )
+			return res;
+		return null;
+	};
+	// Check if it is admin
+	protected ApiFunction check_admin = (req, res) -> {
+		AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( !currentUser.isSuperUser() ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PRIVILEGES);
+			return res;
+		}
+		return null;
 	};
 
-	protected ApiFunction test2 = (req, res) -> {
-		// Get the account object (if any)
-		// AccountObject ao = table.getRequestUser(req.getHttpServletRequest(), null);
-		// Return if a valid login object was found
-		// res.put(Account_Strings.RES_RETURN, ao != null);
-		System.out.println("test2 is ran <<<<<<<<<<<<<<<<<<<<<<<");
-		// Return result
-		return res;
+	////////////////////////////////////////////////////////////////////////////
+	/// Account Parameters Filtering
+	////////////////////////////////////////////////////////////////////////////
+	// Pack all checks into one ApiFunction for ease of usage as well as set up
+	protected ApiFunction param_bundle_check = (req, res) -> {
+		res = this.check_password.apply(req, res);
+		if ( res != null )
+			return res;
+		res = this.check_email.apply(req, res);
+		if ( res != null )
+			return res;
+		return null;
 	};
+	// Check password complexity
+	protected ApiFunction check_password = (req, res) -> {
+		String passwordRegex = "(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])", password = "";
+		Pattern p = Pattern.compile(passwordRegex);
+		String[] passwordList = new String[]{Account_Strings.REQ_PASSWORD, Account_Strings.REQ_NEW_PASSWORD, Account_Strings.REQ_REPEAT_PASSWORD};
+		for ( String password_string : passwordList ) {
+			Matcher m = p.matcher(password);
+			password = req.getString(password_string, "");
+			if ( !password.isEmpty() && !m.matches()) {
+				res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_PASSWORD_COMPLEXITY);
+				return res;
+			}
+		}
+		return null;
+	};
+
+	// Check email format
+	protected ApiFunction check_email = (req, res) -> {
+		String email = req.getString(Account_Strings.REQ_USERNAME);
+		if ( !isEmailFormat(email) ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_INVALID_FORMAT_EMAIL);
+			return res;
+		}
+		return null;
+	};
+	////////////////////////////////////////////////////////////////////////////
+	/// Group Admin Filtering
+	////////////////////////////////////////////////////////////////////////////
+	// Pack all checks into one ApiFunction for ease of usage as well as set up
+	protected ApiFunction group_admin_bundle_check = (req, res) -> {
+		res = this.isLoggedIn.apply(req, res);
+		if ( res != null )
+			return res;
+		res = this.check_crud.apply(req, res);
+		if ( res != null )
+			return res;
+		return null;
+	};
+
+	// Check if user has rights to CRUD group (user must be admin of the group)
+	protected ApiFunction check_crud = (req, res) -> {
+		AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), null);
+		String groupID = req.getString(Account_Strings.REQ_GROUP_ID, "");
+		if ( groupID.isEmpty() ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
+			return res;
+		}
+		req.put(Account_Strings.REQ_USER_ID, currentUser._oid());
+		res = this.getMemberRoleFromGroup.apply(req, res);
+		if ( res.get(Account_Strings.RES_ERROR) != null )
+			return res;
+		String role = res.getString(Account_Strings.RES_SINGLE_RETURN_VALUE);
+		if ( !role.equalsIgnoreCase("admin") ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PRIVILEGES);
+			return res;
+		}
+		return null;
+	};
+
+	////////////////////////////////////////////////////////////////////////////
+	/// Group Member Filtering
+	////////////////////////////////////////////////////////////////////////////
+	// Pack all checks into one ApiFunction for ease of usage as well as set up
+	protected ApiFunction group_member_bundle_check = (req, res) -> {
+		res = this.isLoggedIn.apply(req, res);
+		if ( res != null )
+			return res;
+		return null;
+	};
+	// Check if 
 
 	/// Does the actual setup for the API
 	/// Given the API Builder, and the namespace prefix
@@ -77,9 +154,33 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	/// @param  Path to assume
 	public void setupApiBuilder(ApiBuilder builder, String path) {
     super.setupApiBuilder(builder, path);
-		builder.filter(path+"account/*/*", test2);
-		builder.filter(path+"account/login/*", check_is_super_user);
-    builder.filter(path+"test", test);
+		builder.filter(path+"account/*", param_bundle_check);
+		builder.filter(path+"account/admin/*", admin_bundle_check);
+		builder.filter(path+"account/group/admin/*", group_admin_bundle_check);
+		builder.filter(path+"account/group/member/*", group_member_bundle_check);
 	}
+
 	/// Private Methods
+
+	// with help from http://stackoverflow.com/questions/624581/what-is-the-best-java-email-address-validation-method
+	private boolean isEmailFormat(String inEmail){
+		boolean result = true;
+		try{
+			InternetAddress emailAddr = new InternetAddress(inEmail);
+			emailAddr.validate();
+		}catch(AddressException ex){
+			result = false;
+		}
+		return result;
+	}
+
+
+	private ApiFunction isLoggedIn = (req, res) -> {
+		AccountObject ao = table.getRequestUser(req.getHttpServletRequest(), null);
+		if ( ao == null ) {
+			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			return res;
+		}
+		return null;
+	};
 }

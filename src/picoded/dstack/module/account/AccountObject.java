@@ -750,6 +750,8 @@ public class AccountObject extends Core_MetaObject {
 	public MetaObject setMembershipRoles(List<String> roles) {
 		this.setGroupStatus(true);
 		_group_membershipRoles = null;
+		if ( !roles.contains("admin") )
+			roles.add("admin");
 		group_membershipRoles().put(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE, roles);
 		group_membershipRoles().saveDelta();
 		return group_membershipRoles();

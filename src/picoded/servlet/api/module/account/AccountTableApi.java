@@ -1244,52 +1244,35 @@ public class AccountTableApi implements ApiModule {
 	/// @param  API builder to add the required functions
 	/// @param  Path to assume
 	public void setupApiBuilder(ApiBuilder builder, String path) {
-		builder.put(path+"isLogin", isLogin); // Tested
-		builder.put(path+"login", login); // Tested
-		builder.put(path+"lockTime", lockTime); // Tested
-		builder.put(path+"logout", logout); // Tested
-		builder.put(path+"new", new_account); // Tested
-		builder.put(path+"do_password_reset", do_password_reset); // Tested
-		builder.put(path+"account_info_by_Name", account_info_by_Name); // Tested
-		builder.put(path+"account_info_by_ID", account_info_by_ID); // Tested
-		builder.put(path+"remove", delete_user_account); // Tested
-		builder.put(path+"get_user_or_group_list", get_user_or_group_list); // Tested
-		builder.put(path+"update_current_user_info", update_current_user_info);
+		builder.put(path+"account/isLogin", isLogin); // Tested
+		builder.put(path+"account/login", login); // Tested
+		builder.put(path+"account/lockTime", lockTime); // Tested
+		builder.put(path+"account/logout", logout); // Tested
+		builder.put(path+"account/new", new_account); // Tested
+		builder.put(path+"account/do_password_reset", do_password_reset); // Tested
+		builder.put(path+"account/ccount_info_by_Name", account_info_by_Name); // Tested
+		builder.put(path+"account/account_info_by_ID", account_info_by_ID); // Tested
+		builder.put(path+"account/admin/remove", delete_user_account); // Tested
+		builder.put(path+"account/admin/get_user_or_group_list", get_user_or_group_list); // Tested
+		builder.put(path+"account/update_current_user_info", update_current_user_info);
 
 		//Group functionalities
-		builder.put(path+"groupRoles", groupRoles); // Tested
-		builder.put(path+"getMemberRole", getMemberRoleFromGroup); // Tested
+		builder.put(path+"group/groupRoles", groupRoles); // Tested
+		builder.put(path+"group/getMemberRole", getMemberRoleFromGroup); // Tested
+		builder.put(path+"group/getListOfGroupIDOfMember", getListOfGroupIDOfMember); // Tested
+		builder.put(path+"group/getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
+		builder.put(path+"group/get_single_member_meta", get_single_member_meta); // Tested
+		builder.put(path+"group/update_member_meta_info", update_member_meta_info); // Tested
 
-		builder.put(path+"addMembershipRole", add_new_membership_role); // Tested
-		builder.put(path+"removeMembershipRole", remove_membership_role); // Tested
-
-		builder.put(path+"get_member_list_info", get_member_list_info); // Tested
-		builder.put(path+"add_remove_member", add_remove_member); // Tested
-		builder.put(path+"get_single_member_meta", get_single_member_meta); // Tested
-		builder.put(path+"update_member_meta_info", update_member_meta_info); // Tested
-		builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember); // Tested
-		builder.put(path+"getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
+		builder.put(path+"group/admin/addMembershipRole", add_new_membership_role); // Tested
+		builder.put(path+"group/admin/removeMembershipRole", remove_membership_role); // Tested
+		builder.put(path+"group/admin/get_member_list_info", get_member_list_info); // Tested
+		builder.put(path+"group/admin/add_remove_member", add_remove_member); // Tested
 		// builder.put(path+"getListOfMemberObjectOfGroup", getListOfMemberObjectOfGroup); // Tested
 	}
 
 
 	/// Private Methods
-	private Map<String, String> validateGroupParameters(ApiRequest req) {
-		Map<String, String> res = new HashMap<String, String>();
-		String userNameToAdd = req.getString(Account_Strings.REQ_USERNAME);
-		if ( userNameToAdd == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USERNAME);
-			return res;
-		}
-		String groupName = req.getString(Account_Strings.REQ_GROUPNAME);
-		if ( groupName == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUPNAME);
-			return res;
-		}
-		res.put(Account_Strings.REQ_USERNAME, userNameToAdd);
-		res.put(Account_Strings.REQ_GROUPNAME, groupName);
-		return res;
-	}
 
 	private static Map<String, Object> extractCommonInfoFromAccountObject(AccountObject account, boolean sanitiseOutput) {
 	//sanitise accountNames, groupNames,

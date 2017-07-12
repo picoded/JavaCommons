@@ -557,8 +557,7 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 				for ( BiFunction<ApiRequest, ApiResponse, ApiResponse> filterPoint : filterEndpoints ) {
 					System.out.println("filterPoint applying + <<<<<<<<<<<<<<<<<");
 					filterResponse = filterPoint.apply( reqObj, resObj );
-					resObj = filterResponse;
-					if ( filterResponse.get(Account_Strings.RES_ERROR) != null ) {
+					if ( filterResponse != null && filterResponse.get(Account_Strings.RES_ERROR) != null ) {
 						resObj.halt();
 					}
 				}

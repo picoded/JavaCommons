@@ -558,6 +558,7 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 					System.out.println("filterPoint applying + <<<<<<<<<<<<<<<<<");
 					filterResponse = filterPoint.apply( reqObj, resObj );
 					if ( filterResponse != null && filterResponse.get(Account_Strings.RES_ERROR) != null ) {
+						resObj = filterResponse;
 						resObj.halt();
 					}
 				}
@@ -570,6 +571,7 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 		if ( resObj.get(Account_Strings.RES_ERROR) != null ) {
 			System.out.println(resObj.get(Account_Strings.RES_ERROR));
 		}
+
 			return resObj;
 		} catch(Exception e) {
 			throw e;

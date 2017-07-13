@@ -330,111 +330,111 @@ public class AccountFilterApi_test extends ApiModule_test {
 		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(ERROR_NO_PRIVILEGES, res.get(RES_ERROR));
 		ts.logout();
-		// 3rd Test: Remove non existence members & existence members not in group from Existence group (group 1)
-		ts.loginUser("ARmember1@gmail.com", "Password123");
-		params.clear();
-		params.put(REQ_GROUP_ID, groupID.get(0));
-		removeUserList.add("This is random ID");
-		removeUserList.add(userID.get(0));
-		params.put(REQ_REMOVE_LIST, removeUserList);
-		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
-		expectedFailResult.add("ID: This is random ID, Error: " + ERROR_NO_USER);
-		expectedFailResult.add("ID: " + userID.get(0) + ", Error: User is not in group.");
+		// // 3rd Test: Remove non existence members & existence members not in group from Existence group (group 1)
+		// ts.loginUser("ARmember1@gmail.com", "Password123");
+		// params.clear();
+		// params.put(REQ_GROUP_ID, groupID.get(0));
+		// removeUserList.add("This is random ID");
+		// removeUserList.add(userID.get(0));
+		// params.put(REQ_REMOVE_LIST, removeUserList);
+		// res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
+		// expectedFailResult.add("ID: This is random ID, Error: " + ERROR_NO_USER);
+		// expectedFailResult.add("ID: " + userID.get(0) + ", Error: User is not in group.");
+		// // assertEquals(expectedFailResult, res.get(RES_FAIL_REMOVE));
+		// assertThat("The list is wrong.", res.getList(RES_FAIL_REMOVE), containsInAnyOrder(expectedFailResult.toArray()));
+		//
+		// // 4th Test: Add non existence members without role into existence group (group 1)
+		// params.clear();
+		// addUserList.add("This is another random ID");
+		// addUserList.add("One for the road");
+		// params.put(REQ_ADD_LIST, addUserList);
+		// params.put(REQ_GROUP_ID, groupID.get(0));
+		// res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
+		// assertEquals(ERROR_NO_ROLE, res.get(RES_ERROR));
+		//
+		// // 5th Test: Add non existence members and existence member with non existence role into group (group 2)
+		// expectedFailResult.clear();
+		// expectedFailResult.add("ID: This is another random ID, Error: " + ERROR_NO_USER);
+		// expectedFailResult.add("ID: One for the road, Error: " + ERROR_NO_USER);
+		// expectedFailResult.add("ID: " + userID.get(1) +", Error: "+ "User is already in group or role is not found.");
+		// addUserList.add(userID.get(1));
+		// params.put(REQ_ROLE, "this is random role");
+		// params.put(REQ_ADD_LIST, addUserList);
+		// res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
+		// assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
+		//
+		// // 6th Test: Add existence members and repeated member with existence role into group (group 2)
+		// expectedFailResult.clear();
+		// params.clear();
+		// addUserList.clear();
+		// addUserList.add(userID.get(0));
+		// addUserList.add(userID.get(1));
+		// addUserList.add(userID.get(1));
+		// params.put(REQ_ROLE, "member");
+		// params.put(REQ_ADD_LIST, addUserList);
+		// params.put(REQ_GROUP_ID, groupID.get(1));
+		// expectedFailResult.add("ID: " + userID.get(1) +", Error: "+ "User is already in group or role is not found.");
+		// expectedPassResult.add(userID.get(0));
+		// expectedPassResult.add(userID.get(1));
+		// res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
+		// assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
+		// assertEquals(expectedPassResult, res.get(RES_SUCCESS_ADD));
+		//
+		// // 7th Test: Remove existence members and repeated members from existence group (group 2)
+		// expectedFailResult.clear();
+		// expectedPassResult.clear();
+		// params.clear();
+		// removeUserList.clear();
+		// removeUserList.add(userID.get(0));
+		// removeUserList.add(userID.get(0));
+		// params.put(REQ_GROUP_ID, groupID.get(1));
+		// params.put(REQ_REMOVE_LIST, removeUserList);
+		// expectedFailResult.add("ID: " + userID.get(0) + ", Error: User is not in group.");
+		// expectedPassResult.add(userID.get(0));
+		// res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		// assertEquals(expectedFailResult, res.get(RES_FAIL_REMOVE));
-		assertThat("The list is wrong.", res.getList(RES_FAIL_REMOVE), containsInAnyOrder(expectedFailResult.toArray()));
-
-		// 4th Test: Add non existence members without role into existence group (group 1)
-		params.clear();
-		addUserList.add("This is another random ID");
-		addUserList.add("One for the road");
-		params.put(REQ_ADD_LIST, addUserList);
-		params.put(REQ_GROUP_ID, groupID.get(0));
-		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
-		assertEquals(ERROR_NO_ROLE, res.get(RES_ERROR));
-
-		// 5th Test: Add non existence members and existence member with non existence role into group (group 2)
-		expectedFailResult.clear();
-		expectedFailResult.add("ID: This is another random ID, Error: " + ERROR_NO_USER);
-		expectedFailResult.add("ID: One for the road, Error: " + ERROR_NO_USER);
-		expectedFailResult.add("ID: " + userID.get(1) +", Error: "+ "User is already in group or role is not found.");
-		addUserList.add(userID.get(1));
-		params.put(REQ_ROLE, "this is random role");
-		params.put(REQ_ADD_LIST, addUserList);
-		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
-		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
-
-		// 6th Test: Add existence members and repeated member with existence role into group (group 2)
-		expectedFailResult.clear();
-		params.clear();
-		addUserList.clear();
-		addUserList.add(userID.get(0));
-		addUserList.add(userID.get(1));
-		addUserList.add(userID.get(1));
-		params.put(REQ_ROLE, "member");
-		params.put(REQ_ADD_LIST, addUserList);
-		params.put(REQ_GROUP_ID, groupID.get(1));
-		expectedFailResult.add("ID: " + userID.get(1) +", Error: "+ "User is already in group or role is not found.");
-		expectedPassResult.add(userID.get(0));
-		expectedPassResult.add(userID.get(1));
-		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
-		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
-		assertEquals(expectedPassResult, res.get(RES_SUCCESS_ADD));
-
-		// 7th Test: Remove existence members and repeated members from existence group (group 2)
-		expectedFailResult.clear();
-		expectedPassResult.clear();
-		params.clear();
-		removeUserList.clear();
-		removeUserList.add(userID.get(0));
-		removeUserList.add(userID.get(0));
-		params.put(REQ_GROUP_ID, groupID.get(1));
-		params.put(REQ_REMOVE_LIST, removeUserList);
-		expectedFailResult.add("ID: " + userID.get(0) + ", Error: User is not in group.");
-		expectedPassResult.add(userID.get(0));
-		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
-		assertEquals(expectedFailResult, res.get(RES_FAIL_REMOVE));
-		assertEquals(expectedPassResult, res.get(RES_SUCCESS_REMOVE));
-
-		// 8th Test: Remove valid users from non group account (member 2)
-		expectedFailResult.clear();
-		params.clear();
-		removeUserList.clear();
-		removeUserList.add(userID.get(0));
-		params.put(REQ_GROUP_ID, userID.get(1));
-		params.put(REQ_REMOVE_LIST, removeUserList);
-		expectedFailResult.add("ID: " + userID.get(1) + ", Error: This is not a group.");
-		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
-		assertEquals(expectedFailResult, res.get(RES_FAIL_REMOVE));
-
-		// 9th Test: Adding valid users to user account that do not have roles a.k.a not a group yet (member 2)
-		expectedFailResult.clear();
-		params.clear();
-		addUserList.clear();
-		addUserList.add(userID.get(0));
-		params.put(REQ_GROUP_ID, userID.get(1));
-		params.put(REQ_ADD_LIST, addUserList);
-		params.put(REQ_ROLE, "member");
-		expectedFailResult.add("ID: " + userID.get(0) +", Error: User is already in group or role is not found.");
-		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
-		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
-
-		// 10th Test: Adding valid users to user account that is a group (member 3)
-		expectedPassResult.clear();
-		params.clear();
-		addUserList.clear();
-		addUserList.add(userID.get(0));
-		params.put(REQ_GROUP_ID, userID.get(2));
-		params.put(REQ_ADD_LIST, addUserList);
-		params.put(REQ_ROLE, "knight");
-		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
-		expectedPassResult.add(userID.get(0));
-		assertEquals(expectedPassResult, res.get(RES_SUCCESS_ADD));
-
-		// 11th Test: Add the same user to the same group (member 3)
-		expectedFailResult.clear();
-		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
-		expectedFailResult.add("ID: " + userID.get(0) +", Error: User is already in group or role is not found.");
-		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
+		// assertEquals(expectedPassResult, res.get(RES_SUCCESS_REMOVE));
+		//
+		// // 8th Test: Remove valid users from non group account (member 2)
+		// expectedFailResult.clear();
+		// params.clear();
+		// removeUserList.clear();
+		// removeUserList.add(userID.get(0));
+		// params.put(REQ_GROUP_ID, userID.get(1));
+		// params.put(REQ_REMOVE_LIST, removeUserList);
+		// expectedFailResult.add("ID: " + userID.get(1) + ", Error: This is not a group.");
+		// res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
+		// assertEquals(expectedFailResult, res.get(RES_FAIL_REMOVE));
+		//
+		// // 9th Test: Adding valid users to user account that do not have roles a.k.a not a group yet (member 2)
+		// expectedFailResult.clear();
+		// params.clear();
+		// addUserList.clear();
+		// addUserList.add(userID.get(0));
+		// params.put(REQ_GROUP_ID, userID.get(1));
+		// params.put(REQ_ADD_LIST, addUserList);
+		// params.put(REQ_ROLE, "member");
+		// expectedFailResult.add("ID: " + userID.get(0) +", Error: User is already in group or role is not found.");
+		// res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
+		// assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
+		//
+		// // 10th Test: Adding valid users to user account that is a group (member 3)
+		// expectedPassResult.clear();
+		// params.clear();
+		// addUserList.clear();
+		// addUserList.add(userID.get(0));
+		// params.put(REQ_GROUP_ID, userID.get(2));
+		// params.put(REQ_ADD_LIST, addUserList);
+		// params.put(REQ_ROLE, "knight");
+		// res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
+		// expectedPassResult.add(userID.get(0));
+		// assertEquals(expectedPassResult, res.get(RES_SUCCESS_ADD));
+		//
+		// // 11th Test: Add the same user to the same group (member 3)
+		// expectedFailResult.clear();
+		// res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
+		// expectedFailResult.add("ID: " + userID.get(0) +", Error: User is already in group or role is not found.");
+		// assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
 	}
 	// //
 	// // @Test

@@ -36,10 +36,6 @@ public class AccountFilterApi_test extends ApiModule_test {
 		public ApiModule moduleSetup(CommonStack stack) {
 			AccountTable table = new AccountTable(stack, "account");
 			AccountFilterApi ret = new AccountFilterApi(table);
-			// table.loginThrottle = (inAo, failures) -> {
-				// System.out.println("this was not ran <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-			// 	return (long) 2;
-			// };
 			if( !table.hasLoginID("laughing-man") ) {
 				AccountObject ao = table.newObject("laughing-man");
 				ao.setPassword("The Catcher in the Rye");
@@ -59,54 +55,53 @@ public class AccountFilterApi_test extends ApiModule_test {
 	//
 	//----------------------------------------------------------------------------------------
 
-	// @Test
-	// public void isLoginFailure() {
-	// 	assertNull( requestJSON("isLogin", null).get("INFO") );
-	// 	assertNull( requestJSON("isLogin", null).get(Account_Strings.RES_ERROR) );
-	// 	assertEquals( Boolean.FALSE, requestJSON("isLogin", null).get(Account_Strings.RES_RETURN) );
-	// }
-	//
-	// @Test
-	// public void loginProcessFlow() {
-	// 	// reuse result map
-	// 	Map<String,Object> res = null;
-	//
-	// 	// Check for invalid login
-	// 	assertEquals( Boolean.FALSE, requestJSON("isLogin", null).get(Account_Strings.RES_RETURN) );
-	//
-	// 	// Does a failed login
-	// 	Map<String,Object> loginParams = new HashMap<String,Object>();
-	// 	loginParams.put(Account_Strings.REQ_USERNAME, "laughing-man");
-	// 	loginParams.put(Account_Strings.REQ_PASSWORD, "Is the enemy");
-	// 	res = requestJSON("login", loginParams);
-	//
-	// 	assertEquals( Boolean.FALSE, res.get("isLogin") );
-	// 	assertEquals( Account_Strings.ERROR_FAIL_LOGIN, res.get(Account_Strings.RES_ERROR) );
-	//
-	// 	// Check for invalid login
-	// 	assertEquals( Boolean.FALSE, requestJSON("isLogin", null).get(Account_Strings.RES_RETURN) );
-	//
-	// 	// Does the actual login
-	// 	loginParams.put(Account_Strings.REQ_USERNAME, "laughing-man");
-	// 	loginParams.put(Account_Strings.REQ_PASSWORD, "The Catcher in the Rye");
-	//
-	// 	// Request and check result
-	// 	res = requestJSON("login", loginParams);
-	// 	assertNull( res.get(Account_Strings.RES_ERROR) );
-	// 	assertNull( res.get("INFO") );
-	// 	assertEquals( Boolean.TRUE, res.get("isLogin") );
-	// 	// Validate that login is valid
-	// 	res = requestJSON("isLogin", null);
-	// 	assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
-	//
-	// 	// Log out current user
-	// 	res = requestJSON("logout", null);
-	// 	assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
-	//
-	// 	// Validate that logout is valid
-	// 	res = requestJSON("isLogin", null);
-	// 	assertEquals( Boolean.FALSE, res.get(Account_Strings.RES_RETURN) );
-	// }
+	@Test
+	public void isLoginFailure() {
+		assertNull( requestJSON("account/isLogin", null).get("INFO") );
+		assertNull( requestJSON("account/isLogin", null).get(Account_Strings.RES_ERROR) );
+		assertEquals( Boolean.FALSE, requestJSON("account/isLogin", null).get(Account_Strings.RES_RETURN) );
+	}
+
+	@Test
+	public void loginProcessFlow() {
+		// reuse result map
+		Map<String,Object> res = null;
+
+		// Check for invalid login
+		assertEquals( Boolean.FALSE, requestJSON("account/isLogin", null).get(Account_Strings.RES_RETURN) );
+
+		// Does a failed login
+		Map<String,Object> loginParams = new HashMap<String,Object>();
+		loginParams.put(Account_Strings.REQ_USERNAME, "laughing-man");
+		loginParams.put(Account_Strings.REQ_PASSWORD, "Is the enemy");
+		res = requestJSON("account/login", loginParams);
+
+		assertEquals( Account_Strings.ERROR_PASSWORD_COMPLEXITY, res.get(Account_Strings.RES_ERROR) );
+
+		// Check for invalid login
+		assertEquals( Boolean.FALSE, requestJSON("account/isLogin", null).get(Account_Strings.RES_RETURN) );
+
+		// Does the actual login
+		loginParams.put(Account_Strings.REQ_USERNAME, "laughing-man");
+		loginParams.put(Account_Strings.REQ_PASSWORD, "The Catcher in the Rye");
+
+		// Request and check result
+		res = requestJSON("account/login", loginParams);
+		assertNull( res.get(Account_Strings.RES_ERROR) );
+		assertNull( res.get("INFO") );
+		assertEquals( Boolean.TRUE, res.get("isLogin") );
+		// Validate that login is valid
+		res = requestJSON("account/isLogin", null);
+		assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
+
+		// Log out current user
+		res = requestJSON("account/logout", null);
+		assertEquals( Boolean.TRUE, res.get(Account_Strings.RES_RETURN) );
+
+		// Validate that logout is valid
+		res = requestJSON("account/isLogin", null);
+		assertEquals( Boolean.FALSE, res.get(Account_Strings.RES_RETURN) );
+	}
 	//
 	// @Test
 	// public void loginLockingIncrement() {

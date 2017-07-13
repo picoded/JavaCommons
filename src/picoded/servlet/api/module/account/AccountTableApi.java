@@ -237,18 +237,16 @@ public class AccountTableApi implements ApiModule {
 	public ApiFunction new_account = (req, res) -> {
 		// Only runs function if logged in, and valid group object
 		boolean isGroup = req.getBoolean(Account_Strings.REQ_IS_GROUP, false);
-
-		String userName = req.getString(Account_Strings.REQ_USERNAME);
-		if (userName == null || userName.isEmpty()) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USERNAME);
+		String[] paramsToCheck = new String[]{Account_Strings.REQ_USERNAME};
+		res = check_parameters(paramsToCheck, req, res);
+		if ( res.get(Account_Strings.RES_ERROR) != null )
 			return res;
-		}
+		String userName = req.getString(Account_Strings.REQ_USERNAME);
 		String password = req.getString(Account_Strings.REQ_PASSWORD);
-		if (!isGroup && (password == null || password.isEmpty())) {
+		if ( !isGroup && (password == null || password.isEmpty()) ){
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PASSWORD);
 			return res;
 		}
-
 		Object metaObjRaw = req.get(Account_Strings.REQ_META);
 		Map<String, Object> givenMetaObj = new HashMap<String, Object>();
 		if (metaObjRaw instanceof String) {
@@ -313,11 +311,12 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction groupRoles = (req, res) -> {
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
-		if ( groupID == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
+		String[] paramsToCheck = new String[]{Account_Strings.REQ_GROUP_ID};
+		res = check_parameters(paramsToCheck, req, res);
+		if ( res.get(Account_Strings.RES_ERROR) != null )
 			return res;
-		}
+		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
+
 		AccountObject group = table.get(groupID);
 		if ( group == null ) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
@@ -354,16 +353,13 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction getMemberRoleFromGroup = (req, res) -> {
+		String[] paramsToCheck = new String[]{Account_Strings.REQ_GROUP_ID, Account_Strings.REQ_USER_ID};
+		res = check_parameters(paramsToCheck, req, res);
+		if ( res.get(Account_Strings.RES_ERROR) != null )
+			return res;
 		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
-		if ( groupID == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
-			return res;
-		}
 		String userID = req.getString(Account_Strings.REQ_USER_ID);
-		if ( userID == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER_ID);
-			return res;
-		}
+
 		AccountObject group = table.get(groupID);
 		if ( group == null ) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
@@ -408,17 +404,12 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction add_new_membership_role = (req, res) -> {
+		String[] paramsToCheck = new String[]{Account_Strings.REQ_GROUP_ID, Account_Strings.REQ_ROLE};
+		res = check_parameters(paramsToCheck, req, res);
+		if ( res.get(Account_Strings.RES_ERROR) != null )
+			return res;
 		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
-		if ( groupID == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUPNAME);
-			return res;
-		}
-
 		String role = req.getString(Account_Strings.REQ_ROLE);
-		if ( role == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_ROLE);
-			return res;
-		}
 
 		AccountObject group = table.get(groupID);
 		if ( group == null ) {
@@ -456,19 +447,14 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction remove_membership_role = (req, res) -> {
-		String groupName = req.getString(Account_Strings.REQ_GROUPNAME);
-		if ( groupName == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUPNAME);
+		String[] paramsToCheck = new String[]{Account_Strings.REQ_GROUP_ID, Account_Strings.REQ_ROLE};
+		res = check_parameters(paramsToCheck, req, res);
+		if ( res.get(Account_Strings.RES_ERROR) != null )
 			return res;
-		}
-
+		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
 		String role = req.getString(Account_Strings.REQ_ROLE);
-		if ( role == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_ROLE);
-			return res;
-		}
 
-		AccountObject group = table.getFromLoginID(groupName);
+		AccountObject group = table.get(groupID);
 		if ( group == null ) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
 			return res;
@@ -639,11 +625,13 @@ public class AccountTableApi implements ApiModule {
 		String [] addList = req.getStringArray(Account_Strings.REQ_ADD_LIST, "[]");
 		String [] removeList = req.getStringArray(Account_Strings.REQ_REMOVE_LIST, "[]");
 		String role = req.getString(Account_Strings.REQ_ROLE, null);
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
-		if ( groupID == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
+
+		String[] paramsToCheck = new String[]{Account_Strings.REQ_GROUP_ID};
+		res = check_parameters(paramsToCheck, req, res);
+		if ( res.get(Account_Strings.RES_ERROR) != null )
 			return res;
-		}
+		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
+
 		AccountObject group = table.get(groupID);
 		if ( group == null ) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
@@ -703,11 +691,13 @@ public class AccountTableApi implements ApiModule {
 			return res;
 		}
 		String role = req.getString(Account_Strings.REQ_ROLE);
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID, null);
-		if( groupID == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
+
+		String[] paramsToCheck = new String[]{Account_Strings.REQ_GROUP_ID};
+		res = check_parameters(paramsToCheck, req, res);
+		if ( res.get(Account_Strings.RES_ERROR) != null )
 			return res;
-		}
+		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
+
 		AccountObject group = table.get(groupID);
 		if ( group == null ) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
@@ -760,16 +750,14 @@ public class AccountTableApi implements ApiModule {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
 			return res;
 		}
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID, null);
-		if ( groupID == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
+
+		String[] paramsToCheck = new String[]{Account_Strings.REQ_GROUP_ID, Account_Strings.REQ_META};
+		res = check_parameters(paramsToCheck, req, res);
+		if ( res.get(Account_Strings.RES_ERROR) != null )
 			return res;
-		}
+		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
 		Object metaObjRaw = req.get(Account_Strings.REQ_META);
-		if ( metaObjRaw == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_META);
-			return res;
-		}
+
 		AccountObject group = table.get(groupID);
 		if ( group == null ) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
@@ -832,21 +820,15 @@ public class AccountTableApi implements ApiModule {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
 			return res;
 		}
-		String oldPassword = req.getString(Account_Strings.REQ_OLD_PASSWORD, "");
-		if ( oldPassword.isEmpty() ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PASSWORD);
+
+		String[] paramsToCheck = new String[]{Account_Strings.REQ_OLD_PASSWORD, Account_Strings.REQ_NEW_PASSWORD, Account_Strings.REQ_REPEAT_PASSWORD};
+		res = check_parameters(paramsToCheck, req, res);
+		if ( res.get(Account_Strings.RES_ERROR) != null )
 			return res;
-		}
-		String newPassword = req.getString(Account_Strings.REQ_NEW_PASSWORD, "");
-		if ( newPassword.isEmpty() ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_NEW_PASSWORD);
-			return res;
-		}
-		String repeatPassword = req.getString(Account_Strings.REQ_REPEAT_PASSWORD, "");
-		if ( repeatPassword.isEmpty() ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_NEW_REPEAT_PASSWORD);
-			return res;
-		}
+		String oldPassword = req.getString(Account_Strings.REQ_OLD_PASSWORD);
+		String newPassword = req.getString(Account_Strings.REQ_NEW_PASSWORD);
+		String repeatPassword = req.getString(Account_Strings.REQ_REPEAT_PASSWORD);
+
 		if ( !newPassword.equals(repeatPassword) ) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_PASS_NOT_EQUAL);
 			return res;
@@ -1014,11 +996,12 @@ public class AccountTableApi implements ApiModule {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
 			return res;
 		}
-		Object metaObjRaw = req.get(Account_Strings.REQ_META);
-		if ( metaObjRaw == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_META);
+
+		String[] paramsToCheck = new String[]{Account_Strings.REQ_META};
+		res = check_parameters(paramsToCheck, req, res);
+		if ( res.get(Account_Strings.RES_ERROR) != null )
 			return res;
-		}
+		Object metaObjRaw = req.get(Account_Strings.REQ_META);
 
 		String updateMode = req.getString(Account_Strings.REQ_UPDATE_MODE, "delta");
 		Map<String, Object> metaObj = ConvertJSON.toMap((String) metaObjRaw);
@@ -1281,54 +1264,35 @@ public class AccountTableApi implements ApiModule {
 	* @param  Path to assume
 	**/
 	public void setupApiBuilder(ApiBuilder builder, String path) {
-		builder.put(path+"isLogin", isLogin); // Tested
-		builder.put(path+"login", login); // Tested
-		builder.put(path+"lockTime", lockTime); // Tested
-		builder.put(path+"logout", logout); // Tested
-		builder.put(path+"new", new_account); // Tested
-		builder.put(path+"do_password_reset", do_password_reset); // Tested
-		builder.put(path+"account_info_by_Name", account_info_by_Name); // Tested
-		builder.put(path+"account_info_by_ID", account_info_by_ID); // Tested
-		builder.put(path+"remove", delete_user_account); // Tested
-		builder.put(path+"get_user_or_group_list", get_user_or_group_list); // Tested
-		builder.put(path+"update_current_user_info", update_current_user_info);
+		builder.put(path+"account/isLogin", isLogin); // Tested
+		builder.put(path+"account/login", login); // Tested
+		builder.put(path+"account/lockTime", lockTime); // Tested
+		builder.put(path+"account/logout", logout); // Tested
+		builder.put(path+"account/new", new_account); // Tested
+		builder.put(path+"account/do_password_reset", do_password_reset); // Tested
+		builder.put(path+"account/ccount_info_by_Name", account_info_by_Name); // Tested
+		builder.put(path+"account/account_info_by_ID", account_info_by_ID); // Tested
+		builder.put(path+"account/admin/remove", delete_user_account); // Tested
+		builder.put(path+"account/admin/get_user_or_group_list", get_user_or_group_list); // Tested
+		builder.put(path+"account/update_current_user_info", update_current_user_info);
 
 		//Group functionalities
-		builder.put(path+"groupRoles", groupRoles); // Tested
-		builder.put(path+"getMemberRole", getMemberRoleFromGroup); // Tested
+		builder.put(path+"group/groupRoles", groupRoles); // Tested
+		builder.put(path+"group/getMemberRole", getMemberRoleFromGroup); // Tested
+		builder.put(path+"group/getListOfGroupIDOfMember", getListOfGroupIDOfMember); // Tested
+		builder.put(path+"group/getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
+		builder.put(path+"group/get_single_member_meta", get_single_member_meta); // Tested
+		builder.put(path+"group/update_member_meta_info", update_member_meta_info); // Tested
 
-		builder.put(path+"addMembershipRole", add_new_membership_role); // Tested
-		builder.put(path+"removeMembershipRole", remove_membership_role); // Tested
-
-		builder.put(path+"get_member_list_info", get_member_list_info); // Tested
-		builder.put(path+"add_remove_member", add_remove_member); // Tested
-		builder.put(path+"get_single_member_meta", get_single_member_meta); // Tested
-		builder.put(path+"update_member_meta_info", update_member_meta_info); // Tested
-		builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember); // Tested
-		builder.put(path+"getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
+		builder.put(path+"group/admin/addMembershipRole", add_new_membership_role); // Tested
+		builder.put(path+"group/admin/removeMembershipRole", remove_membership_role); // Tested
+		builder.put(path+"group/admin/get_member_list_info", get_member_list_info); // Tested
+		builder.put(path+"group/admin/add_remove_member", add_remove_member); // Tested
 		// builder.put(path+"getListOfMemberObjectOfGroup", getListOfMemberObjectOfGroup); // Tested
 	}
 
 
-	/**
-	* Private Methods
-	**/
-	private Map<String, String> validateGroupParameters(ApiRequest req) {
-		Map<String, String> res = new HashMap<String, String>();
-		String userNameToAdd = req.getString(Account_Strings.REQ_USERNAME);
-		if ( userNameToAdd == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USERNAME);
-			return res;
-		}
-		String groupName = req.getString(Account_Strings.REQ_GROUPNAME);
-		if ( groupName == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUPNAME);
-			return res;
-		}
-		res.put(Account_Strings.REQ_USERNAME, userNameToAdd);
-		res.put(Account_Strings.REQ_GROUPNAME, groupName);
-		return res;
-	}
+	/// Private Methods
 
 	private static Map<String, Object> extractCommonInfoFromAccountObject(AccountObject account, boolean sanitiseOutput) {
 	//sanitise accountNames, groupNames,
@@ -1441,115 +1405,181 @@ public class AccountTableApi implements ApiModule {
 	int length, String[] headers, String query, String[] queryArgs, String orderBy, String[] insideGroup_any,
 	String[] hasGroupRole_any, String groupStatus, boolean sanitiseOutput) throws RuntimeException {
 
-	List<List<Object>> ret = new ArrayList<List<Object>>();
+		List<List<Object>> ret = new ArrayList<List<Object>>();
 
-	if (_metaTableObj == null) {
-		return ret;
-	}
+		if (_metaTableObj == null) {
+			return ret;
+		}
 
-	try {
-		if (headers != null && headers.length > 0) {
-			MetaObject[] metaObjs = null;
-			AccountObject[] fullUserArray = null;
+		try {
+			if (headers != null && headers.length > 0) {
+				MetaObject[] metaObjs = null;
+				AccountObject[] fullUserArray = null;
 
-			if ((insideGroup_any == null || insideGroup_any.length == 0)
-				&& (hasGroupRole_any == null || hasGroupRole_any.length == 0)) {
-				//do normal query
-				MetaTable accountMetaTable = _metaTableObj.accountMetaTable();
+				if ((insideGroup_any == null || insideGroup_any.length == 0)
+					&& (hasGroupRole_any == null || hasGroupRole_any.length == 0)) {
+					//do normal query
+					MetaTable accountMetaTable = _metaTableObj.accountMetaTable();
 
-				if (accountMetaTable == null) {
+					if (accountMetaTable == null) {
+						return ret;
+					}
+
+					if (query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0) {
+						metaObjs = accountMetaTable.query(null, null, orderBy, start, length);
+					} else {
+						metaObjs = accountMetaTable.query(query, queryArgs, orderBy, start, length);
+					}
+
+					List<AccountObject> retUsers = new ArrayList<AccountObject>();
+					for (MetaObject metaObj : metaObjs) {
+						AccountObject ao = _metaTableObj.get(metaObj._oid()); //a single account
+						// System.out.println(ao._oid()+" ahwejakwekawej<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+						retUsers.add(ao);
+					}
+
+					fullUserArray = retUsers.toArray(new AccountObject[retUsers.size()]);
+				} else {
+					//do filtered query
+					fullUserArray = _metaTableObj.getUsersByGroupAndRole(insideGroup_any, hasGroupRole_any);
+				}
+
+				if (fullUserArray == null || fullUserArray.length == 0) {
 					return ret;
 				}
 
-				if (query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0) {
-					metaObjs = accountMetaTable.query(null, null, orderBy, start, length);
-				} else {
-					metaObjs = accountMetaTable.query(query, queryArgs, orderBy, start, length);
-				}
-
-				List<AccountObject> retUsers = new ArrayList<AccountObject>();
-				for (MetaObject metaObj : metaObjs) {
-					AccountObject ao = _metaTableObj.get(metaObj._oid()); //a single account
-					// System.out.println(ao._oid()+" ahwejakwekawej<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-					retUsers.add(ao);
-				}
-
-				fullUserArray = retUsers.toArray(new AccountObject[retUsers.size()]);
-			} else {
-				//do filtered query
-				fullUserArray = _metaTableObj.getUsersByGroupAndRole(insideGroup_any, hasGroupRole_any);
-			}
-
-			if (fullUserArray == null || fullUserArray.length == 0) {
-				return ret;
-			}
-
-			//group status filtering
-			if (groupStatus != null) {
-				List<AccountObject> filteredUsers = new ArrayList<AccountObject>();
-				for (AccountObject ao : fullUserArray) {
-					if (groupStatus.equalsIgnoreCase("group")) {
-						if (ao.isGroup()) {
-							filteredUsers.add(ao);
-						}
-					} else if (groupStatus.equalsIgnoreCase("user")) {
-						if (!ao.isGroup()) {
-							filteredUsers.add(ao);
+				//group status filtering
+				if (groupStatus != null) {
+					List<AccountObject> filteredUsers = new ArrayList<AccountObject>();
+					for (AccountObject ao : fullUserArray) {
+						if (groupStatus.equalsIgnoreCase("group")) {
+							if (ao.isGroup()) {
+								filteredUsers.add(ao);
+							}
+						} else if (groupStatus.equalsIgnoreCase("user")) {
+							if (!ao.isGroup()) {
+								filteredUsers.add(ao);
+							}
 						}
 					}
+
+					fullUserArray = filteredUsers.toArray(new AccountObject[filteredUsers.size()]);
 				}
 
-				fullUserArray = filteredUsers.toArray(new AccountObject[filteredUsers.size()]);
-			}
+				for (AccountObject ao : fullUserArray) {
+					List<Object> row = new ArrayList<Object>();
+					for (String header : headers) {
+						if (header.equalsIgnoreCase("names")) {
+							if (ao != null) {
+								Set<String> aoNames = ao.getLoginIDSet();
 
-			for (AccountObject ao : fullUserArray) {
-				List<Object> row = new ArrayList<Object>();
-				for (String header : headers) {
-					if (header.equalsIgnoreCase("names")) {
-						if (ao != null) {
-							Set<String> aoNames = ao.getLoginIDSet();
+								if (sanitiseOutput) {
+									aoNames.clear();
+									for (String name : ao.getLoginIDSet()) {
+										aoNames.add(RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(name));
+									}
+								}
 
-							if (sanitiseOutput) {
-								aoNames.clear();
-								for (String name : ao.getLoginIDSet()) {
-									aoNames.add(RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(name));
+								if (aoNames != null) {
+									List<String> aoNameList = new ArrayList<String>(aoNames);
+									row.add(aoNameList);
 								}
 							}
-
-							if (aoNames != null) {
-								List<String> aoNameList = new ArrayList<String>(aoNames);
-								row.add(aoNameList);
-							}
-						}
-					} else {
-						Object rawVal = ao.get(header); //this used to be metaObj.get
-
-						if (sanitiseOutput && rawVal instanceof String) {
-							String stringVal = GenericConvert.toString(rawVal);
-							row.add(stringVal);
 						} else {
-							row.add(rawVal);
+							Object rawVal = ao.get(header); //this used to be metaObj.get
+
+							if (sanitiseOutput && rawVal instanceof String) {
+								String stringVal = GenericConvert.toString(rawVal);
+								row.add(stringVal);
+							} else {
+								row.add(rawVal);
+							}
+
 						}
-
 					}
+					ret.add(row);
 				}
-				ret.add(row);
 			}
+		} catch (Exception e) {
+			throw new RuntimeException("list_GET_and_POST_inner() ", e);
 		}
-	} catch (Exception e) {
-		throw new RuntimeException("list_GET_and_POST_inner() ", e);
+
+		return ret;
 	}
 
-	return ret;
-}
-
-private static String getStringWithWildcardMode(String searchString, String wildcardMode) {
-	if (wildcardMode.equalsIgnoreCase("prefix")) {
-		return "%" + searchString;
-	} else if (wildcardMode.equalsIgnoreCase("suffix")) {
-		return searchString + "%";
-	} else {
-		return "%" + searchString + "%";
+	private static String getStringWithWildcardMode(String searchString, String wildcardMode) {
+		if (wildcardMode.equalsIgnoreCase("prefix")) {
+			return "%" + searchString;
+		} else if (wildcardMode.equalsIgnoreCase("suffix")) {
+			return searchString + "%";
+		} else {
+			return "%" + searchString + "%";
+		}
 	}
-}
+
+	private ApiResponse check_parameters (String[] listToCheck, ApiRequest req, ApiResponse res) {
+	  for (String paramName : listToCheck ) {
+	    String value = "";
+	    switch(paramName) {
+	      case Account_Strings.REQ_ACCOUNT_ID :
+	        value = req.getString(paramName, "");
+	        if ( value.isEmpty() )
+	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER_ID);
+	        break;
+	      case Account_Strings.REQ_USERNAME :
+	        value = req.getString(paramName, "");
+	        if ( value.isEmpty() )
+	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USERNAME);
+	        break;
+	      case Account_Strings.REQ_PASSWORD :
+	        value = req.getString(paramName, "");
+	        if ( value.isEmpty() )
+	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PASSWORD);
+	        break;
+	      case Account_Strings.REQ_GROUP_ID :
+	        value = req.getString(paramName, "");
+	        if ( value.isEmpty() )
+	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
+	        break;
+	      case Account_Strings.REQ_USER_ID :
+	        value = req.getString(paramName, "");
+	        if ( value.isEmpty() )
+	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER_ID);
+	        break;
+	      case Account_Strings.REQ_ROLE :
+	        value = req.getString(paramName, "");
+	        if ( value.isEmpty() )
+	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_ROLE);
+	        break;
+	      case Account_Strings.REQ_GROUPNAME :
+	        value = req.getString(paramName, "");
+	        if ( value.isEmpty() )
+	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUPNAME);
+	        break;
+	      case Account_Strings.REQ_META :
+	        Object metaObj = req.get(paramName);
+	        if ( metaObj == null )
+	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_META);
+	        break;
+	      case Account_Strings.REQ_OLD_PASSWORD:
+	        value = req.getString(paramName, "");
+	        if ( value.isEmpty() )
+	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PASSWORD);
+	        break;
+	      case Account_Strings.REQ_NEW_PASSWORD:
+	        value = req.getString(paramName, "");
+	        if ( value.isEmpty() )
+	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_NEW_PASSWORD);
+	        break;
+	      case Account_Strings.REQ_REPEAT_PASSWORD:
+	        value = req.getString(paramName, "");
+	        if ( value.isEmpty() )
+	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_NEW_REPEAT_PASSWORD);
+	        break;
+	    }
+			if ( res.get(Account_Strings.RES_ERROR) != null )
+				break;
+	  }
+	  return res;
+	}
 }

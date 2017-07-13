@@ -207,6 +207,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		expectedRoles.clear();
 		expectedRoles.add("grandma");
 		expectedRoles.add("grandpa");
+		expectedRoles.add("admin");
 		createDetails.put(Account_Strings.REQ_DEFAULT_ROLES, false);
 		createDetails.put(Account_Strings.REQ_ROLE, expectedRoles);
 		res = requestJSON("new", createDetails);
@@ -552,6 +553,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		initialRole.add("dragon");
 		initialRole.add("tiger");
 		initialRole.add("lion");
+		initialRole.add("admin");
 		params.put(Account_Strings.REQ_ROLE, initialRole);
 		res = requestJSON("new", params);
 		String accountID = res.getString(Account_Strings.RES_ACCOUNT_ID);
@@ -562,7 +564,7 @@ public class AccountTableApi_test extends ApiModule_test {
 
 		params.clear();
 		res = requestJSON("addMembershipRole", null);
-		assertEquals(Account_Strings.ERROR_NO_GROUPNAME, res.get(Account_Strings.RES_ERROR));
+		assertEquals(Account_Strings.ERROR_NO_GROUP_ID, res.get(Account_Strings.RES_ERROR));
 
 		params.put(Account_Strings.REQ_GROUP_ID, "wrong group ID");
 		res = requestJSON("addMembershipRole", params);
@@ -594,8 +596,10 @@ public class AccountTableApi_test extends ApiModule_test {
 		initialRole.add("dragon");
 		initialRole.add("tiger");
 		initialRole.add("lion");
+		initialRole.add("admin");
 		params.put(Account_Strings.REQ_ROLE, initialRole);
 		res = requestJSON("new", params);
+		String groupID = res.getString(Account_Strings.RES_ACCOUNT_ID);
 		assertNull("removeMembershipTest: Something wrong in adding group.", res.get(Account_Strings.RES_ERROR));
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
@@ -603,9 +607,9 @@ public class AccountTableApi_test extends ApiModule_test {
 
 		params.clear();
 		res = requestJSON("removeMembershipRole", null);
-		assertEquals(Account_Strings.ERROR_NO_GROUPNAME, res.get(Account_Strings.RES_ERROR));
+		assertEquals(Account_Strings.ERROR_NO_GROUP_ID, res.get(Account_Strings.RES_ERROR));
 
-		params.put(Account_Strings.REQ_GROUPNAME, "wrong group");
+		params.put(Account_Strings.REQ_GROUP_ID, "wrong group ID");
 		res = requestJSON("removeMembershipRole", params);
 		assertEquals(Account_Strings.ERROR_NO_ROLE, res.get(Account_Strings.RES_ERROR));
 
@@ -613,7 +617,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		res = requestJSON("removeMembershipRole", params);
 		assertEquals(Account_Strings.ERROR_NO_GROUP, res.get(Account_Strings.RES_ERROR));
 
-		params.put(Account_Strings.REQ_GROUPNAME, "removeMembershipRole");
+		params.put(Account_Strings.REQ_GROUP_ID, groupID);
 		res = requestJSON("removeMembershipRole", params);
 		assertEquals("No such role is found.", res.get(Account_Strings.RES_ERROR));
 

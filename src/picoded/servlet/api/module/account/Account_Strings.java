@@ -84,6 +84,8 @@ public class Account_Strings{
     public static final String ERROR_NO_NEW_REPEAT_PASSWORD = "No new repeat password found.";
     public static final String ERROR_PASS_INCORRECT = "Old password is wrong.";
     public static final String ERROR_NO_PRIVILEGES = "User does not have privilege.";
+    public static final String ERROR_PASSWORD_COMPLEXITY = "The password must contain at least 1 uppercase, 1 lowercase and 1 number.";
+    public static final String ERROR_INVALID_FORMAT_EMAIL = "The username is not an email.";
 
     // ADDITIONAL Variables
     public static final String SPACE = " ";

@@ -8,6 +8,7 @@ import picoded.struct.*;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 import picoded.servlet.CorePage;
+import picoded.servlet.api.exception.HaltException;
 
 /**
 * API Request map information
@@ -52,6 +53,16 @@ public class ApiResponse extends GenericConvertHashMap<String, Object> {
 	ApiResponse( ApiBuilder parent ) {
 		// Setup parent API builder object
 		builder = parent;
+	}
+
+	//-----------------------------------------------------------------
+	//
+	//  Halt / Contorl flow termination
+	//
+	//-----------------------------------------------------------------
+
+	public void halt() {
+		throw new HaltException();
 	}
 
 	//---------------------------------------------------------------------------------

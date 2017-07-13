@@ -1249,30 +1249,30 @@ public class AccountTableApi implements ApiModule {
 	/// @param  API builder to add the required functions
 	/// @param  Path to assume
 	public void setupApiBuilder(ApiBuilder builder, String path) {
-		builder.put(path+"account/isLogin", isLogin); // Tested
-		builder.put(path+"account/login", login); // Tested
-		builder.put(path+"account/lockTime", lockTime); // Tested
-		builder.put(path+"account/logout", logout); // Tested
-		builder.put(path+"account/new", new_account); // Tested
-		builder.put(path+"account/do_password_reset", do_password_reset); // Tested
-		builder.put(path+"account/account_info_by_Name", account_info_by_Name); // Tested
-		builder.put(path+"account/account_info_by_ID", account_info_by_ID); // Tested
-		builder.put(path+"account/admin/remove", delete_user_account); // Tested
-		builder.put(path+"account/admin/get_user_or_group_list", get_user_or_group_list); // Tested
-		builder.put(path+"account/update_current_user_info", update_current_user_info);
+		builder.put(path+API_ACCOUNT_IS_LOGIN, isLogin); // Tested
+		builder.put(path+API_ACCOUNT_LOGIN, login); // Tested
+		builder.put(path+API_ACCOUNT_LOCKTIME, lockTime); // Tested
+		builder.put(path+API_ACCOUNT_LOGOUT, logout); // Tested
+		builder.put(path+API_ACCOUNT_NEW, new_account); // Tested
+		builder.put(path+API_ACCOUNT_PASS_RESET, do_password_reset); // Tested
+		builder.put(path+API_ACCOUNT_INFO_NAME, account_info_by_Name); // Tested
+		builder.put(path+API_ACCOUNT_INFO_ID, account_info_by_ID); // Tested
+		builder.put(path+API_ACCOUNT_ADMIN_REMOVE, delete_user_account); // Tested
+		builder.put(path+API_ACCOUNT_ADMIN_GET_U_G_LIST, get_user_or_group_list); // Tested
+		builder.put(path+API_ACCOUNT_UPDATE_U_INFO, update_current_user_info);
 
 		//Group functionalities
-		builder.put(path+"group/groupRoles", groupRoles); // Tested
-		builder.put(path+"group/getMemberRole", getMemberRoleFromGroup); // Tested
-		builder.put(path+"group/getListOfGroupIDOfMember", getListOfGroupIDOfMember); // Tested
-		builder.put(path+"group/getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
-		builder.put(path+"group/get_single_member_meta", get_single_member_meta); // Tested
-		builder.put(path+"group/update_member_meta_info", update_member_meta_info); // Tested
+		builder.put(path+API_GROUP_GRP_ROLES, groupRoles); // Tested
+		builder.put(path+API_GROUP_GET_MEM_ROLE, getMemberRoleFromGroup); // Tested
+		builder.put(path+API_GROUP_GET_LIST_GRP_ID_MEM, getListOfGroupIDOfMember); // Tested
+		builder.put(path+API_GROUP_GET_LIST_GRP_OBJ_MEM, getListOfGroupObjectOfMember); // Tested
+		builder.put(path+API_GROUP_GET_SINGLE_MEM_META, get_single_member_meta); // Tested
+		builder.put(path+API_GROUP_UPDATE_MEM_META, update_member_meta_info); // Tested
 
-		builder.put(path+"group/admin/addMembershipRole", add_new_membership_role); // Tested
-		builder.put(path+"group/admin/removeMembershipRole", remove_membership_role); // Tested
-		builder.put(path+"group/admin/get_member_list_info", get_member_list_info); // Tested
-		builder.put(path+"group/admin/add_remove_member", add_remove_member); // Tested
+		builder.put(path+API_GROUP_ADMIN_ADD_MEM_ROLE, add_new_membership_role); // Tested
+		builder.put(path+API_GROUP_ADMIN_REM_MEM_ROLE, remove_membership_role); // Tested
+		builder.put(path+API_GROUP_ADMIN_GET_MEM_LIST_INFO, get_member_list_info); // Tested
+		builder.put(path+API_GROUP_ADMIN_ADD_REM_MEM, add_remove_member); // Tested
 		// builder.put(path+"getListOfMemberObjectOfGroup", getListOfMemberObjectOfGroup); // Tested
 	}
 

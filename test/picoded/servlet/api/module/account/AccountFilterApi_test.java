@@ -132,7 +132,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		GenericConvertMap<String,Object> res = null;
 		Map<String,Object> createDetails = new HashMap<String,Object>();
 		// 1st Test: Empty Submission
-		TestSet ts = new TestSet(null, "account/new", ERROR_INVALID_FORMAT_EMAIL, RES_ERROR);
+		TestSet ts = new TestSet(null, API_ACCOUNT_NEW, ERROR_INVALID_FORMAT_EMAIL, RES_ERROR);
 		ts.executeGenericTestCase();
 		// 2nd Test: Email format invalid
 		Map<String,Object> loginParams = new HashMap<String,Object>();
@@ -174,7 +174,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		for( int idx = 1; idx <= 2; idx ++ ) {
 			params.put(REQ_USERNAME, "member" + idx + "@gmail.com");
 			params.put(REQ_PASSWORD, "Password123");
-			res = requestJSON("account/new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("createNewGroup Filter: Something wrong in adding user " + idx + ".", res.get(RES_ERROR));
 			userID.add(res.getString(RES_ACCOUNT_ID));
 		}
@@ -189,7 +189,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		// 1st Test: Check if user is logged in
 		createDetails.put(REQ_USERNAME, "boy band");
 		createDetails.put(REQ_IS_GROUP, true);
-		TestSet ts = new TestSet(createDetails, "account/new", ERROR_USER_NOT_LOGIN, RES_ERROR);
+		TestSet ts = new TestSet(createDetails, API_ACCOUNT_NEW, ERROR_USER_NOT_LOGIN, RES_ERROR);
 		ts.executeGenericTestCase();
 		// 2nd Test: Check if it is a group (not a group)
 		// Login the user
@@ -223,7 +223,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		ts.loginUser("laughing-man@gmail.com", "Qwe123");
 		createDetails.clear();
 		createDetails.put(REQ_GROUP_ID, groupID);
-		res = requestJSON("group/groupRoles", createDetails);
+		res = requestJSON(API_GROUP_GRP_ROLES, createDetails);
 		assertEquals(expectedRoles, res.get(RES_LIST));
 		ts.logout();
 	}
@@ -240,11 +240,11 @@ public class AccountFilterApi_test extends ApiModule_test {
 		for( int idx = 1; idx <= 2; idx ++ ) {
 			params.put(REQ_USERNAME, "grpR" + idx + "@gmail.com");
 			params.put(REQ_PASSWORD, "Password123");
-			res = requestJSON("account/new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("groupRoles Filter: Something wrong in adding user " + idx + ".", res.get(RES_ERROR));
 			userID.add(res.getString(RES_ACCOUNT_ID));
 		}
-		TestSet ts = new TestSet(null, "account/new", null, null);
+		TestSet ts = new TestSet(null, API_ACCOUNT_NEW, null, null);
 		ts.loginUser("grpR1@gmail.com", "Password123");
 		ArrayList<String> expectedRoles = new ArrayList<String>();
 		expectedRoles.add("member");
@@ -254,7 +254,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		params.put(REQ_USERNAME, "myGroup");
 		params.put(REQ_IS_GROUP, "1");
 		ts.setAndExecuteGTC(params, null, RES_ERROR);
-		ts.setURL("group/getMemberRole");
+		ts.setURL(API_GROUP_GET_MEM_ROLE);
 		String groupID = ts.getRes().getString(RES_ACCOUNT_ID);
 		params.clear();
 		params.put(REQ_USER_ID, userID.get(0));
@@ -265,7 +265,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
 		// 1st Test: No login, retrieve group roles
-		ts.setURL("group/groupRoles");
+		ts.setURL(API_GROUP_GRP_ROLES);
 		ts.setAndExecuteGTC(params, ERROR_USER_NOT_LOGIN, RES_ERROR);
 		// 2nd Test: Login user, retrieve group not belonging to itself
 		ts.loginUser("grpR2@gmail.com", "Password123");
@@ -290,7 +290,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		for( int idx = 1; idx <= 3; idx ++ ) {
 			params.put(REQ_USERNAME, "ARmember" + idx + "@gmail.com");
 			params.put(REQ_PASSWORD, "Password123");
-			res = requestJSON("account/new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("addAndRemoveMemberToGroupTest Filter: Something wrong in adding user " + idx + ".", res.get(RES_ERROR));
 			userID.add(res.getString(RES_ACCOUNT_ID));
 		}
@@ -300,7 +300,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 			ts.loginUser("ARmember"+idx+"@gmail.com", "Password123");
 			params.put(REQ_USERNAME, "group "+idx);
 			params.put(REQ_IS_GROUP, true);
-			res = requestJSON("account/new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("addAndRemoveMemberToGroupTest Filter: Something wrong in creating group " + idx + ".", res.get(RES_ERROR));
 			groupID.add(res.getString(RES_ACCOUNT_ID));
 			ts.logout();
@@ -310,7 +310,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		params.clear();
 		params.put(REQ_GROUP_ID, userID.get(2));
 		params.put(REQ_ROLE, "knight");
-		res = requestJSON("group/admin/addMembershipRole", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_MEM_ROLE, params);
 		assertNull("addAndRemoveMemberToGroupTest Filter: Something wrong in adding role to group.", res.get(RES_ERROR));
 		ts.logout();
 
@@ -320,14 +320,14 @@ public class AccountFilterApi_test extends ApiModule_test {
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
 		// 1st Test: Submit nothing at all User not logged in
-		res = requestJSON("group/admin/add_remove_member", null);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, null);
 		assertEquals(ERROR_USER_NOT_LOGIN, res.get(RES_ERROR));
 
 		// 2nd Test: Non existence group
 		ts.loginUser("ARmember2@gmail.com", "Password123");
 		params.clear();
 		params.put(REQ_GROUP_ID, "randomID HAHHAHAHA");
-		res = requestJSON("group/admin/add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(ERROR_NO_PRIVILEGES, res.get(RES_ERROR));
 		ts.logout();
 		// 3rd Test: Remove non existence members & existence members not in group from Existence group (group 1)
@@ -337,7 +337,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		removeUserList.add("This is random ID");
 		removeUserList.add(userID.get(0));
 		params.put(REQ_REMOVE_LIST, removeUserList);
-		res = requestJSON("group/admin/add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		expectedFailResult.add("ID: This is random ID, Error: " + ERROR_NO_USER);
 		expectedFailResult.add("ID: " + userID.get(0) + ", Error: User is not in group.");
 		// assertEquals(expectedFailResult, res.get(RES_FAIL_REMOVE));
@@ -349,7 +349,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		addUserList.add("One for the road");
 		params.put(REQ_ADD_LIST, addUserList);
 		params.put(REQ_GROUP_ID, groupID.get(0));
-		res = requestJSON("group/admin/add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(ERROR_NO_ROLE, res.get(RES_ERROR));
 
 		// 5th Test: Add non existence members and existence member with non existence role into group (group 2)
@@ -360,7 +360,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		addUserList.add(userID.get(1));
 		params.put(REQ_ROLE, "this is random role");
 		params.put(REQ_ADD_LIST, addUserList);
-		res = requestJSON("group/admin/add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
 
 		// 6th Test: Add existence members and repeated member with existence role into group (group 2)
@@ -376,7 +376,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		expectedFailResult.add("ID: " + userID.get(1) +", Error: "+ "User is already in group or role is not found.");
 		expectedPassResult.add(userID.get(0));
 		expectedPassResult.add(userID.get(1));
-		res = requestJSON("group/admin/add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
 		assertEquals(expectedPassResult, res.get(RES_SUCCESS_ADD));
 
@@ -391,7 +391,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		params.put(REQ_REMOVE_LIST, removeUserList);
 		expectedFailResult.add("ID: " + userID.get(0) + ", Error: User is not in group.");
 		expectedPassResult.add(userID.get(0));
-		res = requestJSON("group/admin/add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(expectedFailResult, res.get(RES_FAIL_REMOVE));
 		assertEquals(expectedPassResult, res.get(RES_SUCCESS_REMOVE));
 
@@ -403,7 +403,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		params.put(REQ_GROUP_ID, userID.get(1));
 		params.put(REQ_REMOVE_LIST, removeUserList);
 		expectedFailResult.add("ID: " + userID.get(1) + ", Error: This is not a group.");
-		res = requestJSON("group/admin/add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(expectedFailResult, res.get(RES_FAIL_REMOVE));
 
 		// 9th Test: Adding valid users to user account that do not have roles a.k.a not a group yet (member 2)
@@ -415,7 +415,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		params.put(REQ_ADD_LIST, addUserList);
 		params.put(REQ_ROLE, "member");
 		expectedFailResult.add("ID: " + userID.get(0) +", Error: User is already in group or role is not found.");
-		res = requestJSON("group/admin/add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
 
 		// 10th Test: Adding valid users to user account that is a group (member 3)
@@ -426,13 +426,13 @@ public class AccountFilterApi_test extends ApiModule_test {
 		params.put(REQ_GROUP_ID, userID.get(2));
 		params.put(REQ_ADD_LIST, addUserList);
 		params.put(REQ_ROLE, "knight");
-		res = requestJSON("group/admin/add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		expectedPassResult.add(userID.get(0));
 		assertEquals(expectedPassResult, res.get(RES_SUCCESS_ADD));
 
 		// 11th Test: Add the same user to the same group (member 3)
 		expectedFailResult.clear();
-		res = requestJSON("group/admin/add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		expectedFailResult.add("ID: " + userID.get(0) +", Error: User is already in group or role is not found.");
 		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
 	}

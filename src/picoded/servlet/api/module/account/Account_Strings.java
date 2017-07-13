@@ -103,16 +103,30 @@ public class Account_Strings{
     public static final String SV_IS_META = "isMeta";
 
     /// API ENDPOINTS
-    public static final String API_IS_LOGIN = "account/isLogin";
-    public static final String API_LOGIN = "account/login";
-    public static final String API_LOCKTIME = "account/lockTime";
-    public static final String API_LOGOUT = "account/logout";
-    public static final String API_NEW = "account/new";
-    public static final String API_PASS_RESET = "account/do_password_reset";
-    public static final String API_INFO_NAME = "account/account_info_by_Name";
-    public static final String API_INFO_ID = "account/account_info_by_ID";
-    public static final String API_ADMIN_REMOVE = "account/admin/remove";
-    public static final String API_ADMIN_GET_U_G_LIST = "account/admin/get_user_or_group_list";
-    public static final String API_UPDATE_U_INFO = "account/update_current_user_info";
+    public static final String API_ACCOUNT_IS_LOGIN = "account/isLogin";
+    public static final String API_ACCOUNT_LOGIN = "account/login";
+    public static final String API_ACCOUNT_LOCKTIME = "account/lockTime";
+    public static final String API_ACCOUNT_LOGOUT = "account/logout";
+    public static final String API_ACCOUNT_NEW = "account/new";
+    public static final String API_ACCOUNT_PASS_RESET = "account/do_password_reset";
+    public static final String API_ACCOUNT_INFO_NAME = "account/account_info_by_Name";
+    public static final String API_ACCOUNT_INFO_ID = "account/account_info_by_ID";
+    public static final String API_ACCOUNT_ADMIN_REMOVE = "account/admin/remove";
+    public static final String API_ACCOUNT_ADMIN_GET_U_G_LIST = "account/admin/get_user_or_group_list";
+    public static final String API_ACCOUNT_UPDATE_U_INFO = "account/update_current_user_info";
+
+    public static final String API_GROUP_GRP_ROLES = "group/groupRoles";
+    public static final String API_GROUP_GET_MEM_ROLE = "group/getMemberRole";
+    public static final String API_GROUP_GET_LIST_GRP_ID_MEM = "group/getListOfGroupIDOfMember";
+    public static final String API_GROUP_GET_LIST_GRP_OBJ_MEM = "group/getListOfGroupObjectOfMember";
+    public static final String API_GROUP_GET_SINGLE_MEM_META = "group/get_single_member_meta";
+    public static final String API_GROUP_UPDATE_MEM_META = "group/update_member_meta_info";
+    public static final String API_GROUP_ADMIN_ADD_MEM_ROLE = "group/admin/addMembershipRole";
+    public static final String API_GROUP_ADMIN_REM_MEM_ROLE = "group/admin/removeMembershipRole";
+    public static final String API_GROUP_ADMIN_GET_MEM_LIST_INFO = "group/admin/get_member_list_info";
+    public static final String API_GROUP_ADMIN_ADD_REM_MEM = "group/admin/add_remove_member";
+
+
+
 
 }

@@ -82,9 +82,37 @@ public class Account_Strings{
     public static final String ERROR_NO_PRIVILEGES = "User does not have privilege.";
     public static final String ERROR_PASSWORD_COMPLEXITY = "The password must contain at least 1 uppercase, 1 lowercase and 1 number.";
     public static final String ERROR_INVALID_FORMAT_EMAIL = "The username is not an email.";
+    public static final String ERROR_USER_NOT_LOGIN = "User is not logged in.";
 
     /// ADDITIONAL Variables
     public static final String SPACE = " ";
     public static final String GROUP = "group";
+
+    /// Check States Variables (FILTER API)
+    public static final String SV_IS_SUPERUSER = "isSuperUser";
+    public static final String SV_IS_ADMIN = "isAdmin";
+    public static final String SV_IS_MEMBER = "isMember";
+    public static final String SV_IS_SELF = "isSelf";
+    public static final String SV_IS_SELF_GROUP = "isSelfGroup";
+    public static final String SV_IS_LOGGED_IN = "isLoggedIn";
+    public static final String SV_IS_CREATE_GROUP = "isCreateGroup";
+    public static final String SV_IS_USER_ID = "isUserID";
+    public static final String SV_IS_USER_NAME = "isUserName";
+    public static final String SV_IS_PASSWORD_SATISFIED = "isPassFormat";
+    public static final String SV_IS_EMAIL_SATISFIED = "isEmailFormat";
+    public static final String SV_IS_META = "isMeta";
+
+    /// API ENDPOINTS
+    public static final String API_IS_LOGIN = "account/isLogin";
+    public static final String API_LOGIN = "account/login";
+    public static final String API_LOCKTIME = "account/lockTime";
+    public static final String API_LOGOUT = "account/logout";
+    public static final String API_NEW = "account/new";
+    public static final String API_PASS_RESET = "account/do_password_reset";
+    public static final String API_INFO_NAME = "account/account_info_by_Name";
+    public static final String API_INFO_ID = "account/account_info_by_ID";
+    public static final String API_ADMIN_REMOVE = "account/admin/remove";
+    public static final String API_ADMIN_GET_U_G_LIST = "account/admin/get_user_or_group_list";
+    public static final String API_UPDATE_U_INFO = "account/update_current_user_info";
 
 }

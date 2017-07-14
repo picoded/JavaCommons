@@ -126,7 +126,4 @@ public class Account_Strings{
     public static final String API_GROUP_ADMIN_GET_MEM_LIST_INFO = "group/admin/get_member_list_info";
     public static final String API_GROUP_ADMIN_ADD_REM_MEM = "group/admin/add_remove_member";
 
-
-
-
 }

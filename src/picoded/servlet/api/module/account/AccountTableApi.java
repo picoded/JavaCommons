@@ -312,7 +312,6 @@ public class AccountTableApi implements ApiModule {
 	protected ApiFunction groupRoles = (req, res) -> {
 		String[] paramsToCheck = new String[]{REQ_GROUP_ID};
 		res = check_parameters(paramsToCheck, req, res);
-		System.out.println(res.get(RES_ERROR)+" alwkejkawlkl");
 		if ( res.get(RES_ERROR) != null )
 			return res;
 		String groupID = req.getString(REQ_GROUP_ID);
@@ -430,7 +429,7 @@ public class AccountTableApi implements ApiModule {
 	/// | Parameter Name  | Variable Type					| Description                                                                |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	/// | role						| String								| name of the role to remove																								 |
-	/// | groupname				| String								| name of the group to remove from																					 |
+	/// | groupID					| String								| ID of the group to remove from																						 |
 	/// +-----------------+-----------------------+----------------------------------------------------------------------------+
 	///
 	/// ## JSON Object Output Parameters
@@ -450,7 +449,6 @@ public class AccountTableApi implements ApiModule {
 			return res;
 		String groupID = req.getString(REQ_GROUP_ID);
 		String role = req.getString(REQ_ROLE);
-
 		AccountObject group = table.get(groupID);
 		if ( group == null ) {
 			res.put(RES_ERROR, ERROR_NO_GROUP);

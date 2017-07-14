@@ -61,9 +61,9 @@ public class AccountTableApi_test extends ApiModule_test {
 
 	@Test
 	public void isLoginFailure() {
-		assertNull( requestJSON("isLogin", null).get("INFO") );
-		assertNull( requestJSON("isLogin", null).get(RES_ERROR) );
-		assertEquals( Boolean.FALSE, requestJSON("isLogin", null).get(RES_RETURN) );
+		assertNull( requestJSON(API_ACCOUNT_IS_LOGIN, null).get("INFO") );
+		assertNull( requestJSON(API_ACCOUNT_IS_LOGIN, null).get(RES_ERROR) );
+		assertEquals( Boolean.FALSE, requestJSON(API_ACCOUNT_IS_LOGIN, null).get(RES_RETURN) );
 	}
 
 	@Test
@@ -72,39 +72,39 @@ public class AccountTableApi_test extends ApiModule_test {
 		Map<String,Object> res = null;
 
 		// Check for invalid login
-		assertEquals( Boolean.FALSE, requestJSON("isLogin", null).get(RES_RETURN) );
+		assertEquals( Boolean.FALSE, requestJSON(API_ACCOUNT_IS_LOGIN, null).get(RES_RETURN) );
 
 		// Does a failed login
 		Map<String,Object> loginParams = new HashMap<String,Object>();
 		loginParams.put(REQ_USERNAME, "laughing-man");
 		loginParams.put(REQ_PASSWORD, "Is the enemy");
-		res = requestJSON("login", loginParams);
+		res = requestJSON(API_ACCOUNT_LOGIN, loginParams);
 
-		assertEquals( Boolean.FALSE, res.get("isLogin") );
+		assertEquals( Boolean.FALSE, res.get(RES_IS_LOGIN) );
 		assertEquals( ERROR_FAIL_LOGIN, res.get(RES_ERROR) );
 
 		// Check for invalid login
-		assertEquals( Boolean.FALSE, requestJSON("isLogin", null).get(RES_RETURN) );
+		assertEquals( Boolean.FALSE, requestJSON(API_ACCOUNT_IS_LOGIN, null).get(RES_RETURN) );
 
 		// Does the actual login
 		loginParams.put(REQ_USERNAME, "laughing-man");
 		loginParams.put(REQ_PASSWORD, "The Catcher in the Rye");
 
 		// Request and check result
-		res = requestJSON("login", loginParams);
+		res = requestJSON(API_ACCOUNT_LOGIN, loginParams);
 		assertNull( res.get(RES_ERROR) );
 		assertNull( res.get("INFO") );
-		assertEquals( Boolean.TRUE, res.get("isLogin") );
+		assertEquals( Boolean.TRUE, res.get(RES_IS_LOGIN) );
 		// Validate that login is valid
-		res = requestJSON("isLogin", null);
+		res = requestJSON(API_ACCOUNT_IS_LOGIN, null);
 		assertEquals( Boolean.TRUE, res.get(RES_RETURN) );
 
 		// Log out current user
-		res = requestJSON("logout", null);
+		res = requestJSON(API_ACCOUNT_LOGOUT, null);
 		assertEquals( Boolean.TRUE, res.get(RES_RETURN) );
 
 		// Validate that logout is valid
-		res = requestJSON("isLogin", null);
+		res = requestJSON(API_ACCOUNT_IS_LOGIN, null);
 		assertEquals( Boolean.FALSE, res.get(RES_RETURN) );
 	}
 
@@ -113,7 +113,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		// reuse result map
 		Map<String,Object> res = null;
 		// Checks that the test begins with the user not logged in
-		res = requestJSON("isLogin", null);
+		res = requestJSON(API_ACCOUNT_IS_LOGIN, null);
 		assertEquals( Boolean.FALSE, res.get(RES_RETURN) );
 
 		Map<String,Object> loginParams = new HashMap<String,Object>();
@@ -121,11 +121,11 @@ public class AccountTableApi_test extends ApiModule_test {
 		loginParams.put(REQ_PASSWORD, "Is the enemy");
 		int doTestLoop = 3, currentLoop = 0;
 		while(currentLoop < doTestLoop){
-			res = requestJSON("login", loginParams);
+			res = requestJSON(API_ACCOUNT_LOGIN, loginParams);
 			// System.out.println(res.get(RES_ERROR)+" <<<<<<<<<<");
 			Map<String, Object> params = new HashMap<String,Object>();
 			params.put(REQ_ACCOUNT_NAME, "laughing-man");
-			int waitTime = (int) requestJSON("lockTime", params).get("lockTime");
+			int waitTime = (int) requestJSON(API_ACCOUNT_LOCKTIME, params).get("lockTime");
 			if(currentLoop%2==0){
 				assertEquals( Boolean.FALSE, res.get(RES_IS_LOGIN) );
 				assertEquals("It failed on the Loop Number: "+ (currentLoop+1) +" with waitTime: "+waitTime+"\n"+
@@ -147,22 +147,22 @@ public class AccountTableApi_test extends ApiModule_test {
 		Map<String,Object> res = null;
 		Map<String,Object> createDetails = new HashMap<String,Object>();
 
-		res = requestJSON("new", createDetails);
+		res = requestJSON(API_ACCOUNT_NEW, createDetails);
 		assertEquals(ERROR_NO_USERNAME, res.get(RES_ERROR));
 
 		createDetails.put(REQ_USERNAME, "little-boy");
-		res = requestJSON("new", createDetails);
+		res = requestJSON(API_ACCOUNT_NEW, createDetails);
 		assertEquals(ERROR_NO_PASSWORD, res.get(RES_ERROR));
 		// Successfully created account
 		createDetails.put(REQ_PASSWORD, "sooo smallll");
-		res = requestJSON("new", createDetails);
+		res = requestJSON(API_ACCOUNT_NEW, createDetails);
 		assertNotNull( res.get(RES_META));
 		assertNull(res.get(RES_ERROR));
 
 		String accountID = res.get(RES_ACCOUNT_ID).toString();
 
 		//Create same user again
-		res = requestJSON("new", createDetails);
+		res = requestJSON(API_ACCOUNT_NEW, createDetails);
 		assertEquals("Object already exists in account Table", res.get(RES_ERROR));
 		assertEquals(accountID, res.get(RES_ACCOUNT_ID));
 	}
@@ -173,29 +173,29 @@ public class AccountTableApi_test extends ApiModule_test {
 		Map<String,Object> createDetails = new HashMap<String,Object>();
 		createDetails.put(REQ_USERNAME, "boy band");
 		createDetails.put(REQ_IS_GROUP, true);
-		res = requestJSON("new", createDetails);
+		res = requestJSON(API_ACCOUNT_NEW, createDetails);
 		assertNull(res.get(RES_ERROR));
 
 		// Checks if it is a group
 
 		// Creates the same group
-		res = requestJSON("new", createDetails);
+		res = requestJSON(API_ACCOUNT_NEW, createDetails);
 		assertEquals("Object already exists in account Table", res.get(RES_ERROR));
 
 		// Not using the correct value to create group
 		createDetails.put(REQ_USERNAME, "girl band");
 		createDetails.put(REQ_IS_GROUP, "random Words");
-		res = requestJSON("new", createDetails);
+		res = requestJSON(API_ACCOUNT_NEW, createDetails);
 		assertNotNull(res.get(RES_ERROR));
 
 		createDetails.put(REQ_IS_GROUP, "1");
-		res = requestJSON("new", createDetails);
+		res = requestJSON(API_ACCOUNT_NEW, createDetails);
 		assertNull(res.get(RES_ERROR));
 		String accountID = res.getString(RES_ACCOUNT_ID);
 
 		createDetails.clear();
 		createDetails.put(REQ_GROUP_ID, accountID);
-		res = requestJSON("groupRoles", createDetails);
+		res = requestJSON(API_GROUP_GRP_ROLES, createDetails);
 		ArrayList<String> expectedRoles = new ArrayList<String>();
 		expectedRoles.add("member");
 		expectedRoles.add("admin");
@@ -210,13 +210,13 @@ public class AccountTableApi_test extends ApiModule_test {
 		expectedRoles.add("admin");
 		createDetails.put(REQ_DEFAULT_ROLES, false);
 		createDetails.put(REQ_ROLE, expectedRoles);
-		res = requestJSON("new", createDetails);
+		res = requestJSON(API_ACCOUNT_NEW, createDetails);
 		assertNull(res.get(RES_ERROR));
 		accountID = res.getString(RES_ACCOUNT_ID);
 
 		createDetails.clear();
 		createDetails.put(REQ_GROUP_ID, accountID);
-		res = requestJSON("groupRoles", createDetails);
+		res = requestJSON(API_GROUP_GRP_ROLES, createDetails);
 		assertEquals(expectedRoles, res.get(RES_LIST));
 	}
 
@@ -224,24 +224,24 @@ public class AccountTableApi_test extends ApiModule_test {
 	public void groupRoles(){
 		// reuse result map
 		GenericConvertMap<String,Object> res = null;
-		res = requestJSON("groupRoles", null);
+		res = requestJSON(API_GROUP_GRP_ROLES, null);
 		assertEquals(ERROR_NO_GROUP_ID, res.get(RES_ERROR));
 		Map<String,Object> params = new HashMap<String,Object>();
 
 		params.put(REQ_GROUP_ID, "randomID HAHAHAHA");
-		res = requestJSON("groupRoles", params);
+		res = requestJSON(API_GROUP_GRP_ROLES, params);
 		assertEquals(ERROR_NO_GROUP, res.get(RES_ERROR));
 
 		// Add in a group specifically for this test
 		params.clear();
 		params.put(REQ_USERNAME, "Macho");
 		params.put(REQ_IS_GROUP, true);
-		res = requestJSON("new", params);
+		res = requestJSON(API_ACCOUNT_NEW, params);
 		assertNull(res.get(RES_ERROR));
 
 		params.clear();
 		params.put(REQ_GROUP_ID, res.getString(RES_ACCOUNT_ID));
-		res = requestJSON("groupRoles", params);
+		res = requestJSON(API_GROUP_GRP_ROLES, params);
 		assertNull(res.get(RES_ERROR));
 		ArrayList<String> expectedRoles = new ArrayList<String>();
 		expectedRoles.add("member");
@@ -262,7 +262,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		for( int idx = 1; idx <= 3; idx ++ ) {
 			params.put(REQ_USERNAME, "member " + idx);
 			params.put(REQ_PASSWORD, "password");
-			res = requestJSON("new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("addAndRemoveMemberToGroupTest: Something wrong in adding user " + idx + ".", res.get(RES_ERROR));
 			userID.add(res.getString(RES_ACCOUNT_ID));
 		}
@@ -270,7 +270,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		for( int idx = 0; idx <= 3; idx ++ ) {
 			params.put(REQ_USERNAME, "group "+idx);
 			params.put(REQ_IS_GROUP, true);
-			res = requestJSON("new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("addAndRemoveMemberToGroupTest: Something wrong in creating group " + idx + ".", res.get(RES_ERROR));
 			groupID.add(res.getString(RES_ACCOUNT_ID));
 		}
@@ -278,7 +278,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.clear();
 		params.put(REQ_GROUP_ID, userID.get(2));
 		params.put(REQ_ROLE, "knight");
-		res = requestJSON("addMembershipRole", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_MEM_ROLE, params);
 		assertNull("addAndRemoveMemberToGroupTest: Something wrong in adding role to group.", res.get(RES_ERROR));
 
 		List<String> removeUserList = new ArrayList<String>(), addUserList = new ArrayList<String>();
@@ -287,13 +287,13 @@ public class AccountTableApi_test extends ApiModule_test {
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
 		// 1st Test: Submit nothing at all
-		res = requestJSON("add_remove_member", null);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, null);
 		assertEquals(ERROR_NO_GROUP_ID, res.get(RES_ERROR));
 
 		// 2nd Test: Non existence group
 		params.clear();
 		params.put(REQ_GROUP_ID, "randomID HAHHAHAHA");
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(ERROR_NO_GROUP, res.get(RES_ERROR));
 
 		// 3rd Test: Remove non existence members & existence members not in group from Existence group (group 1)
@@ -302,7 +302,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		removeUserList.add("This is random ID");
 		removeUserList.add(userID.get(0));
 		params.put(REQ_REMOVE_LIST, removeUserList);
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		expectedFailResult.add("ID: This is random ID, Error: " + ERROR_NO_USER);
 		expectedFailResult.add("ID: " + userID.get(0) + ", Error: User is not in group.");
 		assertEquals(expectedFailResult, res.get(RES_FAIL_REMOVE));
@@ -313,7 +313,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		addUserList.add("One for the road");
 		params.put(REQ_ADD_LIST, addUserList);
 		params.put(REQ_GROUP_ID, groupID.get(0));
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(ERROR_NO_ROLE, res.get(RES_ERROR));
 
 		// 5th Test: Add non existence members and existence member with non existence role into group (group 2)
@@ -324,7 +324,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		addUserList.add(userID.get(1));
 		params.put(REQ_ROLE, "this is random role");
 		params.put(REQ_ADD_LIST, addUserList);
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
 
 		// 6th Test: Add existence members and repeated member with existence role into group (group 2)
@@ -340,7 +340,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		expectedFailResult.add("ID: " + userID.get(1) +", Error: "+ "User is already in group or role is not found.");
 		expectedPassResult.add(userID.get(0));
 		expectedPassResult.add(userID.get(1));
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
 		assertEquals(expectedPassResult, res.get(RES_SUCCESS_ADD));
 
@@ -355,7 +355,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_REMOVE_LIST, removeUserList);
 		expectedFailResult.add("ID: " + userID.get(0) + ", Error: User is not in group.");
 		expectedPassResult.add(userID.get(0));
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(expectedFailResult, res.get(RES_FAIL_REMOVE));
 		assertEquals(expectedPassResult, res.get(RES_SUCCESS_REMOVE));
 
@@ -367,7 +367,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_GROUP_ID, userID.get(1));
 		params.put(REQ_REMOVE_LIST, removeUserList);
 		expectedFailResult.add("ID: " + userID.get(1) + ", Error: This is not a group.");
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(expectedFailResult, res.get(RES_FAIL_REMOVE));
 
 		// 9th Test: Adding valid users to user account that do not have roles a.k.a not a group yet (member 2)
@@ -379,7 +379,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_ADD_LIST, addUserList);
 		params.put(REQ_ROLE, "member");
 		expectedFailResult.add("ID: " + userID.get(0) +", Error: User is already in group or role is not found.");
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
 
 		// 10th Test: Adding valid users to user account that is a group (member 3)
@@ -390,13 +390,13 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_GROUP_ID, userID.get(2));
 		params.put(REQ_ADD_LIST, addUserList);
 		params.put(REQ_ROLE, "knight");
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		expectedPassResult.add(userID.get(0));
 		assertEquals(expectedPassResult, res.get(RES_SUCCESS_ADD));
 
 		// 11th Test: Add the same user to the same group (member 3)
 		expectedFailResult.clear();
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		expectedFailResult.add("ID: " + userID.get(0) +", Error: User is already in group or role is not found.");
 		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
 	}
@@ -411,13 +411,13 @@ public class AccountTableApi_test extends ApiModule_test {
 	// 	Map<String,Object> params = new HashMap<String,Object>();
 	// 	params.put(REQ_USERNAME, "membermeta");
 	// 	params.put(REQ_PASSWORD, "password");
-	// 	res = requestJSON("new", params);
+	// 	res = requestJSON(API_ACCOUNT_NEW, params);
 	// 	assertNull("MemberMetaTest: Something wrong in adding user.", res.get(RES_ERROR));
 	// 	// Ensure that there is an existing group
 	// 	params.clear();
 	// 	params.put(REQ_USERNAME, "memberMetaGroup");
 	// 	params.put(REQ_IS_GROUP, true);
-	// 	res = requestJSON("new", params);
+	// 	res = requestJSON(API_ACCOUNT_NEW, params);
 	// 	assertNull("MemberMetaTest: Something wrong in adding group.", res.get(RES_ERROR));
 	// 	// Ensure that the user is added to the group
 	// 	params.clear();
@@ -478,20 +478,20 @@ public class AccountTableApi_test extends ApiModule_test {
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put(REQ_USERNAME, "memberrole");
 		params.put(REQ_PASSWORD, "password");
-		res = requestJSON("new", params);
+		res = requestJSON(API_ACCOUNT_NEW, params);
 		assertNull("getMemberRole: Something wrong in adding user.", res.get(RES_ERROR));
 		String userID = res.getString(RES_ACCOUNT_ID);
 
 		params.put(REQ_USERNAME, "memberNotInGroup");
 		params.put(REQ_PASSWORD, "password");
-		res = requestJSON("new", params);
+		res = requestJSON(API_ACCOUNT_NEW, params);
 		assertNull("getMemberRole: Something wrong in adding user.", res.get(RES_ERROR));
 		String wrongUserID = res.getString(RES_ACCOUNT_ID);
 		// Ensure that there is an existing group
 		params.clear();
 		params.put(REQ_USERNAME, "memberRoleGroup");
 		params.put(REQ_IS_GROUP, true);
-		res = requestJSON("new", params);
+		res = requestJSON(API_ACCOUNT_NEW, params);
 		assertNull("getMemberRole: Something wrong in adding group.", res.get(RES_ERROR));
 		String groupID = res.getString(RES_ACCOUNT_ID);
 		// Ensure that the user is added to the group
@@ -500,40 +500,40 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_ADD_LIST, userIDList);
 		params.put(REQ_GROUP_ID, groupID);
 		params.put(REQ_ROLE, "member");
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull("getMemberRole: Something wrong in adding member to group.", res.get(RES_ERROR));
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
 
 		// 1st Test: Empty submission
-		res = requestJSON("getMemberRole", null);
+		res = requestJSON(API_GROUP_GET_MEM_ROLE, null);
 		assertEquals(ERROR_NO_GROUP_ID, res.get(RES_ERROR));
 
 		// 2nd Test: Invalid groupID
 		params.clear();
 		params.put(REQ_GROUP_ID, "wrong group ID");
-		res = requestJSON("getMemberRole", params);
+		res = requestJSON(API_GROUP_GET_MEM_ROLE, params);
 		assertEquals(ERROR_NO_USER_ID, res.get(RES_ERROR));
 
 		// 3rd Test: Invalid member ID
 		params.put(REQ_USER_ID, "wrong member ID");
-		res = requestJSON("getMemberRole", params);
+		res = requestJSON(API_GROUP_GET_MEM_ROLE, params);
 		assertEquals(ERROR_NO_GROUP, res.get(RES_ERROR));
 
 		// 4th Test: Valid groupID
 		params.put(REQ_GROUP_ID, groupID);
-		res = requestJSON("getMemberRole", params);
+		res = requestJSON(API_GROUP_GET_MEM_ROLE, params);
 		assertEquals(ERROR_NO_USER, res.get(RES_ERROR));
 
 		// 5th Test: Existence wrong userID
 		params.put(REQ_USER_ID, wrongUserID);
-		res = requestJSON("getMemberRole", params);
+		res = requestJSON(API_GROUP_GET_MEM_ROLE, params);
 		assertEquals("No role for user is found.", res.get(RES_ERROR));
 
 		// 6th Test: Valid UserID
 		params.put(REQ_USER_ID, userID);
-		res = requestJSON("getMemberRole", params);
+		res = requestJSON(API_GROUP_GET_MEM_ROLE, params);
 		assertNull(res.get(RES_ERROR));
 		assertNotNull(res.get(RES_SINGLE_RETURN_VALUE));
 	}
@@ -555,7 +555,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		initialRole.add("lion");
 		initialRole.add("admin");
 		params.put(REQ_ROLE, initialRole);
-		res = requestJSON("new", params);
+		res = requestJSON(API_ACCOUNT_NEW, params);
 		String accountID = res.getString(RES_ACCOUNT_ID);
 		assertNull("AddMemberShipTest: Something wrong in adding group.", res.get(RES_ERROR));
 		/// -----------------------------------------
@@ -563,19 +563,19 @@ public class AccountTableApi_test extends ApiModule_test {
 		/// -----------------------------------------
 
 		params.clear();
-		res = requestJSON("addMembershipRole", null);
+		res = requestJSON(API_GROUP_ADMIN_ADD_MEM_ROLE, null);
 		assertEquals(ERROR_NO_GROUP_ID, res.get(RES_ERROR));
 
 		params.put(REQ_GROUP_ID, "wrong group ID");
-		res = requestJSON("addMembershipRole", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_MEM_ROLE, params);
 		assertEquals(ERROR_NO_ROLE, res.get(RES_ERROR));
 
 		params.put(REQ_ROLE, "roleToAdd");
-		res = requestJSON("addMembershipRole", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_MEM_ROLE, params);
 		assertEquals(ERROR_NO_GROUP, res.get(RES_ERROR));
 
 		params.put(REQ_GROUP_ID, accountID);
-		res = requestJSON("addMembershipRole", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_MEM_ROLE, params);
 		assertNull(res.get(RES_ERROR));
 		initialRole.add("roleToAdd");
 		assertEquals(initialRole, res.getStringMap(RES_META).get(PROPERTIES_MEMBERSHIP_ROLE));
@@ -598,7 +598,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		initialRole.add("lion");
 		initialRole.add("admin");
 		params.put(REQ_ROLE, initialRole);
-		res = requestJSON("new", params);
+		res = requestJSON(API_ACCOUNT_NEW, params);
 		String groupID = res.getString(RES_ACCOUNT_ID);
 		assertNull("removeMembershipTest: Something wrong in adding group.", res.get(RES_ERROR));
 		/// -----------------------------------------
@@ -606,24 +606,24 @@ public class AccountTableApi_test extends ApiModule_test {
 		/// -----------------------------------------
 
 		params.clear();
-		res = requestJSON("removeMembershipRole", null);
+		res = requestJSON(API_GROUP_ADMIN_REM_MEM_ROLE, null);
 		assertEquals(ERROR_NO_GROUP_ID, res.get(RES_ERROR));
 
 		params.put(REQ_GROUP_ID, "wrong group ID");
-		res = requestJSON("removeMembershipRole", params);
+		res = requestJSON(API_GROUP_ADMIN_REM_MEM_ROLE, params);
 		assertEquals(ERROR_NO_ROLE, res.get(RES_ERROR));
 
 		params.put(REQ_ROLE, "roleToRemove");
-		res = requestJSON("removeMembershipRole", params);
+		res = requestJSON(API_GROUP_ADMIN_REM_MEM_ROLE, params);
 		assertEquals(ERROR_NO_GROUP, res.get(RES_ERROR));
 
 		params.put(REQ_GROUP_ID, groupID);
-		res = requestJSON("removeMembershipRole", params);
+		res = requestJSON(API_GROUP_ADMIN_REM_MEM_ROLE, params);
 		assertEquals("No such role is found.", res.get(RES_ERROR));
 
 		params.put(REQ_ROLE, "dragon");
 		initialRole.remove("dragon");
-		res = requestJSON("removeMembershipRole", params);
+		res = requestJSON(API_GROUP_ADMIN_REM_MEM_ROLE, params);
 		assertNull(res.get(RES_ERROR));
 		assertEquals(initialRole, res.getStringMap(RES_META).get("membershipRoles"));
 	}
@@ -645,7 +645,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		initialRole.add("tiger");
 		initialRole.add("lion");
 		params.put(REQ_ROLE, initialRole);
-		res = requestJSON("new", params);
+		res = requestJSON(API_ACCOUNT_NEW, params);
 		String groupID = res.getString(RES_ACCOUNT_ID);
 		assertNull("MultiLevelGroupTest: Something wrong in adding group.", res.get(RES_ERROR));
 
@@ -655,7 +655,7 @@ public class AccountTableApi_test extends ApiModule_test {
 			params.clear();
 			params.put(REQ_USERNAME, "user"+idx);
 			params.put(REQ_PASSWORD, "thisismypassword");
-			res = requestJSON("new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("MultiLevelGroupTest: Something wrong in adding user" + idx + ".", res.get(RES_ERROR));
 			userID.add(res.getString(RES_ACCOUNT_ID));
 		}
@@ -670,21 +670,21 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_ADD_LIST, userIDList);
 		params.put(REQ_GROUP_ID, groupID);
 		params.put(REQ_ROLE, "dragon");
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull(res.get(RES_ERROR));
 		assertEquals(expectedResult, res.get(RES_FAIL_ADD));
 		// Reaffirm the result
 		params.clear();
 		params.put(REQ_GROUP_ID, groupID);
 		params.put(REQ_USER_ID, userID.get(0));
-		res = requestJSON("getMemberRole", params);
+		res = requestJSON(API_GROUP_GET_MEM_ROLE, params);
 		assertEquals("dragon", res.get(RES_SINGLE_RETURN_VALUE));
 
 		// Adding membershipRoles to user1
 		params.clear();
 		params.put(REQ_ROLE, "knight");
 		params.put(REQ_GROUP_ID, userID.get(0));
-		res = requestJSON("addMembershipRole", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_MEM_ROLE, params);
 		assertNull(res.get(RES_ERROR));
 
 		// Adding user2 to user1
@@ -693,14 +693,14 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_ADD_LIST, userIDList);
 		params.put(REQ_GROUP_ID, userID.get(0));
 		params.put(REQ_ROLE, "knight");
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull(res.get(RES_ERROR));
 		assertEquals(expectedResult, res.get(RES_FAIL_ADD));
 
 		// Reaffirm the result
 		params.put(REQ_GROUP_ID, userID.get(0));
 		params.put(REQ_USER_ID, userID.get(1));
-		res = requestJSON("getMemberRole", params);
+		res = requestJSON(API_GROUP_GET_MEM_ROLE, params);
 		assertEquals("knight", res.get(RES_SINGLE_RETURN_VALUE));
 	}
 
@@ -718,7 +718,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		for( int idx = 1; idx <= 2; idx ++ ) {
 			params.put(REQ_USERNAME, "exampleGrp"+idx);
 			params.put(REQ_IS_GROUP, true);
-			res = requestJSON("new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("getMemberListInfoTest: Something wrong in creating group " + idx + ".", res.get(RES_ERROR));
 			groupID.add(res.getString(RES_ACCOUNT_ID));
 		}
@@ -727,7 +727,7 @@ public class AccountTableApi_test extends ApiModule_test {
 			params.clear();
 			params.put(REQ_USERNAME, "member" + idx);
 			params.put(REQ_PASSWORD, "password");
-			res = requestJSON("new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("getMemberListInfoTest: Something wrong in adding user " + idx + ".", res.get(RES_ERROR));
 			userID.add(res.getString(RES_ACCOUNT_ID));
 			if ( idx % 2 == 0 ) {
@@ -740,7 +740,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_ROLE, "member");
 		params.put(REQ_ADD_LIST, addUserList1);
 		params.put(REQ_GROUP_ID, groupID.get(0));
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull(res.get(RES_ERROR));
 		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
 
@@ -748,7 +748,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_ROLE, "member");
 		params.put(REQ_ADD_LIST, addUserList2);
 		params.put(REQ_GROUP_ID, groupID.get(1));
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull(res.get(RES_ERROR));
 		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
 
@@ -756,16 +756,16 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.clear();
 		params.put(REQ_ROLE, "little-boy");
 		params.put(REQ_GROUP_ID, userID.get(4));
-		res = requestJSON("addMembershipRole", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_MEM_ROLE, params);
 		assertNull(res.get(RES_ERROR));
 
-		res = requestJSON("groupRoles", params);
+		res = requestJSON(API_GROUP_GRP_ROLES, params);
 		// Add some members into member 5
 		params.clear();
 		params.put(REQ_ROLE, "little-boy");
 		params.put(REQ_ADD_LIST, addUserList2);
 		params.put(REQ_GROUP_ID, userID.get(4));
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull(res.get(RES_ERROR));
 		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
 
@@ -775,20 +775,20 @@ public class AccountTableApi_test extends ApiModule_test {
 		/// -----------------------------------------
 
 		// 1st Test: Empty Submission
-		res = requestJSON("get_member_list_info", null);
+		res = requestJSON(API_GROUP_ADMIN_GET_MEM_LIST_INFO, null);
 		assertEquals(ERROR_NO_GROUP, res.get(RES_ERROR));
 
 		// 2nd Test: Invalid Group ID
 		params.clear();
 		params.put(REQ_GROUP_ID, "smlj group ID");
-		res = requestJSON("get_member_list_info", params);
+		res = requestJSON(API_GROUP_ADMIN_GET_MEM_LIST_INFO, params);
 		assertEquals(ERROR_NO_GROUP, res.get(RES_ERROR));
 
 		// 3rd Test: Valid Group ID unknown headers ( group 1 )
 		params.clear();
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_HEADERS, "['first', 'second', 'third']");
-		res = requestJSON("get_member_list_info", params);
+		res = requestJSON(API_GROUP_ADMIN_GET_MEM_LIST_INFO, params);
 		expectedResult.clear();
 		expectedResult.add(new ArrayList<>(Arrays.asList("", "", "")));
 		expectedResult.add(new ArrayList<>(Arrays.asList("", "", "")));
@@ -800,7 +800,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.clear();
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_HEADERS, " this is an invalid header");
-		res = requestJSON("get_member_list_info", params);
+		res = requestJSON(API_GROUP_ADMIN_GET_MEM_LIST_INFO, params);
 		expectedResult.clear();
 		expectedResult.add(new ArrayList<>(Arrays.asList(userID.get(1), "member")));
 		expectedResult.add(new ArrayList<>(Arrays.asList(userID.get(3), "member")));
@@ -811,7 +811,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		// 5th Test: Valid Group ID default headers ( group 1 )
 		params.clear();
 		params.put(REQ_GROUP_ID, groupID.get(0));
-		res = requestJSON("get_member_list_info", params);
+		res = requestJSON(API_GROUP_ADMIN_GET_MEM_LIST_INFO, params);
 		assertThat("Something is wrong with the lists", res.getList(RES_DATA), containsInAnyOrder(expectedResult.toArray()));
 		assertTrue(res.getInt(RES_RECORDS_TOTAL) == 2);
 		assertTrue(res.getInt(RES_RECORDS_FILTERED) == 2);
@@ -820,7 +820,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.clear();
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_HEADERS, "['" + PROPERTIES_ROLE + "', 'group__oid', 'account_email', 'randomHeader']");
-		res = requestJSON("get_member_list_info", params);
+		res = requestJSON(API_GROUP_ADMIN_GET_MEM_LIST_INFO, params);
 		expectedResult.clear();
 		expectedResult.add(new ArrayList<>(Arrays.asList("member", groupID.get(0), "member2", "")));
 		expectedResult.add(new ArrayList<>(Arrays.asList("member", groupID.get(0), "member4", "")));
@@ -832,26 +832,26 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.clear();
 		params.put(REQ_USERNAME, "member2");
 		params.put(REQ_PASSWORD, "password");
-		res = requestJSON("login", params);
+		res = requestJSON(API_ACCOUNT_LOGIN, params);
 		assertNull(res.get(RES_ERROR));
 
 		params.clear();
 		params.put(REQ_HEADERS, "['" + PROPERTIES_ROLE + "', 'group__oid', 'account_email', 'randomHeader']");
-		res = requestJSON("get_member_list_info", params);
+		res = requestJSON(API_GROUP_ADMIN_GET_MEM_LIST_INFO, params);
 		assertEquals(ERROR_NO_GROUP, res.get(RES_ERROR));
-		res = requestJSON("logout", null);
+		res = requestJSON(API_ACCOUNT_LOGOUT, null);
 		assertEquals( Boolean.TRUE, res.get(RES_RETURN) );
 
 		// 8th Test: No groupID, user is group and is logged in
 		params.clear();
 		params.put(REQ_USERNAME, "member5");
 		params.put(REQ_PASSWORD, "password");
-		res = requestJSON("login", params);
+		res = requestJSON(API_ACCOUNT_LOGIN, params);
 		assertNull(res.get(RES_ERROR));
 
 		params.clear();
 		params.put(REQ_HEADERS, "['" + PROPERTIES_ROLE + "', 'group__oid', 'account_email', 'randomHeader']");
-		res = requestJSON("get_member_list_info", params);
+		res = requestJSON(API_GROUP_ADMIN_GET_MEM_LIST_INFO, params);
 		expectedResult.clear();
 		expectedResult.add(new ArrayList<>(Arrays.asList("little-boy", userID.get(4), "member1", "")));
 		expectedResult.add(new ArrayList<>(Arrays.asList("little-boy", userID.get(4), "member3", "")));
@@ -859,7 +859,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		assertTrue(res.getInt(RES_RECORDS_TOTAL) == 3);
 		assertTrue(res.getInt(RES_RECORDS_FILTERED) == 3);
 		assertThat("Something is wrong with the lists", res.getList(RES_DATA), containsInAnyOrder(expectedResult.toArray()));
-		res = requestJSON("logout", null);
+		res = requestJSON(API_ACCOUNT_LOGOUT, null);
 		assertEquals( Boolean.TRUE, res.get(RES_RETURN) );
 
 	}
@@ -878,14 +878,14 @@ public class AccountTableApi_test extends ApiModule_test {
 		// Ensure that there is an existing group
 		params.put(REQ_USERNAME, "exampleGrp");
 		params.put(REQ_IS_GROUP, true);
-		res = requestJSON("new", params);
+		res = requestJSON(API_ACCOUNT_NEW, params);
 		assertNull("singleMemberMetaTest: Something wrong in creating group.", res.get(RES_ERROR));
 		groupID.add(res.getString(RES_ACCOUNT_ID));
 		for( int idx = 1; idx <= 3; idx ++ ) {
 			params.clear();
 			params.put(REQ_USERNAME, "single" + idx);
 			params.put(REQ_PASSWORD, "password");
-			res = requestJSON("new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("singleMemberMetaTest: Something wrong in adding user " + idx + ".", res.get(RES_ERROR));
 			userID.add(res.getString(RES_ACCOUNT_ID));
 			if ( idx % 2 == 1 ) {
@@ -896,7 +896,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_ROLE, "member");
 		params.put(REQ_ADD_LIST, addUserList);
 		params.put(REQ_GROUP_ID, groupID.get(0));
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull(res.get(RES_ERROR));
 		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
 		List<List<String>> expectedResult = new ArrayList<List<String>>();
@@ -905,35 +905,35 @@ public class AccountTableApi_test extends ApiModule_test {
 		/// -----------------------------------------
 
 		// 1st Test: Empty Submission
-		res = requestJSON("get_single_member_meta", null);
+		res = requestJSON(API_GROUP_GET_SINGLE_MEM_META, null);
 		assertEquals(ERROR_NO_USER, res.get(RES_ERROR));
 		// 2nd Test: Invalid userID
 		params.clear();
 		params.put(REQ_USER_ID, "randomID");
-		res = requestJSON("get_single_member_meta", params);
+		res = requestJSON(API_GROUP_GET_SINGLE_MEM_META, params);
 		assertEquals(ERROR_NO_USER, res.get(RES_ERROR));
 		// 3rd Test: Valid accountID, account not in group ( single 2 )
 		params.clear();
 		params.put(REQ_USER_ID, userID.get(1));
-		res = requestJSON("get_single_member_meta", params);
+		res = requestJSON(API_GROUP_GET_SINGLE_MEM_META, params);
 		assertEquals(ERROR_NO_GROUP_ID, res.get(RES_ERROR));
 		// 4th Test: Valid accountID, account not in group, invalid groupID, no roles ( single 2 )
 		params.clear();
 		params.put(REQ_USER_ID, userID.get(1));
 		params.put(REQ_GROUP_ID, "anyhowGroupID");
-		res = requestJSON("get_single_member_meta", params);
+		res = requestJSON(API_GROUP_GET_SINGLE_MEM_META, params);
 		assertEquals(ERROR_NO_GROUP, res.get(RES_ERROR));
 		// 5th Test: Valid accountID, account not in group, Valid group, no roles ( single 2, exampleGrp )
 		params.clear();
 		params.put(REQ_USER_ID, userID.get(1));
 		params.put(REQ_GROUP_ID, groupID.get(0));
-		res = requestJSON("get_single_member_meta", params);
+		res = requestJSON(API_GROUP_GET_SINGLE_MEM_META, params);
 		assertEquals(ERROR_NOT_IN_GROUP_OR_ROLE, res.get(RES_ERROR));
 		// 6th Test: Valid accountID, account in group, Valid group, no roles ( single 1, exampleGrp )
 		params.clear();
 		params.put(REQ_USER_ID, userID.get(0));
 		params.put(REQ_GROUP_ID, groupID.get(0));
-		res = requestJSON("get_single_member_meta", params);
+		res = requestJSON(API_GROUP_GET_SINGLE_MEM_META, params);
 		assertNull(res.get(RES_ERROR));
 		assertEquals("member", res.getStringMap(RES_META).get(PROPERTIES_ROLE));
 		// 7th Test: Valid accountID, account in group, Valid group, with roles ( single 1, exampleGrp )
@@ -941,7 +941,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_USER_ID, userID.get(0));
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_ROLE, "member");
-		res = requestJSON("get_single_member_meta", params);
+		res = requestJSON(API_GROUP_GET_SINGLE_MEM_META, params);
 		assertNull(res.get(RES_ERROR));
 		assertEquals("member", res.getStringMap(RES_META).get(PROPERTIES_ROLE));
 		// 8th Test: Valid accountID, account in group, Valid group, with wrong roles ( single 1, exampleGrp )
@@ -949,31 +949,31 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_USER_ID, userID.get(0));
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_ROLE, "wrongRole");
-		res = requestJSON("get_single_member_meta", params);
+		res = requestJSON(API_GROUP_GET_SINGLE_MEM_META, params);
 		assertEquals(ERROR_NOT_IN_GROUP_OR_ROLE, res.get(RES_ERROR));
 		// 9th Test: No accountID, user logged in, user not group ( single2, exampleGrp )
 		params.clear();
 		params.put(REQ_USERNAME, "single2");
 		params.put(REQ_PASSWORD, "password");
-		res = requestJSON("login", params);
+		res = requestJSON(API_ACCOUNT_LOGIN, params);
 		assertNull(res.get(RES_ERROR));
 		params.clear();
 		params.put(REQ_GROUP_ID, groupID.get(0));
-		res = requestJSON("get_single_member_meta", params);
+		res = requestJSON(API_GROUP_GET_SINGLE_MEM_META, params);
 		assertEquals(ERROR_NOT_IN_GROUP_OR_ROLE, res.get(RES_ERROR));
-		res = requestJSON("logout", null);
+		res = requestJSON(API_ACCOUNT_LOGOUT, null);
 		assertEquals( Boolean.TRUE, res.get(RES_RETURN) );
 		// 10th Test:  No accountID, user logged in, user in group ( single1, exampleGrp )
 		params.clear();
 		params.put(REQ_USERNAME, "single3");
 		params.put(REQ_PASSWORD, "password");
-		res = requestJSON("login", params);
+		res = requestJSON(API_ACCOUNT_LOGIN, params);
 		assertNull(res.get(RES_ERROR));
 		params.clear();
 		params.put(REQ_GROUP_ID, groupID.get(0));
-		res = requestJSON("get_single_member_meta", params);
+		res = requestJSON(API_GROUP_GET_SINGLE_MEM_META, params);
 		assertEquals("member", res.getStringMap(RES_META).get(PROPERTIES_ROLE));
-		res = requestJSON("logout", null);
+		res = requestJSON(API_ACCOUNT_LOGOUT, null);
 		assertEquals( Boolean.TRUE, res.get(RES_RETURN) );
 	}
 
@@ -991,14 +991,14 @@ public class AccountTableApi_test extends ApiModule_test {
 		// Ensure that there is an existing group
 		params.put(REQ_USERNAME, "exampleUpdateGrp");
 		params.put(REQ_IS_GROUP, true);
-		res = requestJSON("new", params);
+		res = requestJSON(API_ACCOUNT_NEW, params);
 		assertNull("updateMemberMetaInfoTest: Something wrong in creating group.", res.get(RES_ERROR));
 		groupID.add(res.getString(RES_ACCOUNT_ID));
 		for( int idx = 1; idx <= 3; idx ++ ) {
 			params.clear();
 			params.put(REQ_USERNAME, "update" + idx);
 			params.put(REQ_PASSWORD, "password");
-			res = requestJSON("new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("updateMemberMetaInfoTest: Something wrong in adding user " + idx + ".", res.get(RES_ERROR));
 			userID.add(res.getString(RES_ACCOUNT_ID));
 			if ( idx % 2 == 1 ) {
@@ -1009,7 +1009,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_ROLE, "member");
 		params.put(REQ_ADD_LIST, addUserList);
 		params.put(REQ_GROUP_ID, groupID.get(0));
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull(res.get(RES_ERROR));
 		assertEquals(expectedFailResult, res.get(RES_FAIL_ADD));
 		List<List<String>> expectedResult = new ArrayList<List<String>>();
@@ -1018,37 +1018,37 @@ public class AccountTableApi_test extends ApiModule_test {
 		/// -----------------------------------------
 
 		// 1st Test: Empty Submission
-		res = requestJSON("update_member_meta_info", null);
+		res = requestJSON(API_GROUP_UPDATE_MEM_META, null);
 		assertEquals(ERROR_NO_USER, res.get(RES_ERROR));
 		// 2nd Test: Invalid userID
 		params.clear();
 		params.put(REQ_USER_ID, "randomID");
-		res = requestJSON("update_member_meta_info", params);
+		res = requestJSON(API_GROUP_UPDATE_MEM_META, params);
 		assertEquals(ERROR_NO_USER, res.get(RES_ERROR));
 		// 3rd Test: Valid accountID, account not in group, no groupID ( update 2 )
 		params.clear();
 		params.put(REQ_USER_ID, userID.get(1));
-		res = requestJSON("update_member_meta_info", params);
+		res = requestJSON(API_GROUP_UPDATE_MEM_META, params);
 		assertEquals(ERROR_NO_GROUP_ID, res.get(RES_ERROR));
 		// 4th Test: Valid accountID, account not in group, invalid groupID, no metaObj ( update 2 )
 		params.clear();
 		params.put(REQ_USER_ID, userID.get(1));
 		params.put(REQ_GROUP_ID, "anyhowGroupID");
-		res = requestJSON("update_member_meta_info", params);
+		res = requestJSON(API_GROUP_UPDATE_MEM_META, params);
 		assertEquals(ERROR_NO_META, res.get(RES_ERROR));
 		// 5th Test: Valid userID not in group, invalid groupID, invalid metaObj ( update 2 )
 		params.clear();
 		params.put(REQ_USER_ID, userID.get(1));
 		params.put(REQ_GROUP_ID, "anyhowGroupID");
 		params.put(REQ_META, "anyhowmetaobj");
-		res = requestJSON("update_member_meta_info", params);
+		res = requestJSON(API_GROUP_UPDATE_MEM_META, params);
 		assertEquals(ERROR_NO_GROUP, res.get(RES_ERROR));
 		// 6th Test: Valid userID not in group, valid groupID, metaObj ( update 2, exampleUpdateGrp )
 		// Get a random person's member metaObj
 		params.clear();
 		params.put(REQ_USER_ID, userID.get(0));
 		params.put(REQ_GROUP_ID, groupID.get(0));
-		res = requestJSON("get_single_member_meta", params);
+		res = requestJSON(API_GROUP_GET_SINGLE_MEM_META, params);
 		assertNull(res.get(RES_ERROR));
 		assertEquals("member", res.getStringMap(RES_META).get(PROPERTIES_ROLE));
 		Map<String, Object> metaObj = res.getStringMap(RES_META);
@@ -1058,79 +1058,79 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_USER_ID, userID.get(1));
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_META, res.getStringMap(RES_META));
-		res = requestJSON("update_member_meta_info", params);
+		res = requestJSON(API_GROUP_UPDATE_MEM_META, params);
 		assertEquals(ERROR_NOT_IN_GROUP_OR_ROLE, res.get(RES_ERROR));
 		// 7th Test: Valid userID in group, valid groupID, invalid metaObj ( update 1, exampleUpdateGrp )
 		params.clear();
 		params.put(REQ_USER_ID, userID.get(0));
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_META, "randomMetaObj");
-		res = requestJSON("update_member_meta_info", params);
+		res = requestJSON(API_GROUP_UPDATE_MEM_META, params);
 		assertEquals(ERROR_INVALID_FORMAT_JSON, res.get(RES_ERROR));
 		// 8th Test: Valid userID in group, valid groupID, valid metaObj ( update 1, exampleUpdateGrp )
 		params.clear();
 		params.put(REQ_USER_ID, userID.get(0));
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_META, metaObj);
-		res = requestJSON("update_member_meta_info", params);
+		res = requestJSON(API_GROUP_UPDATE_MEM_META, params);
 		assertTrue(res.getBoolean(RES_SUCCESS));
 		assertEquals("delta", res.get(RES_UPDATE_MODE));
 		// 9th Test: No userID, user logged in, not in group, valid groupID, valid metaObj ( update2, exampleUpdateGrp )
 		params.clear();
 		params.put(REQ_USERNAME, "update2");
 		params.put(REQ_PASSWORD, "password");
-		res = requestJSON("login", params);
+		res = requestJSON(API_ACCOUNT_LOGIN, params);
 		assertNull(res.get(RES_ERROR));
 		params.clear();
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_META, metaObj);
-		res = requestJSON("update_member_meta_info", params);
+		res = requestJSON(API_GROUP_UPDATE_MEM_META, params);
 		assertEquals(ERROR_NOT_IN_GROUP_OR_ROLE, res.get(RES_ERROR));
-		res = requestJSON("logout", null);
+		res = requestJSON(API_ACCOUNT_LOGOUT, null);
 		assertEquals( Boolean.TRUE, res.get(RES_RETURN) );
 		// 10th Test: No userID, user logged in, in group, valid groupID, valid metaObj ( update1, exampleUpdateGrp )
 		params.clear();
 		params.put(REQ_USERNAME, "update1");
 		params.put(REQ_PASSWORD, "password");
-		res = requestJSON("login", params);
+		res = requestJSON(API_ACCOUNT_LOGIN, params);
 		assertNull(res.get(RES_ERROR));
 		params.clear();
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_META, metaObj);
-		res = requestJSON("update_member_meta_info", params);
+		res = requestJSON(API_GROUP_UPDATE_MEM_META, params);
 		assertTrue(res.getBoolean(RES_SUCCESS));
 		assertEquals("delta", res.get(RES_UPDATE_MODE));
-		res = requestJSON("logout", null);
+		res = requestJSON(API_ACCOUNT_LOGOUT, null);
 		assertEquals( Boolean.TRUE, res.get(RES_RETURN) );
 		// 11th Test: No userID, user logged in, in group, valid groupID, valid metaObj, full ( update3, exampleUpdateGrp )
 		params.clear();
 		params.put(REQ_USERNAME, "update3");
 		params.put(REQ_PASSWORD, "password");
-		res = requestJSON("login", params);
+		res = requestJSON(API_ACCOUNT_LOGIN, params);
 		assertNull(res.get(RES_ERROR));
 		params.clear();
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_META, metaObj);
 		params.put(REQ_UPDATE_MODE, "full");
-		res = requestJSON("update_member_meta_info", params);
+		res = requestJSON(API_GROUP_UPDATE_MEM_META, params);
 		assertTrue(res.getBoolean(RES_SUCCESS));
 		assertEquals("full", res.get(RES_UPDATE_MODE));
-		res = requestJSON("logout", null);
+		res = requestJSON(API_ACCOUNT_LOGOUT, null);
 		assertEquals( Boolean.TRUE, res.get(RES_RETURN) );
 		// 12th Test: No userID, user logged in, in group, valid groupID, valid metaObj, random update ( update3, exampleUpdateGrp )
 		params.clear();
 		params.put(REQ_USERNAME, "update3");
 		params.put(REQ_PASSWORD, "password");
-		res = requestJSON("login", params);
+		res = requestJSON(API_ACCOUNT_LOGIN, params);
 		assertNull(res.get(RES_ERROR));
 		params.clear();
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_META, metaObj);
 		params.put(REQ_UPDATE_MODE, "waerawer");
-		res = requestJSON("update_member_meta_info", params);
+		res = requestJSON(API_GROUP_UPDATE_MEM_META, params);
 		assertTrue(res.getBoolean(RES_SUCCESS));
 		assertEquals("delta", res.get(RES_UPDATE_MODE));
-		res = requestJSON("logout", null);
+		res = requestJSON(API_ACCOUNT_LOGOUT, null);
 		assertEquals( Boolean.TRUE, res.get(RES_RETURN) );
 	}
 
@@ -1146,7 +1146,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.clear();
 		params.put(REQ_USERNAME, "reset");
 		params.put(REQ_PASSWORD, "password");
-		res = requestJSON("new", params);
+		res = requestJSON(API_ACCOUNT_NEW, params);
 		assertNull("passwordResetTest: Something wrong in adding user.", res.get(RES_ERROR));
 		userID.add(res.getString(RES_ACCOUNT_ID));
 
@@ -1154,7 +1154,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
 		// 1st Test: Empty Submission
-		TestSet ts = new TestSet(null, "do_password_reset", ERROR_NO_USER, RES_ERROR);
+		TestSet ts = new TestSet(null, API_ACCOUNT_PASS_RESET, ERROR_NO_USER, RES_ERROR);
 		ts.executeGenericTestCase();
 		// 2nd Test: Invalid userID
 		params.clear();
@@ -1223,7 +1223,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.clear();
 		params.put(REQ_USERNAME, "infoName");
 		params.put(REQ_PASSWORD, "password");
-		res = requestJSON("new", params);
+		res = requestJSON(API_ACCOUNT_NEW, params);
 		assertNull("getInfoByNameTest: Something wrong in adding user.", res.get(RES_ERROR));
 		userID.add(res.getString(RES_ACCOUNT_ID));
 
@@ -1231,7 +1231,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
 		// 1st Test: Empty Submission
-		TestSet ts = new TestSet(null, "account_info_by_Name", ERROR_NO_USER, RES_ERROR);
+		TestSet ts = new TestSet(null, API_ACCOUNT_INFO_NAME, ERROR_NO_USER, RES_ERROR);
 		ts.executeGenericTestCase();
 		// 2nd Test: Invalid username
 		params.clear();
@@ -1259,7 +1259,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.clear();
 		params.put(REQ_USERNAME, "infoID");
 		params.put(REQ_PASSWORD, "password");
-		res = requestJSON("new", params);
+		res = requestJSON(API_ACCOUNT_NEW, params);
 		assertNull("getInfoByIDTest: Something wrong in adding user.", res.get(RES_ERROR));
 		userID.add(res.getString(RES_ACCOUNT_ID));
 
@@ -1267,7 +1267,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
 		// 1st Test: Empty Submission
-		TestSet ts = new TestSet(null, "account_info_by_ID", ERROR_NO_USER, RES_ERROR);
+		TestSet ts = new TestSet(null, API_ACCOUNT_INFO_ID, ERROR_NO_USER, RES_ERROR);
 		ts.executeGenericTestCase();
 		// 2nd Test: Invalid userID
 		params.clear();
@@ -1284,7 +1284,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		ts.logout();
 	}
 
-	// builder.put(path+"getListOfGroupIDOfMember", getListOfGroupIDOfMember);
+	// builder.put(path+API_GROUP_GET_LIST_GRP_ID_MEM, getListOfGroupIDOfMember);
 	@Test
 	public void getListOfGroupIDOfMember(){
 		GenericConvertMap<String,Object> res = null;
@@ -1298,7 +1298,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		for( int idx = 1; idx <= 2; idx ++ ) {
 			params.put(REQ_USERNAME, "groupNumber"+idx);
 			params.put(REQ_IS_GROUP, true);
-			res = requestJSON("new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("getListOfGroupIDOfMemberTest: Something wrong in creating group " + idx + ".", res.get(RES_ERROR));
 			groupID.add(res.getString(RES_ACCOUNT_ID));
 			expectedResult.add(res.getString(RES_ACCOUNT_ID));
@@ -1308,7 +1308,7 @@ public class AccountTableApi_test extends ApiModule_test {
 			params.clear();
 			params.put(REQ_USERNAME, "memberList" + idx);
 			params.put(REQ_PASSWORD, "password");
-			res = requestJSON("new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("getListOfGroupIDOfMemberTest: Something wrong in adding user " + idx + ".", res.get(RES_ERROR));
 			userID.add(res.getString(RES_ACCOUNT_ID));
 			if ( idx % 2 == 1 ) {
@@ -1320,17 +1320,17 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_ADD_LIST, addUserList);
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_ROLE, "member");
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull("getListOfGroupIDOfMemberTest: Something wrong in adding user to group", res.get(RES_ERROR));
 
 		params.put(REQ_GROUP_ID, groupID.get(1));
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull("getListOfGroupIDOfMemberTest: Something wrong in adding user to group", res.get(RES_ERROR));
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
 		// 1st Test: Empty Submission
-		TestSet ts = new TestSet(null, "getListOfGroupIDOfMember", ERROR_NO_USER, RES_ERROR);
+		TestSet ts = new TestSet(null, API_GROUP_GET_LIST_GRP_ID_MEM, ERROR_NO_USER, RES_ERROR);
 		ts.executeGenericTestCase();
 		// 2nd Test: Invalid userID
 		params.clear();
@@ -1362,12 +1362,12 @@ public class AccountTableApi_test extends ApiModule_test {
 		for( int idx = 1; idx <= 2; idx ++ ) {
 			params.put(REQ_USERNAME, "grpOb"+idx);
 			params.put(REQ_IS_GROUP, true);
-			res = requestJSON("new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("getListOfGroupObjectOfMemberTest: Something wrong in creating group " + idx + ".", res.get(RES_ERROR));
 			groupID.add(res.getString(RES_ACCOUNT_ID));
 			params.clear();
 			params.put(REQ_USER_ID, res.get(RES_ACCOUNT_ID));
-			res = requestJSON("account_info_by_ID", params);
+			res = requestJSON(API_ACCOUNT_INFO_ID, params);
 			assertNull("getListOfGroupObjectOfMemberTest: Something wrong in adding group info " + idx + ".", res.get(RES_ERROR));
 			expectedResult.add(res);
 		}
@@ -1376,7 +1376,7 @@ public class AccountTableApi_test extends ApiModule_test {
 			params.clear();
 			params.put(REQ_USERNAME, "memLi" + idx);
 			params.put(REQ_PASSWORD, "password");
-			res = requestJSON("new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("getListOfGroupObjectOfMemberTest: Something wrong in adding user " + idx + ".", res.get(RES_ERROR));
 			userID.add(res.getString(RES_ACCOUNT_ID));
 			if ( idx % 2 == 1 ) {
@@ -1388,17 +1388,17 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_ADD_LIST, addUserList);
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_ROLE, "member");
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull("ListGroupTest: Something wrong in adding user to group", res.get(RES_ERROR));
 
 		params.put(REQ_GROUP_ID, groupID.get(1));
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull("ListGroupTest: Something wrong in adding user to group", res.get(RES_ERROR));
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
 		// 1st Test: Empty Submission
-		TestSet ts = new TestSet(null, "getListOfGroupObjectOfMember", ERROR_NO_USER, RES_ERROR);
+		TestSet ts = new TestSet(null, API_GROUP_GET_LIST_GRP_OBJ_MEM, ERROR_NO_USER, RES_ERROR);
 		ts.executeGenericTestCase();
 		// 2nd Test: Invalid userID
 		params.clear();
@@ -1429,7 +1429,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		// Ensure that there is an existing group
 		params.put(REQ_USERNAME, "grpRemove");
 		params.put(REQ_IS_GROUP, true);
-		res = requestJSON("new", params);
+		res = requestJSON(API_ACCOUNT_NEW, params);
 		assertNull("removeAccountTest: Something wrong in creating group.", res.get(RES_ERROR));
 		groupID.add(res.getString(RES_ACCOUNT_ID));
 		// Ensure that there is an existing user
@@ -1437,7 +1437,7 @@ public class AccountTableApi_test extends ApiModule_test {
 			params.clear();
 			params.put(REQ_USERNAME, "remove" + idx);
 			params.put(REQ_PASSWORD, "password");
-			res = requestJSON("new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("removeAccountTest: Something wrong in adding user " + idx + ".", res.get(RES_ERROR));
 			userID.add(res.getString(RES_ACCOUNT_ID));
 			if ( idx % 2 == 1 ) {
@@ -1449,13 +1449,13 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_ADD_LIST, addUserList);
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_ROLE, "member");
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull("removeAccountTest: Something wrong in adding user to group", res.get(RES_ERROR));
 		// Ensure that there is a member of a member of a group
 		params.clear();
 		params.put(REQ_GROUP_ID, userID.get(0));
 		params.put(REQ_ROLE, "rowABoat");
-		res = requestJSON("addMembershipRole", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_MEM_ROLE, params);
 		assertNull("removeAccountTest: Something wrong in adding user to group", res.get(RES_ERROR));
 		params.clear();
 		addUserList.clear();
@@ -1463,13 +1463,13 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_ADD_LIST, addUserList);
 		params.put(REQ_GROUP_ID, userID.get(0));
 		params.put(REQ_ROLE, "rowABoat");
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull("removeAccountTest: Something wrong in adding user to group", res.get(RES_ERROR));
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
 		// 1st Test: Empty Submission
-		TestSet ts = new TestSet(null, "remove", ERROR_NO_USER, RES_ERROR);
+		TestSet ts = new TestSet(null, API_ACCOUNT_ADMIN_REMOVE, ERROR_NO_USER, RES_ERROR);
 		ts.executeGenericTestCase();
 		// 2nd Test: Invalid userID
 		params.clear();
@@ -1482,28 +1482,28 @@ public class AccountTableApi_test extends ApiModule_test {
 		// Affirmation of Result - No account Found
 		params.clear();
 		params.put(REQ_USER_ID, userID.get(0));
-		ts.setURL("account_info_by_ID");
+		ts.setURL(API_ACCOUNT_INFO_ID);
 		ts.setAndExecuteGTC(params, ERROR_NO_USER, RES_ERROR);
 		// Affirmation of Result - No member Found in valid group
 		params.clear();
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		expectedResult.clear();
-		ts.setURL("get_member_list_info");
+		ts.setURL(API_GROUP_ADMIN_GET_MEM_LIST_INFO);
 		ts.setAndExecuteLTC(params, expectedResult, RES_DATA, "The list has some issues");
 		// Affirmation of Result - No group found in previous member
 		params.clear();
 		params.put(REQ_USER_ID, userID.get(1));
-		ts.setURL("getListOfGroupIDOfMember");
+		ts.setURL(API_GROUP_GET_LIST_GRP_ID_MEM);
 		ts.setAndExecuteLTC(params, expectedResult, RES_LIST, "The list has some issues");
 		// 4th Test: No userID, user is logged in
 		ts.loginUser("remove2", "password");
-		ts.setURL("remove");
+		ts.setURL(API_ACCOUNT_ADMIN_REMOVE);
 		ts.setAndExecuteGTC(null, true, RES_SUCCESS);
 		// Affirmation of Result - No logged in session
-		ts.setURL("isLogin");
+		ts.setURL(API_ACCOUNT_IS_LOGIN);
 		ts.setAndExecuteGTC(null, false, RES_RETURN);
 		// Affirmation of Result - Log in to deleted user
-		ts.setURL("login");
+		ts.setURL(API_ACCOUNT_LOGIN);
 		params.put(REQ_USERNAME, "remove2");
 		params.put(REQ_PASSWORD, "password");
 		ts.setAndExecuteGTC(params, ERROR_FAIL_LOGIN, RES_ERROR);
@@ -1522,7 +1522,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		for( int idx = 1; idx <= 2; idx ++ ) {
 			params.put(REQ_USERNAME, "getTestGrp"+idx);
 			params.put(REQ_IS_GROUP, true);
-			res = requestJSON("new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("getUserOrGroupListTest: Something wrong in creating group " + idx + ".", res.get(RES_ERROR));
 			groupID.add(res.getString(RES_ACCOUNT_ID));
 			// System.out.println(groupID.get(idx-1)+" <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
@@ -1532,7 +1532,7 @@ public class AccountTableApi_test extends ApiModule_test {
 			params.clear();
 			params.put(REQ_USERNAME, "getTestMemb" + idx);
 			params.put(REQ_PASSWORD, "password");
-			res = requestJSON("new", params);
+			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("getUserOrGroupListTest: Something wrong in adding user " + idx + ".", res.get(RES_ERROR));
 			userID.add(res.getString(RES_ACCOUNT_ID));
 			if ( idx % 2 == 1 ) {
@@ -1546,17 +1546,17 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_ADD_LIST, addUserList);
 		params.put(REQ_GROUP_ID, groupID.get(0));
 		params.put(REQ_ROLE, "member");
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull("getUserOrGroupListTest: Something wrong in adding user to group", res.get(RES_ERROR));
 
 		params.put(REQ_GROUP_ID, groupID.get(1));
-		res = requestJSON("add_remove_member", params);
+		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
 		assertNull("getUserOrGroupListTest: Something wrong in adding user to group", res.get(RES_ERROR));
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
 		// 1st Test: Empty Submission
-		TestSet ts = new TestSet(null, "get_user_or_group_list", expectedResult, RES_DATA);
+		TestSet ts = new TestSet(null, API_ACCOUNT_ADMIN_GET_U_G_LIST, expectedResult, RES_DATA);
 		ts.executeTrueTestCase();
 		// 2nd Test: Invalid userID
 		// params.clear();
@@ -1626,10 +1626,10 @@ public class AccountTableApi_test extends ApiModule_test {
 			Map<String,Object> params = new HashMap<String,Object>();
 			params.put(REQ_USERNAME, name);
 			params.put(REQ_PASSWORD, pass);
-			assertNull(requestJSON("login", params).get(RES_ERROR));
+			assertNull(requestJSON(API_ACCOUNT_LOGIN, params).get(RES_ERROR));
 		}
 		public void logout(){
-			assertEquals( Boolean.TRUE, requestJSON("logout", null).get(RES_RETURN) );
+			assertEquals( Boolean.TRUE, requestJSON(API_ACCOUNT_LOGOUT, null).get(RES_RETURN) );
 		}
 	}
 	//
@@ -1644,24 +1644,24 @@ public class AccountTableApi_test extends ApiModule_test {
 	// 	// Ensure that there is an existing group
 	// 	params.put(REQ_USERNAME, "groupObjToRetrieve");
 	// 	params.put(REQ_IS_GROUP, true);
-	// 	res = requestJSON("new", params);
+	// 	res = requestJSON(API_ACCOUNT_NEW, params);
 	// 	assertNull("ListGroupTest: Something wrong in adding group.", res.get(RES_ERROR));
 	// 	// Ensure that there is an existing group
 	// 	params.put(REQ_USERNAME, "groupObjWithNoMember");
 	// 	params.put(REQ_IS_GROUP, true);
-	// 	res = requestJSON("new", params);
+	// 	res = requestJSON(API_ACCOUNT_NEW, params);
 	// 	assertNull("ListGroupTest: Something wrong in adding group.", res.get(RES_ERROR));
 	//
 	// 	// Ensure that there is an existing user
 	// 	params.clear();
 	// 	params.put(REQ_USERNAME, "user test 1");
 	// 	params.put(REQ_PASSWORD, "thisismypassword");
-	// 	res = requestJSON("new", params);
+	// 	res = requestJSON(API_ACCOUNT_NEW, params);
 	// 	assertNull("ListGroupTest: Something wrong in adding user.", res.get(RES_ERROR));
 	//
 	// 	params.put(REQ_USERNAME, "user test 2");
 	// 	params.put(REQ_PASSWORD, "thisismypassword");
-	// 	res = requestJSON("new", params);
+	// 	res = requestJSON(API_ACCOUNT_NEW, params);
 	// 	assertNull("ListGroupTest: Something wrong in adding user.", res.get(RES_ERROR));
 	//
 	// 	// Ensure that group has both member

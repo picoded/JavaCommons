@@ -47,7 +47,11 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	// Pack all checks into one ApiFunction for ease of usage as well as set up
 	protected ApiFunction admin_bundle_check = (req, res) -> {
 		res.put(SV_IS_SUPERUSER, this.is_current_user_superuser.apply(req, res));
-
+		res.put(SV_IS_SELF, this.is_current_user_self.apply(req, res));
+		if ( !res.getBoolean(SV_IS_SUPERUSER) && !res.getBoolean(SV_IS_SELF) ) {
+			res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
+		}
+		res = removeFilterParams(res);
 		return res;
 	};
 
@@ -58,10 +62,13 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	protected ApiFunction account_bundle_check = (req, res) -> {
 		res.put(SV_IS_CREATE_GROUP, this.is_create_group.apply(req, res));
 		res.put(SV_IS_LOGGED_IN, this.is_user_logged_in.apply(req, res));
+		res.put(SV_IS_SUPERUSER, this.is_current_user_superuser.apply(req, res));
+		res.put(SV_IS_META, this.is_meta_exist.apply(req, res));
 		// CHECK: Non logged in users trying to create GROUP accounts
 		if ( res.getBoolean(SV_IS_CREATE_GROUP) &&
 				 !res.getBoolean(SV_IS_LOGGED_IN) ) {
 			res.put(RES_ERROR, ERROR_USER_NOT_LOGIN);
+			res = removeFilterParams(res);
 			return res;
 	  }
 		res.put(SV_IS_SELF, this.is_current_user_self.apply(req, res));
@@ -72,6 +79,7 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 				 res.getBoolean(SV_IS_META) ) {
 			res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
 	  }
+		res = removeFilterParams(res);
 		return res;
 	};
 
@@ -80,13 +88,16 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 		res.put(SV_IS_USER_ID, this.is_user_id_exist.apply(req, res));
 		res.put(SV_IS_USER_NAME, this.is_user_name_exist.apply(req, res));
 		res.put(SV_IS_SELF, this.is_current_user_self.apply(req, res));
-		// CHECK: Non Superusers trying to list other account information
+		res.put(SV_IS_ADMIN, this.is_current_user_group_admin.apply(req,res));
+		// CHECK: Non Superusers trying to list other account information and the userID is not a group ID
 		if ( (res.getBoolean(SV_IS_USER_ID) ||
 		 			res.getBoolean(SV_IS_USER_NAME)) &&
-				 (!res.getBoolean(SV_IS_SUPERUSER) ||
-				 !res.getBoolean(SV_IS_SELF)) ) {
+				 (!res.getBoolean(SV_IS_SUPERUSER) &&
+				 !res.getBoolean(SV_IS_SELF)) &&
+				 !res.getBoolean(SV_IS_ADMIN) ) {
 			res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
 		}
+		res = removeFilterParams(res);
 		return res;
 	};
 
@@ -99,12 +110,14 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 		if ( !res.getBoolean(SV_IS_SUPERUSER) &&
 				 !res.getBoolean(SV_IS_SELF) ) {
 			res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
+			res = removeFilterParams(res);
 			return res;
 		}
 		// CHECK: User's new passwords do not satisfy the complexity
 		if ( !res.getBoolean(SV_IS_PASSWORD_SATISFIED) ) {
 			res.put(RES_ERROR, ERROR_PASSWORD_COMPLEXITY);
 		}
+		res = removeFilterParams(res);
 		return res;
 	};
 
@@ -120,6 +133,7 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 			res.put(RES_ERROR,
 							res.getString(RES_ERROR,"|")+
 							ERROR_PASSWORD_COMPLEXITY);
+		res = removeFilterParams(res);
 		return res;
 	};
 
@@ -128,6 +142,7 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	////////////////////////////////////////////////////////////////////////////
 	// Pack all checks into one ApiFunction for ease of usage as well as set up
 	protected ApiFunction group_admin_bundle_check = (req, res) -> {
+		res = removeFilterParams(res);
 		return res;
 	};
 
@@ -149,14 +164,17 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 		// CHECK: User is not logged in
 		if ( !res.getBoolean(SV_IS_LOGGED_IN) ) {
 			res.put(RES_ERROR, ERROR_USER_NOT_LOGIN);
+			res = removeFilterParams(res);
 			return res;
 		}
 		// CHECK: Non Superusers who are not members trying to perform group functions not to itself
 		if ( !res.getBoolean(SV_IS_MEMBER) &&
 				 !res.getBoolean(SV_IS_SUPERUSER) &&
 				 !res.getBoolean(SV_IS_SELF_GROUP) &&
+				 !res.getBoolean(SV_IS_ADMIN) &&
 				 !res.getBoolean(SV_IS_SELF) ) {
 			res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
+			res = removeFilterParams(res);
 			return res;
 		}
 		// CHECK: Members trying to perform functions on other members
@@ -166,19 +184,28 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 				 !res.getBoolean(SV_IS_SUPERUSER) ) {
 			res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
 		}
+		res = removeFilterParams(res);
 		return res;
 	};
 
 	protected ApiFunction group_get_info_check = (req, res) -> {
+		res.put(SV_IS_LOGGED_IN, this.is_user_logged_in.apply(req, res));
+		res.put(SV_IS_SELF, this.is_current_user_self.apply(req, res));
+		res.put(SV_IS_ADMIN, this.is_current_user_group_admin.apply(req, res));
+		res.put(SV_IS_SUPERUSER, this.is_current_user_superuser.apply(req, res));
+		res.put(SV_IS_MEMBER, this.is_current_user_a_member.apply(req, res));
+		res.put(SV_IS_SELF_GROUP, this.is_current_user_self_group.apply(req, res));
 		// CHECK: Non Superusers and non admin trying to access other people information
 		if ( !res.getBoolean(SV_IS_SELF) ) {
 			if ( !res.getBoolean(SV_IS_SELF_GROUP) &&
 					 !res.getBoolean(SV_IS_SUPERUSER) &&
 					 !res.getBoolean(SV_IS_ADMIN) ){
 				res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
+				res = removeFilterParams(res);
 	  		return res;
 		  }
 		}
+		res = removeFilterParams(res);
 		return res;
 	};
 
@@ -245,10 +272,55 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 		req.put(REQ_USER_ID, currentUser._oid());
 		res = this.getMemberRoleFromGroup.apply(req, res);
 		String role = res.getString(RES_SINGLE_RETURN_VALUE, "");
-		res.put(RES_ERROR, null);
+		res.remove(RES_ERROR);
 		req.put(REQ_USER_ID, originalUserID);
-		if ( role.equalsIgnoreCase("admin") )
+		if ( role.equalsIgnoreCase("admin") ){
 			return Boolean.TRUE;
+		}
+		if ( !this.is_current_user_self.apply(req, res) && this.is_user_id_exist.apply(req, res) ) {
+			// CHECK: current user is an admin accessing other user information
+			String originalGroupID = req.getString(REQ_GROUP_ID);
+			res = this.getListOfGroupIDOfMember.apply(req, res);
+			if ( res.getList(RES_LIST) != null && originalGroupID == null ) {
+				List<String> list = res.getList(RES_LIST);
+				for ( String id : list ) {
+					req.put(REQ_GROUP_ID, id);
+					req.put(REQ_USER_ID, currentUser._oid());
+					res = this.getMemberRoleFromGroup.apply(req, res);
+					role = res.getString(RES_SINGLE_RETURN_VALUE, "");
+					if ( role.equalsIgnoreCase("admin")){
+						break;
+					}
+					res.remove(RES_ERROR);
+				}
+			} else if ( originalGroupID != null ) {
+				req.put(REQ_USER_ID, currentUser._oid());
+				res = this.getMemberRoleFromGroup.apply(req, res);
+				role = res.getString(RES_SINGLE_RETURN_VALUE, "");
+			}
+
+			// RESET: all to the original request
+			req.put(REQ_GROUP_ID, originalGroupID);
+			req.put(REQ_USER_ID, originalUserID);
+			res.remove(RES_ERROR);
+			if ( !role.equalsIgnoreCase("admin") ) {
+				// CHECK: is current user the admin of a group account (userID is the group _oid())
+				req.put(REQ_GROUP_ID, req.getString(REQ_USER_ID));
+				req.put(REQ_USER_ID, currentUser._oid());
+				res = this.getMemberRoleFromGroup.apply(req, res);
+				role = res.getString(RES_SINGLE_RETURN_VALUE, "");
+			}
+
+			// RESET: all to the original request
+			req.put(REQ_GROUP_ID, originalGroupID);
+			req.put(REQ_USER_ID, originalUserID);
+			res.remove(RES_ERROR);
+		}
+		res.remove(RES_SINGLE_RETURN_VALUE);
+		res.remove(RES_LIST);
+		if ( role.equalsIgnoreCase("admin") ) {
+			return Boolean.TRUE;
+		}
 		return Boolean.FALSE;
 	};
 
@@ -261,7 +333,7 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 		req.put(REQ_USER_ID, currentUser._oid());
 		res = this.getMemberRoleFromGroup.apply(req, res);
 		String role = res.getString(RES_SINGLE_RETURN_VALUE, "");
-		res.put(RES_ERROR, null);
+		res.remove(RES_ERROR);
 		req.put(REQ_USER_ID, originalUserID);
 		if ( !role.isEmpty() )
 			return Boolean.TRUE;
@@ -272,7 +344,9 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	private BiFunction<ApiRequest, ApiResponse, Boolean> is_current_user_self = (req, res) -> {
 		AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), null);
 		String userID = req.getString(REQ_USER_ID, "");
-		if ( currentUser != null && userID.equalsIgnoreCase(currentUser._oid()) )
+		String userEmail = req.getString(REQ_USERNAME, "");
+		if ( currentUser != null && (userID.equalsIgnoreCase(currentUser._oid()) ||
+				 userEmail.equalsIgnoreCase(currentUser.getString(PROPERTIES_EMAIL))) )
 			return Boolean.TRUE;
 		return Boolean.FALSE;
 	};
@@ -310,6 +384,11 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 		return ( req.getString(REQ_USERNAME) != null ) ? Boolean.TRUE : Boolean.FALSE;
 	};
 
+	// Check if groupID exist
+	private BiFunction<ApiRequest, ApiResponse, Boolean> is_group_id_exist = (req, res) -> {
+		return ( req.getString(REQ_GROUP_ID) != null ) ? Boolean.TRUE : Boolean.FALSE;
+	};
+
 	// Check password complexity
 	private BiFunction<ApiRequest, ApiResponse, Boolean> is_password_satisfied = (req, res) -> {
 		String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$", password = "";
@@ -340,4 +419,21 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 		Object metaObjRaw = req.get(REQ_META);
 		return ( metaObjRaw == null ) ? Boolean.FALSE : Boolean.TRUE;
 	};
+
+	// Remove all filter checking Parameters
+	private ApiResponse removeFilterParams ( ApiResponse res ) {
+		res.remove(SV_IS_SELF);
+		res.remove(SV_IS_META);
+		res.remove(SV_IS_SUPERUSER);
+		res.remove(SV_IS_ADMIN);
+		res.remove(SV_IS_USER_ID);
+		res.remove(SV_IS_MEMBER);
+		res.remove(SV_IS_USER_NAME);
+		res.remove(SV_IS_SELF_GROUP);
+		res.remove(SV_IS_LOGGED_IN);
+		res.remove(SV_IS_CREATE_GROUP);
+		res.remove(SV_IS_PASSWORD_SATISFIED);
+		res.remove(SV_IS_EMAIL_SATISFIED);
+		return res;
+	}
 }

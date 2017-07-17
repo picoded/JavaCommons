@@ -607,7 +607,6 @@ public class AccountObject extends Core_MetaObject {
 	public MetaObject getMember(AccountObject memberObject) {
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
-
 		if (level == null || level.length() <= 0) {
 			return null;
 		}

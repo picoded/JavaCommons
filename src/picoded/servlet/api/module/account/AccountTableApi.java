@@ -12,6 +12,7 @@ import picoded.conv.GenericConvert;
 import java.util.function.BiFunction;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
+import static picoded.servlet.api.module.account.Account_Strings.*;
 
 /**
 * Account table API builder
@@ -65,7 +66,7 @@ public class AccountTableApi implements ApiModule {
 		// Get the account object (if any)
 		AccountObject ao = table.getRequestUser(req.getHttpServletRequest(), null);
 		// Return if a valid login object was found
-		res.put(Account_Strings.RES_RETURN, ao != null);
+		res.put(RES_RETURN, ao != null);
 		// Return result
 		return res;
 	};
@@ -105,24 +106,24 @@ public class AccountTableApi implements ApiModule {
 	protected ApiFunction login = (req, res) -> {
 
 		// Setup default (failed) login
-		res.put(Account_Strings.RES_ACCOUNT_ID, null);
-		res.put(Account_Strings.RES_LOGIN_ID_LIST, null);
-		res.put(Account_Strings.RES_IS_LOGIN, false);
-		res.put(Account_Strings.RES_REMEMBER_ME, false);
+		res.put(RES_ACCOUNT_ID, null);
+		res.put(RES_LOGIN_ID_LIST, null);
+		res.put(RES_IS_LOGIN, false);
+		res.put(RES_REMEMBER_ME, false);
 
 		// Get the login parameters
-		String accountID = req.getString(Account_Strings.REQ_ACCOUNT_ID, null);
-		String loginID = req.getString(Account_Strings.REQ_USERNAME, null);
-		String loginPass = req.getString(Account_Strings.REQ_PASSWORD, null);
-		boolean rememberMe = req.getBoolean(Account_Strings.REQ_REMEMBER_ME, false);
+		String accountID = req.getString(REQ_ACCOUNT_ID, null);
+		String loginID = req.getString(REQ_USERNAME, null);
+		String loginPass = req.getString(REQ_PASSWORD, null);
+		boolean rememberMe = req.getBoolean(REQ_REMEMBER_ME, false);
 
 		// Missing paremeter error checks
 		if ( loginPass == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_LOGIN_PASSWORD);
+			res.put(RES_ERROR, ERROR_NO_LOGIN_PASSWORD);
 			return res;
 		}
 		if ( accountID == null && loginID == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_LOGIN_ID);
+			res.put(RES_ERROR, ERROR_NO_LOGIN_ID);
 			return res;
 		}
 
@@ -138,7 +139,7 @@ public class AccountTableApi implements ApiModule {
 		if ( ao != null ){
 			int timeAllowed = ao.getNextLoginTimeAllowed(ao._oid());
 			if (timeAllowed != 0){
-				res.put(Account_Strings.RES_ERROR, "Unable to login, user locked out for "+timeAllowed+" seconds.");
+				res.put(RES_ERROR, "Unable to login, user locked out for "+timeAllowed+" seconds.");
 				return res;
 			}
 		}
@@ -150,23 +151,23 @@ public class AccountTableApi implements ApiModule {
 			// Reset any failed login attempts
 			ao.resetLoginThrottle(loginID);
 			// If ao is not null, it assumes a valid login
-			res.put(Account_Strings.RES_IS_LOGIN, true);
-			res.put(Account_Strings.RES_REMEMBER_ME, rememberMe);
-			res.put(Account_Strings.RES_ACCOUNT_ID, ao._oid());
+			res.put(RES_IS_LOGIN, true);
+			res.put(RES_REMEMBER_ME, rememberMe);
+			res.put(RES_ACCOUNT_ID, ao._oid());
 
 			// loginID, as a list - as set does not gurantee sorting, a sort is done for the list for alphanumeric
 			List<String> loginIDList = new ArrayList<String>(ao.getLoginIDSet());
 			Collections.sort(loginIDList);
 
 			// Return the loginIDList
-			res.put(Account_Strings.RES_LOGIN_ID_LIST, loginIDList);
+			res.put(RES_LOGIN_ID_LIST, loginIDList);
 			ao = table.getRequestUser(req.getHttpServletRequest(), null);
 		} else {
 			// Legitimate user but wrong password
 			if ( ao != null ){
 				ao.addDelay(ao);
 			}
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_FAIL_LOGIN);
+			res.put(RES_ERROR, ERROR_FAIL_LOGIN);
 		}
 
 		return res;
@@ -196,12 +197,12 @@ public class AccountTableApi implements ApiModule {
 	* +----------------+--------------------+-------------------------------------------------------------------------------+
 	**/
 	protected ApiFunction logout = (req, res) -> {
-		res.put(Account_Strings.RES_RETURN, false);
+		res.put(RES_RETURN, false);
 
 		if (req.getHttpServletRequest() != null) {
-			res.put(Account_Strings.RES_RETURN, table.logoutAccount(req.getHttpServletRequest(), res.getHttpServletResponse()));
+			res.put(RES_RETURN, table.logoutAccount(req.getHttpServletRequest(), res.getHttpServletResponse()));
 		} else {
-			res.put(Account_Strings.RES_ERROR, MISSING_REQUEST_PAGE);
+			res.put(RES_ERROR, MISSING_REQUEST_PAGE);
 		}
 		return res;
 	};
@@ -236,18 +237,18 @@ public class AccountTableApi implements ApiModule {
 	**/
 	public ApiFunction new_account = (req, res) -> {
 		// Only runs function if logged in, and valid group object
-		boolean isGroup = req.getBoolean(Account_Strings.REQ_IS_GROUP, false);
-		String[] paramsToCheck = new String[]{Account_Strings.REQ_USERNAME};
+		boolean isGroup = req.getBoolean(REQ_IS_GROUP, false);
+		String[] paramsToCheck = new String[]{REQ_USERNAME};
 		res = check_parameters(paramsToCheck, req, res);
-		if ( res.get(Account_Strings.RES_ERROR) != null )
+		if ( res.get(RES_ERROR) != null )
 			return res;
-		String userName = req.getString(Account_Strings.REQ_USERNAME);
-		String password = req.getString(Account_Strings.REQ_PASSWORD);
+		String userName = req.getString(REQ_USERNAME);
+		String password = req.getString(REQ_PASSWORD);
 		if ( !isGroup && (password == null || password.isEmpty()) ){
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PASSWORD);
+			res.put(RES_ERROR, ERROR_NO_PASSWORD);
 			return res;
 		}
-		Object metaObjRaw = req.get(Account_Strings.REQ_META);
+		Object metaObjRaw = req.get(REQ_META);
 		Map<String, Object> givenMetaObj = new HashMap<String, Object>();
 		if (metaObjRaw instanceof String) {
 			String jsonMetaString = (String) metaObjRaw;
@@ -260,29 +261,32 @@ public class AccountTableApi implements ApiModule {
 		if ( newAccount != null ) {
 			if ( isGroup ) {
 				newAccount.setGroupStatus(true);
-				boolean defaultRoles = req.getBoolean(Account_Strings.REQ_DEFAULT_ROLES, true);
-				List<String> list = req.getList(Account_Strings.REQ_ROLE, null);
+				boolean defaultRoles = req.getBoolean(REQ_DEFAULT_ROLES, true);
+				List<String> list = req.getList(REQ_ROLE, null);
 				if ( defaultRoles || list == null ) {
 					newAccount.setMembershipRoles(table.defaultMembershipRoles());
 				} else {
 					newAccount.setMembershipRoles(list);
 				}
+				AccountObject firstAdmin = table.getRequestUser(req.getHttpServletRequest(), null);
+				if ( firstAdmin != null ) // Set the creator as the admin
+					newAccount.setMember(firstAdmin, "admin");
 			}
-			givenMetaObj.put(Account_Strings.PROPERTIES_EMAIL, userName);
+			givenMetaObj.put(PROPERTIES_EMAIL, userName);
 			newAccount.setPassword(password);
 			newAccount.putAll(givenMetaObj);
 			newAccount.saveAll();
 
-			res.put(Account_Strings.RES_META, newAccount);
-			res.put(Account_Strings.RES_ACCOUNT_ID, newAccount._oid());
+			res.put(RES_META, newAccount);
+			res.put(RES_ACCOUNT_ID, newAccount._oid());
 		} else {
 			AccountObject existingAccount = table.getFromLoginID(userName);
 			if (existingAccount != null) {
-				res.put(Account_Strings.RES_ACCOUNT_ID, existingAccount._oid());
+				res.put(RES_ACCOUNT_ID, existingAccount._oid());
 			} else {
-				res.put(Account_Strings.RES_ACCOUNT_ID, null);
+				res.put(RES_ACCOUNT_ID, null);
 			}
-			res.put(Account_Strings.RES_ERROR, "Object already exists in account Table");
+			res.put(RES_ERROR, "Object already exists in account Table");
 		}
 		return res;
 	};
@@ -311,19 +315,19 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction groupRoles = (req, res) -> {
-		String[] paramsToCheck = new String[]{Account_Strings.REQ_GROUP_ID};
+		String[] paramsToCheck = new String[]{REQ_GROUP_ID};
 		res = check_parameters(paramsToCheck, req, res);
-		if ( res.get(Account_Strings.RES_ERROR) != null )
+		if ( res.get(RES_ERROR) != null )
 			return res;
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
+		String groupID = req.getString(REQ_GROUP_ID);
 
 		AccountObject group = table.get(groupID);
 		if ( group == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			res.put(RES_ERROR, ERROR_NO_GROUP);
 			return res;
 		}
-		List<String> membershipRoles = group.group_membershipRoles().getList(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE, "[]");
-		res.put(Account_Strings.RES_LIST, membershipRoles);
+		List<String> membershipRoles = group.group_membershipRoles().getList(PROPERTIES_MEMBERSHIP_ROLE, "[]");
+		res.put(RES_LIST, membershipRoles);
 		// Return result
 		return res;
 	};
@@ -353,28 +357,28 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction getMemberRoleFromGroup = (req, res) -> {
-		String[] paramsToCheck = new String[]{Account_Strings.REQ_GROUP_ID, Account_Strings.REQ_USER_ID};
+		String[] paramsToCheck = new String[]{REQ_GROUP_ID, REQ_USER_ID};
 		res = check_parameters(paramsToCheck, req, res);
-		if ( res.get(Account_Strings.RES_ERROR) != null )
+		if ( res.get(RES_ERROR) != null )
 			return res;
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
-		String userID = req.getString(Account_Strings.REQ_USER_ID);
+		String groupID = req.getString(REQ_GROUP_ID);
+		String userID = req.getString(REQ_USER_ID);
 
 		AccountObject group = table.get(groupID);
 		if ( group == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			res.put(RES_ERROR, ERROR_NO_GROUP);
 			return res;
 		}
 		AccountObject userToAdd = table.get(userID);
 		if ( userToAdd == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			res.put(RES_ERROR, ERROR_NO_USER);
 			return res;
 		}
 		String role = group.getMemberRole(userToAdd);
 		if ( role == null ) {
-			res.put(Account_Strings.RES_ERROR, "No role for user is found.");
+			res.put(RES_ERROR, "No role for user is found.");
 		} else {
-			res.put(Account_Strings.RES_SINGLE_RETURN_VALUE, role);
+			res.put(RES_SINGLE_RETURN_VALUE, role);
 		}
 		return res;
 	};
@@ -404,21 +408,21 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction add_new_membership_role = (req, res) -> {
-		String[] paramsToCheck = new String[]{Account_Strings.REQ_GROUP_ID, Account_Strings.REQ_ROLE};
+		String[] paramsToCheck = new String[]{REQ_GROUP_ID, REQ_ROLE};
 		res = check_parameters(paramsToCheck, req, res);
-		if ( res.get(Account_Strings.RES_ERROR) != null )
+		if ( res.get(RES_ERROR) != null )
 			return res;
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
-		String role = req.getString(Account_Strings.REQ_ROLE);
+		String groupID = req.getString(REQ_GROUP_ID);
+		String role = req.getString(REQ_ROLE);
 
 		AccountObject group = table.get(groupID);
 		if ( group == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			res.put(RES_ERROR, ERROR_NO_GROUP);
 			return res;
 		}
 
 		MetaObject groupResult = group.addNewMembershipRole(role);
-		res.put(Account_Strings.RES_META, groupResult);
+		res.put(RES_META, groupResult);
 		return res;
 	};
 
@@ -447,24 +451,23 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction remove_membership_role = (req, res) -> {
-		String[] paramsToCheck = new String[]{Account_Strings.REQ_GROUP_ID, Account_Strings.REQ_ROLE};
+		String[] paramsToCheck = new String[]{REQ_GROUP_ID, REQ_ROLE};
 		res = check_parameters(paramsToCheck, req, res);
-		if ( res.get(Account_Strings.RES_ERROR) != null )
+		if ( res.get(RES_ERROR) != null )
 			return res;
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
-		String role = req.getString(Account_Strings.REQ_ROLE);
-
+		String groupID = req.getString(REQ_GROUP_ID);
+		String role = req.getString(REQ_ROLE);
 		AccountObject group = table.get(groupID);
 		if ( group == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			res.put(RES_ERROR, ERROR_NO_GROUP);
 			return res;
 		}
 
 		MetaObject groupResult = group.removeMembershipRole(role);
 		if ( groupResult == null ) {
-			res.put(Account_Strings.RES_ERROR, "No such role is found.");
+			res.put(RES_ERROR, "No such role is found.");
 		}else{
-			res.put(Account_Strings.RES_META, groupResult);
+			res.put(RES_META, groupResult);
 		}
 
 		return res;
@@ -507,15 +510,15 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction get_member_list_info = (req, res) -> {
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
+		String groupID = req.getString(REQ_GROUP_ID);
 
 		AccountObject group = ( groupID != null ) ? table.get(groupID) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( group == null || !group.isGroup()) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			res.put(RES_ERROR, ERROR_NO_GROUP);
 			return res;
 		}
 
-		String[] headers = req.getStringArray(Account_Strings.REQ_HEADERS, "['" + Account_Strings.PROPERTIES_OID + "', '" + Account_Strings.PROPERTIES_ROLE +"']");
+		String[] headers = req.getStringArray(REQ_HEADERS, "['" + PROPERTIES_OID + "', '" + PROPERTIES_ROLE +"']");
 		AccountObject[] memberobjList = group.getMembersAccountObject();
 		List<List<Object>> returnList = new ArrayList<List<Object>>();
 		int listCounter = 0;
@@ -523,16 +526,16 @@ public class AccountTableApi implements ApiModule {
 			MetaObject currentGrpAOMeta = group.getMember(ao);
 			returnList.add(new ArrayList<Object>());
 			for ( String column : headers ) {
-				if ( column.equalsIgnoreCase(Account_Strings.PROPERTIES_OID) ) {
+				if ( column.equalsIgnoreCase(PROPERTIES_OID) ) {
 					returnList.get(listCounter).add(ao._oid());
-				} else if ( column.equalsIgnoreCase(Account_Strings.PROPERTIES_NAMES) ) {
+				} else if ( column.equalsIgnoreCase(PROPERTIES_NAMES) ) {
 					Set<String> names = ao.getLoginIDSet();
 					names.clear();
 					for (String name : ao.getLoginIDSet()) {
 						names.add(RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(name));
 					}
 					returnList.get(listCounter).add(ao.getLoginIDSet());
-				} else if ( column.equalsIgnoreCase(Account_Strings.PROPERTIES_ROLE) ) {
+				} else if ( column.equalsIgnoreCase(PROPERTIES_ROLE) ) {
 					returnList.get(listCounter).add(RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(group.getMemberRole(ao)));
 				} else if ( column.toLowerCase().startsWith("account_") ) {
 					String headerSuffix = column.substring("account_".length());
@@ -549,12 +552,12 @@ public class AccountTableApi implements ApiModule {
 			}
 			listCounter++;
 		}
-		res.put(Account_Strings.RES_GROUP_ID, group._oid());
-		res.put(Account_Strings.RES_DATA, returnList);
-		res.put(Account_Strings.RES_DRAW, req.getInt("draw"));
-		res.put(Account_Strings.RES_RECORDS_TOTAL, returnList.size());
-		res.put(Account_Strings.RES_RECORDS_FILTERED, returnList.size());
-		res.put(Account_Strings.RES_HEADERS, headers);
+		res.put(RES_GROUP_ID, group._oid());
+		res.put(RES_DATA, returnList);
+		res.put(RES_DRAW, req.getInt("draw"));
+		res.put(RES_RECORDS_TOTAL, returnList.size());
+		res.put(RES_RECORDS_FILTERED, returnList.size());
+		res.put(RES_HEADERS, headers);
 		return res;
 	};
 
@@ -569,21 +572,21 @@ public class AccountTableApi implements ApiModule {
 	*/
 	private BiFunction<GenericConvertMap<String, Object>, String[], GenericConvertHashMap<String, Object>> addOrRemove = (actionObject, userIDList) -> {
 		List<String> failedList = new ArrayList<String>(), successList = new ArrayList<String>();
-		AccountObject group = (AccountObject) actionObject.get(Account_Strings.GROUP),  currentUser = null;
-		String action = actionObject.getString("action"), role = actionObject.getString(Account_Strings.REQ_ROLE);
+		AccountObject group = (AccountObject) actionObject.get(GROUP),  currentUser = null;
+		String action = actionObject.getString("action"), role = actionObject.getString(REQ_ROLE);
 		String actionErrorMsg = (action.equalsIgnoreCase("add")) ? "User is already in group or role is not found.": "User is not in group.";
 		for ( String userID : userIDList ) {
 			currentUser = table.get(userID);
 			if ( currentUser == null ) {
-				failedList.add("ID: " + userID + ", Error: " + Account_Strings.ERROR_NO_USER);
+				failedList.add("ID: " + userID + ", Error: " + ERROR_NO_USER);
 				continue;
 			}
 			MetaObject result = (action.equalsIgnoreCase("add")) ? group.addMember(currentUser, role) : group.removeMember(currentUser);
 			if ( result == null ) {
 				failedList.add("ID: " + userID + ", Error: " + actionErrorMsg);
 				continue;
-			} else if ( action.equalsIgnoreCase("remove") && result.getInt(Account_Strings.PROPERTIES_IS_GROUP) == 0 && result._oid() == group._oid()) {
-				failedList.add("ID: " + group._oid() + ", Error: " + Account_Strings.ERROR_NOT_GROUP);
+			} else if ( action.equalsIgnoreCase("remove") && result.getInt(PROPERTIES_IS_GROUP) == 0 && result._oid() == group._oid()) {
+				failedList.add("ID: " + group._oid() + ", Error: " + ERROR_NOT_GROUP);
 				break;
 			}
 			successList.add(userID);
@@ -622,37 +625,37 @@ public class AccountTableApi implements ApiModule {
 	**/
 	protected ApiFunction add_remove_member = (req, res) -> {
 		// Checks all input are given before proceeding
-		String [] addList = req.getStringArray(Account_Strings.REQ_ADD_LIST, "[]");
-		String [] removeList = req.getStringArray(Account_Strings.REQ_REMOVE_LIST, "[]");
-		String role = req.getString(Account_Strings.REQ_ROLE, null);
+		String [] addList = req.getStringArray(REQ_ADD_LIST, "[]");
+		String [] removeList = req.getStringArray(REQ_REMOVE_LIST, "[]");
+		String role = req.getString(REQ_ROLE, null);
 
-		String[] paramsToCheck = new String[]{Account_Strings.REQ_GROUP_ID};
+		String[] paramsToCheck = new String[]{REQ_GROUP_ID};
 		res = check_parameters(paramsToCheck, req, res);
-		if ( res.get(Account_Strings.RES_ERROR) != null )
+		if ( res.get(RES_ERROR) != null )
 			return res;
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
+		String groupID = req.getString(REQ_GROUP_ID);
 
 		AccountObject group = table.get(groupID);
 		if ( group == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			res.put(RES_ERROR, ERROR_NO_GROUP);
 			return res;
 		}
 		GenericConvertHashMap<String, Object> actionObject = new GenericConvertHashMap<String, Object>();
-		actionObject.put(Account_Strings.GROUP, group);
+		actionObject.put(GROUP, group);
 		if ( role == null && addList.length > 0 ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_ROLE);
+			res.put(RES_ERROR, ERROR_NO_ROLE);
 		} else if ( addList.length > 0 ) {
 				actionObject.put("action", "add");
-				actionObject.put(Account_Strings.REQ_ROLE, role);
+				actionObject.put(REQ_ROLE, role);
 				GenericConvertHashMap<String, Object> result = addOrRemove.apply(actionObject, addList);
-				res.put(Account_Strings.RES_FAIL_ADD, result.getStringArray("failedList"));
-				res.put(Account_Strings.RES_SUCCESS_ADD, result.getStringArray("successList"));
+				res.put(RES_FAIL_ADD, result.getStringArray("failedList"));
+				res.put(RES_SUCCESS_ADD, result.getStringArray("successList"));
 		}
 		if ( removeList.length > 0 ) {
 			actionObject.put("action", "remove");
 			GenericConvertMap<String, Object> result = addOrRemove.apply(actionObject, removeList);
-			res.put(Account_Strings.RES_FAIL_REMOVE, result.getStringArray("failedList"));
-			res.put(Account_Strings.RES_SUCCESS_REMOVE, result.getStringArray("successList"));
+			res.put(RES_FAIL_REMOVE, result.getStringArray("failedList"));
+			res.put(RES_SUCCESS_REMOVE, result.getStringArray("successList"));
 		}
 		return res;
 	};
@@ -684,31 +687,31 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction get_single_member_meta = (req, res) -> {
-		String userID = req.getString(Account_Strings.REQ_USER_ID, null);
+		String userID = req.getString(REQ_USER_ID, null);
 		AccountObject ao = ( userID != null ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if( ao == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			res.put(RES_ERROR, ERROR_NO_USER);
 			return res;
 		}
-		String role = req.getString(Account_Strings.REQ_ROLE);
+		String role = req.getString(REQ_ROLE);
 
-		String[] paramsToCheck = new String[]{Account_Strings.REQ_GROUP_ID};
+		String[] paramsToCheck = new String[]{REQ_GROUP_ID};
 		res = check_parameters(paramsToCheck, req, res);
-		if ( res.get(Account_Strings.RES_ERROR) != null )
+		if ( res.get(RES_ERROR) != null )
 			return res;
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
+		String groupID = req.getString(REQ_GROUP_ID);
 
 		AccountObject group = table.get(groupID);
 		if ( group == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			res.put(RES_ERROR, ERROR_NO_GROUP);
 			return res;
 		}
 
 		MetaObject groupResult = (role != null) ? group.getMember(ao, role) : group.getMember(ao);
 		if ( groupResult == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NOT_IN_GROUP_OR_ROLE);
+			res.put(RES_ERROR, ERROR_NOT_IN_GROUP_OR_ROLE);
 		}else{
-			res.put(Account_Strings.RES_META, groupResult);
+			res.put(RES_META, groupResult);
 		}
 		return res;
 	};
@@ -743,32 +746,32 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction update_member_meta_info = (req, res) -> {
-		res.put(Account_Strings.RES_SUCCESS, false);
-		String memberIDToUpdate = req.getString(Account_Strings.REQ_USER_ID, null);
+		res.put(RES_SUCCESS, false);
+		String memberIDToUpdate = req.getString(REQ_USER_ID, null);
 		AccountObject ao = (memberIDToUpdate != null ) ? table.get(memberIDToUpdate) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( ao == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			res.put(RES_ERROR, ERROR_NO_USER);
 			return res;
 		}
 
-		String[] paramsToCheck = new String[]{Account_Strings.REQ_GROUP_ID, Account_Strings.REQ_META};
+		String[] paramsToCheck = new String[]{REQ_GROUP_ID, REQ_META};
 		res = check_parameters(paramsToCheck, req, res);
-		if ( res.get(Account_Strings.RES_ERROR) != null )
+		if ( res.get(RES_ERROR) != null )
 			return res;
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID);
-		Object metaObjRaw = req.get(Account_Strings.REQ_META);
+		String groupID = req.getString(REQ_GROUP_ID);
+		Object metaObjRaw = req.get(REQ_META);
 
 		AccountObject group = table.get(groupID);
 		if ( group == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP);
+			res.put(RES_ERROR, ERROR_NO_GROUP);
 			return res;
 		}
 		MetaObject currentMemberMeta = group.getMember(ao);
 		if ( currentMemberMeta == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NOT_IN_GROUP_OR_ROLE);
+			res.put(RES_ERROR, ERROR_NOT_IN_GROUP_OR_ROLE);
 			return res;
 		}
-		String updateMode = req.getString(Account_Strings.REQ_UPDATE_MODE, "delta");
+		String updateMode = req.getString(REQ_UPDATE_MODE, "delta");
 		Map<String, Object> metaObj = ConvertJSON.toMap((String) metaObjRaw);
 		updateMode = ( !updateMode.equalsIgnoreCase("full") ) ? "delta" : updateMode;
 		currentMemberMeta.putAll(metaObj);
@@ -777,10 +780,10 @@ public class AccountTableApi implements ApiModule {
 		} else {
 			currentMemberMeta.saveDelta();
 		}
-		res.put(Account_Strings.RES_ACCOUNT_ID, ao._oid());
-		res.put(Account_Strings.RES_META, metaObj);
-		res.put(Account_Strings.RES_UPDATE_MODE, updateMode);
-		res.put(Account_Strings.RES_SUCCESS, true);
+		res.put(RES_ACCOUNT_ID, ao._oid());
+		res.put(RES_META, metaObj);
+		res.put(RES_UPDATE_MODE, updateMode);
+		res.put(RES_SUCCESS, true);
 
 		return res;
 	};
@@ -813,32 +816,32 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction do_password_reset = (req, res) -> {
-		res.put(Account_Strings.RES_SUCCESS, false);
-		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		res.put(RES_SUCCESS, false);
+		String userID = req.getString(REQ_USER_ID, "");
 		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( ao == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			res.put(RES_ERROR, ERROR_NO_USER);
 			return res;
 		}
 
-		String[] paramsToCheck = new String[]{Account_Strings.REQ_OLD_PASSWORD, Account_Strings.REQ_NEW_PASSWORD, Account_Strings.REQ_REPEAT_PASSWORD};
+		String[] paramsToCheck = new String[]{REQ_OLD_PASSWORD, REQ_NEW_PASSWORD, REQ_REPEAT_PASSWORD};
 		res = check_parameters(paramsToCheck, req, res);
-		if ( res.get(Account_Strings.RES_ERROR) != null )
+		if ( res.get(RES_ERROR) != null )
 			return res;
-		String oldPassword = req.getString(Account_Strings.REQ_OLD_PASSWORD);
-		String newPassword = req.getString(Account_Strings.REQ_NEW_PASSWORD);
-		String repeatPassword = req.getString(Account_Strings.REQ_REPEAT_PASSWORD);
+		String oldPassword = req.getString(REQ_OLD_PASSWORD);
+		String newPassword = req.getString(REQ_NEW_PASSWORD);
+		String repeatPassword = req.getString(REQ_REPEAT_PASSWORD);
 
 		if ( !newPassword.equals(repeatPassword) ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_PASS_NOT_EQUAL);
+			res.put(RES_ERROR, ERROR_PASS_NOT_EQUAL);
 			return res;
 		}
 		if ( !ao.setPassword(newPassword, oldPassword) ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_PASS_INCORRECT);
+			res.put(RES_ERROR, ERROR_PASS_INCORRECT);
 			return res;
 		}
-		res.put(Account_Strings.RES_SUCCESS, true);
-		res.put(Account_Strings.RES_ACCOUNT_ID, ao._oid());
+		res.put(RES_SUCCESS, true);
+		res.put(RES_ACCOUNT_ID, ao._oid());
 
 		return res;
 	};
@@ -898,7 +901,7 @@ public class AccountTableApi implements ApiModule {
 
 		String orderByStr = req.getString("orderBy", "oID");
 
-		String[] headers = req.getStringArray("headers", "['" + Account_Strings.PROPERTIES_OID + "', '" + Account_Strings.PROPERTIES_NAMES + "']");
+		String[] headers = req.getStringArray("headers", "['" + PROPERTIES_OID + "', '" + PROPERTIES_NAMES + "']");
 
 		String query = req.getString("query");
 		String[] queryArgs = req.getStringArray("queryArgs");
@@ -938,13 +941,13 @@ public class AccountTableApi implements ApiModule {
 		MetaTable mtObj = table.accountMetaTable();
 
 		//put back into response
-		res.put(Account_Strings.RES_DRAW, draw);
-		res.put(Account_Strings.RES_HEADERS, headers);
-		res.put(Account_Strings.RES_RECORDS_TOTAL, table.size());
+		res.put(RES_DRAW, draw);
+		res.put(RES_HEADERS, headers);
+		res.put(RES_RECORDS_TOTAL, table.size());
 		if (query != null && !query.isEmpty() && queryArgs != null && queryArgs.length > 0) {
-			res.put(Account_Strings.RES_RECORDS_FILTERED, mtObj.queryCount(query, queryArgs));
+			res.put(RES_RECORDS_FILTERED, mtObj.queryCount(query, queryArgs));
 		} else {
-			res.put(Account_Strings.RES_RECORDS_FILTERED, mtObj.queryCount(null, null));
+			res.put(RES_RECORDS_FILTERED, mtObj.queryCount(null, null));
 		}
 
 		boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
@@ -954,7 +957,7 @@ public class AccountTableApi implements ApiModule {
 			data = list_GET_and_POST_inner(table, draw, start, limit, headers, query, queryArgs,
 				orderByStr, insideGroupAny, hasGroupRole_any, groupStatus, sanitiseOutput);
 				// System.out.println(ConvertJSON.fromObject(data)+" <<<<<<<<<<<<<<<<< data");
-			res.put(Account_Strings.RES_DATA, data);
+			res.put(RES_DATA, data);
 		} catch (Exception e) {
 			res.put("error", e.getMessage());
 		}
@@ -989,21 +992,21 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction update_current_user_info = (req, res) -> {
-		res.put(Account_Strings.RES_SUCCESS, false);
-		String userID = req.getString(Account_Strings.REQ_USER_ID, null);
+		res.put(RES_SUCCESS, false);
+		String userID = req.getString(REQ_USER_ID, null);
 		AccountObject ao = (userID != null ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( ao == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			res.put(RES_ERROR, ERROR_NO_USER);
 			return res;
 		}
 
-		String[] paramsToCheck = new String[]{Account_Strings.REQ_META};
+		String[] paramsToCheck = new String[]{REQ_META};
 		res = check_parameters(paramsToCheck, req, res);
-		if ( res.get(Account_Strings.RES_ERROR) != null )
+		if ( res.get(RES_ERROR) != null )
 			return res;
-		Object metaObjRaw = req.get(Account_Strings.REQ_META);
+		Object metaObjRaw = req.get(REQ_META);
 
-		String updateMode = req.getString(Account_Strings.REQ_UPDATE_MODE, "delta");
+		String updateMode = req.getString(REQ_UPDATE_MODE, "delta");
 		Map<String, Object> metaObj = ConvertJSON.toMap((String) metaObjRaw);
 		updateMode = ( !updateMode.equalsIgnoreCase("full") ) ? "delta" : updateMode;
 		ao.putAll(metaObj);
@@ -1012,10 +1015,10 @@ public class AccountTableApi implements ApiModule {
 		} else {
 			ao.saveDelta();
 		}
-		res.put(Account_Strings.RES_ACCOUNT_ID, ao._oid());
-		res.put(Account_Strings.RES_META, metaObj);
-		res.put(Account_Strings.RES_UPDATE_MODE, updateMode);
-		res.put(Account_Strings.RES_SUCCESS, true);
+		res.put(RES_ACCOUNT_ID, ao._oid());
+		res.put(RES_META, metaObj);
+		res.put(RES_UPDATE_MODE, updateMode);
+		res.put(RES_SUCCESS, true);
 
 		return res;
 	};
@@ -1044,17 +1047,17 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction delete_user_account = (req, res) -> {
-		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		String userID = req.getString(REQ_USER_ID, "");
 		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( ao == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			res.put(RES_ERROR, ERROR_NO_USER);
 			return res;
 		}
 		if ( userID.isEmpty() ) { // logout any current session if it is the current user
 			this.logout.apply(req, res);
 		}
 		table.remove(ao);
-		res.put(Account_Strings.RES_SUCCESS, true);
+		res.put(RES_SUCCESS, true);
 		return res;
 	};
 
@@ -1090,10 +1093,10 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction account_info_by_ID = (req, res) -> {
-		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		String userID = req.getString(REQ_USER_ID, "");
 		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( ao == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			res.put(RES_ERROR, ERROR_NO_USER);
 			return res;
 		}
 		Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
@@ -1133,10 +1136,10 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction account_info_by_Name = (req, res) -> {
-		String userName = req.getString(Account_Strings.REQ_USERNAME, "");
+		String userName = req.getString(REQ_USERNAME, "");
 		AccountObject ao = ( !userName.isEmpty() ) ? table.getFromLoginID(userName) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( ao == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			res.put(RES_ERROR, ERROR_NO_USER);
 			return res;
 		}
 		Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
@@ -1169,14 +1172,14 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction getListOfGroupIDOfMember = (req, res) -> {
-		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		String userID = req.getString(REQ_USER_ID, "");
 		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( ao == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			res.put(RES_ERROR, ERROR_NO_USER);
 			return res;
 		}
 		String[] listOfGroups = ao.getGroups_id();
-		res.put(Account_Strings.RES_LIST, listOfGroups);
+		res.put(RES_LIST, listOfGroups);
 		return res;
 	};
 
@@ -1204,10 +1207,10 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
 	protected ApiFunction getListOfGroupObjectOfMember = (req, res) -> {
-		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		String userID = req.getString(REQ_USER_ID, "");
 		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( ao == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			res.put(RES_ERROR, ERROR_NO_USER);
 			return res;
 		}
 		AccountObject[] listOfGroupsObj = ao.getGroups();
@@ -1218,7 +1221,7 @@ public class AccountTableApi implements ApiModule {
 			groupList.add(commonInfo);
 			listCounter++;
 		}
-		res.put(Account_Strings.RES_LIST, groupList);
+		res.put(RES_LIST, groupList);
 		return res;
 	};
 
@@ -1245,7 +1248,7 @@ public class AccountTableApi implements ApiModule {
 	**/
 
 	protected ApiFunction lockTime = (req, res) -> {
-		String accountName = req.getString(Account_Strings.REQ_ACCOUNT_NAME, null);
+		String accountName = req.getString(REQ_ACCOUNT_NAME, null);
 		if (accountName != null){
 			AccountObject ao = table.getFromLoginID(accountName);
 			if (ao != null){
@@ -1264,41 +1267,41 @@ public class AccountTableApi implements ApiModule {
 	* @param  Path to assume
 	**/
 	public void setupApiBuilder(ApiBuilder builder, String path) {
-		builder.put(path+"account/isLogin", isLogin); // Tested
-		builder.put(path+"account/login", login); // Tested
-		builder.put(path+"account/lockTime", lockTime); // Tested
-		builder.put(path+"account/logout", logout); // Tested
-		builder.put(path+"account/new", new_account); // Tested
-		builder.put(path+"account/do_password_reset", do_password_reset); // Tested
-		builder.put(path+"account/ccount_info_by_Name", account_info_by_Name); // Tested
-		builder.put(path+"account/account_info_by_ID", account_info_by_ID); // Tested
-		builder.put(path+"account/admin/remove", delete_user_account); // Tested
-		builder.put(path+"account/admin/get_user_or_group_list", get_user_or_group_list); // Tested
-		builder.put(path+"account/update_current_user_info", update_current_user_info);
+		builder.put(path+API_ACCOUNT_IS_LOGIN, isLogin); // Tested
+		builder.put(path+API_ACCOUNT_LOGIN, login); // Tested
+		builder.put(path+API_ACCOUNT_LOCKTIME, lockTime); // Tested
+		builder.put(path+API_ACCOUNT_LOGOUT, logout); // Tested
+		builder.put(path+API_ACCOUNT_NEW, new_account); // Tested
+		builder.put(path+API_ACCOUNT_PASS_RESET, do_password_reset); // Tested
+		builder.put(path+API_ACCOUNT_INFO_NAME, account_info_by_Name); // Tested
+		builder.put(path+API_ACCOUNT_INFO_ID, account_info_by_ID); // Tested
+		builder.put(path+API_ACCOUNT_ADMIN_REMOVE, delete_user_account); // Tested
+		builder.put(path+API_ACCOUNT_ADMIN_GET_U_G_LIST, get_user_or_group_list); // Tested
+		builder.put(path+API_ACCOUNT_UPDATE_U_INFO, update_current_user_info);
 
 		//Group functionalities
-		builder.put(path+"group/groupRoles", groupRoles); // Tested
-		builder.put(path+"group/getMemberRole", getMemberRoleFromGroup); // Tested
-		builder.put(path+"group/getListOfGroupIDOfMember", getListOfGroupIDOfMember); // Tested
-		builder.put(path+"group/getListOfGroupObjectOfMember", getListOfGroupObjectOfMember); // Tested
-		builder.put(path+"group/get_single_member_meta", get_single_member_meta); // Tested
-		builder.put(path+"group/update_member_meta_info", update_member_meta_info); // Tested
+		builder.put(path+API_GROUP_GRP_ROLES, groupRoles); // Tested
+		builder.put(path+API_GROUP_GET_MEM_ROLE, getMemberRoleFromGroup); // Tested
+		builder.put(path+API_GROUP_GET_LIST_GRP_ID_MEM, getListOfGroupIDOfMember); // Tested
+		builder.put(path+API_GROUP_GET_LIST_GRP_OBJ_MEM, getListOfGroupObjectOfMember); // Tested
+		builder.put(path+API_GROUP_GET_SINGLE_MEM_META, get_single_member_meta); // Tested
+		builder.put(path+API_GROUP_UPDATE_MEM_META, update_member_meta_info); // Tested
 
-		builder.put(path+"group/admin/addMembershipRole", add_new_membership_role); // Tested
-		builder.put(path+"group/admin/removeMembershipRole", remove_membership_role); // Tested
-		builder.put(path+"group/admin/get_member_list_info", get_member_list_info); // Tested
-		builder.put(path+"group/admin/add_remove_member", add_remove_member); // Tested
+		builder.put(path+API_GROUP_ADMIN_ADD_MEM_ROLE, add_new_membership_role); // Tested
+		builder.put(path+API_GROUP_ADMIN_REM_MEM_ROLE, remove_membership_role); // Tested
+		builder.put(path+API_GROUP_ADMIN_GET_MEM_LIST_INFO, get_member_list_info); // Tested
+		builder.put(path+API_GROUP_ADMIN_ADD_REM_MEM, add_remove_member); // Tested
 		// builder.put(path+"getListOfMemberObjectOfGroup", getListOfMemberObjectOfGroup); // Tested
 	}
 
 
-	/// Private Methods
+	// Private Methods
 
 	private static Map<String, Object> extractCommonInfoFromAccountObject(AccountObject account, boolean sanitiseOutput) {
 	//sanitise accountNames, groupNames,
 		Map<String, Object> commonInfo = new HashMap<String, Object>();
 		sanitiseOutput = true; // let it always sanitise the output
-		commonInfo.put(Account_Strings.RES_ACCOUNT_ID, null);
+		commonInfo.put(RES_ACCOUNT_ID, null);
 		commonInfo.put("accountNames", null);
 		commonInfo.put("isSuperUser", null);
 		commonInfo.put("isGroup", null);
@@ -1306,7 +1309,7 @@ public class AccountTableApi implements ApiModule {
 		commonInfo.put("isAnyGroupAdmin", false);
 
 		if (account != null) {
-			commonInfo.put(Account_Strings.RES_ACCOUNT_ID, account._oid());
+			commonInfo.put(RES_ACCOUNT_ID, account._oid());
 			Set<String> accNameSet = account.getLoginIDSet();
 			if (accNameSet != null) {
 				String[] accNames = new String[accNameSet.size()];
@@ -1521,63 +1524,63 @@ public class AccountTableApi implements ApiModule {
 	  for (String paramName : listToCheck ) {
 	    String value = "";
 	    switch(paramName) {
-	      case Account_Strings.REQ_ACCOUNT_ID :
+	      case REQ_ACCOUNT_ID :
 	        value = req.getString(paramName, "");
 	        if ( value.isEmpty() )
-	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER_ID);
+	          res.put(RES_ERROR, ERROR_NO_USER_ID);
 	        break;
-	      case Account_Strings.REQ_USERNAME :
+	      case REQ_USERNAME :
 	        value = req.getString(paramName, "");
 	        if ( value.isEmpty() )
-	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USERNAME);
+	          res.put(RES_ERROR, ERROR_NO_USERNAME);
 	        break;
-	      case Account_Strings.REQ_PASSWORD :
+	      case REQ_PASSWORD :
 	        value = req.getString(paramName, "");
 	        if ( value.isEmpty() )
-	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PASSWORD);
+	          res.put(RES_ERROR, ERROR_NO_PASSWORD);
 	        break;
-	      case Account_Strings.REQ_GROUP_ID :
+	      case REQ_GROUP_ID :
 	        value = req.getString(paramName, "");
 	        if ( value.isEmpty() )
-	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
+	          res.put(RES_ERROR, ERROR_NO_GROUP_ID);
 	        break;
-	      case Account_Strings.REQ_USER_ID :
+	      case REQ_USER_ID :
 	        value = req.getString(paramName, "");
 	        if ( value.isEmpty() )
-	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER_ID);
+	          res.put(RES_ERROR, ERROR_NO_USER_ID);
 	        break;
-	      case Account_Strings.REQ_ROLE :
+	      case REQ_ROLE :
 	        value = req.getString(paramName, "");
 	        if ( value.isEmpty() )
-	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_ROLE);
+	          res.put(RES_ERROR, ERROR_NO_ROLE);
 	        break;
-	      case Account_Strings.REQ_GROUPNAME :
+	      case REQ_GROUPNAME :
 	        value = req.getString(paramName, "");
 	        if ( value.isEmpty() )
-	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUPNAME);
+	          res.put(RES_ERROR, ERROR_NO_GROUPNAME);
 	        break;
-	      case Account_Strings.REQ_META :
+	      case REQ_META :
 	        Object metaObj = req.get(paramName);
 	        if ( metaObj == null )
-	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_META);
+	          res.put(RES_ERROR, ERROR_NO_META);
 	        break;
-	      case Account_Strings.REQ_OLD_PASSWORD:
+	      case REQ_OLD_PASSWORD:
 	        value = req.getString(paramName, "");
 	        if ( value.isEmpty() )
-	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PASSWORD);
+	          res.put(RES_ERROR, ERROR_NO_PASSWORD);
 	        break;
-	      case Account_Strings.REQ_NEW_PASSWORD:
+	      case REQ_NEW_PASSWORD:
 	        value = req.getString(paramName, "");
 	        if ( value.isEmpty() )
-	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_NEW_PASSWORD);
+	          res.put(RES_ERROR, ERROR_NO_NEW_PASSWORD);
 	        break;
-	      case Account_Strings.REQ_REPEAT_PASSWORD:
+	      case REQ_REPEAT_PASSWORD:
 	        value = req.getString(paramName, "");
 	        if ( value.isEmpty() )
-	          res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_NEW_REPEAT_PASSWORD);
+	          res.put(RES_ERROR, ERROR_NO_NEW_REPEAT_PASSWORD);
 	        break;
 	    }
-			if ( res.get(Account_Strings.RES_ERROR) != null )
+			if ( res.get(RES_ERROR) != null )
 				break;
 	  }
 	  return res;

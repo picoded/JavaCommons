@@ -9,7 +9,7 @@ import picoded.conv.*;
 import picoded.struct.*;
 import org.apache.commons.lang3.ArrayUtils;
 
-import picoded.servlet.api.module.account.Account_Strings;
+import static picoded.servlet.api.module.account.Account_Strings.*;
 
 /**
 * The account class is considered a hybrid class of both the user, group management class.
@@ -1029,7 +1029,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		if ( groupObject == null ) {
 			return false;
 		}
-		List<String> groupRoles = groupObject.getList(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE, "[]");
+		List<String> groupRoles = groupObject.getList(PROPERTIES_MEMBERSHIP_ROLE, "[]");
 		return groupRoles.contains(role);
 	}
 

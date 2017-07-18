@@ -9,7 +9,7 @@ import picoded.struct.*;
 import picoded.security.*;
 
 
-import picoded.servlet.api.module.account.Account_Strings;
+import static picoded.servlet.api.module.account.Account_Strings.*;
 
 /**
 * Represents a single group / user account.
@@ -607,7 +607,6 @@ public class AccountObject extends Core_MetaObject {
 	public MetaObject getMember(AccountObject memberObject) {
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
-
 		if (level == null || level.length() <= 0) {
 			return null;
 		}
@@ -668,7 +667,7 @@ public class AccountObject extends Core_MetaObject {
 
 			// true = uncheckedGet
 			childMeta = mainTable.memberMetaTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
-			childMeta.put(Account_Strings.PROPERTIES_ROLE, role);
+			childMeta.put(PROPERTIES_ROLE, role);
 			childMeta.saveDelta();
 		} else {
 			// true = uncheckedGet
@@ -705,7 +704,7 @@ public class AccountObject extends Core_MetaObject {
 	* Returns if set as group
 	**/
 	public boolean isGroup() {
-		Object status = this.get(Account_Strings.PROPERTIES_IS_GROUP);
+		Object status = this.get(PROPERTIES_IS_GROUP);
 		if (status instanceof Number && //
 			((Number) status).intValue() >= 1) {
 			return true;
@@ -719,9 +718,9 @@ public class AccountObject extends Core_MetaObject {
 	**/
 	public void setGroupStatus(boolean enabled) {
 		if (enabled) {
-			this.put(Account_Strings.PROPERTIES_IS_GROUP, new Integer(1));
+			this.put(PROPERTIES_IS_GROUP, new Integer(1));
 		} else {
-			this.put(Account_Strings.PROPERTIES_IS_GROUP, new Integer(0));
+			this.put(PROPERTIES_IS_GROUP, new Integer(0));
 		}
 		this.saveDelta();
 	}
@@ -739,7 +738,7 @@ public class AccountObject extends Core_MetaObject {
 	}
 
 	public MetaObject addNewMembershipRole(String role) {
-		List<String> currentRoles = group_membershipRoles().getList(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE, "[]");
+		List<String> currentRoles = group_membershipRoles().getList(PROPERTIES_MEMBERSHIP_ROLE, "[]");
 		if ( currentRoles.contains(role) ){
 			return group_membershipRoles();
 		}
@@ -752,13 +751,13 @@ public class AccountObject extends Core_MetaObject {
 		_group_membershipRoles = null;
 		if ( !roles.contains("admin") )
 			roles.add("admin");
-		group_membershipRoles().put(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE, roles);
+		group_membershipRoles().put(PROPERTIES_MEMBERSHIP_ROLE, roles);
 		group_membershipRoles().saveDelta();
 		return group_membershipRoles();
 	}
 
 	public MetaObject removeMembershipRole(String role) {
-		List<String> currentRoles = group_membershipRoles().getList(Account_Strings.PROPERTIES_MEMBERSHIP_ROLE, "[]");
+		List<String> currentRoles = group_membershipRoles().getList(PROPERTIES_MEMBERSHIP_ROLE, "[]");
 		if (!currentRoles.contains(role)){
 			return null;
 		}

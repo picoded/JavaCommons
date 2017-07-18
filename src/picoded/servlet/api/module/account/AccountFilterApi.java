@@ -20,21 +20,26 @@ import picoded.struct.GenericConvertHashMap;
 
 
 
-///
-/// Account table API builder
-///
+/**
+* Account table API builder
+**/
 public class AccountFilterApi extends AccountTableApi implements ApiModule {
 
-	/// The AccountTable reference
+	/**
+	* The AccountTable reference
+	**/
 	protected AccountTable table = null;
 
-	/// Static ERROR MESSAGES
+	/**
+	* Static ERROR MESSAGES
+	**/
 	public static final String MISSING_REQUEST_PAGE = "Unexpected Exception: Missing requestPage()";
 
-
-	/// Setup the account table api class
-	///
-	/// @param  The input AccountTable to use
+	/**
+	* Setup the account table api class
+	*
+	* @param  The input AccountTable to use
+	**/
 	public AccountFilterApi(AccountTable inTable) {
     super(inTable);
 		table = super.table;
@@ -193,12 +198,13 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 		return null;
 	};
 
-
-	/// Does the actual setup for the API
-	/// Given the API Builder, and the namespace prefix
-	///
-	/// @param  API builder to add the required functions
-	/// @param  Path to assume
+	/**
+	* Does the actual setup for the API
+	* Given the API Builder, and the namespace prefix
+	*
+	* @param  API builder to add the required functions
+	* @param  Path to assume
+	**/
 	public void setupApiBuilder(ApiBuilder builder, String path) {
     super.setupApiBuilder(builder, path);
 		builder.filter(path+"account/*", account_bundle_check);
@@ -210,7 +216,8 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 
 	}
 
-	/// Private Methods
+
+	// Private Methods
 
 	// with help from http://stackoverflow.com/questions/624581/what-is-the-best-java-email-address-validation-method
 	private boolean isEmailFormat(String inEmail){

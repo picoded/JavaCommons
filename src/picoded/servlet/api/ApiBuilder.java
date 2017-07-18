@@ -10,7 +10,8 @@ import picoded.struct.UnsupportedDefaultMap;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 import picoded.conv.ConvertJSON;
-import picoded.servlet.api.module.account.Account_Strings;
+
+import static picoded.servlet.api.module.account.Account_Strings.*;
 
 import picoded.servlet.*;
 
@@ -555,9 +556,10 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 			if ( filterEndpoints != null ) {
 				ApiResponse filterResponse = null;
 				for ( BiFunction<ApiRequest, ApiResponse, ApiResponse> filterPoint : filterEndpoints ) {
-					System.out.println("filterPoint applying + <<<<<<<<<<<<<<<<<");
+					// System.out.println("filterPoint applying + <<<<<<<<<<<<<<<<<");
 					filterResponse = filterPoint.apply( reqObj, resObj );
-					if ( filterResponse != null && filterResponse.get(Account_Strings.RES_ERROR) != null ) {
+					if ( filterResponse != null && filterResponse.get(RES_ERROR) != null ) {
+						resObj = filterResponse;
 						resObj.halt();
 					}
 				}
@@ -567,9 +569,10 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 				return endpoint.apply(reqObj, resObj);
 			}
 		} catch(HaltException h) {
-		if ( resObj.get(Account_Strings.RES_ERROR) != null ) {
-			System.out.println(resObj.get(Account_Strings.RES_ERROR));
-		}
+		// if ( resObj.get(RES_ERROR) != null ) {
+		// 	System.out.println(resObj.get(RES_ERROR));
+		// }
+
 			return resObj;
 		} catch(Exception e) {
 			throw e;

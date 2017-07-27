@@ -7,7 +7,7 @@ import javax.mail.internet.*;
 
 import picoded.servlet.api.*;
 import picoded.servlet.api.module.ApiModule;
-import picoded.servlet.api.exception.HaltException;
+import picoded.servlet.api.internal.HaltException;
 
 import picoded.dstack.module.account.*;
 import picoded.dstack.*;

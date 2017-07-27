@@ -5,7 +5,7 @@ import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-import picoded.servlet.api.exception.HaltException;
+import picoded.servlet.api.internal.HaltException;
 import picoded.struct.UnsupportedDefaultMap;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;

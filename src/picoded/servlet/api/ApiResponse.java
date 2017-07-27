@@ -8,7 +8,7 @@ import picoded.struct.*;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 import picoded.servlet.CorePage;
-import picoded.servlet.api.exception.HaltException;
+import picoded.servlet.api.internal.HaltException;
 
 /**
 * API Request map information

@@ -1,4 +1,4 @@
-package picoded.servlet.api.exception;
+package picoded.servlet.api.internal;
 
 public class HaltException extends RuntimeException {
 

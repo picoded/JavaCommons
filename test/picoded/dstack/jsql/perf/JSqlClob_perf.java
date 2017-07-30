@@ -32,7 +32,11 @@ public class JSqlClob_perf extends AbstractBenchmark {
 	
 	// To override for implementation
 	//-----------------------------------------------------
-	public JSql implementationConstructor() {
+	
+	/// Note that this SQL connector constructor
+	/// is to be overriden for the various backend
+	/// specific test cases
+	public JSql jsqlConnection() {
 		return JSqlTest.sqlite();
 	}
 	
@@ -42,7 +46,7 @@ public class JSqlClob_perf extends AbstractBenchmark {
 	public void setUp() {
 		tablename = "mtp_"+TestConfig.randomTablePrefix();
 
-		jsqlObj = implementationConstructor();
+		jsqlObj = jsqlConnection();
 
 		tableSetup();
 		prepareTestObjects();

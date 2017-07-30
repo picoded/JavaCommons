@@ -75,8 +75,8 @@ public class StructSimple_MetaTable_perf extends AbstractBenchmark {
 		HashMap<String, Object> ret = new HashMap<String, Object>();
 
 		for(int i=0; i<max; ++i) {
-			ret.put( GUID.base58(), GUID.base58() );
-			ret.put( GUID.base58(), new Float(RandomUtils.nextFloat(0, 1000000000.0f)) );
+			ret.put( "S"+i, GUID.base58() );
+			ret.put( "N"+i, Math.pow(1.1,i)*RandomUtils.nextDouble(0, 2.0) );
 		}
 
 		return ret;
@@ -84,12 +84,12 @@ public class StructSimple_MetaTable_perf extends AbstractBenchmark {
 
 	/// Prepare several test objects for performance testing alter
 	public void prepareTestObjects() {
-		smallMap = setupTestMap(10);
-		mediumMap = setupTestMap(250);
-		largeMap = setupTestMap(1000);
-		smallMap2 = setupTestMap(10);
-		mediumMap2 = setupTestMap(250);
-		largeMap2 = setupTestMap(1000);
+		smallMap = setupTestMap(50);
+		mediumMap = setupTestMap(200);
+		largeMap = setupTestMap(450);
+		smallMap2 = setupTestMap(50);
+		mediumMap2 = setupTestMap(200);
+		largeMap2 = setupTestMap(450);
 	}
 
 	/// Configurable iteration sets count

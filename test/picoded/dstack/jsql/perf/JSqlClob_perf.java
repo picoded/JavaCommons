@@ -77,7 +77,7 @@ public class JSqlClob_perf extends AbstractBenchmark {
 			new String[] { //
 				"BIGINT PRIMARY KEY AUTOINCREMENT",
 				"VARCHAR(64)", //
-				"CLOB" // 
+				"TEXT" // 
 			}
 		);
 

@@ -33,15 +33,15 @@ public class JSqlFixedIndexless_perf extends JSqlClob_perf {
 
 	public void tableSetup() {
 
-		collumnNames = new String[largeCols*2];
-		collumnTypes = new String[largeCols*2];
+		collumnNames = new String[mediumCols*2];
+		collumnTypes = new String[mediumCols*2];
 
-		for(int i=0; i<largeCols; ++i) {
+		for(int i=0; i<mediumCols; ++i) {
 			collumnNames[i] = "N"+i;
 			collumnTypes[i] = "DECIMAL(36,12)";
 
-			collumnNames[i+largeCols] = "S"+i;
-			collumnTypes[i+largeCols] = "VARCHAR(MAX)";
+			collumnNames[i+mediumCols] = "S"+i;
+			collumnTypes[i+mediumCols] = "VARCHAR(MAX)";
 		}
 
 		collumnNamesWithOID = ArrayUtils.addAll(new String[] { "oID" }, collumnNames);
@@ -124,4 +124,25 @@ public class JSqlFixedIndexless_perf extends JSqlClob_perf {
 		return;
 	}
 
+	//
+	// SKIPPING - largeMapPerf : As the large number of collumns is unrunnable in MySQL
+	//
+
+	@BenchmarkOptions(benchmarkRounds = 5, warmupRounds = 1)
+	@Test
+	public void largeMapPerf_insertAndUpdate() throws Exception {
+		return;
+	}
+
+	@BenchmarkOptions(benchmarkRounds = 5, warmupRounds = 1)
+	@Test
+	public void largeMapPerf_insertAndReplace() throws Exception {
+		return;
+	}
+
+	@BenchmarkOptions(benchmarkRounds = 5, warmupRounds = 1)
+	@Test
+	public void largeMapPerf_insertAndInsert() throws Exception {
+		return;
+	}
 }

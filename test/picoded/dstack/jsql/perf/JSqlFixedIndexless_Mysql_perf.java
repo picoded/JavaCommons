@@ -15,4 +15,11 @@ public class JSqlFixedIndexless_Mysql_perf extends JSqlFixedIndexless_perf {
 		return JSqlTest.mysql();
 	}
 	
+	public void tableSetup() {
+		// Does the table setup
+		super.tableSetup();
+
+		// Alter table format to be "dynamic", required to keep the large number of rows
+		jsqlObj.update_raw("ALTER TABLE `"+tablename+"` ROW_FORMAT=DYNAMIC;");
+	}
 }

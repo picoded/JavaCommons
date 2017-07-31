@@ -6,7 +6,7 @@ import picoded.TestConfig;
 
 /// [Mysql varient]
 /// Testing of metatable full obj-key-val structure performance
-public class JSqlObjKeyVal_Mysql_perf extends JSqlObjKeyVal_perf {
+public class JSqlObjKeyValBatchless_Mysql_perf extends JSqlObjKeyValBatchless_perf {
 
 	/// Note that this SQL connector constructor
 	/// is to be overriden for the various backend

@@ -52,6 +52,12 @@ public class StructSimple_MetaTable_perf extends AbstractBenchmark {
 	// Performance benchmark setup
 	//-----------------------------------------------------
 
+	// Number of cols for int, and string respectively
+	public int smallCols = 50;
+	public int mediumCols = 200;
+	public int largeCols = 800; 
+	//Things break from 400 onwards in SQL, too many collumns, args etc.
+
 	/// Small map of 10 string, and 10 numeric properties
 	Map<String,Object> smallMap = null;
 
@@ -84,12 +90,12 @@ public class StructSimple_MetaTable_perf extends AbstractBenchmark {
 
 	/// Prepare several test objects for performance testing alter
 	public void prepareTestObjects() {
-		smallMap = setupTestMap(50);
-		mediumMap = setupTestMap(200);
-		largeMap = setupTestMap(450);
-		smallMap2 = setupTestMap(50);
-		mediumMap2 = setupTestMap(200);
-		largeMap2 = setupTestMap(450);
+		smallMap = setupTestMap(smallCols);
+		mediumMap = setupTestMap(mediumCols);
+		largeMap = setupTestMap(largeCols);
+		smallMap2 = setupTestMap(smallCols);
+		mediumMap2 = setupTestMap(mediumCols);
+		largeMap2 = setupTestMap(largeCols);
 	}
 
 	/// Configurable iteration sets count

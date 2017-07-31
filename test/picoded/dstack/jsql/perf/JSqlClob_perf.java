@@ -137,8 +137,8 @@ public class JSqlClob_perf extends AbstractBenchmark {
 	// Number of cols for int, and string respectively
 	public int smallCols = 50;
 	public int mediumCols = 200;
-	public int largeCols = 450; 
-	//Things break from 500 onwards in SQL, too many collumns, args etc.
+	public int largeCols = 800; 
+	//Things break from 400 onwards in SQL, too many collumns, args etc.
 
 	/// Prepare several test objects for performance testing alter
 	public void prepareTestObjects() {

@@ -18,12 +18,11 @@ public class ApiBuilderJS {
 			}
 			return fileContents.toString();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		} finally {
 			if(scanner !=null){
 				scanner.close();
 			}
 		}
-		return null;
 	}
 }

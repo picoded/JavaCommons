@@ -7,10 +7,10 @@
 /// to prevent uneeded global variable escape
 
 /// The actual api object tor return
-var api = api || {};
+var api = {};
 
 /// api configuration object
-var apiconfig = { 
+var apiconfig = {
 	baseURL: "//localhost:8080/api/",
 	apiKey: null
 };
@@ -60,7 +60,7 @@ apicore.apiKey = function apiKey(inKey) {
 
 //---------------------------------------------------------------------------------------
 //
-//  API rawPostRequest 
+//  API rawPostRequest
 //
 //---------------------------------------------------------------------------------------
 
@@ -85,7 +85,7 @@ if(apicore.isNodeJS()) {
 		throw "node.js support is not yet implemented.";
 	}
 } else {
-	// Does the browser xhttprequest 
+	// Does the browser xhttprequest
 	// Cookie handling is done natively by the browser
 	apicore.rawPostRequest = function rawPostRequest(reqURI, paramObj, callback) {
 
@@ -128,7 +128,7 @@ if(apicore.isNodeJS()) {
 
 			// Good load event listener
 			request.addEventListener("load", goodLoad)
-			
+
 			// Function to call on a bad load
 			function badLoad(evt) {
 				bad("Request error / abort");
@@ -167,7 +167,7 @@ var apimap = {};
 ///
 /// Normalize the endpoint to '/' notation from either '.' or '/' notations
 /// Eg: user.account.login -> user/account/login
-/// 
+///
 /// @param  The path the normalize
 ///
 /// @return  normalized path
@@ -205,8 +205,8 @@ function callSingleEndpoint(endpointPath, args) {
 	// No arguments, nothing to consider
 	if( args == null || args.length <= 0 ) {
 		return apicore.rawPostRequest(endpointPath);
-	} 
-	
+	}
+
 	// Possible parameter object request
 	if( args.length == 1 ) {
 		var paramObj = args[0];
@@ -234,7 +234,7 @@ function callSingleEndpoint(endpointPath, args) {
 function callEndpointWithNamedArguments(endpointPath, args) {
 	// Endpoint configuration
 	var endpointConfig = apimap[endpointPath];
-	
+
 	// Terminates at invalid name point configration
 	if( endpointConfig == null || endpointConfig.argNameList == null || endpointConfig.argNameList.length <= 0 ) {
 		return new Promise(function(good,bad) {
@@ -257,12 +257,12 @@ function callEndpointWithNamedArguments(endpointPath, args) {
 	return apicore.rawPostRequest(endpointPath, paramObject);
 }
 
-/// Function: setEndpoint
+/// Function: setEndpointRaw
 ///
 /// @param   Endpoint path, must be normalized
 /// @param   Arg names array, for multiple arguments mode / non object mode
-/// @param   Configuration object 
-function setEndpoint(endpointPath, argNameList, config) {
+/// @param   Configuration object
+function setEndpointRaw(endpointPath, argNameList, config) {
 	// Normalize config object
 	config = config || {};
 
@@ -279,7 +279,7 @@ function setEndpoint(endpointPath, argNameList, config) {
 
 /// Function: setupEndpointFunction
 ///
-/// Setup the endpoint function against the "api" object. 
+/// Setup the endpoint function against the "api" object.
 /// This is done recursively against pathSuffix
 ///
 /// @param   pathSuffix, array of names, to setup the call function
@@ -325,7 +325,7 @@ function setupEndpointFunction(pathSuffix, pathPrefix, apiObj) {
 /// @return  The generated function (to append as another apiObj)
 function setupEndpointFunctionStep(apiObj, name, endpointPath) {
 	apiObj[name] = function() {
-		return callEndpoint(endpointPath, (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)) );
+		return callSingleEndpoint(endpointPath, (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)) );
 	}
 	return apiObj[name];
 }
@@ -350,9 +350,9 @@ apicore.callEndpoint = function callEndpoint(endpointPath) {
 ///
 /// @param   Endpoint path
 /// @param   Arg names array, for multiple arguments mode / non object mode
-/// @param   Configuration object 
+/// @param   Configuration object
 apicore.setEndpoint = function setEndpoint(endpointPath, argNameList, config) {
-	return setupEndpointFunction( normalizeEndpointPath(endpointPath), argNameList, config );
+	return setEndpointRaw( normalizeEndpointPath(endpointPath), argNameList, config );
 }
 
 /// Function: api._core.setEndpointMap
@@ -367,4 +367,3 @@ apicore.setEndpointMap = function setEndpointMap(pathMap) {
 		}
 	}
 }
-

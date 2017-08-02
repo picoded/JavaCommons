@@ -688,7 +688,7 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	*
 	* @return ApiResponse, to propagate to the actual user
 	**/
-	public ApiResponse servletExecute(CorePage inCore, String path) {
+	public ApiResponse servletExecute(CorePage inCore, String[] path) {
 		// Setup
 		ApiRequest req = setupApiRequest(inCore);
 		ApiResponse res = new ApiResponse(this);
@@ -697,18 +697,34 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 		if( corePageServlet == null ) {
 			corePageServlet = inCore;
 		}
+		if( path.length > 1 && path[0].matches("^v\\d+\\.\\d+$") ) {
+			String[] versions = path[0].substring(1).split("\\.");
+			int[] intV = new int[versions.length];
+			for ( int idx = 0; idx < versions.length; idx++ )
+				intV[idx] = Integer.parseInt(versions[idx]);
 
-		// Invalid API error
-		if( !isValidPath(path) ) {
-			//Invalid path, terminate
-			res.put("ERROR", "Unknown API request endpoint");
-			res.put("INFO", "Requested path : "+path);
-			return res;
+			if ( path.length > 1)
+				path = Arrays.copyOfRange(path, 1, path.length);
+			if( !isValidPath(intV[0], intV[1], String.join(".", path)) ) {
+				//Invalid path, terminate
+				res.put("ERROR", "Unknown API request endpoint");
+				res.put("INFO", "Requested path : "+String.join(".", path));
+				return res;
+			}
+		} else {
+			// Invalid API error without Version
+			if( !isValidPath(String.join(".", path)) ) {
+				//Invalid path, terminate
+				res.put("ERROR", "Unknown API request endpoint");
+				res.put("INFO", "Requested path : "+String.join(".", path));
+				return res;
+			}
 		}
+
 
 		try {
 			// The actual execution
-			return execute(path, req, res);
+			return execute(String.join(".", path), req, res);
 		} catch(Exception e) {
 			// Suppress and print out the error info
 			res.put("ERROR", e.getMessage());

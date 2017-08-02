@@ -193,7 +193,7 @@ public class CoreApiPage extends CorePage {
 			// @TODO : Consider integrating template data (CorePage) with context data (ApiBuilder)
 
 			// Does actual execution
-			ApiResponse ret = apiBuilder().servletExecute(this, apiPath);
+			ApiResponse ret = apiBuilder().servletExecute(this, Arrays.copyOfRange(wildcardUri,1, wildcardUri.length));
 
 			// There is valid return data
 			if( ret != null ) {

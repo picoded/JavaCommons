@@ -1,0 +1,21 @@
+[
+
+	//--------------------------------------------------------------------------------
+	//
+	// Layer 0 : The final layer of the JStack,
+	//
+	// This would be the "single source of truth"
+	// for subsequent data layers above it
+	//
+	//--------------------------------------------------------------------------------
+	{
+		// Data stack type
+		"type" : "JSql",
+
+		// // [Sqlite] database implmentation
+		// // This is obviously not meant for production, but for testing,
+		// // Path here refers to file path.
+		// // Note that the database, username, password parameters are meaningless for sqlite
+		"engine" : "sqlite"
+	}
+]

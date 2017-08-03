@@ -37,41 +37,30 @@ public class DStackConfigLoader {
 		String engine = configMap.getString("engine", "");
 		String path = configMap.getString("path", null);
 
-		// Get config engine type, and generate the return the JSQL connection accordingly
+		// Generate sqlite connection when applicable
 		if( engine.equalsIgnoreCase("sqlite") ) {
-
+			if ( path == null ) {
+				// Get in memory
+				return JSql.sqlite();
+			}
+			return JSql.sqlite(path);
 		} 
 		
+		// Common settings for remote database
 		String username = configMap.getString("username", "");
 		String password = configMap.getString("password", "");
 		String database = configMap.getString("database", "");
-		if( engine.equalsIgnoreCase("mysql") ) {
 
+		// Generate the JSQL connection accordingly
+		if( engine.equalsIgnoreCase("mysql") ) {
+			return JSql.mysql(path, database, username, password);
+		} else if( engine.equalsIgnoreCase("mssql") ) {
+			throw new InvalidParameterException("MSSQL not yet implemented.");
+		} else if( engine.equalsIgnoreCase("oracle")) {
+			throw new InvalidParameterException("Oracle not yet implemented.");
 		} else {
 			throw new InvalidParameterException("Unknown engine type to load : "+engine);
 		}
-		
-
-		// GenericConvertMap<String, Object> configMap = ConvertJSON.toCustomClass(config, GenericConvertMap.class);
-		// if ( configMap == null )
-		// return null;
-		// String type = configMap.getString("type");
-
-		// if ( type.equalsIgnoreCase("Jsql") ) {
-		// String engine = configMap.getString("engine", "");
-		// String path = configMap.getString("path", "");
-		// String username = configMap.getString("username", "");
-		// String password = configMap.getString("password", "");
-		// String database = configMap.getString("database", "");
-		// if ( path.isEmpty() )
-		// throw new RuntimeException("DStack path is not set.");
-		// if ( engine.equalsIgnoreCase("sqlite") ) {
-		// return  new JSqlStack(JSql.sqlite(path));
-		// } else if ( egine.equalsIgnoreCase("mysql") ) {
-		// return new JSqlStack(Jsql.mysql(path, database, username, password));
-		// }
-		// return null;  
-		// }
 	}
 
 	/**
@@ -97,6 +86,7 @@ public class DStackConfigLoader {
 			ret = new StructSimpleStack();
 		} else if( type.equalsIgnoreCase("JSql") ) {
 			JSql conn = generateJSql(configMap);
+			ret = new JSqlStack(conn);
 		} else {
 			throw new InvalidParameterException("Unknown configuration type to load : "+type);
 		}

@@ -1,36 +1,5 @@
 package picoded.servlet;
 
-// import javax.servlet.ServletContext;
-// import javax.servlet.http.HttpServletRequest;
-// import javax.servlet.http.HttpServletResponse;
-//
-// import java.net.URL;
-// import java.lang.String;
-// import java.io.File;
-// import java.io.IOException;
-//
-// import java.nio.ByteBuffer;
-// import java.nio.charset.Charset; //import java.nio.charset.StandardCharsets;
-// import java.util.*;
-//
-// import java.lang.Number;
-// import java.lang.System;
-// import java.io.StringWriter;
-// import java.util.logging.*;
-//
-// import java.lang.RuntimeException;
-// import java.lang.IllegalArgumentException;
-// import java.io.IOException;
-// import java.lang.Throwable;
-// import java.lang.Exception;
-//
-// // Objects used
-// import java.util.HashMap;
-// import java.io.PrintWriter;
-// import java.net.URLDecoder;
-// import java.lang.Class;
-import java.lang.RuntimeException;
-// import java.lang.Exception;
 import java.util.List;
 import java.io.File;
 

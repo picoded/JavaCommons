@@ -41,7 +41,7 @@ public class ApiBuilderJS {
 		String generateJSScript = "var api = (function() {\n";
 		generateJSScript += getJsLib();
 
-		generateJSScript += "\tapicore.baseURL(\"//" + hostpath + "/api/v1.0/\");\n"+
+		generateJSScript += "\tapicore.baseURL(\"//" + hostpath + "/api/" + versionStr + "/\");\n"+
 												"\tapicore.setEndpointMap({\n";
 
 		// Generating endpoints
@@ -52,6 +52,7 @@ public class ApiBuilderJS {
 		generateJSScript = generateJSScript.substring( 0, index ) + "\n";
 		generateJSScript += "\t});\n" +
 												"\treturn api;\n" +
+												"})();\n";
 		return generateJSScript;
 	}
 }

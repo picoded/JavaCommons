@@ -23,11 +23,11 @@ public class DStackConfigLoader {
     String type = configMap.getString("type");
 
     if ( type.equalsIgnoreCase("Jsql") ) {
-			String engine = configMap.getString("engine", "");
-			String path = configMap.getString("path", "");
-			String username = configMap.getString("username", "");
-			String password = configMap.getString("password", "");
-			String database = configMap.getString("database", "");
+      String engine = configMap.getString("engine", "");
+      String path = configMap.getString("path", "");
+      String username = configMap.getString("username", "");
+      String password = configMap.getString("password", "");
+      String database = configMap.getString("database", "");
       if ( path.isEmpty() )
         throw new RuntimeException("DStack path is not set.");
       if ( engine.equalsIgnoreCase("sqlite") ) {

@@ -22,61 +22,13 @@ import picoded.dstack.stack.DStackConfigLoader;
  * ##[TODO]
  *  + unit tests
  */
-public class DStackPage extends CorePage {
+public class DStackPage extends CoreApiPage {
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Static variables
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////////
-
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Internal variables, can be overwritten. Else it is auto "filled" when needed
-	//
-	/////////////////////////////////////////////////////////////////////////////////////////////
-
-	public String _webInfPath = null;
-	public String _classesPath = null;
-	public String _libraryPath = null;
-	public String _configsPath = null;
-	public String _pageTemplatePath = null;
-	public String _pageOutputPath = null;
-	public String _jsmlTemplatePath = null;
-
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Path variables, according to standard WAR package convention
-	//
-	/////////////////////////////////////////////////////////////////////////////////////////////
-
-	public String getWebInfPath() {
-		return (_webInfPath != null) ? _webInfPath : (_webInfPath = getContextPath() + "WEB-INF/");
-	}
-
-	public String getClassesPath() {
-		return (_classesPath != null) ? _classesPath : (_classesPath = getWebInfPath() + "classes/");
-	}
-
-	public String getLibraryPath() {
-		return (_libraryPath != null) ? _libraryPath : (_libraryPath = getWebInfPath() + "lib/");
-	}
-
-	public String getConfigsPath() {
-		return (_configsPath != null) ? _configsPath : (_configsPath = getWebInfPath() + "config/");
-	}
-
-	public String getPageTemplatePath() {
-		return (_pageTemplatePath != null) ? _pageTemplatePath : (_pageTemplatePath = getWebInfPath() + "page/");
-	}
-
-	public String getPageOutputPath() {
-		return (_pageOutputPath != null) ? _pageOutputPath : (_pageOutputPath = getContextPath());
-	}
-
-	public String getJsmlTemplatePath() {
-		return (_jsmlTemplatePath != null) ? _jsmlTemplatePath : (_jsmlTemplatePath = getWebInfPath() + "jsml/");
-	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//

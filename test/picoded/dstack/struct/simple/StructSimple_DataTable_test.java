@@ -16,16 +16,16 @@ import picoded.struct.CaseInsensitiveHashMap;
 import picoded.dstack.*;
 import picoded.dstack.struct.simple.*;
 
-// MetaTable base test class
-public class StructSimple_MetaTable_test {
+// DataTable base test class
+public class StructSimple_DataTable_test {
 	
 	/// Test object
-	public MetaTable mtObj = null;
+	public DataTable mtObj = null;
 	
 	// To override for implementation
 	//-----------------------------------------------------
-	public MetaTable implementationConstructor() {
-		return new StructSimple_MetaTable();
+	public DataTable implementationConstructor() {
+		return new StructSimple_DataTable();
 	}
 	
 	// Setup and sanity test
@@ -88,10 +88,10 @@ public class StructSimple_MetaTable_test {
 	// @Test
 	// public void invalidSetup() { //Numeric as table prefix tend to cuase
 	// problems
-	// MetaTable m;
+	// DataTable m;
 	//
 	// try {
-	// m = new MetaTable(JStackObj, "1" + TestConfig.randomTablePrefix());
+	// m = new DataTable(JStackObj, "1" + TestConfig.randomTablePrefix());
 	// fail(); // if we got here, no exception was thrown, which is bad
 	// } catch (Exception e) {
 	// final String expected = "Invalid table name (cannot start with numbers)";
@@ -102,7 +102,7 @@ public class StructSimple_MetaTable_test {
 	
 	@Test
 	public void newObjectTest() {
-		MetaObject mObj = null;
+		DataObject mObj = null;
 		
 		assertNotNull(mObj = mtObj.newObject());
 		mObj.put("be", "happy");
@@ -124,7 +124,7 @@ public class StructSimple_MetaTable_test {
 		
 		// Random object to put in
 		HashMap<String, Object> objMap = randomObjMap();
-		MetaObject mObj = null;
+		DataObject mObj = null;
 		
 		// Puts in a new object, and get guid
 		assertNotNull(guid = mtObj.newObject(objMap)._oid());
@@ -143,7 +143,7 @@ public class StructSimple_MetaTable_test {
 	@Test
 	public void blankObjectSave() {
 		String guid = null;
-		MetaObject p = null;
+		DataObject p = null;
 		assertFalse(mtObj.containsKey("hello"));
 		assertNotNull(p = mtObj.newObject());
 		assertNotNull(guid = p._oid());
@@ -183,7 +183,7 @@ public class StructSimple_MetaTable_test {
 	public void indexBasedTest_num() {
 		indexBasedTestSetup();
 		
-		MetaObject[] qRes = null;
+		DataObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
 		assertEquals(7, qRes.length);
 		assertEquals(7, mtObj.queryCount(null, null));
@@ -207,7 +207,7 @@ public class StructSimple_MetaTable_test {
 	public void indexBasedTest_string() {
 		indexBasedTestSetup();
 
-		MetaObject[] qRes = null;
+		DataObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query("str_val = ?", new Object[] { "this" }));
 		assertEquals(2, qRes.length);
 		assertEquals(2, mtObj.queryCount("str_val = ?", new Object[] { "this" }));
@@ -218,7 +218,7 @@ public class StructSimple_MetaTable_test {
 	///
 	@Test
 	public void issue47_exceptionWhenTableIsEmpty() {
-		MetaObject[] qRes = null;
+		DataObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
 		assertEquals(0, qRes.length);
 	}
@@ -240,7 +240,7 @@ public class StructSimple_MetaTable_test {
 		objMap.put("str_val", "nope");
 		mtObj.newObject(objMap);
 		
-		MetaObject[] qRes = null;
+		DataObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
 		assertEquals(3, qRes.length);
 		
@@ -256,12 +256,12 @@ public class StructSimple_MetaTable_test {
 	}
 	
 	///
-	/// Handle right outer closign bracket in metatable meta names
+	/// Handle right outer closign bracket in DataTable meta names
 	///
 	@Test
 	public void mssqlOuterBrackerInMetaNameFlaw() {
 		HashMap<String, Object> objMap = null;
-		MetaObject[] qRes = null;
+		DataObject[] qRes = null;
 		
 		//
 		// Setup vars to test against
@@ -303,7 +303,7 @@ public class StructSimple_MetaTable_test {
 		assertNull(mtObj.get(guid));
 		assertNotNull(guid = mtObj.newObject(objMap)._oid());
 		
-		MetaObject[] qRes = null;
+		DataObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
 		assertEquals(1, qRes.length);
 		
@@ -322,7 +322,7 @@ public class StructSimple_MetaTable_test {
 		assertNull(mtObj.get(guid));
 		assertNotNull(guid = mtObj.newObject(objMap)._oid());
 		
-		MetaObject[] qRes = null;
+		DataObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
 		assertEquals(2, qRes.length);
 		
@@ -338,7 +338,7 @@ public class StructSimple_MetaTable_test {
 		mtObj.newObject(genNumStrObj(1, "one"));
 		mtObj.newObject(genNumStrObj(2, "two"));
 		
-		MetaObject[] list = null;
+		DataObject[] list = null;
 		assertNotNull(list = mtObj.getFromKeyName("num"));
 		assertEquals(2, list.length);
 		
@@ -356,8 +356,8 @@ public class StructSimple_MetaTable_test {
 		
 		// Generates single node
 		mtObj.newObject(genNumStrObj(1, "hello world"));
-		MetaObject[] list = null;
-		MetaObject node = null;
+		DataObject[] list = null;
+		DataObject node = null;
 		
 		// Fetch that single node
 		assertNotNull(list = mtObj.getFromKeyName("num"));
@@ -385,8 +385,8 @@ public class StructSimple_MetaTable_test {
 		
 		// Generates single node
 		mtObj.newObject(genNumStrObj(1, "hello world"));
-		MetaObject[] list = null;
-		MetaObject node = null;
+		DataObject[] list = null;
+		DataObject node = null;
 		
 		// Fetch that single node
 		assertNotNull(list = mtObj.getFromKeyName("num"));
@@ -424,11 +424,11 @@ public class StructSimple_MetaTable_test {
 		List<String> ohnoArray = Arrays.asList(new String[] { "oh", "no" });
 		data.put("arrs", new ArrayList<String>(ohnoArray));
 		
-		MetaObject mo = null;
+		DataObject mo = null;
 		assertNotNull(mo = mtObj.newObject(data));
 		mo.saveDelta();
 		
-		MetaObject to = null;
+		DataObject to = null;
 		assertNotNull(to = mtObj.get(mo._oid()));
 		
 		data.put("_oid", mo._oid());
@@ -443,11 +443,11 @@ public class StructSimple_MetaTable_test {
 		data.put("name", "Hello");
 		data.put("bin", new byte[] { 1, 2, 3, 4, 5 });
 		
-		MetaObject mo = null;
+		DataObject mo = null;
 		assertNotNull(mo = mtObj.newObject(data));
 		mo.saveDelta();
 		
-		MetaObject to = null;
+		DataObject to = null;
 		assertNotNull(to = mtObj.get(mo._oid()));
 		
 		assertTrue(data.get("bin") instanceof byte[]);
@@ -473,7 +473,7 @@ public class StructSimple_MetaTable_test {
 		
 		// Replicated a bug, where u CANNOT use orderby on a collumn your not
 		// doing a where search
-		MetaObject[] qRes = mtObj.query("str_val = ?", new String[] { "this" }, "num ASC");
+		DataObject[] qRes = mtObj.query("str_val = ?", new String[] { "this" }, "num ASC");
 		assertEquals(qRes.length, 2);
 		
 		assertEquals("this", qRes[0].get("str_val"));
@@ -581,16 +581,16 @@ public class StructSimple_MetaTable_test {
 	// @Test
 	// public void demoCode() {
 	// 	// Initiate a meta table
-	// 	MetaTable table = (new JStruct()).getMetaTable("demo");
+	// 	DataTable table = (new JStruct()).getDataTable("demo");
 	// 	
 	// 	// Adding new object?
-	// 	MetaObject mObj = table.newObject();
+	// 	DataObject mObj = table.newObject();
 	// 	mObj.put("be", "happy");
 	// 	mObj.put("num", new Integer(1));
 	// 	mObj.saveDelta();
 	// 	
 	// 	// Doing a query
-	// 	MetaObject[] qRes = null;
+	// 	DataObject[] qRes = null;
 	// 	assertNotNull(qRes = table.query("num > ? OR be = ?", new Object[] { 0, "happy" }));
 	// 	// Each object has a base68 GUID
 	// 	String guid = qRes[0]._oid();
@@ -609,13 +609,13 @@ public class StructSimple_MetaTable_test {
 	// remove meta object support
 	//-----------------------------------------------
 	@Test
-	public void removeViaMetaObject() {
+	public void removeViaDataObject() {
 		
 		// Lets just rescycle old test for some dummy data
 		basicTest();
 		
-		// Lets get MetaObject list
-		MetaObject[] oRes = null;
+		// Lets get DataObject list
+		DataObject[] oRes = null;
 		assertNotNull(oRes = mtObj.query(null, null));
 		assertTrue(oRes.length > 0);
 
@@ -623,7 +623,7 @@ public class StructSimple_MetaTable_test {
 		mtObj.remove(oRes[0]);
 
 		// Lets query to make sure its removed
-		MetaObject[] qRes = null;
+		DataObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
 		assertEquals(oRes.length - 1, qRes.length);
 	}
@@ -634,8 +634,8 @@ public class StructSimple_MetaTable_test {
 		// Lets just rescycle old test for some dummy data
 		basicTest();
 		
-		// Lets get MetaObject list
-		MetaObject[] oRes = null;
+		// Lets get DataObject list
+		DataObject[] oRes = null;
 		assertNotNull(oRes = mtObj.query(null, null));
 		assertTrue(oRes.length > 0);
 
@@ -643,7 +643,7 @@ public class StructSimple_MetaTable_test {
 		mtObj.remove(oRes[0]._oid());
 
 		// Lets query to make sure its removed
-		MetaObject[] qRes = null;
+		DataObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
 		assertEquals(oRes.length - 1, qRes.length);
 	}

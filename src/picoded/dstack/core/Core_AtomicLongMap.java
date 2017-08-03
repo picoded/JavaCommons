@@ -17,7 +17,7 @@ import picoded.struct.query.*;
 import picoded.dstack.*;
 
 /**
-* Common base utility class of MetaTable
+* Common base utility class of DataTable
 *
 * Does not actually implement its required feature,
 * but helps provide a common base line for all the various implementation.

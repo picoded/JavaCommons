@@ -3,7 +3,7 @@ package picoded.set;
 import java.util.*;
 /**
 * MetaType enums represents the various data types,
-* that the struct/JSql/JCache/JStack varients of MetaTable can support.
+* that the struct/JSql/JCache/JStack varients of DataTable can support.
 **/
 public enum MetaType {
 
@@ -29,10 +29,10 @@ public enum MetaType {
 	**/
 	UUID(11),
 	/**
-	* Another MetaTable identifier. This is used for linked MetaTable's
+	* Another DataTable identifier. This is used for linked DataTable's
 	* via a commonly agreeded on UUID
 	**/
-	METATABLE(12),
+	DataTable(12),
 
 	//
 	// Standard based
@@ -88,7 +88,7 @@ public enum MetaType {
 	//
 	// Array based, varients of above
 	//--------------------------------------------------------------------
-	UUID_ARRAY(511), METATABLE_ARRAY(512),
+	UUID_ARRAY(511), DataTable_ARRAY(512),
 
 	INTEGER_ARRAY(521), LONG_ARRAY(522), DOUBLE_ARRAY(523), FLOAT_ARRAY(524), STRING_ARRAY(525),
 

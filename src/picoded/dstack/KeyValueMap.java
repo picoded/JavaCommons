@@ -79,7 +79,7 @@ public interface KeyValueMap extends GenericConvertMap<String, String>, CommonSt
 	}
 
 	/**
-	* [warning] : avoid use in production, use a MetaTable instead.
+	* [warning] : avoid use in production, use a DataTable instead.
 	*
 	* Use only for debugging. Returns all the valid keys.
 	* Kept to ensure full map interface compatibility
@@ -96,7 +96,7 @@ public interface KeyValueMap extends GenericConvertMap<String, String>, CommonSt
 	}
 
 	/**
-	* [warning] : avoid use in production, use a MetaTable instead.
+	* [warning] : avoid use in production, use a DataTable instead.
 	*
 	* NOTE: You DO NOT want to use this, as most KeyValueMap,
 	* systems are NOT designed for this operation. And will do so

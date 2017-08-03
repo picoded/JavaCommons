@@ -2,7 +2,7 @@
 * While not a true implementation of the dstack objects.
 * This packages serves to help build up all other implementations.
 *
-* Especially for MetaTable / Object
+* Especially for DataTable / Object
 *
 * Think of it as a heavier varient of default interface functionalities
 *

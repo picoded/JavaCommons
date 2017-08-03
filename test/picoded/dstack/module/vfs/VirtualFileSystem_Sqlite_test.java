@@ -32,8 +32,8 @@ public class VirtualFileSystem_Sqlite_test extends VirtualFileSystem_test {
 	public VirtualFileSystem implementationConstructor() {
 		JSql conn = sqlConn();
 		return new VirtualFileSystem( //
-			new JSql_MetaTable(conn, TestConfig.randomTablePrefix().toUpperCase()), //
-			new JSql_MetaTable(conn, TestConfig.randomTablePrefix().toUpperCase()) //
+			new JSql_DataTable(conn, TestConfig.randomTablePrefix().toUpperCase()), //
+			new JSql_DataTable(conn, TestConfig.randomTablePrefix().toUpperCase()) //
 		);
 	}
 }

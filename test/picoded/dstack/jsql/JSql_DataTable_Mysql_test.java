@@ -22,7 +22,7 @@ import picoded.dstack.jsql.*;
 import picoded.dstack.jsql.connector.*;
 import picoded.dstack.struct.simple.*;
 
-public class JSql_MetaTable_Mysql_test extends JSql_MetaTable_test {
+public class JSql_DataTable_Mysql_test extends JSql_DataTable_test {
 
 	// To override for implementation
 	//-----------------------------------------------------

@@ -22,7 +22,7 @@ public class VirtualFileSystem_test {
 	/// is to be overriden for the various backend
 	/// specific test cases
 	public VirtualFileSystem implementationConstructor() {
-		return new VirtualFileSystem(new StructSimple_MetaTable(), new StructSimple_MetaTable());
+		return new VirtualFileSystem(new StructSimple_DataTable(), new StructSimple_DataTable());
 	}
 
 	// Setup and sanity test

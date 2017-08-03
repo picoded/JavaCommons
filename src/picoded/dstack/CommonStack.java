@@ -60,14 +60,14 @@ public interface CommonStack extends CommonStructure {
 	}
 
 	/**
-	* Gets the MetaTable object, with provided name
+	* Gets the DataTable object, with provided name
 	*
 	* @param name - name of map in backend
 	*
-	* @return MetaTable
+	* @return DataTable
 	**/
-	default MetaTable getMetaTable(String name) {
-		return (MetaTable) getStructure("MetaTable", name);
+	default DataTable getDataTable(String name) {
+		return (DataTable) getStructure("DataTable", name);
 	}
 
 	/**

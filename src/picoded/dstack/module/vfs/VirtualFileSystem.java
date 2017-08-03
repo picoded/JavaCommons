@@ -8,7 +8,7 @@ import java.util.*;
 import picoded.conv.*;
 
 /**
-* VirtualFileSystem using MetaTable implmentation
+* VirtualFileSystem using DataTable implmentation
 * This replicates most of the file system requirements of Uilicious workspace
 **/
 public class VirtualFileSystem extends VirtualFileObject {
@@ -22,12 +22,12 @@ public class VirtualFileSystem extends VirtualFileObject {
 	/**
 	* Directory structure and meta data
 	**/
-	protected MetaTable directories = null;
+	protected DataTable directories = null;
 
 	/**
 	* Actual data files
 	**/
-	protected MetaTable files = null;
+	protected DataTable files = null;
 
 	/**
 	* Constructor with Directory, and file table
@@ -35,7 +35,7 @@ public class VirtualFileSystem extends VirtualFileObject {
 	* @param Directory table
 	* @param File table
 	**/
-	public VirtualFileSystem(MetaTable inDirectory, MetaTable inFile) {
+	public VirtualFileSystem(DataTable inDirectory, DataTable inFile) {
 		super();
 
 		// The meta table involved
@@ -60,14 +60,14 @@ public class VirtualFileSystem extends VirtualFileObject {
 	// 	}
 	//
 	// 	// The meta object to fetch
-	// 	MetaObject mObj = null;
+	// 	DataObject mObj = null;
 	//
-	// 	mObj = getDirectoryMetaObject(parentID, pathName);
+	// 	mObj = getDirectoryDataObject(parentID, pathName);
 	// 	if( mObj != null ) {
 	// 		return new VirtualFileObject(this, mObj, "DIRECTORY");
 	// 	}
 	//
-	// 	mObj = getFileMetaObject(parentID, pathName);
+	// 	mObj = getFileDataObject(parentID, pathName);
 	// 	if ( mObj != null ) {
 	// 		return new VirtualFileObject(this, mObj, "FILE");
 	// 	}

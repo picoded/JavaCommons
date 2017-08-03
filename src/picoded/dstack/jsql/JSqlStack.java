@@ -36,8 +36,8 @@ public class JSqlStack extends Core_CommonStack {
 	* @return  The CommonStructure that was initialized
 	**/
 	public CommonStructure initializeStructure(String type, String name) {
-		if ("MetaTable".equalsIgnoreCase(type)) {
-			return new JSql_MetaTable(sqlConn, name);
+		if ("DataTable".equalsIgnoreCase(type)) {
+			return new JSql_DataTable(sqlConn, name);
 		} else if ("KeyValueMap".equalsIgnoreCase(type)) {
 			return new JSql_KeyValueMap(sqlConn, name);
 		} else if ("AtomicLongMap".equalsIgnoreCase(type)) {

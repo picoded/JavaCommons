@@ -8,9 +8,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import picoded.dstack.MetaTable;
-import picoded.dstack.MetaObject;
-import picoded.dstack.core.Core_MetaTable;
+import picoded.dstack.DataTable;
+import picoded.dstack.DataObject;
+import picoded.dstack.core.Core_DataTable;
 import picoded.security.NxtCrypt;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
@@ -19,11 +19,11 @@ import picoded.set.JSqlType;
 import picoded.conv.ListValueConv;
 
 /**
-* JSql implmentation of MetaTable
+* JSql implmentation of DataTable
 *
 * Due to how complex this class is, it has been split apart into multiple sub classes
 **/
-public class JSql_MetaTable extends Core_MetaTable {
+public class JSql_DataTable extends Core_DataTable {
 
 	//--------------------------------------------------------------------------
 	//
@@ -52,7 +52,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 	* @param   JSQL connection
 	* @param   Table name to use
 	**/
-	public JSql_MetaTable(JSql inJSql, String tablename) {
+	public JSql_DataTable(JSql inJSql, String tablename) {
 		super();
 		sqlObj = inJSql;
 		baseTableName = "MB_"+tablename;
@@ -315,21 +315,21 @@ public class JSql_MetaTable extends Core_MetaTable {
 
 	//--------------------------------------------------------------------------
 	//
-	// Internal functions, used by MetaObject
+	// Internal functions, used by DataObject
 	//
 	//--------------------------------------------------------------------------
 
 	/**
 	* [Internal use, to be extended in future implementation]
 	*
-	* Removes the complete remote data map, for MetaObject.
+	* Removes the complete remote data map, for DataObject.
 	* This is used to nuke an entire object
 	*
 	* @param  Object ID to remove
 	*
 	* @return  nothing
 	**/
-	protected void metaObjectRemoteDataMap_remove(String oid) {
+	protected void DataObjectRemoteDataMap_remove(String oid) {
 		// Delete the data
 		sqlObj.delete(
 			dataTableName,
@@ -346,22 +346,22 @@ public class JSql_MetaTable extends Core_MetaTable {
 	}
 
 	/**
-	* Gets the complete remote data map, for MetaObject.
+	* Gets the complete remote data map, for DataObject.
 	* Returns null if not exists
 	**/
-	protected Map<String, Object> metaObjectRemoteDataMap_get(String _oid) {
-		return JSql_MetaTableUtils.JSqlObjectMapFetch(sqlObj, dataTableName, _oid, null);
+	protected Map<String, Object> DataObjectRemoteDataMap_get(String _oid) {
+		return JSql_DataTableUtils.JSqlObjectMapFetch(sqlObj, dataTableName, _oid, null);
 	}
 
 	/**
-	* Updates the actual backend storage of MetaObject
+	* Updates the actual backend storage of DataObject
 	* either partially (if supported / used), or completely
 	**/
-	protected void metaObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap,
+	protected void DataObjectRemoteDataMap_update(String _oid, Map<String, Object> fullMap,
 		Set<String> keys) {
 
 		// Curent timestamp
-		long now = JSql_MetaTableUtils.getCurrentTimestamp();
+		long now = JSql_DataTableUtils.getCurrentTimestamp();
 
 		// Ensure GUID is registered
 		sqlObj.upsert( //
@@ -376,7 +376,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 		);
 
 		// Does the data append
-		JSql_MetaTableUtils.JSqlObjectMapAppend(sqlObj, dataTableName, _oid, fullMap, keys, true);
+		JSql_DataTableUtils.JSqlObjectMapAppend(sqlObj, dataTableName, _oid, fullMap, keys, true);
 	}
 
 	//--------------------------------------------------------------------------
@@ -408,7 +408,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 	//--------------------------------------------------------------------------
 
 	/**
-	* Performs a search query, and returns the respective MetaObjects
+	* Performs a search query, and returns the respective DataObjects
 	*
 	* CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
 	* @TODO: Performs the search pattern using the respective type map
@@ -419,19 +419,19 @@ public class JSql_MetaTable extends Core_MetaTable {
 	* @param   offset of the result to display, use -1 to ignore
 	* @param   number of objects to return max
 	*
-	* @return  The MetaObject[] array
+	* @return  The DataObject[] array
 	**/
 	@Override
-	public MetaObject[] query(String whereClause, Object[] whereValues, String orderByStr,
+	public DataObject[] query(String whereClause, Object[] whereValues, String orderByStr,
 		int offset, int limit) {
-		return JSql_MetaTableUtils.metaTableQuery(this, sqlObj, dataTableName, whereClause,
+		return JSql_DataTableUtils.DataTableQuery(this, sqlObj, dataTableName, whereClause,
 			whereValues, orderByStr, offset, limit);
 		//return super.query( whereClause, whereValues, orderByStr, offset, limit );
 	}
 
 	/*
 
-	* Performs a search query, and returns the respective MetaObjects keys
+	* Performs a search query, and returns the respective DataObjects keys
 	*
 	* CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
 	* @TODO: Performs the search pattern using the respective type map
@@ -446,12 +446,12 @@ public class JSql_MetaTable extends Core_MetaTable {
 	@Override
 	public String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr,
 		int offset, int limit) {
-		return JSql_MetaTableUtils.metaTableQueryKey(this, sqlObj, dataTableName, whereClause,
+		return JSql_DataTableUtils.DataTableQueryKey(this, sqlObj, dataTableName, whereClause,
 			whereValues, orderByStr, offset, limit);
 		//return super.query( whereClause, whereValues, orderByStr, offset, limit );
 	}
 
-	* Performs a search query, and returns the respective MetaObjects
+	* Performs a search query, and returns the respective DataObjects
 	*
 	* @param   where query statement
 	* @param   where clause values array
@@ -459,7 +459,7 @@ public class JSql_MetaTable extends Core_MetaTable {
 	* @returns  The total count for the query
 	@Override
 	public long queryCount(String whereClause, Object[] whereValues) {
-		return JSql_MetaTableUtils.metaTableCount(this, sqlObj, dataTableName, whereClause,
+		return JSql_DataTableUtils.DataTableCount(this, sqlObj, dataTableName, whereClause,
 			whereValues, null, -1, -1);
 	}
 

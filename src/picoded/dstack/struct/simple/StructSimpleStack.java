@@ -30,8 +30,8 @@ public class StructSimpleStack extends Core_CommonStack {
 	* @return  The CommonStructure that was initialized
 	**/
 	public CommonStructure initializeStructure(String type, String name) {
-		if ("MetaTable".equalsIgnoreCase(type)) {
-			return new StructSimple_MetaTable();
+		if ("DataTable".equalsIgnoreCase(type)) {
+			return new StructSimple_DataTable();
 		} else if ("KeyValueMap".equalsIgnoreCase(type)) {
 			return new StructSimple_KeyValueMap();
 		} else if ("AtomicLongMap".equalsIgnoreCase(type)) {

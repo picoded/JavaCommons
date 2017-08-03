@@ -22,7 +22,7 @@ import picoded.dstack.jsql.*;
 import picoded.dstack.jsql.connector.*;
 import picoded.dstack.struct.simple.*;
 
-public class JSql_MetaTable_test extends StructSimple_MetaTable_test {
+public class JSql_DataTable_test extends StructSimple_DataTable_test {
 
 	// To override for implementation
 	//-----------------------------------------------------
@@ -35,8 +35,8 @@ public class JSql_MetaTable_test extends StructSimple_MetaTable_test {
 	}
 
 	/// Impomentation constructor for SQL
-	public MetaTable implementationConstructor() {
-		return new JSql_MetaTable( jsqlConnection(), TestConfig.randomTablePrefix() );
+	public DataTable implementationConstructor() {
+		return new JSql_DataTable( jsqlConnection(), TestConfig.randomTablePrefix() );
 	}
 	
 }

@@ -16,13 +16,13 @@ import picoded.struct.query.*;
 import picoded.dstack.*;
 
 /**
-* Common base utility class of MetaTable
+* Common base utility class of DataTable
 *
 * Does not actually implement its required feature,
 * but helps provide a common base line for all the various implementation.
 **/
-abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObject> implements
-	MetaTable {
+abstract public class Core_DataTable extends Core_DataStructure<String, DataObject> implements
+	DataTable {
 
 	//--------------------------------------------------------------------------
 	//
@@ -56,20 +56,20 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	/**
 	* Utility funciton, used to sort and limit the result of a query
 	*
-	* @param   list of MetaObject to sort and return
+	* @param   list of DataObject to sort and return
 	* @param   query string to sort the order by, use null to ignore
 	* @param   offset of the result to display, use -1 to ignore
 	* @param   number of objects to return max
 	*
-	* @return  The MetaObject list to return
+	* @return  The DataObject list to return
 	**/
-	public static List<MetaObject> sortAndOffsetList(List<MetaObject> retList, String orderByStr,
+	public static List<DataObject> sortAndOffsetList(List<DataObject> retList, String orderByStr,
 		int offset, int limit) {
 
 		// Sorting the order, if needed
 		if (orderByStr != null && (orderByStr = orderByStr.trim()).length() > 0) {
 			// Creates the order by sorting, with _oid
-			OrderBy<MetaObject> sorter = new OrderBy<MetaObject>(orderByStr + " , _oid");
+			OrderBy<DataObject> sorter = new OrderBy<DataObject>(orderByStr + " , _oid");
 
 			// Sort it
 			Collections.sort(retList, sorter);
@@ -81,7 +81,7 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 
 			// Out of bound, return blank
 			if (offset >= size) {
-				return new ArrayList<MetaObject>();
+				return new ArrayList<DataObject>();
 			}
 
 			// Ensures the upper end does not go out of bound
@@ -95,37 +95,37 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 
 			// // Out of range
 			// if (end <= offset) {
-			// 	return new MetaObject[0];
+			// 	return new DataObject[0];
 			// }
 
 			// Get sublist
 			retList = retList.subList(offset, end);
 		}
 
-		// Returns the list, you can easily convert to an array via "toArray(new MetaObject[0])"
+		// Returns the list, you can easily convert to an array via "toArray(new DataObject[0])"
 		return retList;
 	}
 
 	//--------------------------------------------------------------------------
 	//
-	// MetaObject removal
+	// DataObject removal
 	//
 	//--------------------------------------------------------------------------
 
 	/**
-	* Removes a metaobject if it exists, from the DB
+	* Removes a DataObject if it exists, from the DB
 	*
-	* @param  object GUID to fetch, OR the MetaObject itself
+	* @param  object GUID to fetch, OR the DataObject itself
 	*
 	* @return NULL
 	**/
-	public MetaObject remove(Object key) {
-			if( key instanceof MetaObject ) {
-				// Removal via MetaObject itself
-				metaObjectRemoteDataMap_remove( ((MetaObject)key)._oid() );
+	public DataObject remove(Object key) {
+			if( key instanceof DataObject ) {
+				// Removal via DataObject itself
+				DataObjectRemoteDataMap_remove( ((DataObject)key)._oid() );
 			} else {
 				// Remove using the ID
-				metaObjectRemoteDataMap_remove(key.toString());
+				DataObjectRemoteDataMap_remove(key.toString());
 			}
 			return null;
 	}
@@ -133,18 +133,18 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	/**
 	* [Internal use, to be extended in future implementation]
 	*
-	* Removes the complete remote data map, for MetaObject.
+	* Removes the complete remote data map, for DataObject.
 	* This is used to nuke an entire object
 	*
 	* @param Object ID to remove
 	*
 	* @return nothing
 	**/
-	abstract protected void metaObjectRemoteDataMap_remove(String oid);
+	abstract protected void DataObjectRemoteDataMap_remove(String oid);
 
 	//--------------------------------------------------------------------------
 	//
-	// Functions, used by MetaObject
+	// Functions, used by DataObject
 	// [Internal use, to be extended in future implementation]
 	//
 	//--------------------------------------------------------------------------
@@ -152,26 +152,26 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	/**
 	* [Internal use, to be extended in future implementation]
 	*
-	* Gets the complete remote data map, for MetaObject.
+	* Gets the complete remote data map, for DataObject.
 	* This is used to get the raw map data from the backend.
 	*
 	* @param  Object ID to get
 	*
-	* @return  The raw Map object to build the MetaObject, null if does not exists
+	* @return  The raw Map object to build the DataObject, null if does not exists
 	**/
-	abstract protected Map<String, Object> metaObjectRemoteDataMap_get(String oid);
+	abstract protected Map<String, Object> DataObjectRemoteDataMap_get(String oid);
 
 	/**
 	* [Internal use, to be extended in future implementation]
 	*
-	* Updates the actual backend storage of MetaObject
+	* Updates the actual backend storage of DataObject
 	* either partially (if supported / used), or completely
 	*
 	* @param   Object ID to get
 	* @param   The full map of data. This is required as not all backend implementations allow partial update
 	* @param   Keys to update, this is used to optimize certain backends
 	**/
-	abstract protected void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
+	abstract protected void DataObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
 		Set<String> keys);
 
 	//--------------------------------------------------------------------------
@@ -182,7 +182,7 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	//--------------------------------------------------------------------------
 
 	/**
-	* Performs a search query, and returns the respective MetaObject keys.
+	* Performs a search query, and returns the respective DataObject keys.
 	*
 	* This is the GUID key varient of query, this is critical for stack lookup
 	*
@@ -197,13 +197,13 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	public String[] query_id(String whereClause, Object[] whereValues, String orderByStr,
 		int offset, int limit) {
 
-		// The return list of MetaObjects
-		List<MetaObject> retList = null;
+		// The return list of DataObjects
+		List<DataObject> retList = null;
 
 		// Setup the query, if needed
 		if (whereClause == null) {
 			// Null gets all
-			retList = new ArrayList<MetaObject>(this.values());
+			retList = new ArrayList<DataObject>(this.values());
 		} else {
 			// Performs a search query
 			Query queryObj = Query.build(whereClause, whereValues);
@@ -232,38 +232,38 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	* @param   offset of the result to display, use -1 to ignore
 	* @param   number of objects to return max
 	*
-	* @return  The MetaObject[] array
+	* @return  The DataObject[] array
 	**/
-	public MetaObject[] getFromKeyName(String keyName, String orderByStr, int offset, int limit) {
+	public DataObject[] getFromKeyName(String keyName, String orderByStr, int offset, int limit) {
 
 		// The return list
-		List<MetaObject> retList = new ArrayList<MetaObject>();
+		List<DataObject> retList = new ArrayList<DataObject>();
 
 		// Iterate the list, add if containsKey
-		for (MetaObject obj : values()) {
+		for (DataObject obj : values()) {
 			if (obj.containsKey(keyName)) {
 				retList.add(obj);
 			}
 		}
 
 		// Sort, offset, convert to array, and return
-		return sortAndOffsetList(retList, orderByStr, offset, limit).toArray(new MetaObject[0]);
+		return sortAndOffsetList(retList, orderByStr, offset, limit).toArray(new DataObject[0]);
 	}
 
 	//--------------------------------------------------------------------------
 	//
-	// MetaObject operations
+	// DataObject operations
 	//
 	//--------------------------------------------------------------------------
 
 	/**
 	* Generates a new blank object, with a GUID
 	*
-	* @return the MetaObject
+	* @return the DataObject
 	**/
-	public MetaObject newObject() {
+	public DataObject newObject() {
 		// Generating a new object
-		MetaObject ret = new Core_MetaObject(this, null, null, false);
+		DataObject ret = new Core_DataObject(this, null, null, false);
 
 		// Baking in _createTime stamp
 		ret.put("_createTime", currentSystemTimeInSeconds());
@@ -273,44 +273,44 @@ abstract public class Core_MetaTable extends Core_DataStructure<String, MetaObje
 	}
 
 	/**
-	* Get a MetaObject, and returns it. Skips existance checks if required
+	* Get a DataObject, and returns it. Skips existance checks if required
 	*
 	* @param  object GUID to fetch
 	* @param  boolean used to indicate if an existance check is done for the request
 	*
-	* @return the MetaObject
+	* @return the DataObject
 	**/
-	public MetaObject get(String oid, boolean isUnchecked) {
+	public DataObject get(String oid, boolean isUnchecked) {
 		if (isUnchecked) {
-			return new Core_MetaObject(this, oid, null, false);
+			return new Core_DataObject(this, oid, null, false);
 		} else {
 			return get(oid);
 		}
 	}
 
 	/**
-	* Get a MetaObject, and returns it.
+	* Get a DataObject, and returns it.
 	*
 	* Existance checks is performed for such requests
 	*
 	* @param  object GUID to fetch
 	*
-	* @return the MetaObject, null if not exists
+	* @return the DataObject, null if not exists
 	**/
-	public MetaObject get(Object oid) {
+	public DataObject get(Object oid) {
 		// String oid
 		String soid = (oid != null) ? oid.toString() : null;
 
 		// Get remote data map
-		Map<String, Object> fullRemote = metaObjectRemoteDataMap_get(soid);
+		Map<String, Object> fullRemote = DataObjectRemoteDataMap_get(soid);
 
 		// Return null, if there is no data
 		if (fullRemote == null) {
 			return null;
 		}
 
-		// Return a Metaobject
-		return new Core_MetaObject(this, soid, fullRemote, true);
+		// Return a DataObject
+		return new Core_DataObject(this, soid, fullRemote, true);
 	}
 
 	//--------------------------------------------------------------------------

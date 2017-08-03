@@ -14,12 +14,12 @@ import picoded.dstack.*;
 import picoded.dstack.core.*;
 
 /**
-* Reference implementation of MetaTable data structure.
+* Reference implementation of DataTable data structure.
 * This is done via a minimal implementation via internal data structures.
 *
-* Built ontop of the Core_MetaTable implementation.
+* Built ontop of the Core_DataTable implementation.
 **/
-public class StructSimple_MetaTable extends Core_MetaTable {
+public class StructSimple_DataTable extends Core_DataTable {
 
 	//--------------------------------------------------------------------------
 	//
@@ -74,21 +74,21 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 
 	//--------------------------------------------------------------------------
 	//
-	// Internal functions, used by MetaObject
+	// Internal functions, used by DataObject
 	//
 	//--------------------------------------------------------------------------
 
 	/**
 	* [Internal use, to be extended in future implementation]
 	*
-	* Removes the complete remote data map, for MetaObject.
+	* Removes the complete remote data map, for DataObject.
 	* This is used to nuke an entire object
 	*
 	* @param  Object ID to remove
 	*
 	* @return  nothing
 	**/
-	protected void metaObjectRemoteDataMap_remove(String oid) {
+	protected void DataObjectRemoteDataMap_remove(String oid) {
 		try {
 			accessLock.writeLock().lock();
 			valueMap.remove(oid);
@@ -99,10 +99,10 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	}
 
 	/**
-	* Gets the complete remote data map, for MetaObject.
+	* Gets the complete remote data map, for DataObject.
 	* Returns null if not exists
 	**/
-	protected Map<String, Object> metaObjectRemoteDataMap_get(String oid) {
+	protected Map<String, Object> DataObjectRemoteDataMap_get(String oid) {
 		try {
 			accessLock.readLock().lock();
 			Map<String, Object> storedValue = valueMap.get(oid);
@@ -120,10 +120,10 @@ public class StructSimple_MetaTable extends Core_MetaTable {
 	}
 
 	/**
-	* Updates the actual backend storage of MetaObject
+	* Updates the actual backend storage of DataObject
 	* either partially (if supported / used), or completely
 	**/
-	protected void metaObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
+	protected void DataObjectRemoteDataMap_update(String oid, Map<String, Object> fullMap,
 		Set<String> keys) {
 		try {
 			accessLock.writeLock().lock();

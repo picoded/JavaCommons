@@ -97,18 +97,18 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	*
 	* Note: Consider this the "PRIMARY TABLE"
 	*
-	* MetaTable<AccountOID, MetaObject>
+	* DataTable<AccountOID, DataObject>
 	**/
-	protected MetaTable accountMetaTable = null;
+	protected DataTable accountDataTable = null;
 
 	/**
 	* Account private infromation
 	* which by default, is not retrivable by the API
 	* used more for internal variables
 	*
-	* MetaTable<AccountOID, MetaObject>
+	* DataTable<AccountOID, DataObject>
 	**/
-	protected MetaTable accountPrivateMetaTable = null;
+	protected DataTable accountPrivateDataTable = null;
 
 	//
 	// Group hirachy, and membership information
@@ -118,23 +118,23 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	/**
 	* Handles the storage of the group role mapping
 	*
-	* MetaTable<Group_guid, MetaObject<Member_guid, "[role1, role2, ...]">
+	* DataTable<Group_guid, DataObject<Member_guid, "[role1, role2, ...]">
 	**/
-	protected MetaTable memberRolesTable = null;
+	protected DataTable memberRolesTable = null;
 
 	/**
 	* Handles the storage of the group child meta information
 	*
-	* MetaTable<GroupOID-AccountOID, MetaObject>
+	* DataTable<GroupOID-AccountOID, DataObject>
 	**/
-	protected MetaTable memberMetaTable = null;
+	protected DataTable memberDataTable = null;
 
 	/**
 	* Handles the storage of the group child private meta information
 	*
-	* MetaTable<GroupOID-AccountOID, MetaObject>
+	* DataTable<GroupOID-AccountOID, DataObject>
 	**/
-	protected MetaTable memberPrivateMetaTable = null;
+	protected DataTable memberPrivateDataTable = null;
 
 	//
 	// Login throttling information
@@ -259,13 +259,13 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		sessionNextTokenMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_NEXT_TOKEN);
 
 		// Account meta information
-		accountMetaTable = stack.getMetaTable(name + SUFFIX_ACCOUNT_META);
-		accountPrivateMetaTable = stack.getMetaTable(name + SUFFIX_MEMBER_PRIVATE_META);
+		accountDataTable = stack.getDataTable(name + SUFFIX_ACCOUNT_META);
+		accountPrivateDataTable = stack.getDataTable(name + SUFFIX_MEMBER_PRIVATE_META);
 
 		// Group hirachy, and membership information
-		memberRolesTable = stack.getMetaTable(name + SUFFIX_MEMBER_ROLE);
-		memberMetaTable = stack.getMetaTable(name + SUFFIX_MEMBER_META);
-		memberPrivateMetaTable = stack.getMetaTable(name + SUFFIX_MEMBER_PRIVATE_META);
+		memberRolesTable = stack.getDataTable(name + SUFFIX_MEMBER_ROLE);
+		memberDataTable = stack.getDataTable(name + SUFFIX_MEMBER_META);
+		memberPrivateDataTable = stack.getDataTable(name + SUFFIX_MEMBER_PRIVATE_META);
 
 		// Login throttling information
 		loginThrottlingAttemptMap = stack.getAtomicLongMap(name + ACCOUNT_LOGIN_THROTTLING_ATTEMPT);
@@ -279,8 +279,8 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		return Arrays.asList(
 			accountLoginIdMap, accountAuthMap,
 			sessionInfoMap, sessionTokenMap, sessionNextTokenMap,
-			accountMetaTable, accountPrivateMetaTable,
-			memberRolesTable, memberMetaTable, memberPrivateMetaTable,
+			accountDataTable, accountPrivateDataTable,
+			memberRolesTable, memberDataTable, memberPrivateDataTable,
 			loginThrottlingAttemptMap, loginThrottlingExpiryMap
 		);
 	}
@@ -310,7 +310,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	* @return  TRUE of account ID exists
 	**/
 	public boolean containsKey(Object oid) {
-		return accountMetaTable.containsKey(oid);
+		return accountDataTable.containsKey(oid);
 	}
 
 	/**
@@ -362,9 +362,9 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	public AccountObject remove(Object inOid) {
 		if (inOid != null) {
 
-			// Alternatively, instead of string use MetaObject
-			if( inOid instanceof MetaObject ) {
-				inOid = ((MetaObject)inOid)._oid();
+			// Alternatively, instead of string use DataObject
+			if( inOid instanceof DataObject ) {
+				inOid = ((DataObject)inOid)._oid();
 			}
 
 			// Get oid as a string, and fetch the account object
@@ -404,8 +404,8 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 			}
 			// Remove account meta information
 			accountLoginIdMap.remove(oid);
-			accountPrivateMetaTable.remove(oid);
-			accountMetaTable.remove(oid);
+			accountPrivateDataTable.remove(oid);
+			accountDataTable.remove(oid);
 
 
 			// Remove login authentication details
@@ -525,14 +525,14 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	* @return  Set of account oid's
 	**/
 	public Set<String> keySet() {
-		return accountMetaTable.keySet();
+		return accountDataTable.keySet();
 	}
 
-	/// Returns the accountMetaTable
+	/// Returns the accountDataTable
 	///
-	/// @return accountMetaTable
-	public MetaTable accountMetaTable(){
-		return accountMetaTable;
+	/// @return accountDataTable
+	public DataTable accountDataTable(){
+		return accountDataTable;
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -1025,7 +1025,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		role = role.toLowerCase();
 
 		// Returns if it exists
-		MetaObject groupObject = accountPrivateMetaTable.get(group_oid);
+		DataObject groupObject = accountPrivateDataTable.get(group_oid);
 		if ( groupObject == null ) {
 			return false;
 		}
@@ -1101,7 +1101,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		for(int idx = 0; idx < insideGroupAny.length; idx++) {
 			query = "";
 		}
-		MetaObject[] metaObjs = accountMetaTable.query(null, null, "oID", 0, 0); //initial query just to get everything out so i can filter
+		DataObject[] metaObjs = accountDataTable.query(null, null, "oID", 0, 0); //initial query just to get everything out so i can filter
 
 		if (metaObjs == null) {
 			return null;
@@ -1110,7 +1110,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 		boolean doGroupCheck = (insideGroupAny != null && insideGroupAny.length > 0);
 		boolean doRoleCheck = (hasRoleAny != null && hasRoleAny.length > 0);
 
-		for (MetaObject metaObj : metaObjs) {
+		for (DataObject metaObj : metaObjs) {
 			AccountObject ao = get(metaObj._oid());
 
 			if (ao == null) {

@@ -8,7 +8,7 @@ import picoded.file.FileUtil;
 import picoded.conv.*;
 
 /**
-* VirtualFileObject using MetaTable implmentation
+* VirtualFileObject using DataTable implmentation
 * This replicates most of the file system requirements of Uilicious workspace
 *
 * This represents a single file / folder
@@ -29,7 +29,7 @@ public class VirtualFileObject {
 	/**
 	* The file / folder meta object
 	**/
-	protected MetaObject mObj = null;
+	protected DataObject mObj = null;
 
 	/**
 	* File object mode
@@ -49,10 +49,10 @@ public class VirtualFileObject {
 	* Avoid direct constructor use.
 	*
 	* @param   Original file system
-	* @param   MetaObject representing either a file or folder
-	* @param   MetaObject type, being either a "FILE" or "FOLDER"
+	* @param   DataObject representing either a file or folder
+	* @param   DataObject type, being either a "FILE" or "FOLDER"
 	**/
-	protected VirtualFileObject(VirtualFileSystem inVFS, MetaObject inMObj, String inType) {
+	protected VirtualFileObject(VirtualFileSystem inVFS, DataObject inMObj, String inType) {
 		vfs = inVFS;
 		mObj = inMObj;
 		type = inType;
@@ -114,13 +114,13 @@ public class VirtualFileObject {
 	}
 
 	/**
-	* Extract various names from an array of MetaObject
+	* Extract various names from an array of DataObject
 	*
 	* @param   array of meta objects
 	*
 	* @return   String array of names, or null (if array is null)
 	**/
-	protected String[] extractMetaObjectNames(MetaObject[] inObjs) {
+	protected String[] extractDataObjectNames(DataObject[] inObjs) {
 		// Null safety check
 		if(inObjs == null) {
 			return null;
@@ -136,12 +136,12 @@ public class VirtualFileObject {
 
 	//--------------------------------------------------------------------------
 	//
-	// MetaObject helper functions
+	// DataObject helper functions
 	//
 	//--------------------------------------------------------------------------
 
 	/**
-	* Fetch the metaobject given the directoryName and parent object
+	* Fetch the DataObject given the directoryName and parent object
 	* if it exists, else return null
 	*
 	* @param   The parent GUID, null defaults to ROOT
@@ -149,14 +149,14 @@ public class VirtualFileObject {
 	*
 	* @return  The Directory meta object, if it exsits
 	**/
-	protected MetaObject getDirectoryMetaObject(String parentID, String directoryName) {
+	protected DataObject getDirectoryDataObject(String parentID, String directoryName) {
 		// Normalize the parent ID
 		if (parentID == null) {
 			parentID = "ROOT";
 		}
 
 		//checking if the Directory already exists
-		MetaObject[] directoryList = vfs.directories.query("parentID = ? AND name = ?",
+		DataObject[] directoryList = vfs.directories.query("parentID = ? AND name = ?",
 		new String[] { parentID,directoryName });
 
 		// Gets the Directory meta object
@@ -167,7 +167,7 @@ public class VirtualFileObject {
 	}
 
 	/**
-	* Fetch the metaobject given the directoryName and parent object
+	* Fetch the DataObject given the directoryName and parent object
 	* if it exists, else return null
 	*
 	* @param   The parent GUID, null defaults to ROOT
@@ -175,14 +175,14 @@ public class VirtualFileObject {
 	*
 	* @return  The file meta object, if it exists
 	**/
-	protected MetaObject getFileMetaObject(String parentID, String fileName) {
+	protected DataObject getFileDataObject(String parentID, String fileName) {
 		// Normalize the parent ID
 		if (parentID == null) {
 			parentID = "ROOT";
 		}
 
 		//checking if the file already exists
-		MetaObject[] fileList = vfs.files.query(
+		DataObject[] fileList = vfs.files.query(
 			"parentID = ? AND name = ?",
 			new String[] { parentID, fileName }
 		);
@@ -245,7 +245,7 @@ public class VirtualFileObject {
 	* @return  List of files
 	**/
 	public String[] listFileNames() {
-		return extractMetaObjectNames(
+		return extractDataObjectNames(
 			vfs.files.query("parentID = ?", new String[] { getDirectoryID() })
 		);
 	};
@@ -258,7 +258,7 @@ public class VirtualFileObject {
 	**/
 
 	public String[] listDirectoryNames() {
-		return extractMetaObjectNames(
+		return extractDataObjectNames(
 			vfs.directories.query("parentID = ?", new String[] { getDirectoryID() })
 		);
 	};
@@ -305,36 +305,36 @@ public class VirtualFileObject {
 			throw new RuntimeException("Function does not support nested directories (yet)");
 		}
 
-		// Get the file MetaObject, or generates a new one if needed.
-		MetaObject newMetaObject = null;
+		// Get the file DataObject, or generates a new one if needed.
+		DataObject newDataObject = null;
 
 		// The parentID to use
 		String parentID = getDirectoryID();
 
 		// Get an exisitng file object
-		newMetaObject = getFileMetaObject( parentID, splitPath[0] );
-		if(newMetaObject != null) {
+		newDataObject = getFileDataObject( parentID, splitPath[0] );
+		if(newDataObject != null) {
 			throw new RuntimeException("There already is a file with this name");
 		}
 
 		// Get an exisisting folder object
-		newMetaObject = getDirectoryMetaObject( parentID , splitPath[0]);
-		if(newMetaObject != null) {
+		newDataObject = getDirectoryDataObject( parentID , splitPath[0]);
+		if(newDataObject != null) {
 			throw new RuntimeException("There already is a folder with this name");
 		}
 
 		// Else create a new file
-		if(newMetaObject == null) {
-			newMetaObject = vfs.files.newObject();
+		if(newDataObject == null) {
+			newDataObject = vfs.files.newObject();
 		}
 
 		// Save required information
-		newMetaObject.put("parentID", parentID);
-		newMetaObject.put("name", splitPath[0]);
-		newMetaObject.saveDelta();
+		newDataObject.put("parentID", parentID);
+		newDataObject.put("name", splitPath[0]);
+		newDataObject.saveDelta();
 
 		// Generate the return object
-		VirtualFileObject ret = new VirtualFileObject(vfs, newMetaObject, "FILE");
+		VirtualFileObject ret = new VirtualFileObject(vfs, newDataObject, "FILE");
 
 		// There is data to save
 		if( data != null ) {
@@ -366,15 +366,15 @@ public class VirtualFileObject {
 		String parentID = getDirectoryID();
 
 		// Get an exisitng file object
-		MetaObject newMetaObject = getFileMetaObject( parentID, splitPath[0] );
+		DataObject newDataObject = getFileDataObject( parentID, splitPath[0] );
 
 		// Return null, if no file obj
-		if( newMetaObject == null ) {
+		if( newDataObject == null ) {
 			return null;
 		}
 
 		// Generate the return object
-		return new VirtualFileObject(vfs, newMetaObject, "FILE");
+		return new VirtualFileObject(vfs, newDataObject, "FILE");
 	}
 
 	/**
@@ -395,7 +395,7 @@ public class VirtualFileObject {
 		String parentID = getDirectoryID();
 
 		//Get the exisiting file
-	 	MetaObject fileToDelete = getFileMetaObject(parentID , splitPath[0]);
+	 	DataObject fileToDelete = getFileDataObject(parentID , splitPath[0]);
 
 		if(fileToDelete != null) {
 			vfs.files.remove( fileToDelete._oid() );
@@ -420,7 +420,7 @@ public class VirtualFileObject {
 		String parentID = getDirectoryID();
 
 		//Get the exisiting file
-      MetaObject fileToMove = getFileMetaObject(parentID , splitPath[0]);
+      DataObject fileToMove = getFileDataObject(parentID , splitPath[0]);
 
 		if(fileToMove != null) {
 			fileToMove.put("name" , newPathName);
@@ -456,36 +456,36 @@ public class VirtualFileObject {
 			throw new RuntimeException("Function does not support nested directories(yet)");
 		}
 
-		// Get the folder MetaObject, or generates a new one if needed.
-		MetaObject newMetaObject = null;
+		// Get the folder DataObject, or generates a new one if needed.
+		DataObject newDataObject = null;
 
 		// The parentID to use
 		String parentID = getDirectoryID();
 
 		// Get an exisitng directory object
-		newMetaObject = getDirectoryMetaObject( parentID, splitPath[0] );
-		if(newMetaObject != null) {
+		newDataObject = getDirectoryDataObject( parentID, splitPath[0] );
+		if(newDataObject != null) {
 			throw new RuntimeException("The folder name already exixts");
 		}
 
 		// Get an exisisting file object
-		newMetaObject = getFileMetaObject( parentID , splitPath[0]);
-		if(newMetaObject != null) {
+		newDataObject = getFileDataObject( parentID , splitPath[0]);
+		if(newDataObject != null) {
 			throw new RuntimeException("This name already exists for a file");
 		}
 
 		// Else create a new directory
-		if(newMetaObject == null) {
-			newMetaObject = vfs.directories.newObject();
+		if(newDataObject == null) {
+			newDataObject = vfs.directories.newObject();
 		}
 
 		// Save required information
-		newMetaObject.put("parentID", parentID);
-		newMetaObject.put("name", splitPath[0]);
-		newMetaObject.saveDelta();
+		newDataObject.put("parentID", parentID);
+		newDataObject.put("name", splitPath[0]);
+		newDataObject.saveDelta();
 
 		// Generate the return object
-		VirtualFileObject ret = new VirtualFileObject(vfs, newMetaObject, "DIRECTORY");
+		VirtualFileObject ret = new VirtualFileObject(vfs, newDataObject, "DIRECTORY");
 
 		// Return the VirtualFileObject
 		return ret;
@@ -511,15 +511,15 @@ public class VirtualFileObject {
 		String parentID = getDirectoryID();
 
 		// Get an exisitng file object
-		MetaObject newMetaObject = getDirectoryMetaObject( parentID, splitPath[0] );
+		DataObject newDataObject = getDirectoryDataObject( parentID, splitPath[0] );
 
 		// Return null, if no file obj
-		if( newMetaObject == null ) {
+		if( newDataObject == null ) {
 			return null;
 		}
 
 		// Generate the return object
-		return new VirtualFileObject(vfs, newMetaObject, "DIRECTORY");
+		return new VirtualFileObject(vfs, newDataObject, "DIRECTORY");
 	}
 
 	/**
@@ -591,7 +591,7 @@ public VirtualFileObject moveDirectory(String pathName , String newPathName) {
 	String parentID = getDirectoryID();
 
 	//Get the exisiting file
-	MetaObject directoryToMove = getDirectoryMetaObject(parentID , splitPath[0]);
+	DataObject directoryToMove = getDirectoryDataObject(parentID , splitPath[0]);
 
 	if(directoryToMove != null) {
 		directoryToMove.put("name" , newPathName);

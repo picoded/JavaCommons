@@ -55,8 +55,8 @@ public abstract class Core_CommonStack implements CommonStack {
 	* @return  True if the type is valid
 	**/
 	protected boolean validateStructureType(String type, CommonStructure inObj) {
-		if ("MetaTable".equalsIgnoreCase(type)) {
-			return (inObj instanceof MetaTable);
+		if ("DataTable".equalsIgnoreCase(type)) {
+			return (inObj instanceof DataTable);
 		} else if ("KeyValueMap".equalsIgnoreCase(type)) {
 			return (inObj instanceof KeyValueMap);
 		} else if ("AtomicLongMap".equalsIgnoreCase(type)) {

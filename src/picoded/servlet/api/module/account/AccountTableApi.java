@@ -230,7 +230,7 @@ public class AccountTableApi implements ApiModule {
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | accountID       | String                | account ID used                                                            |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | metaObject      | {Object}              | MetaObject representing this account                                       |
+	* | DataObject      | {Object}              | DataObject representing this account                                       |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | error           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -421,7 +421,7 @@ public class AccountTableApi implements ApiModule {
 			return res;
 		}
 
-		MetaObject groupResult = group.addNewMembershipRole(role);
+		DataObject groupResult = group.addNewMembershipRole(role);
 		res.put(RES_META, groupResult);
 		return res;
 	};
@@ -463,7 +463,7 @@ public class AccountTableApi implements ApiModule {
 			return res;
 		}
 
-		MetaObject groupResult = group.removeMembershipRole(role);
+		DataObject groupResult = group.removeMembershipRole(role);
 		if ( groupResult == null ) {
 			res.put(RES_ERROR, "No such role is found.");
 		}else{
@@ -523,7 +523,7 @@ public class AccountTableApi implements ApiModule {
 		List<List<Object>> returnList = new ArrayList<List<Object>>();
 		int listCounter = 0;
 		for ( AccountObject ao : memberobjList ) {
-			MetaObject currentGrpAOMeta = group.getMember(ao);
+			DataObject currentGrpAOMeta = group.getMember(ao);
 			returnList.add(new ArrayList<Object>());
 			for ( String column : headers ) {
 				if ( column.equalsIgnoreCase(PROPERTIES_OID) ) {
@@ -581,7 +581,7 @@ public class AccountTableApi implements ApiModule {
 				failedList.add("ID: " + userID + ", Error: " + ERROR_NO_USER);
 				continue;
 			}
-			MetaObject result = (action.equalsIgnoreCase("add")) ? group.addMember(currentUser, role) : group.removeMember(currentUser);
+			DataObject result = (action.equalsIgnoreCase("add")) ? group.addMember(currentUser, role) : group.removeMember(currentUser);
 			if ( result == null ) {
 				failedList.add("ID: " + userID + ", Error: " + actionErrorMsg);
 				continue;
@@ -707,7 +707,7 @@ public class AccountTableApi implements ApiModule {
 			return res;
 		}
 
-		MetaObject groupResult = (role != null) ? group.getMember(ao, role) : group.getMember(ao);
+		DataObject groupResult = (role != null) ? group.getMember(ao, role) : group.getMember(ao);
 		if ( groupResult == null ) {
 			res.put(RES_ERROR, ERROR_NOT_IN_GROUP_OR_ROLE);
 		}else{
@@ -766,7 +766,7 @@ public class AccountTableApi implements ApiModule {
 			res.put(RES_ERROR, ERROR_NO_GROUP);
 			return res;
 		}
-		MetaObject currentMemberMeta = group.getMember(ao);
+		DataObject currentMemberMeta = group.getMember(ao);
 		if ( currentMemberMeta == null ) {
 			res.put(RES_ERROR, ERROR_NOT_IN_GROUP_OR_ROLE);
 			return res;
@@ -938,7 +938,7 @@ public class AccountTableApi implements ApiModule {
 			queryArgs = queryArgsList.toArray(new String[queryArgsList.size()]);
 		}
 
-		MetaTable mtObj = table.accountMetaTable();
+		DataTable mtObj = table.accountDataTable();
 
 		//put back into response
 		res.put(RES_DRAW, draw);
@@ -1404,39 +1404,39 @@ public class AccountTableApi implements ApiModule {
 		return ret;
 	}
 
-	private static List<List<Object>> list_GET_and_POST_inner(AccountTable _metaTableObj, int draw, int start,
+	private static List<List<Object>> list_GET_and_POST_inner(AccountTable _DataTableObj, int draw, int start,
 	int length, String[] headers, String query, String[] queryArgs, String orderBy, String[] insideGroup_any,
 	String[] hasGroupRole_any, String groupStatus, boolean sanitiseOutput) throws RuntimeException {
 
 		List<List<Object>> ret = new ArrayList<List<Object>>();
 
-		if (_metaTableObj == null) {
+		if (_DataTableObj == null) {
 			return ret;
 		}
 
 		try {
 			if (headers != null && headers.length > 0) {
-				MetaObject[] metaObjs = null;
+				DataObject[] metaObjs = null;
 				AccountObject[] fullUserArray = null;
 
 				if ((insideGroup_any == null || insideGroup_any.length == 0)
 					&& (hasGroupRole_any == null || hasGroupRole_any.length == 0)) {
 					//do normal query
-					MetaTable accountMetaTable = _metaTableObj.accountMetaTable();
+					DataTable accountDataTable = _DataTableObj.accountDataTable();
 
-					if (accountMetaTable == null) {
+					if (accountDataTable == null) {
 						return ret;
 					}
 
 					if (query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0) {
-						metaObjs = accountMetaTable.query(null, null, orderBy, start, length);
+						metaObjs = accountDataTable.query(null, null, orderBy, start, length);
 					} else {
-						metaObjs = accountMetaTable.query(query, queryArgs, orderBy, start, length);
+						metaObjs = accountDataTable.query(query, queryArgs, orderBy, start, length);
 					}
 
 					List<AccountObject> retUsers = new ArrayList<AccountObject>();
-					for (MetaObject metaObj : metaObjs) {
-						AccountObject ao = _metaTableObj.get(metaObj._oid()); //a single account
+					for (DataObject metaObj : metaObjs) {
+						AccountObject ao = _DataTableObj.get(metaObj._oid()); //a single account
 						// System.out.println(ao._oid()+" ahwejakwekawej<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 						retUsers.add(ao);
 					}
@@ -1444,7 +1444,7 @@ public class AccountTableApi implements ApiModule {
 					fullUserArray = retUsers.toArray(new AccountObject[retUsers.size()]);
 				} else {
 					//do filtered query
-					fullUserArray = _metaTableObj.getUsersByGroupAndRole(insideGroup_any, hasGroupRole_any);
+					fullUserArray = _DataTableObj.getUsersByGroupAndRole(insideGroup_any, hasGroupRole_any);
 				}
 
 				if (fullUserArray == null || fullUserArray.length == 0) {

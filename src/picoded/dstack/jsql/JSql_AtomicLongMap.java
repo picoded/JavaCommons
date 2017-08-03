@@ -8,8 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import picoded.dstack.MetaTable;
-import picoded.dstack.MetaObject;
+import picoded.dstack.DataTable;
+import picoded.dstack.DataObject;
 import picoded.dstack.core.Core_AtomicLongMap;
 import picoded.security.NxtCrypt;
 import picoded.struct.GenericConvertMap;

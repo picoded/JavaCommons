@@ -23,16 +23,16 @@ import picoded.struct.query.internal.*;
 
 /**
 * Protected class, used to orgainze the various JSql based logic
-* used in MetaTable.
+* used in DataTable.
 *
-* The larger intention is to keep the MetaTable class more maintainable and unit testable
+* The larger intention is to keep the DataTable class more maintainable and unit testable
 **/
-public class JSql_MetaTableUtils {
+public class JSql_DataTableUtils {
 
 	/**
 	* Static local logger
 	**/
-	protected static Logger LOGGER = Logger.getLogger(JSql_MetaTableUtils.class.getName());
+	protected static Logger LOGGER = Logger.getLogger(JSql_DataTableUtils.class.getName());
 
 	//--------------------------------------------------------------------------
 	//
@@ -152,7 +152,7 @@ public class JSql_MetaTableUtils {
 	*
 	* @TODO: Support array sets
 	* @TODO: Support GUID hash
-	* @TODO: Support MetaTable/Object
+	* @TODO: Support DataTable/Object
 	* @TODO: Check against configured type
 	* @TODO: Convert to configured type if possible (like numeric)
 	*
@@ -192,11 +192,11 @@ public class JSql_MetaTableUtils {
 	}
 
 	/**
-	* Takes in the JSqlResult from a MetaTable internal table query
+	* Takes in the JSqlResult from a DataTable internal table query
 	* And extract out the respective result value
 	*
 	* @TODO: Support GUID hash
-	* @TODO: Support MetaTable
+	* @TODO: Support DataTable
 	*
 	* @param  The jsql result set from a select call
 	* @param  Row position to fetch values from result
@@ -560,14 +560,14 @@ public class JSql_MetaTableUtils {
 	*
 	* @return  Order by function obj
 	**/
-	public static OrderBy<MetaObject> getOrderByObject(String rawString) {
+	public static OrderBy<DataObject> getOrderByObject(String rawString) {
 		// Clear out excess whtiespace
 		rawString = rawString.trim().replaceAll("\\s+", " ");
 		if (rawString.length() <= 0) {
 			throw new RuntimeException("Unexpected blank found in OrderBy query : " + rawString);
 		}
 
-		return new OrderBy<MetaObject>(rawString);
+		return new OrderBy<DataObject>(rawString);
 	}
 
 	// Complex query actual implementation
@@ -718,13 +718,13 @@ public class JSql_MetaTableUtils {
 	}
 
 	/**
-	* Performs a search query, and returns the respective MetaObjects information
+	* Performs a search query, and returns the respective DataObjects information
 	* This works by taking the query and its args, building its complex inner view, then querying that view.
 	*
 	* CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
 	* @TODO: Performs the search pattern using the respective type map
 	*
-	* @param   MetaTable object to refrence from
+	* @param   DataTable object to refrence from
 	* @param   JSql connection to use
 	* @param   JSql table name to use
 	* @param   The selected columns to query
@@ -737,7 +737,7 @@ public class JSql_MetaTableUtils {
 	* @return  The JSql query result
 	**/
 	protected static JSqlResult runComplexQuery( //
-		MetaTable metaTableObj, JSql sql, String tablename, String selectedCols, //
+		DataTable DataTableObj, JSql sql, String tablename, String selectedCols, //
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
 
@@ -763,7 +763,7 @@ public class JSql_MetaTableUtils {
 		Object[] queryArgs = null;
 
 		// Result ordering by
-		OrderBy<MetaObject> orderByObj = null;
+		OrderBy<DataObject> orderByObj = null;
 
 		// Building the MetaTypeMap from where request
 		Map<String,MetaType> queryTypeMap = new HashMap<String,MetaType>();
@@ -967,12 +967,12 @@ public class JSql_MetaTableUtils {
 	}
 
 	/**
-	* Performs a search query, and returns the respective MetaObjects GUID keys
+	* Performs a search query, and returns the respective DataObjects GUID keys
 	*
 	* CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
 	* @TODO: Performs the search pattern using the respective type map
 	*
-	* @param   MetaTable object to refrence from
+	* @param   DataTable object to refrence from
 	* @param   JSql connection to use
 	* @param   JSql table name to use
 	* @param   where query statement
@@ -983,14 +983,14 @@ public class JSql_MetaTableUtils {
 	*
 	* @return  The String[] array
 	**/
-	public static String[] metaTableQueryKey( //
+	public static String[] DataTableQueryKey( //
 		// The meta table / sql configs
-		MetaTable metaTableObj, JSql sql, String tablename, //
+		DataTable DataTableObj, JSql sql, String tablename, //
 		// The actual query
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
 		JSqlResult r = runComplexQuery( //
-			metaTableObj, sql, tablename, "DISTINCT \"oID\"", whereClause, whereValues, orderByStr, offset, limit);
+			DataTableObj, sql, tablename, "DISTINCT \"oID\"", whereClause, whereValues, orderByStr, offset, limit);
 		List<Object> oID_list = r.getObjectList("oID");
 		// Generate the object list
 		if (oID_list != null) {
@@ -1001,12 +1001,12 @@ public class JSql_MetaTableUtils {
 	}
 
 	/**
-	* Performs a search query, and returns the respective MetaObjects
+	* Performs a search query, and returns the respective DataObjects
 	*
 	* CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
 	* @TODO: Performs the search pattern using the respective type map
 	*
-	* @param   MetaTable object to refrence from
+	* @param   DataTable object to refrence from
 	* @param   JSql connection to use
 	* @param   JSql table name to use
 	* @param   where query statement
@@ -1015,25 +1015,25 @@ public class JSql_MetaTableUtils {
 	* @param   offset of the result to display, use -1 to ignore
 	* @param   number of objects to return max
 	*
-	* @return  The MetaObject[] array
+	* @return  The DataObject[] array
 	**/
-	public static MetaObject[] metaTableQuery( //
+	public static DataObject[] DataTableQuery( //
 		// The meta table / sql configs
-		MetaTable metaTableObj, JSql sql, String tablename, //
+		DataTable DataTableObj, JSql sql, String tablename, //
 		// The actual query
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
-		return metaTableObj.getArrayFromID(
-			metaTableQueryKey(metaTableObj, sql, tablename, whereClause, whereValues, orderByStr, offset, limit), true);
+		return DataTableObj.getArrayFromID(
+			DataTableQueryKey(DataTableObj, sql, tablename, whereClause, whereValues, orderByStr, offset, limit), true);
 	}
 
 	/**
-	* Performs a search query, and returns the respective MetaObjects
+	* Performs a search query, and returns the respective DataObjects
 	*
 	* CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
 	* @TODO: Performs the search pattern using the respective type map
 	*
-	* @param   MetaTable object to refrence from
+	* @param   DataTable object to refrence from
 	* @param   JSql connection to use
 	* @param   JSql table name to use
 	* @param   where query statement
@@ -1042,15 +1042,15 @@ public class JSql_MetaTableUtils {
 	* @param   offset of the result to display, use -1 to ignore
 	* @param   number of objects to return max
 	*
-	* @return  The MetaObject[] array
+	* @return  The DataObject[] array
 	**/
-	public static long metaTableCount( //
+	public static long DataTableCount( //
 		//
-		MetaTable metaTableObj, JSql sql, String tablename, //
+		DataTable DataTableObj, JSql sql, String tablename, //
 		//
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
-		JSqlResult r = runComplexQuery(metaTableObj, sql, tablename, "COUNT(DISTINCT \"oID\") AS rcount",
+		JSqlResult r = runComplexQuery(DataTableObj, sql, tablename, "COUNT(DISTINCT \"oID\") AS rcount",
 			whereClause, whereValues, orderByStr, offset, limit);
 
 		Object[] rcountArr = r.get("rcount");

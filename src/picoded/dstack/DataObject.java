@@ -5,12 +5,12 @@ import java.util.*;
 import picoded.struct.*;
 
 /**
-* Represents a single object node in the MetaTable collection.
+* Represents a single object node in the DataTable collection.
 * DO NOT use _underscore values, as it is a reserved namespace.
 *
-* NOTE: This class should not be initialized directly, but through MetaTable class
+* NOTE: This class should not be initialized directly, but through DataTable class
 **/
-public interface MetaObject extends GenericConvertMap<String, Object> {
+public interface DataObject extends GenericConvertMap<String, Object> {
 
 	/**
 	* @return The object ID String

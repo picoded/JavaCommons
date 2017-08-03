@@ -14,7 +14,7 @@
 * of each backend layer you deploy with. With a very strong emphasis of making it work, even at
 * a performance loss, if there are no other layers.
 *
-* No query for your MetaTable backend? no worries, we will scan ALL the objects D=
+* No query for your DataTable backend? no worries, we will scan ALL the objects D=
 *
 * However beyond that, it forms the concept of structually having a few core NoSQL data system,
 * which serves as a foundation for much much larger data persistency need.
@@ -27,7 +27,7 @@
 *
 * |------------------|----------------------------------------------------------------------|
 * | KeyValueMap      | Key to string value mapping. Used for temporary values storage       |
-* | MetaTable        | Key to object map storage, used primarily for "table" like data      |
+* | DataTable        | Key to object map storage, used primarily for "table" like data      |
 * | AtomicLongMap    | [@TODO] Key to long values where atomic consistency is required      |
 * | EventLogger      | [@TODO] Event logging and management system                          |
 * |------------------|----------------------------------------------------------------------|

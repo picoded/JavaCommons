@@ -30,7 +30,7 @@
 			//
 			// Catches all
 			"struct" : {
-				"MetaTable" : ["*"],
+				"DataTable" : ["*"],
 				"KeyValueMap" : ["*"],
 				"AccountTable" : ["*"]
 			},
@@ -70,7 +70,7 @@
 			//
 			// Catches all
 			"struct" : {
-				"MetaTable" : ["*"],
+				"DataTable" : ["*"],
 				"KeyValueMap" : ["*"],
 				"AccountTable" : ["*"]
 			}
@@ -105,7 +105,7 @@
 			// As this is the "single source of truth"
 			// It catches all the respective structures
 			"struct" : {
-				"MetaTable" : ["*"],
+				"DataTable" : ["*"],
 				"KeyValueMap" : ["*"],
 				"AccountTable" : ["*"]
 			},
@@ -142,7 +142,7 @@
 	/// Handles the various structure specific
 	/// Configuration, such as restbuilder automated setup, etc.
 	"struct" : {
-		"MetaTable" : {
+		"DataTable" : {
 
 		},
 		"KeyValueMap" : {

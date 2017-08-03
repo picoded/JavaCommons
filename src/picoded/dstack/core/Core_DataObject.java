@@ -7,14 +7,14 @@ import java.util.Map;
 import java.util.Set;
 
 // Picoded imports
-import picoded.dstack.MetaObject;
-import picoded.dstack.MetaTable;
+import picoded.dstack.DataObject;
+import picoded.dstack.DataTable;
 import picoded.conv.ConvertJSON;
 import picoded.conv.GUID;
 import picoded.set.ObjectToken;
 
 /**
-* Represents a single object node in the MetaTable collection.
+* Represents a single object node in the DataTable collection.
 *
 * This is intended, to handle local, delta, and remote data seperately.
 * Where its data layers can be visualized in the following order
@@ -23,18 +23,18 @@ import picoded.set.ObjectToken;
 * + remoteDataMap (incomplete)   - partial data map, used when only query data is needed
 * + remoteDataMap (complete)     - full data map, used when the incomplete map is insufficent
 *
-* NOTE: This class should not be initialized directly, but through MetaTable class
+* NOTE: This class should not be initialized directly, but through DataTable class
 **/
-public class Core_MetaObject implements MetaObject {
+public class Core_DataObject implements DataObject {
 
 	// Core variables
 	//----------------------------------------------
 
 	/**
-	* Core_MetaTable used for the object
+	* Core_DataTable used for the object
 	* Used to provide the underlying backend implementation
 	**/
-	protected Core_MetaTable mainTable = null;
+	protected Core_DataTable mainTable = null;
 
 	/**
 	* GUID used for the object
@@ -63,11 +63,11 @@ public class Core_MetaObject implements MetaObject {
 	//----------------------------------------------
 
 	/**
-	* Setup a MetaObject against a MetaTable backend.
+	* Setup a DataObject against a DataTable backend.
 	*
 	* This allow the setup in the following modes
 	*
-	* + No (or invalid) GUID : Assume a new MetaObject is made with NO DATA. Issues a new GUID for the object
+	* + No (or invalid) GUID : Assume a new DataObject is made with NO DATA. Issues a new GUID for the object
 	* + GUID without remote data, will pull the required data when required
 	* + GUID with complete remote data
 	* + GUID with incomplete remote data, will pull the required data when required
@@ -77,10 +77,10 @@ public class Core_MetaObject implements MetaObject {
 	* @param  Remote mapping data used (this should be modifiable)
 	* @param  is complete remote map, use false if incomplete data
 	**/
-	public Core_MetaObject(MetaTable inTable, String inOID, Map<String, Object> inRemoteData,
+	public Core_DataObject(DataTable inTable, String inOID, Map<String, Object> inRemoteData,
 		boolean isCompleteData) {
 		// Main table to use
-		mainTable = (Core_MetaTable) inTable;
+		mainTable = (Core_DataTable) inTable;
 
 		// Generates a GUID if not given
 		if (inOID == null || inOID.length() < 22) {
@@ -90,7 +90,7 @@ public class Core_MetaObject implements MetaObject {
 			}
 
 			// // D= GUID collision check for LOLZ
-			// remoteDataMap = mainTable.metaObjectRemoteDataMap_get(_oid);
+			// remoteDataMap = mainTable.DataObjectRemoteDataMap_get(_oid);
 			// if (remoteDataMap.size() > 0) {
 			// 	throw new SecurityException("GUID Collision =.= DO YOU HAVE REAL ENTROPY? : " + _oid);
 			// }
@@ -119,17 +119,17 @@ public class Core_MetaObject implements MetaObject {
 	}
 
 	/**
-	* Constructor, with metaTable and GUID (auto generated if null)
+	* Constructor, with DataTable and GUID (auto generated if null)
 	* This is the shorten version of the larger constructor
 	*
 	* @param  Meta table to use
 	* @param  GUID to use, can be null
 	**/
-	public Core_MetaObject(MetaTable inTable, String inOID) {
+	public Core_DataObject(DataTable inTable, String inOID) {
 		this(inTable, inOID, null, false);
 	}
 
-	// MetaObject ID
+	// DataObject ID
 	//----------------------------------------------
 
 	/**
@@ -147,15 +147,15 @@ public class Core_MetaObject implements MetaObject {
 	* Ensures the complete remote data map is loaded.
 	*
 	* This triggers if either the remote data is not flagged
-	* as complete, or is null, and calls from the main MetaTable
-	* via "metaObjectRemoteDataMap_get"
+	* as complete, or is null, and calls from the main DataTable
+	* via "DataObjectRemoteDataMap_get"
 	*
 	* This is mainly used when a get fails opportunistially with delta
 	* or incomplete data, and requires the actual "true" data.
 	**/
 	protected void ensureCompleteRemoteDataMap() {
 		if (remoteDataMap == null || !isCompleteRemoteDataMap) {
-			remoteDataMap = mainTable.metaObjectRemoteDataMap_get(_oid);
+			remoteDataMap = mainTable.DataObjectRemoteDataMap_get(_oid);
 			if (remoteDataMap == null) {
 				remoteDataMap = new HashMap<String, Object>();
 			}
@@ -218,7 +218,7 @@ public class Core_MetaObject implements MetaObject {
 		return value;
 	}
 
-	// MetaObject save operations
+	// DataObject save operations
 	//----------------------------------------------
 
 	/**
@@ -248,7 +248,7 @@ public class Core_MetaObject implements MetaObject {
 	@Override
 	public void saveDelta() {
 		ensureCompleteRemoteDataMap();
-		mainTable.metaObjectRemoteDataMap_update(_oid, this, deltaDataMap.keySet());
+		mainTable.DataObjectRemoteDataMap_update(_oid, this, deltaDataMap.keySet());
 		collapseDeltaToRemoteMap();
 	}
 
@@ -264,7 +264,7 @@ public class Core_MetaObject implements MetaObject {
 
 		Set<String> keySet = new HashSet<String>(deltaDataMap.keySet());
 		keySet.addAll(remoteDataMap.keySet());
-		mainTable.metaObjectRemoteDataMap_update(_oid, this, keySet);
+		mainTable.DataObjectRemoteDataMap_update(_oid, this, keySet);
 
 		collapseDeltaToRemoteMap();
 	}

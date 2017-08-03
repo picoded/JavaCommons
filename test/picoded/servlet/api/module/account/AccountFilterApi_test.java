@@ -43,7 +43,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 
 				AccountObject superUserGrp = table.newObject(table.getSuperUserGroupName());
 				superUserGrp.setMembershipRoles(table.defaultMembershipRoles());
-				MetaObject mo = superUserGrp.addMember(ao, "admin");
+				DataObject mo = superUserGrp.addMember(ao, "admin");
 			}
 			return ret;
 		}

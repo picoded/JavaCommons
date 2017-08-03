@@ -14,7 +14,7 @@ import static picoded.servlet.api.module.account.Account_Strings.*;
 /**
 * Represents a single group / user account.
 **/
-public class AccountObject extends Core_MetaObject {
+public class AccountObject extends Core_DataObject {
 
 	///////////////////////////////////////////////////////////////////////////
 	//
@@ -34,7 +34,7 @@ public class AccountObject extends Core_MetaObject {
 	* and the account GUID
 	**/
 	protected AccountObject(AccountTable accTable, String inOID) {
-		super((Core_MetaTable) (accTable.accountMetaTable), inOID);
+		super((Core_DataTable) (accTable.accountDataTable), inOID);
 		mainTable = accTable;
 	}
 
@@ -276,7 +276,7 @@ public class AccountObject extends Core_MetaObject {
 	* the most recently generated token.
 	*
 	* Additionally info object is INTENTIONALLY NOT stored as a
-	* MetaObject, for performance reasons.
+	* DataObject, for performance reasons.
 	*
 	* @param  Meta information map associated with the session,
 	*         a blank map is assumed if not provided.
@@ -580,12 +580,12 @@ public class AccountObject extends Core_MetaObject {
 	/**
 	* Gets the cached child map
 	**/
-	protected MetaObject _group_userToRoleMap = null;
+	protected DataObject _group_userToRoleMap = null;
 
 	/**
 	* Gets the child map (cached?)
 	**/
-	protected MetaObject group_userToRoleMap() {
+	protected DataObject group_userToRoleMap() {
 		if (_group_userToRoleMap != null) {
 			return _group_userToRoleMap;
 		}
@@ -604,21 +604,21 @@ public class AccountObject extends Core_MetaObject {
 	* Gets and returns the member meta map, if it exists
 	* Only returns if member exists, else null
 	**/
-	public MetaObject getMember(AccountObject memberObject) {
+	public DataObject getMember(AccountObject memberObject) {
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
 		if (level == null || level.length() <= 0) {
 			return null;
 		}
 		// true = uncheckedGet
-		return mainTable.memberMetaTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
+		return mainTable.memberDataTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
 	}
 
 	/**
 	* Gets and returns the member meta map, if it exists
 	* Only returns if member exists and matches role, else null
 	**/
-	public MetaObject getMember(AccountObject memberObject, String role) {
+	public DataObject getMember(AccountObject memberObject, String role) {
 		role = mainTable.validateMembershipRole(this._oid(), role);
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
@@ -626,7 +626,7 @@ public class AccountObject extends Core_MetaObject {
 			return null;
 		}
 		// true = uncheckedGet
-		return mainTable.memberMetaTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
+		return mainTable.memberDataTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
 	}
 
 	/**
@@ -634,7 +634,7 @@ public class AccountObject extends Core_MetaObject {
 	*
 	* Returns the group-member unique meta object, null if previously exists
 	**/
-	public MetaObject addMember(AccountObject memberObject, String role) {
+	public DataObject addMember(AccountObject memberObject, String role) {
 		// Gets the existing object, if exists terminates
 		if (getMember(memberObject) != null) {
 			return null;
@@ -648,14 +648,14 @@ public class AccountObject extends Core_MetaObject {
 	*
 	* Returns the group-member unique meta object
 	**/
-	public MetaObject setMember(AccountObject memberObject, String role) {
+	public DataObject setMember(AccountObject memberObject, String role) {
 		role = mainTable.validateMembershipRole(this._oid(), role);
 		if ( role == null ) {
 			return null;
 		}
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
-		MetaObject childMeta = null;
+		DataObject childMeta = null;
 
 		if (level == null || !level.equals(role)) {
 
@@ -666,18 +666,18 @@ public class AccountObject extends Core_MetaObject {
 			group_userToRoleMap().saveDelta();
 
 			// true = uncheckedGet
-			childMeta = mainTable.memberMetaTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
+			childMeta = mainTable.memberDataTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
 			childMeta.put(PROPERTIES_ROLE, role);
 			childMeta.saveDelta();
 		} else {
 			// true = uncheckedGet
-			childMeta = mainTable.memberMetaTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
+			childMeta = mainTable.memberDataTable.get(AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
 		}
 		return childMeta;
 	}
 
 
-	public MetaObject removeMember(AccountObject memberObject) {
+	public DataObject removeMember(AccountObject memberObject) {
 		if (!this.isGroup()) {
 			return this;
 		}
@@ -690,8 +690,8 @@ public class AccountObject extends Core_MetaObject {
 		group_userToRoleMap().remove(memberOID);
 		group_userToRoleMap().saveAll();
 
-		mainTable.memberMetaTable.remove(AccountTable.getGroupChildMetaKey(this._oid(), memberOID));
-		mainTable.memberPrivateMetaTable.remove(AccountTable.getGroupChildMetaKey(this._oid(), memberOID));
+		mainTable.memberDataTable.remove(AccountTable.getGroupChildMetaKey(this._oid(), memberOID));
+		mainTable.memberPrivateDataTable.remove(AccountTable.getGroupChildMetaKey(this._oid(), memberOID));
 		System.out.println("Remove member called successfully");
 
 		return memberObject;
@@ -728,16 +728,16 @@ public class AccountObject extends Core_MetaObject {
 
 	// Group Configuration
 	// -------------------------------------------------------------------------
-	protected MetaObject _group_membershipRoles = null;
+	protected DataObject _group_membershipRoles = null;
 
-	public MetaObject group_membershipRoles(){
+	public DataObject group_membershipRoles(){
 		if (_group_membershipRoles != null ) {
 			return _group_membershipRoles;
 		}
-		return (_group_membershipRoles = mainTable.accountPrivateMetaTable.get(this._oid(), true));
+		return (_group_membershipRoles = mainTable.accountPrivateDataTable.get(this._oid(), true));
 	}
 
-	public MetaObject addNewMembershipRole(String role) {
+	public DataObject addNewMembershipRole(String role) {
 		List<String> currentRoles = group_membershipRoles().getList(PROPERTIES_MEMBERSHIP_ROLE, "[]");
 		if ( currentRoles.contains(role) ){
 			return group_membershipRoles();
@@ -746,7 +746,7 @@ public class AccountObject extends Core_MetaObject {
 		return setMembershipRoles(currentRoles);
 	}
 
-	public MetaObject setMembershipRoles(List<String> roles) {
+	public DataObject setMembershipRoles(List<String> roles) {
 		this.setGroupStatus(true);
 		_group_membershipRoles = null;
 		if ( !roles.contains("admin") )
@@ -756,7 +756,7 @@ public class AccountObject extends Core_MetaObject {
 		return group_membershipRoles();
 	}
 
-	public MetaObject removeMembershipRole(String role) {
+	public DataObject removeMembershipRole(String role) {
 		List<String> currentRoles = group_membershipRoles().getList(PROPERTIES_MEMBERSHIP_ROLE, "[]");
 		if (!currentRoles.contains(role)){
 			return null;

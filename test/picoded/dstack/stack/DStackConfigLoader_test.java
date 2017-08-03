@@ -36,7 +36,7 @@ public class DStackConfigLoader_test{
 		assertNotNull(dstack);
 
 		// Generate a table object, to force stack validation
-		dstack.getMetaTable("test");
+		dstack.getDataTable("test");
 	}
 
 	@Test
@@ -44,7 +44,7 @@ public class DStackConfigLoader_test{
 		DStack dstack = DStackConfigLoader.generateDStack( getTestConfigFile("singleLayerJSql.json"));
 		assertNotNull(dstack);
 		// Generate a table object, to force stack validation
-		dstack.getMetaTable("test");
+		dstack.getDataTable("test");
 	}
 
 

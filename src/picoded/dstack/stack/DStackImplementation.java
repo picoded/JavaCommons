@@ -23,7 +23,7 @@ import org.apache.commons.lang3.RandomUtils;
 *
 * The design principle is based on the prototyping experience for mmObjDB, and the original servlet-commons implementation of metaTables.
 **/
-public class DStack_Stack extends Core_CommonStack {
+public class DStackImplementation extends Core_CommonStack {
 
 	//-----------------------------------------------------------
 	//
@@ -39,7 +39,7 @@ public class DStack_Stack extends Core_CommonStack {
 	/**
 	* Blank constructor
 	**/
-	public DStack_Stack() {
+	public DStackImplementation() {
 		//
 	}
 
@@ -48,16 +48,25 @@ public class DStack_Stack extends Core_CommonStack {
 	*
 	* @param  A single stack implementation
 	**/
-	public DStack_Stack(CommonStack single) {
+	public DStackImplementation(CommonStack single) {
 		_stackLayers.add(single);
+		validateStackLayers();
 	}
 
 	/**
 	* DStack setup with a list of stack
 	* @param A list of stacks
 	**/
-	public DStack_Stack(List<CommonStack> list) {
+	public DStackImplementation(List<CommonStack> list) {
 		_stackLayers.addAll(list);
+		validateStackLayers();
+	}
+
+	/**
+	 * Validates the internal stacklayers, throw an exception if not valid
+	 */
+	protected void validateStackLayers() {
+		// @TODO : Actually validate
 	}
 
 	//-----------------------------------------------------------

@@ -22,8 +22,32 @@ import org.apache.commons.lang3.RandomUtils;
 *
 * The design principle is based on the prototyping experience for mmObjDB, and the original servlet-commons implementation of metaTables.
 *
-* See stack/DStack_Stack for actual details
+* See stack/DStackImplementation for actual details
 **/
-public class DStack extends DStack_Stack {
+public class DStack extends DStackImplementation {
+
+	/**
+	* Blank constructor
+	**/
+	public DStack() {
+		super();
+	}
+
+	/**
+	* DStack setup with a single stack node
+	*
+	* @param  A single stack implementation
+	**/
+	public DStack(CommonStack single) {
+		super(single);
+	}
+
+	/**
+	* DStack setup with a list of stack
+	* @param A list of stacks
+	**/
+	public DStack(List<CommonStack> list) {
+		super(list);
+	}
 
 }

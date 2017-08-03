@@ -1,0 +1,9 @@
+[
+	{
+		// Name for custom stack layer loading
+		"name" : "LocalSessionCache",
+
+		// Data stack type
+		"type" : "StructSimple"
+	}
+]

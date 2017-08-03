@@ -1,6 +1,7 @@
 package picoded.servlet.util;
 
 import static org.junit.Assert.*;
+import org.junit.*;
 
 import java.io.*;
 import java.net.*;
@@ -9,8 +10,6 @@ import java.nio.file.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
-
-import org.junit.*;
 
 import picoded.TestConfig;
 import picoded.conv.*;

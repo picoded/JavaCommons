@@ -331,6 +331,13 @@
 			<src path="${src-test}"/>
 			<exclude name="**/package-info.java"/>
 		</javac>
+
+		<copy todir="${build-classes}" verbose="true">
+			<fileset dir="src/">
+				<include name="**/*.js"/>
+				<exclude name="**/*.java"/>
+			</fileset>
+		</copy>
 	</target>
 
 	<!-- **************************************************

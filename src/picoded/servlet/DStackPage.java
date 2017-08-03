@@ -51,7 +51,7 @@ import picoded.dstack.jsql.connector.JSql;
  * ##[TODO]
  *  + unit tests
  */
-public class StackPage extends CorePage {
+public class DStackPage extends CorePage {
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -198,18 +198,19 @@ public class StackPage extends CorePage {
 
 		// Gets the JStack configuration, and use it (if exists)
 		//---------------------------------------------------------------
-		List<Object> stackOptions = jc.getObjectList("sys.JStack.stack", null);
+		List<Object> stackOptions = jc.getObjectList("sys.DStack.stack", null);
 		if (stackOptions !=null)
 			for(Object stackOption : stackOptions)
 				System.out.println(ConvertJSON.fromObject(stackOption)+ " awjkehakjwehjkawe");
+		if(stackOptions == null || stackOptions.size() <= 0){
+			System.out.println("---JStackPage -> loadConfiguredJStackLayers -> stackOptions is null or empty---");
+		}
 		return null;
-		// if(stackOptions == null || stackOptions.size() <= 0){
-		// 	System.out.println("---JStackPage -> loadConfiguredJStackLayers -> stackOptions is null or empty---");
-		// }
-		//
 		// ret = JStackUtils.stackConfigLayersToJStackLayers(stackOptions, getWebInfPath());
 		// if (ret != null) {
 		// 	return ret;
+		// } else {
+		// 	throw new RuntimeException("Unable to configure DStack");
 		// }
 
 		// Else falls back to legacy support
@@ -251,8 +252,8 @@ public class StackPage extends CorePage {
 	@Override
 	public void initializeContext() throws Exception {
 		super.initializeContext();
-
-		boolean skipSystemSetup = DConfig().getBoolean("sys.JStack.skipSystemSetup", false);
+		System.out.println("cool shit happens");
+		boolean skipSystemSetup = DConfig().getBoolean("sys.DStack.skipSystemSetup", false);
 		if (!skipSystemSetup) {
 			// DStack().systemSetup();
 			DStack();

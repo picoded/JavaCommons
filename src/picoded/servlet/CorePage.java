@@ -83,7 +83,7 @@ import picoded.servlet.util.FileServlet;
  * ## [TODO]
  * + Websocket support?
 **/
-public class CorePage extends javax.servlet.http.HttpServlet {
+public class CorePage extends javax.servlet.http.HttpServlet implements ServletContextListener {
 
 	///////////////////////////////////////////////////////
 	//

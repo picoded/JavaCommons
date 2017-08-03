@@ -11,6 +11,8 @@ import picoded.dstack.*;
 // import picoded.JSql.*;
 
 import picoded.dstack.jsql.connector.JSql;
+import picoded.dstack.DStack;
+import picoded.dstack.stack.DStackConfigLoader;
 
 /**
  * Extends the corePage functionality, and implements file directory listing, JStack usage, and config files
@@ -101,119 +103,27 @@ public class DStackPage extends CorePage {
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
-	// JStack auto load handling
+	// DStack auto load handling
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected DStack DStackObj = null;
 
-	/// Generates the JSQL layer given the config namespace
-	///
-	/// @TODO : To Deprecate after full roll out of sys.JStack.stack config
-	protected JSql JSqlLayerFromConfig(String profileNameSpace) {
-
-		// Gets the configuration setup
-		DConfig jc = DConfig();
-
-		// Gets the config vars
-		String engine = jc.getString(profileNameSpace + ".engine", "");
-		String path = jc.getString(profileNameSpace + ".path", "");
-		String username = jc.getString(profileNameSpace + ".username", "");
-		String password = jc.getString(profileNameSpace + ".password", "");
-		String database = jc.getString(profileNameSpace + ".database", "");
-
-		// Default fallback on sqlite engine, if the profileNameSpace is default
-		// This is used to ensure existing test cases do not break
-		if (profileNameSpace.equalsIgnoreCase("sys.dataStack.JSqlOnly.sqlite")) {
-			if (engine.length() <= 0) {
-				engine = "sqlite";
-			}
-			if (path.length() <= 0) {
-				path = getWebInfPath() + "/sqlite.db";
-			}
-		}
-
-		// SQLite implmentation
-		if (engine.equalsIgnoreCase("sqlite")) {
-			if (path.length() <= 0) {
-				throw new RuntimeException("Unsupported " + profileNameSpace + ".path: " + path);
-			}
-
-			// Replaces WEB-INF path
-			path = path.replace("./WEB-INF/", getWebInfPath());
-			path = path.replace("${WEB-INF}", getWebInfPath());
-
-			// Generates the sqlite connection with the path
-			return JSql.sqlite(path);
-		// } else if (engine.equalsIgnoreCase("mssql")) {
-		// 	return JSql.mssql(path, database, username, password);
-		} else if (engine.equalsIgnoreCase("mysql")) {
-			return JSql.mysql(path, database, username, password);
-		// } else if (engine.equalsIgnoreCase("oracle")) {
-		// 	return JSql.oracle(path, username, password);
-		} else {
-			throw new RuntimeException("Unsupported " + profileNameSpace + ".engine: " + engine);
-		}
-	}
-
-	// /// Loads the configurations from JStack, and setup the respective JStackLayers
-	// ///
-	// /// @TODO: Support JStackLayers jsons config
-	protected List<CommonStack> loadConfiguredJStackLayers() {
-
-		// Gets the configuration setup
-		DConfig jc = DConfig();
-		List<CommonStack> ret = null;
-
-		// Gets the JStack configuration, and use it (if exists)
-		//---------------------------------------------------------------
-		List<Object> stackOptions = jc.getObjectList("sys.DStack.stack", null);
-		if (stackOptions !=null)
-			for(Object stackOption : stackOptions)
-				System.out.println(ConvertJSON.fromObject(stackOption)+ " awjkehakjwehjkawe");
-		if(stackOptions == null || stackOptions.size() <= 0){
-			System.out.println("---JStackPage -> loadConfiguredJStackLayers -> stackOptions is null or empty---");
-		}
-		return null;
-		// ret = JStackUtils.stackConfigLayersToJStackLayers(stackOptions, getWebInfPath());
-		// if (ret != null) {
-		// 	return ret;
-		// } else {
-		// 	throw new RuntimeException("Unable to configure DStack");
-		// }
-
-		// Else falls back to legacy support
-		//---------------------------------------------------------------
-	//
-	// 	// Gets the profile name and type
-	// 	String profileName = jc.getString("sys.dataStack.selected.profile.name", "JSqlOnly.sqlite");
-	// 	String profileType = jc.getString("sys.dataStack.selected.profile.type", "JSql");
-	//
-	// 	if (profileType.equalsIgnoreCase("JSql")) {
-	// 		return new JStackLayer[] { JSqlLayerFromConfig("sys.dataStack." + profileName) };
-	// 	} else {
-	// 		throw new RuntimeException("Unsupported sys.dataStack.selected.profile.type: " + profileType);
-	// 	}
-	}
-
 	////////////////////////////////////////////////////
 	// tableSetup calls for various jSql based modules
 	////////////////////////////////////////////////////
 
-	/// Returns the JStack object
-	/// @TODO Actual JStack config loading, now it just loads a blank sqlite file =(
+	/**
+	 * Returns the DStack if exists, else generate and return
+	 * 
+	 * @return  the DStack object
+	 */
 	public DStack DStack() {
 		if (DStackObj != null) {
 			return DStackObj;
 		}
-
-		// Load the JStack object
-		loadConfiguredJStackLayers();
-		// DStackObj = new DStack(loadConfiguredJStackLayers());
-
-		// And preload the tables
-		// JStackUtils.preloadJStruct(DStackObj, DConfig().getStringMap("sys.JStack.struct", null));
-
+		List<Object> stackConfig = DConfig().getObjectList("sys.DStack.stack", null);
+		DStackObj = DStackConfigLoader.generateDStack(stackConfig);
 		return DStackObj;
 	}
 
@@ -221,10 +131,8 @@ public class DStackPage extends CorePage {
 	@Override
 	public void initializeContext() throws Exception {
 		super.initializeContext();
-		System.out.println("cool shit happens");
 		boolean skipSystemSetup = DConfig().getBoolean("sys.DStack.skipSystemSetup", false);
 		if (!skipSystemSetup) {
-			// DStack().systemSetup();
 			DStack();
 		} else {
 			System.out.println("Skipping systemSetup in JStackPage");

@@ -52,6 +52,14 @@ public class DStack_Stack extends Core_CommonStack {
 		_stackLayers.add(single);
 	}
 
+	/**
+	* DStack setup with a list of stack
+	* @param A list of stacks
+	**/
+	public DStack_Stack(List<CommonStack> list) {
+		_stackLayers.addAll(list);
+	}
+
 	//-----------------------------------------------------------
 	//
 	// Stack management

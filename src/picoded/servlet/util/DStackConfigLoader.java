@@ -36,7 +36,11 @@ public class DStackConfigLoader {
     }
   }
 
-  // public static DStack generateDStack ( String config ) {
-  //
-  // }
+  public static DStack generateDStack ( List<Object> stackOptions ) {
+    DStack dstack = new DStack();
+    for ( Object stackOption : stackOptions ) {
+      CommonStack stack = configStringToCommonStack(ConvertJSON.fromObject(stackOption));
+
+    }
+  }
 }

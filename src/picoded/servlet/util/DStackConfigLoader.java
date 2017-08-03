@@ -1,5 +1,8 @@
 package picoded.servlet.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import picoded.dstack.DStack;
 import picoded.dstack.jsql.JSqlStack;
 import picoded.dstack.jsql.connector.JSql;
@@ -37,10 +40,12 @@ public class DStackConfigLoader {
   }
 
   public static DStack generateDStack ( List<Object> stackOptions ) {
-    DStack dstack = new DStack();
+    List<CommonStack> _stackLayers = new ArrayList<>();
     for ( Object stackOption : stackOptions ) {
       CommonStack stack = configStringToCommonStack(ConvertJSON.fromObject(stackOption));
-
+      _stackLayers.add(stack);
     }
+    DStack dstack = new DStack(_stackLayers);
+    return dstack;
   }
 }

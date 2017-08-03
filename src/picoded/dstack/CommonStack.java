@@ -19,6 +19,20 @@ public interface CommonStack extends CommonStructure {
 
 	//----------------------------------------------------------------
 	//
+	//  CommonStack naming API
+	//
+	//----------------------------------------------------------------
+
+	/**
+	 * Get its configured name value
+	 * @return  name value (as a string)
+	 */
+	default String getName() {
+		return configMap().getString("name");
+	}
+
+	//----------------------------------------------------------------
+	//
 	//  Get the various DStack structure
 	//
 	//----------------------------------------------------------------

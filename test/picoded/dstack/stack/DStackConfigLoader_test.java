@@ -35,6 +35,7 @@ public class DStackConfigLoader_test{
 		DStack dstack = DStackConfigLoader.generateDStack( getTestConfigFile("singleLayerDStruct.json"));
 		assertNotNull(dstack);
 
+		// Generate a table object, to force stack validation
 		dstack.getMetaTable("test");
 	}
 

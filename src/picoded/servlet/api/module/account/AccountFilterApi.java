@@ -89,12 +89,12 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	};
 	// Check password complexity
 	protected ApiFunction check_password = (req, res) -> {
-		String passwordRegex = "(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])", password = "";
+		String passwordRegex = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,})", password = "";
 		Pattern p = Pattern.compile(passwordRegex);
 		String[] passwordList = new String[]{Account_Strings.REQ_PASSWORD, Account_Strings.REQ_NEW_PASSWORD, Account_Strings.REQ_REPEAT_PASSWORD};
 		for ( String password_string : passwordList ) {
-			Matcher m = p.matcher(password);
 			password = req.getString(password_string, "");
+			Matcher m = p.matcher(password);
 			if ( !password.isEmpty() && !m.matches()) {
 				res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_PASSWORD_COMPLEXITY);
 				return res;

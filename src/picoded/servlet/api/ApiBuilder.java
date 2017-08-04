@@ -4,8 +4,11 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.io.*;
 
+import picoded.servlet.*;
 import picoded.servlet.api.internal.HaltException;
+import picoded.servlet.api.internal.ApiBuilderJS;
 import picoded.struct.UnsupportedDefaultMap;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
@@ -13,7 +16,7 @@ import picoded.conv.ConvertJSON;
 
 import static picoded.servlet.api.module.account.Account_Strings.*;
 
-import picoded.servlet.*;
+
 
 /**
 * ApiBuilder is a utility class, in which facilitates the building of modern JSON pure API's.
@@ -556,7 +559,6 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 			if ( filterEndpoints != null ) {
 				ApiResponse filterResponse = null;
 				for ( BiFunction<ApiRequest, ApiResponse, ApiResponse> filterPoint : filterEndpoints ) {
-					// System.out.println("filterPoint applying + <<<<<<<<<<<<<<<<<");
 					filterResponse = filterPoint.apply( reqObj, resObj );
 					if ( filterResponse != null && filterResponse.get(RES_ERROR) != null ) {
 						resObj = filterResponse;
@@ -671,6 +673,15 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 
 	//-------------------------------------------------------------------
 	//
+	// API JS Handling
+	//
+	//-------------------------------------------------------------------
+	protected String getApiJS(String servername, int port){
+		return ApiBuilderJS.generateApiJs(this, "//" + servername + ":" + port + "");
+	}
+
+	//-------------------------------------------------------------------
+	//
 	// Servlet processing
 	//
 	//-------------------------------------------------------------------
@@ -692,34 +703,38 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 		// Setup
 		ApiRequest req = setupApiRequest(inCore);
 		ApiResponse res = new ApiResponse(this);
-
+		int[] intV = new int[]{majorVersion, minorVersion};
 		// Setup the ApiBuidler corePageServlet : for reuse if needed
 		if( corePageServlet == null ) {
 			corePageServlet = inCore;
 		}
 		if( path.length > 1 && path[0].matches("^v\\d+\\.\\d+$") ) {
 			String[] versions = path[0].substring(1).split("\\.");
-			int[] intV = new int[versions.length];
+			intV = new int[versions.length];
 			for ( int idx = 0; idx < versions.length; idx++ )
 				intV[idx] = Integer.parseInt(versions[idx]);
 
+			// Remove the versioning
 			if ( path.length > 1)
 				path = Arrays.copyOfRange(path, 1, path.length);
-			if( !isValidPath(intV[0], intV[1], String.join(".", path)) ) {
-				//Invalid path, terminate
-				res.put("ERROR", "Unknown API request endpoint");
-				res.put("INFO", "Requested path : "+String.join(".", path));
-				return res;
-			}
-		} else {
-			// Invalid API error without Version
-			if( !isValidPath(String.join(".", path)) ) {
-				//Invalid path, terminate
-				res.put("ERROR", "Unknown API request endpoint");
-				res.put("INFO", "Requested path : "+String.join(".", path));
-				return res;
-			}
+
 		}
+		// Check if it is calling API JS
+		if( path.length >= 1 && path[0].equalsIgnoreCase("api.js") ) {
+			inCore.getHttpServletResponse().setContentType("text/javascript");
+			PrintWriter output = inCore.getWriter();
+			output.println(getApiJS(inCore.getServerName(), inCore.getServerPort()));
+			return null;
+		}
+
+		// If it is invalid path with or without versioning
+		if( !isValidPath(String.join(".", path)) && !isValidPath(intV[0], intV[1], String.join(".", path)) ) {
+			//Invalid path, terminate
+			res.put("ERROR", "Unknown API request endpoint");
+			res.put("INFO", "Requested path : "+String.join(".", path));
+			return res;
+		}
+
 
 
 		try {

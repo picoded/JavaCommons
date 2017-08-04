@@ -44,8 +44,8 @@ public class DStackPage extends CoreApiPage {
 			return DConfigObj;
 		}
 
-		if ((new File(getConfigsPath())).exists()) {
-			DConfigObj = new DConfig(getConfigsPath());
+		if ((new File(getConfigPath())).exists()) {
+			DConfigObj = new DConfig(getConfigPath());
 		} else {
 			DConfigObj = new DConfig();
 		}
@@ -67,7 +67,7 @@ public class DStackPage extends CoreApiPage {
 
 	/**
 	 * Returns the DStack if exists, else generate and return
-	 * 
+	 *
 	 * @return  the DStack object
 	 */
 	public DStack DStack() {

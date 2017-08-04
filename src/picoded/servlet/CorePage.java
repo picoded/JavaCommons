@@ -275,6 +275,17 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 	//-------------------------------------------
 
 	/**
+	* Gets the server name
+	*/
+	public String getServerName() {
+		return httpRequest.getServerName();
+	}
+
+	public int getServerPort() {
+		return httpRequest.getServerPort();
+	}
+
+	/**
 	* Gets the server requestURI
 	**/
 	public String requestURI() {

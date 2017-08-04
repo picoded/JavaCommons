@@ -159,6 +159,14 @@ public class CoreApiPage extends CorePage {
 	/////////////////////////////////////////////
 
 	/**
+	 * API namespace to check for, to assume JSON request
+	 * 
+	 * If this is null, or "" blank, all request is assumed to be for the APIBuilder
+	 * @TODO : Actual support
+	 */
+	public String apiNamespace = "api";
+
+	/**
 	* Set the request mode to JSON, for API page
 	**/
 	@Override

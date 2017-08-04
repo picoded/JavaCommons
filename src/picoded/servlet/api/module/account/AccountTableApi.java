@@ -154,14 +154,17 @@ public class AccountTableApi implements ApiModule {
 			res.put(RES_IS_LOGIN, true);
 			res.put(RES_REMEMBER_ME, rememberMe);
 			res.put(RES_ACCOUNT_ID, ao._oid());
-
+			// Extract Common Info from user account object
+			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
+			res.putAll(commonInfo);
+			// Extract hostURL from user account object
+			res.put("hostURL", ao.get("hostURL"));
 			// loginID, as a list - as set does not gurantee sorting, a sort is done for the list for alphanumeric
 			List<String> loginIDList = new ArrayList<String>(ao.getLoginIDSet());
 			Collections.sort(loginIDList);
 
 			// Return the loginIDList
 			res.put(RES_LOGIN_ID_LIST, loginIDList);
-			ao = table.getRequestUser(req.getHttpServletRequest(), null);
 		} else {
 			// Legitimate user but wrong password
 			if ( ao != null ){
@@ -1325,12 +1328,13 @@ public class AccountTableApi implements ApiModule {
 			commonInfo.put("isGroup", account.isGroup());
 			Map<String, List<Map<String, Object>>> groupMap = new HashMap<String, List<Map<String, Object>>>();
 			AccountObject[] groups = account.getGroups();
+			// Check if any groups exist for the member
 			if (groups != null) {
 				List<Map<String, Object>> groupList = new ArrayList<Map<String, Object>>();
 				for (AccountObject group : groups) {
 					Map<String, Object> newGroup = new HashMap<String, Object>();
 					newGroup.put("groupID", group._oid());
-					//extracting group names and sanitising if needed
+					// Extracting group names and sanitising if needed
 					Set<String> groupNames = group.getLoginIDSet();
 					if (sanitiseOutput) {
 						groupNames.clear();
@@ -1348,6 +1352,7 @@ public class AccountTableApi implements ApiModule {
 					role = ( role == null ) ? "" : role;
 					boolean isAdmin = role.equalsIgnoreCase("admin") || role.equalsIgnoreCase("superuser");
 					newGroup.put("isAdmin", isAdmin);
+					// Check if is group admin
 					if (isAdmin) {
 						commonInfo.replace("isAnyGroupAdmin", true);
 					}

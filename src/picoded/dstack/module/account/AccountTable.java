@@ -277,7 +277,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 		// Return it as a list
 		return Arrays.asList(
-			accountLoginIdMap, accountAuthMap,
+			accountLoginIdMap, accountAuthMap, sessionLinkMap,
 			sessionInfoMap, sessionTokenMap, sessionNextTokenMap,
 			accountDataTable, accountPrivateDataTable,
 			memberRolesTable, memberDataTable, memberPrivateDataTable,

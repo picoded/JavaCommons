@@ -160,22 +160,27 @@ public class CoreApiPage extends CorePage {
 
 	/**
 	 * API namespace to check for, to assume JSON request
-	 * 
+	 *
 	 * If this is null, or "" blank, all request is assumed to be for the APIBuilder
 	 * @TODO : Actual support
 	 */
-	public String apiNamespace = "api";
+	protected String apiNamespace = "api";
 
 	/**
 	* Set the request mode to JSON, for API page
 	**/
 	@Override
 	public boolean isJsonRequest() {
+		// null apiNamespace bypass
+		if(apiNamespace == null || apiNamespace.isEmpty()) {
+			return true;
+		}
+
 		// Gets the wildcard URI
 		String[] wildcardUri = requestWildcardUriArray();
 
 		// Indicates its API for API page
-		if (wildcardUri != null && wildcardUri.length >= 1 && wildcardUri[0].equalsIgnoreCase("api")) {
+		if (wildcardUri != null && wildcardUri.length >= 1 && wildcardUri[0].equalsIgnoreCase(apiNamespace)) {
 			return true;
 		}
 
@@ -192,31 +197,31 @@ public class CoreApiPage extends CorePage {
 		// Gets the wildcard URI
 		String[] wildcardUri = requestWildcardUriArray();
 
+		ApiResponse ret = null;
+		// null apiNamespace bypass
+		if(apiNamespace == null || apiNamespace.isEmpty()) {
+			apiBuilder().servletExecute(this, wildcardUri);
+		}
+
 		// Does the API call
 		if (wildcardUri.length >= 1 && (wildcardUri[0].equalsIgnoreCase("api"))) {
-
-			// Prepare data
-			String apiPath = String.join(".", Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length));
 
 			// @TODO : Consider integrating template data (CorePage) with context data (ApiBuilder)
 
 			// Does actual execution
-			ApiResponse ret = apiBuilder().servletExecute(this, Arrays.copyOfRange(wildcardUri,1, wildcardUri.length));
+			ret = apiBuilder().servletExecute(this, Arrays.copyOfRange(wildcardUri,1, wildcardUri.length));
+		}
 
-			// There is valid return data
-			if( ret != null ) {
-				outputData.putAll(ret);
-				return super.outputJSON(outputData, templateData, output);
-			}
-
-			// If the statement hits here, an unexpected error occur where there is no response from apiBuilder
-			// Fails the return
-			outputData.put("ERROR", "Fatal unexpected missing output from apiBuilder");
+		// There is valid return data
+		if( ret != null ) {
+			outputData.putAll(ret);
 			return super.outputJSON(outputData, templateData, output);
 		}
 
+		// If the statement hits here, an unexpected error occur where there is no response from apiBuilder
 		// Fails the return
-		return false;
+		outputData.put("ERROR", "Fatal unexpected missing output from apiBuilder");
+		return super.outputJSON(outputData, templateData, output);
 	}
 
 }

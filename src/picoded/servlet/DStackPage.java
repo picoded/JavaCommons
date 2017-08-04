@@ -85,25 +85,10 @@ public class DStackPage extends CoreApiPage {
 		super.initializeContext();
 		boolean skipSystemSetup = DConfig().getBoolean("sys.DStack.skipSystemSetup", false);
 		if (!skipSystemSetup) {
-			DStack();
+			DStack().systemSetup();
 		} else {
 			System.out.println("Skipping systemSetup in JStackPage");
 		}
-	}
-
-	/// JStack.disposeStackLayers only if it was initialized
-	public void DStack_disposeStackLayers() throws Exception {//JStackException {
-		if (DStackObj != null) {
-			DStackObj.systemDestroy();
-			DStackObj = null;
-		}
-	}
-
-	/// Does the disposal teardown of all layers (especially JSql in MySql mode)
-	@Override
-	public void doSharedTeardown() throws Exception {
-		DStack_disposeStackLayers();
-		super.doSharedTeardown();
 	}
 
 }

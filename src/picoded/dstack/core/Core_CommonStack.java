@@ -5,6 +5,7 @@ import picoded.dstack.CommonStructure;
 import picoded.security.NxtCrypt;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
+import picoded.dstack.module.account.AccountTable;
 
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
@@ -141,6 +142,49 @@ public abstract class Core_CommonStack implements CommonStack {
 
 	//----------------------------------------------------------------
 	//
+	// Setting up Account Table
+	//
+	//----------------------------------------------------------------
+
+	protected ConcurrentHashMap<String, AccountTable> accountTableCache = new ConcurrentHashMap<String, AccountTable>();
+	protected ReentrantReadWriteLock accountTableCache_lock = new ReentrantReadWriteLock();
+
+
+	protected AccountTable setupAccountTable(String name) {
+		return new AccountTable(this, name);
+	}
+
+	public AccountTable getAccountTable(String name) {
+
+		// Structure backend name is case insensitive
+		name = name.toUpperCase();
+
+		// Tries to get 1 time, without locking
+		AccountTable cacheCopy = accountTableCache.get(name);
+		if (cacheCopy != null) {
+			return cacheCopy;
+		}
+
+		// Tries to get again with lock, creates and put if not exists
+		try {
+			accountTableCache_lock.writeLock().lock();
+
+			cacheCopy = accountTableCache.get(name);
+			if (cacheCopy != null) {
+				return cacheCopy;
+			}
+
+			cacheCopy = setupAccountTable(name);
+			accountTableCache.put(name, cacheCopy);
+			return cacheCopy;
+
+		} finally {
+			accountTableCache_lock.writeLock().unlock();
+		}
+	}
+
+	//----------------------------------------------------------------
+	//
 	//  Preloading of DStack structures, systemSetup/Teardown
 	//  or the respective maintenance/incrementalMaintenance call
 	//
@@ -212,7 +256,7 @@ public abstract class Core_CommonStack implements CommonStack {
 			structureCacheLock.writeLock().unlock();
 		}
 	}
-	
+
 	/**
 	* This does an incrementalMaintenance across all DStack structures
 	* called on all the preloaded DStack structures, created via preload/get calls

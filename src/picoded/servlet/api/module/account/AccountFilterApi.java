@@ -44,18 +44,20 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
     super(inTable);
 		table = super.table;
 	}
+	// Global Variables
+	ApiResponse apr = null;
 
 	////////////////////////////////////////////////////////////////////////////
 	/// Account Admin Filtering
 	////////////////////////////////////////////////////////////////////////////
 	// Pack all checks into one ApiFunction for ease of usage as well as set up
 	protected ApiFunction admin_bundle_check = (req, res) -> {
-		res = this.isLoggedIn.apply(req, res);
-		if ( res != null )
-			return res;
-		res = this.check_is_super_user.apply(req, res);
-		if ( res != null )
-			return res;
+		apr = this.isLoggedIn.apply(req, res);
+		if ( apr != null )
+			return apr;
+		apr = this.check_is_super_user.apply(req, res);
+		if ( apr != null )
+			return apr;
 		return null;
 	};
 	// Check if it is admin
@@ -67,7 +69,6 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 		}
 		return null;
 	};
-
 	////////////////////////////////////////////////////////////////////////////
 	/// Account Filtering
 	////////////////////////////////////////////////////////////////////////////
@@ -78,12 +79,12 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 
 	// checking of password and email format
 	protected ApiFunction complexity_bundle_check = (req, res) -> {
-		res = this.check_password.apply(req, res);
-		if ( res != null )
-			return res;
-		res = this.check_email.apply(req, res);
-		if ( res != null )
-			return res;
+		apr = this.check_password.apply(req, res);
+		if ( apr != null )
+			return apr;
+		apr = this.check_email.apply(req, res);
+		if ( apr != null )
+			return apr;
 		return null;
 	};
 	// Check password complexity
@@ -104,8 +105,8 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 
 	// Check email format
 	protected ApiFunction check_email = (req, res) -> {
-		String email = req.getString(Account_Strings.REQ_USERNAME);
-		if ( !isEmailFormat(email) ) {
+		String email = req.getString(Account_Strings.REQ_USERNAME, "");
+		if ( !isEmailFormat(email) && !email.isEmpty() ) {
 			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_INVALID_FORMAT_EMAIL);
 			return res;
 		}
@@ -116,12 +117,12 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	////////////////////////////////////////////////////////////////////////////
 	// Pack all checks into one ApiFunction for ease of usage as well as set up
 	protected ApiFunction group_admin_bundle_check = (req, res) -> {
-		res = this.check_is_super_user.apply(req, res);
-		if ( res != null )
-			return res;
-		res = this.check_is_current_user_group_admin.apply(req, res);
-		if ( res != null )
-			return res;
+		apr = this.check_is_super_user.apply(req, res);
+		if ( apr != null )
+			return apr;
+		apr = this.check_is_current_user_group_admin.apply(req, res);
+		if ( apr != null )
+			return apr;
 		return null;
 	};
 
@@ -134,21 +135,21 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	////////////////////////////////////////////////////////////////////////////
 	// Pack all checks into one ApiFunction for ease of usage as well as set up
 	protected ApiFunction group_bundle_check = (req, res) -> {
-		res = this.isLoggedIn.apply(req, res);
-		if ( res != null )
-			return res;
-		res = this.check_is_super_user.apply(req, res);
-		if ( res == null )
+		apr = this.isLoggedIn.apply(req, res);
+		if ( apr != null )
+			return apr;
+		apr = this.check_is_super_user.apply(req, res);
+		if ( apr == null )
 			return null;
-		res = this.check_is_current_user_group_admin.apply(req, res);
-		if ( res == null )
+		apr = this.check_is_current_user_group_admin.apply(req, res);
+		if ( apr == null )
 			return null;
-		res = this.check_is_current_user_member.apply(req, res);
-		if ( res != null )
-			return res;
-		res = this.check_is_editing_self.apply(req, res);
-		if (res != null )
-			return res;
+		apr = this.check_is_current_user_member.apply(req, res);
+		if ( apr != null )
+			return apr;
+		apr = this.check_is_editing_self.apply(req, res);
+		if (apr != null )
+			return apr;
 		return null;
 	};
 

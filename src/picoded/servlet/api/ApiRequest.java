@@ -155,7 +155,7 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	*
 	* @return CorePage (if used)
 	**/
-	protected CorePage getCorePage() {
+	public CorePage getCorePage() {
 		if( corePage != null ) {
 			return corePage;
 		}

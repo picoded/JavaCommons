@@ -789,7 +789,7 @@ public class AccountTableApi implements ApiModule {
 	};
 
 	/**
-	* # do_password_reset
+	* # reset_password
 	*
 	* Resets the password of the user/current member
 	*
@@ -815,7 +815,7 @@ public class AccountTableApi implements ApiModule {
 	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
-	protected ApiFunction do_password_reset = (req, res) -> {
+	protected ApiFunction reset_password = (req, res) -> {
 		res.put(RES_SUCCESS, false);
 		String userID = req.getString(REQ_USER_ID, "");
 		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
@@ -1272,7 +1272,7 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+API_ACCOUNT_LOCKTIME, lockTime); // Tested
 		builder.put(path+API_ACCOUNT_LOGOUT, logout); // Tested
 		builder.put(path+API_ACCOUNT_NEW, new_account); // Tested
-		builder.put(path+API_ACCOUNT_PASS_RESET, do_password_reset); // Tested
+		builder.put(path+API_ACCOUNT_PASS_RESET, reset_password); // Tested
 		builder.put(path+API_ACCOUNT_INFO_NAME, account_info_by_Name); // Tested
 		builder.put(path+API_ACCOUNT_INFO_ID, account_info_by_ID); // Tested
 		builder.put(path+API_ACCOUNT_ADMIN_REMOVE, delete_user_account); // Tested

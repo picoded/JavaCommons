@@ -260,7 +260,7 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 
 		// Account meta information
 		accountDataTable = stack.getDataTable(name + SUFFIX_ACCOUNT_META);
-		accountPrivateDataTable = stack.getDataTable(name + SUFFIX_MEMBER_PRIVATE_META);
+		accountPrivateDataTable = stack.getDataTable(name + SUFFIX_ACCOUNT_PRIVATE_META);
 
 		// Group hirachy, and membership information
 		memberRolesTable = stack.getDataTable(name + SUFFIX_MEMBER_ROLE);

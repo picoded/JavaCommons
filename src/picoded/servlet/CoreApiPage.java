@@ -166,6 +166,10 @@ public class CoreApiPage extends CorePage {
 	 */
 	protected String apiNamespace = "api";
 
+	public void setApiNameSpace( String namespace ){
+		apiNamespace = namespace;
+	}
+
 	/**
 	* Set the request mode to JSON, for API page
 	**/
@@ -200,7 +204,7 @@ public class CoreApiPage extends CorePage {
 		ApiResponse ret = null;
 		// null apiNamespace bypass
 		if(apiNamespace == null || apiNamespace.isEmpty()) {
-			apiBuilder().servletExecute(this, wildcardUri);
+			ret = apiBuilder().servletExecute(this, wildcardUri, null);
 		}
 
 		// Does the API call
@@ -209,7 +213,7 @@ public class CoreApiPage extends CorePage {
 			// @TODO : Consider integrating template data (CorePage) with context data (ApiBuilder)
 
 			// Does actual execution
-			ret = apiBuilder().servletExecute(this, Arrays.copyOfRange(wildcardUri,1, wildcardUri.length));
+			ret = apiBuilder().servletExecute(this, Arrays.copyOfRange(wildcardUri,1, wildcardUri.length), null);
 		}
 
 		// There is valid return data
@@ -218,10 +222,8 @@ public class CoreApiPage extends CorePage {
 			return super.outputJSON(outputData, templateData, output);
 		}
 
-		// If the statement hits here, an unexpected error occur where there is no response from apiBuilder
-		// Fails the return
-		outputData.put("ERROR", "Fatal unexpected missing output from apiBuilder");
-		return super.outputJSON(outputData, templateData, output);
+		// Terminates the processing once reaches to this point.
+		return false;
 	}
 
 }

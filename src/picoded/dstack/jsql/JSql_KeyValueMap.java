@@ -241,7 +241,9 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 		//------------------------------------------------
 		if (sqlObj.sqlType() == JSqlType.MYSQL) {
 			sqlObj.createIndex( //
-				sqlTableName, "kVl(255)", null, "valMap" //
+				// kVl(190) is chosen, as mysql "standard prefix limitation" is 767
+				// as a result, with mb4 where 4 byte represents a character. 767/4 = 191
+				sqlTableName, "kVl(191)", null, "valMap" //
 			);
 		} else {
 			sqlObj.createIndex( //

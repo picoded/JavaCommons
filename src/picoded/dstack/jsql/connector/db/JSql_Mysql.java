@@ -577,10 +577,10 @@ public class JSql_Mysql extends JSql_Base {
 			Object[] defaultValues = null;
 
 			// Insert, and default values may or may not occur
-			if( insertValuesList != null && insertValuesList.size() < r ) {
+			if( insertValuesList != null && r < insertValuesList.size() ) {
 				insertValues = insertValuesList.get(r);
 			}
-			if( defaultValuesList != null && defaultValuesList.size() < r ) {
+			if( defaultValuesList != null && r < defaultValuesList.size() ) {
 				defaultValues = defaultValuesList.get(r);
 			}
 
@@ -593,7 +593,7 @@ public class JSql_Mysql extends JSql_Base {
 					queryBuilder.append("?");
 
 					// Process the value
-					if( insertValues != null && insertValues.length > i ) {
+					if( insertValues != null && i < insertValues.length ) {
 						queryArgs.add(insertValues[i]);
 					} else {
 						queryArgs.add(null);
@@ -608,7 +608,7 @@ public class JSql_Mysql extends JSql_Base {
 					queryBuilder.append("?");
 
 					// Process the value
-					if( defaultValues != null && defaultValues.length > i ) {
+					if( defaultValues != null && i < defaultValues.length ) {
 						queryArgs.add(defaultValues[i]);
 					} else {
 						queryArgs.add(null);
@@ -635,7 +635,6 @@ public class JSql_Mysql extends JSql_Base {
 				queryBuilder.append(insertColumns[i]+" = VALUES("+insertColumns[i]+")");
 			}
 		}
-
 		// Builde the actual statement, to run!
 		JSqlPreparedStatement statement =  new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 

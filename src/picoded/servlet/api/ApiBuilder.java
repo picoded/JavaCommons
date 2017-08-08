@@ -574,7 +574,6 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 		// if ( resObj.get(RES_ERROR) != null ) {
 		// 	System.out.println(resObj.get(RES_ERROR));
 		// }
-
 			return resObj;
 		} catch(Exception e) {
 			throw e;
@@ -676,8 +675,8 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	// API JS Handling
 	//
 	//-------------------------------------------------------------------
-	protected String getApiJS(String servername, int port){
-		return ApiBuilderJS.generateApiJs(this, "//" + servername + ":" + port + "");
+	protected String getApiJS(String apiURL){
+		return ApiBuilderJS.generateApiJs(this, apiURL);
 	}
 
 	//-------------------------------------------------------------------
@@ -699,7 +698,7 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 	*
 	* @return ApiResponse, to propagate to the actual user
 	**/
-	public ApiResponse servletExecute(CorePage inCore, String[] path) {
+	public ApiResponse servletExecute(CorePage inCore, String[] path, String apiURL) {
 		// Setup
 		ApiRequest req = setupApiRequest(inCore);
 		ApiResponse res = new ApiResponse(this);
@@ -723,7 +722,11 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 		if( path.length >= 1 && path[0].equalsIgnoreCase("api.js") ) {
 			inCore.getHttpServletResponse().setContentType("text/javascript");
 			PrintWriter output = inCore.getWriter();
-			output.println(getApiJS(inCore.getServerName(), inCore.getServerPort()));
+			if( apiURL == null ){
+				output.println(getApiJS(inCore.getServerName()));
+			} else {
+				output.println(getApiJS(apiURL));
+			}
 			return null;
 		}
 
@@ -734,8 +737,6 @@ public class ApiBuilder implements UnsupportedDefaultMap<String, BiFunction<ApiR
 			res.put("INFO", "Requested path : "+String.join(".", path));
 			return res;
 		}
-
-
 
 		try {
 			// The actual execution

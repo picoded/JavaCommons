@@ -331,6 +331,11 @@ public class JSql_DataTableUtils {
 		boolean batchMode //
 	) throws JSqlException {
 
+		// Nothing to update, nothing to do
+		if( keyList == null ) {
+			return;
+		}
+
 		// boolean sqlMode = batchMode ? sql.getAutoCommit() : false;
 		// if (sqlMode) {
 		// 	sql.setAutoCommit(false);
@@ -383,6 +388,11 @@ public class JSql_DataTableUtils {
 					insertValuesList.add( new Object[] { typSet[0], typSet[1], typSet[2], typSet[3], typSet[4], now, 0 } );
 					defaultValuesList.add( new Object[] { now } );
 				}
+			}
+
+			// Nothing to update, nothing to do
+			if( insertValuesList.size() <= 0 ) {
+				return;
 			}
 
 			// Does the actual multi upsert

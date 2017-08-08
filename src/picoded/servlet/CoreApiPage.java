@@ -205,11 +205,8 @@ public class CoreApiPage extends CorePage {
 		// null apiNamespace bypass
 		if(apiNamespace == null || apiNamespace.isEmpty()) {
 			ret = apiBuilder().servletExecute(this, wildcardUri, null);
-		}
-
-		// Does the API call
-		if (wildcardUri.length >= 1 && (wildcardUri[0].equalsIgnoreCase("api"))) {
-
+		} else if (wildcardUri.length >= 1 && (wildcardUri[0].equalsIgnoreCase(apiNamespace))) {
+			// Standard apiNamespace call
 			// @TODO : Consider integrating template data (CorePage) with context data (ApiBuilder)
 
 			// Does actual execution

@@ -26,7 +26,7 @@ public class JSql_DataTable_test extends StructSimple_DataTable_test {
 
 	// To override for implementation
 	//-----------------------------------------------------
-	
+
 	/// Note that this SQL connector constructor
 	/// is to be overriden for the various backend
 	/// specific test cases
@@ -38,5 +38,5 @@ public class JSql_DataTable_test extends StructSimple_DataTable_test {
 	public DataTable implementationConstructor() {
 		return new JSql_DataTable( jsqlConnection(), TestConfig.randomTablePrefix() );
 	}
-	
+
 }

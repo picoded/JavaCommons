@@ -26,12 +26,12 @@ public class JSql_DataTable_Mysql_test extends JSql_DataTable_test {
 
 	// To override for implementation
 	//-----------------------------------------------------
-	
+
 	/// Note that this SQL connector constructor
 	/// is to be overriden for the various backend
 	/// specific test cases
 	public JSql jsqlConnection() {
-		return JSqlTest.sqlite();
+		return JSqlTest.mysql();
 	}
-	
+
 }

@@ -117,13 +117,22 @@ public class AccountTableApi implements ApiModule {
 		String loginPass = req.getString(REQ_PASSWORD, null);
 		boolean rememberMe = req.getBoolean(REQ_REMEMBER_ME, false);
 
-		// Missing paremeter error checks
-		if ( loginPass == null ) {
-			res.put(RES_ERROR, ERROR_NO_LOGIN_PASSWORD);
+		// Request to get info of user
+		if ( accountID == null && loginID == null ) {
+			// Get current user if any
+			AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), null);
+			if ( currentUser == null ) {
+				res.put(RES_ERROR, ERROR_NO_USER);
+				return res;
+			}
+			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(currentUser, true);
+			res.putAll(commonInfo);
 			return res;
 		}
-		if ( accountID == null && loginID == null ) {
-			res.put(RES_ERROR, ERROR_NO_LOGIN_ID);
+
+		// Missing parameter error checks
+		if ( loginPass == null ) {
+			res.put(RES_ERROR, ERROR_NO_LOGIN_PASSWORD);
 			return res;
 		}
 
@@ -157,8 +166,7 @@ public class AccountTableApi implements ApiModule {
 			// Extract Common Info from user account object
 			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
 			res.putAll(commonInfo);
-			// Extract hostURL from user account object
-			res.put("hostURL", ao.get("hostURL"));
+
 			// loginID, as a list - as set does not gurantee sorting, a sort is done for the list for alphanumeric
 			List<String> loginIDList = new ArrayList<String>(ao.getLoginIDSet());
 			Collections.sort(loginIDList);
@@ -1326,6 +1334,8 @@ public class AccountTableApi implements ApiModule {
 			}
 			commonInfo.put("isSuperUser", account.isSuperUser());
 			commonInfo.put("isGroup", account.isGroup());
+			// Extract hostURL from user account object
+			commonInfo.put("hostURL", account.get("hostURL"));
 			Map<String, List<Map<String, Object>>> groupMap = new HashMap<String, List<Map<String, Object>>>();
 			AccountObject[] groups = account.getGroups();
 			// Check if any groups exist for the member

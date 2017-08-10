@@ -11,7 +11,8 @@ var api = {};
 
 /// api configuration object
 var apiconfig = {
-	baseURL: "//localhost:8080/api/",
+	// baseURL: "//localhost:8080/api/",
+	baseURL: "",
 	apiKey: null
 };
 

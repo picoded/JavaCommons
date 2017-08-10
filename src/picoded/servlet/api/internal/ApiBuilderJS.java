@@ -41,7 +41,7 @@ public class ApiBuilderJS {
 		String generateJSScript = "var api = (function() {\n";
 		generateJSScript += getJsLib();
 
-		generateJSScript += "\tapicore.baseURL(\"//" + hostpath + "/api/" + versionStr + "/\");\n"+
+		generateJSScript += "\tapicore.baseURL(\"//" + hostpath + "/" + versionStr + "/\");\n"+
 												"\tapicore.setEndpointMap({\n";
 
 		// Generating endpoints

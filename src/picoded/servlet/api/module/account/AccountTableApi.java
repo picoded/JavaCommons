@@ -289,7 +289,8 @@ public class AccountTableApi implements ApiModule {
 				if ( firstAdmin != null ) // Set the creator as the admin
 					newAccount.setMember(firstAdmin, "admin");
 			}
-			givenMetaObj.put(PROPERTIES_EMAIL, userName);
+			if(givenMetaObj.get(PROPERTIES_EMAIL) == null || givenMetaObj.get(PROPERTIES_EMAIL).toString().isEmpty())
+				givenMetaObj.put(PROPERTIES_EMAIL, userName);
 			newAccount.setPassword(password);
 			newAccount.putAll(givenMetaObj);
 			newAccount.saveAll();
@@ -1277,6 +1278,60 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
+	protected ApiFunction rancher_register = (req, res) -> {
+		String userName = req.getString(REQ_USERNAME, "");
+		String password = req.getString(REQ_PASSWORD, "");
+		String email = req.getString(REQ_EMAIL, "");
+		String nodeID = req.getString(REQ_NODE_ID, "");
+		String adminpass = req.getString(REQ_ADMIN_PASS, "");//randomly generated
+		long createTimeStamp = System.currentTimeMillis()/1000;//current timestamp now
+		String stackName = req.getString(REQ_STACK_NAME, "");
+		String authKey = req.getString(REQ_AUTH_KEY, "");
+
+		// No authKey means unable to use this API endpoint
+		if ( authKey.isEmpty() || !authKey.equals("thisawesomestring")){
+			res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
+			return res;
+		}
+
+		if ( userName.isEmpty() ){
+			res.put(RES_ERROR, ERROR_NO_USERNAME);
+			return res;
+		}
+		if ( email.isEmpty() ){
+			res.put(RES_ERROR, ERROR_NO_EMAIL);
+			return res;
+		}
+		if ( password.isEmpty() ){
+			res.put(RES_ERROR, ERROR_NO_PASSWORD);
+			return res;
+		}
+		if ( nodeID.isEmpty() ){
+			res.put(RES_ERROR, ERROR_NO_NODE_ID);
+			return res;
+		}
+
+		// Check stackName
+		if ( stackName.isEmpty() ){
+			stackName = userName.replaceAll("[^A-Za-z0-9-]", "");
+			stackName = stackName.replaceAll("\\s", "-") + "-" +nodeID;
+		}
+		String hostURL = "https://client-" + nodeID+".uilicious.com";
+		// Form the meta Object
+		Map<String, Object> metaObjMap = new HashMap<String, Object>();
+		metaObjMap.put(PROPERTIES_NODE_ID, nodeID);
+		metaObjMap.put(PROPERTIES_ADMIN_PASS, adminpass);
+		metaObjMap.put(PROPERTIES_STACK_NAME, stackName);
+		metaObjMap.put(PROPERTIES_CREATE_TIMESTAMP, createTimeStamp);
+		metaObjMap.put(PROPERTIES_EMAIL, email);
+		metaObjMap.put(PROPERTIES_HOST_URL, hostURL);
+		req.put(REQ_META, ConvertJSON.fromMap(metaObjMap));
+		
+		// Creates an new account
+		res = this.new_account.apply(req, res);
+		return res;
+	};
+
 	/**
 	* Does the actual setup for the API
 	* Given the API Builder, and the namespace prefix
@@ -1310,6 +1365,8 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+API_GROUP_ADMIN_GET_MEM_LIST_INFO, get_member_list_info); // Tested
 		builder.put(path+API_GROUP_ADMIN_ADD_REM_MEM, add_remove_member); // Tested
 
+		// Rancher Register Api
+		builder.put(path+API_RANCHER_REGISTER, rancher_register);
 	}
 
 

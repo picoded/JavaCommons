@@ -25,6 +25,13 @@ public class Account_Strings{
     public static final String REQ_REPEAT_PASSWORD = "repeatPass";
     public static final String REQ_NEW_PASSWORD = "newPass";
 
+    // Rancher VARS
+    public static final String REQ_EMAIL = "email";
+    public static final String REQ_NODE_ID = "nodeID";
+    public static final String REQ_STACK_NAME = "stackName";
+    public static final String REQ_AUTH_KEY = "authKey";
+    public static final String REQ_ADMIN_PASS = "adminPass";
+
     /// Static RESPONSE VARS
     // Single Value/Object Variables
   	public static final String RES_ERROR = "ERROR";
@@ -57,6 +64,12 @@ public class Account_Strings{
     public static final String PROPERTIES_IS_GROUP = "isGroup";
     public static final String PROPERTIES_OID = "_oid";
     public static final String PROPERTIES_NAMES = "name";
+    public static final String PROPERTIES_NODE_ID = "nodeID";
+    public static final String PROPERTIES_ADMIN_PASS = "adminPass";
+    public static final String PROPERTIES_STACK_NAME = "stackName";
+    public static final String PROPERTIES_AUTH_KEY = "authKey";
+    public static final String PROPERTIES_CREATE_TIMESTAMP = "createdTimeStamp";
+    public static final String PROPERTIES_HOST_URL = "hostURL";
 
     /// ERROR MESSAGES
     public static final String ERROR_NO_GROUP = "No group is found.";
@@ -83,6 +96,8 @@ public class Account_Strings{
     public static final String ERROR_PASSWORD_COMPLEXITY = "The password must contain at least 1 uppercase, 1 lowercase and 1 number with at least 6 characters long.";
     public static final String ERROR_INVALID_FORMAT_EMAIL = "The username is not an email.";
     public static final String ERROR_USER_NOT_LOGIN = "User is not logged in.";
+    public static final String ERROR_NO_EMAIL = "No email address is found.";
+    public static final String ERROR_NO_NODE_ID = "No node ID is found.";
 
     /// ADDITIONAL Variables
     public static final String SPACE = " ";
@@ -126,4 +141,5 @@ public class Account_Strings{
     public static final String API_GROUP_ADMIN_GET_MEM_LIST_INFO = "group/admin/get_member_list_info";
     public static final String API_GROUP_ADMIN_ADD_REM_MEM = "group/admin/add_remove_member";
 
+    public static final String API_RANCHER_REGISTER = "account/rancherRegister";
 }

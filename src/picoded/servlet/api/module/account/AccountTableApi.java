@@ -125,6 +125,8 @@ public class AccountTableApi implements ApiModule {
 				res.put(RES_ERROR, ERROR_NO_USER);
 				return res;
 			}
+			res.put(RES_IS_LOGIN, true);
+			res.put(RES_REMEMBER_ME, rememberMe);
 			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(currentUser, true);
 			res.putAll(commonInfo);
 			return res;
@@ -269,16 +271,20 @@ public class AccountTableApi implements ApiModule {
 		}
 
 		AccountObject newAccount = table.newObject(userName);
+		// Create new account
 		if ( newAccount != null ) {
+			// Check is it group
 			if ( isGroup ) {
 				newAccount.setGroupStatus(true);
 				boolean defaultRoles = req.getBoolean(REQ_DEFAULT_ROLES, true);
 				List<String> list = req.getList(REQ_ROLE, null);
+				// Set roles
 				if ( defaultRoles || list == null ) {
 					newAccount.setMembershipRoles(table.defaultMembershipRoles());
 				} else {
 					newAccount.setMembershipRoles(list);
 				}
+				// Add the user who create the group as the admin
 				AccountObject firstAdmin = table.getRequestUser(req.getHttpServletRequest(), null);
 				if ( firstAdmin != null ) // Set the creator as the admin
 					newAccount.setMember(firstAdmin, "admin");
@@ -291,6 +297,7 @@ public class AccountTableApi implements ApiModule {
 			res.put(RES_META, newAccount);
 			res.put(RES_ACCOUNT_ID, newAccount._oid());
 		} else {
+			// Account already exists
 			AccountObject existingAccount = table.getFromLoginID(userName);
 			if (existingAccount != null) {
 				res.put(RES_ACCOUNT_ID, existingAccount._oid());
@@ -1302,7 +1309,7 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+API_GROUP_ADMIN_REM_MEM_ROLE, remove_membership_role); // Tested
 		builder.put(path+API_GROUP_ADMIN_GET_MEM_LIST_INFO, get_member_list_info); // Tested
 		builder.put(path+API_GROUP_ADMIN_ADD_REM_MEM, add_remove_member); // Tested
-		// builder.put(path+"getListOfMemberObjectOfGroup", getListOfMemberObjectOfGroup); // Tested
+
 	}
 
 

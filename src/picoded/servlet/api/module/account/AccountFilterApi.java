@@ -18,7 +18,7 @@ import java.util.function.BiFunction;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 
-
+import static picoded.servlet.api.module.account.Account_Strings.*;
 
 /**
 * Account table API builder
@@ -64,7 +64,7 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	protected ApiFunction check_is_super_user = (req, res) -> {
 		AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( !currentUser.isSuperUser() ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PRIVILEGES);
+			res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
 			return res;
 		}
 		return null;
@@ -79,10 +79,10 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 
 	// checking of password and email format
 	protected ApiFunction complexity_bundle_check = (req, res) -> {
-		apr = this.check_password.apply(req, res);
+		apr = this.check_email.apply(req, res);
 		if ( apr != null )
 			return apr;
-		apr = this.check_email.apply(req, res);
+		apr = this.check_password.apply(req, res);
 		if ( apr != null )
 			return apr;
 		return null;
@@ -91,12 +91,12 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	protected ApiFunction check_password = (req, res) -> {
 		String passwordRegex = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,})", password = "";
 		Pattern p = Pattern.compile(passwordRegex);
-		String[] passwordList = new String[]{Account_Strings.REQ_PASSWORD, Account_Strings.REQ_NEW_PASSWORD, Account_Strings.REQ_REPEAT_PASSWORD};
+		String[] passwordList = new String[]{REQ_PASSWORD, REQ_NEW_PASSWORD, REQ_REPEAT_PASSWORD};
 		for ( String password_string : passwordList ) {
 			password = req.getString(password_string, "");
 			Matcher m = p.matcher(password);
 			if ( !password.isEmpty() && !m.matches()) {
-				res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_PASSWORD_COMPLEXITY);
+				res.put(RES_ERROR, ERROR_PASSWORD_COMPLEXITY);
 				return res;
 			}
 		}
@@ -105,10 +105,13 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 
 	// Check email format
 	protected ApiFunction check_email = (req, res) -> {
-		String email = req.getString(Account_Strings.REQ_USERNAME, "");
-		if ( !isEmailFormat(email) && !email.isEmpty() ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_INVALID_FORMAT_EMAIL);
-			return res;
+		String[] emailList = new String[]{REQ_EMAIL};
+		for ( String email_string : emailList ) {
+			String email = req.getString(email_string, "");
+			if ( !email.isEmpty() && !isEmailFormat(email) ) {
+				res.put(RES_ERROR, email_string+" is not a valid email.");
+				return res;
+			}
 		}
 		return null;
 	};
@@ -156,14 +159,14 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	// Check if user is a member of the group
 	protected ApiFunction check_is_current_user_member = (req, res) -> {
 		AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), null);
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID, "");
+		String groupID = req.getString(REQ_GROUP_ID, "");
 		if ( groupID.isEmpty() ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
+			res.put(RES_ERROR, ERROR_NO_GROUP_ID);
 			return res;
 		}
-		req.put(Account_Strings.REQ_USER_ID, currentUser._oid());
+		req.put(REQ_USER_ID, currentUser._oid());
 		res = this.getMemberRoleFromGroup.apply(req, res);
-		if ( res.get(Account_Strings.RES_ERROR) != null )
+		if ( res.get(RES_ERROR) != null )
 			return res;
 		return null;
 	};
@@ -171,18 +174,18 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	// Check if current user is a group admin
 	protected ApiFunction check_is_current_user_group_admin = (req, res) -> {
 		AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), null);
-		String groupID = req.getString(Account_Strings.REQ_GROUP_ID, "");
+		String groupID = req.getString(REQ_GROUP_ID, "");
 		if ( groupID.isEmpty() ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_GROUP_ID);
+			res.put(RES_ERROR, ERROR_NO_GROUP_ID);
 			return res;
 		}
-		req.put(Account_Strings.REQ_USER_ID, currentUser._oid());
+		req.put(REQ_USER_ID, currentUser._oid());
 		res = this.getMemberRoleFromGroup.apply(req, res);
-		if ( res.get(Account_Strings.RES_ERROR) != null )
+		if ( res.get(RES_ERROR) != null )
 			return res;
-		String role = res.getString(Account_Strings.RES_SINGLE_RETURN_VALUE);
+		String role = res.getString(RES_SINGLE_RETURN_VALUE);
 		if ( !role.equalsIgnoreCase("admin") ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PRIVILEGES);
+			res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
 			return res;
 		}
 		return null;
@@ -191,9 +194,9 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	// Check if current user is editing self
 	protected ApiFunction check_is_editing_self = (req, res) -> {
 		AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), null);
-		String userID = req.getString(Account_Strings.REQ_USER_ID, "");
+		String userID = req.getString(REQ_USER_ID, "");
 		if ( !userID.equalsIgnoreCase(currentUser._oid()) ){
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_PRIVILEGES);
+			res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
 			return res;
 		}
 		return null;
@@ -210,6 +213,7 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
     super.setupApiBuilder(builder, path);
 		builder.filter(path+"account/*", account_bundle_check);
 		builder.filter(path+"account/login/*", complexity_bundle_check);
+		builder.filter(path+"account/rancherRegister/*", complexity_bundle_check);
 		builder.filter(path+"account/admin/*", admin_bundle_check);
 
 		builder.filter(path+"account/group/*", group_bundle_check);
@@ -236,7 +240,7 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	private ApiFunction isLoggedIn = (req, res) -> {
 		AccountObject ao = table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( ao == null ) {
-			res.put(Account_Strings.RES_ERROR, Account_Strings.ERROR_NO_USER);
+			res.put(RES_ERROR, ERROR_NO_USER);
 			return res;
 		}
 		return null;

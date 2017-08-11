@@ -132,6 +132,7 @@ public class AccountTableApi implements ApiModule {
 			return res;
 		}
 
+		// Log in Process
 		// Missing parameter error checks
 		if ( loginPass == null ) {
 			res.put(RES_ERROR, ERROR_NO_LOGIN_PASSWORD);
@@ -1279,6 +1280,11 @@ public class AccountTableApi implements ApiModule {
 	};
 
 	protected ApiFunction rancher_register = (req, res) -> {
+		// REQ_AUTH_KEY's actual value has been checked in check_parameters function
+		String[] paramsToCheck = new String[]{REQ_AUTH_KEY, REQ_USERNAME, REQ_PASSWORD, REQ_EMAIL, REQ_NODE_ID, REQ_ADMIN_PASS};
+		res = check_parameters(paramsToCheck, req, res);
+		if ( res.get(RES_ERROR) != null )
+			return res;
 		String userName = req.getString(REQ_USERNAME, "");
 		String password = req.getString(REQ_PASSWORD, "");
 		String email = req.getString(REQ_EMAIL, "");
@@ -1286,32 +1292,8 @@ public class AccountTableApi implements ApiModule {
 		String adminpass = req.getString(REQ_ADMIN_PASS, "");//randomly generated
 		long createTimeStamp = System.currentTimeMillis()/1000;//current timestamp now
 		String stackName = req.getString(REQ_STACK_NAME, "");
-		String authKey = req.getString(REQ_AUTH_KEY, "");
 
-		// No authKey means unable to use this API endpoint
-		if ( authKey.isEmpty() || !authKey.equals("thisawesomestring")){
-			res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
-			return res;
-		}
-
-		if ( userName.isEmpty() ){
-			res.put(RES_ERROR, ERROR_NO_USERNAME);
-			return res;
-		}
-		if ( email.isEmpty() ){
-			res.put(RES_ERROR, ERROR_NO_EMAIL);
-			return res;
-		}
-		if ( password.isEmpty() ){
-			res.put(RES_ERROR, ERROR_NO_PASSWORD);
-			return res;
-		}
-		if ( nodeID.isEmpty() ){
-			res.put(RES_ERROR, ERROR_NO_NODE_ID);
-			return res;
-		}
-
-		// Check stackName
+		// Check stackName, replaceAll special characters
 		if ( stackName.isEmpty() ){
 			stackName = userName.replaceAll("[^A-Za-z0-9-]", "");
 			stackName = stackName.replaceAll("\\s", "-") + "-" +nodeID;
@@ -1326,7 +1308,7 @@ public class AccountTableApi implements ApiModule {
 		metaObjMap.put(PROPERTIES_EMAIL, email);
 		metaObjMap.put(PROPERTIES_HOST_URL, hostURL);
 		req.put(REQ_META, ConvertJSON.fromMap(metaObjMap));
-		
+
 		// Creates an new account
 		res = this.new_account.apply(req, res);
 		return res;
@@ -1657,6 +1639,21 @@ public class AccountTableApi implements ApiModule {
 	        value = req.getString(paramName, "");
 	        if ( value.isEmpty() )
 	          res.put(RES_ERROR, ERROR_NO_NEW_REPEAT_PASSWORD);
+	        break;
+				case REQ_AUTH_KEY: // No authKey means unable to use this API endpoint
+	        value = req.getString(paramName, "");
+	        if ( value.isEmpty() || !value.equals("thisawesomestring") )
+	          res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
+	        break;
+				case REQ_EMAIL:
+	        value = req.getString(paramName, "");
+	        if ( value.isEmpty() )
+	          res.put(RES_ERROR, ERROR_NO_EMAIL);
+	        break;
+				case REQ_NODE_ID:
+	        value = req.getString(paramName, "");
+	        if ( value.isEmpty() )
+	          res.put(RES_ERROR, ERROR_NO_NODE_ID);
 	        break;
 	    }
 			if ( res.get(RES_ERROR) != null )

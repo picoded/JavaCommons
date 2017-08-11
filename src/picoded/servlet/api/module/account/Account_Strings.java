@@ -1,4 +1,5 @@
 package picoded.servlet.api.module.account;
+import javax.mail.internet.*;
 
 public class Account_Strings{
 
@@ -142,4 +143,17 @@ public class Account_Strings{
     public static final String API_GROUP_ADMIN_ADD_REM_MEM = "group/admin/add_remove_member";
 
     public static final String API_RANCHER_REGISTER = "account/rancherRegister";
+
+    // Methods that shared across Account APIs 
+    // with help from http://stackoverflow.com/questions/624581/what-is-the-best-java-email-address-validation-method
+    public static boolean isEmailFormat(String inEmail){
+  		boolean result = true;
+  		try{
+  			InternetAddress emailAddr = new InternetAddress(inEmail);
+  			emailAddr.validate();
+  		}catch(AddressException ex){
+  			result = false;
+  		}
+  		return result;
+    }
 }

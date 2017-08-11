@@ -224,19 +224,6 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 
 	// Private Methods
 
-	// with help from http://stackoverflow.com/questions/624581/what-is-the-best-java-email-address-validation-method
-	private boolean isEmailFormat(String inEmail){
-		boolean result = true;
-		try{
-			InternetAddress emailAddr = new InternetAddress(inEmail);
-			emailAddr.validate();
-		}catch(AddressException ex){
-			result = false;
-		}
-		return result;
-	}
-
-
 	private ApiFunction isLoggedIn = (req, res) -> {
 		AccountObject ao = table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( ao == null ) {

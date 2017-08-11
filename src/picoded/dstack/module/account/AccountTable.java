@@ -292,6 +292,17 @@ public class AccountTable extends ModuleStructure implements UnsupportedDefaultM
 	///////////////////////////////////////////////////////////////////////////
 
 	/**
+	* Checks if the email exists
+	*
+	* @param  email to check
+	*
+	* @return TRUE if email exists
+	*/
+	public boolean isEmailExist(String email) {
+		return (accountLoginIdMap.get(email) == null) ? false : true;
+	}
+
+	/**
 	* Returns if the name exists
 	*
 	* @param  Login ID to use, normally this is an email, or nice username

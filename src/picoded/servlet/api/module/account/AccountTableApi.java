@@ -252,7 +252,7 @@ public class AccountTableApi implements ApiModule {
 	public ApiFunction new_account = (req, res) -> {
 		// Only runs function if logged in, and valid group object
 		boolean isGroup = req.getBoolean(REQ_IS_GROUP, false);
-		String[] paramsToCheck = new String[]{REQ_USERNAME};
+		String[] paramsToCheck = new String[]{REQ_USERNAME, REQ_EMAIL};
 		res = check_parameters(paramsToCheck, req, res);
 		if ( res.get(RES_ERROR) != null )
 			return res;
@@ -271,6 +271,13 @@ public class AccountTableApi implements ApiModule {
 			}
 		}
 
+		// Check if email is in use
+		if ( givenMetaObj.get(PROPERTIES_EMAIL) != null ){
+			if ( table.isEmailExist(givenMetaObj.get(PROPERTIES_EMAIL).toString()) ){
+				res.put(RES_ERROR, ERROR_EMAIL_EXISTS);
+				return res;
+			}
+		}
 		AccountObject newAccount = table.newObject(userName);
 		// Create new account
 		if ( newAccount != null ) {
@@ -293,6 +300,7 @@ public class AccountTableApi implements ApiModule {
 			// Set email as login ID as well
 			if(givenMetaObj.get(PROPERTIES_EMAIL) != null && isEmailFormat(givenMetaObj.get(PROPERTIES_EMAIL).toString()))
 				newAccount.setLoginID(givenMetaObj.get(PROPERTIES_EMAIL).toString());
+
 			newAccount.setPassword(password);
 			newAccount.putAll(givenMetaObj);
 			newAccount.saveAll();

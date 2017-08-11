@@ -87,7 +87,6 @@ public class AccountObject extends Core_DataObject {
 		//
 		// But name collision, if its an email collision should be a very rare event.
 		mainTable.accountLoginIdMap.put(name, _oid);
-
 		// Success of failure
 		return hasLoginID(name);
 	}

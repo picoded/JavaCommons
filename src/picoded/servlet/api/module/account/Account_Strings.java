@@ -99,6 +99,7 @@ public class Account_Strings{
     public static final String ERROR_USER_NOT_LOGIN = "User is not logged in.";
     public static final String ERROR_NO_EMAIL = "No email address is found.";
     public static final String ERROR_NO_NODE_ID = "No node ID is found.";
+    public static final String ERROR_EMAIL_EXISTS = "Email is in used.";
 
     /// ADDITIONAL Variables
     public static final String SPACE = " ";
@@ -144,7 +145,7 @@ public class Account_Strings{
 
     public static final String API_RANCHER_REGISTER = "account/rancherRegister";
 
-    // Methods that shared across Account APIs 
+    // Methods that shared across Account APIs
     // with help from http://stackoverflow.com/questions/624581/what-is-the-best-java-email-address-validation-method
     public static boolean isEmailFormat(String inEmail){
   		boolean result = true;

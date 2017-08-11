@@ -290,8 +290,9 @@ public class AccountTableApi implements ApiModule {
 				if ( firstAdmin != null ) // Set the creator as the admin
 					newAccount.setMember(firstAdmin, "admin");
 			}
-			if(givenMetaObj.get(PROPERTIES_EMAIL) == null || givenMetaObj.get(PROPERTIES_EMAIL).toString().isEmpty())
-				givenMetaObj.put(PROPERTIES_EMAIL, userName);
+			// Set email as login ID as well
+			if(givenMetaObj.get(PROPERTIES_EMAIL) != null && isEmailFormat(givenMetaObj.get(PROPERTIES_EMAIL).toString()))
+				newAccount.setLoginID(givenMetaObj.get(PROPERTIES_EMAIL).toString());
 			newAccount.setPassword(password);
 			newAccount.putAll(givenMetaObj);
 			newAccount.saveAll();
@@ -1279,6 +1280,37 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
+	/**
+	* # rancher_register
+	*
+	* This function is used to migrate rancher accounts into the new Account Table
+	*
+	* ## HTTP Request Parameters
+	*
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | Parameter Name | Variable Type      | Description                                                                   |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | authKey				 | String             | The key to use this API endpoint                                              |
+	* | userName    	 | String             | The username of the account                                                   |
+	* | password    	 | String             | The password of the account                                                   |
+	* | email    			 | String             | The email address of the account                                              |
+	* | nodeID    		 | String             | The randomly generated string used for hostURL                                |
+	* | adminPass    	 | String             | The password used for accessing the server                                    |
+	* | stackName    	 | String [Optional]  | The name of the stack                                                         |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	*
+	* ## JSON Object Output Parameters
+	*
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | Parameter Name | Variable Type      | Description                                                                   |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | accountID      | String             | account ID used		                                                            |
+	* +-----------------+-----------------------+----------------------------------------------------------------------------+
+	* | DataObject     | {Object}           | DataObject representing this account	                                        |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	* | ERROR		    	 | String						  | Errors encounterd if any                                                      |
+	* +----------------+--------------------+-------------------------------------------------------------------------------+
+	*/
 	protected ApiFunction rancher_register = (req, res) -> {
 		// REQ_AUTH_KEY's actual value has been checked in check_parameters function
 		String[] paramsToCheck = new String[]{REQ_AUTH_KEY, REQ_USERNAME, REQ_PASSWORD, REQ_EMAIL, REQ_NODE_ID, REQ_ADMIN_PASS};

@@ -42,6 +42,7 @@ public class AccountTableApi_test extends ApiModule_test {
 			// };
 			if( !table.hasLoginID("laughing-man") ) {
 				AccountObject ao = table.newObject("laughing-man");
+				ao.put(PROPERTIES_EMAIL, "laughing-man@testlalala.com");
 				ao.setPassword("The Catcher in the Rye");
 			}
 
@@ -106,6 +107,17 @@ public class AccountTableApi_test extends ApiModule_test {
 		// Validate that logout is valid
 		res = requestJSON(API_ACCOUNT_IS_LOGIN, null);
 		assertEquals( Boolean.FALSE, res.get(RES_RETURN) );
+
+		// Login using email address
+		loginParams.put(REQ_USERNAME, "laughing-man");
+		loginParams.put(REQ_PASSWORD, "The Catcher in the Rye");
+		res = requestJSON(API_ACCOUNT_LOGIN, loginParams);
+		assertNull( res.get(RES_ERROR) );
+		assertNull( res.get("INFO") );
+		assertEquals( Boolean.TRUE, res.get(RES_IS_LOGIN) );
+		// Log out current user
+		res = requestJSON(API_ACCOUNT_LOGOUT, null);
+		assertEquals( Boolean.TRUE, res.get(RES_RETURN) );
 	}
 
 	@Test
@@ -727,6 +739,9 @@ public class AccountTableApi_test extends ApiModule_test {
 			params.clear();
 			params.put(REQ_USERNAME, "member" + idx);
 			params.put(REQ_PASSWORD, "password");
+			Map<String,Object> meta = new HashMap<String,Object>();
+			meta.put(PROPERTIES_EMAIL, "member" + idx + "@testlalala.com");
+			params.put(REQ_META, meta);
 			res = requestJSON(API_ACCOUNT_NEW, params);
 			assertNull("getMemberListInfoTest: Something wrong in adding user " + idx + ".", res.get(RES_ERROR));
 			userID.add(res.getString(RES_ACCOUNT_ID));
@@ -822,8 +837,8 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_HEADERS, "['" + PROPERTIES_ROLE + "', 'group__oid', 'account_email', 'randomHeader']");
 		res = requestJSON(API_GROUP_ADMIN_GET_MEM_LIST_INFO, params);
 		expectedResult.clear();
-		expectedResult.add(new ArrayList<>(Arrays.asList("member", groupID.get(0), "member2", "")));
-		expectedResult.add(new ArrayList<>(Arrays.asList("member", groupID.get(0), "member4", "")));
+		expectedResult.add(new ArrayList<>(Arrays.asList("member", groupID.get(0), "member2@testlalala.com", "")));
+		expectedResult.add(new ArrayList<>(Arrays.asList("member", groupID.get(0), "member4@testlalala.com", "")));
 		assertTrue(res.getInt(RES_RECORDS_TOTAL) == 2);
 		assertTrue(res.getInt(RES_RECORDS_FILTERED) == 2);
 		assertThat("Something is wrong with the lists", res.getList(RES_DATA), containsInAnyOrder(expectedResult.toArray()));
@@ -853,9 +868,9 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REQ_HEADERS, "['" + PROPERTIES_ROLE + "', 'group__oid', 'account_email', 'randomHeader']");
 		res = requestJSON(API_GROUP_ADMIN_GET_MEM_LIST_INFO, params);
 		expectedResult.clear();
-		expectedResult.add(new ArrayList<>(Arrays.asList("little-boy", userID.get(4), "member1", "")));
-		expectedResult.add(new ArrayList<>(Arrays.asList("little-boy", userID.get(4), "member3", "")));
-		expectedResult.add(new ArrayList<>(Arrays.asList("little-boy", userID.get(4), "member5", "")));
+		expectedResult.add(new ArrayList<>(Arrays.asList("little-boy", userID.get(4), "member1@testlalala.com", "")));
+		expectedResult.add(new ArrayList<>(Arrays.asList("little-boy", userID.get(4), "member3@testlalala.com", "")));
+		expectedResult.add(new ArrayList<>(Arrays.asList("little-boy", userID.get(4), "member5@testlalala.com", "")));
 		assertTrue(res.getInt(RES_RECORDS_TOTAL) == 3);
 		assertTrue(res.getInt(RES_RECORDS_FILTERED) == 3);
 		assertThat("Something is wrong with the lists", res.getList(RES_DATA), containsInAnyOrder(expectedResult.toArray()));

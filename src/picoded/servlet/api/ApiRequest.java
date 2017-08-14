@@ -49,6 +49,11 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	**/
 	protected CorePage corePage = null;
 
+	/**
+	* Super Lambda implementation
+	**/
+	protected BiFunction<ApiRequest, ApiResponse, ApiResponse> superLambda = null;
+
 	//-----------------------------------------------------------------
 	//
 	//  Constructor
@@ -73,6 +78,18 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 			contextObj.putAll(context);
 		}
 	}
+
+	// ApiRequest( ApiRequest original, BiFunction<ApiRequest,ApiResponse,ApiResponse> inSuperLambda ) {
+	// 	builder = original.builder;
+	// 	queryObj = original.queryObj;
+	// 	contextObj = original.contextObj;
+	//
+	// 	superLambda = inSuperLambda;
+	// }
+	//
+	// public ApiResponse super( ApiRequest req, ApiResponse res ) {
+	// 	return superLambda.apply(req,res);
+	// }
 
 	/**
 	* Initialize the class

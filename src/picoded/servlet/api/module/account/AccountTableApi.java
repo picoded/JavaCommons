@@ -9,6 +9,7 @@ import picoded.dstack.*;
 import picoded.conv.ConvertJSON;
 import picoded.conv.RegexUtil;
 import picoded.conv.GenericConvert;
+import picoded.conv.GUID;
 import java.util.function.BiFunction;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
@@ -1354,6 +1355,52 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
+
+	protected ApiFunction sign_up = (req, res) -> {
+		String[] paramsToCheck = new String[]{REQ_USERNAME, REQ_EMAIL, REQ_PASSWORD};
+		res = check_parameters(paramsToCheck, req, res);
+		if ( res.get(RES_ERROR) != null )
+			return res;
+		String username = req.getString(REQ_USERNAME);
+		String email = req.getString(REQ_EMAIL);
+		String password = req.getString(REQ_PASSWORD);
+		username = username.replaceAll("[^A-Za-z0-9-]", "");
+		username = username.replaceAll("\\s","-");
+		String name = "client-" + username;
+		String stackName = name;
+		String description = "[SG] " + username;
+		String nodeID = GUID.base58();
+		String adminPass = GUID.base58();
+		System.out.println("nodeID: "+nodeID+" adminPass: "+adminPass+" password: "+password);
+		// Set up params for rancher_register
+		req.put(REQ_STACK_NAME, stackName);
+		req.put(REQ_ADMIN_PASS, adminPass);
+		req.put(REQ_NODE_ID, nodeID);
+		req.put(REQ_PASSWORD, password);
+		req.put(REQ_EMAIL, email);
+		req.put(REQ_AUTH_KEY, "thisawesomestring");
+		// Calls rancher_register to create account in database
+		res = this.rancher_register.apply(req, res);
+		if ( res.get(RES_ERROR) != null ){
+			return res;
+		}
+
+		// // TEST ONLY
+		// // Check that the user really exists
+		// AccountObject ao = table.get(res.getString(RES_ACCOUNT_ID));
+		// System.out.println(ao!=null);
+		// // Testing phase to add and remove immediately so that it will not populate the database and can be reused
+		// req.put(REQ_USER_ID, res.getString(RES_ACCOUNT_ID));
+		// ApiResponse apr = this.delete_user_account.apply(req, res);
+		// ao = table.get(res.getString(RES_ACCOUNT_ID));
+		// System.out.println(ao!=null);
+		// // END OF TEST ONLY
+
+		// Calls cmd from CLI to integrate with Rancher API
+
+		return res;
+	};
+
 	/**
 	* Does the actual setup for the API
 	* Given the API Builder, and the namespace prefix
@@ -1389,6 +1436,7 @@ public class AccountTableApi implements ApiModule {
 
 		// Rancher Register Api
 		builder.put(path+API_RANCHER_REGISTER, rancher_register);
+		builder.put(path+"account/signup", sign_up);
 	}
 
 

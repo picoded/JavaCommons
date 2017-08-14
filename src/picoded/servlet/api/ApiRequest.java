@@ -52,7 +52,7 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	/**
 	* Super Lambda implementation
 	**/
-	protected BiFunction<ApiRequest, ApiResponse, ApiResponse> superLambda = null;
+	// protected BiFunction<ApiRequest, ApiResponse, ApiResponse> superLambda = null;
 
 	//-----------------------------------------------------------------
 	//

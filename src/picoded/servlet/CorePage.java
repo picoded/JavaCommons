@@ -427,7 +427,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 	}
 
 	/**
-	* Setup the instance, with http request & response
+	* Setup the instance, with http request and response
 	**/
 	protected CorePage setupInstance(HttpRequestType inRequestType, HttpServletRequest req,
 		HttpServletResponse res) throws ServletException {
@@ -730,6 +730,37 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 
 	///////////////////////////////////////////////////////
 	//
+	// CORS Handling
+	//
+	///////////////////////////////////////////////////////
+
+	/**
+	 * Does a check if CORS should be provided, by default this uses `isJsonRequest`
+	 * 
+	 * @return True / False if CORS should be enabled
+	 */
+	 public boolean isCorsRequest() {
+		return isJsonRequest();
+	 }
+
+	/**
+	 * Does the CORS validation headers.
+	 * This is automatically done when `isCorsRequest()` is true
+	 */
+	public void processCors() {
+		// If httpResponse isnt set, there is nothing to CORS
+		if( httpResponse == null ) {
+			return;
+		}
+
+		// By default CORS is enabled for all API requests
+		httpResponse.addHeader("Access-Control-Allow-Origin", "*");
+		httpResponse.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, HEAD");
+		httpResponse.addHeader("Access-Control-Max-Age", "5");
+	}
+
+	///////////////////////////////////////////////////////
+	//
 	// Process Chain execution
 	//
 	///////////////////////////////////////////////////////
@@ -745,6 +776,11 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 				// Does setup
 				doSharedSetup();
 				doSetup();
+
+				// Does CORS processing
+				if( isCorsRequest() ) {
+					processCors();
+				}
 
 				// is JSON request?
 				if (isJsonRequest()) {

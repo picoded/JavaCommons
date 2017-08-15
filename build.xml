@@ -365,7 +365,7 @@
 		<!-- no libs -->
 		<delete dir="bin/build/picodedJavaCommons-noLibs.jar" failonerror="false"/>
 		<jar destfile="bin/build/picodedJavaCommons-noLibs.jar">
-			<fileset dir="${build-classes}" includes="**/*.class" excludes="**/*_test.class"/>
+			<fileset dir="${build-classes}" includes="**/*.class,**/*.js" excludes="**/*_test.class"/>
 		</jar>
 	</target>
 

@@ -216,7 +216,7 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 		builder.filter(path+"account/rancherRegister/*", complexity_bundle_check);
 		builder.filter(path+"account/signup/*", check_password);
 
-		builder.filter(path+"account/admin/*", admin_bundle_check);
+		// builder.filter(path+"account/admin/*", admin_bundle_check);
 
 		builder.filter(path+"account/group/*", group_bundle_check);
 		builder.filter(path+"account/group/admin/*", group_admin_bundle_check);

@@ -9,7 +9,6 @@ import picoded.dstack.*;
 import picoded.conv.ConvertJSON;
 import picoded.conv.RegexUtil;
 import picoded.conv.GenericConvert;
-import picoded.conv.GUID;
 import java.util.function.BiFunction;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
@@ -1076,7 +1075,7 @@ public class AccountTableApi implements ApiModule {
 	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	**/
-	protected ApiFunction delete_user_account = (req, res) -> {
+	public ApiFunction delete_user_account = (req, res) -> {
 		String userID = req.getString(REQ_USER_ID, "");
 		AccountObject ao = ( !userID.isEmpty() ) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
 		if ( ao == null ) {
@@ -1289,117 +1288,6 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 
-	/**
-	* # rancher_register
-	*
-	* This function is used to migrate rancher accounts into the new Account Table
-	*
-	* ## HTTP Request Parameters
-	*
-	* +----------------+--------------------+-------------------------------------------------------------------------------+
-	* | Parameter Name | Variable Type      | Description                                                                   |
-	* +----------------+--------------------+-------------------------------------------------------------------------------+
-	* | authKey				 | String             | The key to use this API endpoint                                              |
-	* | userName    	 | String             | The username of the account                                                   |
-	* | password    	 | String             | The password of the account                                                   |
-	* | email    			 | String             | The email address of the account                                              |
-	* | nodeID    		 | String             | The randomly generated string used for hostURL                                |
-	* | adminPass    	 | String             | The password used for accessing the server                                    |
-	* | stackName    	 | String [Optional]  | The name of the stack                                                         |
-	* +----------------+--------------------+-------------------------------------------------------------------------------+
-	*
-	* ## JSON Object Output Parameters
-	*
-	* +----------------+--------------------+-------------------------------------------------------------------------------+
-	* | Parameter Name | Variable Type      | Description                                                                   |
-	* +----------------+--------------------+-------------------------------------------------------------------------------+
-	* | accountID      | String             | account ID used		                                                            |
-	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | DataObject     | {Object}           | DataObject representing this account	                                        |
-	* +----------------+--------------------+-------------------------------------------------------------------------------+
-	* | ERROR		    	 | String						  | Errors encounterd if any                                                      |
-	* +----------------+--------------------+-------------------------------------------------------------------------------+
-	*/
-	protected ApiFunction rancher_register = (req, res) -> {
-		// REQ_AUTH_KEY's actual value has been checked in check_parameters function
-		String[] paramsToCheck = new String[]{REQ_AUTH_KEY, REQ_USERNAME, REQ_PASSWORD, REQ_EMAIL, REQ_NODE_ID, REQ_ADMIN_PASS};
-		res = check_parameters(paramsToCheck, req, res);
-		if ( res.get(RES_ERROR) != null )
-			return res;
-		String userName = req.getString(REQ_USERNAME, "");
-		String password = req.getString(REQ_PASSWORD, "");
-		String email = req.getString(REQ_EMAIL, "");
-		String nodeID = req.getString(REQ_NODE_ID, "");
-		String adminpass = req.getString(REQ_ADMIN_PASS, "");//randomly generated
-		long createTimeStamp = System.currentTimeMillis()/1000;//current timestamp now
-		String stackName = req.getString(REQ_STACK_NAME, "");
-
-		// Check stackName, replaceAll special characters
-		if ( stackName.isEmpty() ){
-			stackName = userName.replaceAll("[^A-Za-z0-9-]", "");
-			stackName = stackName.replaceAll("\\s", "-") + "-" +nodeID;
-		}
-		String hostURL = "https://client-" + nodeID+".uilicious.com";
-		// Form the meta Object
-		Map<String, Object> metaObjMap = new HashMap<String, Object>();
-		metaObjMap.put(PROPERTIES_NODE_ID, nodeID);
-		metaObjMap.put(PROPERTIES_ADMIN_PASS, adminpass);
-		metaObjMap.put(PROPERTIES_STACK_NAME, stackName);
-		metaObjMap.put(PROPERTIES_CREATE_TIMESTAMP, createTimeStamp);
-		metaObjMap.put(PROPERTIES_EMAIL, email);
-		metaObjMap.put(PROPERTIES_HOST_URL, hostURL);
-		req.put(REQ_META, ConvertJSON.fromMap(metaObjMap));
-
-		// Creates an new account
-		res = this.new_account.apply(req, res);
-		return res;
-	};
-
-
-	protected ApiFunction sign_up = (req, res) -> {
-		String[] paramsToCheck = new String[]{REQ_USERNAME, REQ_EMAIL, REQ_PASSWORD};
-		res = check_parameters(paramsToCheck, req, res);
-		if ( res.get(RES_ERROR) != null )
-			return res;
-		String username = req.getString(REQ_USERNAME);
-		String email = req.getString(REQ_EMAIL);
-		String password = req.getString(REQ_PASSWORD);
-		username = username.replaceAll("[^A-Za-z0-9-]", "");
-		username = username.replaceAll("\\s","-");
-		String name = "client-" + username;
-		String stackName = name;
-		String description = "[SG] " + username;
-		String nodeID = GUID.base58();
-		String adminPass = GUID.base58();
-		System.out.println("nodeID: "+nodeID+" adminPass: "+adminPass+" password: "+password);
-		// Set up params for rancher_register
-		req.put(REQ_STACK_NAME, stackName);
-		req.put(REQ_ADMIN_PASS, adminPass);
-		req.put(REQ_NODE_ID, nodeID);
-		req.put(REQ_PASSWORD, password);
-		req.put(REQ_EMAIL, email);
-		req.put(REQ_AUTH_KEY, "thisawesomestring");
-		// Calls rancher_register to create account in database
-		res = this.rancher_register.apply(req, res);
-		if ( res.get(RES_ERROR) != null ){
-			return res;
-		}
-
-		// // TEST ONLY
-		// // Check that the user really exists
-		// AccountObject ao = table.get(res.getString(RES_ACCOUNT_ID));
-		// System.out.println(ao!=null);
-		// // Testing phase to add and remove immediately so that it will not populate the database and can be reused
-		// req.put(REQ_USER_ID, res.getString(RES_ACCOUNT_ID));
-		// ApiResponse apr = this.delete_user_account.apply(req, res);
-		// ao = table.get(res.getString(RES_ACCOUNT_ID));
-		// System.out.println(ao!=null);
-		// // END OF TEST ONLY
-
-		// Calls cmd from CLI to integrate with Rancher API
-
-		return res;
-	};
 
 	/**
 	* Does the actual setup for the API
@@ -1433,10 +1321,6 @@ public class AccountTableApi implements ApiModule {
 		builder.put(path+API_GROUP_ADMIN_REM_MEM_ROLE, remove_membership_role); // Tested
 		builder.put(path+API_GROUP_ADMIN_GET_MEM_LIST_INFO, get_member_list_info); // Tested
 		builder.put(path+API_GROUP_ADMIN_ADD_REM_MEM, add_remove_member); // Tested
-
-		// Rancher Register Api
-		builder.put(path+API_RANCHER_REGISTER, rancher_register);
-		builder.put(path+"account/signup", sign_up);
 	}
 
 
@@ -1669,7 +1553,7 @@ public class AccountTableApi implements ApiModule {
 		}
 	}
 
-	private ApiResponse check_parameters (String[] listToCheck, ApiRequest req, ApiResponse res) {
+	public static ApiResponse check_parameters (String[] listToCheck, ApiRequest req, ApiResponse res) {
 	  for (String paramName : listToCheck ) {
 	    String value = "";
 	    switch(paramName) {

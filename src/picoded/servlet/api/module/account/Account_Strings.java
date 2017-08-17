@@ -77,11 +77,11 @@ public class Account_Strings{
     public static final String ERROR_NO_GROUP_ID = "No groupID is found.";
     public static final String ERROR_NO_GROUPNAME = "No groupname is found.";
     public static final String ERROR_NOT_GROUP = "This is not a group.";
-    public static final String ERROR_NO_USERNAME = "No username is supplied.";
-    public static final String ERROR_NO_PASSWORD = "No password is supplied.";
+    public static final String ERROR_NO_USERNAME = "No username is found.";
+    public static final String ERROR_NO_PASSWORD = "No password is found.";
     public static final String ERROR_NO_LOGIN_PASSWORD = "Missing login password.";
     public static final String ERROR_NO_LOGIN_ID = "Missing login ID.";
-    public static final String ERROR_FAIL_LOGIN = "Failed login (wrong password or invalid user?).";
+    public static final String ERROR_FAIL_LOGIN = "Invalid username or password.";
     public static final String ERROR_NO_ROLE = "No role is found.";
     public static final String ERROR_NO_USER = "No user is found.";
     public static final String ERROR_NO_USER_ID = "No userID is found.";

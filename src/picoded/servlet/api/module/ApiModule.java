@@ -13,9 +13,9 @@ public interface ApiModule {
 	* Given the API Builder, and the namespace prefix
 	*
 	* @param  API builder to add the required functions
-	* @param  Path to assume as prefix (should be able to accept "" blanks
+	* @param  prefixPath for the api (should be able to accept "" blanks
 	**/
-	default void setupApiBuilder(ApiBuilder api, String path) {
+	default void setupApiBuilder(ApiBuilder api, String prefixPath) {
 		throw new UnsupportedOperationException("Missing the respective setup implementation");
 	}
 

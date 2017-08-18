@@ -71,6 +71,7 @@ public class Account_Strings{
     public static final String PROPERTIES_AUTH_KEY = "authKey";
     public static final String PROPERTIES_CREATE_TIMESTAMP = "createdTimeStamp";
     public static final String PROPERTIES_HOST_URL = "hostURL";
+    public static final String PROPERTIES_STACK_ID = "stackID";
 
     /// ERROR MESSAGES
     public static final String ERROR_NO_GROUP = "No group is found.";

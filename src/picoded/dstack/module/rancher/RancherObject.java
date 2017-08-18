@@ -72,6 +72,8 @@ public class RancherObject{
   /**
   * Initialize a URL connection with the URL
   * @param the path to the url to be connected
+  *
+  * @return the URLConnection to the endpoint
   */
   public URLConnection initializeConnection(String urlPath){
     URLConnection uc = null;
@@ -91,9 +93,11 @@ public class RancherObject{
 
   /**
   * Retrieves the catalog template as specified in the rancherConfig.json file
+  *
+  * @return the result of the catalog template
   */
   public Map<String, Object> retrieveCatalog(){
-    URLConnection uc = initializeConnection(baseURL+"/v" + catalog_version + "-catalog/templates/"+catalogTemplate+":"+templateVersion);
+    URLConnection uc = initializeConnection(baseURL + "/v" + catalog_version + "-catalog/templates/" + catalogTemplate + ":" + templateVersion);
     uc.setRequestProperty("Authorization", basicAuth);
     String catalog = "";
     Map<String, Object> catalogMap = new HashMap<>();
@@ -114,6 +118,8 @@ public class RancherObject{
   * Override this class
   * Generate the data to be transmitted to the Rancher API stack endpoint call
   * @param take in a map that contains user's information
+  *
+  * @return the generated post data for the rancher's stack creation
   */
   public GenericConvertMap<String, Object> generateStackPostData(GenericConvertMap<String, Object> userInfo){
     // returns null unless overwritten
@@ -123,38 +129,88 @@ public class RancherObject{
   /**
   * Create a new stack for the user specified
   * @param take in the stack configuration in form of Map Object
+  *
+  * @return the result of the connection
   */
   public GenericConvertMap<String, Object> createStack(GenericConvertMap<String, Object> stackConfig){
-    HttpURLConnection uc = (HttpURLConnection) initializeConnection(baseURL+"/v" + beta_version + "-beta/projects/"+projectID+"/stack");
+    String url = baseURL + "/v" + beta_version + "-beta/projects/" + projectID + "/stack";
+    byte[] dataBytes = stackConfig.toString().getBytes();
+    return setAndSendRequest(url, "POST", dataBytes);
+  }
+
+  /**
+  * Delete the specified stack using its stackID
+  * @param take in the ID of the stack that needed to be deleted
+  *
+  * @return the result of the connection
+  */
+  public GenericConvertMap<String, Object> deleteStack(String stackID){
+    String url = baseURL + "/v" + beta_version + "-beta/projects/" + projectID + "/stacks/" + stackID;
+    return setAndSendRequest(url, "DELETE", null);
+  }
+
+  /**
+  * Stop the specified stack using its stackID
+  * @param take in the ID of the stack that needed to be stopped
+  *
+  * @return the result of the connection
+  */
+  public GenericConvertMap<String, Object> stopStack(String stackID){
+    String url = baseURL + "/v" + beta_version + "-beta/projects/" + projectID + "/stacks/" + stackID + "?action=deactivateservices";
+    return setAndSendRequest(url, "POST", null);
+  }
+
+  public GenericConvertMap<String, Object> getStack(String stackID){
+    String url = baseURL + "/v" + beta_version + "-beta/projects/" + projectID + "/stacks/" + stackID;
+    return setAndSendRequest(url, "GET", null);
+  }
+
+  /**
+  * Create the general procedure when connecting to rancher
+  * @param take in the full url of the endpoint to connect to
+  * @param take in the requestMethod e.g. GET, POST, DELETE
+  * @param take in the byte array of data to pass to rancher
+  *
+  * @return the result of the connection
+  */
+  private GenericConvertMap<String, Object> setAndSendRequest(String url, String requestMethod, byte[] dataBytes){
+    HttpURLConnection uc = (HttpURLConnection) initializeConnection(url);
     StringBuffer response = new StringBuffer();
     Map<String, Object> result = new HashMap<>();
+    int responseCode = 0;
     try{
-      // Setting POST request
-      uc.setRequestMethod("POST");
+      // Setting the request
+      uc.setRequestMethod(requestMethod);
       uc.setDoOutput(true);
       uc.setDoInput(true);
       uc.setRequestProperty("Authorization", basicAuth);
+      // Generally, all rancher's API endpoint requests can be application/json
       uc.setRequestProperty("Content-Type", "application/json");
       uc.setRequestProperty("Accept", "application/json");
-      // Writing data to the URL
-      byte[] dataBytes = stackConfig.toString().getBytes();
-      OutputStream os = uc.getOutputStream();
-      os.write(dataBytes);
-      os.close();
+
+      if ( dataBytes != null ){
+        // Writing data to the URL
+        OutputStream os = uc.getOutputStream();
+        os.write(dataBytes);
+        os.close();
+      }
+      // Connects if it has not been connected
       uc.connect();
+
       // Getting response back
-      int responseCode = uc.getResponseCode();
+      responseCode = uc.getResponseCode();
       InputStream is = null;
-      // If stack is created
-      if( responseCode == 201 ){
+      // If action is successful
+      if( responseCode == 201 || responseCode == 200){
         is = uc.getInputStream();
       } else {
         // Get the error
         is = uc.getErrorStream();
       }
-      // Outputing the response
+
+      // Output the response
       BufferedReader in = new BufferedReader(new InputStreamReader(is));
-  		String inputLine;
+  		String inputLine = "";
   		while ((inputLine = in.readLine()) != null) {
   			response.append(inputLine);
   		}
@@ -164,10 +220,11 @@ public class RancherObject{
     } catch(Exception e) {
       System.out.println("Connection error while passing data to rancher.");
       // Additional errors captured and placed to result
-      result.put("status", "422");
-      result.put("code", "Connection error while passing data to rancher. Review RancherObject.");
+      result.put("status", responseCode);
+      result.put("code", "Connection error while passing data to rancher. Review RancherObject. Request Method used: " + requestMethod);
     }
     // return as a GenericConvertMap
     return GenericConvert.toGenericConvertStringMap(result);
+
   }
 }

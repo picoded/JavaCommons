@@ -1,4 +1,4 @@
-package picoded.dstack.module.rancher;
+package picoded.devOps.rancher;
 
 import picoded.struct.GenericConvertMap;
 import picoded.conv.*;

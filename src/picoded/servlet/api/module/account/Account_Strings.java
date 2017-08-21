@@ -64,7 +64,7 @@ public class Account_Strings{
     public static final String PROPERTIES_EMAIL = "email";
     public static final String PROPERTIES_IS_GROUP = "isGroup";
     public static final String PROPERTIES_OID = "_oid";
-    public static final String PROPERTIES_NAMES = "name";
+    public static final String PROPERTIES_NAME = "name";
     public static final String PROPERTIES_NODE_ID = "nodeID";
     public static final String PROPERTIES_ADMIN_PASS = "adminPass";
     public static final String PROPERTIES_STACK_NAME = "stackName";

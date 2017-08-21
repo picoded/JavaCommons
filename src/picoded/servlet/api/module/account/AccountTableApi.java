@@ -557,7 +557,7 @@ public class AccountTableApi implements ApiModule {
 			for ( String column : headers ) {
 				if ( column.equalsIgnoreCase(PROPERTIES_OID) ) {
 					returnList.get(listCounter).add(ao._oid());
-				} else if ( column.equalsIgnoreCase(PROPERTIES_NAMES) ) {
+				} else if ( column.equalsIgnoreCase(PROPERTIES_NAME) ) {
 					Set<String> names = ao.getLoginIDSet();
 					names.clear();
 					for (String name : ao.getLoginIDSet()) {
@@ -930,7 +930,7 @@ public class AccountTableApi implements ApiModule {
 
 		String orderByStr = req.getString("orderBy", "oID");
 
-		String[] headers = req.getStringArray("headers", "['" + PROPERTIES_OID + "', '" + PROPERTIES_NAMES + "']");
+		String[] headers = req.getStringArray("headers", "['" + PROPERTIES_OID + "', '" + PROPERTIES_NAME + "']");
 
 		String query = req.getString("query");
 		String[] queryArgs = req.getStringArray("queryArgs");
@@ -1364,7 +1364,11 @@ public class AccountTableApi implements ApiModule {
 			commonInfo.put("isSuperUser", account.isSuperUser());
 			commonInfo.put("isGroup", account.isGroup());
 			// Extract hostURL from user account object
-			commonInfo.put("hostURL", account.get("hostURL"));
+			commonInfo.put(PROPERTIES_HOST_URL, account.get(PROPERTIES_HOST_URL));
+			// Extract email from user account object
+			commonInfo.put(PROPERTIES_EMAIL, account.get(PROPERTIES_EMAIL));
+			// Extract name from user account object
+			commonInfo.put(PROPERTIES_NAME, account.get(PROPERTIES_NAME));
 			Map<String, List<Map<String, Object>>> groupMap = new HashMap<String, List<Map<String, Object>>>();
 			AccountObject[] groups = account.getGroups();
 			// Check if any groups exist for the member

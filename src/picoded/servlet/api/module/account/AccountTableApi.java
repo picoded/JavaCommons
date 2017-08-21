@@ -922,7 +922,7 @@ public class AccountTableApi implements ApiModule {
 	**/
 	protected ApiFunction get_user_or_group_list = (req, res) -> {
 		int draw = req.getInt("draw");
-		int start = req.getInt("start");
+		int start = req.getInt("start", 0);
 		int limit = req.getInt("length");
 		String[] insideGroupAny = req.getStringArray("insideGroup_any");
 		String[] hasGroupRole_any = req.getStringArray("hasGroupRole_any");
@@ -968,8 +968,16 @@ public class AccountTableApi implements ApiModule {
 		}
 
 		DataTable mtObj = table.accountDataTable();
-
+		Map<String, Object> links = new HashMap<>();
+		Map<String, Object> pagination = new HashMap<>();
+		pagination.put("total", table.size());
+		limit = (limit == 0) ? table.size() : limit;
+		pagination.put("per_page", limit);
+		pagination.put("current_page", start+1);
+		pagination.put("last_page", Math.ceil(table.size()/limit));
+		links.put("pagination", pagination);
 		//put back into response
+		res.put("links", links);
 		res.put(RES_DRAW, draw);
 		res.put(RES_HEADERS, headers);
 		res.put(RES_RECORDS_TOTAL, table.size());
@@ -981,11 +989,14 @@ public class AccountTableApi implements ApiModule {
 
 		boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
 
-		List<List<Object>> data = new ArrayList<List<Object>>();
+		// List<List<Object>> data = new ArrayList<List<Object>>();
+		String dataStr = "";
+		boolean asObject = true;
 		try {
-			data = list_GET_and_POST_inner(table, draw, start, limit, headers, query, queryArgs,
-				orderByStr, insideGroupAny, hasGroupRole_any, groupStatus, sanitiseOutput);
+			dataStr = list_GET_and_POST_inner(table, draw, start, limit, headers, query, queryArgs,
+				orderByStr, insideGroupAny, hasGroupRole_any, groupStatus, sanitiseOutput, asObject);
 				// System.out.println(ConvertJSON.fromObject(data)+" <<<<<<<<<<<<<<<<< data");
+			List<Object> data = ConvertJSON.toList(dataStr);
 			res.put(RES_DATA, data);
 		} catch (Exception e) {
 			res.put("error", e.getMessage());
@@ -1437,14 +1448,14 @@ public class AccountTableApi implements ApiModule {
 		return ret;
 	}
 
-	private static List<List<Object>> list_GET_and_POST_inner(AccountTable _DataTableObj, int draw, int start,
+	private static String list_GET_and_POST_inner(AccountTable _DataTableObj, int draw, int start,
 	int length, String[] headers, String query, String[] queryArgs, String orderBy, String[] insideGroup_any,
-	String[] hasGroupRole_any, String groupStatus, boolean sanitiseOutput) throws RuntimeException {
+	String[] hasGroupRole_any, String groupStatus, boolean sanitiseOutput, boolean asObject) throws RuntimeException {
 
-		List<List<Object>> ret = new ArrayList<List<Object>>();
+		List<Object> ret = new ArrayList<Object>();
 
 		if (_DataTableObj == null) {
-			return ret;
+			return ConvertJSON.fromObject(ret);
 		}
 
 		try {
@@ -1458,7 +1469,7 @@ public class AccountTableApi implements ApiModule {
 					DataTable accountDataTable = _DataTableObj.accountDataTable();
 
 					if (accountDataTable == null) {
-						return ret;
+						return ConvertJSON.fromObject(ret);
 					}
 
 					if (query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0) {
@@ -1481,7 +1492,7 @@ public class AccountTableApi implements ApiModule {
 				}
 
 				if (fullUserArray == null || fullUserArray.length == 0) {
-					return ret;
+					return ConvertJSON.fromObject(ret);
 				}
 
 				//group status filtering
@@ -1503,8 +1514,10 @@ public class AccountTableApi implements ApiModule {
 				}
 
 				for (AccountObject ao : fullUserArray) {
-					List<Object> row = new ArrayList<Object>();
+					List<Object> rowAsList = new ArrayList<Object>();
+					Map<String, Object> rowAsObject = new HashMap<String, Object>();
 					for (String header : headers) {
+
 						if (header.equalsIgnoreCase("names")) {
 							if (ao != null) {
 								Set<String> aoNames = ao.getLoginIDSet();
@@ -1518,29 +1531,42 @@ public class AccountTableApi implements ApiModule {
 
 								if (aoNames != null) {
 									List<String> aoNameList = new ArrayList<String>(aoNames);
-									row.add(aoNameList);
+									if (asObject)
+										rowAsObject.put(header, aoNameList);
+									else
+										rowAsList.add(aoNameList);
 								}
 							}
 						} else {
 							Object rawVal = ao.get(header); //this used to be metaObj.get
-
+							if(header.equalsIgnoreCase("_oid"))
+								header = "id";
 							if (sanitiseOutput && rawVal instanceof String) {
 								String stringVal = GenericConvert.toString(rawVal);
-								row.add(stringVal);
+								if (asObject)
+									rowAsObject.put(header, stringVal);
+								else
+									rowAsList.add(stringVal);
 							} else {
-								row.add(rawVal);
+								if (asObject)
+									rowAsObject.put(header, rawVal);
+								else
+									rowAsList.add(rawVal);
 							}
 
 						}
 					}
-					ret.add(row);
+					if (asObject)
+						ret.add(rowAsObject);
+					else
+						ret.add(rowAsList);
 				}
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("list_GET_and_POST_inner() ", e);
 		}
 
-		return ret;
+		return ConvertJSON.fromObject(ret);
 	}
 
 	private static String getStringWithWildcardMode(String searchString, String wildcardMode) {

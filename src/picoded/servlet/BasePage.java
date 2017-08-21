@@ -9,13 +9,13 @@ import picoded.dstack.*;
 */
 public class BasePage extends DStackPage {
 
-  protected AccountTable _accountTable = null;
+	protected AccountTable _accountTable = null;
 
-  @Override
-  public void initializeContext() throws Exception {
-    super.initializeContext();
+	@Override
+	public void initializeContext() throws Exception {
+		super.initializeContext();
 		setupAccountTable();
-  }
+	}
 
 	@Override
 	public boolean doAuth(Map<String, Object> templateData) throws Exception {
@@ -24,7 +24,7 @@ public class BasePage extends DStackPage {
 
 	////////////////////////////////////////////////////////////////////////////
 	//
-  // GET Private Methods
+	// GET Private Methods
 	//
 	////////////////////////////////////////////////////////////////////////////
 
@@ -33,33 +33,33 @@ public class BasePage extends DStackPage {
 	*
 	* @return String of the table prefix
 	*/
-  private String getAccountTablePrefix(){
-    return DConfig().getString("sys.DStack.baseAccount.name",
+	private String getAccountTablePrefix(){
+		return DConfig().getString("sys.DStack.baseAccount.name",
 			DConfig().getString("sys.account.tableConfig.tablePrefix", "account"));
-  }
+	}
 
 	/**
 	* Return the superUserGroup name
 	*
 	* @return String of the superUserGroup
 	*/
-  private String getSuperUserGroupName(){
-    return DConfig().getString("sys.account.superUsers.groupName", "SuperUsers");
-  }
+	private String getSuperUserGroupName(){
+		return DConfig().getString("sys.account.superUsers.groupName", "SuperUsers");
+	}
 
 	/**
 	* Return the account table, sets it if it does not exists
 	*
 	* @return AccountTable object
 	*/
-  private AccountTable getAccountTable(){
-    if ( _accountTable != null ){
-      return _accountTable;
-    }
-    _accountTable = DStack().getAccountTable(getAccountTablePrefix());
+	private AccountTable getAccountTable(){
+		if ( _accountTable != null ){
+			return _accountTable;
+		}
+		_accountTable = DStack().getAccountTable(getAccountTablePrefix());
 
-    return _accountTable;
-  }
+		return _accountTable;
+	}
 
 	////////////////////////////////////////////////////////////////////////////
 	//
@@ -105,15 +105,15 @@ public class BasePage extends DStackPage {
 	/**
 	* Set up account table with its configuration from the file
 	*/
-  public void setupAccountTable(){
+	public void setupAccountTable(){
 		AccountTable at = getAccountTable();
 		DConfig dc = DConfig();
 		// Configure account table
-    at.setSuperUserGroupName(getSuperUserGroupName());
-    at.isHttpOnly = dc.getBoolean("sys.account.session.isHttpOnly", false /*default as false*/);
+		at.setSuperUserGroupName(getSuperUserGroupName());
+		at.isHttpOnly = dc.getBoolean("sys.account.session.isHttpOnly", false /*default as false*/);
 		at.isSecureOnly = dc.getBoolean("sys.account.session.isSecureOnly", false /*default as false*/);
 
-    // Configure login life time from config
+		// Configure login life time from config
 		int loginLifetime = dc.getInt("sys.account.session.loginlifetime", 3600);
 		if(loginLifetime > -1){
 			at.loginLifetime = loginLifetime;
@@ -124,7 +124,7 @@ public class BasePage extends DStackPage {
 			at.systemSetup();
 		}
 
-    // Gets the superuser and group information
+		// Gets the superuser and group information
 		String superGroup = getSuperUserGroupName();
 		String adminUser = dc.getString("sys.account.superUsers.rootUsername", "admin");
 		String adminPass = dc.getString("sys.account.superUsers.rootPassword", "P@ssw0rd!");
@@ -147,19 +147,19 @@ public class BasePage extends DStackPage {
 			superUser.putAll(meta);
 		}
 
-    // Set up super user group if does not exist (condition is to have an user
-    // to be inside)
-    AccountObject superGrp = at.getFromLoginID(getSuperUserGroupName());
-    if ( superGrp == null ) {
-      superGrp = at.newObject(getSuperUserGroupName());
+		// Set up super user group if does not exist (condition is to have an user
+		// to be inside)
+		AccountObject superGrp = at.getFromLoginID(getSuperUserGroupName());
+		if ( superGrp == null ) {
+			superGrp = at.newObject(getSuperUserGroupName());
 			superGrp.setGroupStatus(true);
 			superGrp.setMembershipRoles(superGrpMemberRoles);
 			// Put superUser as the first admin of this group
 			superGrp.addMember(superUser, "admin");
-    }
-    // Apply changes
+		}
+		// Apply changes
 		superUser.saveDelta();
 		superGrp.saveDelta();
-  }
+	}
 
 }

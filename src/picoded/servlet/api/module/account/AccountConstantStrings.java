@@ -1,7 +1,7 @@
 package picoded.servlet.api.module.account;
 import javax.mail.internet.*;
 
-public class Account_Strings{
+public class AccountConstantStrings{
 
   	/// Static REQUEST VARS
     public static final String REQ_OID = "_oid";

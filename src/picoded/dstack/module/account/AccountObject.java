@@ -9,7 +9,7 @@ import picoded.struct.*;
 import picoded.security.*;
 
 
-import static picoded.servlet.api.module.account.Account_Strings.*;
+import static picoded.servlet.api.module.account.AccountConstantStrings.*;
 
 /**
 * Represents a single group / user account.

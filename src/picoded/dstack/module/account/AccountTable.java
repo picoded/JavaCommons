@@ -9,7 +9,7 @@ import picoded.conv.*;
 import picoded.struct.*;
 import org.apache.commons.lang3.ArrayUtils;
 
-import static picoded.servlet.api.module.account.Account_Strings.*;
+import static picoded.servlet.api.module.account.AccountConstantStrings.*;
 
 /**
 * The account class is considered a hybrid class of both the user, group management class.

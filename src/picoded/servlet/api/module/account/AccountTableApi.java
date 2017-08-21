@@ -12,7 +12,7 @@ import picoded.conv.GenericConvert;
 import java.util.function.BiFunction;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
-import static picoded.servlet.api.module.account.Account_Strings.*;
+import static picoded.servlet.api.module.account.AccountConstantStrings.*;
 
 /**
 * Account table API builder
@@ -47,7 +47,7 @@ public class AccountTableApi implements ApiModule {
 	* ## Request Parameters
 	*
 	* +----------------+--------------------+-------------------------------------------------------------------------------+
-	* | Parameter Name | Variable Type	   | Description                                                                   |
+	* | Parameter Name | Variable Type     | Description                                                                   |
 	* +----------------+--------------------+-------------------------------------------------------------------------------+
 	* | -              | -                  | -                                                                             |
 	* +----------------+--------------------+-------------------------------------------------------------------------------+
@@ -79,7 +79,7 @@ public class AccountTableApi implements ApiModule {
 	* ## Request Parameters
 	*
 	* +----------------+--------------------+-------------------------------------------------------------------------------+
-	* | Parameter Name | Variable Type	   | Description                                                                   |
+	* | Parameter Name | Variable Type     | Description                                                                   |
 	* +----------------+--------------------+-------------------------------------------------------------------------------+
 	* | accountID      | String (Optional)  | Either the loginID or the accountID is needed                                 |
 	* | loginID        | String (Optional)  | Either the loginID or the accountID is needed                                 |
@@ -229,10 +229,10 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type	      | Description                                                                |
+	* | Parameter Name  | Variable Type        | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | meta            | {Object} Map<S, O>    | Meta object that represents this account                                   |
-	* | password        | String      	      | Password of new account                                                    |
+	* | password        | String              | Password of new account                                                    |
 	* | username        | String                | Username of new account                                                    |
 	* | isGroup         | boolean (optional)    | whether this is a group object (defaults to false)                         |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -240,7 +240,7 @@ public class AccountTableApi implements ApiModule {
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type	      | Description                                                                |
+	* | Parameter Name  | Variable Type        | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | accountID       | String                | account ID used                                                            |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -328,17 +328,17 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type	    	  | Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | groupID					| String								| ID of the group to retrieve																								 |
+	* | groupID          | String                | ID of the group to retrieve                                                 |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | list						| List		              | List of roles																															 |
+	* | list            | List                  | List of roles                                                               |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -369,18 +369,18 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | userID					| String								| ID of the user to retrieve																								 |
-	* | groupID					| String								| ID of the group to retrieve from																					 |
+	* | userID          | String                | ID of the user to retrieve                                                 |
+	* | groupID          | String                | ID of the group to retrieve from                                           |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | single					| String	              | Role of the user																													 |
+	* | single          | String                | Role of the user                                                           |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -420,18 +420,18 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | role						| String								| name of the role to add																										 |
-	* | groupID					| String								| ID of the group to add to																									 |
+	* | role            | String                | name of the role to add                                                     |
+	* | groupID          | String                | ID of the group to add to                                                   |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | meta						| {Object}	            | Object containing the list of roles of the group													 |
+	* | meta            | {Object}              | Object containing the list of roles of the group                           |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -463,18 +463,18 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | role						| String								| name of the role to remove																								 |
-	* | groupname				| String								| name of the group to remove from																					 |
+	* | role            | String                | name of the role to remove                                                 |
+	* | groupname        | String                | name of the group to remove from                                           |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | meta						| {Object}	            | Object containing the list of roles of the group													 |
+	* | meta            | {Object}              | Object containing the list of roles of the group                           |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -510,25 +510,25 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | draw            | int (optional)     		| Draw counter echoed back, and used by the datatables.js server-side API    |
-	* | start           | int (optional)   		  | Default 0: Record start listing, 0-indexed                                 |
-	* | length          | int (optional)   		  | Default max: The number of records to return                               |
-	* | headers					| String [](optional)		| The columns headers returned 																							 |
-	* | groupID					| String (optional)			| ID of the group/current user to retrieve from															 |
+	* | draw            | int (optional)         | Draw counter echoed back, and used by the datatables.js server-side API    |
+	* | start           | int (optional)         | Default 0: Record start listing, 0-indexed                                 |
+	* | length          | int (optional)         | Default max: The number of records to return                               |
+	* | headers          | String [](optional)    | The columns headers returned                                                |
+	* | groupID          | String (optional)      | ID of the group/current user to retrieve from                               |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | data						| array				          | Rows containing the members' OBJECT of the group													 |
-	* | draw            | int (optional)     		| Draw counter echoed back, and used by the datatables.js server-side API       | not returned
-	* | recordsTotal    | int                		| Total amount of records. Before any search filter (But after base filters)    | not returned
-	* | recordsFilterd  | int                		| Total amount of records. After all search filter                              | not returned
-	* | headers         | String[](optional) 		| The collumns headers returned                                                 |
+	* | data            | array                  | Rows containing the members' OBJECT of the group                           |
+	* | draw            | int (optional)         | Draw counter echoed back, and used by the datatables.js server-side API       | not returned
+	* | recordsTotal    | int                    | Total amount of records. Before any search filter (But after base filters)    | not returned
+	* | recordsFilterd  | int                    | Total amount of records. After all search filter                              | not returned
+	* | headers         | String[](optional)     | The collumns headers returned                                                 |
 	* | groupID         | String             | group ID used in the request                                                  |
 	* | groupID_exist   | boolean            | indicates if the account ID exists in the system                              |
 	* | groupID_valid   | boolean            | indicates if the account ID exists and is a group                             |
@@ -594,10 +594,10 @@ public class AccountTableApi implements ApiModule {
 	* Description: This function performs add/remove members from existing groups
 	*
 	*
-	*	@param actionObject - GenericConvertMap<String, Object> Contains the action and groupID to be performed by the function
+	*  @param actionObject - GenericConvertMap<String, Object> Contains the action and groupID to be performed by the function
 	* @param userIDList - String[] Contains the list of user ID to be processed
 	*
-	*	@return returnResult - GenericConvertMap<String, Object> Returns the failedList and successList back to caller
+	*  @return returnResult - GenericConvertMap<String, Object> Returns the failedList and successList back to caller
 	*/
 	private BiFunction<GenericConvertMap<String, Object>, String[], GenericConvertHashMap<String, Object>> addOrRemove = (actionObject, userIDList) -> {
 		List<String> failedList = new ArrayList<String>(), successList = new ArrayList<String>();
@@ -634,20 +634,20 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | addList					| String []							| List of ID of the users to add																						 |
-	* | removeList			| String []							| List of ID of the users to remove																					 |
-	* | groupID					| String []							| ID of the group to add/remove to/from																			 |
-	* | role						| String								| name of the role assigned for the user																		 |
+	* | addList          | String []              | List of ID of the users to add                                             |
+	* | removeList      | String []              | List of ID of the users to remove                                           |
+	* | groupID          | String []              | ID of the group to add/remove to/from                                       |
+	* | role            | String                | name of the role assigned for the user                                     |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | meta						| {Object}              | Information of the newly added user																				 |
+	* | meta            | {Object}              | Information of the newly added user                                         |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -698,19 +698,19 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | userID					| String								| ID of the user to retrieve																								 |
-	* | groupID					| String								| ID of the group to retrieve from																					 |
-	* | role						| String (Optional)			| name of the role assigned to the user																			 |
+	* | userID          | String                | ID of the user to retrieve                                                 |
+	* | groupID          | String                | ID of the group to retrieve from                                           |
+	* | role            | String (Optional)      | name of the role assigned to the user                                       |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | meta						| {Object}              | Meta information of the user																							 |
+	* | meta            | {Object}              | Meta information of the user                                               |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -753,23 +753,23 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
-	* | groupID					| String								| ID of the group to retrieve from																					 |
-	* | updateMode			| String	              | Mode of the update used, full or delta (default: delta)										 |
-	* | meta						| {Object}							| name of the role assigned to the user																			 |
+	* | userID          | String  (Optional)    | ID of the user/current user to retrieve                                     |
+	* | groupID          | String                | ID of the group to retrieve from                                           |
+	* | updateMode      | String                | Mode of the update used, full or delta (default: delta)                     |
+	* | meta            | {Object}              | name of the role assigned to the user                                       |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | meta						| {Object}              | Meta information of the user																							 |
-	* | accountID				| String	              | ID of the user																														 |
-	* | updateMode			| String	              | Mode of the update used																										 |
-	* | success					| boolean	              | false for failed update and true for success															 |
+	* | meta            | {Object}              | Meta information of the user                                               |
+	* | accountID        | String                | ID of the user                                                             |
+	* | updateMode      | String                | Mode of the update used                                                     |
+	* | success          | boolean                | false for failed update and true for success                               |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -825,21 +825,21 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
-	* | oldPassword			| String								| Old password of the user																									 |
-	* | newPassword			| String								| New password of the user																									 |
-	* | repeatPassword	| String								| Repeat new password of the user																						 |
+	* | userID          | String  (Optional)    | ID of the user/current user to retrieve                                     |
+	* | oldPassword      | String                | Old password of the user                                                   |
+	* | newPassword      | String                | New password of the user                                                   |
+	* | repeatPassword  | String                | Repeat new password of the user                                             |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | accountID				| String	              | ID of the user																														 |
-	* | success					| boolean	              | false for failed change and true for success															 |
+	* | accountID        | String                | ID of the user                                                             |
+	* | success          | boolean                | false for failed change and true for success                               |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -886,7 +886,7 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+--------------------+-------------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type	    | Description                                                                   |
+	* | Parameter Name  | Variable Type      | Description                                                                   |
 	* +-----------------+--------------------+-------------------------------------------------------------------------------+
 	* | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
 	* | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
@@ -907,7 +907,7 @@ public class AccountTableApi implements ApiModule {
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+--------------------+-------------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type	    | Description                                                                   |
+	* | Parameter Name  | Variable Type      | Description                                                                   |
 	* +-----------------+--------------------+-------------------------------------------------------------------------------+
 	* | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
 	* | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    |
@@ -1013,20 +1013,20 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
-	* | updateMode			| String	              | Mode of the update used, full or delta (default: delta)										 |
-	* | meta						| {Object}							| name of the role assigned to the user																			 |
+	* | userID          | String  (Optional)    | ID of the user/current user to retrieve                                     |
+	* | updateMode      | String                | Mode of the update used, full or delta (default: delta)                     |
+	* | meta            | {Object}              | name of the role assigned to the user                                       |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | accountID				| String	              | ID of the user																														 |
-	* | success					| boolean	              | false for failed change and true for success															 |
+	* | accountID        | String                | ID of the user                                                             |
+	* | success          | boolean                | false for failed change and true for success                               |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -1071,17 +1071,17 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	* | userID          | String  (Optional)    | ID of the user/current user to retrieve                                     |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | success					| boolean	              | false for failed change and true for success															 |
+	* | success          | boolean                | false for failed change and true for success                               |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -1109,15 +1109,15 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	* | userID          | String  (Optional)    | ID of the user/current user to retrieve                                     |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | accountID       | String             | account ID used                                                               |
 	* | accountNames    | String[]           | array of account names representing the account                               | sanitise
@@ -1152,15 +1152,15 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | userID					| String  (Optional)		| ID of the user/current user to retrieve																		 |
+	* | userID          | String  (Optional)    | ID of the user/current user to retrieve                                     |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | accountID       | String             | account ID used                                                               |
 	* | accountNames    | String[]           | array of account names representing the account                               | sanitise
@@ -1195,18 +1195,18 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | username				| String	(Either or)		| name of the user to retrieve from																					 |
-	* | oid							| String								| oid of the user to retrieve from																					 |
+	* | username        | String  (Either or)    | name of the user to retrieve from                                           |
+	* | oid              | String                | oid of the user to retrieve from                                           |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type          | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | list						| List<String>          | List containing the groups' ID of the member															 |
+	* | list            | List<String>          | List containing the groups' ID of the member                               |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -1231,17 +1231,17 @@ public class AccountTableApi implements ApiModule {
 	* ## HTTP Request Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type         | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | userID					| String	(Either or)		| ID of the user to retrieve from																						 |
+	* | userID          | String  (Either or)   | ID of the user to retrieve from                                            |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	*
 	* ## JSON Object Output Parameters
 	*
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | Parameter Name  | Variable Type					| Description                                                                |
+	* | Parameter Name  | Variable Type         | Description                                                                |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
-	* | list						| List<String>          | List containing the groups' OBJECT of the member													 |
+	* | list            | List<String>          | List containing the groups' OBJECT of the member                           |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
 	* | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	* +-----------------+-----------------------+----------------------------------------------------------------------------+
@@ -1584,83 +1584,83 @@ public class AccountTableApi implements ApiModule {
 	}
 
 	public static ApiResponse check_parameters (String[] listToCheck, ApiRequest req, ApiResponse res) {
-	  for (String paramName : listToCheck ) {
-	    String value = "";
-	    switch(paramName) {
-	      case REQ_ACCOUNT_ID :
-	        value = req.getString(paramName, "");
-	        if ( value.isEmpty() )
-	          res.put(RES_ERROR, ERROR_NO_USER_ID);
-	        break;
-	      case REQ_USERNAME :
-	        value = req.getString(paramName, "");
-	        if ( value.isEmpty() )
-	          res.put(RES_ERROR, ERROR_NO_USERNAME);
-	        break;
-	      case REQ_PASSWORD :
-	        value = req.getString(paramName, "");
-	        if ( value.isEmpty() )
-	          res.put(RES_ERROR, ERROR_NO_PASSWORD);
-	        break;
-	      case REQ_GROUP_ID :
-	        value = req.getString(paramName, "");
-	        if ( value.isEmpty() )
-	          res.put(RES_ERROR, ERROR_NO_GROUP_ID);
-	        break;
-	      case REQ_USER_ID :
-	        value = req.getString(paramName, "");
-	        if ( value.isEmpty() )
-	          res.put(RES_ERROR, ERROR_NO_USER_ID);
-	        break;
-	      case REQ_ROLE :
-	        value = req.getString(paramName, "");
-	        if ( value.isEmpty() )
-	          res.put(RES_ERROR, ERROR_NO_ROLE);
-	        break;
-	      case REQ_GROUPNAME :
-	        value = req.getString(paramName, "");
-	        if ( value.isEmpty() )
-	          res.put(RES_ERROR, ERROR_NO_GROUPNAME);
-	        break;
-	      case REQ_META :
-	        Object metaObj = req.get(paramName);
-	        if ( metaObj == null )
-	          res.put(RES_ERROR, ERROR_NO_META);
-	        break;
-	      case REQ_OLD_PASSWORD:
-	        value = req.getString(paramName, "");
-	        if ( value.isEmpty() )
-	          res.put(RES_ERROR, ERROR_NO_PASSWORD);
-	        break;
-	      case REQ_NEW_PASSWORD:
-	        value = req.getString(paramName, "");
-	        if ( value.isEmpty() )
-	          res.put(RES_ERROR, ERROR_NO_NEW_PASSWORD);
-	        break;
-	      case REQ_REPEAT_PASSWORD:
-	        value = req.getString(paramName, "");
-	        if ( value.isEmpty() )
-	          res.put(RES_ERROR, ERROR_NO_NEW_REPEAT_PASSWORD);
-	        break;
+		for (String paramName : listToCheck ) {
+			String value = "";
+			switch(paramName) {
+				case REQ_ACCOUNT_ID :
+					value = req.getString(paramName, "");
+					if ( value.isEmpty() )
+						res.put(RES_ERROR, ERROR_NO_USER_ID);
+					break;
+				case REQ_USERNAME :
+					value = req.getString(paramName, "");
+					if ( value.isEmpty() )
+						res.put(RES_ERROR, ERROR_NO_USERNAME);
+					break;
+				case REQ_PASSWORD :
+					value = req.getString(paramName, "");
+					if ( value.isEmpty() )
+						res.put(RES_ERROR, ERROR_NO_PASSWORD);
+					break;
+				case REQ_GROUP_ID :
+					value = req.getString(paramName, "");
+					if ( value.isEmpty() )
+						res.put(RES_ERROR, ERROR_NO_GROUP_ID);
+					break;
+				case REQ_USER_ID :
+					value = req.getString(paramName, "");
+					if ( value.isEmpty() )
+						res.put(RES_ERROR, ERROR_NO_USER_ID);
+					break;
+				case REQ_ROLE :
+					value = req.getString(paramName, "");
+					if ( value.isEmpty() )
+						res.put(RES_ERROR, ERROR_NO_ROLE);
+					break;
+				case REQ_GROUPNAME :
+					value = req.getString(paramName, "");
+					if ( value.isEmpty() )
+						res.put(RES_ERROR, ERROR_NO_GROUPNAME);
+					break;
+				case REQ_META :
+					Object metaObj = req.get(paramName);
+					if ( metaObj == null )
+						res.put(RES_ERROR, ERROR_NO_META);
+					break;
+				case REQ_OLD_PASSWORD:
+					value = req.getString(paramName, "");
+					if ( value.isEmpty() )
+						res.put(RES_ERROR, ERROR_NO_PASSWORD);
+					break;
+				case REQ_NEW_PASSWORD:
+					value = req.getString(paramName, "");
+					if ( value.isEmpty() )
+						res.put(RES_ERROR, ERROR_NO_NEW_PASSWORD);
+					break;
+				case REQ_REPEAT_PASSWORD:
+					value = req.getString(paramName, "");
+					if ( value.isEmpty() )
+						res.put(RES_ERROR, ERROR_NO_NEW_REPEAT_PASSWORD);
+					break;
 				case REQ_AUTH_KEY: // No authKey means unable to use this API endpoint
-	        value = req.getString(paramName, "");
-	        if ( value.isEmpty() || !value.equals("thisawesomestring") )
-	          res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
-	        break;
+					value = req.getString(paramName, "");
+					if ( value.isEmpty() || !value.equals("thisawesomestring") )
+						res.put(RES_ERROR, ERROR_NO_PRIVILEGES);
+					break;
 				case REQ_EMAIL:
-	        value = req.getString(paramName, "");
-	        if ( value.isEmpty() )
-	          res.put(RES_ERROR, ERROR_NO_EMAIL);
-	        break;
+					value = req.getString(paramName, "");
+					if ( value.isEmpty() )
+						res.put(RES_ERROR, ERROR_NO_EMAIL);
+					break;
 				case REQ_NODE_ID:
-	        value = req.getString(paramName, "");
-	        if ( value.isEmpty() )
-	          res.put(RES_ERROR, ERROR_NO_NODE_ID);
-	        break;
-	    }
+					value = req.getString(paramName, "");
+					if ( value.isEmpty() )
+						res.put(RES_ERROR, ERROR_NO_NODE_ID);
+					break;
+			}
 			if ( res.get(RES_ERROR) != null )
 				break;
-	  }
-	  return res;
+		}
+		return res;
 	}
 }

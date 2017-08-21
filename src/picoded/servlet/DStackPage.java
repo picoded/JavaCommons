@@ -15,7 +15,7 @@ import picoded.dstack.DStack;
 import picoded.dstack.stack.DStackConfigLoader;
 
 /**
- * Extends the corePage functionality, and implements file directory listing, JStack usage, and config files
+ * Extends the corePage functionality, and implements file directory listing, DStack usage, and config files
  *
  * ---------------------------------------------------------------------------------------------------------
  *

@@ -1,7 +1,7 @@
 package picoded.servlet.api.module;
 
 import picoded.servlet.api.*;
-import picoded.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertMap;
 
 /**
 * The ApiModule interface template, without the 

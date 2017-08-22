@@ -1,4 +1,4 @@
-package picoded.struct;
+package picoded.core.struct;
 
 // Target test class
 import static org.junit.Assert.assertEquals;
@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 ///
-/// Test Case for picoded.struct.CaseInsensitiveHashMap
+/// Test Case for picoded.core.struct.CaseInsensitiveHashMap
 ///
 public class GenericConvertHashMap_test {
 	UnsupportedDefaultMap<String, String> genericConvertHashMap = null;

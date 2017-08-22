@@ -5,7 +5,7 @@ import java.util.Set;
 import org.apache.commons.lang3.RandomUtils;
 
 import picoded.security.NxtCrypt;
-import picoded.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertMap;
 
 /**
 * Refence interface of KeyValueMap Map data structure

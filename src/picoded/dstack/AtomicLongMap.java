@@ -1,6 +1,6 @@
 package picoded.dstack;
 
-import picoded.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertMap;
 import picoded.core.conv.GenericConvert;
 
 ///

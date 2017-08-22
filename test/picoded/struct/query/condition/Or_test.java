@@ -1,4 +1,4 @@
-package picoded.struct.query.condition;
+package picoded.core.struct.query.condition;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -15,8 +15,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.struct.query.Query;
-import picoded.struct.query.QueryType;
+import picoded.core.struct.query.Query;
+import picoded.core.struct.query.QueryType;
 
 public class Or_test {
 	

@@ -1,4 +1,4 @@
-package picoded.struct;
+package picoded.core.struct;
 
 // Target test class
 import static org.junit.Assert.assertArrayEquals;
@@ -11,10 +11,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.struct.HashMapList;
+import picoded.core.struct.HashMapList;
 
 ///
-/// Test Case for picoded.struct.HashMapList
+/// Test Case for picoded.core.struct.HashMapList
 ///
 public class HashMapList_test {
 	

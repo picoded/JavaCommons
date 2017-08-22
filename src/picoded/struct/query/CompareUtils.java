@@ -1,4 +1,4 @@
-package picoded.struct.query;
+package picoded.core.struct.query;
 
 import java.text.Collator;
 import java.text.NumberFormat;

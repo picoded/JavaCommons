@@ -8,7 +8,7 @@ import org.junit.*;
 import java.util.UUID;
 
 ///
-/// Test Case for picoded.struct.CaseInsensitiveHashMap
+/// Test Case for picoded.core.struct.CaseInsensitiveHashMap
 ///
 public class GUID_test {
 	

@@ -1,18 +1,18 @@
-package picoded.struct.query.condition;
+package picoded.core.struct.query.condition;
 
 // Target test class
 
 // Test Case include
 import org.junit.*;
 
-import picoded.struct.query.Query;
-import picoded.struct.query.QueryType;
+import picoded.core.struct.query.Query;
+import picoded.core.struct.query.QueryType;
 import static org.junit.Assert.*;
 
 import java.util.*;
 
 ///
-/// Test Case for picoded.struct.query.condition.*
+/// Test Case for picoded.core.struct.query.condition.*
 ///
 public class AllCombinations_test {
 	

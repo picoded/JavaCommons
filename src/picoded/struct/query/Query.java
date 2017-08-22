@@ -1,4 +1,4 @@
-package picoded.struct.query;
+package picoded.core.struct.query;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 
-import picoded.struct.ArrayListMap;
-import picoded.struct.query.internal.QueryFilter;
+import picoded.core.struct.ArrayListMap;
+import picoded.core.struct.query.internal.QueryFilter;
 
 
 /**

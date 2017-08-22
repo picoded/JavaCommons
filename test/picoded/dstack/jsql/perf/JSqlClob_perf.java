@@ -16,7 +16,7 @@ import org.apache.commons.lang3.RandomUtils;
 import picoded.core.conv.ConvertJSON;
 // Test depends
 import picoded.core.conv.GUID;
-import picoded.struct.CaseInsensitiveHashMap;
+import picoded.core.struct.CaseInsensitiveHashMap;
 import picoded.dstack.jsql.connector.*;
 import picoded.dstack.jsql.*;
 import picoded.TestConfig;

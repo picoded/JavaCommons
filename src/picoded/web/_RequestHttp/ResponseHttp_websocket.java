@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 import javax.websocket.*;
 
-import picoded.struct.HashMapList;
+import picoded.core.struct.HashMapList;
 import picoded.web.ResponseHttp;
 
 /**

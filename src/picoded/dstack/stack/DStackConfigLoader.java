@@ -10,7 +10,7 @@ import picoded.dstack.CommonStack;
 import picoded.dstack.*;
 import picoded.dstack.struct.simple.StructSimpleStack;
 
-import picoded.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertMap;
 import picoded.core.conv.GenericConvert;
 
 /**

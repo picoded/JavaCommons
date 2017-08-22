@@ -13,9 +13,9 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 
-import picoded.struct.GenericConvertList;
-import picoded.struct.GenericConvertArrayList;
-import picoded.struct.UnsupportedDefaultMap;
+import picoded.core.struct.GenericConvertList;
+import picoded.core.struct.GenericConvertArrayList;
+import picoded.core.struct.UnsupportedDefaultMap;
 import picoded.core.conv.ConvertJSON;
 
 /**

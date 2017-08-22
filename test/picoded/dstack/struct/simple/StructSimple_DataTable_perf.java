@@ -15,7 +15,7 @@ import org.apache.commons.lang3.RandomUtils;
 
 // Test depends
 import picoded.core.conv.GUID;
-import picoded.struct.CaseInsensitiveHashMap;
+import picoded.core.struct.CaseInsensitiveHashMap;
 import picoded.dstack.*;
 import picoded.dstack.struct.simple.*;
 

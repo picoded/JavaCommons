@@ -1,4 +1,4 @@
-package picoded.struct.query;
+package picoded.core.struct.query;
 
 import java.util.EnumSet;
 import java.util.HashMap;

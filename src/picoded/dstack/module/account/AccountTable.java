@@ -6,7 +6,7 @@ import java.util.function.BiFunction;
 import picoded.dstack.*;
 import picoded.dstack.module.*;
 import picoded.core.conv.*;
-import picoded.struct.*;
+import picoded.core.struct.*;
 import org.apache.commons.lang3.ArrayUtils;
 
 import static picoded.servlet.api.module.account.AccountConstantStrings.*;

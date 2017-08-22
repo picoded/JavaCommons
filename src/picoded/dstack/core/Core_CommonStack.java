@@ -3,8 +3,8 @@ package picoded.dstack.core;
 import picoded.dstack.*;
 import picoded.dstack.CommonStructure;
 import picoded.security.NxtCrypt;
-import picoded.struct.GenericConvertMap;
-import picoded.struct.GenericConvertHashMap;
+import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertHashMap;
 import picoded.dstack.module.account.AccountTable;
 
 import java.util.Locale;

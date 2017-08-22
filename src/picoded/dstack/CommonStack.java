@@ -4,9 +4,9 @@ package picoded.dstack;
 import java.util.Map;
 
 // Library imports
-import picoded.struct.GenericConvertMap;
-import picoded.struct.GenericConvertHashMap;
-import picoded.struct.UnsupportedDefaultMap;
+import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertHashMap;
+import picoded.core.struct.UnsupportedDefaultMap;
 
 // Third party imports
 import org.apache.commons.lang3.RandomUtils;

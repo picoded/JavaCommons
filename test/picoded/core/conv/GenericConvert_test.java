@@ -34,10 +34,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.struct.GenericConvertList;
-import picoded.struct.GenericConvertMap;
-import picoded.struct.ProxyGenericConvertList;
-import picoded.struct.ProxyGenericConvertMap;
+import picoded.core.struct.GenericConvertList;
+import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.ProxyGenericConvertList;
+import picoded.core.struct.ProxyGenericConvertMap;
 
 public class GenericConvert_test {
 	

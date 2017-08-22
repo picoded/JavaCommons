@@ -1,4 +1,4 @@
-package picoded.struct.query.internal;
+package picoded.core.struct.query.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,18 +7,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import picoded.struct.MutablePair;
-import picoded.struct.query.Query;
-import picoded.struct.query.condition.And;
-import picoded.struct.query.condition.Equals;
-import picoded.struct.query.condition.LessThan;
-import picoded.struct.query.condition.LessThanOrEquals;
-import picoded.struct.query.condition.Like;
-import picoded.struct.query.condition.MoreThan;
-import picoded.struct.query.condition.MoreThanOrEquals;
-import picoded.struct.query.condition.Not;
-import picoded.struct.query.condition.NotEquals;
-import picoded.struct.query.condition.Or;
+import picoded.core.struct.MutablePair;
+import picoded.core.struct.query.Query;
+import picoded.core.struct.query.condition.And;
+import picoded.core.struct.query.condition.Equals;
+import picoded.core.struct.query.condition.LessThan;
+import picoded.core.struct.query.condition.LessThanOrEquals;
+import picoded.core.struct.query.condition.Like;
+import picoded.core.struct.query.condition.MoreThan;
+import picoded.core.struct.query.condition.MoreThanOrEquals;
+import picoded.core.struct.query.condition.Not;
+import picoded.core.struct.query.condition.NotEquals;
+import picoded.core.struct.query.condition.Or;
 
 /**
 * Internal utilty function for string query filtering,

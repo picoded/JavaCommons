@@ -2,7 +2,7 @@ package picoded.servlet.api.module;
 
 import picoded.servlet.api.*;
 import picoded.core.conv.*;
-import picoded.struct.*;
+import picoded.core.struct.*;
 
 /**
 * The Abstract ApiModule that does some basic implementation for ApiModule.

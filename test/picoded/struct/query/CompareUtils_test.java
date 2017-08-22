@@ -1,4 +1,4 @@
-package picoded.struct.query;
+package picoded.core.struct.query;
 
 // Target test class
 import static org.junit.Assert.assertEquals;
@@ -10,10 +10,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.struct.query.CompareUtils;
+import picoded.core.struct.query.CompareUtils;
 
 ///
-/// Test Case for picoded.struct.query.condition.*
+/// Test Case for picoded.core.struct.query.condition.*
 ///
 public class CompareUtils_test {
 	

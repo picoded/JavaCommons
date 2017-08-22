@@ -9,9 +9,9 @@ import java.io.*;
 import picoded.servlet.*;
 import picoded.servlet.api.internal.HaltException;
 import picoded.servlet.api.internal.ApiBuilderJS;
-import picoded.struct.UnsupportedDefaultMap;
-import picoded.struct.GenericConvertMap;
-import picoded.struct.GenericConvertHashMap;
+import picoded.core.struct.UnsupportedDefaultMap;
+import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertHashMap;
 import picoded.core.conv.ConvertJSON;
 
 import static picoded.servlet.api.module.account.AccountConstantStrings.*;

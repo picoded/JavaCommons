@@ -1,9 +1,9 @@
-package picoded.struct.query.condition;
+package picoded.core.struct.query.condition;
 
 import java.util.Map;
 
-import picoded.struct.query.CompareUtils;
-import picoded.struct.query.QueryType;
+import picoded.core.struct.query.CompareUtils;
+import picoded.core.struct.query.QueryType;
 
 public class Equals extends ConditionBase {
 

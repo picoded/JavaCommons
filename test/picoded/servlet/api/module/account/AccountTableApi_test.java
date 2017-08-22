@@ -17,7 +17,7 @@ import picoded.core.conv.*;
 import picoded.set.*;
 import picoded.dstack.*;
 import picoded.dstack.module.account.*;
-import picoded.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertMap;
 
 import static picoded.servlet.api.module.account.AccountConstantStrings.*;
 

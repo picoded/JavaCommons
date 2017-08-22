@@ -2,8 +2,8 @@ package picoded.servlet.api;
 
 import java.util.*;
 
-import picoded.struct.GenericConvertMap;
-import picoded.struct.GenericConvertHashMap;
+import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertHashMap;
 import picoded.servlet.CorePage;
 
 /**

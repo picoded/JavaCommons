@@ -5,8 +5,8 @@ import java.util.Set;
 
 import picoded.dstack.KeyValueMap;
 import picoded.security.NxtCrypt;
-import picoded.struct.GenericConvertMap;
-import picoded.struct.GenericConvertHashMap;
+import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertHashMap;
 
 /**
 * Common base utility class of KeyValueMap.

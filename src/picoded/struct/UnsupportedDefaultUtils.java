@@ -1,4 +1,4 @@
-package picoded.struct;
+package picoded.core.struct;
 
 /**
 * Class of utility functions used by UnsupportedDefaultList / UnssuportedDefaultMap

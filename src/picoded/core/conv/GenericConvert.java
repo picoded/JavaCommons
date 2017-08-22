@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import picoded.struct.GenericConvertArrayList;
-import picoded.struct.GenericConvertList;
-import picoded.struct.GenericConvertMap;
-import picoded.struct.ProxyGenericConvertMap;
+import picoded.core.struct.GenericConvertArrayList;
+import picoded.core.struct.GenericConvertList;
+import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.ProxyGenericConvertMap;
 
 /**
 * Core class for all the common variable / primitive type conversions.

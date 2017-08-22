@@ -23,9 +23,9 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 
-import picoded.struct.GenericConvertMap;
-import picoded.struct.GenericConvertHashMap;
-import picoded.struct.ProxyGenericConvertMap;
+import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertHashMap;
+import picoded.core.struct.ProxyGenericConvertMap;
 
 /**
 * Email broad casting module, used to send out emails =)

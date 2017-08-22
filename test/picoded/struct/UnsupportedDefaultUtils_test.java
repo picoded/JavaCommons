@@ -1,4 +1,4 @@
-package picoded.struct;
+package picoded.core.struct;
 
 import org.junit.After;
 import org.junit.Before;

@@ -4,7 +4,7 @@ import java.util.*;
 
 import picoded.dstack.*;
 import picoded.core.conv.*;
-import picoded.struct.*;
+import picoded.core.struct.*;
 
 /**
 * The core module structure in which, every module class has to comply with.

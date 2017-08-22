@@ -5,7 +5,7 @@ import java.util.*;
 import picoded.dstack.*;
 import picoded.dstack.core.*;
 import picoded.core.conv.*;
-import picoded.struct.*;
+import picoded.core.struct.*;
 import picoded.security.*;
 
 

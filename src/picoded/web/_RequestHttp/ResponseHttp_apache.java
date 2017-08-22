@@ -12,7 +12,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.cookie.Cookie;
 
-import picoded.struct.HashMapList;
+import picoded.core.struct.HashMapList;
 
 /**
 * Extends the basic implmentation for the Apache Http Client

@@ -1,4 +1,4 @@
-package picoded.struct.query;
+package picoded.core.struct.query;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -15,8 +15,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.struct.MutablePair;
-import picoded.struct.query.OrderBy.OrderType;
+import picoded.core.struct.MutablePair;
+import picoded.core.struct.query.OrderBy.OrderType;
 
 public class OrderBy_test {
 	

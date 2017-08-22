@@ -1,4 +1,4 @@
-package picoded.struct.query;
+package picoded.core.struct.query;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Locale;
 
-import picoded.struct.MutablePair;
-import picoded.struct.query.internal.QueryUtils;
+import picoded.core.struct.MutablePair;
+import picoded.core.struct.query.internal.QueryUtils;
 
 /**
 * Utility class that provides SQL styel OrderBy functionality

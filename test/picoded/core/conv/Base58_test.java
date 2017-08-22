@@ -11,7 +11,7 @@ import org.junit.Test;
 // Apache reference
 
 ///
-/// Test Case for picoded.struct.CaseInsensitiveHashMap
+/// Test Case for picoded.core.struct.CaseInsensitiveHashMap
 ///
 public class Base58_test extends BaseX_test {
 	

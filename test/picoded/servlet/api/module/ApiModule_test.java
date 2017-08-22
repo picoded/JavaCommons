@@ -17,7 +17,7 @@ import picoded.TestConfig;
 import picoded.servlet.*;
 import picoded.servlet.api.*;
 import picoded.servlet.api.module.*;
-import picoded.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertMap;
 import picoded.set.*;
 import picoded.web.*;
 import picoded.core.conv.*;

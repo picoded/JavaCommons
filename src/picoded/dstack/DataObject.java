@@ -2,7 +2,7 @@ package picoded.dstack;
 
 // Java imports
 import java.util.*;
-import picoded.struct.*;
+import picoded.core.struct.*;
 
 /**
 * Represents a single object node in the DataTable collection.

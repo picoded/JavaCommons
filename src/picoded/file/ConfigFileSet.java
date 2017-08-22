@@ -7,7 +7,7 @@ import java.util.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import picoded.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertMap;
 
 /**
 * Config file loader

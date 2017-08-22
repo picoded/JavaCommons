@@ -1,4 +1,4 @@
-package picoded.struct.query;
+package picoded.core.struct.query;
 
 // Target test class
 import static org.junit.Assert.assertEquals;
@@ -18,14 +18,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import picoded.struct.ArrayListMap;
-import picoded.struct.ProxyGenericConvertMap;
+import picoded.core.struct.ArrayListMap;
+import picoded.core.struct.ProxyGenericConvertMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 
 ///
-/// Test Case for picoded.struct.query.condition.*
+/// Test Case for picoded.core.struct.query.condition.*
 ///
 @SuppressWarnings("unused")
 public class Query_test {

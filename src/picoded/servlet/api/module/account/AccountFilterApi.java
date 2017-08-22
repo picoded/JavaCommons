@@ -15,8 +15,8 @@ import picoded.core.conv.ConvertJSON;
 import picoded.core.conv.RegexUtil;
 import picoded.core.conv.GenericConvert;
 import java.util.function.BiFunction;
-import picoded.struct.GenericConvertMap;
-import picoded.struct.GenericConvertHashMap;
+import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertHashMap;
 
 import static picoded.servlet.api.module.account.AccountConstantStrings.*;
 

@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import picoded.core.conv.ConvertJSON;
-import picoded.struct.GenericConvertMap;
-import picoded.struct.ProxyGenericConvertMap;
+import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.ProxyGenericConvertMap;
 
 public interface ResponseHttp {
 

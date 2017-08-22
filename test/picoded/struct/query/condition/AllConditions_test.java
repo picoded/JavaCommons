@@ -1,4 +1,4 @@
-package picoded.struct.query.condition;
+package picoded.core.struct.query.condition;
 
 // Target test class
 import static org.junit.Assert.assertFalse;
@@ -13,16 +13,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.struct.query.Query;
-import picoded.struct.query.condition.Equals;
-import picoded.struct.query.condition.LessThan;
-import picoded.struct.query.condition.LessThanOrEquals;
-import picoded.struct.query.condition.Like;
-import picoded.struct.query.condition.MoreThan;
-import picoded.struct.query.condition.MoreThanOrEquals;
+import picoded.core.struct.query.Query;
+import picoded.core.struct.query.condition.Equals;
+import picoded.core.struct.query.condition.LessThan;
+import picoded.core.struct.query.condition.LessThanOrEquals;
+import picoded.core.struct.query.condition.Like;
+import picoded.core.struct.query.condition.MoreThan;
+import picoded.core.struct.query.condition.MoreThanOrEquals;
 
 ///
-/// Test Case for picoded.struct.query.condition.*
+/// Test Case for picoded.core.struct.query.condition.*
 ///
 public class AllConditions_test {
 	

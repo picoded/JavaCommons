@@ -3,10 +3,10 @@ package picoded.servlet.api;
 import java.util.*;
 
 import picoded.core.conv.*;
-import picoded.struct.*;
+import picoded.core.struct.*;
 
-import picoded.struct.GenericConvertMap;
-import picoded.struct.GenericConvertHashMap;
+import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertHashMap;
 import picoded.servlet.CorePage;
 import picoded.servlet.api.internal.HaltException;
 

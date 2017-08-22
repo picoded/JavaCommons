@@ -1,7 +1,7 @@
-package picoded.struct.query.condition;
+package picoded.core.struct.query.condition;
 
 import java.util.*;
-import picoded.struct.query.*;
+import picoded.core.struct.query.*;
 
 public class NotEquals extends ConditionBase {
 	//

@@ -13,10 +13,10 @@ import java.util.Collections;
 import org.apache.commons.lang3.RandomUtils;
 
 // Picoded imports
-import picoded.struct.UnsupportedDefaultMap;
-import picoded.struct.query.Query;
+import picoded.core.struct.UnsupportedDefaultMap;
+import picoded.core.struct.query.Query;
 import picoded.dstack.core.Core_DataObject;
-import picoded.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertMap;
 
 /**
 * DataTable, serves as the core flexible backend storage implmentation for the whole

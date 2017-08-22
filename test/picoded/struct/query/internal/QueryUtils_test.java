@@ -1,4 +1,4 @@
-package picoded.struct.query.internal;
+package picoded.core.struct.query.internal;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;

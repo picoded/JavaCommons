@@ -9,8 +9,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import picoded.dstack.KeyValueMap;
 import picoded.dstack.core.Core_KeyValueMap;
 import picoded.security.NxtCrypt;
-import picoded.struct.GenericConvertMap;
-import picoded.struct.GenericConvertHashMap;
+import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertHashMap;
 
 /**
 * Reference implementation of KeyValueMap data structure.

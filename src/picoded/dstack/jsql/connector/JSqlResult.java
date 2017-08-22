@@ -22,7 +22,7 @@ import java.io.BufferedReader;
 import oracle.sql.CLOB;
 
 // Lib depends
-import picoded.struct.CaseInsensitiveHashMap;
+import picoded.core.struct.CaseInsensitiveHashMap;
 import picoded.core.conv.ArrayConv;
 
 /**

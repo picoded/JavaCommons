@@ -3,4 +3,4 @@
 *
 * Emulating the SQL WHERE clauses
 **/
-package picoded.struct.query;
+package picoded.core.struct.query;

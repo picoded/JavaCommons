@@ -1,4 +1,4 @@
-package picoded.struct;
+package picoded.core.struct;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

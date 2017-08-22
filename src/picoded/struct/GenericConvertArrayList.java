@@ -1,4 +1,4 @@
-package picoded.struct;
+package picoded.core.struct;
 
 import java.util.ArrayList;
 import java.util.List;

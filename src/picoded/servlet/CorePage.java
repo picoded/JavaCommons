@@ -29,7 +29,7 @@ import picoded.core.conv.ConvertJSON;
 import picoded.file.FileUtil;
 import picoded.set.HttpRequestType;
 import picoded.set.EmptyArray;
-import picoded.struct.HashMapList;
+import picoded.core.struct.HashMapList;
 import picoded.servlet.util.FileServlet;
 
 // Sub modules used

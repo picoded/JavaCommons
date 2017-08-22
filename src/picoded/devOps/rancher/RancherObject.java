@@ -1,6 +1,6 @@
 package picoded.devOps.rancher;
 
-import picoded.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertMap;
 import picoded.core.conv.*;
 import java.util.List;
 import java.util.Map;

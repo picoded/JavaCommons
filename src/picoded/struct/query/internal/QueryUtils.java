@@ -1,4 +1,4 @@
-package picoded.struct.query.internal;
+package picoded.core.struct.query.internal;
 
 import java.text.NumberFormat;
 import java.util.Locale;

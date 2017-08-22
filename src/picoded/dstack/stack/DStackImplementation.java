@@ -8,9 +8,9 @@ import java.util.ArrayList;
 // Library imports
 import picoded.dstack.*;
 import picoded.dstack.core.*;
-import picoded.struct.GenericConvertMap;
-import picoded.struct.GenericConvertHashMap;
-import picoded.struct.UnsupportedDefaultMap;
+import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertHashMap;
+import picoded.core.struct.UnsupportedDefaultMap;
 
 // Third party imports
 import org.apache.commons.lang3.RandomUtils;

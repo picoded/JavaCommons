@@ -16,10 +16,10 @@ import picoded.set.*;
 import picoded.dstack.*;
 import picoded.dstack.jsql.*;
 import picoded.dstack.jsql.connector.*;
-import picoded.struct.*;
-import picoded.struct.query.*;
-import picoded.struct.query.condition.*;
-import picoded.struct.query.internal.*;
+import picoded.core.struct.*;
+import picoded.core.struct.query.*;
+import picoded.core.struct.query.condition.*;
+import picoded.core.struct.query.internal.*;
 
 /**
 * Protected class, used to orgainze the various JSql based logic

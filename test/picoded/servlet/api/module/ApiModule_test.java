@@ -114,7 +114,8 @@ public class ApiModule_test {
 		public void apiBuilderSetup(ApiBuilder api) {
 			// Setup the module API (if built)
 			if( testModule != null ) {
-				testModule.setupApiBuilder(api);
+				// @TODO : FIX THIS
+				//testModule.setupApiBuilder(api);
 			}
 
 			// Setup an intentional exception endpoint (for some sanity test)

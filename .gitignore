@@ -39,5 +39,11 @@ test-files/test-specific/htmlGenerator/generatedFiles/*
 sample-WEB-INF/**/tmp/**/*
 
 #
+# Gitbook specifications engine
+#
+specs/node_modules/*
+specs/_book/*
+
+#
 # Documentation engine
 #

@@ -7,9 +7,11 @@ import java.util.Map;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 import picoded.struct.UnsupportedDefaultMap;
+import picoded.core.common.SystemSetupInterface;
 
 // Third party imports
 import org.apache.commons.lang3.RandomUtils;
+
 
 /**
 * Minimal interface for all of picoded.datastack implmentation structures.
@@ -17,7 +19,7 @@ import org.apache.commons.lang3.RandomUtils;
 *
 * This is used mainly internally via DStack, or JStruct, etc.
 **/
-public interface CommonStructure {
+public interface CommonStructure extends SystemSetupInterface {
 
 	//--------------------------------------------------------------------------
 	//

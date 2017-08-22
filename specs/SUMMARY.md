@@ -2,9 +2,9 @@
 
 * [Introduction](README.md)
 * [Core Structure and Data Conversion](core/the-core.md)
-	* [Conversion Library](core/conv.md)
-	* [Structure](core/struct.md)
-	* [Set](core/set.md)
+	* [Conversion Lib](core/conv.md)
+	* [Structure's Lib](core/struct.md)
+	* [Common Lib](core/common.md)
 * [Utilities of random stuff](util/the-util.md)
 	* [Query and aggregation](util/query.md)
 	* [File helpers](util/file.md)

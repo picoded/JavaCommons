@@ -1,4 +1,7 @@
-# Set
+# Common
+
+This handles common data sets, and interfaces, used between modules.
+All classes in here should be kept to minimal size and functionality, with zero dependencies.
 
 
 ## Classes

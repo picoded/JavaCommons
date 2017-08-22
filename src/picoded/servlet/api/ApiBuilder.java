@@ -14,7 +14,7 @@ import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 import picoded.conv.ConvertJSON;
 
-import static picoded.servlet.api.module.account.Account_Strings.*;
+import static picoded.servlet.api.module.account.AccountConstantStrings.*;
 
 
 

@@ -1,7 +1,7 @@
 package picoded.servlet.api.module.account;
 import javax.mail.internet.*;
 
-public class Account_Strings{
+public class AccountConstantStrings{
 
   	/// Static REQUEST VARS
     public static final String REQ_OID = "_oid";
@@ -64,24 +64,25 @@ public class Account_Strings{
     public static final String PROPERTIES_EMAIL = "email";
     public static final String PROPERTIES_IS_GROUP = "isGroup";
     public static final String PROPERTIES_OID = "_oid";
-    public static final String PROPERTIES_NAMES = "name";
+    public static final String PROPERTIES_NAME = "name";
     public static final String PROPERTIES_NODE_ID = "nodeID";
     public static final String PROPERTIES_ADMIN_PASS = "adminPass";
     public static final String PROPERTIES_STACK_NAME = "stackName";
     public static final String PROPERTIES_AUTH_KEY = "authKey";
     public static final String PROPERTIES_CREATE_TIMESTAMP = "createdTimeStamp";
     public static final String PROPERTIES_HOST_URL = "hostURL";
+    public static final String PROPERTIES_STACK_ID = "stackID";
 
     /// ERROR MESSAGES
     public static final String ERROR_NO_GROUP = "No group is found.";
     public static final String ERROR_NO_GROUP_ID = "No groupID is found.";
     public static final String ERROR_NO_GROUPNAME = "No groupname is found.";
     public static final String ERROR_NOT_GROUP = "This is not a group.";
-    public static final String ERROR_NO_USERNAME = "No username is supplied.";
-    public static final String ERROR_NO_PASSWORD = "No password is supplied.";
+    public static final String ERROR_NO_USERNAME = "No username is found.";
+    public static final String ERROR_NO_PASSWORD = "No password is found.";
     public static final String ERROR_NO_LOGIN_PASSWORD = "Missing login password.";
     public static final String ERROR_NO_LOGIN_ID = "Missing login ID.";
-    public static final String ERROR_FAIL_LOGIN = "Failed login (wrong password or invalid user?).";
+    public static final String ERROR_FAIL_LOGIN = "Invalid username or password.";
     public static final String ERROR_NO_ROLE = "No role is found.";
     public static final String ERROR_NO_USER = "No user is found.";
     public static final String ERROR_NO_USER_ID = "No userID is found.";

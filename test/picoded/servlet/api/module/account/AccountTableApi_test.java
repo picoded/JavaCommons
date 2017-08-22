@@ -19,7 +19,7 @@ import picoded.dstack.*;
 import picoded.dstack.module.account.*;
 import picoded.struct.GenericConvertMap;
 
-import static picoded.servlet.api.module.account.Account_Strings.*;
+import static picoded.servlet.api.module.account.AccountConstantStrings.*;
 
 /// Test the AccountTable API specifically
 public class AccountTableApi_test extends ApiModule_test {
@@ -160,6 +160,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		Map<String,Object> createDetails = new HashMap<String,Object>();
 		Map<String,Object> meta = new HashMap<String,Object>();
 		meta.put(PROPERTIES_EMAIL, "tste@lalalala.com");
+		// createDetails
 		res = requestJSON(API_ACCOUNT_NEW, createDetails);
 		assertEquals(ERROR_NO_USERNAME, res.get(RES_ERROR));
 

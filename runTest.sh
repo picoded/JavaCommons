@@ -28,7 +28,7 @@ else
 		#------------------------------------------------------------------------------
 		_TEST="_test";
 		
-		if [[ $TESTCLASS =~ \_test$ ]] 
+		if [[ ( $TESTCLASS =~ \_test$ ) || ( $TESTCLASS =~ \_perf$ ) ]] 
 		then
 			TESTCLASS="$TESTCLASS";
 		else 

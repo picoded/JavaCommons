@@ -20,7 +20,7 @@ import java.io.UnsupportedEncodingException;
 import org.apache.commons.lang3.StringUtils;
 
 import picoded.core.conv.*;
-import picoded.set.HttpRequestType;
+import picoded.core.common.HttpRequestType;
 
 //import picoded.core.conv.CompileES6;
 
@@ -67,7 +67,7 @@ public class RESTBuilder {
 	// /**
 	// * RESTBuilder HttpRequestType enum access
 	// **/
-	// public static class RequestTypeSet extends picoded.set.HttpRequestType.HttpRequestTypeSet {
+	// public static class RequestTypeSet extends picoded.core.common.HttpRequestType.HttpRequestTypeSet {
 	// };
 
 	/**

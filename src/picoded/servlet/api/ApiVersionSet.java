@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.BiFunction;
 
-import picoded.set.HttpRequestType;
+import picoded.core.common.HttpRequestType;
 
 /**
 * Represents the various different function / filter maps

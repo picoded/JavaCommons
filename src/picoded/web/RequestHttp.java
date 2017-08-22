@@ -9,8 +9,8 @@ import java.io.InputStream;
 import java.io.File;
 import java.util.function.Consumer;
 
-import picoded.set.HttpRequestType;
-import picoded.set.EmptyArray;
+import picoded.core.common.HttpRequestType;
+import picoded.core.common.EmptyArray;
 import picoded.core.conv.GenericConvert;
 import picoded.web._RequestHttp.RequestHttp_apache;
 import picoded.web._RequestHttp.ResponseHttp_websocket;

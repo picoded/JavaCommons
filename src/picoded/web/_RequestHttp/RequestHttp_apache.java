@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import picoded.core.conv.StringEscape;
-import picoded.set.HttpRequestType;
+import picoded.core.common.HttpRequestType;
 import picoded.web.ResponseHttp;
 
 import org.apache.http.HttpResponse;

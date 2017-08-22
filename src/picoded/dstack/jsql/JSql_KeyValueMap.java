@@ -13,7 +13,7 @@ import picoded.security.NxtCrypt;
 import picoded.core.struct.GenericConvertMap;
 import picoded.core.struct.GenericConvertHashMap;
 import picoded.dstack.jsql.connector.*;
-import picoded.set.JSqlType;
+import picoded.core.common.JSqlType;
 import picoded.core.conv.ListValueConv;
 
 /**

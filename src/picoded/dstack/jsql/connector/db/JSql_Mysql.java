@@ -15,7 +15,7 @@ import java.util.Properties;
 import java.util.ArrayList;
 
 import picoded.dstack.jsql.connector.*;
-import picoded.set.JSqlType;
+import picoded.core.common.JSqlType;
 import picoded.core.conv.ConvertJSON;
 
 /**

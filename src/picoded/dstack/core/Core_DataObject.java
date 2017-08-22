@@ -11,7 +11,7 @@ import picoded.dstack.DataObject;
 import picoded.dstack.DataTable;
 import picoded.core.conv.ConvertJSON;
 import picoded.core.conv.GUID;
-import picoded.set.ObjectToken;
+import picoded.core.common.ObjectToken;
 
 /**
 * Represents a single object node in the DataTable collection.
@@ -42,7 +42,7 @@ public class Core_DataObject implements DataObject {
 	protected String _oid = null;
 
 	/**
-	* Written changes, note that picoded.set.ObjectToken.NULL is used
+	* Written changes, note that picoded.core.common.ObjectToken.NULL is used
 	* as a pesudo null value (remove operation)
 	**/
 	protected Map<String, Object> deltaDataMap = new HashMap<String, Object>();

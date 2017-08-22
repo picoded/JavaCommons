@@ -1,4 +1,4 @@
-package picoded.set;
+package picoded.core.common;
 
 import org.apache.commons.lang3.ArrayUtils;
 

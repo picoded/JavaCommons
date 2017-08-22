@@ -4,7 +4,7 @@ import java.util.Locale;
 import java.util.ArrayList;
 
 import picoded.dstack.jsql.connector.*;
-import picoded.set.JSqlType;
+import picoded.core.common.JSqlType;
 
 /**
 * Pure SQLite implentation of JSql

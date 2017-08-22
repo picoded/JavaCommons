@@ -11,7 +11,7 @@ import java.util.Set;
 
 // Picoded imports
 import picoded.core.conv.ConvertJSON;
-import picoded.set.ObjectToken;
+import picoded.core.common.ObjectToken;
 import picoded.core.struct.query.*;
 import picoded.dstack.*;
 

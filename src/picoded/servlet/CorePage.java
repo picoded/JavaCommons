@@ -27,8 +27,8 @@ import org.apache.commons.io.FilenameUtils;
 // JavaCommons library used
 import picoded.core.conv.ConvertJSON;
 import picoded.file.FileUtil;
-import picoded.set.HttpRequestType;
-import picoded.set.EmptyArray;
+import picoded.core.common.HttpRequestType;
+import picoded.core.common.EmptyArray;
 import picoded.core.struct.HashMapList;
 import picoded.servlet.util.FileServlet;
 

@@ -15,7 +15,7 @@ import org.junit.*;
 import picoded.servlet.util.EmbeddedServlet;
 import picoded.TestConfig;
 import picoded.core.conv.*;
-import picoded.set.*;
+import picoded.core.common.*;
 import picoded.web.*;
 
 public class ApiBuilderJS_test {

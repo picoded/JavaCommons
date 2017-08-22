@@ -19,7 +19,7 @@ import java.io.UnsupportedEncodingException;
 
 import picoded.core.conv.GenericConvert;
 import picoded.core.struct.GenericConvertMap;
-import picoded.set.HttpRequestType;
+import picoded.core.common.HttpRequestType;
 
 // Ext lib used
 import org.apache.commons.lang3.ArrayUtils;

@@ -1,4 +1,4 @@
-package picoded.set;
+package picoded.core.common;
 
 /**
 * Sometimes you just want objects which represents "something"

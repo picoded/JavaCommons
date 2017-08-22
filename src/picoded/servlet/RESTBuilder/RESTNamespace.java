@@ -17,7 +17,7 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 
-import picoded.set.HttpRequestType;
+import picoded.core.common.HttpRequestType;
 
 /**
 * Internal RESTNamespace Sub class which handles each function namespace seperately

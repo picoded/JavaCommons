@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import picoded.set.JSqlType;
+import picoded.core.common.JSqlType;
 
 /**
 * JSql provides a wrapper around several common SQL implementations. Via an (almost) single set of syntax.

@@ -1,6 +1,6 @@
 package picoded.dstack.jsql.connector;
 
-import picoded.set.JSqlType;
+import picoded.core.common.JSqlType;
 
 /**
 * A prepared JSql query

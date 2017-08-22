@@ -1,4 +1,4 @@
-package picoded.set;
+package picoded.core.common;
 
 /**
 * JSql type options enum, see JSql.sqlType for its usage

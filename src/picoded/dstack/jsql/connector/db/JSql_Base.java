@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import picoded.set.JSqlType;
+import picoded.core.common.JSqlType;
 import picoded.dstack.jsql.connector.*;
 
 /**

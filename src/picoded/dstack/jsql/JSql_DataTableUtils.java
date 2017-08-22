@@ -12,7 +12,7 @@ import java.sql.SQLException;
 
 // Picoded imports
 import picoded.core.conv.*;
-import picoded.set.*;
+import picoded.core.common.*;
 import picoded.dstack.*;
 import picoded.dstack.jsql.*;
 import picoded.dstack.jsql.connector.*;

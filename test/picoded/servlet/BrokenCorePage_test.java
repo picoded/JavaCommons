@@ -38,8 +38,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import picoded.core.conv.ConvertJSON;
-import picoded.set.EmptyArray;
-import picoded.set.HttpRequestType;
+import picoded.core.common.EmptyArray;
+import picoded.core.common.HttpRequestType;
 
 public class BrokenCorePage_test {
 	

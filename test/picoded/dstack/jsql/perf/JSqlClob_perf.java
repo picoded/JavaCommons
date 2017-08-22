@@ -21,7 +21,7 @@ import picoded.dstack.jsql.connector.*;
 import picoded.dstack.jsql.*;
 import picoded.TestConfig;
 
-/// Testing of metatable full CLOB structure performance
+/// Testing of DataTable full CLOB structure performance
 public class JSqlClob_perf extends AbstractBenchmark {
 	
 	/// Test object

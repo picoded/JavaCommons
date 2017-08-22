@@ -5,7 +5,7 @@ import picoded.dstack.jsql.*;
 import picoded.TestConfig;
 
 /// [Mysql varient]
-/// Testing of metatable full obj-key-val structure performance
+/// Testing of DataTable full obj-key-val structure performance
 public class JSqlObjKeyVal_Mysql_perf extends JSqlObjKeyVal_perf {
 
 	/// Note that this SQL connector constructor

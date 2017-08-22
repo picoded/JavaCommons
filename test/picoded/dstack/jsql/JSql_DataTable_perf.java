@@ -22,7 +22,7 @@ import picoded.dstack.jsql.*;
 import picoded.dstack.jsql.connector.*;
 import picoded.dstack.struct.simple.*;
 
-public class JSql_MetaTable_Mysql_perf extends JSql_MetaTable_perf {
+public class JSql_DataTable_perf extends StructSimple_DataTable_perf {
 
 	// To override for implementation
 	//-----------------------------------------------------
@@ -32,6 +32,11 @@ public class JSql_MetaTable_Mysql_perf extends JSql_MetaTable_perf {
 	/// specific test cases
 	public JSql jsqlConnection() {
 		return JSqlTest.sqlite();
+	}
+
+	/// Impomentation constructor for SQL
+	public DataTable implementationConstructor() {
+		return new JSql_DataTable( jsqlConnection(), TestConfig.randomTablePrefix() );
 	}
 	
 }

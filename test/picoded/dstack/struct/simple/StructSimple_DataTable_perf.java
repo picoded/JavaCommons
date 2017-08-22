@@ -19,16 +19,16 @@ import picoded.struct.CaseInsensitiveHashMap;
 import picoded.dstack.*;
 import picoded.dstack.struct.simple.*;
 
-// MetaTable base test class
-public class StructSimple_MetaTable_perf extends AbstractBenchmark {
+// DataTable base test class
+public class StructSimple_DataTable_perf extends AbstractBenchmark {
 	
 	/// Test object
-	public MetaTable mtObj = null;
+	public DataTable mtObj = null;
 	
 	// To override for implementation
 	//-----------------------------------------------------
-	public MetaTable implementationConstructor() {
-		return new StructSimple_MetaTable();
+	public DataTable implementationConstructor() {
+		return new StructSimple_DataTable();
 	}
 	
 	// Setup and sanity test
@@ -132,7 +132,7 @@ public class StructSimple_MetaTable_perf extends AbstractBenchmark {
 	@Test
 	public void largeMapPerf_insertAndUpdate() throws Exception {
 		for(int i=0; i<iterationCount; ++i) {
-			MetaObject mo = mtObj.newObject(largeMap);
+			DataObject mo = mtObj.newObject(largeMap);
 			mo.saveDelta();
 
 			mo.putAll(largeMap2);
@@ -144,7 +144,7 @@ public class StructSimple_MetaTable_perf extends AbstractBenchmark {
 	@Test
 	public void mediumMapPerf_insertAndUpdate() throws Exception {
 		for(int i=0; i<iterationCount; ++i) {
-			MetaObject mo = mtObj.newObject(mediumMap);
+			DataObject mo = mtObj.newObject(mediumMap);
 			mo.saveDelta();
 
 			mo.putAll(mediumMap2);	
@@ -156,7 +156,7 @@ public class StructSimple_MetaTable_perf extends AbstractBenchmark {
 	@Test
 	public void smallMapPerf_insertAndUpdate() throws Exception {
 		for(int i=0; i<iterationCount; ++i) {
-			MetaObject mo = mtObj.newObject(smallMap);
+			DataObject mo = mtObj.newObject(smallMap);
 			mo.saveDelta();
 
 			mo.putAll(smallMap2);

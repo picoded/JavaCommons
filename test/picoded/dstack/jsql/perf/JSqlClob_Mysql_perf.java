@@ -5,7 +5,7 @@ import picoded.dstack.jsql.*;
 import picoded.TestConfig;
 
 /// [Mysql varient]
-/// Testing of metatable full CLOB structure performance
+/// Testing of DataTable full CLOB structure performance
 public class JSqlClob_Mysql_perf extends JSqlClob_perf {
 
 	/// Note that this SQL connector constructor

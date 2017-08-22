@@ -5,7 +5,7 @@ import picoded.dstack.jsql.connector.*;
 import picoded.dstack.jsql.*;
 import picoded.TestConfig;
 
-/// Testing of metatable obje-key-val, in batchless mode
+/// Testing of DataTable obje-key-val, in batchless mode
 public class JSqlObjKeyValBatchless_perf extends JSqlObjKeyVal_perf {
 
 	/// Does a delta update of changes, with a GUID and original object for refrence

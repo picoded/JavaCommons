@@ -22,7 +22,7 @@ import picoded.dstack.jsql.connector.*;
 import picoded.dstack.jsql.*;
 import picoded.TestConfig;
 
-/// Testing of metatable full indexless fixed table performance
+/// Testing of DataTable full indexless fixed table performance
 public class JSqlFixedIndexless_perf extends JSqlClob_perf {
 
 	public String[] collumnNames = null;

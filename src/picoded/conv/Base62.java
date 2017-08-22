@@ -1,4 +1,4 @@
-package picoded.conv;
+package picoded.core.conv;
 
 /**
 * A class to convert various data types to Base62. Static functions default to Default charset.

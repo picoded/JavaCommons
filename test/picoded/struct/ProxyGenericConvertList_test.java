@@ -9,7 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 
 public class ProxyGenericConvertList_test {
 	

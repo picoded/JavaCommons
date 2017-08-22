@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import picoded.dstack.*;
 import picoded.dstack.core.*;
-import picoded.conv.GenericConvert;
+import picoded.core.conv.GenericConvert;
 
 /**
 * Refence implementation of AtomicLongMap data structure

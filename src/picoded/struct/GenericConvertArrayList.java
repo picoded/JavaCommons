@@ -3,7 +3,7 @@ package picoded.struct;
 import java.util.ArrayList;
 import java.util.List;
 
-import picoded.conv.GenericConvert;
+import picoded.core.conv.GenericConvert;
 
 public class GenericConvertArrayList<E> extends ArrayList<E> implements GenericConvertList<E> {
 

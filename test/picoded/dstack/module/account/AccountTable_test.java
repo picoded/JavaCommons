@@ -6,7 +6,7 @@ import org.junit.*;
 
 // Test depends
 import java.util.*;
-import picoded.conv.*;
+import picoded.core.conv.*;
 import picoded.dstack.*;
 import picoded.dstack.struct.simple.*;
 import picoded.TestConfig;

@@ -3,7 +3,7 @@ package picoded.dstack.module;
 import java.util.*;
 
 import picoded.dstack.*;
-import picoded.conv.*;
+import picoded.core.conv.*;
 import picoded.struct.*;
 
 /**

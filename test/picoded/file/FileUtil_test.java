@@ -18,7 +18,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import picoded.conv.GUID;
+import picoded.core.conv.GUID;
 
 ///
 /// Test Case for picoded.FileUtil.ConfigFileSet

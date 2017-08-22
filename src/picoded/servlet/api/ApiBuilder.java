@@ -12,7 +12,7 @@ import picoded.servlet.api.internal.ApiBuilderJS;
 import picoded.struct.UnsupportedDefaultMap;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 
 import static picoded.servlet.api.module.account.AccountConstantStrings.*;
 

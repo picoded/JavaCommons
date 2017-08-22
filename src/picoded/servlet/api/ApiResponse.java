@@ -2,7 +2,7 @@ package picoded.servlet.api;
 
 import java.util.*;
 
-import picoded.conv.*;
+import picoded.core.conv.*;
 import picoded.struct.*;
 
 import picoded.struct.GenericConvertMap;

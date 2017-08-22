@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 import picoded.dstack.jsql.connector.*;
 import picoded.set.JSqlType;
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 
 /**
 * Pure "MY"SQL implentation of JSql

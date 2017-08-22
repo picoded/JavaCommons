@@ -31,8 +31,8 @@ import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 
-import picoded.conv.GUID;
-import picoded.conv.GenericConvert;
+import picoded.core.conv.GUID;
+import picoded.core.conv.GenericConvert;
 import picoded.file.FileUtil;
 
 /**

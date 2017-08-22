@@ -18,7 +18,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import picoded.struct.GenericConvertMap;
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 
 /**
 * Class map, that handles the request map, and does the conversion between request arrays, and request values

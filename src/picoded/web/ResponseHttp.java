@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.ProxyGenericConvertMap;
 

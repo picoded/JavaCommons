@@ -1,6 +1,6 @@
 package picoded.struct;
 
-import picoded.conv.GenericConvert;
+import picoded.core.conv.GenericConvert;
 
 /**
 * Java MutablePair implementation

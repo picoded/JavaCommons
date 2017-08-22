@@ -1,7 +1,7 @@
 package picoded.dstack;
 
 import picoded.struct.GenericConvertMap;
-import picoded.conv.GenericConvert;
+import picoded.core.conv.GenericConvert;
 
 ///
 /// [DO NOT USE : THIS IS CURRENTLY FLAGGED OUT TO BE REFACTORED]

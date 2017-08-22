@@ -1,4 +1,4 @@
-package picoded.conv;
+package picoded.core.conv;
 
 /**
 * Java libs
@@ -27,7 +27,7 @@ import org.w3c.dom.Node;
 /**
 * JavaCommons libs used
 **/
-import picoded.conv.GenericConvert;
+import picoded.core.conv.GenericConvert;
 
 /**
 * XML simplification helpers. When you do not need custom object / array structures.

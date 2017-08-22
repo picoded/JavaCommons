@@ -7,8 +7,8 @@ import java.util.function.BiFunction;
 import java.util.Set;
 import java.util.HashSet;
 
-import picoded.conv.GenericConvert;
-import picoded.conv.NestedObject;
+import picoded.core.conv.GenericConvert;
+import picoded.core.conv.NestedObject;
 
 /**
 * Common map class, used to implement all the generic convert convinence functions in a map interface

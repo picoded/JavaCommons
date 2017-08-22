@@ -7,7 +7,7 @@ import static org.junit.Assert.assertNull;
 
 import java.util.*;
 
-import picoded.conv.*;
+import picoded.core.conv.*;
 
 import org.junit.After;
 import org.junit.Before;

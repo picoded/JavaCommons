@@ -1,4 +1,4 @@
-package picoded.conv;
+package picoded.core.conv;
 
 import static org.junit.Assert.assertEquals;
 

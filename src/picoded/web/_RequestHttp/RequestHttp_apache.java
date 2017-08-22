@@ -8,7 +8,7 @@ import java.net.URL;
 import java.io.File;
 import java.io.FileInputStream;
 
-import picoded.conv.StringEscape;
+import picoded.core.conv.StringEscape;
 import picoded.set.HttpRequestType;
 import picoded.web.ResponseHttp;
 

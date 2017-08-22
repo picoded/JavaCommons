@@ -3,7 +3,7 @@ package picoded.struct;
 import java.util.List;
 import java.util.UUID;
 
-import picoded.conv.GenericConvert;
+import picoded.core.conv.GenericConvert;
 
 /**
 * Common list class, used to implement all the generic convert convinence functions in a map interface.

@@ -2,7 +2,7 @@ package picoded.struct;
 
 import java.util.*;
 
-import picoded.conv.MapValueConv;
+import picoded.core.conv.MapValueConv;
 
 /**
 * Convenience class, for creating a Map containing list values, and appending them.

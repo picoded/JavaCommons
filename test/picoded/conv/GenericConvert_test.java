@@ -1,4 +1,4 @@
-package picoded.conv;
+package picoded.core.conv;
 
 //Target test class
 import static org.junit.Assert.assertArrayEquals;
@@ -8,19 +8,19 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static picoded.conv.GenericConvert.fetchNestedObject;
-import static picoded.conv.GenericConvert.fetchObject;
-import static picoded.conv.GenericConvert.normalizeObjectPath;
-import static picoded.conv.GenericConvert.splitObjectPath;
-import static picoded.conv.GenericConvert.toGenericConvertList;
-import static picoded.conv.GenericConvert.toGenericConvertStringMap;
-import static picoded.conv.GenericConvertPrimitive.toBoolean;
-import static picoded.conv.GenericConvertStandard.toArrayHelper;
-import static picoded.conv.GenericConvertStandard.toGUID;
-import static picoded.conv.GenericConvertStandard.toList;
-import static picoded.conv.GenericConvertStandard.toObjectArray;
-import static picoded.conv.GenericConvertStandard.toStringArray;
-import static picoded.conv.GenericConvertStandard.toStringMap;
+import static picoded.core.conv.GenericConvert.fetchNestedObject;
+import static picoded.core.conv.GenericConvert.fetchObject;
+import static picoded.core.conv.GenericConvert.normalizeObjectPath;
+import static picoded.core.conv.GenericConvert.splitObjectPath;
+import static picoded.core.conv.GenericConvert.toGenericConvertList;
+import static picoded.core.conv.GenericConvert.toGenericConvertStringMap;
+import static picoded.core.conv.GenericConvertPrimitive.toBoolean;
+import static picoded.core.conv.GenericConvertStandard.toArrayHelper;
+import static picoded.core.conv.GenericConvertStandard.toGUID;
+import static picoded.core.conv.GenericConvertStandard.toList;
+import static picoded.core.conv.GenericConvertStandard.toObjectArray;
+import static picoded.core.conv.GenericConvertStandard.toStringArray;
+import static picoded.core.conv.GenericConvertStandard.toStringMap;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

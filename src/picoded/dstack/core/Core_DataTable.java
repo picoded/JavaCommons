@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 // Picoded imports
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 import picoded.set.ObjectToken;
 import picoded.struct.query.*;
 import picoded.dstack.*;

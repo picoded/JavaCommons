@@ -16,8 +16,8 @@ import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;
 import picoded.dstack.jsql.connector.*;
 import picoded.set.JSqlType;
-import picoded.conv.ListValueConv;
-import picoded.conv.GenericConvert;
+import picoded.core.conv.ListValueConv;
+import picoded.core.conv.GenericConvert;
 
 /**
 * JSql implmentation of AtomicLongMap

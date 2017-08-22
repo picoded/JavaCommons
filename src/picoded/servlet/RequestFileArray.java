@@ -16,7 +16,7 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import picoded.struct.GenericConvertList;
 import picoded.struct.GenericConvertArrayList;
 import picoded.struct.UnsupportedDefaultMap;
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 
 /**
 * Class map, that handles file uploads in a RequestList

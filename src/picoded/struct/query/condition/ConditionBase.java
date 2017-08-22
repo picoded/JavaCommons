@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import picoded.conv.GenericConvert;
+import picoded.core.conv.GenericConvert;
 import picoded.struct.query.Query;
 import picoded.struct.query.QueryType;
 import picoded.struct.query.internal.QueryUtils;

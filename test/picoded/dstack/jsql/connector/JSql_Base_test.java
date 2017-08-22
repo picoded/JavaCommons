@@ -5,7 +5,7 @@ import org.junit.*;
 
 import java.util.Map;
 
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 import picoded.TestConfig;
 import picoded.dstack.jsql.*;
 

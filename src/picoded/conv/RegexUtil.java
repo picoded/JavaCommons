@@ -1,4 +1,4 @@
-package picoded.conv;
+package picoded.core.conv;
 
 /**
 * Simple utility function, that does common regex search and replace.

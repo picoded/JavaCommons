@@ -1,4 +1,4 @@
-package picoded.conv;
+package picoded.core.conv;
 
 // Target test class
 import static org.junit.Assert.assertEquals;
@@ -14,7 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.conv.DateConv.ISODateFormat;
+import picoded.core.conv.DateConv.ISODateFormat;
 
 public class DateConv_test {
 	

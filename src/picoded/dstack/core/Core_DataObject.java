@@ -9,8 +9,8 @@ import java.util.Set;
 // Picoded imports
 import picoded.dstack.DataObject;
 import picoded.dstack.DataTable;
-import picoded.conv.ConvertJSON;
-import picoded.conv.GUID;
+import picoded.core.conv.ConvertJSON;
+import picoded.core.conv.GUID;
 import picoded.set.ObjectToken;
 
 /**

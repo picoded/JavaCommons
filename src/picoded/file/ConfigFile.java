@@ -10,7 +10,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ini4j.Ini;
 
-import picoded.conv.GenericConvert;
+import picoded.core.conv.GenericConvert;
 import picoded.struct.GenericConvertMap;
 
 //import com.hazelcast.com.eclipsesource.json.JsonObject;

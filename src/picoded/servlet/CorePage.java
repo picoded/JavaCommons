@@ -25,7 +25,7 @@ import java.net.URLDecoder;
 import org.apache.commons.io.FilenameUtils;
 
 // JavaCommons library used
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 import picoded.file.FileUtil;
 import picoded.set.HttpRequestType;
 import picoded.set.EmptyArray;

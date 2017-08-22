@@ -1,4 +1,4 @@
-package picoded.conv;
+package picoded.core.conv;
 
 // Junit includes
 import static org.junit.Assert.*;
@@ -11,7 +11,7 @@ import java.util.*;
 import org.apache.commons.lang3.ArrayUtils;
 
 ///
-/// Test Case for picoded.conv.ConvertJSON
+/// Test Case for picoded.core.conv.ConvertJSON
 ///
 public class ConvertXML_test {
 	

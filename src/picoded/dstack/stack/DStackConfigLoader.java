@@ -11,7 +11,7 @@ import picoded.dstack.*;
 import picoded.dstack.struct.simple.StructSimpleStack;
 
 import picoded.struct.GenericConvertMap;
-import picoded.conv.GenericConvert;
+import picoded.core.conv.GenericConvert;
 
 /**
  * Static class used to load a DStack object, from its configuration string/file

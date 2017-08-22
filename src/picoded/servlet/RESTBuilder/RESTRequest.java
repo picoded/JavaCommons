@@ -17,7 +17,7 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 
-import picoded.conv.GenericConvert;
+import picoded.core.conv.GenericConvert;
 import picoded.struct.GenericConvertMap;
 import picoded.set.HttpRequestType;
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import picoded.conv.*;
+import picoded.core.conv.*;
 
 /**
 * Provides a HashMap<K,A ArrayList<V>>,

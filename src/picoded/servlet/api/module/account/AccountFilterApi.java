@@ -11,9 +11,9 @@ import picoded.servlet.api.internal.HaltException;
 
 import picoded.dstack.module.account.*;
 import picoded.dstack.*;
-import picoded.conv.ConvertJSON;
-import picoded.conv.RegexUtil;
-import picoded.conv.GenericConvert;
+import picoded.core.conv.ConvertJSON;
+import picoded.core.conv.RegexUtil;
+import picoded.core.conv.GenericConvert;
 import java.util.function.BiFunction;
 import picoded.struct.GenericConvertMap;
 import picoded.struct.GenericConvertHashMap;

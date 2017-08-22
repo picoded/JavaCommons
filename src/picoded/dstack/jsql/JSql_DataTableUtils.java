@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 import java.sql.SQLException;
 
 // Picoded imports
-import picoded.conv.*;
+import picoded.core.conv.*;
 import picoded.set.*;
 import picoded.dstack.*;
 import picoded.dstack.jsql.*;

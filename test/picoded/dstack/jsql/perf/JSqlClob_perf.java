@@ -13,9 +13,9 @@ import java.util.*;
 // External lib includes
 import org.apache.commons.lang3.RandomUtils;
 
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 // Test depends
-import picoded.conv.GUID;
+import picoded.core.conv.GUID;
 import picoded.struct.CaseInsensitiveHashMap;
 import picoded.dstack.jsql.connector.*;
 import picoded.dstack.jsql.*;

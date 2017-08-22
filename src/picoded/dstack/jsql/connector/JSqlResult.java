@@ -23,7 +23,7 @@ import oracle.sql.CLOB;
 
 // Lib depends
 import picoded.struct.CaseInsensitiveHashMap;
-import picoded.conv.ArrayConv;
+import picoded.core.conv.ArrayConv;
 
 /**
 * JSql result set, data is either prefetched, or fetch on row request. For example usage, refer to JSql

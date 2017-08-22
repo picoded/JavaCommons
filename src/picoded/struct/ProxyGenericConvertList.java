@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.apache.commons.collections4.list.AbstractListDecorator;
 
-import picoded.conv.GenericConvert;
+import picoded.core.conv.GenericConvert;
 
 /**
 * This class provides a static constructor, that builds

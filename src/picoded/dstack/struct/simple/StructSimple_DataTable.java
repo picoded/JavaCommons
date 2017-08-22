@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 // Picoded imports
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 import picoded.set.ObjectToken;
 import picoded.dstack.*;
 import picoded.dstack.core.*;

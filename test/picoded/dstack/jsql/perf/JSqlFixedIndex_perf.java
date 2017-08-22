@@ -14,9 +14,9 @@ import java.util.*;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 // Test depends
-import picoded.conv.GUID;
+import picoded.core.conv.GUID;
 import picoded.struct.CaseInsensitiveHashMap;
 import picoded.dstack.jsql.connector.*;
 import picoded.dstack.jsql.*;

@@ -1,4 +1,4 @@
-package picoded.conv;
+package picoded.core.conv;
 
 /**
 * A reduced java primitives only version of GenericConvert.

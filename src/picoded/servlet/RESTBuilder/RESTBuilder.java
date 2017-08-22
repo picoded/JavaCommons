@@ -19,10 +19,10 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import picoded.conv.*;
+import picoded.core.conv.*;
 import picoded.set.HttpRequestType;
 
-//import picoded.conv.CompileES6;
+//import picoded.core.conv.CompileES6;
 
 /**
  * picoded.servlet.RESTBuilder is a servlet utility class, in which facilitates the building of "RESTful API's"

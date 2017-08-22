@@ -37,7 +37,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 import picoded.set.EmptyArray;
 import picoded.set.HttpRequestType;
 

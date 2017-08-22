@@ -1,4 +1,4 @@
-package picoded.conv;
+package picoded.core.conv;
 
 import org.apache.commons.lang3.ArrayUtils;
 

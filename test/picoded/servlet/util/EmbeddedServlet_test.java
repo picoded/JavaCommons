@@ -12,7 +12,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import picoded.TestConfig;
-import picoded.conv.*;
+import picoded.core.conv.*;
 import picoded.set.*;
 import picoded.web.*;
 

@@ -1,4 +1,4 @@
-package picoded.conv;
+package picoded.core.conv;
 
 import org.junit.After;
 import org.junit.Before;

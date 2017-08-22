@@ -5,7 +5,7 @@ import picoded.file.FileUtil;
 
 import java.util.*;
 
-import picoded.conv.*;
+import picoded.core.conv.*;
 
 /**
 * VirtualFileSystem using DataTable implmentation

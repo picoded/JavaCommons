@@ -1,4 +1,4 @@
-package picoded.conv;
+package picoded.core.conv;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

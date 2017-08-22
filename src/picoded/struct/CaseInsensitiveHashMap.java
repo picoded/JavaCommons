@@ -2,7 +2,7 @@ package picoded.struct;
 
 import java.util.Map;
 
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 
 /**
 * Case Insensitive HashMap, useful for various things.

@@ -20,7 +20,7 @@ import picoded.servlet.api.module.*;
 import picoded.struct.GenericConvertMap;
 import picoded.set.*;
 import picoded.web.*;
-import picoded.conv.*;
+import picoded.core.conv.*;
 import picoded.dstack.*;
 import picoded.dstack.struct.simple.*;
 

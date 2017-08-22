@@ -3,7 +3,7 @@ package picoded.struct;
 import java.util.HashMap;
 import java.util.Map;
 
-import picoded.conv.GenericConvert;
+import picoded.core.conv.GenericConvert;
 
 /**
 *

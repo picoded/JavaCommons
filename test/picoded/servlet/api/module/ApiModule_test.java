@@ -51,7 +51,7 @@ public class ApiModule_test {
 	//
 	// The test folders to use
 	//
-	// File testFolder = new File("./test-files/test-specific/servlet/api/module/ApiModule/");
+	// File testFolder = new File("./test/files/servlet/api/module/ApiModule/");
 	//
 
 	// Statically sared common stack for reuse

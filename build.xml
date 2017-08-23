@@ -5,14 +5,14 @@
 	<property name='lib.dir' value='${basedir}/bin/lib' />
 
 	<!-- Sets the property variables to point to respective directories -->
-	<property name="junit-reports" value="${basedir}/test-files/junit-reports"/>
-	<property name="junit-html" value="${basedir}/test-files/junit-html" />
+	<property name="junit-reports" value="${basedir}/test/files/junit-reports"/>
+	<property name="junit-html" value="${basedir}/test/files/junit-html" />
 
 	<property name="build-classes" value="${basedir}/bin/classes" />
 	<property name="build-docs" value="${basedir}/bin/docs" />
 	<property name="build-temp" value="${basedir}/bin/tmp/build-tmp" />
 
-	<property name="test-temp" value="${basedir}/test-files/tmp" />
+	<property name="test-temp" value="${basedir}/test/files/tmp" />
 
 	<property name="src-path" value="src/picoded" />
 	<property name="src-test" value="test/picoded" />
@@ -75,7 +75,7 @@
 		<delete includeemptydirs="true" failonerror="false">
 			<fileset dir="${basedir}/bin" includes="**/*"/>
 			<fileset dir="${basedir}/html-docs" includes="**/*"/>
-			<fileset dir="${basedir}/test-files/tmp" includes="**/*"/>
+			<fileset dir="${basedir}/test/files/tmp" includes="**/*"/>
 		</delete>
 
 		<mkdir dir="${basedir}/bin"/>
@@ -85,7 +85,7 @@
 		<mkdir dir="${basedir}/bin/tmp"/>
 		<mkdir dir="${basedir}/bin/tmp/build-tmp"/>
 		<mkdir dir="${basedir}/bin/tmp/build-tmp/UBER"/>
-		<mkdir dir="${basedir}/test-files/tmp"/>
+		<mkdir dir="${basedir}/test/files/tmp"/>
 	</target>
 
 	<!-- Code Beautifier, used for pre-commit hook -->
@@ -310,8 +310,8 @@
 
 	<!-- compile the source with picodedTests -->
 	<target name="compile-tests" depends="build-lib-ifneeded">
-		<delete dir="test-files/tmp" failonerror="false"/>
-		<mkdir dir="test-files/tmp"/>
+		<delete dir="test/files/tmp" failonerror="false"/>
+		<mkdir dir="test/files/tmp"/>
 
 		<path id="lib.test.ref">
 			<!--<fileset dir="bin/build" includes="*-libsOnly.jar" />-->

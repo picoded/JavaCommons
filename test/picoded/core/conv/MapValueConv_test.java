@@ -45,7 +45,7 @@ public class MapValueConv_test {
 	
 	@Test
 	public void testTo() {
-		File unqualifiedMapFile = new File("./test-files/test-specific/conv/unqualifiedMap.js");
+		File unqualifiedMapFile = new File("./test/files/conv/unqualifiedMap.js");
 		String jsonString = "";
 		try {
 			jsonString = FileUtils.readFileToString(unqualifiedMapFile);
@@ -73,7 +73,7 @@ public class MapValueConv_test {
 	public void testFrom() {
 		Map<String, Object> unqualifiedMap = new HashMap<String, Object>();
 		
-		File unqualifiedMapFile = new File("./test-files/test-specific/conv/unqualifiedMap.js");
+		File unqualifiedMapFile = new File("./test/files/conv/unqualifiedMap.js");
 		String jsonString = "";
 		try {
 			jsonString = FileUtils.readFileToString(unqualifiedMapFile);
@@ -111,7 +111,7 @@ public class MapValueConv_test {
 	
 	@Test
 	public void chaosMonkeyFinal() {
-		File chaosMonkeyFile = new File("./test-files/test-specific/conv/chaosmonkey.js");
+		File chaosMonkeyFile = new File("./test/files/conv/chaosmonkey.js");
 		String jsonString = "";
 		try {
 			jsonString = FileUtils.readFileToString(chaosMonkeyFile);

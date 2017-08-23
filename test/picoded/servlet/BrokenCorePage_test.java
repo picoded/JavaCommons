@@ -667,12 +667,12 @@ public class BrokenCorePage_test {
 	// 	Map<String, Object> map = new HashMap<String, Object>();
 	// 	Map<String, Object> template = new HashMap<String, Object>();
 	// 	map.put("user", new String[] { "me" });
-	// 	File file = new File("test-files/tmp/servlet/me.txt");
+	// 	File file = new File("test/tmp/servlet/me.txt");
 	// 	PrintWriter printWriter = new PrintWriter(file);
 	// 	assertTrue(corePage.outputJSON(map, template, printWriter));
 	// 	printWriter.flush();
 	// 	printWriter.close();
-	// 	File rFile = new File("test-files/tmp/servlet/me.txt");
+	// 	File rFile = new File("test/tmp/servlet/me.txt");
 	// 	BufferedReader expected = new BufferedReader(new FileReader(rFile));
 	// 	String line;
 	// 	while ((line = expected.readLine()) != null) {
@@ -687,14 +687,14 @@ public class BrokenCorePage_test {
 	// 	Map<String, Object> map = new HashMap<String, Object>();
 	// 	Map<String, Object> template = new HashMap<String, Object>();
 	// 	map.put("user", new String[] { "me" });
-	// 	File file = new File("test-files/tmp/servlet/me.txt");
+	// 	File file = new File("test/tmp/servlet/me.txt");
 	// 	PrintWriter printWriter = new PrintWriter(file);
 	// 	HttpServletResponse response = mock(HttpServletResponse.class);
 	// 	corePage.httpResponse = response;
 	// 	assertTrue(corePage.outputJSON(map, template, printWriter));
 	// 	printWriter.flush();
 	// 	printWriter.close();
-	// 	File rFile = new File("test-files/tmp/servlet/me.txt");
+	// 	File rFile = new File("test/tmp/servlet/me.txt");
 	// 	BufferedReader expected = new BufferedReader(new FileReader(rFile));
 	// 	String line;
 	// 	while ((line = expected.readLine()) != null) {
@@ -709,13 +709,13 @@ public class BrokenCorePage_test {
 	// 	Map<String, Object> map = new HashMap<String, Object>();
 	// 	Map<String, Object> template = new HashMap<String, Object>();
 	// 	map.put("user", new String[] { "me" });
-	// 	File file = new File("test-files/tmp/servlet/me.txt");
+	// 	File file = new File("test/tmp/servlet/me.txt");
 	// 	PrintWriter printWriter = new PrintWriter(file);
 	// 	assertFalse(corePage.outputJSONException(map, template, printWriter, new Exception(
 	// 		"There is an error")));
 	// 	printWriter.flush();
 	// 	printWriter.close();
-	// 	File rFile = new File("test-files/tmp/servlet/me.txt");
+	// 	File rFile = new File("test/tmp/servlet/me.txt");
 	// 	BufferedReader expected = new BufferedReader(new FileReader(rFile));
 	// 	String line;
 	// 	Map<String, String> ret = new HashMap<String, String>();
@@ -733,7 +733,7 @@ public class BrokenCorePage_test {
 	// 	Map<String, Object> map = new HashMap<String, Object>();
 	// 	Map<String, Object> template = new HashMap<String, Object>();
 	// 	map.put("user", new String[] { "me" });
-	// 	File file = new File("test-files/tmp/servlet/me.txt");
+	// 	File file = new File("test/tmp/servlet/me.txt");
 	// 	PrintWriter printWriter = new PrintWriter(file);
 	// 	HttpServletResponse response = mock(HttpServletResponse.class);
 	// 	corePage.httpResponse = response;
@@ -741,7 +741,7 @@ public class BrokenCorePage_test {
 	// 		"There is an error")));
 	// 	printWriter.flush();
 	// 	printWriter.close();
-	// 	File rFile = new File("test-files/tmp/servlet/me.txt");
+	// 	File rFile = new File("test/tmp/servlet/me.txt");
 	// 	BufferedReader expected = new BufferedReader(new FileReader(rFile));
 	// 	String line;
 	// 	Map<String, String> ret = new HashMap<String, String>();

@@ -16,7 +16,7 @@ import java.io.File;
 * // The following was extracted from the unit test case
 * // picodedTests.fileUtils.DeleteFilesByAge_test.
 *
-* String testDir = "./test-files/tmp/fileUtils/DeleteFilesByAge";
+* String testDir = "./test/tmp/fileUtils/DeleteFilesByAge";
 *
 * pWriter = new PrintWriter(testDir+"/olderFile.txt", "UTF-8");
 * pWriter.println("olderFile");

@@ -15,7 +15,7 @@ public class DStackConfigLoader_test{
 	//
 	// The test folders to use
 	//
-	File testCollection = new File("./test-files/test-specific/dstack/stack/DStackConfigLoader/");
+	File testCollection = new File("./test/files/dstack/stack/DStackConfigLoader/");
 	
 	/**
 	 * Load the defined file from the test folder, and returns its string value

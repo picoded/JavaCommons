@@ -26,7 +26,7 @@ public class CoreApiPage_test {
 	//
 	// The test folders to use
 	//
-	File testFolder = new File("./test-files/test-specific/servlet/CoreApiPage/");
+	File testFolder = new File("./test/files/servlet/CoreApiPage/");
 	
 	//
 	// The test vars to use

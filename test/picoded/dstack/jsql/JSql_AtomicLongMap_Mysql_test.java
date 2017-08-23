@@ -23,7 +23,7 @@ import picoded.dstack.jsql.connector.*;
 import picoded.dstack.struct.simple.*;
 
 public class JSql_AtomicLongMap_Mysql_test extends JSql_AtomicLongMap_test {
-
+	
 	// To override for implementation
 	//-----------------------------------------------------
 	

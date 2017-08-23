@@ -75,7 +75,7 @@ public class CoreApiPage_test {
 		
 		// The expected result
 		Map<String, Object> expected = new HashMap<String, Object>();
-		expected.put("echo", msg); 
+		expected.put("echo", msg);
 		String testString = ConvertJSON.fromObject(expected, true).trim();
 		
 		// Request parmeters
@@ -172,7 +172,7 @@ public class CoreApiPage_test {
 		String testUrl = "http://localhost:" + testPort + "/api/this-does-not-exist/";
 		
 		// Check that there IS an error
-		assertNotNull(	ConvertJSON.toMap(RequestHttp.get(testUrl).toString().trim()).get("ERROR") );
+		assertNotNull(ConvertJSON.toMap(RequestHttp.get(testUrl).toString().trim()).get("ERROR"));
 	}
 	
 }

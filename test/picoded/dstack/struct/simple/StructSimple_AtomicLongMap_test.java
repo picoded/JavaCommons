@@ -50,13 +50,13 @@ public class StructSimple_AtomicLongMap_test {
 	@Test
 	public void putTest() {
 		assertNull(testObj.put("key", null));
-		assertEquals((Object)0l, testObj.get("key"));
-
+		assertEquals((Object) 0l, testObj.get("key"));
+		
 		assertNull(testObj.put("key", 0));
-		assertEquals(0, (long)testObj.get("key"));
-
-		assertNull(testObj.put("key", (Long)90l));
-		assertEquals(90, (long)testObj.get("key"));
+		assertEquals(0, (long) testObj.get("key"));
+		
+		assertNull(testObj.put("key", (Long) 90l));
+		assertEquals(90, (long) testObj.get("key"));
 	}
 	
 	@Test
@@ -65,27 +65,27 @@ public class StructSimple_AtomicLongMap_test {
 		assertNull(testObj.put("key", 90l));
 		
 		// Test getAndAdd
-		assertEquals(90l, (long)testObj.getAndAdd("key", (Long) 90l));
-		assertEquals(180l, (long)testObj.getAndAdd("key", (Long) 90l));
-
+		assertEquals(90l, (long) testObj.getAndAdd("key", (Long) 90l));
+		assertEquals(180l, (long) testObj.getAndAdd("key", (Long) 90l));
+		
 		// Test getAndAdd from null
-		assertEquals((Object)0l, testObj.getAndAdd("key1", (Long) 90l));
-		assertEquals((Object)90l, testObj.getAndAdd("key1", (Long) 90l));
-		assertEquals((Object)180l, testObj.getAndAdd("key1", (Long) 90l));
+		assertEquals((Object) 0l, testObj.getAndAdd("key1", (Long) 90l));
+		assertEquals((Object) 90l, testObj.getAndAdd("key1", (Long) 90l));
+		assertEquals((Object) 180l, testObj.getAndAdd("key1", (Long) 90l));
 	}
 	
 	@Test
 	public void getAndIncrementTest() {
 		testObj.put("key", 90l);
-		assertEquals((Object)90l, testObj.getAndIncrement("key"));
-		assertEquals((Object)0l, testObj.getAndIncrement("key1"));
+		assertEquals((Object) 90l, testObj.getAndIncrement("key"));
+		assertEquals((Object) 0l, testObj.getAndIncrement("key1"));
 	}
 	
 	@Test
 	public void incrementAndGetTest() {
-		assertEquals((Object)1l, testObj.incrementAndGet("key"));
+		assertEquals((Object) 1l, testObj.incrementAndGet("key"));
 		testObj.put("key", 90l);
-		assertEquals((Object)91l, testObj.incrementAndGet("key"));
+		assertEquals((Object) 91l, testObj.incrementAndGet("key"));
 	}
 	
 	@Test

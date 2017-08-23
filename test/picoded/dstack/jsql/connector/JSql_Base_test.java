@@ -20,9 +20,10 @@ public class JSql_Base_test {
 	public JSql sqlImplementation() {
 		return JSqlTest.sqlite();
 	}
-
+	
 	protected JSql jsqlObj;
-	protected static String testTableName = "JSqlTest_" + TestConfig.randomTablePrefix().toUpperCase();
+	protected static String testTableName = "JSqlTest_"
+		+ TestConfig.randomTablePrefix().toUpperCase();
 	
 	@BeforeClass
 	public static void oneTimeSetUp() {
@@ -53,207 +54,207 @@ public class JSql_Base_test {
 	public void constructor() {
 		assertNotNull(jsqlObj);
 	}
-
+	
 	/// Simple raw query of creating, writing, reading, and deleting test
 	/// This is considered the simplest minimal test flow
 	@Test
 	public void simpleQueryFlow_raw() {
 		// Creating and inserting the result
-		assertEquals(0, jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
-		assertEquals(1, jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
-
+		assertEquals(0, jsqlObj.update_raw("CREATE TABLE " + testTableName + " ( COL1 INTEGER )"));
+		assertEquals(1, jsqlObj.update_raw("INSERT INTO " + testTableName + " VALUES (1)"));
+		
 		// Query and validating data
 		JSqlResult res = null;
-		assertNotNull( res = jsqlObj.query_raw("SELECT * FROM "+testTableName+"") );
-
+		assertNotNull(res = jsqlObj.query_raw("SELECT * FROM " + testTableName + ""));
+		
 		// Note that expected is in lower case, 
 		// as results is stored in case insensitive hashmap
-		Map<String,Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
-		assertEquals( ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res) );
+		Map<String, Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
+		assertEquals(ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res));
 		res.dispose();
-
+		
 		// Table cleanup
-		jsqlObj.update_raw("DROP TABLE "+testTableName+"");
+		jsqlObj.update_raw("DROP TABLE " + testTableName + "");
 	}
-
+	
 	/// simpleQueryFlow, with built CREATE TABLE statement instead
 	@Test
 	public void simpleQueryFlow_createTable() {
 		// Creating and inserting the result
-		assertTrue( jsqlObj.createTable(testTableName, new String[] { "COL1" }, new String[] { "INTEGER" }) );
-		assertEquals(1, jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
-
+		assertTrue(jsqlObj.createTable(testTableName, new String[] { "COL1" },
+			new String[] { "INTEGER" }));
+		assertEquals(1, jsqlObj.update_raw("INSERT INTO " + testTableName + " VALUES (1)"));
+		
 		// Query and validating data
 		JSqlResult res = null;
-		assertNotNull( res = jsqlObj.query_raw("SELECT * FROM "+testTableName+"") );
-
+		assertNotNull(res = jsqlObj.query_raw("SELECT * FROM " + testTableName + ""));
+		
 		// Note that expected is in lower case, 
 		// as results is stored in case insensitive hashmap
-		Map<String,Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
-		assertEquals( ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res) );
+		Map<String, Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
+		assertEquals(ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res));
 		res.dispose();
-
+		
 		// Table cleanup
-		jsqlObj.update_raw("DROP TABLE "+testTableName+"");
+		jsqlObj.update_raw("DROP TABLE " + testTableName + "");
 	}
-
-
+	
 	/// simpleQueryFlow, with built SELECT statement instead
 	@Test
 	public void simpleQueryFlow_select() {
 		// Creating and inserting the result
-		assertEquals(0, jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
-		assertEquals(1, jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
-
+		assertEquals(0, jsqlObj.update_raw("CREATE TABLE " + testTableName + " ( COL1 INTEGER )"));
+		assertEquals(1, jsqlObj.update_raw("INSERT INTO " + testTableName + " VALUES (1)"));
+		
 		// Query and validating data
 		JSqlResult res = null;
-		assertNotNull( res = jsqlObj.select(testTableName, "*") );
-
+		assertNotNull(res = jsqlObj.select(testTableName, "*"));
+		
 		// Note that expected is in lower case, 
 		// as results is stored in case insensitive hashmap
-		Map<String,Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
-		assertEquals( ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res) );
+		Map<String, Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
+		assertEquals(ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res));
 		res.dispose();
-
+		
 		// Table cleanup
-		jsqlObj.update_raw("DROP TABLE "+testTableName+"");
+		jsqlObj.update_raw("DROP TABLE " + testTableName + "");
 	}
-
+	
 	/// simpleQueryFlow, with built UPSERT statement instead, modified with primary key
 	@Test
 	public void simpleQueryFlow_upsert() {
 		// Creating and inserting the result
-		assertEquals(0, jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER PRIMARY KEY )") );
-
+		assertEquals(0,
+			jsqlObj.update_raw("CREATE TABLE " + testTableName + " ( COL1 INTEGER PRIMARY KEY )"));
+		
 		// Upserting only the primary key, rest is to be facilitated in other tests
-		assertTrue( jsqlObj.upsert(testTableName, new String[] { "COL1" }, new Object[] { 1 }, null, null, null, null, null) );
-
+		assertTrue(jsqlObj.upsert(testTableName, new String[] { "COL1" }, new Object[] { 1 }, null,
+			null, null, null, null));
+		
 		// Query and validating data
 		JSqlResult res = null;
-		assertNotNull( res = jsqlObj.query_raw("SELECT * FROM "+testTableName+"") );
-
+		assertNotNull(res = jsqlObj.query_raw("SELECT * FROM " + testTableName + ""));
+		
 		// Note that expected is in lower case, 
 		// as results is stored in case insensitive hashmap
-		Map<String,Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
-		assertEquals( ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res) );
+		Map<String, Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
+		assertEquals(ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res));
 		res.dispose();
-
+		
 		// Table cleanup
-		jsqlObj.update_raw("DROP TABLE "+testTableName+"");
+		jsqlObj.update_raw("DROP TABLE " + testTableName + "");
 	}
-
+	
 	/// Simple raw query of creating, writing, reading, and deleting test
 	/// This is considered the simplest minimal test flow
 	@Test
 	public void simpleQueryFlow_delete() {
 		// Creating and inserting the result
-		assertEquals(0, jsqlObj.update_raw("CREATE TABLE "+testTableName+" ( COL1 INTEGER )") );
-		assertEquals(1, jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (1)") );
-
+		assertEquals(0, jsqlObj.update_raw("CREATE TABLE " + testTableName + " ( COL1 INTEGER )"));
+		assertEquals(1, jsqlObj.update_raw("INSERT INTO " + testTableName + " VALUES (1)"));
+		
 		// Query and validating data
 		JSqlResult res = null;
-		assertNotNull( res = jsqlObj.query_raw("SELECT * FROM "+testTableName+"") );
-		assertEquals( 1, res.rowCount() );
-
+		assertNotNull(res = jsqlObj.query_raw("SELECT * FROM " + testTableName + ""));
+		assertEquals(1, res.rowCount());
+		
 		// Note that expected is in lower case, 
 		// as results is stored in case insensitive hashmap
-		Map<String,Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
-		assertEquals( ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res) );
-
+		Map<String, Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
+		assertEquals(ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res));
+		
 		// Delete from the table
-		assertEquals(1, jsqlObj.delete(testTableName) );
-
+		assertEquals(1, jsqlObj.delete(testTableName));
+		
 		// Check for no data
-		assertNotNull( res = jsqlObj.query_raw("SELECT * FROM "+testTableName+"") );
-		assertEquals( 0, res.rowCount() );
-
+		assertNotNull(res = jsqlObj.query_raw("SELECT * FROM " + testTableName + ""));
+		assertEquals(0, res.rowCount());
+		
 		// Reinsert a different data
-		assertEquals(1, jsqlObj.update_raw("INSERT INTO "+testTableName+" VALUES (2)") );
-
+		assertEquals(1, jsqlObj.update_raw("INSERT INTO " + testTableName + " VALUES (2)"));
+		
 		// Requery for new data strictly
-		assertNotNull( res = jsqlObj.query_raw("SELECT * FROM "+testTableName+"") );
-		assertEquals( 1, res.rowCount() );
-
+		assertNotNull(res = jsqlObj.query_raw("SELECT * FROM " + testTableName + ""));
+		assertEquals(1, res.rowCount());
+		
 		// Validate the result
 		expected = ConvertJSON.toMap("{ \"col1\" : [ 2 ] }");
-		assertEquals( ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res) );
-
+		assertEquals(ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res));
+		
 		// Table cleanup
-		jsqlObj.update_raw("DROP TABLE "+testTableName+"");
+		jsqlObj.update_raw("DROP TABLE " + testTableName + "");
 	}
-
-
+	
 	/// Create table if not exists test
 	@Test
 	public void createTableStatementBuilder() {
 		// cleanup (just incase)
-		assertEquals(0, jsqlObj.update("DROP TABLE IF EXISTS `" + testTableName + "`") ); 
+		assertEquals(0, jsqlObj.update("DROP TABLE IF EXISTS `" + testTableName + "`"));
 		
 		// valid table creation : no exception
-		assertTrue( jsqlObj.createTable(testTableName, new String[] { "col1", "col2" },
-			new String[] { "INT PRIMARY KEY", "TEXT" }) ); 
+		assertTrue(jsqlObj.createTable(testTableName, new String[] { "col1", "col2" }, new String[] {
+			"INT PRIMARY KEY", "TEXT" }));
 		
 		// run twice to ensure "IF NOT EXISTS" works
-		assertTrue( jsqlObj.createTable(testTableName, new String[] { "col1", "col2" },
-			new String[] { "INT PRIMARY KEY", "TEXT" }) ); 
+		assertTrue(jsqlObj.createTable(testTableName, new String[] { "col1", "col2" }, new String[] {
+			"INT PRIMARY KEY", "TEXT" }));
 		
 		// Truncate call, (ensure no prior data)
-		assertEquals(0, jsqlObj.update("TRUNCATE TABLE " + testTableName + "") ); 
+		assertEquals(0, jsqlObj.update("TRUNCATE TABLE " + testTableName + ""));
 		
 		// Data insertion
-		assertEquals(1, jsqlObj.update("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404,
-			"has nothing") );
+		assertEquals(1, jsqlObj.update("INSERT INTO " + testTableName
+			+ " ( col1, col2 ) VALUES (?,?)", 404, "has nothing"));
 	}
 	
 	/// This is the base execute sql test example, in which other examples are built on
 	@Test
 	public void updateStatements() {
 		// cleanup (just incase)
-		assertEquals(0, jsqlObj.update("DROP TABLE IF EXISTS `" + testTableName + "`") ); 
+		assertEquals(0, jsqlObj.update("DROP TABLE IF EXISTS `" + testTableName + "`"));
 		
-		assertEquals(0, jsqlObj.update(
-			"CREATE TABLE IF NOT EXISTS " + testTableName
+		assertEquals(
+			0,
+			jsqlObj.update("CREATE TABLE IF NOT EXISTS " + testTableName
 				+ " ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50) )")); //valid table creation : no exception
-		assertEquals(0, jsqlObj.update(
-			"CREATE TABLE IF NOT EXISTS " + testTableName
+		assertEquals(
+			0,
+			jsqlObj.update("CREATE TABLE IF NOT EXISTS " + testTableName
 				+ " ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50) )")); //run twice to ensure "IF NOT EXISTS" works
 		
 		// Truncate call, (ensure no prior data)
-		assertEquals(0, jsqlObj.update("TRUNCATE TABLE " + testTableName + "") ); 
+		assertEquals(0, jsqlObj.update("TRUNCATE TABLE " + testTableName + ""));
 		
 		// Data insertion
-		jsqlObj.update("INSERT INTO " + testTableName + " ( col1, col2, col3 ) VALUES (?,?,?)",
-			404, "has nothing", "do nothing");
+		jsqlObj.update("INSERT INTO " + testTableName + " ( col1, col2, col3 ) VALUES (?,?,?)", 404,
+			"has nothing", "do nothing");
 		
 		// Drop non existent view
 		jsqlObj.update("DROP VIEW IF EXISTS `" + testTableName + "_View`");
 		
 		// Create view
-		jsqlObj.update(
-			"CREATE VIEW " + testTableName + "_View AS  SELECT * FROM " + testTableName);
+		jsqlObj.update("CREATE VIEW " + testTableName + "_View AS  SELECT * FROM " + testTableName);
 		
 		// Drop created view
 		jsqlObj.update("DROP VIEW IF EXISTS `" + testTableName + "_View`");
 		
 	}
 	
-	
 	@Test
 	public void update_expectedExceptions() {
 		// runs the no exception varient. to pre populate the tables for exceptions
-		updateStatements(); 
+		updateStatements();
 		
 		// Reduce exception level of sqlite library
 		java.util.logging.Logger.getLogger("com.almworks.sqlite4java").setLevel(
 			java.util.logging.Level.SEVERE); //sets it to tolerate the error
-
+		
 		// The caught exception
 		JSqlException caughtException = null;
-
+		
 		// Try creating an invalid table
 		try {
-			jsqlObj.update(
-				"CREATE TABLE " + testTableName + " (col1 INT PRIMARY KEY, col2 TEXT)"); //invalid table creation : should have exception
+			jsqlObj.update("CREATE TABLE " + testTableName + " (col1 INT PRIMARY KEY, col2 TEXT)"); //invalid table creation : should have exception
 		} catch (JSqlException e) {
 			caughtException = e; //fish caught
 			assertNotNull("Exception caught as intended", e);
@@ -264,7 +265,7 @@ public class JSql_Base_test {
 		}
 		
 		caughtException = null;
-
+		
 		// Try doing an invalid insertion
 		try {
 			jsqlObj.update("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 404,
@@ -330,10 +331,8 @@ public class JSql_Base_test {
 		updateStatements();
 		
 		// added more data to test
-		jsqlObj
-			.update("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 405, "hello");
-		jsqlObj
-			.update("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 406, "world");
+		jsqlObj.update("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 405, "hello");
+		jsqlObj.update("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 406, "world");
 		jsqlObj.update("INSERT INTO " + testTableName + " ( col1, col2 ) VALUES (?,?)", 407, "no.7");
 	}
 	
@@ -347,7 +346,7 @@ public class JSql_Base_test {
 		assertNotNull(r = jsqlObj.select(testTableName, null, null, null)); //select all
 		assertNotNull("SQL result should return a result", r);
 		r.fetchAllRows();
-	
+		
 		assertEquals("via get()[]", 404, ((Number) r.get("col1")[0]).intValue());
 		assertEquals("via get()[]", "has nothing", r.get("col2")[0]);
 		assertEquals("via get()[]", 405, ((Number) r.get("col1")[1]).intValue());
@@ -355,7 +354,7 @@ public class JSql_Base_test {
 		assertEquals("via get()[]", 406, ((Number) r.get("col1")[2]).intValue());
 		assertEquals("via get()[]", "world", r.get("col2")[2]);
 		
-		assertEquals("via readRow", 407, ((Number) r.readRow(3).getInt("col1")) );
+		assertEquals("via readRow", 407, ((Number) r.readRow(3).getInt("col1")));
 		assertEquals("via readRow", "no.7", r.readRow(3).getString("col2"));
 		assertEquals("via get()[]", 407, ((Number) r.get("col1")[3]).intValue());
 		assertEquals("via get()[]", "no.7", r.get("col2")[3]);
@@ -363,8 +362,7 @@ public class JSql_Base_test {
 		r.dispose();
 		
 		// orderby DESC, limits 2, offset 1
-		assertNotNull(r = jsqlObj.select(testTableName, null, null, null, "col1 DESC", 2,
-			1));
+		assertNotNull(r = jsqlObj.select(testTableName, null, null, null, "col1 DESC", 2, 1));
 		
 		assertEquals("DESC, limit 2, offset 1 length check", 2, r.get("col1").length);
 		assertEquals("via get()[]", 405, ((Number) r.get("col1")[1]).intValue());
@@ -373,8 +371,7 @@ public class JSql_Base_test {
 		assertEquals("via get()[]", "world", r.get("col2")[0]);
 		
 		// select all, with select clause, orderby DESC
-		assertNotNull(r = jsqlObj.select(testTableName, "col1, col2", null, null,
-			"col1 DESC", 2, 1));
+		assertNotNull(r = jsqlObj.select(testTableName, "col1, col2", null, null, "col1 DESC", 2, 1));
 		
 		assertEquals("DESC, limit 2, offset 1 length check", 2, r.get("col1").length);
 		assertEquals("via get()[]", 405, ((Number) r.get("col1")[1]).intValue());
@@ -383,8 +380,7 @@ public class JSql_Base_test {
 		assertEquals("via get()[]", "world", r.get("col2")[0]);
 		
 		// select 404, with col2 clause
-		assertNotNull(r = jsqlObj.select(testTableName, "col2", "col1 = ?",
-			(new Object[] { 404 })));
+		assertNotNull(r = jsqlObj.select(testTableName, "col2", "col1 = ?", (new Object[] { 404 })));
 		
 		assertNull("no column", r.get("col1"));
 		assertNotNull("has column check", r.get("col2"));
@@ -408,7 +404,7 @@ public class JSql_Base_test {
 			testTableName, //
 			new String[] { "col1" }, new Object[] { 404 }, //
 			new String[] { "col2", "col3" }, new Object[] { "not found", "not found" } //
-		));
+			));
 		
 		assertNotNull("query should return a JSql result",
 			r = jsqlObj.query("SELECT * FROM " + testTableName + " ORDER BY col1 ASC"));
@@ -424,9 +420,8 @@ public class JSql_Base_test {
 		
 		jsqlObj.update("DROP TABLE IF EXISTS `" + testTableName + "_1`"); //cleanup (just incase)
 		
-		jsqlObj.update(
-			"CREATE TABLE IF NOT EXISTS " + testTableName
-				+ "_1 ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(100) )"); //valid table creation : no exception
+		jsqlObj.update("CREATE TABLE IF NOT EXISTS " + testTableName
+			+ "_1 ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(100) )"); //valid table creation : no exception
 		
 		//Upsert query
 		assertNotNull(jsqlObj.upsert( //
@@ -436,7 +431,7 @@ public class JSql_Base_test {
 			new String[] { "col2" }, new Object[] { "not found" }, //
 			//new String[] { "col4", "col5" }, new Object[] { "not found", "not found" },
 			new String[] { "col3" }, new Object[] { "3 not found" }, new String[] { "col4" } //
-		));
+			));
 		
 		assertNotNull("query should return a JSql result",
 			r = jsqlObj.query("SELECT * FROM " + testTableName + "_1 ORDER BY col1 ASC"));
@@ -453,10 +448,9 @@ public class JSql_Base_test {
 		jsqlObj.update("DROP TABLE IF EXISTS `" + testTableName + "_1`"); //cleanup (just incase)
 		
 		jsqlObj
-			.update(
-				"CREATE TABLE IF NOT EXISTS "
-					+ testTableName
-					+ "_1 ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(100) DEFAULT 'ABC' NOT NULL )"); //valid table creation : no exception
+			.update("CREATE TABLE IF NOT EXISTS "
+				+ testTableName
+				+ "_1 ( col1 INT PRIMARY KEY, col2 TEXT, col3 VARCHAR(50), col4 VARCHAR(100) DEFAULT 'ABC' NOT NULL )"); //valid table creation : no exception
 		
 		//jsqlObj.update("ALTER TABLE " + testTableName + "_1 ADD CONSTRAINT c_col4 DEFAULT (ABC) FOR col4;");
 		
@@ -473,7 +467,7 @@ public class JSql_Base_test {
 			new String[] { "col2" }, new Object[] { "not found" }, //
 			//new String[] { "col4", "col5" }, new Object[] { "not found", "not found" },
 			new String[] { "col3" }, new Object[] { "3 not found" }, new String[] { "col4" } //
-		));
+			));
 		
 		assertNotNull("query should return a JSql result",
 			r = jsqlObj.query("SELECT * FROM " + testTableName + "_1 ORDER BY col1 ASC"));
@@ -514,10 +508,10 @@ public class JSql_Base_test {
 	
 	@Test
 	public void recreate() {
-
+		
 		// Create setup
 		simpleQueryFlow_raw();
-
+		
 		// close connection
 		jsqlObj.dispose();
 		
@@ -525,11 +519,11 @@ public class JSql_Base_test {
 		Exception expected = null;
 		try {
 			simpleQueryFlow_raw();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			expected = e;
 		}
 		assertNotNull(expected);
-
+		
 		// recoreate connection
 		jsqlObj.recreate(true);
 		
@@ -571,9 +565,8 @@ public class JSql_Base_test {
 	public void commitTest() {
 		jsqlObj.update("DROP TABLE IF EXISTS " + testTableName + ""); //cleanup (just incase)
 		
-		jsqlObj.update(
-			"CREATE TABLE IF NOT EXISTS " + testTableName
-				+ " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )");
+		jsqlObj.update("CREATE TABLE IF NOT EXISTS " + testTableName
+			+ " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )");
 		jsqlObj.setAutoCommit(false);
 		assertFalse(jsqlObj.getAutoCommit());
 		jsqlObj.update("INSERT INTO " + testTableName + " ( `col[1].pk`, col2 ) VALUES (?,?)", 404,
@@ -589,17 +582,17 @@ public class JSql_Base_test {
 	public void createTableIndexStatementTest() {
 		jsqlObj.update("DROP TABLE IF EXISTS " + testTableName + "");
 		
-		jsqlObj.update("CREATE TABLE IF NOT EXISTS " + testTableName + " ( `col1` INT PRIMARY KEY, col2 TEXT )");
-		jsqlObj.createIndex(testTableName,"col2");
+		jsqlObj.update("CREATE TABLE IF NOT EXISTS " + testTableName
+			+ " ( `col1` INT PRIMARY KEY, col2 TEXT )");
+		jsqlObj.createIndex(testTableName, "col2");
 	}
 	
 	@Test
 	public void createTableIndexStatementTestThreeParam() {
 		jsqlObj.update("DROP TABLE IF EXISTS " + testTableName + "");
 		
-		jsqlObj.update(
-			"CREATE TABLE IF NOT EXISTS " + testTableName
-				+ " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )");
+		jsqlObj.update("CREATE TABLE IF NOT EXISTS " + testTableName
+			+ " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )");
 		jsqlObj.createIndex(testTableName, "col2", "UNIQUE");
 	}
 	
@@ -607,9 +600,8 @@ public class JSql_Base_test {
 	public void createTableIndexStatementTestFourParam() {
 		jsqlObj.update("DROP TABLE IF EXISTS " + testTableName + "");
 		
-		jsqlObj.update(
-			"CREATE TABLE IF NOT EXISTS " + testTableName
-				+ " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )");
+		jsqlObj.update("CREATE TABLE IF NOT EXISTS " + testTableName
+			+ " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )");
 		jsqlObj.createIndex(testTableName, "col2", "UNIQUE", "IDX");
 	}
 	
@@ -629,33 +621,25 @@ public class JSql_Base_test {
 		assertEquals(array, rArray);
 	}
 	
-	@Test 
+	@Test
 	public void byteArrayStorage() {
 		// Table with BLOB type
-		assertTrue( jsqlObj.createTable(
-			testTableName,
-			new String[] { "pKy", "rVl" },
-			new String[] { "VARCHAR(64) PRIMARY KEY", "BLOB" }
-		) );
-
+		assertTrue(jsqlObj.createTable(testTableName, new String[] { "pKy", "rVl" }, new String[] {
+			"VARCHAR(64) PRIMARY KEY", "BLOB" }));
+		
 		// Byte array to store
 		byte[] dataArr = "big-data : data that cannot fit inside excel spreadsheet".getBytes();
-
+		
 		// Inserting the byte array
-		assertTrue( jsqlObj.upsert(
-			testTableName,
-			new String[] { "pKy" },
-			new Object[] { "small-data" },
-			new String[] { "rVl" },
-			new Object[] { dataArr }
-		));
-
+		assertTrue(jsqlObj.upsert(testTableName, new String[] { "pKy" },
+			new Object[] { "small-data" }, new String[] { "rVl" }, new Object[] { dataArr }));
+		
 		// Fetch the data
 		JSqlResult res = jsqlObj.select(testTableName);
-		assertNotNull( res );
-
+		assertNotNull(res);
+		
 		// Validate data
-		assertEquals( "small-data", res.get("pKy")[0] );
-		assertArrayEquals( dataArr, (byte[])res.get("rVl")[0] );
+		assertEquals("small-data", res.get("pKy")[0]);
+		assertArrayEquals(dataArr, (byte[]) res.get("rVl")[0]);
 	}
 }

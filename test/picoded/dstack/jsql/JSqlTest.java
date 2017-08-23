@@ -24,19 +24,15 @@ import picoded.dstack.struct.simple.*;
 
 /// Utility test class to get the respective JSQL connection used in TESTING
 public class JSqlTest {
-
+	
 	/// SQLite connection
 	public static JSql sqlite() {
 		return JSql.sqlite();
 	}
-
+	
 	/// MYSQL connection
 	public static JSql mysql() {
-		return JSql.mysql( 
-			TestConfig.MYSQL_CONN(),
-			TestConfig.MYSQL_DATA(),
-			TestConfig.MYSQL_USER(),
-			TestConfig.MYSQL_PASS()
-		);
+		return JSql.mysql(TestConfig.MYSQL_CONN(), TestConfig.MYSQL_DATA(), TestConfig.MYSQL_USER(),
+			TestConfig.MYSQL_PASS());
 	}
 }

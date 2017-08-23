@@ -5,21 +5,21 @@ import java.util.Locale;
 import java.util.Map;
 
 public class QueryUtils {
-
+	
 	protected QueryUtils() {
 		throw new IllegalAccessError("Utility class");
 	}
-
+	
 	/**
-	* Gets the field value to test
-	*
-	* @param   object to extract out the field value
-	* @param   field name of extraction
-	*
-	* @TODO: Support FullyQualifiedDomainName extraction? With arrays even?
-	*
-	* @return  The extracted object
-	**/
+	 * Gets the field value to test
+	 *
+	 * @param   object to extract out the field value
+	 * @param   field name of extraction
+	 *
+	 * @TODO: Support FullyQualifiedDomainName extraction? With arrays even?
+	 *
+	 * @return  The extracted object
+	 **/
 	@SuppressWarnings("rawtypes")
 	public static Object getFieldValue(Object t, String field) {
 		if (field == null || "this".equalsIgnoreCase(field)) {
@@ -29,12 +29,12 @@ public class QueryUtils {
 		}
 		return null;
 	}
-
+	
 	/**
-	* Remove and returns field name "wrapers" for sql specific versions
-	*
-	* @return  Fieldnames after removal
-	**/
+	 * Remove and returns field name "wrapers" for sql specific versions
+	 *
+	 * @return  Fieldnames after removal
+	 **/
 	public static String unwrapFieldName(String field) {
 		if ( //
 		(field.startsWith("\"") && field.endsWith("\""))
@@ -42,22 +42,22 @@ public class QueryUtils {
 			|| (field.startsWith("[") && field.endsWith("]"))) { //
 			field = field.substring(1, field.length() - 1);
 		}
-
+		
 		if (field.length() == 0) {
 			throw new RuntimeException("Unexpected blank field");
 		}
-
+		
 		return field;
 	}
-
+	
 	//
 	//--------------------------------------------------------------------
-
+	
 	/**
-	* Normalizes a Number object as a double
-	*
-	* @return Double object
-	**/
+	 * Normalizes a Number object as a double
+	 *
+	 * @return Double object
+	 **/
 	public static Double normalizeNumber(Object number) {
 		Double val = null;
 		if (number instanceof Integer) {
@@ -69,13 +69,13 @@ public class QueryUtils {
 		}
 		return val;
 	}
-
+	
 	/**
-	* returns String only, and ONLY if it should be compared as a string
-	* if its a number, will return as a double
-	*
-	* @return String / Double object
-	**/
+	 * returns String only, and ONLY if it should be compared as a string
+	 * if its a number, will return as a double
+	 *
+	 * @return String / Double object
+	 **/
 	public static Object normalizeObject(Object source) {
 		if (source instanceof String) {
 			// extremely rudimentary check for a number, needs to be improved

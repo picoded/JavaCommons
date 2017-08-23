@@ -28,62 +28,62 @@ import picoded.dstack.struct.simple.*;
 /// Basic template to build and extend all ApiModule test cases
 ///
 public class ApiModule_test {
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// Internal vars
 	//
 	//-------------------------------------------------------------------------
-
+	
 	//
 	// The servlet test vars to use
 	//
 	int testPort = 0; //Test port to use
 	CorePage testPage = null;
 	EmbeddedServlet testServlet = null; //Test servlet to use
-
+	
 	/// The base URL to test from, used this in the respective calls
 	String testBaseUrl = null;
-
+	
 	/// The testing cookie jar, to keep between request (in a single test)
-	Map<String,String[]> cookieJar = new HashMap<String,String[]>();
-
+	Map<String, String[]> cookieJar = new HashMap<String, String[]>();
+	
 	//
 	// The test folders to use
 	//
 	// File testFolder = new File("./test/files/servlet/api/module/ApiModule/");
 	//
-
+	
 	// Statically sared common stack for reuse
 	public static CommonStack sharedCommonStack = null;
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// Testing servlet
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/// The testing API Module servlet template
 	public static class ApiModuleTestServlet extends CoreApiPage {
-
+		
 		/// The CommonStack implementation
 		public CommonStack testStack = null;
-
+		
 		/// The api builder test vars
 		public ApiModule testModule = null;
-
+		
 		/// To overwrite when replacing the default Stack implementation from struct
 		///
 		/// @param   Base static CorePage used
 		///
 		/// @return  The DStack.CommonStack implementation, used for module setup
 		public CommonStack stackSetup() {
-			if( sharedCommonStack == null ) {
+			if (sharedCommonStack == null) {
 				sharedCommonStack = new StructSimpleStack();
 			}
 			return sharedCommonStack;
 		}
-
+		
 		/// The overwrite with the respective ApiModule
 		///
 		/// @param   Base static CorePage used
@@ -93,7 +93,7 @@ public class ApiModule_test {
 		public ApiModule moduleSetup(CommonStack stack) {
 			return null;
 		}
-
+		
 		/// Called once when initialized per request, and by the initializeContext thread.
 		///
 		/// The distinction is important, as certain parameters (such as requesrt details),
@@ -105,7 +105,7 @@ public class ApiModule_test {
 			// Setup the testModule
 			testModule = moduleSetup(testStack);
 		}
-
+		
 		/// !To Override
 		/// to configure the ApiBuilder steps
 		///
@@ -113,27 +113,29 @@ public class ApiModule_test {
 		@Override
 		public void apiBuilderSetup(ApiBuilder api) {
 			// Setup the module API (if built)
-			if( testModule != null ) {
+			if (testModule != null) {
 				// @TODO : FIX THIS
 				//testModule.setupApiBuilder(api);
 			}
-
+			
 			// Setup an intentional exception endpoint (for some sanity test)
-			api.put("IntentionalError", (req,res) -> { throw new RuntimeException("IntentionalError"); });
+			api.put("IntentionalError", (req, res) -> {
+				throw new RuntimeException("IntentionalError");
+			});
 		}
 	}
-
+	
 	/// Testing servlet to provide, for test extension
 	public CorePage setupServlet() {
 		return new ApiModuleTestServlet();
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// JUnit setup and teardown
 	//
 	//-------------------------------------------------------------------------
-
+	
 	//
 	// Standard setup and teardown
 	//
@@ -145,7 +147,7 @@ public class ApiModule_test {
 		testServlet = new EmbeddedServlet(testPort, testPage);
 		testBaseUrl = "http://localhost:" + testPort + "/api/";
 	}
-
+	
 	@After
 	public void tearDown() throws Exception {
 		if (testServlet != null) {
@@ -155,56 +157,57 @@ public class ApiModule_test {
 		testPage = null;
 		cookieJar = null;
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// Convinence function calls
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/// Utility function to do a simple JSON POST request on the server URI
 	///
 	/// @param   Server subpath URI
 	/// @param   Parameters to pass over (can be null)
-	public GenericConvertMap<String,Object> requestJSON(String uri, Map<String,Object> params) {
-
+	public GenericConvertMap<String, Object> requestJSON(String uri, Map<String, Object> params) {
+		
 		// Make a request with cookies
-		ResponseHttp res = RequestHttp.post(testBaseUrl+uri, RequestHttp.simpleParameterConversion(params), cookieJar, null);
+		ResponseHttp res = RequestHttp.post(testBaseUrl + uri,
+			RequestHttp.simpleParameterConversion(params), cookieJar, null);
 		// Store the cookie result
-		cookieJar.putAll( res.cookiesMap() );
-
+		cookieJar.putAll(res.cookiesMap());
+		
 		// Process the result, to JSON map
 		String rawResult = res.toString().trim();
-
+		
 		try {
-			Map<String,Object> ret = ConvertJSON.toMap(rawResult);
-			if( ret == null ) {
-				throw new RuntimeException("Empty JSON response : "+rawResult);
+			Map<String, Object> ret = ConvertJSON.toMap(rawResult);
+			if (ret == null) {
+				throw new RuntimeException("Empty JSON response : " + rawResult);
 			}
 			return GenericConvertMap.build(ret);
 		} catch (Exception e) {
-			throw new RuntimeException("Unexpected requestJSON formatting : \n"+rawResult);
+			throw new RuntimeException("Unexpected requestJSON formatting : \n" + rawResult);
 		}
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// Sanity test
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/// Minimal passing test, where intentionally the wrong URI is called
 	/// to get a JSON API response error
 	@Test
 	public void constructorTest() {
-		assertNotNull( testServlet );
-		assertNotNull( requestJSON("wrong/URI",null).get("ERROR") );
+		assertNotNull(testServlet);
+		assertNotNull(requestJSON("wrong/URI", null).get("ERROR"));
 	}
-
+	
 	/// Making sure IntentionalError, does actually give an error
 	@Test
 	public void intentionalErrorTest() {
-		assertEquals("IntentionalError", requestJSON("IntentionalError",null).get("ERROR") );
-		assertNotNull(requestJSON("IntentionalError",null).get("INFO"));
+		assertEquals("IntentionalError", requestJSON("IntentionalError", null).get("ERROR"));
+		assertNotNull(requestJSON("IntentionalError", null).get("INFO"));
 	}
 }

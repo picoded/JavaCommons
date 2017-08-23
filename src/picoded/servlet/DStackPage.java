@@ -23,48 +23,48 @@ import picoded.dstack.stack.DStackConfigLoader;
  *  + unit tests
  */
 public class DStackPage extends CoreApiPage {
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Static variables
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Config file handling
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	protected DConfig DConfigObj = null;
-
+	
 	/// @TODO, the actual DConfig integration with the DB. Currently its purely via the file system
 	public DConfig DConfig() {
 		if (DConfigObj != null) {
 			return DConfigObj;
 		}
-
+		
 		if ((new File(getConfigPath())).exists()) {
 			DConfigObj = new DConfig(getConfigPath());
 		} else {
 			DConfigObj = new DConfig();
 		}
-
+		
 		return DConfigObj;
 	}
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// DStack auto load handling
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	protected DStack DStackObj = null;
-
+	
 	////////////////////////////////////////////////////
 	// tableSetup calls for various jSql based modules
 	////////////////////////////////////////////////////
-
+	
 	/**
 	 * Returns the DStack if exists, else generate and return
 	 *
@@ -78,7 +78,7 @@ public class DStackPage extends CoreApiPage {
 		DStackObj = DStackConfigLoader.generateDStack(stackConfig);
 		return DStackObj;
 	}
-
+	
 	/// Auto initialize page builder
 	@Override
 	public void initializeContext() throws Exception {
@@ -90,5 +90,5 @@ public class DStackPage extends CoreApiPage {
 			System.out.println("Skipping systemSetup in JStackPage");
 		}
 	}
-
+	
 }

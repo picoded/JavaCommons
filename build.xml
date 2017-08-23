@@ -17,7 +17,7 @@
 	<property name="src-path" value="src/picoded" />
 	<property name="src-test" value="test/picoded" />
 
-	<property name="lib-organized-dir" value="lib-organized" />
+	<property name="lib-organized-dir" value="build/lib-organized" />
 
 	<property name="build-libOnly" value="${basedir}/bin/build/picodedJavaCommons-libsOnly.jar" />
 

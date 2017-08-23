@@ -24,13 +24,13 @@
 	<!-- ant contrib add ons -->
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
-			<pathelement location="${basedir}/build-tools/ant-contrib/ant-contrib-1.0b3.jar"/>
+			<pathelement location="${basedir}/build/tools/ant-contrib/ant-contrib-1.0b3.jar"/>
 		</classpath>
 	</taskdef>
 
 	<!-- jUnit declearation over-ride, see: 'http://stackoverflow.com/questions/9774264/junit-ant-task-junittask-was-not-found' -->
 	<path id="junit-path">
-		<fileset dir="build-tools/junit" includes="**/*.jar" />
+		<fileset dir="build/tools/junit" includes="**/*.jar" />
 	</path>
 	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
 		<classpath refid="junit-path"/>
@@ -42,7 +42,7 @@
 
 	<!-- One-JAR -->
 	<taskdef name="one-jar" classname="com.simontuffs.onejar.ant.OneJarTask"
-        classpath="./build-tools/one-jar/one-jar-ant-task-0.97.jar" onerror="report"/>
+        classpath="./build/tools/one-jar/one-jar-ant-task-0.97.jar" onerror="report"/>
 
 	<!-- **************************************************
 	The following lists the target sets supported by ant
@@ -93,18 +93,18 @@
 		<!-- Scan and beautify the code : spaces only -->
 		<exec executable="java">
 			<arg value="-cp"/>
-			<arg value="./build-tools/java-formatter/java-formatter-with-dependencies.jar"/>
+			<arg value="./build/tools/java-formatter/java-formatter-with-dependencies.jar"/>
 			<arg value="Formatter"/>
-			<arg value="./build-config/code-format.opts"/>
+			<arg value="./build/config/code-format.opts"/>
 			<arg value="./src"/>
 		</exec>
 
 		<!-- Scan and beautify the code : spaces only -->
 		<exec executable="java">
 			<arg value="-cp"/>
-			<arg value="./build-tools/java-formatter/java-formatter-with-dependencies.jar"/>
+			<arg value="./build/tools/java-formatter/java-formatter-with-dependencies.jar"/>
 			<arg value="Formatter"/>
-			<arg value="./build-config/code-format.opts"/>
+			<arg value="./build/config/code-format.opts"/>
 			<arg value="./test"/>
 		</exec>
 	</target>
@@ -286,7 +286,7 @@
 		<mkdir dir="${build-classes}"/>
 		<javac destdir="${build-classes}" classpathref="lib.path.ref" debug="true" debuglevel="lines,source"
 				 includeantruntime="false">
-			<!-- bootclasspath="./build-tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar" -->
+			<!-- bootclasspath="./build/tools/rt-stubs/java-rt-jar-stubs-1.5.0.jar" -->
 			<compilerarg value="-Xlint:all"/>
 			<compilerarg value="-Xlint:-serial"/>
  			<compilerarg value="-Xlint:-path"/>
@@ -316,7 +316,7 @@
 		<path id="lib.test.ref">
 			<!--<fileset dir="bin/build" includes="*-libsOnly.jar" />-->
 			<fileset dir="bin/libs" includes="*.jar" />
-			<fileset dir="build-tools/junit" includes="*.jar" />
+			<fileset dir="build/tools/junit" includes="*.jar" />
 		</path>
 
 		<mkdir dir="${build-classes}"/>
@@ -377,7 +377,7 @@
 				<classpath>
 					<pathelement path="${build-classes}"/>
 					<!--<pathelement path="${build-libOnly}"/>-->
-					<fileset dir="build-tools/junit" includes="**/*.jar" />
+					<fileset dir="build/tools/junit" includes="**/*.jar" />
 					<fileset dir="bin/libs" includes="**/*.jar" />
 					<!--<fileset dir="${build-lib}" includes="**/*.jar" />-->
 				</classpath>
@@ -453,7 +453,7 @@ te>]]></replacetoken>
 			<fileset dir="src" includes="picoded/set/**/*.java" excludes="**/*_test.java"/>
 			<fileset dir="src" includes="picoded/conv/**/*.java" excludes="**/*_test.java"/>
 			<fileset dir="src" includes="picoded/struct/**/*.java" excludes="**/*_test.java"/>
-			<doclet name="ch.raffael.doclets.pegdown.PegdownDoclet" path="build-tools/markdown-javadocs/pegdown-doclet-1.3-all.jar"> </doclet>
+			<doclet name="ch.raffael.doclets.pegdown.PegdownDoclet" path="build/tools/markdown-javadocs/pegdown-doclet-1.3-all.jar"> </doclet>
 		</javadoc>
 
 		<jar destfile="bin/build/picodedJavaCommons-javadocs.jar" basedir="bin/javadoc"/>

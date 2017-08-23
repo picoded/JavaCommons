@@ -48,11 +48,11 @@ else
 		if [[ -z "$TESTFUNCTION" ]]
 		then
 			echo "---------------------------------------------------------------------------------"
-			java -cp "./build-tools/junit/*:./bin/libs/*:./bin/classes" org.junit.runner.JUnitCore "$TESTCLASS"
+			java -cp "./build/tools/junit/*:./bin/libs/*:./bin/classes" org.junit.runner.JUnitCore "$TESTCLASS"
 		else
 			echo "Function: $TESTFUNCTION"
 			echo "---------------------------------------------------------------------------------"
-			java -cp "./build-tools/junit/*:./bin/libs/*:./bin/classes" picoded.JUnit.SingleJUnitTestRunner "$TESTCLASS#$TESTFUNCTION"
+			java -cp "./build/tools/junit/*:./bin/libs/*:./bin/classes" picoded.JUnit.SingleJUnitTestRunner "$TESTCLASS#$TESTFUNCTION"
 		fi
 	done
 fi

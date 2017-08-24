@@ -13,4 +13,6 @@ import java.util.*;
  * Mainly as followed
  * + StringEscape
  **/
-abstract public class AbstractApiModule implements ApiModule {
+abstract public class CommonApiModule extends AbstractApiModule {
+
+}

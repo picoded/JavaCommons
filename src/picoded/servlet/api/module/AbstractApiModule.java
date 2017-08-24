@@ -32,7 +32,7 @@ abstract public class AbstractApiModule implements ApiModule {
 	 * @param  prefixPath  prefix to assume as (should be able to accept "" blanks)
 	 * @param  config      configuration object, assumed to be a map. use GenericConvert.toStringMap to preprocess the data
 	 */
-	public apiSetup(ApiBuilder inApi, String inPrefixPath, Object inConfigMap) {
+	public void apiSetup(ApiBuilder inApi, String inPrefixPath, Object inConfigMap) {
 		// Set the api and its path prefix
 		api = inApi;
 		prefixPath = inPrefixPath;
@@ -41,7 +41,7 @@ abstract public class AbstractApiModule implements ApiModule {
 		config = GenericConvert.toGenericConvertStringMap(inConfigMap, "{}");
 		subsystemList = internalSubsystemList();
 
-		setupApiBuilder(api, prefixPath, config);
+		apiBuilderSetup(api, prefixPath, config);
 	}
 
 	/**

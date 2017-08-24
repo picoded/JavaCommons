@@ -1,11 +1,15 @@
-package picoded.serlvet.api.module.dstack;
+package picoded.servlet.api.module.dstack;
 
-import static picoded.serlvet.api.module.dstack.DStackApiConstantStrings.*;
+import static picoded.servlet.api.module.dstack.DStackApiConstantStrings.*;
+import picoded.servlet.api.module.*;
+import picoded.servlet.api.*;
+
+import picoded.dstack.*;
 
 /**
  * Does the constructor setup of DataTable
  */
-public class DataTableApi extends AbstractApiModule {
+public abstract class DataTableApi extends CommonApiModule {
 
 	/////////////////////////////////////////////
 	//
@@ -39,7 +43,7 @@ public class DataTableApi extends AbstractApiModule {
 	 * ## HTTP Request Parameters
 	 *
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | Parameter Name  | Variable Type	    | Description                                                                   |
+	 * | Parameter Name  | Variable Type	    | Description                                                                  |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | _oid            | String             | object ID used to retrieve the meta object. If no oid is given, return null.  |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -50,7 +54,7 @@ public class DataTableApi extends AbstractApiModule {
 	 * ## JSON Object Output Parameters
 	 *
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | Parameter Name  | Variable Type	    | Description                                                                   |
+	 * | Parameter Name  | Variable Type	    | Description                                                                  |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | _oid            | String             | The internal object ID used (or created)                                      |
 	 * | stringEscape    | Boolean            | Indicate if string escape occured                                             |

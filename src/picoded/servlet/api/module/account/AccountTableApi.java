@@ -3,21 +3,22 @@ package picoded.servlet.api.module.account;
 import java.util.*;
 
 import picoded.servlet.api.*;
-import picoded.servlet.api.module.ApiModule;
+import picoded.servlet.api.module.*;
 import picoded.dstack.module.account.*;
 import picoded.dstack.*;
 import picoded.core.conv.ConvertJSON;
-import picoded.core.conv.RegexUtil;
+import picoded.core.conv.StringEscape;
 import picoded.core.conv.GenericConvert;
 import java.util.function.BiFunction;
 import picoded.core.struct.GenericConvertMap;
 import picoded.core.struct.GenericConvertHashMap;
 import static picoded.servlet.api.module.account.AccountConstantStrings.*;
+import picoded.core.common.SystemSetupInterface;
 
 /**
  * Account table API builder
  **/
-public class AccountTableApi implements ApiModule {
+public class AccountTableApi extends CommonApiModule {
 	
 	/**
 	 * The AccountTable reference
@@ -36,6 +37,10 @@ public class AccountTableApi implements ApiModule {
 	 **/
 	public AccountTableApi(AccountTable inTable) {
 		table = inTable;
+	}
+
+	protected List<SystemSetupInterface> internalSubsystemList() {
+		return new ArrayList<SystemSetupInterface>();
 	}
 	
 	/**
@@ -567,12 +572,12 @@ public class AccountTableApi implements ApiModule {
 					Set<String> names = ao.getLoginIDSet();
 					names.clear();
 					for (String name : ao.getLoginIDSet()) {
-						names.add(RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(name));
+						names.add(StringEscape.commonHtmlEscapeCharacters(name));
 					}
 					returnList.get(listCounter).add(ao.getLoginIDSet());
 				} else if (column.equalsIgnoreCase(PROPERTIES_ROLE)) {
 					returnList.get(listCounter).add(
-						RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(group.getMemberRole(ao)));
+						StringEscape.commonHtmlEscapeCharacters(group.getMemberRole(ao)));
 				} else if (column.toLowerCase().startsWith("account_")) {
 					String headerSuffix = column.substring("account_".length());
 					Object propertyValue = (ao.get(headerSuffix) != null) ? ao.get(headerSuffix) : "";
@@ -1323,6 +1328,10 @@ public class AccountTableApi implements ApiModule {
 		return res;
 	};
 	
+	protected void apiBuilderSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
+		apiBuilderSetup(api, prefixPath);
+	}
+
 	/**
 	 * Does the actual setup for the API
 	 * Given the API Builder, and the namespace prefix
@@ -1330,7 +1339,7 @@ public class AccountTableApi implements ApiModule {
 	 * @param  API builder to add the required functions
 	 * @param  Path to assume
 	 **/
-	public void setupApiBuilder(ApiBuilder builder, String path) {
+	public void apiBuilderSetup(ApiBuilder builder, String path) {
 		builder.put(path + API_ACCOUNT_IS_LOGIN, isLogin); // Tested
 		builder.put(path + API_ACCOUNT_LOGIN, login); // Tested
 		builder.put(path + API_ACCOUNT_LOCKTIME, lockTime); // Tested
@@ -1379,7 +1388,7 @@ public class AccountTableApi implements ApiModule {
 				accNameSet.toArray(accNames);
 				if (sanitiseOutput && accNames != null) {
 					for (int i = 0; i < accNames.length; ++i) {
-						accNames[i] = RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(accNames[i]);
+						accNames[i] = StringEscape.commonHtmlEscapeCharacters(accNames[i]);
 					}
 				}
 				commonInfo.put("accountNames", accNames);
@@ -1405,14 +1414,14 @@ public class AccountTableApi implements ApiModule {
 					if (sanitiseOutput) {
 						groupNames.clear();
 						for (String groupName : group.getLoginIDSet()) {
-							groupNames.add(RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(groupName));
+							groupNames.add(StringEscape.commonHtmlEscapeCharacters(groupName));
 						}
 					}
 					newGroup.put("names", groupNames);
 					//extracting member roles and sanitising if needed
 					String role = group.getMemberRole(account);
 					if (sanitiseOutput) {
-						role = RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(role);
+						role = StringEscape.commonHtmlEscapeCharacters(role);
 					}
 					newGroup.put("role", role); //sanitise role just in case
 					role = (role == null) ? "" : role;
@@ -1558,7 +1567,7 @@ public class AccountTableApi implements ApiModule {
 								if (sanitiseOutput) {
 									aoNames.clear();
 									for (String name : ao.getLoginIDSet()) {
-										aoNames.add(RegexUtil.sanitiseCommonEscapeCharactersIntoAscii(name));
+										aoNames.add(StringEscape.commonHtmlEscapeCharacters(name));
 									}
 								}
 								

@@ -407,9 +407,9 @@ public class ApiBuilder implements
 		
 		// Get the current version, and write the respective endpoint to it
 		if (value == null) {
-			getVersionSet().filterMap.put(path, NULLAPIFUNCTION);
+			getVersionSet().beforeFilterMap.put(path, NULLAPIFUNCTION);
 		} else {
-			getVersionSet().filterMap.put(path, value);
+			getVersionSet().beforeFilterMap.put(path, value);
 		}
 	}
 	
@@ -481,10 +481,10 @@ public class ApiBuilder implements
 		// Gets the collapsed version set
 		ApiVersionSet workingSet = collapsedVersionSet(inMajor, inMinor);
 		List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> filteredLegitPath = new ArrayList<BiFunction<ApiRequest, ApiResponse, ApiResponse>>();
-		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> filterMap = workingSet.filterMap;
+		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> beforeFilterMap = workingSet.beforeFilterMap;
 		Pattern pattern = Pattern.compile("");
 		Matcher match = null;
-		for (String filterPath : filterMap.keySet()) {
+		for (String filterPath : beforeFilterMap.keySet()) {
 			String currentPath = filterPath;
 			filterPath = filterPath.replaceAll("\\.", "\\\\."); // Regex: escape all .
 			filterPath = filterPath.replaceAll("\\*", ".*"); // Regex: change * into .*
@@ -492,7 +492,7 @@ public class ApiBuilder implements
 			pattern = Pattern.compile(filterPath);
 			match = pattern.matcher(path);
 			if (match.matches()) { // Find the exact match
-				filteredLegitPath.add(filterMap.get(currentPath));
+				filteredLegitPath.add(beforeFilterMap.get(currentPath));
 			}
 		}
 		if (filteredLegitPath.size() == 0) {

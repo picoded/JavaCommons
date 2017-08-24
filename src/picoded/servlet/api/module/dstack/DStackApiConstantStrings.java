@@ -1,4 +1,4 @@
-package picoded.serlvet.api.module.dstack;
+package picoded.servlet.api.module.dstack;
 
 /**
  * Collection of string constants, used for parameter names in the various API endpoings

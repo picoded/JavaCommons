@@ -1656,6 +1656,11 @@ public class AccountTableApi implements ApiModule {
 					if ( value.isEmpty() )
 						res.put(RES_ERROR, ERROR_NO_NODE_ID);
 					break;
+				case REQ_NAME:
+					value = req.getString(paramName, "");
+					if ( value.isEmpty() )
+						res.put(RES_ERROR, ERROR_NO_NAME);
+					break;
 			}
 			if ( res.get(RES_ERROR) != null )
 				break;

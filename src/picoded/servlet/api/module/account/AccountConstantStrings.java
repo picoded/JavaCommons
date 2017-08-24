@@ -11,6 +11,7 @@ public class AccountConstantStrings{
     public static final String REQ_REMOVE_LIST = "removeList";
   	public static final String REQ_PASSWORD = "password";
   	public static final String REQ_USERNAME = "username";
+    public static final String REQ_NAME = "name";
     public static final String REQ_REMEMBER_ME = "rememberMe";
     public static final String REQ_SANITISE_OUTPUT = "sanitiseOutput";
     public static final String REQ_DEFAULT_ROLES = "defaultRoles";
@@ -88,6 +89,7 @@ public class AccountConstantStrings{
     public static final String ERROR_NO_USER_ID = "No userID is found.";
     public static final String ERROR_DEFAULT = " is found.";
     public static final String ERROR_NO_META = "No meta is found.";
+    public static final String ERROR_NO_NAME = "No name is found.";
     public static final String ERROR_NOT_IN_GROUP_OR_ROLE = "User is not in group or not in specified role.";
     public static final String ERROR_INVALID_FORMAT_JSON = "Invalid Format JSON";
     public static final String ERROR_PASS_NOT_EQUAL = "The passwords are not equal.";

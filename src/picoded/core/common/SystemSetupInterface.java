@@ -91,4 +91,20 @@ public interface SystemSetupInterface {
 		// Does nothing, needs implementation
 	}
 	
+	//--------------------------------------------------------------------------
+	//
+	// Configuration map
+	//
+	//--------------------------------------------------------------------------
+	
+	// NOTE: Until a use case for this is found, config getter is commented out
+	//
+	// /**
+	// * Configuration getting, that was used in configSetup
+	// *
+	// * @return GenericConvertMap<String,Object> representing the current config
+	// */
+	// default GenericConvertMap<String,Object> config() {
+	// 	throw new UnsupportedOperationException("Missing the respective config implementation");
+	// }
 }

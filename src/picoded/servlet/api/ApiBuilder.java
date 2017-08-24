@@ -14,6 +14,7 @@ import picoded.core.struct.GenericConvertMap;
 import picoded.core.struct.GenericConvertHashMap;
 import picoded.core.conv.ConvertJSON;
 
+import picoded.servlet.api.ApiVersionSet.ApiFunctionType;
 import static picoded.servlet.api.module.account.AccountConstantStrings.*;
 
 /**
@@ -360,6 +361,29 @@ public class ApiBuilder implements
 	//-------------------------------------------------------------------
 	
 	/**
+	 * Register the API function with its respective type
+	 *
+	 * @param  ApiFunctionType  type mapping to use
+	 * @param  String path to sanitize and use
+	 * @param  Function to store as a "value"
+	 */
+	protected void registerApiFunction(ApiFunctionType type, String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
+		// Clears the collapsed version set cache
+		cachedCollapsedVersionSet.clear();
+		
+		// Change / into .
+		path = path.replaceAll("/", ".");
+		
+		// Get the current version, and write the respective endpoint to it
+		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionMap = getVersionSet().functionMap(type);
+		if (value == null) {
+			functionMap.put(path, NULLAPIFUNCTION);
+		} else {
+			functionMap.put(path, value);
+		}
+	}
+
+	/**
 	 * Registers an API function to a single endpoint.
 	 *
 	 * Note that due to the way ApiBuilder is designed to export the respective API libraries
@@ -371,46 +395,31 @@ public class ApiBuilder implements
 	 * @return  returns null
 	 **/
 	public void endpoint(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
-		
-		// if( path.indexOf("/*") >= 0 ) {
-		// 	throw new RuntimeException("Wildcard endpoints are not supported");
-		// }
-		
-		// Clears the collapsed version set cache
-		cachedCollapsedVersionSet.clear();
-		
-		// Change / into .
-		path = path.replaceAll("/", ".");
-		
-		// Get the current version, and write the respective endpoint to it
-		if (value == null) {
-			getVersionSet().endpointMap.put(path, NULLAPIFUNCTION);
-		} else {
-			getVersionSet().endpointMap.put(path, value);
-		}
+		registerApiFunction(ApiFunctionType.ENDPOINT, path, value);
 	}
 	
 	/**
-	 * Registers an API filter function to a single endpoint.
+	 * Registers an API before filter function to a single endpoint.
 	 *
 	 * @param  Endpoint paths
 	 * @param  Executor function, use null to remove an existing function
 	 *
 	 * @return  returns null
 	 **/
-	public void filter(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
-		// Clears the collapsed version set cache
-		cachedCollapsedVersionSet.clear();
-		
-		// Change / into .
-		path = path.replaceAll("/", ".");
-		
-		// Get the current version, and write the respective endpoint to it
-		if (value == null) {
-			getVersionSet().beforeFilterMap.put(path, NULLAPIFUNCTION);
-		} else {
-			getVersionSet().beforeFilterMap.put(path, value);
-		}
+	public void before(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
+		registerApiFunction(ApiFunctionType.BEFORE, path, value);
+	}
+	
+	/**
+	 * Registers an API after filter function to a single endpoint.
+	 *
+	 * @param  Endpoint paths
+	 * @param  Executor function, use null to remove an existing function
+	 *
+	 * @return  returns null
+	 **/
+	public void after(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
+		registerApiFunction(ApiFunctionType.AFTER, path, value);
 	}
 	
 	/**
@@ -436,71 +445,80 @@ public class ApiBuilder implements
 	//-------------------------------------------------------------------
 	
 	/**
-	 * Fetch the relevant endpoint for the API request
+	 * Fetching a specific ApiFunction, that does an exact match for the path
 	 *
+	 * @param   type of api function to get
 	 * @param   major version to use
 	 * @param   minor version to use
 	 * @param   path name to use
 	 *
-	 * @return  The result ApiEndpoint (if found)
-	 **/
-	protected BiFunction<ApiRequest, ApiResponse, ApiResponse> fetchApiEndpoint(int inMajor,
-		int inMinor, String path) {
+	 * @return  The requested API Function, if found
+	 */
+	protected BiFunction<ApiRequest, ApiResponse, ApiResponse> fetchSpecificApiFunction(
+		ApiFunctionType type,
+		int inMajor, int inMinor, 
+		String path
+	) {
 		// Gets the collapsed version set
 		ApiVersionSet workingSet = collapsedVersionSet(inMajor, inMinor);
+
+		// Get the current version, and write the respective endpoint to it
+		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionMap = workingSet.functionMap(type);
+
 		// Find the exact match
-		BiFunction<ApiRequest, ApiResponse, ApiResponse> endpoint = workingSet.endpointMap.get(path);
-		if (endpoint != null) {
-			// Exact match found
-			return endpoint;
-		}
-		
-		// @TODO : ITERATE FOR DYNAMIC MATCH
-		
-		// Fetch failure
-		return null;
+		return functionMap.get(path);
 	}
 	
-	//-------------------------------------------------------------------
-	//
-	// Fetch and get the relevent API Execution FILTER endpoints for the path
-	//
-	//-------------------------------------------------------------------
-	
 	/**
-	 * Fetch the relevant list of filters for the API request
+	 * Fetching ApiFunction that matches the given path, including functions with wildcard matches
 	 *
+	 * @param   type of api function to get
 	 * @param   major version to use
 	 * @param   minor version to use
 	 * @param   path name to use
 	 *
-	 * @return  The result list of FILTERS ApiEndpoint (if found)
-	 **/
-	protected List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> fetchApiFilterEndpoints(
-		int inMajor, int inMinor, String path) {
+	 * @return  The requested API Function, if found
+	 */
+	protected List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> fetchMultipleApiFunction(
+		ApiFunctionType type,
+		int inMajor, int inMinor, 
+		String path
+	) {
 		// Gets the collapsed version set
 		ApiVersionSet workingSet = collapsedVersionSet(inMajor, inMinor);
-		List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> filteredLegitPath = new ArrayList<BiFunction<ApiRequest, ApiResponse, ApiResponse>>();
-		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> beforeFilterMap = workingSet.beforeFilterMap;
+
+		// Get the current version, and write the respective endpoint to it
+		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionMap = workingSet.functionMap(type);
+
+		// List of API functions, with matching path
+		List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> filteredApiFunction = new ArrayList<BiFunction<ApiRequest, ApiResponse, ApiResponse>>();
+
+		// Working pattern / match variables
 		Pattern pattern = Pattern.compile("");
 		Matcher match = null;
-		for (String filterPath : beforeFilterMap.keySet()) {
-			String currentPath = filterPath;
+
+		// Iterate the function map, for relevent functions
+		for (String currentPath : functionMap.keySet()) {
+			// Working filterPath
+			String filterPath = currentPath;
+
+			// Converts path into a usable regex, where * is a wildcard
 			filterPath = filterPath.replaceAll("\\.", "\\\\."); // Regex: escape all .
 			filterPath = filterPath.replaceAll("\\*", ".*"); // Regex: change * into .*
 			filterPath = filterPath.replaceAll("\\\\.\\.\\*$", "(\\\\..*)?"); // Regex: change last \..* into optional (\..*)?
+
+			// Compile the regex
 			pattern = Pattern.compile(filterPath);
 			match = pattern.matcher(path);
+
+			// Check if a match occur, if so the function is added to the list
 			if (match.matches()) { // Find the exact match
-				filteredLegitPath.add(beforeFilterMap.get(currentPath));
+				filteredApiFunction.add(functionMap.get(currentPath));
 			}
 		}
-		if (filteredLegitPath.size() == 0) {
-			return null;
-		}
-		
-		// @TODO : ITERATE FOR DYNAMIC MATCH
-		return filteredLegitPath;
+
+		// Return list of ApiFunctions : maybe blank
+		return filteredApiFunction;
 	}
 	
 	//-------------------------------------------------------------------
@@ -519,7 +537,7 @@ public class ApiBuilder implements
 	 * @return  true if path is valid
 	 **/
 	public boolean isValidPath(int inMajor, int inMinor, String path) {
-		return fetchApiEndpoint(inMajor, inMinor, path) != null;
+		return fetchSpecificApiFunction(ApiFunctionType.ENDPOINT, inMajor, inMinor, path) != null;
 	}
 	
 	/**
@@ -530,7 +548,36 @@ public class ApiBuilder implements
 	 * @return  true if path is valid
 	 **/
 	public boolean isValidPath(String path) {
-		return fetchApiEndpoint(majorVersion, minorVersion, path) != null;
+		return fetchSpecificApiFunction(ApiFunctionType.ENDPOINT, majorVersion, minorVersion, path) != null;
+	}
+
+	/**
+	 * Utility function that iterate and execute the various ApiFunction
+	 * and modify the resulting ApiResponse accordingly
+	 *
+	 * @param  functionList to execute
+	 * @param  req request object
+	 * @param  res result object
+	 *
+	 * @return The result object
+	 */
+	protected ApiResponse executeApiFunctionList(List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionList, ApiRequest req, ApiResponse res) {
+		// Iterate the functionList, and execute it
+		for (BiFunction<ApiRequest, ApiResponse, ApiResponse> func : functionList) {
+			ApiResponse funcResponse = func.apply(req, res);
+			if (funcResponse != null) {
+				res = funcResponse;
+
+				// Automatically terminates on an error
+				if( funcResponse.get(RES_ERROR) != null ) {
+					res.halt();
+				}
+			} else {
+				// A null funcResponse, is considered a halt
+				res.halt();
+			}
+		}
+		return res;
 	}
 	
 	/**
@@ -540,44 +587,44 @@ public class ApiBuilder implements
 	 * @param   minor version to use
 	 * @param   path name to use
 	 * @param   request query parameter to pass forward.
-	 * @param   context data parameter to pass forward,
+	 * @param   result data to write and return into
 	 *
 	 * @return  The result parameters
 	 **/
 	public ApiResponse execute(int inMajor, int inMinor, String path, ApiRequest reqObj,
 		ApiResponse resObj) {
-		// Fetch the list of filters
-		List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> filterEndpoints = fetchApiFilterEndpoints(
-			inMajor, inMinor, path);
 		// Fetch the endpoint
-		BiFunction<ApiRequest, ApiResponse, ApiResponse> endpoint = fetchApiEndpoint(inMajor,
+		BiFunction<ApiRequest, ApiResponse, ApiResponse> endpoint = fetchSpecificApiFunction(ApiFunctionType.ENDPOINT, inMajor,
 			inMinor, path);
 		// Endpoitn does not exists
 		if (endpoint == null) {
 			throw new UnsupportedOperationException("Missing requested path : " + path);
 		}
+
+		// Fetch the list of filters
+		List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> beforeFilterList = fetchMultipleApiFunction(ApiFunctionType.BEFORE, 
+			inMajor, inMinor, path);
+		List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> afterFilterList = fetchMultipleApiFunction(ApiFunctionType.AFTER, 
+			inMajor, inMinor, path);
 		
 		// ApiResponse setup (if null)
 		if (resObj == null) {
 			resObj = new ApiResponse(this);
 		}
 		
+		// Attempt to do the execution, any HaltException is caught and handled here
 		try {
-			// @TODO Filter handling
-			if (filterEndpoints != null) {
-				ApiResponse filterResponse = null;
-				for (BiFunction<ApiRequest, ApiResponse, ApiResponse> filterPoint : filterEndpoints) {
-					filterResponse = filterPoint.apply(reqObj, resObj);
-					if (filterResponse != null && filterResponse.get(RES_ERROR) != null) {
-						resObj = filterResponse;
-						resObj.halt();
-					}
-				}
-			}
-			// Found the endpoint execute and return
-			if (endpoint != null) {
-				return endpoint.apply(reqObj, resObj);
-			}
+			// Before filter handling
+			resObj = executeApiFunctionList(beforeFilterList, reqObj, resObj);
+
+			// Endpoint execution
+			resObj = endpoint.apply(reqObj, resObj);
+			
+			// After filter handling
+			resObj = executeApiFunctionList(afterFilterList, reqObj, resObj);
+
+			// Return result at the end
+			return resObj;
 		} catch (HaltException h) {
 			// if ( resObj.get(RES_ERROR) != null ) {
 			// 	System.out.println(resObj.get(RES_ERROR));
@@ -588,7 +635,7 @@ public class ApiBuilder implements
 		}
 		
 		// Return failure
-		return null;
+		// return null;
 	}
 	
 	/**

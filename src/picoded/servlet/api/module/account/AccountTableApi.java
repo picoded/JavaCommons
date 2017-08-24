@@ -1044,8 +1044,7 @@ public class AccountTableApi implements ApiModule {
 		res = check_parameters(paramsToCheck, req, res);
 		if ( res.get(RES_ERROR) != null )
 			return res;
-		Object metaObjRaw = req.get(REQ_META);
-
+		Object metaObjRaw = req.getStringMap(REQ_META);
 		String updateMode = req.getString(REQ_UPDATE_MODE, "delta");
 		Map<String, Object> metaObj = ConvertJSON.toMap(ConvertJSON.fromObject(metaObjRaw));
 		updateMode = ( !updateMode.equalsIgnoreCase("full") ) ? "delta" : updateMode;

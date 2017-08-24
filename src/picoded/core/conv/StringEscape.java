@@ -118,6 +118,7 @@ public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 	
 	/**
 	 * Sanatizes HTML escape characters "<", ">", or "&" along with "\" escape
+	 * This covers most cases of HTML injection in a child html, but not as a property value
 	 *
 	 * @param  Input string to sanatize
 	 *

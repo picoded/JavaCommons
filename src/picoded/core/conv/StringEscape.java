@@ -116,4 +116,29 @@ public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 		}
 	}
 	
+	/**
+	 * Sanatizes HTML escape characters "<", ">", or "&" along with "\" escape
+	 *
+	 * @param  Input string to sanatize
+	 *
+	 * @return Sanatized string
+	 **/
+	public static String commonHtmlEscapeCharacters(String input) {
+		String ret = input;
+
+		// This has to go first, before other escape
+		ret = ret.replaceAll("\\&", "&amp;");
+
+		// Common XML / HTML open close brackets
+		ret = ret.replaceAll("\\<", "&#60;");
+		ret = ret.replaceAll("\\>", "&#62;");
+		
+		//ret = ret.replaceAll("\\`", "&#96;");
+		//ret = ret.replaceAll("\\'", "&#8216;");
+		//ret = ret.replaceAll("\\\"", "&#34;"); //Removing quote sanitisation as SQL security happens on another layer
+		
+		// Common string \ escape, relevent for embeded javascript in HTML
+		ret = ret.replaceAll("\\\\", "&#92;");
+		return ret;
+	}
 }

@@ -22,17 +22,17 @@ abstract public class AbstractApiModule implements ApiModule {
 	protected List<SystemSetupInterface> subsystemList = null;
 	
 	//-------------------------------------------------------------
-	// Constructor
+	// api setup
 	//-------------------------------------------------------------
 	
 	/**
-	 * Setup the API module, with the given parameters
+	 * Setup the API module, with the given parameters. And register the relevant end points
 	 *
 	 * @param  api         ApiBuilder to add the required functions
 	 * @param  prefixPath  prefix to assume as (should be able to accept "" blanks)
 	 * @param  config      configuration object, assumed to be a map. use GenericConvert.toStringMap to preprocess the data
 	 */
-	public AbstractApiModule(ApiBuilder inApi, String inPrefixPath, Object inConfigMap) {
+	public apiSetup(ApiBuilder inApi, String inPrefixPath, Object inConfigMap) {
 		// Set the api and its path prefix
 		api = inApi;
 		prefixPath = inPrefixPath;
@@ -40,10 +40,18 @@ abstract public class AbstractApiModule implements ApiModule {
 		// Set the config
 		config = GenericConvert.toGenericConvertStringMap(inConfigMap, "{}");
 		subsystemList = internalSubsystemList();
+
+		setupApiBuilder(api, prefixPath, config);
 	}
 
+	/**
+	 * [To Overwrite]
+	 * Does the actual API backend setup logic, this is after standardised apiSetup initialization
+	 */
+	abstract protected void apiBuilderSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config);
+
 	//-------------------------------------------------------------
-	// SystemSetup / Teardown helpers
+	// SystemSetup / Teardown chain helpers
 	//-------------------------------------------------------------
 	
 	/**

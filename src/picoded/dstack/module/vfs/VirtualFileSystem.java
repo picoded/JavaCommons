@@ -5,43 +5,43 @@ import picoded.file.FileUtil;
 
 import java.util.*;
 
-import picoded.conv.*;
+import picoded.core.conv.*;
 
 /**
-* VirtualFileSystem using DataTable implmentation
-* This replicates most of the file system requirements of Uilicious workspace
-**/
+ * VirtualFileSystem using DataTable implmentation
+ * This replicates most of the file system requirements of Uilicious workspace
+ **/
 public class VirtualFileSystem extends VirtualFileObject {
-
+	
 	//--------------------------------------------------------------------------
 	//
 	// Constructor variables, and Constructor
 	//
 	//--------------------------------------------------------------------------
-
+	
 	/**
-	* Directory structure and meta data
-	**/
+	 * Directory structure and meta data
+	 **/
 	protected DataTable directories = null;
-
+	
 	/**
-	* Actual data files
-	**/
+	 * Actual data files
+	 **/
 	protected DataTable files = null;
-
+	
 	/**
-	* Constructor with Directory, and file table
-	*
-	* @param Directory table
-	* @param File table
-	**/
+	 * Constructor with Directory, and file table
+	 *
+	 * @param Directory table
+	 * @param File table
+	 **/
 	public VirtualFileSystem(DataTable inDirectory, DataTable inFile) {
 		super();
-
+		
 		// The meta table involved
 		directories = inDirectory;
 		files = inFile;
-
+		
 		// Setting up root VirtualFileObject1
 		type = "ROOT";
 		vfs = this;
@@ -96,5 +96,5 @@ public class VirtualFileSystem extends VirtualFileObject {
 	// 	// Let us implment for ROOT only for now
 	// 	return getVirtualFileObject(null, splitPath[0]);
 	// }
-
+	
 }

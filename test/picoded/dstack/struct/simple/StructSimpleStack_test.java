@@ -11,17 +11,17 @@ import java.util.*;
 import org.apache.commons.lang3.RandomUtils;
 
 // Test depends
-import picoded.conv.GUID;
-import picoded.struct.CaseInsensitiveHashMap;
+import picoded.core.conv.GUID;
+import picoded.core.struct.CaseInsensitiveHashMap;
 import picoded.dstack.*;
 import picoded.dstack.struct.simple.*;
 
 // Setup the test stack
 public class StructSimpleStack_test {
-
+	
 	// The testing stack to use
 	CommonStack testStack = null;
-
+	
 	// To override for implementation
 	//-----------------------------------------------------
 	public CommonStack implementationConstructor() {
@@ -55,10 +55,8 @@ public class StructSimpleStack_test {
 		// run maintaince, no exception?
 		testStack.maintenance();
 	}
-
+	
 	// Does the various get calls
 	//-----------------------------------------------------
-
-
-
+	
 }

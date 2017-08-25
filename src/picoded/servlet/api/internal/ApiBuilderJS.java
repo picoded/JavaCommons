@@ -10,13 +10,13 @@ import java.io.BufferedReader;
 import picoded.servlet.api.ApiBuilder;
 
 public class ApiBuilderJS {
-
+	
 	public static String getJsLib() {
 		Scanner scanner = null;
 		StringBuilder fileContents = new StringBuilder();
 		try {
 			File file = new File("ApiBuilderJS.js");
-			if ( ApiBuilderJS.class.getResource("ApiBuilderJS.js") != null ) {
+			if (ApiBuilderJS.class.getResource("ApiBuilderJS.js") != null) {
 				file = new File(ApiBuilderJS.class.getResource("ApiBuilderJS.js").getPath());
 			}
 			InputStream is = ApiBuilderJS.class.getResourceAsStream("ApiBuilderJS.js");
@@ -24,35 +24,33 @@ public class ApiBuilderJS {
 			StringBuilder sb = new StringBuilder();
 			String line;
 			while ((line = br.readLine()) != null) {
-				fileContents.append(line+"\n");
+				fileContents.append(line + "\n");
 			}
-		} catch ( IOException e ) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		return ( fileContents == null ) ? "" : fileContents.toString();
+		return (fileContents == null) ? "" : fileContents.toString();
 	}
-
+	
 	/**
-	* Method to generate the entire Javascript API file contents
-	*/
+	 * Method to generate the entire Javascript API file contents
+	 */
 	public static String generateApiJs(ApiBuilder builder, String hostpath) {
 		String versionStr = builder.versionStr();
-
+		
 		String generateJSScript = "var api = (function() {\n";
 		generateJSScript += getJsLib();
-
-		generateJSScript += "\tapicore.baseURL(\"//" + hostpath + "/" + versionStr + "/\");\n"+
-												"\tapicore.setEndpointMap({\n";
-
+		
+		generateJSScript += "\tapicore.baseURL(\"//" + hostpath + "/" + versionStr + "/\");\n"
+			+ "\tapicore.setEndpointMap({\n";
+		
 		// Generating endpoints
-		for ( String endpoint : builder.keySet() ) {
+		for (String endpoint : builder.keySet()) {
 			generateJSScript += "\t\t\"" + endpoint + "\" : [],\n";
- 		}
+		}
 		int index = generateJSScript.lastIndexOf(",\n");
-		generateJSScript = generateJSScript.substring( 0, index ) + "\n";
-		generateJSScript += "\t});\n" +
-												"\treturn api;\n" +
-												"})();\n";
+		generateJSScript = generateJSScript.substring(0, index) + "\n";
+		generateJSScript += "\t});\n" + "\treturn api;\n" + "})();\n";
 		return generateJSScript;
 	}
 }

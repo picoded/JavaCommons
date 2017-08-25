@@ -12,81 +12,81 @@ import picoded.dstack.DataTable;
 import picoded.dstack.DataObject;
 import picoded.dstack.core.Core_AtomicLongMap;
 import picoded.security.NxtCrypt;
-import picoded.struct.GenericConvertMap;
-import picoded.struct.GenericConvertHashMap;
+import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.GenericConvertHashMap;
 import picoded.dstack.jsql.connector.*;
-import picoded.set.JSqlType;
-import picoded.conv.ListValueConv;
-import picoded.conv.GenericConvert;
+import picoded.core.common.JSqlType;
+import picoded.core.conv.ListValueConv;
+import picoded.core.conv.GenericConvert;
 
 /**
-* JSql implmentation of AtomicLongMap
-**/
+ * JSql implmentation of AtomicLongMap
+ **/
 public class JSql_AtomicLongMap extends Core_AtomicLongMap {
-
+	
 	//--------------------------------------------------------------------------
 	//
 	// Constructor setup
 	//
 	//--------------------------------------------------------------------------
-
+	
 	/**
-	* The inner sql object
-	**/
+	 * The inner sql object
+	 **/
 	protected JSql sqlObj = null;
-
+	
 	/**
-	* The tablename for the key value pair map
-	**/
+	 * The tablename for the key value pair map
+	 **/
 	protected String sqlTableName = null;
-
+	
 	/**
-	* JSql setup
-	*
-	* @param   JSQL connection
-	* @param   Table name to use
-	**/
+	 * JSql setup
+	 *
+	 * @param   JSQL connection
+	 * @param   Table name to use
+	 **/
 	public JSql_AtomicLongMap(JSql inJSql, String tablename) {
 		super();
 		sqlObj = inJSql;
-		sqlTableName = "AL_"+tablename;
+		sqlTableName = "AL_" + tablename;
 	}
-
+	
 	//--------------------------------------------------------------------------
 	//
 	// Internal config vars
 	//
 	//--------------------------------------------------------------------------
-
+	
 	/**
-	* Primary key type
-	**/
+	 * Primary key type
+	 **/
 	protected String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
-
+	
 	/**
-	* Timestamp field type
-	**/
+	 * Timestamp field type
+	 **/
 	protected String tStampColumnType = "BIGINT";
-
+	
 	/**
-	* Key name field type
-	**/
+	 * Key name field type
+	 **/
 	protected String keyColumnType = "VARCHAR(64)";
-
+	
 	/**
-	* Value field type
-	**/
+	 * Value field type
+	 **/
 	protected String valueColumnType = "DECIMAL(36,12)";
-
+	
 	//--------------------------------------------------------------------------
 	//
 	// Backend system setup / teardown / maintenance (DStackCommon)
 	//
 	//--------------------------------------------------------------------------
-
+	
 	/**
-	* Setsup the backend storage table, etc. If needed
-	**/
+	 * Setsup the backend storage table, etc. If needed
+	 **/
 	@Override
 	public void systemSetup() {
 		try {
@@ -95,9 +95,9 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 			sqlObj.createTable( //
 				sqlTableName, //
 				new String[] { //
-					// Primary key, as classic int, this is used to lower SQL
-					// fragmentation level, and index memory usage. And is not accessible.
-					// Sharding and uniqueness of system is still maintained by meta keys
+				// Primary key, as classic int, this is used to lower SQL
+				// fragmentation level, and index memory usage. And is not accessible.
+				// Sharding and uniqueness of system is still maintained by meta keys
 					"pKy", // primary key
 					// Time stamps
 					"uTm", //Updated timestamp
@@ -119,52 +119,52 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 					// Value storage
 					valueColumnType } //
 				);
-
+			
 			// Unique index
 			//------------------------------------------------
 			sqlObj.createIndex( //
 				sqlTableName, "kID", "UNIQUE", "unq" //
 			);
-
+			
 			// Value search index
 			//------------------------------------------------
 			sqlObj.createIndex( //
 				sqlTableName, "kVl", null, "valMap" //
 			);
-
+			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-
+	
 	/**
-	* Teardown and delete the backend storage table, etc. If needed
-	**/
+	 * Teardown and delete the backend storage table, etc. If needed
+	 **/
 	@Override
 	public void systemDestroy() {
-		sqlObj.dropTable( sqlTableName );
+		sqlObj.dropTable(sqlTableName);
 	}
-
+	
 	/**
-	* Removes all data, without tearing down setup
-	**/
+	 * Removes all data, without tearing down setup
+	 **/
 	@Override
 	public void clear() {
-		sqlObj.delete( sqlTableName );
+		sqlObj.delete(sqlTableName);
 	}
-
+	
 	//--------------------------------------------------------------------------
 	//
 	// Utility functions
 	//
 	//--------------------------------------------------------------------------
-
+	
 	/**
-	* Simplified upsert, used throughout this package
-	*
-	* @param  Key to use
-	* @param  Value to store
-	**/
+	 * Simplified upsert, used throughout this package
+	 *
+	 * @param  Key to use
+	 * @param  Value to store
+	 **/
 	protected void simplifiedUpsert(Object key, Object newVal) throws JSqlException {
 		long now = currentSystemTimeInSeconds();
 		sqlObj.upsert( //
@@ -173,26 +173,26 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 			new Object[] { key }, //unique value
 			//
 			new String[] { "uTm", "kVl" }, //insert cols
-			new Object[] { now, GenericConvert.toLong(newVal,0) } //insert values
-		);
+			new Object[] { now, GenericConvert.toLong(newVal, 0) } //insert values
+			);
 	}
-
+	
 	//--------------------------------------------------------------------------
 	//
 	// Core put / get
 	//
 	//--------------------------------------------------------------------------
-
+	
 	/**
-	* Stores (and overwrites if needed) key, value pair
-	*
-	* Important note: It does not return the previously stored value
-	*
-	* @param key as String
-	* @param value as Long
-	*
-	* @return null
-	**/
+	 * Stores (and overwrites if needed) key, value pair
+	 *
+	 * Important note: It does not return the previously stored value
+	 *
+	 * @param key as String
+	 * @param value as Long
+	 *
+	 * @return null
+	 **/
 	@Override
 	public Long put(Object key, Long value) {
 		try {
@@ -202,14 +202,14 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 		}
 		return null;
 	}
-
+	
 	/**
-	* Returns the value, given the key
-	*
-	* @param key param find the thae meta key
-	*
-	* @return  value of the given key
-	**/
+	 * Returns the value, given the key
+	 *
+	 * @param key param find the thae meta key
+	 *
+	 * @return  value of the given key
+	 **/
 	@Override
 	public Long get(Object key) {
 		// Search for the key
@@ -219,80 +219,76 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 		}
 		return null;
 	}
-
+	
 	/**
-	* Returns the value, given the key
-	*
-	* @param key param find the meta key
-	* @param delta value to add
-	*
-	* @return  value of the given key
-	**/
+	 * Returns the value, given the key
+	 *
+	 * @param key param find the meta key
+	 * @param delta value to add
+	 *
+	 * @return  value of the given key
+	 **/
 	@Override
 	public Long getAndAdd(Object key, Object delta) {
 		// Tries limits
 		int limit = 100;
 		int tries = 0;
-
+		
 		// Try 100 tries
 		while (tries < limit) {
-
+			
 			// Get the "old" value
 			JSqlResult r = sqlObj.select(sqlTableName, "*", "kID = ?", new Object[] { key });
-
+			
 			Long oldVal = null;
-			if( r.get("kVl") != null && r.get("kVl").length > 0 && r.get("kVl")[0] != null ) {
-				oldVal = GenericConvert.toLong( r.get("kVl")[0], 0 );
+			if (r.get("kVl") != null && r.get("kVl").length > 0 && r.get("kVl")[0] != null) {
+				oldVal = GenericConvert.toLong(r.get("kVl")[0], 0);
 			} else {
 				oldVal = 0l;
 			}
-
-			Long newVal = oldVal.longValue() + GenericConvert.toLong(delta,0);
-
+			
+			Long newVal = oldVal.longValue() + GenericConvert.toLong(delta, 0);
+			
 			// If old value holds true, update to new value
 			if (weakCompareAndSet(key.toString(), oldVal, newVal)) {
 				return oldVal; //return old value on success
 			}
-
+			
 			tries++;
 		}
-
-		throw new RuntimeException("Max tries reached : "+tries);
+		
+		throw new RuntimeException("Max tries reached : " + tries);
 	}
-
+	
 	/**
-	* Returns the number of records deleted, given the key
-	*
-	* Important note: If the key is not unique, all of its records will be deleted
-	*
-	* @param key param find the meta key
-	* @return number of records deleted
-	**/
+	 * Returns the number of records deleted, given the key
+	 *
+	 * Important note: If the key is not unique, all of its records will be deleted
+	 *
+	 * @param key param find the meta key
+	 * @return number of records deleted
+	 **/
 	@Override
 	public Long remove(Object key) {
-		Integer resultDeleted = new Integer(sqlObj.delete(
-			sqlTableName,
-			"kID = ?",
-			new Object[] { key }
-		));
+		Integer resultDeleted = new Integer(sqlObj.delete(sqlTableName, "kID = ?",
+			new Object[] { key }));
 		return resultDeleted.longValue();
 	}
-
-
+	
 	/**
-	* Stores (and overwrites if needed) key, value pair
-	*
-	* Important note: It does not return the previously stored value
-	*
-	* @param key as String
-	* @param value as long
-	*
-	* @return true if successful
-	**/
+	 * Stores (and overwrites if needed) key, value pair
+	 *
+	 * Important note: It does not return the previously stored value
+	 *
+	 * @param key as String
+	 * @param value as long
+	 *
+	 * @return true if successful
+	 **/
 	@Override
 	public boolean weakCompareAndSet(String key, Long expect, Long update) {
 		// Potentially a new upsert, ensure there is something to "delete" atleast
-		if( expect == null || expect == 0l ) {
+		if (expect == null || expect == 0l) {
 			// Does a blank upsert, with default values (No actual insert)
 			long now = currentSystemTimeInSeconds();
 			sqlObj.upsert( //
@@ -305,15 +301,15 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 				new String[] { "uTm", "kVl" }, //insert cols
 				new Object[] { now, 0l }, //insert values
 				// misc (ignore)
-				null
-			);
-
+				null);
+			
 			// Expect is now atleast 0
 			expect = 0l;
 		}
-
+		
 		// Does the update from 0
-		JSqlResult r = sqlObj.query("UPDATE " + sqlTableName + " SET kVl= ? WHERE kID = ? AND kVl = ?", update, key, expect);
+		JSqlResult r = sqlObj.query("UPDATE " + sqlTableName
+			+ " SET kVl= ? WHERE kID = ? AND kVl = ?", update, key, expect);
 		return (r.affectedRows() > 0);
 	}
 }

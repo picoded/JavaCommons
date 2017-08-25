@@ -17,68 +17,68 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 
-import picoded.set.HttpRequestType;
+import picoded.core.common.HttpRequestType;
 
 /**
-* Internal RESTNamespace Sub class which handles each function namespace seperately
-*
-* CRUD       HTTP
-* Create     POST
-* Read       GET
-* Update     PUT
-* Delete     DELETE
-**/
+ * Internal RESTNamespace Sub class which handles each function namespace seperately
+ *
+ * CRUD       HTTP
+ * Create     POST
+ * Read       GET
+ * Update     PUT
+ * Delete     DELETE
+ **/
 public class RESTNamespace extends HashMap<HttpRequestType, RESTFunction> {
-
+	
 	/**
-	* Build warning suppression
-	**/
+	 * Build warning suppression
+	 **/
 	static final long serialVersionUID = 1L;
-
+	
 	//---------------------------------------
 	// Protected vars
 	//---------------------------------------
-
+	
 	/**
-	* The protected string namespace
-	**/
+	 * The protected string namespace
+	 **/
 	protected String namespace = null;
-
+	
 	/**
-	* Get the protected namespace
-	**/
+	 * Get the protected namespace
+	 **/
 	public String namespace() {
 		return namespace;
 	}
-
+	
 	//---------------------------------------
 	// Constructor
 	//---------------------------------------
-
+	
 	/**
-	* [internal use only] Setup the rest method with the given namespace
-	**/
+	 * [internal use only] Setup the rest method with the given namespace
+	 **/
 	public RESTNamespace(String nme) {
 		namespace = nme;
 	}
-
+	
 	/**
-	* [FOR TESTING ONLY] Calls the method without any arguments, call via the RESTBuilder instead
-	**/
+	 * [FOR TESTING ONLY] Calls the method without any arguments, call via the RESTBuilder instead
+	 **/
 	public Map<String, Object> call(HttpRequestType type) {
 		return call(type, new RESTRequest(), new HashMap<String, Object>());
 	}
-
+	
 	/**
-	* [FOR TESTING ONLY] Calls the method without any arguments, call via the RESTBuilder instead
-	**/
+	 * [FOR TESTING ONLY] Calls the method without any arguments, call via the RESTBuilder instead
+	 **/
 	public Map<String, Object> call(HttpRequestType type, Map<String, Object> reqMap) {
 		return call(type, new RESTRequest(reqMap), new HashMap<String, Object>());
 	}
-
+	
 	/**
-	* Internal call method, with the full request, and result
-	**/
+	 * Internal call method, with the full request, and result
+	 **/
 	protected Map<String, Object> call(HttpRequestType type, RESTRequest req, Map<String, Object> res) {
 		RESTFunction f = get(type);
 		if (f == null) {
@@ -87,10 +87,10 @@ public class RESTNamespace extends HashMap<HttpRequestType, RESTFunction> {
 		}
 		return f.apply(req, res);
 	}
-
+	
 	/**
-	* Internal call method, with the full request, and result
-	**/
+	 * Internal call method, with the full request, and result
+	 **/
 	// public Map<String,Object> call(HttpRequestType type, Map<String,Object> reqMap) {
 	// 	return null;
 	// }

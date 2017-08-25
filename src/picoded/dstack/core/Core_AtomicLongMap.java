@@ -10,36 +10,36 @@ import java.util.Map;
 import java.util.Set;
 
 // Picoded imports
-import picoded.conv.ConvertJSON;
-import picoded.conv.GenericConvert;
-import picoded.set.ObjectToken;
-import picoded.struct.query.*;
+import picoded.core.conv.ConvertJSON;
+import picoded.core.conv.GenericConvert;
+import picoded.core.common.ObjectToken;
+import picoded.core.struct.query.*;
 import picoded.dstack.*;
 
 /**
-* Common base utility class of DataTable
-*
-* Does not actually implement its required feature,
-* but helps provide a common base line for all the various implementation.
-**/
+ * Common base utility class of DataTable
+ *
+ * Does not actually implement its required feature,
+ * but helps provide a common base line for all the various implementation.
+ **/
 abstract public class Core_AtomicLongMap extends Core_DataStructure<String, Long> implements
 	AtomicLongMap {
-
+	
 	//--------------------------------------------------------------------------
 	//
 	// Constructor and maintenance
 	//
 	//--------------------------------------------------------------------------
-
+	
 	/**
-	* Maintenance step call, however due to the nature of most implementation not
-	* having any form of time "expirary", this call does nothing in most implementation.
-	*
-	* As such im making that the default =)
-	**/
+	 * Maintenance step call, however due to the nature of most implementation not
+	 * having any form of time "expirary", this call does nothing in most implementation.
+	 *
+	 * As such im making that the default =)
+	 **/
 	@Override
 	public void maintenance() {
 		// Does nothing
 	}
-
+	
 }

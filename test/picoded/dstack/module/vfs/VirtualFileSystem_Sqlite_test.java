@@ -15,17 +15,17 @@ import picoded.dstack.struct.simple.*;
 import picoded.TestConfig;
 
 public class VirtualFileSystem_Sqlite_test extends VirtualFileSystem_test {
-
+	
 	// To override for implementation
 	//-----------------------------------------------------
-
+	
 	/// Note that this implementation constructor
 	/// is to be overriden for the various backend
 	/// specific test cases
 	public JSql sqlConn() {
 		return new JSql_Sqlite();
 	}
-
+	
 	/// Note that this implementation constructor
 	/// is to be overriden for the various backend
 	/// specific test cases

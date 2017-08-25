@@ -14,8 +14,8 @@ import org.junit.*;
 
 import picoded.servlet.util.EmbeddedServlet;
 import picoded.TestConfig;
-import picoded.conv.*;
-import picoded.set.*;
+import picoded.core.conv.*;
+import picoded.core.common.*;
 import picoded.web.*;
 
 public class CorePage_test {

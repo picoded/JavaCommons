@@ -1,0 +1,16 @@
+{
+	"plugins": [
+		"new-flowchart", 
+		"js-sequence-diagram-full",
+		"mermaid-gb3",
+		"block-align",
+		"hints",
+		"numbered-headings-for-web-and-books",
+		"custom-favicon",
+		"toggle-chapters",
+		"youtube"
+	 ],
+	 "pluginsConfig" : {
+		"favicon": "favicon.png"
+	 }
+}

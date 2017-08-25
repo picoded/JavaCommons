@@ -15,7 +15,7 @@ public class TestConfig {
 	/// Randomly generated table prefix, used to prevent multiple running tests from colliding
 	///
 	static public String randomTablePrefix() {
-		return "T"+RandomStringUtils.randomAlphanumeric(7).toUpperCase();
+		return "T" + RandomStringUtils.randomAlphanumeric(7).toUpperCase();
 	}
 	
 	//

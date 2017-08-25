@@ -5,7 +5,7 @@ import org.junit.*;
 
 import java.util.Map;
 
-import picoded.conv.ConvertJSON;
+import picoded.core.conv.ConvertJSON;
 import picoded.TestConfig;
 import picoded.dstack.jsql.*;
 
@@ -20,5 +20,5 @@ public class JSql_Mysql_test extends JSql_Base_test {
 	public JSql sqlImplementation() {
 		return JSqlTest.mysql();
 	}
-
+	
 }

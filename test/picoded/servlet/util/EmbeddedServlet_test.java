@@ -12,8 +12,8 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import picoded.TestConfig;
-import picoded.conv.*;
-import picoded.set.*;
+import picoded.core.conv.*;
+import picoded.core.common.*;
 import picoded.web.*;
 
 ///
@@ -24,7 +24,7 @@ public class EmbeddedServlet_test {
 	//
 	// The test folders to use
 	//
-	File testCollection = new File("./test-files/test-specific/servlet/util/EmbeddedServlet/");
+	File testCollection = new File("./test/files/servlet/util/EmbeddedServlet/");
 	File helloWorldHtml = new File(testCollection, "HelloWorldHtml");
 	File helloWorldJava = new File(testCollection, "HelloWorldJava");
 	File helloWorldJWar = new File(testCollection, "HelloWorldJWar/test.war");

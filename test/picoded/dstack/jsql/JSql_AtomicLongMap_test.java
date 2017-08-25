@@ -23,7 +23,7 @@ import picoded.dstack.jsql.connector.*;
 import picoded.dstack.struct.simple.*;
 
 public class JSql_AtomicLongMap_test extends StructSimple_AtomicLongMap_test {
-
+	
 	// To override for implementation
 	//-----------------------------------------------------
 	
@@ -33,10 +33,10 @@ public class JSql_AtomicLongMap_test extends StructSimple_AtomicLongMap_test {
 	public JSql jsqlConnection() {
 		return JSqlTest.sqlite();
 	}
-
+	
 	/// Impomentation constructor for SQL
 	public AtomicLongMap implementationConstructor() {
-		return new JSql_AtomicLongMap( jsqlConnection(), TestConfig.randomTablePrefix() );
+		return new JSql_AtomicLongMap(jsqlConnection(), TestConfig.randomTablePrefix());
 	}
 	
 }

@@ -10,12 +10,12 @@ import picoded.servlet.util.EmbeddedServlet;
 import picoded.TestConfig;
 import picoded.file.FileUtil;
 
-public class DStackConfigLoader_test{
-
+public class DStackConfigLoader_test {
+	
 	//
 	// The test folders to use
 	//
-	File testCollection = new File("./test-files/test-specific/dstack/stack/DStackConfigLoader/");
+	File testCollection = new File("./test/files/dstack/stack/DStackConfigLoader/");
 	
 	/**
 	 * Load the defined file from the test folder, and returns its string value
@@ -29,23 +29,23 @@ public class DStackConfigLoader_test{
 		assertNotNull(ret);
 		return ret;
 	}
-
+	
 	@Test
 	public void testDStackConfig() {
-		DStack dstack = DStackConfigLoader.generateDStack( getTestConfigFile("singleLayerDStruct.json"));
+		DStack dstack = DStackConfigLoader
+			.generateDStack(getTestConfigFile("singleLayerDStruct.json"));
 		assertNotNull(dstack);
-
+		
 		// Generate a table object, to force stack validation
 		dstack.getDataTable("test");
 	}
-
+	
 	@Test
 	public void testDStackSqliteConfig() {
-		DStack dstack = DStackConfigLoader.generateDStack( getTestConfigFile("singleLayerJSql.json"));
+		DStack dstack = DStackConfigLoader.generateDStack(getTestConfigFile("singleLayerJSql.json"));
 		assertNotNull(dstack);
 		// Generate a table object, to force stack validation
 		dstack.getDataTable("test");
 	}
-
-
+	
 }

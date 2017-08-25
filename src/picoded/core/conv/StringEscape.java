@@ -1,6 +1,6 @@
 package picoded.core.conv;
 
-//import java.net.URLDecoder;
+import java.util.*;
 
 /**
  * Proxy to apache.commons.lang3.StringEscapeUtils. See its full documentation
@@ -143,5 +143,57 @@ public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 		// Common string \ escape, relevent for embeded javascript in HTML
 		ret = ret.replaceAll("\\\\", "&#92;");
 		return ret;
+	}
+
+	/**
+	 * Helper function, used to escape an object in accordance to its instanceof type
+	 */
+	@SuppressWarnings("unchecked")
+	protected static Object commonHtmlEscapeCharacters_generic(Object v) {
+		// Sanatize if needed
+		if( v instanceof String ) {
+			v = commonHtmlEscapeCharacters( (String)v);
+		} else if( v instanceof Map ) {
+			v = commonHtmlEscapeCharacters( (Map<String,Object>)v );
+		} else if( v instanceof List ) {
+			v = commonHtmlEscapeCharacters( (List<Object>)v );
+		}
+		return v;
+	}
+
+	/**
+	 * Sanatizes HTML escape characters "<", ">", or "&" along with "\" escape
+	 * This covers most cases of HTML injection in a child html, but not as a property value
+	 *
+	 * @param  Map of values to sanatize, note that keys are NOT sanatized
+	 *
+	 * @return Sanatized Map
+	 **/
+	public static Map<String,Object> commonHtmlEscapeCharacters(Map<String,Object> input) {
+		// Iterate and update
+		for (String k : input.keySet()) {
+			input.put(k, commonHtmlEscapeCharacters_generic( input.get(k) ));
+		}
+
+		// Return modified input values
+		return input;
+	}
+
+	/**
+	 * Sanatizes HTML escape characters "<", ">", or "&" along with "\" escape
+	 * This covers most cases of HTML injection in a child html, but not as a property value
+	 *
+	 * @param  Map of values to sanatize, note that keys are NOT sanatized
+	 *
+	 * @return Sanatized List
+	 **/
+	public static List<Object> commonHtmlEscapeCharacters(List<Object> input) {
+		// Iterate and update
+		for (int i = 0; i < input.size(); i++) {
+			input.set(i, commonHtmlEscapeCharacters_generic( input.get(i) ));
+		}
+
+		// Return modified input values
+		return input;
 	}
 }

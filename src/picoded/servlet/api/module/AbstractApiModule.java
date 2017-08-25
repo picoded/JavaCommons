@@ -38,10 +38,20 @@ abstract public class AbstractApiModule implements ApiModule {
 		prefixPath = inPrefixPath;
 		
 		// Set the config
-		config = GenericConvert.toGenericConvertStringMap(inConfigMap, "{}");
+		config = defaultConfig();
+		config.putAll( GenericConvert.toStringMap(inConfigMap, "{}") );
+
 		subsystemList = internalSubsystemList();
 
 		apiBuilderSetup(api, prefixPath, config);
+	}
+
+	/**
+	 * [To Overwrite]
+	 * Defines the default config object, this is useful in extending modules, and adjusting default behaviours
+	 */
+	protected GenericConvertHashMap<String,Object> defaultConfig() {
+		return new GenericConvertHashMap<String,Object>();
 	}
 
 	/**
@@ -56,7 +66,6 @@ abstract public class AbstractApiModule implements ApiModule {
 	
 	/**
 	 * [To Overwrite]
-	 * 
 	 * List of internal subsystem modules, which is chained systemSetup / Teardown / clear.
 	 *
 	 * @return List of SystemSetupInterface

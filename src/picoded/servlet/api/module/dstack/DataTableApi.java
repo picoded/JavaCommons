@@ -1,16 +1,18 @@
 package picoded.servlet.api.module.dstack;
 
-import static picoded.servlet.api.module.dstack.DStackApiConstantStrings.*;
 import picoded.servlet.api.module.*;
 import picoded.servlet.api.*;
 
 import picoded.dstack.*;
 import picoded.core.struct.*;
 
+import static picoded.servlet.api.module.dstack.DStackApiConstantStrings.*;
+import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
+
 import java.util.*;
 
 /**
- * Does the constructor setup of DataTable
+ * Provides a centralized
  */
 public abstract class DataTableApi extends CommonApiModule {
 
@@ -34,7 +36,55 @@ public abstract class DataTableApi extends CommonApiModule {
 
 	/////////////////////////////////////////////
 	//
-	// Getter functions
+	// New object functionality
+	//
+	/////////////////////////////////////////////
+	
+	/** 
+	 * # $prefix/new
+	 * # $prefix/newEntry
+	 *
+	 * Creates a new data object. Alias for newEntry exists for code libraries that disallow the new keyword in parameters.
+	 *
+	 * ## HTTP Request Parameters
+	 *
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type	   | Description                                                                   |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | data            | {Object}           | Data object, if found                                                         |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 *
+	 * ## JSON Object Output Parameters
+	 *
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type	   | Description                                                                   |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | result          | String             | The internal object ID created                                                |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | error           | String (Optional)  | Errors encounted if any                                                       |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	*/
+	public ApiFunction newEntry = (req, res) -> {
+		// Get the oid, and sanatise output settings
+		Map<String,Object> newData = req.getStringMap(DATA, "{}");
+		
+		// Try get the object respectively
+		DataObject obj = dataTable.newEntry();
+		
+		// Update data only if object was found, and updated
+		obj.putAll(newData);
+		obj.saveAll();
+
+		// Output the update mode (for easier debugging)
+		res.put(RESULT, obj._oid());
+		
+		// End and return result
+		return res;
+	};
+	
+	/////////////////////////////////////////////
+	//
+	// Basic get and set
 	//
 	/////////////////////////////////////////////
 	
@@ -57,7 +107,7 @@ public abstract class DataTableApi extends CommonApiModule {
 	 * | Parameter Name  | Variable Type	    | Description                                                                  |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | _oid            | String             | The internal object ID used                                                   |
-	 * | data            | {Object}           | Data object, if found                                                         |
+	 * | result          | {Object}           | Data object, if found                                                         |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | error           | String (Optional)  | Errors encounted if any                                                       |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -68,11 +118,11 @@ public abstract class DataTableApi extends CommonApiModule {
 		
 		// Put back config in response
 		res.put(OID, oid);
-		res.put(DATA, null);
+		res.put(RESULT, null);
 
 		// Try get the object respectively
 		DataObject obj = dataTable.get(oid);
-		res.put(DATA, obj);
+		res.put(RESULT, obj);
 
 		// End and return result
 		return res;
@@ -99,7 +149,7 @@ public abstract class DataTableApi extends CommonApiModule {
 	 * | Parameter Name  | Variable Type	   | Description                                                                   |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | _oid            | String             | The internal object ID used                                                   |
-	 * | data            | {Object}           | Data object, of changes, if applied                                           |
+	 * | result          | {Object}           | Data object, of changes, if applied                                           |
 	 * | updateMode      | String             | Update mode used                                                              |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | error           | String (Optional)  | Errors encounted if any                                                       |
@@ -113,7 +163,8 @@ public abstract class DataTableApi extends CommonApiModule {
 		
 		// Put back config in response
 		res.put(OID, oid);
-		res.put(DATA, null);
+		res.put(RESULT, null);
+		res.put(UPDATE_MODE, updateMode);
 
 		// Try get the object respectively
 		DataObject obj = dataTable.get(oid);
@@ -127,7 +178,7 @@ public abstract class DataTableApi extends CommonApiModule {
 				obj.saveAll();
 
 				// Return back the full updated data (for easier debugging)
-				res.put(DATA, obj);
+				res.put(RESULT, obj);
 			} else {
 				// Default mode is delta
 				updateMode = "delta";
@@ -135,8 +186,10 @@ public abstract class DataTableApi extends CommonApiModule {
 				obj.saveDelta();
 
 				// Return back the delta updated data (for easier debugging)
-				res.put(DATA, obj);
+				res.put(RESULT, obj);
 			}
+		} else {
+			res.put(ERROR, "Invalid '_oid' given");
 		}
 
 		// Output the update mode (for easier debugging)
@@ -147,17 +200,16 @@ public abstract class DataTableApi extends CommonApiModule {
 	};
 	
 	/** 
-	 * # $prefix/new
-	 * # $prefix/newEntry
+	 * # $prefix/delete
 	 *
-	 * Creates a new data object. Alias for newEntry exists for code libraries that disallow the new keyword in parameters.
+	 * Deletes a data object
 	 *
 	 * ## HTTP Request Parameters
 	 *
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | Parameter Name  | Variable Type	   | Description                                                                   |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | data            | {Object}           | Data object, if found                                                         |
+	 * | _oid            | String             | object ID used to delete                                                      |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 *
 	 * ## JSON Object Output Parameters
@@ -165,26 +217,70 @@ public abstract class DataTableApi extends CommonApiModule {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | Parameter Name  | Variable Type	   | Description                                                                   |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | _oid            | String             | The internal object ID created                                                |
-	 * | data            | {Object}           | Data object, of changes, if applied                                           |
+	 * | _oid            | String             | The internal object ID used                                                   |
+	 * | result          | Boolean            | Returns true ONLY if the element was removed from the table                   |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | error           | String (Optional)  | Errors encounted if any                                                       |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	*/
-	public ApiFunction newEntry = (req, res) -> {
+	public ApiFunction delete = (req, res) -> {
 		// Get the oid, and sanatise output settings
-		Map<String,Object> newData = req.getStringMap(DATA, "{}");
-		
-		// Try get the object respectively
-		DataObject obj = dataTable.newEntry();
-		
-		// Update data only if object was found, and updated
-		obj.putAll(newData);
-		obj.saveAll();
+		String oid = req.getString(OID, null);
 
-		// Output the update mode (for easier debugging)
-		res.put(OID, obj._oid());
-		
+		// Put back config in response
+		res.put(OID, oid);
+		res.put(RESULT, false);
+
+		// If oid is null / empty, terminate
+		if( oid == null || oid.isEmpty() ) {
+			return res;
+		}
+
+		// If oid does not exsits, termiante
+		if( !dataTable.containsKey(oid) ) {
+			return res;
+		}
+
+		// Remove, and return true
+		dataTable.remove(oid);
+		res.put(RESULT, true);
+
+		// End and return result
+		return res;
+	};
+	
+	/////////////////////////////////////////////
+	//
+	// KeyName look up (for adminstration) 
+	//
+	/////////////////////////////////////////////
+	
+	/** 
+	 * # $prefix/keyNames
+	 *
+	 * Deletes a data object
+	 *
+	 * ## HTTP Request Parameters
+	 *
+	 * +------+
+	 * | None |
+	 * +------+
+	 *
+	 * ## JSON Object Output Parameters
+	 *
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type	   | Description                                                                   |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | result          | String[]           | Array of string keys found in this datatable                                  |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | error           | String (Optional)  | Errors encounted if any                                                       |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	*/
+	public ApiFunction keyNames = (req, res) -> {
+		// Get and return keynames
+		Set<String> resSet = dataTable.getKeyNames();
+		res.put(RESULT, new ArrayList<String>(resSet));
+
 		// End and return result
 		return res;
 	};
@@ -211,7 +307,14 @@ public abstract class DataTableApi extends CommonApiModule {
 	protected void apiBuilderSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
 		super.apiBuilderSetup(api, prefixPath, config);
 
+		api.endpoint(prefixPath+"/new", newEntry);
+		api.endpoint(prefixPath+"/newEntry", newEntry);
+
 		api.endpoint(prefixPath+"/get", get);
+		api.endpoint(prefixPath+"/set", set);
+		api.endpoint(prefixPath+"/delete", delete);
+
+		api.endpoint(prefixPath+"/keyNames", keyNames);
 	}
 
 }

@@ -8,5 +8,6 @@ public class DStackApiConstantStrings {
 	public static final String OID = "_oid";
 	public static final String DATA = "data";
 	public static final String UPDATE_MODE = "updateMode";
+	public static final String DELETE = "delete";
 	
 }

@@ -37,11 +37,11 @@ public class AccountFilterApi_test extends ApiModule_test {
 			AccountTable table = new AccountTable(stack, "account");
 			AccountFilterApi ret = new AccountFilterApi(table);
 			if (!table.hasLoginID(SUPERUSERNAME)) {
-				AccountObject ao = table.newObject(SUPERUSERNAME);
+				AccountObject ao = table.newEntry(SUPERUSERNAME);
 				ao.setPassword(VALIDPASSWORD);
 				// Add to superUserGrp
 				
-				AccountObject superUserGrp = table.newObject(table.getSuperUserGroupName());
+				AccountObject superUserGrp = table.newEntry(table.getSuperUserGroupName());
 				superUserGrp.setMembershipRoles(table.defaultMembershipRoles());
 				DataObject mo = superUserGrp.addMember(ao, "admin");
 			}

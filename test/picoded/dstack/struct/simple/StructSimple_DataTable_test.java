@@ -101,10 +101,10 @@ public class StructSimple_DataTable_test {
 	// }
 	
 	@Test
-	public void newObjectTest() {
+	public void newEntryTest() {
 		DataObject mObj = null;
 		
-		assertNotNull(mObj = mtObj.newObject());
+		assertNotNull(mObj = mtObj.newEntry());
 		mObj.put("be", "happy");
 		mObj.saveDelta();
 		
@@ -127,14 +127,14 @@ public class StructSimple_DataTable_test {
 		DataObject mObj = null;
 		
 		// Puts in a new object, and get guid
-		assertNotNull(guid = mtObj.newObject(objMap)._oid());
+		assertNotNull(guid = mtObj.newEntry(objMap)._oid());
 		
 		// Get and check with guid
 		objMap.put("_oid", guid);
 		assetSubset(objMap, (Map<String, Object>) mtObj.get(guid));
 		
 		objMap = randomObjMap();
-		assertNotNull(guid = mtObj.newObject(objMap)._oid());
+		assertNotNull(guid = mtObj.newEntry(objMap)._oid());
 		objMap.put("_oid", guid);
 		assetSubset(objMap, mtObj.get(guid));
 	}
@@ -145,7 +145,7 @@ public class StructSimple_DataTable_test {
 		String guid = null;
 		DataObject p = null;
 		assertFalse(mtObj.containsKey("hello"));
-		assertNotNull(p = mtObj.newObject());
+		assertNotNull(p = mtObj.newEntry());
 		assertNotNull(guid = p._oid());
 		p.saveDelta();
 		
@@ -169,13 +169,13 @@ public class StructSimple_DataTable_test {
 	
 	@Test
 	public void indexBasedTestSetup() {
-		mtObj.newObject(genNumStrObj(1, "this"));
-		mtObj.newObject(genNumStrObj(2, "is"));
-		mtObj.newObject(genNumStrObj(3, "hello"));
-		mtObj.newObject(genNumStrObj(4, "world"));
-		mtObj.newObject(genNumStrObj(5, "program"));
-		mtObj.newObject(genNumStrObj(6, "in"));
-		mtObj.newObject(genNumStrObj(7, "this"));
+		mtObj.newEntry(genNumStrObj(1, "this"));
+		mtObj.newEntry(genNumStrObj(2, "is"));
+		mtObj.newEntry(genNumStrObj(3, "hello"));
+		mtObj.newEntry(genNumStrObj(4, "world"));
+		mtObj.newEntry(genNumStrObj(5, "program"));
+		mtObj.newEntry(genNumStrObj(6, "in"));
+		mtObj.newEntry(genNumStrObj(7, "this"));
 	}
 	
 	/// Numeric based query test
@@ -230,15 +230,15 @@ public class StructSimple_DataTable_test {
 	///
 	@Test
 	public void innerJoinFlaw() {
-		mtObj.newObject(genNumStrObj(1, "hello world"));
+		mtObj.newEntry(genNumStrObj(1, "hello world"));
 		
 		HashMap<String, Object> objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("num", new Integer(2));
-		mtObj.newObject(objMap).saveDelta();
+		mtObj.newEntry(objMap).saveDelta();
 		
 		objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("str_val", "nope");
-		mtObj.newObject(objMap);
+		mtObj.newEntry(objMap);
 		
 		DataObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
@@ -268,17 +268,17 @@ public class StructSimple_DataTable_test {
 		//
 		objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("num[0].val", new Integer(2));
-		mtObj.newObject(objMap).saveDelta();
+		mtObj.newEntry(objMap).saveDelta();
 		
 		objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("str[0].val", "nope");
 		objMap.put("str[1].val", "rawr");
-		mtObj.newObject(objMap);
+		mtObj.newEntry(objMap);
 		
 		objMap = new CaseInsensitiveHashMap<String, Object>();
 		objMap.put("num[0].val", new Integer(2));
 		objMap.put("str[0].val", "nope");
-		mtObj.newObject(objMap);
+		mtObj.newEntry(objMap);
 		
 		//
 		// Query to run
@@ -301,7 +301,7 @@ public class StructSimple_DataTable_test {
 		
 		String guid = GUID.base58();
 		assertNull(mtObj.get(guid));
-		assertNotNull(guid = mtObj.newObject(objMap)._oid());
+		assertNotNull(guid = mtObj.newEntry(objMap)._oid());
 		
 		DataObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
@@ -313,14 +313,14 @@ public class StructSimple_DataTable_test {
 	
 	@Test
 	public void missingNumWithSomeoneElse() {
-		mtObj.newObject(genNumStrObj(1, "hello world"));
+		mtObj.newEntry(genNumStrObj(1, "hello world"));
 		
 		HashMap<String, Object> objMap = new HashMap<String, Object>();
 		objMap.put("str_val", "^_^");
 		
 		String guid = GUID.base58();
 		assertNull(mtObj.get(guid));
-		assertNotNull(guid = mtObj.newObject(objMap)._oid());
+		assertNotNull(guid = mtObj.newEntry(objMap)._oid());
 		
 		DataObject[] qRes = null;
 		assertNotNull(qRes = mtObj.query(null, null));
@@ -335,8 +335,8 @@ public class StructSimple_DataTable_test {
 	@Test
 	public void getFromKeyName_basic() {
 		
-		mtObj.newObject(genNumStrObj(1, "one"));
-		mtObj.newObject(genNumStrObj(2, "two"));
+		mtObj.newEntry(genNumStrObj(1, "one"));
+		mtObj.newEntry(genNumStrObj(2, "two"));
 		
 		DataObject[] list = null;
 		assertNotNull(list = mtObj.getFromKeyName("num"));
@@ -355,7 +355,7 @@ public class StructSimple_DataTable_test {
 	public void nonIndexedKeySaveCheck() {
 		
 		// Generates single node
-		mtObj.newObject(genNumStrObj(1, "hello world"));
+		mtObj.newEntry(genNumStrObj(1, "hello world"));
 		DataObject[] list = null;
 		DataObject node = null;
 		
@@ -384,7 +384,7 @@ public class StructSimple_DataTable_test {
 	public void getFromKeyName_customKeys() {
 		
 		// Generates single node
-		mtObj.newObject(genNumStrObj(1, "hello world"));
+		mtObj.newEntry(genNumStrObj(1, "hello world"));
 		DataObject[] list = null;
 		DataObject node = null;
 		
@@ -425,7 +425,7 @@ public class StructSimple_DataTable_test {
 		data.put("arrs", new ArrayList<String>(ohnoArray));
 		
 		DataObject mo = null;
-		assertNotNull(mo = mtObj.newObject(data));
+		assertNotNull(mo = mtObj.newEntry(data));
 		mo.saveDelta();
 		
 		DataObject to = null;
@@ -444,7 +444,7 @@ public class StructSimple_DataTable_test {
 		data.put("bin", new byte[] { 1, 2, 3, 4, 5 });
 		
 		DataObject mo = null;
-		assertNotNull(mo = mtObj.newObject(data));
+		assertNotNull(mo = mtObj.newEntry(data));
 		mo.saveDelta();
 		
 		DataObject to = null;
@@ -463,13 +463,13 @@ public class StructSimple_DataTable_test {
 	public void T50_orderByTest() {
 		
 		// Lets just rescycle old test for the names
-		mtObj.newObject(genNumStrObj(1, "this", 5));
-		mtObj.newObject(genNumStrObj(2, "is", 4));
-		mtObj.newObject(genNumStrObj(3, "hello", 3));
-		mtObj.newObject(genNumStrObj(4, "world", 2));
-		mtObj.newObject(genNumStrObj(5, "program", 1));
-		mtObj.newObject(genNumStrObj(6, "in", 6));
-		mtObj.newObject(genNumStrObj(7, "this", 7));
+		mtObj.newEntry(genNumStrObj(1, "this", 5));
+		mtObj.newEntry(genNumStrObj(2, "is", 4));
+		mtObj.newEntry(genNumStrObj(3, "hello", 3));
+		mtObj.newEntry(genNumStrObj(4, "world", 2));
+		mtObj.newEntry(genNumStrObj(5, "program", 1));
+		mtObj.newEntry(genNumStrObj(6, "in", 6));
+		mtObj.newEntry(genNumStrObj(7, "this", 7));
 		
 		// Replicated a bug, where u CANNOT use orderby on a collumn your not
 		// doing a where search
@@ -584,7 +584,7 @@ public class StructSimple_DataTable_test {
 	// 	DataTable table = (new JStruct()).getDataTable("demo");
 	//
 	// 	// Adding new object?
-	// 	DataObject mObj = table.newObject();
+	// 	DataObject mObj = table.newEntry();
 	// 	mObj.put("be", "happy");
 	// 	mObj.put("num", new Integer(1));
 	// 	mObj.saveDelta();

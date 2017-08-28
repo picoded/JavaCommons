@@ -285,7 +285,7 @@ public class AccountTableApi extends CommonApiModule {
 				return res;
 			}
 		}
-		AccountObject newAccount = table.newObject(userName);
+		AccountObject newAccount = table.newEntry(userName);
 		// Create new account
 		if (newAccount != null) {
 			// Check is it group

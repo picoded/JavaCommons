@@ -32,13 +32,14 @@ import static picoded.servlet.api.module.account.AccountConstantStrings.*;
  * # @TODO Items
  *
  * [ ] Add in documentation / definition support API
- * [ ] Add in filter lambda API
+ * [+] Add in filter lambda API
  * [ ] Add in parametarised paths support
  * [ ] Add in actual servlet support (See RESTBuilder)
- * [ ] Add in JS API script generation
+ * [+] Add in JS API script generation
  * [ ] Patch up endpoint removal, and keyset to take into seperate account filters
- * [ ] Possibly seperate out filters?
+ * [+] Possibly seperate out filters? (before / after)
  * [ ] Formally define how ambiguity of API endpoints is resolved
+ * [ ] Extend function for api endpoints / filters
  *
  * # Description rents
  *

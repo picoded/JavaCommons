@@ -261,7 +261,7 @@ abstract public class Core_DataTable extends Core_DataStructure<String, DataObje
 	 *
 	 * @return the DataObject
 	 **/
-	public DataObject newObject() {
+	public DataObject newEntry() {
 		// Generating a new object
 		DataObject ret = new Core_DataObject(this, null, null, false);
 		

@@ -7,6 +7,8 @@ import picoded.servlet.api.*;
 import picoded.dstack.*;
 import picoded.core.struct.*;
 
+import java.util.*;
+
 /**
  * Does the constructor setup of DataTable
  */
@@ -146,8 +148,9 @@ public abstract class DataTableApi extends CommonApiModule {
 	
 	/** 
 	 * # $prefix/new
+	 * # $prefix/newEntry
 	 *
-	 * Update a data object
+	 * Creates a new data object. Alias for newEntry exists for code libraries that disallow the new keyword in parameters.
 	 *
 	 * ## HTTP Request Parameters
 	 *
@@ -168,12 +171,12 @@ public abstract class DataTableApi extends CommonApiModule {
 	 * | error           | String (Optional)  | Errors encounted if any                                                       |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	*/
-	public ApiFunction newObject = (req, res) -> {
+	public ApiFunction newEntry = (req, res) -> {
 		// Get the oid, and sanatise output settings
 		Map<String,Object> newData = req.getStringMap(DATA, "{}");
 		
 		// Try get the object respectively
-		DataObject obj = dataTable.new();
+		DataObject obj = dataTable.newEntry();
 		
 		// Update data only if object was found, and updated
 		obj.putAll(newData);

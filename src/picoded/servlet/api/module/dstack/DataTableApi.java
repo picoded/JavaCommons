@@ -2,12 +2,13 @@ package picoded.servlet.api.module.dstack;
 
 import picoded.servlet.api.module.*;
 import picoded.servlet.api.*;
-
 import picoded.dstack.*;
-import picoded.core.struct.*;
 
 import static picoded.servlet.api.module.dstack.DStackApiConstantStrings.*;
 import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
+
+import picoded.core.common.EmptyArray;
+import picoded.core.struct.*;
 
 import java.util.*;
 
@@ -287,11 +288,184 @@ public abstract class DataTableApi extends CommonApiModule {
 	
 	/////////////////////////////////////////////
 	//
-	// Utility functions
+	// List functions
 	//
 	/////////////////////////////////////////////
 	
+	/** 
+	 * # $prefix/list
+	 *
+	 * List various data for the frontend
+	 *
+	 * Lists the DataObjects according to the search criteria
+	 *
+	 * ## HTTP Request Parameters
+	 *
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type	   | Description                                                                   |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | fieldList       | String[] (optional)| Default ["_oid"], the fields to return                                        |
+	 * | query           | String   (optional)| Requested Query filter, default matches all                                   |
+	 * | queryArgs       | String[] (optional)| Requested Query filter arguments                                              |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | searchString    | String   (optional)| Search string passed                                                          |
+	 * | searchFieldList | String[] (optional)| Fields used for searching, defaults to headers                                |
+	 * | searchMode      | String   (optional)| Default PREFIX. Determines SQL query wildcard position, for the first word.   |
+	 * |                 |                    | (Either prefix, suffix, or both), second word onwards always uses both.       |
+	 * |                 |                    | This is used mainly to tune the generated SQL performance, against use case.  |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
+	 * | length          | int (optional)     | Default 50: The number of records to return                                   |
+	 * | orderBy         | String (optional)  | Default : order by _oid                                                       |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | rowMode         | String (optional)  | Default "object", the result array row format, use either "array" or "object" |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 *
+	 * ## JSON Object Output Parameters
+	 *
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type      | Description                                                                   |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | totalCount      | int                | Total amount of records, matching the query, and search filter                |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | fieldList       | String[]           | Default ["_oid"], the collumns to return                                      |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | result          | Array[Obj/Array]   | Array of row records, each row is represented as an array                     |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | error           | String (Optional)  | Errors encounted if any                                                       |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 */
+	public ApiFunction list = (req, res) -> {
 
+		// Arguments handling
+		//-------------------------------------------------------------------------------
+
+		// Get header arguments
+		String[] fieldList = req.getStringArray(FIELD_LIST, "['_oid']");
+		
+		// The query to use
+		String query = req.getString(QUERY, "").trim();
+		String[] queryArgs = req.getStringArray(QUERY_ARGS, EmptyArray.STRING);
+		
+		// Search value to filter the result by
+		String searchString = req.getString(SEARCH_STRING, "").trim();
+		String[] searchFieldList = req.getStringArray(SEARCH_FIELDLIST, fieldList);
+		String searchMode = req.getString(SEARCH_MODE, "suffix");
+
+		// Fix a specific issue in DataTable, where searchString is
+		// sent with beginning and ending quotes, remove it accordingly
+		if( searchString.length() >= 2 ) {
+			if( // 
+				(searchString.startsWith("\"") && searchString.endsWith("\""))  || //
+				(searchString.startsWith("'") && searchString.endsWith("'")) 
+			) { //
+				searchString = searchString.substring(1, searchString.length() - 1);
+			}
+		}
+
+		// Start, Length, and ordering limiting of data
+		int start = req.getInt(START, 0);
+		int length = req.getInt(LENGTH, 50);
+		String orderBy = req.getString(ORDER_BY, "oID");
+
+		// The result data row mode
+		String rowMode = req.getString(ROW_MODE, "object");
+
+		// Processing the query and search together
+		//-------------------------------------------------------------------------------
+
+		// The actual joint query to use in list API, handled internally
+		String jointQuery = query;
+		String[] jointQueryArgs = queryArgs;
+
+		// End and return result
+		return res;
+	};
+
+	/**
+	 * Generate query string from a single word, to apply across multiple collumns.
+	 *
+	 * @param  searchString String used in searching
+	 * @param  queryCols    String[] query collumns to use, and search against
+	 * @param  queryMode String representing the wildcard mode (PREFIX / SUFFIX / BOTH)
+	 * 
+	 * @return MutablePair<String,List> for the query and arguments respectively
+	 */
+	protected static MutablePair<String,List<Object>> generateSearchStringFromSearchPhrase(String searchString, String[] queryCols, String queryMode) {
+		StringBuilder query = new StringBuilder();
+		List<Object> queryArgs = new ArrayList<Object>();
+
+		// No query is needed, terminate and return null
+		if( searchString == null || queryCols == null || searchString.length() <= 0 || queryCols.length <= 0 ) {
+			return null;
+		}
+
+		// Split the search string where whitespaces occur
+		String[] searchStringSplit = searchString.trim().split("\\s+");
+		
+		// Iterate the search string
+		for (int i = 0; i < searchStringSplit.length; ++i) {
+			String searchWord = searchStringSplit[i];
+
+			// Prepare the query block for one search word
+			query.append("(");
+
+			// Iterate the collumns to query
+			for (int colIdx = 0; colIdx < queryCols.length; ++colIdx) {
+
+				// Within a single word, append OR statements for each collumn
+				query.append(queryCols[colIdx] + " LIKE ?");
+
+				// Query arg for the search
+				queryArgs.add(generateSearchWordWithWildcard(searchWord, queryMode));
+
+				// Append or statemetns between collumns
+				if (colIdx < queryCols.length - 1) {
+					query.append(" OR ");
+				}
+			}
+
+			// Close the query block for the search word
+			query.append(")");
+
+			// Append the AND statement between word blocks
+			if (i < searchStringSplit.length - 1) {
+				query.append(" AND ");
+			}
+			
+			// Second string onwards is an "any" prefix and suffix wildcard
+			queryMode = "any"; 
+		}
+
+		// Invalid blank query (wrongly formatted input?)
+		if( query.length() <= 2 ) {
+			return null;
+		}
+
+		// Return the built query
+		return new MutablePair<String,List<Object>>(query.toString(), queryArgs);
+	}
+	
+	/**
+	 * Generate a string, with the SQL wildcard attached, in accordence to the given search word, and/or wildcard mode
+	 *
+	 * @param  searchWord  to modify
+	 * @param  queryMode  to use, either prefix/suffix/exact/any(fallback)
+	 *
+	 * @return  Modified string to pass as argument in larger query
+	 */
+	protected static String generateSearchWordWithWildcard(String searchWord, String queryMode) {
+		// if (queryMode.equalsIgnoreCase("exact")) {
+		// 	return searchWord;
+		// }  
+		if (queryMode.equalsIgnoreCase("prefix")) {
+			return searchWord + "%";
+		} else if (queryMode.equalsIgnoreCase("suffix")) {
+			return "%" + searchWord;
+		} else {
+			return "%" + searchWord + "%";
+		}
+	}
 
 	/////////////////////////////////////////////
 	//

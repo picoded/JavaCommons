@@ -267,10 +267,6 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 		return false;
 	}
 
-	// CORS config handling
-	// @TODO CORS OPTION implementation
-	//-------------------------------------------
-
 	// HTTP Servlet convinence functions
 	//-------------------------------------------
 
@@ -755,6 +751,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 
 		// By default CORS is enabled for all API requests
 		httpResponse.addHeader("Access-Control-Allow-Origin", "*");
+		httpResponse.addHeader("Access-Control-Allow-Credentials", "true");
 		httpResponse.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, HEAD");
 		httpResponse.addHeader("Access-Control-Max-Age", "5");
 	}

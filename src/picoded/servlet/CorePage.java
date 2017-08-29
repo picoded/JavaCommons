@@ -748,9 +748,18 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 		if( httpResponse == null ) {
 			return;
 		}
+		
+		// Get origin server
+		String originServer = httpRequest.getHeader("Referer");
+		if( originServer == null || originServer.isEmpty() ) {
+			// Unable to process CORS as no referer was sent
+			httpResponse.addHeader("Access-Control-Warning", "Missing Referer header, Unable to process CORS");
+			return;
+		}
+		// @TODO : Validate originServer against accepted list?
 
 		// By default CORS is enabled for all API requests
-		httpResponse.addHeader("Access-Control-Allow-Origin", "*");
+		httpResponse.addHeader("Access-Control-Allow-Origin", originServer);
 		httpResponse.addHeader("Access-Control-Allow-Credentials", "true");
 		httpResponse.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, HEAD");
 		httpResponse.addHeader("Access-Control-Max-Age", "5");

@@ -17,4 +17,24 @@ public interface ApiModule extends SystemSetupInterface {
 	 */
 	public void apiSetup(ApiBuilder inApi, String inPrefixPath, Object inConfigMap);
 
+	/**
+	 * Setup the API module, with the given parameters. And register the relevant end points
+	 *
+	 * @param  api         ApiBuilder to add the required functions
+	 * @param  prefixPath  prefix to assume as (should be able to accept "" blanks)
+	 */
+	public default void apiSetup(ApiBuilder inApi, String inPrefixPath) {
+		apiSetup(inApi, inPrefixPath, "{}");
+		return;
+	}
+
+	/**
+	 * Setup the API module, with the given parameters. And register the relevant end points
+	 *
+	 * @param  api         ApiBuilder to add the required functions
+	 */
+	public default void apiSetup(ApiBuilder inApi) {
+		apiSetup(inApi, "", "{}");
+		return;
+	}
 }

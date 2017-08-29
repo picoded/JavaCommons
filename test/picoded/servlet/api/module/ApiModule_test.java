@@ -17,7 +17,7 @@ import picoded.TestConfig;
 import picoded.servlet.*;
 import picoded.servlet.api.*;
 import picoded.servlet.api.module.*;
-import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.*;
 import picoded.core.common.*;
 import picoded.web.*;
 import picoded.core.conv.*;
@@ -69,9 +69,15 @@ public class ApiModule_test {
 		/// The CommonStack implementation
 		public CommonStack testStack = null;
 		
-		/// The api builder test vars
+		/// The api builder test module
 		public ApiModule testModule = null;
 		
+		/// The api test prefix (default blank)
+		public String apiTestPath = "";
+
+		/// The api test config (default blank map)
+		public GenericConvertMap<String,Object> apiConfig = new GenericConvertHashMap<String,Object>();
+
 		/// To overwrite when replacing the default Stack implementation from struct
 		///
 		/// @param   Base static CorePage used
@@ -111,11 +117,11 @@ public class ApiModule_test {
 		///
 		/// @param  The APIBuilder object used for setup
 		@Override
-		public void apiBuilderSetup(ApiBuilder api) {
+		public void apiSetup(ApiBuilder api) {
 			// Setup the module API (if built)
 			if (testModule != null) {
 				// @TODO : FIX THIS
-				//testModule.apiBuilderSetup(api);
+				testModule.apiSetup(api);
 			}
 			
 			// Setup an intentional exception endpoint (for some sanity test)
@@ -168,11 +174,13 @@ public class ApiModule_test {
 	///
 	/// @param   Server subpath URI
 	/// @param   Parameters to pass over (can be null)
-	public GenericConvertMap<String, Object> requestJSON(String uri, Map<String, Object> params) {
-		
+	public GenericConvertMap<String, Object> requestJSON(String uri, Object params) {
+		// Enforce param map
+		Map<String,Object> paramMap = GenericConvert.toStringMap(params);
+
 		// Make a request with cookies
 		ResponseHttp res = RequestHttp.post(testBaseUrl + uri,
-			RequestHttp.simpleParameterConversion(params), cookieJar, null);
+			RequestHttp.simpleParameterConversion(paramMap), cookieJar, null);
 		// Store the cookie result
 		cookieJar.putAll(res.cookiesMap());
 		
@@ -189,7 +197,7 @@ public class ApiModule_test {
 			throw new RuntimeException("Unexpected requestJSON formatting : \n" + rawResult);
 		}
 	}
-	
+
 	//-------------------------------------------------------------------------
 	//
 	// Sanity test

@@ -7,7 +7,7 @@ import picoded.dstack.*;
 import static picoded.servlet.api.module.dstack.DStackApiConstantStrings.*;
 import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
 
-import picoded.core.common.EmptyArray;
+import picoded.core.common.*;
 import picoded.core.struct.query.*;
 import picoded.core.struct.*;
 import picoded.core.conv.*;
@@ -17,7 +17,7 @@ import java.util.*;
 /**
  * Provides a centralized
  */
-public abstract class DataTableApi extends CommonApiModule {
+public class DataTableApi extends CommonApiModule {
 
 	/////////////////////////////////////////////
 	//
@@ -35,6 +35,15 @@ public abstract class DataTableApi extends CommonApiModule {
 	 */
 	public DataTableApi(DataTable inTable) {
 		dataTable = inTable;
+	}
+
+	/**
+	 * Array of internal subsystems : Currently only DataTable dstack module
+	 *
+	 * @return  Array of internal subsystems
+	 */
+	protected SystemSetupInterface[] internalSubsystemArray() {
+		return new SystemSetupInterface[] { dataTable };
 	}
 
 	/////////////////////////////////////////////
@@ -579,8 +588,8 @@ public abstract class DataTableApi extends CommonApiModule {
 	 *
 	 * This functionality can be refined via the config object
 	 */
-	protected void apiBuilderSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
-		super.apiBuilderSetup(api, prefixPath, config);
+	protected void apiSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
+		super.apiSetup(api, prefixPath, config);
 
 		api.endpoint(prefixPath+"/new", newEntry);
 		api.endpoint(prefixPath+"/newEntry", newEntry);

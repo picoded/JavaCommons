@@ -39,8 +39,8 @@ public class AccountTableApi extends CommonApiModule {
 		table = inTable;
 	}
 
-	protected List<SystemSetupInterface> internalSubsystemList() {
-		return new ArrayList<SystemSetupInterface>();
+	protected SystemSetupInterface[] internalSubsystemArray() {
+		return new SystemSetupInterface[] {};
 	}
 	
 	/**
@@ -1328,8 +1328,8 @@ public class AccountTableApi extends CommonApiModule {
 		return res;
 	};
 	
-	protected void apiBuilderSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
-		apiBuilderSetup(api, prefixPath);
+	protected void apiSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
+		apiSetup(api, prefixPath);
 	}
 
 	/**
@@ -1339,7 +1339,7 @@ public class AccountTableApi extends CommonApiModule {
 	 * @param  API builder to add the required functions
 	 * @param  Path to assume
 	 **/
-	public void apiBuilderSetup(ApiBuilder builder, String path) {
+	public void apiSetup(ApiBuilder builder, String path) {
 		builder.put(path + API_ACCOUNT_IS_LOGIN, isLogin); // Tested
 		builder.put(path + API_ACCOUNT_LOGIN, login); // Tested
 		builder.put(path + API_ACCOUNT_LOCKTIME, lockTime); // Tested

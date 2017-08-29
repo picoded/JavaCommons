@@ -43,7 +43,7 @@ abstract public class AbstractApiModule implements ApiModule {
 
 		subsystemList = internalSubsystemList();
 
-		apiBuilderSetup(api, prefixPath, config);
+		apiSetup(api, prefixPath, config);
 	}
 
 	/**
@@ -58,7 +58,7 @@ abstract public class AbstractApiModule implements ApiModule {
 	 * [To Overwrite]
 	 * Does the actual API backend setup logic, this is after standardised apiSetup initialization
 	 */
-	abstract protected void apiBuilderSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config);
+	abstract protected void apiSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config);
 
 	//-------------------------------------------------------------
 	// SystemSetup / Teardown chain helpers
@@ -66,11 +66,24 @@ abstract public class AbstractApiModule implements ApiModule {
 	
 	/**
 	 * [To Overwrite]
-	 * List of internal subsystem modules, which is chained systemSetup / Teardown / clear.
+	 * 
+	 * Array of internal subsystem modules, which is chained systemSetup / Teardown / clear.
 	 *
-	 * @return List of SystemSetupInterface
+	 * Alternatively if a list is prefered, overwrite internalSubsystemList, 
+	 * and throw and exception on this function
+	 *
+	 * @return Array of SystemSetupInterface
 	 */
-	abstract protected List<SystemSetupInterface> internalSubsystemList();
+	abstract protected SystemSetupInterface[] internalSubsystemArray();
+	
+	/**
+	 * Array of internal subsystem modules, which is chained systemSetup / Teardown / clear.
+	 *
+	 * @return Array of SystemSetupInterface
+	 */
+	protected List<SystemSetupInterface> internalSubsystemList() {
+		return Arrays.asList(internalSubsystemArray());
+	}
 
 	//----------------------------------------------------------------
 	//

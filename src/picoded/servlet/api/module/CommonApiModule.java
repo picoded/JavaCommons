@@ -19,7 +19,7 @@ abstract public class CommonApiModule extends AbstractApiModule {
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
-	//  apiBuilderSetup functionality
+	//  apiSetup functionality
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -28,7 +28,7 @@ abstract public class CommonApiModule extends AbstractApiModule {
 	 *
 	 * This functionality can be refined via the config object
 	 */
-	protected void apiBuilderSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
+	protected void apiSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
 		if( config.getBoolean("stringEscapeAfterFilter", true) ) {
 			api.after(prefixPath+"/*", stringEscapeAfterFilter);
 		}

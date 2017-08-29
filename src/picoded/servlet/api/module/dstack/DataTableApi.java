@@ -8,7 +8,9 @@ import static picoded.servlet.api.module.dstack.DStackApiConstantStrings.*;
 import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
 
 import picoded.core.common.EmptyArray;
+import picoded.core.struct.query.*;
 import picoded.core.struct.*;
+import picoded.core.conv.*;
 
 import java.util.*;
 
@@ -306,12 +308,13 @@ public abstract class DataTableApi extends CommonApiModule {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | fieldList       | String[] (optional)| Default ["_oid"], the fields to return                                        |
 	 * | query           | String   (optional)| Requested Query filter, default matches all                                   |
-	 * | queryArgs       | String[] (optional)| Requested Query filter arguments                                              |
+	 * | queryArgs       | Object[] (optional)| Requested Query filter arguments                                              |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | searchString    | String   (optional)| Search string passed                                                          |
 	 * | searchFieldList | String[] (optional)| Fields used for searching, defaults to headers                                |
 	 * | searchMode      | String   (optional)| Default PREFIX. Determines SQL query wildcard position, for the first word.   |
 	 * |                 |                    | (Either prefix, suffix, or both), second word onwards always uses both.       |
+	 * |                 |                    | For example: PREFIX mode, with search string hello, will query with "hello%". |
 	 * |                 |                    | This is used mainly to tune the generated SQL performance, against use case.  |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
@@ -340,17 +343,33 @@ public abstract class DataTableApi extends CommonApiModule {
 		// Arguments handling
 		//-------------------------------------------------------------------------------
 
-		// Get header arguments
+		// Get fieldList arguments
 		String[] fieldList = req.getStringArray(FIELD_LIST, "['_oid']");
-		
+		if(fieldList.length <= 0) {
+			res.put(ERROR, "fieldList, requested cannot be an empty array");
+			res.halt();
+		}
+
 		// The query to use
 		String query = req.getString(QUERY, "").trim();
-		String[] queryArgs = req.getStringArray(QUERY_ARGS, EmptyArray.STRING);
+		Object[] queryArgs = req.getObjectArray(QUERY_ARGS, EmptyArray.STRING);
 		
+		// Query format safety check
+		if( !query.isEmpty() ) {
+			try {
+				Query queryCheck = Query.build(query,queryArgs);
+				query = queryCheck.toSqlString();
+				queryArgs = queryCheck.queryArgumentsArray();
+			} catch (Exception e) {
+				res.put(ERROR, "Invalid query format : "+query);
+				res.halt();
+			}
+		}
+
 		// Search value to filter the result by
 		String searchString = req.getString(SEARCH_STRING, "").trim();
 		String[] searchFieldList = req.getStringArray(SEARCH_FIELDLIST, fieldList);
-		String searchMode = req.getString(SEARCH_MODE, "suffix");
+		String searchMode = req.getString(SEARCH_MODE, "prefix");
 
 		// Fix a specific issue in DataTable, where searchString is
 		// sent with beginning and ending quotes, remove it accordingly
@@ -372,18 +391,65 @@ public abstract class DataTableApi extends CommonApiModule {
 		String rowMode = req.getString(ROW_MODE, "object");
 
 		// Processing the query and search together
+		//
+		// Since the above does extensive null check fallbacks, 
+		// everything past this point can safely be assumed to be not null
 		//-------------------------------------------------------------------------------
 
 		// The actual joint query to use in list API, handled internally
 		String jointQuery = query;
-		String[] jointQueryArgs = queryArgs;
+		Object[] jointQueryArgs = queryArgs;
+
+		// Checks if search string is valid, and process it
+		MutablePair<String,Object[]> searchQuery = generateSearchStringFromSearchPhrase(searchString, searchFieldList, searchMode);
+		if( searchQuery != null ) {
+			if( query.isEmpty() || queryArgs.length == 0 ) {
+				// If query is empty, assumes that search replaces it
+				jointQuery = searchQuery.getLeft();
+				jointQueryArgs = searchQuery.getRight();
+			} else {
+				// query isnt empty, does a "merge" with it
+				jointQuery = "(" + query + ") AND (" + searchQuery.getLeft() + ")";
+				jointQueryArgs = ArrayConv.addAll(queryArgs, searchQuery.getRight());
+			}
+		} // else fallsback to just query 
+
+		// Executing the query, and getting its result
+		//-------------------------------------------------------------------------------
+		
+		// The resulting data object, and total count
+		DataObject[] dataObjs = null;
+		long dataCount = 0;
+
+		// Converts the jointQuery to null, if blank
+		if ( jointQuery.isEmpty() || jointQueryArgs.length == 0) {
+			jointQuery = null;
+			jointQueryArgs = null;
+		}
+
+		// Fetching the objects and count
+		dataObjs = dataTable.query(jointQuery, jointQueryArgs, orderBy, start, length);
+		dataCount = dataTable.queryCount(jointQuery,jointQueryArgs);
+		
+		// Process the result for output
+		res.put(FIELD_LIST, fieldList);
+		res.put(TOTAL_COUNT, dataCount);
+		res.put(RESULT, formatDataObjectList(dataObjs, fieldList, rowMode));
 
 		// End and return result
 		return res;
 	};
 
+	/////////////////////////////////////////////
+	//
+	// List functions utils 
+	// (maybe migrated to another class)
+	//
+	/////////////////////////////////////////////
+	
 	/**
 	 * Generate query string from a single word, to apply across multiple collumns.
+	 * Returns null if searchString failed to be processed
 	 *
 	 * @param  searchString String used in searching
 	 * @param  queryCols    String[] query collumns to use, and search against
@@ -391,14 +457,15 @@ public abstract class DataTableApi extends CommonApiModule {
 	 * 
 	 * @return MutablePair<String,List> for the query and arguments respectively
 	 */
-	protected static MutablePair<String,List<Object>> generateSearchStringFromSearchPhrase(String searchString, String[] queryCols, String queryMode) {
-		StringBuilder query = new StringBuilder();
-		List<Object> queryArgs = new ArrayList<Object>();
-
+	protected static MutablePair<String,Object[]> generateSearchStringFromSearchPhrase(String searchString, String[] queryCols, String queryMode) {
 		// No query is needed, terminate and return null
-		if( searchString == null || queryCols == null || searchString.length() <= 0 || queryCols.length <= 0 ) {
+		if( searchString.isEmpty() || queryCols.length <= 0 ) {
 			return null;
 		}
+
+		// The return args
+		StringBuilder query = new StringBuilder();
+		List<Object> queryArgs = new ArrayList<Object>();
 
 		// Split the search string where whitespaces occur
 		String[] searchStringSplit = searchString.trim().split("\\s+");
@@ -443,7 +510,7 @@ public abstract class DataTableApi extends CommonApiModule {
 		}
 
 		// Return the built query
-		return new MutablePair<String,List<Object>>(query.toString(), queryArgs);
+		return new MutablePair<String,Object[]>(query.toString(), queryArgs.toArray(new Object[0]));
 	}
 	
 	/**
@@ -465,6 +532,40 @@ public abstract class DataTableApi extends CommonApiModule {
 		} else {
 			return "%" + searchWord + "%";
 		}
+	}
+
+	/**
+	 * Format the data object list result
+	 */
+	protected static List<Object> formatDataObjectList(DataObject[] dataObjs, String[] fieldList, String rowMode) {
+		// Check if row mode is an array, else assume its an object
+		boolean isArrayMode = rowMode.equalsIgnoreCase("array");
+
+		// The return data
+		List<Object> ret = new ArrayList<Object>();
+
+		// Iterate data objects
+		for(DataObject obj : dataObjs) {
+			// Prepare the result in accordance to the data mode
+			if( isArrayMode ) {
+				// Assume array mode output
+				List<Object> row = new ArrayList<Object>();
+				for(int i = 0; i < fieldList.length; ++i) {
+					row.add( obj.get( fieldList[i] ) );
+				}
+				ret.add(row);
+			} else {
+				// Assume object mode output
+				Map<String,Object> row = new HashMap<String,Object>();
+				for(int i = 0; i < fieldList.length; ++i) {
+					row.put(fieldList[i], obj.get( fieldList[i] ));
+				}
+				ret.add(row);
+			}
+		}
+
+		// Return the result
+		return ret;
 	}
 
 	/////////////////////////////////////////////

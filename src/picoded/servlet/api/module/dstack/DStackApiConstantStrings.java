@@ -24,5 +24,5 @@ public class DStackApiConstantStrings {
 	public static final String ORDER_BY = "orderBy";
 
 	public static final String ROW_MODE = "rowMode";
-
+	public static final String TOTAL_COUNT = "totalCount";
 }

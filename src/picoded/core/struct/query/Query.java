@@ -211,6 +211,14 @@ public interface Query extends Predicate<Object> {
 	
 	/**
 	 * Returns the argument values used,
+	 * In a array, in accordance to their query component order
+	 **/
+	default Object[] queryArgumentsArray() {
+		return queryArgumentsList(new ArrayList<Object>()).toArray(new Object[0]);
+	}
+	
+	/**
+	 * Returns the argument values used,
 	 * In a list, in accordance to their query component order
 	 **/
 	default List<Object> queryArgumentsList() {

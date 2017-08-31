@@ -87,7 +87,7 @@ public class DataTableApi extends CommonApiModule {
 		obj.putAll(newData);
 		obj.saveAll();
 
-		// Output the update mode (for easier debugging)
+		// Output the OID
 		res.put(RESULT, obj._oid());
 		
 		// End and return result
@@ -127,7 +127,7 @@ public class DataTableApi extends CommonApiModule {
 	public ApiFunction get = (req, res) -> {
 		// Get the oid, and sanatise output settings
 		String oid = req.getString(OID, null);
-		
+
 		// Put back config in response
 		res.put(OID, oid);
 		res.put(RESULT, null);
@@ -597,6 +597,8 @@ public class DataTableApi extends CommonApiModule {
 		api.endpoint(prefixPath+"/get", get);
 		api.endpoint(prefixPath+"/set", set);
 		api.endpoint(prefixPath+"/delete", delete);
+
+		api.endpoint(prefixPath+"/list", list);
 
 		api.endpoint(prefixPath+"/keyNames", keyNames);
 	}

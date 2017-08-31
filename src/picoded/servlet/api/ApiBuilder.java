@@ -802,7 +802,11 @@ public class ApiBuilder implements
 			return execute(String.join(".", path), req, res);
 		} catch (Exception e) {
 			// Suppress and print out the error info
-			res.put("ERROR", e.getMessage());
+			String errorMsg = e.getMessage();
+			if( errorMsg == null || errorMsg.trim().isEmpty() ) {
+				errorMsg = "Fatal Error";
+			}
+			res.put("ERROR", errorMsg.trim() );
 			res.put("INFO", org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e));
 		}
 		return res;

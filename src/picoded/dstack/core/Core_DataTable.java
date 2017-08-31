@@ -301,6 +301,11 @@ abstract public class Core_DataTable extends Core_DataStructure<String, DataObje
 		// String oid
 		String soid = (oid != null) ? oid.toString() : null;
 		
+		// Return null, if OID is null
+		if ( soid == null || soid.isEmpty() ) {
+			return null;
+		}
+
 		// Get remote data map
 		Map<String, Object> fullRemote = DataObjectRemoteDataMap_get(soid);
 		

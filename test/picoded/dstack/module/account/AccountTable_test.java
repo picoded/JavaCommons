@@ -69,7 +69,7 @@ public class AccountTable_test {
 	@Test
 	public void createCycleTest() {
 		AccountObject testAO = null;
-		assertNotNull(testAO = testAT.newObject("hello-world"));
+		assertNotNull(testAO = testAT.newEntry("hello-world"));
 		assertTrue(testAT.hasLoginID("hello-world"));
 		
 		// Validating seperately collected accountObjects
@@ -85,7 +85,7 @@ public class AccountTable_test {
 	
 	@Test
 	public void passwordTest() {
-		AccountObject testAO = testAT.newObject("hello-world");
+		AccountObject testAO = testAT.newEntry("hello-world");
 		
 		assertFalse(testAO.hasPassword());
 		assertFalse(testAO.validatePassword("bad-pass"));
@@ -98,7 +98,7 @@ public class AccountTable_test {
 	
 	@Test
 	public void sessionAndTokenManagement() {
-		AccountObject testAO = testAT.newObject("hello-world");
+		AccountObject testAO = testAT.newEntry("hello-world");
 		testAO.setPassword("P@ssw0rd!");
 		
 		// The existing session ID sets

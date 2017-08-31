@@ -54,7 +54,7 @@ public interface DataTable extends UnsupportedDefaultMap<String, DataObject>, Co
 	 *
 	 * @return the DataObject
 	 **/
-	DataObject newObject();
+	DataObject newEntry();
 	
 	/**
 	 * Generates a new blank object, with a GUID.
@@ -66,8 +66,8 @@ public interface DataTable extends UnsupportedDefaultMap<String, DataObject>, Co
 	 *
 	 * @return the DataObject
 	 **/
-	default DataObject newObject(Map<String, Object> data) {
-		DataObject ret = newObject();
+	default DataObject newEntry(Map<String, Object> data) {
+		DataObject ret = newEntry();
 		ret.putAll(data);
 		ret.saveAll();
 		return ret;

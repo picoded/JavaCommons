@@ -210,8 +210,8 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	 * @param  API builder to add the required functions
 	 * @param  Path to assume
 	 **/
-	public void apiBuilderSetup(ApiBuilder builder, String path) {
-		super.apiBuilderSetup(builder, path);
+	public void apiSetup(ApiBuilder builder, String path) {
+		super.apiSetup(builder, path);
 		builder.before(path + "account/*", account_bundle_check);
 		// builder.before(path+"account/login/*", complexity_bundle_check);
 		builder.before(path + "account/rancherRegister/*", complexity_bundle_check);

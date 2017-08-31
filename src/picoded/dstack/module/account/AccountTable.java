@@ -328,7 +328,7 @@ public class AccountTable extends ModuleStructure implements
 	 * Note without setting a name, or any additional values.
 	 * This call in some sense is quite, err useless.
 	 **/
-	public AccountObject newObject() {
+	public AccountObject newEntry() {
 		AccountObject ret = new AccountObject(this, null);
 		// ret.saveAll(); //ensures the blank object is now in DB
 		return ret;
@@ -341,14 +341,14 @@ public class AccountTable extends ModuleStructure implements
 	 *
 	 * @return AccountObject if succesfully created
 	 **/
-	public AccountObject newObject(String name) {
+	public AccountObject newEntry(String name) {
 		// Quick fail check
 		if (hasLoginID(name)) {
 			return null;
 		}
 		
 		// Creating account object, setting the name if valid
-		AccountObject ret = newObject();
+		AccountObject ret = newEntry();
 		if (ret.setLoginID(name)) {
 			return ret;
 		} else {

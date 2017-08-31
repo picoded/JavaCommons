@@ -32,13 +32,14 @@ import static picoded.servlet.api.module.account.AccountConstantStrings.*;
  * # @TODO Items
  *
  * [ ] Add in documentation / definition support API
- * [ ] Add in filter lambda API
+ * [+] Add in filter lambda API
  * [ ] Add in parametarised paths support
  * [ ] Add in actual servlet support (See RESTBuilder)
- * [ ] Add in JS API script generation
+ * [+] Add in JS API script generation
  * [ ] Patch up endpoint removal, and keyset to take into seperate account filters
- * [ ] Possibly seperate out filters?
+ * [+] Possibly seperate out filters? (before / after)
  * [ ] Formally define how ambiguity of API endpoints is resolved
+ * [ ] Extend function for api endpoints / filters
  *
  * # Description rents
  *
@@ -801,7 +802,11 @@ public class ApiBuilder implements
 			return execute(String.join(".", path), req, res);
 		} catch (Exception e) {
 			// Suppress and print out the error info
-			res.put("ERROR", e.getMessage());
+			String errorMsg = e.getMessage();
+			if( errorMsg == null || errorMsg.trim().isEmpty() ) {
+				errorMsg = "Fatal Error";
+			}
+			res.put("ERROR", errorMsg.trim() );
 			res.put("INFO", org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e));
 		}
 		return res;

@@ -41,7 +41,7 @@ public class AccountTableApi_test extends ApiModule_test {
 			// 	return (long) 2;
 			// };
 			if (!table.hasLoginID("laughing-man")) {
-				AccountObject ao = table.newObject("laughing-man");
+				AccountObject ao = table.newEntry("laughing-man");
 				ao.put(PROPERTIES_EMAIL, "laughing-man@testlalala.com");
 				ao.setPassword("The Catcher in the Rye");
 			}

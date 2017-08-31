@@ -136,7 +136,7 @@ public class CoreApiPage extends CorePage {
 		
 		// Create a new object, and set it up
 		_apiBuilderObj = new ApiBuilder();
-		apiBuilderSetup(_apiBuilderObj);
+		apiSetup(_apiBuilderObj);
 		
 		// Return the result
 		return _apiBuilderObj;
@@ -148,7 +148,7 @@ public class CoreApiPage extends CorePage {
 	 *
 	 * @param  The APIBuilder object used for setup
 	 **/
-	public void apiBuilderSetup(ApiBuilder api) {
+	public void apiSetup(ApiBuilder api) {
 		
 	}
 	

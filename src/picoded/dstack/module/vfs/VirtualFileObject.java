@@ -321,7 +321,7 @@ public class VirtualFileObject {
 		
 		// Else create a new file
 		if (newDataObject == null) {
-			newDataObject = vfs.files.newObject();
+			newDataObject = vfs.files.newEntry();
 		}
 		
 		// Save required information
@@ -472,7 +472,7 @@ public class VirtualFileObject {
 		
 		// Else create a new directory
 		if (newDataObject == null) {
-			newDataObject = vfs.directories.newObject();
+			newDataObject = vfs.directories.newEntry();
 		}
 		
 		// Save required information

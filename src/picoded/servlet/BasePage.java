@@ -140,7 +140,7 @@ public class BasePage extends DStackPage {
 		// Set up super user
 		AccountObject superUser = at.getFromLoginID(adminUser);
 		if (superUser == null) {
-			superUser = at.newObject(adminUser);
+			superUser = at.newEntry(adminUser);
 			superUser.setPassword(adminPass);
 		} else if (resetPass) {
 			superUser.setPassword(adminPass);
@@ -155,7 +155,7 @@ public class BasePage extends DStackPage {
 		// to be inside)
 		AccountObject superGrp = at.getFromLoginID(getSuperUserGroupName());
 		if (superGrp == null) {
-			superGrp = at.newObject(getSuperUserGroupName());
+			superGrp = at.newEntry(getSuperUserGroupName());
 			superGrp.setGroupStatus(true);
 			superGrp.setMembershipRoles(superGrpMemberRoles);
 			// Put superUser as the first admin of this group

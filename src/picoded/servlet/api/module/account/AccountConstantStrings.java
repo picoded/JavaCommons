@@ -25,6 +25,7 @@ public class AccountConstantStrings {
 	public static final String REQ_OLD_PASSWORD = "oldPass";
 	public static final String REQ_REPEAT_PASSWORD = "repeatPass";
 	public static final String REQ_NEW_PASSWORD = "newPass";
+	public static final String REQ_NAME = "name";
 
 	// Rancher VARS
 	public static final String REQ_EMAIL = "email";
@@ -101,6 +102,7 @@ public class AccountConstantStrings {
 	public static final String ERROR_NO_EMAIL = "No email address is found.";
 	public static final String ERROR_NO_NODE_ID = "No node ID is found.";
 	public static final String ERROR_EMAIL_EXISTS = "Email is in used.";
+	public static final String ERROR_NO_NAME = "No name is found.";
 
 	/// ADDITIONAL Variables
 	public static final String SPACE = " ";

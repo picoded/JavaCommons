@@ -123,8 +123,7 @@ public class AccountConstantStrings {
 	public static final String API_ACCOUNT_PASS_RESET = "account/do_password_reset";
 	public static final String API_ACCOUNT_INFO = "account/info/get";
 	public static final String API_ACCOUNT_ADMIN_REMOVE = "account/admin/remove";
-	public static final String API_ACCOUNT_ADMIN_GET_U_G_LIST = "account/admin/get_user_or_group_list";
-	public static final String API_ACCOUNT_UPDATE_U_INFO = "account/update_current_user_info";
+	public static final String API_ACCOUNT_LIST = "account/list";
 
 	public static final String API_GROUP_GRP_ROLES = "group/groupRoles";
 	public static final String API_GROUP_GET_MEM_ROLE = "group/getMemberRole";

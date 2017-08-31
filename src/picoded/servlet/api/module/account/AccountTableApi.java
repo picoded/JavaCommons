@@ -5,6 +5,7 @@ import java.util.*;
 import picoded.servlet.api.*;
 import picoded.servlet.api.module.*;
 import picoded.dstack.module.account.*;
+import picoded.servlet.api.module.dstack.*;
 import picoded.dstack.*;
 import picoded.core.conv.ConvertJSON;
 import picoded.core.conv.StringEscape;
@@ -32,6 +33,7 @@ public class AccountTableApi extends CommonApiModule {
 	public static final String MISSING_REQUEST_PAGE = "Unexpected Exception: Missing requestPage()";
 
 	public boolean isTesting = false;
+	private DataTableApi dataTableApi = null;
 
 	/**
 	 * Setup the account table api class
@@ -41,12 +43,15 @@ public class AccountTableApi extends CommonApiModule {
 	public AccountTableApi(AccountTable inTable) {
 		table = inTable;
 		isTesting = false;
+		dataTableApi = new DataTableApi(inTable.accountDataTable());
 	}
 
 	public AccountTableApi(AccountTable inTable, boolean setTesting) {
 		table = inTable;
 		isTesting = setTesting;
+		dataTableApi = new DataTableApi(inTable.accountDataTable());
 	}
+
 	protected SystemSetupInterface[] internalSubsystemArray() {
 		return new SystemSetupInterface[] {};
 	}
@@ -1290,7 +1295,7 @@ public class AccountTableApi extends CommonApiModule {
 		builder.put(path + API_ACCOUNT_INFO, account_info); // Tested
 		// builder.put(path + API_ACCOUNT_INFO_ID, account_info_by_ID); // Tested
 		// builder.put(path + API_ACCOUNT_ADMIN_REMOVE, delete_user_account); // Tested
-		// builder.put(path + API_ACCOUNT_ADMIN_GET_U_G_LIST, get_user_or_group_list); // Tested
+		builder.put(path + API_ACCOUNT_LIST, dataTableApi.list); 
 		//
 		// //Group functionalities
 		// builder.put(path + API_GROUP_GRP_ROLES, groupRoles); // Tested

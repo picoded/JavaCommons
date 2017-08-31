@@ -1530,7 +1530,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 	// 		}
 	// 		expectedResult.add(userID.get(idx - 1));
 	// 	}
-	// 	TestSet ts = new TestSet(null, API_ACCOUNT_ADMIN_GET_U_G_LIST, null, null);
+	// 	TestSet ts = new TestSet(null, API_ACCOUNT_LIST, null, null);
 	// 	// Ensure that there is an existing group
 	// 	for (int idx = 1; idx <= 2; idx++) {
 	// 		ts.loginUser("getTestMemb" + idx + "@mailawer.com", VALIDPASSWORD);
@@ -1571,7 +1571,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 	// 	ts.logout();
 	// 	// 3rd Test: Superuser search
 	// 	ts.loginUser(SUPERUSERNAME, VALIDPASSWORD);
-	// 	ts = new TestSet(null, API_ACCOUNT_ADMIN_GET_U_G_LIST, expectedResult, DATA);
+	// 	ts = new TestSet(null, API_ACCOUNT_LIST, expectedResult, DATA);
 	// 	ts.executeTrueTestCase();
 	// }
 

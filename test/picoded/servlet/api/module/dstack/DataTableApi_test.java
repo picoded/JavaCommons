@@ -93,16 +93,37 @@ public class DataTableApi_test extends ApiModule_test {
 		assertEquals( 2, res.getStringMap("result").get("zero") );
 	}
 
-	@Test 
-	public void keyNamesTest() {
+	@Test
+	public void basicListTest() {
+		// Get blank list
+		GenericConvertMap<String, Object> res = requestJSON("data/list", null);
+		checkResForError(res);
+		assertNotNull( res.getObjectArray("result") );
+		assertTrue( res.getObjectArray("result").length == 0);
+
+		// Create a single object
 		newGetSetGetTest();
 
+		// Get a list of 1
+		res = requestJSON("data/list", null);
+		checkResForError(res);
+		assertNotNull( res.getObjectArray("result") );
+		assertTrue( res.getObjectArray("result").length == 1);
+	}
+
+	@Test 
+	public void keyNamesTest() {
+		// Generate an object
+		newGetSetGetTest();
+
+		// Get keyname
 		GenericConvertMap<String, Object> res = requestJSON("data/keyNames", null);
 		checkResForError(res);
 		assertNotNull( res.getObjectArray("result") );
 		
-		//assertEquals( 1, res.getObjectArray("result").length );
-		//assertEquals( "zero", res.getObjectArray("result")[0] );
+		// Validate "zero" is in the keyname
+		assertTrue( res.getObjectArray("result").length >= 1);
+		assertTrue( Arrays.asList(res.getObjectArray("result")[0]).contains("zero") );
 	}
 	
 }

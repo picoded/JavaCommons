@@ -4,60 +4,54 @@ import javax.mail.internet.*;
 public class AccountConstantStrings {
 
 	/// Static REQUEST VARS
-	public static final String REQ_OID = "_oid";
-	public static final String REQ_ACCOUNT_ID = "accountID";
-	public static final String REQ_ACCOUNT_NAME = "accountName";
-	public static final String REQ_ADD_LIST = "addList";
-	public static final String REQ_REMOVE_LIST = "removeList";
-	public static final String REQ_PASSWORD = "password";
-	public static final String REQ_USERNAME = "username";
-	public static final String REQ_REMEMBER_ME = "rememberMe";
-	public static final String REQ_SANITISE_OUTPUT = "sanitiseOutput";
-	public static final String REQ_DEFAULT_ROLES = "defaultRoles";
-	public static final String REQ_GROUPNAME = "groupname";
-	public static final String REQ_GROUP_ID = "groupID";
-	public static final String REQ_IS_GROUP = "isGroup";
-	public static final String REQ_HEADERS = "headers";
-	public static final String REQ_META = "meta";
-	public static final String REQ_ROLE = "role";
-	public static final String REQ_USER_ID = "userID";
-	public static final String REQ_UPDATE_MODE = "updateMode";
-	public static final String REQ_OLD_PASSWORD = "oldPass";
-	public static final String REQ_REPEAT_PASSWORD = "repeatPass";
-	public static final String REQ_NEW_PASSWORD = "newPass";
-	public static final String REQ_NAME = "name";
+	public static final String OID = "_oid";
+	public static final String ACCOUNT_ID = "accountID";
+	public static final String ACCOUNT_NAME = "accountName";
+	public static final String ADD_LIST = "addList";
+	public static final String REMOVE_LIST = "removeList";
+	public static final String PASSWORD = "password";
+	public static final String LOGINNAME = "loginName";
+	public static final String REMEMBER_ME = "rememberMe";
+	public static final String SANITISE_OUTPUT = "sanitiseOutput";
+	public static final String DEFAULT_ROLES = "defaultRoles";
+	public static final String GROUPNAME = "groupname";
+	public static final String GROUP_ID = "groupID";
+	public static final String IS_GROUP = "isGroup";
+	public static final String HEADERS = "headers";
+	public static final String META = "meta";
+	public static final String ROLE = "role";
+	public static final String USER_ID = "userID";
+	public static final String UPDATE_MODE = "updateMode";
+	public static final String OLD_PASSWORD = "oldPass";
+	public static final String REPEAT_PASSWORD = "repeatPass";
+	public static final String NEW_PASSWORD = "newPass";
+	public static final String NAME = "name";
 
 	// Rancher VARS
-	public static final String REQ_EMAIL = "email";
-	public static final String REQ_NODE_ID = "nodeID";
-	public static final String REQ_STACK_NAME = "stackName";
-	public static final String REQ_AUTH_KEY = "authKey";
-	public static final String REQ_ADMIN_PASS = "adminPass";
+	public static final String EMAIL = "email";
+	public static final String NODE_ID = "nodeID";
+	public static final String STACK_NAME = "stackName";
+	public static final String AUTH_KEY = "authKey";
+	public static final String ADMIN_PASS = "adminPass";
 
 	/// Static RESPONSE VARS
 	// Single Value/Object Variables
-	public static final String RES_ERROR = "ERROR";
-	public static final String RES_RETURN = "return";
-	public static final String RES_ACCOUNT_ID = "accountID";
-	public static final String RES_SINGLE_RETURN_VALUE = "single";
-	public static final String RES_GROUP_ID = "groupID";
-	public static final String RES_IS_LOGIN = "isLogin";
-	public static final String RES_REMEMBER_ME = "rememberMe";
-	public static final String RES_META = "meta";
-	public static final String RES_DRAW = "draw";
-	public static final String RES_RECORDS_TOTAL = "recordsTotal";
-	public static final String RES_RECORDS_FILTERED = "recordsFiltered";
-	public static final String RES_UPDATE_MODE = "updateMode";
-	public static final String RES_SUCCESS = "success";
+	public static final String ERROR = "ERROR";
+	public static final String RETURN = "return";
+	public static final String SINGLE_RETURN_VALUE = "single";
+	public static final String IS_LOGIN = "isLogin";
+	public static final String DRAW = "draw";
+	public static final String RECORDS_TOTAL = "recordsTotal";
+	public static final String RECORDS_FILTERED = "recordsFiltered";
+	public static final String SUCCESS = "success";
 	// Data List Return Variables
-	public static final String RES_HEADERS = "headers";
-	public static final String RES_DATA = "data";
-	public static final String RES_LOGIN_ID_LIST = "loginIDList";
-	public static final String RES_LIST = "list";
-	public static final String RES_FAIL_REMOVE = "failToRemove";
-	public static final String RES_SUCCESS_REMOVE = "succeedRemove";
-	public static final String RES_FAIL_ADD = "failToAdd";
-	public static final String RES_SUCCESS_ADD = "succeedAdd";
+	public static final String DATA = "data";
+	public static final String LOGIN_NAME_LIST = "loginNameList";
+	public static final String LIST = "list";
+	public static final String FAIL_REMOVE = "failToRemove";
+	public static final String SUCCESS_REMOVE = "succeedRemove";
+	public static final String FAIL_ADD = "failToAdd";
+	public static final String SUCCESS_ADD = "succeedAdd";
 
 	/// Static PROPERTIES VARS
 	public static final String PROPERTIES_ROLE = "role";

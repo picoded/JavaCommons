@@ -108,6 +108,10 @@ if(apicore.isNodeJS()) {
 		var request = new XMLHttpRequest();
 		request.open("POST", apicore.baseURL()+reqURI);
 
+		// Enable cookies on CORS
+		// See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
+		request.withCredentials = true; 
+
 		// Return promise object
 		var ret = new Promise(function(good,bad) {
 

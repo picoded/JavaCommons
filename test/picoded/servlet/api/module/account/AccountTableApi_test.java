@@ -149,33 +149,33 @@ public class AccountTableApi_test extends ApiModule_test {
 	// 	}
 	// }
 	//
-	// @Test
-	// public void createNewUserAccount() {
-	// 	Map<String, Object> res = null;
-	// 	Map<String, Object> createDetails = new HashMap<String, Object>();
-	// 	Map<String, Object> meta = new HashMap<String, Object>();
-	// 	meta.put(PROPERTIES_EMAIL, "tste@lalalala.com");
-	// 	// createDetails
-	// 	res = requestJSON(API_ACCOUNT_NEW, createDetails);
-	// 	assertEquals(ERROR_NO_LOGINNAME, res.get(ERROR));
-	//
-	// 	createDetails.put(LOGINNAME, "little-boy");
-	// 	res = requestJSON(API_ACCOUNT_NEW, createDetails);
-	// 	assertEquals(ERROR_NO_PASSWORD, res.get(ERROR));
-	// 	// Successfully created account
-	// 	createDetails.put(PASSWORD, "sooo smallll");
-	// 	res = requestJSON(API_ACCOUNT_NEW, createDetails);
-	// 	assertNotNull(res.get(META));
-	// 	assertNull(res.get(ERROR));
-	//
-	// 	String accountID = res.get(ACCOUNT_ID).toString();
-	//
-	// 	//Create same user again
-	// 	res = requestJSON(API_ACCOUNT_NEW, createDetails);
-	// 	assertEquals("Object already exists in account Table", res.get(ERROR));
-	// 	assertEquals(accountID, res.get(ACCOUNT_ID));
-	// }
-	//
+	@Test
+	public void createNewUserAccount() {
+		Map<String, Object> res = null;
+		Map<String, Object> createDetails = new HashMap<String, Object>();
+		Map<String, Object> meta = new HashMap<String, Object>();
+		meta.put(PROPERTIES_EMAIL, "tste@lalalala.com");
+		// createDetails
+		res = requestJSON(API_ACCOUNT_NEW, createDetails);
+		assertEquals(ERROR_NO_LOGINNAME, res.get(ERROR));
+
+		createDetails.put(LOGINNAME, "little-boy");
+		res = requestJSON(API_ACCOUNT_NEW, createDetails);
+		assertEquals(ERROR_NO_PASSWORD, res.get(ERROR));
+		// Successfully created account
+		createDetails.put(PASSWORD, "sooo smallll");
+		res = requestJSON(API_ACCOUNT_NEW, createDetails);
+		assertNotNull(res.get(DATA));
+		assertNull(res.get(ERROR));
+
+		String accountID = res.get(ACCOUNT_ID).toString();
+
+		//Create same user again
+		res = requestJSON(API_ACCOUNT_NEW, createDetails);
+		assertEquals("Object already exists in account Table", res.get(ERROR));
+		assertEquals(accountID, res.get(ACCOUNT_ID));
+	}
+
 	// @Test
 	// public void createNewGroup() {
 	// 	GenericConvertMap<String, Object> res = null;

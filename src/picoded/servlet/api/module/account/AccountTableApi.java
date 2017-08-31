@@ -63,7 +63,7 @@ public class AccountTableApi extends CommonApiModule {
 	 * +----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | accountID      | String (Optional)  | Either the loginID or the accountID is needed                                 |
 	 * | loginName      | String (Optional)  | Either the loginID or the accountID is needed                                 |
-	 * | loginPass      | String             | The account password used for login                                           |
+	 * | password       | String             | The account password used for login                                           |
 	 * | rememberMe     | boolean            | indicator if the session is persistent (remember me)                          |
 	 * +----------------+--------------------+-------------------------------------------------------------------------------+
 	 *
@@ -201,106 +201,112 @@ public class AccountTableApi extends CommonApiModule {
 		return res;
 	};
 
-	// /**
-	//  * # new [POST]
-	//  *
-	//  * Creates a new account in the table
-	//  *
-	//  * ## HTTP Request Parameters
-	//  *
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | Parameter Name  | Variable Type        | Description                                                                |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | meta            | {Object} Map<S, O>    | Meta object that represents this account                                   |
-	//  * | password        | String              | Password of new account                                                    |
-	//  * | username        | String                | Username of new account                                                    |
-	//  * | isGroup         | boolean (optional)    | whether this is a group object (defaults to false)                         |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  *
-	//  * ## JSON Object Output Parameters
-	//  *
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | Parameter Name  | Variable Type        | Description                                                                |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | accountID       | String                | account ID used                                                            |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | DataObject      | {Object}              | DataObject representing this account                                       |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | error           | String (Optional)     | Errors encountered if any                                                  |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  **/
-	// public ApiFunction new_account = (req, res) -> {
-	// 	// Only runs function if logged in, and valid group object
-	// 	boolean isGroup = req.getBoolean(IS_GROUP, false);
-	// 	String[] paramsToCheck = new String[] { USERNAME };
-	// 	res = check_parameters(paramsToCheck, req, res);
-	// 	if (res.get(ERROR) != null)
-	// 		return res;
-	// 	String userName = req.getString(USERNAME);
-	// 	String password = req.getString(PASSWORD);
-	// 	if (!isGroup && (password == null || password.isEmpty())) {
-	// 		res.put(ERROR, ERROR_NO_PASSWORD);
-	// 		return res;
-	// 	}
-	// 	Object metaObjRaw = req.get(META);
-	// 	Map<String, Object> givenMetaObj = new HashMap<String, Object>();
-	// 	if (metaObjRaw instanceof String) {
-	// 		String jsonMetaString = (String) metaObjRaw;
-	// 		if (jsonMetaString != null && !jsonMetaString.isEmpty()) {
-	// 			givenMetaObj = ConvertJSON.toMap(jsonMetaString);
-	// 		}
-	// 	}
-	//
-	// 	// Check if email is in use
-	// 	if (givenMetaObj.get(PROPERTIES_EMAIL) != null) {
-	// 		if (table.isEmailExist(givenMetaObj.get(PROPERTIES_EMAIL).toString())) {
-	// 			res.put(ERROR, ERROR_EMAIL_EXISTS);
-	// 			return res;
-	// 		}
-	// 	}
-	// 	AccountObject newAccount = table.newEntry(userName);
-	// 	// Create new account
-	// 	if (newAccount != null) {
-	// 		// Check is it group
-	// 		if (isGroup) {
-	// 			newAccount.setGroupStatus(true);
-	// 			boolean defaultRoles = req.getBoolean(DEFAULT_ROLES, true);
-	// 			List<String> list = req.getList(ROLE, null);
-	// 			// Set roles
-	// 			if (defaultRoles || list == null) {
-	// 				newAccount.setMembershipRoles(table.defaultMembershipRoles());
-	// 			} else {
-	// 				newAccount.setMembershipRoles(list);
-	// 			}
-	// 			// Add the user who create the group as the admin
-	// 			AccountObject firstAdmin = table.getRequestUser(req.getHttpServletRequest(), null);
-	// 			if (firstAdmin != null) // Set the creator as the admin
-	// 				newAccount.setMember(firstAdmin, "admin");
-	// 		}
-	// 		// Set email as login ID as well
-	// 		if (givenMetaObj.get(PROPERTIES_EMAIL) != null
-	// 			&& isEmailFormat(givenMetaObj.get(PROPERTIES_EMAIL).toString()))
-	// 			newAccount.setLoginID(givenMetaObj.get(PROPERTIES_EMAIL).toString());
-	//
-	// 		newAccount.setPassword(password);
-	// 		newAccount.putAll(givenMetaObj);
-	// 		newAccount.saveAll();
-	//
-	// 		res.put(META, newAccount);
-	// 		res.put(ACCOUNT_ID, newAccount._oid());
-	// 	} else {
-	// 		// Account already exists
-	// 		AccountObject existingAccount = table.getFromLoginName(userName);
-	// 		if (existingAccount != null) {
-	// 			res.put(ACCOUNT_ID, existingAccount._oid());
-	// 		} else {
-	// 			res.put(ACCOUNT_ID, null);
-	// 		}
-	// 		res.put(ERROR, "Object already exists in account Table");
-	// 	}
-	// 	return res;
-	// };
-	//
+	/**
+	 * # new [POST]
+	 *
+	 * Creates a new account in the table
+	 *
+	 * ## HTTP Request Parameters
+	 *
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type         | Description                                                                |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | data            | {Object} Map<S, O>    | Meta object that represents this account                                   |
+	 * | password        | String                | Password of new account                                                    |
+	 * | loginName       | String                | Username of new account                                                    |
+	 * | isGroup         | boolean (optional)    | whether this is a group object (defaults to false)                         |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 *
+	 * ## JSON Object Output Parameters
+	 *
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type         | Description                                                                |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | result          | String                | account ID used                                                            |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | data            | {Object}              | DataObject representing this account                                       |
+	 * | loginNameList   | String[]              | array of account names representing the user                               |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | error           | String (Optional)     | Errors encountered if any                                                  |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 **/
+	public ApiFunction new_account = (req, res) -> {
+		// Only runs function if logged in, and valid group object
+		boolean isGroup = req.getBoolean(IS_GROUP, false);
+		String[] paramsToCheck = new String[] { LOGINNAME };
+		res = check_parameters(paramsToCheck, req, res);
+		if (res.get(ERROR) != null){
+			return res;
+		}
+		String loginName = req.getString(LOGINNAME);
+		String password = req.getString(PASSWORD);
+		if (!isGroup && (password == null || password.isEmpty())) {
+			res.put(ERROR, ERROR_NO_PASSWORD);
+			return res;
+		}
+		Object metaObjRaw = req.get(DATA);
+		Map<String, Object> givenMetaObj = new HashMap<String, Object>();
+		if (metaObjRaw instanceof String) {
+			String jsonMetaString = (String) metaObjRaw;
+			if (jsonMetaString != null && !jsonMetaString.isEmpty()) {
+				givenMetaObj = ConvertJSON.toMap(jsonMetaString);
+			}
+		}
+		// Check if it email is filled in if creating user
+		String email = req.getString(EMAIL, "");
+		if (!isGroup && email.isEmpty() && !isTesting){
+			res.put(ERROR, ERROR_NO_EMAIL);
+			return res;
+		}
+		// Check if email is in use
+		if (!isGroup && table.isEmailExist(email)) {
+			res.put(ERROR, ERROR_EMAIL_EXISTS);
+			return res;
+		}
+
+		AccountObject newAccount = table.newEntry(loginName);
+		// Create new account
+		if (newAccount != null) {
+			// Check is it group
+			if (isGroup) {
+				newAccount.setGroupStatus(true);
+				boolean defaultRoles = req.getBoolean(DEFAULT_ROLES, true);
+				List<String> list = req.getList(ROLE, null);
+				// Set roles
+				if (defaultRoles || list == null) {
+					newAccount.setMembershipRoles(table.defaultMembershipRoles());
+				} else {
+					newAccount.setMembershipRoles(list);
+				}
+				// Add the user who create the group as the admin
+				AccountObject firstAdmin = table.getRequestUser(req.getHttpServletRequest(), null);
+				if (firstAdmin != null) // Set the creator as the admin
+					newAccount.setMember(firstAdmin, "admin");
+			}
+			// Set email as login ID as well
+			if (givenMetaObj.get(PROPERTIES_EMAIL) != null
+				&& isEmailFormat(givenMetaObj.get(PROPERTIES_EMAIL).toString()))
+				newAccount.setLoginID(givenMetaObj.get(PROPERTIES_EMAIL).toString());
+
+			newAccount.setPassword(password);
+			newAccount.putAll(givenMetaObj);
+			newAccount.saveAll();
+
+			res.put(DATA, newAccount);
+			res.put(ACCOUNT_ID, newAccount._oid());
+		} else {
+			// Account already exists
+			AccountObject existingAccount = table.getFromLoginName(loginName);
+			if (existingAccount != null) {
+				res.put(ACCOUNT_ID, existingAccount._oid());
+			} else {
+				res.put(ACCOUNT_ID, null);
+			}
+			res.put(ERROR, "Object already exists in account Table");
+		}
+		return res;
+	};
+
 	// /**
 	//  * # groupRoles
 	//  *
@@ -433,7 +439,7 @@ public class AccountTableApi extends CommonApiModule {
 	// 	}
 	//
 	// 	DataObject groupResult = group.addNewMembershipRole(role);
-	// 	res.put(META, groupResult);
+	// 	res.put(DATA, groupResult);
 	// 	return res;
 	// };
 	//
@@ -478,7 +484,7 @@ public class AccountTableApi extends CommonApiModule {
 	// 	if (groupResult == null) {
 	// 		res.put(ERROR, "No such role is found.");
 	// 	} else {
-	// 		res.put(META, groupResult);
+	// 		res.put(DATA, groupResult);
 	// 	}
 	//
 	// 	return res;
@@ -731,7 +737,7 @@ public class AccountTableApi extends CommonApiModule {
 	// 	if (groupResult == null) {
 	// 		res.put(ERROR, ERROR_NOT_IN_GROUP_OR_ROLE);
 	// 	} else {
-	// 		res.put(META, groupResult);
+	// 		res.put(DATA, groupResult);
 	// 	}
 	// 	return res;
 	// };
@@ -775,12 +781,12 @@ public class AccountTableApi extends CommonApiModule {
 	// 		return res;
 	// 	}
 	//
-	// 	String[] paramsToCheck = new String[] { GROUP_ID, META };
+	// 	String[] paramsToCheck = new String[] { GROUP_ID, DATA };
 	// 	res = check_parameters(paramsToCheck, req, res);
 	// 	if (res.get(ERROR) != null)
 	// 		return res;
 	// 	String groupID = req.getString(GROUP_ID);
-	// 	Object metaObjRaw = req.get(META);
+	// 	Object metaObjRaw = req.get(DATA);
 	//
 	// 	AccountObject group = table.get(groupID);
 	// 	if (group == null) {
@@ -802,7 +808,7 @@ public class AccountTableApi extends CommonApiModule {
 	// 		currentMemberMeta.saveDelta();
 	// 	}
 	// 	res.put(ACCOUNT_ID, ao._oid());
-	// 	res.put(META, metaObj);
+	// 	res.put(DATA, metaObj);
 	// 	res.put(UPDATE_MODE, updateMode);
 	// 	res.put(SUCCESS, true);
 	//
@@ -1037,11 +1043,11 @@ public class AccountTableApi extends CommonApiModule {
 	// 		return res;
 	// 	}
 	//
-	// 	String[] paramsToCheck = new String[] { META };
+	// 	String[] paramsToCheck = new String[] { DATA };
 	// 	res = check_parameters(paramsToCheck, req, res);
 	// 	if (res.get(ERROR) != null)
 	// 		return res;
-	// 	Object metaObjRaw = req.getStringMap(META);
+	// 	Object metaObjRaw = req.getStringMap(DATA);
 	// 	String updateMode = req.getString(UPDATE_MODE, "delta");
 	// 	Map<String, Object> metaObj = ConvertJSON.toMap(ConvertJSON.fromObject(metaObjRaw));
 	// 	updateMode = ( !updateMode.equalsIgnoreCase("full") ) ? "delta" : updateMode;
@@ -1052,7 +1058,7 @@ public class AccountTableApi extends CommonApiModule {
 	// 		ao.saveDelta();
 	// 	}
 	// 	res.put(ACCOUNT_ID, ao._oid());
-	// 	res.put(META, metaObj);
+	// 	res.put(DATA, metaObj);
 	// 	res.put(UPDATE_MODE, updateMode);
 	// 	res.put(SUCCESS, true);
 	//
@@ -1174,7 +1180,7 @@ public class AccountTableApi extends CommonApiModule {
 	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	//  **/
 	// protected ApiFunction account_info_by_Name = (req, res) -> {
-	// 	String userName = req.getString(USERNAME, "");
+	// 	String userName = req.getString(LOGINNAME, "");
 	// 	AccountObject ao = (!userName.isEmpty()) ? table.getFromLoginName(userName) : table
 	// 		.getRequestUser(req.getHttpServletRequest(), null);
 	// 	if (ao == null) {
@@ -1315,9 +1321,9 @@ public class AccountTableApi extends CommonApiModule {
 		builder.put(path + API_ACCOUNT_LOGIN, login); // Tested
 		// builder.put(path + API_ACCOUNT_LOCKTIME, lockTime); // Tested
 		builder.put(path + API_ACCOUNT_LOGOUT, logout); // Tested
-		// builder.put(path + API_ACCOUNT_NEW, new_account); // Tested
+		builder.put(path + API_ACCOUNT_NEW, new_account); // Tested
 		// builder.put(path + API_ACCOUNT_PASS_RESET, reset_password); // Tested
-		// builder.put(path + API_ACCOUNT_INFO_NAME, account_info_by_Name); // Tested
+		builder.put(path + API_ACCOUNT_INFO, account_info_by_Name); // Tested
 		// builder.put(path + API_ACCOUNT_INFO_ID, account_info_by_ID); // Tested
 		// builder.put(path + API_ACCOUNT_ADMIN_REMOVE, delete_user_account); // Tested
 		// builder.put(path + API_ACCOUNT_ADMIN_GET_U_G_LIST, get_user_or_group_list); // Tested
@@ -1604,7 +1610,7 @@ public class AccountTableApi extends CommonApiModule {
 				case LOGINNAME :
 					value = req.getString(paramName, "");
 					if ( value.isEmpty() )
-						res.put(ERROR, ERROR_NO_USERNAME);
+						res.put(ERROR, ERROR_NO_LOGINNAME);
 					break;
 				case PASSWORD :
 					value = req.getString(paramName, "");
@@ -1631,7 +1637,7 @@ public class AccountTableApi extends CommonApiModule {
 					if ( value.isEmpty() )
 						res.put(ERROR, ERROR_NO_GROUPNAME);
 					break;
-				case META :
+				case DATA :
 					Object metaObj = req.get(paramName);
 					if ( metaObj == null )
 						res.put(ERROR, ERROR_NO_META);

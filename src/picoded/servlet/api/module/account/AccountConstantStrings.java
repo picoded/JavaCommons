@@ -18,7 +18,7 @@ public class AccountConstantStrings {
 	public static final String GROUP_ID = "groupID";
 	public static final String IS_GROUP = "isGroup";
 	public static final String HEADERS = "headers";
-	public static final String META = "meta";
+	public static final String DATA = "data";
 	public static final String ROLE = "role";
 	public static final String USER_ID = "userID";
 	public static final String UPDATE_MODE = "updateMode";
@@ -44,7 +44,6 @@ public class AccountConstantStrings {
 	public static final String RECORDS_FILTERED = "recordsFiltered";
 	public static final String SUCCESS = "success";
 	// Data List Return Variables
-	public static final String DATA = "data";
 	public static final String LOGIN_NAME_LIST = "loginNameList";
 	public static final String LIST = "list";
 	public static final String FAIL_REMOVE = "failToRemove";
@@ -72,7 +71,7 @@ public class AccountConstantStrings {
 	public static final String ERROR_NO_GROUP_ID = "No groupID is found.";
 	public static final String ERROR_NO_GROUPNAME = "No groupname is found.";
 	public static final String ERROR_NOT_GROUP = "This is not a group.";
-	public static final String ERROR_NO_USERNAME = "No username is found.";
+	public static final String ERROR_NO_LOGINNAME = "No loginname is found.";
 	public static final String ERROR_NO_PASSWORD = "No password is found.";
 	public static final String ERROR_NO_LOGIN_PASSWORD = "Missing login password.";
 	public static final String ERROR_NO_LOGIN_ID = "Missing login ID.";

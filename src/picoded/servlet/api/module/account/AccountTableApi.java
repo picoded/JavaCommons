@@ -1291,7 +1291,6 @@ public class AccountTableApi extends CommonApiModule {
 		// builder.put(path + API_ACCOUNT_INFO_ID, account_info_by_ID); // Tested
 		// builder.put(path + API_ACCOUNT_ADMIN_REMOVE, delete_user_account); // Tested
 		// builder.put(path + API_ACCOUNT_ADMIN_GET_U_G_LIST, get_user_or_group_list); // Tested
-		// builder.put(path + API_ACCOUNT_UPDATE_U_INFO, update_current_user_info);
 		//
 		// //Group functionalities
 		// builder.put(path + API_GROUP_GRP_ROLES, groupRoles); // Tested

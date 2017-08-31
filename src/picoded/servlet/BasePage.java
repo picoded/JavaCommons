@@ -3,6 +3,7 @@ package picoded.servlet;
 import java.util.*;
 import java.io.IOException;
 import picoded.dstack.module.account.*;
+import picoded.servlet.api.module.account.*;
 import picoded.dstack.*;
 
 /**
@@ -11,7 +12,12 @@ import picoded.dstack.*;
 public class BasePage extends DStackPage {
 
 	protected AccountTable _accountTable = null;
-
+	@Override
+	public void doSharedSetup() throws Exception {
+		super.doSharedSetup();
+		AccountTableApi ata = new AccountTableApi(DStack().getAccountTable("account"));
+		ata.apiSetup(this.apiBuilder(), "");
+	}
 	@Override
 	public void initializeContext() throws Exception {
 		super.initializeContext();

@@ -16,6 +16,7 @@ import picoded.core.conv.ConvertJSON;
 
 import picoded.servlet.api.ApiVersionSet.ApiFunctionType;
 import static picoded.servlet.api.module.account.AccountConstantStrings.*;
+import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
 
 /**
  * ApiBuilder is a utility class, in which facilitates the building of modern JSON pure API's.

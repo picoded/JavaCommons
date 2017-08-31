@@ -19,6 +19,7 @@ import picoded.core.struct.GenericConvertMap;
 import picoded.core.struct.GenericConvertHashMap;
 
 import static picoded.servlet.api.module.account.AccountConstantStrings.*;
+import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
 
 /**
  * Account table API builder

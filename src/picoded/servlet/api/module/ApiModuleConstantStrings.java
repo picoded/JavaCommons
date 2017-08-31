@@ -7,4 +7,5 @@ public class ApiModuleConstantStrings {
 	public static final String ERROR = "ERROR";
 	public static final String STRING_ESCAPE = "stringEscape";
 	public static final String STRING_ESCAPE_AFTER_FILTER = "stringEscapeAfterFilter";
+	public static final String INFO = "INFO";
 }

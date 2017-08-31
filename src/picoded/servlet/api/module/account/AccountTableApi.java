@@ -13,6 +13,7 @@ import java.util.function.BiFunction;
 import picoded.core.struct.GenericConvertMap;
 import picoded.core.struct.GenericConvertHashMap;
 import static picoded.servlet.api.module.account.AccountConstantStrings.*;
+import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
 import picoded.core.common.SystemSetupInterface;
 
 /**
@@ -71,7 +72,8 @@ public class AccountTableApi extends CommonApiModule {
 	 * +----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | Parameter Name | Variable Type      | Description                                                                   |
 	 * +----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | isLogin        | boolean            | indicator if the session is logged in or not                                  |
+	 * | result         | boolean            | indicator if the session is logged in or not                                  |
+	 * | isSuperUser    | boolean            | indicator if the user is a superuser or not                                   |
 	 * | accountID      | String             | account id of the session                                                     |
 	 * | loginNameList  | String[]           | array of account names representing the session                               |
 	 * | rememberMe     | boolean            | indicator if the session is persistent (remember me)                          |
@@ -84,7 +86,7 @@ public class AccountTableApi extends CommonApiModule {
 		// Setup default (failed) login
 		res.put(ACCOUNT_ID, null);
 		res.put(LOGIN_NAME_LIST, null);
-		res.put(IS_LOGIN, false);
+		res.put(RESULT, false);
 		res.put(REMEMBER_ME, false);
 
 		// Get the login parameters
@@ -101,7 +103,7 @@ public class AccountTableApi extends CommonApiModule {
 				res.put(ERROR, ERROR_NO_USER);
 				return res;
 			}
-			res.put(IS_LOGIN, true);
+			res.put(RESULT, true);
 			res.put(REMEMBER_ME, rememberMe);
 			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(currentUser, true);
 			res.putAll(commonInfo);
@@ -140,7 +142,7 @@ public class AccountTableApi extends CommonApiModule {
 			// Reset any failed login attempts
 			ao.resetLoginThrottle(loginID);
 			// If ao is not null, it assumes a valid login
-			res.put(IS_LOGIN, true);
+			res.put(RESULT, true);
 			res.put(REMEMBER_ME, rememberMe);
 			res.put(ACCOUNT_ID, ao._oid());
 			// Extract Common Info from user account object
@@ -163,42 +165,42 @@ public class AccountTableApi extends CommonApiModule {
 
 		return res;
 	};
-	//
-	// /**
-	//  * # logout (GET)
-	//  *
-	//  * The logout GET function, used to logout the current browser session
-	//  *
-	//  * ## HTTP Request Parameters
-	//  *
-	//  * +----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | Parameter Name | Variable Type      | Description                                                                   |
-	//  * +----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | No parameters options                                                                                               |
-	//  * +----------------+--------------------+-------------------------------------------------------------------------------+
-	//  *
-	//  * ## JSON Object Output Parameters
-	//  *
-	//  * +----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | Parameter Name | Variable Type      | Description                                                                   |
-	//  * +----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | return         | boolean            | indicator if logout is successful or not                                      |
-	//  * +----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | error          | String (Optional)  | Errors encountered if any                                                     |
-	//  * +----------------+--------------------+-------------------------------------------------------------------------------+
-	//  **/
-	// protected ApiFunction logout = (req, res) -> {
-	// 	res.put(RETURN, false);
-	//
-	// 	if (req.getHttpServletRequest() != null) {
-	// 		res.put(RETURN,
-	// 			table.logoutAccount(req.getHttpServletRequest(), res.getHttpServletResponse()));
-	// 	} else {
-	// 		res.put(ERROR, MISSING_REQUEST_PAGE);
-	// 	}
-	// 	return res;
-	// };
-	//
+
+	/**
+	 * # logout (GET)
+	 *
+	 * The logout GET function, used to logout the current browser session
+	 *
+	 * ## HTTP Request Parameters
+	 *
+	 * +----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | Parameter Name | Variable Type      | Description                                                                   |
+	 * +----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | No parameters options                                                                                               |
+	 * +----------------+--------------------+-------------------------------------------------------------------------------+
+	 *
+	 * ## JSON Object Output Parameters
+	 *
+	 * +----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | Parameter Name | Variable Type      | Description                                                                   |
+	 * +----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | result         | boolean            | indicator if logout is successful or not                                      |
+	 * +----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | error          | String (Optional)  | Errors encountered if any                                                     |
+	 * +----------------+--------------------+-------------------------------------------------------------------------------+
+	 **/
+	protected ApiFunction logout = (req, res) -> {
+		res.put(RESULT, false);
+
+		if (req.getHttpServletRequest() != null) {
+			res.put(RESULT,
+				table.logoutAccount(req.getHttpServletRequest(), res.getHttpServletResponse()));
+		} else {
+			res.put(ERROR, MISSING_REQUEST_PAGE);
+		}
+		return res;
+	};
+
 	// /**
 	//  * # new [POST]
 	//  *
@@ -1312,7 +1314,7 @@ public class AccountTableApi extends CommonApiModule {
 	public void apiSetup(ApiBuilder builder, String path) {
 		builder.put(path + API_ACCOUNT_LOGIN, login); // Tested
 		// builder.put(path + API_ACCOUNT_LOCKTIME, lockTime); // Tested
-		// builder.put(path + API_ACCOUNT_LOGOUT, logout); // Tested
+		builder.put(path + API_ACCOUNT_LOGOUT, logout); // Tested
 		// builder.put(path + API_ACCOUNT_NEW, new_account); // Tested
 		// builder.put(path + API_ACCOUNT_PASS_RESET, reset_password); // Tested
 		// builder.put(path + API_ACCOUNT_INFO_NAME, account_info_by_Name); // Tested

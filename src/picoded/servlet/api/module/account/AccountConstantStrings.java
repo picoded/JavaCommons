@@ -36,7 +36,6 @@ public class AccountConstantStrings {
 
 	/// Static RESPONSE VARS
 	// Single Value/Object Variables
-	public static final String ERROR = "ERROR";
 	public static final String RETURN = "return";
 	public static final String SINGLE_RETURN_VALUE = "single";
 	public static final String IS_LOGIN = "isLogin";

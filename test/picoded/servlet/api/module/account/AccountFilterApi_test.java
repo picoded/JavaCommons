@@ -1180,7 +1180,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 	// 	/// End of Preparation before commencement of Test
 	// 	/// -----------------------------------------
 	// 	// 1st Test: Non logged in users
-	// 	ts.setURL(API_ACCOUNT_INFO_NAME);
+	// 	ts.setURL(API_ACCOUNT_INFO);
 	// 	params.clear();
 	// 	params.put(USERNAME, "infoName1@mailawer.com");
 	// 	ts.setAndExecuteGTC(params, ERROR_NO_PRIVILEGES, ERROR);

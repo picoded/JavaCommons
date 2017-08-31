@@ -1249,78 +1249,124 @@ public class AccountTableApi_test extends ApiModule_test {
 	// 	ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
 	// }
 	//
-	// @Test
-	// public void getInfoByName() {
-	// 	GenericConvertMap<String, Object> res = null;
-	// 	/// -----------------------------------------
-	// 	/// Preparation before commencement of Test
-	// 	/// -----------------------------------------
-	// 	Map<String, Object> params = new HashMap<String, Object>();
-	// 	List<String> userID = new ArrayList<String>();
-	// 	// Ensure that there is an existing user
-	// 	params.clear();
-	// 	params.put(LOGINNAME, "infoName");
-	// 	params.put(PASSWORD, "password");
-	// 	res = requestJSON(API_ACCOUNT_NEW, params);
-	// 	assertNull("getInfoByNameTest: Something wrong in adding user.", res.get(ERROR));
-	// 	userID.add(res.getString(ACCOUNT_ID));
-	//
-	// 	/// -----------------------------------------
-	// 	/// End of Preparation before commencement of Test
-	// 	/// -----------------------------------------
-	// 	// 1st Test: Empty Submission
-	// 	TestSet ts = new TestSet(null, API_ACCOUNT_INFO_NAME, ERROR_NO_USER, ERROR);
-	// 	ts.executeGenericTestCase();
-	// 	// 2nd Test: Invalid username
-	// 	params.clear();
-	// 	params.put(LOGINNAME, "randomName");
-	// 	ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
-	// 	// 3rd Test: Valid username
-	// 	params.clear();
-	// 	params.put(LOGINNAME, "infoName");
-	// 	ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
-	// 	// 4th Test: No user ID, user logged in
-	// 	ts.loginUser("infoName", "password");
-	// 	params.clear();
-	// 	ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
-	// }
-	//
-	// @Test
-	// public void getInfoByID() {
-	// 	GenericConvertMap<String, Object> res = null;
-	// 	/// -----------------------------------------
-	// 	/// Preparation before commencement of Test
-	// 	/// -----------------------------------------
-	// 	Map<String, Object> params = new HashMap<String, Object>();
-	// 	List<String> userID = new ArrayList<String>();
-	// 	// Ensure that there is an existing user
-	// 	params.clear();
-	// 	params.put(LOGINNAME, "infoID");
-	// 	params.put(PASSWORD, "password");
-	// 	res = requestJSON(API_ACCOUNT_NEW, params);
-	// 	assertNull("getInfoByIDTest: Something wrong in adding user.", res.get(ERROR));
-	// 	userID.add(res.getString(ACCOUNT_ID));
-	//
-	// 	/// -----------------------------------------
-	// 	/// End of Preparation before commencement of Test
-	// 	/// -----------------------------------------
-	// 	// 1st Test: Empty Submission
-	// 	TestSet ts = new TestSet(null, API_ACCOUNT_INFO_ID, ERROR_NO_USER, ERROR);
-	// 	ts.executeGenericTestCase();
-	// 	// 2nd Test: Invalid userID
-	// 	params.clear();
-	// 	params.put(USER_ID, "randomID");
-	// 	ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
-	// 	// 3rd Test: Valid ID
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
-	// 	// 4th Test: No user ID, user logged in
-	// 	ts.loginUser("infoID", "password");
-	// 	params.clear();
-	// 	ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
-	// 	ts.logout();
-	// }
+	@Test
+	public void getInfoByName() {
+		GenericConvertMap<String, Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		Map<String, Object> params = new HashMap<String, Object>();
+		List<String> userID = new ArrayList<String>();
+		// Ensure that there is an existing user
+		params.clear();
+		params.put(LOGINNAME, "infoName");
+		params.put(PASSWORD, "password");
+		res = requestJSON(API_ACCOUNT_NEW, params);
+		assertNull("getInfoByNameTest: Something wrong in adding user.", res.get(ERROR));
+		userID.add(res.getString(ACCOUNT_ID));
+
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+		// 1st Test: Empty Submission
+		TestSet ts = new TestSet(null, API_ACCOUNT_INFO, ERROR_NO_USER, ERROR);
+		ts.executeGenericTestCase();
+		// 2nd Test: Invalid username
+		params.clear();
+		params.put(LOGINNAME, "randomName");
+		ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
+		// 3rd Test: Valid username
+		params.clear();
+		params.put(LOGINNAME, "infoName");
+		ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
+		// 4th Test: No user ID, user logged in
+		ts.loginUser("infoName", "password");
+		params.clear();
+		ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
+	}
+
+	@Test
+	public void getInfoByID() {
+		GenericConvertMap<String, Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		Map<String, Object> params = new HashMap<String, Object>();
+		List<String> userID = new ArrayList<String>();
+		// Ensure that there is an existing user
+		params.clear();
+		params.put(LOGINNAME, "infoID");
+		params.put(PASSWORD, "password");
+		res = requestJSON(API_ACCOUNT_NEW, params);
+		assertNull("getInfoByIDTest: Something wrong in adding user.", res.get(ERROR));
+		userID.add(res.getString(ACCOUNT_ID));
+
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+		// 1st Test: Empty Submission
+		TestSet ts = new TestSet(null, API_ACCOUNT_INFO, ERROR_NO_USER, ERROR);
+		ts.executeGenericTestCase();
+		// 2nd Test: Invalid userID
+		params.clear();
+		params.put(ACCOUNT_ID, "randomID");
+		ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
+		// 3rd Test: Valid ID
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
+		// 4th Test: No user ID, user logged in
+		ts.loginUser("infoID", "password");
+		params.clear();
+		ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
+		ts.logout();
+	}
+
+	@Test
+	public void updateUserInfo() {
+		GenericConvertMap<String, Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		Map<String, Object> params = new HashMap<String, Object>();
+		List<String> userID = new ArrayList<String>();
+		// Ensure that there is an existing user
+		params.clear();
+		params.put(LOGINNAME, "updateUser");
+		params.put(PASSWORD, "password");
+		res = requestJSON(API_ACCOUNT_NEW, params);
+		assertNull("updateUserInfoTest: Something wrong in adding user.", res.get(ERROR));
+		userID.add(res.getString(ACCOUNT_ID));
+
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+		// 1st Test: Empty Submission
+		TestSet ts = new TestSet(null, API_ACCOUNT_INFO, ERROR_NO_USER, ERROR);
+		ts.executeGenericTestCase();
+		// 2nd Test: Invalid accountID
+		params.clear();
+		params.put(ACCOUNT_ID, "randomID");
+		ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
+		// 3rd Test: Valid ID
+		Map<String, Object> data = new HashMap<>();
+		data.put("wassup", "hi");
+		data.put("email", "jaja@lol.com");
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		params.put(DATA, data);
+		ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
+		res = GenericConvert.toGenericConvertStringMap(ConvertJSON.fromObject(ts.getRes()));
+		res = GenericConvert.toGenericConvertStringMap(res.getStringMap(RESULT));
+		System.out.println(ConvertJSON.fromObject(res));
+		assertTrue(res.getString("email").equalsIgnoreCase("jaja@lol.com"));
+		// 4th Test: No user ID, user logged in
+		ts.loginUser("updateUser", "password");
+		params.clear();
+		ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
+		ts.logout();
+	}
+
 	//
 	// // builder.put(path+API_GROUP_GET_LIST_GRP_ID_MEM, getListOfGroupIDOfMember);
 	// @Test
@@ -1619,6 +1665,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		private String url = "";
 		private Object expectedResult = "";
 		private String resultToGetFrom = "";
+		GenericConvertMap<String, Object> res = null;
 
 		public TestSet(Map<String, Object> params, String url, Object expectedResult,
 			String resultToGetFrom) {
@@ -1648,21 +1695,22 @@ public class AccountTableApi_test extends ApiModule_test {
 			return resultToGetFrom;
 		}
 
+		public GenericConvertMap<String, Object> getRes(){
+			return res;
+		}
+
 		public void executeGenericTestCase() {
-			GenericConvertMap<String, Object> res = null;
 			res = requestJSON(url, params);
 			assertEquals(expectedResult, res.get(resultToGetFrom));
 		}
 
 		public void executeListTestCase(String errorMsg) {
-			GenericConvertMap<String, Object> res = null;
 			res = requestJSON(url, params);
 			List<Object> result = ConvertJSON.toList(ConvertJSON.fromObject(expectedResult));
 			assertThat(errorMsg, res.getList(resultToGetFrom), containsInAnyOrder(result.toArray()));
 		}
 
 		public void executeTrueTestCase() {
-			GenericConvertMap<String, Object> res = null;
 			res = requestJSON(url, params);
 			List<Object> result = ConvertJSON.toList(ConvertJSON.fromObject(res.get(DATA)));
 			assertTrue(result.size() > 0);

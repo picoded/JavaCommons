@@ -20,12 +20,12 @@ public class AccountConstantStrings {
 	public static final String HEADERS = "headers";
 	public static final String DATA = "data";
 	public static final String ROLE = "role";
-	public static final String USER_ID = "userID";
 	public static final String UPDATE_MODE = "updateMode";
 	public static final String OLD_PASSWORD = "oldPass";
 	public static final String REPEAT_PASSWORD = "repeatPass";
 	public static final String NEW_PASSWORD = "newPass";
 	public static final String NAME = "name";
+	public static final String UPDATE = "update";
 
 	// Rancher VARS
 	public static final String EMAIL = "email";
@@ -121,8 +121,7 @@ public class AccountConstantStrings {
 	public static final String API_ACCOUNT_LOGOUT = "account/logout";
 	public static final String API_ACCOUNT_NEW = "account/new";
 	public static final String API_ACCOUNT_PASS_RESET = "account/do_password_reset";
-	public static final String API_ACCOUNT_INFO_NAME = "account/account_info_by_Name";
-	public static final String API_ACCOUNT_INFO_ID = "account/account_info_by_ID";
+	public static final String API_ACCOUNT_INFO = "account/info/get";
 	public static final String API_ACCOUNT_ADMIN_REMOVE = "account/admin/remove";
 	public static final String API_ACCOUNT_ADMIN_GET_U_G_LIST = "account/admin/get_user_or_group_list";
 	public static final String API_ACCOUNT_UPDATE_U_INFO = "account/update_current_user_info";

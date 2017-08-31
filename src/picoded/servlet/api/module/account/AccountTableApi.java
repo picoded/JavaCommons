@@ -1599,7 +1599,7 @@ public class AccountTableApi extends CommonApiModule {
 					if ( value.isEmpty() )
 						res.put(ERROR, ERROR_NO_USER_ID);
 					break;
-				case USERNAME :
+				case LOGINNAME :
 					value = req.getString(paramName, "");
 					if ( value.isEmpty() )
 						res.put(ERROR, ERROR_NO_USERNAME);

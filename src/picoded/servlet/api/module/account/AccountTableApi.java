@@ -33,7 +33,7 @@ public class AccountTableApi extends CommonApiModule {
 	public static final String MISSING_REQUEST_PAGE = "Unexpected Exception: Missing requestPage()";
 
 	public boolean isTesting = false;
-	private DataTableApi dataTableApi = null;
+	protected DataTableApi dataTableApi = null;
 
 	/**
 	 * Setup the account table api class
@@ -55,6 +55,12 @@ public class AccountTableApi extends CommonApiModule {
 	protected SystemSetupInterface[] internalSubsystemArray() {
 		return new SystemSetupInterface[] {};
 	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	//   Basic login, logout, and account creation
+	//
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * # $prefix/login
@@ -172,7 +178,7 @@ public class AccountTableApi extends CommonApiModule {
 	};
 
 	/**
-	 * # logout (GET)
+	 * # $prefix/logout
 	 *
 	 * The logout GET function, used to logout the current browser session
 	 *
@@ -207,7 +213,7 @@ public class AccountTableApi extends CommonApiModule {
 	};
 
 	/**
-	 * # new [POST]
+	 * # $prefix/new
 	 *
 	 * Creates a new account in the table
 	 *
@@ -290,8 +296,9 @@ public class AccountTableApi extends CommonApiModule {
 			}
 			// Set email as login ID as well
 			if (givenMetaObj.get(PROPERTIES_EMAIL) != null
-				&& isEmailFormat(givenMetaObj.get(PROPERTIES_EMAIL).toString()))
+				&& isEmailFormat(givenMetaObj.get(PROPERTIES_EMAIL).toString())) {
 				newAccount.setLoginID(givenMetaObj.get(PROPERTIES_EMAIL).toString());
+			}
 
 			newAccount.setPassword(password);
 			newAccount.putAll(givenMetaObj);
@@ -311,6 +318,20 @@ public class AccountTableApi extends CommonApiModule {
 		}
 		return res;
 	};
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	//   DataTable info proxy
+	//
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	//   Other stuff (to review)
+	//
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// /**
 	//  * # groupRoles
@@ -1074,7 +1095,7 @@ public class AccountTableApi extends CommonApiModule {
 
 		return res;
 	};
-	//
+	
 	// /**
 	//  * # delete_user_account
 	//  *

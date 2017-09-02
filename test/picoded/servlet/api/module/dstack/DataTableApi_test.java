@@ -23,13 +23,13 @@ import static picoded.servlet.api.module.account.AccountConstantStrings.*;
 
 /// Test the AccountTable API specifically
 public class DataTableApi_test extends ApiModule_test {
-	
+
 	//----------------------------------------------------------------------------------------
 	//
 	//  Test setup
 	//
 	//----------------------------------------------------------------------------------------
-	
+
 	/// The test servlet to use
 	public static class DataTableApiTestServlet extends ApiModuleTestServlet {
 		@Override
@@ -43,28 +43,22 @@ public class DataTableApi_test extends ApiModule_test {
 			return tableApi;
 		}
 	}
-	
+
 	public CorePage setupServlet() {
 		return new DataTableApiTestServlet();
 	}
-	
+
 	//----------------------------------------------------------------------------------------
 	//
 	//  Test running
 	//
 	//----------------------------------------------------------------------------------------
 	
-	public void checkResForError(GenericConvertMap<String, Object> res) {
-		assertNotNull(res);
-		assertNull(res.getString("ERROR"));
-		assertNull(res.getString("INFO"));
-	}
-
 	@Test
 	public void newGetSetGetTest() {
 		// Create a new object
 		GenericConvertMap<String, Object> res = requestJSON("data/new", "{ \"data\" : { \"zero\" : 1 } }");
-		checkResForError(res);
+		checkResultForError(res);
 		assertNotNull(res.getString("result"));
 
 		// Get the _oid value
@@ -72,7 +66,7 @@ public class DataTableApi_test extends ApiModule_test {
 
 		// Get the data
 		assertNotNull(res = requestJSON("data/get", "{ \"_oid\" : \""+oid+"\"}"));
-		checkResForError(res);
+		checkResultForError(res);
 
 		// Validate the data
 		assertEquals( oid, res.getString("_oid") );
@@ -81,11 +75,11 @@ public class DataTableApi_test extends ApiModule_test {
 
 		// Set and update the data
 		assertNotNull(res = requestJSON("data/set", "{ \"_oid\" : \""+oid+"\", \"data\": { \"zero\" : 2 } }"));
-		checkResForError(res);
+		checkResultForError(res);
 
 		// Get the updated data
 		assertNotNull(res = requestJSON("data/get", "{ \"_oid\" : \""+oid+"\"}"));
-		checkResForError(res);
+		checkResultForError(res);
 
 		// Validate the updated data
 		assertEquals( oid, res.getString("_oid") );
@@ -97,7 +91,7 @@ public class DataTableApi_test extends ApiModule_test {
 	public void basicListTest() {
 		// Get blank list
 		GenericConvertMap<String, Object> res = requestJSON("data/list", null);
-		checkResForError(res);
+		checkResultForError(res);
 		assertNotNull( res.getObjectArray("result") );
 		assertTrue( res.getObjectArray("result").length == 0);
 
@@ -106,24 +100,24 @@ public class DataTableApi_test extends ApiModule_test {
 
 		// Get a list of 1
 		res = requestJSON("data/list", null);
-		checkResForError(res);
+		checkResultForError(res);
 		assertNotNull( res.getObjectArray("result") );
 		assertTrue( res.getObjectArray("result").length == 1);
 	}
 
-	@Test 
+	@Test
 	public void keyNamesTest() {
 		// Generate an object
 		newGetSetGetTest();
 
 		// Get keyname
 		GenericConvertMap<String, Object> res = requestJSON("data/keyNames", null);
-		checkResForError(res);
+		checkResultForError(res);
 		assertNotNull( res.getObjectArray("result") );
-		
+
 		// Validate "zero" is in the keyname
 		assertTrue( res.getObjectArray("result").length >= 1);
 		assertTrue( Arrays.asList(res.getObjectArray("result")[0]).contains("zero") );
 	}
-	
+
 }

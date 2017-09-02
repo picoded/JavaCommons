@@ -7,13 +7,15 @@ import picoded.core.common.SystemSetupInterface;
 
 import java.util.*;
 
+import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
+
 /**
  * CommonApiModule further extends the standard API module, by adding several common features
  *
  * Mainly as followed
  * + StringEscape
  * + AccessFilter config
- * 
+ *
  **/
 abstract public class CommonApiModule extends AbstractApiModule {
 
@@ -29,7 +31,7 @@ abstract public class CommonApiModule extends AbstractApiModule {
 	 * This functionality can be refined via the config object
 	 */
 	protected void apiSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
-		if( config.getBoolean("stringEscapeAfterFilter", true) ) {
+		if( config.getBoolean(STRING_ESCAPE_AFTER_FILTER, true) ) {
 			api.after(prefixPath+"/*", stringEscapeAfterFilter);
 		}
 	}
@@ -64,7 +66,7 @@ abstract public class CommonApiModule extends AbstractApiModule {
 	 */
 	public ApiFunction stringEscapeAfterFilter = (req, res) -> {
 		// Get the desired chosen mode
-		boolean stringEscape = req.getBoolean("stringEscape", true);
+		boolean stringEscape = req.getBoolean(STRING_ESCAPE, true);
 
 		// Apply string escape if needed
 		if( stringEscape ) {
@@ -72,7 +74,7 @@ abstract public class CommonApiModule extends AbstractApiModule {
 		}
 
 		// Output the chosen mode, and result
-		res.put("stringEscape", stringEscape);
+		res.put(STRING_ESCAPE, stringEscape);
 		return res;
 	};
 }

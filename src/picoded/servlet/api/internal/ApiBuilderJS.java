@@ -10,7 +10,7 @@ import java.io.BufferedReader;
 import picoded.servlet.api.ApiBuilder;
 
 public class ApiBuilderJS {
-	
+
 	public static String getJsLib() {
 		Scanner scanner = null;
 		StringBuilder fileContents = new StringBuilder();
@@ -31,25 +31,26 @@ public class ApiBuilderJS {
 		}
 		return (fileContents == null) ? "" : fileContents.toString();
 	}
-	
+
 	/**
 	 * Method to generate the entire Javascript API file contents
 	 */
 	public static String generateApiJs(ApiBuilder builder, String hostpath) {
 		String versionStr = builder.versionStr();
-		
+
 		String generateJSScript = "var api = (function() {\n";
 		generateJSScript += getJsLib();
-		
 		generateJSScript += "\tapicore.baseURL(\"//" + hostpath + "/" + versionStr + "/\");\n"
 			+ "\tapicore.setEndpointMap({\n";
-		
+
 		// Generating endpoints
 		for (String endpoint : builder.keySet()) {
 			generateJSScript += "\t\t\"" + endpoint + "\" : [],\n";
 		}
-		int index = generateJSScript.lastIndexOf(",\n");
-		generateJSScript = generateJSScript.substring(0, index) + "\n";
+		// Add an empty endpoint for closing sake @TODO: fix this plox
+		generateJSScript += "\t\t\"\" : []\n";
+		// System.out.println(generateJSScript+"\n\n it is completed here "+index);
+		// generateJSScript = generateJSScript.substring(0, index) + "\n";
 		generateJSScript += "\t});\n" + "\treturn api;\n" + "})();\n";
 		return generateJSScript;
 	}

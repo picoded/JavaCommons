@@ -76,7 +76,7 @@ public class AccountTable_test {
 		assertNotNull(testAO._oid());
 		assertNotNull(testAT.get(testAO._oid()));
 		assertEquals(testAO._oid(), testAT.get(testAO._oid())._oid());
-		assertEquals(testAO._oid(), testAT.getFromLoginID("hello-world")._oid());
+		assertEquals(testAO._oid(), testAT.getFromLoginName("hello-world")._oid());
 		
 		// Removal test
 		testAO.remove(testAO);

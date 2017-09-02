@@ -11,13 +11,31 @@ import picoded.dstack.*;
  */
 public class BasePage extends DStackPage {
 
+	////////////////////////////////////////////////////////////////////////////
+	//
+	// Internal data structures and their API
+	//
+	////////////////////////////////////////////////////////////////////////////
+
+	// AccountTable 
 	protected AccountTable _accountTable = null;
+
+	// AccountTableAPI
+	protected AccountTableApi _accountTableAPi = null;
+
+	////////////////////////////////////////////////////////////////////////////
+	//
+	// Setup and auth
+	//
+	////////////////////////////////////////////////////////////////////////////
+
 	@Override
 	public void doSharedSetup() throws Exception {
 		super.doSharedSetup();
 		AccountTableApi ata = new AccountTableApi(DStack().getAccountTable("account"));
 		ata.apiSetup(this.apiBuilder(), "");
 	}
+
 	@Override
 	public void initializeContext() throws Exception {
 		super.initializeContext();
@@ -73,6 +91,8 @@ public class BasePage extends DStackPage {
 	// Current Account Methods
 	//
 	////////////////////////////////////////////////////////////////////////////
+
+	// Cache of the currentAccount, for quick reuse
 	private AccountObject _currentAccount = null;
 
 	/**
@@ -81,7 +101,6 @@ public class BasePage extends DStackPage {
 	 * @return AccountObject else null
 	 */
 	public AccountObject currentAccount() {
-
 		if (_currentAccount != null) {
 			return _currentAccount;
 		}
@@ -137,11 +156,9 @@ public class BasePage extends DStackPage {
 		String adminUser = dc.getString("sys.account.superUsers.rootUsername", "admin");
 		String adminPass = dc.getString("sys.account.superUsers.rootPassword", "P@ssw0rd!");
 		boolean resetPass = dc.getBoolean("sys.account.superUsers.rootPasswordReset", false);
-		Map<String, Object> meta = dc.getStringMap("sys.account.superUsers.meta",
-			new HashMap<String, Object>());
-		boolean resetMeta = dc.getBoolean("sys.account.superUsers.resetMeta", true);
-		List<String> superGrpMemberRoles = dc.getList("sys.account.superUsers.memberRoles",
-			at.defaultMembershipRoles());
+		Map<String, Object> meta = dc.getStringMap("sys.account.superUsers.data", "{}");
+		boolean resetMeta = dc.getBoolean("sys.account.superUsers.resetData", false);
+		List<String> superGrpMemberRoles = dc.getList("sys.account.superUsers.memberRoles", at.defaultMembershipRoles());
 
 		// Set up super user
 		AccountObject superUser = at.getFromLoginName(adminUser);

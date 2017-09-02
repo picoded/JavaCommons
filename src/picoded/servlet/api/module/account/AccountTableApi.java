@@ -373,7 +373,7 @@ public class AccountTableApi extends CommonApiModule {
 		defaultsCurrentAccountAsOID(req, res);
 		return dataTableApi.get.apply(req, res);
 	};
-	
+
 	/**
 	 * # $prefix/info/set
 	 *
@@ -413,7 +413,7 @@ public class AccountTableApi extends CommonApiModule {
 	protected ApiFunction info_list = (req, res) -> {
 		return dataTableApi.list.apply(req, res);
 	};
-	
+
 	/**
 	 * # $prefix/info/datatables
 	 * See: DataTableApi.list.datatables
@@ -421,7 +421,7 @@ public class AccountTableApi extends CommonApiModule {
 	protected ApiFunction info_list_datatables = (req, res) -> {
 		return dataTableApi.list.apply(req, res);
 	};
-	
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	//   Other stuff (to review)
@@ -936,66 +936,67 @@ public class AccountTableApi extends CommonApiModule {
 	// 	return res;
 	// };
 	//
-	// /**
-	//  * # reset_password
-	//  *
-	//  * Resets the password of the user/current member
-	//  *
-	//  * ## HTTP Request Parameters
-	//  *
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | Parameter Name  | Variable Type          | Description                                                                |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | userID          | String  (Optional)    | ID of the user/current user to retrieve                                     |
-	//  * | oldPassword      | String                | Old password of the user                                                   |
-	//  * | newPassword      | String                | New password of the user                                                   |
-	//  * | repeatPassword  | String                | Repeat new password of the user                                             |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  *
-	//  * ## JSON Object Output Parameters
-	//  *
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | Parameter Name  | Variable Type          | Description                                                                |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | accountID        | String                | ID of the user                                                             |
-	//  * | success          | boolean                | false for failed change and true for success                               |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  **/
-	// protected ApiFunction reset_password = (req, res) -> {
-	// 	res.put(SUCCESS, false);
-	// 	String userID = req.getString(USER_ID, "");
-	// 	AccountObject ao = (!userID.isEmpty()) ? table.get(userID) : table.getRequestUser(
-	// 		req.getHttpServletRequest(), null);
-	// 	if (ao == null) {
-	// 		res.put(ERROR, ERROR_NO_USER);
-	// 		return res;
-	// 	}
-	//
-	// 	String[] paramsToCheck = new String[] { OLD_PASSWORD, NEW_PASSWORD,
-	// 		REPEAT_PASSWORD };
-	// 	res = check_parameters(paramsToCheck, req, res);
-	// 	if (res.get(ERROR) != null)
-	// 		return res;
-	// 	String oldPassword = req.getString(OLD_PASSWORD);
-	// 	String newPassword = req.getString(NEW_PASSWORD);
-	// 	String repeatPassword = req.getString(REPEAT_PASSWORD);
-	//
-	// 	if (!newPassword.equals(repeatPassword)) {
-	// 		res.put(ERROR, ERROR_PASS_NOT_EQUAL);
-	// 		return res;
-	// 	}
-	// 	if (!ao.setPassword(newPassword, oldPassword)) {
-	// 		res.put(ERROR, ERROR_PASS_INCORRECT);
-	// 		return res;
-	// 	}
-	// 	res.put(SUCCESS, true);
-	// 	res.put(ACCOUNT_ID, ao._oid());
-	//
-	// 	return res;
-	// };
-	//
+	/**
+	 * # reset_password
+	 *
+	 * Resets the password of the user/current member
+	 *
+	 * ## HTTP Request Parameters
+	 *
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type          | Description                                                                |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | userID          | String  (Optional)    | ID of the user/current user to retrieve                                     |
+	 * | oldPassword      | String                | Old password of the user                                                   |
+	 * | newPassword      | String                | New password of the user                                                   |
+	 * | repeatPassword  | String                | Repeat new password of the user                                             |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 *
+	 * ## JSON Object Output Parameters
+	 *
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type          | Description                                                                |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | accountID        | String                | ID of the user                                                             |
+	 * | success          | boolean                | false for failed change and true for success                               |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 **/
+	protected ApiFunction reset_password = (req, res) -> {
+		res.put(SUCCESS, false);
+		String accountID = req.getString(ACCOUNT_ID, "");
+		AccountObject ao = (!accountID.isEmpty()) ? table.get(accountID) : table.getRequestUser(
+			req.getHttpServletRequest(), null);
+		if (ao == null) {
+			res.put(ERROR, ERROR_NO_USER);
+			return res;
+		}
+
+		String[] paramsToCheck = new String[] { OLD_PASSWORD, NEW_PASSWORD,
+			REPEAT_PASSWORD };
+		res = check_parameters(paramsToCheck, req, res);
+		if (res.get(ERROR) != null){
+			return res;
+		}
+		String oldPassword = req.getString(OLD_PASSWORD);
+		String newPassword = req.getString(NEW_PASSWORD);
+		String repeatPassword = req.getString(REPEAT_PASSWORD);
+
+		if (!newPassword.equals(repeatPassword)) {
+			res.put(ERROR, ERROR_PASS_NOT_EQUAL);
+			return res;
+		}
+		if (!ao.setPassword(newPassword, oldPassword)) {
+			res.put(ERROR, ERROR_PASS_INCORRECT);
+			return res;
+		}
+		res.put(SUCCESS, true);
+		res.put(ACCOUNT_ID, ao._oid());
+
+		return res;
+	};
+
 	// /**
 	//  * # get_user_or_group_list
 	//  *
@@ -1190,7 +1191,7 @@ public class AccountTableApi extends CommonApiModule {
 
 		return res;
 	};
-	
+
 	// /**
 	//  * # delete_user_account
 	//  *
@@ -1410,18 +1411,18 @@ public class AccountTableApi extends CommonApiModule {
 		builder.put(path + API_ACCOUNT_NEW, new_account); // Tested
 
 		// Account info get, set, list
-		builder.put(path + "info/get", info_get);
-		builder.put(path + "info/set", info_set);
-		builder.put(path + "info/list", info_list);
-		builder.put(path + "info/list/datatables", info_list_datatables);
+		builder.put(path + "account/info/get", info_get);
+		builder.put(path + "account/info/set", info_set);
+		builder.put(path + "account/info/list", info_list);
+		builder.put(path + "account/info/list/datatables", info_list_datatables);
 
 		// builder.put(path + API_ACCOUNT_LOCKTIME, lockTime); // Tested
-		// builder.put(path + API_ACCOUNT_PASS_RESET, reset_password); // Tested
-		
+		builder.put(path + API_ACCOUNT_PASS_RESET, reset_password); // Tested
+
 		// builder.put(path + API_ACCOUNT_INFO, account_info); // Tested
 		// builder.put(path + API_ACCOUNT_INFO_ID, account_info_by_ID); // Tested
 		// builder.put(path + API_ACCOUNT_ADMIN_REMOVE, delete_user_account); // Tested
-		// builder.put(path + API_ACCOUNT_LIST, dataTableApi.list); 
+		// builder.put(path + API_ACCOUNT_LIST, dataTableApi.list);
 		//
 		// //Group functionalities
 		// builder.put(path + API_GROUP_GRP_ROLES, groupRoles); // Tested

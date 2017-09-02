@@ -108,8 +108,8 @@ public class AccountTableApi extends CommonApiModule {
 
 		// Request to get info of user
 		if (accountID == null && loginID == null) {
-			// Get current user if any
-			AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), null);
+			// Get current user if any, http response is given to allow any update of the cookies if needed
+			AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), res.getHttpServletResponse());
 			if (currentUser == null) {
 				res.put(ERROR, ERROR_NO_USER);
 				return res;
@@ -325,8 +325,103 @@ public class AccountTableApi extends CommonApiModule {
 	//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	
+	/**
+	 * Utility function used to set the current account as _oid, for the api request
+	 * IF _oid is not set
+	 */
+	protected void defaultsCurrentAccountAsOID(ApiRequest req, ApiResponse res) {
+		// Only works if _oid is null
+		if( req.getString("_oid") == null ) {
+			// Get the current user
+			AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), null);
 
+			// If current user is null, halt and throw an error
+			if( currentUser == null ) {
+				res.put(ERROR, ERROR_NO_USER);
+			}
+
+			// Put user._oid as _oid
+			req.put("_oid", currentUser._oid());
+		}
+	}
+
+	/**
+	 * # $prefix/info/get
+	 *
+	 * Gets and return the data object
+	 *
+	 * ## HTTP Request Parameters
+	 *
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type      | Description                                                                   |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | _oid            | String             | object ID used to retrieve the data object. Default to login user.            |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 *
+	 * ## JSON Object Output Parameters
+	 *
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type      | Description                                                                   |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | _oid            | String             | The internal object ID used                                                   |
+	 * | result          | {Object}           | Data object, if found                                                         |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | error           | String (Optional)  | Errors encounted if any                                                       |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 **/
+	protected ApiFunction info_get = (req, res) -> {
+		defaultsCurrentAccountAsOID(req, res);
+		return dataTableApi.get.apply(req, res);
+	};
+	
+	/**
+	 * # $prefix/info/set
+	 *
+	 * Update a data object
+	 *
+	 * ## HTTP Request Parameters
+	 *
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type	   | Description                                                                   |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | _oid            | String             | object ID used to retrieve the data object. Default to login user.            |
+	 * | data            | {Object}           | Data object, to apply update if found                                         |
+	 * | updateMode      | String (Optional)  | (Default) "delta" for only updating the given fields, or "full" for all       |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 *
+	 * ## JSON Object Output Parameters
+	 *
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type	   | Description                                                                   |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | _oid            | String             | The internal object ID used                                                   |
+	 * | result          | {Object}           | Data object, of changes, if applied                                           |
+	 * | updateMode      | String             | Update mode used                                                              |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 * | error           | String (Optional)  | Errors encounted if any                                                       |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
+	 **/
+	protected ApiFunction info_set = (req, res) -> {
+		defaultsCurrentAccountAsOID(req, res);
+		return dataTableApi.set.apply(req, res);
+	};
+
+	/**
+	 * # $prefix/info/list
+	 * See: DataTableApi.list
+	 **/
+	protected ApiFunction info_list = (req, res) -> {
+		return dataTableApi.list.apply(req, res);
+	};
+	
+	/**
+	 * # $prefix/info/datatables
+	 * See: DataTableApi.list.datatables
+	 **/
+	protected ApiFunction info_list_datatables = (req, res) -> {
+		return dataTableApi.list.apply(req, res);
+	};
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	//   Other stuff (to review)
@@ -1308,15 +1403,25 @@ public class AccountTableApi extends CommonApiModule {
 	 * @param  Path to assume
 	 **/
 	public void apiSetup(ApiBuilder builder, String path) {
+
+		// Basic new account, login, and logout
 		builder.put(path + API_ACCOUNT_LOGIN, login); // Tested
-		// builder.put(path + API_ACCOUNT_LOCKTIME, lockTime); // Tested
 		builder.put(path + API_ACCOUNT_LOGOUT, logout); // Tested
 		builder.put(path + API_ACCOUNT_NEW, new_account); // Tested
+
+		// Account info get, set, list
+		builder.put(path + "info/get", info_get);
+		builder.put(path + "info/set", info_set);
+		builder.put(path + "info/list", info_list);
+		builder.put(path + "info/list/datatables", info_list_datatables);
+
+		// builder.put(path + API_ACCOUNT_LOCKTIME, lockTime); // Tested
 		// builder.put(path + API_ACCOUNT_PASS_RESET, reset_password); // Tested
-		builder.put(path + API_ACCOUNT_INFO, account_info); // Tested
+		
+		// builder.put(path + API_ACCOUNT_INFO, account_info); // Tested
 		// builder.put(path + API_ACCOUNT_INFO_ID, account_info_by_ID); // Tested
 		// builder.put(path + API_ACCOUNT_ADMIN_REMOVE, delete_user_account); // Tested
-		builder.put(path + API_ACCOUNT_LIST, dataTableApi.list); 
+		// builder.put(path + API_ACCOUNT_LIST, dataTableApi.list); 
 		//
 		// //Group functionalities
 		// builder.put(path + API_GROUP_GRP_ROLES, groupRoles); // Tested

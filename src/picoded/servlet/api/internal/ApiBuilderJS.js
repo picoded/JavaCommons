@@ -96,7 +96,7 @@ if(apicore.isNodeJS()) {
 			for (var name in paramObj) {
 				if (paramObj.hasOwnProperty(name)) {
 					var val = paramObj[name];
-					if( val ... is obj / array ) {
+					if( val instanceof Array || val instanceof Object ) {
 						val = JSON.stringify(val)
 					}
 					formData.append(name, val);

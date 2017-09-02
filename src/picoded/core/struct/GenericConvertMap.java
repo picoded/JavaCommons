@@ -26,6 +26,25 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 		return ProxyGenericConvertMap.ensure(inMap);
 	}
 	
+	// Fallback if null, for native format
+	//---------------------------------------------------------------------------------------------------
+
+	/**
+	 * Map get function, with fallback
+	 *
+	 * @param key The input value key to convert
+	 * @param fallbck The fallback default (if not convertable, aka null)
+	 *
+	 * @return The converted string, always possible unless null
+	 **/
+	default V get(K key, V fallbck) {
+		V res = get(key);
+		if( res == null ) {
+			return fallbck;
+		}
+		return res;
+	}
+
 	// to string conversion
 	//---------------------------------------------------------------------------------------------------
 	

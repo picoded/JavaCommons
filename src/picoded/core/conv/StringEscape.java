@@ -1,6 +1,6 @@
 package picoded.core.conv;
 
-//import java.net.URLDecoder;
+import java.util.*;
 
 /**
  * Proxy to apache.commons.lang3.StringEscapeUtils. See its full documentation
@@ -116,4 +116,84 @@ public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 		}
 	}
 	
+	/**
+	 * Sanatizes HTML escape characters "<", ">", or "&" along with "\" escape
+	 * This covers most cases of HTML injection in a child html, but not as a property value
+	 *
+	 * @TODO : Optimize this as a single parse? because this function is called to sanatize almost every API request
+	 *
+	 * @param  Input string to sanatize
+	 *
+	 * @return Sanatized string
+	 **/
+	public static String commonHtmlEscapeCharacters(String input) {
+		String ret = input;
+
+		// This has to go first, before other escape
+		ret = ret.replaceAll("\\&", "&amp;");
+
+		// Common XML / HTML open close brackets
+		ret = ret.replaceAll("\\<", "&#60;");
+		ret = ret.replaceAll("\\>", "&#62;");
+		
+		//ret = ret.replaceAll("\\`", "&#96;");
+		//ret = ret.replaceAll("\\'", "&#8216;");
+		//ret = ret.replaceAll("\\\"", "&#34;"); //Removing quote sanitisation as SQL security happens on another layer
+		
+		// Common string \ escape, relevent for embeded javascript in HTML
+		ret = ret.replaceAll("\\\\", "&#92;");
+		return ret;
+	}
+
+	/**
+	 * Helper function, used to escape an object in accordance to its instanceof type
+	 */
+	@SuppressWarnings("unchecked")
+	protected static Object commonHtmlEscapeCharacters_generic(Object v) {
+		// Sanatize if needed
+		if( v instanceof String ) {
+			v = commonHtmlEscapeCharacters( (String)v);
+		} else if( v instanceof Map ) {
+			v = commonHtmlEscapeCharacters( (Map<String,Object>)v );
+		} else if( v instanceof List ) {
+			v = commonHtmlEscapeCharacters( (List<Object>)v );
+		}
+		return v;
+	}
+
+	/**
+	 * Sanatizes HTML escape characters "<", ">", or "&" along with "\" escape
+	 * This covers most cases of HTML injection in a child html, but not as a property value
+	 *
+	 * @param  Map of values to sanatize, note that keys are NOT sanatized
+	 *
+	 * @return Sanatized Map
+	 **/
+	public static Map<String,Object> commonHtmlEscapeCharacters(Map<String,Object> input) {
+		// Iterate and update
+		for (String k : input.keySet()) {
+			input.put(k, commonHtmlEscapeCharacters_generic( input.get(k) ));
+		}
+
+		// Return modified input values
+		return input;
+	}
+
+	/**
+	 * Sanatizes HTML escape characters "<", ">", or "&" along with "\" escape
+	 * This covers most cases of HTML injection in a child html, but not as a property value
+	 *
+	 * @param  Map of values to sanatize, note that keys are NOT sanatized
+	 *
+	 * @return Sanatized List
+	 **/
+	public static List<Object> commonHtmlEscapeCharacters(List<Object> input) {
+		// Iterate and update
+		for (int i = 0; i < input.size(); i++) {
+			input.set(i, commonHtmlEscapeCharacters_generic( input.get(i) ));
+		}
+
+		// Return modified input values
+		return input;
+	}
 }

@@ -58,7 +58,7 @@ public class CoreApiPage_test {
 		
 		// Message to put
 		@Override
-		public void apiBuilderSetup(ApiBuilder api) {
+		public void apiSetup(ApiBuilder api) {
 			api.put("echo", EchoApi.SimpleEcho);
 		}
 	}
@@ -112,7 +112,7 @@ public class CoreApiPage_test {
 		
 		// Message to put
 		@Override
-		public void apiBuilderSetup(ApiBuilder api) {
+		public void apiSetup(ApiBuilder api) {
 			api.put("file", testFileEcho);
 		}
 	}

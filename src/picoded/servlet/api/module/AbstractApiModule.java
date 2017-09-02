@@ -22,38 +22,68 @@ abstract public class AbstractApiModule implements ApiModule {
 	protected List<SystemSetupInterface> subsystemList = null;
 	
 	//-------------------------------------------------------------
-	// Constructor
+	// api setup
 	//-------------------------------------------------------------
 	
 	/**
-	 * Setup the API module, with the given parameters
+	 * Setup the API module, with the given parameters. And register the relevant end points
 	 *
 	 * @param  api         ApiBuilder to add the required functions
 	 * @param  prefixPath  prefix to assume as (should be able to accept "" blanks)
 	 * @param  config      configuration object, assumed to be a map. use GenericConvert.toStringMap to preprocess the data
 	 */
-	public AbstractApiModule(ApiBuilder inApi, String inPrefixPath, Object inConfigMap) {
+	public void apiSetup(ApiBuilder inApi, String inPrefixPath, Object inConfigMap) {
 		// Set the api and its path prefix
 		api = inApi;
 		prefixPath = inPrefixPath;
 		
 		// Set the config
-		config = GenericConvert.toGenericConvertStringMap(inConfigMap, "{}");
+		config = defaultConfig();
+		config.putAll( GenericConvert.toStringMap(inConfigMap, "{}") );
+
 		subsystemList = internalSubsystemList();
+
+		apiSetup(api, prefixPath, config);
 	}
 
+	/**
+	 * [To Overwrite]
+	 * Defines the default config object, this is useful in extending modules, and adjusting default behaviours
+	 */
+	protected GenericConvertHashMap<String,Object> defaultConfig() {
+		return new GenericConvertHashMap<String,Object>();
+	}
+
+	/**
+	 * [To Overwrite]
+	 * Does the actual API backend setup logic, this is after standardised apiSetup initialization
+	 */
+	abstract protected void apiSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config);
+
 	//-------------------------------------------------------------
-	// SystemSetup / Teardown helpers
+	// SystemSetup / Teardown chain helpers
 	//-------------------------------------------------------------
 	
 	/**
 	 * [To Overwrite]
 	 * 
-	 * List of internal subsystem modules, which is chained systemSetup / Teardown / clear.
+	 * Array of internal subsystem modules, which is chained systemSetup / Teardown / clear.
 	 *
-	 * @return List of SystemSetupInterface
+	 * Alternatively if a list is prefered, overwrite internalSubsystemList, 
+	 * and throw and exception on this function
+	 *
+	 * @return Array of SystemSetupInterface
 	 */
-	abstract protected List<SystemSetupInterface> internalSubsystemList();
+	abstract protected SystemSetupInterface[] internalSubsystemArray();
+	
+	/**
+	 * Array of internal subsystem modules, which is chained systemSetup / Teardown / clear.
+	 *
+	 * @return Array of SystemSetupInterface
+	 */
+	protected List<SystemSetupInterface> internalSubsystemList() {
+		return Arrays.asList(internalSubsystemArray());
+	}
 
 	//----------------------------------------------------------------
 	//

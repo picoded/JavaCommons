@@ -105,8 +105,8 @@ public class StructSimple_DataTable_perf extends AbstractBenchmark {
 	@Test
 	public void largeMapPerf() throws Exception {
 		for (int i = 0; i < iterationCount; ++i) {
-			mtObj.newObject(largeMap);
-			mtObj.newObject(largeMap2);
+			mtObj.newEntry(largeMap);
+			mtObj.newEntry(largeMap2);
 		}
 	}
 	
@@ -114,8 +114,8 @@ public class StructSimple_DataTable_perf extends AbstractBenchmark {
 	@Test
 	public void mediumMapPerf() throws Exception {
 		for (int i = 0; i < iterationCount; ++i) {
-			mtObj.newObject(mediumMap);
-			mtObj.newObject(mediumMap2);
+			mtObj.newEntry(mediumMap);
+			mtObj.newEntry(mediumMap2);
 		}
 	}
 	
@@ -123,8 +123,8 @@ public class StructSimple_DataTable_perf extends AbstractBenchmark {
 	@Test
 	public void smallMapPerf() throws Exception {
 		for (int i = 0; i < iterationCount; ++i) {
-			mtObj.newObject(smallMap);
-			mtObj.newObject(smallMap2);
+			mtObj.newEntry(smallMap);
+			mtObj.newEntry(smallMap2);
 		}
 	}
 	
@@ -132,7 +132,7 @@ public class StructSimple_DataTable_perf extends AbstractBenchmark {
 	@Test
 	public void largeMapPerf_insertAndUpdate() throws Exception {
 		for (int i = 0; i < iterationCount; ++i) {
-			DataObject mo = mtObj.newObject(largeMap);
+			DataObject mo = mtObj.newEntry(largeMap);
 			mo.saveDelta();
 			
 			mo.putAll(largeMap2);
@@ -144,7 +144,7 @@ public class StructSimple_DataTable_perf extends AbstractBenchmark {
 	@Test
 	public void mediumMapPerf_insertAndUpdate() throws Exception {
 		for (int i = 0; i < iterationCount; ++i) {
-			DataObject mo = mtObj.newObject(mediumMap);
+			DataObject mo = mtObj.newEntry(mediumMap);
 			mo.saveDelta();
 			
 			mo.putAll(mediumMap2);
@@ -156,7 +156,7 @@ public class StructSimple_DataTable_perf extends AbstractBenchmark {
 	@Test
 	public void smallMapPerf_insertAndUpdate() throws Exception {
 		for (int i = 0; i < iterationCount; ++i) {
-			DataObject mo = mtObj.newObject(smallMap);
+			DataObject mo = mtObj.newEntry(smallMap);
 			mo.saveDelta();
 			
 			mo.putAll(smallMap2);

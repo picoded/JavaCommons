@@ -20,7 +20,8 @@ public class ApiVersionSet {
 	/**
 	 * The filter map for
 	 **/
-	Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> filterMap = new HashMap<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>>();
+	Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> beforeFilterMap = new HashMap<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>>();
+	Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> afterFilterMap = new HashMap<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>>();
 	
 	/**
 	 * Takes in another endpoint map, and overwrite it onto itself!
@@ -29,7 +30,38 @@ public class ApiVersionSet {
 	 * @param  External version set to import
 	 **/
 	protected void importVersionSet(ApiVersionSet importSet) {
-		filterMap.putAll(importSet.filterMap);
+		// Endpoints
 		endpointMap.putAll(importSet.endpointMap);
+
+		// Filters
+		beforeFilterMap.putAll(importSet.beforeFilterMap);
+		afterFilterMap.putAll(importSet.afterFilterMap);
+	}
+
+	/**
+	 * Enum set for helper function access for before / endpoint / after function maps
+	 */
+	static enum ApiFunctionType {
+		BEFORE,
+		ENDPOINT,
+		AFTER
+	};
+	
+	/**
+	 * Get the function map of the specified type
+	 *
+	 * @param  ApiFunctionType type of map to fetch
+	 * 
+	 * @return The function map to manipulation
+	 */
+	Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionMap( ApiFunctionType type ) {
+		if( type == ApiFunctionType.BEFORE ) {
+			return beforeFilterMap;
+		} else if( type == ApiFunctionType.ENDPOINT ) {
+			return endpointMap;
+		} else if( type == ApiFunctionType.AFTER ) {
+			return afterFilterMap;
+		}
+		throw new IllegalArgumentException("Unknown ApiFunctionType : "+type);
 	}
 }

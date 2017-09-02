@@ -296,6 +296,7 @@
 		<copy todir="${build-classes}/picoded">
 			<fileset dir="${src-path}">
 				<exclude name="**/*.java"/>
+				<include name="**/*.js"/>
 			</fileset>
 		</copy>
 	</target>

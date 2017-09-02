@@ -86,23 +86,4 @@ public class RegexUtil {
 	
 	private static String removeAllNonAlphaNumericAllowCommonSeparatorsRegexString = "[^a-zA-Z0-9-_\\.\\]\\[]";
 	
-	/**
-	 * Sanatizes HTML escape characters "<" or ">" along with "\" escape
-	 *
-	 * @param  Input string to sanatize
-	 *
-	 * @return Sanatized string
-	 **/
-	public static String sanitiseCommonEscapeCharactersIntoAscii(String input) {
-		String ret = input;
-		ret = ret.replaceAll("\\<", "&#60;");
-		ret = ret.replaceAll("\\>", "&#62;");
-		
-		//ret = ret.replaceAll("\\`", "&#96;");
-		//ret = ret.replaceAll("\\'", "&#8216;");
-		//ret = ret.replaceAll("\\\"", "&#34;"); //Removing quote sanitisation as SQL security happens on another layer
-		
-		ret = ret.replaceAll("\\\\", "&#92;");
-		return ret;
-	}
 }

@@ -51,7 +51,7 @@ public class AccountObject extends Core_DataObject {
 	 * @return TRUE if login ID belongs to this account
 	 **/
 	public boolean hasLoginID(String name) {
-		return _oid.equals(mainTable.accountLoginIdMap.get(name));
+		return _oid.equals(mainTable.accountLoginNameMap.get(name));
 	}
 	
 	/**
@@ -60,7 +60,7 @@ public class AccountObject extends Core_DataObject {
 	 * @return  Set of loginID's used by this account
 	 **/
 	public Set<String> getLoginIDSet() {
-		return mainTable.accountLoginIdMap.keySet(_oid);
+		return mainTable.accountLoginNameMap.keySet(_oid);
 	}
 	
 	/**
@@ -85,7 +85,7 @@ public class AccountObject extends Core_DataObject {
 		// Technically a race condition =X
 		//
 		// But name collision, if its an email collision should be a very rare event.
-		mainTable.accountLoginIdMap.put(name, _oid);
+		mainTable.accountLoginNameMap.put(name, _oid);
 		// Success of failure
 		return hasLoginID(name);
 	}
@@ -97,7 +97,7 @@ public class AccountObject extends Core_DataObject {
 	 **/
 	public void removeLoginID(String name) {
 		if (hasLoginID(name)) {
-			mainTable.accountLoginIdMap.remove(name);
+			mainTable.accountLoginNameMap.remove(name);
 		}
 	}
 	
@@ -132,7 +132,7 @@ public class AccountObject extends Core_DataObject {
 				continue;
 			}
 			// Remove the login ID
-			mainTable.accountLoginIdMap.remove(oldName);
+			mainTable.accountLoginNameMap.remove(oldName);
 		}
 		
 		return true;

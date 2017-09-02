@@ -26,6 +26,7 @@ public class AccountConstantStrings {
 	public static final String NEW_PASSWORD = "newPass";
 	public static final String NAME = "name";
 	public static final String UPDATE = "update";
+	public static final String LOGINNAMELIST = "_loginNames";
 
 	// Rancher VARS
 	public static final String EMAIL = "email";
@@ -120,7 +121,7 @@ public class AccountConstantStrings {
 	public static final String API_ACCOUNT_LOCKTIME = "account/lockTime";
 	public static final String API_ACCOUNT_LOGOUT = "account/logout";
 	public static final String API_ACCOUNT_NEW = "account/new";
-	public static final String API_ACCOUNT_PASS_RESET = "account/do_password_reset";
+	public static final String API_ACCOUNT_PASS_RESET = "account/password/reset";
 	public static final String API_ACCOUNT_INFO = "account/info/get";
 	public static final String API_ACCOUNT_ADMIN_REMOVE = "account/admin/remove";
 	public static final String API_ACCOUNT_LIST = "account/list";

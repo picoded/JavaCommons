@@ -161,7 +161,7 @@ public class AccountTableApi extends CommonApiModule {
 			res.putAll(commonInfo);
 
 			// loginID, as a list - as set does not gurantee sorting, a sort is done for the list for alphanumeric
-			List<String> loginIDList = new ArrayList<String>(ao.getLoginIDSet());
+			List<String> loginIDList = new ArrayList<String>(ao.getLoginNameSet());
 			Collections.sort(loginIDList);
 
 			// Return the loginIDList
@@ -295,9 +295,8 @@ public class AccountTableApi extends CommonApiModule {
 					newAccount.setMember(firstAdmin, "admin");
 			}
 			// Set email as login ID as well
-			if (givenMetaObj.get(PROPERTIES_EMAIL) != null
-				&& isEmailFormat(givenMetaObj.get(PROPERTIES_EMAIL).toString())) {
-				newAccount.setLoginID(givenMetaObj.get(PROPERTIES_EMAIL).toString());
+			if (!email.isEmpty() && isEmailFormat(email)) {
+				newAccount.setLoginName(email);
 			}
 
 			newAccount.setPassword(password);
@@ -365,12 +364,21 @@ public class AccountTableApi extends CommonApiModule {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | _oid            | String             | The internal object ID used                                                   |
 	 * | result          | {Object}           | Data object, if found                                                         |
+ 	 * | loginName       | String[]           | List of login names                                                           |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | error           | String (Optional)  | Errors encounted if any                                                       |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 **/
 	protected ApiFunction info_get = (req, res) -> {
 		defaultsCurrentAccountAsOID(req, res);
+
+		// Return a list of login names of the user if exists
+		String oid = req.getString(OID, null);
+		AccountObject ao = table.get(oid);
+		if(ao != null){
+			res.put(LOGINNAME, ao.getLoginNameSet());
+		}
+
 		return dataTableApi.get.apply(req, res);
 	};
 
@@ -419,7 +427,7 @@ public class AccountTableApi extends CommonApiModule {
 	 * See: DataTableApi.list.datatables
 	 **/
 	protected ApiFunction info_list_datatables = (req, res) -> {
-		return dataTableApi.list.apply(req, res);
+		return dataTableApi.datatables.apply(req, res);
 	};
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -669,12 +677,12 @@ public class AccountTableApi extends CommonApiModule {
 	// 			if (column.equalsIgnoreCase(PROPERTIES_OID)) {
 	// 				returnList.get(listCounter).add(ao._oid());
 	// 			} else if (column.equalsIgnoreCase(PROPERTIES_NAME)) {
-	// 				Set<String> names = ao.getLoginIDSet();
+	// 				Set<String> names = ao.getLoginNameSet();
 	// 				names.clear();
-	// 				for (String name : ao.getLoginIDSet()) {
+	// 				for (String name : ao.getLoginNameSet()) {
 	// 					names.add(StringEscape.commonHtmlEscapeCharacters(name));
 	// 				}
-	// 				returnList.get(listCounter).add(ao.getLoginIDSet());
+	// 				returnList.get(listCounter).add(ao.getLoginNameSet());
 	// 			} else if (column.equalsIgnoreCase(PROPERTIES_ROLE)) {
 	// 				returnList.get(listCounter).add(
 	// 					StringEscape.commonHtmlEscapeCharacters(group.getMemberRole(ao)));
@@ -1454,7 +1462,7 @@ public class AccountTableApi extends CommonApiModule {
 
 		if (account != null) {
 			commonInfo.put(ACCOUNT_ID, account._oid());
-			Set<String> accNameSet = account.getLoginIDSet();
+			Set<String> accNameSet = account.getLoginNameSet();
 			if (accNameSet != null) {
 				String[] accNames = new String[accNameSet.size()];
 				accNameSet.toArray(accNames);
@@ -1482,10 +1490,10 @@ public class AccountTableApi extends CommonApiModule {
 					Map<String, Object> newGroup = new HashMap<String, Object>();
 					newGroup.put("groupID", group._oid());
 					// Extracting group names and sanitising if needed
-					Set<String> groupNames = group.getLoginIDSet();
+					Set<String> groupNames = group.getLoginNameSet();
 					if (sanitiseOutput) {
 						groupNames.clear();
-						for (String groupName : group.getLoginIDSet()) {
+						for (String groupName : group.getLoginNameSet()) {
 							groupNames.add(StringEscape.commonHtmlEscapeCharacters(groupName));
 						}
 					}
@@ -1634,11 +1642,11 @@ public class AccountTableApi extends CommonApiModule {
 
 						if (header.equalsIgnoreCase("names")) {
 							if (ao != null) {
-								Set<String> aoNames = ao.getLoginIDSet();
+								Set<String> aoNames = ao.getLoginNameSet();
 
 								if (sanitiseOutput) {
 									aoNames.clear();
-									for (String name : ao.getLoginIDSet()) {
+									for (String name : ao.getLoginNameSet()) {
 										aoNames.add(StringEscape.commonHtmlEscapeCharacters(name));
 									}
 								}

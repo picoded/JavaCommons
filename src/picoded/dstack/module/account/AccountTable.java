@@ -38,7 +38,7 @@ public class AccountTable extends ModuleStructure implements
 	/**
 	 * Provides a key value pair mapping of the account login ID to AccountID (GUID)
 	 *
-	 * KeyValueMap<uniqueLoginID,AccountID>
+	 * KeyValueMap<uniqueLoginName,AccountID>
 	 *
 	 * login ID are unique, and are usually usernames or emails
 	 * AccountID's are not unique, as a single AccountID can have multiple "names"
@@ -307,8 +307,8 @@ public class AccountTable extends ModuleStructure implements
 	 *
 	 * @return TRUE if login ID exists
 	 **/
-	public boolean hasLoginID(String inLoginID) {
-		return accountLoginNameMap.containsKey(inLoginID);
+	public boolean hasLoginName(String inLoginName) {
+		return accountLoginNameMap.containsKey(inLoginName);
 	}
 
 	/**
@@ -343,13 +343,13 @@ public class AccountTable extends ModuleStructure implements
 	 **/
 	public AccountObject newEntry(String name) {
 		// Quick fail check
-		if (hasLoginID(name)) {
+		if (hasLoginName(name)) {
 			return null;
 		}
 
 		// Creating account object, setting the name if valid
 		AccountObject ret = newEntry();
-		if (ret.setLoginID(name)) {
+		if (ret.setLoginName(name)) {
 			return ret;
 		} else {
 			// Removal step is required on failure,
@@ -427,7 +427,7 @@ public class AccountTable extends ModuleStructure implements
 
 		return null;
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Account object getters

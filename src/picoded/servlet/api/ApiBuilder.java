@@ -358,7 +358,7 @@ public class ApiBuilder implements
 
 	//-------------------------------------------------------------------
 	//
-	// API put / remove map handling
+	// API put / remove map handling, and its filters
 	//
 	//-------------------------------------------------------------------
 
@@ -439,6 +439,50 @@ public class ApiBuilder implements
 		Map<String, Object> queryParams, Map<String, Object> contextParams) {
 		return execute(inMajor, inMinor, path, setupApiRequest(queryParams, contextParams), null);
 	}
+
+	//-------------------------------------------------------------------
+	//
+	// Extending an API function / filter
+	//
+	//-------------------------------------------------------------------
+
+	/**
+	 * Registers an API function to a single endpoint.
+	 *
+	 * Note that due to the way ApiBuilder is designed to export the respective API libraries
+	 * wildcard based endpoints will not be supported.
+	 *
+	 * @param  Endpoint paths
+	 * @param  Executor function, use null to remove an existing function
+	 *
+	 * @return  returns null
+	 **/
+	public void extendEndpoint(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
+		for(String name : getVersionSet().functionMap(ApiFunctionType.ENDPOINT).keySet()){
+			System.out.println(name +" the name of the endpoint");
+		}
+		// The original endpoint function to extend
+		BiFunction<ApiRequest, ApiResponse, ApiResponse> originalEndpoint = fetchSpecificApiFunction(ApiFunctionType.ENDPOINT, majorVersion, minorVersion, path);
+System.out.println(value==null);
+System.out.println(path);
+		// If originalEndpoint is null, just implement directly
+		if( originalEndpoint == null ) {
+			System.out.println("The originalEndpoint is null ");
+			endpoint(path, value);
+		}
+System.out.println(value==null);
+		// Registers the new endpoint function
+		endpoint(path, (req,res) -> {
+			// New request to use
+			ApiRequest overwriteReq = new ApiRequest(req, originalEndpoint);
+			System.out.println(value==null);
+			System.out.println(ConvertJSON.fromObject(overwriteReq)+ "overwriteReq");
+			// Call the BiFunction, with the extended request
+			return value.apply(overwriteReq, res);
+		});
+	}
+
+
 
 	//-------------------------------------------------------------------
 	//

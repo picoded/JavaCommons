@@ -128,7 +128,7 @@ public class AccountConstantStrings {
 	public static final String API_ACCOUNT_INFO = "account/info/get";
 	public static final String API_ACCOUNT_ADMIN_REMOVE = "account/admin/remove";
 	public static final String API_ACCOUNT_LIST = "account/list";
-	public static final String API_ACCOUNT_SET_LOGIN_NAME = "account/login/name/set";
+	public static final String API_ACCOUNT_SET_LOGIN_NAME = "account/login/rename";
 
 	public static final String API_GROUP_GRP_ROLES = "group/groupRoles";
 	public static final String API_GROUP_GET_MEM_ROLE = "group/getMemberRole";

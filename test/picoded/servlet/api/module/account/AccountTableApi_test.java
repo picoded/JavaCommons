@@ -41,7 +41,7 @@ public class AccountTableApi_test extends ApiModule_test {
 			// System.out.println("this was not ran <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 			// 	return (long) 2;
 			// };
-			if (!table.hasLoginID("laughing-man")) {
+			if (!table.hasLoginName("laughing-man")) {
 				AccountObject ao = table.newEntry("laughing-man");
 				ao.put(PROPERTIES_EMAIL, "laughing-man@testlalala.com");
 				ao.setPassword("The Catcher in the Rye");
@@ -1171,84 +1171,84 @@ public class AccountTableApi_test extends ApiModule_test {
 	// 	res = requestJSON(API_ACCOUNT_LOGOUT, null);
 	// 	assertEquals(Boolean.TRUE, res.get(RESULT));
 	// }
-	//
-	// @Test
-	// public void passwordReset() {
-	// 	GenericConvertMap<String, Object> res = null;
-	// 	/// -----------------------------------------
-	// 	/// Preparation before commencement of Test
-	// 	/// -----------------------------------------
-	// 	Map<String, Object> params = new HashMap<String, Object>();
-	// 	List<String> userID = new ArrayList<String>();
-	// 	// Ensure that there is an existing user
-	// 	params.clear();
-	// 	params.put(LOGINNAME, "reset");
-	// 	params.put(PASSWORD, "password");
-	// 	res = requestJSON(API_ACCOUNT_NEW, params);
-	// 	assertNull("passwordResetTest: Something wrong in adding user.", res.get(ERROR));
-	// 	userID.add(res.getString(ACCOUNT_ID));
-	//
-	// 	/// -----------------------------------------
-	// 	/// End of Preparation before commencement of Test
-	// 	/// -----------------------------------------
-	// 	// 1st Test: Empty Submission
-	// 	TestSet ts = new TestSet(null, API_ACCOUNT_PASS_RESET, ERROR_NO_USER, ERROR);
-	// 	ts.executeGenericTestCase();
-	// 	// 2nd Test: Invalid userID
-	// 	params.clear();
-	// 	params.put(USER_ID, "randomID");
-	// 	ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
-	// 	// 3rd Test: Valid userID, No old password
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	ts.setAndExecuteGTC(params, ERROR_NO_PASSWORD, ERROR);
-	// 	// 4th Test: Valid userID, old password, no new password
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	params.put(OLD_PASSWORD, "password");
-	// 	ts.setAndExecuteGTC(params, ERROR_NO_NEW_PASSWORD, ERROR);
-	// 	// 5th Test: Valid userID, old password, new password, no repeatPass
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	params.put(OLD_PASSWORD, "password");
-	// 	params.put(NEW_PASSWORD, "password");
-	// 	ts.setAndExecuteGTC(params, ERROR_NO_NEW_REPEAT_PASSWORD, ERROR);
-	// 	// 6th Test: Valid userID, old password, new password, incorrect repeatPass
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	params.put(OLD_PASSWORD, "password");
-	// 	params.put(NEW_PASSWORD, "passwordnew");
-	// 	params.put(REPEAT_PASSWORD, "passwordHAHAHHA");
-	// 	ts.setAndExecuteGTC(params, ERROR_PASS_NOT_EQUAL, ERROR);
-	// 	// 7th Test: Valid userID, incorrect old password, new password, correct repeatPass
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	params.put(OLD_PASSWORD, "wrongOldPasswr");
-	// 	params.put(NEW_PASSWORD, "passwordnew");
-	// 	params.put(REPEAT_PASSWORD, "passwordnew");
-	// 	ts.setAndExecuteGTC(params, ERROR_PASS_INCORRECT, ERROR);
-	// 	// 8th Test: Valid userID, correct old password, new password, correct repeatPass
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	params.put(OLD_PASSWORD, "password");
-	// 	params.put(NEW_PASSWORD, "passwordnew");
-	// 	params.put(REPEAT_PASSWORD, "passwordnew");
-	// 	ts.setAndExecuteGTC(params, true, SUCCESS);
-	// 	// 9th Test: no userID, user not logged in, correct old password, new password, correct repeatPass
-	// 	params.clear();
-	// 	params.put(OLD_PASSWORD, "password");
-	// 	params.put(NEW_PASSWORD, "passwordnewlol");
-	// 	params.put(REPEAT_PASSWORD, "passwordnewlol");
-	// 	ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
-	// 	// 10th Test: no userID, user logged in, correct old password, new password, correct repeatPass
-	// 	ts.loginUser("reset", "passwordnew");
-	// 	params.clear();
-	// 	params.put(OLD_PASSWORD, "passwordnew");
-	// 	params.put(NEW_PASSWORD, "passwordnewnew");
-	// 	params.put(REPEAT_PASSWORD, "passwordnewnew");
-	// 	ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
-	// }
-	//
+
+	@Test
+	public void passwordReset() {
+		GenericConvertMap<String, Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		Map<String, Object> params = new HashMap<String, Object>();
+		List<String> userID = new ArrayList<String>();
+		// Ensure that there is an existing user
+		params.clear();
+		params.put(LOGINNAME, "reset");
+		params.put(PASSWORD, "password");
+		res = requestJSON(API_ACCOUNT_NEW, params);
+		assertNull("passwordResetTest: Something wrong in adding user.", res.get(ERROR));
+		userID.add(res.getString(ACCOUNT_ID));
+
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+		// 1st Test: Empty Submission
+		TestSet ts = new TestSet(null, API_ACCOUNT_PASS_RESET, ERROR_NO_USER, ERROR);
+		ts.executeGenericTestCase();
+		// 2nd Test: Invalid userID
+		params.clear();
+		params.put(ACCOUNT_ID, "randomID");
+		ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
+		// 3rd Test: Valid userID, No old password
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		ts.setAndExecuteGTC(params, ERROR_NO_PASSWORD, ERROR);
+		// 4th Test: Valid userID, old password, no new password
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		params.put(OLD_PASSWORD, "password");
+		ts.setAndExecuteGTC(params, ERROR_NO_NEW_PASSWORD, ERROR);
+		// 5th Test: Valid userID, old password, new password, no repeatPass
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		params.put(OLD_PASSWORD, "password");
+		params.put(NEW_PASSWORD, "password");
+		ts.setAndExecuteGTC(params, ERROR_NO_NEW_REPEAT_PASSWORD, ERROR);
+		// 6th Test: Valid userID, old password, new password, incorrect repeatPass
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		params.put(OLD_PASSWORD, "password");
+		params.put(NEW_PASSWORD, "passwordnew");
+		params.put(REPEAT_PASSWORD, "passwordHAHAHHA");
+		ts.setAndExecuteGTC(params, ERROR_PASS_NOT_EQUAL, ERROR);
+		// 7th Test: Valid userID, incorrect old password, new password, correct repeatPass
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		params.put(OLD_PASSWORD, "wrongOldPasswr");
+		params.put(NEW_PASSWORD, "passwordnew");
+		params.put(REPEAT_PASSWORD, "passwordnew");
+		ts.setAndExecuteGTC(params, ERROR_PASS_INCORRECT, ERROR);
+		// 8th Test: Valid userID, correct old password, new password, correct repeatPass
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		params.put(OLD_PASSWORD, "password");
+		params.put(NEW_PASSWORD, "passwordnew");
+		params.put(REPEAT_PASSWORD, "passwordnew");
+		ts.setAndExecuteGTC(params, true, SUCCESS);
+		// 9th Test: no userID, user not logged in, correct old password, new password, correct repeatPass
+		params.clear();
+		params.put(OLD_PASSWORD, "password");
+		params.put(NEW_PASSWORD, "passwordnewlol");
+		params.put(REPEAT_PASSWORD, "passwordnewlol");
+		ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
+		// 10th Test: no userID, user logged in, correct old password, new password, correct repeatPass
+		ts.loginUser("reset", "passwordnew");
+		params.clear();
+		params.put(OLD_PASSWORD, "passwordnew");
+		params.put(NEW_PASSWORD, "passwordnewnew");
+		params.put(REPEAT_PASSWORD, "passwordnewnew");
+		ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
+	}
+
 	@Test
 	public void getInfoByName() {
 		GenericConvertMap<String, Object> res = null;

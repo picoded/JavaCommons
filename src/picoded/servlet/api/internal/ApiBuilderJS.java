@@ -45,6 +45,7 @@ public class ApiBuilderJS {
 
 		// Generating endpoints
 		for (String endpoint : builder.keySet()) {
+			endpoint = endpoint.replaceAll("/", "\\.");
 			generateJSScript += "\t\t\"" + endpoint + "\" : [],\n";
 		}
 		// Add an empty endpoint for closing sake @TODO: fix this plox

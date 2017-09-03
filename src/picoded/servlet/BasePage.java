@@ -17,7 +17,7 @@ public class BasePage extends DStackPage {
 	//
 	////////////////////////////////////////////////////////////////////////////
 
-	// AccountTable 
+	// AccountTable
 	protected AccountTable _accountTable = null;
 
 	// AccountTableAPI
@@ -32,7 +32,7 @@ public class BasePage extends DStackPage {
 	@Override
 	public void doSharedSetup() throws Exception {
 		super.doSharedSetup();
-		AccountTableApi ata = new AccountTableApi(DStack().getAccountTable("account"));
+		AccountTableApi ata = new AccountTableApi(getAccountTable());
 		ata.apiSetup(this.apiBuilder(), "");
 	}
 

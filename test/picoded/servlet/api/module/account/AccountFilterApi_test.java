@@ -37,7 +37,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 		public ApiModule moduleSetup(CommonStack stack) {
 			AccountTable table = new AccountTable(stack, "account");
 			AccountFilterApi ret = new AccountFilterApi(table);
-			if (!table.hasLoginID(SUPERUSERNAME)) {
+			if (!table.hasLoginName(SUPERUSERNAME)) {
 				AccountObject ao = table.newEntry(SUPERUSERNAME);
 				ao.setPassword(VALIDPASSWORD);
 				// Add to superUserGrp

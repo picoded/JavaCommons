@@ -1434,7 +1434,6 @@ public class AccountTableApi extends CommonApiModule {
 	 **/
 	protected ApiFunction set_login_name = (req, res) -> {
 		// Either the current user or the super user should be using this endpoint
-		System.out.println("Original version was called");
 		String[] paramsToCheck = new String[] { LOGINNAME };
 		res = check_parameters(paramsToCheck, req, res);
 		if (res.get(ERROR) != null){
@@ -1462,7 +1461,6 @@ public class AccountTableApi extends CommonApiModule {
 		res.put(RESULT, true);
 		res.put(ACCOUNT_ID, ao._oid());
 		res.put(LOGINNAME, loginName);
-System.out.println("Ended original function");
 		return res;
 	};
 
@@ -1484,7 +1482,6 @@ System.out.println("Ended original function");
 		builder.put(path + API_ACCOUNT_LOGOUT, logout); // Tested
 		builder.put(path + API_ACCOUNT_NEW, new_account); // Tested
 		builder.put(path + API_ACCOUNT_SET_LOGIN_NAME, set_login_name);
-		System.out.println(path+ API_ACCOUNT_SET_LOGIN_NAME+ " JWJAWJEJWAJEWJ");
 		// Account info get, set, list
 		builder.put(path + "account/info/get", info_get);
 		builder.put(path + "account/info/set", info_set);

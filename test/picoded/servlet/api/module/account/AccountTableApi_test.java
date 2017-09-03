@@ -1248,6 +1248,48 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REPEAT_PASSWORD, "passwordnewnew");
 		ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
 	}
+	@Test
+	public void setLoginNameTest(){
+		GenericConvertMap<String, Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		Map<String, Object> params = new HashMap<String, Object>();
+		List<String> userID = new ArrayList<String>();
+		// Ensure that there is an existing user
+		params.clear();
+		params.put(LOGINNAME, "setTestName");
+		params.put(PASSWORD, "password");
+		res = requestJSON(API_ACCOUNT_NEW, params);
+		assertNull("getInfoByNameTest: Something wrong in adding user.", res.get(ERROR));
+		userID.add(res.getString(ACCOUNT_ID));
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+		// 1st Test: Empty Submission
+		TestSet ts = new TestSet(null, API_ACCOUNT_SET_LOGIN_NAME, ERROR_NO_LOGINNAME, ERROR);
+		ts.executeGenericTestCase();
+		// 2nd Test: No account ID
+		params.clear();
+		params.put(LOGINNAME, "anotherLoginName");
+		ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
+		// 3rd Test: Valid accountID, login name in use
+		params.clear();
+		params.put(LOGINNAME, "setTestName");
+		params.put(ACCOUNT_ID, userID.get(0));
+		ts.setAndExecuteGTC(params, ERROR_LOGIN_NAME_EXISTS, ERROR);
+		// 4th Test: Valid accountID, valid login name
+		params.clear();
+		params.put(LOGINNAME, "setTestNameAnother");
+		params.put(ACCOUNT_ID, userID.get(0));
+		ts.setAndExecuteGTC(params, true, RESULT);
+		// 5th Test; User logged in, name change
+		ts.loginUser("setTestNameAnother", "password");
+		params.clear();
+		params.put(LOGINNAME, "setTestNameBack");
+		ts.setAndExecuteGTC(params, true, RESULT);
+		ts.logout();
+	}
 
 	@Test
 	public void getInfoByName() {

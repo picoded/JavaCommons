@@ -97,6 +97,7 @@ public class AccountConstantStrings {
 	public static final String ERROR_EMAIL_EXISTS = "Email is in used.";
 	public static final String ERROR_NO_NAME = "No name is found.";
 	public static final String ERROR_NO_ACCOUNT_ID = "No account ID is found.";
+	public static final String ERROR_LOGIN_NAME_EXISTS = "The login name is in use.";
 
 	/// ADDITIONAL Variables
 	public static final String SPACE = " ";

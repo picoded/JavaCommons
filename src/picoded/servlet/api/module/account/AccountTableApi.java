@@ -1441,9 +1441,15 @@ public class AccountTableApi extends CommonApiModule {
 		}
 		// loginName to set
 		String loginName = req.getString(LOGINNAME, "");
+		// Check if loginName has been used
+		AccountObject ao = table.getFromLoginName(loginName);
+		if (ao != null){
+			res.put(ERROR, ERROR_LOGIN_NAME_EXISTS);
+			return res;
+		}
 		// accountID to change if there is
 		String accountID = req.getString(ACCOUNT_ID, "");
-		AccountObject ao = (!accountID.isEmpty()) ? table.get(accountID) : table.getRequestUser(
+		ao = (!accountID.isEmpty()) ? table.get(accountID) : table.getRequestUser(
 			req.getHttpServletRequest(), null);
 		if (ao == null) {
 			res.put(ERROR, ERROR_NO_USER);

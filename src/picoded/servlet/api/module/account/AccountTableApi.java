@@ -1143,68 +1143,68 @@ public class AccountTableApi extends CommonApiModule {
 	// 	return res;
 	// };
 	//
-	/**
-	 * # update_current_user_info
-	 *
-	 * Update the account meta of existing/current user
-	 *
-	 * ## HTTP Request Parameters
-	 *
-	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | Parameter Name  | Variable Type          | Description                                                               |
-	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | accountID       | String  (Optional)    | ID of the user/current user to retrieve                                    |
-	 * | loginName       | String  (Optional)    | loginName of the user/current user to retrieve                             |
-	 * | updateMode      | String                | Mode of the update used, full or delta (default: delta)                    |
-	 * | data            | {Object}              | information to be updated                                                  |
-	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 *
-	 * ## JSON Object Output Parameters
-	 *
-	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | Parameter Name  | Variable Type         | Description                                                                |
-	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | accountID       | String                | The account ID of the user                                                 |
-	 * | result          | {Object}              | The information of the user                                                |
-	 * | update          | boolean               | false for failed change and true for success                               |
-	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 **/
-	protected ApiFunction update_current_user_info = (req, res) -> {
-		res.put(UPDATE, false);
-		String loginName = req.getString(LOGINNAME, "");
-		String accountID = req.getString(ACCOUNT_ID, "");
-		AccountObject ao = (!accountID.isEmpty()) ? table.get(accountID) :
-											 (!loginName.isEmpty()) ? table.getFromLoginName(loginName) :
-											 table.getRequestUser(req.getHttpServletRequest(), null);
-		if (ao == null) {
-			res.put(ERROR, ERROR_NO_USER);
-			return res;
-		}
-
-		String[] paramsToCheck = new String[] { DATA };
-		res = check_parameters(paramsToCheck, req, res);
-		if (res.get(ERROR) != null){
-			return res;
-		}
-		Object metaObjRaw = req.getStringMap(DATA);
-		String updateMode = req.getString(UPDATE_MODE, "delta");
-		Map<String, Object> metaObj = ConvertJSON.toMap(ConvertJSON.fromObject(metaObjRaw));
-		updateMode = ( !updateMode.equalsIgnoreCase("full") ) ? "delta" : updateMode;
-		ao.putAll(metaObj);
-		if (updateMode.equalsIgnoreCase("full")) {
-			ao.saveAll();
-		} else {
-			ao.saveDelta();
-		}
-		Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
-		res.put(ACCOUNT_ID, ao._oid());
-		res.put(RESULT, commonInfo);
-		res.put(UPDATE, true);
-
-		return res;
-	};
+	// /**
+	//  * # update_current_user_info
+	//  *
+	//  * Update the account meta of existing/current user
+	//  *
+	//  * ## HTTP Request Parameters
+	//  *
+	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	//  * | Parameter Name  | Variable Type          | Description                                                               |
+	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	//  * | accountID       | String  (Optional)    | ID of the user/current user to retrieve                                    |
+	//  * | loginName       | String  (Optional)    | loginName of the user/current user to retrieve                             |
+	//  * | updateMode      | String                | Mode of the update used, full or delta (default: delta)                    |
+	//  * | data            | {Object}              | information to be updated                                                  |
+	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	//  *
+	//  * ## JSON Object Output Parameters
+	//  *
+	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	//  * | Parameter Name  | Variable Type         | Description                                                                |
+	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	//  * | accountID       | String                | The account ID of the user                                                 |
+	//  * | result          | {Object}              | The information of the user                                                |
+	//  * | update          | boolean               | false for failed change and true for success                               |
+	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	//  * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	//  **/
+	// protected ApiFunction update_current_user_info = (req, res) -> {
+	// 	res.put(UPDATE, false);
+	// 	String loginName = req.getString(LOGINNAME, "");
+	// 	String accountID = req.getString(ACCOUNT_ID, "");
+	// 	AccountObject ao = (!accountID.isEmpty()) ? table.get(accountID) :
+	// 										 (!loginName.isEmpty()) ? table.getFromLoginName(loginName) :
+	// 										 table.getRequestUser(req.getHttpServletRequest(), null);
+	// 	if (ao == null) {
+	// 		res.put(ERROR, ERROR_NO_USER);
+	// 		return res;
+	// 	}
+	//
+	// 	String[] paramsToCheck = new String[] { DATA };
+	// 	res = check_parameters(paramsToCheck, req, res);
+	// 	if (res.get(ERROR) != null){
+	// 		return res;
+	// 	}
+	// 	Object metaObjRaw = req.getStringMap(DATA);
+	// 	String updateMode = req.getString(UPDATE_MODE, "delta");
+	// 	Map<String, Object> metaObj = ConvertJSON.toMap(ConvertJSON.fromObject(metaObjRaw));
+	// 	updateMode = ( !updateMode.equalsIgnoreCase("full") ) ? "delta" : updateMode;
+	// 	ao.putAll(metaObj);
+	// 	if (updateMode.equalsIgnoreCase("full")) {
+	// 		ao.saveAll();
+	// 	} else {
+	// 		ao.saveDelta();
+	// 	}
+	// 	Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
+	// 	res.put(ACCOUNT_ID, ao._oid());
+	// 	res.put(RESULT, commonInfo);
+	// 	res.put(UPDATE, true);
+	//
+	// 	return res;
+	// };
 
 	/**
 	 * # delete_user_account
@@ -1245,52 +1245,52 @@ public class AccountTableApi extends CommonApiModule {
 		return res;
 	};
 
-	/**
-	 * # account_info
-	 *
-	 * Retrieve the account information of existing/current user using username
-	 *
-	 * ## HTTP Request Parameters
-	 *
-	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | Parameter Name  | Variable Type          | Description                                                                |
-	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | userID          | String  (Optional)    | ID of the user/current user to retrieve                                     |
-	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 *
-	 * ## JSON Object Output Parameters
-	 *
-	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | Parameter Name  | Variable Type         | Description                                                                |
-	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | accountID       | String                | The account ID of the user                                                 |
-	 * | result          | {Object}              | The information of the user                                                |
-	 * | update          | boolean               | false for no change and true for success                                   |
-	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 **/
-	protected ApiFunction account_info = (req, res) -> {
-		String loginName = req.getString(LOGINNAME, "");
-		String accountID = req.getString(ACCOUNT_ID, "");
-		AccountObject ao = (!loginName.isEmpty()) ? table.getFromLoginName(loginName) :
-											 (!accountID.isEmpty()) ? table.get(accountID) : table
-											 .getRequestUser(req.getHttpServletRequest(), null);
-		if (ao == null) {
-			res.put(ERROR, ERROR_NO_USER);
-			return res;
-		}
-		Object metaObjRaw = req.getStringMap(DATA, null);
-		if (metaObjRaw == null ){
-			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
-			res.put(ACCOUNT_ID, ao._oid());
-			res.put(RESULT, commonInfo);
-			res.put(UPDATE, false);
-			return res;
-		} else {
-			return this.update_current_user_info.apply(req, res);
-		}
-	};
+	// /**
+	//  * # account_info
+	//  *
+	//  * Retrieve the account information of existing/current user using username
+	//  *
+	//  * ## HTTP Request Parameters
+	//  *
+	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	//  * | Parameter Name  | Variable Type          | Description                                                                |
+	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	//  * | userID          | String  (Optional)    | ID of the user/current user to retrieve                                     |
+	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	//  *
+	//  * ## JSON Object Output Parameters
+	//  *
+	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	//  * | Parameter Name  | Variable Type         | Description                                                                |
+	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	//  * | accountID       | String                | The account ID of the user                                                 |
+	//  * | result          | {Object}              | The information of the user                                                |
+	//  * | update          | boolean               | false for no change and true for success                                   |
+	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	//  * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	//  **/
+	// protected ApiFunction account_info = (req, res) -> {
+	// 	String loginName = req.getString(LOGINNAME, "");
+	// 	String accountID = req.getString(ACCOUNT_ID, "");
+	// 	AccountObject ao = (!loginName.isEmpty()) ? table.getFromLoginName(loginName) :
+	// 										 (!accountID.isEmpty()) ? table.get(accountID) : table
+	// 										 .getRequestUser(req.getHttpServletRequest(), null);
+	// 	if (ao == null) {
+	// 		res.put(ERROR, ERROR_NO_USER);
+	// 		return res;
+	// 	}
+	// 	Object metaObjRaw = req.getStringMap(DATA, null);
+	// 	if (metaObjRaw == null ){
+	// 		Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
+	// 		res.put(ACCOUNT_ID, ao._oid());
+	// 		res.put(RESULT, commonInfo);
+	// 		res.put(UPDATE, false);
+	// 		return res;
+	// 	} else {
+	// 		return this.update_current_user_info.apply(req, res);
+	// 	}
+	// };
 	//
 	// /**
 	//  * # getListOfGroupIDOfMember
@@ -1406,6 +1406,59 @@ public class AccountTableApi extends CommonApiModule {
 	// 	return res;
 	// };
 
+	/**
+	 * # set_login_name
+	 *
+	 * Set the login name of the user
+	 *
+	 * ## HTTP Request Parameters
+	 *
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type         | Description                                                                |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | loginName       | String                | The login name to change to                                                |
+	 * | accountID       | String  (Optional)    | ID of the user/current user to retrieve                                    |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 *
+	 * ## JSON Object Output Parameters
+	 *
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type         | Description                                                                |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | accountID       | String                | The account ID of the user                                                 |
+	 * | result          | boolean               | The state of change of login name of the user                              |
+	 * | loginName       | String                | The login name that was change to                                          |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 **/
+	protected ApiFunction set_login_name = (req, res) -> {
+		// Either the current user or the super user should be using this endpoint
+		String[] paramsToCheck = new String[] { LOGINNAME };
+		res = check_parameters(paramsToCheck, req, res);
+		if (res.get(ERROR) != null){
+			return res;
+		}
+		// loginName to set
+		String loginName = req.getString(LOGINNAME, "");
+		// accountID to change if there is
+		String accountID = req.getString(ACCOUNT_ID, "");
+		AccountObject ao = (!accountID.isEmpty()) ? table.get(accountID) : table.getRequestUser(
+			req.getHttpServletRequest(), null);
+		if (ao == null) {
+			res.put(ERROR, ERROR_NO_USER);
+			return res;
+		}
+		// Set it as a unique name
+		ao.setUniqueLoginName(loginName);
+		// Set and send back response
+		res.put(RESULT, true);
+		res.put(ACCOUNT_ID, ao._oid());
+		res.put(LOGINNAME, loginName);
+
+		return res;
+	};
+
 	protected void apiSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
 		apiSetup(api, prefixPath);
 	}
@@ -1423,6 +1476,7 @@ public class AccountTableApi extends CommonApiModule {
 		builder.put(path + API_ACCOUNT_LOGIN, login); // Tested
 		builder.put(path + API_ACCOUNT_LOGOUT, logout); // Tested
 		builder.put(path + API_ACCOUNT_NEW, new_account); // Tested
+		builder.put(path + API_ACCOUNT_SET_LOGIN_NAME, set_login_name);
 
 		// Account info get, set, list
 		builder.put(path + "account/info/get", info_get);

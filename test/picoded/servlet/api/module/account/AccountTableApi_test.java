@@ -1248,6 +1248,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REPEAT_PASSWORD, "passwordnewnew");
 		ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
 	}
+	
 	@Test
 	public void setLoginNameTest(){
 		GenericConvertMap<String, Object> res = null;

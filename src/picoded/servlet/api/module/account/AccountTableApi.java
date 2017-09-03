@@ -384,7 +384,7 @@ public class AccountTableApi extends CommonApiModule {
 		if(ao != null){
 			res.put(LOGINNAMELIST, ao.getLoginNameSet());
 		}
-
+System.out.println(res.get(INFO));
 		return dataTableApi.get.apply(req, res);
 	};
 
@@ -1493,7 +1493,7 @@ public class AccountTableApi extends CommonApiModule {
 
 		// builder.put(path + API_ACCOUNT_INFO, account_info); // Tested
 		// builder.put(path + API_ACCOUNT_INFO_ID, account_info_by_ID); // Tested
-		// builder.put(path + API_ACCOUNT_ADMIN_REMOVE, delete_user_account); // Tested
+		builder.put(path + API_ACCOUNT_ADMIN_REMOVE, delete_user_account); // Tested
 		// builder.put(path + API_ACCOUNT_LIST, dataTableApi.list);
 		//
 		// //Group functionalities

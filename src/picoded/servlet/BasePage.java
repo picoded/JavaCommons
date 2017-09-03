@@ -77,7 +77,7 @@ public class BasePage extends DStackPage {
 	 *
 	 * @return AccountTable object
 	 */
-	private AccountTable getAccountTable() {
+	public AccountTable getAccountTable() {
 		if (_accountTable != null) {
 			return _accountTable;
 		}

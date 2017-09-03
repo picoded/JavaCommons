@@ -373,8 +373,10 @@ public class ApiBuilder implements
 		// Clears the collapsed version set cache
 		cachedCollapsedVersionSet.clear();
 
-		// Change / into .
-		path = path.replaceAll("/", ".");
+		// Change . into /
+		path = path.replaceAll("\\.", "/");
+		path = path.replaceAll("//", "/"); // Change // to /
+		path = path.replaceAll("^/", ""); // Remove / from the start of point
 
 		// Get the current version, and write the respective endpoint to it
 		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionMap = getVersionSet().functionMap(type);
@@ -458,28 +460,21 @@ public class ApiBuilder implements
 	 * @return  returns null
 	 **/
 	public void extendEndpoint(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
-		for(String name : getVersionSet().functionMap(ApiFunctionType.ENDPOINT).keySet()){
-			System.out.println(name +" the name of the endpoint");
-		}
 		// The original endpoint function to extend
 		BiFunction<ApiRequest, ApiResponse, ApiResponse> originalEndpoint = fetchSpecificApiFunction(ApiFunctionType.ENDPOINT, majorVersion, minorVersion, path);
-System.out.println(value==null);
-System.out.println(path);
 		// If originalEndpoint is null, just implement directly
 		if( originalEndpoint == null ) {
-			System.out.println("The originalEndpoint is null ");
 			endpoint(path, value);
+		} else {
+			// Registers the new endpoint function
+			endpoint(path, (req,res) -> {
+				// New request to use
+				ApiRequest overwriteReq = new ApiRequest(req, originalEndpoint);
+				// Call the BiFunction, with the extended request
+				return value.apply(overwriteReq, res);
+			});
 		}
-System.out.println(value==null);
-		// Registers the new endpoint function
-		endpoint(path, (req,res) -> {
-			// New request to use
-			ApiRequest overwriteReq = new ApiRequest(req, originalEndpoint);
-			System.out.println(value==null);
-			System.out.println(ConvertJSON.fromObject(overwriteReq)+ "overwriteReq");
-			// Call the BiFunction, with the extended request
-			return value.apply(overwriteReq, res);
-		});
+
 	}
 
 
@@ -549,9 +544,9 @@ System.out.println(value==null);
 			String filterPath = currentPath;
 
 			// Converts path into a usable regex, where * is a wildcard
-			filterPath = filterPath.replaceAll("\\.", "\\\\."); // Regex: escape all .
+			filterPath = filterPath.replaceAll("\\.", "/"); // Regex: change all . to /
 			filterPath = filterPath.replaceAll("\\*", ".*"); // Regex: change * into .*
-			filterPath = filterPath.replaceAll("\\\\.\\.\\*$", "(\\\\..*)?"); // Regex: change last \..* into optional (\..*)?
+			filterPath = filterPath.replaceAll("/\\.\\*$", "(/.*)?"); // Regex: change last /.* into optional (/.*)?
 
 			// Compile the regex
 			pattern = Pattern.compile(filterPath);
@@ -834,17 +829,19 @@ System.out.println(value==null);
 		}
 
 		// If it is invalid path with or without versioning
-		if (!isValidPath(String.join(".", path))
-			&& !isValidPath(intV[0], intV[1], String.join(".", path))) {
+		String jointPath = String.join("/", path);
+		jointPath = jointPath.replaceAll("//", "/"); // Change // to /
+		if (!isValidPath(jointPath)
+			&& !isValidPath(intV[0], intV[1], jointPath)) {
 			//Invalid path, terminate
 			res.put("ERROR", "Unknown API request endpoint");
-			res.put("INFO", "Requested path : " + String.join(".", path));
+			res.put("INFO", "Requested path : " + jointPath);
 			return res;
 		}
 
 		try {
 			// The actual execution
-			return execute(String.join(".", path), req, res);
+			return execute(jointPath, req, res);
 		} catch (Exception e) {
 			// Suppress and print out the error info
 			String errorMsg = e.getMessage();

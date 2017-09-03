@@ -343,6 +343,7 @@ public class AccountTableApi extends CommonApiModule {
 			// If current user is null, halt and throw an error
 			if( currentUser == null ) {
 				res.put(ERROR, ERROR_NO_USER);
+				return;
 			}
 
 			// Put user._oid as _oid
@@ -384,7 +385,7 @@ public class AccountTableApi extends CommonApiModule {
 		if(ao != null){
 			res.put(LOGINNAMELIST, ao.getLoginNameSet());
 		}
-System.out.println(res.get(INFO));
+
 		return dataTableApi.get.apply(req, res);
 	};
 

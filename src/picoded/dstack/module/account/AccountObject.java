@@ -94,8 +94,9 @@ public class AccountObject extends Core_DataObject {
 	}
 
 	/**
-	* Add the login name list to the account object
+	* Add the login name list to the account info object
 	*
+	* @param Name to be added
 	*/
 	public void populateLoginNameList(String name){
 		if (name == null || name.length() <= 0) {
@@ -115,6 +116,28 @@ public class AccountObject extends Core_DataObject {
 	}
 
 	/**
+	* Remove the login name in the list of the account info object
+	*
+	* @param Name to be removed
+	*/
+	public void removeLoginNameFromList(String name){
+		if (name == null || name.length() <= 0) {
+			throw new RuntimeException("No Login Name to be remove.");
+		}
+
+		// Get the current list of login names
+		List<String> loginNames = this.getList(LOGINNAMELIST, new ArrayList<String>());
+		// Add if not exists
+		if (!loginNames.contains(name)){
+			loginNames.remove(name);
+		}
+		// Put it back to the object
+		this.put(LOGINNAMELIST, loginNames);
+		// Save the object
+		this.saveDelta();
+	}
+
+	/**
 	 * Removes the old name from the database
 	 *
 	 * @param  LoginName to setup for this account
@@ -122,6 +145,7 @@ public class AccountObject extends Core_DataObject {
 	public void removeLoginName(String name) {
 		if (hasLoginName(name)) {
 			mainTable.accountLoginNameMap.remove(name);
+			removeLoginNameFromList(name);
 		}
 	}
 
@@ -157,6 +181,7 @@ public class AccountObject extends Core_DataObject {
 			}
 			// Remove the login ID
 			mainTable.accountLoginNameMap.remove(oldName);
+			removeLoginNameFromList(oldName);
 		}
 
 		return true;

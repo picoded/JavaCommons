@@ -269,6 +269,12 @@ public class AccountTableApi extends CommonApiModule {
 			res.put(ERROR, ERROR_NO_EMAIL);
 			return res;
 		}
+		// Check if it is in the correct format
+		if (!isEmailFormat(email) && !isTesting) {
+			res.put(ERROR, ERROR_INVALID_FORMAT_EMAIL);
+			return res;
+		}
+
 		// Check if email is in use
 		if (!isGroup && table.isEmailExist(email)) {
 			res.put(ERROR, ERROR_EMAIL_EXISTS);
@@ -1200,44 +1206,44 @@ public class AccountTableApi extends CommonApiModule {
 		return res;
 	};
 
-	// /**
-	//  * # delete_user_account
-	//  *
-	//  * Delete an existing/current user
-	//  *
-	//  * ## HTTP Request Parameters
-	//  *
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | Parameter Name  | Variable Type          | Description                                                                |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | userID          | String  (Optional)    | ID of the user/current user to retrieve                                     |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  *
-	//  * ## JSON Object Output Parameters
-	//  *
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | Parameter Name  | Variable Type          | Description                                                                |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | success          | boolean                | false for failed change and true for success                               |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  **/
-	// public ApiFunction delete_user_account = (req, res) -> {
-	// 	String userID = req.getString(USER_ID, "");
-	// 	AccountObject ao = (!userID.isEmpty()) ? table.get(userID) : table.getRequestUser(
-	// 		req.getHttpServletRequest(), null);
-	// 	if (ao == null) {
-	// 		res.put(ERROR, ERROR_NO_USER);
-	// 		return res;
-	// 	}
-	// 	if (userID.isEmpty()) { // logout any current session if it is the current user
-	// 		this.logout.apply(req, res);
-	// 	}
-	// 	table.remove(ao);
-	// 	res.put(SUCCESS, true);
-	// 	return res;
-	// };
+	/**
+	 * # delete_user_account
+	 *
+	 * Delete an existing/current user
+	 *
+	 * ## HTTP Request Parameters
+	 *
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type          | Description                                                                |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | userID          | String  (Optional)    | ID of the user/current user to retrieve                                     |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 *
+	 * ## JSON Object Output Parameters
+	 *
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | Parameter Name  | Variable Type          | Description                                                                |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | result          | boolean                | false for failed change and true for success                               |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
+	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
+	 **/
+	public ApiFunction delete_user_account = (req, res) -> {
+		String userID = req.getString(ACCOUNT_ID, "");
+		AccountObject ao = (!userID.isEmpty()) ? table.get(userID) : table.getRequestUser(
+			req.getHttpServletRequest(), null);
+		if (ao == null) {
+			res.put(ERROR, ERROR_NO_USER);
+			return res;
+		}
+		if (userID.isEmpty()) { // logout any current session if it is the current user
+			this.logout.apply(req, res);
+		}
+		table.remove(ao);
+		res.put(RESULT, true);
+		return res;
+	};
 
 	/**
 	 * # account_info

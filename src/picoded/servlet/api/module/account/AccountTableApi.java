@@ -303,6 +303,7 @@ public class AccountTableApi extends CommonApiModule {
 			// Set email as login ID as well
 			if (!email.isEmpty() && isEmailFormat(email)) {
 				newAccount.setLoginName(email);
+				newAccount.put(EMAIL, email);
 			}
 
 			newAccount.setPassword(password);

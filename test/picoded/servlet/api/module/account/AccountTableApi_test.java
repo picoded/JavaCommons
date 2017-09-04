@@ -1741,7 +1741,6 @@ public class AccountTableApi_test extends ApiModule_test {
 
 		public void executeGenericTestCase() {
 			res = requestJSON(url, params);
-			System.out.println(res.get(INFO));
 			assertEquals(expectedResult, res.get(resultToGetFrom));
 		}
 

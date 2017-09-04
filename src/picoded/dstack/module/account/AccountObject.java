@@ -104,13 +104,13 @@ public class AccountObject extends Core_DataObject {
 		}
 
 		// Get the current list of login names
-		List<String> loginNames = this.getList(UNDERSCORE_LOGINNAMELIST, new ArrayList<String>());
+		List<String> loginNames = this.getList(LOGINNAMELIST, new ArrayList<String>());
 		// Add if not exists
 		if (!loginNames.contains(name)){
 			loginNames.add(name);
 		}
 		// Put it back to the object
-		this.put(UNDERSCORE_LOGINNAMELIST, loginNames);
+		this.put(LOGINNAMELIST, loginNames);
 		// Save the object
 		this.saveDelta();
 	}
@@ -126,13 +126,13 @@ public class AccountObject extends Core_DataObject {
 		}
 
 		// Get the current list of login names
-		List<String> loginNames = this.getList(UNDERSCORE_LOGINNAMELIST, new ArrayList<String>());
+		List<String> loginNames = this.getList(LOGINNAMELIST, new ArrayList<String>());
 		// Add if not exists
 		if (!loginNames.contains(name)){
 			loginNames.remove(name);
 		}
 		// Put it back to the object
-		this.put(UNDERSCORE_LOGINNAMELIST, loginNames);
+		this.put(LOGINNAMELIST, loginNames);
 		// Save the object
 		this.saveDelta();
 	}

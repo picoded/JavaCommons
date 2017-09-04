@@ -26,7 +26,7 @@ public class AccountConstantStrings {
 	public static final String NEW_PASSWORD = "newPass";
 	public static final String NAME = "name";
 	public static final String UPDATE = "update";
-	public static final String LOGINNAMELIST = "loginNamesList";
+	public static final String LOGINNAMELIST = "loginNameList";
 
 	// Rancher VARS
 	public static final String EMAIL = "email";

@@ -1,5 +1,4 @@
 /**
  * Security utility functions
  **/
-package picoded.security;
-
+package picoded.util.security;

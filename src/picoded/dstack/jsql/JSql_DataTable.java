@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import picoded.dstack.DataTable;
 import picoded.dstack.DataObject;
 import picoded.dstack.core.Core_DataTable;
-import picoded.security.NxtCrypt;
+import picoded.util.security.NxtCrypt;
 import picoded.core.struct.GenericConvertMap;
 import picoded.core.struct.GenericConvertHashMap;
 import picoded.dstack.jsql.connector.*;

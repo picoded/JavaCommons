@@ -2,7 +2,7 @@ package picoded.dstack.core;
 
 import picoded.dstack.*;
 import picoded.dstack.CommonStructure;
-import picoded.security.NxtCrypt;
+import picoded.util.security.NxtCrypt;
 import picoded.core.struct.GenericConvertMap;
 import picoded.core.struct.GenericConvertHashMap;
 import picoded.dstack.module.account.AccountTable;

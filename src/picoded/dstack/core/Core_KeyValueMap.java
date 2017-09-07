@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import picoded.dstack.KeyValueMap;
-import picoded.security.NxtCrypt;
+import picoded.util.security.NxtCrypt;
 import picoded.core.struct.GenericConvertMap;
 import picoded.core.struct.GenericConvertHashMap;
 

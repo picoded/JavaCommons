@@ -27,6 +27,7 @@ public class AccountConstantStrings {
 	public static final String NAME = "name";
 	public static final String UPDATE = "update";
 	public static final String LOGINNAMELIST = "loginNameList";
+	public static final String TOKEN = "token";
 
 	// Rancher VARS
 	public static final String EMAIL = "email";
@@ -90,15 +91,16 @@ public class AccountConstantStrings {
 	public static final String ERROR_PASS_INCORRECT = "Old password is wrong.";
 	public static final String ERROR_NO_PRIVILEGES = "User does not have privilege.";
 	public static final String ERROR_PASSWORD_COMPLEXITY = "The password must contain at least 1 uppercase, 1 lowercase and 1 number with at least 6 characters long.";
-	public static final String ERROR_INVALID_FORMAT_EMAIL = "The username is not an email.";
+	public static final String ERROR_INVALID_FORMAT_EMAIL = "Invalid email format.";
 	public static final String ERROR_USER_NOT_LOGIN = "User is not logged in.";
 	public static final String ERROR_NO_EMAIL = "No email address is found.";
 	public static final String ERROR_NO_NODE_ID = "No node ID is found.";
-	public static final String ERROR_EMAIL_EXISTS = "Email is in used.";
+	public static final String ERROR_EMAIL_EXISTS = "This email is in use.";
 	public static final String ERROR_NO_NAME = "No name is found.";
 	public static final String ERROR_NO_ACCOUNT_ID = "No account ID is found.";
-	public static final String ERROR_LOGIN_NAME_EXISTS = "The login name is in use.";
-
+	public static final String ERROR_LOGIN_NAME_EXISTS = "This username is in use.";
+	public static final String ERROR_NO_DIFFERENT_EMAIL_ALLOW = "You cannot change the login name to a different email address.";
+	public static final String ERROR_NO_EMAIL_LOGIN_NAME_FOUND = "One of the login names must contain the user's email.";
 	/// ADDITIONAL Variables
 	public static final String SPACE = " ";
 	public static final String GROUP = "group";

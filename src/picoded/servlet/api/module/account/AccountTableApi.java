@@ -313,14 +313,7 @@ public class AccountTableApi extends CommonApiModule {
 			res.put(DATA, newAccount);
 			res.put(ACCOUNT_ID, newAccount._oid());
 		} else {
-			// Account already exists
-			AccountObject existingAccount = table.getFromLoginName(loginName);
-			if (existingAccount != null) {
-				res.put(ACCOUNT_ID, existingAccount._oid());
-			} else {
-				res.put(ACCOUNT_ID, null);
-			}
-			res.put(ERROR, "Object already exists in account Table");
+			res.put(ERROR, ERROR_LOGIN_NAME_EXISTS);
 		}
 		return res;
 	};

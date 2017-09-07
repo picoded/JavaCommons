@@ -82,7 +82,7 @@ public class BasePage extends DStackPage {
 			return _accountTable;
 		}
 		_accountTable = DStack().getAccountTable(getAccountTablePrefix());
-
+		_accountTable.cookieDomain = DConfig().getString("sys.account.domain", null);
 		return _accountTable;
 	}
 

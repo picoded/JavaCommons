@@ -165,6 +165,11 @@ public class JSql_DataTableUtils {
 		// Type flag to use
 		int type = 0;
 
+		// Null type support
+		if( value == null ) {
+			return valueTypeSet(0, null, null, null, null);
+		}
+
 		// Numeric type support
 		if (value instanceof Number) {
 			if (value instanceof Integer) {
@@ -173,6 +178,12 @@ public class JSql_DataTableUtils {
 				type = MetaType.FLOAT.getValue();
 			} else if (value instanceof Double) {
 				type = MetaType.DOUBLE.getValue();
+			} else if (value instanceof Long) {
+				type = MetaType.LONG.getValue();
+			} else {
+				// When all else fail, use Double type
+				type = MetaType.DOUBLE.getValue();
+				value = new Double(((Number)value).doubleValue());
 			}
 			return valueTypeSet(type, (Number) value, shortenStringValue(value), value.toString(),
 				null);
@@ -211,6 +222,13 @@ public class JSql_DataTableUtils {
 		// Get the storage type setting
 		//
 		int baseType = ((Number) (r.get("typ")[pos])).intValue();
+
+		//
+		// Null type support
+		//
+		if(baseType == MetaType.NULL.getValue()) {
+			return null;
+		}
 
 		//
 		// Int, Long, Double, Float

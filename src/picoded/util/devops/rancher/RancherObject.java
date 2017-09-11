@@ -34,12 +34,11 @@ public class RancherObject {
 	protected String catalogTemplate = "";
 	protected String templateVersion = "";
 	protected String basicAuth = "";
-	protected String deployment_server_url = "";
 	protected String externalID = "";
-	protected String selenium_external_link = "";
 	protected String beta_version = "";
 	protected String catalog_version = "";
 	Rancher rancher = null;
+	protected GenericConvertMap<String, Object> masterRancherConfig = null;
 
 	/**
 	 * Constructor for RancherObject
@@ -89,21 +88,33 @@ public class RancherObject {
 		projectID = rancherConfig.getString("projectID", "");
 		catalogTemplate = rancherConfig.getString("catalogTemplate", "");
 		templateVersion = rancherConfig.getString("templateVersion", "");
-		deployment_server_url = rancherConfig.getString("deployment_server_url", "");
-		selenium_external_link = rancherConfig.getString("selenium_external_link", "");
+		externalID = rancherConfig.getString("externalID", "");
 		beta_version = rancherConfig.getString("beta_version", "2");
 		catalog_version = rancherConfig.getString("catalog_version", "1");
-		externalID = rancherConfig.getString("externalID", "");
 		if (accessKey.isEmpty() || secretKey.isEmpty() || baseURL.isEmpty() || projectID.isEmpty()
-			|| catalogTemplate.isEmpty() || templateVersion.isEmpty()
-			|| deployment_server_url.isEmpty() || externalID.isEmpty()
-			|| selenium_external_link.isEmpty())
+			|| catalogTemplate.isEmpty() || templateVersion.isEmpty() || externalID.isEmpty())
 			throw new RuntimeException(
 				"rancherConfig file is not set up properly. Ensure that there are \n"
-					+ "accessKey, secretKey, baseURL, projectID, catalogTemplate, templateVersion, externalID, selenium_external_link and deployment_server_url are set.");
+					+ "accessKey, secretKey, baseURL, projectID, catalogTemplate, templateVersion and externalID are set.");
 		String userpass = accessKey + ":" + secretKey;
 		// the username and password in Base64 for the subsequent requests
 		basicAuth = "Basic " + new String(Base64.getEncoder().encodeToString(userpass.getBytes()));
+		masterRancherConfig = rancherConfig;
+	}
+
+	/**
+	 * Obtain the template variables in the configuration file and set them into the
+	 * environment
+	 * @param environment of the stack to be created
+	 *
+	 * @return environment of the stack with the variables set
+	 */
+	protected Map<String, Object> setupInternalTemplateConfig(Map<String, Object> environment){
+		Map<String, String> templateVariables = masterRancherConfig.getStringMap("templateVariables");
+		for (String variable : templateVariables.keySet()) {
+			environment.put(variable, templateVariables.get(variable));
+		}
+		return environment;
 	}
 
 	/**

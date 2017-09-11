@@ -82,7 +82,7 @@ public class BasePage extends DStackPage {
 			return _accountTable;
 		}
 		_accountTable = DStack().getAccountTable(getAccountTablePrefix());
-		_accountTable.cookieDomain = DConfig().getString("sys.account.session.domain", null);
+		_accountTable.cookieDomain = DConfig().getString("sys.account.session.cookieDomain", null);
 		return _accountTable;
 	}
 
@@ -104,6 +104,7 @@ public class BasePage extends DStackPage {
 		if (_currentAccount != null) {
 			return _currentAccount;
 		}
+
 		_currentAccount = getAccountTable().getRequestUser(httpRequest, httpResponse);
 		return _currentAccount;
 	}

@@ -32,7 +32,6 @@ public class AccountConstantStrings {
 	// Rancher VARS
 	public static final String EMAIL = "email";
 	public static final String NODE_ID = "nodeID";
-	public static final String STACK_NAME = "stackName";
 	public static final String AUTH_KEY = "authKey";
 	public static final String ADMIN_PASS = "adminPass";
 

@@ -939,4 +939,30 @@ public class AccountObject extends Core_DataObject {
 		mainTable.loginThrottlingAttemptMap.put(userId, null);
 		mainTable.loginThrottlingExpiryMap.put(userId, null);
 	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Private Meta Data Table Management
+	//
+	///////////////////////////////////////////////////////////////////////////
+	private DataObject _accountPrivateDataTable = null;
+
+	public void setPrivateMetaData(String key, Object value){
+		// Create a new private data for the account if it does not exists
+		if ( mainTable.accountPrivateDataTable.get(this._oid()) == null ){
+			_accountPrivateDataTable = mainTable.accountPrivateDataTable.get(this._oid(), true);
+		}
+		// Put in the details and save it
+		_accountPrivateDataTable.put(key, value);
+		_accountPrivateDataTable.saveDelta();
+	}
+
+	public String getPrivateMetaStringData(String key){
+		if ( _accountPrivateDataTable != null ){
+			return _accountPrivateDataTable.getString(key, "");
+		}
+		_accountPrivateDataTable = mainTable.accountPrivateDataTable.get(this._oid());
+		return _accountPrivateDataTable.getString(key, "");
+	}
+
 }

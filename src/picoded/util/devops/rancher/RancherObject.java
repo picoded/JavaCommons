@@ -220,6 +220,12 @@ public class RancherObject {
 		return setAndSendRequest(url, "GET", null);
 	}
 
+	public GenericConvertMap<String, Object> getService(String serviceID) {
+		String url = baseURL + "/v" + beta_version + "-beta/projects/" + projectID + "/services/"
+			+ serviceID;
+		return setAndSendRequest(url, "GET", null);
+	}
+
 	/**
 	 * Create the general procedure when connecting to rancher
 	 * @param take in the full url of the endpoint to connect to

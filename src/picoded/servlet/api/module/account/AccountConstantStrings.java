@@ -21,9 +21,9 @@ public class AccountConstantStrings {
 	public static final String DATA = "data";
 	public static final String ROLE = "role";
 	public static final String UPDATE_MODE = "updateMode";
-	public static final String OLD_PASSWORD = "oldPass";
-	public static final String REPEAT_PASSWORD = "repeatPass";
-	public static final String NEW_PASSWORD = "newPass";
+	public static final String OLD_PASSWORD = "oldPassword";
+	public static final String REPEAT_PASSWORD = "repeatPassword";
+	public static final String NEW_PASSWORD = "newPassword";
 	public static final String NAME = "name";
 	public static final String UPDATE = "update";
 	public static final String LOGINNAMELIST = "loginNameList";

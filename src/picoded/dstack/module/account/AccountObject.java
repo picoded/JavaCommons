@@ -952,6 +952,10 @@ public class AccountObject extends Core_DataObject {
 		if ( mainTable.accountPrivateDataTable.get(this._oid()) == null ){
 			_accountPrivateDataTable = mainTable.accountPrivateDataTable.get(this._oid(), true);
 		}
+		// Set the table if it is null
+		if ( _accountPrivateDataTable == null ){
+			_accountPrivateDataTable = mainTable.accountPrivateDataTable.get(this._oid());
+		}
 		// Put in the details and save it
 		_accountPrivateDataTable.put(key, value);
 		_accountPrivateDataTable.saveDelta();
@@ -961,6 +965,11 @@ public class AccountObject extends Core_DataObject {
 		if ( _accountPrivateDataTable != null ){
 			return _accountPrivateDataTable.getString(key, "");
 		}
+		// Create a new private data for the account if it does not exists
+		if ( mainTable.accountPrivateDataTable.get(this._oid()) == null ){
+			_accountPrivateDataTable = mainTable.accountPrivateDataTable.get(this._oid(), true);
+		}
+
 		_accountPrivateDataTable = mainTable.accountPrivateDataTable.get(this._oid());
 		return _accountPrivateDataTable.getString(key, "");
 	}

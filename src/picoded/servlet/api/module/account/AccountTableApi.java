@@ -987,7 +987,7 @@ public class AccountTableApi extends CommonApiModule {
 		}
 
 		// Validate if the required params exists
-		String[] paramsToCheck = new String[] { OLD_PASSWORD, NEW_PASSWORD,	REPEAT_PASSWORD };
+		String[] paramsToCheck = new String[] { NEW_PASSWORD };
 		res = check_parameters(paramsToCheck, req, res);
 		if (res.get(ERROR) != null){
 			return res;

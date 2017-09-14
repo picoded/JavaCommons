@@ -946,63 +946,83 @@ public class AccountTableApi extends CommonApiModule {
 	// };
 	//
 	/**
-	 * # reset_password
+	 * # account/changePassword
 	 *
 	 * Resets the password of the user/current member
 	 *
 	 * ## HTTP Request Parameters
 	 *
 	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | Parameter Name  | Variable Type          | Description                                                                |
+	 * | Parameter Name  | Variable Type         | Description                                                                |
 	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | userID          | String  (Optional)    | ID of the user/current user to retrieve                                     |
-	 * | oldPassword      | String                | Old password of the user                                                   |
-	 * | newPassword      | String                | New password of the user                                                   |
-	 * | repeatPassword  | String                | Repeat new password of the user                                             |
+	 * | accountID       | String  (Optional)    | ID of the user/current user to retrieve                                    |
+	 * | oldPassword     | String                | Old password of the user                                                   |
+	 * | newPassword     | String                | New password of the user                                                   |
 	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	 *
 	 * ## JSON Object Output Parameters
 	 *
 	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | Parameter Name  | Variable Type          | Description                                                                |
+	 * | Parameter Name  | Variable Type         | Description                                                                |
 	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | accountID        | String                | ID of the user                                                             |
-	 * | success          | boolean                | false for failed change and true for success                               |
+	 * | accountID       | String                | ID of the user                                                             |
+	 * | result          | boolean               | false for failed change and true for success                               |
 	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	 * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
 	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	 **/
-	protected ApiFunction reset_password = (req, res) -> {
-		res.put(SUCCESS, false);
+	protected ApiFunction changePassword = (req, res) -> {
+		
+		// Get accountID to update
 		String accountID = req.getString(ACCOUNT_ID, "");
-		AccountObject ao = (!accountID.isEmpty()) ? table.get(accountID) : table.getRequestUser(
-			req.getHttpServletRequest(), null);
+
+		// Get the current user ID
+		AccountObject cu = table.getRequestUser(req.getHttpServletRequest(), null);
+		AccountObject ao = table.get(accountID);
+
+		// Validate that account object is given
 		if (ao == null) {
 			res.put(ERROR, ERROR_NO_USER);
 			return res;
 		}
 
-		String[] paramsToCheck = new String[] { OLD_PASSWORD, NEW_PASSWORD,
-			REPEAT_PASSWORD };
+		// Validate if the required params exists
+		String[] paramsToCheck = new String[] { OLD_PASSWORD, NEW_PASSWORD,	REPEAT_PASSWORD };
 		res = check_parameters(paramsToCheck, req, res);
 		if (res.get(ERROR) != null){
 			return res;
 		}
+
+		// Get the old, and new password
 		String oldPassword = req.getString(OLD_PASSWORD);
 		String newPassword = req.getString(NEW_PASSWORD);
-		String repeatPassword = req.getString(REPEAT_PASSWORD);
 
-		if (!newPassword.equals(repeatPassword)) {
-			res.put(ERROR, ERROR_PASS_NOT_EQUAL);
+		// If current account is super user, 
+		// and is not modifying himself
+		if( oldPassword == null && cu.isSuperUser() && !cu._oid().equals(ao._oid()) ) {
+			// Bypass old password check, and set new password
+			ao.setPassword( newPassword );
+			res.put(RESULT, true);
 			return res;
 		}
+
+		// Ensure from here user logged in and changing password is the same
+		if(ao._oid().equals(cu._oid()) == false) {
+			res.put(ERROR, "Change password, requires the respective user login permission");
+			return res;
+		}
+
+		// Else require a proper setPassword with validation
 		if (!ao.setPassword(newPassword, oldPassword)) {
 			res.put(ERROR, ERROR_PASS_INCORRECT);
 			return res;
 		}
-		res.put(SUCCESS, true);
+
+		// Return successful password reset
+		res.put(RESULT, true);
 		res.put(ACCOUNT_ID, ao._oid());
 
+		// return result
 		return res;
 	};
 
@@ -1484,11 +1504,11 @@ public class AccountTableApi extends CommonApiModule {
 		builder.put(path + "account/info/list/datatables", info_list_datatables);
 
 		// builder.put(path + API_ACCOUNT_LOCKTIME, lockTime); // Tested
-		builder.put(path + API_ACCOUNT_PASS_RESET, reset_password); // Tested
+		builder.put(path + "account/changePassword", changePassword); // Tested
 
 		// builder.put(path + API_ACCOUNT_INFO, account_info); // Tested
 		// builder.put(path + API_ACCOUNT_INFO_ID, account_info_by_ID); // Tested
-		builder.put(path + API_ACCOUNT_ADMIN_REMOVE, delete_user_account); // Tested
+		builder.put(path + "account/admin/remove", delete_user_account); // Tested
 		// builder.put(path + API_ACCOUNT_LIST, dataTableApi.list);
 		//
 		// //Group functionalities

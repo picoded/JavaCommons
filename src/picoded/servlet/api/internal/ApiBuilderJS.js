@@ -122,9 +122,9 @@ if(apicore.isNodeJS()) {
 					var jsonObj = JSON.parse(request.responseText);
 
 					// Error response in request
-					if( jsonObj.error ) {
+					if( jsonObj.ERROR || jsonObj.error) {
 						// Throw error from json object
-						bad(jsonObj.error);
+						bad(jsonObj.ERROR || jsonObj.error);
 					} else {
 						// Request succeded, returns json result
 						good(jsonObj);

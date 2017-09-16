@@ -263,23 +263,6 @@ public class AccountTableApi extends CommonApiModule {
 				givenMetaObj = ConvertJSON.toMap(jsonMetaString);
 			}
 		}
-		// Check if it email is filled in if creating user
-		String email = req.getString(EMAIL, "");
-		if (!isGroup && email.isEmpty() && !isTesting){
-			res.put(ERROR, ERROR_NO_EMAIL);
-			return res;
-		}
-		// Check if it is in the correct format
-		if (!isEmailFormat(email) && !isTesting) {
-			res.put(ERROR, ERROR_INVALID_FORMAT_EMAIL);
-			return res;
-		}
-
-		// Check if email is in use
-		if (!isGroup && table.isEmailExist(email)) {
-			res.put(ERROR, ERROR_EMAIL_EXISTS);
-			return res;
-		}
 
 		AccountObject newAccount = table.newEntry(loginName);
 		// Create new account
@@ -299,11 +282,6 @@ public class AccountTableApi extends CommonApiModule {
 				AccountObject firstAdmin = table.getRequestUser(req.getHttpServletRequest(), null);
 				if (firstAdmin != null) // Set the creator as the admin
 					newAccount.setMember(firstAdmin, "admin");
-			}
-			// Set email as login ID as well
-			if (!email.isEmpty() && isEmailFormat(email)) {
-				newAccount.setLoginName(email);
-				newAccount.put(EMAIL, email);
 			}
 
 			newAccount.setPassword(password);
@@ -972,7 +950,7 @@ public class AccountTableApi extends CommonApiModule {
 	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	 **/
 	protected ApiFunction changePassword = (req, res) -> {
-		
+
 		// Get accountID to update
 		String accountID = req.getString(ACCOUNT_ID, "");
 
@@ -997,7 +975,7 @@ public class AccountTableApi extends CommonApiModule {
 		String oldPassword = req.getString(OLD_PASSWORD);
 		String newPassword = req.getString(NEW_PASSWORD);
 
-		// If current account is super user, 
+		// If current account is super user,
 		// and is not modifying himself
 		if( oldPassword == null && cu.isSuperUser() && !cu._oid().equals(ao._oid()) ) {
 			// Bypass old password check, and set new password

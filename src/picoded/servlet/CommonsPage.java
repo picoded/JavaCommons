@@ -34,7 +34,8 @@ public class CommonsPage extends BasePage {
 		String password = DConfig().getString("sys.smtp.password", "");
 		String emailFrom = DConfig().getString("sys.smtp.emailFrom", "testingTheEmailSystem@mailinator.com");
 		boolean isSSL = DConfig().getBoolean("sys.smtp.ssl", false);
-
-		return (systemEmail = new EmailBroadcaster(hostname, username, password, emailFrom, isSSL));
+		systemEmail = new EmailBroadcaster(hostname, username, password, emailFrom, isSSL);
+		systemEmail.setAdminEmail(DConfig().getString("sys.smtp.adminEmail", "eugene@uilicious.com"));
+		return systemEmail;
 	}
 }

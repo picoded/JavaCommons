@@ -27,18 +27,18 @@ import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 
 /**
-* Support the RequestHTTP api via apache
-* Note that apache requests are synchrnous, and not async
-**/
+ * Support the RequestHTTP api via apache
+ * Note that apache requests are synchrnous, and not async
+ **/
 public class RequestHttp_apache {
-
+	
 	///////////////////////////////////////////////////////////////////////
 	// Utility / Helper functions
 	///////////////////////////////////////////////////////////////////////
-
+	
 	/**
-	* Returns the apache client HttpUriRequest, based on its type
-	**/
+	 * Returns the apache client HttpUriRequest, based on its type
+	 **/
 	protected static HttpRequestBase HttpUriRequest_fromRequestType(HttpRequestType reqType,
 		String reqURL) {
 		switch (reqType) {
@@ -53,14 +53,14 @@ public class RequestHttp_apache {
 		case OPTION:
 			return new HttpOptions(reqURL);
 		}
-
+		
 		throw new RuntimeException("Invalid request type not supported: " + reqType);
 		//return null;
 	}
-
+	
 	/**
-	* Adds the cookies parameters to cookieJar
-	**/
+	 * Adds the cookies parameters to cookieJar
+	 **/
 	protected static BasicCookieStore addCookiesIntoCookieJar(String domain,
 		BasicCookieStore cookieJar, Map<String, String[]> cookieMap) {
 		if (cookieMap != null) {
@@ -68,7 +68,7 @@ public class RequestHttp_apache {
 				String[] values = entry.getValue();
 				for (String val : values) {
 					BasicClientCookie cookie = new BasicClientCookie(entry.getKey(), val);
-
+					
 					//
 					// T_T
 					//
@@ -97,17 +97,17 @@ public class RequestHttp_apache {
 					//
 					// Q_Q
 					//
-
+					
 					cookieJar.addCookie(cookie);
 				}
 			}
 		}
 		return cookieJar;
 	}
-
+	
 	/**
-	* Adds the header parameters to request
-	**/
+	 * Adds the header parameters to request
+	 **/
 	protected static HttpRequestBase addHeadersIntoRequest(HttpRequestBase reqBase,
 		Map<String, String[]> headersMap) {
 		if (headersMap != null) {
@@ -120,15 +120,15 @@ public class RequestHttp_apache {
 		}
 		return reqBase;
 	}
-
+	
 	/**
-	* Ammends the GET request URL with the parameters if needed
-	**/
+	 * Ammends the GET request URL with the parameters if needed
+	 **/
 	protected static String appendGetParameters(String reqURL, Map<String, String[]> parametersMap) {
 		if (parametersMap != null && parametersMap.size() > 0) {
 			reqURL = reqURL.trim();
 			StringBuilder req = new StringBuilder(reqURL);
-
+			
 			if (reqURL.endsWith("?")) {
 				//does nothing
 			} else if (reqURL.indexOf('?') >= 0) {
@@ -136,30 +136,30 @@ public class RequestHttp_apache {
 			} else {
 				req.append("?"); //start of parameters
 			}
-
+			
 			boolean first = true;
 			for (Map.Entry<String, String[]> entry : parametersMap.entrySet()) {
 				for (String val : entry.getValue()) {
 					if (!first) {
 						req.append("&"); //add to previous paremeters
 					}
-
+					
 					req.append(StringEscape.encodeURI(entry.getKey()));
 					req.append("=");
 					req.append(StringEscape.encodeURI(val));
-
+					
 					first = false;
 				}
 			}
-
+			
 			return req.toString();
 		}
 		return reqURL;
 	}
-
+	
 	/**
-	* Helps convert a Map<String, String[]> to a List<NameValuePair>, for put and post
-	**/
+	 * Helps convert a Map<String, String[]> to a List<NameValuePair>, for put and post
+	 **/
 	public static List<NameValuePair> parametersToNameValuePairs(Map<String, String[]> parametersMap) {
 		// Create a List to hold the NameValuePairs to be passed to the PostMethod
 		List<NameValuePair> listNameValuePairs = new ArrayList<NameValuePair>();
@@ -170,17 +170,17 @@ public class RequestHttp_apache {
 				}
 			}
 		}
-
+		
 		return listNameValuePairs;
 	}
-
+	
 	///////////////////////////////////////////////////////////////////////
 	// HTTP Request call handling
 	///////////////////////////////////////////////////////////////////////
-
+	
 	/**
-	* Request executor taking a HttpRequestBase and returning its response
-	**/
+	 * Request executor taking a HttpRequestBase and returning its response
+	 **/
 	protected static ResponseHttp_apache callRequest( //
 		String reqURL, HttpRequestBase httpRequest, //
 		Map<String, String[]> cookieMap //
@@ -188,33 +188,33 @@ public class RequestHttp_apache {
 		try {
 			// gets the hostname
 			String host = new URL(reqURL).getHost();
-
+			
 			// Prepares the HTTPClient, with a cookieJar =D
 			BasicCookieStore cookieJar = addCookiesIntoCookieJar(host, new BasicCookieStore(),
 				cookieMap);
 			HttpClient apacheClient = HttpClientBuilder.create().setDefaultCookieStore(cookieJar)
 				.build();
-
+			
 			// Executes request
 			HttpResponse apacheResponse = apacheClient.execute(httpRequest);
-
+			
 			// The response object to return is created
 			ResponseHttp_apache returnResponse = new ResponseHttp_apache();
 			returnResponse._cookieJar = cookieJar;
 			returnResponse._apacheResponse = apacheResponse;
 			returnResponse._inputStream = apacheResponse.getEntity().getContent();
-
+			
 			// And Return
 			return returnResponse;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-
+	
 	/**
-	* Executes the request, given the type and parmeters
-	* Note that post/put request parameters are sent as http form entities
-	**/
+	 * Executes the request, given the type and parmeters
+	 * Note that post/put request parameters are sent as http form entities
+	 **/
 	public static ResponseHttp callRequest( //
 		HttpRequestType reqType, //
 		String reqURL, //
@@ -224,12 +224,12 @@ public class RequestHttp_apache {
 	) {
 		return callRequest(reqType, reqURL, parametersMap, cookiesMap, headersMap, null);
 	}
-
+	
 	/**
-	* Executes the request, given the type and parmeters
-	* Note that post/put request parameters are sent using
-	* the input stream if given, else it uses the parameter map
-	**/
+	 * Executes the request, given the type and parmeters
+	 * Note that post/put request parameters are sent using
+	 * the input stream if given, else it uses the parameter map
+	 **/
 	public static ResponseHttp callRequest( //
 		HttpRequestType reqType, //
 		String reqURL, //
@@ -241,12 +241,12 @@ public class RequestHttp_apache {
 		return callRequest(reqType, reqURL, parametersMap, cookiesMap, headersMap, null,
 			requestStream);
 	}
-
+	
 	/**
-	* Executes the request, given the type and parmeters
-	* Note that post/put request parameters are sent using
-	* the input stream if given, else it uses the parameter map
-	**/
+	 * Executes the request, given the type and parmeters
+	 * Note that post/put request parameters are sent using
+	 * the input stream if given, else it uses the parameter map
+	 **/
 	public static ResponseHttp callRequest( //
 		HttpRequestType reqType, //
 		String reqURL, //
@@ -260,11 +260,11 @@ public class RequestHttp_apache {
 		if (reqType == HttpRequestType.GET || reqType == HttpRequestType.DELETE) {
 			reqURL = appendGetParameters(reqURL, parametersMap);
 		}
-
+		
 		// prepare request with headers
 		HttpRequestBase reqBase = HttpUriRequest_fromRequestType(reqType, reqURL);
 		reqBase = addHeadersIntoRequest(reqBase, headersMap);
-
+		
 		// POST and PUT parameters
 		if (reqType == HttpRequestType.POST || reqType == HttpRequestType.PUT) {
 			try {
@@ -275,7 +275,7 @@ public class RequestHttp_apache {
 				} else if (filesMap != null) {
 					// does a multipart encoding request
 					MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-
+					
 					// Process the file map, not using lambda as it does not auto rethrow the IOException
 					for (Map.Entry<String, File[]> part : filesMap.entrySet()) {
 						String filePath = part.getKey();
@@ -285,7 +285,7 @@ public class RequestHttp_apache {
 						}
 					}
 					;
-
+					
 					// Process the text map
 					if (parametersMap != null) {
 						parametersMap.forEach((key, valArr) -> {
@@ -294,7 +294,7 @@ public class RequestHttp_apache {
 							}
 						});
 					}
-
+					
 					// And submit it
 					HttpEntity multipart = builder.build();
 					((HttpEntityEnclosingRequestBase) reqBase).setEntity(multipart);
@@ -307,7 +307,7 @@ public class RequestHttp_apache {
 				throw new RuntimeException(e);
 			}
 		}
-
+		
 		// calls request with cookies
 		return callRequest(reqURL, reqBase, cookiesMap);
 	}

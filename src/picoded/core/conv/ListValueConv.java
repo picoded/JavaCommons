@@ -3,17 +3,17 @@ package picoded.core.conv;
 import java.util.*;
 
 /**
-* Utility conversion class, that helps convert Map values from one type to another.
-**/
+ * Utility conversion class, that helps convert Map values from one type to another.
+ **/
 public class ListValueConv {
-
+	
 	/**
-	* Invalid constructor (throws exception)
-	**/
+	 * Invalid constructor (throws exception)
+	 **/
 	protected ListValueConv() {
 		throw new IllegalAccessError("Utility class");
 	}
-
+	
 	public static String[] objectListToStringArray(List<Object> listObj) {
 		String[] stringArr = new String[listObj.size()];
 		for (int a = 0; a < listObj.size(); ++a) {
@@ -22,7 +22,7 @@ public class ListValueConv {
 		}
 		return stringArr;
 	}
-
+	
 	public static List<String> objectToString(List<Object> listObj) {
 		List<String> stringList = new ArrayList<String>();
 		for (Object obj : listObj) {
@@ -30,13 +30,13 @@ public class ListValueConv {
 		}
 		return stringList;
 	}
-
+	
 	public static List<String> deduplicateValuesWithoutArrayOrder(List<String> list) {
 		Set<String> set = new HashSet<String>();
 		set.addAll(list);
 		return new ArrayList<String>(set);
 	}
-
+	
 	public static <V> Set<String> toStringSet(List<V> list) {
 		Set<String> ret = new HashSet<String>();
 		for (V item : list) {

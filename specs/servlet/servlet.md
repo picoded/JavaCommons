@@ -309,7 +309,7 @@ The ApiModule template.
 {% hint style='Working' %}
 **Methods Summary**
 
-+ setupApiBuilder()
++ apiBuilderSetup()
 
 
 {% endhint %}
@@ -346,7 +346,7 @@ Account table filter.
 
 **Methods Summary**
 
-+ setupApiBuilder()
++ apiBuilderSetup()
 
 {% endhint %}
 
@@ -366,7 +366,7 @@ Account table API builder.
 
 **Methods Summary**
 
-+ setupApiBuilder()
++ apiBuilderSetup()
 
 {% endhint %}
 

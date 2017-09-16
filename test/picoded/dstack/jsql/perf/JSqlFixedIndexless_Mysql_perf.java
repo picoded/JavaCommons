@@ -7,7 +7,7 @@ import picoded.TestConfig;
 /// [Mysql varient]
 /// Testing of DataTable full indexless fixed table performance
 public class JSqlFixedIndexless_Mysql_perf extends JSqlFixedIndexless_perf {
-
+	
 	/// Note that this SQL connector constructor
 	/// is to be overriden for the various backend
 	/// specific test cases
@@ -18,8 +18,8 @@ public class JSqlFixedIndexless_Mysql_perf extends JSqlFixedIndexless_perf {
 	public void tableSetup() {
 		// Does the table setup
 		super.tableSetup();
-
+		
 		// Alter table format to be "dynamic", required to keep the large number of rows
-		jsqlObj.update_raw("ALTER TABLE `"+tablename+"` ROW_FORMAT=DYNAMIC;");
+		jsqlObj.update_raw("ALTER TABLE `" + tablename + "` ROW_FORMAT=DYNAMIC;");
 	}
 }

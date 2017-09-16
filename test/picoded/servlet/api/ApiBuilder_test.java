@@ -26,7 +26,7 @@ public class ApiBuilder_test {
 	int testPort = 0; //Test port to use
 	EmbeddedServlet testServlet = null; //Test servlet to use
 	ApiBuilder builder = null; //API builder to use
-
+	
 	//
 	// Standard setup and teardown
 	//
@@ -44,7 +44,7 @@ public class ApiBuilder_test {
 		}
 		builder = null;
 	}
-
+	
 	//
 	// Non servlet test
 	//
@@ -59,119 +59,133 @@ public class ApiBuilder_test {
 	@Test
 	public void simpleHelloWorld() {
 		baseSetup();
-
+		
 		// Blank Key set checking
 		Set<String> set = new HashSet<String>();
 		assertEquals(set, builder.keySet());
-
+		
 		// Register the script
-		builder.put("hello", (req,res) -> { res.put("hello","world"); return res; });
+		builder.put("hello", (req, res) -> {
+			res.put("hello", "world");
+			return res;
+		});
 		
 		// Validate result format
-		assertEquals( "{\"hello\":\"world\"}", ConvertJSON.fromMap(builder.execute("hello", null)) );
+		assertEquals("{\"hello\":\"world\"}", ConvertJSON.fromMap(builder.execute("hello", null)));
 	}
-
+	
 	//
 	// More comprehensive test of the hello world example
 	//
 	@Test
 	public void baseHelloWorld() {
 		baseSetup();
-
+		
 		// Blank Key set checking
 		Set<String> set = new HashSet<String>();
 		assertEquals(set, builder.keySet());
-
+		
 		// Register the script
-		builder.put("hello", (req,res) -> { 
+		builder.put("hello", (req, res) -> {
 			assertNotNull(req);
 			assertNotNull(res);
-			res.put("hello","world"); 
-			return res; 
+			res.put("hello", "world");
+			return res;
 		});
 		
 		// Registerd key set testing
 		set.add("hello");
 		assertEquals(set, builder.keySet());
 		assertNotNull(builder.get("hello"));
-
+		
 		// Assert result not null
-		assertNotNull( builder.execute("hello", null) );
-
+		assertNotNull(builder.execute("hello", null));
+		
 		// Validate result format
-		assertEquals( "{\"hello\":\"world\"}", ConvertJSON.fromMap(builder.execute("hello", null)) );
+		assertEquals("{\"hello\":\"world\"}", ConvertJSON.fromMap(builder.execute("hello", null)));
 	}
-
+	
 	//
 	// An example of versioning in action
 	//
 	@Test
 	public void helloWorldVersioning() {
 		baseSetup();
-
+		
 		// base versioning
-		assertEquals( "v0.0", builder.versionStr() );
-
+		assertEquals("v0.0", builder.versionStr());
+		
 		// Pointless version setup
-		assertNotNull( builder.setVersion(0,0) );
-		assertEquals( "v0.0", builder.versionStr() );
+		assertNotNull(builder.setVersion(0, 0));
+		assertEquals("v0.0", builder.versionStr());
 		
 		// Bad world
-		builder.put("hello", (req,res) -> { res.put("hello","bad-world"); return res; });
-		assertEquals( "bad-world", builder.execute("hello", null).get("hello") );
-
+		builder.put("hello", (req, res) -> {
+			res.put("hello", "bad-world");
+			return res;
+		});
+		assertEquals("bad-world", builder.execute("hello", null).get("hello"));
+		
 		// Version incrementing
-		assertNotNull( builder.setVersion(0,1) );
-		assertEquals( "v0.1", builder.versionStr() );
-
+		assertNotNull(builder.setVersion(0, 1));
+		assertEquals("v0.1", builder.versionStr());
+		
 		// Good world
-		builder.put("hello", (req,res) -> { res.put("hello","good-world"); return res; });
-		assertEquals( "good-world", builder.execute("hello", null).get("hello") );
+		builder.put("hello", (req, res) -> {
+			res.put("hello", "good-world");
+			return res;
+		});
+		assertEquals("good-world", builder.execute("hello", null).get("hello"));
 	}
+	
 	//
 	// Testing exception handling
 	//
 	@Test
 	public void missingPathException() {
 		baseSetup();
-
+		
 		// registering error endpoint
-		builder.put("error", (req,res) -> { throw new RuntimeException("test-exception"); });
-
+		builder.put("error", (req, res) -> {
+			throw new RuntimeException("test-exception");
+		});
+		
 		// Exception to validate
 		Exception testException = null;
-
+		
 		// Try to cause an exception
 		try {
 			builder.execute("does/not/exist", null);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			testException = e;
 		}
-
+		
 		// Validate that an exception occur
 		assertNotNull(testException);
 	}
-
+	
 	//
 	// Testing exception handling
 	//
 	@Test
 	public void validException() {
 		baseSetup();
-
+		
 		// registering error endpoint
-		builder.put("error", (req,res) -> { throw new RuntimeException("test-exception"); });
-
+		builder.put("error", (req, res) -> {
+			throw new RuntimeException("test-exception");
+		});
+		
 		// Exception to validate
 		Exception testException = null;
-
+		
 		// Try to cause an exception
 		try {
 			builder.execute("test-exception", null);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			testException = e;
 		}
-
+		
 		// Validate that an exception occur
 		assertNotNull(testException);
 	}

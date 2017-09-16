@@ -17,79 +17,79 @@ import picoded.core.common.JSqlType;
 import picoded.core.conv.ListValueConv;
 
 /**
-* Reference implementation of KeyValueMap data structure.
-* This is done via a minimal implementation via internal data structures.
-*
-* Built ontop of the Core_KeyValueMap implementation.
-**/
+ * Reference implementation of KeyValueMap data structure.
+ * This is done via a minimal implementation via internal data structures.
+ *
+ * Built ontop of the Core_KeyValueMap implementation.
+ **/
 public class JSql_KeyValueMap extends Core_KeyValueMap {
-
+	
 	//--------------------------------------------------------------------------
 	//
 	// Constructor vars
 	//
 	//--------------------------------------------------------------------------
-
+	
 	/**
-	* The inner sql object
-	**/
+	 * The inner sql object
+	 **/
 	protected JSql sqlObj = null;
-
+	
 	/**
-	* The tablename for the key value pair map
-	**/
+	 * The tablename for the key value pair map
+	 **/
 	protected String sqlTableName = null;
-
+	
 	/**
-	* [internal use] JSql setup with a SQL connection and tablename
-	**/
+	 * [internal use] JSql setup with a SQL connection and tablename
+	 **/
 	public JSql_KeyValueMap(JSql inJSql, String tablename) {
 		super();
-		sqlTableName = "KV_"+tablename;
+		sqlTableName = "KV_" + tablename;
 		sqlObj = inJSql;
 	}
-
+	
 	//--------------------------------------------------------------------------
 	//
 	// Fundemental set/get value (core)
 	//
 	//--------------------------------------------------------------------------
-
+	
 	/**
-	* [Internal use, to be extended in future implementation]
-	* Returns the value, with validation
-	*
-	* Handles re-entrant lock where applicable
-	*
-	* @param key as String
-	* @param now timestamp
-	*
-	* @return String value
-	**/
+	 * [Internal use, to be extended in future implementation]
+	 * Returns the value, with validation
+	 *
+	 * Handles re-entrant lock where applicable
+	 *
+	 * @param key as String
+	 * @param now timestamp
+	 *
+	 * @return String value
+	 **/
 	protected String getValueRaw(String key, long now) {
 		// Search for the key
 		JSqlResult r = sqlObj.select(sqlTableName, "*", "kID=?", new Object[] { key });
 		long expiry = getExpiryRaw(r);
-
+		
 		if (expiry != 0 && expiry < now) {
 			return null;
 		}
-
+		
 		return r.get("kVl")[0].toString();
 	}
-
+	
 	/**
-	* [Internal use, to be extended in future implementation]
-	* Sets the value, with validation
-	*
-	* Handles re-entrant lock where applicable
-	*
-	* @param key
-	* @param value, null means removal
-	* @param expire timestamp, 0 means not timestamp
-	*
-	* @return null
-	**/
+	 * [Internal use, to be extended in future implementation]
+	 * Sets the value, with validation
+	 *
+	 * Handles re-entrant lock where applicable
+	 *
+	 * @param key
+	 * @param value, null means removal
+	 * @param expire timestamp, 0 means not timestamp
+	 *
+	 * @return null
+	 **/
 	protected String setValueRaw(String key, String value, long expire) {
 		long now = currentSystemTimeInSeconds();
 		sqlObj.upsert( //
@@ -99,31 +99,31 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 			//
 			new String[] { "cTm", "eTm", "kVl" }, //insert cols
 			new Object[] { now, expire, value } //insert values
-		);
+			);
 		return null;
 	}
-
+	
 	//--------------------------------------------------------------------------
 	//
 	// Expiration and lifespan handling (core)
 	//
 	//--------------------------------------------------------------------------
-
+	
 	/**
-	* [Internal use, to be extended in future implementation]
-	* Gets the expire time from the JSqlResult
-	**/
+	 * [Internal use, to be extended in future implementation]
+	 * Gets the expire time from the JSqlResult
+	 **/
 	protected long getExpiryRaw(JSqlResult r) throws JSqlException {
 		// Search for the key
 		Object rawTime = null;
-
+		
 		// Has value
 		if (r != null && r.rowCount() > 0) {
 			rawTime = r.get("eTm")[0];
 		} else {
 			return -1; //No value (-1)
 		}
-
+		
 		// 0 represents expired value
 		long ret = 0;
 		if (rawTime != null) {
@@ -133,75 +133,74 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 				ret = Long.parseLong(rawTime.toString());
 			}
 		}
-
+		
 		if (ret <= 0) {
 			return 0;
 		} else {
 			return ret;
 		}
 	}
-
+	
 	/**
-	* [Internal use, to be extended in future implementation]
-	* Returns the expire time stamp value, raw without validation
-	*
-	* Handles re-entrant lock where applicable
-	*
-	* @param key as String
-	*
-	* @return long
-	**/
+	 * [Internal use, to be extended in future implementation]
+	 * Returns the expire time stamp value, raw without validation
+	 *
+	 * Handles re-entrant lock where applicable
+	 *
+	 * @param key as String
+	 *
+	 * @return long
+	 **/
 	protected long getExpiryRaw(String key) {
 		// Search for the key, get expire timestamp, and process it
 		return getExpiryRaw( //
-			sqlObj.select(sqlTableName, "eTm", "kID=?", new Object[] { key })
-		);
+		sqlObj.select(sqlTableName, "eTm", "kID=?", new Object[] { key }));
 	}
-
+	
 	/**
-	* [Internal use, to be extended in future implementation]
-	* Sets the expire time stamp value, raw without validation
-	*
-	* Handles re-entrant lock where applicable
-	*
-	* @param key as String
-	* @param expire timestamp in seconds, 0 means NO expire
-	*
-	* @return long
-	**/
+	 * [Internal use, to be extended in future implementation]
+	 * Sets the expire time stamp value, raw without validation
+	 *
+	 * Handles re-entrant lock where applicable
+	 *
+	 * @param key as String
+	 * @param expire timestamp in seconds, 0 means NO expire
+	 *
+	 * @return long
+	 **/
 	public void setExpiryRaw(String key, long time) {
 		sqlObj.update("UPDATE " + sqlTableName + " SET eTm=? WHERE kID=?", time, key);
 	}
-
+	
 	//--------------------------------------------------------------------------
 	//
 	// Backend system setup / teardown / maintenance (DStackCommon)
 	//
 	//--------------------------------------------------------------------------
-
+	
 	/**
-	* Primary key type
-	**/
+	 * Primary key type
+	 **/
 	protected String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
-
+	
 	/**
-	* Timestamp field type
-	**/
+	 * Timestamp field type
+	 **/
 	protected String tStampColumnType = "BIGINT";
-
+	
 	/**
-	* Key name field type
-	**/
+	 * Key name field type
+	 **/
 	protected String keyColumnType = "VARCHAR(64)";
-
+	
 	/**
-	* Value field type
-	**/
+	 * Value field type
+	 **/
 	protected String valueColumnType = "VARCHAR(MAX)";
-
+	
 	/**
-	* Setsup the backend storage table, etc. If needed
-	**/
+	 * Setsup the backend storage table, etc. If needed
+	 **/
 	public void systemSetup() {
 		// Table constructor
 		//-------------------
@@ -221,7 +220,7 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 				"kVl" //
 			}, //
 			new String[] { //
-				pKeyColumnType, //Primary key
+			pKeyColumnType, //Primary key
 				// Time stamps
 				tStampColumnType, tStampColumnType,
 				// Storage keys
@@ -229,14 +228,14 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 				// Value storage
 				valueColumnType //
 			} //
-		);
-
+			);
+		
 		// Unique index
 		//------------------------------------------------
 		sqlObj.createIndex( //
 			sqlTableName, "kID", "UNIQUE", "unq" //
 		);
-
+		
 		// Value search index
 		//------------------------------------------------
 		if (sqlObj.sqlType() == JSqlType.MYSQL) {
@@ -251,79 +250,77 @@ public class JSql_KeyValueMap extends Core_KeyValueMap {
 			);
 		}
 	}
-
+	
 	/**
-	* Teardown and delete the backend storage table, etc. If needed
-	**/
+	 * Teardown and delete the backend storage table, etc. If needed
+	 **/
 	public void systemDestroy() {
 		sqlObj.dropTable(sqlTableName);
 	}
-
+	
 	/**
-	* Perform maintenance, mainly removing of expired data if applicable
-	**/
+	 * Perform maintenance, mainly removing of expired data if applicable
+	 **/
 	public void maintenance() {
 		sqlObj.delete( //
 			sqlTableName, //
 			"eTm <= ? AND eTm > ?", //
-			new Object[] { currentSystemTimeInSeconds(), 0 }
-		);
+			new Object[] { currentSystemTimeInSeconds(), 0 });
 	}
-
+	
 	/**
-	* Removes all data, without tearing down setup
-	**/
+	 * Removes all data, without tearing down setup
+	 **/
 	@Override
 	public void clear() {
 		sqlObj.delete(sqlTableName);
 	}
-
+	
 	//--------------------------------------------------------------------------
 	//
 	// SQL specific KeySet / remove optimization
 	//
 	//--------------------------------------------------------------------------
-
+	
 	/**
-	* Search using the value, all the relevent key mappings
-	*
-	* Handles re-entrant lock where applicable
-	*
-	* @param key, note that null matches ALL
-	*
-	* @return array of keys
-	**/
+	 * Search using the value, all the relevent key mappings
+	 *
+	 * Handles re-entrant lock where applicable
+	 *
+	 * @param key, note that null matches ALL
+	 *
+	 * @return array of keys
+	 **/
 	@Override
 	public Set<String> keySet(String value) {
 		long now = currentSystemTimeInSeconds();
 		JSqlResult r = null;
 		if (value == null) {
-			r = sqlObj.select(sqlTableName, "kID", "eTm <= ? OR eTm > ?",
-				new Object[] { 0, now });
+			r = sqlObj.select(sqlTableName, "kID", "eTm <= ? OR eTm > ?", new Object[] { 0, now });
 		} else {
-			r = sqlObj.select(sqlTableName, "kID", "kVl = ? AND (eTm <= ? OR eTm > ?)",
-				new Object[] { value, 0, now });
+			r = sqlObj.select(sqlTableName, "kID", "kVl = ? AND (eTm <= ? OR eTm > ?)", new Object[] {
+				value, 0, now });
 		}
-
+		
 		if (r == null || r.get("kID") == null) {
 			return new HashSet<String>();
 		}
-
+		
 		// Gets the various key names as a set
 		return ListValueConv.toStringSet(r.getObjectList("kID", "[]"));
 	}
-
+	
 	/**
-	* Remove the value, given the key
-	*
-	* @param key param find the thae meta key
-	*
-	* @return  null
-	**/
+	 * Remove the value, given the key
+	 *
+	 * @param key param find the thae meta key
+	 *
+	 * @return  null
+	 **/
 	@Override
 	public String remove(Object key) {
 		sqlObj.update("DELETE FROM `" + sqlTableName + "` WHERE kID = ?", key.toString());
 		return null;
 	}
-
+	
 }

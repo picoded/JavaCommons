@@ -3,49 +3,132 @@ package picoded.servlet.api.module;
 import picoded.servlet.api.*;
 import picoded.core.conv.*;
 import picoded.core.struct.*;
+import picoded.core.common.SystemSetupInterface;
+
+import java.util.*;
 
 /**
-* The Abstract ApiModule that does some basic implementation for ApiModule.
-* This makes it easier to complete the implementation of the ApiModule interface
-**/
+ * The Abstract ApiModule that does some basic implementation for ApiModule.
+ * This makes it easier to complete the implementation of the ApiModule interface
+ **/
 abstract public class AbstractApiModule implements ApiModule {
-
+	
 	//-------------------------------------------------------------
 	// Stored objects
 	//-------------------------------------------------------------
 	protected ApiBuilder api = null;
 	protected String prefixPath = null;
-	protected GenericConvertMap<String,Object> config = null;
-
+	protected GenericConvertMap<String, Object> config = null;
+	protected List<SystemSetupInterface> subsystemList = null;
+	
 	//-------------------------------------------------------------
-	// API setup, load and config functions
+	// api setup
 	//-------------------------------------------------------------
-
+	
 	/**
-	* Does the actual setup for the API
-	* Given the API Builder, and the namespace prefix
-	*
-	* @param  api         ApiBuilder to add the required functions
-	* @param  prefixPath  prefix to assume as (should be able to accept "" blanks)
-	* @param  config      configuration object, assumed to be a map. use GenericConvert.toStringMap to preprocess the data
-	*/
-	public void configSetup(ApiBuilder inApi, String inPrefixPath, Object inConfigMap) {
+	 * Setup the API module, with the given parameters. And register the relevant end points
+	 *
+	 * @param  api         ApiBuilder to add the required functions
+	 * @param  prefixPath  prefix to assume as (should be able to accept "" blanks)
+	 * @param  config      configuration object, assumed to be a map. use GenericConvert.toStringMap to preprocess the data
+	 */
+	public void apiSetup(ApiBuilder inApi, String inPrefixPath, Object inConfigMap) {
 		// Set the api and its path prefix
 		api = inApi;
 		prefixPath = inPrefixPath;
-
+		
 		// Set the config
-		config = GenericConvert.toGenericConvertStringMap(inConfigMap);
+		config = defaultConfig();
+		config.putAll( GenericConvert.toStringMap(inConfigMap, "{}") );
+
+		subsystemList = internalSubsystemList();
+
+		apiSetup(api, prefixPath, config);
 	}
 
-	// NOTE: Until a use case for this is found, config getter is commented out
-	// /**
-	// * Configuration getter
-	// * 
-	// * @return GenericConvertMap<String,Object> representing the updated config
-	// */
-	// public GenericConvertMap<String,Object> config() {
-	// 	return config;
-	// }
+	/**
+	 * [To Overwrite]
+	 * Defines the default config object, this is useful in extending modules, and adjusting default behaviours
+	 */
+	protected GenericConvertHashMap<String,Object> defaultConfig() {
+		return new GenericConvertHashMap<String,Object>();
+	}
 
+	/**
+	 * [To Overwrite]
+	 * Does the actual API backend setup logic, this is after standardised apiSetup initialization
+	 */
+	abstract protected void apiSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config);
+
+	//-------------------------------------------------------------
+	// SystemSetup / Teardown chain helpers
+	//-------------------------------------------------------------
+	
+	/**
+	 * [To Overwrite]
+	 * 
+	 * Array of internal subsystem modules, which is chained systemSetup / Teardown / clear.
+	 *
+	 * Alternatively if a list is prefered, overwrite internalSubsystemList, 
+	 * and throw and exception on this function
+	 *
+	 * @return Array of SystemSetupInterface
+	 */
+	abstract protected SystemSetupInterface[] internalSubsystemArray();
+	
+	/**
+	 * Array of internal subsystem modules, which is chained systemSetup / Teardown / clear.
+	 *
+	 * @return Array of SystemSetupInterface
+	 */
+	protected List<SystemSetupInterface> internalSubsystemList() {
+		return Arrays.asList(internalSubsystemArray());
+	}
+
+	//----------------------------------------------------------------
+	//
+	//  Preloading of DStack structures, systemSetup/Teardown
+	//
+	//----------------------------------------------------------------
+	
+	/**
+	 * This does the systemSetup call on all the subsystems by default
+	 **/
+	public void systemSetup() {
+		subsystemList.forEach(item -> item.systemSetup());
+	}
+	
+	/**
+	 * This does the systemDestroy call on all the subsystems by default
+	 **/
+	public void systemDestroy() {
+		subsystemList.forEach(item -> item.systemDestroy());
+	}
+	
+	/**
+	 * This does the maintenance call on all the subsystems by default
+	 *
+	 * This is meant for large maintenance jobs.
+	 * Such as weekly or monthly compaction. It may or may not be a long
+	 * running task, where its use case is backend specific
+	 **/
+	public void maintenance() {
+		subsystemList.forEach(item -> item.maintenance());
+	}
+	
+	/**
+	 * This does the increment maintenance call on all the subsystems by default,
+	 * meant for minor changes between requests.
+	 **/
+	public void incrementalMaintenance() {
+		subsystemList.forEach(item -> item.incrementalMaintenance());
+	}
+	
+	/**
+	 * This does the clear call on all the subsystems by default
+	 **/
+	public void clear() {
+		subsystemList.forEach(item -> item.clear());
+	}
+	
 }

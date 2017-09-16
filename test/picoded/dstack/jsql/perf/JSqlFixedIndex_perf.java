@@ -4,8 +4,8 @@ package picoded.dstack.jsql.perf;
 import static org.junit.Assert.*;
 import org.junit.*;
 import com.carrotsearch.junitbenchmarks.AbstractBenchmark;
-import com.carrotsearch.junitbenchmarks.BenchmarkOptions; 
-import com.carrotsearch.junitbenchmarks.BenchmarkRule; 
+import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
+import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 
 // Java includes
 import java.util.*;
@@ -24,18 +24,18 @@ import picoded.TestConfig;
 
 /// Testing of DataTable full indexless fixed table performance
 public class JSqlFixedIndex_perf extends JSqlFixedIndexless_perf {
-
+	
 	//public String[] collumnNames = null;
-
+	
 	public void tableSetup() {
 		// Does original table setup
 		super.tableSetup();
-
+		
 		// This optimizes query by collumn names
-		for(int i=0; i<collumnNames.length; ++i) {
+		for (int i = 0; i < collumnNames.length; ++i) {
 			jsqlObj.createIndex( //
 				tablename, collumnNames[i], null, collumnNames[i] //
-			); //
+				); //
 		}
 	}
 }

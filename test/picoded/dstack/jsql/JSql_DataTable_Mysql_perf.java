@@ -23,7 +23,7 @@ import picoded.dstack.jsql.connector.*;
 import picoded.dstack.struct.simple.*;
 
 public class JSql_DataTable_Mysql_perf extends JSql_DataTable_perf {
-
+	
 	// To override for implementation
 	//-----------------------------------------------------
 	

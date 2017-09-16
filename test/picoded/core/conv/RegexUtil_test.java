@@ -62,9 +62,4 @@ public class RegexUtil_test {
 			RegexUtil.removeAllNonNumeric("T 1  H 2er3e4  WILL 5 Be N O W H I T E I S S PACE"));
 	}
 	
-	@Test
-	public void sanitiseCommonEscapeCharactersIntoAsciiTest() {
-		assertEquals("&#92;&#60;test&#92;&#62;",
-			RegexUtil.sanitiseCommonEscapeCharactersIntoAscii("\\<test\\>"));
-	}
 }

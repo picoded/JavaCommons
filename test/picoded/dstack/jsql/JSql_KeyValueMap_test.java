@@ -23,7 +23,7 @@ import picoded.dstack.jsql.connector.*;
 import picoded.dstack.struct.simple.*;
 
 public class JSql_KeyValueMap_test extends StructSimple_KeyValueMap_test {
-
+	
 	// To override for implementation
 	//-----------------------------------------------------
 	
@@ -33,10 +33,10 @@ public class JSql_KeyValueMap_test extends StructSimple_KeyValueMap_test {
 	public JSql jsqlConnection() {
 		return JSqlTest.sqlite();
 	}
-
+	
 	/// Impomentation constructor for SQL
 	public KeyValueMap implementationConstructor() {
-		return new JSql_KeyValueMap( jsqlConnection(), TestConfig.randomTablePrefix() );
+		return new JSql_KeyValueMap(jsqlConnection(), TestConfig.randomTablePrefix());
 	}
 	
 }

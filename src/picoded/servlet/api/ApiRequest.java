@@ -7,78 +7,78 @@ import picoded.core.struct.GenericConvertHashMap;
 import picoded.servlet.CorePage;
 
 /**
-* API Request map information
-* For the API function to process
-**/
+ * API Request map information
+ * For the API function to process
+ **/
 public class ApiRequest implements GenericConvertMap<String, Object> {
-
+	
 	//-----------------------------------------------------------------
 	//
 	//  Constructor vars
 	//
 	//-----------------------------------------------------------------
-
+	
 	/**
-	* The query and context object
-	**/
-	protected GenericConvertMap<String,Object> queryObj = new GenericConvertHashMap<String,Object> ();
-
+	 * The query and context object
+	 **/
+	protected GenericConvertMap<String, Object> queryObj = new GenericConvertHashMap<String, Object>();
+	
 	/**
-	* The context object to use
-	**/
-	protected GenericConvertMap<String,Object> contextObj = new GenericConvertHashMap<String,Object> ();
-
+	 * The context object to use
+	 **/
+	protected GenericConvertMap<String, Object> contextObj = new GenericConvertHashMap<String, Object>();
+	
 	/**
-	* The base API builder
-	**/
+	 * The base API builder
+	 **/
 	protected ApiBuilder builder = null;
-
+	
 	//-----------------------------------------------------------------
 	//
 	//  Overwrites vars (that would have taken from builder instead)
 	//
 	//-----------------------------------------------------------------
-
+	
 	/**
-	* Overwrite the request type, to be a certain type, such as "JAVA"
-	**/
+	 * Overwrite the request type, to be a certain type, such as "JAVA"
+	 **/
 	protected String requestMethod = null;
-
+	
 	/**
-	* CorePage overwrite
-	**/
+	 * CorePage overwrite
+	 **/
 	protected CorePage corePage = null;
-
+	
 	/**
-	* Super Lambda implementation
-	**/
+	 * Super Lambda implementation
+	 **/
 	// protected BiFunction<ApiRequest, ApiResponse, ApiResponse> superLambda = null;
-
+	
 	//-----------------------------------------------------------------
 	//
 	//  Constructor
 	//
 	//-----------------------------------------------------------------
-
+	
 	/**
-	* Initialize the class with query and context object
-	*
-	* @param   Parent ApiBuilder
-	* @param   Query map to assume
-	* @param   Context map to assume
-	**/
-	ApiRequest( ApiBuilder parent, Map<String,Object> query, Map<String,Object> context ) {
+	 * Initialize the class with query and context object
+	 *
+	 * @param   Parent ApiBuilder
+	 * @param   Query map to assume
+	 * @param   Context map to assume
+	 **/
+	ApiRequest(ApiBuilder parent, Map<String, Object> query, Map<String, Object> context) {
 		// Setup parent API builder object
 		builder = parent;
 		// Query and context setup
-		if( query != null ) {
+		if (query != null) {
 			queryObj.putAll(query);
 		}
-		if( context != null ) {
+		if (context != null) {
 			contextObj.putAll(context);
 		}
 	}
-
+	
 	// ApiRequest( ApiRequest original, BiFunction<ApiRequest,ApiResponse,ApiResponse> inSuperLambda ) {
 	// 	builder = original.builder;
 	// 	queryObj = original.queryObj;
@@ -90,113 +90,113 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	// public ApiResponse super( ApiRequest req, ApiResponse res ) {
 	// 	return superLambda.apply(req,res);
 	// }
-
+	
 	/**
-	* Initialize the class
-	*
-	* @param   Parent ApiBuilder
-	**/
-	ApiRequest( ApiBuilder parent ) {
+	 * Initialize the class
+	 *
+	 * @param   Parent ApiBuilder
+	 **/
+	ApiRequest(ApiBuilder parent) {
 		// Setup parent API builder object
 		builder = parent;
 	}
-
+	
 	//-------------------------------------------------------------------------------
 	//
 	//  Parameter getters
 	//
 	//-------------------------------------------------------------------------------
-
+	
 	/**
-	* @return  query parameters map
-	**/
-	public GenericConvertMap<String,Object> query() {
+	 * @return  query parameters map
+	 **/
+	public GenericConvertMap<String, Object> query() {
 		return queryObj;
 	}
-
+	
 	/**
-	* @return  context aprameter map
-	**/
-	public GenericConvertMap<String,Object> context() {
+	 * @return  context aprameter map
+	 **/
+	public GenericConvertMap<String, Object> context() {
 		return contextObj;
 	}
-
+	
 	//---------------------------------------------------------------------------------
 	//
 	// Critical functions that need to over-ride, to support Map
 	// Right now this proxies the request onto queryObj, but maybe changed in future
 	//
 	//---------------------------------------------------------------------------------
-
+	
 	/**
-	* throws an UnsupportedOperationException
-	**/
+	 * throws an UnsupportedOperationException
+	 **/
 	@Override
 	public Object get(Object key) {
 		return queryObj.get(key);
 	}
-
+	
 	/**
-	* throws an UnsupportedOperationException
-	**/
+	 * throws an UnsupportedOperationException
+	 **/
 	@Override
 	public Object put(String key, Object value) {
 		return queryObj.put(key, value);
 	}
-
+	
 	/**
-	* throws an UnsupportedOperationException
-	**/
+	 * throws an UnsupportedOperationException
+	 **/
 	@Override
 	public Object remove(Object key) {
 		return queryObj.remove(key);
 	}
-
+	
 	/**
-	* throws an UnsupportedOperationException
-	**/
+	 * throws an UnsupportedOperationException
+	 **/
 	@Override
 	public Set<String> keySet() {
 		return queryObj.keySet();
 	}
-
+	
 	//---------------------------------------------------------------------------------
 	//
 	// CorePage, and HTTPRequestServlet support
 	//
 	//---------------------------------------------------------------------------------
-
+	
 	/**
-	* Gets and return the CorePage (if used)
-	* Note: Currently this is protected until substential use case for public is found
-	*
-	* @return CorePage (if used)
-	**/
+	 * Gets and return the CorePage (if used)
+	 * Note: Currently this is protected until substential use case for public is found
+	 *
+	 * @return CorePage (if used)
+	 **/
 	public CorePage getCorePage() {
-		if( corePage != null ) {
+		if (corePage != null) {
 			return corePage;
 		}
-
-		if( builder != null && builder.corePageServlet != null ) {
+		
+		if (builder != null && builder.corePageServlet != null) {
 			return builder.corePageServlet;
 		}
-
+		
 		return null;
 	}
-
+	
 	/**
-	* Gets and return the java HttpServletRequest (if used)
-	*
-	* @return  HttpServletRequest (if used)
-	**/
+	 * Gets and return the java HttpServletRequest (if used)
+	 *
+	 * @return  HttpServletRequest (if used)
+	 **/
 	public javax.servlet.http.HttpServletRequest getHttpServletRequest() {
 		CorePage core = getCorePage();
-		if( core != null ) {
+		if (core != null) {
 			return core.getHttpServletRequest();
 		}
 		return null;
 	}
-
+	
 	/*
 	Request
 	Request information and functionality is provided by the request parameter:
@@ -255,5 +255,5 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	response.cookie("foo", "bar", 3600);       // set cookie with a max-age
 	response.cookie("foo", "bar", 3600, true); // secure cookie
 	response.removeCookie("foo");              // remove cookieCopy
-	*/
+	 */
 }

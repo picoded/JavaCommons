@@ -102,7 +102,7 @@ public class EmailBroadcaster {
 			session = Session.getInstance(props, null);
 		}
 
-		System.out.println("Finished setting up emailbroadcaster object");
+		// System.out.println("Finished setting up emailbroadcaster object");
 
 	}
 
@@ -156,7 +156,7 @@ public class EmailBroadcaster {
 			session = Session.getInstance(props, null);
 		}
 
-		System.out.println("Finished setting up emailbroadcaster object");
+		// System.out.println("Finished setting up emailbroadcaster object");
 	}
 
 	/**

@@ -66,7 +66,7 @@ public class Aggregation_test {
 		String[] aggTermsAndArgs = new String[] {countIntVal, maxIntVal, minDoubleVal, sumDoubleVal, avgStringVal};
 		Map<String, Object> res = Aggregation.aggregation(aggTermsAndArgs, fullDataSet);
 
-		assertEquals(10, res.get(countIntVal));
+		assertEquals(10, ((BigDecimal)res.get(countIntVal)).intValue());
 		assertEquals(9, ((BigDecimal)res.get(maxIntVal)).intValue());
 		assertEquals(0.0, ((BigDecimal)res.get(minDoubleVal)).doubleValue(), 0);
 		assertEquals(49.5, ((BigDecimal)res.get(sumDoubleVal)).doubleValue(), 0);
@@ -82,21 +82,21 @@ public class Aggregation_test {
 	public void testCountIntVal(){
 		String aggTermAndArg = Aggregation.COUNT+"(intVal)";
 		Map<String, Object> res = Aggregation.aggregation(new String[]{ aggTermAndArg }, fullDataSet);
-		assertEquals(10, res.get(aggTermAndArg));
+		assertEquals(10, ((BigDecimal)res.get(aggTermAndArg)).intValue());
 	}
 
 	@Test
 	public void testCountDoubleVal(){
 		String aggTermAndArg = Aggregation.COUNT+"(doubleVal)";
 		Map<String, Object> res = Aggregation.aggregation(new String[]{ aggTermAndArg }, fullDataSet);
-		assertEquals(10, res.get(aggTermAndArg));
+		assertEquals(10, ((BigDecimal)res.get(aggTermAndArg)).intValue());
 	}
 
 	@Test
 	public void testCountStringVal(){
 		String aggTermAndArg = Aggregation.COUNT+"(stringVal)";
 		Map<String, Object> res = Aggregation.aggregation(new String[]{ aggTermAndArg }, fullDataSet);
-		assertEquals(10, res.get(aggTermAndArg));
+		assertEquals(10, ((BigDecimal)res.get(aggTermAndArg)).intValue());
 	}
 
 	//------------------------------------------

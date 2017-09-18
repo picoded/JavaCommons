@@ -28,6 +28,10 @@ public class Aggregation {
 	public static String AVG = "avg";
 	public static String SUM = "sum";
 
+	// this variable is here temporarily to make the avg function not crash if the result has a repeating non terminating decimal portion
+	// will limit the result to 2 decimal places
+	public static int AVG_RESULT_MAX_DECIMAL_PLACES = 2;
+
 	/**
 	*
 	* Terms [ "count(*)", "max(investment_total)", "sum(investment_count)" ]
@@ -92,7 +96,6 @@ public class Aggregation {
 		return result;
 	}
 
-
 	//-------------------
 	//
 	// Aggregation Implementations
@@ -121,7 +124,7 @@ public class Aggregation {
 				++countResult;
 			}
 		}
-		return countResult;
+		return new BigDecimal(Integer.toString(countResult));
 	};
 
 	public static AggregationFunction max = (fieldName, inputDataSet) -> {
@@ -161,7 +164,7 @@ public class Aggregation {
 			++valueCount;
 		}
 
-		avgResult = sumResult.divide(new BigDecimal(valueCount));
+		avgResult = sumResult.divide(new BigDecimal(valueCount), AVG_RESULT_MAX_DECIMAL_PLACES, BigDecimal.ROUND_HALF_UP);
 		return avgResult;
 	};
 

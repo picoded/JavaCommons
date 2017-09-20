@@ -3,14 +3,17 @@ import javax.mail.internet.*;
 
 public class AccountConstantStrings {
 
+	public static final String ACCOUNT_ID = "accountID";
+	public static final String LOGIN_NAME = "loginName";
+	public static final String LOGIN_NAME_LIST = "loginNameList";
+
+
 	/// Static REQUEST VARS
 	public static final String OID = "_oid";
-	public static final String ACCOUNT_ID = "accountID";
 	public static final String ACCOUNT_NAME = "accountName";
 	public static final String ADD_LIST = "addList";
 	public static final String REMOVE_LIST = "removeList";
 	public static final String PASSWORD = "password";
-	public static final String LOGINNAME = "loginName";
 	public static final String REMEMBER_ME = "rememberMe";
 	public static final String SANITISE_OUTPUT = "sanitiseOutput";
 	public static final String DEFAULT_ROLES = "defaultRoles";
@@ -26,8 +29,9 @@ public class AccountConstantStrings {
 	public static final String NEW_PASSWORD = "newPassword";
 	public static final String NAME = "name";
 	public static final String UPDATE = "update";
-	public static final String LOGINNAMELIST = "loginNameList";
 	public static final String TOKEN = "token";
+	public static final String LOGINNAME = "loginName";
+	public static final String LOGINNAMELIST = "loginNameList";
 
 	// Rancher VARS
 	public static final String EMAIL = "email";
@@ -45,7 +49,6 @@ public class AccountConstantStrings {
 	public static final String RECORDS_FILTERED = "recordsFiltered";
 	public static final String SUCCESS = "success";
 	// Data List Return Variables
-	public static final String LOGIN_NAME_LIST = "loginNameList";
 	public static final String LIST = "list";
 	public static final String FAIL_REMOVE = "failToRemove";
 	public static final String SUCCESS_REMOVE = "succeedRemove";

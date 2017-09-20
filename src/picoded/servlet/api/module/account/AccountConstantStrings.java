@@ -3,10 +3,20 @@ import javax.mail.internet.*;
 
 public class AccountConstantStrings {
 
+	/// Common parameter names (standardised)
 	public static final String ACCOUNT_ID = "accountID";
 	public static final String LOGIN_NAME = "loginName";
 	public static final String LOGIN_NAME_LIST = "loginNameList";
 
+	/// Common error / info messages
+	public static final String INFO_MISSING_LOGIN = "Missing login information (request is missing valid authentication)";
+	
+
+	//--------------------------------------------------------------------
+	//
+	// Everything below here is NOT yet approved
+	//
+	//--------------------------------------------------------------------
 
 	/// Static REQUEST VARS
 	public static final String OID = "_oid";

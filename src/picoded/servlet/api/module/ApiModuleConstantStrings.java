@@ -21,4 +21,11 @@ public class ApiModuleConstantStrings {
 
 	// Unless named otherwise, all object id is set as _oid
 	public static final String OBJECT_ID = "_oid";
+
+	//--------------------------------------------------------------------
+	//
+	// Everything below here is NOT yet approved
+	//
+	//--------------------------------------------------------------------
+
 }

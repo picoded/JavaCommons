@@ -281,7 +281,6 @@ public class AccountLoginApi extends CommonApiModule {
 		return res;
 	};
 
-
 	/**
 	 * Does the actual setup for the API
 	 * Given the API Builder, and the namespace prefix
@@ -294,6 +293,5 @@ public class AccountLoginApi extends CommonApiModule {
 		// Basic new account, login, and logout
 		api.put(prefixPath + API_ACCOUNT_LOGIN, login); // Tested
 		api.put(prefixPath + API_ACCOUNT_LOGOUT, logout); // Tested
-
 	}
 }

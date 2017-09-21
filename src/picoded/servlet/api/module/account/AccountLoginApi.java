@@ -94,9 +94,10 @@ public class AccountLoginApi extends CommonApiModule {
 			// Get the login name set
 			Set<String> loginNameSet = account.getLoginNameSet();
 			if (loginNameSet != null) {
-				String[] loginNameArray = new String[loginNameSet.size()];
-				loginNameSet.toArray(loginNameArray);
-				resultMap.put(LOGIN_NAME_LIST, loginNameArray);
+				// loginName, as a list - as set does not gurantee sorting, a sort is done for the list for alphanumeric
+				List<String> loginNameList = new ArrayList<String>(loginNameSet);
+				Collections.sort(loginNameList);
+				resultMap.put(LOGIN_NAME_LIST, loginNameList);
 			}
 
 			// Get isSuperUser, isGroup
@@ -191,6 +192,7 @@ public class AccountLoginApi extends CommonApiModule {
 			res.put(ERROR, "Missing login password");
 			return res;
 		}
+
 		// Fetch the respective account object
 		AccountObject ao = null;
 		if (accountID != null) {
@@ -201,45 +203,48 @@ public class AccountLoginApi extends CommonApiModule {
 			res.put(ERROR, "Missing login name");
 			return res;
 		}
+
 		// Check if account has been locked out
 		if (ao != null) {
 			int timeAllowed = ao.getNextLoginTimeAllowed();
 			if (timeAllowed != 0) {
-				res.put(INFO, "Unable to login, user locked out for " + timeAllowed + " seconds.");
+				res.put(INFO, "Unable to login, account is locked for " + timeAllowed + " seconds");
 				return res;
 			}
 		}
 
 		// Attempts to log in user
-		ao = table.loginAccount(req.getHttpServletRequest(), res.getHttpServletResponse(), ao,
+		// This returns NULL if login fails
+		AccountObject loginAO = table.loginAccount(req.getHttpServletRequest(), res.getHttpServletResponse(), ao,
 			loginPass, rememberMe);
+
 		// No such user exists or wrong password
-		if (ao == null){
-			ao = (table.get(accountID) == null ) ? table.getFromLoginName(loginName) : table.get(accountID);
+		// as table.loginAccount returns NULL
+		if (loginAO == null){
 			// if user exists
 			if (ao != null){
 				ao.incrementNextAllowedLoginTime();
 			}
-			res.put(INFO, ERROR_FAIL_LOGIN);
+			res.put(INFO, "Invalid username or password");
 			return res;
 		}
-		// Reset any failed login attempts
+
+		//
+		// From here downards, it is assured that login occured succesfully
+		//
+
+		// Reset any failed login attempts, that may failred previously
 		ao.resetLoginThrottle();
-		// If ao is not null, it assumes a valid login
+
+		// Return succesful result
 		res.put(RESULT, true);
 		res.put(REMEMBER_ME, rememberMe);
 		res.put(ACCOUNT_ID, ao._oid());
+
 		// Extract Common Info from user account object
-		Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, res);
-		res.putAll(commonInfo);
+		extractCommonInfoFromAccountObject(ao, res);
 
-		// loginName, as a list - as set does not gurantee sorting, a sort is done for the list for alphanumeric
-		List<String> loginNameList = new ArrayList<String>(ao.getLoginNameSet());
-		Collections.sort(loginNameList);
-
-		// Return the loginNameList
-		res.put(LOGIN_NAME_LIST, loginNameList);
-
+		// Returning the result
 		return res;
 	};
 

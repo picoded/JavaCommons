@@ -34,6 +34,7 @@ public class AccountTableApi extends CommonApiModule {
 
 	public boolean isTesting = false;
 	protected DataTableApi dataTableApi = null;
+	protected AccountLoginApi accountLoginApi = null;
 
 	/**
 	 * Setup the account table api class
@@ -44,12 +45,14 @@ public class AccountTableApi extends CommonApiModule {
 		table = inTable;
 		isTesting = false;
 		dataTableApi = new DataTableApi(inTable.accountDataTable());
+		accountLoginApi = new AccountLoginApi(table);
 	}
 
 	public AccountTableApi(AccountTable inTable, boolean setTesting) {
 		table = inTable;
 		isTesting = setTesting;
 		dataTableApi = new DataTableApi(inTable.accountDataTable());
+		accountLoginApi = new AccountLoginApi(table);
 	}
 
 	protected SystemSetupInterface[] internalSubsystemArray() {
@@ -1459,6 +1462,7 @@ public class AccountTableApi extends CommonApiModule {
 
 	protected void apiSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
 		apiSetup(api, prefixPath);
+		accountLoginApi.apiSetup(api, prefixPath, config);
 	}
 
 	/**
@@ -1470,9 +1474,10 @@ public class AccountTableApi extends CommonApiModule {
 	 **/
 	public void apiSetup(ApiBuilder builder, String path) {
 
+		accountLoginApi.apiSetup(builder, path, null);
 		// Basic new account, login, and logout
-		builder.put(path + API_ACCOUNT_LOGIN, login); // Tested
-		builder.put(path + API_ACCOUNT_LOGOUT, logout); // Tested
+		// builder.put(path + API_ACCOUNT_LOGIN, login); // Tested
+		// builder.put(path + API_ACCOUNT_LOGOUT, logout); // Tested
 		builder.put(path + API_ACCOUNT_NEW, new_account); // Tested
 		builder.put(path + API_ACCOUNT_SET_LOGIN_NAME, set_login_name);
 		// Account info get, set, list

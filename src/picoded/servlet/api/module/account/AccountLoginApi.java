@@ -162,7 +162,6 @@ public class AccountLoginApi extends CommonApiModule {
 		//---------------------------------------------------
 		// Request to get info of user
 		//---------------------------------------------------
-
 		if (accountID == null && loginName == null) {
 			// Get current user if any, http response is given to allow any update of the cookies if needed
 			AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), res.getHttpServletResponse());
@@ -192,7 +191,6 @@ public class AccountLoginApi extends CommonApiModule {
 			res.put(ERROR, "Missing login password");
 			return res;
 		}
-
 		// Fetch the respective account object
 		AccountObject ao = null;
 		if (accountID != null) {
@@ -203,7 +201,6 @@ public class AccountLoginApi extends CommonApiModule {
 			res.put(ERROR, "Missing login name");
 			return res;
 		}
-
 		// Check if account has been locked out
 		if (ao != null) {
 			int timeAllowed = ao.getNextLoginTimeAllowed();
@@ -218,7 +215,7 @@ public class AccountLoginApi extends CommonApiModule {
 			loginPass, rememberMe);
 		// No such user exists or wrong password
 		if (ao == null){
-			ao = table.get(accountID);
+			ao = (table.get(accountID) == null ) ? table.getFromLoginName(loginName) : table.get(accountID);
 			// if user exists
 			if (ao != null){
 				ao.incrementNextAllowedLoginTime();

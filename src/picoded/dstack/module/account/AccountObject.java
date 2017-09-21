@@ -895,9 +895,6 @@ public class AccountObject extends Core_DataObject {
 	 **/
 	public int getNextLoginTimeAllowed() {
 		long val = getExpiryTime();
-		if (val == -1) {
-			return 0;
-		}
 		int allowedTime = (int) val - (int) (System.currentTimeMillis() / 1000);
 		return allowedTime > 0 ? allowedTime : 0;
 	}
@@ -918,19 +915,23 @@ public class AccountObject extends Core_DataObject {
 		long attemptValue = mainTable.loginThrottlingAttemptMap.getAndIncrement(this._oid());
 		int elapsedValue = (int) (System.currentTimeMillis() / 1000);
 		elapsedValue += mainTable.calculateDelay.apply(this, attemptValue);
-		mainTable.loginThrottlingExpiryMap.addAndGet(this._oid(), elapsedValue);
+		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getExpiryTime(), (long)elapsedValue);
+	}
+
+	private long getAttempts(){
+		return mainTable.loginThrottlingAttemptMap.get(this._oid(), 0l);
 	}
 
 	private long getExpiryTime() {
-		return mainTable.loginThrottlingExpiryMap.get(this._oid());
+		return mainTable.loginThrottlingExpiryMap.get(this._oid(), 0l);
 	}
 
 	/**
 	 * This method reset the entries for the user (should call after successful login)
 	 **/
 	public void resetLoginThrottle() {
-		mainTable.loginThrottlingAttemptMap.weakCompareAndSet(this._oid(), null, 0l);
-		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), null, 0l);
+		mainTable.loginThrottlingAttemptMap.weakCompareAndSet(this._oid(), getAttempts(), 0l);
+		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getExpiryTime(), 0l);
 	}
 
 	///////////////////////////////////////////////////////////////////////////

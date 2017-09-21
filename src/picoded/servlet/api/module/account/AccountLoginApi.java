@@ -34,7 +34,7 @@ public class AccountLoginApi extends CommonApiModule {
 
 	/**
 	 * Setup the account login API
-	 * 
+	 *
 	 * @param  AccountTable to use
 	 **/
 	public AccountLoginApi(AccountTable inTable) {
@@ -43,9 +43,9 @@ public class AccountLoginApi extends CommonApiModule {
 
 	/**
 	 * Internal subsystem array, used to chain up setup commands
-	 * 
+	 *
 	 * @TODO : Chain up accountTable internalSubsystemArray to its internal objects
-	 * 
+	 *
 	 * @return  Array containing the AccountTable used
 	 */
 	protected SystemSetupInterface[] internalSubsystemArray() {
@@ -60,25 +60,25 @@ public class AccountLoginApi extends CommonApiModule {
 
 	/**
 	 * Utility function used to extract out common information from an account object.
-	 * 
+	 *
 	 * This covers the following fields
-	 * 
+	 *
 	 * + accountID
 	 * + accountNameList
 	 * + isSuperUser
 	 * + isGroup
-	 * 
+	 *
 	 * @param  account   to extract these common information from
 	 * @param  resultMap to populate, can be null
-	 * 
+	 *
 	 * @return resultMap containing the common information
 	 */
-	private static Map<String, Object> extractCommonInfoFromAccountObject(AccountObject account, Map<String,Object> resultMap) {	
+	private static Map<String, Object> extractCommonInfoFromAccountObject(AccountObject account, Map<String,Object> resultMap) {
 		// Null safety
 		if( resultMap == null ) {
 			resultMap = null;
 		}
-	
+
 		// Resets the result
 		resultMap.put(ACCOUNT_ID, null);
 		resultMap.put(LOGIN_NAME_LIST, null);
@@ -90,7 +90,7 @@ public class AccountLoginApi extends CommonApiModule {
 
 			// Get account ID
 			resultMap.put(ACCOUNT_ID, account._oid());
-			
+
 			// Get the login name set
 			Set<String> loginNameSet = account.getLoginNameSet();
 			if (loginNameSet != null) {
@@ -101,8 +101,8 @@ public class AccountLoginApi extends CommonApiModule {
 
 			// Get isSuperUser, isGroup
 			resultMap.put("isSuperUser", account.isSuperUser());
-			resultMap.put("isGroup", account.isGroup());	
-		} 
+			resultMap.put("isGroup", account.isGroup());
+		}
 
 		// Return result map
 		return resultMap;
@@ -162,7 +162,7 @@ public class AccountLoginApi extends CommonApiModule {
 		//---------------------------------------------------
 		// Request to get info of user
 		//---------------------------------------------------
-		
+
 		if (accountID == null && loginName == null) {
 			// Get current user if any, http response is given to allow any update of the cookies if needed
 			AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), res.getHttpServletResponse());
@@ -185,7 +185,7 @@ public class AccountLoginApi extends CommonApiModule {
 		//---------------------------------------------------
 		// Missing parameters for login checks
 		//---------------------------------------------------
-		
+
 		// Log in Process
 		// Missing parameter error checks
 		if (loginPass == null) {
@@ -204,43 +204,44 @@ public class AccountLoginApi extends CommonApiModule {
 			return res;
 		}
 
-		// // Check if account has been locked out
-		// if (ao != null) {
-		// 	int timeAllowed = ao.getNextLoginTimeAllowed(ao._oid());
-		// 	if (timeAllowed != 0) {
-		// 		res.put(ERROR, "Unable to login, user locked out for " + timeAllowed + " seconds.");
-		// 		return res;
-		// 	}
-		// }
+		// Check if account has been locked out
+		if (ao != null) {
+			int timeAllowed = ao.getNextLoginTimeAllowed();
+			if (timeAllowed != 0) {
+				res.put(INFO, "Unable to login, user locked out for " + timeAllowed + " seconds.");
+				return res;
+			}
+		}
 
-		// // Continue only with an account object and does not have a lockout timing
-		// if (ao != null && ao.validatePassword(loginPass)) {
-		// 	// Validate and login, with password
-		// 	ao = table.loginAccount(req.getHttpServletRequest(), res.getHttpServletResponse(), ao,
-		// 		loginPass, rememberMe);
-		// 	// Reset any failed login attempts
-		// 	ao.resetLoginThrottle(loginName);
-		// 	// If ao is not null, it assumes a valid login
-		// 	res.put(RESULT, true);
-		// 	res.put(REMEMBER_ME, rememberMe);
-		// 	res.put(ACCOUNT_ID, ao._oid());
-		// 	// Extract Common Info from user account object
-		// 	Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
-		// 	res.putAll(commonInfo);
+		// Attempts to log in user
+		ao = table.loginAccount(req.getHttpServletRequest(), res.getHttpServletResponse(), ao,
+			loginPass, rememberMe);
+		// No such user exists or wrong password
+		if (ao == null){
+			ao = table.get(accountID);
+			// if user exists
+			if (ao != null){
+				ao.incrementNextAllowedLoginTime();
+			}
+			res.put(INFO, ERROR_FAIL_LOGIN);
+			return res;
+		}
+		// Reset any failed login attempts
+		ao.resetLoginThrottle();
+		// If ao is not null, it assumes a valid login
+		res.put(RESULT, true);
+		res.put(REMEMBER_ME, rememberMe);
+		res.put(ACCOUNT_ID, ao._oid());
+		// Extract Common Info from user account object
+		Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, res);
+		res.putAll(commonInfo);
 
-		// 	// loginName, as a list - as set does not gurantee sorting, a sort is done for the list for alphanumeric
-		// 	List<String> loginNameList = new ArrayList<String>(ao.getLoginNameSet());
-		// 	Collections.sort(loginNameList);
+		// loginName, as a list - as set does not gurantee sorting, a sort is done for the list for alphanumeric
+		List<String> loginNameList = new ArrayList<String>(ao.getLoginNameSet());
+		Collections.sort(loginNameList);
 
-		// 	// Return the loginNameList
-		// 	res.put(LOGIN_NAME_LIST, loginNameList);
-		// } else {
-		// 	// Legitimate user but wrong password
-		// 	if (ao != null) {
-		// 		ao.addDelay(ao);
-		// 	}
-		// 	res.put(ERROR, ERROR_FAIL_LOGIN);
-		// }
+		// Return the loginNameList
+		res.put(LOGIN_NAME_LIST, loginNameList);
 
 		return res;
 	};
@@ -269,14 +270,14 @@ public class AccountLoginApi extends CommonApiModule {
 	 * +----------------+--------------------+-------------------------------------------------------------------------------+
 	 **/
 	protected ApiFunction logout = (req, res) -> {
-		// res.put(RESULT, false);
+		res.put(RESULT, false);
 
-		// if (req.getHttpServletRequest() != null) {
-		// 	res.put(RESULT,
-		// 		table.logoutAccount(req.getHttpServletRequest(), res.getHttpServletResponse()));
-		// } else {
-		// 	res.put(ERROR, MISSING_REQUEST_PAGE);
-		// }
+		if (req.getHttpServletRequest() != null) {
+			res.put(RESULT,
+				table.logoutAccount(req.getHttpServletRequest(), res.getHttpServletResponse()));
+		} else {
+			res.put(ERROR, MISSING_REQUEST_PAGE);
+		}
 		return res;
 	};
 
@@ -290,7 +291,6 @@ public class AccountLoginApi extends CommonApiModule {
 	 * @param  config configuration map
 	 **/
 	protected void apiSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
-
 		// Basic new account, login, and logout
 		api.put(prefixPath + API_ACCOUNT_LOGIN, login); // Tested
 		api.put(prefixPath + API_ACCOUNT_LOGOUT, logout); // Tested

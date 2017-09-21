@@ -881,20 +881,20 @@ public class AccountObject extends Core_DataObject {
 		return (superUserGroupRole != null && superUserGroupRole.equalsIgnoreCase("admin"));
 	}
 
-	/**
-	 * This method logs the details about login faailure for the user based on User ID
-	 **/
-	public void logLoginFailure(String userID) {
-		mainTable.loginThrottlingAttemptMap.put(userID, 1);
-		int elapsedTime = ((int) (System.currentTimeMillis() / 1000)) + 2;
-		mainTable.loginThrottlingExpiryMap.put(userID, elapsedTime);
-	}
+	// /**
+	//  * This method logs the details about login faailure for the user based on User ID
+	//  **/
+	// private void initializeLoginFailureAttempt() {
+	// 	mainTable.loginThrottlingAttemptMap.put(this._oid(), 1);
+	// 	int elapsedTime = ((int) (System.currentTimeMillis() / 1000)) + 2;
+	// 	mainTable.loginThrottlingExpiryMap.put(this._oid(), elapsedTime);
+	// }
 
 	/**
 	 * This method returns time left before next permitted login attempt for the user based on User ID
 	 **/
-	public int getNextLoginTimeAllowed(String userId) {
-		long val = getExpiryTime(userId);
+	public int getNextLoginTimeAllowed() {
+		long val = getExpiryTime();
 		if (val == -1) {
 			return 0;
 		}
@@ -902,50 +902,35 @@ public class AccountObject extends Core_DataObject {
 		return allowedTime > 0 ? allowedTime : 0;
 	}
 
-	/**
-	 * This method would be added in on next login failure for the user based on User ID
-	 **/
-	public long getTimeElapsedNextLogin(String userId) {
-		long elapsedValue = getExpiryTime(userId);
-		if (elapsedValue == -1) {
-			return (System.currentTimeMillis() / 1000) + 2;
-		}
-		return elapsedValue;
-	}
+	// /**
+	//  * This method would be added in on next login failure for the user based on User ID
+	//  **/
+	// public long getTimeElapsedNextLogin() {
+	// 	long elapsedValue = getExpiryTime();
+	// 	return elapsedValue;
+	// }
 
 	/**
-	 * This method would be added the delay for the user based on User ID
+	 * This method would be increment the attempt counter and update the delay for the user
+	 * to log in next
 	 **/
-	public void addDelay(AccountObject ao) {
-		String userId = ao._oid();
-		long attemptValue = getAttempts(userId);
-		if (attemptValue == -1) {
-			logLoginFailure(userId);
-		} else {
-			attemptValue++;
-			int elapsedValue = (int) (System.currentTimeMillis() / 1000);
-			elapsedValue += mainTable.calculateDelay.apply(ao, attemptValue);
-			mainTable.loginThrottlingAttemptMap.put(userId, attemptValue);
-			mainTable.loginThrottlingExpiryMap.put(userId, elapsedValue);
-		}
+	public void incrementNextAllowedLoginTime() {
+		long attemptValue = mainTable.loginThrottlingAttemptMap.getAndIncrement(this._oid());
+		int elapsedValue = (int) (System.currentTimeMillis() / 1000);
+		elapsedValue += mainTable.calculateDelay.apply(this, attemptValue);
+		mainTable.loginThrottlingExpiryMap.addAndGet(this._oid(), elapsedValue);
 	}
 
-	public long getAttempts(String userID) {
-		return (mainTable.loginThrottlingAttemptMap.get(userID) != null) ? mainTable.loginThrottlingAttemptMap
-			.get(userID) : -1;
-	}
-
-	public long getExpiryTime(String userID) {
-		return (mainTable.loginThrottlingExpiryMap.get(userID) != null) ? mainTable.loginThrottlingExpiryMap
-			.get(userID) : -1;
+	private long getExpiryTime() {
+		return mainTable.loginThrottlingExpiryMap.get(this._oid());
 	}
 
 	/**
-	 * This method remove the entries for the user (should call after successful login)
+	 * This method reset the entries for the user (should call after successful login)
 	 **/
-	public void resetLoginThrottle(String userId) {
-		mainTable.loginThrottlingAttemptMap.put(userId, null);
-		mainTable.loginThrottlingExpiryMap.put(userId, null);
+	public void resetLoginThrottle() {
+		mainTable.loginThrottlingAttemptMap.weakCompareAndSet(this._oid(), null, 0l);
+		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), null, 0l);
 	}
 
 	///////////////////////////////////////////////////////////////////////////

@@ -138,7 +138,7 @@ public class AccountTableApi extends CommonApiModule {
 
 		// Check if account has been locked out
 		if (ao != null) {
-			int timeAllowed = ao.getNextLoginTimeAllowed(ao._oid());
+			int timeAllowed = ao.getNextLoginTimeAllowed();
 			if (timeAllowed != 0) {
 				res.put(ERROR, "Unable to login, user locked out for " + timeAllowed + " seconds.");
 				return res;
@@ -151,7 +151,7 @@ public class AccountTableApi extends CommonApiModule {
 			ao = table.loginAccount(req.getHttpServletRequest(), res.getHttpServletResponse(), ao,
 				loginPass, rememberMe);
 			// Reset any failed login attempts
-			ao.resetLoginThrottle(loginID);
+			ao.resetLoginThrottle();
 			// If ao is not null, it assumes a valid login
 			res.put(RESULT, true);
 			res.put(REMEMBER_ME, rememberMe);
@@ -169,7 +169,7 @@ public class AccountTableApi extends CommonApiModule {
 		} else {
 			// Legitimate user but wrong password
 			if (ao != null) {
-				ao.addDelay(ao);
+				ao.incrementNextAllowedLoginTime();
 			}
 			res.put(ERROR, ERROR_FAIL_LOGIN);
 		}
@@ -1386,7 +1386,7 @@ public class AccountTableApi extends CommonApiModule {
 	//  * | lockTime       | long               | If the number is whole number, it will be int                                 |
 	//  * +----------------+--------------------+-------------------------------------------------------------------------------+
 	//  **/
-	//
+	// // TO BE DELETED
 	// protected ApiFunction lockTime = (req, res) -> {
 	// 	String accountName = req.getString(ACCOUNT_NAME, null);
 	// 	if (accountName != null) {

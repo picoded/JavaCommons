@@ -1077,7 +1077,7 @@ public class AccountTableApi extends CommonApiModule {
 			return res;
 		}
 		if (userID.isEmpty()) { // logout any current session if it is the current user
-			this.logout.apply(req, res);
+			accountLoginApi.logout.apply(req, res);
 		}
 		table.remove(ao);
 		res.put(RESULT, true);

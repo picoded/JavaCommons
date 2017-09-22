@@ -10,7 +10,7 @@ public class AccountConstantStrings {
 
 	/// Common error / info messages
 	public static final String INFO_MISSING_LOGIN = "Missing login information (request is missing valid authentication)";
-	
+
 
 	//--------------------------------------------------------------------
 	//
@@ -76,7 +76,7 @@ public class AccountConstantStrings {
 	public static final String PROPERTIES_ADMIN_PASS = "adminPass";
 	public static final String PROPERTIES_STACK_NAME = "stackName";
 	public static final String PROPERTIES_AUTH_KEY = "authKey";
-	public static final String PROPERTIES_CREATE_TIMESTAMP = "createdTimeStamp";
+	public static final String PROPERTIES_CREATE_STACK_TIMESTAMP = "createdStackTimeStamp";
 	public static final String PROPERTIES_HOST_URL = "hostURL";
 	public static final String PROPERTIES_STACK_ID = "stackID";
 

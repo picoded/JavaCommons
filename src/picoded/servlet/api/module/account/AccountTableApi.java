@@ -143,7 +143,7 @@ public class AccountTableApi extends CommonApiModule {
 			newAccount.saveAll();
 
 			res.put(DATA, newAccount);
-			res.put(ACCOUNT_ID, newAccount._oid());
+			res.put(RESULT, newAccount._oid());
 		} else {
 			res.put(ERROR, ERROR_LOGIN_NAME_EXISTS);
 		}

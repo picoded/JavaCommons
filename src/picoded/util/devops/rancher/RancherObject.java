@@ -220,6 +220,12 @@ public class RancherObject {
 		return setAndSendRequest(url, "GET", null);
 	}
 
+	public GenericConvertMap<String,Object> getStackViaName(String stackName){
+		String url = baseURL + "/v" + beta_version + "-beta/projects/" + projectID + "/stacks"
+			+ "?name=" + stackName;
+		return setAndSendRequest(url, "GET", null);
+	}
+
 	public GenericConvertMap<String, Object> getService(String serviceID) {
 		String url = baseURL + "/v" + beta_version + "-beta/projects/" + projectID + "/services/"
 			+ serviceID;

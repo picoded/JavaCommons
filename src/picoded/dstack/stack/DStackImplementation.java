@@ -71,6 +71,25 @@ public class DStackImplementation extends Core_CommonStack {
 	
 	//-----------------------------------------------------------
 	//
+	// Closure, of DStack connections (ie: JSQL)
+	//
+	//-----------------------------------------------------------
+	
+
+	/**
+	 * Perform any required connection / file handlers / etc closure
+	 * This is to clean up any "resource" usage if needed.
+	 * 
+	 * This proxy the closure call to the actual underlying implementation
+	 */
+	public void close() {
+		for(CommonStack layer : _stackLayers) {
+			layer.close();
+		}
+	}
+	
+	//-----------------------------------------------------------
+	//
 	// Stack management
 	//
 	//-----------------------------------------------------------

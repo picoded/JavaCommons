@@ -41,7 +41,7 @@ import picoded.core.conv.ArrayConv;
  * * rowAffected() : used to get the amount of rows affected for an update statment
  * * Exception for readRow / readRowCol on out-of-bound row number
  * * Non silent (exception), and silent varient (returns null) for readRow / readRowCol
- * * isDisposed: boolean function for the fetch checking.
+ * * isClosed: boolean function for the fetch checking.
  *
  * IGNORED feature list (not fully supported, and dropped to ensure consistancy in sqlite/sql mode)
  * - SingleRow fetch and related features was seen to be buggy in sqlite.
@@ -297,7 +297,7 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 			}
 			
 			// Dispose the original sql result set
-			dispose();
+			close();
 			
 			// Change format from List to Object array
 			for (int i = 0; i < colCount; ++i) {
@@ -376,7 +376,7 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 	 *
 	 * Note if you call this prior to fetchAllRows, data loss may occur.
 	 **/
-	public void dispose() {
+	public void close() {
 		try {
 			if (sqlRes != null) {
 				sqlRes.close();
@@ -384,7 +384,7 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 			}
 		} catch (Exception e) {
 			// Log the exception as warning
-			LOGGER.log(Level.WARNING, "JSqlResult.dispose result exception", e);
+			LOGGER.log(Level.WARNING, "JSqlResult.close result exception", e);
 		}
 		
 		try {
@@ -394,7 +394,7 @@ public class JSqlResult extends CaseInsensitiveHashMap<String, Object[]> {
 			}
 		} catch (Exception e) {
 			// Log the exception as warning
-			LOGGER.log(Level.WARNING, "JSqlResult.dispose statement exception", e);
+			LOGGER.log(Level.WARNING, "JSqlResult.close statement exception", e);
 		}
 	}
 	

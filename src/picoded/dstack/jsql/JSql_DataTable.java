@@ -55,8 +55,8 @@ public class JSql_DataTable extends Core_DataTable {
 	public JSql_DataTable(JSql inJSql, String tablename) {
 		super();
 		sqlObj = inJSql;
-		baseTableName = "MB_" + tablename;
-		dataTableName = "MD_" + tablename;
+		baseTableName = "DP_" + tablename;
+		dataTableName = "DD_" + tablename;
 	}
 	
 	//--------------------------------------------------------------------------

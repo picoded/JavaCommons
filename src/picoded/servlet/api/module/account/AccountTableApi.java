@@ -96,6 +96,11 @@ public class AccountTableApi extends CommonApiModule {
 			return res;
 		}
 		String loginName = req.getString(LOGINNAME);
+		// either loginName or loginNameList
+		String[] loginNameList = req.getStringArray(LOGINNAMELIST, new String[]{});
+		if(loginNameList.length > 0){
+			loginName = loginNameList[0];
+		}
 		String password = req.getString(PASSWORD);
 		if (!isGroup && (password == null || password.isEmpty())) {
 			res.put(ERROR, ERROR_NO_PASSWORD);
@@ -129,7 +134,10 @@ public class AccountTableApi extends CommonApiModule {
 				if (firstAdmin != null) // Set the creator as the admin
 					newAccount.setMember(firstAdmin, "admin");
 			}
-
+			// Attach all of the login names in loginNameList to account
+			for(String name : loginNameList){
+				newAccount.setLoginName(name);
+			}
 			newAccount.setPassword(password);
 			newAccount.putAll(givenMetaObj);
 			newAccount.saveAll();

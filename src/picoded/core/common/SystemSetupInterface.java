@@ -14,7 +14,7 @@ import org.apache.commons.lang3.RandomUtils;
  * + clear
  *
  */
-public interface SystemSetupInterface {
+public interface SystemSetupInterface extends AutoCloseable {
 	
 	//--------------------------------------------------------------------------
 	//
@@ -23,7 +23,7 @@ public interface SystemSetupInterface {
 	//--------------------------------------------------------------------------
 	
 	/**
-	 * Sets up the backend storage. If needed.
+	 * Does onetime set up of the backend storage. If needed.
 	 * The SQL equivalent would be "CREATE TABLE {TABLENAME} IF NOT EXISTS"
 	 **/
 	default void systemSetup() {
@@ -91,6 +91,28 @@ public interface SystemSetupInterface {
 		// Does nothing, needs implementation
 	}
 	
+	//--------------------------------------------------------------------------
+	//
+	// Does the closure of any underlying connection if needed
+	//
+	//--------------------------------------------------------------------------
+	
+	/**
+	 * Perform any required connection / file handlers / etc closure
+	 * This is to clean up any "resource" usage if needed.
+	 * 
+	 * Particularly important for JSQL backend implementation (for example)
+	 * 
+	 * Note that unlike the "AutoCloseable" specification. This is REQUIRED
+	 * to be indepotent, as it will be called multiple times
+	 * 
+	 * Also as per our "standard" its exception type is limited to RuntimeException
+	 * This reduces the "warning" for possible interrupt exception types in java.
+	 */
+	default void close() throws RuntimeException {
+		// Does nothing
+	}
+
 	//--------------------------------------------------------------------------
 	//
 	// Configuration map

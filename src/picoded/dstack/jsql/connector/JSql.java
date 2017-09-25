@@ -415,16 +415,16 @@ public abstract class JSql {
 	//-------------------------------------------------------------------------
 	
 	/**
-	 * Returns true, if dispose() function was called prior
+	 * Returns true, if close() function was called prior
 	 **/
-	public boolean isDisposed() {
+	public boolean isClosed() {
 		return sqlConn == null;
 	}
 	
 	/**
 	 * Dispose of the respective SQL driver / connection
 	 **/
-	public void dispose() {
+	public void close() {
 		// Disposes the instancce connection
 		if (sqlConn != null) {
 			try {
@@ -442,7 +442,7 @@ public abstract class JSql {
 	 **/
 	protected void finalize() throws Throwable {
 		try {
-			dispose(); // close open files
+			close(); // close open files
 		} finally {
 			super.finalize();
 		}

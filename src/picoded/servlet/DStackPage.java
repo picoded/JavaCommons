@@ -79,7 +79,12 @@ public class DStackPage extends CoreApiPage {
 		return DStackObj;
 	}
 	
-	/// Auto initialize page builder
+	/**
+	 * Auto initialize the DStack database setup
+	 * on project load.
+	 * 
+	 * Note that this step is skipped if DConfig : sys.Dstack.skipSystemSetup is false
+	 */
 	@Override
 	public void initializeContext() throws Exception {
 		super.initializeContext();
@@ -91,4 +96,12 @@ public class DStackPage extends CoreApiPage {
 		}
 	}
 	
+	/**
+	 * Performs the required DStack / JSql connection closure in "shared teardown"
+	 **/
+	public void doSharedTeardown() throws Exception {
+		DStack().close();
+		super.doSharedTeardown();
+	}
+
 }

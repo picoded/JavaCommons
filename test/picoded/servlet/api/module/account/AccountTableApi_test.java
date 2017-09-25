@@ -36,12 +36,12 @@ public class AccountTableApi_test extends ApiModule_test {
 		@Override
 		public ApiModule moduleSetup(CommonStack stack) {
 			AccountTable table = new AccountTable(stack, "account");
-			AccountTableApi ret = new AccountTableApi(table, true);
+			AccountTableApi ret = new AccountTableApi(table); //removed testing var
 			// table.loginThrottle = (inAo, failures) -> {
 			// System.out.println("this was not ran <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 			// 	return (long) 2;
 			// };
-			if (!table.hasLoginID("laughing-man")) {
+			if (!table.hasLoginName("laughing-man")) {
 				AccountObject ao = table.newEntry("laughing-man");
 				ao.put(PROPERTIES_EMAIL, "laughing-man@testlalala.com");
 				ao.setPassword("The Catcher in the Rye");
@@ -1171,84 +1171,127 @@ public class AccountTableApi_test extends ApiModule_test {
 	// 	res = requestJSON(API_ACCOUNT_LOGOUT, null);
 	// 	assertEquals(Boolean.TRUE, res.get(RESULT));
 	// }
-	//
-	// @Test
-	// public void passwordReset() {
-	// 	GenericConvertMap<String, Object> res = null;
-	// 	/// -----------------------------------------
-	// 	/// Preparation before commencement of Test
-	// 	/// -----------------------------------------
-	// 	Map<String, Object> params = new HashMap<String, Object>();
-	// 	List<String> userID = new ArrayList<String>();
-	// 	// Ensure that there is an existing user
-	// 	params.clear();
-	// 	params.put(LOGINNAME, "reset");
-	// 	params.put(PASSWORD, "password");
-	// 	res = requestJSON(API_ACCOUNT_NEW, params);
-	// 	assertNull("passwordResetTest: Something wrong in adding user.", res.get(ERROR));
-	// 	userID.add(res.getString(ACCOUNT_ID));
-	//
-	// 	/// -----------------------------------------
-	// 	/// End of Preparation before commencement of Test
-	// 	/// -----------------------------------------
-	// 	// 1st Test: Empty Submission
-	// 	TestSet ts = new TestSet(null, API_ACCOUNT_PASS_RESET, ERROR_NO_USER, ERROR);
-	// 	ts.executeGenericTestCase();
-	// 	// 2nd Test: Invalid userID
-	// 	params.clear();
-	// 	params.put(USER_ID, "randomID");
-	// 	ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
-	// 	// 3rd Test: Valid userID, No old password
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	ts.setAndExecuteGTC(params, ERROR_NO_PASSWORD, ERROR);
-	// 	// 4th Test: Valid userID, old password, no new password
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	params.put(OLD_PASSWORD, "password");
-	// 	ts.setAndExecuteGTC(params, ERROR_NO_NEW_PASSWORD, ERROR);
-	// 	// 5th Test: Valid userID, old password, new password, no repeatPass
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	params.put(OLD_PASSWORD, "password");
-	// 	params.put(NEW_PASSWORD, "password");
-	// 	ts.setAndExecuteGTC(params, ERROR_NO_NEW_REPEAT_PASSWORD, ERROR);
-	// 	// 6th Test: Valid userID, old password, new password, incorrect repeatPass
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	params.put(OLD_PASSWORD, "password");
-	// 	params.put(NEW_PASSWORD, "passwordnew");
-	// 	params.put(REPEAT_PASSWORD, "passwordHAHAHHA");
-	// 	ts.setAndExecuteGTC(params, ERROR_PASS_NOT_EQUAL, ERROR);
-	// 	// 7th Test: Valid userID, incorrect old password, new password, correct repeatPass
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	params.put(OLD_PASSWORD, "wrongOldPasswr");
-	// 	params.put(NEW_PASSWORD, "passwordnew");
-	// 	params.put(REPEAT_PASSWORD, "passwordnew");
-	// 	ts.setAndExecuteGTC(params, ERROR_PASS_INCORRECT, ERROR);
-	// 	// 8th Test: Valid userID, correct old password, new password, correct repeatPass
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	params.put(OLD_PASSWORD, "password");
-	// 	params.put(NEW_PASSWORD, "passwordnew");
-	// 	params.put(REPEAT_PASSWORD, "passwordnew");
-	// 	ts.setAndExecuteGTC(params, true, SUCCESS);
-	// 	// 9th Test: no userID, user not logged in, correct old password, new password, correct repeatPass
-	// 	params.clear();
-	// 	params.put(OLD_PASSWORD, "password");
-	// 	params.put(NEW_PASSWORD, "passwordnewlol");
-	// 	params.put(REPEAT_PASSWORD, "passwordnewlol");
-	// 	ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
-	// 	// 10th Test: no userID, user logged in, correct old password, new password, correct repeatPass
-	// 	ts.loginUser("reset", "passwordnew");
-	// 	params.clear();
-	// 	params.put(OLD_PASSWORD, "passwordnew");
-	// 	params.put(NEW_PASSWORD, "passwordnewnew");
-	// 	params.put(REPEAT_PASSWORD, "passwordnewnew");
-	// 	ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
-	// }
-	//
+
+	@Test
+	public void passwordReset() {
+		GenericConvertMap<String, Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		Map<String, Object> params = new HashMap<String, Object>();
+		List<String> userID = new ArrayList<String>();
+		// Ensure that there is an existing user
+		params.clear();
+		params.put(LOGINNAME, "reset");
+		params.put(PASSWORD, "password");
+		res = requestJSON(API_ACCOUNT_NEW, params);
+		assertNull("passwordResetTest: Something wrong in adding user.", res.get(ERROR));
+		userID.add(res.getString(ACCOUNT_ID));
+
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+		// 1st Test: Empty Submission
+		TestSet ts = new TestSet(null, API_ACCOUNT_PASS_RESET, ERROR_NO_USER, ERROR);
+		ts.executeGenericTestCase();
+		// 2nd Test: Invalid userID
+		params.clear();
+		params.put(ACCOUNT_ID, "randomID");
+		ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
+		// 3rd Test: Valid userID, No old password
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		ts.setAndExecuteGTC(params, ERROR_NO_PASSWORD, ERROR);
+		// 4th Test: Valid userID, old password, no new password
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		params.put(OLD_PASSWORD, "password");
+		ts.setAndExecuteGTC(params, ERROR_NO_NEW_PASSWORD, ERROR);
+		// 5th Test: Valid userID, old password, new password, no repeatPass
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		params.put(OLD_PASSWORD, "password");
+		params.put(NEW_PASSWORD, "password");
+		ts.setAndExecuteGTC(params, ERROR_NO_NEW_REPEAT_PASSWORD, ERROR);
+		// 6th Test: Valid userID, old password, new password, incorrect repeatPass
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		params.put(OLD_PASSWORD, "password");
+		params.put(NEW_PASSWORD, "passwordnew");
+		params.put(REPEAT_PASSWORD, "passwordHAHAHHA");
+		ts.setAndExecuteGTC(params, ERROR_PASS_NOT_EQUAL, ERROR);
+		// 7th Test: Valid userID, incorrect old password, new password, correct repeatPass
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		params.put(OLD_PASSWORD, "wrongOldPasswr");
+		params.put(NEW_PASSWORD, "passwordnew");
+		params.put(REPEAT_PASSWORD, "passwordnew");
+		ts.setAndExecuteGTC(params, ERROR_PASS_INCORRECT, ERROR);
+		// 8th Test: Valid userID, correct old password, new password, correct repeatPass
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		params.put(OLD_PASSWORD, "password");
+		params.put(NEW_PASSWORD, "passwordnew");
+		params.put(REPEAT_PASSWORD, "passwordnew");
+		ts.setAndExecuteGTC(params, true, SUCCESS);
+		// 9th Test: no userID, user not logged in, correct old password, new password, correct repeatPass
+		params.clear();
+		params.put(OLD_PASSWORD, "password");
+		params.put(NEW_PASSWORD, "passwordnewlol");
+		params.put(REPEAT_PASSWORD, "passwordnewlol");
+		ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
+		// 10th Test: no userID, user logged in, correct old password, new password, correct repeatPass
+		ts.loginUser("reset", "passwordnew");
+		params.clear();
+		params.put(OLD_PASSWORD, "passwordnew");
+		params.put(NEW_PASSWORD, "passwordnewnew");
+		params.put(REPEAT_PASSWORD, "passwordnewnew");
+		ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
+	}
+
+	@Test
+	public void setLoginNameTest(){
+		GenericConvertMap<String, Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		Map<String, Object> params = new HashMap<String, Object>();
+		List<String> userID = new ArrayList<String>();
+		// Ensure that there is an existing user
+		params.clear();
+		params.put(LOGINNAME, "setTestName");
+		params.put(PASSWORD, "password");
+		res = requestJSON(API_ACCOUNT_NEW, params);
+		assertNull("getInfoByNameTest: Something wrong in adding user.", res.get(ERROR));
+		userID.add(res.getString(ACCOUNT_ID));
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+		// 1st Test: Empty Submission
+		TestSet ts = new TestSet(null, API_ACCOUNT_SET_LOGIN_NAME, ERROR_NO_LOGINNAME, ERROR);
+		ts.executeGenericTestCase();
+		// 2nd Test: No account ID
+		params.clear();
+		params.put(LOGINNAME, "anotherLoginName");
+		ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
+		// 3rd Test: Valid accountID, login name in use
+		params.clear();
+		params.put(LOGINNAME, "setTestName");
+		params.put(ACCOUNT_ID, userID.get(0));
+		ts.setAndExecuteGTC(params, ERROR_LOGIN_NAME_EXISTS, ERROR);
+		// 4th Test: Valid accountID, valid login name
+		params.clear();
+		params.put(LOGINNAME, "setTestNameAnother");
+		params.put(ACCOUNT_ID, userID.get(0));
+		ts.setAndExecuteGTC(params, true, RESULT);
+		// 5th Test; User logged in, name change
+		ts.loginUser("setTestNameAnother", "password");
+		params.clear();
+		params.put(LOGINNAME, "setTestNameBack");
+		ts.setAndExecuteGTC(params, true, RESULT);
+		ts.logout();
+	}
+
 	@Test
 	public void getInfoByName() {
 		GenericConvertMap<String, Object> res = null;
@@ -1509,99 +1552,96 @@ public class AccountTableApi_test extends ApiModule_test {
 	// 	ts.setAndExecuteLTC(params, expectedResult, LIST, "The list has some issues");
 	// }
 	//
-	// @Test
-	// public void removeAccount() {
-	// 	GenericConvertMap<String, Object> res = null;
-	// 	/// -----------------------------------------
-	// 	/// Preparation before commencement of Test
-	// 	/// -----------------------------------------
-	// 	Map<String, Object> params = new HashMap<String, Object>();
-	// 	List<String> userID = new ArrayList<String>(), groupID = new ArrayList<String>(), addUserList = new ArrayList<String>();
-	// 	List<Object> expectedResult = new ArrayList<Object>();
-	// 	// Ensure that there is an existing group
-	// 	params.put(LOGINNAME, "grpRemove");
-	// 	params.put(IS_GROUP, true);
-	// 	res = requestJSON(API_ACCOUNT_NEW, params);
-	// 	assertNull("removeAccountTest: Something wrong in creating group.", res.get(ERROR));
-	// 	groupID.add(res.getString(ACCOUNT_ID));
-	// 	// Ensure that there is an existing user
-	// 	for (int idx = 1; idx <= 2; idx++) {
-	// 		params.clear();
-	// 		params.put(LOGINNAME, "remove" + idx);
-	// 		params.put(PASSWORD, "password");
-	// 		res = requestJSON(API_ACCOUNT_NEW, params);
-	// 		assertNull("removeAccountTest: Something wrong in adding user " + idx + ".",
-	// 			res.get(ERROR));
-	// 		userID.add(res.getString(ACCOUNT_ID));
-	// 		if (idx % 2 == 1) {
-	// 			addUserList.add(res.getString(ACCOUNT_ID));
-	// 		}
-	// 	}
-	// 	// Ensure that user is in group
-	// 	params.clear();
-	// 	params.put(ADD_LIST, addUserList);
-	// 	params.put(GROUP_ID, groupID.get(0));
-	// 	params.put(ROLE, "member");
-	// 	res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
-	// 	assertNull("removeAccountTest: Something wrong in adding user to group", res.get(ERROR));
-	// 	// Ensure that there is a member of a member of a group
-	// 	params.clear();
-	// 	params.put(GROUP_ID, userID.get(0));
-	// 	params.put(ROLE, "rowABoat");
-	// 	res = requestJSON(API_GROUP_ADMIN_ADD_MEM_ROLE, params);
-	// 	assertNull("removeAccountTest: Something wrong in adding user to group", res.get(ERROR));
-	// 	params.clear();
-	// 	addUserList.clear();
-	// 	addUserList.add(userID.get(1));
-	// 	params.put(ADD_LIST, addUserList);
-	// 	params.put(GROUP_ID, userID.get(0));
-	// 	params.put(ROLE, "rowABoat");
-	// 	res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
-	// 	assertNull("removeAccountTest: Something wrong in adding user to group", res.get(ERROR));
-	// 	/// -----------------------------------------
-	// 	/// End of Preparation before commencement of Test
-	// 	/// -----------------------------------------
-	// 	// 1st Test: Empty Submission
-	// 	TestSet ts = new TestSet(null, API_ACCOUNT_ADMIN_REMOVE, ERROR_NO_USER, ERROR);
-	// 	ts.executeGenericTestCase();
-	// 	// 2nd Test: Invalid userID
-	// 	params.clear();
-	// 	params.put(USER_ID, "randomID");
-	// 	ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
-	// 	// 3rd Test: Valid User ID
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	ts.setAndExecuteGTC(params, true, SUCCESS);
-	// 	// Affirmation of Result - No account Found
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(0));
-	// 	ts.setURL(API_ACCOUNT_INFO_ID);
-	// 	ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
-	// 	// Affirmation of Result - No member Found in valid group
-	// 	params.clear();
-	// 	params.put(GROUP_ID, groupID.get(0));
-	// 	expectedResult.clear();
-	// 	ts.setURL(API_GROUP_ADMIN_GET_MEM_LIST_INFO);
-	// 	ts.setAndExecuteLTC(params, expectedResult, DATA, "The list has some issues");
-	// 	// Affirmation of Result - No group found in previous member
-	// 	params.clear();
-	// 	params.put(USER_ID, userID.get(1));
-	// 	ts.setURL(API_GROUP_GET_LIST_GRP_ID_MEM);
-	// 	ts.setAndExecuteLTC(params, expectedResult, LIST, "The list has some issues");
-	// 	// 4th Test: No userID, user is logged in
-	// 	ts.loginUser("remove2", "password");
-	// 	ts.setURL(API_ACCOUNT_ADMIN_REMOVE);
-	// 	ts.setAndExecuteGTC(null, true, SUCCESS);
-	// 	// Affirmation of Result - No logged in session
-	// 	ts.setURL(API_ACCOUNT_RESULT);
-	// 	ts.setAndExecuteGTC(null, false, RESULT);
-	// 	// Affirmation of Result - Log in to deleted user
-	// 	ts.setURL(API_ACCOUNT_LOGIN);
-	// 	params.put(LOGINNAME, "remove2");
-	// 	params.put(PASSWORD, "password");
-	// 	ts.setAndExecuteGTC(params, ERROR_FAIL_LOGIN, ERROR);
-	// }
-	//
+	@Test
+	public void removeAccount() {
+		GenericConvertMap<String, Object> res = null;
+		/// -----------------------------------------
+		/// Preparation before commencement of Test
+		/// -----------------------------------------
+		Map<String, Object> params = new HashMap<String, Object>();
+		List<String> userID = new ArrayList<String>(), groupID = new ArrayList<String>(), addUserList = new ArrayList<String>();
+		List<Object> expectedResult = new ArrayList<Object>();
+		// Ensure that there is an existing group
+		params.put(LOGINNAME, "grpRemove");
+		params.put(IS_GROUP, true);
+		res = requestJSON(API_ACCOUNT_NEW, params);
+		assertNull("removeAccountTest: Something wrong in creating group.", res.get(ERROR));
+		groupID.add(res.getString(ACCOUNT_ID));
+		// Ensure that there is an existing user
+		for (int idx = 1; idx <= 2; idx++) {
+			params.clear();
+			params.put(LOGINNAME, "remove" + idx);
+			params.put(PASSWORD, "password");
+			res = requestJSON(API_ACCOUNT_NEW, params);
+			assertNull("removeAccountTest: Something wrong in adding user " + idx + ".",
+				res.get(ERROR));
+			userID.add(res.getString(ACCOUNT_ID));
+			if (idx % 2 == 1) {
+				addUserList.add(res.getString(ACCOUNT_ID));
+			}
+		}
+		// // Ensure that user is in group
+		// params.clear();
+		// params.put(ADD_LIST, addUserList);
+		// params.put(GROUP_ID, groupID.get(0));
+		// params.put(ROLE, "member");
+		// res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
+		// assertNull("removeAccountTest: Something wrong in adding user to group", res.get(ERROR));
+		// // Ensure that there is a member of a member of a group
+		// params.clear();
+		// params.put(GROUP_ID, userID.get(0));
+		// params.put(ROLE, "rowABoat");
+		// res = requestJSON(API_GROUP_ADMIN_ADD_MEM_ROLE, params);
+		// assertNull("removeAccountTest: Something wrong in adding user to group", res.get(ERROR));
+		// params.clear();
+		// addUserList.clear();
+		// addUserList.add(userID.get(1));
+		// params.put(ADD_LIST, addUserList);
+		// params.put(GROUP_ID, userID.get(0));
+		// params.put(ROLE, "rowABoat");
+		// res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
+		// assertNull("removeAccountTest: Something wrong in adding user to group", res.get(ERROR));
+		/// -----------------------------------------
+		/// End of Preparation before commencement of Test
+		/// -----------------------------------------
+		// 1st Test: Empty Submission
+		TestSet ts = new TestSet(null, API_ACCOUNT_ADMIN_REMOVE, ERROR_NO_USER, ERROR);
+		ts.executeGenericTestCase();
+		// 2nd Test: Invalid userID
+		params.clear();
+		params.put(ACCOUNT_ID, "randomID");
+		ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
+		// 3rd Test: Valid User ID
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		ts.setAndExecuteGTC(params, true, RESULT);
+		// Affirmation of Result - No account Found
+		params.clear();
+		params.put(ACCOUNT_ID, userID.get(0));
+		ts.setURL("account/info/get");
+		ts.setAndExecuteGTC(params, ERROR_NO_USER, ERROR);
+		// // Affirmation of Result - No member Found in valid group
+		// params.clear();
+		// params.put(GROUP_ID, groupID.get(0));
+		// expectedResult.clear();
+		// ts.setURL(API_GROUP_ADMIN_GET_MEM_LIST_INFO);
+		// ts.setAndExecuteLTC(params, expectedResult, DATA, "The list has some issues");
+		// // Affirmation of Result - No group found in previous member
+		// params.clear();
+		// params.put(ACCOUNT_ID, userID.get(1));
+		// ts.setURL(API_GROUP_GET_LIST_GRP_ID_MEM);
+		// ts.setAndExecuteLTC(params, expectedResult, LIST, "The list has some issues");
+		// 4th Test: No userID, user is logged in
+		ts.loginUser("remove2", "password");
+		ts.setURL(API_ACCOUNT_ADMIN_REMOVE);
+		ts.setAndExecuteGTC(null, true, RESULT);
+		// Affirmation of Result - Log in to deleted user
+		ts.setURL(API_ACCOUNT_LOGIN);
+		params.put(LOGINNAME, "remove2");
+		params.put(PASSWORD, "password");
+		ts.setAndExecuteGTC(params, ERROR_FAIL_LOGIN, ERROR);
+	}
+
 	@Test
 	public void getUserOrGroupList() {
 		GenericConvertMap<String, Object> res = null;

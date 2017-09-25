@@ -24,7 +24,7 @@ public class DataTableApi extends CommonApiModule {
 	// Constructor setup
 	//
 	/////////////////////////////////////////////
-	
+
 	// Internal data table object, set by constructor
 	protected DataTable dataTable = null;
 
@@ -51,8 +51,8 @@ public class DataTableApi extends CommonApiModule {
 	// New object functionality
 	//
 	/////////////////////////////////////////////
-	
-	/** 
+
+	/**
 	 * # $prefix/new
 	 * # $prefix/newEntry
 	 *
@@ -79,28 +79,28 @@ public class DataTableApi extends CommonApiModule {
 	public ApiFunction newEntry = (req, res) -> {
 		// Get the oid, and sanatise output settings
 		Map<String,Object> newData = req.getStringMap(DATA, "{}");
-		
+
 		// Try get the object respectively
 		DataObject obj = dataTable.newEntry();
-		
+
 		// Update data only if object was found, and updated
 		obj.putAll(newData);
 		obj.saveAll();
 
 		// Output the OID
 		res.put(RESULT, obj._oid());
-		
+
 		// End and return result
 		return res;
 	};
-	
+
 	/////////////////////////////////////////////
 	//
 	// Basic get and set
 	//
 	/////////////////////////////////////////////
-	
-	/** 
+
+	/**
 	 * # $prefix/get
 	 *
 	 * Gets and return the data object
@@ -108,7 +108,7 @@ public class DataTableApi extends CommonApiModule {
 	 * ## HTTP Request Parameters
 	 *
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | Parameter Name  | Variable Type	    | Description                                                                  |
+	 * | Parameter Name  | Variable Type	    | Description                                                                   |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | _oid            | String             | object ID used to retrieve the data object. If no oid is given, return null.  |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -116,7 +116,7 @@ public class DataTableApi extends CommonApiModule {
 	 * ## JSON Object Output Parameters
 	 *
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | Parameter Name  | Variable Type	    | Description                                                                  |
+	 * | Parameter Name  | Variable Type	    | Description                                                                   |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | _oid            | String             | The internal object ID used                                                   |
 	 * | result          | {Object}           | Data object, if found                                                         |
@@ -139,8 +139,8 @@ public class DataTableApi extends CommonApiModule {
 		// End and return result
 		return res;
 	};
-	
-	/** 
+
+	/**
 	 * # $prefix/set
 	 *
 	 * Update a data object
@@ -172,7 +172,7 @@ public class DataTableApi extends CommonApiModule {
 		String oid = req.getString(OID, null);
 		String updateMode = req.getString(UPDATE_MODE, "delta");
 		Map<String,Object> updateData = req.getStringMap(DATA, "{}");
-		
+
 		// Put back config in response
 		res.put(OID, oid);
 		res.put(RESULT, null);
@@ -180,7 +180,7 @@ public class DataTableApi extends CommonApiModule {
 
 		// Try get the object respectively
 		DataObject obj = dataTable.get(oid);
-		
+
 		// Update data only if object was found, and updated
 		if( obj != null ) {
 			if( updateMode.equalsIgnoreCase("full") ) {
@@ -206,12 +206,12 @@ public class DataTableApi extends CommonApiModule {
 
 		// Output the update mode (for easier debugging)
 		res.put(UPDATE_MODE, updateMode);
-		
+
 		// End and return result
 		return res;
 	};
-	
-	/** 
+
+	/**
 	 * # $prefix/delete
 	 *
 	 * Deletes a data object
@@ -260,14 +260,14 @@ public class DataTableApi extends CommonApiModule {
 		// End and return result
 		return res;
 	};
-	
+
 	/////////////////////////////////////////////
 	//
-	// KeyName look up (for adminstration) 
+	// KeyName look up (for adminstration)
 	//
 	/////////////////////////////////////////////
-	
-	/** 
+
+	/**
 	 * # $prefix/keyNames
 	 *
 	 * Deletes a data object
@@ -296,14 +296,14 @@ public class DataTableApi extends CommonApiModule {
 		// End and return result
 		return res;
 	};
-	
+
 	/////////////////////////////////////////////
 	//
 	// List functions
 	//
 	/////////////////////////////////////////////
-	
-	/** 
+
+	/**
 	 * # $prefix/list
 	 *
 	 * List various data for the frontend
@@ -358,11 +358,10 @@ public class DataTableApi extends CommonApiModule {
 			res.put(ERROR, "fieldList, requested cannot be an empty array");
 			res.halt();
 		}
-
 		// The query to use
 		String query = req.getString(QUERY, "").trim();
 		Object[] queryArgs = req.getObjectArray(QUERY_ARGS, EmptyArray.STRING);
-		
+
 		// Query format safety check
 		if( !query.isEmpty() ) {
 			try {
@@ -383,9 +382,9 @@ public class DataTableApi extends CommonApiModule {
 		// Fix a specific issue in DataTable, where searchString is
 		// sent with beginning and ending quotes, remove it accordingly
 		if( searchString.length() >= 2 ) {
-			if( // 
+			if( //
 				(searchString.startsWith("\"") && searchString.endsWith("\""))  || //
-				(searchString.startsWith("'") && searchString.endsWith("'")) 
+				(searchString.startsWith("'") && searchString.endsWith("'"))
 			) { //
 				searchString = searchString.substring(1, searchString.length() - 1);
 			}
@@ -398,10 +397,9 @@ public class DataTableApi extends CommonApiModule {
 
 		// The result data row mode
 		String rowMode = req.getString(ROW_MODE, "object");
-
 		// Processing the query and search together
 		//
-		// Since the above does extensive null check fallbacks, 
+		// Since the above does extensive null check fallbacks,
 		// everything past this point can safely be assumed to be not null
 		//-------------------------------------------------------------------------------
 
@@ -421,11 +419,11 @@ public class DataTableApi extends CommonApiModule {
 				jointQuery = "(" + query + ") AND (" + searchQuery.getLeft() + ")";
 				jointQueryArgs = ArrayConv.addAll(queryArgs, searchQuery.getRight());
 			}
-		} // else fallsback to just query 
+		} // else fallsback to just query
 
 		// Executing the query, and getting its result
 		//-------------------------------------------------------------------------------
-		
+
 		// The resulting data object, and total count
 		DataObject[] dataObjs = null;
 		long dataCount = 0;
@@ -439,7 +437,7 @@ public class DataTableApi extends CommonApiModule {
 		// Fetching the objects and count
 		dataObjs = dataTable.query(jointQuery, jointQueryArgs, orderBy, start, length);
 		dataCount = dataTable.queryCount(jointQuery,jointQueryArgs);
-		
+
 		// Process the result for output
 		res.put(FIELD_LIST, fieldList);
 		res.put(TOTAL_COUNT, dataCount);
@@ -451,11 +449,11 @@ public class DataTableApi extends CommonApiModule {
 
 	/////////////////////////////////////////////
 	//
-	// List functions utils 
+	// List functions utils
 	// (maybe migrated to another class)
 	//
 	/////////////////////////////////////////////
-	
+
 	/**
 	 * Generate query string from a single word, to apply across multiple collumns.
 	 * Returns null if searchString failed to be processed
@@ -463,7 +461,7 @@ public class DataTableApi extends CommonApiModule {
 	 * @param  searchString String used in searching
 	 * @param  queryCols    String[] query collumns to use, and search against
 	 * @param  queryMode String representing the wildcard mode (PREFIX / SUFFIX / BOTH)
-	 * 
+	 *
 	 * @return MutablePair<String,List> for the query and arguments respectively
 	 */
 	protected static MutablePair<String,Object[]> generateSearchStringFromSearchPhrase(String searchString, String[] queryCols, String queryMode) {
@@ -478,7 +476,7 @@ public class DataTableApi extends CommonApiModule {
 
 		// Split the search string where whitespaces occur
 		String[] searchStringSplit = searchString.trim().split("\\s+");
-		
+
 		// Iterate the search string
 		for (int i = 0; i < searchStringSplit.length; ++i) {
 			String searchWord = searchStringSplit[i];
@@ -508,9 +506,9 @@ public class DataTableApi extends CommonApiModule {
 			if (i < searchStringSplit.length - 1) {
 				query.append(" AND ");
 			}
-			
+
 			// Second string onwards is an "any" prefix and suffix wildcard
-			queryMode = "any"; 
+			queryMode = "any";
 		}
 
 		// Invalid blank query (wrongly formatted input?)
@@ -521,7 +519,7 @@ public class DataTableApi extends CommonApiModule {
 		// Return the built query
 		return new MutablePair<String,Object[]>(query.toString(), queryArgs.toArray(new Object[0]));
 	}
-	
+
 	/**
 	 * Generate a string, with the SQL wildcard attached, in accordence to the given search word, and/or wildcard mode
 	 *
@@ -533,7 +531,7 @@ public class DataTableApi extends CommonApiModule {
 	protected static String generateSearchWordWithWildcard(String searchWord, String queryMode) {
 		// if (queryMode.equalsIgnoreCase("exact")) {
 		// 	return searchWord;
-		// }  
+		// }
 		if (queryMode.equalsIgnoreCase("prefix")) {
 			return searchWord + "%";
 		} else if (queryMode.equalsIgnoreCase("suffix")) {
@@ -549,7 +547,6 @@ public class DataTableApi extends CommonApiModule {
 	protected static List<Object> formatDataObjectList(DataObject[] dataObjs, String[] fieldList, String rowMode) {
 		// Check if row mode is an array, else assume its an object
 		boolean isArrayMode = rowMode.equalsIgnoreCase("array");
-
 		// The return data
 		List<Object> ret = new ArrayList<Object>();
 
@@ -582,12 +579,12 @@ public class DataTableApi extends CommonApiModule {
 	// List varients (for UI integration)
 	//
 	/////////////////////////////////////////////
-	
-	/** 
+
+	/**
 	 * # $prefix/list/datatables
 	 *
 	 * Varient of the list function : Used specifically for datatable integration.
-	 * 
+	 *
 	 * This supports the list field parameters, unless overwritten by a DataTable field (as listed below), such as rowMode='array';
 	 *
 	 * ## DataTables specific parameters
@@ -626,7 +623,7 @@ public class DataTableApi extends CommonApiModule {
 		res.put( "draw", req.getInt("draw", 0) );
 
 		// Set row mode
-		req.put( "rowMode", "array" );
+		req.put( ROW_MODE, "array" );
 
 		// Get search[value]
 		String searchValue = req.getString("search[value]");
@@ -680,7 +677,7 @@ public class DataTableApi extends CommonApiModule {
 	// Actual API setup
 	//
 	/////////////////////////////////////////////
-	
+
 	/**
 	 * Does the setup of the StringEscape filter, and AccessFilter config.
 	 *

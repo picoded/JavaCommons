@@ -5,6 +5,12 @@ package picoded.servlet.api.module.dstack;
  */
 public class DStackApiConstantStrings {
 
+	//--------------------------------------------------------------------
+	//
+	// Everything below here is NOT yet approved
+	//
+	//--------------------------------------------------------------------
+
 	public static final String OID = "_oid";
 	public static final String DATA = "data";
 	public static final String UPDATE_MODE = "updateMode";

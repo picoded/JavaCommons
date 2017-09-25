@@ -38,7 +38,7 @@ public class AccountTable extends ModuleStructure implements
 	/**
 	 * Provides a key value pair mapping of the account login ID to AccountID (GUID)
 	 *
-	 * KeyValueMap<uniqueLoginID,AccountID>
+	 * KeyValueMap<uniqueLoginName,AccountID>
 	 *
 	 * login ID are unique, and are usually usernames or emails
 	 * AccountID's are not unique, as a single AccountID can have multiple "names"
@@ -156,6 +156,21 @@ public class AccountTable extends ModuleStructure implements
 	 **/
 	protected AtomicLongMap loginThrottlingExpiryMap = null;
 
+	//
+	// Account Related Token Maps
+	//
+	//--------------------------------------------------------------------------
+
+	/**
+	 * Stores the verification token against the account ID together with the expiry time
+	**/
+	protected KeyValueMap accountVerificationMap = null;
+
+	/**
+	 * Stores the verification token for account password resets with expiry time
+	**/
+	protected KeyValueMap accountPasswordTokenMap = null;
+
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Table suffixes for the variosu sub tables
@@ -228,6 +243,16 @@ public class AccountTable extends ModuleStructure implements
 	 **/
 	protected static String ACCOUNT_LOGIN_THROTTLING_EXPIRY = "_TE";
 
+	/**
+	 * The Account Verification values for account verification tokens
+	 **/
+	protected static String ACCOUNT_VERIFICATION = "_AV";
+
+	/**
+	 * The Account Password token prefix
+	 **/
+	protected static String ACCOUNT_PASSWORD_TOKEN = "_PT";
+
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Constructor setup : Setup the actual tables, with the various names
@@ -272,6 +297,12 @@ public class AccountTable extends ModuleStructure implements
 		loginThrottlingAttemptMap = stack.getAtomicLongMap(name + ACCOUNT_LOGIN_THROTTLING_ATTEMPT);
 		loginThrottlingExpiryMap = stack.getAtomicLongMap(name + ACCOUNT_LOGIN_THROTTLING_EXPIRY);
 
+		// Account Verification information
+		accountVerificationMap = stack.getKeyValueMap(name+ ACCOUNT_VERIFICATION);
+
+		// Account Password Token information
+		accountPasswordTokenMap = stack.getKeyValueMap(name + ACCOUNT_PASSWORD_TOKEN);
+
 		// Side note: For new table, edit here and add into the return List
 
 		// @TODO - Consider adding support for temporary tabls typehints
@@ -280,7 +311,7 @@ public class AccountTable extends ModuleStructure implements
 		return Arrays.asList(accountLoginNameMap, accountAuthMap, sessionLinkMap, sessionInfoMap,
 			sessionTokenMap, sessionNextTokenMap, accountDataTable, accountPrivateDataTable,
 			memberRolesTable, memberDataTable, memberPrivateDataTable, loginThrottlingAttemptMap,
-			loginThrottlingExpiryMap);
+			loginThrottlingExpiryMap, accountVerificationMap, accountPasswordTokenMap);
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -307,8 +338,8 @@ public class AccountTable extends ModuleStructure implements
 	 *
 	 * @return TRUE if login ID exists
 	 **/
-	public boolean hasLoginID(String inLoginID) {
-		return accountLoginNameMap.containsKey(inLoginID);
+	public boolean hasLoginName(String inLoginName) {
+		return accountLoginNameMap.containsKey(inLoginName);
 	}
 
 	/**
@@ -343,13 +374,13 @@ public class AccountTable extends ModuleStructure implements
 	 **/
 	public AccountObject newEntry(String name) {
 		// Quick fail check
-		if (hasLoginID(name)) {
+		if (hasLoginName(name)) {
 			return null;
 		}
 
 		// Creating account object, setting the name if valid
 		AccountObject ret = newEntry();
-		if (ret.setLoginID(name)) {
+		if (ret.setLoginName(name)) {
 			return ret;
 		} else {
 			// Removal step is required on failure,
@@ -427,7 +458,7 @@ public class AccountTable extends ModuleStructure implements
 
 		return null;
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Account object getters
@@ -536,11 +567,28 @@ public class AccountTable extends ModuleStructure implements
 		return accountDataTable.keySet();
 	}
 
-	/// Returns the accountDataTable
-	///
-	/// @return accountDataTable
+	/** Returns the accountDataTable
+	*
+	* @return accountDataTable
+	**/
 	public DataTable accountDataTable() {
 		return accountDataTable;
+	}
+
+	/** Returns the accountVerificationMap
+	*
+	* @return list of accountVerification data
+	**/
+	public KeyValueMap accountVerificationMap() {
+		return accountVerificationMap;
+	}
+
+	/** Returns the accountPasswordTokenMap
+	*
+	* @return list of accountPasswordToken data
+	**/
+	public KeyValueMap accountPasswordTokenMap() {
+		return accountPasswordTokenMap;
 	}
 
 	///////////////////////////////////////////////////////////////////////////

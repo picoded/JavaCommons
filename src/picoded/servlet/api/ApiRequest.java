@@ -2,6 +2,7 @@ package picoded.servlet.api;
 
 import java.util.*;
 
+import java.util.function.BiFunction;
 import picoded.core.struct.GenericConvertMap;
 import picoded.core.struct.GenericConvertHashMap;
 import picoded.servlet.CorePage;
@@ -11,55 +12,60 @@ import picoded.servlet.CorePage;
  * For the API function to process
  **/
 public class ApiRequest implements GenericConvertMap<String, Object> {
-	
+
 	//-----------------------------------------------------------------
 	//
 	//  Constructor vars
 	//
 	//-----------------------------------------------------------------
-	
+
 	/**
 	 * The query and context object
 	 **/
 	protected GenericConvertMap<String, Object> queryObj = new GenericConvertHashMap<String, Object>();
-	
+
 	/**
 	 * The context object to use
 	 **/
 	protected GenericConvertMap<String, Object> contextObj = new GenericConvertHashMap<String, Object>();
-	
+
 	/**
 	 * The base API builder
 	 **/
 	protected ApiBuilder builder = null;
-	
+
+	/**
+	 * Original implementation (super) call for a endpoint / filter
+	 **/
+	protected BiFunction<ApiRequest, ApiResponse, ApiResponse> defaultFunction = null;
+
 	//-----------------------------------------------------------------
 	//
 	//  Overwrites vars (that would have taken from builder instead)
 	//
 	//-----------------------------------------------------------------
-	
+
 	/**
 	 * Overwrite the request type, to be a certain type, such as "JAVA"
 	 **/
 	protected String requestMethod = null;
-	
+
 	/**
 	 * CorePage overwrite
 	 **/
 	protected CorePage corePage = null;
-	
+
 	/**
 	 * Super Lambda implementation
 	 **/
 	// protected BiFunction<ApiRequest, ApiResponse, ApiResponse> superLambda = null;
-	
+
 	//-----------------------------------------------------------------
 	//
 	//  Constructor
 	//
 	//-----------------------------------------------------------------
-	
+
 	/**
 	 * Initialize the class with query and context object
 	 *
@@ -78,7 +84,22 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 			contextObj.putAll(context);
 		}
 	}
-	
+
+	/**
+	 * Extends an ApiRequest, with a "super" function endpoint
+	 **/
+	 ApiRequest(ApiRequest oriReq, BiFunction<ApiRequest, ApiResponse, ApiResponse> oriFunc) {
+		 // Cloning the request parameter
+		 queryObj = oriReq.queryObj;
+		 contextObj = oriReq.contextObj;
+		 builder = oriReq.builder;
+		 requestMethod = oriReq.requestMethod;
+		 corePage = oriReq.corePage;
+
+		 // The actual super function
+		 defaultFunction = oriFunc;
+	 }
+
 	// ApiRequest( ApiRequest original, BiFunction<ApiRequest,ApiResponse,ApiResponse> inSuperLambda ) {
 	// 	builder = original.builder;
 	// 	queryObj = original.queryObj;
@@ -90,7 +111,7 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	// public ApiResponse super( ApiRequest req, ApiResponse res ) {
 	// 	return superLambda.apply(req,res);
 	// }
-	
+
 	/**
 	 * Initialize the class
 	 *
@@ -100,34 +121,50 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 		// Setup parent API builder object
 		builder = parent;
 	}
-	
+
+	//-------------------------------------------------------------------------------
+	//
+	//  Super function call
+	//
+	//-------------------------------------------------------------------------------
+
+	/**
+	 * Calls the superfunction (if present)
+	 **/
+	public ApiResponse superCall(ApiRequest req, ApiResponse res) {
+		if( defaultFunction == null ) {
+			throw new RuntimeException("Missing super function to extend from");
+		}
+		return defaultFunction.apply(req, res);
+	}
+
 	//-------------------------------------------------------------------------------
 	//
 	//  Parameter getters
 	//
 	//-------------------------------------------------------------------------------
-	
+
 	/**
 	 * @return  query parameters map
 	 **/
 	public GenericConvertMap<String, Object> query() {
 		return queryObj;
 	}
-	
+
 	/**
 	 * @return  context aprameter map
 	 **/
 	public GenericConvertMap<String, Object> context() {
 		return contextObj;
 	}
-	
+
 	//---------------------------------------------------------------------------------
 	//
 	// Critical functions that need to over-ride, to support Map
 	// Right now this proxies the request onto queryObj, but maybe changed in future
 	//
 	//---------------------------------------------------------------------------------
-	
+
 	/**
 	 * throws an UnsupportedOperationException
 	 **/
@@ -135,7 +172,7 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	public Object get(Object key) {
 		return queryObj.get(key);
 	}
-	
+
 	/**
 	 * throws an UnsupportedOperationException
 	 **/
@@ -143,7 +180,7 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	public Object put(String key, Object value) {
 		return queryObj.put(key, value);
 	}
-	
+
 	/**
 	 * throws an UnsupportedOperationException
 	 **/
@@ -151,7 +188,7 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	public Object remove(Object key) {
 		return queryObj.remove(key);
 	}
-	
+
 	/**
 	 * throws an UnsupportedOperationException
 	 **/
@@ -159,13 +196,13 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 	public Set<String> keySet() {
 		return queryObj.keySet();
 	}
-	
+
 	//---------------------------------------------------------------------------------
 	//
 	// CorePage, and HTTPRequestServlet support
 	//
 	//---------------------------------------------------------------------------------
-	
+
 	/**
 	 * Gets and return the CorePage (if used)
 	 * Note: Currently this is protected until substential use case for public is found
@@ -176,14 +213,14 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 		if (corePage != null) {
 			return corePage;
 		}
-		
+
 		if (builder != null && builder.corePageServlet != null) {
 			return builder.corePageServlet;
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * Gets and return the java HttpServletRequest (if used)
 	 *
@@ -196,7 +233,7 @@ public class ApiRequest implements GenericConvertMap<String, Object> {
 		}
 		return null;
 	}
-	
+
 	/*
 	Request
 	Request information and functionality is provided by the request parameter:

@@ -3,14 +3,27 @@ import javax.mail.internet.*;
 
 public class AccountConstantStrings {
 
+	/// Common parameter names (standardised)
+	public static final String ACCOUNT_ID = "accountID";
+	public static final String LOGIN_NAME = "loginName";
+	public static final String LOGIN_NAME_LIST = "loginNameList";
+
+	/// Common error / info messages
+	public static final String INFO_MISSING_LOGIN = "Missing login information (request is missing valid authentication)";
+	
+
+	//--------------------------------------------------------------------
+	//
+	// Everything below here is NOT yet approved
+	//
+	//--------------------------------------------------------------------
+
 	/// Static REQUEST VARS
 	public static final String OID = "_oid";
-	public static final String ACCOUNT_ID = "accountID";
 	public static final String ACCOUNT_NAME = "accountName";
 	public static final String ADD_LIST = "addList";
 	public static final String REMOVE_LIST = "removeList";
 	public static final String PASSWORD = "password";
-	public static final String LOGINNAME = "loginName";
 	public static final String REMEMBER_ME = "rememberMe";
 	public static final String SANITISE_OUTPUT = "sanitiseOutput";
 	public static final String DEFAULT_ROLES = "defaultRoles";
@@ -21,16 +34,18 @@ public class AccountConstantStrings {
 	public static final String DATA = "data";
 	public static final String ROLE = "role";
 	public static final String UPDATE_MODE = "updateMode";
-	public static final String OLD_PASSWORD = "oldPass";
-	public static final String REPEAT_PASSWORD = "repeatPass";
-	public static final String NEW_PASSWORD = "newPass";
+	public static final String OLD_PASSWORD = "oldPassword";
+	public static final String REPEAT_PASSWORD = "repeatPassword";
+	public static final String NEW_PASSWORD = "newPassword";
 	public static final String NAME = "name";
 	public static final String UPDATE = "update";
+	public static final String TOKEN = "token";
+	public static final String LOGINNAME = "loginName";
+	public static final String LOGINNAMELIST = "loginNameList";
 
 	// Rancher VARS
 	public static final String EMAIL = "email";
 	public static final String NODE_ID = "nodeID";
-	public static final String STACK_NAME = "stackName";
 	public static final String AUTH_KEY = "authKey";
 	public static final String ADMIN_PASS = "adminPass";
 
@@ -44,7 +59,6 @@ public class AccountConstantStrings {
 	public static final String RECORDS_FILTERED = "recordsFiltered";
 	public static final String SUCCESS = "success";
 	// Data List Return Variables
-	public static final String LOGIN_NAME_LIST = "loginNameList";
 	public static final String LIST = "list";
 	public static final String FAIL_REMOVE = "failToRemove";
 	public static final String SUCCESS_REMOVE = "succeedRemove";
@@ -89,13 +103,16 @@ public class AccountConstantStrings {
 	public static final String ERROR_PASS_INCORRECT = "Old password is wrong.";
 	public static final String ERROR_NO_PRIVILEGES = "User does not have privilege.";
 	public static final String ERROR_PASSWORD_COMPLEXITY = "The password must contain at least 1 uppercase, 1 lowercase and 1 number with at least 6 characters long.";
-	public static final String ERROR_INVALID_FORMAT_EMAIL = "The username is not an email.";
+	public static final String ERROR_INVALID_FORMAT_EMAIL = "Invalid email format.";
 	public static final String ERROR_USER_NOT_LOGIN = "User is not logged in.";
 	public static final String ERROR_NO_EMAIL = "No email address is found.";
 	public static final String ERROR_NO_NODE_ID = "No node ID is found.";
-	public static final String ERROR_EMAIL_EXISTS = "Email is in used.";
+	public static final String ERROR_EMAIL_EXISTS = "This email is in use.";
 	public static final String ERROR_NO_NAME = "No name is found.";
-
+	public static final String ERROR_NO_ACCOUNT_ID = "No account ID is found.";
+	public static final String ERROR_LOGIN_NAME_EXISTS = "This username is in use.";
+	public static final String ERROR_NO_DIFFERENT_EMAIL_ALLOW = "You cannot change the login name to a different email address.";
+	public static final String ERROR_NO_EMAIL_LOGIN_NAME_FOUND = "One of the login names must contain the user's email.";
 	/// ADDITIONAL Variables
 	public static final String SPACE = " ";
 	public static final String GROUP = "group";
@@ -120,10 +137,11 @@ public class AccountConstantStrings {
 	public static final String API_ACCOUNT_LOCKTIME = "account/lockTime";
 	public static final String API_ACCOUNT_LOGOUT = "account/logout";
 	public static final String API_ACCOUNT_NEW = "account/new";
-	public static final String API_ACCOUNT_PASS_RESET = "account/do_password_reset";
+	public static final String API_ACCOUNT_PASS_RESET = "account/password/reset";
 	public static final String API_ACCOUNT_INFO = "account/info/get";
 	public static final String API_ACCOUNT_ADMIN_REMOVE = "account/admin/remove";
 	public static final String API_ACCOUNT_LIST = "account/list";
+	public static final String API_ACCOUNT_SET_LOGIN_NAME = "account/info/loginname";
 
 	public static final String API_GROUP_GRP_ROLES = "group/groupRoles";
 	public static final String API_GROUP_GET_MEM_ROLE = "group/getMemberRole";

@@ -71,7 +71,7 @@ public class JSql_Base_test {
 		// as results is stored in case insensitive hashmap
 		Map<String, Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
 		assertEquals(ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res));
-		res.dispose();
+		res.close();
 		
 		// Table cleanup
 		jsqlObj.update_raw("DROP TABLE " + testTableName + "");
@@ -93,7 +93,7 @@ public class JSql_Base_test {
 		// as results is stored in case insensitive hashmap
 		Map<String, Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
 		assertEquals(ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res));
-		res.dispose();
+		res.close();
 		
 		// Table cleanup
 		jsqlObj.update_raw("DROP TABLE " + testTableName + "");
@@ -114,7 +114,7 @@ public class JSql_Base_test {
 		// as results is stored in case insensitive hashmap
 		Map<String, Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
 		assertEquals(ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res));
-		res.dispose();
+		res.close();
 		
 		// Table cleanup
 		jsqlObj.update_raw("DROP TABLE " + testTableName + "");
@@ -139,7 +139,7 @@ public class JSql_Base_test {
 		// as results is stored in case insensitive hashmap
 		Map<String, Object> expected = ConvertJSON.toMap("{ \"col1\" : [ 1 ] }");
 		assertEquals(ConvertJSON.fromMap(expected), ConvertJSON.fromMap(res));
-		res.dispose();
+		res.close();
 		
 		// Table cleanup
 		jsqlObj.update_raw("DROP TABLE " + testTableName + "");
@@ -310,7 +310,7 @@ public class JSql_Base_test {
 		assertEquals("via get()[]", 406, ((Number) r.get("col1")[2]).intValue());
 		assertEquals("via get()[]", "world", r.get("col2")[2]);
 		
-		r.dispose();
+		r.close();
 	}
 	
 	/// Test if the "INDEX IF NOT EXISTS" clause is being handled correctly
@@ -359,7 +359,7 @@ public class JSql_Base_test {
 		assertEquals("via get()[]", 407, ((Number) r.get("col1")[3]).intValue());
 		assertEquals("via get()[]", "no.7", r.get("col2")[3]);
 		
-		r.dispose();
+		r.close();
 		
 		// orderby DESC, limits 2, offset 1
 		assertNotNull(r = jsqlObj.select(testTableName, null, null, null, "col1 DESC", 2, 1));
@@ -513,7 +513,7 @@ public class JSql_Base_test {
 		simpleQueryFlow_raw();
 		
 		// close connection
-		jsqlObj.dispose();
+		jsqlObj.close();
 		
 		// Expected exeception with connection gone of course
 		Exception expected = null;
@@ -534,31 +534,31 @@ public class JSql_Base_test {
 	/// JSQL table collumn with ending bracket ], which may breaks MS-SQL
 	@Test
 	public void mssqlClosingBracketInCollumnName() {
-		jsqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").dispose(); //cleanup (just incase)
+		jsqlObj.query("DROP TABLE IF EXISTS " + testTableName + "").close(); //cleanup (just incase)
 		
 		jsqlObj.query(
 			"CREATE TABLE IF NOT EXISTS " + testTableName
-				+ " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )").dispose(); //valid table creation : no exception
+				+ " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )").close(); //valid table creation : no exception
 		jsqlObj.query(
 			"CREATE TABLE IF NOT EXISTS " + testTableName
-				+ " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )").dispose(); //run twice to ensure "IF NOT EXISTS" works
+				+ " ( `col[1].pk` INT PRIMARY KEY, col2 TEXT )").close(); //run twice to ensure "IF NOT EXISTS" works
 		
 		jsqlObj.query("INSERT INTO " + testTableName + " ( `col[1].pk`, col2 ) VALUES (?,?)", 404,
-			"has nothing").dispose();
+			"has nothing").close();
 		jsqlObj.query("INSERT INTO " + testTableName + " ( `col[1].pk`, col2 ) VALUES (?,?)", 405,
-			"has nothing").dispose();
+			"has nothing").close();
 		
 		JSqlResult r = null;
 		
 		assertNotNull("SQL result returns as expected",
 			r = jsqlObj.query("SELECT `col[1].pk` FROM " + testTableName + ""));
-		r.dispose();
+		r.close();
 		
 		assertNotNull(
 			"SQL result returns as expected",
 			r = jsqlObj.query("SELECT `col[1].pk` AS `test[a].pk` FROM " + testTableName
 				+ " WHERE `col[1].pk` > 404"));
-		r.dispose();
+		r.close();
 	}
 	
 	@Test

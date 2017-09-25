@@ -45,5 +45,17 @@ public class JSqlStack extends Core_CommonStack {
 		}
 		return null;
 	}
+
+	/**
+	 * Perform any required connection / file handlers / etc closure
+	 * This is to clean up any "resource" usage if needed.
+	 * 
+	 * This proxy the closure call to the actual underlying implementation
+	 */
+	public void close() {
+		if(sqlConn != null) {
+			sqlConn.close();
+		}
+	}
 	
 }

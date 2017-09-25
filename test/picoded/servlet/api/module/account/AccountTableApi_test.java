@@ -36,7 +36,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		@Override
 		public ApiModule moduleSetup(CommonStack stack) {
 			AccountTable table = new AccountTable(stack, "account");
-			AccountTableApi ret = new AccountTableApi(table, true);
+			AccountTableApi ret = new AccountTableApi(table);
 			// table.loginThrottle = (inAo, failures) -> {
 			// System.out.println("this was not ran <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 			// 	return (long) 2;

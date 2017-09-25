@@ -953,6 +953,8 @@ public class AccountObject extends Core_DataObject {
 		// Create a new private data for the account if it does not exists
 		if ( accountPrivateDataTable().get(this._oid()) == null ){
 			_accountPrivateData = accountPrivateDataTable().get(this._oid(), true);
+		} else {
+			_accountPrivateData = accountPrivateDataTable().get(this._oid());
 		}
 		// Put in the details and save it
 		_accountPrivateData.put(key, value);

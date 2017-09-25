@@ -101,6 +101,7 @@ public class DStackPage extends CoreApiPage {
 	 **/
 	public void doSharedTeardown() throws Exception {
 		DStack().close();
+		super.doSharedTeardown();
 	}
 
 }

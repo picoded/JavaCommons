@@ -109,7 +109,7 @@ public interface SystemSetupInterface extends AutoCloseable {
 	 * Also as per our "standard" its exception type is limited to RuntimeException
 	 * This reduces the "warning" for possible interrupt exception types in java.
 	 */
-	default void close() throws RuntimeException {
+	default void close() {
 		// Does nothing
 	}
 

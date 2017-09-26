@@ -20,7 +20,7 @@ public class DataTableAggregationApi extends DataTableApi {
 	// Constructor setup
 	//
 	/////////////////////////////////////////////
-	
+
 	// Internal data table object, set by constructor
 	protected DataTable dataTable = null;
 
@@ -48,8 +48,8 @@ public class DataTableAggregationApi extends DataTableApi {
 	// List functions
 	//
 	/////////////////////////////////////////////
-	
-	/** 
+
+	/**
 	 * # $prefix/list
 	 *
 	 * List various data for the frontend
@@ -78,7 +78,8 @@ public class DataTableAggregationApi extends DataTableApi {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | rowMode         | String (optional)  | Default "object", the result array row format, use either "array" or "object" |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 *
+	 * | aggregations    | String[] (optional)| type of calculation based a certain field (eg. count(totalape),sum(totalape)) |
+	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * ## JSON Object Output Parameters
 	 *
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -108,7 +109,7 @@ public class DataTableAggregationApi extends DataTableApi {
 		// The query to use
 		String query = req.getString(QUERY, "").trim();
 		Object[] queryArgs = req.getObjectArray(QUERY_ARGS, EmptyArray.STRING);
-		
+
 		// Query format safety check
 		if( !query.isEmpty() ) {
 			try {
@@ -129,9 +130,9 @@ public class DataTableAggregationApi extends DataTableApi {
 		// Fix a specific issue in DataTable, where searchString is
 		// sent with beginning and ending quotes, remove it accordingly
 		if( searchString.length() >= 2 ) {
-			if( // 
+			if( //
 				(searchString.startsWith("\"") && searchString.endsWith("\""))  || //
-				(searchString.startsWith("'") && searchString.endsWith("'")) 
+				(searchString.startsWith("'") && searchString.endsWith("'"))
 			) { //
 				searchString = searchString.substring(1, searchString.length() - 1);
 			}
@@ -147,7 +148,7 @@ public class DataTableAggregationApi extends DataTableApi {
 
 		// Processing the query and search together
 		//
-		// Since the above does extensive null check fallbacks, 
+		// Since the above does extensive null check fallbacks,
 		// everything past this point can safely be assumed to be not null
 		//-------------------------------------------------------------------------------
 
@@ -167,11 +168,11 @@ public class DataTableAggregationApi extends DataTableApi {
 				jointQuery = "(" + query + ") AND (" + searchQuery.getLeft() + ")";
 				jointQueryArgs = ArrayConv.addAll(queryArgs, searchQuery.getRight());
 			}
-		} // else fallsback to just query 
+		} // else fallsback to just query
 
 		// Executing the query, and getting its result
 		//-------------------------------------------------------------------------------
-		
+
 		// The resulting data object, and total count
 		DataObject[] dataObjs = null;
 		long dataCount = 0;
@@ -193,7 +194,7 @@ public class DataTableAggregationApi extends DataTableApi {
 			Map<String, Object> aggResult = picoded.core.struct.aggregation.Aggregation.aggregation(aggTermsAndArgs, dataObjList);
 			res.put("aggregationResult", aggResult);
 		}
-		
+
 		// Process the result for output
 		res.put(FIELD_LIST, fieldList);
 		res.put(TOTAL_COUNT, dataCount);
@@ -205,11 +206,11 @@ public class DataTableAggregationApi extends DataTableApi {
 
 	/////////////////////////////////////////////
 	//
-	// List functions utils 
+	// List functions utils
 	// (maybe migrated to another class)
 	//
 	/////////////////////////////////////////////
-	
+
 	/**
 	 * Generate query string from a single word, to apply across multiple collumns.
 	 * Returns null if searchString failed to be processed
@@ -217,7 +218,7 @@ public class DataTableAggregationApi extends DataTableApi {
 	 * @param  searchString String used in searching
 	 * @param  queryCols    String[] query collumns to use, and search against
 	 * @param  queryMode String representing the wildcard mode (PREFIX / SUFFIX / BOTH)
-	 * 
+	 *
 	 * @return MutablePair<String,List> for the query and arguments respectively
 	 */
 	protected static MutablePair<String,Object[]> generateSearchStringFromSearchPhrase(String searchString, String[] queryCols, String queryMode) {
@@ -232,7 +233,7 @@ public class DataTableAggregationApi extends DataTableApi {
 
 		// Split the search string where whitespaces occur
 		String[] searchStringSplit = searchString.trim().split("\\s+");
-		
+
 		// Iterate the search string
 		for (int i = 0; i < searchStringSplit.length; ++i) {
 			String searchWord = searchStringSplit[i];
@@ -262,9 +263,9 @@ public class DataTableAggregationApi extends DataTableApi {
 			if (i < searchStringSplit.length - 1) {
 				query.append(" AND ");
 			}
-			
+
 			// Second string onwards is an "any" prefix and suffix wildcard
-			queryMode = "any"; 
+			queryMode = "any";
 		}
 
 		// Invalid blank query (wrongly formatted input?)
@@ -275,7 +276,7 @@ public class DataTableAggregationApi extends DataTableApi {
 		// Return the built query
 		return new MutablePair<String,Object[]>(query.toString(), queryArgs.toArray(new Object[0]));
 	}
-	
+
 	/**
 	 * Generate a string, with the SQL wildcard attached, in accordence to the given search word, and/or wildcard mode
 	 *
@@ -287,7 +288,7 @@ public class DataTableAggregationApi extends DataTableApi {
 	protected static String generateSearchWordWithWildcard(String searchWord, String queryMode) {
 		// if (queryMode.equalsIgnoreCase("exact")) {
 		// 	return searchWord;
-		// }  
+		// }
 		if (queryMode.equalsIgnoreCase("prefix")) {
 			return searchWord + "%";
 		} else if (queryMode.equalsIgnoreCase("suffix")) {
@@ -336,7 +337,7 @@ public class DataTableAggregationApi extends DataTableApi {
 	// Actual API setup
 	//
 	/////////////////////////////////////////////
-	
+
 	/**
 	 * Does the setup of the StringEscape filter, and AccessFilter config.
 	 *

@@ -35,7 +35,7 @@ public class Aggregation {
 	/**
 	*
 	* Terms [ "count(*)", "max(investment_total)", "sum(investment_count)" ]
-	* Query 
+	* Query
 	*/
 	public static Map<String, Object> aggregation(String[] inAggregationTermsAndParameters, Collection<Map<String, Object>> dataSet) {
 		// 1. Ensure input safety
@@ -61,7 +61,7 @@ public class Aggregation {
 
 		if(aggTerms.length != aggArguments.length){
 			throw new RuntimeException("Aggregation terms and arguments lengths differ.");
-		}		
+		}
 
 		// 3. Based on term, run the correct aggregation function
 		Map<String, Object> aggResult = new HashMap<String, Object>();
@@ -120,6 +120,8 @@ public class Aggregation {
 	public static AggregationFunction count = (fieldName, inputDataSet) -> {
 		int countResult = 0;
 		for(Map<String, Object> mapData : inputDataSet){
+			if(mapData.get(fieldName) == null)
+				continue;
 			if(mapData.containsKey(fieldName)){
 				++countResult;
 			}
@@ -130,6 +132,8 @@ public class Aggregation {
 	public static AggregationFunction max = (fieldName, inputDataSet) -> {
 		BigDecimal maxResult = null;
 		for(Map<String, Object> mapData : inputDataSet){
+			if(mapData.get(fieldName) == null)
+				continue;
 			BigDecimal currentNumber = new BigDecimal(mapData.get(fieldName).toString());
 			if(maxResult == null){
 				maxResult = currentNumber;
@@ -143,11 +147,13 @@ public class Aggregation {
 	public static AggregationFunction min = (fieldName, inputDataSet) -> {
 		BigDecimal minResult = null;
 		for(Map<String, Object> mapData : inputDataSet){
+			if(mapData.get(fieldName) == null)
+				continue;
 			BigDecimal currentNumber = new BigDecimal(mapData.get(fieldName).toString());
 			if(minResult == null){
 				minResult = currentNumber;
 			}
-			
+
 			minResult = currentNumber.min(minResult);
 		}
 		return minResult;
@@ -159,6 +165,8 @@ public class Aggregation {
 		int valueCount = 0;
 
 		for(Map<String, Object> mapData : inputDataSet){
+			if(mapData.get(fieldName) == null)
+				continue;
 			BigDecimal currentNumber = new BigDecimal(mapData.get(fieldName).toString());
 			sumResult = sumResult.add(currentNumber);
 			++valueCount;
@@ -171,9 +179,12 @@ public class Aggregation {
 	public static AggregationFunction sum = (fieldName, inputDataSet) -> {
 		BigDecimal sumResult = new BigDecimal(0);
 		for(Map<String, Object> mapData : inputDataSet){
+			if(mapData.get(fieldName) == null)
+				continue;
 			BigDecimal currentNumber = new BigDecimal(mapData.get(fieldName).toString());
 			sumResult = sumResult.add(currentNumber);
-		}		
+		}
+
 		return sumResult;
 	};
 }

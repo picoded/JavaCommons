@@ -652,6 +652,10 @@ public class DataTableApi extends CommonApiModule {
 				}
 			}
 
+			// orderBy DESC or ASC
+			String orderByStyle = req.getString("order[0][dir]", "asc");
+			orderByStr += " "+orderByStyle;
+
 			// Set the orderBy string value respectively
 			req.put("orderBy", orderByStr);
 		}

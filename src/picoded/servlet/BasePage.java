@@ -17,7 +17,7 @@ public class BasePage extends DStackPage {
 	//
 	////////////////////////////////////////////////////////////////////////////
 
-	// AccountTable 
+	// AccountTable
 	protected AccountTable _accountTable = null;
 
 	// AccountTableAPI
@@ -32,7 +32,7 @@ public class BasePage extends DStackPage {
 	@Override
 	public void doSharedSetup() throws Exception {
 		super.doSharedSetup();
-		AccountTableApi ata = new AccountTableApi(DStack().getAccountTable("account"));
+		AccountTableApi ata = new AccountTableApi(getAccountTable());
 		ata.apiSetup(this.apiBuilder(), "");
 	}
 
@@ -77,12 +77,12 @@ public class BasePage extends DStackPage {
 	 *
 	 * @return AccountTable object
 	 */
-	private AccountTable getAccountTable() {
+	public AccountTable getAccountTable() {
 		if (_accountTable != null) {
 			return _accountTable;
 		}
 		_accountTable = DStack().getAccountTable(getAccountTablePrefix());
-
+		_accountTable.cookieDomain = DConfig().getString("sys.account.session.cookieDomain", null);
 		return _accountTable;
 	}
 
@@ -104,6 +104,7 @@ public class BasePage extends DStackPage {
 		if (_currentAccount != null) {
 			return _currentAccount;
 		}
+
 		_currentAccount = getAccountTable().getRequestUser(httpRequest, httpResponse);
 		return _currentAccount;
 	}

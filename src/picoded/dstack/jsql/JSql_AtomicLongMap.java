@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import picoded.dstack.DataTable;
 import picoded.dstack.DataObject;
 import picoded.dstack.core.Core_AtomicLongMap;
-import picoded.security.NxtCrypt;
+import picoded.util.security.NxtCrypt;
 import picoded.core.struct.GenericConvertMap;
 import picoded.core.struct.GenericConvertHashMap;
 import picoded.dstack.jsql.connector.*;
@@ -23,23 +23,23 @@ import picoded.core.conv.GenericConvert;
  * JSql implmentation of AtomicLongMap
  **/
 public class JSql_AtomicLongMap extends Core_AtomicLongMap {
-	
+
 	//--------------------------------------------------------------------------
 	//
 	// Constructor setup
 	//
 	//--------------------------------------------------------------------------
-	
+
 	/**
 	 * The inner sql object
 	 **/
 	protected JSql sqlObj = null;
-	
+
 	/**
 	 * The tablename for the key value pair map
 	 **/
 	protected String sqlTableName = null;
-	
+
 	/**
 	 * JSql setup
 	 *
@@ -51,39 +51,39 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 		sqlObj = inJSql;
 		sqlTableName = "AL_" + tablename;
 	}
-	
+
 	//--------------------------------------------------------------------------
 	//
 	// Internal config vars
 	//
 	//--------------------------------------------------------------------------
-	
+
 	/**
 	 * Primary key type
 	 **/
 	protected String pKeyColumnType = "BIGINT PRIMARY KEY AUTOINCREMENT";
-	
+
 	/**
 	 * Timestamp field type
 	 **/
 	protected String tStampColumnType = "BIGINT";
-	
+
 	/**
 	 * Key name field type
 	 **/
 	protected String keyColumnType = "VARCHAR(64)";
-	
+
 	/**
 	 * Value field type
 	 **/
 	protected String valueColumnType = "DECIMAL(36,12)";
-	
+
 	//--------------------------------------------------------------------------
 	//
 	// Backend system setup / teardown / maintenance (DStackCommon)
 	//
 	//--------------------------------------------------------------------------
-	
+
 	/**
 	 * Setsup the backend storage table, etc. If needed
 	 **/
@@ -119,24 +119,24 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 					// Value storage
 					valueColumnType } //
 				);
-			
+
 			// Unique index
 			//------------------------------------------------
 			sqlObj.createIndex( //
 				sqlTableName, "kID", "UNIQUE", "unq" //
 			);
-			
+
 			// Value search index
 			//------------------------------------------------
 			sqlObj.createIndex( //
 				sqlTableName, "kVl", null, "valMap" //
 			);
-			
+
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/**
 	 * Teardown and delete the backend storage table, etc. If needed
 	 **/
@@ -144,7 +144,7 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 	public void systemDestroy() {
 		sqlObj.dropTable(sqlTableName);
 	}
-	
+
 	/**
 	 * Removes all data, without tearing down setup
 	 **/
@@ -152,13 +152,13 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 	public void clear() {
 		sqlObj.delete(sqlTableName);
 	}
-	
+
 	//--------------------------------------------------------------------------
 	//
 	// Utility functions
 	//
 	//--------------------------------------------------------------------------
-	
+
 	/**
 	 * Simplified upsert, used throughout this package
 	 *
@@ -176,13 +176,13 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 			new Object[] { now, GenericConvert.toLong(newVal, 0) } //insert values
 			);
 	}
-	
+
 	//--------------------------------------------------------------------------
 	//
 	// Core put / get
 	//
 	//--------------------------------------------------------------------------
-	
+
 	/**
 	 * Stores (and overwrites if needed) key, value pair
 	 *
@@ -202,7 +202,7 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Returns the value, given the key
 	 *
@@ -219,7 +219,7 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Returns the value, given the key
 	 *
@@ -233,33 +233,30 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 		// Tries limits
 		int limit = 100;
 		int tries = 0;
-		
+
 		// Try 100 tries
 		while (tries < limit) {
-			
 			// Get the "old" value
 			JSqlResult r = sqlObj.select(sqlTableName, "*", "kID = ?", new Object[] { key });
-			
+
 			Long oldVal = null;
 			if (r.get("kVl") != null && r.get("kVl").length > 0 && r.get("kVl")[0] != null) {
 				oldVal = GenericConvert.toLong(r.get("kVl")[0], 0);
 			} else {
 				oldVal = 0l;
 			}
-			
 			Long newVal = oldVal.longValue() + GenericConvert.toLong(delta, 0);
-			
+
 			// If old value holds true, update to new value
 			if (weakCompareAndSet(key.toString(), oldVal, newVal)) {
 				return oldVal; //return old value on success
 			}
-			
 			tries++;
 		}
-		
+
 		throw new RuntimeException("Max tries reached : " + tries);
 	}
-	
+
 	/**
 	 * Returns the number of records deleted, given the key
 	 *
@@ -274,7 +271,7 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 			new Object[] { key }));
 		return resultDeleted.longValue();
 	}
-	
+
 	/**
 	 * Stores (and overwrites if needed) key, value pair
 	 *
@@ -291,22 +288,27 @@ public class JSql_AtomicLongMap extends Core_AtomicLongMap {
 		if (expect == null || expect == 0l) {
 			// Does a blank upsert, with default values (No actual insert)
 			long now = currentSystemTimeInSeconds();
-			sqlObj.upsert( //
-				sqlTableName, // unique key
-				new String[] { "kID" }, //unique cols
-				new Object[] { key }, //unique value
-				// insert (ignore)
-				null, null,
-				// default value
-				new String[] { "uTm", "kVl" }, //insert cols
-				new Object[] { now, 0l }, //insert values
-				// misc (ignore)
-				null);
-			
+			try {
+				sqlObj.upsert( //
+					sqlTableName, // unique key
+					new String[] { "kID" }, //unique cols
+					new Object[] { key }, //unique value
+					// insert (ignore)
+					null, null,
+					// default value
+					new String[] { "uTm", "kVl" }, //insert cols
+					new Object[] { now, 0l }, //insert values
+					// misc (ignore)
+					null
+				);
+			} catch(JSqlException e) {
+				// silenced exception, if value already exists,
+				// the update call will work anyway
+			}
 			// Expect is now atleast 0
 			expect = 0l;
 		}
-		
+
 		// Does the update from 0
 		JSqlResult r = sqlObj.query("UPDATE " + sqlTableName
 			+ " SET kVl= ? WHERE kID = ? AND kVl = ?", update, key, expect);

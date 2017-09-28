@@ -70,7 +70,7 @@ public class AccountTable_test {
 	public void createCycleTest() {
 		AccountObject testAO = null;
 		assertNotNull(testAO = testAT.newEntry("hello-world"));
-		assertTrue(testAT.hasLoginID("hello-world"));
+		assertTrue(testAT.hasLoginName("hello-world"));
 		
 		// Validating seperately collected accountObjects
 		assertNotNull(testAO._oid());

@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import picoded.dstack.DataTable;
 import picoded.dstack.DataObject;
 import picoded.dstack.core.Core_DataTable;
-import picoded.security.NxtCrypt;
+import picoded.util.security.NxtCrypt;
 import picoded.core.struct.GenericConvertMap;
 import picoded.core.struct.GenericConvertHashMap;
 import picoded.dstack.jsql.connector.*;
@@ -55,8 +55,8 @@ public class JSql_DataTable extends Core_DataTable {
 	public JSql_DataTable(JSql inJSql, String tablename) {
 		super();
 		sqlObj = inJSql;
-		baseTableName = "MB_" + tablename;
-		dataTableName = "MD_" + tablename;
+		baseTableName = "DP_" + tablename;
+		dataTableName = "DD_" + tablename;
 	}
 	
 	//--------------------------------------------------------------------------

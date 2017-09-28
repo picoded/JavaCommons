@@ -358,7 +358,7 @@ public class ApiBuilder implements
 
 	//-------------------------------------------------------------------
 	//
-	// API put / remove map handling
+	// API put / remove map handling, and its filters
 	//
 	//-------------------------------------------------------------------
 
@@ -373,8 +373,10 @@ public class ApiBuilder implements
 		// Clears the collapsed version set cache
 		cachedCollapsedVersionSet.clear();
 
-		// Change / into .
-		path = path.replaceAll("/", ".");
+		// Change . into /
+		path = path.replaceAll("\\.", "/");
+		path = path.replaceAll("//", "/"); // Change // to /
+		path = path.replaceAll("^/", ""); // Remove / from the start of point
 
 		// Get the current version, and write the respective endpoint to it
 		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionMap = getVersionSet().functionMap(type);
@@ -442,6 +444,43 @@ public class ApiBuilder implements
 
 	//-------------------------------------------------------------------
 	//
+	// Extending an API function / filter
+	//
+	//-------------------------------------------------------------------
+
+	/**
+	 * Registers an API function to a single endpoint.
+	 *
+	 * Note that due to the way ApiBuilder is designed to export the respective API libraries
+	 * wildcard based endpoints will not be supported.
+	 *
+	 * @param  Endpoint paths
+	 * @param  Executor function, use null to remove an existing function
+	 *
+	 * @return  returns null
+	 **/
+	public void extendEndpoint(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
+		// The original endpoint function to extend
+		BiFunction<ApiRequest, ApiResponse, ApiResponse> originalEndpoint = fetchSpecificApiFunction(ApiFunctionType.ENDPOINT, majorVersion, minorVersion, path);
+		// If originalEndpoint is null, just implement directly
+		if( originalEndpoint == null ) {
+			endpoint(path, value);
+		} else {
+			// Registers the new endpoint function
+			endpoint(path, (req,res) -> {
+				// New request to use
+				ApiRequest overwriteReq = new ApiRequest(req, originalEndpoint);
+				// Call the BiFunction, with the extended request
+				return value.apply(overwriteReq, res);
+			});
+		}
+
+	}
+
+
+
+	//-------------------------------------------------------------------
+	//
 	// Fetch and get the relevent API Execution endpoints for the path
 	//
 	//-------------------------------------------------------------------
@@ -505,9 +544,9 @@ public class ApiBuilder implements
 			String filterPath = currentPath;
 
 			// Converts path into a usable regex, where * is a wildcard
-			filterPath = filterPath.replaceAll("\\.", "\\\\."); // Regex: escape all .
+			filterPath = filterPath.replaceAll("\\.", "/"); // Regex: change all . to /
 			filterPath = filterPath.replaceAll("\\*", ".*"); // Regex: change * into .*
-			filterPath = filterPath.replaceAll("\\\\.\\.\\*$", "(\\\\..*)?"); // Regex: change last \..* into optional (\..*)?
+			filterPath = filterPath.replaceAll("/\\.\\*$", "(/.*)?"); // Regex: change last /.* into optional (/.*)?
 
 			// Compile the regex
 			pattern = Pattern.compile(filterPath);
@@ -790,17 +829,19 @@ public class ApiBuilder implements
 		}
 
 		// If it is invalid path with or without versioning
-		if (!isValidPath(String.join(".", path))
-			&& !isValidPath(intV[0], intV[1], String.join(".", path))) {
+		String jointPath = String.join("/", path);
+		jointPath = jointPath.replaceAll("//", "/"); // Change // to /
+		if (!isValidPath(jointPath)
+			&& !isValidPath(intV[0], intV[1], jointPath)) {
 			//Invalid path, terminate
 			res.put("ERROR", "Unknown API request endpoint");
-			res.put("INFO", "Requested path : " + String.join(".", path));
+			res.put("INFO", "Requested path : " + jointPath);
 			return res;
 		}
 
 		try {
 			// The actual execution
-			return execute(String.join(".", path), req, res);
+			return execute(jointPath, req, res);
 		} catch (Exception e) {
 			// Suppress and print out the error info
 			String errorMsg = e.getMessage();

@@ -96,7 +96,7 @@ if(apicore.isNodeJS()) {
 			for (var name in paramObj) {
 				if (paramObj.hasOwnProperty(name)) {
 					var val = paramObj[name];
-					if( val ... is obj / array ) {
+					if( val instanceof Array || val instanceof Object ) {
 						val = JSON.stringify(val)
 					}
 					formData.append(name, val);
@@ -122,9 +122,9 @@ if(apicore.isNodeJS()) {
 					var jsonObj = JSON.parse(request.responseText);
 
 					// Error response in request
-					if( jsonObj.error ) {
+					if( jsonObj.ERROR || jsonObj.error) {
 						// Throw error from json object
-						bad(jsonObj.error);
+						bad(jsonObj.ERROR || jsonObj.error);
 					} else {
 						// Request succeded, returns json result
 						good(jsonObj);

@@ -4,7 +4,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.RandomUtils;
 
-import picoded.security.NxtCrypt;
+import picoded.util.security.NxtCrypt;
 import picoded.core.struct.GenericConvertMap;
 
 /**
@@ -227,7 +227,7 @@ public interface KeyValueMap extends GenericConvertMap<String, String>, CommonSt
 	/**
 	 * Generates a random nonce hash, and saves the value to it
 	 *
-	 * Note that the random nonce value returned, is based on picoded.security.NxtCrypt.randomString.
+	 * Note that the random nonce value returned, is based on picoded.util.security.NxtCrypt.randomString.
 	 * Note that this relies on true random to avoid collisions, and if it occurs. Values are over-written
 	 *
 	 * @param keyLength random key length size

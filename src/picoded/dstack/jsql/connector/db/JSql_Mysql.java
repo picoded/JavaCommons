@@ -91,7 +91,7 @@ public class JSql_Mysql extends JSql_Base {
 	 **/
 	public void recreate(boolean force) {
 		if (force) {
-			dispose();
+			close();
 		}
 		// call internal method to create the connection
 		setupConnection();

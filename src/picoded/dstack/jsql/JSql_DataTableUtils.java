@@ -28,18 +28,18 @@ import picoded.core.struct.query.internal.*;
  * The larger intention is to keep the DataTable class more maintainable and unit testable
  **/
 public class JSql_DataTableUtils {
-	
+
 	/**
 	 * Static local logger
 	 **/
 	protected static Logger LOGGER = Logger.getLogger(JSql_DataTableUtils.class.getName());
-	
+
 	//--------------------------------------------------------------------------
 	//
 	// JSqlResult search
 	//
 	//--------------------------------------------------------------------------
-	
+
 	/**
 	 * Fetches the result array position using the filters
 	 *
@@ -59,28 +59,28 @@ public class JSql_DataTableUtils {
 		Object[] oID_array = r.get("oID");
 		Object[] kID_array = r.get("kID");
 		Object[] idx_array = r.get("idx");
-		
+
 		int lim = kID_array.length;
 		for (int i = 0; i < lim; ++i) {
-			
+
 			if (_oid != null && !_oid.equals(oID_array[i])) {
 				continue;
 			}
-			
+
 			if (key != null && !key.equals(((String) (kID_array[i])))) {
 				continue;
 			}
-			
+
 			if (idx > -9 && idx != ((Number) (idx_array[i])).intValue()) {
 				continue;
 			}
-			
+
 			return i;
 		}
-		
+
 		return -1;
 	}
-	
+
 	/**
 	 * Fetches the result array position using the filters
 	 *
@@ -98,13 +98,13 @@ public class JSql_DataTableUtils {
 	protected static int fetchResultPosition(JSqlResult r, String key, int idx) {
 		return fetchResultPosition(r, null, key, idx);
 	}
-	
+
 	//--------------------------------------------------------------------------
 	//
 	// MetaType and SQL handling
 	//
 	//------------------------------------------------------------------------------------------
-	
+
 	/**
 	 * The shorten string value used to represent the object
 	 *
@@ -122,7 +122,7 @@ public class JSql_DataTableUtils {
 		}
 		return shortenValue;
 	}
-	
+
 	/**
 	 * An option set, represents the following storage collumn
 	 *
@@ -146,7 +146,7 @@ public class JSql_DataTableUtils {
 		byte[] rawVal) {
 		return new Object[] { new Integer(type), value, shortStr, fullStr, rawVal };
 	}
-	
+
 	/**
 	 * Values to option set conversion used by JSql
 	 * Note collumn strong typing is now DEPRECATED (for now)
@@ -164,7 +164,12 @@ public class JSql_DataTableUtils {
 	public static Object[] valueToValueTypeSet(Object value) {
 		// Type flag to use
 		int type = 0;
-		
+
+		// Null type support
+		if( value == null ) {
+			return valueTypeSet(0, null, null, null, null);
+		}
+
 		// Numeric type support
 		if (value instanceof Number) {
 			if (value instanceof Integer) {
@@ -173,27 +178,33 @@ public class JSql_DataTableUtils {
 				type = MetaType.FLOAT.getValue();
 			} else if (value instanceof Double) {
 				type = MetaType.DOUBLE.getValue();
+			} else if (value instanceof Long) {
+				type = MetaType.LONG.getValue();
+			} else {
+				// When all else fail, use Double type
+				type = MetaType.DOUBLE.getValue();
+				value = new Double(((Number)value).doubleValue());
 			}
 			return valueTypeSet(type, (Number) value, shortenStringValue(value), value.toString(),
 				null);
 		}
-		
+
 		// String type support
 		if (value instanceof String) {
 			return valueTypeSet(MetaType.STRING.getValue(), null, shortenStringValue(value),
 				value.toString(), null);
 		}
-		
+
 		// Binary type support
 		if (value instanceof byte[]) {
 			return valueTypeSet(MetaType.BINARY.getValue(), null, null, null, (byte[]) value);
 		}
-		
+
 		// Fallback JSON support
 		String jsonString = ConvertJSON.fromObject(value);
 		return valueTypeSet(MetaType.JSON.getValue(), null, null, jsonString.toString(), null);
 	}
-	
+
 	/**
 	 * Takes in the JSqlResult from a DataTable internal table query
 	 * And extract out the respective result value
@@ -211,7 +222,14 @@ public class JSql_DataTableUtils {
 		// Get the storage type setting
 		//
 		int baseType = ((Number) (r.get("typ")[pos])).intValue();
-		
+
+		//
+		// Null type support
+		//
+		if(baseType == MetaType.NULL.getValue()) {
+			return null;
+		}
+
 		//
 		// Int, Long, Double, Float
 		//
@@ -224,7 +242,7 @@ public class JSql_DataTableUtils {
 		} else if (baseType == MetaType.DOUBLE.getValue()) {
 			return new Double(((Number) (r.get("nVl")[pos])).doubleValue());
 		}
-		
+
 		//
 		// String / Text value support
 		//
@@ -233,14 +251,14 @@ public class JSql_DataTableUtils {
 		} else if (baseType == MetaType.TEXT.getValue()) { // Text
 			return (String) (r.get("tVl")[pos]);
 		}
-		
+
 		//
 		// Binary value
 		//
 		if (baseType == MetaType.BINARY.getValue()) {
 			// Older base64 stroage format
 			// return (Base64.getDecoder().decode((String) (r.get("tVl")[pos])));
-			
+
 			Object rawValue = r.get("rVl")[pos];
 			if (rawValue instanceof java.sql.Blob) {
 				java.sql.Blob blobData = (java.sql.Blob) rawValue;
@@ -260,7 +278,7 @@ public class JSql_DataTableUtils {
 			}
 			return (byte[]) rawValue;
 		}
-		
+
 		//
 		// JSON value support
 		//
@@ -270,10 +288,10 @@ public class JSql_DataTableUtils {
 		
 		throw new RuntimeException("Object type not yet supported: oID = " + r.get("oID")[pos]
 			+ ", kID = " + r.get("kID")[pos] + ", BaseType = " + baseType);
-		
+
 		//throw new RuntimeException("Object type not yet supported: Pos = "+pos+", BaseType = "+ baseType);
 	}
-	
+
 	/**
 	 * Same as extractNonArrayValueFromPos, however returns oid, and row key names as well
 	 *
@@ -286,7 +304,7 @@ public class JSql_DataTableUtils {
 		Object value = extractNonArrayValueFromPos(r, pos);
 		return new Object[] { r.get("kID")[pos], value };
 	}
-	
+
 	/**
 	 * Extract the key value
 	 *
@@ -304,20 +322,20 @@ public class JSql_DataTableUtils {
 		}
 		return extractNonArrayValueFromPos(r, pos);
 	}
-	
+
 	//------------------------------------------------------------------------------------------
 	//
 	// Append and get
 	//
 	//------------------------------------------------------------------------------------------
-	
+
 	/**
 	 * Get the current timestamp in seconds
 	 **/
 	public static long getCurrentTimestamp() {
 		return (System.currentTimeMillis() / 1000L);
 	}
-	
+
 	/**
 	 * Iterates the relevent keyList, and appends its value from the objMap, into the sql colTypes database
 	 *
@@ -334,31 +352,31 @@ public class JSql_DataTableUtils {
 		Map<String, Object> objMap, Set<String> keyList, //
 		boolean batchMode //
 	) throws JSqlException {
-		
+
 		// Nothing to update, nothing to do
 		if (keyList == null) {
 			return;
 		}
-		
+
 		// boolean sqlMode = batchMode ? sql.getAutoCommit() : false;
 		// if (sqlMode) {
 		// 	sql.setAutoCommit(false);
 		// }
-		
+
 		try {
 			// Curent timestamp
 			long now = getCurrentTimestamp();
-			
+
 			//
 			// Iterate and store ONLY values inside the keyList
 			// This helps optimize writes to only changed data
 			//---------------------------------------------------------
-			
+
 			// Prepare the large multiUpsert values
 			List<Object[]> uniqueValuesList = new ArrayList<Object[]>();
 			List<Object[]> insertValuesList = new ArrayList<Object[]>();
 			List<Object[]> defaultValuesList = new ArrayList<Object[]>();
-			
+
 			// Iterate the key list to apply updates
 			for (String k : keyList) {
 				// Skip reserved key, otm is not allowed to be saved
@@ -366,16 +384,16 @@ public class JSql_DataTableUtils {
 				if (k.equalsIgnoreCase("_otm")) { //reserved
 					continue;
 				}
-				
+
 				// Key length size protection
 				if (k.length() > 64) {
 					throw new RuntimeException(
 						"Attempted to insert a key value larger then 64 for (_oid = " + _oid + "): " + k);
 				}
-				
+
 				// Get the value to insert
 				Object v = objMap.get(k);
-				
+
 				// Delete support
 				if (v == ObjectToken.NULL || v == null) {
 					// Skip reserved key, oid key is allowed to be removed directly
@@ -386,7 +404,7 @@ public class JSql_DataTableUtils {
 				} else {
 					// Converts it into a type set, and store it
 					Object[] typSet = valueToValueTypeSet(v);
-					
+
 					// Setup the multiUpsert
 					uniqueValuesList.add(new Object[] { _oid, k, 0 });
 					insertValuesList.add(new Object[] { typSet[0], typSet[1], typSet[2], typSet[3],
@@ -394,12 +412,12 @@ public class JSql_DataTableUtils {
 					defaultValuesList.add(new Object[] { now });
 				}
 			}
-			
+
 			// Nothing to update, nothing to do
 			if (insertValuesList.size() <= 0) {
 				return;
 			}
-			
+
 			// Does the actual multi upsert
 			sql.multiUpsert(tName, // Table name to upsert on
 				// "pKy" is auto generated by SQL db
@@ -413,7 +431,7 @@ public class JSql_DataTableUtils {
 				defaultValuesList, //
 				null // The only misc col, is pKy, which is being handled by DB
 			);
-			
+
 			//
 			//sql.commit();
 		} catch (Exception e) {
@@ -424,7 +442,7 @@ public class JSql_DataTableUtils {
 			// }
 		}
 	}
-	
+
 	/**
 	 * Extracts and build the map stored under an _oid
 	 *
@@ -441,7 +459,7 @@ public class JSql_DataTableUtils {
 		JSqlResult r = sql.select(sqlTableName, "*", "oID=?", new Object[] { _oid });
 		return extractObjectMapFromJSqlResult(r, _oid, ret);
 	}
-	
+
 	/**
 	 * Extracts and build the map stored under an _oid, from the JSqlResult
 	 *
@@ -456,47 +474,47 @@ public class JSql_DataTableUtils {
 		if (r == null) {
 			return ret;
 		}
-		
+
 		// Get thee value lists
 		Object[] oID_list = r.get("oID");
 		Object[] kID_list = r.get("kID");
 		Object[] idx_list = r.get("idx");
-		
+
 		// This is a query call, hence no data to extract
 		if (kID_list == null || kID_list.length <= 0) {
 			return ret;
 		}
-		
+
 		// Iterate the keys
 		int lim = kID_list.length;
 		for (int i = 0; i < lim; ++i) {
-			
+
 			// oid provided, and does not match, terminated
 			if (_oid != null && !_oid.equals(oID_list[i])) {
 				continue;
 			}
-			
+
 			// Ignore non 0-indexed value (array support not added yet)
 			if (((Number) (idx_list[i])).intValue() != 0) {
 				continue; //Now only accepts first value (not an array)
 			}
-			
+
 			// Extract out key value pair
 			Object[] rowData = extractKeyValueFromPos_nonArray(r, i);
-			
+
 			// Only check for ret, at this point,
 			// so returning null when no data occurs
 			if (ret == null) {
 				ret = new HashMap<String, Object>();
 			}
-			
+
 			// Add in vallue
 			ret.put(rowData[0].toString(), rowData[1]);
 		}
-		
+
 		return ret;
 	}
-	
+
 	//========================================================================================
 	//
 	// Super complicated complex inner join query builder here
@@ -507,23 +525,23 @@ public class JSql_DataTableUtils {
 	// The complexity of this query generator SHOULD NOT be underextimated
 	//
 	//========================================================================================
-	
+
 	// Complex query static vars
 	//-----------------------------------------------------------------------------
-	
+
 	/**
 	 * Select column statements for DISTINCT oID
 	 **/
 	protected static String oid_distinct = "DISTINCT oID";
-	
+
 	/**
 	 * Select column statements for counting DISTINCT oID
 	 **/
 	protected static String oid_distinctCount = "COUNT(DISTINCT oID) AS rcount";
-	
+
 	// Complex query utilities
 	//-----------------------------------------------------------------------------
-	
+
 	/**
 	 * Does the value to MetaType conversion used in query search
 	 *
@@ -550,7 +568,7 @@ public class JSql_DataTableUtils {
 		//}
 		return null;
 	}
-	
+
 	/**
 	 * Sanatizes a query key, for a somewhat SQL safer varient
 	 *
@@ -568,7 +586,7 @@ public class JSql_DataTableUtils {
 			.replaceAll("\\]", "\\]") // Replaces the [ms-sql closing brackets]
 			.replaceAll("\\#", "\\#"); // Replaces the reserved # key
 	}
-	
+
 	/**
 	 * Sanatize the order by string, and places the field name as query arguments
 	 *
@@ -582,18 +600,18 @@ public class JSql_DataTableUtils {
 		if (rawString.length() <= 0) {
 			throw new RuntimeException("Unexpected blank found in OrderBy query : " + rawString);
 		}
-		
+
 		return new OrderBy<DataObject>(rawString);
 	}
-	
+
 	// Complex query actual implementation
 	//-----------------------------------------------------------------------------
-	
+
 	/**
 	 * Lowercase suffix string
 	 **/
 	protected static String lowerCaseSuffix = "#lc";
-	
+
 	/**
 	 * The complex left inner join StringBuilder used for view / query requests
 	 *
@@ -615,33 +633,33 @@ public class JSql_DataTableUtils {
 		//
 		// Vendor specific customization
 		//-----------------------------------------
-		
+
 		String joinType = "LEFT";
-		
+
 		String lBracket = "\"";
 		String rBracket = "\"";
-		
+
 		// Reserved to overwrite, and to do more complex quotes
 		if (sql.sqlType() == JSqlType.MSSQL) {
 			lBracket = "[";
 			rBracket = "]";
 		}
-		
+
 		//
 		// Select / From StringBuilder setup
 		//
 		// Also setup the distinct oID collumn
 		//
 		//-----------------------------------------
-		
+
 		// This statement section, represents the final view "columns" to use
 		StringBuilder select = new StringBuilder("SELECT B.oID AS ");
 		select.append(lBracket + "oID" + rBracket);
-		
+
 		// This statement section, reprsents the underlying actual "columns" to fetch from
 		StringBuilder from = new StringBuilder(" FROM ");
 		from.append("(SELECT DISTINCT oID");
-		
+
 		//
 		// Distinct table reference
 		//
@@ -649,29 +667,29 @@ public class JSql_DataTableUtils {
 		// to a single row per oID
 		//
 		//-----------------------------------------
-		
+
 		from.append(" FROM " + tableName + ")");
 		//from.append( tableName );
 		from.append(" AS B");
-		
+
 		//
 		// Select / From query building base on MetaType
 		//
 		//--------------------------------------------------
-		
+
 		// Join count, is required to ensure table labeling does not colide
 		int joinCount = 0;
-		
+
 		//
 		// Iterate every MetaType, and build their respective column SELECT/FROM statement
 		//
 		for (Map.Entry<String, MetaType> e : mtm.entrySet()) {
-			
+
 			// Get key, safekey, and type
 			String rawKey = e.getKey();
 			String safeKey = escapeQueryKey(rawKey);
 			MetaType type = e.getValue();
-			
+
 			if ( //
 			type == MetaType.INTEGER || //
 				type == MetaType.FLOAT || //
@@ -679,58 +697,58 @@ public class JSql_DataTableUtils {
 																					 //---------------------------
 																					 // Numeric column processing
 																					 //---------------------------
-				
+
 				// Get numeric column
 				select.append(", N" + joinCount + ".nVl AS ");
 				select.append(lBracket + safeKey + rBracket);
 				// Get string column, and shorten lowercase
 				select.append(", N" + joinCount + ".sVl AS ");
 				select.append(lBracket + safeKey + lowerCaseSuffix + rBracket);
-				
+
 				// Joined from, with unique OID
 				from.append(" " + joinType + " JOIN " + tableName + " AS N" + joinCount);
 				from.append(" ON B.oID = N" + joinCount + ".oID");
 				// and is not an array, while matching raw key
 				from.append(" AND N" + joinCount + ".idx = 0 AND N" + joinCount + ".kID = ?");
 				queryArgs.add(rawKey);
-				
+
 			} else if (type == MetaType.STRING) {
 				//---------------------------
 				// String column processing
 				//---------------------------
-				
+
 				// Get string column, in full representation,
 				select.append(", S" + joinCount + ".tVl AS ");
 				select.append(lBracket + safeKey + rBracket);
 				// Get string column, and shorten lowercase
 				select.append(", S" + joinCount + ".sVl AS ");
 				select.append(lBracket + safeKey + lowerCaseSuffix + rBracket);
-				
+
 				// Joined from, with unique OID
 				from.append(" " + joinType + " JOIN " + tableName + " AS S" + joinCount);
 				from.append(" ON B.oID = S" + joinCount + ".oID");
 				// and is not an array, while matching raw key
 				from.append(" AND S" + joinCount + ".idx = 0 AND S" + joinCount + ".kID = ?");
 				queryArgs.add(rawKey);
-				
+
 			} else {
 				// Unknown MetaType ignored
 				LOGGER.log(Level.WARNING, "complexQueryView -> Unsupported MetaType (" + type
 					+ ") - for meta key : " + rawKey);
 			}
-			
+
 			++joinCount;
 		}
-		
+
 		// The final return string builder
 		StringBuilder ret = new StringBuilder();
 		ret.append(select);
 		ret.append(from);
-		
+
 		// Return StringBuilder
 		return ret;
 	}
-	
+
 	/**
 	 * Performs a search query, and returns the respective DataObjects information
 	 * This works by taking the query and its args, building its complex inner view, then querying that view.
@@ -754,7 +772,7 @@ public class JSql_DataTableUtils {
 		DataTable DataTableObj, JSql sql, String tablename, String selectedCols, //
 		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
 	) { //
-	
+
 		//----------------------------------------------------------------------
 		// Quick optimal lookup : Does not do any complext building
 		// Runs the query and exit immediately
@@ -764,42 +782,42 @@ public class JSql_DataTableUtils {
 			// Blank search, quick and easy
 			return sql.select(tablename, selectedCols);
 		}
-		
+
 		//----------------------------------------------------------------------
 		// Sadly looks like things must be done the hardway, initialize the vars
 		//----------------------------------------------------------------------
-		
+
 		// Query string, for either a newly constructed view, or cached view
 		StringBuilder queryBuilder = new StringBuilder();
-		
+
 		// The actual args to use
 		List<Object> complexQueryArgs = new ArrayList<Object>();
 		Object[] queryArgs = null;
-		
+
 		// Result ordering by
 		OrderBy<DataObject> orderByObj = null;
-		
+
 		// Building the MetaTypeMap from where request
 		Map<String, MetaType> queryTypeMap = new HashMap<String, MetaType>();
-		
+
 		// The where clause query object, that is built, and actually used
 		Query queryObj = null;
-		
+
 		//----------------------------------------------------------------------
 		// Validating the Where clause and using it to build the MetaTypeMap
 		// AND rebuild the query to the required formatting (lowercase)
 		//----------------------------------------------------------------------
-		
+
 		// Where clause exists, build it!
 		if (whereClause != null && whereClause.length() >= 0) {
-			
+
 			// Conversion to raw query object, round 1 of sanatizing
 			//
 			// To avoid confusion, the original query is called "RAW QUERY",
 			// While the converted actual JSql query is called "PROCESSED QUERY"
 			//---------------------------------------------------------------------
 			queryObj = Query.build(whereClause, whereValues);
-			
+
 			// Build the query type map from the "raw query"
 			//---------------------------------------------------------------------
 			Map<String, List<Object>> queryMap = queryObj.keyValuesMap();
@@ -809,59 +827,59 @@ public class JSql_DataTableUtils {
 					queryTypeMap.put(key, subType);
 				}
 			}
-			
+
 			// Gets the original field to "raw query" maps
 			// of keys, to do subtitution on,
 			// and their respective argument map.
 			Map<String, List<Query>> fieldQueryMap = queryObj.fieldQueryMap();
 			Map<String, Object> queryArgMap = queryObj.queryArgumentsMap();
-			
+
 			// Gets the new index position to add new arguments if needed
 			int newQueryArgsPos = queryArgMap.size() + 1;
-			
+
 			// Iterate the queryTypeMap, and doing the
 			// required query expension / substitution
 			//
 			// Parses the where clause with query type map
 			for (String key : queryTypeMap.keySet()) {
-				
+
 				// Get the "raw query" type that may require processing
 				MetaType subType = queryTypeMap.get(key);
-				
+
 				// The query list to do processing on
 				List<Query> toReplaceQueries = fieldQueryMap.get(key);
-				
+
 				// Skip if no query was found needed processing
 				if (toReplaceQueries == null || toReplaceQueries.size() <= 0) {
 					continue;
 				}
-				
+
 				// For each string based search,
 				// enforce and additional lowercase matching
 				// for increased indexing perfromance.
 				if (subType == MetaType.STRING) {
-					
+
 					// Iterate the queries to replace them
 					//-------------------------------------------
 					for (Query toReplace : toReplaceQueries) {
-						
+
 						// Get the argument name/idx used in the query
 						String argName = toReplace.argumentName();
-						
+
 						// Get the lower case representation of query arguments
 						String argLowerCase = queryArgMap.get(argName).toString();
 						if (argLowerCase != null) {
 							argLowerCase = argLowerCase.toString().toLowerCase();
 						}
-						
+
 						// Store the lower case varient of the query
 						queryArgMap.put("" + newQueryArgsPos, argLowerCase);
-						
+
 						// Add the new query with the lower case argument
 						Query replacement = QueryFilter.basicQueryFromTokens(queryArgMap,
 							toReplace.fieldName() + lowerCaseSuffix, toReplace.operatorSymbol(), ":"
 								+ newQueryArgsPos);
-						
+
 						// Case sensitive varient, to consider support with #cs ?
 						// Or perhaps a meta table configuration?
 						//
@@ -870,10 +888,10 @@ public class JSql_DataTableUtils {
 						// 	toReplace,
 						// 	queryArgMap
 						// );
-						
+
 						// Replaces old query with new query
 						queryObj = queryObj.replaceQuery(toReplace, replacement);
-						
+
 						// Increment the argument count
 						++newQueryArgsPos;
 					}
@@ -882,38 +900,38 @@ public class JSql_DataTableUtils {
 				}
 			}
 		}
-		
+
 		//----------------------------------------------------------------------
 		// Order by clause handling
 		//----------------------------------------------------------------------
-		
+
 		// Order by object handling, of oid keys
 		// Replaces reserved "_oid" key with actual key
 		if (orderByStr != null) {
 			orderByStr.replaceAll("_oid", "oID");
 			orderByObj = getOrderByObject(orderByStr);
 		}
-		
+
 		// Order by handling for metatype map
 		if (orderByObj != null) {
 			// Iterate each order by key name, and normalize them
 			Set<String> orderByKeys = orderByObj.getKeyNames();
 			for (String keyName : orderByKeys) {
-				
+
 				// Ignores oID keynames
 				if (keyName.equalsIgnoreCase("oID")) {
 					continue;
 				}
-				
+
 				// Check if keyname is found within metamap
 				// adds it if it wasnt previously added, assumes a string
 				if (!queryTypeMap.containsKey(keyName)) {
 					queryTypeMap.put(keyName, MetaType.STRING);
 				}
-				
+
 				// Get the query type
 				MetaType type = queryTypeMap.get(keyName);
-				
+
 				// Force lowercase string sorting for string orderby
 				//
 				// Case sensitive varient, to consider support with #cs ?
@@ -923,17 +941,17 @@ public class JSql_DataTableUtils {
 				}
 			}
 		}
-		
+
 		//----------------------------------------------------------------------
 		// Finally putting all the query pieces together
 		//----------------------------------------------------------------------
-		
+
 		// Building the Inner join query, via a complex query view
 		// to actually query thee data against. This somewhat represents the actual table,
 		// you would have quried against in traditional fixed SQL view
 		StringBuilder innerJoinQuery = complexQueryView(sql, tablename, queryTypeMap,
 			complexQueryArgs);
-		
+
 		// Building the complex inner join query
 		//
 		// Filters out DISTINCT support as it will probably be there only for OID
@@ -942,26 +960,26 @@ public class JSql_DataTableUtils {
 		queryBuilder.append("SELECT " + selectedCols.replaceAll("DISTINCT", "") + " FROM (");
 		queryBuilder.append(innerJoinQuery);
 		queryBuilder.append(") AS R");
-		
+
 		// WHERE query is built from queryObj, this acts as a form of sql sanitization
 		if (queryObj != null) {
 			queryBuilder.append(" WHERE ");
 			queryBuilder.append(queryObj.toSqlString());
 			complexQueryArgs.addAll(queryObj.queryArgumentsList());
 		}
-		
+
 		// Order by string mapping
 		if (orderByObj != null) {
 			queryBuilder.append(" ORDER BY ");
 			queryBuilder.append(orderByObj.toString());
 		}
-		
+
 		//logger.log( Level.WARNING, queryBuilder.toString() );
 		//logger.log( Level.WARNING, Arrays.asList(queryArgs).toString() );
-		
+
 		// Finalize query args
 		queryArgs = complexQueryArgs.toArray(new Object[0]);
-		
+
 		// Limit and offset clause handling
 		if (limit > 0) {
 			queryBuilder.append(" LIMIT " + limit);
@@ -969,19 +987,19 @@ public class JSql_DataTableUtils {
 				queryBuilder.append(" OFFSET " + offset);
 			}
 		}
-		
+
 		// // In case you want to debug the query =(
 		// System.out.println(">>> "+queryBuilder.toString());
 		// System.out.println(">>> "+ConvertJSON.fromList(complexQueryArgs));
-		
+
 		// // Dump and debug the table
 		// System.out.println(">>> TABLE DUMP");
 		// System.out.println( ConvertJSON.fromMap( sql.select(tablename).readRow(0) ) );
-		
+
 		// Execute and get the result
 		return sql.query(queryBuilder.toString(), queryArgs);
 	}
-	
+
 	/**
 	 * Performs a search query, and returns the respective DataObjects GUID keys
 	 *
@@ -1017,7 +1035,7 @@ public class JSql_DataTableUtils {
 		// Blank list as fallback
 		return new String[0];
 	}
-	
+
 	/**
 	 * Performs a search query, and returns the respective DataObjects
 	 *
@@ -1045,7 +1063,7 @@ public class JSql_DataTableUtils {
 			DataTableQueryKey(DataTableObj, sql, tablename, whereClause, whereValues, orderByStr,
 				offset, limit), true);
 	}
-	
+
 	/**
 	 * Performs a search query, and returns the respective DataObjects
 	 *
@@ -1071,7 +1089,7 @@ public class JSql_DataTableUtils {
 	) { //
 		JSqlResult r = runComplexQuery(DataTableObj, sql, tablename,
 			"COUNT(DISTINCT \"oID\") AS rcount", whereClause, whereValues, orderByStr, offset, limit);
-		
+
 		Object[] rcountArr = r.get("rcount");
 		// Generate the object list
 		if (rcountArr != null && rcountArr.length > 0) {
@@ -1080,5 +1098,5 @@ public class JSql_DataTableUtils {
 		// Blank as fallback
 		return 0;
 	}
-	
+
 }

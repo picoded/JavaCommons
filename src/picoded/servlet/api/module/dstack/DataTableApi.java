@@ -361,7 +361,6 @@ public class DataTableApi extends CommonApiModule {
 		// The query to use
 		String query = req.getString(QUERY, "").trim();
 		Object[] queryArgs = req.getObjectArray(QUERY_ARGS, EmptyArray.STRING);
-
 		// Query format safety check
 		if( !query.isEmpty() ) {
 			try {
@@ -628,7 +627,7 @@ public class DataTableApi extends CommonApiModule {
 		// Get search[value]
 		String searchValue = req.getString("search[value]");
 		if( searchValue != null && !searchValue.isEmpty() ) {
-			req.put("searchValue", searchValue);
+			req.put(SEARCH_STRING, searchValue);
 		}
 
 		// DataTables : Order by string integration

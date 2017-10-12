@@ -124,7 +124,7 @@ Additionally for components under master-ReleaseCandidate / master, the followin
 To run a test case inside the picodedTests. name space, use the following, *without the _test*
 + `./runTest.sh {test namespace}` 
 
-So for example, to run the test case `picoded.conv.Base62_test`. Run the following.
+So for example, to run the test case `picoded.core.conv.Base62_test`. Run the following.
 + `./runTest.sh conv.Base62` 
 
 Additionally for those who want to loop the test on file changes (Mac / linux only)

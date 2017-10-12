@@ -8,7 +8,7 @@ import java.io.File;
 import picoded.dstack.*;
 import picoded.servlet.util.EmbeddedServlet;
 import picoded.TestConfig;
-import picoded.file.FileUtil;
+import picoded.util.file.FileUtil;
 
 public class DStackConfigLoader_test {
 	

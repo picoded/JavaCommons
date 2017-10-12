@@ -33,7 +33,7 @@ import org.apache.catalina.LifecycleListener;
 
 import picoded.core.conv.GUID;
 import picoded.core.conv.GenericConvert;
-import picoded.file.FileUtil;
+import picoded.util.file.FileUtil;
 
 /**
  * EmbeddedServlet class, provides a means of self executing any of the JavaCommons packages

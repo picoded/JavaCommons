@@ -1,4 +1,4 @@
-package picoded.file;
+package picoded.util.file;
 
 // Test Case include
 import static org.junit.Assert.assertEquals;
@@ -21,7 +21,7 @@ import org.junit.Test;
 import picoded.core.conv.GUID;
 
 ///
-/// Test Case for picoded.FileUtil.ConfigFileSet
+/// Test Case for picoded.util.fileUtil.ConfigFileSet
 ///
 public class FileUtil_test {
 	

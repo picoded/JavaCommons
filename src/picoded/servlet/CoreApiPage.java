@@ -20,7 +20,7 @@ import java.io.PrintWriter;
 
 // javacommons stuff
 import picoded.servlet.api.*;
-import picoded.file.ConfigFileSet;
+import picoded.util.file.ConfigFileSet;
 
 /**
  * Extends the core API page, to support API's

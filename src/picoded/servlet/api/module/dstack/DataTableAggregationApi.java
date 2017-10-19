@@ -200,6 +200,8 @@ public class DataTableAggregationApi extends DataTableApi {
 		res.put(TOTAL_COUNT, dataCount);
 		res.put(RESULT, formatDataObjectList(dataObjs, fieldList, rowMode));
 
+		res.put("req_data", req.getStringArray("req_data", ""));		
+
 		// End and return result
 		return res;
 	};

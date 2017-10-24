@@ -74,7 +74,6 @@ public class JSql_Mssql extends JSql_Base {
 
 	// Internal parser that converts some of the common sql statements to mssql
 	public String genericSqlParser(String inString) {
-
 		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("`", "\"").replaceAll("'", "\"")
 			.replaceAll("\\s+", " ").replaceAll(" =", "=").replaceAll("= ", "=").trim();
 
@@ -159,7 +158,7 @@ public class JSql_Mssql extends JSql_Base {
 					qStringPrefix = "CREATE TABLE ";
 				}
 				qString = _fixTableNameInMssqlSubQuery(fixedQuotes.substring(prefixOffset));
-				//qString = _simpleMysqlToOracle_collumnSubstitude(qString);
+				qString = _simpleMysqlToMssql_collumnSubstitude(qString);
 			} else {
 				// logger.finer("Trying to matched INDEX : " + upperCaseStr.substring(prefixOffset));
 				if (createIndexType.matcher(upperCaseStr.substring(prefixOffset)).matches()) { //UNIQUE|FULLTEXT|SPATIAL|_ INDEX
@@ -341,6 +340,12 @@ public class JSql_Mssql extends JSql_Base {
 		return qString;
 	}
 
+	/// Collumn type correction from mysql to ms sql
+	private static String _simpleMysqlToMssql_collumnSubstitude(String qString) {
+		return qString
+			.replaceAll("(?i)BLOB", "varchar(MAX)");
+	}
+
 	/// Executes the argumented query, and returns the result object *without*
 	/// fetching the result data from the database. (not fetching may not apply to all implementations)
 	///
@@ -495,7 +500,7 @@ public class JSql_Mssql extends JSql_Base {
 				updateColumnNames.append("?");
 				updateColumnNames.append(columnSeperator);
 
-				updateQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				 updateQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
 
 				// select dual
 				selectColumnNames.append("?");
@@ -503,7 +508,7 @@ public class JSql_Mssql extends JSql_Base {
 				selectColumnNames.append(insertColumns[a]);
 				selectColumnNames.append(columnSeperator);
 
-				selectQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+					selectQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]: null);
 
 				// insert column
 				insertColumnNames.append(insertColumns[a]);
@@ -512,7 +517,7 @@ public class JSql_Mssql extends JSql_Base {
 				insertColumnValues.append("?");
 				insertColumnValues.append(columnSeperator);
 
-				insertQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+					insertQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
 			}
 		}
 

@@ -114,7 +114,7 @@ public class JSql_DataTable extends Core_DataTable {
 	/**
 	 * Raw datastorage type
 	 **/
-	protected String rawDataColumnType = "VARCHAR(MAX)";
+	protected String rawDataColumnType = "BLOB";
 
 	//--------------------------------------------------------------------------
 	//
